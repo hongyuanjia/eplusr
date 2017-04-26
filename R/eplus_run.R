@@ -348,6 +348,11 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        csv = TRUE, print_proc = FALSE,
                        run = "exe", ver = NULL) {
 
+    # Backup the original working directory.
+    ori_wd <- getwd()
+    # Set the working directory as the same folder of input file.
+    setwd(dirname(input))
+
     # If EnergyPlus version has been specified.
     if (!is.null(ver)) {
         # Case 1. But 'eplus_dir' is not given
@@ -481,6 +486,9 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
     } else {
         stop("Argument 'run' should be one of c('exe', 'bat').", call. = FALSE)
     }
+
+    # Set the woring directory back.
+    setwd(ori_wd)
 
 }
 # }}}1
