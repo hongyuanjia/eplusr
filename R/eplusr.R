@@ -1,36 +1,4 @@
 ################################################################################
-#                                Load Packages                                 #
-################################################################################
-
-# # Load packages {{{1
-# if (!require(installr)) {
-#     install.packages("installr")
-# }
-# library(installr)
-# library(tools)
-# require2(sys)
-# require2(purrr)
-# require2(data.table)
-# require2(lubridate)
-# require2(xts)
-# require2(readr)
-# require2(stringr)
-# require2(padr)
-# require2(dplyr)
-# require2(tidyr)
-# require2(stringi)
-# # library(tidyverse)
-# # library(stringr)
-# # library(scales)
-# # library(ggsci)
-# # library(forcats)
-# # library(extrafont)
-# # library(fasttime)
-# # library(viridis)
-# # library(cowplot)
-# # }}}1
-
-################################################################################
 #                             Deprecated functions                             #
 ################################################################################
 
