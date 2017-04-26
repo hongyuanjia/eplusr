@@ -380,6 +380,14 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
 
     # If output directory is given,
     if (!is.null(output_dir)) {
+        output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
+        if (!dir.exists(output_dir)) {
+            output_dir_flag <- dir.create(output_dir, showWarnings = TRUE)
+            if(!output_dir_flag) {
+                stop("Could not find or create the specified output direcotry.")
+            }
+        }
+
         # (a) and also is output prefix.
         if (!is.null(output_prefix)) {
             new_name_idf <- file.path(output_dir, paste0(output_prefix, ".", eplus_in_ext))
