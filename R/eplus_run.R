@@ -483,6 +483,14 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        epmacro = TRUE, expand_obj = TRUE, readvars = readvars,
                        annual = FALSE, design_day = FALSE, idd = NULL,
                        legacy = FALSE, print_proc = print_proc)
+
+        # Delete "fort.6" and "Energy+.ini" created by "EnergyPlus.exe" after
+        # simulations.
+        fort <- file.path(dirname(input), "fort.6")
+        Energy_plus_ini <- file.path(dirname(input), "Energy+.ini")
+        unlink(fort)
+        unlink(Energy_plus_ini)
+
     } else {
         stop("Argument 'run' should be one of c('exe', 'bat').", call. = FALSE)
     }
