@@ -150,7 +150,7 @@ eplus_meter_read <- function (meter, year = current_year(), eplus_date_col = "Da
     }
 
     if (long) {
-        meter <- meter %>% long_table()
+        meter <- long_table(meter)
     }
 
     return(meter)
@@ -198,7 +198,7 @@ eplus_result_read <- function (result, year = current_year(), eplus_date_col = "
                          new_date_col = new_date_col, tz = tz, keep_ori = FALSE)
 
     if (long) {
-        result <- result %>% long_table()
+        result <- long_table(result)
    }
 
     return(result)
@@ -232,7 +232,7 @@ eplus_epg_sim_read <- function(epg, results = "meter", case_ref = "idf"){
     } else if (case_ref == "idf") {
         case_col <- "idf"
     } else if (case_ref == "weather") {
-        case_col <- "idf"
+        case_col <- "weather"
     } else {
         case_col <- "result_suffix"
     }
@@ -279,58 +279,51 @@ eplus_tbl_info_read <- function(table){
     # }}}2
     # Get report names {{{2
     report_category <-
-        raw_table %>% grep(x=., pattern = "report:", ignore.case = T, value = T) %>%
-        gsub(x=., pattern = ".*,", "")
+        grep(x = raw_table, pattern = "report:", ignore.case = TRUE, value = TRUE)
+    report_category <-
+        gsub(x = report_category, pattern = ".*,", replacement = "")
 
     report_for <-
-        raw_table %>% grep(x=., pattern = "report:", ignore.case = T, perl = T) %>%
-        `+`(., +1) %>% raw_table[.] %>% gsub(x=., pattern = ".*,", "")
+        grep(x = raw_table, pattern = "report:", ignore.case = TRUE)
+    report_for <-
+        gsub(x = raw_table[`+`(report_for, +1)], pattern = ".*,", replacement = "")
 
-    report_name <-
-        data.table::data.table(report_category, report_for) %>%
-        .[, (report_name = paste(report_category, report_for, sep = ":"))]
+    report_name <- paste(report_category, report_for, sep = ":")
     ## }}}2
     # Get report range {{{2
     report_rowstart <-
-        raw_table %>% grep(x=., pattern = "report:", ignore.case = T, perl = T)
+         grep(x = raw_table, pattern = "report:", ignore.case = TRUE)
 
     report_length <-
-        raw_table %>% grep(x=., pattern = "report:", ignore.case = T, perl = T) %>%
-        c(., length(raw_table)) %>% diff()
+        diff(c(report_rowstart, length(raw_table)))
     # }}}2
     # table info extraction {{{2
     # Get raw table contents
-    table_rows <-
-        raw_table %>% grep(x=., pattern = "^,", value = F)
+    table_rows <- grep(x = raw_table, pattern = "^,")
     # Get table range
-    table_startrow <-
-        table_rows[c(min(table_rows), diff(table_rows)) > 1]
-    table_endrow <-
-        table_rows[c(diff(table_rows), max(table_rows)) > 1]
-    ## all table names
-    table_name <- `-`(table_startrow,2) %>% raw_table[.]
-    ## table range
+    table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
+    table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
+    # all table names
+    table_name <-  raw_table[`-`(table_startrow, 2)]
+    # table range
     table_range <- data.table::data.table(table_name, table_startrow, table_endrow)
 
     table_info <-
         dplyr::tibble(report_name = report_name,
                       table_name = purrr::map2(report_rowstart, report_length,
-                                               function(x,y){
+                                               function(x, y){
                                                    report_range <- seq(from = x, length.out = y, by = 1)
                                                    report <- raw_table[report_range]
-                                                   table_rows <-
-                                                       report %>% grep(x=., pattern = "^,", value = F)
-                                                   table_startrow <-
-                                                       table_rows[c(min(table_rows), diff(table_rows)) > 1]
-                                                   table_endrow <-
-                                                       table_rows[c(diff(table_rows), max(table_rows)) > 1]
-                                                   table_name_per_report <- `-`(table_startrow,2) %>% report[.]
+                                                   table_rows <- grep(x = report, pattern = "^,", value = FALSE)
+                                                   table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
+                                                   table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
+                                                   table_name_per_report <- report[`-`(table_startrow, 2)]
                                                    data.table::data.table(table_name_per_report, table_startrow, table_endrow)
-                                               })) %>%
-    tidyr::unnest() %>% data.table::as.data.table()
+                                               }))
+    table_info <- data.table::as.data.table(tidyr::unnest(table_info))
 
     # Delete table that has no contents to avoid errors when extract table contents
-    table_info[table_startrow!=table_endrow]
+    table_info[table_startrow != table_endrow]
     # }}}2
   return(table_info)
 }
@@ -340,60 +333,46 @@ eplus_tbl_info_read <- function(table){
 # {{{1
 eplus_table_read <- function(table){
     # Read raw table results {{{2
-    raw_table <-
-        readr::read_lines(table)[-(1:6)] # exclude first 6 lines that are of no use.
+    raw_table <- readr::read_lines(table)[-(1:6)] # exclude first 6 lines that are of no use.
     # }}}2
     # Extract tables names and ranges per report {{{2
     table_info <- eplus_tbl_info_read(table)
     # }}}2
     # Extract tables names and ranges without report info {{{2
-    table_rows <-
-      raw_table %>% grep(x=., pattern = "^,", value = F)
+    table_rows <- grep(x = raw_table, pattern = "^,", value = FALSE)
 
-    table_startrow <-
-      table_rows[c(min(table_rows), diff(table_rows)) > 1]
+    table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
+    table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
+    table_name <- raw_table[`-`(table_startrow, 2)]
+    table_range <- data.table::data.table(table_name, table_startrow, table_endrow)
 
-    table_endrow <-
-      table_rows[c(diff(table_rows), max(table_rows)) > 1]
-
-    table_name <- `-`(table_startrow,2) %>% raw_table[.]
-
-    table_start <-
-      data.table::data.table(table_name, table_startrow, table_endrow) %>%
-      .[table_startrow != table_endrow] %>% .[, table_startrow]
-
-    table_end <-
-      data.table::data.table(table_name, table_startrow, table_endrow) %>%
-      .[table_startrow != table_endrow] %>% .[, table_endrow]
-
-    table_name <-
-      data.table::data.table(table_name, table_startrow, table_endrow) %>%
-      .[table_startrow != table_endrow] %>% .[, table_name]
+    table_start <- table_range[table_startrow != table_endrow, table_startrow]
+    table_end <- table_range[table_startrow != table_endrow, table_endrow]
+    table_name <- table_range[table_startrow != table_endrow, table_name]
     # }}}2
-  # Extract table contents with table names {{{2
-  tables <- purrr::map2(table_start, table_end,
-                        function(x,y){
-                            raw_table[x:y] %>%
-                                paste0(., collapse = "\n") %>% readr::read_csv() %>%
-                                data.table::as.data.table() %>% .[, X1:=NULL] %>%
-                                data.table::setnames("X2", "Components") %>% .[] }) %>%
-            purrr::set_names(table_name)
-
+    # Extract table contents with table names {{{2
+    tables <- purrr::map2(table_start, table_end,
+                          function(x, y){
+                              str <- paste0(raw_table[x:y], collapse = "\n")
+                              table <- data.table::as.data.table(readr::read_csv(str))
+                              table <- table[, X1 := NULL]
+                              table <- data.table::setnames(table, "X2", "Components")})
+    tables <- purrr::set_names(tables, table_name)
   # }}}2
     # Group tables by report {{{2
-    unique_rptname <-
-        table_info %>% .[, report_name] %>% unique()
+    unique_rptname <- unique(table_info$report_name)
     group_list <-
-        purrr::map(unique_rptname, function(rptname){
-                   grep(x=table_info$report_name, rptname, fixed = T)})
-    group_start <- group_list %>% purrr::map_int(.,min)
-    group_end <- group_list %>% purrr::map_int(.,max)
-
-    table <-
-        purrr::map2(group_start,group_end,
-                    function(x,y){
-                        list(tables[x:y])
+        purrr::map(unique_rptname,
+                   function(rptname){
+                       grep(x=table_info$report_name, rptname, fixed = TRUE)
                    })
+    group_start <- purrr::map_int(group_list, min)
+    group_end <- purrr::map_int(group_list, max)
+
+    table <- purrr::map2(group_start,group_end,
+                         function(x,y){
+                             list(tables[x:y])
+                         })
 
     names(table) <- unique_rptname
     # }}}2
