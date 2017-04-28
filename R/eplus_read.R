@@ -45,6 +45,158 @@ eplus_epg_read <- function(epg){
 }
 # }}}1
 
+# eplus_read: A function to read EnergyPlus simulation results.
+# {{{1
+eplus_read <- function (path, output = "variable",
+                        year = current_year(), eplus_date_col = "Date/Time",
+                        new_date_col = "datetime", tz = Sys.timezone(),
+                        rp_na = NA, to_GJ = FALSE, long = FALSE) {
+    # Get the output name pattern.
+    file_names <- get_eplus_main_output_files(path)
+
+    if (is.na(match(output, c("variable", "meter", "table", "surface report")))) {
+        stop("Invalid value of argument 'output'. It should be one of ",
+             "c('variable', 'meter', 'table', 'surface report').", call. = FALSE)
+    } else if (output == "variable"){
+        file_name <- file_names[["variable"]]
+    } else if (output == "meter"){
+        file_name <- file_names[["meter"]]
+    } else if (output == "surface report"){
+        file_name <- file_names[["surface_report"]]
+    } else {
+        file_name <- file_names[["table"]]
+    }
+
+    check_eplus_output_file_exist(path, file_names, output)
+
+    if (output == "variable") {
+      data <-
+          dplyr::tibble(case = file_names[["prefix"]],
+                        variable_output = purrr::map(file.path(path, file_name),
+                                                     function (file) {
+                                                         if (file.exists(file)) {
+                                                             eplus_result_read(result = file,
+                                                                               year = year,
+                                                                               eplus_date_col = eplus_date_col,
+                                                                               new_date_col = new_date_col,
+                                                                               tz = tz,
+                                                                               rp_na = rp_na,
+                                                                               long = long)
+                                                         } else {
+                                                             return(NULL)
+                                                         }
+                                                     })) %>% data.table::as.data.table() #%>% tidyr::unnest()
+
+    } else if (output == "meter"){
+      data <-
+          dplyr::tibble(case = file_names[["prefix"]],
+                        meter_output = purrr::map(file.path(path, file_name),
+                                                  function (file) {
+                                                      if (file.exists(file)) {
+                                                          eplus_result_read(result = file,
+                                                                            year = year,
+                                                                            eplus_date_col = eplus_date_col,
+                                                                            new_date_col = new_date_col,
+                                                                            tz = tz,
+                                                                            to_GJ = to_GJ,
+                                                                            rp_na = rp_na,
+                                                                            long = long)
+                                                      } else {
+                                                          return(NULL)
+                                                      }
+                                                  }
+                                                  )) %>% data.table::as.data.table() #%>% tidyr::unnest()
+
+    } else if (output == "surface report") {
+      data <-
+          dplyr::tibble(case = file_names[["prefix"]],
+                        surface_report = purrr::map(file.path(path, file_name),
+                                                    function (file) {
+                                                        if (file.exists(file)) {
+                                                            eplus_surf_rpt_read(eio = file)
+                                                        } else {
+                                                            return(NULL)
+                                                        }
+                                                    }
+                                                    )) %>% data.table::as.data.table() #%>% tidyr::unnest()
+    } else  {
+      data <-
+          dplyr::tibble(case = file_names[["prefix"]],
+                        table_output = purrr::map(file.path(path, file_name),
+                                                  function (file) {
+                                                      if (file.exists(file)) {
+                                                          eplus_table_read(table = file)
+                                                      } else {
+                                                          return(NULL)
+                                                      }
+                                                  }
+                                                  )) %>% data.table::as.data.table() #%>% tidyr::unnest()
+    }
+
+    return(data)
+}
+# }}}1
+
+# get_eplus_main_output_names
+# {{{1
+get_eplus_main_output_names <- function (output_prefix, output_pattern) {
+    if (all(output_prefix == "in", output_pattern == "legacy")) {
+        variable <- "eplusout.csv"
+        meter <- "eplusmtr.csv"
+        surf_rpt <- "eplusout.eio"
+        table <- "eplustbl.csv"
+    } else if (all(output_prefix != "in", output_pattern == "capital")) {
+        variable <- paste0(output_prefix,  ".csv")
+        meter <- paste0(output_prefix, "Meter.csv")
+        surf_rpt <- paste0(output_prefix, ".eio")
+        table <- paste0(output_prefix, "Table.csv")
+    } else {
+        stop("Could not detect the result names.")
+    }
+
+    main_names <- data.table(prefix = output_prefix,
+                             pattern = output_pattern,
+                             variable = variable, meter = meter,
+                             surface_report = surf_rpt,
+                             table = table)
+
+    return(main_names)
+}
+# }}}1
+
+# get_eplus_main_output_files
+# {{{1
+get_eplus_main_output_files <- function (path) {
+    output_prefix <- get_eplus_output_prefix_str(path = path)
+    output_pattern <- get_eplus_output_prefix_ptn(output_prefix = output_prefix)
+    file_names <- purrr::map2(output_prefix, output_pattern,
+                              get_eplus_main_output_names)
+    file_names <- data.table::rbindlist(file_names)
+
+    return(file_names)
+}
+# }}}1
+
+# check_eplus_output_file_exist
+# {{{1
+check_eplus_output_file_exist <- function (path, file_names, type) {
+    input <- file_names[["prefix"]]
+    files <- file.path(path, file_names[[type]])
+    purrr::map(seq_along(files),
+                   function(i) {
+                       if (!file.exists(files[i])) {
+                           message("EnergyPlus '", type ,"' file '",
+                                   basename(files[i]),
+                                   "' does not exist for input file '", input[i],
+                                   "', and will be ignored during reading process.")
+                           return(files[i])
+                       } else {
+                           return(NULL)
+                       }
+                   }) %>% unlist
+}
+# }}}1
+
 # eplus_surf_rpt_read: A function to read EnergyPlus Surface Details Report in eio file.
 # {{{1
 eplus_surf_rpt_read <- function(eio){
