@@ -429,31 +429,18 @@ eplus_time_trans <- function(data, year = current_year(),
     }
 
     # Build a date column with standard "%Y-%m-%d %H:%M:%S" ISO format.
-    eplus_date_col <- data[[eplus_date_col]]
-    eplus_date_col <- gsub(x = eplus_date_col, "^", paste0(year, "-"))
-    eplus_date_col <- gsub(x = eplus_date_col, "/", "-")
-    eplus_date_col <- gsub(x = eplus_date_col, "  ", " ")
-    data[[new_date_col]] <- lubridate::ymd_hms(eplus_date_col, tz = tz)
-
-    data <- data.table::setcolorder(data,
-                                    c(new_date_col,
-                                      col_names(data, new_date_col, invert = T)))
-
-    # # Build a date column with standard "%Y-%m-%d %H:%M:%S" ISO format.
-    # data <-
-    #     data[, c(new_date_col) := gsub(x = data[[eplus_date_col]],
-    #                                        "^", paste0(year, "-"))] %>%
-    #     .[, c(new_date_col) := gsub(x = .[[new_date_col]], "/", "-")] %>%
-    #     .[, c(new_date_col) := gsub(x = .[[new_date_col]], "  ", " ")] %>%
-    #     .[, c(new_date_col) := lubridate::ymd_hms(.[[new_date_col]], tz = tz)] %>%
-    #     data.table::setcolorder(c(new_date_col,
-    #                               col_names(., new_date_col, invert = T))) %>% .[]
+    data <-
+        data[, c(new_date_col) := gsub(x = data[[eplus_date_col]],
+                                           "^", paste0(year, "-"))] %>%
+        .[, c(new_date_col) := gsub(x = .[[new_date_col]], "/", "-")] %>%
+        .[, c(new_date_col) := gsub(x = .[[new_date_col]], "  ", " ")] %>%
+        .[, c(new_date_col) := lubridate::ymd_hms(.[[new_date_col]], tz = tz)] %>%
+        data.table::setcolorder(c(new_date_col,
+                                  col_names(., new_date_col, invert = T))) %>% .[]
 
     # Delete the original
     if (!keep_ori) {
-        data[[2]] <- NULL
-        # data[[c(eplus_date_col)]] <- NULL
-        # data <- data[, c(eplus_date_col) := NULL]
+        data <- data[, c(eplus_date_col) := NULL][]
     }
 
     return(data)
@@ -784,18 +771,16 @@ long_table <- function(data) {
 
     date_col <- get_date_col(data)
 
-    data <- data %>%
-        melt(id.vars = date_col,
-             variable.name = "component", value.name = "value",
-             variable.factor = FALSE) %>%
-        .[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")] %>%
-        .[, lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")),
-          .SDcol = c("type", "unit", "timestep"),
-          by = c(date_col, "component", "value")] %>%
-        .[, lapply(.SD, trimws),
-          .SDcol = c("type", "unit", "timestep"),
-          by = c(date_col, "component", "value")] %>%
-        data.table::setcolorder(c(date_col, "component", "type", "value", "unit", "timestep")) %>% .[]
+    data <- melt(data, id.vars = date_col,
+                 variable.name = "component", value.name = "value",
+                 variable.factor = FALSE)
+    data <- data[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")][,
+                 lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+                 lapply(.SD, function(x) gsub(x=x, "^\\s+", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+                 lapply(.SD, function(x) gsub(x=x, "\\s+$", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+                 # lapply(.SD, str_trim), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+
+    data <- data.table::setcolorder(data, c(date_col, "component", "type", "value", "unit", "timestep"))
 
     return(data)
 }
