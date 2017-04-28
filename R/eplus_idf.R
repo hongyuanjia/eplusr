@@ -1,5 +1,3 @@
-# idf_path <- "C:/Dropbox/papers/validation_radiant_model/model/flexlab_x3_param.imf"
-
 # read_idf
 # {{{1
 read_idf <- function (idf_path) {
@@ -84,23 +82,9 @@ regex_field <- "(.*\\s*)[,;]\\s*!\\s*-\\s*(.*)$"
 # {{{1
 get_idf_field_value <- function (idf_object) {
     object_contents <- flatten_chr(idf_object)
-    field_value <- object_contents %>% replace_field(regex_field, "\\1")
-    field_name_unit <- object_contents %>% replace_field(regex_field, "\\2")
-    field_name <- field_name_unit %>% replace_field("(.*)\\s\\{(.*)\\}", "\\1")
-    field_unit <-
-        field_name_unit %>% str_extract_all("\\{(.*)\\}$")
+    field_value <- replace_field(object_contents, regex_field, "\\1")
+    field_name_unit <- replace_field(object_contents, regex_field, "\\2")
+    field_name <- replace_field(field_name_unit, "(.*)\\s\\{(.*)\\}", "\\1")
+    field_unit <- str_extract_all(field_name_unit, "\\{(.*)\\}$")
 }
 # }}}1
-
-
-# Test idf functions
-# # {{{1
-# idf <- read_idf(idf_path)
-# idf %>% get_idf_object_name()
-# idf %>% get_idf_object_range()
-# idf %>% get_idf_object()
-
-# idf_objects <- idf %>% get_idf_object()
-# idf_object <- idf_objects[600]
-
-# # }}}1
