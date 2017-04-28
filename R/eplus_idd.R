@@ -20,7 +20,7 @@ parse_idd <- function (idd_path) {
     idd_attrs <- attributes(idd)
 
     # For groups
-    idd_groups <- idd %>% get_idd_group %>% add_attrs(idd_attrs)
+    idd_groups <- add_attrs(get_idd_group(idd), idd_attrs)
 
     # For fields
     idd_parsed <-
@@ -233,7 +233,7 @@ get_idd_object_memo_attr <- function (object_attrs) {
     regex <- "^\\\\memo "
     result <- find_field(object_attrs, regex)
     if (length(result) != 0) {
-        result <- replace_field(result, regex, "") %>% paste(collapse = " ")
+        result <- paste(replace_field(result, regex, ""), collapse = " ")
         return(result)
     } else {
         return(NULL)
@@ -273,8 +273,7 @@ get_idd_object_min_fields_attr <- function (object_attrs) {
     regex <- "^\\\\min-fields"
     result <- find_field(object_attrs, regex)
     if (length(result) != 0) {
-        result <- replace_field(result, regex, "") %>% paste(collapse = " ") %>%
-            as.numeric()
+        result <- as.numeric(paste(replace_field(result, regex, ""), collapse = " "))
         return(result)
     } else {
         return(0)
@@ -438,11 +437,10 @@ get_idd_field_range <- function(idd_object){
     field_ranges <-
         purrr::map(seq_along(field_name),
             function (i) {
-                A_N_occurances <- stringr::str_extract_all(field_name[i], "[AN]") %>%
-                                  flatten_chr %>% length
+                A_N_occurances <- length(flatten_chr(stringr::str_extract_all(field_name[i], "[AN]")))
                 # If a line with multiple fields
                 if (A_N_occurances > 1) {
-                    field_name <- stringr::str_split(field_name[i], "[,;]") %>% purrr::flatten_chr
+                    field_name <- purrr::flatten_chr(stringr::str_split(field_name[i], "[,;]"))
                     point_field_start = rep(point_field_start[i], length(field_name))
                     point_field_end = rep(point_field_end[i], length(field_name))
                 } else {
@@ -520,7 +518,7 @@ get_idd_field_note_attr <- function (attrs) {
     regex <- "^\\\\note "
     result <- find_field(attrs, regex)
     if (length(result) != 0) {
-        result <- replace_field(result, regex, "") %>% paste(collapse = " ")
+        result <- paste(replace_field(result, regex, ""), collapse = " ")
         return(result)
     } else {
         return(NULL)
@@ -738,7 +736,7 @@ get_idd_field_key_attr <- function (attrs) {
     regex <- "^\\\\key "
     result <- find_field(attrs, regex)
     if (length(result) != 0) {
-        result <- replace_field(result, regex, "") %>% c()
+        result <- c(replace_field(result, regex, ""))
         return(result)
     } else {
         return(NULL)
