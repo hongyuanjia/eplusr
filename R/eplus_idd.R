@@ -63,9 +63,8 @@ check_list <- function (x) {
 
 add_attrs <- function (x, attrs) {
     names <- names(attrs)
-    expr <- purrr::map(seq_along(attrs),
-                       ~paste0("attr(x, '", names[.x], "') <- attrs[[", .x, "]]\n")) %>%
-            purrr::flatten_chr
+    expr <- purrr::flatten_chr(purrr::map(seq_along(attrs),
+                                          ~paste0("attr(x, '", names[.x], "') <- attrs[[", .x, "]]\n")))
 
     eval(parse(text = expr))
 
@@ -453,7 +452,7 @@ get_idd_field_range <- function(idd_object){
                                            field_start_row = point_field_start,
                                            field_end_row = point_field_end)
                 return(field_ranges)
-            }) %>% data.table::rbindlist
+            }) %>% data.table::rbindlist(l = .)
 
     return(field_ranges)
 }
@@ -808,7 +807,7 @@ get_idd_field <- function (idd_object) {
                          }) %>% purrr::set_names(field_ranges$field_name)
 
     attrs <- purrr::map(fields, "attrs") %>% purrr::map(get_idd_field_attrs)
-    idd_field <- purrr::map(fields, "contents") %>% purrr::flatten_chr %>% purrr::map2(., attrs, add_attrs)
+    idd_field <- purrr::map(fields, "contents") %>% purrr::flatten_chr() %>% purrr::map2(., attrs, add_attrs)
     return(idd_field)
 }
 # }}}2
