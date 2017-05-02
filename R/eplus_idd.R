@@ -91,7 +91,7 @@ get_idd_build <- function (idd) {
 
 read_idd <- function(idd) {
     idd <- readr::read_lines(idd)
-    idd <- iconv(idd, to = "UTF-8")
+    idd <- iconv(idd, from = "UTF-8", to = "UTF-8", sub = "")
 
     version <- get_idd_version(idd)
     build <- get_idd_build(idd)
