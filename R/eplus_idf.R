@@ -4,7 +4,16 @@
 
 # read_idf
 # {{{1
-read_idf <- function (idf_path) {
+read_idf <- function(idf_path) {
+    idf <- read_idf_raw(idf_path)
+    idf <- get_idf_object(idf)
+    return(idf)
+}
+# }}}1
+
+# read_idf_raw
+# {{{1
+read_idf_raw <- function (idf_path) {
     idf <- read_lines(idf_path) %>% iconv(to = "UTF-8")
     regex_blank_line <- "^\\s*$"
     regex_comment_line <- "^\\s*!.*$"
@@ -24,6 +33,7 @@ regex_object <- "^([A-Z][A-Za-z].*),$"
 # get_idf_object_name
 # {{{1
 get_idf_object_name <- function(idf) {
+    regex_object <- "^([A-Z][A-Za-z].*),$"
     object_names <- find_field(idf, regex_object)
     object_names <- replace_field(object_names, regex_object, "\\1")
     return(object_names)
@@ -33,6 +43,7 @@ get_idf_object_name <- function(idf) {
 # get_idf_object_range
 # {{{1
 get_idf_object_range <- function(idf){
+    regex_object <- "^([A-Z][A-Za-z].*),$"
     object_names <- get_idf_object_name(idf)
 
     # If the group only contains one object
@@ -57,7 +68,24 @@ get_idf_object_range <- function(idf){
 }
 # }}}1
 
-# get_idd_object
+# get_idf_object_fields
+# {{{1
+# get_idf_object_fields <- function (object, object_start, object_end) {
+get_idf_object_fields <- function (object) {
+    # object <- idf[object_start:object_end]
+    object_field <- str_split(object, pattern = "[,;]\\s*!\\s*-\\s*", simplify = TRUE)
+    value <- object_field[, 1]
+    field_unit <- object_field[, 2]
+    field <- str_replace_all(field_unit, pattern = "(.*)\\s\\{.+\\}", replacement = "\\1")
+    unit <- str_extract_all(field_unit, pattern = "\\{.+\\}")
+    unit <- str_replace_all(unit, pattern = "[\\{\\}]", replacement = "")
+    unit <- ifelse(unit == "character(0)", "NULL", unit)
+    object <- data.table(value = value, field = field, unit = unit)
+    return(object)
+}
+# }}}1
+
+# get_idf_object
 # {{{1
 get_idf_object <- function (idf) {
     object_ranges <- get_idf_object_range(idf)
@@ -66,29 +94,25 @@ get_idf_object <- function (idf) {
                     object_ranges$object_end_row,
                     function (object_start, object_end) {
                         object <- idf[object_start:object_end]
-                        # object_attrs <- get_idf_object_attr_str(object)
-                        # object_fields <- get_idf_object_field_str(object)
-                        # object <- list(contents = object_fields,
-                        #                attrs = object_attrs)
-                        return(object)
+                        object_fields <- get_idf_object_fields(object)
+                        return(object_fields)
                     }) %>% set_names(object_ranges$object_name)
-
-    # attrs <- map(objects, "attrs") %>% map(get_idf_object_attrs)
-    # idf_object <- map(objects, "contents") %>% map2(., attrs, add_attrs)
-    #
-    # return(idf_object)
     return(objects)
 }
 # }}}1
 
-regex_field <- "(.*\\s*)[,;]\\s*!\\s*-\\s*(.*)$"
-# get_idd_field_value
+# find_object
 # {{{1
-get_idf_field_value <- function (idf_object) {
-    object_contents <- flatten_chr(idf_object)
-    field_value <- replace_field(object_contents, regex_field, "\\1")
-    field_name_unit <- replace_field(object_contents, regex_field, "\\2")
-    field_name <- replace_field(field_name_unit, "(.*)\\s\\{(.*)\\}", "\\1")
-    field_unit <- str_extract_all(field_name_unit, "\\{(.*)\\}$")
+find_object <- function (idf, obj_ptn, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
+    ori_names <- names(idf)
+    names(idf) <- make.unique(names(idf), sep = "_")
+    objs <- grep(x = names(idf), pattern = obj_ptn, ignore_case, perl = perl, invert = invert)
+    if (length(objs) == 0) {
+        stop("Could not find any matched objects.", call. = FALSE)
+    } else {
+        results <- idf[c(objs)]
+    }
+    names(idf) <- ori_names
+    return(results)
 }
 # }}}1
