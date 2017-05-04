@@ -39,25 +39,25 @@ write_idf <- function (idf, path) {
           )
 
     obj_header_info <-
-        map(unique(names(idf)),
-            function (name) {
-                upper_name <- str_to_upper(name)
-                index <- grep(x = names(idf), pattern = paste0("^", name, "$")) %>% .[[1]]
-                data.table(name = upper_name, index = index)
-            }) %>% rbindlist(.)
+        purrr::map(unique(names(idf)),
+                   function (name) {
+                       upper_name <- str_to_upper(name)
+                       index <- grep(x = names(idf), pattern = paste0("^", name, "$")) %>% .[[1]]
+                       data.table::data.table(name = upper_name, index = index)
+                   }) %>% data.table::rbindlist(.)
 
-    idf_lines <- map(seq_along(idf),
-                     function (i) {
-                         lines <- create_idf_object_lines(idf[i])
-                         if (!is.na(match(i, obj_header_info[["index"]]))) {
-                             class <- obj_header_info[index == i, name]
-                             obj_header_str <- paste0( "!-   ===========  ALL OBJECTS IN CLASS: ", class, " ===========")
-                             lines <- c(obj_header_str, lines)
-                         }
-                         return(lines)
-          }) %>% flatten_chr()
+    idf_lines <- purrr::map(seq_along(idf),
+                            function (i) {
+                                lines <- create_idf_object_lines(idf[i])
+                                if (!is.na(match(i, obj_header_info[["index"]]))) {
+                                    class <- obj_header_info[index == i, name]
+                                    obj_header_str <- paste0( "!-   ===========  ALL OBJECTS IN CLASS: ", class, " ===========")
+                                    lines <- c(obj_header_str, lines)
+                                }
+                                return(lines)
+                            }) %>% purrr::flatten_chr()
     idf <- c(header, idf_lines)
-    write_lines(idf, path = path)
+    readr::write_lines(idf, path = path)
 }
 # }}}1
 
@@ -68,7 +68,7 @@ write_idf <- function (idf, path) {
 # read_idf_raw
 # {{{1
 read_idf_raw <- function (idf_path) {
-    idf <- read_lines(idf_path) %>% iconv(to = "UTF-8")
+    idf <- readr::read_lines(idf_path) %>% iconv(to = "UTF-8")
     regex_blank_line <- "^\\s*$"
     regex_comment_line <- "^\\s*!.*$"
 
@@ -77,7 +77,7 @@ read_idf_raw <- function (idf_path) {
     # Get rid of comment lines
     idf <- find_field(idf, regex_comment_line, invert = TRUE)
     # Get rid of leading and trailing spaces
-    idf <- str_trim(idf, side = "both")
+    idf <- stringr::str_trim(idf, side = "both")
 
     return(idf)
 }
@@ -165,24 +165,27 @@ create_idf_object_lines <- function (object) {
     unit <- object[["unit"]]
 
     lines <-
-        map_chr(seq(1:nrow(object)),
-                function (i) {
-                    sep <- if_else(i != nrow(object), ",", ";")
-                    value <- str_pad(paste0("    ", value[i], sep), 29, side = "right")
-                    field <- field[i]
-                    unit <- unit[i]
-                    if (is.na(unit)) {
-                        line <- paste0(value, "!- ", field)
-                    } else {
-                        line <- paste0(value, "!- ", field, "{", unit, "}")
-                    }
-                    # if (i == nrow(object)) {
-                    #     line <- paste0(line, "\n\n")
-                    # }
-                    return(line)
-                })
+        purrr::map_chr(seq(1:nrow(object)),
+                       function (i) {
+                           sep <- ifelse(i != nrow(object), ",", ";")
+                           value <- stringr::str_pad(paste0("    ", value[i], sep),
+                                                     29, side = "right")
+                           field <- field[i]
+                           unit <- unit[i]
+                           if (is.na(unit)) {
+                               line <- paste0(value, "!- ", field)
+                           } else {
+                               line <- paste0(value, "!- ", field, " {", unit, "}")
+                           }
+                           # if (i == nrow(object)) {
+                           #     line <- paste0(line, "\n\n")
+                           # }
+                           return(line)
+                       })
+
     header <- paste0(object_name, ",")
     object_lines <- c(header, lines)
+
     return(object_lines)
 }
 # }}}1
