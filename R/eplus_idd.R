@@ -235,7 +235,7 @@ get_idd_object_memo_attr <- function (object_attrs) {
         result <- paste(replace_field(result, regex, ""), collapse = " ")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -328,7 +328,7 @@ get_idd_object_format_attr <- function (object_attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -342,7 +342,7 @@ get_idd_object_reference_class_name_attr <- function (object_attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -506,7 +506,7 @@ get_idd_field_field_attr <- function (attrs) {
     if (length(result) != 0) {
         result <- replace_field(result, regex, "")
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -520,7 +520,7 @@ get_idd_field_note_attr <- function (attrs) {
         result <- paste(replace_field(result, regex, ""), collapse = " ")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -560,7 +560,7 @@ get_idd_field_units_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -574,7 +574,7 @@ get_idd_field_ip_units_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -588,7 +588,7 @@ get_idd_field_unitsBasedOnField_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -602,7 +602,7 @@ get_idd_field_minimum_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -616,7 +616,7 @@ get_idd_field_maximum_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -630,7 +630,7 @@ get_idd_field_minimum_larger_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -644,7 +644,7 @@ get_idd_field_maximum_smaller_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -658,7 +658,7 @@ get_idd_field_default_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -711,7 +711,7 @@ get_idd_field_type_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -738,7 +738,7 @@ get_idd_field_key_attr <- function (attrs) {
         result <- c(replace_field(result, regex, ""))
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -752,7 +752,7 @@ get_idd_field_object_list_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -766,7 +766,7 @@ get_idd_field_external_list_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
@@ -780,7 +780,7 @@ get_idd_field_reference_attr <- function (attrs) {
         result <- replace_field(result, regex, "")
         return(result)
     } else {
-        return(NULL)
+        return(NA_character_)
     }
 }
 # }}}2
