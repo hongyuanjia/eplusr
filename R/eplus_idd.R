@@ -22,6 +22,9 @@ parse_idd <- function (idd_path) {
     # For groups
     idd_groups <- add_attrs(get_idd_group(idd), idd_attrs)
 
+    # For showing progress bar.
+    p <- progress_estimated(n = length(idd_groups))
+
     # For fields
     idd_parsed <-
         purrr::map(seq_along(idd_groups),
@@ -34,6 +37,7 @@ parse_idd <- function (idd_path) {
                                                  fields <- get_idd_field(object)
                                                  return(fields)
                                              }) %>% purrr::set_names(names(idd_objects))
+                       p$tick()$print()
                        return(objects)
                    }) %>% purrr::set_names(names(idd_groups))
 
@@ -269,7 +273,7 @@ get_idd_object_required_object_attr <- function (object_attrs) {
 # get_idd_object_min_fields_attr
 # {{{2
 get_idd_object_min_fields_attr <- function (object_attrs) {
-    regex <- "^\\\\min-fields"
+    regex <- "^\\\\min-fields "
     result <- find_field(object_attrs, regex)
     if (length(result) != 0) {
         result <- as.numeric(paste(replace_field(result, regex, ""), collapse = " "))
