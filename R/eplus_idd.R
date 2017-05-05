@@ -20,7 +20,7 @@ parse_idd <- function (idd_path) {
     idd_attrs <- attributes(idd)
 
     # For groups
-    idd_groups <- add_attrs(get_idd_group(idd), idd_attrs)
+    idd_groups <- get_idd_group(idd)
 
     # For showing progress bar.
     p <- progress_estimated(n = length(idd_groups))
@@ -40,6 +40,9 @@ parse_idd <- function (idd_path) {
                        p$tick()$print()
                        return(objects)
                    }) %>% purrr::set_names(names(idd_groups))
+
+    # For idd attrs
+    idd_parsed <- add_attrs(idd_parsed, idd_attrs)
 
     return(idd_parsed)
 }
@@ -389,7 +392,9 @@ get_idd_object <- function (idd_group) {
                            }) %>% purrr::set_names(object_ranges$object_name)
 
     attrs <- purrr::map(objects, "attrs") %>% purrr::map(get_idd_object_attrs)
-    idd_object <- purrr::map(objects, "contents") %>% purrr::map2(., attrs, add_attrs)
+    idd_object <- purrr::map(objects, "contents") #%>% purrr::map2(., attrs, add_attrs)
+
+    idd_object <- list(attrs = attrs, idd_object = idd_object)
 
     return(idd_object)
 }
@@ -477,27 +482,27 @@ get_idd_field_attr_str <- function (idd_field) {
 # {{{2
 get_idd_field_attrs <- function (attrs) {
     attrs <-
-        list("field" = get_idd_field_field_attr(attrs),
-             "note" = get_idd_field_note_attr(attrs),
-             "required-field" = get_idd_field_required_field_attr(attrs),
-             "begin-extensible" = get_idd_field_begin_extensible_attr(attrs),
-             "units" = get_idd_field_units_attr(attrs),
-             "ip-units" = get_idd_field_ip_units_attr(attrs),
-             "unitsBasedOnField" = get_idd_field_unitsBasedOnField_attr(attrs),
-             "minimum" = get_idd_field_minimum_attr(attrs),
-             "maximum" = get_idd_field_maximum_attr(attrs),
-             "minimum_larger" = get_idd_field_minimum_larger_attr(attrs),
-             "maximum_smaller" = get_idd_field_maximum_smaller_attr(attrs),
-             "default" = get_idd_field_default_attr(attrs),
-             "deprecated" = get_idd_field_deprecated_attr(attrs),
-             "autosizable" = get_idd_field_autosizable_attr(attrs),
-             "autocalculatable" = get_idd_field_autocalculatable_attr(attrs),
-             "type" = get_idd_field_type_attr(attrs),
-             "retaincase" = get_idd_field_retaincase_attr(attrs),
-             "key" = get_idd_field_key_attr(attrs),
-             "object-list" = get_idd_field_object_list_attr(attrs),
-             "external-list" = get_idd_field_external_list_attr(attrs),
-             "reference" = get_idd_field_reference_attr(attrs))
+        data.table("field"             = get_idd_field_field_attr(attrs),
+                   "note"              = get_idd_field_note_attr(attrs),
+                   "required-field"    = get_idd_field_required_field_attr(attrs),
+                   "begin-extensible"  = get_idd_field_begin_extensible_attr(attrs),
+                   "units"             = get_idd_field_units_attr(attrs),
+                   "ip-units"          = get_idd_field_ip_units_attr(attrs),
+                   "unitsBasedOnField" = get_idd_field_unitsBasedOnField_attr(attrs),
+                   "minimum"           = get_idd_field_minimum_attr(attrs),
+                   "maximum"           = get_idd_field_maximum_attr(attrs),
+                   "minimum_larger"    = get_idd_field_minimum_larger_attr(attrs),
+                   "maximum_smaller"   = get_idd_field_maximum_smaller_attr(attrs),
+                   "default"           = get_idd_field_default_attr(attrs),
+                   "deprecated"        = get_idd_field_deprecated_attr(attrs),
+                   "autosizable"       = get_idd_field_autosizable_attr(attrs),
+                   "autocalculatable"  = get_idd_field_autocalculatable_attr(attrs),
+                   "type"              = get_idd_field_type_attr(attrs),
+                   "retaincase"        = get_idd_field_retaincase_attr(attrs),
+                   "keys"              = list(get_idd_field_key_attr(attrs)),
+                   "object-list"       = get_idd_field_object_list_attr(attrs),
+                   "external-list"     = get_idd_field_external_list_attr(attrs),
+                   "reference"         = get_idd_field_reference_attr(attrs))
     return(attrs)
 }
 # }}}2
@@ -794,6 +799,8 @@ get_idd_field_reference_attr <- function (attrs) {
 get_idd_field <- function (idd_object) {
     check_list(idd_object)
 
+    object_name <- names(idd_object)
+
     field_ranges <- get_idd_field_range(idd_object)
 
     object_contents <- purrr::flatten_chr(idd_object)
@@ -804,15 +811,21 @@ get_idd_field <- function (idd_object) {
                              field_start <- field_ranges$field_start_row[i]
                              field_end <- field_ranges$field_end_row[i]
                              field <- object_contents[field_start:field_end]
-                             field_attrs <- get_idd_field_attr_str(field)
-                             field <- list(contents = field_name,
-                                           attrs = field_attrs)
+                             field_attrs_str <- get_idd_field_attr_str(field)
+                             field_attrs <- get_idd_field_attrs(field_attrs_str)
+                             field <- field_attrs[, name := field_name]
+                             field <- setcolorder(field, c("name", col_names(field, "^name$", invert = TRUE)))
+                             # field <- list(contents = field_name,
+                             #               attrs = field_attrs)
                              return(field)
-                         }) %>% purrr::set_names(field_ranges$field_name)
+                         }) %>% rbindlist() #purrr::set_names(field_ranges$field_name)
 
-    attrs <- purrr::map(fields, "attrs") %>% purrr::map(get_idd_field_attrs)
-    idd_field <- purrr::map(fields, "contents") %>% purrr::flatten_chr() %>% purrr::map2(., attrs, add_attrs)
-    return(idd_field)
+    fields <- fields[, object := object_name]
+    fields <- setcolorder(fields, c("object", col_names(fields, "^object$", invert = TRUE)))
+    return(fields)
+    # attrs <- purrr::map(fields, "attrs") %>% purrr::map(get_idd_field_attrs)
+    # idd_field <- purrr::map(fields, "contents") %>% purrr::flatten_chr() %>% purrr::map2(., attrs, add_attrs)
+    # return(idd_field)
 }
 # }}}2
 
