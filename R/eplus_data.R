@@ -560,10 +560,10 @@ agg_by_time <- function (data, col_based = NULL, interval = 1L, by_col = NULL,
 
     if (is.null(by_col)) {
         data_agg <- data_thicken %>%
-            .[, lapply(.SD, get(fun)), by = c(col_based)][]
+            .[, lapply(.SD, get(fun)), by = c(col_based)]#[]
     } else {
         data_agg <- data_thicken %>%
-            .[, lapply(.SD, get(fun)), by = c(col_based, col_names(., by_col))][]
+            .[, lapply(.SD, get(fun)), by = c(col_based, col_names(., by_col))]#[]
     }
 
     return(data_agg)
