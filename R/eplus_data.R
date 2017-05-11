@@ -398,14 +398,11 @@ eplus_time_trans <- function(data, year = current_year(),
     }
 
     # Build a date column with standard "%Y-%m-%d %H:%M:%S" ISO format.
-    data <-
-        data[, c(new_date_col) := gsub(x = data[[eplus_date_col]],
-                                           "^", paste0(year, "-"))][,
-               c(new_date_col) := gsub(x = .[[new_date_col]], "/", "-")][,
-               c(new_date_col) := gsub(x = .[[new_date_col]], "  ", " ")][,
-               c(new_date_col) := lubridate::ymd_hms(.[[new_date_col]], tz = tz)]
-    data <- data.table::setcolorder(data, c(new_date_col,
-                                            col_names(., new_date_col, invert = T)))
+    data <- data[, c(new_date_col) := gsub(x = data[[eplus_date_col]], "^", paste0(year, "-"))]
+    data <- data[, c(new_date_col) := gsub(x = data[[new_date_col]], "/", "-")]
+    data <- data[, c(new_date_col) := gsub(x = data[[new_date_col]], "  ", " ")]
+    data <- data[, c(new_date_col) := lubridate::ymd_hms(data[[new_date_col]], tz = tz)]
+    data <- data.table::setcolorder(data, c(new_date_col, col_names(data, new_date_col, invert = T)))
 
     # Delete the original
     if (!keep_ori) {
