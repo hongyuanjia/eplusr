@@ -444,16 +444,24 @@ eplus_time_trans <- function(data, year = current_year(),
 time_col_add <- function (data, based_col = NULL, interval = "level_up",
                           new_name = NULL, one_year = FALSE) {
 
+    check_df(data)
+    data <- conv_dt(data)
+
+    # Make a copy to keep the original data untouched.
+    data <- copy(data)
+
+    date_col_name <- check_date_col(data, based_col)
+    date_col <- data[[date_col_name]]
+    # Capture the original of classes of data sequence.
+    classes <- attributes(date_col)$class
+
+    if (one_year) {
+        date_col <- one_year(date_col)
+    }
+
+
     if(!is.na(match(class(interval), c("integer", "numeric")))){
         interval <- as.integer(interval)
-
-        check_df(data)
-        data <- conv_dt(data)
-
-        date_col_name <- check_date_col(data, based_col)
-        date_col <- data[[date_col_name]]
-        # Capture the original of classes of data sequence.
-        classes <- attributes(date_col)$class
 
         if(is.null(new_name)) {
             new_name <- paste0(date_col_name, "_", interval, "mins")
@@ -462,20 +470,21 @@ time_col_add <- function (data, based_col = NULL, interval = "level_up",
         # Get the interval in secs.
         interval <- as.integer(interval * 60L)
 
-        data <- copy(data)
         data_thicken <- data[, c(new_name) := xts::align.time(date_col, n = interval)]
 
         # Get the original classes back after time aligned, because 'align.time'
         # will always return a class of "POSIXt" rather than "POSIXct".
         attr(data_thicken[[new_name]], "class") <- classes
 
-    } else {
-        data_thicken <- padr::thicken(x = data, interval = interval,
-                                      colname = new_name, by = based_col)
-    }
+    } else  {
+        interval <- uniform_interval_name(interval)
 
-    if (one_year) {
-        data_thicken <- one_year(data_thicken)
+        if(is.null(new_name)) {
+            new_name <- paste0(date_col_name, "_", interval)
+        }
+
+        eval_text <- paste0("lubridate::", interval, "(date_col)")
+        data_thicken <- data[, c(new_name) := eval(parse(text = eval_text))]
     }
 
     return(data_thicken)
@@ -491,21 +500,43 @@ time_col_add <- function (data, based_col = NULL, interval = "level_up",
 #' data.table.
 #' @param fun A character indicates the function to apply during aggregation.
 #' @inheritParams time_col_add
+#' @importFrom purrr map_lgl
 #' @export
 # agg_by_time
 # {{{1
-agg_by_time <- function (data, based_col = NULL, interval = "level_up",
+agg_by_time <- function (data, based_col = NULL, interval = "year",
                          by_col = NULL, new_name = NULL, fun = "mean",
                          one_year = FALSE) {
+
+    if (is.null(based_col)) {
+        based_col <- check_date_col(data)
+    }
 
     data_thicken <- time_col_add(data = data, based_col = based_col,
                                  interval = interval, new_name = new_name,
                                  one_year = one_year)
 
+    # Delete the original datetime column.
+    data_thicken <- data_thicken[, c(based_col) := NULL]
+
+    # Cause `time_col_add` always add the new column as the last column.
+    if (is.null(new_name)) {
+        new_name <- names(data_thicken)[length(names(data_thicken))]
+    }
+
+    # Check if there are non-numeric columns
+    check_numeric <- purrr::map_lgl(data_thicken, is.numeric)
+    non_numeric_col <- grep(x = names(data_thicken)[!check_numeric],
+                            paste0("^", new_name, "$"), invert = TRUE, value = TRUE)
+    if (length(non_numeric_col) > 0 & is.null(by_col)) {
+        stop("Non-numeric column ", paste0("'", non_numeric_col, "'"), " found. ",
+             "Please use `by_col` argument.")
+    }
+
     if (is.null(by_col)) {
-        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(based_col)]
+        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(new_name)]
     } else {
-        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(based_col, col_names(., by_col))]
+        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(new_name, col_names(data_thicken, by_col))]
     }
 
     return(data_agg)
@@ -599,7 +630,7 @@ site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
         data <- data[, lapply(.SD, function(x) round(x*ele_fct/1E9, digits)),
                        .SDcol = col_names(data, ele_pattern),
                        by = c(col_names(data, ele_pattern, invert = T))]
-        data <- data[, lapply(.SD, function(x) round(x*gas/1E9, digits)),
+        data <- data[, lapply(.SD, function(x) round(x*gas_fct/1E9, digits)),
                        .SDcol = col_names(data, gas_pattern),
                        by = c(col_names(data, gas_pattern, invert = T))]
         data <- data.table::setnames(data, gsub(x=col_names(data),
@@ -905,18 +936,18 @@ get_interval <- function (date_seq) {
 # one_year: A helper function to replace (year + 1)-01-01 occurance with
 # year-12-31.
 # {{{1
-one_year <- function (data) {
-    date_col_names <- get_date_col(data)
-    thicken_col_name <- date_col_names[length(date_col_names)]
-    date_seq <- data[[thicken_col_name]]
+one_year <- function (date_seq) {
+
     # Get the frequency of all years.
     years <- sort(table(lubridate::year(date_seq)))
     # If all date sequence is in one year, return as it is.
     if (length(years) == 1) {
-        one_year <- date_seq
+        return(date_seq)
+
     # If there are more than two number of years occur, give an error.
     } else if (length(years) > 2){
         stop("The span of the time exceeds more than 2 years.")
+
     # If there are only two number of years occur,
     } else {
         year_diff <- diff(as.integer(names(years)))
@@ -930,9 +961,40 @@ one_year <- function (data) {
                ori := ori + lubridate::days(1)][, year := NULL]
         }
         one_year <- dt[["ori"]]
-        data <- data[, c(thicken_col_name) := one_year]
 
-        return(data)
+        return(one_year)
     }
+}
+# }}}1
+
+# uniform_interval_name
+# {{{1
+uniform_interval_name <- function(interval) {
+    if (interval %in% c("y", "year", "years")) {
+        interval <- "year"
+    } else if (interval %in% c("q", "quarter", "quarters")){
+        interval <- "quarter"
+    } else if (interval %in% c("m", "mo", "mon", "mont", "month", "months")) {
+        interval <- "month"
+    } else if (interval %in% c("w", "we", "wee", "week", "weeks")){
+        interval <- "week"
+    } else if (interval %in% c("yd", "yda", "yday", "ydays")) {
+        interval <- "yday"
+    } else if (interval %in% c("md", "mda", "mday", "mdays")) {
+        interval <- "mday"
+    } else if (interval %in% c("wd", "wda", "wday", "wdays")) {
+        interval <- "wday"
+    } else if (interval %in% c("d", "da", "day", "days")) {
+        interval <- "day"
+    } else if (interval %in% c("h", "ho", "hou", "hour", "hours")) {
+        interval <- "hour"
+    } else if (interval %in% c("mi", "min", "mins", "minute", "minutes")) {
+        interval <- "minute"
+    } else if (interval %in% c("s", "se", "sec", "secs", "second", "seconds")) {
+        interval <- "second"
+    } else {
+        stop("Invalid `interval` value.")
+    }
+    return(interval)
 }
 # }}}1
