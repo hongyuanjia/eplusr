@@ -49,7 +49,7 @@ col_names <- function(data, pattern = ".*", ignore_case = TRUE, invert = FALSE) 
                           value = TRUE, invert = FALSE))
             sel_names <- purrr::flatten_chr(sel_names)
 
-        colnames <- name[is.na(match(name, sel_name, nomatch=NA_integer_))]
+        colnames <- name[is.na(match(name, sel_name, nomatch=NA_character_))]
         }
     }
 
@@ -98,7 +98,7 @@ col_select <- function (data, col_pattern = "", by_pattern = NULL,
 
     # Extract group column names.
     if (!is.null(by_pattern)) {
-        by_col <- col_names(data, by_patterni, ignore_case, invert = FALSE)
+        by_col <- col_names(data, by_pattern, ignore_case, invert = FALSE)
     }
 
     # If no column pattern is given, return all columns.
@@ -666,7 +666,7 @@ site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
 # {{{1
 data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
                        variable_name = "variable", value_name = "value",
-                       na_rm = FALSE, variable_factor = TRUE, value_facotr = FALSE) {
+                       na_rm = FALSE, variable_factor = TRUE, value_factor = FALSE) {
     check_df(data)
     data <- conv_dt(data)
 
