@@ -777,6 +777,87 @@ bias <- function (x, y) {
 }
 # }}}1
 
+
+#' Apply a function between groups
+#'
+#' \code{case_cal} .
+#'
+#' @param data A data.table object.
+#' @param case_col Unquoted column name that is used as the group column.
+#' @param col_pattern A RegEx indicates the column that the function applys to.
+#' @param fun A character indicates the name of the function. It must be a
+#' function that takes two arguments, i.e. cvrmse(x, y).
+#' @param case_order If TRUE, the function applied will take the appearance
+#' order in group column. For example, the group column contains three unique
+#' c("a", "b", "c"), and only fun(a, b), fun(a, c) and fun(b, c) will be
+#' calculated. If FALSE, all permutation without duplicated elements will be
+#' calculated.
+#' @param melt If TRUE, a molten data.table will be returned with the first
+#' column named "case" showing what function and arguments has been applied.
+#' @return A data.table
+#' @export
+# case_cal
+# {{{1
+case_cal <- function (data, case_col, col_pattern = NULL, fun, case_order = TRUE,
+                      melt = FALSE) {
+    check_df(data)
+    data <- conv_dt(data)
+
+    if(!(hasArg(fun))){
+        stop("Argument 'fun' is missing!")
+    }
+
+    # NSE: Non-standard evaluation implementation.
+    case_col <- substitute(case_col)
+    cases <- unique(data[, eval(case_col, envir = .SD)])
+
+    if (case_order) {
+        cases <- as.data.table(t(combn(cases, 2)))
+        cases <- setnames(cases, c("x", "y"))
+    } else {
+        # Get all combinations of cases
+        cases <- purrr::cross_d(list(x = cases, y = cases), function (x, y) y == x)
+    }
+
+    # Get selected column names
+    if (is.null(col_pattern)) {
+        # Only apply functions to numeric columns
+        numeric_cols <- colnames(data)[purrr::map_lgl(data, is.numeric)]
+        # Select numeric columns and exclude case column
+        sel_cols <- grep(x = numeric_cols, paste0("^", case_col, "$"), value = TRUE, invert = TRUE)
+
+        non_numeric_cols <- colnames(data)[!purrr::map_lgl(data, is.numeric)]
+        non_numeric_cols <- grep(x = non_numeric_cols, paste0("^", case_col, "$"), value = TRUE, invert = TRUE)
+        if (length(non_numeric_cols) > 0) {
+            warning("Non-numeric columns found: ", paste0(paste0("'", non_numeric_cols, "'"), collapse = ", "), ".\n",
+                    "Function '", fun, "' was only applied to numeric columns.", call. = FALSE)
+        }
+    } else {
+        sel_cols <- col_names(data, as.character(case_col), invert = TRUE)
+        sel_cols <- grep(x = sel_cols, col_pattern, value = TRUE, perl = TRUE)
+    }
+
+    fun <- substitute(fun)
+
+    cal <-
+        purrr::map2_df(cases$x, cases$y,
+                       function (x, y) {
+                           case_1 <- data[eval(case_col) == x, ..sel_cols]
+                           case_2 <- data[eval(case_col) == y, ..sel_cols]
+                           cal <- as.data.table(purrr::map2_df(case_1, case_2, eval(parse(text = fun))))
+                           cal <- cal[, case := paste0(fun, "(", x, ", ", y, ")")]
+                           # Set column order
+                           cal <- data.table::setcolorder(cal, c("case", col_names(cal, "case", invert = TRUE)))
+                       })
+
+    if (melt) {
+        cal <- melt(cal, id.vars = "case")
+    }
+
+  return(cal)
+}
+# }}}1
+
 ######################
 #  helper functions  #
 ######################
@@ -967,7 +1048,7 @@ one_year <- function (date_seq) {
 }
 # }}}1
 
-# uniform_interval_name
+# uniform_interval_name: A helper function to get the right interval string.
 # {{{1
 uniform_interval_name <- function(interval) {
     if (interval %in% c("y", "year", "years")) {
