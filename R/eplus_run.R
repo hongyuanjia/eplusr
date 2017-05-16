@@ -2,9 +2,9 @@
 #                                Run EnergyPlus                                #
 ################################################################################
 
-# check_eplus_ver: A function that gets the versions of EnergyPlus.
+# get_idd_ver: A function that gets the versions of EnergyPlus.
 # {{{1
-check_eplus_ver <- function(eplus_dir){
+get_idd_ver <- function(eplus_dir){
     idd <- file.path(eplus_dir, "Energy+.idd")
     idd_ver <- purrr::map_chr(idd, ~gsub(x = readLines(.x, n = 1), "!IDD_Version ", ""))
     return(idd_ver)
@@ -13,7 +13,7 @@ check_eplus_ver <- function(eplus_dir){
 
 # find_eplus: A function to locate EnergyPlus folder.
 # {{{1
-find_eplus <- function(ver = NULL){
+find_eplus <- function(ver = NULL, verbose = TRUE){
     # Define searching paths.
     # 1. check if drives exist.
     disks <- c("C:", "D:", "E:", "F:", "G:")
@@ -31,39 +31,45 @@ find_eplus <- function(ver = NULL){
     # If not, give a warning of specifying EnergyPlus program location
     # mannually.
     if (length(eplus_dir) == 0L) {
-        stop(paste("Cannot find EnergyPlus folder ",
+        stop(paste("Cannot find EnergyPlus folder. ",
                    "Please specify EnergyPlus installed path mannually."),
              call. = FALSE)
     }
 
     # Get the version(s) of EnergyPlus.
-    idd_ver <- check_eplus_ver(eplus_dir)
+    idd_ver <- get_idd_ver(eplus_dir)
     # Get the latest version of EnergyPlus and its path.
     eplus_dir_latest <- eplus_dir[max(order(idd_ver))]
     idd_ver_latest <- max(idd_ver)
 
     # If multiple EnergyPlus versions are found, list the paths and versions.
     if (length(eplus_dir) > 1) {
-        message(paste("Multiple EnergyPlus versions are found: \n"),
-                paste(eplus_dir, "Version:", idd_ver, collapse = "\n"), "\n")
+        if (verbose) {
+            message(paste("Multiple EnergyPlus versions are found: \n"),
+                    paste(eplus_dir, "Version:", idd_ver, collapse = "\n"), "\n")
+        }
     }
 
     # If no EnergyPlus version is specified, use the latest version.
     if (is.null(ver)) {
         # If multiple EnergyPlus versions are found, use the latest version.
         if (length(eplus_dir) > 1) {
-            message(paste("NOTE: Only the latest version of EnergyPlus",
-                          idd_ver_latest,
-                          "will be used if argument 'ver' is not sepcified.\n"))
+            if (verbose) {
+                message(paste("NOTE: Only the latest version of EnergyPlus",
+                              idd_ver_latest,
+                              "will be used if argument 'ver' is not sepcified.\n"))
+            }
         # If only one EnergyPlus version is found, print message.
         } else {
-            message(paste("EnergyPlus Version:", idd_ver_latest,
-                          "has been successfully located:\n", eplus_dir_latest, "\n"))
+            if (verbose) {
+                message(paste("EnergyPlus Version:", idd_ver_latest,
+                              "has been successfully located:\n", eplus_dir_latest, "\n"))
+            }
         }
 
         return(eplus_dir_latest)
     } else {
-        ver <- gsub(x = as.character(ver), " ", "")
+        ver <- paste0(gsub(x = as.character(ver), " ", ""), ".0")
         if (is.na(match(ver, idd_ver))) {
             stop(paste0("Cannot find EnergyPlus Version:", ver, " ",
                         "Please specify EnergyPlus path mannually.\n",
@@ -71,8 +77,10 @@ find_eplus <- function(ver = NULL){
         } else {
             eplus_dir_matched <- eplus_dir[match(ver, idd_ver)]
             idd_ver_matched <- idd_ver[match(ver, idd_ver)]
-            message(paste0("EnergyPlus Version: ", idd_ver_matched,
-                          " has been successfully located:\n", eplus_dir_matched, "\n"))
+            if (verbose) {
+                message(paste0("EnergyPlus Version: ", idd_ver_matched,
+                               " has been successfully located:\n", eplus_dir_matched, "\n"))
+            }
 
         return(eplus_dir_matched)
         }
@@ -108,7 +116,7 @@ create_eplus_ini <- function (eplus_dir, working_dir) {
 Epl_run_bat <- function(eplus_dir = find_eplus(),
                         eplus_in, eplus_out, eplus_in_ext, eplus_wthr,
                         eplus_type, pausing, max_col, conv_eso, csv,
-                        print_proc = FALSE){
+                        echo = FALSE){
     ############################################################################
     #                            Notes on arguments                            #
     ############################################################################
@@ -188,28 +196,18 @@ Epl_run_bat <- function(eplus_dir = find_eplus(),
                      eplus_type, pausing, max_col, conv_eso, csv,
                      sep = " ")
 
-    if (print_proc) {
+    if (echo) {
         # eplus_stdout <- exec_wait(cmd = command)
         # eplus_stdout <- system2(command = command, wait = TRUE)
         eplus_stdout <- system(command = command, wait = TRUE)
         return(eplus_stdout)
 
     } else {
-        pid_before <- sort(installr::get_pid("energyplus.exe"))
+        eplus_stdout <- system(command = command, wait = FALSE, invisible = FALSE)
 
-        # eplus_stdout <- exec_background(cmd = command)
-        # eplus_stdout <- system2(command = command, wait = FALSE)
-        eplus_stdout <- system(command = command, wait = FALSE)
+        message("EnergyPlus has been successfully execuated in background.")
 
-        Sys.sleep(time = 0.5)
-
-        pid_after <- sort(installr::get_pid("energyplus.exe"))
-
-        eplus_pid <- setdiff(pid_after, pid_before)
-
-        message("EnergyPlus has been successfully execuated in background.\n",
-                "Task PID = ", eplus_pid, ".")
-        return(eplus_pid)
+        return(invisible())
     }
 
 }
@@ -222,7 +220,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
                             output_prefix = "eplus", output_suffix = "L",
                             epmacro = TRUE, expand_obj = TRUE, readvars = TRUE,
                             annual = FALSE, design_day = FALSE, idd = NULL,
-                            legacy = FALSE, print_proc = FALSE) {
+                            legacy = FALSE, echo = FALSE) {
     ############################################################################
     #                            Notes on arguments                            #
     ############################################################################
@@ -305,38 +303,31 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
     if (design_day) design_day <- "--design-day" else design_day <- NULL
     if (!is.null(idd)) idd <- paste0("--idd", '"', idd, '"') else idd <- NULL
 
+    # Show a cmd window when the simulation finishs.
+    msg <- paste0("type ", output_prefix, ".end && PAUSE")
+
     command <- paste(cmd_head, "cd", working_dir, "&&",
                      energyplus_exe,
                      "--weather", weather,
                      "--output-directory", output_dir,
                      "--output-prefix", output_prefix,
                      "--output-suffix", output_suffix,
-                     epmacro, expand_obj, readvars, annual, design_day, idd,
-                     idf, sep = " ")
+                     epmacro, expand_obj, readvars, annual, design_day, idd, idf,
+                     "&&", msg,
+                     sep = " ")
 
-    if (print_proc) {
+    if (echo) {
         # eplus_stdout <- exec_wait(cmd = command)
         # eplus_stdout <- system2(command = command, wait = TRUE)
         eplus_stdout <- system(command = command, wait = TRUE)
         return(eplus_stdout)
 
     } else {
-        pid_before <- sort(installr::get_pid("energyplus.exe"))
+        eplus_stdout <- system(command = command, wait = FALSE, invisible = FALSE)
 
-        # eplus_stdout <- exec_background(cmd = command)
-        # eplus_stdout <- system2(command = command, wait = FALSE)
-        eplus_stdout <- system(command = command, wait = FALSE)
+        message("EnergyPlus has been successfully execuated in background.")
 
-        Sys.sleep(time = 1.5)
-
-        pid_after <- sort(installr::get_pid("energyplus.exe"))
-
-        eplus_pid <- setdiff(pid_after, pid_before)
-
-        message("EnergyPlus has been successfully execuated in background.\n",
-                "Task PID = ", eplus_pid, ".")
-
-        return(eplus_pid)
+        return(invisible())
     }
 }
 # }}}1
@@ -345,7 +336,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 # {{{1
 eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        output_dir = NULL, output_prefix = NULL,
-                       csv = TRUE, print_proc = FALSE,
+                       csv = TRUE, echo = FALSE,
                        run = "exe", ver = NULL) {
 
     # Backup the original working directory.
@@ -460,7 +451,7 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                     eplus_in_ext = eplus_in_ext, eplus_wthr = eplus_wthr,
                     eplus_type = eplus_type, pausing = pausing,
                     max_col = max_col, conv_eso = conv_eso, csv = csv,
-                    print_proc = print_proc)
+                    echo = echo)
 
     # Use energyplus, i.e. "energyplus.exe", to run EnergyPlus.
     } else if (run == "exe"){
@@ -482,7 +473,7 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        output_suffix = output_suffix,
                        epmacro = TRUE, expand_obj = TRUE, readvars = readvars,
                        annual = FALSE, design_day = FALSE, idd = NULL,
-                       legacy = FALSE, print_proc = print_proc)
+                       legacy = FALSE, echo = echo)
 
         # Delete "fort.6" and "Energy+.ini" created by "EnergyPlus.exe" after
         # simulations.
