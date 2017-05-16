@@ -209,7 +209,7 @@ get_eplus_clean_files <- function (output_prefix, output_pattern,
 
         clean_files <- paste0(output_prefix, output_suffix)
 
-        extra_files <- c("Energy+.ini")
+        extra_files <- c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat")
 
         clean_files <- c(clean_files, extra_files)
     } else {
