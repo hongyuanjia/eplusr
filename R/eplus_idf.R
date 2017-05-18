@@ -4,25 +4,108 @@
 
 # read_idf
 # {{{1
-read_idf <- function(idf_path) {
-    idf <- read_idf_raw(idf_path)
-    idf <- get_idf_object(idf)
-    return(idf)
+read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
+
+    if (is_idf_str(file)) {
+        idf_lines <- file
+    } else {
+        idf_lines <- read_idf_lines(file)
+    }
+
+    is_imf <- is_imf(idf_lines)
+
+    idf_ver <- get_idf_ver(idf_lines)
+
+    # If parametric fields exist, and parse is FALSE, give a warning.
+    if (is_param_exist(idf_lines)) {
+        if (parse) {
+            warning("Parametric fields found in the input file. ",
+                    "'parse' is forced to FALSE and only a string vector of input .idf/.imf file will be returned.",
+                    call. = FALSE)
+            parse <- FALSE
+        }
+    # NOTE: If parametric fields exist, the .imf file cannot directly converted
+    # to an .idf file.
+    # If no parametric fields in the input.
+    } else {
+        # If input is an .imf file
+        if (is_imf) {
+            # Convert the .imf file to a .idf file
+            if (imf_to_idf) {
+                idf_lines <- imf_to_idf(imf_lines = idf_lines, rename = FALSE, verbose = verbose, keep = FALSE)
+            # If imf_to_idf is FALSE,
+            } else {
+                # but 'parse' has been sepcified as FALSE, give a warning.
+                if (!parse) {
+                    warning("Unable to parse imf when 'imf_to_idf' is FALSE. ",
+                            "'parse' is forced to FALSE and only a string vector of input .idf/.imf file will be returned.",
+                            call. = FALSE)
+                    parse <- FALSE
+                }
+            }
+        }
+    }
+
+
+
+    # Return a string vector directly.
+    if (!parse) {
+        attrs <- list(ver = idf_ver,
+                      type = "string")
+        idf_lines <- add_attrs(idf_lines, attrs)
+        return(idf_lines)
+    # Return a parsed idf which is a list of data.tables.
+    } else {
+        attrs <- list(ver = idf_ver,
+                      type = "parsed")
+        idf <- get_idf_object(idf = idf_lines)
+        idf <- add_attrs(idf, attrs)
+        return(idf)
+    }
+
 }
 # }}}1
 
 # find_object
 # {{{1
 find_object <- function (idf, obj_ptn, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
-    ori_names <- names(idf)
-    names(idf) <- make.unique(names(idf), sep = "_")
-    objs <- grep(x = names(idf), pattern = obj_ptn, ignore_case, perl = perl, invert = invert)
-    if (length(objs) == 0) {
-        stop("Could not find any matched objects.", call. = FALSE)
+    type <- get_idf_type(idf)
+
+    if (type == "string") {
+        macro_pt <- stringr::str_which(idf, "^##")
+        if (length(macro_pt) > 0) {
+            idf <- idf[-macro_pt]
+        }
+        object_ranges <- get_idf_object_range(idf)
+        object_names <- unique(object_ranges[["object_name"]])
+        objs <- grep(x = object_names, pattern = obj_ptn, value = TRUE,
+                     ignore.case = ignore_case, perl = perl, invert = invert)
+        if (length(objs) == 0) {
+            stop("Could not find any matched objects.", call. = FALSE)
+        } else {
+            object_ranges_selected <- object_ranges[object_name %in% objs]
+            results <- map2(object_ranges_selected$object_start_row,
+                            object_ranges_selected$object_end_row,
+                            function (object_start, object_end) {
+                                object <- idf[object_start:object_end]
+                                object_fields <- get_idf_object_fields(object)
+                                return(object_fields)
+                            }) %>% set_names(make.unique(object_ranges_selected$object_name, sep = "_"))
+        }
+
+    } else if (type == "parsed") {
+        ori_names <- names(idf)
+        names(idf) <- make.unique(names(idf), sep = "_")
+        objs <- grep(x = names(idf), pattern = obj_ptn, ignore.case = ignore_case, perl = perl, invert = invert)
+        if (length(objs) == 0) {
+            stop("Could not find any matched objects.", call. = FALSE)
+        } else {
+            results <- idf[c(objs)]
+        }
+        names(idf) <- ori_names
     } else {
-        results <- idf[c(objs)]
+        stop("Unknown input idf type.", call. = FALSE)
     }
-    names(idf) <- ori_names
     return(results)
 }
 # }}}1
@@ -46,16 +129,17 @@ write_idf <- function (idf, path) {
                        data.table::data.table(name = upper_name, index = index)
                    }) %>% data.table::rbindlist(.)
 
-    idf_lines <- purrr::map(seq_along(idf),
-                            function (i) {
-                                lines <- create_idf_object_lines(idf[i])
-                                if (!is.na(match(i, obj_header_info[["index"]]))) {
-                                    class <- obj_header_info[index == i, name]
-                                    obj_header_str <- paste0( "!-   ===========  ALL OBJECTS IN CLASS: ", class, " ===========")
-                                    lines <- c(obj_header_str, lines)
-                                }
-                                return(lines)
-                            }) %>% purrr::flatten_chr()
+    idf_lines <-
+        purrr::map(seq_along(idf),
+                   function (i) {
+                       lines <- format_idf_lines(idf[i])
+                       if (!is.na(match(i, obj_header_info[["index"]]))) {
+                           class <- obj_header_info[index == i, name]
+                           obj_header_str <- paste0( "!-   ===========  ALL OBJECTS IN CLASS: ", class, " ===========")
+                           lines <- c(obj_header_str, lines)
+                       }
+                       return(lines)
+                   }) %>% purrr::flatten_chr()
     idf <- c(header, idf_lines)
     readr::write_lines(idf, path = path)
 }
@@ -65,20 +149,11 @@ write_idf <- function (idf, path) {
 #  helper functions  #
 ######################
 
-# read_idf_raw
+# read_idf_lines
 # {{{1
-read_idf_raw <- function (idf_path) {
-    idf <- readr::read_lines(idf_path) %>% iconv(to = "UTF-8")
-    regex_blank_line <- "^\\s*$"
-    regex_comment_line <- "^\\s*!.*$"
-
-    # Get rid of blank lines
-    idf <- find_field(idf, regex_blank_line, invert = TRUE)
-    # Get rid of comment lines
-    idf <- find_field(idf, regex_comment_line, invert = TRUE)
-    # Get rid of leading and trailing spaces
-    idf <- stringr::str_trim(idf, side = "both")
-
+read_idf_lines <- function (file) {
+    idf <- readr::read_lines(file) %>% iconv(to = "UTF-8")
+    idf <- clean_idf_lines(idf)
     return(idf)
 }
 # }}}1
@@ -155,9 +230,9 @@ get_idf_object <- function (idf) {
 }
 # }}}1
 
-# create_idf_object_lines
+# format_idf_lines
 # {{{1
-create_idf_object_lines <- function (object) {
+format_idf_lines <- function (object) {
     object_name <- names(object)
     object <- object[[1]]
     value <- object[["value"]]
@@ -187,5 +262,221 @@ create_idf_object_lines <- function (object) {
     object_lines <- c(header, lines)
 
     return(object_lines)
+}
+# }}}1
+
+# get_idf_ver
+# {{{1
+get_idf_ver <- function (idf_lines) {
+    ver_pt_normal <- stringr::str_which(idf_lines, "^\\d\\.\\d\\s*;\\s*\\!\\s*-\\s*Version Identifier$")
+    ver_pt_special <- stringr::str_which(idf_lines, "^Version\\s*,\\s*\\d\\.\\d;$")
+
+    if (length(ver_pt_normal) == 1) {
+        idf_ver <- stringr::str_extract(idf_lines[ver_pt_normal], "\\d\\.\\d")
+    } else {
+        idf_ver <- stringr::str_extract(idf_lines[ver_pt_special], "\\d\\.\\d")
+    }
+
+    return(idf_ver)
+}
+# }}}1
+
+# is_param_exist
+# {{{
+is_param_exist <- function (idf_lines) {
+    param_exist <- any(stringr::str_detect(idf_lines, "@@.*@@"))
+    return(param_exist)
+}
+# }}}
+
+# epmacro_exe
+# {{{1
+epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verbose = TRUE) {
+    # In order to chain commands, this has to be used before commands.
+    cmd_head <- "cmd.exe /c"
+
+    # Use "energyplus.exe" to run EnergyPlus.
+    epmacro_exe <- file.path(eplus_dir, "EPMacro.exe")
+
+    # Get the working directory.
+    working_dir <- dirname(imf_path)
+
+    command <- paste(cmd_head, "cd", working_dir, "&&",
+                     epmacro_exe, imf_path, sep = " ")
+
+    epmacro_run <- system(command = command, wait = TRUE)
+
+    output <- file.path(working_dir, "out.idf")
+    new_output <- paste0(tools::file_path_sans_ext(imf_path), ".idf")
+    audit <- file.path(working_dir, "audit.out")
+    new_audit <- file.path(dirname(audit), paste0(file_path_sans_ext(basename(imf_path)), ".out"))
+
+    if (file.exists(output)) {
+
+        # Read error messages
+        audit_raw <- readr::read_lines(file.path(dirname(imf_path), "audit.out"))
+        errors_pt <- stringr::str_which(audit_raw, "ERROR")
+
+        if (rename) {
+            rename_flag <- file.copy(from = output, to = new_output,
+                                     copy.mode = TRUE, copy.date = TRUE,
+                                     overwrite = TRUE)
+
+            rename_flag_audit <- file.copy(from = audit, to = new_audit,
+                                           copy.mode = TRUE, copy.date = TRUE,
+                                           overwrite = TRUE)
+
+            if (rename_flag) {
+                # If renaming successed, delete the original output file.
+                unlink(output, force = TRUE)
+            } else {
+                warning("Could not rename the output idf file.", call. = FALSE)
+            }
+
+            if (rename_flag_audit) {
+                # If renaming successed, delete the original audit file.
+                unlink(audit, force = TRUE)
+            } else {
+                warning("Could not rename the audit file.", call. = FALSE)
+            }
+        }
+
+        if (verbose) {
+            if (rename) {
+                if (rename_flag) {
+                    message("File '", basename(imf_path), "' has been successfully converted to '",
+                            basename(new_output), "'.")
+                } else {
+                    message("File '", basename(imf_path), "' has been successfully converted to 'out.idf'.")
+                }
+
+                if (rename_flag_audit) {
+                    message("Please see '", basename(new_audit), "' for details.")
+                } else {
+                    message("Please see '", basename(audit), "' for details.")
+                }
+
+            } else {
+                message("File '", basename(imf_path), "' has been successfully converted to 'out.idf'.")
+                message("Please see '", basename(audit), "' for details.")
+            }
+
+            if (length(errors_pt) > 0) {
+                error_msg <-
+                    purrr::map(seq_along(errors_pt),
+                               ~{error_pt <- errors_pt[.x];
+                               msg <- c("Error message [", .x, "]:\n",
+                                        paste0(audit_raw[(error_pt-2):error_pt], collapse = "\n"))})
+                error_msg <- map_chr(error_msg, ~paste0(.x, collapse = ""))
+                error_msg <- paste0(error_msg, collapse = "\n\n")
+                warning("\nNOTE: ", length(errors_pt), " errors found during the conversion.\n", call. = FALSE)
+                warning(error_msg, call. = FALSE)
+            }
+        }
+
+    } else {
+        stop("Error occured when running 'EPMacro.exe'.", call. = FALSE)
+    }
+}
+# }}}1
+
+# imf_to_idf
+# {{{1
+imf_to_idf <- function(imf_lines, verbose = FALSE) {
+
+    # Get the input imf file version.
+    imf_ver <- get_idf_ver(imf_lines)
+
+    # Find the path of EnergyPlus with the same version.
+    eplus_dir <- find_eplus(ver = imf_ver, verbose = F)
+
+    imf_name <- paste0("imf_", stringi::stri_rand_strings(1, 8), ".imf")
+    imf_path <- file.path(normalizePath(tempdir(), winslash = "/"), imf_name)
+
+    write_lines(imf_lines, path = imf_path)
+    # Convert the input imf file to a idf file
+    epmacro_exe(eplus_dir = eplus_dir, imf_path = imf_path,
+                verbose = verbose, rename = FALSE)
+
+    idf_path <- file.path(dirname(imf_path), "out.idf")
+    idf_lines <- read_idf_lines(idf_path)
+    unlink(imf_path, force = TRUE)
+
+    return(idf_lines)
+}
+# }}}1
+
+# get_idf_type
+# {{{1
+get_idf_type <- function (idf) {
+    type <- attr(idf, "type")
+
+    if (is.null(type)) {
+        type <- "string"
+    }
+
+    return(type)
+}
+# }}}1
+
+# clean_idf_lines
+# {{{1
+clean_idf_lines <- function (idf_lines) {
+    regex_blank_line <- "^\\s*$"
+    regex_comment_line <- "^\\s*!.*$"
+
+    # Get rid of blank lines
+    idf_lines <- find_field(idf_lines, regex_blank_line, invert = TRUE)
+    # Get rid of comment lines
+    idf_lines <- find_field(idf_lines, regex_comment_line, invert = TRUE)
+    # Get rid of leading and trailing spaces
+    idf_lines <- stringr::str_trim(idf_lines, side = "both")
+
+    # Get rid of Output:PreprocessorMessage
+    regex_preproc_msg <- "^Output:PreprocessorMessage,"
+    preproc_msg_start_pt <- stringr::str_which(idf_lines, regex_preproc_msg)
+    preproc_msg_end_pt <- preproc_msg_start_pt + (diff(c(preproc_msg_start_pt, (length(idf_lines) + 1))) - 1)
+    preproc_msg_rows <- flatten_int(map2(preproc_msg_start_pt, preproc_msg_end_pt, seq))
+    if (length(preproc_msg_rows) > 0) {
+        idf_lines <- idf_lines[-preproc_msg_rows]
+    }
+
+    return(idf_lines)
+}
+# }}}1
+
+# is_idf_str
+# {{{1
+is_idf_str <- function (text) {
+    text <- clean_idf_lines(text)
+
+    regex_object_start <- "^([A-Z][A-Za-z].*),$"
+    regex_object_end <- "^([A-Za-z0-9@]).*\\s*;\\s*!\\s*-"
+    first_obj_start_pt <- purrr::detect_index(text, stringr::str_detect, pattern = regex_object_start)
+    first_obj_end_pt <- purrr::detect_index(text, stringr::str_detect, pattern = regex_object_end)
+
+    if (all(first_obj_start_pt > 0, first_obj_end_pt > 0, first_obj_start_pt < first_obj_end_pt)) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+# }}}1
+
+# is_imf
+# {{{1
+is_imf <- function (idf_lines) {
+    macro_dict <-
+        c("##include", "##fileprefix", "##includesilent", "##nosilent", # Incorporating external files
+          "##if", "##ifdef", "##ifndef", "##elseif", "##else", "##endif", # Selective accepting or skipping lins
+          "##def", "##enddef", "##def1", "##set1", # Defining blocks of input
+          "#eval", "#\\[", # Arithmetic operations
+          "##list", "##nolist", "##show", "##noshow", "##showdetail", "##noshowdetail", # Marco debugging and listing
+          "##expandcomment", "##traceback", "##notraceback", "##write", "##nowrite", # Marco debugging and listing
+          "##symboltable", "##clear", "##reverse", "##!") # Marco debugging and listing
+
+    is_imf <- any(map_lgl(macro_dict, ~any(stringr::str_detect(idf_lines, paste0("^", .x)))))
+
+    return(is_imf)
 }
 # }}}1
