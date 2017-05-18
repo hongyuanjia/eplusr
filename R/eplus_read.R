@@ -45,9 +45,9 @@ read_epg_info <- function(epg){
 }
 # }}}1
 
-# eplus_read: A function to read EnergyPlus simulation results.
+# read_output: A function to read EnergyPlus simulation results.
 # {{{1
-eplus_read <- function (path, output = "variable",
+read_output <- function (path, output = "variable",
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
                         rp_na = NA, to_GJ = FALSE, long = FALSE) {
