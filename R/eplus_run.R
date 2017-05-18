@@ -462,6 +462,8 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
             output_prefix <- tools::file_path_sans_ext(basename(input))
         }
 
+        epmacro <- ifelse(identical(tools::file_ext(input), "imf"), TRUE, FALSE)
+
         output_suffix <- "C"
         readvars <- ifelse(csv, TRUE, FALSE)
 
@@ -469,7 +471,7 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        idf = idf, weather = weather, output_dir = output_dir,
                        output_prefix = output_prefix,
                        output_suffix = output_suffix,
-                       epmacro = TRUE, expand_obj = TRUE, readvars = readvars,
+                       epmacro = epmacro, expand_obj = TRUE, readvars = readvars,
                        annual = FALSE, design_day = FALSE, idd = NULL,
                        legacy = FALSE, echo = echo)
 
