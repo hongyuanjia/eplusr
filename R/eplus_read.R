@@ -113,7 +113,7 @@ read_output <- function (path, output = "variable",
                         surface_report = purrr::map(file.path(path, file_name),
                                                     function (file) {
                                                         if (file.exists(file)) {
-                                                            eplus_surf_rpt_read(eio = file)
+                                                            read_surf_rpt(eio = file)
                                                         } else {
                                                             return(NULL)
                                                         }
@@ -197,9 +197,9 @@ check_eplus_output_file_exist <- function (path, file_names, type) {
 }
 # }}}1
 
-# eplus_surf_rpt_read: A function to read EnergyPlus Surface Details Report in eio file.
+# read_surf_rpt: A function to read EnergyPlus Surface Details Report in eio file.
 # {{{1
-eplus_surf_rpt_read <- function(eio){
+read_surf_rpt <- function(eio){
     # Read raw .eio file
     eio <- readr::read_lines(eio)
     # Row num of all headers
@@ -401,7 +401,7 @@ read_epg <- function(epg, results = "meter", case_ref = "idf"){
       data <-
           dplyr::tibble(Case = sim_info[, get(case_col)],
                         results = purrr::map(paste(sim_info[, ResultPath], file_pattern, sep = ""),
-                                             ~eplus_surf_rpt_read(.))) %>%
+                                             ~read_surf_rpt(.))) %>%
       tidyr::unnest() %>% data.table::as.data.table()
   }else{
       data <-
