@@ -125,7 +125,7 @@ eplus_read <- function (path, output = "variable",
                         table_output = purrr::map(file.path(path, file_name),
                                                   function (file) {
                                                       if (file.exists(file)) {
-                                                          eplus_read_table(file = file)
+                                                          read_table(file = file)
                                                       } else {
                                                           return(NULL)
                                                       }
@@ -421,9 +421,9 @@ eplus_epg_sim_read <- function(epg, results = "meter", case_ref = "idf"){
 }
 # }}}1
 
-# eplus_read_table: A function to read EnergyPlus table results
+# read_table: A function to read EnergyPlus table results.
 # {{{1
-eplus_read_table <- function (file) {
+read_table <- function (file) {
     regex_tbl_name <- "<!-- FullName:(.*)-->"
     # Get table names.
     tbl_name_comments <- stringr::str_subset(readr::read_lines(path), regex_tbl_name)
@@ -442,57 +442,5 @@ eplus_read_table <- function (file) {
 
     return(tbl)
 
-}
-# }}}1
-
-# select_table
-# {{{1
-select_table <- function (table, name = c("report", "for", "table"), regex = FALSE) {
-    check_dt <- is.data.table(table)
-    check_name <- identical(colnames(table), c("full_name", "report", "for", "table", "content"))
-
-    if (any(!check_dt, !check_name)) {
-        stop("Invalid input table. Please use `eplus_read_table` to read your ",
-             "EnergyPlus table results.", call. = FALSE)
-    }
-
-    if (missingArg(name)) {
-        stop("Please give 'name' value.", call. = FALSE)
-    }
-
-    if (any(!is.character(name), length(name) != 3)) {
-        stop("'name' should be a character vector of length 3 indicating the ",
-             "name of report, the name of 'for' and the name of table.", call. = FALSE)
-    }
-
-    if (!regex) {
-        selected_table <- table[report == name[1] &
-                                `for` == name[2] &
-                                table == name[3], .(full_name, content)]
-    } else {
-        report_names <- unique(as.character(table[, report]))
-        report_sel <- stringr::str_subset(report_names, name[1])
-
-        for_names <- unique(as.character(table[, `for`]))
-        for_sel <- stringr::str_subset(for_names, name[2])
-
-        table_names <- unique(as.character(table[, table]))
-        table_sel <- stringr::str_subset(table_names, name[3])
-
-        selected_table <- table[report %in% report_sel &
-                                `for` %in% for_sel &
-                                table %in% table_sel, .(full_name, content)]
-    }
-
-    if (nrow(selected_table) == 0) {
-        stop("No matched table found. Please check the value of 'name' or set ",
-             "'regex' to TRUE if you want to use regular expression.", call. = FALSE)
-    }
-
-    result <- selected_table[, content]
-    table_names <- selected_table[, full_name]
-    result <- purrr::set_names(result, table_names)
-
-    return(result)
 }
 # }}}1
