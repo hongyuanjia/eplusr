@@ -75,7 +75,7 @@ read_output <- function (path, output = "variable",
                         variable_output = purrr::map(file.path(path, file_name),
                                                      function (file) {
                                                          if (file.exists(file)) {
-                                                             eplus_result_read(result = file,
+                                                             read_variable(result = file,
                                                                                year = year,
                                                                                eplus_date_col = eplus_date_col,
                                                                                new_date_col = new_date_col,
@@ -93,7 +93,7 @@ read_output <- function (path, output = "variable",
                         meter_output = purrr::map(file.path(path, file_name),
                                                   function (file) {
                                                       if (file.exists(file)) {
-                                                          eplus_result_read(result = file,
+                                                          read_variable(result = file,
                                                                             year = year,
                                                                             eplus_date_col = eplus_date_col,
                                                                             new_date_col = new_date_col,
@@ -308,10 +308,9 @@ read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Tim
 }
 # }}}1
 
-# eplus_result_read: A function to take the path of EnergyPlus results and
-#                    return a data.table of the contents with the first being a
-#                    "POSIXt" column transformed from EnergyPlus standard
-#                    "Date/Time".
+# read_variable: A function to take the path of EnergyPlus results and return a
+# data.table of the contents with the first being a "POSIXt" column transformed
+# from EnergyPlus standard "Date/Time".
 
 # - 'result': A path of EnergyPlus meter results. Normally a .csv file named
 # (idf).csv or eplusout.csv.
@@ -338,7 +337,7 @@ read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Tim
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
 # {{{1
-eplus_result_read <- function (result, year = current_year(), eplus_date_col = "Date/Time",
+read_variable <- function (result, year = current_year(), eplus_date_col = "Date/Time",
                                new_date_col = "datetime", tz = Sys.timezone(),
                                rp_na = NA, long = FALSE) {
     result <-
