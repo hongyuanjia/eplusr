@@ -284,6 +284,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 
     # Get the working directory.
     working_dir <- dirname(idf)
+    idf_name <- tools::file_path_sans_ext(basename(idf))
     # Create an "Energy+.ini" file and copy it to the current working directory.
     create_eplus_ini(eplus_dir = eplus_dir, working_dir = working_dir)
 
@@ -303,6 +304,17 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
     if (design_day) design_day <- "--design-day" else design_day <- NULL
     if (!is.null(idd)) idd <- paste0("--idd", '"', idd, '"') else idd <- NULL
 
+    # Delete "fort.6" and "Energy+.ini" created by "EnergyPlus.exe" and
+    # "readvars.audit" created by "ReadVarsESO.exe" after simulations.
+    del_list <- c("fort.6", "Energy+.ini", "readvars.audit")
+    del_cmd <- paste("IF EXIST", del_list, "DEL", del_list)
+    post_proc <- c("@ECHO OFF", del_cmd)
+    if (!is.null(epmacro)) {
+        rename_imf <- stringr::str_interp("IF EXIST out.idf MOVE out.idf ${idf_name}.idf")
+        post_proc <- c(post_proc, rename_imf)
+    }
+    readr::write_lines(post_proc, "post_proc.bat")
+
     # Show a cmd window when the simulation finishs.
     msg <- paste0("type ", output_prefix, ".end && PAUSE")
 
@@ -313,7 +325,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
                      "--output-prefix", output_prefix,
                      "--output-suffix", output_suffix,
                      epmacro, expand_obj, readvars, annual, design_day, idd, idf,
-                     "&&", msg,
+                     "&& post_proc.bat && DEL post_proc.bat &&", msg,
                      sep = " ")
 
     if (echo) {
@@ -474,13 +486,6 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
                        epmacro = epmacro, expand_obj = TRUE, readvars = readvars,
                        annual = FALSE, design_day = FALSE, idd = NULL,
                        legacy = FALSE, echo = echo)
-
-        # Delete "fort.6" and "Energy+.ini" created by "EnergyPlus.exe" after
-        # simulations.
-        fort <- file.path(dirname(input), "fort.6")
-        Energy_plus_ini <- file.path(dirname(input), "Energy+.ini")
-        unlink(fort)
-        unlink(Energy_plus_ini)
 
     } else {
         stop("Argument 'run' should be one of c('exe', 'bat').", call. = FALSE)
