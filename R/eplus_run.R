@@ -364,12 +364,15 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
         stop("Weather file does not exist. Please check input.", call. = FALSE)
     }
 
+    input_prefix <- tools::file_path_sans_ext(basename(input))
+    eplus_in_ext <- tools::file_ext(input)
+    wthr_prefix <- tools::file_path_sans_ext(basename(weather))
+    eplus_wthr_ext <- tools::file_ext(weather)
+
     # File extension checking.
-    eplus_in_ext <- file_ext(input)
     if (!grepl(x = eplus_in_ext, pattern = "i[dm]f", ignore.case = TRUE)) {
        stop("'input' should be a full file path with an extension of '.idf' or '.imf'.")
     }
-    eplus_wthr_ext <- file_ext(weather)
     if (!grepl(x = eplus_wthr_ext, pattern = "epw", ignore.case = TRUE)) {
        stop("'weather' should be a full file path with an extension of '.epw'.")
     }
@@ -387,37 +390,32 @@ eplus_run <- function (input, weather, eplus_dir = find_eplus(),
         # (a) and also is output prefix.
         if (!is.null(output_prefix)) {
             new_name_idf <- file.path(output_dir, paste0(output_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(output_dir, paste0(output_prefix, ".", eplus_wthr_ext))
-            # Copy the input file into the working directory after renaming it.
-            file.copy(from = input, to = new_name_idf, overwrite = TRUE,
-                      copy.mode = TRUE, copy.date = TRUE)
+            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, "(", output_prefix, ").", eplus_wthr_ext))
 
         # (b) but output_prefix is not given.
         } else {
-            input_prefix <- tools::file_path_sans_ext(basename(input))
-            new_name_wthr <- file.path(output_dir, paste0(input_prefix, ".", eplus_wthr_ext))
-            # Copy the input file into the working directory.
-            file.copy(from = input, to = output_dir, overwrite = TRUE,
-                      copy.mode = TRUE, copy.date = TRUE)
+            new_name_idf <- file.path(output_dir, paste0(input_prefix, ".", eplus_in_ext))
+            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, "(", input_prefix, ").", eplus_wthr_ext))
         }
-        # Copy the weather file into the working directory after renaming it.
-        file.copy(from = weather, to = new_name_wthr, overwrite = TRUE,
-                  copy.mode = TRUE, copy.date = TRUE)
     # If output directory is not given,
     } else {
         # (a) but output prefix is given
         if (!is.null(output_prefix)) {
             new_name_idf <- file.path(dirname(input), paste0(output_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(dirname(input), paste0(input_prefix, ".", eplus_wthr_ext))
-            # Make a copy of the input file and rename it in the input path.
-            file.copy(from = input, to = new_name_idf, overwrite = TRUE,
-                      copy.mode = TRUE, copy.date = TRUE)
+            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, "(", output_prefix, ").", eplus_wthr_ext))
 
         # (b) neither is output prefix.
         } else {
-            input_prefix <- tools::file_path_sans_ext(basename(input))
-            new_name_wthr <- file.path(dirname(input), paste0(input_prefix, ".", eplus_wthr_ext))
+            new_name_idf <- file.path(dirname(input), paste0(input_prefix, ".", eplus_in_ext))
+            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, "(", input_prefix, ").", eplus_wthr_ext))
         }
+    }
+    if (!identical(new_name_idf, input)) {
+        # Copy the input file into the working directory.
+        file.copy(from = input, to = new_name_idf, overwrite = TRUE,
+                  copy.mode = TRUE, copy.date = TRUE)
+    }
+    if (!identical(new_name_wthr, weather)) {
         # Copy the weather file into the working directory after renaming it.
         file.copy(from = weather, to = new_name_wthr, overwrite = TRUE,
                   copy.mode = TRUE, copy.date = TRUE)
