@@ -2,12 +2,11 @@
 #                     EnergyPlus Working Directory Cleaning                    #
 ################################################################################
 
-# eplus_wd_clean: A function to clean the working directory of EnergyPlus after
-#                 backing up specifed files. All other files that are not parts
-#                 of EnergyPlus input or output files will be left as it is.
-#                 This is also true if you rename those files of EnergyPlus
-#                 before you run this function. Currently, files work as input
-#                 schedule files are not supported, and will be left untouched.
+# clean_wd: A function to clean the working directory of EnergyPlus after
+# backing up specifed files. All other files that are not parts of EnergyPlus
+# input or output files will be left as it is.  This is also true if you rename
+# those files of EnergyPlus before you run this function. Currently, files work
+# as input schedule files are not supported, and will be left untouched.
 
 # - 'path': A EnergyPlus working directory.
 
@@ -29,7 +28,7 @@
 # as backup_folder.
 
 # {{{1
-eplus_wd_clean <- function(path = getwd(), backup = NULL, backup_folder = NULL,
+clean_wd <- function(path = getwd(), backup = NULL, backup_folder = NULL,
                            rename = FALSE) {
 
     # Store the original working directory of current R session.
