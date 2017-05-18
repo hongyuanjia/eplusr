@@ -88,14 +88,6 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
 }
 # }}}1
 
-# read_eplus_end: A help function to read ".end" file which contains the
-# simulation summary info.
-# {{{1
-read_eplus_end <- function (path, prefix = "eplusout") {
-    readLines(file.path(path, paste0(prefix, ".end")))
-}
-# }}}1
-
 # create_eplus_ini: A function to create an "Energy+.ini" file per working
 # direcotry.
 # {{{1
