@@ -421,76 +421,65 @@ read_epg <- function(epg, results = "meter", case_ref = "idf"){
 
 # read_table: A function to read EnergyPlus table results.
 # {{{1
-read_table <- function (file) {
-    regex_tbl_name <- "<!-- FullName:(.*)-->"
-    # Get table names.
-    tbl_name_comments <- stringr::str_subset(readr::read_lines(file), regex_tbl_name)
-    tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
-    tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
-    tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
-    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(str_split(report_for, "_", 2, simplify = TRUE))][, report_for := NULL]
-    tbl_name_split <- setcolorder(tbl_name_split, c("full_name", "report", "for", "table"))
-
-    # Get table contents.
-    tbls_raw <- rvest::html_nodes(xml2::read_html(file), "table")
-    tbls <- rvest::html_table(tbls_raw, header = TRUE)
-
-    # Combine table names and contents.
-    tbl <- tbl_name_split[, content := dplyr::tibble(content = tbls)]
-
-    return(tbl)
-
-}
-# }}}1
-
-# select_table: Easy table result selection.
-# {{{1
-select_table <- function (table, name = c("report", "for", "table"), regex = FALSE) {
-    check_dt <- is.data.table(table)
-    check_name <- identical(colnames(table), c("full_name", "report", "for", "table", "content"))
-
-    if (any(!check_dt, !check_name)) {
-        stop("Invalid input table. Please use `eplus_read_table` to read your ",
-             "EnergyPlus table results.", call. = FALSE)
-    }
-
+read_table <- function (file, name = c("report", "for", "table"), regex = FALSE) {
+    # Check input.
     if (missingArg(name)) {
         stop("Please give 'name' value.", call. = FALSE)
     }
-
     if (any(!is.character(name), length(name) != 3)) {
         stop("'name' should be a character vector of length 3 indicating the ",
              "name of report, the name of 'for' and the name of table.", call. = FALSE)
     }
 
+    regex_tbl_name <- "<!-- FullName:(.*)-->"
+    # Get table names.
+    # NOTE: Did not find a way to extract comments in htm/htmls in 'rvest'
+    # package. Have to use a ugly regex method.
+    tbl_name_comments <- stringr::str_subset(readr::read_lines(file), regex_tbl_name)
+    tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
+    tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
+    tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
+    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(str_split(report_for, "_", 2, simplify = TRUE))][,
+                                     c("full_name", "report_for") := NULL]
+    tbl_names <- setcolorder(tbl_name_split, c("report", "for", "table"))
+
     if (!regex) {
-        selected_table <- table[report == name[1] &
-                                `for` == name[2] &
-                                table == name[3], .(full_name, content)]
+        # Set 'which' to TRUE without '.j' will return the row number. Or can
+        # use method: DT[  , .I[X=="B"] ]
+        # Borrowed from: http://stackoverflow.com/questions/22408306/using-i-to-return-row-numbers-with-data-table-package
+        table_id <- tbl_names[report == name[1] & `for` == name[2] & table == name[3], which = TRUE]
     } else {
-        report_names <- unique(as.character(table[, report]))
+        report_names <- unique(as.character(tbl_names[, report]))
         report_sel <- stringr::str_subset(report_names, name[1])
 
-        for_names <- unique(as.character(table[, `for`]))
+        for_names <- unique(as.character(tbl_names[, `for`]))
         for_sel <- stringr::str_subset(for_names, name[2])
 
-        table_names <- unique(as.character(table[, table]))
+        table_names <- unique(as.character(tbl_names[, table]))
         table_sel <- stringr::str_subset(table_names, name[3])
 
-        selected_table <- table[report %in% report_sel &
-                                `for` %in% for_sel &
-                                table %in% table_sel, .(full_name, content)]
+        table_id <- tbl_names[report %in% report_sel &
+                              `for` %in% for_sel &
+                              table %in% table_sel, which = TRUE]
     }
 
-    if (nrow(selected_table) == 0) {
+    if (length(table_id) == 0) {
         stop("No matched table found. Please check the value of 'name' or set ",
-             "'regex' to TRUE if you want to use regular expression.", call. = FALSE)
+             "'regex' to TRUE if you want to extract multiple tables using ",
+             "regular expressions.", call. = FALSE)
     }
 
-    result <- selected_table[, content]
-    table_names <- selected_table[, full_name]
-    result <- purrr::set_names(result, table_names)
+    # Get table contents.
+    tbls_raw <- rvest::html_nodes(xml2::read_html(file), "table")
+    tbls <- rvest::html_table(tbls_raw[table_id], header = TRUE)
 
-    return(result)
+    # Get the combined table names.
+    names <- tbl_names[table_id, paste0("[Report]:(", report, ") [For]:(", `for`, ") [Table]:(", table, ")")]
+
+    # Combine table names and contents.
+    tbl <- set_names(tbls, names)
+
+    return(tbl)
+
 }
 # }}}1
