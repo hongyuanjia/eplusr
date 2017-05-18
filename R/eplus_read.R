@@ -424,7 +424,7 @@ read_epg <- function(epg, results = "meter", case_ref = "idf"){
 read_table <- function (file) {
     regex_tbl_name <- "<!-- FullName:(.*)-->"
     # Get table names.
-    tbl_name_comments <- stringr::str_subset(readr::read_lines(path), regex_tbl_name)
+    tbl_name_comments <- stringr::str_subset(readr::read_lines(file), regex_tbl_name)
     tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
     tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
     tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
@@ -432,7 +432,7 @@ read_table <- function (file) {
     tbl_name_split <- setcolorder(tbl_name_split, c("full_name", "report", "for", "table"))
 
     # Get table contents.
-    tbls_raw <- rvest::html_nodes(xml2::read_html(path), "table")
+    tbls_raw <- rvest::html_nodes(xml2::read_html(file), "table")
     tbls <- rvest::html_table(tbls_raw, header = TRUE)
 
     # Combine table names and contents.
