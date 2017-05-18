@@ -2,10 +2,10 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
-# eplus_epg_read: A function to create a data.table of simulation info from a
-#                 EnergyPlus *.epg file.
+# read_epg_info: A function to create a data.table of simulation info from a
+# EnergyPlus *.epg file.
 # {{{1
-eplus_epg_read <- function(epg){
+read_epg_info <- function(epg){
 
     sim_info <-
         readr::read_csv(file = epg, comment = "!",
@@ -363,7 +363,7 @@ eplus_result_read <- function (result, year = current_year(), eplus_date_col = "
 # TODO: merge readTable into it.
 read_epg <- function(epg, results = "meter", case_ref = "idf"){
     # Read simluation info from *.epg file.
-    sim_info <-  eplus_epg_read(epg)
+    sim_info <-  read_epg_info(epg)
 
     if (is.na(match(table, c("variable", "meter", "table", "surface report")))) {
         stop("Invalid value of argument 'results'. It should be one of ",
