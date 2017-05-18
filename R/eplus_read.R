@@ -245,10 +245,9 @@ read_surf_rpt <- function(eio){
 }
 # }}}1
 
-# eplus_meter_read: A function to take the path of EnergyPlus meter results and
-#                   return a data.table of the contents with the first being a
-#                   "POSIXt" column transformed from EnergyPlus standard
-#                   "Date/Time".
+# read_meter: A function to take the path of EnergyPlus meter results and return
+# a data.table of the contents with the first being a "POSIXt" column
+# transformed from EnergyPlus standard "Date/Time".
 
 # - 'meter': A path of EnergyPlus meter results. Normally a .csv file named
 # (idf)Meter.csv or eplusmtr.csv.
@@ -278,7 +277,7 @@ read_surf_rpt <- function(eio){
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
 # {{{1
-eplus_meter_read <- function (meter, year = current_year(), eplus_date_col = "Date/Time",
+read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Time",
                               new_date_col = "datetime", tz = Sys.timezone(),
                               rp_na = 0L, to_GJ = FALSE, long = FALSE) {
     meter <-
