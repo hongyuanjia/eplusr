@@ -125,7 +125,7 @@ eplus_read <- function (path, output = "variable",
                         table_output = purrr::map(file.path(path, file_name),
                                                   function (file) {
                                                       if (file.exists(file)) {
-                                                          eplus_table_read(table = file)
+                                                          eplus_read_table(file = file)
                                                       } else {
                                                           return(NULL)
                                                       }
@@ -421,113 +421,78 @@ eplus_epg_sim_read <- function(epg, results = "meter", case_ref = "idf"){
 }
 # }}}1
 
-# eplus_tbl_info_read: A helper function to extract range info EnergyPlus csv
-#                      format table results.
+# eplus_read_table: A function to read EnergyPlus table results
 # {{{1
-eplus_tbl_info_read <- function(table){
-    # Read raw table results {{{2
-    raw_table <-
-        readr::read_lines(table)[-(1:6)] # exclude first 6 lines that are of no use.
-    # }}}2
-    # Get report names {{{2
-    report_category <-
-        grep(x = raw_table, pattern = "report:", ignore.case = TRUE, value = TRUE)
-    report_category <-
-        gsub(x = report_category, pattern = ".*,", replacement = "")
+eplus_read_table <- function (file) {
+    regex_tbl_name <- "<!-- FullName:(.*)-->"
+    # Get table names.
+    tbl_name_comments <- stringr::str_subset(readr::read_lines(path), regex_tbl_name)
+    tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
+    tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
+    tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
+    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(str_split(report_for, "_", 2, simplify = TRUE))][, report_for := NULL]
+    tbl_name_split <- setcolorder(tbl_name_split, c("full_name", "report", "for", "table"))
 
-    report_for <-
-        grep(x = raw_table, pattern = "report:", ignore.case = TRUE)
-    report_for <-
-        gsub(x = raw_table[`+`(report_for, +1)], pattern = ".*,", replacement = "")
+    # Get table contents.
+    tbls_raw <- rvest::html_nodes(xml2::read_html(path), "table")
+    tbls <- rvest::html_table(tbls_raw, header = TRUE)
 
-    report_name <- paste(report_category, report_for, sep = ":")
-    ## }}}2
-    # Get report range {{{2
-    report_rowstart <-
-         grep(x = raw_table, pattern = "report:", ignore.case = TRUE)
+    # Combine table names and contents.
+    tbl <- tbl_name_split[, content := dplyr::tibble(content = tbls)]
 
-    report_length <-
-        diff(c(report_rowstart, length(raw_table)))
-    # }}}2
-    # table info extraction {{{2
-    # Get raw table contents
-    table_rows <- grep(x = raw_table, pattern = "^,")
-    # Get table range
-    table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
-    table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
-    # all table names
-    table_name <-  raw_table[`-`(table_startrow, 2)]
-    # table range
-    table_range <- data.table::data.table(table_name, table_startrow, table_endrow)
+    return(tbl)
 
-    table_info <-
-        dplyr::tibble(report_name = report_name,
-                      table_name = purrr::map2(report_rowstart, report_length,
-                                               function(x, y){
-                                                   report_range <- seq(from = x, length.out = y, by = 1)
-                                                   report <- raw_table[report_range]
-                                                   table_rows <- grep(x = report, pattern = "^,", value = FALSE)
-                                                   table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
-                                                   table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
-                                                   table_name_per_report <- report[`-`(table_startrow, 2)]
-                                                   data.table::data.table(table_name_per_report, table_startrow, table_endrow)
-                                               }))
-    table_info <- data.table::as.data.table(tidyr::unnest(table_info))
-
-    # Delete table that has no contents to avoid errors when extract table contents
-    table_info[table_startrow != table_endrow]
-    # }}}2
-  return(table_info)
 }
 # }}}1
 
-# eplus_table_read: A function to read EnergyPlus table results
+# select_table
 # {{{1
-eplus_table_read <- function(table){
-    # Read raw table results {{{2
-    raw_table <- readr::read_lines(table)[-(1:6)] # exclude first 6 lines that are of no use.
-    # }}}2
-    # Extract tables names and ranges per report {{{2
-    table_info <- eplus_tbl_info_read(table)
-    # }}}2
-    # Extract tables names and ranges without report info {{{2
-    table_rows <- grep(x = raw_table, pattern = "^,", value = FALSE)
+select_table <- function (table, name = c("report", "for", "table"), regex = FALSE) {
+    check_dt <- is.data.table(table)
+    check_name <- identical(colnames(table), c("full_name", "report", "for", "table", "content"))
 
-    table_startrow <- table_rows[c(min(table_rows), diff(table_rows)) > 1]
-    table_endrow <- table_rows[c(diff(table_rows), max(table_rows)) > 1]
-    table_name <- raw_table[`-`(table_startrow, 2)]
-    table_range <- data.table::data.table(table_name, table_startrow, table_endrow)
+    if (any(!check_dt, !check_name)) {
+        stop("Invalid input table. Please use `eplus_read_table` to read your ",
+             "EnergyPlus table results.", call. = FALSE)
+    }
 
-    table_start <- table_range[table_startrow != table_endrow, table_startrow]
-    table_end <- table_range[table_startrow != table_endrow, table_endrow]
-    table_name <- table_range[table_startrow != table_endrow, table_name]
-    # }}}2
-    # Extract table contents with table names {{{2
-    tables <- purrr::map2(table_start, table_end,
-                          function(x, y){
-                              str <- paste0(raw_table[x:y], collapse = "\n")
-                              table <- data.table::as.data.table(readr::read_csv(str))
-                              table <- table[, X1 := NULL]
-                              table <- data.table::setnames(table, "X2", "Components")})
-    tables <- purrr::set_names(tables, table_name)
-  # }}}2
-    # Group tables by report {{{2
-    unique_rptname <- unique(table_info$report_name)
-    group_list <-
-        purrr::map(unique_rptname,
-                   function(rptname){
-                       grep(x=table_info$report_name, rptname, fixed = TRUE)
-                   })
-    group_start <- purrr::map_int(group_list, min)
-    group_end <- purrr::map_int(group_list, max)
+    if (missingArg(name)) {
+        stop("Please give 'name' value.", call. = FALSE)
+    }
 
-    table <- purrr::map2(group_start,group_end,
-                         function(x,y){
-                             list(tables[x:y])
-                         })
+    if (any(!is.character(name), length(name) != 3)) {
+        stop("'name' should be a character vector of length 3 indicating the ",
+             "name of report, the name of 'for' and the name of table.", call. = FALSE)
+    }
 
-    names(table) <- unique_rptname
-    # }}}2
-    return(table)
+    if (!regex) {
+        selected_table <- table[report == name[1] &
+                                `for` == name[2] &
+                                table == name[3], .(full_name, content)]
+    } else {
+        report_names <- unique(as.character(table[, report]))
+        report_sel <- stringr::str_subset(report_names, name[1])
+
+        for_names <- unique(as.character(table[, `for`]))
+        for_sel <- stringr::str_subset(for_names, name[2])
+
+        table_names <- unique(as.character(table[, table]))
+        table_sel <- stringr::str_subset(table_names, name[3])
+
+        selected_table <- table[report %in% report_sel &
+                                `for` %in% for_sel &
+                                table %in% table_sel, .(full_name, content)]
+    }
+
+    if (nrow(selected_table) == 0) {
+        stop("No matched table found. Please check the value of 'name' or set ",
+             "'regex' to TRUE if you want to use regular expression.", call. = FALSE)
+    }
+
+    result <- selected_table[, content]
+    table_names <- selected_table[, full_name]
+    result <- purrr::set_names(result, table_names)
+
+    return(result)
 }
 # }}}1
