@@ -291,8 +291,8 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
     idf <- paste0('"', idf, '"')
     weather <- paste0('"', weather, '"')
     output_dir <- paste0('"', output_dir, '"')
-    output_prefix <- paste0('"', output_prefix, '"')
-    output_suffix <- paste0('"', output_suffix, '"')
+    # output_prefix <- paste0('"', output_prefix, '"')
+    # output_suffix <- paste0('"', output_suffix, '"')
 
     # Get the right format of the input command to EnergyPlus.
     # NOTE: `ifelse` function cannot return NULL.
