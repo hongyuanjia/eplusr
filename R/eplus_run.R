@@ -344,9 +344,9 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 }
 # }}}1
 
-# eplus_run: A function to run EnergyPlus in R.
+# run_eplus: A function to run EnergyPlus in R.
 # {{{1
-eplus_run <- function (input, weather, eplus_dir = find_eplus(),
+run_eplus <- function (input, weather, eplus_dir = find_eplus(),
                        output_dir = NULL, output_prefix = NULL,
                        csv = TRUE, echo = FALSE,
                        run = "exe", ver = NULL) {
