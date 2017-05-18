@@ -357,11 +357,11 @@ eplus_result_read <- function (result, year = current_year(), eplus_date_col = "
 }
 # }}}1
 
-# eplus_epg_sim_read: A function to read EnergyPlus simulation results grouped
-#                     by an *.epg file.
+# read_epg: A function to read EnergyPlus simulation results grouped by an *.epg
+# file.
 # {{{1
 # TODO: merge readTable into it.
-eplus_epg_sim_read <- function(epg, results = "meter", case_ref = "idf"){
+read_epg <- function(epg, results = "meter", case_ref = "idf"){
     # Read simluation info from *.epg file.
     sim_info <-  eplus_epg_read(epg)
 
