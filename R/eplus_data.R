@@ -615,7 +615,7 @@ na_replace <- function(data, col_pattern, type = "na", replacement = 0L){
 # site_to_src
 # {{{1
 site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
-                         ele_fct = 3.095, gas_fct = 1.092, digits = 4, to_GJ = TRUE) {
+                         ele_fct = 3.095, gas_fct = 1.092, digits = 4, to_GJ = FALSE) {
     check_df(data)
     data <- conv_dt(data)
 
