@@ -627,16 +627,18 @@ site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
                    by = c(col_names(data, gas_pattern, invert = T))]
 
     if(to_GJ){
-        data <- data[, lapply(.SD, function(x) round(x*ele_fct/1E9, digits)),
+        data <- data[, lapply(.SD, function(x) round(x/1E9, digits)),
                        .SDcol = col_names(data, ele_pattern),
                        by = c(col_names(data, ele_pattern, invert = T))]
-        data <- data[, lapply(.SD, function(x) round(x*gas_fct/1E9, digits)),
+        data <- data[, lapply(.SD, function(x) round(x/1E9, digits)),
                        .SDcol = col_names(data, gas_pattern),
                        by = c(col_names(data, gas_pattern, invert = T))]
         data <- data.table::setnames(data, gsub(x=col_names(data),
                                                 pattern = "\\[J\\].*$",
                                                 replacement = "[GJ]"))
     }
+
+    return(data)
 }
 # }}}1
 
