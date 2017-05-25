@@ -3,7 +3,7 @@
 ################################################################################
 
 # # caseAlign: A function to make time interval of two datasets be the same
-# {{{1
+# # {{{1
 # caseAlign <- function(x, y, date_col = NULL, col_based = "Case", bind = FALSE){
 #     x_case_names <- x[[col_based]]
 #     y_case_names <- y[[col_based]]
@@ -54,29 +54,29 @@
 
 # # statCal: A function to make one statistial calculation between two data.table
 # # {{{1
-# statCal <- function(sim, obs, col_pattern, fun, melt = FALSE, by_pattern = NULL, case.col = "Case", case.align = FALSE){
+# statCal <- function(sim, obs, col_pattern, fun, melt = FALSE, by_pattern = NULL, case_col = "Case", case.align = FALSE){
 
-#   if(case.align) {sim <- caseAlign(sim = sim, obs = obs, bind = FALSE)}
+#     # if(case.align) {sim <- caseAlign(sim = sim, obs = obs, bind = FALSE)}
 
-#   if(!(hasArg(col_pattern))){
-#     col_pattern = "^(?!DateTime|Case)"
-#   }
+#     if(!(hasArg(col_pattern))){
+#         col_pattern = "^(?!DateTime|Case)"
+#     }
 
-#   if(!(hasArg(fun))){
-#     stop("Argument 'fun' is missing!")
-#   }
+#     if(!(hasArg(fun))){
+#         stop("Argument 'fun' is missing!")
+#     }
 
-#   sim_case_names <- sim[, unique(get(case.col))]
-#   obs_case_names <- obs[, unique(get(case.col))]
+#     sim_case_names <- sim[, unique(get(case_col))]
+#     obs_case_names <- obs[, unique(get(case_col))]
 
-#   if(length(obs_case_names) > 1){
-#     warning("Only the first unique values in 'by.case' was used!")
-#     obs <- obs[eval(parse(text = case.col)) == obs_case_names[1]]
-#   }
+#     if(length(obs_case_names) > 1){
+#         warning("Only the first unique values in 'case_col' was used!")
+#         obs <- obs[eval(parse(text = case_col)) == obs_case_names[1]]
+#     }
 
 #   results <-
 #     map(sim_case_names, ~map_df(col_pattern, function(x, case_name){
-#       sim <- sim[eval(parse(text = case.col)) == case_name]
+#       sim <- sim[eval(parse(text = case_col)) == case_name]
 #       results <- map2_df(sim[, col_names(sim, x), with = F],
 #                          obs[, col_names(obs, x), with = F], eval(parse(text = fun))) %>%
 #         as.data.table() %>% .[, Sim_Case := case_name] %>%
@@ -85,32 +85,31 @@
 
 #   nrow_results_per_case <-
 #     map_int(results[, unique(Sim_Case)], ~nrow(results %>% .[Sim_Case == .x]))
-#   nrow_obs_by_pattern <- nrow(obs %>% .[, lapply(.SD, unique), .SDcol = col_names(., by_pattern])
+#   nrow_obs_by_pattern <- nrow(obs %>% .[, lapply(.SD, unique), .SDcol = col_names(., by_pattern)]
 
 #   if(melt){
 #     if(!is.null(by_pattern){
 #       if(all(nrow_results_per_case == nrow_obs_by_pattern){
 #         results <-
-#           sim %>% .[, .SD, .SDcol = col_names(., by_pattern] %>%
+#           sim %>% .[, .SD, .SDcol = col_names(., by_pattern)] %>%
 #           bind_cols(., results) %>%
-#           melt(., id.vars = c(col_names(.,by_pattern, "Sim_Case"),
+#           melt(., id.vars = c(col_names(.,by_pattern, "Sim_Case")),
 #                variable.name = "Variable", value.name = fun) %>%
 #           .[, lapply(.SD, function(x) signif(x=x, digits = 4)),
-#             by = c(col_names(.,by_pattern, "Sim_Case", "Variable")]
+#             by = c(col_names(.,by_pattern, "Sim_Case", "Variable"))]
 
 #       }else{
 #         results %<>%
 #           melt(., id.vars = c("Sim_Case"),
 #                variable.name = "Variable", value.name = fun) %>%
 #           .[, lapply(.SD, function(x) signif(x=x, digits = 4)),
-#             by = c(col_names(.,by_pattern, "Sim_Case", "Variable")]
+#             by = c(col_names(.,by_pattern, "Sim_Case", "Variable"))]
 #         warning("'by_pattern' feature will not apply because of non-equal length of 'by_pattern' in 'obs' and results.")
 #       }
 
 #     }else{
 #       results %<>%
-#         melt(., id.vars = c("Sim_Case"),
-#              variable.name = "Variable", value.name = fun) %>%
+#         melt(., id.vars = c("Sim_Case"), variable.name = "Variable", value.name = fun) %>%
 #         .[, lapply(.SD, function(x) signif(x=x, digits = 4)), by = c("Sim_Case", "Variable")]
 #     }
 
@@ -120,14 +119,14 @@
 #     if(!is.null(by_pattern){
 #       if(all(nrow_results_per_case == nrow_obs_by_pattern){
 #         results <-
-#           sim %>% .[, .SD, .SDcol = col_names(., by_pattern] %>%
+#           sim %>% .[, .SD, .SDcol = col_names(., by_pattern)] %>%
 #           bind_cols(., results) %>%
 #           .[, lapply(.SD, function(x) signif(x = x, digits = 4)),
-#             by = c(col_names(.,by_pattern, "Sim_Case", "Stat_Fun")]
+#             by = c(col_names(.,by_pattern, "Sim_Case", "Stat_Fun"))]
 #       }else{
 #       results %<>%
 #         .[, lapply(.SD, function(x) signif(x = x, digits = 4)),
-#           by = c(case.col, "Stat_Fun")]
+#           by = c(case_col, "Stat_Fun")]
 #         warning("'by_pattern' feature will not apply because of non-equal length of 'by_pattern' in 'obs' and results.")
 #       }
 
@@ -143,10 +142,10 @@
 
 # # statmCal: A function to make multiple statistical calculation between two data.tables
 # {{{1
-# statmCal <- function(sim, obs, col_pattern, fun, melt = FALSE, by_pattern = NULL, case.col = "Case", case.align = FALSE){
+# statmCal <- function(sim, obs, col_pattern, fun, melt = FALSE, by_pattern = NULL, case_col = "Case", case.align = FALSE){
 
 #   if(case.align){
-#     sim <- caseAlign(sim, obs, case.col = case.col, bind = FALSE)
+#     sim <- caseAlign(sim, obs, case_col = case_col, bind = FALSE)
 #   }
 
 #   if(!(hasArg(col_pattern))){
@@ -161,13 +160,13 @@
 #     Reduce(function(...) merge(..., all = T),
 #            lapply(fun, function(fun) statCal(sim = sim, obs = obs, fun,
 #                                              col_pattern = col_pattern, melt = TRUE,
-#                                              by_pattern = by_pattern, case.col = case.col,
+#                                              by_pattern = by_pattern, case_col = case_col,
 #                                              case.align = case.align))) %>%
 #     return(.)
 #   }else{
 #     lapply(fun, function(fun) statCal(sim = sim, obs = obs, fun,
 #                                       col_pattern = col_pattern, melt = FALSE,
-#                                       by_pattern = by_pattern, case.col = case.col,
+#                                       by_pattern = by_pattern, case_col = case_col,
 #                                       case.align = case.align)) %>%
 #     rbindlist(.) %>%
 #     return(.)
@@ -296,21 +295,21 @@
 # # barPlot: A function for easy EnergyPlus meter data plotting using geom_bar
 # # {{{1
 # barPlot <- function(data, x.col = "Month", y.col = "value",
-#                     case.col = "Case", fill.col, facet.col, scales.free = "free_x"){
+#                     case_col = "Case", fill.col, facet.col, scales.free = "free_x"){
 #   if(!(x.col %in% names(data))){
 #     stop("x column not found in data input!")
 #   }
 #   if(!(y.col %in% names(data))){
 #     stop("y column not found in data input!")
 #   }
-#   if(!(case.col %in% names(data))){
+#   if(!(case_col %in% names(data))){
 #     stop("Case column not found in data input!")
 #   }
 #   if(!hasArg(fill.col)){
 #     plot <-
 #       data %>%
 #       ggplot(aes_(x= as.name(x.col), y = as.name(y.col),
-#                   group = as.name(case.col), fill = as.name(case.col))) +
+#                   group = as.name(case_col), fill = as.name(case_col))) +
 #       geom_bar(stat = "identity", position = "dodge", color = "black") +
 #       scale_y_continuous(expand = c(0,0.02)) +
 #       ylab("") +
@@ -319,7 +318,7 @@
 #     plot <-
 #       data %>%
 #       ggplot(aes_(x= as.name(x.col), y = as.name(y.col),
-#                   group = as.name(case.col), fill = as.name(fill.col))) +
+#                   group = as.name(case_col), fill = as.name(fill.col))) +
 #       geom_bar(stat = "identity", position = "dodge", color = "black") +
 #       scale_y_continuous(expand = c(0,0.02)) +
 #       ylab("") +
@@ -327,7 +326,7 @@
 #   }
 #   if(!hasArg(facet.col)){
 #     plot <-
-#       plot + facet_wrap(~eval(parse(text=case.col)), ncol = 1, scales = scales.free)
+#       plot + facet_wrap(~eval(parse(text=case_col)), ncol = 1, scales = scales.free)
 #   }else{
 #     plot <-
 #       plot + facet_wrap(~eval(parse(text=facet.col)), ncol = 1, scales = scales.free)
@@ -352,16 +351,16 @@
 # }
 # # }}}1
 
-# # themeClean: A theme with minimal formatting of ggplot2
-# # {{{1
-# themeClean <- function(base_size = 14, base_family = "Palatino Linotype") {
-#   theme_bw(base_size = base_size, base_family = base_family) +
-#     theme(axis.title = element_text(size = 14),
-#           axis.text = element_text(face = "bold"),
-#           legend.key=element_rect(colour=NA, fill =NA),
-#           panel.grid = element_blank(),
-#           panel.border = element_rect(fill = NA, colour = "black", size=1),
-#           panel.background = element_rect(fill = "white", colour = "black"),
-#           strip.background = element_rect(fill = NA))
-# }
-# # }}}1
+# theme_clean: A theme with minimal formatting of ggplot2
+# {{{1
+theme_clean <- function(base_size = 14, base_family = "Palatino Linotype") {
+    theme_bw(base_size = base_size, base_family = base_family) +
+        theme(axis.title = element_text(size = 14),
+              axis.text = element_text(face = "bold"),
+              legend.key=element_rect(colour=NA, fill =NA),
+              panel.grid = element_blank(),
+              panel.border = element_rect(fill = NA, colour = "black", size=1),
+              panel.background = element_rect(fill = "white", colour = "black"),
+              strip.background = element_rect(fill = NA))
+}
+# }}}1
