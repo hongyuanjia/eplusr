@@ -2,28 +2,25 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
-# import_epg: A function to create a data.table of simulation info from a
-# EnergyPlus *.epg file.
+# import_epg: A function to create a data.table of simulation info from an
+# EnergyPlus .epg file.
 # {{{1
 import_epg <- function(epg){
 
     sim_info <-
         data.table::as.data.table(readr::read_csv(file = epg, comment = "!",
-                                                  col_names = c("idf", "weather", "result", "run_times"),
+                                                  col_names = c("model", "weather", "result", "run_times"),
                                                   col_types = cols(.default = "c", run_times = col_integer())))
 
     sim_info <- sim_info[, lapply(.SD, function(x) gsub(x=x, pattern = "\\\\", replacement = "/"))]
-        sim_info <- sim_info[, `:=`(idf_name      = basename(idf),
-                                    idf_path      = dirname(idf),
-                                    weather_name  = basename(weather),
-                                    weather_path  = dirname(weather),
-                                    result_prefix = basename(result),
-                                    result_path   = dirname(result))]
-        sim_info <- sim_info[, `:=`(idf = NULL, weather = NULL, result = NULL)]
-        sim_info <- data.table::setcolorder(sim_info,
-                                            c("idf_name", "weather_name", "result_prefix",
-                                  "idf_path", "weather_path", "result_path", "run_times"))
-    return(sim_info)
+    sim_info <- sim_info[, `:=`(output_dir = dirname(result),
+                                output_prefix = basename(result))]
+    sim_info <- sim_info[, `:=`(result = NULL)]
+    sim_info <- data.table::setcolorder(sim_info, c("model", "weather", "output_dir", "output_prefix", "run_times"))
+
+    attr(sim_info, "job_type") <- "epg"
+
+    return(sim_info[])
 }
 # }}}1
 
