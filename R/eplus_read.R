@@ -2,45 +2,27 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
-# read_epg_info: A function to create a data.table of simulation info from a
+# import_epg: A function to create a data.table of simulation info from a
 # EnergyPlus *.epg file.
 # {{{1
-read_epg_info <- function(epg){
+import_epg <- function(epg){
 
     sim_info <-
-        readr::read_csv(file = epg, comment = "!",
-                        col_names = c("idf", "weather", "result", "run_times"),
-                        col_types = cols(.default = "c", run_times = col_integer())) %>%
-        data.table::as.data.table() %>%
-        .[,lapply(.SD, function(x) gsub(x=x, pattern = "\\\\", replacement = "/"))] %>%
-        .[, `:=`(idf_name      = basename(idf),
-                 idf_path      = dirname(idf),
-                 weather_name  = basename(weather),
-                 weather_path  = dirname(weather),
-                 result_prefix = basename(result),
-                 result_path   = dirname(result))] %>%
-        .[, `:=`(idf = NULL, weather = NULL, result = NULL)] %>%
-        data.table::setcolorder(c("idf_name", "weather_name", "result_prefix",
-                                  "idf_path", "weather_path", "result_path", "run_times")) %>%
-        .[]
-    # if(full.path){
-    #     epg_file <- dir(path, full.names = TRUE)
-    # }else{
-    #     epg_file <- dir(path, pattern = ".epg$", recursive = F, full.names = TRUE)
-    # }
-    # sim_info <-
-    #     fread(epg_file, skip = 9, col.names = c("IDFFile", "WeatherFile", "ResultPath"), drop = 4) %>%
-    #     .[,lapply(.SD, function(x) gsub(x=x, pattern = "\\\\", replacement = "/"))]
+        data.table::as.data.table(readr::read_csv(file = epg, comment = "!",
+                                                  col_names = c("idf", "weather", "result", "run_times"),
+                                                  col_types = cols(.default = "c", run_times = col_integer())))
 
-    # if(relative.path){
-    #     sim_info %<>%
-    #         .[, ResultFolder := ResultPath] %>%
-    #         .[, lapply(.SD, function(x) gsub(x=x, pattern = ".*/(.*)$",
-    #                                          replacement = "\\1", ignore.case = T, perl = T)),
-# by = .(ResultPath)] %>%
-    # setcolorder(c("IDFFile", "WeatherFile", "ResultFolder", "ResultPath")) %>% .[]
-    # }
-
+    sim_info <- sim_info[, lapply(.SD, function(x) gsub(x=x, pattern = "\\\\", replacement = "/"))]
+        sim_info <- sim_info[, `:=`(idf_name      = basename(idf),
+                                    idf_path      = dirname(idf),
+                                    weather_name  = basename(weather),
+                                    weather_path  = dirname(weather),
+                                    result_prefix = basename(result),
+                                    result_path   = dirname(result))]
+        sim_info <- sim_info[, `:=`(idf = NULL, weather = NULL, result = NULL)]
+        sim_info <- data.table::setcolorder(sim_info,
+                                            c("idf_name", "weather_name", "result_prefix",
+                                  "idf_path", "weather_path", "result_path", "run_times"))
     return(sim_info)
 }
 # }}}1
@@ -361,7 +343,7 @@ read_variable <- function (result, year = current_year(), eplus_date_col = "Date
 # TODO: merge readTable into it.
 read_epg <- function(epg, results = "meter", case_ref = "idf"){
     # Read simluation info from *.epg file.
-    sim_info <-  read_epg_info(epg)
+    sim_info <-  import_epg(epg)
 
     if (is.na(match(table, c("variable", "meter", "table", "surface report")))) {
         stop("Invalid value of argument 'results'. It should be one of ",
