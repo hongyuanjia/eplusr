@@ -405,6 +405,10 @@ read_epg <- function(epg, results = "meter", case_ref = "idf"){
 # {{{1
 read_table <- function (file, name = c("report", "for", "table"), regex = FALSE) {
     # Check input.
+    if (all(!identical(tools::file_ext(basename(file)), "htm"),
+            !identical(tools::file_ext(basename(file)), "html"))) {
+        stop("Input file should be a .htm/.html file.", call. = FALSE)
+    }
     if (missingArg(name)) {
         stop("Please give 'name' value.", call. = FALSE)
     }
@@ -459,9 +463,11 @@ read_table <- function (file, name = c("report", "for", "table"), regex = FALSE)
     names <- tbl_names[table_id, paste0("[Report]:(", report, ") [For]:(", `for`, ") [Table]:(", table, ")")]
 
     # Combine table names and contents.
-    tbl <- set_names(tbls, names)
+    tbls <- set_names(tbls, names)
+    # Always rename the first column to "Components".
+    tbls <- map(tbls, ~{names(.x)[1] <- "Components"; .x})
 
-    return(tbl)
+    return(tbls)
 
 }
 # }}}1
