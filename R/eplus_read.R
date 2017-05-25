@@ -24,6 +24,56 @@ import_epg <- function(epg){
 }
 # }}}1
 
+# import_jeplus: A function to create a data.table of simulation info fram a
+# jEplus .json project file.
+# {{{1
+import_jeplus <- function (json) {
+    # Read jeplus JSON project file.
+    info <- jsonlite::fromJSON(json)
+
+    # Get parameter info.
+    params <- info[["parameters"]]
+
+    param_name <- params[["name"]]
+
+    param_field <- stringr::str_split(params[["searchString"]], "\\|")
+    param_field <- purrr::set_names(param_field, param_name)
+
+    param_value <- stringr::str_replace_all(params[["valuesString"]], "[\\{\\}]", "")
+    param_value <- stringr::str_split(param_value, "(\\s)*,(\\s)*")
+
+    # Get selected parameter values.
+    param_value_selected <- params[["selectedAltValue"]]
+    param_value <- map2(param_value_selected, param_value, ~{if (.x > 0) .y <- .y[.x] else .y})
+
+    param_value <- purrr::map(param_value, ~stringr::str_split(.x, "(\\s)*\\|(\\s)*"))
+    param_value <- purrr::set_names(param_value, param_name)
+
+    # Create case names according to parameter names.
+    case_names <- purrr::map2(param_name, param_value, ~paste0(.x, seq_along(.y)))
+    case_names <- data.table::rbindlist(purrr::cross_n(case_names))
+    case_names <- purrr::flatten_chr(purrr::by_row(case_names, ~paste(.x, collapse = "_"))[[".out"]])
+
+    # Get all combination of case values.
+    param_value <- purrr::cross_n(param_value)
+    param_value <- set_names(param_value, case_names)
+
+
+    # Get input file info.
+    idfs <- purrr::flatten_chr(stringr::str_split(info[["idftemplate"]], "\\s*;\\s*"))
+    wthrs <- purrr::flatten_chr(stringr::str_split(info[["weatherFile"]], "\\s*;\\s*"))
+    idf_path <- paste0(info[["idfdir"]], idfs)
+    wthr_path <- paste0(info[["weatherDir"]], wthrs)
+
+    sim_info <- list(idf_path = idf_path, weather_path = wthr_path,
+                     param_field = param_field, param_value = param_value)
+
+    attr(sim_info, "job_type") <- "jeplus"
+
+    return(sim_info)
+}
+# }}}1
+
 # read_output: A function to read EnergyPlus simulation results.
 # {{{1
 read_output <- function (path, output = "variable",
