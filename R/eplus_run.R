@@ -533,3 +533,95 @@ import_jeplus <- function (json) {
          param_field = param_field, param_value = param_value)
 }
 # }}}1
+
+# create_param
+# {{{1
+create_param <- function (idf_path, param_name, param_field, param_value) {
+    con <- environment()
+    idf_raw <- read_idf(idf_path, parse = FALSE)
+
+    purrr::walk(param_name,
+                ~{purrr::walk2(param_field, param_value,
+                               ~{assign("idf_raw", stringr::str_replace_all(idf_raw, .x, .y), envir = con)})})
+
+    idf_ver <- get_idf_ver(idf_raw)
+    attrs <- list(ver = idf_ver,
+                  type = "string")
+    idf_raw <- add_attrs(idf_raw, attrs)
+
+    return(idf_raw)
+}
+# }}}1
+
+# create_job
+# {{{1
+create_job <- function (param_tbl, path = NULL) {
+    all_names <- names(param_tbl)
+    is_param_tbl <- all(match("idf_path", all_names),
+                        match("weather_path", all_names),
+                        match("param_field", all_names),
+                        match("param_value", all_names))
+
+    if (!is_param_tbl) {
+        stop("Invalid parametric table.", call. = FALSE)
+    }
+
+    if (is.null(path)) {
+        path <- getwd()
+    }
+
+    idf_path <- param_tbl[["idf_path"]]
+    idf_name <- basename(idf_path)
+    weather_path <- param_tbl[["weather_path"]]
+    weather_name <- basename(weather_path)
+    param_name <- names(param_tbl[["param_field"]])
+    param_field <- purrr::flatten_chr(param_tbl[["param_field"]])
+    param_value <- map(param_tbl[["param_value"]], flatten_chr)
+
+    # Creat idf/imfs and save it into tempdir.
+    # Create tempdir for eplus package
+    temp_dir <- normalizePath(paste0(tempdir(), "\\eplusr"), winslash = "/", mustWork = FALSE)
+    if (!dir.exists(temp_dir)) {
+        dir.create(temp_dir)
+    }
+
+    # TODO: Find a functionial way to determine the file extension.
+    file_name <- file.path(temp_dir, paste0(names(param_value), ".imf"))
+    file_name <- normalizePath(file_name, winslash = "/", mustWork = FALSE)
+    param_idfs <-
+        map(seq_along(param_value),
+            ~create_param(idf_path = idf_path,
+                          param_name = param_name,
+                          param_field = param_field,
+                          param_value = param_value[[.x]]))
+    param_idfs <- purrr::set_names(param_idfs, names(param_value))
+    purrr::walk2(param_idfs, file_name, ~readr::write_lines(x = .x, path = .y))
+
+    # Creat job info
+    combinations <- purrr::cross_n(list(names(param_value), idf_name, weather_path))
+    job <-
+        purrr::map(seq_along(combinations),
+                   ~{input_info <- combinations[[.x]]
+                     case_name <- input_info[[1]]
+                     field_values <- param_value[[case_name]]
+                     info <- append(combinations[[.x]], field_values)
+                   })
+    # Convert the job info into a data.table
+    job <- data.table::rbindlist(job)
+    # Add job number
+    job <- job[, `#` := seq_along(V1)]
+    job <- setcolorder(job, c("#", col_names(job, "#", invert = TRUE)))
+    # Set names as jEPlus style.
+    job <- purrr::set_names(job, c("#", "model_case", "model_template", "weather", param_field))
+
+    # Modify the job table before writing it to "job_index.csv"
+    job_ <- copy(job)
+    job_ <- job_[, `:=`(weather = basename(weather))]
+
+    job_file <- file.path(path, "job_index.csv")
+    write_csv(job_, path = job_file)
+
+    job <- job[, .(model = normalizePath(file.path(temp_dir, paste0(model_case, ".imf")), mustWork = TRUE), weather)]
+    return(job)
+}
+# }}}1
