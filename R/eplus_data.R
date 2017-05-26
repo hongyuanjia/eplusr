@@ -415,7 +415,7 @@ eplus_time_trans <- function(data, year = current_year(),
 
 #' Add a padding time column for further aggregation.
 #'
-#' \code{time_col_add} adds a padding time column in a data.table for further
+#' \code{add_time} adds a padding time column in a data.table for further
 #' easy data aggregation. Basically, this is a wrapper function of
 #' \code{\link[padr]{thicken}} but with an extra feature to give an exact number
 #' of minutes of interval. It can also replace the datetime that is
@@ -429,8 +429,8 @@ eplus_time_trans <- function(data, year = current_year(),
 #' higher than the interval of the input datetime variable. If 'NULL', it will
 #' be one level higher than the interval of the input datetime variable. It can
 #' also be an integer indicates the interval of minutes. In conclusion,
-#' 'interval' should be a number or one of c("level_up", "year", "quarter",
-#' "month", "week", "day", "hour", "min").
+#' 'interval' should be a number or one of c("year", "quarter", "month", "week",
+#' "yday", "mday", "wday", "day", "date", "hour", "min", "second").
 #' @param new_name The column name of the added variable. If 'NULL' it will be
 #' the name of the original datetime variable with the interval name added to
 #' it, separeted by an underscore.
@@ -439,10 +439,10 @@ eplus_time_trans <- function(data, year = current_year(),
 #' @importFrom xts align.time
 #' @importFrom padr thicken
 #' @export
-# time_col_add
+# add_time
 # {{{1
-time_col_add <- function (data, based_col = NULL, interval = "level_up",
-                          new_name = NULL, one_year = FALSE) {
+add_time <- function (data, based_col = NULL, interval, new_name = NULL,
+                      one_year = FALSE) {
 
     check_df(data)
     data <- conv_dt(data)
@@ -499,7 +499,7 @@ time_col_add <- function (data, based_col = NULL, interval = "level_up",
 #' @param by_col For grouping using the feature of \code{by} argument in
 #' data.table.
 #' @param fun A character indicates the function to apply during aggregation.
-#' @inheritParams time_col_add
+#' @inheritParams add_time
 #' @importFrom purrr map_lgl
 #' @export
 # agg_by_time
@@ -512,14 +512,14 @@ agg_by_time <- function (data, based_col = NULL, interval = "year",
         based_col <- check_date_col(data)
     }
 
-    data_thicken <- time_col_add(data = data, based_col = based_col,
+    data_thicken <- add_time(data = data, based_col = based_col,
                                  interval = interval, new_name = new_name,
                                  one_year = one_year)
 
     # Delete the original datetime column.
     data_thicken <- data_thicken[, c(based_col) := NULL]
 
-    # Cause `time_col_add` always add the new column as the last column.
+    # Cause `add_time` always add the new column as the last column.
     if (is.null(new_name)) {
         new_name <- names(data_thicken)[length(names(data_thicken))]
     }
@@ -1069,6 +1069,8 @@ uniform_interval_name <- function(interval) {
         interval <- "wday"
     } else if (interval %in% c("d", "da", "day", "days")) {
         interval <- "day"
+    } else if (interval %in% c("dat", "date")) {
+        interval <- "date"
     } else if (interval %in% c("h", "ho", "hou", "hour", "hours")) {
         interval <- "hour"
     } else if (interval %in% c("mi", "min", "mins", "minute", "minutes")) {
