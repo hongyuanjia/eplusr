@@ -79,7 +79,7 @@ import_jeplus <- function (json) {
 read_eplus <- function (path, output = "variable",
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
-                        rp_na = NA, to_GJ = FALSE, long = FALSE) {
+                        rp_na = NA, to_GJ = NULL, long = FALSE) {
     # Check if the input model path is given.
     ext <- tools::file_ext(path)
     if (ext != "") {
@@ -98,6 +98,10 @@ read_eplus <- function (path, output = "variable",
     } else {
         # Get the output name pattern.
         file_names <- get_eplus_main_output_files(path)
+    }
+
+    if (is.null(to_GJ)) {
+        to_GJ <- FALSE
     }
 
     if (is.na(match(output, c("variable", "meter", "table", "surface report")))) {
