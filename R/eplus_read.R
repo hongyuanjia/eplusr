@@ -76,7 +76,7 @@ import_jeplus <- function (json) {
 
 # read_eplus: A function to read EnergyPlus simulation results.
 # {{{1
-read_eplus <- function (path, output = "variable",
+read_eplus <- function (path, output = c("variable", "meter", "table", "surface report"),
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
                         rp_na = NA, to_GJ = NULL, unnest = FALSE, long = FALSE) {
@@ -98,6 +98,11 @@ read_eplus <- function (path, output = "variable",
     } else {
         # Get the output name pattern.
         file_names <- get_eplus_main_output_files(path)
+    }
+
+    if (missingArg(output)) {
+        stop("Missing 'output', which should be one of c('variable', 'meter', 'table', 'surface report').",
+             call. = FALSE)
     }
 
     if (is.null(to_GJ)) {
