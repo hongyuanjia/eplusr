@@ -73,7 +73,7 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
         if (is.na(match(ver, idd_ver))) {
             stop(paste0("Cannot find EnergyPlus Version:", ver, " ",
                         "Please specify EnergyPlus path mannually.\n",
-                        "NOTE: Version format should be 'X.Y.Z'."))
+                        "NOTE: Version format should be 'X.Y'."))
         } else {
             eplus_dir_matched <- eplus_dir[match(ver, idd_ver)]
             idd_ver_matched <- idd_ver[match(ver, idd_ver)]
