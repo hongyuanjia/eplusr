@@ -85,44 +85,67 @@ col_names <- function(data, pattern = ".*", ignore_case = TRUE, invert = FALSE) 
 #' col_select(mtcars, "t$")
 # col_select
 # {{{1
-col_select <- function (data, col_pattern = "", by_pattern = NULL,
-                       ignore_case = TRUE, invert = FALSE) {
+col_select <- function (data, col_pattern = "", by_pattern = NULL, regex = TRUE,
+                        ignore_case = TRUE, invert = FALSE) {
     check_df(data)
     data <- conv_dt(data)
 
-    # Extract selected column names.
-    if (col_pattern != "") {
-        selected_col <- col_names(data, col_pattern,
-                                  ignore_case = ignore_case, invert = invert)
-    }
-
-    # Extract group column names.
-    if (!is.null(by_pattern)) {
-        by_col <- col_names(data, by_pattern, ignore_case, invert = FALSE)
-    }
-
-    # If no column pattern is given, return all columns.
-    if (col_pattern == "") {
-        # If 'by_pattern' is not given, return data as it is.
-        if (is.null(by_pattern)) {
-            data_selected <- data
-        # Else, return data grouped by the 'by_col'.
+    if (any(length(col_pattern) > 1, length(by_pattern) > 1)) {
+        regex <- FALSE
+        if (length(col_pattern) > 1) {
+            warning("'col_pattern' has a length > 1, 'regex' is forced to FALSE.",
+                    call. = FALSE)
         } else {
-            data_selected <- data[, .SD, by = by_col]
+            warning("'by_pattern' has a length > 1, 'regex' is forced to FALSE.",
+                    call. = FALSE)
+        }
+    }
+
+    # If 'regex' is FALSE, then one of length of 'col_pattern' and 'by_pattern'
+    # should be bigger than one.
+    if (!regex) {
+        # if 'col_pattern' is empty, return the data as it is.
+        if (length(col_pattern) == 1) {
+            if (col_pattern == "") {
+                return(data)
+            }
         }
 
-    # If column pattern is given, return only selected columns.
+        selected_col <- col_pattern
+        missings <- colnames(data)[is.na(match(selected_col, colnames(data)))]
+        if (length(missings) != 0) {
+            warning("Could not find column ", paste0("'", missings, "'"), ".",
+                    call. = FALSE)
+        }
+
+        if (is.null(by_pattern)) {
+            return(data[, .SD, .SDcol = selected_col])
+        } else {
+            by_col <- by_pattern
+            missings <- colnames(data)[is.na(match(by_col, colnames(data)))]
+            if (length(missings) != 0) {
+                warning("Could not find by column ", paste0("'", missings, "'"), ".",
+                        call. = FALSE)
+            }
+            return(data[, .SD, .SDcol = selected_col, by = by_col])
+        }
+
+    # If 'regex' is TRUE, then length of 'col_pattern' and 'by_pattern' should
+    # be one.
     } else {
-        # If 'by_pattern' is not given, ignore 'by' argument in data.table.
-        if (is.null(by_pattern)) {
-            data_selected <- data[, .SD, .SDcol = selected_col]
-        # Else, return columns in data grouped by the 'by_col'.
+        if (col_pattern != "") {
+            selected_col <- col_names(data, col_pattern,
+                                      ignore_case = ignore_case, invert = invert)
         } else {
-            data_selected <- data[, .SD, .SDcol = selected_col, by = by_col]
+            return(data)
         }
-    }
 
-    return(data_selected)
+        by_col <- col_names(data, by_pattern,
+                            ignore_case = ignore_case, invert = invert)
+
+        return(data[, .SD, .SDcol = selected_col, by = by_col])
+
+    }
 }
 # }}}1
 
