@@ -80,8 +80,25 @@ read_eplus <- function (path, output = "variable",
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
                         rp_na = NA, to_GJ = FALSE, long = FALSE) {
-    # Get the output name pattern.
-    file_names <- get_eplus_main_output_files(path)
+    # Check if the input model path is given.
+    ext <- tools::file_ext(path)
+    if (ext != "") {
+        if (length(grep("i[dm]f", ext, ignore.case = TRUE)) == 0) {
+            stop("'path' should be a path of folder or a path of the input .idf or .imf file.",
+                 call. = FALSE)
+        } else {
+            prefix = tools::file_path_sans_ext(basename(path))
+            file_names <- data.table(prefix = prefix,
+                                     variable = paste0(prefix, ".csv"),
+                                     meter = paste0(prefix, "Meter.csv"),
+                                     surface_report = paste0(prefix, ".eio"),
+                                     table = paste0(prefix, "Table.csv"))
+            path <- dirname(path)
+        }
+    } else {
+        # Get the output name pattern.
+        file_names <- get_eplus_main_output_files(path)
+    }
 
     if (is.na(match(output, c("variable", "meter", "table", "surface report")))) {
         stop("Invalid value of argument 'output'. It should be one of ",
