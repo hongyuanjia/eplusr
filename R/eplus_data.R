@@ -13,8 +13,10 @@
 #' @param data A data frame that you want to extract column names from.
 #' @param pattern A RegEx used for column name extraction. If multiple patterns
 #' are given, then all items in the vector will be seperately used for
-#' searching. Default is ".*" which will return all column names of the input
+#' searching. Default is ".*", which will return all column names of the input
 #' data frame.
+#' @param regex If FALSE, \code{pattern} is treated as a character vector of
+#' column names.
 #' @param ignore_case A logical value. If FALSE, the pattern matching is case
 #' sensitive and if TRUE, case is ignored during matching. Default is TRUE.
 #' @param invert A logical value. If TRUE return column names that do not match.
@@ -27,37 +29,29 @@
 #' col_names(mtcars, "t$")
 #' col_names(mtcars, c("^c", "t$"))
 #' col_names(mtcars, "cyl", invert = TRUE)
+#' col_names(mtcars, c("cly", "disp"), regex = FALSE)
 # col_names
 # {{{1
-col_names <- function(data, pattern = ".*", ignore_case = TRUE, invert = FALSE) {
+col_names <- function (data, pattern = ".*", regex = TRUE,
+                       ignore_case = TRUE, invert = FALSE) {
     check_df(data)
 
-    name <- names(data)
-    if(length(pattern) == 1){
-        colnames <- grep(x = name, pattern = pattern, ignore.case = ignore_case,
-                         perl = TRUE, value = TRUE, invert = invert)
-    }else{
-        if(!invert){
-         colnames <- purrr::map(pattern,
-                                ~grep(x = name, .x, ignore.case = ignore_case,
-                                      perl = TRUE, value = TRUE, invert = FALSE))
-         colnames <- purrr::flatten_chr(colnames)
-        } else {
-            sel_name <-
-                purrr::map(pattern,
-                    ~grep(x = name, .x, ignore.case = ignore_case, perl = TRUE,
-                          value = TRUE, invert = FALSE))
-            sel_names <- purrr::flatten_chr(sel_names)
+    name <- colnames(data)
 
-        colnames <- name[is.na(match(name, sel_name, nomatch=NA_character_))]
-        }
-    }
-
-    if (length(colnames) == 0) {
-        stop("No matched column names found.", call. = FALSE)
+    if (!regex) {
+        colnames <- name[!is.na(match(pattern, name))]
     } else {
-        return(colnames)
+        colnames <- purrr::map(pattern,
+                               ~grep(x = name, .x, ignore.case = ignore_case,
+                                     perl = TRUE, value = TRUE, invert = FALSE))
+        colnames <- unique(purrr::flatten_chr(colnames))
     }
+
+    if (invert) {
+        colnames <- setdiff(name, colnames)
+    }
+
+    return(colnames)
 }
 # }}}1
 
