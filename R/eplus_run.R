@@ -614,7 +614,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
         output_prefix <- job[["output_prefix"]]
     }
     # If the job is imported from `import_jeplus`
-    if (identical(job_type "jeplus")) {
+    if (identical(job_type, "jeplus")) {
         job <- create_job(param_tbl)
     }
 
