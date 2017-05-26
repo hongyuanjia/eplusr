@@ -510,9 +510,9 @@ get_eplus_output_prefix_str <- function(path = getwd()) {
         setwd(path)
     }
 
-    output_prefix <- list_files_with_exts(dir = path,
-                                          exts = c("imf", "idf", "epmidf")) %>%
-                     basename() %>% file_path_sans_ext()
+    output_prefix <- tools::list_files_with_exts(dir = path,
+                                                 exts = c("imf", "idf", "epmidf"))
+    output_prefix <- tools::file_path_sans_ext(basename(output_prefix))
 
     if (length(output_prefix) == 0) {
         message("None 'imf', 'idf' or 'epmidf' file found in the input path.")
