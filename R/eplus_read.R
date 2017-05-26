@@ -74,9 +74,9 @@ import_jeplus <- function (json) {
 }
 # }}}1
 
-# read_output: A function to read EnergyPlus simulation results.
+# read_eplus: A function to read EnergyPlus simulation results.
 # {{{1
-read_output <- function (path, output = "variable",
+read_eplus <- function (path, output = "variable",
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
                         rp_na = NA, to_GJ = FALSE, long = FALSE) {
