@@ -79,7 +79,7 @@ import_jeplus <- function (json) {
 read_eplus <- function (path, output = "variable",
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
-                        rp_na = NA, to_GJ = NULL, long = FALSE) {
+                        rp_na = NA, to_GJ = NULL, unnest = FALSE, long = FALSE) {
     # Check if the input model path is given.
     ext <- tools::file_ext(path)
     if (ext != "") {
@@ -181,6 +181,10 @@ read_eplus <- function (path, output = "variable",
                                                       }
                                                   }
                                                   )) %>% data.table::as.data.table() #%>% tidyr::unnest()
+    }
+
+    if (unnest) {
+        data <- tidyr::unnest(data = data)
     }
 
     return(data)
