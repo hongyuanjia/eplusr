@@ -39,7 +39,12 @@ col_names <- function (data, pattern = ".*", regex = TRUE,
     name <- colnames(data)
 
     if (!regex) {
-        colnames <- name[!is.na(match(pattern, name))]
+        colnames <- pattern[!is.na(match(pattern, name))]
+        missings <- pattern[is.na(match(pattern, name))]
+        if (length(missings) > 0) {
+            warning("Column ", paste(paste0("'", missings, "'"), collapse = ", "),
+                    " not found in the input data.", call. = FALSE)
+        }
     } else {
         colnames <- purrr::map(pattern,
                                ~grep(x = name, .x, ignore.case = ignore_case,
@@ -62,84 +67,54 @@ col_names <- function (data, pattern = ".*", regex = TRUE,
 #' be lost.
 #'
 #' @param data A data.frame or data.table to subset culumns from.
-#' @param col_pattern A RegEx used for column subsetting. If blank, all columns
-#' be returned.
-#' @param by_pattern A RegEx used for grouped column subsetting using the
+#' @param col A RegEx used for column subsetting. If blank, all columns be
+#' returned.
+#' @param by A character vector used for grouped column subsetting using the
 #' feature of \code{by} argument in data.table. Especially useful when you want
 #' grouping or cases when the \code{by} columns are not easy to be combined with
-#' \code{col_pattern}.
+#' \code{col}. NOTE: \code{by} is not a regex, but a character vector.
+#' @param regex If FALSE, \code{col} is treated as a character vector of
+#' column names, not a regex.
 #' @param ignore_case A logical value. If FALSE, the pattern matching is case
 #' sensitive and if TRUE, case is ignored during matching. Default is TRUE.
+#' \code{ignore_case} only takes effect on \code{col} not \code{by}.
 #' @param invert A logical value. If TRUE return column names that do not match.
-#' Default is FALSE. \code{invert} only takes effect on \code{col_pattern} not
-#' \code{by_pattern}.
+#' Default is FALSE. \code{invert} only takes effect on \code{col} not
+#' \code{by}.
 #' @return A data.table that only contains the subsetted columns.
 #' @export
 #' @examples
 #' col_select(mtcars, "t$")
 # col_select
 # {{{1
-col_select <- function (data, col_pattern = "", by_pattern = NULL, regex = TRUE,
+col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
                         ignore_case = TRUE, invert = FALSE) {
     check_df(data)
     data <- conv_dt(data)
 
-    if (any(length(col_pattern) > 1, length(by_pattern) > 1)) {
-        regex <- FALSE
-        if (length(col_pattern) > 1) {
-            warning("'col_pattern' has a length > 1, 'regex' is forced to FALSE.",
-                    call. = FALSE)
-        } else {
-            warning("'by_pattern' has a length > 1, 'regex' is forced to FALSE.",
-                    call. = FALSE)
-        }
-    }
-
-    # If 'regex' is FALSE, then one of length of 'col_pattern' and 'by_pattern'
-    # should be bigger than one.
-    if (!regex) {
-        # if 'col_pattern' is empty, return the data as it is.
-        if (length(col_pattern) == 1) {
-            if (col_pattern == "") {
-                return(data)
-            }
-        }
-
-        selected_col <- col_pattern
-        missings <- colnames(data)[is.na(match(selected_col, colnames(data)))]
-        if (length(missings) != 0) {
-            warning("Could not find column ", paste0("'", missings, "'"), ".",
-                    call. = FALSE)
-        }
-
-        if (is.null(by_pattern)) {
-            return(data[, .SD, .SDcol = selected_col])
-        } else {
-            by_col <- by_pattern
-            missings <- colnames(data)[is.na(match(by_col, colnames(data)))]
-            if (length(missings) != 0) {
-                warning("Could not find by column ", paste0("'", missings, "'"), ".",
-                        call. = FALSE)
-            }
-            return(data[, .SD, .SDcol = selected_col, by = by_col])
-        }
-
-    # If 'regex' is TRUE, then length of 'col_pattern' and 'by_pattern' should
-    # be one.
+    # If no 'col' given, return the input data as it is.
+    if (is.null(col)) {
+        return(data)
     } else {
-        if (col_pattern != "") {
-            selected_col <- col_names(data, col_pattern,
-                                      ignore_case = ignore_case, invert = invert)
-        } else {
-            return(data)
+        sel_col <- col_names(data, pattern = col, regex = regex,
+                             ignore_case = ignore_case, invert = invert)
+        if (length(sel_col) == 0) {
+            stop("No matched column found.", call. = FALSE)
         }
-
-        by_col <- col_names(data, by_pattern,
-                            ignore_case = ignore_case, invert = invert)
-
-        return(data[, .SD, .SDcol = selected_col, by = by_col])
-
+        if (is.null(by)) {
+            return(data[, ..sel_col])
+        } else {
+            by_col <- col_names(data, pattern = by, regex = FALSE)
+            if (length(by_col) == 0) {
+                stop("No matched by column found.\n",
+                     "NOTE: `by` is not parsed as a regex but a character vector of column names.",
+                     call. = FALSE)
+            } else {
+                return(data[, ..sel_col, by = ..by_col])
+            }
+        }
     }
+
 }
 # }}}1
 
