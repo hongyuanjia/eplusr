@@ -256,49 +256,89 @@ check_eplus_output_file_exist <- function (path, file_names, type) {
 }
 # }}}1
 
-# read_surf_rpt: A function to read EnergyPlus Surface Details Report in eio file.
+#' Read EnergyPlus Surface Details Report from an .eio file.
+#'
+#' \code{read_surf_rpt} takes a file path of EnergyPlus .eio output file as
+#' input, and returns a data.table object which contains the contents of the
+#' report. It is worth noting that you have to add an "Output:Surfaces:List"
+#' object in your model in order to generate an Surface Details Report in the
+#' .eio output file.
+#'
+#' @param eio A path of an EnergyPlus .eio output file.
+#' @return A data.table containing the Surface Details Report.
+#' @export
+#' @importFrom stringr str_which str_split str_trim str_replace_all str_replace str_extract
+#' @importFrom readr cols col_character col_double col_integer read_csv
+#' @importFrom data.table rbindlist as.data.table fread
+#' @importFrom purrr flatten_chr map2
+# read_surf_rpt
 # {{{1
 read_surf_rpt <- function(eio){
     # Read raw .eio file
     eio <- readr::read_lines(eio)
     # Row num of all headers
-    rownum_all <- eio %>% grep(x=., "! <.*>", value = F)
+    row_all <- stringr::str_which(eio, "! <.*>")
     # Starting row num of surface details report
-    rownum_surf <- eio %>%
-        grep(x=., "! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces")
+    row_surf <- stringr::str_which(eio, "! <Zone/Shading Surfaces>,<Zone Name>/#Shading Surfaces,# Surfaces")
 
     # Stop if there is no Surface Details Report
-    if(length(rownum_surf) == 0){
+    if(length(row_surf) == 0){
         stop("'Surface Details Report' was not found in the eio file. ",
-             "Please check if the 'Output:Surfaces:List' output exists in the IDF file.")
+             "Please check if the 'Output:Surfaces:List' output exists in the IDF file.",
+             call. = FALSE)
     }
 
     # Format output table headers
-    header <-
-        map2_chr(eio[rownum_surf+1] %>% stringr::str_split(pattern = ",") %>% unlist(),
-                 eio[rownum_surf+2] %>% stringr::str_split(pattern = ",") %>% unlist(),
-                 ~paste(.x,.y)) %>%
-        gsub(x=., "!\\s", "") %>% gsub(x=., "<|>", "") %>% stringr::str_trim()
+    header_name <- as.character(stringr::str_split(eio[row_surf + 1], ",", simplify = TRUE))
+    # Clean header characters
+    header_name <- stringr::str_trim(stringr::str_replace_all(header_name, "(?:!\\s)*<(.*)>", "\\1"))
+    header_name <- stringr::str_trim(stringr::str_replace_all(header_name, "^~", ""))
+    header_unit <- as.character(stringr::str_split(eio[row_surf + 2], ",", simplify = TRUE))
+    header_unit <- stringr::str_replace(header_unit, "! <Units>", "")
+    header <- stringr::str_trim(paste(header_name, header_unit))
+    col_types <- cols("HeatTransfer/Shading/Frame/Divider_Surface" = col_character(),
+                      "Surface Name" = col_character(),
+                      "Surface Class" = col_character(),
+                      "Base Surface" = col_character(),
+                      "Heat Transfer Algorithm" = col_character(),
+                      "Construction/Transmittance Schedule" = col_character(),
+                      "ExtBoundCondition" = col_character(),
+                      "ExtConvCoeffCalc" = col_character(),
+                      "IntConvCoeffCalc" = col_character(),
+                      "SunExposure" = col_character(),
+                      "WindExposure" = col_character(),
+                      "#Sides" = col_integer(),
+                      .default = col_double())
 
     # Raw table of surf info
-    surf_info_raw <-
-        eio[rownum_surf:rownum_all[grep(x=rownum_all, pattern = rownum_surf)+3]] %>% .[-length(.)]
+    row_next_rpt <- row_all[row_all > row_surf][3]
+    # If surface report is the last report
+    if (is.na(row_next_rpt)) {
+        surf_rpt <- eio[row_surf:length(eio)]
+    } else {
+        surf_rpt <- eio[row_surf:(row_next_rpt -1)]
+    }
 
     # Extract zone name per surface
-    zone_name <-
-        purrr::map2(surf_info_raw %>% grep(x=., "Shading_Surfaces|Zone_Surfaces", value = F) %>%
-                    c(., length(surf_info_raw)+1) %>% diff(.)-1,
-                surf_info_raw %>% grep(x=., "Shading_Surfaces|Zone_Surfaces", value = T),
-                ~replicate(.x,.y)) %>% unlist() %>% paste0(collapse = "\n") %>%
-    data.table::fread(col.names = c("Zone/Shading Surfaces", "Zone Name/#Shading Surfaces"),drop=3)
+    len <- length(surf_rpt)
+    # Get the row number of zone info
+    row_zone_start <- stringr::str_which(surf_rpt, "^(Shading_Surfaces|Zone_Surfaces),.*?,\\s*\\d")
+    row_zone_len <- as.integer(stringr::str_extract(surf_rpt[row_zone_start], "\\d+$"))
+    zone_info <- data.table::rbindlist(purrr::map2(row_zone_start, row_zone_len,
+                                                   ~{raw <- paste0(rep(surf_rpt[.x], .y), collapse = "\n")
+                                                     data.table::fread(raw, col.names = c("Zone/Shading Surfaces", "Zone Name/#Shading Surfaces", "# Surfaces"))}))
 
     # Table except sub header
-    surf_info  <-
-        surf_info_raw[-c(1:3)] %>%
-        grep(x=., "^(?!Zone_Surfaces|Shading_Surfaces)", perl=T, value=T) %>%
-        paste0(., collapse = "\n") %>%
-        readr::read_csv(col_names = header) %>% data.table::as.data.table() %>%
-        .[, cbind(zone_name, .SD)]
+    raw_per_zone <- purrr::flatten_chr(purrr::map2(row_zone_start, row_zone_len, ~{raw <- surf_rpt[(.x+1):(.x+.y)]}))
+    # Supress warning messages from read_csv
+    oldw <- getOption("warn")
+    options(warn = -1)
+    surf_info <- readr::read_csv(paste0(raw_per_zone, collapse = "\n"), col_names = header, col_types = col_types)
+    # Get the orginal warning setting back
+    options(warn = oldw)
+
+    # Combine zone info and surface info per zone
+    surf_info <- as.data.table(surf_info)[, cbind(zone_info, .SD)]
 
     return(surf_info)
 }
