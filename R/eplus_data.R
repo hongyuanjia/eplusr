@@ -94,7 +94,7 @@ col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
 
     # If no 'col' given, return the input data as it is.
     if (is.null(col)) {
-        return(data)
+        sel_data <- data
     } else {
         sel_col <- col_names(data, pattern = col, regex = regex,
                              ignore_case = ignore_case, invert = invert)
@@ -102,7 +102,7 @@ col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
             stop("No matched column found.", call. = FALSE)
         }
         if (is.null(by)) {
-            return(data[, ..sel_col])
+            sel_data <- data[, ..sel_col]
         } else {
             by_col <- col_names(data, pattern = by, regex = FALSE)
             if (length(by_col) == 0) {
@@ -110,11 +110,12 @@ col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
                      "NOTE: `by` is not parsed as a regex but a character vector of column names.",
                      call. = FALSE)
             } else {
-                return(data[, ..sel_col, by = ..by_col])
+                sel_data <- data[, .SD, .SDcol = sel_col, by = by_col]
             }
         }
     }
 
+    return(sel_data)
 }
 # }}}1
 
