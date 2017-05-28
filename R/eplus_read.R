@@ -34,7 +34,7 @@ import_epg <- function(epg){
 #' and return a list containing model paths, weather paths, parametric fields,
 #' and parametric values. The returned list will have an attribute 'job_type'
 #' with value 'jeplus' which will be used when running jobs using
-#' \link(\code{run_job}).
+#' \link{\code{run_job}}.
 #'
 #' @param json A file path of an .json file.
 #' @return A list containing project info.
