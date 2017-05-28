@@ -68,7 +68,7 @@ read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
 
 # find_object
 # {{{1
-find_object <- function (idf, obj_ptn, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
+find_object <- function (idf, pattern, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
     type <- get_idf_type(idf)
 
     if (type == "string") {
@@ -78,7 +78,7 @@ find_object <- function (idf, obj_ptn, ignore_case = TRUE, perl = TRUE, invert =
         }
         object_ranges <- get_idf_object_range(idf)
         object_names <- unique(object_ranges[["object_name"]])
-        objs <- grep(x = object_names, pattern = obj_ptn, value = TRUE,
+        objs <- grep(x = object_names, pattern = pattern, value = TRUE,
                      ignore.case = ignore_case, perl = perl, invert = invert)
         if (length(objs) == 0) {
             stop("Could not find any matched objects.", call. = FALSE)
@@ -96,7 +96,7 @@ find_object <- function (idf, obj_ptn, ignore_case = TRUE, perl = TRUE, invert =
     } else if (type == "parsed") {
         ori_names <- names(idf)
         names(idf) <- make.unique(names(idf), sep = "_")
-        objs <- grep(x = names(idf), pattern = obj_ptn, ignore.case = ignore_case, perl = perl, invert = invert)
+        objs <- grep(x = names(idf), pattern = pattern, ignore.case = ignore_case, perl = perl, invert = invert)
         if (length(objs) == 0) {
             stop("Could not find any matched objects.", call. = FALSE)
         } else {
