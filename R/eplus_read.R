@@ -27,6 +27,24 @@ import_epg <- function(epg){
 # import_jeplus: A function to create a data.table of simulation info fram a
 # jEplus .json project file.
 # {{{1
+
+#' Import jEPlus .json type project.
+#'
+#' \code{import_jeplus} takes a file path of an .json type project of jEPlus,
+#' and return a list containing model paths, weather paths, parametric fields,
+#' and parametric values. The returned list will have an attribute 'job_type'
+#' with value 'jeplus' which will be used when running jobs using
+#' \link(\code{run_job}).
+#'
+#' @param json A file path of an .json file.
+#' @return A list containing project info.
+#' @importFrom jsonlite fromJSON
+#' @importFrom stringr str_split str_replace_all str_split
+#' @importFrom purrr set_names map map_chr map2 set_names flatten_chr cross_n
+#' @importFrom data.table rbindlist
+#' @export
+# import_jeplus
+# {{{1
 import_jeplus <- function (json) {
     # Read jeplus JSON project file.
     info <- jsonlite::fromJSON(json)
@@ -44,7 +62,7 @@ import_jeplus <- function (json) {
 
     # Get selected parameter values.
     param_value_selected <- params[["selectedAltValue"]]
-    param_value <- map2(param_value_selected, param_value, ~{if (.x > 0) .y <- .y[.x] else .y})
+    param_value <- purrr::map2(param_value_selected, param_value, ~{if (.x > 0) .y <- .y[.x] else .y})
 
     param_value <- purrr::map(param_value, ~stringr::str_split(.x, "(\\s)*\\|(\\s)*"))
     param_value <- purrr::set_names(param_value, param_name)
@@ -52,11 +70,11 @@ import_jeplus <- function (json) {
     # Create case names according to parameter names.
     case_names <- purrr::map2(param_name, param_value, ~paste0(.x, seq_along(.y)))
     case_names <- data.table::rbindlist(purrr::cross_n(case_names))
-    case_names <- purrr::flatten_chr(purrr::by_row(case_names, ~paste(.x, collapse = "_"))[[".out"]])
+    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
 
     # Get all combination of case values.
     param_value <- purrr::cross_n(param_value)
-    param_value <- set_names(param_value, case_names)
+    param_value <- purrr::set_names(param_value, case_names)
 
 
     # Get input file info.
