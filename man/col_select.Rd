@@ -4,26 +4,30 @@
 \alias{col_select}
 \title{Column selection using RegEx in a data.table.}
 \usage{
-col_select(data, col_pattern = "", by_pattern = NULL, ignore_case = TRUE,
-  invert = FALSE)
+col_select(data, col = NULL, by = NULL, regex = TRUE,
+  ignore_case = TRUE, invert = FALSE)
 }
 \arguments{
 \item{data}{A data.frame or data.table to subset culumns from.}
 
-\item{col_pattern}{A RegEx used for column subsetting. If blank, all columns
-be returned.}
+\item{col}{A RegEx used for column subsetting. If blank, all columns be
+returned.}
 
-\item{by_pattern}{A RegEx used for grouped column subsetting using the
+\item{by}{A character vector used for grouped column subsetting using the
 feature of \code{by} argument in data.table. Especially useful when you want
 grouping or cases when the \code{by} columns are not easy to be combined with
-\code{col_pattern}.}
+\code{col}. NOTE: \code{by} is not a regex, but a character vector.}
+
+\item{regex}{If FALSE, \code{col} is treated as a character vector of
+column names, not a regex.}
 
 \item{ignore_case}{A logical value. If FALSE, the pattern matching is case
-sensitive and if TRUE, case is ignored during matching. Default is TRUE.}
+sensitive and if TRUE, case is ignored during matching. Default is TRUE.
+\code{ignore_case} only takes effect on \code{col} not \code{by}.}
 
 \item{invert}{A logical value. If TRUE return column names that do not match.
-Default is FALSE. \code{invert} only takes effect on \code{col_pattern} not
-\code{by_pattern}.}
+Default is FALSE. \code{invert} only takes effect on \code{col} not
+\code{by}.}
 }
 \value{
 A data.table that only contains the subsetted columns.

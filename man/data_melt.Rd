@@ -6,7 +6,7 @@
 \usage{
 data_melt(data, id_pattern, measure_pattern, ignore_case = TRUE,
   variable_name = "variable", value_name = "value", na_rm = FALSE,
-  variable_factor = TRUE, value_facotr = FALSE)
+  variable_factor = TRUE, value_factor = FALSE)
 }
 \arguments{
 \item{data}{A data.frame or data.table object to manipulate.}

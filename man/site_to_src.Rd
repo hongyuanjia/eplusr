@@ -5,7 +5,7 @@
 \title{Tramsform EnergyPlus meter output from site energy to source energy.}
 \usage{
 site_to_src(data, ele_pattern = "electricity", gas_pattern = "gas",
-  ele_fct = 3.095, gas_fct = 1.092, digits = 4, to_GJ = TRUE)
+  ele_fct = 3.095, gas_fct = 1.092, digits = 4, to_GJ = FALSE)
 }
 \arguments{
 \item{data}{A data.table object containing EnergyPlus standard meter result.}
