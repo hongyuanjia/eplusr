@@ -26,7 +26,7 @@
 
 # - 'rename': If TRUE, the backed-up files will be renamed with the same suffix
 # as backup_folder.
-
+# clean_wd
 # {{{1
 clean_wd <- function(path = getwd(), backup = NULL, backup_folder = NULL,
                            rename = FALSE) {
@@ -289,6 +289,7 @@ get_eplus_backup_files <- function (type = NULL,
 
 # suffix_create: A helper function to create a formatted string used as a folder
 #                name.
+# suffix_create
 # {{{1
 suffix_create <- function (string = c("datetime", "date", "time")) {
     if (missingArg(string)) string <- "datetime"
@@ -326,6 +327,7 @@ suffix_create <- function (string = c("datetime", "date", "time")) {
 
 # name_create: A helper function to create a folder with name being the
 #              concatenation of specified prefix and suffix string.
+# name_create
 # {{{1
 name_create <- function (prefix = "backups", suffix = suffix_create()) {
     prefix <- as.character(prefix) %>% stringr::str_trim() %>% gsub(x=., "\\s", "_")
@@ -338,6 +340,7 @@ name_create <- function (prefix = "backups", suffix = suffix_create()) {
 # folder_create: A helper function to create a folder. If the folder already
 #                exist, a folder with a suffix of 5 random characters will be
 #                created.
+# folder_create
 # {{{1
 folder_create <- function (folder_name) {
     # If folder does not exist
@@ -357,6 +360,7 @@ folder_create <- function (folder_name) {
 
 # backup_file: A helper function to copy input file into specified folder with
 #              an option to rename the file with a formatted suffix string.
+# backup_file
 # {{{1
 backup_file <- function(file_name, backup_folder = name_create(),
                         rename = FALSE, newname_suffix = suffix_create()) {

@@ -3,6 +3,7 @@
 ################################################################################
 
 # get_idd_ver: A function that gets the versions of EnergyPlus.
+# get_idd_ver
 # {{{1
 get_idd_ver <- function(eplus_dir){
     idd <- file.path(eplus_dir, "Energy+.idd")
@@ -12,6 +13,7 @@ get_idd_ver <- function(eplus_dir){
 # }}}1
 
 # find_eplus: A function to locate EnergyPlus folder.
+# find_eplus
 # {{{1
 find_eplus <- function(ver = NULL, verbose = TRUE){
     # Define searching paths.
@@ -90,6 +92,7 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
 
 # create_eplus_ini: A function to create an "Energy+.ini" file per working
 # direcotry.
+# create_eplus_ini
 # {{{1
 create_eplus_ini <- function (eplus_dir, working_dir) {
     eplus_dir_win <- paste0(gsub(x=eplus_dir, "/", "\\\\"), "\\")
@@ -104,6 +107,7 @@ create_eplus_ini <- function (eplus_dir, working_dir) {
 # }}}1
 
 # Epl_run_bat: A wrapper function of "Epl-run.bat" distributed with EnergyPlus.
+# Epl_run_bat
 # {{{1
 Epl_run_bat <- function(eplus_dir = find_eplus(),
                         eplus_in, eplus_out, eplus_in_ext, eplus_wthr,
@@ -206,6 +210,7 @@ Epl_run_bat <- function(eplus_dir = find_eplus(),
 # }}}1
 
 # energyplus_exe: A wrapper function of EnergyPlus command line interface.
+# energyplus_exe
 #  {{{1
 energyplus_exe <- function (eplus_dir = find_eplus(),
                             idf, weather, output_dir,
@@ -337,6 +342,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 # }}}1
 
 # run_eplus: A function to run EnergyPlus in R.
+# run_eplus
 # {{{1
 run_eplus <- function (input, weather, eplus_dir = find_eplus(),
                        output_dir = NULL, output_prefix = NULL,

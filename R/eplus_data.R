@@ -858,6 +858,7 @@ case_cal <- function (data, case_col, col_pattern = NULL, fun, case_order = TRUE
 ######################
 
 # addCalExp: A function to generate column calculation expression in data.table.
+# addCalExp
 # {{{1
 addCalExp <- function(data, newcol.name = "NewColumn", sep = "", ref = TRUE, p.list){
   if(missing(p.list)){
@@ -899,6 +900,7 @@ addCalExp <- function(data, newcol.name = "NewColumn", sep = "", ref = TRUE, p.l
 # }}}1
 
 # addCalCol: A function to add new column using regex in data.table
+# addCalCol
 # {{{1
 addCalCol <- function(data, newcol.name, p.list, bycol_pattern, sep = "",
                       ref = TRUE, copy = FALSE){
@@ -921,6 +923,7 @@ addCalCol <- function(data, newcol.name, p.list, bycol_pattern, sep = "",
 
 # check_df: A helper function to check if the input object is a data.frame or
 #           not.
+# check_df
 # {{{1
 check_df <- function (data) {
     if (!is.data.frame(data)) {
@@ -931,6 +934,7 @@ check_df <- function (data) {
 
 # conv_dt: A helper function to check if the input object is a data.table or
 #          not. If not, convert it to a data.table.
+# conv_dt
 # {{{1
 conv_dt <- function (data) {
     # Check if the input is a data.table object. If not, convert it to a
@@ -949,6 +953,7 @@ conv_dt <- function (data) {
 # data.frame. It will return a name vector of column that has a calss of
 # 'POSIXt' or 'Date'. If none is found, it will return a vector with a length of
 # zero.
+# get_date_col
 # {{{1
 get_date_col <- function(data){
     check_df(data)
@@ -968,6 +973,7 @@ get_date_col <- function(data){
 
 # check_date_col: A helper function to check if there is only one date column in
 # the input.
+# check_date_col
 # {{{1
 check_date_col <- function (data, date_col = NULL) {
     # If missing 'date_col', get the name of date column automatically.
@@ -989,6 +995,7 @@ check_date_col <- function (data, date_col = NULL) {
 # get_interval: A helper function to get the minimum time interval of a POSIXct
 # or Date sequence. It return a minimum interval of given time sequence in secs.
 # - 'date_seq': A time sequence.
+# get_interval
 # {{{1
 get_interval <- function (date_seq) {
 
@@ -1011,6 +1018,7 @@ get_interval <- function (date_seq) {
 #' @importFrom lubridate year days
 # one_year: A helper function to replace (year + 1)-01-01 occurance with
 # year-12-31.
+# one_year
 # {{{1
 one_year <- function (date_seq) {
 
@@ -1044,6 +1052,7 @@ one_year <- function (date_seq) {
 # }}}1
 
 # uniform_interval_name: A helper function to get the right interval string.
+# uniform_interval_name
 # {{{1
 uniform_interval_name <- function(interval) {
     if (interval %in% c("y", "year", "years")) {
