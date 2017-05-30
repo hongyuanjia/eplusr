@@ -13,6 +13,7 @@
 #                  - IDD build
 #            This process will take several minutes (6 mins in my computer). It
 #            may be a good choice to store the result list as an external file.
+# parse_idd
 # {{{1
 parse_idd <- function (idd_path) {
     # For idd

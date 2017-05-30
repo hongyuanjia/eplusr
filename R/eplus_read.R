@@ -4,6 +4,7 @@
 
 # import_epg: A function to create a data.table of simulation info from an
 # EnergyPlus .epg file.
+# import_epg
 # {{{1
 import_epg <- function(epg){
 
@@ -23,10 +24,6 @@ import_epg <- function(epg){
     return(sim_info[])
 }
 # }}}1
-
-# import_jeplus: A function to create a data.table of simulation info fram a
-# jEplus .json project file.
-# {{{1
 
 #' Import jEPlus .json type project.
 #'
@@ -93,6 +90,7 @@ import_jeplus <- function (json) {
 # }}}1
 
 # read_eplus: A function to read EnergyPlus simulation results.
+# read_eplus
 # {{{1
 read_eplus <- function (path, output = c("variable", "meter", "table", "surface report"),
                         year = current_year(), eplus_date_col = "Date/Time",
@@ -393,6 +391,7 @@ read_surf_rpt <- function(eio){
 # 'timestep' indicating the tiem step of data collected. A meter output from a
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
+# read_meter
 # {{{1
 read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Time",
                               new_date_col = "datetime", tz = Sys.timezone(),
@@ -453,6 +452,7 @@ read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Tim
 # 'timestep' indicating the tiem step of data collected. A meter output from a
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
+# read_variable
 # {{{1
 read_variable <- function (result, year = current_year(), eplus_date_col = "Date/Time",
                                new_date_col = "datetime", tz = Sys.timezone(),
@@ -474,6 +474,7 @@ read_variable <- function (result, year = current_year(), eplus_date_col = "Date
 
 # read_epg: A function to read EnergyPlus simulation results grouped by an *.epg
 # file.
+# read_epg
 # {{{1
 # TODO: merge readTable into it.
 read_epg <- function(epg, results = "meter", case_ref = "idf"){
@@ -537,6 +538,7 @@ read_epg <- function(epg, results = "meter", case_ref = "idf"){
 # }}}1
 
 # read_table: A function to read EnergyPlus table results.
+# read_table
 # {{{1
 read_table <- function (file, name = c("report", "for", "table"), regex = FALSE) {
     # Check input.
