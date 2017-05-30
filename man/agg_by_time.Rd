@@ -4,7 +4,7 @@
 \alias{agg_by_time}
 \title{Aggregate data according to given time interval.}
 \usage{
-agg_by_time(data, based_col = NULL, interval = "level_up", by_col = NULL,
+agg_by_time(data, based_col = NULL, interval = "year", by_col = NULL,
   new_name = NULL, fun = "mean", one_year = FALSE)
 }
 \arguments{
@@ -18,8 +18,8 @@ If not given, it will be auto-detected.}
 higher than the interval of the input datetime variable. If 'NULL', it will
 be one level higher than the interval of the input datetime variable. It can
 also be an integer indicates the interval of minutes. In conclusion,
-'interval' should be a number or one of c("level_up", "year", "quarter",
-"month", "week", "day", "hour", "min").}
+'interval' should be a number or one of c("year", "quarter", "month", "week",
+"yday", "mday", "wday", "day", "date", "hour", "min", "second").}
 
 \item{by_col}{For grouping using the feature of \code{by} argument in
 data.table.}
