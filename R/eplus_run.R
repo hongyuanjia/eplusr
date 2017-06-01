@@ -357,39 +357,62 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
     # Set the working directory as the same folder of input file.
     setwd(dirname(input))
 
+    # 'eplus_dir' checking
+    # {{{2
     # If EnergyPlus version has been specified.
     if (!is.null(ver)) {
         # Case 1. But 'eplus_dir' is not given
         if (missingArg(eplus_dir)) {
             eplus_dir <- find_eplus(ver = ver)
+            ver <- attr(eplus_dir, "ver")
         # Case 2. And 'eplus_dir' is given.
         } else {
+            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+            if (!file.exists(energyplus_exe)) {
+                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
+            } else {
+            ver <- get_idd_ver(eplus_dir)
             warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
                     "specifed manually.", call. = FALSE)
+            }
         }
     }
+    # }}}2
 
     # File existing checking
+    # {{{2
     if (!file.exists(input)) {
         stop("Input model file does not exist. Please check input.", call. = FALSE)
     }
     if (!file.exists(weather)) {
         stop("Weather file does not exist. Please check input.", call. = FALSE)
     }
+    # }}}2
 
+    # Input file version and EnergyPlus verion match checking
+    # {{{2
+    idf_ver <- paste0(get_idf_ver(readr::read_lines(input)), ".0")
+    if (!identical(idf_ver, ver)) {
+        warning(stringr::str_interp("The input model ${input} indicates an EnergyPlus verion of ${idf_ver} but is simulated using EnergyPlus ${ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
+    }
+    # }}}2
+
+    # File extension checking
+    # {{{2
     input_prefix <- tools::file_path_sans_ext(basename(input))
     eplus_in_ext <- tools::file_ext(input)
     wthr_prefix <- tools::file_path_sans_ext(basename(weather))
     eplus_wthr_ext <- tools::file_ext(weather)
-
-    # File extension checking.
     if (!grepl(x = eplus_in_ext, pattern = "i[dm]f", ignore.case = TRUE)) {
        stop("'input' should be a full file path with an extension of '.idf' or '.imf'.")
     }
     if (!grepl(x = eplus_wthr_ext, pattern = "epw", ignore.case = TRUE)) {
        stop("'weather' should be a full file path with an extension of '.epw'.")
     }
+    # }}}2
 
+    # Input file renaming
+    # {{{2
     # If output directory is given,
     if (!is.null(output_dir)) {
         output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
@@ -433,8 +456,10 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
         file.copy(from = weather, to = new_name_wthr, overwrite = TRUE,
                   copy.mode = TRUE, copy.date = TRUE)
     }
+    # }}}2
 
     # Use Epl_run_bat, i.e. "Epl-run.bat", to run EnergyPlus.
+    # {{{2
     if (run == "bat") {
         eplus_in <- gsub(x=input, "\\.i[dm]f$", "", ignore.case = TRUE)
 
@@ -463,8 +488,9 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
                     eplus_type = eplus_type, pausing = pausing,
                     max_col = max_col, conv_eso = conv_eso, csv = csv,
                     echo = echo)
-
+    # }}}2
     # Use energyplus, i.e. "energyplus.exe", to run EnergyPlus.
+    # {{{2
     } else if (run == "exe"){
         idf <- input
         if (is.null(output_dir)) {
@@ -491,10 +517,10 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
     } else {
         stop("Argument 'run' should be one of c('exe', 'bat').", call. = FALSE)
     }
+    # }}}2
 
     # Set the woring directory back.
     setwd(ori_wd)
-
 }
 # }}}1
 
@@ -723,6 +749,23 @@ run_job <- function (job, eplus_dir = find_eplus(),
         }
     }
     energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+    # }}}2
+
+    # Input file version and EnergyPlus verion match checking
+    # {{{2
+    idf_vers <- purrr::map_chr(model, ~paste0(get_idf_ver(readr::read_lines(.x)), ".0"))
+    is_matched <- purrr::map_lgl(idf_vers, ~{identical(.x, ver)})
+    if (!all(is_matched)) {
+        if (identical(job_type, "jeplus")) {
+            warning(stringr::str_interp("The input template model indicates an EnergyPlus verion of ${unique(idf_vers)} but is simulated using EnergyPlus ${ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
+        } else {
+            warning(stringr::str_interp("There are models indicating EnergyPlus versions which are different from the EnergyPlus version ${ver} used in simulation:\n"))
+            un_matched_models <- model[!is_ver_matched]
+            un_matched_vers <- idf_vers[!is_ver_matched]
+            msg <- paste(paste0("Model:", un_matched_models, ", indicated version:", un_matched_vers), collapse = "\n")
+            warning(meg, call. = FALSE)
+        }
+    }
     # }}}2
 
     # 'output_dir' checking
