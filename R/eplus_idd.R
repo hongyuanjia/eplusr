@@ -1,6 +1,9 @@
 ################################################################################
 #                          Parse EnergyPlus IDD File                           #
 ################################################################################
+
+#' @importFrom dplyr progress_estimated
+#' @importFrom purrr map set_names
 # parse_idd: A function that takes the idd path as input and returns a list that
 #            contains all the information of input idd with the structure below:
 #            - Groups
@@ -24,7 +27,7 @@ parse_idd <- function (idd_path) {
     idd_groups <- get_idd_group(idd)
 
     # For showing progress bar.
-    p <- progress_estimated(n = length(idd_groups))
+    p <- dplyr::progress_estimated(n = length(idd_groups))
 
     # For fields
     idd_parsed <-
@@ -49,6 +52,7 @@ parse_idd <- function (idd_path) {
 }
 # }}}1
 
+#' @importFrom purrr flatten_chr map
 # Helper functions
 # {{{1
 find_field <- function (x, regex, value = TRUE, invert = FALSE) {
@@ -80,6 +84,7 @@ add_attrs <- function (x, attrs) {
 }
 # }}}1
 
+#' @importFrom readr read_lines
 # For idd
 # {{{1
 get_idd_version <- function(idd) {
@@ -119,6 +124,8 @@ read_idd <- function(idd) {
 }
 # }}}1
 
+#' @importFrom data.table data.table
+#' @importFrom purrr map2 set_names
 # For groups
 # {{{1
 regex_group <- "\\\\group (.*)$"
@@ -159,6 +166,8 @@ get_idd_group <- function (idd) {
 }
 # }}}1
 
+#' @importFrom purrr flatten_chr detect_index map2 set_names map
+#' @importFrom data.table data.table
 # For objects
 # {{{1
 regex_object <- "^([A-Z][A-Za-z].*),$"
@@ -168,7 +177,7 @@ regex_object <- "^([A-Z][A-Za-z].*),$"
 get_idd_object_name <- function(idd_group) {
     check_list(idd_group)
 
-    group_contents <- flatten_chr(idd_group)
+    group_contents <- purrr::flatten_chr(idd_group)
 
     object_names <- find_field(group_contents, regex_object)
     object_names <- replace_field(object_names, regex_object, "\\1")
@@ -402,10 +411,12 @@ get_idd_object <- function (idd_group) {
 # }}}2
 # }}}1
 
+#' @importFrom purrr flatten_chr map
+#' @importFrom stringr str_extract_all str_split
+#' @importFrom data.table data.table rbindlist setcolorder
 # For fields
 # {{{1
 regex_field <- "((?:[AN][0-9]+\\s*[,;]\\s*)+)(\\\\(?:field|note)\\s(.*))$"
-
 # get_idd_field_name
 # {{{2
 get_idd_field_name <- function(idd_object) {
@@ -824,9 +835,6 @@ get_idd_field <- function (idd_object) {
     fields <- fields[, object := object_name]
     fields <- setcolorder(fields, c("object", col_names(fields, "^object$", invert = TRUE)))
     return(fields)
-    # attrs <- purrr::map(fields, "attrs") %>% purrr::map(get_idd_field_attrs)
-    # idd_field <- purrr::map(fields, "contents") %>% purrr::flatten_chr() %>% purrr::map2(., attrs, add_attrs)
-    # return(idd_field)
 }
 # }}}2
 

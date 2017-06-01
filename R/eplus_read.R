@@ -2,6 +2,8 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
+#' @importFrom readr read_csv
+#' @importFrom data.table setcolorder
 # import_epg: A function to create a data.table of simulation info from an
 # EnergyPlus .epg file.
 # import_epg
@@ -36,7 +38,7 @@ import_epg <- function(epg){
 #' @param json A file path of an .json file.
 #' @return A list containing project info.
 #' @importFrom jsonlite fromJSON
-#' @importFrom stringr str_split str_replace_all str_split
+#' @importFrom stringr str_split str_replace_all str_replace str_detect str_replace
 #' @importFrom purrr set_names map map_chr map2 set_names flatten_chr cross_n
 #' @importFrom data.table rbindlist
 #' @export
@@ -101,6 +103,10 @@ import_jeplus <- function (json) {
 }
 # }}}1
 
+#' @importFrom tools file_path_sans_ext file_ext
+#' @importFrom data.table data.table as.data.table
+#' @importFrom dplyr tibble
+#' @importFrom purrr map
 # read_eplus: A function to read EnergyPlus simulation results.
 # read_eplus
 # {{{1
@@ -224,6 +230,7 @@ read_eplus <- function (path, output = c("variable", "meter", "table", "surface 
 }
 # }}}1
 
+#' @importFrom data.table data.table
 # get_eplus_main_output_names
 # {{{1
 get_eplus_main_output_names <- function (output_prefix, output_pattern) {
@@ -251,6 +258,8 @@ get_eplus_main_output_names <- function (output_prefix, output_pattern) {
 }
 # }}}1
 
+#' @importFrom purrr map2
+#' @importFrom data.table rbindlist
 # get_eplus_main_output_files
 # {{{1
 get_eplus_main_output_files <- function (path) {
@@ -264,6 +273,7 @@ get_eplus_main_output_files <- function (path) {
 }
 # }}}1
 
+#' @importFrom purrr map
 # check_eplus_output_file_exist
 # {{{1
 check_eplus_output_file_exist <- function (path, file_names, type) {
@@ -294,11 +304,11 @@ check_eplus_output_file_exist <- function (path, file_names, type) {
 #'
 #' @param eio A path of an EnergyPlus .eio output file.
 #' @return A data.table containing the Surface Details Report.
-#' @export
 #' @importFrom stringr str_which str_split str_trim str_replace_all str_replace str_extract
-#' @importFrom readr cols col_character col_double col_integer read_csv
+#' @importFrom readr read_lines cols col_character col_double col_integer read_csv
 #' @importFrom data.table rbindlist as.data.table fread
 #' @importFrom purrr flatten_chr map2
+#' @export
 # read_surf_rpt
 # {{{1
 read_surf_rpt <- function(eio){
@@ -372,6 +382,8 @@ read_surf_rpt <- function(eio){
 }
 # }}}1
 
+#' @importFrom readr read_csv cols
+#' @importFrom data.table as.data.table setnames
 # read_meter: A function to take the path of EnergyPlus meter results and return
 # a data.table of the contents with the first being a "POSIXt" column
 # transformed from EnergyPlus standard "Date/Time".
@@ -436,6 +448,8 @@ read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Tim
 }
 # }}}1
 
+#' @importFrom readr read_csv cols
+#' @importFrom data.table as.data.table
 # read_variable: A function to take the path of EnergyPlus results and return a
 # data.table of the contents with the first being a "POSIXt" column transformed
 # from EnergyPlus standard "Date/Time".
@@ -484,71 +498,13 @@ read_variable <- function (result, year = current_year(), eplus_date_col = "Date
 }
 # }}}1
 
-# read_epg: A function to read EnergyPlus simulation results grouped by an *.epg
-# file.
-# read_epg
-# {{{1
-# TODO: merge readTable into it.
-read_epg <- function(epg, results = "meter", case_ref = "idf"){
-    # Read simluation info from *.epg file.
-    sim_info <-  import_epg(epg)
-
-    if (is.na(match(table, c("variable", "meter", "table", "surface report")))) {
-        stop("Invalid value of argument 'results'. It should be one of ",
-             "c('variable', 'meter', 'table', 'surface report').", call. = FALSE)
-    } else if (table == "variable"){
-        file_suffix <- ".csv"
-    } else if (table == "meter"){
-        file_suffix <- "Meter.csv"
-    } else if (table == "surface report"){
-        file_suffix <- ".eio"
-    } else {
-        file_suffix <- "Table.csv"
-    }
-
-    if (is.na(match(case_ref, c("idf", "weather", "result")))) {
-        stop("Invalid 'case_ref'. 'case_ref' should be one of c('idf', ",
-             "'weather', 'result').", call. = FALSE)
-    } else if (case_ref == "idf") {
-        case_col <- "idf"
-    } else if (case_ref == "weather") {
-        case_col <- "weather"
-    } else {
-        case_col <- "result_suffix"
-    }
-
-    if(table == "variable" | table == "meter"){
-      data <-
-          dplyr::tibble(Case = sim_info[, get(case_col)],
-                        results = purrr::map(paste(sim_info[, ResultPath], file_pattern, sep = ""),
-                                             ~readr::read_csv(.))) %>%
-      tidyr::unnest() %>% data.table::as.data.table() %>%
-      naReplace() %>%
-      eplus_time_trans()
-  }else if(table == "surface report"){
-      data <-
-          dplyr::tibble(Case = sim_info[, get(case_col)],
-                        results = purrr::map(paste(sim_info[, ResultPath], file_pattern, sep = ""),
-                                             ~read_surf_rpt(.))) %>%
-      tidyr::unnest() %>% data.table::as.data.table()
-  }else{
-      data <-
-          dplyr::tibble(Case = sim_info[, get(case_col)],
-                        results = map(paste(sim_info[, ResultPath], file_pattern, sep = ""),
-                                      ~readr::read_csv(.))) %>%
-      tidyr::unnest() %>% data.table::as.data.table()
-  }
-
-  if((to.src)*(table == "meter")){
-      data %<>% siteToSrc()
-  }else if(all(to.src, (table != "meter"))){
-      stop("'to.src' only applys when 'table' is 'meter'.")
-  }
-
-  return(data)
-}
-# }}}1
-
+#' @importFrom tools file_ext
+#' @importFrom stringr str_subset str_replace_all str_match str_split
+#' @importFrom readr read_lines
+#' @importFrom data.table as.data.table setnames setcolorder
+#' @importFrom rvest html_nodes html_table
+#' @importFrom xml2 read_html
+#' @importFrom purrr map set_names
 # read_table: A function to read EnergyPlus table results.
 # read_table
 # {{{1
@@ -574,9 +530,9 @@ read_table <- function (file, name = c("report", "for", "table"), regex = FALSE)
     tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
     tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
     tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
-    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(str_split(report_for, "_", 2, simplify = TRUE))][,
+    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(stringr::str_split(report_for, "_", 2, simplify = TRUE))][,
                                      c("full_name", "report_for") := NULL]
-    tbl_names <- setcolorder(tbl_name_split, c("report", "for", "table"))
+    tbl_names <- data.table::setcolorder(tbl_name_split, c("report", "for", "table"))
 
     if (!regex) {
         # Set 'which' to TRUE without '.j' will return the row number. Or can
@@ -612,9 +568,9 @@ read_table <- function (file, name = c("report", "for", "table"), regex = FALSE)
     names <- tbl_names[table_id, paste0("[Report]:(", report, ") [For]:(", `for`, ") [Table]:(", table, ")")]
 
     # Combine table names and contents.
-    tbls <- set_names(tbls, names)
+    tbls <- purrr::set_names(tbls, names)
     # Always rename the first column to "Components".
-    tbls <- map(tbls, ~{names(.x)[1] <- "Components"; .x})
+    tbls <- purrr::map(tbls, ~{names(.x)[1] <- "Components"; .x})
 
     return(tbls)
 
