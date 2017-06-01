@@ -30,6 +30,7 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
         purrr::flatten_chr(purrr::map(path_list,
                                       ~grep(x = dir(path = .x, full.names = TRUE),
                                             "EnergyPlus", value = T, fixed = T)))
+
     # If not, give a warning of specifying EnergyPlus program location
     # mannually.
     if (length(eplus_dir) == 0L) {
@@ -44,19 +45,15 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
     eplus_dir_latest <- eplus_dir[max(order(idd_ver))]
     idd_ver_latest <- max(idd_ver)
 
-    # If multiple EnergyPlus versions are found, list the paths and versions.
-    if (length(eplus_dir) > 1) {
-        if (verbose) {
-            message(paste("Multiple EnergyPlus versions are found: \n"),
-                    paste(eplus_dir, "Version:", idd_ver, collapse = "\n"), "\n")
-        }
-    }
-
     # If no EnergyPlus version is specified, use the latest version.
     if (is.null(ver)) {
         # If multiple EnergyPlus versions are found, use the latest version.
         if (length(eplus_dir) > 1) {
             if (verbose) {
+                # List the paths and versions.
+                message(paste("Multiple EnergyPlus versions are found: \n"),
+                        paste(eplus_dir, "Version:", idd_ver, collapse = "\n"), "\n")
+                # Use the latest version.
                 message(paste("NOTE: Only the latest version of EnergyPlus",
                               idd_ver_latest,
                               "will be used if argument 'ver' is not sepcified.\n"))
@@ -68,14 +65,16 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
                               "has been successfully located:\n", eplus_dir_latest, "\n"))
             }
         }
-
-        return(eplus_dir_latest)
+        ver_returned <- idd_ver_latest
+        dir_returned <- eplus_dir_latest
     } else {
+        if (!stringr::str_detect(ver, "^\\d+\\.\\d+$")) {
+            stop("'ver' should be a format of 'X.Y'.", call. = FALSE)
+        }
         ver <- paste0(gsub(x = as.character(ver), " ", ""), ".0")
         if (is.na(match(ver, idd_ver))) {
             stop(paste0("Cannot find EnergyPlus Version:", ver, " ",
-                        "Please specify EnergyPlus path mannually.\n",
-                        "NOTE: Version format should be 'X.Y'."))
+                        "Please specify EnergyPlus path mannually.\n"), call. = FALSE)
         } else {
             eplus_dir_matched <- eplus_dir[match(ver, idd_ver)]
             idd_ver_matched <- idd_ver[match(ver, idd_ver)]
@@ -84,9 +83,13 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
                                " has been successfully located:\n", eplus_dir_matched, "\n"))
             }
 
-        return(eplus_dir_matched)
+        ver_returned <- idd_ver_matched
+        dir_returned <- eplus_dir_matched
         }
     }
+
+    attr(dir_returned, "ver") <- ver_returned
+    return(dir_returned)
 }
 # }}}1
 
@@ -362,7 +365,7 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
         # Case 2. And 'eplus_dir' is given.
         } else {
             warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
-                    "specifed manually.")
+                    "specifed manually.", call. = FALSE)
         }
     }
 
