@@ -2,6 +2,7 @@
 #                       Parse EnergyPlus IDF/IMF File                          #
 ################################################################################
 
+#' @importFrom stringr str_interp str_length
 # read_idf
 # {{{1
 read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
@@ -10,6 +11,13 @@ read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
         idf_lines <- file
     } else {
         idf_lines <- read_idf_lines(file)
+        if (!is_model_str(idf_lines)) {
+            ori_error_len <- getOption("warning.length")
+            invalid_lines <- paste(is_model_str(idf_lines, lines = TRUE), collapse = "\n")
+            options("warning.length" = stringr::str_length(invalid_lines) + 1000)
+            stop(stringr::str_interp("Invalid lines found in the input:\n${invalid_lines}"), call. = FALSE)
+            on.exit(options("warning.length" = ori_error_len))
+        }
     }
 
     is_imf <- is_imf(idf_lines)
@@ -63,6 +71,7 @@ read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
 }
 # }}}1
 
+#' @importFrom stringr str_which
 # find_object
 # {{{1
 find_object <- function (idf, pattern, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
@@ -107,6 +116,10 @@ find_object <- function (idf, pattern, ignore_case = TRUE, perl = TRUE, invert =
 }
 # }}}1
 
+#' @importFrom purrr map flatten_chr
+#' @importFrom stringr str_to_upper
+#' @importFrom data.table data.table rbindlist
+#' @importFrom readr write_lines
 # write_idf
 # {{{1
 write_idf <- function (idf, path) {
@@ -121,8 +134,8 @@ write_idf <- function (idf, path) {
     obj_header_info <-
         purrr::map(unique(names(idf)),
                    function (name) {
-                       upper_name <- str_to_upper(name)
-                       index <- grep(x = names(idf), pattern = paste0("^", name, "$")) %>% .[[1]]
+                       upper_name <- stringr::str_to_upper(name)
+                       index <- grep(x = names(idf), pattern = paste0("^", name, "$"))[[1]]
                        data.table::data.table(name = upper_name, index = index)
                    }) %>% data.table::rbindlist(.)
 
@@ -146,6 +159,7 @@ write_idf <- function (idf, path) {
 #  helper functions  #
 ######################
 
+#' @importFrom readr read_lines
 # read_idf_lines
 # {{{1
 read_idf_lines <- function (file) {
@@ -166,6 +180,7 @@ get_idf_object_name <- function(idf) {
 }
 # }}}1
 
+#' @importFrom data.table data.table
 # get_idf_object_range
 # {{{1
 get_idf_object_range <- function(idf){
@@ -194,39 +209,42 @@ get_idf_object_range <- function(idf){
 }
 # }}}1
 
+#' @importFrom stringr str_split str_replace_all str_extract_all
+#' @importFrom data.table data.table
 # get_idf_object_fields
 # {{{1
-# get_idf_object_fields <- function (object, object_start, object_end) {
 get_idf_object_fields <- function (object) {
-    # object <- idf[object_start:object_end]
-    object_field <- str_split(object, pattern = "[,;]\\s*!\\s*-\\s*", simplify = TRUE)
+    object_field <- stringr::str_split(object, pattern = "[,;]\\s*!\\s*-\\s*", simplify = TRUE)
     value <- object_field[, 1]
     field_unit <- object_field[, 2]
-    field <- str_replace_all(field_unit, pattern = "(.*)\\s\\{.+\\}", replacement = "\\1")
-    unit <- str_extract_all(field_unit, pattern = "\\{.+\\}")
-    unit <- str_replace_all(unit, pattern = "[\\{\\}]", replacement = "")
+    field <- stringr::str_replace_all(field_unit, pattern = "(.*)\\s\\{.+\\}", replacement = "\\1")
+    unit <- stringr::str_extract_all(field_unit, pattern = "\\{.+\\}")
+    unit <- stringr::str_replace_all(unit, pattern = "[\\{\\}]", replacement = "")
     unit <- ifelse(unit == "character(0)", NA_character_, unit)
-    object <- data.table(value = value, field = field, unit = unit)
+    object <- data.table::data.table(value = value, field = field, unit = unit)
     return(object)
 }
 # }}}1
 
+#' @importFrom purrr map2
 # get_idf_object
 # {{{1
 get_idf_object <- function (idf) {
     object_ranges <- get_idf_object_range(idf)
 
-    objects <- map2(object_ranges$object_start_row,
-                    object_ranges$object_end_row,
-                    function (object_start, object_end) {
-                        object <- idf[object_start:object_end]
-                        object_fields <- get_idf_object_fields(object)
-                        return(object_fields)
-                    }) %>% set_names(object_ranges$object_name)
+    objects <- purrr::map2(object_ranges$object_start_row,
+                           object_ranges$object_end_row,
+                           function (object_start, object_end) {
+                               object <- idf[object_start:object_end]
+                               object_fields <- get_idf_object_fields(object)
+                               return(object_fields)
+                           }) %>% set_names(object_ranges$object_name)
     return(objects)
 }
 # }}}1
 
+#' @importFrom purrr map_chr
+#' @importFrom stringr str_pad
 # format_idf_lines
 # {{{1
 format_idf_lines <- function (object) {
@@ -262,6 +280,7 @@ format_idf_lines <- function (object) {
 }
 # }}}1
 
+#' @importFrom stringr str_which str_extract
 # get_idf_ver
 # {{{1
 get_idf_ver <- function (idf_lines) {
@@ -280,6 +299,7 @@ get_idf_ver <- function (idf_lines) {
 }
 # }}}1
 
+#' @importFrom stringr str_detect
 # is_param_exist
 # {{{
 is_param_exist <- function (idf_lines) {
@@ -288,6 +308,10 @@ is_param_exist <- function (idf_lines) {
 }
 # }}}
 
+#' @importFrom tools file_path_sans_ext
+#' @importFrom readr read_lines
+#' @importFrom stringr str_which
+#' @importFrom purrr map
 # epmacro_exe
 # {{{1
 epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verbose = TRUE) {
@@ -308,7 +332,7 @@ epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verb
     output <- file.path(working_dir, "out.idf")
     new_output <- paste0(tools::file_path_sans_ext(imf_path), ".idf")
     audit <- file.path(working_dir, "audit.out")
-    new_audit <- file.path(dirname(audit), paste0(file_path_sans_ext(basename(imf_path)), ".out"))
+    new_audit <- file.path(dirname(audit), paste0(tools::file_path_sans_ext(basename(imf_path)), ".out"))
 
     if (file.exists(output)) {
 
@@ -379,6 +403,8 @@ epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verb
 }
 # }}}1
 
+#' @importFrom stringi stri_rand_strings
+#' @importFrom readr write_lines
 # imf_to_idf
 # {{{1
 imf_to_idf <- function(imf_lines, verbose = FALSE) {
@@ -392,7 +418,7 @@ imf_to_idf <- function(imf_lines, verbose = FALSE) {
     imf_name <- paste0("imf_", stringi::stri_rand_strings(1, 8), ".imf")
     imf_path <- file.path(normalizePath(tempdir(), winslash = "/"), imf_name)
 
-    write_lines(imf_lines, path = imf_path)
+    readr::write_lines(imf_lines, path = imf_path)
     # Convert the input imf file to a idf file
     epmacro_exe(eplus_dir = eplus_dir, imf_path = imf_path,
                 verbose = verbose, rename = FALSE)
@@ -418,6 +444,8 @@ get_idf_type <- function (idf) {
 }
 # }}}1
 
+#' @importFrom stringr str_trim
+#' @importFrom purrr flatten_int map2
 # clean_idf_lines
 # {{{1
 clean_idf_lines <- function (idf_lines) {
@@ -435,7 +463,7 @@ clean_idf_lines <- function (idf_lines) {
     regex_preproc_msg <- "^Output:PreprocessorMessage,"
     preproc_msg_start_pt <- stringr::str_which(idf_lines, regex_preproc_msg)
     preproc_msg_end_pt <- preproc_msg_start_pt + (diff(c(preproc_msg_start_pt, (length(idf_lines) + 1))) - 1)
-    preproc_msg_rows <- flatten_int(map2(preproc_msg_start_pt, preproc_msg_end_pt, seq))
+    preproc_msg_rows <- purrr::flatten_int(purrr::map2(preproc_msg_start_pt, preproc_msg_end_pt, seq))
     if (length(preproc_msg_rows) > 0) {
         idf_lines <- idf_lines[-preproc_msg_rows]
     }
@@ -444,9 +472,11 @@ clean_idf_lines <- function (idf_lines) {
 }
 # }}}1
 
+#' @importFrom purrr flatten_int map
+#' @importFrom stringr str_which
 # is_model_str
 # {{{1
-is_model_str <- function (text) {
+is_model_str <- function (text, lines = FALSE) {
     text <- clean_idf_lines(text)
 
     # Get EpMacro row number
@@ -469,21 +499,28 @@ is_model_str <- function (text) {
     regex_field <- "^([A-Za-z0-9\\*\\-@])*\\s*[,;]\\s*!\\s*-"
     regex_field <- "^(((\\w|\\d|-|\\*|@@|\\.).*\\s*[,;])|[,;])\\s*!\\s*-"
 
-    head_rows <- str_which(text, regex_object_head)
-    special_rows <- str_which(text, regex_object_special)
-    field_rows <- str_which(text, regex_field)
+    head_rows <- stringr::str_which(text, regex_object_head)
+    special_rows <- stringr::str_which(text, regex_object_special)
+    field_rows <- stringr::str_which(text, regex_field)
     # }}}2
 
     valid_lines <- sort(c(macro_rows, head_rows, special_rows, field_rows))
 
-    if (identical(seq_along(text), valid_lines)) {
-        return(TRUE)
+    if (!lines) {
+        if (identical(seq_along(text), valid_lines)) {
+            return(TRUE)
+        } else {
+            return(FALSE)
+        }
     } else {
-        return(FALSE)
+        invalid <- setdiff(seq_along(text), valid_lines)
+        return(text[invalid])
     }
 }
 # }}}1
 
+#' @importFrom purrr map_lgl
+#' @importFrom stringr str_detect
 # is_imf
 # {{{1
 is_imf <- function (idf_lines) {
@@ -496,7 +533,7 @@ is_imf <- function (idf_lines) {
           "##expandcomment", "##traceback", "##notraceback", "##write", "##nowrite", # Marco debugging and listing
           "##symboltable", "##clear", "##reverse", "##!") # Marco debugging and listing
 
-    is_imf <- any(map_lgl(macro_dict, ~any(stringr::str_detect(idf_lines, paste0("^", .x)))))
+    is_imf <- any(purrr::map_lgl(macro_dict, ~any(stringr::str_detect(idf_lines, paste0("^", .x)))))
 
     return(is_imf)
 }

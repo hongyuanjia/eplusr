@@ -35,7 +35,7 @@
 #       x_per_case <- x %>% .[Case == x_case]
 #       if(x_interval < y_time_interval){
 #         x_per_case %<>%
-#           agg_by_time(interval = as.integer(y_interval), by_col = "Case") %>%
+#           agg_by(interval = as.integer(y_interval), by_col = "Case") %>%
 #           .[-.N]
 #       }
 #       return(x_per_case)

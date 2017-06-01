@@ -263,6 +263,7 @@ annual_seq <- function(interval = 1L, year = current_year(), tz = Sys.timezone()
 #' default value is the current system time zone.
 #' @return It returns a time sequence of giving year and inverval.
 #' @importFrom lubridate year
+#' @importFrom data.table data.table set merge
 #' @export
 # annual_sch
 # {{{1
@@ -316,6 +317,7 @@ annual_sch <- function(data, date_col = NULL,
 #' '24:00' format.
 #' @param copy Whether hard copy the input to protect it unchanged.
 #' @importFrom lubridate year
+#' @importFrom data.table data.table as.IDate ":="
 #' @export
 # eplus_time_trans
 # {{{1
@@ -375,6 +377,7 @@ eplus_time_fmt <- function(data, date_col = NULL, std_fmt = TRUE, copy = TRUE){
 #' @return A data.table with first column being the transformed POSIXct column
 #' from EnergyPlus Date/Time format column.
 #' @importFrom lubridate ymd_hms
+#' @importFrom data.table ":=" setcolorder
 #' @export
 # eplus_time_trans
 # {{{1
@@ -430,7 +433,7 @@ eplus_time_trans <- function(data, year = current_year(),
 #' @param one_year If TRUE, the (year+1)-01-01 will be replaced with
 #' (year)-12-31.
 #' @importFrom xts align.time
-#' @importFrom padr thicken
+#' @importFrom lubridate year quarter month week yday mday wday day date hour minute second
 #' @export
 # add_time
 # {{{1
@@ -486,7 +489,7 @@ add_time <- function (data, based_col = NULL, interval, new_name = NULL,
 
 #' Aggregate data according to given time interval.
 #'
-#' \code{agg_by_time} adds a padding time column in a data.table and aggregate
+#' \code{agg_by} adds a padding time column in a data.table and aggregate
 #' time series data according to given time interval.
 #'
 #' @param by_col For grouping using the feature of \code{by} argument in
@@ -495,19 +498,18 @@ add_time <- function (data, based_col = NULL, interval, new_name = NULL,
 #' @inheritParams add_time
 #' @importFrom purrr map_lgl
 #' @export
-# agg_by_time
+# agg_by
 # {{{1
-agg_by_time <- function (data, based_col = NULL, interval = "year",
-                         by_col = NULL, new_name = NULL, fun = "mean",
-                         one_year = FALSE) {
+agg_by <- function (data, based_col = NULL, interval = "year", by_col = NULL,
+                    new_name = NULL, fun = "mean", one_year = FALSE) {
 
     if (is.null(based_col)) {
         based_col <- check_date_col(data)
     }
 
     data_thicken <- add_time(data = data, based_col = based_col,
-                                 interval = interval, new_name = new_name,
-                                 one_year = one_year)
+                             interval = interval, new_name = new_name,
+                             one_year = one_year)
 
     # Delete the original datetime column.
     data_thicken <- data_thicken[, c(based_col) := NULL]
@@ -546,6 +548,7 @@ agg_by_time <- function (data, based_col = NULL, interval = "year",
 #' @param replacement A single character or number used to replace the nonsense
 #' data.
 #' @return A data.table with nonsense data replaced.
+#' @importFrom data.table set fun
 #' @export
 # na_replace
 # {{{1
@@ -604,6 +607,7 @@ na_replace <- function(data, col_pattern, type = "na", replacement = 0L){
 #' Joule to Gigajoule.
 #' @return A data.table containing EnergyPlus meter results with site energy
 #' converted into source energy.
+#' @importFrom data.table setnames
 #' @export
 # site_to_src
 # {{{1
@@ -654,6 +658,7 @@ site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
 #' @param value_factor If TRUE, the value column will be converted to factor,
 #' else the molten value type is left unchanged.
 #' @return A molten data.table.
+#' @importFrom data.table melt
 #' @export
 #' @examples
 #' data_melt(iris, id_pattern = "^S")
@@ -705,6 +710,7 @@ data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
 #' @param data A data.table object containing EnergyPlus standard output or
 #' meter result.
 #' @return A data.table with long table format.
+#' @importFrom data.table melt setcolorder
 #' @export
 # long_table
 # {{{1
@@ -790,6 +796,8 @@ bias <- function (x, y) {
 #' @param melt If TRUE, a molten data.table will be returned with the first
 #' column named "case" showing what function and arguments has been applied.
 #' @return A data.table
+#' @importFrom purrr cross_d map_lgl map2_df
+#' @importFrom data.table as.data.table
 #' @export
 # case_cal
 # {{{1
@@ -857,6 +865,7 @@ case_cal <- function (data, case_col, col_pattern = NULL, fun, case_order = TRUE
 #  helper functions  #
 ######################
 
+#' @importFrom purrr map flatten_chr
 # addCalExp: A function to generate column calculation expression in data.table.
 # addCalExp
 # {{{1
@@ -866,58 +875,53 @@ addCalExp <- function(data, newcol.name = "NewColumn", sep = "", ref = TRUE, p.l
   }
 
   colnames <-
-    map(p.list,
-        function(par){
-          if(grepl(x=par,"^@")){
-            par %>% sub(x=.,"^@(.*)$", " \\1 ")
-          }else if(length(col_names(data, par))){
-            col_names(data, par) %>%
-              gsub(x=., "(.*)", "`\\1`")
-          }else{
-            stop("Column not found in the data.")
-          }}) %>%
-    flatten_chr() ## %>% unique()
+    purrr::map(p.list,
+               function(par){
+                   if(grepl(x=par,"^@")){
+                       par %>% sub(x=.,"^@(.*)$", " \\1 ")
+                   }else if(length(col_names(data, par))){
+                       col_names(data, par) %>%
+                           gsub(x=., "(.*)", "`\\1`")
+                   }else{
+                       stop("Column not found in the data.")
+               }}) %>% purrr::flatten_chr()
 
   if(sep == ""){
-    if(ref){
-      expr <-
-        paste0('c("', newcol.name, '") := ', paste0(colnames, collapse = ""))
-    }else{
-      expr <-
-        paste0('.(`', newcol.name, '` = ', paste0(colnames), ')', collapse = "")
-    }
+      if(ref){
+          expr <- paste0('c("', newcol.name, '") := ', paste0(colnames, collapse = ""))
+      }else{
+          expr <- paste0('.(`', newcol.name, '` = ', paste0(colnames), ')', collapse = "")
+      }
   }else{
-    if(ref){
-      expr <-
-        paste0('c("', newcol.name, '") := ', paste(colnames, collapse = sep))
-    }else{
-      expr <-
-        paste0('.(`', newcol.name, '` = ', paste(colnames, collapse = sep), ')')
-    }
+      if(ref){
+          expr <- paste0('c("', newcol.name, '") := ', paste(colnames, collapse = sep))
+      }else{
+          expr <- paste0('.(`', newcol.name, '` = ', paste(colnames, collapse = sep), ')')
+      }
   }
   return(expr)
 }
 # }}}1
 
+#' @importFrom magrittr "%>%" "%<>%"
+#' @importFrom data.table copy
 # addCalCol: A function to add new column using regex in data.table
 # addCalCol
 # {{{1
 addCalCol <- function(data, newcol.name, p.list, bycol_pattern, sep = "",
                       ref = TRUE, copy = FALSE){
-  if(copy){
-    data %<>% copy(.)
-  }
-  if(hasArg(bycol_pattern)){
-    data %<>%
-      .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
-                                      ref = ref, p.list = p.list))),
-        by = c(col_names(., bycol_pattern))] %>% .[]
-  }else{
-    data %<>%
-      .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
-                                      ref = ref, p.list = p.list)))] %>% .[]
-  }
-  return(data)
+    if(copy){
+        data %<>% copy(.)
+    }
+    if(hasArg(bycol_pattern)){
+        data %<>% .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
+                                                  ref = ref, p.list = p.list))),
+                    by = c(col_names(., bycol_pattern))] %>% .[]
+    }else{
+        data %<>% .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
+                                                  ref = ref, p.list = p.list)))] %>% .[]
+    }
+    return(data)
 }
 # }}}1
 
@@ -932,6 +936,7 @@ check_df <- function (data) {
 }
 # }}}1
 
+#' @importFrom data.table is.data.table as.data.table
 # conv_dt: A helper function to check if the input object is a data.table or
 #          not. If not, convert it to a data.table.
 # conv_dt

@@ -2,16 +2,21 @@
 #                                Run EnergyPlus                                #
 ################################################################################
 
+#' @importFrom purrr map_chr
+#' @importFrom stringr str_replace
+#' @importFrom readr read_lines
 # get_idd_ver: A function that gets the versions of EnergyPlus.
 # get_idd_ver
 # {{{1
 get_idd_ver <- function(eplus_dir){
     idd <- file.path(eplus_dir, "Energy+.idd")
-    idd_ver <- purrr::map_chr(idd, ~gsub(x = readLines(.x, n = 1), "!IDD_Version ", ""))
+    idd_ver <- purrr::map_chr(idd, ~stringr::str_replace(x = readr::read_lines(.x, n_max = 1), "!IDD_Version ", ""))
     return(idd_ver)
 }
 # }}}1
 
+#' @importFrom purrr flatten_chr map
+#' @importFrom stringr str_detect
 # find_eplus: A function to locate EnergyPlus folder.
 # find_eplus
 # {{{1
@@ -29,7 +34,7 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
     eplus_dir <-
         purrr::flatten_chr(purrr::map(path_list,
                                       ~grep(x = dir(path = .x, full.names = TRUE),
-                                            "EnergyPlus", value = T, fixed = T)))
+                                            "EnergyPlus", value = TRUE, fixed = TRUE)))
 
     # If not, give a warning of specifying EnergyPlus program location
     # mannually.
@@ -212,6 +217,9 @@ Epl_run_bat <- function(eplus_dir = find_eplus(),
 }
 # }}}1
 
+#' @importFrom tools file_path_sans_ext
+#' @importFrom stringr str_interp
+#' @importFrom readr write_lines
 # energyplus_exe: A wrapper function of EnergyPlus command line interface.
 # energyplus_exe
 #  {{{1
@@ -344,6 +352,9 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 }
 # }}}1
 
+#' @importFrom readr read_lines
+#' @importFrom stringr str_interp
+#' @importFrom tools file_path_sans_ext file_ext
 # run_eplus: A function to run EnergyPlus in R.
 # run_eplus
 # {{{1
@@ -524,6 +535,8 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
 }
 # }}}1
 
+#' @importFrom purrr walk2
+#' @importFrom stringr str_replace_all
 # create_param
 # {{{1
 create_param <- function (idf_path, param_name, param_field, param_value) {
@@ -543,6 +556,10 @@ create_param <- function (idf_path, param_name, param_field, param_value) {
 }
 # }}}1
 
+
+#' @importFrom purrr flatten_chr map set_names cross_n
+#' @importFrom data.table setcolorder rbindlist
+#' @importFrom readr write_lines write_csv
 # create_job
 # {{{1
 create_job <- function (param_tbl, path = NULL) {
@@ -619,6 +636,10 @@ create_job <- function (param_tbl, path = NULL) {
 }
 # }}}1
 
+#' @importFrom tools file_path_sans_ext file_ext
+#' @importFrom stringr str_length str_interp
+#' @importFrom purrr map_lgl map_chr walk walk2 map keep negate flatten_chr
+#' @importFrom readr read_lines write_lines
 # run_job
 # {{{1
 run_job <- function (job, eplus_dir = find_eplus(),
@@ -897,19 +918,19 @@ run_job <- function (job, eplus_dir = find_eplus(),
     if (design_day) design_day <- "--design-day" else design_day <- NULL
     if (!is.null(idd)) idd <- paste0("--idd", '"', idd, '"') else idd <- NULL
     cmd_eplus <-
-        map_chr(1:total,
-                ~{model <- stringr::str_interp('"${model[.x]}"');
-                weather <- stringr::str_interp('"${weather[.x]}"');
-                output_dir <- output_dir[.x]
-                output_prefix <- output_prefix[.x]
-                if (epmacro[.x]) epmacro <- "--epmacro" else epmacro <- NULL;
-                paste(energyplus_exe,
-                      "--weather", weather,
-                      "--output-directory", output_dir,
-                      "--output-prefix", output_prefix,
-                      "--output-suffix", output_suffix,
-                      epmacro, expand_obj, readvars, annual, design_day,
-                      idd, model, sep = " ")}
+        purrr::map_chr(1:total,
+                       ~{model <- stringr::str_interp('"${model[.x]}"');
+                         weather <- stringr::str_interp('"${weather[.x]}"');
+                         output_dir <- output_dir[.x]
+                         output_prefix <- output_prefix[.x]
+                         if (epmacro[.x]) epmacro <- "--epmacro" else epmacro <- NULL;
+                         paste(energyplus_exe,
+                               "--weather", weather,
+                               "--output-directory", output_dir,
+                               "--output-prefix", output_prefix,
+                               "--output-suffix", output_suffix,
+                               epmacro, expand_obj, readvars, annual, design_day,
+                               idd, model, sep = " ")}
                 )
     # }}}3
     # }}}2

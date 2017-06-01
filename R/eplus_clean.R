@@ -2,30 +2,32 @@
 #                     EnergyPlus Working Directory Cleaning                    #
 ################################################################################
 
-# clean_wd: A function to clean the working directory of EnergyPlus after
-# backing up specifed files. All other files that are not parts of EnergyPlus
-# input or output files will be left as it is.  This is also true if you rename
-# those files of EnergyPlus before you run this function. Currently, files work
-# as input schedule files are not supported, and will be left untouched.
-
-# - 'path': A EnergyPlus working directory.
-
-# - 'backup': Should be NULL or one of c('input', 'basic', 'all').  If NULL,
-# none file will be backed up.  If 'input', *.imf, *.idf, *.epw, *.epmidf will
-# be backed up.  If 'basic', *.imf, *.idf, *.ewp, *.epmidf, and results of
-# summary report, meter output and variable output will be backed up.  If 'all',
-# all EnergyPlus input and output files will be backed up.
-
-# - 'backup_folder': A character indicates the name prefix of the folder that
-# will be auto-generated in current working directory to store backed-up files.
-# The full folder name will be ('backup_folder'_(suffix)). The suffix is a
-# character that shows the current date and time in format like 'Apr06_01h_02m'.
-# If this this folder already, which means that you run this function multiple
-# times within 1 minute, the folder name will be the decribed above with 6
-# random characters.
-
-# - 'rename': If TRUE, the backed-up files will be renamed with the same suffix
-# as backup_folder.
+#' Clean an working directory of EnergyPlus
+#'
+#' \code{clean_wd} is a function to clean the working directory of EnergyPlus
+#' after backing up specifed files. All other files that are not parts of
+#' EnergyPlus input or output files will be left as it is.  This is also true if
+#' you rename those files of EnergyPlus before you run this function. Currently,
+#' files work as input schedule files are not supported, and will be left
+#' untouched.
+#'
+#' @param path A EnergyPlus working directory.
+#' @param backup Should be NULL or one of c('input', 'basic', 'all').  If NULL,
+#' none file will be backed up.  If 'input', *.imf, *.idf, *.epw, *.epmidf will
+#' be backed up.  If 'basic', *.imf, *.idf, *.ewp, *.epmidf, and results of
+#' summary report, meter output and variable output will be backed up.  If
+#' 'all', all EnergyPlus input and output files will be backed up.
+#' @param backup_folder A character indicates the name prefix of the folder that
+#' will be auto-generated in current working directory to store backed-up files.
+#' The full folder name will be ('backup_folder'_(suffix)). The suffix is a
+#' character that shows the current date and time in format like
+#' 'Apr06_01h_02m'.  If this this folder already, which means that you run this
+#' function multiple times within 1 minute, the folder name will be the decribed
+#' above with 6 random characters.
+#' @param rename If TRUE, the backed-up files will be renamed with the same
+#' suffix as backup_folder.
+#' @export
+#' @importFrom purrr walk2
 # clean_wd
 # {{{1
 clean_wd <- function(path = getwd(), backup = NULL, backup_folder = NULL,
@@ -90,6 +92,7 @@ clean_wd <- function(path = getwd(), backup = NULL, backup_folder = NULL,
 }
 # }}}1
 
+#' @importFrom purrr walk
 # backup_eplus_wd
 # {{{1
 backup_eplus_wd <- function(path = getwd(), type = NULL,
@@ -129,6 +132,7 @@ backup_eplus_wd <- function(path = getwd(), type = NULL,
 }
 # }}}1
 
+#' @importFrom purrr walk
 # clean_eplus_wd
 # {{{1
 clean_eplus_wd <- function(path = getwd(),
@@ -287,6 +291,7 @@ get_eplus_backup_files <- function (type = NULL,
 }
 # }}}1
 
+#' @importFrom stringr str_trim
 # suffix_create: A helper function to create a formatted string used as a folder
 #                name.
 # suffix_create
@@ -305,11 +310,11 @@ suffix_create <- function (string = c("datetime", "date", "time")) {
 
         if (match(string, "datetime")) {
             # suffix <- Sys.time() %>% format("(%b%d_%Hh_%Mm_%Ss)")
-            suffix <- Sys.time() %>% format("(%b%d_%Hh_%Mm)")
+            suffix <- format(Sys.time(), "(%b%d_%Hh_%Mm)")
         } else if (match(string, "date")) {
-            suffix <- Sys.time() %>% format("(%b%d)")
+            suffix <- format(Sys.time(), "(%b%d)")
         } else {
-            suffix <- Sys.time() %>% format("(%Hh_%Mm_%Ss)")
+            suffix <- format(Sys.time(), "(%Hh_%Mm_%Ss)")
         }
 
         # Change the time locale to the original value. In order to not print
@@ -325,6 +330,7 @@ suffix_create <- function (string = c("datetime", "date", "time")) {
 }
 # }}}1
 
+#' @importFrom stringr str_trim
 # name_create: A helper function to create a folder with name being the
 #              concatenation of specified prefix and suffix string.
 # name_create
@@ -337,6 +343,7 @@ name_create <- function (prefix = "backups", suffix = suffix_create()) {
 }
 # }}}1
 
+#' @importFrom stringi stri_rand_strings
 # folder_create: A helper function to create a folder. If the folder already
 #                exist, a folder with a suffix of 5 random characters will be
 #                created.
@@ -407,100 +414,9 @@ backup_file <- function(file_name, backup_folder = name_create(),
     return(invisible())
 
 }
-    # # If the file already exists in the backup folder.
-    # backup_exist_flag <- file.exists(file.path(backup_folder, file_name))
-    # if (backup_exist_flag) {
-    #     # Do not want to rename it.
-    #     if (!rename) {
-    #         message("File '", file.path(getwd(), file_name),
-    #                 "' has already been backed up into folder '",
-    #                 file.path(getwd(), backup_folder),
-    #                 "' before, and will not be backed up this time.")
-    #         return(invisible())
-    #     # Want to rename it.
-    #     } else {
-    #         # Copy the original file into a temp dir in order to make it
-    #         # possible to rename the file.
-    #         file.copy(from = file_name, to = backup_folder,
-    #                   copy.mode = TRUE, copy.date = TRUE, overwrite = TRUE)
-
-    #         file.copy(from = file_name, to = file.path(backup_folder, "fuck.idf"),
-    #                   copy.mode = TRUE, copy.date = TRUE, overwrite = TRUE)
-
-    #         tempdir() %>% gsub(x=., "\\\\", "/")
-    #         new_name <- paste0(file_path_sans_ext(file_name), "_",
-    #                            newname_suffix, ".", file_ext(file_name))
-
-    #         rename_flag <-
-    #             file.rename(from = file.path(backup_folder, basename(file_name)),
-    #                         to = file.path(backup_folder, new_name))
-
-    #     }
-    # }
-
-    # # 'copy_flag' expected to be TRUE.
-    # copy_flag <- file.copy(from = file_name, to = backup_folder,
-    #                        copy.mode = TRUE, copy.date = TRUE, overwrite = FALSE)
-
-    # #
-    # if () {
-
-    # }
-    # # Otherwise, copy the file without renaming it.
-    # if (all(copy_flag, !rename)) {
-    #     message("File '", file.path(getwd(), file_name),
-    #             "' has already been backed up into folder '",
-    #             file.path(getwd(), backup_folder),
-    #             "' before, and will not be backed up this time.")
-    #     return(invisible())
-    # # Copy the
-    # } else if (all(copy_flag, rename)) {
-
-    # }
-
-    #     message("File '", file.path(getwd(), file_name),
-    #             "' has already been backed up into folder '",
-    #             file.path(getwd(), backup_folder),
-    #             "' before, and will not be backed up this time.")
-    #     return(invisible())
-    # }
-
-    # if (all(copy_flag, rename)) {
-        # new_name <- paste0(file_path_sans_ext(file_name), "_",
-        #                    newname_suffix, ".", file_ext(file_name))
-
-    #     rename_flag <-
-    #         file.rename(from = file.path(backup_folder, basename(file_name)),
-    #                     to = file.path(backup_folder, new_name))
-
-    #     if (rename_flag) {
-    #         message("File '", file.path(getwd(), file_name),
-    #                 "' has been successfully backed up into folder '",
-    #                 file.path(getwd(), backup_folder),
-    #                 "' with a new name '", new_name, "'.")
-    #         return(invisible())
-    #     } else {
-    #         message("File '", file.path(getwd(), file_name),
-    #                 "' has already been backed up into folder '",
-    #                 file.path(getwd(), backup_folder),
-    #                 "' before, and will not be backed up this time.")
-    #     }
-    # } else {
-    #     if (copy_flag) {
-    #         message("File '", file.path(getwd(), file_name),
-    #                 "' has been successfully backed up into folder '",
-    #                 file.path(getwd(), backup_folder), "'.")
-    #     } else {
-    #         message("Fail to back up file '", file.path(getwd(), file_name), "'.")
-    #     }
-    # }
-    # # } else {
-    # #     warning('File "',file_name, '" does not exist, and will not be backed up.',
-    # #             call. = FALSE)
-    # }
-# }
 # }}}1
 
+#' @importFrom tools list_files_with_exts file_path_sans_ext
 # get_eplus_output_prefix_str
 # {{{1
 get_eplus_output_prefix_str <- function(path = getwd()) {
@@ -532,6 +448,7 @@ get_eplus_output_prefix_str <- function(path = getwd()) {
 }
 # }}}1
 
+#' @importFrom purrr map_chr
 # get_eplus_output_prefix_ptn
 # {{{1
 get_eplus_output_prefix_ptn <- function(output_prefix = get_eplus_output_prefix_str()) {
