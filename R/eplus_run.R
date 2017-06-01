@@ -709,6 +709,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
         # Case 1. But 'eplus_dir' is not given
         if (missingArg(eplus_dir)) {
             eplus_dir <- find_eplus(ver = ver)
+            ver <- attr(eplus_dir, "ver")
         # Case 2. And 'eplus_dir' is given.
         } else {
             energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
