@@ -55,7 +55,20 @@ import_jeplus <- function (json) {
     param_field <- purrr::set_names(param_field, param_name)
 
     param_value <- stringr::str_replace_all(params[["valuesString"]], "[\\{\\}]", "")
+    # Check if  the parametric value is a numeric seq.
+    regex_seq <- "\\[(\\d+(?:\\.\\d+)*):(\\d+(?:\\.\\d+)*):(\\d+(?:\\.\\d)*)\\]"
+    idx_value_seq <- stringr::str_detect(param_value, regex_seq)
+
     param_value <- stringr::str_split(param_value, "(\\s)*,(\\s)*")
+    param_value <- map2(idx_value_seq, seq_along(param_value),
+                        ~{if (.x) {
+                             from <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\1"))
+                             by <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\2"))
+                             to <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\3"))
+                             as.character(seq(from = from , to = to, by = by))
+                         } else {
+                             param_value[[.y]]
+                         }})
 
     # Get selected parameter values.
     param_value_selected <- params[["selectedAltValue"]]
@@ -72,7 +85,6 @@ import_jeplus <- function (json) {
     # Get all combination of case values.
     param_value <- purrr::cross_n(param_value)
     param_value <- purrr::set_names(param_value, case_names)
-
 
     # Get input file info.
     idfs <- purrr::flatten_chr(stringr::str_split(info[["idftemplate"]], "\\s*;\\s*"))
