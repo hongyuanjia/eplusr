@@ -699,10 +699,11 @@ run_job <- function (job, eplus_dir = find_eplus(),
         } else {
             energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
             if (!file.exists(energyplus_exe)) {
-                stop("Invalid EnergyPlus path.")
+                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
             } else {
+            ver <- get_idd_ver(eplus_dir)
             warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
-                    "specifed manually.")
+                    "specifed manually.", call. = FALSE)
             }
         }
     }
@@ -901,6 +902,6 @@ run_job <- function (job, eplus_dir = find_eplus(),
     walk(start_cmd, ~system(.x, wait = FALSE, invisible = FALSE))
     # }}}2
 
-    message("The job has been successfully executed using EnergyPlus")
+    message(stringr::str_interp("The job has been successfully executed using EnergyPlus ${ver}."))
 }
 # }}}1
