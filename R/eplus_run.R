@@ -678,6 +678,20 @@ run_job <- function (job, eplus_dir = find_eplus(),
     }
     # }}}2
 
+    # Parametric field existence checking
+    # {{{2
+    idx_has_param <- purrr::map_lgl(model, ~{raw <- readr::read_lines(.x);is_param_exist(raw)})
+    if (any(idx_has_param)) {
+        param_idfs <- model[idx_has_param]
+        if (match(job_type, "jeplus")) {
+            msg <- stringr::str_interp("There are parametric fields which do not have values. Please check the jEPlus .json project file and make sure every parametric field has a value string.\n")
+        } else {
+            msg <- map(param_idfs, ~stringr::str_interp("Model ${.x} has parametric fields which do not have values. Please clean the model before simulation.\n"))
+        }
+        stop(msg, call. = FALSE)
+    }
+    # }}}2
+
     # File extension checking
     # {{{2
     if (any(!grepl(x = model_ext, pattern = "i[dm]f", ignore.case = TRUE))) {
