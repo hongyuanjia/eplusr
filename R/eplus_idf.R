@@ -273,8 +273,10 @@ get_idf_ver <- function (idf_lines) {
 
     if (length(ver_pt_normal) == 1) {
         idf_ver <- stringr::str_extract(idf_lines[ver_pt_normal], "\\d\\.\\d")
-    } else {
+    } else if (length(ver_pt_special) == 1) {
         idf_ver <- stringr::str_extract(idf_lines[ver_pt_special], "\\d\\.\\d")
+    } else {
+        return(NULL)
     }
 
     return(idf_ver)
