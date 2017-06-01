@@ -6,7 +6,7 @@
 # {{{1
 read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
 
-    if (is_idf_str(file)) {
+    if (is_model_str(file)) {
         idf_lines <- file
     } else {
         idf_lines <- read_idf_lines(file)
@@ -46,8 +46,6 @@ read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
         }
     }
 
-
-
     # Return a string vector directly.
     if (!parse) {
         attrs <- list(ver = idf_ver,
@@ -62,7 +60,6 @@ read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
         idf <- add_attrs(idf, attrs)
         return(idf)
     }
-
 }
 # }}}1
 
@@ -272,9 +269,9 @@ get_idf_ver <- function (idf_lines) {
     ver_pt_special <- stringr::str_which(idf_lines, "^Version\\s*,\\s*\\d\\.\\d;$")
 
     if (length(ver_pt_normal) == 1) {
-        idf_ver <- stringr::str_extract(idf_lines[ver_pt_normal], "\\d\\.\\d")
+        idf_ver <- stringr::str_extract(idf_lines[ver_pt_normal], "\\d+\\.\\d+")
     } else if (length(ver_pt_special) == 1) {
-        idf_ver <- stringr::str_extract(idf_lines[ver_pt_special], "\\d\\.\\d")
+        idf_ver <- stringr::str_extract(idf_lines[ver_pt_special], "\\d+\\.\\d+")
     } else {
         return(NULL)
     }
@@ -447,17 +444,39 @@ clean_idf_lines <- function (idf_lines) {
 }
 # }}}1
 
-# is_idf_str
+# is_model_str
 # {{{1
-is_idf_str <- function (text) {
+is_model_str <- function (text) {
     text <- clean_idf_lines(text)
 
-    regex_object_start <- "^([A-Z][A-Za-z].*),$"
-    regex_object_end <- "^([A-Za-z0-9@]).*\\s*;\\s*!\\s*-"
-    first_obj_start_pt <- purrr::detect_index(text, stringr::str_detect, pattern = regex_object_start)
-    first_obj_end_pt <- purrr::detect_index(text, stringr::str_detect, pattern = regex_object_end)
+    # Get EpMacro row number
+    # {{{2
+    macro_dict <-
+        c("##include", "##fileprefix", "##includesilent", "##nosilent", # Incorporating external files
+          "##if", "##ifdef", "##ifndef", "##elseif", "##else", "##endif", # Selective accepting or skipping lins
+          "##def", "##enddef", "##def1", "##set1", # Defining blocks of input
+          "#eval", "#\\[", # Arithmetic operations
+          "##list", "##nolist", "##show", "##noshow", "##showdetail", "##noshowdetail", # Marco debugging and listing
+          "##expandcomment", "##traceback", "##notraceback", "##write", "##nowrite", # Marco debugging and listing
+          "##symboltable", "##clear", "##reverse", "##!") # Marco debugging and listing
+    macro_rows <- purrr::flatten_int(purrr::map(macro_dict, ~stringr::str_which(text, paste0("^", .x))))
+    # }}}2
 
-    if (all(first_obj_start_pt > 0, first_obj_end_pt > 0, first_obj_start_pt < first_obj_end_pt)) {
+    # Get IDF row number
+    # {{{2
+    regex_object_head <- "^([A-Z][A-Za-z].*),$"
+    regex_object_special <- '^\\w.*\\s*,\\s*.*;$'
+    regex_field <- "^([A-Za-z0-9\\*\\-@])*\\s*[,;]\\s*!\\s*-"
+    regex_field <- "^(((\\w|\\d|-|\\*|@@|\\.).*\\s*[,;])|[,;])\\s*!\\s*-"
+
+    head_rows <- str_which(text, regex_object_head)
+    special_rows <- str_which(text, regex_object_special)
+    field_rows <- str_which(text, regex_field)
+    # }}}2
+
+    valid_lines <- sort(c(macro_rows, head_rows, special_rows, field_rows))
+
+    if (identical(seq_along(text), valid_lines)) {
         return(TRUE)
     } else {
         return(FALSE)
