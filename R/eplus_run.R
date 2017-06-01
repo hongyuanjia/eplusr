@@ -550,11 +550,11 @@ create_job <- function (param_tbl, path = NULL) {
     file_name <- file.path(temp_dir, paste0(names(param_value), ".imf"))
     file_name <- normalizePath(file_name, winslash = "/", mustWork = FALSE)
     param_idfs <-
-        map(seq_along(param_value),
-            ~create_param(idf_path = idf_path,
-                          param_name = param_name,
-                          param_field = param_field,
-                          param_value = param_value[[.x]]))
+        purrr::map(seq_along(param_value),
+                   ~create_param(idf_path = idf_path,
+                                 param_name = param_name,
+                                 param_field = param_field,
+                                 param_value = param_value[[.x]]))
     param_idfs <- purrr::set_names(param_idfs, names(param_value))
     purrr::walk2(param_idfs, file_name, ~readr::write_lines(x = .x, path = .y))
 
@@ -571,7 +571,7 @@ create_job <- function (param_tbl, path = NULL) {
     job <- data.table::rbindlist(job)
     # Add job number
     job <- job[, `#` := seq_along(V1)]
-    job <- setcolorder(job, c("#", col_names(job, "#", invert = TRUE)))
+    job <- data.table::setcolorder(job, c("#", col_names(job, "#", invert = TRUE)))
     # Set names as jEPlus style.
     job <- purrr::set_names(job, c("#", "model_case", "model_template", "weather", param_field))
 
@@ -579,8 +579,11 @@ create_job <- function (param_tbl, path = NULL) {
     job_ <- copy(job)
     job_ <- job_[, `:=`(weather = basename(weather))]
 
+    if (!dir.exists(path)) {
+        dir.create(path)
+    }
     job_file <- file.path(path, "job_index.csv")
-    write_csv(job_, path = job_file)
+    readr::write_csv(job_, path = job_file)
 
     job <- job[, .(model = normalizePath(file.path(temp_dir, paste0(model_case, ".imf")), mustWork = TRUE), weather)]
     return(job)
