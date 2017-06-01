@@ -473,11 +473,19 @@ clean_idf_lines <- function (idf_lines) {
 # }}}1
 
 #' @importFrom purrr flatten_int map
-#' @importFrom stringr str_which
+#' @importFrom stringr str_which str_trim
 # is_model_str
 # {{{1
 is_model_str <- function (text, lines = FALSE) {
-    text <- clean_idf_lines(text)
+    # Get rid of blank lines, comment lines and leading&trailing spaces
+    # {{{2
+    regex_blank <- "^\\s*$"
+    regex_comment <- "^\\s*!.*$"
+    row_blank <- stringr::str_which(text, regex_blank)
+    row_comment <- stringr::str_which(text, regex_comment)
+    text_cleaned <- text[-sort(c(row_blank, row_comment))]
+    text_cleaned <- stringr::str_trim(text_cleaned)
+    # }}}2
 
     # Get EpMacro row number
     # {{{2
@@ -489,31 +497,30 @@ is_model_str <- function (text, lines = FALSE) {
           "##list", "##nolist", "##show", "##noshow", "##showdetail", "##noshowdetail", # Marco debugging and listing
           "##expandcomment", "##traceback", "##notraceback", "##write", "##nowrite", # Marco debugging and listing
           "##symboltable", "##clear", "##reverse", "##!") # Marco debugging and listing
-    macro_rows <- purrr::flatten_int(purrr::map(macro_dict, ~stringr::str_which(text, paste0("^", .x))))
+    macro_rows <- purrr::flatten_int(purrr::map(macro_dict, ~stringr::str_which(text_cleaned, paste0("^", .x))))
     # }}}2
 
     # Get IDF row number
     # {{{2
     regex_object_head <- "^([A-Z][A-Za-z].*),$"
     regex_object_special <- '^\\w.*\\s*,\\s*.*;$'
-    regex_field <- "^([A-Za-z0-9\\*\\-@])*\\s*[,;]\\s*!\\s*-"
     regex_field <- "^(((\\w|\\d|-|\\*|@@|\\.).*\\s*[,;])|[,;])\\s*!\\s*-"
 
-    head_rows <- stringr::str_which(text, regex_object_head)
-    special_rows <- stringr::str_which(text, regex_object_special)
-    field_rows <- stringr::str_which(text, regex_field)
+    head_rows <- stringr::str_which(text_cleaned, regex_object_head)
+    special_rows <- stringr::str_which(text_cleaned, regex_object_special)
+    field_rows <- stringr::str_which(text_cleaned, regex_field)
     # }}}2
 
     valid_lines <- sort(c(macro_rows, head_rows, special_rows, field_rows))
 
     if (!lines) {
-        if (identical(seq_along(text), valid_lines)) {
+        if (identical(seq_along(text_cleaned), valid_lines)) {
             return(TRUE)
         } else {
             return(FALSE)
         }
     } else {
-        invalid <- setdiff(seq_along(text), valid_lines)
+        invalid <- setdiff(seq_along(text_cleaned), valid_lines)
         return(text[invalid])
     }
 }
