@@ -51,6 +51,7 @@ import_jeplus <- function (json) {
     # Get parameter info.
     params <- info[["parameters"]]
 
+    param_id <- params[["id"]]
     param_name <- params[["name"]]
 
     param_field <- stringr::str_split(params[["searchString"]], "\\|")
@@ -80,7 +81,14 @@ import_jeplus <- function (json) {
     param_value <- purrr::set_names(param_value, param_name)
 
     # Create case names according to parameter names.
-    case_names <- purrr::map2(param_name, param_value, ~paste0(.x, seq_along(.y)))
+    case_names <- purrr::pmap(list(param_id, param_value, param_value_selected),
+                              function(name, value, selected) {
+                                  if (as.integer(selected) > 0) {
+                                      paste0(name, selected)
+                                  } else {
+                                      paste0(name, seq_along(value))
+                                  }
+                              })
     case_names <- data.table::rbindlist(purrr::cross_n(case_names))
     case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
 
@@ -157,7 +165,14 @@ import_epat <- function (json) {
     param_value <- purrr::set_names(param_value, param_name)
 
     # Create case names according to parameter names.
-    case_names <- purrr::map2(param_id, param_value, ~paste0(.x, seq_along(.y)))
+    case_names <- purrr::pmap(list(param_id, param_value, param_value_selected),
+                              function(name, value, selected) {
+                                  if (as.integer(selected) > 0) {
+                                      paste0(name, selected)
+                                  } else {
+                                      paste0(name, seq_along(value))
+                                  }
+                              })
     case_names <- data.table::rbindlist(purrr::cross_n(case_names))
     case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
 
