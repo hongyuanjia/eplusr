@@ -35,7 +35,7 @@ import_epg <- function(epg){
 #' with value 'jeplus' which will be used when running jobs using
 #' \link{\code{run_job}}.
 #'
-#' @param json A file path of an .json file.
+#' @param json A file path of a .json file.
 #' @return A list containing project info.
 #' @importFrom jsonlite fromJSON
 #' @importFrom stringr str_split str_replace_all str_replace str_detect str_replace
@@ -98,6 +98,87 @@ import_jeplus <- function (json) {
                      param_field = param_field, param_value = param_value)
 
     attr(sim_info, "job_type") <- "jeplus"
+
+    return(sim_info)
+}
+# }}}1
+
+#' Import EPAT .json type project
+#'
+#' \code{import_epat} takes a file path of an .json type project of EPAT, and
+#' return a list containing model paths, weather paths, parametric fields, and
+#' parametric values. The returned list will have an attribute 'job_type' with
+#' value 'epat' which will be used when running jobs using
+#' \link{\code{run_job}}.
+#'
+#' @param json A file path of a .json file.
+#' @return A list containing project info.
+#' @importFrom jsonlite fromJSON
+#' @importFrom stringr str_split str_replace_all str_replace str_detect str_replace
+#' @importFrom purrr set_names map map_chr map2 set_names flatten_chr cross_n
+#' @importFrom data.table rbindlist
+#' @export
+# import_epat
+# {{{1
+import_epat <- function (json) {
+    # Read jeplus JSON project file.
+    info <- jsonlite::fromJSON(json)
+
+    # Get parameter info.
+    params <- info[["param_table"]]
+
+    param_id <- params[["ID"]]
+    param_name <- params[["Name"]]
+
+    param_field <- stringr::str_split(params[["Search Tag"]], "\\|")
+    param_field <- purrr::set_names(param_field, param_name)
+
+    param_value <- stringr::str_replace_all(params[["Value Expressions"]], "[\\{\\}]", "")
+    # Check if  the parametric value is a numeric seq.
+    regex_seq <- "\\[(\\d+(?:\\.\\d+)*):(\\d+(?:\\.\\d+)*):(\\d+(?:\\.\\d)*)\\]"
+    idx_value_seq <- stringr::str_detect(param_value, regex_seq)
+
+    param_value <- stringr::str_split(param_value, "(\\s)*,(\\s)*")
+    param_value <- map2(idx_value_seq, seq_along(param_value),
+                        ~{if (.x) {
+                             from <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\1"))
+                             by <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\2"))
+                             to <- as.numeric(stringr::str_replace(param_value[[.y]], regex_seq, "\\3"))
+                             as.character(seq(from = from , to = to, by = by))
+                         } else {
+                             param_value[[.y]]
+                         }})
+
+    # Get selected parameter values.
+    param_value_selected <- as.integer(params[["Fixed Value"]])
+    param_value <- purrr::map2(param_value_selected, param_value, ~{if (.x > 0) .y <- .y[.x] else .y})
+
+    param_value <- purrr::map(param_value, ~stringr::str_split(.x, "(\\s)*\\|(\\s)*"))
+    param_value <- purrr::set_names(param_value, param_name)
+
+    # Create case names according to parameter names.
+    case_names <- purrr::map2(param_id, param_value, ~paste0(.x, seq_along(.y)))
+    case_names <- data.table::rbindlist(purrr::cross_n(case_names))
+    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
+
+    # Get all combination of case values.
+    param_value <- purrr::cross_n(param_value)
+    param_value <- purrr::set_names(param_value, case_names)
+
+    # Get input file info.
+    idf_path <- info[["idf_path"]]
+    wthr_path <- info[["weather_path"]]
+
+    # Get other misc info
+    eplus_path <- info[["eplus_path"]]
+    wd_path <- info[["wd_path"]]
+    parallel_num <- info[["parallel_num"]]
+
+    sim_info <- list(idf_path = idf_path, weather_path = wthr_path,
+                     param_field = param_field, param_value = param_value,
+                     eplus_path = eplus_path, wd_path = wd_path, parallel_num = parallel_num)
+
+    attr(sim_info, "job_type") <- "epat"
 
     return(sim_info)
 }
