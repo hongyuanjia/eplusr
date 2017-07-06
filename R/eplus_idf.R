@@ -308,6 +308,18 @@ is_param_exist <- function (idf_lines) {
 }
 # }}}
 
+#' @importFrom stringr str_extract_all
+#' @importFrom purrr flatten_chr keep
+# list_params
+# {{{1
+list_params <- function (idf_lines) {
+    param_check <- stringr::str_extract_all(idf_lines, "@@.*@@")
+    params_all <- purrr::flatten_chr(purrr::keep(param_check, ~ length(.x) > 0))
+    params <- unique(params_all)
+    return(params)
+}
+# }}}1
+
 #' @importFrom tools file_path_sans_ext
 #' @importFrom readr read_lines
 #' @importFrom stringr str_which
