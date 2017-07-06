@@ -754,12 +754,20 @@ run_job <- function (job, eplus_dir = find_eplus(),
     idx_has_param <- purrr::map_lgl(model, ~{raw <- readr::read_lines(.x);is_param_exist(raw)})
     if (any(idx_has_param)) {
         param_idfs <- model[idx_has_param]
+        param_list <- purrr::map_chr(param_idfs,
+                                      ~{raw <- readr::read_lines(.x)
+                                        params <- list_params(raw)
+                                        paste(params, collapse = ", ")
+                                       })
+        info <- purrr::map2_chr(param_idfs, param_list,
+                                ~stringr::str_interp("For ${basename(.x)}: ${.y}"))
         if (!is.na(match(job_type, c("jeplus", "epat")))) {
-            msg <- stringr::str_interp("There are parametric fields which do not have values. Please check the jEPlus .json project file and make sure every parametric field has a value string.\n")
+            msg <- stringr::str_interp("There are parametric fields which do not have values. Please check the .json project file and make sure every parametric field has a value string.\n")
         } else {
             msg <- map(param_idfs, ~stringr::str_interp("Model ${.x} has parametric fields which do not have values. Please clean the model before simulation.\n"))
         }
-        stop(msg, call. = FALSE)
+        msg_all <- c(msg, "\n", paste0(info, collapse = "\n"))
+        stop(msg_all, call. = FALSE)
     }
     # }}}2
 
