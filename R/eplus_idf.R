@@ -459,14 +459,14 @@ clean_idf_lines <- function (idf_lines) {
     # Get rid of leading and trailing spaces
     idf_lines <- stringr::str_trim(idf_lines, side = "both")
 
-    # Get rid of Output:PreprocessorMessage
-    regex_preproc_msg <- "^Output:PreprocessorMessage,"
-    preproc_msg_start_pt <- stringr::str_which(idf_lines, regex_preproc_msg)
-    preproc_msg_end_pt <- preproc_msg_start_pt + (diff(c(preproc_msg_start_pt, (length(idf_lines) + 1))) - 1)
-    preproc_msg_rows <- purrr::flatten_int(purrr::map2(preproc_msg_start_pt, preproc_msg_end_pt, seq))
-    if (length(preproc_msg_rows) > 0) {
-        idf_lines <- idf_lines[-preproc_msg_rows]
-    }
+    # # Get rid of Output:PreprocessorMessage
+    # regex_preproc_msg <- "^Output:PreprocessorMessage,"
+    # preproc_msg_start_pt <- stringr::str_which(idf_lines, regex_preproc_msg)
+    # preproc_msg_end_pt <- preproc_msg_start_pt + (diff(c(preproc_msg_start_pt, (length(idf_lines) + 1))) - 1)
+    # preproc_msg_rows <- purrr::flatten_int(purrr::map2(preproc_msg_start_pt, preproc_msg_end_pt, seq))
+    # if (length(preproc_msg_rows) > 0) {
+    #     idf_lines <- idf_lines[-preproc_msg_rows]
+    # }
 
     return(idf_lines)
 }
@@ -483,8 +483,19 @@ is_model_str <- function (text, lines = FALSE) {
     regex_comment <- "^\\s*!.*$"
     row_blank <- stringr::str_which(text, regex_blank)
     row_comment <- stringr::str_which(text, regex_comment)
-    text_cleaned <- text[-sort(c(row_blank, row_comment))]
-    text_cleaned <- stringr::str_trim(text_cleaned)
+    row_rem <- c(row_blank, row_comment)
+    if (length(row_rem) == 0L) {
+        text_cleaned <- stringr::str_trim(text)
+    } else {
+        text_cleaned <- stringr::str_trim(text[-sort(row_rem)])
+    }
+    # }}}2
+
+    # Return FALSE if no lines left
+    # {{{2
+    if (length(text_cleaned) == 0L) {
+        return(FALSE)
+    }
     # }}}2
 
     # Get EpMacro row number
@@ -514,13 +525,13 @@ is_model_str <- function (text, lines = FALSE) {
     valid_lines <- sort(c(macro_rows, head_rows, special_rows, field_rows))
 
     if (!lines) {
-        if (identical(seq_along(text_cleaned), valid_lines)) {
+        invalid <- setdiff(seq_along(text_cleaned), valid_lines)
+        if (length(invalid) == 0L) {
             return(TRUE)
         } else {
             return(FALSE)
         }
     } else {
-        invalid <- setdiff(seq_along(text_cleaned), valid_lines)
         return(text[invalid])
     }
 }
