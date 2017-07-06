@@ -883,6 +883,11 @@ run_job <- function (job, eplus_dir = find_eplus(),
                 create_eplus_ini(eplus_dir = eplus_dir, working_dir = .x)})
     # }}}2
 
+    # Clean output directory per case.
+    # {{{2
+    purrr::walk(output_dir, clean_wd)
+    # }}}2
+
     # Get new input file names.
     # {{{2
     if (length(output_prefix) == 1) {
