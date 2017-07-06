@@ -10,7 +10,7 @@
 # {{{1
 get_idd_ver <- function(eplus_dir){
     idd <- file.path(eplus_dir, "Energy+.idd")
-    idd_ver <- purrr::map_chr(idd, ~stringr::str_replace(x = readr::read_lines(.x, n_max = 1), "!IDD_Version ", ""))
+    idd_ver <- purrr::map_chr(idd, ~stringr::str_replace(readr::read_lines(.x, n_max = 1), "!IDD_Version ", ""))
     return(idd_ver)
 }
 # }}}1
