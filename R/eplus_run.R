@@ -626,7 +626,7 @@ create_job <- function (param_tbl, path = NULL) {
     job_ <- job_[, `:=`(weather = basename(weather))]
 
     if (!dir.exists(path)) {
-        dir.create(path)
+        dir.create(path, recursive = TRUE)
     }
     job_file <- file.path(path, "job_index.csv")
     readr::write_csv(job_, path = job_file)
