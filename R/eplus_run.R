@@ -816,7 +816,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
             un_matched_models <- model[!is_ver_matched]
             un_matched_vers <- idf_vers[!is_ver_matched]
             msg <- paste(paste0("Model:", un_matched_models, ", indicated version:", un_matched_vers), collapse = "\n")
-            warning(meg, call. = FALSE)
+            warning(msg, call. = FALSE)
         }
     }
     # }}}2
