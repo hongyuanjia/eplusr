@@ -781,27 +781,24 @@ run_job <- function (job, eplus_dir = find_eplus(),
     }
     # }}}2
 
-    # 'eplus_dir' checking
+    # 'eplus_dir' and 'ver' checking
     # {{{2
-    # If EnergyPlus version has been specified.
     if (!is.null(ver)) {
-        # Case 1. But 'eplus_dir' is not given
-        if (missing(eplus_dir)) {
-            eplus_dir <- find_eplus(ver = ver)
-            ver <- attr(eplus_dir, "ver")
-        # Case 2. And 'eplus_dir' is given.
-        } else {
-            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-            if (!file.exists(energyplus_exe)) {
-                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
-            } else {
-            ver <- get_idd_ver(eplus_dir)
+        eplus_dir <- find_eplus(ver = ver)
+        ver <- attr(eplus_dir, "ver")
+        energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+        if (methods::hasArg(eplus_dir)) {
             warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
                     "specifed manually.", call. = FALSE)
-            }
+        }
+    } else {
+        energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+        if (!file.exists(energyplus_exe)) {
+            stop("Invalid EnergyPlus path. Please correct 'eplus_dir'.", call. = FALSE)
+        } else {
+            ver <- get_idd_ver(eplus_dir)
         }
     }
-    energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
     # }}}2
 
     # Input file version and EnergyPlus verion match checking
