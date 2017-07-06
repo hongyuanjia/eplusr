@@ -556,7 +556,6 @@ create_param <- function (idf_path, param_name, param_field, param_value) {
 }
 # }}}1
 
-
 #' @importFrom purrr flatten_chr map set_names cross_n
 #' @importFrom data.table setcolorder rbindlist
 #' @importFrom readr write_lines write_csv
@@ -640,6 +639,7 @@ create_job <- function (param_tbl, path = NULL) {
 #' @importFrom stringr str_length str_interp
 #' @importFrom purrr map_lgl map_chr walk walk2 map keep negate flatten_chr
 #' @importFrom readr read_lines write_lines
+#' @importFrom methods hasArg
 # run_job
 # {{{1
 run_job <- function (job, eplus_dir = find_eplus(),
