@@ -806,14 +806,13 @@ run_job <- function (job, eplus_dir = find_eplus(),
     idf_vers <- purrr::map_chr(model, ~paste0(get_idf_ver(readr::read_lines(.x)), ".0"))
     is_ver_matched <- purrr::map_lgl(idf_vers, ~{identical(.x, ver)})
     if (!all(is_ver_matched)) {
-        if (identical(job_type, "jeplus")) {
+        if (identical(job_type, c("jeplus", "epat"))) {
             warning(stringr::str_interp("The input template model indicates an EnergyPlus verion of ${unique(idf_vers)} but is simulated using EnergyPlus ${ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
         } else {
-            warning(stringr::str_interp("There are models indicating EnergyPlus versions which are different from the EnergyPlus version ${ver} used in simulation:\n"))
             un_matched_models <- model[!is_ver_matched]
             un_matched_vers <- idf_vers[!is_ver_matched]
             msg <- paste(paste0("Model:", un_matched_models, ", indicated version:", un_matched_vers), collapse = "\n")
-            warning(msg, call. = FALSE)
+            warning(stringr::str_interp("There are models indicating EnergyPlus versions which are different from the EnergyPlus version ${ver} used in simulation:\n"), msg, call. = FALSE)
         }
     }
     # }}}2
