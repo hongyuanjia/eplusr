@@ -674,6 +674,30 @@ run_job <- function (job, eplus_dir = find_eplus(),
         job <- create_job(param_tbl = job, path = output_dir)
     }
 
+    # If the job is imported from `import_epat`
+    if (identical(job_type, "epat")) {
+        job_parallel_num <- job$parallel_num
+        job_eplus_path <- job$eplus_path
+        job_wd_path <- job$wd_path
+        if (is.null(output_dir)) {
+            if (any(is.null(job_wd_path), identical(job_wd_path, ""), is.na(job_wd_path))) {
+                output_dir <- getwd()
+            } else {
+                output_dir <- job_wd_path
+            }
+        }
+        job <- create_job(param_tbl = job, path = output_dir)
+
+        # Get n
+        if (!all(is.null(job_parallel_num), identical(job_parallel_num, ""), is.na(job_parallel_num))) {
+            n <- as.integer(job_parallel_num)
+        }
+
+        if (!all(is.null(job_eplus_path), identical(job_eplus_path, ""), is.na(job_eplus_path))) {
+            eplus_dir <- job_eplus_path
+        }
+    }
+
     # 'job' format checking
     if (!is.data.frame(job)) {
         stop("Invalid job. 'job' should be a data.frame with two columns named 'model' and 'weather' respectively.", call. = FALSE)
@@ -730,7 +754,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
     idx_has_param <- purrr::map_lgl(model, ~{raw <- readr::read_lines(.x);is_param_exist(raw)})
     if (any(idx_has_param)) {
         param_idfs <- model[idx_has_param]
-        if (match(job_type, "jeplus")) {
+        if (!is.na(match(job_type, c("jeplus", "epat")))) {
             msg <- stringr::str_interp("There are parametric fields which do not have values. Please check the jEPlus .json project file and make sure every parametric field has a value string.\n")
         } else {
             msg <- map(param_idfs, ~stringr::str_interp("Model ${.x} has parametric fields which do not have values. Please clean the model before simulation.\n"))
@@ -754,7 +778,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
     # If EnergyPlus version has been specified.
     if (!is.null(ver)) {
         # Case 1. But 'eplus_dir' is not given
-        if (missingArg(eplus_dir)) {
+        if (missing(eplus_dir)) {
             eplus_dir <- find_eplus(ver = ver)
             ver <- attr(eplus_dir, "ver")
         # Case 2. And 'eplus_dir' is given.
