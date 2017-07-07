@@ -959,12 +959,12 @@ run_job <- function (job, eplus_dir = find_eplus(),
     }
     if (!is.null(output_prefix)) {
         new_model_name <- file.path(output_dir, paste0(output_prefix, ".", model_ext))
-        new_weather_name <- file.path(output_dir, paste0(weather_name, "(", output_prefix, ").", weather_ext))
+        new_weather_name <- file.path(output_dir, paste0(weather_name, ".", weather_ext))
 
     } else {
         output_prefix <- model_name
         new_model_name <- file.path(output_dir, paste0(model_name, ".", model_ext))
-        new_weather_name <- file.path(output_dir, paste0(weather_name, "(", model_name, ").", weather_ext))
+        new_weather_name <- file.path(output_dir, paste0(weather_name, ".", weather_ext))
     }
     # }}}2
 
