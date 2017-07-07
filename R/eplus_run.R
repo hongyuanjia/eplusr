@@ -373,7 +373,7 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
     # If EnergyPlus version has been specified.
     if (!is.null(ver)) {
         # Case 1. But 'eplus_dir' is not given
-        if (missingArg(eplus_dir)) {
+        if (missing(eplus_dir)) {
             eplus_dir <- find_eplus(ver = ver)
             ver <- attr(eplus_dir, "ver")
         # Case 2. And 'eplus_dir' is given.
@@ -783,6 +783,25 @@ run_job <- function (job, eplus_dir = find_eplus(),
 
     # 'eplus_dir' and 'ver' checking
     # {{{2
+    # If EnergyPlus version has been specified.
+    if (!is.null(ver)) {
+        # Case 1. But 'eplus_dir' is not given
+        if (missing(eplus_dir)) {
+            eplus_dir <- find_eplus(ver = ver)
+            ver <- attr(eplus_dir, "ver")
+            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+        # Case 2. And 'eplus_dir' is given.
+        } else {
+            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
+            if (!file.exists(energyplus_exe)) {
+                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
+            } else {
+            ver <- get_idd_ver(eplus_dir)
+            warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
+                    "specifed manually.", call. = FALSE)
+            }
+        }
+    }
     if (!is.null(ver)) {
         eplus_dir <- find_eplus(ver = ver)
         ver <- attr(eplus_dir, "ver")
