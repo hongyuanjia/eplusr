@@ -114,6 +114,39 @@ create_eplus_ini <- function (eplus_dir, working_dir) {
 }
 # }}}1
 
+#' @importFrom stringr str_subset str_extract
+# get_external_fill: A helper function to get file paths in 'Schedule:File'.
+# get_external_fill
+# {{{1
+get_external_file <- function (idf_lines) {
+    schedule_files <- stringr::str_subset(idf_lines, "!\\s*-\\s*File Name$")
+    files <- unique(stringr::str_extract(schedule_files, "^.*(?=,)"))
+    return(files)
+}
+# }}}1
+
+#' @importFrom purrr walk
+# copy_external_file: A helper function to copy files used in 'Schedule:File' to
+# output dir.
+# copy_external_file
+# {{{1
+copy_external_file <- function (idf_lines, output_dir) {
+    files <- get_external_file(idf_lines)
+    if (!dir.exists(output_dir)) {
+        dir.create(output_dir, recursive = TRUE)
+    }
+    purrr::walk(files,
+        ~{flag <- file.copy(from = .x, to = file.path(output_dir, basename(.x)),
+                            overwrite = TRUE, copy.date = TRUE)
+          if (!flag) {
+              warning("Cannot copy file '", basename(.x), "' to path ", output_dir,
+                      call. = FALSE)
+          }
+         }
+    )
+}
+# }}}1
+
 # Epl_run_bat: A wrapper function of "Epl-run.bat" distributed with EnergyPlus.
 # Epl_run_bat
 # {{{1
@@ -422,6 +455,12 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
     }
     # }}}2
 
+    # Copy files used in 'Schedule:File' to output dir.
+    # {{{2
+    input_lines <- read_idf_lines(input)
+    copy_external_file(input_lines)
+    # }}}2
+
     # Input file renaming
     # {{{2
     # If output directory is given,
@@ -430,7 +469,7 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
         if (!dir.exists(output_dir)) {
             output_dir_flag <- dir.create(output_dir, showWarnings = TRUE, recursive = TRUE)
             if(!output_dir_flag) {
-                stop("Could not find or create the specified output direcotry.")
+                stop("Could not find or create the specified output direcotry.", call. = FALSE)
             }
         }
 
@@ -905,6 +944,12 @@ run_job <- function (job, eplus_dir = find_eplus(),
     # Clean output directory per case.
     # {{{2
     purrr::walk(output_dir, clean_wd)
+    # }}}2
+
+    # Copy files used in 'Schedule:File' to output dir.
+    # {{{2
+    input_lines <- read_idf_lines(imf)
+    purrr::walk2(model, output_dir, ~copy_external_file(read_idf_lines(.x), .y))
     # }}}2
 
     # Get new input file names.
