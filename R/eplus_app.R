@@ -470,6 +470,23 @@ edit_epat <- function (json, parse = TRUE) {
 }
 # }}}1
 
+#' A Shiny app for EnergyPlus Parametric Analysis in R.
+#'
+#' \code{epat} will launch a shiny app called EPAT (EnergyPlus Parametric
+#' Analysis Toolkit).
+#'
+#' @export
+#' @examples
+#' epat()
+# epat{{{1
+epat <- function () {
+    shiny::runApp(appDir = system.file("inst/app", package="eplusr"))
+}
+# }}}1
+
+#####################################
+#  helper function for edit_epat()  #
+#####################################
 # read_epat{{{1
 read_epat <- function(json) {
     job <- jsonlite::fromJSON(json)
@@ -480,7 +497,6 @@ read_epat <- function(json) {
     return(job)
 }
 # }}}1
-
     # preview_values{{{2
     preview_values <- function (string) {
         # Check if a R expression string
