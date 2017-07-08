@@ -948,7 +948,6 @@ run_job <- function (job, eplus_dir = find_eplus(),
 
     # Copy files used in 'Schedule:File' to output dir.
     # {{{2
-    input_lines <- read_idf_lines(imf)
     purrr::walk2(model, output_dir, ~copy_external_file(read_idf_lines(.x), .y))
     # }}}2
 
