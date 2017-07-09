@@ -2,8 +2,6 @@
 #                         EnergyPlus Data Manipulation                         #
 ################################################################################
 
-#' @import data.table
-
 #' Column name extraction using RegEx.
 #'
 #' \code{col_names} returns all column names that are matched by the specifed
