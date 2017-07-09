@@ -7,7 +7,7 @@
 import_jeplus(json)
 }
 \arguments{
-\item{json}{A file path of an .json file.}
+\item{json}{A file path of a .json file.}
 }
 \value{
 A list containing project info.
@@ -17,5 +17,5 @@ A list containing project info.
 and return a list containing model paths, weather paths, parametric fields,
 and parametric values. The returned list will have an attribute 'job_type'
 with value 'jeplus' which will be used when running jobs using
-\link(\code{run_job}).
+\link{\code{run_job}}.
 }
