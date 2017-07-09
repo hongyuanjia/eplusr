@@ -15,20 +15,90 @@ get_idd_ver <- function(eplus_dir){
 }
 # }}}1
 
+# check_energyplus
+# check_energyplus{{{1
+check_energyplus <- function (eplus_dir) {
+    os <- Sys.info()['sysname']
+    if (os == "Windows") {
+        energyplus <- normalizePath(file.path(eplus_dir, "energyplus.exe"), mustWork = FALSE)
+    } else {
+        energyplus <- normalizePath(file.path(eplus_dir, "energyplus"), mustWork = FALSE)
+    }
+    idd <- normalizePath(file.path(eplus_dir, "Energy+.idd"), mustWork = FALSE)
+
+    purrr::map2_lgl(energyplus, idd,
+                   ~{
+                        if (all(file.exists(.x, .y))) {
+                            return(TRUE)
+                        } else {
+                            return(FALSE)
+                        }
+                   })
+}
+# }}}1
+
+# get_volumes: A function to get all disks (borrowed from 'getVolumes' function
+# in 'shinyFiles' package).
+# get_volumes{{{1
+get_volumes <- function(exclude = NULL) {
+    os <- Sys.info()['sysname']
+    if (os == 'Darwin') {
+        volumes <- list.files('/Volumes/', full.names=T)
+        names(volumes) <- basename(volumes)
+    } else if (os == 'Linux') {
+        volumes <- c('Computer'='/')
+        local <- list.files('/usr/local/', full.names=T)
+        names(local) <- basename(local)
+        volumes <- c(volumes, local)
+    } else if (os == 'Windows') {
+        volumes <- system('wmic logicaldisk get Caption', intern=T)
+        volumes <- sub(' *\\r$', '', volumes)
+        keep <- !tolower(volumes) %in% c('caption', '')
+        volumes <- volumes[keep]
+        volNames <- system('wmic logicaldisk get VolumeName', intern=T)
+        volNames <- sub(' *\\r$', '', volNames)
+        volNames <- volNames[keep]
+        volNames <- paste0(volNames, ifelse(volNames == "", "", " "))
+        volNames <- paste0(volNames, '(', volumes, ')')
+        names(volumes) <- volNames
+    } else {
+        stop('unsupported OS')
+    }
+    if (!is.null(exclude)) {
+        volumes <- volumes[!names(volumes) %in% exclude]
+    }
+    volumes
+}
+# }}}1
+
+#' Find EnergyPlus locations on current computer.
+#'
+#' \code{find_eplus} try to find the locations of EnergyPlus on current
+#' computer.
+#'
+#' @param ver The version to locate for. If NULL, all versions will be returned.
+#' @param verbose If TRUE, extra message will be shown.
+#' @return A tibble object with two columns named 'path' and 'version'.
 #' @importFrom purrr flatten_chr map
 #' @importFrom stringr str_detect
-# find_eplus: A function to locate EnergyPlus folder.
+#' @export
+#' @examples
+#' find_eplus()
 # find_eplus
 # {{{1
 find_eplus <- function(ver = NULL, verbose = TRUE){
     # Define searching paths.
     # 1. check if drives exist.
-    disks <- c("C:", "D:", "E:", "F:", "G:")
-    disks <- disks[dir.exists(paste0(disks,"/"))]
+    disks <- get_volumes()
     # 2. search EnergyPlus in drive root path and program file folders.
-    path_list <- c(paste0(disks, "/"),
-                   file.path(disks, "Program Files"),
-                   file.path(disks, "Program Files (x86)"))
+    os <- Sys.info()['sysname']
+    if (os == "Windows") {
+        path_list <- c(paste0(disks, "/"),
+                       file.path(disks, "Program Files"),
+                       file.path(disks, "Program Files (x86)"))
+    } else {
+        stop('Unsupported OS.')
+    }
 
     # Find if EnergyPlus folder exists in path list.
     eplus_dir <-
@@ -40,15 +110,19 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
     # mannually.
     if (length(eplus_dir) == 0L) {
         stop(paste("Cannot find EnergyPlus folder. ",
-                   "Please specify EnergyPlus installed path mannually."),
+                   "Please specify EnergyPlus path mannually."),
              call. = FALSE)
     }
 
+    # Validate the paths
+    validated <- check_energyplus(eplus_dir)
     # Get the version(s) of EnergyPlus.
     idd_ver <- get_idd_ver(eplus_dir)
+    results <- dplyr::tibble(path = eplus_dir, version = idd_ver)
     # Get the latest version of EnergyPlus and its path.
-    eplus_dir_latest <- eplus_dir[max(order(idd_ver))]
-    idd_ver_latest <- max(idd_ver)
+    results <- dplyr::arrange(results, version)
+    eplus_dir_latest <- results[nrow(results),][["path"]]
+    idd_ver_latest <- results[nrow(results),][["version"]]
 
     # If no EnergyPlus version is specified, use the latest version.
     if (is.null(ver)) {
@@ -58,10 +132,6 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
                 # List the paths and versions.
                 message(paste("Multiple EnergyPlus versions are found: \n"),
                         paste(eplus_dir, "Version:", idd_ver, collapse = "\n"), "\n")
-                # Use the latest version.
-                message(paste("NOTE: Only the latest version of EnergyPlus",
-                              idd_ver_latest,
-                              "will be used if argument 'ver' is not sepcified.\n"))
             }
         # If only one EnergyPlus version is found, print message.
         } else {
@@ -70,8 +140,6 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
                               "has been successfully located:\n", eplus_dir_latest, "\n"))
             }
         }
-        ver_returned <- idd_ver_latest
-        dir_returned <- eplus_dir_latest
     } else {
         if (!stringr::str_detect(ver, "^\\d+\\.\\d+$")) {
             stop("'ver' should be a format of 'X.Y'.", call. = FALSE)
@@ -87,14 +155,11 @@ find_eplus <- function(ver = NULL, verbose = TRUE){
                 message(paste0("EnergyPlus Version: ", idd_ver_matched,
                                " has been successfully located:\n", eplus_dir_matched, "\n"))
             }
-
-        ver_returned <- idd_ver_matched
-        dir_returned <- eplus_dir_matched
         }
+        results <- dplyr::tibble(path = eplus_dir_matched, version = idd_Ver_matched)
     }
 
-    attr(dir_returned, "ver") <- ver_returned
-    return(dir_returned)
+    return(results)
 }
 # }}}1
 
@@ -388,6 +453,7 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 #' @importFrom readr read_lines
 #' @importFrom stringr str_interp
 #' @importFrom tools file_path_sans_ext file_ext
+#' @export
 # run_eplus: A function to run EnergyPlus in R.
 # run_eplus
 # {{{1
@@ -587,8 +653,7 @@ create_param <- function (idf_path, param_name, param_field, param_value) {
                                ~{assign("idf_raw", stringr::str_replace_all(idf_raw, .x, .y), envir = con)})})
 
     idf_ver <- get_idf_ver(idf_raw)
-    attrs <- list(ver = idf_ver,
-                  type = "string")
+    attrs <- list(ver = idf_ver, type = "string")
     idf_raw <- add_attrs(idf_raw, attrs)
 
     return(idf_raw)
@@ -600,7 +665,7 @@ create_param <- function (idf_path, param_name, param_field, param_value) {
 #' @importFrom readr write_lines write_csv
 # create_job
 # {{{1
-create_job <- function (param_tbl, path = NULL) {
+create_job <- function (param_tbl) {
     all_names <- names(param_tbl)
     is_param_tbl <- all(match("idf_path", all_names),
                         match("weather_path", all_names),
@@ -611,23 +676,22 @@ create_job <- function (param_tbl, path = NULL) {
         stop("Invalid parametric table.", call. = FALSE)
     }
 
-    if (is.null(path)) {
-        path <- getwd()
-    }
-
     idf_path <- param_tbl[["idf_path"]]
     idf_name <- basename(idf_path)
     weather_path <- param_tbl[["weather_path"]]
     weather_name <- basename(weather_path)
     param_name <- names(param_tbl[["param_field"]])
     param_field <- purrr::flatten_chr(param_tbl[["param_field"]])
-    param_value <- map(param_tbl[["param_value"]], flatten_chr)
+    param_value <- purrr::map(param_tbl[["param_value"]], purrr::flatten_chr)
 
-    # Creat idf/imfs and save it into tempdir.
+    # Create a txt progress bar
+    p <- dplyr::progress_estimated(length(param_value))
+
+    # Create idf/imfs and save it into tempdir.
     # Create tempdir for eplus package
-    temp_dir <- normalizePath(paste0(tempdir(), "\\eplusr"), winslash = "/", mustWork = FALSE)
+    temp_dir <- getOption("eplusr.temp_dir")
     if (!dir.exists(temp_dir)) {
-        dir.create(temp_dir)
+        dir.create(temp_dir, showWarnings = FALSE, recursive = TRUE)
     }
 
     # TODO: Find a functionial way to determine the file extension.
@@ -635,10 +699,12 @@ create_job <- function (param_tbl, path = NULL) {
     file_name <- normalizePath(file_name, winslash = "/", mustWork = FALSE)
     param_idfs <-
         purrr::map(seq_along(param_value),
-                   ~create_param(idf_path = idf_path,
-                                 param_name = param_name,
-                                 param_field = param_field,
-                                 param_value = param_value[[.x]]))
+                   ~{idf <- create_param(idf_path = idf_path,
+                                         param_name = param_name,
+                                         param_field = param_field,
+                                         param_value = param_value[[.x]])
+                     p$tick()$print();idf})
+    p$stop()
     param_idfs <- purrr::set_names(param_idfs, names(param_value))
     purrr::walk2(param_idfs, file_name, ~readr::write_lines(x = .x, path = .y))
 
@@ -652,25 +718,17 @@ create_job <- function (param_tbl, path = NULL) {
                      info <- append(combinations[[.x]], field_values)
                    })
     # Convert the job info into a data.table
-    job <- data.table::rbindlist(job)
+    job <- dplyr::as_tibble(data.table::rbindlist(job))
     # Add job number
-    job <- job[, `#` := seq_along(V1)]
-    job <- data.table::setcolorder(job, c("#", col_names(job, "#", invert = TRUE)))
+    job <- dplyr::mutate(job, `#` = seq_along(V1))
+    job <- dplyr::select(job, dplyr::one_of("#"), dplyr::everything())
     # Set names as jEPlus style.
     job <- purrr::set_names(job, c("#", "model_case", "model_template", "weather", param_field))
+    job_index <- dplyr::mutate(job, weather = basename(weather))
+    job <- dplyr::transmute(job, model = normalizePath(file.path(temp_dir, paste0(model_case, ".imf")), mustWork = TRUE), weather)
 
-    # Modify the job table before writing it to "job_index.csv"
-    job_ <- copy(job)
-    job_ <- job_[, `:=`(weather = basename(weather))]
-
-    if (!dir.exists(path)) {
-        dir.create(path, recursive = TRUE)
-    }
-    job_file <- file.path(path, "job_index.csv")
-    readr::write_csv(job_, path = job_file)
-
-    job <- job[, .(model = normalizePath(file.path(temp_dir, paste0(model_case, ".imf")), mustWork = TRUE), weather)]
-    return(job)
+    job_return <- list(job = job, job_index = job_index)
+    return(job_return)
 }
 # }}}1
 
@@ -678,87 +736,37 @@ create_job <- function (param_tbl, path = NULL) {
 #' @importFrom stringr str_length str_interp
 #' @importFrom purrr map_lgl map_chr walk walk2 map keep negate flatten_chr
 #' @importFrom readr read_lines write_lines
-#' @importFrom methods hasArg
-# run_job
+#' @export
+# run_multi
 # {{{1
-run_job <- function (job, eplus_dir = find_eplus(),
-                     output_dir = NULL, output_prefix = NULL,
-                     by = c("model", "weather"),
-                     n = parallel::detectCores(logical = FALSE), ver = NULL) {
+run_multi <- function (models, weathers, output_dirs, output_prefixes, case_name,
+                       n = NULL, eplus_ver = NULL, eplus_dir = NULL) {
 
-    # Create tempdir for eplus package
+    # Get tempdir
     # {{{2
-    temp_dir <- normalizePath(paste0(tempdir(), "\\eplusr"), winslash = "/", mustWork = FALSE)
-    if (!dir.exists(temp_dir)) {
-        dir.create(temp_dir)
-    }
-    # }}}2
-
-    # Check job type.
-    # {{{2
-    job_type <- attr(job, "job_type")
-    # If the job is imported from `import_epg`
-    if (identical(job_type, "epg")) {
-        if (any(!is.null(output_dir), !is.null(output_prefix))) {
-            warning("For job imported from jEPlus, 'output_dir' and 'output_prefix will be omitted.'", call. = FALSE)
-        }
-        output_dir <- job[["output_dir"]]
-        output_prefix <- job[["output_prefix"]]
-    }
-    # If the job is imported from `import_jeplus`
-    if (identical(job_type, "jeplus")) {
-        if (is.null(output_dir)) {
-            output_dir <- getwd()
-        }
-        job <- create_job(param_tbl = job, path = output_dir)
-    }
-
-    # If the job is imported from `import_epat`
-    if (identical(job_type, "epat")) {
-        job_parallel_num <- job$parallel_num
-        job_eplus_path <- job$eplus_path
-        job_wd_path <- job$wd_path
-        if (is.null(output_dir)) {
-            if (any(is.null(job_wd_path), identical(job_wd_path, ""), is.na(job_wd_path))) {
-                output_dir <- getwd()
-            } else {
-                output_dir <- job_wd_path
-            }
-        }
-        job <- create_job(param_tbl = job, path = output_dir)
-
-        # Get n
-        if (!all(is.null(job_parallel_num), identical(job_parallel_num, ""), is.na(job_parallel_num))) {
-            n <- as.integer(job_parallel_num)
-        }
-
-        if (!all(is.null(job_eplus_path), identical(job_eplus_path, ""), is.na(job_eplus_path))) {
-            eplus_dir <- job_eplus_path
-        }
-    }
-
-    # 'job' format checking
-    if (!is.data.frame(job)) {
-        stop("Invalid job. 'job' should be a data.frame with two columns named 'model' and 'weather' respectively.", call. = FALSE)
-    }
-    all_names <- names(job)
-    check_job <- all(match("model", all_names), match("weather", all_names))
-    if (!check_job) {
-        stop("Invalid job. 'job' should be a data.frame having two columns named 'model' and 'weather' respectively.", call. = FALSE)
+    temp_dir <- getOption("eplusr.temp_dir")
+    if (dir.exists(temp_dir)) {
+        dir.create(temp_dir, showWarnings = FALSE, recursive = TRUE)
     }
     # }}}2
 
     # Get basic info of input files.
     # {{{2
-    model <- job[["model"]]
-    weather <- job[["weather"]]
-    model_name <- tools::file_path_sans_ext(basename(job[["model"]]))
-    weather_name <- tools::file_path_sans_ext(basename(job[["weather"]]))
-    model_ext <- tools::file_ext(model)
-    weather_ext <- tools::file_ext(weather)
+    models <- normalizePath(models, winslash = "/", mustWork = FALSE)
+    weathers <- normalizePath(weathers, winslash = "/", mustWork = FALSE)
+    output_dirs <- normalizePath(output_dirs, winslash = "/", mustWork = FALSE)
+    model_names <- tools::file_path_sans_ext(basename(models))
+    weather_names <- tools::file_path_sans_ext(basename(weathers))
+    model_exts <- tools::file_ext(models)
+    weather_exts <- tools::file_ext(weathers)
+    # }}}2
 
+    # get 'n'{{{2
     # Get total job number.
-    total <- nrow(job)
+    total <- length(models)
+    if (is.null(n)) {
+        n <- getOption("eplusr.parallel_num")
+    }
     # If the total job number is smaller than the core specified, set the core
     # equal to total job number.
     if (n > total) {
@@ -768,20 +776,20 @@ run_job <- function (job, eplus_dir = find_eplus(),
 
     # File existing checking
     # {{{2
-    idx_model <- any(!file.exists(model))
-    idx_weather <- any(!file.exists(weather))
+    idx_model <- any(!file.exists(models))
+    idx_weather <- any(!file.exists(weathers))
     if (idx_model) {
         ori_error_len <- getOption("warning.length")
-        missing_model <- model[idx_model]
-        error_msg <- paste0("Input model file '", missing_model, "' does not exist. Please check input.", collapse = "\n")
+        missing_models <- models[idx_model]
+        error_msg <- paste0("Input model file '", missing_models, "' does not exist. Please check input.", collapse = "\n")
         options("warning.length" = stringr::str_length(error_msg) + 1000)
         stop(error_msg, call. = FALSE)
         options("warning.length" = ori_error_len)
     }
     if (idx_weather) {
         ori_error_len <- getOption("warning.length")
-        missing_weather <- weather[idx_weather]
-        error_msg <- paste0("Input weather file '", missing_weather, "' does not exist. Please check input.", collapse = "\n")
+        missing_weathers <- weathers[idx_weather]
+        error_msg <- paste0("Input weather file '", missing_weathers, "' does not exist. Please check input.", collapse = "\n")
         options("warning.length" = stringr::str_length(error_msg) + 1000)
         stop(error_msg, call. = FALSE)
         options("warning.length" = ori_error_len)
@@ -790,9 +798,9 @@ run_job <- function (job, eplus_dir = find_eplus(),
 
     # Parametric field existence checking
     # {{{2
-    idx_has_param <- purrr::map_lgl(model, ~{raw <- readr::read_lines(.x);is_param_exist(raw)})
+    idx_has_param <- purrr::map_lgl(models, ~{raw <- readr::read_lines(.x);is_param_exist(raw)})
     if (any(idx_has_param)) {
-        param_idfs <- model[idx_has_param]
+        param_idfs <- models[idx_has_param]
         param_list <- purrr::map_chr(param_idfs,
                                       ~{raw <- readr::read_lines(.x)
                                         params <- list_params(raw)
@@ -800,7 +808,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
                                        })
         info <- purrr::map2_chr(param_idfs, param_list,
                                 ~stringr::str_interp("For ${basename(.x)}: ${.y}"))
-        if (!is.na(match(job_type, c("jeplus", "epat")))) {
+        if (!is.na(match(type, c("jeplus", "epat")))) {
             msg <- stringr::str_interp("There are parametric fields which do not have values. Please check the .json project file and make sure every parametric field has a value string.\n")
         } else {
             msg <- map(param_idfs, ~stringr::str_interp("Model ${.x} has parametric fields which do not have values. Please clean the model before simulation.\n"))
@@ -812,165 +820,117 @@ run_job <- function (job, eplus_dir = find_eplus(),
 
     # File extension checking
     # {{{2
-    if (any(!grepl(x = model_ext, pattern = "i[dm]f", ignore.case = TRUE))) {
-       stop("'input' should be a full file path with an extension of '.idf' or '.imf'.", call. = FALSE)
+    idx_model_exts <- grepl(x = model_exts, pattern = "i[dm]f", ignore.case = TRUE)
+    idx_weather_exts <- grepl(x = weather_exts, pattern = "epw", ignore.case = TRUE)
+    if (any(!idx_model_exts)) {
+        msg_head <- "Model should have an extension of '.idf' or '.imf':\n"
+        wrong_models <- models[!idx_model_exts]
+        wrong_exts <- model_exts[!idx_model_exts]
+        msg_info <-paste0("Model '", wrong_models, "' has an extenssion of '", wrong_exts, "'.",
+                          collapse = "\n")
+        stop(msg_head, msg_info, call. = FALSE)
     }
-    if (any(!grepl(x = weather_ext, pattern = "epw", ignore.case = TRUE))) {
-       stop("'weather' should be a full file path with an extension of '.epw'.", call. = FALSE)
+    if (any(!idx_weather_exts)) {
+        msg_head <- "Weather should have an extension of '.epw':\n"
+        wrong_weathers <- weathers[!idx_weather_exts]
+        wrong_exts <- weather_exts[!idx_weather_exts]
+        msg_info <-paste0("Weather '", wrong_weathers, " has an extenssion of '", wrong_exts, "'.",
+                          collapse = "\n")
+        stop(msg_head, msg_info, call. = FALSE)
     }
     # }}}2
 
-    # 'eplus_dir' and 'ver' checking
+    # 'eplus_dir' and 'eplus_ver' checking
     # {{{2
-    # If EnergyPlus version has been specified.
-    if (!is.null(ver)) {
-        # Case 1. But 'eplus_dir' is not given
-        if (missing(eplus_dir)) {
-            eplus_dir <- find_eplus(ver = ver)
-            ver <- attr(eplus_dir, "ver")
-            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-        # Case 2. And 'eplus_dir' is given.
-        } else {
-            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-            if (!file.exists(energyplus_exe)) {
-                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
-            } else {
-            ver <- get_idd_ver(eplus_dir)
-            warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
-                    "specifed manually.", call. = FALSE)
-            }
-        }
-    }
-    if (!is.null(ver)) {
-        eplus_dir <- find_eplus(ver = ver)
-        ver <- attr(eplus_dir, "ver")
-        energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-        if (methods::hasArg(eplus_dir)) {
-            warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
-                    "specifed manually.", call. = FALSE)
-        }
-    } else {
-        energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-        if (!file.exists(energyplus_exe)) {
-            stop("Invalid EnergyPlus path. Please correct 'eplus_dir'.", call. = FALSE)
-        } else {
-            ver <- get_idd_ver(eplus_dir)
-        }
-    }
+    eplus_dir_ver <- check_eplus_dir_ver(eplus_dir, eplus_ver)
+    eplus_dir <- eplus_dir_ver[["eplus_dir"]]
+    eplus_ver <- eplus_dir_ver[["eplus_ver"]]
+    energyplus <- normalizePath(file.path(eplus_dir, "energyplus.exe"), mustWork = TRUE)
     # }}}2
 
     # Input file version and EnergyPlus verion match checking
     # {{{2
-    idf_vers <- purrr::map_chr(model, ~paste0(get_idf_ver(readr::read_lines(.x)), ".0"))
-    is_ver_matched <- purrr::map_lgl(idf_vers, ~{identical(.x, ver)})
+    idf_vers <- purrr::map_chr(models, ~paste0(get_idf_ver(readr::read_lines(.x)), ".0"))
+    is_ver_matched <- purrr::map_lgl(idf_vers, ~{identical(.x, eplus_ver)})
     if (!all(is_ver_matched)) {
         if (identical(job_type, c("jeplus", "epat"))) {
-            warning(stringr::str_interp("The input template model indicates an EnergyPlus verion of ${unique(idf_vers)} but is simulated using EnergyPlus ${ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
+            warning(stringr::str_interp("The input template model indicates an EnergyPlus verion of ${unique(idf_vers)} but is simulated using EnergyPlus ${eplus_ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
         } else {
-            un_matched_models <- model[!is_ver_matched]
+            un_matched_models <- models[!is_ver_matched]
             un_matched_vers <- idf_vers[!is_ver_matched]
             msg <- paste(paste0("Model:", un_matched_models, ", indicated version:", un_matched_vers), collapse = "\n")
-            warning(stringr::str_interp("There are models indicating EnergyPlus versions which are different from the EnergyPlus version ${ver} used in simulation:\n"), msg, call. = FALSE)
+            warning(stringr::str_interp("There are models indicating EnergyPlus versions which are different from the EnergyPlus version ${eplus_ver} used in simulation:\n"), msg, call. = FALSE)
         }
     }
     # }}}2
 
-    # 'output_dir' checking
+    # 'output_dirs' checking
     # {{{2
-    if (!is.null(output_dir)) {
-        if (all(!is.character(output_dir), length(output_dir) != 1, length(output_dir) != total)) {
-            stop("'output_dir' should be a character vector of length 1 or length equal to total job number.",
+    if (!is.null(output_dirs)) {
+        if (any(!is.character(output_dirs), all(length(output_dirs) != 1, length(output_dirs) != total))) {
+            stop("'output_dirs' should be a character vector of length 1 or length equal to total job number.",
                  call. = FALSE)
         }
     }
     # }}}2
 
-    # 'output_prefix' checking
+    # 'output_prefixes' checking
     # {{{2
-    if (!is.null(output_prefix)) {
-        if (all(!is.character(output_prefix), length(output_prefix) != 1, length(output_prefix) != total)) {
-            stop("'output_prefix' should be a character vector of length 1 or length equal to total job number.",
+    if (!is.null(output_prefixes)) {
+        if (any(!is.character(output_prefixes), all(length(output_prefixes) != 1, length(output_prefixes) != total))) {
+            stop("'output_prefixes' should be a character vector of length 1 or length equal to total job number.",
                  call. = FALSE)
         }
     }
     # }}}2
 
-    # 'by' value checking
+    # Create the parent output directory.
     # {{{2
-    if (missingArg(by)) {
-        by <- "weather"
-    } else {
-        if (is.na(match(by, c("model", "weather")))) {
-            stop("`by` should be one of c('model', 'weather').", call. = FALSE)
-        }
-    }
-    # }}}2
-
-    # Create a directory per case.
-    # {{{2
-    if (!is.null(output_dir)) {
-        # Get the full path of output_dir if is given as a relative path.
-        output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
-        if (!dir.exists(output_dir)) {
-            output_dir_flag <- dir.create(output_dir, showWarnings = TRUE, recursive = TRUE)
-            if(!output_dir_flag) {
-                stop("Could not find or create the specified output direcotry.", call. = FALSE)
-            }
-        }
+    if (!is.null(output_dirs)) {
+        # Get the full path of output_dirs if is given as a relative path.
+        output_dirs <- normalizePath(file.path(output_dirs, output_prefixes), winslash = "/", mustWork = FALSE)
     } else {
         # set the parent output directory as current directory.
-        output_dir <- dirname(model)
-    }
-    # }}}2
-
-    # Get output directory per case.
-    # {{{2
-    if (length(output_dir) == 1) {
-        output_dir <- rep(output_dir, total)
-    }
-    if (identical(by, "model")) {
-        output_dir <- purrr::map_chr(1:total, ~file.path(output_dir[.x], model_name[.x], weather_name[.x]))
-    } else {
-        output_dir <- purrr::map_chr(1:total, ~file.path(output_dir[.x], weather_name[.x], model_name[.x]))
+        output_dirs <- normalizePath(file.path(dirname(models), output_prefixes), winslash = "/", mustWork = FALSE)
     }
     # }}}2
 
     # Create output directories and 'Energy+.ini' per directory.
     # {{{2
-    purrr::walk(output_dir, ~{if (!dir.exists(.x)) dir.create(.x, recursive = TRUE);
+    purrr::walk(output_dirs, ~{if (!dir.exists(.x)) dir.create(.x, recursive = TRUE);
                 create_eplus_ini(eplus_dir = eplus_dir, working_dir = .x)})
     # }}}2
 
     # Clean output directory per case.
     # {{{2
-    purrr::walk(output_dir, clean_wd)
+    purrr::walk(output_dirs, clean_wd)
     # }}}2
 
     # Copy files used in 'Schedule:File' to output dir.
     # {{{2
-    purrr::walk2(model, output_dir, ~copy_external_file(read_idf_lines(.x), .y))
+    purrr::walk2(models, output_dirs, ~copy_external_file(read_idf_lines(.x), .y))
     # }}}2
 
     # Get new input file names.
     # {{{2
-    if (length(output_prefix) == 1) {
-        output_prefix <- rep(output_prefix, total)
+    if (length(output_prefixes) == 1) {
+        output_prefixes <- rep(output_prefixes, total)
     }
-    if (!is.null(output_prefix)) {
-        new_model_name <- file.path(output_dir, paste0(output_prefix, ".", model_ext))
-        new_weather_name <- file.path(output_dir, paste0(weather_name, ".", weather_ext))
+    if (!is.null(output_prefixes)) {
+        new_model_names <- file.path(output_dirs, paste0(output_prefixes, ".", model_exts))
+        new_weather_names <- file.path(output_dirs, paste0(weather_names, ".", weather_exts))
 
     } else {
-        output_prefix <- model_name
-        new_model_name <- file.path(output_dir, paste0(model_name, ".", model_ext))
-        new_weather_name <- file.path(output_dir, paste0(weather_name, ".", weather_ext))
+        output_prefixes <- model_names
+        new_model_names <- file.path(output_dirs, paste0(model_names, ".", model_exts))
+        new_weather_names <- file.path(output_dirs, paste0(weather_names, ".", weather_exts))
     }
     # }}}2
 
     # Copy and rename input files according to new names.
     # {{{2
-    purrr::walk2(c(new_model_name, new_weather_name),
-                 normalizePath(c(model, weather), winslash = "/"),
+    purrr::walk2(c(new_model_names, new_weather_names),
+                 normalizePath(c(models, weathers), winslash = "/"),
                  function(new, old) {
                      if (!identical(new, old)) {
                          file.copy(from = old, to = new, overwrite = TRUE,
@@ -984,7 +944,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
     cmd_head <- "cmd.exe /c"
     # Change directory
     echo_off <- "@ECHO OFF"
-    cmd_cd <- paste("CD", normalizePath(output_dir), sep = " ")
+    cmd_cd <- paste("CD", normalizePath(output_dirs), sep = " ")
 
     # Title
     cmd_title <- map_chr(1:total, ~stringr::str_interp("TITLE Simulation in progress [${.x}/${total}]"))
@@ -996,7 +956,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
     # {{{3
     output_suffix <- "C"
     # If any imf file exist in the job table, turn epmacro on.
-    epmacro <- purrr::map_lgl(model_ext, ~{if (identical(.x, "imf")) TRUE else FALSE})
+    epmacro <- purrr::map_lgl(model_exts, ~{if (identical(.x, "imf")) TRUE else FALSE})
     readvars <- TRUE
     expand_obj <- TRUE
     annual <- FALSE
@@ -1015,15 +975,15 @@ run_job <- function (job, eplus_dir = find_eplus(),
     if (!is.null(idd)) idd <- paste0("--idd", '"', idd, '"') else idd <- NULL
     cmd_eplus <-
         purrr::map_chr(1:total,
-                       ~{model <- stringr::str_interp('"${model[.x]}"');
-                         weather <- stringr::str_interp('"${weather[.x]}"');
-                         output_dir <- output_dir[.x]
-                         output_prefix <- output_prefix[.x]
+                       ~{model <- stringr::str_interp('"${models[.x]}"');
+                         weather <- stringr::str_interp('"${weathers[.x]}"');
+                         output_dirs <- output_dirs[.x]
+                         output_prefixes <- output_prefixes[.x]
                          if (epmacro[.x]) epmacro <- "--epmacro" else epmacro <- NULL;
-                         paste(energyplus_exe,
+                         paste(energyplus,
                                "--weather", weather,
-                               "--output-directory", output_dir,
-                               "--output-prefix", output_prefix,
+                               "--output-directory", output_dirs,
+                               "--output-prefix", output_prefixes,
                                "--output-suffix", output_suffix,
                                epmacro, expand_obj, readvars, annual, design_day,
                                idd, model, sep = " ")}
@@ -1038,7 +998,7 @@ run_job <- function (job, eplus_dir = find_eplus(),
     cmd_post_proc <-
         map(1:total,
             ~{if (epmacro[.x]) {
-                  rename_imf <- stringr::str_interp("IF EXIST out.idf MOVE out.idf ${model_name[.x]}.idf")
+                  rename_imf <- stringr::str_interp("IF EXIST out.idf MOVE out.idf ${model_names[.x]}.idf")
                   c(cmd_post_proc, rename_imf)
               } else {
                   c(cmd_post_proc)
@@ -1077,6 +1037,346 @@ run_job <- function (job, eplus_dir = find_eplus(),
     walk(start_cmd, ~system(.x, wait = FALSE, invisible = FALSE))
     # }}}2
 
-    message(stringr::str_interp("The job has been successfully executed using EnergyPlus ${ver}."))
+    message(stringr::str_interp("The job has been successfully executed using EnergyPlus ${eplus_ver}."))
+}
+# }}}1
+
+#' @expoprt
+# run_epg{{{1
+run_epg <- function (epg, n = NULL, eplus_ver = NULL, eplus_dir = NULL) {
+
+    # Check 'epg'{{{2
+    if (is.character(epg)) {
+        if (!file.exists(epg)) {
+            stop("Input 'epg' file does not exists.", call. = FALSE)
+        } else {
+            job <- import_epg(epg)
+        }
+    } else if (is.data.frame(epg)) {
+        type <- attr(epg, "job_type")
+        col_names <- colnames(epg)
+        required <- c("model", "weather", "output_dir", "output_prefix", "run_times")
+        ex_col <- setdiff(col_names, required)
+        mis_col <- setdiff(required, col_names)
+        if (all(type == "epg", length(ex_col) == 0L, length(mis_col) == 0L)) {
+            job <- epg
+        } else {
+            stop("Invalid 'epg'. Please use 'import_epg' to get the correct type", call. = FALSE)
+        }
+    } else {
+        stop("'epg' should be either a data.frame or an .epg file path.", call. = FALSE)
+    }
+    # }}}2
+
+    # Write epg file{{{2
+    if (unique(job[["output_dir"]]) == 1L) {
+        path <- unique(job[["output_dir"]])
+        if (!dir.exists(path)) {
+            dir.create(path, showWarnings = FALSE, recursive = TRUE)
+        }
+        file_name <- normalizePath(file.path(path, "run.epg"), mustWork = FALSE)
+        write_epg(models = normalizePath(job[["model"]], mustWork = TRUE),
+                  weathers = normalizePath(job[["weather"]], mustWork = TRUE),
+                  output_dirs = normalizePath(file.path(job[["output_dir"]], job[["output_prefix"]])), mustWork = FALSE,
+                  run_times = job[["run_times"]], path = file_name)
+    }
+    # }}}2
+
+    # Run
+    rum_multi(models = epg[["model"]], weathers = epg[["weather"]],
+              output_dirs = epg[["output_dir"]], output_prefix = epg[["outout_prefixes"]],
+              n = n, eplus_ver = eplus_ver, eplus_dir = eplus_dir)
+}
+# }}}1
+
+# run_epat{{{1
+run_epat <- function(epat, case_name = NULL, output_dir = NULL, n = NULL,
+                     eplus_ver = NULL, eplus_dir = NULL) {
+
+    # Check 'epat'{{{2
+    if (is.character(epat)) {
+        if (!file.exists(epat)) {
+            stop("Input 'epat' file does not exists.", call. = FALSE)
+        } else {
+            if (tools::file_ext(epat) == "epat"){
+                epat <- import_epat(epat)
+            } else {
+                stop("Input 'epat' file should have an extension of 'epat'.",
+                     call. = FALSE)
+            }
+        }
+    } else {
+        if (!check_epat(epat = epat)) {
+            stop("'epat' should be either an EPAT project, or a job imported using 'import_epat'.",
+                 call. = FALSE)
+        }
+    }
+    # }}}2
+
+    # Get job{{{2
+    job_info <- create_job(param_tbl = epat)
+    job <- job_info[["job"]]
+    job_index <- job_info[["job_index"]]
+    # }}}2
+
+    # Other args check{{{2
+    if (is.null(output_dir)) {
+        if (epat[["wd_path"]] != "") {
+            output_dir <- epat[["wd_path"]]
+        } else {
+            output_dir <- dirname(epat[["idf_path"]])
+        }
+    }
+    if (!is.null(case_name)) {
+        output_dir <- file.path(output_dir, case_name)
+    }
+    if (is.null(n)) {
+        n <- epat[["parallel_num"]]
+    }
+    if (is.null(eplus_dir)) {
+        eplus_dir <- epat[["eplus_path"]]
+    }
+    if (!dir.exists(output_dir)) {
+        dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+    }
+    # }}}2
+
+    # Write 'job_index.csv'.
+    readr::write_csv(job_index, file.path(output_dir, "job_index.csv"))
+
+    run_multi(models = job[["model"]], weathers = job[["weather"]],
+              output_dirs = output_dir, output_prefixes = job_index[["model_case"]],
+              case_name = case_name, n = n, eplus_ver = eplus_ver, eplus_dir = eplus_dir)
+}
+# }}}1
+
+# run_jeplus{{{1
+run_jeplus <- function(jeplus, case_name = NULL, output_dir = NULL, n = NULL,
+                       eplus_ver = NULL, eplus_dir = NULL) {
+
+    # Check 'jeplus'{{{2
+    if (is.character(jeplus)) {
+        if (!file.exists(jeplus)) {
+            stop("Input 'jeplus' file does not exists.", call. = FALSE)
+        } else {
+            if (tools::file_ext(jeplus) == "json"){
+                jeplus <- import_jeplus(jeplus)
+            } else {
+                stop("Input 'jeplus' file should have an extension of 'json'.",
+                     call. = FALSE)
+            }
+        }
+    } else {
+        if (!check_jeplus(jeplus = jeplus)) {
+            stop("'jeplus' should be either a jEPlus .json project, or a job imported using 'import_jeplus'.",
+                 call. = FALSE)
+        }
+    }
+    # }}}2
+
+    # Get job{{{2
+    job_info <- create_job(param_tbl = jeplus)
+    job <- job_info[["job"]]
+    job_index <- job_info[["job_index"]]
+    # }}}2
+
+    # Other arg check{{{2
+    if (is.null(output_dir)) {
+        output_dir <- dirname(jeplus[["idf_path"]])
+    }
+    if (!is.null(case_name)) {
+        output_dir <- file.path(output_dir, case_name)
+    }
+    if (is.null(eplus_dir)) {
+        eplus_dir <- epat[["eplus_path"]]
+    }
+    if (!dir.exists(output_dir)) {
+        dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+    }
+    # }}}2
+
+    # Write 'job_index.csv'.
+    readr::write_csv(job_index, file.path(output_dir, "job_index.csv"))
+
+    # Run
+    run_multi(models = job[["model"]], weathers = job[["weather"]],
+              output_dirs = output_dir, output_prefixes = job_index[["model_case"]],
+              n = n, eplus_ver = eplus_ver, eplus_dir = eplus_dir)
+}
+# }}}1
+
+# check_eplus_dir_ver{{{1
+check_eplus_dir_ver <- function (eplus_dir = NULL, eplus_ver = NULL) {
+    default_eplus_dir <- getOption("eplusr.eplus_dir")
+    all_eplus <- find_eplus(verbose = FALSE)
+    validated_eplus_dirs <- all_eplus[["path"]]
+    validated_eplus_vers <- all_eplus[["version"]]
+    # If 'eplus_ver' is given{{{2
+    if (!is.null(eplus_ver)) {
+        if (!stringr::str_detect(eplus_ver, "^\\d+\\.\\d+$")) {
+            stop("'eplus_ver' should be a format of 'X.Y'.", call. = FALSE)
+        }
+        full_eplus_ver <- paste0(eplus_ver, ".0")
+        # Case 1. But 'eplus_dir' is not given{{{3
+        if (is.null(eplus_dir)) {
+            # Sub Case 1. If the given 'eplus_ver' is valid{{{4
+            idx_ver <- match(full_eplus_ver, validated_eplus_vers)
+            if (!is.na(idx_ver)) {
+                eplus_dir_used <- validated_eplus_dirs[idx_ver]
+                eplus_ver_used <- validated_eplus_vers[idx_ver]
+                message("EnergyPlus V", eplus_ver_used, " located at '",
+                        eplus_dir_used, "' will be used.")
+            # }}}4
+            # Sub Case 2. If the given 'eplus_ver' is not valid{{{4
+            } else {
+                # If no EnergyPlus location was found when 'eplusr' loaded, i.e.
+                # getOption('eplusr.eplus_dir') is "".
+                if (default_eplus_dir == "") {
+                    stop("'eplusr' could not detect valid EnergyPlus locations automatically.\nPlease change the option 'eplusr.eplus_dir', or give a valid EnergyPlus location in 'eplus_dir'.", call. = FALSE)
+                } else {
+                    eplus_dir_used <- default_eplus_dir
+                    eplus_ver_used <- get_idd_ver(default_eplus_dir)
+                    warning("Could not find the specified EnergyPlus V", full_eplus_ver, ".\nThe default EnergyPlus V", eplus_ver_used, " located at '", eplus_dir_used, "' will be used.", call. = FALSE)
+                }
+            # }}}4
+            }
+        # }}}3
+        # Case 2. And 'eplus_dir' is given.{{{3
+        } else {
+            # Sub Case 1. If the given 'eplus_ver' is valid{{{4
+            idx_ver <- match(full_eplus_ver, validated_eplus_vers)
+            if (!is.na(idx_ver)) {
+                eplus_dir_from_ver <- validated_eplus_dirs[idx_ver]
+                eplus_ver_from_ver <- validated_eplus_vers[idx_ver]
+                # Sub Sub Case 1. If the given 'eplus_dir' is valid too
+                if (check_energyplus(eplus_dir)) {
+                    msg_head <- "Both 'eplus_dir' and 'eplus_ver' are given.\n"
+                    # Get the version from 'eplus_dir'
+                    eplus_dir_from_dir <- eplus_dir
+                    eplus_ver_from_dir <- get_idd_ver(eplus_dir)
+                    # Get the latest EnergyPlus version.
+                    if (eplus_ver_from_ver > eplus_ver_from_dir) {
+                        eplus_dir_used <- eplus_dir_from_ver
+                        eplus_ver_used <- eplus_ver_from_ver
+                        msg_ver <- paste0("'eplus_ver' indicates a newer version of EnergyPlus V",
+                                          eplus_ver_from_ver, " than the version of EnergyPlus V",
+                                          eplus_ver_from_dir," indicated from 'eplus_dir'.\n",
+                                          "The newer one will be used:\n\n")
+                    } else if (eplus_ver_from_ver < eplus_ver_from_dir) {
+                        eplus_dir_used <- eplus_dir_from_dir
+                        eplus_ver_used <- eplus_ver_from_dir
+                        msg_ver <- paste0("'eplus_dir' indicates a newer version of EnergyPlus V",
+                                          eplus_ver_from_dir, " than the version of EnergyPlus V",
+                                          eplus_ver_from_ver," indicated from 'eplus_ver'.\n",
+                                          "The newer one will be used:\n\n")
+                    } else {
+                        eplus_dir_used <- eplus_dir_from_dir
+                        eplus_ver_used <- eplus_ver_from_dir
+                        msg_ver <- paste0("'eplus_dir' and 'eplus_ver' indicate a same version of EnergyPlus V", eplus_ver_used,".\n'eplus_dir' has the priority over 'eplus_ver', and EnergyPlus below will be used:\n\n")
+                    }
+                    warning(msg_head, msg_ver,
+                            "EnergyPlus V", eplus_ver_used, " located at '", eplus_dir_used, "'.",
+                            call. = FALSE)
+                # Sub Sub Case 2. If the given 'eplus_dir' is not valid
+                } else {
+                    eplus_dir_used <- eplus_dir_from_ver
+                    eplus_ver_used <- eplus_ver_from_ver
+                    warning("Invalid EnergyPlus location in 'eplus_dir'\n.",
+                            "The EnergyPlus V", eplus_ver_from_ver,
+                            " indicated by 'eplus_ver' will be used:\n\n",
+                            "EnergyPlus V", eplus_ver_used, " located at '", eplus_dir_used, "'.",
+                            call. = FALSE)
+                }
+            # }}}4
+            # Sub Case 2. If the given 'eplus_ver' is not valid{{{4
+            } else {
+                # Sub Sub Case 1. If the given 'eplus_dir' is valid{{{5
+                if (check_energyplus(eplus_dir)) {
+                    # Get the version from 'eplus_dir'
+                    eplus_dir_used <- eplus_dir
+                    eplus_ver_used <- get_idd_ver(eplus_dir)
+                    msg_head <- paste0("Both 'eplus_dir' and 'eplus_ver' are given.\nBut could not find the EnergyPlus V", full_eplus_ver, " indicated by 'eplus_ver'.\n")
+                    msg_ver <- paste0("EnergyPlus V", eplus_ver_used, " indicated by 'eplus_dir' will be used:\n\n")
+                    warning(msg_head, msg_ver,
+                            "EnergyPlus V", eplus_ver_used, " located at '", eplus_dir_used, "'.",
+                            call. = FALSE)
+                # }}}5
+                # Sub Sub Case 2. If the given 'eplus_dir' is not valid{{{5
+                } else {
+                    # If no EnergyPlus location was found when 'eplusr' loaded, i.e.
+                    # getOption('eplusr.eplus_dir') is "".
+                    if (default_eplus_dir == "") {
+                        stop("Both 'eplus_dir' and 'eplus_ver' are invalid.\nCould not detect valid EnergyPlus locations automatically.\nPlease change the option 'eplusr.eplus_dir', or give a valid EnergyPlus location in 'eplus_dir'.", call. = FALSE)
+                    } else {
+                        eplus_dir_used <- default_eplus_dir
+                        eplus_ver_used <- get_idd_ver(default_eplus_dir)
+                        warning("Both 'eplus_dir' and 'eplus_ver' are invalid.\nThe default EnergyPlus V", eplus_ver_used, " located at '", eplus_dir_used, "' will be used.", call. = FALSE)
+                    }
+                }
+                # }}}5
+            }
+            # }}}4
+        }
+        # }}}3
+    # }}}2
+    # If 'eplus_ver' is not given{{{2
+    } else {
+        # Case 1. And 'eplus_dir' is not given neither{{{3
+        if (is.null(eplus_dir)) {
+            # If no EnergyPlus location was found when 'eplusr' loaded, i.e.
+            # getOption('eplusr.eplus_dir') is "".
+            if (default_eplus_dir == "") {
+                stop("'eplusr' could not detect valid EnergyPlus locations automatically.\nPlease change the option 'eplusr.eplus_dir', or give a valid EnergyPlus location in 'eplus_dir'.", call. = FALSE)
+            } else {
+                eplus_dir_used <- default_eplus_dir
+                eplus_ver_used <- get_idd_ver(default_eplus_dir)
+                message("The default EnergyPlus V", eplus_ver_used,
+                        " located at '", eplus_dir_used, "' will be used.")
+            }
+        # }}}3
+        # Case 2. But 'eplus_dir' is given{{{3
+        } else {
+            # Sub Case 1. But is not valid, use the default location{{{4
+            if (!check_energyplus(eplus_dir)) {
+                if (default_eplus_dir != "") {
+                    eplus_dir_used <- default_eplus_dir
+                    eplus_ver_used <- get_idd_ver(default_eplus_dir)
+                    warning("Invalid EnergyPlus path. The default EnergyPlus V", eplus_ver_used,
+                            " located at '", eplus_dir_used, "' will be used.", call. = FALSE)
+                } else {
+                    stop("'eplusr' could not detect valid EnergyPlus locations automatically.\nPlease change the option 'eplusr.eplus_dir', or give a valid EnergyPlus location in 'eplus_dir'.", call. = FALSE)
+                }
+            # }}}4
+            # Sub Case 2. And is valid{{{4
+            } else {
+                eplus_dir_used <- eplus_dir
+                eplus_ver_used <- get_idd_ver(eplus_dir)
+            }
+            # }}}4
+        }
+        # }}}3
+    }
+    # }}}2
+    return(list(eplus_dir = eplus_dir_used, eplus_ver = eplus_ver_used))
+}
+# }}}1
+
+# write_epg{{{1
+write_epg <- function(models, weathers, output_dirs, run_times, path){
+    header <- paste0(
+        "! EnergyPlus Group File",
+        "! ------------------------------------------------------------------------------------------------",
+        "! Each line represents a specific simulation. If you don't want a simulation to run, add a comment",
+        "! character (an exclamation point) to the beginning of that line. Commas are used to separate the ",
+        "! fields. Each line consists of the following fields: ",
+        "!",
+        "!    input file name, weather file name, output file name (no extension), counter",
+        "!",
+        "! ------------------------------------------------------------------------------------------------",
+        collapse = "\n")
+
+    contents <- paste(models, weathers, output_dirs, run_times, sep = ",")
+    epg_info <- paste(header, contents)
+    readr::write_lines(epg_info, path)
 }
 # }}}1
