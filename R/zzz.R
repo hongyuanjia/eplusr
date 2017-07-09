@@ -43,8 +43,8 @@
             packageStartupMessage("**********\nMultiple EnergyPlus Versions (",
                                   paste0(paste0("'", eplus_info[["version"]], "'"), collapse = ", "),
                                   ") have been found.")
-            packageStartupMessage("The lasted verion '", eplus_ver, "' will be used as default which located:\n")
-            packageStartupMessage(eplus_dir, "\n**********")
+            packageStartupMessage("The lasted verion '", eplus_ver, "' will be used as default which located:\n\n", eplus_dir)
+            packageStartupMessage("\nYou can change it mannually in the option 'eplusr.eplus_dir'.\n**********")
         } else {
             packageStartupMessage("**********\nEnergyPlus Version: ", attr(eplus_dir, eplus_ver),
                                   " has been successfully located:\n", eplus_dir, "\n**********")
