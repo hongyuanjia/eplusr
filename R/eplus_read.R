@@ -2,28 +2,35 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
-#' @importFrom readr read_csv
-#' @importFrom data.table setcolorder
-# import_epg: A function to create a data.table of simulation info from an
-# EnergyPlus .epg file.
-# import_epg
-# {{{1
+#' Import EnergyPlus .epg group file
+#'
+#' \code{import_epg} returns a tibble which contains the necessary infomation in
+#' order to run simulations using \code{\link{run_epg}}.
+#'
+#' @param epg A file path of EnergyPlus .epg file.
+#' @return A tibble.
+#' @importFrom readr read_csv cols col_integer
+#' @importFrom dplyr as_tibble mutate select one_of
+#' @importFrom purrr map_at
+#' @export
+# import_epg{{{1
 import_epg <- function(epg){
 
-    sim_info <-
-        data.table::as.data.table(readr::read_csv(file = epg, comment = "!",
-                                                  col_names = c("model", "weather", "result", "run_times"),
-                                                  col_types = cols(.default = "c", run_times = col_integer())))
+    sim_info <- readr::read_csv(file = epg, comment = "!",
+                                col_names = c("model", "weather", "result", "run_times"),
+                                col_types = cols(.default = "c", run_times = col_integer()))
 
-    sim_info <- sim_info[, lapply(.SD, function(x) gsub(x=x, pattern = "\\\\", replacement = "/"))]
-    sim_info <- sim_info[, `:=`(output_dir = dirname(result),
-                                output_prefix = basename(result))]
-    sim_info <- sim_info[, `:=`(result = NULL)]
-    sim_info <- data.table::setcolorder(sim_info, c("model", "weather", "output_dir", "output_prefix", "run_times"))
+    sim_info <- dplyr::as_tibble(purrr::map_at(sim_info,
+                                               c("model", "weather", "result"),
+                                               normalizePath,  winslash = "/", mustWork = FALSE
+                                               ))
+    sim_info <- dplyr::mutate(sim_info, output_dir = dirname(result))
+    sim_info <- dplyr::mutate(sim_info, output_prefix = basename(result))
+    sim_info <- dplyr::select(sim_info, dplyr::one_of("model", "weather", "output_dir", "output_prefix", "run_times"))
 
     attr(sim_info, "job_type") <- "epg"
 
-    return(sim_info[])
+    return(sim_info)
 }
 # }}}1
 
@@ -41,9 +48,9 @@ import_epg <- function(epg){
 #' @importFrom stringr str_split str_replace_all str_replace str_detect str_replace
 #' @importFrom purrr set_names map map_chr map2 set_names flatten_chr cross_n
 #' @importFrom data.table rbindlist
+#' @importFrom dplyr as_tibble
 #' @export
-# import_jeplus
-# {{{1
+# import_jeplus{{{1
 import_jeplus <- function (json) {
     # Read jeplus JSON project file.
     info <- jsonlite::fromJSON(json)
@@ -89,8 +96,8 @@ import_jeplus <- function (json) {
                                       paste0(name, seq_along(value))
                                   }
                               })
-    case_names <- data.table::rbindlist(purrr::cross_n(case_names))
-    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
+    case_names <- dplyr::as_tibble(data.table::rbindlist(purrr::cross_n(case_names)))
+    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x,], collapse = "_"))
 
     # Get all combination of case values.
     param_value <- purrr::cross_n(param_value)
@@ -125,9 +132,9 @@ import_jeplus <- function (json) {
 #' @importFrom stringr str_split str_replace_all str_replace str_detect str_replace
 #' @importFrom purrr set_names map map_chr map2 set_names flatten_chr cross_n
 #' @importFrom data.table rbindlist
+#' @importFrom dplyr as_tibble
 #' @export
-# import_epat
-# {{{1
+# import_epat{{{1
 import_epat <- function (json) {
     # Read jeplus JSON project file.
     info <- jsonlite::fromJSON(json)
@@ -203,6 +210,7 @@ import_epat <- function (json) {
 #' @importFrom data.table data.table as.data.table
 #' @importFrom dplyr tibble
 #' @importFrom purrr map
+#' @export
 # read_eplus: A function to read EnergyPlus simulation results.
 # read_eplus
 # {{{1
