@@ -409,128 +409,124 @@ eplus_time_trans <- function(data, year = current_year(),
 
 #' Add a padding time column for further aggregation.
 #'
-#' \code{add_time} adds a padding time column in a data.table for further
-#' easy data aggregation. Basically, this is a wrapper function of
-#' \code{\link[padr]{thicken}} but with an extra feature to give an exact number
-#' of minutes of interval. It can also replace the datetime that is
-#' (year+1)-01-01 with (year)-12-31.
+#' \code{add_time} adds a padding time column in a data.frame for further easy
+#' data aggregation. It can also replace the datetime that is (year+1)-01-01
+#' with (year)-12-31.
 #'
-#' @param data A data frame containing at least one datetime variable of class
-#' 'Date', class 'POSIXct' or class 'POSIXlt'.
-#' @param based_col A character indicates the name of 'POSIXt' or 'Date' column.
-#' If not given, it will be auto-detected.
-#' @param interval The interval of the added datetime variable, which should be
+#' @param data A data frame containing at least one datetime column.
+#' @param base A character indicates the name of datetime column.  If not given,
+#' it will be auto-detected.
+#' @param step The timestep of the added datetime variable, which should be
 #' higher than the interval of the input datetime variable. If 'NULL', it will
 #' be one level higher than the interval of the input datetime variable. It can
 #' also be an integer indicates the interval of minutes. In conclusion,
 #' 'interval' should be a number or one of c("year", "quarter", "month", "week",
 #' "yday", "mday", "wday", "day", "date", "hour", "min", "second").
-#' @param new_name The column name of the added variable. If 'NULL' it will be
+#' @param new The column name of the added variable. If 'NULL' it will be
 #' the name of the original datetime variable with the interval name added to
 #' it, separeted by an underscore.
 #' @param one_year If TRUE, the (year+1)-01-01 will be replaced with
 #' (year)-12-31.
-#' @importFrom xts align.time
-#' @importFrom lubridate year quarter month week yday mday wday day date hour minute second
+#' @importFrom lubridate ceiling_date floor_date round_date
+#' @importFrom stringr str_replace_all
+#' @importFrom rlang arg_match
+#' @importFrom dplyr mutate
 #' @export
 # add_time
-# {{{1
-add_time <- function (data, based_col = NULL, interval, new_name = NULL,
-                      one_year = FALSE) {
+# add_time{{{1
+add_time <- function (data, base = NULL, new = NULL, step,
+                      toward = c("up", "down", "round"), one_year = FALSE) {
 
+    # TODO: Add checking for invalid step such as '600 secs'.
     check_df(data)
-    data <- conv_dt(data)
-
-    # Make a copy to keep the original data untouched.
-    data <- copy(data)
-
-    date_col_name <- check_date_col(data, based_col)
-    date_col <- data[[date_col_name]]
-    # Capture the original of classes of data sequence.
-    classes <- attributes(date_col)$class
+    if (is.null(base)) {
+        base <- check_date_col(data)
+    }
+    datetimes <- data[[base]]
 
     if (one_year) {
-        date_col <- one_year(date_col)
+        datetimes <- one_year(datetimes)
     }
 
+    if(is.null(new)) {
+        new <- paste0(base, "_", stringr::str_replace_all(step, "\\s", ""))
+    } else {
+        new <- stringr::str_replace_all(new, "\\s", "")
+    }
 
-    if(!is.na(match(class(interval), c("integer", "numeric")))){
-        interval <- as.integer(interval)
+    toward <- rlang::arg_match(toward)
 
-        if(is.null(new_name)) {
-            new_name <- paste0(date_col_name, "_", interval, "mins")
-        }
+    data_thicken <-
+        switch(toward,
+               up = dplyr::mutate(data, !!new := lubridate::ceiling_date(datetimes, unit = step)),
+               down = dplyr::mutate(data, !!new := lubridate::floor_date(datetimes, unit = step)),
+               round = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
+               )
 
-        # Get the interval in secs.
-        interval <- as.integer(interval * 60L)
-
-        data_thicken <- data[, c(new_name) := xts::align.time(date_col, n = interval)]
-
-        # Get the original classes back after time aligned, because 'align.time'
-        # will always return a class of "POSIXt" rather than "POSIXct".
-        attr(data_thicken[[new_name]], "class") <- classes
-
-    } else  {
-        interval <- uniform_interval_name(interval)
-
-        if(is.null(new_name)) {
-            new_name <- paste0(date_col_name, "_", interval)
-        }
-
-        eval_text <- paste0("lubridate::", interval, "(date_col)")
-        data_thicken <- data[, c(new_name) := eval(parse(text = eval_text))]
+    if (identical(new, base)) {
+        message("Column '", new, "' has been replaced with new timestep of '",
+                step, "'.")
+    } else {
+        message("A new column named '", new, "' with step '", step,
+                "' has been added based on column '", base, "'.")
     }
 
     return(data_thicken)
 }
 # }}}1
 
-#' Aggregate data according to given time interval.
+#' Resample data according to given time step.
 #'
-#' \code{agg_by} adds a padding time column in a data.table and aggregate
-#' time series data according to given time interval.
+#' \code{resample} adds a padding time column and aggregate time series data
+#' according to given time step.
 #'
-#' @param by_col For grouping using the feature of \code{by} argument in
-#' data.table.
-#' @param fun A character indicates the function to apply during aggregation.
 #' @inheritParams add_time
+#' @param drop If TRUE, all non-numeric columns will be dropped during
+#' resampling. Otherwise, they will be used as group columns.
 #' @importFrom purrr map_lgl
 #' @export
-# agg_by
-# {{{1
-agg_by <- function (data, based_col = NULL, interval = "year", by_col = NULL,
-                    new_name = NULL, fun = "mean", one_year = FALSE) {
+# resample{{{1
+resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALSE) {
 
-    if (is.null(based_col)) {
-        based_col <- check_date_col(data)
+    if (is.null(base)) {
+        base <- check_date_col(data)
     }
 
-    data_thicken <- add_time(data = data, based_col = based_col,
-                             interval = interval, new_name = new_name,
-                             one_year = one_year)
-
-    # Delete the original datetime column.
-    data_thicken <- data_thicken[, c(based_col) := NULL]
+    data_thicken <- add_time(data = data, base = base, new = new, step = step)
 
     # Cause `add_time` always add the new column as the last column.
-    if (is.null(new_name)) {
-        new_name <- names(data_thicken)[length(names(data_thicken))]
+    if (is.null(new)) {
+        date_cols <- get_date_col(data_thicken)
+        new <- date_cols[length(date_cols)]
+    }
+
+    # Delete the original datetime column if the new name is not the same as the
+    # base name.
+    if (!identical(base, new)) {
+        data_thicken <- dplyr::select(data_thicken, -dplyr::one_of(base))
     }
 
     # Check if there are non-numeric columns
-    check_numeric <- purrr::map_lgl(data_thicken, is.numeric)
-    non_numeric_col <- grep(x = names(data_thicken)[!check_numeric],
-                            paste0("^", new_name, "$"), invert = TRUE, value = TRUE)
-    if (length(non_numeric_col) > 0 & is.null(by_col)) {
-        stop("Non-numeric column ", paste0("'", non_numeric_col, "'"), " found. ",
-             "Please use `by_col` argument.")
+    non_num_cols <- names(purrr::discard(data_thicken, is.numeric))
+    non_num_cols <- non_num_cols[non_num_cols != new]
+    new_name <- rlang::syms(new)
+    if (assertthat::not_empty(non_num_cols)) {
+        if (drop) {
+            warning("Non-numeric column found: ",
+                    paste0("'", non_num_cols, "'", collapse = ", "),
+                    ". It/They will be dropped during resampling. ",
+                    "Please set 'drop' to FALSE argument if you want to keep it/them.",
+                    call. = FALSE)
+            data_thicken <- dplyr::select(data_thicken, -dplyr::one_of(non_num_cols))
+            data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(new_name))
+        } else {
+            non_num <- rlang::syms(non_num_cols)
+            data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(non_num), rlang::UQS(new_name))
+        }
     }
 
-    if (is.null(by_col)) {
-        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(new_name)]
-    } else {
-        data_agg <- data_thicken[, lapply(.SD, get(fun)), by = c(new_name, col_names(data_thicken, by_col))]
-    }
+    data_agg <- dplyr::summarise_all(data_thicken, mean)
+    data_agg <- dplyr::ungroup(data_agg)
 
     return(data_agg)
 }
@@ -694,44 +690,44 @@ data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
 }
 # }}}1
 
-#' Format EnergyPlus output and meter result into a long table.
-#'
-#' \code{long_table} takes an EnergyPlus "output" or "meter" result as an input
-#' and returns a long table with first column being the POSIXt column, and next
-#' 'component' indicating energy consumption components, 'type' indicating
-#' energy types (e.g.  Electricity, and Gas), 'value' indicating the value of
-#' the component, 'unit' indicating the unit of energy used, and 'timestep'
-#' indicating the tiem step of data collected. A meter output from a
-#' 10-min-timestep annual simulation will takes about 5 seconds to load.  So,
-#' use with caution.
-#'
-#' @param data A data.table object containing EnergyPlus standard output or
-#' meter result.
-#' @return A data.table with long table format.
-#' @importFrom data.table melt setcolorder
-#' @export
-# long_table
-# {{{1
-long_table <- function(data) {
-    check_df(data)
-    data <- conv_dt(data)
+# #' Format EnergyPlus output and meter result into a long table.
+# #'
+# #' \code{long_table} takes an EnergyPlus "output" or "meter" result as an input
+# #' and returns a long table with first column being the POSIXt column, and next
+# #' 'component' indicating energy consumption components, 'type' indicating
+# #' energy types (e.g.  Electricity, and Gas), 'value' indicating the value of
+# #' the component, 'unit' indicating the unit of energy used, and 'timestep'
+# #' indicating the tiem step of data collected. A meter output from a
+# #' 10-min-timestep annual simulation will takes about 5 seconds to load.  So,
+# #' use with caution.
+# #'
+# #' @param data A data.table object containing EnergyPlus standard output or
+# #' meter result.
+# #' @return A data.table with long table format.
+# #' @importFrom data.table melt setcolorder
+# #' @export
+# # long_table
+# # {{{1
+# long_table <- function(data) {
+#     check_df(data)
+#     data <- conv_dt(data)
 
-    date_col <- get_date_col(data)
+#     date_col <- get_date_col(data)
 
-    data <- melt(data, id.vars = date_col,
-                 variable.name = "component", value.name = "value",
-                 variable.factor = FALSE)
-    data <- data[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")][,
-                 lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
-                 lapply(.SD, function(x) gsub(x=x, "^\\s+", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
-                 lapply(.SD, function(x) gsub(x=x, "\\s+$", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
-                 # lapply(.SD, str_trim), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+#     data <- melt(data, id.vars = date_col,
+#                  variable.name = "component", value.name = "value",
+#                  variable.factor = FALSE)
+#     data <- data[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")][,
+#                  lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+#                  lapply(.SD, function(x) gsub(x=x, "^\\s+", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+#                  lapply(.SD, function(x) gsub(x=x, "\\s+$", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+#                  # lapply(.SD, str_trim), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
 
-    data <- data.table::setcolorder(data, c(date_col, "component", "type", "value", "unit", "timestep"))
+#     data <- data.table::setcolorder(data, c(date_col, "component", "type", "value", "unit", "timestep"))
 
-    return(data)
-}
-# }}}1
+#     return(data)
+# }
+# # }}}1
 
 #' Calculate CV(RMSE) between two numeric vector.
 #'
@@ -775,7 +771,6 @@ bias <- function (x, y) {
   return(bias)
 }
 # }}}1
-
 
 #' Apply a function between groups
 #'
@@ -978,17 +973,14 @@ get_date_col <- function(data){
 # the input.
 # check_date_col
 # {{{1
-check_date_col <- function (data, date_col = NULL) {
-    # If missing 'date_col', get the name of date column automatically.
-    if (is.null(date_col)) {
-        date_col <- get_date_col(data = data)
-        if (length(date_col) == 0) {
-            stop("None date column found.")
-        }
+check_date_col <- function (data) {
+    date_col <- get_date_col(data = data)
+    if (length(date_col) == 0) {
+        stop("None datetime column found.", call. = FALSE)
     }
     # If there are multiple date columns found, stop.
     if (length(date_col) > 1) {
-        stop("Multiple date columns found. Please specify the date column name.")
+        stop("Multiple datetime columns found.", call. = FALSE)
     }
 
     return(date_col)
@@ -1017,6 +1009,109 @@ get_interval <- function (date_seq) {
     return(interval)
 }
 # }}}1
+# S3 methods for get_timestep{{{
+get_timestep <- function (x, unit, by, simplify) {
+   UseMethod("get_timestep", x)
+}
+
+get_timestep.default <- function (x, unit, simplify = FALSE) {
+   stop("Unsupport for class ", class(x),".", call. = FALSE)
+}
+
+get_timestep.POSIXt <- function (x, ..., unit = "second", simplify = FALSE) {
+    datetimes_to_nums <- as.integer(x)
+    datetimes_diff_table <- table(diff(datetimes_to_nums))
+    steps <- format_table(datetimes_diff_table, unit = "second")
+    steps <- dplyr::mutate(steps, step = units::set_units(step, unit))
+    if (simplify) {
+        if (length(steps[["step"]]) > 1L) {
+            stop("Input have multiple timesteps. Unable to simplify.",
+                 call. = FALSE)
+        }
+        steps <- steps[["step"]]
+    }
+    return(steps)
+}
+
+get_timestep.Date <- function (x, ..., unit = "day", simplify = FALSE) {
+    datetimes_to_nums <- as.integer(x)
+    datetimes_diff_table <- table(diff(datetimes_to_nums))
+    steps <- format_table(datetimes_diff_table, unit = "day")
+    steps <- dplyr::mutate(steps, step = units::set_units(step, unit))
+    if (simplify) {
+        if (length(steps[["step"]]) > 1L) {
+            stop("Input have multiple timesteps. Unable to simplify.",
+                 call. = FALSE)
+        }
+        steps <- steps[["step"]]
+    }
+    return(steps)
+}
+
+get_timestep.data.frame <- function(x, by = NULL, unit = NULL, simplify = FALSE) {
+    if (!is.null(by)) {
+        dfs <- split(x, x[[by]])
+        steps <- map(dfs, .get_timestep_df)
+    } else {
+        steps <- .get_timestep_df(x)
+    }
+
+    if (!is.null(unit)) {
+        steps <- purrr::map(steps, ~dplyr::mutate(.x, step = units::set_units(step, unit)))
+    }
+
+    return(steps)
+}
+
+.get_timestep_df <- function (df) {
+    dates <- names(purrr::keep(df, assertthat::is.date))
+    times <- names(purrr::keep(df, assertthat::is.time))
+
+    datetimes <- df[, c(dates, times)]
+
+    assertthat::assert_that(assertthat::not_empty(datetimes),
+                            msg = "Input does not contain any column with date or time.")
+
+    datetimes_to_nums <- purrr::map_df(datetimes, as.integer)
+    datetimes_diff_table <- purrr::map(datetimes_to_nums, ~table(diff(.x)))
+
+    steps <- purrr::map(names(datetimes_diff_table),
+                        ~{
+                            name <- names(datetimes_diff_table[.x])
+                            table <- datetimes_diff_table[[.x]]
+                            format_table(table, unit = ifelse(name %in% dates, "day", "second"))
+                        })
+    steps <- purrr::set_names(steps, names(datetimes))
+
+    return(steps)
+}
+
+get_unit <- function (x) {
+    assertthat::assert_that(inherits(x, "units"),
+                            msg = "Input should be a object of units class.")
+    unit_info <- units(x)
+    unit <- unit_info[["numerator"]]
+    return(unit)
+}
+
+format_table <- function (table, unit) {
+    assertthat::assert_that(is.table(table), msg = "Input is not a table object.")
+    per <- round(as.numeric(prop.table(table)*100))
+
+    # Make sure the sum of percentages equals 100%.
+    per[which.max(per)] <- 100 - sum(per[-which.max(per)])
+
+    tbl <- as_tibble(table)
+    tbl <- purrr::set_names(tbl, c("step", "n"))
+    tbl <- dplyr::mutate(tbl,
+                         step = as.integer(step),
+                         `%` = round(per))
+    tbl <- dplyr::mutate(tbl,
+                         step = units::set_units(step, unit),
+                         `%` = units::set_units(`%`, "%"))
+    return(tbl)
+}
+# }}}
 
 #' @importFrom lubridate year days
 # one_year: A helper function to replace (year + 1)-01-01 occurance with
