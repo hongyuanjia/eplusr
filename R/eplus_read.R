@@ -479,7 +479,9 @@ read_surf_rpt <- function(eio){
     # Table except sub header
     raw_per_zone <- purrr::flatten_chr(purrr::map2(row_zone_start, row_zone_len, ~{raw <- surf_rpt[(.x+1):(.x+.y)]}))
     # Supress warning messages from read_csv
-    surf_info <- suppressWarnings(readr::read_csv(stringr::str_c(raw_per_zone, collapse = "\n"), col_names = header, col_types = col_types))
+    surf_info <- suppressWarnings(readr::read_csv(stringr::str_c(raw_per_zone, collapse = "\n"),
+                                                  col_names = header, col_types = col_types,
+                                                  na = c("", "NA", "N/A")))
 
     # Combine zone info and surface info per zone
     surf_info <- dplyr::bind_cols(zone_info, surf_info)
