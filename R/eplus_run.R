@@ -1037,7 +1037,7 @@ run_multi <- function (models, weathers, output_dirs, output_prefixes, case_name
     walk(start_cmd, ~system(.x, wait = FALSE, invisible = FALSE))
     # }}}2
 
-    message(stringr::str_interp("The job has been successfully executed using EnergyPlus ${eplus_ver}."))
+    message(stringr::str_interp("The job has been successfully executed using EnergyPlus V${eplus_ver} located at '${eplus_dir}'."))
 }
 # }}}1
 
