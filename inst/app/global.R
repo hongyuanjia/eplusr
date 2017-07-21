@@ -6,6 +6,7 @@ library(shinyBS)
 library(shinycssloaders)
 library(shinythemes)
 library(shinyLP)
+library(shinydashboard)
 
 jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 
