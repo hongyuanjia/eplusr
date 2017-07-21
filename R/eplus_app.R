@@ -515,8 +515,8 @@ show_output <- function (data, state = NULL, group = NULL,
     library(ggplot2)
     library(plotly)
     library(glue)
-    library(rclipboard)
     library(shinyAce)
+    library(clipr)
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
@@ -738,7 +738,11 @@ show_output <- function (data, state = NULL, group = NULL,
                 # Main panel{{{
                     tabsetPanel(type = "tabs",
                         tabPanel("R Code",
-                                 uiOutput("clip"),
+                                 textInput("data_name_prefix", label = "Data Name Prefix:", value = "data"),
+                                 actionButton("update_data_name_prefix", "Update"),
+                                 actionButton("copy_code", "Copy Code to Clipboard", icon = icon("clipboard")),
+                                 shinyWidgets::receiveSweetAlert("success_copy"),
+                                 tags$br(),
                                  aceEditor(outputId = "source_code", mode = "r",
                                            theme = "monokai", vimKeyBinding = TRUE,
                                            height = "600px", readOnly = TRUE,
@@ -888,6 +892,19 @@ show_output <- function (data, state = NULL, group = NULL,
         })
         # }}}
 
+        # Set reactive value of code action input{{{
+        data_name_prefix <- reactive({
+            data_name_prefix <- input$data_name_prefix
+            if (is.null(data_name_prefix)) {
+                return("data")
+            }
+            if (data_name_prefix == "") {
+                return("data")
+            }
+            return(data_name_prefix)
+        })
+        # }}}
+
         # Set reactive data{{{
         data_all <- reactiveValues()
 
@@ -923,7 +940,7 @@ show_output <- function (data, state = NULL, group = NULL,
         })
         data_all$source_code <- reactive({
             time_range = format(time_range(), "%F %X")
-            create_source_code(data_name = data_name,
+            create_source_code(data_name = data_name, data_name_prefix = data_name_prefix(),
                                group = group, col_datetime = col_datetime,
                                time_range = time_range, cases = case(),
                                outputs = data_all$output_info()[["output"]],
@@ -1038,14 +1055,21 @@ show_output <- function (data, state = NULL, group = NULL,
         )
         # }}}
 
-        # Add clipboard buttons
-        output$clip <- renderUI({
-            rclipButton("clipbtn", "Copy to Clipboard", input$source_code, icon("clipboard"))
-        })
+        # Source code actions{{{
+        observeEvent(input$update_data_name_prefix,
+            {
+                updateAceEditor(session, "source_code", value = data_all$source_code())
+                updateTextInput(session, "data_name_prefix", value = isolate(data_name_prefix()))
+            }
+        )
+        observeEvent(input$copy_code,
+            {
+                clipr::write_clip(content = isolate(data_all$source_code()), object_type = "character")
+                shinyWidgets::sendSweetAlert("success_copy", title = "Success!", text = "Source Code has been successfully copied to clipboard", type = "success")
+            }
+        )
+        # }}}
 
-        observe({
-            updateAceEditor(session, "source_code", value = data_all$source_code())
-        })
         # # Debug{{{
         # output$source_code <- renderText({
         #     data_all$source_code()
