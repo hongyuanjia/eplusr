@@ -9,7 +9,7 @@
 #' @export
 #'
 # edit_epat{{{1
-edit_epat <- function (json, parse = TRUE) {
+edit_epat <- function (json, parse = FALSE) {
 
     library(shiny)
     library(shinyFiles)
