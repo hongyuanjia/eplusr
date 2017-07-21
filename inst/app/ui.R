@@ -22,6 +22,7 @@ shinyUI(tagList(
             # navbar {{{2
             bs3_navbar("EPAT",
                        navs = list(
+                            # File {{{3
                             bs3_dropdown(name = "File", #icon = icon("file"),
                                          navs = list(
                                              actionLink("new", "New Project", icon = icon("file")),
@@ -36,7 +37,9 @@ shinyUI(tagList(
 
                                          )
                             ),
+                            # }}}3
 
+                            # Edit{{{3
                             bs3_dropdown(name = "Edit", #icon = icon("edit"),
                                          navs = list(
                                              actionLink("import_csv", "Import Parameters from CSV...", icon = icon("sign-in")),
@@ -46,30 +49,37 @@ shinyUI(tagList(
 
                                          )
                             ),
+                            # }}}3
 
+                            # Action{{{3
                             bs3_dropdown(name = "Action", #icon = icon("play"),
                                          navs = list(
                                              actionLink("validate", "Validate Jobs", icon = icon("check-square")),
                                              actionLink("simulate", "Run Jobs", icon = icon("play")),
                                              tags$hr(class = "sep"),
-                                             actionLink("summary", "Show Output Summary", icon = icon("list")),
+                                             actionLink("summary", "Show Result Summary", icon = icon("list")),
                                              actionLink("plot", "Plot...", icon = icon("bar-chart"))
                                          )
                             ),
+                            # }}}3
 
+                            # Tools{{{3
                             bs3_dropdown(name = "Tools", #icon = icon("wrench"),
                                          navs = list(
                                              actionLink("converter", "IDF Version Converter", icon = icon("retweet")),
                                              actionLink("imftoidf", "IMF to IDF Converter", icon = icon("mail-forward"))
                                          )
                             ),
+                            # }}}3
 
+                            # Help{{{3
                             bs3_dropdown(name = "Help", #icon = icon("question-circle"),
                                          navs = list(
                                              actionLink("guide", "User Guide", icon = icon("question-circle")),
                                              actionLink("about", "About", icon = icon("exclamation-circle"))
                                          )
                             )
+                            # }}}3
                       )
             ),
             # }}}2
@@ -207,6 +217,13 @@ shinyUI(tagList(
                     tags$style(type='text/css', "#jeplus_sel {vertical-align: top; margin-top: 25px;}"),
                     tags$style(type='text/css', "#import_jeplus_project {vertical-align: top; margin-top: 25px;}")
                 )
+            )
+        ),
+        # }}}2
+
+        # page_plotting{{{2
+        shinyjs::hidden(
+            div(id = "div_page_plotting",
             )
         ),
         # }}}2
