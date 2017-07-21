@@ -1380,3 +1380,57 @@ write_epg <- function(models, weathers, output_dirs, run_times, path){
     readr::write_lines(epg_info, path)
 }
 # }}}1
+
+# check_jeplus{{{1
+check_jeplus <- function (jeplus) {
+    if (!is.list(jeplus)) return(FALSE)
+    type <- attr(jeplus, "job_type")
+    if (type != "jeplus") return(FALSE)
+    var_names <- names(jeplus)
+    required <- c("execSettings", "parameters", "rvx", "projectType",
+                  "weatherDir", "idfdir", "weatherFile", "projectID",
+                  "projectNotes", "idftemplate", "rvxFile", "paramFile")
+    ex_vars <- setdiff(var_names, required)
+    mis_vars <- setdiff(required, var_names)
+    if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+# }}}1
+
+# check_epat{{{1
+check_epat <- function (epat) {
+    if (!is.list(epat)) return(FALSE)
+    type <- attr(epat, "job_type")
+    if (type != "epat") return(FALSE)
+    var_names <- names(epat)
+    required <- c("idf_path", "weather_path", "param_field", "param_value",
+                  "eplus_path", "wd_path", "parallel_num")
+    ex_vars <- setdiff(var_names, required)
+    mis_vars <- setdiff(required, var_names)
+    if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+# }}}1
+
+# check_epg{{{1
+check_epg <- function (epg) {
+    if (!is.data.frame(epg)) return(FALSE)
+    type <- attr(epg, "job_type")
+    if (type != "epg") return(FALSE)
+    var_names <- names(epg)
+    required <- c("model", "weather", "output_dir", "output_prefix", "run_times")
+    ex_vars <- setdiff(var_names, required)
+    mis_vars <- setdiff(required, var_names)
+    if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
+}
+# }}}1
