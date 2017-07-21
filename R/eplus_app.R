@@ -1526,78 +1526,86 @@ if_then_else <- function (.if, .then, .else) {
 }
 # }}}
 # create_source_code{{{
-create_source_code <- function (data_name, group, col_datetime, time_range,
+create_source_code <- function (data_name, data_name_prefix, group, col_datetime, time_range,
                                 cases, outputs, plot_group, plot_color, plot_facet) {
     code_data_check <-
         glue("
-             # DATA MUNIPULATION
+             # OUTPUT SELECTION
              ## Check if data meets the requirements.
-             data <- standardize_wide_table({data_name}, exclude = {if_then_else(is.null(group), 'NULL', c_name(group))})\n
+             {data_name_prefix}_wide_table <- standardize_wide_table({data_name}, exclude = {if_then_else(is.null(group), 'NULL', c_name(group))})\n
              ")
 
     code_data_time_filtered <-
         glue("
              ## Filter data according to selected time range.
-             data_time_filtered <- dplyr::filter(data,
+             {data_name_prefix}_time_filtered <- dplyr::filter({data_name_prefix}_wide_table,
                                                  {col_datetime} >= '{time_range[1]}' &
                                                  {col_datetime} <  '{time_range[2]}')\n
              ")
 
     code_data_group_filtered <-
         glue("
-             data_group_filtered <- dplyr::filter(data_time_filtered,
+             {data_name_prefix}_group_filtered <- dplyr::filter({data_name_prefix}_time_filtered,
                                                   {group} %in% {glue('c({c_name(cases)})')})\n
              ")
 
     code_name_before <- if_then_else(rlang::is_empty(code_data_group_filtered),
-                                     'data_time_filtered', 'data_group_filtered')
+                                     glue('{data_name_prefix}_time_filtered'),
+                                     glue('{data_name_prefix}_group_filtered'))
     code_data_selected <-
         glue("
              ## Filter data according to selected outputs.
-             data_selected <- dplyr::select({code_name_before}, {glue(if_then_else(is.null(group), NULL, group), ', ')}{col_datetime},
-             {paste0('    `', outputs, '`', collapse = ',\n')})\n
+             {data_name_prefix}_selected <- dplyr::select({code_name_before}, {if_then_else(is.null(group), '', glue({group}, ', '))}{col_datetime},
+             {paste0('    `', outputs, '`', collapse = ',\n')})\n\n
              ")
 
     code_data_ggplot <-
         glue("
+             # PLOT SELECTED OUTPUTS USING GGPLOT2
              ## Gather data for use in `ggplot2`.
-             data_long_table <- tidyr::gather(data_selected, key = output, value = value,
-                                              {glue(if_then_else(is.null(group), NULL, group), ', ')}-{col_datetime})\n\n
+             ### Get output info of selected data.
+             {data_name_prefix}_output_info <- eplusr::get_output_info({data_name_prefix}_selected)
+             ### Change selected data into long table format.
+             {data_name_prefix}_long_table <- tidyr::gather({data_name_prefix}_selected, key = output, value = value,
+                                              {if_then_else(is.null(group), '', glue({group}, ', '))}-{col_datetime})
+             ### Join output info data and long table data.
+             {data_name_prefix}_full_join <- dplyr::full_join({data_name_prefix}_long_table, {data_name_prefix}_output_info)
+             ### Delete rows containing NAs.
+             {data_name_prefix} <- tidyr::drop_na({data_name_prefix}_full_join)\n
              ")
 
     code_ggplot_init <-
         glue("
-             # PLOT SELECTED OUTPUTS USING GGPLOT2
              ## Initialize ggplot object
-             p <- ggplot(data_long_table, aes(x = {col_datetime}, y = value))\n
+             p_{data_name_prefix} <- ggplot({data_name_prefix}, aes(x = {col_datetime}, y = value))\n
              ")
 
     code_ggplot_line <-
         glue("
              ## Add line plot
-             p <- p + geom_line(size = 1)\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + geom_line(size = 1)\n
              ")
 
     code_ggplot_color <-
         glue("
              ## Add color aes.
-             p <- p + aes(color = {plot_color})\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + aes(color = {plot_color})\n
              ")
     code_ggplot_group <-
         glue("
              ## Add group aes.
-             p <- p + aes(group = {plot_group})\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + aes(group = {plot_group})\n
              ")
     code_ggplot_facet <-
         glue("
              ## Add facets.
-             p <- p + facet_grid(facets = {plot_facet}, scales = 'free')\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + facet_grid(facets = {plot_facet}, scales = 'free')\n
              ")
 
     code_ggplot_theme <-
         glue("
              ## Set theme
-             p <- p + theme_bw() +
+             p_{data_name_prefix} <- p_{data_name_prefix} + theme_bw() +
                  theme(legend.position = 'bottom',
                        legend.background = element_rect(color = 'black'),
                        legend.key = element_rect(color = 'gray'),
