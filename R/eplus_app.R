@@ -490,9 +490,9 @@ epat <- function () {
 # read_epat{{{1
 read_epat <- function(json) {
     job <- jsonlite::fromJSON(json)
-    if (is.null(job$epat_ver)) {
-        stop("Input is not a valid EPAT project file.", call. = FALSE)
-    }
+    # if (is.null(job$epat_ver)) {
+    #     stop("Input is not a valid EPAT project file.", call. = FALSE)
+    # }
     attr(job, "job_type") <- "epat"
     return(job)
 }
