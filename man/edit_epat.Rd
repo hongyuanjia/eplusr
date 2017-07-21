@@ -4,7 +4,7 @@
 \alias{edit_epat}
 \title{A Shiny Gadget for editing EPAT job}
 \usage{
-edit_epat(json, parse = TRUE)
+edit_epat(json, parse = FALSE)
 }
 \arguments{
 \item{json}{A EPAT json file or json string.}
