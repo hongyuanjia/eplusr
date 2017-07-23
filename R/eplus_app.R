@@ -611,7 +611,6 @@ show_output <- function (data, state = NULL, group = NULL,
 
     # ui{{{
     ui <- bootstrapPage(
-        rclipboardSetup(),
         theme = shinythemes::shinytheme("lumen"),
         sidebarLayout(
             sidebarPanel(id = "coll_plot_var", multiple = TRUE, open = c("Time", "Variables"),
