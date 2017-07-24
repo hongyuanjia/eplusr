@@ -520,6 +520,8 @@ show_output <- function (data, state = NULL, group = NULL,
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
+    assertthat::assert_that(assertthat::are_equal(length(group), 1L),
+                            msg = "'group' should be a single character string.")
     # Standardize input data
     data <- standardize_wide_table(data, exclude = group)
 
@@ -1374,8 +1376,8 @@ standardize_wide_table <- function (data, exclude = NULL) {
 
     # Check if all column names meet the EnergyPlus standard output name format.
     if (!is.null(exclude)) {
-        assertthat::assert_that(length(exclude) == 1L,
-                                msg = "'exlude' should be a single character string.")
+        # assertthat::assert_that(length(exclude) == 1L,
+        #                         msg = "'exlude' should be a single character string.")
         col_missing <- exclude[is.na(match(exclude, colnames(data)))]
         assertthat::assert_that(rlang::is_empty(col_missing),
                                 msg = paste0("Invalid 'exclude'. Could not find column ",
@@ -1416,8 +1418,8 @@ standardize_long_table <- function (data, exclude = NULL) {
 
     # Check if all column names meet the format.
     if (!is.null(exclude)) {
-        assertthat::assert_that(length(exclude) == 1L,
-                                msg = "'exlude' should be a single character string.")
+        # assertthat::assert_that(length(exclude) == 1L,
+        #                         msg = "'exlude' should be a single character string.")
         col_missing <- exclude[is.na(match(exclude, colnames(data)))]
         assertthat::assert_that(rlang::is_empty(col_missing),
                                 msg = paste0("Invalid 'exclude'. Could not find column ",
@@ -1590,7 +1592,7 @@ create_source_code <- function (data_name, data_name_prefix, group, col_datetime
              {data_name_prefix}_output_info <- eplusr::get_output_info({data_name_prefix}_selected)
              ### Change selected data into long table format.
              {data_name_prefix}_long_table <- tidyr::gather({data_name_prefix}_selected, key = output, value = value,
-                                              {if_then_else(is.null(group), '', glue({group}, ', '))}-{col_datetime})
+                                              {if_then_else(is.null(group), '', glue('-', {group}, ', '))}-{col_datetime})
              ### Join output info data and long table data.
              {data_name_prefix}_full_join <- dplyr::full_join({data_name_prefix}_long_table, {data_name_prefix}_output_info)
              ### Delete rows containing NAs.
