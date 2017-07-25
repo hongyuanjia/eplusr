@@ -486,7 +486,8 @@ add_time <- function (data, base = NULL, new = NULL, step,
 #' @importFrom purrr map_lgl
 #' @export
 # resample{{{1
-resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALSE) {
+resample <- function (data, base = NULL, new = NULL, step = "month",
+                      drop = FALSE, fun = mean, ...) {
 
     if (is.null(base)) {
         base <- check_date_col(data)
@@ -513,7 +514,7 @@ resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALS
     if (assertthat::not_empty(non_num_cols)) {
         if (drop) {
             warning("Non-numeric column found: ",
-                    paste0("'", non_num_cols, "'", collapse = ", "),
+                    paste0(sQuote(non_num_cols), collapse = ", "),
                     ". It/They will be dropped during resampling. ",
                     "Please set 'drop' to FALSE argument if you want to keep it/them.",
                     call. = FALSE)
@@ -523,9 +524,12 @@ resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALS
             non_num <- rlang::syms(non_num_cols)
             data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(non_num), rlang::UQS(new_name))
         }
+    } else {
+        data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(new_name))
     }
 
-    data_agg <- dplyr::summarise_all(data_thicken, mean)
+    fun <- purrr::as_function(fun, ...)
+    data_agg <- dplyr::summarise_all(data_thicken, fun)
     data_agg <- dplyr::ungroup(data_agg)
 
     return(data_agg)
@@ -772,6 +776,28 @@ bias <- function (x, y) {
 }
 # }}}1
 
+#' Calculate Mean Radiant Temperature (MRT).
+#'
+#' \code{tg_to_tr} returns
+#'
+#' @param tg Global Temperature
+#' @param ta Mean air temperature measured at the same height of \code{tg}.
+#' @param d The dimeter of the globe.
+#' @param e The emissivity of the globe.
+#' @param v The air velocity.
+#' @return Calculated mean radiant temperature.
+#' @export
+#'
+# tg_to_tr{{{
+tg_to_tr <- function (tg, ta, d = 0.038, e = 0.9, v = 0.01) {
+    # Variables and constants used to calculate mean radiant temperature
+    sigma <- 5.67*(10^-8)
+    hc <- 6.32*(d^-0.4)*(v^0.5)
+    tr <- (hc/(sigma*e)*(tg-ta)+(tg+273.15)^4)^0.25-273.15
+    return(tr)
+}
+# }}}
+
 #' Apply a function between groups
 #'
 #' \code{case_cal} .
@@ -853,6 +879,113 @@ case_cal <- function (data, case_col, col_pattern = NULL, fun, case_order = TRUE
   return(cal)
 }
 # }}}1
+
+# case_apply{{{
+case_apply <- function (wide_table, case, primary = NULL, fun, ..., by_var = FALSE) {
+    assertthat::assert_that(assertthat::is.string(case))
+    assertthat::assert_that(is.null(primary)||assertthat::is.string(primary))
+
+    wide_table <- standardize_wide_table(wide_table, exclude = case)
+
+    # Arrange the wide table by case column.
+    wide_table <- dplyr::arrange_(wide_table, case)
+    # Get the name of cases.
+    case_name <- unique(wide_table[[case]])
+    # Get combination of all cases.
+    if (is.null(primary)) {
+        case_combn <- combn(case_name, 2, simplify = FALSE)
+    } else {
+        if (is.na(match(primary, case_name))) {
+            stop("'primary' is not one of the cases.", call. = FALSE)
+        } else {
+            case_left <- case_name[!case_name == primary]
+            case_combn <- purrr::map(purrr::cross2(primary, case_left), purrr::flatten_chr)
+        }
+    }
+    # Get the function and the function name
+    fun_name <- deparse(substitute(fun))
+    fun <- purrr::as_function(fun, ...)
+
+    long_table <- long_table(wide_table, group = case)
+    if (by_var) {
+        cols <- colnames(long_table)
+        output_info <- get_output_info(wide_table)
+        long_table_full <- tidyr::drop_na(dplyr::full_join(long_table, output_info, by = "output"))
+
+        # Get keys per cases.
+        info_key <-
+            long_table_full %>%
+            dplyr::group_by_(case, "variable") %>%
+            dplyr::summarise(n_key = length(unique(key)), key = I(list(unique(key)))) %>%
+            dplyr::ungroup() %>%
+            dplyr::filter(n_key > 0L)
+
+        # Get variables per cases.
+        info_variable <-
+            info_key %>% dplyr::select_(case, "variable") %>%
+            base::split(., .[[case]]) %>%
+            purrr::map("variable")
+
+        # Check same variables for each case
+        check_equal_variable <-
+            purrr::map(case_combn,
+                       ~{x <- info_variable[[.x[1]]]
+                         y <- info_variable[[.x[2]]]
+                         notin_y <- setdiff(x, y)
+                         notin_x <- setdiff(y, x)
+                         out <- list(notin_y, notin_x)
+                         names(out) <- c(glue::glue("found in case '{.x[1]}' but not in case '{.x[2]}'"),
+                                         glue::glue("found in case '{.x[2]}' but not in case '{.x[1]}'"))
+                         return(out)
+                       })
+        non_equal_cases <- purrr::keep(purrr::flatten(check_equal_variable), ~length(.x) > 0L)
+        non_equal_case_msg <- paste0(purrr::map_chr(seq_along(non_equal_cases),
+                                                    ~{glue::glue("[{.x}] Variable {c_name(non_equal_cases[[.x]])} {names(non_equal_cases[.x])}.")}),
+                                     collapse = "\n")
+        assertthat::assert_that(rlang::is_empty(non_equal_cases),
+                                msg = glue::glue("Non-equal variables found in cases:\n",
+                                                 non_equal_case_msg, "\n",
+                                                 "You may try set 'by_var' = FALSE"))
+
+        if (all(info_key[["n_key"]] == 1L)) {
+            cols_keep <- c(cols[cols != "output"], "variable")
+            long_table_full <- tidyr::drop_na(dplyr::select(long_table_full, dplyr::one_of(cols_keep)))
+            long_table_per <- split(long_table_full, long_table_full$variable)
+
+        } else {
+            non_matched <- filter(info_key, n_key != 1L)
+            msg <- glue::glue_data(non_matched, "Multiple keys found for variable '{variable}' in case '{case}': {c_name(key)}.")
+            assertthat::assert_that(assertthat::are_equal(nrow(non_matched), 0L),
+                                    msg = msg)
+        }
+
+    } else {
+        long_table_per <- split(long_table, long_table$output)
+    }
+    # long_table_per <- purrr::map(split(long_table, long_table$output), dplyr::select, -output)
+    wide_table_per <- purrr::map(long_table_per, tidyr::spread_, case, "value")
+
+    cal_results <-
+        purrr::map(wide_table_per,
+                   function(tbl) {
+                       per_wide_table <- tbl
+                       purrr::map(case_combn,
+                                  function(case_pair) {
+                                      per_wide_table_case <- dplyr::select(per_wide_table, dplyr::one_of(case_pair))
+                                      cal_results <- purrr::flatten_dbl(purrr::map2(per_wide_table_case[[case_pair[1]]],
+                                                                                    per_wide_table_case[[case_pair[2]]],
+                                                                                    fun))
+                                      result_name <- glue::glue('{fun_name}({case_pair[1]}, {case_pair[2]})')
+                                      cal_results_tbl <- dplyr::tibble(!!result_name := cal_results)
+                                      results_combn <- dplyr::bind_cols(per_wide_table, cal_results_tbl)
+                                  })
+                   }
+                   ) %>% purrr::flatten() %>% data.table::rbindlist() %>% dplyr::as_tibble()
+
+    return(cal_results)
+
+}
+# }}}
 
 ######################
 #  helper functions  #
