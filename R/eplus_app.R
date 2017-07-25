@@ -503,23 +503,25 @@ show_output <- function (data, state = NULL, group = NULL,
                                  "state",
                                  "long_table", "wide_table", "output_info")) {
 
-    library(shinyWidgets)
+    # library(shinyWidgets)
     library(shiny)
-    library(shinyTime)
-    library(shinythemes)
-    library(shinyBS)
-    library(shinyjqui)
-    library(rlang)
-    library(tidyverse)
-    library(dygraphs)
+    # library(shinyTime)
+    # library(shinythemes)
+    # library(shinyBS)
+    # library(shinyjqui)
+    # library(rlang)
+    # library(tidyverse)
+    # library(dygraphs)
     library(ggplot2)
-    library(plotly)
-    library(glue)
-    library(rclipboard)
-    library(shinyAce)
+    # library(plotly)
+    # library(glue)
+    # library(shinyAce)
+    # library(clipr)
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
+    assertthat::assert_that(assertthat::are_equal(length(group), 1L),
+                            msg = "'group' should be a single character string.")
     # Standardize input data
     data <- standardize_wide_table(data, exclude = group)
 
@@ -611,7 +613,6 @@ show_output <- function (data, state = NULL, group = NULL,
 
     # ui{{{
     ui <- bootstrapPage(
-        rclipboardSetup(),
         theme = shinythemes::shinytheme("lumen"),
         sidebarLayout(
             sidebarPanel(id = "coll_plot_var", multiple = TRUE, open = c("Time", "Variables"),
@@ -738,7 +739,11 @@ show_output <- function (data, state = NULL, group = NULL,
                 # Main panel{{{
                     tabsetPanel(type = "tabs",
                         tabPanel("R Code",
-                                 uiOutput("clip"),
+                                 textInput("data_name_prefix", label = "Data Name Prefix:", value = "data"),
+                                 actionButton("update_data_name_prefix", "Update"),
+                                 actionButton("copy_code", "Copy Code to Clipboard", icon = icon("clipboard")),
+                                 shinyWidgets::receiveSweetAlert("success_copy"),
+                                 tags$br(),
                                  aceEditor(outputId = "source_code", mode = "r",
                                            theme = "monokai", vimKeyBinding = TRUE,
                                            height = "600px", readOnly = TRUE,
@@ -888,6 +893,19 @@ show_output <- function (data, state = NULL, group = NULL,
         })
         # }}}
 
+        # Set reactive value of code action input{{{
+        data_name_prefix <- reactive({
+            data_name_prefix <- input$data_name_prefix
+            if (is.null(data_name_prefix)) {
+                return("data")
+            }
+            if (data_name_prefix == "") {
+                return("data")
+            }
+            return(data_name_prefix)
+        })
+        # }}}
+
         # Set reactive data{{{
         data_all <- reactiveValues()
 
@@ -921,9 +939,13 @@ show_output <- function (data, state = NULL, group = NULL,
             data_plot <- tidyr::drop_na(data_plot)
             return(data_plot)
         })
+        data_all$data_units <- reactive({
+            data_units <- purrr::flatten_chr(get_select(data_all$output_info(), "unit"))
+            return(data_units)
+        })
         data_all$source_code <- reactive({
             time_range = format(time_range(), "%F %X")
-            create_source_code(data_name = data_name,
+            create_source_code(data_name = data_name, data_name_prefix = data_name_prefix(),
                                group = group, col_datetime = col_datetime,
                                time_range = time_range, cases = case(),
                                outputs = data_all$output_info()[["output"]],
@@ -962,23 +984,43 @@ show_output <- function (data, state = NULL, group = NULL,
                        input$update_color,
                        input$update_facet),
             {
-                data_all$plot_ggplot <- ggplot_line(data = isolate(data_all$data_plot()),
-                                                x = col_datetime, y = "value",
-                                                group = isolate(plot_group()),
-                                                color = isolate(plot_color()),
-                                                facet = isolate(plot_facet()))
+                data_units <- isolate(data_all$data_units())
+                data_plot <- isolate(data_all$data_plot())
+                data_plot_splitted <- base::split(data_plot, data_plot[["unit"]])
 
-                data_all$plot_ggplot <- isolate(data_all$plot_ggplot) +
-                    theme(legend.position = "bottom",
-                          legend.background = element_rect(color = "black"),
-                          legend.key = element_rect(color = "gray"),
-                          strip.background = element_rect(fill = "white", color = "black"))
+                data_all$plot_ggplot <-
+                    purrr::map(names(data_plot_splitted),
+                               ~{
+                                   data_plot <- data_plot_splitted[[.x]]
+                                   p <- ggplot_line(data = data_plot,
+                                                    x = col_datetime, y = "value",
+                                                    group = isolate(plot_group()),
+                                                    color = isolate(plot_color()),
+                                                    facet = isolate(plot_facet()))
+                                   p <- p +
+                                        scale_x_datetime(name = "", breaks = scales::date_breaks("4 hour"),
+                                                         labels = scales::date_format("%b %d %Hh", tz = Sys.timezone()))
+                                        theme(legend.position = 'bottom',
+                                              legend.background = element_rect(color = 'black'),
+                                              legend.key = element_rect(color = 'gray'),
+                                              strip.background = element_rect(fill = 'white', color = 'black'))
 
+                                   if (all(length(units) > 1L, .x != units[length(units)])) {
+                                       p <- p +
+                                           theme(legend.position = 'none',
+                                                 axis.title.x = element_blank(),
+                                                 axis.text.x = element_blank(),
+                                                 axis.ticks.x = element_blank())
+                                   }
+                                   return(p)
+                               })
+
+                data_all$plot_ggplot <- do.call(cowplot::plot_grid, c(data_all$plot_ggplot, ncol = 1, align = "hv"))
                 output$ggplot <- renderPlot({data_all$plot_ggplot})
 
-                data_all$plot_plotly <- ggplotly(data_all$plot_ggplot) #%>%
+                data_all$plot_plotly <- plotly::ggplotly(data_all$plot_ggplot) #%>%
                     # layout(legend = list(x = 0.5, xanchor = "center", y = -0.25))
-                output$plotly <- renderPlotly({data_all$plot_plotly})
+                output$plotly <- plotly::renderPlotly({data_all$plot_plotly})
             }
         )
         # }}}
@@ -1003,7 +1045,7 @@ show_output <- function (data, state = NULL, group = NULL,
 
                 data_plot_splitted <- base::split(isolate(data_all$data_plot()),
                                                   isolate(data_all$data_plot())[["unit"]])
-                data_all$plot_dygraphs <- map(names(data_plot_splitted),
+                data_all$plot_dygraphs <- purrr::map(names(data_plot_splitted),
                                 ~{
                                     data_plot <- data_plot_splitted[[.x]]
                                     wide_table_splitted <- wide_table(data_plot)
@@ -1038,14 +1080,21 @@ show_output <- function (data, state = NULL, group = NULL,
         )
         # }}}
 
-        # Add clipboard buttons
-        output$clip <- renderUI({
-            rclipButton("clipbtn", "Copy to Clipboard", input$source_code, icon("clipboard"))
-        })
+        # Source code actions{{{
+        observeEvent(input$update_data_name_prefix,
+            {
+                updateAceEditor(session, "source_code", value = data_all$source_code())
+                updateTextInput(session, "data_name_prefix", value = isolate(data_name_prefix()))
+            }
+        )
+        observeEvent(input$copy_code,
+            {
+                clipr::write_clip(content = isolate(data_all$source_code()), object_type = "character")
+                shinyWidgets::sendSweetAlert("success_copy", title = "Success!", text = "Source Code has been successfully copied to clipboard", type = "success")
+            }
+        )
+        # }}}
 
-        observe({
-            updateAceEditor(session, "source_code", value = data_all$source_code())
-        })
         # # Debug{{{
         # output$source_code <- renderText({
         #     data_all$source_code()
@@ -1175,7 +1224,7 @@ parse_epat <- function (info) {
     # Create case names according to parameter names.
     case_names <- purrr::map2(param_id, param_value, ~paste0(.x, seq_along(.y)))
     case_names <- data.table::rbindlist(purrr::cross_n(case_names))
-    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
+    case_names <- purrr::map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
 
     # Get all combination of case values.
     param_value <- purrr::cross_n(param_value)
@@ -1351,8 +1400,8 @@ standardize_wide_table <- function (data, exclude = NULL) {
 
     # Check if all column names meet the EnergyPlus standard output name format.
     if (!is.null(exclude)) {
-        assertthat::assert_that(length(exclude) == 1L,
-                                msg = "'exlude' should be a single character string.")
+        # assertthat::assert_that(length(exclude) == 1L,
+        #                         msg = "'exlude' should be a single character string.")
         col_missing <- exclude[is.na(match(exclude, colnames(data)))]
         assertthat::assert_that(rlang::is_empty(col_missing),
                                 msg = paste0("Invalid 'exclude'. Could not find column ",
@@ -1393,8 +1442,8 @@ standardize_long_table <- function (data, exclude = NULL) {
 
     # Check if all column names meet the format.
     if (!is.null(exclude)) {
-        assertthat::assert_that(length(exclude) == 1L,
-                                msg = "'exlude' should be a single character string.")
+        # assertthat::assert_that(length(exclude) == 1L,
+        #                         msg = "'exlude' should be a single character string.")
         col_missing <- exclude[is.na(match(exclude, colnames(data)))]
         assertthat::assert_that(rlang::is_empty(col_missing),
                                 msg = paste0("Invalid 'exclude'. Could not find column ",
@@ -1526,78 +1575,86 @@ if_then_else <- function (.if, .then, .else) {
 }
 # }}}
 # create_source_code{{{
-create_source_code <- function (data_name, group, col_datetime, time_range,
+create_source_code <- function (data_name, data_name_prefix, group, col_datetime, time_range,
                                 cases, outputs, plot_group, plot_color, plot_facet) {
     code_data_check <-
         glue("
-             # DATA MUNIPULATION
+             # OUTPUT SELECTION
              ## Check if data meets the requirements.
-             data <- standardize_wide_table({data_name}, exclude = {if_then_else(is.null(group), 'NULL', c_name(group))})\n
+             {data_name_prefix}_wide_table <- standardize_wide_table({data_name}, exclude = {if_then_else(is.null(group), 'NULL', c_name(group))})\n
              ")
 
     code_data_time_filtered <-
         glue("
              ## Filter data according to selected time range.
-             data_time_filtered <- dplyr::filter(data,
+             {data_name_prefix}_time_filtered <- dplyr::filter({data_name_prefix}_wide_table,
                                                  {col_datetime} >= '{time_range[1]}' &
                                                  {col_datetime} <  '{time_range[2]}')\n
              ")
 
     code_data_group_filtered <-
         glue("
-             data_group_filtered <- dplyr::filter(data_time_filtered,
+             {data_name_prefix}_group_filtered <- dplyr::filter({data_name_prefix}_time_filtered,
                                                   {group} %in% {glue('c({c_name(cases)})')})\n
              ")
 
     code_name_before <- if_then_else(rlang::is_empty(code_data_group_filtered),
-                                     'data_time_filtered', 'data_group_filtered')
+                                     glue('{data_name_prefix}_time_filtered'),
+                                     glue('{data_name_prefix}_group_filtered'))
     code_data_selected <-
         glue("
              ## Filter data according to selected outputs.
-             data_selected <- dplyr::select({code_name_before}, {glue(if_then_else(is.null(group), NULL, group), ', ')}{col_datetime},
-             {paste0('    `', outputs, '`', collapse = ',\n')})\n
+             {data_name_prefix}_selected <- dplyr::select({code_name_before}, {if_then_else(is.null(group), '', glue({group}, ', '))}{col_datetime},
+             {paste0('    `', outputs, '`', collapse = ',\n')})\n\n
              ")
 
     code_data_ggplot <-
         glue("
+             # PLOT SELECTED OUTPUTS USING GGPLOT2
              ## Gather data for use in `ggplot2`.
-             data_long_table <- tidyr::gather(data_selected, key = output, value = value,
-                                              {glue(if_then_else(is.null(group), NULL, group), ', ')}-{col_datetime})\n\n
+             ### Get output info of selected data.
+             {data_name_prefix}_output_info <- eplusr::get_output_info({data_name_prefix}_selected)
+             ### Change selected data into long table format.
+             {data_name_prefix}_long_table <- tidyr::gather({data_name_prefix}_selected, key = output, value = value,
+                                              {if_then_else(is.null(group), '', glue('-', {group}, ', '))}-{col_datetime})
+             ### Join output info data and long table data.
+             {data_name_prefix}_full_join <- dplyr::full_join({data_name_prefix}_long_table, {data_name_prefix}_output_info)
+             ### Delete rows containing NAs.
+             {data_name_prefix} <- tidyr::drop_na({data_name_prefix}_full_join)\n
              ")
 
     code_ggplot_init <-
         glue("
-             # PLOT SELECTED OUTPUTS USING GGPLOT2
              ## Initialize ggplot object
-             p <- ggplot(data_long_table, aes(x = {col_datetime}, y = value))\n
+             p_{data_name_prefix} <- ggplot({data_name_prefix}, aes(x = {col_datetime}, y = value))\n
              ")
 
     code_ggplot_line <-
         glue("
              ## Add line plot
-             p <- p + geom_line(size = 1)\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + geom_line(size = 1)\n
              ")
 
     code_ggplot_color <-
         glue("
              ## Add color aes.
-             p <- p + aes(color = {plot_color})\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + aes(color = {plot_color})\n
              ")
     code_ggplot_group <-
         glue("
              ## Add group aes.
-             p <- p + aes(group = {plot_group})\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + aes(group = {plot_group})\n
              ")
     code_ggplot_facet <-
         glue("
              ## Add facets.
-             p <- p + facet_grid(facets = {plot_facet}, scales = 'free')\n
+             p_{data_name_prefix} <- p_{data_name_prefix} + facet_grid(facets = {plot_facet}, scales = 'free')\n
              ")
 
     code_ggplot_theme <-
         glue("
              ## Set theme
-             p <- p + theme_bw() +
+             p_{data_name_prefix} <- p_{data_name_prefix} + theme_bw() +
                  theme(legend.position = 'bottom',
                        legend.background = element_rect(color = 'black'),
                        legend.key = element_rect(color = 'gray'),
