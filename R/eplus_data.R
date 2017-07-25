@@ -486,7 +486,8 @@ add_time <- function (data, base = NULL, new = NULL, step,
 #' @importFrom purrr map_lgl
 #' @export
 # resample{{{1
-resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALSE) {
+resample <- function (data, base = NULL, new = NULL, step = "month",
+                      drop = FALSE, fun = mean, ...) {
 
     if (is.null(base)) {
         base <- check_date_col(data)
@@ -774,6 +775,28 @@ bias <- function (x, y) {
   return(bias)
 }
 # }}}1
+
+#' Calculate Mean Radiant Temperature (MRT).
+#'
+#' \code{tg_to_tr} returns
+#'
+#' @param tg Global Temperature
+#' @param ta Mean air temperature measured at the same height of \code{tg}.
+#' @param d The dimeter of the globe.
+#' @param e The emissivity of the globe.
+#' @param v The air velocity.
+#' @return Calculated mean radiant temperature.
+#' @export
+#'
+# tg_to_tr{{{
+tg_to_tr <- function (tg, ta, d = 0.038, e = 0.9, v = 0.01) {
+    # Variables and constants used to calculate mean radiant temperature
+    sigma <- 5.67*(10^-8)
+    hc <- 6.32*(d^-0.4)*(v^0.5)
+    tr <- (hc/(sigma*e)*(tg-ta)+(tg+273.15)^4)^0.25-273.15
+    return(tr)
+}
+# }}}
 
 #' Apply a function between groups
 #'
