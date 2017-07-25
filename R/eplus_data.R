@@ -513,7 +513,7 @@ resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALS
     if (assertthat::not_empty(non_num_cols)) {
         if (drop) {
             warning("Non-numeric column found: ",
-                    paste0("'", non_num_cols, "'", collapse = ", "),
+                    paste0(sQuote(non_num_cols), collapse = ", "),
                     ". It/They will be dropped during resampling. ",
                     "Please set 'drop' to FALSE argument if you want to keep it/them.",
                     call. = FALSE)
