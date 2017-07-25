@@ -503,20 +503,20 @@ show_output <- function (data, state = NULL, group = NULL,
                                  "state",
                                  "long_table", "wide_table", "output_info")) {
 
-    library(shinyWidgets)
+    # library(shinyWidgets)
     library(shiny)
-    library(shinyTime)
-    library(shinythemes)
-    library(shinyBS)
-    library(shinyjqui)
-    library(rlang)
-    library(tidyverse)
-    library(dygraphs)
+    # library(shinyTime)
+    # library(shinythemes)
+    # library(shinyBS)
+    # library(shinyjqui)
+    # library(rlang)
+    # library(tidyverse)
+    # library(dygraphs)
     library(ggplot2)
-    library(plotly)
-    library(glue)
-    library(shinyAce)
-    library(clipr)
+    # library(plotly)
+    # library(glue)
+    # library(shinyAce)
+    # library(clipr)
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
@@ -939,6 +939,10 @@ show_output <- function (data, state = NULL, group = NULL,
             data_plot <- tidyr::drop_na(data_plot)
             return(data_plot)
         })
+        data_all$data_units <- reactive({
+            data_units <- purrr::flatten_chr(get_select(data_all$output_info(), "unit"))
+            return(data_units)
+        })
         data_all$source_code <- reactive({
             time_range = format(time_range(), "%F %X")
             create_source_code(data_name = data_name, data_name_prefix = data_name_prefix(),
@@ -980,23 +984,43 @@ show_output <- function (data, state = NULL, group = NULL,
                        input$update_color,
                        input$update_facet),
             {
-                data_all$plot_ggplot <- ggplot_line(data = isolate(data_all$data_plot()),
-                                                x = col_datetime, y = "value",
-                                                group = isolate(plot_group()),
-                                                color = isolate(plot_color()),
-                                                facet = isolate(plot_facet()))
+                data_units <- isolate(data_all$data_units())
+                data_plot <- isolate(data_all$data_plot())
+                data_plot_splitted <- base::split(data_plot, data_plot[["unit"]])
 
-                data_all$plot_ggplot <- isolate(data_all$plot_ggplot) +
-                    theme(legend.position = "bottom",
-                          legend.background = element_rect(color = "black"),
-                          legend.key = element_rect(color = "gray"),
-                          strip.background = element_rect(fill = "white", color = "black"))
+                data_all$plot_ggplot <-
+                    purrr::map(names(data_plot_splitted),
+                               ~{
+                                   data_plot <- data_plot_splitted[[.x]]
+                                   p <- ggplot_line(data = data_plot,
+                                                    x = col_datetime, y = "value",
+                                                    group = isolate(plot_group()),
+                                                    color = isolate(plot_color()),
+                                                    facet = isolate(plot_facet()))
+                                   p <- p +
+                                        scale_x_datetime(name = "", breaks = scales::date_breaks("4 hour"),
+                                                         labels = scales::date_format("%b %d %Hh", tz = Sys.timezone()))
+                                        theme(legend.position = 'bottom',
+                                              legend.background = element_rect(color = 'black'),
+                                              legend.key = element_rect(color = 'gray'),
+                                              strip.background = element_rect(fill = 'white', color = 'black'))
 
+                                   if (all(length(units) > 1L, .x != units[length(units)])) {
+                                       p <- p +
+                                           theme(legend.position = 'none',
+                                                 axis.title.x = element_blank(),
+                                                 axis.text.x = element_blank(),
+                                                 axis.ticks.x = element_blank())
+                                   }
+                                   return(p)
+                               })
+
+                data_all$plot_ggplot <- do.call(cowplot::plot_grid, c(data_all$plot_ggplot, ncol = 1, align = "hv"))
                 output$ggplot <- renderPlot({data_all$plot_ggplot})
 
-                data_all$plot_plotly <- ggplotly(data_all$plot_ggplot) #%>%
+                data_all$plot_plotly <- plotly::ggplotly(data_all$plot_ggplot) #%>%
                     # layout(legend = list(x = 0.5, xanchor = "center", y = -0.25))
-                output$plotly <- renderPlotly({data_all$plot_plotly})
+                output$plotly <- plotly::renderPlotly({data_all$plot_plotly})
             }
         )
         # }}}
@@ -1021,7 +1045,7 @@ show_output <- function (data, state = NULL, group = NULL,
 
                 data_plot_splitted <- base::split(isolate(data_all$data_plot()),
                                                   isolate(data_all$data_plot())[["unit"]])
-                data_all$plot_dygraphs <- map(names(data_plot_splitted),
+                data_all$plot_dygraphs <- purrr::map(names(data_plot_splitted),
                                 ~{
                                     data_plot <- data_plot_splitted[[.x]]
                                     wide_table_splitted <- wide_table(data_plot)
@@ -1200,7 +1224,7 @@ parse_epat <- function (info) {
     # Create case names according to parameter names.
     case_names <- purrr::map2(param_id, param_value, ~paste0(.x, seq_along(.y)))
     case_names <- data.table::rbindlist(purrr::cross_n(case_names))
-    case_names <- map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
+    case_names <- purrr::map_chr(seq(1:nrow(case_names)), ~paste(case_names[.x], collapse = "_"))
 
     # Get all combination of case values.
     param_value <- purrr::cross_n(param_value)
