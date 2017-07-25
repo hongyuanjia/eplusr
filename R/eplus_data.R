@@ -523,6 +523,8 @@ resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALS
             non_num <- rlang::syms(non_num_cols)
             data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(non_num), rlang::UQS(new_name))
         }
+    } else {
+        data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(new_name))
     }
 
     data_agg <- dplyr::summarise_all(data_thicken, mean)
