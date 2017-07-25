@@ -223,7 +223,7 @@ shinyUI(tagList(
 
         # page_plotting{{{2
         shinyjs::hidden(
-            div(id = "div_page_plotting",
+            div(id = "div_page_plotting"
             )
         ),
         # }}}2
