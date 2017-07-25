@@ -457,36 +457,26 @@ energyplus_exe <- function (eplus_dir = find_eplus(),
 # run_eplus: A function to run EnergyPlus in R.
 # run_eplus
 # {{{1
-run_eplus <- function (input, weather, eplus_dir = find_eplus(),
-                       output_dir = NULL, output_prefix = NULL,
-                       csv = TRUE, echo = FALSE,
-                       run = "exe", ver = NULL) {
+run_eplus <- function (input, weather, output_dir = NULL, output_prefix = NULL,
+                       csv = TRUE, echo = FALSE, run = c("exe", "bat"),
+                       eplus_dir = NULL, eplus_ver = NULL) {
 
     # Backup the original working directory.
     ori_wd <- getwd()
     # Set the working directory as the same folder of input file.
     setwd(dirname(input))
+    # Avoid case sensitive match in `identical`.
+    input <- normalizePath(input, winslash = "/", mustWork = FALSE)
+    weather <- normalizePath(weather, winslash = "/", mustWork = FALSE)
+    input_lines <- read_idf_lines(input)
+    run <- rlang::arg_match(run)
 
-    # 'eplus_dir' checking
+    # 'eplus_dir' and 'eplus_ver' checking
     # {{{2
-    # If EnergyPlus version has been specified.
-    if (!is.null(ver)) {
-        # Case 1. But 'eplus_dir' is not given
-        if (missing(eplus_dir)) {
-            eplus_dir <- find_eplus(ver = ver)
-            ver <- attr(eplus_dir, "ver")
-        # Case 2. And 'eplus_dir' is given.
-        } else {
-            energyplus_exe <- normalizePath(file.path(eplus_dir, "energyplus.exe"))
-            if (!file.exists(energyplus_exe)) {
-                stop("Invalid EnergyPlus path. Please change 'eplus_dir'.", call. = FALSE)
-            } else {
-            ver <- get_idd_ver(eplus_dir)
-            warning("Argument 'ver' will be ignored as 'eplus_dir' has been ",
-                    "specifed manually.", call. = FALSE)
-            }
-        }
-    }
+    eplus_dir_ver <- check_eplus_dir_ver(eplus_dir, eplus_ver)
+    eplus_dir <- eplus_dir_ver[["eplus_dir"]]
+    eplus_ver <- eplus_dir_ver[["eplus_ver"]]
+    energyplus <- normalizePath(file.path(eplus_dir, "energyplus.exe"), mustWork = TRUE)
     # }}}2
 
     # File existing checking
@@ -501,9 +491,9 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
 
     # Input file version and EnergyPlus verion match checking
     # {{{2
-    idf_ver <- paste0(get_idf_ver(readr::read_lines(input)), ".0")
-    if (!identical(idf_ver, ver)) {
-        warning(stringr::str_interp("The input model ${input} indicates an EnergyPlus verion of ${idf_ver} but is simulated using EnergyPlus ${ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
+    idf_ver <- paste0(get_idf_ver(input_lines), ".0")
+    if (!identical(idf_ver, eplus_ver)) {
+        warning(glue::glue("The input model {input} indicates an EnergyPlus verion of {idf_ver} but is simulated using EnergyPlus {eplus_ver}. Unexpected results may occur. It is recommended to use 'IDFVersionUpdater' distributed with EnergyPlus before simulation."), call. = FALSE)
     }
     # }}}2
 
@@ -629,9 +619,6 @@ run_eplus <- function (input, weather, eplus_dir = find_eplus(),
                        epmacro = epmacro, expand_obj = TRUE, readvars = readvars,
                        annual = FALSE, design_day = FALSE, idd = NULL,
                        legacy = FALSE, echo = echo)
-
-    } else {
-        stop("Argument 'run' should be one of c('exe', 'bat').", call. = FALSE)
     }
     # }}}2
 
@@ -761,7 +748,8 @@ run_multi <- function (models, weathers, output_dirs, output_prefixes, case_name
     weather_exts <- tools::file_ext(weathers)
     # }}}2
 
-    # get 'n'{{{2
+    # Get 'n'
+    # {{{2
     # Get total job number.
     total <- length(models)
     if (is.null(n)) {
