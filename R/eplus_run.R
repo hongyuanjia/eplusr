@@ -511,12 +511,6 @@ run_eplus <- function (input, weather, output_dir = NULL, output_prefix = NULL,
     }
     # }}}2
 
-    # Copy files used in 'Schedule:File' to output dir.
-    # {{{2
-    input_lines <- read_idf_lines(input)
-    copy_external_file(input_lines)
-    # }}}2
-
     # Input file renaming
     # {{{2
     # If output directory is given,
@@ -575,6 +569,11 @@ run_eplus <- function (input, weather, output_dir = NULL, output_prefix = NULL,
             eplus_out <- file.path(output_dir, output_prefix)
         }
 
+        # Copy files used in 'Schedule:File' to output dir.
+        # {{{3
+        copy_external_file(input_lines, output_dir = eplus_out)
+        # }}}3
+
         eplus_wthr <- weather
 
         # Who will run EnergyPlus Without weather file?
@@ -595,13 +594,19 @@ run_eplus <- function (input, weather, output_dir = NULL, output_prefix = NULL,
                     max_col = max_col, conv_eso = conv_eso, csv = csv,
                     echo = echo)
     # }}}2
+
     # Use energyplus, i.e. "energyplus.exe", to run EnergyPlus.
     # {{{2
-    } else if (run == "exe"){
+    } else {
         idf <- input
         if (is.null(output_dir)) {
             output_dir <- dirname(input)
         }
+
+        # Copy files used in 'Schedule:File' to output dir.
+        # {{{3
+        copy_external_file(input_lines, output_dir = output_dir)
+        # }}}3
 
         if (is.null(output_prefix)) {
             output_prefix <- tools::file_path_sans_ext(basename(input))
