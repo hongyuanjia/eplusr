@@ -527,7 +527,8 @@ resample <- function (data, base = NULL, new = NULL, step = "month", drop = FALS
         data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(new_name))
     }
 
-    data_agg <- dplyr::summarise_all(data_thicken, mean)
+    fun <- purrr::as_function(fun, ...)
+    data_agg <- dplyr::summarise_all(data_thicken, fun)
     data_agg <- dplyr::ungroup(data_agg)
 
     return(data_agg)
