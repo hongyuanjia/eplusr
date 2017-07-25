@@ -532,24 +532,24 @@ run_eplus <- function (input, weather, output_dir = NULL, output_prefix = NULL,
         # (a) and also is output prefix.
         if (!is.null(output_prefix)) {
             new_name_idf <- file.path(output_dir, paste0(output_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, "(", output_prefix, ").", eplus_wthr_ext))
+            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, ".", eplus_wthr_ext))
 
         # (b) but output_prefix is not given.
         } else {
             new_name_idf <- file.path(output_dir, paste0(input_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, "(", input_prefix, ").", eplus_wthr_ext))
+            new_name_wthr <- file.path(output_dir, paste0(wthr_prefix, ".", eplus_wthr_ext))
         }
     # If output directory is not given,
     } else {
         # (a) but output prefix is given
         if (!is.null(output_prefix)) {
             new_name_idf <- file.path(dirname(input), paste0(output_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, "(", output_prefix, ").", eplus_wthr_ext))
+            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, ".", eplus_wthr_ext))
 
         # (b) neither is output prefix.
         } else {
             new_name_idf <- file.path(dirname(input), paste0(input_prefix, ".", eplus_in_ext))
-            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, "(", input_prefix, ").", eplus_wthr_ext))
+            new_name_wthr <- file.path(dirname(input), paste0(wthr_prefix, ".", eplus_wthr_ext))
         }
     }
     if (!identical(new_name_idf, input)) {
