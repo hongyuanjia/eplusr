@@ -8,6 +8,9 @@
 
     op <- options()
 
+    # For use `sQuote` and `sQuote`
+    options(useFancyQuotes = FALSE)
+
     op.eplusr <- list(
        eplusr.temp_dir = normalizePath(file.path(tempdir(), "eplusr"), mustWork = FALSE),
        eplusr.eplus_dir = eplus_info_latest[["path"]],
