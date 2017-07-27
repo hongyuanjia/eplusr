@@ -27,3 +27,19 @@ to_eplus_time <- function (x) {
     return(eplus_time)
 }
 # }}}
+
+# yhour {{{
+yhour <- function (x) {
+    assertthat::assert_that(assertthat::is.time(x) || assertthat::is.date(x))
+
+    year <- lubridate::year(x)
+    tz <- lubridate::tz(x)
+
+    diffs <- difftime(x, as.POSIXct(paste0(year, "-01-01 00:00:00"), tz = tz),
+                      units = "hour")
+
+    diff_hour <- as.numeric(diffs)
+
+    return(diff_hour)
+}
+# }}}
