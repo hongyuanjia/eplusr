@@ -629,7 +629,7 @@ show_output <- function (data, state = NULL, group = NULL,
                             ),
 
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                timeInput("time_s", label = "Start Time:",
+                                shinyTime::timeInput("time_s", label = "Start Time:",
                                           value = init_time_start, seconds = FALSE)
                             )
                         ),
@@ -639,7 +639,7 @@ show_output <- function (data, state = NULL, group = NULL,
                                           value = init_date_end, min = date_end_min, max = date_end_max)
                             ),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                timeInput("time_e", label = "End Time:",
+                                shinyTime::timeInput("time_e", label = "End Time:",
                                           value = init_time_end, seconds = FALSE)
                             )
                         ),
@@ -744,7 +744,7 @@ show_output <- function (data, state = NULL, group = NULL,
                                  actionButton("copy_code", "Copy Code to Clipboard", icon = icon("clipboard")),
                                  shinyWidgets::receiveSweetAlert("success_copy"),
                                  tags$br(),
-                                 aceEditor(outputId = "source_code", mode = "r",
+                                 shinyAce::aceEditor(outputId = "source_code", mode = "r",
                                            theme = "monokai", vimKeyBinding = TRUE,
                                            height = "600px", readOnly = TRUE,
                                            autoComplete = "live")
@@ -757,10 +757,10 @@ show_output <- function (data, state = NULL, group = NULL,
                                  # textOutput("debug3")
                         ),
                         tabPanel("ggplot2",
-                                 jqui_resizabled(plotOutput("ggplot"))
+                                 shinyjqui::jqui_resizabled(plotOutput("ggplot"))
                         ),
                         tabPanel("plotly",
-                                 jqui_resizabled(plotlyOutput("plotly"))
+                                 shinyjqui::jqui_resizabled(plotly::plotlyOutput("plotly"))
                         ),
                         tabPanel("dygraph",
                                  tags$br(),
@@ -1000,14 +1000,14 @@ show_output <- function (data, state = NULL, group = NULL,
                                    p <- p +
                                         scale_x_datetime(name = "", breaks = scales::date_breaks("4 hour"),
                                                          labels = scales::date_format("%b %d %Hh", tz = Sys.timezone()))
-                                        theme(legend.position = 'bottom',
-                                              legend.background = element_rect(color = 'black'),
-                                              legend.key = element_rect(color = 'gray'),
-                                              strip.background = element_rect(fill = 'white', color = 'black'))
+                                        theme(legend.position = "bottom",
+                                              legend.background = element_rect(color = "black"),
+                                              legend.key = element_rect(color = "gray"),
+                                              strip.background = element_rect(fill = "white", color = "black"))
 
-                                   if (all(length(units) > 1L, .x != units[length(units)])) {
+                                   if (all(length(data_units) > 1L, .x != data_units[length(data_units)])) {
                                        p <- p +
-                                           theme(legend.position = 'none',
+                                           theme(legend.position = "none",
                                                  axis.title.x = element_blank(),
                                                  axis.text.x = element_blank(),
                                                  axis.ticks.x = element_blank())
@@ -1051,15 +1051,15 @@ show_output <- function (data, state = NULL, group = NULL,
                                     wide_table_splitted <- wide_table(data_plot)
                                     xts_splitted <- wide_to_xts(wide_table_splitted, short_name = TRUE)
                                     plot_dygraph <-
-                                        dygraph(xts_splitted, group = "dygraphs",
+                                        dygraphs::dygraph(xts_splitted, group = "dygraphs",
                                                 ylab = paste0("[",as.character(.x), "]")) %>%
-                                        dyRangeSelector() %>%
-                                        dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
-                                        dyOptions(useDataTimezone = TRUE, axisLineWidth = 1.5) %>%
-                                        dyLegend(width = 400, show = "follow", labelsSeparateLines = TRUE) %>%
+                                        dygraphs::dyRangeSelector() %>%
+                                        dygraphs::dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
+                                        dygraphs::dyOptions(useDataTimezone = TRUE, axisLineWidth = 1.5) %>%
+                                        dygraphs::dyLegend(width = 400, show = "follow", labelsSeparateLines = TRUE) %>%
                                         # dyLegend(width = 400, show = "follow", labelsSeparateLines = TRUE, labelsDiv = "dygraphs_legend") %>%
-                                        dyCrosshair(direction = "vertical") %>%
-                                        dyCSS(system.file("css", "dygraphs.css", package = "eplusr"))
+                                        dygraphs::dyCrosshair(direction = "vertical") %>%
+                                        dygraphs::dyCSS(system.file("css", "dygraphs.css", package = "eplusr"))
                                     return(plot_dygraph)
                                 })
 
@@ -1071,7 +1071,7 @@ show_output <- function (data, state = NULL, group = NULL,
                         my_i <- i
                         # plotname <- paste0("Unit: ", data$units[my_i])
 
-                        output[[ids_dygraph[my_i]]] <- renderDygraph({
+                        output[[ids_dygraph[my_i]]] <- dygraphs::renderDygraph({
                             isolate(data_all$plot_dygraphs)[[my_i]]
                         })
                     })
@@ -1083,7 +1083,7 @@ show_output <- function (data, state = NULL, group = NULL,
         # Source code actions{{{
         observeEvent(input$update_data_name_prefix,
             {
-                updateAceEditor(session, "source_code", value = data_all$source_code())
+                shinyAce::updateAceEditor(session, "source_code", value = data_all$source_code())
                 updateTextInput(session, "data_name_prefix", value = isolate(data_name_prefix()))
             }
         )
