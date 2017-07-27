@@ -29,14 +29,24 @@ to_eplus_time <- function (x) {
 # }}}
 
 # yhour {{{
-yhour <- function (x) {
+x <- solar_data$datetime
+yhour <- function (x, one_year = FALSE, no_leap = FALSE) {
     assertthat::assert_that(assertthat::is.time(x) || assertthat::is.date(x))
 
-    year <- lubridate::year(x)
+    if (one_year) {
+        year <- min(lubridate::year(x))
+    } else {
+        year <- lubridate::year(x)
+    }
+
     tz <- lubridate::tz(x)
 
     diffs <- difftime(x, as.POSIXct(paste0(year, "-01-01 00:00:00"), tz = tz),
                       units = "hour")
+
+    if (no_leap && lubridate::leap_year(year)) {
+        diffs[diffs > (24*(31+28))] <- (diffs[diffs > (24*(31+28))] - 24L)
+    }
 
     diff_hour <- as.numeric(diffs)
 
