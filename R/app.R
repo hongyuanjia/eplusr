@@ -503,20 +503,8 @@ show_output <- function (data, state = NULL, group = NULL,
                                  "state",
                                  "long_table", "wide_table", "output_info")) {
 
-    # library(shinyWidgets)
     library(shiny)
-    # library(shinyTime)
-    # library(shinythemes)
-    # library(shinyBS)
-    # library(shinyjqui)
-    # library(rlang)
-    # library(tidyverse)
-    # library(dygraphs)
     library(ggplot2)
-    # library(plotly)
-    # library(glue)
-    # library(shinyAce)
-    # library(clipr)
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
