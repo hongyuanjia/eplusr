@@ -493,6 +493,10 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
         base <- check_date_col(data)
     }
 
+    if (is.null(new)) {
+        new <- base
+    }
+
     data_thicken <- add_time(data = data, base = base, new = new, step = step)
 
     # Cause `add_time` always add the new column as the last column.
