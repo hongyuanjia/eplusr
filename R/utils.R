@@ -29,7 +29,6 @@ to_eplus_time <- function (x) {
 # }}}
 
 # yhour {{{
-x <- solar_data$datetime
 yhour <- function (x, one_year = FALSE, no_leap = FALSE) {
     assertthat::assert_that(assertthat::is.time(x) || assertthat::is.date(x))
 
