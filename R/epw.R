@@ -11,11 +11,11 @@ read_epw <- function(file) {
 # read_epw_data{{{
 read_epw_data <- function (epw_lines) {
     data_regex <- stringr::regex("
-        ^\\d{4},               # year
-        ([1-9]|1[0-2]),        # month
-        ([1-9]|2[0-9]|3[0-1]), # day
-        ([0-9]|1[0-9]|2[0-4]), # hour
-        ([0-9]|5[0-9]),        # minute
+        ^\\d{4},                   # year
+        ([1-9]|1[0-2]),            # month
+        ([1-9]|[1-2][0-9]|3[0-1]), # day
+        ([0-9]|1[0-9]|2[0-4]),     # hour
+        ([0-9]|5[0-9]),            # minute
         ", comments = TRUE
     )
     data_lines <- stringr::str_subset(epw_lines, data_regex)
