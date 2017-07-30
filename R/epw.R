@@ -31,8 +31,8 @@ read_epw_data <- function (epw_lines) {
     data_lines <- epw_lines[data_line_idx]
     data_line <- paste0(data_lines, collapse = "\n")
 
-    colnames <- c("year", "month", "day", "hour", "minute", "source", "drybulb",
-                  "dewpoint", "relhum", "atmos_pressure", "ET_hor_rad",
+    colnames <- c("year", "month", "day", "hour", "minute", "source", "dry_bulb",
+                  "dew_point", "rel_hum", "atmos_pressure", "ET_hor_rad",
                   "ET_dir_nor_rad", "hor_zir_sky", "glo_hor_rad", "dir_nor_rad",
                   "dif_hor_rad", "glo_hor_illum", "dir_nor_illu", "dif_hor_illum",
                   "zen_lum", "wind_dir", "wind_spd", "tot_sky_cvr", "opaq_sky_cvr",
