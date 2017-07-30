@@ -141,7 +141,7 @@ add_time <- function (data, base = NULL, new = NULL, step,
                       toward = c("up", "down", "center"), one_year = FALSE) {
 
     # TODO: Add checking for invalid step such as '600 secs'.
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     if (is.null(base)) {
         base <- check_date_col(data)
     }

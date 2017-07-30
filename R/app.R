@@ -1275,7 +1275,7 @@ get_output_info <- function (wide_table) {
 # }}}
 # get_select{{{
 get_select <- function (data, cols) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
 
     # Find the column with classes of "character" or "factor"
     classes <- purrr::map(data, class)
