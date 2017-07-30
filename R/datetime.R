@@ -138,7 +138,8 @@ yhour <- function (x, one_year = FALSE, no_leap = FALSE) {
 # add_time
 # add_time{{{1
 add_time <- function (data, base = NULL, new = NULL, step,
-                      toward = c("up", "down", "center")) {
+                      toward = c("up", "down", "center"),
+                      no_leap = FALSE) {
 
     # TODO: Add checking for invalid step such as '600 secs'.
     assertthat::assert_that(is.data.frame(data))
@@ -161,6 +162,13 @@ add_time <- function (data, base = NULL, new = NULL, step,
                down = dplyr::mutate(data, !!new := lubridate::floor_date(datetimes, unit = step)),
                center = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
                )
+
+    if (no_leap) {
+        datetime_thicken <- data_thicken[[new]]
+        is_leap_day <- is_leap_day(datetime_thicken)
+        datetime_thicken[is_leap_day] <- datetime_thicken[is_leap_day] + lubridate::days(1)
+        data_thicken[[new]] <- datetime_thicken
+    }
 
     if (identical(new, base)) {
         message("Column '", new, "' has been replaced with new timestep of '",
