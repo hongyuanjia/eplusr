@@ -131,5 +131,10 @@ tbl_to_chr <- function (tbl) {
     return(chr)
 }
 # }}}
+# print.epw {{{
+print.epw <- function (epw) {
+    city <- tidyr::unite(epw$location, city, city, state, country, sep = ", ")$city
+    cat("Location:", city, "\n")
+    epw$data
 }
 # }}}
