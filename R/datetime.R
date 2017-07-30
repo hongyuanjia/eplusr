@@ -110,6 +110,74 @@ yhour <- function (x, one_year = FALSE, no_leap = FALSE) {
 }
 # }}}
 
+#' Add a padding time column for further aggregation.
+#'
+#' \code{add_time} adds a padding time column in a data.frame for further easy
+#' data aggregation. It can also replace the datetime that is (year+1)-01-01
+#' with (year)-12-31.
+#'
+#' @param data A data frame containing at least one datetime column.
+#' @param base A character indicates the name of datetime column.  If not given,
+#' it will be auto-detected.
+#' @param step The timestep of the added datetime variable, which should be
+#' higher than the interval of the input datetime variable. If 'NULL', it will
+#' be one level higher than the interval of the input datetime variable. It can
+#' also be an integer indicates the interval of minutes. In conclusion,
+#' 'interval' should be a number or one of c("year", "quarter", "month", "week",
+#' "yday", "mday", "wday", "day", "date", "hour", "min", "second").
+#' @param new The column name of the added variable. If 'NULL' it will be
+#' the name of the original datetime variable with the interval name added to
+#' it, separeted by an underscore.
+#' @param one_year If TRUE, the (year+1)-01-01 will be replaced with
+#' (year)-12-31.
+#' @importFrom lubridate ceiling_date floor_date round_date
+#' @importFrom stringr str_replace_all
+#' @importFrom rlang arg_match
+#' @importFrom dplyr mutate
+#' @export
+# add_time
+# add_time{{{1
+add_time <- function (data, base = NULL, new = NULL, step,
+                      toward = c("up", "down", "center"), one_year = FALSE) {
+
+    # TODO: Add checking for invalid step such as '600 secs'.
+    check_df(data)
+    if (is.null(base)) {
+        base <- check_date_col(data)
+    }
+    datetimes <- data[[base]]
+
+    if (one_year) {
+        datetimes <- one_year(datetimes)
+    }
+
+    if(is.null(new)) {
+        new <- paste0(base, "_", stringr::str_replace_all(step, "\\s", ""))
+    } else {
+        new <- stringr::str_replace_all(new, "\\s", "")
+    }
+
+    toward <- rlang::arg_match(toward)
+
+    data_thicken <-
+        switch(toward,
+               up = dplyr::mutate(data, !!new := lubridate::ceiling_date(datetimes, unit = step)),
+               down = dplyr::mutate(data, !!new := lubridate::floor_date(datetimes, unit = step)),
+               center = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
+               )
+
+    if (identical(new, base)) {
+        message("Column '", new, "' has been replaced with new timestep of '",
+                step, "'.")
+    } else {
+        message("A new column named '", new, "' with step '", step,
+                "' has been added based on column '", base, "'.")
+    }
+
+    return(data_thicken)
+}
+# }}}1
+
 # has_leap_day {{{
 has_leap_day <- function (x) {
     assertthat::assert_that(assertthat::is.time(x) || assertthat::is.date(x))
