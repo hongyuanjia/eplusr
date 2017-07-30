@@ -430,8 +430,15 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
         new <- base
     }
 
-    data_thicken <- add_time(data = data, base = base, new = new, step = step,
-                             toward = toward)
+    # If the original datetime object does not have leap day, then the added
+    # padding column should not neither, and vice versa.
+    if (!has_leap_day(data[[base]])) {
+        data_thicken <- add_time(data = data, base = base, new = new, step = step,
+                                 toward = toward, no_leap = TRUE)
+    } else {
+        data_thicken <- add_time(data = data, base = base, new = new, step = step,
+                                 toward = toward, no_leap = FALSE)
+    }
 
     # Cause `add_time` always add the new column as the last column.
     if (is.null(new)) {
