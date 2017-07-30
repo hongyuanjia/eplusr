@@ -32,7 +32,7 @@
 # {{{1
 col_names <- function (data, pattern = ".*", regex = TRUE,
                        ignore_case = TRUE, invert = FALSE) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
 
     name <- colnames(data)
 
@@ -87,7 +87,7 @@ col_names <- function (data, pattern = ".*", regex = TRUE,
 # {{{1
 col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
                         ignore_case = TRUE, invert = FALSE) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     # If no 'col' given, return the input data as it is.
@@ -134,7 +134,7 @@ col_select <- function (data, col = NULL, by = NULL, regex = TRUE,
 # row_select
 # {{{1
 row_select <- function(data, based_col = "Variable", row_pattern = ""){
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     if (row_pattern == "") {
@@ -268,7 +268,7 @@ annual_seq <- function(interval = 1L, year = current_year(), tz = Sys.timezone()
 annual_sch <- function(data, date_col = NULL,
                        down = TRUE, leap_day = TRUE, rp_na = NA,
                        tz = Sys.timezone()){
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     date_col_name <- check_date_col(data, date_col)
@@ -326,7 +326,7 @@ eplus_time_fmt <- function(data, date_col = NULL, std_fmt = TRUE, copy = TRUE){
         data <- copy(data)
     }
 
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     date_col_name <- check_date_col(data, date_col)
@@ -383,7 +383,7 @@ eplus_time_trans <- function(data, year = current_year(),
                              eplus_date_col = "Date/Time",
                              new_date_col = "datetime", tz = Sys.timezone(),
                              keep_ori = FALSE, copy = FALSE){
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     # Hard copy the data to protect the original data untouched.
@@ -489,7 +489,7 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
 # na_replace
 # {{{1
 na_replace <- function(data, col_pattern, type = "na", replacement = 0L){
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     dataa <- conv_dt(data)
 
     if(type == "na"){
@@ -549,7 +549,7 @@ na_replace <- function(data, col_pattern, type = "na", replacement = 0L){
 # {{{1
 site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
                          ele_fct = 3.095, gas_fct = 1.092, digits = 4, to_GJ = FALSE) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     data <- data[, lapply(.SD, function(x) round(x*ele_fct, digits)),
@@ -603,7 +603,7 @@ site_to_src <- function (data, ele_pattern = "electricity", gas_pattern = "gas",
 data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
                        variable_name = "variable", value_name = "value",
                        na_rm = FALSE, variable_factor = TRUE, value_factor = FALSE) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     if(hasArg(id_pattern)){
@@ -651,7 +651,7 @@ data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
 # # long_table
 # # {{{1
 # long_table <- function(data) {
-#     check_df(data)
+    # assertthat::assert_that(is.data.frame(data))
 #     data <- conv_dt(data)
 
 #     date_col <- get_date_col(data)
@@ -760,7 +760,7 @@ tg_to_tr <- function (tg, ta, d = 0.038, e = 0.9, v = 0.01) {
 # {{{1
 case_cal <- function (data, case_col, col_pattern = NULL, fun, case_order = TRUE,
                       melt = FALSE) {
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
     if(!(hasArg(fun))){
@@ -989,17 +989,6 @@ addCalCol <- function(data, newcol.name, p.list, bycol_pattern, sep = "",
 }
 # }}}1
 
-# check_df: A helper function to check if the input object is a data.frame or
-#           not.
-# check_df
-# {{{1
-check_df <- function (data) {
-    if (!is.data.frame(data)) {
-        stop("'data' should be a data.frame.", call. = FALSE)
-    }
-}
-# }}}1
-
 #' @importFrom data.table is.data.table as.data.table
 # conv_dt: A helper function to check if the input object is a data.table or
 #          not. If not, convert it to a data.table.
@@ -1025,7 +1014,7 @@ conv_dt <- function (data) {
 # get_date_col
 # {{{1
 get_date_col <- function(data){
-    check_df(data)
+    assertthat::assert_that(is.data.frame(data))
 
     # Get classes for all columns.
     classes <- purrr::map(data, class)
