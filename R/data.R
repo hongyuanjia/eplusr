@@ -435,7 +435,7 @@ eplus_time_trans <- function(data, year = current_year(),
 # add_time
 # add_time{{{1
 add_time <- function (data, base = NULL, new = NULL, step,
-                      toward = c("up", "down", "round"), one_year = FALSE) {
+                      toward = c("up", "down", "center"), one_year = FALSE) {
 
     # TODO: Add checking for invalid step such as '600 secs'.
     check_df(data)
@@ -460,7 +460,7 @@ add_time <- function (data, base = NULL, new = NULL, step,
         switch(toward,
                up = dplyr::mutate(data, !!new := lubridate::ceiling_date(datetimes, unit = step)),
                down = dplyr::mutate(data, !!new := lubridate::floor_date(datetimes, unit = step)),
-               round = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
+               center = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
                )
 
     if (identical(new, base)) {
