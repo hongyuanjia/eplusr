@@ -151,7 +151,7 @@ add_time <- function (data, base = NULL, new = NULL, step,
         datetimes <- one_year(datetimes)
     }
 
-    if(is.null(new)) {
+    if (is.null(new)) {
         new <- paste0(base, "_", stringr::str_replace_all(step, "\\s", ""))
     } else {
         new <- stringr::str_replace_all(new, "\\s", "")
@@ -183,7 +183,7 @@ has_leap_day <- function (x) {
     assertthat::assert_that(assertthat::is.time(x) || assertthat::is.date(x))
 
     is_leap_year <- lubridate::leap_year(x)
-    if (!all(is_leap_year)) {
+    if (all(!is_leap_year)) {
         return(FALSE)
     } else {
         x_leap_year <- x[is_leap_year]
@@ -192,10 +192,14 @@ has_leap_day <- function (x) {
     years <- unique(lubridate::year(x_leap_year))
 
     is_leap_day <-
-        as.Date(x, tz = lubridate::tz(x)) ==
-        as.Date(paste0(year, "-02-29"), tz = lubridate::tz(x))
+        purrr::map_lgl(years,
+           ~{
+                any(as.Date(x_leap_year, tz = lubridate::tz(x_leap_year)) ==
+                    as.Date(paste0(.x, "-02-29"), tz = lubridate::tz(x_leap_year)))
+            }
+        )
 
-    if (any(is_leap_day)) {
+    if (is_leap_day) {
         return(TRUE)
     } else {
         return(FALSE)
