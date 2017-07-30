@@ -138,7 +138,7 @@ yhour <- function (x, one_year = FALSE, no_leap = FALSE) {
 # add_time
 # add_time{{{1
 add_time <- function (data, base = NULL, new = NULL, step,
-                      toward = c("up", "down", "center"), one_year = FALSE) {
+                      toward = c("up", "down", "center")) {
 
     # TODO: Add checking for invalid step such as '600 secs'.
     assertthat::assert_that(is.data.frame(data))
@@ -146,10 +146,6 @@ add_time <- function (data, base = NULL, new = NULL, step,
         base <- check_date_col(data)
     }
     datetimes <- data[[base]]
-
-    if (one_year) {
-        datetimes <- one_year(datetimes)
-    }
 
     if (is.null(new)) {
         new <- paste0(base, "_", stringr::str_replace_all(step, "\\s", ""))
