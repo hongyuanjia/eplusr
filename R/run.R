@@ -180,8 +180,8 @@ create_eplus_ini <- function (eplus_dir, working_dir) {
 # }}}1
 
 #' @importFrom stringr str_subset str_extract
-# get_external_fill: A helper function to get file paths in 'Schedule:File'.
-# get_external_fill
+# get_external_file: A helper function to get file paths in 'Schedule:File'.
+# get_external_file
 # {{{1
 get_external_file <- function (idf_lines) {
     schedule_files <- stringr::str_subset(idf_lines, "!\\s*-\\s*File Name$")
