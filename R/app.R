@@ -12,17 +12,13 @@
 edit_epat <- function (json, parse = FALSE) {
 
     library(shiny)
-    library(shinyFiles)
-    library(shinyjs)
-    library(shinycssloaders)
-    library(DT)
     library(miniUI)
 
     job <- read_epat(json)
 
     # UI{{{2
     ui <- miniPage(
-        useShinyjs(),
+        shinyjs::useShinyjs(),
         theme = shinythemes::shinytheme("flatly"),
         gadgetTitleBar("Parametric Job Editor"),
         miniTabstripPanel(
@@ -32,7 +28,7 @@ edit_epat <- function (json, parse = FALSE) {
                     div(class = "container-fluid",
                         div(class = "row", style = "no-gutters",
                             div(class = "col-sm-9", style="display:inline-block", textInput("model_path", label = "IDF/IMF model template:", value = job$idf_path, width = "100%")),
-                            div(style="display:inline-block", shinyFilesButton("model_sel", label = "...", title = "Please select an IDF/IMF model template", multiple = FALSE)),
+                            div(style="display:inline-block", shinyFiles::shinyFilesButton("model_sel", label = "...", title = "Please select an IDF/IMF model template", multiple = FALSE)),
                             div(style="display:inline-block", actionButton("edit_model", label = "Edit", icon = icon("pencil-square"))),
                             tags$style(type='text/css', "#model_sel {vertical-align: top; margin-top: 25px;}"),
                             tags$style(type='text/css', "#edit_model {vertical-align: top; margin-top: 25px;}")
@@ -42,7 +38,7 @@ edit_epat <- function (json, parse = FALSE) {
                     div(class = "container-fluid",
                         div(class = "row", style = "no-gutters",
                             div(class = "col-sm-9", style="display:inline-block", textInput("weather_path", label = "Weather file:", value = job$weather_path, width = "100%")),
-                            div(style="display:inline-block", shinyFilesButton("weather_sel", label = "..", title = "Please select a weather file:", multiple = TRUE)),
+                            div(style="display:inline-block", shinyFiles::shinyFilesButton("weather_sel", label = "..", title = "Please select a weather file:", multiple = TRUE)),
                             div(style="display:inline-block", actionButton("edit_weather", label = "Edit", icon = icon("pencil-square"))),
                             tags$style(type='text/css', "#weather_sel {vertical-align: top; margin-top: 25px;}"),
                             tags$style(type='text/css', "#edit_weather {vertical-align: top; margin-top: 25px;}")
@@ -87,7 +83,7 @@ edit_epat <- function (json, parse = FALSE) {
                     div(class = "container-fluid",
                         div(class = "row", style = "no-gutters",
                             div(class = "col-sm-10", style = "display:inline-block", textInput("eplus_path", label = "EnergyPlus location:", value = job$eplus_path, width = "100%")),
-                            div(style = "display:inline-block", shinyDirButton("eplus_sel", label = "...", title = "Please select an EnergyPlus location:")),
+                            div(style = "display:inline-block", shinyFiles::shinyDirButton("eplus_sel", label = "...", title = "Please select an EnergyPlus location:")),
                             tags$style(type='text/css', "#eplus_sel {vertical-align: top; margin-top: 25px;}")
                         )
                     ),
@@ -101,7 +97,7 @@ edit_epat <- function (json, parse = FALSE) {
                     div(class = "container-fluid",
                         div(class = "row", style = "no-gutters",
                             div(class = "col-sm-10", style = "display:inline-block", textInput("wd_path", label = "Working dir:", value = job$wd_path, width = "100%")),
-                            div(style = "display:inline-block", shinyDirButton("wd_sel", label = "...", title = "Working dir:")),
+                            div(style = "display:inline-block", shinyFiles::shinyDirButton("wd_sel", label = "...", title = "Working dir:")),
                             tags$style(type='text/css', "#wd_sel {vertical-align: top; margin-top: 25px;}")
                         )
                     )
@@ -118,19 +114,19 @@ edit_epat <- function (json, parse = FALSE) {
         project <- reactiveValues()
 
         # shinyFileChoose for model and weather{{{3
-        shinyFileChoose(input, 'model_sel', roots = getVolumes(), filetypes = c("idf", "IDF", "imf", "IMF"))
-        shinyFileChoose(input, 'weather_sel', roots = getVolumes(), filetypes = c("epw", "EPW"))
+        shinyFiles::shinyFileChoose(input, 'model_sel', roots = shinyFiles::getVolumes(), filetypes = c("idf", "IDF", "imf", "IMF"))
+        shinyFiles::shinyFileChoose(input, 'weather_sel', roots = shinyFiles::getVolumes(), filetypes = c("epw", "EPW"))
         # }}}3
 
         # Get reactive values of model and weather{{{3
         model_path <- reactive({
-            model_path <- parseFilePaths(getVolumes(), input$model_sel)
+            model_path <- shinyFiles::parseFilePaths(shinyFiles::getVolumes(), input$model_sel)
             if (is.null(model_path)) return(NULL)
             if (identical(model_path, "")) return(NULL)
             return(model_path)
         })
         weather_path <- reactive({
-            weather_path <- parseFilePaths(getVolumes(), input$weather_sel)
+            weather_path <- shinyFiles::parseFilePaths(shinyFiles::getVolumes(), input$weather_sel)
             if (is.null(weather_path)) return(NULL)
             if (identical(weather_path, "")) return(NULL)
             return(weather_path)
@@ -281,7 +277,7 @@ edit_epat <- function (json, parse = FALSE) {
                 } else {
                     param_table$table <- dplyr::bind_rows(param_table$table, isolate(project$params()))
                     param_table$table <- tidyr::drop_na(param_table$table, ID, Name, `Search Tag`, `Value Expressions`)
-                    replaceData(proxy, param_table$table, resetPaging = FALSE)
+                    DT::replaceData(proxy, param_table$table, resetPaging = FALSE)
                 }
                 # }}}5
             }
@@ -322,7 +318,7 @@ edit_epat <- function (json, parse = FALSE) {
                     if (!is.null(s)) {
                         row <- isolate(project$params())
                         param_table$table[s,] <- row
-                        replaceData(proxy, param_table$table, resetPaging = FALSE)
+                        DT::replaceData(proxy, param_table$table, resetPaging = FALSE)
                     } else {
                         showNotification(ui = div(h5(strong("Error")),
                                                   div(icon("exclamation-sign", lib = "glyphicon"),
@@ -404,19 +400,19 @@ edit_epat <- function (json, parse = FALSE) {
         # }}}3
 
         # shinyDirChoose for EnergyPlus and Working dir{{{3
-        shinyDirChoose(input, "eplus_sel", roots = getVolumes())
-        shinyDirChoose(input, "wd_sel", roots = getVolumes())
+        shinyFiles::shinyDirChoose(input, "eplus_sel", roots = shinyFiles::getVolumes())
+        shinyFiles::shinyDirChoose(input, "wd_sel", roots = shinyFiles::getVolumes())
         # }}}3
 
         # Get reactive values of EnergyPlus location and working directory{{{3
         eplus_sel <- reactive({
-            eplus_sel <- parseDirPath(getVolumes(), input$eplus_sel)
+            eplus_sel <- shinyFiles::parseDirPath(shinyFiles::getVolumes(), input$eplus_sel)
             if (is.null(eplus_sel)) return(NULL)
             if (identical(eplus_sel, "")) return(NULL)
             return(eplus_sel)
         })
         wd_sel <- reactive({
-            wd_sel <- parseDirPath(getVolumes(), input$wd_sel)
+            wd_sel <- shinyFiles::parseDirPath(shinyFiles::getVolumes(), input$wd_sel)
             if (is.null(wd_sel)) return(NULL)
             if (identical(wd_sel, "")) return(NULL)
             return(wd_sel)
