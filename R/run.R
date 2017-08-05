@@ -150,9 +150,12 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
     command <- paste0(cmd_head, " eplusr_run.bat && DEL eplusr_run.bat")
     system(command = command, wait = echo, invisible = echo)
     if (!echo) {
-        msg_head <- paste0("Simulation has been successfully executed using EnergyPlus V", eplus_ver, " located at", sQuote(eplus_dir), ".\n----------\n")
-        msg_job <- paste0("Model: ", file_path(model), "\n",
-                          "Weather: ", file_path(weather), "\n----------")
+        msg_head <- paste0(
+            "Simulation has been successfully executed using EnergyPlus V",
+            eplus_ver, " located at", sQuote(eplus_dir), ".\n----------\n")
+        msg_job <- paste0(
+            "Model: ", file_path(model), "\n",
+            "Weather: ", file_path(weather), "\n----------")
         message(msg_head, msg_job)
     }
 
@@ -768,7 +771,7 @@ change_output_dir <- function (cmd_run, output_dir) {
 run_multi <- function (models, weathers, cores = NULL,
                        output_dirs = NULL, output_prefixes = NULL,
                        output_suffix = c("C", "L", "D"), special_run = NULL,
-                       eplus_ver = NULL, eplus_dir = NULL) {
+                       eplus_ver = NULL, eplus_dir = NULL, show_msg = TRUE) {
     # Get tempdir {{{2
     temp_dir <- getOption("eplusr.temp_dir")
     if (!dir.exists(temp_dir)) {
@@ -856,7 +859,16 @@ run_multi <- function (models, weathers, cores = NULL,
     walk(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
     # }}}2
 
-    message(stringr::str_interp("The job has been successfully executed using EnergyPlus V${eplus_ver} located at '${eplus_dir}'."))
+    if (show_msg) {
+        msg_head <- paste0(
+            "The job has been successfully executed using EnergyPlus V",
+            eplus_ver, " located at ", sQuote(eplus_dir), ".\n----------\n")
+
+        msg_job <- paste0("[Job ", seq, "]:\n",
+                          "Model: ", file_path(models), "\n",
+                          "Weather: ", file_path(weathers), "\n----------\n")
+        msg(msg_head, msg_job)
+    }
 }
 # }}}1
 # divide_job {{{1
