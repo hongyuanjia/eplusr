@@ -106,7 +106,7 @@ get_clean_files <- function (prefix, suffix_type, extra = NULL) {
     prefix <- tools::file_path_sans_ext(prefix)
     clean_files <- output_files(prefix = prefix, suffix_type = suffix_type)
     extra = c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat", extra)
-    extra_files <- file.path(prefix, extra)
+    extra_files <- file_path(prefix, extra)
     clean_files <- c(clean_files, extra_files)
     return(clean_files)
 }
@@ -205,8 +205,8 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
         return(invisible())
     }
 
-    file <- normalizePath(file, winslash = "/", mustWork = FALSE)
-    backup_folder <- normalizePath(backup_folder, winslash = "/", mustWork = FALSE)
+    file <- normalizePath(file, mustWork = FALSE)
+    backup_folder <- normalizePath(backup_folder, mustWork = FALSE)
     if (identical(dirname(file), backup_folder)) {
         return(invisible())
     }
@@ -228,7 +228,7 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
         }
     } else {
         new_name_prefix <- name_create(prefix = prefix, suffix = newname_suffix)
-        new_name <- file.path(dirname(file), paste0(new_name_prefix, ".", ext))
+        new_name <- file_path(dirname(file), paste0(new_name_prefix, ".", ext))
         rename_flag <- file.rename(from = file, to = new_name)
         if (rename_flag) {
             message("File '", file,
