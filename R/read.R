@@ -28,8 +28,7 @@ read_epg <- function(epg){
     sim_info <- dplyr::mutate(sim_info, output_prefix = basename(result))
     sim_info <- dplyr::select(sim_info, dplyr::one_of("model", "weather", "output_dir", "output_prefix", "run_times"))
 
-    attr(sim_info, "job_type") <- "epg"
-    class(sim_info) <- "eplus_job"
+    class(sim_info) <- c("epg", "eplus_job", class(sim_info))
 
     return(sim_info)
 }
@@ -113,8 +112,7 @@ read_jeplus <- function (json) {
     sim_info <- list(idf_path = idf_path, weather_path = wthr_path,
                      param_field = param_field, param_value = param_value)
 
-    attr(sim_info, "job_type") <- "jeplus"
-    class(sim_info) <- "eplus_job"
+    class(sim_info) <- c("jeplus", "eplus_job", class(sim_info))
 
     return(sim_info)
 }
@@ -202,8 +200,7 @@ import_epat <- function (json) {
                      param_field = param_field, param_value = param_value,
                      eplus_path = eplus_path, wd_path = wd_path, parallel_num = parallel_num)
 
-    attr(sim_info, "job_type") <- "epat"
-    class(sim_info) <- "eplus_job"
+    class(sim_info) <- c("epat", "eplus_job", class(sim_info))
 
     return(sim_info)
 }
