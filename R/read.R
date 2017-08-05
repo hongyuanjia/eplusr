@@ -214,10 +214,10 @@ import_epat <- function (json) {
 #' @importFrom dplyr tibble
 #' @importFrom purrr map
 #' @export
-# read_eplus: A function to read EnergyPlus simulation results.
-# read_eplus
+# collect_eplus: A function to read EnergyPlus simulation results.
+# collect_eplus
 # {{{1
-read_eplus <- function (path, output = c("variable", "meter", "table", "surface report"),
+collect_eplus <- function (path, output = c("variable", "meter", "table", "surface report"),
                         year = current_year(), eplus_date_col = "Date/Time",
                         new_date_col = "datetime", tz = Sys.timezone(),
                         rp_na = NA, to_GJ = NULL, unnest = FALSE, long = FALSE) {
