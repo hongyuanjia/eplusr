@@ -60,3 +60,20 @@ has_imf_ext <- function (x) {
         x
     }
 }
+
+file_path <- function (..., normalize = FALSE) {
+    os <- Sys.info()['sysname']
+    if (os == "Windows") {
+        fsep = "\\"
+    } else {
+        fsep = "/"
+    }
+
+    if (normalize) {
+        path <- normalizePath(file.path(..., fsep = fsep), mustWork = FALSE)
+    } else {
+        path <- file.path(..., fsep = fsep)
+    }
+
+    return(path)
+}
