@@ -344,7 +344,7 @@ epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verb
     output <- file_path(working_dir, "out.idf")
     new_output <- paste0(tools::file_path_sans_ext(imf_path), ".idf")
     audit <- file_path(working_dir, "audit.out")
-    new_audit <- file_path(dirname(audit), paste0(tools::file_path_sans_ext(basename(imf_path)), ".out"))
+    new_audit <- file_path(dirname(audit), paste0(file_prefix(imf_path), ".out"))
 
     if (file.exists(output)) {
 
