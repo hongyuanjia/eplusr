@@ -228,7 +228,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
             stop("'path' should be a path of folder or a path of the input .idf or .imf file.",
                  call. = FALSE)
         } else {
-            prefix = tools::file_path_sans_ext(basename(path))
+            prefix = file_prefix(path)
             file_names <- data.table(prefix = prefix,
                                      variable = paste0(prefix, ".csv"),
                                      meter = paste0(prefix, "Meter.csv"),

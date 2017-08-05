@@ -62,7 +62,7 @@ clean_wd <- function(path, suffix_type = c("C", "L", "D"), extra= NULL,
     # Set the working dirctory to the input of EnergyPlus result folder.
     setwd(wd)
     # }}}2
-    prefix <- tools::file_path_sans_ext(basename(path))
+    prefix <- file_prefix(path)
     if (!is.null(backup_type)) {
         backup_files <- get_backup_files(type = backup_type, prefix = prefix, suffix_type = suffix_type)
 
@@ -103,7 +103,7 @@ backup_files <- function(files, folder_prefix = NULL, folder_suffix = "datetime"
 # get_clean_files
 # {{{1
 get_clean_files <- function (prefix, suffix_type, extra = NULL) {
-    prefix <- tools::file_path_sans_ext(prefix)
+    prefix <- file_prefix(prefix)
     clean_files <- output_files(prefix = prefix, suffix_type = suffix_type)
     extra = c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat", extra)
     extra_files <- file_path(prefix, extra)
@@ -212,7 +212,7 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
     }
 
     file_name <- basename(file)
-    prefix <- tools::file_path_sans_ext(file_name)
+    prefix <- file_prefix(file_name)
     ext <- tools::file_ext(file_name)
 
     if (is.null(newname_suffix)) {
@@ -246,7 +246,7 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
 # output_files {{{
 output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
                           type = NULL, simplify = FALSE) {
-    prefix <- tools::file_path_sans_ext(prefix)
+    prefix <- file_prefix(prefix)
     suffix_type <- rlang::arg_match(suffix_type)
 
     suffix <- switch(suffix_type,
