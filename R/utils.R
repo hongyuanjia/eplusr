@@ -61,7 +61,7 @@ has_imf_ext <- function (x) {
     }
 }
 
-file_path <- function (..., normalize = FALSE) {
+file_path <- function (..., normalize = TRUE) {
     os <- Sys.info()['sysname']
     if (os == "Windows") {
         fsep = "\\"
