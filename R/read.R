@@ -22,7 +22,7 @@ read_epg <- function(epg){
 
     sim_info <- dplyr::as_tibble(purrr::map_at(sim_info,
                                                c("model", "weather", "result"),
-                                               normalizePath,  winslash = "/", mustWork = FALSE
+                                               normalizePath, mustWork = FALSE
                                                ))
     sim_info <- dplyr::mutate(sim_info, output_dir = dirname(result))
     sim_info <- dplyr::mutate(sim_info, output_prefix = basename(result))
@@ -268,7 +268,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     if (output == "variable") {
       data <-
           dplyr::tibble(case = file_names[["prefix"]],
-                        variable_output = purrr::map(file.path(path, file_name),
+                        variable_output = purrr::map(file_path(path, file_name),
                                                      function (file) {
                                                          if (file.exists(file)) {
                                                              read_variable(result = file,
@@ -286,7 +286,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     } else if (output == "meter"){
       data <-
           dplyr::tibble(case = file_names[["prefix"]],
-                        meter_output = purrr::map(file.path(path, file_name),
+                        meter_output = purrr::map(file_path(path, file_name),
                                                   function (file) {
                                                       if (file.exists(file)) {
                                                           read_variable(result = file,
@@ -306,7 +306,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     } else if (output == "surface report") {
       data <-
           dplyr::tibble(case = file_names[["prefix"]],
-                        surface_report = purrr::map(file.path(path, file_name),
+                        surface_report = purrr::map(file_path(path, file_name),
                                                     function (file) {
                                                         if (file.exists(file)) {
                                                             read_surf_rpt(eio = file)
@@ -318,7 +318,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     } else  {
       data <-
           dplyr::tibble(case = file_names[["prefix"]],
-                        table_output = purrr::map(file.path(path, file_name),
+                        table_output = purrr::map(file_path(path, file_name),
                                                   function (file) {
                                                       if (file.exists(file)) {
                                                           read_table(file = file)
@@ -385,7 +385,7 @@ get_eplus_main_output_files <- function (path) {
 # {{{1
 check_eplus_output_file_exist <- function (path, file_names, type) {
     input <- file_names[["prefix"]]
-    files <- file.path(path, file_names[[type]])
+    files <- file_path(path, file_names[[type]])
     purrr::map(seq_along(files),
                    function(i) {
                        if (!file.exists(files[i])) {

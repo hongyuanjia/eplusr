@@ -331,7 +331,7 @@ epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verb
     cmd_head <- "cmd.exe /c"
 
     # Use "energyplus.exe" to run EnergyPlus.
-    epmacro_exe <- file.path(eplus_dir, "EPMacro.exe")
+    epmacro_exe <- file_path(eplus_dir, "EPMacro.exe")
 
     # Get the working directory.
     working_dir <- dirname(imf_path)
@@ -341,15 +341,15 @@ epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verb
 
     epmacro_run <- system(command = command, wait = TRUE)
 
-    output <- file.path(working_dir, "out.idf")
+    output <- file_path(working_dir, "out.idf")
     new_output <- paste0(tools::file_path_sans_ext(imf_path), ".idf")
-    audit <- file.path(working_dir, "audit.out")
-    new_audit <- file.path(dirname(audit), paste0(tools::file_path_sans_ext(basename(imf_path)), ".out"))
+    audit <- file_path(working_dir, "audit.out")
+    new_audit <- file_path(dirname(audit), paste0(tools::file_path_sans_ext(basename(imf_path)), ".out"))
 
     if (file.exists(output)) {
 
         # Read error messages
-        audit_raw <- readr::read_lines(file.path(dirname(imf_path), "audit.out"))
+        audit_raw <- readr::read_lines(file_path(dirname(imf_path), "audit.out"))
         errors_pt <- stringr::str_which(audit_raw, "ERROR")
 
         if (rename) {
@@ -428,14 +428,14 @@ imf_to_idf <- function(imf_lines, verbose = FALSE) {
     eplus_dir <- find_eplus(ver = imf_ver, verbose = F)
 
     imf_name <- paste0("imf_", stringi::stri_rand_strings(1, 8), ".imf")
-    imf_path <- file.path(normalizePath(tempdir(), winslash = "/"), imf_name)
+    imf_path <- file_path(normalizePath(tempdir()), imf_name)
 
     readr::write_lines(imf_lines, path = imf_path)
     # Convert the input imf file to a idf file
     epmacro_exe(eplus_dir = eplus_dir, imf_path = imf_path,
                 verbose = verbose, rename = FALSE)
 
-    idf_path <- file.path(dirname(imf_path), "out.idf")
+    idf_path <- file_path(dirname(imf_path), "out.idf")
     idf_lines <- read_idf_lines(idf_path)
     unlink(imf_path, force = TRUE)
 

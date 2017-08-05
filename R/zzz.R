@@ -12,7 +12,7 @@
     options(useFancyQuotes = FALSE)
 
     op.eplusr <- list(
-       eplusr.temp_dir = normalizePath(file.path(tempdir(), "eplusr"), mustWork = FALSE),
+       eplusr.temp_dir = normalizePath(file_path(tempdir(), "eplusr"), mustWork = FALSE),
        eplusr.eplus_dir = eplus_info_latest[["path"]],
        eplusr.parallel_num = parallel::detectCores()
   )
