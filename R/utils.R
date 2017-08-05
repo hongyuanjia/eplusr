@@ -32,3 +32,31 @@ lsos <- function(..., n=10) {
     .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
 }
 # }}}1
+
+has_model_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("i[dm]f", ext, ignore.case = TRUE)
+}
+
+has_epw_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("epw", ext, ignore.case = TRUE)
+}
+
+has_idf_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("i[dm]f", ext, ignore.case = TRUE)
+}
+
+has_imf_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("i[dm]f", ext, ignore.case = TRUE)
+}
+
+`%||%` <- function (x, y) {
+    if (is.null(x)) {
+        y
+    } else {
+        x
+    }
+}
