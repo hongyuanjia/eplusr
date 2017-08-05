@@ -77,3 +77,7 @@ file_path <- function (..., normalize = TRUE) {
 
     return(path)
 }
+
+file_prefix <- function (x) {
+    tools::file_path_sans_ext(basename(x))
+}
