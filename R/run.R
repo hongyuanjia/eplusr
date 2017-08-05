@@ -765,9 +765,10 @@ change_output_dir <- function (cmd_run, output_dir) {
 #' @export
 # run_multi
 # run_multi {{{1
-run_multi <- function (models, weathers, output_dirs = NULL, output_prefixes = NULL,
+run_multi <- function (models, weathers, cores = NULL,
+                       output_dirs = NULL, output_prefixes = NULL,
                        output_suffix = c("C", "L", "D"), special_run = NULL,
-                       cores = NULL, eplus_ver = NULL, eplus_dir = NULL) {
+                       eplus_ver = NULL, eplus_dir = NULL) {
     # Get tempdir {{{2
     temp_dir <- getOption("eplusr.temp_dir")
     if (!dir.exists(temp_dir)) {
@@ -852,7 +853,7 @@ run_multi <- function (models, weathers, output_dirs = NULL, output_prefixes = N
     # }}}2
     # Run the job with multithreading {{{2
     cmd_starts <- paste0(cmd_head, " START ", path_multi_run_bats)
-    # walk(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
+    walk(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
     # }}}2
 
     message(stringr::str_interp("The job has been successfully executed using EnergyPlus V${eplus_ver} located at '${eplus_dir}'."))
