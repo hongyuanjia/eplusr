@@ -4,7 +4,7 @@
 
 #' Import EnergyPlus .epg group file
 #'
-#' \code{import_epg} returns a tibble which contains the necessary infomation in
+#' \code{read_epg} returns a tibble which contains the necessary infomation in
 #' order to run simulations using \code{\link{run_epg}}.
 #'
 #' @param epg A file path of EnergyPlus .epg file.
@@ -13,8 +13,8 @@
 #' @importFrom dplyr as_tibble mutate select one_of
 #' @importFrom purrr map_at
 #' @export
-# import_epg{{{1
-import_epg <- function(epg){
+# read_epg{{{1
+read_epg <- function(epg){
 
     sim_info <- readr::read_csv(file = epg, comment = "!",
                                 col_names = c("model", "weather", "result", "run_times"),
@@ -29,6 +29,7 @@ import_epg <- function(epg){
     sim_info <- dplyr::select(sim_info, dplyr::one_of("model", "weather", "output_dir", "output_prefix", "run_times"))
 
     attr(sim_info, "job_type") <- "epg"
+    class(sim_info) <- "eplus_job"
 
     return(sim_info)
 }
@@ -36,7 +37,7 @@ import_epg <- function(epg){
 
 #' Import jEPlus .json type project.
 #'
-#' \code{import_jeplus} takes a file path of an .json type project of jEPlus,
+#' \code{read_jeplus} takes a file path of an .json type project of jEPlus,
 #' and return a list containing model paths, weather paths, parametric fields,
 #' and parametric values. The returned list will have an attribute 'job_type'
 #' with value 'jeplus' which will be used when running jobs using
@@ -50,8 +51,8 @@ import_epg <- function(epg){
 #' @importFrom data.table rbindlist
 #' @importFrom dplyr as_tibble
 #' @export
-# import_jeplus{{{1
-import_jeplus <- function (json) {
+# read_jeplus{{{1
+read_jeplus <- function (json) {
     # Read jeplus JSON project file.
     info <- jsonlite::fromJSON(json)
 
@@ -113,6 +114,7 @@ import_jeplus <- function (json) {
                      param_field = param_field, param_value = param_value)
 
     attr(sim_info, "job_type") <- "jeplus"
+    class(sim_info) <- "eplus_job"
 
     return(sim_info)
 }
@@ -201,6 +203,7 @@ import_epat <- function (json) {
                      eplus_path = eplus_path, wd_path = wd_path, parallel_num = parallel_num)
 
     attr(sim_info, "job_type") <- "epat"
+    class(sim_info) <- "eplus_job"
 
     return(sim_info)
 }
