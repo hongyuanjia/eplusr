@@ -30,303 +30,109 @@
 #' @importFrom purrr walk2
 # clean_wd
 # {{{1
-clean_wd <- function(path = getwd(), backup = NULL, backup_folder = NULL,
-                           rename = FALSE) {
+clean_wd <- function(path, suffix_type = c("C", "L", "D"), extra= NULL,
+                     backup = FALSE, backup_folder = NULL, mark = "datetime",
+                     newname_mark = NULL) {
 
-    # Store the original working directory of current R session.
-    ori_wd <- getwd()
-
-    # Check if input path exists.
-    if (!dir.exists(path)) {
-        stop("Input path does exist.", call. = FALSE)
-    } else {
-        # Set the working dirctory to the input of EnergyPlus result folder.
-        setwd(path)
-
-    }
-
-    # Check for invalid input of argument 'backup'.
-    if (!is.null(backup)) {
-        if (is.na(match(backup, c("input", "basic", "all")))) {
-            stop("Argument 'backup' should be NULL or one of c('input', 'basic', 'all').",
-                 call. = FALSE)
-        } else {
-            # Get the output prefix.
-            output_prefix <- get_eplus_output_prefix_str(path = path)
-
-            if (is.null(output_prefix)) {
-                message("No cleaning will be done.")
-                return(invisible())
-            }
-
-            # Get the output pattern.
-            output_pattern <- get_eplus_output_prefix_ptn(output_prefix = output_prefix)
-
-            purrr::walk2(output_prefix, output_pattern,
-                         ~backup_eplus_wd(path = path, type = backup,
-                                          output_prefix = .x, output_pattern = .y,
-                                          backup_folder = backup_folder, rename = rename))
-            purrr::walk2(output_prefix, output_pattern,
-                         ~clean_eplus_wd(path = path,
-                                         output_prefix = .x, output_pattern = .y))
-        }
-    } else {
-        # Get the output prefix.
-        output_prefix <- get_eplus_output_prefix_str(path = path)
-
-        if (is.null(output_prefix)) {
-            message("No cleaning will be done.")
-            return(invisible())
-        }
-
-        # Get the output pattern.
-        output_pattern <- get_eplus_output_prefix_ptn(output_prefix = output_prefix)
-
-        purrr::walk2(output_prefix, output_pattern,
-                     ~clean_eplus_wd(path = path,
-                                     output_prefix = .x, output_pattern = .y))
-    }
-
-    # Set the working directory back to the original path.
-    setwd(ori_wd)
-}
-# }}}1
-
-#' @importFrom purrr walk
-# backup_eplus_wd
-# {{{1
-backup_eplus_wd <- function(path = getwd(), type = NULL,
-                            output_prefix, output_pattern,
-                            backup_folder = NULL, rename = FALSE) {
-
-    # Store the original working directory of current R session.
-    ori_wd <- getwd()
-
-    if (!dir.exists(path)) {
-        stop("Input path does exist.", call. = FALSE)
-    } else {
-        # Set the working dirctory to the input of EnergyPlus result folder.
-        setwd(path)
-    }
-
-    suffix <- suffix_create(string = "datetime")
-    if (is.null(backup_folder)) {
-        backup_folder <- name_create(prefix = "backups", suffix = suffix)
-    } else {
-        backup_folder <- name_create(prefix = backup_folder, suffix = suffix)
-    }
-
-    backup_folder <- folder_create(folder_name = backup_folder)
-
-    backup_files <- get_eplus_backup_files(type = type,
-                                           output_prefix = output_prefix,
-                                           output_pattern = output_pattern)
-
-    purrr::walk(backup_files,
-                ~backup_file(file_name = .x, backup_folder = backup_folder,
-                             rename = rename, newname_suffix = suffix)
+    # Args validation {{{2
+    # assertthat::assert_that(file.exists(path))
+    ext <- tools::file_ext(path)
+    assertthat::assert_that(grepl("i[dm]f", ext, ignore.case = TRUE),
+        msg = "'path' should be a EnergyPlus model path."
     )
-
-    # Set the working directory back to the original path.
-    setwd(ori_wd)
-}
-# }}}1
-
-#' @importFrom purrr walk
-# clean_eplus_wd
-# {{{1
-clean_eplus_wd <- function(path = getwd(),
-                           output_prefix = NULL, output_pattern) {
-
+    suffix_type <- rlang::arg_match(suffix_type)
+    # Check for invalid input of argument 'backup'.
+    if (is.logical(backup)) {
+        if (backup) {
+            backup_type <- "basic"
+        } else {
+            backup_type <- NULL
+        }
+    } else {
+        backup_type <- rlang::arg_match(backup, c("input", "table", "variable",
+        "meter", "basic", "all"))
+    }
+    # }}}2
+    # Set working dir {{{2
+    wd <- dirname(path)
     # Store the original working directory of current R session.
     ori_wd <- getwd()
+    # Set the working directory back to the original path.
+    on.exit(setwd(ori_wd))
+    # Set the working dirctory to the input of EnergyPlus result folder.
+    setwd(wd)
+    # }}}2
+    prefix <- tools::file_path_sans_ext(basename(path))
+    if (!is.null(backup_type)) {
+        backup_files <- get_backup_files(type = backup_type, prefix = prefix, suffix_type = suffix_type)
 
-    if (!dir.exists(path)) {
-        stop("Input path does exist.", call. = FALSE)
-    } else {
-        # Set the working dirctory to the input of EnergyPlus result folder.
-        setwd(path)
+        backup_files(backup_files, backup_folder, mark, newname_mark)
     }
-
-    clean_files <- get_eplus_clean_files(output_prefix = output_prefix,
-                                         output_pattern = output_pattern)
-
+    clean_files <- get_clean_files(prefix = prefix, suffix_type = suffix_type, extra = extra)
     purrr::walk(clean_files,
                 function(file_name) {
                     if (file.exists(file_name)) {
-                        unlink(file_name)
+                        unlink(file_name, force = TRUE)
                         message("File ", file_name, " has been successfully deleted ",
-                                "from folder '", path, "'.\n")
+                                "from folder '", wd, "'.")
                     }
                 })
-
-    # Set the working directory back to the original path.
-    setwd(ori_wd)
+    return(invisible())
 }
 # }}}1
 
-# get_eplus_clean_files
+#' @importFrom purrr walk
+# backup_files
 # {{{1
-get_eplus_clean_files <- function (output_prefix, output_pattern,
-                                   extra = c("Energy+.ini")) {
-    if (all(output_prefix == "in", output_pattern == "legacy")) {
-        clean_files <- c("BasementGHTIn.idf", "audit.out", "audit.out",
-                         "eplusmap.csv", "eplusmap.tab", "eplusmap.txt",
-                         "eplusmtr.csv", "eplusmtr.tab", "eplusmtr.txt",
-                         "eplusout.audit", "eplusout.bnd", "eplusout.csv",
-                         "eplusout.dbg", "eplusout.dbg",
-                         "eplusout.delightdfdmp", "eplusout.delighteldmp",
-                         "eplusout.delightin", "eplusout.delightout",
-                         "eplusout.dfs", "eplusout.dxf", "eplusout.edd",
-                         "eplusout.eio", "eplusout.end", "eplusout.err",
-                         "eplusout.eso", "eplusout.inp", "eplusout.inp",
-                         "eplusout.log", "eplusout.mdd", "eplusout.mtd",
-                         "eplusout.mtr", "eplusout.rdd", "eplusout.sci",
-                         "eplusout.shd", "eplusout.sln", "eplusout.sparklog",
-                         "eplusout.sql", "eplusout.svg", "eplusout.tab",
-                         "eplusout.txt", "eplusout.wrl", "eplusscreen.csv",
-                         "eplusssz.csv", "eplusssz.tab", "eplusssz.txt",
-                         "eplustbl.csv", "eplustbl.htm", "eplustbl.html",
-                         "eplustbl.tab", "eplustbl.txt", "eplustbl.xml",
-                         "epluszsz.csv", "epluszsz.tab", "epluszsz.txt",
-                         "expanded.idf", "expandedidf.err", "in.epw", "in.idf",
-                         "in.idf.temp", "in.imf", "in.stat", "out.idf",
-                         "readvars.audit", "slab.int", "sqlite.err", "test.mvi")
+backup_files <- function(files, folder_prefix = NULL, folder_suffix = "datetime",
+                         newname_suffix = NULL) {
 
-        extra_files <- extra
+    if (is.null(folder_prefix)) folder_prefix <- "backup"
+    folder <- name_create(prefix = folder_prefix, suffix = folder_suffix)
+    backup_folder <- folder_create(folder_name = folder)
 
-        clean_files <- c(clean_files, extra_files)
-    } else if (all(output_prefix != "in", output_pattern == "capital")) {
-        output_suffix <- c("*.mat", ".Zsz", ".audit", ".bnd", ".csv", ".dbg",
-                           ".det", ".dxf", ".edd", ".eio", ".end", ".epmdet",
-                           ".epmidf", ".err", ".eso", ".expidf", ".idf", ".mdd",
-                           ".mtd", ".mtr", ".rdd", ".rvaudit", ".sci", ".shd",
-                           ".sln", ".sql", ".ssz", ".svg", ".tab", ".txt",
-                           ".wrl", "DElight.dfdmp", "DElight.eldmp",
-                           "DElight.in", "DElight.out", "DFS.csv", "Map.csv",
-                           "Map.tab", "Map.txt", "Meter.csv", "Meter.tab",
-                           "Meter.txt", "Screen.csv", "Spark.log", "Sqlite.err",
-                           "Ssz.csv", "Ssz.tab", "Ssz.txt", "Table.csv",
-                           "Table.htm", "Table.html", "Table.tab", "Table.txt",
-                           "Table.xml", "Zsz.csv", "Zsz.tab", "Zsz.txt")
+    purrr::walk(files,
+                ~backup_file(file = .x, backup_folder = backup_folder,
+                             newname_suffix = newname_suffix)
+    )
 
-        clean_files <- paste0(output_prefix, output_suffix)
+    return(invisible())
+}
+# }}}1
 
-        extra_files <- c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat")
-
-        clean_files <- c(clean_files, extra_files)
-    } else {
-        stop("Invalid value of argument 'output_prefix' or output_pattern'.")
-    }
-
+# get_clean_files
+# {{{1
+get_clean_files <- function (prefix, suffix_type, extra = NULL) {
+    prefix <- tools::file_path_sans_ext(prefix)
+    clean_files <- output_files(prefix = prefix, suffix_type = suffix_type)
+    extra = c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat", extra)
+    extra_files <- file.path(prefix, extra)
+    clean_files <- c(clean_files, extra_files)
     return(clean_files)
 }
 # }}}1
 
-# get_eplus_backup_files
+# get_backup_files
 # {{{1
-get_eplus_backup_files <- function (type = NULL,
-                                    output_prefix, output_pattern) {
+get_backup_files <- function (type = NULL, prefix, suffix_type) {
     if (is.null(type)) {
         return(NULL)
-    } else if (type == "input") {
-        if (all(output_prefix == "in", output_pattern == "legacy")) {
-            backup_files <- c("in.imf", "in.idf", "out.idf", "in.epw")
-        } else if (all(output_prefix != "in", output_pattern == "capital")) {
-            backup_files <- paste0(output_prefix, c(".imf",".idf", ".epmidf"))
-        } else {
-            stop("Invalid value of argument 'output_prefix' or output_pattern'.")
-        }
-    } else if (type == "basic") {
-        if (all(output_prefix == "in", output_pattern == "legacy")) {
-            backup_files <- c(# Input files.
-                              "in.imf", "in.idf", "out.idf", "in.epw",
-                              # Raw output
-                              "eplusout.eio", "eplusout.eso", "eplustbl.csv",
-                              # Summary report
-                              "eplustbl.htm", "eplustbl.html", "eplustbl.tab",
-                              "eplustbl.txt", "eplustbl.xml",
-                              # Meter output
-                              "eplusmtr.csv", "eplusmtr.tab", "eplusmtr.txt",
-                              # Variable output
-                              "eplusout.tab","eplusout.txt","eplusout.csv",
-                              "eplusout.sql")
-        } else if (all(output_prefix != "in", output_pattern == "capital")) {
-            backup_files <- c(# Input files
-                              "in.imf", "in.idf", "out.idf", "in.epw",
-                              # Raw output
-                              "eplusout.eio", "eplusout.eso",
-                              # Summary report
-                              "eplustbl.csv", "eplustbl.txt", "eplustbl.tab",
-                              "eplustbl.htm", "eplustbl.html", "eplustbl.xml",
-                              # Meter output
-                              "eplusmtr.csv", "eplusmtr.tab", "eplusmtr.txt",
-                              # Variable output
-                              "eplusout.tab","eplusout.txt","eplusout.csv",
-                              "eplusout.sql")
-            backup_files <- paste0(output_prefix,
-                                     # Input files
-                                   c(".imf",".idf", ".epmidf", ".epw",
-                                     # Raw output
-                                     ".eio", ".eso",
-                                     # Summary report
-                                     "Table.csv", "Table.txt", "Table.tab",
-                                     "Table.htm", "Table.html", "Table.xml",
-                                     # Meter output
-                                     "Meter.csv", "Meter.tab", "Meter.txt",
-                                     # Variable output
-                                     ".csv", ".tab", ".txt"
-                                     ))
-        } else {
-            stop("Invalid value of argument 'output_prefix' or output_pattern'.")
-        }
-    } else if (type == "all") {
-        backup_files <- get_eplus_clean_files(output_prefix = output_prefix,
-                                              output_suffix = output_suffix)
     } else {
-        stop("Invalid value of argument 'type'.")
+        type <- rlang::arg_match(type, c("input", "table", "variable", "meter", "basic", "all"))
+
+        input <- output_files(prefix, suffix_type, type = "input", simplify = TRUE)
+        table <- output_files(prefix, suffix_type, type = "table", simplify = TRUE)
+        variable <- output_files(prefix, suffix_type, type = "variable", simplify = TRUE)
+        meter <- output_files(prefix, suffix_type, type = "meter", simplify = TRUE)
+        basic <- c(input, table, variable, meter)
+        all <- output_files(prefix, suffix_type)
+
+        backup_files <- switch(type, input = input, table = table,
+                               variable = variable, meter = meter,
+                               basic = basic, all = all)
     }
 
     return(backup_files)
-}
-# }}}1
-
-#' @importFrom stringr str_trim
-# suffix_create: A helper function to create a formatted string used as a folder
-#                name.
-# suffix_create
-# {{{1
-suffix_create <- function (string = c("datetime", "date", "time")) {
-    if (missingArg(string)) string <- "datetime"
-
-    if (!is.na(match(string, c("datetime", "date", "time")))) {
-        # Store the original time locale.
-        ori_locale <- Sys.getlocale(category = "LC_TIME")
-        # Change the time locale to "English_United States.1252". In order to
-        # not print the locale while run this function, store the output of
-        # Sys.setlocale().
-        not_print <- Sys.setlocale(category = "LC_TIME", locale="English_United States.1252")
-        # Get the name suffix and then restore time locale setting.
-
-        if (match(string, "datetime")) {
-            # suffix <- Sys.time() %>% format("(%b%d_%Hh_%Mm_%Ss)")
-            suffix <- format(Sys.time(), "(%b%d_%Hh_%Mm)")
-        } else if (match(string, "date")) {
-            suffix <- format(Sys.time(), "(%b%d)")
-        } else {
-            suffix <- format(Sys.time(), "(%Hh_%Mm_%Ss)")
-        }
-
-        # Change the time locale to the original value. In order to not print
-        # the locale while run this function, store the output of
-        # Sys.setlocale().
-        not_print <- Sys.setlocale(category = "LC_TIME", locale= ori_locale)
-
-    } else {
-        suffix <- as.character(string) %>% stringr::str_trim() %>% gsub(x=., "\\s", "_")
-    }
-
-    return(suffix)
 }
 # }}}1
 
@@ -335,11 +141,34 @@ suffix_create <- function (string = c("datetime", "date", "time")) {
 #              concatenation of specified prefix and suffix string.
 # name_create
 # {{{1
-name_create <- function (prefix = "backups", suffix = suffix_create()) {
-    prefix <- as.character(prefix) %>% stringr::str_trim() %>% gsub(x=., "\\s", "_")
-    suffix <- as.character(suffix) %>% stringr::str_trim() %>% gsub(x=., "\\s", "_")
+name_create <- function (prefix = "backups", suffix = "datetime") {
+    assertthat::assert_that(assertthat::is.string(prefix))
+    prefix <- gsub("\\s", "_", stringr::str_trim(prefix))
 
-    name <- paste0(prefix, "_", suffix)
+    if (!is.null(suffix)) {
+        assertthat::assert_that(assertthat::is.string(suffix))
+        if (!is.na(match(suffix, c("datetime", "date", "time")))) {
+            # Store the original time locale.
+            ori_locale <- Sys.getlocale(category = "LC_TIME")
+            # Change the time locale to the original value. In order to not print
+            # the locale while run this function, store the output of
+            # Sys.setlocale().
+            on.exit(not_print <- Sys.setlocale(category = "LC_TIME", locale = ori_locale))
+            # Change the time locale to "English_United States.1252".
+            not_print <- Sys.setlocale(category = "LC_TIME", locale = "English_United States.1252")
+            # Get the name suffix and then restore time locale setting.
+            suffix <- switch(suffix,
+                             datetime = format(Sys.time(), "(%b%d_%Hh_%Mm)"),
+                             date = format(Sys.time(), "(%b%d)"),
+                             time = format(Sys.time(), "(%Hh_%Mm_%Ss)"))
+        } else {
+            suffix <- gsub("\\s", "_", stringr::str_trim(suffix))
+        }
+    }
+
+    name <- paste(c(prefix, suffix), sep = "_", collapse = "_")
+
+    return(name)
 }
 # }}}1
 
@@ -352,7 +181,7 @@ name_create <- function (prefix = "backups", suffix = suffix_create()) {
 folder_create <- function (folder_name) {
     # If folder does not exist
     if (!dir.exists(folder_name)) {
-        dir.create(folder_name)
+        dir.create(folder_name, recursive = TRUE)
 
     # If folder already exists, add a trailing string of random 5 selections
     # from "a" to "z" and "0" to "9"
@@ -361,6 +190,7 @@ folder_create <- function (folder_name) {
         folder_name <- paste0(folder_name, "_", rand_str)
         dir.create(folder_name)
     }
+
     return(folder_name)
 }
 # }}}1
@@ -369,97 +199,132 @@ folder_create <- function (folder_name) {
 #              an option to rename the file with a formatted suffix string.
 # backup_file
 # {{{1
-backup_file <- function(file_name, backup_folder = name_create(),
-                        rename = FALSE, newname_suffix = suffix_create()) {
-    if (!dir.exists(backup_folder)) {
-        stop("Backup folder'", backup_folder, "' does not exists.", call. = FALSE)
-    }
-
+backup_file <- function(file, backup_folder, newname_suffix = NULL) {
     # If the file does not exist, return nothing.
-    original_exist_flag <- file.exists(file_name)
-    if (!original_exist_flag) {
+    if (!file.exists(file)) {
         return(invisible())
     }
 
-    if (!rename) {
-        copy_flag <- file.copy(from = file_name,
-                               to = backup_folder,
-                               copy.mode = TRUE, copy.date = TRUE,
+    file <- normalizePath(file, winslash = "/", mustWork = FALSE)
+    backup_folder <- normalizePath(backup_folder, winslash = "/", mustWork = FALSE)
+    if (identical(dirname(file), backup_folder)) {
+        return(invisible())
+    }
+
+    file_name <- basename(file)
+    prefix <- tools::file_path_sans_ext(file_name)
+    ext <- tools::file_ext(file_name)
+
+    if (is.null(newname_suffix)) {
+        copy_flag <- file.copy(from = file,
+                               to = backup_folder, copy.date = TRUE,
                                overwrite = TRUE)
         if (copy_flag) {
-            message("File '", file.path(getwd(), file_name),
+            message("File '", file,
                     "' has been successfully backed up into folder '",
-                    file.path(getwd(), backup_folder), "'.")
+                    backup_folder, "'.")
         } else {
-            message("Fail to back up file '", file.path(getwd(), file_name), "'.")
+            warning("Fail to back up file '", file, "'.", call. = FALSE)
         }
     } else {
-        new_name <- paste0(file_path_sans_ext(file_name), "_",
-                           newname_suffix, ".", file_ext(file_name))
-
-        rename_flag <- file.copy(from = file_name,
-                                 to = file.path(backup_folder, new_name),
-                                 copy.mode = TRUE, copy.date = TRUE,
-                                 overwrite = TRUE)
+        new_name_prefix <- name_create(prefix = prefix, suffix = newname_suffix)
+        new_name <- file.path(dirname(file), paste0(new_name_prefix, ".", ext))
+        rename_flag <- file.rename(from = file, to = new_name)
         if (rename_flag) {
-            message("File '", file.path(getwd(), file_name),
+            message("File '", file,
                     "' has been successfully backed up into folder '",
-                    file.path(getwd(), backup_folder),
-                    "' with a new name '", new_name, "'.")
+                    backup_folder, "' with a new name '", basename(new_name), "'.")
         } else {
-            message("Fail to back up file '", file.path(getwd(), file_name), "'.")
+            warning("Fail to back up file '", file, "'.", call. = FALSE)
         }
     }
 
     return(invisible())
-
 }
 # }}}1
 
-#' @importFrom tools list_files_with_exts file_path_sans_ext
-# get_eplus_output_prefix_str
-# {{{1
-get_eplus_output_prefix_str <- function(path = getwd()) {
-    # Store the original working directory of current R session.
-    ori_wd <- getwd()
+# output_files {{{
+output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
+                          type = NULL, simplify = FALSE) {
+    prefix <- tools::file_path_sans_ext(prefix)
+    suffix_type <- rlang::arg_match(suffix_type)
 
-    if (!dir.exists(path)) {
-        stop("Input path does exist.", call. = FALSE)
-    } else {
-        # Set the working dirctory to the input of EnergyPlus result folder.
-        setwd(path)
+    suffix <- switch(suffix_type,
+        L = c("*.mat", ".epw", ".idf", ".imf", "delight.dfdmp", "delight.eldmp",
+              "delight.in", "delight.out", "dfs.csv", ".epmdet", ".epmidf",
+              "map.csv", "map.tab", "map.txt", "meter.csv", "meter.tab",
+              "meter.txt", "out.audit", "out.bnd", "out.csv", "out.dbg",
+              "out.det", "out.dxf", "out.edd", "out.eio", "out.end",
+              "out.epmdet", "out.epmidf", "out.err", "out.eso", "out.expidf",
+              "out.mdd", "out.mtd", "out.mtr", "out.rdd", "out.rvaudit",
+              "out.sci", "out.shd", "out.sln", "out.sql", "out.ssz", "out.svg",
+              "out.tab", "out.txt", "out.wrl", "out.zsz", "screen.csv",
+              "spark.log", "sqlite.err", "ssz.csv", "ssz.tab", "ssz.txt",
+              "tbl.csv", "tbl.htm", "tbl.html", "tbl.tab", "tbl.txt", "tbl.xml",
+              "zsz.csv", "zsz.tab", "zsz.txt"),
+
+        C = c("*.mat", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dxf", ".edd",
+              ".eio", ".end", ".epmdet", ".epmidf", ".epw", ".err", ".eso",
+              ".expidf", ".idf", ".imf", ".mdd", ".mtd", ".mtr", ".rdd",
+              ".rvaudit", ".sci", ".shd", ".sln", ".sql", ".ssz", ".svg",
+              ".tab", ".txt", ".wrl", "DFS.csv", "Map.csv", "Map.tab",
+              "Map.txt", "Meter.csv", "Meter.tab", "Meter.txt", "Screen.csv",
+              "Spark.log", "Sqlite.err", "Ssz.csv", "Ssz.tab", "Ssz.txt",
+              "Table.csv", "Table.htm", "Table.html", "Table.tab", "Table.txt",
+              "Table.xml", "Zsz.csv", "Zsz.tab", "Zsz.txt", "delight.dfdmp",
+              "delight.eldmp", "delight.in", "delight.out"),
+
+        D = c("*.mat", ".zsz", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dxf",
+              ".edd", ".eio", ".end", ".epmdet", ".epmidf", ".epw", ".err",
+              ".eso", ".expidf", ".idf", ".imf", ".mdd", ".mtd", ".mtr", ".rdd",
+              ".rvaudit", ".sci", ".shd", ".sln", ".sql", ".ssz", ".svg",
+              ".tab", ".txt", ".wrl", "-delight.dfdmp", "-delight.eldmp",
+              "-delight.in", "-delight.out", "-dfs.csv", "-map.csv", "-map.tab",
+              "-map.txt", "-meter.csv", "-meter.tab", "-meter.txt",
+              "-screen.csv", "-spark.log", "-sqlite.err", "-ssz.csv",
+              "-ssz.tab", "-ssz.txt", "-table.csv", "-table.htm", "-table.html",
+              "-table.tab", "-table.txt", "-table.xml", "-zsz.csv", "-zsz.tab",
+              "-zsz.txt")
+    )
+
+    fixed <- TRUE
+    if (!is.null(type)) {
+        if (!is.null(ext)) {
+            ext <- NULL
+            warning("'ext' will be ignored when 'type' specified.", call. = FALSE)
+        }
+        type <- rlang::arg_match(type, c("input", "table", "meter", "variable"))
+        if (identical(type, "input")) {
+            ext <- c(".idf", ".imf", ".epw")
+        } else if (identical(type, "table")) {
+            ext <- switch(suffix_type, L = "tbl.", C = "Table.", D = "-table.")
+        } else if (identical(type, "meter")) {
+            ext <- switch(suffix_type, L = "meter.", C = "Meter.", D = "-meter.")
+        } else {
+            fixed <- FALSE
+            ext <- switch(suffix_type,
+                          L = c("^out.csv$", "^out.txt$", "^out.tab$", "^out.sql$"),
+                          C = c("^.csv$", "^.txt$", "^.tab$", "^.sql$"),
+                          D = c("^.csv$", "^.txt$", "^.tab$", "^.sql$"))
+        }
     }
 
-    output_prefix <- tools::list_files_with_exts(dir = path,
-                                                 exts = c("imf", "idf", "epmidf"))
-    output_prefix <- tools::file_path_sans_ext(basename(output_prefix))
-
-    if (length(output_prefix) == 0) {
-        message("None 'imf', 'idf' or 'epmidf' file found in the input path.")
-        output_prefix <- NULL
+    if (!is.null(ext)) {
+        assertthat::assert_that(is.character(ext))
+        suffix <- purrr::map(paste0(ext), grep, x = suffix, fixed = fixed, value = TRUE)
+        files <- purrr::map(suffix, ~{ if (!purrr::is_empty(.x)) paste0(prefix, .x) })
+        files <- purrr::set_names(files, ext)
+        if (simplify) {
+            files <- unique(purrr::flatten_chr(files))
+        }
     } else {
-        output_prefix <- unique(gsub(x = output_prefix, "^out$", "in"))
+        files <- paste0(prefix, suffix)
     }
 
-    # Set the working directory back to the original path.
-    setwd(ori_wd)
+    if (!is.null(type)) {
 
-    return(output_prefix)
+    }
+
+    return(files)
 }
-# }}}1
-
-#' @importFrom purrr map_chr
-# get_eplus_output_prefix_ptn
-# {{{1
-get_eplus_output_prefix_ptn <- function(output_prefix = get_eplus_output_prefix_str()) {
-
-    if (all(is.null(output_prefix))) {
-        output_pattern <- NULL
-    } else {
-        output_pattern <-
-            purrr::map_chr(output_prefix, ~ifelse(.x == "in", "legacy", "capital"))
-    }
-
-    return(output_pattern)
-}
-# }}}1
+# }}}
