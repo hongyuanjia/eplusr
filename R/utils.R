@@ -33,6 +33,7 @@ lsos <- function(..., n=10) {
 }
 # }}}1
 
+# has_*_ext {{{1
 has_model_ext <- function (x) {
     ext <- tools::file_ext(x)
     grepl("i[dm]f", ext, ignore.case = TRUE)
@@ -53,6 +54,22 @@ has_imf_ext <- function (x) {
     grepl("i[dm]f", ext, ignore.case = TRUE)
 }
 
+has_epg_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("epg", ext, ignore.case = TRUE)
+}
+
+has_epat_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("epat", ext, ignore.case = TRUE)
+}
+
+has_json_ext <- function (x) {
+    ext <- tools::file_ext(x)
+    grepl("json", ext, ignore.case = TRUE)
+}
+# }}}1
+
 `%||%` <- function (x, y) {
     if (is.null(x)) {
         y
@@ -61,6 +78,7 @@ has_imf_ext <- function (x) {
     }
 }
 
+# file_* {{{1
 file_path <- function (..., normalize = TRUE) {
     os <- Sys.info()['sysname']
     if (os == "Windows") {
@@ -81,3 +99,4 @@ file_path <- function (..., normalize = TRUE) {
 file_prefix <- function (x) {
     tools::file_path_sans_ext(basename(x))
 }
+# }}}1
