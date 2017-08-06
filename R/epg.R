@@ -12,6 +12,8 @@
 # read_epg{{{1
 read_epg <- function(epg){
 
+    assertthat::assert_that(is_epg_file(epg), msg = "Invalid epg file.")
+
     sim_info <- readr::read_csv(file = epg, comment = "!",
                                 col_names = c("model", "weather", "result", "run_times"),
                                 col_types = cols(.default = "c", run_times = col_integer()))
@@ -30,12 +32,15 @@ read_epg <- function(epg){
 # }}}1
 
 # is_epg{{{1
-is_epg <- function (epg) {
-    if (inherits(epg, "epg")) {
-        TRUE
-    } else {
-        if (assertthat::is.string(epg)) {
-            if (has_epg_ext(epg)) {
+is_epg_file <- function (epg) {
+    if (assertthat::is.string(epg)) {
+        if (has_epg_ext(epg)) {
+            assertthat::is.readable(epg)
+            try_epg <- readr::read_csv(epg, comment = "!", n_max = 0,
+                col_names = FALSE,
+                col_types = readr::cols(.default = readr::col_character())
+            )
+            if (identical(ncol(try_epg), 4L)) {
                 TRUE
             } else {
                 FALSE
@@ -43,6 +48,8 @@ is_epg <- function (epg) {
         } else {
             FALSE
         }
+    } else {
+        FALSE
     }
 }
 # }}}1
