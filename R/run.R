@@ -993,53 +993,6 @@ create_job <- function (param_tbl) {
 # }}}1
 
 #' @expoprt
-# run_epg{{{1
-run_epg <- function (epg, n = NULL, eplus_ver = NULL, eplus_dir = NULL) {
-
-    # Check 'epg'{{{2
-    if (is.character(epg)) {
-        if (!file.exists(epg)) {
-            stop("Input 'epg' file does not exists.", call. = FALSE)
-        } else {
-            job <- read_epg(epg)
-        }
-    } else if (is.data.frame(epg)) {
-        type <- attr(epg, "job_type")
-        col_names <- colnames(epg)
-        required <- c("model", "weather", "output_dir", "output_prefix", "run_times")
-        ex_col <- setdiff(col_names, required)
-        mis_col <- setdiff(required, col_names)
-        if (all(type == "epg", length(ex_col) == 0L, length(mis_col) == 0L)) {
-            job <- epg
-        } else {
-            stop("Invalid 'epg'. Please use 'read_epg' to get the correct type", call. = FALSE)
-        }
-    } else {
-        stop("'epg' should be either a data.frame or an .epg file path.", call. = FALSE)
-    }
-    # }}}2
-
-    # Write epg file{{{2
-    if (unique(job[["output_dir"]]) == 1L) {
-        path <- unique(job[["output_dir"]])
-        if (!dir.exists(path)) {
-            dir.create(path, showWarnings = FALSE, recursive = TRUE)
-        }
-        file_name <- normalizePath(file_path(path, "run.epg"), mustWork = FALSE)
-        write_epg(models = normalizePath(job[["model"]], mustWork = TRUE),
-                  weathers = normalizePath(job[["weather"]], mustWork = TRUE),
-                  output_dirs = normalizePath(file_path(job[["output_dir"]], job[["output_prefix"]])), mustWork = FALSE,
-                  run_times = job[["run_times"]], path = file_name)
-    }
-    # }}}2
-
-    # Run
-    rum_multi(models = epg[["model"]], weathers = epg[["weather"]],
-              output_dirs = epg[["output_dir"]], output_prefix = epg[["outout_prefixes"]],
-              n = n, eplus_ver = eplus_ver, eplus_dir = eplus_dir)
-}
-# }}}1
-
 # run_epat{{{1
 run_epat <- function(epat, case_name = NULL, output_dir = NULL, n = NULL,
                      eplus_ver = NULL, eplus_dir = NULL) {
@@ -1156,26 +1109,6 @@ run_jeplus <- function(jeplus, case_name = NULL, output_dir = NULL, n = NULL,
 }
 # }}}1
 
-# write_epg{{{1
-write_epg <- function(models, weathers, output_dirs, run_times, path){
-    header <- paste0(
-        "! EnergyPlus Group File",
-        "! ------------------------------------------------------------------------------------------------",
-        "! Each line represents a specific simulation. If you don't want a simulation to run, add a comment",
-        "! character (an exclamation point) to the beginning of that line. Commas are used to separate the ",
-        "! fields. Each line consists of the following fields: ",
-        "!",
-        "!    input file name, weather file name, output file name (no extension), counter",
-        "!",
-        "! ------------------------------------------------------------------------------------------------",
-        collapse = "\n")
-
-    contents <- paste(models, weathers, output_dirs, run_times, sep = ",")
-    epg_info <- paste(header, contents)
-    readr::write_lines(epg_info, path)
-}
-# }}}1
-
 # check_jeplus{{{1
 check_jeplus <- function (jeplus) {
     if (!is.list(jeplus)) return(FALSE)
@@ -1203,23 +1136,6 @@ check_epat <- function (epat) {
     var_names <- names(epat)
     required <- c("idf_path", "weather_path", "param_field", "param_value",
                   "eplus_path", "wd_path", "parallel_num")
-    ex_vars <- setdiff(var_names, required)
-    mis_vars <- setdiff(required, var_names)
-    if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
-        return(TRUE)
-    } else {
-        return(FALSE)
-    }
-}
-# }}}1
-
-# check_epg{{{1
-check_epg <- function (epg) {
-    if (!is.data.frame(epg)) return(FALSE)
-    type <- attr(epg, "job_type")
-    if (type != "epg") return(FALSE)
-    var_names <- names(epg)
-    required <- c("model", "weather", "output_dir", "output_prefix", "run_times")
     ex_vars <- setdiff(var_names, required)
     mis_vars <- setdiff(required, var_names)
     if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
