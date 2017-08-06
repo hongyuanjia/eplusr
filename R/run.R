@@ -993,67 +993,6 @@ create_job <- function (param_tbl) {
 # }}}1
 
 #' @expoprt
-# run_epat{{{1
-run_epat <- function(epat, case_name = NULL, output_dir = NULL, n = NULL,
-                     eplus_ver = NULL, eplus_dir = NULL) {
-
-    # Check 'epat'{{{2
-    if (is.character(epat)) {
-        if (!file.exists(epat)) {
-            stop("Input 'epat' file does not exists.", call. = FALSE)
-        } else {
-            if (tools::file_ext(epat) == "epat"){
-                epat <- import_epat(epat)
-            } else {
-                stop("Input 'epat' file should have an extension of 'epat'.",
-                     call. = FALSE)
-            }
-        }
-    } else {
-        if (!check_epat(epat = epat)) {
-            stop("'epat' should be either an EPAT project, or a job imported using 'import_epat'.",
-                 call. = FALSE)
-        }
-    }
-    # }}}2
-
-    # Get job{{{2
-    job_info <- create_job(param_tbl = epat)
-    job <- job_info[["job"]]
-    job_index <- job_info[["job_index"]]
-    # }}}2
-
-    # Other args check{{{2
-    if (is.null(output_dir)) {
-        if (epat[["wd_path"]] != "") {
-            output_dir <- epat[["wd_path"]]
-        } else {
-            output_dir <- dirname(epat[["idf_path"]])
-        }
-    }
-    if (!is.null(case_name)) {
-        output_dir <- file_path(output_dir, case_name)
-    }
-    if (is.null(n)) {
-        n <- epat[["parallel_num"]]
-    }
-    if (is.null(eplus_dir)) {
-        eplus_dir <- epat[["eplus_path"]]
-    }
-    if (!dir.exists(output_dir)) {
-        dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-    }
-    # }}}2
-
-    # Write 'job_index.csv'.
-    readr::write_csv(job_index, file_path(output_dir, "job_index.csv"))
-
-    run_multi(models = job[["model"]], weathers = job[["weather"]],
-              output_dirs = output_dir, output_prefixes = job_index[["model_case"]],
-              case_name = case_name, n = n, eplus_ver = eplus_ver, eplus_dir = eplus_dir)
-}
-# }}}1
-
 # run_jeplus{{{1
 run_jeplus <- function(jeplus, case_name = NULL, output_dir = NULL, n = NULL,
                        eplus_ver = NULL, eplus_dir = NULL) {

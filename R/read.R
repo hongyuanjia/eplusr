@@ -2,38 +2,6 @@
 #                          EnergyPlus Results Reading                          #
 ################################################################################
 
-#' Import EnergyPlus .epg group file
-#'
-#' \code{read_epg} returns a tibble which contains the necessary infomation in
-#' order to run simulations using \code{\link{run_epg}}.
-#'
-#' @param epg A file path of EnergyPlus .epg file.
-#' @return A tibble.
-#' @importFrom readr read_csv cols col_integer
-#' @importFrom dplyr as_tibble mutate select one_of
-#' @importFrom purrr map_at
-#' @export
-# read_epg{{{1
-read_epg <- function(epg){
-
-    sim_info <- readr::read_csv(file = epg, comment = "!",
-                                col_names = c("model", "weather", "result", "run_times"),
-                                col_types = cols(.default = "c", run_times = col_integer()))
-
-    sim_info <- dplyr::as_tibble(purrr::map_at(sim_info,
-                                               c("model", "weather", "result"),
-                                               normalizePath, mustWork = FALSE
-                                               ))
-    sim_info <- dplyr::mutate(sim_info, output_dir = dirname(result))
-    sim_info <- dplyr::mutate(sim_info, output_prefix = basename(result))
-    sim_info <- dplyr::select(sim_info, dplyr::one_of("model", "weather", "output_dir", "output_prefix", "run_times"))
-
-    class(sim_info) <- c("epg", "eplus_job", class(sim_info))
-
-    return(sim_info)
-}
-# }}}1
-
 #' Import jEPlus .json type project.
 #'
 #' \code{read_jeplus} takes a file path of an .json type project of jEPlus,
