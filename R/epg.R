@@ -36,7 +36,7 @@ read_epg <- function(epg){
 is_epg_file <- function (epg) {
     if (assertthat::is.string(epg)) {
         if (has_epg_ext(epg)) {
-            assertthat::is.readable(epg)
+            assertthat::assert_that(assertthat::is.readable(epg))
             try_epg <- readr::read_csv(epg, comment = "!", n_max = 0,
                 col_names = FALSE,
                 col_types = readr::cols(.default = readr::col_character())
