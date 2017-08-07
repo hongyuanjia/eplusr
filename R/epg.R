@@ -111,10 +111,11 @@ run_epg <- function (epg, cores = NULL, output_suffix = c("C", "L", "D"),
 
     job <- validate_job(epg, "epg")
     # Get inputs {{{2
-    models <- job[["model"]]
-    weathers <- job[["weather"]]
-    output_dirs <- job[["output_dir"]]
-    output_prefixes <- job[["output_prefix"]]
+    run_times <- job[["run_times"]]
+    models <- purrr::map2_chr(job[["model"]], run_times, ~rep(.x, times = .y))
+    weathers <- purrr::map2_chr(job[["weather"]], run_times, ~rep(.x, times = .y))
+    output_dirs <- purrr::map2_chr(job[["output_dir"]], run_times, ~rep(.x, times = .y))
+    output_prefixes <- purrr::map2_chr(job[["output_prefix"]], run_time,s ~rep(.x, times = .y))
     # }}}2
     # Write the epg file to output dir {{{2
     if (identical(length(unique(output_dirs)), 1L)) {
@@ -127,7 +128,6 @@ run_epg <- function (epg, cores = NULL, output_suffix = c("C", "L", "D"),
               output_suffix = output_suffix, special_run = special_run,
               eplus_ver = eplus_ver, eplus_dir = eplus_dir, show_msg = TRUE)
     # }}}2
-
 
 }
 # }}}1
