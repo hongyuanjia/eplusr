@@ -92,11 +92,9 @@ as_epg <- function (x) {
     assertthat::assert_that(identical(ncol(x), 4L))
 
     col_names = c("model", "weather", "output_name", "run_times")
-    assertthat::assert_that(all(!is.na(match(colnames(x), colnames))),
-        msg = paste0("Input shoud be a data.frame with columns ",
-            sQuote(col_names), "."
-        )
-    )
+    if (any(is.na(match(colnames(x), colnames)))) {
+        stop("Input shoud be a data.frame with columns ", sQuote(col_names), ".")
+    }
 
     epg <- x
     class(epg) <- unique(c("epg", "eplusr_job", class(sim_info)))
