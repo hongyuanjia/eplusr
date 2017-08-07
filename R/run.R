@@ -1066,21 +1066,3 @@ check_jeplus <- function (jeplus) {
     }
 }
 # }}}1
-
-# check_epat{{{1
-check_epat <- function (epat) {
-    if (!is.list(epat)) return(FALSE)
-    type <- attr(epat, "job_type")
-    if (type != "epat") return(FALSE)
-    var_names <- names(epat)
-    required <- c("idf_path", "weather_path", "param_field", "param_value",
-                  "eplus_path", "wd_path", "parallel_num")
-    ex_vars <- setdiff(var_names, required)
-    mis_vars <- setdiff(required, var_names)
-    if (all(length(ex_vars) == 0L, length(mis_vars) == 0L)) {
-        return(TRUE)
-    } else {
-        return(FALSE)
-    }
-}
-# }}}1
