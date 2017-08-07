@@ -55,21 +55,7 @@ is_epg_file <- function (epg) {
 }
 # }}}1
 
-# validate_job {{{1
-validate_job <- function (job, type = c("epg", "jeplus", "epat")) {
-    assertthat::assert_that(inherits(job, "eplusr_job"),
-        msg = "Input is not an eplusr job object."
-    )
-    type <- rlang::arg_match(type)
-    val_job <- switch(type,
-        epg = validate_epg(epg),
-        jeplus = validate_jeplus(job),
-        epat = validate_epat(job)
-    )
-
-    return(val_job)
-}
-
+# validate_epg {{{1
 validate_epg <- function (epg) {
     if (is_epg_file(epg)) {
         job <- read_epg(epg)
