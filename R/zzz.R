@@ -15,16 +15,16 @@
        eplusr.temp_dir = normalizePath(file_path(tempdir(), "eplusr"), mustWork = FALSE),
        eplusr.eplus_dir = eplus_info_latest[["path"]],
        eplusr.parallel_num = parallel::detectCores()
-  )
+    )
 
-  toset <- !(names(op.eplusr) %in% names(op))
-  if(any(toset)) options(op.eplusr[toset])
+    toset <- !(names(op.eplusr) %in% names(op))
+    if(any(toset)) options(op.eplusr[toset])
 
-  if (!dir.exists(op.eplusr$eplusr.temp_dir)) {
+    if (!dir.exists(op.eplusr$eplusr.temp_dir)) {
       dir.create(op.eplusr$eplusr.temp_dir, showWarnings = FALSE, recursive = TRUE)
-  }
+    }
 
-  invisible()
+    invisible()
 }
 
 .onAttach <- function (libname, pkgname) {
