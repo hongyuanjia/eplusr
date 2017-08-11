@@ -913,9 +913,6 @@ assign_job_to_core <- function (id_job, id_core, job, n_jobs) {
 
 # validate_job {{{1
 validate_job <- function (job, type = c("epg", "jeplus", "epat")) {
-    assertthat::assert_that(inherits(job, "eplusr_job"),
-        msg = "Input is not an eplusr job object."
-    )
     type <- rlang::arg_match(type)
     val_job <- switch(type,
         epg = validate_epg(epg),
