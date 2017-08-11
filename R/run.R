@@ -148,6 +148,9 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
     # }}}2
 
     command <- paste0(cmd_head, " eplusr_run.bat && DEL eplusr_run.bat")
+    status <- system(command = command, wait = echo, invisible = echo)
+    if (status != 0L) {
+        stop("Error occured when running commands.", call. = FALSE)
     system(command = command, wait = echo, invisible = echo)
     if (!echo) {
         msg_head <- paste0(
@@ -856,6 +859,9 @@ run_multi <- function (models, weathers, cores = NULL,
     # }}}2
     # Run the job with multithreading {{{2
     cmd_starts <- paste0(cmd_head, " START ", path_multi_run_bats)
+    status <- purrr::map_int(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
+    if (any(status != 0L)) {
+        stop("Error occured when running commands", call. = FALSE)
     walk(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
     # }}}2
 
