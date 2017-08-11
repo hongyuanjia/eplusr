@@ -350,6 +350,10 @@ cmd_run <- function (eplus_dir, model, weather, output_dir, output_prefix,
     new_model <- file_path(wd, new_model_name)
     new_weather <- file_path(wd, new_weather_name)
     # }}}2
+    # cmd_mkdir: Make temp dir if it does not exists {{{2
+    cmd_mkdir <- paste("IF NOT EXIST", shQuote(file_path(wd, "NUL", normalize = FALSE)),
+                       "MKDIR", shQuote(wd), sep = " ")
+    # }}}2
     # cmd_copy_input: Copy model and weather file into temp dir {{{2
     cmd_copy_model <- paste("COPY /Y", shQuote(model), shQuote(new_model), ">NUL", sep = " ")
     cmd_copy_weather <- paste("COPY /Y", shQuote(weather), shQuote(new_weather), ">NUL", sep = " ")
@@ -393,7 +397,7 @@ cmd_run <- function (eplus_dir, model, weather, output_dir, output_prefix,
                            annual = annual, design_day = design_day, idd = idd)
     # }}}2
     # Combine all commands {{{2
-    cmd <- c(cmd_head, cmd_copy_input,
+    cmd <- c(cmd_head, cmd_mkdir, cmd_copy_input,
              cmd_title_s, cmd_working_dir, cmd_eplus,
              cmd_post_proc, cmd_msg, cmd_title_e, cmd_pause)
     # }}}2
