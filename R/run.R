@@ -826,7 +826,7 @@ run_multi <- function (models, weathers, cores = NULL,
                             output_prefix = output_prefixes)
     # }}}2
     # Command heading and titles {{{2
-    cmd_head <- "cmd.exe /c @ECHO OFF"
+    cmd_head <- "cmd.exe /c @ECHO OFF &&"
     # Title
     seq <- stringr::str_pad(1:n_jobs, nchar(n_jobs), side = "left", pad = "0")
     cmd_title <- paste0("Simulation in progress [", seq, "/", n_jobs, "]")
@@ -879,6 +879,7 @@ run_multi <- function (models, weathers, cores = NULL,
                           "Weather: ", file_path(weathers), "\n----------\n")
         msg(msg_head, msg_job)
     }
+    # }}}2
 }
 # }}}1
 # divide_job {{{1
