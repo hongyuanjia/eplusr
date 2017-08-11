@@ -103,7 +103,7 @@ run_epg <- function (epg, cores = NULL, output_suffix = c("C", "L", "D"),
     # }}}2
     # Write the epg file to output dir {{{2
     if (identical(length(unique(output_dirs)), 1L)) {
-        write_epg(epg, file_path(output_dirs[1], "run.epg"))
+        write_epg(job, file_path(output_dirs[1], "run.epg"))
     }
     # }}}2
     # Run {{{2
