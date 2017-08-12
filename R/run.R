@@ -151,7 +151,7 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
     status <- system(command = command, wait = echo, invisible = echo)
     if (status != 0L) {
         stop("Error occured when running commands.", call. = FALSE)
-    system(command = command, wait = echo, invisible = echo)
+    }
     if (!echo) {
         msg_head <- paste0(
             "Simulation has been successfully executed using EnergyPlus V",
