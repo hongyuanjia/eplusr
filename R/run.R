@@ -877,7 +877,7 @@ run_multi <- function (models, weathers, cores = NULL,
         msg_job <- paste0("[Job ", seq, "]:\n",
                           "Model: ", file_path(models), "\n",
                           "Weather: ", file_path(weathers), "\n----------\n")
-        msg(msg_head, msg_job)
+        message(msg_head, msg_job)
     }
     # }}}2
 }
