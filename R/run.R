@@ -351,7 +351,7 @@ cmd_run <- function (eplus_dir, model, weather, output_dir, output_prefix,
     new_weather <- file_path(wd, new_weather_name)
     # }}}2
     # cmd_mkdir: Make temp dir if it does not exists {{{2
-    cmd_mkdir <- paste("IF NOT EXIST", shQuote(file_path(wd, "NUL", normalize = FALSE)),
+    cmd_mkdir <- paste("IF NOT EXIST", shQuote(file_path(wd, "\\")),
                        "MKDIR", shQuote(wd), sep = " ")
     # }}}2
     # cmd_copy_input: Copy model and weather file into temp dir {{{2
