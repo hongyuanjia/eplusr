@@ -851,7 +851,7 @@ run_multi <- function (models, weathers, cores = NULL,
     output_prefixes <- job_infos[["output_prefix"]]
     # }}}2
     # Divide jobs according to total core number {{{2
-    divided_jobs <- divide_jobs(cores, cmd_jobs)
+    divided_jobs <- divide_jobs(cores, cmd_jobs, append = "EXIT")
     # }}}2
     # Write 'run.bat' and 'multi_run_*.bat' {{{2
     # Write 'run.bat' to output dir
@@ -883,9 +883,14 @@ run_multi <- function (models, weathers, cores = NULL,
 }
 # }}}1
 # divide_job {{{1
-divide_jobs <- function (cores, jobs) {
+divide_jobs <- function (cores, jobs, append = NULL) {
     id_cores <- seq(1:cores)
-    purrr::map(id_cores, ~divide_jobs_to_core(.x, jobs))
+    divided_jobs <- purrr::map(id_cores, ~divide_jobs_to_core(.x, jobs))
+    if (!is.null(append)) {
+        divided_jobs <- purrr::map(divided_jobs, base::append, values = append)
+    }
+
+    return(divided_jobs)
 }
 
 divide_jobs_to_core <- function (id_core, jobs) {
