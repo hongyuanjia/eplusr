@@ -866,9 +866,9 @@ run_multi <- function (models, weathers, cores = NULL,
     status <- purrr::map_int(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
     if (any(status != 0L)) {
         stop("Error occured when running commands", call. = FALSE)
-    walk(cmd_starts, ~system(command = .x, wait = FALSE, invisible = FALSE))
+    }
     # }}}2
-
+    # Info message {{{2
     if (show_msg) {
         msg_head <- paste0(
             "The job has been successfully executed using EnergyPlus V",
