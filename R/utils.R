@@ -100,3 +100,7 @@ file_prefix <- function (x) {
     tools::file_path_sans_ext(basename(x))
 }
 # }}}1
+
+is_empty <- function (x) {
+    length(x) == 0L
+}
