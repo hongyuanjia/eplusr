@@ -304,7 +304,8 @@ pre_proc <- function (model, weather, output_dir = NULL, output_prefix = NULL,
                    start_title = start_title, finish_title = finish_title)
     # }}}2
     # Get 'run.bat' {{{2
-    run_bat <- cmd[6]
+    # Use 'eplus_dir' to locate the command
+    run_bat <- cmd[grepl(eplus_dir, cmd, fixed = TRUE)]
     run_bat <- change_output_dir(run_bat, output_dir)
     # }}}2
 
