@@ -245,7 +245,8 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
 
 # output_files {{{
 output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
-                          type = NULL, simplify = FALSE) {
+                          type = c("input", "table", "meter", "variable"),
+                          simplify = FALSE) {
     prefix <- file_prefix(prefix)
     suffix_type <- rlang::arg_match(suffix_type)
 
@@ -288,6 +289,7 @@ output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
     )
 
     fixed <- TRUE
+    if (missing(type)) type <- NULL
     if (!is.null(type)) {
         if (!is.null(ext)) {
             ext <- NULL
