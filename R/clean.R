@@ -321,10 +321,6 @@ output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
         files <- paste0(prefix, suffix)
     }
 
-    if (!is.null(type)) {
-
-    }
-
     return(files)
 }
 # }}}
