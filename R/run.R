@@ -127,7 +127,6 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
     cmd_run <- job_info[["cmd_run"]]
     output_dir <- job_info[["output_dir"]]
     output_prefix <- job_info[["output_prefix"]]
-    output_suffix <- job_info[["output_suffix"]]
     # }}}2
     # Set working dir as 'output_dir' {{{2
     ori_wd <- getwd()
