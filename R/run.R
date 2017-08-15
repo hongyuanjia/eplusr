@@ -135,10 +135,13 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
     # }}}2
     # Clean output dir before simulation {{{2
     output_model <- file_path(output_dir, paste0(output_prefix, ".idf"))
+    # If output dir is the dir where the model is, keep the model and weather in
+    # order to use them in simulation
+    keep_input <- if (identical(file_path(model), output_model)) TRUE else FALSE
     if (echo) {
-        clean_wd(path = output_model, suffix_type = output_suffix)
+        clean_wd(path = output_model, suffix_type = output_suffix, keep_input = keep_input)
     } else {
-        suppressMessages(clean_wd(path = output_model, suffix_type = output_suffix))
+        suppressMessages(clean_wd(path = output_model, suffix_type = output_suffix, keep_input = keep_input))
     }
     # }}}2
     # Write 'run.bat' and 'eplusr_run.bat'into the output dir {{{2
