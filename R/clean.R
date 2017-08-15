@@ -30,9 +30,9 @@
 #' @importFrom purrr walk2
 # clean_wd
 # {{{1
-clean_wd <- function(path, suffix_type = c("C", "L", "D"), extra= NULL,
-                     backup = FALSE, backup_folder = NULL, mark = "datetime",
-                     newname_mark = NULL) {
+clean_wd <- function(path, suffix_type = c("C", "L", "D"), extra = NULL,
+                     keep_input = FALSE, backup = FALSE, backup_folder = NULL,
+                     mark = "datetime", newname_mark = NULL) {
 
     # Args validation {{{2
     # assertthat::assert_that(file.exists(path))
@@ -102,9 +102,13 @@ backup_files <- function(files, folder_prefix = NULL, folder_suffix = "datetime"
 
 # get_clean_files
 # {{{1
-get_clean_files <- function (prefix, suffix_type, extra = NULL) {
+get_clean_files <- function (prefix, suffix_type, extra = NULL, except_input = FALSE) {
     prefix <- file_prefix(prefix)
     clean_files <- output_files(prefix = prefix, suffix_type = suffix_type)
+    if (except_input) {
+        input <- output_files(prefix = prefix, suffix_type = suffix_type, type = "input")
+        clean_files <- setdiff(clean_files, input)
+    }
     extra = c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat", extra)
     extra_files <- file_path(prefix, extra)
     clean_files <- c(clean_files, extra_files)
