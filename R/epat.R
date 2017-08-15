@@ -720,14 +720,15 @@ fileChoose <- function (input, output, session, filetypes = NULL) {
         }
     )
 
-    file_path <- reactive({
-        file_path <- input$text
-        if (is.null(file_path)) return(NULL)
-        if (identical(file_path, "")) return(NULL)
-        return(file_path)
+    file_paths <- reactive({
+        file_paths <- input$text
+        if (is.null(file_paths)) return(NULL)
+        if (identical(file_paths, "")) return(NULL)
+        file_paths <- purrr::simplify(stringr::str_split(file_paths, ","))
+        return(file_path(file_paths))
     })
 
-    return(list(path = file_path, btn = reactive(input$btn)))
+    return(list(path = file_paths, btn = reactive(input$btn)))
 }
 # }}}1
 # dirChooseInput {{{1
@@ -797,7 +798,7 @@ dirChoose <- function (input, output, session) {
         dir_path <- input$text
         if (is.null(dir_path)) return(NULL)
         if (identical(dir_path, "")) return(NULL)
-        return(dir_path)
+        return(file_path(dir_path))
     })
 
     return(list(path = dir_path, btn = reactive(input$btn)))
