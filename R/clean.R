@@ -68,7 +68,7 @@ clean_wd <- function(path, suffix_type = c("C", "L", "D"), extra = NULL,
 
         backup_files(backup_files, backup_folder, mark, newname_mark)
     }
-    clean_files <- get_clean_files(prefix = prefix, suffix_type = suffix_type, extra = extra)
+    clean_files <- get_clean_files(prefix = prefix, suffix_type = suffix_type, extra = extra, except_input = keep_input)
     purrr::walk(clean_files,
                 function(file_name) {
                     if (file.exists(file_name)) {
@@ -106,7 +106,7 @@ get_clean_files <- function (prefix, suffix_type, extra = NULL, except_input = F
     prefix <- file_prefix(prefix)
     clean_files <- output_files(prefix = prefix, suffix_type = suffix_type)
     if (except_input) {
-        input <- output_files(prefix = prefix, suffix_type = suffix_type, type = "input")
+        input <- output_files(prefix = prefix, suffix_type = suffix_type, type = "input", simplify = TRUE)
         clean_files <- setdiff(clean_files, input)
     }
     extra = c("Energy+.ini", "fort.6", "audit.out", "post_proc.bat", extra)
