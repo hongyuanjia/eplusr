@@ -187,6 +187,91 @@ run_epat <- function (epat, group = c("model", "weather", "all"), pair = NULL,
 }
 # }}}1
 
+# collect_epat {{{1
+collect_epat <- function (x, case_names = NULL, no_params = TRUE,
+                          output = c("variable", "meter", "table", "surface report"),
+                          suffix_type = c("auto", "C", "L", "D"), which = NULL,
+                          year = current_year(), new_date = "datetime",
+                          tz = Sys.timezone(), drop_na = FALSE, unnest = FALSE,
+                          long_table = FALSE) {
+    # Initialize
+    is_job_index <- FALSE
+    epat <- tryCatch(validate_epat(x), error = function (e) NULL)
+    # If 'x' is not a parsable epat
+    if (is.null(epat)) {
+        assertthat::assert_that(assertthat::is.string(x))
+        is_file <- file_test("-f", x)
+        is_dir <- file_test("-d", x)
+        if (is_file) {
+            is_job_index <- identical(basename(x), "job_index.csv")
+            path <- x
+        } else if (is_dir) {
+            path <- file_path(x, "job_index.csv")
+            is_job_index <- file.exists(path)
+        } else {
+            is_job_index <- FALSE
+        }
+    # If 'x' is a parsable epat
+    } else {
+        x <- epat[["project_dir"]]
+        is_dir <- file_test("-d", x)
+        if (is_dir) {
+            path <- file_path(x, "job_index.csv")
+            is_job_index <- file_test("-f", path)
+        } else {
+            is_job_index <- FALSE
+        }
+    }
+    # Stop if no 'job_index.csv' has been found
+    assertthat::assert_that(is_job_index,
+        msg = msg("Could not find 'job_index.csv'. 'x' should be an epat object,
+                  a path to an .epat file, a path to a 'job_index.csv' or a
+                  directory that contains one.")
+    )
+
+    # Read "job_index.csv"
+    job_index <- read_job_index(path)
+
+    # Get output dirs
+    dirs <- job_index[["dir"]]
+    output_dirs <- file_path(dirname(path), dirs)
+
+    # Get default value of 'case_names'
+    case_names <- case_names %||% dirs
+    is_equal_length <- identical(length(case_names), length(dirs))
+    assertthat::assert_that(all(is.character(case_names), is_equal_length),
+        msg = msg("'case_names' should be a character vector with a same length
+                  as case number.")
+    )
+
+    # Read data
+    data <- tidyr::unnest(
+        dplyr::mutate(job_index, case = case_names,
+            data = purrr::map(output_dirs,
+                ~collect_eplus(path = .x, output = output, suffix_type = suffix_type,
+                    which = which, year = year, new_date = new_date, tz = tz,
+                    drop_na = drop_na, unnest = unnest, long_table = long_table
+                )
+            )
+        ),
+        data
+    )
+    data <- dplyr::select(data, no, case, dplyr::everything())
+
+    # Delete param columns
+    if (no_params) {
+        data <- dplyr::select(data, -dplyr::starts_with("@@"))
+    }
+
+    # Unnest data
+    if (unnest) {
+        data <- tidyr::unnest(data)
+    }
+
+    return(data)
+}
+# }}}1
+
 #' A Shiny Gadget for editing EPAT job
 #'
 #' \code{edit_pat} takes an EPAT json project file, starts a Shiny Gadget to
@@ -805,6 +890,23 @@ dirChoose <- function (input, output, session) {
 }
 # }}}1
 
+# read_job_index {{{1
+read_job_index <- function (path, no_at = FALSE) {
+    assertthat::assert_that(
+        all(assertthat::is.string(path), basename(path) == "job_index.csv"),
+        msg = msg("'path' should be a path to a 'job_index.csv'.")
+    )
+
+    job_index <- readr::read_csv(path)
+    if (no_at) {
+        job_index <- purrr::set_names(job_index,
+            stringr::str_replace_all(names(job_index), "@", "")
+        )
+    }
+
+    return(job_index)
+}
+# }}}1
 # is_epat_file {{{1
 is_epat_file <- function (epat) {
     if (assertthat::is.string(epat)) {
