@@ -13,12 +13,24 @@
 #' @export
 #'
 # time_from_eplus{{{
-time_from_eplus <- function (x, year = lubridate::year(Sys.Date()), tz = Sys.timezone()) {
-    assertthat::assert_that(assertthat::are_equal(class(x), "character"))
+time_from_eplus <- function (x, year = current_year(), tz = Sys.timezone()) {
+    assertthat::assert_that(is.character(x))
 
     x_trim <- stringr::str_trim(x, side = "both")
-    x_with_year <- paste0(paste0(as.character(year), "/"), x_trim)
-    x_parsed <- lubridate::ymd_hms(x_with_year, tz = tz)
+    freq <- guess_freq(x_trim)
+    if (freq == "date") {
+        x_datetime <- paste0(paste0(as.character(year), "/"), x_trim, " 00:00:00")
+    } else if (freq == "datetime") {
+        x_datetime <- paste0(paste0(as.character(year), "/"), x_trim)
+    } else if (freq == "monthly") {
+        x_datetime <- paste0(paste0(as.character(year), "-"), x_trim, "-01 00:00:00")
+    } else {
+        warning(msg("No parsing has been done. Fail to parse EnergyPlus
+                    DateTime format."), call. = FALSE)
+        return(x)
+    }
+
+    x_parsed <- lubridate::ymd_hms(x_datetime, tz = tz)
 
     if (lubridate::leap_year(year)) {
         is_leap_datetime <-
@@ -29,6 +41,15 @@ time_from_eplus <- function (x, year = lubridate::year(Sys.Date()), tz = Sys.tim
             warning("'year' is a leap year. All instances with Feb 29th will be replaced with Mar 1st.",
                     call. = FALSE)
         }
+    }
+
+    if (any(is.na(x_parsed))) {
+        fails <- x[is.na(x_parsed)]
+        ids <- which(is.na(x_parsed))
+        warning("No parsing has been done. Fail to parse instances below:\n",
+            msg("No. ", ids,": ", sQuote(fails)), call. = FALSE
+        )
+        return(x)
     }
 
     return(x_parsed)
@@ -221,3 +242,24 @@ is_leap_day <- function (x) {
     return(results)
 }
 # }}}
+
+# guess_freq {{{1
+guess_freq <- function (x, n_max = 10L) {
+    # Use first ten instances to guess output freq
+    x_10 <- na.omit(x[1:n_max])
+    regex_daily <- "^\\s*(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[0-1])$"
+    regex_datetime <- "^\\s*(0[1-9]|1[0-2])/(0[1-9]|[1-2][0-9]|3[0-1])  (0[0-9]|1[0-9]|2[0-4]):(0[0-9]|[1-5][0-9]):(0[0-9]|[1-5][0-9])$"
+
+    if (all(grepl(regex_daily, x_10, perl = TRUE))) {
+        freq <- "date"
+    } else if (all(grepl(regex_datetime, x_10, perl = TRUE))) {
+        freq <- "datetime"
+    } else if (all(!is.na(match(x_10, base::month.name)))) {
+        freq <- "monthly"
+    } else {
+        freq <- "unknown"
+    }
+
+    return(freq)
+}
+# }}}1
