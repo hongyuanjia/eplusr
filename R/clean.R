@@ -249,9 +249,9 @@ backup_file <- function(file, backup_folder, newname_suffix = NULL) {
 
 # output_files {{{
 output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
-                          type = c("input", "table", "meter", "variable"),
-                          simplify = FALSE) {
-    prefix <- file_prefix(prefix)
+                          type = c("input", "table", "meter", "variable", "sizing"),
+                          simplify = FALSE, exist_only = FALSE) {
+    # prefix <- file_prefix(prefix)
     suffix_type <- rlang::arg_match(suffix_type)
 
     suffix <- switch(suffix_type,
@@ -299,29 +299,46 @@ output_files <- function (prefix, suffix_type = c("L", "C", "D"), ext = NULL,
             ext <- NULL
             warning("'ext' will be ignored when 'type' specified.", call. = FALSE)
         }
-        type <- rlang::arg_match(type, c("input", "table", "meter", "variable"))
+        type <- rlang::arg_match(type)
         if (identical(type, "input")) {
             ext <- c(".idf", ".imf", ".epw")
         } else if (identical(type, "table")) {
             ext <- switch(suffix_type, L = "tbl.", C = "Table.", D = "-table.")
         } else if (identical(type, "meter")) {
             ext <- switch(suffix_type, L = "meter.", C = "Meter.", D = "-meter.")
-        } else {
+        } else if (identical(type, "variable")){
             fixed <- FALSE
             ext <- switch(suffix_type,
                           L = c("^out.csv$", "^out.txt$", "^out.tab$", "^out.sql$"),
                           C = c("^.csv$", "^.txt$", "^.tab$", "^.sql$"),
-                          D = c("^.csv$", "^.txt$", "^.tab$", "^.sql$"))
+                          D = c("^.csv$", "^.txt$", "^.tab$", "^.sql$")
+            )
+        } else {
+            ext <- switch(suffix_type,
+                L = c("ssz.", "zsz."),
+                C = c("Ssz.", "Zsz."),
+                D = c("-ssz.", "-zsz.")
+            )
         }
+        simplify <- TRUE
     }
 
     if (!is.null(ext)) {
         assertthat::assert_that(is.character(ext))
         suffix <- purrr::map(paste0(ext), grep, x = suffix, fixed = fixed, value = TRUE)
         files <- purrr::map(suffix, ~{ if (!purrr::is_empty(.x)) paste0(prefix, .x) })
+        if (exist_only) {
+            if (!is.null(files)) {
+                files <- purrr::map(files, ~{if (!is.null(.x)) .x[file.exists(.x)] })
+            }
+        }
+
         files <- purrr::set_names(files, ext)
+        if (length(ext) == 1L) {
+            simplify <- TRUE
+        }
         if (simplify) {
-            files <- unique(purrr::flatten_chr(files))
+            files <- unique(purrr::simplify(files))
         }
     } else {
         files <- paste0(prefix, suffix)
