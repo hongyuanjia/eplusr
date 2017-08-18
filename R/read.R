@@ -93,118 +93,81 @@ read_jeplus <- function (json) {
 #' @export
 # collect_eplus: A function to read EnergyPlus simulation results.
 # collect_eplus
-# {{{1
+# collect_eplus {{{1
 collect_eplus <- function (path, output = c("variable", "meter", "table", "surface report"),
-                        year = current_year(), eplus_date_col = "Date/Time",
-                        new_date_col = "datetime", tz = Sys.timezone(),
-                        rp_na = NA, to_GJ = NULL, unnest = FALSE, long = FALSE) {
-    # Check if the input model path is given.
-    ext <- tools::file_ext(path)
-    if (ext != "") {
-        if (length(grep("i[dm]f", ext, ignore.case = TRUE)) == 0) {
-            stop("'path' should be a path of folder or a path of the input .idf or .imf file.",
-                 call. = FALSE)
-        } else {
-            prefix = file_prefix(path)
-            file_names <- data.table(prefix = prefix,
-                                     variable = paste0(prefix, ".csv"),
-                                     meter = paste0(prefix, "Meter.csv"),
-                                     surface_report = paste0(prefix, ".eio"),
-                                     table = paste0(prefix, "Table.htm"))
-            path <- dirname(path)
-        }
+                           suffix_type = c("auto", "C", "L", "D"), which = NULL,
+                           year = current_year(), new_date = "datetime",
+                           tz = Sys.timezone(), drop_na = FALSE, unnest = FALSE,
+                           long_table = FALSE) {
+    # Read only one path at a time
+    assertthat::assert_that(assertthat::is.string(path))
+    # Default is to read variable output
+    output <- rlang::arg_match(output)
+    # Default is to auto-detect suffix type
+    suffix_type <- rlang::arg_match(suffix_type)
+
+    # Check if given 'path' is a dir or a file {{{2
+    is_file <- file_test("-f", path)
+    is_dir <- file_test("-d", path)
+    is_model <- has_model_ext(path)
+    # Stop if 'path' is neither a model nor a dir.
+    assertthat::assert_that(any(all(is_file, is_model), is_dir),
+        msg = msg("'path' should be a directory containing EnergyPlus simulation
+                  results or a path of an EnergyPlus model where simulation
+                  results locates.")
+    )
+    # }}}2
+    # Get the suffix type of output {{{2
+    # If 'path' is a directory
+    if (is_dir) {
+        ori_wd <- getwd()
+        on.exit(setwd(ori_wd), add = TRUE)
+        setwd(path)
+        # Get all models in the directory
+        model <- list.files(path, pattern = "\\.i[dm]f", ignore.case = TRUE, full.names = TRUE)
+        assertthat::assert_that(assertthat::is.string(model),
+            msg = msg("Input 'path' is a directory that contains more than one
+                      EnergyPlus models. Please set 'path' to one path of the
+                      models that you want to collect simulation results of.")
+        )
+    # If 'path' is a model path
     } else {
-        # Get the output name pattern.
-        file_names <- get_eplus_main_output_files(path)
+        model <- path
     }
+    # Get the prefix of model
+    prefix <- file_prefix(model, basename = FALSE)
+    # Get the suffix of model
+    if (suffix_type == "auto") suffix_type <- get_suffix_type(prefix)
+    assertthat::assert_that(assertthat::is.string(suffix_type),
+        msg = msg("The directory of 'path' contains results from one model but
+                  with multiple output suffixes: ", csQuote(suffix), ". Please
+                  specify 'suffix_type' explicitly, e.g. one of c('C', 'L', 'D').")
+    )
+    # }}}2
+    # Get the output files {{{2
+    file_to_read <- get_file_to_read(prefix = prefix, suffix = suffix_type, type = output)
+    # }}}2
 
-    if (missingArg(output)) {
-        stop("Missing 'output', which should be one of c('variable', 'meter', 'table', 'surface report').",
-             call. = FALSE)
-    }
-
-    if (is.null(to_GJ)) {
-        to_GJ <- FALSE
-    }
-
-    if (is.na(match(output, c("variable", "meter", "table", "surface report")))) {
-        stop("Invalid value of argument 'output'. It should be one of ",
-             "c('variable', 'meter', 'table', 'surface report').", call. = FALSE)
-    } else if (output == "variable"){
-        file_name <- file_names[["variable"]]
-    } else if (output == "meter"){
-        file_name <- file_names[["meter"]]
-    } else if (output == "surface report"){
-        file_name <- file_names[["surface_report"]]
-    } else {
-        file_name <- file_names[["table"]]
-    }
-
-    check_eplus_output_file_exist(path, file_names, output)
-
-    if (output == "variable") {
-      data <-
-          dplyr::tibble(case = file_names[["prefix"]],
-                        variable_output = purrr::map(file_path(path, file_name),
-                                                     function (file) {
-                                                         if (file.exists(file)) {
-                                                             read_variable(result = file,
-                                                                               year = year,
-                                                                               eplus_date_col = eplus_date_col,
-                                                                               new_date_col = new_date_col,
-                                                                               tz = tz,
-                                                                               rp_na = rp_na,
-                                                                               long = long)
-                                                         } else {
-                                                             return(NULL)
-                                                         }
-                                                     })) #%>% data.table::as.data.table() #%>% tidyr::unnest()
-
-    } else if (output == "meter"){
-      data <-
-          dplyr::tibble(case = file_names[["prefix"]],
-                        meter_output = purrr::map(file_path(path, file_name),
-                                                  function (file) {
-                                                      if (file.exists(file)) {
-                                                          read_variable(result = file,
-                                                                            year = year,
-                                                                            eplus_date_col = eplus_date_col,
-                                                                            new_date_col = new_date_col,
-                                                                            tz = tz,
-                                                                            to_GJ = to_GJ,
-                                                                            rp_na = rp_na,
-                                                                            long = long)
-                                                      } else {
-                                                          return(NULL)
-                                                      }
-                                                  }
-                                                  )) #%>% data.table::as.data.table() #%>% tidyr::unnest()
-
-    } else if (output == "surface report") {
-      data <-
-          dplyr::tibble(case = file_names[["prefix"]],
-                        surface_report = purrr::map(file_path(path, file_name),
-                                                    function (file) {
-                                                        if (file.exists(file)) {
-                                                            read_surf_rpt(eio = file)
-                                                        } else {
-                                                            return(NULL)
-                                                        }
-                                                    }
-                                                    )) #%>% data.table::as.data.table() #%>% tidyr::unnest()
-    } else  {
-      data <-
-          dplyr::tibble(case = file_names[["prefix"]],
-                        table_output = purrr::map(file_path(path, file_name),
-                                                  function (file) {
-                                                      if (file.exists(file)) {
-                                                          read_table(file = file)
-                                                      } else {
-                                                          return(NULL)
-                                                      }
-                                                  }
-                                                  )) #%>% data.table::as.data.table() #%>% tidyr::unnest()
-    }
+    data <- switch(output,
+        variable = dplyr::tibble(model_prefix = file_prefix(file_to_read),
+            variable = purrr::map(file_to_read, read_variable,
+                year = year, new_date = new_date, tz = tz, drop_na = drop_na,
+                long_table = long_table
+            )
+        ),
+        meter = dplyr::tibble(model_prefix = file_prefix(file_to_read),
+            meter = purrr::map(file_to_read, read_meter,
+                year = year, new_date = new_date, tz = tz, drop_na = drop_na,
+                long_table = long_table
+            )
+        ),
+        table = dplyr::tibble(model_prefix = file_prefix(file_to_read),
+            table = purrr::map(file_to_read, read_table, which = which)
+        ),
+        surface_report = dplyr::tibble(model_prefix = file_prefix(file_to_read),
+            surface_report = purrr::map(file_to_read, read_surf_rpt)
+        )
+    )
 
     if (unnest) {
         data <- tidyr::unnest(data = data)
@@ -404,33 +367,13 @@ read_surf_rpt <- function(eio){
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
 # read_meter
-# {{{1
-read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Time",
-                              new_date_col = "datetime", tz = Sys.timezone(),
-                              rp_na = 0L, to_GJ = FALSE, long = FALSE) {
-    meter <-
-        readr::read_csv(meter, col_types = cols(.default = "d", `Date/Time` = "c")) %>%
-        data.table::as.data.table() %>%
-        na_replace(type = "na", replacement = rp_na) %>%
-        eplus_time_trans(year = year, eplus_date_col = eplus_date_col,
-                         new_date_col = new_date_col, tz = tz, keep_ori = FALSE)
-
-    meter <- meter %>%
-        data.table::setnames(col_names(., c("Electricity:Facility", "Gas:Facility")),
-                             col_names(., c("Electricity:Facility", "Gas:Facility")) %>%
-                                 gsub(x =.,  "(.*):(.*)\\s", "\\2:\\1 ")) %>% .[]
-
-    if (to_GJ) {
-        meter <- meter[, lapply(.SD, function(x) round(x/1E9, digits = 4)),
-                       by = c(new_date_col)] %>%
-                       data.table::setnames(col_names(., new_date_col, invert = TRUE),
-                                            col_names(., new_date_col, invert = TRUE) %>%
-                                                gsub(x = ., pattern = "\\[J\\]", replacement = "\\[GJ\\]"))
-    }
-
-    if (long) {
-        meter <- long_table(meter)
-    }
+# read_meter {{{1
+read_meter <- function (path, year = current_year(), new_date = "datetime",
+                        tz = Sys.timezone(), drop_na = FALSE, to_GJ = FALSE,
+                        long_table = FALSE) {
+    meter <- read_variable(path = path, year = year, new_date = new_date,
+        tz = tz, drop_na = drop_na, long_table = long_table
+    )
 
     return(meter)
 }
@@ -467,22 +410,29 @@ read_meter <- function (meter, year = current_year(), eplus_date_col = "Date/Tim
 # 10-min-timestep simulation will takes about 5 seconds to load.  So, use with
 # caution.
 # read_variable
-# {{{1
-read_variable <- function (result, year = current_year(), eplus_date_col = "Date/Time",
-                               new_date_col = "datetime", tz = Sys.timezone(),
-                               rp_na = NA, long = FALSE) {
-    result <-
-        readr::read_csv(result, col_types = cols(.default = "d", `Date/Time` = "c")) %>%
-        data.table::as.data.table() %>%
-        na_replace(type = "na", replacement = rp_na) %>%
-        eplus_time_trans(year = year, eplus_date_col = eplus_date_col,
-                         new_date_col = new_date_col, tz = tz, keep_ori = FALSE)
+# read_variable {{{1
+read_variable <- function (path, year = current_year(), new_date = "datetime",
+                           tz = Sys.timezone(), drop_na = FALSE, long_table = FALSE) {
+    assertthat::assert_that(assertthat::is.string(path))
+    assertthat::assert_that(has_ext(path, "csv"))
+    if (!file.exists(path)) return(NULL)
+    csv <- suppressMessages(readr::read_csv(path))
+    if (drop_na) {
+        csv <- tidyr::drop_na(csv)
+    }
+    data <- dplyr::mutate(csv,
+        rlang::UQ(new_date) := time_from_eplus(`Date/Time`, year = year, tz = tz))
+    if (new_date != "Date/Time") {
+        data <- dplyr::select(data,
+            dplyr::one_of(new_date), dplyr::everything(), -`Date/Time`
+        )
+    }
 
-    if (long) {
-        result <- long_table(result)
+    if (long_table) {
+        data <- long_table_full(data)
    }
 
-    return(result)
+    return(data)
 }
 # }}}1
 
@@ -495,65 +445,56 @@ read_variable <- function (result, year = current_year(), eplus_date_col = "Date
 #' @importFrom purrr map set_names
 # read_table: A function to read EnergyPlus table results.
 # read_table
-# {{{1
-read_table <- function (file, name = c("report", "for", "table"), regex = FALSE) {
-    # Check input.
-    if (all(!identical(tools::file_ext(basename(file)), "htm"),
-            !identical(tools::file_ext(basename(file)), "html"))) {
-        stop("Input file should be a .htm/.html file.", call. = FALSE)
-    }
-    if (missingArg(name)) {
-        stop("Please give 'name' value.", call. = FALSE)
-    }
-    if (any(!is.character(name), length(name) != 3)) {
-        stop("'name' should be a character vector of length 3 indicating the ",
-             "name of report, the name of 'for' and the name of table.", call. = FALSE)
-    }
+# read_table {{{1
+read_table <- function (file, which = NULL) {
+    assertthat::assert_that(assertthat::is.string(file))
+    assertthat::assert_that(has_ext(file, ext = "html{0,1}"),
+        msg = msg("'file' should have an extension of either '.htm' or '.html'.")
+    )
+    assertthat::assert_that(all(is.data.frame(which), ncol(which) == 3L),
+        msg = msg("'which' should be a data.frame that contains 'Report', 'For',
+                  'Table' info of tables you want to read.")
+    )
 
-    regex_tbl_name <- "<!-- FullName:(.*)-->"
-    # Get table names.
-    # NOTE: Did not find a way to extract comments in htm/htmls in 'rvest'
-    # package. Have to use a ugly regex method.
-    tbl_name_comments <- stringr::str_subset(readr::read_lines(file), regex_tbl_name)
-    tbl_full_names <- stringr::str_replace_all(tbl_name_comments, regex_tbl_name, "\\1")
-    tbl_name_split <- data.table::as.data.table(stringr::str_match(tbl_full_names, "(.*)_(.*)"))
-    tbl_name_split <- data.table::setnames(tbl_name_split, c("full_name", "report_for", "table"))
-    tbl_name_split <- tbl_name_split[, c("report", "for") := as.data.frame(stringr::str_split(report_for, "_", 2, simplify = TRUE))][,
-                                     c("full_name", "report_for") := NULL]
-    tbl_names <- data.table::setcolorder(tbl_name_split, c("report", "for", "table"))
-
-    if (!regex) {
-        # Set 'which' to TRUE without '.j' will return the row number. Or can
-        # use method: DT[  , .I[X=="B"] ]
-        # Borrowed from: http://stackoverflow.com/questions/22408306/using-i-to-return-row-numbers-with-data-table-package
-        table_id <- tbl_names[report == name[1] & `for` == name[2] & table == name[3], which = TRUE]
-    } else {
-        report_names <- unique(as.character(tbl_names[, report]))
-        report_sel <- stringr::str_subset(report_names, name[1])
-
-        for_names <- unique(as.character(tbl_names[, `for`]))
-        for_sel <- stringr::str_subset(for_names, name[2])
-
-        table_names <- unique(as.character(tbl_names[, table]))
-        table_sel <- stringr::str_subset(table_names, name[3])
-
-        table_id <- tbl_names[report %in% report_sel &
-                              `for` %in% for_sel &
-                              table %in% table_sel, which = TRUE]
-    }
-
-    if (length(table_id) == 0) {
-        stop("No matched table found. Please check the value of 'name' or set ",
-             "'regex' to TRUE if you want to extract multiple tables using ",
-             "regular expressions.", call. = FALSE)
-    }
+    tbl_names <- dplyr::mutate(read_table_info(file, full_name = TRUE),
+        id = seq_along(.data$full_name)
+    )
 
     # Get table contents.
     tbls_raw <- rvest::html_nodes(xml2::read_html(file), "table")
-    tbls <- rvest::html_table(tbls_raw[table_id], header = TRUE)
+    # Stop if the logic above results in a number mismatch of table names and
+    # tables.
+    assertthat::assert_that(identical(length(tbls_raw), nrow(tbl_names)),
+        msg = msg("Error[Debug]: Mismatch length of extracted table names and
+                  table number.")
+    )
+
+    # Get the table id to be extracted.
+    if (!is.null(which)) {
+        # Make sure 'which' has the column names to be used in joining.
+        tbl_sel <- purrr::set_names(which, c("report", "for", "table"))
+        # Check if there are invalid rows in 'which'.
+        valid_sel <- dplyr::semi_join(tbl_sel, tbl_names)
+        invalid_sel <- dplyr::anti_join(tbl_sel, valid_sel)
+        if (nrow(invalid_sel) > 0L) {
+            warning(msg("Invalid row found in 'which': ",
+                "There is no table called ", sQuote(invalid_sel[["table"]]),
+                " in report ", sQuote(invalid_sel[["report"]]),
+                " for ", sQuote(invalid_sel[["for"]]), "."),
+                "\nAll invalid nrows will be ignored. ", call. = FALSE)
+        }
+        id_tbl <- as.integer(dplyr::pull(dplyr::inner_join(tbl_names, valid_sel), id))
+    } else {
+        id_tbl <- 1:nrow(tbl_names)
+    }
+
+    tbls <- rvest::html_table(tbls_raw[id_tbl], header = TRUE)
 
     # Get the combined table names.
-    names <- tbl_names[table_id, paste0("[Report]:(", report, ") [For]:(", `for`, ") [Table]:(", table, ")")]
+    rows <- tbl_names[id_tbl,]
+    names <- paste0(
+        "[Report]:", sQuote(rows[["report"]]), " | ",
+        "[For]:", sQuote(rows[["for"]]), " | [Table]:", sQuote(rows[["table"]]))
 
     # Combine table names and contents.
     tbls <- purrr::set_names(tbls, names)
@@ -561,6 +502,62 @@ read_table <- function (file, name = c("report", "for", "table"), regex = FALSE)
     tbls <- purrr::map(tbls, ~{names(.x)[1] <- "Components"; .x})
 
     return(tbls)
+}
+# }}}1
 
+# read_table_info {{{1
+read_table_info <- function(file, full_name = FALSE) {
+    assertthat::assert_that(assertthat::is.string(file))
+    assertthat::assert_that(has_ext(file, ext = "html{0,1}"), msg = "'file'
+                            should have an extension of either '.htm' or
+                            '.html'")
+
+    regex_tbl_name <- "<!-- FullName:(.*)-->"
+    # Get table names.
+    # NOTE: Did not find a way to extract comments in htm/htmls in 'rvest'
+    # package. Have to use a ugly regex method.
+    name_comments <- stringr::str_subset(readr::read_lines(file), regex_tbl_name)
+    full_names <- stringr::str_replace(name_comments, regex_tbl_name, "\\1")
+    tbl_names <- purrr::set_names(
+        dplyr::as_tibble(str_split(full_names, "_", simplify = TRUE)),
+        c("report", "for", "table")
+    )
+    if (full_name) {
+        tbl_names <- dplyr::mutate(tbl_names, full_name = full_names)
+        tbl_names <- dplyr::select(tbl_names, full_name, dplyr::everything())
+    }
+
+    return(tbl_names)
+}
+# }}}1
+# long_table_full {{{1
+long_table_full <- function (wide_table) {
+    long_tbl <- long_table(data)
+    info <- get_output_info(data)
+    full_tbl <- dplyr::select(dplyr::full_join(long_tbl, info), -value, value)
+
+    return(full_tbl)
+}
+# }}}1
+# get_file_to_read {{{1
+get_file_to_read <- function (prefix, suffix, type) {
+    ext <- switch(type,
+        # Currently `read_table` only support .htm(l) files.
+        table = "html{0,1}",
+        variable = "csv",
+        meter = "csv",
+        `surface report` = "eio"
+    )
+
+    # Get file candidates
+    if (type != "surface report") {
+        file_cand <- output_files(prefix, suffix_type = suffix, type = type, exist_only = TRUE)
+    } else {
+        file_cand <- output_files(prefix, suffix_type = suffix, ext = ".eio")
+    }
+
+    file <- file_cand[has_ext(file_cand, ext = ext)]
+
+    return(file)
 }
 # }}}1
