@@ -898,6 +898,15 @@ read_job_index <- function (path, no_at = FALSE) {
     )
 
     job_index <- readr::read_csv(path)
+
+    # Validate column names
+    nms <- names(job_index)
+    req <- c("no", "dir", "template", "weather")
+    mis <- req[is.na(match(req, nms))]
+    if (length(mis) > 0L) {
+        stop("Invalid job index file. Missing column:\n", csQuote(mis), call. = FALSE)
+    }
+
     if (no_at) {
         job_index <- purrr::set_names(job_index,
             stringr::str_replace_all(names(job_index), "@", "")
