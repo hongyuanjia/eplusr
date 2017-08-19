@@ -132,3 +132,38 @@ file_exists <- function (...) {
     )
 }
 # }}}1
+
+# get_suffix_type {{{1
+get_suffix_type <- function (prefix) {
+    ori_wd <- getwd()
+    on.exit(setwd(ori_wd), add = TRUE)
+    setwd(dirname(prefix))
+    type <- c("table", "meter", "sizing")
+
+    get_sgl_type_suffix <- function (prefix, type) {
+        all_suffixes <- c("C", "L", "D")
+        purrr::set_names(
+            purrr::map_lgl(all_suffixes,
+                ~any(file_exists(
+                    output_files(prefix = prefix, suffix_type = .x,
+                        type = type, simplify = TRUE))
+                )
+            ),
+            all_suffixes
+        )
+    }
+
+    idx <- purrr::map_lgl(
+        purrr::simplify_all(
+            purrr::transpose(
+                purrr::map(type, ~get_sgl_type_suffix(prefix, .x))
+            )
+        ),
+        any
+    )
+
+    suffix <- names(which(idx))
+
+    return(suffix)
+}
+# }}}1
