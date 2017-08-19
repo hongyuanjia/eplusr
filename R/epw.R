@@ -24,7 +24,7 @@ read_epw_data <- function (epw_lines) {
         ([1-9]|1[0-2]),            # month
         ([1-9]|[1-2][0-9]|3[0-1]), # day
         ([0-9]|1[0-9]|2[0-4]),     # hour
-        ([0-9]|5[0-9]),            # minute
+        ([0-9]|[1-5][0-9]),        # minute
         ", comments = TRUE
     )
     data_line_idx <- stringr::str_which(epw_lines, data_regex)
