@@ -34,6 +34,16 @@ lsos <- function(..., n=10) {
 # }}}1
 
 # has_*_ext {{{1
+has_ext <- function (path, ext) {
+    grepl(ext, tools::file_ext(path), ignore.case = TRUE, perl = TRUE)
+}
+
+assertthat::on_failure(has_ext) <- function (call, env = parent.env) {
+    path <- eval(call$path, env)
+    ext <- eval(call$ext, env)
+    msg("File ", sQuote(basename(path)), " does not have extension ", sQuote(ext), ".")
+}
+
 has_model_ext <- function (x) {
     ext <- tools::file_ext(x)
     grepl("i[dm]f", ext, ignore.case = TRUE)
