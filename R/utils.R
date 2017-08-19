@@ -118,3 +118,17 @@ is_empty <- function (x) {
 msg <- function (..., prefix = " ", initial = "") {
     paste(strwrap(paste0(...)), collapse = "\n")
 }
+
+# file_exists: Case-sensitive file existence checking {{{1
+file_exists <- function (...) {
+    files <- normalizePath(c(...), winslash = "/", mustWork = FALSE)
+    dirs <- dirname(files)
+    all_files <- purrr::set_names(
+        purrr::map(dirs, list.files, full.names = TRUE),
+        files
+    )
+    purrr::map2_lgl(files, all_files,
+        ~any(grepl(pattern = .x, x = .y, fixed = TRUE))
+    )
+}
+# }}}1
