@@ -106,8 +106,8 @@ file_path <- function (..., normalize = TRUE) {
     return(path)
 }
 
-file_prefix <- function (x) {
-    tools::file_path_sans_ext(basename(x))
+file_prefix <- function (x, basename = TRUE) {
+    if (basename) tools::file_path_sans_ext(basename(x)) else tools::file_path_sans_ext(x)
 }
 # }}}1
 
