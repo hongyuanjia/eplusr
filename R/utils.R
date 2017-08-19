@@ -114,3 +114,7 @@ file_prefix <- function (x, basename = TRUE) {
 is_empty <- function (x) {
     length(x) == 0L
 }
+
+msg <- function (..., prefix = " ", initial = "") {
+    paste(strwrap(paste0(...)), collapse = "\n")
+}
