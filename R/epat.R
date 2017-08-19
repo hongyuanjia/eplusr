@@ -897,7 +897,7 @@ read_job_index <- function (path, no_at = FALSE) {
         msg = msg("'path' should be a path to a 'job_index.csv'.")
     )
 
-    job_index <- readr::read_csv(path)
+    job_index <- suppressMessages(readr::read_csv(path))
 
     # Validate column names
     nms <- names(job_index)
