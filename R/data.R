@@ -1076,7 +1076,7 @@ get_interval <- function (date_seq) {
     return(interval)
 }
 # }}}1
-# S3 methods for get_timestep{{{
+# get_timestep{{{
 get_timestep <- function (x, unit, by, simplify) {
    UseMethod("get_timestep", x)
 }
@@ -1124,7 +1124,11 @@ get_timestep.data.frame <- function(x, by = NULL, unit = NULL, simplify = FALSE)
     }
 
     if (!is.null(unit)) {
-        steps <- purrr::map(steps, ~dplyr::mutate(.x, step = units::set_units(step, unit)))
+        steps <- purrr::map(steps,
+            ~purrr::map(.x,
+                ~dplyr::mutate(.x, step = units::set_units(step, unit))
+            )
+        )
     }
 
     return(steps)
