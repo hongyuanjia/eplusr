@@ -1119,16 +1119,32 @@ get_timestep.data.frame <- function(x, by = NULL, unit = NULL, simplify = FALSE)
     if (!is.null(by)) {
         dfs <- split(x, x[[by]])
         steps <- map(dfs, .get_timestep_df)
+        case_names <- names(steps)
+        steps <- dplyr::as_tibble(data.table::rbindlist(
+            purrr::map2(steps, case_names,
+                ~{
+                    dplyr::select(dplyr::mutate(.x, case = .y),
+                        case, dplyr::everything()
+                    )
+                 }
+            )
+        ))
     } else {
         steps <- .get_timestep_df(x)
     }
 
     if (!is.null(unit)) {
-        steps <- purrr::map(steps,
-            ~purrr::map(.x,
-                ~dplyr::mutate(.x, step = units::set_units(step, unit))
-            )
-        )
+        steps <- dplyr::mutate(steps, step = units::set_units(step, unit))
+    }
+
+    if (simplify) {
+        all_steps <- steps[["step"]]
+        if (length(unique(steps[["step"]])) == 1L) {
+            steps <- all_steps[1]
+        } else {
+            stop("Input have multiple timesteps. Unable to simplify.",
+                 call. = FALSE)
+        }
     }
 
     return(steps)
@@ -1150,9 +1166,15 @@ get_timestep.data.frame <- function(x, by = NULL, unit = NULL, simplify = FALSE)
                         ~{
                             name <- names(datetimes_diff_table[.x])
                             table <- datetimes_diff_table[[.x]]
-                            format_table(table, unit = ifelse(name %in% dates, "day", "second"))
+                            table <- format_table(table,
+                                unit = ifelse(name %in% dates, "day", "second")
+                            )
+                            table <- dplyr::select(
+                                dplyr::mutate(table, col = name),
+                                col, dplyr::everything()
+                            )
                         })
-    steps <- purrr::set_names(steps, names(datetimes))
+    steps <- dplyr::as_tibble(data.table::rbindlist(steps))
 
     return(steps)
 }
