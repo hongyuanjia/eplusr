@@ -1532,8 +1532,12 @@ show_output <- function (data, state = NULL, group = NULL,
 
     # Get the input data name for source code creation
     data_name <- deparse(substitute(data))
-    assertthat::assert_that(assertthat::are_equal(length(group), 1L),
-                            msg = "'group' should be a single character string.")
+
+    if (!is.null(group)) {
+        assertthat::assert_that(assertthat::are_equal(length(group), 1L),
+            msg = "'group' should be a single character string."
+        )
+    }
     # Standardize input data
     data <- standardize_wide_table(data, exclude = group)
 
