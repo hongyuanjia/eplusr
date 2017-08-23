@@ -180,9 +180,26 @@ collect_epg <- function (epg, output = c("variable", "meter", "table", "surafce 
     output <- rlang::arg_match(output)
     data <- purrr::map(models, collect_eplus,
         output = output, which = which, year = year, new_date = new_date,
-        tz = tz, unnest = unnest, long_table = long_table)
+        tz = tz, unnest = FALSE, long_table = long_table)
 
     data <- dplyr::as_tibble(data.table::rbindlist(data, fill = TRUE))
+
+    names(data[[2]]) <- data[[1]]
+    non_null <- names(purrr::discard(data[[2]], is.null))
+    null <- setdiff(data[[1]], non_null)
+
+    if (unnest) {
+        data <- tidyr::unnest(dplyr::filter(data, model_prefix %in% non_null))
+    }
+
+    if (length(null) > 0L) {
+        mes <- msg("Model ", csQuote(null), " does not have ", output, " output.")
+        if (unnest) {
+            mes <- c(mes, " And they have been removed when unnesting.")
+        }
+        warning(mes, call. = FALSE)
+    }
+
     return(data)
 }
 # }}}1
