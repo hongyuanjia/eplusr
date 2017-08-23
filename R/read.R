@@ -370,9 +370,9 @@ read_surf_rpt <- function(eio){
 # read_meter {{{1
 read_meter <- function (path, year = current_year(), new_date = "datetime",
                         tz = Sys.timezone(), drop_na = FALSE, to_GJ = FALSE,
-                        long_table = FALSE) {
+                        unnest = FALSE, long_table = FALSE) {
     meter <- read_variable(path = path, year = year, new_date = new_date,
-        tz = tz, drop_na = drop_na, long_table = long_table
+        tz = tz, drop_na = drop_na, unnest = unnest, long_table = long_table
     )
 
     return(meter)
