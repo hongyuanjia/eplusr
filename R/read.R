@@ -149,28 +149,36 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     # }}}2
 
     data <- switch(output,
-        variable = dplyr::tibble(model_prefix = file_prefix(file_to_read),
-            variable = purrr::map(file_to_read, read_variable,
+        variable = dplyr::tibble(model_prefix = basename(prefix),
+            variable = purrr::set_names(purrr::map(file_to_read, read_variable,
                 year = year, new_date = new_date, tz = tz, drop_na = drop_na,
-                long_table = long_table
+                long_table = long_table),
+                basename(prefix)
             )
         ),
-        meter = dplyr::tibble(model_prefix = file_prefix(file_to_read),
-            meter = purrr::map(file_to_read, read_meter,
+        meter = dplyr::tibble(model_prefix = basename(prefix),
+            meter = purrr::set_names(purrr::map(file_to_read, read_meter,
                 year = year, new_date = new_date, tz = tz, drop_na = drop_na,
-                long_table = long_table
+                long_table = long_table),
+                basename(prefix)
             )
         ),
-        table = dplyr::tibble(model_prefix = file_prefix(file_to_read),
-            table = purrr::map(file_to_read, read_table, which = which)
+        table = dplyr::tibble(model_prefix = basename(prefix),
+            table = purrr::set_names(
+                purrr::map(file_to_read, read_table, which = which),
+                basename(prefix)
+            )
         ),
-        surface_report = dplyr::tibble(model_prefix = file_prefix(file_to_read),
-            surface_report = purrr::map(file_to_read, read_surf_rpt)
+        surface_report = dplyr::tibble(model_prefix = basename(prefix),
+            surface_report = purrr::set_names(
+                purrr::map(file_to_read, read_surf_rpt),
+                basename(prefix)
+            )
         )
     )
 
     if (unnest) {
-        data <- tidyr::unnest(data = data)
+        data <- tidyr::unnest(data)
     }
 
     return(data)
@@ -372,7 +380,7 @@ read_meter <- function (path, year = current_year(), new_date = "datetime",
                         tz = Sys.timezone(), drop_na = FALSE, to_GJ = FALSE,
                         unnest = FALSE, long_table = FALSE) {
     meter <- read_variable(path = path, year = year, new_date = new_date,
-        tz = tz, drop_na = drop_na, unnest = unnest, long_table = long_table
+        tz = tz, drop_na = drop_na, long_table = long_table
     )
 
     return(meter)
@@ -551,7 +559,7 @@ get_file_to_read <- function (prefix, suffix, type) {
 
     # Get file candidates
     if (type != "surface report") {
-        file_cand <- output_files(prefix, suffix_type = suffix, type = type, exist_only = TRUE)
+        file_cand <- output_files(prefix, suffix_type = suffix, type = type)
     } else {
         file_cand <- output_files(prefix, suffix_type = suffix, ext = ".eio")
     }
