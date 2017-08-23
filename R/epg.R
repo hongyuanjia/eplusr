@@ -145,7 +145,7 @@ write_epg <- function(epg, path, head_info = NULL){
         run_times = stringr::str_pad(as.character(run_times), 7L, "left")
     )
 
-    content <- readr::format_csv(epg_content, col_names = FALSE)
+    content <- stringr::str_sub(readr::format_csv(epg_content, col_names = FALSE), end = -2L)
     epg_info <- paste(header, content, sep = "\n", collapse = "\n")
 
     if (!is.null(head_info)) {
