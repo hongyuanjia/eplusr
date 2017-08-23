@@ -170,3 +170,19 @@ write_epg <- function(epg, path, head_info = NULL){
     return(invisible())
 }
 # }}}1
+
+# collect_epg {{{1
+collect_epg <- function (epg, output = c("variable", "meter", "table", "surafce report"),
+                         which = NULL, year = current_year(), new_date = "datetime",
+                         tz = Sys.timezone(), unnest = FALSE, long_table = FALSE) {
+    job <- validate_job(epg, "epg")
+    models <- job[["model"]]
+    output <- rlang::arg_match(output)
+    data <- purrr::map(models, collect_eplus,
+        output = output, which = which, year = year, new_date = new_date,
+        tz = tz, unnest = unnest, long_table = long_table)
+
+    data <- dplyr::as_tibble(data.table::rbindlist(data, fill = TRUE))
+    return(data)
+}
+# }}}1
