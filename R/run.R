@@ -923,7 +923,7 @@ assign_job_to_core <- function (id_job, id_core, job, n_jobs) {
 validate_job <- function (job, type = c("epg", "jeplus", "epat")) {
     type <- rlang::arg_match(type)
     val_job <- switch(type,
-        epg = validate_epg(epg),
+        epg = validate_epg(job),
         jeplus = validate_jeplus(job),
         epat = validate_epat(job)
     )
