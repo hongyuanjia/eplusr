@@ -167,3 +167,16 @@ get_suffix_type <- function (prefix) {
     return(suffix)
 }
 # }}}1
+
+# csQuote{{{
+csQuote <- function (x, and = TRUE) {
+    x_sq <- sQuote(x)
+    if (length(x_sq) > 1L & and) {
+        x_sq[length(x_sq)] <- paste0("and ", x_sq[length(x_sq)])
+    }
+
+    x_csq <- paste0(x_sq, collapse = ", ")
+
+    return(x_csq)
+}
+# }}}
