@@ -473,9 +473,11 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
         data_thicken <- dplyr::group_by(data_thicken, rlang::UQS(new_name))
     }
 
-    fun <- rlang::as_function(fun, ...)
-    data_agg <- dplyr::summarise_all(data_thicken, fun)
-    data_agg <- dplyr::ungroup(data_agg)
+    data_thicken_dt <- data.table::as.data.table(data_thicken)
+    data_agg <- data_thicken_dt[, lapply(.SD, fun, ...), by = c(non_num_cols, new)]
+    data_agg <- dplyr::as_tibble(data_agg)
+    # data_agg <- dplyr::summarise_all(data_thicken, dplyr::funs(fun))
+    # data_agg <- dplyr::ungroup(data_agg)
 
     return(data_agg)
 }
