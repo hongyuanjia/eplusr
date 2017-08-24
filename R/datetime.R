@@ -179,9 +179,9 @@ add_time <- function (data, base = NULL, new = NULL, step,
 
     data_thicken <-
         switch(toward,
-               up = dplyr::mutate(data, !!new := lubridate::ceiling_date(datetimes, unit = step)),
-               down = dplyr::mutate(data, !!new := lubridate::floor_date(datetimes, unit = step)),
-               center = dplyr::mutate(data, !!new := lubridate::round_date(datetimes, unit = step))
+               up = dplyr::mutate(data, rlang::UQ(new) := lubridate::ceiling_date(datetimes, unit = step)),
+               down = dplyr::mutate(data, rlang::UQ(new) := lubridate::floor_date(datetimes, unit = step)),
+               center = dplyr::mutate(data, rlang::UQ(new) := lubridate::round_date(datetimes, unit = step))
                )
 
     if (no_leap) {
@@ -192,11 +192,11 @@ add_time <- function (data, base = NULL, new = NULL, step,
     }
 
     if (identical(new, base)) {
-        message("Column '", new, "' has been replaced with new timestep of '",
-                step, "'.")
+        message(msg("Column '", new, "' has been replaced with new timestep of '",
+                 step, "'."))
     } else {
-        message("A new column named '", new, "' with step '", step,
-                "' has been added based on column '", base, "'.")
+        message(msg("A new column named '", new, "' with step '", step,
+                 "' has been added based on column '", base, "'."))
     }
 
     return(data_thicken)
