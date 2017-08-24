@@ -1131,6 +1131,172 @@ show_output <- function (data, state = NULL, group = NULL,
 }
 # }}}
 
+# show_dygraphs {{{1
+show_dygraphs <- function (data, group = "output", key = "model_prefix", ylab = "unit") {
+    library(shiny)
+
+    plot_table <- create_dygraphs(data, group = group, key = key, ylab = ylab)
+    dy_info <- multi_dygraphOutput(plot_table, by = ylab, id_prefix = "dy", col_width = 6L)
+    plots <- get_plots(plot_table, by = ylab, plot_col = "dys")
+    id_output <- dy_info[["id"]]
+    tag_output <- dy_info[["tag"]]
+
+    ui <- shinyUI(
+        fluidPage(
+            uiOutput("dygraph")
+        )
+    )
+
+    server <- shinyServer(
+        function (input, output, session) {
+            # Generate dygraphOutput
+            output$dygraph <- renderUI({
+                tag_output
+            })
+            # Create dygraphs
+            for (i in seq_along(id_output)) {
+                # Need local so that each item gets its own number. Without it, the value
+                # of i in the renderPlot() will be the same across all instances, because
+                # of when the expression is evaluated.
+                local({
+                    my_i <- i
+                    # plotname <- paste0("Unit: ", data$units[my_i])
+                    output[[id_output[my_i]]] <- dygraphs::renderDygraph({
+                        plots[[my_i]]
+                    })
+                })
+            }
+            # Stop shiny app when closing the web brower.
+            session$onSessionEnded(stopApp)
+        }
+    )
+
+    runGadget(shinyApp(ui, server))
+}
+# }}}1
+
+#########################################
+#  helper function for show_dygraphs()  #
+#########################################
+# get_plots {{{1
+get_plots <- function (plot_table, by = NULL, plot_col = "dys") {
+    if (is.null(by)) {
+        plots <- plot_table[[plot_col]]
+    } else {
+        plots_sp <- split(plot_table, plot_table[[by]])
+        plots <- purrr::flatten(purrr::map(plots_sp, ~.x[[plot_col]]))
+    }
+
+    return(plots)
+}
+# }}}1
+# arrange_plots {{{1
+arrange_plots <- function (plots, by = NULL) {
+    if (!is.null(by)) {
+        n_col_per_row <- purrr::map(split(plots, plots[[by]]), nrow)
+    } else {
+        n_col_per_row <- nrow(plots)
+    }
+
+    return(n_col_per_row)
+}
+# }}}1
+# multi_dygraphOutput {{{1
+multi_dygraphOutput <- function (plot_table, by = NULL, id_prefix = "dy", col_width = 6L) {
+    arrange_info <- arrange_plots(plot_table, by = by)
+
+    if (!is.null(by)) {
+        list_output <- purrr::transpose(purrr::map(seq_along(arrange_info),
+            ~{
+                id_row <- paste0(id_prefix, "_row_", .x)
+                n_cols <- arrange_info[[.x]]
+                seq_cols <- 1:n_cols
+                id_plot <- paste0(id_row, "_col_", seq_cols)
+                col_plot <- map(id_plot,
+                    ~column(col_width,
+                        shinycssloaders::withSpinner(dygraphs::dygraphOutput(.x))
+                        # shinyjqui::jqui_resizabled(
+                            # shinycssloaders::withSpinner(dygraphs::dygraphOutput(.x))
+                        # )
+                    )
+                )
+                tag_col_plot <- purrr::invoke(tagList, col_plot)
+                tag_row_plot <- div(
+                    h3(strong(paste0("For ", stringr::str_to_title(by), " [", names(arrange_info[.x]), "]"))),
+                    tags$br(),
+                    fluidRow(tag_col_plot),
+                    # shinyjqui::jqui_sortabled(fluidRow(tag_col_plot)),
+                    tags$hr(), tags$br()
+                )
+                info <- list(id = id_plot, tag = tag_row_plot)
+                return(info)
+             }
+        ))
+
+        id_output <- purrr::flatten_chr(list_output$id)
+        tag_output <- div(id = "dygraphs", purrr::invoke(tagList, list_output$tag))
+        # tag_output <- shinyjqui::jqui_sortabled(
+            # div(id = "dygraphs", purrr::invoke(tagList, list_output$tag))
+        # )
+    } else {
+        id_plot <- paste0(id_prefix, "_", 1:arrange_info)
+        col_plot <- map(id_plot,
+            ~column(12,
+                shinycssloaders::withSpinner(dygraphs::dygraphOutput(.x))
+                # shinyjqui::jqui_resizabled(
+                    # shinycssloaders::withSpinner(dygraphs::dygraphOutput(.x))
+                # )
+            )
+        )
+        tag_col_plot <- purrr::invoke(tagList, col_plot)
+        tag_row_plot <- div(id = "dygraphs", tags$br(), fluidRow(tag_col_plot), tags$hr(), tags$br())
+        # tag_row_plot <- shinyjqui::jqui_sortabled(
+            # div(id = "dygraphs", tags$br(), fluidRow(tag_col_plot), tags$hr(), tags$br())
+        # )
+
+        id_output <- id_plot
+        tag_output <- tag_row_plot
+    }
+
+    results <- list(id = id_output, tag = tag_output)
+
+    return(results)
+}
+# }}}1
+# create_dygraphs {{{1
+create_dygraphs <- function (wide_table, group = "model_prefix", key = "output",
+                             ylab = "variable") {
+
+    col_datetime <- get_date_col(wide_table)
+
+    full <- wide_to_full(wide_table, group = group)
+
+    full_nest <- tidyr::nest(
+        dplyr::select(
+            dplyr::group_by(full, rlang::UQ(rlang::sym(key))),
+            dplyr::one_of(c(group, col_datetime, key, "value"))
+        )
+    )
+
+    full_xts <- dplyr::mutate(full_nest,
+        xts = purrr::map(data, ~wide_to_xts(long_to_wide(.x, key = group)))
+    )
+
+    full_xts <- dplyr::full_join(get_output_info(wide_table), full_xts)
+
+    full_dys <- dplyr::mutate(full_xts,
+        dys = purrr::pmap(
+            list(xts, rlang::UQ(rlang::sym(key)), rlang::UQ(rlang::sym(ylab))),
+            function (data, main, ylab) {
+                dygraph_output(data = data, main = main, ylab = ylab)
+            }
+        )
+    )
+
+    return(full_dys)
+}
+# }}}1
+
 #####################################
 #  helper function for edit_epat()  #
 #####################################
