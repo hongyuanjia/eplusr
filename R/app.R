@@ -1533,11 +1533,11 @@ ggplot_line <- function (data, x, y, color = NULL, group = NULL, facet = NULL) {
     p <- p + geom_line(size = 1)
 
     if (!is.null(color)) {
-        p <- p + aes_string(color = color)
+        p <- p + aes_string(color = paste0("`", color, "`"))
     }
 
     if (!is.null(group)) {
-        p <- p + aes_string(group = group)
+        p <- p + aes_string(group = paste0("`", group, "`"))
     }
 
     if (!is.null(facet)) {
