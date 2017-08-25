@@ -1529,7 +1529,7 @@ filter_output_info <- function(info, key = NULL, variable = NULL, unit = NULL) {
 # }}}
 # ggplot_line{{{
 ggplot_line <- function (data, x, y, color = NULL, group = NULL, facet = NULL) {
-    p <- ggplot(data, aes_string(x = x, y = y)) + theme_bw()
+    p <- ggplot(data, aes_string(x = paste0("`", x, "`"), y = paste0("`", y, "`"))) + theme_bw()
     p <- p + geom_line(size = 1)
 
     if (!is.null(color)) {
