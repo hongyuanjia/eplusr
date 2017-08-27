@@ -164,6 +164,9 @@ add_time <- function (data, base = NULL, new = NULL, step,
 
     # TODO: Add checking for invalid step such as '600 secs'.
     assertthat::assert_that(is.data.frame(data))
+    is_tbl <- tibble::is_tibble(data)
+    is_dt <- data.table::is.data.table(data)
+
     if (is.null(base)) {
         base <- check_date_col(data)
     }
@@ -197,6 +200,13 @@ add_time <- function (data, base = NULL, new = NULL, step,
     } else {
         message(msg("A new column named '", new, "' with step '", step,
                  "' has been added based on column '", base, "'."))
+    }
+
+    if (is_tbl) {
+        data_thicken <- dplyr::as_tibble(data_thicken)
+    }
+    if (is_dt) {
+        data_thicken <- data.table::as.data.table(data_thicken)
     }
 
     return(data_thicken)
