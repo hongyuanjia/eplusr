@@ -421,6 +421,8 @@ eplus_time_trans <- function(data, year = current_year(),
 resample <- function (data, base = NULL, new = NULL, step = "month",
                       toward = c("up", "down", "center"), drop = FALSE,
                       fun = mean, ...) {
+    is_tbl <- tibble::is_tibble(data)
+    is_dt <- data.table::is.data.table(data)
 
     if (is.null(base)) {
         base <- check_date_col(data)
@@ -475,9 +477,13 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
 
     data_thicken_dt <- data.table::as.data.table(data_thicken)
     data_agg <- data_thicken_dt[, lapply(.SD, fun, ...), by = c(non_num_cols, new)]
-    data_agg <- dplyr::as_tibble(data_agg)
-    # data_agg <- dplyr::summarise_all(data_thicken, dplyr::funs(fun))
-    # data_agg <- dplyr::ungroup(data_agg)
+
+    if (is_tbl) {
+        data_agg <- tibble::as_tibble(data_agg)
+    }
+    if (is_dt) {
+        data_agg <- data.table::as.data.table(data_agg)
+    }
 
     return(data_agg)
 }
