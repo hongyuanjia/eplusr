@@ -1334,7 +1334,7 @@ pair_filter <- function (pair) {
         "
     )
 
-    fun <- purrr::as_function(eval(parse(text = fun_stringr)))
+    fun <- rlang::as_function(eval(parse(text = fun_stringr)))
 
     return(fun)
 }
@@ -1415,8 +1415,6 @@ create_job_index <- function (job, group, proj_dir, input_pairs, params, model_d
     models <- purrr::simplify_all(purrr::transpose(input_pairs))[[1]]
     weathers <- purrr::simplify_all(purrr::transpose(input_pairs))[[2]]
 
-    model_dirs %>% purrr::simplify() %>% as.list %>% as_tibble()
-
     basic_info <- dplyr::tibble(
         no = seq_along(purrr::simplify(model_dirs)),
         dir = output_dirs,
@@ -1428,7 +1426,7 @@ create_job_index <- function (job, group, proj_dir, input_pairs, params, model_d
         ~{
             case <- .x
             len <- length(model_dirs[[case]])
-            param_rep <- map(as.list(params[[.x]]), ~rep(.x, 2))
+            param_rep <- map(as.list(params[[.x]]), ~rep(.x, len))
             tbl_param <- dplyr::as_tibble(param_rep)
          }
     )
