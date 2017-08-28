@@ -148,8 +148,8 @@ run_epat <- function (epat, group = c("model", "weather", "all"), pair = NULL,
     # }}}2
     # Get input pairs and selected models and weathers {{{2
     input_pairs <- get_input_pairs(models, weathers, pair = pair)
-    models_sel <- purrr::simplify_all(purrr::transpose(input_pairs))[[1]]
-    weathers_sel <- purrr::simplify_all(purrr::transpose(input_pairs))[[2]]
+    models_sel <- input_pairs[["model"]]
+    weathers_sel <- input_pairs[["weather"]]
     # }}}2
     # Get all model content of all cases {{{2
     model_contents <- get_model_content(models_sel, params)
@@ -1302,42 +1302,15 @@ replace_param_lines_per_value <- function (line_params, value) {
 # get_input_pairs {{{1
 get_input_pairs <- function (models, weathers, pair = NULL) {
 
-    filter <- if (is.null(pair)) NULL else pair_filter(pair)
-    input_pairs <- purrr::cross2(models, weathers, .filter = filter)
+    pair <- if (is.null(pair)) NULL
+    pair <- if (is_empty(pair)) NULL
 
+    input_pairs <- purrr::cross_df(list(model = models, weather = weathers))
+
+    if (!is.null(pair)) {
+        input_pairs <- dplyr::inner_join(pair, input_pairs)
+    }
     return(input_pairs)
-}
-# }}}1
-# pair_filter {{{1
-pair_filter <- function (pair) {
-    # Change paths in pair into UNIX-like ones
-    pair <- purrr::map_df(pair, ~normalizePath(.x, winslash = "/", mustWork = FALSE))
-
-    filter_string <- paste0(
-        purrr::map_chr(pair,
-            ~{
-                glue::glue(
-                    "(
-                        model %in% c({csQuote(.x[1], and = FALSE)}) &
-                        weather %in% c({csQuote(.x[2], and = FALSE)})
-                     )"
-                )
-             }
-        ), collapse = " | "
-    )
-
-    fun_stringr <- glue::glue(
-        "
-        function (model, weather) {
-            {filter_string}
-        }
-        "
-    )
-
-    fun <- rlang::as_function(eval(parse(text = fun_stringr)))
-    fun <- rlang::as_function(eval(parse(text = fun_stringr)))
-
-    return(fun)
 }
 # }}}1
 # get_missing_param_fields {{{1
@@ -1360,8 +1333,8 @@ get_group_output_dir <- function (group, proj_dir, input_pairs, job, model_dirs,
     models <- job[["model"]]
     weathers <- job[["weather"]]
     # Get the selected models and weathers from 'input_pairs'
-    models_sel <- purrr::simplify_all(purrr::transpose(input_pairs))[[1]]
-    weathers_sel <- purrr::simplify_all(purrr::transpose(input_pairs))[[2]]
+    models_sel <- input_pairs[["model"]]
+    weathers_sel <- input_pairs[["weather"]]
     # Get the position of selected models/weathers in all model
     # templates/weathers
     models_idx <- purrr::map_int(models_sel, ~which(models == .x))
@@ -1413,8 +1386,8 @@ create_job_index <- function (job, group, proj_dir, input_pairs, params, model_d
     output_dirs <- get_group_output_dir(group = group, proj_dir = proj_dir,
         input_pairs = input_pairs, job = job, model_dirs = model_dirs, case_only = TRUE)
 
-    models <- purrr::simplify_all(purrr::transpose(input_pairs))[[1]]
-    weathers <- purrr::simplify_all(purrr::transpose(input_pairs))[[2]]
+    models <- input_pairs[["model"]]
+    weathers <- input_pairs[["weather"]]
 
     basic_info <- dplyr::tibble(
         no = seq_along(purrr::simplify(model_dirs)),
