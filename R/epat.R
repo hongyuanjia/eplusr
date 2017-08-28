@@ -956,7 +956,7 @@ get_epat_unparsed <- function (x) {
 # get_case_param {{{1
 get_case_param <- function (id, field, value) {
     case_name <- make_case_name(id, value)
-    values <- purrr::simplify_all(purrr::cross_n(value), .type = "character")
+    values <- purrr::simplify_all(purrr::cross(value), .type = "character")
     values <- purrr::map(values, purrr::set_names, field)
     names(values) <- case_name
     values <- purrr::map(values, get_jeplus_param_comb_value)
@@ -971,7 +971,7 @@ make_case_name <- function (id, value) {
     assertthat::assert_that(assertthat::are_equal(length(id), length(value)))
 
     case <- purrr::map2(id, value, ~paste0(.x, "_", seq_along(.y)))
-    case_dt <- data.table::rbindlist(purrr::cross_n(case))
+    case_dt <- data.table::rbindlist(purrr::cross(case))
     case_name <- purrr::invoke(paste, case_dt, sep = "-")
 
     return(case_name)
@@ -1334,6 +1334,7 @@ pair_filter <- function (pair) {
         "
     )
 
+    fun <- rlang::as_function(eval(parse(text = fun_stringr)))
     fun <- rlang::as_function(eval(parse(text = fun_stringr)))
 
     return(fun)
