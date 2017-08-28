@@ -1782,12 +1782,12 @@ dygraph_facet <- function (data, group = NULL, row = NULL, col = NULL) {
 }
 # }}}
 # dygraph_output {{{
-dygraph_output <- function (data, main = NULL, xlab = NULL, ylab = NULL) {
+dygraph_output <- function (data, main = NULL, xlab = NULL, ylab = NULL, legend_width = 400) {
     dygraphs::dygraph(data, group = "dygraphs", main = main, xlab = xlab, ylab = ylab) %>%
     dygraphs::dyRangeSelector() %>%
     dygraphs::dyHighlight(highlightSeriesOpts = list(strokeWidth = 3)) %>%
     dygraphs::dyOptions(useDataTimezone = TRUE, axisLineWidth = 1.5) %>%
-    dygraphs::dyLegend(labelsSeparateLines = TRUE) %>%
+    dygraphs::dyLegend(width = legend_width, labelsSeparateLines = TRUE) %>%
     # dygraphs::dyLegend(width = 400, show = "follow", labelsSeparateLines = TRUE) %>%
     # dyLegend(width = 400, show = "follow", labelsSeparateLines = TRUE, labelsDiv = "dygraphs_legend") %>%
     dygraphs::dyCrosshair(direction = "vertical") %>%
