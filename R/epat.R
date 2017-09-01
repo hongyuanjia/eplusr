@@ -250,7 +250,7 @@ collect_epat <- function (x, case_names = NULL, no_params = TRUE,
             data = purrr::map(output_dirs,
                 ~collect_eplus(path = .x, output = output, suffix_type = suffix_type,
                     which = which, year = year, new_date = new_date, tz = tz,
-                    drop_na = drop_na, unnest = unnest, long_table = long_table
+                    drop_na = drop_na, unnest = FALSE, long_table = long_table
                 )
             )
         ),
