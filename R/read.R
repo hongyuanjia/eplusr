@@ -125,7 +125,9 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
         setwd(path)
         # Get all models in the directory
         model <- list.files(path, pattern = "\\.i[dm]f", ignore.case = TRUE, full.names = TRUE)
-        assertthat::assert_that(assertthat::is.string(model),
+        # Get the prefix of model and handle same model with different ext
+        prefix <- unique(file_prefix(model, basename = FALSE))
+        assertthat::assert_that(assertthat::is.string(prefix),
             msg = msg("Input 'path' is a directory that contains more than one
                       EnergyPlus models. Please set 'path' to one path of the
                       models that you want to collect simulation results of.")
@@ -133,9 +135,9 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     # If 'path' is a model path
     } else {
         model <- path
+        # Get the prefix of model
+        prefix <- file_prefix(model, basename = FALSE)
     }
-    # Get the prefix of model
-    prefix <- file_prefix(model, basename = FALSE)
     # Get the suffix of model
     if (suffix_type == "auto") suffix_type <- get_suffix_type(prefix)
     assertthat::assert_that(assertthat::is.string(suffix_type),
