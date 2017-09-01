@@ -719,7 +719,9 @@ create_eplus_ini <- function (eplus_dir, working_dir) {
 # get_external_file {{{1
 get_external_file <- function (idf_lines) {
     schedule_files <- stringr::str_subset(idf_lines, "!\\s*-\\s*File Name$")
-    files <- unique(stringr::str_extract(schedule_files, "^.*(?=,)"))
+    # Check if the lines are commented
+    idx_comment <- str_detect(stringr::str_trim(schedule_files), "^!")
+    files <- unique(stringr::str_extract(schedule_files[!idx_comment], "^.*(?=,)"))
     return(files)
 }
 # }}}1
