@@ -188,7 +188,7 @@ run_epat <- function (epat, group = c("model", "weather", "all"), pair = NULL,
 # }}}1
 
 # collect_epat {{{1
-collect_epat <- function (x, case_names = NULL, no_params = TRUE,
+collect_epat <- function (x, case_names = NULL, no_info = FALSE, no_params = TRUE,
                           output = c("variable", "meter", "table", "surface report"),
                           suffix_type = c("auto", "C", "L", "D"), which = NULL,
                           year = current_year(), new_date = "datetime",
@@ -257,6 +257,11 @@ collect_epat <- function (x, case_names = NULL, no_params = TRUE,
         data
     )
     data <- dplyr::select(data, no, case, dplyr::everything())
+
+    # Delete info columns except 'case'
+    if (no_info) {
+        data <- dplyr::select(data, -dplyr::one_of("no", "dir", "template", "weather", "model_prefix"))
+    }
 
     # Delete param columns
     if (no_params) {
