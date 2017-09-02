@@ -601,10 +601,17 @@ edit_epat <- function (epat, parse = FALSE) {
         )
         # }}}3
         # Show a parameter table {{{3
-        output$dt_param_table <- DT::renderDataTable(param_table,
-            selection = "single", option = list(dom = "t")
-        )
-        proxy <- DT::dataTableProxy("dt_param_table")
+        observe({
+            input$add_param
+            input$save_param
+            input$delete_param
+            input$copy_param
+            output$dt_param_table <- DT::renderDataTable(
+                DT::datatable(param_table,
+                    selection = "single", option = list(dom = "t")
+                )
+            )
+        })
         # }}}3
         # Add parameters{{{3
         observeEvent(input$add_param,
@@ -622,9 +629,8 @@ edit_epat <- function (epat, parse = FALSE) {
                 # }}}4
                 # Show the parameter table{{{4
                 } else {
-                    param_table <- dplyr::bind_rows(param_table, isolate(params()))
-                    param_table <- tidyr::drop_na(param_table, ID, Name, `Search Tag`, `Value Expressions`)
-                    DT::replaceData(proxy, param_table, resetPaging = FALSE)
+                    param_table <<- dplyr::bind_rows(param_table, isolate(params()))
+                    param_table <<- tidyr::drop_na(param_table, ID, Name, `Search Tag`, `Value Expressions`)
                 }
                 # }}}4
             }
@@ -647,8 +653,7 @@ edit_epat <- function (epat, parse = FALSE) {
                     s <- input$dt_param_table_rows_selected
                     if (!is.null(s)) {
                         row <- isolate(params())
-                        param_table[s,] <- row
-                        DT::replaceData(proxy, param_table, resetPaging = FALSE)
+                        param_table[s,] <<- row
                     } else {
                         shinytoastr::toastr_error("Please select a parameter from the table before save.", title = "Error",
                             closeButton = TRUE, progressBar = TRUE,
@@ -665,8 +670,7 @@ edit_epat <- function (epat, parse = FALSE) {
             {
                  s <- input$dt_param_table_rows_selected
                  if (!is.null(s)) {
-                     param_table <- param_table[-s,]
-                     DT::replaceData(proxy, param_table, resetPaging = FALSE)
+                     param_table <<- param_table[-s,]
                  } else {
                     shinytoastr::toastr_error("Please select a parameter from the table before delete.", title = "Error",
                         closeButton = TRUE, progressBar = TRUE,
@@ -683,8 +687,7 @@ edit_epat <- function (epat, parse = FALSE) {
                  s <- input$dt_param_table_rows_selected
                  if (!is.null(s)) {
                      row <- param_table$table[s,]
-                     param_table <- dplyr::bind_rows(param_table, row)
-                     DT::replaceData(proxy, param_table, resetPaging = FALSE)
+                     param_table <<- dplyr::bind_rows(param_table, row)
                  } else {
                     shinytoastr::toastr_error("Please select a parameter from the table before copy.", title = "Error",
                         closeButton = TRUE, progressBar = TRUE,
