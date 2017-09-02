@@ -453,7 +453,6 @@ edit_epat <- function (epat, parse = FALSE) {
         })
         input_pair <- reactive({
             pairs <- get_input_pairs(model_list(), weather_list())
-            pairs <- data.table::rbindlist(pairs)
             pairs <- purrr::set_names(pairs, c("Model Template", "Weather"))
             pairs <- tibble::as_tibble(pairs)
             pairs <- tibble::add_column(pairs, Selected = rep(TRUE, nrow(pairs)), .before = 1L)
