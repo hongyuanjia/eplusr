@@ -458,7 +458,7 @@ show_output <- function (data, state = NULL, group = NULL,
 
         data_plot <- reactive({
             data_plot <- dplyr::full_join(long_tbl(), info_filtered())
-            if (!is.na(group)) {
+            if (!is.null(group)) {
                 data_plot <- mutate(data_plot,
                     rlang::UQ(paste0(group, " & output")) := paste0("[", rlang::UQ(rlang::sym(group)), "]", output),
                     rlang::UQ(paste0(group, " & variable")) := paste0("[", rlang::UQ(rlang::sym(group)), "]", variable),
