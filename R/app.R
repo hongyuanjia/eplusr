@@ -43,7 +43,7 @@ show_output <- function (data, state = NULL, group = NULL,
 
     # Standardize input data
     data <- standardize_wide_table(data, exclude = group)
-    names(data) <- stringr::str_to_lower(names(data))
+    # names(data) <- stringr::str_to_lower(names(data))
 
     col_datetime <- get_date_col(data)
     output_info <- get_output_info(data)
@@ -946,7 +946,8 @@ get_output_info <- function (wide_table) {
     output_names <- outputs[idx]
 
     dplyr::tibble(output = output_names,
-                  key = stringr::str_to_lower(stringr::str_extract(output_names, ".*(?=:)")),
+                  key = stringr::str_extract(output_names, ".*(?=:)"),
+                  # key = stringr::str_to_lower(stringr::str_extract(output_names, ".*(?=:)")),
                   variable = stringr::str_extract(output_names, "(?<=:).*(?=\\s\\[)"),
                   unit = stringr::str_extract(output_names, "(?<=\\[).*(?=\\])"),
                   freq = stringr::str_extract(output_names, "(?<=\\]\\().*?(?=\\)$)"))
@@ -1403,7 +1404,7 @@ create_source_code <- function (data_name, data_name_prefix, group, col_datetime
     code_ggplot_facet <-
         glue::glue("
             ## Add facets.
-            p_{data_name_prefix} <- p_{data_name_prefix} + facet_grid(facets = {plot_facet}, swith = 'y', scales = 'free')\n
+            p_{data_name_prefix} <- p_{data_name_prefix} + facet_grid(facets = {plot_facet}, switch = 'y', scales = 'free')\n
         ")
 
     code_ggplot_theme <-
