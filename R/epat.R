@@ -1309,8 +1309,7 @@ replace_param_lines_per_value <- function (line_params, value) {
 # get_input_pairs {{{1
 get_input_pairs <- function (models, weathers, pair = NULL) {
 
-    pair <- if (is.null(pair)) NULL
-    pair <- if (is_empty(pair)) NULL
+    if (is_empty(pair)) pair <- NULL
 
     input_pairs <- purrr::cross_df(list(model = models, weather = weathers))
 
