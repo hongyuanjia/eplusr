@@ -1076,7 +1076,7 @@ ggplot_line <- function (data, x, y, color = NULL, group = NULL, facet = NULL) {
     if (!is.null(facet)) {
         # facet <- rlang::parse_quosure(facet)
         facet <- as.formula(facet)
-        p <- p+ facet_grid(facets = facet, scales = "free")
+        p <- p+ facet_grid(facets = facet, scales = "free", switch = "y")
     }
     p
 }
