@@ -142,7 +142,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     if (suffix_type == "auto") suffix_type <- get_suffix_type(prefix)
     assertthat::assert_that(assertthat::is.string(suffix_type),
         msg = msg("The directory of 'path' contains results from one model but
-                  with multiple output suffixes: ", csQuote(suffix), ". Please
+                  with multiple output suffixes: ", csQuote(suffix_type), ". Please
                   specify 'suffix_type' explicitly, e.g. one of c('C', 'L', 'D').")
     )
     # }}}2
