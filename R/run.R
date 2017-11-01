@@ -172,6 +172,7 @@ run_eplus <- function (model, weather = NULL, output_dir = NULL, output_prefix =
 #' @importFrom stringr str_replace
 #' @importFrom readr read_lines
 # get_idd_ver {{{1
+# A helper to get IDD version
 get_idd_ver <- function(eplus_dir){
     idd <- file_path(eplus_dir, "Energy+.idd")
     idd_ver <- purrr::map_chr(idd, ~stringr::str_replace(readr::read_lines(.x, n_max = 1),
@@ -180,6 +181,7 @@ get_idd_ver <- function(eplus_dir){
 }
 # }}}1
 # check_energyplus{{{1
+# A helper to check if EnergyPlus executable exists in the input dir.
 check_energyplus <- function (eplus_dir) {
     os <- Sys.info()['sysname']
     if (os == "Windows") {
@@ -193,8 +195,8 @@ check_energyplus <- function (eplus_dir) {
 }
 # }}}1
 # get_volumes{{{1
-# get_volumes: A function to get all disks (borrowed from 'getVolumes' function
-# in 'shinyFiles' package).
+# A helper to get all disks (borrowed from 'getVolumes' function in 'shinyFiles'
+# package).
 get_volumes <- function(exclude = NULL) {
     os <- Sys.info()['sysname']
     if (os == 'Darwin') {
