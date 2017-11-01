@@ -1028,7 +1028,7 @@ create_job <- function (param_tbl) {
 }
 # }}}1
 
-#' @expoprt
+#' @export
 # run_jeplus{{{1
 run_jeplus <- function(jeplus, case_name = NULL, output_dir = NULL, n = NULL,
                        eplus_ver = NULL, eplus_dir = NULL) {
