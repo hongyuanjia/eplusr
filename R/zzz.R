@@ -33,7 +33,7 @@
 
     eplus_info <- tryCatch(find_eplus(verbose = FALSE),
                            error = function(e) {dplyr::tibble(path = "", version = "")})
-    eplus_info_latest <- eplus_info[length(eplus_info),]
+    eplus_info_latest <- eplus_info[nrow(eplus_info),]
 
     eplus_dir <- eplus_info_latest[["path"]]
     eplus_ver <- eplus_info_latest[["version"]]
