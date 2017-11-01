@@ -261,7 +261,7 @@ annual_seq <- function(interval = 1L, year = current_year(), tz = Sys.timezone()
 #' default value is the current system time zone.
 #' @return It returns a time sequence of giving year and inverval.
 #' @importFrom lubridate year
-#' @importFrom data.table data.table set merge
+#' @importFrom data.table data.table set
 #' @export
 # annual_sch
 # {{{1
@@ -499,7 +499,7 @@ resample <- function (data, base = NULL, new = NULL, step = "month",
 #' @param replacement A single character or number used to replace the nonsense
 #' data.
 #' @return A data.table with nonsense data replaced.
-#' @importFrom data.table set fun
+#' @importFrom data.table set
 #' @export
 # na_replace
 # {{{1
