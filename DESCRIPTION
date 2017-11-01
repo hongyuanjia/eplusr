@@ -4,22 +4,28 @@ Version: 0.0.1
 Authors@R: person("Hongyuan", "Jia", email = "hongyuanjia@outlookcom", role = c("aut", "cre"))
 Description: This package provides tools to run EnergyPlus and collect, analyse,
     summary and plot parametric simulation results in R.
-Depends: R (>= 3.3.3)
+Depends: 
+    R (>= 3.3.3),
+    data.table
 License: MIT
 URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Encoding: UTF-8
 LazyData: true
-Imports: installr,
+Imports: 
+    installr,
     magrittr,
     purrr,
-    data.table,
     lubridate,
     xts,
     readr,
     stringr,
     stringi,
-    padr,
     dplyr,
-    tidyr
+    tidyr,
+    rvest,
+    xml2,
+    assertthat,
+    jsonlite,
+    rlang
 RoxygenNote: 6.0.1
