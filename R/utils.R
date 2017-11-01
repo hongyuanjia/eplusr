@@ -46,7 +46,7 @@ assertthat::on_failure(has_ext) <- function (call, env = parent.env) {
 
 has_model_ext <- function (x) {
     ext <- tools::file_ext(x)
-    grepl("i[dm]f", ext, ignore.case = TRUE)
+    grepl("(i[pm]f|expidf)$", ext, ignore.case = TRUE)
 }
 
 has_epw_ext <- function (x) {
