@@ -259,7 +259,7 @@ show_output <- function (data, state = NULL, group = NULL,
                                  textInput("data_name_prefix", label = "Data Name Prefix:", value = "data"),
                                  actionButton("update_data_name_prefix", "Update"),
                                  actionButton("copy_code", "Copy Code to Clipboard", icon = icon("clipboard")),
-                                 shinyWidgets::receiveSweetAlert("success_copy"),
+                                 shinyWidgets::useSweetAlert(),
                                  tags$br(),
                                  shinyAce::aceEditor(outputId = "source_code", mode = "r",
                                            theme = "monokai", vimKeyBinding = TRUE,
@@ -611,7 +611,7 @@ show_output <- function (data, state = NULL, group = NULL,
         observeEvent(input$copy_code,
             {
                 clipr::write_clip(content = isolate(source_code()), object_type = "character")
-                shinyWidgets::sendSweetAlert("success_copy", title = "Success!",
+                shinyWidgets::sendSweetAlert(session = session, title = "Success!",
                     text = "Source Code has been successfully copied to clipboard", type = "success"
                 )
             }
