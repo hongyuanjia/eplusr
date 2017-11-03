@@ -26,7 +26,7 @@ page_main <- "https://www.energyplus.net"
 #' @importFrom purrr map pwalk
 #' @importFrom tidyr unnest
 wthr_download <- function(search, savedir = getwd(),
-                          type = c("all", "ddy", "epw", "stat"), quiet = TRUE) {
+                          type = c("all", "ddy", "epw", "stat"), quiet = FALSE) {
     src <- wthr_search(search = search)
     cat("Search completed.", nrow(src), "results returned:\n",
         "Please type the number of results you want to download:\n")
@@ -92,18 +92,18 @@ wthr_search <- function(search) {
 wthr_get_dl_info <- function(path) {
     # Get the base file name in order to rename the downloaded zip file.
     dl_basename <- basename(path)
-    results_dl_raw <- read_html(paste0(page_main, path)) %>%
-        html_node(".region") %>%
-        html_node(".btn-group-vertical") %>%
-        html_children()
+    results_dl_raw <- xml2::read_html(paste0(page_main, path)) %>%
+        rvest::html_node(".region") %>%
+        rvest::html_node(".btn-group-vertical") %>%
+        rvest::html_children()
 
-    dl_type <- html_text(results_dl_raw)
+    dl_type <- rvest::html_text(results_dl_raw)
     dl_type[length(dl_type)] <- "all"
-    dl_url <- paste0(page_main, html_attr(results_dl_raw, "href"))
+    dl_url <- paste0(page_main, rvest::html_attr(results_dl_raw, "href"))
 
     dl_filename <- c(basename(dl_url[-length(dl_url)]), paste0(dl_basename, ".zip"))
 
-    results_dl <- tibble(type = dl_type, url = dl_url, filename = dl_filename)
+    results_dl <- dplyr::tibble(type = dl_type, url = dl_url, filename = dl_filename)
 
     return(results_dl)
 }
