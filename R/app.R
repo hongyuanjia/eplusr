@@ -512,8 +512,7 @@ show_output <- function (data, state = NULL, group = NULL,
                     legend.background = element_rect(color = "black"),
                     legend.key = element_rect(color = "gray"),
                     strip.background = element_blank(),
-                    strip.placement = "outside",
-                    strip.text.y = element_text(angle = 90)
+                    strip.placement = "outside"
                 ) +
                 guides(color = guide_legend(title.position = "top", ncol = 1))
 
@@ -1413,8 +1412,7 @@ create_source_code <- function (data_name, data_name_prefix, group, col_datetime
                       legend.background = element_rect(color = 'black'),
                       legend.key = element_rect(color = 'gray'),
                       strip.background = element_blank(),
-                      strip.placement = 'outside',
-                      strip.text.y = element_text(angle = 90)
+                      strip.placement = 'outside'
                 )
         ")
 
