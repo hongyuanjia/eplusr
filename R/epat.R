@@ -200,8 +200,8 @@ collect_epat <- function (x, case_names = NULL, no_info = FALSE, no_params = TRU
     # If 'x' is not a parsable epat
     if (is.null(epat)) {
         assertthat::assert_that(assertthat::is.string(x))
-        is_file <- file_test("-f", x)
-        is_dir <- file_test("-d", x)
+        is_file <- utils::file_test("-f", x)
+        is_dir <- utils::file_test("-d", x)
         if (is_file) {
             is_job_index <- identical(basename(x), "job_index.csv")
             path <- x
@@ -994,10 +994,10 @@ parse_param_values <- function (string, try = TRUE) {
         # Eval the text in a new environment parent from an empty
         # environment.
         if (try) {
-            values <- tryCatch(eval(parse(text = string), env = environment()),
+            values <- tryCatch(eval(parse(text = string), envir = environment()),
                 error = function (e) "Invalid R expression.")
         } else {
-            values <- eval(parse(text = string), env = environment())
+            values <- eval(parse(text = string), envir = environment())
         }
     }
 

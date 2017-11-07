@@ -4,8 +4,6 @@
 #' Analysis Toolkit).
 #'
 #' @export
-#' @examples
-#' epat()
 # epat{{{1
 epat <- function () {
     shiny::runApp(appDir = system.file("inst/app", package="eplusr"))
@@ -851,8 +849,8 @@ read_epat <- function(json) {
             eval_results <- tryCatch(
                 # Eval the text in a new environment parent from an empty
                 # environment.
-                eval(parse(text = string_replaced), env = environment()),
-                # eval(parse(text = param_values), env = new.env(parent = emptyenv())),
+                eval(parse(text = string_replaced), envir = environment()),
+                # eval(parse(text = param_values), envir = new.env(parent = emptyenv())),
                 error = function (e) eval_error
             )
         } else {

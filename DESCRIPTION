@@ -1,10 +1,10 @@
 Package: eplusr
 Title: A Toolkit for Using EnergyPlus in R
 Version: 0.0.1
-Authors@R: person("Hongyuan", "Jia", email = "hongyuanjia@outlookcom", role = c("aut", "cre"))
+Authors@R: person("Hongyuan", "Jia", email = "hongyuanjia@cqu.edu.cn", role = c("aut", "cre"))
 Description: This package provides tools to run EnergyPlus and collect, analyse,
     summary and plot parametric simulation results in R.
-Depends: 
+Depends:
     R (>= 3.3.3),
     data.table
 License: MIT
@@ -12,20 +12,41 @@ URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Encoding: UTF-8
 LazyData: true
-Imports: 
-    installr,
+Imports:
+    assertthat,
+    xts,
+    dplyr,
+    jsonlite,
+    lubridate,
     magrittr,
     purrr,
-    lubridate,
-    xts,
     readr,
-    stringr,
-    stringi,
-    dplyr,
-    tidyr,
+    rlang,
     rvest,
+    stringi,
+    stringr,
     xml2,
-    assertthat,
-    jsonlite,
-    rlang
+    methods,
+    tibble,
+    tidyr,
+    units,
+    shiny,
+    ggplot2,
+    miniUI,
+    DT,
+    clipr,
+    dygraphs,
+    glue,
+    plotly,
+    rhandsontable,
+    shinyAce,
+    shinyBS,
+    shinyFiles,
+    shinyTime,
+    shinyWidgets,
+    shinycssloaders,
+    shinyjqui,
+    shinyjs,
+    shinythemes,
+    shinytoastr
 RoxygenNote: 6.0.1

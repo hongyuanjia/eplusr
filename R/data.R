@@ -199,7 +199,7 @@ annual_seq <- function(interval = 1L, year = current_year(), tz = Sys.timezone()
     }
 
     # If 'year' argument is not given, set the year as current year.
-    if (missingArg(year)) {
+    if (methods::missingArg(year)) {
         year <- current_year()
     } else if (!is.numeric(year)) {
         stop("Argument 'year' should be a numeric object.")
@@ -207,7 +207,7 @@ annual_seq <- function(interval = 1L, year = current_year(), tz = Sys.timezone()
 
     year <- as.integer(year)
 
-    if (missingArg(tz)) {
+    if (methods::missingArg(tz)) {
         tz <- Sys.timezone()
     }
 
@@ -271,7 +271,7 @@ annual_sch <- function(data, date_col = NULL,
     assertthat::assert_that(is.data.frame(data))
     data <- conv_dt(data)
 
-    date_col_name <- check_date_col(data, date_col)
+    date_col_name <- check_date_col(data)
 
     date_col <- data[[date_col_name]]
 
@@ -284,8 +284,7 @@ annual_sch <- function(data, date_col = NULL,
     interval <- `/`(get_interval(date_col), 60L)
 
     annual <- data.table::data.table(annual = annual_seq(interval = interval, year = year,
-                                                         down = down, leap_day = leap_day,
-                                                         ...))
+                                                         down = down, leap_day = leap_day))
 
     data_merged <- merge(annual, y = data, all.x = TRUE,
                          by.x = "annual", by.y = date_col)
@@ -846,7 +845,7 @@ case_apply <- function (wide_table, case, primary = NULL, fun, ..., by_var = FAL
     case_name <- unique(wide_table[[case]])
     # Get combination of all cases.
     if (is.null(primary)) {
-        case_combn <- combn(case_name, 2, simplify = FALSE)
+        case_combn <- utils::combn(case_name, 2, simplify = FALSE)
     } else {
         if (is.na(match(primary, case_name))) {
             stop("'primary' is not one of the cases.", call. = FALSE)
@@ -957,10 +956,9 @@ addCalExp <- function(data, newcol.name = "NewColumn", sep = "", ref = TRUE, p.l
     purrr::map(p.list,
                function(par){
                    if(grepl(x=par,"^@")){
-                       par %>% sub(x=.,"^@(.*)$", " \\1 ")
+                        sub("^@(.*)$", " \\1 ", x=par)
                    }else if(length(col_names(data, par))){
-                       col_names(data, par) %>%
-                           gsub(x=., "(.*)", "`\\1`")
+                           gsub("(.*)", "`\\1`", col_names(data, par))
                    }else{
                        stop("Column not found in the data.")
                }}) %>% purrr::flatten_chr()
@@ -990,15 +988,15 @@ addCalExp <- function(data, newcol.name = "NewColumn", sep = "", ref = TRUE, p.l
 addCalCol <- function(data, newcol.name, p.list, bycol_pattern, sep = "",
                       ref = TRUE, copy = FALSE){
     if(copy){
-        data %<>% copy(.)
+        data <- copy(data)
     }
     if(hasArg(bycol_pattern)){
-        data %<>% .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
+        data <- data[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
                                                   ref = ref, p.list = p.list))),
-                    by = c(col_names(., bycol_pattern))] %>% .[]
+                    by = c(col_names(., bycol_pattern))]
     }else{
-        data %<>% .[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
-                                                  ref = ref, p.list = p.list)))] %>% .[]
+        data <- data[, eval(parse(text = addCalExp(data, newcol.name = newcol.name, sep = sep,
+                                                  ref = ref, p.list = p.list)))]
     }
     return(data)
 }

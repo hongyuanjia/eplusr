@@ -107,8 +107,8 @@ collect_eplus <- function (path, output = c("variable", "meter", "table", "surfa
     suffix_type <- rlang::arg_match(suffix_type)
 
     # Check if given 'path' is a dir or a file {{{2
-    is_file <- file_test("-f", path)
-    is_dir <- file_test("-d", path)
+    is_file <- utils::file_test("-f", path)
+    is_dir <- utils::file_test("-d", path)
     is_model <- has_model_ext(path)
     # Stop if 'path' is neither a model nor a dir.
     assertthat::assert_that(any(all(is_file, is_model), is_dir),

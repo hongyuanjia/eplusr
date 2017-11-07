@@ -18,5 +18,4 @@ Analysis Toolkit).
 }
 \examples{
 epat()
-epat()
 }
