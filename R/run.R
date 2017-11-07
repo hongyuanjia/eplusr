@@ -2,7 +2,7 @@
 #                                Run EnergyPlus                                #
 ################################################################################
 
-#' Find EnergyPlus locations on current computer.
+#' @title Find EnergyPlus locations on current computer.
 #'
 #' \code{find_eplus} try to find the locations of EnergyPlus on current
 #' computer.
@@ -13,11 +13,8 @@
 #' @importFrom purrr flatten_chr map
 #' @importFrom stringr str_detect
 #' @export
-#' @examples
-#' find_eplus()
-# find_eplus
-# {{{1
 find_eplus <- function(ver = NULL, verbose = FALSE){
+    # {{{1
     # Define searching paths.
     # 1. check if drives exist.
     disks <- get_volumes()

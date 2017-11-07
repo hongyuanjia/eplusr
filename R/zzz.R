@@ -28,7 +28,7 @@
 }
 
 .onAttach <- function (libname, pkgname) {
-    v = packageVersion("eplusr")
+    v <- utils::packageVersion("eplusr")
     packageStartupMessage("eplusr ", v)
 
     eplus_info <- tryCatch(find_eplus(verbose = FALSE),

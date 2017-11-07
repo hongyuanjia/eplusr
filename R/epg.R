@@ -83,7 +83,7 @@ as_epg <- function (x) {
     }
 
     epg <- x
-    class(epg) <- unique(c("epg", "eplusr_job", class(sim_info)))
+    class(epg) <- unique(c("epg", "eplusr_job", class(x)))
 
     return(epg)
 }
