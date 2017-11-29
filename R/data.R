@@ -646,44 +646,44 @@ data_melt <- function (data, id_pattern, measure_pattern, ignore_case = TRUE,
 }
 # }}}1
 
-# #' Format EnergyPlus output and meter result into a long table.
-# #'
-# #' \code{long_table} takes an EnergyPlus "output" or "meter" result as an input
-# #' and returns a long table with first column being the POSIXt column, and next
-# #' 'component' indicating energy consumption components, 'type' indicating
-# #' energy types (e.g.  Electricity, and Gas), 'value' indicating the value of
-# #' the component, 'unit' indicating the unit of energy used, and 'timestep'
-# #' indicating the tiem step of data collected. A meter output from a
-# #' 10-min-timestep annual simulation will takes about 5 seconds to load.  So,
-# #' use with caution.
-# #'
-# #' @param data A data.table object containing EnergyPlus standard output or
-# #' meter result.
-# #' @return A data.table with long table format.
-# #' @importFrom data.table melt setcolorder
-# #' @export
-# # long_table
-# # {{{1
-# long_table <- function(data) {
-    # assertthat::assert_that(is.data.frame(data))
-#     data <- conv_dt(data)
+#' Format EnergyPlus output and meter result into a long table.
+#'
+#' \code{long_table} takes an EnergyPlus "output" or "meter" result as an input
+#' and returns a long table with first column being the POSIXt column, and next
+#' 'component' indicating energy consumption components, 'type' indicating
+#' energy types (e.g.  Electricity, and Gas), 'value' indicating the value of
+#' the component, 'unit' indicating the unit of energy used, and 'timestep'
+#' indicating the tiem step of data collected. A meter output from a
+#' 10-min-timestep annual simulation will takes about 5 seconds to load.  So,
+#' use with caution.
+#'
+#' @param data A data.table object containing EnergyPlus standard output or
+#' meter result.
+#' @return A data.table with long table format.
+#' @importFrom data.table melt setcolorder
+#' @export
+# long_table
+# {{{1
+long_table <- function(data) {
+    assertthat::assert_that(is.data.frame(data))
+    data <- conv_dt(data)
 
-#     date_col <- get_date_col(data)
+    date_col <- get_date_col(data)
 
-#     data <- melt(data, id.vars = date_col,
-#                  variable.name = "component", value.name = "value",
-#                  variable.factor = FALSE)
-#     data <- data[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")][,
-#                  lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
-#                  lapply(.SD, function(x) gsub(x=x, "^\\s+", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
-#                  lapply(.SD, function(x) gsub(x=x, "\\s+$", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
-#                  # lapply(.SD, str_trim), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+    data <- melt(data, id.vars = date_col,
+                 variable.name = "component", value.name = "value",
+                 variable.factor = FALSE)
+    data <- data[, c("component", "type", "unit", "timestep") := data.table::tstrsplit(component, "[:\\[\\(]")][,
+                 lapply(.SD, function(x) gsub(x=x, "\\]*\\)*", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+                 lapply(.SD, function(x) gsub(x=x, "^\\s+", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")][,
+                 lapply(.SD, function(x) gsub(x=x, "\\s+$", "")), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
+                 # lapply(.SD, str_trim), .SDcol = c("type", "unit", "timestep"), by = c(date_col, "component", "value")]
 
-#     data <- data.table::setcolorder(data, c(date_col, "component", "type", "value", "unit", "timestep"))
+    data <- data.table::setcolorder(data, c(date_col, "component", "type", "value", "unit", "timestep"))
 
-#     return(data)
-# }
-# # }}}1
+    return(data)
+}
+# }}}1
 
 #' Calculate CV(RMSE) between two numeric vector.
 #'
