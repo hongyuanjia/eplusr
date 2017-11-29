@@ -1073,7 +1073,7 @@ ggplot_line <- function (data, x, y, color = NULL, group = NULL, facet = NULL) {
     if (!is.null(facet)) {
         # facet <- rlang::parse_quosure(facet)
         facet <- as.formula(facet)
-        p <- p+ facet_grid(facets = facet, scales = "free", switch = "y")
+        p <- p+ facet_grid(facets = facet, scales = "free", switch = "y", labeller = label_wrap_gen())
     }
     p
 }
@@ -1415,6 +1415,7 @@ create_source_code <- function (data_name, data_name_prefix, group, col_datetime
                       strip.placement = 'outside'
                 )
         ")
+        
 
     source_code <- paste0(code_data_check,
                           code_data_time_filtered,
