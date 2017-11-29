@@ -758,9 +758,7 @@ fileChooseInput <- function(id, title = NULL, value = "", placeholder = NULL,
                 ),
                 column(3,
                     shinyFiles::shinyFilesButton(ns("choose"),
-                        label = label, title = chooseTitle, multiple = TRUE,
-                        icon = icon("folder-open")
-                    )
+                        label = label, title = chooseTitle, multiple = TRUE)
                 )
             )
         )
@@ -776,10 +774,8 @@ fileChooseInput <- function(id, title = NULL, value = "", placeholder = NULL,
                 ),
                 column(3,
                     shinyFiles::shinyFilesButton(ns("choose"),
-                        label = label, title = chooseTitle, multiple = TRUE,
-                        icon = icon("folder-open")
-                    ),
-                    actionButton(ns("btn"), label = btnLabel, icon = btnIcon)
+                        label = label, title = chooseTitle, multiple = TRUE),
+                    actionButton(ns("btn"), label = btnLabel)
                 )
             )
         )
