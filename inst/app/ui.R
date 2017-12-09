@@ -1,3 +1,386 @@
+# convertMenuItem {{{
+convertMenuItem <- function (mi, tabName) {
+    mi$children[[1]]$attribs['data-toggle'] = "tab"
+    mi$children[[1]]$attribs['data-value'] = tabName
+    mi
+}
+# }}}
+
+# eplusrModal {{{
+eplusrModal <- function(id, title, trigger, ..., size, footer = NULL, close.button = TRUE, width = NULL) {
+    if (!missing(size)) {
+        if (size == "large") {
+            size = "modal-lg"
+        } else if(size == "small") {
+            size = "modal-sm"
+        }
+        size <- paste("modal-dialog", size)
+        width = NULL
+    } else {
+        size <- "modal-dialog"
+    }
+
+    if (is.null(footer)) {
+        footer <- shiny::tagList()
+    }
+
+    if (close.button) {
+        footer <- shiny::tagAppendChild(footer,
+            shiny::tagList(shiny::tags$button(type = "button",
+                class = "btn btn-default", "data-dismiss" = "modal", "Close")
+            )
+        )
+    }
+
+    bsTag <- shiny::tags$div(class = size,
+        shiny::tags$div(class = "modal-content",
+            shiny::tags$div(class = "modal-header",
+                shiny::tags$button(type = "button", class = "close", "data-dismiss" = "modal",
+                    shiny::tags$span(shiny::HTML("&times;"))
+                 ),
+                shiny::tags$h4(class = "modal-title", title)
+            ),
+            shiny::tags$div(class = "modal-body", list(...)),
+            shiny::tags$div(class = "modal-footer", footer)
+        )
+    )
+
+    if(!is.null(width)) {
+        bsTag <- addAttribs(bsTag, style = paste0("width: ", width, " !important;"))
+    }
+
+    bsTag <- shiny::tags$div(class = "modal sbs-modal fade", id = id,
+                             tabindex = "-1", "data-sbs-trigger" = trigger, bsTag)
+}
+# }}}
+
+# TODO:
+# 1. Use `formattable` to show eplus `*.end` files. (Use reactivePoll)
+# 2. Use `collapsibleTree` to show the structure of the project.
+# 3. Use `diagrammaR` to show the structure of eplus models
+# 4. Use `rpivotTable` to show the simulation results of all cases.
+# 5. Use `shinyFeedback` to check inputs.
+# 6. Find some way to use `rhandsontable`.
+
+# dashboard {{{
+library(shiny)
+library(shinydashboard)
+library(shinyWidgets)
+library(shinyBS)
+library(collapsibleTree)
+
+# help(package = "shinyWidgets")
+ui <- dashboardPage(
+    # skin = "purple",
+
+    # Header {{{
+    dashboardHeader(title = "EPAT",
+        dropdownMenu(type = "messages",
+            messageItem(
+                from = "Sales Dept",
+                message = "Sales are steady this month."
+            )
+        ),
+        dropdownMenu(type = "notifications",
+            notificationItem(
+                text = "5 new users today", icon("users")
+            )
+        )
+    ),
+    # }}}
+
+    # Sidebar {{{
+    dashboardSidebar(
+        # sidebarUserPanel("Hongyuan", subtitle = NULL, image = icon("headphones")),
+        sidebarMenu(
+            # project {{{
+            convertMenuItem(
+                menuItem("Project", tabName = "tab_project", icon = icon("file"),
+                    tags$li(
+                        actionLink("lnk_proj_new", " New Project", icon = icon("file")),
+                        actionLink("lnk_proj_open", " Open Project...", icon = icon("folder-open")),
+                        actionLink("lnk_proj_save", " Save", icon = icon("floppy-o")),
+                        actionLink("lnk_proj_saveas", " Save As...", icon = icon("floppy-o")),
+                        actionLink("lnk_proj_jeplus", " Import jEPlus JSON Project...", icon = icon("tasks"))
+                    )
+                ),
+                tabName = "tab_project"
+            ),
+            # }}}
+            # edit {{{
+            convertMenuItem(
+                menuItem("Edit", tabName = "tab_edit", icon = icon("edit"),
+                    menuItem("Import Parameters from CSV...", tabName = "tab_edit_imp_csv", icon = icon("sign-in")),
+                    menuItem("Export Parameters to CSV...", tabName = "tab_edit_exp_csv", icon = icon("sign-out")),
+                    menuItem("Settings...", tabName = "tab_edit_settings", icon = icon("gears"))
+                ),
+                tabName = "tab_edit"
+            ),
+            # }}}
+            # action {{{
+            menuItem("Action", tabName = "tab_action", icon = icon("play"),
+                menuItem(tabName = "tab_action_validate", "Validate Jobs", icon = icon("check-square")),
+                menuItem(tabName = "tab_action_simulate", "Run Jobs", icon = icon("play")),
+                menuItem(tabName = "tab_action_summary", "Show Result Summary", icon = icon("list")),
+                menuItem(tabName = "tab_action_plot", "Plot...", icon = icon("bar-chart"))
+            ),
+            # }}}
+            # tools {{{
+            menuItem("Tools", tabName = "tab_tools", icon = icon("wrench"),
+                menuItem("IDF Version Converter", tabName = "tab_tools_converter", icon = icon("retweet")),
+                menuItem("IMF to IDF Converter", tabName = "tab_tools_imftoidf", icon = icon("mail-forward"))
+            ),
+            # }}}
+            # help {{{
+            menuItem("Help", tabName = "tab_help", icon = icon("question-circle"),
+                menuItem("User Guide", tabName = "guide", icon = icon("question-circle")),
+                menuItem("About", tabName = "about", icon = icon("exclamation-circle"))
+            )
+            # }}}
+        )
+    ),
+    # }}}
+
+    # Body {{{
+    dashboardBody(
+        # # mod_proj_new {{{
+        # eplusrModal(id = "mod_proj_new", title = "New Project", close.button = FALSE,
+            # trigger = "lnk_proj_new", size = "large",
+            # textInput("lnk_proj_new_name", label = "Name of the Project:",
+                # value = "", placeholder = "Please insert a name"
+            # ),
+            # footer = tagList(
+                # shinyWidgets::actionBttn("mod_proj_new_btn_start", "Start",
+                    # size = "sm", style = "fill", color = "primary"),
+                # tagAppendAttributes(
+                    # shinyWidgets::actionBttn("mod_proj_new_btn_cancel", "Cancel",
+                        # size = "sm", style = "fill"),
+                    # "data-dismiss" = "modal")
+            # )
+        # ),
+        # # }}}
+        # # mod_proj_open {{{
+        # eplusrModal(id = "mod_proj_open", title = "Open Project", close.button = FALSE,
+            # trigger = "lnk_proj_open", size = "large",
+            # textInput("lnk_proj_open_name", label = "Name of the Project:",
+                # value = "", placeholder = "Please insert a name"
+            # ),
+            # footer = tagList(
+                # shinyWidgets::actionBttn("mod_proj_open_btn_start", "Start",
+                    # size = "sm", style = "fill", color = "primary"),
+                # tagAppendAttributes(
+                    # shinyWidgets::actionBttn("mod_proj_open_btn_cancel", "Cancel",
+                        # size = "sm", style = "fill"),
+                    # "data-dismiss" = "modal")
+            # )
+        # ),
+        # # }}}
+        # # mod_proj_save {{{
+        # eplusrModal(id = "mod_proj_save", title = "Save Project", close.button = FALSE,
+            # trigger = "lnk_proj_save", size = "large",
+            # textInput("lnk_proj_save_name", label = "Name of the Project:",
+                # value = "", placeholder = "Please insert a name"
+            # ),
+            # footer = tagList(
+                # shinyWidgets::actionBttn("mod_proj_save_btn_start", "Start",
+                    # size = "sm", style = "fill", color = "primary"),
+                # tagAppendAttributes(
+                    # shinyWidgets::actionBttn("mod_proj_save_btn_cancel", "Cancel",
+                        # size = "sm", style = "fill"),
+                    # "data-dismiss" = "modal")
+            # )
+        # ),
+        # # }}}
+        # # mod_proj_saveas {{{
+        # eplusrModal(id = "mod_proj_saveas", title = "Save Project", close.button = FALSE,
+            # trigger = "lnk_proj_saveas", size = "large",
+            # textInput("lnk_proj_saveas_name", label = "Name of the Project:",
+                # value = "", placeholder = "Please insert a name"
+            # ),
+            # footer = tagList(
+                # shinyWidgets::actionBttn("mod_proj_saveas_btn_start", "Start",
+                    # size = "sm", style = "fill", color = "primary"),
+                # tagAppendAttributes(
+                    # shinyWidgets::actionBttn("mod_proj_saveas_btn_cancel", "Cancel",
+                        # size = "sm", style = "fill"),
+                    # "data-dismiss" = "modal")
+            # )
+        # ),
+        # # }}}
+        # # mod_proj_jeplus {{{
+        # eplusrModal(id = "mod_proj_jeplus", title = "Import jEPlus JSON Project", close.button = FALSE,
+            # trigger = "lnk_proj_jeplus", size = "large",
+            # textInput("lnk_proj_jeplus_name", label = "Name of the Project:",
+                # value = "", placeholder = "Please insert a name"
+            # ),
+            # footer = tagList(
+                # shinyWidgets::actionBttn("mod_proj_jeplus_btn_start", "Start",
+                    # size = "sm", style = "fill", color = "primary"),
+                # tagAppendAttributes(
+                    # shinyWidgets::actionBttn("mod_proj_jeplus_btn_cancel", "Cancel",
+                        # size = "sm", style = "fill"),
+                    # "data-dismiss" = "modal")
+            # )
+        # ),
+        # # }}}
+        tabItems(
+            # tab_project {{{
+            tabItem(tabName = "tab_project",
+                # mod_proj_new {{{
+                eplusrModal(id = "mod_proj_new", title = "New Project", close.button = FALSE,
+                    trigger = "lnk_proj_new", size = "large",
+                    textInput("lnk_proj_new_name", label = "Name of the Project:",
+                        value = "", placeholder = "Please insert a name"
+                    ),
+                    footer = tagList(
+                        shinyWidgets::actionBttn("mod_proj_new_btn_start", "Start",
+                            size = "sm", style = "fill", color = "primary"),
+                        tagAppendAttributes(
+                            shinyWidgets::actionBttn("mod_proj_new_btn_cancel", "Cancel",
+                                size = "sm", style = "fill"),
+                            "data-dismiss" = "modal")
+                    )
+                ),
+                # }}}
+        # mod_proj_open {{{
+        eplusrModal(id = "mod_proj_open", title = "Open Project", close.button = FALSE,
+            trigger = "lnk_proj_open", size = "large",
+            textInput("lnk_proj_open_name", label = "Name of the Project:",
+                value = "", placeholder = "Please insert a name"
+            ),
+            footer = tagList(
+                shinyWidgets::actionBttn("mod_proj_open_btn_start", "Start",
+                    size = "sm", style = "fill", color = "primary"),
+                tagAppendAttributes(
+                    shinyWidgets::actionBttn("mod_proj_open_btn_cancel", "Cancel",
+                        size = "sm", style = "fill"),
+                    "data-dismiss" = "modal")
+            )
+        ),
+        # }}}
+        # mod_proj_save {{{
+        eplusrModal(id = "mod_proj_save", title = "Save Project", close.button = FALSE,
+            trigger = "lnk_proj_save", size = "large",
+            textInput("lnk_proj_save_name", label = "Name of the Project:",
+                value = "", placeholder = "Please insert a name"
+            ),
+            footer = tagList(
+                shinyWidgets::actionBttn("mod_proj_save_btn_start", "Start",
+                    size = "sm", style = "fill", color = "primary"),
+                tagAppendAttributes(
+                    shinyWidgets::actionBttn("mod_proj_save_btn_cancel", "Cancel",
+                        size = "sm", style = "fill"),
+                    "data-dismiss" = "modal")
+            )
+        ),
+        # }}}
+        # mod_proj_saveas {{{
+        eplusrModal(id = "mod_proj_saveas", title = "Save Project", close.button = FALSE,
+            trigger = "lnk_proj_saveas", size = "large",
+            textInput("lnk_proj_saveas_name", label = "Name of the Project:",
+                value = "", placeholder = "Please insert a name"
+            ),
+            footer = tagList(
+                shinyWidgets::actionBttn("mod_proj_saveas_btn_start", "Start",
+                    size = "sm", style = "fill", color = "primary"),
+                tagAppendAttributes(
+                    shinyWidgets::actionBttn("mod_proj_saveas_btn_cancel", "Cancel",
+                        size = "sm", style = "fill"),
+                    "data-dismiss" = "modal")
+            )
+        ),
+        # }}}
+        # mod_proj_jeplus {{{
+        eplusrModal(id = "mod_proj_jeplus", title = "Import jEPlus JSON Project", close.button = FALSE,
+            trigger = "lnk_proj_jeplus", size = "large",
+            textInput("lnk_proj_jeplus_name", label = "Name of the Project:",
+                value = "", placeholder = "Please insert a name"
+            ),
+            footer = tagList(
+                shinyWidgets::actionBttn("mod_proj_jeplus_btn_start", "Start",
+                    size = "sm", style = "fill", color = "primary"),
+                tagAppendAttributes(
+                    shinyWidgets::actionBttn("mod_proj_jeplus_btn_cancel", "Cancel",
+                        size = "sm", style = "fill"),
+                    "data-dismiss" = "modal")
+            )
+        ),
+        # }}}
+                fluidRow(
+                    valueBox(value = "Project:", subtitle = "project", icon = icon("briefcase")),
+                    valueBox(value = "Model Template:", subtitle = "Template", icon = icon("laptop")),
+                    valueBox(value = "Weather File:", subtitle = "Weather", icon = icon("sun-o"))
+                ),
+                fluidRow(
+                    shinycssloaders::withSpinner(tableOutput("param_table"), type = 6)
+                ),
+                fluidRow(
+                    # Show project summary
+                )
+            ),
+            # }}}
+            # tab_edit {{{
+            tabItem(tabName = "tab_edit",
+                fluidRow(
+                    shinycssloaders::withSpinner(DT::dataTableOutput("tab_edit_param_table"), type = 6)
+                ),
+                shinyBS::bsCollapsePanel("File Input", style = "primary",
+                    fluidRow(
+                        column(6, textInput("id", "Field ID*:", value = NULL, width = "100%")),
+                        column(6, textInput("name", "Field Name*:", value = NULL, width = "100%"))
+                    ),
+                    fluidRow(
+                        column(12,
+                            textInput("tag", "Search tag*:", value = NULL, width = "100%")
+                        )
+                    ),
+                    fluidRow(
+                        column(12,
+                            textInput("desc", "Description:", value = NULL, width = "100%")
+                        )
+                    ),
+                    fluidRow(
+                        column(8,
+                            textInput("values", "Value Expressions*:", value = NULL, width = "100%")
+                        ),
+                        column(4,
+                            actionButton("preview", label = "Preview values", icon = icon("eye"))
+                        )
+                    ),
+                    fluidRow(
+                        column(12,
+                            shinyjs::hidden(
+                                div(id = "preview_values", class = "frame", style = "border-style: solid;",
+                                    tagAppendAttributes(
+                                        textOutput("preview_values"), style = "white-space:pre-wrap;"
+                                    )
+                                )
+                            )
+                        )
+                    ),
+                    fluidRow(
+                        column(12,
+                            selectInput("fixed_value", "Fix on i-th value:", choices = 0L)
+                        )
+                    ),
+                    helpText("Note: Fields marked with '*' are requred.")
+                )
+            )
+            # }}}
+        )
+    )
+    # }}}
+)
+
+server <- function (input, output, session) {
+
+    # Stop shiny app when closing the web brower.
+    session$onSessionEnded(stopApp)
+}
+
+shinyApp(ui = ui, server = server)
+# }}}
+
 # UI {{{1
 shinyUI(tagList(
         # Change width of shiny notifications{{{2
