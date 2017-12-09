@@ -568,3 +568,282 @@ is_imf <- function (idf_lines) {
     return(is_imf)
 }
 # }}}1
+
+################################################################################
+#                          Refact IDF parsing process                          #
+################################################################################
+library('data.table')
+# parse_idf {{{
+parse_idf <- function (filepath, idd) {
+
+    idf_str <- read_idf(filepath)
+
+    idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
+    setkey(idf_dt, line)
+
+    # value and comment {{{
+    # mark blank, block comments and inline comments {{{
+    idf_dt[, `:=`(ignore = FALSE,
+                  blank = FALSE,
+                  block_comment = FALSE,
+                  block_special_comment = FALSE,
+                  inline_comment = FALSE,
+                  inline_special_comment = FALSE,
+                  value = NA_character_,
+                  comment = NA_character_)]
+    # blank lines
+    idf_dt[string == "", blank := TRUE]
+    # block comment lines
+    idf_dt[blank == FALSE & stringr::str_detect(string, "^!"),
+           block_comment := TRUE]
+    # lines that can ignore during parsing
+    idf_dt[blank == TRUE | block_comment == TRUE, ignore := TRUE]
+    # block special comment lines
+    idf_dt[blank == FALSE & stringr::str_detect(string, "^!-"),
+           block_special_comment := TRUE]
+    # inline comment lines, such as "Version,8.8 ! this is a comment"
+    idf_dt[ignore == FALSE & stringr::str_detect(string, stringr::fixed("!")),
+           inline_comment := TRUE]
+    # inline special comment lines, i.e. "8.8; !- Version"
+    idf_dt[inline_comment == TRUE & stringr::str_detect(string, "!\\s{0,1}-"),
+           inline_special_comment := TRUE]
+    # }}}
+    # get values and comment values {{{
+    # NOTE: Leading spaces have been preserved for comments
+    # for block comments
+    idf_dt[block_comment == TRUE & block_special_comment == FALSE,
+           comment := stringr::str_trim(stringr::str_sub(string, start = 2), side = "right")]
+    # for block special comments
+    idf_dt[block_special_comment == TRUE,
+           comment := stringr::str_trim(stringr::str_sub(string, start = 3), side = "right")]
+    # for inline comments
+    idf_dt[inline_comment == TRUE & inline_special_comment == FALSE,
+           c("value", "comment") :=
+               data.table(stringr::str_split_fixed(string, "\\s*!", n = 2L))]
+    # for inline special comments
+    idf_dt[inline_special_comment == TRUE,
+           c("value", "comment") :=
+               data.table(stringr::str_split_fixed(string, "\\s*!\\s*-", n = 2L))]
+    # for lines without any comment
+    idf_dt[ignore == FALSE & inline_comment == FALSE, value := string]
+    # }}}
+    # handle condensed values {{{
+    idf_dt[, `:=`(value_condensed = NA_integer_)]
+    # if the sum of comma and semicolon > 2, then it must be a specially formatted
+    # object or field. It may contain a class name, e.g. 'Version,8.8;' and it may
+    # not, e.g. '0.0,0.0,0.0' in 'BuildingSurface:Detailed'.
+    # get number of condensed values
+    idf_dt[ignore == FALSE & stringr::str_count(value, "[,;]") > 1L,
+           `:=`(value_condensed = stringr::str_count(value, "[,;]"))]
+    # extract condensed values
+    idf_value_condensed <- idf_dt[
+        !is.na(value_condensed),
+        stringr::str_split_fixed(value, "\\s*,\\s*", n = value_condensed),
+        by = .(line)]
+    setnames(idf_value_condensed, c("line", "value"))
+    # combine
+    idf_dt <- idf_value_condensed[idf_dt, on = c("line")][
+            is.na(value_condensed), value := i.value][
+            , i.value := NULL]
+    # }}}
+    # get ending characters and values withou ending character {{{
+    idf_dt[, `:=`(ending_char = NA_character_)]
+    # if not contains any comma or semicolon, the ending character must be a comma
+    # that has been removed during handling condensed values
+    idf_dt[!is.na(value) & !stringr::str_detect(value, "[,;]"),
+           `:=`(ending_char = ",")]
+    idf_dt[!is.na(value) & stringr::str_detect(value, stringr::fixed(",")),
+           `:=`(ending_char = stringr::str_sub(value, start = -1L),
+                value = stringr::str_sub(value, start = 1L, end = -2L))]
+    idf_dt[!is.na(value) & stringr::str_detect(value, stringr::fixed(";")),
+           `:=`(ending_char = stringr::str_sub(value, start = -1L),
+                value = stringr::str_sub(value, start = 1L, end = -2L))]
+    # }}}
+    # }}}
+
+    # special comment key and value {{{
+    idf_dt[, `:=`(block_special_comment_key = NA_character_,
+                  block_special_comment_value = NA_character_)]
+    idf_dt[block_special_comment == TRUE,
+           c("block_special_comment_key", "block_special_comment_value") :=
+               data.table(stringr::str_split_fixed(comment, "\\s+", n = 2))]
+
+    idf_dt[, `:=`(idfeditor_pre_edit = NA)]
+    idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "GENERATOR" &
+           stringr::str_sub(block_special_comment_value, start = 1L, end = 9L) == "IDFEditor",
+           idfeditor_pre_edit := TRUE]
+
+    # ignore these three special keys as they were in IDFEditor
+    # idf_dt[, `:=`(idd_date = NA_character_)]
+    # idf_dt[block_special_comment == TRUE &
+    #        stringr::str_to_upper(block_special_comment_key) == "IDDDATE",
+    #        idd_date := block_special_comment_value]
+
+    # idf_dt[, `:=`(weather_file = NA_character_)]
+    # idf_dt[block_special_comment == TRUE &
+    #        stringr::str_to_upper(block_special_comment_key) == "WEATHERFILE",
+    #        weather_file := block_special_comment_value]
+
+    # idf_dt[, `:=`(post_processor = NA_character_)]
+    # idf_dt[block_special_comment == TRUE &
+    #        stringr::str_to_upper(block_special_comment_key) == "POSTPROCESSOR",
+    #        post_processor := block_special_comment_value]
+
+    option_special_format <- FALSE
+    option_view_in_ip_units <- FALSE
+    idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "OPTION" &
+           stringr::str_to_upper(block_special_comment_value) == "SORTEDORDER",
+           option_save := "SortedOrder"]
+    idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "OPTION" &
+           stringr::str_to_upper(block_special_comment_value) == "ORIGINALORDERTOP",
+           option_save := "OriginalOrderTop"]
+    idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "OPTION" &
+           stringr::str_to_upper(block_special_comment_value) == "ORIGINALORDERBOTTOM",
+           option_save := "OriginalOrderBottom"]
+    idf_errors_option_save <- idf_dt[!is.na(option_save), .(line, string, option_save)]
+    option_save <- idf_errors_option_save[, option_save]
+    if (nrow(idf_errors_option_save) > 1L) {
+        parse_issue(type = "More than one save option found", idf_errors_option_save,
+                    src = "IDF", stop = FALSE,
+                    info = glue::glue("Only the first option '{option_save[1]}' \\
+                                      will be used."))
+    }
+    if (idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "OPTION" &
+           stringr::str_to_upper(block_special_comment_value) == "USESPECIALFORMAT",
+        .N] == 1L) {
+        option_special_format <- TRUE
+    }
+    if (idf_dt[block_special_comment == TRUE &
+           stringr::str_to_upper(block_special_comment_key) == "OPTION" &
+           stringr::str_to_upper(block_special_comment_value) == "VIEWINIPUNITS",
+        .N] == 1L) {
+        option_view_in_ip_units <- TRUE
+    }
+    # }}}
+
+    # range test {{{
+    idf_dt[, `:=`(range_test_on = NA, range_test_off = NA)]
+    idf_dt[block_comment == TRUE &
+           stringr::str_detect(string, stringr::fixed("RangeTestOn")),
+           range_test_on := TRUE]
+    idf_dt[block_comment == TRUE &
+           stringr::str_detect(string, stringr::fixed("RangeTestOff")),
+           range_test_off := TRUE]
+    # }}}
+
+    # add row number for ordering rows
+    idf_dt[, row_id := .I]
+
+    # CLASS: 3 indicators,
+    # 1. In non-blank, non-block-comment lines
+    # 2. 'value' matches class names in idd_class
+    # 3. The line before should have 'field_last' equals TRUE
+    # {{{
+    idf_dt[, `:=`(object_order = NA_integer_, object_end = FALSE)]
+    idf_dt[ending_char == ";", object_end := TRUE, by = .(ignore, row_id)]
+    # if is the last field, then the line after last field line should be a class
+    # name except the last field is the last non-blank and non-comment line. Others
+    # are just normal fields.
+    # set an id for last field per object
+    # TODO: use new rolling feature tu fill na in `parse_idd`
+    idf_dt[ending_char == ";", object_order := .GRP, by = .(ignore, row_id)]
+    # fill object_order backward
+    idf_dt <- idf_dt[!is.na(object_order), .(ignore, row_id, object_order)][
+                idf_dt[, object_order := NULL], on = c("ignore", "row_id"), roll = -Inf]
+    # class name should be the same of 'value' column for first line grouped by
+    # object_order
+    idf_dt[, `:=`(object_start = FALSE)]
+    idf_dt[idf_dt[, .I[1], by = object_order]$V1[-1],
+           `:=`(object_start = TRUE,
+                class_upper_case = stringr::str_to_upper(value))]
+    idf_dt <- copy(idd$class)[, class_order := class_id][
+        , .(class_order, group, class, class_upper_case = stringr::str_to_upper(class))][
+        idf_dt, on = "class_upper_case"][, class_upper_case := NULL]
+
+    # checking un-recognized class names {{{
+    idf_errors_unknown_class <- idf_dt[object_start == TRUE & is.na(class), .(line, string)]
+    if (nrow(idf_errors_unknown_class) > 0L) {
+        parse_issue(type = "Object type not recognized", idf_errors_unknown_class, src = "IDF",
+                   info = "This error may be caused by a misspelled object name.")
+    }
+    # }}}
+    # fill object_order forward
+    idf_dt <- idf_dt[!is.na(class), .(ignore, row_id, group, class, class_order)][
+        idf_dt[, `:=`(group = NULL, class = NULL, class_order = NULL)],
+        on = c("ignore", "row_id"), roll = Inf]
+    # }}}
+    # link comments to object
+    # NOTE: remember to put unique grouped-on column (here "row_id") to the last
+    # {{{
+    idf_dt <- idf_dt[
+        !is.na(object_order), .(blank, block_special_comment, row_id, object_order)][
+           idf_dt[, object_order := NULL],
+           on = c("blank", "block_special_comment", "row_id"), roll = -Inf]
+    # }}}
+
+    # set class, object, and field id
+    # {{{
+    # class id
+    idf_dt[!is.na(class_order), class_id := .GRP, by = .(class_order)]
+    # object id
+    # NOTE: unable to find a more elegant way to avoid for loop.
+    for (id in idf_dt[, unique(class_id)]) {
+        idf_dt[class_id == id, object_id := .GRP, by = .(class_id, object_order)]
+    }
+    # field id
+    idf_dt[!is.na(object_id) & object_start == FALSE, field_id := rowid(object_id), by = .(class_id, rleid(object_id))]
+    ## for object start row, set field id to zero
+    idf_dt[object_start == TRUE, field_id := 0L]
+    # }}}
+
+    # checking for idf and idd version mismatch
+    idd_version <- idd$version
+    idf_version <- idf_dt[class == "Version" & field_id == 1, value]
+    if (!stringr::str_detect(idd_version, idf_version)) {
+        warning(glue::glue("Version Mismatch. The file parsing is a differnet \\
+            version than the EnergyPlus program and IDD file you are using. Editing \\
+            and saving the file may make it incompatible with an older version of EnergyPlus."),
+            call. = FALSE)
+    }
+
+    # subset columns
+    idf_parsed <- idf_dt[,
+        c("row_id", "line", "string", "group", "class", "value", "class_id", "field_id",
+          "class_order", "object_order", "block_comment", "block_special_comment",
+          "inline_comment", "inline_special_comment"), with = FALSE]
+
+    idf <- list(version = idf_version,
+                options = list(save_format = option_save,
+                               special_format = option_special_format,
+                               view_in_ip = option_view_in_ip_units),
+                idf = idf_parsed)
+
+    return(idf)
+}
+# }}}
+# read_idf {{{
+read_idf <- function (filepath) {
+    con = file(filepath)
+    idf_str <- readLines(con, encoding = "UTF-8")
+    close(con)
+
+    # Get rid of preceeding and trailing spaces
+    idf_str <- stringr::str_trim(idf_str)
+
+    return(idf_str)
+}
+# }}}
+
+##########
+#  test  #
+##########
+idd_filepath <- "C:/EnergyPlusV8-8-0/Energy+.idd"
+source("C:/Users/hongy/Dropbox/github_repo/eplusr/R/idd.R")
+idd <- parse_idd(idd_filepath)
+filepath <- "C:/EnergyPlusV8-8-0/ExampleFiles/5Zone_Transformer.idf"
+parse_idf(filepath, idd)
