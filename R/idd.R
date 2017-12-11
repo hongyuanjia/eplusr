@@ -952,7 +952,7 @@ read_idd <- function(filepath) {
     close(con)
 
     # Get rid of leading and trailing spaces
-    idd_str <- stringr::str_trim(idd_str, side = "both")
+    idd_str <- trimws(idd_str, which = "both")
 
     return(idd_str)
 }
