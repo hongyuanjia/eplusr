@@ -951,16 +951,9 @@ read_idd <- function(filepath) {
     idd_str <- readLines(con)
     close(con)
 
-    version <- get_idd_version(idd_str)
-    build <- get_idd_build(idd_str)
-
-    # Get rid of comment lines
-    idd_str[stringr::str_detect(idd_str, reg_comment_line)] <- "!"
     # Get rid of leading and trailing spaces
     idd_str <- stringr::str_trim(idd_str, side = "both")
 
-    attr(idd_str, "version") <- version
-    attr(idd_str, "build") <- build
     return(idd_str)
 }
 # }}}1
