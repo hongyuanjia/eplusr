@@ -2,13 +2,21 @@
 #                          Parse EnergyPlus IDD File                           #
 ################################################################################
 
+#' Parse Energy+.idd file
+#'
+#' @param filepath Path to 'Energy+.idd' file
+#'
+#' @details The parsing process was basically the same as that was implemented
+#' in IDFEditor distributed with EnergyPlus, but using the powerful 'data.table'
+#' package to speed up the whole process and store the results.  The souce codes
+#' of IDFEditor can be found as below:
+#' https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor
+#'
+#' @return A list contains the IDD version, build, parsed class data and parsed
+#' field data. Both class data and field data are stored in data.tables
 #' @export
+
 parse_idd <- function(filepath) {
-    # The parsing process was basically the same as that was implemented in
-    # IDFEditor distributed with EnergyPlus, but using the powerful 'data.table'
-    # package to speed up the whole process and store the results.
-    # The souce codes of IDFEditor can be found as below:
-    # https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor
 
     # set progress bar
     pb <- progress::progress_bar$new(
@@ -18,903 +26,311 @@ parse_idd <- function(filepath) {
     # show progress bar
     pb$tick(0)
 
-    pb$tick(tokens = list(what = "Initialize"))
+    pb$update(0.1, tokens = list(what = "Initialize"))
     # read idd string, get idd version and build
     idd_str <- read_idd(filepath)
-    idd_version <- attr(idd_str, "version")
-    idd_build <- attr(idd_str, "build")
-    idd_dt <- data.table(line = seq_along(idd_str), string = idd_str)
-    setkeyv(idd_dt, c("line", "string"))
+    idd_dt <- data.table(line = seq_along(idd_str), string = idd_str, key = "line")
+    idd_version <- idd_dt[grepl("!IDD_Version", string), substr(string, 14L, nchar(string))]
+    idd_build <- idd_dt[grepl("!IDD_BUILD", string), substr(string, 12L, nchar(string))]
 
-    pb$tick(tokens = list(what = "Parsing "))
-    # parse basic info {{{
-    pb$tick(tokens = list(what = "Parsing "))
-    # Mark blank and comment lines
-    # {{{
-    idd_dt[, ignore := FALSE]
-    idd_dt[stringr::str_detect(string, "^!|(^$)"), ignore := TRUE]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # FIELD: non-ignored, non-group, and non-slash lines with leading
-    # characters "[AN][0-9]+"
-    # handle condensed fields first {{{
-    idd_dt[, `:=`(field_condensed = NA_integer_,
-                  field_anid = NA_character_,
-                  field_slash= NA_character_,
-                  field_last = NA)]
-    # get number of AN in condensed lines
-    idd_dt[ignore == FALSE &
-           stringr::str_detect(string, "^[AaNn]\\d+\\s*,\\s*[AaNn]\\d+"),
-           field_condensed := get_condensed_field_num(string, sep = "\\")]
-    # get number of AN in condensed lines
-    idd_dt[ignore == FALSE &
-           stringr::str_detect(string, "^[AaNn].*\\s*?,\\s*?(?=\\\\)"),
-           c("field_anid", "field_slash", "field_last") :=
-                data.table(stringr::str_split_fixed(string, "\\s*,\\s*(?=\\\\)", n = 2L),
-                           field_last = FALSE)]
-    idd_dt[ignore == FALSE &
-           stringr::str_detect(string, "^[AnNn].*\\s*;\\s*(?=\\\\)"),
-           c("field_anid", "field_slash", "field_last") :=
-                data.table(stringr::str_split_fixed(string, "\\s*;\\s*(?=\\\\)", n = 2L),
-                           field_last = TRUE)]
-    # extract field AN and id
-    idd_field_condensed <- idd_dt[
-        !is.na(field_condensed),
-        stringr::str_split_fixed(field_anid, "\\s*,\\s*", n = field_condensed),
-        by = .(line)]
-    setnames(idd_field_condensed, c("line", "field_anid"))
-    # combine
-    idd_dt <- idd_field_condensed[idd_dt, on = "line"][
-        is.na(field_condensed), field_anid := i.field_anid][
-        , i.field_anid := NULL]
-    # }}}
-    pb$tick(tokens = list(what = "Parsing "))
-    # {{{
-    # for not the last fields
-    idd_dt[ignore == FALSE & is.na(field_condensed) &
-           stringr::str_detect(string, "^[AaNn][0-9]+\\s*,"),
-           c("field_anid", "field_slash", "field_last", "field_condensed") :=
-               data.table(stringr::str_split_fixed(string, "\\s*,\\s*", n = 2L),
-                          field_last = FALSE, field_condensed = 1L)]
-    # for the last fields
-    idd_dt[ignore == FALSE & is.na(field_condensed) &
-           stringr::str_detect(string, "^[AaNn][0-9]+\\s*;"),
-           c("field_anid", "field_slash", "field_last", "field_condensed") :=
-               data.table(stringr::str_split_fixed(string, "\\s*;\\s*", n = 2L),
-                          field_last = TRUE, field_condensed = 1L)]
-    idd_dt[field_slash == "", field_slash := NA_character_]
-    # FIELD ID: integers after "[AN]" before "[,;]" in field AN lines.
-    # FIELD AN: leading "[AN]" in field AN lines.
-    idd_dt[, `:=`(field_an = NA_character_, field_id = NA_integer_)]
-    idd_dt[!is.na(field_anid), field_an := stringr::str_sub(field_anid, start = 1L, end = 1L)]
-    idd_dt[!is.na(field_anid), field_id := as.integer(stringr::str_sub(field_anid, start = 2L))]
-    idd_dt[, field_anid := NULL]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # SLASH: non-ignored, non-group lines with leading characters "\" or
-    # string in field_slash column
-    # NOTE: have to combine splited results into a data.table in advance.
-    # {{{
-    idd_dt[, c("slash_key", "slash_value") := NA_character_]
-    ## for slash lines
-    ### have to handle some informal slash keys such as '\ group' which should
-    ### be '\group'
-    idd_dt[ignore == FALSE & is.na(field_an) & stringr::str_detect(string, "^\\\\\\s+"),
-           string := stringr::str_replace(string, "^\\\\\\s+", "\\\\")]
-    ### have to handle some informal slash keys such as '\minimum >0' which should
-    ### be '\minimum< 0'
-    idd_dt[ignore == FALSE & is.na(field_an) &
-           stringr::str_detect(string, stringr::regex("^\\\\minimum\\s+>", ignore_case = TRUE)),
-           string := stringr::str_replace(string, "\\s+>", "> ")]
-    idd_dt[ignore == FALSE & is.na(field_an) &
-           stringr::str_detect(string, stringr::regex("^\\\\maximum\\s+<", ignore_case = TRUE)),
-           string := stringr::str_replace(string, "\\s+<", "< ")]
-    ## change "\extensible:[1-9]" to "\extensible [1-9]"
-    idd_dt[ignore == FALSE & is.na(field_an) & stringr::str_detect(string, "^\\\\"),
-               string := replace_slash_colon(string)]
-
-    idd_dt[ignore == FALSE & is.na(field_an) & stringr::str_detect(string, "^\\\\"),
-           c("slash_key", "slash_value") :=
-               as.data.table(stringr::str_split_fixed(string, "\\s+", n = 2L))]
-    idd_dt[!is.na(field_slash),
-           c("slash_key", "slash_value") :=
-               as.data.table(stringr::str_split_fixed(field_slash, "\\s+", n = 2L))]
-    idd_dt[, slash_key := stringr::str_sub(slash_key, start = 2L)]
-    idd_dt[, field_slash := NULL]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # CLASS: non-ignored, non-group, non-slash lines with trailing character ","
-    # NOTE: there are some class lines that have comments
-    # {{{
-    idd_dt[, class := NA_character_]
-    idd_dt[ignore == FALSE &
-           is.na(field_an) &
-           is.na(slash_key) &
-           stringr::str_detect(string, ",(\\s*!.*)*$"),
-           class := stringr::str_split_fixed(string, "\\s*,\\s*", n = 2)[,1]]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # SEPERATOR: non-ignored, non-group, non-class, non-slash lines with
-    # trailing character ";". Currently there are treated just as comments
-    # {{{
-    idd_dt[ignore == FALSE &
-           is.na(class) &
-           is.na(field_an) &
-           is.na(slash_key) &
-           stringr::str_detect(string, ";$"),
-           ignore := TRUE]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # check parsing error {{{
-    idd_errors <- idd_dt[ignore == FALSE &
-                         is.na(class) &
-                         is.na(field_an) &
-                         is.na(slash_key), .(line, string)]
-    if (nrow(idd_errors) > 0) {
-        parse_issue("Invalid line found", idd_errors)
+    pb$update(0.2, tokens = list(what = "Parsing "))
+    # mark type{{{
+    # -2, unknown
+    type_unknown <- -2L
+    # -1, clash
+    type_slash <- -1L
+    # 0 , group
+    type_group <- 0L
+    # 1 , class
+    type_class <- 1L
+    # 2 , class slash
+    type_class_slash <- 2L
+    # 3 , field
+    type_field <- 3L
+    # 4 , last field in class
+    type_field_last <- 4L
+    # 5 , field slash
+    type_field_slash <- 5L
+    idd_dt[, type := type_unknown]
+    setkey(idd_dt, line, type)
+    # Delete all comment and blank lines
+    idd_dt <- idd_dt[grep("^!|(^$)", string, invert = TRUE)]
+    # trucate to characters left of ! in order to handle cases when there are
+    # inline comments starting with "!", e.g.
+    # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
+    idd_dt[, explpt_loc := regexpr("!", string, fixed = TRUE)]
+    idd_dt[explpt_loc > 1, string := trimws(substr(string, 1L, explpt_loc - 1L), which = "right")]
+    idd_dt[, explpt_loc := NULL]
+    # categorize all slash lines
+    idd_dt[startsWith(string, "\\"), type := type_slash]
+    # categorize all lines with trailing comma into class. Lines that
+    # have one slash can not be a class
+    idd_dt[type < -1L & endsWith(string, ","), type := type_class]
+    # categorize field lines
+    idd_dt[grepl("\\", string, fixed = TRUE) & grepl("^[AaNn]", string), type := type_field]
+    # ignore section if exists, e.g. "Simulation Data;"
+    line_section <- idd_dt[type == -2L & endsWith(string, ";"), which = TRUE]
+    if (length(line_section) > 0L) {
+        idd_dt <- idd_dt[-line_section]
+    }
+    # if there are still known lines, report an error
+    line_error_invalid <- idd_dt[type < -1L, which = TRUE]
+    if (length(line_error_invalid) > 0L) {
+        parse_issue(type = "Invalid line found", src = "IDD", stop = TRUE,
+                    data_errors = idd_dt[line_error_invalid, .(line, string)])
     }
     # }}}
-    # }}}
 
-    pb$tick(tokens = list(what = "Parsing "))
-    # Special filtering for handling certain schedule objects that provide
-    # multi-unit field support
+    pb$update(0.3, tokens = list(what = "Parsing "))
+    # basic {{{
+    # get class names
+    idd_dt[type == type_class, class := substr(string, 1L, nchar(string) - 1L)]
+
+    # get field AN and id
     # {{{
-    idd_dt[, class_special_multi_unit := NA]
-    idd_dt[!is.na(class), class_special_multi_unit := FALSE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULETYPELIMITS", class_special_multi_unit := TRUE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULE:DAY:HOURLY", class_special_multi_unit := TRUE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULE:DAY:INTERVAL", class_special_multi_unit := TRUE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULE:DAY:LIST", class_special_multi_unit := TRUE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULE:COMPACT", class_special_multi_unit := TRUE]
-    idd_dt[stringr::str_to_upper(class) == "SCHEDULE:CONSTANT", class_special_multi_unit := TRUE]
+    # get location of first slash
+    idd_dt[, slash_loc := regexpr("\\", string, fixed = TRUE)]
+    # get combined field AN and id
+    idd_dt[type == type_field,
+           `:=`(field_anid = trimws(substr(string, 1L, slash_loc - 1L), which = "right"),
+                slash_key_value = substr(string, slash_loc, nchar(string)))]
+    idd_dt[endsWith(field_anid, ";"), `:=`(type = type_field_last)]
+    # clean
+    idd_dt[, slash_loc := NULL]
+
+    # handle condensed fields
+    # {{{
+    idd_dt[, field_count := 0L]
+    # TODO: find a better way to count occurrences in string without using
+    # "stringr" package
+    idd_dt[between(type, type_field, type_field_last), field_count := stringr::str_count(field_anid, "[,;]")]
+
+    idd_dt <- idd_dt[
+        between(type, type_field, type_field_last), strsplit(field_anid, "\\s*[,;]\\s*"), by = .(line)][
+        idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
+    setnames(idd_dt, "V1", "field_anid")
+    # get row numeber of last field per condensed field line in each class
+    line_field_last <- idd_dt[
+        field_count > 1L & type == type_field_last, .(line_field_last = last(.I)), by = .(line, type)][
+        , line_field_last]
+    # set all type of condensed field lines to "field"
+    idd_dt[field_count > 1L, type := type_field]
+    idd_dt[line_field_last, type := type_field_last]
     # }}}
 
-    pb$tick(30L, tokens = list(what = "Parsing "))
+    # fix duplicated fields in "ZoneHVAC:HighTemperatureRadiant" and
+    # "Foundation:Kiva"
+    # NOTE: there are errors in "ZoneHVAC:HighTemperatureRadiant" that
+    # duplicated fields ANid are used for 'N76', 'N77', 'N87' and
+    # "Foundation:Kiva" for "N16", have to fix it in advanced.
+    # {{{
+    # fill class downwards to make search easiser
+    idd_dt_dup <- idd_dt[between(type, type_class, type_field)][
+        , class := class[1], by = .(cumsum(!is.na(class)))][
+        type == type_field, .(line, class, field_anid)]
+    # found duplicated field in the whole data.table
+    line_dup <- idd_dt_dup[,
+        .SD[duplicated(field_anid)], .SDcol = "line",  by = .(class)][, line]
+    # add a suffix of 'd' to the duplicated field
+    if (length(line_dup) > 0L) {
+        idd_dt[line %in% line_dup, `:=`(field_anid = gsub("([,;])$", "_dup\\1", field_anid))]
+    }
+    # }}}
+
+    # seperate file AN and id
+    # {{{
+    idd_dt[field_count == 1L, field_anid := trimws(substr(field_anid, 1L, nchar(field_anid) - 1L), "right")]
+    idd_dt[field_count >= 1L,
+           `:=`(field_an = substr(field_anid, 1L, 1L),
+                field_id = substr(field_anid, 2L, nchar(field_anid)))]
+    # }}}
+
+    # get slash keys and values
+    # {{{
+    idd_dt[type == type_slash, slash_key_value := string]
+    # Remove slash
+    idd_dt[!is.na(slash_key_value), slash_key_value := trimws(substr(slash_key_value, 2L, nchar(slash_key_value)), which = "left")]
+
+    # handle informal slash keys
+    # {{{
+    # have to handle some informal slash keys such as '\minimum >0' which should
+    # be '\minimum> 0', and '\maximum <100' which should be `\maximum< 100`.
+    idd_dt[!is.na(slash_key_value) & grepl("^minimum\\s+>", slash_key_value, ignore.case = TRUE),
+           slash_key_value := gsub("\\s+>", "> ", slash_key_value)]
+    idd_dt[!is.na(slash_key_value) & grepl("^maximum\\s+<", slash_key_value, ignore.case = TRUE),
+           slash_key_value := gsub("\\s+<", "< ", slash_key_value)]
+    # }}}
+
+    # seperate slash key and value
+    idd_dt[, space_loc := regexpr(" ", slash_key_value, fixed = TRUE)]
+    # handle cases like "\extensible:2"
+    idd_dt[, colon_loc := regexpr(":", slash_key_value, fixed = TRUE)]
+    idd_dt[(colon_loc > 0L & space_loc > 0L & colon_loc < space_loc) |
+           (space_loc == -1L & colon_loc > 0L), space_loc := colon_loc]
+    idd_dt[, colon_loc := NULL]
+
+    idd_dt[space_loc > 0L,
+           `:=`(slash_key = toupper(substr(slash_key_value, 1L, space_loc - 1L)),
+                slash_value = trimws(substr(slash_key_value, space_loc + 1L, nchar(slash_key_value)), "left"))]
+    idd_dt[space_loc < 0L, `:=`(slash_key = toupper(slash_key_value))]
+    # remove trailing tabs in slash keys
+    idd_dt[grepl("\t", slash_key), slash_key := gsub(slash_key, "\t", "")]
+
+    # clean up
+    idd_dt[, `:=`(space_loc = NULL, slash_key_value = NULL, field_anid = NULL)]
+    # }}}
+    # }}}
+
+    pb$tick(10L, tokens = list(what = "Parsing "))
     # parse slash lines {{{
-    idd_dt[, slash_supported := NA]
     idd_dt[!is.na(slash_key), slash_supported := FALSE]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Field {{{
-    idd_dt[, `:=`(field_name = NA_character_,
-                  field_autosizable = NA,
-                  field_autocalculatable = NA,
-                  field_deprecated = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "FIELD",
-           `:=`(slash_supported = TRUE,
-                field_name = slash_value,
-                field_autosizable = FALSE,
-                field_autocalculatable = FALSE,
-                field_deprecated = FALSE)]
-    # }}}
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Units {{{
-    idd_dt[, `:=`(field_units = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "UNITS",
-           `:=`(slash_supported = TRUE,
-                field_units = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Key {{{
-    idd_dt[, `:=`(field_choice = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "KEY",
-           `:=`(slash_supported = TRUE,
-                field_choice = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Minimum & \Minimum> {{{
-    idd_dt[, `:=`(field_minimum = NA_real_,
-                  field_exclusive_min = NA,
-                  field_min_specified = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MINIMUM",
-           `:=`(slash_supported = TRUE,
-                field_minimum = as.double(slash_value),
-                field_exclusive_min = FALSE,
-                field_min_specified = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MINIMUM>",
-           `:=`(slash_supported = TRUE,
-                field_minimum = as.double(slash_value),
-                field_exclusive_min = TRUE,
-                field_min_specified = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Maximum & \Maximum< {{{
-    idd_dt[, `:=`(field_maximum = NA_real_,
-                  field_exclusive_max = NA,
-                  field_max_specified = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MAXIMUM",
-           `:=`(slash_supported = TRUE,
-                field_maximum = as.double(slash_value),
-                field_exclusive_max = FALSE,
-                field_max_specified = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MAXIMUM<",
-           `:=`(slash_supported = TRUE,
-                field_maximum = as.double(slash_value),
-                field_exclusive_max = TRUE,
-                field_max_specified = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Default {{{
-    idd_dt[, `:=`(field_default_value = NA_real_,
-                  field_default_autosize = NA,
-                  field_default_autocalculate = NA,
-                  field_default_specified = NA,
-                  field_default_choice = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "DEFAULT" &
-           !is.na(suppressWarnings(as.double(slash_value))),
-           `:=`(slash_supported = TRUE,
-                field_default_value = as.double(slash_value),
-                field_default_specified = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "DEFAULT" &
-           stringr::str_to_upper(slash_value) == "AUTOSIZE",
-           `:=`(slash_supported = TRUE,
-                field_default_autosize = TRUE,
-                field_default_specified = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "DEFAULT" &
-           stringr::str_to_upper(slash_value) == "AUTOCALCULATE",
-           `:=`(slash_supported = TRUE,
-                field_default_autocalculate = TRUE,
-                field_default_specified = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "DEFAULT" &
-           is.na(field_default_value) &
-           is.na(field_default_autosize) &
-           is.na(field_default_autocalculate),
-           `:=`(slash_supported = TRUE,
-                field_default_choice = slash_value,
-                field_default_specified = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Note {{{
-    idd_dt[, `:=`(field_note = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "NOTE",
-           `:=`(slash_supported = TRUE,
-                field_note = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Type {{{
-    idd_dt[, `:=`(field_type = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "TYPE",
-           `:=`(slash_supported = TRUE,
-                field_type = slash_value)]
-    idd_errors_type <- idd_dt[stringr::str_to_upper(slash_key) == "TYPE" &
-                              stringr::str_to_upper(slash_value) != "REAL" &
-                              stringr::str_to_upper(slash_value) != "INTEGER" &
-                              stringr::str_to_upper(slash_value) != "ALPHA" &
-                              stringr::str_to_upper(slash_value) != "CHOICE" &
-                              stringr::str_to_upper(slash_value) != "OBJECT-LIST" &
-                              stringr::str_to_upper(slash_value) != "EXTERNAL-LIST" &
-                              stringr::str_to_upper(slash_value) != "NODE",
-                              .(line, string)]
-    if (nrow(idd_errors_type) > 0) {
-        parse_issue("Invalid \\type found", idd_errors_type)
+    group_slash_key <- c("GROUP")
+    class_slash_key <- c("MEMO", "UNIQUE-OBJECT", "REQUIRED-OBJECT",
+                         "MIN-FIELDS", "FORMAT", "REFERENCE-CLASS-NAME")
+    field_slash_key <- c("FIELD", "NOTE", "REQUIRED-FIELD", "UNITS", "IP-UNITS",
+                         "UNITSBASEDONFIELD", "MINIMUM", "MINIMUM>", "MAXIMUM",
+                         "MAXIMUM<", "DEFAULT", "DEPRECATED", "AUTOSIZABLE",
+                         "AUTOCALCULATABLE", "TYPE", "KEY", "OBJECT-LIST",
+                         "EXTERNAL-LIST", "REFERENCE")
+    ignored_slash_key <- c("BEGIN-EXTENSIBLE", "RETAINCASE", "EXTENSIBLE")
+    # mark group slash key and values
+    idd_dt[slash_key %chin% group_slash_key,
+           `:=`(slash_supported = TRUE, type = type_group, group = slash_value)]
+    # mark class slash key and values
+    idd_dt[slash_key %chin% class_slash_key,
+           `:=`(slash_supported = TRUE, type = type_class_slash)]
+    # mark field slash key and values
+    idd_dt[slash_key %chin% field_slash_key,
+           `:=`(slash_supported = TRUE, type = type_field_slash)]
+    # mark other ignored slash keys
+    idd_dt[slash_key %chin% ignored_slash_key, slash_supported := TRUE]
+    # check for unsupported slash keys
+    line_error_slash_key <- idd_dt[slash_supported == FALSE, .I]
+    if (length(line_error_slash_key) > 0L) {
+        parse_issue(type = "Invalid slash key found.", src = "IDD", stop = TRUE,
+                    data_errors = idd_dt[line_error_slash_key, .(line, string)])
+    }
+    # check for unsupported slash values
+    idd_dt[, slash_value_upper := toupper(slash_value)]
+    # \type {{{
+    line_error_type <- idd_dt[slash_key == "TYPE"][
+       !(slash_value_upper %chin% c("REAL", "INTEGER", "ALPHA", "CHOICE",
+            "OBJECT-LIST", "EXTERNAL-LIST", "NODE")), which = TRUE]
+    if (length(line_error_type) > 0) {
+        parse_issue("Invalid \\type found", idd_dt[line_error_type, .(line, string)])
     }
     # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Group {{{
-    idd_dt[, `:=`(group = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "GROUP",
-           `:=`(slash_supported = TRUE,
-                group = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Memo {{{
-    idd_dt[, `:=`(class_memo = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MEMO",
-           `:=`(slash_supported = TRUE,
-                class_memo = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Object-List {{{
-    idd_dt[, `:=`(field_object_list = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "OBJECT-LIST",
-           `:=`(slash_supported = TRUE,
-                field_object_list = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \External-List {{{
-    idd_dt[, `:=`(field_external_list = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "EXTERNAL-LIST",
-           `:=`(slash_supported = TRUE)]
-    idd_dt[stringr::str_to_upper(slash_key) == "EXTERNAL-LIST" &
-           stringr::str_to_upper(slash_value) == "AUTORDDVARIABLE",
-           `:=`(field_external_list = "Variable")]
-    idd_dt[stringr::str_to_upper(slash_key) == "EXTERNAL-LIST" &
-           stringr::str_to_upper(slash_value) == "AUTORDDMETER",
-           `:=`(field_external_list = "Meter")]
-    idd_dt[stringr::str_to_upper(slash_key) == "EXTERNAL-LIST" &
-           stringr::str_to_upper(slash_value) == "AUTORDDVARIABLEMETER",
-           `:=`(field_external_list = "VariableMeter")]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Reference {{{
-    idd_dt[, `:=`(field_reference = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "REFERENCE",
-           `:=`(slash_supported = TRUE,
-                field_reference = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Reference-Class-Name {{{
-    idd_dt[, `:=`(class_reference_name = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "REFERENCE-CLASS-NAME",
-           `:=`(slash_supported = TRUE,
-                class_reference_name = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Min-Fields {{{
-    idd_dt[, `:=`(class_min_fields = NA_integer_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "MIN-FIELDS",
-           `:=`(slash_supported = TRUE,
-                class_min_fields = as.integer((slash_value)))]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \IP-Units {{{
-    idd_dt[, `:=`(field_ip_units = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "IP-UNITS",
-           `:=`(slash_supported = TRUE,
-                field_ip_units = slash_value)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Format {{{
-    idd_dt[, `:=`(field_format = NA_character_)]
-    idd_dt[stringr::str_to_upper(slash_key) == "FORMAT",
-           `:=`(slash_supported = TRUE,
-                class_format = slash_value)]
-    idd_errors_format <- idd_dt[stringr::str_to_upper(slash_key) == "FORMAT" &
-                                stringr::str_to_upper(slash_value) != "SINGLELINE" &
-                                stringr::str_to_upper(slash_value) != "VERTICES" &
-                                stringr::str_to_upper(slash_value) != "COMPACTSCHEDULE" &
-                                stringr::str_to_upper(slash_value) != "FLUIDPROPERTY" &
-                                stringr::str_to_upper(slash_value) != "VIEWFACTOR" &
-                                stringr::str_to_upper(slash_value) != "SPECTRAL",
-                              .(line, string)]
-    if (nrow(idd_errors_format) > 0) {
-        parse_issue("Invalid \\format found", idd_errors_format)
+    # \external-List {{{
+    line_error_external_list <- idd_dt[slash_key %chin% "EXTERNAL-LIST"][
+           !(slash_value_upper %chin% c("AUTORDDVARIABLE", "AUTORDDMETER",
+               "AUTORDDVARIABLEMETER")), which = TRUE]
+    if (length(line_error_type) > 0) {
+        parse_issue("Invalid \\type found", idd_dt[line_error_type, .(line, string)])
     }
     # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Deprecated {{{
-    idd_dt[, `:=`(field_deprecated = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "DEPRECATED",
-           `:=`(slash_supported = TRUE,
-                field_deprecated = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Required-Field {{{
-    idd_dt[, `:=`(field_required = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "REQUIRED-FIELD",
-           `:=`(slash_supported = TRUE,
-                field_required = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \Unique-Object {{{
-    idd_dt[, `:=`(class_unique_object = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "UNIQUE-OBJECT",
-           `:=`(slash_supported = TRUE,
-                class_unique_object = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \AutoSizable {{{
-    idd_dt[, `:=`(field_autosizable = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "AUTOSIZABLE",
-           `:=`(slash_supported = TRUE,
-                field_autosizable = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \AutoCalculatable {{{
-    idd_dt[, `:=`(field_autocalculatable = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "AUTOCALCULATABLE",
-           `:=`(slash_supported = TRUE,
-                field_autocalculatable = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \PreserveIndent {{{
-    idd_dt[, `:=`(field_preserve_indent = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "PRESERVEINDENT",
-           `:=`(slash_supported = TRUE,
-                field_preserve_indent = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # \UnitsBasedOnField {{{
-    idd_dt[, `:=`(field_units = NA)]
-    idd_dt[stringr::str_to_upper(slash_key) == "UNITSBASEDONFIELD",
-           `:=`(slash_supported = TRUE,
-                field_units_based_on_field = TRUE)]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # Just list supported slash keys in IDFEditor. These keys are treated just
-    # as normal texts in IDFEditor.
-    idd_dt[stringr::str_to_upper(slash_key) %in% c("REQUIRED-OBJECT", "EXTENSIBLE",
-               "OBSOLETE", "RETAINCASE", "BEGIN-EXTENSIBLE", "FIELD-INDEX",
-               "SEQUENCE-ID", "GROUP-INDEX", "HIDEINLIBRARYUI",
-               "EMSUNIQUECOMPONENT", "HIDEINALLUI", "SIMERGYONLY", "NO-SEQUENCE",
-               "SURROGATE-NAME-FOR-SEQUENCE"),
-           `:=`(slash_supported = TRUE)]
-
-    idd_errors_slash_key <- idd_dt[!is.na(slash_key) &
-                                   slash_supported == FALSE,
-                                   .(line, string)]
-    if (nrow(idd_errors_slash_key) > 0L) {
-        parse_issue("Invalid slash line found", idd_errors_slash_key)
+    # \format {{{
+    line_error_format <- idd_dt[slash_key %chin% "FORMAT"][
+        !(slash_value_upper %chin% c("SINGLELINE", "VERTICES", "COMPACTSCHEDULE",
+            "FLUIDPROPERTY", "VIEWFACTOR", "SPECTRAL")), which = TRUE]
+    if (length(line_error_format) > 0) {
+        parse_issue("Invalid \\format found", idd_dt[line_error_format, .(line, string)])
     }
     # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # clean {{{
-    idd_dt[, slash_supported := NULL]
-
-    setcolorder(idd_dt,
-                c("line", "string", "ignore", "slash_key", "slash_value",
-
-                  "group",
-
-                  "class", "class_format", "class_memo", "class_min_fields",
-                  "class_reference_name", "class_special_multi_unit",
-                  "class_unique_object",
-
-                  "field_an", "field_id", "field_name", "field_last", "field_units",
-                  "field_note", "field_ip_units", "field_units_based_on_field",
-                  "field_required", "field_type", "field_format", "field_maximum",
-                  "field_max_specified", "field_exclusive_max", "field_minimum",
-                  "field_min_specified", "field_exclusive_min",
-                  "field_autocalculatable", "field_autosizable", "field_choice",
-                  "field_default_autocalculate", "field_default_autosize",
-                  "field_default_choice", "field_default_specified",
-                  "field_default_value", "field_external_list", "field_object_list",
-                  "field_reference", "field_preserve_indent", "field_condensed",
-                  "field_deprecated"
-                  ))
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # fill na for group {{{
-    idd_dt[ignore == FALSE, group := group[1], by = .(cumsum(!is.na(group)))]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # fill na for class {{{
-    idd_dt[!is.na(group), class := class[1], by = .(cumsum(!is.na(class)))]
-    setorder(idd_dt, line)
-    idd_dt[!is.na(class), class_format:= class_format[1], by = .(cumsum(!is.na(class_format)), class)]
-    # NOTE: leave NA as it is for class_memo
-    # idd_dt[!is.na(class), class_memo:= class_memo[1], by = .(cumsum(!is.na(class_memo)), class)]
-    idd_dt[!is.na(class), class_min_fields:= class_min_fields[1], by = .(cumsum(!is.na(class_min_fields)), class)]
-    idd_dt[!is.na(class), class_reference_name:= class_reference_name[1], by = .(cumsum(!is.na(class_reference_name)), class)]
-    idd_dt[!is.na(class), class_special_multi_unit:= class_special_multi_unit[1], by = .(cumsum(!is.na(class_special_multi_unit)), class)]
-    idd_dt[!is.na(class), class_unique_object:= class_unique_object[1], by = .(cumsum(!is.na(class_unique_object)), class)]
-
-    setorder(idd_dt, -line)
-    idd_dt[!is.na(class), class_format:= class_format[1], by = .(cumsum(!is.na(class_format)), class)]
-    # idd_dt[!is.na(class), class_memo:= class_memo[1], by = .(cumsum(!is.na(class_memo)), class)]
-    idd_dt[!is.na(class), class_min_fields:= class_min_fields[1], by = .(cumsum(!is.na(class_min_fields)), class)]
-    idd_dt[!is.na(class), class_reference_name:= class_reference_name[1], by = .(cumsum(!is.na(class_reference_name)), class)]
-    idd_dt[!is.na(class), class_special_multi_unit:= class_special_multi_unit[1], by = .(cumsum(!is.na(class_special_multi_unit)), class)]
-    idd_dt[!is.na(class), class_unique_object:= class_unique_object[1], by = .(cumsum(!is.na(class_unique_object)), class)]
-
-    setorder(idd_dt, line)
-    # NOTE: leave NA as it is for class_format
-    # idd_dt[!is.na(class) & is.na(class_format), class_format := NA_character_]
-    # NOTE: leave NA as it is for class_memo
-    # idd_dt[!is.na(class) & is.na(class_memo), class_memo := NA_character_]
-    idd_dt[!is.na(class) & is.na(class_min_fields), class_min_fields := -1L]
-    # NOTE: leave NA as it is for class_reference_name
-    # idd_dt[!is.na(class) & is.na(class_reference_name), class_reference_name := NA_character_]
-    idd_dt[!is.na(class) & is.na(class_special_multi_unit), class_special_multi_unit := FALSE]
-    idd_dt[!is.na(class) & is.na(class_unique_object), class_unique_object := FALSE]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # fill na for field {{{
-    idd_dt[!is.na(class), field_an := field_an[1], by = .(cumsum(!is.na(field_an)), class)]
-    idd_dt[!is.na(class), field_id := field_id[1], by = .(cumsum(!is.na(field_id)), class)]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    setorder(idd_dt, line)
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_name := field_name[1],
-           by = .(cumsum(!is.na(field_name)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_last := field_last[1],
-           by = .(cumsum(!is.na(field_last)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_units := field_units[1],
-           by = .(cumsum(!is.na(field_units)), class, field_an, field_id)]
-    # NOTE: leave NA as it is for field_note
-    # idd_dt[!is.na(field_an) & !is.na(field_id),
-    #        field_note := field_note[1],
-    #        by = .(cumsum(!is.na(field_note)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_ip_units := field_ip_units[1],
-           by = .(cumsum(!is.na(field_ip_units)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_units_based_on_field := field_units_based_on_field[1],
-           by = .(cumsum(!is.na(field_units_based_on_field)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_required := field_required[1],
-           by = .(cumsum(!is.na(field_required)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_type := field_type[1],
-           by = .(cumsum(!is.na(field_type)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_maximum := field_maximum[1],
-           by = .(cumsum(!is.na(field_maximum)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_max_specified := field_max_specified[1],
-           by = .(cumsum(!is.na(field_max_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_exclusive_max := field_exclusive_max[1],
-           by = .(cumsum(!is.na(field_exclusive_max)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_minimum := field_minimum[1],
-           by = .(cumsum(!is.na(field_minimum)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_min_specified := field_min_specified[1],
-           by = .(cumsum(!is.na(field_min_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_exclusive_min := field_exclusive_min[1],
-           by = .(cumsum(!is.na(field_exclusive_min)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_autocalculatable := field_autocalculatable[1],
-           by = .(cumsum(!is.na(field_autocalculatable)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_autosizable := field_autosizable[1],
-           by = .(cumsum(!is.na(field_autosizable)), class, field_an, field_id)]
-    # NOTE: leave NA as it is for field_choice
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_choice := field_choice[1],
-           by = .(cumsum(!is.na(field_choice)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_autocalculate := field_default_autocalculate[1],
-           by = .(cumsum(!is.na(field_default_autocalculate)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_autosize := field_default_autosize[1],
-           by = .(cumsum(!is.na(field_default_autosize)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_choice := field_default_choice[1],
-           by = .(cumsum(!is.na(field_default_choice)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_specified := field_default_specified[1],
-           by = .(cumsum(!is.na(field_default_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_value := field_default_value[1],
-           by = .(cumsum(!is.na(field_default_value)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_external_list := field_external_list[1],
-           by = .(cumsum(!is.na(field_external_list)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_object_list := field_object_list[1],
-           by = .(cumsum(!is.na(field_object_list)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_reference := field_reference[1],
-           by = .(cumsum(!is.na(field_reference)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_preserve_indent := field_preserve_indent[1],
-           by = .(cumsum(!is.na(field_preserve_indent)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_condensed := field_condensed[1],
-           by = .(cumsum(!is.na(field_condensed)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_deprecated := field_deprecated[1],
-           by = .(cumsum(!is.na(field_deprecated)), class, field_an, field_id)]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    setorder(idd_dt, -line)
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_name := field_name[1],
-           by = .(cumsum(!is.na(field_name)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_last := field_last[1],
-           by = .(cumsum(!is.na(field_last)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_units := field_units[1],
-           by = .(cumsum(!is.na(field_units)), class, field_an, field_id)]
-    # NOTE: leave NA as it is for field_note
-    # idd_dt[!is.na(field_an) & !is.na(field_id),
-    #        field_note := field_note[1],
-    #        by = .(cumsum(!is.na(field_note)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_ip_units := field_ip_units[1],
-           by = .(cumsum(!is.na(field_ip_units)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_units_based_on_field := field_units_based_on_field[1],
-           by = .(cumsum(!is.na(field_units_based_on_field)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_required := field_required[1],
-           by = .(cumsum(!is.na(field_required)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_type := field_type[1],
-           by = .(cumsum(!is.na(field_type)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_maximum := field_maximum[1],
-           by = .(cumsum(!is.na(field_maximum)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_max_specified := field_max_specified[1],
-           by = .(cumsum(!is.na(field_max_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_exclusive_max := field_exclusive_max[1],
-           by = .(cumsum(!is.na(field_exclusive_max)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_minimum := field_minimum[1],
-           by = .(cumsum(!is.na(field_minimum)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_min_specified := field_min_specified[1],
-           by = .(cumsum(!is.na(field_min_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_exclusive_min := field_exclusive_min[1],
-           by = .(cumsum(!is.na(field_exclusive_min)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_autocalculatable := field_autocalculatable[1],
-           by = .(cumsum(!is.na(field_autocalculatable)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_autosizable := field_autosizable[1],
-           by = .(cumsum(!is.na(field_autosizable)), class, field_an, field_id)]
-    # NOTE: leave NA as it is for field_choice
-    # idd_dt[!is.na(field_an) & !is.na(field_id),
-    #        field_choice := field_choice[1],
-    #        by = .(cumsum(!is.na(field_choice)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_autocalculate := field_default_autocalculate[1],
-           by = .(cumsum(!is.na(field_default_autocalculate)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_autosize := field_default_autosize[1],
-           by = .(cumsum(!is.na(field_default_autosize)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_choice := field_default_choice[1],
-           by = .(cumsum(!is.na(field_default_choice)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_specified := field_default_specified[1],
-           by = .(cumsum(!is.na(field_default_specified)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_default_value := field_default_value[1],
-           by = .(cumsum(!is.na(field_default_value)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_external_list := field_external_list[1],
-           by = .(cumsum(!is.na(field_external_list)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_object_list := field_object_list[1],
-           by = .(cumsum(!is.na(field_object_list)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_reference := field_reference[1],
-           by = .(cumsum(!is.na(field_reference)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_preserve_indent := field_preserve_indent[1],
-           by = .(cumsum(!is.na(field_preserve_indent)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_condensed := field_condensed[1],
-           by = .(cumsum(!is.na(field_condensed)), class, field_an, field_id)]
-    idd_dt[!is.na(field_an) & !is.na(field_id),
-           field_deprecated := field_deprecated[1],
-           by = .(cumsum(!is.na(field_deprecated)), class, field_an, field_id)]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    setorder(idd_dt, line)
-    # NOTE: leave NA as it is for field_name
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_name),
-    #        field_name := NA_character_]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_last),
-           field_last := FALSE]
-    # NOTE: leave NA as it is for field_units
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_units),
-    #        field_units := NA_character_]
-    # NOTE: leave NA as it is for field_note
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_note),
-    #        field_note := NA_character_]
-    # NOTE: leave NA as it is for field_ip_units
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_ip_units),
-    #        field_ip_units := NA_character_]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_units_based_on_field),
-           field_units_based_on_field := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_required),
-           field_required := FALSE]
-    # NOTE: leave NA as it is for field_type
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_type),
-    #        field_type := NA_character_]
-    # NOTE: leave NA as it is for field_maximum
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_maximum),
-    #        field_maximum := NA]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_max_specified),
-           field_max_specified := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_exclusive_max),
-           field_exclusive_max := FALSE]
-    # NOTE: leave NA as it is for field_minimum
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_minimum),
-    #        field_minimum := NA]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_min_specified),
-           field_min_specified := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_exclusive_min),
-           field_exclusive_min := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_autocalculatable),
-           field_autocalculatable := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_autosizable),
-           field_autosizable := FALSE]
-    # NOTE: leave NA as it is for field_choice
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_choice),
-    #        field_choice := NA_character_]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_default_autocalculate),
-           field_default_autocalculate := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_default_autosize),
-           field_default_autosize := FALSE]
-    # NOTE: leave NA as it is for field_default_choice
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_default_choice),
-    #        field_default_choice := NA_character_]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_default_specified),
-           field_default_specified := FALSE]
-    # NOTE: leave NA as it is for field_default_value
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_default_value),
-    #        field_default_value := NA_real_]
-    # NOTE: leave NA as it is for field_external_list
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_external_list),
-    #        field_external_list := NA_character_]
-    # NOTE: leave NA as it is for field_object_list
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_object_list),
-    #        field_object_list := NA_character_]
-    # NOTE: leave NA as it is for field_reference
-    # idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_reference),
-    #        field_reference := NA_character_]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_preserve_indent),
-           field_preserve_indent := FALSE]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_condensed),
-           field_condensed := 1L]
-    idd_dt[!is.na(field_an) & !is.na(field_id) & is.na(field_deprecated),
-           field_deprecated := FALSE]
-    # }}}
-
-    pb$tick(tokens = list(what = "Parsing "))
-    idd_parsed <- idd_dt[
-        stringr::str_to_upper(slash_key) != "GROUP"][
-        !is.na(slash_key)]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # FIELD data.table {{{
-    # get all field related data
-    idd_field_full <- unique(
-        idd_parsed[!is.na(field_an) & !is.na(field_id)][
-                   , .SD, .SDcol = c("group", "class",
-                                     stringr::str_subset(names(idd_dt), "^field"))])
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # handle multiple values of \note, \reference, \object-list, \key {{{
-    ## handle class with multiple \memo
-    # extract only columns with single value
-    idd_field <- unique(
-        idd_field_full[
-        , .SD, .SDcol = setdiff(names(idd_field_full),
-                                c("field_note", "field_choice", "field_reference",
-                                  "field_object_list"))
-        ]
-    )
-
-    # combine note into one per field
-    idd_field_note <-
-        idd_field_full[!is.na(field_note), field_note, by = .(group, class, field_an, field_id)][
-        , .(field_note = stringr::str_c(field_note, collapse = " ")), by = .(group, class, field_an, field_id)
-    ]
-
-    # merge memo into the main field data.table
-    idd_field <- idd_field_note[idd_field, on = c("group", "class", "field_an", "field_id")]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    ## handle class with multiple \field-choice
-    # combine field choices into one vector per field
-    idd_field_choice <- idd_field_full[
-        !is.na(field_choice),
-        .(field_choice = c(.SD)), .SDcol = "field_choice",
-        by = c("group", "class", "field_an", "field_id")]
-
-    # merge class reference names into the main field data.table
-    idd_field <- idd_field_choice[idd_field, on = c("group", "class", "field_an", "field_id")]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    ## handle class with multiple \field-reference
-    # combine field references into one vector per field
-    idd_field_reference <- idd_field_full[
-        !is.na(field_reference),
-        .(field_reference = c(.SD)), .SDcol = "field_reference",
-        by = c("group", "class", "field_an", "field_id")]
-
-    # merge field reference names into the main field data.table
-    idd_field <- idd_field_reference[idd_field, on = c("group", "class", "field_an", "field_id")]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    ## handle class with multiple \field-object-list
-    # combine field object lists into one vector per field
-    idd_field_object_list <- idd_field_full[
-        !is.na(field_object_list),
-        .(field_object_list = c(.SD)), .SDcol = "field_object_list",
-        by = c("group", "class", "field_an", "field_id")]
-
-    # merge field objectlist names into the main field data.table
-    idd_field <- idd_field_object_list[idd_field, on = c("group", "class", "field_an", "field_id")]
     # }}}
     # }}}
 
-    pb$tick(tokens = list(what = "Parsing "))
-    # CLASS data.table {{{
-    # 1. if slash key is group, it has already been duplicated during NA-filling
-    #    process.
-    # 2. if an non-ignored non-group line with slash key being NA, it must be a
-    #    class which has been duplicated during the NA-filling process
+    pb$update(0.8, tokens = list(what = "Parsing "))
+    # FIELD data
+    # {{{
+    # extract class data
+    idd_field <- idd_dt[type == type_class | between(type, type_field, type_field_slash),
+        .SD, .SDcol = c("line","class", "field_an", "field_id", "slash_key", "slash_value")]
+    # rolling fill downwards for class and field AN and id
+    idd_field[, class := class[1], by = .(cumsum(!is.na(class)))]
+    idd_field[, field_an := field_an[1], by = .(cumsum(!is.na(field_an)), class)]
+    idd_field[, field_id := field_id[1], by = .(cumsum(!is.na(field_id)), class)]
+    # combine field AN and id again for easing distinguishing fields
+    idd_field[, field_anid := paste0(field_an, field_id)]
+    # As the first line of each class is a class name which has been filled,
+    # delete it
+    idd_field <- idd_field[!is.na(slash_key)]
+    # if slash key exists and slash value not, it must be a logical attribute,
+    # such as "\\unique-object". Set it to TRUE
+    idd_field <- idd_field[is.na(slash_value), slash_value := "TRUE"]
+    # order class as the sequence the appears in IDD
+    idd_field[, class_order := .GRP, by = .(class)]
+    # using dcast to cast all field attributes into seperated columns
+    idd_field <- dcast.data.table(idd_field,
+        class_order + class + field_anid + field_an + field_id ~ slash_key,
+        value.var = "slash_value",
+        fun.aggregate = list(function(x) paste0(x, collapse = " ")), fill = NA)
+    # set names
+    new_nms <- gsub("-", "_", tolower(names(idd_field)), fixed = TRUE)
+    setnames(idd_field, new_nms)
+    # set column type
+    idd_field[, `:=`(autocalculatable = as.logical(autocalculatable),
+                     autosizable= as.logical(autosizable),
+                     maximum = as.double(maximum),
+                     minimum = as.double(minimum),
+                     `maximum<` = as.double(`maximum<`),
+                     `minimum>` = as.double(`minimum>`),
+                     unitsbasedonfield = as.logical(unitsbasedonfield))]
+    # fill na
+    idd_field[is.na(autocalculatable), autocalculatable := FALSE]
+    idd_field[is.na(autosizable), autosizable := FALSE]
+    idd_field[is.na(unitsbasedonfield), unitsbasedonfield := FALSE]
 
-    # get all class related data
-    idd_class_full <- unique(idd_parsed[, .SD,
-        .SDcol = c("group", stringr::str_subset(names(idd_dt), "^class"))])
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # handle multiple values of \memo, \class-reference-name {{{
-    ## handle class with multiple \memo
-    # extract only columns with single value
-    idd_class <- unique(
-        idd_class_full[
-        , .SD, .SDcol = setdiff(names(idd_class_full),
-                                c("class_memo", "class_reference_name"))
-        ]
-    )
-
-    # combine memo into one per class
-    idd_class_memo <-
-        idd_class_full[!is.na(class_memo), class_memo, by = class][
-        , .(class_memo = stringr::str_c(class_memo, collapse = " ")), by = class
-    ]
-
-    # merge memo into the main class data.table
-    idd_class <- idd_class_memo[idd_class, on = "class"]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    ## handle class with multiple \class-reference-name
-    # combine class reference names into one vector per class
-    idd_class_reference_name <- idd_class_full[
-        !is.na(class_reference_name),
-        .(class_reference_name = c(.SD)), .SDcol = "class_reference_name", by = class]
-
-    # merge class reference names into the main class data.table
-    idd_class <- idd_class_reference_name[idd_class, on = "class"]
+    # order fields per class
+    idd_field[, field_order := seq_along(field_anid), by = .(class)]
     # }}}
 
-    pb$tick(tokens = list(what = "Parsing "))
-    # get max field number per class
-    idd_class_max_field <- idd_field[!is.na(field_an) & !is.na(field_id),
-        .(class_max_fields = .N), by = class]
-    # merge class_max_fields into the main class data.table
-    idd_class <- idd_class_max_field[idd_class, on = "class"]
-    # add class id for object ordering in idf
-    idd_class[, class_id := .I]
-
-    pb$tick(tokens = list(what = "Parsing "))
-    # re-arrange columns
-    setcolorder(idd_class, c("group", "class_id", "class", "class_min_fields",
-        "class_max_fields", "class_format", "class_unique_object",
-        "class_special_multi_unit", "class_reference_name", "class_memo"))
+    pb$update(0.6, tokens = list(what = "Parsing "))
+    # CLASS data
+    # {{{
+    # extract class data
+    idd_class <- idd_dt[between(type, type_group, type_class_slash),
+        .SD, .SDcol = c("group", "class", "slash_key", "slash_value")]
+    # rolling fill downwards for group and class
+    idd_class[, group := group[1], by = .(cumsum(!is.na(group)))]
+    idd_class[, class := class[1], by = .(cumsum(!is.na(class)))]
+    # As group has been add into a seperated column named "group"and also the
+    # last class in one group has been mis-categorized into the next group by
+    # the filing process, delete group slash_key
+    idd_class <- idd_class[!(slash_key %chin% "GROUP")]
+    # as the first na in first group can not be replaced using downward filling
+    idd_class <- idd_class[!is.na(class)]
+    # if slash key exists and slash value not, it must be a logical attribute,
+    # such as "\\unique-object". Set it to TRUE
+    idd_class <- idd_class[!is.na(slash_key)][is.na(slash_value), slash_value := "TRUE"]
+    # order group and class as the sequence the appears in IDD
+    idd_class[, group_order := .GRP, by = .(group)]
+    idd_class[, class_order := .GRP, by = .(class)]
+    # using dcast to cast all class attributes into seperated columns
+    idd_class <- dcast.data.table(idd_class,
+        group_order + group + class_order + class ~ slash_key,
+        value.var = "slash_value",
+        fun.aggregate = list(function(x) paste0(x, collapse = " ")), fill = NA)
+    # set names
+    new_nms <- gsub("-", "_", tolower(names(idd_class)), fixed = TRUE)
+    setnames(idd_class, new_nms)
+    # set column type
+    idd_class[, `:=`(min_fields = as.integer(min_fields),
+                     required_object = as.logical(required_object),
+                     unique_object = as.logical(unique_object))]
+    # fill na
+    idd_class[is.na(format), format := "standard"]
+    idd_class[is.na(min_fields), min_fields := 0L]
+    idd_class[is.na(required_object), required_object := FALSE]
+    idd_class[is.na(unique_object), unique_object := FALSE]
+    # get max field per class
+    idd_class <- idd_field[, .(max_fields = .N), by = class][idd_class, on = "class"]
+    setcolorder(idd_class, c("group_order", "group", "class_order", "class",
+                             "format", "min_fields", "max_fields",
+                             "required_object", "unique_object",
+                             "reference_class_name", "memo"))
     # }}}
 
-    pb$tick(tokens = list(what = "Parsing "))
+    pb$update(0.9, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
                 class = idd_class,
@@ -928,24 +344,6 @@ parse_idd <- function(filepath) {
 #                                   helpers                                    #
 ################################################################################
 # read_idd {{{1
-# reg {{{
-reg_version_line <- "!IDD_Version"
-reg_build_line <- "!IDD_BUILD"
-reg_blank_line <- "^\\s*$"
-reg_comment_line <- "^\\s*!.*$"
-# }}}
-get_idd_version <- function(idd_str) {
-    point <- stringr::str_which(idd_str, stringr::fixed(reg_version_line))
-    idd_version <- stringr::str_sub(idd_str[point], start = 14L)
-    return(idd_version)
-}
-
-get_idd_build <- function (idd_str) {
-    point <- stringr::str_which(idd_str, stringr::fixed(reg_build_line))
-    idd_build <- stringr::str_sub(idd_str[point], start = 12L)
-    return(idd_build)
-}
-
 read_idd <- function(filepath) {
     con = file(filepath, encoding = "UTF-8")
     idd_str <- readLines(con)
@@ -958,7 +356,7 @@ read_idd <- function(filepath) {
 }
 # }}}1
 # parse_issue {{{
-parse_issue <- function (type = "", data_errors, info = NULL, src = c("IDD", "IDF"),
+parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
                         stop = TRUE) {
     if (!is.null(info)) {
         sep <- paste0(rep("-", 60L), collapse = "")
@@ -974,26 +372,46 @@ parse_issue <- function (type = "", data_errors, info = NULL, src = c("IDD", "ID
         key_line <-  "[Warning Type]"
     }
 
+    error_num <- NULL
+    error_truncated <- NULL
+    if (!is.null(data_errors)) {
+        num_row <- nrow(data_errors)
+        error_num <- num_row
+        # Only use the first 10 lines.
+        if (num_row > 10L) {
+            data_errors <- data_errors[1:10]
+            error_truncated <- "**Only first 10 errors are shown below**"
+        }
+    }
+
     mes <- c(
          glue::glue("
 
                     ============================================================
                     {src} PARSING ERROR for file {sQuote(filepath)}
                     {key_line}: {type}
-                    [Total Number]: {nrow(data_errors)}
-                    {if (nrow(data_errors) > 10L) '**Only first 10 errors are shown below**'}
-                    ------------------------------------------------------------
-
                     "),
-         glue::glue_data({if (nrow(data_errors) > 10L) data_errors[1:10] else data_errors},
-                         "
-                         Line {line[1:10]}: {sQuote(string[1:10])}\n
-                         "),
+         glue::glue("
+                    [Total Number]: {error_num}
+                    "),
+         glue::glue("
+                    {error_truncated}
+                    "),
          glue::glue("
                     {sep}
 
                     "),
-         glue::glue("{info}"),
+         if (!is.null(data_errors)) {
+             glue::glue_data(data_errors,
+                    "
+                    Line {line}: {sQuote(string)}\n
+                    ")
+         },
+         glue::glue("
+                    {sep}
+
+                    "),
+         glue::glue(info),
          glue::glue("
 
                     ============================================================
@@ -1007,39 +425,6 @@ parse_issue <- function (type = "", data_errors, info = NULL, src = c("IDD", "ID
         on.exit(option(warning.length = ori))
         warning(glue::glue("{mes}"), call. = FALSE)
     }
-}
-# }}}
-# replace_slash_colon {{{
-replace_slash_colon <- function (string) {
-    slash_dt <- data.table(line = seq_along(string), char = string)
-
-    slash_dt[, loc_space := stringr::str_locate(char, stringr::fixed(" "))[,1]]
-    slash_dt[, loc_colon := stringr::str_locate(char, stringr::fixed(":"))[,1]]
-
-    slash_dt[is.na(loc_space), loc_space := stringr::str_length(char)]
-    slash_dt[is.na(loc_colon), loc_colon := stringr::str_length(char)]
-
-    slash_dt[loc_colon < loc_space,
-             char := stringr::str_replace(char, stringr::fixed(":"), stringr::fixed(" "))]
-
-    return(slash_dt[, char])
-}
-# }}}
-# get_condensed_field_num {{{
-get_condensed_field_num <- function (string, sep) {
-    # find all ",", ";" and "\"
-    loc <- stringr::str_match_all(string, "[,;\\\\]")
-    # transpose
-    loc_t <- purrr::map(loc, t)
-    if (stringr::str_trim(sep) == "\\") {
-        offset = 1L
-    } else {
-        offset = -1L
-    }
-    # the field number equals line number of "\" minus 1
-    n_field <- purrr::map_int(loc_t, ~max(which(.x == sep)) - offset)
-
-    return(n_field)
 }
 # }}}
 # conversion_units_record {{{
