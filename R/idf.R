@@ -280,24 +280,25 @@ format_idf_lines <- function (object) {
 }
 # }}}1
 
-#' @importFrom stringr str_which str_extract
-# get_idf_ver
-# {{{1
-get_idf_ver <- function (idf_lines) {
-    ver_pt_normal <- stringr::str_which(idf_lines, "^\\d\\.\\d\\s*;\\s*\\!\\s*-\\s*Version Identifier$")
-    ver_pt_special <- stringr::str_which(idf_lines, "^Version\\s*,\\s*\\d\\.\\d;$")
+# get_idf_ver {{{
+get_idf_ver <- function (idf_str) {
+    ver_normal <- idf_str[endsWith(idf_str, "Version Identifier")]
+    ver_special <- idf_str[startsWith(idf_str, "Version")]
 
-    if (length(ver_pt_normal) == 1) {
-        idf_ver <- stringr::str_extract(idf_lines[ver_pt_normal], "\\d+\\.\\d+")
-    } else if (length(ver_pt_special) == 1) {
-        idf_ver <- stringr::str_extract(idf_lines[ver_pt_special], "\\d+\\.\\d+")
+    if (length(ver_normal) == 1L) {
+        ver_line <- ver_normal
+    } else if (length(ver_special) == 1L){
+        ver_line <- ver_special
     } else {
         return(NULL)
     }
 
-    return(idf_ver)
+    ver_pt <- regexpr("\\d", ver_line)
+    ver <- substr(ver_special, ver_pt, ver_pt + 2)
+
+    return(ver)
 }
-# }}}1
+# }}}
 
 #' @importFrom stringr str_detect
 # is_param_exist
