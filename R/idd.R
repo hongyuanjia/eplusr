@@ -335,7 +335,8 @@ parse_idd <- function(filepath) {
                 build = idd_build,
                 class = idd_class,
                 field = idd_field)
-
+    # set class to IDD
+    class(idd) <- c("IDD", class(idd))
     pb$tick(100L, tokens = list(what = "Complete"))
     return(idd)
 }
