@@ -324,10 +324,9 @@ parse_idd <- function(filepath) {
     idd_class[is.na(unique_object), unique_object := FALSE]
     # get max field per class
     idd_class <- idd_field[, .(max_fields = .N), by = class][idd_class, on = "class"]
-    setcolorder(idd_class, c("group_order", "group", "class_order", "class",
-                             "format", "min_fields", "max_fields",
-                             "required_object", "unique_object",
-                             "reference_class_name", "memo"))
+    neworder <- c("group_order", "group", "class_order", "class", "format",
+         "min_fields", "max_fields", "required_object", "unique_object")
+    setcolorder(idd_class, c(neworder, setdiff(names(idd_class), neworder)))
     # }}}
 
     pb$update(0.9, tokens = list(what = "Parsing "))
