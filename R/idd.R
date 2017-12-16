@@ -272,6 +272,8 @@ parse_idd <- function(filepath) {
         by = c("class_order", "field_anid"), all.x = TRUE, sort = FALSE)
     # set order according to line
     setorder(idd_field, line)
+    # delete line column
+    idd_field[, line := NULL]
     # set names
     new_nms <- gsub("-", "_", tolower(names(idd_field)), fixed = TRUE)
     setnames(idd_field, new_nms)
