@@ -338,11 +338,56 @@ parse_idd <- function(filepath) {
     setcolorder(idd_class, c(neworder, setdiff(names(idd_class), neworder)))
     # }}}
 
-    pb$update(0.9, tokens = list(what = "Parsing "))
+    pb$update(0.85, tokens = list(what = "Parsing "))
+    # Object-List reference data {{{
+    # collect \reference-class-name data
+    idd_class_reference <- idd_class[!is.na(reference_class_name),
+        .(class, reference_class_name)][
+        , strsplit(reference_class_name, " ", fixed = TRUE), by = .(class)][
+        , .(ref_value = c(.SD)), by = .(V1)]
+    setnames(idd_class_reference, c("ref_key", "ref_class"))
+
+    # collect \reference data
+    idd_field_reference <- idd_field[!is.na(reference),
+        .(class, field_order, reference)][
+        , strsplit(reference, " ", fixed = TRUE), by = .(class, field_order)][
+        , .(ref_class = c(.SD[, 1]), ref_field_order = c(.SD[, 2])), by = .(V1)]
+    setnames(idd_field_reference, c("ref_key", "ref_class", "ref_field_order"))
+
+    # combine \reference-class-name and \reference data
+    idd_reference <- rbindlist(
+        list(idd_field_reference, idd_class_reference), fill = TRUE
+    )
+    # add an indicator column for easy subsetting
+    idd_reference[, num_ref_field := length(unlist(ref_field_order)), by = ref_key]
+
+    # collect \object-list data
+    idd_object_list <- idd_field[!is.na(object_list),
+        .(class_order, class, field_order, field, object_list)][
+        , strsplit(object_list, " ", fixed = TRUE),
+        by = .(class_order, class, field_order, field)]
+    setnames(idd_object_list, "V1", "object_list")
+
+    # combine all data
+    idd_object_list_ref <- merge(idd_object_list, idd_reference,
+        by.x = "object_list", by.y = "ref_key", all.x = TRUE, sort = FALSE)
+    # remove object-lists that are not referred by any class or field
+    idd_object_list_ref <- idd_object_list_ref[!is.na(num_ref_field)]
+    # }}}
+
+    pb$update(0.90, tokens = list(what = "Parsing "))
+    # External-List reference data {{{
+    idd_external_list_ref <- idd_field[!is.na(external_list),
+        .(class_order, field_order, external_list)]
+    # }}}
+
+    pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
                 class = idd_class,
-                field = idd_field)
+                field = idd_field,
+                object_ref = idd_object_list_ref,
+                external_ref = idd_external_list_ref)
     # set class to IDD
     class(idd) <- c("IDD", class(idd))
     pb$tick(100L, tokens = list(what = "Complete"))
