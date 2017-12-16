@@ -446,12 +446,15 @@ parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("ID
                     {key_line}: {type}
                     "),
          glue::glue("
+
                     [Total Number]: {error_num}
                     "),
          glue::glue("
+
                     {error_truncated}
                     "),
          glue::glue("
+
                     {sep}
 
                     "),
