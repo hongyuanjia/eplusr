@@ -574,14 +574,26 @@
 #                          Refact IDF parsing process                          #
 ################################################################################
 # parse_idf {{{
-parse_idf <- function (filepath, eplus_dir = NULL) {
+parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
 
-    if (is.null(eplus_dir)) {
-        eplus_dir <- getOption("eplusr.eplus_dir")
+    # check idd {{{
+    if (is.null(idd)) {
+        if (is.null(eplus_dir)) {
+            eplus_dir <- getOption("eplusr.eplus_dir")
+        }
+        idd_path <- normalizePath(file.path(eplus_dir, "Energy+.idd"))
+        idd <- parse_idd(idd_path)
+    } else if (is.character(idd) & length(idd) == 1L) {
+        if (file.exists(idd)) {
+            idd <- parse_idd(path)
+        } else {
+            stop("Input IDD file does not exist.", call. = FALSE)
+        }
+    } else if (!("IDD" %chin% class(idd))) {
+        stop("'idd' should be a path of 'Energy+.idd' or an IDD object.",
+             call. = FALSE)
     }
-
-    idd_path <- normalizePath(file.path(eplus_dir, "Energy+.idd"))
-    idd <- parse_idd(idd_path)
+    # }}}
 
     idf_str <- read_idf(filepath)
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
