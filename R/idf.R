@@ -846,6 +846,7 @@ parse_idf <- function (filepath, eplus_dir = NULL) {
                 value = idf_value,
                 comment = idf_comment)
 
+    class(idf) <- c("IDF", class(idf))
     return(idf)
 }
 # }}}
