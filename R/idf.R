@@ -906,6 +906,93 @@ read_idf <- function (filepath) {
     return(idf_str)
 }
 # }}}
+# save_idf {{{
+save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
+
+    format <- match.arg(format)
+
+    if (idf$options$idfeditor) {
+        header_generator <- "!-Generator IDFEditor"
+    } else {
+        header_generator <- "!-Generator eplusr"
+    }
+
+    save_format <- switch(format,
+           asis = idf$options$save_format,
+           sorted = "SortedOrder",
+           ori_bot = "OriginalOrderBottom",
+           ori_top = "OriginalOrderTop")
+
+    # Default use "SortedOrder"
+    if (is.null(save_format)) {
+        save_format <- "SortedOrder"
+    }
+    header_save_format <- paste0("!-Option ", save_format)
+
+    # TODO: Add "UseSpecialFormat" and "ViewInIPunits" support
+    header <- c(
+        header_generator,
+        header_save_format,
+        "",
+        "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
+        "!-      Use '!' comments if they need to be retained when using the IDFEditor.",
+        "")
+
+    idf_comment <- idf$comment[, .(row_id, line, object_id, comment, leading_spaces)]
+    idf_value <- idf$value[, .(row_id, class_order, class, object_id, field_order, value, field, field_anid,  units)]
+
+    # init
+    idf_value[, output := ""]
+
+    # handle different save options
+    # "SortedOrder"
+    if (save_format == "SortedOrder") {
+        setorder(idf_value, class_order, object_id, field_order)
+        # add class heading
+        idf_value[, class_group :=  .GRP, by = .(rleid(class))]
+        idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
+                  output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
+                                   toupper(class), " ===========\n\n")]
+    }
+    if (save_format == "OriginalOrderTop") {
+        setorder(idf_value, row_id)
+    }
+    if (save_format == "OriginalOrderBottom") {
+        setorder(idf_value, row_id)
+    }
+
+    # add class name
+    idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
+              output := paste0(output, class, ",\n")]
+
+    # for field name
+    idf_value[is.na(field), output_name := paste0("!- ", field_anid)]
+    idf_value[!is.na(field), output_name := paste0("!- ", field)]
+    # for field unit
+    idf_value[is.na(units), output_unit := ""]
+    idf_value[!is.na(units), output_unit := paste0(" {", units, "}")]
+    # add a new line after the last field per class
+    idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
+              output_unit := paste0(output_unit, "\n")]
+    # for field value
+    idf_value[, output_value := paste0("    ", value, ",")]
+    idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
+              output_value := sub(",$", ";", output_value)]
+    # handle indentation
+    idf_value[nchar(output_value) <= 29L,
+              output_value := stringr::str_pad(output_value, 29L, side = "right")]
+    idf_value[nchar(output_value) > 29L,
+              output_value := paste0(output_value, "  ")]
+    # combine
+    idf_value[, output := paste0(output, output_value, output_name, output_unit)]
+
+    value_output <- idf_value[, output]
+
+    output <- c(header, value_output)
+
+    return(output)
+}
+# }}}
 # get_idf_ver {{{1
 get_idf_ver <- function (idf_str) {
     ver_normal <- idf_str[endsWith(idf_str, "Version Identifier")]
