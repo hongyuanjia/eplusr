@@ -804,31 +804,12 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # }}}
 
     # Error checking
-    # # idf and idd version mismatch {{{
-    # idd_version <- idd$version
-    # idf_version <- idf_field[class == "Version" & field_order == 1, value]
-    # if (!grepl(idf_version, idd_version, fixed = TRUE)) {
-    #     warning(glue::glue("Version Mismatch. The file parsing is a differnet \\
-    #         version '{idf_version}' than the EnergyPlus program and IDD file \\
-    #         you are using '{substr(idd_version, 1L, 4L)}'. Editing and saving \\
-    #         the file may make it incompatible with an older version of EnergyPlus."),
-    #         call. = FALSE)
-    # }
-    # # }}}
     # un-recognized class names {{{
     idf_errors_unknown_class <- idf_class[!is.na(value) & is.na(class), .(line, string)]
     if (nrow(idf_errors_unknown_class) > 0L) {
         parse_issue(type = "Object type not recognized", idf_errors_unknown_class,
                     src = "IDF",
                     info = "This error may be caused by a misspelled object name.")
-    }
-    # }}}
-    # missing required object {{{
-    idf_errors_missing_required <- idf_class_all[required_object == TRUE & is.na(line), class]
-    if (length(idf_errors_missing_required) > 0L) {
-        stop(glue::glue("Missing required object ",
-                        glue::collapse(idf_errors_missing_required)),
-             call. = FALSE)
     }
     # }}}
     # duplicated unqiue object {{{
@@ -856,18 +837,29 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
              call. = FALSE)
     }
     # }}}
-    # missing required field {{{
-    idf_errors_missing_required_field <- idf_value_all[!is.na(object_id)][required_field == TRUE & is.na(value)]
-    if (nrow(idf_errors_missing_required_field) > 0L) {
-        stop(glue::glue("Missing required fields in objects \\
-                        {glue::collapse(idf_errors_missing_required_field$class, sep = ',', last = ' and ')}.",
-                        glue::collapse({rep('-', 60L)})),
-             glue::glue_data("Line\tObject name\tMissing
-                             {line}\t{class}\t{field}{{units}}
-                             "),
-             call. = FALSE)
+    # Do not check missing required objects and fields for imf files.
+    if (!is_imf) {
+        # missing required object {{{
+        idf_errors_missing_required <- idf_class_all[required_object == TRUE & is.na(line), class]
+        if (length(idf_errors_missing_required) > 0L) {
+            stop(glue::glue("Missing required object ",
+                            glue::collapse(idf_errors_missing_required)),
+                 call. = FALSE)
+        }
+        # }}}
+        # missing required field {{{
+        idf_errors_missing_required_field <- idf_value_all[!is.na(object_id)][required_field == TRUE & is.na(value)]
+        if (nrow(idf_errors_missing_required_field) > 0L) {
+            stop(glue::glue("Missing required fields in objects \\
+                            {glue::collapse(idf_errors_missing_required_field$class, sep = ',', last = ' and ')}.",
+                            glue::collapse({rep('-', 60L)})),
+                 glue::glue_data("Line\tObject name\tMissing
+                                 {line}\t{class}\t{field}{{units}}
+                                 "),
+                 call. = FALSE)
+        }
+        # }}}
     }
-    # }}}
 
     # clean up after error checking
     idf_value <- idf_value_all[!is.na(line)]
