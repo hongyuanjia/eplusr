@@ -713,6 +713,9 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                option_save := "OriginalOrderBottom"]
     idf_errors_option_save <- idf_option[!is.na(option_save), .(line, string, option_save)]
     option_save <- idf_errors_option_save[, unique(option_save)]
+    if (length(option_save) == 0L) {
+        option_save <- NULL
+    }
     if (nrow(idf_errors_option_save) > 1L) {
         parse_issue(type = "More than one save option found", idf_errors_option_save,
                     src = "IDF", stop = FALSE,
