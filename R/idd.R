@@ -30,8 +30,8 @@ parse_idd <- function(filepath) {
     # read idd string, get idd version and build
     idd_str <- read_idd(filepath)
     idd_dt <- data.table(line = seq_along(idd_str), string = idd_str, key = "line")
-    idd_version <- idd_dt[grepl("!IDD_Version", string), substr(string, 14L, nchar(string))]
-    idd_build <- idd_dt[grepl("!IDD_BUILD", string), substr(string, 12L, nchar(string))]
+    idd_version <- idd_dt[grepl("!IDD_Version", string, fixed = TRUE), substr(string, 14L, nchar(string))]
+    idd_build <- idd_dt[grepl("!IDD_BUILD", string, fixed = TRUE), substr(string, 12L, nchar(string))]
 
     pb$update(0.2, tokens = list(what = "Parsing "))
     # mark type{{{
