@@ -255,11 +255,12 @@ parse_idd <- function(filepath) {
     idd_dt[, `:=`(slash_key_value = NULL, field_anid = NULL)]
 
     pb$update(0.6, tokens = list(what = "Parsing "))
+    idd_dt[, row_id := .I]
     # FIELD data
     # {{{
     # extract class data
     idd_field <- idd_dt[type == type_class | between(type, type_field, type_field_slash),
-        .SD, .SDcol = c("line", "class", "field_an", "field_id", "slash_key", "slash_value")]
+        .SD, .SDcol = c("row_id", "class", "field_an", "field_id", "slash_key", "slash_value")]
     # rolling fill downwards for class and field AN and id
     idd_field[, class := class[1], by = .(cumsum(!is.na(class)))]
     idd_field[, field_an := field_an[1], by = .(cumsum(!is.na(field_an)), class)]
@@ -276,7 +277,7 @@ parse_idd <- function(filepath) {
     idd_field[, class_order := .GRP, by = .(class)]
     # using dcast to cast all field attributes into seperated columns
     # get line of field AN and id
-    idd_field_line <- idd_field[, .(class_order, field_anid, line)]
+    idd_field_line <- idd_field[, .(class_order, field_anid, row_id)]
     idd_field_line <- idd_field_line[
         idd_field_line[, .I[1], by = .(class_order, field_anid)]$V1]
     # dcast
@@ -288,9 +289,9 @@ parse_idd <- function(filepath) {
     idd_field <- merge(idd_field, idd_field_line,
         by = c("class_order", "field_anid"), all.x = TRUE, sort = FALSE)
     # set order according to line
-    setorder(idd_field, line)
+    setorder(idd_field, row_id)
     # delete line column
-    idd_field[, line := NULL]
+    idd_field[, row_id := NULL]
     # set names
     new_nms <- gsub("-", "_", tolower(names(idd_field)), fixed = TRUE)
     setnames(idd_field, new_nms)
