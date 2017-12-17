@@ -601,9 +601,9 @@ parse_idf <- function (filepath, eplus_dir = NULL) {
     # mark type {{{
     # -2, unknown
     type_unknown <- -2L
-    # -1, block comment
+    # -1, speical comment
     type_special <- -1L
-    #  0, special comment
+    #  0, block comment
     type_comment <- 0L
     #  1, object
     type_object <- 1L
