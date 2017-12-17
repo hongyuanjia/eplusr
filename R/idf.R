@@ -877,7 +877,7 @@ get_idf_ver <- function (idf_str) {
     }
 
     ver_pt <- regexpr("\\d", ver_line)
-    ver <- substr(ver_special, ver_pt, ver_pt + 2)
+    ver <- substr(ver_line, ver_pt, ver_pt + 2)
 
     return(ver)
 }
