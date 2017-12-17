@@ -722,6 +722,10 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                     info = glue::glue("Only the first option '{option_save[1]}' \\
                                        will be used."))
     }
+    # for imf, always use "OriginalOrderBottom"
+    if (is_imf) {
+        option_save <- "OriginalOrderBottom"
+    }
     # }}}
 
     # get rid of special comment lines
