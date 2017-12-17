@@ -361,59 +361,49 @@ parse_idd <- function(filepath) {
     pb$update(0.85, tokens = list(what = "Parsing "))
     # Object-List reference data {{{
     # collect \object-list data
-    idd_object_list <- idd_field[!is.na(object_list),
-        .(class_order, field_order, object_list)][
-        , strsplit(object_list, " ", fixed = TRUE),
-        by = .(class_order, field_order)]
-    setnames(idd_object_list, "V1", "ref_key")
+    idd_object_list <- NULL
+    # if '\object-list' exists
+    if (slash_exists(idd_field, "object_list")) {
+        idd_object_list <- idd_field[!is.na(object_list),
+            .(class_order, field_order, object_list)][
+            , strsplit(object_list, " ", fixed = TRUE),
+            by = .(class_order, field_order)]
+        setnames(idd_object_list, "V1", "ref_key")
+    }
 
     # collect \reference-class-name data
-    idd_class_reference <- idd_class[!is.na(reference_class_name),
-        .(class_order, reference_class_name)][
-        , strsplit(reference_class_name, " ", fixed = TRUE), by = .(class_order)]
-    setnames(idd_class_reference, "V1", "ref_key")
-    setcolorder(idd_class_reference, c("ref_key", "class_order"))
+    idd_class_reference <- NULL
+    # if '\reference-class-name' exists
+    if (slash_exists(idd_class, "reference_class_name")) {
+        idd_class_reference <- idd_class[!is.na(reference_class_name),
+            .(class_order, reference_class_name)][
+            , strsplit(reference_class_name, " ", fixed = TRUE), by = .(class_order)]
+        setnames(idd_class_reference, "V1", "ref_key")
+        setcolorder(idd_class_reference, c("ref_key", "class_order"))
+    }
 
     # collect \reference data
-    idd_field_reference <- idd_field[!is.na(reference),
-        .(class_order, field_order, reference)][
-        , strsplit(reference, " ", fixed = TRUE), by = .(class_order, field_order)]
-    setnames(idd_field_reference, c("class_order", "field_order", "ref_key"))
-    setcolorder(idd_field_reference, c("ref_key", "class_order", "field_order"))
-
-    # idd_field_reference <- idd_field[!is.na(reference),
-    #     .(class, field_order, reference)][
-    #     , strsplit(reference, " ", fixed = TRUE), by = .(class, field_order)][
-    #     , .(ref_class = c(.SD[, 1]), ref_field_order = c(.SD[, 2])), by = .(V1)]
-    # setnames(idd_field_reference, c("ref_key", "ref_class", "ref_field_order"))
-
-    # # combine \reference-class-name and \reference data
-    # idd_reference <- rbindlist(
-    #     list(idd_field_reference, idd_class_reference), fill = TRUE
-    # )
-    # # add an indicator column for easy subsetting
-    # idd_reference[, num_ref_field := length(unlist(ref_field_order)), by = ref_key]
-
-    # # collect \object-list data
-    # idd_object_list <- idd_field[!is.na(object_list),
-    #     .(class_order, class, field_order, field, object_list)][
-    #     , strsplit(object_list, " ", fixed = TRUE),
-    #     by = .(class_order, class, field_order, field)]
-    # setnames(idd_object_list, "V1", "object_list")
-
-    # # combine all data
-    # idd_object_list_ref <- merge(idd_object_list, idd_reference,
-    #     by.x = "object_list", by.y = "ref_key", all.x = TRUE, sort = FALSE)
-    # # remove object-lists that are not referred by any class or field
-    # idd_object_list_ref <- idd_object_list_ref[!is.na(num_ref_field)]
+    idd_field_reference <- NULL
+    # if '\reference' exists
+    if (slash_exists(idd_field, "reference")) {
+        idd_field_reference <- idd_field[!is.na(reference),
+            .(class_order, field_order, reference)][
+            , strsplit(reference, " ", fixed = TRUE), by = .(class_order, field_order)]
+        setnames(idd_field_reference, c("class_order", "field_order", "ref_key"))
+        setcolorder(idd_field_reference, c("ref_key", "class_order", "field_order"))
+    }
     # }}}
 
     pb$update(0.90, tokens = list(what = "Parsing "))
     # External-List reference data {{{
-    idd_external_list <- idd_field[!is.na(external_list),
-        .(class_order, field_order, external_list)]
-    setnames(idd_external_list, "external_list", "ref_key")
-    setcolorder(idd_external_list, c("ref_key", "class_order", "field_order"))
+    idd_external_list <- NULL
+    # if '\external-list' exists
+    if (slash_exists(idd_field, "external_list")) {
+        idd_external_list <- idd_field[!is.na(external_list),
+            .(class_order, field_order, external_list)]
+        setnames(idd_external_list, "external_list", "ref_key")
+        setcolorder(idd_external_list, c("ref_key", "class_order", "field_order"))
+    }
     # }}}
 
     pb$update(0.95, tokens = list(what = "Parsing "))
@@ -1057,4 +1047,9 @@ multi_unit_name[144] = "Wavelength"
 # }}}
 
 conversion_units_record <- data.table(si_name, ip_name, mult, offset, alt, multi_unit_name)
+# }}}
+# slash_exists {{{
+slash_exists <- function (idd_data, slash) {
+    any(grepl(slash, names(idd_data), fixed = TRUE))
+}
 # }}}
