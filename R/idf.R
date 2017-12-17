@@ -596,6 +596,8 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # }}}
 
     idf_str <- read_idf(filepath)
+    # check if input file is an imf file.
+    is_imf <- is_imf(idf_str)
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
     # idf and idd version mismatch {{{
@@ -611,10 +613,12 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # }}}
 
     # mark type {{{
-    # -2, unknown
-    type_unknown <- -2L
-    # -1, speical comment
-    type_special <- -1L
+    # -3, unknown
+    type_unknown <- -3L
+    # -2, speical comment
+    type_special <- -2L
+    # -1, macro
+    type_macro <- -1L
     #  0, block comment
     type_comment <- 0L
     #  1, object
@@ -628,6 +632,29 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
 
     # delete blank lines
     idf_dt <- idf_dt[!(string %chin% "")]
+    idf_dt[startsWith(string, "##"), type := type_macro]
+    # handle EP-Macro lines {{{
+    idf_macro <- idf_dt[type == type_macro]
+    idf_macro[, space_loc := regexpr(" ", string, fixed = TRUE)]
+    idf_macro[space_loc > 0L,
+        `:=`(macro_key = substr(string, 1L, space_loc - 1L),
+             macro_value = substr(string, space_loc + 1L, nchar(string)))]
+    idf_macro[space_loc < 0L, macro_key := substr(string, 1L, nchar(string))]
+    # unknown marco key {{{
+    idf_errors_unknown_macro <- idf_macro[!(macro_key %chin% macro_dict),
+                                          .(line, string)]
+    if (nrow(idf_errors_unknown_macro) > 0L) {
+        parse_issue(type = "Unknown macro found", src = "IDF",
+                    data_errors = idf_errors_unknown_macro)
+    }
+    # }}}
+    # mark macro values as macro {{{
+    macro_value <- idf_macro[!is.na(macro_value), unique(macro_value)]
+    idf_dt[string %chin% macro_value, type := type_macro]
+    # }}}
+    # }}}
+    # treat macro lines as the same as comments
+    # idf_dt[type == type_macro, type := type_comment]
     idf_dt[startsWith(string, "!"), type := type_comment]
     idf_dt[startsWith(string, "!-"), type := type_special]
     # mark location of "!" and "!-"
@@ -639,6 +666,7 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_dt[special_loc > 0L, comment := substr(string, explpt_loc + 2L, nchar(string))]
     idf_dt[special_loc < 0L & explpt_loc > 0L,
            comment := substr(string, explpt_loc + 1L, nchar(string))]
+    idf_dt[type == type_macro, comment := string]
     # get the number of leading spaces in comment
     idf_dt[, leading_spaces := regexpr("\\S", comment) - 1L]
     # get rid of leading spaces
@@ -651,6 +679,8 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_dt[endsWith(value, ";"), type := type_field_last]
     # clean unused columns
     idf_dt[, `:=`(explpt_loc = NULL, special_loc = NULL)]
+    # NOTE: treat macro lines as the same as comments
+    idf_dt[type == type_macro, type := type_comment]
     # }}}
 
     # special comment key and value {{{
@@ -739,9 +769,10 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
         idf_dt[, object_id := NULL], on = c("row_id"), roll = -Inf]
     # }}}
 
-    # get comments
+    # get comments and macros
     idf_comment <- idf_dt[is_comment == TRUE, .SD,
         .SDcol = c("row_id", "object_id", "line", "comment", "string", "leading_spaces")]
+    idf_comment[is.na(leading_spaces), leading_spaces := 0L]
     # get idf without comments
     idf_dt <- idf_dt[is_comment == FALSE, .SD,
          .SDcol = c("row_id", "object_id", "line", "type", "value", "comment", "string")]
