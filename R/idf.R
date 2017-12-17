@@ -908,16 +908,22 @@ is_imf <- function (idf_lines) {
 # update_obj_ref {{{
 update_obj_ref <- function (idf_value, idd) {
     # get field values that are referred
-    idf_ref_value_field <- idd$ref_object$field[idf_value,
-        on = c("class_order", "field_order"), nomatch = 0L][
-        , .(ref_key, value)][
-        , .(ref_value = c(.SD)), by = .(ref_key)]
+    idf_ref_value_field <- NULL
+    if (!is.null(idd$ref_object$field)) {
+        idf_ref_value_field <- idd$ref_object$field[idf_value,
+            on = c("class_order", "field_order"), nomatch = 0L][
+            , .(ref_key, value)][
+            , .(ref_value = c(.SD)), by = .(ref_key)]
+    }
 
     # get class values that are referred
-    idf_ref_value_class <- idd$ref_object$class[idf_value,
-        on = c("class_order"), nomatch = 0L][
-        field_order == 1L, .(ref_key, class)][
-        , .(ref_value = c(.SD)), by = .(ref_key)]
+    idf_ref_value_class <- NULL
+    if (!is.null(idd$ref_object$class)) {
+        idf_ref_value_class <- idd$ref_object$class[idf_value,
+            on = c("class_order"), nomatch = 0L][
+            field_order == 1L, .(ref_key, class)][
+            , .(ref_value = c(.SD)), by = .(ref_key)]
+    }
 
     idf_ref_value <- rbindlist(list(idf_ref_value_class, idf_ref_value_field))
 
@@ -927,12 +933,20 @@ update_obj_ref <- function (idf_value, idd) {
 # check_obj_ref {{{
 check_obj_ref <- function (idf_value, idd) {
     # get fields that have \object-list
-    idf_ref_field <- idf_value[!is.na(object_list),
-        .(row_id, line, string,
-          object_id, class_order, field_order,
-          object_list, value)][
-        # remove empty lines
-        nchar(value) > 1L]
+    idf_ref_field <- data.table()
+    if (slash_exists(idf_value, "object_list")) {
+        idf_ref_field <- idf_value[!is.na(object_list),
+            .(row_id, line, string,
+              object_id, class_order, field_order,
+              object_list, value)][
+            # remove empty lines
+            nchar(value) > 1L]
+    }
+
+    # if no '\object-list' exists
+    if (nrow(idf_ref_field) == 0L) {
+        return(idf_ref_field)
+    }
 
     # get referred value
     idf_ref_value <- update_obj_ref(idf_value, idd)
