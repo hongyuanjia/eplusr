@@ -82,10 +82,10 @@ parse_idd <- function(filepath) {
     # }}}
 
     pb$update(0.3, tokens = list(what = "Parsing "))
-    # basic {{{
     # get class names
     idd_dt[type == type_class, class := substr(string, 1L, nchar(string) - 1L)]
 
+    pb$update(0.4, tokens = list(what = "Parsing "))
     # get field AN and id
     # {{{
     # get location of first slash
@@ -116,25 +116,6 @@ parse_idd <- function(filepath) {
     # set all type of condensed field lines to "field"
     idd_dt[field_count > 1L, type := type_field]
     idd_dt[line_field_last, type := type_field_last]
-    # }}}
-
-    # fix duplicated fields in "ZoneHVAC:HighTemperatureRadiant" and
-    # "Foundation:Kiva"
-    # NOTE: there are errors in "ZoneHVAC:HighTemperatureRadiant" that
-    # duplicated fields ANid are used for 'N76', 'N77', 'N87' and
-    # "Foundation:Kiva" for "N16", have to fix it in advanced.
-    # {{{
-    # fill class downwards to make search easiser
-    idd_dt_dup <- idd_dt[between(type, type_class, type_field)][
-        , class := class[1], by = .(cumsum(!is.na(class)))][
-        type == type_field, .(line, class, field_anid)]
-    # found duplicated field in the whole data.table
-    line_dup <- idd_dt_dup[,
-        .SD[duplicated(field_anid)], .SDcol = "line",  by = .(class)][, line]
-    # add a suffix of 'd' to the duplicated field
-    if (length(line_dup) > 0L) {
-        idd_dt[line %in% line_dup, `:=`(field_anid = gsub("([,;])$", "_dup\\1", field_anid))]
-    }
     # }}}
 
     # seperate file AN and id {{{
@@ -175,11 +156,11 @@ parse_idd <- function(filepath) {
     idd_dt[grepl("\t", slash_key), slash_key := gsub(slash_key, "\t", "")]
 
     # clean up
-    idd_dt[, `:=`(space_loc = NULL, slash_key_value = NULL, field_anid = NULL)]
+    idd_dt[, `:=`(space_loc = NULL)]
     # }}}
     # }}}
 
-    pb$tick(10L, tokens = list(what = "Parsing "))
+    pb$update(0.5, tokens = list(what = "Parsing "))
     # parse slash lines {{{
     idd_dt[!is.na(slash_key), slash_supported := FALSE]
     group_slash_key <- c("GROUP")
@@ -235,7 +216,43 @@ parse_idd <- function(filepath) {
     }
     # }}}
     # }}}
+
+    # fix duplicated values
+    # {{{
+    # fix duplicated class slash lines such as "\min-fields 3" in
+    # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
+    # {{{
+    line_dup_class_slash <- idd_dt[between(type, type_class, type_class_slash)][
+        , class := class[1], by = .(cumsum(!is.na(class)))][
+        type == type_class_slash, .(line, class, slash_key_value)][
+        , .SD[duplicated(slash_key_value)], .SDcol = "line", by = .(class)][, line]
+    # remove duplicated class slash lines
+    if (length(line_dup_class_slash) > 0L) {
+        idd_dt <- idd_dt[!(line %in% line_dup_class_slash)]
+    }
     # }}}
+
+    # fix duplicated fields in "ZoneHVAC:HighTemperatureRadiant" and
+    # "Foundation:Kiva"
+    # NOTE: there are errors in "ZoneHVAC:HighTemperatureRadiant" that
+    # duplicated fields ANid are used for 'N76', 'N77', 'N87' and
+    # "Foundation:Kiva" for "N16", have to fix it in advanced.
+    # {{{
+    # fill class downwards to make search easiser
+    line_dup_field_anid <- idd_dt[between(type, type_class, type_field_slash)][
+        ## fill class name downwards
+        , class := class[1], by = .(cumsum(!is.na(class)))][
+        type == type_field_slash & !is.na(field_anid), .(line, class, field_anid)][,
+        ## found duplicated field in the whole data.table
+        .SD[duplicated(field_anid)], .SDcol = "line",  by = .(class)][, line]
+    # add a suffix of 'd' to the duplicated field
+    if (length(line_dup_field_anid) > 0L) {
+        idd_dt[line %in% line_dup_field_anid, `:=`(field_id = gsub("$", "_dup", field_id))]
+    }
+    # }}}
+    # }}}
+    # clean
+    idd_dt[, `:=`(slash_key_value = NULL, field_anid = NULL)]
 
     pb$update(0.6, tokens = list(what = "Parsing "))
     # FIELD data
