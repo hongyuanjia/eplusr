@@ -1137,3 +1137,18 @@ check_obj_ref <- function (idf_value, idd) {
     return(error_ref)
 }
 # }}}
+# print.IDF {{{
+print.IDF <- function (idf) {
+    count_obj <- setorder(idf$class, group_order, class_order)[
+        , .N, by = .(group, class, object_id)][
+        , .(num = .N), by = .(group, class)][
+        , num_obj := paste0("[", stringr::str_pad(num, 2, "left", "0"), "]")][
+        , output := paste0(num_obj, " ", class)]
+
+    output <- count_obj[count_obj[, .I[1], by = .(group)]$V1,
+        output := paste0("\n", group, "\n---------------------------\n", output)][
+        , output]
+
+    cat(output, sep = "\n")
+}
+# }}}
