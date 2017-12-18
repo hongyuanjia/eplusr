@@ -928,39 +928,29 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     if (is.null(save_format)) {
         save_format <- "SortedOrder"
     }
-    header_save_format <- paste0("!-Option ", save_format)
+    header_option <- paste0("!-Option ", save_format)
 
     # TODO: Add "UseSpecialFormat" and "ViewInIPunits" support
     header <- c(
         header_generator,
-        header_save_format,
+        header_option,
         "",
         "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
         "!-      Use '!' comments if they need to be retained when using the IDFEditor.",
         "")
 
     idf_comment <- idf$comment[, .(row_id, line, object_id, comment, leading_spaces)]
-    idf_value <- idf$value[, .(row_id, class_order, class, object_id, field_order, value, field, field_anid,  units)]
+    # init
+    idf_comment[, output := ""]
+    idf_comment[, output_space := strrep(" ", leading_spaces)]
+    idf_comment[, output := paste0("!", output_space, comment)]
+    idf_comment[, field_order := 0L]
+
+    idf_value <- idf$value[, .(row_id, class_order, class, object_id, field_order,
+                               value, field, field_anid,  units)]
 
     # init
     idf_value[, output := ""]
-
-    # handle different save options
-    # "SortedOrder"
-    if (save_format == "SortedOrder") {
-        setorder(idf_value, class_order, object_id, field_order)
-        # add class heading
-        idf_value[, class_group :=  .GRP, by = .(rleid(class))]
-        idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
-                  output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
-                                   toupper(class), " ===========\n\n")]
-    }
-    if (save_format == "OriginalOrderTop") {
-        setorder(idf_value, row_id)
-    }
-    if (save_format == "OriginalOrderBottom") {
-        setorder(idf_value, row_id)
-    }
 
     # add class name
     idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
@@ -987,7 +977,34 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     # combine
     idf_value[, output := paste0(output, output_value, output_name, output_unit)]
 
-    value_output <- idf_value[, output]
+    # combine comment and value
+    idf_output <- rbindlist(list(idf_comment, idf_value), fill = TRUE)[
+        , .(row_id, object_id, class_order, field_order, class, output)]
+    idf_output <- idf_output[!is.na(class_order), .(row_id, class_order, class)][
+        idf_output[, `:=`(class_order = NULL, class = NULL)],
+        on = "row_id", roll = -Inf]
+
+    # handle different save options
+    # "SortedOrder"
+    if (save_format == "SortedOrder") {
+        setorder(idf_output, row_id)
+        # add class heading
+        idf_output[, class_group :=  .GRP, by = .(rleid(class))]
+        idf_output[idf_output[, .I[1], by = .(class_group)]$V1,
+                  output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
+                                   toupper(class), " ===========\n\n", output)]
+        setorder(idf_output, class_order, object_id, field_order)
+    }
+    # "OriginalOrderTop"
+    if (save_format == "OriginalOrderTop") {
+        setorder(idf_output, row_id)
+    }
+    # "OriginalOrderBottom"
+    if (save_format == "OriginalOrderBottom") {
+        setorder(idf_output, row_id)
+    }
+
+    value_output <- idf_output[, output]
 
     output <- c(header, value_output)
 
