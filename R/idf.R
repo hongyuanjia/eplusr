@@ -863,3 +863,37 @@ print.IDF <- function (idf) {
     cat(output, sep = "\n")
 }
 # }}}
+# find_object {{{
+find_object <- function (idf, pattern, full = TRUE, ...) {
+    # copy whole idf to preserve the original input untouched.
+    idf_copy <- idf
+
+    if (full) {
+        pattern = paste0(pattern, "$")
+    }
+
+    idf_copy$value <- idf_copy$value[grepl(pattern, class, ...)]
+    if (nrow(idf_copy$value) == 0L) {
+        stop("No matched object found.", call. = FALSE)
+    }
+    idf_copy$class <- idf_copy$class[class %chin% idf_copy$value[, unique(class)]]
+
+    value_output <- get_output_value(idf_copy$value)
+    object_count <- value_output[, .N, by = .(class, object_id)][, .N, by = .(class)]
+    value_output <- object_count[value_output, on = "class", roll = Inf]
+
+    # add class heading
+    setorder(value_output, row_id)
+    value_output[, class_group := .GRP, by = .(rleid(class))]
+    value_output[value_output[, .I[1], by = .(class_group)]$V1,
+        output := paste0("\n[=========== ", N, " Objects Found in Class: ",
+        class, " ===========]\n\n", output)]
+    value_output[value_output[, .I[.N], by = .(class_group)]$V1,
+        output := paste0(output, "\n------------------------------------------------------------")]
+    setorder(value_output, class_order, object_id, field_order)
+
+    cat(value_output[, output], sep = "\n")
+
+    return(invisible(idf_copy))
+}
+# }}}
