@@ -915,6 +915,7 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
 
     format <- match.arg(format)
 
+    # header {{{
     if (idf$options$idfeditor) {
         header_generator <- "!-Generator IDFEditor"
     } else {
@@ -935,6 +936,9 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
 
     special_format <- if (idf$options$special_format) "UseSpecialFormat" else NULL
     ip_unit <- if (idf$options$view_in_ip) "ViewInIPunits" else NULL
+    # currently, "UseSpecialFormat" and "ViewInIPunits" options are not supported.
+    special_format <- NULL
+    ip_unit <- NULL
 
     header_option <- paste0(header_option, " ", special_format, " ", ip_unit)
     header_option <- trimws(header_option, "right")
@@ -947,14 +951,18 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
         "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
         "!-      Use '!' comments if they need to be retained when using the IDFEditor.",
         "")
+    # }}}
 
+    # comment {{{
     idf_comment <- idf$comment[, .(row_id, line, object_id, comment, leading_spaces)]
     # init
     idf_comment[, output := ""]
     idf_comment[, output_space := strrep(" ", leading_spaces)]
     idf_comment[, output := paste0("!", output_space, comment)]
     idf_comment[, field_order := 0L]
+    # }}}
 
+    # value {{{
     idf_value <- idf$value[, .(row_id, class_order, class, object_id, field_order,
                                value, field, field_anid,  units)]
 
@@ -985,15 +993,17 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
               output_value := paste0(output_value, "  ")]
     # combine
     idf_value[, output := paste0(output, output_value, output_name, output_unit)]
+    # }}}
 
-    # combine comment and value
+    # combine comment and value {{{
     idf_output <- rbindlist(list(idf_comment, idf_value), fill = TRUE)[
         , .(row_id, object_id, class_order, field_order, class, output)]
     idf_output <- idf_output[!is.na(class_order), .(row_id, class_order, class)][
         idf_output[, `:=`(class_order = NULL, class = NULL)],
         on = "row_id", roll = -Inf]
+    # }}}
 
-    # handle different save options
+    # handle different save options {{{
     # "SortedOrder"
     if (save_format == "SortedOrder") {
         setorder(idf_output, row_id)
@@ -1014,6 +1024,13 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
         header <- c(header, "")
         setorder(idf_output, row_id)
     }
+    # }}}
+
+    # # handle special format object {{{
+    # if (idf$options$special_format) {
+
+    # }
+    # # }}}
 
     value_output <- idf_output[, output]
 
