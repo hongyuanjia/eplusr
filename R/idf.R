@@ -780,6 +780,7 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_comment <- idf_dt[is_comment == TRUE, .SD,
         .SDcol = c("row_id", "object_id", "line", "comment", "string", "leading_spaces")]
     idf_comment[is.na(leading_spaces), leading_spaces := 0L]
+    idf_comment[leading_spaces < 0L, leading_spaces := 0L]
     # get idf without comments
     idf_dt <- idf_dt[is_comment == FALSE, .SD,
          .SDcol = c("row_id", "object_id", "line", "type", "value", "comment", "string")]
