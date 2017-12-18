@@ -693,6 +693,9 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
     idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
                       special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
+    idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
+    idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = .(line, string, special_key)]
+    setnames(idf_option, "V1", "special_value")
     if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
         .N] > 1L) {
         option_idfeditor <- TRUE
@@ -930,6 +933,12 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     }
     header_option <- paste0("!-Option ", save_format)
 
+    special_format <- if (idf$options$special_format) "UseSpecialFormat" else NULL
+    ip_unit <- if (idf$options$view_in_ip) "ViewInIPunits" else NULL
+
+    header_option <- paste0(header_option, " ", special_format, " ", ip_unit)
+    header_option <- trimws(header_option, "right")
+
     # TODO: Add "UseSpecialFormat" and "ViewInIPunits" support
     header <- c(
         header_generator,
@@ -997,10 +1006,12 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     }
     # "OriginalOrderTop"
     if (save_format == "OriginalOrderTop") {
+        header <- c(header, "")
         setorder(idf_output, row_id)
     }
     # "OriginalOrderBottom"
     if (save_format == "OriginalOrderBottom") {
+        header <- c(header, "")
         setorder(idf_output, row_id)
     }
 
