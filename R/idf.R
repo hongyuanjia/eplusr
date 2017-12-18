@@ -291,7 +291,7 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
 
     idf_str <- read_idf(filepath)
     # check if input file is an imf file.
-    is_imf <- is_imf(idf_str)
+    is_imf <- is_imf_str(idf_str)
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
     # idf and idd version mismatch {{{
@@ -786,11 +786,11 @@ macro_dict <-
       # Marco debugging and listing
       "##symboltable", "##clear", "##reverse", "##!")
 # }}}
-# is_imf {{{1
-is_imf <- function (idf_lines) {
-    is_imf <- any(purrr::map_lgl(macro_dict, ~any(startsWith(idf_lines, .x))))
+# is_imf_str {{{1
+is_imf_str <- function (idf_lines) {
+    is_imf_str <- any(purrr::map_lgl(macro_dict, ~any(startsWith(idf_lines, .x))))
 
-    return(is_imf)
+    return(is_imf_str)
 }
 # }}}1
 # update_obj_ref {{{
