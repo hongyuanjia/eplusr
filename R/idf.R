@@ -896,3 +896,13 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     return(invisible(idf_copy))
 }
 # }}}
+# valid_class {{{
+valid_class <- function (idf) {
+    setorder(copy(idf$class), group_order, class_order, object_id)[, unique(class)]
+}
+# }}}
+# print_output {{{
+print_output <- function (x) {
+    cat(x$output, sep = "\n")
+}
+# }}}
