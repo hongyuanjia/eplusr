@@ -857,10 +857,9 @@ print.IDF <- function (idf) {
         , output := paste0(num_obj, " ", class)]
 
     output <- count_obj[count_obj[, .I[1], by = .(group)]$V1,
-        output := paste0("\n", group, "\n---------------------------\n", output)][
-        , output]
+        output := paste0("\n", group, "\n---------------------------\n", output)]
 
-    cat(output, sep = "\n")
+    print_output(output)
 }
 # }}}
 # find_object {{{
@@ -892,7 +891,7 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
         output := paste0(output, "\n------------------------------------------------------------")]
     setorder(value_output, class_order, object_id, field_order)
 
-    cat(value_output[, output], sep = "\n")
+    print_output(value_output)
 
     return(invisible(idf_copy))
 }
