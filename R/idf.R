@@ -793,12 +793,12 @@ is_imf_str <- function (idf_lines) {
     return(is_imf_str)
 }
 # }}}1
-# update_obj_ref {{{
-update_obj_ref <- function (idf_value, idd) {
+# get_obj_ref {{{
+get_obj_ref <- function (idf, idd) {
     # get field values that are referred
     idf_ref_value_field <- NULL
     if (!is.null(idd$ref_object$field)) {
-        idf_ref_value_field <- idd$ref_object$field[idf_value,
+        idf_ref_value_field <- idd$ref_object$field[idf$value,
             on = c("class_order", "field_order"), nomatch = 0L][
             , .(ref_key, value)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -807,7 +807,7 @@ update_obj_ref <- function (idf_value, idd) {
     # get class values that are referred
     idf_ref_value_class <- NULL
     if (!is.null(idd$ref_object$class)) {
-        idf_ref_value_class <- idd$ref_object$class[idf_value,
+        idf_ref_value_class <- idd$ref_object$class[idf$value,
             on = c("class_order"), nomatch = 0L][
             field_order == 1L, .(ref_key, class)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -819,11 +819,11 @@ update_obj_ref <- function (idf_value, idd) {
 }
 # }}}
 # check_obj_ref {{{
-check_obj_ref <- function (idf_value, idd) {
+check_obj_ref <- function (idf, idd) {
     # get fields that have \object-list
     idf_ref_field <- data.table()
-    if (slash_exists(idf_value, "object_list")) {
-        idf_ref_field <- idf_value[!is.na(object_list),
+    if (slash_exists(idf$value, "object_list")) {
+        idf_ref_field <- idf$value[!is.na(object_list),
             .(row_id, line, string,
               object_id, class_order, field_order,
               object_list, value)][
@@ -837,7 +837,7 @@ check_obj_ref <- function (idf_value, idd) {
     }
 
     # get referred value
-    idf_ref_value <- update_obj_ref(idf_value, idd)
+    idf_ref_value <- get_obj_ref(idf, idd)
 
     idf_ref <- merge(idf_ref_field, idf_ref_value,
                      by.x = "object_list" , by.y = "ref_key")
