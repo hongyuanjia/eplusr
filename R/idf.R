@@ -947,4 +947,78 @@ console_width <- function() {
     return(as.integer(width))
 }
 # }}}
+# get_object {{{
+get_object <- function (idf, id) {
+    if (!(id %in% valid_id(idf, verbose = FALSE))) {
+        stop("Invalid object id. You can find all valid id using 'eplusr::valid_id'.", call. = FALSE)
+    }
+
+    single_object <- idf$value[object_id == id]
+
+    single_output <- get_output_value(single_object, show_id = TRUE)
+
+    print_output(single_output)
+
+    return(invisible(NULL))
+}
+# }}}
+# dup_object {{{
+dup_object <- function (idf, id, new_name = NULL, idd) {
+
+    max_id <- idf$value[, max(object_id)]
+    max_row <- idf$value[, max(row_id)]
+    max_line <- idf$value[, max(line)]
+
+    target_object <- idf$value[object_id == id]
+    target_class <- target_object[, unique(class)]
+    # check if the target object is an unique object
+    if (idd$class[class == target_class, unique_object]) {
+        stop("The target object is an unique object which cannot be duplicated.",
+             call. = FALSE)
+    }
+
+    # mark that this is a new object
+    target_object[, edited := 2L]
+    target_object[, object_id := max_id + 1L]
+    target_object[, row_id := seq_along(max_row) + max_row]
+    target_object[, line := seq_along(max_line) + max_line]
+
+    # Give new name if applicable {{{
+    if (target_object[field_order == 1L & grepl("Name", field, fixed = TRUE), .N]) {
+        # get all names of objects in the same class
+        all_names <- idf$value[class == target_class & field_order == 1L, value]
+        # get all names of new or midified objects in the same class
+        all_new_names <- idf$value[edited == 1L & class == target_class & field_order == 1L, value]
+        # auto-create a new name if new name is not given and make sure that an
+        # unique object name is created.
+        if (is.null(new_name)) {
+            n_new <- length(all_new_names)
+            if (n_new > 0L) {
+                target_object[field_order == 1L, value := paste0(value, "_", n_new)]
+            } else {
+                target_object[field_order == 1L, value := paste0(value, "_1")]
+            }
+        } else {
+            if (new_name %chin% all_names) {
+                used_id <- idf$value[class == target_class & field_order == 1L & field == new_name, object_id]
+                stop("Given new name has been used for object [ID:", used_id, "]",
+                     call. = FALSE)
+            } else {
+                used_id <- idf$value[class == target_class & field_order == 1L, value := new_name]
+            }
+        }
+    } else {
+        if (!is.null(new_name)) {
+            warning("'new_name' is ignored for class ", target_class, call. = FALSE)
+        }
+    }
+    # }}}
+
+    idf$value <- rbindlist(list(idf$value, target_object))
+
+    idf$ref <- get_obj_ref(idf$value, idd)
+
+    return(idf)
+}
+# }}}
 is.idf <- function (x) inherits(x, "IDF")
