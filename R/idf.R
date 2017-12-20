@@ -877,36 +877,32 @@ print.IDF <- function (idf) {
 # }}}
 # find_object {{{
 find_object <- function (idf, pattern, full = TRUE, ...) {
-    # copy whole idf to preserve the original input untouched.
-    idf_copy <- idf
 
     if (full) {
         pattern = paste0(pattern, "$")
     }
 
-    idf_copy$value <- idf_copy$value[grepl(pattern, class, ...)]
-    if (nrow(idf_copy$value) == 0L) {
+    idf_value <- idf$value[grepl(pattern, class, ...)]
+    if (nrow(idf_value) == 0L) {
         stop("No matched object found.", call. = FALSE)
     }
-    idf_copy$class <- idf_copy$class[class %chin% idf_copy$value[, unique(class)]]
 
-    value_output <- get_output_value(idf_copy$value)
-    object_count <- value_output[, .N, by = .(class, object_id)][, .N, by = .(class)]
-    value_output <- object_count[value_output, on = "class", roll = Inf]
+    object_count <- idf_value[, .N, by = .(class, object_id)][, .N, by = .(class)]
+    idf_value <- get_output_value(idf_value, show_id = TRUE)
+    idf_value <- object_count[idf_value, on = "class", roll = Inf]
 
     # add class heading
-    setorder(value_output, row_id)
-    value_output[, class_group := .GRP, by = .(rleid(class))]
-    value_output[value_output[, .I[1], by = .(class_group)]$V1,
-        output := paste0("\n[=========== ", N, " Objects Found in Class: ",
-        class, " ===========]\n\n", output)]
-    value_output[value_output[, .I[.N], by = .(class_group)]$V1,
-        output := paste0(output, "\n------------------------------------------------------------")]
-    setorder(value_output, class_order, object_id, field_order)
+    setorder(idf_value, row_id)
+    idf_value[, class_group := .GRP, by = .(rleid(class))]
+    idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
+              output := paste0("\n",
+                stringr::str_pad(paste0("== * ", N, " Objects Found in Class: ", class, " * "), console_width(), side = "right", pad = "=" ), "\n\n", output)]
 
-    print_output(value_output)
+    setorder(idf_value, class_order, object_id, field_order)
 
-    return(invisible(idf_copy))
+    print_output(idf_value)
+
+    return(invisible())
 }
 # }}}
 # valid_class {{{
