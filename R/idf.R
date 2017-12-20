@@ -910,6 +910,17 @@ valid_class <- function (idf) {
     setorder(copy(idf$class), group_order, class_order, object_id)[, unique(class)]
 }
 # }}}
+# valid_id {{{
+valid_id <- function (idf) {
+    idf_value <- idf$value[idf$value[, .I[1:3], by = .(class)]$V1][ !is.na(class_order)]
+    idf_value <- get_output_value(idf_value, show_id = TRUE)
+    idf_value[field_order == 3L, output := "    ........\n"]
+
+    print_output(idf_value)
+
+    return(invisible(idf$value[, unique(object_id)]))
+}
+# }}}
 # print_output {{{
 print_output <- function (x) {
     cat(x$output, sep = "\n")
