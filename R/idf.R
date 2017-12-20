@@ -915,3 +915,17 @@ print_output <- function (x) {
     cat(x$output, sep = "\n")
 }
 # }}}
+# console_width {{{
+# Reference: `cli` (https://github.com/r-lib/cli)
+console_width <- function() {
+    width <- getOption(
+        "cli.width",
+        Sys.getenv("RSTUDIO_CONSOLE_WIDTH",
+                   getOption("width", 80)
+        )
+    )
+
+    return(as.integer(width))
+}
+# }}}
+is.idf <- function (x) inherits(x, "IDF")
