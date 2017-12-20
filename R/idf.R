@@ -492,6 +492,8 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_class_all <- merge(idf_dt, copy(idd$class)[, class_upper_case := toupper(class)],
         by = "class_upper_case", all = TRUE, sort = FALSE)
     idf_class <- idf_class_all[type == type_object]
+    # add an indicator column to mark the class has been modified or not.
+    idf_class[, edited := 0L]
     # }}}
 
     # FIELD
@@ -567,7 +569,9 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     }
 
     # clean up after error checking
-    idf_value <- idf_value_all[!is.na(line)]
+    idf_value <- idf_value_all[!is.na(line)][, reference := NULL]
+    # add an indicator column to mark the fields has been modified or not.
+    idf_value[, edited := 0L]
 
     # wrong class and field references {{{
     idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
@@ -576,6 +580,7 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                     idf_errors_wrong_references)
     }
     # }}}
+    idf_ref <- get_obj_ref(idf_value, idd)
 
     idf <- list(version = idf_version,
                 options = list(save_format = option_save,
@@ -584,7 +589,8 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                                idfeditor = option_idfeditor),
                 class = idf_class,
                 value = idf_value,
-                comment = idf_comment)
+                comment = idf_comment,
+                ref = idf_ref)
 
     class(idf) <- c("IDF", class(idf))
     return(idf)
@@ -807,11 +813,11 @@ is_imf_str <- function (idf_lines) {
 }
 # }}}1
 # get_obj_ref {{{
-get_obj_ref <- function (idf, idd) {
+get_obj_ref <- function (idf_value, idd) {
     # get field values that are referred
     idf_ref_value_field <- NULL
     if (!is.null(idd$ref_object$field)) {
-        idf_ref_value_field <- idd$ref_object$field[idf$value,
+        idf_ref_value_field <- idd$ref_object$field[idf_value,
             on = c("class_order", "field_order"), nomatch = 0L][
             , .(ref_key, value)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -820,7 +826,7 @@ get_obj_ref <- function (idf, idd) {
     # get class values that are referred
     idf_ref_value_class <- NULL
     if (!is.null(idd$ref_object$class)) {
-        idf_ref_value_class <- idd$ref_object$class[idf$value,
+        idf_ref_value_class <- idd$ref_object$class[idf_value,
             on = c("class_order"), nomatch = 0L][
             field_order == 1L, .(ref_key, class)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -850,7 +856,7 @@ check_obj_ref <- function (idf, idd) {
     }
 
     # get referred value
-    idf_ref_value <- get_obj_ref(idf, idd)
+    idf_ref_value <- get_obj_ref(idf$value, idd)
 
     idf_ref <- merge(idf_ref_field, idf_ref_value,
                      by.x = "object_list" , by.y = "ref_key")
@@ -911,12 +917,14 @@ valid_class <- function (idf) {
 }
 # }}}
 # valid_id {{{
-valid_id <- function (idf) {
+valid_id <- function (idf, verbose = TRUE) {
     idf_value <- idf$value[idf$value[, .I[1:3], by = .(class)]$V1][ !is.na(class_order)]
     idf_value <- get_output_value(idf_value, show_id = TRUE)
     idf_value[field_order == 3L, output := "    ........\n"]
 
-    print_output(idf_value)
+    if (verbose) {
+        print_output(idf_value)
+    }
 
     return(invisible(idf$value[, unique(object_id)]))
 }
