@@ -712,16 +712,14 @@ get_output_comment <- function (idf_comment) {
 }
 # }}}
 # get_output_value {{{
-get_output_value <- function (idf_value) {
+get_output_value <- function (idf_value, show_id = FALSE) {
     idf_value <- idf_value[, .(row_id, class_order, class, object_id, field_order,
                                value, field, field_anid,  units)]
 
-    # init
-    idf_value[, output := ""]
-
     # add class name
+    idf_value[, output_class := ""]
     idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
-              output := paste0(output, class, ",\n")]
+              output_class := paste0(class, ",\n")]
 
     # for field name
     idf_value[is.na(field), output_name := paste0("!- ", field_anid)]
@@ -741,8 +739,23 @@ get_output_value <- function (idf_value) {
               output_value := stringr::str_pad(output_value, 29L, side = "right")]
     idf_value[nchar(output_value) > 29L,
               output_value := paste0(output_value, "  ")]
+
     # combine
-    idf_value[, output := paste0(output, output_value, output_name, output_unit)]
+    if (show_id) {
+        max_id <- idf_value[, max(object_id)]
+        setorder(idf_value, class_order, object_id, field_order)
+        idf_value[, output_id := ""]
+        idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
+            output_id := paste0(
+                "[ID:", stringr::str_pad(object_id, nchar(max_id), "left", " "), "] ")
+        ]
+
+        idf_value[, output := paste0(
+            output_id, output_class, output_value, output_name, output_unit)]
+    } else {
+        idf_value[, output := paste0(
+            output_class, output_value, output_name, output_unit)]
+    }
 
     setorder(idf_value, class_order, object_id, field_order)
 
