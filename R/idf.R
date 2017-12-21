@@ -494,6 +494,15 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_class <- idf_class_all[type == type_object]
     # add an indicator column to mark the class has been modified or not.
     idf_class[, edited := 0L]
+    # select needed columns
+    col_class_all <- names(idf_class)
+    col_class_full <- c("object_id", "group_order", "group",
+        "class_order", "class", "format", "min_fields", "max_fields",
+        "required_object", "unique_object", "memo", "edited", "shit",
+        # for error checking
+        "line", "string", "value")
+    col_class_avail <- col_class_all[!is.na(match(col_class_all, col_class_full))]
+    idf_class <- idf_class[, .SD, .SDcol = col_class_avail]
     # }}}
 
     # FIELD
@@ -569,9 +578,18 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     }
 
     # clean up after error checking
-    idf_value <- idf_value_all[!is.na(line)][, reference := NULL]
+    idf_class[, c("line", "string", "value") := NULL]
+    idf_value <- idf_value_all[!is.na(line)][, c("reference", "comment") := NULL]
     # add an indicator column to mark the fields has been modified or not.
     idf_value[, edited := 0L]
+    # select needed columns
+    col_value_all <- names(idf_value)
+    col_value_full <- c("row_id", "object_id", "class_order", "class",
+        "field_order", "field", "field_anid", "field_an", "field_id", "value",
+        "units", "ip_units", "default", "key", "maximum", "maximum<", "minimum",
+        "minimum>", "required_field", "object_list", "edited")
+    col_value_avail <- col_value_all[!is.na(match(col_value_all, col_value_full))]
+    idf_value <- idf_value[, .SD, .SDcol = col_value_avail]
 
     # wrong class and field references {{{
     idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
