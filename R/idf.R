@@ -631,10 +631,16 @@ read_idf <- function (filepath) {
 
 # save_idf {{{
 save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
+    save_format <- switch(format,
+           asis = idf_options$save_format,
+           sorted = "SortedOrder",
+           ori_bot = "OriginalOrderBottom",
+           ori_top = "OriginalOrderTop")
+    if (is.null(save_format)) save_format <- "SortedOrder"
 
-    header <- get_output_header(idf$options, format = foramt)
+    header <- get_output_header(idf$options, format = save_format)
     comment <- get_output_comment(idf$comment)
-    value <- get_output_value(idf$value)
+    value <- get_output_line(idf$value)
 
     # combine comment and value {{{
     output <- rbindlist(list(comment, value), fill = TRUE)[
@@ -647,7 +653,7 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     # handle different save options {{{
     # "SortedOrder"
     if (save_format == "SortedOrder") {
-        setorder(output, row_id)
+        setorder(output, object_id, field_order)
         # add class heading
         output[, class_group :=  .GRP, by = .(rleid(class))]
         output[output[, .I[1], by = .(class_group)]$V1,
@@ -658,12 +664,12 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     # "OriginalOrderTop"
     if (save_format == "OriginalOrderTop") {
         header <- c(header, "")
-        setorder(output, row_id)
+        setorder(output, object_id, field_order)
     }
     # "OriginalOrderBottom"
     if (save_format == "OriginalOrderBottom") {
         header <- c(header, "")
-        setorder(output, row_id)
+        setorder(output, object_id, field_order)
     }
     # }}}
 
