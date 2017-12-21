@@ -687,7 +687,7 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
 }
 # }}}
 # get_output_header {{{
-get_output_header <- function (idf_options, format = c("asis", "sorted", "ori_bot", "ori_top")) {
+get_output_header <- function (idf_options, format = c("SortedOrder", "OriginalOrderBottom", "OriginalOrderTop")) {
     format <- match.arg(format)
 
     if (idf_options$idfeditor) {
@@ -696,17 +696,11 @@ get_output_header <- function (idf_options, format = c("asis", "sorted", "ori_bo
         header_generator <- "!-Generator eplusr"
     }
 
-    save_format <- switch(format,
-           asis = idf_options$save_format,
-           sorted = "SortedOrder",
-           ori_bot = "OriginalOrderBottom",
-           ori_top = "OriginalOrderTop")
-
     # Default use "SortedOrder"
-    if (is.null(save_format)) {
-        save_format <- "SortedOrder"
+    if (is.null(format)) {
+        format <- "SortedOrder"
     }
-    header_option <- paste0("!-Option ", save_format)
+    header_option <- paste0("!-Option ", format)
 
     special_format <- if (idf_options$special_format) "UseSpecialFormat" else NULL
     ip_unit <- if (idf_options$view_in_ip) "ViewInIPunits" else NULL
@@ -741,53 +735,121 @@ get_output_comment <- function (idf_comment) {
     return(idf_comment)
 }
 # }}}
-# get_output_value {{{
-get_output_value <- function (idf_value, show_id = FALSE) {
-    idf_value <- idf_value[, .(row_id, class_order, class, object_id, field_order,
-                               value, field, field_anid,  units)]
+# get_output_line {{{
+get_output_line <- function (idf_value, keep_all = FALSE, show_class = TRUE,
+                             show_id = FALSE, fill_na = FALSE, indent = TRUE,
+                             standard = TRUE, new_line = TRUE) {
+    idf_value <- copy(idf_value)
 
+    comb_list <- c("output_value", "output_field")
     # add class name
+    if (show_class) {
+        idf_value <- add_output_class(idf_value)
+        comb_list <- c("output_class", comb_list)
+    }
+
+    # add field value
+    idf_value <- add_output_value(idf_value, fill_na = fill_na, indent = indent)
+
+    # add field name
+    idf_value <- add_output_field(idf_value, keep_all = keep_all, standard = standard, new_line = new_line)
+
+    # add object id
+    if (show_id) {
+        idf_value <- add_output_id(idf_value)
+        comb_list <- c("output_id", comb_list)
+    }
+
+    idf_value[, output := do.call(paste0, .SD), .SDcol = comb_list]
+
+    setorder(idf_value, class_order, object_id, field_order)
+
+    if (!keep_all) {
+        idf_value[, c(comb_list) := NULL]
+    }
+
+    return(idf_value)
+}
+# }}}
+# add_output_id {{{
+add_output_id <- function (idf_value) {
+    max_id <- idf_value[, max(object_id)]
+    setorder(idf_value, class_order, object_id, field_order)
+    idf_value[, output_id := ""]
+    idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
+        output_id := paste0(
+            "[ID:", stringr::str_pad(object_id, nchar(max_id), "left", " "), "] ")
+    ]
+
+    return(idf_value)
+}
+# }}}
+# add_output_class {{{
+add_output_class <- function (idf_value) {
     idf_value[, output_class := ""]
     idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
               output_class := paste0(class, ",\n")]
 
-    # for field name
-    idf_value[is.na(field), output_name := paste0("!- ", field_anid)]
-    idf_value[!is.na(field), output_name := paste0("!- ", field)]
-    # for field unit
-    idf_value[is.na(units), output_unit := ""]
-    idf_value[!is.na(units), output_unit := paste0(" {", units, "}")]
-    # add a new line after the last field per class
-    idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
-              output_unit := paste0(output_unit, "\n")]
-    # for field value
-    idf_value[, output_value := paste0("    ", value, ",")]
+    return(idf_value)
+}
+# }}}
+# add_output_value {{{
+add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE) {
+    idf_value[, value_fill := value]
+    if (fill_na) {
+        idf_value[is.na(value_fill), value_fill := ""]
+    }
+    idf_value[, output_value := paste0("    ", value_fill, ",")][
+        , `:=`(value_fill = NULL)]
     idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
               output_value := sub(",$", ";", output_value)]
-    # handle indentation
-    idf_value[nchar(output_value) <= 29L,
-              output_value := stringr::str_pad(output_value, 29L, side = "right")]
-    idf_value[nchar(output_value) > 29L,
-              output_value := paste0(output_value, "  ")]
 
-    # combine
-    if (show_id) {
-        max_id <- idf_value[, max(object_id)]
-        setorder(idf_value, class_order, object_id, field_order)
-        idf_value[, output_id := ""]
-        idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
-            output_id := paste0(
-                "[ID:", stringr::str_pad(object_id, nchar(max_id), "left", " "), "] ")
-        ]
-
-        idf_value[, output := paste0(
-            output_id, output_class, output_value, output_name, output_unit)]
-    } else {
-        idf_value[, output := paste0(
-            output_class, output_value, output_name, output_unit)]
+    if (indent) {
+        idf_value[nchar(output_value) <= 29L,
+                  output_value := stringr::str_pad(output_value, 29L, side = "right")]
+        idf_value[nchar(output_value) > 29L,
+                  output_value := paste0(output_value, "  ")]
     }
 
-    setorder(idf_value, class_order, object_id, field_order)
+    return(idf_value)
+}
+# }}}
+# add_output_field_name {{{
+add_output_field_name <- function (idf_value) {
+    idf_value[is.na(field), output_name := field_anid]
+    idf_value[!is.na(field), output_name := field]
+
+    return(idf_value)
+}
+# }}}
+# add_output_field_unit {{{
+add_output_field_unit <- function (idf_value) {
+    idf_value[is.na(units), output_unit := ""]
+    idf_value[!is.na(units), output_unit := paste0(" {", units, "}")]
+
+    return(idf_value)
+}
+# }}}
+# add_output_field {{{
+add_output_field <- function (idf_value, standard = TRUE, new_line = TRUE, keep_all = FALSE) {
+    idf_value <- add_output_field_name(idf_value)
+    idf_value <- add_output_field_unit(idf_value)
+
+    if (standard) {
+        idf_value[, output_name := paste0("!- ", output_name)]
+    }
+
+    if (new_line) {
+        # add a new line after the last field per class
+        idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
+                  output_unit := paste0(output_unit, "\n")]
+    }
+
+    idf_value[, output_field := paste0(output_name, output_unit)]
+
+    if (!keep_all) {
+        idf_value[, `:=`(output_name = NULL, output_unit = NULL)]
+    }
 
     return(idf_value)
 }
@@ -918,7 +980,7 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     }
 
     object_count <- idf_value[, .N, by = .(class, object_id)][, .N, by = .(class)]
-    idf_value <- get_output_value(idf_value, show_id = TRUE)
+    idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value <- object_count[idf_value, on = "class", roll = Inf]
 
     # add class heading
@@ -943,7 +1005,7 @@ valid_class <- function (idf) {
 # valid_id {{{
 valid_id <- function (idf, verbose = TRUE) {
     idf_value <- idf$value[idf$value[, .I[1:3], by = .(class)]$V1][ !is.na(class_order)]
-    idf_value <- get_output_value(idf_value, show_id = TRUE)
+    idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value[field_order == 3L, output := "    ........\n"]
 
     if (verbose) {
@@ -954,8 +1016,8 @@ valid_id <- function (idf, verbose = TRUE) {
 }
 # }}}
 # print_output {{{
-print_output <- function (x) {
-    cat(x$output, sep = "\n")
+print_output <- function (x, col = "output") {
+    cat(x[[col]], sep = "\n")
 }
 # }}}
 # console_width {{{
@@ -979,7 +1041,7 @@ get_object <- function (idf, id) {
 
     single_object <- idf$value[object_id == id]
 
-    single_output <- get_output_value(single_object, show_id = TRUE)
+    single_output <- get_output_line(single_object, show_id = TRUE)
 
     print_output(single_output)
 
@@ -1004,8 +1066,8 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
     # mark that this is a new object
     target_object[, edited := 2L]
     target_object[, object_id := max_id + 1L]
-    target_object[, row_id := seq_along(max_row) + max_row]
-    target_object[, line := seq_along(max_line) + max_line]
+    target_object[, row_id := seq_along(.I) + max_row]
+    target_object[, line := seq_along(.I) + max_line]
 
     # Give new name if applicable {{{
     if (target_object[field_order == 1L & grepl("Name", field, fixed = TRUE), .N]) {
