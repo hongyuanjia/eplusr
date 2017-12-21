@@ -302,10 +302,12 @@ parse_idd <- function(filepath) {
                      minimum = as.double(minimum),
                      `maximum<` = as.double(`maximum<`),
                      `minimum>` = as.double(`minimum>`),
+                     required_field = as.logical(required_field),
                      unitsbasedonfield = as.logical(unitsbasedonfield))]
     # fill na
     idd_field[is.na(autocalculatable), autocalculatable := FALSE]
     idd_field[is.na(autosizable), autosizable := FALSE]
+    idd_field[is.na(required_field), required_field := FALSE]
     idd_field[is.na(unitsbasedonfield), unitsbasedonfield := FALSE]
 
     # order fields per class
