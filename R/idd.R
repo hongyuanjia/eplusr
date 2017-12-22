@@ -35,7 +35,10 @@ parse_idd <- function(filepath) {
 
     pb$update(0.2, tokens = list(what = "Parsing "))
     # Delete all comment and blank lines
-    idd_dt <- idd_dt[grep("^!|(^$)", string, invert = TRUE)]
+    line_comment <- idd_dt[startsWith(string, "!"), line]
+    line_blank <- idd_dt[nchar(string) == 0L, line]
+    idd_dt[!(line %in% c(line_comment, line_blank))]
+    idd_dt <- idd_dt[-c(line_comment, line_blank)]
     # mark type{{{
     # -2, unknown
     type_unknown <- -2L
