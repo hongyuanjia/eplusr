@@ -373,8 +373,6 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     idf_dt[endsWith(value, ";"), type := type_field_last]
     # clean unused columns
     idf_dt[, `:=`(explpt_loc = NULL, special_loc = NULL)]
-    # NOTE: treat macro lines as the same as comments
-    idf_dt[type == type_macro, type := type_comment]
     # }}}
 
     # special comment key and value {{{
@@ -384,45 +382,53 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     option_save <- NULL
 
     idf_option <- idf_dt[type == type_special]
-    idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
-    idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
-                      special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
-    idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
-    idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = .(line, string, special_key)]
-    setnames(idf_option, "V1", "special_value")
-    if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
-        .N] > 1L) {
-        option_idfeditor <- TRUE
-    }
-    if (idf_option[special_key == "OPTION" & special_value == "USESPECIALFORMAT",
+    if (not_empty(idf_option)) {
+        idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
+        idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
+                          special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
+        idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
+        idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = .(line, string, special_key)]
+        setnames(idf_option, "V1", "special_value")
+        if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
+            .N] > 1L) {
+            option_idfeditor <- TRUE
+        }
+        if (idf_option[special_key == "OPTION" & special_value == "USESPECIALFORMAT",
+                .N] == 1L) {
+            option_special_format <- TRUE
+        }
+        if (idf_option[special_key == "OPTION" & special_value == "VIEWINIPUNITS",
             .N] == 1L) {
-        option_special_format <- TRUE
-    }
-    if (idf_option[special_key == "OPTION" & special_value == "VIEWINIPUNITS",
-        .N] == 1L) {
-        option_view_in_ip_units <- TRUE
-    }
-    idf_option[special_key == "OPTION" & special_value == "SORTEDORDER",
-               option_save := "SortedOrder"]
-    idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERTOP",
-               option_save := "OriginalOrderTop"]
-    idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERBOTTOM",
-               option_save := "OriginalOrderBottom"]
-    idf_errors_option_save <- idf_option[!is.na(option_save), .(line, string, option_save)]
-    option_save <- idf_errors_option_save[, unique(option_save)]
-    if (is_empty(option_save)) {
-        option_save <- NULL
-    }
-    if (nrow(idf_errors_option_save) > 1L) {
-        parse_issue(type = "More than one save option found", idf_errors_option_save,
-                    src = "IDF", stop = FALSE,
-                    info = glue::glue("Only the first option '{option_save[1]}' \\
-                                       will be used."))
-    }
-    # for imf, always use "OriginalOrderBottom"
-    if (is_imf) {
-        option_save <- "OriginalOrderBottom"
-    }
+            option_view_in_ip_units <- TRUE
+        }
+        idf_option[special_key == "OPTION" & special_value == "SORTEDORDER",
+                   option_save := "SortedOrder"]
+        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERTOP",
+                   option_save := "OriginalOrderTop"]
+        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERBOTTOM",
+                   option_save := "OriginalOrderBottom"]
+        idf_errors_option_save <- idf_option[!is.na(option_save), .(line, string, option_save)]
+        option_save <- idf_errors_option_save[, unique(option_save)]
+        if (is_empty(option_save)) {
+            option_save <- NULL
+        }
+        if (nrow(idf_errors_option_save) > 1L) {
+            parse_issue(type = "More than one save option found", idf_errors_option_save,
+                        src = "IDF", stop = FALSE,
+                        info = glue::glue("Only the first option '{option_save[1]}' \\
+                                           will be used."))
+        }
+        }
+        # for imf, always use "OriginalOrderBottom"
+        if (is_imf) {
+            option_save <- "OriginalOrderBottom"
+        }
+
+    heading_options = list(
+        save_format = option_save,
+        special_format = option_special_format,
+        view_in_ip = option_view_in_ip_units,
+        idfeditor = option_idfeditor)
     # }}}
 
     # get rid of special comment lines
@@ -433,9 +439,10 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # 'Version,8.8;' and it may not, e.g. '0.0,0.0,0.0,' in
     # 'BuildingSurface:Detailed'.
     # get number of condensed values
-    idf_dt[!is.na(value), `:=`(value_count = stringr::str_count(value, "[,;]"))]
+    idf_dt[!is.na(value), `:=`(value_count = char_count(value, "[,;]"))]
     idf_dt[is.na(value), `:=`(value_count = 0L)]
-    idf_dt <- idf_dt[type != type_comment, strsplit(value, "\\s*[,;]\\s*"), by = .(line)][
+    idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)),
+        strsplit(value, "\\s*[,;]\\s*"), by = .(line)][
         idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
     setnames(idf_dt, "V1", "value")
     # get row numeber of last field per condensed field line in each class
@@ -465,22 +472,23 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # class name except the last field is the last non-blank and non-comment
     # line. Others are just normal fields.
     idf_dt[type == type_field_last, object_id := .GRP, by = .(row_id)]
-    # fill object_id backward for non-comment lines
-    idf_dt[, is_comment := FALSE]
-    idf_dt[type == type_comment, is_comment := TRUE]
-    # link comments to object order
     idf_dt <- idf_dt[!is.na(object_id), .(row_id, object_id)][
         idf_dt[, object_id := NULL], on = c("row_id"), roll = -Inf]
     # }}}
 
-    # get comments and macros
-    idf_comment <- idf_dt[is_comment == TRUE, .SD,
-        .SDcol = c("row_id", "object_id", "line", "comment", "string", "leading_spaces")]
+    # COMMENT (MACRO)
+    # {{{
+    idf_comment <- idf_dt[type %in% c(type_macro, type_comment), .SD,
+        .SDcol = c("type", "object_id", "comment", "leading_spaces")]
     idf_comment[is.na(leading_spaces), leading_spaces := 0L]
     idf_comment[leading_spaces < 0L, leading_spaces := 0L]
+    idf_comment[, field_order := seq_along(.I), by = .(object_id)]
+    idf_comment[, .SD, .SDcol = c("type", "object_id", "field_order", "comment", "leading_spaces")]
+    # }}}
     # get idf without comments
-    idf_dt <- idf_dt[is_comment == FALSE, .SD,
-         .SDcol = c("row_id", "object_id", "line", "type", "value", "comment", "string")]
+    # NOTE: currently, inline comments are not supported.
+    idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)), .SD,
+         .SDcol = c("row_id", "object_id", "line", "type", "value", "string")]
     # class name should be the same of 'value' column for first line grouped by
     # object_id
     idf_dt[idf_dt[, .I[1], by = object_id]$V1,
@@ -491,6 +499,37 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # merge IDD class data
     idf_class_all <- merge(idf_dt, copy(idd$class)[, class_upper_case := toupper(class)],
         by = "class_upper_case", all = TRUE, sort = FALSE)
+
+    # Error checking {{{
+    # duplicated unqiue object {{{
+    idf_errors_duplicated_unique <- idf_class_all[unique_object == TRUE][duplicated(class), .(line, class)]
+    if (not_empty(idf_errors_duplicated_unique)) {
+        stop(glue::glue("Duplicated unique object found for class",
+                        glue::collapse(idf_errors_duplicated_unique$class, sep = ",",
+                                       last = " and ")),
+             call. = FALSE)
+    }
+    # }}}
+    # un-recognized class names {{{
+    idf_errors_unknown_class <- idf_class_all[type == type_object][!is.na(value) & is.na(class), .(line, string)]
+    if (not_empty(idf_errors_unknown_class)) {
+        parse_issue(type = "Object type not recognized", idf_errors_unknown_class,
+                    src = "IDF",
+                    info = "This error may be caused by a misspelled object name.")
+    }
+    # }}}
+    # Do not check missing required objects and fields for imf files.
+    if (!is_imf) {
+        # missing required object {{{
+        idf_errors_missing_required <- idf_class_all[required_object == TRUE & is.na(line), class]
+        if (not_empty(idf_errors_missing_required)) {
+            stop(glue::glue("Missing required object ",
+                            glue::collapse(idf_errors_missing_required)),
+                 call. = FALSE)
+        }
+        # }}}
+    }
+    # }}}
     idf_class <- idf_class_all[type == type_object]
     # add an indicator column to mark the class has been modified or not.
     idf_class[, edited := 0L]
@@ -498,9 +537,7 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     col_class_all <- names(idf_class)
     col_class_full <- c("object_id", "group_order", "group",
         "class_order", "class", "format", "min_fields", "max_fields",
-        "required_object", "unique_object", "memo", "edited", "shit",
-        # for error checking
-        "line", "string", "value")
+        "required_object", "unique_object", "memo", "edited")
     col_class_avail <- col_class_all[!is.na(match(col_class_all, col_class_full))]
     idf_class <- idf_class[, .SD, .SDcol = col_class_avail]
     # }}}
@@ -513,34 +550,15 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
         # get rid of class lines
         type > type_object][, c("type", "class_upper_case") := NULL]
     # order fields per object
-    idf_field[, field_order := seq_along(row_id), by = .(object_id)]
+    idf_field[, field_order := seq_along(.I), by = .(object_id)]
 
     idf_value_all <- merge(idf_field, idd$field,
         by = c("class_order", "class", "field_order"), all = TRUE)
-    # }}}
-
-    # Error checking
-    # un-recognized class names {{{
-    idf_errors_unknown_class <- idf_class[!is.na(value) & is.na(class), .(line, string)]
-    if (not_empty(idf_errors_unknown_class)) {
-        parse_issue(type = "Object type not recognized", idf_errors_unknown_class,
-                    src = "IDF",
-                    info = "This error may be caused by a misspelled object name.")
-    }
-    # }}}
-    # duplicated unqiue object {{{
-    idf_errors_duplicated_unique <- idf_class_all[unique_object == TRUE][duplicated(class), .(line, class)]
-    if (not_empty(idf_errors_duplicated_unique)) {
-        stop(glue::glue("Duplicated unique object found for class",
-                        glue::collapse(idf_errors_duplicated_unique$class, sep = ",",
-                                       last = " and ")),
-             call. = FALSE)
-    }
-    # }}}
+    # Error checking {{{
     # exceed max field {{{
     # get field number per class
     idf_num_fields <- idf_field[, .(num_fields = .N), by = .(object_id, class)]
-    idf_errors_max_fields <- idf_class[idf_num_fields, on = c("object_id", "class")][
+    idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("object_id", "class")][
         num_fields > max_fields, .(line, class, max_fields, num_fields)]
     if (not_empty(idf_errors_max_fields)) {
         stop(glue::glue("Too many fields for objects \\
@@ -555,14 +573,6 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
     # }}}
     # Do not check missing required objects and fields for imf files.
     if (!is_imf) {
-        # missing required object {{{
-        idf_errors_missing_required <- idf_class_all[required_object == TRUE & is.na(line), class]
-        if (length(idf_errors_missing_required) > 0L) {
-            stop(glue::glue("Missing required object ",
-                            glue::collapse(idf_errors_missing_required)),
-                 call. = FALSE)
-        }
-        # }}}
         # missing required field {{{
         idf_errors_missing_required_field <- idf_value_all[!is.na(object_id)][required_field == TRUE & is.na(value)]
         if (not_empty(idf_errors_missing_required_field)) {
@@ -576,21 +586,15 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
         }
         # }}}
     }
-
+    # }}}
     # clean up after error checking
-    idf_class[, c("line", "string", "value") := NULL]
-    idf_value <- idf_value_all[!is.na(line)][, c("reference", "comment") := NULL]
+    idf_value <- idf_value_all[!is.na(line)][, c("reference") := NULL]
     # add an indicator column to mark the fields has been modified or not.
     idf_value[, edited := 0L]
-    # select needed columns
-    col_value_all <- names(idf_value)
-    col_value_full <- c("row_id", "object_id", "class_order", "class",
-        "field_order", "field", "field_anid", "field_an", "field_id", "value",
-        "units", "ip_units", "default", "key", "maximum", "maximum<", "minimum",
-        "minimum>", "required_field", "object_list", "edited")
-    col_value_avail <- col_value_all[!is.na(match(col_value_all, col_value_full))]
-    idf_value <- idf_value[, .SD, .SDcol = col_value_avail]
+    # }}}
 
+    # REF
+    # {{{
     # wrong class and field references {{{
     idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
     if (not_empty(idf_errors_wrong_references)) {
@@ -598,13 +602,20 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                     idf_errors_wrong_references)
     }
     # }}}
+    # select needed columns after ref checking
+    col_value_all <- names(idf_value)
+    col_value_full <- c("object_id", "class_order", "class", "field_order",
+        "field", "field_anid", "field_an", "field_id", "value", "units",
+        "ip_units", "default", "key", "maximum", "maximum<", "minimum",
+        "minimum>", "required_field", "object_list", "edited")
+    col_value_avail <- col_value_all[!is.na(match(col_value_all, col_value_full))]
+    idf_value <- idf_value[, .SD, .SDcol = col_value_avail]
+    setkey(idf_value, object_id, class_order, field_order)
     idf_ref <- get_obj_ref(idf_value, idd)
+    # }}}
 
     idf <- list(version = idf_version,
-                options = list(save_format = option_save,
-                               special_format = option_special_format,
-                               view_in_ip = option_view_in_ip_units,
-                               idfeditor = option_idfeditor),
+                options = heading_options,
                 class = idf_class,
                 value = idf_value,
                 comment = idf_comment,
@@ -671,6 +682,31 @@ is_imf_str <- function (idf_lines) {
     return(is_imf_str)
 }
 # }}}1
+# get_obj_ref {{{
+get_obj_ref <- function (idf_value, idd) {
+    # get field values that are referred
+    idf_ref_value_field <- NULL
+    if (!is.null(idd$ref_object$field)) {
+        idf_ref_value_field <- idd$ref_object$field[idf_value,
+            on = c("class_order", "field_order"), nomatch = 0L][
+            , .(ref_key, value)][
+            , .(ref_value = c(.SD)), by = .(ref_key)]
+    }
+
+    # get class values that are referred
+    idf_ref_value_class <- NULL
+    if (!is.null(idd$ref_object$class)) {
+        idf_ref_value_class <- idd$ref_object$class[idf_value,
+            on = c("class_order"), nomatch = 0L][
+            field_order == 1L, .(ref_key, class)][
+            , .(ref_value = c(.SD)), by = .(ref_key)]
+    }
+
+    idf_ref_value <- rbindlist(list(idf_ref_value_class, idf_ref_value_field))
+
+    return(idf_ref_value)
+}
+# }}}
 # check_obj_ref {{{
 check_obj_ref <- function (idf, idd) {
     # get fields that have \object-list
@@ -717,9 +753,10 @@ print.IDF <- function (idf) {
 # }}}
 
 # save_idf {{{
-save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
+save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_top")) {
+    format <- match.arg(format)
     save_format <- switch(format,
-           asis = idf_options$save_format,
+           asis = idf$options$save_format,
            sorted = "SortedOrder",
            ori_bot = "OriginalOrderBottom",
            ori_top = "OriginalOrderTop")
@@ -731,10 +768,10 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
 
     # combine comment and value {{{
     output <- rbindlist(list(comment, value), fill = TRUE)[
-        , .(row_id, object_id, class_order, field_order, class, output)]
-    output <- output[!is.na(class_order), .(row_id, class_order, class)][
+        , .(object_id, class_order, field_order, class, output)]
+    output <- output[!is.na(class_order), .(object_id, field_order, class_order, class)][
         output[, `:=`(class_order = NULL, class = NULL)],
-        on = "row_id", roll = -Inf]
+        on = c("object_id", "field_order"), roll = -Inf]
     # }}}
 
     # handle different save options {{{
@@ -768,9 +805,17 @@ save_idf <- function (idf, format = c("asis", "sorted", "ori_bot", "ori_top")) {
 
     value_output <- output[, output]
 
-    output <- c(header, value_output)
+    str_output <- c(header, value_output)
 
-    return(output)
+    # if (!dir.exists(dirname(path))) {
+    #     dir.create(dirname(path))
+    # }
+
+    # con <- file(path)
+    # writeLines(str_output, path)
+    # close(con)
+
+    return(str_output)
 }
 # }}}
 # get_output_header {{{
@@ -812,12 +857,17 @@ get_output_header <- function (idf_options, format = c("SortedOrder", "OriginalO
 # }}}
 # get_output_comment {{{
 get_output_comment <- function (idf_comment) {
-    idf_comment <- idf_comment[, .(row_id, line, object_id, comment, leading_spaces)]
+    idf_comment <- copy(idf_comment)
     # init
     idf_comment[, output := ""]
     idf_comment[, output_space := strrep(" ", leading_spaces)]
-    idf_comment[, output := paste0("!", output_space, comment)]
-    idf_comment[, field_order := 0L]
+    # for macro lines
+    idf_comment[type == -1L, output := paste0(output_space, comment)]
+    # for normal comment lines
+    idf_comment[type == 0L, output := paste0("!", output_space, comment)]
+    setorder(idf_comment, object_id, -field_order)
+    idf_comment[, field_order := -seq_along(.I), by = .(object_id)]
+    setorder(idf_comment, object_id, field_order)
 
     return(idf_comment)
 }
@@ -950,14 +1000,17 @@ print_output <- function (x, col = "output") {
 # valid_field {{{
 valid_field <- function (class, idf, idd, verbose = TRUE) {
     class_name <- class
-    assert_that(is_valid_class(class_name, idf))
+    assertthat::assert_that(is_valid_class(class_name, idf))
 
     all_fields <- add_output_field(idd$field[class == class_name],
         standard = FALSE, new_line = FALSE, keep_all = TRUE)[
         , output_field := paste0(field_order, ": ", output_field)]
 
     if (verbose) {
-        print_output(all_fields, "output_field")
+        output <- copy(all_fields)[
+            required_field == TRUE, output := paste0("*", output_field)][
+            required_field == FALSE, output := paste0(" ", output_field)]
+        print_output(output)
     }
 
     return(invisible(all_fields[, output_name]))
@@ -985,7 +1038,7 @@ valid_id <- function (idf, verbose = TRUE) {
 
 # get_class {{{
 get_class <- function (idf, id) {
-    assert_that(is_valid_id(id, idf))
+    assertthat::assert_that(is_valid_id(id, idf))
 
     single_class <- idf$class[object_id == id]
 
@@ -994,7 +1047,7 @@ get_class <- function (idf, id) {
 # }}}
 # get_object {{{
 get_object <- function (idf, id, verbose = TRUE) {
-    assert_that(is_valid_id(id, idf))
+    assertthat::assert_that(is_valid_id(id, idf))
 
     single_object <- idf$value[object_id == id]
 
@@ -1044,7 +1097,7 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 
     target_class <- get_class(idf, id = id)
     class_name <- target_class[, unique(class)]
-    assert_that(can_be_duplicated(class_name, idf, idd))
+    assertthat::assert_that(can_be_duplicated(class_name, idf, idd))
 
     target_object <- get_object(idf, id = id)
 
@@ -1093,8 +1146,8 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 # add_object {{{
 add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     class_name <- class
-    assert_that(is_valid_class(class_name, idf))
-    assert_that(can_be_duplicated(class_name, idf, idd))
+    assertthat::assert_that(is_valid_class(class_name, idf))
+    assertthat::assert_that(can_be_duplicated(class_name, idf, idd))
 
     new_class <- extract_class(class_name, idf = idf, idd = idd)
     new_object <- extract_object(class_name, min = min, idf = idf, idd = idd)
@@ -1132,9 +1185,9 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd, verbose = TRUE) {
-    assert_that(is_valid_id(idf, id))
+    assertthat::assert_that(is_valid_id(idf, id))
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values is empty")
+    assertthat::assert_that(not_empty(fields), msg = "Field values is empty")
 
     target_class <- get_class(idf, id = id)
 
@@ -1153,12 +1206,8 @@ set_object <- function (idf, id, ..., idd, verbose = TRUE) {
 # }}}
 
 # get_field_order {{{
-get_field_order <- function (idf_value, field_name, id = NULL) {
-    # add standard field name
-    idf_value <- add_output_field_name(idf_value)
-    # add lower case field_name
-    idf_value[, output_name_lower := tolower(output_name)]
-    idf_value[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
+get_field_order <- function (idf_value, field_name, id = NULL, idd) {
+
     if (is.null(id)) {
         id <- idf_value[, unique(object_id)]
         if (length(id) > 1L) {
@@ -1166,12 +1215,19 @@ get_field_order <- function (idf_value, field_name, id = NULL) {
         }
     }
 
+    assertthat::assert_that(is_valid_id(id, idf))
+
+    target_class <- idf_value[object_id == id, unique(class)]
+    idd_field <- idd$class[class == target_class]
+    # add standard field name
+    idd_field <- add_output_field_name(idd_field)
+    # add lower case field_name
+    idd_field[, output_name_lower := tolower(output_name)]
+    idd_field[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
     if (all(grepl("^[a-z]", field_name))) {
-        all_names <- idf_value[object_id == id][order(field_order)][
-            , output_name_lower]
+        all_names <- idd_field[order(field_order)][, output_name_lower]
     } else if (all(grepl("^[A-Z]", field_name))) {
-        all_names <- idf_value[object_id == id][order(field_order)][
-            , output_name]
+        all_names <- idd_field[order(field_order)][, output_name]
     } else {
         stop("Field names should be either in title-case or lower-case",
              call. = FALSE)
@@ -1198,21 +1254,21 @@ console_width <- function() {
 # }}}
 # is_valid_id {{{
 is_valid_id <- function (id, idf) {
-    id %in% valid_id(idf, verbose = FALSE)
+    length(id) == 1L & is.integer(id) & id %in% valid_id(idf, verbose = FALSE)
 }
 
-on_failure(is_valid_id) <- function(call, env) {
+assertthat::on_failure(is_valid_id) <- function(call, env) {
     paste0(deparse(call$id), " is not a valid object id. You can find all valid classes using 'eplusr::valid_id'")
 }
 # }}}
 # is_valid_class {{{
-#' @importFrom assertthat assert_that on_failure<-
+#' @importFrom assertthat assertthat::assert_that assertthat::on_failure<-
 
-is_valid_class <- function(class, class) {
+is_valid_class <- function(class, idf) {
     class %chin% valid_class(idf)
 }
 
-on_failure(is_valid_class) <- function(call, env) {
+assertthat::on_failure(is_valid_class) <- function(call, env) {
     paste0(deparse(call$class), " is not a valid class name. You can find all valid classes using 'eplusr::valid_class'")
 }
 # }}}
@@ -1228,23 +1284,23 @@ can_be_duplicated <- function (class, idf, idd) {
     idd$class[class == class_name, unique_object] && class_name %chin% valid_class(idf)
 }
 
-on_failure(can_be_duplicated) <- function(call, env) {
+assertthat::on_failure(can_be_duplicated) <- function(call, env) {
     paste0(deparse(call$class), " is an unique object and already exists")
 }
 # }}}
 # not_empty {{{
-not_empty <- function(x) {
+not_empty <- function (x) {
     all((dim(x) %||% length(x)) != 0)
 }
-on_failure(not_empty) <- function(call, env) {
+assertthat::on_failure(not_empty) <- function (call, env) {
     paste0(deparse(call$x), " is empty")
 }
 # }}}
 # is_empty {{{
-is_empty <- function(x) {
+is_empty <- function (x) {
     all((dim(x) %||% length(x)) == 0)
 }
-on_failure(is_empty) <- function(call, env) {
+assertthat::on_failure(is_empty) <- function (call, env) {
     paste0(deparse(call$x), " is not empty")
 }
 # }}}
@@ -1282,7 +1338,7 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
         object_data[, edited := 1L]
 
         id <- class_data[, unique(object_id)]
-        assert_that(is_valid_id(id, idf))
+        assertthat::assert_that(is_valid_id(id, idf))
         idf$class <- idf$class[object_id != id]
         idf$value <- idf$value[object_id != id]
     }
@@ -1329,19 +1385,30 @@ set_default <- function (idf_value) {
 # set_fields {{{
 set_fields <- function (object, fields, idd) {
 
-    # set specified values
+    class_name <- get_class_name(object)
+
     value_length <- length(fields)
     value_name <- names(fields)
 
+    if (is.null(value_name)) {
+        target_order <- seq_along(fields)
+    } else {
+        target_order <- get_field_order(new_object, value_name)
+    }
+
     # TODO: check value types and min, max range
 
-    # check num of fields
+    # check value types {{{
+
+    # }}}
+    # check num of fields {{{
     max_fields <- idd$class[class == class_name, max_fields]
     if (value_length > max_fields) {
         stop("Only *", max_fields, "* fields are applicable for class",
              sQuote(class_name), ", but ", value_length, " are given.",
              call. = FALSE)
     }
+    # }}}
 
     if (is.null(value_name)) {
         target_order <- seq_along(fields)
@@ -1366,3 +1433,10 @@ set_fields <- function (object, fields, idd) {
 }
 # }}}
 is.idf <- function (x) inherits(x, "IDF")
+`%||%` <- function (x, y) {
+    if (is.null(x)) {
+        y
+    } else {
+        x
+    }
+}
