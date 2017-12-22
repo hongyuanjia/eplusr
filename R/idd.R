@@ -34,6 +34,8 @@ parse_idd <- function(filepath) {
     idd_build <- idd_dt[grepl("!IDD_BUILD", string, fixed = TRUE), substr(string, 12L, nchar(string))]
 
     pb$update(0.2, tokens = list(what = "Parsing "))
+    # Delete all comment and blank lines
+    idd_dt <- idd_dt[grep("^!|(^$)", string, invert = TRUE)]
     # mark type{{{
     # -2, unknown
     type_unknown <- -2L
@@ -52,9 +54,6 @@ parse_idd <- function(filepath) {
     # 5 , field slash
     type_field_slash <- 5L
     idd_dt[, type := type_unknown]
-    setkey(idd_dt, line, type)
-    # Delete all comment and blank lines
-    idd_dt <- idd_dt[grep("^!|(^$)", string, invert = TRUE)]
     # trucate to characters left of ! in order to handle cases when there are
     # inline comments starting with "!", e.g.
     # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
@@ -65,17 +64,17 @@ parse_idd <- function(filepath) {
     idd_dt[startsWith(string, "\\"), type := type_slash]
     # categorize all lines with trailing comma into class. Lines that
     # have one slash can not be a class
-    idd_dt[type < -1L & endsWith(string, ","), type := type_class]
+    idd_dt[type == type_unknown & endsWith(string, ","), type := type_class]
     # categorize field lines
     idd_dt[grepl("\\", string, fixed = TRUE) & grepl("^[AaNn]", string), type := type_field]
     # ignore section if exists, e.g. "Simulation Data;"
-    line_section <- idd_dt[type == -2L & endsWith(string, ";"), which = TRUE]
-    if (length(line_section) > 0L) {
+    line_section <- idd_dt[type == type_unknown & endsWith(string, ";"), which = TRUE]
+    if (not_empty(line_section)) {
         idd_dt <- idd_dt[-line_section]
     }
     # if there are still known lines, report an error
-    line_error_invalid <- idd_dt[type < -1L, which = TRUE]
-    if (length(line_error_invalid) > 0L) {
+    line_error_invalid <- idd_dt[J(type_unknown), which = TRUE, on = "type"]
+    if (!is.na(line_error_invalid)) {
         parse_issue(type = "Invalid line found", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_invalid, .(line, string)])
     }
@@ -101,12 +100,8 @@ parse_idd <- function(filepath) {
     # handle condensed fields
     # {{{
     idd_dt[, field_count := 0L]
-    # TODO: find a better way to count occurrences in string without using
-    # "stringr" package
-    idd_dt[between(type, type_field, type_field_last), field_count := stringr::str_count(field_anid, "[,;]")]
-
-    idd_dt <- idd_dt[
-        between(type, type_field, type_field_last), strsplit(field_anid, "\\s*[,;]\\s*"), by = .(line)][
+    idd_dt[type %in% c(type_field, type_field_last),
+           field_count := char_count(field_anid, "[,;]")]
         idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
     setnames(idd_dt, "V1", "field_anid")
     # get row numeber of last field per condensed field line in each class
@@ -128,16 +123,39 @@ parse_idd <- function(filepath) {
     # get slash keys and values {{{
     idd_dt[type == type_slash, slash_key_value := string]
     # Remove slash
-    idd_dt[!is.na(slash_key_value), slash_key_value := trimws(substr(slash_key_value, 2L, nchar(slash_key_value)), which = "left")]
+    idd_dt[!is.na(slash_key_value),
+        slash_key_value := trimws(
+            substr(slash_key_value, 2L, nchar(slash_key_value)), which = "left")]
 
-    # handle informal slash keys
+    # handle informal field slash keys
     # {{{
     # have to handle some informal slash keys such as '\minimum >0' which should
     # be '\minimum> 0', and '\maximum <100' which should be `\maximum< 100`.
-    idd_dt[!is.na(slash_key_value) & grepl("^minimum\\s+>", slash_key_value, ignore.case = TRUE),
-           slash_key_value := gsub("\\s+>", "> ", slash_key_value)]
-    idd_dt[!is.na(slash_key_value) & grepl("^maximum\\s+<", slash_key_value, ignore.case = TRUE),
-           slash_key_value := gsub("\\s+<", "< ", slash_key_value)]
+    line_bad_min_exclu <- idd_dt[!is.na(slash_key_value)][
+        startsWith(slash_key_value, "minimum")][
+        , left_str := substr(slash_key_value, 8L, 9L)][
+        J(" >"), on = "left_str", line]
+    if (!is.na(line_bad_min_exclu)) {
+        idd_dt[line_bad_min_exclu,
+        slash_key_value := paste0(
+            "minimum> ",
+            substr(slash_key_value, 10L, nchar(slash_key_value))
+            )
+        ]
+    }
+
+    line_bad_max_exclu <- idd_dt[!is.na(slash_key_value)][
+        startsWith(slash_key_value, "maximum")][
+        , left_str := substr(slash_key_value, 8L, 9L)][
+        J(" <"), on = "left_str", line]
+    if (!is.na(line_bad_max_exclu)) {
+        idd_dt[line_bad_max_exclu,
+        slash_key_value := paste0(
+            "maximum< ",
+            substr(slash_key_value, 10L, nchar(slash_key_value))
+            )
+        ]
+    }
     # }}}
 
     # seperate slash key and value
@@ -222,13 +240,14 @@ parse_idd <- function(filepath) {
     # fix duplicated class slash lines such as "\min-fields 3" in
     # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
     # {{{
-    line_dup_class_slash <- idd_dt[between(type, type_class, type_class_slash)][
-        , class := class[1], by = .(cumsum(!is.na(class)))][
-        type == type_class_slash, .(line, class, slash_key_value)][
-        , .SD[duplicated(slash_key_value)], .SDcol = "line", by = .(class)][, line]
+    dup_class_slash <- idd_dt[J(c(type_class, type_class_slash)), on = "type"][
+        order(line)][, class := class[1], by = .(cumsum(!is.na(class)))][
+        J(type_class_slash), on = "type", .(line, class, slash_key_value)]
+    line_dup <- dup_class_slash[
+        duplicated(dup_class_slash, by = c("class", "slash_key_value")), line]
     # remove duplicated class slash lines
-    if (length(line_dup_class_slash) > 0L) {
-        idd_dt <- idd_dt[!(line %in% line_dup_class_slash)]
+    if (not_empty(line_dup)) {
+        idd_dt <- idd_dt[!(line %in% line_dup)]
     }
     # }}}
 
@@ -239,15 +258,16 @@ parse_idd <- function(filepath) {
     # "Foundation:Kiva" for "N16", have to fix it in advanced.
     # {{{
     # fill class downwards to make search easiser
-    line_dup_field_anid <- idd_dt[between(type, type_class, type_field_slash)][
-        ## fill class name downwards
+    dup_field_anid <- idd_dt[J(c(type_class, type_class_slash, type_field,
+        type_field_last, type_field_slash)), on = "type"][order(line)][
         , class := class[1], by = .(cumsum(!is.na(class)))][
-        type == type_field_slash & !is.na(field_anid), .(line, class, field_anid)][,
-        ## found duplicated field in the whole data.table
-        .SD[duplicated(field_anid)], .SDcol = "line",  by = .(class)][, line]
+        type == type_field_slash & !is.na(field_anid), .(line, class, field_anid)]
+
+    line_dup <- dup_field_anid[
+        duplicated(dup_field_anid, by = c("class", "field_anid")), line]
     # add a suffix of 'd' to the duplicated field
-    if (length(line_dup_field_anid) > 0L) {
-        idd_dt[line %in% line_dup_field_anid, `:=`(field_id = gsub("$", "_dup", field_id))]
+    if (not_empty(line_dup)) {
+        idd_dt[line %in% line_dup, `:=`(field_id = gsub("$", "_dup", field_id))]
     }
     # }}}
     # }}}
@@ -332,7 +352,8 @@ parse_idd <- function(filepath) {
     idd_class <- idd_class[!is.na(class)]
     # if slash key exists and slash value not, it must be a logical attribute,
     # such as "\\unique-object". Set it to TRUE
-    idd_class <- idd_class[!is.na(slash_key)][is.na(slash_value), slash_value := "TRUE"]
+    idd_class <- idd_class[!is.na(slash_key)][
+        is.na(slash_value), slash_value := "TRUE"]
     # order group and class as the sequence the appears in IDD
     idd_class[, group_order := .GRP, by = .(group)]
     idd_class[, class_order := .GRP, by = .(class)]
@@ -358,6 +379,7 @@ parse_idd <- function(filepath) {
     neworder <- c("group_order", "group", "class_order", "class", "format",
          "min_fields", "max_fields", "required_object", "unique_object")
     setcolorder(idd_class, c(neworder, setdiff(names(idd_class), neworder)))
+    setorder(idd_class, group_order, class_order)
     # }}}
 
     pb$update(0.85, tokens = list(what = "Parsing "))
@@ -1053,5 +1075,10 @@ conversion_units_record <- data.table(si_name, ip_name, mult, offset, alt, multi
 # slash_exists {{{
 slash_exists <- function (idd_data, slash) {
     any(grepl(slash, names(idd_data), fixed = TRUE))
+}
+# }}}
+# char_count {{{
+char_count <- function (x, pattern, ...) {
+    nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
 }
 # }}}
