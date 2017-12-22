@@ -29,9 +29,10 @@ parse_idd <- function(filepath) {
     pb$update(0.1, tokens = list(what = "Initialize"))
     # read idd string, get idd version and build
     idd_str <- read_idd(filepath)
+    idd_version <- get_idd_ver(idd_str)
+    idd_build <- get_idd_build(idd_str)
+
     idd_dt <- data.table(line = seq_along(idd_str), string = idd_str, key = "line")
-    idd_version <- idd_dt[grepl("!IDD_Version", string, fixed = TRUE), substr(string, 14L, nchar(string))]
-    idd_build <- idd_dt[grepl("!IDD_BUILD", string, fixed = TRUE), substr(string, 12L, nchar(string))]
 
     pb$update(0.2, tokens = list(what = "Parsing "))
     # Delete all comment and blank lines
@@ -1083,5 +1084,37 @@ slash_exists <- function (idd_data, slash) {
 # char_count {{{
 char_count <- function (x, pattern, ...) {
     nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
+}
+# }}}
+# get_idd_ver {{{
+get_idd_ver <- function (idd_str) {
+    ver_line <- idd_str[grepl("!IDD_Version", string, fixed = TRUE)]
+
+    if (length(ver_line) == 1L) {
+        ver <- substr(ver_line, 14L, nchar(ver_line))
+        return(ver)
+    } else if (length(ver_line > 1L)) {
+        "!DEBUG Multiple version found in IDD file."
+        return(NULL)
+    } else {
+        "!DEBUG No version found in IDD file."
+        return(NULL)
+    }
+}
+# }}}
+# get_idd_build {{{
+get_idd_build <- function (idd_str) {
+    build_line <- idd_str[grepl("!IDD_BUILD", string, fixed = TRUE)]
+
+    if (length(build_line) == 1L) {
+        build <- substr(build_line, 12L, nchar(build_line))
+        return(build)
+    } else if (length(build_line > 1L)) {
+        "!DEBUG Multiple build found in IDD file."
+        return(NULL)
+    } else {
+        "!DEBUG No build found in IDD file."
+        return(NULL)
+    }
 }
 # }}}
