@@ -21,8 +21,8 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
             private$time_read <- Sys.time()
         },
 
-        list = function (type = c("id", "class", "field"), class = NULL)
-            ilist_idf(self, private, type, class),
+        all = function (type = c("id", "class", "field"), class = NULL)
+            iall_idf(self, private, type, class),
 
         find = function (pattern, full = TRUE, ...)
             ifind_object(self, pattern, full, ...),
@@ -93,8 +93,9 @@ isave_idf <- function (self, path, format = c("asis", "sorted", "ori_bot", "ori_
 }
 # }}}
 
-# ilist_idf {{{
-ilist_idf <- function (self, private, type = c("id", "class", "field"), class = NULL) {
+# iall_idf {{{
+iall_idf <- function (self, private, type = c("id", "class", "field"), class = NULL) {
+    type <- match.arg(type)
     if(type == "field" && is.null(class)) {
         stop("'class' is required when type is 'field'.", call. = FALSE)
     }

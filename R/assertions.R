@@ -41,7 +41,7 @@ is_valid_id <- function (id, idf) {
 }
 
 on_failure(is_valid_id) <- function(call, env) {
-    paste0(sQuote(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$list('id')\"")
+    paste0(sQuote(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$all('id')\"")
 }
 # }}}
 # is_valid_class {{{
@@ -50,7 +50,7 @@ is_valid_class <- function(class, idf) {
 }
 
 on_failure(is_valid_class) <- function(call, env) {
-    paste0(sQuote(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$list('class')\"")
+    paste0(sQuote(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$all('class')\"")
 }
 # }}}
 # is_class_exist {{{
