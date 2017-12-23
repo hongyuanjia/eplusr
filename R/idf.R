@@ -784,7 +784,7 @@ valid_id <- function (idf, verbose = TRUE) {
 get_class <- function (idf, id) {
     assert_that(is_valid_id(id, idf))
 
-    single_class <- idf$class[object_id == id]
+    single_class <- idf$class[object_id %in% id]
 
     return(single_class)
 }
@@ -938,10 +938,12 @@ set_object <- function (idf, id, ..., idd, verbose = TRUE) {
 
     target_class <- get_class(idf, id = id)
 
-    target_object <- get_object(idf, id, verbose = FALSE)
-    target_object <- set_fields(target_object, fields, idd)
+    ori_object <- get_object(idf, id, verbose = FALSE)
+    new_object <- set_fields(ori_object, fields, idd)
 
-    new_idf <- append_data(target_class, target_object, type = "change", idf, idd)
+    idf <- update_field_ref(ori_object, new_object, idf, idd)
+
+    new_idf <- append_data(target_class, new_object, type = "change", idf, idd)
 
     if (verbose) {
         print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
@@ -1004,10 +1006,15 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
         object_data <- append_id(object_data, base = "value", idf)
     } else {
         class_data[, edited := 1L]
-        object_data[, edited := 1L]
-
+        # only mark fields that have been changed.
         id <- class_data[, unique(object_id)]
         assert_that(is_valid_id(id, idf))
+
+        ori_object <- idf$value[object_id == id]
+        field_order_changed <- get_field_changes(ori_object, object_data)[
+            , field_order]
+        object_data[field_order %in% field_order_changed, edited := 1L]
+
         idf$class <- idf$class[object_id != id]
         idf$value <- idf$value[object_id != id]
     }
@@ -1142,4 +1149,43 @@ get_field_order <- function (idf_value, field_name, id = NULL, idd) {
 
     return(orders)
 }
+# }}}
+# get_field_changes {{{
+get_field_changes <- function (ori_object, new_object) {
+    # get the original object
+    ori_object <- ori_object[, .(class_order, field_order, value)]
+    setnames(ori_object, "value", "ori_value")
+    # get the new object
+    new_object <- new_object[, .(class_order, field_order, value)]
+    data.table::setnames(new_object, "value", "new_value")
+
+    modified_fields <- ori_object[new_object,
+        on = c("class_order", "field_order")][ori_value != new_value]
+
+    return(modified_fields)
+}
+# }}}
+# update_field_ref {{{
+update_field_ref <- function (ori_object, new_object, idf, idd) {
+
+    field_changes <- get_field_changes(ori_object, new_object)
+
+    # find fields that have ref keys in the object
+    field_ref_value <- idd$ref_object$field[field_changes,
+        on = c("class_order", "field_order"), nomatch = 0L][
+        , .(ref_key, ori_value, new_value)]
+
+    # update new values
+    idf$value <- field_ref_value[
+        # insert ref keys, original values, and new values
+        idd$ref_object$key[idf$value, on = c("class_order", "field_order")],
+        on = "ref_key"][
+        # udpate new values and mark changes
+        !is.na(ref_key) & ori_value == value,
+        `:=`(value = new_value, edited = 1L)][
+        , c("ref_key", "ori_value", "new_value") := NULL]
+
+    return(idf)
+}
+
 # }}}
