@@ -760,7 +760,9 @@ valid_field <- function (class, idf, idd, verbose = TRUE) {
 # }}}
 # valid_class {{{
 valid_class <- function (idf) {
-    setorder(copy(idf$class), group_order, class_order, object_id)[, unique(class)]
+    key_cols <- c("group_order", "class_order", "object_id")
+    key_avail <- names(idf$class)[names(idf$class) %in% key_cols]
+    setorderv(copy(idf$class), key_avail)[, unique(class)]
 }
 # }}}
 # valid_id {{{
