@@ -1110,7 +1110,9 @@ set_fields <- function (object, fields, idd) {
 # }}}
 # get_class_name {{{
 get_class_name <- function (object) {
-    object[, unique(class)]
+    class_name <- object[, unique(class)]
+    assert_that(is_scalar(class_name), msg = "Input has more than one objects")
+    class_name
 }
 # }}}
 # get_field_order {{{
