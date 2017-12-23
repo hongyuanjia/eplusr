@@ -2,6 +2,9 @@
 #' @docType class
 #' @export
 eplus_model <- R6::R6Class(classname = "Energy+Model",
+    # prevent modification
+    lock_class = TRUE,
+
     public = list(
         path = NULL,
         ver = NULL,
