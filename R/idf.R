@@ -852,9 +852,9 @@ dup_object <- function (idf, id, new_name = NULL, idd, verbose = TRUE) {
     # Give new name if applicable {{{
     if (target_object[field_order == 1L & grepl("Name", field, fixed = TRUE), .N]) {
         # get all names of objects in the same class
-        all_names <- idf$value[class == target_class & field_order == 1L, value]
+        all_names <- idf$value[class == class_name & field_order == 1L, value]
         # get all names of new or midified objects in the same class
-        all_new_names <- idf$value[edited == 1L & class == target_class & field_order == 1L, value]
+        all_new_names <- idf$value[edited == 1L & class == class_name & field_order == 1L, value]
         # auto-create a new name if new name is not given and make sure that an
         # unique object name is created.
         if (is.null(new_name)) {
@@ -866,16 +866,16 @@ dup_object <- function (idf, id, new_name = NULL, idd, verbose = TRUE) {
             }
         } else {
             if (new_name %chin% all_names) {
-                used_id <- idf$value[class == target_class & field_order == 1L & field == new_name, object_id]
+                used_id <- idf$value[class == class_name & field_order == 1L & field == new_name, object_id]
                 stop("Given new name has been used for object [ID:", used_id, "]",
                      call. = FALSE)
             } else {
-                used_id <- idf$value[class == target_class & field_order == 1L, value := new_name]
+                used_id <- idf$value[class == class_name & field_order == 1L, value := new_name]
             }
         }
     } else {
         if (!is.null(new_name)) {
-            warning("'new_name' is ignored for class ", target_class, call. = FALSE)
+            warning("'new_name' is ignored for class ", class_name, call. = FALSE)
         }
     }
     # }}}
@@ -934,7 +934,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd, verbose = TRUE) {
-    assert_that(is_valid_id(idf, id))
+    assert_that(is_valid_id(id, idf))
     fields <- list(...)
     assert_that(not_empty(fields), msg = "Field values are empty")
 
@@ -948,7 +948,7 @@ set_object <- function (idf, id, ..., idd, verbose = TRUE) {
     new_idf <- append_data(target_class, new_object, type = "change", idf, idd)
 
     if (verbose) {
-        print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
+        print_output(get_output_line(new_object, show_class = TRUE, show_id = TRUE))
         return(invisible(new_idf))
     }
 
@@ -1095,7 +1095,7 @@ set_fields <- function (object, fields, idd) {
         invalid_name <- value_name[is.na(target_order)]
         if (length(invalid_name) > 0L) {
             stop("Invalid field names found: ", sQuote(invalid_name),
-                 ". You can find all invalid field names using `eplusr::valid_field`.",
+                 ". You can find all invalid field names using \"$all('field', class = '", class_name, "')\".",
                  call. = FALSE)
         }
     }
