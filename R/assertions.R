@@ -37,7 +37,7 @@ has_macro <- function (str) {
 # }}}1
 # is_valid_id {{{
 is_valid_id <- function (id, idf) {
-    length(id) == 1L & is.integer(id) & id %in% valid_id(idf, verbose = FALSE)
+    is_scalar(id) == 1L & id %in% valid_id(idf, verbose = FALSE)
 }
 
 on_failure(is_valid_id) <- function(call, env) {
@@ -123,7 +123,7 @@ on_failure(not_empty) <- function (call, env) {
 # }}}
 # is_empty {{{
 is_empty <- function (x) {
-    all((dim(x) %||% length(x)) == 0)
+    !not_empty(x)
 }
 on_failure(is_empty) <- function (call, env) {
     paste0(deparse(call$x), " is not empty")
