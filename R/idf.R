@@ -1,301 +1,42 @@
-#################################################################################
-##                       Parse EnergyPlus IDF/IMF File                          #
-#################################################################################
+#' @import data.table
+#' @importFrom stringr str_pad
+NULL
 
-##' @importFrom stringr str_interp str_length
-## read_idf
-## {{{1
-#read_idf <- function(file, parse = TRUE, imf_to_idf = FALSE, verbose = FALSE) {
-
-#    if (is_model_str(file)) {
-#        idf_lines <- file
-#    } else {
-#        idf_lines <- read_idf_lines(file)
-#        if (!is_model_str(idf_lines)) {
-#            ori_error_len <- getOption("warning.length")
-#            invalid_lines <- paste(is_model_str(idf_lines, lines = TRUE), collapse = "\n")
-#            options("warning.length" = stringr::str_length(invalid_lines) + 1000)
-#            stop(stringr::str_interp("Invalid lines found in the input:\n${invalid_lines}"), call. = FALSE)
-#            on.exit(options("warning.length" = ori_error_len))
-#        }
-#    }
-
-#    is_imf <- is_imf(idf_lines)
-
-#    idf_ver <- get_idf_ver(idf_lines)
-
-#    # If parametric fields exist, and parse is FALSE, give a warning.
-#    if (is_param_exist(idf_lines)) {
-#        if (parse) {
-#            warning("Parametric fields found in the input file. ",
-#                    "'parse' is forced to FALSE and only a string vector of input .idf/.imf file will be returned.",
-#                    call. = FALSE)
-#            parse <- FALSE
-#        }
-#    # NOTE: If parametric fields exist, the .imf file cannot directly converted
-#    # to an .idf file.
-#    # If no parametric fields in the input.
-#    } else {
-#        # If input is an .imf file
-#        if (is_imf) {
-#            # Convert the .imf file to a .idf file
-#            if (imf_to_idf) {
-#                idf_lines <- imf_to_idf(imf_lines = idf_lines, rename = FALSE, verbose = verbose, keep = FALSE)
-#            # If imf_to_idf is FALSE,
-#            } else {
-#                # but 'parse' has been sepcified as FALSE, give a warning.
-#                if (!parse) {
-#                    warning("Unable to parse imf when 'imf_to_idf' is FALSE. ",
-#                            "'parse' is forced to FALSE and only a string vector of input .idf/.imf file will be returned.",
-#                            call. = FALSE)
-#                    parse <- FALSE
-#                }
-#            }
-#        }
-#    }
-
-#    # Return a string vector directly.
-#    if (!parse) {
-#        attrs <- list(ver = idf_ver,
-#                      type = "string")
-#        idf_lines <- add_attrs(idf_lines, attrs)
-#        return(idf_lines)
-#    # Return a parsed idf which is a list of data.tables.
-#    } else {
-#        attrs <- list(ver = idf_ver,
-#                      type = "parsed")
-#        idf <- get_idf_object(idf = idf_lines)
-#        idf <- add_attrs(idf, attrs)
-#        return(idf)
-#    }
-#}
-## }}}1
-
-##' @importFrom stringr str_which
-## find_object
-## {{{1
-#find_object <- function (idf, pattern, ignore_case = TRUE, perl = TRUE, invert = FALSE) {
-#    type <- get_idf_type(idf)
-
-#    if (type == "string") {
-#        macro_pt <- stringr::str_which(idf, "^##")
-#        if (length(macro_pt) > 0) {
-#            idf <- idf[-macro_pt]
-#        }
-#        object_ranges <- get_idf_object_range(idf)
-#        object_names <- unique(object_ranges[["object_name"]])
-#        objs <- grep(x = object_names, pattern = pattern, value = TRUE,
-#                     ignore.case = ignore_case, perl = perl, invert = invert)
-#        if (length(objs) == 0) {
-#            stop("Could not find any matched objects.", call. = FALSE)
-#        } else {
-#            object_ranges_selected <- object_ranges[object_name %in% objs]
-#            results <- map2(object_ranges_selected$object_start_row,
-#                            object_ranges_selected$object_end_row,
-#                            function (object_start, object_end) {
-#                                object <- idf[object_start:object_end]
-#                                object_fields <- get_idf_object_fields(object)
-#                                return(object_fields)
-#                            }) %>% set_names(make.unique(object_ranges_selected$object_name, sep = "_"))
-#        }
-
-#    } else if (type == "parsed") {
-#        ori_names <- names(idf)
-#        names(idf) <- make.unique(names(idf), sep = "_")
-#        objs <- grep(x = names(idf), pattern = pattern, ignore.case = ignore_case, perl = perl, invert = invert)
-#        if (length(objs) == 0) {
-#            stop("Could not find any matched objects.", call. = FALSE)
-#        } else {
-#            results <- idf[c(objs)]
-#        }
-#        names(idf) <- ori_names
-#    } else {
-#        stop("Unknown input idf type.", call. = FALSE)
-#    }
-#    return(results)
-#}
-## }}}1
-
-#######################
-##  helper functions  #
-#######################
-
-##' @importFrom stringr str_detect
-## is_param_exist
-## {{{
-#is_param_exist <- function (idf_lines) {
-#    param_exist <- any(stringr::str_detect(idf_lines, "@@.*@@"))
-#    return(param_exist)
-#}
-## }}}
-
-##' @importFrom stringr str_extract_all
-##' @importFrom purrr flatten_chr keep
-## list_params
-## {{{1
-#list_params <- function (idf_lines) {
-#    param_check <- stringr::str_extract_all(idf_lines, "@@.*@@")
-#    params_all <- purrr::flatten_chr(purrr::keep(param_check, ~ length(.x) > 0))
-#    params <- unique(params_all)
-#    return(params)
-#}
-## }}}1
-
-##' @importFrom tools file_path_sans_ext
-##' @importFrom readr read_lines
-##' @importFrom stringr str_which
-##' @importFrom purrr map
-## epmacro_exe
-## {{{1
-#epmacro_exe <- function (eplus_dir = find_eplus(), imf_path, rename = TRUE, verbose = TRUE) {
-#    # In order to chain commands, this has to be used before commands.
-#    cmd_head <- "cmd.exe /c"
-
-#    # Use "energyplus.exe" to run EnergyPlus.
-#    epmacro_exe <- file_path(eplus_dir, "EPMacro.exe")
-
-#    # Get the working directory.
-#    working_dir <- dirname(imf_path)
-
-#    command <- paste(cmd_head, "cd", working_dir, "&&",
-#                     epmacro_exe, imf_path, sep = " ")
-
-#    epmacro_run <- system(command = command, wait = TRUE)
-
-#    output <- file_path(working_dir, "out.idf")
-#    new_output <- paste0(tools::file_path_sans_ext(imf_path), ".idf")
-#    audit <- file_path(working_dir, "audit.out")
-#    new_audit <- file_path(dirname(audit), paste0(file_prefix(imf_path), ".out"))
-
-#    if (file.exists(output)) {
-
-#        # Read error messages
-#        audit_raw <- readr::read_lines(file_path(dirname(imf_path), "audit.out"))
-#        errors_pt <- stringr::str_which(audit_raw, "ERROR")
-
-#        if (rename) {
-#            rename_flag <- file.copy(from = output, to = new_output,
-#                                     copy.mode = TRUE, copy.date = TRUE,
-#                                     overwrite = TRUE)
-
-#            rename_flag_audit <- file.copy(from = audit, to = new_audit,
-#                                           copy.mode = TRUE, copy.date = TRUE,
-#                                           overwrite = TRUE)
-
-#            if (rename_flag) {
-#                # If renaming successed, delete the original output file.
-#                unlink(output, force = TRUE)
-#            } else {
-#                warning("Could not rename the output idf file.", call. = FALSE)
-#            }
-
-#            if (rename_flag_audit) {
-#                # If renaming successed, delete the original audit file.
-#                unlink(audit, force = TRUE)
-#            } else {
-#                warning("Could not rename the audit file.", call. = FALSE)
-#            }
-#        }
-
-#        if (verbose) {
-#            if (rename) {
-#                if (rename_flag) {
-#                    message("File '", basename(imf_path), "' has been successfully converted to '",
-#                            basename(new_output), "'.")
-#                } else {
-#                    message("File '", basename(imf_path), "' has been successfully converted to 'out.idf'.")
-#                }
-
-#                if (rename_flag_audit) {
-#                    message("Please see '", basename(new_audit), "' for details.")
-#                } else {
-#                    message("Please see '", basename(audit), "' for details.")
-#                }
-
-#            } else {
-#                message("File '", basename(imf_path), "' has been successfully converted to 'out.idf'.")
-#                message("Please see '", basename(audit), "' for details.")
-#            }
-
-#            if (length(errors_pt) > 0) {
-#                error_msg <-
-#                    purrr::map(seq_along(errors_pt),
-#                               ~{error_pt <- errors_pt[.x];
-#                               msg <- c("Error message [", .x, "]:\n",
-#                                        paste0(audit_raw[(error_pt-2):error_pt], collapse = "\n"))})
-#                error_msg <- map_chr(error_msg, ~paste0(.x, collapse = ""))
-#                error_msg <- paste0(error_msg, collapse = "\n\n")
-#                warning("\nNOTE: ", length(errors_pt), " errors found during the conversion.\n", call. = FALSE)
-#                warning(error_msg, call. = FALSE)
-#            }
-#        }
-
-#    } else {
-#        stop("Error occured when running 'EPMacro.exe'.", call. = FALSE)
-#    }
-#}
-## }}}1
-
-##' @importFrom stringi stri_rand_strings
-##' @importFrom readr write_lines
-## imf_to_idf
-## {{{1
-#imf_to_idf <- function(imf_lines, verbose = FALSE) {
-
-#    # Get the input imf file version.
-#    imf_ver <- get_idf_ver(imf_lines)
-
-#    # Find the path of EnergyPlus with the same version.
-#    eplus_dir <- find_eplus(ver = imf_ver, verbose = F)
-
-#    imf_name <- paste0("imf_", stringi::stri_rand_strings(1, 8), ".imf")
-#    imf_path <- file_path(normalizePath(tempdir()), imf_name)
-
-#    readr::write_lines(imf_lines, path = imf_path)
-#    # Convert the input imf file to a idf file
-#    epmacro_exe(eplus_dir = eplus_dir, imf_path = imf_path,
-#                verbose = verbose, rename = FALSE)
-
-#    idf_path <- file_path(dirname(imf_path), "out.idf")
-#    idf_lines <- read_idf_lines(idf_path)
-#    unlink(imf_path, force = TRUE)
-
-#    return(idf_lines)
-#}
-## }}}1
-
-################################################################################
-#                          Refact IDF parsing process                          #
-################################################################################
+#' Parse EnergyPlus models
+#'
+#' @param path Path to EnergyPlus \code{IDF} or \code{IMF} file. The file
+#' extension does not matter. So models stored in \code{TXT} file are still able
+#' to correctly be parsed.
+#' @param idd Path to \code{Energy+.idd} or an IDD object.
+#'
+#' @return A list contains the IDF version, option data, class data, value data,
+#' comment data and field reference data.
+#'
+#' @export
 # parse_idf {{{
-parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
+parse_idf <- function (filepath, idd = NULL) {
 
-    # check idd {{{
-    if (is.null(idd)) {
-        if (is.null(eplus_dir)) {
-            eplus_dir <- getOption("eplusr.eplus_dir")
-        }
-        idd_path <- normalizePath(file.path(eplus_dir, "Energy+.idd"))
-        idd <- parse_idd(idd_path)
-    } else if (is.character(idd) & length(idd) == 1L) {
-        if (file.exists(idd)) {
-            idd <- parse_idd(path)
-        } else {
-            stop("Input IDD file does not exist.", call. = FALSE)
-        }
-    } else if (!("IDD" %chin% class(idd))) {
-        stop("'idd' should be a path of 'Energy+.idd' or an IDD object.",
-             call. = FALSE)
-    }
-    # }}}
+    assert_that(is_readable(filepath))
 
     idf_str <- read_idf(filepath)
+    idf_version <- get_idf_ver(idf_str)
     # check if input file is an imf file.
-    is_imf <- is_imf_str(idf_str)
+    is_imf <- has_macro(idf_str)
+    if (is.null(idd)) {
+        idd <- link_idd(idf_version)
+        if (is.null(idd)) {
+            stop(glue::glue("Input file has a version '{idf_version}' whose \\
+                IDD file has not been pre-parsed. 'idd' should be specified."),
+                call. = FALSE
+            )
+        }
+    } else {
+        idd <- parse_idd(idd)
+    }
+
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
     # idf and idd version mismatch {{{
-    idf_version <- get_idf_ver(idf_str)
     idd_version <- idd$version
     if (!grepl(idf_version, idd_version, fixed = TRUE)) {
         warning(glue::glue("Version Mismatch. The file parsing is a differnet \\
@@ -621,7 +362,12 @@ parse_idf <- function (filepath, idd = NULL, eplus_dir = NULL) {
                 comment = idf_comment,
                 ref = idf_ref)
 
-    class(idf) <- c("IDF", class(idf))
+    if (is_imf) {
+        class(idf) <- c("IMF", class(idf))
+    } else {
+        class(idf) <- c("IDF", class(idf))
+    }
+
     return(idf)
 }
 # }}}
@@ -634,7 +380,7 @@ read_idf <- function (filepath) {
     close(con)
 
     # Get rid of preceeding and trailing spaces
-    idf_str <- stringr::str_trim(idf_str)
+    idf_str <- trimws(idf_str, "both")
 
     return(idf_str)
 }
@@ -656,30 +402,6 @@ get_idf_ver <- function (idf_str) {
     ver <- substr(ver_line, ver_pt, ver_pt + 2)
 
     return(ver)
-}
-# }}}1
-# macro_dict {{{
-macro_dict <-
-      # Incorporating external files
-    c("##include", "##fileprefix", "##includesilent", "##nosilent",
-      # Selective accepting or skipping lins
-      "##if", "##ifdef", "##ifndef", "##elseif", "##else", "##endif",
-      # Defining blocks of input
-      "##def", "##enddef", "##def1", "##set1",
-      # Arithmetic operations
-      "#eval", "#\\[",
-      # Marco debugging and listing
-      "##list", "##nolist", "##show", "##noshow", "##showdetail", "##noshowdetail",
-      # Marco debugging and listing
-      "##expandcomment", "##traceback", "##notraceback", "##write", "##nowrite",
-      # Marco debugging and listing
-      "##symboltable", "##clear", "##reverse", "##!")
-# }}}
-# is_imf_str {{{1
-is_imf_str <- function (idf_lines) {
-    is_imf_str <- any(purrr::map_lgl(macro_dict, ~any(startsWith(idf_lines, .x))))
-
-    return(is_imf_str)
 }
 # }}}1
 # get_obj_ref {{{
@@ -746,9 +468,23 @@ print.IDF <- function (idf) {
         , output := paste0(num_obj, " ", class)]
 
     output <- count_obj[count_obj[, .I[1], by = .(group)]$V1,
-        output := paste0("\n", group, "\n---------------------------\n", output)]
+        output := paste0("\n", group, "\n", strrep("-", console_width()), "\n", output)]
 
     print_output(output)
+}
+# }}}
+# link_idd {{{
+link_idd <- function (ver) {
+    if (is_pre_parsed(ver)) {
+        switch(ver,
+            "8.4" = idd_8.4,
+            "8.5" = idd_8.5,
+            "8.6" = idd_8.6,
+            "8.7" = idd_8.7,
+            "8.8" = idd_8.8)
+    } else {
+        NULL
+    }
 }
 # }}}
 
@@ -767,33 +503,34 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     value <- get_output_line(idf$value)
 
     # combine comment and value {{{
-    output <- rbindlist(list(comment, value), fill = TRUE)[
+    output_dt <- rbindlist(list(comment, value), fill = TRUE)[
         , .(object_id, class_order, field_order, class, output)]
-    output <- output[!is.na(class_order), .(object_id, field_order, class_order, class)][
-        output[, `:=`(class_order = NULL, class = NULL)],
+    output_dt <- output_dt[!is.na(class_order),
+        .(object_id, field_order, class_order, class)][
+        output_dt[, `:=`(class_order = NULL, class = NULL)],
         on = c("object_id", "field_order"), roll = -Inf]
     # }}}
 
     # handle different save options {{{
     # "SortedOrder"
     if (save_format == "SortedOrder") {
-        setorder(output, object_id, field_order)
+        setorder(output_dt, class_order, object_id, field_order)
         # add class heading
-        output[, class_group :=  .GRP, by = .(rleid(class))]
-        output[output[, .I[1], by = .(class_group)]$V1,
-                  output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
-                                   toupper(class), " ===========\n\n", output)]
-        setorder(output, class_order, object_id, field_order)
+        output_dt[, class_group := .GRP, by = .(rleid(class))]
+        output_dt[output_dt[, .I[1], by = .(class_group)]$V1,
+            output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
+                             toupper(class), " ===========\n\n", output)]
+        setorder(output_dt, class_order, object_id, field_order)
     }
     # "OriginalOrderTop"
     if (save_format == "OriginalOrderTop") {
         header <- c(header, "")
-        setorder(output, object_id, field_order)
+        setorder(output_dt, object_id, field_order)
     }
     # "OriginalOrderBottom"
     if (save_format == "OriginalOrderBottom") {
         header <- c(header, "")
-        setorder(output, object_id, field_order)
+        setorder(output_dt, object_id, field_order)
     }
     # }}}
 
@@ -803,19 +540,19 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     # }
     # # }}}
 
-    value_output <- output[, output]
+    value_output <- output_dt[, output]
 
     str_output <- c(header, value_output)
 
-    # if (!dir.exists(dirname(path))) {
-    #     dir.create(dirname(path))
-    # }
+    if (!dir.exists(dirname(path))) dir.create(dirname(path), recursive = TRUE)
+    if (!file.exists(path)) file.create(path)
+    assert_that(is_writeable(path))
 
-    # con <- file(path)
-    # writeLines(str_output, path)
-    # close(con)
+    con <- file(path)
+    writeLines(str_output, path)
+    close(con)
 
-    return(str_output)
+    return(invisible())
 }
 # }}}
 # get_output_header {{{
@@ -1000,7 +737,7 @@ print_output <- function (x, col = "output") {
 # valid_field {{{
 valid_field <- function (class, idf, idd, verbose = TRUE) {
     class_name <- class
-    assertthat::assert_that(is_valid_class(class_name, idf))
+    assert_that(is_valid_class(class_name, idf))
 
     all_fields <- add_output_field(idd$field[class == class_name],
         standard = FALSE, new_line = FALSE, keep_all = TRUE)[
@@ -1038,7 +775,7 @@ valid_id <- function (idf, verbose = TRUE) {
 
 # get_class {{{
 get_class <- function (idf, id) {
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
 
     single_class <- idf$class[object_id == id]
 
@@ -1047,7 +784,7 @@ get_class <- function (idf, id) {
 # }}}
 # get_object {{{
 get_object <- function (idf, id, verbose = TRUE) {
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
 
     single_object <- idf$value[object_id == id]
 
@@ -1078,7 +815,7 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     idf_value <- object_count[idf_value, on = "class", roll = Inf]
 
     # add class heading
-    setorder(idf_value, row_id)
+    setorder(idf_value, class_order, object_id, field_order)
     idf_value[, class_group := .GRP, by = .(rleid(class))]
     idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
               output := paste0("\n",
@@ -1097,7 +834,7 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 
     target_class <- get_class(idf, id = id)
     class_name <- target_class[, unique(class)]
-    assertthat::assert_that(can_be_duplicated(class_name, idf, idd))
+    assert_that(can_be_duplicated(class_name, idf, idd))
 
     target_object <- get_object(idf, id = id)
 
@@ -1146,8 +883,8 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 # add_object {{{
 add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     class_name <- class
-    assertthat::assert_that(is_valid_class(class_name, idf))
-    assertthat::assert_that(can_be_duplicated(class_name, idf, idd))
+    assert_that(is_valid_class(class_name, idf))
+    assert_that(can_be_duplicated(class_name, idf, idd))
 
     new_class <- extract_class(class_name, idf = idf, idd = idd)
     new_object <- extract_object(class_name, min = min, idf = idf, idd = idd)
@@ -1185,9 +922,9 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd, verbose = TRUE) {
-    assertthat::assert_that(is_valid_id(idf, id))
+    assert_that(is_valid_id(idf, id))
     fields <- list(...)
-    assertthat::assert_that(not_empty(fields), msg = "Field values is empty")
+    assert_that(not_empty(fields), msg = "Field values is empty")
 
     target_class <- get_class(idf, id = id)
 
@@ -1215,7 +952,7 @@ get_field_order <- function (idf_value, field_name, id = NULL, idd) {
         }
     }
 
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
 
     target_class <- idf_value[object_id == id, unique(class)]
     idd_field <- idd$class[class == target_class]
@@ -1236,72 +973,6 @@ get_field_order <- function (idf_value, field_name, id = NULL, idd) {
     orders <- match(field_name, all_names)
 
     return(orders)
-}
-# }}}
-
-# console_width {{{
-# Reference: `cli` (https://github.com/r-lib/cli)
-console_width <- function() {
-    width <- getOption(
-        "cli.width",
-        Sys.getenv("RSTUDIO_CONSOLE_WIDTH",
-                   getOption("width", 80)
-        )
-    )
-
-    return(as.integer(width))
-}
-# }}}
-# is_valid_id {{{
-is_valid_id <- function (id, idf) {
-    length(id) == 1L & is.integer(id) & id %in% valid_id(idf, verbose = FALSE)
-}
-
-assertthat::on_failure(is_valid_id) <- function(call, env) {
-    paste0(deparse(call$id), " is not a valid object id. You can find all valid classes using 'eplusr::valid_id'")
-}
-# }}}
-# is_valid_class {{{
-#' @importFrom assertthat assertthat::assert_that assertthat::on_failure<-
-
-is_valid_class <- function(class, idf) {
-    class %chin% valid_class(idf)
-}
-
-assertthat::on_failure(is_valid_class) <- function(call, env) {
-    paste0(deparse(call$class), " is not a valid class name. You can find all valid classes using 'eplusr::valid_class'")
-}
-# }}}
-# is_class_exist {{{
-is_class_exist <- function (idf, class) {
-    class_name <- class
-    class_name %chin% valid_class(idf)
-}
-# }}}
-# can_be_duplicated {{{
-can_be_duplicated <- function (class, idf, idd) {
-    class_name <- class
-    idd$class[class == class_name, unique_object] && class_name %chin% valid_class(idf)
-}
-
-assertthat::on_failure(can_be_duplicated) <- function(call, env) {
-    paste0(deparse(call$class), " is an unique object and already exists")
-}
-# }}}
-# not_empty {{{
-not_empty <- function (x) {
-    all((dim(x) %||% length(x)) != 0)
-}
-assertthat::on_failure(not_empty) <- function (call, env) {
-    paste0(deparse(call$x), " is empty")
-}
-# }}}
-# is_empty {{{
-is_empty <- function (x) {
-    all((dim(x) %||% length(x)) == 0)
-}
-assertthat::on_failure(is_empty) <- function (call, env) {
-    paste0(deparse(call$x), " is not empty")
 }
 # }}}
 
@@ -1338,7 +1009,7 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
         object_data[, edited := 1L]
 
         id <- class_data[, unique(object_id)]
-        assertthat::assert_that(is_valid_id(id, idf))
+        assert_that(is_valid_id(id, idf))
         idf$class <- idf$class[object_id != id]
         idf$value <- idf$value[object_id != id]
     }
@@ -1432,11 +1103,3 @@ set_fields <- function (object, fields, idd) {
     return(object)
 }
 # }}}
-is.idf <- function (x) inherits(x, "IDF")
-`%||%` <- function (x, y) {
-    if (is.null(x)) {
-        y
-    } else {
-        x
-    }
-}

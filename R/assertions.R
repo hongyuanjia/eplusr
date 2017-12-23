@@ -1,0 +1,142 @@
+#' @importFrom assertthat assert_that `on_failure<-`
+
+# is_eplus_ver {{{
+is_eplus_ver <- function (ver) {
+    ver_fmt <- "[78]\\.[0-9]"
+    grepl(ver_fmt, as.character(ver))
+}
+
+on_failure(is_eplus_ver) <- function (call, env) {
+    paste0(deparse(call$ver), " is not a valid EnergyPlus version.")
+}
+# }}}
+# is_supported_ver {{{
+is_supported_ver <- function (ver) {
+    supp_ver <- paste0("8.", 5:8)
+    ver %in% supp_ver
+}
+
+on_failure(is_supported_ver) <- function (call, env) {
+    paste0(deparse(call$ver), " is not supported yet.")
+}
+# }}}
+# is_eplus_exists {{{
+is_eplus_exists <- function (eplus_exe) {
+    file.exists(eplus_exe)
+}
+
+on_failure(is_eplus_exists) <- function (call, env) {
+    paste0("EnergyPlus does not exist")
+}
+# }}}
+
+# has_macro {{{1
+has_macro <- function (str) {
+    any(sapply(macro_dict, function(x) any(startsWith(str, x))))
+}
+# }}}1
+# is_valid_id {{{
+is_valid_id <- function (id, idf) {
+    length(id) == 1L & is.integer(id) & id %in% valid_id(idf, verbose = FALSE)
+}
+
+on_failure(is_valid_id) <- function(call, env) {
+    paste0(deparse(call$id), " is not a valid object id. You can find all valid classes using 'eplusr::valid_id'")
+}
+# }}}
+# is_valid_class {{{
+is_valid_class <- function(class, idf) {
+    class %chin% valid_class(idf)
+}
+
+on_failure(is_valid_class) <- function(call, env) {
+    paste0(deparse(call$class), " is not a valid class name. You can find all valid classes using 'eplusr::valid_class'")
+}
+# }}}
+# is_class_exist {{{
+is_class_exist <- function (idf, class) {
+    class_name <- class
+    class_name %chin% valid_class(idf)
+}
+
+on_failure(is_class_exist) <- function (call, env) {
+    paste0(deparse(call$class), " does not exist in current model")
+}
+# }}}
+# can_be_duplicated {{{
+can_be_duplicated <- function (class, idf, idd) {
+    class_name <- class
+    idd$class[class == class_name, unique_object] && class_name %chin% valid_class(idf)
+}
+
+on_failure(can_be_duplicated) <- function(call, env) {
+    paste0(deparse(call$class), " is an unique object and already exists")
+}
+# }}}
+# is_idf {{{
+is_idf <- function (x) inherits(x, "IDF")
+
+on_failure(is_idf) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDF object")
+}
+# }}}
+# is_imf {{{
+is_imf <- function (x) inherits(x, "IMF")
+
+on_failure(is_imf) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IMF object")
+}
+# }}}
+# is_idd {{{
+is_idd <- function (x) inherits(x, "IDD")
+
+on_failure(is_idd) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDD object")
+}
+# }}}
+# is_pre_parsed {{{
+is_pre_parsed <- function (ver) {
+    ver %in% paste0("8.", 4:8)
+}
+# }}}
+
+# not_empty {{{
+not_empty <- function (x) {
+    all((dim(x) %||% length(x)) != 0)
+}
+on_failure(not_empty) <- function (call, env) {
+    paste0(deparse(call$x), " is empty")
+}
+# }}}
+# is_empty {{{
+is_empty <- function (x) {
+    all((dim(x) %||% length(x)) == 0)
+}
+on_failure(is_empty) <- function (call, env) {
+    paste0(deparse(call$x), " is not empty")
+}
+# }}}
+# is_string {{{
+is_string <- function(x) is.character(x) && length(x) == 1
+on_failure(is_string) <- function(call, env) {
+    paste0(deparse(call$x), " is not a string (a length one character vector).")
+}
+# }}}
+# is_writeable {{{
+is_writeable <- function(path) {
+    assert_that(is_string(path), file.exists(path))
+    file.access(path, mode = 2)[[1]] == 0
+}
+on_failure(is_writeable) <- function (call, env) {
+    paste0(eval(call$path, env), " is not writeable")
+}
+# }}}
+# is_readable {{{
+is_readable <- function(path) {
+    assert_that(is_string(path), file.exists(path))
+    file.access(path, mode = 4)[[1]] == 0
+}
+on_failure(is_readable) <- function (call, env) {
+    paste0(eval(call$path, env), " is not readable")
+}
+# }}}

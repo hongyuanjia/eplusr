@@ -11,42 +11,8 @@ URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Encoding: UTF-8
 LazyData: true
-Imports: 
-    data.table (>= 1.9.8)
-    assertthat,
-    xts,
-    dplyr,
-    jsonlite,
-    lubridate,
-    magrittr,
-    purrr,
-    readr,
-    rlang,
-    rvest,
-    stringi,
-    stringr,
-    xml2,
-    methods,
-    tibble,
-    tidyr,
-    units,
-    shiny,
-    ggplot2,
-    miniUI,
-    DT,
-    clipr,
-    dygraphs,
+Imports:
+    data.table (>= 1.9.8),
     glue,
-    plotly,
-    rhandsontable,
-    shinyAce,
-    shinyBS,
-    shinyFiles,
-    shinyTime,
-    shinyWidgets,
-    shinycssloaders,
-    shinyjqui,
-    shinyjs,
-    shinythemes,
-    shinytoastr
+    stringr
 RoxygenNote: 6.0.1
