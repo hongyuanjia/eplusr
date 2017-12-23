@@ -71,8 +71,15 @@ iprint_idf <- function (self) {
 # }}}
 
 # isave_idf {{{
-isave_idf <- function (self, path, format = c("asis", "sorted", "ori_bot", "ori_top")) {
-    if (missing(path)) path <- self$path
+isave_idf <- function (self, path, format = c("asis", "sorted", "ori_bot", "ori_top"), overwrite = FALSE) {
+    if (missing(path)) {
+        path <- self$path
+        if (!overwrite) {
+            stop(glue::glue("Saving will overwrite the original model located \\
+                at {self$path}. This may have a risk of losing your original \\
+                model. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
+        }
+    }
     save_idf(self$model, path = path, format = format)
 }
 # }}}
