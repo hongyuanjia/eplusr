@@ -14,25 +14,11 @@ NULL
 #'
 #' @export
 # parse_idf {{{
-parse_idf <- function (filepath, idd = NULL) {
+parse_idf <- function (idf_str, idd) {
 
-    assert_that(is_readable(filepath))
-
-    idf_str <- read_idf(filepath)
     idf_version <- get_idf_ver(idf_str)
     # check if input file is an imf file.
     is_imf <- has_macro(idf_str)
-    if (is.null(idd)) {
-        idd <- link_idd(idf_version)
-        if (is.null(idd)) {
-            stop(glue::glue("Input file has a version '{idf_version}' whose \\
-                IDD file has not been pre-parsed. 'idd' should be specified."),
-                call. = FALSE
-            )
-        }
-    } else {
-        idd <- parse_idd(idd)
-    }
 
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
@@ -373,6 +359,8 @@ parse_idf <- function (filepath, idd = NULL) {
 # }}}
 # read_idf {{{
 read_idf <- function (filepath) {
+    assert_that(is_readable(filepath))
+
     con = file(filepath)
     idf_str <- readLines(con, encoding = "UTF-8")
     # Get rid of unparsable characters
@@ -485,6 +473,23 @@ link_idd <- function (ver) {
     } else {
         NULL
     }
+}
+# }}}
+# get_idd {{{
+get_idd <- function (ver = NULL, path = NULL) {
+    if (is.null(path)) {
+        idd <- link_idd(ver)
+        if (is.null(idd)) {
+            stop(glue::glue("Input file has a version '{idf_version}' whose \\
+                IDD file has not been pre-parsed. 'idd' should be specified."),
+                call. = FALSE
+            )
+        }
+    } else {
+        idd <- parse_idd(idd)
+    }
+
+    return(idd)
 }
 # }}}
 
@@ -765,6 +770,8 @@ valid_id <- function (idf, verbose = TRUE) {
     idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value[field_order == 3L, output := "    ........\n"]
 
+    setorder(idf_value, object_id, field_order)
+
     if (verbose) {
         print_output(idf_value)
     }
@@ -782,22 +789,7 @@ get_class <- function (idf, id) {
     return(single_class)
 }
 # }}}
-# get_object {{{
-get_object <- function (idf, id, verbose = TRUE) {
-    assert_that(is_valid_id(id, idf))
 
-    single_object <- idf$value[object_id == id]
-
-    single_output <- get_output_line(single_object, show_id = TRUE)
-
-    if (verbose) {
-        print_output(single_output)
-        return(invisible(single_object))
-    }
-
-    return(single_object)
-}
-# }}}
 # find_object {{{
 find_object <- function (idf, pattern, full = TRUE, ...) {
 
@@ -806,7 +798,7 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     }
 
     idf_value <- idf$value[grepl(pattern, class, ...)]
-    if (is_empty(idf_value) == 0L) {
+    if (is_empty(idf_value)) {
         stop("No matched object found.", call. = FALSE)
     }
 
@@ -818,8 +810,10 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     setorder(idf_value, class_order, object_id, field_order)
     idf_value[, class_group := .GRP, by = .(rleid(class))]
     idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
-              output := paste0("\n",
-                stringr::str_pad(paste0("== * ", N, " Objects Found in Class: ", class, " * "), console_width(), side = "right", pad = "=" ), "\n\n", output)]
+        output := paste0("\n",
+            stringr::str_pad(paste0("== * ", N, " Objects Found in Class: ", class, " * "),
+                             console_width(), side = "right", pad = "=" ),
+            "\n\n", output)]
 
     setorder(idf_value, class_order, object_id, field_order)
 
@@ -828,13 +822,28 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     return(invisible())
 }
 # }}}
+# get_object {{{
+get_object <- function (idf, id, verbose = TRUE) {
+    lapply(id, function (x) assert_that(is_valid_id(x, idf)))
 
+    single_object <- idf$value[object_id %in% id]
+
+    single_output <- get_output_line(single_object, show_id = TRUE)
+
+    if (verbose) {
+        print_output(single_output)
+        return(invisible(single_object))
+    }
+
+    return(single_object)
+}
+# }}}
 # dup_object {{{
-dup_object <- function (idf, id, new_name = NULL, idd) {
+dup_object <- function (idf, id, new_name = NULL, idd, verbose = TRUE) {
 
     target_class <- get_class(idf, id = id)
     class_name <- target_class[, unique(class)]
-    assert_that(can_be_duplicated(class_name, idf, idd))
+    assert_that(can_be_duplicated(class_name, idf))
 
     target_object <- get_object(idf, id = id)
 
@@ -883,11 +892,11 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 # add_object {{{
 add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     class_name <- class
-    assert_that(is_valid_class(class_name, idf))
-    assert_that(can_be_duplicated(class_name, idf, idd))
+    assert_that(is_valid_class(class_name, idd))
+    assert_that(can_be_duplicated(class_name, idf))
 
-    new_class <- extract_class(class_name, idf = idf, idd = idd)
-    new_object <- extract_object(class_name, min = min, idf = idf, idd = idd)
+    new_class <- extract_class(class_name, idf, idd)
+    new_object <- extract_object(class_name, min, idf, idd)
 
     # set default values first
     new_object <- set_default(new_object)
@@ -901,6 +910,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     # check missing required fields
     missing_fields <- new_object[required_field == TRUE & is.na(value)]
     if (not_empty(missing_fields)) {
+        new_object <- append_id(new_object, base = "value", idf)
         new_object[required_field == TRUE & is.na(value),
                    value := "[ ** missing ** ]"]
         missing_res <- get_output_line(new_object,
@@ -910,7 +920,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     }
 
     # append all data
-    new_idf <- append_id(new_class, new_object, type = "add", idf, idd)
+    new_idf <- append_data(new_class, new_object, type = "add", idf, idd)
 
     if (verbose) {
         print_output(get_output_line(new_object, show_class = TRUE, show_id = TRUE))
@@ -924,11 +934,11 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
 set_object <- function (idf, id, ..., idd, verbose = TRUE) {
     assert_that(is_valid_id(idf, id))
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values is empty")
+    assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
 
-    target_object <- get_object(idf, id = id, verbose = FALSE)
+    target_object <- get_object(idf, id, verbose = FALSE)
     target_object <- set_fields(target_object, fields, idd)
 
     new_idf <- append_data(target_class, target_object, type = "change", idf, idd)
@@ -941,38 +951,25 @@ set_object <- function (idf, id, ..., idd, verbose = TRUE) {
     return(new_idf)
 }
 # }}}
+# del_object {{{
+del_object <- function (idf, id, idd, verbose = TRUE) {
 
-# get_field_order {{{
-get_field_order <- function (idf_value, field_name, id = NULL, idd) {
+    target_class <- get_class(idf, id = id)
+    class_name <- target_class[, unique(class)]
+    assert_that(can_be_deleted(class_name, idf))
 
-    if (is.null(id)) {
-        id <- idf_value[, unique(object_id)]
-        if (length(id) > 1L) {
-            stop("'id' required if more than one object exists in the input.", call. = FALSE)
-        }
+    target_object <- get_object(idf, id = id)
+
+    idf$class <- idf$class[object_id != id]
+    idf$value <- idf$value[object_id != id]
+    idf$ref <- get_obj_ref(idf$value, idd)
+
+    if (verbose) {
+        print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
+        return(invisible(idf))
     }
 
-    assert_that(is_valid_id(id, idf))
-
-    target_class <- idf_value[object_id == id, unique(class)]
-    idd_field <- idd$class[class == target_class]
-    # add standard field name
-    idd_field <- add_output_field_name(idd_field)
-    # add lower case field_name
-    idd_field[, output_name_lower := tolower(output_name)]
-    idd_field[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
-    if (all(grepl("^[a-z]", field_name))) {
-        all_names <- idd_field[order(field_order)][, output_name_lower]
-    } else if (all(grepl("^[A-Z]", field_name))) {
-        all_names <- idd_field[order(field_order)][, output_name]
-    } else {
-        stop("Field names should be either in title-case or lower-case",
-             call. = FALSE)
-    }
-
-    orders <- match(field_name, all_names)
-
-    return(orders)
+    return(idf)
 }
 # }}}
 
@@ -986,6 +983,7 @@ extract_class <- function (class, idf, idd) {
 # }}}
 # extract_object {{{
 extract_object <- function (class, min = TRUE, idf, idd) {
+    class_name <- class
     if (min) {
         num_min_field <- idd$class[class == class_name, min_fields]
         new_object <- idd$field[class == class_name & field_order <= num_min_field]
@@ -1002,8 +1000,8 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
     type <- match.arg(type)
 
     if (identical(type, "add")) {
-        class_data <- append_id(class_data, base = "value")
-        object_data <- append_id(object_data, base = "value")
+        class_data <- append_id(class_data, base = "value", idf)
+        object_data <- append_id(object_data, base = "value", idf)
     } else {
         class_data[, edited := 1L]
         object_data[, edited := 1L]
@@ -1034,12 +1032,10 @@ append_id <- function (data, base = c("class", "value"), idf) {
 
     # get max object id
     max_id <- idf[[base]][, max(object_id)]
-    if (base == "value") max_row <- idf[[base]][, max(row_id)]
 
     # set new indicator
     data[, edited := 2L]
     data[, object_id := max_id + 1L]
-    if (base == "value") data[, row_id := seq_along(.I) + max_row]
 
     return(data)
 }
@@ -1064,7 +1060,7 @@ set_fields <- function (object, fields, idd) {
     if (is.null(value_name)) {
         target_order <- seq_along(fields)
     } else {
-        target_order <- get_field_order(new_object, value_name)
+        target_order <- get_field_order(object, value_name, idd = idd)
     }
 
     # TODO: check value types and min, max range
@@ -1084,7 +1080,7 @@ set_fields <- function (object, fields, idd) {
     if (is.null(value_name)) {
         target_order <- seq_along(fields)
     } else {
-        target_order <- get_field_order(new_object, value_name)
+        target_order <- get_field_order(object, value_name, idd = idd)
 
         # check invalid field names
         invalid_name <- value_name[is.na(target_order)]
@@ -1101,5 +1097,49 @@ set_fields <- function (object, fields, idd) {
     }
 
     return(object)
+}
+# }}}
+# get_class_name {{{
+get_class_name <- function (object) {
+    object[, unique(class)]
+}
+# }}}
+# get_field_order {{{
+get_field_order <- function (idf_value, field_name, id = NULL, idd) {
+
+    if (is.null(id)) {
+        if ("object_id" %in% names(idf_value)) {
+            id <- idf_value[, unique(object_id)]
+            if (length(id) > 1L) {
+                stop("'id' required if more than one object exists in the input.", call. = FALSE)
+            }
+            target_class <- idf_value[object_id == id, unique(class)]
+        } else {
+            target_class <- idf_value[, unique(class)]
+            assert_that(is_string(target_class), msg = "Multiple classes found in input. Cannot set fields.")
+        }
+    } else {
+        assert_that(is_valid_id(id, idf))
+        target_class <- idf_value[, unique(class)]
+    }
+
+    idd_field <- idd$field[class == target_class]
+    # add standard field name
+    idd_field <- add_output_field_name(idd_field)
+    # add lower case field_name
+    idd_field[, output_name_lower := tolower(output_name)]
+    idd_field[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
+    if (all(grepl("^[a-z]", field_name))) {
+        all_names <- idd_field[order(field_order)][, output_name_lower]
+    } else if (all(grepl("^[A-Z]", field_name))) {
+        all_names <- idd_field[order(field_order)][, output_name]
+    } else {
+        stop("Field names should be either in title-case or lower-case",
+             call. = FALSE)
+    }
+
+    orders <- match(field_name, all_names)
+
+    return(orders)
 }
 # }}}

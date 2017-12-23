@@ -7,7 +7,7 @@ is_eplus_ver <- function (ver) {
 }
 
 on_failure(is_eplus_ver) <- function (call, env) {
-    paste0(deparse(call$ver), " is not a valid EnergyPlus version.")
+    paste0(sQuote(eval(call$ver, env)), " is not a valid EnergyPlus version.")
 }
 # }}}
 # is_supported_ver {{{
@@ -17,7 +17,7 @@ is_supported_ver <- function (ver) {
 }
 
 on_failure(is_supported_ver) <- function (call, env) {
-    paste0(deparse(call$ver), " is not supported yet.")
+    paste0("EnergyPlus version ", sQuote(eval(call$ver, env)), " is not supported yet.")
 }
 # }}}
 # is_eplus_exists {{{
@@ -41,7 +41,7 @@ is_valid_id <- function (id, idf) {
 }
 
 on_failure(is_valid_id) <- function(call, env) {
-    paste0(deparse(call$id), " is not a valid object id. You can find all valid classes using 'eplusr::valid_id'")
+    paste0(sQuote(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$list('id')\"")
 }
 # }}}
 # is_valid_class {{{
@@ -50,7 +50,7 @@ is_valid_class <- function(class, idf) {
 }
 
 on_failure(is_valid_class) <- function(call, env) {
-    paste0(deparse(call$class), " is not a valid class name. You can find all valid classes using 'eplusr::valid_class'")
+    paste0(sQuote(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$list('class')\"")
 }
 # }}}
 # is_class_exist {{{
@@ -60,17 +60,30 @@ is_class_exist <- function (idf, class) {
 }
 
 on_failure(is_class_exist) <- function (call, env) {
-    paste0(deparse(call$class), " does not exist in current model")
+    paste0(sQuote(eval(call$class, env)), " does not exist in current model")
 }
 # }}}
 # can_be_duplicated {{{
-can_be_duplicated <- function (class, idf, idd) {
+can_be_duplicated <- function (class, idf) {
     class_name <- class
-    idd$class[class == class_name, unique_object] && class_name %chin% valid_class(idf)
+    !(is_valid_class(class_name, idf) &&
+      idf$class[class == class_name, unique_object])
 }
 
 on_failure(can_be_duplicated) <- function(call, env) {
-    paste0(deparse(call$class), " is an unique object and already exists")
+    paste0(sQuote(eval(call$class, env)), " is an unique object and already exists")
+}
+# }}}
+# can_be_deleted {{{
+can_be_deleted <- function (class, idf) {
+    class_name <- class
+    !(is_valid_class(class_name, idf) &&
+      (idf$class[class == class_name, unique_object] ||
+       idf$class[class == class_name, required_object]))
+}
+
+on_failure(can_be_deleted) <- function(call, env) {
+    paste0(sQuote(eval(call$class, env)), " is an unique or required object that cannot be deleted")
 }
 # }}}
 # is_idf {{{
@@ -120,6 +133,14 @@ on_failure(is_empty) <- function (call, env) {
 is_string <- function(x) is.character(x) && length(x) == 1
 on_failure(is_string) <- function(call, env) {
     paste0(deparse(call$x), " is not a string (a length one character vector).")
+}
+# }}}
+# is_scalar {{{
+is_scalar <- function(x) {
+    length(x) == 1L
+}
+on_failure(is_scalar) <- function(call, env) {
+  paste0(deparse(call$x), " is not a scalar.")
 }
 # }}}
 # is_writeable {{{

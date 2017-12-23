@@ -10,17 +10,44 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
 
         initialize = function(path, idd = NULL) {
             self$path <- normalizePath(path, winslash = "/")
-            self$model <- parse_idf(path, idd = idd)
-            self$ver <- self$model$ver
+            private$str <- read_idf(path)
+            self$ver <- get_idf_ver(private$str)
+            private$idd <- get_idd(self$ver, idd)
+            self$model <- parse_idf(private$str, idd = private$idd)
             self$type <- class(self$model)[1]
         },
+
+        list = function (type = c("id", "class", "field"), class = NULL)
+            ilist_idf(self, private, type, class),
+
+        find = function (pattern, full = TRUE, ...)
+            ifind_object(self, pattern, full, ...),
+
+        get = function (id, echo = TRUE)
+            iget_object(self, id, echo),
+
+        add = function (class, ..., min = TRUE, echo = TRUE)
+            iadd_object(self, private, class, min, ..., echo = echo),
+
+        set = function (id, ..., echo = TRUE)
+            iset_object(self, private, id, ..., echo = echo),
+
+        dup = function (id, new_name = NULL, echo = TRUE)
+            idup_object(self, private, id, new_name, echo),
+
+        del = function (id, echo = TRUE)
+            idel_object(self, private, id, echo),
 
         save = function(path, format = c("asis", "sorted", "ori_bot", "ori_top"))
             isave_idf(self, path = path, format = format),
 
         print = function()
             iprint_idf(self)
-    )
+    ),
+
+    private = list(
+        str = NULL,
+        idd = NULL)
 )
 
 # iprint_idf {{{
@@ -46,12 +73,63 @@ iprint_idf <- function (self) {
 # isave_idf {{{
 isave_idf <- function (self, path, format = c("asis", "sorted", "ori_bot", "ori_top")) {
     if (missing(path)) path <- self$path
-    save_idf(self$idf, path = path, format = format)
+    save_idf(self$model, path = path, format = format)
 }
 # }}}
 
 # ilist_idf {{{
-ilist_idf <- function (self, type = c("id", "class", "")) {
+ilist_idf <- function (self, private, type = c("id", "class", "field"), class = NULL) {
+    if(type == "field" && is.null(class)) {
+        stop("'class' is required when type is 'field'.", call. = FALSE)
+    }
 
+    switch(type,
+        id = valid_id(self$model),
+        class = valid_class(self$model),
+        field = valid_field(class = class, self$model, private$idd))
+}
+# }}}
+
+# ifind_object {{{
+ifind_object <- function (self, pattern, full = TRUE, ...) {
+    find_object(self$model, pattern, full, ...)
+}
+# }}}
+
+# iget_object {{{
+iget_object <- function (self, id, echo) {
+    get_object(self$model, id, verbose = echo)
+}
+# }}}
+
+# idup_object {{{
+idup_object <- function (self, private, id, new_name = NULL, echo = TRUE) {
+    self$model <- dup_object(self$model, id, new_name, private$idd, verbose = echo)
+
+    return(self)
+}
+# }}}
+
+# iadd_object {{{
+iadd_object <- function (self, private, class, min, ..., echo = TRUE) {
+    self$model <- add_object(self$model, class, ..., min = min, idd = private$idd, verbose = echo)
+
+    return(self)
+}
+# }}}
+
+# idel_object {{{
+idel_object <- function (self, private, id, echo = TRUE) {
+    self$model <- del_object(self$model, id, private$idd, verbose = echo)
+
+    return(self)
+}
+# }}}
+
+# iset_object {{{
+iset_object <- function (self, private, id, ..., echo = TRUE) {
+    self$model <- set_object(self$model, id, ..., idd = private$idd, verbose = echo)
+
+    return(self)
 }
 # }}}
