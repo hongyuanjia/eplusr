@@ -425,31 +425,38 @@ parse_idd <- function(path) {
         setnames(idd_field_reference, c("class_order", "field_order", "ref_key"))
         setcolorder(idd_field_reference, c("ref_key", "class_order", "field_order"))
     }
+    idd_ref_object <- list(key = idd_object_list,
+                           class = idd_class_reference,
+                           field = idd_field_reference)
     # }}}
 
     pb$update(0.90, tokens = list(what = "Parsing "))
     # External-List reference data {{{
-    idd_external_list <- NULL
+    idd_ref_external <- NULL
     # if '\external-list' exists
     if (slash_exists(idd_field, "external_list")) {
-        idd_external_list <- idd_field[!is.na(external_list),
+        idd_ref_external <- idd_field[!is.na(external_list),
             .(class_order, field_order, external_list)]
-        setnames(idd_external_list, "external_list", "ref_key")
-        setcolorder(idd_external_list, c("ref_key", "class_order", "field_order"))
+        setnames(idd_ref_external, "external_list", "ref_key")
+        setcolorder(idd_ref_external, c("ref_key", "class_order", "field_order"))
     }
     # }}}
+
+    # set class
+    setattr(idd_class, "class", c("IDD_Class", class(idd_class)))
+    setattr(idd_field, "class", c("IDD_Field", class(idd_field)))
+    setattr(idd_ref_object, "class", c("IDD_Ref_Obj", class(idd_ref_object)))
+    setattr(idd_ref_external, "class", c("IDD_Ref_Ext", class(idd_ref_external)))
 
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
                 class = idd_class,
                 field = idd_field,
-                ref_object = list(key = idd_object_list,
-                                  class = idd_class_reference,
-                                  field = idd_field_reference),
-                ref_external = idd_external_list)
+                ref_object = idd_ref_object,
+                ref_external = idd_ref_external)
     # set class to IDD
-    class(idd) <- c("IDD", class(idd))
+    setattr(idd, "class", c("IDD", class(idf)))
     pb$tick(100L, tokens = list(what = "Complete"))
     return(idd)
 }

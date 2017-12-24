@@ -342,6 +342,12 @@ parse_idf <- function (idf_str, idd) {
     idf_ref <- get_obj_ref(idf_value, idd)
     # }}}
 
+    # set class
+    setattr(idf_class, "class", c("IDF_Class", class(idf_class)))
+    setattr(idf_value, "class", c("IDF_Value", class(idf_value)))
+    setattr(idf_comment, "class", c("IDF_Comment", class(idf_comment)))
+    setattr(idf_ref, "class", c("IDF_Ref", class(idf_ref)))
+
     idf <- list(version = idf_version,
                 options = heading_options,
                 class = idf_class,
@@ -350,9 +356,9 @@ parse_idf <- function (idf_str, idd) {
                 ref = idf_ref)
 
     if (is_imf) {
-        class(idf) <- c("IMF", class(idf))
+        setattr(idf, "class", c("IMF", class(idf)))
     } else {
-        class(idf) <- c("IDF", class(idf))
+        setattr(idf, "class", c("IDF", class(idf)))
     }
 
     return(idf)
