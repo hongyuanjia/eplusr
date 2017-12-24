@@ -35,8 +35,8 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         dup = function (id, new_name = NULL, echo = TRUE)
             idup_object(self, private, id, new_name, echo),
 
-        del = function (id, echo = TRUE)
-            idel_object(self, private, id, echo),
+        del = function (id, force = FALSE, echo = TRUE)
+            idel_object(self, private, id, force, echo),
 
         diff = function ()
             idiff_idf(self, private),

@@ -616,17 +616,25 @@ get_output_comment <- function (idf_comment) {
 }
 # }}}
 # get_output_line {{{
-get_output_line <- function (idf_value, keep_all = FALSE, show_class = TRUE,
-                             show_diff = FALSE, show_id = FALSE, fill_na = FALSE,
-                             indent = TRUE, standard = TRUE, new_line = TRUE) {
+get_output_line <- function (idf_value, keep_all = FALSE, show_id = FALSE,
+                             show_class = TRUE, show_diff = FALSE,
+                             show_ref = FALSE, fill_na = FALSE, indent = TRUE,
+                             standard = TRUE, new_line = TRUE) {
     idf_value <- copy(idf_value)
 
     comb_list <- c("output_value", "output_field")
+    # add ref
+    if (show_ref) {
+        idf_value <- add_output_ref(idf_value)
+        comb_list <- c("output_ref", comb_list)
+    }
+
     # add diff
     if (show_diff) {
         idf_value <- add_output_diff(idf_value)
         comb_list <- c("output_diff", comb_list)
     }
+
     # add class name
     if (show_class) {
         idf_value <- add_output_class(idf_value)
@@ -654,6 +662,12 @@ get_output_line <- function (idf_value, keep_all = FALSE, show_class = TRUE,
     }
 
     return(idf_value)
+}
+# }}}
+# add_output_ref {{{
+add_output_ref <- function (idf_value_ref) {
+    idf_value_ref[ref_value != value, output_ref := "   "]
+    idf_value_ref[ref_value == value, output_ref := "($)"]
 }
 # }}}
 # add_output_id {{{
@@ -975,13 +989,36 @@ set_object <- function (idf, id, ..., idd, verbose = TRUE) {
 }
 # }}}
 # del_object {{{
-del_object <- function (idf, id, idd, verbose = TRUE) {
+del_object <- function (idf, id, idd, force = FALSE, verbose = TRUE) {
 
     target_class <- get_class(idf, id = id)
     class_name <- target_class[, unique(class)]
     assert_that(can_be_deleted(class_name, idf))
 
     target_object <- get_object(idf, id = id)
+
+    # check if the fields in the target object have been referred by other
+    # objects
+    field_referred <- get_referred(target_object, idf, idd)
+    if (not_empty(field_referred)) {
+        field_output <- get_output_line(field_referred, show_id = TRUE,
+            show_class = TRUE, show_ref = TRUE)
+        ref_ids <- field_referred[, unique(object_id)]
+        if (force) {
+            warning(glue::glue("
+                Force to delete object (ID:{id}) that has \\
+                been referred. Errors may occur during simulations."),
+                call. = FALSE)
+        } else {
+            stop(glue::glue("
+                Some field(s) in current object (ID:{id}) has \\
+                been referred by other object(s) \\
+                (ID:{paste0(ref_ids, collapse = ', ')}) below. Comfirm by \\
+                setting 'force' to TRUE."), "\n",
+                paste0(field_output[, output], collapse = '\n'),
+                call. = FALSE)
+        }
+    }
 
     idf$class <- idf$class[object_id != id]
     idf$value <- idf$value[object_id != id]
@@ -1189,14 +1226,43 @@ get_field_changes <- function (ori_object, new_object) {
     return(modified_fields)
 }
 # }}}
+# get_ref_key {{{
+get_ref_key <- function (idf_value, idd) {
+    field_ref_value <- idd_8.8$ref_object$field[idf_value,
+        on = c("class_order", "field_order"), nomatch = 0L]
+
+    return(field_ref_value)
+}
+# }}}
+# get_referred {{{
+get_referred <- function (idf_value, idf, idd) {
+    all_needed <- c("ref_key", "class", "field", "field_anid", "units", "value")
+    field_ref_value <- get_ref_key(idf_value, idd)[, ..all_needed]
+    new_names <- c("ref_key", paste0("ref_", setdiff(all_needed, "ref_key")))
+    setnames(field_ref_value, all_needed, new_names)
+
+    field_referred <- field_ref_value[
+        # insert ref keys, referred values
+        idd$ref_object$key[idf$value, on = c("class_order", "field_order")],
+        on = "ref_key"][!is.na(ref_key) & ref_value == value,
+        .SD, .SDcol = c(new_names, "object_id", "class_order", "field_order")]
+
+    setnames(field_referred,
+        c("class_order", "field_order"),
+        c("target_class_order", "target_field_order"))
+
+    comb <- idf$value[field_referred, on = "object_id"]
+
+    return(comb)
+}
+# }}}
 # update_field_ref {{{
 update_field_ref <- function (ori_object, new_object, idf, idd) {
 
     field_changes <- get_field_changes(ori_object, new_object)
 
     # find fields that have ref keys in the object
-    field_ref_value <- idd$ref_object$field[field_changes,
-        on = c("class_order", "field_order"), nomatch = 0L][
+    field_ref_value <- get_ref_key(field_changes, idd)[
         , .(ref_key, ori_value, new_value)]
 
     # update new values
