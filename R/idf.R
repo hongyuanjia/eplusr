@@ -1298,3 +1298,12 @@ get_idf_diff <- function (idf) {
     return(invisible(output_comb))
 }
 # }}}
+# get_obj_count {{{
+get_obj_count <- function (idf_value) {
+    count_obj <- setorder(idf_value, class_order, object_id, field_order)[
+        , .N, by = .(class_order, class, object_id)][
+        , .(num = .N), by = .(class_order, class)]
+
+    return(count_obj)
+}
+# }}}
