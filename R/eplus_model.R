@@ -163,6 +163,8 @@ isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "o
     }
 
     save_idf(private$model, path = path, format = format)
+
+    message(glue::glue("Model has been successfully saved at {path}."))
 }
 # }}}
 
@@ -197,6 +199,9 @@ ireset_model <- function (self, private, comfirm = FALSE) {
     private$ver <- get_idf_ver(private$str)
     private$model <- parse_idf(private$str, idd = private$idd)
     private$type <- class(private$model)[1]
+
+    message(glue::glue("The model has been reset to the status when it was \\
+       first read at {private$time_read}."))
 
     return(self)
 }
