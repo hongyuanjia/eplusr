@@ -829,10 +829,12 @@ get_class <- function (idf, id) {
 find_object <- function (idf, pattern, full = TRUE, ...) {
 
     if (full) {
-        pattern = paste0(pattern, "$")
+        pattern = paste0("^(", pattern, ")$")
+        idf_value <- idf$value[grepl(pattern, class)]
+    } else {
+        idf_value <- idf$value[grepl(pattern, class, ...)]
     }
 
-    idf_value <- idf$value[grepl(pattern, class, ...)]
     if (is_empty(idf_value)) {
         stop("No matched object found.", call. = FALSE)
     }
