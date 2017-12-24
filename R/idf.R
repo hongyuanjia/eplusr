@@ -617,15 +617,26 @@ get_output_comment <- function (idf_comment) {
 # }}}
 # get_output_line {{{
 get_output_line <- function (idf_value, keep_all = FALSE, show_class = TRUE,
-                             show_id = FALSE, fill_na = FALSE, indent = TRUE,
-                             standard = TRUE, new_line = TRUE) {
+                             show_diff = FALSE, show_id = FALSE, fill_na = FALSE,
+                             indent = TRUE, standard = TRUE, new_line = TRUE) {
     idf_value <- copy(idf_value)
 
     comb_list <- c("output_value", "output_field")
+    # add diff
+    if (show_diff) {
+        idf_value <- add_output_diff(idf_value)
+        comb_list <- c("output_diff", comb_list)
+    }
     # add class name
     if (show_class) {
         idf_value <- add_output_class(idf_value)
         comb_list <- c("output_class", comb_list)
+    }
+
+    # add object id
+    if (show_id) {
+        idf_value <- add_output_id(idf_value)
+        comb_list <- c("output_id", comb_list)
     }
 
     # add field value
@@ -633,12 +644,6 @@ get_output_line <- function (idf_value, keep_all = FALSE, show_class = TRUE,
 
     # add field name
     idf_value <- add_output_field(idf_value, keep_all = keep_all, standard = standard, new_line = new_line)
-
-    # add object id
-    if (show_id) {
-        idf_value <- add_output_id(idf_value)
-        comb_list <- c("output_id", comb_list)
-    }
 
     idf_value[, output := do.call(paste0, .SD), .SDcol = comb_list]
 
@@ -660,6 +665,19 @@ add_output_id <- function (idf_value) {
         output_id := paste0(
             "[ID:", stringr::str_pad(object_id, nchar(max_id), "left", " "), "] ")
     ]
+
+    return(idf_value)
+}
+# }}}
+# add_output_diff {{{
+add_output_diff <- function (idf_value) {
+    idf_value[, output_diff := "   "]
+    # for deleted fields
+    idf_value[edited ==-1L, output_diff := "(-)"]
+    # for changed fields
+    idf_value[edited == 1L, output_diff := "(~)"]
+    # for added fields
+    idf_value[edited == 2L, output_diff := "(+)"]
 
     return(idf_value)
 }
@@ -968,6 +986,7 @@ del_object <- function (idf, id, idd, verbose = TRUE) {
     idf$class <- idf$class[object_id != id]
     idf$value <- idf$value[object_id != id]
     idf$ref <- get_obj_ref(idf$value, idd)
+    idf$del <- rbindlist(list(idf$del, copy(target_object)[, edited := -1L]))
 
     if (verbose) {
         print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
@@ -1193,4 +1212,21 @@ update_field_ref <- function (ori_object, new_object, idf, idd) {
     return(idf)
 }
 
+# }}}
+# get_idf_diff {{{
+get_idf_diff <- function (idf) {
+    output_dt <- get_output_line(idf$value[edited > 0L],
+        show_diff = TRUE, show_id = TRUE)[
+        , .(object_id, class_order, field_order, output)]
+    output_del <- get_output_line(idf$del,
+        show_diff = TRUE, show_id = TRUE)[
+        , .(object_id, class_order, field_order, output)]
+
+    output_comb <- rbindlist(list(output_dt, output_del))
+    setorder(output_comb, object_id, class_order, field_order)
+
+    print_output(output_comb)
+
+    return(invisible(output_comb))
+}
 # }}}

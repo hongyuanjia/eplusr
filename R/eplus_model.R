@@ -12,6 +12,7 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
             private$ver <- get_idf_ver(private$str)
             private$idd <- get_idd(private$ver, idd)
             private$model <- parse_idf(private$str, idd = private$idd)
+            private$model$del <- data.table()
             private$type <- class(private$model)[1]
             private$time_read <- Sys.time()
         },
@@ -36,6 +37,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
 
         del = function (id, echo = TRUE)
             idel_object(self, private, id, echo),
+
+        diff = function ()
+            idiff_idf(self, private),
 
         save = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"),
                          protect = TRUE, overwrite = FALSE)
@@ -114,6 +118,14 @@ idel_object <- function (self, private, id, echo = TRUE) {
     private$model <- del_object(private$model, id, private$idd, verbose = echo)
 
     return(self)
+}
+# }}}
+
+# idiff_idf {{{
+idiff_idf <- function (self, private) {
+    get_idf_diff(private$model)
+
+    return(invisible(self))
 }
 # }}}
 
