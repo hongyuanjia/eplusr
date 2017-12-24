@@ -116,6 +116,7 @@ idel_object <- function (self, private, id, echo = TRUE) {
 }
 # }}}
 
+#' @importFrom tools file_ext
 # isave_idf {{{
 isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "ori_top"), overwrite = FALSE) {
     if (missing(path)) {
@@ -126,6 +127,19 @@ isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "o
                 model. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
         }
     }
+
+    # check mismatch of file content and file extention.
+    right_ext <- tolower(private$type)
+    target_ext <- tolower(tools::file_ext(path))
+    if (right_ext == "imf" && target_ext == "idf") {
+        stop(glue::glue("The model has macro input and should be saved as an \\
+            'imf' file, not an 'idf' file."), call. = FALSE)
+    } else if (right_ext == "idf" && target_ext == "imf") {
+        warning(glue::glue("The model has no macro input and should be saved \\
+            as an 'idf' file. Saving it to 'imf' will force to run Ep-Marco \\
+            preprocessor before simulation which is unnecessary."), call. = FALSE)
+    }
+
     save_idf(private$model, path = path, format = format)
 }
 # }}}
