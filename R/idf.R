@@ -211,6 +211,7 @@ parse_idf <- function (idf_str, idd) {
     idf_comment[leading_spaces < 0L, leading_spaces := 0L]
     idf_comment[, field_order := seq_along(.I), by = .(object_id)]
     idf_comment[, .SD, .SDcol = c("type", "object_id", "field_order", "comment", "leading_spaces")]
+    idf_comment[, edited := 0L]
     # }}}
     # get idf without comments
     # NOTE: currently, inline comments are not supported.
@@ -509,11 +510,11 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
-        , .(object_id, class_order, field_order, class, output)]
+        , .(edited, object_id, class_order, field_order, class, output)]
     output_dt <- output_dt[!is.na(class_order),
-        .(object_id, field_order, class_order, class)][
+        .(edited, object_id, field_order, class_order, class)][
         output_dt[, `:=`(class_order = NULL, class = NULL)],
-        on = c("object_id", "field_order"), roll = -Inf]
+        on = c("edited", "object_id", "field_order"), roll = -Inf]
     # }}}
 
     # handle different save options {{{
@@ -530,12 +531,12 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     # "OriginalOrderTop"
     if (save_format == "OriginalOrderTop") {
         header <- c(header, "")
-        setorder(output_dt, object_id, field_order)
+        setorder(output_dt, edited, object_id, field_order)
     }
     # "OriginalOrderBottom"
     if (save_format == "OriginalOrderBottom") {
         header <- c(header, "")
-        setorder(output_dt, object_id, field_order)
+        setorder(output_dt, -edited, object_id, field_order)
     }
     # }}}
 

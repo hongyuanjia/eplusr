@@ -37,8 +37,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         del = function (id, echo = TRUE)
             idel_object(self, private, id, echo),
 
-        save = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"))
-            isave_idf(private, path = path, format = format),
+        save = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"),
+                         protect = TRUE, overwrite = FALSE)
+            isave_idf(private, path = path, format = format, protect, overwrite),
 
         print = function ()
             iprint_idf(private),
