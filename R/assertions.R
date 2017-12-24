@@ -100,6 +100,13 @@ on_failure(is_imf) <- function (call, env) {
     paste0(deparse(call$x), " is not an IMF object")
 }
 # }}}
+# is_model {{{
+is_model <- function (x) inherits(x, "IMF") || inherits(x, "IDF")
+
+on_failure(is_model) <- function (call, env) {
+    paste0(deparse(call$x), " is neither an IDF nor IMF object")
+}
+# }}}
 # is_idf_class {{{
 is_idf_class <- function (x) inherits(x, "IDF_Class")
 
