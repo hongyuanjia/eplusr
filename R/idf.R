@@ -428,7 +428,7 @@ get_obj_ref <- function (idf_value, idd) {
 check_obj_ref <- function (idf, idd) {
     # get fields that have \object-list
     idf_ref_field <- data.table()
-    if (slash_exists(idf$value, "object_list")) {
+    if (has_name(idf$value, "object_list")) {
         idf_ref_field <- idf$value[!is.na(object_list),
             .(row_id, line, string,
               object_id, class_order, field_order,

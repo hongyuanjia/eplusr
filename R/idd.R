@@ -396,7 +396,7 @@ parse_idd <- function(path) {
     # collect \object-list data
     idd_object_list <- NULL
     # if '\object-list' exists
-    if (slash_exists(idd_field, "object_list")) {
+    if (has_name(idd_field, "object_list")) {
         idd_object_list <- idd_field[!is.na(object_list),
             .(class_order, field_order, object_list)][
             , strsplit(object_list, " ", fixed = TRUE),
@@ -407,7 +407,7 @@ parse_idd <- function(path) {
     # collect \reference-class-name data
     idd_class_reference <- NULL
     # if '\reference-class-name' exists
-    if (slash_exists(idd_class, "reference_class_name")) {
+    if (has_name(idd_class, "reference_class_name")) {
         idd_class_reference <- idd_class[!is.na(reference_class_name),
             .(class_order, reference_class_name)][
             , strsplit(reference_class_name, " ", fixed = TRUE), by = .(class_order)]
@@ -418,7 +418,7 @@ parse_idd <- function(path) {
     # collect \reference data
     idd_field_reference <- NULL
     # if '\reference' exists
-    if (slash_exists(idd_field, "reference")) {
+    if (has_name(idd_field, "reference")) {
         idd_field_reference <- idd_field[!is.na(reference),
             .(class_order, field_order, reference)][
             , strsplit(reference, " ", fixed = TRUE), by = .(class_order, field_order)]
@@ -434,7 +434,7 @@ parse_idd <- function(path) {
     # External-List reference data {{{
     idd_ref_external <- NULL
     # if '\external-list' exists
-    if (slash_exists(idd_field, "external_list")) {
+    if (has_name(idd_field, "external_list")) {
         idd_ref_external <- idd_field[!is.na(external_list),
             .(class_order, field_order, external_list)]
         setnames(idd_ref_external, "external_list", "ref_key")

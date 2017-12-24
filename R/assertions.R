@@ -224,3 +224,9 @@ on_failure(is_readable) <- function (call, env) {
     paste0(eval(call$path, env), " is not readable")
 }
 # }}}
+# has_name {{{
+has_name <- function(x, which) which %in% names(x)
+on_failure(has_name) <- function(call, env) {
+    paste0(deparse(call$x), " does not have name ", eval(call$which, env))
+}
+# }}}

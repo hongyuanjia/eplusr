@@ -25,9 +25,9 @@ char_count <- function (x, pattern, ...) {
     nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
 }
 # }}}
-# slash_exists {{{
-slash_exists <- function (idd_data, slash) {
-    any(grepl(slash, names(idd_data), fixed = TRUE))
+# get_avail_cols {{{
+get_avail_cols <- function (x, table) {
+    names(x)[match(table, names(x))]
 }
 # }}}
 # sep_line {{{
