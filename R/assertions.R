@@ -100,11 +100,74 @@ on_failure(is_imf) <- function (call, env) {
     paste0(deparse(call$x), " is not an IMF object")
 }
 # }}}
+# is_idf_class {{{
+is_idf_class <- function (x) inherits(x, "IDF_Class")
+
+on_failure(is_idf_class) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDF_Class object")
+}
+# }}}
+# is_idf_value {{{
+is_idf_value <- function (x) inherits(x, "IDF_Value")
+
+on_failure(is_idf_value) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDF_Value object")
+}
+# }}}
+# is_idf_obj {{{
+is_idf_obj <- function (x) inherits(x, "IDF_Value") || inherits(x, "IDF_Class")
+
+on_failure(is_idf_obj) <- function (call, env) {
+    paste0(deparse(call$x), " is neither an IDF_Class nor IDF_Value object")
+}
+# }}}
+# is_idf_comment {{{
+is_idf_comment <- function (x) inherits(x, "IDF_Comment")
+
+on_failure(is_idf_comment) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDF_Comment object")
+}
+# }}}
+# is_idf_ref {{{
+is_idf_ref <- function (x) inherits(x, "IDF_Ref")
+
+on_failure(is_idf_ref) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDF_Ref object")
+}
+# }}}
 # is_idd {{{
 is_idd <- function (x) inherits(x, "IDD")
 
 on_failure(is_idd) <- function (call, env) {
     paste0(deparse(call$x), " is not an IDD object")
+}
+# }}}
+# is_idd_class {{{
+is_idd_class <- function (x) inherits(x, "IDD_Class")
+
+on_failure(is_idd_class) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDD_Class object")
+}
+# }}}
+# is_idd_value {{{
+is_idd_value <- function (x) inherits(x, "IDD_Field")
+
+on_failure(is_idd_value) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDD_Field object")
+}
+# }}}
+# is_idd_ref_obj {{{
+is_idd_ref_obj <- function (x) inherits(x, "IDD_Ref_Obj")
+
+on_failure(is_idd_ref_obj) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDD_Ref_Obj object")
+}
+# }}}
+# is_idd_ref_ext {{{
+is_idd_ref_ext <- function (x) inherits(x, "IDD_Ref_Ext")
+
+on_failure(is_idd_ref_ext) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IDD_Ref_Ext object")
 }
 # }}}
 # is_pre_parsed {{{
