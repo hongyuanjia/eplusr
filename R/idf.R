@@ -480,7 +480,7 @@ get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
         idd <- link_idd(ver)
         if (is.null(idd)) {
-            stop(glue::glue("Input file has a version '{idf_version}' whose \\
+            stop(glue::glue("Input file has a version '{ver}' whose \\
                 IDD file has not been pre-parsed. 'idd' should be specified."),
                 call. = FALSE
             )
