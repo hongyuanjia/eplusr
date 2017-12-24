@@ -118,14 +118,18 @@ idel_object <- function (self, private, id, echo = TRUE) {
 
 #' @importFrom tools file_ext
 # isave_idf {{{
-isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "ori_top"), overwrite = FALSE) {
+isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "ori_top"), protect = TRUE, overwrite = FALSE) {
     if (missing(path)) {
         path <- private$path
-        if (!overwrite) {
-            stop(glue::glue("Saving will overwrite the original model located \\
+        if (protect) {
+            stop(glue::glue("Saving will protect the original model located \\
                 at {private$path}. This may have a risk of losing your original \\
-                model. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
+                model. Comfirm by setting 'protect' to TRUE."), call. = FALSE)
         }
+    } else if (file.exists(path) & !overwrite) {
+        path <- normalizePath(path, winslash = "/")
+        stop(glue::glue("Saving will replace an existing model file located at \\
+            {path}. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
     }
 
     # check mismatch of file content and file extention.
@@ -138,6 +142,11 @@ isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "o
         warning(glue::glue("The model has no macro input and should be saved \\
             as an 'idf' file. Saving it to 'imf' will force to run Ep-Marco \\
             preprocessor before simulation which is unnecessary."), call. = FALSE)
+    # other cases such as saving the model as a 'txt' file.
+    } else if (right_ext != target_ext) {
+        warning(glue::glue("The model should be saved as an '{right_ext}' file \\
+            , but has been saved with an extension '{target_ext}' which \\
+            EnergyPlus may not able to recognize."), call. == FALSE)
     }
 
     save_idf(private$model, path = path, format = format)
