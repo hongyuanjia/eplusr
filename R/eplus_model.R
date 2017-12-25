@@ -6,15 +6,18 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
     lock_class = TRUE,
 
     public = list(
+        getPrivate = function () private,
+
         initialize = function(path, idd = NULL) {
             private$path <- normalizePath(path, winslash = "/")
             private$str <- read_idf(path)
             private$ver <- get_idf_ver(private$str)
             private$idd <- get_idd(private$ver, idd)
             private$model <- parse_idf(private$str, idd = private$idd)
-            private$model$del <- data.table()
             private$type <- class(private$model)[1]
             private$time_read <- Sys.time()
+            private$model$log <- data.table(step = 0, timestep = private$time_read,
+                action = "init", id = 0L, new_id = 0L, active = TRUE)
         },
 
         all = function (type = c("id", "class", "field"), class = NULL)
@@ -23,27 +26,29 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         find = function (pattern, full = TRUE, ...)
             ifind_object(private, pattern, full, ...),
 
-        get = function (id, echo = TRUE)
-            iget_object(private, id, echo),
+        get = function (...)
+            iget_object(self, private, ...),
 
-        add = function (class, ..., min = TRUE, echo = TRUE)
-            iadd_object(self, private, class, min, ..., echo = echo),
+        add = function (class, ..., min = TRUE)
+            iadd_object(self, private, class, min, ...),
 
-        set = function (id, ..., echo = TRUE)
-            iset_object(self, private, id, ..., echo = echo),
+        set = function (id, ...)
+            iset_object(self, private, id, ...),
 
-        dup = function (id, new_name = NULL, echo = TRUE)
-            idup_object(self, private, id, new_name, echo),
+        dup = function (id, new_name = NULL)
+            idup_object(self, private, id, new_name),
 
-        del = function (id, force = FALSE, echo = TRUE)
-            idel_object(self, private, id, force, echo),
+        del = function (id, force = FALSE)
+            idel_object(self, private, id, force),
 
-        diff = function ()
-            idiff_idf(self, private),
+        diff = function (type = c("all", "add", "set", "del"))
+            idiff_idf(self, private, type),
 
-        save = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"),
-                         protect = TRUE, overwrite = FALSE)
-            isave_idf(private, path = path, format = format, protect, overwrite),
+        save = function (comfirm = FALSE, format = c("asis", "sorted", "ori_bot", "ori_top"))
+            isave_idf(private, format = format, comfirm = comfirm),
+
+        saveas = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"), overwrite = FALSE)
+            isaveas_idf(private, path, format, overwrite),
 
         print = function ()
             iprint_idf(private),
@@ -84,67 +89,58 @@ ifind_object <- function (private, pattern, full = TRUE, ...) {
 # }}}
 
 # iget_object {{{
-iget_object <- function (private, id, echo) {
-    get_object(private$model, id, verbose = echo)
+iget_object <- function (self, private, ...) {
+    private$model <- get_object(private$model, ...)
+
+    return(self)
 }
 # }}}
 
 # iadd_object {{{
-iadd_object <- function (self, private, class, min, ..., echo = TRUE) {
-    private$model <- add_object(private$model, class, ..., min = min, idd = private$idd, verbose = echo)
+iadd_object <- function (self, private, class, min, ...) {
+    private$model <- add_object(private$model, class, ..., min = min, idd = private$idd)
 
     return(self)
 }
 # }}}
 
 # iset_object {{{
-iset_object <- function (self, private, id, ..., echo = TRUE) {
-    private$model <- set_object(private$model, id, ..., idd = private$idd, verbose = echo)
+iset_object <- function (self, private, id, ...) {
+    private$model <- set_object(private$model, id, ..., idd = private$idd)
 
     return(self)
 }
 # }}}
 
 # idup_object {{{
-idup_object <- function (self, private, id, new_name = NULL, echo = TRUE) {
-    private$model <- dup_object(private$model, id, new_name, private$idd, verbose = echo)
+idup_object <- function (self, private, id, new_name = NULL) {
+    private$model <- dup_object(private$model, id, new_name, private$idd)
 
     return(self)
 }
 # }}}
 
 # idel_object {{{
-idel_object <- function (self, private, id, echo = TRUE) {
-    private$model <- del_object(private$model, id, private$idd, verbose = echo)
+idel_object <- function (self, private, id, force = FALSE) {
+    private$model <- del_object(private$model, id, private$idd)
 
     return(self)
 }
 # }}}
 
 # idiff_idf {{{
-idiff_idf <- function (self, private) {
-    get_idf_diff(private$model)
+idiff_idf <- function (self, private, type = c("all", "add", "set", "del")) {
+    type <- match.arg(type)
 
-    return(invisible(self))
+    private$model <- diff_idf(private$model, type)
+
+    return(self)
 }
 # }}}
 
 #' @importFrom tools file_ext
-# isave_idf {{{
-isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "ori_top"), protect = TRUE, overwrite = FALSE) {
-    if (missing(path)) {
-        path <- private$path
-        if (protect) {
-            stop(glue::glue("Saving will protect the original model located \\
-                at {private$path}. This may have a risk of losing your original \\
-                model. Comfirm by setting 'protect' to TRUE."), call. = FALSE)
-        }
-    } else if (file.exists(path) & !overwrite) {
-        path <- normalizePath(path, winslash = "/")
-        stop(glue::glue("Saving will replace an existing model file located at \\
-            {path}. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
-    }
-
+# isave_ {{{
+isave_ <- function (private, path, format) {
     # check mismatch of file content and file extention.
     right_ext <- tolower(private$type)
     target_ext <- tolower(tools::file_ext(path))
@@ -162,29 +158,47 @@ isave_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "o
             EnergyPlus may not able to recognize."), call. == FALSE)
     }
 
-    save_idf(private$model, path = path, format = format)
+    save_idf(private$model, path, format)
 
     message(glue::glue("Model has been successfully saved at {path}."))
+
+    return(invisible(NULL))
+}
+# }}}
+# isave_idf {{{
+isave_idf <- function (private, format = c("asis", "sorted", "ori_bot", "ori_top"),
+                       comfirm = FALSE) {
+    if (!comfirm) {
+        stop(glue::glue("Saving will overwrite the original model located \\
+            at {private$path}. This may have a risk of losing your original \\
+            model. Comfirm by setting 'comfirm' to TRUE."), call. = FALSE)
+    }
+
+    isave_(private, private$path, format)
+}
+# }}}
+# isaveas_idf {{{
+isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", "ori_top"),
+                         overwrite = FALSE) {
+    if (file.exists(path) & !overwrite) {
+        path <- normalizePath(path, winslash = "/")
+        stop(glue::glue("Saving will replace an existing model file located at \\
+            {path}. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
+    }
+
+    isave_(private, path, format)
 }
 # }}}
 
 # iprint_idf {{{
 iprint_idf <- function (private) {
-    count_obj <- setorder(private$model$class, group_order, class_order)[
-        , .N, by = .(group, class, object_id)][
-        , .(num = .N), by = .(group, class)][
-        , num_obj := paste0("[", stringr::str_pad(num, 2, "left", "0"), "]")][
-        , output := paste0(num_obj, " ", class)]
 
-    output <- count_obj[count_obj[, .I[1], by = .(group)]$V1,
-        output := paste0("\n", group, "\n", sep_line(), "\n", output)]
+    path <- paste0("[ Path  ]: ", private$path)
+    ver  <- paste0("[Version]: ", private$ver)
+    type <- paste0("[ Type  ]: ", private$type)
+    info <- c(path, ver, type, sep_line("="))
 
-    cat("Path: ", private$path, "\n")
-    cat("Version: ", private$ver, "\n")
-    cat("Type: ", private$type, "\n")
-    cat(sep_line("="), "\n")
-
-    print_output(output)
+    .print(private$model, info)
 }
 # }}}
 
@@ -196,13 +210,13 @@ ireset_model <- function (self, private, comfirm = FALSE) {
             that time and resetting cannot be undone. Comfirm by setting \\
             'comfirm' to TRUE."), call. = FALSE)
     }
-    private$ver <- get_idf_ver(private$str)
-    private$model <- parse_idf(private$str, idd = private$idd)
-    private$type <- class(private$model)[1]
+
+    self$initialize(private$path)
 
     message(glue::glue("The model has been reset to the status when it was \\
        first read at {private$time_read}."))
 
-    return(self)
+    # Do not print
+    return(invisible(self))
 }
 # }}}

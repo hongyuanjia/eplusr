@@ -25,9 +25,9 @@ char_count <- function (x, pattern, ...) {
     nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
 }
 # }}}
-# get_avail_cols {{{
-get_avail_cols <- function (x, table) {
-    names(x)[match(table, names(x))]
+# avail_cols {{{
+avail_cols <- function (x, table) {
+    names(x)[!is.na(match(table, names(x)))]
 }
 # }}}
 # sep_line {{{

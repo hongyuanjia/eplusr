@@ -37,7 +37,7 @@ has_macro <- function (str) {
 # }}}1
 # is_valid_id {{{
 is_valid_id <- function (id, idf) {
-    is_scalar(id) == 1L & id %in% valid_id(idf, verbose = FALSE)
+    id %in% attr(idf, "id")
 }
 
 on_failure(is_valid_id) <- function(call, env) {
@@ -66,6 +66,7 @@ on_failure(is_class_exist) <- function (call, env) {
 # can_be_duplicated {{{
 can_be_duplicated <- function (class, idf) {
     class_name <- class
+    assert_that(is_string(class_name))
     !(is_valid_class(class_name, idf) &&
       idf$class[class == class_name, unique_object])
 }
@@ -77,6 +78,7 @@ on_failure(can_be_duplicated) <- function(call, env) {
 # can_be_deleted {{{
 can_be_deleted <- function (class, idf) {
     class_name <- class
+    assert_that(is_string(class_name))
     !(is_valid_class(class_name, idf) &&
       (idf$class[class == class_name, unique_object] ||
        idf$class[class == class_name, required_object]))
@@ -84,6 +86,15 @@ can_be_deleted <- function (class, idf) {
 
 on_failure(can_be_deleted) <- function(call, env) {
     paste0(sQuote(eval(call$class, env)), " is an unique or required object that cannot be deleted")
+}
+# }}}
+# not_deleted {{{
+not_deleted <- function (id, idf) {
+    !(id %in% attr(idf, "id_del"))
+}
+
+on_failure(not_deleted) <- function(call, env) {
+    paste0("Object with ID ", sQuote(eval(call$id, env)), " has already been deleted before")
 }
 # }}}
 # is_idf {{{

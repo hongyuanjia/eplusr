@@ -361,6 +361,9 @@ parse_idf <- function (idf_str, idd) {
         setattr(idf, "class", c("IDF", class(idf)))
     }
 
+    ids <- sort(idf$class[, object_id])
+    setattr(idf, "id", ids)
+
     return(idf)
 }
 # }}}
@@ -404,7 +407,7 @@ get_obj_ref <- function (idf_value, idd) {
     # get field values that are referred
     idf_ref_value_field <- NULL
     if (!is.null(idd$ref_object$field)) {
-        idf_ref_value_field <- idd$ref_object$field[idf_value,
+        idf_ref_value_field <- idd$ref_object$field[idf_value[edited >= 0L],
             on = c("class_order", "field_order"), nomatch = 0L][
             , .(ref_key, value)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -413,7 +416,7 @@ get_obj_ref <- function (idf_value, idd) {
     # get class values that are referred
     idf_ref_value_class <- NULL
     if (!is.null(idd$ref_object$class)) {
-        idf_ref_value_class <- idd$ref_object$class[idf_value,
+        idf_ref_value_class <- idd$ref_object$class[idf_value[edited >= 0L],
             on = c("class_order"), nomatch = 0L][
             field_order == 1L, .(ref_key, class)][
             , .(ref_value = c(.SD)), by = .(ref_key)]
@@ -512,7 +515,7 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     header <- get_output_header(idf$options, format = save_format)
     comment <- get_output_comment(idf$comment)
-    value <- get_output_line(idf$value)
+    value <- get_output_line(idf$value[edited > 0L])
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
@@ -622,10 +625,12 @@ get_output_comment <- function (idf_comment) {
 }
 # }}}
 # get_output_line {{{
-get_output_line <- function (idf_value, keep_all = FALSE, show_id = FALSE,
-                             show_class = TRUE, show_diff = FALSE,
-                             show_ref = FALSE, fill_na = FALSE, indent = TRUE,
-                             standard = TRUE, new_line = TRUE) {
+get_output_line <- function (idf_value, keep_all = FALSE,
+                             show_id = FALSE, show_class = TRUE,
+                             show_diff = FALSE, show_order = FALSE,
+                             mark_required = FALSE, show_ref = FALSE,
+                             fill_na = FALSE, indent = TRUE, standard = TRUE,
+                             new_line = TRUE) {
     idf_value <- copy(idf_value)
 
     comb_list <- c("output_value", "output_field")
@@ -639,6 +644,12 @@ get_output_line <- function (idf_value, keep_all = FALSE, show_id = FALSE,
     if (show_diff) {
         idf_value <- add_output_diff(idf_value)
         comb_list <- c("output_diff", comb_list)
+    }
+
+    # add field order
+    if (show_order) {
+        idf_value <- add_output_order(idf_value, mark_required = mark_required)
+        comb_list <- c("output_order", comb_list)
     }
 
     # add class name
@@ -670,6 +681,18 @@ get_output_line <- function (idf_value, keep_all = FALSE, show_id = FALSE,
     return(idf_value)
 }
 # }}}
+# add_output_order {{{
+add_output_order <- function (idf_value, mark_required = FALSE) {
+    output_dt <- copy(idf_value)[, output_order := paste0(field_order, ":")]
+    if (mark_required) {
+        output_dt[
+            required_field == TRUE, output_order := paste0("*", output_order)][
+            required_field == FALSE, output_order := paste0(" ", output_order)]
+    }
+
+    return(output_dt)
+}
+# }}}
 # add_output_ref {{{
 add_output_ref <- function (idf_value_ref) {
     idf_value_ref[ref_value != value, output_ref := "   "]
@@ -690,16 +713,17 @@ add_output_id <- function (idf_value) {
 }
 # }}}
 # add_output_diff {{{
-add_output_diff <- function (idf_value) {
-    idf_value[, output_diff := "   "]
+add_output_diff <- function (idf_object) {
+    assert_that(has_name(idf_object, "edited"))
+    idf_object[, output_diff := "   "]
     # for deleted fields
-    idf_value[edited ==-1L, output_diff := "(-)"]
+    idf_object[edited ==-1L, output_diff := "(-)"]
     # for changed fields
-    idf_value[edited == 1L, output_diff := "(~)"]
+    idf_object[edited == 1L, output_diff := "(~)"]
     # for added fields
-    idf_value[edited == 2L, output_diff := "(+)"]
+    idf_object[edited == 2L, output_diff := "(+)"]
 
-    return(idf_value)
+    return(idf_object)
 }
 # }}}
 # add_output_class {{{
@@ -736,6 +760,7 @@ add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE) {
 add_output_field <- function (idf_value, standard = TRUE, new_line = TRUE, keep_all = FALSE) {
     idf_value <- add_output_field_name(idf_value)
     idf_value <- add_output_field_unit(idf_value)
+    comb_list <- c("output_name", "output_unit")
 
     if (standard) {
         idf_value[, output_name := paste0("!- ", output_name)]
@@ -747,10 +772,10 @@ add_output_field <- function (idf_value, standard = TRUE, new_line = TRUE, keep_
                   output_unit := paste0(output_unit, "\n")]
     }
 
-    idf_value[, output_field := paste0(output_name, output_unit)]
+    idf_value[, output_field := do.call(paste0, .SD), .SDcol = comb_list]
 
     if (!keep_all) {
-        idf_value[, `:=`(output_name = NULL, output_unit = NULL)]
+        idf_value[, c(comb_list) := NULL]
     }
 
     return(idf_value)
@@ -772,16 +797,91 @@ add_output_field_unit <- function (idf_value) {
     return(idf_value)
 }
 # }}}
+# get_output_summary {{{
+get_output_summary <- function (idf, diff = FALSE) {
+    assert_that(is_model(idf))
+    output_dt <- add_output_count(idf$class)
+    output_dt <- add_output_group(output_dt)
+
+    output_dt[, output := paste0(output_group, output_count, " ", class)]
+
+    return(output_dt)
+}
+# }}}
+# add_output_group {{{
+add_output_group <- function (idf_class) {
+    key_cols <- c("group_order", "class_order", "object_id")
+    key_cols <- avail_cols(idf_class, key_cols)
+    setorderv(idf_class, key_cols)
+
+    output_dt <- idf_class[, output_group := ""][
+        idf_class[, .I[1L], by = .(group_order)]$V1,
+        output_group := paste0("\n", group, "\n", sep_line(), "\n")]
+
+    return(output_dt)
+}
+# }}}
+# add_output_count {{{
+add_output_count <- function (idf_class) {
+    assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
+    output_dt <- get_obj_count(idf_class)
+    max_count <- output_dt[, max(num)]
+
+    output_dt <- output_dt[, output_count := paste0(
+        "[", stringr::str_pad(num, width = nchar(max_count), "left", "0"), "]")
+        ][, num := NULL]
+
+    setorder(output_dt, group_order, class_order)
+
+    return(output_dt)
+}
+# }}}
 # print_output {{{
 print_output <- function (x, col = "output") {
     cat(x[[col]], sep = "\n")
 }
 # }}}
+# .print {{{
+.print <- function (idf, info = NULL) {
+    target_id <- idf$log[.N, unlist(id)]
+    new_id <- idf$log[.N, new_id]
+    if (new_id > 0L) target_id <- unique(c(target_id, new_id)[c(target_id, new_id) > 0L])
+    action <- idf$log[.N, action]
+    active <- idf$log[.N, active]
+
+    # not active action
+    if (!active) {
+        # print the whole idf
+        output_str <- get_output_summary(idf)[, output]
+        output_str <- c(info, output_str)
+    # init or reset
+    } else if (all(target_id == 0L)) {
+        # print the whole idf
+        output_str <- get_output_summary(idf)[, output]
+        output_str <- c(info, output_str)
+    } else if (action == "diff") {
+        if (all(target_id == 0L)) {
+            idf$log[.N, active := FALSE]
+            return(cat("No modification has been made yet\n"))
+        } else {
+            output_str <- get_output_dt(idf, target_id, action)[, output]
+        }
+    } else {
+        output_str <- get_output_dt(idf, target_id, action)[, output]
+    }
+
+    cat(output_str, sep = "\n")
+
+    idf$log[.N, active := FALSE]
+
+    return(invisible())
+}
+# }}}
 
 # valid_field {{{
 valid_field <- function (class, idf, idd, verbose = TRUE) {
+    assert_that(is_string(class), is_valid_class(class, idf))
     class_name <- class
-    assert_that(is_valid_class(class_name, idf))
 
     all_fields <- add_output_field(idd$field[class == class_name],
         standard = FALSE, new_line = FALSE, keep_all = TRUE)[
@@ -800,7 +900,7 @@ valid_field <- function (class, idf, idd, verbose = TRUE) {
 # valid_class {{{
 valid_class <- function (idf) {
     key_cols <- c("group_order", "class_order", "object_id")
-    key_avail <- names(idf$class)[names(idf$class) %in% key_cols]
+    key_avail <- avail_cols(idf$class, key_cols)
     setorderv(copy(idf$class), key_avail)[, unique(class)]
 }
 # }}}
@@ -823,11 +923,20 @@ valid_id <- function (idf, verbose = TRUE) {
 
 # get_class {{{
 get_class <- function (idf, id) {
-    assert_that(is_valid_id(id, idf))
+    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
 
     single_class <- idf$class[object_id %in% id]
 
     return(single_class)
+}
+# }}}
+# get_value {{{
+get_value <- function (idf, id) {
+    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
+
+    object <- idf$value[object_id == id]
+
+    return(object)
 }
 # }}}
 
@@ -862,33 +971,28 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
 
     print_output(idf_value)
 
-    return(invisible())
+    return(invisible(idf))
 }
 # }}}
 # get_object {{{
-get_object <- function (idf, id, verbose = TRUE) {
-    lapply(id, function (x) assert_that(is_valid_id(x, idf)))
+get_object <- function (idf, ...) {
+    id <- list(...)
+    lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(is_valid_id(y, idf))))
 
-    single_object <- idf$value[object_id %in% id]
+    id <- unlist(id)
+    idf <- add_log("get", id, 0L, idf)
 
-    single_output <- get_output_line(single_object, show_id = TRUE)
-
-    if (verbose) {
-        print_output(single_output)
-        return(invisible(single_object))
-    }
-
-    return(single_object)
+    return(idf)
 }
 # }}}
 # dup_object {{{
-dup_object <- function (idf, id, new_name = NULL, idd, verbose = TRUE) {
-
+dup_object <- function (idf, id, new_name = NULL, idd) {
     target_class <- get_class(idf, id = id)
     class_name <- target_class[, unique(class)]
+    # check if the object can be duplicated
     assert_that(can_be_duplicated(class_name, idf))
 
-    target_object <- get_object(idf, id = id)
+    target_object <- get_value(idf, id)
 
     # Give new name if applicable {{{
     if (target_object[field_order == 1L & grepl("Name", field, fixed = TRUE), .N]) {
@@ -908,32 +1012,27 @@ dup_object <- function (idf, id, new_name = NULL, idd, verbose = TRUE) {
         } else {
             if (new_name %chin% all_names) {
                 used_id <- idf$value[class == class_name & field_order == 1L & field == new_name, object_id]
-                stop("Given new name has been used for object [ID:", used_id, "]",
+                stop("Given new name has been used in object [ID:", used_id, "]",
                      call. = FALSE)
             } else {
-                used_id <- idf$value[class == class_name & field_order == 1L, value := new_name]
+                used_id <- target_object[class == class_name & field_order == 1L, value := new_name]
             }
         }
     } else {
         if (!is.null(new_name)) {
-            warning("'new_name' is ignored for class ", class_name, call. = FALSE)
+            warning("'new_name' is ignored for class ", sQuote(class_name), call. = FALSE)
         }
     }
     # }}}
 
     # append all data
-    new_idf <- append_data(target_class, target_object, type = "add", idf, idd)
-
-    if (verbose) {
-        print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
-        return(invisible(new_idf))
-    }
+    new_idf <- append_data(id, target_class, target_object, action = "dup", idf, idd)
 
     return(new_idf)
 }
 # }}}
 # add_object {{{
-add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
+add_object <- function (idf, class, ..., min = TRUE, idd) {
     class_name <- class
     assert_that(is_valid_class(class_name, idd))
     assert_that(can_be_duplicated(class_name, idf))
@@ -963,47 +1062,38 @@ add_object <- function (idf, class, ..., min = TRUE, idd, verbose = TRUE) {
     }
 
     # append all data
-    new_idf <- append_data(new_class, new_object, type = "add", idf, idd)
-
-    if (verbose) {
-        print_output(get_output_line(new_object, show_class = TRUE, show_id = TRUE))
-        return(invisible(new_idf))
-    }
+    new_idf <- append_data(id = NULL, new_class, new_object, action = "add", idf, idd)
 
     return(new_idf)
 }
 # }}}
 # set_object {{{
-set_object <- function (idf, id, ..., idd, verbose = TRUE) {
+set_object <- function (idf, id, ..., idd) {
     assert_that(is_valid_id(id, idf))
     fields <- list(...)
     assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
 
-    ori_object <- get_object(idf, id, verbose = FALSE)
+    ori_object <- get_value(idf, id)
     new_object <- set_fields(ori_object, fields, idd)
 
     idf <- update_field_ref(ori_object, new_object, idf, idd)
 
-    new_idf <- append_data(target_class, new_object, type = "change", idf, idd)
-
-    if (verbose) {
-        print_output(get_output_line(new_object, show_class = TRUE, show_id = TRUE))
-        return(invisible(new_idf))
-    }
+    new_idf <- append_data(id, target_class, new_object, action = "set", idf, idd)
 
     return(new_idf)
 }
 # }}}
 # del_object {{{
-del_object <- function (idf, id, idd, force = FALSE, verbose = TRUE) {
+del_object <- function (idf, id, idd, force = FALSE) {
 
-    target_class <- get_class(idf, id = id)
+    target_class <- get_class(idf, id)
     class_name <- target_class[, unique(class)]
+    assert_that(not_deleted(id, idf))
     assert_that(can_be_deleted(class_name, idf))
 
-    target_object <- get_object(idf, id = id)
+    target_object <- get_value(idf, id = id)
 
     # check if the fields in the target object have been referred by other
     # objects
@@ -1028,15 +1118,22 @@ del_object <- function (idf, id, idd, force = FALSE, verbose = TRUE) {
         }
     }
 
-    idf$class <- idf$class[object_id != id]
-    idf$value <- idf$value[object_id != id]
-    idf$ref <- get_obj_ref(idf$value, idd)
-    idf$del <- rbindlist(list(idf$del, copy(target_object)[, edited := -1L]))
+    new_idf <- append_data(id, target_class, target_object, action = "del", idf, idd)
 
-    if (verbose) {
-        print_output(get_output_line(target_object, show_class = TRUE, show_id = TRUE))
-        return(invisible(idf))
-    }
+    return(new_idf)
+}
+# }}}
+# diff_idf {{{
+diff_idf <- function (idf, type = c("all", "add", "set", "del")) {
+    idx <- switch(type,
+        all = idf$class[edited != 0L, object_id],
+        del = idf$class[edited ==-1L, object_id],
+        set = idf$class[edited == 1L, object_id],
+        add = idf$class[edited == 2L, object_id]
+    )
+
+    if (is_empty(idx)) idx <- 0L
+    idf <- add_log("diff", idx, 0L, idf)
 
     return(idf)
 }
@@ -1064,19 +1161,24 @@ extract_object <- function (class, min = TRUE, idf, idd) {
 }
 # }}}
 # append_data {{{
-append_data <- function (class_data, object_data, type = c("add", "change"), idf, idd) {
+append_data <- function (id = NULL, class_data = NULL, object_data = NULL, action, idf, idd) {
 
-    type <- match.arg(type)
+    action <- match.arg(action, c("add", "dup", "set", "del"))
+    new_id <- 0L
 
-    if (identical(type, "add")) {
+    if (action %in% c("add", "dup")) {
         class_data <- append_id(class_data, base = "value", idf)
         object_data <- append_id(object_data, base = "value", idf)
-    } else {
+        new_id <- max_id(idf) + 1L
+        setattr(idf, "id", c(attr(idf, "id"), new_id))
+        if (action == "add") {
+            assert_that(is.null(id))
+            id <- 0L
+        }
+    } else if (action == "set") {
         class_data[, edited := 1L]
         # only mark fields that have been changed.
         id <- class_data[, unique(object_id)]
-        assert_that(is_valid_id(id, idf))
-
         ori_object <- idf$value[object_id == id]
         field_order_changed <- get_field_changes(ori_object, object_data)[
             , field_order]
@@ -1084,18 +1186,29 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
 
         idf$class <- idf$class[object_id != id]
         idf$value <- idf$value[object_id != id]
+    # del
+    } else {
+        idf$class[object_id == id, edited := -1L]
+        idf$value[object_id == id, edited := -1L]
+        id_del <- sort(unique(c(attr(idf, "id_del"), id)))
+        setattr(idf, "id_del", id_del)
     }
 
-    needed_cols_class <- names(idf$class)
-    idf$class <- rbindlist(list(idf$class, class_data[, ..needed_cols_class]))
-    setorder(idf$class, group_order, class_order, object_id)
+    if (action != "del") {
+        needed_cols_class <- names(idf$class)
+        idf$class <- rbindlist(list(idf$class, class_data[, ..needed_cols_class]))
+        setorder(idf$class, group_order, class_order, object_id)
 
-    needed_cols_value <- names(idf$value)
-    idf$value <- rbindlist(list(idf$value, object_data[, ..needed_cols_value]))
-    setorder(idf$value, class_order, object_id, field_order)
+        needed_cols_value <- names(idf$value)
+        idf$value <- rbindlist(list(idf$value, object_data[, ..needed_cols_value]))
+        setorder(idf$value, class_order, object_id, field_order)
+    }
 
     # update ref
     idf$ref <- get_obj_ref(idf$value, idd)
+
+    # add log
+    idf <- add_log(action, id, new_id, idf)
 
     return(idf)
 }
@@ -1104,12 +1217,9 @@ append_data <- function (class_data, object_data, type = c("add", "change"), idf
 append_id <- function (data, base = c("class", "value"), idf) {
     base <- match.arg(base)
 
-    # get max object id
-    max_id <- idf[[base]][, max(object_id)]
-
     # set new indicator
     data[, edited := 2L]
-    data[, object_id := max_id + 1L]
+    data[, object_id := max_id(idf) + 1L]
 
     return(data)
 }
@@ -1287,29 +1397,45 @@ update_field_ref <- function (ori_object, new_object, idf, idd) {
 }
 
 # }}}
-# get_idf_diff {{{
-get_idf_diff <- function (idf) {
-    output_dt <- get_output_line(idf$value[edited > 0L],
-        show_diff = TRUE, show_id = TRUE)[
-        , .(object_id, class_order, field_order, output)]
-    output_del <- get_output_line(idf$del,
-        show_diff = TRUE, show_id = TRUE)[
-        , .(object_id, class_order, field_order, output)]
-
-    output_comb <- rbindlist(list(output_dt, output_del))
-    setorder(output_comb, object_id, class_order, field_order)
-
-    print_output(output_comb)
-
-    return(invisible(output_comb))
-}
-# }}}
 # get_obj_count {{{
-get_obj_count <- function (idf_value) {
-    count_obj <- setorder(idf_value, class_order, object_id, field_order)[
-        , .N, by = .(class_order, class, object_id)][
-        , .(num = .N), by = .(class_order, class)]
+get_obj_count <- function (idf_object) {
+    key_cols <- c("group_order", "group", "class_order", "class", "object_id")
+    key_cols <- avail_cols(idf_object, key_cols)
+
+    setorderv(idf_object, setdiff(key_cols, c("group", "class")))
+    count_obj <- idf_object[, .N, by = c(key_cols)][
+        , .(num = .N), by = c(setdiff(key_cols, c("object_id")))]
 
     return(count_obj)
+}
+# }}}
+# add_log {{{
+add_log <- function (action, id, new_id = 0L, idf) {
+    action <- match.arg(action,
+        c("get", "add", "set", "dup", "del", "diff")
+    )
+    pre_step <- max(idf$log$step)
+    log_dt <- data.table(step = pre_step + 1L, timestep = Sys.time(),
+        action = action, id = list(id), new_id = new_id, active = TRUE)
+
+    idf$log <- rbindlist(list(idf$log[.N, active := FALSE], log_dt))
+    setorder(idf$log, step)
+
+    return(idf)
+}
+# }}}
+# get_output_dt {{{
+get_output_dt <- function (idf, ids, action) {
+    objects <- idf$value[object_id %in% ids]
+
+    output_dt <- get_output_line(objects, show_id = TRUE, show_class = TRUE,
+        show_order = TRUE, show_diff = TRUE)
+
+    return(output_dt)
+}
+# }}}
+# max_id {{{
+max_id <- function (idf) {
+    max(attr(idf, "id"))
 }
 # }}}
