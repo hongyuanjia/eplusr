@@ -466,8 +466,8 @@ parse_idd <- function(path) {
 ################################################################################
 # read_idd {{{1
 read_idd <- function(filepath) {
-    con = file(filepath, encoding = "UTF-8")
-    idd_str <- readLines(con)
+    con = file(filepath)
+    idd_str <- readLines(con, warn = FALSE)
     close(con)
 
     # Get rid of leading and trailing spaces
