@@ -1255,7 +1255,7 @@ set_fields <- function (object, fields, idd) {
     # check num of fields {{{
     max_fields <- idd$class[class == class_name, max_fields]
     if (value_length > max_fields) {
-        stop("Only *", max_fields, "* fields are applicable for class",
+        stop("Only * ", max_fields, " * fields are applicable for class ",
              sQuote(class_name), ", but ", value_length, " are given.",
              call. = FALSE)
     }
@@ -1299,17 +1299,17 @@ get_field_order <- function (idf_value, field_name, id = NULL, idd) {
             if (length(id) > 1L) {
                 stop("'id' required if more than one object exists in the input.", call. = FALSE)
             }
-            target_class <- idf_value[object_id == id, unique(class)]
+            class_name <- idf_value[object_id == id, unique(class)]
         } else {
-            target_class <- idf_value[, unique(class)]
-            assert_that(is_string(target_class), msg = "Multiple classes found in input. Cannot set fields.")
+            class_name <- idf_value[, unique(class)]
+            assert_that(is_string(class_name), msg = "Multiple classes found in input. Cannot set fields.")
         }
     } else {
         assert_that(is_valid_id(id, idf))
-        target_class <- idf_value[, unique(class)]
+        class_name <- idf_value[, unique(class)]
     }
 
-    idd_field <- idd$field[class == target_class]
+    idd_field <- idd$field[class == class_name]
     # add standard field name
     idd_field <- add_output_field_name(idd_field)
     # add lower case field_name
