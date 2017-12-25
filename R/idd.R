@@ -198,7 +198,7 @@ parse_idd <- function(path) {
                          "MAXIMUM<", "DEFAULT", "DEPRECATED", "AUTOSIZABLE",
                          "AUTOCALCULATABLE", "TYPE", "KEY", "OBJECT-LIST",
                          "EXTERNAL-LIST", "REFERENCE")
-    ignored_slash_key <- c("BEGIN-EXTENSIBLE", "RETAINCASE", "EXTENSIBLE")
+    ignored_slash_key <- c("BEGIN-EXTENSIBLE", "RETAINCASE", "EXTENSIBLE", "OBSOLETE")
     # mark group slash key and values
     idd_dt[slash_key %chin% group_slash_key,
            `:=`(slash_supported = TRUE, type = type_group, group = slash_value)]
@@ -246,20 +246,6 @@ parse_idd <- function(path) {
 
     # fix duplicated values
     # {{{
-    # fix duplicated class slash lines such as "\min-fields 3" in
-    # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
-    # {{{
-    dup_class_slash <- idd_dt[type %in% c(type_class, type_class_slash)][
-        , class := class[1], by = .(cumsum(!is.na(class)))][
-        type == type_class_slash, .(line, class, slash_key_value)]
-    line_dup <- dup_class_slash[
-        duplicated(dup_class_slash, by = c("class", "slash_key_value")), line]
-    # remove duplicated class slash lines
-    if (not_empty(line_dup)) {
-        idd_dt <- idd_dt[!(line %in% line_dup)]
-    }
-    # }}}
-
     # fix duplicated fields in "ZoneHVAC:HighTemperatureRadiant" and
     # "Foundation:Kiva"
     # NOTE: there are errors in "ZoneHVAC:HighTemperatureRadiant" that
@@ -269,14 +255,50 @@ parse_idd <- function(path) {
     # fill class downwards to make search easiser
     dup_field_anid <- idd_dt[type %in% c(type_class, type_class_slash, type_field,
         type_field_last, type_field_slash)][
-        , class := class[1], by = .(cumsum(!is.na(class)))][
+        , class := class[1L], by = .(cumsum(!is.na(class)))][
         type == type_field_slash][!is.na(field_anid), .(line, class, field_anid)]
 
     line_dup <- dup_field_anid[
         duplicated(dup_field_anid, by = c("class", "field_anid")), line]
     # add a suffix of 'd' to the duplicated field
     if (not_empty(line_dup)) {
-        idd_dt[line %in% line_dup, `:=`(field_id = paste0(field_id, "_dup"))]
+        idd_dt[line %in% line_dup,
+            `:=`(field_anid = paste0(field_anid, "_dup"),
+                 field_id = paste0(field_id, "_dup"))]
+    }
+    # }}}
+
+    # fix duplicated class slash lines such as "\min-fields 3" in such as
+    # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
+    # {{{
+    dup_class_slash <- idd_dt[type %in% c(type_class, type_class_slash)][
+        , class := class[1L], by = .(cumsum(!is.na(class)))][
+        type == type_class_slash, .(line, class, slash_key_value)]
+    line_dup <- dup_class_slash[
+        duplicated(dup_class_slash, by = c("class", "slash_key_value")), line]
+    # remove duplicated class slash lines
+    if (not_empty(line_dup)) {
+        idd_dt <- idd_dt[!(line %in% line_dup)]
+    }
+    # }}}
+
+    # fix duplicated field slash lines such as "\unit m" in such as
+    # "HVACTemplate:Zone:WaterToAirHeatPump"
+    # {{{
+    dup_field_slash <- idd_dt[
+        type %in% c(type_class, type_field, type_field_last, type_field_slash),
+        .(type, line, class, field_anid, slash_key, slash_key_value)][
+        , class := class[1L], by = .(cumsum(!is.na(class)))][
+        slash_key != "NOTE"][, field_anid := field_anid[1L],
+        by = .(class, cumsum(!is.na(field_anid)))][
+        type == type_field_slash]
+
+    line_dup <- dup_field_slash[
+        duplicated(dup_field_slash, by = c("class", "field_anid", "slash_key_value")),
+        line]
+    # remove duplicated field slash lines
+    if (not_empty(line_dup)) {
+        idd_dt <- idd_dt[!(line %in% line_dup)]
     }
     # }}}
     # }}}
@@ -291,9 +313,9 @@ parse_idd <- function(path) {
     idd_field <- idd_dt[type %in% c(type_class, type_field, type_field_last, type_field_slash),
         .SD, .SDcol = c("row_id", "class", "field_an", "field_id", "slash_key", "slash_value")]
     # rolling fill downwards for class and field AN and id
-    idd_field[, class := class[1], by = .(cumsum(!is.na(class)))]
-    idd_field[, field_an := field_an[1], by = .(cumsum(!is.na(field_an)), class)]
-    idd_field[, field_id := field_id[1], by = .(cumsum(!is.na(field_id)), class)]
+    idd_field[, class := class[1L], by = .(cumsum(!is.na(class)))]
+    idd_field[, field_an := field_an[1L], by = .(cumsum(!is.na(field_an)), class)]
+    idd_field[, field_id := field_id[1L], by = .(cumsum(!is.na(field_id)), class)]
     # combine field AN and id again for easing distinguishing fields
     idd_field[, field_anid := paste0(field_an, field_id)]
     # As the first line of each class is a class name which has been filled,
@@ -308,7 +330,7 @@ parse_idd <- function(path) {
     # get line of field AN and id
     idd_field_line <- idd_field[, .(class_order, field_anid, row_id)]
     idd_field_line <- idd_field_line[
-        idd_field_line[, .I[1], by = .(class_order, field_anid)]$V1]
+        idd_field_line[, .I[1L], by = .(class_order, field_anid)]$V1]
     # dcast
     idd_field <- dcast.data.table(idd_field,
         class_order + class + field_anid + field_an + field_id ~ slash_key,
@@ -351,8 +373,8 @@ parse_idd <- function(path) {
     idd_class <- idd_dt[between(type, type_group, type_class_slash),
         .SD, .SDcol = c("group", "class", "slash_key", "slash_value")]
     # rolling fill downwards for group and class
-    idd_class[, group := group[1], by = .(cumsum(!is.na(group)))]
-    idd_class[, class := class[1], by = .(cumsum(!is.na(class)))]
+    idd_class[, group := group[1L], by = .(cumsum(!is.na(group)))]
+    idd_class[, class := class[1L], by = .(cumsum(!is.na(class)))]
     # As group has been add into a seperated column named "group"and also the
     # last class in one group has been mis-categorized into the next group by
     # the filing process, delete group slash_key
@@ -445,8 +467,12 @@ parse_idd <- function(path) {
     # set class
     setattr(idd_class, "class", c("IDD_Class", class(idd_class)))
     setattr(idd_field, "class", c("IDD_Field", class(idd_field)))
-    setattr(idd_ref_object, "class", c("IDD_Ref_Obj", class(idd_ref_object)))
-    setattr(idd_ref_external, "class", c("IDD_Ref_Ext", class(idd_ref_external)))
+    if (!is.null(idd_ref_object)) {
+        setattr(idd_ref_object, "class", c("IDD_Ref_Obj", class(idd_ref_object)))
+    }
+    if (!is.null(idd_ref_external)) {
+        setattr(idd_ref_external, "class", c("IDD_Ref_Ext", class(idd_ref_external)))
+    }
 
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
