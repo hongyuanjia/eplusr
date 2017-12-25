@@ -33,7 +33,7 @@ parse_idd <- function(path) {
 
     pb$update(0.1, tokens = list(what = "Initialize"))
     # read idd string, get idd version and build
-    idd_str <- read_idd(filepath)
+    idd_str <- read_idd(path)
     idd_version <- get_idd_ver(idd_str)
     idd_build <- get_idd_build(idd_str)
 
@@ -456,7 +456,7 @@ parse_idd <- function(path) {
                 ref_object = idd_ref_object,
                 ref_external = idd_ref_external)
     # set class to IDD
-    setattr(idd, "class", c("IDD", class(idf)))
+    setattr(idd, "class", c("IDD", class(idd)))
     pb$tick(100L, tokens = list(what = "Complete"))
     return(idd)
 }
