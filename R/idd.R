@@ -482,7 +482,7 @@ read_idd <- function(filepath) {
 parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
                         stop = TRUE) {
     if (!is.null(info)) {
-        sep <- paste0(rep("-", console_width()), collapse = "")
+        sep <- sep_line("-")
     } else {
         sep <- NULL
     }
@@ -510,8 +510,8 @@ parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("ID
     mes <- c(
          glue::glue("
 
-                    {strrep('=', console_width())}
-                    {src} PARSING ERROR for file {sQuote(filepath)}
+                    {sep_line('=')}
+                    {src} PARSING ERROR for file {sQuote(path)}
                     {key_line}: {type}
                     "),
          glue::glue("
@@ -530,7 +530,8 @@ parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("ID
          if (!is.null(data_errors)) {
              glue::glue_data(data_errors,
                     "
-                    Line {line}: {sQuote(string)}\n
+
+                    Line {line}: {sQuote(string)}
                     ")
          },
          glue::glue("
