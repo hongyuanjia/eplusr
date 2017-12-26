@@ -15,6 +15,7 @@ NULL
 #' @export
 # parse_idf {{{
 parse_idf <- function (idf_str, idd) {
+    path <- attr(idf_str, "path")
 
     idf_version <- get_idf_ver(idf_str)
     # check if input file is an imf file.
@@ -253,8 +254,9 @@ parse_idf <- function (idf_str, idd) {
     if (!is_imf) {
         # missing required object {{{
         idf_errors_missing_required <- idf_class_all[required_object == TRUE][
-            is.na(line), class][, `:=`(line = "NA", string = class)]
+            is.na(line)]
         if (not_empty(idf_errors_missing_required)) {
+            idf_errors_missing_required[, `:=`(line = "NA", string = class)]
             parse_issue(path, "Missing required object", src = "IDF",
                         data_errors = idf_errors_missing_required)
         }
