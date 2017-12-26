@@ -12,7 +12,7 @@ on_failure(is_eplus_ver) <- function (call, env) {
 # }}}
 # is_supported_ver {{{
 is_supported_ver <- function (ver) {
-    supp_ver <- paste0("8.", 5:8)
+    supp_ver <- paste0("8.", 0:8)
     ver %in% supp_ver
 }
 
