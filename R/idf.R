@@ -1,5 +1,6 @@
 #' @import data.table
 #' @importFrom stringr str_pad
+#' @importFrom purrr map_lgl map2_lgl
 NULL
 
 #' Parse EnergyPlus models
@@ -235,7 +236,7 @@ parse_idf <- function (idf_str, idd) {
     idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
         unique_object == TRUE, .(line, class)][
         , lapply(.SD, list), .SDcol = "line", by = class][
-        sapply(line, function (x) length(x) > 1L)][, string := class]
+        purrr::map_lgl(line, ~length(.x) > 1L)][, string := class]
     if (not_empty(idf_errors_duplicated_unique)) {
         parse_issue(path, "Duplicated unique objects found",
             idf_errors_duplicated_unique, src = "IDF")
@@ -1048,7 +1049,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
     # set specified values
     fields <- list(...)
     if (not_empty(fields)) {
-        new_object <- set_fields(new_object, fields, idd = idd)
+        new_object <- set_fields(new_object, fields, idf, idd)
     }
 
     # check missing required fields
@@ -1078,7 +1079,7 @@ set_object <- function (idf, id, ..., idd) {
     target_class <- get_class(idf, id = id)
 
     ori_object <- get_value(idf, id)
-    new_object <- set_fields(ori_object, fields, idd)
+    new_object <- set_fields(ori_object, fields, idf, idd)
 
     idf <- update_field_ref(ori_object, new_object, idf, idd)
 
@@ -1236,7 +1237,7 @@ set_default <- function (idf_value) {
 }
 # }}}
 # set_fields {{{
-set_fields <- function (object, fields, idd) {
+set_fields <- function (object, fields, idf, idd) {
 
     class_name <- get_class_name(object)
 
@@ -1439,5 +1440,188 @@ get_output_dt <- function (idf, ids, action) {
 # max_id {{{
 max_id <- function (idf) {
     max(attr(idf, "id"))
+}
+# }}}
+# key_col {{{
+key_col <- function (idf_obj, type = c("field", "class")) {
+    type <- match.arg(type)
+
+    if (type == "field") key_cols <- c("object_id", "class_order", "field_order")
+    if (type == "class") key_cols <- c("group_order", "object_id", "class_order")
+
+    avail_cols(idf_obj, key_cols)
+}
+# }}}
+
+# check
+# check_object {{{
+check_object <- function (idf_value, type, idf) {
+    valid_checks <- c("missing", "scalar", "an", "integer", "choice", "object-list", "range", "auto")
+    if (missing(type)) type <- valid_checks
+
+    # get rid of autosizable and autocalculatable fields
+    input <- idf_value[-get_field_auto_line(idf_value)]
+
+    # always check missing
+    type <- unique(c("missing", type))
+
+    # get rid of non-required fields with empty values
+    # TODO: does this have any risk of messing things up?
+    input <- input[required_field == FALSE][!is.na(value)][value != ""]
+
+    res <- data.table()
+    if ("missing" %in% type)     res <- rbindlist(list(res, check_field_missing(input)), fill = TRUE)
+    if ("scalar" %in% type)      res <- rbindlist(list(res, check_field_scalar(input)), fill = TRUE)
+    if ("an" %in% type)          res <- rbindlist(list(res, check_field_an(input)), fill = TRUE)
+    if ("integer" %in% type)     res <- rbindlist(list(res, check_field_int(input)), fill = TRUE)
+    if ("choice" %in% type)      res <- rbindlist(list(res, check_field_choice(input)), fill = TRUE)
+    if ("object-list" %in% type) res <- rbindlist(list(res, check_field_objlist(input, idf)), fill = TRUE)
+    if ("range" %in% type)       res <- rbindlist(list(res, check_field_range(input)), fill = TRUE)
+    if ("auto" %in% type)        res <- rbindlist(list(res, check_field_auto(input)), fill = TRUE)
+
+    return(res)
+}
+# }}}
+# check_field_missing {{{
+check_field_missing <- function (object) {
+    if (!has_name(object, "required_field")) return(data.table())
+    object[required_field == TRUE][purrr::map_lgl(value, is_empty) | purrr::map_lgl(value, is.na)][
+           , `:=`(check_type = "missing", wrong = "[ * missing * ]")]
+}
+# }}}
+# check_field_scalar {{{
+check_field_scalar <- function (object) {
+    object[!purrr::map_lgl(value, is_scalar)][
+           , `:=`(check_type = "scalar", wrong = value)]
+}
+# }}}
+# check_field_an {{{
+check_field_an <- function (object) {
+    object[
+        # for $add and $set
+        if (is.list(value)) {
+            (field_an == "A" & !purrr::map_lgl(value, is.character)) |
+            (field_an == "N" & !purrr::map_lgl(value, is.numeric))
+        } else {
+            field_an == "N" & is.na(is.numeric(value))
+        }][
+       , `:=`(check_type = "an", wrong = value, right = field_an)]
+}
+# }}}
+# check_field_int {{{
+check_field_int <- function (object) {
+    object[type == "integer"][
+        # for $add and $set
+        if (is.list(value)) !purrr::map_lgl(value, is_integerish)
+        else !(!is.na(as.integer(value)) && as.integer(value) == as.numeric(value))][
+        , `:=`(check_type = "integer", wrong = value, right = as.integer(value))]
+}
+# }}}
+# check_field_choice {{{
+check_field_choice <- function (object) {
+    if (!has_name(object, "key")) return(data.table())
+    choice <- object[!is.na(key)]
+    if (is_empty(choice)) return(data.table())
+
+    key_cols <- c("object_id", "class_order", "class", "field_order")
+    key_cols <- avail_cols(object, key_cols)
+    choice <- choice[, list(strsplit(key, " ", fixed = TRUE)),
+        by = c(key_cols)][
+        choice[, key := NULL], on = c(key_cols)][
+        type == "choice"][!purrr::map2_lgl(value, V1, ~tolower(.x) %in% tolower(.y))]
+    setnames(choice, "V1", "key")
+
+    choice[, `:=`(check_type = "choice", wrong = value, right = key)]
+}
+# }}}
+# check_field_objlist {{{
+check_field_objlist <- function (object, idf) {
+    if (!has_name(object, "object_list")) return(data.table())
+    if (is_empty(idf$ref)) return(data.table())
+    obj_list <- object[!is.na(object_list)]
+    if (is_empty(obj_list)) return(data.table())
+
+    key_cols <- c("object_id", "class_order", "class", "field_order")
+    key_cols <- avail_cols(object, key_cols)
+
+    obj_list[, row_id := .I]
+    ref_keys <- obj_list[, strsplit(object_list, " ", fixed = TRUE), by = c("row_id", key_cols, "value")]
+    ref_values <- idf$ref[ref_keys, on = c("ref_key" = "V1"), nomatch = 0L]
+    obj_list <- ref_values[obj_list, on = c(key_cols), nomatch = 0L][
+        purrr::map2_lgl(value, ref_value,
+            ~{if (is.null(.x)||is.na(.x)||.x == "") FALSE
+              else !tolower(.x) %in% tolower(.y)
+            })]
+    setnames(obj_list[, `:=`(key = NULL, ref_key = NULL)], "ref_value", "key")
+
+    obj_list[, `:=`(check_type = "object-list", wrong = value, right = key)]
+}
+# }}}
+# check_field_range {{{
+check_field_range <- function (object) {
+    max_dt <- check_field_maximum(object)
+    min_dt <- check_field_minimum(object)
+    maxe_dt <- check_field_maximum_exclu(object)
+    mine_dt <- check_field_minimum_exclu(object)
+
+    rbindlist(list(max_dt, min_dt, maxe_dt, mine_dt), use.names = TRUE)
+}
+# }}}
+# check_field_maximum {{{
+check_field_maximum <- function (object) {
+    if (!has_name(object, "maximum")) return(data.table())
+
+    object[!is.na(maximum)][purrr::map2_lgl(value, maximum, ~as.numeric(.x) > .y)][
+           , `:=`(check_type = "maximum", wrong = value, right = maximum)]
+}
+# }}}
+# check_field_maximum_exclu {{{
+check_field_maximum_exclu <- function (object) {
+    if (!has_name(object, "maximum<")) return(data.table())
+
+    object[!is.na(`maximum<`)][purrr::map2_lgl(value, `maximum<`, ~as.numeric(.x) >= .y)][
+           , `:=`(check_type = "maximum<", wrong = value, right = `maximum<`)]
+}
+# }}}
+# check_field_minimum {{{
+check_field_minimum <- function (object) {
+    if (!has_name(object, "minimum")) return(data.table())
+
+    object[!is.na(minimum)][purrr::map2_lgl(value, minimum, ~as.numeric(.x) < .y)][
+           , `:=`(check_type = "minimum", wrong = value, right = `minimum`)]
+}
+# }}}
+# check_field_minimum_exclu {{{
+check_field_minimum_exclu <- function (object) {
+    if (!has_name(object, "minimum>")) return(data.table())
+
+    object[!is.na(`minimum>`)][purrr::map2_lgl(value, `minimum>`, ~as.numeric(.x) <= .y)][
+           , `:=`(check_type = "minimum>", wrong = value, right = `minimum>`)]
+}
+# }}}
+# check_field_auto {{{
+check_field_auto <- function (object) {
+    if (!any(has_name(object, "autosizable"), has_name(object, "autocalculatable"))) {
+        return(data.table())
+    }
+
+    res_size <- object[autosizable == FALSE][
+        purrr::map_lgl(value, ~tolower(.x) == "autosize")][
+        , `:=`(check_type = "autosizable", wrong = value)]
+    res_cal <- object[autocalculatable == FALSE][
+        purrr::map_lgl(value, ~tolower(.x) == "autocalculate")][
+        , `:=`(check_type = "autocalculatable", wrong = value)]
+
+    rbindlist(list(res_size, res_cal), fill = TRUE)
+}
+# }}}
+# get_field_auto_line {{{
+get_field_auto_line <- function (object) {
+    if (!any(has_name(object, "autosizable"), has_name(object, "autocalculatable"))) {
+        return(data.table())
+    }
+
+    object[(autosizable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autosize") ) |
+           (autocalculatable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
 }
 # }}}
