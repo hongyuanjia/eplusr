@@ -84,7 +84,7 @@ parse_idd <- function(path) {
     # if there are still known lines, report an error
     line_error_invalid <- idd_dt[type == type_unknown, which = TRUE]
     if (not_empty(line_error_invalid)) {
-        parse_issue(type = "Invalid line found", src = "IDD", stop = TRUE,
+        parse_issue(path, type = "Invalid line found", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_invalid, .(line, string)])
     }
     # }}}
@@ -213,7 +213,7 @@ parse_idd <- function(path) {
     # check for unsupported slash keys
     line_error_slash_key <- idd_dt[slash_supported == FALSE, which = TRUE]
     if (length(line_error_slash_key) > 0L) {
-        parse_issue(type = "Invalid slash key found.", src = "IDD", stop = TRUE,
+        parse_issue(path, type = "Invalid slash key found.", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_slash_key, .(line, string)])
     }
     # check for unsupported slash values
@@ -223,7 +223,7 @@ parse_idd <- function(path) {
        !(slash_value_upper %chin% c("REAL", "INTEGER", "ALPHA", "CHOICE",
             "OBJECT-LIST", "EXTERNAL-LIST", "NODE")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue("Invalid \\type found", idd_dt[line_error_type, .(line, string)])
+        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, .(line, string)])
     }
     # }}}
     # \external-List {{{
@@ -231,7 +231,7 @@ parse_idd <- function(path) {
            !(slash_value_upper %chin% c("AUTORDDVARIABLE", "AUTORDDMETER",
                "AUTORDDVARIABLEMETER")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue("Invalid \\type found", idd_dt[line_error_type, .(line, string)])
+        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, .(line, string)])
     }
     # }}}
     # \format {{{
@@ -239,7 +239,7 @@ parse_idd <- function(path) {
         !(slash_value_upper %chin% c("SINGLELINE", "VERTICES", "COMPACTSCHEDULE",
             "FLUIDPROPERTY", "VIEWFACTOR", "SPECTRAL")), which = TRUE]
     if (length(line_error_format) > 0) {
-        parse_issue("Invalid \\format found", idd_dt[line_error_format, .(line, string)])
+        parse_issue(path, "Invalid \\format found", idd_dt[line_error_format, .(line, string)])
     }
     # }}}
     # }}}
@@ -503,12 +503,12 @@ read_idd <- function(filepath) {
 }
 # }}}1
 
-#' @import glue
 # parse_issue {{{
-parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
-                        stop = TRUE) {
+parse_issue <- function (path, type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
+                        stop = TRUE, quote = TRUE) {
     if (!is.null(info)) {
-        sep <- sep_line("-")
+        sep <- paste0(sep_line("-"), "\n")
+        info <- paste0(info, "\n")
     } else {
         sep <- NULL
     }
@@ -529,54 +529,39 @@ parse_issue <- function (type = "", data_errors = NULL, info = NULL, src = c("ID
         # Only use the first 10 lines.
         if (num_row > 10L) {
             data_errors <- data_errors[1:10]
-            error_truncated <- "**Only first 10 errors are shown below**"
+            error_truncated <- "**Only first 10 errors are shown below**\n"
         }
     }
 
-    mes <- c(
-         glue::glue("
-
-                    {sep_line('=')}
-                    {src} PARSING ERROR for file {sQuote(path)}
-                    {key_line}: {type}
-                    "),
-         glue::glue("
-
-                    [Total Number]: {error_num}
-                    "),
-         glue::glue("
-
-                    {error_truncated}
-                    "),
-         glue::glue("
-
-                    {sep}
-
-                    "),
-         if (!is.null(data_errors)) {
-             glue::glue_data(data_errors,
-                    "
-
-                    Line {line}: {sQuote(string)}
-                    ")
-         },
-         glue::glue("
-                    {sep}
-
-                    "),
-         glue::glue(info),
-         glue::glue("
-
-                    {strrep('=', console_width())}
-                    "))
+    max_c <- max(sapply(data_errors[["line"]], nchar))
+    if (quote) {
+        data_str <- paste0(sprintf(paste0("Line %", max_c, "s: %s"), data_errors[["line"]],
+                           sapply(data_errors[["string"]], sQuote)), collapse = "\n")
+    } else {
+        data_str <- paste0(sprintf(paste0("Line %", max_c, "s: %s"), data_errors[["line"]],
+                           data_errors[["string"]]), collapse = "\n")
+    }
+    mes <- paste0("\n",
+        sep_line("="), "\n",
+        sprintf("%s PARSING ERROR for file %s", src, sQuote(path)), "\n",
+        paste0(key_line, ": ", type), "\n",
+        paste0("[Total Number]: ", error_num), "\n",
+        error_truncated,
+        sep_line("-"), "\n",
+        data_str, "\n",
+        sep,
+        info,
+        sep_line("="),
+        collapse = "\n")
+    mes <- gsub("\n\n", "\n", mes)
 
     if (stop) {
-        stop(glue::glue("{mes}"), call. = FALSE)
+        stop(mes, call. = FALSE)
     } else {
         ori <- getOption("warning.length")
         options(warning.length = 8000)
         on.exit(option(warning.length = ori))
-        warning(glue::glue("{mes}"), call. = FALSE)
+        warning(mes, call. = FALSE)
     }
 }
 # }}}

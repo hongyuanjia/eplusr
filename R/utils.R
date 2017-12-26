@@ -35,3 +35,8 @@ sep_line <- function (char = "-", length = console_width()) {
     strrep(char, length)
 }
 # }}}
+# msg {{{
+msg <- function (..., prefix = " ", initial = "") {
+    paste(strwrap(paste0(...)), collapse = "\n")
+}
+# }}}

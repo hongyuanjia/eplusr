@@ -25,10 +25,11 @@ parse_idf <- function (idf_str, idd) {
     # idf and idd version mismatch {{{
     idd_version <- idd$version
     if (!grepl(idf_version, idd_version, fixed = TRUE)) {
-        warning(glue::glue("Version Mismatch. The file parsing is a differnet \\
-            version '{idf_version}' than the EnergyPlus program and IDD file \\
-            you are using '{substr(idd_version, 1L, 3L)}'. Editing and saving \\
-            the file may make it incompatible with an older version of EnergyPlus."),
+        warning(msg("Version Mismatch. The file parsing is a differnet version
+                    '",idf_version,"' than the EnergyPlus program and IDD file
+                    you are using '",substr(idd_version, 1L, 3L),"'. Editing and
+                    saving the file may make it incompatible with an older
+                    version of EnergyPlus."),
             call. = FALSE)
     }
     # }}}
@@ -65,7 +66,7 @@ parse_idf <- function (idf_str, idd) {
     idf_errors_unknown_macro <- idf_macro[!(macro_key %chin% macro_dict),
                                           .(line, string)]
     if (not_empty(idf_errors_unknown_macro)) {
-        parse_issue(type = "Unknown macro found", src = "IDF",
+        parse_issue(path, type = "Unknown macro found", src = "IDF",
                     data_errors = idf_errors_unknown_macro)
     }
     # }}}
@@ -140,10 +141,10 @@ parse_idf <- function (idf_str, idd) {
             option_save <- NULL
         }
         if (nrow(idf_errors_option_save) > 1L) {
-            parse_issue(type = "More than one save option found", idf_errors_option_save,
+            parse_issue(path, type = "More than one save option found", idf_errors_option_save,
                         src = "IDF", stop = FALSE,
-                        info = glue::glue("Only the first option '{option_save[1]}' \\
-                                           will be used."))
+                        info = msg("Only the first option '",option_save[1],"'
+                                   will be used."))
         }
         }
         # for imf, always use "OriginalOrderBottom"
@@ -230,30 +231,32 @@ parse_idf <- function (idf_str, idd) {
 
     # Error checking {{{
     # duplicated unqiue object {{{
-    idf_errors_duplicated_unique <- idf_class_all[unique_object == TRUE][duplicated(class), .(line, class)]
+    idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
+        unique_object == TRUE, .(line, class)][
+        , lapply(.SD, list), .SDcol = "line", by = class][
+        sapply(line, function (x) length(x) > 1L)][, string := class]
     if (not_empty(idf_errors_duplicated_unique)) {
-        stop(glue::glue("Duplicated unique object found for class",
-                        glue::collapse(idf_errors_duplicated_unique$class, sep = ",",
-                                       last = " and ")),
-             call. = FALSE)
+        parse_issue(path, "Duplicated unique objects found",
+            idf_errors_duplicated_unique, src = "IDF")
     }
     # }}}
     # un-recognized class names {{{
-    idf_errors_unknown_class <- idf_class_all[type == type_object][!is.na(value) & is.na(class), .(line, string)]
+    idf_errors_unknown_class <- idf_class_all[type == type_object][
+        !is.na(value)][is.na(class), .(line, string)]
     if (not_empty(idf_errors_unknown_class)) {
-        parse_issue(type = "Object type not recognized", idf_errors_unknown_class,
-                    src = "IDF",
+        parse_issue(path, type = "Object type not recognized", src = "IDF",
+                    data_errors = idf_errors_unknown_class,
                     info = "This error may be caused by a misspelled object name.")
     }
     # }}}
     # Do not check missing required objects and fields for imf files.
     if (!is_imf) {
         # missing required object {{{
-        idf_errors_missing_required <- idf_class_all[required_object == TRUE & is.na(line), class]
+        idf_errors_missing_required <- idf_class_all[required_object == TRUE][
+            is.na(line), class][, `:=`(line = "NA", string = class)]
         if (not_empty(idf_errors_missing_required)) {
-            stop(glue::glue("Missing required object ",
-                            glue::collapse(idf_errors_missing_required)),
-                 call. = FALSE)
+            parse_issue(path, "Missing required object", src = "IDF",
+                        data_errors = idf_errors_missing_required)
         }
         # }}}
     }
@@ -285,32 +288,23 @@ parse_idf <- function (idf_str, idd) {
     # Error checking {{{
     # exceed max field {{{
     # get field number per class
-    idf_num_fields <- idf_field[, .(num_fields = .N), by = .(object_id, class)]
-    idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("object_id", "class")][
-        num_fields > max_fields, .(line, class, max_fields, num_fields)]
+    idf_num_fields <- idf_field[, .(num_fields = .N), by = .(class, object_id)]
+    idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("class", "object_id")][
+        num_fields > max_fields, .(line, class, max_fields, num_fields)][
+        , string := sprintf("*%s* fields found for class %s with only *%s* allowed", num_fields, sQuote(class), max_fields)]
     if (not_empty(idf_errors_max_fields)) {
-        stop(glue::glue("Too many fields for objects \\
-                        {glue::collapse(idf_errors_max_fields$class, sep = ',', last = ' and ')}.
-                        {sep_line()}
-                        "),
-             glue::glue_data("Line\tObject name\tField num.\tMax allowed
-                             {line}\t{class}\t{num_fields}\t{max_fields}"),
-             sep_line(),
-             call. = FALSE)
+        parse_issue(path, "Too many fields in objects", idf_errors_max_fields, src = "IDF", quote = FALSE)
     }
     # }}}
     # Do not check missing required objects and fields for imf files.
     if (!is_imf) {
         # missing required field {{{
-        idf_errors_missing_required_field <- idf_value_all[!is.na(object_id)][required_field == TRUE & is.na(value)]
+        idf_errors_missing_required_field <- idf_value_all[
+            !is.na(object_id)][required_field == TRUE & is.na(value)][
+            , string := paste0("Missing field ", field, "{", units, "}", "in class ", sQuote(class))]
         if (not_empty(idf_errors_missing_required_field)) {
-            stop(glue::glue("Missing required fields in objects \\
-                            {glue::collapse(idf_errors_missing_required_field$class, sep = ',', last = ' and ')}.",
-                            sep_line()),
-                 glue::glue_data("Line\tObject name\tMissing
-                                 {line}\t{class}\t{field}{{units}}
-                                 "),
-                 call. = FALSE)
+            parse_issue(path, "Missing reqiured fields in objects",
+                idf_errors_missing_required_field, src = "IDF", quote = FALSE)
         }
         # }}}
     }
@@ -326,7 +320,7 @@ parse_idf <- function (idf_str, idd) {
     # wrong class and field references {{{
     idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
     if (not_empty(idf_errors_wrong_references)) {
-        parse_issue(type = "Wrong value references", src = "IDF",
+        parse_issue(path, type = "Wrong value references", src = "IDF",
                     idf_errors_wrong_references)
     }
     # }}}
@@ -380,6 +374,7 @@ read_idf <- function (filepath) {
 
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
+    setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
     return(idf_str)
 }
