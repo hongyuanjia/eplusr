@@ -27,7 +27,7 @@ char_count <- function (x, pattern, ...) {
 # }}}
 # avail_cols {{{
 avail_cols <- function (x, table) {
-    names(x)[!is.na(match(names(x), table))]
+    names(x)[match(table, names(x))]
 }
 # }}}
 # sep_line {{{
