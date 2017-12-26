@@ -248,3 +248,8 @@ on_failure(has_name) <- function(call, env) {
     paste0(deparse(call$x), " does not have name ", eval(call$which, env))
 }
 # }}}
+# is_integerish {{{
+is_integerish <- function(x) {
+    is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
+}
+# }}}
