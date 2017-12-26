@@ -291,11 +291,11 @@ parse_idf <- function (idf_str, idd) {
     if (not_empty(idf_errors_max_fields)) {
         stop(glue::glue("Too many fields for objects \\
                         {glue::collapse(idf_errors_max_fields$class, sep = ',', last = ' and ')}.
-                        {glue::collapse(rep('-', 60L))}
+                        {sep_line()}
                         "),
              glue::glue_data("Line\tObject name\tField num.\tMax allowed
                              {line}\t{class}\t{num_fields}\t{max_fields}"),
-             glue::collapse({rep('-', 60L)}),
+             sep_line(),
              call. = FALSE)
     }
     # }}}
@@ -306,7 +306,7 @@ parse_idf <- function (idf_str, idd) {
         if (not_empty(idf_errors_missing_required_field)) {
             stop(glue::glue("Missing required fields in objects \\
                             {glue::collapse(idf_errors_missing_required_field$class, sep = ',', last = ' and ')}.",
-                            glue::collapse({rep('-', 60L)})),
+                            sep_line()),
                  glue::glue_data("Line\tObject name\tMissing
                                  {line}\t{class}\t{field}{{units}}
                                  "),
@@ -334,8 +334,9 @@ parse_idf <- function (idf_str, idd) {
     col_value_all <- names(idf_value)
     col_value_full <- c("object_id", "class_order", "class", "field_order",
         "field", "field_anid", "field_an", "field_id", "value", "units",
-        "ip_units", "default", "key", "maximum", "maximum<", "minimum",
-        "minimum>", "required_field", "object_list", "edited")
+        "ip_units", "type", "default", "key", "maximum", "maximum<", "minimum",
+        "minimum>", "autosizable", "autocalculatable", "required_field",
+        "object_list", "edited")
     col_value_avail <- col_value_all[!is.na(match(col_value_all, col_value_full))]
     idf_value <- idf_value[, .SD, .SDcol = col_value_avail]
     setkey(idf_value, object_id, class_order, field_order)
@@ -475,6 +476,10 @@ print.IDF <- function (idf) {
 link_idd <- function (ver) {
     if (is_pre_parsed(ver)) {
         switch(ver,
+            "8.0" = idd_8.0,
+            "8.1" = idd_8.1,
+            "8.2" = idd_8.2,
+            "8.3" = idd_8.3,
             "8.4" = idd_8.4,
             "8.5" = idd_8.5,
             "8.6" = idd_8.6,
