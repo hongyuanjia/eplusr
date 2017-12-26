@@ -3,4 +3,4 @@
 .RData
 *.cmd
 *.vbs
-.vscode/*.*
+try\.R
