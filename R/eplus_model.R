@@ -1,7 +1,7 @@
 #' Read, modify, save, run and analyze EnergyPlus models
 #'
 #' IDFEditor distributed along with
-#' \href{EnergyPlus}{https://www.energyplus.net/} provides full support for
+#' \href{https://www.energyplus.net}{EnergyPlus} provides full support for
 #' preparing EnergyPus IDF and IMF files for simulations. The parsing and
 #' writing process of IDF and IDD files in \code{eplusr} is basically the same
 #' as that in IDFEditor. But \code{eplusr} takes advantage of the powerful
@@ -9,7 +9,7 @@
 #' results. The IDD files for EnergyPlus 8.0 to 8.8 have been pre-parsed and
 #' stored internally and will automatically be used when parsing \code{IDF} and
 #' \code{IMF} files. The souce codes of IDFEditor can be found on
-#' \href{GitHub}{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}:
+#' \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{GitHub}
 #' . There is still an option to give an additional IDD file path to parse if
 #' you want. However, it will still take about 3-4 sec to parse an IDD file
 #' which is much slower than IDFEditor written in Visual Basic.
@@ -19,7 +19,7 @@
 #' you can set fields (using \code{$set}) in the object, duplicate (using
 #' \code{$dup}), delete (using \code{del}) the object.
 #'
-#' @section Usage
+#' @section Usage:
 #'
 #' ```
 #' model <- eplus_model$new(path, idd = NULL)
@@ -40,7 +40,7 @@
 #' model$reset(comfirm = FALSE)
 #' ```
 #'
-#' @section Read
+#' @section Read:
 #'
 #' ```
 #' model <- eplus_model$new(path, idd = NULL)
@@ -52,7 +52,7 @@
 #' * `idd`: Path to `Energy+.idd` file. If NULL, the pre-parsed `Energy+.idd`
 #'     files stored internally from EnergyPlus v8.0 to 8.8 will be used.
 #'
-#' @section Query
+#' @section Query:
 #'
 #' ```
 #' model$all(type, class = NULL)
@@ -93,7 +93,7 @@
 #' * `...` (in `$get`): Valid object IDs. You can find all valid object IDs
 #'                      using `$all("id")`.
 #'
-#' @section Modify
+#' @section Modify:
 #'
 #' ```
 #' model$add(class, ..., min = TRUE)
@@ -149,7 +149,7 @@
 #'          given without units. Error will occur when the type (character or
 #'          numeric), and the value (e.g. range) are not valid.
 #'
-#' @section Diff
+#' @section Diff:
 #'
 #' ```
 #' model$diff(type)
@@ -165,7 +165,7 @@
 #' * `type`: What type of modifications to show. Should be one of "all", "add",
 #'           "set", "del". Default is "all".
 #'
-#' @section Check
+#' @section Check:
 #'
 #' ```
 #' model$check()
@@ -180,7 +180,7 @@
 #'
 #' * `model`: An `eplus_model` object.
 #'
-#' @section Save
+#' @section Save:
 #'
 #' ```
 #' model$save(comfirm = FALSE, format)
@@ -210,7 +210,7 @@
 #' * `overwrite`: Whether to overwrite the file if it already exists. Default is
 #'                FALSE.
 #'
-#' @section Reset
+#' @section Reset:
 #'
 #' ```
 #' model$reset(comfirm = FALSE)
@@ -471,8 +471,8 @@ ireset_model <- function (self, private, comfirm = FALSE) {
 
     self$initialize(private$path)
 
-    message(msg("The model has been reset to the status when it was \\
-       first read at ", sQuote(private$time_read), "."))
+    message(msg("The model has been reset to the status when it was first read
+                at ", sQuote(private$time_read), "."))
 
     # Do not print
     return(invisible(self))
