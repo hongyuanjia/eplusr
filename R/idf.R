@@ -900,14 +900,21 @@ valid_field <- function (class, idf, idd) {
 # }}}
 # valid_class {{{
 valid_class <- function (idf) {
-    key_cols <- c("group_order", "class_order", "object_id")
-    key_avail <- avail_cols(idf$class, key_cols)
-    return(setorderv(copy(idf$class), key_avail)[, unique(class)])
+    key_avail <- key_col(idf$class, "class")
+    id_del <- get_deleted_id(idf)
+    idf_class <- copy(idf$class)
+    if (not_empty(id_del)) idf_class <- idf_class[!object_id %in% id_del]
+    return(setorderv(idf_class, key_avail)[, unique(class)])
 }
 # }}}
 # valid_id {{{
 valid_id <- function (idf) {
-    idf_value <- idf$value[idf$value[, .I[1:3], by = .(object_id)]$V1][
+    idf_value <- copy(idf$value)
+    id_del <- get_deleted_id(idf)
+    if (not_empty(id_del)) {
+        idf_value <- idf_value[!object_id %in% id_del]
+    }
+    idf_value <- idf_value[idf_value[, .I[1:3], by = .(object_id)]$V1][
         !is.na(class_order)]
     idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value[field_order == 3L, output := "    ........\n"]
@@ -916,7 +923,7 @@ valid_id <- function (idf) {
 
     print_output(idf_value)
 
-    return(invisible(idf$value[, unique(object_id)]))
+    return(invisible(idf_value[, unique(object_id)]))
 }
 # }}}
 
@@ -1018,6 +1025,7 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
     class_name <- get_class_name(target_class)
     # check if the object can be duplicated
     assert_that(can_be_duplicated(class_name, idf))
+    assert_that(not_deleted(id, idf))
 
     target_object <- get_value(idf, id)
 
@@ -1120,6 +1128,7 @@ set_object <- function (idf, id, ..., idd) {
     target_class <- get_class(idf, id = id)
     target_object <- get_value(idf, id)
     class_name <- get_class_name(target_class)
+    assert_that(not_deleted(id, idf))
     assert_that(can_be_modified(class_name, idf))
 
     target_order <- get_target_order(target_object, id, fields, idf, idd)
@@ -1550,6 +1559,9 @@ key_col <- function (idf_obj, type = c("field", "class")) {
 
     avail_cols(idf_obj, key_cols)
 }
+# }}}
+# get_deleted_id {{{
+get_deleted_id <- function (idf) attr(idf, "id_del")
 # }}}
 
 # check
