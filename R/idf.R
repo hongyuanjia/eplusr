@@ -5,10 +5,8 @@ NULL
 
 #' Parse EnergyPlus models
 #'
-#' @param path Path to EnergyPlus \code{IDF} or \code{IMF} file. The file
-#' extension does not matter. So models stored in \code{TXT} file are still able
-#' to correctly be parsed.
-#' @param idd Path to \code{Energy+.idd} or an IDD object.
+#' @param idf_str A character vector created using \code{read_idf}.
+#' @param idd An IDD object created using \code{parse_idd}.
 #'
 #' @return A list contains the IDF version, option data, class data, value data,
 #' comment data and field reference data.
@@ -50,7 +48,7 @@ parse_idf <- function (idf_str, idd) {
     #  3, last field in an object
     type_field_last <- 3L
     idf_dt[, type := type_unknown]
-    setkey(idf_dt, line, type)
+    setorderv(idf_dt, c("line", "type"))
 
     # delete blank lines
     idf_dt <- idf_dt[!(string %chin% "")]
@@ -64,7 +62,7 @@ parse_idf <- function (idf_str, idd) {
     idf_macro[space_loc < 0L, macro_key := substr(string, 1L, nchar(string))]
     # unknown marco key {{{
     idf_errors_unknown_macro <- idf_macro[!(macro_key %chin% macro_dict),
-                                          .(line, string)]
+                                          list(line, string)]
     if (not_empty(idf_errors_unknown_macro)) {
         parse_issue(path, type = "Unknown macro found", src = "IDF",
                     data_errors = idf_errors_unknown_macro)
@@ -115,7 +113,7 @@ parse_idf <- function (idf_str, idd) {
                       special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
     idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
     if (not_empty(idf_option)) {
-        idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = .(line, string, special_key)]
+        idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = list(line, string, special_key)]
         setnames(idf_option, "V1", "special_value")
         if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
             .N] > 1L) {
@@ -135,7 +133,7 @@ parse_idf <- function (idf_str, idd) {
                    option_save := "OriginalOrderTop"]
         idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERBOTTOM",
                    option_save := "OriginalOrderBottom"]
-        idf_errors_option_save <- idf_option[!is.na(option_save), .(line, string, option_save)]
+        idf_errors_option_save <- idf_option[!is.na(option_save), list(line, string, option_save)]
         option_save <- idf_errors_option_save[, unique(option_save)]
         if (is_empty(option_save)) {
             option_save <- NULL
@@ -171,12 +169,12 @@ parse_idf <- function (idf_str, idd) {
     idf_dt[!is.na(value), `:=`(value_count = char_count(value, "[,;]"))]
     idf_dt[is.na(value), `:=`(value_count = 0L)]
     idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)),
-        strsplit(value, "\\s*[,;]\\s*"), by = .(line)][
+        strsplit(value, "\\s*[,;]\\s*"), by = list(line)][
         idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
     setnames(idf_dt, "V1", "value")
     # get row numeber of last field per condensed field line in each class
     line_value_last <- idf_dt[
-        value_count > 1L & type == type_field_last, .(line_value_last = last(.I)), by = .(line, type)][
+        value_count > 1L & type == type_field_last, list(line_value_last = last(.I)), by = list(line, type)][
         , line_value_last]
     # set all type of condensed field lines to "field", including class names.
     idf_dt[value_count > 1L, type := type_field]
@@ -200,8 +198,8 @@ parse_idf <- function (idf_str, idd) {
     # if is the last field, then the line after last field line should be a
     # class name except the last field is the last non-blank and non-comment
     # line. Others are just normal fields.
-    idf_dt[type == type_field_last, object_id := .GRP, by = .(row_id)]
-    idf_dt <- idf_dt[!is.na(object_id), .(row_id, object_id)][
+    idf_dt[type == type_field_last, object_id := .GRP, by = list(row_id)]
+    idf_dt <- idf_dt[!is.na(object_id), list(row_id, object_id)][
         idf_dt[, object_id := NULL], on = c("row_id"), roll = -Inf]
     # }}}
 
@@ -211,7 +209,7 @@ parse_idf <- function (idf_str, idd) {
         .SDcol = c("type", "object_id", "comment", "leading_spaces")]
     idf_comment[is.na(leading_spaces), leading_spaces := 0L]
     idf_comment[leading_spaces < 0L, leading_spaces := 0L]
-    idf_comment[, field_order := seq_along(.I), by = .(object_id)]
+    idf_comment[, field_order := seq_along(.I), by = list(object_id)]
     idf_comment[, .SD, .SDcol = c("type", "object_id", "field_order", "comment", "leading_spaces")]
     idf_comment[, edited := 0L]
     # }}}
@@ -233,7 +231,7 @@ parse_idf <- function (idf_str, idd) {
     # Error checking {{{
     # duplicated unqiue object {{{
     idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
-        unique_object == TRUE, .(line, class)][
+        unique_object == TRUE, list(line, class)][
         , lapply(.SD, list), .SDcol = "line", by = class][
         purrr::map_lgl(line, ~length(.x) > 1L)][, string := class]
     if (not_empty(idf_errors_duplicated_unique)) {
@@ -243,7 +241,7 @@ parse_idf <- function (idf_str, idd) {
     # }}}
     # un-recognized class names {{{
     idf_errors_unknown_class <- idf_class_all[type == type_object][
-        !is.na(value)][is.na(class), .(line, string)]
+        !is.na(value)][is.na(class), list(line, string)]
     if (not_empty(idf_errors_unknown_class)) {
         parse_issue(path, type = "Object type not recognized", src = "IDF",
                     data_errors = idf_errors_unknown_class,
@@ -278,21 +276,21 @@ parse_idf <- function (idf_str, idd) {
     # FIELD
     # {{{
     # fill class downwards
-    idf_field <- idf_class_all[!is.na(class), .(row_id, class_order, class)][
+    idf_field <- idf_class_all[!is.na(class), list(row_id, class_order, class)][
         idf_dt, on = c("row_id"), roll = Inf][
         # get rid of class lines
         type > type_object][, c("type", "class_upper_case") := NULL]
     # order fields per object
-    idf_field[, field_order := seq_along(.I), by = .(object_id)]
+    idf_field[, field_order := seq_along(.I), by = list(object_id)]
 
     idf_value_all <- merge(idf_field, idd$field,
         by = c("class_order", "class", "field_order"), all = TRUE)
     # Error checking {{{
     # exceed max field {{{
     # get field number per class
-    idf_num_fields <- idf_field[, .(num_fields = .N), by = .(class, object_id)]
+    idf_num_fields <- idf_field[, list(num_fields = .N), by = list(class, object_id)]
     idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("class", "object_id")][
-        num_fields > max_fields, .(line, class, max_fields, num_fields)][
+        num_fields > max_fields, list(line, class, max_fields, num_fields)][
         , string := sprintf("*%s* fields found for class %s with only *%s* allowed", num_fields, sQuote(class), max_fields)]
     if (not_empty(idf_errors_max_fields)) {
         parse_issue(path, "Too many fields in objects", idf_errors_max_fields, src = "IDF", quote = FALSE)
@@ -407,8 +405,8 @@ get_obj_ref <- function (idf_value, idd) {
     if (!is.null(idd$ref_object$field)) {
         idf_ref_value_field <- idd$ref_object$field[idf_value[edited >= 0L],
             on = c("class_order", "field_order"), nomatch = 0L][
-            , .(ref_key, value)][
-            , .(ref_value = c(.SD)), by = .(ref_key)]
+            , list(ref_key, value)][
+            , list(ref_value = c(.SD)), by = list(ref_key)]
     }
 
     # get class values that are referred
@@ -416,8 +414,8 @@ get_obj_ref <- function (idf_value, idd) {
     if (!is.null(idd$ref_object$class)) {
         idf_ref_value_class <- idd$ref_object$class[idf_value[edited >= 0L],
             on = c("class_order"), nomatch = 0L][
-            field_order == 1L, .(ref_key, class)][
-            , .(ref_value = c(.SD)), by = .(ref_key)]
+            field_order == 1L, list(ref_key, class)][
+            , list(ref_value = c(.SD)), by = list(ref_key)]
     }
 
     idf_ref_value <- rbindlist(list(idf_ref_value_class, idf_ref_value_field))
@@ -431,7 +429,7 @@ check_obj_ref <- function (idf, idd) {
     idf_ref_field <- data.table()
     if (has_name(idf$value, "object_list")) {
         idf_ref_field <- idf$value[!is.na(object_list),
-            .(row_id, line, string,
+            list(row_id, line, string,
               object_id, class_order, field_order,
               object_list, value)][
             # remove empty lines
@@ -450,7 +448,7 @@ check_obj_ref <- function (idf, idd) {
                      by.x = "object_list" , by.y = "ref_key")
 
     error_ref <- idf_ref[!(toupper(value) %chin% toupper(unlist(ref_value))),
-        .(line, string)]
+        list(line, string)]
 
     return(error_ref)
 }
@@ -458,12 +456,12 @@ check_obj_ref <- function (idf, idd) {
 # print.IDF {{{
 print.IDF <- function (idf) {
     count_obj <- setorder(idf$class, group_order, class_order)[
-        , .N, by = .(group, class, object_id)][
-        , .(num = .N), by = .(group, class)][
+        , .N, by = list(group, class, object_id)][
+        , list(num = .N), by = list(group, class)][
         , num_obj := paste0("[", stringr::str_pad(num, 2, "left", "0"), "]")][
         , output := paste0(num_obj, " ", class)]
 
-    output <- count_obj[count_obj[, .I[1], by = .(group)]$V1,
+    output <- count_obj[count_obj[, .I[1], by = list(group)]$V1,
         output := paste0("\n", group, "\n", strrep("-", console_width()), "\n", output)]
 
     print_output(output)
@@ -473,7 +471,6 @@ print.IDF <- function (idf) {
 link_idd <- function (ver) {
     if (is_pre_parsed(ver)) {
         switch(ver,
-            "8.0" = idd_8.0,
             "8.1" = idd_8.1,
             "8.2" = idd_8.2,
             "8.3" = idd_8.3,
@@ -522,9 +519,9 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
-        , .(edited, object_id, class_order, field_order, class, output)]
+        , list(edited, object_id, class_order, field_order, class, output)]
     output_dt <- output_dt[!is.na(class_order),
-        .(edited, object_id, field_order, class_order, class)][
+        list(edited, object_id, field_order, class_order, class)][
         output_dt[, `:=`(class_order = NULL, class = NULL)],
         on = c("edited", "object_id", "field_order"), roll = -Inf]
     # }}}
@@ -534,8 +531,8 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     if (save_format == "SortedOrder") {
         setorder(output_dt, class_order, object_id, field_order)
         # add class heading
-        output_dt[, class_group := .GRP, by = .(rleid(class))]
-        output_dt[output_dt[, .I[1], by = .(class_group)]$V1,
+        output_dt[, class_group := .GRP, by = list(rleid(class))]
+        output_dt[output_dt[, .I[1], by = list(class_group)]$V1,
             output := paste0("\n!-   ===========  ALL OBJECTS IN CLASS: ",
                              toupper(class), " ===========\n\n", output)]
         setorder(output_dt, class_order, object_id, field_order)
@@ -621,7 +618,7 @@ get_output_comment <- function (idf_comment) {
     # for normal comment lines
     idf_comment[type == 0L, output := paste0("!", output_space, comment)]
     setorder(idf_comment, object_id, -field_order)
-    idf_comment[, field_order := -seq_along(.I), by = .(object_id)]
+    idf_comment[, field_order := -seq_along(.I), by = list(object_id)]
     setorder(idf_comment, object_id, field_order)
 
     return(idf_comment)
@@ -707,7 +704,7 @@ add_output_id <- function (idf_value) {
     max_id <- idf_value[, max(object_id)]
     setorder(idf_value, class_order, object_id, field_order)
     idf_value[, output_id := ""]
-    idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
+    idf_value[idf_value[, .I[1], by = list(object_id)]$V1,
         output_id := paste0(
             "[ID:", stringr::str_pad(object_id, nchar(max_id), "left", " "), "] ")
     ]
@@ -732,7 +729,7 @@ add_output_diff <- function (idf_object) {
 # add_output_class {{{
 add_output_class <- function (idf_value) {
     idf_value[, output_class := ""]
-    idf_value[idf_value[, .I[1], by = .(object_id)]$V1,
+    idf_value[idf_value[, .I[1], by = list(object_id)]$V1,
               output_class := paste0(class, ",\n")]
 
     return(idf_value)
@@ -746,7 +743,7 @@ add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE) {
     }
     idf_value[, output_value := paste0("    ", value_fill, ",")][
         , `:=`(value_fill = NULL)]
-    idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
+    idf_value[idf_value[, .I[.N], by = list(object_id)]$V1,
               output_value := sub(",$", ";", output_value)]
 
     if (indent) {
@@ -771,7 +768,7 @@ add_output_field <- function (idf_value, standard = TRUE, new_line = TRUE, keep_
 
     if (new_line) {
         # add a new line after the last field per class
-        idf_value[idf_value[, .I[.N], by = .(object_id)]$V1,
+        idf_value[idf_value[, .I[.N], by = list(object_id)]$V1,
                   output_unit := paste0(output_unit, "\n")]
     }
 
@@ -818,7 +815,7 @@ add_output_group <- function (idf_class) {
     setorderv(idf_class, key_cols)
 
     output_dt <- idf_class[, output_group := ""][
-        idf_class[, .I[1L], by = .(group_order)]$V1,
+        idf_class[, .I[1L], by = list(group_order)]$V1,
         output_group := paste0("\n", group, "\n", sep_line(), "\n")]
 
     return(output_dt)
@@ -915,7 +912,7 @@ valid_id <- function (idf) {
     if (not_empty(id_del)) {
         idf_value <- idf_value[!object_id %in% id_del]
     }
-    idf_value <- idf_value[idf_value[, .I[1:3], by = .(object_id)]$V1][
+    idf_value <- idf_value[idf_value[, .I[1:3], by = list(object_id)]$V1][
         !is.na(class_order)]
     idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value[field_order == 3L, output := "    ........\n"]
@@ -956,14 +953,14 @@ find_object <- function (idf, pattern, ...) {
         stop("No matched object found.", call. = FALSE)
     }
 
-    object_count <- idf_value[, .N, by = .(class, object_id)][, .N, by = .(class)]
+    object_count <- idf_value[, .N, by = list(class, object_id)][, .N, by = list(class)]
     idf_value <- get_output_line(idf_value, show_id = TRUE)
     idf_value <- object_count[idf_value, on = "class", roll = Inf]
 
     # add class heading
     setorder(idf_value, class_order, object_id, field_order)
-    idf_value[, class_group := .GRP, by = .(rleid(class))]
-    idf_value[idf_value[, .I[1], by = .(class_group)]$V1,
+    idf_value[, class_group := .GRP, by = list(rleid(class))]
+    idf_value[idf_value[, .I[1], by = list(class_group)]$V1,
         output := paste0("\n",
             stringr::str_pad(paste0("== * ", N, " Objects Found in Class: ", class, " * "),
                              console_width(), side = "right", pad = "=" ),
@@ -981,9 +978,9 @@ find_field <- function (idf, pattern, ..., all = FALSE) {
 
     if (!all) {
         idx <- idf$value[field_an == "A"][
-            grepl(pattern, value, ...), .(object_id, field_order)]
+            grepl(pattern, value, ...), list(object_id, field_order)]
     } else {
-        idx <- idf$value[grepl(pattern, value, ...), .(object_id, field_order)]
+        idx <- idf$value[grepl(pattern, value, ...), list(object_id, field_order)]
     }
 
     total <- idx[, .N]
@@ -1254,11 +1251,11 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
 
     if (action != "del") {
         needed_cols_class <- names(idf$class)
-        idf$class <- rbindlist(list(idf$class, class_data[, ..needed_cols_class]))
+        idf$class <- rbindlist(list(idf$class, class_data[, .SD, .SDcol = needed_cols_class]))
         setorder(idf$class, group_order, class_order, object_id)
 
         needed_cols_value <- names(idf$value)
-        idf$value <- rbindlist(list(idf$value, object_data[, ..needed_cols_value]))
+        idf$value <- rbindlist(list(idf$value, object_data[, .SD, .SDcol = needed_cols_value]))
         setorder(idf$value, class_order, object_id, field_order)
     }
 
@@ -1348,10 +1345,10 @@ get_class_name <- function (object) {
 # get_field_changes {{{
 get_field_changes <- function (ori_object, new_object) {
     # get the original object
-    ori_object <- ori_object[, .(class_order, field_order, value)]
+    ori_object <- ori_object[, list(class_order, field_order, value)]
     setnames(ori_object, "value", "ori_value")
     # get the new object
-    new_object <- new_object[, .(class_order, field_order, value)]
+    new_object <- new_object[, list(class_order, field_order, value)]
     setnames(new_object, "value", "new_value")
 
     modified_fields <- ori_object[new_object,
@@ -1390,8 +1387,8 @@ get_target_order <- function (idf_value, id = NULL, fields, idf, idd) {
     # {{{
     if (field_length > num_max) {
         stop(msg("Only *",num_max,"* fields are allowed for class
-                 ",sQuote(class_name," but *",field_length,"* are given."),
-                 call. = FALSE))
+                 ",sQuote(class_name)," but *",field_length,"* are given."),
+                 call. = FALSE)
     }
     # }}}
 
@@ -1467,7 +1464,7 @@ get_ref_key <- function (idf_value, idd) {
 # get_referred {{{
 get_referred <- function (idf_value, idf, idd) {
     all_needed <- c("ref_key", "class", "field", "field_anid", "units", "value")
-    field_ref_value <- get_ref_key(idf_value, idd)[, ..all_needed]
+    field_ref_value <- get_ref_key(idf_value, idd)[, .SD, .SDcol = all_needed]
     new_names <- c("ref_key", paste0("ref_", setdiff(all_needed, "ref_key")))
     setnames(field_ref_value, all_needed, new_names)
 
@@ -1493,7 +1490,7 @@ update_field_ref <- function (ori_object, new_object, idf, idd) {
 
     # find fields that have ref keys in the object
     field_ref_value <- get_ref_key(field_changes, idd)[
-        , .(ref_key, ori_value, new_value)]
+        , list(ref_key, ori_value, new_value)]
 
     # update new values
     idf$value <- field_ref_value[
@@ -1516,7 +1513,7 @@ get_obj_count <- function (idf_object) {
 
     setorderv(idf_object, setdiff(key_cols, c("group", "class")))
     count_obj <- idf_object[, .N, by = c(key_cols)][
-        , .(num = .N), by = c(setdiff(key_cols, c("object_id")))]
+        , list(num = .N), by = c(setdiff(key_cols, c("object_id")))]
 
     return(count_obj)
 }
@@ -1601,28 +1598,28 @@ check_object <- function (idf_value, idf, stop = FALSE) {
     # always checking missing values first
     mis <- check_field_missing(input)
     # get rid of lines with missing required values
-    if (not_empty(mis)) input <- input[!mis[, ..cols], on = c(cols)]
+    if (not_empty(mis)) input <- input[!mis[, .SD, .SDcol = cols], on = c(cols)]
 
     scalar <- check_field_scalar(input)
-    if (not_empty(scalar)) input <- input[!scalar[, ..cols], on = c(cols)]
+    if (not_empty(scalar)) input <- input[!scalar[, .SD, .SDcol = cols], on = c(cols)]
 
     auto <- check_field_auto(input)
-    if (not_empty(auto)) input <- input[!auto[, ..cols], on = c(cols)]
+    if (not_empty(auto)) input <- input[!auto[, .SD, .SDcol = cols], on = c(cols)]
 
     an <- check_field_an(input)
-    if (not_empty(an)) input <- input[!an[, ..cols], on = c(cols)]
+    if (not_empty(an)) input <- input[!an[, .SD, .SDcol = cols], on = c(cols)]
 
     int <- check_field_int(input)
-    if (not_empty(int)) input <- input[!int[, ..cols], on = c(cols)]
+    if (not_empty(int)) input <- input[!int[, .SD, .SDcol = cols], on = c(cols)]
 
     choice <- check_field_choice(input)
-    if (not_empty(choice)) input <- input[!choice[, ..cols], on = c(cols)]
+    if (not_empty(choice)) input <- input[!choice[, .SD, .SDcol = cols], on = c(cols)]
 
     objlist <- check_field_objlist(input, idf)
-    if (not_empty(objlist)) input <- input[!objlist[, ..cols], on = c(cols)]
+    if (not_empty(objlist)) input <- input[!objlist[, .SD, .SDcol = cols], on = c(cols)]
 
     range <- check_field_range(input)
-    # if (not_empty(range)) input <- input[!range[, ..cols], on = c(cols)]
+    # if (not_empty(range)) input <- input[!range[, .SD, .SDcol = cols], on = c(cols)]
 
     res <- rbindlist(list(mis, scalar, an, int, choice, objlist, range, auto), fill = TRUE)
 

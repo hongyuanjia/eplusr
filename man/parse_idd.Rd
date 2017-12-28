@@ -17,7 +17,7 @@ field data. Both class data and field data are stored in data.tables.
 Parse Energy+.idd file
 }
 \details{
-The IDD files for EnergyPlus 8.0 to 8.8 have been pre-parsed and
+The IDD files for EnergyPlus 8.1 to 8.8 have been pre-parsed and
 stored internally and will automatically be used when parsing \code{IDF} and
 \code{IMF} files. The parsing process was basically the same as that was
 implemented in IDFEditor distributed with EnergyPlus, but using the powerful
