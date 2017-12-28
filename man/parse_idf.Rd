@@ -7,11 +7,9 @@
 parse_idf(idf_str, idd)
 }
 \arguments{
-\item{idd}{Path to \code{Energy+.idd} or an IDD object.}
+\item{idf_str}{A character vector created using \code{read_idf}.}
 
-\item{path}{Path to EnergyPlus \code{IDF} or \code{IMF} file. The file
-extension does not matter. So models stored in \code{TXT} file are still able
-to correctly be parsed.}
+\item{idd}{An IDD object created using \code{parse_idd}.}
 }
 \value{
 A list contains the IDF version, option data, class data, value data,

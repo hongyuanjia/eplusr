@@ -15,7 +15,7 @@ preparing EnergyPus IDF and IMF files for simulations. The parsing and
 writing process of IDF and IDD files in \code{eplusr} is basically the same
 as that in IDFEditor. But \code{eplusr} takes advantage of the powerful
 \code{data.table} package to speed up the whole process and store the
-results. The IDD files for EnergyPlus 8.0 to 8.8 have been pre-parsed and
+results. The IDD files for EnergyPlus 8.1 to 8.8 have been pre-parsed and
 stored internally and will automatically be used when parsing \code{IDF} and
 \code{IMF} files. The souce codes of IDFEditor can be found on
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{GitHub}
