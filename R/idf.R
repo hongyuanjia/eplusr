@@ -517,7 +517,7 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     header <- get_output_header(idf$options, format = save_format)
     comment <- get_output_comment(idf$comment)
-    value <- get_output_line(idf$value[edited > 0L])
+    value <- get_output_line(idf$value[edited > -1L])
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
