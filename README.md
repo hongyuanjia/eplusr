@@ -1,3 +1,5 @@
+[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)
+
 # eplusr
 
 A Toolkit for Using EnergyPlus in R.
