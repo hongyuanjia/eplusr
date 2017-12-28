@@ -1,53 +1,17 @@
-################################################################################
-#                           Miscellaneous Functions                            #
-################################################################################
-# has_*_ext {{{1
-has_ext <- function (path, ext) {
-    grepl(ext, tools::file_ext(path), ignore.case = TRUE, perl = TRUE)
-}
+# console_width {{{
+# Reference: `cli` (https://github.com/r-lib/cli)
+console_width <- function() {
+    width <- getOption(
+        "cli.width",
+        Sys.getenv("RSTUDIO_CONSOLE_WIDTH",
+                   getOption("width", 80)
+        )
+    )
 
-assertthat::on_failure(has_ext) <- function (call, env = parent.env) {
-    path <- eval(call$path, env)
-    ext <- eval(call$ext, env)
-    msg("File ", sQuote(basename(path)), " does not have extension ", sQuote(ext), ".")
+    return(as.integer(width))
 }
-
-has_model_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("(i[dm]f|expidf)$", ext, ignore.case = TRUE)
-}
-
-has_epw_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("epw", ext, ignore.case = TRUE)
-}
-
-has_idf_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("i[dm]f", ext, ignore.case = TRUE)
-}
-
-has_imf_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("i[dm]f", ext, ignore.case = TRUE)
-}
-
-has_epg_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("epg", ext, ignore.case = TRUE)
-}
-
-has_epat_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("epat", ext, ignore.case = TRUE)
-}
-
-has_json_ext <- function (x) {
-    ext <- tools::file_ext(x)
-    grepl("json", ext, ignore.case = TRUE)
-}
-# }}}1
-
+# }}}
+# `%||%` {{{
 `%||%` <- function (x, y) {
     if (is.null(x)) {
         y
@@ -55,96 +19,44 @@ has_json_ext <- function (x) {
         x
     }
 }
-
-# file_* {{{1
-file_path <- function (..., normalize = TRUE) {
-    os <- Sys.info()['sysname']
-    if (os == "Windows") {
-        fsep = "\\"
-    } else {
-        fsep = "/"
-    }
-
-    if (normalize) {
-        path <- normalizePath(file.path(..., fsep = fsep), mustWork = FALSE)
-    } else {
-        path <- file.path(..., fsep = fsep)
-    }
-
-    return(path)
+# }}}
+# char_count {{{
+char_count <- function (x, pattern, ...) {
+    nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
 }
+# }}}
 
-file_prefix <- function (x, basename = TRUE) {
-    if (basename) tools::file_path_sans_ext(basename(x)) else tools::file_path_sans_ext(x)
+#' @importFrom stats na.omit
+# avail_cols {{{
+avail_cols <- function (x, table) {
+    stats::na.omit(names(x)[match(table, names(x))])
 }
-# }}}1
-
-is_empty <- function (x) {
-    length(x) == 0L
+# }}}
+# sep_line {{{
+sep_line <- function (char = "-", length = console_width()) {
+    strrep(char, length)
 }
-
+# }}}
+# msg {{{
 msg <- function (..., prefix = " ", initial = "") {
     paste(strwrap(paste0(...)), collapse = "\n")
 }
-
-# file_exists: Case-sensitive file existence checking {{{1
-file_exists <- function (...) {
-    files <- normalizePath(c(...), winslash = "/", mustWork = FALSE)
-    dirs <- dirname(files)
-    all_files <- purrr::set_names(
-        purrr::map(dirs, list.files, full.names = TRUE),
-        files
-    )
-    purrr::map2_lgl(files, all_files,
-        ~any(grepl(pattern = .x, x = .y, fixed = TRUE))
-    )
-}
-# }}}1
-
-# get_suffix_type {{{1
-get_suffix_type <- function (prefix) {
-    ori_wd <- getwd()
-    on.exit(setwd(ori_wd), add = TRUE)
-    setwd(dirname(prefix))
-    type <- c("table", "meter", "sizing")
-
-    get_sgl_type_suffix <- function (prefix, type) {
-        all_suffixes <- c("C", "L", "D")
-        purrr::set_names(
-            purrr::map_lgl(all_suffixes,
-                ~any(file_exists(
-                    output_files(prefix = prefix, suffix_type = .x,
-                        type = type, simplify = TRUE))
-                )
-            ),
-            all_suffixes
-        )
-    }
-
-    idx <- purrr::map_lgl(
-        purrr::simplify_all(
-            purrr::transpose(
-                purrr::map(type, ~get_sgl_type_suffix(prefix, .x))
-            )
-        ),
-        any
-    )
-
-    suffix <- names(which(idx))
-
-    return(suffix)
-}
-# }}}1
-
-# csQuote{{{
-csQuote <- function (x, and = TRUE) {
-    x_sq <- sQuote(x)
-    if (length(x_sq) > 1L & and) {
-        x_sq[length(x_sq)] <- paste0("and ", x_sq[length(x_sq)])
-    }
-
-    x_csq <- paste0(x_sq, collapse = ", ")
-
-    return(x_csq)
-}
+# }}}
+# globalVariables {{{
+id = output = extra_required = field_order = target_order = active = NULL
+ori_value = output = output_class = output_count = output_diff = output_field = NULL
+output_group = output_id = output_name = output_name_lower = output_order = NULL
+output_ref = output_space = output_unit = output_value = ref_key = ref_value = NULL
+reference = reference_class_name = required_field = required_object = right = NULL
+row_id = set_value = slash_key = slash_key_value = slash_loc = slash_supported = NULL
+slash_value = slash_value_upper = space_loc = special_key = special_loc = NULL
+special_value = step = string = target_order = type = unique_object = NULL
+unitsbasedonfield = value = value_count = value_fill = wrong = NULL
+max_fields = object_id = num = group_order = class_order = edited = NULL
+N = V1 = na.omit = NULL
+autocalculatable = autosizable = call. = char = check_type = class_group = NULL
+class_upper_case = colon_loc = default = explpt_loc = external_list = field = NULL
+field_an = field_anid = field_count = field_id = group = leading_spaces = line = NULL
+macro_key = max_fields = maximum = `maximum<` = min_fields = minimum = `minimum>` = NULL
+new_value = num_fields = num_obj = object_list = NULL
 # }}}
