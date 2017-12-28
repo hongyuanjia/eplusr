@@ -852,6 +852,7 @@ print_output <- function (x, col = "output") {
     action <- idf$log[.N, action]
     active <- idf$log[.N, active]
 
+    if (action == "save") return(invisible())
     # not active action
     if (!active) {
         # print the whole idf
@@ -1523,7 +1524,7 @@ get_obj_count <- function (idf_object) {
 # add_log {{{
 add_log <- function (action, id, new_id = 0L, idf) {
     action <- match.arg(action,
-        c("get", "add", "set", "dup", "del", "diff")
+        c("get", "add", "set", "dup", "del", "diff", "save")
     )
     pre_step <- max(idf$log$step)
     log_dt <- data.table(step = pre_step + 1L, timestep = Sys.time(),
