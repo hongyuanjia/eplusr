@@ -6,7 +6,7 @@ NULL
 #'
 #' @param path Path to 'Energy+.idd' file
 #'
-#' @details The IDD files for EnergyPlus 8.0 to 8.8 have been pre-parsed and
+#' @details The IDD files for EnergyPlus 8.1 to 8.8 have been pre-parsed and
 #' stored internally and will automatically be used when parsing \code{IDF} and
 #' \code{IMF} files. The parsing process was basically the same as that was
 #' implemented in IDFEditor distributed with EnergyPlus, but using the powerful
@@ -84,7 +84,7 @@ parse_idd <- function(path) {
     line_error_invalid <- idd_dt[type == type_unknown, which = TRUE]
     if (not_empty(line_error_invalid)) {
         parse_issue(path, type = "Invalid line found", src = "IDD", stop = TRUE,
-                    data_errors = idd_dt[line_error_invalid, .(line, string)])
+                    data_errors = idd_dt[line_error_invalid, list(line, string)])
     }
     # }}}
 
@@ -111,13 +111,13 @@ parse_idd <- function(path) {
     idd_dt[type %in% c(type_field, type_field_last),
            field_count := char_count(field_anid, "[,;]")]
     idd_dt <- idd_dt[type %in% c(type_field, type_field_last),
-        strsplit(field_anid, "\\s*[,;]\\s*"), by = .(line)][
+        strsplit(field_anid, "\\s*[,;]\\s*"), by = list(line)][
         idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
     setnames(idd_dt, "V1", "field_anid")
     # get row numeber of last field per condensed field line in each class
     idd_dt[, row_id := .I]
     line_field_last <- idd_dt[field_count> 1L][type == type_field_last,
-        row_id[.N], by = .(line, type)]$V1
+        row_id[.N], by = list(line, type)]$V1
     # set all type of condensed field lines to "field"
     idd_dt[field_count > 1L, type := type_field]
     idd_dt[line_field_last, type := type_field_last]
@@ -213,7 +213,7 @@ parse_idd <- function(path) {
     line_error_slash_key <- idd_dt[slash_supported == FALSE, which = TRUE]
     if (length(line_error_slash_key) > 0L) {
         parse_issue(path, type = "Invalid slash key found.", src = "IDD", stop = TRUE,
-                    data_errors = idd_dt[line_error_slash_key, .(line, string)])
+                    data_errors = idd_dt[line_error_slash_key, list(line, string)])
     }
     # check for unsupported slash values
     idd_dt[, slash_value_upper := toupper(slash_value)]
@@ -222,7 +222,7 @@ parse_idd <- function(path) {
        !(slash_value_upper %chin% c("REAL", "INTEGER", "ALPHA", "CHOICE",
             "OBJECT-LIST", "EXTERNAL-LIST", "NODE")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, .(line, string)])
+        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, list(line, string)])
     }
     # }}}
     # \external-List {{{
@@ -230,7 +230,7 @@ parse_idd <- function(path) {
            !(slash_value_upper %chin% c("AUTORDDVARIABLE", "AUTORDDMETER",
                "AUTORDDVARIABLEMETER")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, .(line, string)])
+        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, list(line, string)])
     }
     # }}}
     # \format {{{
@@ -238,7 +238,7 @@ parse_idd <- function(path) {
         !(slash_value_upper %chin% c("SINGLELINE", "VERTICES", "COMPACTSCHEDULE",
             "FLUIDPROPERTY", "VIEWFACTOR", "SPECTRAL")), which = TRUE]
     if (length(line_error_format) > 0) {
-        parse_issue(path, "Invalid \\format found", idd_dt[line_error_format, .(line, string)])
+        parse_issue(path, "Invalid \\format found", idd_dt[line_error_format, list(line, string)])
     }
     # }}}
     # }}}
@@ -254,8 +254,8 @@ parse_idd <- function(path) {
     # fill class downwards to make search easiser
     dup_field_anid <- idd_dt[type %in% c(type_class, type_class_slash, type_field,
         type_field_last, type_field_slash)][
-        , class := class[1L], by = .(cumsum(!is.na(class)))][
-        type == type_field_slash][!is.na(field_anid), .(line, class, field_anid)]
+        , class := class[1L], by = list(cumsum(!is.na(class)))][
+        type == type_field_slash][!is.na(field_anid), list(line, class, field_anid)]
 
     line_dup <- dup_field_anid[
         duplicated(dup_field_anid, by = c("class", "field_anid")), line]
@@ -271,8 +271,8 @@ parse_idd <- function(path) {
     # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
     # {{{
     dup_class_slash <- idd_dt[type %in% c(type_class, type_class_slash)][
-        , class := class[1L], by = .(cumsum(!is.na(class)))][
-        type == type_class_slash, .(line, class, slash_key_value)]
+        , class := class[1L], by = list(cumsum(!is.na(class)))][
+        type == type_class_slash, list(line, class, slash_key_value)]
     line_dup <- dup_class_slash[
         duplicated(dup_class_slash, by = c("class", "slash_key_value")), line]
     # remove duplicated class slash lines
@@ -286,10 +286,10 @@ parse_idd <- function(path) {
     # {{{
     dup_field_slash <- idd_dt[
         type %in% c(type_class, type_field, type_field_last, type_field_slash),
-        .(type, line, class, field_anid, slash_key, slash_key_value)][
-        , class := class[1L], by = .(cumsum(!is.na(class)))][
+        list(type, line, class, field_anid, slash_key, slash_key_value)][
+        , class := class[1L], by = list(cumsum(!is.na(class)))][
         slash_key != "NOTE"][, field_anid := field_anid[1L],
-        by = .(class, cumsum(!is.na(field_anid)))][
+        by = list(class, cumsum(!is.na(field_anid)))][
         type == type_field_slash]
 
     line_dup <- dup_field_slash[
@@ -312,9 +312,9 @@ parse_idd <- function(path) {
     idd_field <- idd_dt[type %in% c(type_class, type_field, type_field_last, type_field_slash),
         .SD, .SDcol = c("row_id", "class", "field_an", "field_id", "slash_key", "slash_value")]
     # rolling fill downwards for class and field AN and id
-    idd_field[, class := class[1L], by = .(cumsum(!is.na(class)))]
-    idd_field[, field_an := field_an[1L], by = .(cumsum(!is.na(field_an)), class)]
-    idd_field[, field_id := field_id[1L], by = .(cumsum(!is.na(field_id)), class)]
+    idd_field[, class := class[1L], by = list(cumsum(!is.na(class)))]
+    idd_field[, field_an := field_an[1L], by = list(cumsum(!is.na(field_an)), class)]
+    idd_field[, field_id := field_id[1L], by = list(cumsum(!is.na(field_id)), class)]
     # combine field AN and id again for easing distinguishing fields
     idd_field[, field_anid := paste0(field_an, field_id)]
     # As the first line of each class is a class name which has been filled,
@@ -324,12 +324,12 @@ parse_idd <- function(path) {
     # such as "\\unique-object". Set it to TRUE
     idd_field <- idd_field[is.na(slash_value), slash_value := "TRUE"]
     # order class as the sequence the appears in IDD
-    idd_field[, class_order := .GRP, by = .(class)]
+    idd_field[, class_order := .GRP, by = list(class)]
     # using dcast to cast all field attributes into seperated columns
     # get line of field AN and id
-    idd_field_line <- idd_field[, .(class_order, field_anid, row_id)]
+    idd_field_line <- idd_field[, list(class_order, field_anid, row_id)]
     idd_field_line <- idd_field_line[
-        idd_field_line[, .I[1L], by = .(class_order, field_anid)]$V1]
+        idd_field_line[, .I[1L], by = list(class_order, field_anid)]$V1]
     # dcast
     idd_field <- dcast.data.table(idd_field,
         class_order + class + field_anid + field_an + field_id ~ slash_key,
@@ -361,7 +361,7 @@ parse_idd <- function(path) {
     idd_field[is.na(unitsbasedonfield), unitsbasedonfield := FALSE]
 
     # order fields per class
-    idd_field[, field_order := seq_along(field_anid), by = .(class)]
+    idd_field[, field_order := seq_along(field_anid), by = list(class)]
     setorder(idd_field, class_order, field_order)
     # }}}
 
@@ -372,8 +372,8 @@ parse_idd <- function(path) {
     idd_class <- idd_dt[between(type, type_group, type_class_slash),
         .SD, .SDcol = c("group", "class", "slash_key", "slash_value")]
     # rolling fill downwards for group and class
-    idd_class[, group := group[1L], by = .(cumsum(!is.na(group)))]
-    idd_class[, class := class[1L], by = .(cumsum(!is.na(class)))]
+    idd_class[, group := group[1L], by = list(cumsum(!is.na(group)))]
+    idd_class[, class := class[1L], by = list(cumsum(!is.na(class)))]
     # As group has been add into a seperated column named "group"and also the
     # last class in one group has been mis-categorized into the next group by
     # the filing process, delete group slash_key
@@ -385,8 +385,8 @@ parse_idd <- function(path) {
     idd_class <- idd_class[!is.na(slash_key)][
         is.na(slash_value), slash_value := "TRUE"]
     # order group and class as the sequence the appears in IDD
-    idd_class[, group_order := .GRP, by = .(group)]
-    idd_class[, class_order := .GRP, by = .(class)]
+    idd_class[, group_order := .GRP, by = list(group)]
+    idd_class[, class_order := .GRP, by = list(class)]
     # using dcast to cast all class attributes into seperated columns
     idd_class <- dcast.data.table(idd_class,
         group_order + group + class_order + class ~ slash_key,
@@ -405,7 +405,7 @@ parse_idd <- function(path) {
     idd_class[is.na(required_object), required_object := FALSE]
     idd_class[is.na(unique_object), unique_object := FALSE]
     # get max field per class
-    idd_class <- idd_field[, .(max_fields = .N), by = class][idd_class, on = "class"]
+    idd_class <- idd_field[, list(max_fields = .N), by = class][idd_class, on = "class"]
     neworder <- c("group_order", "group", "class_order", "class", "format",
          "min_fields", "max_fields", "required_object", "unique_object")
     setcolorder(idd_class, c(neworder, setdiff(names(idd_class), neworder)))
@@ -419,9 +419,9 @@ parse_idd <- function(path) {
     # if '\object-list' exists
     if (has_name(idd_field, "object_list")) {
         idd_object_list <- idd_field[!is.na(object_list),
-            .(class_order, field_order, object_list)][
+            list(class_order, field_order, object_list)][
             , strsplit(object_list, " ", fixed = TRUE),
-            by = .(class_order, field_order)]
+            by = list(class_order, field_order)]
         setnames(idd_object_list, "V1", "ref_key")
     }
 
@@ -430,8 +430,8 @@ parse_idd <- function(path) {
     # if '\reference-class-name' exists
     if (has_name(idd_class, "reference_class_name")) {
         idd_class_reference <- idd_class[!is.na(reference_class_name),
-            .(class_order, reference_class_name)][
-            , strsplit(reference_class_name, " ", fixed = TRUE), by = .(class_order)]
+            list(class_order, reference_class_name)][
+            , strsplit(reference_class_name, " ", fixed = TRUE), by = list(class_order)]
         setnames(idd_class_reference, "V1", "ref_key")
         setcolorder(idd_class_reference, c("ref_key", "class_order"))
     }
@@ -441,8 +441,8 @@ parse_idd <- function(path) {
     # if '\reference' exists
     if (has_name(idd_field, "reference")) {
         idd_field_reference <- idd_field[!is.na(reference),
-            .(class_order, field_order, reference)][
-            , strsplit(reference, " ", fixed = TRUE), by = .(class_order, field_order)]
+            list(class_order, field_order, reference)][
+            , strsplit(reference, " ", fixed = TRUE), by = list(class_order, field_order)]
         setnames(idd_field_reference, c("class_order", "field_order", "ref_key"))
         setcolorder(idd_field_reference, c("ref_key", "class_order", "field_order"))
     }
@@ -457,7 +457,7 @@ parse_idd <- function(path) {
     # if '\external-list' exists
     if (has_name(idd_field, "external_list")) {
         idd_ref_external <- idd_field[!is.na(external_list),
-            .(class_order, field_order, external_list)]
+            list(class_order, field_order, external_list)]
         setnames(idd_ref_external, "external_list", "ref_key")
         setcolorder(idd_ref_external, c("ref_key", "class_order", "field_order"))
     }
