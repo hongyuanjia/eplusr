@@ -21,10 +21,10 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         all = function (type = c("id", "class", "field"), class = NULL)
             iall_idf(private, type, class),
 
-        contains = function (match, scale = c("object", "field"))
+        contains = function (match, scale = c("class", "field"))
             ifind_(private, pattern = match, scale = scale, fixed = TRUE),
 
-        matches = function (match, ..., scale = c("object", "field"))
+        matches = function (match, ..., scale = c("class", "field"))
             ifind_(private, pattern = match, scale = scale, ...),
 
         get = function (...)
@@ -87,10 +87,10 @@ iall_idf <- function (private, type = c("id", "class", "field"), class = NULL) {
 # }}}
 
 # ifind_ {{{
-ifind_ <- function (private, pattern, scale = c("object", "field"), ...) {
+ifind_ <- function (private, pattern, scale = c("class", "field"), ...) {
     scale <- match.arg(scale)
 
-    if (scale == "object") {
+    if (scale == "class") {
         object = find_object(private$model, pattern, ...)
     } else {
         field = find_field(private$model, pattern, ...)
