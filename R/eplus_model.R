@@ -178,6 +178,10 @@ isave_ <- function (private, path, format) {
 
     message(sprintf("Model has been successfully saved at %s.", sQuote(path)))
 
+    private$path <- normalizePath(path, winslash = "/")
+    private$str <- read_idf(path)
+    private$model <- parse_idf(private$str, idd = private$idd)
+    private$model$log <- add_log("save", id = 0L, new_id = 0L, private$model)
     return(invisible(NULL))
 }
 # }}}
@@ -207,8 +211,6 @@ isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", 
     }
 
     isave_(private, path, format)
-
-    private$path <- path
 }
 # }}}
 
