@@ -559,7 +559,7 @@ parse_issue <- function (path, type = "", data_errors = NULL, info = NULL, src =
     } else {
         ori <- getOption("warning.length")
         options(warning.length = 8000)
-        on.exit(option(warning.length = ori))
+        on.exit(options(warning.length = ori))
         warning(mes, call. = FALSE)
     }
 }
