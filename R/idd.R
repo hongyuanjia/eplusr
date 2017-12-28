@@ -18,8 +18,6 @@ NULL
 #'
 #' @return A list contains the IDD version, build, parsed class data and parsed
 #' field data. Both class data and field data are stored in data.tables.
-#'
-#' @export
 parse_idd <- function(path) {
 
     assert_that(is_readable(path))
