@@ -4,7 +4,7 @@
 \alias{parse_idf}
 \title{Parse EnergyPlus models}
 \usage{
-parse_idf(filepath, idd = NULL)
+parse_idf(idf_str, idd)
 }
 \arguments{
 \item{idd}{Path to \code{Energy+.idd} or an IDD object.}

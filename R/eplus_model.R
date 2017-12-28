@@ -21,8 +21,11 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         all = function (type = c("id", "class", "field"), class = NULL)
             iall_idf(private, type, class),
 
-        find = function (pattern, full = TRUE, ...)
-            ifind_object(private, pattern, full, ...),
+        contains = function (match, scale = c("object", "field"))
+            ifind_(private, pattern = match, scale = scale, fixed = TRUE),
+
+        matches = function (match, ..., scale = c("object", "field"))
+            ifind_(private, pattern = match, scale = scale, ...),
 
         get = function (...)
             iget_object(self, private, ...),
@@ -41,6 +44,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
 
         diff = function (type = c("all", "add", "set", "del"))
             idiff_idf(self, private, type),
+
+        check = function ()
+            icheck_object(self, private),
 
         save = function (comfirm = FALSE, format = c("asis", "sorted", "ori_bot", "ori_top"))
             isave_idf(private, format = format, comfirm = comfirm),
@@ -80,9 +86,15 @@ iall_idf <- function (private, type = c("id", "class", "field"), class = NULL) {
 }
 # }}}
 
-# ifind_object {{{
-ifind_object <- function (private, pattern, full = TRUE, ...) {
-    find_object(private$model, pattern, full, ...)
+# ifind_ {{{
+ifind_ <- function (private, pattern, scale = c("object", "field"), ...) {
+    scale <- match.arg(scale)
+
+    if (scale == "object") {
+        object = find_object(private$model, pattern, ...)
+    } else {
+        field = find_field(private$model, pattern, ...)
+    }
 }
 # }}}
 
@@ -143,22 +155,28 @@ isave_ <- function (private, path, format) {
     right_ext <- tolower(private$type)
     target_ext <- tolower(tools::file_ext(path))
     if (right_ext == "imf" && target_ext == "idf") {
-        stop(glue::glue("The model has macro input and should be saved as an \\
-            'imf' file, not an 'idf' file."), call. = FALSE)
+        stop(msg(
+            sprintf("The model has macro input and should be saved as an %s
+                    file, not an %s file.",sQuote("imf"),sQuote("idf"))),
+                 call. = FALSE)
     } else if (right_ext == "idf" && target_ext == "imf") {
-        warning(glue::glue("The model has no macro input and should be saved \\
-            as an 'idf' file. Saving it to 'imf' will force to run Ep-Marco \\
-            preprocessor before simulation which is unnecessary."), call. = FALSE)
+        warning(msg(
+            sprintf("The model has no macro input and should be saved as an %s
+                    file. Saving it to %s will force to run Ep-Marco
+                    preprocessor before simulation which is unnecessary.",
+                    sQuote("idf"), sQuote("imf"))),
+                    call. = FALSE)
     # other cases such as saving the model as a 'txt' file.
     } else if (right_ext != target_ext) {
-        warning(glue::glue("The model should be saved as an '{right_ext}' file \\
-            , but has been saved with an extension '{target_ext}' which \\
-            EnergyPlus may not able to recognize."), call. == FALSE)
+        warning(msg(
+            sprintf("The model should be saved as an %s file, but has been saved
+                    with an extension %s which EnergyPlus may not able to
+                    recognize.", sQuote(right_ext), sQuote(target_ext))), call. == FALSE)
     }
 
     save_idf(private$model, path, format)
 
-    message(glue::glue("Model has been successfully saved at {path}."))
+    message(sprintf("Model has been successfully saved at %s.", sQuote(path)))
 
     return(invisible(NULL))
 }
@@ -167,9 +185,11 @@ isave_ <- function (private, path, format) {
 isave_idf <- function (private, format = c("asis", "sorted", "ori_bot", "ori_top"),
                        comfirm = FALSE) {
     if (!comfirm) {
-        stop(glue::glue("Saving will overwrite the original model located \\
-            at {private$path}. This may have a risk of losing your original \\
-            model. Comfirm by setting 'comfirm' to TRUE."), call. = FALSE)
+        stop(msg(
+            sprintf("Saving will overwrite the original model located at %s.
+                    This may have a risk of losing your original model. Comfirm
+                    by setting 'comfirm' to TRUE.", sQuote(private$path))),
+                    call. = FALSE)
     }
 
     isave_(private, private$path, format)
@@ -180,11 +200,25 @@ isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", 
                          overwrite = FALSE) {
     if (file.exists(path) & !overwrite) {
         path <- normalizePath(path, winslash = "/")
-        stop(glue::glue("Saving will replace an existing model file located at \\
-            {path}. Comfirm by setting 'overwrite' to TRUE."), call. = FALSE)
+        stop(msg(
+            sprintf("Saving will replace an existing model file located at %s.
+                    Comfirm by setting 'overwrite' to TRUE.", sQuote(path))),
+                    call. = FALSE)
     }
 
     isave_(private, path, format)
+
+    private$path <- path
+}
+# }}}
+
+# icheck_object {{{
+icheck_object <- function (self, private) {
+    check_input <- private$model$value[!(required_field == FALSE & value == "")]
+
+    suppressWarnings(check_object(check_input, idf = private$model))
+
+    return(invisible(self))
 }
 # }}}
 
@@ -203,16 +237,17 @@ iprint_idf <- function (private) {
 # ireset_model {{{
 ireset_model <- function (self, private, comfirm = FALSE) {
     if (!comfirm) {
-        stop(glue::glue("Reset the model back to the status when it was first \\
-            read at {private$time_read}. You will lose all modifications after \\
-            that time and resetting cannot be undone. Comfirm by setting \\
-            'comfirm' to TRUE."), call. = FALSE)
+        stop(msg(
+            sprintf("Reset the model back to the status when it was first read
+                    at %s. You will lose all modifications after that time and
+                    resetting cannot be undone. Comfirm by setting 'comfirm' to
+                    TRUE.", sQuote(private$time_read))), call. = FALSE)
     }
 
     self$initialize(private$path)
 
-    message(glue::glue("The model has been reset to the status when it was \\
-       first read at {private$time_read}."))
+    message(msg("The model has been reset to the status when it was \\
+       first read at ", sQuote(private$time_read), "."))
 
     # Do not print
     return(invisible(self))

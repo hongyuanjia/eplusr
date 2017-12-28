@@ -12,8 +12,6 @@ NULL
 #'
 #' @return A list contains the IDF version, option data, class data, value data,
 #' comment data and field reference data.
-#'
-#' @export
 # parse_idf {{{
 parse_idf <- function (idf_str, idd) {
     path <- attr(idf_str, "path")
@@ -493,8 +491,9 @@ get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
         idd <- link_idd(ver)
         if (is.null(idd)) {
-            stop(glue::glue("Input file has a version '{ver}' whose \\
-                IDD file has not been pre-parsed. 'idd' should be specified."),
+            stop(msg(
+                sprintf("Input file has a version %s whose IDD file has not been
+                        pre-parsed. 'idd' should be specified.", sQuote(ver))),
                 call. = FALSE
             )
         }
@@ -882,7 +881,7 @@ print_output <- function (x, col = "output") {
 # }}}
 
 # valid_field {{{
-valid_field <- function (class, idf, idd, verbose = TRUE) {
+valid_field <- function (class, idf, idd) {
     assert_that(is_string(class), is_valid_class(class, idf))
     class_name <- class
 
@@ -890,12 +889,10 @@ valid_field <- function (class, idf, idd, verbose = TRUE) {
         standard = FALSE, new_line = FALSE, keep_all = TRUE)[
         , output_field := paste0(field_order, ": ", output_field)]
 
-    if (verbose) {
-        output <- copy(all_fields)[
-            required_field == TRUE, output := paste0("*", output_field)][
-            required_field == FALSE, output := paste0(" ", output_field)]
-        print_output(output)
-    }
+    output <- copy(all_fields)[
+        required_field == TRUE, output := paste0("*", output_field)][
+        required_field == FALSE, output := paste0(" ", output_field)]
+    print_output(output)
 
     return(invisible(all_fields[, output_name]))
 }
@@ -904,11 +901,11 @@ valid_field <- function (class, idf, idd, verbose = TRUE) {
 valid_class <- function (idf) {
     key_cols <- c("group_order", "class_order", "object_id")
     key_avail <- avail_cols(idf$class, key_cols)
-    setorderv(copy(idf$class), key_avail)[, unique(class)]
+    return(setorderv(copy(idf$class), key_avail)[, unique(class)])
 }
 # }}}
 # valid_id {{{
-valid_id <- function (idf, verbose = TRUE) {
+valid_id <- function (idf) {
     idf_value <- idf$value[idf$value[, .I[1:3], by = .(object_id)]$V1][
         !is.na(class_order)]
     idf_value <- get_output_line(idf_value, show_id = TRUE)
@@ -916,9 +913,7 @@ valid_id <- function (idf, verbose = TRUE) {
 
     setorder(idf_value, object_id, field_order)
 
-    if (verbose) {
-        print_output(idf_value)
-    }
+    print_output(idf_value)
 
     return(invisible(idf$value[, unique(object_id)]))
 }
@@ -944,14 +939,9 @@ get_value <- function (idf, id) {
 # }}}
 
 # find_object {{{
-find_object <- function (idf, pattern, full = TRUE, ...) {
+find_object <- function (idf, pattern, ...) {
 
-    if (full) {
-        pattern = paste0("^(", pattern, ")$")
-        idf_value <- idf$value[grepl(pattern, class)]
-    } else {
-        idf_value <- idf$value[grepl(pattern, class, ...)]
-    }
+    idf_value <- idf$value[grepl(pattern, class, ...)]
 
     if (is_empty(idf_value)) {
         stop("No matched object found.", call. = FALSE)
@@ -977,10 +967,43 @@ find_object <- function (idf, pattern, full = TRUE, ...) {
     return(invisible(idf))
 }
 # }}}
+# find_field {{{
+find_field <- function (idf, pattern, ..., all = FALSE) {
+
+    if (!all) {
+        idx <- idf$value[field_an == "A"][
+            grepl(pattern, value, ...), .(object_id, field_order)]
+    } else {
+        idx <- idf$value[grepl(pattern, value, ...), .(object_id, field_order)]
+    }
+
+    total <- idx[, .N]
+    if (is_empty(idx)) {
+        stop("No matched field found.", call. = FALSE)
+    }
+
+    idf_value <- idf$value[object_id %in% idx$object_id]
+    idf_value <- idx[, char := "(*)"][
+        idf_value, on = c("object_id", "field_order")][
+        !is.na(char), value := paste0(char, value)][
+        is.na(char), value := paste0("   ", value)]
+
+    idf_value <- get_output_line(idf_value, show_id = TRUE)
+
+    setorder(idf_value, class_order, object_id, field_order)
+
+    cat(stringr::str_pad(
+            sprintf("== * %s Matched Fields Found * ", total),
+            console_width(), "right", "="), "\n\n")
+    print_output(idf_value)
+
+    return(invisible(idf))
+}
+# }}}
 # get_object {{{
 get_object <- function (idf, ...) {
     id <- list(...)
-    lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(is_valid_id(y, idf))))
+    lapply(id, function (x) lapply(x, function (y) assert_that(is_valid_id(y, idf))))
 
     id <- unlist(id)
     idf <- add_log("get", id, 0L, idf)
@@ -991,7 +1014,7 @@ get_object <- function (idf, ...) {
 # dup_object {{{
 dup_object <- function (idf, id, new_name = NULL, idd) {
     target_class <- get_class(idf, id = id)
-    class_name <- target_class[, unique(class)]
+    class_name <- get_class_name(target_class)
     # check if the object can be duplicated
     assert_that(can_be_duplicated(class_name, idf))
 
@@ -1046,23 +1069,40 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
     # set default values first
     new_object <- set_default(new_object)
 
-    # set specified values
     fields <- list(...)
-    if (not_empty(fields)) {
-        new_object <- set_fields(new_object, fields, idf, idd)
+    assert_that(not_empty(fields), msg = "Field values are empty")
+
+    # add suggestion of 'min' option
+    num_max <- new_class[, max_fields]
+    num_cur <- new_object[, .N]
+
+    target_order <- get_target_order(new_object, id = NULL, fields, idf, idd)
+
+    if (min && max(target_order) > num_cur) {
+        stop(msg(sprintf("No.*%s* field found in input, which exceeded current
+                         field number (*%s* in total) in object template for
+                         class %s. Try to set %s to FALSE.", max(target_order),
+                         num_cur, sQuote(class_name), sQuote("min")
+                )
+            ),
+            call. = FALSE
+        )
     }
 
-    # check missing required fields
-    missing_fields <- new_object[required_field == TRUE & is.na(value)]
-    if (not_empty(missing_fields)) {
-        new_object <- append_id(new_object, base = "value", idf)
-        new_object[required_field == TRUE & is.na(value),
-                   value := "[ ** missing ** ]"]
-        missing_res <- get_output_line(new_object,
-            show_class = FALSE, standard = TRUE, new_line = FALSE)[, output]
-        stop("Missing required values for fields:\n",
-             paste0(missing_res, collapse = "\n"), call. = FALSE)
-    }
+    new_object <- add_extra_required(new_object, target_order, fields, idf, idd)
+    new_object <- set_fields(new_object, target_order, fields, "add", idf, idd)
+
+    # # check missing required fields
+    # missing_fields <- new_object[required_field == TRUE & is.na(value)]
+    # if (not_empty(missing_fields)) {
+    #     new_object <- append_id(new_object, base = "value", idf)
+    #     new_object[required_field == TRUE & is.na(value),
+    #                value := "[ ** missing ** ]"]
+    #     missing_res <- get_output_line(new_object,
+    #         show_class = FALSE, standard = TRUE, new_line = FALSE)[, output]
+    #     stop("Missing required values for fields:\n",
+    #          paste0(missing_res, collapse = "\n"), call. = FALSE)
+    # }
 
     # append all data
     new_idf <- append_data(id = NULL, new_class, new_object, action = "add", idf, idd)
@@ -1072,16 +1112,20 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd) {
-    assert_that(is_valid_id(id, idf))
+    assert_that(is_scalar(id), is_valid_id(id, idf))
     fields <- list(...)
     assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
+    target_object <- get_value(idf, id)
+    class_name <- get_class_name(target_class)
+    assert_that(can_be_modified(class_name, idf))
 
-    ori_object <- get_value(idf, id)
-    new_object <- set_fields(ori_object, fields, idf, idd)
+    target_order <- get_target_order(target_object, id, fields, idf, idd)
+    # target_object <- add_extra_required(target_object, target_order, fields, idf, idd)
+    new_object <- set_fields(target_object, target_order, fields, "set", idf, idd)
 
-    idf <- update_field_ref(ori_object, new_object, idf, idd)
+    idf <- update_field_ref(target_object, new_object, idf, idd)
 
     new_idf <- append_data(id, target_class, new_object, action = "set", idf, idd)
 
@@ -1092,7 +1136,7 @@ set_object <- function (idf, id, ..., idd) {
 del_object <- function (idf, id, idd, force = FALSE) {
 
     target_class <- get_class(idf, id)
-    class_name <- target_class[, unique(class)]
+    class_name <- get_class_name(target_class)
     assert_that(not_deleted(id, idf))
     assert_that(can_be_deleted(class_name, idf))
 
@@ -1106,16 +1150,16 @@ del_object <- function (idf, id, idd, force = FALSE) {
             show_class = TRUE, show_ref = TRUE)
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
-            warning(glue::glue("
-                Force to delete object (ID:{id}) that has \\
-                been referred. Errors may occur during simulations."),
+            warning(msg(
+                sprintf("Force to delete object (ID:%s) that has \\ been
+                        referred. Errors may occur during simulations.", id)),
                 call. = FALSE)
         } else {
-            stop(glue::glue("
-                Some field(s) in current object (ID:{id}) has \\
-                been referred by other object(s) \\
-                (ID:{paste0(ref_ids, collapse = ', ')}) below. Comfirm by \\
-                setting 'force' to TRUE."), "\n",
+            stop(msg(
+                sprintf("Some field(s) in current object (ID:%s) has been
+                        referred by other object(s) (ID:%s) below. Comfirm by
+                        setting 'force' to TRUE.",
+                        id, paste0(ref_ids, collapse = ', '))), "\n",
                 paste0(field_output[, output], collapse = '\n'),
                 call. = FALSE)
         }
@@ -1237,51 +1281,48 @@ set_default <- function (idf_value) {
 }
 # }}}
 # set_fields {{{
-set_fields <- function (object, fields, idf, idd) {
-
-    class_name <- get_class_name(object)
-
-    value_length <- length(fields)
-    value_name <- names(fields)
-
-    if (is.null(value_name)) {
-        target_order <- seq_along(fields)
+set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd) {
+    type <- match.arg(type)
+    # prepare object for checking
+    object[orders, set_value := fields]
+    # for $add
+    if (type == "add") {
+        # defaults was set and field input is missing. Do not check, just give a
+        # message.
+        line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null)][
+            !is.na(default)][value == default, row_id]
+        mes <- add_output_field(object[line_skip], standard = FALSE, new_line = FALSE)[
+            !is.na(as.numeric(value)), value := as.character(as.numeric(value))][
+            , mes := sprintf(
+                "Value for field %s in class %s is missing. Default value %s is used.",
+                sQuote(output_field), sQuote(class), sQuote(value))][, mes]
+    # for $set
     } else {
-        target_order <- get_field_order(object, value_name, idd = idd)
+        # skip fields whose input values are NULLs
+        line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null), row_id]
+        mes <- NULL
     }
+    # check fields
+    if (not_empty(line_skip)) check_input <- object[-line_skip] else check_input <- object
+    suppressWarnings(check_object(check_input, idf = idf, stop = TRUE))
+    if (not_empty(mes)) message(sep_line("~"), "\n", paste0(mes, collapse = "\n"), "\n", sep_line("~"), "\n")
 
-    # TODO: check value types and min, max range
-
-    # check value types {{{
-
-    # }}}
-    # check num of fields {{{
-    max_fields <- idd$class[class == class_name, max_fields]
-    if (value_length > max_fields) {
-        stop("Only * ", max_fields, " * fields are applicable for class ",
-             sQuote(class_name), ", but ", value_length, " are given.",
-             call. = FALSE)
-    }
-    # }}}
-
-    if (is.null(value_name)) {
-        target_order <- seq_along(fields)
+    # NOTE: In data.table, if fields is a scalar, 'set_value' is not a list but
+    # a vector and other missing values will be NAs; if not a scalar,
+    # 'set_value' will be a list and other missing values will be lists of NULL
+    # if set more than one field
+    if (is_scalar(fields)) {
+        object[!is.na(set_value), value := set_value]
     } else {
-        target_order <- get_field_order(object, value_name, idd = idd)
-
-        # check invalid field names
-        invalid_name <- value_name[is.na(target_order)]
-        if (length(invalid_name) > 0L) {
-            stop("Invalid field names found: ", sQuote(invalid_name),
-                 ". You can find all invalid field names using \"$all('field', class = '", class_name, "')\".",
-                 call. = FALSE)
+        l_to_ins <- object[!purrr::map_lgl(set_value, is.null), which = TRUE]
+        for (i in l_to_ins) {
+            set(object, i = i, j = "value", value = as.character(unlist(object$set_value[i])))
         }
     }
 
-    for (num in seq_along(fields)) {
-        set(object, i = target_order[num], j = "value",
-            value = as.character(fields[[num]]))
-    }
+    # clean
+    object[, set_value := NULL]
+    if (has_name(object, "extra_required")) object[, extra_required := NULL]
 
     return(object)
 }
@@ -1293,45 +1334,6 @@ get_class_name <- function (object) {
     class_name
 }
 # }}}
-# get_field_order {{{
-get_field_order <- function (idf_value, field_name, id = NULL, idd) {
-
-    if (is.null(id)) {
-        if ("object_id" %in% names(idf_value)) {
-            id <- idf_value[, unique(object_id)]
-            if (length(id) > 1L) {
-                stop("'id' required if more than one object exists in the input.", call. = FALSE)
-            }
-            class_name <- idf_value[object_id == id, unique(class)]
-        } else {
-            class_name <- idf_value[, unique(class)]
-            assert_that(is_string(class_name), msg = "Multiple classes found in input. Cannot set fields.")
-        }
-    } else {
-        assert_that(is_valid_id(id, idf))
-        class_name <- idf_value[, unique(class)]
-    }
-
-    idd_field <- idd$field[class == class_name]
-    # add standard field name
-    idd_field <- add_output_field_name(idd_field)
-    # add lower case field_name
-    idd_field[, output_name_lower := tolower(output_name)]
-    idd_field[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
-    if (all(grepl("^[a-z]", field_name))) {
-        all_names <- idd_field[order(field_order)][, output_name_lower]
-    } else if (all(grepl("^[A-Z]", field_name))) {
-        all_names <- idd_field[order(field_order)][, output_name]
-    } else {
-        stop("Field names should be either in title-case or lower-case",
-             call. = FALSE)
-    }
-
-    orders <- match(field_name, all_names)
-
-    return(orders)
-}
-# }}}
 # get_field_changes {{{
 get_field_changes <- function (ori_object, new_object) {
     # get the original object
@@ -1339,12 +1341,108 @@ get_field_changes <- function (ori_object, new_object) {
     setnames(ori_object, "value", "ori_value")
     # get the new object
     new_object <- new_object[, .(class_order, field_order, value)]
-    data.table::setnames(new_object, "value", "new_value")
+    setnames(new_object, "value", "new_value")
 
     modified_fields <- ori_object[new_object,
         on = c("class_order", "field_order")][ori_value != new_value]
 
     return(modified_fields)
+}
+# }}}
+# get_target_order {{{
+get_target_order <- function (idf_value, id = NULL, fields, idf, idd) {
+    # get class_name
+    if (is.null(id)) {
+        if ("object_id" %in% names(idf_value)) {
+            id <- idf_value[, unique(object_id)]
+            if (length(id) > 1L) {
+                stop("'id' required if more than one object exists in the input.", call. = FALSE)
+            }
+            class_name <- get_class_name(idf_value)
+        } else {
+            class_name <- get_class_name(idf_value)
+        }
+    } else {
+        assert_that(is_scalar(id), is_valid_id(id, idf))
+        class_name <- idf_value[object_id == id, unique(class)]
+    }
+    class_data <- extract_class(class_name, idf, idd)
+
+    # get field info
+    field_length <- length(fields)
+    field_name <- names(fields)
+
+    num_cur <- idf_value[, .N]
+    num_max <- class_data[, max_fields]
+
+    # 1. check num of field input
+    # {{{
+    if (field_length > num_max) {
+        stop(msg("Only *",num_max,"* fields are allowed for class
+                 ",sQuote(class_name," but *",field_length,"* are given."),
+                 call. = FALSE))
+    }
+    # }}}
+
+    # 2. get field order
+    # {{{
+    if (is.null(field_name)) {
+        orders <- seq_along(fields)
+    } else {
+        idd_field <- extract_object(class_name, min = FALSE, idf, idd)
+        # add standard field name
+        idd_field <- add_output_field_name(idd_field)
+        # add lower case field_name
+        idd_field[, output_name_lower := tolower(output_name)]
+        idd_field[, output_name_lower := gsub(" ", "_", output_name_lower, fixed = TRUE)]
+        idd_field[, output_name_lower := gsub("-", "_", output_name_lower, fixed = TRUE)]
+        if (all(grepl("^[a-z]", field_name))) {
+            all_names <- idd_field[order(field_order)][, output_name_lower]
+        } else if (all(grepl("^[A-Z]", field_name))) {
+            all_names <- idd_field[order(field_order)][, output_name]
+        } else {
+            stop("Field names should be either in title-case or lower-case",
+                 call. = FALSE)
+        }
+        orders <- match(field_name, all_names)
+    }
+    # }}}
+
+    # 3. check field names
+    # {{{
+    invalid_name <- field_name[is.na(orders)]
+    if (not_empty(invalid_name)) {
+        stop(msg("Invalid field names found: ", sQuote(invalid_name), ". You can
+                 find all invalid field names using \"$all('field', class = '",
+                 class_name, "')\"."),
+             call. = FALSE)
+    }
+    # }}}
+
+    return(orders)
+}
+# }}}
+# add_extra_required {{{
+add_extra_required <- function (object, orders, fields, idf, idd) {
+    # check new fields in the input
+    # add extra index column
+    object[, extra_required := FALSE]
+    class_name <- get_class_name(object)
+    if (max(orders) > object[, max(field_order)]) {
+        # get orders for new fields
+        diff_field_order <- setdiff(target_order, object[, field_order])
+        # get orders for fields to fill
+        new_field_order <- seq(min(diff_field_order), max(diff_field_order), by = 1L)
+        fill_field_order <- setdiff(new_field_order, diff_field_order)
+        # get new field data from idd and set the filled fields as required
+        new_field <- extract_object(class_name, min = FALSE, idf, idd)[
+            field_order %in% new_field_order][fill_field_order, extra_required := TRUE]
+        # set default values
+        set_default(new_field)
+        object <- rbindlist(list(object, new_field), fill = TRUE)
+    }
+
+    return(object)
 }
 # }}}
 # get_ref_key {{{
@@ -1455,29 +1553,81 @@ key_col <- function (idf_obj, type = c("field", "class")) {
 
 # check
 # check_object {{{
-check_object <- function (idf_value, type, idf) {
-    valid_checks <- c("missing", "scalar", "an", "integer", "choice", "object-list", "range", "auto")
-    if (missing(type)) type <- valid_checks
+check_object <- function (idf_value, idf, stop = FALSE) {
+    ori <- getOption("warning.length")
+    options(warning.length = 8000)
+    on.exit(options(warning.length = ori))
+    if (has_name(idf_value, "set_value")) {
+        setnames(idf_value, c("value", "set_value"), c("ori_value", "value"))
+    }
+
+    # get key columns
+    cols <- key_col(idf_value, type = "field")
+
+    valid_checks <- c("missing", "scalar", "an", "integer", "choice",
+                      "object-list", "range", "auto")
 
     # get rid of autosizable and autocalculatable fields
-    input <- idf_value[-get_field_auto_line(idf_value)]
+    line_auto <- get_field_auto_line(idf_value)
+    if (not_empty(line_auto)) {
+        input <- idf_value[-line_auto]
+    } else {
+        input <- copy(idf_value)
+    }
 
-    # always check missing
-    type <- unique(c("missing", type))
+    add_output_field(input, standard = FALSE, new_line = FALSE)[
+        , output := sprintf("field %s in class %s",
+                            sQuote(output_field), sQuote(class))]
 
-    # get rid of non-required fields with empty values
-    # TODO: does this have any risk of messing things up?
-    input <- input[required_field == FALSE][!is.na(value)][value != ""]
+    # always checking missing values first
+    mis <- check_field_missing(input)
+    # get rid of lines with missing required values
+    if (not_empty(mis)) input <- input[!mis[, ..cols], on = c(cols)]
 
-    res <- data.table()
-    if ("missing" %in% type)     res <- rbindlist(list(res, check_field_missing(input)), fill = TRUE)
-    if ("scalar" %in% type)      res <- rbindlist(list(res, check_field_scalar(input)), fill = TRUE)
-    if ("an" %in% type)          res <- rbindlist(list(res, check_field_an(input)), fill = TRUE)
-    if ("integer" %in% type)     res <- rbindlist(list(res, check_field_int(input)), fill = TRUE)
-    if ("choice" %in% type)      res <- rbindlist(list(res, check_field_choice(input)), fill = TRUE)
-    if ("object-list" %in% type) res <- rbindlist(list(res, check_field_objlist(input, idf)), fill = TRUE)
-    if ("range" %in% type)       res <- rbindlist(list(res, check_field_range(input)), fill = TRUE)
-    if ("auto" %in% type)        res <- rbindlist(list(res, check_field_auto(input)), fill = TRUE)
+    scalar <- check_field_scalar(input)
+    if (not_empty(scalar)) input <- input[!scalar[, ..cols], on = c(cols)]
+
+    auto <- check_field_auto(input)
+    if (not_empty(auto)) input <- input[!auto[, ..cols], on = c(cols)]
+
+    an <- check_field_an(input)
+    if (not_empty(an)) input <- input[!an[, ..cols], on = c(cols)]
+
+    int <- check_field_int(input)
+    if (not_empty(int)) input <- input[!int[, ..cols], on = c(cols)]
+
+    choice <- check_field_choice(input)
+    if (not_empty(choice)) input <- input[!choice[, ..cols], on = c(cols)]
+
+    objlist <- check_field_objlist(input, idf)
+    if (not_empty(objlist)) input <- input[!objlist[, ..cols], on = c(cols)]
+
+    range <- check_field_range(input)
+    # if (not_empty(range)) input <- input[!range[, ..cols], on = c(cols)]
+
+    res <- rbindlist(list(mis, scalar, an, int, choice, objlist, range, auto), fill = TRUE)
+
+    if (not_empty(res)) {
+        res[res[, .I[1L], by = check_type]$V1,
+            output := paste0("\n", sep_line("="), "\n",
+                             "Errors found when checking ", sQuote(check_type), "\n",
+                             sep_line("-"), "\n", output)]
+        res[res[, .I[.N], by = check_type]$V1,
+            output := paste0(output, "\n", sep_line("="), "\n")]
+
+        str <- paste0(res[, output], collapse = "\n")
+
+        if (stop){
+            stop(str, call. = FALSE)
+        } else {
+            message(str)
+        }
+    }
+
+    # set names back
+    if (has_name(idf_value, "ori_value")) {
+        setnames(idf_value, c("ori_value", "value"), c("value", "set_value"))
+    }
 
     return(res)
 }
@@ -1485,14 +1635,29 @@ check_object <- function (idf_value, type, idf) {
 # check_field_missing {{{
 check_field_missing <- function (object) {
     if (!has_name(object, "required_field")) return(data.table())
-    object[required_field == TRUE][purrr::map_lgl(value, is_empty) | purrr::map_lgl(value, is.na)][
-           , `:=`(check_type = "missing", wrong = "[ * missing * ]")]
+    if (has_name(object, "extra_required")) {
+        mis <- object[required_field == TRUE | extra_required == TRUE]
+    } else {
+        mis <- object[required_field == TRUE]
+    }
+
+    mis_null <- mis[purrr::map_lgl(value, is_empty)][
+        , `:=`(check_type = "Missing Value")][
+        , output := sprintf("Missing value for required %s", output)]
+
+    mis_na <- mis[!purrr::map_lgl(value, is_empty)][purrr::map_lgl(value, is.na)][
+        , `:=`(check_type = "Missing Value")][
+        , output := sprintf("Missing value for required %s", output)]
+
+    rbindlist(list(mis_null, mis_na))
 }
 # }}}
 # check_field_scalar {{{
 check_field_scalar <- function (object) {
     object[!purrr::map_lgl(value, is_scalar)][
-           , `:=`(check_type = "scalar", wrong = value)]
+        , `:=`(check_type = "Scalar", wrong = value)][
+        , output := sprintf("Value %s for %s is not a scalar",
+                            sQuote(wrong), output)]
 }
 # }}}
 # check_field_an {{{
@@ -1503,9 +1668,13 @@ check_field_an <- function (object) {
             (field_an == "A" & !purrr::map_lgl(value, is.character)) |
             (field_an == "N" & !purrr::map_lgl(value, is.numeric))
         } else {
-            field_an == "N" & is.na(is.numeric(value))
+            field_an == "N" & is.na(as.numeric(value))
         }][
-       , `:=`(check_type = "an", wrong = value, right = field_an)]
+        , `:=`(check_type = "Type", wrong = class(unlist(value)), right = field_an)][
+        , output := sprintf("Invalid value type %s (which should be %s) for %s",
+                            sQuote(wrong),
+                            sQuote(ifelse(right == "A", "character", "numeric")),
+                            output)]
 }
 # }}}
 # check_field_int {{{
@@ -1514,7 +1683,9 @@ check_field_int <- function (object) {
         # for $add and $set
         if (is.list(value)) !purrr::map_lgl(value, is_integerish)
         else !(!is.na(as.integer(value)) && as.integer(value) == as.numeric(value))][
-        , `:=`(check_type = "integer", wrong = value, right = as.integer(value))]
+        , `:=`(check_type = "Integer", wrong = as.character(value), right = as.character(as.integer(value)))][
+        , output := sprintf("Input value %s for %s will should be an integer",
+                            sQuote(wrong), output)]
 }
 # }}}
 # check_field_choice {{{
@@ -1531,7 +1702,9 @@ check_field_choice <- function (object) {
         type == "choice"][!purrr::map2_lgl(value, V1, ~tolower(.x) %in% tolower(.y))]
     setnames(choice, "V1", "key")
 
-    choice[, `:=`(check_type = "choice", wrong = value, right = key)]
+    choice[, `:=`(check_type = "Choice", wrong = value, right = key)][
+        , output := sprintf("Invalid value %s found for %s which should be one of choices %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_objlist {{{
@@ -1541,20 +1714,20 @@ check_field_objlist <- function (object, idf) {
     obj_list <- object[!is.na(object_list)]
     if (is_empty(obj_list)) return(data.table())
 
-    key_cols <- c("object_id", "class_order", "class", "field_order")
-    key_cols <- avail_cols(object, key_cols)
-
     obj_list[, row_id := .I]
-    ref_keys <- obj_list[, strsplit(object_list, " ", fixed = TRUE), by = c("row_id", key_cols, "value")]
+    ref_keys <- obj_list[, strsplit(object_list, " ", fixed = TRUE), by = c("row_id")]
     ref_values <- idf$ref[ref_keys, on = c("ref_key" = "V1"), nomatch = 0L]
-    obj_list <- ref_values[obj_list, on = c(key_cols), nomatch = 0L][
+
+    obj_list <- ref_values[obj_list, on = c("row_id"), nomatch = 0L][
         purrr::map2_lgl(value, ref_value,
             ~{if (is.null(.x)||is.na(.x)||.x == "") FALSE
               else !tolower(.x) %in% tolower(.y)
             })]
-    setnames(obj_list[, `:=`(key = NULL, ref_key = NULL)], "ref_value", "key")
+    setnames(obj_list[, `:=`(row_id = NULL, key = NULL, ref_key = NULL)], "ref_value", "key")
 
-    obj_list[, `:=`(check_type = "object-list", wrong = value, right = key)]
+    obj_list[, `:=`(check_type = "Reference", wrong = value, right = key)][
+        , output := sprintf("Invalid value %s found for %s which should be one of references %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_range {{{
@@ -1572,7 +1745,9 @@ check_field_maximum <- function (object) {
     if (!has_name(object, "maximum")) return(data.table())
 
     object[!is.na(maximum)][purrr::map2_lgl(value, maximum, ~as.numeric(.x) > .y)][
-           , `:=`(check_type = "maximum", wrong = value, right = maximum)]
+           , `:=`(check_type = "Maximum", wrong = as.character(value), right = as.character(maximum))][
+        , output := sprintf("Invalid value %s for %s which should be no more than (<=) %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_maximum_exclu {{{
@@ -1580,7 +1755,9 @@ check_field_maximum_exclu <- function (object) {
     if (!has_name(object, "maximum<")) return(data.table())
 
     object[!is.na(`maximum<`)][purrr::map2_lgl(value, `maximum<`, ~as.numeric(.x) >= .y)][
-           , `:=`(check_type = "maximum<", wrong = value, right = `maximum<`)]
+           , `:=`(check_type = "Maximum<", wrong = as.character(value), right = as.character(`maximum<`))][
+        , output := sprintf("Invalid value %s for %s which should be less than (<) %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_minimum {{{
@@ -1588,7 +1765,9 @@ check_field_minimum <- function (object) {
     if (!has_name(object, "minimum")) return(data.table())
 
     object[!is.na(minimum)][purrr::map2_lgl(value, minimum, ~as.numeric(.x) < .y)][
-           , `:=`(check_type = "minimum", wrong = value, right = `minimum`)]
+           , `:=`(check_type = "Minimum", wrong = as.character(value), right = as.character(`minimum`))][
+        , output := sprintf("Invalid value %s for %s which should be no less than (>=) %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_minimum_exclu {{{
@@ -1596,7 +1775,10 @@ check_field_minimum_exclu <- function (object) {
     if (!has_name(object, "minimum>")) return(data.table())
 
     object[!is.na(`minimum>`)][purrr::map2_lgl(value, `minimum>`, ~as.numeric(.x) <= .y)][
-           , `:=`(check_type = "minimum>", wrong = value, right = `minimum>`)]
+           , `:=`(check_type = "Minimum>", wrong = as.character(value), right = as.character(`minimum>`))][
+        # , output := paste0("Invalid value ",sQuote(wrong)," for ",output," should be more than (>) ",sQuote(right))]
+        , output := sprintf("Value %s for %s should be more than (>) %s",
+                            sQuote(wrong), output, sQuote(right))]
 }
 # }}}
 # check_field_auto {{{
@@ -1607,12 +1789,14 @@ check_field_auto <- function (object) {
 
     res_size <- object[autosizable == FALSE][
         purrr::map_lgl(value, ~tolower(.x) == "autosize")][
-        , `:=`(check_type = "autosizable", wrong = value)]
+        , `:=`(check_type = "Autosizable", wrong = value)]
     res_cal <- object[autocalculatable == FALSE][
         purrr::map_lgl(value, ~tolower(.x) == "autocalculate")][
-        , `:=`(check_type = "autocalculatable", wrong = value)]
+        , `:=`(check_type = "Autocalculatable", wrong = value)]
 
-    rbindlist(list(res_size, res_cal), fill = TRUE)
+    rbindlist(list(res_size, res_cal), fill = TRUE)[
+        , output := sprintf("Value for %s is not but was set to %s" ,
+                            output, sQuote(wrong))]
 }
 # }}}
 # get_field_auto_line {{{
@@ -1621,7 +1805,8 @@ get_field_auto_line <- function (object) {
         return(data.table())
     }
 
-    object[(autosizable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autosize") ) |
-           (autocalculatable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
+    object[!purrr::map_lgl(value, is_empty)][
+        (autosizable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autosize")) |
+        (autocalculatable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
 }
 # }}}

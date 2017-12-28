@@ -2,7 +2,7 @@
 eplus_path <- function (ver = NULL, path = NULL) {
     os <- Sys.info()['sysname']
     if (!is.null(ver)) {
-        assertthat::assert_that(is_eplus_ver(ver))
+        assert_that(is_eplus_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
             "Windows" = paste0("C:/EnergyPlusV", ver_dash),
@@ -28,7 +28,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
 # }}}
 # dash_ver {{{
 dash_ver <- function (ver) {
-    assertthat::assert_that(is_eplus_ver(ver))
+    assert_that(is_eplus_ver(ver))
     paste0(sub(".", "-", ver, fixed = TRUE), "-0")
 }
 # }}}
