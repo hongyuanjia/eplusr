@@ -37,7 +37,7 @@ has_macro <- function (str) {
 # }}}1
 # is_valid_id {{{
 is_valid_id <- function (id, idf) {
-    id %in% attr(idf, "id")
+    is_scalar(id) && is_integerish(id) && id %in% attr(idf, "id")
 }
 
 on_failure(is_valid_id) <- function(call, env) {
@@ -86,6 +86,16 @@ can_be_deleted <- function (class, idf) {
 
 on_failure(can_be_deleted) <- function(call, env) {
     paste0(sQuote(eval(call$class, env)), " is an unique or required object that cannot be deleted")
+}
+# }}}
+# can_be_modified {{{
+can_be_modified <- function (class, idf) {
+    class_name <- class
+    assert_that(is_valid_class(class_name, idf))
+    !identical(class, "Version")
+}
+on_failure(can_be_modified) <- function(call, env) {
+    paste0(sQuote(eval(call$class, env)), " is protected and cannot be modified.")
 }
 # }}}
 # not_deleted {{{

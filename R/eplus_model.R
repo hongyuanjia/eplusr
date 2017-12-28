@@ -6,8 +6,6 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
     lock_class = TRUE,
 
     public = list(
-        getPrivate = function () private,
-
         initialize = function(path, idd = NULL) {
             private$path <- normalizePath(path, winslash = "/")
             private$str <- read_idf(path)
@@ -220,3 +218,8 @@ ireset_model <- function (self, private, comfirm = FALSE) {
     return(invisible(self))
 }
 # }}}
+
+# a helper to access private numbers of the `eplus_model` R6 class
+.get <- function (model, x) {
+    environment(model$initialize)$private[[x]]
+}
