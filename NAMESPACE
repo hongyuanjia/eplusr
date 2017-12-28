@@ -3,7 +3,7 @@
 export(eplus_model)
 import(data.table)
 importFrom(R6,R6Class)
-importFrom(assertthat,`on_failure<-`)
+importFrom(assertthat,"on_failure<-")
 importFrom(assertthat,assert_that)
 importFrom(progress,progress_bar)
 importFrom(purrr,map2_lgl)
