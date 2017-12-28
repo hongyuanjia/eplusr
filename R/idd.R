@@ -1,4 +1,5 @@
 #' @import data.table
+#' @importFrom progress progress_bar
 NULL
 
 #' Parse Energy+.idd file
