@@ -2,4 +2,6 @@
 \.Rproj$
 ^\.gitignore$
 ^\.travis\.yml$
-^\src$
+^try\.R$
+^TODO\.md$
+^idd$
