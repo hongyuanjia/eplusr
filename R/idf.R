@@ -1012,7 +1012,7 @@ find_field <- function (idf, pattern, ..., all = FALSE) {
 # get_object {{{
 get_object <- function (idf, ...) {
     id <- list(...)
-    lapply(id, function (x) lapply(x, function (y) assert_that(is_valid_id(y, idf))))
+    lapply(id, function (x) lapply(x, function (y) assert_that(not_deleted(y, idf), is_valid_id(y, idf))))
 
     id <- unlist(id)
     idf <- add_log("get", id, 0L, idf)
