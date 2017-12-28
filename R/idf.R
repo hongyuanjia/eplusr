@@ -1589,9 +1589,14 @@ check_object <- function (idf_value, idf, stop = FALSE) {
         input <- copy(idf_value)
     }
 
-    add_output_field(input, standard = FALSE, new_line = FALSE)[
-        , output := sprintf("field %s in class %s",
-                            sQuote(output_field), sQuote(class))]
+    input <- add_output_field(input, standard = FALSE, new_line = FALSE)
+    if (has_name(input, "object_id")) {
+        input[, output := sprintf("field %s in class %s with ID %s",
+            sQuote(output_field), sQuote(class), object_id)]
+    } else {
+        input[, output := sprintf("field %s in class %s",
+            sQuote(output_field), sQuote(class))]
+    }
 
     # always checking missing values first
     mis <- check_field_missing(input)
