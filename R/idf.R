@@ -110,11 +110,11 @@ parse_idf <- function (idf_str, idd) {
     option_save <- NULL
 
     idf_option <- idf_dt[type == type_special]
+    idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
+    idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
+                      special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
+    idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
     if (not_empty(idf_option)) {
-        idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
-        idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
-                          special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
-        idf_option <- idf_option[special_key %chin% c("GENERATOR", "OPTION")]
         idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE), by = .(line, string, special_key)]
         setnames(idf_option, "V1", "special_value")
         if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
@@ -146,11 +146,12 @@ parse_idf <- function (idf_str, idd) {
                         info = msg("Only the first option '",option_save[1],"'
                                    will be used."))
         }
-        }
-        # for imf, always use "OriginalOrderBottom"
-        if (is_imf) {
-            option_save <- "OriginalOrderBottom"
-        }
+    }
+
+    # for imf, always use "OriginalOrderBottom"
+    if (is_imf) {
+        option_save <- "OriginalOrderBottom"
+    }
 
     heading_options = list(
         save_format = option_save,
