@@ -374,6 +374,9 @@ read_idf <- function (filepath) {
 
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
+
+    assert_that(not_empty(idf_str))
+
     setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
     return(idf_str)
@@ -487,6 +490,7 @@ link_idd <- function (ver) {
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
+        assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
         if (is.null(idd)) {
             stop(msg(
