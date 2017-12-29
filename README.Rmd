@@ -1,0 +1,187 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+library(knitr)
+# the default output hook
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  if (!is.null(n <- options$out.lines)) {
+    x = unlist(stringr::str_split(x, '\n'))
+    if (length(x) > n) {
+      # truncate the output
+      x = c(head(x, n), '....\n')
+    }
+    x = paste(x, collapse = '\n') # paste first n lines together
+  }
+  hook_output(x, options)
+})
+
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# eplusr
+
+[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr) 
+
+> A Toolkit for Using EnergyPlus in R.
+
+IDFEditor distributed along with [EnergyPlus]{https://www.energyplus.net}
+provides full support for preparing EnergyPus IDF and IMF files for
+simulations. The parsing and writing process of IDF and IDD files in `eplusr`
+is basically the same as that in IDFEditor. But `eplusr` takes advantage of the
+powerful [`data.table`]{http://r-datatable.com} package to speed up the whole
+process and store the results. The IDD files for EnergyPlus 8.3 to 8.8 have
+been pre-parsed and stored internally and will automatically be used when
+parsing `IDF` and `IMF` files. The souce codes of IDFEditor can be
+found on [GitHub]{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}
+. There is still an option to give an additional IDD file path to parse if you
+want. However, it will still take about 3-4 sec to parse an IDD file which is
+much slower than IDFEditor written in Visual Basic.
+
+Basically, all model data are stored as `data.table`s. And each object in the
+model has an unique `ID`. Once you have the object `ID`, you can set fields
+(using `$set`) in the object, duplicate (using `$dup`), delete (using `del`)
+the object. A full example of reading and editing an `IDF` file is given in
+[Example]{#example}.
+
+The functionality of running EnergyPlus, and collecting and analyze the output
+is under development, and will release in the next version.
+
+## Warning
+
+This package is still in its infant stage of development and is subject to change. It is not recommended to use it in working environment.
+
+## Installation
+
+`eplusr` is currently not on CRAN. You can install eplusr from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("hongyuanjia/eplusr")
+```
+
+## Features
+
+* Read and parse EnergyPlus `IDF`, `IMF` files
+* Query on models, including classes, objects and fields
+* Directly add, modify, duplicate, and delete objects of parse `IDF` and `IMF` files in R.
+* Save the changed models into standard formats in the same way as IDFEditor distrubuted along with EnergyPlus.
+* Run your models directly in R (*under development*)
+* Collect and analyze the output of EnergyPlus in R (*under development*)
+
+## Example {#example}
+
+```{r}
+library(eplusr)
+```
+
+For detailed reference, please see package documentation: `help(package = "eplusr")`.
+
+### Read and parse
+
+All reading process starts with create an `R6Class` called `eplus_model`. The model will be printed in a similar style you see in IDFEditor, with an additional heading lines show the `Path`, `Version` and `Type` of the model. The classes of objects in the model are ordered by Group and the number of objects in classes are shown in square bracket. All `Energy+.idd` files from EnergyPlus v8.3 to v8.8 have been pre-parsed and stored. So you can just ignore the `idd` argument if you are using those verions. If not, just pass the path of the `Energy+.idd` file using `idd`.
+
+```{r read, out.lines = 30}
+model <- eplus_model$new(path = system.file("extdata", "5Zone_Transformer.idf", package = "eplusr"), idd = NULL)
+
+model
+```
+
+
+### Query
+
+#### `$all`
+
+You can list all valid components you specified using `$all`. The `type` argument will determine what kind of components you want to see. 
+
+All objects in the model will have an unique `ID` according to their sequences. you can find all valid `ID`s using `$all(type = "id")`. The model will be printed in a way that is much similar with what you see when you open your model in an text editor, except that each object binded an unique `ID` and only first two lines of each object will be shown.
+
+```{r all_id, out.lines = 20}
+model$all("id")
+```
+
+If you want to see all classes in your model, you can use `$all(type = "class")`.
+
+```{r all_class, out.lines = 14}
+model$all(type = "class")
+```
+
+You can find all available fields for all valid class in IDD using `$all(type = "field", class = "any_valid_class_in_IDD")` which makes it handy to be used along with `$add` you will see below. All required fields are marked with `*`. For example, you can find all valid fields in class `Material`:
+
+```{r all_field}
+model$all(type = "field", class = "Material")
+```
+
+#### `$contains` & `$matches`
+
+`$contains` and `$matches` will search and return objects that contain the string or match the regular expression you give. The `scale` argument will determine where you want to search. If "class", only class names existing in current model will be searched. If "field", only fields in current model will be searched. This is a handy option when you want to see if an object e.g. one material, is referred by other objects e.g. constructions.
+
+```{r contains}
+model$contains(match = "Algorithm", scale = "class")
+```
+
+If the `scale` is set to "field", all matched fields will be marked with `(*)`. What's more, `$matches` accepts extra arguments using `...`. All those arguments will be directly passed to `grepl`.
+
+```{r matches}
+model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
+```
+
+#### `$get`
+
+`$get` will return you the objects with valid IDs you give.
+
+```{r get}
+model$get(1, 2, 38)
+```
+
+### Modify
+
+You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set` and `$del` respectively.
+
+All newly added, modified and deleted fields will be marked with "(+)", "(~)" and "(-)" respectively. The valid IDs will be appended after `$add` and `$dup`, and the newly added (duplicated) object will have the max ID. Note that the IDs of deleted objects are invalid after `$del` and cannot be applied to methods `$set`, `$dup` and `$del`, of course. However, unless you save the model, the deleted objects are still there internally but with a special mark to prevent them accessable. This is done by purpose, in order to provide a new method call `$undo` in the future, which will enable you to un-delete the objects.
+
+For `$add` and `$set`, new field values should be given. Currently three styles of value are acceptable: (a) directly list all field values with no name. The values will be assigned to fields according to the order of values; (b) give both field names and values in pair, e.g. Name = "Test", "Sepcific Heat" = 150. You can find all valid field names (with units) using `$all("field", class = "class_name_to_query")`; (c) some kind of the same as (b), but with all field names in lower cases and spaces replaced by "_". Note: All field names should be given without units. Error will occur when the type (character or numeric), and the value (e.g. range) are not valid.
+
+#### `$add`
+
+`$add` will add an object in the class you give. All fields will be set to their defaults if applicable.
+
+```{r add_mat}
+model$add(class = "Material", name = "test_add", roughness = "Rough", thickness = 0.8, conductivity = 55, density = 55, specific_heat = 100)
+```
+
+Note that only minimum fiels will be added by default. But you can change it by setting `min` to FALSE.
+
+```{r add_min_f}
+model$add("Material", name = "test_add", roughness = "Rough", thickness = 0.8, conductivity = 55, density = 55, specific_heat = 100, thermal_absorptance = 0.8, min = FALSE)
+```
+
+Existing unique objects cannot be added.
+
+```{r add_unique, error = TRUE}
+model$add(class = "Version")
+```
+
+Errors will occur if required fields are missing.
+
+```{r add_missing, error = TRUE}
+model$add("Material", roughness = "Rough", thickness = 0.8, conductivity = 55, density = 55, specific_heat = 100)
+```
+
+#### `$set`
+
+`$set` works pretty much the same way as `$add`, except it only accepts valid `ID` not class names.
+
+```{r set}
+model$set(52, roughness = "Rough", thickness = 0.8, conductivity = 55, density = 55, specific_heat = 100)
+```
+
