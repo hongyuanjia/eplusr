@@ -5,3 +5,5 @@
 ^try\.R$
 ^TODO\.md$
 ^idd$
+^README\.Rmd$
+^README-.*\.png$
