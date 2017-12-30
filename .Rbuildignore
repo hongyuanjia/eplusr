@@ -2,6 +2,7 @@
 \.Rproj$
 ^\.gitignore$
 ^\.travis\.yml$
+^appveyor\.yml$
 ^try\.R$
 ^TODO\.md$
 ^idd$

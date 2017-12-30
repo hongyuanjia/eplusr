@@ -474,8 +474,8 @@ print.IDF <- function (idf) {
 link_idd <- function (ver) {
     if (is_pre_parsed(ver)) {
         switch(ver,
-            "8.1" = idd_8.1,
-            "8.2" = idd_8.2,
+            # "8.1" = idd_8.1,
+            # "8.2" = idd_8.2,
             "8.3" = idd_8.3,
             "8.4" = idd_8.4,
             "8.5" = idd_8.5,
@@ -1163,7 +1163,7 @@ del_object <- function (idf, id, idd, force = FALSE) {
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
             warning(msg(
-                sprintf("Force to delete object (ID:%s) that has \\ been
+                sprintf("Force to delete object (ID:%s) that has been
                         referred. Errors may occur during simulations.", id)),
                 call. = FALSE)
         } else {
