@@ -1163,8 +1163,9 @@ del_object <- function (idf, id, idd, force = FALSE) {
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
             warning(msg(
-                sprintf("Force to delete object (ID:%s) that has been
-                        referred. Errors may occur during simulations.", id)),
+                sprintf("Force to delete object (ID:%s) that has been referred
+                        by other objects (ID:%s). Errors may occur during
+                        simulations.", id, paste0(ref_ids, collapse = ", "))),
                 call. = FALSE)
         } else {
             stop(msg(
