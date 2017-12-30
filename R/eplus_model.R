@@ -355,7 +355,7 @@ idup_object <- function (self, private, id, new_name = NULL) {
 
 # idel_object {{{
 idel_object <- function (self, private, id, force = FALSE) {
-    private$model <- del_object(private$model, id, private$idd)
+    private$model <- del_object(private$model, id, private$idd, force = force)
 
     return(self)
 }
