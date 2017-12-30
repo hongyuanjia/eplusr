@@ -260,3 +260,6 @@ model$save(comfirm = TRUE)
 model$reset(comfirm = TRUE)
 ```
 
+## License
+
+MIT © Hongyuan Jia
