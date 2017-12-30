@@ -95,10 +95,10 @@ model
 #> [ Path  ]: D:/Documents/R/win-library/3.4/eplusr/extdata/5Zone_Transformer.idf
 #> [Version]: 8.8
 #> [ Type  ]: IDF
-#> ================================================================================
+#> =========================================================================================================================================================================================================
 #> 
 #> Simulation Parameters
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> [01] Version
 #> [01] SimulationControl
 #> [01] Building
@@ -108,19 +108,19 @@ model
 #> [01] Timestep
 #> 
 #> Location and Climate
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> [01] Site:Location
 #> [02] SizingPeriod:DesignDay
 #> [02] RunPeriod
 #> [01] Site:GroundTemperature:BuildingSurface
 #> 
 #> Schedules
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> [06] ScheduleTypeLimits
 #> [23] Schedule:Compact
 #> 
 #> Surface Construction Elements
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> [10] Material
 ....
 ```
@@ -218,19 +218,19 @@ objects, e.g. `Construction`s.
 ``` r
 model$contains(match = "Algorithm", scale = "class")
 #> 
-#> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Inside * =============
+#> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Inside * ======================================================================================================================================
 #> 
 #> [ID:4] SurfaceConvectionAlgorithm:Inside,
 #>     Simple;                  !- Algorithm
 #> 
 #> 
-#> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Outside * ============
+#> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Outside * =====================================================================================================================================
 #> 
 #> [ID:5] SurfaceConvectionAlgorithm:Outside,
 #>     SimpleCombined;          !- Algorithm
 #> 
 #> 
-#> == * 1 Objects Found in Class: HeatBalanceAlgorithm * ==========================
+#> == * 1 Objects Found in Class: HeatBalanceAlgorithm * ===================================================================================================================================================
 #> 
 #> [ID:6] HeatBalanceAlgorithm,
 #>     ConductionTransferFunction;  !- Algorithm
@@ -242,7 +242,7 @@ those arguments will be directly passed to `grepl`.
 
 ``` r
 model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
-#> == * 2 Matched Fields Found * ================================================== 
+#> == * 2 Matched Fields Found * =========================================================================================================================================================================== 
 #> 
 #> [ID:55] Material:NoMass,
 #>     (*)MAT-CLNG-1,           !- Name
@@ -331,10 +331,10 @@ change it by setting `min` to FALSE.
 model$add("Material", name = "test_add", roughness = "Rough", thickness = 0.8,
           conductivity = 55, density = 55, specific_heat = 100,
           thermal_absorptance = 0.8, min = FALSE)
-#> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #> Value for field 'Solar Absorptance' in class 'Material' is missing. Default value '0.7' is used.
 #> Value for field 'Visible Absorptance' in class 'Material' is missing. Default value '0.7' is used.
-#> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #> [ID:324] Material,
 #> 1:(+)    test_add,                !- Name
 #> 2:(+)    Rough,                   !- Roughness
@@ -360,11 +360,11 @@ Errors will occur if required fields are missing.
 model$add("Material", roughness = "Rough", thickness = 0.8, conductivity = 55, 
           density = 55, specific_heat = 100)
 #> Error: 
-#> ================================================================================
+#> =========================================================================================================================================================================================================
 #> Errors found when checking 'Missing Value'
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> Missing value for required field 'Name' in class 'Material'
-#> ================================================================================
+#> =========================================================================================================================================================================================================
 ```
 
 #### `$set`
@@ -521,9 +521,9 @@ autocalculatable fields.
 ``` r
 model$check()
 #> 
-#> ================================================================================
+#> =========================================================================================================================================================================================================
 #> Errors found when checking 'Autocalculatable'
-#> --------------------------------------------------------------------------------
+#> ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #> Value for field 'Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 172 is not but was set to 'AUTOCALCULATE'
 #> Value for field 'Maximum Flow Fraction During Reheat' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 172 is not but was set to 'AUTOCALCULATE'
 #> Value for field 'Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 173 is not but was set to 'AUTOCALCULATE'
@@ -534,7 +534,7 @@ model$check()
 #> Value for field 'Maximum Flow Fraction During Reheat' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 175 is not but was set to 'AUTOCALCULATE'
 #> Value for field 'Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 176 is not but was set to 'AUTOCALCULATE'
 #> Value for field 'Maximum Flow Fraction During Reheat' in class 'AirTerminal:SingleDuct:VAV:Reheat' with ID 176 is not but was set to 'AUTOCALCULATE'
-#> ================================================================================
+#> =========================================================================================================================================================================================================
 ```
 
 ### Save
@@ -561,5 +561,10 @@ modifications.
 ``` r
 model$reset(comfirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2017-12-29 17:45:23'.
+#> '2017-12-29 17:56:30'.
 ```
+
+License
+-------
+
+MIT ?? Hongyuan Jia
