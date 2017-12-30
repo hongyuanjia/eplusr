@@ -156,7 +156,9 @@ For `$add` and `$set`, new field values should be given. Currently three styles 
 
 * directly list all field values with no name. The values will be assigned to fields according to the order of values; 
 * give both field names and values in pair, e.g. `Name = "Test", "Sepcific Heat" = 150`. You can find all valid field names (with units) using `$all("field", class = "class_name_to_query")`; 
-* some kind of the same as above, but with all field names in lower cases and spaces replaced by `_`. Note: All field names should be given without units. Error will occur when the type (character or numeric), and the value (e.g. range) is not valid.
+* some kind of the same as above, but with all field names in lower cases and spaces replaced by `_`, e.g. `name = "Test", specific_heat = 150`.
+
+Note: All field names should be given **without** units. Error will occur when the type (character or numeric), and the value (e.g. range) is not valid.
 
 #### `$add`
 
