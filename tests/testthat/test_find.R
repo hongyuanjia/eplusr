@@ -1,7 +1,7 @@
 context("Find method")
 
 test_that("find method works", {
-    model <- eplus_model$new("files/5Zone_Transformer_8.8.idf")
+    model <- eplus_model$new("5Zone_Transformer_8.8.idf")
 
     # wrong input
     expect_error(model$all("version"))
