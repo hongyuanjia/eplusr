@@ -8,3 +8,4 @@
 ^idd$
 ^README\.Rmd$
 ^README-.*\.png$
+^codecov\.yml$

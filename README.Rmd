@@ -31,8 +31,9 @@ knitr::opts_chunk$set(
 # eplusr
 
 [![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)
-[![Build status](https://ci.appveyor.com/api/projects/status/0hp744sb0wrm66fa?svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
-[![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+<!--[![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)-->
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 
 > A Toolkit for Using EnergyPlus in R.
 

@@ -8,11 +8,9 @@ Authors@R:
            email = "hongyuanjia@cqu.edu.cn")
 Description: This package provides tools to run EnergyPlus and collect,
     analyse, summary and plot parametric simulation results in R.
-License: MIT + file License
+License: MIT + file LICENSE
 URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
-Depends:
-    R (>= 3.2.0)
 Imports:
     data.table (>= 1.9.8),
     glue,
@@ -22,7 +20,8 @@ Imports:
     progress,
     purrr
 Suggests:
-    testthat
+    testthat,
+    covr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
