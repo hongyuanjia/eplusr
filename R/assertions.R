@@ -263,3 +263,14 @@ is_integerish <- function(x) {
     is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
 }
 # }}}
+# has_ext {{{
+has_ext <- function (path, ext) {
+    ext == tolower(tools::file_ext(path))
+}
+
+on_failure(has_ext) <- function (call, env = parent.env) {
+    path <- eval(call$path, env)
+    ext <- eval(call$ext, env)
+    msg("File ", sQuote(basename(path)), " does not have extension ", sQuote(ext), ".")
+}
+# }}}
