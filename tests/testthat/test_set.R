@@ -1,7 +1,7 @@
 context("Set method")
 
 test_that("Set method works", {
-    model <- eplus_model$new("5Zone_Transformer_8.8.idf")
+    model <- eplus_model$new(system.file("testdata", "5Zone_Transformer_8.8.idf", package = "eplusr"))
 
     # missing id
     expect_error(model$set())
