@@ -1,7 +1,7 @@
 context("Del method")
 
 test_that("Del method works", {
-    model <- eplus_model$new("5Zone_Transformer_8.8.idf")
+    model <- eplus_model$new(system.file("testdata", "5Zone_Transformer_8.8.idf", package = "eplusr"))
     id_max <- max_id(.get(model, "model"))
     # missing id
     expect_error(model$del())
