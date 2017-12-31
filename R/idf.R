@@ -1302,8 +1302,13 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
     if (type == "add") {
         # defaults was set and field input is missing. Do not check, just give a
         # message.
-        line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null)][
-            !is.na(default)][value == default, row_id]
+        if (is_scalar(fields)) {
+            line_skip <- object[, row_id := .I][is.na(set_value)][
+                !is.na(default)][value == default, row_id]
+        } else {
+            line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null)][
+                !is.na(default)][value == default, row_id]
+        }
         mes <- add_output_field(object[line_skip], standard = FALSE, new_line = FALSE)[
             !is.na(as.numeric(value)), value := as.character(as.numeric(value))][
             , mes := sprintf(
@@ -1311,8 +1316,13 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
                 sQuote(output_field), sQuote(class), sQuote(value))][, mes]
     # for $set
     } else {
-        # skip fields whose input values are NULLs
-        line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null), row_id]
+        if (is_scalar(fields)) {
+            # skip fields whose input values are NAs
+            line_skip <- object[, row_id := .I][is.na(set_value), row_id]
+        } else {
+            # skip fields whose input values are NULLs
+            line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null), row_id]
+        }
         mes <- NULL
     }
     # check fields
@@ -1325,7 +1335,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
     # 'set_value' will be a list and other missing values will be lists of NULL
     # if set more than one field
     if (is_scalar(fields)) {
-        object[!is.na(set_value), value := set_value]
+        object[!is.na(set_value), value := as.character(set_value)]
     } else {
         l_to_ins <- object[!purrr::map_lgl(set_value, is.null), which = TRUE]
         for (i in l_to_ins) {
