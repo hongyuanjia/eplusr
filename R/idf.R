@@ -374,6 +374,9 @@ read_idf <- function (filepath) {
 
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
+
+    assert_that(not_empty(idf_str))
+
     setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
     return(idf_str)
@@ -471,8 +474,8 @@ print.IDF <- function (idf) {
 link_idd <- function (ver) {
     if (is_pre_parsed(ver)) {
         switch(ver,
-            "8.1" = idd_8.1,
-            "8.2" = idd_8.2,
+            # "8.1" = idd_8.1,
+            # "8.2" = idd_8.2,
             "8.3" = idd_8.3,
             "8.4" = idd_8.4,
             "8.5" = idd_8.5,
@@ -487,6 +490,7 @@ link_idd <- function (ver) {
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
+        assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
         if (is.null(idd)) {
             stop(msg(
@@ -1159,8 +1163,9 @@ del_object <- function (idf, id, idd, force = FALSE) {
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
             warning(msg(
-                sprintf("Force to delete object (ID:%s) that has \\ been
-                        referred. Errors may occur during simulations.", id)),
+                sprintf("Force to delete object (ID:%s) that has been referred
+                        by other objects (ID:%s). Errors may occur during
+                        simulations.", id, paste0(ref_ids, collapse = ", "))),
                 call. = FALSE)
         } else {
             stop(msg(
