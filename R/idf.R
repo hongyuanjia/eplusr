@@ -1301,6 +1301,7 @@ set_default <- function (idf_value) {
 set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd) {
     type <- match.arg(type)
     # prepare object for checking
+    object <- copy(object)
     object[orders, set_value := fields]
     # for $add
     if (type == "add") {
@@ -1474,7 +1475,7 @@ add_extra_required <- function (object, orders, fields, idf, idd) {
 # }}}
 # get_ref_key {{{
 get_ref_key <- function (idf_value, idd) {
-    field_ref_value <- idd_8.8$ref_object$field[idf_value,
+    field_ref_value <- idd$ref_object$field[idf_value,
         on = c("class_order", "field_order"), nomatch = 0L]
 
     return(field_ref_value)
@@ -1506,20 +1507,29 @@ get_referred <- function (idf_value, idf, idd) {
 update_field_ref <- function (ori_object, new_object, idf, idd) {
 
     field_changes <- get_field_changes(ori_object, new_object)
-
     # find fields that have ref keys in the object
     field_ref_value <- get_ref_key(field_changes, idd)[
         , list(ref_key, ori_value, new_value)]
+    if (not_empty(field_ref_value)) {
+        # update new values
+        target_fields <- field_ref_value[
+            # insert ref keys, original values, and new values
+            idd$ref_object$key[idf$value, on = c("class_order", "field_order"),
+                               nomatch = 0L],
+            on = "ref_key", nomatch = 0L][
+            # get field locations
+            !is.na(ref_key) & ori_value == value,
+            c(key_col(idf$value), "new_value"), with = FALSE]
 
-    # update new values
-    idf$value <- field_ref_value[
-        # insert ref keys, original values, and new values
-        idd$ref_object$key[idf$value, on = c("class_order", "field_order")],
-        on = "ref_key"][
-        # udpate new values and mark changes
-        !is.na(ref_key) & ori_value == value,
-        `:=`(value = new_value, edited = 1L)][
-        , c("ref_key", "ori_value", "new_value") := NULL]
+        idf$value <- target_fields[idf$value, on = c(key_col(idf$value))][
+            !is.na(new_value), `:=`(value = new_value, edited = 1L)][
+            , c("new_value") := NULL]
+
+        idf$class <- target_fields[, .(object_id, new_value)][
+            idf$class, on = "object_id"][
+            !is.na(new_value), `:=`(edited = 1L)][
+            , c("new_value") := NULL]
+    }
 
     return(idf)
 }
