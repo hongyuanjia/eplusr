@@ -83,8 +83,12 @@ parse_idf <- function (idf_str, idd) {
     # lines ending with comma and without explaination symbol must be a object
     idf_dt[explpt_loc < 0L & endsWith(string, ","), type := type_object]
     # extract comments with leading spaces in order to preserve the indentation.
-    idf_dt[special_loc > 0L, comment := substr(string, explpt_loc + 2L, nchar(string))]
+    idf_dt[special_loc > 0L,
+           comment := substr(string, explpt_loc + 2L, nchar(string))]
     idf_dt[special_loc < 0L & explpt_loc > 0L,
+           comment := substr(string, explpt_loc + 1L, nchar(string))]
+    # for commented objects
+    idf_dt[special_loc > 0L & explpt_loc > 0L,
            comment := substr(string, explpt_loc + 1L, nchar(string))]
     idf_dt[type == type_macro, comment := string]
     # get the number of leading spaces in comment
