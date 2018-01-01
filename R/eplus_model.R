@@ -281,7 +281,10 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
             iprint_idf(private),
 
         reset = function (comfirm = FALSE)
-            ireset_model(self, private, comfirm)
+            ireset_model(self, private, comfirm),
+
+        run = function (weather, echo = FALSE, eplus_home = NULL)
+            irun_idf(self, private, weather, echo, eplus_home)
     ),
 
     private = list(
@@ -478,6 +481,23 @@ ireset_model <- function (self, private, comfirm = FALSE) {
 
     # Do not print
     return(invisible(self))
+}
+# }}}
+
+# irun_idf {{{
+irun_idf <- function (self, private, weather, echo = FALSE, eplus_home = NULL) {
+    eplus_info <- eplus_path(private$ver, eplus_home)
+    eplus_exe <- eplus_info["eplus"]
+
+    if (missing(weather)) {
+        weather <- eplus_info["epw"]
+        warning(msg(
+            "Missing weather input, weather file located at ",
+            sQuote(weather), " will been used."), call. = FALSE)
+    }
+
+    p <- run_idf(eplus_exe, private$path, weather, echo = echo)
+    return(p)
 }
 # }}}
 
