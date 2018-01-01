@@ -401,10 +401,12 @@ isave_ <- function (private, path, format) {
 
     message(sprintf("Model has been successfully saved at %s.", sQuote(path)))
 
+    pre_log <- private$model$log
     private$path <- normalizePath(path, winslash = "/")
-    private$str <- read_idf(path)
+    private$str <- read_idf(private$path)
     private$model <- parse_idf(private$str, idd = private$idd)
-    private$model$log <- add_log("save", id = 0L, new_id = 0L, private$model)
+    private$model$log <- pre_log
+    private$model <- add_log("save", id = 0L, new_id = 0L, private$model)
     return(invisible(NULL))
 }
 # }}}
