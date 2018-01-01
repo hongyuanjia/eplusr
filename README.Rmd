@@ -1,5 +1,6 @@
 ---
-output: github_document
+output:
+    github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -59,9 +60,25 @@ the object. A full example of reading and editing an `IDF` file is given in
 The functionality of running EnergyPlus, and collecting and analyze the output
 is under development, and will release in the next version.
 
+---
+
+-   [Warning](#warning)
+-   [Installation](#installation)
+-   [Features](#features)
+-   [Usage](#usage)
+    -   [Read and parse](#read-and-parse)
+    -   [Query](#query)
+    -   [Modify](#modify)
+    -   [Diff](#diff)
+    -   [Check](#check)
+    -   [Save](#save)
+    -   [Reset](#reset)
+-   [License](#license)
+
 ## Warning
 
-This package is still in its infant stage of development and is subject to change. It is not recommended to use it in working environment.
+This package is still in its infant stage of development and is subject to
+change. It is not recommended to use it in working environment.
 
 ## Installation
 
@@ -76,22 +93,32 @@ devtools::install_github("hongyuanjia/eplusr")
 
 * Read and parse EnergyPlus `IDF`, `IMF` files
 * Query on models, including classes, objects and fields
-* Directly add, modify, duplicate, and delete objects of parse `IDF` and `IMF` files in R.
-* Save the changed models into standard formats in the same way as IDFEditor distrubuted along with EnergyPlus.
+* Directly add, modify, duplicate, and delete objects of parse `IDF` and `IMF`
+  files in R.
+* Save the changed models into standard formats in the same way as IDFEditor
+  distrubuted along with EnergyPlus.
 * Run your models directly in R (**under development**)
 * Collect and analyze the output of EnergyPlus in R (**under development**)
 
-## Example {#example}
+## Usage
 
 ```{r}
 library(eplusr)
 ```
 
-For detailed reference, please see package documentation: `help(package = "eplusr")`.
+For detailed reference, please see package documentation: `help(package
+= "eplusr")`.
 
 ### Read and parse
 
-All reading process starts with creating an `R6Class` called `eplus_model`. The model will be printed in a similar style you see in IDFEditor, with an additional heading lines show the `Path`, `Version` and `Type` of the model. The classes of objects in the model are ordered by Group and the number of objects in classes are shown in square bracket. All `Energy+.idd` files from EnergyPlus v8.3 to v8.8 have been pre-parsed and stored. So you can just ignore the `idd` argument if you are using those verions. If not, just pass the path of the `Energy+.idd` file using `idd`.
+All reading process starts with creating an `R6Class` called `eplus_model`. The
+model will be printed in a similar style you see in IDFEditor, with an
+additional heading lines show the `Path`, `Version` and `Type` of the model.
+The classes of objects in the model are ordered by Group and the number of
+objects in classes are shown in square bracket. All `Energy+.idd` files from
+EnergyPlus v8.3 to v8.8 have been pre-parsed and stored. So you can just ignore
+the `idd` argument if you are using those verions. If not, just pass the path
+of the `Energy+.idd` file using `idd`.
 
 ```{r read, out.lines = 30}
 model <- eplus_model$new(path = system.file("extdata", "5Zone_Transformer.idf", package = "eplusr"), idd = NULL)
@@ -99,14 +126,18 @@ model <- eplus_model$new(path = system.file("extdata", "5Zone_Transformer.idf", 
 model
 ```
 
-
 ### Query
 
 #### `$all`
 
-You can list all valid components you specified using `$all`. The `type` argument will determine what kind of components you want to see. 
+You can list all valid components you specified using `$all`. The `type`
+argument will determine what kind of components you want to see.
 
-All objects in the model will have an unique `ID` according to their sequences. you can find all valid `ID`s using `$all(type = "id")`. The model will be printed in a way that is much similar with what you see when you open your model in an text editor, except that each object binded an unique `ID` and only first two lines of each object will be shown.
+All objects in the model will have an unique `ID` according to their sequences.
+you can find all valid `ID`s using `$all(type = "id")`. The model will be
+printed in a way that is much similar with what you see when you open your
+model in an text editor, except that each object binded an unique `ID` and only
+first two lines of each object will be shown.
 
 ```{r all_id, out.lines = 20}
 model$all("id")
@@ -118,7 +149,10 @@ If you want to see all classes in your model, you can use `$all(type = "class")`
 model$all(type = "class")
 ```
 
-You can find all available fields for all valid class in IDD using `$all(type = "field", class = "any_valid_class_in_IDD")` which makes it handy to be used along with `$add` you will see below. All required fields are marked with `*`. For example, you can find all valid fields in class `Material`:
+You can find all available fields for all valid class in IDD using `$all(type
+= "field", class = "any_valid_class_in_IDD")` which makes it handy to be used
+along with `$add` you will see below. All required fields are marked with `*`.
+For example, you can find all valid fields in class `Material`:
 
 ```{r all_field}
 model$all(type = "field", class = "Material")
@@ -126,13 +160,20 @@ model$all(type = "field", class = "Material")
 
 #### `$contains` & `$matches`
 
-`$contains` and `$matches` will search and return objects that contain the string or match the regular expression you give. The `scale` argument will determine where you want to search. If `class`, only class names existing in current model will be searched. If `field`, only fields in current model will be searched. This is a handy option when you want to see if an object, e.g. one `Material`, is referred by other objects, e.g. `Construction`s.
+`$contains` and `$matches` will search and return objects that contain the
+string or match the regular expression you give. The `scale` argument will
+determine where you want to search. If `class`, only class names existing in
+current model will be searched. If `field`, only fields in current model will
+be searched. This is a handy option when you want to see if an object, e.g. one
+`Material`, is referred by other objects, e.g. `Construction`s.
 
 ```{r contains}
 model$contains(match = "Algorithm", scale = "class")
 ```
 
-If the `scale` is set to `field`, all matched fields will be marked with `(*)`. What's more, `$matches` accepts extra arguments using `...`. All those arguments will be directly passed to `grepl`.
+If the `scale` is set to `field`, all matched fields will be marked with `(*)`.
+What's more, `$matches` accepts extra arguments using `...`. All those
+arguments will be directly passed to `grepl`.
 
 ```{r matches}
 model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
@@ -148,29 +189,41 @@ model$get(1, 2, 38)
 
 ### Modify
 
-You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set` and `$del` respectively.
+You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set`
+and `$del` respectively.
 
-All newly added (duplicated), modified and deleted fields will be marked with `(+)`, `(~)` and `(-)` respectively. The valid IDs will be appended after `$add` and `$dup`, and the newly added (duplicated) object will have the max ID.
+All newly added (duplicated), modified and deleted fields will be marked with
+`(+)`, `(~)` and `(-)` respectively. The valid IDs will be appended after
+`$add` and `$dup`, and the newly added (duplicated) object will have the max
+ID.
 
-For `$add` and `$set`, new field values should be given. Currently three styles of value are acceptable:
+For `$add` and `$set`, new field values should be given. Currently three styles
+of value are acceptable:
 
-* directly list all field values with no name. The values will be assigned to fields according to the order of values; 
-* give both field names and values in pair, e.g. `Name = "Test", "Sepcific Heat" = 150`. You can find all valid field names (with units) using `$all("field", class = "class_name_to_query")`; 
-* some kind of the same as above, but with all field names in lower cases and spaces replaced by `_`, e.g. `name = "Test", specific_heat = 150`.
+* directly list all field values with no name. The values will be assigned to
+  fields according to the order of values;
+* give both field names and values in pair, e.g. `Name = "Test", "Sepcific
+  Heat" = 150`. You can find all valid field names (with units) using
+  `$all("field", class = "class_name_to_query")`;
+* some kind of the same as above, but with all field names in lower cases and
+  spaces replaced by `_`, e.g. `name = "Test", specific_heat = 150`.
 
-Note: All field names should be given **without** units. Error will occur when the type (character or numeric), and the value (e.g. range) is not valid.
+Note: All field names should be given **without** units. Error will occur when
+the type (character or numeric), and the value (e.g. range) is not valid.
 
 #### `$add`
 
-`$add` will add an object in the class you give. All fields will be set to their defaults if applicable.
+`$add` will add an object in the class you give. All fields will be set to
+their defaults if applicable.
 
 ```{r add_mat}
-model$add(class = "Material", name = "test_add", roughness = "Rough", 
+model$add(class = "Material", name = "test_add", roughness = "Rough",
           thickness = 0.8, conductivity = 55, density = 55,
           specific_heat = 100)
 ```
 
-Note that only minimum fiels will be added by default. But you can change it by setting `min` to FALSE.
+Note that only minimum fiels will be added by default. But you can change it by
+setting `min` to FALSE.
 
 ```{r add_min_f}
 model$add("Material", name = "test_add", roughness = "Rough", thickness = 0.8,
@@ -187,22 +240,34 @@ model$add(class = "Version")
 Errors will occur if required fields are missing.
 
 ```{r add_missing, error = TRUE}
-model$add("Material", roughness = "Rough", thickness = 0.8, conductivity = 55, 
+model$add("Material", roughness = "Rough", thickness = 0.8, conductivity = 55,
           density = 55, specific_heat = 100)
 ```
 
 #### `$set`
 
-`$set` works pretty much the same way as `$add`, except it only accepts valid `ID` not class names.
+`$set` works pretty much the same way as `$add`, except it only accepts valid
+`ID` not class names.
 
 ```{r set}
-model$set(52, roughness = "Rough", thickness = 0.8, conductivity = 55, 
+model$set(52, name = "test_set", roughness = "Rough", thickness = 0.8, conductivity = 55,
           density = 55, specific_heat = 100)
 ```
 
-####`$dup`
+Also, if the modified fields were referred by fields in
+other objects, the corresponding fields will also be updated.
 
-`$dup` will duplicate the object you specified using `id`. If there is a name field in the class, you can assign a new name to the duplicated object using `new_name`. If NULL, which is default, the duplicated object will have the same name of the original object except with a suffix of "_1", "_2" and etc. Both the original and the duplicated objects will be shown.
+```{r set_ref}
+model$get(52, 69)
+```
+
+#### `$dup`
+
+`$dup` will duplicate the object you specified using `id`. If there is a name
+field in the class, you can assign a new name to the duplicated object using
+`new_name`. If NULL, which is default, the duplicated object will have the same
+name of the original object except with a suffix of "_1", "_2" and etc. Both
+the original and the duplicated objects will be shown.
 
 ```{r dup}
 model$dup(52)
@@ -216,8 +281,9 @@ model$dup(2)
 
 #### `$del`
 
-`$del` will delete current object specified by `id`. If the object is referred by other object(s), an error will given showing the fields that were referred. You can still delete the object if you want by setting `force` to `TRUE`.
-
+`$del` will delete current object specified by `id`. If the object is referred
+by other object(s), an error will given showing the fields that were referred.
+You can still delete the object if you want by setting `force` to `TRUE`.
 
 ```{r del, error = TRUE}
 model$del(55)
@@ -227,11 +293,18 @@ model$del(55)
 model$del(55, force = TRUE)
 ```
 
-Note that the IDs of deleted objects are invalid after `$del` and cannot be applied to methods `$set`, `$dup` and `$del`, of course. However, unless you save the model, the deleted objects are still there internally but with a special mark to prevent them accessable. This is done by purpose, in order to provide a new method call `$undo` in the future, which will enable you to un-delete the objects.
+Note that the IDs of deleted objects are invalid after `$del` and cannot be
+applied to methods `$set`, `$dup` and `$del`, of course. However, unless you
+save the model, the deleted objects are still there internally but with
+a special mark to prevent them accessable. This is done by purpose, in order to
+provide a new method call `$undo` in the future, which will enable you to
+un-delete the objects.
 
 ### Diff
 
-`$diff` will show all modifications you made, including added (or duplicated), modified and deleted objects with markers `(+)`, `(~)`, `(-)` respectively. You can also only show one kind of modifications using argument `type`.
+`$diff` will show all modifications you made, including added (or duplicated),
+modified and deleted objects with markers `(+)`, `(~)`, `(-)` respectively. You
+can also only show one kind of modifications using argument `type`.
 
 ```{r diff}
 model$diff()
@@ -239,7 +312,9 @@ model$diff()
 
 ### Check
 
-`$check` will check the validation of all fields in current model, including missing required objected and fields, wrong value types, choices, references, any value range exceedings, invalid autosizable and autocalculatable fields.
+`$check` will check the validation of all fields in current model, including
+missing required objected and fields, wrong value types, choices, references,
+any value range exceedings, invalid autosizable and autocalculatable fields.
 
 ```{r check, error = TRUE}
 model$check()
@@ -247,7 +322,10 @@ model$check()
 
 ### Save
 
-You can save your model using `$save` and `$saveas`. `$save` is a shortcut of `$saveas(path = "the_original_model_path")` and will overwrite the current file which has a risk of losing your original file and data. So make sure you have a safe copy of you original model.
+You can save your model using `$save` and `$saveas`. `$save` is a shortcut of
+`$saveas(path = "the_original_model_path")` and will overwrite the current file
+which has a risk of losing your original file and data. So make sure you have
+a safe copy of you original model.
 
 `$saveas` will save the model as a new file.
 
@@ -257,7 +335,10 @@ model$save(comfirm = TRUE)
 
 ### Reset
 
-`$reset` will reset the model to the status when it was last saved using `$save` or `$saveas` (if never saved, first read and parsed using `eplus_model$new`) All your modifications will be lost, so use with caution. It is pretty useful if you messed things up during modifications.
+`$reset` will reset the model to the status when it was last saved using
+`$save` or `$saveas` (if never saved, first read and parsed using
+`eplus_model$new`) All your modifications will be lost, so use with caution. It
+is pretty useful if you messed things up during modifications.
 
 ```{r reset}
 model$reset(comfirm = TRUE)
