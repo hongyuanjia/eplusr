@@ -15,7 +15,6 @@ Depends:
     R (>= 3.0.0)
 Imports: 
     data.table (>= 1.9.8),
-    glue,
     stringr,
     R6,
     assertthat,
