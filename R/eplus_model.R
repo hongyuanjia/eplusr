@@ -34,10 +34,10 @@
 #' model$del(id, force = FALSE)
 #' model$diff(type)
 #' model$check()
-#' model$save(comfirm = FALSE, format)
+#' model$save(confirm = FALSE, format)
 #' model$saveas(path, format, overwrite = FALSE)
 #' model$print()
-#' model$reset(comfirm = FALSE)
+#' model$reset(confirm = FALSE)
 #' ```
 #'
 #' @section Read:
@@ -183,7 +183,7 @@
 #' @section Save:
 #'
 #' ```
-#' model$save(comfirm = FALSE, format)
+#' model$save(confirm = FALSE, format)
 #' model$saveas(path, format, overwrite = FALSE)
 #' ```
 #'
@@ -196,7 +196,7 @@
 #' **Arguments**
 #'
 #' * `model`: An `eplus_model` object.
-#' * `comfirm`: Whether to save the model and overwrite the original file.
+#' * `confirm`: Whether to save the model and overwrite the original file.
 #'              Default is FALSE.
 #' * `format`: The saving format. Should be one of "asis", "sorted", "ori_top",
 #'             and "ori_bot". If "asis", which is the default, the model will be
@@ -213,7 +213,7 @@
 #' @section Reset:
 #'
 #' ```
-#' model$reset(comfirm = FALSE)
+#' model$reset(confirm = FALSE)
 #' ```
 #'
 #' `$reset` will reset the model to the status when it was last saved using
@@ -271,8 +271,8 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         check = function ()
             icheck_object(self, private),
 
-        save = function (comfirm = FALSE, format = c("asis", "sorted", "ori_bot", "ori_top"))
-            isave_idf(private, format = format, comfirm = comfirm),
+        save = function (confirm = FALSE, format = c("asis", "sorted", "ori_bot", "ori_top"))
+            isave_idf(private, format = format, confirm = confirm),
 
         saveas = function (path, format = c("asis", "sorted", "ori_bot", "ori_top"), overwrite = FALSE)
             isaveas_idf(private, path, format, overwrite),
@@ -280,8 +280,8 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         print = function ()
             iprint_idf(private),
 
-        reset = function (comfirm = FALSE)
-            ireset_model(self, private, comfirm),
+        reset = function (confirm = FALSE)
+            ireset_model(self, private, confirm),
 
         run = function (weather, echo = FALSE, eplus_home = NULL)
             irun_idf(self, private, weather, echo, eplus_home)
@@ -415,12 +415,12 @@ isave_ <- function (private, path, format) {
 # }}}
 # isave_idf {{{
 isave_idf <- function (private, format = c("asis", "sorted", "ori_bot", "ori_top"),
-                       comfirm = FALSE) {
-    if (!comfirm) {
+                       confirm = FALSE) {
+    if (!confirm) {
         stop(msg(
             sprintf("Saving will overwrite the original model located at %s.
-                    This may have a risk of losing your original model. Comfirm
-                    by setting 'comfirm' to TRUE.", sQuote(private$path))),
+                    This may have a risk of losing your original model. confirm
+                    by setting 'confirm' to TRUE.", sQuote(private$path))),
                     call. = FALSE)
     }
 
@@ -434,7 +434,7 @@ isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", 
         path <- normalizePath(path, winslash = "/")
         stop(msg(
             sprintf("Saving will replace an existing model file located at %s.
-                    Comfirm by setting 'overwrite' to TRUE.", sQuote(path))),
+                    confirm by setting 'overwrite' to TRUE.", sQuote(path))),
                     call. = FALSE)
     }
 
@@ -465,12 +465,12 @@ iprint_idf <- function (private) {
 # }}}
 
 # ireset_model {{{
-ireset_model <- function (self, private, comfirm = FALSE) {
-    if (!comfirm) {
+ireset_model <- function (self, private, confirm = FALSE) {
+    if (!confirm) {
         stop(msg(
             sprintf("Reset the model back to the status when it was first read
                     at %s. You will lose all modifications after that time and
-                    resetting cannot be undone. Comfirm by setting 'comfirm' to
+                    resetting cannot be undone. confirm by setting 'confirm' to
                     TRUE.", sQuote(private$time_read))), call. = FALSE)
     }
 
