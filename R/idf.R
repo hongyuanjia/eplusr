@@ -522,8 +522,9 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     if (is.null(save_format)) save_format <- "SortedOrder"
 
     header <- get_output_header(idf$options, format = save_format)
-    comment <- get_output_comment(idf$comment)
-    value <- get_output_line(idf$value[edited > -1L])
+    # exclude comments after the last object
+    comment <- get_output_comment(idf$comment[!is.na(object_id)])
+    value <- get_output_line(idf$value[edited >= 0L])
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
@@ -533,6 +534,24 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
         output_dt[, `:=`(class_order = NULL, class = NULL)],
         on = c("edited", "object_id", "field_order"), roll = -Inf]
     # }}}
+
+    id_del <- attr(idf, "id_del")
+    # handle comments that were attached to deleted objects
+    if (not_empty(id_del)) {
+        for (i in id_del) {
+            if (i < max_id(idf)) {
+                info <- output_dt[object_id > i][1L, .(object_id, class_order, class)]
+            } else {
+                info <- output_dt[object_id < i][.N, .(object_id, class_order, class)]
+            }
+
+            output_dt[object_id == i,
+                `:=`(object_id = info$object_id,
+                     class_order = info$class_order,
+                     class = info$class)
+            ]
+        }
+    }
 
     # handle different save options {{{
     # "SortedOrder"
