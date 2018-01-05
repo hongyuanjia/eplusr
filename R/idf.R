@@ -368,7 +368,7 @@ parse_idf <- function (idf_str, idd) {
 # }}}
 # read_idf {{{
 read_idf <- function (filepath) {
-    assert_that(is_readable(filepath))
+    assertthat::assert_that(is_readable(filepath))
 
     con = file(filepath)
     idf_str <- readLines(con, encoding = "UTF-8")
@@ -379,7 +379,7 @@ read_idf <- function (filepath) {
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
 
-    assert_that(not_empty(idf_str))
+    assertthat::assert_that(not_empty(idf_str))
 
     setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
@@ -494,7 +494,7 @@ link_idd <- function (ver) {
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
-        assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
+        assertthat::assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
         if (is.null(idd)) {
             stop(msg(
@@ -569,7 +569,7 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     if (!dir.exists(dirname(path))) dir.create(dirname(path), recursive = TRUE)
     if (!file.exists(path)) file.create(path)
-    assert_that(is_writeable(path))
+    assertthat::assert_that(is_writeable(path))
 
     con <- file(path)
     writeLines(str_output, path)
@@ -722,7 +722,7 @@ add_output_id <- function (idf_value) {
 # }}}
 # add_output_diff {{{
 add_output_diff <- function (idf_object) {
-    assert_that(has_name(idf_object, "edited"))
+    assertthat::assert_that(has_name(idf_object, "edited"))
     idf_object[, output_diff := "   "]
     # for deleted fields
     idf_object[edited ==-1L, output_diff := "(-)"]
@@ -807,7 +807,7 @@ add_output_field_unit <- function (idf_value) {
 # }}}
 # get_output_summary {{{
 get_output_summary <- function (idf, diff = FALSE) {
-    assert_that(is_model(idf))
+    assertthat::assert_that(is_model(idf))
     output_dt <- add_output_count(idf$class)
     output_dt <- add_output_group(output_dt)
 
@@ -831,7 +831,7 @@ add_output_group <- function (idf_class) {
 # }}}
 # add_output_count {{{
 add_output_count <- function (idf_class) {
-    assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
+    assertthat::assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
     output_dt <- get_obj_count(idf_class)
     max_count <- output_dt[, max(num)]
 
@@ -889,7 +889,7 @@ print_output <- function (x, col = "output") {
 
 # valid_field {{{
 valid_field <- function (class, idf, idd) {
-    assert_that(is_string(class), is_valid_class(class, idf))
+    assertthat::assert_that(is_valid_class(class, idf))
     class_name <- class
 
     all_fields <- add_output_field(idd$field[class == class_name],
@@ -935,7 +935,7 @@ valid_id <- function (idf) {
 
 # get_class {{{
 get_class <- function (idf, id) {
-    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
+    assertthat::assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
 
     single_class <- idf$class[object_id %in% id]
 
@@ -944,7 +944,7 @@ get_class <- function (idf, id) {
 # }}}
 # get_value {{{
 get_value <- function (idf, id) {
-    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
+    assertthat::assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
 
     object <- idf$value[object_id == id]
 
@@ -1030,8 +1030,8 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
     target_class <- get_class(idf, id = id)
     class_name <- get_class_name(target_class)
     # check if the object can be duplicated
-    assert_that(can_be_duplicated(class_name, idf))
-    assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_duplicated(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
 
     target_object <- get_value(idf, id)
 
@@ -1075,8 +1075,8 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
 # add_object {{{
 add_object <- function (idf, class, ..., min = TRUE, idd) {
     class_name <- class
-    assert_that(is_valid_class(class_name, idd))
-    assert_that(can_be_duplicated(class_name, idf))
+    assertthat::assert_that(is_valid_class(class_name, idd))
+    assertthat::assert_that(can_be_duplicated(class_name, idf))
 
     new_class <- extract_class(class_name, idf, idd)
     new_object <- extract_object(class_name, min, idf, idd)
@@ -1085,7 +1085,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
     new_object <- set_default(new_object)
 
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values are empty")
+    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
 
     # add suggestion of 'min' option
     num_max <- new_class[, max_fields]
@@ -1127,15 +1127,15 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd) {
-    assert_that(is_scalar(id), is_valid_id(id, idf))
+    assertthat::assert_that(is_scalar(id), is_valid_id(id, idf))
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values are empty")
+    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
     target_object <- get_value(idf, id)
     class_name <- get_class_name(target_class)
-    assert_that(not_deleted(id, idf))
-    assert_that(can_be_modified(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_modified(class_name, idf))
 
     target_order <- get_target_order(target_object, id, fields, idf, idd)
     # target_object <- add_extra_required(target_object, target_order, fields, idf, idd)
@@ -1153,8 +1153,8 @@ del_object <- function (idf, id, idd, force = FALSE) {
 
     target_class <- get_class(idf, id)
     class_name <- get_class_name(target_class)
-    assert_that(not_deleted(id, idf))
-    assert_that(can_be_deleted(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_deleted(class_name, idf))
 
     target_object <- get_value(idf, id = id)
 
@@ -1236,7 +1236,7 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
         new_id <- max_id(idf) + 1L
         setattr(idf, "id", c(attr(idf, "id"), new_id))
         if (action == "add") {
-            assert_that(is.null(id))
+            assertthat::assert_that(is.null(id))
             id <- 0L
         }
     } else if (action == "set") {
@@ -1358,7 +1358,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
 # get_class_name {{{
 get_class_name <- function (object) {
     class_name <- object[, unique(class)]
-    assert_that(is_scalar(class_name), msg = "Input has more than one objects")
+    assertthat::assert_that(is_scalar(class_name), msg = "Input has more than one objects")
     class_name
 }
 # }}}
@@ -1391,7 +1391,7 @@ get_target_order <- function (idf_value, id = NULL, fields, idf, idd) {
             class_name <- get_class_name(idf_value)
         }
     } else {
-        assert_that(is_scalar(id), is_valid_id(id, idf))
+        assertthat::assert_that(is_scalar(id), is_valid_id(id, idf))
         class_name <- idf_value[object_id == id, unique(class)]
     }
     class_data <- extract_class(class_name, idf, idd)
