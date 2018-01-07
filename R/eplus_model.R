@@ -32,12 +32,17 @@
 #' model$set(id, ...)
 #' model$dup(id, new_name = NULL)
 #' model$del(id, force = FALSE)
+#' model$hide(id, force = FALSE)
+#' model$notes(id, ..., append = FALSE, wrap = 0L)
 #' model$diff(type)
 #' model$check()
 #' model$save(confirm = FALSE, format)
 #' model$saveas(path, format, overwrite = FALSE)
 #' model$print()
 #' model$reset(confirm = FALSE)
+#' model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+#' model$collect(type = c("variable", "meter"), long = FALSE)
+#' model$table(report = NULL, key = NULL, table = NULL)
 #' ```
 #'
 #' @section Read:
@@ -100,6 +105,7 @@
 #' model$set(id, ...)
 #' model$dup(id, new_name = NULL)
 #' model$del(id, force = FALSE)
+#' model$hide(id, force = FALSE)
 #' ```
 #'
 #' `$add` will add an object in the `class` you give. All fields will be set to
@@ -114,15 +120,20 @@
 #'   were referred. You can still delete the object if you want by setting
 #'   `force` to TRUE.
 #'
-#' All newly added, modified and deleted fields will be marked with "(+)", "(~)"
-#'   and "(-)" respectively. The valid IDs will be appended after `$add` and
-#'   `$dup`, and the newly added (duplicated) object will have the max ID.
-#'   *Note* that the IDs of deleted objects are invalid after `$del` and cannot
-#'   be applied to methods `$set`, `$dup` and `$del`, of course. However, unless
-#'   you save the model, the deleted objects are still there internally but with
-#'   a special mark to prevent them accessable. This is done by purpose, in
-#'   order to provide a new method call `$undo` in the future, which will enable
-#'   you to un-delete the objects.
+#' `$hide` is the same as `$del`, except that `$hide` will comment out the
+#' object instead of deleting it. This make if possible for you to get the
+#' hidden objects back by uncomment it using any test editor.
+#'
+#' All newly added, modified, deleted and hidden fields will be marked with
+#' "(+)", "(~)", "(-)" and "(!)" respectively. The valid IDs will be appended
+#' after `$add` and `$dup`, and the newly added (duplicated) object will have
+#' the max ID.  *Note* that the IDs of deleted and hidden objects are invalid
+#' after `$del` and cannot be applied to methods `$set`, `$dup`, `$del` and
+#' `$hide`, of course. However, unless you save the model, the deleted and
+#' hidden objects are still there internally but with a special mark to prevent
+#' them accessable. This is done by purpose, in order to provide a new method
+#' call `$undo` in the future, which will enable you to un-delete or un-hide
+#' the objects.
 #'
 #' **Arguments**
 #'
@@ -136,8 +147,8 @@
 #' * `new_name`: The new name of the duplicated object if applicable. If NULL,
 #'               the duplicated object will have the same name of the original
 #'               object except with a suffix of "_1", "_2" and etc.
-#' * `force`: Whether delete the object even it has been referred by others.
-#'            Default is FALSE.
+#' * `force`: Whether delete or hide the object even it has been referred by
+#'            others. Default is FALSE.
 #' * `...`: Field values you want to add or modify. Currently three types are
 #'          acceptable: (a) directly list all field values with no name. The
 #'          values will be assigned to fields according to the order of values;
@@ -148,6 +159,26 @@
 #'          cases and spaces replaced by "_". Note: All field names should be
 #'          given without units. Error will occur when the type (character or
 #'          numeric), and the value (e.g. range) are not valid.
+#'
+#' @section Notes:
+#'
+#' ```
+#' model$notes(id, ..., append = FALSE, wrap = 0L)
+#' ```
+#'
+#' `$notes` will show, add or delete notes(comments) for the object specified using `id`.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `id`: A valid object IDs. You can find all valid object IDs using
+#'         `$all("id")`.
+#' * `...`: Any character vectors you want to add as notes for the object. If
+#'          empty, the objects with notes will be printed.
+#' * `append`: If TRUE, add new notes to the end of existing ones, otherwise
+#'             add notes to the beginning of existing ones. If NULL, the
+#'             already existing notes will be deleted before add new ones.
+#' * `wrap`: If greater than 0L,long notes will be wrap at the length of `wrap`.
 #'
 #' @section Diff:
 #'
@@ -221,7 +252,90 @@
 #' `eplus_model$new`) All your modifications will be lost, so use with
 #' caution. It is pretty useful if you messed things up during modifications.
 #'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `confirm`: Whether to reset the model. Default is FALSE.
+#'
+#' @section Run Model and Collect Results:
+#'
+#' ```
+#' model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+#' model$collect(type = c("variable", "meter", long = FALSE))
+#' model$table(report = NULL, key = NULL, table = NULL)
+#' ```
+#'
+#' `$run` will run the current model within given period using corresponding
+#'   version of EnergyPlus.
+#'
+#' `$collect` will collect the simulation variable (specified in
+#'   `Output:Variable` class) and meter (specified in `Output:Meter*` classes)
+#'   output of current model
+#'
+#' `$table` will extract tables from simulation table (specified in
+#'   `Output:Table*` classes) output of current model.
+#'
+#' NOTE: The underlying functions in `$table` relies on the `HTML` format
+#' output. If the `Column Separator` in `OutputControl:Table:Style` does not
+#' contain `HTML` format, `eplusr` will automatically change it when running
+#' the model. For example, `"Comma"` (which is the default value) will be
+#' changed into `"CommaAndHTML"` and a warning message will be issued.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `period`: A formula specified in format `from ~ to` to determine what
+#'             period should the model be run. It can be used to override the
+#'             `RunPeriod` objects. The original objects in `RunPeriod` class
+#'             will be commented out using `$hide`. Each side of a `period`
+#'             formulais specified as a character in format `'MM-DD'`, but
+#'             powerful shorthand is available:
+#'    - `~.`: Use existing `RunPeriod` objects. This is the default.
+#'    - `~"annual"`: Force to run annual simulation only.
+#'    - `~"design_day"`: Force to run design day only.
+#'    - `~4` or `~"4"` or `~"Apr"`: Force to run from April 1st to April 30th.
+#'    - `2~4` or `"2"~"4"` or `"Feb"~"Apr"`: Force to run from February 1st to
+#'        April 30th.
+#'    - `"2-1"~"4-30": Same as above.
+#' * `weather`: The weather file used to run simulation. If missing, the
+#'              chicago weather file
+#'              ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw") in the
+#'              distributed along with corresponding EnergyPlus will be used,
+#'              and a warning message will be given.
+#' * `echo`: Whether to print the standard output and error of EnergyPlus to
+#'           the screen. Default is FALSE.
+#' * `dir`: The directory to save the simulation results. If NULL, which is the
+#'          default, the model folder will be used.
+#' * `eplus_home`: The EnergyPlus installation folder path. If NULL, which is
+#'                 the default, `eplusr` will try to find if corresponding
+#'                 version of EnergyPlus was installed in the standard
+#'                 location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
+#'                 "/usr/local/EnergyPlus-X-X-X" on Linux and
+#'                 "/Applications/EnergyPlus-X-X-X" on MacOS.
+#' * `type`: Should be one of "variabale" (default) and "meter". If "variable",
+#'           results from `Output:Variable` will be collected. If "meter",
+#'           results from `Output:Meter*` will be collected.
+#' * `long`: Whether to change the collected data from wide format (which is
+#'           the default format from EnergyPlus) to long format which is much
+#'           easy for data analysis. In long table format, the wide table will
+#'           be melten according to DateTime and the output names will be
+#'           splited into four parts, i.e. key, variable, frequency and unit.
+#'           For more information on "Tidy Data", please read the excellent
+#'           paper of Hadley Wickham
+#'           \href{http://vita.had.co.nz/papers/tidy-data.html}{here}.
+#' * `report`, `key` and `table`: Specify what tables to extract from
+#'                                EnergyPlus HTML table output. You can find
+#'                                valid report values by looking at Table of
+#'                                Contents of the file, valid key values by
+#'                                looking at the "For" line after each report
+#'                                name. For example, the first table in the
+#'                                table output can be extract by specifying
+#'                                `$table(report = "Annual Building Utility
+#'                                Performance Summary", key = "Entire
+#'                                Facility", table = "Site and Source Energy")`.
+#'
 #' @importFrom R6 R6Class
+#' @importFrom tools file_ext
 #' @docType class
 #' @export
 eplus_model <- R6::R6Class(classname = "Energy+Model",
@@ -265,6 +379,12 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         del = function (id, force = FALSE)
             idel_object(self, private, id, force),
 
+        hide = function (id, force = FALSE)
+            ihide_object(self, private, id = id, force = force),
+
+        notes = function (id, ..., append = FALSE, wrap = 0L)
+            inotes(self, private, id, ..., append = append, wrap = wrap),
+
         diff = function (type = c("all", "add", "set", "del"))
             idiff_idf(self, private, type),
 
@@ -283,8 +403,16 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         reset = function (confirm = FALSE)
             ireset_model(self, private, confirm),
 
-        run = function (weather, echo = FALSE, eplus_home = NULL)
-            irun_idf(self, private, weather, echo, eplus_home)
+        run = function (period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
+            irun_idf(self, private, period = period, weather, echo = echo,
+                     dir = dir, eplus_home = eplus_home),
+
+        collect = function (type = c("variable", "meter"), long = FALSE)
+            icollect_varmeter(self, private, type = type, long = long),
+
+        table = function (report = NULL, key = NULL, table = NULL)
+            icollect_output(self, private, type = "table", report = report,
+                            key = key, table = table)
     ),
 
     private = list(
@@ -294,7 +422,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         model = NULL,
         str = NULL,
         idd = NULL,
-        time_read = NULL
+        time_read = NULL,
+        sim = list(),
+        process = NULL
     )
 )
 
@@ -359,6 +489,32 @@ idup_object <- function (self, private, id, new_name = NULL) {
 # idel_object {{{
 idel_object <- function (self, private, id, force = FALSE) {
     private$model <- del_object(private$model, id, private$idd, force = force)
+
+    return(self)
+}
+# }}}
+
+# ihide_object {{{
+ihide_object <- function (self, private, id, force = FALSE) {
+    private$model <- del_object(private$model, id, private$idd, force = force, hide = TRUE)
+    return(self)
+}
+# }}}
+
+# inotes {{{
+inotes <- function (self, private, id, ..., append = FALSE, wrap = 0L) {
+    content <- unlist(c(...))
+
+    if (is.null(append)) {
+        private$model <- del_comment(private$model, id)
+    }
+
+    if (is_empty(content)) {
+        private$model <- get_comment(private$model, id)
+    } else {
+        if (!is.null(append)) assertthat::assert_that(is.logical(append))
+        private$model <- add_comment(private$model, id, append == append, type = 1L, content, log = TRUE, wrap = wrap)
+    }
 
     return(self)
 }
@@ -485,23 +641,116 @@ ireset_model <- function (self, private, confirm = FALSE) {
 # }}}
 
 # irun_idf {{{
-irun_idf <- function (self, private, weather, echo = FALSE, eplus_home = NULL) {
+irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
+                      eplus_home = NULL) {
     eplus_info <- eplus_path(private$ver, eplus_home)
     eplus_exe <- eplus_info["eplus"]
 
-    if (missing(weather)) {
-        weather <- eplus_info["epw"]
-        warning(msg(
-            "Missing weather input, weather file located at ",
-            sQuote(weather), " will been used."), call. = FALSE)
+    # check if the model has been modified but not saved {{{
+    log <- private$model$log
+    acts <- log[, action]
+    modify_act <- c("add", "set", "dup", "del", "hide", "notes")
+    step_mod <- log[action %in% modify_act, step]
+    step_save <- log[action == "save", step]
+    if (not_empty(step_mod)) {
+        if (is_empty(step_save)) step_save <- 0L
+        assertthat::assert_that(max(step_mod) < max(step_save),
+            msg = msg("The model has been changed without saving. Please save
+                      or reset your model before run.")
+        )
     }
+    # }}}
 
-    p <- run_idf(eplus_exe, private$path, weather, echo = echo)
-    return(p)
+    # set run period {{{
+    idf <- set_runperiod(private$model, period, private$idd)
+
+    annual <- design_day <- FALSE
+    rp <- attr(idf, "runperiod")
+    data.table::setattr(idf, "runperiod", NULL)
+
+    if (as.character(rp[[1]]) == "annual") {
+        annual <- TRUE
+        rp_mes <- "Reset run period to 'Annual Simulation'"
+    } else if (as.character(rp[[1]]) == "design_day") {
+        design_day <- TRUE
+        rp_mes <- "Reset run period to 'Design Day Simulation'"
+    } else if (as.character(rp[[1]]) != "asis") {
+        # Store the original time locale.
+        ori_locale <- Sys.getlocale(category = "LC_TIME")
+        # Change the time locale to the original value. In order to not print
+        # the locale while run this function, store the output of
+        # Sys.setlocale().
+        on.exit(invisible(Sys.setlocale(category = "LC_TIME", locale = ori_locale)))
+        # Change the time locale to "English_United States.1252".
+        not_print <- Sys.setlocale(category = "LC_TIME", locale = "English_United States.1252")
+        rp_mes <- sprintf("Reset run period to '%s - %s'",
+                       format(rp[[1]], "%B %d"), format(rp[[2]], "%B %d"))
+    } else {
+        rp_mes <- NULL
+    }
+    # }}}
+
+    # set default weather {{{
+    if (is_empty(weather)) {
+        weather <- eplus_info["epw"]
+        if (is_empty(weather)) {
+            stop(msg("Failed to use default weather file
+                     'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'. Please
+                     give 'weather' file path."), call. = FALSE)
+        } else {
+            warning(msg(
+                "Missing weather input, weather file located at ",
+                sQuote(weather), " will been used."), call. = FALSE)
+        }
+    }
+    # }}}
+
+    # auto correct table output style
+    idf <- set_output_table_stype(idf, private$idd)
+
+    # auto determine whether to expand objects
+    if (has_hvac_template(private$model)) expand_obj <- TRUE else expand_obj <- FALSE
+    if (not_empty(rp_mes)) message(rp_mes)
+
+    # save the new model and update objects
+    save_idf(idf, private$path)
+    private$model <- idf
+
+    data_run <- run_idf(eplus_exe, model = private$path, weather = weather,
+                        output_dir = dir, design_day = design_day,
+                        annual = annual, expand_obj = expand_obj, echo = echo)
+    private$process <- data_run$process
+    private$sim <- data_run$info
 }
 # }}}
 
-# a helper to access private numbers of the `eplus_model` R6 class
+# icollect_varmeter {{{
+icollect_varmeter <- function (self, private, type = c("variable", "meter"), long = FALSE) {
+    type <- match.arg(type)
+    icollect_output(self, private, type = type, long = long)
+}
+# }}}
+# icollect_output {{{
+icollect_output <- function (self, private, type = c("variable", "meter", "table"),
+                             long = FALSE, report = NULL, key = NULL, table = NULL) {
+    type <- match.arg(type)
+
+    # if the model has not been run
+    if (is.null(private$process)) {
+        path <- private$path
+    } else {
+        path <- private$sim$model
+        if (private$process$is_alive()) {
+            stop("Simulation is still running.", call. = FALSE)
+            return(invisible(NULL))
+        }
+    }
+
+    collect_eplus(path, output = type, long = long, report = report, key = key, table = table)
+}
+# }}}
+
+# a helper to access private members of the `eplus_model` R6 class
 .get <- function (model, x) {
     environment(model$initialize)$private[[x]]
 }
