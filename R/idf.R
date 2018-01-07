@@ -368,7 +368,7 @@ parse_idf <- function (idf_str, idd) {
 # }}}
 # read_idf {{{
 read_idf <- function (filepath) {
-    assert_that(is_readable(filepath))
+    assertthat::assert_that(is_readable(filepath))
 
     con = file(filepath)
     idf_str <- readLines(con, encoding = "UTF-8")
@@ -379,7 +379,7 @@ read_idf <- function (filepath) {
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
 
-    assert_that(not_empty(idf_str))
+    assertthat::assert_that(not_empty(idf_str))
 
     setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
@@ -461,17 +461,13 @@ check_obj_ref <- function (idf, idd) {
 }
 # }}}
 # print.IDF {{{
-print.IDF <- function (idf) {
-    count_obj <- setorder(idf$class, group_order, class_order)[
-        , .N, by = list(group, class, object_id)][
-        , list(num = .N), by = list(group, class)][
-        , num_obj := paste0("[", stringr::str_pad(num, 2, "left", "0"), "]")][
-        , output := paste0(num_obj, " ", class)]
-
-    output <- count_obj[count_obj[, .I[1], by = list(group)]$V1,
-        output := paste0("\n", group, "\n", strrep("-", console_width()), "\n", output)]
-
-    print_output(output)
+print.IDF <- function (idf, ...) {
+    .print(idf)
+}
+# }}}
+# print.IMF {{{
+print.IMF <- function (imf, ...) {
+    .print(imf)
 }
 # }}}
 # link_idd {{{
@@ -494,7 +490,7 @@ link_idd <- function (ver) {
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
-        assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
+        assertthat::assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
         if (is.null(idd)) {
             stop(msg(
@@ -522,8 +518,8 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
     if (is.null(save_format)) save_format <- "SortedOrder"
 
     header <- get_output_header(idf$options, format = save_format)
-    comment <- get_output_comment(idf$comment)
-    value <- get_output_line(idf$value[edited > -1L])
+    comment <- get_output_comment(idf$comment[edited >= -1L])
+    value <- get_output_line(idf$value[edited >= -1L], show_hide = TRUE)
 
     # combine comment and value {{{
     output_dt <- rbindlist(list(comment, value), fill = TRUE)[
@@ -569,7 +565,7 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     if (!dir.exists(dirname(path))) dir.create(dirname(path), recursive = TRUE)
     if (!file.exists(path)) file.create(path)
-    assert_that(is_writeable(path))
+    assertthat::assert_that(is_writeable(path))
 
     con <- file(path)
     writeLines(str_output, path)
@@ -622,9 +618,11 @@ get_output_comment <- function (idf_comment) {
     idf_comment[, output := ""]
     idf_comment[, output_space := strrep(" ", leading_spaces)]
     # for macro lines
-    idf_comment[type == -1L, output := paste0(output_space, comment)]
+    idf_comment[type ==-1L, output := paste0(output_space, comment)]
     # for normal comment lines
     idf_comment[type == 0L, output := paste0("!", output_space, comment)]
+    idf_comment[type == 1L, output := paste0("!", output_space, comment)]
+    idf_comment[type == 2L, output := paste0("!#", output_space, comment)]
     setorder(idf_comment, object_id, -field_order)
     idf_comment[, field_order := -seq_along(.I), by = list(object_id)]
     setorder(idf_comment, object_id, field_order)
@@ -637,8 +635,8 @@ get_output_line <- function (idf_value, keep_all = FALSE,
                              show_id = FALSE, show_class = TRUE,
                              show_diff = FALSE, show_order = FALSE,
                              mark_required = FALSE, show_ref = FALSE,
-                             fill_na = FALSE, indent = TRUE, standard = TRUE,
-                             new_line = TRUE) {
+                             show_hide = FALSE, fill_na = FALSE, indent = TRUE,
+                             standard = TRUE, new_line = TRUE) {
     idf_value <- copy(idf_value)
 
     comb_list <- c("output_value", "output_field")
@@ -662,7 +660,7 @@ get_output_line <- function (idf_value, keep_all = FALSE,
 
     # add class name
     if (show_class) {
-        idf_value <- add_output_class(idf_value)
+        idf_value <- add_output_class(idf_value, show_hide = show_hide)
         comb_list <- c("output_class", comb_list)
     }
 
@@ -673,7 +671,8 @@ get_output_line <- function (idf_value, keep_all = FALSE,
     }
 
     # add field value
-    idf_value <- add_output_value(idf_value, fill_na = fill_na, indent = indent)
+    idf_value <- add_output_value(idf_value, fill_na = fill_na, indent = indent,
+                                  show_hide = show_hide)
 
     # add field name
     idf_value <- add_output_field(idf_value, keep_all = keep_all, standard = standard, new_line = new_line)
@@ -691,7 +690,9 @@ get_output_line <- function (idf_value, keep_all = FALSE,
 # }}}
 # add_output_order {{{
 add_output_order <- function (idf_value, mark_required = FALSE) {
-    output_dt <- copy(idf_value)[, output_order := paste0(field_order, ":")]
+    max_id <- idf_value[, max(field_order)]
+    output_dt <- copy(idf_value)[
+        , output_order := paste0(stringr::str_pad(field_order, nchar(max_id), "left"), ":")]
     if (mark_required) {
         output_dt[
             required_field == TRUE, output_order := paste0("*", output_order)][
@@ -722,10 +723,12 @@ add_output_id <- function (idf_value) {
 # }}}
 # add_output_diff {{{
 add_output_diff <- function (idf_object) {
-    assert_that(has_name(idf_object, "edited"))
+    assertthat::assert_that(has_name(idf_object, "edited"))
     idf_object[, output_diff := "   "]
     # for deleted fields
-    idf_object[edited ==-1L, output_diff := "(-)"]
+    idf_object[edited ==-2L, output_diff := "(-)"]
+    # for hidden fields
+    idf_object[edited ==-1L, output_diff := "(!)"]
     # for changed fields
     idf_object[edited == 1L, output_diff := "(~)"]
     # for added fields
@@ -735,16 +738,28 @@ add_output_diff <- function (idf_object) {
 }
 # }}}
 # add_output_class {{{
-add_output_class <- function (idf_value) {
+add_output_class <- function (idf_value, show_hide = FALSE) {
     idf_value[, output_class := ""]
-    idf_value[idf_value[, .I[1], by = list(object_id)]$V1,
-              output_class := paste0(class, ",\n")]
+    l_class <- idf_value[, .I[1], by = list(object_id)]$V1
+    idf_value[, row_id_class := .I]
+    if (show_hide) {
+        # Support for hidden objects
+        idf_value[row_id_class %in% l_class & edited == -1L,
+                  output_class := paste0("! ", class, ",\n")][
+                  row_id_class %in% l_class & edited != -1L,
+                  output_class := paste0(class, ",\n")][
+                  , row_id_class := NULL]
+    } else {
+        idf_value[row_id_class %in% l_class,
+                  output_class := paste0(class, ",\n")][
+                  , row_id_class := NULL]
+    }
 
     return(idf_value)
 }
 # }}}
 # add_output_value {{{
-add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE) {
+add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE, show_hide = FALSE) {
     idf_value[, value_fill := value]
     if (fill_na) {
         idf_value[is.na(value_fill), value_fill := ""]
@@ -759,6 +774,11 @@ add_output_value <- function (idf_value, fill_na = FALSE, indent = TRUE) {
                   output_value := stringr::str_pad(output_value, 29L, side = "right")]
         idf_value[nchar(output_value) > 29L,
                   output_value := paste0(output_value, "  ")]
+    }
+
+    if (show_hide) {
+        # Support for hidden objects
+        idf_value[edited == -1L, output_value := paste0("! ", output_value)]
     }
 
     return(idf_value)
@@ -807,7 +827,7 @@ add_output_field_unit <- function (idf_value) {
 # }}}
 # get_output_summary {{{
 get_output_summary <- function (idf, diff = FALSE) {
-    assert_that(is_model(idf))
+    assertthat::assert_that(is_model(idf))
     output_dt <- add_output_count(idf$class)
     output_dt <- add_output_group(output_dt)
 
@@ -831,7 +851,7 @@ add_output_group <- function (idf_class) {
 # }}}
 # add_output_count {{{
 add_output_count <- function (idf_class) {
-    assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
+    assertthat::assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
     output_dt <- get_obj_count(idf_class)
     max_count <- output_dt[, max(num)]
 
@@ -873,10 +893,10 @@ print_output <- function (x, col = "output") {
             idf$log[.N, active := FALSE]
             return(cat("No modification has been made yet\n"))
         } else {
-            output_str <- get_output_dt(idf, target_id, action)[, output]
+            output_str <- get_output_str(idf, target_id, action)
         }
     } else {
-        output_str <- get_output_dt(idf, target_id, action)[, output]
+        output_str <- get_output_str(idf, target_id, action)
     }
 
     cat(output_str, sep = "\n")
@@ -889,17 +909,14 @@ print_output <- function (x, col = "output") {
 
 # valid_field {{{
 valid_field <- function (class, idf, idd) {
-    assert_that(is_string(class), is_valid_class(class, idf))
+    assertthat::assert_that(is_valid_class(class, idd))
     class_name <- class
 
-    all_fields <- add_output_field(idd$field[class == class_name],
-        standard = FALSE, new_line = FALSE, keep_all = TRUE)[
-        , output_field := paste0(field_order, ": ", output_field)]
+    all_fields <- add_output_order(idd$field[class == class_name], mark_required = TRUE)
+    all_fields <- add_output_field(all_fields, standard = FALSE, new_line = FALSE, keep_all = TRUE)
+    all_fields[, output := paste0(output_order, " ", output_field)]
 
-    output <- copy(all_fields)[
-        required_field == TRUE, output := paste0("*", output_field)][
-        required_field == FALSE, output := paste0(" ", output_field)]
-    print_output(output)
+    print_output(all_fields)
 
     return(invisible(all_fields[, output_name]))
 }
@@ -933,9 +950,23 @@ valid_id <- function (idf) {
 }
 # }}}
 
+# pull_data {{{
+pull_data <- function (idf, class, type = c("class", "value")) {
+    assertthat::assert_that(is_string(class))
+    assertthat::assert_that(is_valid_class(class, idf))
+    class_name <- class
+
+    type <- match.arg(type)
+
+    switch(type,
+           class = idf$class[class == class_name],
+           value = idf$value[class == class_name]
+    )
+}
+# }}}
 # get_class {{{
 get_class <- function (idf, id) {
-    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
+    assertthat::assert_that(is_model(idf), is_valid_id(id, idf))
 
     single_class <- idf$class[object_id %in% id]
 
@@ -943,12 +974,27 @@ get_class <- function (idf, id) {
 }
 # }}}
 # get_value {{{
-get_value <- function (idf, id) {
-    assert_that(is_model(idf), is_scalar(id), is_valid_id(id, idf))
+get_value <- function (idf, id, field = NULL) {
+    assertthat::assert_that(is_model(idf), is_valid_id(id, idf))
 
     object <- idf$value[object_id == id]
+    if (!is.null(field)) {
+        sapply(field, function (x) assertthat::assert_that(is_integerish(x)))
+        sapply(field, function (x) assertthat::assert_that(x <= object[, max(field_order)]))
+        object <- object[field]
+    }
 
     return(object)
+}
+# }}}
+# get_id {{{
+get_id <- function (idf, class) {
+    assertthat::assert_that(is_valid_class(class, idf))
+
+    class_name <- class
+    ids <- idf$class[class == class_name, object_id]
+
+    return(ids)
 }
 # }}}
 
@@ -1015,23 +1061,34 @@ find_field <- function (idf, pattern, ..., all = FALSE) {
 }
 # }}}
 # get_object {{{
-get_object <- function (idf, ...) {
+get_object <- function (idf, ..., log = TRUE) {
     id <- list(...)
-    lapply(id, function (x) lapply(x, function (y) assert_that(not_deleted(y, idf), is_valid_id(y, idf))))
+    check_char <- all(sapply(id, function (x) sapply(x, is.character)))
+    check_num <- all(sapply(id, function (x) sapply(x, is_integerish)))
+    assertthat::assert_that(check_char || check_num,
+        msg = "Input should be either all character types or integer types.")
+    if (check_char) {
+        lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(is_valid_class(y, idf))))
+        class_names <- unlist(id)
+        ids <- idf$class[class %chin% class_names, object_id]
+        lapply(ids, function (x) assertthat::assert_that(not_deleted(x, idf)))
+    } else {
+        lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(not_deleted(y, idf), is_valid_id(y, idf))))
+        ids <- unlist(id)
+    }
 
-    id <- unlist(id)
-    idf <- add_log("get", id, 0L, idf)
+    if (log) idf <- add_log("get", ids, 0L, idf)
 
     return(idf)
 }
 # }}}
 # dup_object {{{
-dup_object <- function (idf, id, new_name = NULL, idd) {
+dup_object <- function (idf, id, new_name = NULL, idd, log = TRUE) {
     target_class <- get_class(idf, id = id)
     class_name <- get_class_name(target_class)
     # check if the object can be duplicated
-    assert_that(can_be_duplicated(class_name, idf))
-    assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_duplicated(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
 
     target_object <- get_value(idf, id)
 
@@ -1067,16 +1124,16 @@ dup_object <- function (idf, id, new_name = NULL, idd) {
     # }}}
 
     # append all data
-    new_idf <- append_data(id, target_class, target_object, action = "dup", idf, idd)
+    new_idf <- append_data(id, target_class, target_object, action = "dup", idf, idd, log)
 
     return(new_idf)
 }
 # }}}
 # add_object {{{
-add_object <- function (idf, class, ..., min = TRUE, idd) {
+add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
     class_name <- class
-    assert_that(is_valid_class(class_name, idd))
-    assert_that(can_be_duplicated(class_name, idf))
+    assertthat::assert_that(is_valid_class(class_name, idd))
+    assertthat::assert_that(can_be_duplicated(class_name, idf))
 
     new_class <- extract_class(class_name, idf, idd)
     new_object <- extract_object(class_name, min, idf, idd)
@@ -1085,13 +1142,13 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
     new_object <- set_default(new_object)
 
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values are empty")
+    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
 
     # add suggestion of 'min' option
     num_max <- new_class[, max_fields]
     num_cur <- new_object[, .N]
 
-    target_order <- get_target_order(new_object, id = NULL, fields, idf, idd)
+    target_order <- get_target_order(new_object, index = class_name, fields, idf, idd)
 
     if (min && max(target_order) > num_cur) {
         stop(msg(sprintf("No.*%s* field found in input, which exceeded current
@@ -1107,54 +1164,41 @@ add_object <- function (idf, class, ..., min = TRUE, idd) {
     new_object <- add_extra_required(new_object, target_order, fields, idf, idd)
     new_object <- set_fields(new_object, target_order, fields, "add", idf, idd)
 
-    # # check missing required fields
-    # missing_fields <- new_object[required_field == TRUE & is.na(value)]
-    # if (not_empty(missing_fields)) {
-    #     new_object <- append_id(new_object, base = "value", idf)
-    #     new_object[required_field == TRUE & is.na(value),
-    #                value := "[ ** missing ** ]"]
-    #     missing_res <- get_output_line(new_object,
-    #         show_class = FALSE, standard = TRUE, new_line = FALSE)[, output]
-    #     stop("Missing required values for fields:\n",
-    #          paste0(missing_res, collapse = "\n"), call. = FALSE)
-    # }
-
     # append all data
-    new_idf <- append_data(id = NULL, new_class, new_object, action = "add", idf, idd)
+    new_idf <- append_data(id = NULL, new_class, new_object, action = "add", idf, idd, log)
 
     return(new_idf)
 }
 # }}}
 # set_object {{{
-set_object <- function (idf, id, ..., idd) {
-    assert_that(is_scalar(id), is_valid_id(id, idf))
+set_object <- function (idf, id, ..., idd, log = TRUE) {
+    assertthat::assert_that(is_valid_id(id, idf))
     fields <- list(...)
-    assert_that(not_empty(fields), msg = "Field values are empty")
+    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
     target_object <- get_value(idf, id)
     class_name <- get_class_name(target_class)
-    assert_that(not_deleted(id, idf))
-    assert_that(can_be_modified(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_modified(class_name, idf))
 
-    target_order <- get_target_order(target_object, id, fields, idf, idd)
-    # target_object <- add_extra_required(target_object, target_order, fields, idf, idd)
+    target_order <- get_target_order(target_object, index = id, fields, idf, idd)
     new_object <- set_fields(target_object, target_order, fields, "set", idf, idd)
 
     idf <- update_field_ref(target_object, new_object, idf, idd)
 
-    new_idf <- append_data(id, target_class, new_object, action = "set", idf, idd)
+    new_idf <- append_data(id, target_class, new_object, action = "set", idf, idd, log)
 
     return(new_idf)
 }
 # }}}
 # del_object {{{
-del_object <- function (idf, id, idd, force = FALSE) {
+del_object <- function (idf, id, idd, force = FALSE, hide = FALSE, log = TRUE) {
 
     target_class <- get_class(idf, id)
     class_name <- get_class_name(target_class)
-    assert_that(not_deleted(id, idf))
-    assert_that(can_be_deleted(class_name, idf))
+    assertthat::assert_that(not_deleted(id, idf))
+    assertthat::assert_that(can_be_deleted(class_name, idf))
 
     target_object <- get_value(idf, id = id)
 
@@ -1166,10 +1210,12 @@ del_object <- function (idf, id, idd, force = FALSE) {
             show_class = TRUE, show_ref = TRUE)
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
+            if (hide) act <- "hide" else act <- "delete"
             warning(msg(
-                sprintf("Force to delete object (ID:%s) that has been referred
+                sprintf("Force to %s object (ID:%s) that has been referred
                         by other objects (ID:%s). Errors may occur during
-                        simulations.", id, paste0(ref_ids, collapse = ", "))),
+                        simulations.", act, id,
+                        paste0(ref_ids, collapse = ", "))),
                 call. = FALSE)
         } else {
             stop(msg(
@@ -1182,16 +1228,71 @@ del_object <- function (idf, id, idd, force = FALSE) {
         }
     }
 
-    new_idf <- append_data(id, target_class, target_object, action = "del", idf, idd)
+    if (hide) action <- "hide" else action <- "del"
+    new_idf <- append_data(id, target_class, target_object, action = action, idf, idd, log)
 
     return(new_idf)
 }
 # }}}
+# get_comment {{{
+get_comment <- function (idf, id) {
+    assertthat::assert_that(is_valid_id(id, idf))
+
+    idf <- add_log("notes", id, 0L, idf)
+
+    return(idf)
+}
+# }}}
+# add_comment {{{
+add_comment <- function (idf, id, append = TRUE, type = 1L, ..., wrap = 0L, log = TRUE) {
+    assertthat::assert_that(is_valid_id(id, idf), not_deleted(id, idf))
+    assertthat::assert_that(is_integerish(wrap))
+    content <- unlist(c(...))
+    if (wrap > 0L) content <- strwrap(content, width = wrap)
+    assertthat::assert_that(not_empty(content), msg = "Comment to be inserted is empty.")
+
+    # make sure that 'edited' value is consistent between value and comment
+    edited <- get_class(idf, id)[, edited]
+    new_comment <- data.table(type = type, object_id = id, comment = content,
+                              leading_spaces = 1L, edited = edited)
+
+    # check if there are already comments in this object
+    ori_comment <- setorder(idf$comment[object_id == id], field_order)
+    if (not_empty(ori_comment)) {
+        idf$comment <- idf$comment[object_id != id]
+        if (append) {
+            new_comment <- rbindlist(list(ori_comment, new_comment), fill = TRUE)
+        } else {
+            new_comment <- rbindlist(list(new_comment, ori_comment), fill = TRUE)
+        }
+    }
+
+    new_comment[, field_order := .I]
+    idf$comment <- rbindlist(list(idf$comment, new_comment), fill = TRUE)
+    setorder(idf$comment, object_id, field_order)
+
+    if (log) idf <- add_log(action = "notes", id = id, new_id = 0L, idf)
+
+    return(idf)
+}
+# }}}
+# del_comment {{{
+del_comment <- function (idf, id) {
+    assertthat::assert_that(is_valid_id(id, idf))
+
+    idf$comment <- idf$comment[object_id != id]
+
+    idf <- add_log("notes", id, 0L, idf)
+
+    return(idf)
+}
+# }}}
 # diff_idf {{{
-diff_idf <- function (idf, type = c("all", "add", "set", "del")) {
+diff_idf <- function (idf, type = c("all", "add", "set", "del", "hide")) {
     idx <- switch(type,
         all = idf$class[edited != 0L, object_id],
-        del = idf$class[edited ==-1L, object_id],
+        del = idf$class[edited ==-2L, object_id],
+        hide = idf$class[edited ==-1L, object_id],
         set = idf$class[edited == 1L, object_id],
         add = idf$class[edited == 2L, object_id]
     )
@@ -1216,7 +1317,12 @@ extract_object <- function (class, min = TRUE, idf, idd) {
     class_name <- class
     if (min) {
         num_min_field <- idd$class[class == class_name, min_fields]
-        new_object <- idd$field[class == class_name & field_order <= num_min_field]
+        if (num_min_field > 0L) {
+            new_object <- idd$field[class == class_name & field_order <= num_min_field]
+        # if no min field requirement, return all fields
+        } else {
+            new_object <- idd$field[class == class_name]
+        }
     } else {
         new_object <- idd$field[class == class_name]
     }
@@ -1225,9 +1331,9 @@ extract_object <- function (class, min = TRUE, idf, idd) {
 }
 # }}}
 # append_data {{{
-append_data <- function (id = NULL, class_data = NULL, object_data = NULL, action, idf, idd) {
+append_data <- function (id = NULL, class_data = NULL, object_data = NULL, action, idf, idd, log = TRUE) {
 
-    action <- match.arg(action, c("add", "dup", "set", "del"))
+    action <- match.arg(action, c("add", "dup", "set", "del", "hide"))
     new_id <- 0L
 
     if (action %in% c("add", "dup")) {
@@ -1236,7 +1342,7 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
         new_id <- max_id(idf) + 1L
         setattr(idf, "id", c(attr(idf, "id"), new_id))
         if (action == "add") {
-            assert_that(is.null(id))
+            assertthat::assert_that(is.null(id))
             id <- 0L
         }
     } else if (action == "set") {
@@ -1250,15 +1356,19 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
 
         idf$class <- idf$class[object_id != id]
         idf$value <- idf$value[object_id != id]
-    # del
+        idf$comment <- idf$comment[object_id == id, edited := 1L]
+    # del and hide
     } else {
-        idf$class[object_id == id, edited := -1L]
-        idf$value[object_id == id, edited := -1L]
+        if (action == "del") idx <- -2L else idx <- -1L
+        idf$class[object_id == id, edited := idx]
+        idf$value[object_id == id, edited := idx]
+        idf$comment[object_id == id, edited := idx]
+        # just mark hidden objects as deleted
         id_del <- sort(unique(c(attr(idf, "id_del"), id)))
         setattr(idf, "id_del", id_del)
     }
 
-    if (action != "del") {
+    if (!action %in% c("del", "hide")) {
         needed_cols_class <- names(idf$class)
         idf$class <- rbindlist(list(idf$class, class_data[, .SD, .SDcol = needed_cols_class]))
         setorder(idf$class, group_order, class_order, object_id)
@@ -1272,7 +1382,7 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
     idf$ref <- get_obj_ref(idf$value, idd)
 
     # add log
-    idf <- add_log(action, id, new_id, idf)
+    if (log) idf <- add_log(action, id, new_id, idf)
 
     return(idf)
 }
@@ -1315,7 +1425,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
                 !is.na(default)][value == default, row_id]
         }
         mes <- add_output_field(object[line_skip], standard = FALSE, new_line = FALSE)[
-            !is.na(as.numeric(value)), value := as.character(as.numeric(value))][
+            !is.na(suppressWarnings(as.numeric(value))), value := as.character(as.numeric(value))][
             , mes := sprintf(
                 "Value for field %s in class %s is missing. Default value %s is used.",
                 sQuote(output_field), sQuote(class), sQuote(value))][, mes]
@@ -1358,7 +1468,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
 # get_class_name {{{
 get_class_name <- function (object) {
     class_name <- object[, unique(class)]
-    assert_that(is_scalar(class_name), msg = "Input has more than one objects")
+    assertthat::assert_that(is_scalar(class_name), msg = "Input has more than one objects")
     class_name
 }
 # }}}
@@ -1378,22 +1488,17 @@ get_field_changes <- function (ori_object, new_object) {
 }
 # }}}
 # get_target_order {{{
-get_target_order <- function (idf_value, id = NULL, fields, idf, idd) {
-    # get class_name
-    if (is.null(id)) {
-        if ("object_id" %in% names(idf_value)) {
-            id <- idf_value[, unique(object_id)]
-            if (length(id) > 1L) {
-                stop("'id' required if more than one object exists in the input.", call. = FALSE)
-            }
-            class_name <- get_class_name(idf_value)
-        } else {
-            class_name <- get_class_name(idf_value)
-        }
-    } else {
-        assert_that(is_scalar(id), is_valid_id(id, idf))
+get_target_order <- function (idf_value, index, fields, idf, idd) {
+    class_name <- NULL
+    if (is_integerish(index)) {
+        assertthat::assert_that(is_valid_id(index, idf))
+        id <- index
         class_name <- idf_value[object_id == id, unique(class)]
+    } else {
+        assertthat::assert_that(is_valid_class(index, idd))
+        class_name <- index
     }
+
     class_data <- extract_class(class_name, idf, idd)
 
     # get field info
@@ -1550,8 +1655,9 @@ get_obj_count <- function (idf_object) {
 # add_log {{{
 add_log <- function (action, id, new_id = 0L, idf) {
     action <- match.arg(action,
-        c("get", "add", "set", "dup", "del", "diff", "save")
+        c("get", "add", "set", "dup", "del", "hide", "notes", "diff", "save")
     )
+
     pre_step <- max(idf$log$step)
     log_dt <- data.table(step = pre_step + 1L, timestep = Sys.time(),
         action = action, id = list(id), new_id = new_id, active = TRUE)
@@ -1562,14 +1668,19 @@ add_log <- function (action, id, new_id = 0L, idf) {
     return(idf)
 }
 # }}}
-# get_output_dt {{{
-get_output_dt <- function (idf, ids, action) {
+# get_output_str {{{
+get_output_str <- function (idf, ids, action, new_ids = NULL) {
     objects <- idf$value[object_id %in% ids]
+    comments <- NULL
+    if (action %in% c("notes", "hide")) {
+        idf_comment <- setorder(idf$comment, object_id, field_order)[
+            object_id %in% ids]
+        comments <- get_output_comment(idf_comment)[, output]
+    }
+    output <- get_output_line(objects, show_id = TRUE, show_class = TRUE,
+        show_order = TRUE, show_diff = TRUE)[, output]
 
-    output_dt <- get_output_line(objects, show_id = TRUE, show_class = TRUE,
-        show_order = TRUE, show_diff = TRUE)
-
-    return(output_dt)
+    return(c(comments, output))
 }
 # }}}
 # max_id {{{
@@ -1589,6 +1700,44 @@ key_col <- function (idf_obj, type = c("field", "class")) {
 # }}}
 # get_deleted_id {{{
 get_deleted_id <- function (idf) attr(idf, "id_del")
+# }}}
+# get_comment_attach_id {{{
+get_comment_attach_id <- function (idf, id) {
+    obj <- get_value(idf, id)
+
+    class_name <- get_class_name(obj)
+
+    prev_id <- idf$class[class == class_name][object_id < id, object_id]
+    next_id <- idf$class[class == class_name][object_id > id, object_id]
+
+    targ_id <- NULL
+    if (is_empty(next_id)) {
+        if (!is_empty(prev_id)) {
+            targ_id <- max(prev_id)
+        }
+    } else {
+        tar_id <- min(next_id)
+    }
+
+    # case when there is only one object in the class
+    if (is.null(targ_id)) {
+
+        prev_id <- idf$class[edited >= 0L][object_id < id, max(object_id)]
+        next_id <- idf$class[edited >= 0L][object_id > id, min(object_id)]
+
+        if (is_empty(next_id)) {
+            if (is_empty(prev_id)) {
+                stop("The commented object is the only object existed in the model", call. = FALSE)
+            } else {
+                targ_id <- prev_id
+            }
+        } else {
+            tar_id <- next_id
+        }
+    }
+
+    return(tar_id)
+}
 # }}}
 
 # check
