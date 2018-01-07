@@ -66,10 +66,12 @@ is under development, and will release in the next version.
     -   [Read and parse](#read-and-parse)
     -   [Query](#query)
     -   [Modify](#modify)
+    -   [Notes](#notes)
     -   [Diff](#diff)
     -   [Check](#check)
     -   [Save](#save)
     -   [Reset](#reset)
+    -   [Run and Collect Output](#ran-and-collect-output)
 -   [License](#license)
 
 ## Warning
