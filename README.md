@@ -1,7 +1,3 @@
----
-output:
-    github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -44,10 +40,12 @@ is under development, and will release in the next version.
     -   [Read and parse](#read-and-parse)
     -   [Query](#query)
     -   [Modify](#modify)
+    -   [Notes](#notes)
     -   [Diff](#diff)
     -   [Check](#check)
     -   [Save](#save)
     -   [Reset](#reset)
+    -   [Run and Collect Output](#ran-and-collect-output)
 -   [License](#license)
 
 ## Warning
@@ -106,7 +104,7 @@ model
 #> [Version]: 8.8
 #> [ Type  ]: IDF
 #> ===========================================================================
-#> 
+#>
 #> Simulation Parameters
 #> ---------------------------------------------------------------------------
 #> [01] Version
@@ -116,19 +114,19 @@ model
 #> [01] SurfaceConvectionAlgorithm:Outside
 #> [01] HeatBalanceAlgorithm
 #> [01] Timestep
-#> 
+#>
 #> Location and Climate
 #> ---------------------------------------------------------------------------
 #> [01] Site:Location
 #> [02] SizingPeriod:DesignDay
 #> [02] RunPeriod
 #> [01] Site:GroundTemperature:BuildingSurface
-#> 
+#>
 #> Schedules
 #> ---------------------------------------------------------------------------
 #> [06] ScheduleTypeLimits
 #> [23] Schedule:Compact
-#> 
+#>
 #> Surface Construction Elements
 #> ---------------------------------------------------------------------------
 #> [10] Material
@@ -153,23 +151,23 @@ only first two lines of each object will be shown.
 model$all("id")
 #> [ID:  1] Version,
 #>     8.8;                     !- Version Identifier
-#> 
+#>
 #> [ID:  2] SimulationControl,
 #>     Yes,                     !- Do Zone Sizing Calculation
 #>     Yes,                     !- Do System Sizing Calculation
 #>     ........
-#> 
+#>
 #> [ID:  3] Building,
 #>     Building,                !- Name
 #>     30.,                     !- North Axis {deg}
 #>     ........
-#> 
+#>
 #> [ID:  4] SurfaceConvectionAlgorithm:Inside,
 #>     Simple;                  !- Algorithm
-#> 
+#>
 #> [ID:  5] SurfaceConvectionAlgorithm:Outside,
 #>     SimpleCombined;          !- Algorithm
-#> 
+#>
 #> [ID:  6] HeatBalanceAlgorithm,
 ....
 ```
@@ -179,20 +177,20 @@ If you want to see all classes in your model, you can use `$all(type = "class")`
 
 ```r
 model$all(type = "class")
-#>  [1] "Version"                                   
-#>  [2] "SimulationControl"                         
-#>  [3] "Building"                                  
-#>  [4] "SurfaceConvectionAlgorithm:Inside"         
-#>  [5] "SurfaceConvectionAlgorithm:Outside"        
-#>  [6] "HeatBalanceAlgorithm"                      
-#>  [7] "Timestep"                                  
-#>  [8] "Site:Location"                             
-#>  [9] "SizingPeriod:DesignDay"                    
-#> [10] "RunPeriod"                                 
-#> [11] "Site:GroundTemperature:BuildingSurface"    
-#> [12] "ScheduleTypeLimits"                        
-#> [13] "Schedule:Compact"                          
-#> [14] "Material"                                  
+#>  [1] "Version"
+#>  [2] "SimulationControl"
+#>  [3] "Building"
+#>  [4] "SurfaceConvectionAlgorithm:Inside"
+#>  [5] "SurfaceConvectionAlgorithm:Outside"
+#>  [6] "HeatBalanceAlgorithm"
+#>  [7] "Timestep"
+#>  [8] "Site:Location"
+#>  [9] "SizingPeriod:DesignDay"
+#> [10] "RunPeriod"
+#> [11] "Site:GroundTemperature:BuildingSurface"
+#> [12] "ScheduleTypeLimits"
+#> [13] "Schedule:Compact"
+#> [14] "Material"
 ....
 ```
 
@@ -227,21 +225,21 @@ be searched. This is a handy option when you want to see if an object, e.g. one
 
 ```r
 model$contains(match = "Algorithm", scale = "class")
-#> 
+#>
 #> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Inside * ========
-#> 
+#>
 #> [ID:4] SurfaceConvectionAlgorithm:Inside,
 #>     Simple;                  !- Algorithm
-#> 
-#> 
+#>
+#>
 #> == * 1 Objects Found in Class: SurfaceConvectionAlgorithm:Outside * =======
-#> 
+#>
 #> [ID:5] SurfaceConvectionAlgorithm:Outside,
 #>     SimpleCombined;          !- Algorithm
-#> 
-#> 
+#>
+#>
 #> == * 1 Objects Found in Class: HeatBalanceAlgorithm * =====================
-#> 
+#>
 #> [ID:6] HeatBalanceAlgorithm,
 #>     ConductionTransferFunction;  !- Algorithm
 ```
@@ -253,8 +251,8 @@ arguments will be directly passed to `grepl`.
 
 ```r
 model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
-#> == * 2 Matched Fields Found * ============================================= 
-#> 
+#> == * 2 Matched Fields Found * =============================================
+#>
 #> [ID:55] Material:NoMass,
 #>     (*)MAT-CLNG-1,           !- Name
 #>        Rough,                !- Roughness
@@ -262,7 +260,7 @@ model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
 #>        0.65,                 !- Thermal Absorptance
 #>        0.65,                 !- Solar Absorptance
 #>        0.65;                 !- Visible Absorptance
-#> 
+#>
 #> [ID:68] Construction,
 #>        CLNG-1,               !- Name
 #>     (*)MAT-CLNG-1;           !- Outside Layer
@@ -278,14 +276,14 @@ give.
 model$get(1, 2, 38)
 #> [ID: 1] Version,
 #> 1:       8.8;                     !- Version Identifier
-#> 
+#>
 #> [ID: 2] SimulationControl,
 #> 1:       Yes,                     !- Do Zone Sizing Calculation
 #> 2:       Yes,                     !- Do System Sizing Calculation
 #> 3:       Yes,                     !- Do Plant Sizing Calculation
 #> 4:       No,                      !- Run Simulation for Sizing Periods
 #> 5:       Yes;                     !- Run Simulation for Weather File Run Periods
-#> 
+#>
 #> [ID:38] Schedule:Compact,
 #> 1:       PlantOnSched,            !- Name
 #> 2:       Fraction,                !- Schedule Type Limits Name
@@ -300,7 +298,7 @@ model$get(1, 2, 38)
 model$get("Version", "Zone")
 #> [ID: 1] Version,
 #> 1:       8.8;                     !- Version Identifier
-#> 
+#>
 #> [ID:74] Zone,
 #> 1:       PLENUM-1,                !- Name
 #> 2:       0,                       !- Direction of Relative North {deg}
@@ -311,7 +309,7 @@ model$get("Version", "Zone")
 #> 7:       1,                       !- Multiplier
 #> 8:       0.609600067,             !- Ceiling Height {m}
 #> 9:       283.2;                   !- Volume {m3}
-#> 
+#>
 #> [ID:75] Zone,
 #> 1:       SPACE1-1,                !- Name
 #> 2:       0,                       !- Direction of Relative North {deg}
@@ -401,7 +399,7 @@ Errors will occur if required fields are missing.
 ```r
 model$add("Material", roughness = "Rough", thickness = 0.8, conductivity = 55,
           density = 55, specific_heat = 100)
-#> Error: 
+#> Error:
 #> ===========================================================================
 #> Errors found when checking 'Missing Value'
 #> ---------------------------------------------------------------------------
@@ -446,7 +444,7 @@ model$get(52, 69)
 #> 7:       0.9000000,               !- Thermal Absorptance
 #> 8:       0.6500000,               !- Solar Absorptance
 #> 9:       0.6500000;               !- Visible Absorptance
-#> 
+#>
 #> [ID:69] Construction,
 #> 1:       FLOOR-SLAB-1,            !- Name
 #> 2:(~)    test_set;                !- Outside Layer
@@ -473,7 +471,7 @@ model$dup(52)
 #> 7:       0.9000000,               !- Thermal Absorptance
 #> 8:       0.6500000,               !- Solar Absorptance
 #> 9:       0.6500000;               !- Visible Absorptance
-#> 
+#>
 #> [ID:325] Material,
 #> 1:(+)    test_set_1,              !- Name
 #> 2:(+)    Rough,                   !- Roughness
@@ -675,7 +673,7 @@ model$diff()
 #> 14:(!)    For: AllOtherDays,       !- Field 12
 #> 15:(!)    Until: 24:00,            !- Field 13
 #> 16:(!)    0.0;                     !- Field 14
-#> 
+#>
 #> [ID: 52] Material,
 #>  1:(~)    test_set,                !- Name
 #>  2:(~)    Rough,                   !- Roughness
@@ -686,7 +684,7 @@ model$diff()
 #>  7:       0.9000000,               !- Thermal Absorptance
 #>  8:       0.6500000,               !- Solar Absorptance
 #>  9:       0.6500000;               !- Visible Absorptance
-#> 
+#>
 #> [ID:323] Material,
 #>  1:(+)    test_add,                !- Name
 #>  2:(+)    Rough,                   !- Roughness
@@ -694,7 +692,7 @@ model$diff()
 #>  4:(+)    55,                      !- Conductivity {W/m-K}
 #>  5:(+)    55,                      !- Density {kg/m3}
 #>  6:(+)    100;                     !- Specific Heat {J/kg-K}
-#> 
+#>
 #> [ID:324] Material,
 #>  1:(+)    test_add,                !- Name
 #>  2:(+)    Rough,                   !- Roughness
@@ -705,7 +703,7 @@ model$diff()
 #>  7:(+)    0.8,                     !- Thermal Absorptance
 #>  8:(+)    .7,                      !- Solar Absorptance
 #>  9:(+)    .7;                      !- Visible Absorptance
-#> 
+#>
 #> [ID:325] Material,
 #>  1:(+)    test_set_1,              !- Name
 #>  2:(+)    Rough,                   !- Roughness
@@ -716,7 +714,7 @@ model$diff()
 #>  7:(+)    0.9000000,               !- Thermal Absorptance
 #>  8:(+)    0.6500000,               !- Solar Absorptance
 #>  9:(+)    0.6500000;               !- Visible Absorptance
-#> 
+#>
 #> [ID: 55] Material:NoMass,
 #>  1:(-)    MAT-CLNG-1,              !- Name
 #>  2:(-)    Rough,                   !- Roughness
@@ -724,7 +722,7 @@ model$diff()
 #>  4:(-)    0.65,                    !- Thermal Absorptance
 #>  5:(-)    0.65,                    !- Solar Absorptance
 #>  6:(-)    0.65;                    !- Visible Absorptance
-#> 
+#>
 #> [ID: 69] Construction,
 #>  1:       FLOOR-SLAB-1,            !- Name
 #>  2:(~)    test_set;                !- Outside Layer
@@ -739,7 +737,7 @@ any value range exceeding, invalid autosizable and autocalculatable fields.
 
 ```r
 model$check()
-#> 
+#>
 #> ===========================================================================
 #> Errors found when checking 'Reference'
 #> ---------------------------------------------------------------------------
@@ -748,8 +746,8 @@ model$check()
 #> Invalid value 'CoolingCoilAvailSched' found for field 'Availability Schedule Name' in class 'Coil:Cooling:Water' with ID 194 which should be one of references 'c("OCCUPY-1", "LIGHTS-1", "EQUIP-1", "INFIL-SCH", "ActSchd", "ShadeTransSch", "Htg-SetP-Sch", "PlenumHtg-SetP-Sch", "Clg-SetP-Sch", "PlenumClg-SetP-Sch", "Zone Control Type Sched", "Min OA Sched", "FanAvailSched", "CoolingPumpAvailSched", "ReheatCoilAvailSched", "CW Loop Temp Schedule", "HW Loop Temp Schedule", "PlantOnSched", "Seasonal Reset Supply Air Temp Sch", "OA Cooling Supply Air Temp Sch", "OA Heating Supply Air Temp Sch", "Always On")'
 #> Invalid value 'CoolingCoilAvailSched' found for field 'Availability Schedule Name' in class 'Coil:Heating:Water' with ID 200 which should be one of references 'c("OCCUPY-1", "LIGHTS-1", "EQUIP-1", "INFIL-SCH", "ActSchd", "ShadeTransSch", "Htg-SetP-Sch", "PlenumHtg-SetP-Sch", "Clg-SetP-Sch", "PlenumClg-SetP-Sch", "Zone Control Type Sched", "Min OA Sched", "FanAvailSched", "CoolingPumpAvailSched", "ReheatCoilAvailSched", "CW Loop Temp Schedule", "HW Loop Temp Schedule", "PlantOnSched", "Seasonal Reset Supply Air Temp Sch", "OA Cooling Supply Air Temp Sch", "OA Heating Supply Air Temp Sch", "Always On")'
 #> ===========================================================================
-#> 
-#> 
+#>
+#>
 #> ===========================================================================
 #> Errors found when checking 'Autocalculatable'
 #> ---------------------------------------------------------------------------
@@ -777,7 +775,7 @@ is pretty useful if you messed things up during modifications.
 ```r
 model$reset(confirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2018-01-08 00:45:38'.
+#> '2018-01-08 00:58:26'.
 ```
 
 ### Save
@@ -824,7 +822,7 @@ model$run(period = ~"design_day", echo = FALSE)
 #> 'C:/EnergyPlusV8-8-0/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'
 #> will been used.
 #> Reset run period to 'Design Day Simulation'
-#> Running command C:/EnergyPlusV8-8-0/energyplus.exe 
+#> Running command C:/EnergyPlusV8-8-0/energyplus.exe
 #> Arguments:
 #> --weather "D:/Documents/R/win-library/3.3/eplusr/extdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" --output-directory "D:/Documents/R/win-library/3.3/eplusr/extdata" --output-prefix "5Zone_Transformer" --output-suffix C   --readvars  --design-day  "D:/Documents/R/win-library/3.3/eplusr/extdata/5Zone_Transformer.idf"
 ```
@@ -850,7 +848,7 @@ model$collect("meter")
 #>   3: 2017-01-21 00:45:00                            1695473
 #>   4: 2017-01-21 01:00:00                            1695473
 #>   5: 2017-01-21 01:15:00                            1695473
-#>  ---                                                       
+#>  ---
 #> 188: 2017-07-21 23:00:00                            2149990
 #> 189: 2017-07-21 23:15:00                            2131850
 #> 190: 2017-07-21 23:30:00                            2115123
@@ -862,7 +860,7 @@ model$collect("meter")
 #>   3:                            1237500
 #>   4:                            1237500
 #>   5:                            1237500
-#>  ---                                   
+#>  ---
 #> 188:                             427500
 #> 189:                             427500
 #> 190:                             427500
@@ -874,7 +872,7 @@ model$collect("meter")
 #>   3:                                   337500
 #>   4:                                   337500
 #>   5:                                   337500
-#>  ---                                         
+#>  ---
 #> 188:                                   337500
 #> 189:                                   337500
 #> 190:                                   337500
@@ -886,7 +884,7 @@ model$collect("meter")
 #>   3:                       376759.6                        81213.77
 #>   4:                       376759.6                        81213.77
 #>   5:                       376759.6                        81213.60
-#>  ---                                                               
+#>  ---
 #> 188:                       374825.8                      1347664.07
 #> 189:                       374825.8                      1329524.25
 #> 190:                       374825.8                      1312797.50
@@ -898,7 +896,7 @@ model$collect("meter")
 #>   3:                       338588.4                              12927651
 #>   4:                       338588.4                              12927600
 #>   5:                       338588.4                              12932318
-#>  ---                                                                     
+#>  ---
 #> 188:                       338588.4                               3463968
 #> 189:                       338588.4                               3404587
 #> 190:                       338588.4                               3347742
@@ -934,13 +932,13 @@ model$table(table = c("Site and Source Energy", "Site to Source Energy Conversio
 #> [[1]]
 #> [[1]]$report
 #> [1] "Annual Building Utility Performance Summary"
-#> 
+#>
 #> [[1]]$key
 #> [1] "Entire Facility"
-#> 
+#>
 #> [[1]]$table
 #> [1] "Site and Source Energy"
-#> 
+#>
 #> [[1]]$content
 #>                       Total Energy [GJ]
 #> 1   Total Site Energy                 0
@@ -957,18 +955,18 @@ model$table(table = c("Site and Source Energy", "Site to Source Energy Conversio
 #> 2                                            0
 #> 3                                            0
 #> 4                                            0
-#> 
-#> 
+#>
+#>
 #> [[2]]
 #> [[2]]$report
 #> [1] "Annual Building Utility Performance Summary"
-#> 
+#>
 #> [[2]]$key
 #> [1] "Entire Facility"
-#> 
+#>
 #> [[2]]$table
 #> [1] "Site to Source Energy Conversion Factors"
-#> 
+#>
 #> [[2]]$content
 #>                     Site=>Source Conversion Factor
 #> 1       Electricity                          3.167
