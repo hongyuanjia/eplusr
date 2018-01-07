@@ -187,8 +187,8 @@
 #' ```
 #'
 #' `$diff` will show all modifications you made, including added (or
-#'   duplicated), modified and deleted objects with markers "(+)", "(~)", "(-)"
-#'   respectively.
+#'   duplicated), modified, deleted and hidden objects with markers "(+)",
+#'   "(~)", "(-)" and "(!)" respectively.
 #'
 #' **Arguments**
 #'
@@ -260,9 +260,9 @@
 #' @section Run Model and Collect Results:
 #'
 #' ```
-#' model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+#' model$run(period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
 #' model$collect(type = c("variable", "meter", long = FALSE))
-#' model$table(report = NULL, key = NULL, table = NULL)
+#' model$table(report = NULL, key = NULL, table = NULL, nest = TRUE)
 #' ```
 #'
 #' `$run` will run the current model within given period using corresponding
@@ -296,19 +296,18 @@
 #'    - `~4` or `~"4"` or `~"Apr"`: Force to run from April 1st to April 30th.
 #'    - `2~4` or `"2"~"4"` or `"Feb"~"Apr"`: Force to run from February 1st to
 #'        April 30th.
-#'    - `"2-1"~"4-30": Same as above.
-#' * `weather`: The weather file used to run simulation. If missing, the
-#'              chicago weather file
-#'              ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw") in the
-#'              distributed along with corresponding EnergyPlus will be used,
-#'              and a warning message will be given.
+#'    - `"2-1"~"4-30"`: Same as above.
+#' * `weather`: The weather file used to run simulation. If NULL, the chicago
+#'              weather file ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+#'              in the distributed along with corresponding EnergyPlus will be
+#'              used, and a warning message will be given.
 #' * `echo`: Whether to print the standard output and error of EnergyPlus to
 #'           the screen. Default is FALSE.
 #' * `dir`: The directory to save the simulation results. If NULL, which is the
 #'          default, the model folder will be used.
 #' * `eplus_home`: The EnergyPlus installation folder path. If NULL, which is
 #'                 the default, `eplusr` will try to find if corresponding
-#'                 version of EnergyPlus was installed in the standard
+#'                 version of EnergyPlus that was installed in the standard
 #'                 location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
 #'                 "/usr/local/EnergyPlus-X-X-X" on Linux and
 #'                 "/Applications/EnergyPlus-X-X-X" on MacOS.
@@ -333,6 +332,11 @@
 #'                                `$table(report = "Annual Building Utility
 #'                                Performance Summary", key = "Entire
 #'                                Facility", table = "Site and Source Energy")`.
+#' * `nest`: If TRUE, which is the default, `$table` will return a data.table
+#'           with four columns named `"report"`, `"key"`, `"table"` and
+#'           `"content"`. `"content"` is a list column which has the extracted
+#'           tables. If FALSE, a list will return with each each number
+#'           containing those data.
 #'
 #' @importFrom R6 R6Class
 #' @importFrom tools file_ext
@@ -410,9 +414,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
         collect = function (type = c("variable", "meter"), long = FALSE)
             icollect_varmeter(self, private, type = type, long = long),
 
-        table = function (report = NULL, key = NULL, table = NULL)
+        table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
             icollect_output(self, private, type = "table", report = report,
-                            key = key, table = table)
+                            key = key, table = table, nest = nest)
     ),
 
     private = list(
@@ -732,7 +736,8 @@ icollect_varmeter <- function (self, private, type = c("variable", "meter"), lon
 # }}}
 # icollect_output {{{
 icollect_output <- function (self, private, type = c("variable", "meter", "table"),
-                             long = FALSE, report = NULL, key = NULL, table = NULL) {
+                             long = FALSE, report = NULL, key = NULL, table = NULL,
+                             nest = TRUE) {
     type <- match.arg(type)
 
     # if the model has not been run
@@ -743,10 +748,16 @@ icollect_output <- function (self, private, type = c("variable", "meter", "table
         if (private$process$is_alive()) {
             stop("Simulation is still running.", call. = FALSE)
             return(invisible(NULL))
+        } else if (private$process$get_exit_status() > 0L) {
+            stop(msg("Simulation ended with errors. Please solve the problems
+                     and re-run the simulation before collect results."),
+                     call. = FALSE)
+            return(invisible(NULL))
         }
     }
 
-    collect_eplus(path, output = type, long = long, report = report, key = key, table = table)
+    collect_eplus(path, output = type, long = long, report = report, key = key, table = table,
+                  nest = nest)
 }
 # }}}
 

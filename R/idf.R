@@ -1210,10 +1210,12 @@ del_object <- function (idf, id, idd, force = FALSE, hide = FALSE, log = TRUE) {
             show_class = TRUE, show_ref = TRUE)
         ref_ids <- field_referred[, unique(object_id)]
         if (force) {
+            if (hide) act <- "hide" else act <- "delete"
             warning(msg(
-                sprintf("Force to delete object (ID:%s) that has been referred
+                sprintf("Force to %s object (ID:%s) that has been referred
                         by other objects (ID:%s). Errors may occur during
-                        simulations.", id, paste0(ref_ids, collapse = ", "))),
+                        simulations.", act, id,
+                        paste0(ref_ids, collapse = ", "))),
                 call. = FALSE)
         } else {
             stop(msg(

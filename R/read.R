@@ -3,12 +3,14 @@
 #' @importFrom fasttime fastPOSIXct
 #' @importFrom rvest html_nodes html_table
 #' @importFrom xml2 read_html
+#' @importFrom purrr transpose
 NULL
 
 # collect_eplus: A function to read EnergyPlus simulation results.
 # collect_eplus {{{1
 collect_eplus <- function (path, output = c("variable", "meter", "table"),
-                           long = FALSE, report = NULL, key = NULL, table = NULL) {
+                           long = FALSE, report = NULL, key = NULL, table = NULL,
+                           nest = TRUE) {
     # Read only one path at a time
     assertthat::assert_that(is_string(path))
     # Default is to read variable output
@@ -26,8 +28,13 @@ collect_eplus <- function (path, output = c("variable", "meter", "table"),
         table = read_table(file_to_read, report = report, key = key, table = table)
     )
 
-    data[, model := basename(path)]
-    setcolorder(data, c("model", setdiff(names(data), "model")))
+    # data[, model := basename(path)]
+#
+    # setcolorder(data, c("model", setdiff(names(data), "model")))
+#
+    if (!nest & output == "table") {
+        data <- purrr::transpose(as.list(data))
+    }
 
     return(data[])
 }
@@ -122,7 +129,7 @@ read_table <- function (file, report = NULL, key = NULL, table = NULL) {
         stop("No matched table found.")
     }
 
-    tbls[, content := rvest::html_table(content, header = TRUE)][
+    tbls[, content := list(rvest::html_table(content, header = TRUE))][
         , `:=`(id = NULL, name = NULL)]
 
     return(tbls)
