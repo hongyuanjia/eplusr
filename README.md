@@ -14,9 +14,9 @@ provides full support for preparing EnergyPus IDF and IMF files for
 simulations. The parsing and writing process of IDF and IDD files in `eplusr`
 is basically the same as that in IDFEditor. But `eplusr` takes advantage of the
 powerful [`data.table`](http://r-datatable.com) package to speed up the whole
-process and store the results. The IDD files for EnergyPlus 8.3 to 8.8 have
+process and store the results. The IDD files for EnergyPlus 8.5 to 8.8 have
 been pre-parsed and stored internally and will automatically be used when
-parsing `IDF` and `IMF` files. The souce codes of IDFEditor can be
+parsing `IDF` and `IMF` files. The source codes of IDFEditor can be
 found on [GitHub](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor)
 . There is still an option to give an additional IDD file path to parse if you
 want. However, it will still take about 3-4 sec to parse an IDD file which is
@@ -28,8 +28,8 @@ model has an unique `ID`. Once you have the object `ID`, you can set fields
 the object. A full example of reading and editing an `IDF` file is given in
 [Example](#example).
 
-The functionality of running EnergyPlus, and collecting and analyze the output
-is under development, and will release in the next version.
+Also, `eplusr` has the functionalities of running EnergyPlus, and collecting
+output.
 
 ---
 
@@ -45,7 +45,7 @@ is under development, and will release in the next version.
     -   [Check](#check)
     -   [Save](#save)
     -   [Reset](#reset)
-    -   [Run and Collect Output](#ran-and-collect-output)
+    -   [Run and Collect Output](#run-and-collect-output)
 -   [License](#license)
 
 ## Warning
@@ -55,7 +55,7 @@ change. It is not recommended to use it in working environment.
 
 ## Installation
 
-`eplusr` is currently not on CRAN. You can install eplusr from github with:
+`eplusr` is currently not on CRAN. You can install `eplusr` from GitHub with:
 
 
 ```r
@@ -67,12 +67,14 @@ devtools::install_github("hongyuanjia/eplusr")
 
 * Read and parse EnergyPlus `IDF`, `IMF` files
 * Query on models, including classes, objects and fields
-* Directly add, modify, duplicate, and delete objects of parse `IDF` and `IMF`
-  files in R.
+* Directly add, modify, duplicate, and delete objects of `IDF` and `IMF` files
+  in R.
+* Automatically change referred fields when modifying objects.
 * Save the changed models into standard formats in the same way as IDFEditor
   distributed along with EnergyPlus.
-* Run your models directly in R
-* Collect the simulation output of EnergyPlus in R
+* Run your models directly in R with customized run period which was directly
+  set in R.
+* Collect the simulation output of EnergyPlus in R.
 
 ## Usage
 
@@ -339,7 +341,7 @@ of value are acceptable:
 * some kind of the same as above, but with all field names in lower cases and
   spaces replaced by `_`, e.g. `name = "Test", specific_heat = 150`.
 
-Note: All field names should be given **without** units. Error will occur when
+> Note: All field names should be given **without** units. Error will occur when
 the type (character or numeric), and the value (e.g. range) is not valid.
 
 #### `$add`
@@ -650,8 +652,9 @@ model$notes(2, append = NULL)
 ### Diff
 
 `$diff` will show all modifications you made, including added (or duplicated),
-modified and deleted objects with markers `(+)`, `(~)`, `(-)` respectively. You
-can also only show one kind of modifications using argument `type`.
+modified, deleted and hidden objects with markers `(+)`, `(~)`, `(-)` and `(!)`
+respectively. You can also only show one kind of modifications using argument
+`type`.
 
 
 ```r
@@ -775,7 +778,7 @@ is pretty useful if you messed things up during modifications.
 ```r
 model$reset(confirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2018-01-08 00:58:26'.
+#> '2018-01-08 01:11:04'.
 ```
 
 ### Save
@@ -799,12 +802,12 @@ model$saveas("~/test_eplusr/test_model.idf", overwrite = TRUE)
 `$run` will run the current model within given period using corresponding
 version of EnergyPlus.
 
-`eplusr` will try to find if corresponding version of EnergyPlus that was
+`eplusr` will try to find corresponding version of EnergyPlus that was
 installed in the standard location. If failed, an error will be given.
 
 You can use `period` to override the `RunPeriod` objects. The original objects
 in `RunPeriod` class will be commented out using `$hide`. Each side of a
-`period` formulais specified as a character in format `'MM-DD'`, but powerful
+`period` formula is specified as a character in format `'MM-DD'`, but powerful
 shorthand is available:
 
 * `~.`: Use existing `RunPeriod` objects. This is the default.
@@ -835,7 +838,7 @@ model$run(period = ~"design_day", echo = FALSE)
 `$collect` will collect the simulation variable (specified in `Output:Variable`
 class) and meter (specified in `Output:Meter*` classes) output of current model.
 The `"Date/Time"` column in the output will be renamed to `"datetime` and will
-be converted to a DateTimeClass automatically.
+be converted to a `DateTimeClass` automatically.
 
 > NOTE: You cannot collect the results until simulation ends successfully.
 
