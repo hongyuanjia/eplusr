@@ -20,7 +20,7 @@ NULL
 #' field data. Both class data and field data are stored in data.tables.
 parse_idd <- function(path) {
 
-    assert_that(is_readable(path))
+    assertthat::assert_that(is_readable(path))
 
     # set progress bar
     pb <- progress::progress_bar$new(
