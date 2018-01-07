@@ -15,7 +15,7 @@ preparing EnergyPus IDF and IMF files for simulations. The parsing and
 writing process of IDF and IDD files in \code{eplusr} is basically the same
 as that in IDFEditor. But \code{eplusr} takes advantage of the powerful
 \code{data.table} package to speed up the whole process and store the
-results. The IDD files for EnergyPlus 8.1 to 8.8 have been pre-parsed and
+results. The IDD files for EnergyPlus 8.5 to 8.8 have been pre-parsed and
 stored internally and will automatically be used when parsing \code{IDF} and
 \code{IMF} files. The souce codes of IDFEditor can be found on
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{GitHub}
@@ -40,12 +40,17 @@ model$add(class, ..., min = TRUE)
 model$set(id, ...)
 model$dup(id, new_name = NULL)
 model$del(id, force = FALSE)
+model$hide(id, force = FALSE)
+model$notes(id, ..., append = FALSE, wrap = 0L)
 model$diff(type)
 model$check()
-model$save(comfirm = FALSE, format)
+model$save(confirm = FALSE, format)
 model$saveas(path, format, overwrite = FALSE)
 model$print()
-model$reset(comfirm = FALSE)
+model$reset(confirm = FALSE)
+model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+model$collect(type = c("variable", "meter"), long = FALSE)
+model$table(report = NULL, key = NULL, table = NULL)
 }
 }
 
@@ -106,6 +111,7 @@ using \code{$all("id")}.
 model$set(id, ...)
 model$dup(id, new_name = NULL)
 model$del(id, force = FALSE)
+model$hide(id, force = FALSE)
 }
 
 \code{$add} will add an object in the \code{class} you give. All fields will be set to
@@ -120,15 +126,20 @@ referred by other object(s), an error will given showing the fields that
 were referred. You can still delete the object if you want by setting
 \code{force} to TRUE.
 
-All newly added, modified and deleted fields will be marked with "(+)", "(~)"
-and "(-)" respectively. The valid IDs will be appended after \code{$add} and
-\code{$dup}, and the newly added (duplicated) object will have the max ID.
-\emph{Note} that the IDs of deleted objects are invalid after \code{$del} and cannot
-be applied to methods \code{$set}, \code{$dup} and \code{$del}, of course. However, unless
-you save the model, the deleted objects are still there internally but with
-a special mark to prevent them accessable. This is done by purpose, in
-order to provide a new method call \code{$undo} in the future, which will enable
-you to un-delete the objects.
+\code{$hide} is the same as \code{$del}, except that \code{$hide} will comment out the
+object instead of deleting it. This make if possible for you to get the
+hidden objects back by uncomment it using any test editor.
+
+All newly added, modified, deleted and hidden fields will be marked with
+"(+)", "(~)", "(-)" and "(!)" respectively. The valid IDs will be appended
+after \code{$add} and \code{$dup}, and the newly added (duplicated) object will have
+the max ID.  \emph{Note} that the IDs of deleted and hidden objects are invalid
+after \code{$del} and cannot be applied to methods \code{$set}, \code{$dup}, \code{$del} and
+\code{$hide}, of course. However, unless you save the model, the deleted and
+hidden objects are still there internally but with a special mark to prevent
+them accessable. This is done by purpose, in order to provide a new method
+call \code{$undo} in the future, which will enable you to un-delete or un-hide
+the objects.
 
 \strong{Arguments}
 \itemize{
@@ -142,8 +153,8 @@ all valid fields will be created. Default is TRUE.
 \item \code{new_name}: The new name of the duplicated object if applicable. If NULL,
 the duplicated object will have the same name of the original
 object except with a suffix of "_1", "_2" and etc.
-\item \code{force}: Whether delete the object even it has been referred by others.
-Default is FALSE.
+\item \code{force}: Whether delete or hide the object even it has been referred by
+others. Default is FALSE.
 \item \code{...}: Field values you want to add or modify. Currently three types are
 acceptable: (a) directly list all field values with no name. The
 values will be assigned to fields according to the order of values;
@@ -157,13 +168,33 @@ numeric), and the value (e.g. range) are not valid.
 }
 }
 
+\section{Notes}{
+\preformatted{model$notes(id, ..., append = FALSE, wrap = 0L)
+}
+
+\code{$notes} will show, add or delete notes(comments) for the object specified using \code{id}.
+
+\strong{Arguments}
+\itemize{
+\item \code{model}: An \code{eplus_model} object.
+\item \code{id}: A valid object IDs. You can find all valid object IDs using
+\code{$all("id")}.
+\item \code{...}: Any character vectors you want to add as notes for the object. If
+empty, the objects with notes will be printed.
+\item \code{append}: If TRUE, add new notes to the end of existing ones, otherwise
+add notes to the beginning of existing ones. If NULL, the
+already existing notes will be deleted before add new ones.
+\item \code{wrap}: If greater than 0L,long notes will be wrap at the length of \code{wrap}.
+}
+}
+
 \section{Diff}{
 \preformatted{model$diff(type)
 }
 
 \code{$diff} will show all modifications you made, including added (or
-duplicated), modified and deleted objects with markers "(+)", "(~)", "(-)"
-respectively.
+duplicated), modified, deleted and hidden objects with markers "(+)",
+"(~)", "(-)" and "(!)" respectively.
 
 \strong{Arguments}
 \itemize{
@@ -189,7 +220,7 @@ autocalculatable fields.
 }
 
 \section{Save}{
-\preformatted{model$save(comfirm = FALSE, format)
+\preformatted{model$save(confirm = FALSE, format)
 model$saveas(path, format, overwrite = FALSE)
 }
 
@@ -202,7 +233,7 @@ data. So make sure you have a safe copy of you original model.
 \strong{Arguments}
 \itemize{
 \item \code{model}: An \code{eplus_model} object.
-\item \code{comfirm}: Whether to save the model and overwrite the original file.
+\item \code{confirm}: Whether to save the model and overwrite the original file.
 Default is FALSE.
 \item \code{format}: The saving format. Should be one of "asis", "sorted", "ori_top",
 and "ori_bot". If "asis", which is the default, the model will be
@@ -219,13 +250,100 @@ FALSE.
 }
 
 \section{Reset}{
-\preformatted{model$reset(comfirm = FALSE)
+\preformatted{model$reset(confirm = FALSE)
 }
 
 \code{$reset} will reset the model to the status when it was last saved using
 \code{$save} or \code{$saveas} (if never saved, first read and parsed using
 \code{eplus_model$new}) All your modifications will be lost, so use with
 caution. It is pretty useful if you messed things up during modifications.
+
+\strong{Arguments}
+\itemize{
+\item \code{model}: An \code{eplus_model} object.
+\item \code{confirm}: Whether to reset the model. Default is FALSE.
+}
+}
+
+\section{Run Model and Collect Results}{
+\preformatted{model$run(period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
+model$collect(type = c("variable", "meter", long = FALSE))
+model$table(report = NULL, key = NULL, table = NULL, nest = TRUE)
+}
+
+\code{$run} will run the current model within given period using corresponding
+version of EnergyPlus.
+
+\code{$collect} will collect the simulation variable (specified in
+\code{Output:Variable} class) and meter (specified in \code{Output:Meter*} classes)
+output of current model
+
+\code{$table} will extract tables from simulation table (specified in
+\code{Output:Table*} classes) output of current model.
+
+NOTE: The underlying functions in \code{$table} relies on the \code{HTML} format
+output. If the \code{Column Separator} in \code{OutputControl:Table:Style} does not
+contain \code{HTML} format, \code{eplusr} will automatically change it when running
+the model. For example, \code{"Comma"} (which is the default value) will be
+changed into \code{"CommaAndHTML"} and a warning message will be issued.
+
+\strong{Arguments}
+\itemize{
+\item \code{model}: An \code{eplus_model} object.
+\item \code{period}: A formula specified in format \code{from ~ to} to determine what
+period should the model be run. It can be used to override the
+\code{RunPeriod} objects. The original objects in \code{RunPeriod} class
+will be commented out using \code{$hide}. Each side of a \code{period}
+formulais specified as a character in format \code{'MM-DD'}, but
+powerful shorthand is available:
+\itemize{
+\item \code{~.}: Use existing \code{RunPeriod} objects. This is the default.
+\item \code{~"annual"}: Force to run annual simulation only.
+\item \code{~"design_day"}: Force to run design day only.
+\item \code{~4} or \code{~"4"} or \code{~"Apr"}: Force to run from April 1st to April 30th.
+\item \code{2~4} or \code{"2"~"4"} or \code{"Feb"~"Apr"}: Force to run from February 1st to
+April 30th.
+\item \code{"2-1"~"4-30"}: Same as above.
+}
+\item \code{weather}: The weather file used to run simulation. If NULL, the chicago
+weather file ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+in the distributed along with corresponding EnergyPlus will be
+used, and a warning message will be given.
+\item \code{echo}: Whether to print the standard output and error of EnergyPlus to
+the screen. Default is FALSE.
+\item \code{dir}: The directory to save the simulation results. If NULL, which is the
+default, the model folder will be used.
+\item \code{eplus_home}: The EnergyPlus installation folder path. If NULL, which is
+the default, \code{eplusr} will try to find if corresponding
+version of EnergyPlus that was installed in the standard
+location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
+"/usr/local/EnergyPlus-X-X-X" on Linux and
+"/Applications/EnergyPlus-X-X-X" on MacOS.
+\item \code{type}: Should be one of "variabale" (default) and "meter". If "variable",
+results from \code{Output:Variable} will be collected. If "meter",
+results from \code{Output:Meter*} will be collected.
+\item \code{long}: Whether to change the collected data from wide format (which is
+the default format from EnergyPlus) to long format which is much
+easy for data analysis. In long table format, the wide table will
+be melten according to DateTime and the output names will be
+splited into four parts, i.e. key, variable, frequency and unit.
+For more information on "Tidy Data", please read the excellent
+paper of Hadley Wickham
+\href{http://vita.had.co.nz/papers/tidy-data.html}{here}.
+\item \code{report}, \code{key} and \code{table}: Specify what tables to extract from
+EnergyPlus HTML table output. You can find
+valid report values by looking at Table of
+Contents of the file, valid key values by
+looking at the "For" line after each report
+name. For example, the first table in the
+table output can be extract by specifying
+\code{$table(report = "Annual Building Utility Performance Summary", key = "Entire Facility", table = "Site and Source Energy")}.
+\item \code{nest}: If TRUE, which is the default, \code{$table} will return a data.table
+with four columns named \code{"report"}, \code{"key"}, \code{"table"} and
+\code{"content"}. \code{"content"} is a list column which has the extracted
+tables. If FALSE, a list will return with each each number
+containing those data.
+}
 }
 
 \keyword{datasets}
