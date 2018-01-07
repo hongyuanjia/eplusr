@@ -1,8 +1,13 @@
+#' @importFrom processx run process
+#' @importFrom lubridate ymd
+#' @importFrom tools file_path_sans_ext
+#' @importFrom rlang f_lhs f_rhs f_env eval_tidy
+
 # eplus_path {{{
 eplus_path <- function (ver = NULL, path = NULL) {
     os <- Sys.info()['sysname']
     if (!is.null(ver)) {
-        assert_that(is_eplus_ver(ver))
+        assertthat::assert_that(is_eplus_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
             "Windows" = paste0("C:/EnergyPlusV", ver_dash),
@@ -56,13 +61,13 @@ eplus_path <- function (ver = NULL, path = NULL) {
 # }}}
 # dash_ver {{{
 dash_ver <- function (ver) {
-    assert_that(is_eplus_ver(ver))
+    assertthat::assert_that(is_eplus_ver(ver))
     paste0(sub(".", "-", ver, fixed = TRUE), "-0")
 }
 # }}}
-# cmd_args {{{1
+# cmd_args {{{
 cmd_args <- function (model, weather, output_dir, output_prefix,
-                      output_suffix, expand_obj = TRUE, readvars = TRUE,
+                      output_suffix = "C", expand_obj = TRUE, readvars = TRUE,
                       annual = FALSE, design_day = FALSE, idd = NULL) {
     # docs {{{
     ############################################################################
@@ -122,17 +127,14 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
 
     # }}}
     # Get the right format of the input command to EnergyPlus. {{{2
-    if (missing(output_dir)) {
-        output_dir <- dirname(model)
-    }
-    if (missing(output_prefix)) {
+    # NOTE: `ifelse` function cannot return NULL.
+    if (missing(output_prefix) || is.null(output_prefix)) {
         output_prefix <- tools::file_path_sans_ext(basename(model))
     }
-    if (missing(output_suffix)) {
+    if (missing(output_suffix) || is.null(output_suffix)) {
         output_suffix <- "C"
     }
 
-    # NOTE: `ifelse` function cannot return NULL.
     if (has_ext(model, "imf")) {
         epmacro <- TRUE
         cmd_epmacro <- "--epmacro"
@@ -159,23 +161,245 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
 
     return(args)
 }
-# }}}1
+# }}}
+# copy_run_files {{{
+copy_run_files <- function (file, dir) {
+    loc <- file.path(dir, basename(file))
+    flag <- FALSE
+
+    if (file == loc) return(file)
+
+    flag <- file.copy(from = file, to = loc, overwrite = TRUE, copy.date = TRUE)
+
+    if (!flag) stop(msg(sprintf("Unable to copy file %s into simulation output directory.",
+                                sQuote(basename(file)))),
+                    call. = FALSE)
+
+    return(loc)
+}
+# }}}
 # run_idf {{{
-run_idf <- function (eplus_exe, model, weather, ..., echo = FALSE) {
+run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
+                     design_day = FALSE, annual = FALSE, expand_obj = TRUE,
+                     echo = FALSE) {
+    model <- normalizePath(model, winslash = "/", mustWork = FALSE)
+    weather <- normalizePath(weather, winslash = "/", mustWork = FALSE)
+    assertthat::assert_that(file.exists(model))
+    assertthat::assert_that(file.exists(weather))
+
+    # get output directory
+    if (is.null(output_dir)) output_dir <- dirname(model)
+    if (!dir.exists(output_dir)) {
+        flag_dir <- dir.create(
+            normalizePath(output_dir, winslash = "/", mustWork = FALSE),
+            recursive = TRUE)
+        assertthat::assert_that(flag_dir, msg = "Unable to create output directory. Simulation stoped.")
+    }
+
+    # copy input files
+    loc_m <- copy_run_files(model, output_dir)
+    loc_w <- copy_run_files(weather, output_dir)
+
+    # set working dirctory
     ori_wd <- getwd()
-    wd <- dirname(model)
-    setwd(wd)
+    setwd(dirname(loc_m))
     on.exit(setwd(ori_wd))
+
+    # get arguments of energyplus
+    args <- cmd_args(loc_m, loc_w, output_dir = output_dir, annual = annual,
+                     design_day = design_day, expand_obj = expand_obj)
+
+    sim_info <- list(model = loc_m, weather = loc_w, dir = output_dir)
+
     if (echo) {
-        invisible(processx::run(eplus_exe, cmd_args(model, weather, ...),
+        invisible(processx::run(eplus_exe, args,
                                 windows_verbatim_args = TRUE, echo = TRUE))
     } else {
         p <- processx::process$new(
-            eplus_exe, cmd_args(model, weather, ...),
+            eplus_exe, args,
             stdout = "|", stderr = "|", cleanup = TRUE,
             echo_cmd = TRUE, windows_verbatim_args = TRUE,
             windows_hide_window = FALSE)
-        return(p)
+        return(list(process = p, info = sim_info))
     }
+
+}
+# }}}
+
+# days_in_month {{{
+days_in_month <- function (x) {
+    days_all <- c(`1` = 31L, `2` = 28L, `3` = 31L,
+                  `4` = 30L, `5` = 31L, `6` = 30L,
+                  `7` = 31L, `8` = 31L, `9` = 30L,
+                  `10` = 31L, `11` = 30L, `12` = 31L)
+    unname(days_all[which(names(days_all) == data.table::month(x))])
+}
+# }}}
+# format_runperiod {{{
+format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
+
+    side <- match.arg(side)
+
+    # just a random non-leep year
+    const_year <- 2017L
+
+    if (as.character(runperiod) %in% c("asis", "annual", "design_day")) {
+        return(runperiod)
+    }
+
+    split_str <- unlist(strsplit(as.character(runperiod), "[-/.]|[[:space:]]"))
+
+    # handle month
+    if (length(split_str) == 1L) {
+        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", split_str), truncated = 1L))
+        if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
+
+        if (side == "rhs") {
+            total_days <- days_in_month(out)
+            out <- lubridate::ymd(paste0(const_year, "-", split_str, "-", total_days))
+        }
+
+    } else if (length(split_str) == 2L) {
+        out <- suppressWarnings(lubridate::ymd(paste0(const_year, paste0(split_str, collapse = "-"))))
+    } else {
+        stop("Cannot parse run period.", call. = FALSE)
+    }
+
+    if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
+
+    return(out)
+}
+# }}}
+# parse_runperiod {{{
+parse_runperiod <- function (runperiod) {
+    # NOTE: inspired by `tibbletime` package.
+    # lhs/rhs list
+    rp <- list(lhs = rlang::f_lhs(runperiod), rhs = rlang::f_rhs(runperiod))
+
+    # Environment to evaluate the sides in
+    rp_env <- rlang::f_env(runperiod)
+    rp_env$. <- "asis"
+
+    # Tidy evaluation
+    rp <- lapply(rp,
+        function(x) {
+            rlang::eval_tidy(x, env = rp_env)
+        }
+    )
+
+    # Double up if 1 sided
+    # length = 2 means that it has ~ and 1 side
+    if (length(runperiod) == 2) {
+        rp$lhs <- rp$rhs
+    }
+
+    out <- list(start = NA, end = NA)
+    out$start <- format_runperiod(rp$lhs, "lhs")
+    out$end <- format_runperiod(rp$rhs, "rhs")
+
+    if (out$end %in% c("annual", "design_day", "asis") &&
+        as.character(out$start) != out$end) {
+        stop(msg("Invalid run period formula. Left hand side should be empty if
+                 right hand side is 'annual', 'design_day', or '.'."),
+                 call. = FALSE)
+    } else if (out$start %in% c("annual", "design_day", "asis") &&
+               out$start != as.character(out$end)) {
+        stop(msg("Invalid run period formula. Formula should be in a format of
+                 '~RHS' if 'annual', 'design_day' or '.' is used."),
+                 call. = FALSE)
+    } else if (out$start > out$end) {
+        stop(msg("Invalid run period formula. Start date should be smaller than
+                 end date."), call. = FALSE)
+    }
+
+    out
+}
+# }}}
+# set_runperiod {{{
+set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
+    rp <- parse_runperiod(runperiod)
+
+    setattr(idf, "runperiod", rp)
+
+    if (rp$end %in% c("asis", "annual", "design_day")) return(idf)
+
+    ids <- get_id(idf, "RunPeriod")
+
+    # if the model has already been set before, use it
+    if (not_empty(ids)) {
+        rp_eplusr <- idf$value[object_id %in% ids][field_order == 1L][
+            value == "run_period_eplusr", object_id]
+        rp_others <- setdiff(ids, rp_eplusr)
+        if (not_empty(rp_eplusr)) {
+            idf <- invisible(
+                set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
+                           begin_month = data.table::month(rp$start),
+                           begin_day_of_month = data.table::mday(rp$start),
+                           end_month = data.table::month(rp$end),
+                           end_day_of_month = data.table::mday(rp$end), idd = idd)
+            )
+        } else {
+            idf <- invisible(
+                add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
+                           begin_month = data.table::month(rp$start),
+                           begin_day_of_month = data.table::mday(rp$start),
+                           end_month = data.table::month(rp$end),
+                           end_day_of_month = data.table::mday(rp$end), idd = idd)
+            )
+        }
+
+        if (hide_others && not_empty(rp_others)) {
+            for (i in rp_others) {
+                idf <- add_comment(idf, i, append = FALSE, type = 1L,
+                                   "[ * Commented out automatically by eplusr * ]")
+                idf <- del_object(idf, i, idd, hide = TRUE)
+            }
+            warning(msg(sprintf("Objects in class %s with ID %s has/have been
+                                commented out to use the input run period.",
+                                sQuote("RunPeriod"),
+                                paste(rp_others, collapse = ", "))), call. = FALSE)
+        }
+
+    }
+
+    return(idf)
+}
+# }}}
+# set_output_table_stype {{{
+set_output_table_stype <- function (idf, idd) {
+    targ_class <- "OutputControl:Table:Style"
+    id <- tryCatch(get_id(idf, targ_class), error = function (e) NULL)
+
+    if (not_empty(id)) {
+        dict <- c(Comma = "CommaAndHTML", Tab = "TabAndHTML",
+                  XML = "XMLandHTML", Fixed = "All", CommaAndXML = "ALL")
+
+        val <- get_value(idf, id, 1L)[, value]
+        new_val <- dict[which(val == names(dict))]
+
+        if (val %in% names(dict)) {
+            mes <- sprintf("Inorder to extract tabe output using %s, the value of
+                           %s in class %s with ID %s has been changed from %s to
+                           %s.",
+                           sQuote("$table"), sQuote("Column Separator"),
+                           sQuote(targ_class), sQuote(id),
+                           sQuote(val), sQuote(new_val))
+            idf <- invisible(set_object(idf = idf, id = id, new_val, idd = idd))
+            warning(msg(mes), call. = FALSE)
+        }
+
+    } else {
+        mes <- sprintf("In order to extract table output using %s, the value of
+                       %s in class %s has been changed from the default %s to
+                       %s.",
+                       sQuote("$table"), sQuote("Column Separator"),
+                       sQuote(targ_class),
+                       sQuote("Comma"), sQuote("CommaAndHTML"))
+        idf <- invisible(add_object(idf = idf, class = targ_class,
+                                    "CommaAndHTML", "None", idd = idd))
+        warning(msg(mes), call. = FALSE)
+    }
+
+    return(idf)
 }
 # }}}

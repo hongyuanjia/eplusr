@@ -44,6 +44,11 @@ assertthat::on_failure(is_valid_id) <- function(call, env) {
     paste0(sQuote(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$all('id')\"")
 }
 # }}}
+# is_comment_id {{{
+is_comment_id <- function (id, idf) {
+    is_scalar(id) && is_integerish(id) && id %in% idf$comment[, unique(object_id)]
+}
+# }}}
 # is_valid_class {{{
 is_valid_class <- function(class, idf) {
     is_string(class) && class %chin% valid_class(idf)
