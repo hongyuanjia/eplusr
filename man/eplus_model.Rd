@@ -193,8 +193,8 @@ already existing notes will be deleted before add new ones.
 }
 
 \code{$diff} will show all modifications you made, including added (or
-duplicated), modified and deleted objects with markers "(+)", "(~)", "(-)"
-respectively.
+duplicated), modified, deleted and hidden objects with markers "(+)",
+"(~)", "(-)" and "(!)" respectively.
 
 \strong{Arguments}
 \itemize{
@@ -266,9 +266,9 @@ caution. It is pretty useful if you messed things up during modifications.
 }
 
 \section{Run Model and Collect Results}{
-\preformatted{model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+\preformatted{model$run(period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
 model$collect(type = c("variable", "meter", long = FALSE))
-model$table(report = NULL, key = NULL, table = NULL)
+model$table(report = NULL, key = NULL, table = NULL, nest = TRUE)
 }
 
 \code{$run} will run the current model within given period using corresponding
@@ -303,20 +303,19 @@ powerful shorthand is available:
 \item \code{~4} or \code{~"4"} or \code{~"Apr"}: Force to run from April 1st to April 30th.
 \item \code{2~4} or \code{"2"~"4"} or \code{"Feb"~"Apr"}: Force to run from February 1st to
 April 30th.
-\item `"2-1"~"4-30": Same as above.
+\item \code{"2-1"~"4-30"}: Same as above.
 }
-\item \code{weather}: The weather file used to run simulation. If missing, the
-chicago weather file
-("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw") in the
-distributed along with corresponding EnergyPlus will be used,
-and a warning message will be given.
+\item \code{weather}: The weather file used to run simulation. If NULL, the chicago
+weather file ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+in the distributed along with corresponding EnergyPlus will be
+used, and a warning message will be given.
 \item \code{echo}: Whether to print the standard output and error of EnergyPlus to
 the screen. Default is FALSE.
 \item \code{dir}: The directory to save the simulation results. If NULL, which is the
 default, the model folder will be used.
 \item \code{eplus_home}: The EnergyPlus installation folder path. If NULL, which is
 the default, \code{eplusr} will try to find if corresponding
-version of EnergyPlus was installed in the standard
+version of EnergyPlus that was installed in the standard
 location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
 "/usr/local/EnergyPlus-X-X-X" on Linux and
 "/Applications/EnergyPlus-X-X-X" on MacOS.
@@ -339,6 +338,11 @@ looking at the "For" line after each report
 name. For example, the first table in the
 table output can be extract by specifying
 \code{$table(report = "Annual Building Utility Performance Summary", key = "Entire Facility", table = "Site and Source Energy")}.
+\item \code{nest}: If TRUE, which is the default, \code{$table} will return a data.table
+with four columns named \code{"report"}, \code{"key"}, \code{"table"} and
+\code{"content"}. \code{"content"} is a list column which has the extracted
+tables. If FALSE, a list will return with each each number
+containing those data.
 }
 }
 

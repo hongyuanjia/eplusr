@@ -94,8 +94,8 @@ devtools::install_github("hongyuanjia/eplusr")
   files in R.
 * Save the changed models into standard formats in the same way as IDFEditor
   distributed along with EnergyPlus.
-* Run your models directly in R (**under development**)
-* Collect and analyze the output of EnergyPlus in R (**under development**)
+* Run your models directly in R
+* Collect the simulation output of EnergyPlus in R
 
 ## Usage
 
@@ -178,21 +178,25 @@ model$matches(match = "mat-clng-1", scale = "field", ignore.case = TRUE)
 
 #### `$get`
 
-`$get` will return you the objects with valid IDs you give.
+`$get` will return you the objects with valid IDs or all objects in classes you
+give.
 
-```{r get}
+```{r get_id}
 model$get(1, 2, 38)
+```
+
+```{r get_class, out.lines = 20}
+model$get("Version", "Zone")
 ```
 
 ### Modify
 
 You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set`
-and `$del` respectively.
+and `$del` or `$hide` respectively.
 
-All newly added (or duplicated), modified and deleted fields will be marked with
-`(+)`, `(~)` and `(-)` respectively. The valid IDs will be appended after
-`$add` and `$dup`, and the newly added (or duplicated) object will have the max
-ID.
+All newly added, modified, deleted and hidden fields will be marked with "(+)",
+"(~)", "(-)" and "(!)" respectively. The valid IDs will be appended after`$add`
+and `$dup`, and the newly added (or duplicated) object will have the max ID.
 
 For `$add` and `$set`, new field values should be given. Currently three styles
 of value are acceptable:
@@ -290,12 +294,54 @@ model$del(55)
 model$del(55, force = TRUE)
 ```
 
-Note that the IDs of deleted objects are invalid after `$del` and cannot be
-applied to methods `$set`, `$dup` and `$del`, of course. However, unless you
-save the model, the deleted objects are still there internally but with
-a special mark to prevent them accessible. This is done by purpose, in order to
-provide a new method call `$undo` in the future, which will enable you to
-un-delete the objects.
+#### `$hide`
+
+`$hide` is the same as `$del`, except that `$hide` will comment out the object
+instead of deleting it. This make if possible for you to get the hidden objects
+back by uncomment it using any test editor.
+
+> Note that the IDs of deleted or hidden objects are invalid after `$del` and
+cannot be applied to methods `$set`, `$dup` and `$del`, of course. However,
+unless you save the model, the deleted or hidden objects are still there
+internally but with a special mark to prevent them accessible. This is done by
+purpose, in order to provide a new method call `$undo` in the future, which will
+enable you to un-delete the objects.
+
+```{r hide}
+model$hide(33, force = TRUE)
+```
+
+
+#### Notes
+
+`$notes` will show, add or delete notes (comments) for the object specified
+using `id`.
+
+If `...` is empty, then the object with notes will be shown directly.
+
+```{r notes_show, out.lines = 20}
+model$notes(1)
+```
+
+You can wrap long notes at given length using `wrap`.
+
+```{r notes_add}
+model$notes(2, "Just some simple notes about this objects.", wrap = 10L)
+```
+
+If `append` is `TRUE`, new notes will be added to the end of existing ones,
+otherwise the beginning of existing ones. If NULL, the already existing notes
+will be deleted before adding new ones. You can delete all notes of one object
+by given empty `...` and setting `append` to `NULL`.
+
+```{r notes_append}
+model$notes(2, "Add a new simple note after.", append = TRUE)
+```
+
+```{r notes_del}
+model$notes(2, append = NULL)
+```
+
 
 ### Diff
 
@@ -317,19 +363,6 @@ any value range exceeding, invalid autosizable and autocalculatable fields.
 model$check()
 ```
 
-### Save
-
-You can save your model using `$save` and `$saveas`. `$save` is a shortcut of
-`$saveas(path = "the_original_model_path")` and will overwrite the current file
-which has a risk of losing your original file and data. So make sure you have
-a safe copy of you original model.
-
-`$saveas` will save the model as a new file.
-
-```{r save, eval = FALSE}
-model$save(confirm = TRUE)
-```
-
 ### Reset
 
 `$reset` will reset the model to the status when it was last saved using
@@ -340,6 +373,85 @@ is pretty useful if you messed things up during modifications.
 ```{r reset}
 model$reset(confirm = TRUE)
 ```
+
+### Save
+
+You can save your model using `$save` and `$saveas`. `$save` is a shortcut of
+`$saveas(path = "the_original_model_path")` and will overwrite the current file
+which has a risk of losing your original file and data. So make sure you have
+a safe copy of you original model.
+
+`$saveas` will save the model as a new file.
+
+```{r save, eval = FALSE}
+model$saveas("~/test_eplusr/test_model.idf", overwrite = TRUE)
+```
+
+### Run and Collect Output
+
+#### `$run`
+
+`$run` will run the current model within given period using corresponding
+version of EnergyPlus.
+
+`eplusr` will try to find if corresponding version of EnergyPlus that was
+installed in the standard location. If failed, an error will be given.
+
+You can use `period` to override the `RunPeriod` objects. The original objects
+in `RunPeriod` class will be commented out using `$hide`. Each side of a
+`period` formulais specified as a character in format `'MM-DD'`, but powerful
+shorthand is available:
+
+* `~.`: Use existing `RunPeriod` objects. This is the default.
+* `~"annual"`: Force to run annual simulation only.
+* `~"design_day"`: Force to run design day only.
+* `~4` or `~"4"` or `~"Apr"`: Force to run from April 1st to April 30th.
+* `2~4` or `"2"~"4"` or `"Feb"~"Apr"`: Force to run from February 1st to
+    April 30th.
+* `"2-1"~"4-30"`: Same as above.
+
+```{r run}
+model$run(period = ~"design_day", echo = FALSE)
+```
+
+```{r delay, include = FALSE}
+Sys.sleep(10)
+```
+
+
+#### `$collect` and `table`
+
+`$collect` will collect the simulation variable (specified in `Output:Variable`
+class) and meter (specified in `Output:Meter*` classes) output of current model.
+The `"Date/Time"` column in the output will be renamed to `"datetime` and will
+be converted to a DateTimeClass automatically.
+
+> NOTE: You cannot collect the results until simulation ends successfully.
+
+```{r collect}
+model$collect("meter")
+```
+
+`$table` will extract tables from simulation table (specified in
+`Output:Table*` classes) output of current model.
+
+> NOTE: The underlying functions in `$table` relies on the `HTML` format output.
+If the `Column Separator` in `OutputControl:Table:Style` does not contain
+`HTML` format, `eplusr` will automatically change it when running the model.
+For example, `"Comma"` (which is the default value) will be changed into
+`"CommaAndHTML"` and a warning message will be issued.
+
+```{r table}
+model$table(table = c("Site and Source Energy", "Site to Source Energy Conversion Factors"))
+
+```
+
+By default, a list column named `"content"` will returned with all extracted tables. You can see the contents of the table by setting `nest` to FALSE.
+
+```{r table_unnest}
+model$table(table = c("Site and Source Energy", "Site to Source Energy Conversion Factors"), nest = FALSE)
+```
+
 
 ## License
 
