@@ -102,7 +102,7 @@ of the `Energy+.idd` file using `idd`.
 model <- eplus_model$new(path = system.file("extdata", "5Zone_Transformer.idf", package = "eplusr"), idd = NULL)
 
 model
-#> [ Path  ]: D:/Documents/R/win-library/3.3/eplusr/extdata/5Zone_Transformer.idf
+#> [ Path  ]: C:/Program Files/R/R-3.3.3/library/eplusr/extdata/5Zone_Transformer.idf
 #> [Version]: 8.8
 #> [ Type  ]: IDF
 #> ===========================================================================
@@ -326,8 +326,8 @@ model$get("Version", "Zone")
 You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set`
 and `$del` or `$hide` respectively.
 
-All newly added, modified, deleted and hidden fields will be marked with "(+)",
-"(~)", "(-)" and "(!)" respectively. The valid IDs will be appended after`$add`
+All newly added, modified, deleted and hidden fields will be marked with `(+)`,
+`(~)`, `(-)` and `(!)` respectively. The valid IDs will be appended after `$add`
 and `$dup`, and the newly added (or duplicated) object will have the max ID.
 
 For `$add` and `$set`, new field values should be given. Currently three styles
@@ -456,7 +456,7 @@ model$get(52, 69)
 
 `$dup` will duplicate the object you specified using `id`. If there is a name
 field in the class, you can assign a new name to the duplicated object using
-`new_name`. If NULL, which is default, the duplicated object will have the same
+`new_name`. If `NULL`, which is default, the duplicated object will have the same
 name of the original object except with a suffix of "`_1`", "`_2`" and etc. Both
 the original and the duplicated objects will be shown.
 
@@ -615,7 +615,7 @@ model$notes(2, "Just some simple notes about this objects.", wrap = 10L)
 ```
 
 If `append` is `TRUE`, new notes will be added to the end of existing ones,
-otherwise the beginning of existing ones. If NULL, the already existing notes
+otherwise the beginning of existing ones. If `NULL`, the already existing notes
 will be deleted before adding new ones. You can delete all notes of one object
 by given empty `...` and setting `append` to `NULL`.
 
@@ -778,7 +778,7 @@ is pretty useful if you messed things up during modifications.
 ```r
 model$reset(confirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2018-01-08 01:11:04'.
+#> '2018-01-08 10:25:39'.
 ```
 
 ### Save
@@ -827,13 +827,13 @@ model$run(period = ~"design_day", echo = FALSE)
 #> Reset run period to 'Design Day Simulation'
 #> Running command C:/EnergyPlusV8-8-0/energyplus.exe
 #> Arguments:
-#> --weather "D:/Documents/R/win-library/3.3/eplusr/extdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" --output-directory "D:/Documents/R/win-library/3.3/eplusr/extdata" --output-prefix "5Zone_Transformer" --output-suffix C   --readvars  --design-day  "D:/Documents/R/win-library/3.3/eplusr/extdata/5Zone_Transformer.idf"
+#> --weather "C:/Program Files/R/R-3.3.3/library/eplusr/extdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" --output-directory "C:/Program Files/R/R-3.3.3/library/eplusr/extdata" --output-prefix "5Zone_Transformer" --output-suffix C   --readvars  --design-day  "C:/Program Files/R/R-3.3.3/library/eplusr/extdata/5Zone_Transformer.idf"
 ```
 
 
 
 
-#### `$collect` and `table`
+#### `$collect` and `$table`
 
 `$collect` will collect the simulation variable (specified in `Output:Variable`
 class) and meter (specified in `Output:Meter*` classes) output of current model.
@@ -845,66 +845,7 @@ be converted to a `DateTimeClass` automatically.
 
 ```r
 model$collect("meter")
-#>                 datetime Electricity:Facility [J](TimeStep)
-#>   1: 2017-01-21 00:15:00                            1695473
-#>   2: 2017-01-21 00:30:00                            1695473
-#>   3: 2017-01-21 00:45:00                            1695473
-#>   4: 2017-01-21 01:00:00                            1695473
-#>   5: 2017-01-21 01:15:00                            1695473
-#>  ---
-#> 188: 2017-07-21 23:00:00                            2149990
-#> 189: 2017-07-21 23:15:00                            2131850
-#> 190: 2017-07-21 23:30:00                            2115123
-#> 191: 2017-07-21 23:45:00                            2093699
-#> 192: 2017-07-22 00:00:00                            2079832
-#>      Electricity:Building [J](TimeStep)
-#>   1:                            1237500
-#>   2:                            1237500
-#>   3:                            1237500
-#>   4:                            1237500
-#>   5:                            1237500
-#>  ---
-#> 188:                             427500
-#> 189:                             427500
-#> 190:                             427500
-#> 191:                             427500
-#> 192:                             427500
-#>      InteriorLights:Electricity [J](TimeStep)
-#>   1:                                   337500
-#>   2:                                   337500
-#>   3:                                   337500
-#>   4:                                   337500
-#>   5:                                   337500
-#>  ---
-#> 188:                                   337500
-#> 189:                                   337500
-#> 190:                                   337500
-#> 191:                                   337500
-#> 192:                                   337500
-#>      Electricity:HVAC [J](TimeStep) Electricity:Plant [J](TimeStep)
-#>   1:                       376759.6                        81213.75
-#>   2:                       376759.6                        81213.77
-#>   3:                       376759.6                        81213.77
-#>   4:                       376759.6                        81213.77
-#>   5:                       376759.6                        81213.60
-#>  ---
-#> 188:                       374825.8                      1347664.07
-#> 189:                       374825.8                      1329524.25
-#> 190:                       374825.8                      1312797.50
-#> 191:                       374825.8                      1291373.50
-#> 192:                       374825.8                      1277506.59
-#>      Fans:Electricity [J](TimeStep) EnergyTransfer:Building [J](TimeStep)
-#>   1:                       338588.4                              12927707
-#>   2:                       338588.4                              12927767
-#>   3:                       338588.4                              12927651
-#>   4:                       338588.4                              12927600
-#>   5:                       338588.4                              12932318
-#>  ---
-#> 188:                       338588.4                               3463968
-#> 189:                       338588.4                               3404587
-#> 190:                       338588.4                               3347742
-#> 191:                       338588.4                               3293424
-#> 192:                       338588.4                               3241605
+#> Error: The simulation output file does not exists.
 ```
 
 `$table` will extract tables from simulation table (specified in
