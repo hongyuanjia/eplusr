@@ -26,7 +26,7 @@ Basically, all model data are stored as `data.table`s. And each object in the
 model has an unique `ID`. Once you have the object `ID`, you can set fields
 (using `$set`) in the object, duplicate (using `$dup`), delete (using `$del`)
 the object. A full example of reading and editing an `IDF` file is given in
-[Example](#example).
+[Usage](#usage).
 
 Also, `eplusr` has the functionalities of running EnergyPlus, and collecting
 output.
@@ -102,7 +102,7 @@ of the `Energy+.idd` file using `idd`.
 model <- eplus_model$new(path = system.file("extdata", "5Zone_Transformer.idf", package = "eplusr"), idd = NULL)
 
 model
-#> [ Path  ]: C:/Program Files/R/R-3.3.3/library/eplusr/extdata/5Zone_Transformer.idf
+#> [ Path  ]: C:/Users/hongy/Documents/R/win-library/3.3/eplusr/extdata/5Zone_Transformer.idf
 #> [Version]: 8.8
 #> [ Type  ]: IDF
 #> ===========================================================================
@@ -582,8 +582,8 @@ model$notes(1)
 #> !
 #> ! Location:                Chicago, IL
 #> !
-#> ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
-#> !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
+#> ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3ç™ˆ
+#> !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5ç™ˆ MCWB=  23.0ç™ˆ
 #> !
 #> ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 #> !
@@ -778,7 +778,7 @@ is pretty useful if you messed things up during modifications.
 ```r
 model$reset(confirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2018-01-08 10:25:39'.
+#> '2018-01-08 16:40:36'.
 ```
 
 ### Save
@@ -827,7 +827,7 @@ model$run(period = ~"design_day", echo = FALSE)
 #> Reset run period to 'Design Day Simulation'
 #> Running command C:/EnergyPlusV8-8-0/energyplus.exe
 #> Arguments:
-#> --weather "C:/Program Files/R/R-3.3.3/library/eplusr/extdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" --output-directory "C:/Program Files/R/R-3.3.3/library/eplusr/extdata" --output-prefix "5Zone_Transformer" --output-suffix C   --readvars  --design-day  "C:/Program Files/R/R-3.3.3/library/eplusr/extdata/5Zone_Transformer.idf"
+#> --weather "C:/Users/hongy/Documents/R/win-library/3.3/eplusr/extdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw" --output-directory "C:/Users/hongy/Documents/R/win-library/3.3/eplusr/extdata" --output-prefix "5Zone_Transformer" --output-suffix C   --readvars  --design-day  "C:/Users/hongy/Documents/R/win-library/3.3/eplusr/extdata/5Zone_Transformer.idf"
 ```
 
 
@@ -845,7 +845,66 @@ be converted to a `DateTimeClass` automatically.
 
 ```r
 model$collect("meter")
-#> Error: The simulation output file does not exists.
+#>                 datetime Electricity:Facility [J](TimeStep)
+#>   1: 2017-01-21 00:15:00                            1695473
+#>   2: 2017-01-21 00:30:00                            1695473
+#>   3: 2017-01-21 00:45:00                            1695473
+#>   4: 2017-01-21 01:00:00                            1695473
+#>   5: 2017-01-21 01:15:00                            1695473
+#>  ---
+#> 188: 2017-07-21 23:00:00                            2149990
+#> 189: 2017-07-21 23:15:00                            2131850
+#> 190: 2017-07-21 23:30:00                            2115123
+#> 191: 2017-07-21 23:45:00                            2093699
+#> 192: 2017-07-22 00:00:00                            2079832
+#>      Electricity:Building [J](TimeStep)
+#>   1:                            1237500
+#>   2:                            1237500
+#>   3:                            1237500
+#>   4:                            1237500
+#>   5:                            1237500
+#>  ---
+#> 188:                             427500
+#> 189:                             427500
+#> 190:                             427500
+#> 191:                             427500
+#> 192:                             427500
+#>      InteriorLights:Electricity [J](TimeStep)
+#>   1:                                   337500
+#>   2:                                   337500
+#>   3:                                   337500
+#>   4:                                   337500
+#>   5:                                   337500
+#>  ---
+#> 188:                                   337500
+#> 189:                                   337500
+#> 190:                                   337500
+#> 191:                                   337500
+#> 192:                                   337500
+#>      Electricity:HVAC [J](TimeStep) Electricity:Plant [J](TimeStep)
+#>   1:                       376759.6                        81213.75
+#>   2:                       376759.6                        81213.77
+#>   3:                       376759.6                        81213.77
+#>   4:                       376759.6                        81213.77
+#>   5:                       376759.6                        81213.60
+#>  ---
+#> 188:                       374825.8                      1347664.07
+#> 189:                       374825.8                      1329524.25
+#> 190:                       374825.8                      1312797.50
+#> 191:                       374825.8                      1291373.50
+#> 192:                       374825.8                      1277506.59
+#>      Fans:Electricity [J](TimeStep) EnergyTransfer:Building [J](TimeStep)
+#>   1:                       338588.4                              12927707
+#>   2:                       338588.4                              12927767
+#>   3:                       338588.4                              12927651
+#>   4:                       338588.4                              12927600
+#>   5:                       338588.4                              12932318
+#>  ---
+#> 188:                       338588.4                               3463968
+#> 189:                       338588.4                               3404587
+#> 190:                       338588.4                               3347742
+#> 191:                       338588.4                               3293424
+#> 192:                       338588.4                               3241605
 ```
 
 `$table` will extract tables from simulation table (specified in
