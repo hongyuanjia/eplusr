@@ -1,4 +1,5 @@
-#' @import data.table
+#' @importFrom data.table data.table between dcast.data.table setorder
+#' @importFrom data.table setcolorder setattr ":=" setnames
 #' @importFrom progress progress_bar
 NULL
 
@@ -20,7 +21,7 @@ NULL
 #' field data. Both class data and field data are stored in data.tables.
 parse_idd <- function(path) {
 
-    assertthat::assert_that(is_readable(path))
+    assert_that(is_readable(path))
 
     # set progress bar
     pb <- progress::progress_bar$new(

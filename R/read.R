@@ -4,6 +4,9 @@
 #' @importFrom rvest html_nodes html_table
 #' @importFrom xml2 read_html
 #' @importFrom purrr transpose
+#' @importFrom data.table data.table fread setcolorder setattr tstrsplit setDT
+#' @importFrom data.table setnames melt.data.table
+#' @importFrom assertthat assert_that
 NULL
 
 # collect_eplus: A function to read EnergyPlus simulation results.
@@ -12,13 +15,13 @@ collect_eplus <- function (path, output = c("variable", "meter", "table"),
                            long = FALSE, report = NULL, key = NULL, table = NULL,
                            nest = TRUE) {
     # Read only one path at a time
-    assertthat::assert_that(is_string(path))
+    assert_that(is_string(path))
     # Default is to read variable output
     output <- match.arg(output)
 
     # Get the output files {{{
     file_to_read <- get_file_to_read(path, type = output)
-    assertthat::assert_that(file.exists(file_to_read),
+    assert_that(file.exists(file_to_read),
                             msg = msg("The simulation output file does not exists."))
     # }}}
 
@@ -33,7 +36,7 @@ collect_eplus <- function (path, output = c("variable", "meter", "table"),
     # setcolorder(data, c("model", setdiff(names(data), "model")))
 #
     if (!nest & output == "table") {
-        data <- purrr::transpose(as.list(data))
+        data <- transpose(as.list(data))
     }
 
     return(data[])
@@ -71,13 +74,13 @@ collect_eplus <- function (path, output = c("variable", "meter", "table"),
 
 # read_variable {{{1
 read_variable <- function (path, long = FALSE, year = 2017) {
-    assertthat::assert_that(is_string(path))
-    assertthat::assert_that(has_output_ext(path))
+    assert_that(is_string(path))
+    assert_that(has_output_ext(path))
 
     if (!file.exists(path)) return(NULL)
     data <- fread(path)[, `Date/Time` := paste0(year, "/", `Date/Time`)][
-        , `Date/Time` := (fasttime::fastPOSIXct(`Date/Time`, tz = "GMT"))][
-        , `Date/Time` := lubridate::force_tz(`Date/Time`, tz = Sys.timezone())]
+        , `Date/Time` := fastPOSIXct(`Date/Time`, tz = "GMT")][
+        , `Date/Time` := force_tz(`Date/Time`, tzone = Sys.timezone())]
     setnames(data, "Date/Time", "datetime")
 
     if (long) {
@@ -91,19 +94,19 @@ read_variable <- function (path, long = FALSE, year = 2017) {
 # read_table: A function to read EnergyPlus table results.
 # read_table {{{
 read_table <- function (file, report = NULL, key = NULL, table = NULL) {
-    assertthat::assert_that(is_string(file))
-    assertthat::assert_that(file.exists(file))
-    assertthat::assert_that(has_ext(file, ext = "html") || has_ext(file, ext = "htm"),
+    assert_that(is_string(file))
+    assert_that(file.exists(file))
+    assert_that(has_ext(file, ext = "html") || has_ext(file, ext = "htm"),
         msg = msg("'file' should have an extension of either '.htm' or '.html'.")
     )
 
     tbls <- read_table_info(file)
 
     # Get table contents.
-    tbls_raw <- rvest::html_nodes(xml2::read_html(file), "table")
+    tbls_raw <- html_nodes(read_html(file), "table")
     # Stop if the logic above results in a number mismatch of table names and
     # tables.
-    assertthat::assert_that(identical(length(tbls_raw), nrow(tbls)),
+    assert_that(identical(length(tbls_raw), nrow(tbls)),
         msg = msg("Error[Debug]: Mismatch length of extracted table names and
                   table number.")
     )
@@ -129,7 +132,7 @@ read_table <- function (file, report = NULL, key = NULL, table = NULL) {
         stop("No matched table found.")
     }
 
-    tbls[, content := list(rvest::html_table(content, header = TRUE))][
+    tbls[, content := list(html_table(content, header = TRUE))][
         , `:=`(id = NULL, name = NULL)]
 
     return(tbls)
@@ -154,7 +157,7 @@ read_table_info <- function(file) {
 # }}}1
 # long_table {{{1
 long_table <- function(data) {
-    assertthat::assert_that(is.data.frame(data))
+    assert_that(is.data.frame(data))
     setDT(data)
 
     cols <- get_output_col(data)
@@ -168,7 +171,7 @@ long_table <- function(data) {
     data <- melt.data.table(data, id.vars = key_cols,
         variable.name = "component", value.name = "value", variable.factor = FALSE)
 
-    data[, c("key", "variable", "unit", "frequency") := data.table::tstrsplit(component, "[:\\[\\(]")][
+    data[, c("key", "variable", "unit", "frequency") := tstrsplit(component, "[:\\[\\(]")][
          , `:=`(variable = substr(variable, 1L, nchar(variable) - 1L),
                 unit = substr(unit, 1L, nchar(unit) - 1L),
                 frequency = substr(frequency, 1L, nchar(frequency) - 1L))
@@ -192,13 +195,13 @@ get_output_col <- function (data) {
 # }}}
 # get_date_col {{{1
 get_date_col <- function(df){
-    assertthat::assert_that(is.data.frame(df))
+    assert_that(is.data.frame(df))
 
     # Get classes for all columns.
     classes <- sapply(df, class)
     # Find the column with a class of "POSIXt" or "Date".
-    date_classes <- (purrr::map_lgl(classes, function(classes) 'POSIXt' %in% classes)|
-                     purrr::map_lgl(classes, function(classes) 'Date' %in% classes))
+    date_classes <- (map_lgl(classes, function(classes) 'POSIXt' %in% classes)|
+                     map_lgl(classes, function(classes) 'Date' %in% classes))
 
     # Find the name of date column.
     date_col <- names(which(date_classes))
@@ -208,7 +211,7 @@ get_date_col <- function(df){
 # }}}1
 # get_file_to_read {{{1
 get_file_to_read <- function (path, type = c("variable", "meter", "table")) {
-    prefix <- tools::file_path_sans_ext(path)
+    prefix <- file_path_sans_ext(path)
 
     suffix <- switch(type,
         # Currently `read_table` only support .htm(l) files.
