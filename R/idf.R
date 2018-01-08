@@ -372,9 +372,9 @@ read_idf <- function (filepath) {
     assert_that(is_readable(filepath))
 
     con = file(filepath)
-    idf_str <- readLines(con, encoding = "UTF-8")
+    idf_str <- readLines(con, encoding = "UTF-8", warn = FALSE)
     # Get rid of unparsable characters
-    idf_str <- iconv(idf_str, to = "UTF-8")
+    idf_str <- iconv(idf_str, to = "UTF-8", sub = " ")
     close(con)
 
     # Get rid of preceeding and trailing spaces
