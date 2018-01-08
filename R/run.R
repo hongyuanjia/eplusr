@@ -19,7 +19,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
                      sQuote(eplus_home), ". Please give 'path'."))
         }
     } else if (!is.null(path)) {
-        if (!dir.exists(eplus_home)) stop(msg(sQuote(path), " does not exists."))
+        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
         eplus_home <- path
     } else {
         stop("Both 'ver' and 'path' are NULL.", call. = FALSE)
