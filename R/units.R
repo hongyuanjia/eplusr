@@ -1,3 +1,6 @@
+#' @importFrom data.table data.table
+NULL
+
 # conversion_units_record {{{
 # SI names {{{
 si_name <- character(length = 154)

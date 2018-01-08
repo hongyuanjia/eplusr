@@ -1,4 +1,5 @@
-#' @import data.table
+#' @importFrom data.table "%chin%" data.table rbindlist set setattr setkey
+#' @importFrom data.table setorder setorderv copy rleid last setnames
 #' @importFrom stringr str_pad
 #' @importFrom purrr map_lgl map2_lgl
 NULL
@@ -237,7 +238,7 @@ parse_idf <- function (idf_str, idd) {
     idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
         unique_object == TRUE, list(line, class)][
         , lapply(.SD, list), .SDcol = "line", by = class][
-        purrr::map_lgl(line, ~length(.x) > 1L)][, string := class]
+        map_lgl(line, ~length(.x) > 1L)][, string := class]
     if (not_empty(idf_errors_duplicated_unique)) {
         parse_issue(path, "Duplicated unique objects found",
             idf_errors_duplicated_unique, src = "IDF")
@@ -368,7 +369,7 @@ parse_idf <- function (idf_str, idd) {
 # }}}
 # read_idf {{{
 read_idf <- function (filepath) {
-    assertthat::assert_that(is_readable(filepath))
+    assert_that(is_readable(filepath))
 
     con = file(filepath)
     idf_str <- readLines(con, encoding = "UTF-8")
@@ -379,7 +380,7 @@ read_idf <- function (filepath) {
     # Get rid of preceeding and trailing spaces
     idf_str <- trimws(idf_str, "both")
 
-    assertthat::assert_that(not_empty(idf_str))
+    assert_that(not_empty(idf_str))
 
     setattr(idf_str, "path", normalizePath(filepath, winslash = "/"))
 
@@ -474,10 +475,6 @@ print.IMF <- function (imf, ...) {
 link_idd <- function (ver) {
     if (is_pre_parsed(ver)) {
         switch(ver,
-            # "8.1" = idd_8.1,
-            # "8.2" = idd_8.2,
-            # "8.3" = idd_8.3,
-            # "8.4" = idd_8.4,
             "8.5" = idd_8.5,
             "8.6" = idd_8.6,
             "8.7" = idd_8.7,
@@ -490,7 +487,7 @@ link_idd <- function (ver) {
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
     if (is.null(path)) {
-        assertthat::assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
+        assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
         if (is.null(idd)) {
             stop(msg(
@@ -565,7 +562,7 @@ save_idf <- function (idf, path, format = c("asis", "sorted", "ori_bot", "ori_to
 
     if (!dir.exists(dirname(path))) dir.create(dirname(path), recursive = TRUE)
     if (!file.exists(path)) file.create(path)
-    assertthat::assert_that(is_writeable(path))
+    assert_that(is_writeable(path))
 
     con <- file(path)
     writeLines(str_output, path)
@@ -723,7 +720,7 @@ add_output_id <- function (idf_value) {
 # }}}
 # add_output_diff {{{
 add_output_diff <- function (idf_object) {
-    assertthat::assert_that(has_name(idf_object, "edited"))
+    assert_that(has_name(idf_object, "edited"))
     idf_object[, output_diff := "   "]
     # for deleted fields
     idf_object[edited ==-2L, output_diff := "(-)"]
@@ -827,7 +824,7 @@ add_output_field_unit <- function (idf_value) {
 # }}}
 # get_output_summary {{{
 get_output_summary <- function (idf, diff = FALSE) {
-    assertthat::assert_that(is_model(idf))
+    assert_that(is_model(idf))
     output_dt <- add_output_count(idf$class)
     output_dt <- add_output_group(output_dt)
 
@@ -851,7 +848,7 @@ add_output_group <- function (idf_class) {
 # }}}
 # add_output_count {{{
 add_output_count <- function (idf_class) {
-    assertthat::assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
+    assert_that(has_name(idf_class, "group_order"), has_name(idf_class, "class_order"))
     output_dt <- get_obj_count(idf_class)
     max_count <- output_dt[, max(num)]
 
@@ -909,7 +906,7 @@ print_output <- function (x, col = "output") {
 
 # valid_field {{{
 valid_field <- function (class, idf, idd) {
-    assertthat::assert_that(is_valid_class(class, idd))
+    assert_that(is_valid_class(class, idd))
     class_name <- class
 
     all_fields <- add_output_order(idd$field[class == class_name], mark_required = TRUE)
@@ -952,8 +949,8 @@ valid_id <- function (idf) {
 
 # pull_data {{{
 pull_data <- function (idf, class, type = c("class", "value")) {
-    assertthat::assert_that(is_string(class))
-    assertthat::assert_that(is_valid_class(class, idf))
+    assert_that(is_string(class))
+    assert_that(is_valid_class(class, idf))
     class_name <- class
 
     type <- match.arg(type)
@@ -966,7 +963,7 @@ pull_data <- function (idf, class, type = c("class", "value")) {
 # }}}
 # get_class {{{
 get_class <- function (idf, id) {
-    assertthat::assert_that(is_model(idf), is_valid_id(id, idf))
+    assert_that(is_model(idf), is_valid_id(id, idf))
 
     single_class <- idf$class[object_id %in% id]
 
@@ -975,12 +972,12 @@ get_class <- function (idf, id) {
 # }}}
 # get_value {{{
 get_value <- function (idf, id, field = NULL) {
-    assertthat::assert_that(is_model(idf), is_valid_id(id, idf))
+    assert_that(is_model(idf), is_valid_id(id, idf))
 
     object <- idf$value[object_id == id]
     if (!is.null(field)) {
-        sapply(field, function (x) assertthat::assert_that(is_integerish(x)))
-        sapply(field, function (x) assertthat::assert_that(x <= object[, max(field_order)]))
+        sapply(field, function (x) assert_that(is_integerish(x)))
+        sapply(field, function (x) assert_that(x <= object[, max(field_order)]))
         object <- object[field]
     }
 
@@ -989,7 +986,7 @@ get_value <- function (idf, id, field = NULL) {
 # }}}
 # get_id {{{
 get_id <- function (idf, class) {
-    assertthat::assert_that(is_valid_class(class, idf))
+    assert_that(is_valid_class(class, idf))
 
     class_name <- class
     ids <- idf$class[class == class_name, object_id]
@@ -1063,18 +1060,20 @@ find_field <- function (idf, pattern, ..., all = FALSE) {
 # get_object {{{
 get_object <- function (idf, ..., log = TRUE) {
     id <- list(...)
-    check_char <- all(sapply(id, function (x) sapply(x, is.character)))
-    check_num <- all(sapply(id, function (x) sapply(x, is_integerish)))
-    assertthat::assert_that(check_char || check_num,
+    assert_that(not_empty(id), msg = "'id' or 'class' is empty")
+    check_char <- all(map_lgl(id, is.character))
+    check_num <- all(map_lgl(id, is_integerish))
+    assert_that(check_char || check_num,
         msg = "Input should be either all character types or integer types.")
+    id <- unlist(id)
     if (check_char) {
-        lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(is_valid_class(y, idf))))
-        class_names <- unlist(id)
+        map_lgl(id, ~assert_that(is_valid_class(.x, idf)))
+        class_names <- id
         ids <- idf$class[class %chin% class_names, object_id]
-        lapply(ids, function (x) assertthat::assert_that(not_deleted(x, idf)))
+        ids <- ids[map_lgl(ids, ~not_deleted(.x, idf))]
     } else {
-        lapply(id, function (x) lapply(x, function (y) assertthat::assert_that(not_deleted(y, idf), is_valid_id(y, idf))))
-        ids <- unlist(id)
+        map_lgl(id, ~assert_that(not_deleted(.x, idf), is_valid_id(.x, idf)))
+        ids <- id
     }
 
     if (log) idf <- add_log("get", ids, 0L, idf)
@@ -1087,8 +1086,8 @@ dup_object <- function (idf, id, new_name = NULL, idd, log = TRUE) {
     target_class <- get_class(idf, id = id)
     class_name <- get_class_name(target_class)
     # check if the object can be duplicated
-    assertthat::assert_that(can_be_duplicated(class_name, idf))
-    assertthat::assert_that(not_deleted(id, idf))
+    assert_that(can_be_duplicated(class_name, idf))
+    assert_that(not_deleted(id, idf))
 
     target_object <- get_value(idf, id)
 
@@ -1132,8 +1131,8 @@ dup_object <- function (idf, id, new_name = NULL, idd, log = TRUE) {
 # add_object {{{
 add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
     class_name <- class
-    assertthat::assert_that(is_valid_class(class_name, idd))
-    assertthat::assert_that(can_be_duplicated(class_name, idf))
+    assert_that(is_valid_class(class_name, idd))
+    assert_that(can_be_duplicated(class_name, idf))
 
     new_class <- extract_class(class_name, idf, idd)
     new_object <- extract_object(class_name, min, idf, idd)
@@ -1142,7 +1141,7 @@ add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
     new_object <- set_default(new_object)
 
     fields <- list(...)
-    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
+    assert_that(not_empty(fields), msg = "Field values are empty")
 
     # add suggestion of 'min' option
     num_max <- new_class[, max_fields]
@@ -1172,15 +1171,15 @@ add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
 # }}}
 # set_object {{{
 set_object <- function (idf, id, ..., idd, log = TRUE) {
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
     fields <- list(...)
-    assertthat::assert_that(not_empty(fields), msg = "Field values are empty")
+    assert_that(not_empty(fields), msg = "Field values are empty")
 
     target_class <- get_class(idf, id = id)
     target_object <- get_value(idf, id)
     class_name <- get_class_name(target_class)
-    assertthat::assert_that(not_deleted(id, idf))
-    assertthat::assert_that(can_be_modified(class_name, idf))
+    assert_that(not_deleted(id, idf))
+    assert_that(can_be_modified(class_name, idf))
 
     target_order <- get_target_order(target_object, index = id, fields, idf, idd)
     new_object <- set_fields(target_object, target_order, fields, "set", idf, idd)
@@ -1197,8 +1196,8 @@ del_object <- function (idf, id, idd, force = FALSE, hide = FALSE, log = TRUE) {
 
     target_class <- get_class(idf, id)
     class_name <- get_class_name(target_class)
-    assertthat::assert_that(not_deleted(id, idf))
-    assertthat::assert_that(can_be_deleted(class_name, idf))
+    assert_that(not_deleted(id, idf))
+    assert_that(can_be_deleted(class_name, idf))
 
     target_object <- get_value(idf, id = id)
 
@@ -1236,7 +1235,7 @@ del_object <- function (idf, id, idd, force = FALSE, hide = FALSE, log = TRUE) {
 # }}}
 # get_comment {{{
 get_comment <- function (idf, id) {
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
 
     idf <- add_log("notes", id, 0L, idf)
 
@@ -1245,11 +1244,11 @@ get_comment <- function (idf, id) {
 # }}}
 # add_comment {{{
 add_comment <- function (idf, id, append = TRUE, type = 1L, ..., wrap = 0L, log = TRUE) {
-    assertthat::assert_that(is_valid_id(id, idf), not_deleted(id, idf))
-    assertthat::assert_that(is_integerish(wrap))
+    assert_that(is_valid_id(id, idf), not_deleted(id, idf))
+    assert_that(is_integerish(wrap))
     content <- unlist(c(...))
     if (wrap > 0L) content <- strwrap(content, width = wrap)
-    assertthat::assert_that(not_empty(content), msg = "Comment to be inserted is empty.")
+    assert_that(not_empty(content), msg = "Comment to be inserted is empty.")
 
     # make sure that 'edited' value is consistent between value and comment
     edited <- get_class(idf, id)[, edited]
@@ -1278,7 +1277,7 @@ add_comment <- function (idf, id, append = TRUE, type = 1L, ..., wrap = 0L, log 
 # }}}
 # del_comment {{{
 del_comment <- function (idf, id) {
-    assertthat::assert_that(is_valid_id(id, idf))
+    assert_that(is_valid_id(id, idf))
 
     idf$comment <- idf$comment[object_id != id]
 
@@ -1342,7 +1341,7 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
         new_id <- max_id(idf) + 1L
         setattr(idf, "id", c(attr(idf, "id"), new_id))
         if (action == "add") {
-            assertthat::assert_that(is.null(id))
+            assert_that(is.null(id))
             id <- 0L
         }
     } else if (action == "set") {
@@ -1421,7 +1420,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
             line_skip <- object[, row_id := .I][is.na(set_value)][
                 !is.na(default)][value == default, row_id]
         } else {
-            line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null)][
+            line_skip <- object[, row_id := .I][map_lgl(set_value, is.null)][
                 !is.na(default)][value == default, row_id]
         }
         mes <- add_output_field(object[line_skip], standard = FALSE, new_line = FALSE)[
@@ -1436,7 +1435,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
             line_skip <- object[, row_id := .I][is.na(set_value), row_id]
         } else {
             # skip fields whose input values are NULLs
-            line_skip <- object[, row_id := .I][purrr::map_lgl(set_value, is.null), row_id]
+            line_skip <- object[, row_id := .I][map_lgl(set_value, is.null), row_id]
         }
         mes <- NULL
     }
@@ -1452,7 +1451,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
     if (is_scalar(fields)) {
         object[!is.na(set_value), value := as.character(set_value)]
     } else {
-        l_to_ins <- object[!purrr::map_lgl(set_value, is.null), which = TRUE]
+        l_to_ins <- object[!map_lgl(set_value, is.null), which = TRUE]
         for (i in l_to_ins) {
             set(object, i = i, j = "value", value = as.character(unlist(object$set_value[i])))
         }
@@ -1468,7 +1467,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
 # get_class_name {{{
 get_class_name <- function (object) {
     class_name <- object[, unique(class)]
-    assertthat::assert_that(is_scalar(class_name), msg = "Input has more than one objects")
+    assert_that(is_scalar(class_name), msg = "Input has more than one objects")
     class_name
 }
 # }}}
@@ -1491,11 +1490,11 @@ get_field_changes <- function (ori_object, new_object) {
 get_target_order <- function (idf_value, index, fields, idf, idd) {
     class_name <- NULL
     if (is_integerish(index)) {
-        assertthat::assert_that(is_valid_id(index, idf))
+        assert_that(is_valid_id(index, idf))
         id <- index
         class_name <- idf_value[object_id == id, unique(class)]
     } else {
-        assertthat::assert_that(is_valid_class(index, idd))
+        assert_that(is_valid_class(index, idd))
         class_name <- index
     }
 
@@ -1630,7 +1629,7 @@ update_field_ref <- function (ori_object, new_object, idf, idd) {
             !is.na(new_value), `:=`(value = new_value, edited = 1L)][
             , c("new_value") := NULL]
 
-        idf$class <- target_fields[, .(object_id, new_value)][
+        idf$class <- target_fields[, list(object_id, new_value)][
             idf$class, on = "object_id"][
             !is.na(new_value), `:=`(edited = 1L)][
             , c("new_value") := NULL]
@@ -1835,11 +1834,11 @@ check_field_missing <- function (object) {
         mis <- object[required_field == TRUE]
     }
 
-    mis_null <- mis[purrr::map_lgl(value, is_empty)][
+    mis_null <- mis[map_lgl(value, is_empty)][
         , `:=`(check_type = "Missing Value")][
         , output := sprintf("Missing value for required %s", output)]
 
-    mis_na <- mis[!purrr::map_lgl(value, is_empty)][purrr::map_lgl(value, is.na)][
+    mis_na <- mis[!map_lgl(value, is_empty)][map_lgl(value, is.na)][
         , `:=`(check_type = "Missing Value")][
         , output := sprintf("Missing value for required %s", output)]
 
@@ -1848,7 +1847,7 @@ check_field_missing <- function (object) {
 # }}}
 # check_field_scalar {{{
 check_field_scalar <- function (object) {
-    object[!purrr::map_lgl(value, is_scalar)][
+    object[!map_lgl(value, is_scalar)][
         , `:=`(check_type = "Scalar", wrong = value)][
         , output := sprintf("Value %s for %s is not a scalar",
                             sQuote(wrong), output)]
@@ -1859,8 +1858,8 @@ check_field_an <- function (object) {
     object[
         # for $add and $set
         if (is.list(value)) {
-            (field_an == "A" & !purrr::map_lgl(value, is.character)) |
-            (field_an == "N" & !purrr::map_lgl(value, is.numeric))
+            (field_an == "A" & !map_lgl(value, is.character)) |
+            (field_an == "N" & !map_lgl(value, is.numeric))
         } else {
             field_an == "N" & is.na(as.numeric(value))
         }][
@@ -1875,7 +1874,7 @@ check_field_an <- function (object) {
 check_field_int <- function (object) {
     object[type == "integer"][
         # for $add and $set
-        if (is.list(value)) !purrr::map_lgl(value, is_integerish)
+        if (is.list(value)) !map_lgl(value, is_integerish)
         else !(!is.na(as.integer(value)) && as.integer(value) == as.numeric(value))][
         , `:=`(check_type = "Integer", wrong = as.character(value), right = as.character(as.integer(value)))][
         , output := sprintf("Input value %s for %s will should be an integer",
@@ -1893,7 +1892,7 @@ check_field_choice <- function (object) {
     choice <- choice[, list(strsplit(key, " ", fixed = TRUE)),
         by = c(key_cols)][
         choice[, key := NULL], on = c(key_cols)][
-        type == "choice"][!purrr::map2_lgl(value, V1, ~tolower(.x) %in% tolower(.y))]
+        type == "choice"][!map2_lgl(value, V1, ~tolower(.x) %in% tolower(.y))]
     setnames(choice, "V1", "key")
 
     choice[, `:=`(check_type = "Choice", wrong = value, right = key)][
@@ -1913,7 +1912,7 @@ check_field_objlist <- function (object, idf) {
     ref_values <- idf$ref[ref_keys, on = c("ref_key" = "V1"), nomatch = 0L]
 
     obj_list <- ref_values[obj_list, on = c("row_id"), nomatch = 0L][
-        purrr::map2_lgl(value, ref_value,
+        map2_lgl(value, ref_value,
             ~{if (is.null(.x)||is.na(.x)||.x == "") FALSE
               else !tolower(.x) %in% tolower(.y)
             })]
@@ -1938,7 +1937,7 @@ check_field_range <- function (object) {
 check_field_maximum <- function (object) {
     if (!has_name(object, "maximum")) return(data.table())
 
-    object[!is.na(maximum)][purrr::map2_lgl(value, maximum, ~as.numeric(.x) > .y)][
+    object[!is.na(maximum)][map2_lgl(value, maximum, ~as.numeric(.x) > .y)][
            , `:=`(check_type = "Maximum", wrong = as.character(value), right = as.character(maximum))][
         , output := sprintf("Invalid value %s for %s which should be no more than (<=) %s",
                             sQuote(wrong), output, sQuote(right))]
@@ -1948,7 +1947,7 @@ check_field_maximum <- function (object) {
 check_field_maximum_exclu <- function (object) {
     if (!has_name(object, "maximum<")) return(data.table())
 
-    object[!is.na(`maximum<`)][purrr::map2_lgl(value, `maximum<`, ~as.numeric(.x) >= .y)][
+    object[!is.na(`maximum<`)][map2_lgl(value, `maximum<`, ~as.numeric(.x) >= .y)][
            , `:=`(check_type = "Maximum<", wrong = as.character(value), right = as.character(`maximum<`))][
         , output := sprintf("Invalid value %s for %s which should be less than (<) %s",
                             sQuote(wrong), output, sQuote(right))]
@@ -1958,7 +1957,7 @@ check_field_maximum_exclu <- function (object) {
 check_field_minimum <- function (object) {
     if (!has_name(object, "minimum")) return(data.table())
 
-    object[!is.na(minimum)][purrr::map2_lgl(value, minimum, ~as.numeric(.x) < .y)][
+    object[!is.na(minimum)][map2_lgl(value, minimum, ~as.numeric(.x) < .y)][
            , `:=`(check_type = "Minimum", wrong = as.character(value), right = as.character(`minimum`))][
         , output := sprintf("Invalid value %s for %s which should be no less than (>=) %s",
                             sQuote(wrong), output, sQuote(right))]
@@ -1968,7 +1967,7 @@ check_field_minimum <- function (object) {
 check_field_minimum_exclu <- function (object) {
     if (!has_name(object, "minimum>")) return(data.table())
 
-    object[!is.na(`minimum>`)][purrr::map2_lgl(value, `minimum>`, ~as.numeric(.x) <= .y)][
+    object[!is.na(`minimum>`)][map2_lgl(value, `minimum>`, ~as.numeric(.x) <= .y)][
            , `:=`(check_type = "Minimum>", wrong = as.character(value), right = as.character(`minimum>`))][
         # , output := paste0("Invalid value ",sQuote(wrong)," for ",output," should be more than (>) ",sQuote(right))]
         , output := sprintf("Value %s for %s should be more than (>) %s",
@@ -1982,10 +1981,10 @@ check_field_auto <- function (object) {
     }
 
     res_size <- object[autosizable == FALSE][
-        purrr::map_lgl(value, ~tolower(.x) == "autosize")][
+        map_lgl(value, ~tolower(.x) == "autosize")][
         , `:=`(check_type = "Autosizable", wrong = value)]
     res_cal <- object[autocalculatable == FALSE][
-        purrr::map_lgl(value, ~tolower(.x) == "autocalculate")][
+        map_lgl(value, ~tolower(.x) == "autocalculate")][
         , `:=`(check_type = "Autocalculatable", wrong = value)]
 
     rbindlist(list(res_size, res_cal), fill = TRUE)[
@@ -1999,8 +1998,8 @@ get_field_auto_line <- function (object) {
         return(data.table())
     }
 
-    object[!purrr::map_lgl(value, is_empty)][
-        (autosizable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autosize")) |
-        (autocalculatable == TRUE & purrr::map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
+    object[!map_lgl(value, is_empty)][
+        (autosizable == TRUE & map_lgl(value, ~tolower(.x) == "autosize")) |
+        (autocalculatable == TRUE & map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
 }
 # }}}
