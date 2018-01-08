@@ -52,7 +52,7 @@ Basically, all model data are stored as `data.table`s. And each object in the
 model has an unique `ID`. Once you have the object `ID`, you can set fields
 (using `$set`) in the object, duplicate (using `$dup`), delete (using `$del`)
 the object. A full example of reading and editing an `IDF` file is given in
-[Example](#example).
+[Usage](#usage).
 
 Also, `eplusr` has the functionalities of running EnergyPlus, and collecting
 output.
