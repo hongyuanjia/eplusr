@@ -2,12 +2,13 @@
 #' @importFrom lubridate ymd
 #' @importFrom tools file_path_sans_ext
 #' @importFrom rlang f_lhs f_rhs f_env eval_tidy
+#' @importFrom data.table month mday setattr
 
 # eplus_path {{{
 eplus_path <- function (ver = NULL, path = NULL) {
     os <- Sys.info()['sysname']
     if (!is.null(ver)) {
-        assertthat::assert_that(is_eplus_ver(ver))
+        assert_that(is_eplus_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
             "Windows" = paste0("C:/EnergyPlusV", ver_dash),
@@ -61,7 +62,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
 # }}}
 # dash_ver {{{
 dash_ver <- function (ver) {
-    assertthat::assert_that(is_eplus_ver(ver))
+    assert_that(is_eplus_ver(ver))
     paste0(sub(".", "-", ver, fixed = TRUE), "-0")
 }
 # }}}
@@ -184,8 +185,8 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
                      echo = FALSE) {
     model <- normalizePath(model, winslash = "/", mustWork = FALSE)
     weather <- normalizePath(weather, winslash = "/", mustWork = FALSE)
-    assertthat::assert_that(file.exists(model))
-    assertthat::assert_that(file.exists(weather))
+    assert_that(file.exists(model))
+    assert_that(file.exists(weather))
 
     # get output directory
     if (is.null(output_dir)) output_dir <- dirname(model)
@@ -193,7 +194,7 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
         flag_dir <- dir.create(
             normalizePath(output_dir, winslash = "/", mustWork = FALSE),
             recursive = TRUE)
-        assertthat::assert_that(flag_dir, msg = "Unable to create output directory. Simulation stoped.")
+        assert_that(flag_dir, msg = "Unable to create output directory. Simulation stoped.")
     }
 
     # copy input files
@@ -232,7 +233,7 @@ days_in_month <- function (x) {
                   `4` = 30L, `5` = 31L, `6` = 30L,
                   `7` = 31L, `8` = 31L, `9` = 30L,
                   `10` = 31L, `11` = 30L, `12` = 31L)
-    unname(days_all[which(names(days_all) == data.table::month(x))])
+    unname(days_all[which(names(days_all) == month(x))])
 }
 # }}}
 # format_runperiod {{{
@@ -333,18 +334,18 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
         if (not_empty(rp_eplusr)) {
             idf <- invisible(
                 set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
-                           begin_month = data.table::month(rp$start),
-                           begin_day_of_month = data.table::mday(rp$start),
-                           end_month = data.table::month(rp$end),
-                           end_day_of_month = data.table::mday(rp$end), idd = idd)
+                           begin_month = month(rp$start),
+                           begin_day_of_month = mday(rp$start),
+                           end_month = month(rp$end),
+                           end_day_of_month = mday(rp$end), idd = idd)
             )
         } else {
             idf <- invisible(
                 add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
-                           begin_month = data.table::month(rp$start),
-                           begin_day_of_month = data.table::mday(rp$start),
-                           end_month = data.table::month(rp$end),
-                           end_day_of_month = data.table::mday(rp$end), idd = idd)
+                           begin_month = month(rp$start),
+                           begin_day_of_month = mday(rp$start),
+                           end_month = month(rp$end),
+                           end_day_of_month = mday(rp$end), idd = idd)
             )
         }
 

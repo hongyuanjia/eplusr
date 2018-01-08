@@ -26,7 +26,7 @@ test_that("find method works", {
     expect_output(model$matches("Node", fixed = TRUE, scale = "field"))
 
     # missing id, model summary returned
-    expect_silent(model$get())
+    expect_error(model$get())
     # wrong id
     expect_error(model$get(1e5))
     expect_error(model$get("1"))
@@ -34,4 +34,5 @@ test_that("find method works", {
 
     expect_silent(model$get(1, 2, 1))
     expect_silent(model$get(1:2, 1))
+    expect_silent(model$get("Version", "Zone"))
 })

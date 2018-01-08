@@ -29,7 +29,7 @@ char_count <- function (x, pattern, ...) {
 #' @importFrom stats na.omit
 # avail_cols {{{
 avail_cols <- function (x, table) {
-    stats::na.omit(names(x)[match(table, names(x))])
+    na.omit(names(x)[match(table, names(x))])
 }
 # }}}
 # sep_line {{{
@@ -58,5 +58,6 @@ autocalculatable = autosizable = call. = char = check_type = class_group = NULL
 class_upper_case = colon_loc = default = explpt_loc = external_list = field = NULL
 field_an = field_anid = field_count = field_id = group = leading_spaces = line = NULL
 macro_key = max_fields = maximum = `maximum<` = min_fields = minimum = `minimum>` = NULL
-new_value = num_fields = num_obj = object_list = NULL
+new_value = num_fields = num_obj = object_list = row_id_class = action = variable = NULL
+component = unit = frequency = content = name = `Date/Time` = NULL
 # }}}

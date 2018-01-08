@@ -340,6 +340,7 @@
 #'
 #' @importFrom R6 R6Class
 #' @importFrom tools file_ext
+#' @importFrom data.table data.table setattr
 #' @docType class
 #' @export
 eplus_model <- R6::R6Class(classname = "Energy+Model",
@@ -355,8 +356,9 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
             private$model <- parse_idf(private$str, idd = private$idd)
             private$type <- class(private$model)[1]
             private$time_read <- Sys.time()
-            private$model$log <- data.table(step = 0, timestep = private$time_read,
-                action = "init", id = 0L, new_id = 0L, active = TRUE)
+            private$model$log <- data.table(step = 0,
+                timestep = private$time_read, action = "init", id = 0L,
+                new_id = 0L, active = TRUE)
         },
 
         all = function (type = c("id", "class", "field"), class = NULL)
@@ -516,7 +518,7 @@ inotes <- function (self, private, id, ..., append = FALSE, wrap = 0L) {
     if (is_empty(content)) {
         private$model <- get_comment(private$model, id)
     } else {
-        if (!is.null(append)) assertthat::assert_that(is.logical(append))
+        if (!is.null(append)) assert_that(is.logical(append))
         private$model <- add_comment(private$model, id, append == append, type = 1L, content, log = TRUE, wrap = wrap)
     }
 
@@ -658,7 +660,7 @@ irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
     step_save <- log[action == "save", step]
     if (not_empty(step_mod)) {
         if (is_empty(step_save)) step_save <- 0L
-        assertthat::assert_that(max(step_mod) < max(step_save),
+        assert_that(max(step_mod) < max(step_save),
             msg = msg("The model has been changed without saving. Please save
                       or reset your model before run.")
         )
@@ -670,7 +672,7 @@ irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
 
     annual <- design_day <- FALSE
     rp <- attr(idf, "runperiod")
-    data.table::setattr(idf, "runperiod", NULL)
+    setattr(idf, "runperiod", NULL)
 
     if (as.character(rp[[1]]) == "annual") {
         annual <- TRUE

@@ -270,7 +270,7 @@ model$get(52, 69)
 
 `$dup` will duplicate the object you specified using `id`. If there is a name
 field in the class, you can assign a new name to the duplicated object using
-`new_name`. If NULL, which is default, the duplicated object will have the same
+`new_name`. If `NULL`, which is default, the duplicated object will have the same
 name of the original object except with a suffix of "`_1`", "`_2`" and etc. Both
 the original and the duplicated objects will be shown.
 
@@ -334,7 +334,7 @@ model$notes(2, "Just some simple notes about this objects.", wrap = 10L)
 ```
 
 If `append` is `TRUE`, new notes will be added to the end of existing ones,
-otherwise the beginning of existing ones. If NULL, the already existing notes
+otherwise the beginning of existing ones. If `NULL`, the already existing notes
 will be deleted before adding new ones. You can delete all notes of one object
 by given empty `...` and setting `append` to `NULL`.
 
@@ -425,7 +425,7 @@ Sys.sleep(10)
 ```
 
 
-#### `$collect` and `table`
+#### `$collect` and `$table`
 
 `$collect` will collect the simulation variable (specified in `Output:Variable`
 class) and meter (specified in `Output:Meter*` classes) output of current model.
