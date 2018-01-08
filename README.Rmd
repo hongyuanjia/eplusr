@@ -198,8 +198,8 @@ model$get("Version", "Zone")
 You can add, duplicate, modify and delete objects using `$add`, `$dup`, `$set`
 and `$del` or `$hide` respectively.
 
-All newly added, modified, deleted and hidden fields will be marked with "(+)",
-"(~)", "(-)" and "(!)" respectively. The valid IDs will be appended after`$add`
+All newly added, modified, deleted and hidden fields will be marked with `(+)`,
+`(~)`, `(-)` and `(!)` respectively. The valid IDs will be appended after `$add`
 and `$dup`, and the newly added (or duplicated) object will have the max ID.
 
 For `$add` and `$set`, new field values should be given. Currently three styles
