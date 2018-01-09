@@ -25,7 +25,7 @@ install:
   - ps: $env:ENERGYPLUS_DOWNLOAD_URL = "$env:ENERGYPLUS_DOWNLOAD_BASE_URL/$env:ENERGYPLUS_DOWNLOAD_FILENAME"
 
   - ps: curl $env:ENERGYPLUS_DOWNLOAD_URL -OutFile $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME
-  - ps: & $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME /S | Out-Null
+  - ps: "& $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME /S | Out-Null"
 
 cache:
   - C:\RLibrary
