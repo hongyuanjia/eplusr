@@ -2,16 +2,19 @@
 % Please edit documentation in R/idd.R
 \name{parse_idd}
 \alias{parse_idd}
+\alias{print.IDD}
 \title{Parse Energy+.idd file}
 \usage{
 parse_idd(path)
+
+\method{print}{IDD}(x, ...)
 }
 \arguments{
 \item{path}{Path to 'Energy+.idd' file}
 }
 \value{
-A list contains the IDD version, build, parsed class data and parsed
-field data. Both class data and field data are stored in data.tables.
+An IDD object contains the IDD version, build, parsed class data and
+parsed field data. Both class data and field data are stored in data.tables.
 }
 \description{
 Parse Energy+.idd file
@@ -26,4 +29,10 @@ results. The souce codes of IDFEditor can be found on
 \href{GitHub}{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}:
 . However, it will still take about 3-4 sec to parse an IDD file which is
 much slower than IDFEditor written in Visual Basic.
+
+You may not need to parse any Energy+.idd file unless your model is produced
+by EnergyPlus whose version is below 8.5. If so, it is suggested to store the
+parsed IDD object and directly pass it to the \code{idd} argument in
+\code{eplusr_model$new} in order to avoid the parsing process whenever you
+read a model of that version.
 }
