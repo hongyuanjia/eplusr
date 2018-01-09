@@ -2,21 +2,24 @@ context("Run method")
 
 test_that("Run IDF works", {
 
-    path_8.8 <- eplus_path(8.8)
-    path_8.7 <- eplus_path(8.7)
-    path_8.6 <- eplus_path(8.6)
-    path_eplus <- list(path_8.8, path_8.7, path_8.6)
-
     # for CI testing
     ver <- Sys.getenv("ENERGYPLUS_INSTALL_VERSION")
     # for local testing
     if (ver != "") {
+        path_8.8 <- eplus_path(8.8)
+        path_8.7 <- eplus_path(8.7)
+        path_8.6 <- eplus_path(8.6)
         path_8.5 <- eplus_path(8.5)
         path_8.4 <- eplus_path(8.4)
         path_8.3 <- eplus_path(8.3)
         path_8.2 <- eplus_path(8.2)
         path_eplus <- list(path_8.8, path_8.7, path_8.6, path_8.5, path_8.4,
                            path_8.3, path_8.2)
+    } else {
+        path_8.8 <- eplus_path(8.8)
+        path_8.7 <- eplus_path(8.7)
+        path_8.6 <- eplus_path(8.6)
+        path_eplus <- list(path_8.8, path_8.7, path_8.6)
     }
 
     example_folder <- "ExampleFiles"
