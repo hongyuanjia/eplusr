@@ -2,12 +2,9 @@
 % Please edit documentation in R/idd.R
 \name{parse_idd}
 \alias{parse_idd}
-\alias{print.IDD}
 \title{Parse Energy+.idd file}
 \usage{
 parse_idd(path)
-
-\method{print}{IDD}(x, ...)
 }
 \arguments{
 \item{path}{Path to 'Energy+.idd' file}
