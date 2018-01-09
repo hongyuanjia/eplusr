@@ -4,13 +4,6 @@
 #' @importFrom purrr map_lgl map2_lgl
 NULL
 
-#' Parse EnergyPlus models
-#'
-#' @param idf_str A character vector created using \code{read_idf}.
-#' @param idd An IDD object created using \code{parse_idd}.
-#'
-#' @return A list contains the IDF version, option data, class data, value data,
-#' comment data and field reference data.
 # parse_idf {{{
 parse_idf <- function (idf_str, idd) {
     assert_that(is_idd(idd))
