@@ -5,7 +5,7 @@
 
 # eplusr
 
-[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)<!--[![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)-->[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
+[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)[![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -91,7 +91,7 @@ For detailed reference, please see package documentation: `help(package
 All reading process starts with creating a `R6Class` called `eplus_model`. The
 model will be printed in a similar style you see in IDFEditor, with an
 additional heading lines show the `Path`, `Version` and `Type` of the model.
-The classes of objects in the model are ordered by Group and the number of
+The classes of objects in the model are ordered by group and the number of
 objects in classes are shown in square bracket. All `Energy+.idd` files from
 EnergyPlus v8.5 to v8.8 have been pre-parsed and stored. So you can just ignore
 the `idd` argument if you are using those versions. If not, just pass the path
@@ -134,6 +134,18 @@ model
 #> [10] Material
 ....
 ```
+
+By the way, if you need to read lots of models with versions other than 8.5
+to 8.8, it is suggested to use `parse_idd` function to store the parsed IDD
+object and directly pass it to the `idd` argument, in order to avoid IDD parsing
+process (usually takes 3 - 4 sec) whenever you read a model of that version.
+
+
+```r
+myidd <- parse_idd(idd = "path_to_Energy+.idd_file")
+model <- eplus_model$new(path = "model_path", idd = myidd)
+```
+
 
 ### Query
 
@@ -778,7 +790,7 @@ is pretty useful if you messed things up during modifications.
 ```r
 model$reset(confirm = TRUE)
 #> The model has been reset to the status when it was first read at
-#> '2018-01-08 16:40:36'.
+#> '2018-01-09 10:37:06'.
 ```
 
 ### Save
@@ -803,7 +815,8 @@ model$saveas("~/test_eplusr/test_model.idf", overwrite = TRUE)
 version of EnergyPlus.
 
 `eplusr` will try to find corresponding version of EnergyPlus that was
-installed in the standard location. If failed, an error will be given.
+installed in the standard location. If failed, an error will be given and you
+have to specify the EnergyPlus installation path using `eplusr_home`.
 
 You can use `period` to override the `RunPeriod` objects. The original objects
 in `RunPeriod` class will be commented out using `$hide`. Each side of a
