@@ -15,6 +15,70 @@ cache:
 
 # Adapt as necessary starting from here
 
+matrix:
+  fast_finish: true
+
+environment:
+  matrix:
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.7.0"
+      ENERGYPLUS_SHA: "78a111df4a"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.7.0"
+      ENERGYPLUS_SHA: "78a111df4a"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.6.0"
+      ENERGYPLUS_SHA: "198c6a3cff"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.6.0"
+      ENERGYPLUS_SHA: "198c6a3cff"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.5.0"
+      ENERGYPLUS_SHA: "c87e61b44b"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.5.0"
+      ENERGYPLUS_SHA: "c87e61b44b"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.4.0"
+      ENERGYPLUS_SHA: "832e4bb9cb"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.4.0"
+      ENERGYPLUS_SHA: "832e4bb9cb"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.3.0"
+      ENERGYPLUS_SHA: "6d97d074ea"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.3.0"
+      ENERGYPLUS_SHA: "6d97d074ea"
+    - ARCHITECTURE: "i386"
+      ENERGYPLUS_VERSION: "8.2.0"
+      ENERGYPLUS_SHA: "e53a815bb2"
+    - ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.2.0"
+      ENERGYPLUS_SHA: "e53a815bb2"
+
+install:
+  - ECHO "Filesystem root:"
+  - ps: "ls \"C:/\""
+
+  - ECHO "Installed SDKs:"
+  - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
+  # install EnergyPlus
+  - ECHO "Installing EnergyPlus"
+  - ps: $env:ENERGYPLUS_INSTALL_VERSION = $env:ENERGYPLUS_VERSION -replace '\.','-'
+  - ps: $env:ENERGYPLUS_DOWNLOAD_BASE_URL = "https://github.com/NREL/EnergyPlus/releases/download/v$env:ENERGYPLUS_VERSION"
+  - ps: $env:ENERGYPLUS_DOWNLOAD_FILENAME = "EnergyPlus-$env:ENERGYPLUS_VERSION-$env:ENERGYPLUS_SHA-Windows-$env:ARCHITECTURE.exe"
+  - ps: $env:ENERGYPLUS_DOWNLOAD_URL = "$env:ENERGYPLUS_DOWNLOAD_BASE_URL/$env:ENERGYPLUS_DOWNLOAD_FILENAME"
+
+  - ps: "curl $env:ENERGYPLUS_DOWNLOAD_URL -OutFile $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME"
+  - ps: "& $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME /S | Out-Null"
+
 build_script:
   - travis-tool.sh install_deps
 
