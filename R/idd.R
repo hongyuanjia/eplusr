@@ -17,8 +17,15 @@ NULL
 #' . However, it will still take about 3-4 sec to parse an IDD file which is
 #' much slower than IDFEditor written in Visual Basic.
 #'
-#' @return A list contains the IDD version, build, parsed class data and parsed
-#' field data. Both class data and field data are stored in data.tables.
+#' You may not need to parse any Energy+.idd file unless your model is produced
+#' by EnergyPlus whose version is below 8.5. If so, it is suggested to store the
+#' parsed IDD object and directly pass it to the \code{idd} argument in
+#' \code{eplusr_model$new} in order to avoid the parsing process whenever you
+#' read a model of that version.
+#'
+#' @return An IDD object contains the IDD version, build, parsed class data and
+#' parsed field data. Both class data and field data are stored in data.tables.
+#' @export
 parse_idd <- function(path) {
 
     assert_that(is_readable(path))
@@ -502,6 +509,17 @@ read_idd <- function(filepath) {
     return(idd_str)
 }
 # }}}1
+
+#' @rdname parse_idd
+#' @export
+# print.IDD {{{
+print.IDD <- function (x, ...) {
+    cat("EnergyPlus Input Data Dictionary Object\n")
+    cat("Version: ", x$version, "\n")
+    cat("Build: ", x$build, "\n")
+    cat("Total Class: ", x$class[, .N], "\n")
+}
+# }}}
 
 # parse_issue {{{
 parse_issue <- function (path, type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
