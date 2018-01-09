@@ -510,7 +510,6 @@ read_idd <- function(filepath) {
 }
 # }}}1
 
-#' @rdname parse_idd
 #' @export
 # print.IDD {{{
 print.IDD <- function (x, ...) {
