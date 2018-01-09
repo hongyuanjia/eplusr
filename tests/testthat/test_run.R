@@ -3,7 +3,7 @@ context("Run method")
 test_that("Run IDF works", {
 
     # for CI testing
-    ver <- Sys.getenv("ENERGYPLUS_INSTALL_VERSION")
+    ver <- Sys.getenv("ENERGYPLUS_VERSION")
     # for local testing
     if (ver != "") {
         ver <- substr(ver, 1, 3)
