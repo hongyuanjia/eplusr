@@ -29,11 +29,12 @@ test_that("Run IDF works", {
     for (i in seq_along(path_eplus)) {
         eplus_home <- path_eplus[[i]]["home"]
         weather <- path_eplus[[i]]["epw"]
-        expect_silent(model <- eplus_model$new(file.path(eplus_home, example_folder, testfile)))
+        path_idd <- path_eplus[[i]]["idd"]
+        expect_silent(model <- eplus_model$new(file.path(eplus_home, example_folder, testfile), idd = path_idd))
         expect_output(model$run(weather = weather,  dir = file.path("~", output_folder)))
         expect_message(model$run(~"design_day", weather,  dir = file.path("~", output_folder)))
         expect_warning(model$run(eplus_home = path_eplus[[i]]["home"]))
-        model <- eplus_model$new(file.path(eplus_home, example_folder, testfile))
+        model <- eplus_model$new(file.path(eplus_home, example_folder, testfile), idd = path_idd)
         model$notes(1, "test_run")
         expect_error(model$run())
     }
