@@ -13,6 +13,7 @@ NULL
 #' comment data and field reference data.
 # parse_idf {{{
 parse_idf <- function (idf_str, idd) {
+    assert_that(is_idd(idd))
     path <- attr(idf_str, "path")
 
     idf_version <- get_idf_ver(idf_str)
@@ -486,6 +487,9 @@ link_idd <- function (ver) {
 # }}}
 # get_idd {{{
 get_idd <- function (ver = NULL, path = NULL) {
+    # if an IDD object is directly given
+    if (is_idd(path)) return(path)
+
     if (is.null(path)) {
         assert_that(not_empty(ver), msg = "Both 'ver' and 'path' are NULL.")
         idd <- link_idd(ver)
@@ -497,7 +501,7 @@ get_idd <- function (ver = NULL, path = NULL) {
             )
         }
     } else {
-        idd <- parse_idd(idd)
+        idd <- parse_idd(path)
     }
 
     return(idd)
