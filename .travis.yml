@@ -1,4 +1,8 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+branches:
+  only:
+  - master
+  - develop
 
 language: R
 sudo: required
@@ -10,7 +14,6 @@ os:
 
 r:
   - release
-  - devel
   - oldrel
 
 r_packages:
@@ -38,6 +41,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/$ENERGYPLUS_DOWNLOAD_FILENAME/$ENERGYPLUS_DOWNLOAD_FILENAME.pkg -target /; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo chmod +x $ENERGYPLUS_DOWNLOAD_FILENAME.$EXT; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "y\r" | sudo ./$ENERGYPLUS_DOWNLOAD_FILENAME.$EXT; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo chmod -R a+w /usr/local/EnergyPlus-$ENERGYPLUS_INSTALL_VERSION; fi
 
   - sudo rm $ENERGYPLUS_DOWNLOAD_FILENAME.$EXT
 
