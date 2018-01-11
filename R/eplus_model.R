@@ -712,7 +712,7 @@ irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
     # }}}
 
     # auto correct table output style
-    idf <- set_output_table_stype(idf, private$idd)
+    idf <- set_output_table_style(idf, private$idd)
 
     # auto determine whether to expand objects
     if (has_hvac_template(private$model)) expand_obj <- TRUE else expand_obj <- FALSE

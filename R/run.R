@@ -6,9 +6,13 @@
 
 # eplus_path {{{
 eplus_path <- function (ver = NULL, path = NULL) {
-    os <- Sys.info()['sysname']
-    # try to locate EnergyPlus in default location
-    if (!is.null(ver)) {
+    os <- osname()
+
+    # if path is given, use it
+    if (!is.null(path)) {
+        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
+        eplus_home <- path
+    } else if (!is.null(ver)) {
         assert_that(is_eplus_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
@@ -18,20 +22,10 @@ eplus_path <- function (ver = NULL, path = NULL) {
         # if failed
         if (!dir.exists(eplus_home)) {
             # and path is NULL, error
-            if (is.null(path)) {
-                stop(msg("Cannot locate EnergyPlus V", ver, " at default
-                         installation path ", sQuote(eplus_home), ". Please
-                         give exact 'path' of EnergyPlus installation."))
-            # and path is given, then use path
-            } else {
-                if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-                eplus_home <- path
-            }
+            stop(msg("Cannot locate EnergyPlus V", ver, " at default
+                     installation path ", sQuote(eplus_home), ". Please
+                     give exact 'path' of EnergyPlus installation."))
         }
-    # if no version, try path
-    } else if (!is.null(path)) {
-        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-        eplus_home <- path
     # if none, error
     } else {
         stop("Both 'ver' and 'path' are NULL.", call. = FALSE)
@@ -59,8 +53,8 @@ eplus_path <- function (ver = NULL, path = NULL) {
     }
 
     if (!file.exists(energyplus_idd)) {
-        warning(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
-                    installation folder."))
+        stop(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
+                 installation folder."))
         energyplus_idd <- NULL
     }
 
@@ -202,6 +196,7 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
 
     # get output directory
     if (is.null(output_dir)) output_dir <- dirname(model)
+    output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
     if (!dir.exists(output_dir)) {
         flag_dir <- dir.create(
             normalizePath(output_dir, winslash = "/", mustWork = FALSE),
@@ -273,7 +268,7 @@ format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
         }
 
     } else if (length(split_str) == 2L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, paste0(split_str, collapse = "-"))))
+        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", paste0(split_str, collapse = "-"))))
     } else {
         stop("Cannot parse run period.", call. = FALSE)
     }
@@ -372,20 +367,19 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
                                 sQuote("RunPeriod"),
                                 paste(rp_others, collapse = ", "))), call. = FALSE)
         }
-
     }
 
     return(idf)
 }
 # }}}
-# set_output_table_stype {{{
-set_output_table_stype <- function (idf, idd) {
+# set_output_table_style {{{
+set_output_table_style <- function (idf, idd) {
     targ_class <- "OutputControl:Table:Style"
     id <- tryCatch(get_id(idf, targ_class), error = function (e) NULL)
 
     if (not_empty(id)) {
         dict <- c(Comma = "CommaAndHTML", Tab = "TabAndHTML",
-                  XML = "XMLandHTML", Fixed = "All", CommaAndXML = "ALL")
+                  XML = "XMLAndHTML", Fixed = "All", CommaAndXML = "ALL")
 
         val <- get_value(idf, id, 1L)[, value]
         new_val <- dict[which(val == names(dict))]
