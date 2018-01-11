@@ -196,6 +196,7 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
 
     # get output directory
     if (is.null(output_dir)) output_dir <- dirname(model)
+    output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
     if (!dir.exists(output_dir)) {
         flag_dir <- dir.create(
             normalizePath(output_dir, winslash = "/", mustWork = FALSE),
@@ -366,7 +367,6 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
                                 sQuote("RunPeriod"),
                                 paste(rp_others, collapse = ", "))), call. = FALSE)
         }
-
     }
 
     return(idf)
