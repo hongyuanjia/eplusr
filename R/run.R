@@ -273,7 +273,7 @@ format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
         }
 
     } else if (length(split_str) == 2L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, paste0(split_str, collapse = "-"))))
+        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", paste0(split_str, collapse = "-"))))
     } else {
         stop("Cannot parse run period.", call. = FALSE)
     }
