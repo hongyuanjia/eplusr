@@ -303,3 +303,23 @@ on_failure(has_output_ext) <- function (call, env = parent.env) {
     msg("File ", sQuote(basename(path)), " is not an EnergyPlus output data file.")
 }
 # }}}
+# osname {{{
+osname <- function () {
+    Sys.info()["sysname"]
+}
+# }}}
+# is_windows {{{
+is_windows <- function () {
+    osname() == "Windows"
+}
+# }}}
+# is_linux {{{
+is_linux <- function () {
+    osname() == "Linux"
+}
+# }}}
+# is_macos {{{
+is_macos <- function () {
+    osname() == "Darwin"
+}
+# }}}

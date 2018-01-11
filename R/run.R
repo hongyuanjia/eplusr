@@ -6,9 +6,13 @@
 
 # eplus_path {{{
 eplus_path <- function (ver = NULL, path = NULL) {
-    os <- Sys.info()['sysname']
-    # try to locate EnergyPlus in default location
-    if (!is.null(ver)) {
+    os <- osname()
+
+    # if path is given, use it
+    if (!is.null(path)) {
+        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
+        eplus_home <- path
+    } else if (!is.null(ver)) {
         assert_that(is_eplus_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
@@ -18,20 +22,10 @@ eplus_path <- function (ver = NULL, path = NULL) {
         # if failed
         if (!dir.exists(eplus_home)) {
             # and path is NULL, error
-            if (is.null(path)) {
-                stop(msg("Cannot locate EnergyPlus V", ver, " at default
-                         installation path ", sQuote(eplus_home), ". Please
-                         give exact 'path' of EnergyPlus installation."))
-            # and path is given, then use path
-            } else {
-                if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-                eplus_home <- path
-            }
+            stop(msg("Cannot locate EnergyPlus V", ver, " at default
+                     installation path ", sQuote(eplus_home), ". Please
+                     give exact 'path' of EnergyPlus installation."))
         }
-    # if no version, try path
-    } else if (!is.null(path)) {
-        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-        eplus_home <- path
     # if none, error
     } else {
         stop("Both 'ver' and 'path' are NULL.", call. = FALSE)
@@ -59,8 +53,8 @@ eplus_path <- function (ver = NULL, path = NULL) {
     }
 
     if (!file.exists(energyplus_idd)) {
-        warning(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
-                    installation folder."))
+        stop(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
+                 installation folder."))
         energyplus_idd <- NULL
     }
 
