@@ -372,14 +372,14 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
     return(idf)
 }
 # }}}
-# set_output_table_stype {{{
-set_output_table_stype <- function (idf, idd) {
+# set_output_table_style {{{
+set_output_table_style <- function (idf, idd) {
     targ_class <- "OutputControl:Table:Style"
     id <- tryCatch(get_id(idf, targ_class), error = function (e) NULL)
 
     if (not_empty(id)) {
         dict <- c(Comma = "CommaAndHTML", Tab = "TabAndHTML",
-                  XML = "XMLandHTML", Fixed = "All", CommaAndXML = "ALL")
+                  XML = "XMLAndHTML", Fixed = "All", CommaAndXML = "ALL")
 
         val <- get_value(idf, id, 1L)[, value]
         new_val <- dict[which(val == names(dict))]
