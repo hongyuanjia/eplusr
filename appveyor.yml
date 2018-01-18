@@ -40,18 +40,23 @@ environment:
     - R_VERSION: release
       R_ARCH: x64
     - R_VERSION: stable
+      R_ARCH: x64
     - R_VERSION: patched
+      R_ARCH: x64
     - R_VERSION: oldrel
+      R_ARCH: x64
       RTOOLS_VERSION: 33
       CRAN: http://cran.rstudio.com
     - R_VERSION: 3.1.3
+      R_ARCH: x64
       RTOOLS_VERSION: 32
       CRAN: http://cran.rstudio.com
     - R_VERSION: 3.1.0
+      R_ARCH: x64
       RTOOLS_VERSION: 32
       CRAN: http://cran.rstudio.com
-      PKGTYPE: source
 
+  matrix:
     - ARCHITECTURE: "i386"
       ENERGYPLUS_VERSION: "8.8.0"
       ENERGYPLUS_SHA: "7c3bbe4830"
