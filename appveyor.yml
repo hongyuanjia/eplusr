@@ -56,7 +56,7 @@ environment:
       RTOOLS_VERSION: 32
       CRAN: http://cran.rstudio.com
 
-  matrix:
+  eplus:
     - ARCHITECTURE: "i386"
       ENERGYPLUS_VERSION: "8.8.0"
       ENERGYPLUS_SHA: "7c3bbe4830"
