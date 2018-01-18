@@ -649,6 +649,9 @@ ireset_model <- function (self, private, confirm = FALSE) {
 # irun_idf {{{
 irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
                       eplus_home = NULL) {
+    assert_that(as.numeric(private$ver) >= 8.3,
+                msg = "Currently, `$run` only supports EnergyPlus V8.3 or higher.")
+
     eplus_info <- eplus_path(private$ver, eplus_home)
     eplus_exe <- eplus_info["eplus"]
 
