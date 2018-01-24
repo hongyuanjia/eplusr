@@ -388,10 +388,13 @@ parse_idd <- function(path) {
     idd_class <- idd_class[!(slash_key %chin% "GROUP")]
     # as the first na in first group can not be replaced using downward filling
     idd_class <- idd_class[!is.na(class)]
+    # first handle classes without slashes such as "SwimmingPool:Indoor"
+    class_no_slash <- idd_class[, .N, by = list(class)][N == 1L, class]
+    idd_class <- idd_class[!class %chin% class_no_slash & !is.na(slash_key) |
+        class %chin% class_no_slash]
     # if slash key exists and slash value not, it must be a logical attribute,
     # such as "\\unique-object". Set it to TRUE
-    idd_class <- idd_class[!is.na(slash_key)][
-        is.na(slash_value), slash_value := "TRUE"]
+    idd_class <- idd_class[is.na(slash_value), slash_value := "TRUE"]
     # order group and class as the sequence the appears in IDD
     idd_class[, group_order := .GRP, by = list(group)]
     idd_class[, class_order := .GRP, by = list(class)]
