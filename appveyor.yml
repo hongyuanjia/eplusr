@@ -37,60 +37,77 @@ matrix:
 
 environment:
   matrix:
+    # For Energyplus 8.8 on x64 platform on every R version
     - R_VERSION: release
       R_ARCH: x64
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+
     - R_VERSION: stable
       R_ARCH: x64
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+
     - R_VERSION: patched
       R_ARCH: x64
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+
     - R_VERSION: oldrel
       R_ARCH: x64
       RTOOLS_VERSION: 33
       CRAN: http://cran.rstudio.com
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+
     - R_VERSION: 3.1.3
       R_ARCH: x64
       RTOOLS_VERSION: 32
       CRAN: http://cran.rstudio.com
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
+
     - R_VERSION: 3.1.0
       R_ARCH: x64
       RTOOLS_VERSION: 32
       CRAN: http://cran.rstudio.com
+      ARCHITECTURE: "x86_64"
+      ENERGYPLUS_VERSION: "8.8.0"
+      ENERGYPLUS_SHA: "7c3bbe4830"
 
-  eplus:
-    - ARCHITECTURE: "i386"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-    - ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-    - ARCHITECTURE: "i386"
+    # For Energyplus 8.3 to 8.7 on x64 platform on the latest release of R
+    - R_VERSION: release
+      R_ARCH: x64
+      ARCHITECTURE: "x86_64"
       ENERGYPLUS_VERSION: "8.7.0"
       ENERGYPLUS_SHA: "78a111df4a"
-    - ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.7.0"
-      ENERGYPLUS_SHA: "78a111df4a"
-    - ARCHITECTURE: "i386"
+
+    - R_VERSION: release
+      R_ARCH: x64
+      ARCHITECTURE: "x86_64"
       ENERGYPLUS_VERSION: "8.6.0"
       ENERGYPLUS_SHA: "198c6a3cff"
-    - ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.6.0"
-      ENERGYPLUS_SHA: "198c6a3cff"
-    - ARCHITECTURE: "i386"
+
+    - R_VERSION: release
+      R_ARCH: x64
+      ARCHITECTURE: "x86_64"
       ENERGYPLUS_VERSION: "8.5.0"
       ENERGYPLUS_SHA: "c87e61b44b"
-    - ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.5.0"
-      ENERGYPLUS_SHA: "c87e61b44b"
-    - ARCHITECTURE: "i386"
+
+    - R_VERSION: release
+      R_ARCH: x64
+      ARCHITECTURE: "x86_64"
       ENERGYPLUS_VERSION: "8.4.0"
       ENERGYPLUS_SHA: "832e4bb9cb"
-    - ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.4.0"
-      ENERGYPLUS_SHA: "832e4bb9cb"
-    - ARCHITECTURE: "i386"
-      ENERGYPLUS_VERSION: "8.3.0"
-      ENERGYPLUS_SHA: "6d97d074ea"
-    - ARCHITECTURE: "x86_64"
+
+    - R_VERSION: release
+      R_ARCH: x64
+      ARCHITECTURE: "x86_64"
       ENERGYPLUS_VERSION: "8.3.0"
       ENERGYPLUS_SHA: "6d97d074ea"
 
