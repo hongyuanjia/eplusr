@@ -1406,7 +1406,7 @@ append_id <- function (data, base = c("class", "value"), idf) {
 # }}}
 # append_id_del {{{
 append_id_del <- function (idf, id_del) {
-    id_del <- sort(unique(c(attr(idf, "id_del"), id)))
+    id_del <- sort(unique(c(get_deleted_id(idf), id_del)))
     setattr(idf, "id_del", id_del)
 
     return(idf)
