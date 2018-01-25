@@ -442,7 +442,7 @@ iall_idf <- function (private, type = c("id", "class", "field"), class = NULL) {
     }
 
     switch(type,
-        id = valid_id(private$model),
+        id = valid_id(private$model, class = class),
         class = valid_class(private$model),
         field = valid_field(class = class, private$model, private$idd))
 }
