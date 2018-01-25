@@ -26,7 +26,7 @@ test_that("Run helper: eplus_path workds", {
         Linux = "/usr/local/EnergyPlus-8-7-0",
         Darwin = "/Applications/EnergyPlus-8-7-0")
     names(home_8.7) <- "home"
-    expect_equal(eplus_path("8.8", path = path_8.7)["home"], home_8.7)
+    expect_equal(eplus_path("8.8", path = home_8.7)["home"], home_8.7)
 })
 
 test_that("Run helper: parse_runperiod works", {

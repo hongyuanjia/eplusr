@@ -10,6 +10,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
 
     # if path is given, use it
     if (!is.null(path)) {
+        path <- unname(path)
         if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
         eplus_home <- path
     } else if (!is.null(ver)) {
