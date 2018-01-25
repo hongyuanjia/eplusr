@@ -221,8 +221,10 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
     sim_info <- list(model = loc_m, weather = loc_w, dir = output_dir)
 
     if (echo) {
-        invisible(processx::run(eplus_exe, args,
-                                windows_verbatim_args = TRUE, echo = TRUE))
+        # have to suppress warnings here as it always complains about warnings
+        # on 'can nonly read in bytes in a non-UTF-8 MBCS locale'.
+        invisible(suppressWarnings(processx::run(eplus_exe, args,
+                                 windows_verbatim_args = TRUE, echo = TRUE)))
     } else {
         p <- processx::process$new(
             eplus_exe, args,
