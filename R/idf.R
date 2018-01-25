@@ -2007,6 +2007,6 @@ get_field_auto_line <- function (object) {
 
     object[!map_lgl(value, is_empty)][
         (autosizable == TRUE & map_lgl(value, ~tolower(.x) == "autosize")) |
-        (autocalculatable == TRUE & map_lgl(value, ~tolower(.x) == "autocalculatable")), which = TRUE]
+        (autocalculatable == TRUE & map_lgl(value, ~tolower(.x) == "autocalculate")), which = TRUE]
 }
 # }}}
