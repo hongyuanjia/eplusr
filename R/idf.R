@@ -931,11 +931,16 @@ valid_class <- function (idf) {
 }
 # }}}
 # valid_id {{{
-valid_id <- function (idf) {
+valid_id <- function (idf, class = NULL) {
     idf_value <- copy(idf$value)
     id_del <- get_deleted_id(idf)
     if (not_empty(id_del)) {
         idf_value <- idf_value[!object_id %in% id_del]
+    }
+    if (not_empty(class)) {
+        assert_that(is_valid_class(class, idf))
+        class_name <- class
+        idf_value <- idf_value[class == class_name]
     }
     idf_value <- idf_value[idf_value[, .I[1:3], by = list(object_id)]$V1][
         !is.na(class_order)]
