@@ -463,12 +463,12 @@ check_obj_ref <- function (idf, idd) {
 # }}}
 # print.IDF {{{
 print.IDF <- function (idf, ...) {
-    .print(idf)
+    cat(get_output_summary(idf), sep = "\n")
 }
 # }}}
 # print.IMF {{{
 print.IMF <- function (imf, ...) {
-    .print(imf)
+    cat(get_output_summary(idf), sep = "\n")
 }
 # }}}
 # link_idd {{{
@@ -833,7 +833,7 @@ get_output_summary <- function (idf, diff = FALSE) {
 
     output_dt[, output := paste0(output_group, output_count, " ", class)]
 
-    return(output_dt)
+    return(output_dt[, output])
 }
 # }}}
 # add_output_group {{{
@@ -881,12 +881,12 @@ print_output <- function (x, col = "output") {
     # not active action
     if (!active) {
         # print the whole idf
-        output_str <- get_output_summary(idf)[, output]
+        output_str <- get_output_summary(idf)
         output_str <- c(info, output_str)
     # init or reset
     } else if (all(target_id == 0L)) {
         # print the whole idf
-        output_str <- get_output_summary(idf)[, output]
+        output_str <- get_output_summary(idf)
         output_str <- c(info, output_str)
     } else if (action == "diff") {
         if (all(target_id == 0L)) {
