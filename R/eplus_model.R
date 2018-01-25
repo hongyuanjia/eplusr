@@ -348,12 +348,12 @@ eplus_model <- R6::R6Class(classname = "Energy+Model",
     lock_class = TRUE,
 
     public = list(
-        initialize = function(path, idd = NULL) {
+        initialize = function(path, idd = NULL, check = TRUE) {
             private$path <- normalizePath(path, winslash = "/")
             private$str <- read_idf(path)
             private$ver <- get_idf_ver(private$str)
             private$idd <- get_idd(private$ver, idd)
-            private$model <- parse_idf(private$str, idd = private$idd)
+            private$model <- parse_idf(private$str, idd = private$idd, check = check)
             private$type <- class(private$model)[1]
             private$time_read <- Sys.time()
             private$model$log <- data.table(step = 0,

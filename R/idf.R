@@ -5,7 +5,7 @@
 NULL
 
 # parse_idf {{{
-parse_idf <- function (idf_str, idd) {
+parse_idf <- function (idf_str, idd, check = TRUE) {
     assert_that(is_idd(idd))
     path <- attr(idf_str, "path")
 
@@ -228,36 +228,38 @@ parse_idf <- function (idf_str, idd) {
         by = "class_upper_case", all = TRUE, sort = FALSE)
 
     # Error checking {{{
-    # duplicated unqiue object {{{
-    idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
-        unique_object == TRUE, list(line, class)][
-        , lapply(.SD, list), .SDcol = "line", by = class][
-        map_lgl(line, ~length(.x) > 1L)][, string := class]
-    if (not_empty(idf_errors_duplicated_unique)) {
-        parse_issue(path, "Duplicated unique objects found",
-            idf_errors_duplicated_unique, src = "IDF")
-    }
-    # }}}
-    # un-recognized class names {{{
-    idf_errors_unknown_class <- idf_class_all[type == type_object][
-        !is.na(value)][is.na(class), list(line, string)]
-    if (not_empty(idf_errors_unknown_class)) {
-        parse_issue(path, type = "Object type not recognized", src = "IDF",
-                    data_errors = idf_errors_unknown_class,
-                    info = "This error may be caused by a misspelled object name.")
-    }
-    # }}}
-    # Do not check missing required objects and fields for imf files.
-    if (!is_imf) {
-        # missing required object {{{
-        idf_errors_missing_required <- idf_class_all[required_object == TRUE][
-            is.na(line)]
-        if (not_empty(idf_errors_missing_required)) {
-            idf_errors_missing_required[, `:=`(line = "NA", string = class)]
-            parse_issue(path, "Missing required object", src = "IDF",
-                        data_errors = idf_errors_missing_required)
+    if (check) {
+        # duplicated unqiue object {{{
+        idf_errors_duplicated_unique <- idf_class_all[!is.na(line)][
+            unique_object == TRUE, list(line, class)][
+            , lapply(.SD, list), .SDcol = "line", by = class][
+            map_lgl(line, ~length(.x) > 1L)][, string := class]
+        if (not_empty(idf_errors_duplicated_unique)) {
+            parse_issue(path, "Duplicated unique objects found",
+                idf_errors_duplicated_unique, src = "IDF")
         }
         # }}}
+        # un-recognized class names {{{
+        idf_errors_unknown_class <- idf_class_all[type == type_object][
+            !is.na(value)][is.na(class), list(line, string)]
+        if (not_empty(idf_errors_unknown_class)) {
+            parse_issue(path, type = "Object type not recognized", src = "IDF",
+                        data_errors = idf_errors_unknown_class,
+                        info = "This error may be caused by a misspelled object name.")
+        }
+        # }}}
+        # Do not check missing required objects and fields for imf files.
+        if (!is_imf) {
+            # missing required object {{{
+            idf_errors_missing_required <- idf_class_all[required_object == TRUE][
+                is.na(line)]
+            if (not_empty(idf_errors_missing_required)) {
+                idf_errors_missing_required[, `:=`(line = "NA", string = class)]
+                parse_issue(path, "Missing required object", src = "IDF",
+                            data_errors = idf_errors_missing_required)
+            }
+            # }}}
+        }
     }
     # }}}
     idf_class <- idf_class_all[type == type_object]
@@ -283,29 +285,31 @@ parse_idf <- function (idf_str, idd) {
     idf_field[, field_order := seq_along(.I), by = list(object_id)]
 
     idf_value_all <- merge(idf_field, idd$field,
-        by = c("class_order", "class", "field_order"), all = TRUE)
+        by = c("class_order", "class", "field_order"), all = TRUE, sort = FALSE)
     # Error checking {{{
-    # exceed max field {{{
-    # get field number per class
-    idf_num_fields <- idf_field[, list(num_fields = .N), by = list(class, object_id)]
-    idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("class", "object_id")][
-        num_fields > max_fields, list(line, class, max_fields, num_fields)][
-        , string := sprintf("*%s* fields found for class %s with only *%s* allowed", num_fields, sQuote(class), max_fields)]
-    if (not_empty(idf_errors_max_fields)) {
-        parse_issue(path, "Too many fields in objects", idf_errors_max_fields, src = "IDF", quote = FALSE)
-    }
-    # }}}
-    # Do not check missing required objects and fields for imf files.
-    if (!is_imf) {
-        # missing required field {{{
-        idf_errors_missing_required_field <- idf_value_all[
-            !is.na(object_id)][required_field == TRUE & is.na(value)][
-            , string := paste0("Missing field ", field, "{", units, "}", "in class ", sQuote(class))]
-        if (not_empty(idf_errors_missing_required_field)) {
-            parse_issue(path, "Missing reqiured fields in objects",
-                idf_errors_missing_required_field, src = "IDF", quote = FALSE)
+    if (check) {
+        # exceed max field {{{
+        # get field number per class
+        idf_num_fields <- idf_field[, list(num_fields = .N), by = list(class, object_id)]
+        idf_errors_max_fields <- idf_class_all[type == type_object][idf_num_fields, on = c("class", "object_id")][
+            num_fields > max_fields, list(line, class, max_fields, num_fields)][
+            , string := sprintf("*%s* fields found for class %s with only *%s* allowed", num_fields, sQuote(class), max_fields)]
+        if (not_empty(idf_errors_max_fields)) {
+            parse_issue(path, "Too many fields in objects", idf_errors_max_fields, src = "IDF", quote = FALSE)
         }
         # }}}
+        # Do not check missing required objects and fields for imf files.
+        if (!is_imf) {
+            # missing required field {{{
+            idf_errors_missing_required_field <- idf_value_all[
+                !is.na(object_id)][required_field == TRUE & is.na(value)][
+                , string := paste0("Missing field ", field, "{", units, "}", "in class ", sQuote(class))]
+            if (not_empty(idf_errors_missing_required_field)) {
+                parse_issue(path, "Missing reqiured fields in objects",
+                    idf_errors_missing_required_field, src = "IDF", quote = FALSE)
+            }
+            # }}}
+        }
     }
     # }}}
     # clean up after error checking
@@ -316,13 +320,15 @@ parse_idf <- function (idf_str, idd) {
 
     # REF
     # {{{
-    # wrong class and field references {{{
-    idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
-    if (not_empty(idf_errors_wrong_references)) {
-        parse_issue(path, type = "Wrong value references", src = "IDF",
-                    idf_errors_wrong_references)
+    if (check) {
+        # wrong class and field references {{{
+        idf_errors_wrong_references <- check_obj_ref(idf_value, idd)
+        if (not_empty(idf_errors_wrong_references)) {
+            parse_issue(path, type = "Wrong value references", src = "IDF",
+                        idf_errors_wrong_references)
+        }
+        # }}}
     }
-    # }}}
     # select needed columns after ref checking
     col_value_all <- names(idf_value)
     col_value_full <- c("object_id", "class_order", "class", "field_order",
