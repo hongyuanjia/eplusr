@@ -1142,8 +1142,8 @@ add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
     assert_that(is_valid_class(class_name, idd))
     assert_that(can_be_duplicated(class_name, idf))
 
-    new_class <- extract_class(class_name, idf, idd)
-    new_object <- extract_object(class_name, min, idf, idd)
+    new_class <- extract_class(class_name, idd)
+    new_object <- extract_object(class_name, min, idd)
 
     # set default values first
     new_object <- set_default(new_object)
@@ -1151,7 +1151,6 @@ add_object <- function (idf, class, ..., min = TRUE, idd, log = TRUE) {
     fields <- list(...)
     assert_that(not_empty(fields), msg = "Field values are empty")
 
-    # add suggestion of 'min' option
     num_max <- new_class[, max_fields]
     num_cur <- new_object[, .N]
 
@@ -1312,7 +1311,7 @@ diff_idf <- function (idf, type = c("all", "add", "set", "del", "hide")) {
 # }}}
 
 # extract_class {{{
-extract_class <- function (class, idf, idd) {
+extract_class <- function (class, idd) {
     class_name <- class
     new_class <- idd$class[class == class_name]
 
@@ -1320,7 +1319,7 @@ extract_class <- function (class, idf, idd) {
 }
 # }}}
 # extract_object {{{
-extract_object <- function (class, min = TRUE, idf, idd) {
+extract_object <- function (class, min = TRUE, idd) {
     class_name <- class
     if (min) {
         num_min_field <- idd$class[class == class_name, min_fields]
@@ -1449,7 +1448,7 @@ set_fields <- function (object, orders, fields, type = c("add", "set"), idf, idd
     }
     # check fields
     if (not_empty(line_skip)) check_input <- object[-line_skip] else check_input <- object
-    suppressWarnings(check_object(check_input, idf = idf, stop = TRUE))
+    check_object(check_input, idf = idf, stop = TRUE)
     if (not_empty(mes)) message(sep_line("~"), "\n", paste0(mes, collapse = "\n"), "\n", sep_line("~"), "\n")
 
     # NOTE: In data.table, if fields is a scalar, 'set_value' is not a list but
@@ -1506,7 +1505,7 @@ get_target_order <- function (idf_value, index, fields, idf, idd) {
         class_name <- index
     }
 
-    class_data <- extract_class(class_name, idf, idd)
+    class_data <- extract_class(class_name, idd)
 
     # get field info
     field_length <- length(fields)
@@ -1529,7 +1528,7 @@ get_target_order <- function (idf_value, index, fields, idf, idd) {
     if (is.null(field_name)) {
         orders <- seq_along(fields)
     } else {
-        idd_field <- extract_object(class_name, min = FALSE, idf, idd)
+        idd_field <- extract_object(class_name, min = FALSE, idd)
         # add standard field name
         idd_field <- add_output_field_name(idd_field)
         # add lower case field_name
@@ -1575,7 +1574,7 @@ add_extra_required <- function (object, orders, fields, idf, idd) {
         new_field_order <- seq(min(diff_field_order), max(diff_field_order), by = 1L)
         fill_field_order <- setdiff(new_field_order, diff_field_order)
         # get new field data from idd and set the filled fields as required
-        new_field <- extract_object(class_name, min = FALSE, idf, idd)[
+        new_field <- extract_object(class_name, min = FALSE, idd)[
             field_order %in% new_field_order][fill_field_order, extra_required := TRUE]
         # set default values
         set_default(new_field)
@@ -1869,7 +1868,7 @@ check_field_an <- function (object) {
             (field_an == "A" & !map_lgl(value, is.character)) |
             (field_an == "N" & !map_lgl(value, is.numeric))
         } else {
-            field_an == "N" & is.na(as.numeric(value))
+            field_an == "N" & is.na(suppressWarnings(as.numeric(value)))
         }][
         , `:=`(check_type = "Type", wrong = class(unlist(value)), right = field_an)][
         , output := sprintf("Invalid value type %s (which should be %s) for %s",
