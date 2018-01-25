@@ -956,7 +956,7 @@ valid_id <- function (idf, class = NULL) {
 # }}}
 
 # pull_data {{{
-pull_data <- function (idf, class, type = c("class", "value")) {
+pull_data <- function (idf, class, type = c("class", "value", "comment")) {
     assert_that(is_string(class))
     assert_that(is_valid_class(class, idf))
     class_name <- class
@@ -965,7 +965,8 @@ pull_data <- function (idf, class, type = c("class", "value")) {
 
     switch(type,
            class = idf$class[class == class_name],
-           value = idf$value[class == class_name]
+           value = idf$value[class == class_name],
+           comment = idf$comment[class == class_name]
     )
 }
 # }}}
