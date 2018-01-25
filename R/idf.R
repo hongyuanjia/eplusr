@@ -1370,8 +1370,7 @@ append_data <- function (id = NULL, class_data = NULL, object_data = NULL, actio
         idf$value[object_id == id, edited := idx]
         idf$comment[object_id == id, edited := idx]
         # just mark hidden objects as deleted
-        id_del <- sort(unique(c(attr(idf, "id_del"), id)))
-        setattr(idf, "id_del", id_del)
+        idf <- append_id_del(idf, id)
     }
 
     if (!action %in% c("del", "hide")) {
@@ -1402,6 +1401,14 @@ append_id <- function (data, base = c("class", "value"), idf) {
     data[, object_id := max_id(idf) + 1L]
 
     return(data)
+}
+# }}}
+# append_id_del {{{
+append_id_del <- function (idf, id_del) {
+    id_del <- sort(unique(c(attr(idf, "id_del"), id)))
+    setattr(idf, "id_del", id_del)
+
+    return(idf)
 }
 # }}}
 # set_default {{{
