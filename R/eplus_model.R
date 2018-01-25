@@ -608,7 +608,8 @@ isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", 
 icheck_object <- function (self, private) {
     check_input <- private$model$value[!(required_field == FALSE & value == "")]
 
-    suppressWarnings(check_object(check_input, idf = private$model))
+    res <- check_object(check_input, idf = private$model)
+    if (is_empty(res)) message("Cheers! No error found.")
 
     return(invisible(self))
 }
