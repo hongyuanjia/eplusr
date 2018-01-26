@@ -14,7 +14,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
         if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
         eplus_home <- path
     } else if (!is.null(ver)) {
-        assert_that(is_eplus_ver(ver))
+        assert_that(is_supported_ver(ver))
         ver_dash <- dash_ver(ver)
         eplus_home <- switch(os,
             "Windows" = paste0("C:/EnergyPlusV", ver_dash),
@@ -65,12 +65,6 @@ eplus_path <- function (ver = NULL, path = NULL) {
                     idd = energyplus_idd, epw = chicago_epw)
 
     return(eplus_info)
-}
-# }}}
-# dash_ver {{{
-dash_ver <- function (ver) {
-    assert_that(is_eplus_ver(ver))
-    paste0(sub(".", "-", ver, fixed = TRUE), "-0")
 }
 # }}}
 # cmd_args {{{
