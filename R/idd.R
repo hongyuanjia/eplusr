@@ -26,6 +26,7 @@ NULL
 #' @return An IDD object contains the IDD version, build, parsed class data and
 #' parsed field data. Both class data and field data are stored in data.tables.
 #' @export
+# parse_idd {{{
 parse_idd <- function(path) {
 
     assert_that(is_readable(path))
@@ -185,6 +186,9 @@ parse_idd <- function(path) {
     idd_dt[space_loc > 0L,
            `:=`(slash_key = toupper(substr(slash_key_value, 1L, space_loc - 1L)),
                 slash_value = trimws(substr(slash_key_value, space_loc + 1L, nchar(slash_key_value)), "left"))]
+    # for "\extensible:<#>" with comments
+    idd_dt[space_loc > 0L & slash_key == "EXTENSIBLE",
+           slash_value := substr(slash_value, 1L, regexpr("\\D", slash_value) - 1L)]
     idd_dt[space_loc < 0L, `:=`(slash_key = toupper(slash_key_value))]
     # remove trailing tabs in slash keys
     idd_dt[grepl("\t", slash_key), slash_key := gsub(slash_key, "\t", "")]
@@ -199,13 +203,14 @@ parse_idd <- function(path) {
     idd_dt[!is.na(slash_key), slash_supported := FALSE]
     group_slash_key <- c("GROUP")
     class_slash_key <- c("MEMO", "UNIQUE-OBJECT", "REQUIRED-OBJECT",
-                         "MIN-FIELDS", "FORMAT", "REFERENCE-CLASS-NAME")
+                         "MIN-FIELDS", "FORMAT", "REFERENCE-CLASS-NAME",
+                         "EXTENSIBLE")
     field_slash_key <- c("FIELD", "NOTE", "REQUIRED-FIELD", "UNITS", "IP-UNITS",
                          "UNITSBASEDONFIELD", "MINIMUM", "MINIMUM>", "MAXIMUM",
                          "MAXIMUM<", "DEFAULT", "DEPRECATED", "AUTOSIZABLE",
                          "AUTOCALCULATABLE", "TYPE", "KEY", "OBJECT-LIST",
-                         "EXTERNAL-LIST", "REFERENCE")
-    ignored_slash_key <- c("BEGIN-EXTENSIBLE", "RETAINCASE", "EXTENSIBLE", "OBSOLETE")
+                         "EXTERNAL-LIST", "REFERENCE", "BEGIN-EXTENSIBLE")
+    ignored_slash_key <- c("RETAINCASE", "OBSOLETE")
     # mark group slash key and values
     idd_dt[slash_key %chin% group_slash_key,
            `:=`(slash_supported = TRUE, type = type_group, group = slash_value)]
@@ -223,6 +228,7 @@ parse_idd <- function(path) {
         parse_issue(path, type = "Invalid slash key found.", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_slash_key, list(line, string)])
     }
+    # remove comments for "\extensible:<#>"
     # check for unsupported slash values
     idd_dt[, slash_value_upper := toupper(slash_value)]
     # \type {{{
@@ -361,12 +367,14 @@ parse_idd <- function(path) {
                      `maximum<` = as.double(`maximum<`),
                      `minimum>` = as.double(`minimum>`),
                      required_field = as.logical(required_field),
-                     unitsbasedonfield = as.logical(unitsbasedonfield))]
+                     unitsbasedonfield = as.logical(unitsbasedonfield),
+                     begin_extensible = as.logical(begin_extensible))]
     # fill na
     idd_field[is.na(autocalculatable), autocalculatable := FALSE]
     idd_field[is.na(autosizable), autosizable := FALSE]
     idd_field[is.na(required_field), required_field := FALSE]
     idd_field[is.na(unitsbasedonfield), unitsbasedonfield := FALSE]
+    idd_field[is.na(begin_extensible), begin_extensible := FALSE]
 
     # order fields per class
     idd_field[, field_order := seq_along(field_anid), by = list(class)]
@@ -409,16 +417,19 @@ parse_idd <- function(path) {
     # set column type
     idd_class[, `:=`(min_fields = as.integer(min_fields),
                      required_object = as.logical(required_object),
-                     unique_object = as.logical(unique_object))]
+                     unique_object = as.logical(unique_object),
+                     extensible = as.integer(extensible))]
     # fill na
     idd_class[is.na(format), format := "standard"]
     idd_class[is.na(min_fields), min_fields := 0L]
     idd_class[is.na(required_object), required_object := FALSE]
     idd_class[is.na(unique_object), unique_object := FALSE]
+    idd_class[is.na(extensible), extensible := 0L]
     # get max field per class
     idd_class <- idd_field[, list(max_fields = .N), by = class][idd_class, on = "class"]
     neworder <- c("group_order", "group", "class_order", "class", "format",
-         "min_fields", "max_fields", "required_object", "unique_object")
+         "min_fields", "max_fields", "required_object", "unique_object",
+         "extensible")
     setcolorder(idd_class, c(neworder, setdiff(names(idd_class), neworder)))
     setorder(idd_class, group_order, class_order)
     # }}}
@@ -496,6 +507,7 @@ parse_idd <- function(path) {
     pb$tick(100L, tokens = list(what = "Complete"))
     return(idd)
 }
+# }}}
 
 ################################################################################
 #                                   helpers                                    #
