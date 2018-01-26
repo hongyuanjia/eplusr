@@ -7,17 +7,18 @@ is_eplus_ver <- function (ver) {
 }
 
 on_failure(is_eplus_ver) <- function (call, env) {
-    paste0(sQuote(eval(call$ver, env)), " is not a valid EnergyPlus version.")
+    paste0(sQuote(eval(call$ver, env)), " is not a valid EnergyPlus version (which should be a number or string with format '[78].[0-9]').")
 }
 # }}}
 # is_supported_ver {{{
 is_supported_ver <- function (ver) {
-    supp_ver <- paste0("8.", 1:8)
-    ver %in% supp_ver
+    is_eplus_ver(ver)
+    supp_ver <- paste0("8.", 3:8)
+    as.character(ver) %in% supp_ver
 }
 
 on_failure(is_supported_ver) <- function (call, env) {
-    paste0("EnergyPlus version ", sQuote(eval(call$ver, env)), " is not supported yet.")
+    paste0("Currently EnergyPlus v8.3 to v8.8 are supported.")
 }
 # }}}
 # is_eplus_exists {{{
