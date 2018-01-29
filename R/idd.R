@@ -133,7 +133,7 @@ parse_idd <- function(path) {
     idd_dt[, row_id := NULL]
     # }}}
 
-    # seperate file AN and id {{{
+    # seperate field AN and id {{{
     idd_dt[field_count == 1L,
         field_anid := trimws(substr(field_anid, 1L, nchar(field_anid) - 1L), "right")]
     idd_dt[field_count >= 1L,
@@ -485,16 +485,6 @@ parse_idd <- function(path) {
     }
     # }}}
 
-    # set class
-    setattr(idd_class, "class", c("IDD_Class", class(idd_class)))
-    setattr(idd_field, "class", c("IDD_Field", class(idd_field)))
-    if (!is.null(idd_ref_object)) {
-        setattr(idd_ref_object, "class", c("IDD_Ref_Obj", class(idd_ref_object)))
-    }
-    if (!is.null(idd_ref_external)) {
-        setattr(idd_ref_external, "class", c("IDD_Ref_Ext", class(idd_ref_external)))
-    }
-
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
@@ -536,8 +526,8 @@ print.IDD <- function (x, ...) {
 # }}}
 
 # parse_issue {{{
-parse_issue <- function (path, type = "", data_errors = NULL, info = NULL, src = c("IDD", "IDF"),
-                        stop = TRUE, quote = TRUE) {
+parse_issue <- function (path = NULL, type = "", data_errors = NULL, info = NULL,
+                         src = c("IDD", "IDF"), stop = TRUE, quote = TRUE) {
     if (!is.null(info)) {
         sep <- paste0(sep_line("-"), "\n")
         info <- paste0(info, "\n")
@@ -573,9 +563,16 @@ parse_issue <- function (path, type = "", data_errors = NULL, info = NULL, src =
         data_str <- paste0(sprintf(paste0("Line %", max_c, "s: %s"), data_errors[["line"]],
                            data_errors[["string"]]), collapse = "\n")
     }
+
+    if (is.null(path)) {
+        header <- sprintf("%s PARSING ERROR", src)
+    } else {
+        header <- sprintf("%s PARSING ERROR for file %s", src, sQuote(path))
+    }
+
     mes <- paste0("\n",
         sep_line("="), "\n",
-        sprintf("%s PARSING ERROR for file %s", src, sQuote(path)), "\n",
+        header, "\n",
         paste0(key_line, ": ", type), "\n",
         paste0("[Total Number]: ", error_num), "\n",
         error_truncated,
