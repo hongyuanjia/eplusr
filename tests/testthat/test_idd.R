@@ -26,40 +26,30 @@ test_that("Parse IDD works", {
     expect_equal(idd$group_name(), "TestGroup")
     expect_equal(idd$group_name("TestClass"), "TestGroup")
     expect_error(idd$group_name("WrongClass"),
-                 paste0("Invalid class name found: ", sQuote("WrongClass"), "."))
+                 paste0("Invalid class name found: ", backtick("WrongClass"), "."))
 
     expect_equal(idd$class_name(), "TestClass")
     expect_equal(idd$class_name("TestGroup"), "TestClass")
-    expect_error(idd$class_name("WrongClass"),
-                 paste0("Invalid class name found: ", sQuote("WrongClass"), "."))
+    expect_error(idd$class_name("WrongGroup"),
+                 paste0("Invalid group name found: ", backtick("WrongGroup"), "."))
 
     expect_equal(idd$group_order(), c(`TestGroup` = 1L))
     expect_equal(idd$group_order("TestGroup"), c(`TestGroup` = 1L))
     expect_error(idd$group_order("WrongGroup"),
-                 paste0("Invalid group name found: ", sQuote("WrongGroup"), "."))
+                 paste0("Invalid group name found: ", backtick("WrongGroup"), "."))
 
     expect_equal(idd$class_order(), c(`TestClass` = 1L))
     expect_equal(idd$class_order("TestClass"), c(`TestClass` = 1L))
     expect_error(idd$class_order("WrongClass"),
-                 paste0("Invalid class name found: ", sQuote("WrongClass"), "."))
+                 paste0("Invalid class name found: ", backtick("WrongClass"), "."))
 
-    expect_equal(idd$is_valid_group(c("TestGroup", "WrongGroup")), c(TRUE, FALSE))
-    expect_equal(idd$is_valid_class(c("TestClass", "WrongClass")), c(TRUE, FALSE))
-
-    skip_on_cran(
-        expect_silent(IDD$new("../../idd/V8-8-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-7-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-6-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-5-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-4-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-3-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-2-0-Energy+.idd"))
-        expect_silent(IDD$new("../../idd/V8-1-0-Energy+.idd"))
-    )
+    skip_on_cran()
+    expect_silent(IDD$new("../../idd/V8-8-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-7-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-6-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-5-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-4-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-3-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-2-0-Energy+.idd"))
+    expect_silent(IDD$new("../../idd/V8-1-0-Energy+.idd"))
 })
-assertthat::on_failure(IDDObject$public_methods$is_valid_field_num) <- function (call, env) {
-    paste0(eval(self$class_name(),env))
-}
-idd <- IDD$new(text_idd)
-idd["TestClass"]$is_valid_field_num(3)
-assertthat::assert_that(idd["TestClass"]$is_valid_field_num(3))
