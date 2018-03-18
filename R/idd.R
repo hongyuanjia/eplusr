@@ -473,7 +473,7 @@ parse_idd <- function(path) {
            !(slash_value_upper %in% c("AUTORDDVARIABLE", "AUTORDDMETER",
                "AUTORDDVARIABLEMETER")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, list(line, string)])
+        parse_issue(path, "Invalid \\external-list found", idd_dt[line_error_type, list(line, string)])
     }
     # }}}
     # \format {{{
