@@ -653,9 +653,10 @@ parse_idd <- function(path) {
     # split reference
     idd_field[, new_reference := list(strsplit(reference, " ", fixed = TRUE)),
               by = c("class_order", "field_order")]
-    idd_field[, reference := NULL]
-    data.table::setnames(idd_field, "new_reference", "reference")
-    if (!has_name(idd_field, "reference")) idd_field[, reference := list(list(NA_character_))]
+    # idd_field[, reference := NULL]
+    data.table::setnames(idd_field,
+                         c("new_reference", "reference"),
+                         c("reference", "reference_string"))
 
     # split choice
     idd_field[, new_key := list(strsplit(key, " ", fixed = TRUE)),
@@ -666,8 +667,10 @@ parse_idd <- function(path) {
     # split objectList
     idd_field[, new_object_list := list(strsplit(object_list, " ", fixed = TRUE)),
               by = c("class_order", "field_order")]
-    idd_field[, object_list := NULL]
-    data.table::setnames(idd_field, "new_object_list", "object_list")
+    # idd_field[, object_list := NULL]
+    data.table::setnames(idd_field,
+                         c("new_object_list", "object_list"),
+                         c("object_list", "object_list_string"))
 
     # add field standard and lower case field names
     idd_field[is.na(field), `_field_name` := field_anid]
@@ -741,11 +744,38 @@ parse_idd <- function(path) {
     idd_class[is.na(extensible), extensible := 0L]
     # get max field per class
     idd_class <- idd_field[, list(num_fields = .N), by = class][idd_class, on = "class"]
+    # split reference_class_name
+    idd_class[, new_reference_class_name := list(strsplit(reference_class_name, " ", fixed = TRUE)),
+              by = c("class_order")]
+    # idd_class[, reference_class_name := NULL]
+    data.table::setnames(idd_class,
+                         c("new_reference_class_name", "reference_class_name"),
+                         c("reference_class_name", "reference_class_name_string"))
     neworder <- c("group_order", "group", "class_order", "class", "format", "memo",
          "min_fields", "num_fields", "required_object", "unique_object",
-         "extensible", "reference_class_name")
+         "extensible", "reference_class_name", "reference_class_name_string")
     data.table::setcolorder(idd_class, neworder)
     data.table::setorder(idd_class, group_order, class_order)
+    # }}}
+
+    # REFERENCE data
+    # {{{
+    # Object List data
+    idd_object_list <- idd_field[!is.na(object_list_string),
+        list(class_order, class, field_order, object_list)]
+    idd_field[, `:=`(object_list_string = NULL)]
+    # Reference Field data
+    idd_reference_field <- idd_field[!is.na(reference_string),
+        list(class_order, class, field_order, reference)]
+    idd_field[, `:=`(reference_string = NULL)]
+    # Reference Class data
+    idd_reference_class <- idd_class[!is.na(reference_class_name_string),
+        list(class_order, class, reference_class_name)]
+    idd_class[, `:=`(reference_class_name_string = NULL)]
+    # Combine
+    idd_reference <- list(object_list = idd_object_list,
+                          reference_class = idd_reference_class,
+                          reference_field = idd_reference_field)
     # }}}
 
     # restore group and class order data
@@ -766,7 +796,9 @@ parse_idd <- function(path) {
     idd <- list(version = idd_version,
                 build = idd_build,
                 order = idd_order,
-                # field = idd_field,
+                class = idd_class,
+                field = idd_field,
+                reference = idd_reference,
                 data = idd_data)
     # set class to IDD
     data.table::setattr(idd, "class", c("IDD_File", class(idd)))
