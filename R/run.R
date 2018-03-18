@@ -11,7 +11,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
     # if path is given, use it
     if (!is.null(path)) {
         path <- unname(path)
-        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
+        if (!dir.exists(path)) stop(msg(backtick(path), " does not exists."), call. = FALSE)
         eplus_home <- path
     } else if (!is.null(ver)) {
         assert_that(is_supported_ver(ver))
@@ -24,7 +24,7 @@ eplus_path <- function (ver = NULL, path = NULL) {
         if (!dir.exists(eplus_home)) {
             # and path is NULL, error
             stop(msg("Cannot locate EnergyPlus V", ver, " at default
-                     installation path ", sQuote(eplus_home), ". Please
+                     installation path ", backtick(eplus_home), ". Please
                      give exact 'path' of EnergyPlus installation."))
         }
     # if none, error
@@ -50,11 +50,11 @@ eplus_path <- function (ver = NULL, path = NULL) {
     )
 
     if (!file.exists(eplus_exe)) {
-        stop(msg("EnergyPlus executable does not exist in folder ", sQuote(eplus_home), "."))
+        stop(msg("EnergyPlus executable does not exist in folder ", backtick(eplus_home), "."))
     }
 
     if (!file.exists(energyplus_idd)) {
-        stop(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
+        stop(msg(backtick("Energy+.idd"), " does not exist in EnergyPlus
                  installation folder."))
         energyplus_idd <- NULL
     }
@@ -174,7 +174,7 @@ copy_run_files <- function (file, dir) {
     flag <- file.copy(from = file, to = loc, overwrite = TRUE, copy.date = TRUE)
 
     if (!flag) stop(msg(sprintf("Unable to copy file %s into simulation output directory.",
-                                sQuote(basename(file)))),
+                                backtick(basename(file)))),
                     call. = FALSE)
 
     return(loc)
@@ -361,7 +361,7 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
             }
             warning(msg(sprintf("Objects in class %s with ID %s has/have been
                                 commented out to use the input run period.",
-                                sQuote("RunPeriod"),
+                                backtick("RunPeriod"),
                                 paste(rp_others, collapse = ", "))), call. = FALSE)
         }
     }
@@ -385,9 +385,9 @@ set_output_table_style <- function (idf, idd) {
             mes <- sprintf("Inorder to extract tabe output using %s, the value of
                            %s in class %s with ID %s has been changed from %s to
                            %s.",
-                           sQuote("$table"), sQuote("Column Separator"),
-                           sQuote(targ_class), sQuote(id),
-                           sQuote(val), sQuote(new_val))
+                           backtick("$table"), backtick("Column Separator"),
+                           backtick(targ_class), backtick(id),
+                           backtick(val), backtick(new_val))
             idf <- invisible(set_object(idf = idf, id = id, new_val, idd = idd))
             warning(msg(mes), call. = FALSE)
         }
@@ -396,9 +396,9 @@ set_output_table_style <- function (idf, idd) {
         mes <- sprintf("In order to extract table output using %s, the value of
                        %s in class %s has been changed from the default %s to
                        %s.",
-                       sQuote("$table"), sQuote("Column Separator"),
-                       sQuote(targ_class),
-                       sQuote("Comma"), sQuote("CommaAndHTML"))
+                       backtick("$table"), backtick("Column Separator"),
+                       backtick(targ_class),
+                       backtick("Comma"), backtick("CommaAndHTML"))
         idf <- invisible(add_object(idf = idf, class = targ_class,
                                     "CommaAndHTML", "None", idd = idd))
         warning(msg(mes), call. = FALSE)

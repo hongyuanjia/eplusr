@@ -33,19 +33,19 @@ install_eplus <- function (ver = "latest", force = FALSE) {
         if (!force) {
             message(msg(sprintf("It seems EnergyPlus v%s has been already
                 installed at %s. Set 'force' to TRUE to reinstall.",
-                ver, sQuote(ver_exist["home"]))))
+                ver, backtick(ver_exist["home"]))))
             return(invisible())
         }
     }
 
-    message(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", sep_line("="))
+    message(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
     dl <- download_eplus(ver, tempdir())
     if (dl != 0L) {
         stop(sprintf("Failed to download EnergyPlus v%s.", ver), call. = FALSE)
     }
 
     exec <- attr(dl, "destfile")
-    message(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", sep_line("="))
+    message(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
     res <- switch(osname(),
            Windows = install_eplus_win(exec),
            Linux = install_eplus_linux(exec),

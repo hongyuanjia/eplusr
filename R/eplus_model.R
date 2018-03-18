@@ -545,26 +545,26 @@ isave_ <- function (private, path, format) {
     if (right_ext == "imf" && target_ext == "idf") {
         stop(msg(
             sprintf("The model has macro input and should be saved as an %s
-                    file, not an %s file.",sQuote("imf"),sQuote("idf"))),
+                    file, not an %s file.",backtick("imf"),backtick("idf"))),
                  call. = FALSE)
     } else if (right_ext == "idf" && target_ext == "imf") {
         warning(msg(
             sprintf("The model has no macro input and should be saved as an %s
                     file. Saving it to %s will force to run Ep-Marco
                     preprocessor before simulation which is unnecessary.",
-                    sQuote("idf"), sQuote("imf"))),
+                    backtick("idf"), backtick("imf"))),
                     call. = FALSE)
     # other cases such as saving the model as a 'txt' file.
     } else if (right_ext != target_ext) {
         warning(msg(
             sprintf("The model should be saved as an %s file, but has been saved
                     with an extension %s which EnergyPlus may not able to
-                    recognize.", sQuote(right_ext), sQuote(target_ext))), call. == FALSE)
+                    recognize.", backtick(right_ext), backtick(target_ext))), call. == FALSE)
     }
 
     save_idf(private$model, path, format)
 
-    message(sprintf("Model has been successfully saved at %s.", sQuote(path)))
+    message(sprintf("Model has been successfully saved at %s.", backtick(path)))
 
     pre_log <- private$model$log
     private$path <- normalizePath(path, winslash = "/")
@@ -582,7 +582,7 @@ isave_idf <- function (private, format = c("asis", "sorted", "ori_bot", "ori_top
         stop(msg(
             sprintf("Saving will overwrite the original model located at %s.
                     This may have a risk of losing your original model. confirm
-                    by setting 'confirm' to TRUE.", sQuote(private$path))),
+                    by setting 'confirm' to TRUE.", backtick(private$path))),
                     call. = FALSE)
     }
 
@@ -596,7 +596,7 @@ isaveas_idf <- function (private, path, format = c("asis", "sorted", "ori_bot", 
         path <- normalizePath(path, winslash = "/")
         stop(msg(
             sprintf("Saving will replace an existing model file located at %s.
-                    confirm by setting 'overwrite' to TRUE.", sQuote(path))),
+                    confirm by setting 'overwrite' to TRUE.", backtick(path))),
                     call. = FALSE)
     }
 
@@ -621,7 +621,7 @@ iprint_idf <- function (private) {
     path <- paste0("[ Path  ]: ", private$path)
     ver  <- paste0("[Version]: ", private$ver)
     type <- paste0("[ Type  ]: ", private$type)
-    info <- c(path, ver, type, sep_line("="))
+    info <- c(path, ver, type, cli::rule(line = 2))
 
     .print(private$model, info)
 }
@@ -634,13 +634,13 @@ ireset_model <- function (self, private, confirm = FALSE) {
             sprintf("Reset the model back to the status when it was first read
                     at %s. You will lose all modifications after that time and
                     resetting cannot be undone. confirm by setting 'confirm' to
-                    TRUE.", sQuote(private$time_read))), call. = FALSE)
+                    TRUE.", backtick(private$time_read))), call. = FALSE)
     }
 
     self$initialize(private$path)
 
     message(msg("The model has been reset to the status when it was first read
-                at ", sQuote(private$time_read), "."))
+                at ", backtick(private$time_read), "."))
 
     # Do not print
     return(invisible(self))
@@ -710,7 +710,7 @@ irun_idf <- function (self, private, period, weather, echo = FALSE, dir = NULL,
         } else {
             warning(msg(
                 "Missing weather input, weather file located at ",
-                sQuote(weather), " will been used."), call. = FALSE)
+                backtick(weather), " will been used."), call. = FALSE)
         }
     }
     # }}}
