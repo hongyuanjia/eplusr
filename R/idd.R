@@ -129,14 +129,14 @@ IDD <- R6::R6Class(classname = "IDD",
 
         group_name = function (class = NULL) {
             if (is_empty(class)) return(private$m_orders[, group])
-            self$is_valid_class(class)
+            assert_that(self$is_valid_class(class))
             cls <- class
             private$m_orders[class %in% cls, group]
         },
 
         class_name = function (group = NULL) {
             if (is_empty(group)) return(private$m_orders[, class])
-            self$is_valid_group(group)
+            assert_that(self$is_valid_group(group))
             grp <- group
             private$m_orders[group %in% grp, class]
         },
@@ -146,7 +146,7 @@ IDD <- R6::R6Class(classname = "IDD",
                 res <- private$m_orders[, group_order]
                 names(res) <- private$m_orders[, group]
             } else {
-                self$is_valid_group(group)
+                assert_that(self$is_valid_group(group))
                 grp <- group
                 res <- private$m_orders[group %in% grp, group_order]
                 names(res) <- grp
@@ -159,7 +159,7 @@ IDD <- R6::R6Class(classname = "IDD",
                 res <- private$m_orders[, class_order]
                 names(res) <- private$m_orders[, class]
             } else {
-                self$is_valid_class(class)
+                assert_that(self$is_valid_class(class))
                 cls <- class
                 res <- private$m_orders[class %in% cls, class_order]
                 names(res) <- cls
@@ -178,7 +178,7 @@ IDD <- R6::R6Class(classname = "IDD",
 
         objects = function (class = NULL) {
             if (is_empty(name)) return(private$m_objects)
-            self$is_valid_class(class)
+            assert_that(self$is_valid_class(class))
             return(private$m_objects[class])
         },
 
@@ -899,6 +899,15 @@ get_idd_build <- function (idd_str) {
 ################################################################################
 #                                  ASSERTIONS                                  #
 ################################################################################
+
+#' @importFrom assertthat "on_failure<-"
+on_failure(IDD$public_methods$is_valid_class) <- function (call, env) {
+    paste0("Invalid class name found: ", backtick(eval(call$class, env)), ".")
+}
+
+on_failure(IDD$public_methods$is_valid_group) <- function (call, env) {
+    paste0("Invalid group name found: ", backtick(eval(call$group, env)), ".")
+}
 
 '[.IDD' <- function(x, i, j, ..., drop = FALSE) {
     m_obj <- .subset2(x, "objects")()
