@@ -714,6 +714,9 @@ parse_idd <- function(path) {
         group_order + group + class_order + class ~ slash_key,
         value.var = "slash_value",
         fun.aggregate = list(function(x) paste0(x, collapse = " ")), fill = NA)
+    # delete column "NA" caused by classes without slash such as
+    # "SwimmingPool:Indoor"
+    if (has_name(idd_class, "NA")) idd_class[, `:=`(`NA` = NULL)]
     # set names
     new_nms <- gsub("-", "_", tolower(names(idd_class)), fixed = TRUE)
     data.table::setnames(idd_class, new_nms)
