@@ -7,7 +7,7 @@ is_eplus_ver <- function (ver) {
 }
 
 on_failure(is_eplus_ver) <- function (call, env) {
-    paste0(sQuote(eval(call$ver, env)), " is not a valid EnergyPlus version (which should be a number or string with format '[78].[0-9]').")
+    paste0(backtick(eval(call$ver, env)), " is not a valid EnergyPlus version (which should be a number or string with format '[78].[0-9]').")
 }
 # }}}
 # is_supported_ver {{{
@@ -42,7 +42,7 @@ is_valid_id <- function (id, idf) {
 }
 
 on_failure(is_valid_id) <- function(call, env) {
-    paste0(sQuote(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$all('id')\"")
+    paste0(backtick(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$all('id')\"")
 }
 # }}}
 # is_comment_id {{{
@@ -52,21 +52,21 @@ is_comment_id <- function (id, idf) {
 # }}}
 # is_valid_class {{{
 is_valid_class <- function(class, idf) {
-    is_string(class) && class %chin% valid_class(idf)
+    is_string(class) && class %in% valid_class(idf)
 }
 
 on_failure(is_valid_class) <- function(call, env) {
-    paste0(sQuote(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$all('class')\"")
+    paste0(backtick(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$all('class')\"")
 }
 # }}}
 # is_class_exist {{{
 is_class_exist <- function (idf, class) {
     class_name <- class
-    class_name %chin% valid_class(idf)
+    class_name %in% valid_class(idf)
 }
 
 on_failure(is_class_exist) <- function (call, env) {
-    paste0(sQuote(eval(call$class, env)), " does not exist in current model")
+    paste0(backtick(eval(call$class, env)), " does not exist in current model")
 }
 # }}}
 # can_be_duplicated {{{
@@ -78,7 +78,7 @@ can_be_duplicated <- function (class, idf) {
 }
 
 on_failure(can_be_duplicated) <- function(call, env) {
-    paste0(sQuote(eval(call$class, env)), " is an unique object and already exists")
+    paste0(backtick(eval(call$class, env)), " is an unique object and already exists")
 }
 # }}}
 # can_be_deleted {{{
@@ -91,7 +91,7 @@ can_be_deleted <- function (class, idf) {
 }
 
 on_failure(can_be_deleted) <- function(call, env) {
-    paste0(sQuote(eval(call$class, env)), " is an unique or required object that cannot be deleted")
+    paste0(backtick(eval(call$class, env)), " is an unique or required object that cannot be deleted")
 }
 # }}}
 # can_be_modified {{{
@@ -101,7 +101,7 @@ can_be_modified <- function (class, idf) {
     !identical(class, "Version")
 }
 on_failure(can_be_modified) <- function(call, env) {
-    paste0(sQuote(eval(call$class, env)), " is protected and cannot be modified.")
+    paste0(backtick(eval(call$class, env)), " is protected and cannot be modified.")
 }
 # }}}
 # not_deleted {{{
@@ -110,7 +110,7 @@ not_deleted <- function (id, idf) {
 }
 
 on_failure(not_deleted) <- function(call, env) {
-    paste0("Object with ID ", sQuote(eval(call$id, env)), " has already been deleted before")
+    paste0("Object with ID ", backtick(eval(call$id, env)), " has already been deleted before")
 }
 # }}}
 # is_idf {{{
@@ -222,6 +222,16 @@ on_failure(has_class) <- function (call, env) {
     paste0(deparse(call$idf), " does not contain any ", eval(call$class, env), " object")
 }
 # }}}
+# is_count {{{
+is_count <- function (x) {
+    if (length(x) != 1) return(FALSE)
+    if (!is_integerish(x)) return(FALSE)
+    x > 0
+}
+on_failure(is_count) <- function(call, env) {
+  paste0(deparse(call$x), " is not a count (a single positive integer)")
+}
+# }}}
 
 # not_empty {{{
 not_empty <- function (x) {
@@ -290,7 +300,7 @@ has_ext <- function (path, ext) {
 on_failure(has_ext) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    msg("File ", sQuote(basename(path)), " does not have extension ", sQuote(ext), ".")
+    msg("File ", backtick(basename(path)), " does not have extension ", backtick(ext), ".")
 }
 # }}}
 # has_output_ext {{{
@@ -301,7 +311,7 @@ has_output_ext <- function (x) {
 on_failure(has_output_ext) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    msg("File ", sQuote(basename(path)), " is not an EnergyPlus output data file.")
+    msg("File ", backtick(basename(path)), " is not an EnergyPlus output data file.")
 }
 # }}}
 # osname {{{
