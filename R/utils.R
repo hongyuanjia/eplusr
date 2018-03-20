@@ -34,7 +34,7 @@ msg <- function (..., prefix = " ", initial = "") {
 backtick_collapse <- function (x) {
     s <- paste0("`", x, "`")
     if (length(s) == 1L) {
-        return (x)
+        return (s)
     } else {
         b <- paste0(s[-length(s)], collapse = ", ")
         e <- s[length(s)]
@@ -46,5 +46,10 @@ backtick_collapse <- function (x) {
 # backtick {{{
 backtick <- function (x) {
     paste0("`", x, "`")
+}
+# }}}
+# `._get_private`{{{
+`._get_private` <- function (x) {
+    .subset2(.subset2(x, ".__enclos_env__"), "private")
 }
 # }}}

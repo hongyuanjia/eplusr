@@ -83,13 +83,13 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
     public = list(
 
-        initialize = function (list, idd) {
+        initialize = function (object_id, class, comment, value, idd) {
             # {{{
-            private$m_id <- list$object_id
-            private$m_value <- as.list(list$value)
-            private$m_comment <- list$comment
+            private$m_id <- object_id
+            private$m_value <- as.list(value[[1]])
+            private$m_comment <- unlist(comment)
 
-            .iddobj <- idd$object(list$class)
+            .iddobj <- idd$object(class)
             len <- length(private$m_value)
             assert_that(.iddobj$is_valid_field_num(len),
                         msg = paste0("Object [ID:", private$m_id, "] in class ",
@@ -104,8 +104,8 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
                 .iddobj <- .iddobj$clone(deep = TRUE)
                 .iddobj$add_extensible_groups(num_to_add)
             }
-            private$m_fields <- .get(.iddobj, "m_fields")
-            private$m_properties <- .get(.iddobj, "m_properties")
+            private$m_fields <- `._get_private`(.iddobj)$m_fields
+            private$m_properties <- `._get_private`(.iddobj)$m_properties
             private$enforce_value_type()
             # }}}
         },
@@ -144,7 +144,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # return object values
             # {{{
             if (all(is.null(index), is.null(name))) {
-                index <- index %||% seq_len(length(private$m_value))
+                index <- seq_len(length(private$m_value))
             }
 
             index <- private$fields(index, name)[, field_order]
@@ -246,7 +246,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # TODO: check if below is ok for single field objects such
             # `Version`
             check_data <- private$fields(index)[, value := dots]
-            errors <- private$check_object(.data = check_data, print = FALSE)
+            errors <- private$check_object(data = check_data, print = FALSE)
 
             # get current valid value number
             num_value <- length(private$m_value)
@@ -278,7 +278,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
                     }
                 }
                 private$m_value[index] <- dots
-                self$print()
+                return(self)
             } else {
                 # store original field values
                 ori_value <- private$m_value
@@ -324,6 +324,33 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # }}}
         },
 
+        # Overwrite super class public methods
+        # {{{
+        num_fields = function () {
+            # return total number of fields that have values
+            # {{{
+            return(length(private$m_value))
+            # }}}
+        },
+
+        field_index = function (name = NULL) {
+            # return field index by field name (in either standard or lower case
+            # format)
+            # {{{
+            if (is.null(name)) return(seq_along(private$m_value))
+            super$field_index(name)
+            # }}}
+        },
+
+        is_valid_field_index = function (index) {
+            # check if input index is a valid field index
+            # {{{
+            assert_that(is_count(index))
+            index <= length(private$m_value)
+            # }}}
+        },
+        # }}}
+
         print = function (comment = TRUE) {
             # TODO: change unit according to IDF$options$view_in_ip
             # {{{
@@ -362,265 +389,121 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         m_properties = NULL,
         m_fields = NULL,
         m_check = list(),
-        m_check_data = data.table(),
+        m_check_field = data.table(),
         # }}}
 
         # PRIVATE FUNCTIONS
         # {{{
-        enforce_value_type = function () {
-        # make sure that numeric strings are converted to numeric values and
-        # all empty values are converted to corresponding NAs
+        # Overwrite super class private methods
+        # {{{
+        fields = function (index = NULL, name = NULL) {
+            # return single field data by field index or field name (either in
+            # standard format or lower case format)
             # {{{
-            .value_dt <- private$m_fields[field_order <= length(private$m_value)]
-            # NOTE: In `data.table`, if 'private$m_value' is a list of length
-            # 1, then 'value' here will be a character string, not a list. Have
-            # to fix this first.
-            if (is_scalar(private$m_value)) {
-                .value_dt[, value := list(private$m_value)]
-            } else {
-                .value_dt[, value := list(private$m_value)]
+            if (is_empty(index) && is_empty(name)) {
+                index <- seq_along(private$m_value)
             }
-
-            is_empty <- purrr::map_lgl(private$m_value, ~.x == "")
-            is_auto <- purrr::map_lgl(private$m_value, ~tolower(.x) %in% c("autosize", "autocalculate"))
-            .value_dt[field_an == "A" & is_empty,
-                      value := list(list(NA_character_)), by = c("field_order")]
-            .value_dt[field_an == "N" & is_empty,
-                      value := list(list(NA_real_)), by = c("field_order")]
-            .value_dt[field_an == "N" & !is_auto,
-                      value := list(list(tryCatch(as.numeric(value),
-                                                  warning = function (c) unlist(value)))),
-                      by = c("field_order")]
-
-            private$m_value <- .value_dt[, value]
+            super$fields(index, name)
             # }}}
         },
 
-        check_object = function (.data = NULL, print = TRUE) {
-        # check if there are errors in current object
+        field_name_std = function (index = NULL, unit = FALSE, in_ip = FALSE) {
+            # return standard field name
             # {{{
-            private$m_check <- NULL
-            if (is.null(.data)) {
-                private$m_check_data <- private$m_fields[
-                    field_order <= length(private$m_value)][
-                    , value := private$m_value]
-            } else {
-                private$m_check_data <- .data
-            }
-            on.exit({private$m_check_data <- NULL})
+            index <- index %||% seq_along(private$m_value)
+            super$field_name_std(index, unit, in_ip)
+            # }}}
+        },
+        # }}}
 
-            # check scalar
-            private$check_scalar()
-            # check missing required fields
-            private$check_missing()
-            # check invalid auto
-            private$check_auto()
-            # exclude auto fields below during checking
-            private$m_check_data <- private$m_check_data[
-                !purrr::map_lgl(value, ~tolower(.x) %in% c("autosize", "autocalculate"))]
-            # check invalid type
-            private$check_type()
-            # check invalid integer
-            private$check_integer()
-            # check invalid choice
-            private$check_choice()
-            # check range exceeding
-            private$check_range()
+        enforce_value_type = function () {
+            # make sure that numeric strings are converted to numeric values and
+            # all empty values are converted to corresponding NAs
+            # {{{
+            an_a <- private$m_fields[seq_along(private$m_value), field_an == "A"]
+            is_empty <- private$m_value == ""
+            is_auto <- tolower(private$m_value) %in% c("autosize", "autocalculate")
+            na_chr <- an_a & is_empty
+            na_dbl <- !an_a & is_empty
+            an_n <- !an_a & !is_auto
+            private$m_value[na_chr] <- rep(NA_character_, sum(na_chr))
+            private$m_value[na_dbl] <- rep(NA_real_, sum(na_dbl))
+            num <- suppressWarnings(as.numeric(unlist(private$m_value)))
+            private$m_value[an_n & !is.na(num)] <- num[an_n & !is.na(num)]
+            # }}}
+        },
 
-            if (print) {
-                private$print_check()
-                return(invisible(private$m_check))
-            } else {
-                return(private$m_check)
-            }
+        check_object = function (data = NULL, print = TRUE) {
+            # check if there are errors in current object
+            # {{{
+            i_check_object(private, data, print)
             # }}}
         },
 
         check_scalar = function () {
-        # check if every value is a scalar
+            # check if every value is a scalar
             # {{{
-            res_scalar <- private$m_check_data[!is.na(value)][
-                !purrr::map_lgl(value, is_scalar),
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$scalar <- res_scalar
-            if (not_empty(res_scalar)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_scalar[, field_order]]
-            }
+            i_check_scalar(private)
             # }}}
         },
 
         check_missing = function () {
-        # check if there are missing required values
+            # check if there are missing required values
             # {{{
-            res_missing <- private$m_check_data[required_field == TRUE][
-                purrr::map_lgl(value, `==`, "") |
-                purrr::map_lgl(value, is.na) |
-                purrr::map_lgl(value, is.null),
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$missing <- res_missing
-            if (not_empty(res_missing)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_missing[, field_order]]
-            }
+            i_check_missing(private)
             # }}}
         },
 
         check_auto = function () {
-        # check if there are invalid autosize and autocalculate fields
+            # check if there are invalid autosize and autocalculate fields
             # {{{
-            # invalid autosize fields
-            res_autosize <- private$m_check_data[autosizable == FALSE][
-                tolower(unlist(value)) == "autosize",
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$autosize <- res_autosize
-            if (not_empty(res_autosize)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_autosize[, field_order]]
-            }
-
-            # invalid autocalculate fields
-            res_autocalculate <- private$m_check_data[autocalculatable == FALSE][
-                tolower(unlist(value)) == "autocalculate",
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$autocalculate <- res_autocalculate
-            if (not_empty(res_autocalculate)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_autocalculate[, field_order]]
-            }
+            i_check_auto(private)
             # }}}
         },
 
         check_type = function () {
-        # check if there are character values which should be numeric or vice
+            # check if there are character values which should be numeric or vice
         # versa
             # {{{
-            # numeric type mismatch
-            res_numeric <- private$m_check_data[field_an == "N"][
-                !purrr::map_lgl(value, is.numeric),
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$numeric <- res_numeric
-            if (not_empty(res_numeric)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_numeric[, field_order]]
-            }
-
-            # character type mismatch
-            res_character <- private$m_check_data[field_an == "A"][
-                !purrr::map_lgl(value, is.character),
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$character <- res_character
-            if (not_empty(res_character)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_character[, field_order]]
-            }
+            i_check_type(private)
             # }}}
         },
 
         check_integer = function () {
-        # check if there are invalid integer
+            # check if there are invalid integer
             # {{{
-            res_integer <- private$m_check_data[!is.na(value)][type == "integer"][
-                !is_integerish(unlist(value)),
-                list(field_order, `_field`, `_field_ip`, value)]
-            private$m_check$integer <- res_integer
-            if (not_empty(res_integer)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_integer[, field_order]]
-            }
+            i_check_integer(private)
             # }}}
         },
 
         check_choice = function () {
-        # check if there are invalid choices
+            # check if there are invalid choices
             # {{{
-            res_choice <- private$m_check_data[!is.na(value)][type == "choice"][
-                !purrr::map2_lgl(value, key, ~tolower(.x) %in% tolower(.y)),
-                list(field_order, `_field`, `_field_ip`, value, key)]
-            private$m_check$choice <- res_choice
-            if (not_empty(res_choice)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_choice[, field_order]]
-            }
+            i_check_choice(private)
             # }}}
         },
 
         check_range = function () {
-        # check if the value exceeds range
+            # check if the value exceeds range
             # {{{
-            res_range <- private$m_check_data[!is.na(value)][have_range == TRUE][
-                !purrr::map2_lgl(value, range, in_range),
-                list(field_order, `_field`, `_field_ip`, value, range)]
-            private$m_check$range <- res_range
-            if (not_empty(res_range)) {
-                private$m_check_data <- private$m_check_data[
-                    field_order != res_range[, field_order]]
-            }
+            i_check_range(private)
             # }}}
         },
 
-        print_check = function (success = TRUE) {
-        # print pretty check results
+        print_check = function (ip_unit = FALSE) {
+            # print pretty check results
             # {{{
-            if (all(purrr::map_lgl(private$m_check, is_empty))) {
-                cli::cat_line(" ", clisymbols::symbol$tick, " ",
-                              "No error found.")
-            } else {
-                error_num <- sum(purrr::map_int(private$m_check, nrow))
-                cli::cat_line(" ", clisymbols::symbol$cross, " [", error_num, "] ",
-                              "Errors found during value validation.")
-                cli::cat_rule(line = 2)
-                purrr::iwalk(private$m_check, ~if(not_empty(.x)) private$cat_errors(.y))
-                cli::cat_line()
-            }
+            i_print_check(private$m_check, ip_unit)
             # }}}
         },
 
         cat_errors = function (type = c("scalar", "missing", "autosize",
                                         "autocalculate", "numeric", "character",
-                                        "integer", "choice", "range")) {
-        # cat detailed error messages of a single type
+                                        "integer", "choice", "range"),
+                               ip_unit = FALSE) {
+            # cat detailed error messages of a single type
             # {{{
-            type <- match.arg(type)
-
-            .data <- private$m_check[[type]]
-            error_num <- nrow(.data)
-            index <- .data[, field_order]
-
-            title <- switch(type,
-                scalar = "Not Scalar",
-                missing = "Missing Required Field",
-                autosize = "Invalid Autosize Field",
-                autocalculate = "Invalid Autocalculate Field",
-                numeric = "Invalid Number",
-                character = "Invalid Character",
-                integer = "Invalid Integer",
-                choice = "Invalid Choice",
-                range = "Range Exceeding")
-
-            bullet <- switch(type,
-                scalar = "Fields below have multiple values.",
-                missing = "Fields below are required but values are not given.",
-                autosize = "Fields below cannot be `Autosize`.",
-                autocalculate = "Fields below cannot be `Autocalculate`.",
-                numeric = "Fields below should be numbers but are not.",
-                character = "Fields below should be characters but are not.",
-                integer = "Fields below are not or cannot be coerced into integers.",
-                choice = "Fields below are not one of prescribed choices.",
-                range = "Fields below exceed prescibed ranges.")
-
-            cli::cat_line()
-            cli::cat_rule(paste0("[", error_num, "] ", title))
-            cli::cat_bullet(bullet, bullet = "circle_cross")
-            ori_value <- private$m_value[index]
-            cli::cat_line(self$out_lines(index))
-            # }}}
-        },
-
-        no_error = function () {
-        # return TRUE if there is no error in current object
-            # {{{
-            purrr::map_lgl(private$m_check)
+            i_cat_errors(private$m_check, type, ip_unit)
             # }}}
         },
 
@@ -645,31 +528,25 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         },
 
         values_to_str = function (index = NULL, blank = FALSE) {
-        # convert all NAs to "" and change all values to character
+            # convert all NAs to "" and change all values to character
             # {{{
             if (is.null(index)) {
-                .value <- private$m_value
+                values <- private$m_value
             } else {
                 valid <- self$is_valid_field_index(index)
-                assert_that(all(valid), msg = paste0("Invalid field index found: ",
-                    backtick_collapse(index[!valid])))
-                .value <- private$m_value[index]
+                assert_that(all(valid),
+                    msg = paste0("Invalid field index found: ",
+                                 backtick_collapse(index[!valid]), "."))
+                values <- private$m_value[index]
             }
-
-            if (blank) {
-                res <- purrr::map(.value, ~ifelse(is.na(.x), "<Blank>", .x))
-            } else {
-                res <- purrr::map(.value, ~ifelse(is.na(.x), "", .x))
-            }
-
-            return(as.character(res))
+            i_values_to_str(values, blank)
             # }}}
         },
 
         out_index = function (index) {
         # return formated field index
             # {{{
-            out <- stringr::str_pad(index, nchar(max(index)), "left")
+            i_out_index(index)
             # }}}
         },
 
@@ -677,49 +554,29 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         # return IDF format value output
             # {{{
             values <- private$values_to_str(index, blank)
-
-            if (length(values) == length(private$m_value)) {
-                if (length(values) > 1L) {
-                    res <- c(paste0(values[-length(values)], ","),
-                             paste0(values[length(values)], ";"))
-                } else {
-                    res <- paste0(values, ";")
-                }
-            } else {
-                res <- paste0(values, ",")
-            }
-
-            spcs <- strrep(" ", leading)
-            res <- paste0(spcs, res)
-
-            res <- purrr::map_chr(res, ~
-                ifelse(nchar(.x) > length,
-                       paste0(.x, "  "),
-                       stringr::str_pad(.x, length, "right")))
-
-            return(res)
+            end <- length(values) == length(private$m_value)
+            i_out_values(values, end, leading, length, blank)
             # }}}
         },
 
         out_names = function (index = NULL, ip_units = FALSE) {
         # return IDF format field names
             # {{{
-            nms <- self$field_name(index = index, unit = TRUE, in_ip = ip_units)
-            paste0("!- ", nms)
+            if (!is.null(index)) {
+                valid <- index <= length(private$m_value)
+                if (!all(valid)) {
+                    warning("Indice larger than total field values have been remove.")
+                    index <- index[valid]
+                }
+            }
+            i_out_names(private$fields(index), ip_units)
             # }}}
         },
 
         out_comments = function () {
         # return formated comments
             # {{{
-            if (is_empty(private$m_comment)) return(invisible(NULL))
-
-            out <- private$m_comment
-            # TODO: add color to macro lines using `crayon` package
-            is_macro <- startsWith(out, "#")
-            out[!is_macro] <- paste0("!", out[!is_macro])
-
-            return(out)
+            i_out_comments(private$m_comment)
             # }}}
         }
         # }}}
@@ -727,7 +584,8 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 )
 # }}}
 
-# in_range{{{
+# in_range: check if input is in a specified range
+# {{{
 in_range <- function (x, range) {
     if (range$lower_incbounds) {
         l <- x >= range$lower
@@ -744,5 +602,383 @@ in_range <- function (x, range) {
     }
 
     return(u)
+}
+# }}}
+
+# i_check_object: check if there are errors in current object
+# {{{
+i_check_object = function (private, data = NULL, print = TRUE,
+                           cols = c("field_order", "_field", "_field_ip", "value")) {
+    private$m_check <- NULL
+    if (is.null(data)) {
+        private$m_check_field <- private$m_fields[
+            field_order <= length(private$m_value)][
+            , value := private$m_value]
+    } else {
+        private$m_check_field <- data
+    }
+    # on.exit({private$m_check_field <- NULL})
+
+    # check scalar
+    i_check_scalar(private, cols)
+    # check missing required fields
+    i_check_missing(private, cols)
+    # check invalid auto
+    i_check_auto(private, cols)
+    # exclude auto fields below during checking
+    private$m_check_field <- private$m_check_field[
+        !purrr::map_lgl(value, ~tolower(.x) %in% c("autosize", "autocalculate"))]
+    # check invalid type
+    i_check_type(private, cols)
+    # check invalid integer
+    i_check_integer(private, cols)
+    # check invalid choice
+    i_check_choice(private, cols = c(cols, "key"))
+    # check range exceeding
+    i_check_range(private, cols = c(cols, "range"))
+
+    data.table::setattr(private$m_check, "class", c("IDFCheckRes", "list"))
+    private$m_check
+}
+# }}}
+
+# i_check_scalar: check if every value is a scalar
+# {{{
+i_check_scalar <- function (private, cols = c("field_order", "_field",
+                                              "_field_ip", "value")) {
+    res_scalar <- private$m_check_field[!is.na(value)][
+        !purrr::map_lgl(value, is_scalar), ..cols]
+    private$m_check$scalar <- res_scalar
+    if (not_empty(res_scalar)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_scalar[, field_order]]
+    }
+}
+# }}}
+
+# i_check_missing: check if there are missing required values
+# {{{
+i_check_missing <- function (private, cols = c("field_order", "_field",
+                                               "_field_ip", "value")) {
+    res_missing <- private$m_check_field[required_field == TRUE][
+        purrr::map_lgl(value, `==`, "") |
+        purrr::map_lgl(value, is.na) |
+        purrr::map_lgl(value, is.null), ..cols]
+    private$m_check$missing <- res_missing
+    if (not_empty(res_missing)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_missing[, field_order]]
+    }
+}
+# }}}
+
+# i_check_auto: check if there are invalid autosize and autocalculate fields
+# {{{
+i_check_auto <- function (private, cols = c("field_order", "_field",
+                                            "_field_ip", "value")) {
+    # invalid autosize fields
+    res_autosize <- private$m_check_field[autosizable == FALSE][
+        tolower(unlist(value)) == "autosize", ..cols]
+    private$m_check$autosize <- res_autosize
+    if (not_empty(res_autosize)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_autosize[, field_order]]
+    }
+
+    # invalid autocalculate fields
+    res_autocalculate <- private$m_check_field[autocalculatable == FALSE][
+        tolower(unlist(value)) == "autocalculate", ..cols]
+    private$m_check$autocalculate <- res_autocalculate
+    if (not_empty(res_autocalculate)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_autocalculate[, field_order]]
+    }
+}
+# }}}
+
+# i_check_type: check if there are character values which should be numeric or vice versa
+# {{{
+i_check_type <- function (private, cols = c("field_order", "_field",
+                                            "_field_ip", "value")) {
+    # numeric type mismatch
+    res_numeric <- private$m_check_field[field_an == "N"][
+        !purrr::map_lgl(value, is.numeric), ..cols]
+    private$m_check$numeric <- res_numeric
+    if (not_empty(res_numeric)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_numeric[, field_order]]
+    }
+
+    # character type mismatch
+    res_character <- private$m_check_field[field_an == "A"][
+        !purrr::map_lgl(value, is.character), ..cols]
+    private$m_check$character <- res_character
+    if (not_empty(res_character)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_character[, field_order]]
+    }
+}
+# }}}
+
+# i_check_integer: check if there are invalid integer
+# {{{
+i_check_integer <- function (private, cols = c("field_order", "_field",
+                                               "_field_ip", "value")) {
+    res_integer <- private$m_check_field[!is.na(value)][type == "integer"][
+        !is_integerish(unlist(value)), ..cols]
+    private$m_check$integer <- res_integer
+    if (not_empty(res_integer)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_integer[, field_order]]
+    }
+}
+# }}}
+
+# i_check_choice: check if there are invalid choices
+# {{{
+i_check_choice <- function (private, cols = c("field_order", "_field",
+                                              "_field_ip", "value", "key")) {
+    res_choice <- private$m_check_field[!is.na(value)][type == "choice"][
+        !purrr::map2_lgl(value, key, ~tolower(.x) %in% tolower(.y)), ..cols]
+    private$m_check$choice <- res_choice
+    if (not_empty(res_choice)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_choice[, field_order]]
+    }
+}
+# }}}
+
+# i_check_range: check if the value exceeds range
+# {{{
+i_check_range <- function (private, cols = c("field_order", "_field",
+                                             "_field_ip", "value", "range")) {
+    res_range <- private$m_check_field[!is.na(value)][have_range == TRUE][
+        !purrr::map2_lgl(value, range, in_range), ..cols]
+    private$m_check$range <- res_range
+    if (not_empty(res_range)) {
+        private$m_check_field <- private$m_check_field[
+            !field_order %in% res_range[, field_order]]
+    }
+}
+# }}}
+
+# i_out_lines: return output lines for certain fields
+# {{{
+i_out_lines <- function (values, fields, ip_units = FALSE) {
+    .value <- i_out_values(values, leading = 1L, length = 20L, blank = TRUE)
+    .name <- i_out_names(fields, ip_units = ip_units)
+    .index <- i_out_index(fields[["field_order"]])
+    res <- paste0(.index, ":", .value, .name)
+    # check if there are class names in the fields
+    if (has_name(fields, "class") && has_name(fields, "object_id")) {
+        data.table::setorder(fields, class_order, object_id, field_order)
+        fields[, `:=`(out = as.list(res), row_id = .I), by = .I]
+
+        # add field char
+        last_field <- fields[, row_id[.N], by = list(class, object_id)]$V1
+        last_object <- fields[object_id %in% fields[, max(object_id), by = list(class_order)]$V1, unique(object_id)]
+        fields[!object_id %in% last_object & row_id %in% last_field,
+               out := list(list(paste0("  |  \\- ", out[[1]]))), by = row_id]
+        fields[!object_id %in% last_object & !row_id %in% last_field,
+               out := list(list(paste0("  |  +- ", out[[1]]))), by = row_id]
+        fields[object_id %in% last_object & row_id %in% last_field,
+               out := list(list(paste0("     \\- ", out[[1]]))), by = row_id]
+        fields[object_id %in% last_object & !row_id %in% last_field,
+               out := list(list(paste0("     +- ", out[[1]]))), by = row_id]
+
+        # add object char
+        first_row_per_object <- fields[, row_id[1], by = list(class_order, object_id)]$V1
+        first_row_per_last_object <- fields[object_id %in% last_object, row_id[1], by = object_id]$V1
+        fields[setdiff(first_row_per_object, first_row_per_last_object),
+               out := list(list(
+                    c(paste0("  +- Object [ID:", object_id,"]"),
+                      out[[1]]))),
+               by = list(row_id)]
+        fields[first_row_per_last_object,
+               out := list(list(
+                    c(paste0("  \\- Object [ID:", object_id,"]"),
+                      out[[1]]))),
+               by = list(row_id)]
+
+        # add class char
+        each_class <- fields[, row_id[1], by = class_order]$V1
+        fields[each_class,
+               out := list(list(
+                    c("",
+                      paste0("  Class ", backtick(class)),
+                      out[[1]]))),
+               by = row_id]
+
+        res <- unlist(fields[["out"]])
+        # clean
+        fields[, c("out", "row_id") := NULL]
+    } else {
+        res <- c("", paste0("  ", res))
+    }
+
+    return(res)
+}
+# }}}
+
+# i_out_names: return IDF format field names
+# {{{
+i_out_names <- function (fields, ip_units = FALSE) {
+    nms <- i_field_name_std(fields, unit = TRUE, in_ip = ip_units)
+    paste0("!- ", nms)
+}
+# }}}
+
+# i_field_name_std: return standard field name
+# {{{
+i_field_name_std <- function (fields, unit = FALSE, in_ip = FALSE) {
+    if (unit) {
+        if (in_ip) {
+            res <- fields[, `_field_ip`]
+        } else {
+            res <- fields[, `_field`]
+        }
+    } else {
+        res <- fields[, `_field_name`]
+    }
+
+    return(res)
+}
+# }}}
+
+# i_out_index: return right aligned field index
+# {{{
+i_out_index <- function (index) {
+    stringr::str_pad(index, nchar(max(index)), "left")
+}
+# }}}
+
+# i_out_values: return IDF format value output
+# {{{
+i_out_values <- function (values, end = FALSE, leading = 4L, length = 29L, blank = FALSE) {
+    values <- i_values_to_str(values, blank)
+
+    if (end) {
+        if (length(values) > 1L) {
+            res <- c(paste0(values[-length(values)], ","),
+                     paste0(values[length(values)], ";"))
+        } else {
+            res <- paste0(values, ";")
+        }
+    } else {
+        res <- paste0(values, ",")
+    }
+
+    res <- paste0(strrep(" ", leading), res)
+
+    long <- nchar(res) > length
+    res[long] <- paste0(res[long], " ")
+    res[!long] <- stringr::str_pad(res[!long], length, "right")
+
+    return(res)
+}
+# }}}
+
+# i_out_comments: return comments
+# {{{
+i_out_comments <- function (comments) {
+    if (is_empty(comments)) return(invisible(NULL))
+
+    out <- comments
+    # TODO: add color to macro lines using `crayon` package
+    is_macro <- startsWith(out, "#")
+    out[!is_macro] <- paste0("!", out[!is_macro])
+
+    return(out)
+}
+# }}}
+
+# i_values_to_str: convert all NAs to "" and change all values to character
+# {{{
+i_values_to_str <- function (values, blank = FALSE) {
+    if (blank) {
+        values[is.na(values)] <- list(rep("<Blank>", sum(is.na(values))))
+    } else {
+        values[is.na(values)] <- list(rep("", sum(is.na(values))))
+    }
+
+    return(as.character(values))
+}
+# }}}
+
+# print.IDFCheckRes: S3 method for printing IDF and IDFObject check results
+# {{{
+print.IDFCheckRes <- function (x, ip_unit = FALSE, ...) {
+    i_print_check(x, ip_unit = FALSE)
+}
+# }}}
+
+# i_print_check: print pretty check results
+# {{{
+i_print_check = function (check, ip_unit = FALSE) {
+    empty <- purrr::map_lgl(check, is_empty)
+    if (all(empty)) {
+        cli::cat_line(" ", clisymbols::symbol$tick, " ", "No error found.")
+    } else {
+        error_num <- sum(purrr::map_int(check[!empty], nrow))
+        cli::cat_line(" ", clisymbols::symbol$cross, " [", error_num, "] ",
+                      "Errors found during value validation.")
+        cli::cat_rule(line = 2)
+        purrr::iwalk(check[!empty], ~i_cat_errors(.x, .y, ip_unit))
+        cli::cat_line()
+    }
+}
+# }}}
+
+# i_cat_errors: cat detailed error messages of a single type
+# {{{
+i_cat_errors = function (check_data,
+                         type = c("class_missing", "class_duplicate", "scalar",
+                                  "missing", "autosize", "autocalculate",
+                                  "numeric", "character", "integer", "choice",
+                                  "range", "reference"),
+                         ip_units = FALSE) {
+    type <- match.arg(type)
+
+    error_num <- nrow(check_data)
+    index <- check_data[, field_order]
+
+    title <- switch(type,
+        class_missing = "Missing Required Object",
+        class_duplicate = "Duplicated Unique Object",
+        scalar = "Not Scalar",
+        missing = "Missing Required Field",
+        autosize = "Invalid Autosize Field",
+        autocalculate = "Invalid Autocalculate Field",
+        numeric = "Invalid Number",
+        character = "Invalid Character",
+        integer = "Invalid Integer",
+        choice = "Invalid Choice",
+        range = "Range Exceeding",
+        reference = "Invalid Reference")
+
+    bullet <- switch(type,
+        class_missing = "Objects below are required but not exist.",
+        class_duplicate = "Objects should be unique but have multiple instances.",
+        scalar = "Fields below have multiple values.",
+        missing = "Fields below are required but values are not given.",
+        autosize = "Fields below cannot be `Autosize`.",
+        autocalculate = "Fields below cannot be `Autocalculate`.",
+        numeric = "Fields below should be numbers but are not.",
+        character = "Fields below should be characters but are not.",
+        integer = "Fields below are not or cannot be coerced into integers.",
+        choice = "Fields below are not one of prescribed choices.",
+        range = "Fields below exceed prescibed ranges.",
+        reference = "Fields below are not one of valid references.")
+
+    cli::cat_line()
+    cli::cat_rule(paste0("[", error_num, "] ", title))
+    cli::cat_bullet(bullet, bullet = "circle_cross")
+    if (type == "class_missing") {
+        cli::cat_line(backtick_collapse(check_data$class))
+    } else if (type == "class_duplicate") {
+        cli::cat_line()
+    } else {
+        cli::cat_line(i_out_lines(check_data$value, check_data, ip_units))
+    }
 }
 # }}}

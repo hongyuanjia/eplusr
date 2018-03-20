@@ -291,6 +291,9 @@ on_failure(has_name) <- function(call, env) {
 is_integerish <- function(x) {
     is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
 }
+on_failure(is_integerish) <- function(call, env) {
+  paste0(deparse(call$x), " is neither an integer nor can be converted into an integer")
+}
 # }}}
 # has_ext {{{
 has_ext <- function (path, ext) {
