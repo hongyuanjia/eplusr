@@ -71,9 +71,6 @@
 #' `$class_order(class)` returns integer orders (orders of name apperarance in
 #' the IDD file) of that `class`.
 #'
-#' `$orders()` returns the all order data (stored as a data.table with four
-#' columns, i.e. "group", "group_order", "class", "class_order").
-#'
 #' `$object(class)` returns an IDDObject of that `class`.
 #'
 #' `$objects(class)` returns a list of IDDObjects of `class`es. If `class` is
@@ -110,10 +107,14 @@ IDD <- R6::R6Class(classname = "IDD",
 
             private$m_version<- idd_file$version
             private$m_build <- idd_file$build
-            private$m_orders <- idd_file$order
+            private$m_objects <- idd_file$data[,
+                object := list(list(IDDObject$new(data_class, data_field))),
+                by = class_order]
+            private$m_reference <- idd_file$reference
+            private$m_external <- idd_file$external
 
-            private$m_objects <- purrr::map(idd_file$data, IDDObject$new)
-            names(private$m_objects) <- private$m_orders[, class]
+            # private$m_objects <- purrr::map(idd_file$data, IDDObject$new)
+            # names(private$m_objects) <- private$m_orders[, class]
         },
         # }}}
 
@@ -128,27 +129,27 @@ IDD <- R6::R6Class(classname = "IDD",
         },
 
         group_name = function (class = NULL) {
-            if (is_empty(class)) return(private$m_orders[, group])
+            if (is_empty(class)) return(private$m_objects[["group"]])
             assert_that(self$is_valid_class(class))
             cls <- class
-            private$m_orders[class %in% cls, group]
+            private$m_objects[class %in% cls, group]
         },
 
         class_name = function (group = NULL) {
-            if (is_empty(group)) return(private$m_orders[, class])
+            if (is_empty(group)) return(private$m_objects[["class"]])
             assert_that(self$is_valid_group(group))
             grp <- group
-            private$m_orders[group %in% grp, class]
+            private$m_objects[group %in% grp, class]
         },
 
         group_order = function (group = NULL) {
             if (is_empty(group)) {
-                res <- private$m_orders[, group_order]
-                names(res) <- private$m_orders[, group]
+                res <- private$m_objects[["group_order"]]
+                names(res) <- private$m_objects[["group"]]
             } else {
                 assert_that(self$is_valid_group(group))
                 grp <- group
-                res <- private$m_orders[group %in% grp, group_order]
+                res <- private$m_objects[group %in% grp, group_order]
                 names(res) <- grp
             }
             return(res)
@@ -156,35 +157,48 @@ IDD <- R6::R6Class(classname = "IDD",
 
         class_order = function (class = NULL) {
             if (is_empty(class)) {
-                res <- private$m_orders[, class_order]
-                names(res) <- private$m_orders[, class]
+                res <- private$m_objects[["class_order"]]
+                names(res) <- private$m_objects[["class"]]
             } else {
                 assert_that(self$is_valid_class(class))
                 cls <- class
-                res <- private$m_orders[class %in% cls, class_order]
+                res <- private$m_objects[class %in% cls, class_order]
                 names(res) <- cls
             }
             return(res)
         },
 
-        orders = function () {
-            return(private$m_orders)
-        },
-
         object = function (class) {
             assert_that(self$is_valid_class(class))
-            return(private$m_objects[class][[1]])
+            cls <- class
+            return(private$m_objects[class == cls, object][[1]])
         },
 
         objects = function (class = NULL) {
-            if (is_empty(name)) return(private$m_objects)
-            assert_that(self$is_valid_class(class))
-            return(private$m_objects[class])
+            if (is_empty(class)) return(private$m_objects[["object"]])
+            private$assert_valid_class(class)
+            cls <- class
+            return(private$m_objects[class %in% cls, object])
         },
 
         objects_in_group = function (group) {
-            cls <- self$class_name(group)
-            return(private$m_objects[cls])
+            self$is_valid_group(group)
+            grp <- group
+            return(private$m_objects[group == grp, object])
+        },
+
+        reference = function () {
+            # return reference data
+            # {{{
+            private$m_reference
+            # }}}
+        },
+
+        external = function () {
+            # return external reference data
+            # {{{
+            private$m_external
+            # }}}
         },
         # }}}
 
@@ -192,19 +206,19 @@ IDD <- R6::R6Class(classname = "IDD",
         # {{{
         is_valid_group = function (group) {
             assert_that(is_string(group))
-            group %in% private$m_orders[, group]
+            group %in% private$m_objects[["group"]]
         },
 
         is_valid_class = function (class) {
             assert_that(is_string(class))
-            class %in% names(private$m_objects)
+            class %in% private$m_objects[["class"]]
         },
         # }}}
 
         print = function () {
             ver <- paste0("Version: ", private$m_version)
             bld <- paste0("Build: ", private$m_build)
-            cls <- paste0("Total Class: ", private$m_orders[, .N])
+            cls <- paste0("Total Class: ", nrow(private$m_objects))
             cli::cat_rule(left = "EnergyPlus Input Data Dictionary")
             cli::cat_bullet(ver)
             cli::cat_bullet(bld)
@@ -217,8 +231,9 @@ IDD <- R6::R6Class(classname = "IDD",
         # {{{
         m_version = character(),
         m_build = character(),
-        m_orders = data.table(),
-        m_objects = list(),
+        m_objects = data.table(),
+        m_reference = list(),
+        m_external = list(),
         # }}}
 
         # PRIVATE FUNCTIONS
@@ -605,6 +620,7 @@ parse_idd <- function(path) {
     if (!has_name(idd_field, "reference")) idd_field[, reference := NA_character_]
     if (!has_name(idd_field, "key")) idd_field[, key := NA_character_]
     if (!has_name(idd_field, "object_list")) idd_field[, object_list := NA_character_]
+    if (!has_name(idd_field, "external_list")) idd_field[, external_list := NA_character_]
     if (!has_name(idd_field, "field")) idd_field[, field := NA_character_]
     if (!has_name(idd_field, "units")) idd_field[, units := NA_character_]
     if (!has_name(idd_field, "ip_units")) idd_field[, ip_units := NA_character_]
@@ -667,10 +683,17 @@ parse_idd <- function(path) {
     # split objectList
     idd_field[, new_object_list := list(strsplit(object_list, " ", fixed = TRUE)),
               by = c("class_order", "field_order")]
-    # idd_field[, object_list := NULL]
     data.table::setnames(idd_field,
                          c("new_object_list", "object_list"),
                          c("object_list", "object_list_string"))
+
+    # split externalList
+    idd_field[, new_external_list := list(strsplit(external_list, " ", fixed = TRUE)),
+              by = c("class_order", "field_order")]
+    data.table::setnames(idd_field,
+                         c("new_external_list", "external_list"),
+                         c("external_list", "external_list_string"))
+
 
     # add field standard and lower case field names
     idd_field[is.na(field), `_field_name` := field_anid]
@@ -778,8 +801,16 @@ parse_idd <- function(path) {
                           reference_field = idd_reference_field)
     # }}}
 
-    # restore group and class order data
-    idd_order <- idd_class[, .SD, .SDcol = c("group_order", "group", "class_order", "class")]
+    # EXTERNAL data
+    # {{{
+    # External List data
+    idd_external_list <- idd_field[!is.na(external_list_string),
+        list(class_order, class, field_order, external_list)]
+    idd_field[, `:=`(external_list_string = NULL)]
+    idd_external <- list(external_list = idd_external_list,
+                         reference_rdd = list(),
+                         reference_mdd = list())
+    # }}}
 
     pb$update(0.85, tokens = list(what = "Parsing "))
     # split class data per class name
@@ -789,17 +820,15 @@ parse_idd <- function(path) {
     # split field data per field name
     idd_field_per_class <- split(idd_field, by = "class")
 
-    idd_data <- purrr::transpose(list(class = idd_class_per_class,
-                                      field = idd_field_per_class))
+    idd_data <- idd_class[, `:=`(data_class = idd_class_per_class,
+                                 data_field = idd_field_per_class)]
 
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
-                order = idd_order,
-                class = idd_class,
-                field = idd_field,
+                data = idd_data,
                 reference = idd_reference,
-                data = idd_data)
+                external = idd_external)
     # set class to IDD
     data.table::setattr(idd, "class", c("IDD_File", class(idd)))
     pb$tick(100L, tokens = list(what = "Complete"))
