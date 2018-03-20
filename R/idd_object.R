@@ -195,10 +195,10 @@ NULL
 IDDObject <- R6::R6Class(classname = "IDDObject",
 
     public = list(
-        initialize = function (list) {
+        initialize = function (data_class, data_field) {
             # {{{
-            private$m_properties <- list$class
-            private$m_fields <- list$field
+            private$m_properties <- data_class[[1]]
+            private$m_fields <- data_field[[1]]
             # }}}
         },
 
@@ -274,18 +274,18 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         reference_class_name = function () {
             # return reference class name
             # {{{
-            .data <- private$m_properties$reference_class_name
-            if (is.na(.data)) return(.data)
-            return(strsplit(.data, " ", fixed = TRUE)[[1]])
+            return(private$m_properties$reference_class_name)
             # }}}
         },
 
         first_extensible = function () {
             # return index of the first extensible field
             # {{{
-            .data <- private$m_fields[begin_extensible == TRUE, field_order]
-            if (is_empty(.data)) return(0L)
-            return(.data)
+            x <- which(private$m_fields[["begin_extensible"]])
+            ifelse(is_empty(x), 0L, x)
+            # .data <- private$m_fields[begin_extensible == TRUE, field_order]
+            # if (is_empty(.data)) return(0L)
+            # return(.data)
             # }}}
         },
 
@@ -381,7 +381,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # return field index by field name (in either standard or lower case
             # format)
             # {{{
-            if (is.null(name)) return(seq_len(self$num_fields()))
+            if (is.null(name)) return(private$all_indice())
             private$assert_valid_field_index(name)
             res <- match(name, name_std)
             res_lc <- match(name, name_lc)
@@ -494,6 +494,16 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # }}}
         },
 
+        is_extensible_field_index = function (index) {
+            # TODO: add documentation
+            # check if input index is a valid extensible field index
+            # {{{
+            assert_that(is_count(index))
+            if (self$is_extensible()) return(FALSE)
+            ifelse(index >= self$first_extensible(), TRUE, FALSE)
+            # }}}
+        },
+
         is_valid_field_name = function (name) {
             # check if input name is a valid field name
             # {{{
@@ -522,7 +532,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         is_autocalculatable_field = function (index = NULL, name = NULL) {
             # check if a field is autocalculatable or not
             # {{{
-            i_iddobject_is_autocalculatable_field(self, private, index, name)
+            assert_that(is_single_key(index, name))
+            private$fields(index, name)[, autocalculatable]
             # }}}
         },
 
@@ -556,7 +567,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             cli::cat_line(clisymbols::symbol$star, clisymbols::symbol$star,
                           " Class: ", backtick(self$class_name()), " ",
                           clisymbols::symbol$star, clisymbols::symbol$star)
-            cli::cat_rule(center = "* MEMO* ", line = 1)
+            cli::cat_rule(center = "* MEMO *", line = 1)
             cli::cat_line("  \"", msg(self$memo()), "\"")
             cli::cat_rule(center = "* PROPERTIES *", line = 1)
             cli::cat_line("  Group: ", self$group_name())
@@ -567,12 +578,14 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             cli::cat_line("  Minimum fields: ", self$min_fields())
             cli::cat_line("  Extensible field number: ", self$num_extensible())
             cli::cat_line("  First extensible field index: ", self$first_extensible())
-            cli::cat_rule(center = "* FIELDS* ", line = 1)
+            cli::cat_rule(center = "* FIELDS *", line = 1)
 
             if (self$is_extensible()) {
                 first_ext <- self$first_extensible()
                 last_ext <- first_ext + self$num_extensible() - 1L
-                last_req <- private$m_fields[required_field == TRUE, max(field_order)]
+                req <- private$m_fields[required_field == TRUE, field_order]
+                last_req <- ifelse(is_empty(req), 0L, max(req))
+                # last_req <- private$m_fields[required_field == TRUE, max(field_order)]
                 num_print <- max(last_ext, last_req)
                 mark_ext <- character(num_print)
                 mark_ext[seq.int(first_ext, last_ext)] <- paste0(" <", clisymbols::symbol$arrow_down, ">")
@@ -584,8 +597,10 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
 
             nms <- self$field_name(unit = TRUE, in_ip = ip_unit)[lines]
             index <- stringr::str_pad(lines, nchar(num_print), "left")
-            required <- private$m_fields[field_order <= num_print][
+            required <- private$m_fields[field_order <= num_print &
                 required_field == TRUE, field_order]
+            # required <- private$m_fields[field_order <= num_print][
+            #     required_field == TRUE, field_order]
 
             if (not_empty(required)) {
                 mark_req <- character(length(nms))
@@ -635,7 +650,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
                 index <- purrr::map_chr(name, self$field_index)
                 out <- private$m_fields[index]
             } else {
-                out <- private$m_fields
+                # this makes sure that it is save to call $fields() in IDFObject
+                out <- private$m_fields[private$all_indice()]
             }
 
             return(out)
@@ -645,26 +661,14 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         field_name_std = function (index = NULL, unit = FALSE, in_ip = FALSE) {
         # return standard field name
             # {{{
-            .data <- private$m_fields
+            fields <- private$m_fields
             if (not_empty(index)) {
-                assert_that(is.numeric(index))
-                valid <- self$is_valid_field_index(index)
-                assert_that(all(valid),
-                            msg = paste0("Invalid field index found: ",
-                                         paste0(backtick(index[valid]), collapse = ", ")))
-                .data <- .data[index]
-            }
-            if (unit) {
-                if (in_ip) {
-                    res <- .data[, `_field_ip`]
-                } else {
-                    res <- .data[, `_field`]
-                }
+                private$assert_valid_field_index(index)
+                fields <- fields[index]
             } else {
-                res <- .data[, `_field_name`]
+                fields <- fields[private$all_indice()]
             }
-
-            return(res)
+            i_field_name_std(fields, unit, in_ip)
             # }}}
         },
 
@@ -716,6 +720,25 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             .data[, field_order := num_field + added_field_id]
 
             return(.data)
+            # }}}
+        },
+
+        assert_valid_field_index = function (index) {
+            # assert that all input are valid field indice.
+            # {{{
+            assert_that(is.numeric(index))
+            valid <- purrr::map_lgl(index, self$is_valid_field_index)
+            assert_that(all(valid),
+                msg = paste0("Invalid field index found for class: ",
+                             self$class_name(),": ",
+                             backtick_collapse(index[!valid]), "."))
+            # }}}
+        },
+
+        all_indice = function () {
+            # get default indice
+            # {{{
+            seq_len(self$num_fields())
             # }}}
         }
         # }}}
