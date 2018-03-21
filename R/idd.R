@@ -112,9 +112,6 @@ IDD <- R6::R6Class(classname = "IDD",
                 by = class_order]
             private$m_reference <- idd_file$reference
             private$m_external <- idd_file$external
-
-            # private$m_objects <- purrr::map(idd_file$data, IDDObject$new)
-            # names(private$m_objects) <- private$m_orders[, class]
         },
         # }}}
 
@@ -182,9 +179,23 @@ IDD <- R6::R6Class(classname = "IDD",
         },
 
         objects_in_group = function (group) {
-            self$is_valid_group(group)
+            assert_that(self$is_valid_group(group))
             grp <- group
             return(private$m_objects[group == grp, object])
+        },
+
+        required_objects = function () {
+            # return a list of all required IDDObjects
+            # {{{
+            private$m_objects[required_object == TRUE, object]
+            # }}}
+        },
+
+        unique_objects = function () {
+            # return a list of all unique IDDObjcts
+            # {{{
+            private$m_objects[unique_object == TRUE, object]
+            # }}}
         },
 
         reference = function () {
@@ -255,9 +266,7 @@ IDD <- R6::R6Class(classname = "IDD",
             # {{{
             valid <- purrr::map_lgl(class, self$is_valid_class)
             assert_that(all(valid),
-                msg = paste0("Invalid class names found for current IDD",
-                             "(Version: ", self$version(),",",
-                             "Build: ", self$build(), "): ",
+                msg = paste0("Invalid class name found: ",
                              backtick_collapse(class[!valid]), "."))
             # }}}
         }
@@ -336,7 +345,7 @@ parse_idd <- function(path) {
     # if there are still known lines, report an error
     line_error_invalid <- idd_dt[type == type_unknown, which = TRUE]
     if (not_empty(line_error_invalid)) {
-        parse_issue(path, type = "Invalid line found", src = "IDD", stop = TRUE,
+        parse_issue(type = "Invalid line found", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_invalid, list(line, string)])
     }
     # }}}
@@ -469,34 +478,34 @@ parse_idd <- function(path) {
     # check for unsupported slash keys
     line_error_slash_key <- idd_dt[slash_supported == FALSE, which = TRUE]
     if (length(line_error_slash_key) > 0L) {
-        parse_issue(path, type = "Invalid slash key found.", src = "IDD", stop = TRUE,
+        parse_issue(type = "Invalid slash key found.", src = "IDD", stop = TRUE,
                     data_errors = idd_dt[line_error_slash_key, list(line, string)])
     }
     # remove comments for "\extensible:<#>"
     # check for unsupported slash values
     idd_dt[, slash_value_upper := toupper(slash_value)]
     # \type {{{
-    line_error_type <- idd_dt[slash_key == "TYPE"][
+    line_error_type <- idd_dt[slash_key == "TYPE" &
        !(slash_value_upper %in% c("REAL", "INTEGER", "ALPHA", "CHOICE",
             "OBJECT-LIST", "EXTERNAL-LIST", "NODE")), which = TRUE]
     if (length(line_error_type) > 0) {
-        parse_issue(path, "Invalid \\type found", idd_dt[line_error_type, list(line, string)])
+        parse_issue("Invalid \\type found", idd_dt[line_error_type, list(line, string)])
     }
     # }}}
     # \external-List {{{
-    line_error_external_list <- idd_dt[slash_key %in% "EXTERNAL-LIST"][
+    line_error_external_list <- idd_dt[slash_key == "EXTERNAL-LIST" &
            !(slash_value_upper %in% c("AUTORDDVARIABLE", "AUTORDDMETER",
                "AUTORDDVARIABLEMETER")), which = TRUE]
-    if (length(line_error_type) > 0) {
-        parse_issue(path, "Invalid \\external-list found", idd_dt[line_error_type, list(line, string)])
+    if (length(line_error_external_list) > 0) {
+        parse_issue("Invalid \\external-list found", idd_dt[line_error_external_list, list(line, string)])
     }
     # }}}
     # \format {{{
-    line_error_format <- idd_dt[slash_key %in% "FORMAT"][
+    line_error_format <- idd_dt[slash_key %in% "FORMAT" &
         !(slash_value_upper %in% c("SINGLELINE", "VERTICES", "COMPACTSCHEDULE",
             "FLUIDPROPERTY", "VIEWFACTOR", "SPECTRAL")), which = TRUE]
     if (length(line_error_format) > 0) {
-        parse_issue(path, "Invalid \\format found", idd_dt[line_error_format, list(line, string)])
+        parse_issue("Invalid \\format found", idd_dt[line_error_format, list(line, string)])
     }
     # }}}
     # }}}
@@ -708,6 +717,15 @@ parse_idd <- function(path) {
     idd_field[is.na(ip_units), `_field_ip` := `_field_name`]
 
     data.table::setorder(idd_field, class_order, field_order)
+    neworder <- c("class_order", "class", "field_order", "field", "field_anid",
+                  "field_an", "field_id", "units", "ip_units", "required_field",
+                  "type", "have_range", "range", "default", "key", "autosizable",
+                  "autocalculatable", "note", "begin_extensible", "reference",
+                  "object_list", "external_list", "unitsbasedonfield", "_field_name",
+                  "_unit", "_ip_unit", "_field", "_field_ip",
+                  "reference_string", "object_list_string", "external_list_string")
+    idd_field <- idd_field[, .SD, .SDcol = neworder]
+    data.table::setcolorder(idd_field, neworder)
     # }}}
 
     pb$update(0.8, tokens = list(what = "Parsing "))
@@ -857,7 +875,7 @@ read_idd <- function(filepath) {
 
 #' @importFrom cli rule
 # parse_issue {{{
-parse_issue <- function (path = NULL, type = "", data_errors = NULL, info = NULL,
+parse_issue <- function (type, data_errors = NULL, info = NULL,
                          src = c("IDD", "IDF"), stop = TRUE, quote = TRUE) {
     if (!is.null(info)) {
         sep <- paste0(cli::rule(), "\n")
@@ -895,11 +913,7 @@ parse_issue <- function (path = NULL, type = "", data_errors = NULL, info = NULL
                            data_errors[["string"]]), collapse = "\n")
     }
 
-    if (is.null(path)) {
-        header <- sprintf("%s PARSING ERROR", src)
-    } else {
-        header <- sprintf("%s PARSING ERROR for file %s", src, backtick(path))
-    }
+    header <- sprintf("%s PARSING ERROR", src)
 
     mes <- paste0("\n",
         cli::rule(line = 2), "\n",
