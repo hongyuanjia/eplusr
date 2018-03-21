@@ -382,7 +382,9 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # format)
             # {{{
             if (is.null(name)) return(private$all_indice())
-            private$assert_valid_field_index(name)
+            private$assert_valid_field_name(name)
+            name_std <- private$field_name_std()
+            name_lc <- private$field_name_lcase()
             res <- match(name, name_std)
             res_lc <- match(name, name_lc)
             res[is.na(res)] <- res_lc[is.na(res)]
@@ -508,7 +510,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # check if input name is a valid field name
             # {{{
             assert_that(is_string(name))
-            name %in% private$field_name_std() |
+            name %in% private$field_name_std() ||
             name %in% private$field_name_lcase()
             # }}}
         },
@@ -568,7 +570,11 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
                           " Class: ", backtick(self$class_name()), " ",
                           clisymbols::symbol$star, clisymbols::symbol$star)
             cli::cat_rule(center = "* MEMO *", line = 1)
-            cli::cat_line("  \"", msg(self$memo()), "\"")
+            if (is.na(self$memo())) {
+                cli::cat_line("  <No Memo>")
+            } else {
+                cli::cat_line("  \"", msg(self$memo()), "\"")
+            }
             cli::cat_rule(center = "* PROPERTIES *", line = 1)
             cli::cat_line("  Group: ", self$group_name())
             cli::cat_line("  Unique object: ", self$is_unique())
@@ -634,20 +640,16 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # {{{
             # either 'index' or 'name' should be used, not both
             if (all(not_empty(index), not_empty(name))) {
-                warning("Both 'index' and 'name' are given. 'name' will be ignored.",
+                warning("Both `index` and `name` are given. `name` will be ignored.",
                         call. = FALSE)
                 name <- NULL
             }
 
             if (not_empty(index)) {
-                valid <- purrr::map_lgl(index, self$is_valid_field_index)
-                assert_that(all(valid),
-                            msg = paste0("Invalid field index found for class ",
-                                         backtick(self$class_name()), ": ",
-                                         backtick_collapse(index[!valid]), "."))
+                private$assert_valid_field_index(index)
                 out <- private$m_fields[index]
             } else if (not_empty(name)) {
-                index <- purrr::map_chr(name, self$field_index)
+                index <- self$field_index(name = name)
                 out <- private$m_fields[index]
             } else {
                 # this makes sure that it is save to call $fields() in IDFObject
@@ -661,14 +663,9 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         field_name_std = function (index = NULL, unit = FALSE, in_ip = FALSE) {
         # return standard field name
             # {{{
-            fields <- private$m_fields
-            if (not_empty(index)) {
-                private$assert_valid_field_index(index)
-                fields <- fields[index]
-            } else {
-                fields <- fields[private$all_indice()]
-            }
-            i_field_name_std(fields, unit, in_ip)
+            index <- index %||% private$all_indice()
+            private$assert_valid_field_index(index)
+            i_field_name_std(private$m_fields[index], unit, in_ip)
             # }}}
         },
 
@@ -694,6 +691,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # }}}
         },
 
+        # TODO: update idd reference_field data when extensible groups are added
+        # and have \objectList attributes
         append_extensible_numbers = function (num = 1L) {
         # append numbers in field, field_id, field_anid, and field_order in
         # extensible groups
@@ -723,13 +722,25 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # }}}
         },
 
+        assert_valid_field_name = function (name) {
+            # assert that all input are valid field names.
+            # {{{
+            assert_that(is.character(name))
+            valid <- purrr::map_lgl(name, self$is_valid_field_name)
+            assert_that(all(valid),
+                msg = paste0("Invalid field name found for class ",
+                             self$class_name(),": ",
+                             backtick_collapse(name[!valid]), "."))
+            # }}}
+        },
+
         assert_valid_field_index = function (index) {
             # assert that all input are valid field indice.
             # {{{
             assert_that(is.numeric(index))
             valid <- purrr::map_lgl(index, self$is_valid_field_index)
             assert_that(all(valid),
-                msg = paste0("Invalid field index found for class: ",
+                msg = paste0("Invalid field index found for class ",
                              self$class_name(),": ",
                              backtick_collapse(index[!valid]), "."))
             # }}}
