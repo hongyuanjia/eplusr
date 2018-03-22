@@ -301,6 +301,24 @@ describe("$class_name()", {
     })
 })
 
+describe("$required_class_name()", {
+    it("can return names of all required classes", {
+        expect_equal(idd$required_class_name(), "TestSlash")
+    })
+})
+
+describe("$unique_class_name()", {
+    it("can return names of all unique classes", {
+        expect_equal(idd$unique_class_name(), "TestSlash")
+    })
+})
+
+describe("$extensible_class_name()", {
+    it("can return names of all extensible classes", {
+        expect_equal(idd$extensible_class_name(), "TestSlash")
+    })
+})
+
 describe("$group_order()", {
     it("can return all group orders", {
            expect_equal(idd$group_order(), c(`TestGroup1` = 1L, `TestGroup2` = 2L))
