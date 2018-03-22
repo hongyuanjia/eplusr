@@ -1,6 +1,6 @@
-context("Parse method")
+context("IDF method")
 
-test_that("Parse IDF works", {
+describe("IDF related", {
 
     path <- "files/5Zone_Transformer_8.8.idf"
 
@@ -50,10 +50,37 @@ test_that("Parse IDF works", {
 
     idd <- IDD$new("files/V8-8-0-Energy+.idd")
 
-    expect_silent(idf_str <- read_idd(text_idf))
-    expect_equal(get_idf_ver(idf_str), "8.8")
-    expect_silent(idf_parsed <- parse_idf(text_idf, idd))
-    expect_silent(idf <- IDF$new(text_idf, idd))
+    describe("Preprocess IDF files"
+        it("can read IDF stored in files", {
+            expect_silent(idf_str <- read_idd(path))
+        })
+
+        it("can read IDF stored in strings", {
+            expect_silent(idf_str <- read_idd(text_idf))
+        })
+
+        it("can correctly get IDF version", {
+            expect_equal(get_idf_ver(idf_str), "8.8")
+        })
+
+        it("has not tested what would happen when no version")
+    )
+
+    describe("Parse IDF files",
+        it("can parse IDF stored in files", {
+            expect_silent(idf_parsed <- parse_idf(path, idd))
+        })
+
+        it("can parse IDF stored in strings", {
+            expect_silent(idf_parsed <- parse_idf(text_idf, idd))
+        })
+    )
+
+    describe("IDF methods",
+        it("can create new IDF object", {
+            expect_silent(idf <- IDF$new(text_idf, idd))
+        })
+    )
 
     expect_equal(idf$version(), "8.8")
 
@@ -79,7 +106,6 @@ test_that("Parse IDF works", {
     expect_equal(class(idf$objects(1:2)), "list")
     expect_equal(length(idf$objects(1:2)), 2L)
     expect_error(idf$objects(1:5), "`5` is not a valid object ID in current IDF.")
-
 
     expect_silent(idf$objects_in_class("Building"))
     expect_equal(idf$objects_in_class("Building"), idf$objects(3))
