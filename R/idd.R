@@ -372,10 +372,16 @@ parse_idd <- function(path) {
     idd_dt[, field_count := 0L]
     idd_dt[type %in% c(type_field, type_field_last),
            field_count := char_count(field_anid, "[,;]")]
-    idd_dt <- idd_dt[type %in% c(type_field, type_field_last),
-        strsplit(field_anid, "\\s*[,;]\\s*"), by = list(line)][
+    # applause to Matt Dowle:
+    # https://stackoverflow.com/questions/15673662/applying-a-function-to-each-row-of-a-data-table
+    idd_dt <- idd_dt[data.table::between(type, type_field, type_field_last),
+        {s <- strsplit(field_anid, "\\s*[,;]\\s*");
+         list(line = rep(line, sapply(s, length)), V1 = unlist(s))}][
         idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
-    data.table::setnames(idd_dt, "V1", "field_anid")
+    # idd_dt <- idd_dt[type %in% c(type_field, type_field_last),
+    #     strsplit(field_anid, "\\s*[,;]\\s*"), by = list(line)][
+    #     idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
+    # data.table::setnames(idd_dt, "V1", "field_anid")
     # get row numeber of last field per condensed field line in each class
     idd_dt[, row_id := .I]
     line_field_last <- idd_dt[field_count> 1L][type == type_field_last,
