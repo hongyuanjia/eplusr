@@ -82,9 +82,6 @@ the IDD file) of that \code{group}.
 \code{$class_order(class)} returns integer orders (orders of name apperarance in
 the IDD file) of that \code{class}.
 
-\code{$orders()} returns the all order data (stored as a data.table with four
-columns, i.e. "group", "group_order", "class", "class_order").
-
 \code{$object(class)} returns an IDDObject of that \code{class}.
 
 \code{$objects(class)} returns a list of IDDObjects of \code{class}es. If \code{class} is

@@ -17,7 +17,7 @@ class. \code{IDFObject} inherits \code{\link{IDDObject}}, so all methods of
 idfobj <- IDFObject$new(list, idd)
 
 idfobj$get_comment()
-idfobj$set_comment(comment, append = TRUE, wrap = 0L)
+idfobj$set_comment(comment, append = TRUE, width = 0L)
 idfobj$get_value(index = NULL, name = NULL)
 idfobj$set_value(...)
 

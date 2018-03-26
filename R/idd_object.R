@@ -310,13 +310,33 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         add_extensible_groups = function (num = 1L) {
             # add one or more extensible groups
             # {{{
-            assert_that(is_integerish(num), num > 0L,
-                        msg = "`num` should be a positive integer.")
-            private$assert_is_extensible()
+            assert_that(is_count(num))
+            assert_that(self$is_extensible(),
+                        msg = paste0("Class ", self$class_name(), " is not extensible. ",
+                                     "Failed to add extensible group."))
             .data <- data.table::rbindlist(
                  purrr::map(seq_len(num),
                             ~private$append_extensible_numbers(.x)))
             private$m_fields <- data.table::rbindlist(list(private$m_fields, .data))
+            private$m_properties[, num_fields := {private$m_fields[, .N]}]
+            return(self)
+            # }}}
+        },
+
+        del_extensible_groups = function (num = 1L) {
+            # delete extensible groups
+            # {{{
+            assert_that(is_count(num))
+            assert_that(self$is_extensible(),
+                        msg = paste0("Class ", self$class_name(), " is not extensible. ",
+                                     "Failed to add extensible group."))
+            assert_that(num < private$num_extensible_group(),
+                        msg = paste0("Only one extensible group exists in Class ",
+                                     self$class_name(), ". ",
+                                     "Failed to delete extensible group."))
+            line_left <- self$num_fields() - num * self$num_extensible()
+            line_del <- (line_left + 1L) : self$num_fields()
+            private$m_fields <- private$m_fields[-line_del]
             private$m_properties[, num_fields := {private$m_fields[, .N]}]
             return(self)
             # }}}
@@ -470,6 +490,13 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             names(res) <- out
             # }}}
         },
+
+        field_note = function (index = NULL, name = NULL) {
+            # return field note by field index
+            # {{{
+            private$fields(index, name)[, note]
+            # }}}
+        },
         # }}}
 
         # ASSERTIONS
@@ -480,11 +507,11 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # {{{
             assert_that(is_count(num))
             # if has \min-fields
-            min_num <- self$min_fields()
+            min_num <- private$m_properties$min_fields
             if (min_num > 0L & min_num > num) return(FALSE)
             # if no \extensible:<#>
             if (!self$is_extensible()) {
-                if (self$num_fields() < num) return(FALSE) else return(TRUE)
+                if (private$m_properties$num_fields < num) return(FALSE) else return(TRUE)
             # if has \extensible:<#>
             } else {
                 if (private$get_extensible_field_index(num) == 0L) {
@@ -519,7 +546,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # check if input index is a valid field index
             # {{{
             assert_that(is_count(index))
-            index <= self$num_fields()
+            index <= private$m_properties$num_fields
             # }}}
         },
 
@@ -605,8 +632,6 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             index <- stringr::str_pad(lines, nchar(num_print), "left")
             required <- private$m_fields[field_order <= num_print &
                 required_field == TRUE, field_order]
-            # required <- private$m_fields[field_order <= num_print][
-            #     required_field == TRUE, field_order]
 
             if (not_empty(required)) {
                 mark_req <- character(length(nms))
@@ -635,8 +660,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         # PRIVATE FUNCTIONS
         # {{{
         fields = function (index = NULL, name = NULL) {
-        # return single field data by field index or field name (either in
-        # standard format or lower case format)
+            # return single field data by field index or field name (either in
+            # standard format or lower case format)
             # {{{
             # either 'index' or 'name' should be used, not both
             if (all(not_empty(index), not_empty(name))) {
@@ -653,7 +678,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
                 out <- private$m_fields[index]
             } else {
                 # this makes sure that it is save to call $fields() in IDFObject
-                out <- private$m_fields[private$all_indice()]
+                out <- private$m_fields
             }
 
             return(out)

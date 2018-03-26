@@ -139,6 +139,27 @@ IDD <- R6::R6Class(classname = "IDD",
             private$m_objects[group %in% grp, class]
         },
 
+        required_class_name = function () {
+            # return names of all required classes
+            # {{{
+            private$m_objects[required_object == TRUE, class]
+            # }}}
+        },
+
+        unique_class_name = function () {
+            # return names of all unique classes
+            # {{{
+            private$m_objects[unique_object == TRUE, class]
+            # }}}
+        },
+
+        extensible_class_name = function () {
+            # return names of all unique classes
+            # {{{
+            private$m_objects[extensible >= 1L, class]
+            # }}}
+        },
+
         group_order = function (group = NULL) {
             if (is_empty(group)) {
                 res <- private$m_objects[["group_order"]]
@@ -378,10 +399,7 @@ parse_idd <- function(path) {
         {s <- strsplit(field_anid, "\\s*[,;]\\s*");
          list(line = rep(line, sapply(s, length)), V1 = unlist(s))}][
         idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
-    # idd_dt <- idd_dt[type %in% c(type_field, type_field_last),
-    #     strsplit(field_anid, "\\s*[,;]\\s*"), by = list(line)][
-    #     idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
-    # data.table::setnames(idd_dt, "V1", "field_anid")
+    data.table::setnames(idd_dt, "V1", "field_anid")
     # get row numeber of last field per condensed field line in each class
     idd_dt[, row_id := .I]
     line_field_last <- idd_dt[field_count> 1L][type == type_field_last,
@@ -525,8 +543,7 @@ parse_idd <- function(path) {
     # "Foundation:Kiva" for "N16", have to fix it in advanced.
     # {{{
     # fill class downwards to make search easiser
-    dup_field_anid <- idd_dt[type %in% c(type_class, type_class_slash, type_field,
-        type_field_last, type_field_slash)][
+    dup_field_anid <- idd_dt[data.table::between(type, type_class_slash, type_field_slash)][
         , class := class[1L], by = list(cumsum(!is.na(class)))][
         type == type_field_slash][!is.na(field_anid), list(line, class, field_anid)]
 
@@ -681,34 +698,34 @@ parse_idd <- function(path) {
     idd_field[, `:=`(minimum = NULL, maximum = NULL,
                      lower_incbounds = NULL, upper_incbounds = NULL)]
 
+    # add row id
+    idd_field[, row_id := .I]
+
     # split reference
-    idd_field[, new_reference := list(strsplit(reference, " ", fixed = TRUE)),
-              by = c("class_order", "field_order")]
-    # idd_field[, reference := NULL]
-    data.table::setnames(idd_field,
-                         c("new_reference", "reference"),
-                         c("reference", "reference_string"))
+    idd_field[, has_reference := FALSE]
+    idd_field[!is.na(reference), has_reference := TRUE]
+    idd_field[, new_reference := list(strsplit(reference, " ", fixed = TRUE)), by = row_id]
+    idd_field[, reference := NULL]
+    data.table::setnames(idd_field, "new_reference", "reference")
 
     # split choice
-    idd_field[, new_key := list(strsplit(key, " ", fixed = TRUE)),
-              by = c("class_order", "field_order")]
+    idd_field[, new_key := list(strsplit(key, " ", fixed = TRUE)), by = row_id]
     idd_field[, key := NULL]
     data.table::setnames(idd_field, "new_key", "key")
 
     # split objectList
-    idd_field[, new_object_list := list(strsplit(object_list, " ", fixed = TRUE)),
-              by = c("class_order", "field_order")]
-    data.table::setnames(idd_field,
-                         c("new_object_list", "object_list"),
-                         c("object_list", "object_list_string"))
+    idd_field[, has_object_list := FALSE]
+    idd_field[!is.na(object_list), has_object_list := TRUE]
+    idd_field[, new_object_list := list(strsplit(object_list, " ", fixed = TRUE)), by = row_id]
+    idd_field[, object_list := NULL]
+    data.table::setnames(idd_field, "new_object_list", "object_list")
 
     # split externalList
-    idd_field[, new_external_list := list(strsplit(external_list, " ", fixed = TRUE)),
-              by = c("class_order", "field_order")]
-    data.table::setnames(idd_field,
-                         c("new_external_list", "external_list"),
-                         c("external_list", "external_list_string"))
-
+    idd_field[, has_external_list := FALSE]
+    idd_field[!is.na(external_list), has_external_list := TRUE]
+    idd_field[, new_external_list := list(strsplit(external_list, " ", fixed = TRUE)), by = row_id]
+    idd_field[, external_list := NULL]
+    data.table::setnames(idd_field, "new_external_list", "external_list")
 
     # add field standard and lower case field names
     idd_field[is.na(field), `_field_name` := field_anid]
@@ -726,10 +743,10 @@ parse_idd <- function(path) {
     neworder <- c("class_order", "class", "field_order", "field", "field_anid",
                   "field_an", "field_id", "units", "ip_units", "required_field",
                   "type", "have_range", "range", "default", "key", "autosizable",
-                  "autocalculatable", "note", "begin_extensible", "reference",
-                  "object_list", "external_list", "unitsbasedonfield", "_field_name",
+                  "autocalculatable", "note", "begin_extensible", "has_reference",
+                  "has_object_list", "has_external_list", "unitsbasedonfield", "_field_name",
                   "_unit", "_ip_unit", "_field", "_field_ip",
-                  "reference_string", "object_list_string", "external_list_string")
+                  "reference", "object_list", "external_list")
     idd_field <- idd_field[, .SD, .SDcol = neworder]
     data.table::setcolorder(idd_field, neworder)
     # }}}
@@ -792,15 +809,14 @@ parse_idd <- function(path) {
     # get max field per class
     idd_class <- idd_field[, list(num_fields = .N), by = class][idd_class, on = "class"]
     # split reference_class_name
-    idd_class[, new_reference_class_name := list(strsplit(reference_class_name, " ", fixed = TRUE)),
+    idd_class[, reference := list(strsplit(reference_class_name, " ", fixed = TRUE)),
               by = c("class_order")]
-    # idd_class[, reference_class_name := NULL]
-    data.table::setnames(idd_class,
-                         c("new_reference_class_name", "reference_class_name"),
-                         c("reference_class_name", "reference_class_name_string"))
+    idd_class[, has_reference := FALSE]
+    idd_class[!is.na(reference_class_name), has_reference := TRUE]
+    idd_class[, reference_class_name := NULL]
     neworder <- c("group_order", "group", "class_order", "class", "format", "memo",
          "min_fields", "num_fields", "required_object", "unique_object",
-         "extensible", "reference_class_name", "reference_class_name_string")
+         "extensible", "has_reference", "reference")
     data.table::setcolorder(idd_class, neworder)
     data.table::setorder(idd_class, group_order, class_order)
     # }}}
@@ -808,17 +824,14 @@ parse_idd <- function(path) {
     # REFERENCE data
     # {{{
     # Object List data
-    idd_object_list <- idd_field[!is.na(object_list_string),
+    idd_object_list <- idd_field[has_object_list == TRUE,
         list(class_order, class, field_order, object_list)]
-    idd_field[, `:=`(object_list_string = NULL)]
     # Reference Field data
-    idd_reference_field <- idd_field[!is.na(reference_string),
+    idd_reference_field <- idd_field[has_reference == TRUE,
         list(class_order, class, field_order, reference)]
-    idd_field[, `:=`(reference_string = NULL)]
     # Reference Class data
-    idd_reference_class <- idd_class[!is.na(reference_class_name_string),
+    idd_reference_class <- idd_class[has_reference == TRUE,
         list(class_order, class, reference_class_name)]
-    idd_class[, `:=`(reference_class_name_string = NULL)]
     # Combine
     idd_reference <- list(object_list = idd_object_list,
                           reference_class = idd_reference_class,
@@ -828,9 +841,8 @@ parse_idd <- function(path) {
     # EXTERNAL data
     # {{{
     # External List data
-    idd_external_list <- idd_field[!is.na(external_list_string),
+    idd_external_list <- idd_field[has_external_list == TRUE,
         list(class_order, class, field_order, external_list)]
-    idd_field[, `:=`(external_list_string = NULL)]
     idd_external <- list(external_list = idd_external_list,
                          reference_rdd = list(),
                          reference_mdd = list())
@@ -850,6 +862,8 @@ parse_idd <- function(path) {
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
+                class = idd_class,
+                field = idd_field,
                 data = idd_data,
                 reference = idd_reference,
                 external = idd_external)
