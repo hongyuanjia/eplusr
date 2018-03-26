@@ -52,28 +52,154 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 
+
+idd_pared <- parse_idd("files/V8-8-0-Energy+.idd")
 idd <- IDD$new("files/V8-8-0-Energy+.idd")
-IDF$debug("initialize")
+
 idf <- IDF$new(idf_text, idd)
 idf <- IDF$new("files/5Zone_Transformer_8.8.idf", idd)
-idf$objects(1:2)
+
+idd_parsed <- parse_idd("files/V8-8-0-Energy+.idd")
+idf_parsed <- parse_idf("files/5Zone_Transformer_8.8.idf", idd)
+
+value <- idf_parsed$value
+IDFObject$new()
+value[, object := list(list(IDFObject$new(object_id = object_id, class = class, comment = comment, value = value, idd = idd))),
+    by = list(group)][, object]
+idd_parsed$reference
+c
+idf$check()
+idf$.__enclos_env__$private$fetch_check_data()
+class <- data.table::copy(idf$.__enclos_env__$private$m_check_class)
+field <- data.table::copy(idf$.__enclos_env__$private$m_check_field)
+reference <- data.table::copy(idf$.__enclos_env__$private$m_reference)
+
+reference$object_list[reference$reference_field, on = c("class_order", "field_order"), nomatch = 0L]
+library(uuid)
+
+ref_class <-
+idf$.__enclos_env__$private$m_check_ref
+
+# get all possible field values that can be referenced
+ref_field <- reference$reference_field[
+    , lapply(.SD, unlist), by = list(class_order, field_order)][
+    field, on = c("class_order", "field_order"), nomatch = 0L][
+    , i.reference := NULL][, list(reference, class_order, class, field_order, value)]
+
+IDFRefValue <- R6::R6Class(classname = "IDFRefValue",
+    public = list(
+        value = character(),
+        class_order = integer(),
+        field_order = integer(),
+        ref_key = character(),
+
+        initialize = function (class_order, field_order, ref_key, value) {
+            self$class_order <- class_order
+            self$field_order <- field_order
+            self$ref_key <- ref_key
+            self$value <- value[[1]]
+        },
+
+        get_value = function (value) {
+            # get ref value
+            self$value
+        },
+
+        set_value = function (value) {
+            # set ref value
+            # {{{
+            self$value <- value
+            # }}}
+        },
+
+        print = function() {
+            cli::cat_line(self$value)
+        }
+    )
+)
+
+IDFRefValue <- R6::R6Class(classname = "IDFRefValue",
+    public = list(
+        value = character(),
+        class_order = integer(),
+        field_order = integer(),
+        ref_key = character(),
+
+        initialize = function (class_order, field_order, ref_key, value) {
+            self$class_order <- class_order
+            self$field_order <- field_order
+            self$ref_key <- ref_key
+            self$value <- value[[1]]
+        },
+
+        get_value = function (value) {
+            # get ref value
+            self$value
+        },
+
+        set_value = function (value) {
+            # set ref value
+            # {{{
+            self$value <- value
+            # }}}
+        },
+
+        print = function() {
+            cli::cat_line(self$value)
+        }
+    )
+)
+
+R6::R6Class
+test1 <- new.env()
+test2 <- new.env()
+
+test1$value <- ref
+test2$value <- ref
+
+test1$value$set_value("test")
+test1$value
+ref_field_r6 <- ref_field[, row := .I][, refvalue := list(list(IDFRefValue$new(class_order, field_order, reference, value))),
+          by = list(row)]
+idf$object(1)
+reference$reference_field[field_order > 1]
+ref_field[, value]
+purrr::map(ref_field_r6[, refvalue], ~.x$get_value())
+ref <- ref_field_r6[, refvalue][[1]]
+
 idf_file$value[, object_id]
 idf_file$value[, class]
+idf_file$value[, fuck := list(list(Fuck$new(row_id, class))), by = row_id][, fuck]
 idf_file$value[, fuck := list(list(Fuck$new(row_id, class))), by = row_id][, fuck]
 idf_file$value[, row_id := .I][, list(list(Fuck$new(object_id))), by = row_id]$V1
 
 Fuck <- R6::R6Class(classname = "Fuck",
             public = list (
-                           initialize = function (object_id, class) {
-                               private$m_class <- class
-                               private$m_id <- object_id
+                           initialize = function (x, y) {
+                               private$y <- y
+                               private$x <- x
                            }
                            ),
             private = list(
-                           m_id = NA_integer_,
-                           m_class = NA_character_
+                           x = NA,
+                           y = NA
                            ))
+value[, row_id := .I][, object := list(list(Fuck$new(class, object_id))),
+    by = list(row_id)][, object]
 
+data.table(class = c("Class1", "Class2"), object_id = 1:2)[,
+    purrr::lmap(list(class, object_id), ~Fuck$new(..1, ..2))]
+    object := list(list(Fuck$new(class, object_id))), by = list(object_id)][, object]
+
+tibble(class = c("Class1", "Class2"), object_id = 1:2) %>%
+    group_by(object_id) %>%
+    mutate(fuck = purrr::map2(class, object_id, ~Fuck$new(.x, .y))) %>%
+    # mutate(fuck = list(Fuck$new(class, object_id))) %>%
+    pmap
+    pull(fuck)
+
+    pmap(value, ~IDFObject$new(class = ..5, object_id = ..1, comment = ..6,
+                               value = ..7, idd))
 
 idf_file$value[, fuck := list(list(IDFObject$new(object_id, class, comment, value, idd))), by = list(object_id, class_order)][, fuck]
 idf_file$value[, purrr::map(object_id)]

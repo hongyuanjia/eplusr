@@ -10,7 +10,7 @@
 #' idfobj <- IDFObject$new(list, idd)
 #'
 #' idfobj$get_comment()
-#' idfobj$set_comment(comment, append = TRUE, wrap = 0L)
+#' idfobj$set_comment(comment, append = TRUE, width = 0L)
 #' idfobj$get_value(index = NULL, name = NULL)
 #' idfobj$set_value(...)
 #'
@@ -83,11 +83,13 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
     public = list(
 
-        initialize = function (object_id, class, comment, value, idd) {
+        initialize = function (object_id, class, comment, value, idd, ...) {
             # {{{
             private$m_id <- object_id
-            private$m_value <- as.list(value[[1]])
-            private$m_comment <- unlist(comment)
+            private$m_value <- as.list(value)
+            # private$m_value <- as.list(value[[1]])
+            private$m_comment <- unlist(comment) %||% NA_character_
+            data.table::setattr(private$m_comment, "class", "IDFObject_Comment")
 
             .iddobj <- idd$object(class)
             len <- length(private$m_value)
@@ -107,36 +109,55 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             private$m_fields <- `._get_private`(.iddobj)$m_fields
             private$m_properties <- `._get_private`(.iddobj)$m_properties
             private$enforce_value_type()
+            private$add_value_attr()
+            data.table::setattr(private$m_value, "class", "IDFObject_Value")
             # }}}
         },
 
         # PUBLIC FUNCTIONS
         # {{{
-        get_comment = function () {
-            # return object comments
+        id = function () {
+            # return object id
             # {{{
-            cli::cat_line("! ", private$m_comment)
-            return(invisible(private$m_comment))
+            private$m_id
             # }}}
         },
 
-        set_comment = function (comment, append = TRUE, wrap = 0L) {
+        get_comment = function () {
+            # return object comments
+            # {{{
+            private$m_comment
+            # }}}
+        },
+
+        set_comment = function (comment, append = TRUE, width = 0L) {
             # set object comment
             # {{{
             if (is_empty(comment)) {
-                private$m_comment <- NULL
+                private$m_comment <- private$empty_comment()
             } else {
                 assert_that(is.character(comment))
-                if (wrap > 0L) comment <- strwrap(comment, width = wrap)
+                if (width != 0L) {
+                    assert_that(is_count(width))
+                    comment <- strwrap(comment, width = width)
+                }
 
-                if (append) {
-                    private$m_comment <- c(private$m_comment, comment)
+                if (private$is_empty_comment()) {
+                    private$m_comment <- private$set_comment_class(comment)
+                } else if (is.null(append)) {
+                    private$m_comment <- private$set_comment_class(comment)
                 } else {
-                    private$m_comment <- c(comment, private$m_comment)
+                    assert_that(is_scalar(append),
+                                msg = "`append` should be NULL or a single logical value.")
+                    if (append) {
+                        private$m_comment <- private$set_comment_class(c(private$m_comment, comment))
+                    } else {
+                        private$m_comment <- private$set_comment_class(c(comment, private$m_comment))
+                    }
                 }
             }
 
-            cli::cat_line("! ", private$m_comment)
+            private$m_comment
             # }}}
         },
 
@@ -144,12 +165,11 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # return object values
             # {{{
             if (all(is.null(index), is.null(name))) {
-                index <- seq_len(length(private$m_value))
+                index <- private$all_indice()
+            } else {
+                index <- private$fields(index, name)[, field_order]
             }
-
-            index <- private$fields(index, name)[, field_order]
-            cli::cat_line(self$out_lines(index))
-            return(invisible(private$m_value[index]))
+            private$m_value[index]
             # }}}
         },
 
@@ -169,50 +189,67 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             }
 
             # get current field number
-            num <- self$num_fields()
+            # TODO: check other $num_fields() in IDFObject
+            num <- length(private$m_value)
             # if all named, using named index
             # {{{
             if (named) {
                 # check duplication of names
                 if (anyDuplicated(nms)) {
                     stop("Duplicated field names found: ",
-                         backtick_collapse(nms[duplicated(nms)]),
+                         backtick_collapse(nms[duplicated(nms)]), ".",
                          call. = FALSE)
                 }
 
-                # check if all inputs have valid names
-                valid <- self$is_valid_field_name(nms)
+                # check if all inputs have valid field names in current
+                # IDDObject
+                valid <- nms %in% private$field_name_std() |
+                         nms %in% private$field_name_lcase()
+                # if not, only make sense when this is an extensible object
                 if (!all(valid)) {
-                    # check if there are newly added extensible fields
+                    # stop if it is not an extensible object
                     if (!self$is_extensible()) {
-                        stop("Invalid field names found: ",
-                             backtick_collapse(nms[!valid]),
+                        stop("Invalid field names found for class ",
+                             self$class_name(), ": ",
+                             backtick_collapse(nms[!valid]), ".",
                              call. = FALSE)
+                    # if it is an extensible object
                     } else {
-                        # get new field names
-                        new_fields <- nms[!valid]
-                        new_num <- length(new_fields)
-                        new_nms <- names(new_fields)
-                        # check if the number of new fields is acceptable
-                        if (!self$is_valid_field_num(num + new_num)) {
-                            stop("Invalid field number found: ", backtick(len), ". ",
-                                 "Should be ", backtick(paste0(self$num_fields(), " + ",
-                                                             self$num_extensible(), " * X.")))
-                        }
-                        # add new extensible groups
-                        num_to_add <- new_num / self$num_extensible()
-                        private$add_extensible_groups(num_to_add)
+                        new_nms <- nms[!valid]
+                        new_num <- length(new_nms)
+                        # Add new extensible groups to validate field names.
+                        # It should be safe as added extensible group will be
+                        # deleted if invalid field names found
+                        num_to_add <- round(new_num / self$num_extensible())
+                        num_to_add <- ifelse(num_to_add == 0, 1L, num_to_add)
+                        self$add_extensible_groups(num_to_add)
                         # check if new field names are valid
                         new_valid <- new_nms %in%
-                            c(self$field_name(seq(num + 1, length.out = new_num)))
+                            self$field_name(seq(num + 1, length.out = new_num))
                         if (!all(new_valid)) {
-                            stop("Invalid field names found: ",
-                                 backtick_collapse(new_nms[!new_valid]),
+                            # remove added extensible groups
+                            self$del_extensible_groups(num_to_add)
+                            stop("Failed to add extensible fields. ",
+                                 "Invalid field names found for class ",
+                                 self$class_name(), ": ",
+                                 backtick_collapse(new_nms[!new_valid]), ".",
                                  call. = FALSE)
+                        }
+                        # check if the number of new fields is acceptable
+                        if (!self$is_valid_field_num(num + new_num)) {
+                            # remove added extensible groups
+                            self$del_extensible_groups(num_to_add)
+                            stop("Failed to add new fields named: ",
+                                 backtick_collapse(new_nms), ". ",
+                                 "Invalid field number found for class ",
+                                 self$class_name(), ": ", backtick(num + new_num),
+                                 ". Should be ",
+                                 backtick(paste0(self$num_fields(), " + ",
+                                                 self$num_extensible(), " * X")),
+                                 ".", call. = FALSE)
                         }
                     }
                 }
-
                 index <- self$field_index(nms)
             # }}}
 
@@ -224,15 +261,17 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
                 # if need to add new extensible groups
                 if (len > num) {
                     if (!self$is_extensible()) {
-                        stop("Invalid field number found: ", backtick(len), ". ",
-                             "Should be ", backtick(paste0(self$num_fields(), " + ",
-                                                         self$num_extensible(), " * X.")))
-                    }
-
-                    if (private$get_extensible_field_index(len) != 0) {
-                        stop("Invalid field number found: ", backtick(len), ". ",
-                             "Should be ", backtick(paste0(self$num_fields(), " + ",
-                                                         self$num_extensible(), " * X.")))
+                        stop("Invalid field number found for class ",
+                             self$class_name(), ": ", backtick(len), ". ",
+                             "Should be less than ", self$num_fields(), ".",
+                             call. = FALSE)
+                    } else if (private$get_extensible_field_index(len) != 0) {
+                        stop("Invalid field number found for class ",
+                             self$class_name(), ": ", backtick(len), ". ",
+                             "Should be ",
+                             backtick(paste0(self$num_fields(), " + ",
+                                             self$num_extensible(), " * X")), ".",
+                             call. = FALSE)
                     }
 
                     num_to_add <- (len - num) / self$num_extensible()
@@ -245,8 +284,8 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
             # TODO: check if below is ok for single field objects such
             # `Version`
-            check_data <- private$fields(index)[, value := dots]
-            errors <- private$check_object(data = check_data, print = FALSE)
+            private$m_check_field <- private$fields(index)[, value := dots]
+            private$check_object()
 
             # get current valid value number
             num_value <- length(private$m_value)
@@ -258,7 +297,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             mis_index <- full_index[full_index > num_value & full_index < max(index)]
 
             # if no error
-            if (all(purrr::map_lgl(errors, is_empty))) {
+            if (all(purrr::map_lgl(private$m_check, is_empty))) {
                 # if there are newly added non-required fields
                 if (not_empty(mis_index)) {
                     # for named case
@@ -278,13 +317,13 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
                     }
                 }
                 private$m_value[index] <- dots
+                private$add_value_attr()
                 return(self)
             } else {
-                # store original field values
-                ori_value <- private$m_value
-                on.exit({private$m_value <- ori_value}, add = TRUE)
-                private$m_value[index] <- dots
-                private$print_check(errors)
+                # remove added extensible groups
+                self$del_extensible_groups(num_to_add)
+                # print checking results before stop
+                i_print_check(private$m_check, ip_unit = FALSE)
                 stop("Failed to set field values.", call. = FALSE)
             }
             # }}}
@@ -293,7 +332,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         check = function () {
             # validate field in terms of all creteria
             # {{{
-            private$check_object(print = TRUE)
+            private$check_object()
             # }}}
         },
 
@@ -324,33 +363,6 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # }}}
         },
 
-        # Overwrite super class public methods
-        # {{{
-        num_fields = function () {
-            # return total number of fields that have values
-            # {{{
-            return(length(private$m_value))
-            # }}}
-        },
-
-        field_index = function (name = NULL) {
-            # return field index by field name (in either standard or lower case
-            # format)
-            # {{{
-            if (is.null(name)) return(seq_along(private$m_value))
-            super$field_index(name)
-            # }}}
-        },
-
-        is_valid_field_index = function (index) {
-            # check if input index is a valid field index
-            # {{{
-            assert_that(is_count(index))
-            index <= length(private$m_value)
-            # }}}
-        },
-        # }}}
-
         print = function (comment = TRUE) {
             # TODO: change unit according to IDF$options$view_in_ip
             # {{{
@@ -359,9 +371,8 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
             # comment
             if (comment) {
-                if (not_empty(private$m_comment)) {
-                    cli::cat_rule(center = "* NOTES *", line = 1)
-                    cli::cat_line(private$m_comment)
+                if (!(is_scalar(private$m_comment) & is.na(private$m_comment))) {
+                    print.IDFObject_Comment(private$m_comment)
                 }
             }
 
@@ -394,27 +405,26 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
         # PRIVATE FUNCTIONS
         # {{{
-        # Overwrite super class private methods
-        # {{{
-        fields = function (index = NULL, name = NULL) {
-            # return single field data by field index or field name (either in
-            # standard format or lower case format)
+        empty_comment = function () {
+            # return an empty IDFObject_Comment object
             # {{{
-            if (is_empty(index) && is_empty(name)) {
-                index <- seq_along(private$m_value)
-            }
-            super$fields(index, name)
+            structure(NA_character_, class = c("IDFObject_Comment", "character"))
             # }}}
         },
 
-        field_name_std = function (index = NULL, unit = FALSE, in_ip = FALSE) {
-            # return standard field name
+        is_empty_comment = function () {
+            # return TRUE if current comment is empty
             # {{{
-            index <- index %||% seq_along(private$m_value)
-            super$field_name_std(index, unit, in_ip)
+            identical(private$m_comment, private$empty_comment())
             # }}}
         },
-        # }}}
+
+        set_comment_class = function (x) {
+            # set the class of a character vector to `IDFObject_Comment`
+            # {{{
+            structure(x, class = c("IDFObject_Comment", "character"))
+            # }}}
+        },
 
         enforce_value_type = function () {
             # make sure that numeric strings are converted to numeric values and
@@ -430,80 +440,39 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             private$m_value[na_dbl] <- rep(NA_real_, sum(na_dbl))
             num <- suppressWarnings(as.numeric(unlist(private$m_value)))
             private$m_value[an_n & !is.na(num)] <- num[an_n & !is.na(num)]
+
+            # when this field has \obejct-list
+            comb <- private$m_fields[seq_along(private$m_value)]
+            an_a <- comb[["field_an"]]
+            is_src <- comb[["has_reference"]]
+            is_ref <- comb[["has_object_list"]]
+            private$m_value[is_ref]
+            # when this field has \reference
             # }}}
         },
 
-        check_object = function (data = NULL, print = TRUE) {
+        add_value_attr = function () {
+            # add `index`, `field` and `field_ip` attributes to values
+            # {{{
+            private$m_value <- private$m_fields[seq_along(private$m_value),
+                list(field_order, `_field`, `_field_ip`)][
+                , value := list(private$m_value)][
+                , value := list(list(data.table::setattr(value[[1]], "index", field_order))), by = field_order][
+                , value := list(list(data.table::setattr(value[[1]], "field", `_field`))), by = field_order][
+                , value := list(list(data.table::setattr(value[[1]], "field_ip", `_field_ip`))), by = field_order][
+                , value]
+            # }}}
+        },
+
+        check_object = function () {
             # check if there are errors in current object
             # {{{
-            i_check_object(private, data, print)
-            # }}}
-        },
-
-        check_scalar = function () {
-            # check if every value is a scalar
-            # {{{
-            i_check_scalar(private)
-            # }}}
-        },
-
-        check_missing = function () {
-            # check if there are missing required values
-            # {{{
-            i_check_missing(private)
-            # }}}
-        },
-
-        check_auto = function () {
-            # check if there are invalid autosize and autocalculate fields
-            # {{{
-            i_check_auto(private)
-            # }}}
-        },
-
-        check_type = function () {
-            # check if there are character values which should be numeric or vice
-        # versa
-            # {{{
-            i_check_type(private)
-            # }}}
-        },
-
-        check_integer = function () {
-            # check if there are invalid integer
-            # {{{
-            i_check_integer(private)
-            # }}}
-        },
-
-        check_choice = function () {
-            # check if there are invalid choices
-            # {{{
-            i_check_choice(private)
-            # }}}
-        },
-
-        check_range = function () {
-            # check if the value exceeds range
-            # {{{
-            i_check_range(private)
-            # }}}
-        },
-
-        print_check = function (ip_unit = FALSE) {
-            # print pretty check results
-            # {{{
-            i_print_check(private$m_check, ip_unit)
-            # }}}
-        },
-
-        cat_errors = function (type = c("scalar", "missing", "autosize",
-                                        "autocalculate", "numeric", "character",
-                                        "integer", "choice", "range"),
-                               ip_unit = FALSE) {
-            # cat detailed error messages of a single type
-            # {{{
-            i_cat_errors(private$m_check, type, ip_unit)
+            if (is.null(private$m_check_field)) {
+                private$m_check_field <- private$m_fields[
+                    field_order <= length(private$m_value)][
+                    , value := private$m_value]
+            }
+            i_check(private, type = "idfobject")
             # }}}
         },
 
@@ -533,10 +502,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             if (is.null(index)) {
                 values <- private$m_value
             } else {
-                valid <- self$is_valid_field_index(index)
-                assert_that(all(valid),
-                    msg = paste0("Invalid field index found: ",
-                                 backtick_collapse(index[!valid]), "."))
+                private$assert_valid_field_index(index)
                 values <- private$m_value[index]
             }
             i_values_to_str(values, blank)
@@ -565,7 +531,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             if (!is.null(index)) {
                 valid <- index <= length(private$m_value)
                 if (!all(valid)) {
-                    warning("Indice larger than total field values have been remove.")
+                    warning("Indice larger than total field number have been remove.")
                     index <- index[valid]
                 }
             }
@@ -602,43 +568,6 @@ in_range <- function (x, range) {
     }
 
     return(u)
-}
-# }}}
-
-# i_check_object: check if there are errors in current object
-# {{{
-i_check_object = function (private, data = NULL, print = TRUE,
-                           cols = c("field_order", "_field", "_field_ip", "value")) {
-    private$m_check <- NULL
-    if (is.null(data)) {
-        private$m_check_field <- private$m_fields[
-            field_order <= length(private$m_value)][
-            , value := private$m_value]
-    } else {
-        private$m_check_field <- data
-    }
-    # on.exit({private$m_check_field <- NULL})
-
-    # check scalar
-    i_check_scalar(private, cols)
-    # check missing required fields
-    i_check_missing(private, cols)
-    # check invalid auto
-    i_check_auto(private, cols)
-    # exclude auto fields below during checking
-    private$m_check_field <- private$m_check_field[
-        !purrr::map_lgl(value, ~tolower(.x) %in% c("autosize", "autocalculate"))]
-    # check invalid type
-    i_check_type(private, cols)
-    # check invalid integer
-    i_check_integer(private, cols)
-    # check invalid choice
-    i_check_choice(private, cols = c(cols, "key"))
-    # check range exceeding
-    i_check_range(private, cols = c(cols, "range"))
-
-    data.table::setattr(private$m_check, "class", c("IDFCheckRes", "list"))
-    private$m_check
 }
 # }}}
 
@@ -776,15 +705,20 @@ i_out_lines <- function (values, fields, ip_units = FALSE) {
 
         # add field char
         last_field <- fields[, row_id[.N], by = list(class, object_id)]$V1
+        first_field <- setdiff(fields[, row_id[1L], by = list(class, object_id)]$V1, last_field)
         last_object <- fields[object_id %in% fields[, max(object_id), by = list(class_order)]$V1, unique(object_id)]
         fields[!object_id %in% last_object & row_id %in% last_field,
                out := list(list(paste0("  |  \\- ", out[[1]]))), by = row_id]
-        fields[!object_id %in% last_object & !row_id %in% last_field,
+        fields[!object_id %in% last_object & row_id %in% first_field,
                out := list(list(paste0("  |  +- ", out[[1]]))), by = row_id]
+        fields[!object_id %in% last_object & !row_id %in% c(first_field, last_field),
+               out := list(list(paste0("  |  |- ", out[[1]]))), by = row_id]
         fields[object_id %in% last_object & row_id %in% last_field,
                out := list(list(paste0("     \\- ", out[[1]]))), by = row_id]
-        fields[object_id %in% last_object & !row_id %in% last_field,
+        fields[object_id %in% last_object & row_id %in% first_field,
                out := list(list(paste0("     +- ", out[[1]]))), by = row_id]
+        fields[object_id %in% last_object & !row_id %in% c(first_field, last_field),
+               out := list(list(paste0("     |- ", out[[1]]))), by = row_id]
 
         # add object char
         first_row_per_object <- fields[, row_id[1], by = list(class_order, object_id)]$V1
@@ -833,12 +767,12 @@ i_out_names <- function (fields, ip_units = FALSE) {
 i_field_name_std <- function (fields, unit = FALSE, in_ip = FALSE) {
     if (unit) {
         if (in_ip) {
-            res <- fields[, `_field_ip`]
+            res <- fields[["_field_ip"]]
         } else {
-            res <- fields[, `_field`]
+            res <- fields[["_field"]]
         }
     } else {
-        res <- fields[, `_field_name`]
+        res <- fields[["_field_name"]]
     }
 
     return(res)
@@ -848,7 +782,7 @@ i_field_name_std <- function (fields, unit = FALSE, in_ip = FALSE) {
 # i_out_index: return right aligned field index
 # {{{
 i_out_index <- function (index) {
-    stringr::str_pad(index, nchar(max(index)), "left")
+    paste0(" ", stringr::str_pad(index, nchar(max(index)), "left"))
 }
 # }}}
 
@@ -932,7 +866,7 @@ i_print_check = function (check, ip_unit = FALSE) {
 # i_cat_errors: cat detailed error messages of a single type
 # {{{
 i_cat_errors = function (check_data,
-                         type = c("class_missing", "class_duplicate", "scalar",
+                         type = c("missing_object", "duplicate_object", "scalar",
                                   "missing", "autosize", "autocalculate",
                                   "numeric", "character", "integer", "choice",
                                   "range", "reference"),
@@ -943,8 +877,8 @@ i_cat_errors = function (check_data,
     index <- check_data[, field_order]
 
     title <- switch(type,
-        class_missing = "Missing Required Object",
-        class_duplicate = "Duplicated Unique Object",
+        missing_object = "Missing Required Object",
+        duplicate_object = "Duplicated Unique Object",
         scalar = "Not Scalar",
         missing = "Missing Required Field",
         autosize = "Invalid Autosize Field",
@@ -957,8 +891,8 @@ i_cat_errors = function (check_data,
         reference = "Invalid Reference")
 
     bullet <- switch(type,
-        class_missing = "Objects below are required but not exist.",
-        class_duplicate = "Objects should be unique but have multiple instances.",
+        missing_object = "Objects below are required but not exist.",
+        duplicate_object = "Objects should be unique but have multiple instances.",
         scalar = "Fields below have multiple values.",
         missing = "Fields below are required but values are not given.",
         autosize = "Fields below cannot be `Autosize`.",
@@ -973,12 +907,58 @@ i_cat_errors = function (check_data,
     cli::cat_line()
     cli::cat_rule(paste0("[", error_num, "] ", title))
     cli::cat_bullet(bullet, bullet = "circle_cross")
-    if (type == "class_missing") {
-        cli::cat_line(backtick_collapse(check_data$class))
-    } else if (type == "class_duplicate") {
-        cli::cat_line()
+    if (type == "missing_object") {
+        cli::cat_bullet(backtick(check_data$class))
     } else {
         cli::cat_line(i_out_lines(check_data$value, check_data, ip_units))
     }
+}
+# }}}
+
+#' @export
+# `[.IDFObject_Comment`
+# {{{
+"[.IDFObject_Comment" <- function(x, i, ...) {
+    res <- .subset(x, i)
+    class(res) <- "IDFObject_Comment"
+    res
+}
+# }}}
+
+#' @export
+# `[.IDFObject_Value`
+# {{{
+"[.IDFObject_Value" <- function(x, i, ...) {
+    res <- .subset(x, i)
+    class(res) <- "IDFObject_Value"
+    res
+}
+# }}}
+
+#' @export
+# print.IDFObject_Comment
+# {{{
+print.IDFObject_Comment <- function (x, ...) {
+    if (all(is.na(x))) {
+        cli::cat_line("<No Comments>")
+    } else {
+        out <- x
+        is_macro <- startsWith(out, "#")
+        out[!is_macro] <- paste0("!", out[!is_macro])
+
+        cli::cat_rule(center = "* COMMENTS *", line = 1)
+        cli::cat_line(paste0(" ", out))
+    }
+}
+# }}}
+
+#' @export
+# print.IDFObject_Value
+# {{{
+print.IDFObject_Value <- function (x, in_ip = FALSE, ...) {
+    .value <- i_out_values(x, leading = 1L, length = 20, blank = TRUE)
+    .name <- purrr::map_chr(x, attr, ifelse(in_ip, "field_ip", "field"))
+    .index <- i_out_index(purrr::map_int(x, attr, "index"))
+    cli::cat_line(.index, ":", .value, .name)
 }
 # }}}

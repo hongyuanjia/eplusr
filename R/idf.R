@@ -100,12 +100,16 @@ IDF <- R6::R6Class(classname = "IDF",
 
             private$m_path <- path
             private$m_definition <- `._get_private`(idd)$m_objects
+            private$m_reference <- `._get_private`(idd)$m_reference
+            private$m_external <- `._get_private`(idd)$m_external
 
             private$m_version <- idf_file$version
             private$m_options <- idf_file$options
-            private$m_objects <- idf_file$value[,
-                object := list(list(IDFObject$new(object_id, class, comment, value, idd))),
-                by = "object_id"]
+            objects <- purrr::pmap(idf_file$value, IDFObject$new, idd = idd)
+            private$m_objects <- idf_file$value[, object := objects]
+            # private$m_objects <- idf_file$value[,
+            #     object := list(list(IDFObject$new(object_id, class, comment, value, idd))),
+            #     by = list(object_id)]
             # }}}
         },
 
@@ -298,9 +302,12 @@ IDF <- R6::R6Class(classname = "IDF",
         m_options = list(),
         m_objects = data.table(),
         m_definition = data.table(),
+        m_reference = list(),
+        m_external = list(),
         m_check = list(),
         m_check_class = data.table(),
         m_check_field = data.table(),
+        m_check_ref = data.table(),
         # }}}
 
         # PRIVATE FUNCTIONS
@@ -314,14 +321,17 @@ IDF <- R6::R6Class(classname = "IDF",
             # fetch values from all objects
             # {{{
             # get class checking data
+            # {{{
             class_info <- private$m_definition[, .SD, .SDcol = c("class_order",
                 "class", "format", "min_fields", "num_fields",
                 "required_object", "unique_object", "extensible")]
             private$m_check_class <- merge(class_info, private$m_objects,
                 by = c("class_order", "class"), all = TRUE, sort = FALSE)[
                 , row_id := .I]
+            # }}}
 
             # get field checking data
+            # {{{
             # gather values from all idf objects
             field_values <- private$m_objects[,
                 list(value = `._get_private`(object[[1]])$m_value),
@@ -333,11 +343,32 @@ IDF <- R6::R6Class(classname = "IDF",
                 num_value := length(value[[1]]), by = "object_id"][
                 , `._get_private`(object[[1]])$m_fields[field_order <= num_value],
                 by = list(object_id)]
-
             # combine all
             private$m_check_field <- def_fields[field_values,
                 on = c("object_id", "class_order", "field_order", "class")][
                 , row_id := .I]
+            # }}}
+
+            # get reference checking data
+            # {{{
+            # get field values that are referred
+            ref_value_field <- private$m_reference$reference_field[
+                , lapply(.SD, unlist), by = list(class_order, field_order)][
+                private$m_check_field, on = c("class_order", "field_order"), nomatch = 0L][
+                , i.reference := NULL][
+                , list(value = list(unlist(value))), by = reference]
+
+            # get class values that are referred
+            # TODO: directly get these values when parsing idd
+            ref_value_class <- private$m_reference$reference_class[
+                , lapply(.SD, unlist), by = list(class_order)][
+                , list(value = list(class)), by = reference_class_name]
+            data.table::setnames(ref_value_class, "reference_class_name", "reference")
+
+            # combine
+            private$m_check_ref <- data.table::rbindlist(list(ref_value_class, ref_value_field))
+            data.table::setnames(private$m_check_ref, "value", "source")
+            # }}}
             # }}}
         },
 
@@ -345,17 +376,32 @@ IDF <- R6::R6Class(classname = "IDF",
             # check if there are errors in current IDF
             # {{{
             private$fetch_check_data()
-            i_check_object(private, data = private$m_check_field,
-                           cols = c("object_id", "class_order", "class",
-                                    "field_order", "_field", "_field_ip",
-                                    "value"))
+            i_check(private, type = "idf")
+            # }}}
+        },
+
+        check_missing_object = function () {
+            # check if there are missing required objects
+            # {{{
+            i_check_missing_object(private)
+            # }}}
+        },
+
+        check_duplicate_object = function () {
+            # check if there are duplicated unique objects
+            # {{{
+            i_check_duplicate_object(private, cols = c("class_order", "class",
+                                                       "object_id",
+                                                       "field_order", "_field",
+                                                       "_field_ip", "value"))
             # }}}
         },
 
         check_scalar = function () {
             # check if every value is a scalar
             # {{{
-            i_check_scalar(private, cols = c("class_order", "class", "field_order",
+            i_check_scalar(private, cols = c("class_order", "class",
+                                             "object_id", "field_order",
                                              "_field", "_field_ip", "value"))
             # }}}
         },
@@ -363,16 +409,18 @@ IDF <- R6::R6Class(classname = "IDF",
         check_missing = function () {
             # check if there are missing required values
             # {{{
-            i_check_missing(private, cols = c("class_order", "class", "field_order",
-                                             "_field", "_field_ip", "value"))
+            i_check_missing(private, cols = c("class_order", "class",
+                                              "object_id", "field_order",
+                                              "_field", "_field_ip", "value"))
             # }}}
         },
 
         check_auto = function () {
             # check if there are invalid autosize and autocalculate fields
             # {{{
-            i_check_auto(private, cols = c("class_order", "class", "field_order",
-                                           "_field", "_field_ip", "value"))
+            i_check_auto(private, cols = c("class_order", "class", "object_id",
+                                           "field_order", "_field", "_field_ip",
+                                           "value"))
             # }}}
         },
 
@@ -380,15 +428,17 @@ IDF <- R6::R6Class(classname = "IDF",
             # check if there are character values which should be numeric or
             # vice versa
             # {{{
-            i_check_type(private, cols = c("class_order", "class", "field_order",
-                                           "_field", "_field_ip", "value"))
+            i_check_type(private, cols = c("class_order", "class", "object_id",
+                                           "field_order", "_field", "_field_ip",
+                                           "value"))
             # }}}
         },
 
         check_integer = function () {
             # check if there are invalid integer
             # {{{
-            i_check_integer(private, cols = c("class_order", "class", "field_order",
+            i_check_integer(private, cols = c("class_order", "class",
+                                              "object_id", "field_order",
                                               "_field", "_field_ip", "value"))
             # }}}
         },
@@ -396,7 +446,8 @@ IDF <- R6::R6Class(classname = "IDF",
         check_choice = function () {
         # check if there are invalid choices
             # {{{
-            i_check_choice(private, cols = c("class_order", "class", "field_order",
+            i_check_choice(private, cols = c("class_order", "class",
+                                             "object_id", "field_order",
                                              "_field", "_field_ip", "value"))
             # }}}
         },
@@ -404,8 +455,18 @@ IDF <- R6::R6Class(classname = "IDF",
         check_range = function () {
             # check if the value exceeds range
             # {{{
-            i_check_range(private, cols = c("class_order", "class", "field_order",
-                                            "_field", "_field_ip", "value"))
+            i_check_range(private, cols = c("class_order", "class", "object_id",
+                                            "field_order", "_field",
+                                            "_field_ip", "value"))
+            # }}}
+        },
+
+        check_reference = function () {
+            # check if value has invalid reference
+            # {{{
+            i_check_reference(private, cols = c("class_order", "class",
+                                                "object_id", "field_order",
+                                                "_field", "_field_ip", "value"))
             # }}}
         },
 
@@ -562,7 +623,7 @@ parse_idf <- function (path, idd) {
     idf_errors_unknown_macro <- idf_macro[!(macro_key %in% macro_dict),
                                           list(line, string)]
     if (not_empty(idf_errors_unknown_macro)) {
-        parse_issue(path, type = "Unknown macro found", src = "IDF",
+        parse_issue(type = "Unknown macro found", src = "IDF",
                     data_errors = idf_errors_unknown_macro)
     }
     # }}}
@@ -639,7 +700,7 @@ parse_idf <- function (path, idd) {
             option_save <- NULL
         }
         if (nrow(idf_errors_option_save) > 1L) {
-            parse_issue(path, type = "More than one save option found", idf_errors_option_save,
+            parse_issue(type = "More than one save option found", idf_errors_option_save,
                         src = "IDF", stop = FALSE,
                         info = msg("Only the first option '",option_save[1],"'
                                    will be used."))
@@ -734,7 +795,7 @@ parse_idf <- function (path, idd) {
     unknown_class <- idf_idd_all[type == type_object][
         !is.na(value)][is.na(class), list(line, string)]
     if (not_empty(unknown_class)) {
-        parse_issue(path, type = "Object type not recognized", src = "IDF",
+        parse_issue(type = "Object type not recognized", src = "IDF",
                     data_errors = unknown_class,
                     info = "This error may be caused by a misspelled class name.")
     }
@@ -765,7 +826,8 @@ parse_idf <- function (path, idd) {
 
     idf <- list(version = idf_version,
                 options = heading_options,
-                value = idf_value)
+                value = idf_value,
+                field = idf_field)
 
     return(idf)
 }
@@ -789,3 +851,90 @@ get_idf_ver <- function (idf_str) {
     return(ver)
 }
 # }}}1
+
+# i_check: check if there are errors in current object
+# {{{
+i_check = function (private, type = c("idf", "idfobject")) {
+    private$m_check <- NULL
+    type <- match.arg(type)
+
+    # get returned columns according to `type`
+    cols_idfobject <- c("field_order", "value", "_field", "_field_ip")
+    cols <- switch(type,
+        idf = c("class_order", "class", "object_id", cols_idfobject),
+        idfobject = cols_idfobject)
+    # clean up after checking
+    on.exit({private$m_check_field <- NULL}, add = TRUE)
+
+    if (type == "idf") {
+        i_check_missing_object(private)
+        i_check_duplicate_object(private, cols)
+        # clean up after checking
+        on.exit({private$m_check_class <- NULL}, add = TRUE)
+    }
+
+    # check scalar
+    i_check_scalar(private, cols)
+    # check missing required fields
+    i_check_missing(private, cols)
+    # check invalid auto
+    i_check_auto(private, cols)
+    # exclude auto fields below during checking
+    private$m_check_field <- private$m_check_field[
+        !purrr::map_lgl(value, ~tolower(.x) %in% c("autosize", "autocalculate"))]
+    # check invalid type
+    i_check_type(private, cols)
+    # check invalid integer
+    i_check_integer(private, cols)
+    # check invalid choice
+    i_check_choice(private, cols = c(cols, "key"))
+    # check range exceeding
+    i_check_range(private, cols = c(cols, "range"))
+    # check invalid reference
+    # do this at last in order to exclude all other errors before checking
+    if (type == "idf") {
+        i_check_reference(private, cols = c(cols, "source"))
+    }
+
+    data.table::setattr(private$m_check, "class", c("IDFCheckRes", "list"))
+    private$m_check
+}
+# }}}
+
+# i_check_missing_object
+# {{{
+i_check_missing_object <- function (private) {
+    private$m_check$missing_object <- private$m_check_class[
+        required_object == TRUE & is.na(object_id)][, field_order := 0L]
+}
+# }}}
+
+# i_check_duplicate_object
+# {{{
+i_check_duplicate_object <- function (private, cols) {
+    res <- private$m_check_class[unique_object == TRUE & !is.na(object_id),
+        list(num = .N, object_id = list(object_id)), by = list(class_order, class)][
+        num > 1L, list(class_order, class, object_id)]
+    if (is_empty(res)) return(data.table())
+    res <- res[, lapply(.SD, unlist), by = list(class_order, class)]
+    private$m_check$duplicate_object <- private$m_check_field[res,
+        on = c("class_order", "object_id")][, ..cols]
+}
+# }}}
+
+# i_check_reference
+# {{{
+i_check_reference <- function (private, cols) {
+    # get fields that have \object-list
+    targ <- c(setdiff(cols, "source"), "object_list")
+    ref_field <- private$m_check_field[!is.na(object_list), ..targ][
+        , lapply(.SD, unlist), by = setdiff(targ, c("value", "object_list"))][
+        !is.na(value)]
+    data.table::setnames(ref_field, "object_list", "reference")
+
+    private$m_check$reference <- merge(ref_field, private$m_check_ref,
+        by = "reference")[ , row_id := .I][
+        !purrr::map2_lgl(value, source, ~toupper(.x) %in% toupper(.y)),
+        ..cols, by = row_id][, row_id := NULL]
+}
+# }}}
