@@ -4,28 +4,29 @@
 
 context("IDFObject method")
 
-# helpers
-# {{{
-get_attr <- function (x, attr, type) {
-    vapply(x, function (x) attr(x, attr), type)
-}
-
-remove_attr <- function (x) {
-    lapply(x, function (x) {attributes(x) <- NULL; x})
-}
-# }}}
-
+# idf_text {{{
 idf_text <- "
+    Version,
+        8.8;                     !- Version Identifier
+
+    ! this is a test comment for WD01
     Material,
-        WD10,                    !- Name
+        WD01,                    !- Name
         MediumSmooth,            !- Roughness
-        0.667,                   !- Thickness {m}
-        0.115,                   !- Conductivity {W/m-K}
-        513,                     !- Density {kg/m3}
-        1381,                    !- Specific Heat {J/kg-K}
-        0.9,                     !- Thermal Absorptance
-        0.78,                    !- Solar Absorptance
-        0.78;                    !- Visible Absorptance
+        1.9099999E-02,           !- Thickness {m}
+        0.1150000,               !- Conductivity {W/m-K}
+        513.0000,                !- Density {kg/m3}
+        1381.000,                !- Specific Heat {J/kg-K}
+        0.9000000,               !- Thermal Absorptance
+        0.7800000,               !- Solar Absorptance
+        0.7800000;               !- Visible Absorptance
+
+    Construction,
+        WALL-1,                  !- Name
+        WD01,                    !- Outside Layer
+        PW03,                    !- Layer 2
+        IN02,                    !- Layer 3
+        GP01;                    !- Layer 4
 
     BuildingSurface:Detailed,
         WALL-1PF,                !- Name
@@ -51,350 +52,267 @@ idf_text <- "
         0.0,                     !- Vertex 4 Y-coordinate {m}
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
+# }}}
 
-
-idd_pared <- parse_idd("files/V8-8-0-Energy+.idd")
 idd <- IDD$new("files/V8-8-0-Energy+.idd")
 
 idf <- IDF$new(idf_text, idd)
-idf <- IDF$new("files/5Zone_Transformer_8.8.idf", idd)
+ver <- idf$object_in_class("Version")
+mat <- idf$object_in_class("Material")
+surf <- idf$object_in_class("BuildingSurface:Detailed")
+con <- idf$object_in_class("Construction")
 
-idd_parsed <- parse_idd("files/V8-8-0-Energy+.idd")
-idf_parsed <- parse_idf("files/5Zone_Transformer_8.8.idf", idd)
-
-value <- idf_parsed$value
-IDFObject$new()
-value[, object := list(list(IDFObject$new(object_id = object_id, class = class, comment = comment, value = value, idd = idd))),
-    by = list(group)][, object]
-idd_parsed$reference
-c
-idf$check()
-idf$.__enclos_env__$private$fetch_check_data()
-class <- data.table::copy(idf$.__enclos_env__$private$m_check_class)
-field <- data.table::copy(idf$.__enclos_env__$private$m_check_field)
-reference <- data.table::copy(idf$.__enclos_env__$private$m_reference)
-
-reference$object_list[reference$reference_field, on = c("class_order", "field_order"), nomatch = 0L]
-library(uuid)
-
-ref_class <-
-idf$.__enclos_env__$private$m_check_ref
-
-# get all possible field values that can be referenced
-ref_field <- reference$reference_field[
-    , lapply(.SD, unlist), by = list(class_order, field_order)][
-    field, on = c("class_order", "field_order"), nomatch = 0L][
-    , i.reference := NULL][, list(reference, class_order, class, field_order, value)]
-
-IDFRefValue <- R6::R6Class(classname = "IDFRefValue",
-    public = list(
-        value = character(),
-        class_order = integer(),
-        field_order = integer(),
-        ref_key = character(),
-
-        initialize = function (class_order, field_order, ref_key, value) {
-            self$class_order <- class_order
-            self$field_order <- field_order
-            self$ref_key <- ref_key
-            self$value <- value[[1]]
-        },
-
-        get_value = function (value) {
-            # get ref value
-            self$value
-        },
-
-        set_value = function (value) {
-            # set ref value
-            # {{{
-            self$value <- value
-            # }}}
-        },
-
-        print = function() {
-            cli::cat_line(self$value)
-        }
-    )
-)
-
-IDFRefValue <- R6::R6Class(classname = "IDFRefValue",
-    public = list(
-        value = character(),
-        class_order = integer(),
-        field_order = integer(),
-        ref_key = character(),
-
-        initialize = function (class_order, field_order, ref_key, value) {
-            self$class_order <- class_order
-            self$field_order <- field_order
-            self$ref_key <- ref_key
-            self$value <- value[[1]]
-        },
-
-        get_value = function (value) {
-            # get ref value
-            self$value
-        },
-
-        set_value = function (value) {
-            # set ref value
-            # {{{
-            self$value <- value
-            # }}}
-        },
-
-        print = function() {
-            cli::cat_line(self$value)
-        }
-    )
-)
-
-R6::R6Class
-test1 <- new.env()
-test2 <- new.env()
-
-test1$value <- ref
-test2$value <- ref
-
-test1$value$set_value("test")
-test1$value
-ref_field_r6 <- ref_field[, row := .I][, refvalue := list(list(IDFRefValue$new(class_order, field_order, reference, value))),
-          by = list(row)]
-idf$object(1)
-reference$reference_field[field_order > 1]
-ref_field[, value]
-purrr::map(ref_field_r6[, refvalue], ~.x$get_value())
-ref <- ref_field_r6[, refvalue][[1]]
-
-idf_file$value[, object_id]
-idf_file$value[, class]
-idf_file$value[, fuck := list(list(Fuck$new(row_id, class))), by = row_id][, fuck]
-idf_file$value[, fuck := list(list(Fuck$new(row_id, class))), by = row_id][, fuck]
-idf_file$value[, row_id := .I][, list(list(Fuck$new(object_id))), by = row_id]$V1
-
-Fuck <- R6::R6Class(classname = "Fuck",
-            public = list (
-                           initialize = function (x, y) {
-                               private$y <- y
-                               private$x <- x
-                           }
-                           ),
-            private = list(
-                           x = NA,
-                           y = NA
-                           ))
-value[, row_id := .I][, object := list(list(Fuck$new(class, object_id))),
-    by = list(row_id)][, object]
-
-data.table(class = c("Class1", "Class2"), object_id = 1:2)[,
-    purrr::lmap(list(class, object_id), ~Fuck$new(..1, ..2))]
-    object := list(list(Fuck$new(class, object_id))), by = list(object_id)][, object]
-
-tibble(class = c("Class1", "Class2"), object_id = 1:2) %>%
-    group_by(object_id) %>%
-    mutate(fuck = purrr::map2(class, object_id, ~Fuck$new(.x, .y))) %>%
-    # mutate(fuck = list(Fuck$new(class, object_id))) %>%
-    pmap
-    pull(fuck)
-
-    pmap(value, ~IDFObject$new(class = ..5, object_id = ..1, comment = ..6,
-                               value = ..7, idd))
-
-idf_file$value[, fuck := list(list(IDFObject$new(object_id, class, comment, value, idd))), by = list(object_id, class_order)][, fuck]
-idf_file$value[, purrr::map(object_id)]
-purrr::map(purrr::transpose(idf_file$value), ~IDFObject$new(.x[[1]], .x[[2]], .x[[3]], .x[[4]], idd))
-
-private$m_id
-private$m_value
-# get `Material`
-idfobj <-
-
-parse_idf(idf_text, idd)$value[,
-    object := list(list(IDFObject$new(object_id, class, comment, value, idd))),
-    by = object_id][, object]
-private$m_objects[, object]
-`._get_private`(`._get_private`(idf)$m_objects[1, object][[1]])$m_id
 describe("$id()", {
-    it("can return right object id", {
-        expect_equal(idfobj$id(), 1L)
-    })
+    it("can return right object id", expect_equal(mat$id(), 2L))
 })
 
 describe("$get_comment()", {
-    it("can return valid `IDFObject_Comment`", {
-        expect_equal(idfobj$get_comment(),
-                     structure(NA_character_, class = "IDFObject_Comment"))
+    # {{{
+    it("can return comment", {
+        expect_equal(mat$get_comment(), " this is a test comment for WD01")
     })
+    # }}}
 })
 
 describe("$set_comment()", {
+    # {{{
     it("can handle invalid input types of comment", {
-        expect_error(idfobj$set_comment(comment = 1),
+        expect_error(mat$set_comment(comment = 1),
                      "comment is not a character vector")
-        expect_error(idfobj$set_comment(comment = list("a")),
+        expect_error(mat$set_comment(comment = list("a")),
                      "comment is not a character vector")
     })
 
     it("can delete comments", {
-        expect_equal(idfobj$set_comment(comment = NULL),
-                     structure(NA_character_, class = "IDFObject_Comment"))
+        expect_null(mat$set_comment(comment = NULL)$get_comment())
     })
 
     it("can add comments when comment is NA before", {
-        expect_equal(idfobj$set_comment(comment = c("a")),
-                     structure(c("a"), class = "IDFObject_Comment"))
+        expect_equal(mat$set_comment(comment = c("a"))$get_comment(), "a")
     })
 
     it("can append comments", {
-        expect_equal(idfobj$set_comment(comment = c("b")),
-                     structure(c("a", "b"), class = "IDFObject_Comment"))
+        expect_equal(mat$set_comment(comment = c("b"))$get_comment(), c("a", "b"))
     })
 
     it("can prepend comments", {
-        expect_equal(idfobj$set_comment(comment = c("c"), append = FALSE),
-                     structure(c("c", "a", "b"), class = "IDFObject_Comment"))
+        expect_equal(mat$set_comment(comment = c("c"), append = FALSE)$get_comment(),
+                     c("c", "a", "b"))
     })
 
     it("can reset comments", {
-        expect_equal(idfobj$set_comment(comment = c("d"), append = NULL),
-                     structure(c("d"), class = "IDFObject_Comment"))
+        expect_equal(mat$set_comment(comment = c("d"), append = NULL)$get_comment(), "d")
     })
 
     it("can detect invalid `append` value", {
-        expect_error(idfobj$set_comment(comment = c("b"), append = 1:2),
+        expect_error(mat$set_comment(comment = c("b"), append = 1:2),
                      "`append` should be NULL or a single logical value.")
     })
 
     it("can wrap comment at specified `width`", {
-        expect_equal(idfobj$set_comment(comment = c("a", "bb ccc"), append = NULL, width = 1L),
-                     structure(c("a", "bb", "ccc"), class = "IDFObject_Comment"))
+        expect_equal(mat$set_comment(comment = c("a", "bb ccc"), append = NULL, width = 1L)$get_comment(),
+                     c("a", "bb", "ccc"))
     })
 
     it("can detect invalid `width` value", {
-        expect_error(idfobj$set_comment(comment = c("a"), append = NULL, width = "a"))
+        expect_error(mat$set_comment(comment = c("a"), append = NULL, width = "a"))
     })
-
-    it("can retain class when subsetting", {
-        expect_is(idfobj$get_comment(), "IDFObject_Comment")
-        expect_identical(class(idfobj$get_comment()), class(idfobj$get_comment()[2]))
-    })
+    # }}}
 })
 
 describe("$get_value()", {
+    # {{{
     index <- c(3, 1, 5)
     name <- c("Thickness", "Name")
+    value <- list(Name = "WD01",
+                  Roughness = "MediumSmooth",
+                  Thickness = 0.0191,
+                  Conductivity = 0.115,
+                  Density = 513,
+                  `Specific Heat` = 1381,
+                  `Thermal Absorptance` = 0.9,
+                  `Solar Absorptance` = 0.78,
+                  `Visible Absorptance` = 0.78)
+
     it("can handle cases when both `index` and `name` are NULL", {
-        expect_is(idfobj$get_value(), "IDFObject_Value")
-        expect_equal(remove_attr(idfobj$get_value()),
-                     list("WD10", "MediumSmooth", 0.667, 0.115, 513, 1381,
-                          0.9, 0.78, 0.78))
+        expect_is(mat$get_value(), "list")
+        expect_equivalent(mat$get_value(), value, tolerance = 1e-5)
     })
 
     it("can detect invaid `index` values", {
-        expect_error(idfobj$get_value("1"),
+        expect_error(mat$get_value("1"),
                      "index is not a numeric or integer vector")
-        expect_error(idfobj$get_value(c(1, 10:11)),
+        expect_error(mat$get_value(c(1, 10:11)),
                      "Invalid field index found for class Material: `10` and `11`.")
     })
 
     it("can return subset of values in a object using `index`", {
-        expect_is(idfobj$get_value(index), "IDFObject_Value")
-        expect_equal(remove_attr(idfobj$get_value(index)), list(0.667, "WD10", 513))
-        expect_equal(get_attr(idfobj$get_value(index), "index", 1L), c(3, 1, 5))
-        expect_equal(get_attr(idfobj$get_value(index), "field", ""),
-                     c("Thickness {m}", "Name", "Density {kg/m3}"))
+        expect_is(mat$get_value(index), "list")
+        expect_equivalent(mat$get_value(index), value[index], tolerance = 1e-5)
     })
 
     it("can detect invalid `name` values", {
-        expect_error(idfobj$get_value(name = c("Thickness", "Wrong", "Name")),
+        expect_error(mat$get_value(name = c("Thickness", "Wrong", "Name")),
                      "Invalid field name found for class Material: `Wrong`.")
     })
 
     it("can handle cases when both `index` and `name` are given", {
-        expect_warning(idfobj$get_value(index = index, name = name),
+        expect_warning(mat$get_value(index = index, name = name),
                        "Both `index` and `name` are given. `name` will be ignored.")
-        expect_equal(remove_attr(idfobj$get_value(index, name)), list(0.667, "WD10", 513))
-        expect_equal(get_attr(idfobj$get_value(index, name), "index", 1L), c(3, 1, 5))
-        expect_equal(get_attr(idfobj$get_value(index, name), "field", ""),
-                     c("Thickness {m}", "Name", "Density {kg/m3}"))
     })
 
     it("can return subset of values in a object using `name`", {
-        expect_equal(remove_attr(idfobj$get_value(name = name)),
-                     list(0.667, "WD10"))
-        expect_equal(get_attr(idfobj$get_value(name = name), "index", 1L), c(3, 1))
-        expect_equal(get_attr(idfobj$get_value(name = name), "field", ""),
-                     c("Thickness {m}", "Name"))
+        expect_equivalent(mat$get_value(name = name), value[name], tolerance = 1e-5)
     })
+    # }}}
 })
 
-# get first object in class `Material`
-idfobj <- idf$objects_in_class("BuildingSurface:Detailed", 1L)[[1]]
-
 describe("$set_value()", {
+    # {{{
     it("can stop when trying to directly modify `Version` object", {
-        expect_error(idf$objects_in_class("Version")[[1]]$set_value(),
+        expect_error(ver$set_value(),
                      "Cannot modify `Version` object directly.")
     })
 
     it("can stop when no values are given", {
-        expect_error(idfobj$set_value(), "Please give values to set.")
+        expect_error(con$set_value(), "Please give values to set.")
     })
 
     it("can stop when both named values and unnamed values are given", {
-        expect_error(idfobj$set_value(name = "named", "unnamed"),
+        expect_error(con$set_value(name = "named", "unnamed"),
                      "Values should be either all unnamed or all named.")
     })
 
     it("can stop when duplicated names are given", {
-        expect_error(idfobj$set_value(name = "first", name = "second"),
-                     "Duplicated field nameds found: `name`.")
+        expect_error(con$set_value(name = "first", name = "second"),
+                     "Duplicated field names found: `name`.")
     })
 
     it("can stop when invalid names are given for a non-extensible class", {
-        expect_error(idf$objects_in_class("SimulationControl")[[1]]$set_value(name = "first"),
-                     "Invalid field names found for class SimulationControl: `name`.")
-    })
-
-    it("can stop when invalid names are given for an extensible class", {
-        expect_error(idfobj$set_value(name = "first", wrong = "second"),
+        expect_error(mat$set_value(wrong = "something"),
                      "Invalid field names found for class Material: `wrong`.")
     })
 
+    it("can stop when invalid names are given for an extensible class", {
+        expect_error(con$set_value(name = "first", wrong = "second"),
+                     "Invalid field names found for class Construction: `wrong`.")
+    })
+
     it("can stop when valid names are given, but total field values are not accepatable for an extensible class", {
-        expect_error(idfobj$set_value(vertex_5_x_coordinate = 1,
-                                      vertex_5_y_corrdinate = 2))
+        expect_error(surf$set_value(vertex_5_x_coordinate = 1,
+                                    vertex_5_y_coordinate = 2))
     })
 
     it("can stop when total field values are acceptable but invalid names are given for an extensible class", {
-        num_ori <- idfobj$num_fields()
-        obj_ori <- idfobj$clone(deep = TRUE)
-        expect_error(idfobj$set_value(vertex_5_x_coordinate = 1,
+        num_ori <- surf$num_fields()
+        obj_ori <- surf$clone(deep = TRUE)
+        expect_error(surf$set_value(vertex_5_x_coordinate = 1,
                                       vertex_5_y_coordinate = 2,
                                       vertex_5_z_wrong = 3),
-                     paste0("Failed to add extensible fields. Invalid field ",
-                            "names found for class BuildingSurface:Detailed: ",
+                     paste0("Invalid field names found for class BuildingSurface:Detailed: ",
                             "`vertex_5_z_wrong`."))
-        expect_equal(idfobj$num_fields(), num_ori)
-        expect_identical(iddobj, obj_ori)
+        expect_equal(surf$num_fields(), num_ori)
+        expect_equal(surf, obj_ori)
     })
 
     it("can add new values for extensible fields", {
-        expect_silent(idfobj$set_value(vertex_5_x_coordinate = 1,
-                                      vertex_5_y_coordinate = 2,
-                                      vertex_5_z_coordinate = 3))
-        expect_equal(remove_attr(idfobj$get_value()[23:25]), list(1, 2, 3))
-        expect_equal(get_attr(idfobj$get_value()[23:25], "index", 1), 23:25)
-        expect_equal(get_attr(idfobj$get_value()[23:25], "field", ""),
-                     c("Vertex 5 X-coordinate {m}",
-                       "Vertex 5 Y-coordinate {m}",
-                       "Vertex 5 Z-coordinate {m}"))
+        expect_silent(surf$set_value(vertex_5_x_coordinate = 1,
+                                     vertex_5_y_coordinate = 2,
+                                     vertex_5_z_coordinate = 3))
+        expect_equal(surf$get_value()[23:25], list(1, 2, 3))
+        expect_equal(surf$field_name(23:25),
+                     c("Vertex 5 X-coordinate",
+                       "Vertex 5 Y-coordinate",
+                       "Vertex 5 Z-coordinate"))
     })
-idd$extensible_class_name()
 
+    it("can change referenced values accordingly", {
+        expect_equal(con$set_value(name = "NewWallName")$get_value(name = "Name")[[1]], "NewWallName")
+        expect_equal(surf$get_value(name = "Construction Name")[[1]], "NewWallName")
 
-    it("", {
-
+        expect_equal(mat$set_value(name = "NewMaterialName")$get_value(name = "Name")[[1]], "NewMaterialName")
+        expect_equal(con$get_value(name = "Outside Layer")[[1]], "NewMaterialName")
     })
+
+    it("can stop when there are invalid references in the input", {
+        expect_error(con$set_value(layer_6 = "missing"))
+    })
+    # }}}
+})
+
+describe("$validate() & $is_valid()", {
+    # {{{
+    it("can find errors of invalid reference", {
+        expect_true(ver$is_valid())
+        expect_true(mat$is_valid())
+        expect_false(surf$is_valid())
+        expect_false(con$is_valid())
+    })
+    # }}}
+})
+
+describe("$out()", {
+    # {{{
+    mat_out <- c(
+        "Material,",
+        "    NewMaterialName,         !- Name",
+        "    MediumSmooth,            !- Roughness",
+        "    0.019099999,             !- Thickness {m}",
+        "    0.115,                   !- Conductivity {W/m-K}",
+        "    513,                     !- Density {kg/m3}",
+        "    1381,                    !- Specific Heat {J/kg-K}",
+        "    0.9,                     !- Thermal Absorptance",
+        "    0.78,                    !- Solar Absorptance",
+        "    0.78;                    !- Visible Absorptance")
+
+    it("can return correctly formatted IDF string output", {
+        expect_equal(mat$out(comment = FALSE), mat_out)
+    })
+    # }}}
+})
+
+describe("$print()", {
+    # {{{
+    it("can successfully print object", {
+        expect_output(ver$print())
+    })
+    # }}}
+})
+
+describe("methods inherited from IddObject", {
+    # {{{
+    it("can use $group_name()",  expect_equal(mat$group_name(), "Surface Construction Elements"))
+    it("can use $group_order()", expect_equal(mat$group_order(), 5L))
+    it("can use $class_name()", expect_equal(mat$class_name(), "Material"))
+    it("can use $class_order()", expect_equal(mat$class_order(), 55L))
+    it("can use $class_format()", expect_equal(mat$class_format(), "standard"))
+    it("can use $min_fields()", expect_equal(mat$min_fields(), 6L))
+    it("can use $num_fields()", expect_equal(mat$num_fields(), 9L))
+    it("can use $memo()", expect_match(mat$memo(), "Regular materials described.*"))
+    it("can use $num_extensible()", expect_equal(surf$num_extensible(), 3L))
+    it("can use $reference_class_name()", expect_equal(surf$reference_class_name(), NULL))
+    it("can use $first_extensible()", expect_equal(surf$first_extensible(), 11L))
+    it("can use $add_extensible_groups()", expect_equal(surf$add_extensible_groups()$num_fields(), 373L))
+    it("can use $del_extensible_groups()", expect_equal(surf$del_extensible_groups()$num_fields(), 370L))
+    it("can use $is_version()", expect_true(ver$is_version()))
+    it("can use $is_required()", expect_false(ver$is_required()))
+    it("can use $is_unique()", expect_true(ver$is_unique()))
+    it("can use $is_extensible()", expect_true(surf$is_extensible()))
+    it("can use $has_name()", expect_true(surf$has_name()))
+    it("can use $field_name()", expect_match(surf$field_name(2), "Surface Type"))
+    it("can use $field_index()", expect_equal(surf$field_index("Surface Type"), 2L))
+    it("can use $field_type()", expect_equal(surf$field_type(2), "choice"))
+    it("can use $field_unit()", expect_equal(mat$field_unit(3), "m"))
+    it("can use $field_reference()", expect_equal(con$field_reference(1), list("ConstructionNames")))
+    it("can use $field_object_list()", expect_equal(con$field_object_list(2), list("MaterialName")))
+    it("can use $field_default()", expect_equal(mat$field_default(c(1, 2)), list(NA_character_, "VeryRough")))
+
+    it("can use $field_choice()", {
+       expect_equal(mat$field_choice(c(1, 2)),
+            list(NA_character_, c("VeryRough", "Rough", "MediumRough",
+                                  "MediumSmooth", "Smooth", "VerySmooth")))
+    })
+
+    it("can use $field_note()", expect_equal(mat$field_note(1), NA_character_))
+    # }}}
 })

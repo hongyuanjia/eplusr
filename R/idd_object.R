@@ -456,8 +456,9 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # return field default value by field index
             # {{{
             # if default exists, use it
-            .field <- private$fields(index, name)
-            .field[, .default := list(list(default)), by = "field_order"]
+            .field <- private$fields(index, name)[
+                , list(.default = list(default), key = key, default = default),
+                by = list(field_order, field_an)]
 
             # enforce value type
             .field[field_an == "N" & !tolower(default) %in% c("autosize", "autocalculate"),
@@ -727,7 +728,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # get current number of extensible groups
             num_grp <- private$num_extensible_group()
             # get max field_id
-            max_field_id <- private$m_fields[.N, as.integer(field_id)]
+            max_field_id <- private$m_fields[.N, as.integer(gsub("\\D*", "", field_id))]
             # get new added field id
             added_field_id <- (num - 1L) * self$num_extensible() + seq_len(self$num_extensible())
             # get total fields
