@@ -85,14 +85,14 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
 
         initialize = function (object_id, class, comment, value, idd, ...) {
             # {{{
-            private$m_object_order <- object_id
+            private$m_object_id <- object_id
             private$m_value <- as.list(value)
             private$m_comment <- unlist(comment)
 
             .iddobj <- idd$object(class)
             len <- length(private$m_value)
             assert_that(.iddobj$is_valid_field_num(len),
-                        msg = paste0("Object [ID:", private$m_object_order, "] in class ",
+                        msg = paste0("Object [ID:", private$m_object_id, "] in class ",
                                      .iddobj$class_name(), " have ", len,
                                      " fields, which is not a valid field number."))
             # handle extensible fields
@@ -115,7 +115,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         id = function () {
             # return object id
             # {{{
-            private$m_object_order
+            private$m_object_id
             # }}}
         },
 
@@ -304,11 +304,6 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             # `Version`
             # check if there are reference fields in the input
             fields <- private$fields(index)
-            # when checking, do not convert values to refs. Treat them as normal
-            # values
-
-            # dots[fields[["has_reference"]]] <- purrr::map(dots[fields[["has_reference"]]])
-            # fields[has_reference == TRUE, ]
             # check if there are object-list fields in the input
             private$m_check_field <- data.table::copy(fields)[, value := flatten_ref(dots)]
             self$validate()
@@ -324,18 +319,34 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             if (all(purrr::map_lgl(private$m_check, is_empty))) {
                 # if there are reference fields, only need to modify the
                 # reference map
-                ref <- fields[has_reference == TRUE, field_order]
-                if (not_empty(ref)) {
+                ref_field <- fields[has_reference == TRUE]
+                ref_ord <- ref_field$field_order
+                if (not_empty(ref_field)) {
                     line_ref <- private$m_refmap$field[
-                        object_id == private$m_object_order & src_field_order %in% ref,
+                        object_id == private$m_object_id & src_field_order %in% ref_ord,
                         which = TRUE]
                     if (not_empty(line_ref)) {
                         private$m_refmap$field[line_ref,
-                            `:=`(value = unlist(unname(dots[ref])),
-                                 refvalue = purrr::map2(refvalue, dots[ref], set_ref_value))]
+                            `:=`(value = unlist(unname(dots[ref_ord])),
+                                 refvalue = purrr::map2(refvalue, dots[ref_ord], set_ref_value))]
                         # replace the value
-                        dots[ref] <- private$m_refmap$field[line_ref, refvalue]
+                        dots[ref_ord] <- private$m_refmap$field[line_ref, refvalue]
+                    # this is the case when the input value is a new reference
+                    # add it to the field reference map
+                    } else {
+                        new_ref <- ref_field[, list(reference, class_order, class, field_order)][
+                            , `:=`(object_id = private$m_object_id,
+                                   value = unlist(unname(dots[ref_ord])),
+                                   refvalue = purrr::map(unname(dots[ref_ord]), create_ref))]
+                        data.table::setnames(new_ref,
+                             c("class_order", "class", "field_order"),
+                             c("src_class_order", "src_class", "src_field_order")
+                        )
+                        private$m_refmap$field <- data.table::rbindlist(
+                            list(private$m_refmap$field, new_ref), use.names = TRUE)
+                        dots[ref_ord] <- new_ref$refvalue
                     }
+
                 }
 
                 # if there are object-list fields, set to the new reference
@@ -430,7 +441,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         print = function (comment = TRUE) {
             # TODO: change unit according to IDF$options$view_in_ip
             # {{{
-            id_class <- paste0("[ID: ", private$m_object_order, "] Class ", backtick(self$class_name()))
+            id_class <- paste0("[ID: ", private$m_object_id, "] Class ", backtick(self$class_name()))
             cli::cat_line(clisymbols::symbol$star, clisymbols::symbol$star, id_class, clisymbols::symbol$star, clisymbols::symbol$star)
 
             # comment
@@ -458,7 +469,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
     private = list(
         # PRIVATE FIELDS
         # {{{
-        m_object_order = NA_integer_,
+        m_object_id = NA_integer_,
         m_value = list(),
         m_comment = character(),
         m_iddobj = NULL,
@@ -466,6 +477,7 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
         m_fields = NULL,
         m_check = list(),
         m_check_field = list(),
+        m_order = new.env(),
         m_ref_map = new.env(),
         # }}}
 
@@ -493,9 +505,13 @@ IDFObject <- R6::R6Class(classname = "IDFObject",
             if (!any(tgt)) return(invisible(NULL))
             # for fields that have \reference
             if (any(fields[["has_reference"]])) {
-                ref_val <- private$m_refmap$field[object_id == private$m_object_order,
+                ref_val <- private$m_refmap$field[object_id == private$m_object_id,
                     list(src_field_order, refvalue)]
                 if (not_empty(ref_val)) {
+                    # There are some fields that have more than one reference
+                    # names. As the environment is the same, it will be ok to
+                    # only use the first one
+                    ref_val <- ref_val[, data.table::first(.SD), by = src_field_order]
                     # replace the value
                     private$m_value[ref_val[["src_field_order"]]] <- ref_val[["refvalue"]]
                 }
@@ -694,7 +710,7 @@ i_check_type <- function (private, cols = c("field_order", "_field",
 }
 # }}}
 
-# i_check_integer: check if there are invalid integer
+# i_check_integer: check if there are invalid integers
 # {{{
 i_check_integer <- function (private, cols = c("field_order", "_field",
                                                "_field_ip", "value")) {
@@ -736,21 +752,26 @@ i_check_range <- function (private, cols = c("field_order", "_field",
 }
 # }}}
 
-# i_check_reference
+# i_check_reference: check if there are invalid references
 # {{{
 i_check_reference <- function (private, cols) {
     # get fields that have \object-list
-    targ <- c(cols, "object_list")
+    targ <- setdiff(c(cols, "object_list"), "source")
     ref_field <- private$m_check_field[has_object_list == TRUE, ..targ]
     if (is_empty(ref_field)) return(data.table::data.table())
     ref_field <- ref_field[
         , lapply(.SD, unlist), by = setdiff(targ, c("value", "object_list"))][
         !is.na(value)]
 
-    private$m_check$reference <- merge(ref_field,
-        data.table::copy(private$m_refmap$field)[, object_id := NULL],
-        by.x = c("object_list", "value"), by.y = c("reference", "value"),
-        all.x = TRUE, sort = FALSE)[is.na(src_field_order), ..cols]
+    src <- data.table::rbindlist(
+        list(private$m_refmap$class, private$m_refmap$field), fill = TRUE)[
+        , list(reference, value)][, list(source = list(value)), by = reference]
+
+    private$m_check$reference <- merge(ref_field, src,
+        by.x = "object_list", by.y = "reference", all.x = TRUE, sort = FALSE)[
+        , row_id := .I][
+        !purrr::map2_lgl(value, source, ~toupper(.x) %in% toupper(.y)),
+        ..cols, by = row_id]
 }
 # }}}
 
@@ -907,6 +928,15 @@ i_values_to_str <- function (values, blank = FALSE) {
 # {{{
 flatten_ref <- function (x) {
     purrr::map_if(x, is.environment, ~unlist(as.list(.x), use.names = FALSE))
+}
+# }}}
+
+# create_ref
+# {{{
+create_ref <- function (value) {
+    env <- new.env(parent = emptyenv(), size = 1L)
+    env$value <- value
+    env
 }
 # }}}
 

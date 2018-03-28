@@ -97,19 +97,24 @@ IDF <- R6::R6Class(classname = "IDF",
         initialize = function (path, idd) {
             # {{{
             idf_file <- parse_idf(path, idd)
+            if (length(path) == 1L) {
+                if (file.exists(path)) private$m_path <- path
+            }
+            private$m_idd <- idd
+            private$get_order_data(idf_file$value)
 
-            private$m_path <- path
-            private$m_definition <- `._get_private`(idd)$m_objects
-            private$m_reference <- `._get_private`(idd)$m_reference
-            private$m_external <- `._get_private`(idd)$m_external
+            private$m_reference <- idd$reference()
+            private$m_external <- idd$external()
+            private$get_refmap_class(idf_file$value)
+            private$get_refmap_field(idf_file$value)
 
+            # TODO: create a version object if it does not exists
             private$m_version <- idf_file$version
             private$m_options <- idf_file$options
+            IDFObject$private_fields$m_refmap <- private$m_refmap
+            IDFObject$private_fields$m_order <- private$m_order
             objects <- purrr::pmap(idf_file$value, IDFObject$new, idd = idd)
-            private$m_objects <- idf_file$value[, object := objects]
-            # private$m_objects <- idf_file$value[,
-            #     object := list(list(IDFObject$new(object_id, class, comment, value, idd))),
-            #     by = list(object_id)]
+            private$m_objects <- idf_file$value[, `:=`(object = objects, value = NULL)]
             # }}}
         },
 
@@ -145,7 +150,7 @@ IDF <- R6::R6Class(classname = "IDF",
             scope <- match.arg(scope, choices = c("idf", "idd"))
             switch(scope,
                    idf = unique(private$m_objects$class),
-                   idd = private$m_definition$class)
+                   idd = private$m_idd$class_name())
             # }}}
         },
 
@@ -185,6 +190,27 @@ IDF <- R6::R6Class(classname = "IDF",
             # {{{
             purrr::walk(id, ~assert_that(self$is_valid_id(.x)))
             private$m_objects[object_id %in% id, object]
+            # }}}
+        },
+
+        object_in_class = function (class, index = NULL) {
+            # return a list which contails all objects in the target class
+            # {{{
+            ids <- self$id_of_class(class)
+            cls <- class
+            res <- private$m_objects[class == cls, object]
+            if (is_empty(index)) {
+                return(res[[1]])
+            } else {
+                assert_that(is_count(index))
+                n <- length(res)
+                assert_that(index <= n,
+                    msg = paste0("Invalid object index found for class ",
+                                 backtick(class), ": ",
+                                 backtick_collapse(index), ". Only ",
+                                 n, ifelse(n > 1L, " objects exist.")))
+                return(res[[index]])
+            }
             # }}}
         },
 
@@ -253,10 +279,11 @@ IDF <- R6::R6Class(classname = "IDF",
             # }}}
         },
 
-        check = function () {
+        validate = function () {
             # check if there are errors in current model
             # {{{
-            private$check_idf()
+            private$fetch_check_data()
+            i_check(private, type = "idf")
             # }}}
         },
 
@@ -300,14 +327,15 @@ IDF <- R6::R6Class(classname = "IDF",
         m_path = NULL,
         m_version = NULL,
         m_options = list(),
-        m_objects = data.table(),
-        m_definition = data.table(),
+        m_idd = NULL,
+        m_objects = data.frame(),
+        m_refmap = new.env(parent = emptyenv(), size = 2L),
+        m_order = new.env(parent = emptyenv(), size = 1L),
         m_reference = list(),
         m_external = list(),
         m_check = list(),
-        m_check_class = data.table(),
-        m_check_field = data.table(),
-        m_check_ref = data.table(),
+        m_check_class = data.frame(),
+        m_check_field = data.frame(),
         # }}}
 
         # PRIVATE FUNCTIONS
@@ -322,9 +350,10 @@ IDF <- R6::R6Class(classname = "IDF",
             # {{{
             # get class checking data
             # {{{
-            class_info <- private$m_definition[, .SD, .SDcol = c("class_order",
-                "class", "format", "min_fields", "num_fields",
-                "required_object", "unique_object", "extensible")]
+            class_info <- ._get_private(private$m_idd)$m_objects[
+                , .SD, .SDcol = c("class_order", "class", "format",
+                                  "min_fields", "num_fields", "required_object",
+                                  "unique_object", "extensible")]
             private$m_check_class <- merge(class_info, private$m_objects,
                 by = c("class_order", "class"), all = TRUE, sort = FALSE)[
                 , row_id := .I]
@@ -336,137 +365,58 @@ IDF <- R6::R6Class(classname = "IDF",
             field_values <- private$m_objects[,
                 list(value = `._get_private`(object[[1]])$m_value),
                 by = c("object_id", "class_order", "class")][
+                , value := flatten_ref(value)][
                 , field_order := seq_along(.I), by = "object_id"]
 
             # gather fields from all idd objects
-            def_fields <- private$m_objects[,
-                num_value := length(value[[1]]), by = "object_id"][
-                , `._get_private`(object[[1]])$m_fields[field_order <= num_value],
-                by = list(object_id)]
+            def_fields <- data.table::rbindlist(._get_private(idd)$m_objects[, data_field])
+
             # combine all
             private$m_check_field <- def_fields[field_values,
-                on = c("object_id", "class_order", "field_order", "class")][
-                , row_id := .I]
-            # }}}
-
-            # get reference checking data
-            # {{{
-            # get field values that are referred
-            ref_value_field <- private$m_reference$reference_field[
-                , lapply(.SD, unlist), by = list(class_order, field_order)][
-                private$m_check_field, on = c("class_order", "field_order"), nomatch = 0L][
-                , i.reference := NULL][
-                , list(value = list(unlist(value))), by = reference]
-
-            # get class values that are referred
-            # TODO: directly get these values when parsing idd
-            ref_value_class <- private$m_reference$reference_class[
-                , lapply(.SD, unlist), by = list(class_order)][
-                , list(value = list(class)), by = reference_class_name]
-            data.table::setnames(ref_value_class, "reference_class_name", "reference")
-
-            # combine
-            private$m_check_ref <- data.table::rbindlist(list(ref_value_class, ref_value_field))
-            data.table::setnames(private$m_check_ref, "value", "source")
+                on = c("class_order", "field_order", "class")]
             # }}}
             # }}}
         },
 
-        check_idf = function () {
-            # check if there are errors in current IDF
+        get_order_data = function (idf_value) {
             # {{{
-            private$fetch_check_data()
-            i_check(private, type = "idf")
+            env <- new.env(parent = emptyenv(), size = 1L)
+            env$order <- idf_value[, list(group_order, group, class_order, class, object_id)]
+            data.table::setorder(env$order, group_order, class_order, object_id)
+            private$m_order <- env
             # }}}
         },
 
-        check_missing_object = function () {
-            # check if there are missing required objects
+        get_refmap_field = function (idf_value) {
+            # set all field values that have reference to environments
             # {{{
-            i_check_missing_object(private)
+            val_field <- idf_value[, list(class_order, object_id, class, value)][
+                , lapply(.SD, unlist), by = list(class_order, object_id, class)][
+                , field_order := seq_len(.N), by = object_id]
+
+            target <- private$m_reference$reference_field[val_field,
+                on = c(src_class_order = "class_order", src_class = "class",
+                       src_field_order = "field_order"), nomatch = 0L]
+
+            uni_ref <- unique(
+                target[, list(src_class_order, src_field_order, object_id, value)]
+                )[, refvalue := list(purrr::map(value, value_to_ref)),
+                by = list(object_id, src_class_order, src_field_order)]
+
+            ref_field <- uni_ref[target, on = setdiff(names(uni_ref), "refvalue")]
+
+            private$m_refmap$field <- ref_field
             # }}}
         },
 
-        check_duplicate_object = function () {
-            # check if there are duplicated unique objects
+        get_refmap_class = function (idf_value) {
+            # collect all classes that have reference
             # {{{
-            i_check_duplicate_object(private, cols = c("class_order", "class",
-                                                       "object_id",
-                                                       "field_order", "_field",
-                                                       "_field_ip", "value"))
-            # }}}
-        },
-
-        check_scalar = function () {
-            # check if every value is a scalar
-            # {{{
-            i_check_scalar(private, cols = c("class_order", "class",
-                                             "object_id", "field_order",
-                                             "_field", "_field_ip", "value"))
-            # }}}
-        },
-
-        check_missing = function () {
-            # check if there are missing required values
-            # {{{
-            i_check_missing(private, cols = c("class_order", "class",
-                                              "object_id", "field_order",
-                                              "_field", "_field_ip", "value"))
-            # }}}
-        },
-
-        check_auto = function () {
-            # check if there are invalid autosize and autocalculate fields
-            # {{{
-            i_check_auto(private, cols = c("class_order", "class", "object_id",
-                                           "field_order", "_field", "_field_ip",
-                                           "value"))
-            # }}}
-        },
-
-        check_type = function () {
-            # check if there are character values which should be numeric or
-            # vice versa
-            # {{{
-            i_check_type(private, cols = c("class_order", "class", "object_id",
-                                           "field_order", "_field", "_field_ip",
-                                           "value"))
-            # }}}
-        },
-
-        check_integer = function () {
-            # check if there are invalid integer
-            # {{{
-            i_check_integer(private, cols = c("class_order", "class",
-                                              "object_id", "field_order",
-                                              "_field", "_field_ip", "value"))
-            # }}}
-        },
-
-        check_choice = function () {
-        # check if there are invalid choices
-            # {{{
-            i_check_choice(private, cols = c("class_order", "class",
-                                             "object_id", "field_order",
-                                             "_field", "_field_ip", "value"))
-            # }}}
-        },
-
-        check_range = function () {
-            # check if the value exceeds range
-            # {{{
-            i_check_range(private, cols = c("class_order", "class", "object_id",
-                                            "field_order", "_field",
-                                            "_field_ip", "value"))
-            # }}}
-        },
-
-        check_reference = function () {
-            # check if value has invalid reference
-            # {{{
-            i_check_reference(private, cols = c("class_order", "class",
-                                                "object_id", "field_order",
-                                                "_field", "_field_ip", "value"))
+            val_class <- idf_value[, list(class_order, object_id, class)][
+                , value := class]
+            ref_class <- private$m_reference$reference_class[val_class,
+                on = c(src_class_order = "class_order", src_class = "class"), nomatch = 0L]
+            private$m_refmap$class <- ref_class
             # }}}
         },
 
@@ -557,8 +507,7 @@ IDF <- R6::R6Class(classname = "IDF",
 #' @importFrom assertthat "on_failure<-"
 # assertion failure message {{{
 on_failure(IDF$public_methods$is_valid_class) <- function (call, env) {
-    paste0(backtick(eval(call$name, env)), " is not a valid class name in current ",
-           toupper(eval(call$scope, env)), ".")
+    paste0(backtick(eval(call$class, env)), " is not a valid class name in current IDF.")
 }
 
 on_failure(IDF$public_methods$is_valid_id) <- function (call, env) {
@@ -892,9 +841,7 @@ i_check = function (private, type = c("idf", "idfobject")) {
     i_check_range(private, cols = c(cols, "range"))
     # check invalid reference
     # do this at last in order to exclude all other errors before checking
-    if (type == "idf") {
-        i_check_reference(private, cols = c(cols, "source"))
-    }
+    i_check_reference(private, cols = c(cols, "source"))
 
     data.table::setattr(private$m_check, "class", c("IDFCheckRes", "list"))
     private$m_check
@@ -922,19 +869,19 @@ i_check_duplicate_object <- function (private, cols) {
 }
 # }}}
 
-# i_check_reference
+# value_to_ref
 # {{{
-i_check_reference <- function (private, cols) {
-    # get fields that have \object-list
-    targ <- c(setdiff(cols, "source"), "object_list")
-    ref_field <- private$m_check_field[!is.na(object_list), ..targ][
-        , lapply(.SD, unlist), by = setdiff(targ, c("value", "object_list"))][
-        !is.na(value)]
-    data.table::setnames(ref_field, "object_list", "reference")
+value_to_ref <- function (x) {
+    env <- new.env(parent = emptyenv(), size = 1L)
+    env$value <- x
+    env
+}
+# }}}
 
-    private$m_check$reference <- merge(ref_field, private$m_check_ref,
-        by = "reference")[ , row_id := .I][
-        !purrr::map2_lgl(value, source, ~toupper(.x) %in% toupper(.y)),
-        ..cols, by = row_id][, row_id := NULL]
+# set_ref_value
+# {{{
+set_ref_value <- function (ref, value) {
+    ref[["value"]] <- value
+    ref
 }
 # }}}

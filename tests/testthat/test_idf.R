@@ -74,6 +74,10 @@ describe("IDF related", {
         it("can parse IDF stored in strings", {
             expect_silent(idf_parsed <- parse_idf(text_idf, idd))
         })
+
+        it("can add a version object if not exists in current model", {
+            FALSE
+        })
     )
 
     describe("IDF methods",

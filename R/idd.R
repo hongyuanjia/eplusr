@@ -107,6 +107,7 @@ IDD <- R6::R6Class(classname = "IDD",
 
             private$m_version<- idd_file$version
             private$m_build <- idd_file$build
+            private$m_order <- idd_file$order
             private$m_objects <- idd_file$data[,
                 object := list(list(IDDObject$new(data_class, data_field))),
                 by = class_order]
@@ -161,6 +162,8 @@ IDD <- R6::R6Class(classname = "IDD",
         },
 
         group_order = function (group = NULL) {
+            # return group order
+            # {{{
             if (is_empty(group)) {
                 res <- private$m_objects[["group_order"]]
                 names(res) <- private$m_objects[["group"]]
@@ -171,9 +174,12 @@ IDD <- R6::R6Class(classname = "IDD",
                 names(res) <- grp
             }
             return(res)
+            # }}}
         },
 
         class_order = function (class = NULL) {
+            # return class order
+            # {{{
             if (is_empty(class)) {
                 res <- private$m_objects[["class_order"]]
                 names(res) <- private$m_objects[["class"]]
@@ -184,25 +190,35 @@ IDD <- R6::R6Class(classname = "IDD",
                 names(res) <- cls
             }
             return(res)
+            # }}}
         },
 
         object = function (class) {
+            # return a single object
+            # {{{
             assert_that(self$is_valid_class(class))
             cls <- class
             return(private$m_objects[class == cls, object][[1]])
+            # }}}
         },
 
         objects = function (class = NULL) {
+            # return objects in a class
+            # {{{
             if (is_empty(class)) return(private$m_objects[["object"]])
             private$assert_valid_class(class)
             cls <- class
             return(private$m_objects[class %in% cls, object])
+            # }}}
         },
 
         objects_in_group = function (group) {
+            # return all objects in a group
+            # {{{
             assert_that(self$is_valid_group(group))
             grp <- group
             return(private$m_objects[group == grp, object])
+            # }}}
         },
 
         required_objects = function () {
@@ -230,6 +246,13 @@ IDD <- R6::R6Class(classname = "IDD",
             # return external reference data
             # {{{
             private$m_external
+            # }}}
+        },
+
+        order = function () {
+            # return order data
+            # {{{
+            private$m_order
             # }}}
         },
         # }}}
@@ -263,7 +286,8 @@ IDD <- R6::R6Class(classname = "IDD",
         # {{{
         m_version = character(),
         m_build = character(),
-        m_objects = data.table(),
+        m_order = data.frame(),
+        m_objects = data.frame(),
         m_reference = list(),
         m_external = list(),
         # }}}
@@ -819,19 +843,37 @@ parse_idd <- function(path) {
          "extensible", "has_reference", "reference")
     data.table::setcolorder(idd_class, neworder)
     data.table::setorder(idd_class, group_order, class_order)
+    idd_order <- idd_class[, list(group_order, group, class_order, class)]
     # }}}
 
     # REFERENCE data
     # {{{
     # Object List data
     idd_object_list <- idd_field[has_object_list == TRUE,
-        list(class_order, class, field_order, object_list)]
+        list(class_order, class, field_order, object_list)][
+        , lapply(.SD, unlist), by = list(class_order, class, field_order)]
+    data.table::setcolorder(idd_object_list,
+        c("object_list", "class_order", "class", "field_order"))
+    data.table::setnames(idd_object_list,
+        c("object_list", "tgt_class_order", "tgt_class", "tgt_field_order"))
+
     # Reference Field data
     idd_reference_field <- idd_field[has_reference == TRUE,
-        list(class_order, class, field_order, reference)]
+        list(class_order, class, field_order, reference)][
+        , lapply(.SD, unlist), by = list(class_order, class, field_order)]
+    data.table::setcolorder(idd_reference_field,
+        c("reference", "class_order", "class", "field_order"))
+    data.table::setnames(idd_reference_field,
+        c("reference", "src_class_order", "src_class", "src_field_order"))
+
     # Reference Class data
     idd_reference_class <- idd_class[has_reference == TRUE,
-        list(class_order, class, reference_class_name)]
+        list(class_order, class, reference)][
+        , lapply(.SD, unlist), by = list(class_order, class)]
+    data.table::setcolorder(idd_reference_class,
+        c("reference", "class_order", "class"))
+    data.table::setnames(idd_reference_class,
+        c("reference", "src_class_order", "src_class"))
     # Combine
     idd_reference <- list(object_list = idd_object_list,
                           reference_class = idd_reference_class,
@@ -842,10 +884,15 @@ parse_idd <- function(path) {
     # {{{
     # External List data
     idd_external_list <- idd_field[has_external_list == TRUE,
-        list(class_order, class, field_order, external_list)]
+        list(class_order, class, field_order, external_list)][
+        , lapply(.SD, unlist), by = list(class_order, class, field_order)]
     idd_external <- list(external_list = idd_external_list,
                          reference_rdd = list(),
                          reference_mdd = list())
+    data.table::setcolorder(idd_external_list,
+        c("external_list", "class_order", "class", "field_order"))
+    data.table::setnames(idd_external_list,
+        c("external_list", "tgt_class_order", "tgt_class", "tgt_field_order"))
     # }}}
 
     pb$update(0.85, tokens = list(what = "Parsing "))
@@ -862,8 +909,7 @@ parse_idd <- function(path) {
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
-                class = idd_class,
-                field = idd_field,
+                order = idd_order,
                 data = idd_data,
                 reference = idd_reference,
                 external = idd_external)
