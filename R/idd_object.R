@@ -274,7 +274,7 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         reference_class_name = function () {
             # return reference class name
             # {{{
-            return(private$m_properties$reference_class_name)
+            return(private$m_properties$reference)
             # }}}
         },
 
