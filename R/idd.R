@@ -868,8 +868,12 @@ parse_idd <- function(path) {
 
     # Reference Class data
     idd_reference_class <- idd_class[has_reference == TRUE,
-        list(class_order, class, reference)][
-        , lapply(.SD, unlist), by = list(class_order, class)]
+        list(class_order, class, reference)]
+    # for version that does not have \reference-class-name attributes
+    if (not_empty(idd_reference_class)) {
+        idd_reference_class <- idd_reference_class[
+            , lapply(.SD, unlist), by = list(class_order, class)]
+    }
     data.table::setcolorder(idd_reference_class,
         c("reference", "class_order", "class"))
     data.table::setnames(idd_reference_class,
