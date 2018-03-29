@@ -567,7 +567,7 @@ parse_idd <- function(path) {
     # "Foundation:Kiva" for "N16", have to fix it in advanced.
     # {{{
     # fill class downwards to make search easiser
-    dup_field_anid <- idd_dt[data.table::between(type, type_class_slash, type_field_slash)][
+    dup_field_anid <- idd_dt[data.table::between(type, type_class, type_field_slash)][
         , class := class[1L], by = list(cumsum(!is.na(class)))][
         type == type_field_slash][!is.na(field_anid), list(line, class, field_anid)]
 
