@@ -1,122 +1,403 @@
-#' Parse an EnergyPlus IDF file
+#' Read, modify, save, run and analyze EnergyPlus models
 #'
-#' \code{IDF} R6 class is the core class that enable fully access to and
-#' manipulate EnergyPlus IDF models.
+#' IDFEditor distributed along with
+#' \href{https://www.energyplus.net}{EnergyPlus} provides full support for
+#' preparing EnergyPus IDF and IMF files for simulations. The parsing and
+#' writing process of IDF and IDD files in \code{eplusr} is basically the same
+#' as that in IDFEditor. But \code{eplusr} takes advantage of the powerful
+#' \code{data.table} package to speed up the whole process and store the
+#' results. The IDD files for EnergyPlus 8.5 to 8.8 have been pre-parsed and
+#' stored internally and will automatically be used when parsing \code{IDF} and
+#' \code{IMF} files. The souce codes of IDFEditor can be found on
+#' \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{GitHub}
+#' . There is still an option to give an additional IDD file path to parse if
+#' you want. However, it will still take about 3-4 sec to parse an IDD file
+#' which is much slower than IDFEditor written in Visual Basic.
+#'
+#' Basically, all model data are stored as `data.table`s. And each object
+#' in the model has an unique \strong{\code{ID}}. Once you have the object ID,
+#' you can set fields (using \code{$set}) in the object, duplicate (using
+#' \code{$dup}), delete (using \code{del}) the object.
 #'
 #' @section Usage:
-#' ```
-#'
-#' idf <- IDF$new(path, idd)
-#'
-#' idf$version()
-#' idf$id_of_class(class)
-#' idf$class_of_id(id)
-#' idf$all_class(scope = "idf")
-#' idf$all_id()
-#'
-#' idf$is_valid_class(class, scope = "idf")
-#' idf$is_valid_id(id)
-#'
-#' idf$object(id)
-#' idf$objects(id)
-#' idf$objects_in_class(class)
-#' idf$objects_in_group(group)
-#'
-#' idf$out(format = c("asis", "sorted", "ori_bot", "ori_top"), comment = TRUE,
-#' in_ip = FALSE)
-#'
-#' idf$print()
-#'
-#' print(idf)
 #'
 #' ```
+#' model <- eplus_model$new(path, idd = NULL)
 #'
-#' @section Arguments:
+#' model$all(type, class = NULL)
+#' model$contains(match, scale)
+#' model$matches(match, ..., scale)
+#' model$get(...)
+#' model$add(class, ..., min = TRUE)
+#' model$set(id, ...)
+#' model$dup(id, new_name = NULL)
+#' model$del(id, force = FALSE)
+#' model$hide(id, force = FALSE)
+#' model$notes(id, ..., append = FALSE, wrap = 0L)
+#' model$diff(type)
+#' model$check()
+#' model$save(confirm = FALSE, format)
+#' model$saveas(path, format, overwrite = FALSE)
+#' model$print()
+#' model$reset(confirm = FALSE)
+#' model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
+#' model$collect(type = c("variable", "meter"), long = FALSE)
+#' model$table(report = NULL, key = NULL, table = NULL)
+#' ```
 #'
-#' * `path`: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-#' named as `Energy+.idd`.
+#' @section Read:
 #'
-#' * `group`: A valid group name or valid group names.
+#' ```
+#' model <- eplus_model$new(path, idd = NULL)
+#' ```
 #'
-#' * `class`: A valid class name or valid class names.
+#' * `path`: Path to EnergyPlus `IDF` or `IMF` file. The file extension does not
+#'     matter. So models stored in `TXT` file are still able to correctly be
+#'     parsed.
+#' * `idd`: Path to `Energy+.idd` file. If NULL, the pre-parsed `Energy+.idd`
+#'     files stored internally from EnergyPlus v8.0 to 8.8 will be used.
 #'
-#' @section Detail:
+#' @section Query:
 #'
-#' `IDD$new()` parses an EnergyPlus Input Data Dictionary (IDD) file, and
-#' returns an IDD object.
+#' ```
+#' model$all(type, class = NULL)
+#' model$contains(match, scale)
+#' model$matches(match, ..., scale)
+#' model$get(...)
+#' ```
 #'
-#' `$version()` returns the version string of current idd file.
+#' `$all` will give you all valid components you specified using `type` in
+#'   current model for type "id" and "class". You can find all available fields
+#'   for all valid class in IDD using `$all(type = "field", class =
+#'   "any_valid_class_in_IDD")` which makes it handy to be used along with
+#'   `$add`.
 #'
-#' `$build()` returns the build tag string of current idd file.
+#' `$contains` and `$matches` will search and return objects that contain the
+#'   string or match the regular expression you give.
 #'
-#' `$group_name(class)` returns group name that that `class` belong to.
+#' `$get` will return you the objects with valid IDs you give.
 #'
-#' `$class_name(group)` returns class names of that `group`. If `group` not
-#' given, all class names in current IDD are returned.
+#' **Arguments**
 #'
-#' `$group_order(group)` returns integer orders (orders of name apperarance in
-#' the IDD file) of that `group`.
+#' * `model`: An `eplus_model` object.
+#' * `type`: Should be one of "id", "class" and "field". "id" will give you all
+#'           object IDs in current model. "class" will give you all classes
+#'           existed in current model. "field" will give you all valid fields in
+#'           the class with required fields marked with "*".
+#' * `class`: An valid class name. Only required when `type` is set to "field".
+#'            you can find all valid class names using `$all("class")`.
+#' * `match`: A string for `$contains` and a regular expression for `$matches`
+#'            you want to search or match. All `...` in `$matches` will be
+#'            parsed to `grepl`. See \code{\link{grepl}}.
+#' * `scale`: Where you want to search. Should be one of "class" and "field".
+#'            If "class", only class names existing in current model will be
+#'            searched. If "field", only fields in current model will be
+#'            searched. This is a handy option when you want to see if an object
+#'            e.g. one material, is referred by other objects e.g.
+#'            constructions.
+#' * `...` (in `$get`): Valid object IDs. You can find all valid object IDs
+#'                      using `$all("id")`.
 #'
-#' `$class_order(class)` returns integer orders (orders of name apperarance in
-#' the IDD file) of that `class`.
+#' @section Modify:
 #'
-#' `$orders()` returns the all order data (stored as a data.table with four
-#' columns, i.e. "group", "group_order", "class", "class_order").
+#' ```
+#' model$add(class, ..., min = TRUE)
+#' model$set(id, ...)
+#' model$dup(id, new_name = NULL)
+#' model$del(id, force = FALSE)
+#' model$hide(id, force = FALSE)
+#' ```
 #'
-#' `$object(class)` returns an IDDObject of that `class`.
+#' `$add` will add an object in the `class` you give. All fields will be set to
+#'   their defaults if applicable.
 #'
-#' `$objects(class)` returns a list of IDDObjects of `class`es. If `class` is
-#' NULL, all IDDObjects in current IDD are returned.
+#' `$set` will set curtain fields in the objects specified by `id`.
 #'
-#' `$objects_in_group(group)` returns a list of IDDObjects in that `group`.
+#' `$dup` will duplicate current object specified by `id`.
 #'
-#' `$is_valid_group(group)` return `TRUE` if the input is a valid `group` name.
+#' `$del` will delete current object specified by `id`. If the object is
+#'   referred by other object(s), an error will given showing the fields that
+#'   were referred. You can still delete the object if you want by setting
+#'   `force` to TRUE.
 #'
-#' `$is_valid_class(class)` return `TRUE` if the input is a valid `class` name.
+#' `$hide` is the same as `$del`, except that `$hide` will comment out the
+#' object instead of deleting it. This make if possible for you to get the
+#' hidden objects back by uncomment it using any test editor.
 #'
-#' @importFrom R6 R6Class
-#' @importFrom purrr map walk
-#' @importFrom assertthat assert_that
-#' @importFrom cli cat_rule cat_line
-#' @importFrom data.table rleid
-#' @return An IDF object
+#' All newly added, modified, deleted and hidden fields will be marked with
+#' "(+)", "(~)", "(-)" and "(!)" respectively. The valid IDs will be appended
+#' after `$add` and `$dup`, and the newly added (duplicated) object will have
+#' the max ID.  *Note* that the IDs of deleted and hidden objects are invalid
+#' after `$del` and cannot be applied to methods `$set`, `$dup`, `$del` and
+#' `$hide`, of course. However, unless you save the model, the deleted and
+#' hidden objects are still there internally but with a special mark to prevent
+#' them accessable. This is done by purpose, in order to provide a new method
+#' call `$undo` in the future, which will enable you to un-delete or un-hide
+#' the objects.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `class`: An valid class name. Only required when `type` is set to "field".
+#'            you can find all valid class names using `$all("class")`.
+#' * `id`: A valid object IDs. You can find all valid object IDs using
+#'         `$all("id")`.
+#' * `min`: If TRUE, only minimum fields will be created. Else,
+#'          all valid fields will be created. Default is TRUE.
+#' * `new_name`: The new name of the duplicated object if applicable. If NULL,
+#'               the duplicated object will have the same name of the original
+#'               object except with a suffix of "_1", "_2" and etc.
+#' * `force`: Whether delete or hide the object even it has been referred by
+#'            others. Default is FALSE.
+#' * `...`: Field values you want to add or modify. Currently three types are
+#'          acceptable: (a) directly list all field values with no name. The
+#'          values will be assigned to fields according to the order of values;
+#'          (b) give both field names and values in pair, e.g. Name = "Test",
+#'          `Sepcific Heat` = 150. You can find all valid field names (with
+#'          units) using `$all("field", class = "class_name_to_query")`; (c)
+#'          some kind of the same as (b), but with all field names in lower
+#'          cases and spaces replaced by "_". Note: All field names should be
+#'          given without units. Error will occur when the type (character or
+#'          numeric), and the value (e.g. range) are not valid.
+#'
+#' @section Notes:
+#'
+#' ```
+#' model$notes(id, ..., append = FALSE, wrap = 0L)
+#' ```
+#'
+#' `$notes` will show, add or delete notes(comments) for the object specified using `id`.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `id`: A valid object IDs. You can find all valid object IDs using
+#'         `$all("id")`.
+#' * `...`: Any character vectors you want to add as notes for the object. If
+#'          empty, the objects with notes will be printed.
+#' * `append`: If TRUE, add new notes to the end of existing ones, otherwise
+#'             add notes to the beginning of existing ones. If NULL, the
+#'             already existing notes will be deleted before add new ones.
+#' * `wrap`: If greater than 0L,long notes will be wrap at the length of `wrap`.
+#'
+#' @section Diff:
+#'
+#' ```
+#' model$diff(type)
+#' ```
+#'
+#' `$diff` will show all modifications you made, including added (or
+#'   duplicated), modified, deleted and hidden objects with markers "(+)",
+#'   "(~)", "(-)" and "(!)" respectively.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `type`: What type of modifications to show. Should be one of "all", "add",
+#'           "set", "del". Default is "all".
+#'
+#' @section Check:
+#'
+#' ```
+#' model$check()
+#' ```
+#'
+#' `$check` will check the validation of all fields in current model, including
+#'   missing required objected and fields, wrong value types, choices,
+#'   references, any value range exceeds, invalid autosizable and
+#'   autocalculatable fields.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#'
+#' @section Save:
+#'
+#' ```
+#' model$save(confirm = FALSE, format)
+#' model$saveas(path, format, overwrite = FALSE)
+#' ```
+#'
+#' `$save` is a shortcut of `$saveas(path = "the_original_model_path")` and will
+#' overwrite the current file which has a risk of losing your original file and
+#' data. So make sure you have a safe copy of you original model.
+#'
+#' `$saveas` will save the model as a new file.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `confirm`: Whether to save the model and overwrite the original file.
+#'              Default is FALSE.
+#' * `format`: The saving format. Should be one of "asis", "sorted", "ori_top",
+#'             and "ori_bot". If "asis", which is the default, the model will be
+#'             saved in the same format as it is. If the model does not contain
+#'             any format saving option, which is typically the case when the
+#'             model was not saved using `eplusr` or IDFEditor, the "sorted"
+#'             will be used. "sorted", "ori_top" and "ori_bot" are the same as
+#'             the save options "Sorted", "Original with New at Top", and
+#'             "Original with New at Bottom" in IDFEditor.
+#' * `path`: The path to save the model.
+#' * `overwrite`: Whether to overwrite the file if it already exists. Default is
+#'                FALSE.
+#'
+#' @section Reset:
+#'
+#' ```
+#' model$reset(confirm = FALSE)
+#' ```
+#'
+#' `$reset` will reset the model to the status when it was last saved using
+#' `$save` or `$saveas` (if never saved, first read and parsed using
+#' `eplus_model$new`) All your modifications will be lost, so use with
+#' caution. It is pretty useful if you messed things up during modifications.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `confirm`: Whether to reset the model. Default is FALSE.
+#'
+#' @section Run Model and Collect Results:
+#'
+#' ```
+#' model$run(period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
+#' model$collect(type = c("variable", "meter", long = FALSE))
+#' model$table(report = NULL, key = NULL, table = NULL, nest = TRUE)
+#' ```
+#'
+#' `$run` will run the current model within given period using corresponding
+#'   version of EnergyPlus.
+#'
+#' `$collect` will collect the simulation variable (specified in
+#'   `Output:Variable` class) and meter (specified in `Output:Meter*` classes)
+#'   output of current model
+#'
+#' `$table` will extract tables from simulation table (specified in
+#'   `Output:Table*` classes) output of current model.
+#'
+#' NOTE: The underlying functions in `$table` relies on the `HTML` format
+#' output. If the `Column Separator` in `OutputControl:Table:Style` does not
+#' contain `HTML` format, `eplusr` will automatically change it when running
+#' the model. For example, `"Comma"` (which is the default value) will be
+#' changed into `"CommaAndHTML"` and a warning message will be issued.
+#'
+#' **Arguments**
+#'
+#' * `model`: An `eplus_model` object.
+#' * `period`: A formula specified in format `from ~ to` to determine what
+#'             period should the model be run. It can be used to override the
+#'             `RunPeriod` objects. The original objects in `RunPeriod` class
+#'             will be commented out using `$hide`. Each side of a `period`
+#'             formulais specified as a character in format `'MM-DD'`, but
+#'             powerful shorthand is available:
+#'    - `~.`: Use existing `RunPeriod` objects. This is the default.
+#'    - `~"annual"`: Force to run annual simulation only.
+#'    - `~"design_day"`: Force to run design day only.
+#'    - `~4` or `~"4"` or `~"Apr"`: Force to run from April 1st to April 30th.
+#'    - `2~4` or `"2"~"4"` or `"Feb"~"Apr"`: Force to run from February 1st to
+#'        April 30th.
+#'    - `"2-1"~"4-30"`: Same as above.
+#' * `weather`: The weather file used to run simulation. If NULL, the chicago
+#'              weather file ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+#'              in the distributed along with corresponding EnergyPlus will be
+#'              used, and a warning message will be given.
+#' * `echo`: Whether to print the standard output and error of EnergyPlus to
+#'           the screen. Default is FALSE.
+#' * `dir`: The directory to save the simulation results. If NULL, which is the
+#'          default, the model folder will be used.
+#' * `eplus_home`: The EnergyPlus installation folder path. If NULL, which is
+#'                 the default, `eplusr` will try to find if corresponding
+#'                 version of EnergyPlus that was installed in the standard
+#'                 location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
+#'                 "/usr/local/EnergyPlus-X-X-X" on Linux and
+#'                 "/Applications/EnergyPlus-X-X-X" on MacOS.
+#' * `type`: Should be one of "variabale" (default) and "meter". If "variable",
+#'           results from `Output:Variable` will be collected. If "meter",
+#'           results from `Output:Meter*` will be collected.
+#' * `long`: Whether to change the collected data from wide format (which is
+#'           the default format from EnergyPlus) to long format which is much
+#'           easy for data analysis. In long table format, the wide table will
+#'           be melten according to DateTime and the output names will be
+#'           splited into four parts, i.e. key, variable, frequency and unit.
+#'           For more information on "Tidy Data", please read the excellent
+#'           paper of Hadley Wickham
+#'           \href{http://vita.had.co.nz/papers/tidy-data.html}{here}.
+#' * `report`, `key` and `table`: Specify what tables to extract from
+#'                                EnergyPlus HTML table output. You can find
+#'                                valid report values by looking at Table of
+#'                                Contents of the file, valid key values by
+#'                                looking at the "For" line after each report
+#'                                name. For example, the first table in the
+#'                                table output can be extract by specifying
+#'                                `$table(report = "Annual Building Utility
+#'                                Performance Summary", key = "Entire
+#'                                Facility", table = "Site and Source Energy")`.
+#' * `nest`: If TRUE, which is the default, `$table` will return a data.table
+#'           with four columns named `"report"`, `"key"`, `"table"` and
+#'           `"content"`. `"content"` is a list column which has the extracted
+#'           tables. If FALSE, a list will return with each each number
+#'           containing those data.
+#'
 #' @docType class
-#' @name IDF
+#' @name idf
 #' @author Hongyuan Jia
-#' @references
-#' \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor
-#' source code}
+#' @importFrom R6 R6Class
+#' @importFrom data.table data.table setattr rbindlist copy
+#' @importFrom purrr splice map
+#' @importFrom glue glue
+#' @importFrom cli cat_line rule
+#' @importFrom readr write_lines
+#' @importFrom assertthat assert_that
 NULL
 
-#' @export
-# IDF {{{
-IDF <- R6::R6Class(classname = "IDF",
+# Idf {{{
+Idf <- R6::R6Class(classname = "Idf",
+    inherit = Idd,
 
     public = list(
 
-        initialize = function (path, idd) {
-            # {{{
-            idf_file <- parse_idf(path, idd)
+        # INITIALIZE {{{
+        initialize = function (path, idd = NULL) {
+            # only store if input is a path
             if (length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- path
             }
-            private$m_idd <- idd
-            private$get_order_data(idf_file$value)
 
-            private$m_reference <- idd$reference()
-            private$m_external <- idd$external()
-            private$get_refmap_class(idf_file$value)
-            private$get_refmap_field(idf_file$value)
-
-            # TODO: create a version object if it does not exists
+            idf_file <- parse_idf_file(path, idd)
             private$m_version <- idf_file$version
-            private$m_options <- idf_file$options
-            IDFObject$private_fields$m_refmap <- private$m_refmap
-            IDFObject$private_fields$m_order <- private$m_order
-            objects <- purrr::pmap(idf_file$value, IDFObject$new, idd = idd)
-            private$m_objects <- idf_file$value[, `:=`(object = objects, value = NULL)]
-            # }}}
+            # init options
+            private$m_options <- list2env(idf_file$options, parent = emptyenv())
+            private$m_options$validate_level <- "final"
+            private$m_options$verbose_info <- TRUE
+            # deep clone idd content and init idd tbl
+            private$m_idd_tbl <- ._get_private(idd$clone(deep = TRUE))$m_idd_tbl
+
+            # init idf tbl
+            private$m_idf_tbl <- list2env(idf_file[!names(idf_file) %in% c("version", "options")],
+                parent = emptyenv()
+            )
+
+            # init log data
+            private$m_log <- new.env(parent = emptyenv())
+            private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
+                , object_order := 0L]
+
+            # assign shared data to IdfObject R6Class Generator
+            IdfObject$private_fields$m_idf_tbl <- private$m_idf_tbl
+            IdfObject$private_fields$m_idd_tbl <- private$m_idd_tbl
+            IdfObject$private_fields$m_options <- private$m_options
+            IdfObject$private_fields$m_log <- private$m_log
         },
+        # }}}
+
+        # FINALIZE {{{
+        finalize = function() {
+            # delete modified private fields IddObject R6Class Generator
+            IdfObject$private_fields$m_idf_tbl <- NULL
+            IdfObject$private_fields$m_idd_tbl <- NULL
+            IdfObject$private_fields$m_options <- NULL
+        },
+        # }}}
 
         # PUBLIC FUNCTIONS
         # {{{
@@ -127,53 +408,107 @@ IDF <- R6::R6Class(classname = "IDF",
             # }}}
         },
 
-        id_of_class = function (class) {
-            # return all valid id in one class or in current IDF
+        group_names = function (where = c("idf", "idd")) {
+            # return all group names
             # {{{
-            assert_that(self$is_valid_class(class))
-            cls <- class
-            private$m_objects[class == cls, object_id]
+            where <- match.arg(where)
+            if (where == "idf") {
+                private$m_idf_tbl$object[
+                    private$m_idd_tbl$class, on = "class_id", nomatch = 0L, list(group_id)][
+                    private$m_idd_tbl$group, on = "group_id", nomatch = 0L, unique(group_name)]
+            } else {
+                super$group_names()
+            }
             # }}}
         },
 
-        class_of_id = function (id) {
-            # return the class name of given object id in current IDF
+        class_names = function (where = c("idf", "idd")) {
+            # return all class names
             # {{{
-            assert_that(self$is_valid_id(id))
-            private$m_objects[object_id == id, class]
+            where <- match.arg(where)
+            if (where == "idf") {
+                private$m_idf_tbl$object[
+                    private$m_idd_tbl$class, on = "class_id", nomatch = 0L,
+                    unique(class_name)]
+            } else {
+                super$class_names()
+            }
             # }}}
         },
 
-        all_class = function (scope = "idf") {
-            # return all valid class in current IDF
-            # {{{
-            scope <- match.arg(scope, choices = c("idf", "idd"))
-            switch(scope,
-                   idf = unique(private$m_objects$class),
-                   idd = private$m_idd$class_name())
-            # }}}
-        },
-
-        all_id = function () {
+        object_ids = function (class = NULL) {
             # return all object ids in current IDF
             # {{{
-            private$m_objects$object_id
+            if (is.null(class)) {
+                res <- private$m_idd_tbl$class[private$m_idf_tbl$object,
+                    on = "class_id", nomatch = 0L, list(object_id, class_name)]
+            } else {
+                assert_that(self$is_valid_class(class, "idf"))
+                id <- super$class_order(class)
+                res <- private$m_idd_tbl$class[
+                    private$m_idf_tbl$object[class_id == id],
+                    on = "class_id", nomatch = 0L, list(object_id, class_name)]
+            }
+            data.table::setattr(res[["object_id"]], "names", res[["class_name"]])[]
             # }}}
         },
 
-        is_valid_class = function (class, scope = "idf") {
+        is_valid_class = function (class, where = "idf") {
             # check if the input string is a valid class name in current IDF
             # {{{
             assert_that(is_string(class))
-            class %in% self$all_class(scope)
+            class %in% self$class_names(where)
             # }}}
         },
 
         is_valid_id = function (id) {
             # check if the input number is a valid object id in current IDF
             # {{{
-            assert_that(is_scalar(id), is_integerish(id))
-            id %in% self$all_id()
+            assert_that(is_count(id))
+            id %in% self$object_ids()
+            # }}}
+        },
+
+        get_options = function (options = NULL) {
+            # return current options for current Idf
+            # {{{
+            res <- as.list.environment(private$m_options)
+            if (is.null(options)) {
+                res
+            } else {
+                assert_that(is.character(options))
+                private$assert_valid_options(options)
+                res[options]
+            }
+            # }}}
+        },
+
+        set_options = function (...) {
+            # set options for current Idf
+            # {{{
+            # capture all arguments in dots and flatten into a list
+            dots <- purrr::splice(...)
+            assert_that(not_empty(dots), msg = "Please give options to set.")
+            nms <- names(dots)
+            assert_that(all(nms != ""), msg = "Please give option names to set.")
+            private$assert_valid_options(nms)
+            if (not_empty(dots$validate_level)) {
+                private$set_validate_level(dots[["validate_level"]])
+            }
+            if (not_empty(dots$save_format)) {
+                private$set_save_format(dots[["save_format"]])
+            }
+            if (not_empty(dots$special_format)) {
+                private$set_flag_option("special_format", dots[["special_format"]])
+            }
+            if (not_empty(dots$view_in_ip)) {
+                private$set_flag_option("view_in_ip", dots[["view_in_ip"]])
+            }
+            if (not_empty(dots$num_digits)) {
+                private$set_num_digits(dots[["num_digits"]])
+            }
+            private$update_value_tbl()
+            return(invisible(self))
             # }}}
         },
 
@@ -181,94 +516,278 @@ IDF <- R6::R6Class(classname = "IDF",
             # return a single object
             # {{{
             assert_that(self$is_valid_id(id))
-            private$m_objects[object_id == id, object][[1]]
+            IdfObject$new(id)
             # }}}
         },
 
-        objects = function (id) {
+        objects = function (ids) {
             # return a list which contains all objects with input object ids
             # {{{
-            purrr::walk(id, ~assert_that(self$is_valid_id(.x)))
-            private$m_objects[object_id %in% id, object]
+            private$assert_valid_ids(ids)
+            purrr::map(ids, IdfObject$new)
             # }}}
         },
 
         object_in_class = function (class, index = NULL) {
-            # return a list which contails all objects in the target class
+            # return the IdfObject at index in a class
             # {{{
-            ids <- self$id_of_class(class)
-            cls <- class
-            res <- private$m_objects[class == cls, object]
-            if (is_empty(index)) {
-                return(res[[1]])
+            ids <- self$object_ids(class)
+            if (is.null(index)) {
+                IdfObject$new(ids[1])
             } else {
                 assert_that(is_count(index))
-                n <- length(res)
-                assert_that(index <= n,
-                    msg = paste0("Invalid object index found for class ",
-                                 backtick(class), ": ",
-                                 backtick_collapse(index), ". Only ",
-                                 n, ifelse(n > 1L, " objects exist.")))
-                return(res[[index]])
+                assert_that(index <= length(ids),
+                    msg = paste0("Invalid index found for class ",
+                        backtick(class), ": ",
+                        backtick_collapse(index), ". Only ",
+                        n, ifelse(n > 1L, " objects exist.", " object exists.")
+                    )
+                )
+                IdfObject$new(ids[index])
             }
             # }}}
         },
 
-        objects_in_class = function (class, index = NULL) {
+        objects_in_class = function (class, indexes = NULL) {
             # return a list which contails all objects in the target class
             # {{{
-            ids <- self$id_of_class(class)
-            cls <- class
-            res <- private$m_objects[class == cls, object]
-            if (not_empty(index)) {
-                purrr::walk(index, ~assert_that(is_count(.x)))
-                n <- length(res)
-                valid <- index <= n
-                assert_that(all(valid),
-                    msg = paste0("Invalid object index found for class ",
-                                 backtick(class), ": ",
-                                 backtick_collapse(index[!valid]), ". Only ",
-                                 n, ifelse(n > 1L, " objects exist.", " object exists.")))
-                return(res[index])
+            ids <- self$object_ids(class)
+            if (is.null(indexes)) {
+                purrr:map(ids, IdfObject$new)
             } else {
-                return(res)
+                assert_that(is_integerish(indexes))
+                assert_that(all(indexes <= length(ids)),
+                    msg = paste0("Invalid indexes found for class ",
+                        backtick(class), ": ",
+                        backtick_collapse(indexes[indexes > length(ids)]),
+                        ". Only ", n, ifelse(n > 1L, " objects exist.", " object exists.")
+                    )
+                )
+                purrr::map(ids[indexes], IdfObject$new)
             }
             # }}}
         },
 
-        dup_object = function (id) {
+        dup_object = function (id, new_name = NULL) {
             # duplicate an Object
             # {{{
+            # first, copy the corresponding row in the private$m_objects
+            target <- self$object(id)
+
+            # can be duplicated?
+            private$assert_can_add_object_in_class(target$class_name())
+
+            can_name <- target$has_name()
+            if (!is.null(new_name)) {
+                if (can_name) {
+                    # check name conflict
+                    old_nm <- target$get_value(1L)[[1]]
+                    assert_that(new_name != old_nm, msg = glue::glue(
+                        "New name `{new_name}` is the same as the name of \\
+                        duplicated object."))
+                } else {
+                    warning(glue::glue("Class {obj$class_name()} does not have \\
+                        name. `new_name` is ignored."), call. = FALSE)
+                }
+            } else {
+                if (can_name) {
+                    old_nm <- target$get_value(1L)[[1]]
+                    # get all names in the same class
+                    nms <- private$m_idf_tbl$object[class_id == target$class_order()][
+                        private$m_idf_tbl$value, on = "object_id", nomatch = 0L][
+                        private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
+                        field_order == 1L, list(value_upper, value)]
+                    # get existing names that has a prefix of old name
+                    same <- nms[["value_upper"]][startsWith(nms[["value_upper"]], paste0(toupper(old_nm), "_"))]
+                    if (length(same) == 0L) {
+                        new_name <- paste0(old_nm, "_1")
+                    } else {
+                        # extract the max duplicated time
+                        suffix <- unlist(purrr::map(strsplit(same, "_", fixed = TRUE), 2L))
+                        max_dup <- max(suppressWarnings(as.integer(suffix)))
+                        new_name <- paste0(old_nm, "_", max_dup + 1L)
+                    }
+                    private$verbose_info("New name of the new object is not \\
+                        given. A name `{new_name}` is assigned to it.")
+                }
+            }
+
+            max_obj_id <- private$m_idf_tbl$object[, max(object_id)]
+            max_val_id <- private$m_idf_tbl$value[, max(value_id)]
+            max_cmt_id <- private$m_idf_tbl$comment[, max(comment_id)]
+
+            obj_tbl <- private$m_idf_tbl$object[object_id == id][
+                , object_id := max_obj_id + 1L]
+            val_tbl <- private$m_idf_tbl$value[object_id == id][
+                , `:=`(value_id = max_val_id + seq_along(value_id),
+                       object_id = rep(max_obj_id + 1L, length(value_id)))]
+            if (can_name) {
+                val_tbl[1, `:=`(value = new_name,
+                                value_upper = toupper(new_name))]
+            }
+            cmt_tbl <- private$m_idf_tbl$comment[object_id == id][
+                , `:=`(comment_id = max_cmt_id + seq_along(comment_id),
+                       object_id = rep(max_obj_id + 1L, length(object_id)))]
+
+            old_ids <- private$m_idf_tbl$value[object_id == id, value_id]
+            new_ids <- val_tbl[["value_id"]]
+            val_ref_tbl <- private$m_idf_tbl$value_reference[value_id %in% old_ids][
+                , `:=`(value_id = new_ids[old_ids %in% value_id])]
+
+            private$m_idf_tbl$object <- data.table::rbindlist(list(
+                private$m_idf_tbl$object, obj_tbl
+            ))
+            private$m_idf_tbl$value <- data.table::rbindlist(list(
+                private$m_idf_tbl$value, val_tbl
+            ))
+            private$m_idf_tbl$comment <- data.table::rbindlist(list(
+                private$m_idf_tbl$comment, cmt_tbl
+            ))
+            private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
+                private$m_idf_tbl$value_reference, val_ref_tbl
+            ))
+            # log
+            private$m_log$order <- data.table::rbindlist(list(
+                private$m_log$order,
+                private$m_log$order[object_id == id][
+                    , `:=`(object_id = max_obj_id + 1L, object_order = 1L)]
+            ))
+
+            IdfObject$new(max_obj_id + 1L)
+            # }}}
+        },
+
+        search_object = function (class, field) {
+            # classs
+            # {{{
 
             # }}}
         },
 
-        add_object = function (class) {
+        insert_objects = function (object) {
+            # insert objects from other Idf or file or even clipboard
+            # {{{
+
+            # }}}
+        },
+
+        insert_object = function (object) {
+            # insert an object from other Idf or file or even clipboard
+            # {{{
+
+            # }}}
+        },
+
+        add_object = function (class, ..., defaults = TRUE) {
             # add a new object in class
             # {{{
+            # can be added?
+            private$assert_can_add_object_in_class(class)
 
+            cls_id <- super$class_order(class)
+            obj_id <- private$m_idf_tbl$object[, max(object_id)] + 1L
+            obj_tbl <- data.table::data.table(object_id = obj_id, class_id = cls_id)
+
+            private$m_idf_tbl$object <- data.table::rbindlist(list(
+                private$m_idf_tbl$object, obj_tbl))
+
+            idfobj <- IdfObject$new(obj_id)
+
+            idfobj <- tryCatch(idfobj$set_value(..., defaults = defaults),
+                error = function(e) {
+                    private$m_idf_tbl$object <- private$m_idf_tbl$object[
+                       object_id != obj_id]
+                    e
+                }
+            )
+            # if failed
+            if (inherits(idfobj, "error")) {
+                cli::cat_line(glue::glue("Failed to add a new object \\
+                    [ID: {obj_id}] in class `{class}`."))
+            } else {
+                # log
+                private$m_log$order <- data.table::rbindlist(list(
+                    private$m_log$order,
+                    data.table::data.table(object_id = obj_id, object_order = 1L)
+                ))
+                private$verbose_info("A new object [ID: {obj_id}] in class \\
+                    `{class}` has been added.")
+                idfobj
+            }
             # }}}
         },
 
-        set_object = function (id, ..., comment = NULL) {
+        set_object = function (id, ...) {
             # set values in an object
             # {{{
-            assert_that(self$is_valid_id(id))
-            self$object(id)$set_value(...)
-            # private$m_objects[object_id == id, object := object$set_value(...)]
+            obj <- self$object(id)
+            obj$set_value(...)
+            # log
+            private$m_log$order[object_id == id, object_order := object_order + 1L]
+            obj
             # }}}
         },
 
-        set_objects_in_class = function (class, index = NULL) {
-            # set values across all or some objects in a class
-            # {{{
-            # }}}
-        },
-
-        del_object = function (id) {
+        del_object = function (id, force = FALSE, referenced = FALSE) {
             # delete an object
             # {{{
-
+            target <- self$object(id)
+            refby <- ._get_private(target)$field_ref_by(with_other = TRUE)
+            # message
+            # {{{
+            if (not_empty(refby)) {
+                if (private$m_options$validate_level == "final") {
+                    if (force) {
+                        if (referenced) {
+                            ids <- c(id, refby[["target_object_id"]])
+                            if (private$m_options$verbose_info) {
+                                message(glue::glue("Force to delete target object \\
+                                    and also referenced objects. [ID: {backtick_collapse(ids)}]."))
+                            }
+                        } else {
+                            ids <- id
+                            if (private$m_options$verbose_ino) {
+                                message(glue::glue("Force to delete target object \\
+                                    which was referenced by objects \\
+                                    [ID: {backtick_collapse(refby[['target_object_id']])}]."))
+                            }
+                        }
+                    } else {
+                        cli::cat_line(format_refmap_sgl(
+                            refby, "by", in_ip = private$m_options$view_in_ip
+                        ))
+                        stop(glue::glue("Target object was referenced by other \\
+                            objects [ID: {backtick_collapse(refby[['target_object_id']])}]. \\
+                            Set `force` to TRUE if you want to continue."),
+                            call. = FALSE)
+                    }
+                } else {
+                    if (referenced) {
+                        ids <- c(id, refby[["target_object_id"]])
+                        if (private$m_options$verbose_info) {
+                            message(glue::glue("Delete target object \\
+                                and also referenced objects. [ID: {backtick_collapse(ids)}]."))
+                        }
+                    } else {
+                        ids <- id
+                        if (private$m_options$verbose_ino) {
+                            message(glue::glue("Delete target object \\
+                                which was referenced by objects \\
+                                [ID: {backtick_collapse(refby[['target_object_id']])}]."))
+                        }
+                    }
+                }
+            }
+            # }}}
+            # delete
+            private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% ids]
+            val_ids <- private$m_idf_tbl$value[object_id %in% ids, value_id]
+            private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% ids]
+            private$m_idf_tbl$value_reference <- private$m_idf_tbl$comment[
+                !(referenced_value_id %in% ids | value_id %in% ids)]
+            private$m_idf_tbl$comment <- private$m_idf_tbl$comment[!object_id %in% ids]
+            # log
+            private$m_log$order <- private$m_log$order[!object_id %in% ids]
             # }}}
         },
 
@@ -280,45 +799,106 @@ IDF <- R6::R6Class(classname = "IDF",
         },
 
         validate = function () {
-            # check if there are errors in current model
+            # validate field in terms of all creteria
             # {{{
-            private$fetch_check_data()
-            i_check(private, type = "idf")
+            i_collect_validate(private)
+            private$m_validate
             # }}}
         },
 
-        out = function (format = c("asis", "sorted", "ori_bot", "ori_top"),
-                        comment = TRUE, in_ip = FALSE) {
-            # return save-ready format string
+        is_valid = function () {
+            # return TRUE if there are no errors after `$check()`
             # {{{
-            format <- private$out_format(format)
-            header <- private$out_header(format)
-            lines <- private$out_line(format = format, comment = comment)
-            c(header, lines)
+            i_is_valid(private)
             # }}}
         },
+
+        string = function (header = TRUE) {
+            # return save-ready format string
+            # {{{
+            val_tbl <- private$value_tbl()[private$m_log$order, on = "object_id",
+                nomatch = 0L]
+            cmt_tbl <- private$comment_tbl()
+            main <- format_output(val_tbl, cmt_tbl, private$m_options)
+            main <- unlist(strsplit(main, "\n", fixed = TRUE))
+
+            h <- NULL
+            if (header) {
+                h <- format_header(private$m_options)
+            } else {
+                main <- main[-c(1,2)]
+            }
+
+            # add a blank line at the end like IDFEditor
+            c(h, main, "")
+            # }}}
+        },
+
+        save = function (path, overwrite = FALSE) {
+            # {{{
+            assert_that(is_string(path))
+            assert_that(has_exts(path, c("idf", "imf", "text")))
+
+            str <- self$string(header = TRUE)
+            if (file.exists(path)) {
+                if (!overwrite) {
+                    stop("Target already exists. Please set `overwrite` to ",
+                         "FALSE if you want to replace it.", call. = FALSE)
+                } else {
+                    private$verbose_info("Replace the existing file located \\
+                        at `{normalizePath(path)}`.")
+                    readr::write_lines(str, path)
+                }
+            } else {
+                readr::write_lines(str, path)
+                private$verbose_info("The Idf has been successfully saved to\\
+                    `{normalizePath(path)}`.")
+            }
+            # }}}
+        },
+
+        run = function (weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
+            irun(self, private, weather, echo = echo,
+                 dir = dir, eplus_home = eplus_home),
+
+        collect = function (type = c("variable", "meter"), long = FALSE)
+            icollect_varmeter(self, private, type = type, long = long),
+
+        table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
+            icollect_output(self, private, type = "table", report = report,
+                            key = key, table = table, nest = nest),
+
+        # mask or delete non-useful methods inherited from `Idd` class
+        # TODO: find a nicer way to do so
+        build = function () stop("attempt to apply non-function", call. = FALSE),
+        group_order = function () stop("attempt to apply non-function", call. = FALSE),
+        class_order = function () stop("attempt to apply non-function", call. = FALSE),
+        objects_in_group = function () stop("attempt to apply non-function", call. = FALSE),
+        required_objects = function () stop("attempt to apply non-function", call. = FALSE),
+        unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
 
         print = function () {
             # {{{
-            # get object count
-            res <- private$m_objects[, list(num = .N), by = c("group", "class")]
+            count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
+                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
+                , list(group_name, class_name, num_obj)]
 
-            max_count <- res[, max(num)]
+            max_num <- count[, max(num_obj)]
+            count[, num_str := paste0("[", lpad(num_obj, "0"), "]")]
+            count[, grp := ""]
+            count[count[, .I[1L], by = list(group_name)]$V1,
+                grp := paste0("\nGroup: ", backtick(group_name), "\n", cli::rule(), "\n")]
+            out <- count[, paste0(grp, num_str, " ", class_name)]
 
-            res <- res[, count := paste0(
-                "[", stringr::str_pad(num, nchar(max_count), "left", "0"), "]")]
-
-            res[, grp := ""]
-
-            res[res[, .I[1L], by = list(group)]$V1,
-                grp := paste0("\nGroup: ", backtick(group), "\n", cli::rule(), "\n")]
-
-            out <- res[, paste0(grp, count, " ", class)]
-
-            cat(out, sep = "\n")
+            path <- private$m_path %||% ""
+            cli::cat_line("# Path: ", backtick(path))
+            cli::cat_line("# Version: ", backtick(private$m_version))
+            cli::cat_line(out)
             # }}}
         }
         # }}}
+
     ),
 
     private = list(
@@ -327,176 +907,158 @@ IDF <- R6::R6Class(classname = "IDF",
         m_path = NULL,
         m_version = NULL,
         m_options = list(),
-        m_idd = NULL,
-        m_objects = data.frame(),
-        m_refmap = new.env(parent = emptyenv(), size = 2L),
-        m_order = new.env(parent = emptyenv(), size = 1L),
-        m_reference = list(),
-        m_external = list(),
-        m_check = list(),
-        m_check_class = data.frame(),
-        m_check_field = data.frame(),
+        m_idd_tbl = NULL,
+        m_idf_tbl = NULL,
+        m_validate = NULL,
+        m_temp = NULL,
+        m_log = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
         # {{{
-        fetch_cache = function () {
-            # cache
-
-        },
-
-        fetch_check_data = function () {
-            # fetch values from all objects
+        object_tbl = function () {
+            # return a tbl contains all object info
             # {{{
-            # get class checking data
-            # {{{
-            class_info <- ._get_private(private$m_idd)$m_objects[
-                , .SD, .SDcol = c("class_order", "class", "format",
-                                  "min_fields", "num_fields", "required_object",
-                                  "unique_object", "extensible")]
-            private$m_check_class <- merge(class_info, private$m_objects,
-                by = c("class_order", "class"), all = TRUE, sort = FALSE)[
-                , row_id := .I]
-            # }}}
-
-            # get field checking data
-            # {{{
-            # gather values from all idf objects
-            field_values <- private$m_objects[,
-                list(value = `._get_private`(object[[1]])$m_value),
-                by = c("object_id", "class_order", "class")][
-                , value := flatten_ref(value)][
-                , field_order := seq_along(.I), by = "object_id"]
-
-            # gather fields from all idd objects
-            def_fields <- data.table::rbindlist(._get_private(idd)$m_objects[, data_field])
-
-            # combine all
-            private$m_check_field <- def_fields[field_values,
-                on = c("class_order", "field_order", "class")]
-            # }}}
+            private$m_idf_tbl$object[private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
             # }}}
         },
 
-        get_order_data = function (idf_value) {
+        value_tbl = function () {
+            # return a tbl contains all value info
             # {{{
-            env <- new.env(parent = emptyenv(), size = 1L)
-            env$order <- idf_value[, list(group_order, group, class_order, class, object_id)]
-            data.table::setorder(env$order, group_order, class_order, object_id)
-            private$m_order <- env
+            private$m_idd_tbl$group[
+                private$m_idd_tbl$class, on = "group_id", nomatch = 0L][
+                private$m_idf_tbl$object, on = "class_id", nomatch = 0L, list(object_id, class_name)][
+                private$m_idf_tbl$value, on = "object_id", nomatch = 0L][
+                private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
+                private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L]
             # }}}
         },
 
-        get_refmap_field = function (idf_value) {
-            # set all field values that have reference to environments
+        comment_tbl = function () {
+            # return a tbl contains all comment info
             # {{{
-            val_field <- idf_value[, list(class_order, object_id, class, value)][
-                , lapply(.SD, unlist), by = list(class_order, object_id, class)][
-                , field_order := seq_len(.N), by = object_id]
-
-            target <- private$m_reference$reference_field[val_field,
-                on = c(src_class_order = "class_order", src_class = "class",
-                       src_field_order = "field_order"), nomatch = 0L]
-
-            uni_ref <- unique(
-                target[, list(src_class_order, src_field_order, object_id, value)]
-                )[, refvalue := list(purrr::map(value, value_to_ref)),
-                by = list(object_id, src_class_order, src_field_order)]
-
-            ref_field <- uni_ref[target, on = setdiff(names(uni_ref), "refvalue")]
-
-            private$m_refmap$field <- ref_field
+            data.table::copy(private$m_idf_tbl$comment)[
+                type == 0L, `:=`(comment = paste0("!", comment))][
+                , lapply(.SD, paste0, collapse = "\n"),
+                .SDcols = "comment", by = object_id]
             # }}}
         },
 
-        get_refmap_class = function (idf_value) {
-            # collect all classes that have reference
+        update_value_tbl = function () {
+            # update value tbl according num_digits and view_in_ip options
             # {{{
-            val_class <- idf_value[, list(class_order, object_id, class)][
-                , value := class]
-            ref_class <- private$m_reference$reference_class[val_class,
-                on = c(src_class_order = "class_order", src_class = "class"), nomatch = 0L]
-            private$m_refmap$class <- ref_class
+            private$m_idf_tbl$value <- update_value_num(private$value_tbl(),
+                digits = private$m_options$num_digits,
+                in_ip = private$m_options$view_in_ip)[
+                , .SD, .SDcols = names(private$m_idf_tbl$value)]
             # }}}
         },
 
-        out_format = function (format = c("asis", "sorted", "ori_bot", "ori_top")) {
-            # return save format
+        assert_can_add_object_in_class = function (class) {
+            # assert that all members in group are valid group names.
             # {{{
-            # Default use "SortedOrder"
-            format <- match.arg(format)
-            format <- switch(format,
-                asis = private$m_options$format,
-                sorted = "SortedOrder",
-                ori_bot = "OriginalOrderBottom",
-                ori_top = "OriginalOrderTop")
-            if (is.null(format)) format <- "SortedOrder"
+            if (private$m_options$validate_level == "none") {
+                res <- TRUE
+            }
 
-            return(format)
-            # }}}
-        },
-
-        out_header = function (format) {
-            # return output header
-            # {{{
-            if (private$m_options$idfeditor) {
-                header_generator <- "!-Generator IDFEditor"
+            is_unique <- class %in% super$unique_class_names()
+            if (!is_unique) {
+                res <- TRUE
             } else {
-                header_generator <- "!-Generator eplusr"
+                num <- private$m_idf_tbl$object[
+                    class_id == super$class_order(class), .N]
+                if (num == 0L) {
+                    res <- TRUE
+                } else {
+                    res <- FALSE
+                }
             }
-
-            header_option <- paste0("!-Option ", format)
-
-            if (private$m_options$special_format) {
-                warning("Currently option 'UseSpecialFormat' is not supported. Standard foramt will be used.",
-                        call. = FALSE)
-            }
-
-            if (private$m_options$view_in_ip) {
-                warning("Currently option 'ViewInIPunits' is not supported. SI format will be used.",
-                        call. = FALSE)
-            }
-            # currently, "UseSpecialFormat" and "ViewInIPunits" options are not supported.
-            special_format <- NULL
-            ip_unit <- NULL
-
-            header_option <- paste0(header_option, " ", special_format, " ", ip_unit)
-            header_option <- stringr::str_trim(header_option, "right")
-
-            # TODO: Add "UseSpecialFormat" and "ViewInIPunits" support
-            header <- c(
-                header_generator,
-                header_option,
-                "",
-                "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
-                "!-      Use '!' comments if they need to be retained when using the IDFEditor."
-                )
-
-            return(header)
+            assert_that(res,
+                msg = paste0("Class ", backtick(class), " is an existing unique ",
+                   "object that can not be added or duplicated."))
             # }}}
         },
 
-        out_line = function (comment = TRUE, format) {
-            # return output lines according to the format
+        assert_valid_ids = function (ids) {
+            # assert that all members in group are valid group names.
             # {{{
-            data.table::setorder(private$m_objects, class_order, object_id)
-            private$m_objects[, class_group := .GRP, by = list(data.table::rleid(class))]
-            l_cls <- private$m_objects[, .I[1], by = list(class_group)]$V1
-            id_cls <- private$m_objects[l_cls, object_id]
+            valid <- ids %in% self$object_ids()
+            assert_that(all(valid),
+                msg = paste0("Invalid object id found for current Idf:",
+                             backtick_collapse(ids[!valid]), "."))
+            # }}}
+        },
 
-            # collect all out from each object
-            private$m_objects[, out_obj := list(list(c("", object[[1]]$out()))), by = object_id]
-            # add headings
-            private$m_objects[object_id %in% id_cls,
-                out_obj := list(list(c(
-                    "",
-                    "",
-                    paste0("!-   ===========  ALL OBJECTS IN CLASS: ",
-                            toupper(class), " ==========="),
-                    out_obj[[1]]
-                ))), by = object_id]
-            # combine
-            unlist(private$m_objects[["out_obj"]])
+        assert_valid_groups = function (groups) {
+            # assert that all members in group are valid group names.
+            # {{{
+            valid <- groups %in% self$group_names()
+            assert_that(all(valid),
+                msg = paste0("Invalid group names found for current Idf:",
+                             backtick_collapse(groups[!valid]), "."))
+            # }}}
+        },
+
+        assert_valid_classes = function (classes) {
+            # assert that all members in class are valid class names.
+            # {{{
+            valid <- classes %in% self$class_names()
+            assert_that(all(valid),
+                msg = paste0("Invalid class name found for current Idf: ",
+                             backtick_collapse(classes[!valid]), "."))
+            # }}}
+        },
+
+        assert_valid_options = function (options) {
+            # assert that all members in options are valid option names.
+            # {{{
+            valid <- options %in% names(private$m_options)
+            assert_that(all(valid),
+                msg = paste0("Invalid option name found for current Idf: ",
+                             backtick_collapse(options[!valid]), "."))
+            # }}}
+        },
+
+        set_flag_option = function (option, flag) {
+            # set flag option
+            # {{{
+            assert_that(is_flag(flag))
+            private$m_options[[option]] <- flag
+            # }}}
+        },
+
+        set_validate_level = function (level = c("none", "draft", "final")) {
+            # set validate strictness level
+            # {{{
+            level <- match.arg(level)
+            private$m_options$validate_level <- level
+            # }}}
+        },
+
+        set_save_format = function (format = c("sorted", "new_top", "new_bottom")) {
+            # set validate strictness format
+            # {{{
+            format <- match.arg(format)
+            private$m_options$save_format <- format
+            # }}}
+        },
+
+        set_num_digits = function (digits) {
+            # set validate strictness format
+            # {{{
+            assert_that(is_count(digits))
+            private$m_options$num_digits <- digits
+            # }}}
+        },
+
+        verbose_info = function (msg) {
+            # return add verbose message
+            # {{{
+            if (private$m_options$verbose_info) {
+                message(glue::glue(msg, .envir = parent.frame(1)))
+            }
             # }}}
         }
         # }}}
@@ -504,384 +1066,45 @@ IDF <- R6::R6Class(classname = "IDF",
 )
 # }}}
 
-#' @importFrom assertthat "on_failure<-"
-# assertion failure message {{{
-on_failure(IDF$public_methods$is_valid_class) <- function (call, env) {
-    paste0(backtick(eval(call$class, env)), " is not a valid class name in current IDF.")
-}
+# irun {{{
+irun <- function (self, private, period, weather, echo = FALSE, dir = NULL,
+                      eplus_home = NULL) {
+    assert_that(private$m_version >= 8.3,
+                msg = "Currently, `$run` only supports EnergyPlus V8.3 or higher.")
 
-on_failure(IDF$public_methods$is_valid_id) <- function (call, env) {
-    paste0(backtick(eval(call$id, env)), " is not a valid object ID in current IDF.")
-}
-# }}}
+    eplus_info <- eplus_path(private$version, eplus_home)
+    eplus_exe <- eplus_info["eplus"]
 
-#' @importFrom data.table setnames setorder last
-# parse_idf {{{
-parse_idf <- function (path, idd) {
-    assert_that(is_idd(idd))
-
-    idf_str <- read_idd(path)
-
-    idf_version <- get_idf_ver(idf_str)
-
-    idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
-
-    # idf and idd version mismatch {{{
-    idd_version <- idd$version()
-    if (not_empty(idf_version)) {
-        if (!grepl(idf_version, idd_version, fixed = TRUE)) {
-            warning(msg("Version Mismatch. The file parsing is a differnet version
-                        '",idf_version,"' than the EnergyPlus program and IDD file
-                        you are using '",substr(idd_version, 1L, 3L),"'. Editing and
-                        saving the file may make it incompatible with an older
-                        version of EnergyPlus."),
-                call. = FALSE)
+    # set default weather {{{
+    if (is_empty(weather)) {
+        weather <- eplus_info["epw"]
+        if (is_empty(weather)) {
+            stop(msg("Failed to use default weather file
+                     'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'. Please
+                     give 'weather' file path."), call. = FALSE)
+        } else {
+            warning(msg(
+                "Missing weather input, weather file located at ",
+                backtick(weather), " will been used."), call. = FALSE)
         }
     }
     # }}}
 
-    # mark type {{{
-    # -3, unknown
-    type_unknown <- -3L
-    # -2, speical comment
-    type_special <- -2L
-    # -1, macro
-    type_macro <- -1L
-    #  0, block comment
-    type_comment <- 0L
-    #  1, object
-    type_object <- 1L
-    #  2, field
-    type_field <- 2L
-    #  3, last field in an object
-    type_field_last <- 3L
-    idf_dt[, type := type_unknown]
-    data.table::setorder(idf_dt, line, type)
+    # auto correct table output style
+    idf <- set_output_table_style(idf, private$idd)
 
-    # delete blank lines
-    idf_dt <- idf_dt[!(string %in% "")]
-    idf_dt[startsWith(string, "##"), type := type_macro]
-    # handle EP-Macro lines {{{
-    idf_macro <- idf_dt[type == type_macro]
-    idf_macro[, space_loc := regexpr(" ", string, fixed = TRUE)]
-    idf_macro[space_loc > 0L,
-        `:=`(macro_key = substr(string, 1L, space_loc - 1L),
-             macro_value = substr(string, space_loc + 1L, nchar(string)))]
-    idf_macro[space_loc < 0L, macro_key := substr(string, 1L, nchar(string))]
-    # unknown marco key {{{
-    idf_errors_unknown_macro <- idf_macro[!(macro_key %in% macro_dict),
-                                          list(line, string)]
-    if (not_empty(idf_errors_unknown_macro)) {
-        parse_issue(type = "Unknown macro found", src = "IDF",
-                    data_errors = idf_errors_unknown_macro)
-    }
-    # }}}
-    # mark macro values as macro {{{
-    macro_value <- idf_macro[!is.na(macro_value), unique(macro_value)]
-    idf_dt[string %in% macro_value, type := type_macro]
-    # }}}
-    # }}}
-    # treat macro lines as the same as comments
-    # idf_dt[type == type_macro, type := type_comment]
-    idf_dt[startsWith(string, "!"), type := type_comment]
-    idf_dt[startsWith(string, "!-"), type := type_special]
-    # mark location of "!" and "!-"
-    idf_dt[, explpt_loc := regexpr("!", string, fixed = TRUE)]
-    idf_dt[, special_loc := regexpr("!-", string, fixed = TRUE)]
-    # lines ending with comma and without explaination symbol must be a object
-    idf_dt[explpt_loc < 0L & endsWith(string, ","), type := type_object]
-    # extract comments with leading spaces in order to preserve the indentation.
-    idf_dt[special_loc > 0L,
-           comment := substr(string, explpt_loc + 2L, nchar(string))]
-    idf_dt[special_loc < 0L & explpt_loc > 0L,
-           comment := substr(string, explpt_loc + 1L, nchar(string))]
-    # for commented objects
-    idf_dt[special_loc > 0L & explpt_loc > 0L,
-           comment := substr(string, explpt_loc + 1L, nchar(string))]
-    idf_dt[type == type_macro, comment := string]
-    # get the number of leading spaces in comment
-    idf_dt[, leading_spaces := regexpr("\\S", comment) - 1L]
-    # get the value for lines that have comments
-    idf_dt[explpt_loc > 1L, value := trimws(substr(string, 1L, explpt_loc - 1L), "right")]
-    # get the value for lines without comments
-    idf_dt[explpt_loc < 0L, value := string]
-    # mark the last field in an object
-    idf_dt[endsWith(value, ";"), type := type_field_last]
-    # clean unused columns
-    idf_dt[, `:=`(explpt_loc = NULL, special_loc = NULL)]
-    # }}}
+    # auto determine whether to expand objects
+    if (has_hvac_template(private$model)) expand_obj <- TRUE else expand_obj <- FALSE
+    if (not_empty(rp_mes)) message(rp_mes)
 
-    # special comment key and value {{{
-    option_idfeditor <- FALSE
-    option_special_format <- FALSE
-    option_view_in_ip_units <- FALSE
-    option_save <- NULL
+    # save the new model and update objects
+    save_idf(idf, private$path)
+    private$model <- idf
 
-    idf_option <- idf_dt[type == type_special]
-    idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
-    idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
-                      special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
-    idf_option <- idf_option[special_key %in% c("GENERATOR", "OPTION")]
-    if (not_empty(idf_option)) {
-        idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE)[[1]], by = list(line, string, special_key)]
-        data.table::setnames(idf_option, "V1", "special_value")
-        if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
-            .N] > 1L) {
-            option_idfeditor <- TRUE
-        }
-        if (idf_option[special_key == "OPTION" & special_value == "USESPECIALFORMAT",
-                .N] == 1L) {
-            option_special_format <- TRUE
-        }
-        if (idf_option[special_key == "OPTION" & special_value == "VIEWINIPUNITS",
-            .N] == 1L) {
-            option_view_in_ip_units <- TRUE
-        }
-        idf_option[special_key == "OPTION" & special_value == "SORTEDORDER",
-                   option_save := "SortedOrder"]
-        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERTOP",
-                   option_save := "OriginalOrderTop"]
-        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERBOTTOM",
-                   option_save := "OriginalOrderBottom"]
-        idf_errors_option_save <- idf_option[!is.na(option_save), list(line, string, option_save)]
-        option_save <- idf_errors_option_save[, unique(option_save)]
-        if (is_empty(option_save)) {
-            option_save <- NULL
-        }
-        if (nrow(idf_errors_option_save) > 1L) {
-            parse_issue(type = "More than one save option found", idf_errors_option_save,
-                        src = "IDF", stop = FALSE,
-                        info = msg("Only the first option '",option_save[1],"'
-                                   will be used."))
-        }
-    }
-
-    heading_options = list(
-        save_format = option_save,
-        special_format = option_special_format,
-        view_in_ip = option_view_in_ip_units,
-        idfeditor = option_idfeditor)
-    # }}}
-
-    # get rid of special comment lines
-    idf_dt <- idf_dt[type != type_special]
-    # handle condensed values {{{
-    # if the sum of comma and semicolon > 2, then it must be a specially
-    # formatted object or field. It may contain a class name, e.g.
-    # 'Version,8.8;' and it may not, e.g. '0.0,0.0,0.0,' in
-    # 'BuildingSurface:Detailed'.
-    # get number of condensed values
-    idf_dt[!is.na(value), `:=`(value_count = char_count(value, "[,;]"))]
-    idf_dt[is.na(value), `:=`(value_count = 0L)]
-    # idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)),
-    idf_dt <- idf_dt[data.table::between(type, type_macro, type_comment),
-        strsplit(value, "\\s*[,;]\\s*"), by = list(line)][
-        idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
-    data.table::setnames(idf_dt, "V1", "value")
-    # get row numeber of last field per condensed field line in each class
-    line_value_last <- idf_dt[
-        value_count > 1L & type == type_field_last,
-        list(line_value_last = data.table::last(.I)),
-        by = list(line, type)][, line_value_last]
-    # set all type of condensed field lines to "field", including class names.
-    idf_dt[value_count > 1L, type := type_field]
-    # mark last field per object in condensed lines
-    idf_dt[line_value_last, type := type_field_last]
-    # make lines that only has one value as "field", excluding recognized class
-    # names.
-    idf_dt[type != type_object & value_count == 1L, type := type_field]
-    # }}}
-
-    # set row id
-    idf_dt[, row_id := .I]
-    # mark last field and remove trailing comma or semicolon in values {{{
-    idf_dt[endsWith(value, ","), value := substr(value, 1L, nchar(value) - 1L)]
-    idf_dt[endsWith(value, ";"),
-           `:=`(type = type_field_last,
-                value = substr(value, 1L, nchar(value) - 1L))]
-    # }}}
-
-    # set an id for last field per object {{{
-    # if is the last field, then the line after last field line should be a
-    # class name except the last field is the last non-blank and non-comment
-    # line. Others are just normal fields.
-    idf_dt[type == type_field_last, object_id := .GRP, by = list(row_id)]
-    idf_dt <- idf_dt[!is.na(object_id), list(row_id, object_id)][
-        idf_dt[, object_id := NULL], on = c("row_id"), roll = -Inf]
-    # }}}
-
-    # COMMENT (MACRO)
-    # {{{
-    idf_comment <- idf_dt[type %in% c(type_macro, type_comment), .SD,
-        .SDcol = c("type", "object_id", "comment")]
-    idf_comment[, field_order := seq_along(.I), by = list(object_id)]
-    idf_comment[, .SD, .SDcol = c("type", "object_id", "field_order", "comment")]
-    # }}}
-
-    # CLASS & FIELD
-    # {{{
-    # get idf without comments
-    # {{{
-    # NOTE: currently, inline comments are not supported.
-    idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)), .SD,
-         .SDcol = c("row_id", "object_id", "line", "type", "value", "string")]
-    # }}}
-
-    # get class name
-    # {{{
-    # class name should be the same of 'value' column for first line grouped by
-    # object_id
-    idf_dt[idf_dt[, .I[1], by = object_id]$V1,
-           `:=`(type = type_object, class_upper_case = toupper(value))]
-
-    idf_idd_all <- `._get_private`(idd)$m_objects[,
-        list(group_order, group, class_order, class)][
-        , class_upper_case := toupper(class)][
-        idf_dt, on = "class_upper_case"][
-        order(object_id, class_order)]
-
-    # check for un-recognized class names {{{
-    unknown_class <- idf_idd_all[type == type_object][
-        !is.na(value)][is.na(class), list(line, string)]
-    if (not_empty(unknown_class)) {
-        parse_issue(type = "Object type not recognized", src = "IDF",
-                    data_errors = unknown_class,
-                    info = "This error may be caused by a misspelled class name.")
-    }
-    # }}}
-
-    # fill class downwards
-    idf_field <- idf_idd_all[!is.na(class),
-        list(row_id, group_order, group, class_order, class)][
-        idf_dt, on = "row_id", roll = Inf][
-        # get rid of class lines
-        type > type_object]
-    # }}}
-    # }}}
-
-    # get splited idf values
-    idf_value <- idf_field[, .SD,
-        .SDcol = c("object_id", "group_order", "group", "class_order", "class", "value")][
-        , list(value = list(value)), by = list(object_id, group_order, group, class_order, class)]
-
-    # currently, ep-macro lines are not supported
-    idf_comment <- idf_comment[, .SD, .SDcol = c("object_id", "comment")][
-                               , list(comment = list(comment)), by = list(object_id)]
-
-    idf_value <- idf_comment[idf_value, on = "object_id"]
-
-    data.table::setcolorder(idf_value,
-        c("object_id", "group_order", "group", "class_order", "class", "comment", "value"))
-
-    idf <- list(version = idf_version,
-                options = heading_options,
-                value = idf_value,
-                field = idf_field)
-
-    return(idf)
-}
-# }}}
-# get_idf_ver {{{1
-get_idf_ver <- function (idf_str) {
-    ver_normal <- idf_str[endsWith(idf_str, "Version Identifier")]
-    ver_special <- idf_str[startsWith(idf_str, "Version")]
-
-    if (length(ver_normal) == 1L) {
-        ver_line <- ver_normal
-    } else if (length(ver_special) == 1L){
-        ver_line <- ver_special
-    } else {
-        return(NULL)
-    }
-
-    ver_pt <- regexpr("\\d", ver_line)
-    ver <- substr(ver_line, ver_pt, ver_pt + 2)
-
-    return(ver)
-}
-# }}}1
-
-# i_check: check if there are errors in current object
-# {{{
-i_check = function (private, type = c("idf", "idfobject")) {
-    private$m_check <- NULL
-    type <- match.arg(type)
-
-    # get returned columns according to `type`
-    cols_idfobject <- c("field_order", "value", "_field", "_field_ip")
-    cols <- switch(type,
-        idf = c("class_order", "class", "object_id", cols_idfobject),
-        idfobject = cols_idfobject)
-    # clean up after checking
-    on.exit({private$m_check_field <- NULL}, add = TRUE)
-
-    if (type == "idf") {
-        i_check_missing_object(private)
-        i_check_duplicate_object(private, cols)
-        # clean up after checking
-        on.exit({private$m_check_class <- NULL}, add = TRUE)
-    }
-
-    # check scalar
-    i_check_scalar(private, cols)
-    # check missing required fields
-    i_check_missing(private, cols)
-    # check invalid auto
-    i_check_auto(private, cols)
-    # exclude auto fields below during checking
-    private$m_check_field <- private$m_check_field[
-        !purrr::map_lgl(value, ~tolower(.x) %in% c("autosize", "autocalculate"))]
-    # check invalid type
-    i_check_type(private, cols)
-    # check invalid integer
-    i_check_integer(private, cols)
-    # check invalid choice
-    i_check_choice(private, cols = c(cols, "key"))
-    # check range exceeding
-    i_check_range(private, cols = c(cols, "range"))
-    # check invalid reference
-    # do this at last in order to exclude all other errors before checking
-    i_check_reference(private, cols = c(cols, "source"))
-
-    data.table::setattr(private$m_check, "class", c("IDFCheckRes", "list"))
-    private$m_check
-}
-# }}}
-
-# i_check_missing_object
-# {{{
-i_check_missing_object <- function (private) {
-    private$m_check$missing_object <- private$m_check_class[
-        required_object == TRUE & is.na(object_id)][, field_order := 0L]
-}
-# }}}
-
-# i_check_duplicate_object
-# {{{
-i_check_duplicate_object <- function (private, cols) {
-    res <- private$m_check_class[unique_object == TRUE & !is.na(object_id),
-        list(num = .N, object_id = list(object_id)), by = list(class_order, class)][
-        num > 1L, list(class_order, class, object_id)]
-    if (is_empty(res)) return(data.table())
-    res <- res[, lapply(.SD, unlist), by = list(class_order, class)]
-    private$m_check$duplicate_object <- private$m_check_field[res,
-        on = c("class_order", "object_id")][, ..cols]
-}
-# }}}
-
-# value_to_ref
-# {{{
-value_to_ref <- function (x) {
-    env <- new.env(parent = emptyenv(), size = 1L)
-    env$value <- x
-    env
-}
-# }}}
-
-# set_ref_value
-# {{{
-set_ref_value <- function (ref, value) {
-    ref[["value"]] <- value
-    ref
+    data_run <- run_idf(eplus_exe, model = private$path, weather = weather,
+                        output_dir = dir, design_day = design_day,
+                        annual = annual, expand_obj = expand_obj, echo = echo)
+    private$process <- data_run$process
+    private$sim <- data_run$info
 }
 # }}}

@@ -1,8 +1,10 @@
 #' @importFrom assertthat assert_that "on_failure<-"
+#' @importFrom tools file_ext
 
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver) {
-    ver_fmt <- "[78]\\.[0-9]"
+    if (length(ver) != 1L) return(FALSE)
+    ver_fmt <- "^[78]\\.[0-9]$"
     grepl(ver_fmt, as.character(ver))
 }
 
@@ -13,13 +15,18 @@ on_failure(is_eplus_ver) <- function (call, env) {
 # is_supported_ver {{{
 is_supported_ver <- function (ver) {
     is_eplus_ver(ver)
-    supp_ver <- paste0("8.", 3:8)
+    supp_ver <- paste0("8.", 1:9)
     as.character(ver) %in% supp_ver
 }
 
 on_failure(is_supported_ver) <- function (call, env) {
-    paste0("Currently EnergyPlus v8.3 to v8.8 are supported.")
+    paste0("Currently EnergyPlus v8.1 to v8.9 are supported.")
 }
+# is_pre_parsed {{{
+is_pre_parsed <- function (ver) {
+    is_supported_ver(ver) && as.character(ver) %in% paste0("8.", 6:9)
+}
+# }}}
 # }}}
 # is_eplus_exists {{{
 is_eplus_exists <- function (eplus_exe) {
@@ -30,101 +37,29 @@ on_failure(is_eplus_exists) <- function (call, env) {
     paste0("EnergyPlus does not exist")
 }
 # }}}
-
 # has_macro {{{1
 has_macro <- function (str) {
     any(sapply(macro_dict, function(x) any(startsWith(str, x))))
 }
 # }}}1
-# is_valid_id {{{
-is_valid_id <- function (id, idf) {
-    is_scalar(id) && is_integerish(id) && id %in% attr(idf, "id")
+# has_hvac_template {{{
+has_hvac_template <- function (idf) {
+    idf$class[startsWith(class, "HVACTemplate"), list(unique(class))][, .N] > 0L
 }
+# }}}
 
-on_failure(is_valid_id) <- function(call, env) {
-    paste0(backtick(eval(call$id, env)), " is not a valid object id. You can find all valid id using \"$all('id')\"")
-}
-# }}}
-# is_comment_id {{{
-is_comment_id <- function (id, idf) {
-    is_scalar(id) && is_integerish(id) && id %in% idf$comment[, unique(object_id)]
-}
-# }}}
-# is_valid_class {{{
-is_valid_class <- function(class, idf) {
-    is_string(class) && class %in% valid_class(idf)
-}
-
-on_failure(is_valid_class) <- function(call, env) {
-    paste0(backtick(eval(call$class, env)), " is not a valid class name. You can find all valid classes using \"$all('class')\"")
-}
-# }}}
-# is_class_exist {{{
-is_class_exist <- function (idf, class) {
-    class_name <- class
-    class_name %in% valid_class(idf)
-}
-
-on_failure(is_class_exist) <- function (call, env) {
-    paste0(backtick(eval(call$class, env)), " does not exist in current model")
-}
-# }}}
-# can_be_duplicated {{{
-can_be_duplicated <- function (class, idf) {
-    class_name <- class
-    assert_that(is_string(class_name))
-    !(is_valid_class(class_name, idf) &&
-      idf$class[class == class_name, unique_object])
-}
-
-on_failure(can_be_duplicated) <- function(call, env) {
-    paste0(backtick(eval(call$class, env)), " is an unique object and already exists")
-}
-# }}}
-# can_be_deleted {{{
-can_be_deleted <- function (class, idf) {
-    class_name <- class
-    assert_that(is_string(class_name))
-    !(is_valid_class(class_name, idf) &&
-      (idf$class[class == class_name, unique_object] ||
-       idf$class[class == class_name, required_object]))
-}
-
-on_failure(can_be_deleted) <- function(call, env) {
-    paste0(backtick(eval(call$class, env)), " is an unique or required object that cannot be deleted")
-}
-# }}}
-# can_be_modified {{{
-can_be_modified <- function (class, idf) {
-    class_name <- class
-    assert_that(is_valid_class(class_name, idf))
-    !identical(class, "Version")
-}
-on_failure(can_be_modified) <- function(call, env) {
-    paste0(backtick(eval(call$class, env)), " is protected and cannot be modified.")
-}
-# }}}
-# not_deleted {{{
-not_deleted <- function (id, idf) {
-    !(id %in% attr(idf, "id_del"))
-}
-
-on_failure(not_deleted) <- function(call, env) {
-    paste0("Object with ID ", backtick(eval(call$id, env)), " has already been deleted before")
-}
-# }}}
 # is_idf {{{
-is_idf <- function (x) inherits(x, "IDF")
+is_idf <- function (x) inherits(x, "Idf")
 
 on_failure(is_idf) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDF object")
+    paste0(deparse(call$x), " is not an Idf object")
 }
 # }}}
 # is_imf {{{
-is_imf <- function (x) inherits(x, "IMF")
+is_imf <- function (x) inherits(x, "Imf")
 
 on_failure(is_imf) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IMF object")
+    paste0(deparse(call$x), " is not an Imf object")
 }
 # }}}
 # is_model {{{
@@ -134,105 +69,6 @@ on_failure(is_model) <- function (call, env) {
     paste0(deparse(call$x), " is neither an IDF nor IMF object")
 }
 # }}}
-# is_idf_class {{{
-is_idf_class <- function (x) inherits(x, "IDF_Class")
-
-on_failure(is_idf_class) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDF_Class object")
-}
-# }}}
-# is_idf_value {{{
-is_idf_value <- function (x) inherits(x, "IDF_Value")
-
-on_failure(is_idf_value) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDF_Value object")
-}
-# }}}
-# is_idf_obj {{{
-is_idf_obj <- function (x) inherits(x, "IDF_Value") || inherits(x, "IDF_Class")
-
-on_failure(is_idf_obj) <- function (call, env) {
-    paste0(deparse(call$x), " is neither an IDF_Class nor IDF_Value object")
-}
-# }}}
-# is_idf_comment {{{
-is_idf_comment <- function (x) inherits(x, "IDF_Comment")
-
-on_failure(is_idf_comment) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDF_Comment object")
-}
-# }}}
-# is_idf_ref {{{
-is_idf_ref <- function (x) inherits(x, "IDF_Ref")
-
-on_failure(is_idf_ref) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDF_Ref object")
-}
-# }}}
-# is_idd {{{
-is_idd <- function (x) inherits(x, "IDD")
-
-on_failure(is_idd) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDD object")
-}
-# }}}
-# is_idd_class {{{
-is_idd_class <- function (x) inherits(x, "IDD_Class")
-
-on_failure(is_idd_class) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDD_Class object")
-}
-# }}}
-# is_idd_value {{{
-is_idd_value <- function (x) inherits(x, "IDD_Field")
-
-on_failure(is_idd_value) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDD_Field object")
-}
-# }}}
-# is_idd_ref_obj {{{
-is_idd_ref_obj <- function (x) inherits(x, "IDD_Ref_Obj")
-
-on_failure(is_idd_ref_obj) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDD_Ref_Obj object")
-}
-# }}}
-# is_idd_ref_ext {{{
-is_idd_ref_ext <- function (x) inherits(x, "IDD_Ref_Ext")
-
-on_failure(is_idd_ref_ext) <- function (call, env) {
-    paste0(deparse(call$x), " is not an IDD_Ref_Ext object")
-}
-# }}}
-# is_pre_parsed {{{
-is_pre_parsed <- function (ver) {
-    ver %in% paste0("8.", 5:8)
-}
-# }}}
-# has_hvac_template {{{
-has_hvac_template <- function (idf) {
-    idf$class[startsWith(class, "HVACTemplate"), list(unique(class))][, .N] > 0L
-}
-# }}}
-# has_class {{{
-has_class <- function (idf, class) {
-    class %in% valid_class(idf)
-}
-on_failure(has_class) <- function (call, env) {
-    paste0(deparse(call$idf), " does not contain any ", eval(call$class, env), " object")
-}
-# }}}
-# is_count {{{
-is_count <- function (x) {
-    if (length(x) != 1) return(FALSE)
-    if (!is_integerish(x)) return(FALSE)
-    x > 0
-}
-on_failure(is_count) <- function(call, env) {
-  paste0(deparse(call$x), " is not a count (a single positive integer)")
-}
-# }}}
-
 # not_empty {{{
 not_empty <- function (x) {
     all((dim(x) %||% length(x)) != 0)
@@ -249,6 +85,16 @@ on_failure(is_empty) <- function (call, env) {
     paste0(deparse(call$x), " is not empty")
 }
 # }}}
+# is_count {{{
+is_count <- function (x) {
+    if (length(x) != 1) return(FALSE)
+    if (!is_integerish(x)) return(FALSE)
+    x > 0
+}
+on_failure(is_count) <- function(call, env) {
+  paste0(deparse(call$x), " is not a count (a single positive integer)")
+}
+# }}}
 # is_string {{{
 is_string <- function(x) is.character(x) && length(x) == 1
 on_failure(is_string) <- function(call, env) {
@@ -261,6 +107,20 @@ is_scalar <- function(x) {
 }
 on_failure(is_scalar) <- function(call, env) {
   paste0(deparse(call$x), " is not a scalar.")
+}
+# }}}
+# is_integerish {{{
+is_integerish <- function(x) {
+    is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
+}
+on_failure(is_integerish) <- function(call, env) {
+  paste0(deparse(call$x), " is neither an integer nor can be converted into an integer")
+}
+# }}}
+# is_flag {{{
+is_flag <- function(x) is.logical(x) && length(x) == 1
+on_failure(is_flag) <- function(call, env) {
+  paste0(deparse(call$x), " is not a flag (a length one logical vector).")
 }
 # }}}
 # is_writeable {{{
@@ -281,18 +141,18 @@ on_failure(is_readable) <- function (call, env) {
     paste0(eval(call$path, env), " is not readable")
 }
 # }}}
+
 # has_name {{{
 has_name <- function(x, which) which %in% names(x)
 on_failure(has_name) <- function(call, env) {
     paste0(deparse(call$x), " does not have name ", eval(call$which, env))
 }
 # }}}
-# is_integerish {{{
-is_integerish <- function(x) {
-    is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
-}
-on_failure(is_integerish) <- function(call, env) {
-  paste0(deparse(call$x), " is neither an integer nor can be converted into an integer")
+# has_names {{{
+has_names <- function(x, which) all(which %in% names(x))
+on_failure(has_names) <- function(call, env) {
+    paste0(deparse(call$x), " does not have all required names: ",
+           backtick_collapse(eval(call$which, env)), ".")
 }
 # }}}
 # has_ext {{{
@@ -304,6 +164,17 @@ on_failure(has_ext) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
     msg("File ", backtick(basename(path)), " does not have extension ", backtick(ext), ".")
+}
+# }}}
+# has_exts {{{
+has_exts <- function (path, exts) {
+    tolower(tools::file_ext(path)) %in% exts
+}
+
+on_failure(has_exts) <- function (call, env = parent.env) {
+    path <- eval(call$path, env)
+    ext <- eval(call$ext, env)
+    msg("File ", backtick(basename(path)), " should have one of extensions ", backtick_collapse(ext), ".")
 }
 # }}}
 # has_output_ext {{{
