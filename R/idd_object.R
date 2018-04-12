@@ -1,6 +1,3 @@
-# TODO: fields created by extensible fields should have the same
-# reference data
-
 #' EnergyPlus IDD objects
 #'
 #' \code{IDDObject} is a R6 class used internally as members in \code{IDD} R6
@@ -178,27 +175,37 @@
 #'
 #' `$is_required_field(index, name)` returns `TRUE` if the field is required.
 #'
-#' @importFrom R6 R6Class
-#' @importFrom data.table rbindlist
-#' @importFrom purrr map map_lgl map_chr
-#' @importFrom assertthat assert_that
-#' @importFrom cli cat_rule cat_line
-#' @importFrom clisymbols symbol
 #' @return An IDDObject object
 #' @docType class
-#' @name IDDObject
+#' @name idd_object
 #' @author Hongyuan Jia
 NULL
 
-#' @export
-# IDDObject {{{
-IDDObject <- R6::R6Class(classname = "IDDObject",
+#' @importFrom R6 R6Class
+#' @importFrom glue glue
+#' @importFrom data.table data.table rbindlist copy set setattr between
+#' @importFrom stringr str_replace_all
+#' @importFrom cli cat_line cat_rule
+#' @importFrom assertthat assert_that
+#' @importFrom clisymbols symbol
+# IddObject {{{
+IddObject <- R6::R6Class(classname = "IddObject",
 
     public = list(
-        initialize = function (data_class, data_field) {
+        initialize = function (class) {
             # {{{
-            private$m_properties <- data_class[[1]]
-            private$m_fields <- data_field[[1]]
+            assert_that(!is.null(private$m_idd_tbl),
+                msg = glue::glue("IddObject can only be created after a parent \\
+                Idd object has been initialized.")
+            )
+
+            assert_that(is_string(class))
+            assert_that(class %in% private$m_idd_tbl$class[["class_name"]],
+                msg = glue::glue("Failed to create IddObject. Invalid class \\
+                name found: `{class}`.")
+            )
+
+            private$m_class_name <- class
             # }}}
         },
 
@@ -210,56 +217,57 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         group_name = function () {
             # return group name
             # {{{
-            return(private$m_properties$group)
+            private$m_idd_tbl$class[class_name == private$m_class_name][
+                private$m_idd_tbl$group, on = "group_id", nomatch = 0L, group_name]
             # }}}
         },
 
         group_order = function () {
             # return group order
             # {{{
-            return(private$m_properties$group_order)
+            private$m_idd_tbl$class[class_name == private$m_class_name, group_id]
             # }}}
         },
 
         class_name = function () {
             # return class name
             # {{{
-            return(private$m_properties$class)
+            private$m_class_name
             # }}}
         },
 
         class_order = function () {
             # return class order
             # {{{
-            return(private$m_properties$class_order)
+            private$m_idd_tbl$class[class_name == private$m_class_name, class_id]
             # }}}
         },
 
         class_format = function () {
             # return class format
             # {{{
-            return(private$m_properties$format)
+            private$class_tbl()[["class_format"]]
             # }}}
         },
 
         min_fields = function () {
             # return minimum field number requirement
             # {{{
-            return(private$m_properties$min_fields)
+            private$class_tbl()[["min_fields"]]
             # }}}
         },
 
         num_fields = function () {
             # return total number of fields in definition
             # {{{
-            return(private$m_properties$num_fields)
+            private$class_tbl()[["num_fields"]]
             # }}}
         },
 
         memo = function () {
             # return memo
             # {{{
-            return(private$m_properties$memo)
+            private$class_tbl()[["memo"]]
             # }}}
         },
 
@@ -267,77 +275,165 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # return field number of extensible fields in a extensible field
             # group
             # {{{
-            return(private$m_properties$extensible)
+            private$class_tbl()[["num_extensible"]]
             # }}}
         },
 
         reference_class_name = function () {
             # return reference class name
             # {{{
-            return(private$m_properties$reference)
+            private$m_idd_tbl$class[class_name == private$m_class_name][
+                private$m_idd_tbl$class_reference, on = "class_id", nomatch = 0L, reference]
             # }}}
         },
 
-        first_extensible = function () {
+        first_extensible_index = function () {
             # return index of the first extensible field
             # {{{
-            x <- which(private$m_fields[["begin_extensible"]])
-            ifelse(is_empty(x), 0L, x)
-            # .data <- private$m_fields[begin_extensible == TRUE, field_order]
-            # if (is_empty(.data)) return(0L)
-            # return(.data)
+            res <- private$m_idd_tbl$class[class_name == private$m_class_name, list(class_id)][
+                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id, field_order)][
+                private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L][
+                begin_extensible == TRUE, field_order]
+            ifelse(is_empty(res), 0L, res)
             # }}}
         },
 
-        extensible_group = function () {
-            # return data of the extensible field group
+        extensible_group_index = function () {
+            # return field indexes of the extensible field group
             # {{{
-            # if the current object is not extensible, return an empty
-            # data.table
-            if (!self$is_extensible()) return(data.table())
-
-            # get the line number of extensible fields
-            first_ext <- self$first_extensible()
-            num_ext <- self$num_extensible()
-            lines_ext <- seq.int(first_ext, length.out = num_ext)
-            .data <- private$m_fields[lines_ext][
-                , `:=`(required_field = FALSE, begin_extensible = FALSE)]
-
-            return(.data[])
+            res <- private$m_idd_tbl$class[class_name == private$m_class_name, list(class_id)][
+                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id, field_order)][
+                private$m_idd_tbl$field_extensible, on = "field_id", nomatch = 0L, list(field_id, field_order)][
+                private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L][
+                begin_extensible == TRUE, field_order]
             # }}}
         },
 
-        add_extensible_groups = function (num = 1L) {
+        add_extensible_group = function (num = 1L) {
             # add one or more extensible groups
             # {{{
             assert_that(is_count(num))
-            assert_that(self$is_extensible(),
-                        msg = paste0("Class ", self$class_name(), " is not extensible. ",
-                                     "Failed to add extensible group."))
-            .data <- data.table::rbindlist(
-                 purrr::map(seq_len(num),
-                            ~private$append_extensible_numbers(.x)))
-            private$m_fields <- data.table::rbindlist(list(private$m_fields, .data))
-            private$m_properties[, num_fields := {private$m_fields[, .N]}]
+            assert_that(self$is_extensible(), msg = glue::glue("Failed to add \\
+               extensible groups. Class `{private$m_class_name}` is not \\
+               extensible.")
+            )
+
+            # get the max field id
+            max_id <- private$m_idd_tbl$field[, max(field_id)]
+            # get field ids of first extensible group
+            ext_id <- private$class_tbl()[, list(class_id)][
+                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id)][
+                private$m_idd_tbl$field_extensible, on = "field_id", nomatch = 0L, field_id]
+
+            # insert new `field_order`, `full_name` and `full_ipname` values
+            # into field
+            ext_field <- data.table::rbindlist(
+                replicate(num, private$m_idd_tbl$field[field_id %in% ext_id], simplify = FALSE)
+            )
+
+            num_ext <- self$num_extensible()
+            # get new added field id
+            added_field_num <- seq_len(num_ext * num)
+            # get new field id
+            new_field_id <- max_id + added_field_num
+            # get total fields
+            num_field <- self$num_fields()
+            # get new field orders
+            new_field_order <- num_field + added_field_num
+            # get total extensible group num
+            num_ext_grp <- private$num_extensible_group()
+            new_ext_ord <- rep(seq_len(num) + num_ext_grp, each = num_ext)
+            # combine
+            new_ext_field <- data.table::copy(ext_field)[,
+                `:=`(field_id = new_field_id,
+                     field_order = new_field_order,
+                     field_name = stringr::str_replace_all(field_name, "1", as.character(new_ext_ord)),
+                     full_name = stringr::str_replace_all(full_name, "1", as.character(new_ext_ord)),
+                     full_ipname = stringr::str_replace_all(full_ipname, "1", as.character(new_ext_ord)))]
+            private$m_idd_tbl$field <- data.table::rbindlist(list(private$m_idd_tbl$field, new_ext_field))
+
+            # insert new values of field property
+            ext_field_property <- private$m_idd_tbl$field_property[field_id %in% ext_id]
+            new_ext_field_property <- data.table::rbindlist(
+                replicate(num, ext_field_property, simplify = FALSE)
+            )[, `:=`(field_id = new_field_id,
+                     required_field = FALSE,
+                     begin_extensible = FALSE)]
+            private$m_idd_tbl$field_property <- data.table::rbindlist(
+                list(private$m_idd_tbl$field_property, new_ext_field_property)
+            )
+
+            # append_ext_tbl: local function to append extensible fields
+            # {{{
+            append_ext_tbl <- function (tbl) {
+                tbl <- deparse(substitute(tbl))
+                tbl_name <- paste0("field_", tbl)
+                id_name <- paste0(tbl, "_id")
+                # insert new values of field choice
+                ext_field <- private$m_idd_tbl[[tbl_name]][field_id %in% ext_id]
+                if (not_empty(ext_field)) {
+                    new_ref_id <- new_field_id[rep(ext_id %in% ext_field[["field_id"]], times = num)]
+                    new_self_id <- max(private$m_idd_tbl[[tbl_name]][[id_name]]) + length(new_field_id)
+                    new_ext_field <- data.table::rbindlist(
+                        replicate(num, ext_field, simplify = FALSE)
+                    )
+                    for (i in 1:nrow(new_ext_field)) {
+                        data.table::set(new_ext_field, i, c(id_name, "field_id"),
+                            list(new_self_id[i], new_ref_id[i]))
+                    }
+                    private$m_idd_tbl[[tbl_name]] <- data.table::rbindlist(
+                        list(private$m_idd_tbl[[tbl_name]], new_ext_field)
+                    )
+                }
+            }
+            # }}}
+            append_ext_tbl(choice)
+            append_ext_tbl(range)
+            append_ext_tbl(reference)
+            append_ext_tbl(object_list)
+            append_ext_tbl(external_list)
+            # update `num_fields` field in class property at the end
+            private$m_idd_tbl$class_property[, num_fields := self$num_fields() + self$num_extensible() * num]
             return(self)
             # }}}
         },
 
-        del_extensible_groups = function (num = 1L) {
+        del_extensible_group = function (num = 1L) {
             # delete extensible groups
             # {{{
             assert_that(is_count(num))
-            assert_that(self$is_extensible(),
-                        msg = paste0("Class ", self$class_name(), " is not extensible. ",
-                                     "Failed to add extensible group."))
-            assert_that(num < private$num_extensible_group(),
-                        msg = paste0("Only one extensible group exists in Class ",
-                                     self$class_name(), ". ",
-                                     "Failed to delete extensible group."))
+            assert_that(self$is_extensible(), msg = glue::glue("Failed to delete \\
+               extensible groups. Class `{private$m_class_name}` is not \\
+               extensible.")
+            )
             line_left <- self$num_fields() - num * self$num_extensible()
-            line_del <- (line_left + 1L) : self$num_fields()
-            private$m_fields <- private$m_fields[-line_del]
-            private$m_properties[, num_fields := {private$m_fields[, .N]}]
+            last_req <- private$class_tbl()[
+                private$m_idd_tbl$field, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L][
+                required_field == TRUE, field_order]
+             assert_that(line_left >= last_req, msg = glue::glue("Failed to \\
+                 delete extensible groups. Number of fields left after \\
+                 deletion will be `{line_left}` which is less than \\
+                 the required field number `{last_req}`."))
+
+            # get ids of fields to delete
+            del_start <- self$num_fields() - num * self$num_extensible() + 1L
+            del_end <- self$num_fields()
+            del_id <- private$m_idd_tbl$field[class_id == self$class_order() &
+                data.table::between(field_order, del_start, del_end), field_id]
+
+            # delete fields
+            private$m_idd_tbl$field <- private$m_idd_tbl$field[!field_id %in% del_id]
+            private$m_idd_tbl$field_property <- private$m_idd_tbl$field_property[!field_id %in% del_id]
+            private$m_idd_tbl$field_choice <- private$m_idd_tbl$field_choice[!field_id %in% del_id]
+            private$m_idd_tbl$field_range <- private$m_idd_tbl$field_range[!field_id %in% del_id]
+            private$m_idd_tbl$field_reference <- private$m_idd_tbl$field_reference[!field_id %in% del_id]
+            private$m_idd_tbl$field_extensible <- private$m_idd_tbl$field_extensible[!field_id %in% del_id]
+            private$m_idd_tbl$field_object_list <- private$m_idd_tbl$field_object_list[!field_id %in% del_id]
+            private$m_idd_tbl$field_external_list <- private$m_idd_tbl$field_external_list[!field_id %in% del_id]
+            # update field num
+            private$m_idd_tbl$class[, num_fields := (del_start - 1L)]
+
             return(self)
             # }}}
         },
@@ -348,35 +444,35 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         is_version = function () {
             # return TRUE if this is the 'Version' object
             # {{{
-            ifelse(self$class_name() == "Version", TRUE, FALSE)
+            ifelse(private$class_tbl()[["class_name"]] == "Version", TRUE, FALSE)
             #}}}
         },
 
         is_required = function () {
             # return TRUE if this is a required object
             # {{{
-            return(private$m_properties$required_object)
+            private$class_tbl()[["required_object"]]
             # }}}
         },
 
         is_unique = function () {
             # return TRUE if this is a unique object
             # {{{
-            return(private$m_properties$unique_object)
+            private$class_tbl()[["unique_object"]]
             # }}}
         },
 
         is_extensible = function () {
             # return TRUE if this object contains extensible fields
             # {{{
-            ifelse(self$num_extensible(), TRUE, FALSE)
+            private$class_tbl()[["num_extensible"]] > 0L
             # }}}
         },
 
         has_name = function () {
             # return TRUE if this object has a name field
             # {{{
-            grepl("Name", private$m_fields[field_order == 1L, field], fixed = TRUE)
+            private$class_tbl()[["has_name"]]
             # }}}
         },
         # }}}
@@ -402,28 +498,25 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # format)
             # {{{
             if (is.null(name)) return(private$all_indice())
-            private$assert_valid_field_name(name)
             name_std <- private$field_name_std()
             name_lc <- private$field_name_lcase()
-            res <- match(name, name_std)
+            res_std <- match(name, name_std)
             res_lc <- match(name, name_lc)
-            res[is.na(res)] <- res_lc[is.na(res)]
-            return(res)
+            invalid <- is.na(res_std) & is.na(res_lc)
+            assert_that(!any(invalid),
+                msg = paste0("Invalid field name found for class ",
+                             self$class_name(),": ",
+                             backtick_collapse(name[invalid]), "."))
+            res_std[is.na(res_std)] <- res_lc[is.na(res_std)]
+            return(res_std)
             # }}}
         },
 
         field_type = function (index = NULL, name = NULL) {
             # return field type
             # {{{
-            res <- private$fields(index, name)[, type]
-            # if no type specified, using field_an
-            input <- index %||% name
-            mis <- input[is.na(res)]
-            if (is_empty(mis)) return(res)
-            an_mis <- private$fields(mis)[, field_an]
-            type_mis <- ifelse(an_mis == "N", "real", "alpha")
-            res[is.na(res)] <- type_mis
-            return(res)
+            res_tbl <- private$field_tbl(index, name)[, list(field_name, type)]
+            data.table::setattr(as.list.default(res_tbl[["type"]]), "names", res_tbl[["field_name"]])[]
             # }}}
         },
 
@@ -431,71 +524,60 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # return field unit in SI or IP format
             # {{{
             if (in_ip) {
-                private$fields(index, name)[, ip_units]
+                res_tbl <- private$field_tbl(index, name)[, list(field_name, ip_units)]
+                data.table::setattr(as.list.default(res_tbl[["ip_units"]]),
+                                    "names", res_tbl[["field_name"]])[]
             } else {
-                private$fields(index, name)[, units]
+                res_tbl <- private$field_tbl(index, name)[, list(field_name, units)]
+                data.table::setattr(as.list.default(res_tbl[["units"]]),
+                                    "names", res_tbl[["field_name"]])[]
             }
-            # }}}
-        },
-
-        field_reference = function (index = NULL, name = NULL) {
-            # return field references
-            # {{{
-            private$fields(index, name)[, reference]
-            # }}}
-        },
-
-        field_object_list = function (index = NULL, name = NULL) {
-            # return field reference key by field index
-            # {{{
-            private$fields(index, name)[, object_list]
             # }}}
         },
 
         field_default = function (index = NULL, name = NULL) {
             # return field default value by field index
             # {{{
-            # if default exists, use it
-            .field <- private$fields(index, name)[
-                , list(.default = list(default), key = key, default = default),
-                by = list(field_order, field_an)]
-
-            # enforce value type
-            .field[field_an == "N" & !tolower(default) %in% c("autosize", "autocalculate"),
-                   .default := list(list(as.numeric(default))), by = "field_order"]
-            # if no default, and choices exist, use the first one
-            .field[is.na(default) & !is.na(key), .default := list(list(unlist(key)[1])),
-                   by = "field_order"]
-            # if no default and the type is not choice, use corresponding NA
-            .field[purrr::map_lgl(.default, is.na) & field_an == "N",
-                   .default := list(list(NA_real_)), by = "field_order"]
-            .field[purrr::map_lgl(.default, is.na) & field_an == "A",
-                   .default := list(list(NA_character_)), by = "field_order"]
-
-            .field[, .default]
+            res_tbl <- private$field_tbl(index, name)[
+                , list(field_name, type, field_default)][
+                , `:=`(defaults = as.list(field_default))][
+                !is.na(field_default) & type == "integer",
+                `:=`(defaults = as.list(as.integer(field_default)))][
+                !is.na(field_default) & type == "real",
+                `:=`(defaults = as.list(as.double(field_default)))]
+            data.table::setattr(res_tbl[["defaults"]], "names", res_tbl[["field_name"]])[]
             # }}}
         },
 
         field_choice = function (index = NULL, name = NULL) {
             # return field choices by field index
             # {{{
-            private$fields(index, name)[, key]
+            res_tbl <- private$m_idd_tbl$field_choice[
+                private$field_tbl(index, name)[, list(field_id, field_name)],
+                on = "field_id"][, lapply(.SD, list), .SDcol = "choice",
+                by = list(field_id, field_name)]
+            data.table::setattr(res_tbl[["choice"]], "names", res_tbl[["field_name"]])[]
             # }}}
         },
 
         field_range = function (index = NULL, name = NULL) {
             # return field range value by field index
             # {{{
-            res <- private$fields(index, name)[, range]
-            out <- purrr::map_chr(res, private$str_range)
-            names(res) <- out
+            res_tbl <- private$m_idd_tbl$field_range[
+                private$field_tbl(index, name)[, list(field_id, field_name)]
+                , on = "field_id"][, `:=`(range = list(list(
+                    minimum = minimum, lower_incbounds = lower_incbounds,
+                    maximum = maximum, upper_incbounds = upper_incbounds))
+                ), by = "field_id"]
+            data.table::setattr(res_tbl[["range"]], "names", res_tbl[["field_name"]])[]
             # }}}
         },
 
         field_note = function (index = NULL, name = NULL) {
             # return field note by field index
             # {{{
-            private$fields(index, name)[, note]
+            res_tbl <- private$field_tbl(index, name)[, list(field_name, note)]
+            data.table::setattr(as.list.default(res_tbl[["note"]]), "names", res_tbl[["field_name"]])[]
             # }}}
         },
         # }}}
@@ -508,11 +590,11 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # {{{
             assert_that(is_count(num))
             # if has \min-fields
-            min_num <- private$m_properties$min_fields
+            min_num <- self$min_fields()
             if (min_num > 0L & min_num > num) return(FALSE)
             # if no \extensible:<#>
             if (!self$is_extensible()) {
-                if (private$m_properties$num_fields < num) return(FALSE) else return(TRUE)
+                if (self$num_fields() < num) return(FALSE) else return(TRUE)
             # if has \extensible:<#>
             } else {
                 if (private$get_extensible_field_index(num) == 0L) {
@@ -525,12 +607,11 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         },
 
         is_extensible_field_index = function (index) {
-            # TODO: add documentation
             # check if input index is a valid extensible field index
             # {{{
             assert_that(is_count(index))
-            if (self$is_extensible()) return(FALSE)
-            ifelse(index >= self$first_extensible(), TRUE, FALSE)
+            if (!self$is_extensible()) return(FALSE)
+            ifelse(index >= self$first_extensible_index(), TRUE, FALSE)
             # }}}
         },
 
@@ -547,79 +628,77 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # check if input index is a valid field index
             # {{{
             assert_that(is_count(index))
-            index <= private$m_properties$num_fields
+            index <= self$num_fields()
             # }}}
         },
 
-        is_autosizable_field = function (index = NULL, name = NULL) {
+        is_autosizable_field = function (index) {
             # check if a field is autosizable or not
             # {{{
-            assert_that(is_single_key(index, name))
-            private$fields(index, name)[, autosizable]
+            assert_that(self$is_valid_field_index(index))
+            private$field_tbl(index)[["autosizable"]]
             # }}}
         },
 
-        is_autocalculatable_field = function (index = NULL, name = NULL) {
+        is_autocalculatable_field = function (index) {
             # check if a field is autocalculatable or not
             # {{{
-            assert_that(is_single_key(index, name))
-            private$fields(index, name)[, autocalculatable]
+            assert_that(self$is_valid_field_index(index))
+            private$field_tbl(index)[["autocalculatable"]]
             # }}}
         },
 
-        is_numeric_field = function (index = NULL, name = NULL) {
+        is_numeric_field = function (index) {
             # check if a field is a numeric field or not
             # {{{
-            assert_that(is_single_key(index, name))
-            private$fields(index, name)[, field_an] == "N"
+            assert_that(self$is_valid_field_index(index))
+            private$field_tbl(index)[["type"]] %in% c("integer", "real")
             # }}}
         },
 
-        is_integer_field = function (index = NULL, name = NULL) {
+        is_integer_field = function (index) {
             # check if a field is an integer field or not
             # {{{
-            assert_that(is_single_key(index, name))
-            private$fields(index, name)[, type] == "integer"
+            assert_that(self$is_valid_field_index(index))
+            private$field_tbl(index)[["type"]] == "integer"
             # }}}
         },
 
-        is_required_field = function (index = NULL, name = NULL) {
+        is_required_field = function (index) {
             # return TURE if the index is an index of a required field
             # {{{
-            assert_that(is_single_key(index, name))
-            private$fields(index, name)[, required_field]
+            assert_that(self$is_valid_field_index(index))
+            private$field_tbl(index)[["required_field"]]
             # }}}
         },
         # }}}
 
         print = function (ip_unit = FALSE) {
             # {{{
-            cli::cat_line(clisymbols::symbol$star, clisymbols::symbol$star,
-                          " Class: ", backtick(self$class_name()), " ",
-                          clisymbols::symbol$star, clisymbols::symbol$star)
+            prop <- private$class_tbl()[private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
+                , `:=`(group =    paste0("  Group: ", backtick(group_name)),
+                       unique =   paste0("  Unique: ", unique_object),
+                       required = paste0("  Required: ", required_object),
+                       num =      paste0("  Total fields: ", num_fields)
+                       )]
+
+            cli::cat_line("<< Class: ", backtick(prop[["class_name"]]), " >>")
             cli::cat_rule(center = "* MEMO *", line = 1)
-            if (is.na(self$memo())) {
+            memo <- self$memo()
+            if (is_empty(memo)) {
                 cli::cat_line("  <No Memo>")
             } else {
-                cli::cat_line("  \"", msg(self$memo()), "\"")
+                cli::cat_line("  \"", msg(memo), "\"")
             }
             cli::cat_rule(center = "* PROPERTIES *", line = 1)
-            cli::cat_line("  Group: ", self$group_name())
-            cli::cat_line("  Unique object: ", self$is_unique())
-            cli::cat_line("  Required: ", self$is_required())
-            cli::cat_line("  Format: ", self$class_format())
-            cli::cat_line("  Total fields: ", self$num_fields())
-            cli::cat_line("  Minimum fields: ", self$min_fields())
-            cli::cat_line("  Extensible field number: ", self$num_extensible())
-            cli::cat_line("  First extensible field index: ", self$first_extensible())
+            cli::cat_line(unlist(prop[, list(group, unique, required, num)]))
             cli::cat_rule(center = "* FIELDS *", line = 1)
 
+            req <- private$field_tbl()[required_field == TRUE, field_order]
             if (self$is_extensible()) {
-                first_ext <- self$first_extensible()
+                first_ext <- self$first_extensible_index()
                 last_ext <- first_ext + self$num_extensible() - 1L
-                req <- private$m_fields[required_field == TRUE, field_order]
                 last_req <- ifelse(is_empty(req), 0L, max(req))
-                # last_req <- private$m_fields[required_field == TRUE, max(field_order)]
                 num_print <- max(last_ext, last_req)
                 mark_ext <- character(num_print)
                 mark_ext[seq.int(first_ext, last_ext)] <- paste0(" <", clisymbols::symbol$arrow_down, ">")
@@ -630,9 +709,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             lines <- seq_len(num_print)
 
             nms <- self$field_name(unit = TRUE, in_ip = ip_unit)[lines]
-            index <- stringr::str_pad(lines, nchar(num_print), "left")
-            required <- private$m_fields[field_order <= num_print &
-                required_field == TRUE, field_order]
+            index <- lpad(lines)
+            required <- req[req < num_print]
 
             if (not_empty(required)) {
                 mark_req <- character(length(nms))
@@ -652,17 +730,24 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
     private = list(
         # PRIVATE FIELDS
         # {{{
-        # class property data
-        m_properties = data.table(),
-        # field data
-        m_fields = data.table(),
+        # class name
+        m_class_name = character(),
+        m_idd_tbl = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
         # {{{
-        fields = function (index = NULL, name = NULL) {
-            # return single field data by field index or field name (either in
-            # standard format or lower case format)
+        class_tbl = function () {
+            # return a tbl which contains all class property data
+            # {{{
+            private$m_idd_tbl$class[class_name == private$m_class_name][
+                private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
+            # }}}
+        },
+
+        field_tbl = function (index = NULL, name = NULL, min = FALSE) {
+            # return a tbl which contains field property data excluding range,
+            # choice, reference, object_list and external_list
             # {{{
             # either 'index' or 'name' should be used, not both
             if (all(not_empty(index), not_empty(name))) {
@@ -671,27 +756,42 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
                 name <- NULL
             }
 
+            out_tbl <- private$class_tbl()[private$m_idd_tbl$field, on = "class_id", nomatch = 0L]
             if (not_empty(index)) {
                 private$assert_valid_field_index(index)
-                out <- private$m_fields[index]
+                ord <- index
             } else if (not_empty(name)) {
-                index <- self$field_index(name = name)
-                out <- private$m_fields[index]
+                ord <- self$field_index(name = name)
             } else {
-                # this makes sure that it is save to call $fields() in IDFObject
-                out <- private$m_fields
+                # this makes sure that it is save to call $field_tbl() in Idfbject
+                ord <- NULL
             }
 
-            return(out)
+            if (!is.null(ord)) {
+                out_tbl <- out_tbl[ord]
+            }
+
+            private$m_idd_tbl$field_property[out_tbl, on = "field_id", nomatch = 0L]
             # }}}
         },
 
         field_name_std = function (index = NULL, unit = FALSE, in_ip = FALSE) {
         # return standard field name
             # {{{
+            if (!is.null(index)) private$assert_valid_field_index(index)
             index <- index %||% private$all_indice()
-            private$assert_valid_field_index(index)
-            i_field_name_std(private$m_fields[index], unit, in_ip)
+            res_tbl <- private$class_tbl()[private$m_idd_tbl$field,
+                on = "class_id", nomatch = 0L][index]
+
+            if (unit) {
+                if (in_ip) {
+                    res_tbl[["full_ipname"]]
+                } else {
+                    res_tbl[["full_name"]]
+                }
+            } else {
+                res_tbl[["field_name"]]
+            }
             # }}}
         },
 
@@ -706,45 +806,14 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         get_extensible_field_index = function (index) {
         # change input index to the line number of extensible data
             # {{{
-            (index - self$first_extensible() + 1L) %% self$num_extensible()
+            (index - self$first_extensible_index() + 1L) %% self$num_extensible()
             # }}}
         },
 
         num_extensible_group = function () {
         # return the number of extensible groups in the original idd data
             # {{{
-            (self$num_fields() - self$first_extensible() + 1) / self$num_extensible()
-            # }}}
-        },
-
-        # TODO: update idd reference_field data when extensible groups are added
-        # and have \objectList attributes
-        append_extensible_numbers = function (num = 1L) {
-        # append numbers in field, field_id, field_anid, and field_order in
-        # extensible groups
-            # {{{
-            assert_that(is_count(num))
-            num_ext <- self$num_extensible()
-            # get current number of extensible groups
-            num_grp <- private$num_extensible_group()
-            # get max field_id
-            max_field_id <- private$m_fields[.N, as.integer(gsub("\\D*", "", field_id))]
-            # get new added field id
-            added_field_id <- (num - 1L) * self$num_extensible() + seq_len(self$num_extensible())
-            # get total fields
-            num_field <- self$num_fields()
-            # append numbers in field, field_id, field_anid, field_order
-            .data <- self$extensible_group()
-            .data[, field := gsub("1", num_grp + num, field)]
-            .data[, `_field_name` := gsub("1", num_grp + num, `_field_name`)]
-            .data[, `_field` := gsub("1", num_grp + num, `_field`)]
-            .data[, `_field_ip` := gsub("1", num_grp + num, `_field_ip`)]
-            .data[, field_id := as.character(max_field_id + added_field_id)]
-            .data[, field_anid := paste0(field_an, field_id)]
-            .data[, field_order := num_field + added_field_id]
-            .data[, field_order := num_field + added_field_id]
-
-            return(.data)
+            (self$num_fields() - self$first_extensible_index() + 1) / self$num_extensible()
             # }}}
         },
 
@@ -752,7 +821,9 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # assert that all input are valid field names.
             # {{{
             assert_that(is.character(name))
-            valid <- purrr::map_lgl(name, self$is_valid_field_name)
+            nm_std <- private$field_name_std()
+            nm_lc <- private$field_name_lc()
+            valid <- name %in% nm_std | name %in% nm_lc
             assert_that(all(valid),
                 msg = paste0("Invalid field name found for class ",
                              self$class_name(),": ",
@@ -764,7 +835,8 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
             # assert that all input are valid field indice.
             # {{{
             assert_that(is.numeric(index))
-            valid <- purrr::map_lgl(index, self$is_valid_field_index)
+            total <- self$num_fields()
+            valid <- index <= total
             assert_that(all(valid),
                 msg = paste0("Invalid field index found for class ",
                              self$class_name(),": ",
@@ -781,18 +853,4 @@ IDDObject <- R6::R6Class(classname = "IDDObject",
         # }}}
     )
 )
-# }}}
-
-#######################################################################
-#                             ASSERTIONS                              #
-#######################################################################
-# is_single_key
-# {{{
-is_single_key <- function (index, name) {
-    key <- index %||% name
-    length(key) == 1L
-}
-on_failure(is_single_key) <- function (call, env) {
-    paste0("`index` and `name` should have a length of one.")
-}
 # }}}

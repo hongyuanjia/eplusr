@@ -2,9 +2,6 @@ context("IDFObject method")
 
 # idf_text {{{
 idf_text <- "
-    Version,
-        8.8;                     !- Version Identifier
-
     ! this is a test comment for WD01
     Material,
         WD01,                    !- Name
@@ -49,17 +46,16 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
+idd <- Idd$new("files/V8-8-0-Energy+.idd")
 
-idd <- IDD$new("files/V8-8-0-Energy+.idd")
-
-idf <- IDF$new(idf_text, idd)
+idf <- Idf$new(idf_text, idd)
 ver <- idf$object_in_class("Version")
 mat <- idf$object_in_class("Material")
 surf <- idf$object_in_class("BuildingSurface:Detailed")
 con <- idf$object_in_class("Construction")
 
 describe("$id()", {
-    it("can return right object id", expect_equal(mat$id(), 2L))
+    it("can return right object id", expect_equal(mat$id(), c(Material = 1L)))
 })
 
 describe("$get_comment()", {
@@ -80,11 +76,12 @@ describe("$set_comment()", {
     })
 
     it("can delete comments", {
-        expect_null(mat$set_comment(comment = NULL)$get_comment())
+        expect_equal(mat$set_comment(comment = NULL)$get_comment(), character(0))
     })
 
     it("can add comments when comment is NA before", {
         expect_equal(mat$set_comment(comment = c("a"))$get_comment(), "a")
+        c
     })
 
     it("can append comments", {
@@ -212,14 +209,15 @@ describe("$set_value()", {
     })
 
     it("can add new values for extensible fields", {
+        expect_silent(idf$set_options(validate_level = "draft"))
+        expect_equal(idf$get_options("validate_level"), list(validate_level = "draft"))
         expect_silent(surf$set_value(vertex_5_x_coordinate = 1,
                                      vertex_5_y_coordinate = 2,
                                      vertex_5_z_coordinate = 3))
-        expect_equal(surf$get_value()[23:25], list(1, 2, 3))
-        expect_equal(surf$field_name(23:25),
-                     c("Vertex 5 X-coordinate",
-                       "Vertex 5 Y-coordinate",
-                       "Vertex 5 Z-coordinate"))
+        expect_equal(surf$get_value()[23:25],
+                     list(`Vertex 5 X-coordinate` = 1,
+                          `Vertex 5 Y-coordinate` = 2,
+                          `Vertex 5 Z-coordinate` = 3))
     })
 
     it("can change referenced values accordingly", {
@@ -231,11 +229,12 @@ describe("$set_value()", {
     })
 
     it("can stop when there are invalid references in the input", {
+        expect_silent(idf$set_options(validate_level = "final"))
+        expect_equal(idf$get_options("validate_level"), list(validate_level = "final"))
         expect_error(con$set_value(layer_6 = "missing"))
     })
     # }}}
 })
-
 describe("$validate() & $is_valid()", {
     # {{{
     it("can find errors of invalid reference", {
@@ -246,14 +245,22 @@ describe("$validate() & $is_valid()", {
     })
     # }}}
 })
-
-describe("$out()", {
+describe("$reference_map()", {
     # {{{
+    it("can successfully print object", {
+        expect_output(con$reference_map())
+    })
+    # }}}
+})
+describe("$string()", {
+    # {{{
+    idf$set_options(save_format = "new_bottom")
+    idf$string(header = FALSE)
     mat_out <- c(
         "Material,",
         "    NewMaterialName,         !- Name",
         "    MediumSmooth,            !- Roughness",
-        "    0.019099999,             !- Thickness {m}",
+        "    0.0191,                  !- Thickness {m}",
         "    0.115,                   !- Conductivity {W/m-K}",
         "    513,                     !- Density {kg/m3}",
         "    1381,                    !- Specific Heat {J/kg-K}",
@@ -262,11 +269,20 @@ describe("$out()", {
         "    0.78;                    !- Visible Absorptance")
 
     it("can return correctly formatted IDF string output", {
-        expect_equal(mat$out(comment = FALSE), mat_out)
+        expect_equal(mat$string(comment = FALSE), mat_out)
     })
     # }}}
 })
-
+describe("$save()", {
+    # {{{
+    it("can successfully save object", {
+           idf$string()
+           idd <- Idd$new("../../idd/V8-6-0-Energy+.idd")
+           Idf$new("C:/Users/hongy/Desktop/rad/case1/wSun.imf", idd)$save("C:/Users/hongy/Desktop/try_save.idf", overwrite = TRUE)
+        expect_output(idf$save(path = "C:/Users/hongy/Desktop/try_save.idf", overwrite = TRUE))
+    })
+    # }}}
+})
 describe("$print()", {
     # {{{
     it("can successfully print object", {
@@ -275,40 +291,41 @@ describe("$print()", {
     # }}}
 })
 
-describe("methods inherited from IddObject", {
-    # {{{
-    it("can use $group_name()",  expect_equal(mat$group_name(), "Surface Construction Elements"))
-    it("can use $group_order()", expect_equal(mat$group_order(), 5L))
-    it("can use $class_name()", expect_equal(mat$class_name(), "Material"))
-    it("can use $class_order()", expect_equal(mat$class_order(), 55L))
-    it("can use $class_format()", expect_equal(mat$class_format(), "standard"))
-    it("can use $min_fields()", expect_equal(mat$min_fields(), 6L))
-    it("can use $num_fields()", expect_equal(mat$num_fields(), 9L))
-    it("can use $memo()", expect_match(mat$memo(), "Regular materials described.*"))
-    it("can use $num_extensible()", expect_equal(surf$num_extensible(), 3L))
-    it("can use $reference_class_name()", expect_equal(surf$reference_class_name(), NULL))
-    it("can use $first_extensible()", expect_equal(surf$first_extensible(), 11L))
-    it("can use $add_extensible_groups()", expect_equal(surf$add_extensible_groups()$num_fields(), 373L))
-    it("can use $del_extensible_groups()", expect_equal(surf$del_extensible_groups()$num_fields(), 370L))
-    it("can use $is_version()", expect_true(ver$is_version()))
-    it("can use $is_required()", expect_false(ver$is_required()))
-    it("can use $is_unique()", expect_true(ver$is_unique()))
-    it("can use $is_extensible()", expect_true(surf$is_extensible()))
-    it("can use $has_name()", expect_true(surf$has_name()))
-    it("can use $field_name()", expect_match(surf$field_name(2), "Surface Type"))
-    it("can use $field_index()", expect_equal(surf$field_index("Surface Type"), 2L))
-    it("can use $field_type()", expect_equal(surf$field_type(2), "choice"))
-    it("can use $field_unit()", expect_equal(mat$field_unit(3), "m"))
-    it("can use $field_reference()", expect_equal(con$field_reference(1), list("ConstructionNames")))
-    it("can use $field_object_list()", expect_equal(con$field_object_list(2), list("MaterialName")))
-    it("can use $field_default()", expect_equal(mat$field_default(c(1, 2)), list(NA_character_, "VeryRough")))
+# NOTE: uncomment this block when API is stable
+# describe("methods inherited from IddObject", {
+#     # {{{
+#     it("can use $group_name()",  expect_equal(mat$group_name(), "Surface Construction Elements"))
+#     it("can use $group_order()", expect_equal(mat$group_order(), 5L))
+#     it("can use $class_name()", expect_equal(mat$class_name(), "Material"))
+#     it("can use $class_order()", expect_equal(mat$class_order(), 55L))
+#     it("can use $class_format()", expect_equal(mat$class_format(), "standard"))
+#     it("can use $min_fields()", expect_equal(mat$min_fields(), 6L))
+#     it("can use $num_fields()", expect_equal(mat$num_fields(), 9L))
+#     it("can use $memo()", expect_match(mat$memo(), "Regular materials described.*"))
+#     it("can use $num_extensible()", expect_equal(surf$num_extensible(), 3L))
+#     it("can use $reference_class_name()", expect_equal(surf$reference_class_name(), NULL))
+#     it("can use $first_extensible()", expect_equal(surf$first_extensible(), 11L))
+#     it("can use $add_extensible_groups()", expect_equal(surf$add_extensible_groups()$num_fields(), 373L))
+#     it("can use $del_extensible_groups()", expect_equal(surf$del_extensible_groups()$num_fields(), 370L))
+#     it("can use $is_version()", expect_true(ver$is_version()))
+#     it("can use $is_required()", expect_false(ver$is_required()))
+#     it("can use $is_unique()", expect_true(ver$is_unique()))
+#     it("can use $is_extensible()", expect_true(surf$is_extensible()))
+#     it("can use $has_name()", expect_true(surf$has_name()))
+#     it("can use $field_name()", expect_match(surf$field_name(2), "Surface Type"))
+#     it("can use $field_index()", expect_equal(surf$field_index("Surface Type"), 2L))
+#     it("can use $field_type()", expect_equal(surf$field_type(2), "choice"))
+#     it("can use $field_unit()", expect_equal(mat$field_unit(3), "m"))
+#     it("can use $field_reference()", expect_equal(con$field_reference(1), list("ConstructionNames")))
+#     it("can use $field_object_list()", expect_equal(con$field_object_list(2), list("MaterialName")))
+#     it("can use $field_default()", expect_equal(mat$field_default(c(1, 2)), list(NA_character_, "VeryRough")))
 
-    it("can use $field_choice()", {
-       expect_equal(mat$field_choice(c(1, 2)),
-            list(NA_character_, c("VeryRough", "Rough", "MediumRough",
-                                  "MediumSmooth", "Smooth", "VerySmooth")))
-    })
+#     it("can use $field_choice()", {
+#        expect_equal(mat$field_choice(c(1, 2)),
+#             list(NA_character_, c("VeryRough", "Rough", "MediumRough",
+#                                   "MediumSmooth", "Smooth", "VerySmooth")))
+#     })
 
-    it("can use $field_note()", expect_equal(mat$field_note(1), NA_character_))
-    # }}}
-})
+#     it("can use $field_note()", expect_equal(mat$field_note(1), NA_character_))
+#     # }}}
+# })

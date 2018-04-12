@@ -16,6 +16,7 @@
 #'            releases).
 #' @param force Whether to install EnergyPlus even if it has already been
 #'              installed.
+#' @name install
 #' @export
 # install_eplus {{{
 install_eplus <- function (ver = "latest", force = FALSE) {

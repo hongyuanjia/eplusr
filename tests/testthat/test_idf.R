@@ -1,124 +1,353 @@
-context("IDF method")
+context("Idf method")
 
-describe("IDF related", {
+# idf_text {{{
+idf_text <- "
+    ! this is a test comment for WD01
+    Material,
+        WD01,                    !- Name
+        MediumSmooth,            !- Roughness
+        1.9099999E-02,           !- Thickness {m}
+        0.1150000,               !- Conductivity {W/m-K}
+        513.0000,                !- Density {kg/m3}
+        1381.000,                !- Specific Heat {J/kg-K}
+        0.9000000,               !- Thermal Absorptance
+        0.7800000,               !- Solar Absorptance
+        0.7800000;               !- Visible Absorptance
 
-    path <- "files/5Zone_Transformer_8.8.idf"
+    Construction,
+        WALL-1,                  !- Name
+        WD01,                    !- Outside Layer
+        PW03,                    !- Layer 2
+        IN02,                    !- Layer 3
+        GP01;                    !- Layer 4
 
-    text_idf <- c(
-       "!-Generator eplusr
-        !-Option SortedOrder
+    BuildingSurface:Detailed,
+        WALL-1PF,                !- Name
+        WALL,                    !- Surface Type
+        WALL-1,                  !- Construction Name
+        PLENUM-1,                !- Zone Name
+        Outdoors,                !- Outside Boundary Condition
+        ,                        !- Outside Boundary Condition Object
+        SunExposed,              !- Sun Exposure
+        WindExposed,             !- Wind Exposure
+        0.50000,                 !- View Factor to Ground
+        4,                       !- Number of Vertices
+        0.0,                     !- Vertex 1 X-coordinate {m}
+        0.0,                     !- Vertex 1 Y-coordinate {m}
+        3.0,                     !- Vertex 1 Z-coordinate {m}
+        0.0,                     !- Vertex 2 X-coordinate {m}
+        0.0,                     !- Vertex 2 Y-coordinate {m}
+        2.4,                     !- Vertex 2 Z-coordinate {m}
+        30.5,                    !- Vertex 3 X-coordinate {m}
+        0.0,                     !- Vertex 3 Y-coordinate {m}
+        2.4,                     !- Vertex 3 Z-coordinate {m}
+        30.5,                    !- Vertex 4 X-coordinate {m}
+        0.0,                     !- Vertex 4 Y-coordinate {m}
+        3.0;                     !- Vertex 4 Z-coordinate {m}
+    "
+# }}}
+idd <- eplusr::idd_8.8
 
-        !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
-        !-      Use '!' comments if they need to be retained when using the IDFEditor.
+describe("parse_idf_file()", {
+    it("can read Idf stored in strings", {
+        expect_silent(idf_str <- read_idd(idf_text))
+    })
+    it("can parse Idf stored in strings", {
+        # {{{
+        expect_silent(idf_parsed <- parse_idf_file(idf_text, idd))
+        expect_equal(names(idf_parsed),
+            c("version", "options", "object", "value", "value_reference", "comment"))
+        # }}}
+    })
 
+    idf_parsed <- parse_idf_file(idf_text, idd)
+    it("can add version according to input Idd object", {
+        # {{{
+        expect_equal(idf_parsed$version, as.numeric_version("8.8"))
+        expect_true(idf_parsed$version == idd$version())
+        # }}}
+    })
+    it("can parse options data", {
+        # {{{
+        expect_equal(idf_parsed$options,
+            list(save_format = "sorted", special_format = FALSE, view_in_ip = FALSE,
+                 num_digits = 8L))
+        # }}}
+    })
+    it("can parse object data", {
+        # {{{
+        expect_equal(idf_parsed$object$object_id, 1:4)
+        expect_equal(idf_parsed$object$class_id, c(55, 90, 103, 1))
+        # }}}
+    })
+    it("can parse value reference data", {
+        # {{{
+        expect_equal(idf_parsed$value_reference$reference_value_id, c(1, 10))
+        expect_equal(idf_parsed$value_reference$value_id, c(11, 17))
+        # }}}
+    })
+    it("can parse comment data", {
+        # {{{
+        expect_equal(idf_parsed$comment$comment_id, 1)
+        expect_equal(idf_parsed$comment$comment, " this is a test comment for WD01")
+        expect_equal(idf_parsed$comment$type, 0)
+        expect_equal(idf_parsed$comment$object_id, 1)
+        # }}}
+    })
+    it("can parse value data", {
+        # {{{
+        text_object <- c(
+            "Material,
+                WD01,                    !- Name
+                MediumSmooth,            !- Roughness
+                0.2000000,               !- Thickness {m}
+                0.1150000,               !- Conductivity {W/m-K}
+                513.0000,                !- Density {kg/m3}
+                1381.000,                !- Specific Heat {J/kg-K}
+                0.9000000,               !- Thermal Absorptance
+                0.7800000,               !- Solar Absorptance
+                0.7800000;               !- Visible Absorptance
+            ")
+        val <- {s <- strsplit(text_object, "\n")[[1]][-c(1, 11)]
+                gsub("[,;].*", "", trimws(s, "left"))}
+        num <- suppressWarnings(as.double(c(val, "8.8")))
 
-        !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
+        as.character(idd$object("Material")$field_unit())
+        expect_silent(idf_value <- parse_idf_file(text_object, idd))
+        expect_equal(names(idf_value$value),
+            c("value_id", "value", "value_upper", "value_num", "object_id"))
+        expect_equal(idf_value$value$value_id, 1:10)
+        expect_equal(idf_value$value$value, c(val, "8.8"))
+        expect_equal(idf_value$value$value_upper, toupper(c(val, "8.8")))
+        expect_equivalent(idf_value$value$value_num, num)
+        expect_equal(idf_value$value$object_id, c(rep(1, 9), 2))
+        # }}}
+    })
+    it("can detect error of invalid class name", {
+        # {{{
+        idf_wrong <- c(
+            "WrongClass,
+                WD01,                    !- Name
+                MediumSmooth,            !- Roughness
+                1.9099999E-02,           !- Thickness {m}
+                0.1150000,               !- Conductivity {W/m-K}
+                513.0000,                !- Density {kg/m3}
+                1381.000,                !- Specific Heat {J/kg-K}
+                0.9000000,               !- Thermal Absorptance
+                0.7800000,               !- Solar Absorptance
+                0.7800000;               !- Visible Absorptance
+            ")
+        expect_error(parse_idf_file(idf_wrong, idd))
+        # }}}
+    })
+})
 
-        ! 5Zone_Transformer.idf
-        Version,
-            8.8;                     !- Version Identifier
+describe("Idf$new()",
+    # {{{
+    it("can create new Idf object from file", {
+        expect_silent(idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd))
+    })
+    it("can create new Idf object from string", {
+        expect_silent(idf <- Idf$new(idf_text, idd))
+    })
+    # }}}
+)
 
+describe("$version()", {
+    # {{{
+    it("can get Idf version", {
+       expect_equal(idf$version(), as.numeric_version("8.8"))
+    })
+    # }}}
+})
+describe("$group_names()", {
+    # {{{
+    it("can get group names in Idf", {
+        expect_equal(idf$group_names(),
+                     c("Simulation Parameters",
+                       "Surface Construction Elements",
+                       "Thermal Zones and Surfaces"))
+    })
+    it("can get group names in Idd", {
+        expect_equal(idf$group_names(where = "idd"), idd$group_names())
+    })
+    # }}}
+})
+describe("$class_names()", {
+    # {{{
+    it("can get class names in Idf", {
+        expect_equal(idf$class_names(),
+                     c("Version",
+                       "Material",
+                       "Construction",
+                       "BuildingSurface:Detailed"))
+    })
+    it("can get class names in Idd", {
+        expect_equal(idf$class_names(where = "idd"), idd$class_names())
+    })
+    # }}}
+})
+describe("$object_ids()", {
+    # {{{
+    it("can get all object ids", {
+        expect_equivalent(idf$object_ids(), 1:4)
+    })
+    it("can get all object ids of a single class", {
+        expect_equivalent(idf$object_ids("Version"), c(Version = 4))
+    })
+    # }}}
+})
+describe("$is_valid_class()", {
+    # {{{
+    it("works", {
+        expect_true(idf$is_valid_class("Version"))
+        expect_false(idf$is_valid_class("Wrong"))
+    })
+    # }}}
+})
+describe("$is_valid_id()", {
+    # {{{
+    it("works", {
+        expect_true(idf$is_valid_id(1L))
+        expect_false(idf$is_valid_id(5L))
+        expect_error(idf$is_valid_id(1L:4L), "id is not a count")
+    })
+    # }}}
+})
+describe("$get_options()", {
+    # {{{
+    it("works", {
+        expect_equal(idf$get_options(),
+                     list(validate_level = "final",
+                          view_in_ip = FALSE,
+                          special_format = FALSE,
+                          save_format = "sorted_order"))
+        expect_equal(idf$get_options(c("view_in_ip", "save_format")),
+                     list(view_in_ip = FALSE, save_format = "sorted_order"))
+    })
+    # }}}
+})
+describe("$set_options()", {
+    # {{{
+    it("works", {
+        expect_error(idf$set_options(), "Please give options to set")
+        expect_error(idf$set_options(Wrong = TRUE), "Invalid option name")
+        expect_error(idf$set_options(validate_level = "wrong")),
+        expect_error(idf$set_options(save_format = "wrong"))
+        ops <- list(validate_level = "draft",
+                    view_in_ip = FALSE,
+                    special_format = FALSE,
+                    save_format = "sorted_order")
+        expect_equal(idf$set_options(ops), ops)
+    })
+    # }}}
+})
+describe("$object()", {
+    # {{{
+    it("works", {
+        expect_is(idf$object(1), c("IdfObject", "IddObject", "R6"))
+        expect_silent(idf$object(1))
+        expect_error(idf$object(1:2))
+        expect_error(idf$object("a"))
+        expect_error(idf$object(5))
+    })
+    # }}}
+})
+describe("$objects()", {
+    # {{{
+    it("works", {
+        expect_silent(idf$objects(1:2))
+        expect_equal(class(idf$objects(1:2)), "list")
+        expect_equal(length(idf$objects(1:2)), 2L)
+        expect_error(idf$objects(1:5), "not a valid object ID")
+    })
+    # }}}
+})
+describe("$object_in_class()", {
+    # {{{
+    it("works", {
+        expect_silent(idf$object_in_class("Version"))
+        expect_equivalent(idf$object_in_class("Version"), idf$object(4))
+    })
+    # }}}
+})
+describe("$objects_in_class()", {
+    # {{{
+    it("works", {
+        expect_equivalent(idf$objects_in_class("Version", 1), idf$objects(4))
+        expect_error(idf$objects_in_class("Version", 2))
+    })
+    # }}}
+})
+describe("$dup_object()", {
+    # {{{
+    it("works", {
+        idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd)
+        expect_equal(idf$dup_object(66)$get_value(2:5),
+                     idf$object(66)$get_value(2:5))
+    })
+    # }}}
+})
+describe("$add_object()", {
+    # {{{
+    it("", {
 
-        !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
+    })
+    # }}}
+})
+describe("$set_object()", {
+    # {{{
+    it("", {
 
-        SimulationControl,
-            Yes,                     !- Do Zone Sizing Calculation
-            Yes,                     !- Do System Sizing Calculation
-            Yes,                     !- Do Plant Sizing Calculation
-            No,                      !- Run Simulation for Sizing Periods
-            Yes;                     !- Run Simulation for Weather File Run Periods
+    })
+    # }}}
+})
+describe("$del_object()", {
+    # {{{
+    it("", {
 
+    })
+    # }}}
+})
+describe("$validate()", {
+    # {{{
+    it("", {
 
-        !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
+    })
+    # }}}
+})
+describe("$string()", {
+    # {{{
+    it("", {
 
-        Building,
-            Building,                !- Name
-            30,                      !- North Axis {deg}
-            City,                    !- Terrain
-            0.04,                    !- Loads Convergence Tolerance Value
-            0.4,                     !- Temperature Convergence Tolerance Value {deltaC}
-            FullExterior,            !- Solar Distribution
-            25,                      !- Maximum Number of Warmup Days
-            6;                       !- Minimum Number of Warmup Days
-
-
-        !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
-
-        SurfaceConvectionAlgorithm:Inside,
-            Simple;                  !- Algorithm"
-    )
-
-    idd <- IDD$new("files/V8-8-0-Energy+.idd")
-
-    describe("Preprocess IDF files"
-        it("can read IDF stored in files", {
-            expect_silent(idf_str <- read_idd(path))
-        })
-
-        it("can read IDF stored in strings", {
-            expect_silent(idf_str <- read_idd(text_idf))
-        })
-
-        it("can correctly get IDF version", {
-            expect_equal(get_idf_ver(idf_str), "8.8")
-        })
-
-        it("has not tested what would happen when no version")
-    )
-
-    describe("Parse IDF files",
-        it("can parse IDF stored in files", {
-            expect_silent(idf_parsed <- parse_idf(path, idd))
-        })
-
-        it("can parse IDF stored in strings", {
-            expect_silent(idf_parsed <- parse_idf(text_idf, idd))
-        })
-
-        it("can add a version object if not exists in current model", {
-            FALSE
-        })
-    )
-
-    describe("IDF methods",
-        it("can create new IDF object", {
-            expect_silent(idf <- IDF$new(text_idf, idd))
-        })
-    )
-
-    expect_equal(idf$version(), "8.8")
-
-    expect_equal(idf$all_id(), 1:4)
-    expect_equal(idf$all_class(), c("Version", "SimulationControl", "Building",
-                                    "SurfaceConvectionAlgorithm:Inside"))
-    expect_equal(idf$id_of_class("Version"), 1L)
-    expect_equal(idf$class_of_id(2L), "SimulationControl")
-
-    expect_equal(idf$is_valid_id(1L), TRUE)
-    expect_error(idf$is_valid_id(1L:4L), "id is not a scalar.")
-    expect_equal(idf$is_valid_id(5L), FALSE)
-    expect_equal(idf$is_valid_class("Version"), TRUE)
-    expect_equal(idf$is_valid_class("Wrong"), FALSE)
-
-    expect_silent(idf$object(1))
-    expect_equal(class(idf$object(1)), c("IDFObject", "IDDObject", "R6"))
-    expect_error(idf$object(1:2))
-    expect_error(idf$object("a"))
-    expect_error(idf$object(5))
-
-    expect_silent(idf$objects(1:2))
-    expect_equal(class(idf$objects(1:2)), "list")
-    expect_equal(length(idf$objects(1:2)), 2L)
-    expect_error(idf$objects(1:5), "`5` is not a valid object ID in current IDF.")
-
-    expect_silent(idf$objects_in_class("Building"))
-    expect_equal(idf$objects_in_class("Building"), idf$objects(3))
-    expect_equal(idf$objects_in_class("Building", 1), idf$objects(3))
-    expect_error(idf$objects_in_class("Version", 2))
-
-    expect_error(idf$set_object(1))
-    expect_equal(idf$set_object(2, "No")$get_value(1), list("No"))
-    expect_equal(idf$set_object(2, "Yes")$get_value(1), list("Yes"))
-
-    expect_equal(trimws(idf$out()), idf_str)
+        idf$set_options(validate_level = "draft")
+        idf$add_object("Construction", "try", "add", "object")
+        idf$set_options(save_format = "new_bottom")
+        idf$string()
+        idf$format_idf(header = FALSE)
+        idf$set_options(view_in_ip = TRUE)
+        idf$format_idf(header = FALSE)
+        idf$set_options(num_digits = 4L)
+        idf$format_idf(header = FALSE)
+    })
+    # }}}
+})
+describe("$save()", {
+    # {{{
+    it("", {
+        idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd)
+        idf$set_options(save_format = "sorted")
+        idf$save("files/test_save.idf", overwrite = TRUE)
+        idf$set_options(save_format = "new_bottom")
+        idf$string()
+        idf$set_options(validate_level = "draft")
+        idf$add_object("Construction", "try", "add", "object")
+        idf$string()
+        idf$format_idf(header = FALSE)
+        idf$set_options(view_in_ip = TRUE)
+        idf$format_idf(header = FALSE)
+        idf$set_options(num_digits = 4L)
+        idf$format_idf(header = FALSE)
+    })
+    # }}}
 })

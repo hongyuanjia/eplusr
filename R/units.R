@@ -536,5 +536,5 @@ multi_unit_name[129] = "VolumetricFlowPerPower"
 multi_unit_name[144] = "Wavelength"
 # }}}
 
-conversion_units_record <- data.table(si_name, ip_name, mult, offset, alt, multi_unit_name)
+unit_conv_table <- data.table(si_name, ip_name, mult, offset, alt, multi_unit_name)
 # }}}
