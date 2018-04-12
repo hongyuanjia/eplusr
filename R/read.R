@@ -158,7 +158,7 @@ read_table_info <- function(file) {
 # long_table {{{1
 long_table <- function(data) {
     assert_that(is.data.frame(data))
-    setDT(data)
+    data.table::setDT(data)
 
     cols <- get_output_col(data)
     key_cols <- attr(cols, "unknown")
@@ -171,15 +171,15 @@ long_table <- function(data) {
     data <- melt.data.table(data, id.vars = key_cols,
         variable.name = "component", value.name = "value", variable.factor = FALSE)
 
-    data[, c("key", "variable", "unit", "frequency") := tstrsplit(component, "[:\\[\\(]")][
-         , `:=`(variable = substr(variable, 1L, nchar(variable) - 1L),
-                unit = substr(unit, 1L, nchar(unit) - 1L),
-                frequency = substr(frequency, 1L, nchar(frequency) - 1L))
-    ]
+    sep <- data.table::as.data.table(
+        stringr::str_match(cols, "(.*?)\\s*:\\s*(.*?)\\s*\\[(.*?)\\]\\s*(\\(.*?\\))*")
+    )
+    data.table::setnames(sep, c("component", "key", "variable", "unit", "frequency"))
 
-    setcolorder(data, c(key_cols, "component", "key", "variable", "unit", "frequency", "value"))
+    res <- sep[data, on = "component"]
+    setcolorder(res, c(key_cols, "component", "key", "variable", "unit", "frequency", "value"))
 
-    return(data)
+    return(res)
 }
 # }}}1
 # get_output_col {{{

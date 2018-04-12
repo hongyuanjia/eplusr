@@ -1,16 +1,3 @@
-# console_width {{{
-# Reference: `cli` (https://github.com/r-lib/cli)
-console_width <- function() {
-    width <- getOption(
-        "cli.width",
-        Sys.getenv("RSTUDIO_CONSOLE_WIDTH",
-                   getOption("width", 80)
-        )
-    )
-
-    return(as.integer(width))
-}
-# }}}
 # `%||%` {{{
 `%||%` <- function (x, y) {
     if (is.null(x)) {
@@ -51,5 +38,20 @@ backtick <- function (x) {
 # `._get_private`{{{
 `._get_private` <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
+}
+# }}}
+# pad: borrowed from `r-lib/cli` {{{
+rpad <- function(x, char = " ", width = NULL) {
+    if (!length(x)) return(x)
+    w <- nchar(x, type = "width")
+    if (is.null(width)) width <- max(w)
+    paste0(x, strrep(char, pmax(width - w, 0)))
+}
+
+lpad <- function(x, char = " ", width = NULL) {
+    if (!length(x)) return(x)
+    w <- nchar(x, type = "width")
+    if (is.null(width)) width <- max(w)
+    paste0(strrep(char, pmax(width - w, 0)), x)
 }
 # }}}
