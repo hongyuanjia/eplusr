@@ -3,7 +3,63 @@
 #' @importFrom tools file_path_sans_ext
 #' @importFrom rlang f_lhs f_rhs f_env eval_tidy
 #' @importFrom data.table month mday setattr
+NULL
 
+# eplus_default_path {{{
+eplus_default_path <- function (ver) {
+    assert_that(is.numeric_version(ver))
+    ver_dash <- paste0(ver[,1], "-", ver[,2], "-0")
+    if (is_windows()) {
+        d <- paste0("C:/EnergyPlusV", ver_dash)
+    } else if (is_linux()) {
+        d <- paste0("/usr/local/EnergyPlus-", ver_dash)
+    } else {
+        d <- paste0("/Applications/EnergyPlus-", ver_dash)
+    }
+    d
+}
+# }}}
+# exe {{{
+exe <- function () if (is_windows()) ".exe" else  ""
+# }}}
+# is_valid_eplus_path {{{
+is_valid_eplus_path <- function (path) {
+    if (!dir.exists(path)) {
+        FALSE
+    } else {
+        all(file.exists(c(file.path(path, paste0("energyplus",exe())),
+                          file.path(path, "Energy+.idd"))))
+    }
+}
+# }}}
+# get_ver_from_path {{{
+get_ver_from_path <- function (path) as.numeric_version(gsub(".*V", "", path))
+# }}}
+# use_eplus {{{
+use_eplus <- function (eplus) {
+    # if eplus is a version, try to locate it in the default path
+    if (is_supported_ver(eplus)) {
+        ver <- as.numeric_version(eplus)
+        eplus_dir <- eplus_default_path(eplus)
+        if (!is_valid_eplus_path(eplus_dir)) {
+            stop(msg("Cannot locate EnergyPlus V", trimws(eplus), " at default
+                     installation path ", backtick(eplus_dir), ". Please
+                     give exact path of EnergyPlus installation."),
+                call. = FALSE)
+        }
+    } else {
+        ver <- get_ver_from_path(eplus)
+        eplus_dir <- eplus
+        if (!is_valid_eplus_path(eplus)) {
+            stop(msg(backtick(eplus_dir), "is not a valid EnergyPlus installation path."),
+                call. = FALSE)
+
+        }
+    }
+
+    list(version = ver, dir = eplus_dir, exe = paste0("energyplus", exe()))
+}
+# }}}
 # eplus_path {{{
 eplus_path <- function (ver = NULL, path = NULL) {
     os <- osname()
@@ -128,7 +184,7 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
     ############################################################################
 
     # }}}
-    # Get the right format of the input command to EnergyPlus. {{{2
+    # Get the right format of the input command to EnergyPlus. {{{
     # NOTE: `ifelse` function cannot return NULL.
     if (missing(output_prefix) || is.null(output_prefix)) {
         output_prefix <- tools::file_path_sans_ext(basename(model))
@@ -149,8 +205,8 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
     if (annual) cmd_annual <- "--annual" else cmd_annual <- NULL
     if (design_day) cmd_design_day <- "--design-day" else cmd_design_day <- NULL
     if (!is.null(idd)) cmd_idd <- paste0("--idd", shQuote(idd)) else cmd_idd <- NULL
-    # }}}2
-    # In case there are spaces in user input, quote all pathes {{{2
+    # }}}
+    # In case there are spaces in user input, quote all pathes {{{
     args <- paste(
         "--weather", shQuote(weather),
         "--output-directory", shQuote(output_dir),
@@ -159,14 +215,15 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
         cmd_epmacro, cmd_expand_obj, cmd_readvars, cmd_annual, cmd_design_day, cmd_idd,
         shQuote(model)
     )
-    # }}}2
+    # }}}
 
     return(args)
 }
 # }}}
 # copy_run_files {{{
 copy_run_files <- function (file, dir) {
-    loc <- file.path(dir, basename(file))
+    file <- normalizePath(file, mustWork = FALSE)
+    loc <- normalizePath(file.path(dir, basename(file)), mustWork = FALSE)
     flag <- FALSE
 
     if (file == loc) return(file)
@@ -184,19 +241,21 @@ copy_run_files <- function (file, dir) {
 run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
                      design_day = FALSE, annual = FALSE, expand_obj = TRUE,
                      echo = FALSE) {
-    model <- normalizePath(model, winslash = "/", mustWork = FALSE)
-    weather <- normalizePath(weather, winslash = "/", mustWork = FALSE)
+    model <- normalizePath(model, mustWork = FALSE)
+    weather <- normalizePath(weather, mustWork = FALSE)
     assert_that(file.exists(model))
     assert_that(file.exists(weather))
 
     # get output directory
     if (is.null(output_dir)) output_dir <- dirname(model)
-    output_dir <- normalizePath(output_dir, winslash = "/", mustWork = FALSE)
+    output_dir <- normalizePath(output_dir, mustWork = FALSE)
     if (!dir.exists(output_dir)) {
-        flag_dir <- dir.create(
-            normalizePath(output_dir, winslash = "/", mustWork = FALSE),
-            recursive = TRUE)
-        assert_that(flag_dir, msg = "Unable to create output directory. Simulation stoped.")
+        tryCatch(dir.create(output_dir, recursive = TRUE),
+            warning = function (w) {
+                stop("Failed to create output directory: ",
+                     backtick(output_dir), call. = FALSE)
+            }
+        )
     }
 
     # copy input files
@@ -206,7 +265,7 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
     # set working dirctory
     ori_wd <- getwd()
     setwd(dirname(loc_m))
-    on.exit(setwd(ori_wd))
+    on.exit(setwd(ori_wd), add = TRUE)
 
     # get arguments of energyplus
     args <- cmd_args(loc_m, loc_w, output_dir = output_dir, annual = annual,
@@ -218,7 +277,7 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
         # have to suppress warnings here as it always complains about warnings
         # on 'can nonly read in bytes in a non-UTF-8 MBCS locale'.
         invisible(suppressWarnings(processx::run(eplus_exe, args,
-                                 windows_verbatim_args = TRUE, echo = TRUE)))
+            windows_verbatim_args = TRUE, echo = TRUE)))
     } else {
         p <- processx::process$new(
             eplus_exe, args,
