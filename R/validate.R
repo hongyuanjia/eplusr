@@ -41,7 +41,7 @@ i_collect_validate <- function (private) {
     }
 
     if (private$m_options$validate_level == "draft") {
-        # i_exclu_empty(private, input)
+        i_exclu_empty(private, input)
         i_check_autosize(private, input)
         i_check_autocalculate(private, input)
         i_exclu_auto(private, input)
@@ -62,7 +62,7 @@ i_collect_validate <- function (private) {
         i_check_conflict_name(private, input)
 
         i_check_missing(private, input)
-        # i_exclu_empty(private, input)
+        i_exclu_empty(private, input)
         i_check_autosize(private, input)
         i_check_autocalculate(private, input)
         i_exclu_auto(private, input)
@@ -134,11 +134,11 @@ i_check_missing <- function (private, input) {
     }
 }
 # }}}
-# # i_exclu_empty: exclude non-required empty fields {{{
-# i_exclu_empty <- function (private, input) {
-#     input$value_tbl <- input$value_tbl[!(required_field == FALSE & value == "")]
-# }
-# # }}}
+# i_exclu_empty: exclude non-required empty fields {{{
+i_exclu_empty <- function (private, input) {
+    input$value_tbl <- input$value_tbl[!(required_field == FALSE & value == "")]
+}
+# }}}
 # i_check_autosize: invalid autosize fields {{{
 i_check_autosize <- function (private, input) {
     private$m_validate$autosize <- input$value_tbl[
