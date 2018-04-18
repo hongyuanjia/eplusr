@@ -33,25 +33,6 @@
 #'
 #' @name eplusr-package
 #' @section Package options:
-(op.eplusr <- list(
-      #' - `tibble.print_max`: Row number threshold: Maximum number of rows
-      #'     printed. Set to `Inf` to always print all rows.  Default: 20.
-      eplusr.num_digits = 20L,
-
-      #' - `tibble.print_min`: Number of rows printed if row number
-      #'     threshold is exceeded. Default: 10.
-      eplusr.view_in_ip = FALSE,
-
-      #' - `tibble.width`: Output width. Default: `NULL` (use
-      #'     `width` option).
-      eplusr.validate_level = NULL,
-
-      #' - `tibble.max_extra_cols`: Number of extra columns
-      #'     printed in reduced form. Default: 100.
-      eplusr.verbose_info = 100L,
-
-      eplusr.save_format = "sorted"
-))
 # https://github.com/Rdatatable/data.table/blob/master/R/onLoad.R
 # https://github.com/Rdatatable/data.table/blob/master/R/onAttach.R
 # https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html
@@ -61,3 +42,16 @@
 # https://github.com/tidyverse/dplyr/blob/master/R/zzz.r
 # https://github.com/tidyverse/dplyr/blob/master/DESCRIPTION
 eplusr_opt <- function(x) op.eplusr[[paste0("eplusr.", x)]]
+
+# package level global constant
+.globals <- new.env(parent = emptyenv())
+.globals$latest_parsed_ver <- as.numeric_version("8.9")
+
+# package level mutable global options
+.options <- new.env(parent = emptyenv())
+.options$num_digits <- 8L
+.options$view_in_ip <- FALSE
+.options$validate_level <- "final"
+.options$verbose_info <- TRUE
+.options$save_format <- "sorted"
+.options$num_parallel <- parallel::detectCores(logical = FALSE)

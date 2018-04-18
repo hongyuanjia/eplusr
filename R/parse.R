@@ -630,12 +630,23 @@ parse_idd_file <- function(path) {
 #' @importFrom purrr map2
 #' @importFrom cli cat_line cat_rule rule
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd) {
-    assert_that(inherits(idd, "Idd"))
+parse_idf_file <- function (path, idd = NULL) {
 
     idf_str <- read_idd(path)
 
-    # idf_version <- get_idf_ver(idf_str)
+    # if idd is missing, use preparsed Idd object
+    if (is.null(idd)) {
+        # get idf version
+        idf_ver <- get_idf_ver(idf_str)
+        if (!is.null(idf_ver)) {
+            idd <- use_idd(idf_ver)
+        # if no version found, use the latest Idd object
+        } else {
+            idd <- use_idd(.globals$latest_parsed_ver)
+        }
+    } else {
+        assert_that(is_idd(idd))
+    }
 
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
@@ -675,11 +686,10 @@ parse_idf_file <- function (path, idd) {
     # }}}
     # mark macro values as macro {{{
     macro_value <- idf_macro[!is.na(macro_value), unique(macro_value)]
+    is_imf <- ifelse(not_empty(macro_value), TRUE, FALSE)
     idf_dt[string %in% macro_value, type := type_macro]
     # }}}
     # }}}
-    # treat macro lines as the same as comments
-    # idf_dt[type == type_macro, type := type_comment]
     idf_dt[startsWith(string, "!"), type := type_comment]
     idf_dt[startsWith(string, "!-"), type := type_special]
     # mark location of "!" and "!-"
@@ -772,8 +782,7 @@ parse_idf_file <- function (path, idd) {
     # get number of condensed values
     idf_dt[!is.na(value), `:=`(value_count = char_count(value, "[,;]"))]
     idf_dt[is.na(value), `:=`(value_count = 0L)]
-    # idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)),
-    idf_dt <- idf_dt[data.table::between(type, type_macro, type_comment),
+    idf_dt <- idf_dt[!data.table::between(type, type_macro, type_comment),
         strsplit(value, "\\s*[,;]\\s*"), by = list(line)][
         idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
     data.table::setnames(idf_dt, "V1", "value")
@@ -949,6 +958,8 @@ parse_idf_file <- function (path, idd) {
                 comment = comment)
 
     data.table::setattr(idf, "class", c("IdfFile", class(idf)))
+    data.table::setattr(idf, "is_imf", is_imf)
+    data.table::setattr(idf, "idd", idd)
 
     return(idf)
 }
@@ -1031,6 +1042,22 @@ get_idd_build <- function (idd_str) {
              paste0("  ", backtick(build_line), collapse = "\n"), call. = FALSE)
     } else {
         warning("No IDD build tag found in the input.", call. = FALSE)
+    }
+}
+# }}}
+
+# get_idf_ver {{{
+get_idf_ver <- function (idf_str) {
+    ver_normal <- idf_str[endsWith(idf_str, "Version Identifier")]
+    ver_special <- idf_str[startsWith(idf_str, "Version")]
+
+    if (length(ver_normal) == 1L) {
+        # for "8.6; !- Version Identifier"
+        as.numeric_version(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
+    } else if (length(ver_special) == 1L){
+        as.numeric_version(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
+    } else {
+        return(NULL)
     }
 }
 # }}}

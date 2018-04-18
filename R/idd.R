@@ -110,14 +110,7 @@ Idd <- R6::R6Class(classname = "Idd",
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
             # assign tbls to IddObject R6Class Generator
-            IddObject$private_fields$m_idd_tbl <- private$m_idd_tbl
-        },
-        # }}}
-
-        # FINALIZE {{{
-        finalize = function() {
-            # delete modified private fields IddObject R6Class Generator
-            IddObject$private_fields$m_idd_tbl <- NULL
+            private$create_iddobj_gen(IddObject)
         },
         # }}}
 
@@ -205,7 +198,7 @@ Idd <- R6::R6Class(classname = "Idd",
             # return a single object
             # {{{
             assert_that(self$is_valid_class(class))
-            IddObject$new(class)
+            private$IddObject$new(class)
             # }}}
         },
 
@@ -216,7 +209,7 @@ Idd <- R6::R6Class(classname = "Idd",
             purrr::map(
                 private$m_idd_tbl$group[group_name == group][
                     private$m_idd_tbl$class, on = "group_id", class_name],
-                IddObject$new
+                private$IddObject$new
             )
             # }}}
         },
@@ -224,14 +217,14 @@ Idd <- R6::R6Class(classname = "Idd",
         required_objects = function () {
             # return a list of all required IDDObjects
             # {{{
-            purrr::map(self$required_class_names(), IddObject$new)
+            purrr::map(self$required_class_names(), private$IddObject$new)
             # }}}
         },
 
         unique_objects = function () {
             # return a list of all unique IDDObjcts
             # {{{
-            purrr::map(self$unique_class_names(), IddObject$new)
+            purrr::map(self$unique_class_names(), private$IddObject$new)
             # }}}
         },
 
@@ -302,7 +295,7 @@ Idd <- R6::R6Class(classname = "Idd",
             ver <- paste0("Version: ", private$m_version)
             bld <- paste0("Build: ", private$m_build)
             cls <- paste0("Total Class: ", nrow(private$m_idd_tbl$class))
-            cli::cat_rule(left = "EnergyPlus Input Data Dictionary")
+            cli::cat_rule(left = crayon::bold("EnergyPlus Input Data Dictionary"))
             cli::cat_bullet(ver)
             cli::cat_bullet(bld)
             cli::cat_bullet(cls)
@@ -315,14 +308,27 @@ Idd <- R6::R6Class(classname = "Idd",
         m_version = character(),
         m_build = character(),
         m_idd_tbl = NULL,
+        IddObject = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
         # {{{
+        create_iddobj_gen = function (IddObject) {
+            # create an IddObject R6Class Generator corresponding to this Idd
+            # {{{
+            # clone the IddObject R6Class Generator
+            own_iddobject <- clone_generator(IddObject)
+            # assign shared data to IddObject R6Class Generator
+            own_iddobject$self$private_fields$m_version <- private$m_version
+            own_iddobject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
+            private$IddObject <- own_iddobject
+            # }}}
+        },
+
         assert_valid_groups = function (groups) {
             # assert that all members in group are valid group names.
             # {{{
-            valid <- groups %in% self$group_names()
+            valid <- groups %in% private$m_idd_tbl$group[["group_name"]]
             assert_that(all(valid),
                 msg = paste0("Invalid group name found for current IDD",
                              backtick_collapse(groups[!valid]), "."))
@@ -332,7 +338,7 @@ Idd <- R6::R6Class(classname = "Idd",
         assert_valid_classes = function (classes) {
             # assert that all members in class are valid class names.
             # {{{
-            valid <- classes %in% self$class_names()
+            valid <- classes %in% private$m_idd_tbl$class[["class_name"]]
             assert_that(all(valid),
                 msg = paste0("Invalid class name found for current IDD",
                              backtick_collapse(classes[!valid]), "."))
@@ -358,10 +364,11 @@ on_failure(Idd$public_methods$is_valid_group) <- function (call, env) {
 #' @export
 # use_idd {{{
 use_idd <- function (idd) {
+    if (is_idd(idd)) return(idd)
+
     assert_that(is_scalar(idd))
-    if (is_idd(idd)) {
-        res <- idd
-    } else if (is_eplus_ver(idd)) {
+
+    if (is_eplus_ver(idd)) {
         if (is_pre_parsed(idd)) {
             idd <- as.character(idd)
             res <- switch(idd,
@@ -373,13 +380,11 @@ use_idd <- function (idd) {
         } else {
             stop("Currently only Idd of EnergyPlus v8.5 to v8.9 have been pre-parsed. ",
                  "Please give a valid path to an `Energy+.idd` file of EnergyPlus version ",
-                 idd, ".", call. = FALSE)
+                 backtick(idd), ".", call. = FALSE)
         }
     } else {
         res <- Idd$new(idd)
     }
-    # assign tbls to IddObject R6Class Generator
-    IddObject$private_fields$m_idd_tbl <- ._get_private(res)$m_idd_tbl
     res
 }
 # }}}

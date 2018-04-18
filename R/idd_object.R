@@ -731,7 +731,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
         # PRIVATE FIELDS
         # {{{
         # class name
-        m_class_name = character(),
+        m_version = NULL,
+        m_class_name = NULL,
         m_idd_tbl = NULL,
         # }}}
 

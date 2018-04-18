@@ -358,44 +358,54 @@ Idf <- R6::R6Class(classname = "Idf",
 
         # INITIALIZE {{{
         initialize = function (path, idd = NULL) {
+
+            # add a uuid
+            private$m_uuid <- uuid::UUIDgenerate(use.time = TRUE)
+
             # only store if input is a path
             if (length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- path
             }
 
             idf_file <- parse_idf_file(path, idd)
+            # warn if input is an imf file
+            is_imf <- attr(idf_file, "is_imf")
+            if (is_imf) {
+                warning("Currently, Imf file is not fully supported. All ",
+                        "EpMacro lines will be treated as normal comments of ",
+                        "the nearest downwards object.", call. = FALSE)
+            }
             private$m_version <- idf_file$version
             # init options
             private$m_options <- list2env(idf_file$options, parent = emptyenv())
             private$m_options$validate_level <- "final"
             private$m_options$verbose_info <- TRUE
-            # deep clone idd content and init idd tbl
-            private$m_idd_tbl <- ._get_private(idd$clone(deep = TRUE))$m_idd_tbl
 
+            # init idd tbl
+            private$m_idd_tbl <- list2env(as.list.environment(
+                ._get_private(attr(idf_file, "idd"))$m_idd_tbl),
+                parent = emptyenv())
             # init idf tbl
-            private$m_idf_tbl <- list2env(idf_file[!names(idf_file) %in% c("version", "options")],
+            private$m_idf_tbl <- list2env  (
+                idf_file[c("object", "value", "value_reference", "comment")],
                 parent = emptyenv()
             )
 
             # init log data
             private$m_log <- new.env(parent = emptyenv())
+            private$m_log$unsaved <- FALSE
             private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
                 , object_order := 0L]
 
-            # assign shared data to IdfObject R6Class Generator
-            IdfObject$private_fields$m_idf_tbl <- private$m_idf_tbl
-            IdfObject$private_fields$m_idd_tbl <- private$m_idd_tbl
-            IdfObject$private_fields$m_options <- private$m_options
-            IdfObject$private_fields$m_log <- private$m_log
-        },
-        # }}}
+            # create the IdfObject R6Class Generator for this specific Idf
+            private$create_idfobj_gen(IdfObject)
 
-        # FINALIZE {{{
-        finalize = function() {
-            # delete modified private fields IddObject R6Class Generator
-            IdfObject$private_fields$m_idf_tbl <- NULL
-            IdfObject$private_fields$m_idd_tbl <- NULL
-            IdfObject$private_fields$m_options <- NULL
+            # try to locate EnergyPlus of this version
+            eplus_path <- eplus_default_path(private$m_version)
+            if (is_valid_eplus_path(eplus_path)) private$m_run$eplus <- eplus_path
+
+            # add `Output:SQLite` for collecting simulaton results
+            private$add_sql_output()
         },
         # }}}
 
@@ -444,9 +454,9 @@ Idf <- R6::R6Class(classname = "Idf",
                     on = "class_id", nomatch = 0L, list(object_id, class_name)]
             } else {
                 assert_that(self$is_valid_class(class, "idf"))
-                id <- super$class_order(class)
+                ids <- super$class_orders(class)
                 res <- private$m_idd_tbl$class[
-                    private$m_idf_tbl$object[class_id == id],
+                    private$m_idf_tbl$object[class_id == ids],
                     on = "class_id", nomatch = 0L, list(object_id, class_name)]
             }
             data.table::setattr(res[["object_id"]], "names", res[["class_name"]])[]
@@ -516,7 +526,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # return a single object
             # {{{
             assert_that(self$is_valid_id(id))
-            IdfObject$new(id)
+            private$IdfObject$new(id)
             # }}}
         },
 
@@ -524,7 +534,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # return a list which contains all objects with input object ids
             # {{{
             private$assert_valid_ids(ids)
-            purrr::map(ids, IdfObject$new)
+            purrr::map(ids, private$IdfObject$new)
             # }}}
         },
 
@@ -533,7 +543,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             ids <- self$object_ids(class)
             if (is.null(index)) {
-                IdfObject$new(ids[1])
+                private$IdfObject$new(ids[1])
             } else {
                 assert_that(is_count(index))
                 assert_that(index <= length(ids),
@@ -543,7 +553,7 @@ Idf <- R6::R6Class(classname = "Idf",
                         n, ifelse(n > 1L, " objects exist.", " object exists.")
                     )
                 )
-                IdfObject$new(ids[index])
+                private$IdfObject$new(ids[index])
             }
             # }}}
         },
@@ -553,17 +563,18 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             ids <- self$object_ids(class)
             if (is.null(indexes)) {
-                purrr:map(ids, IdfObject$new)
+                purrr::map(ids, private$IdfObject$new)
             } else {
+                n <- length(ids)
                 assert_that(is_integerish(indexes))
-                assert_that(all(indexes <= length(ids)),
+                assert_that(all(indexes <= n),
                     msg = paste0("Invalid indexes found for class ",
                         backtick(class), ": ",
                         backtick_collapse(indexes[indexes > length(ids)]),
                         ". Only ", n, ifelse(n > 1L, " objects exist.", " object exists.")
                     )
                 )
-                purrr::map(ids[indexes], IdfObject$new)
+                purrr::map(ids[indexes], private$IdfObject$new)
             }
             # }}}
         },
@@ -647,34 +658,57 @@ Idf <- R6::R6Class(classname = "Idf",
                 private$m_idf_tbl$value_reference, val_ref_tbl
             ))
             # log
+            private$m_log$unsaved <- TRUE
             private$m_log$order <- data.table::rbindlist(list(
                 private$m_log$order,
                 private$m_log$order[object_id == id][
                     , `:=`(object_id = max_obj_id + 1L, object_order = 1L)]
             ))
 
-            IdfObject$new(max_obj_id + 1L)
+            private$IdfObject$new(max_obj_id + 1L)
             # }}}
         },
 
-        search_object = function (class, field) {
+        search_object = function (class, field, value) {
             # classs
             # {{{
 
             # }}}
         },
 
-        insert_objects = function (object) {
-            # insert objects from other Idf or file or even clipboard
-            # {{{
-
-            # }}}
-        },
-
-        insert_object = function (object) {
+        insert_objects = function (objects) {
             # insert an object from other Idf or file or even clipboard
             # {{{
-
+            # check if input is a object list
+            if (is.list(objects)) {
+                len <- length(objects)
+                # every component should be an IdfObject
+                valid <- purrr::map_lgl(objects, is_idfobject)
+                if (!all(valid)) {
+                    stop("When input is a list, every component should be an ",
+                         "IdfObject.", call. = FALSE)
+                }
+                purrr::map(objects, private$insert_object)
+            # check if input is a string
+            } else if (is_scalar(objects)) {
+                if (is_idfobject(objects)) {
+                    private$insert_object(objects)
+                } else if (is_string(objects)) {
+                    # try to parse the input using same idd
+                    idd <- use_idd(private$m_version)
+                    in_idf <- Idf$new(objects, idd)
+                    # delete version object
+                    tbl <- ._get_private(in_idf)$m_idf_tbl
+                    id_ver <- tbl$object[class_id == 1L, object_id]
+                    tbl$object <- tbl$object[object_id != id_ver]
+                    tbl$value <-  tbl$value[object_id != id_ver]
+                    ids <- in_idf$object_ids()
+                    purrr::map(in_idf$objects(ids), private$insert_object)
+                }
+            } else {
+                stop("Input should be an IdfObject, a list of IdfObjects, or ",
+                     "any input acceptable for `Idf$new()`.", call. = FALSE)
+            }
             # }}}
         },
 
@@ -683,15 +717,12 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             # can be added?
             private$assert_can_add_object_in_class(class)
-
-            cls_id <- super$class_order(class)
+            cls_id <- super$class_orders(class)
             obj_id <- private$m_idf_tbl$object[, max(object_id)] + 1L
             obj_tbl <- data.table::data.table(object_id = obj_id, class_id = cls_id)
-
             private$m_idf_tbl$object <- data.table::rbindlist(list(
                 private$m_idf_tbl$object, obj_tbl))
-
-            idfobj <- IdfObject$new(obj_id)
+            idfobj <- private$IdfObject$new(obj_id)
 
             idfobj <- tryCatch(idfobj$set_value(..., defaults = defaults),
                 error = function(e) {
@@ -702,10 +733,11 @@ Idf <- R6::R6Class(classname = "Idf",
             )
             # if failed
             if (inherits(idfobj, "error")) {
-                cli::cat_line(glue::glue("Failed to add a new object \\
-                    [ID: {obj_id}] in class `{class}`."))
+                stop(glue::glue("Failed to add a new object \\
+                    [ID: {obj_id}] in class `{class}`."), call. = FALSE)
             } else {
                 # log
+                private$m_log$unsaved <- TRUE
                 private$m_log$order <- data.table::rbindlist(list(
                     private$m_log$order,
                     data.table::data.table(object_id = obj_id, object_order = 1L)
@@ -723,70 +755,69 @@ Idf <- R6::R6Class(classname = "Idf",
             obj <- self$object(id)
             obj$set_value(...)
             # log
+            private$m_log$unsaved <- TRUE
             private$m_log$order[object_id == id, object_order := object_order + 1L]
             obj
             # }}}
         },
 
-        del_object = function (id, force = FALSE, referenced = FALSE) {
+        del_object = function (id, referenced = FALSE) {
             # delete an object
             # {{{
             target <- self$object(id)
-            refby <- ._get_private(target)$field_ref_by(with_other = TRUE)
+            cls <- target$class_name()
+            # ckeck
+            # {{{
+            # stop if target object is a `Version` object
+            if (cls == "Version") {
+                stop("Cannot delete `Version` object.", call. = FALSE)
+            }
+            # stop if target object is an required object
+            if (cls %in% c(super$required_class_names())) {
+                if (private$m_options$validate_level == "final") {
+                    stop("Cannot delete an required object.", call. = FALSE)
+                }
+            }
+            # }}}
+            refby <- target$reference_map()$reference_by
             # message
             # {{{
             if (not_empty(refby)) {
+                # stop if target object is refereced by others
                 if (private$m_options$validate_level == "final") {
-                    if (force) {
-                        if (referenced) {
-                            ids <- c(id, refby[["target_object_id"]])
-                            if (private$m_options$verbose_info) {
-                                message(glue::glue("Force to delete target object \\
-                                    and also referenced objects. [ID: {backtick_collapse(ids)}]."))
-                            }
-                        } else {
-                            ids <- id
-                            if (private$m_options$verbose_ino) {
-                                message(glue::glue("Force to delete target object \\
-                                    which was referenced by objects \\
-                                    [ID: {backtick_collapse(refby[['target_object_id']])}]."))
-                            }
-                        }
-                    } else {
-                        cli::cat_line(format_refmap_sgl(
-                            refby, "by", in_ip = private$m_options$view_in_ip
-                        ))
-                        stop(glue::glue("Target object was referenced by other \\
-                            objects [ID: {backtick_collapse(refby[['target_object_id']])}]. \\
-                            Set `force` to TRUE if you want to continue."),
-                            call. = FALSE)
-                    }
-                } else {
-                    if (referenced) {
-                        ids <- c(id, refby[["target_object_id"]])
-                        if (private$m_options$verbose_info) {
-                            message(glue::glue("Delete target object \\
-                                and also referenced objects. [ID: {backtick_collapse(ids)}]."))
-                        }
-                    } else {
-                        ids <- id
-                        if (private$m_options$verbose_ino) {
-                            message(glue::glue("Delete target object \\
-                                which was referenced by objects \\
-                                [ID: {backtick_collapse(refby[['target_object_id']])}]."))
-                        }
-                    }
+                    cli::cat_line(format_refmap_sgl(
+                        refby, "by", in_ip = private$m_options$view_in_ip
+                    ))
+                    stop(glue::glue("Failed to delete target object [ID:{backtick(id)}]. \\
+                    Target object [ID: {id}] was referenced \\
+                    by other objects [ID: {backtick_collapse(refby[['target_object_id']])}]."),
+                    call. = FALSE)
                 }
+                if (!referenced) {
+                    ids <- id
+                    private$verbose_info("Delete object [ID:{backtick(id)}] \\
+                        which was referenced by objects \\
+                        [ID: {backtick_collapse(refby[['target_object_id']])}].")
+                } else {
+                    ids <- c(id, refby[["target_object_id"]])
+                    private$verbose_info("Delete target object \\
+                        and also other objects [ID: {backtick_collapse(ids)}] \\
+                        that are referencing target object.")
+                }
+            } else {
+                ids <- id
+                private$verbose_info("Delete target object [ID:", backtick_collapse(id), "].")
             }
             # }}}
             # delete
             private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% ids]
             val_ids <- private$m_idf_tbl$value[object_id %in% ids, value_id]
             private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% ids]
-            private$m_idf_tbl$value_reference <- private$m_idf_tbl$comment[
-                !(referenced_value_id %in% ids | value_id %in% ids)]
+            private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
+                !(reference_value_id %in% ids | value_id %in% ids)]
             private$m_idf_tbl$comment <- private$m_idf_tbl$comment[!object_id %in% ids]
             # log
+            private$m_log$unsaved <- TRUE
             private$m_log$order <- private$m_log$order[!object_id %in% ids]
             # }}}
         },
@@ -854,12 +885,113 @@ Idf <- R6::R6Class(classname = "Idf",
                 private$verbose_info("The Idf has been successfully saved to\\
                     `{normalizePath(path)}`.")
             }
+
+            # log
+            private$m_log$unsaved <- FALSE
+            # change path
+            private$m_path <- path
             # }}}
         },
 
-        run = function (weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
-            irun(self, private, weather, echo = echo,
-                 dir = dir, eplus_home = eplus_home),
+        run = function (weather = NULL, dir = NULL, wait = TRUE) {
+            # {{{
+            # eplus path
+            # TODO: add eplus options to handle this. May be `use_eplus()`.
+            assert_that(private$m_version >= 8.3,
+                msg = "Currently, `$run()` only supports EnergyPlus V8.3 or higher.")
+            if (is.null(private$m_run$eplus)) {
+                stop(msg("Cannot locate EnergyPlus V", private$m_version,
+                         " at default installation path ",
+                         backtick(eplus_default_path(private$m_version)),
+                         ". Please give exact path of EnergyPlus installation."),
+                     call. = FALSE)
+            }
+            flag_unsaved <- private$m_log$unsaved
+            if (flag_unsaved) {
+                warning(msg("The model has unsaved changes. Simulation results
+                            will be different from the last saved stage."),
+                    call. = FALSE)
+            }
+            # get model path {{{
+            # if the model is not created from a local file
+            if (is.null(private$m_path)) {
+                # and the output dir is not given
+                if (is.null(dir)) {
+                    # save it as a temp file and run it in temp dir
+                    run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
+                        mustWork = FALSE)
+                    path_idf <- normalizePath(tempfile(pattern = "idf_", tmpdir = run_dir, fileext = ".idf"),
+                        mustWork = FALSE)
+                    name_idf <- tools::file_path_sans_ext(basename(path_idf))
+                    message(msg("Could not find model file path, nor `dir` is
+                                given. The model will be saved as a temporary
+                                file at ", backtick(run_dir), " and run in that
+                                directory."))
+                # but output dir is given
+                } else {
+                    # save it to the given output dir with random name and run
+                    # it in that dir
+                    run_dir <- normalizePath(dir, mustWork = FALSE)
+                    path_idf <- normalizePath(tempfile("model_", run_dir, ".idf"),
+                        mustWork = FALSE)
+                    name_idf <- tools::file_path_sans_ext(basename(path_idf))
+                    message(msg("The model will be saved in the output dir ",
+                                backtick(run_dir), " with a random name ",
+                                backtick(paste0(name_idf, ".idf")), " and run
+                                there."))
+                }
+            # if the model is created from a local file
+            } else {
+                # but the output dir is not given
+                if (is.null(dir)) {
+                    # save it as a temp file with same name and run it in temp dir
+                    run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
+                        mustWork = FALSE)
+                    name_idf <- tools::file_path_sans_ext(basename(private$m_path))
+                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
+                        mustWork = FALSE)
+                    message(msg("`dir` is not given. The model will be saved as
+                                a temporary file named ",
+                                backtick(paste0(name_idf, ".idf")), " at ",
+                                backtick(run_dir), " and run there."))
+                # and the output dir is given
+                } else {
+                    # save it with same name in the output dir and run it there
+                    run_dir <- normalizePath(dir)
+                    name_idf <- tools::file_path_sans_ext(basename(private$m_path))
+                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
+                        mustWork = FALSE)
+                }
+            }
+
+            if (!dir.exists(run_dir)) {
+                tryCatch(dir.create(run_dir, recursive = TRUE),
+                    warning = function (w) {
+                        stop("Failed to create output directory: ",
+                             backtick(run_dir), call. = FALSE)
+                    }
+                )
+            }
+            readr::write_lines(self$string(), path_idf)
+            # save info
+            private$m_run$run_dir <- run_dir
+            private$m_run$path_idf <- path_idf
+            private$m_run$name_idf <- name_idf
+            # }}}
+            if (!is.null(private$m_run$eplus)) {
+                eplus_exe <- file.path(private$m_run$eplus, paste0("energyplus", exe()))
+            } else {
+                stop(msg("Could not locate EnergyPlus v ", private$m_version, "
+                         to run this Idf."), call. = FALSE)
+            }
+
+            expand_obj <- ifelse(private$have_hvac_template(), TRUE, FALSE)
+
+            process <- run_idf(eplus_exe, model = path_idf, weather = weather,
+                    output_dir = run_dir, expand_obj = expand_obj, echo = wait)
+            private$m_run$process <- process
+            # }}}
+        },
 
         collect = function (type = c("variable", "meter"), long = FALSE)
             icollect_varmeter(self, private, type = type, long = long),
@@ -869,14 +1001,13 @@ Idf <- R6::R6Class(classname = "Idf",
                             key = key, table = table, nest = nest),
 
         # mask or delete non-useful methods inherited from `Idd` class
-        # TODO: find a nicer way to do so
-        build = function () stop("attempt to apply non-function", call. = FALSE),
-        group_order = function () stop("attempt to apply non-function", call. = FALSE),
-        class_order = function () stop("attempt to apply non-function", call. = FALSE),
-        objects_in_group = function () stop("attempt to apply non-function", call. = FALSE),
-        required_objects = function () stop("attempt to apply non-function", call. = FALSE),
-        unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
-
+        # # TODO: find a nicer way to do so
+        # build = function () stop("attempt to apply non-function", call. = FALSE),
+        # group_order = function () stop("attempt to apply non-function", call. = FALSE),
+        # class_order = function () stop("attempt to apply non-function", call. = FALSE),
+        # objects_in_group = function () stop("attempt to apply non-function", call. = FALSE),
+        # required_objects = function () stop("attempt to apply non-function", call. = FALSE),
+        # unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
         print = function () {
             # {{{
             count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
@@ -904,18 +1035,71 @@ Idf <- R6::R6Class(classname = "Idf",
     private = list(
         # PRIVATE FIELDS
         # {{{
+        m_uuid = NULL,
         m_path = NULL,
         m_version = NULL,
-        m_options = list(),
+        m_options = NULL,
         m_idd_tbl = NULL,
         m_idf_tbl = NULL,
         m_validate = NULL,
         m_temp = NULL,
         m_log = NULL,
+        m_run = NULL,
+        IdfObject = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
         # {{{
+        create_idfobj_gen = function (IdfObject) {
+            # create an IdfObject R6Class Generator corresponding to this Idf
+            # {{{
+            # clone the IdfObject R6Class Generator
+            own_idfobject <- clone_generator(IdfObject)
+            # assign shared data to IdfObject R6Class Generator
+            own_idfobject$self$private_fields$m_uuid <- private$m_uuid
+            own_idfobject$self$private_fields$m_version <- private$m_version
+            own_idfobject$self$private_fields$m_idf_tbl <- private$m_idf_tbl
+            own_idfobject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
+            own_idfobject$self$private_fields$m_options <- private$m_options
+            own_idfobject$self$private_fields$m_log <- private$m_log
+            private$IdfObject <- own_idfobject
+            # }}}
+        },
+
+        insert_object = function (object) {
+            # insert objects from other Idf or file or even clipboard
+            # {{{
+            assert_that(is_idfobject(object))
+            # check if it is a version object
+            if (object$is_version()) {
+                stop("Could not insert a `Version` object.", call. = FALSE)
+            }
+            # get version which should be the same version as this model
+            ver_in <- ._get_private(object)$m_version
+            if (ver_in != private$m_version) {
+                stop("Input object has a different version ", backtick(ver_in),
+                     " than current Idf object (", private$m_version, ").",
+                     call. = FALSE)
+            }
+            # get the uuid to see if it comes from the same object
+            uuid_in <- ._get_private(object)$m_uuid
+            if (uuid_in == private$m_uuid) {
+                private$verbose_info("Object (ID:{backtick(object$id())}) to \\
+                    insert is an object from this model. The target object \\
+                    will be directly duplicated instead of creating a new \\
+                    one with same values.")
+                self$dup_object(object$id())
+            } else {
+                cls <- object$class_name()
+                # check if can add an object in the class
+                private$assert_can_add_object_in_class(cls)
+                # get all value
+                val <- object$get_value()
+                self$add_object(cls, val)
+            }
+            # }}}
+        },
+
         object_tbl = function () {
             # return a tbl contains all object info
             # {{{
@@ -960,7 +1144,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # assert that all members in group are valid group names.
             # {{{
             if (private$m_options$validate_level == "none") {
-                res <- TRUE
+                return(TRUE)
             }
 
             is_unique <- class %in% super$unique_class_names()
@@ -968,7 +1152,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 res <- TRUE
             } else {
                 num <- private$m_idf_tbl$object[
-                    class_id == super$class_order(class), .N]
+                    class_id == super$class_orders(class), .N]
                 if (num == 0L) {
                     res <- TRUE
                 } else {
@@ -988,26 +1172,6 @@ Idf <- R6::R6Class(classname = "Idf",
             assert_that(all(valid),
                 msg = paste0("Invalid object id found for current Idf:",
                              backtick_collapse(ids[!valid]), "."))
-            # }}}
-        },
-
-        assert_valid_groups = function (groups) {
-            # assert that all members in group are valid group names.
-            # {{{
-            valid <- groups %in% self$group_names()
-            assert_that(all(valid),
-                msg = paste0("Invalid group names found for current Idf:",
-                             backtick_collapse(groups[!valid]), "."))
-            # }}}
-        },
-
-        assert_valid_classes = function (classes) {
-            # assert that all members in class are valid class names.
-            # {{{
-            valid <- classes %in% self$class_names()
-            assert_that(all(valid),
-                msg = paste0("Invalid class name found for current Idf: ",
-                             backtick_collapse(classes[!valid]), "."))
             # }}}
         },
 
@@ -1053,17 +1217,101 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        verbose_info = function (msg) {
+        verbose_info = function (mes) {
             # return add verbose message
             # {{{
             if (private$m_options$verbose_info) {
-                message(glue::glue(msg, .envir = parent.frame(1)))
+                # cli::cat_line(msg(glue::glue(mes, .envir = parent.frame(1))), "\n")
+                message(msg(glue::glue(mes, .envir = parent.frame(1))), "\n")
             }
+            # }}}
+        },
+
+        add_sql_output = function () {
+            # add `Output:SQLite` variable if not exists and set `Option Type`
+            # to "SimpleAndTabular"
+            # {{{
+            if (self$is_valid_class("Output:SQLite")) {
+                sql <- self$object_in_class("Output:SQLite")
+                type <- sql$get_value()[[1]]
+                if (type != "SimpleAndTabular") {
+                    invisible(sql$set_value("SimpleAndTabular"))
+                    private$verbose_info("Setting `Option Type` in \\
+                        `Output:SQLite` to from `{type}` to `SimpleAndTabular`.")
+                }
+            } else {
+                invisible(self$add_object("Output:SQLite", "SimpleAndTabular"))
+                private$verbose_info("Adding object `Output:SQLite` and setting \\
+                    `Option Type` to `SimpleAndTabular`.")
+            }
+            # }}}
+        },
+
+        have_hvac_template = function () {
+            # return TRUE if the model has any "HVACTemplate"
+            # {{{
+            cls <- self$class_names(where = "idf")
+            any(startsWith(cls, "HVACTemplate"))
             # }}}
         }
         # }}}
     )
 )
+# }}}
+
+# ASSERTION ERROR MESSAGES
+
+#' @importFrom assertthat "on_failure<-"
+on_failure(Idf$public_methods$is_valid_class) <- function (call, env) {
+    paste0("Invalid class name found for current ", eval(call$where, env),
+           ": ", backtick(eval(call$class, env)), ".")
+}
+
+on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
+    paste0("Invalid object id found for current Idf: ", backtick(eval(call$id, env)), ".")
+}
+
+# [.Idf {{{
+'[.Idf' <- function(x, i, j, ..., drop = FALSE) {
+    if (missing(i)) {
+        stop("Missing object id or class name.", call. = FALSE)
+    }
+    if (missing(j)) {
+        if (is.character(i)) {
+            obj <- .subset2(x, "objects_in_class")(i)
+        } else if (is.numeric(i)){
+            obj <- .subset2(x, "objects")(i)
+        }
+    } else {
+        if (is.character(i)) {
+            obj <- .subset2(x, "objects_in_class")(i, j)
+        } else if (is.numeric(i)){
+            stop("j should not be given when i is object ids.", call. = FALSE)
+        }
+    }
+    obj
+}
+# }}}
+# [[.Idf {{{
+'[[.Idf' <- function(x, i, j, ..., drop = FALSE) {
+    if (missing(i)) {
+        stop("Missing object id or class name.", call. = FALSE)
+    }
+    if (missing(j)) {
+        if (is.character(i)) {
+            obj <- .subset2(x, "object_in_class")(i)
+        } else if (is.numeric(i)){
+            obj <- .subset2(x, "object")(i)
+        }
+    } else {
+        if (is.character(i)) {
+            obj <- .subset2(x, "object_in_class")(i, j)
+        } else if (is.numeric(i)){
+            stop("j should not be given when i is an object id.", call. = FALSE)
+        }
+    }
+    obj
+}
 # }}}
 
 # irun {{{

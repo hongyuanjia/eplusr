@@ -4,6 +4,7 @@
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver) {
     if (length(ver) != 1L) return(FALSE)
+    if (is.numeric_version(ver)) TRUE
     ver_fmt <- "^[78]\\.[0-9]$"
     grepl(ver_fmt, as.character(ver))
 }
@@ -14,9 +15,17 @@ on_failure(is_eplus_ver) <- function (call, env) {
 # }}}
 # is_supported_ver {{{
 is_supported_ver <- function (ver) {
-    is_eplus_ver(ver)
-    supp_ver <- paste0("8.", 1:9)
-    as.character(ver) %in% supp_ver
+    if (!is_eplus_ver(ver)) return(FALSE)
+    ver <- as.numeric_version(ver)
+    if (!is.na(ver[, 3L])) {
+        if (ver[, 3L] != 0L) {
+            return(FALSE)
+        } else {
+            ver > 8.0
+        }
+    } else {
+        ver > 8.0
+    }
 }
 
 on_failure(is_supported_ver) <- function (call, env) {
@@ -24,7 +33,7 @@ on_failure(is_supported_ver) <- function (call, env) {
 }
 # is_pre_parsed {{{
 is_pre_parsed <- function (ver) {
-    is_supported_ver(ver) && as.character(ver) %in% paste0("8.", 6:9)
+    is_supported_ver(ver) && as.numeric_version(ver) > 8.5
 }
 # }}}
 # }}}
@@ -48,11 +57,25 @@ has_hvac_template <- function (idf) {
 }
 # }}}
 
+# is_idd {{{
+is_idd <- function (x) inherits(x, "Idd")
+
+on_failure(is_idd) <- function (call, env) {
+    paste0(deparse(call$x), " is not an Idd object")
+}
+# }}}
 # is_idf {{{
 is_idf <- function (x) inherits(x, "Idf")
 
 on_failure(is_idf) <- function (call, env) {
     paste0(deparse(call$x), " is not an Idf object")
+}
+# }}}
+# is_idfobject {{{
+is_idfobject <- function (x) inherits(x, "IdfObject")
+
+on_failure(is_idf) <- function (call, env) {
+    paste0(deparse(call$x), " is not an IdfObject object")
 }
 # }}}
 # is_imf {{{
@@ -111,7 +134,8 @@ on_failure(is_scalar) <- function(call, env) {
 # }}}
 # is_integerish {{{
 is_integerish <- function(x) {
-    is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
+    # is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
+    all(abs(x - round(x)) < .Machine$double.eps^0.5)
 }
 on_failure(is_integerish) <- function(call, env) {
   paste0(deparse(call$x), " is neither an integer nor can be converted into an integer")
@@ -188,23 +212,12 @@ on_failure(has_output_ext) <- function (call, env = parent.env) {
     msg("File ", backtick(basename(path)), " is not an EnergyPlus output data file.")
 }
 # }}}
-# osname {{{
-osname <- function () {
-    Sys.info()["sysname"]
-}
-# }}}
 # is_windows {{{
-is_windows <- function () {
-    osname() == "Windows"
-}
+is_windows <- function () .Platform$OS.type == 'windows'
 # }}}
 # is_linux {{{
-is_linux <- function () {
-    osname() == "Linux"
-}
+is_linux <- function () Sys.info()["sysname"] == "Linux"
 # }}}
 # is_macos {{{
-is_macos <- function () {
-    osname() == "Darwin"
-}
+is_macos <- function () Sys.info()["sysname"] == "Darwin"
 # }}}
