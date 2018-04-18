@@ -185,19 +185,17 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                                  )
                             ), fill = TRUE)[order(object_id), comment_id := .I]
                     }
+
                 }
-                # add_undo_log
-                # tbl: comment,
-                # object_id: private$m_object_id,
-                # action: set_comment(),
-                # old_value: old,
-                # new_value: comment or NULL
             }
 
+            # log
+            private$m_log$unsaved <- TRUE
             # log order change
             private$m_log$order[object_id == private$m_object_id,
                 object_order := object_order + 1L]
-            return(self)
+
+            self
             # }}}
         },
 
@@ -359,7 +357,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # if default is TRUE
             if (defaults) {
                 # make sure all required fields with defaults will be set
-                last_req <- value_to_set[required_field == TRUE, max(field_order)]
+                req <- value_to_set[required_field == TRUE]
+                if (not_empty(req)) last_req <- req[, max(field_order)] else last_req <- 0L
                 last_val <- max(last_req, last_ord)
                 can_def <- value_to_set[field_order <= last_val &
                                         is.na(value) &
@@ -431,6 +430,29 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                     private$m_log$order[object_id %in% ids,
                                         object_order := object_order + 1L]
                 }
+
+                # if there are fields referencing other fields, update the value
+                # reference tbl
+                obj <- private$m_idd_tbl$field_object_list[new_val_tbl,
+                    on = "field_id", nomatch = 0L,
+                    list(value_id, value_upper, field_id, object_list)]
+                if (not_empty(obj)) {
+                    obj_res <- obj[private$m_idd_tbl$field_reference,
+                        on = c(object_list = "reference"), nomatch = 0L,
+                        list(value_id, value_upper, i.field_id)][
+                        private$m_idf_tbl$value,
+                        on = c(i.field_id = "field_id", "value_upper"),
+                        nomatch = 0L, list(value_id, i.value_id)]
+                    if (not_empty(obj_res)) {
+                        data.table::setnames(obj_res, c("value_id", "reference_value_id"))
+                        private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
+                            private$m_idf_tbl$value_reference[!value_id %in% obj_res],
+                            obj_res
+                        ))
+                        data.table::setorder(private$m_idf_tbl$value_reference, value_id)
+                    }
+                }
+                private$m_log$unsaved <- TRUE
 
                 return(self)
             } else {
@@ -570,12 +592,16 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
     private = list(
         # PRIVATE FIELDS
         # {{{
-        m_object_id = integer(),
+        # shared data from parent Idf object
+        m_uuid = NULL,
+        m_version = NULL,
         m_idf_tbl = NULL,
         m_options = NULL,
+        m_log = NULL,
+
+        m_object_id = integer(),
         m_validate = list(),
         m_temp = NULL,
-        m_log = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS

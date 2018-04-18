@@ -46,9 +46,9 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
-idd <- Idd$new("files/V8-8-0-Energy+.idd")
+idd <- use_idd(8.8)
 
-idf <- Idf$new(idf_text, idd)
+idf <- Idf$new(idf_text, 8.8)
 ver <- idf$object_in_class("Version")
 mat <- idf$object_in_class("Material")
 surf <- idf$object_in_class("BuildingSurface:Detailed")

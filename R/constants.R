@@ -1,4 +1,3 @@
-latest_parsed_ver <- function () as.numeric_version("8.8")
 # macro_dict {{{
 macro_dict <-
       # Incorporating external files

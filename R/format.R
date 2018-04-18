@@ -209,7 +209,7 @@ format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
 
     if (end) {
         if (has_names(value_tbl, c("object_id", "field_order"))) {
-            is_end <- value_tbl[, .I[max(field_order)], by = object_id]$V1
+            is_end <- value_tbl[, .I[max(seq_along(field_order))], by = object_id]$V1
         } else {
             is_end <- length(values)
         }
@@ -278,7 +278,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             !is.na(value_ipnum) & type == "real",
             `:=`(value = as.character(round(value_ipnum, digits = digits)))][
             !is.na(value_ipnum) & type == "integer" & is_integerish(value_ipnum),
-            `:=`(value = as.character(as.integer(value_ipnum)))][
+            `:=`(value = as.character(round(value_ipnum)))][
             !is.na(value_ipnum),
             `:=`(value_num = value_ipnum / mult - offset)]
     } else {
@@ -286,10 +286,9 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             !is.na(value_num) & type == "real",
             `:=`(value = as.character(round(value_num, digits = digits)))][
             !is.na(value_num) & type == "integer" & is_integerish(value_num),
-            `:=`(value = as.character(as.integer(value_num)))][
+            `:=`(value = as.character(round(value_num)))][
             !is.na(value_num),
             `:=`(value_ipnum = value_num * mult + offset)]
-
     }
 
     value_tbl[, `:=`(value_upper = toupper(value))]
@@ -305,7 +304,7 @@ value_list <- function (value_tbl, in_ip = FALSE) {
             l <- as.list(value)
 
             is_int <- !is.na(value_ipnum) & type == "integer"
-            l[is_int] <- as.list(as.integer(value_ipnum[is_int]))
+            l[is_int] <- as.list(round(value_ipnum[is_int]))
 
             is_dbl <- !is.na(value_ipnum) & type == "real"
             l[is_dbl] <- as.list(value_ipnum[is_dbl])
@@ -317,7 +316,7 @@ value_list <- function (value_tbl, in_ip = FALSE) {
             l <- as.list(value)
 
             is_int <- !is.na(value_num) & type == "integer"
-            l[is_int] <- as.list(as.integer(value_num[is_int]))
+            l[is_int] <- as.list(round(value_num[is_int]))
 
             is_dbl <- !is.na(value_num) & type == "real"
             l[is_dbl] <- as.list(value_num[is_dbl])
