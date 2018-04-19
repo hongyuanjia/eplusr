@@ -1048,8 +1048,10 @@ get_idd_build <- function (idd_str) {
 
 # get_idf_ver {{{
 get_idf_ver <- function (idf_str) {
-    ver_normal <- idf_str[endsWith(idf_str, "Version Identifier")]
-    ver_special <- idf_str[startsWith(idf_str, "Version")]
+    ver_normal_cand <- idf_str[endsWith(idf_str, "Version Identifier")]
+    ver_normal <- ver_normal_cand[!startsWith(ver_normal_cand, "!")]
+    ver_special_cand <- idf_str[startsWith(idf_str, "Version")]
+    ver_special <- ver_special_cand[!startsWith(ver_special_cand, "!")]
 
     if (length(ver_normal) == 1L) {
         # for "8.6; !- Version Identifier"
