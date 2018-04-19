@@ -4,7 +4,11 @@
 \name{eplusr-package}
 \alias{tibble-package}
 \alias{eplusr-package}
+\alias{eplusr_opt}
 \title{eplusr: A Toolkit for Using EnergyPlus in R}
+\usage{
+eplusr_opt(x)
+}
 \description{
 This package provides tools to run EnergyPlus and collect,
 analyse, summary and plot parametric simulation results in R.
@@ -40,16 +44,6 @@ and \code{\link[=print.tbl]{print.tbl()}} and \code{\link[=glimpse]{glimpse()}} 
 
 \section{Package options}{
 
-\itemize{
-\item \code{tibble.print_max}: Row number threshold: Maximum number of rows
-printed. Set to \code{Inf} to always print all rows.  Default: 20.
-\item \code{tibble.print_min}: Number of rows printed if row number
-threshold is exceeded. Default: 10.
-\item \code{tibble.width}: Output width. Default: \code{NULL} (use
-\code{width} option).
-\item \code{tibble.max_extra_cols}: Number of extra columns
-printed in reduced form. Default: 100.
-}
 }
 
 \examples{

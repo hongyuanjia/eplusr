@@ -348,6 +348,7 @@
 #' @importFrom cli cat_line rule
 #' @importFrom readr write_lines
 #' @importFrom assertthat assert_that
+#' @importFrom uuid UUIDgenerate
 NULL
 
 # Idf {{{
@@ -375,6 +376,7 @@ Idf <- R6::R6Class(classname = "Idf",
                         "EpMacro lines will be treated as normal comments of ",
                         "the nearest downwards object.", call. = FALSE)
             }
+            private$m_is_imf <- is_imf
             private$m_version <- idf_file$version
             # init options
             private$m_options <- list2env(idf_file$options, parent = emptyenv())
@@ -483,6 +485,13 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             assert_that(is_count(id))
             id %in% self$object_ids()
+            # }}}
+        },
+
+        is_unsaved = function () {
+            # return TRUE if there are unsaved changes
+            # {{{
+            private$m_log$unsaved %||% FALSE
             # }}}
         },
 
@@ -872,10 +881,27 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        save = function (path, overwrite = FALSE) {
+        save = function (path = NULL, overwrite = FALSE) {
             # {{{
-            assert_that(is_string(path))
-            assert_that(has_exts(path, c("idf", "imf", "text")))
+            if (is.null(path)) {
+                if (is.null(private$m_path)) {
+                    stop("The Idf object is not created from local file. ",
+                         "Please give the path to save.", call. = FALSE)
+                } else {
+                    path <- private$m_path
+                }
+            } else {
+                assert_that(is_string(path))
+            }
+
+            if (private$m_is_imf & !has_ext(path, "imf")) {
+                warning("The Idf object contains EpMacro lines. Saving it to a ",
+                    "file other than `imf` file may cause errors during simulation.",
+                    call. = FALSE)
+            } else {
+                assert_that(has_exts(path, c("idf", "imf")),
+                    msg = paste0("`path` should have an extension of `idf` or `imf`."))
+            }
 
             str <- self$string(header = TRUE)
             if (file.exists(path)) {
@@ -951,9 +977,11 @@ Idf <- R6::R6Class(classname = "Idf",
             } else {
                 # but the output dir is not given
                 if (is.null(dir)) {
-                    # save it as a temp file with same name and run it in temp dir
-                    run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
-                        mustWork = FALSE)
+                    # use the model path
+                    run_dir <- dirname(private$m_path)
+                    # # save it as a temp file with same name and run it in temp dir
+                    # run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
+                    #     mustWork = FALSE)
                     name_idf <- tools::file_path_sans_ext(basename(private$m_path))
                     path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
                         mustWork = FALSE)
@@ -992,16 +1020,62 @@ Idf <- R6::R6Class(classname = "Idf",
                          to run this Idf."), call. = FALSE)
             }
 
-            expand_obj <- ifelse(private$have_hvac_template(), TRUE, FALSE)
+            if (is_epw(weather)) {
+                weather <- weather$path()
+            }
 
-            process <- run_idf(eplus_exe, model = path_idf, weather = weather,
+            job <- run_idf(eplus_exe, model = path_idf, weather = weather,
                     output_dir = run_dir, expand_obj = expand_obj, echo = wait)
-            private$m_run$process <- process
+            private$m_run$job <- job
+            job
             # }}}
         },
 
-        collect = function (type = c("variable", "meter"), long = FALSE)
-            icollect_varmeter(self, private, type = type, long = long),
+        collect = function (type = c("variable", "meter"), long = FALSE) {
+
+            # if the model has not been run
+            if (is.null(private$m_run$job)) {
+                if (is.null(private$m_path)) {
+                    stop("The Idf was not created from local file. Failed to ",
+                         "locate simulation results.", call. = FALSE)
+                }
+                # try to locate the sql result file
+                sql <- paste0(tool::file_path_sans_ext(private$m_path), ".sql")
+                if (!utils::file_test(sql, "-f")) {
+                    stop("Failed to locate simulation SQL output in the folder ",
+                         "of Idf file.", call. = FALSE)
+                }
+
+                # compare last changed time
+                sql_ctime <- file.info(sql)$ctime
+                idf_ctime <- file.info(private$m_path)$ctime
+                if (is.na(idf_ctime)) {
+                    warning("Failed to locate the Idf file.", call. = FALSE)
+                } else {
+                    if (sql_ctime < idf_ctime) {
+                        warning("The Idf has been changed since last simulation. ",
+                                "The simulation results may not be correct", call. = FALSE)
+                    }
+                }
+
+            # if the model has been run before
+            } else {
+                # check if the model was run in waiting mode
+                if (private$m_run$job$wait) {
+                    # check the exist status of last simulationa
+                }
+                # check if the model is still running
+                if (private$m_run$job$process$is_alive()) {
+                    stop("Simulation is still running. Please wait simulation ",
+                         "to finish before collecting results.", call. = FALSE)
+                } else if (private$process$get_exit_status() > 0L) {
+                    stop(msg("Simulation ended with errors. Please solve the problems
+                             and re-run the simulation before collect results."),
+                             call. = FALSE)
+                    return(invisible(NULL))
+                }
+            }
+        },
 
         table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
             icollect_output(self, private, type = "table", report = report,
@@ -1044,6 +1118,7 @@ Idf <- R6::R6Class(classname = "Idf",
         # {{{
         m_uuid = NULL,
         m_path = NULL,
+        m_is_imf = NULL,
         m_version = NULL,
         m_options = NULL,
         m_idd_tbl = NULL,
