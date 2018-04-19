@@ -418,6 +418,13 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
+        path = function () {
+            # return the model path
+            # {{{
+            private$m_path
+            # }}}
+        },
+
         group_names = function (where = c("idf", "idd")) {
             # return all group names
             # {{{

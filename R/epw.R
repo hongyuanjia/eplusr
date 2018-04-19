@@ -1,7 +1,7 @@
 #' @importFrom R6 R6Class
 #' @importFrom data.table month mday year copy fwrite
 #' @importFrom readr write_lines
-#' @importFrom cli cat_line rule cli_bullet
+#' @importFrom cli cat_line rule cat_bullet
 #' @importFrom units ud_units
 # Epw {{{
 Epw <- R6::R6Class(classname = "Epw",
@@ -104,14 +104,25 @@ Epw <- R6::R6Class(classname = "Epw",
 
         # INITIALIZE {{{
         initialize = function (path) {
+            if (is_string(path)) {
+                if (file.exists(path)) {
+                    private$m_path <- normalizePath(path)
+                }
+            }
+
             epw_file <- parse_epw_file(path)
-            private$m_path <- normalizePath(path)
             private$m_location <- epw_file$location
             private$m_header_unparsed <- epw_file$header_unparsed
             private$m_data_periods <- epw_file$data_periods
             private$m_data <- private$set_na(epw_file$data)
         },
         # }}}
+
+        path = function () {
+            # {{{
+            private$m_path
+            # }}}
+        },
 
         get_data = function (year = NULL, unit = TRUE) {
             # return weather data
