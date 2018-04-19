@@ -33,7 +33,17 @@ is_valid_eplus_path <- function (path) {
 }
 # }}}
 # get_ver_from_path {{{
-get_ver_from_path <- function (path) as.numeric_version(gsub(".*V", "", path))
+get_ver_from_path <- function (path) {
+    # try to get version form EnergyPlus path
+    ver <- tryCatch(as.numeric_version(gsub("^.*V", "", path)), error = function (e) NULL)
+    # then from the first line of Energy+.idd
+    if (is.null(ver)) {
+        h <- readr::read_lines(file.path(path, "Energy+.idd"), n_max = 1L)
+        # if still failed, just return NULL
+        ver <- tryCatch(get_idd_ver(h), error = function (e) NULL)
+    }
+    ver
+}
 # }}}
 # use_eplus {{{
 use_eplus <- function (eplus) {
@@ -271,22 +281,18 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
     args <- cmd_args(loc_m, loc_w, output_dir = output_dir, annual = annual,
                      design_day = design_day, expand_obj = expand_obj)
 
-    sim_info <- list(model = loc_m, weather = loc_w, dir = output_dir)
-
     if (echo) {
         # have to suppress warnings here as it always complains about warnings
         # on 'can nonly read in bytes in a non-UTF-8 MBCS locale'.
         invisible(suppressWarnings(processx::run(eplus_exe, args,
             windows_verbatim_args = TRUE, echo = TRUE)))
     } else {
-        p <- processx::process$new(
+        processx::process$new(
             eplus_exe, args,
             stdout = "|", stderr = "|", cleanup = TRUE,
             echo_cmd = TRUE, windows_verbatim_args = TRUE,
             windows_hide_window = FALSE)
-        return(list(process = p, info = sim_info))
     }
-
 }
 # }}}
 
@@ -423,44 +429,6 @@ set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
                                 backtick("RunPeriod"),
                                 paste(rp_others, collapse = ", "))), call. = FALSE)
         }
-    }
-
-    return(idf)
-}
-# }}}
-# set_output_table_style {{{
-set_output_table_style <- function (idf, idd) {
-    targ_class <- "OutputControl:Table:Style"
-    id <- tryCatch(get_id(idf, targ_class), error = function (e) NULL)
-
-    if (not_empty(id)) {
-        dict <- c(Comma = "CommaAndHTML", Tab = "TabAndHTML",
-                  XML = "XMLAndHTML", Fixed = "All", CommaAndXML = "ALL")
-
-        val <- get_value(idf, id, 1L)[, value]
-        new_val <- dict[which(val == names(dict))]
-
-        if (val %in% names(dict)) {
-            mes <- sprintf("Inorder to extract tabe output using %s, the value of
-                           %s in class %s with ID %s has been changed from %s to
-                           %s.",
-                           backtick("$table"), backtick("Column Separator"),
-                           backtick(targ_class), backtick(id),
-                           backtick(val), backtick(new_val))
-            idf <- invisible(set_object(idf = idf, id = id, new_val, idd = idd))
-            warning(msg(mes), call. = FALSE)
-        }
-
-    } else {
-        mes <- sprintf("In order to extract table output using %s, the value of
-                       %s in class %s has been changed from the default %s to
-                       %s.",
-                       backtick("$table"), backtick("Column Separator"),
-                       backtick(targ_class),
-                       backtick("Comma"), backtick("CommaAndHTML"))
-        idf <- invisible(add_object(idf = idf, class = targ_class,
-                                    "CommaAndHTML", "None", idd = idd))
-        warning(msg(mes), call. = FALSE)
     }
 
     return(idf)
