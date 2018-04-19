@@ -78,18 +78,11 @@ on_failure(is_idf) <- function (call, env) {
     paste0(deparse(call$x), " is not an IdfObject object")
 }
 # }}}
-# is_imf {{{
-is_imf <- function (x) inherits(x, "Imf")
+# is_epw {{{
+is_epw <- function (x) inherits(x, "Epw")
 
-on_failure(is_imf) <- function (call, env) {
-    paste0(deparse(call$x), " is not an Imf object")
-}
-# }}}
-# is_model {{{
-is_model <- function (x) inherits(x, "IMF") || inherits(x, "IDF")
-
-on_failure(is_model) <- function (call, env) {
-    paste0(deparse(call$x), " is neither an IDF nor IMF object")
+on_failure(is_epw) <- function (call, env) {
+    paste0(deparse(call$x), " is not an Epw object")
 }
 # }}}
 # not_empty {{{
