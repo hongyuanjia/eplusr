@@ -402,10 +402,6 @@ Idf <- R6::R6Class(classname = "Idf",
             # create the IdfObject R6Class Generator for this specific Idf
             private$create_idfobj_gen(IdfObject)
 
-            # try to locate EnergyPlus of this version
-            eplus_path <- eplus_default_path(private$m_version)
-            if (is_valid_eplus_path(eplus_path)) private$m_run$eplus <- eplus_path
-
             # add `Output:SQLite` for collecting simulaton results
             private$add_sql_output()
         },
@@ -914,6 +910,14 @@ Idf <- R6::R6Class(classname = "Idf",
                     readr::write_lines(str, path)
                 }
             } else {
+                d <- dirname(path)
+                if (!dir.exists(d)) {
+                    tryCatch(dir.create(d, recursive = TRUE),
+                             warning = function (w) {
+                                 stop("Failed to creat directory ",
+                                      backtick(d), ".", call. = FALSE)
+                             })
+                }
                 readr::write_lines(str, path)
                 private$verbose_info("The Idf has been successfully saved to\\
                     `{normalizePath(path)}`.")
@@ -929,112 +933,42 @@ Idf <- R6::R6Class(classname = "Idf",
         run = function (weather = NULL, dir = NULL, wait = TRUE) {
             # {{{
             # eplus path
-            # TODO: add eplus options to handle this. May be `use_eplus()`.
-            assert_that(private$m_version >= 8.3,
-                msg = "Currently, `$run()` only supports EnergyPlus V8.3 or higher.")
-            if (is.null(private$m_run$eplus)) {
-                stop(msg("Cannot locate EnergyPlus V", private$m_version,
-                         " at default installation path ",
-                         backtick(eplus_default_path(private$m_version)),
-                         ". Please give exact path of EnergyPlus installation."),
+            ver <- as.character(private$m_version)
+            all_ver <- names(.globals$eplus_config)
+            if (!ver %in% all_ver) {
+                stop("Could not locate EnergyPlus v", private$m_version, " at ",
+                     "the default installation path. Please set the path to use ",
+                     "using `use_eplus()`.", call. = FALSE)
+            }
+            eplus_config <- .globals$eplus_config[[ver]]
+            if (eplus_config$version < 8.3) {
+                stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
                      call. = FALSE)
-            }
-            flag_unsaved <- private$m_log$unsaved
-            if (flag_unsaved) {
-                warning(msg("The model has unsaved changes. Simulation results
-                            will be different from the last saved stage."),
-                    call. = FALSE)
-            }
-            # get model path {{{
-            # if the model is not created from a local file
-            if (is.null(private$m_path)) {
-                # and the output dir is not given
-                if (is.null(dir)) {
-                    # save it as a temp file and run it in temp dir
-                    run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
-                        mustWork = FALSE)
-                    path_idf <- normalizePath(tempfile(pattern = "idf_", tmpdir = run_dir, fileext = ".idf"),
-                        mustWork = FALSE)
-                    name_idf <- tools::file_path_sans_ext(basename(path_idf))
-                    message(msg("Could not find model file path, nor `dir` is
-                                given. The model will be saved as a temporary
-                                file at ", backtick(run_dir), " and run in that
-                                directory."))
-                # but output dir is given
-                } else {
-                    # save it to the given output dir with random name and run
-                    # it in that dir
-                    run_dir <- normalizePath(dir, mustWork = FALSE)
-                    path_idf <- normalizePath(tempfile("model_", run_dir, ".idf"),
-                        mustWork = FALSE)
-                    name_idf <- tools::file_path_sans_ext(basename(path_idf))
-                    message(msg("The model will be saved in the output dir ",
-                                backtick(run_dir), " with a random name ",
-                                backtick(paste0(name_idf, ".idf")), " and run
-                                there."))
-                }
-            # if the model is created from a local file
-            } else {
-                # but the output dir is not given
-                if (is.null(dir)) {
-                    # use the model path
-                    run_dir <- dirname(private$m_path)
-                    # # save it as a temp file with same name and run it in temp dir
-                    # run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
-                    #     mustWork = FALSE)
-                    name_idf <- tools::file_path_sans_ext(basename(private$m_path))
-                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
-                        mustWork = FALSE)
-                    message(msg("`dir` is not given. The model will be saved as
-                                a temporary file named ",
-                                backtick(paste0(name_idf, ".idf")), " at ",
-                                backtick(run_dir), " and run there."))
-                # and the output dir is given
-                } else {
-                    # save it with same name in the output dir and run it there
-                    run_dir <- normalizePath(dir)
-                    name_idf <- tools::file_path_sans_ext(basename(private$m_path))
-                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
-                        mustWork = FALSE)
-                }
-            }
-
-            if (!dir.exists(run_dir)) {
-                tryCatch(dir.create(run_dir, recursive = TRUE),
-                    warning = function (w) {
-                        stop("Failed to create output directory: ",
-                             backtick(run_dir), call. = FALSE)
-                    }
-                )
-            }
-            readr::write_lines(self$string(), path_idf)
-            # save info
-            private$m_run$run_dir <- run_dir
-            private$m_run$path_idf <- path_idf
-            private$m_run$name_idf <- name_idf
-            # }}}
-            if (!is.null(private$m_run$eplus)) {
-                eplus_exe <- file.path(private$m_run$eplus, paste0("energyplus", exe()))
-            } else {
-                stop(msg("Could not locate EnergyPlus v ", private$m_version, "
-                         to run this Idf."), call. = FALSE)
             }
 
             if (is_epw(weather)) {
                 weather <- weather$path()
             }
 
-            job <- run_idf(eplus_exe, model = path_idf, weather = weather,
-                    output_dir = run_dir, expand_obj = expand_obj, echo = wait)
-            private$m_run$job <- job
-            job
+            private$run_info(weather, dir)
+            eplus <- file.path(eplus_config$dir, eplus_config$exe)
+            expand_obj <- ifelse(private$have_hvac_template(), TRUE, FALSE)
+            proc <- run_idf(eplus,
+                            private$m_run$path_idf,
+                            private$m_run$path_epw,
+                            private$m_run$out_dir,
+                            echo = wait, expand_obj = expand_obj)
+            private$m_run$proc <- proc
+            private$m_run$wait <- wait
+            proc
             # }}}
         },
 
         collect = function (type = c("variable", "meter"), long = FALSE) {
-
-            # if the model has not been run
-            if (is.null(private$m_run$job)) {
+            # check status
+            # {{{
+            # if the model has not been run before
+            if (is.null(private$m_run)) {
                 if (is.null(private$m_path)) {
                     stop("The Idf was not created from local file. Failed to ",
                          "locate simulation results.", call. = FALSE)
@@ -1061,20 +995,37 @@ Idf <- R6::R6Class(classname = "Idf",
             # if the model has been run before
             } else {
                 # check if the model was run in waiting mode
-                if (private$m_run$job$wait) {
+                if (private$m_run$wait) {
                     # check the exist status of last simulationa
-                }
-                # check if the model is still running
-                if (private$m_run$job$process$is_alive()) {
-                    stop("Simulation is still running. Please wait simulation ",
-                         "to finish before collecting results.", call. = FALSE)
-                } else if (private$process$get_exit_status() > 0L) {
-                    stop(msg("Simulation ended with errors. Please solve the problems
-                             and re-run the simulation before collect results."),
+                    is_succeed <- private$m_run$proc$status
+                    if (!is.na(is_succeed)) {
+                        stop("Simulation was terminated before. Please solve ",
+                             "the problems and re-run the simulation before collect ",
+                             "results", call. = FALSE)
+                    } else if (!is_succeed) {
+                        stop("Simulation ended with errors. Please solve the problems
+                             and re-run the simulation before collect results.",
                              call. = FALSE)
-                    return(invisible(NULL))
+                    }
+                } else {
+                    # check if the model is still running
+                    if (private$m_run$proc$is_alive()) {
+                        stop("Simulation is still running. Please wait simulation ",
+                             "to finish before collecting results.", call. = FALSE)
+                    } else if (private$m_run$proc$get_exit_status() != 0L) {
+                        stop(msg("Simulation ended with errors. Please solve the problems
+                                 and re-run the simulation before collect results."),
+                                 call. = FALSE)
+                    }
                 }
             }
+            # }}}
+            # connect to the sql file
+            path_sql <- file.path(private$m_run$out_dir,
+                paste0(private$m_run$name_idf, ".sql"))
+            private$m_run$sql <- path_sql
+            sql <- RSQLite::dbConnect(RSQLite::SQLite(), path_sql)
+            sql
         },
 
         table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
@@ -1334,6 +1285,154 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             cls <- self$class_names(where = "idf")
             any(startsWith(cls, "HVACTemplate"))
+            # }}}
+        },
+
+        resolve_external_links = function (dir) {
+            # copy external files to local output dir and use relative paths in
+            # objects such as `Schedule:File`
+            # {{{
+            dir <- normalizePath(dir, mustWork = TRUE)
+            ori <- getwd()
+            setwd(dir)
+            on.exit(setwd(ori), add = TRUE)
+            if (!self$is_valid_class("Schedule:File")) return(FALSE)
+            # manually change the value instead of using `IdfObject$set_value()`
+            # to speed up
+            obj_ids <- self$object_ids(class = "Schedule:File")
+            val_info <- private$value_tbl()[object_id %in% obj_ids][
+                full_name == "File Name", list(value_id, value)]
+            val_ids <- val_info$value_id
+            vals <- val_info$value
+            # get full path of external files
+            val_paths <- normalizePath(vals, mustWork = FALSE)
+            # get files that exist
+            is_exist <- file.exists(val_paths)
+
+            msg_exist <- NULL
+            if (any(!is_exist)) {
+                warning(paste0("Broken external file link found in Idf: ",
+                    backtick(val_paths[!is_exist]), collapse = "\n"), call. = FALSE)
+            }
+
+            # get file directory that is not the same as target directory
+            is_same_dir <- dirname(val_paths) == dir
+            # get files that need copied
+            to_copy <- is_exist & !is_same_dir
+            targ <- val_paths[to_copy]
+            # copy files into the target directory
+            msg_copy <- NULL
+            flgs <- TRUE
+            if (not_empty(targ)) {
+                flgs <- file.copy(targ, dir, overwrite = TRUE, copy.date = TRUE)
+                if (any(!flgs)) {
+                    stop(paste0("Failed to copy external file into the ",
+                        "output directory: ", backtick(targ[!flgs]), collapse = "\n"),
+                        call. = FALSEE)
+                }
+                # change value tbl
+                targ_ids <- val_ids[to_copy][flgs]
+                new_paths <- normalizePath(file.path(dir, basename(targ[flgs])))
+                private$m_idf_tbl$value[value_id %in% targ_ids,
+                    `:=`(value = new_paths, value_upper = toupper(new_paths))]
+                targ_obj <- obj_ids[to_copy][flgs]
+                private$m_log$order[object_id %in% targ_obj,
+                    object_order := object_order + 1L]
+                TRUE
+            } else {
+                FALSE
+            }
+            # }}}
+        },
+
+        run_info = function (weather, dir = NULL) {
+            # get basic simulation run info
+            # {{{
+            # if the model is not created from a local file
+            path_idf <- private$m_path
+            msg <- NULL
+            flg_sav <- FALSE
+            if (is.null(path_idf)) {
+                msg <- "The Idf was not created from local file."
+                # and the output dir is not given
+                if (is.null(dir)) {
+                    # save it as a temp file and run it in temp dir
+                    msg <- c(msg, "`dir` is not given.",
+                    "The Idf will be saved as a temporary file and run in temporary directory.")
+                    flg_sav <- TRUE
+                    run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
+                        mustWork = FALSE)
+                    path_idf <- normalizePath(tempfile(pattern = "idf_", tmpdir = run_dir, fileext = ".idf"),
+                        mustWork = FALSE)
+                # but output dir is given
+                } else {
+                    # save it to the given output dir with random name and run
+                    # it in that dir
+                    msg <- c(msg, "The Idf will be saved in the output",
+                             "directory with a randon name.")
+                    flg_sav <- TRUE
+                    run_dir <- normalizePath(dir, mustWork = FALSE)
+                    path_idf <- normalizePath(tempfile("model_", run_dir, ".idf"),
+                        mustWork = FALSE)
+                }
+            # if the model is created from a local file
+            } else {
+                # but the output dir is not given
+                if (is.null(dir)) {
+                    # use the model path
+                    run_dir <- dirname(path_idf)
+                    path_idf <- normalizePath(file.path(run_dir, basename(path_idf)),
+                        mustWork = FALSE)
+                    if (self$is_unsaved()) {
+                        msg <- c(msg, "The Idf has been modified before.",
+                                 "It will be saved in the output directory",
+                                 "before run.")
+                        flg_sav <- TRUE
+                    }
+                # and the output dir is given
+                } else {
+                    # save it with same name in the output dir and run it there
+                    run_dir <- normalizePath(dir, mustWork = FALSE)
+                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
+                        mustWork = FALSE)
+                    if (!path_idf == private$m_path) flg_sav <- TRUE
+                }
+            }
+
+            name_idf <- tools::file_path_sans_ext(basename(path_idf))
+            # create output dir
+            if (!dir.exists(run_dir)) {
+                if (!flg_sav) {
+                    warning("The Idf file has been deleted. It will be created ",
+                            "using `Idf$save()` before run.", call. = FALSE)
+                    flg_sav <- TRUE
+                }
+                tryCatch(dir.create(run_dir, recursive = TRUE),
+                    warning = function (w) {
+                        stop("Failed to create output directory: ",
+                             backtick(run_dir), call. = FALSE)
+                    }
+                )
+            }
+
+            # resolve external file links
+            flg_res <- private$resolve_external_links(run_dir)
+            if (flg_res) flg_sav <- TRUE
+
+            # save the model if necessary
+            if (flg_sav) {
+                readr::write_lines(self$string(), path_idf)
+            }
+
+            path_epw <- normalizePath(weather, mustWork = FALSE)
+            name_epw <- tools::file_path_sans_ext(basename(weather))
+
+            # save info
+            private$m_run$out_dir <- run_dir
+            private$m_run$path_idf <- path_idf
+            private$m_run$path_epw <- path_epw
+            private$m_run$name_idf <- name_idf
+            private$m_run$name_epw <- name_epw
             # }}}
         }
         # }}}
