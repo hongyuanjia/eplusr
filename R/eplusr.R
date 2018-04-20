@@ -46,6 +46,7 @@ eplusr_opt <- function(x) op.eplusr[[paste0("eplusr.", x)]]
 # package level global constant
 .globals <- new.env(parent = emptyenv())
 .globals$latest_parsed_ver <- as.numeric_version("8.9")
+.globals$eplus_config <- list()
 
 # package level mutable global options
 .options <- new.env(parent = emptyenv())
