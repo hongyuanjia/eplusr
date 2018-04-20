@@ -7,7 +7,9 @@ NULL
 
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
-    assert_that(is.numeric_version(ver))
+    stopifnot(is_eplus_ver(ver))
+    ver <- as.numeric_version(ver)
+    # assert_that()
     ver_dash <- paste0(ver[,1], "-", ver[,2], "-0")
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)
@@ -65,72 +67,21 @@ use_eplus <- function (eplus) {
                 call. = FALSE)
 
         }
+        if (is.null(ver)) {
+            stop("Failed to detect the version of EnergyPlus located in ",
+                 backtick(eplus_dir), ".", call. = FALSE)
+        }
     }
 
-    list(version = ver, dir = eplus_dir, exe = paste0("energyplus", exe()))
+    res <- list(version = ver, dir = eplus_dir, exe = paste0("energyplus", exe()))
+    .globals$eplus_config[[as.character(ver)]] <- res
+    message("EnergyPlus v", ver, " has been added to EnergyPlus location dictionary.")
 }
 # }}}
-# eplus_path {{{
-eplus_path <- function (ver = NULL, path = NULL) {
-    os <- osname()
-
-    # if path is given, use it
-    if (!is.null(path)) {
-        path <- unname(path)
-        if (!dir.exists(path)) stop(msg(backtick(path), " does not exists."), call. = FALSE)
-        eplus_home <- path
-    } else if (!is.null(ver)) {
-        assert_that(is_supported_ver(ver))
-        ver_dash <- dash_ver(ver)
-        eplus_home <- switch(os,
-            "Windows" = paste0("C:/EnergyPlusV", ver_dash),
-            "Linux" = paste0("/usr/local/EnergyPlus-", ver_dash),
-            "Darwin" = paste0("/Applications/EnergyPlus-", ver_dash))
-        # if failed
-        if (!dir.exists(eplus_home)) {
-            # and path is NULL, error
-            stop(msg("Cannot locate EnergyPlus V", ver, " at default
-                     installation path ", backtick(eplus_home), ". Please
-                     give exact 'path' of EnergyPlus installation."))
-        }
-    # if none, error
-    } else {
-        stop("Both 'ver' and 'path' are NULL.", call. = FALSE)
-    }
-
-    ext <- ""
-    if (os == "Windows") ext <- ".exe"
-
-    eplus_exe <- normalizePath(
-        file.path(eplus_home, paste0("energyplus", ext)),
-        winslash = "/", mustWork = FALSE
-    )
-
-    energyplus_idd <- normalizePath(
-        file.path(eplus_home, "Energy+.idd"), winslash = "/", mustWork = FALSE
-    )
-
-    chicago_epw <- normalizePath(
-        file.path(eplus_home, "WeatherData", "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"),
-        winslash = "/", mustWork = FALSE
-    )
-
-    if (!file.exists(eplus_exe)) {
-        stop(msg("EnergyPlus executable does not exist in folder ", backtick(eplus_home), "."))
-    }
-
-    if (!file.exists(energyplus_idd)) {
-        stop(msg(backtick("Energy+.idd"), " does not exist in EnergyPlus
-                 installation folder."))
-        energyplus_idd <- NULL
-    }
-
-    if (!file.exists(chicago_epw)) chicago_epw <- NULL
-
-    eplus_info <- c(home = eplus_home, eplus = eplus_exe,
-                    idd = energyplus_idd, epw = chicago_epw)
-
-    return(eplus_info)
+# init_avail_eplus {{{
+init_avail_eplus <- function () {
+    lapply(c(8.5, 8.6, 8.7, 8.8, 8.9),
+           tryCatch(use_eplus, error = function (e) NULL))
 }
 # }}}
 # cmd_args {{{
@@ -296,141 +247,141 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
 }
 # }}}
 
-# days_in_month {{{
-days_in_month <- function (x) {
-    days_all <- c(`1` = 31L, `2` = 28L, `3` = 31L,
-                  `4` = 30L, `5` = 31L, `6` = 30L,
-                  `7` = 31L, `8` = 31L, `9` = 30L,
-                  `10` = 31L, `11` = 30L, `12` = 31L)
-    unname(days_all[which(names(days_all) == month(x))])
-}
-# }}}
-# format_runperiod {{{
-format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
+# # days_in_month {{{
+# days_in_month <- function (x) {
+#     days_all <- c(`1` = 31L, `2` = 28L, `3` = 31L,
+#                   `4` = 30L, `5` = 31L, `6` = 30L,
+#                   `7` = 31L, `8` = 31L, `9` = 30L,
+#                   `10` = 31L, `11` = 30L, `12` = 31L)
+#     unname(days_all[which(names(days_all) == month(x))])
+# }
+# # }}}
+# # format_runperiod {{{
+# format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
 
-    side <- match.arg(side)
+#     side <- match.arg(side)
 
-    # just a random non-leep year
-    const_year <- 2017L
+#     # just a random non-leep year
+#     const_year <- 2017L
 
-    if (as.character(runperiod) %in% c("asis", "annual", "design_day")) {
-        return(runperiod)
-    }
+#     if (as.character(runperiod) %in% c("asis", "annual", "design_day")) {
+#         return(runperiod)
+#     }
 
-    split_str <- unlist(strsplit(as.character(runperiod), "[-/.]|[[:space:]]"))
+#     split_str <- unlist(strsplit(as.character(runperiod), "[-/.]|[[:space:]]"))
 
-    # handle month
-    if (length(split_str) == 1L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", split_str), truncated = 1L))
-        if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
+#     # handle month
+#     if (length(split_str) == 1L) {
+#         out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", split_str), truncated = 1L))
+#         if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
 
-        if (side == "rhs") {
-            total_days <- days_in_month(out)
-            out <- lubridate::ymd(paste0(const_year, "-", split_str, "-", total_days))
-        }
+#         if (side == "rhs") {
+#             total_days <- days_in_month(out)
+#             out <- lubridate::ymd(paste0(const_year, "-", split_str, "-", total_days))
+#         }
 
-    } else if (length(split_str) == 2L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", paste0(split_str, collapse = "-"))))
-    } else {
-        stop("Cannot parse run period.", call. = FALSE)
-    }
+#     } else if (length(split_str) == 2L) {
+#         out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", paste0(split_str, collapse = "-"))))
+#     } else {
+#         stop("Cannot parse run period.", call. = FALSE)
+#     }
 
-    if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
+#     if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
 
-    return(out)
-}
-# }}}
-# parse_runperiod {{{
-parse_runperiod <- function (runperiod) {
-    # NOTE: inspired by `tibbletime` package.
-    # lhs/rhs list
-    rp <- list(lhs = rlang::f_lhs(runperiod), rhs = rlang::f_rhs(runperiod))
+#     return(out)
+# }
+# # }}}
+# # parse_runperiod {{{
+# parse_runperiod <- function (runperiod) {
+#     # NOTE: inspired by `tibbletime` package.
+#     # lhs/rhs list
+#     rp <- list(lhs = rlang::f_lhs(runperiod), rhs = rlang::f_rhs(runperiod))
 
-    # Environment to evaluate the sides in
-    rp_env <- rlang::f_env(runperiod)
-    rp_env$. <- "asis"
+#     # Environment to evaluate the sides in
+#     rp_env <- rlang::f_env(runperiod)
+#     rp_env$. <- "asis"
 
-    # Tidy evaluation
-    rp <- lapply(rp,
-        function(x) {
-            rlang::eval_tidy(x, env = rp_env)
-        }
-    )
+#     # Tidy evaluation
+#     rp <- lapply(rp,
+#         function(x) {
+#             rlang::eval_tidy(x, env = rp_env)
+#         }
+#     )
 
-    # Double up if 1 sided
-    # length = 2 means that it has ~ and 1 side
-    if (length(runperiod) == 2) {
-        rp$lhs <- rp$rhs
-    }
+#     # Double up if 1 sided
+#     # length = 2 means that it has ~ and 1 side
+#     if (length(runperiod) == 2) {
+#         rp$lhs <- rp$rhs
+#     }
 
-    out <- list(start = NA, end = NA)
-    out$start <- format_runperiod(rp$lhs, "lhs")
-    out$end <- format_runperiod(rp$rhs, "rhs")
+#     out <- list(start = NA, end = NA)
+#     out$start <- format_runperiod(rp$lhs, "lhs")
+#     out$end <- format_runperiod(rp$rhs, "rhs")
 
-    if (out$end %in% c("annual", "design_day", "asis") &&
-        as.character(out$start) != out$end) {
-        stop(msg("Invalid run period formula. Left hand side should be empty if
-                 right hand side is 'annual', 'design_day', or '.'."),
-                 call. = FALSE)
-    } else if (out$start %in% c("annual", "design_day", "asis") &&
-               out$start != as.character(out$end)) {
-        stop(msg("Invalid run period formula. Formula should be in a format of
-                 '~RHS' if 'annual', 'design_day' or '.' is used."),
-                 call. = FALSE)
-    } else if (out$start > out$end) {
-        stop(msg("Invalid run period formula. Start date should be smaller than
-                 end date."), call. = FALSE)
-    }
+#     if (out$end %in% c("annual", "design_day", "asis") &&
+#         as.character(out$start) != out$end) {
+#         stop(msg("Invalid run period formula. Left hand side should be empty if
+#                  right hand side is 'annual', 'design_day', or '.'."),
+#                  call. = FALSE)
+#     } else if (out$start %in% c("annual", "design_day", "asis") &&
+#                out$start != as.character(out$end)) {
+#         stop(msg("Invalid run period formula. Formula should be in a format of
+#                  '~RHS' if 'annual', 'design_day' or '.' is used."),
+#                  call. = FALSE)
+#     } else if (out$start > out$end) {
+#         stop(msg("Invalid run period formula. Start date should be smaller than
+#                  end date."), call. = FALSE)
+#     }
 
-    out
-}
-# }}}
-# set_runperiod {{{
-set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
-    rp <- parse_runperiod(runperiod)
+#     out
+# }
+# # }}}
+# # set_runperiod {{{
+# set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
+#     rp <- parse_runperiod(runperiod)
 
-    setattr(idf, "runperiod", rp)
+#     setattr(idf, "runperiod", rp)
 
-    if (rp$end %in% c("asis", "annual", "design_day")) return(idf)
+#     if (rp$end %in% c("asis", "annual", "design_day")) return(idf)
 
-    ids <- get_id(idf, "RunPeriod")
+#     ids <- get_id(idf, "RunPeriod")
 
-    # if the model has already been set before, use it
-    if (not_empty(ids)) {
-        rp_eplusr <- idf$value[object_id %in% ids][field_order == 1L][
-            value == "run_period_eplusr", object_id]
-        rp_others <- setdiff(ids, rp_eplusr)
-        if (not_empty(rp_eplusr)) {
-            idf <- invisible(
-                set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
-                           begin_month = month(rp$start),
-                           begin_day_of_month = mday(rp$start),
-                           end_month = month(rp$end),
-                           end_day_of_month = mday(rp$end), idd = idd)
-            )
-        } else {
-            idf <- invisible(
-                add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
-                           begin_month = month(rp$start),
-                           begin_day_of_month = mday(rp$start),
-                           end_month = month(rp$end),
-                           end_day_of_month = mday(rp$end), idd = idd)
-            )
-        }
+#     # if the model has already been set before, use it
+#     if (not_empty(ids)) {
+#         rp_eplusr <- idf$value[object_id %in% ids][field_order == 1L][
+#             value == "run_period_eplusr", object_id]
+#         rp_others <- setdiff(ids, rp_eplusr)
+#         if (not_empty(rp_eplusr)) {
+#             idf <- invisible(
+#                 set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
+#                            begin_month = month(rp$start),
+#                            begin_day_of_month = mday(rp$start),
+#                            end_month = month(rp$end),
+#                            end_day_of_month = mday(rp$end), idd = idd)
+#             )
+#         } else {
+#             idf <- invisible(
+#                 add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
+#                            begin_month = month(rp$start),
+#                            begin_day_of_month = mday(rp$start),
+#                            end_month = month(rp$end),
+#                            end_day_of_month = mday(rp$end), idd = idd)
+#             )
+#         }
 
-        if (hide_others && not_empty(rp_others)) {
-            for (i in rp_others) {
-                idf <- add_comment(idf, i, append = FALSE, type = 1L,
-                                   "[ * Commented out automatically by eplusr * ]")
-                idf <- del_object(idf, i, idd, hide = TRUE)
-            }
-            warning(msg(sprintf("Objects in class %s with ID %s has/have been
-                                commented out to use the input run period.",
-                                backtick("RunPeriod"),
-                                paste(rp_others, collapse = ", "))), call. = FALSE)
-        }
-    }
+#         if (hide_others && not_empty(rp_others)) {
+#             for (i in rp_others) {
+#                 idf <- add_comment(idf, i, append = FALSE, type = 1L,
+#                                    "[ * Commented out automatically by eplusr * ]")
+#                 idf <- del_object(idf, i, idd, hide = TRUE)
+#             }
+#             warning(msg(sprintf("Objects in class %s with ID %s has/have been
+#                                 commented out to use the input run period.",
+#                                 backtick("RunPeriod"),
+#                                 paste(rp_others, collapse = ", "))), call. = FALSE)
+#         }
+#     }
 
-    return(idf)
-}
-# }}}
+#     return(idf)
+# }
+# # }}}
