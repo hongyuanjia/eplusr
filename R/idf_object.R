@@ -568,6 +568,12 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                                backtick(private$m_class_name))
             cli::cat_line("<<", id_class, ">>")
 
+            value_tbl <- private$value_tbl(with_field = TRUE)
+            if (is_empty(value_tbl)) {
+                cli::cat_line(" * Object has been deleted * ")
+                return(invisible())
+            }
+
             # comment
             if (comment) {
                 if (not_empty(private$comment_tbl())) {
@@ -577,9 +583,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             }
 
             # value
-            fld <- format_field(private$value_tbl(with_field = TRUE), leading = 1L,
+            fld <- format_field(value_tbl, leading = 1L,
                                 in_ip = private$m_options$view_in_ip,
                                 sep_at = 20L, index = TRUE, blank = TRUE)
+
             # remove class line
             cli::cat_rule(center = "* FIELDS *")
             cli::cat_line(fld)
