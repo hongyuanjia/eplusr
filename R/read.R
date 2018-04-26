@@ -1,3 +1,31 @@
+# connect_sql {{{
+connect_sql <- function (sql) RSQLite::dbConnect(RSQLite::SQLite(), sql)
+# }}}
+# sql_read_table {{{
+sql_read_table <- function (sql, table) {
+    con <- connect_sql(sql)
+
+    tbl <- data.table::setDT(dbReadTable(con, table))
+
+    # close conn
+    RSQLite::dbDisconnect(con)
+
+    tbl
+}
+# }}}
+# sql_avail_tables {{{
+sql_avail_tables <- function (sql) {
+    con <- connect_sql(sql)
+
+    tbls <- RSQLite::dbListTables(con)
+
+    # close conn
+    RSQLite::dbDisconnect(con)
+
+    tbls
+}
+# }}}
+
 #' @importFrom tools file_path_sans_ext
 #' @importFrom lubridate force_tz
 #' @importFrom fasttime fastPOSIXct
