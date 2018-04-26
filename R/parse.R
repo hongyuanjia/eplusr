@@ -93,7 +93,7 @@ parse_idd_file <- function(path) {
     # {{{
     idd_dt[, field_count := 0L]
     idd_dt[type %in% c(type_field, type_field_last),
-           field_count := char_count(field_anid, "[,;]")]
+           field_count := stringr::str_count(field_anid, "[,;]")]
     # hats off to Matt Dowle:
     # https://stackoverflow.com/questions/15673662/applying-a-function-to-each-row-of-a-data-table
     idd_dt <- idd_dt[data.table::between(type, type_field, type_field_last),
@@ -780,10 +780,12 @@ parse_idf_file <- function (path, idd = NULL) {
     # 'Version,8.8;' and it may not, e.g. '0.0,0.0,0.0,' in
     # 'BuildingSurface:Detailed'.
     # get number of condensed values
-    idf_dt[!is.na(value), `:=`(value_count = char_count(value, "[,;]"))]
+    idf_dt[!is.na(value), `:=`(value_count = stringr::str_count(value, "[,;]"))]
     idf_dt[is.na(value), `:=`(value_count = 0L)]
-    idf_dt <- idf_dt[!data.table::between(type, type_macro, type_comment),
-        strsplit(value, "\\s*[,;]\\s*"), by = list(line)][
+    idf_dt <- idf_dt[!data.table::between(type, type_macro, type_comment)][,
+        {s = strsplit(value, "\\s*[,;]\\s*");
+         list(line  = rep(line, sapply(s, length)),
+              V1 = unlist(s))}][
         idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
     data.table::setnames(idf_dt, "V1", "value")
     # get row numeber of last field per condensed field line in each class
@@ -1001,12 +1003,11 @@ parse_error <- function (type = c("idf", "idd"), error, num, msg = NULL, stop = 
 read_idd <- function(filepath) {
     idd_str <- readr::read_lines(filepath)
     # Have to fix encoding errors in version 8.3 and below
-    idd_str <- iconv(idd_str, "UTF-8", "UTF-8", "byte")
-    idd_str <- gsub("<92>", "'", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("<93>", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("<94>", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("<b0>", "deg", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("<d0>", "D", idd_str, useBytes = TRUE, fixed = TRUE)
+    idd_str <- gsub("\x92", "'", idd_str, useBytes = TRUE, fixed = TRUE)
+    idd_str <- gsub("\x93", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
+    idd_str <- gsub("\x94", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
+    idd_str <- gsub("\xb0", "deg", idd_str, useBytes = TRUE, fixed = TRUE)
+    idd_str <- gsub("\xd0", "D", idd_str, useBytes = TRUE, fixed = TRUE)
     # Get rid of leading and trailing spaces
     idd_str <- stringr::str_trim(idd_str, "both")
 
