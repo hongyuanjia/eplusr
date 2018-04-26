@@ -7,11 +7,6 @@
     }
 }
 # }}}
-# char_count {{{
-char_count <- function (x, pattern, ...) {
-    nchar(as.character(x)) - nchar(gsub(pattern, "", x, ...))
-}
-# }}}
 # msg {{{
 msg <- function (...) {
     paste(strwrap(paste0(...)), collapse = "\n")
