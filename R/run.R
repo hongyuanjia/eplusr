@@ -81,7 +81,7 @@ use_eplus <- function (eplus) {
 # init_avail_eplus {{{
 init_avail_eplus <- function () {
     lapply(c(8.5, 8.6, 8.7, 8.8, 8.9),
-           tryCatch(use_eplus, error = function (e) NULL))
+           function (x) tryCatch(use_eplus(x), error = function (e) NULL))
 }
 # }}}
 # cmd_args {{{
