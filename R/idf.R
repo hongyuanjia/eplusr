@@ -828,7 +828,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 }
             } else {
                 ids <- id
-                private$verbose_info("Delete target object [ID:", backtick_collapse(id), "].")
+                private$verbose_info("Delete target object [ID:{backtick_collapse(id)}].")
             }
             # }}}
             # delete
@@ -844,12 +844,12 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        diff = function (id) {
-            # diff the values
-            # {{{
+#         diff = function (id) {
+#             # diff the values
+#             # {{{
 
-            # }}}
-        },
+#             # }}}
+#         },
 
         validate = function () {
             # validate field in terms of all creteria
@@ -977,19 +977,18 @@ Idf <- R6::R6Class(classname = "Idf",
         collect = function (type = c("variable", "meter"), long = FALSE) {
             # check status
             # {{{
+            # try to locate the sql result file
+            sql <- paste0(tools::file_path_sans_ext(private$m_path), ".sql")
             # if the model has not been run before
             if (is.null(private$m_run)) {
                 if (is.null(private$m_path)) {
                     stop("The Idf was not created from local file. Failed to ",
                          "locate simulation results.", call. = FALSE)
                 }
-                # try to locate the sql result file
-                sql <- paste0(tool::file_path_sans_ext(private$m_path), ".sql")
-                if (!utils::file_test(sql, "-f")) {
+                if (!utils::file_test("-f", sql)) {
                     stop("Failed to locate simulation SQL output in the folder ",
                          "of Idf file.", call. = FALSE)
                 }
-
                 # compare last changed time
                 sql_ctime <- file.info(sql)$ctime
                 idf_ctime <- file.info(private$m_path)$ctime
@@ -1013,9 +1012,8 @@ Idf <- R6::R6Class(classname = "Idf",
                              "the problems and re-run the simulation before collect ",
                              "results", call. = FALSE)
                     } else if (!is_succeed) {
-                        stop("Simulation ended with errors. Please solve the problems
-                             and re-run the simulation before collect results.",
-                             call. = FALSE)
+                        warning("Simulation ended with errors. Simulation results ",
+                                "may not be correct.", call. = FALSE)
                     }
                 } else {
                     # check if the model is still running
@@ -1023,19 +1021,16 @@ Idf <- R6::R6Class(classname = "Idf",
                         stop("Simulation is still running. Please wait simulation ",
                              "to finish before collecting results.", call. = FALSE)
                     } else if (private$m_run$proc$get_exit_status() != 0L) {
-                        stop(msg("Simulation ended with errors. Please solve the problems
-                                 and re-run the simulation before collect results."),
-                                 call. = FALSE)
+                        warning("Simulation ended with errors. Simulation results ",
+                                "may not be correct.", call. = FALSE)
                     }
                 }
             }
             # }}}
             # connect to the sql file
-            path_sql <- file.path(private$m_run$out_dir,
-                paste0(private$m_run$name_idf, ".sql"))
-            private$m_run$sql <- path_sql
-            sql <- RSQLite::dbConnect(RSQLite::SQLite(), path_sql)
-            sql
+            private$m_run$sql <- sql
+            sql_db <- RSQLite::dbConnect(RSQLite::SQLite(), sql)
+            sql_db
         },
 
         table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
@@ -1043,13 +1038,13 @@ Idf <- R6::R6Class(classname = "Idf",
                             key = key, table = table, nest = nest),
 
         # mask or delete non-useful methods inherited from `Idd` class
-        # # TODO: find a nicer way to do so
-        # build = function () stop("attempt to apply non-function", call. = FALSE),
-        # group_order = function () stop("attempt to apply non-function", call. = FALSE),
-        # class_order = function () stop("attempt to apply non-function", call. = FALSE),
-        # objects_in_group = function () stop("attempt to apply non-function", call. = FALSE),
-        # required_objects = function () stop("attempt to apply non-function", call. = FALSE),
-        # unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
+        # TODO: find a nicer way to do so
+        build = function () stop("attempt to apply non-function", call. = FALSE),
+        group_orders = function (...) stop("attempt to apply non-function", call. = FALSE),
+        class_orders = function (...) stop("attempt to apply non-function", call. = FALSE),
+        objects_in_group = function (...) stop("attempt to apply non-function", call. = FALSE),
+        required_objects = function () stop("attempt to apply non-function", call. = FALSE),
+        unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
         print = function () {
             # {{{
             count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
@@ -1089,6 +1084,7 @@ Idf <- R6::R6Class(classname = "Idf",
         m_log = NULL,
         m_run = NULL,
         IdfObject = NULL,
+        IddObject = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
@@ -1326,7 +1322,7 @@ Idf <- R6::R6Class(classname = "Idf",
             }
 
             # get file directory that is not the same as target directory
-            is_same_dir <- dirname(val_paths) == dir
+            is_same_dir <- normalizePath(dirname(val_paths), mustWork = FALSE) == dir
             # get files that need copied
             to_copy <- is_exist & !is_same_dir
             targ <- val_paths[to_copy]
@@ -1342,9 +1338,9 @@ Idf <- R6::R6Class(classname = "Idf",
                 }
                 # change value tbl
                 targ_ids <- val_ids[to_copy][flgs]
-                new_paths <- normalizePath(file.path(dir, basename(targ[flgs])))
+                new_vals <- basename(targ[flgs])
                 private$m_idf_tbl$value[value_id %in% targ_ids,
-                    `:=`(value = new_paths, value_upper = toupper(new_paths))]
+                    `:=`(value = new_vals, value_upper = toupper(new_vals))]
                 targ_obj <- obj_ids[to_copy][flgs]
                 private$m_log$order[object_id %in% targ_obj,
                     object_order := object_order + 1L]
