@@ -124,7 +124,7 @@ Epw <- R6::R6Class(classname = "Epw",
             # }}}
         },
 
-        get_data = function (year = NULL, unit = TRUE) {
+        get_data = function (year = NULL, unit = FALSE) {
             # return weather data
             # {{{
             if (unit) {
@@ -132,7 +132,22 @@ Epw <- R6::R6Class(classname = "Epw",
             } else {
                 private$drop_units()
             }
-            private$m_data
+            if (!is.null(year)) {
+                d <- data.table::copy(private$m_data)
+                years <- unique(d$year)
+                if (length(years) != 1L) {
+                    stop("Multiple year found in the weather data: ",
+                         backtick_collapse(years), ".", call. = FALSE)
+                }
+                last_day <- d[.N, all(month == "12", day == "31", hour = "24", minute = "0")]
+                lubridate::year(d$datetime) <- year
+                if (last_day) {
+                    d[.N, datetime := lubridate::year(datetime) + years(1L)]
+                }
+                d
+            } else {
+                private$m_data
+            }
             # }}}
         },
 
@@ -195,10 +210,34 @@ Epw <- R6::R6Class(classname = "Epw",
 
         print = function () {
             cli::cat_line(cli::rule("EnergyPlus Weather File"))
-            loc <- paste0(c("City", "State or Province", "Country", "Data Source",
-                            "WMO Number", "Latitude", "Longtitude", "Time Zone",
-                            "Evevation"), ":", private$m_location)
+            loc_keys <- c(
+                "[ City       ]",
+                "[ State      ]",
+                "[ Country    ]",
+                "[ Data Source]",
+                "[ WMO Number ]",
+                "[ Latitude   ]",
+                "[ Longtitude ]",
+                "[ Time Zone  ]",
+                "[ Evevation  ]")
+            loc <- paste0(loc_keys, ": ", private$m_location)
+
+            dp_keys <- c(
+                "[ Period Num ]",
+                "[ Time Step  ]",
+                "[ Date Range ]")
+            dp <- private$m_data_periods
+            start_date <- format(dp$start_date, "%b %d")
+            end_date <- format(dp$end_date, "%b %d")
+            range <- paste0(start_date, " - ", end_date)
+
+            dp <- paste0(dp_keys, ": ",
+                         c(dp$n_data_periods,
+                           paste0(dp$time_step * 10, " min"),
+                           range))
+
             cli::cat_bullet(loc)
+            cli::cat_bullet(dp)
         }
     ),
 
