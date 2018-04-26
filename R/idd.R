@@ -125,6 +125,7 @@ Idd <- R6::R6Class(classname = "Idd",
         },
 
         group_names = function (class = NULL) {
+            # {{{
             if (is.null(class)) {
                 private$m_idd_tbl$group[["group_name"]]
             } else {
@@ -135,9 +136,11 @@ Idd <- R6::R6Class(classname = "Idd",
                 data.table::setattr(res, "names", class)
                 res
             }
+            # }}}
         },
 
         class_names = function (group = NULL) {
+            # {{{
             if (is.null(group)) {
                 private$m_idd_tbl$class[["class_name"]]
             } else {
@@ -148,6 +151,7 @@ Idd <- R6::R6Class(classname = "Idd",
                 data.table::setattr(res, "names", group)
                 res
             }
+            # }}}
         },
 
         required_class_names = function () {
@@ -197,7 +201,6 @@ Idd <- R6::R6Class(classname = "Idd",
         object = function (class) {
             # return a single object
             # {{{
-            assert_that(self$is_valid_class(class))
             private$IddObject$new(class)
             # }}}
         },
@@ -208,7 +211,8 @@ Idd <- R6::R6Class(classname = "Idd",
             assert_that(self$is_valid_group(group))
             purrr::map(
                 private$m_idd_tbl$group[group_name == group][
-                    private$m_idd_tbl$class, on = "group_id", class_name],
+                    private$m_idd_tbl$class, on = "group_id", nomatch = 0L,
+                    class_name],
                 private$IddObject$new
             )
             # }}}
