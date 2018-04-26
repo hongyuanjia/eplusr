@@ -383,10 +383,13 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_options$validate_level <- "final"
             private$m_options$verbose_info <- TRUE
 
+            idd <- attr(idf_file, "idd")
             # init idd tbl
             private$m_idd_tbl <- list2env(as.list.environment(
-                ._get_private(attr(idf_file, "idd"))$m_idd_tbl),
-                parent = emptyenv())
+                ._get_private(idd)$m_idd_tbl), parent = emptyenv())
+            # get IddObject generator
+            private$IddObject <- ._get_private(idd)$IddObject
+
             # init idf tbl
             private$m_idf_tbl <- list2env  (
                 idf_file[c("object", "value", "value_reference", "comment")],
@@ -531,6 +534,13 @@ Idf <- R6::R6Class(classname = "Idf",
             }
             private$update_value_tbl()
             return(invisible(self))
+            # }}}
+        },
+
+        definition = function (class) {
+            # return the IddObject of specific class
+            # {{{
+            super$object(class)
             # }}}
         },
 
