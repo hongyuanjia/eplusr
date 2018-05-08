@@ -4,4 +4,4 @@
 *.cmd
 *.vbs
 try.R
-R\sysdata\.rda
+R/sysdata\.rda
