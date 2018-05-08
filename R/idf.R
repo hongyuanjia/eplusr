@@ -979,8 +979,9 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             # try to locate the sql result file
             sql <- paste0(tools::file_path_sans_ext(private$m_path), ".sql")
+
             # if the model has not been run before
-            if (is.null(private$m_run)) {
+            if (is.null(private$m_run$proc)) {
                 if (is.null(private$m_path)) {
                     stop("The Idf was not created from local file. Failed to ",
                          "locate simulation results.", call. = FALSE)
@@ -1004,7 +1005,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # if the model has been run before
             } else {
                 # check if the model was run in waiting mode
-                if (private$m_run$wait) {
+                if (isTRUE(private$m_run$wait)) {
                     # check the exist status of last simulationa
                     is_succeed <- private$m_run$proc$status
                     if (!is.na(is_succeed)) {
@@ -1399,7 +1400,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 } else {
                     # save it with same name in the output dir and run it there
                     run_dir <- normalizePath(dir, mustWork = FALSE)
-                    path_idf <- normalizePath(file.path(run_dir, paste0(name_idf, ".idf")),
+                    path_idf <- normalizePath(file.path(run_dir, basename(path_idf)),
                         mustWork = FALSE)
                     if (!path_idf == private$m_path) flg_sav <- TRUE
                 }
