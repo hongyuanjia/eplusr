@@ -1,5 +1,5 @@
 #' @importFrom R6 R6Class
-#' @importFrom data.table month mday year copy fwrite
+#' @importFrom data.table copy fwrite
 #' @importFrom readr write_lines
 #' @importFrom cli cat_line rule cat_bullet
 #' @importFrom units ud_units
@@ -179,16 +179,16 @@ Epw <- R6::R6Class(classname = "Epw",
 
             data_periods <- private$m_data_periods
             start_date <- data_periods$start_date
-            start_month <- data.table::month(start_date)
-            start_day <- data.table::mday(start_date)
+            start_month <- lubridate::month(start_date)
+            start_day <- lubridate::mday(start_date)
             start <- paste0(lpad(start_month, width = 2L), "/", lpad(start_day, width = 2L))
             end_date <- private$m_data_periods$end_date
-            end_month <- data.table::month(end_date)
-            end_day <- data.table::mday(end_date)
+            end_month <- lubridate::month(end_date)
+            end_day <- lubridate::mday(end_date)
             end <- paste0(lpad(end_month, width = 2L), "/", lpad(end_day, width = 2L))
             if (data_periods$is_real_year) {
-                start_year <- data.table::year(start_date)
-                end_year <- data.table::year(end_date)
+                start_year <- lubridate::year(start_date)
+                end_year <- lubridate::year(end_date)
                 start <- paste0(start, "/", start_year)
                 end <- paste0(end, "/", end_year)
             }
@@ -364,7 +364,7 @@ Epw <- R6::R6Class(classname = "Epw",
 
 #' @importFrom readr read_lines
 #' @importFrom stringr str_trim
-#' @importFrom data.table fread setnames shift month minute mday year
+#' @importFrom data.table fread setnames shift
 #' @importFrom fasttime fastPOSIXct
 # parse_epw_file {{{
 parse_epw_file <- function (path, strict = TRUE) {
@@ -540,14 +540,14 @@ parse_epw_file <- function (path, strict = TRUE) {
                  call. = FALSE)
     }
     # check if warp around
-    epw_data[, dt_month := data.table::month(datetime)]
-    epw_data[, dt_month_shifted := data.table::month(datetime_shifted)]
+    epw_data[, dt_month := lubridate::month(datetime)]
+    epw_data[, dt_month_shifted := lubridate::month(datetime_shifted)]
     wrap_around <- epw_data[-.N][dt_month < dt_month_shifted, .N > 0L]
 
     # check for agreement between the file value and the computed value
     min_per_rcd <- 60L/data_periods[["time_step"]]
     min_seq <- seq(0, 60, length.out = data_periods[["time_step"]] + 1L)[-1L]
-    epw_data[, dt_minute := data.table::minute(datetime)]
+    epw_data[, dt_minute := lubridate::minute(datetime)]
     epw_data[, dt_minute_cal := {rep(min_seq, nrow(epw_data))}][
         dt_minute_cal == 60L, dt_minute_cal := 0L]
     min_mismatch <- epw_data[dt_minute != dt_minute_cal, which = TRUE]
@@ -573,8 +573,8 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     # check start date and end date mismatching
     first_date <- as.Date(epw_data[1L, datetime])
-    if (data.table::month(first_date) != data.table::month(start_date) ||
-        data.table::mday(first_date) != data.table::mday(start_date)) {
+    if (lubridate::month(first_date) != lubridate::month(start_date) ||
+        lubridate::mday(first_date) != lubridate::mday(start_date)) {
         stop("Header start date does not match data in EPW file ", backtick(path), call. = FALSE)
     }
     last_date_list <- epw_data[.N, list(datetime, hour, minute)]
@@ -583,8 +583,8 @@ parse_epw_file <- function (path, strict = TRUE) {
     } else {
         last_date <- last_date_list[["datetime"]]
     }
-    if (data.table::month(last_date) != data.table::month(end_date) ||
-        data.table::mday(last_date) != data.table::mday(end_date)) {
+    if (lubridate::month(last_date) != lubridate::month(end_date) ||
+        lubridate::mday(last_date) != lubridate::mday(end_date)) {
         stop("Header end date does not match data in EPW file ", backtick(path), call. = FALSE)
     }
     if (real_year) {
@@ -594,8 +594,8 @@ parse_epw_file <- function (path, strict = TRUE) {
                     "will be treated as typical (TMY)", call. = FALSE)
             data_periods[["is_real_year"]] <- FALSE
         } else {
-            data_periods[["start_date_actual_year"]] <- data.table::year(start_date)
-            data_periods[["end_date_actual_year"]] <- data.table::year(end_date)
+            data_periods[["start_date_actual_year"]] <- lubridate::year(start_date)
+            data_periods[["end_date_actual_year"]] <- lubridate::year(end_date)
         }
     }
     if (!real_year && wrap_around) {
