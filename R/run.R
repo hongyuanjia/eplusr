@@ -2,7 +2,7 @@
 #' @importFrom lubridate ymd
 #' @importFrom tools file_path_sans_ext
 #' @importFrom rlang f_lhs f_rhs f_env eval_tidy
-#' @importFrom data.table month mday setattr
+#' @importFrom data.table setattr
 NULL
 
 # eplus_default_path {{{
