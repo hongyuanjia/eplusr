@@ -1007,12 +1007,12 @@ Idf <- R6::R6Class(classname = "Idf",
                 # check if the model was run in waiting mode
                 if (isTRUE(private$m_run$wait)) {
                     # check the exist status of last simulationa
-                    is_succeed <- private$m_run$proc$status
-                    if (!is.na(is_succeed)) {
+                    exit_status <- private$m_run$proc$status
+                    if (is.na(exit_status)) {
                         stop("Simulation was terminated before. Please solve ",
                              "the problems and re-run the simulation before collect ",
                              "results", call. = FALSE)
-                    } else if (!is_succeed) {
+                    } else if (exit_status != 0) {
                         warning("Simulation ended with errors. Simulation results ",
                                 "may not be correct.", call. = FALSE)
                     }
@@ -1030,8 +1030,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
             # connect to the sql file
             private$m_run$sql <- sql
-            sql_db <- RSQLite::dbConnect(RSQLite::SQLite(), sql)
-            sql_db
+            Sql$new(sql)
         },
 
         table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
