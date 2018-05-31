@@ -755,8 +755,7 @@ Idf <- R6::R6Class(classname = "Idf",
             )
             # if failed
             if (inherits(idfobj, "error")) {
-                stop(glue::glue("Failed to add a new object \\
-                    [ID: {obj_id}] in class `{class}`."), call. = FALSE)
+                stop(idfobj$message, call. = FALSE)
             } else {
                 # log
                 private$m_log$unsaved <- TRUE
@@ -913,7 +912,7 @@ Idf <- R6::R6Class(classname = "Idf",
             if (file.exists(path)) {
                 if (!overwrite) {
                     stop("Target already exists. Please set `overwrite` to ",
-                         "FALSE if you want to replace it.", call. = FALSE)
+                         "TRUE if you want to replace it.", call. = FALSE)
                 } else {
                     private$verbose_info("Replace the existing file located \\
                         at `{normalizePath(path)}`.")
@@ -1499,48 +1498,5 @@ on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
         }
     }
     obj
-}
-# }}}
-
-# irun {{{
-irun <- function (self, private, period, weather, echo = FALSE, dir = NULL,
-                      eplus_home = NULL) {
-    assert_that(private$m_version >= 8.3,
-                msg = "Currently, `$run` only supports EnergyPlus V8.3 or higher.")
-
-    eplus_info <- eplus_path(private$version, eplus_home)
-    eplus_exe <- eplus_info["eplus"]
-
-    # set default weather {{{
-    if (is_empty(weather)) {
-        weather <- eplus_info["epw"]
-        if (is_empty(weather)) {
-            stop(msg("Failed to use default weather file
-                     'USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw'. Please
-                     give 'weather' file path."), call. = FALSE)
-        } else {
-            warning(msg(
-                "Missing weather input, weather file located at ",
-                backtick(weather), " will been used."), call. = FALSE)
-        }
-    }
-    # }}}
-
-    # auto correct table output style
-    idf <- set_output_table_style(idf, private$idd)
-
-    # auto determine whether to expand objects
-    if (has_hvac_template(private$model)) expand_obj <- TRUE else expand_obj <- FALSE
-    if (not_empty(rp_mes)) message(rp_mes)
-
-    # save the new model and update objects
-    save_idf(idf, private$path)
-    private$model <- idf
-
-    data_run <- run_idf(eplus_exe, model = private$path, weather = weather,
-                        output_dir = dir, design_day = design_day,
-                        annual = annual, expand_obj = expand_obj, echo = echo)
-    private$process <- data_run$process
-    private$sim <- data_run$info
 }
 # }}}
