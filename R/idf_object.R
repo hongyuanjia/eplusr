@@ -583,7 +583,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         },
 
         print = function (comment = TRUE) {
-            # TODO: add the index of this object in the class
+            # TODO: add the index of this object in the class and required mark
             # {{{
             id_class <- paste0("[ID: ", private$m_object_id, "] Class ",
                                backtick(private$m_class_name))
