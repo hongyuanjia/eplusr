@@ -535,6 +535,60 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # }}}
         },
 
+        value_table = function (all = FALSE, unit = TRUE,
+                                wide = FALSE, string_value = TRUE) {
+            # return object data in spreadsheet format
+            # {{{
+            tbl <- private$value_tbl(with_field = TRUE, all = all)
+            in_ip <- private$m_options$view_in_ip
+            # change to IP numbers and names if necessary
+            tbl <- update_value_num(tbl, private$m_options$num_digits, in_ip)
+
+            if (!unit) fld_nm <- "field_name"
+
+            if (in_ip) {
+                if (unit) fld_nm <- "full_ipname"
+                cols <- c("field_order", fld_nm, "value", "value_ipnum")
+            } else {
+                if (unit) fld_nm <- "full_name"
+                cols <- c("field_order", fld_nm, "value", "value_num")
+            }
+
+            tbl_sub <- tbl[, .SD, .SDcols = cols]
+            if (in_ip) {
+                data.table::setnames(tbl_sub,
+                    c("full_ipname", "value_ipnum"),
+                    c("full_name", "value_num"))
+            }
+
+            if (!string_value) {
+                tbl_sub[, value := list(as.list(value))]
+                # NOTE: if a numeric field is set to "autosize", then
+                # inconsistency will be introduced into return value classes, as
+                # values will be return as a string "autosize" instead of a
+                # number.
+                tbl_sub[!is.na(value_num), value := list(as.list(value_num))]
+            }
+
+            tbl_sub[, value_num := NULL]
+
+            data.table::setnames(tbl_sub, c("order", "name", "value"))
+
+            if (wide) {
+                tbl_wide <- data.table::dcast(tbl_sub, . ~ name,
+                    value.var = c("value"))[, `.` := NULL]
+                data.table::setcolorder(tbl_wide, tbl_sub[["name"]])
+                if (!string_value) {
+                    tbl_wide <- tbl_wide[, lapply(.SD, unlist)]
+                }
+
+                return(tbl_wide[])
+            } else {
+                return(tbl_sub[])
+            }
+            # }}}
+        },
+
         is_valid = function () {
             # return TRUE if there are no errors after `$check()`
             # {{{
