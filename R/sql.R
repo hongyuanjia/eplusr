@@ -34,11 +34,29 @@ Sql <- R6::R6Class(classname = "EpSql", cloneable = FALSE, lock_class = TRUE,
             # }}}
         },
 
-        report_data = function (key_value = NULL, name = NULL) {
+        report_data = function (key_value = NULL, name = NULL, all = FALSE,
+                                year = NULL, tz = "GMT") {
             # read report data
             # {{{
             q <- private$vars_query(key_value = key_value, name = name)
-            private$get_sql_query(q)
+            res <- private$get_sql_query(q)
+
+            Year <- year %||% lubridate::year(Sys.Date())
+            res[, DateTime := fasttime::fastPOSIXct(
+                      paste0(Year, "-", Month, "-", Day, " ", Hour, ":", Minute, ":00"),
+                      required.components = 5L, tz = "GMT")]
+
+            if (!all) {
+                res <- res[, .SD, .SDcols = c("DateTime", "KeyValue", "Name", "Units", "Value")]
+            } else {
+                data.table::setcolorder(res, c("DateTime", setdiff(names(res), "DateTime")))
+            }
+
+            data.table::setorder(res, KeyValue, Name, DateTime)
+
+            if (tz != "GMT") res$DateTime <- lubridate::force_tz(res$DateTime, tz)
+
+            res
             # }}}
         },
 
