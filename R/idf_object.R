@@ -696,16 +696,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 
         # PRIVATE FUNCTIONS
         # {{{
-        object_tbl = function (with_group = FALSE) {
+        object_tbl = function () {
             # return object tbl
             # {{{
-            out_tbl <- private$m_idf_tbl$object[object_id == private$m_object_id][
+            private$m_idf_tbl$object[object_id == private$m_object_id][
                 private$class_tbl(), on = "class_id", nomatch = 0L]
-            if (with_group) {
-                out_tbl[private$m_idd_tbl$group, on = "group_id", nomatch = 0L]
-            } else {
-                out_tbl
-            }
             # }}}
         },
 

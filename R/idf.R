@@ -1141,11 +1141,16 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        object_tbl = function () {
+        object_tbl = function (all = FALSE) {
             # return a tbl contains all object info
             # {{{
-            private$m_idf_tbl$object[private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
-                private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
+            if (all) {
+                private$m_idf_tbl$object[private$m_idd_tbl$class, on = "class_id"][
+                    private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
+            } else {
+                private$m_idf_tbl$object[private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                    private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
+            }
             # }}}
         },
 
