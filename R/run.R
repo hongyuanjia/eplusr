@@ -47,6 +47,8 @@ get_ver_from_path <- function (path) {
     ver
 }
 # }}}
+
+#' @export
 # use_eplus {{{
 use_eplus <- function (eplus) {
     # if eplus is a version, try to locate it in the default path
@@ -78,6 +80,14 @@ use_eplus <- function (eplus) {
     message("EnergyPlus v", ver, " has been added to EnergyPlus location dictionary.")
 }
 # }}}
+
+#' @export
+# avail_eplus {{{
+avail_eplus <- function () {
+    names(.globals$eplus_config)
+}
+# }}}
+
 # init_avail_eplus {{{
 init_avail_eplus <- function () {
     lapply(c(8.5, 8.6, 8.7, 8.8, 8.9),
@@ -198,6 +208,8 @@ copy_run_files <- function (file, dir) {
     return(loc)
 }
 # }}}
+
+#' @export
 # run_idf {{{
 run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
                      design_day = FALSE, annual = FALSE, expand_obj = TRUE,
