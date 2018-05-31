@@ -216,6 +216,13 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # capture all arguments in dots and flatten into a list
             dots <- purrr::splice(...)
             assert_that(not_empty(dots), msg = "Please give values to set.")
+            # check if there are NA or empty string or "" in the dots
+            # check if there are fields to delete
+            is_null <- purrr::map_lgl(dots, is.null)
+            is_valid <- purrr::map_lgl(dots[!is_null], ~!is.na(.x) & length(.x) > 0 & .x != "")
+            if (any(!is_valid)) {
+                stop("Input values should be number, string or NULL.", call. = FALSE)
+            }
             # check if the dots have names
             nms <- names(dots)
             named <- all(nms != "", !is.null(nms))
@@ -340,12 +347,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # prepare values for validation
             # {{{
             value_tbl <- private$value_tbl(with_field = TRUE, all = TRUE)
+            vals <- dots
+            vals[is_null] <- rep("", sum(is_null))
             value_to_set <- value_tbl[index,
-                `:=`(value = as.character(unlist(dots)),
+                `:=`(value = as.character(unlist(vals)),
                      object_id = private$m_object_id)][index,
                 `:=`(value_upper = toupper(value),
-                     value_num = {is_num = purrr::map_lgl(dots, is.numeric);
-                         value_num[is_num]  = unlist(dots[is_num]); value_num})][,
+                     value_num = {is_num = purrr::map_lgl(vals, is.numeric);
+                         value_num[is_num]  = unlist(vals[is_num]); value_num})][,
                 `:=`(value_ipnum = value_num)]
             value_to_set <- update_value_num(
                 value_to_set,
@@ -353,37 +362,44 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 private$m_options$view_in_ip)
 
             # get the last value index
-            last_ord <- max(max(num), max(index))
+            last_ord <- max(num, index)
             # if default is TRUE
             if (defaults) {
                 # make sure all required fields with defaults will be set
                 req <- value_to_set[required_field == TRUE]
                 if (not_empty(req)) last_req <- req[, max(field_order)] else last_req <- 0L
                 last_val <- max(last_req, last_ord)
-                can_def <- value_to_set[field_order <= last_val &
-                                        is.na(value) &
-                                        !is.na(field_default), field_order]
+                can_def <- value_to_set[
+                    !field_order %in% index[is_null] & # exclude fields to be deleted
+                    field_order <= last_val &
+                    is.na(value) &
+                    !is.na(field_default),
+                    field_order]
                 # have fields with defaults
                 if (not_empty(can_def)) {
                     # only reset the last order if having defaults to set
                     last_ord <- last_val
                     value_to_set[
                         can_def,
-                        `:=`(value = field_default, value_upper = toupper(field_default))][
+                        `:=`(value = field_default,
+                             value_upper = toupper(field_default),
+                             object_id = private$m_object_id)][
                         can_def & type %in% c("integer", "real"),
                         `:=`(value_num = as.double(field_default))]
                     # print messages
                     if (private$m_options$verbose_info) {
                         cli::cat_rule("Info")
+                        dft_flds <- backtick(value_to_set$field_name[can_def])
+                        flds <- paste0(can_def, ":", dft_flds, sep = ", ")
                         cli::cat_bullet(
-                            paste0("| Values for field ",
-                                backtick_collapse(can_def),
+                            paste0("| Values for field ", flds,
                                 " are missing. Default values are added."),
                             bullet = "info")
                         cli::cat_line()
                     }
                 }
             }
+
             # fill missing value_id
             max_id <- private$m_idf_tbl$value[, max(value_id)]
             value_to_set[field_order <= last_ord & is.na(value_id),
@@ -405,7 +421,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             if (all(purrr::map_lgl(private$m_validate, is_empty))) {
                 # assign value
                 new_val_tbl <- update_value_num(private$m_temp$value_to_set)[
-                    , .SD, .SDcols = names(private$m_idf_tbl$value)]
+                    !field_order %in% index[is_null],
+                    .SD, .SDcols = names(private$m_idf_tbl$value)]
                 private$m_idf_tbl$value <- data.table::rbindlist(list(
                     private$m_idf_tbl$value[object_id != private$m_object_id],
                     new_val_tbl
