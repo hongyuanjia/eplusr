@@ -500,12 +500,12 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         reference_map = function () {
             # return reference and referenced fields
             # {{{
-            # check if this object has been referenced by others
             all_fld <- private$m_idd_tbl$field[
                 private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L][
                 private$m_idd_tbl$class, on = "class_id", nomatch = 0L,
                 list(class_id, field_id, field_order, class_name, full_name, full_ipname)]
 
+            # check if this object has been referenced by others
             ref_ed <- private$field_ref_by(with_field = TRUE)
             targ <- ref_ed[
                 private$m_idf_tbl$value[, list(value_id, value, object_id, field_id)],
@@ -514,6 +514,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             nms <- names(targ)
             dup_nms <- nms[startsWith(nms, "i.")]
             data.table::setnames(targ, dup_nms, gsub("i\\.", "target_", dup_nms))
+            data.table::setorder(targ, field_order)
+            targ[, target_object := list(lapply(target_object_id, private$IdfObject$new))]
 
             # check if this object has referenced fields from others
             ref <- private$field_ref_from(with_field = TRUE)
@@ -524,6 +526,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             nms <- names(src)
             dup_nms <- nms[startsWith(nms, "i.")]
             data.table::setnames(src, dup_nms, gsub("i\\.", "reference_", dup_nms))
+            data.table::setorder(src, field_order)
+            src[, reference_object := list(lapply(reference_object_id, private$IdfObject$new))]
 
             res <- list(reference_from = src, reference_by = targ)
             data.table::setattr(res, "class", c("IdfObjectRefMap", "list"))
@@ -626,6 +630,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         m_object_id = integer(),
         m_validate = list(),
         m_temp = NULL,
+
+        IdfObject = NULL,
+        IddObject = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS
