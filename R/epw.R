@@ -86,12 +86,12 @@ Epw <- R6::R6Class(classname = "Epw",
             # }}}
         },
 
-        longtitude = function (value) {
+        longitude = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_header$location$longtitude
+                private$m_header$location$longitude
             } else {
-                private$m_header$location$longtitude <- value
+                private$m_header$location$longitude <- value
             }
             # }}}
         },
@@ -265,7 +265,7 @@ Epw <- R6::R6Class(classname = "Epw",
                 "Data Source",
                 "WMO Number",
                 "Latitude",
-                "Longtitude",
+                "Longitude",
                 "Time Zone",
                 "Evevation")
             loc <- paste0(loc_keys, ": ", private$m_header$location)
@@ -472,15 +472,15 @@ parse_epw_file <- function (path, strict = TRUE) {
     location[["data_source"]] <- loc[5]
     location[["wmo_number"]] <- loc[6]
     location[["latitude"]] <- suppressWarnings(as.double(loc[7]))
-    location[["longtitude"]] <- suppressWarnings(as.double(loc[8]))
+    location[["longitude"]] <- suppressWarnings(as.double(loc[8]))
     location[["time_zone"]] <- suppressWarnings(as.double(loc[9]))
     location[["elevation"]] <- suppressWarnings(as.double(loc[10]))
     if (is.na(location[["latitude"]])) {
         stop("Non-numerical latitude found in EPW file ", backtick(path),
              ": ", backtick(loc[7]), ".", call. = FALSE)
     }
-    if (is.na(location[["longtitude"]])) {
-        stop("Non-numerical longtitude found in EPW file ", backtick(path),
+    if (is.na(location[["longitude"]])) {
+        stop("Non-numerical longitude found in EPW file ", backtick(path),
              ": ", backtick(loc[8]), ".", call. = FALSE)
     }
     if (is.na(location[["time_zone"]])) {
