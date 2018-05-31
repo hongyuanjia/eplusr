@@ -351,6 +351,7 @@
 #' @importFrom uuid UUIDgenerate
 NULL
 
+#' @export
 # Idf {{{
 Idf <- R6::R6Class(classname = "Idf",
     inherit = Idd,
