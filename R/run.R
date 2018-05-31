@@ -210,6 +210,41 @@ copy_run_files <- function (file, dir) {
 # }}}
 
 #' @export
+# clean_wd {{{
+clean_wd <- function (model_path) {
+
+    without_ext <- tools::file_path_sans_ext(model_path)
+    wd <- dirname(model_path)
+
+    # files_to_delete {{{
+    suffix <- c(".Zsz", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dfs",
+                         ".dxf", ".edd", ".eio", ".end", ".epmdet", ".epmidf",
+                         ".err", ".eso", ".expidf", ".inp", ".log", ".mat", ".mdd",
+                         ".mtd", ".mtr", ".rdd", ".rvaudit", ".sci", ".shd", ".sln",
+                         ".sql", ".ssz", ".svg", ".tab", ".txt", ".wrl",
+                         "DElight.dfdmp", "DElight.eldmp", "DElight.in",
+                         "DElight.out", "DFS.csv", "Map.csv", "Map.tab", "Map.txt",
+                         "Meter.csv", "Meter.tab", "Meter.txt", "Screen.csv",
+                         "Spark.log", "Sqlite.err", "Ssz.csv", "Ssz.tab",
+                         "Ssz.txt", "Table.csv", "Table.htm", "Table.html",
+                         "Table.tab", "Table.txt", "Table.xml", "Zsz.csv",
+                         "Zsz.tab", "Zsz.txt")
+    out_files <- paste0(without_ext, suffix)
+
+    individual <- c("BasementGHTIn.idf", "audit.out", "expanded.idf",
+                   "expandedidf.err", "in.epw", "in.idf", "in.imf", "in.stat",
+                   "out.idf", "readvars.audit", "slab.int", "sqlite.err",
+                   "test.mvi", "fort.6")
+    seperates <- normalizePath(file.path(wd, individual), mustWork = FALSE)
+
+    target <- c(out_files, seperates)
+    # }}}
+
+    purrr::walk(target, unlink)
+}
+# }}}
+
+#' @export
 # run_idf {{{
 run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
                      design_day = FALSE, annual = FALSE, expand_obj = TRUE,
@@ -234,6 +269,8 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
     # copy input files
     loc_m <- copy_run_files(model, output_dir)
     loc_w <- copy_run_files(weather, output_dir)
+    # clean output directory
+    clean_wd(model)
 
     # set working dirctory
     ori_wd <- getwd()
@@ -258,142 +295,3 @@ run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
     }
 }
 # }}}
-
-# # days_in_month {{{
-# days_in_month <- function (x) {
-#     days_all <- c(`1` = 31L, `2` = 28L, `3` = 31L,
-#                   `4` = 30L, `5` = 31L, `6` = 30L,
-#                   `7` = 31L, `8` = 31L, `9` = 30L,
-#                   `10` = 31L, `11` = 30L, `12` = 31L)
-#     unname(days_all[which(names(days_all) == month(x))])
-# }
-# # }}}
-# # format_runperiod {{{
-# format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
-
-#     side <- match.arg(side)
-
-#     # just a random non-leep year
-#     const_year <- 2017L
-
-#     if (as.character(runperiod) %in% c("asis", "annual", "design_day")) {
-#         return(runperiod)
-#     }
-
-#     split_str <- unlist(strsplit(as.character(runperiod), "[-/.]|[[:space:]]"))
-
-#     # handle month
-#     if (length(split_str) == 1L) {
-#         out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", split_str), truncated = 1L))
-#         if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
-
-#         if (side == "rhs") {
-#             total_days <- days_in_month(out)
-#             out <- lubridate::ymd(paste0(const_year, "-", split_str, "-", total_days))
-#         }
-
-#     } else if (length(split_str) == 2L) {
-#         out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", paste0(split_str, collapse = "-"))))
-#     } else {
-#         stop("Cannot parse run period.", call. = FALSE)
-#     }
-
-#     if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
-
-#     return(out)
-# }
-# # }}}
-# # parse_runperiod {{{
-# parse_runperiod <- function (runperiod) {
-#     # NOTE: inspired by `tibbletime` package.
-#     # lhs/rhs list
-#     rp <- list(lhs = rlang::f_lhs(runperiod), rhs = rlang::f_rhs(runperiod))
-
-#     # Environment to evaluate the sides in
-#     rp_env <- rlang::f_env(runperiod)
-#     rp_env$. <- "asis"
-
-#     # Tidy evaluation
-#     rp <- lapply(rp,
-#         function(x) {
-#             rlang::eval_tidy(x, env = rp_env)
-#         }
-#     )
-
-#     # Double up if 1 sided
-#     # length = 2 means that it has ~ and 1 side
-#     if (length(runperiod) == 2) {
-#         rp$lhs <- rp$rhs
-#     }
-
-#     out <- list(start = NA, end = NA)
-#     out$start <- format_runperiod(rp$lhs, "lhs")
-#     out$end <- format_runperiod(rp$rhs, "rhs")
-
-#     if (out$end %in% c("annual", "design_day", "asis") &&
-#         as.character(out$start) != out$end) {
-#         stop(msg("Invalid run period formula. Left hand side should be empty if
-#                  right hand side is 'annual', 'design_day', or '.'."),
-#                  call. = FALSE)
-#     } else if (out$start %in% c("annual", "design_day", "asis") &&
-#                out$start != as.character(out$end)) {
-#         stop(msg("Invalid run period formula. Formula should be in a format of
-#                  '~RHS' if 'annual', 'design_day' or '.' is used."),
-#                  call. = FALSE)
-#     } else if (out$start > out$end) {
-#         stop(msg("Invalid run period formula. Start date should be smaller than
-#                  end date."), call. = FALSE)
-#     }
-
-#     out
-# }
-# # }}}
-# # set_runperiod {{{
-# set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
-#     rp <- parse_runperiod(runperiod)
-
-#     setattr(idf, "runperiod", rp)
-
-#     if (rp$end %in% c("asis", "annual", "design_day")) return(idf)
-
-#     ids <- get_id(idf, "RunPeriod")
-
-#     # if the model has already been set before, use it
-#     if (not_empty(ids)) {
-#         rp_eplusr <- idf$value[object_id %in% ids][field_order == 1L][
-#             value == "run_period_eplusr", object_id]
-#         rp_others <- setdiff(ids, rp_eplusr)
-#         if (not_empty(rp_eplusr)) {
-#             idf <- invisible(
-#                 set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
-#                            begin_month = month(rp$start),
-#                            begin_day_of_month = mday(rp$start),
-#                            end_month = month(rp$end),
-#                            end_day_of_month = mday(rp$end), idd = idd)
-#             )
-#         } else {
-#             idf <- invisible(
-#                 add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
-#                            begin_month = month(rp$start),
-#                            begin_day_of_month = mday(rp$start),
-#                            end_month = month(rp$end),
-#                            end_day_of_month = mday(rp$end), idd = idd)
-#             )
-#         }
-
-#         if (hide_others && not_empty(rp_others)) {
-#             for (i in rp_others) {
-#                 idf <- add_comment(idf, i, append = FALSE, type = 1L,
-#                                    "[ * Commented out automatically by eplusr * ]")
-#                 idf <- del_object(idf, i, idd, hide = TRUE)
-#             }
-#             warning(msg(sprintf("Objects in class %s with ID %s has/have been
-#                                 commented out to use the input run period.",
-#                                 backtick("RunPeriod"),
-#                                 paste(rp_others, collapse = ", "))), call. = FALSE)
-#         }
-#     }
-
-#     return(idf)
-# }
-# # }}}
