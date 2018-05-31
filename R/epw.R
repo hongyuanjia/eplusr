@@ -717,7 +717,7 @@ parse_epw_file <- function (path, strict = TRUE) {
         stop("Header start date does not match data in EPW file ", backtick(path), call. = FALSE)
     }
     last_date_list <- epw_data[.N, list(datetime, hour, minute)]
-    if (last_date_list[["hour"]] == 24L && last_date_list[["minute"]] == 0L) {
+    if (last_date_list[["hour"]] == 24L) {
         last_date <- last_date_list[["datetime"]] - lubridate::days(1)
     } else {
         last_date <- last_date_list[["datetime"]]
