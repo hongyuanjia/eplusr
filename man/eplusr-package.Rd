@@ -59,6 +59,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Hongyuan Jia \email{hongyuanjia@cqu.edu.cn}
+\strong{Maintainer}: Hongyuan Jia \email{hongyuanjia@cqu.edu.cn} (0000-0002-0075-8183)
 
 }
