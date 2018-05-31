@@ -80,8 +80,8 @@ format_output <- function (value_tbl, comment_tbl, options) {
 format_refmap <- function (ref_map, in_ip = FALSE) {
     assert_that(inherits(ref_map, "IdfObjectRefMap"))
 
-    ref_by <- format_refmap_sgl(ref_map[["reference_by"]], "by", in_ip)
-    ref_from <- format_refmap_sgl(ref_map[["reference_from"]], "from", in_ip)
+    ref_by <- format_refmap_sgl(ref_map$reference_by, "by", in_ip)
+    ref_from <- format_refmap_sgl(ref_map$reference_from, "from", in_ip)
 
     out <- c(ref_by, ref_from)
     return(out)
@@ -100,12 +100,11 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 
         nms <- names(ref_sgl)
         prefix <- switch(type, by = "target_", from = "reference_")
-        is_other <- grep(prefix, nms, fixed = TRUE)
+        is_other <- setdiff(grep(prefix, nms, fixed = TRUE), paste0(prefix, "object"))
         self <- ref_sgl[, .SD, .SDcols = nms[-is_other]]
         other <- ref_sgl[, .SD, .SDcols = c("value_id", nms[is_other])]
         data.table::setnames(other,
             c("ori_value_id", gsub(prefix, "", nms[is_other], fixed = TRUE)))
-
         sp_self <- split(unique(self), by = "value_id")
         sp_other <- split(other, by = "ori_value_id")
         fld_self <- purrr::map(sp_self, format_objects, in_ip = in_ip)
