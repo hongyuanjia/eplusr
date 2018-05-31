@@ -1102,6 +1102,7 @@ Idf <- R6::R6Class(classname = "Idf",
             own_idfobject$self$private_fields$m_options <- private$m_options
             own_idfobject$self$private_fields$m_log <- private$m_log
             private$IdfObject <- own_idfobject
+            private$IdfObject$self$private_fields$IdfObject <- own_idfobject
             # }}}
         },
 
