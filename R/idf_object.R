@@ -785,3 +785,88 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
     )
 )
 # }}}
+
+# [.IdfObject {{{
+'[.IdfObject' <- function(x, i, j, ...) {
+    if (!missing(j)) {
+        stop("incorrect number of dimensions.", call. = FALSE)
+    }
+    if (missing(i)) {
+        x
+    } else {
+        if (is.character(i)) {
+            .subset2(x, "get_value")(name = i)
+        } else if (is.numeric(i)){
+            .subset2(x, "get_value")(index = i)
+        } else {
+            stop("i should be an integer or string.", call. = FALSE)
+        }
+    }
+}
+# }}}
+# [<-.IdfObject {{{
+'[<-.IdfObject' <- function(x, i, j, ..., value) {
+    if (!missing(j)) {
+        stop("incorrect number of dimensions.", call. = FALSE)
+    }
+    if (missing(i)) {
+        stop("Missing field index or name.", call. = FALSE)
+    } else {
+        if (is.character(i)) {
+            nms <- i
+        } else if (is.numeric(i)){
+            nms <- .subset2(x, "field_name")(index = i)
+        } else {
+            stop("i should either integers or strings.", call. = FALSE)
+        }
+    }
+    names(value) <- nms
+    .subset2(x, "set_value")(value)
+}
+# }}}
+# [[.IdfObject {{{
+'[[.IdfObject' <- function(x, i, j, ..., drop = FALSE) {
+    if (!missing(j)) {
+        stop("incorrect number of dimensions.", call. = FALSE)
+    }
+    if (missing(i)) {
+        stop("Missing field index or name.", call. = FALSE)
+    } else {
+        if (length(i) == 1L) {
+            if (is.character(i)) {
+                .subset2(x, "get_value")(name = i)[[1]]
+            } else if (is.numeric(i)){
+                .subset2(x, "get_value")(index = i)[[1]]
+            } else {
+                stop("i should either integers or strings.", call. = FALSE)
+            }
+        } else {
+            stop("subscript out of bounds.", call. = FALSE)
+        }
+    }
+}
+# }}}
+# [[<-.IdfObject {{{
+'[[<-.IdfObject' <- function(x, i, j, ..., value) {
+    if (!missing(j)) {
+        stop("incorrect number of dimensions.", call. = FALSE)
+    }
+    if (missing(i)) {
+        stop("Missing field number or name.", call. = FALSE)
+    } else {
+        if (length(i) == 1L) {
+            if (is.character(i)) {
+                nm <- i
+            } else if (is.numeric(i)){
+                nm <- .subset2(x, "field_name")(i)
+            } else {
+                stop("i should either integers or strings.", call. = FALSE)
+            }
+            names(value) <- nm
+            .subset2(x, "set_value")(value)
+        } else {
+            stop("subscript out of bounds.", call. = FALSE)
+        }
+    }
+}
+# }}}
