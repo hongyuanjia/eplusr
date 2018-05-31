@@ -5,7 +5,8 @@ Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
            role = c("aut", "cre"),
-           email = "hongyuanjia@cqu.edu.cn")
+           email = "hongyuanjia@cqu.edu.cn",
+           comment = c(ORCID = "0000-0002-0075-8183"))
 Description: This package provides tools to run EnergyPlus and collect,
     analyse, summary and plot parametric simulation results in R.
 License: GPL-3 + file LICENSE
@@ -25,7 +26,13 @@ Imports:
     progress,
     purrr,
     processx,
-    xml2
+    xml2,
+    units,
+    uuid,
+    cli,
+    clisymbols,
+    readr,
+    RSQLite
 Suggests:
     testthat,
     covr
