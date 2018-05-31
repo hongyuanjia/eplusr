@@ -789,7 +789,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             target <- self$object(id)
             cls <- target$class_name()
-            # ckeck
+            # check
             # {{{
             # stop if target object is a `Version` object
             if (cls == "Version") {
