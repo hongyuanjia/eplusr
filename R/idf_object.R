@@ -214,14 +214,16 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # {{{
             assert_that(!self$is_version(), msg = "Cannot modify `Version` object directly.")
             # capture all arguments in dots and flatten into a list
-            dots <- purrr::splice(...)
+            dots <- as.list(...)
             assert_that(not_empty(dots), msg = "Please give values to set.")
+            depth <- purrr::vec_depth(dots)
+            assert_that(depth == 2L, msg = "Nested list is not supported.")
             # check if there are NA or empty string or "" in the dots
             # check if there are fields to delete
             is_null <- purrr::map_lgl(dots, is.null)
-            is_valid <- purrr::map_lgl(dots[!is_null], ~!is.na(.x) & length(.x) > 0 & .x != "")
+            is_valid <- purrr::map_lgl(dots[!is_null], ~any(!is.na(.x) & length(.x) > 0))
             if (any(!is_valid)) {
-                stop("Input values should be number, string or NULL.", call. = FALSE)
+                stop("Input values should be numbers, strings or NULLs.", call. = FALSE)
             }
             # check if the dots have names
             nms <- names(dots)
@@ -353,8 +355,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 `:=`(value = as.character(unlist(vals)),
                      object_id = private$m_object_id)][index,
                 `:=`(value_upper = toupper(value),
-                     value_num = {is_num = purrr::map_lgl(vals, is.numeric);
-                         value_num[is_num]  = unlist(vals[is_num]); value_num})][,
+                     value_num = {
+                         is_num = purrr::map_lgl(vals, is.numeric);
+                         value_num[is_num] = unlist(vals[is_num]);
+                         value_num[!is_num] = NA_real_;
+                         value_num})][,
                 `:=`(value_ipnum = value_num)]
             value_to_set <- update_value_num(
                 value_to_set,
