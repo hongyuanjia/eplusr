@@ -678,10 +678,10 @@ parse_epw_file <- function (path, strict = TRUE) {
                  backtick(path), ". Data will be treated as typical (TMY).",
                  call. = FALSE)
     }
-    # check if warp around
-    epw_data[, dt_month := lubridate::month(datetime)]
-    epw_data[, dt_month_shifted := lubridate::month(datetime_shifted)]
-    wrap_around <- epw_data[-.N][dt_month < dt_month_shifted, .N > 0L]
+    # # check if warp around
+    # epw_data[, dt_month := lubridate::month(datetime)]
+    # epw_data[, dt_month_shifted := lubridate::month(datetime_shifted)]
+    # wrap_around <- epw_data[-.N][dt_month < dt_month_shifted, .N > 0L]
 
     # check for agreement between the file value and the computed value
     min_per_rcd <- 60L/data_periods[["time_step"]]
@@ -704,7 +704,6 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     # check NAs
     epw_data[, `:=`(datetime_shifted = NULL, datetime_delta = NULL,
-                    dt_month = NULL, dt_month_shifted = NULL,
                     dt_minute = NULL, dt_minute_cal = NULL)]
     na_epw_data <- na.omit(epw_data, invert = TRUE)
     if (not_empty(na_epw_data)) {
@@ -738,9 +737,9 @@ parse_epw_file <- function (path, strict = TRUE) {
             data_periods[["end_date_actual_year"]] <- lubridate::year(end_date)
         }
     }
-    if (!real_year && wrap_around) {
-        stop("Wrap around years not supported for TMY data, EPW file ", backtick(path), call. = FALSE)
-    }
+    # if (!real_year && wrap_around) {
+    #     stop("Wrap around years not supported for TMY data, EPW file ", backtick(path), call. = FALSE)
+    # }
     # }}}
 
     # set column order
