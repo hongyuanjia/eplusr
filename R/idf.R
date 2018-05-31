@@ -545,6 +545,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
+        # TODO: using object name to get object
         object = function (id) {
             # return a single object
             # {{{
