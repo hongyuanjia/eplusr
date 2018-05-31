@@ -1,8 +1,27 @@
+# What actually used by EnergyPlus:
+# dry bulb temperature
+# dew point temperature
+# relative humidity
+# atmospheric pressure
+# horizontal infrared radiation intensity from sky
+# direct normal radiation
+# diffuse horizontal radiation
+# wind direction
+# wind spped
+# present weather observation
+# present weather codes
+# snow depth
+# liquid precipitation depth
+# liquid precipitation rate
+
 #' @importFrom R6 R6Class
-#' @importFrom data.table copy fwrite
+#' @importFrom data.table copy fwrite between
 #' @importFrom readr write_lines
 #' @importFrom cli cat_line rule cat_bullet
+#' @importFrom lubridate year month mday
+#' @importFrom purrr keep
 #' @importFrom units ud_units
+#' @export
 # Epw {{{
 Epw <- R6::R6Class(classname = "Epw",
     # ACTIVE {{{
@@ -10,9 +29,9 @@ Epw <- R6::R6Class(classname = "Epw",
         city = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$city
+                private$m_header$location$city
             } else {
-                private$m_location$city <- value
+                private$m_header$location$city <- value
             }
             # }}}
         },
@@ -20,9 +39,9 @@ Epw <- R6::R6Class(classname = "Epw",
         state_province = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$state_province
+                private$m_header$location$state_province
             } else {
-                private$m_location$state_province <- value
+                private$m_header$location$state_province <- value
             }
             # }}}
         },
@@ -30,9 +49,9 @@ Epw <- R6::R6Class(classname = "Epw",
         country = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$country
+                private$m_header$location$country
             } else {
-                private$m_location$country <- value
+                private$m_header$location$country <- value
             }
             # }}}
         },
@@ -40,9 +59,9 @@ Epw <- R6::R6Class(classname = "Epw",
         data_source = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$data_source
+                private$m_header$location$data_source
             } else {
-                private$m_location$data_source <- value
+                private$m_header$location$data_source <- value
             }
             # }}}
         },
@@ -50,9 +69,9 @@ Epw <- R6::R6Class(classname = "Epw",
         wmo_number = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$wmo_number
+                private$m_header$location$wmo_number
             } else {
-                private$m_location$wmo_number <- value
+                private$m_header$location$wmo_number <- value
             }
             # }}}
         },
@@ -60,9 +79,9 @@ Epw <- R6::R6Class(classname = "Epw",
         latitude = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$latitude
+                private$m_header$location$latitude
             } else {
-                private$m_location$latitude <- value
+                private$m_header$location$latitude <- value
             }
             # }}}
         },
@@ -70,9 +89,9 @@ Epw <- R6::R6Class(classname = "Epw",
         longtitude = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$longtitude
+                private$m_header$location$longtitude
             } else {
-                private$m_location$longtitude <- value
+                private$m_header$location$longtitude <- value
             }
             # }}}
         },
@@ -80,9 +99,9 @@ Epw <- R6::R6Class(classname = "Epw",
         time_zone = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$time_zone
+                private$m_header$location$time_zone
             } else {
-                private$m_location$time_zone <- value
+                private$m_header$location$time_zone <- value
             }
             # }}}
         },
@@ -90,9 +109,29 @@ Epw <- R6::R6Class(classname = "Epw",
         elevation = function (value) {
             # {{{
             if (missing(value)) {
-                private$m_location$elevation
+                private$m_header$location$elevation
             } else {
-                private$m_location$elevation <- value
+                private$m_header$location$elevation <- value
+            }
+            # }}}
+        },
+
+        time_step = function (value) {
+            # {{{
+            if (missing(value)) {
+                private$m_header$data_periods$time_step
+            } else {
+                private$m_header$data_periods$time_step <- value
+            }
+            # }}}
+        },
+
+        start_day_of_week = function (value) {
+            # {{{
+            if (missing(value)) {
+                private$m_header$data_periods$start_day_of_week
+            } else {
+                private$m_header$data_periods$start_day_of_week <- value
             }
             # }}}
         }
@@ -111,9 +150,7 @@ Epw <- R6::R6Class(classname = "Epw",
             }
 
             epw_file <- parse_epw_file(path)
-            private$m_location <- epw_file$location
-            private$m_header_unparsed <- epw_file$header_unparsed
-            private$m_data_periods <- epw_file$data_periods
+            private$m_header <- epw_file$header
             private$m_data <- private$set_na(epw_file$data)
         },
         # }}}
@@ -146,7 +183,7 @@ Epw <- R6::R6Class(classname = "Epw",
                 }
                 d
             } else {
-                private$m_data
+                data.table::copy(private$m_data)
             }
             # }}}
         },
@@ -171,18 +208,18 @@ Epw <- R6::R6Class(classname = "Epw",
             if (file.exists(path)) {
                 if (!overwrite) {
                     stop("Target already exists. Please set `overwrite` to ",
-                         "FALSE if you want to replace it.", call. = FALSE)
+                         "TRUE if you want to replace it.", call. = FALSE)
                 }
             }
+            header <- private$m_header
+            header$location <- paste0("LOCATION,", paste0(private$m_header$location, collapse = ","))
 
-            loc <- paste0("LOCATION,", paste0(private$m_location, collapse = ","))
-
-            data_periods <- private$m_data_periods
+            data_periods <- private$m_header$data_periods
             start_date <- data_periods$start_date
             start_month <- lubridate::month(start_date)
             start_day <- lubridate::mday(start_date)
             start <- paste0(lpad(start_month, width = 2L), "/", lpad(start_day, width = 2L))
-            end_date <- private$m_data_periods$end_date
+            end_date <- private$m_header$data_periods$end_date
             end_month <- lubridate::month(end_date)
             end_day <- lubridate::mday(end_date)
             end <- paste0(lpad(end_month, width = 2L), "/", lpad(end_day, width = 2L))
@@ -192,13 +229,24 @@ Epw <- R6::R6Class(classname = "Epw",
                 start <- paste0(start, "/", start_year)
                 end <- paste0(end, "/", end_year)
             }
-            dp <- paste("DATA PERIODS",
+            header$data_periods <- paste("DATA PERIODS",
                          data_periods$n_data_period,
                          data_periods$time_step,
                          "Data",
                          data_periods$start_day_of_week,
                          start, end, sep = ",")
-            header <- c(loc, private$m_header_unparsed, dp)
+
+            hldys_dlt_svgs <- private$m_header$holidays_daylight_savings
+            hldys_dlt_svgs$leap_year <- ifelse(hldys_dlt_svgs$leap_year, "yes", "no")
+            if (is.na(hldys_dlt_svgs$dls_start_day)) hldys_dlt_svgs$dls_start_day <- "0"
+            if (is.na(hldys_dlt_svgs$dls_end_day)) hldys_dlt_svgs$dls_end_day <- "0"
+            if (hldys_dlt_svgs$num_of_holiday == 0L) {
+                hldys_dlt_svgs$holidays <- NULL
+            }
+            header$holidays_daylight_savings <- paste0(
+                c("HOLIDAYS/DAYLIGHT SAVINGS", hldys_dlt_svgs), collapse = ",")
+
+            header <- purrr::keep(header, not_empty)
             readr::write_lines(header, path)
 
             d <- data.table::copy(private$m_data)[, `:=`(datetime = NULL)]
@@ -211,30 +259,33 @@ Epw <- R6::R6Class(classname = "Epw",
         print = function () {
             cli::cat_line(cli::rule("EnergyPlus Weather File"))
             loc_keys <- c(
-                "[ City       ]",
-                "[ State      ]",
-                "[ Country    ]",
-                "[ Data Source]",
-                "[ WMO Number ]",
-                "[ Latitude   ]",
-                "[ Longtitude ]",
-                "[ Time Zone  ]",
-                "[ Evevation  ]")
-            loc <- paste0(loc_keys, ": ", private$m_location)
+                "City",
+                "State",
+                "Country",
+                "Data Source",
+                "WMO Number",
+                "Latitude",
+                "Longtitude",
+                "Time Zone",
+                "Evevation")
+            loc <- paste0(loc_keys, ": ", private$m_header$location)
 
             dp_keys <- c(
-                "[ Period Num ]",
-                "[ Time Step  ]",
-                "[ Date Range ]")
-            dp <- private$m_data_periods
+                "Period Num ",
+                "Time Step",
+                "Date Range",
+                "Start Weekday")
+            dp <- private$m_header$data_periods
             start_date <- format(dp$start_date, "%b %d")
             end_date <- format(dp$end_date, "%b %d")
             range <- paste0(start_date, " - ", end_date)
+            weekday <- dp$start_day_of_week
 
             dp <- paste0(dp_keys, ": ",
                          c(dp$n_data_periods,
-                           paste0(dp$time_step * 10, " min"),
-                           range))
+                           paste0(60/ dp$time_step, " min"),
+                           range,
+                           weekday))
 
             cli::cat_bullet(loc)
             cli::cat_bullet(dp)
@@ -243,9 +294,7 @@ Epw <- R6::R6Class(classname = "Epw",
 
     private = list(
         m_path = NULL,
-        m_location = NULL,
-        m_header_unparsed = NULL,
-        m_data_periods = NULL,
+        m_header = NULL,
         m_data = NULL,
 
         set_units = function () {
@@ -348,7 +397,7 @@ Epw <- R6::R6Class(classname = "Epw",
               is.na(opaque_sky_cover), opaque_sky_cover := 99][
               is.na(visibility), visibility := 9999][
               is.na(ceiling_height), ceiling_height := 99999][
-              is.na(present_weather_codes), present_weather_codes := 999999999][
+              is.na(present_weather_codes), present_weather_codes := "999999999"][
               is.na(precipitable_water), precipitable_water := 999][
               is.na(aerosol_optical_depth), aerosol_optical_depth := 0.999][
               is.na(snow_depth), snow_depth := 999][
@@ -365,16 +414,48 @@ Epw <- R6::R6Class(classname = "Epw",
 #' @importFrom readr read_lines
 #' @importFrom stringr str_trim
 #' @importFrom data.table fread setnames shift
+#' @importFrom purrr map map_lgl
 #' @importFrom fasttime fastPOSIXct
 # parse_epw_file {{{
 parse_epw_file <- function (path, strict = TRUE) {
-    header <- readr::read_lines(path, n_max = 8L)
+    num_header <- 8L
+    header <- readr::read_lines(path, n_max = num_header)
     header <- stringr::str_trim(header, "left")
 
-    # parse first line: "LOCATION"
+    # read head pairs {{{
+    header_key <- c("LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS",
+      "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVINGS", "COMMENTS 1",
+      "COMMENTS 2", "DATA PERIODS" )
+    l_header_pairs <- purrr::map(header_key, grep, x = header, fixed = TRUE)
+    names(l_header_pairs) <- header_key
+    missing_header <- purrr::map_lgl(l_header_pairs, is_empty)
+    to_parse <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE)
+
+    if (any(missing_header)) {
+        if (any(missing_header[to_parse])) {
+            stop("Missing ", backtick_collapse(missing_header[to_parse]), " specifier ",
+                 "in EPW file ", backtick(path), ".", call. = FALSE)
+        } else {
+            l_unknown <- seq_len(num_header)[missing_header]
+            l_known <- as.integer(l_header_pairs[!missing_header])
+
+            if (any(l_unknown < max(l_known))) {
+                stop("Invalid header line found in EPW file ", backtick(path), ": \n",
+                     paste0(backtick(header[l_unknown]), collapse = "\n"),
+                     call. = FALSE)
+            } else {
+                num_header <- max(l_known)
+            }
+        }
+    }
+    header_pairs <- purrr::map(l_header_pairs, ~header[.x])
+    names(header_pairs) <- tolower(gsub("[^A-Z0-9]", "_", names(header_pairs)))
+    # }}}
+
+    # parse line: "LOCATION"
     # {{{
     # LOCATION, city, stateProvinceRegion, country, dataSource, wmoNumber, latitude, longitude, timeZone, elevation
-    loc <- stringr::str_trim(strsplit(header[1], ",")[[1]])
+    loc <- stringr::str_trim(strsplit(header_pairs$location, ",")[[1]])
     len_loc <- length(loc)
     if (len_loc < 10L) {
         stop("Expected 10 location fields rather than ", backtick(len_loc),
@@ -384,21 +465,16 @@ parse_epw_file <- function (path, strict = TRUE) {
                 " fields in EPW file ", backtick(path), ".", call. = FALSE)
     }
 
-    if (loc[1] != "LOCATION") {
-        stop("Missing `LOCATION` specifier in EPW file ", backtick(path), ".",
-             call. = FALSE)
-    }
-
     location <- list()
     location[["city"]] <- loc[2]
     location[["state"]] <- loc[3]
     location[["country"]] <- loc[4]
     location[["data_source"]] <- loc[5]
     location[["wmo_number"]] <- loc[6]
-    location[["latitude"]] <- as.double(loc[7])
-    location[["longtitude"]] <- as.double(loc[8])
-    location[["time_zone"]] <- as.double(loc[9])
-    location[["elevation"]] <- as.double(loc[10])
+    location[["latitude"]] <- suppressWarnings(as.double(loc[7]))
+    location[["longtitude"]] <- suppressWarnings(as.double(loc[8]))
+    location[["time_zone"]] <- suppressWarnings(as.double(loc[9]))
+    location[["elevation"]] <- suppressWarnings(as.double(loc[10]))
     if (is.na(location[["latitude"]])) {
         stop("Non-numerical latitude found in EPW file ", backtick(path),
              ": ", backtick(loc[7]), ".", call. = FALSE)
@@ -417,11 +493,11 @@ parse_epw_file <- function (path, strict = TRUE) {
     }
     # }}}
 
-    # parse 8th line: "DATA PERIODS"
+    # parse line: "DATA PERIODS"
     # {{{
     # DATA PERIODS, nDataPeriods, timeStep, startDayOfWeek, startDate, endDate
     # NOTE THAT ONLY ONE DATA PERIOD IS SUPPORTED
-    dp <- stringr::str_trim(strsplit(header[8], ",")[[1]])
+    dp <- stringr::str_trim(strsplit(header_pairs$data_periods, ",")[[1]])
     len_dp <- length(dp)
     if(len_dp < 7L) {
         stop("Expected 7 data period fields rather than the ", backtick(len_dp),
@@ -430,13 +506,9 @@ parse_epw_file <- function (path, strict = TRUE) {
         warning("Expected 7 data period fields rather than the ", backtick(len_dp),
                 " fields in EPW file ", backtick(path), ".", call. = FALSE)
     }
-    if (dp[1] != "DATA PERIODS") {
-        stop("Missing `DATA PERIODS` specifier in EPW file ", backtick(path), ".",
-             call. = FALSE)
-    }
     data_periods <- list()
-    data_periods[["n_data_periods"]] <- as.integer(dp[2])
-    data_periods[["time_step"]] <- as.integer(dp[3])
+    data_periods[["n_data_periods"]] <- suppressWarnings(as.integer(dp[2]))
+    data_periods[["time_step"]] <- suppressWarnings(as.integer(dp[3]))
     data_periods[["start_day_of_week"]] <- dp[5]
     data_periods[["start_date"]] <- dp[6]
     data_periods[["end_date"]] <- dp[7]
@@ -475,52 +547,119 @@ parse_epw_file <- function (path, strict = TRUE) {
     data_periods[["is_real_year"]] <- real_year
     # }}}
 
-    # store unparsed head lines
-    header_unparsed <- header[2L:7L]
+    # parse line: "HOLIDAYS/DAYLIGHT SAVINGS"
+    # {{{
+    # HOLIDAYS/DAYLIGHT SAVINGS, LeapYear Observed?, Daylight Saving Start Day, Daylight Saving End Day, Number of Holidays, Holiday 1 Name, Holiday 1 Day
+    # NOTE THAT ONLY ONE DATA PERIOD IS SUPPORTED
+    ho <- stringr::str_trim(strsplit(header_pairs$holidays_daylight_savings, ",")[[1]])
+    len_ho <- length(ho)
+    if(len_ho < 5L) {
+        stop("Expected at least 5 holidays and daylight saving fields rather ",
+             "than the ", backtick(len_ho), " fields in EPW file ",
+             backtick(path), ".", call. = FALSE)
+    }
+
+    holidays_dls <- list()
+    leap_year <- ho[2]
+    dls_start_day <- ifelse(ho[3] == "0", NA, ho[3])
+    dls_end_day <- ifelse(ho[4] == "0", NA, ho[4])
+    num_of_holiday <- suppressWarnings(as.integer(ho[5]))
+    ho_data <- ho[-(1:5)]
+
+    if (!tolower(leap_year) %in% c("yes", "no")) {
+        stop("Value of LeapYear Observed is neither `yes` nor `no` in EPW file ",
+             backtick(path), ": ", backtick(leap_year), ".", call. = FALSE)
+    }
+    holidays_dls[["leap_year"]] <- ifelse(tolower(leap_year) == "yes", TRUE, FALSE)
+
+    if (!is.na(dls_start_day) & is.na(dls_end_day)) {
+        stop("Daylight saving start day specified without daylight saving end day.",
+             call. = FALSE)
+    }
+    if (is.na(dls_start_day) & !is.na(dls_end_day)) {
+        stop("Daylight saving end day specified without daylight saving start day.",
+             call. = FALSE)
+    }
+    holidays_dls[["dls_start_day"]] <- dls_start_day
+    holidays_dls[["dls_end_day"]] <- dls_end_day
+
+    if (is.na(num_of_holiday)) {
+        stop("Non-integral number of holiday number in EPW file ", backtick(path),
+             ": ", backtick(ho[5]), ".", call. = FALSE)
+    } else if (num_of_holiday < 0L) {
+        stop("Non-positive number of holiday number in EPW file ", backtick(path),
+             ": ", backtick(ho[5]), ".", call. = FALSE)
+    } else if (num_of_holiday > 0L){
+        if ((length(ho) - 5L) != num_of_holiday * 2L) {
+            stop("Expected ", num_of_holiday, " holiday data rather ",
+                 "than the", backtick((length(ho) - 5L) %/% 2L), " in EPW file ",
+                 backtick(path), ".", call. = FALSE)
+        } else {
+            holidays <- ho_data[rep(c(FALSE, TRUE), length = num_of_holiday)]
+            names(holidays) <- ho_data[rep(c(TRUE, FALSE), length = num_of_holiday)]
+        }
+    }
+    holidays_dls[["num_of_holiday"]] <- num_of_holiday
+    if (num_of_holiday == 0L) {
+        holidays_dls["holidays"] <- list(NULL)
+    } else {
+        holidays_dls[["holidays"]] <- holidays
+    }
+    # }}}
 
     # parse the rest of file
     # colnames refers to column "Long Name" in Table 2.8 in
     # "AuxiliaryPrograms.pdf" of EnergyPlus 8.6
     # {{{
-    epw_data <- data.table::fread(path, skip = 8L)
-    if (ncol(epw_data) != 35L) {
+    header_epw_data <- data.table::fread(path, skip = num_header, nrows = 0L)
+    if (ncol(header_epw_data) != 35L) {
         stop("Expected 35 fields in EPW data instead of the ",
              backtick(ncol(epw_data)), " recieved in EPW file ",
              backtick(path), ".", call. = FALSE)
     }
 
-    data.table::setnames(epw_data, c(
-        "year", "month", "day", "hour", "minute", "datasource",
-        "dry_bulb_temperature",
-        "dew_point_temperature",
-        "relative_humidity",
-        "atmospheric_pressure",
-        "extraterrestrial_horizontal_radiation",
-        "extraterrestrial_direct_normal_radiation",
-        "horizontal_infrared_radiation_intensity_from_sky",
-        "global_horizontal_radiation",
-        "direct_normal_radiation",
-        "diffuse_horizontal_radiation",
-        "global_horizontal_illuminance",
-        "direct_normal_illuminance",
-        "diffuse_horizontal_illuminance",
-        "zenith_luminance",
-        "wind_direction",
-        "wind_speed",
-        "total_sky_cover",
-        "opaque_sky_cover",
-        "visibility",
-        "ceiling_height",
-        "present_weather_observation",
-        "present_weather_codes",
-        "precipitable_water",
-        "aerosol_optical_depth",
-        "snow_depth",
-        "days_since_last_snow",
-        "albedo",
-        "liquid_precip_depth",
-        "liquid_precip_rate"
-    ))
+    epw_data <- data.table::fread(path, skip = num_header,
+        col.names = c("year",                                             # 1. integer
+                      "month",                                            # 2. integer
+                      "day",                                              # 3. integer
+                      "hour",                                             # 4. integer
+                      "minute",                                           # 5. integer
+                      "datasource",                                       # 6. character
+                      "dry_bulb_temperature",                             # 7. double
+                      "dew_point_temperature",                            # 8. double
+                      "relative_humidity",                                # 9. double
+                      "atmospheric_pressure",                             # 10. double
+                      "extraterrestrial_horizontal_radiation",            # 11. double
+                      "extraterrestrial_direct_normal_radiation",         # 12. double
+                      "horizontal_infrared_radiation_intensity_from_sky", # 13. double
+                      "global_horizontal_radiation",                      # 14. double
+                      "direct_normal_radiation",                          # 15. double
+                      "diffuse_horizontal_radiation",                     # 16. double
+                      "global_horizontal_illuminance",                    # 17. double
+                      "direct_normal_illuminance",                        # 18. double
+                      "diffuse_horizontal_illuminance",                   # 19. double
+                      "zenith_luminance",                                 # 20. double
+                      "wind_direction",                                   # 21. double
+                      "wind_speed",                                       # 22. double
+                      "total_sky_cover",                                  # 23. integer
+                      "opaque_sky_cover",                                 # 24. integer
+                      "visibility",                                       # 25. double
+                      "ceiling_height",                                   # 26. double
+                      "present_weather_observation",                      # 27. integer
+                      "present_weather_codes",                            # 28. character
+                      "precipitable_water",                               # 29. double
+                      "aerosol_optical_depth",                            # 30. double
+                      "snow_depth",                                       # 31. double
+                      "days_since_last_snow",                             # 32. integer
+                      "albedo",                                           # 33. double
+                      "liquid_precip_depth",                              # 34. double
+                      "liquid_precip_rate"),                              # 35. double
+        colClasses = list(
+            integer = c(1:5, 23, 27, 32),
+            character = c(6, 28),
+            double = c(7:22, 25, 26, 29:31, 33:35))
+        )
+
     # }}}
     # error checking
     # {{{
@@ -547,8 +686,9 @@ parse_epw_file <- function (path, strict = TRUE) {
     # check for agreement between the file value and the computed value
     min_per_rcd <- 60L/data_periods[["time_step"]]
     min_seq <- seq(0, 60, length.out = data_periods[["time_step"]] + 1L)[-1L]
+
     epw_data[, dt_minute := lubridate::minute(datetime)]
-    epw_data[, dt_minute_cal := {rep(min_seq, nrow(epw_data))}][
+    epw_data[, dt_minute_cal := {rep_len(min_seq, nrow(epw_data))}][
         dt_minute_cal == 60L, dt_minute_cal := 0L]
     min_mismatch <- epw_data[dt_minute != dt_minute_cal, which = TRUE]
     if (not_empty(min_mismatch)) {
@@ -606,8 +746,10 @@ parse_epw_file <- function (path, strict = TRUE) {
     # set column order
     data.table::setcolorder(epw_data, c("datetime", names(epw_data)[-ncol(epw_data)]))
 
-    list(location = location, data_periods = data_periods, data = epw_data,
-         header_unparsed = header_unparsed)
+    header_pairs[["location"]] <- location
+    header_pairs[["data_periods"]] <- data_periods
+    header_pairs[["holidays_daylight_savings"]] <- holidays_dls
+    list(header = header_pairs, data = epw_data)
 }
 # }}}
 
@@ -642,12 +784,12 @@ get_epw_week_day <- function (x, num = FALSE){
 }
 # }}}
 # get_epw_year {{{
-get_epw_year <- function (year = NULL, start_week_day, leap_year = FALSE) {
-    # start out assuming 2009
-    year <- as.integer(year %||% 2009L)
-    targ <- as.character(get_epw_week_day(start_week_day, num = TRUE))
-    while (lubridate::leap_year(year) != leap_year ||
-           strftime(paste0(year, "-1-1"),'%u') != targ) {
+get_epw_year <- function (year = NULL, week_day, check_date = "1-1", leap_year = FALSE) {
+    # start out from current year
+    year <- as.integer(year %||% lubridate::year(Sys.Date()))
+    targ <- get_epw_week_day(week_day, num = TRUE)
+    # while (lubridate::leap_year(year) != leap_year ||
+    while (lubridate::wday(lubridate::ymd(paste0(year, "-", check_date)), week_start = 1L) != targ) {
         year <- year - 1L
     }
 
@@ -664,13 +806,12 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
         stop("Bad data period ", type, " date format found in EPW file ",
              backtick(path), ":", backtick(x), ".", call. = FALSE)
     } else if (len_s == 2L) {
-        assume_year <- get_epw_year(year = NULL, start_day_of_week)
-        res <- as.Date(paste0(assume_year, "-", s[1], "-", s[2]))
+        day <- switch(type, start = x, end = "1-1")
+        assume_year <- get_epw_year(year = NULL, start_day_of_week, check_date = day)
+        res <- lubridate::ymd(paste0(assume_year, "-", x))
         real_year <- FALSE
     } else {
-        year <- s[3]
-        year <- get_epw_year(year, start_day_of_week)
-        res <- as.Date(paste0(year, "-", s[1], "-", s[2]))
+        res <- lubridate::mdy(x)
         real_year <- TRUE
     }
 
