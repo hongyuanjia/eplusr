@@ -4,43 +4,33 @@
 #' @importFrom clisymbols symbol
 # i_collect_validate: collect_results validate results {{{
 i_collect_validate <- function (private) {
-    # for "none" level, nothing will be checked
     private$m_validate <- list()
 
-    # init
-    cols <- c("value_id", "value", "object_id", "class_id", "class_name",
-              "field_order", "full_name", "full_ipname")
-
-    # prepare check input data
-    all_object_tbl <- private$m_idf_tbl$object[
-        private$m_idd_tbl$class, on = "class_id"][
-        private$m_idd_tbl$class_property, on = "class_id", nomatch = 0L]
-
-    all_value_tbl <- all_object_tbl[, list(object_id, class_name)][
-        private$m_idf_tbl$value, on = "object_id", nomatch = 0L][
-        private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
-        private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L]
-
-    input <- list(object_tbl = all_object_tbl,
-                  value_tbl = all_value_tbl,
-                  cols = cols)
-    input <- list2env(input, parent = emptyenv(), size = 3L)
-
-    # for IdfObject
-    flag_idfobj <- ifelse(not_empty(private$m_object_id), TRUE, FALSE)
-    # for set_value()
-    flag_set <- ifelse(flag_idfobj && not_empty(private$m_temp$value_to_set), TRUE, FALSE)
-
-    # modify input
-    if (flag_idfobj) {
-        if (flag_set) {
-            input$value_tbl <- private$m_temp$value_to_set
-        } else {
-            input$value_tbl <- input$value_tbl[object_id == private$m_object_id]
-        }
+    # for "none" level, nothing will be checked
+    if (private$m_options$validate_level == "none") {
+        return(private$m_validate)
     }
 
+    # prepare check input data
+    input <- new.env(parent = emptyenv(), size = 5L)
+
+    input$cols <- c("value_id", "value", "object_id", "class_id", "class_name",
+                    "field_order", "full_name", "full_ipname")
+    input$is_idfobj <- ifelse(not_empty(private$m_object_id), TRUE, FALSE)
+    input$is_set <- ifelse(input$is_idfobj && not_empty(private$m_temp$value_to_set), TRUE, FALSE)
+
     if (private$m_options$validate_level == "draft") {
+        # get input
+        if (input$is_idfobj) {
+            if (input$is_set) {
+                input$value_tbl <- private$m_temp$value_to_set
+            } else {
+                input$value_tbl <- private$value_tbl(with_field = TRUE)
+            }
+        } else {
+            input$value_tbl <- private$value_tbl()
+        }
+
         i_exclu_empty(private, input)
         i_check_autosize(private, input)
         i_check_autocalculate(private, input)
@@ -49,16 +39,26 @@ i_collect_validate <- function (private) {
         i_check_integer(private, input)
         i_check_choice(private, input)
     } else if (private$m_options$validate_level == "final"){
+        # get input
+        if (input$is_idfobj) {
+            input$object_tbl <- private$object_tbl()
+            if (input$is_set) {
+                input$value_tbl <- private$m_temp$value_to_set
+            } else {
+                input$value_tbl <- private$value_tbl(with_field = TRUE)
+            }
+        } else {
+            input$object_tbl <- private$object_tbl(all = TRUE)
+            input$value_tbl <- private$value_tbl()
+        }
+
         # only for Idf object
-        if (!flag_idfobj) {
+        if (!input$is_idfobj) {
             i_check_missing_object(private, input)
             i_check_duplicate_object(private, input)
+            i_exclu_class(private, input)
         }
-        i_exclu_class(private, input)
-        # only check current IdfObject
-        if (flag_idfobj) {
-            input$object_tbl <- input$object_tbl[object_id == private$m_object_id]
-        }
+
         i_check_conflict_name(private, input)
 
         i_check_missing(private, input)
@@ -69,16 +69,8 @@ i_collect_validate <- function (private) {
         i_check_numeric(private, input)
         i_check_integer(private, input)
         i_check_choice(private, input)
-
-        # replace values in whole value for reference checking
-        if (flag_idfobj) {
-            input$value_tbl <- data.table::rbindlist(list(
-                all_value_tbl[object_id != private$m_object_id],
-                input$value_tbl[, .SD, .SDcols = names(all_value_tbl)]
-            ))
-        }
         i_check_reference(private, input)
-        # mark if IdfObject
+
         data.table::setattr(private$m_validate, "class", c("IdfValidity", "list"))
     }
 }
@@ -113,13 +105,20 @@ i_check_duplicate_object <- function (private, input) {
 # }}}
 # i_check_conflict_name: objects in the same class have exact the same name {{{
 i_check_conflict_name <- function (private, input) {
-    target_class <- input$object_tbl[has_name == TRUE, class_id]
-    ids <- input$value_tbl[class_id %in% target_class][
-        field_order == 1L, list(num = .N, object_id = list(object_id)),
-        by = list(class_id, value_upper)][num > 1L, object_id]
-    if (is_empty(ids)) private$m_validate$conflict_name <- data.table::data.table()
-    private$m_validate$duplicate_object <- input$value_tbl[object_id %in% unlist(ids),
-        .SD, .SDcols = input$cols]
+    cls_id <- input$object_tbl[has_name == TRUE, class_id]
+    if (not_empty(cls_id)) {
+        all_ids <- private$m_idf_tbl$object[class_id %in% cls_id, object_id]
+        fld_id <- private$m_idd_tbl$field[
+            class_id %in% cls_id & field_order == 1L, field_id]
+        obj_id <- private$m_idf_tbl$value[field_id %in% fld_id][
+            private$m_idf_tbl$object, on = "object_id", nomatch = 0L][,
+            list(num = .N, object_id = list(object_id)),
+            by = list(class_id, value_upper)][num > 1L, object_id]
+        if (not_empty(obj_id)) {
+            private$m_validate$conflict_name <- input$value_tbl[object_id %in% unlist(ids),
+                .SD, .SDcols = input$cols]
+        }
+    }
 }
 # }}}
 # i_check_missing: missing required fields {{{
@@ -228,42 +227,44 @@ i_check_range <- function (private, input) {
 # }}}
 # i_check_reference: invlaid reference fields {{{
 i_check_reference <- function (private, input) {
-    targ <- input$value_tbl
-    if (not_empty(private$m_object_id)) {
-        targ <- targ[object_id == private$m_object_id]
-    }
-    val_obj_list <- targ[private$m_idd_tbl$field_object_list,
+    val_obj_list <- input$value_tbl[private$m_idd_tbl$field_object_list,
         on = "field_id", nomatch = 0L][
         , .SD, .SDcols = c(input$cols, "value_upper", "object_list")]
+    if (not_empty(val_obj_list)) {
+        val_fld_ref <- private$m_idd_tbl$field_reference[
+            reference %in% val_obj_list$object_list][
+            private$m_idf_tbl$value, on = "field_id", nomatch = 0L][,
+            lapply(.SD, list), .SDcols = c("value", "value_upper"),
+            by = reference]
 
-    val_fld_ref <- input$value_tbl[private$m_idd_tbl$field_reference,
-        on = "field_id", nomatch = 0L][
-        , lapply(.SD, list), .SDcols = c("value", "value_upper"), by = reference]
+        if (not_empty(private$m_idd_tbl$class_reference)) {
+            val_cls_ref <- private$m_idd_tbl$class_reference[
+                reference %in% val_obj_list$object_list][
+                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][,
+                value_upper := toupper(class_name)][,
+                lapply(.SD, list), .SDcols = c("class_name", "value_upper"),
+                by = reference]
+            data.table::setnames(val_cls_ref, "class_name", "value")
+            val_ref <- data.table::rbindlist(list(val_fld_ref, val_cls_ref), fill = TRUE)
+        } else {
+            val_ref <- val_fld_ref
+        }
 
-    if (not_empty(private$m_idd_tbl$class_reference)) {
-        val_cls_ref <- private$m_idf_tbl$object[
-            private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
-            private$m_idd_tbl$class_reference, on = "class_id", nomatch = 0L][
-            , value_upper := toupper(class_name)][
-            , lapply(.SD, list), .SDcols = c("class_name", "value_upper"), by = reference]
-        data.table::setnames(val_cls_ref, "class_name", "value")
-        val_ref <- data.table::rbindlist(list(val_fld_ref, val_cls_ref), fill = TRUE)
-    } else {
-        val_ref <- val_fld_ref
-    }
-    data.table::setnames(val_ref, c("value", "value_upper"),
-                         c("value_reference", "value_reference_upper"))
+        data.table::setnames(val_ref,
+            c("value", "value_upper"),
+            c("value_reference", "value_reference_upper"))
+        private$m_validate$reference <- val_ref[
+            val_obj_list, on = c(reference = "object_list")][
+            , lapply(.SD, function (x) list(unlist(x))),
+            .SDcol = c("value_reference", "value_reference_upper"),
+            by = c(input$cols, "value_upper")][
+            !purrr::map2_lgl(value_upper, value_reference_upper, `%in%`),
+            .SD, .SDcols = c(input$cols, "value_reference")]
 
-    private$m_validate$reference <- val_ref[
-        val_obj_list, on = c(reference = "object_list")][
-        , lapply(.SD, function (x) list(unlist(x))),
-        .SDcol = c("value_reference", "value_reference_upper"),
-        by = c(input$cols, "value_upper")][
-        !purrr::map2_lgl(value_upper, value_reference_upper, `%in%`),
-        .SD, .SDcols = c(input$cols, "value_reference")]
-    if (not_empty(private$m_validate$reference)) {
-        input$value_tbl <- input$value_tbl[
-            !value_id %in% private$m_validate$reference[["value_id"]]]
+        if (not_empty(private$m_validate$reference)) {
+            input$value_tbl <- input$value_tbl[
+                !value_id %in% private$m_validate$reference[["value_id"]]]
+        }
     }
 }
 # }}}
