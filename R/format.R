@@ -259,6 +259,60 @@ print.IdfObjectRefMap <- function (x, ...) {
     cli::cat_line(format_refmap(x, ...))
 }
 
+#' @importFrom data.table copy
+#' @export
+# print.ErrFile {{{
+print.ErrFile <- function (x, ...) {
+    if (x$completed) {
+        if (x$successful) {
+            sum_line <- "EnergyPlus completed successfully"
+        } else {
+            sum_line <- "EnergyPlus completed unsuccessfully"
+        }
+    } else {
+        sum_line <- "EnergyPlus terminated"
+    }
+    err_dt <- data.table::copy(x$data)
+
+    err_dt[, line := .I]
+    num_sum <- err_dt[, list(num = max(level_index)), by = list(level)][level != "Info"]
+    if (not_empty(num_sum)) {
+        num_line <- num_sum[, paste0(paste0(num, " ", level), collapse = ", ")]
+        head <- paste0("\n", sum_line, " with ", num_line, ".")
+    } else {
+        head <- paste0("\n", sum_line, " or is still running.")
+    }
+
+    dt_num <- err_dt[begin_environment == FALSE, .N, by = list(environment_index, index)]
+
+    if (is_empty(dt_num)) cat(head, "\n");return(invisible())
+
+    index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
+    l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
+                     line[.N], by = index]$V1
+
+    err_dt[, level_num := max(level_index), by = list(level)]
+    err_dt[, out := message]
+    err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
+    err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L), by = line]
+
+    err_dt[begin_environment == FALSE & seperate == TRUE,
+           out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
+
+    err_dt[, out := as.list(out)]
+    err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
+
+    err_box_dt <- err_dt[begin_environment == FALSE,
+        list(msg_box = cli::boxx(unlist(out), padding = 0L)), by = environment_index]
+    err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
+    msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
+    msg_dt[environment_index == environment_index[1L], msg := paste0(msg_line, "\n", msg_box)]
+    msg_dt[environment_index != environment_index[1L], msg := paste0("\n", msg_line, "\n", msg_box)]
+
+    cat(c(msg_dt$msg, head), sep = "\n")
+}
+# }}}
+
 #' @importFrom data.table setnames
 # update_value_num: update value string and digits
 # {{{
