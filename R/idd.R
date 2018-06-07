@@ -373,18 +373,14 @@ use_idd <- function (idd) {
     assert_that(is_scalar(idd))
 
     if (is_eplus_ver(idd)) {
-        if (is_pre_parsed(idd)) {
-            idd <- as.character(idd)
-            res <- switch(idd,
-                "8.5" = idd_8.5,
-                "8.6" = idd_8.6,
-                "8.7" = idd_8.7,
-                "8.8" = idd_8.8,
-                "8.9" = idd_8.9)
-        } else {
-            stop("Currently only Idd of EnergyPlus v8.5 to v8.9 have been pre-parsed. ",
+        ver <- standerize_ver(idd)
+        if (!is_pre_parsed(idd)) {
+            stop("Currently only Idd of EnergyPlus v8.5.0 to v8.9.0 have been pre-parsed. ",
                  "Please give a valid path to an `Energy+.idd` file of EnergyPlus version ",
-                 backtick(idd), ".", call. = FALSE)
+                 backtick(ver), ".", call. = FALSE)
+        } else {
+            nm <- paste0("idd_", as.character(ver[1,1:2]))
+            res <- get(nm)
         }
     } else {
         res <- Idd$new(idd)

@@ -101,6 +101,7 @@ eplus_available <- function (ver) !is.null(eplus_config(ver))
 
 # standerize_ver {{{
 standerize_ver <- function (ver) {
+    if (is_integerish(ver)) ver <- paste0(ver, ".0")
     ver <- as.numeric_version(ver)
     if (is.na(ver[1,3])) ver[1,3] <- 0
     ver

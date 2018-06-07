@@ -35,7 +35,7 @@ on_failure(is_supported_ver) <- function (call, env) {
 # }}}
 # is_pre_parsed {{{
 is_pre_parsed <- function (ver) {
-    is_supported_ver(ver) && as.numeric_version(ver) > 8.5
+    as.character(standerize_ver(ver)) %in% .globals$pre_parsed_ver
 }
 # }}}
 # is_eplus_exists {{{
@@ -129,6 +129,7 @@ on_failure(is_scalar) <- function(call, env) {
 # is_integerish {{{
 is_integerish <- function(x) {
     # is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
+    if (!is.numeric(x)) return (FALSE)
     all(abs(x - round(x)) < .Machine$double.eps^0.5)
 }
 on_failure(is_integerish) <- function(call, env) {
