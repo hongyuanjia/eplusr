@@ -533,7 +533,9 @@ Idf <- R6::R6Class(classname = "Idf",
             if (not_empty(dots$num_digits)) {
                 private$set_num_digits(dots[["num_digits"]])
             }
-            private$update_value_tbl()
+            if (not_empty(dots$view_in_ip) | not_empty(dots$num_digits)) {
+                private$update_value_tbl()
+            }
             return(invisible(self))
             # }}}
         },
