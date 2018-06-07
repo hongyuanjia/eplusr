@@ -115,8 +115,8 @@ i_check_conflict_name <- function (private, input) {
             list(num = .N, object_id = list(object_id)),
             by = list(class_id, value_upper)][num > 1L, object_id]
         if (not_empty(obj_id)) {
-            private$m_validate$conflict_name <- input$value_tbl[object_id %in% unlist(ids),
-                .SD, .SDcols = input$cols]
+            private$m_validate$conflict_name <- input$value_tbl[
+                object_id %in% unlist(obj_id), .SD, .SDcols = input$cols]
         }
     }
 }
