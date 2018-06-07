@@ -1098,24 +1098,28 @@ Idf <- R6::R6Class(classname = "Idf",
         objects_in_group = function (...) stop("attempt to apply non-function", call. = FALSE),
         required_objects = function () stop("attempt to apply non-function", call. = FALSE),
         unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
-        print = function () {
+        print = function (plain = FALSE) {
             # {{{
-            count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
-                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
-                private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
-                , list(group_name, class_name, num_obj)]
+            if (plain) {
+                cli::cat_line(self$string())
+            } else {
+                count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
+                    private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                    private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
+                    , list(group_name, class_name, num_obj)]
 
-            max_num <- count[, max(num_obj)]
-            count[, num_str := paste0("[", lpad(num_obj, "0"), "]")]
-            count[, grp := ""]
-            count[count[, .I[1L], by = list(group_name)]$V1,
-                grp := paste0("\nGroup: ", backtick(group_name), "\n", cli::rule(), "\n")]
-            out <- count[, paste0(grp, num_str, " ", class_name)]
+                max_num <- count[, max(num_obj)]
+                count[, num_str := paste0("[", lpad(num_obj, "0"), "]")]
+                count[, grp := ""]
+                count[count[, .I[1L], by = list(group_name)]$V1,
+                    grp := paste0("\nGroup: ", backtick(group_name), "\n", cli::rule(), "\n")]
+                out <- count[, paste0(grp, num_str, " ", class_name)]
 
-            path <- private$m_path %||% ""
-            cli::cat_line("# Path: ", backtick(path))
-            cli::cat_line("# Version: ", backtick(private$m_version))
-            cli::cat_line(out)
+                path <- private$m_path %||% ""
+                cli::cat_line("# Path: ", backtick(path))
+                cli::cat_line("# Version: ", backtick(private$m_version))
+                cli::cat_line(out)
+            }
             # }}}
         }
         # }}}
