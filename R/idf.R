@@ -878,8 +878,8 @@ Idf <- R6::R6Class(classname = "Idf",
                     cli::cat_line(format_refmap_sgl(
                         refby, "by", in_ip = private$m_options$view_in_ip
                     ))
-                    stop(glue::glue("Failed to delete target object [ID:{backtick(id)}]. \\
-                    Target object [ID: {id}] was referenced \\
+                    stop(glue::glue("Failed to delete target object [ID:{backtick(id)}] \\
+                    at validation level `final`.  Target object [ID: {id}] was referenced \\
                     by other objects [ID: {backtick_collapse(refby[['target_object_id']])}]."),
                     call. = FALSE)
                 }
@@ -1042,68 +1042,33 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        collect = function (type = c("variable", "meter"), long = FALSE) {
-            # check status
+        output_dir = function (open = FALSE) {
+            # return or open the output directory
             # {{{
-            # try to locate the sql result file
-            sql <- paste0(tools::file_path_sans_ext(private$m_path), ".sql")
-
-            # if the model has not been run before
-            if (is.null(private$m_run$proc)) {
-                if (is.null(private$m_path)) {
-                    stop("The Idf was not created from local file. Failed to ",
-                         "locate simulation results.", call. = FALSE)
-                }
-                if (!utils::file_test("-f", sql)) {
-                    stop("Failed to locate simulation SQL output in the folder ",
-                         "of Idf file.", call. = FALSE)
-                }
-                # compare last changed time
-                sql_ctime <- file.info(sql)$ctime
-                idf_ctime <- file.info(private$m_path)$ctime
-                if (is.na(idf_ctime)) {
-                    warning("Failed to locate the Idf file.", call. = FALSE)
-                } else {
-                    if (sql_ctime < idf_ctime) {
-                        warning("The Idf has been changed since last simulation. ",
-                                "The simulation results may not be correct", call. = FALSE)
-                    }
+            dir <- dirname(private$locate_output(strict = FALSE))
+            if (!open) return(dir)
+            if (open) {
+                if (is.null(dir)) {
+                    message("No simulation has been run yet.")
+                    return(invisible())
                 }
 
-            # if the model has been run before
-            } else {
-                # check if the model was run in waiting mode
-                if (isTRUE(private$m_run$wait)) {
-                    # check the exist status of last simulationa
-                    exit_status <- private$m_run$proc$status
-                    if (is.na(exit_status)) {
-                        stop("Simulation was terminated before. Please solve ",
-                             "the problems and re-run the simulation before collect ",
-                             "results", call. = FALSE)
-                    } else if (exit_status != 0) {
-                        warning("Simulation ended with errors. Simulation results ",
-                                "may not be correct.", call. = FALSE)
-                    }
+                # Reference:
+                # http://r.789695.n4.nabble.com/R-command-to-open-a-file-quot-browser-quot-on-Windows-and-Mac-td4710688.html
+                if (is_windows()) {
+                    shell.exec(dir)
+                } else if (is_macos()) {
+                    system2("open", dir)
+                } else if (is_linux()) {
+                    system(paste0("xdg-open ", dir))
                 } else {
-                    # check if the model is still running
-                    if (private$m_run$proc$is_alive()) {
-                        stop("Simulation is still running. Please wait simulation ",
-                             "to finish before collecting results.", call. = FALSE)
-                    } else if (private$m_run$proc$get_exit_status() != 0L) {
-                        warning("Simulation ended with errors. Simulation results ",
-                                "may not be correct.", call. = FALSE)
-                    }
+                    message("Current platform not supported.")
                 }
             }
+            dir
             # }}}
-            # connect to the sql file
-            private$m_run$sql <- sql
-            Sql$new(sql)
         },
 
-        table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
-            icollect_output(self, private, type = "table", report = report,
-                            key = key, table = table, nest = nest),
         errors = function (info = TRUE) {
             # read simulation errors
             # {{{
