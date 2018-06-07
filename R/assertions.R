@@ -6,6 +6,7 @@ is_eplus_ver <- function (ver) {
     assert_that(is_scalar(ver))
     if (is.numeric_version(ver)) TRUE
     ver_fmt <- "^[78]\\.[0-9](\\.[0-9]){0,1}$"
+    if (is_integerish(ver)) ver <- paste0(ver, ".0")
     grepl(ver_fmt, as.character(ver))
 }
 
@@ -31,11 +32,11 @@ is_supported_ver <- function (ver) {
 on_failure(is_supported_ver) <- function (call, env) {
     paste0("Currently EnergyPlus v8.1 to v8.9 are supported.")
 }
+# }}}
 # is_pre_parsed {{{
 is_pre_parsed <- function (ver) {
     is_supported_ver(ver) && as.numeric_version(ver) > 8.5
 }
-# }}}
 # }}}
 # is_eplus_exists {{{
 is_eplus_exists <- function (eplus_exe) {
