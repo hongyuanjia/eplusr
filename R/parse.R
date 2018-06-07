@@ -1093,7 +1093,7 @@ get_idd_ver <- function (idd_str) {
 
     if (length(ver_line) == 1L) {
         ver <- substr(ver_line, 14L, nchar(ver_line))
-        return(as.numeric_version(ver))
+        return(standerize_ver(ver))
     } else if (length(ver_line > 1L)) {
         stop("Multiple IDD version found in the input:\n",
              paste0("  ", backtick(ver_line), collapse = "\n"), call. = FALSE)
@@ -1128,9 +1128,9 @@ get_idf_ver <- function (idf_str) {
 
     if (length(ver_normal) == 1L) {
         # for "8.6; !- Version Identifier"
-        as.numeric_version(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
+        standerize_ver(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
     } else if (length(ver_special) == 1L){
-        as.numeric_version(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
+        standerize_ver(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
     } else {
         return(NULL)
     }
