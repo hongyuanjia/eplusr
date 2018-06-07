@@ -214,9 +214,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # {{{
             assert_that(!self$is_version(), msg = "Cannot modify `Version` object directly.")
             # capture all arguments in dots and flatten into a list
-            dots <- list(...)
+            dots <- purrr::splice(...)
             assert_that(not_empty(dots), msg = "Please give values to set.")
-            if (length(dots) == 1L) dots <- as.list(dots[[1]])
             depth <- purrr::vec_depth(dots)
             assert_that(depth == 2L, msg = "Nested list is not supported.")
             # check if there are NA or empty string or "" in the dots
@@ -859,6 +858,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 stop("i should either integers or strings.", call. = FALSE)
             }
             names(value) <- nm
+            value <- as.list(value)
             .subset2(x, "set_value")(value)
         } else {
             stop("subscript out of bounds.", call. = FALSE)
