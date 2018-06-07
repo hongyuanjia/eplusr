@@ -257,38 +257,52 @@ Epw <- R6::R6Class(classname = "Epw",
         },
 
         print = function () {
-            cli::cat_line(cli::rule("EnergyPlus Weather File"))
+            cli::cat_line(cli::rule("Location"))
             loc_keys <- c(
-                "City",
-                "State",
-                "Country",
-                "Data Source",
-                "WMO Number",
-                "Latitude",
-                "Longitude",
-                "Time Zone",
-                "Evevation")
-            loc <- paste0(loc_keys, ": ", private$m_header$location)
+                "[ City    ]",
+                "[ State   ]",
+                "[ Country ]",
+                "[ Source  ]",
+                "[ WMO Num ]",
+                "[Latitude ]",
+                "[Longitude]",
+                "[Time Zone]",
+                "[Evevation]")
+            loc_str <- paste0(loc_keys, ": ", private$m_header$location)
+            cli::cat_bullet(loc_str)
 
+            cli::cat_line("\n", cli::rule("Data Period"))
             dp_keys <- c(
-                "Period Num ",
-                "Time Step",
-                "Date Range",
-                "Start Weekday")
+                "[Period Num ]",
+                "[Time Step  ]",
+                "[Date Range ]",
+                "[1st Weekday]",
+                "[Real Year  ]")
             dp <- private$m_header$data_periods
+            num <- dp$n_data_periods
+            time_step <- paste0(60/ dp$time_step, " min")
             start_date <- format(dp$start_date, "%b %d")
             end_date <- format(dp$end_date, "%b %d")
             range <- paste0(start_date, " - ", end_date)
             weekday <- dp$start_day_of_week
+            real_year <- dp$is_real_year
+            dp_str <- paste0(dp_keys, ": ", c(num, time_step, range, weekday))
+            cli::cat_bullet(dp_str)
 
-            dp <- paste0(dp_keys, ": ",
-                         c(dp$n_data_periods,
-                           paste0(60/ dp$time_step, " min"),
-                           range,
-                           weekday))
-
-            cli::cat_bullet(loc)
-            cli::cat_bullet(dp)
+            cli::cat_line("\n", cli::rule("Holidays and Daylight Savings"))
+            dst_keys <- c(
+                "[ Leap Year ]",
+                "[ DST Range ]",
+                "[Holiday Num]")
+            dst <- private$m_header$holidays_daylight_savings
+            if (!is.na(dst$dls_start_day)) {
+                dst_range <- paste0(dst$dls_start_day, " - ", dst$dls_end_day)
+            } else {
+                dst_range <- NA
+            }
+            hol_num <- dst$num_of_holiday
+            dst_str <- paste0(dst_keys, ": ", list(dst$leap_year, dst_range, hol_num))
+            cli::cat_bullet(dst_str)
         }
     ),
 
