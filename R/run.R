@@ -8,9 +8,8 @@ NULL
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
     stopifnot(is_eplus_ver(ver))
-    ver <- as.numeric_version(ver)
-    # assert_that()
-    ver_dash <- paste0(ver[,1], "-", ver[,2], "-0")
+    ver <- standerize_ver(ver)
+    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)
     } else if (is_linux()) {
@@ -37,14 +36,14 @@ is_valid_eplus_path <- function (path) {
 # get_ver_from_path {{{
 get_ver_from_path <- function (path) {
     # try to get version form EnergyPlus path
-    ver <- tryCatch(as.numeric_version(gsub("^.*V", "", path)), error = function (e) NULL)
+    ver <- tryCatch(gsub("^.*V", "", path), error = function (e) NULL)
     # then from the first line of Energy+.idd
     if (is.null(ver)) {
         h <- readr::read_lines(file.path(path, "Energy+.idd"), n_max = 1L)
         # if still failed, just return NULL
         ver <- tryCatch(get_idd_ver(h), error = function (e) NULL)
     }
-    ver
+    standerize_ver(ver)
 }
 # }}}
 
@@ -53,7 +52,7 @@ get_ver_from_path <- function (path) {
 use_eplus <- function (eplus) {
     # if eplus is a version, try to locate it in the default path
     if (is_supported_ver(eplus)) {
-        ver <- as.numeric_version(eplus)
+        ver <- standerize_ver(eplus)
         eplus_dir <- eplus_default_path(eplus)
         if (!is_valid_eplus_path(eplus_dir)) {
             stop(msg("Cannot locate EnergyPlus V", trimws(eplus), " at default
@@ -83,8 +82,28 @@ use_eplus <- function (eplus) {
 
 #' @export
 # avail_eplus {{{
-avail_eplus <- function () {
-    names(.globals$eplus_config)
+avail_eplus <- function () names(.globals$eplus_config)
+# }}}
+
+#' @export
+# eplus_config {{{
+eplus_config <- function (ver) {
+    assert_that(is_eplus_ver(ver))
+    ver <- standerize_ver(ver)
+    .globals$eplus_config[[as.character(ver)]]
+}
+# }}}
+
+#' @export
+# eplus_available {{{
+eplus_available <- function (ver) !is.null(eplus_config(ver))
+# }}}
+
+# standerize_ver {{{
+standerize_ver <- function (ver) {
+    ver <- as.numeric_version(ver)
+    if (is.na(ver[1,3])) ver[1,3] <- 0
+    ver
 }
 # }}}
 

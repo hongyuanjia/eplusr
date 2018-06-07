@@ -3,9 +3,9 @@
 
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver) {
-    if (length(ver) != 1L) return(FALSE)
+    assert_that(is_scalar(ver))
     if (is.numeric_version(ver)) TRUE
-    ver_fmt <- "^[78]\\.[0-9]$"
+    ver_fmt <- "^[78]\\.[0-9](\\.[0-9]){0,1}$"
     grepl(ver_fmt, as.character(ver))
 }
 
