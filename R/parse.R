@@ -967,10 +967,82 @@ parse_idf_file <- function (path, idd = NULL) {
 }
 # }}}
 
+#' @importFrom readr read_lines
+#' @importFrom data.table data.table ":=" setattr setcolorder
+#' @importFrom stringr str_match str_detect
+# parse_err_file {{{
+parse_err_file <- function (path) {
+    if (file.exists(path)) {
+        res <- list(completed = FALSE, successful = FALSE, data = data.table::data.table())
+        data.table::setattr(res, "class", "ErrFile")
+        res
+    }
+
+    err_line <- readr::read_lines(path)
+    err_dt <- data.table::data.table(string = err_line)
+
+    reg_start <- "^\\s+\\*{5,}\\s+(.*)$"
+    reg_w_or_e <- "^\\s*\\**\\s+\\*\\*\\s*([^~\\s\\*]+)\\s*\\*\\*\\s+(.*)$"
+    reg_w_or_e_con <- "^\\s*\\**\\s+\\*\\*\\s*~~~\\s*\\*\\*\\s+(.*)$"
+    reg_comp_success <- "^\\s*\\*+ EnergyPlus Completed Successfully.*"
+    reg_ground_comp_success <- "^\\s*\\*+ GroundTempCalc\\S* Completed Successfully.*"
+    reg_comp_unsuccess <- "^\\s*\\*+ EnergyPlus Terminated.*"
+
+    err_dt[, `:=`(message = stringr::str_match(string, reg_start)[, 2])]
+    err_dt[, `:=`(seperate = !is.na(message),
+                  begin_environment = stringr::str_detect(message, "Beginning"))]
+    err_dt[is.na(begin_environment), begin_environment := FALSE]
+    err_dt[begin_environment == TRUE, environment_index := .GRP, by = list(message)]
+    err_dt[is.na(seperate), seperate := FALSE]
+
+    is_completed <- FALSE
+    is_successful <- FALSE
+    flg_success <- err_dt[seperate == TRUE,
+        any(stringr::str_detect(string, reg_comp_success) |
+            stringr::str_detect(string, reg_ground_comp_success))]
+    if (flg_success) is_completed <- TRUE; is_successful <- TRUE
+    flg_unsuccess <- err_dt[seperate == TRUE,
+        any(stringr::str_detect(string, reg_comp_unsuccess))]
+    if (flg_unsuccess) is_completed <- TRUE
+
+    l_final <- err_dt[seperate == TRUE & stringr::str_detect(message, "Final Error Summary"),
+           which = TRUE]
+    if (not_empty(l_final)) err_dt <- err_dt[-(l_final:.N)]
+
+    err_dt[is.na(message), c("level", "message") := {
+        as.list(stringr::str_match(string, reg_w_or_e)[, 2:3])}]
+    err_dt[is.na(message),
+           `:=`(message = stringr::str_match(string, reg_w_or_e_con)[, 2])]
+    err_dt <- err_dt[!is.na(message)]
+
+    err_dt[!is.na(level), `:=`(seperate = TRUE)]
+    err_dt[is.na(level) & seperate == TRUE, level := "Info"]
+    err_dt[is.na(level) & seperate == FALSE, `:=`(message = paste0("  ", message))]
+    err_dt[seperate == TRUE, index := .I]
+    err_dt[, `:=`(index = index[1L], level = level[1L]), by = list(cumsum(seperate == TRUE))]
+    err_dt[, `:=`(environment_index = environment_index[1L]), by = list(cumsum(begin_environment == TRUE))]
+    err_dt <- err_dt[!is.na(index)]
+
+    err_dt[level == "Info", `:=`(level_index = data.table::rleid(index))]
+    err_dt[level == "Warning", `:=`(level_index = data.table::rleid(index))]
+    err_dt[level == "Severe", `:=`(level_index = data.table::rleid(index))]
+    err_dt[level == "Fatal", `:=`(level_index = data.table::rleid(index))]
+    err_dt[, `:=`(string = NULL)]
+    data.table::setcolorder(err_dt,
+        c("level", "message",
+          "environment_index", "index", "level_index",
+          "seperate", "begin_environment"))
+
+    res <- list(completed = is_completed, successfull = is_successful, data = err_dt)
+    data.table::setattr(res, "class", "ErrFile")
+    res
+}
+# }}}
+
 #' @importFrom glue glue glue_data
 #' @importFrom cli cat_line rule
 # parse_error {{{
-parse_error <- function (type = c("idf", "idd"), error, num, msg = NULL, stop = TRUE) {
+parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, stop = TRUE) {
     type <- match.arg(type)
     if (is.data.frame(msg)) {
         if (missing(num)) {

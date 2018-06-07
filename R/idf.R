@@ -1037,6 +1037,26 @@ Idf <- R6::R6Class(classname = "Idf",
         table = function (report = NULL, key = NULL, table = NULL, nest = TRUE)
             icollect_output(self, private, type = "table", report = report,
                             key = key, table = table, nest = nest),
+        errors = function (info = TRUE) {
+            # read simulation errors
+            # {{{
+            path_err <- private$locate_output(".err", strict = FALSE)
+
+            err <- parse_err_file(path_err)
+
+            if (!info) err$data <- err$data[!(level == "Info" & begin_environment == FALSE)]
+
+            err
+            # }}}
+        },
+
+        collect = function (dir = NULL, type = c("variable", "meter"), long = FALSE) {
+            # check status
+            # {{{
+            private$m_run$sql <- private$locate_output(".sql")
+            Sql$new(private$m_run$sql)
+            # }}}
+        },
 
         # mask or delete non-useful methods inherited from `Idd` class
         # TODO: find a nicer way to do so
@@ -1446,6 +1466,115 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_run$path_epw <- path_epw
             private$m_run$name_idf <- name_idf
             private$m_run$name_epw <- name_epw
+            # }}}
+        },
+
+        is_local_file = function () {
+            # return TRUE if the model was created from a local file
+            # {{{
+            if (is.null(private$m_path)) return(FALSE)
+            if (!file_test("-f", private$m_path)) return(FALSE)
+            TRUE
+            # }}}
+        },
+
+        sim_status = function (based_suffix = ".err") {
+            # check simulation status
+            # {{{
+            # init
+            local_file <- private$is_local_file() # if the model was created from local file
+            status <- list(
+                run_before = FALSE, # if the model has been run before or is still running
+                changed_after = FALSE, # if the model has been changed after last simulation
+                terminated = FALSE, # if last simulation was terminated
+                successful = FALSE, # if last simulation was successful
+                alive = FALSE, # if simulation is still running
+                prefix = NULL # prefix of simulation output file
+            )
+
+            # if the model has not been run before
+            if (is.null(private$m_run$proc)) {
+                if (local_file) {
+                    prefix <- tools::file_path_sans_ext(private$m_path)
+                    basefile <- paste0(prefix, based_suffix)
+                    if (!utils::file_test("-f", basefile)) return(status)
+                    status$prefix <- prefix
+
+                    # compare last changed time
+                    err_ctime <- file.info(basefile)$ctime
+                    idf_ctime <- file.info(private$m_path)$ctime
+                    if (err_ctime < idf_ctime) status$changed_after <- TRUE
+                }
+            # if the model has been run before
+            } else {
+                status$run_before <- TRUE
+                status$prefix <- tools::file_path_sans_ext(private$m_run$path_idf)
+                # check if the model was run in waiting mode
+                if (isTRUE(private$m_run$wait)) {
+                    # check the exist status of last simulationa
+                    exit_status <- private$m_run$proc$status
+                    if (is.na(exit_status)) {
+                        status$terminated <- TRUE
+                    } else if (exit_status == 0) {
+                        status$successful <- TRUE
+
+                    }
+                } else {
+                    # check if the model is still running
+                    if (private$m_run$proc$is_alive()) {
+                        status$alive <- TRUE
+                    } else if (private$m_run$proc$get_exit_status() == 0L) {
+                        status$successful <- TRUE
+                    }
+                }
+            }
+            status
+            # }}}
+        },
+
+        locate_output = function (suffix = ".err", strict = TRUE) {
+            # locate output file
+            # {{{
+            status <- private$sim_status(suffix)
+            if (is.null(status$prefix)) {
+                if (!private$is_local_file()) {
+                    stop("The Idf was not created from local file. Failed to ",
+                         "locate simulation output.",
+                         call. = FALSE)
+                } else {
+                    if (status$terminated) {
+                        stop("Simulation was terminated before. Please solve ",
+                             "the problems and re-run the simulation before collect ",
+                             "output", call. = FALSE)
+                    } else {
+                        stop("Failed to locate simulation output in the Idf file folder", call. = FALSE)
+                    }
+                }
+            } else {
+                if (strict) {
+                    if (status$terminated) {
+                        stop("Simulation was terminated before. Please solve ",
+                             "the problems and re-run the simulation before collect ",
+                             "output", call. = FALSE)
+                    }
+
+                    if (status$alive) {
+                        stop("Simulation is still running. Please wait simulation ",
+                             "to finish before collecting results.", call. = FALSE)
+                    }
+
+                    if (status$changed_after) {
+                        warning("The Idf has been changed since last simulation. ",
+                                "The simulation output may not be correct.", call. = FALSE)
+                    }
+
+                    if (status$run_before & !status$successful) {
+                        warning("Simulation ended with errors. Simulation results ",
+                                "may not be correct.", call. = FALSE)
+                    }
+                }
+            }
+            paste0(status$prefix, suffix)
             # }}}
         }
         # }}}
