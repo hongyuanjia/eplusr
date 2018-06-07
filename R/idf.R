@@ -1206,14 +1206,32 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        value_tbl = function () {
+        value_tbl = function (object = NULL, class = NULL, field = NULL) {
             # return a tbl contains all value info
             # {{{
+            object_tbl <- private$m_idf_tbl$object
+            class_tbl <- private$m_idd_tbl$class
+            field_tbl <- private$m_idd_tbl$field
+            if (!is.null(object)) {
+                object_tbl <- object_tbl[object_id %in% object]
+            }
+            if (!is.null(class)) {
+                private$assert_valid_classes(class)
+                class_tbl <- class_tbl[class_name %in% class]
+                if (!is.null(field)) {
+                    field_tbl <- field_tbl[field_name == field]
+                }
+            } else {
+                if (!is.null(field)) {
+                    stop("`class` should be specified when `field` is given.",
+                         call. = FALSE)
+                }
+            }
             private$m_idd_tbl$group[
-                private$m_idd_tbl$class, on = "group_id", nomatch = 0L][
-                private$m_idf_tbl$object, on = "class_id", nomatch = 0L, list(object_id, class_name)][
+                class_tbl, on = "group_id", nomatch = 0L][
+                object_tbl, on = "class_id", nomatch = 0L, list(object_id, class_name)][
                 private$m_idf_tbl$value, on = "object_id", nomatch = 0L][
-                private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
+                field_tbl, on = "field_id", nomatch = 0L][
                 private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L]
             # }}}
         },
