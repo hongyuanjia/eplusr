@@ -117,7 +117,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # return object name or NULL if not exists
             # {{{
             if (!self$has_name()) return(NULL)
-            flatten_ref(private$m_value[1])[[1]]
+            private$value_tbl(index = 1L)[1, value]
             # }}}
         },
 
