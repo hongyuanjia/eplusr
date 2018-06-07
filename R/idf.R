@@ -695,10 +695,75 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        search_object = function (class, field, value) {
+        search_value = function (pattern) {
             # classs
             # {{{
+            val <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
+            if (is_empty(val)) {
+                message("No matched result found.")
+                return(invisible())
+            }
 
+            value_tbl <- val[
+                private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
+                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$field, on = "field_id", nomatch = 0L]
+
+            cli::cat_line(format_objects(value_tbl, in_ip = private$m_options$view_in_ip))
+            # }}}
+        },
+
+        replace_value = function (pattern, replacement) {
+            # replace value using regex
+            # {{{
+            val_before <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
+            if (is_empty(val_before)) {
+                message("No matched result found.", call. = FLASE)
+                return(invisible())
+            }
+
+            val_after <- data.table::copy(val_before)[,
+                value := stringr::str_replace_all(value, pattern, replacement)]
+
+            value_tbl_before <- val_before[
+                private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
+                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$field, on = "field_id", nomatch = 0L][,
+                `:=`(field_order = paste0(lpad(field_order, "0"), "(before)"),
+                     full_name = paste0(full_name, "\n"),
+                     full_ipname = paste0(full_ipname, "\n"))]
+
+            value_tbl_after <- val_after[
+                private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
+                private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+                private$m_idd_tbl$field, on = "field_id", nomatch = 0L][,
+                `:=`(field_order = paste0(lpad(field_order, "0"), "(after) "))]
+
+            value_tbl <- data.table::rbindlist(list(value_tbl_before, value_tbl_after))
+
+            value_tbl_after[, `:=`(
+                value_upper = toupper(value),
+                value_num = suppressWarnings(as.numeric(value)),
+                value_ipnum = suppressWarnings(as.numeric(value)))][,
+                private$m_idd_tbl$field_property, on = "field_id", nomatch = 0L]
+
+            value_tbl_new <- private$m_idd_tbl$field_property[value_tbl_after,
+                on = "field_id", nomatch = 0L]
+            value_tbl_new <- update_value_num(
+                value_tbl_new,
+                private$m_options$num_digits,
+                private$m_options$view_in_ip)
+
+            private$m_idf_tbl$value[value_id %in% value_tbl_after$value_id, `:=`(
+                value = value_tbl_after$value,
+                value_upper = value_tbl_after$value_upper,
+                value_num = value_tbl_after$value_num,
+                value_ipnum = value_tbl_after$value_ipnum)]
+
+            private$m_log$order[object_id %in% value_tbl_after$object_id,
+                                object_order := object_order + 1L]
+
+            cli::cat_line(format_objects(value_tbl, in_ip = private$m_options$view_in_ip))
             # }}}
         },
 
