@@ -161,7 +161,8 @@ Epw <- R6::R6Class(classname = "Epw",
             # }}}
         },
 
-        get_data = function (year = NULL, unit = FALSE) {
+        get_data = function (year = NULL, unit = FALSE, tz = Sys.timezone(),
+                             update = FALSE) {
             # return weather data
             # {{{
             if (unit) {
@@ -169,22 +170,56 @@ Epw <- R6::R6Class(classname = "Epw",
             } else {
                 private$drop_units()
             }
+
+            d <- data.table::copy(private$m_data)
             if (!is.null(year)) {
-                d <- data.table::copy(private$m_data)
-                years <- unique(d$year)
-                if (length(years) != 1L) {
-                    stop("Multiple year found in the weather data: ",
-                         backtick_collapse(years), ".", call. = FALSE)
+                assert_that(is_integerish(year))
+                # NOTE: if use a variable `year` on the RHS of
+                # `lubridate::year<-`, it will fail.
+                y <- as.integer(year)
+                if (private$m_header$data_periods$n_data_periods > 1L) {
+                    warning("Epw file has more than 1 data periods. ",
+                            "Year will be applied to all periods which will ",
+                            "introduce duplicated date time.", call. = FALSE)
                 }
-                last_day <- d[.N, all(month == "12", day == "31", hour = "24", minute = "0")]
-                lubridate::year(d$datetime) <- year
-                if (last_day) {
-                    d[.N, datetime := lubridate::year(datetime) + years(1L)]
+                if (private$m_header$holidays_daylight_savings$leap_year &
+                    !lubridate::leap_year(year)) {
+                    stop("Epw file contains data of a leap year. Input year ",
+                         backtick(year), " is not a leap year.", call. = FALSE)
                 }
-                d
-            } else {
-                data.table::copy(private$m_data)
+                if (!private$m_header$holidays_daylight_savings$leap_year &
+                    lubridate::leap_year(year)) {
+                    warning("Input year ", backtick(year), " is a leap year ",
+                            "while Epw file only contains data of a non-leap year. ",
+                            "Datetime inconsistency may occur.", call. = FALSE)
+                }
+
+                d[, `:=`(dt_month = lubridate::month(datetime),
+                         dt_day = lubridate::mday(datetime),
+                         dt_hour = lubridate::hour(datetime),
+                         dt_minute = lubridate::minute(datetime),
+                         line = .I)]
+                l_before_change <- d[dt_month == 12 & dt_day == 31 & dt_hour == 23 & dt_minute < 60, line[.N]]
+                l_after_change <- d[dt_month == 1 & dt_day == 1 & dt_hour == 0 & dt_minute == 0, line[.N]]
+                if (l_before_change + 1L == l_after_change) {
+                    d[line < l_after_change, `:=`(datetime = {lubridate::year(datetime) <- y; datetime})]
+                    d[line >=l_after_change, datetime := {lubridate::year(datetime) <- y + 1L; datetime}]
+                } else {
+                    stop("Failed to detect the first line of the next year.",
+                         call. = FALSE)
+                }
+
+                d[, c("dt_month", "dt_day", "dt_hour", "dt_minute") := NULL]
+                if (update) {
+                    d <- format_epw_date(d)
+                }
             }
+
+            if (attr(d$datetime, "tzone") != tz) {
+                d[, datetime := lubridate::force_tz(datetime, tz)]
+            }
+
+            d[]
             # }}}
         },
 
@@ -763,6 +798,53 @@ parse_epw_file <- function (path, strict = TRUE) {
     header_pairs[["data_periods"]] <- data_periods
     header_pairs[["holidays_daylight_savings"]] <- holidays_dls
     list(header = header_pairs, data = epw_data)
+}
+# }}}
+
+#' @importFrom data.table as.ITime
+#' @importFrom lubridate month mday minute days
+# format_epw_date {{{
+format_epw_date <- function (dt) {
+    # recreate minute column
+    dt[, `:=`(minute = as.integer(lubridate::minute(datetime)))]
+    # create ITime column
+    dt[, `:=`(time = data.table::as.ITime(datetime))]
+    # create an one-day-offset datetime column
+    dt[, `:=`(offset = datetime - lubridate::days(1))]
+    # at 00:00:00, reset month and day by one day backwards and set hour to 23 and
+    # minute to 60
+    dt[time == data.table::as.ITime("00:00:00"),
+       `:=`(month = as.integer(lubridate::month(offset)),
+            day = as.integer(lubridate::mday(offset)),
+            hour = 23L, minute = 60L)]
+
+    # after 00:00:00 and before 01:00:00, reset month and day by one day backwards
+    # and set hour to 24
+    dt[time > data.table::as.ITime("00:00:00") &
+       time < data.table::as.ITime("01:00:00"),
+       `:=`(month = as.integer(lubridate::month(offset)),
+            day = as.integer(lubridate::mday(offset)),
+            hour = 24L)]
+
+    # for 01:00:00, reset month and day by one day backwards
+    # and set hour to 24 and minute to 60
+    dt[time == data.table::as.ITime("01:00:00"),
+       `:=`(month = as.integer(lubridate::month(offset)),
+            day = as.integer(lubridate::mday(offset)),
+            hour = 24L, minute = 60L)]
+
+    # for XX:00:00 at any hour except 01:00:00, reset hour by 1 backwards and set
+    # minute to 60
+    dt[minute == 0L & time != data.table::as.ITime("00:00:00"),
+       `:=`(hour = hour - 1L, minute = 60L)]
+
+    # update year
+    dt[, year := as.integer(lubridate::year(datetime))]
+
+    # clean
+    dt[, `:=`(time = NULL, offset = NULL)]
+
+    dt
 }
 # }}}
 
