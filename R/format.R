@@ -285,31 +285,40 @@ print.ErrFile <- function (x, ...) {
 
     dt_num <- err_dt[begin_environment == FALSE, .N, by = list(environment_index, index)]
 
-    if (is_empty(dt_num)) cat(head, "\n");return(invisible())
+    if (is_empty(dt_num)) {
+        cat(head, "\n")
+    } else {
+        index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
+        l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
+                         line[.N], by = index]$V1
 
-    index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
-    l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
-                     line[.N], by = index]$V1
+        err_dt[, level_num := max(level_index), by = list(level)]
+        err_dt[, out := message]
+        err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
+        err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L), by = line]
 
-    err_dt[, level_num := max(level_index), by = list(level)]
-    err_dt[, out := message]
-    err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
-    err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L), by = line]
+        err_dt[begin_environment == FALSE & seperate == TRUE,
+               out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
 
-    err_dt[begin_environment == FALSE & seperate == TRUE,
-           out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
+        err_dt[, out := as.list(out)]
+        err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
 
-    err_dt[, out := as.list(out)]
-    err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
+        if (all(is.na(err_dt$environment_index))) {
+            cat(unlist(err_dt$out), head, sep = "\n")
+        } else {
+            err_dt[is.na(environment_index), environment_index := 0L]
+            err_box_dt <- err_dt[begin_environment == FALSE,
+                list(msg_box = cli::boxx(unlist(out), padding = 0L)), by = environment_index]
+            err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
+            msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
+            msg_dt[is.na(msg_line), msg_line := ""]
+            msg_dt[environment_index == environment_index[1L], msg := paste0(msg_line, "\n", msg_box)]
+            msg_dt[environment_index != environment_index[1L], msg := paste0("\n", msg_line, "\n", msg_box)]
 
-    err_box_dt <- err_dt[begin_environment == FALSE,
-        list(msg_box = cli::boxx(unlist(out), padding = 0L)), by = environment_index]
-    err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
-    msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
-    msg_dt[environment_index == environment_index[1L], msg := paste0(msg_line, "\n", msg_box)]
-    msg_dt[environment_index != environment_index[1L], msg := paste0("\n", msg_line, "\n", msg_box)]
+            cat(c(msg_dt$msg, head), sep = "\n")
+        }
+    }
 
-    cat(c(msg_dt$msg, head), sep = "\n")
 }
 # }}}
 
