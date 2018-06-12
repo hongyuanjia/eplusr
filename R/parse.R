@@ -1000,17 +1000,27 @@ parse_err_file <- function (path) {
     flg_success <- err_dt[seperate == TRUE,
         any(stringr::str_detect(string, reg_comp_success) |
             stringr::str_detect(string, reg_ground_comp_success))]
-    if (flg_success) is_completed <- TRUE; is_successful <- TRUE
+    if (flg_success) {
+        is_completed <- TRUE
+        is_successful <- TRUE
+    }
     flg_unsuccess <- err_dt[seperate == TRUE,
         any(stringr::str_detect(string, reg_comp_unsuccess))]
     if (flg_unsuccess) is_completed <- TRUE
 
-    l_final <- err_dt[seperate == TRUE & stringr::str_detect(message, "Final Error Summary"),
+    l_final <- err_dt[seperate == TRUE & stringr::str_detect(message, "Final|Simulation Error Summary"),
            which = TRUE]
-    if (not_empty(l_final)) err_dt <- err_dt[-(l_final:.N)]
+    if (is_empty(l_final)) l_final <- Inf
+    l_warm <- err_dt[seperate == TRUE & stringr::str_detect(message, "EnergyPlus Warmup Error Summary"),
+           which = TRUE]
+    if (is_empty(l_warm)) l_warm <- Inf
+    l_last_valid <- min(l_final, l_warm)
+
+    if (l_last_valid > 0L) err_dt <- err_dt[-(l_last_valid:.N)]
 
     err_dt[is.na(message), c("level", "message") := {
-        as.list(stringr::str_match(string, reg_w_or_e)[, 2:3])}]
+        res <- stringr::str_match(string, reg_w_or_e)[, 2:3]
+        list(res[,1], res[,2])}]
     err_dt[is.na(message),
            `:=`(message = stringr::str_match(string, reg_w_or_e_con)[, 2])]
     err_dt <- err_dt[!is.na(message)]
@@ -1023,7 +1033,8 @@ parse_err_file <- function (path) {
     err_dt[, `:=`(environment_index = environment_index[1L]), by = list(cumsum(begin_environment == TRUE))]
     err_dt <- err_dt[!is.na(index)]
 
-    err_dt[level == "Info", `:=`(level_index = data.table::rleid(index))]
+    err_dt[begin_environment == FALSE & level == "Info", `:=`(level_index = data.table::rleid(index))]
+    err_dt[begin_environment == TRUE, `:=`(level_index = 0)]
     err_dt[level == "Warning", `:=`(level_index = data.table::rleid(index))]
     err_dt[level == "Severe", `:=`(level_index = data.table::rleid(index))]
     err_dt[level == "Fatal", `:=`(level_index = data.table::rleid(index))]
