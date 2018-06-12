@@ -22,27 +22,50 @@
 #' @section Usage:
 #'
 #' ```
-#' model <- eplus_model$new(path, idd = NULL)
+#' model <- Idf$new(path, idd = NULL)
 #'
-#' model$all(type, class = NULL)
-#' model$contains(match, scale)
-#' model$matches(match, ..., scale)
-#' model$get(...)
-#' model$add(class, ..., min = TRUE)
-#' model$set(id, ...)
-#' model$dup(id, new_name = NULL)
-#' model$del(id, force = FALSE)
-#' model$hide(id, force = FALSE)
-#' model$notes(id, ..., append = FALSE, wrap = 0L)
-#' model$diff(type)
-#' model$check()
-#' model$save(confirm = FALSE, format)
-#' model$saveas(path, format, overwrite = FALSE)
-#' model$print()
-#' model$reset(confirm = FALSE)
-#' model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
-#' model$collect(type = c("variable", "meter"), long = FALSE)
-#' model$table(report = NULL, key = NULL, table = NULL)
+#' model$version()
+#' model$path()
+#' model$group_names(where = c("idf", "idd"))
+#' model$class_names(where = c("idf", "idd"))
+#' model$object_ids(class = NULL)
+#'
+#' model$get_options(options = NULL)
+#' model$set_options(...)
+#'
+#' model$definition(class)
+#'
+#' model$object(id)
+#' model$objects(ids)
+#' model$object_in_class(class, index = NULL)
+#' model$objects_in_class(class, indexes = NULL)
+#' model$search_value(pattern)
+#' model$replace_value(pattern, replacement)
+#'
+#' model$add_object(class, ..., default = TRUE)
+#' model$dup_object(id, new_name = NULL)
+#' model$ins_object(objects)
+#' model$set_object(id, ...)
+#' model$del_object(id, referenced = FALSE)
+#'
+#' model$validate()
+#'
+#' model$string(header = TRUE, comment = TRUE)
+#' model$save(path = NULL, overwrite = FALSE)
+#'
+#' model$copy()
+#'
+#' model$is_valid_class(class, where = "idf")
+#' model$is_valid_id(id)
+#' model$is_unsaved()
+#' model$is_valid()
+#'
+#' model$run(weather = NULL, dir = NULL, wait = TRUE)
+#' model$errors(info = TRUE)
+#' model$collect()
+#' model$output_dir(open = FALSE)
+#'
+#' model$print(plain = FALSE)
 #' ```
 #'
 #' @section Read:
@@ -380,9 +403,11 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_is_imf <- is_imf
             private$m_version <- idf_file$version
             # init options
-            private$m_options <- list2env(idf_file$options, parent = emptyenv())
-            private$m_options$validate_level <- "final"
-            private$m_options$verbose_info <- TRUE
+
+            private$m_options <- list2env(as.list.environment(.options), parent = emptyenv())
+            private$m_options$save_format <- idf_file$options$save_format
+            private$m_options$view_in_ip <- idf_file$options$view_in_ip
+            private$m_options$special_format <- idf_file$options$special_format
 
             idd <- attr(idf_file, "idd")
             # init idd tbl
@@ -767,7 +792,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        insert_objects = function (objects) {
+        ins_object = function (objects) {
             # insert an object from other Idf or file or even clipboard
             # {{{
             # check if input is a object list
@@ -1082,7 +1107,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        collect = function (dir = NULL, type = c("variable", "meter"), long = FALSE) {
+        collect = function () {
             # check status
             # {{{
             private$m_run$sql <- private$locate_output(".sql")
@@ -1648,6 +1673,7 @@ on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
     paste0("Invalid object id found for current Idf: ", backtick(eval(call$id, env)), ".")
 }
 
+#' @export
 # [.Idf {{{
 '[.Idf' <- function(x, i, j, ..., drop = FALSE) {
     if (missing(i)) {
@@ -1669,6 +1695,8 @@ on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
     obj
 }
 # }}}
+
+#' @export
 # [[.Idf {{{
 '[[.Idf' <- function(x, i, j, ..., drop = FALSE) {
     if (missing(i)) {

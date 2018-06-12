@@ -2,54 +2,63 @@
 % Please edit documentation in R/eplusr.R
 \docType{package}
 \name{eplusr-package}
-\alias{tibble-package}
+\alias{eplusr}
 \alias{eplusr-package}
-\alias{eplusr_opt}
 \title{eplusr: A Toolkit for Using EnergyPlus in R}
-\usage{
-eplusr_opt(x)
-}
 \description{
-This package provides tools to run EnergyPlus and collect,
-analyse, summary and plot parametric simulation results in R.
-
-Display options for \code{tbl_df}, used by \code{\link[=trunc_mat]{trunc_mat()}} and
-(indirectly) by \code{\link[=print.tbl]{print.tbl()}}.
+eplusr: A Toolkit for Using EnergyPlus in R
 }
 \details{
-EnergyPlus has been widely used for XXXX. \code{eplusr}
+eplusr provides a richable toolkit of using EnergyPlus directly in
+R, which enables programmatical navigation, modification of EnergyPlus models
+and makes it less painful to do parametric simulations and analysis.
+
+With eplusr, you can do:
+\itemize{
+\item Read and parse EnergyPlus \code{IDF} files
+\item Query on models, including classes, objects and fields
+\item Directly add, modify, duplicate, and delete objects of \code{IDF} in R.
+\item Automatically change referred fields when modifying objects.
+\item Save the changed models into standard formats in the same way as IDFEditor
+distributed along with EnergyPlus.
+\itemize{
+\item Run your models directly and collect the simulation output of EnergyPlus
+in R.
 }
-\section{Methods}{
-
-
-\code{tbl_df} implements four important base methods:
-
-\describe{
-\item{print}{By default only prints the first 10 rows (at most 20), and the
-columns that fit on screen; see \code{\link[=print.tbl]{print.tbl()}}}
-\item{\code{[}}{Does not simplify (drop) by default, returns a data frame}
-\item{\code{[[}, \code{$}}{Calls \code{\link[=.subset2]{.subset2()}} directly,
-so is considerably faster. Returns \code{NULL} if column does not exist,
-\code{$} warns.}
-}
-}
-
-\section{Important functions}{
-
-
-\code{\link[=tibble]{tibble()}} and \code{\link[=tribble]{tribble()}} for construction,
-\code{\link[=as_tibble]{as_tibble()}} for coercion,
-and \code{\link[=print.tbl]{print.tbl()}} and \code{\link[=glimpse]{glimpse()}} for display.
 }
 
+To learn more about dplyr, start with the vignettes:
+\code{browseVignettes(package = "eplusr")}
+}
 \section{Package options}{
 
+\itemize{
+\item \code{eplusr.num_digits}: Integer indicating the number of decimal places for
+numeric fields. Default: \code{8L}
+\item \code{eplusr.view_in_ip}: Whether models should be presented in IP units.
+Default: \code{FALSE}
+\item \code{eplusr.validate_level}: The strictness level of validation during field
+value modification and model error checking. Possible value: \code{"none"},
+\code{"draft"} and \code{"final"}. Default: \code{"final"}. Detailed description:
+\itemize{
+\item For \code{"none"}, none validation will be done;
+\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
+integer, and choice field values will be done;
+\item For \code{"final"}, besides above, checking of missing required objects,
+duplicated unique objects, object name confliction, missing required
+fields and invalid field value reference will also be done.
+}
+\item \code{eplusr.verbose_info}: Whether to show information messages. Default: TRUE
+\item \code{eplusr.save_format}: The format to use when saving Idf objects to \code{.idf}
+files. Possible values: \code{"sorted"}, \code{"new_top"} and \code{"new_bottom"}, which
+have the same effect as settings \code{"Sorted"}, \code{"Original with New at Top"} and
+\code{"Original with New at Bottom"} in IDF Editor, respectively. Default:
+\code{"sorted"}. Detailed description:
+\item \code{eplusr.num_parallel}: Maximum number of parallel simulations to run.
+Default: \code{parallel::detectCores()}.
+}
 }
 
-\examples{
-tibble(a = 1:26, b = letters)
-as_tibble(iris)
-}
 \seealso{
 Useful links:
 \itemize{
