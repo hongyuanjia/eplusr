@@ -35,7 +35,7 @@ Sql <- R6::R6Class(classname = "EpSql", cloneable = FALSE, lock_class = TRUE,
         },
 
         report_data = function (key_value = NULL, name = NULL, all = FALSE,
-                                year = NULL, tz = "GMT") {
+                                year = NULL, tz = "GMT", case = FALSE) {
             # read report data
             # {{{
             q <- private$vars_query(key_value = key_value, name = name)
@@ -55,6 +55,11 @@ Sql <- R6::R6Class(classname = "EpSql", cloneable = FALSE, lock_class = TRUE,
             data.table::setorder(res, KeyValue, Name, DateTime)
 
             if (tz != "GMT") res$DateTime <- lubridate::force_tz(res$DateTime, tz)
+
+            if (case) {
+                res[, Case := tools::file_path_sans_ext(basename(private$m_path))]
+                data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
+            }
 
             res
             # }}}
