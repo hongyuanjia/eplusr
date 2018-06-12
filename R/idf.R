@@ -1113,6 +1113,22 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
+        copy = function () {
+            # thoroughly copy current Idf object
+            # {{{
+            deep_cloned <- self$clone(deep = TRUE)
+            enclos_env <- deep_cloned$.__enclos_env__
+            enclos_env$private$IdfObject$self$private_fields$m_uuid <- enclos_env$private$m_uuid
+            enclos_env$private$IdfObject$self$private_fields$m_version <- enclos_env$private$m_version
+            enclos_env$private$IdfObject$self$private_fields$m_idf_tbl <- enclos_env$private$m_idf_tbl
+            enclos_env$private$IdfObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
+            enclos_env$private$IdfObject$self$private_fields$m_options <- enclos_env$private$m_options
+            enclos_env$private$IdfObject$self$private_fields$m_log <- enclos_env$private$m_log
+            enclos_env$private$IdfObject$self$private_fields$IdfObject <- enclos_env$private$IdfObject
+            deep_cloned
+            # }}}
+        },
+
         # mask or delete non-useful methods inherited from `Idd` class
         # TODO: find a nicer way to do so
         build = function () stop("attempt to apply non-function", call. = FALSE),
@@ -1652,6 +1668,31 @@ Idf <- R6::R6Class(classname = "Idf",
                 }
             }
             paste0(status$prefix, suffix)
+            # }}}
+        },
+
+        deep_clone = function (name, value) {
+            # deep clone an Idf object
+            # {{{
+            if (name == "m_uuid") {
+                uuid::UUIDgenerate(use.time = TRUE)
+            } else if (name == "IdfObject") {
+                # clone the IdfObject R6Class Generator
+                cloned_IdfObject <- clone_generator(value)
+                # # assign shared data to IdfObject R6Class Generator
+                # cloned_IdfObject$self$private_fields$m_uuid <- m_uuid
+                # cloned_IdfObject$self$private_fields$m_version <- private$m_version
+                # cloned_IdfObject$self$private_fields$m_idf_tbl <- private$m_idf_tbl
+                # cloned_IdfObject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
+                # cloned_IdfObject$self$private_fields$m_options <- private$m_options
+                # cloned_IdfObject$self$private_fields$m_log <- private$m_log
+                cloned_IdfObject
+            } else if (is.environment(value) &  name != "IddObject") {
+                list2env(as.list.environment(value, all.names = TRUE),
+                         parent = emptyenv())
+            } else {
+                value
+            }
             # }}}
         }
         # }}}
