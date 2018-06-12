@@ -723,7 +723,6 @@ parse_idf_file <- function (path, idd = NULL) {
     option_special_format <- FALSE
     option_view_in_ip_units <- FALSE
     option_save <- "sorted"
-    option_num_digits <- 8L
 
     idf_option <- idf_dt[type == type_special]
     idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
@@ -769,7 +768,7 @@ parse_idf_file <- function (path, idd = NULL) {
         save_format = option_save,
         special_format = option_special_format,
         view_in_ip = option_view_in_ip_units,
-        num_digits = option_num_digits)
+        num_digits = 8L)
     # }}}
 
     # get rid of special comment lines

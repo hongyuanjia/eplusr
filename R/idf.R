@@ -1036,25 +1036,23 @@ Idf <- R6::R6Class(classname = "Idf",
         run = function (weather = NULL, dir = NULL, wait = TRUE) {
             # {{{
             # eplus path
-            ver <- as.character(private$m_version)
-            all_ver <- names(.globals$eplus_config)
-            if (!ver %in% all_ver) {
+            ver <- private$m_version
+            if (!eplus_available(ver)) {
                 stop("Could not locate EnergyPlus v", private$m_version, " at ",
                      "the default installation path. Please set the path to use ",
                      "using `use_eplus()`.", call. = FALSE)
             }
-            eplus_config <- .globals$eplus_config[[ver]]
-            if (eplus_config$version < 8.3) {
+            if (ver < 8.3) {
                 stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
                      call. = FALSE)
             }
 
-            if (is_epw(weather)) {
-                weather <- weather$path()
-            }
+            if (is_epw(weather))  weather <- weather$path()
 
             private$run_info(weather, dir)
-            eplus <- file.path(eplus_config$dir, eplus_config$exe)
+            config <- eplus_config(ver)
+            eplus <- file.path(config$dir, config$exe)
+
             expand_obj <- ifelse(private$have_hvac_template(), TRUE, FALSE)
             proc <- run_idf(eplus,
                             private$m_run$path_idf,
