@@ -1,47 +1,54 @@
-#' @aliases NULL tibble-package
+#' eplusr: A Toolkit for Using EnergyPlus in R
 #'
-#' @details EnergyPlus has been widely used for XXXX. `eplusr`
+#' @details eplusr provides a richable toolkit of using EnergyPlus directly in
+#' R, which enables programmatical navigation, modification of EnergyPlus models
+#' and makes it less painful to do parametric simulations and analysis.
 #'
-#' @section Methods:
+#' With eplusr, you can do:
 #'
-#' `tbl_df` implements four important base methods:
+#' * Read and parse EnergyPlus `IDF` files
+#' * Query on models, including classes, objects and fields
+#' * Directly add, modify, duplicate, and delete objects of `IDF` in R.
+#' * Automatically change referred fields when modifying objects.
+#' * Save the changed models into standard formats in the same way as IDFEditor
+#'   distributed along with EnergyPlus.
+#'   * Run your models directly and collect the simulation output of EnergyPlus
+#'   in R.
 #'
-#' \describe{
-#' \item{print}{By default only prints the first 10 rows (at most 20), and the
-#'   columns that fit on screen; see [print.tbl()]}
-#' \item{\code{[}}{Does not simplify (drop) by default, returns a data frame}
-#' \item{\code{[[}, `$`}{Calls [.subset2()] directly,
-#'   so is considerably faster. Returns `NULL` if column does not exist,
-#'   `$` warns.}
-#' }
+#' To learn more about dplyr, start with the vignettes:
+#' `browseVignettes(package = "eplusr")`
 #'
-#' @section Important functions:
+#' @section Package options:
 #'
-#' [tibble()] and [tribble()] for construction,
-#' [as_tibble()] for coercion,
-#' and [print.tbl()] and [glimpse()] for display.
-#' @importFrom data.table ":="
-#' @examples
-#' tibble(a = 1:26, b = letters)
-#' as_tibble(iris)
-"_PACKAGE"
-
-#' Package options
+#' * `eplusr.num_digits`: Integer indicating the number of decimal places for
+#' numeric fields. Default: `8L`
 #'
-#' Display options for `tbl_df`, used by [trunc_mat()] and
-#' (indirectly) by [print.tbl()].
+#' * `eplusr.view_in_ip`: Whether models should be presented in IP units.
+#' Default: `FALSE`
+#'
+#' * `eplusr.validate_level`: The strictness level of validation during field
+#' value modification and model error checking. Possible value: `"none"`,
+#' `"draft"` and `"final"`. Default: `"final"`. Detailed description:
+#'     - For `"none"`, none validation will be done;
+#'     - For `"draft"`, checking of invalid autosize, autocalculate, numeric,
+#'       integer, and choice field values will be done;
+#'     - For `"final"`, besides above, checking of missing required objects,
+#'     duplicated unique objects, object name confliction, missing required
+#'     fields and invalid field value reference will also be done.
+#'
+#' * `eplusr.verbose_info`: Whether to show information messages. Default: `TRUE`
+#'
+#' * `eplusr.save_format`: The format to use when saving Idf objects to `.idf`
+#' files. Possible values: `"sorted"`, `"new_top"` and `"new_bottom"`, which
+#' have the same effect as `Save Options` settings `"Sorted"`, `"Original with
+#' New at Top"` and `"Original with New at Bottom"` in IDF Editor, respectively.
+#' Default: `"sorted"`.
+#'
+#' * `eplusr.num_parallel`: Maximum number of parallel simulations to run.
+#' Default: `parallel::detectCores()`.
 #'
 #' @name eplusr-package
-#' @section Package options:
-# https://github.com/Rdatatable/data.table/blob/master/R/onLoad.R
-# https://github.com/Rdatatable/data.table/blob/master/R/onAttach.R
-# https://cran.r-project.org/web/packages/roxygen2/vignettes/markdown.html
-# https://cran.r-project.org/web/packages/roxygen2/vignettes/rd.html
-# https://github.com/tidyverse/tibble/blob/782c8904353ad3de878d2b07ac910fbbab04e8a1/DESCRIPTION
-# https://github.com/tidyverse/dplyr/blob/master/R/dplyr.r
-# https://github.com/tidyverse/dplyr/blob/master/R/zzz.r
-# https://github.com/tidyverse/dplyr/blob/master/DESCRIPTION
-eplusr_opt <- function(x) op.eplusr[[paste0("eplusr.", x)]]
+"_PACKAGE"
 
 # package level global constant
 .globals <- new.env(parent = emptyenv())
@@ -54,6 +61,6 @@ eplusr_opt <- function(x) op.eplusr[[paste0("eplusr.", x)]]
 .options$num_digits <- 8L
 .options$view_in_ip <- FALSE
 .options$validate_level <- "final"
-.options$verbose_info <- TRUE
+.options$verbose_info <- FALSE
 .options$save_format <- "sorted"
-.options$num_parallel <- parallel::detectCores(logical = FALSE)
+.options$num_parallel <- parallel::detectCores()

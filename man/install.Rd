@@ -3,17 +3,24 @@
 \name{install}
 \alias{install}
 \alias{install_eplus}
-\title{Install EnergyPlus}
+\alias{install}
+\alias{download_eplus}
+\title{Download and Install EnergyPlus}
 \usage{
 install_eplus(ver = "latest", force = FALSE)
+
+download_eplus(ver = "latest", dir = getwd())
 }
 \arguments{
 \item{ver}{The EnergyPlus version number, e.g., \code{8.7}; the special value
-\code{latest} means the latest version (fetched from Github
-releases).}
+\code{"latest"} means the latest version (fetched from Github releases).}
 
 \item{force}{Whether to install EnergyPlus even if it has already been
 installed.}
+
+\item{dir}{Where to save EnergyPlus installer file. Default is current
+working directory. Only applicable to \code{download_eplus()}. For
+\code{install_eplus()}, it will be saved into \code{tempdir()}.}
 }
 \description{
 Download specified version of EnergyPlus for your platform from Github and

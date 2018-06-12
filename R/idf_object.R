@@ -7,21 +7,29 @@
 #' @section Usage:
 #' ```
 #'
-#' idfobj <- IDFObject$new(list, idd)
+#' idfobj <- IDFObject$new(object_id)
+#'
+#' idfobj$id()
+#' idfobj$name()
 #'
 #' idfobj$get_comment()
 #' idfobj$set_comment(comment, append = TRUE, width = 0L)
 #' idfobj$get_value(index = NULL, name = NULL)
-#' idfobj$set_value(...)
+#' idfobj$set_value(..., defaults = TRUE)
 #'
-#' idfobj$check()
+#' idfobj$validate()
 #'
-#' idfobj$out(comment = TRUE, leading = 4L, ip_units = FALSE, sep_at = 29L,
-#'            add_blank = FALSE)
-#' idfobj$out_lines(index = NULL, ip_units = FALSE)
+#' idfobj$reference_map()
+#'
+#' idfobj$value_table(all = FALSE, unit = TRUE, wide = FALSE, string_value =
+#' TRUE)
+#'
+#' idfobj$is_valid()
+#' idfobj$has_reference_by()
+#' idfobj$has_reference_from()
+#' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 #'
 #' idfobj$print(comment = TRUE)
-#'
 #' print(iddobj)
 #' ```
 #'
@@ -487,13 +495,6 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # }}}
         },
 
-        set_default = function (force = FALSE) {
-            # set field values to their defaults
-            # {{{
-
-            # }}}
-        },
-
         validate = function () {
             # validate field in terms of all creteria
             # {{{
@@ -781,6 +782,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 )
 # }}}
 
+#' @export
 # [.IdfObject {{{
 '[.IdfObject' <- function(x, i, j, ...) {
     if (!missing(j)) {
@@ -799,6 +801,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
     }
 }
 # }}}
+
+#' @export
 # [<-.IdfObject {{{
 '[<-.IdfObject' <- function(x, i, j, ..., value) {
     if (!missing(j)) {
@@ -819,6 +823,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
     .subset2(x, "set_value")(value)
 }
 # }}}
+
+#' @export
 # [[.IdfObject {{{
 '[[.IdfObject' <- function(x, i, j, ..., drop = FALSE) {
     if (!missing(j)) {
@@ -841,6 +847,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
     }
 }
 # }}}
+
+#' @export
 # [[<-.IdfObject {{{
 '[[<-.IdfObject' <- function(x, i, j, ..., value) {
     if (!missing(j)) {
