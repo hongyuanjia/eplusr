@@ -209,7 +209,7 @@ Epw <- R6::R6Class(classname = "Epw",
                          call. = FALSE)
                 }
 
-                d[, c("dt_month", "dt_day", "dt_hour", "dt_minute") := NULL]
+                d[, c("dt_month", "dt_day", "dt_hour", "dt_minute", "line") := NULL]
                 if (update) {
                     d <- format_epw_date(d)
                 }
