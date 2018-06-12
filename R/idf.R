@@ -1757,3 +1757,58 @@ on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
     obj
 }
 # }}}
+
+#' @export
+# length.Idf {{{
+length.Idf <- function (x) {
+    ids <- .subset2(x, "object_ids")()
+    length(ids)
+}
+# }}}
+
+#' @export
+# format.Idf {{{
+format.Idf <- function (x, header = TRUE, comment = TRUE,
+                        format = c("sorted", "new_top", "new_bottom"),
+                        digits = 8L, in_ip = FALSE, ...) {
+
+    format <- match.arg(format)
+
+    opt <- list(save_format = format,
+                num_digits = digits,
+                view_in_ip = in_ip,
+                special_format = FALSE)
+
+    priv <- .subset2(.subset2(model, ".__enclos_env__"), "private")
+
+    val_tbl <- update_value_num(priv$value_tbl(), digits = digits, in_ip = in_ip)
+    val_tbl <- val_tbl[priv$m_log$order, on = "object_id",
+        nomatch = 0L]
+
+    if (comment) {
+        cmt_tbl <- priv$comment_tbl()
+    } else {
+        cmt_tbl <- NULL
+    }
+
+    main <- format_output(val_tbl, cmt_tbl, opt)
+    main <- unlist(strsplit(main, "\n", fixed = TRUE))
+
+    h <- NULL
+    if (header) {
+        h <- format_header(opt)
+    } else {
+        main <- main[-c(1,2)]
+    }
+
+    # add a blank line at the end like IDFEditor
+    c(h, main, "")
+}
+# }}}
+
+#' @export
+# str.Idf {{{
+str.Idf <- function (object, ...) {
+    .subset2(object, "print")()
+}
+# }}}
