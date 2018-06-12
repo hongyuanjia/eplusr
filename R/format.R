@@ -52,13 +52,23 @@ format_output <- function (value_tbl, comment_tbl, options) {
 
     # add field output
     fld <- format_field(value_tbl, in_ip = options$view_in_ip)
-    value_tbl[, out := fld]
+
     # add comment output
-    tbl <- comment_tbl[value_tbl, on = "object_id"]
+    if (not_empty(comment_tbl)) {
+        has_comment <- TRUE
+        tbl <- comment_tbl[value_tbl, on = "object_id"]
+    } else {
+        has_comment <- FALSE
+        tbl <- value_tbl
+    }
+
+    tbl[, out := fld]
+    tbl[field_order == 1L, out := paste0(class_name, ",\n", out)]
+    if (has_comment) {
+        tbl[field_order == 1L & !is.na(comment), out := paste0(comment, "\n", out)]
+    }
 
     # add class output
-    tbl[field_order == 1L, out := paste0(class_name, ",\n", out)][
-        field_order == 1L & !is.na(comment), out := paste0(comment, "\n", out)]
     cls_1 <- tbl[, class_group := .GRP, by = list(data.table::rleid(class_id))][
         , .I[1L], by = list(class_group)]$V1
     if (sav_fmt == "sorted") {
