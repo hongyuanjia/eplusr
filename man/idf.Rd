@@ -26,27 +26,50 @@ you can set fields (using \code{$set}) in the object, duplicate (using
 \code{$dup}), delete (using \code{del}) the object.
 }
 \section{Usage}{
-\preformatted{model <- eplus_model$new(path, idd = NULL)
+\preformatted{model <- Idf$new(path, idd = NULL)
 
-model$all(type, class = NULL)
-model$contains(match, scale)
-model$matches(match, ..., scale)
-model$get(...)
-model$add(class, ..., min = TRUE)
-model$set(id, ...)
-model$dup(id, new_name = NULL)
-model$del(id, force = FALSE)
-model$hide(id, force = FALSE)
-model$notes(id, ..., append = FALSE, wrap = 0L)
-model$diff(type)
-model$check()
-model$save(confirm = FALSE, format)
-model$saveas(path, format, overwrite = FALSE)
-model$print()
-model$reset(confirm = FALSE)
-model$run(period = ~., weather, echo = FALSE, dir = NULL, eplus_home = NULL)
-model$collect(type = c("variable", "meter"), long = FALSE)
-model$table(report = NULL, key = NULL, table = NULL)
+model$version()
+model$path()
+model$group_names(where = c("idf", "idd"))
+model$class_names(where = c("idf", "idd"))
+model$object_ids(class = NULL)
+
+model$get_options(options = NULL)
+model$set_options(...)
+
+model$definition(class)
+
+model$object(id)
+model$objects(ids)
+model$object_in_class(class, index = NULL)
+model$objects_in_class(class, indexes = NULL)
+model$search_value(pattern)
+model$replace_value(pattern, replacement)
+
+model$add_object(class, ..., default = TRUE)
+model$dup_object(id, new_name = NULL)
+model$ins_object(objects)
+model$set_object(id, ...)
+model$del_object(id, referenced = FALSE)
+
+model$validate()
+
+model$string(header = TRUE, comment = TRUE)
+model$save(path = NULL, overwrite = FALSE)
+
+model$copy()
+
+model$is_valid_class(class, where = "idf")
+model$is_valid_id(id)
+model$is_unsaved()
+model$is_valid()
+
+model$run(weather = NULL, dir = NULL, wait = TRUE)
+model$errors(info = TRUE)
+model$collect()
+model$output_dir(open = FALSE)
+
+model$print(plain = FALSE)
 }
 }
 
