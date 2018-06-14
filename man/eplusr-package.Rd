@@ -48,12 +48,11 @@ integer, and choice field values will be done;
 duplicated unique objects, object name confliction, missing required
 fields and invalid field value reference will also be done.
 }
-\item \code{eplusr.verbose_info}: Whether to show information messages. Default: TRUE
+\item \code{eplusr.verbose_info}: Whether to show information messages. Default: \code{TRUE}
 \item \code{eplusr.save_format}: The format to use when saving Idf objects to \code{.idf}
 files. Possible values: \code{"sorted"}, \code{"new_top"} and \code{"new_bottom"}, which
-have the same effect as settings \code{"Sorted"}, \code{"Original with New at Top"} and
-\code{"Original with New at Bottom"} in IDF Editor, respectively. Default:
-\code{"sorted"}. Detailed description:
+have the same effect as \code{Save Options} settings \code{"Sorted"}, \code{"Original with New at Top"} and \code{"Original with New at Bottom"} in IDF Editor, respectively.
+Default: \code{"sorted"}.
 \item \code{eplusr.num_parallel}: Maximum number of parallel simulations to run.
 Default: \code{parallel::detectCores()}.
 }
