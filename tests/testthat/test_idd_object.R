@@ -43,7 +43,7 @@ idd_text <- c(
        \\object-list RefTestSimpleA1")
 # }}}
 
-idd <- Idd$new(idd_text)
+idd <- read_idd(idd_text)
 slash <- idd$object("TestSlash")
 
 describe("methods from IddObject", {
