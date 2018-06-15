@@ -685,7 +685,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
             cli::cat_line("<< Class: ", backtick(prop[["class_name"]]), " >>")
             cli::cat_rule(center = "* MEMO *", line = 1)
             memo <- self$memo()
-            if (is_empty(memo)) {
+            if (is.na(memo)) {
                 cli::cat_line("  <No Memo>")
             } else {
                 cli::cat_line("  \"", msg(memo), "\"")
