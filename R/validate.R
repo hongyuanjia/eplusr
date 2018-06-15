@@ -136,9 +136,10 @@ i_check_missing <- function (private, input) {
 # i_exclu_empty: exclude non-required empty fields {{{
 i_exclu_empty <- function (private, input) {
     if (private$m_options$validate_level == "final") {
-        input$value_tbl <- input$value_tbl[!(required_field == FALSE & value == "")]
+        input$value_tbl <- input$value_tbl[!(required_field == FALSE &
+            (value == "" | is.na(value)))]
     } else {
-        input$value_tbl <- input$value_tbl[value != ""]
+        input$value_tbl <- input$value_tbl[!(value == "" | is.na(value))]
     }
 }
 # }}}

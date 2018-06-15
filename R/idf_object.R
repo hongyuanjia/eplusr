@@ -218,24 +218,24 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # }}}
         },
 
-        set_value = function (..., defaults = TRUE) {
+        set_value = function (..., defaults = TRUE, all = TRUE) {
             # set field value
             # {{{
             assert_that(!self$is_version(), msg = "Cannot modify `Version` object directly.")
             # capture all arguments in dots and flatten into a list
             dots <- purrr::splice(...)
+            # check if there are invalid empty fields
+            if (not_empty(dots) && !all(vapply(dots, is_scalar, logical(1)))) {
+                stop("Each value should be an atomic vector.", call. = FALSE)
+            }
             if (private$m_options$validate_level == "final") {
                 assert_that(not_empty(dots), msg = "Please give values to set.")
                 depth <- purrr::vec_depth(dots)
                 assert_that(depth == 2L, msg = "Nested list is not supported.")
             }
-            # check if there are NA or empty string or "" in the dots
-            # check if there are fields to delete
-            is_null <- purrr::map_lgl(dots, is.null)
-            is_valid <- purrr::map_lgl(dots[!is_null], ~any(!is.na(.x) & length(.x) == 1))
-            if (any(!is_valid)) {
-                stop("Each value should be an atomic vector or NULL.", call. = FALSE)
-            }
+            # check if there are NA in the dots
+            is_na <- vapply(dots, is.na, logical(1))
+
             # check if the dots have names
             nms <- names(dots)
             named <- all(nms != "", !is.null(nms))
@@ -360,42 +360,30 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # prepare values for validation
             # {{{
             value_tbl <- private$value_tbl(with_field = TRUE, all = TRUE)
-            vals <- dots
-            vals[is_null] <- rep("", sum(is_null))
-            value_to_set <- value_tbl[index,
-                `:=`(value = as.character(unlist(vals)),
-                     object_id = private$m_object_id)][index,
-                `:=`(value_upper = toupper(value),
-                     value_num = {
-                         is_num = purrr::map_lgl(vals, is.numeric);
-                         value_num[is_num] = unlist(vals[is_num]);
-                         value_num[!is_num] = NA_real_;
-                         value_num})][,
-                `:=`(value_ipnum = value_num)]
-            value_to_set <- update_value_num(
-                value_to_set,
-                private$m_options$num_digits,
-                private$m_options$view_in_ip)
-
             # get the last value index
             last_ord <- max(num, index)
+            last_req <- value_tbl[required_field == TRUE,
+                {if (is_empty(field_order)) 0 else max(field_order)}]
+            if (all) {
+                last_val <- num_fields
+            } else {
+                last_val <- max(last_req, last_ord)
+                # if this class is a class with no required fields
+                if (last_val == 0) last_val <- num_fields
+            }
             # if default is TRUE
             if (defaults) {
                 # make sure all required fields with defaults will be set
-                req <- value_to_set[required_field == TRUE]
-                if (not_empty(req)) last_req <- req[, max(field_order)] else last_req <- 0L
-                last_val <- max(last_req, last_ord)
-                can_def <- value_to_set[
-                    !field_order %in% index[is_null] & # exclude fields to be deleted
+                can_def <- value_tbl[,
+                    !field_order %in% index[is_na] & # exclude fields to be deleted
                     field_order <= last_val &
                     is.na(value) &
-                    !is.na(field_default),
-                    field_order]
+                    !is.na(field_default)]
                 # have fields with defaults
-                if (not_empty(can_def)) {
+                if (any(can_def)) {
                     # only reset the last order if having defaults to set
                     last_ord <- last_val
-                    value_to_set[
+                    value_tbl[
                         can_def,
                         `:=`(value = field_default,
                              value_upper = toupper(field_default),
@@ -405,7 +393,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                     # print messages
                     if (private$m_options$verbose_info) {
                         cli::cat_rule("Info")
-                        dft_flds <- backtick(value_to_set$field_name[can_def])
+                        dft_flds <- backtick(value_tbl$field_name[can_def])
                         flds <- paste0(can_def, ":", dft_flds, sep = ", ")
                         cli::cat_bullet(
                             paste0("| Values for field ", flds,
@@ -416,13 +404,25 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 }
             }
 
-            # fill missing value_id
+            # fill missing value_id and object_id
             max_id <- private$m_idf_tbl$value[, max(value_id)]
-            value_to_set[field_order <= last_ord & is.na(value_id),
+            value_tbl[field_order <= last_ord & is.na(value_id),
                 `:=`(value_id = max_id + seq_along(value_id))]
-            # for non-required fields that have no defaults, set value to ""
-            value_to_set <- value_to_set[is.na(value),
-                `:=`(value = "", value_upper = "", object_id = private$m_object_id)]
+            # update value num
+            value_tbl <- value_tbl[index,
+                `:=`(value = as.character(unlist(dots)),
+                     object_id = private$m_object_id)][index,
+                `:=`(value_upper = toupper(value),
+                     value_num = {
+                         is_num = vapply(dots, is.numeric, logical(1));
+                         value_num[is_num] = unlist(vals[is_num]);
+                         value_num[!is_num] = NA_real_;
+                         value_num})][,
+                `:=`(value_ipnum = value_num)]
+            value_to_set <- update_value_num(
+                value_tbl,
+                private$m_options$num_digits,
+                private$m_options$view_in_ip)
             # set to m_temp for value validation
             private$m_temp$value_to_set <- value_to_set
             # clean up temp variables
@@ -436,8 +436,27 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             if (all(purrr::map_lgl(private$m_validate, is_empty))) {
                 # assign value
                 new_val_tbl <- update_value_num(private$m_temp$value_to_set)[
-                    field_order %in% index[!is_null],
-                    .SD, .SDcols = names(private$m_idf_tbl$value)]
+                    , .SD, .SDcols = c(names(private$m_idf_tbl$value), "field_order")][
+                    , object_id := private$m_object_id]
+                # Case 1: no values
+                # dots can be empty only when validate level is not "final"
+                if (is_empty(dots)) {
+                    new_val_tbl <- new_val_tbl[field_order <= last_val]
+                # Case 2: no value to delete
+                } else if (all(!is_na)) {
+                    new_val_tbl <- new_val_tbl[field_order <= last_val]
+                # Case 3: have values to delete and is from `Idf$add_object`
+                } else if (private$m_log$from_add_object) {
+                    # just ignore delete action
+                    new_val_tbl <- new_val_tbl[field_order <= last_val]
+                # Case 4: have values to delete and is from `IdfObject$set_object`
+                } else {
+                    # ignore fields to delete that are behind the last val
+                    index_del <- index[is_na]
+                    index_keep <- max(index_del[index_del <= last_val], last_val)
+                    new_val_tbl <- new_val_tbl[field_order <= index_keep]
+                }
+                new_val_tbl[, field_order := NULL]
                 private$m_idf_tbl$value <- data.table::rbindlist(list(
                     private$m_idf_tbl$value[object_id != private$m_object_id],
                     new_val_tbl
@@ -669,10 +688,6 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             }
 
             value_tbl <- private$value_tbl(with_field = TRUE)
-            if (is_empty(value_tbl)) {
-                cli::cat_line(" * Object has been deleted * ")
-                return(invisible())
-            }
 
             # comment
             if (comment) {

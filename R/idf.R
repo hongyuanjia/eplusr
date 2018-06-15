@@ -976,7 +976,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        add_object = function (class, ..., defaults = TRUE) {
+        add_object = function (class, ..., defaults = TRUE, all = FALSE) {
             # add a new object in class
             # {{{
             # can be added?
@@ -989,8 +989,11 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_idf_tbl$object <- data.table::rbindlist(list(
                 private$m_idf_tbl$object, obj_tbl), fill = TRUE)
             idfobj <- private$IdfObject$new(obj_id)
+            # transfer `all` to idfobj
+            private$m_log$from_add_object <- TRUE
+            on.exit({private$m_log$from_add_object <- NULL}, add = TRUE)
 
-            idfobj <- tryCatch(idfobj$set_value(..., defaults = defaults),
+            idfobj <- tryCatch(idfobj$set_value(..., defaults = defaults, all = all),
                 error = function(e) {
                     private$m_idf_tbl$object <- private$m_idf_tbl$object[
                        object_id != obj_id]
@@ -1009,6 +1012,10 @@ Idf <- R6::R6Class(classname = "Idf",
                 ))
                 private$verbose_info("A new object [ID: {obj_id}] in class \\
                     `{class}` has been added.")
+                # update object name because this object was initialized with
+                # empty name
+                idfobj$.__enclos_env__$private$m_object_name <- private$m_idf_tbl$object[
+                    object_id == obj_id, object_name]
                 idfobj
             }
             # }}}
