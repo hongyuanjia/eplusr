@@ -333,6 +333,8 @@ i_print_single_validate <- function (res, type) {
     }
 }
 # }}}
+
+#' @export
 # print.IdfValidity {{{
 print.IdfValidity <- function (x, ...) {
     i_print_validate(x)
