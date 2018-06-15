@@ -395,6 +395,9 @@ read_idf <- function (path, idd = NULL) {
 
     idf <- Idf$new(path, idd)
 
+    # NOTE: since R did not provide an `unlockEnvironment` function, have to set
+    # those function to NULL to `mask` then. However, they are still visible by
+    # `names` and autocompletion feature in RStudio
     # delete unnecessary methods inherited from parent Idd class
     methods_mask <- c("build", "group_orders", "class_orders",
         "objects_in_group", "required_objects", "unique_objects",
