@@ -436,7 +436,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             if (all(purrr::map_lgl(private$m_validate, is_empty))) {
                 # assign value
                 new_val_tbl <- update_value_num(private$m_temp$value_to_set)[
-                    !field_order %in% index[is_null],
+                    field_order %in% index[!is_null],
                     .SD, .SDcols = names(private$m_idf_tbl$value)]
                 private$m_idf_tbl$value <- data.table::rbindlist(list(
                     private$m_idf_tbl$value[object_id != private$m_object_id],
