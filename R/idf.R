@@ -896,12 +896,12 @@ Idf <- R6::R6Class(classname = "Idf",
             if (is.list(objects)) {
                 len <- length(objects)
                 # every component should be an IdfObject
-                valid <- purrr::map_lgl(objects, is_idfobject)
+                valid <- vapply(objects, is_idfobject, logical(1))
                 if (!all(valid)) {
                     stop("When input is a list, every component should be an ",
                          "IdfObject.", call. = FALSE)
                 }
-                purrr::map(objects, private$insert_object)
+                lapply(objects, private$insert_object)
             # check if input is a string
             } else if (is_scalar(objects)) {
                 if (is_idfobject(objects)) {
@@ -916,7 +916,7 @@ Idf <- R6::R6Class(classname = "Idf",
                     tbl$object <- tbl$object[object_id != id_ver]
                     tbl$value <-  tbl$value[object_id != id_ver]
                     ids <- in_idf$object_ids()
-                    purrr::map(in_idf$objects(ids), private$insert_object)
+                    lapply(in_idf$objects(ids), private$insert_object)
                 }
             } else {
                 stop("Input should be an IdfObject, a list of IdfObjects, or ",
