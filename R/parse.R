@@ -15,7 +15,7 @@ parse_idd_file <- function(path) {
 
     pb$update(0.1, tokens = list(what = "Initialize"))
     # read idd string, get idd version and build
-    idd_str <- read_idd(path)
+    idd_str <- read_idd_str(path)
     idd_version <- get_idd_ver(idd_str)
     idd_build <- get_idd_build(idd_str)
 
@@ -632,7 +632,7 @@ parse_idd_file <- function(path) {
 # parse_idf_file {{{
 parse_idf_file <- function (path, idd = NULL) {
 
-    idf_str <- read_idd(path)
+    idf_str <- read_idd_str(path)
 
     # if idd is missing, use preparsed Idd object
     if (is.null(idd)) {
@@ -1092,8 +1092,8 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
 
 #' @importFrom stringr str_trim
 #' @importFrom readr read_lines
-# read_idd {{{
-read_idd <- function(filepath) {
+# read_idd_str {{{
+read_idd_str <- function(filepath) {
     idd_str <- readr::read_lines(filepath)
     # Have to fix encoding errors in version 8.3 and below
     idd_str <- gsub("\x92", "'", idd_str, useBytes = TRUE, fixed = TRUE)
