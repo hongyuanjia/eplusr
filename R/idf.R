@@ -941,21 +941,21 @@ Idf <- R6::R6Class(classname = "Idf",
                 }
                 lapply(objects, private$insert_object)
             # check if input is a string
-            } else if (is_scalar(objects)) {
-                if (is_idfobject(objects)) {
-                    private$insert_object(objects)
-                } else if (is_string(objects)) {
-                    # try to parse the input using same idd
-                    idd <- use_idd(private$m_version)
-                    in_idf <- Idf$new(objects, idd)
-                    # delete version object
-                    tbl <- ._get_private(in_idf)$m_idf_tbl
-                    id_ver <- tbl$object[class_id == 1L, object_id]
-                    tbl$object <- tbl$object[object_id != id_ver]
-                    tbl$value <-  tbl$value[object_id != id_ver]
-                    ids <- in_idf$object_ids()
-                    lapply(in_idf$objects(ids), private$insert_object)
-                }
+            } else if (is_idfobject(objects)) {
+                private$insert_object(objects)
+            } else if (is_string(objects)) {
+                # TODO: check if current Idf is parsed using custom Idd object.
+                # If so, then here we should use the custom Idd
+                # try to parse the input using same idd
+                idd <- use_idd(private$m_version)
+                in_idf <- Idf$new(objects, idd)
+                # delete version object
+                tbl <- ._get_private(in_idf)$m_idf_tbl
+                id_ver <- tbl$object[class_id == 1L, object_id]
+                tbl$object <- tbl$object[object_id != id_ver]
+                tbl$value <-  tbl$value[object_id != id_ver]
+                ids <- in_idf$object_ids(simplify = TRUE)
+                lapply(in_idf$objects(ids), private$insert_object)
             } else {
                 stop("Input should be an IdfObject, a list of IdfObjects, or ",
                      "any input acceptable for `Idf$new()`.", call. = FALSE)
