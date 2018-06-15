@@ -110,10 +110,9 @@ i_check_conflict_name <- function (private, input) {
         all_ids <- private$m_idf_tbl$object[class_id %in% cls_id, object_id]
         fld_id <- private$m_idd_tbl$field[
             class_id %in% cls_id & field_order == 1L, field_id]
-        obj_id <- private$m_idf_tbl$value[field_id %in% fld_id][
-            private$m_idf_tbl$object, on = "object_id", nomatch = 0L][,
+        obj_id <- private$m_idf_tbl$object[,
             list(num = .N, object_id = list(object_id)),
-            by = list(class_id, value_upper)][num > 1L, object_id]
+            by = list(class_id, object_name_upper)][num > 1L, object_id]
         if (not_empty(obj_id)) {
             private$m_validate$conflict_name <- input$value_tbl[
                 object_id %in% unlist(obj_id), .SD, .SDcols = input$cols]
@@ -274,7 +273,11 @@ i_print_validate <- function (validate) {
     if (all(empty)) {
         cli::cat_line(" ", clisymbols::symbol$tick, " ", "No error found.")
     } else {
-        error_num <- sum(purrr::map_int(validate[!empty], nrow))
+        error_num <- sum(purrr::imap_int(validate[!empty],
+                ~{
+                    if (.y == "conflict_name") length(unique(.x$object_id))
+                    else nrow(.x)
+                }))
         cli::cat_line(" ", clisymbols::symbol$cross, " [", error_num, "] ",
                       "Errors found during validation.")
         cli::cat_rule(line = 2)
@@ -285,7 +288,11 @@ i_print_validate <- function (validate) {
 # }}}
 # i_print_single_validate: print a single validate result {{{
 i_print_single_validate <- function (res, type) {
-    error_num <- nrow(res)
+    if (type == "conflict_name") {
+        error_num <- length(unique(res$object_id))
+    } else {
+        error_num <- nrow(res)
+    }
     index <- res[["field_order"]]
 
     title <- switch(type,
