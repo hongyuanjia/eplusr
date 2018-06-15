@@ -452,11 +452,10 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        group_names = function (where = c("idf", "idd")) {
+        group_names = function (all = FALSE) {
             # return all group names
             # {{{
-            where <- match.arg(where)
-            if (where == "idf") {
+            if (!all) {
                 private$m_idf_tbl$object[
                     private$m_idd_tbl$class, on = "class_id", nomatch = 0L, list(group_id)][
                     private$m_idd_tbl$group, on = "group_id", nomatch = 0L, unique(group_name)]
@@ -466,11 +465,10 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        class_names = function (where = c("idf", "idd")) {
+        class_names = function (all = FALSE) {
             # return all class names
             # {{{
-            where <- match.arg(where)
-            if (where == "idf") {
+            if (!all) {
                 private$m_idf_tbl$object[
                     private$m_idd_tbl$class, on = "class_id", nomatch = 0L,
                     unique(class_name)]
@@ -480,28 +478,68 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        object_ids = function (class = NULL) {
+        object_ids = function (class = NULL, simplify = FALSE) {
             # return all object ids in current IDF
             # {{{
             if (is.null(class)) {
-                res <- private$m_idd_tbl$class[private$m_idf_tbl$object,
-                    on = "class_id", nomatch = 0L, list(object_id, class_name)]
+                if (simplify) {
+                    private$m_idf_tbl$object[order(object_id), object_id]
+                } else {
+                    res <- private$m_idd_tbl$class[private$m_idf_tbl$object,
+                        on = "class_id", nomatch = 0L, list(object_id, class_name)]
+
+                    lapply(split(res, by = "class_name", keep.by = FALSE),
+                        function (x) x[["object_id"]])
+                }
             } else {
-                assert_that(self$is_valid_class(class, "idf"))
-                ids <- super$class_orders(class)
-                res <- private$m_idd_tbl$class[
-                    private$m_idf_tbl$object[class_id == ids],
-                    on = "class_id", nomatch = 0L, list(object_id, class_name)]
+                assert_that(self$is_valid_class(class))
+                id <- super$class_orders(class)
+                private$m_idd_tbl$class[
+                    private$m_idf_tbl$object[class_id == id], on = "class_id",
+                    object_id]
             }
-            data.table::setattr(res[["object_id"]], "names", res[["class_name"]])[]
             # }}}
         },
 
-        is_valid_class = function (class, where = "idf") {
+        object_names = function (class = NULL, simplify = FALSE, keep_na = FALSE) {
+            # return all object names in current IDF
+            # {{{
+            if (is.null(class)) {
+                if (simplify) {
+                    if (keep_na) {
+                        private$m_idf_tbl$object$object_name
+                    } else {
+                        private$m_idf_tbl$object[!is.na(object_name), object_name]
+                    }
+                } else {
+                    res <- private$m_idd_tbl$class[private$m_idf_tbl$object,
+                        on = "class_id", nomatch = 0L, list(object_name, class_name)]
+                    if (!keep_na) res <- res[!is.na(object_name)]
+
+                    lapply(split(res, by = "class_name", keep.by = FALSE),
+                        function (x) x[["object_name"]])
+                }
+            } else {
+                assert_that(self$is_valid_class(class))
+                id <- super$class_orders(class)
+                res <- private$m_idd_tbl$class[
+                    private$m_idf_tbl$object[class_id == id], on = "class_id",
+                    list(object_name, class_name)]
+
+                if (!keep_na) {
+                    res[!is.na(object_name), object_name]
+                } else {
+                    res$object_name
+                }
+            }
+            # }}}
+        },
+
+        is_valid_class = function (class) {
             # check if the input string is a valid class name in current IDF
             # {{{
             assert_that(is_string(class))
-            class %in% self$class_names(where)
+            class %in% self$class_names()
             # }}}
         },
 
@@ -510,6 +548,15 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             assert_that(is_count(id))
             id %in% self$object_ids()
+            # }}}
+        },
+
+        is_valid_name = function (name) {
+            # check if the input string is a valid object name in current IDF.
+            # NOTE: checking is case insensitive
+            # {{{
+            assert_that(is_string(name))
+            toupper(name) %in% private$m_idf_tbl$object[!is.na(object_name), object_name_upper]
             # }}}
         },
 
@@ -573,19 +620,27 @@ Idf <- R6::R6Class(classname = "Idf",
         },
 
         # TODO: using object name to get object
-        object = function (id) {
+        object = function (index) {
             # return a single object
             # {{{
-            assert_that(self$is_valid_id(id))
+            assert_that(is_scalar(index))
+            id <- private$id_from_index(index)
+            if (length(id) > 1L){
+                warning("More than one objects [ID: ", backtick_collapse(id),
+                    "] found with the name ", backtick(name),
+                    ". Only the first object will be returned.", call. = FALSE)
+                id <- id[1]
+            }
             private$IdfObject$new(id)
             # }}}
         },
 
-        objects = function (ids) {
-            # return a list which contains all objects with input object ids
+        objects = function (indexes) {
+            # return a list which contains all objects with input object ids or
+            # names
             # {{{
-            private$assert_valid_ids(ids)
-            purrr::map(ids, private$IdfObject$new)
+            ids <- private$id_from_index(indexes)
+            lapply(ids, private$IdfObject$new)
             # }}}
         },
 
@@ -594,18 +649,38 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             ids <- self$object_ids(class)
             if (is.null(index)) {
-                private$IdfObject$new(ids[1])
-            } else {
-                assert_that(is_count(index))
+                id <- ids[1]
+            } else if (is_count(index)){
+                total <- length(ids)
                 assert_that(index <= length(ids),
-                    msg = paste0("Invalid index found for class ",
+                    msg = paste0("Invalid object order found for class ",
                         backtick(class), ": ",
-                        backtick_collapse(index), ". Only ",
-                        n, ifelse(n > 1L, " objects exist.", " object exists.")
+                        backtick(index), ". Only ",
+                        total, ifelse(total > 1L, " objects exist.", " object exists.")
                     )
                 )
-                private$IdfObject$new(ids[index])
+                id <- ids[index]
+            } else if (is_string(index)) {
+                nms <- self$object_names(class = class)
+                if (is_empty(nms)) {
+                    stop("Class ", backtick(class), " does not have name attribute.",
+                        call. = FALSE)
+                }
+                valid <- toupper(index) %in% toupper(nms)
+                if (all(!valid)) {
+                    stop("Invalid object name found for class ", backtick(class),
+                        ": ", backtick(index), ". Valid names: ",
+                        backtick_collapse(nms), ".", call = FALSE)
+                }
+                id <- ids[valid]
+                if (length(id) > 1) {
+                    warning("More than one objects found with the name ",
+                        backtick(index), " in class ", backtick(class),
+                        ". Only the first object will be returned.", call. = FALSE)
+                    id <- id[1]
+                }
             }
+            private$IdfObject$new(id)
             # }}}
         },
 
@@ -613,110 +688,39 @@ Idf <- R6::R6Class(classname = "Idf",
             # return a list which contails all objects in the target class
             # {{{
             ids <- self$object_ids(class)
-            if (is.null(indexes)) {
-                purrr::map(ids, private$IdfObject$new)
-            } else {
-                n <- length(ids)
-                assert_that(is_integerish(indexes))
-                assert_that(all(indexes <= n),
-                    msg = paste0("Invalid indexes found for class ",
-                        backtick(class), ": ",
-                        backtick_collapse(indexes[indexes > length(ids)]),
-                        ". Only ", n, ifelse(n > 1L, " objects exist.", " object exists.")
-                    )
-                )
-                purrr::map(ids[indexes], private$IdfObject$new)
-            }
-            # }}}
-        },
-
-        dup_object = function (id, new_name = NULL) {
-            # duplicate an Object
-            # {{{
-            # first, copy the corresponding row in the private$m_objects
-            target <- self$object(id)
-
-            # can be duplicated?
-            private$assert_can_add_object_in_class(target$class_name())
-
-            can_name <- target$has_name()
-            if (!is.null(new_name)) {
-                if (can_name) {
-                    # check name conflict
-                    old_nm <- target$get_value(1L)[[1]]
-                    assert_that(new_name != old_nm, msg = glue::glue(
-                        "New name `{new_name}` is the same as the name of \\
-                        duplicated object."))
-                } else {
-                    warning(glue::glue("Class {obj$class_name()} does not have \\
-                        name. `new_name` is ignored."), call. = FALSE)
-                }
-            } else {
-                if (can_name) {
-                    old_nm <- target$get_value(1L)[[1]]
-                    # get all names in the same class
-                    nms <- private$m_idf_tbl$object[class_id == target$class_order()][
-                        private$m_idf_tbl$value, on = "object_id", nomatch = 0L][
-                        private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
-                        field_order == 1L, list(value_upper, value)]
-                    # get existing names that has a prefix of old name
-                    same <- nms[["value_upper"]][startsWith(nms[["value_upper"]], paste0(toupper(old_nm), "_"))]
-                    if (length(same) == 0L) {
-                        new_name <- paste0(old_nm, "_1")
-                    } else {
-                        # extract the max duplicated time
-                        suffix <- unlist(purrr::map(strsplit(same, "_", fixed = TRUE), 2L))
-                        max_dup <- max(suppressWarnings(as.integer(suffix)))
-                        new_name <- paste0(old_nm, "_", max_dup + 1L)
+            if (!is.null(indexes)) {
+                if (all(is.numeric(indexes))){
+                    valid_order <- vapply(indexes, is_count, logical(1))
+                    if (!all(valid_order)) {
+                        stop("Invalid object order found: ",
+                            backtick_collapse(indexes[!valid_order]), ".",
+                            call. = FALSE)
                     }
-                    private$verbose_info("New name of the new object is not \\
-                        given. A name `{new_name}` is assigned to it.")
+                    total <- length(ids)
+                    assert_that(all(index <= total),
+                        msg = paste0("Invalid object order found for class ",
+                            backtick(class), ": ",
+                            backtick(index[index > total]), ". Only ",
+                            total, ifelse(total > 1L, " objects exist.", " object exists.")
+                        )
+                    )
+                    ids <- ids[indexes]
+                } else if (all(is.character(indexes))) {
+                    nms <- self$object_names(class = class)
+                    if (is_empty(nms)) {
+                        stop("Class ", backtick(class), " does not have name attribute.",
+                            call. = FALSE)
+                    }
+                    valid <- toupper(indexes) %in% toupper(nms)
+                    if (!all(valid)) {
+                        stop("Invalid object name found for class ", backtick(class),
+                            ": ", backtick(indexes[!valid]), ". Valid names: ",
+                            backtick_collapse(nms), ".", call = FALSE)
+                    }
+                    ids <- ids[valid]
                 }
+                lapply(ids, private$IdfObject$new)
             }
-
-            max_obj_id <- private$m_idf_tbl$object[, max(object_id)]
-            max_val_id <- private$m_idf_tbl$value[, max(value_id)]
-            max_cmt_id <- private$m_idf_tbl$comment[, max(comment_id)]
-
-            obj_tbl <- private$m_idf_tbl$object[object_id == id][
-                , object_id := max_obj_id + 1L]
-            val_tbl <- private$m_idf_tbl$value[object_id == id][
-                , `:=`(value_id = max_val_id + seq_along(value_id),
-                       object_id = rep(max_obj_id + 1L, length(value_id)))]
-            if (can_name) {
-                val_tbl[1, `:=`(value = new_name,
-                                value_upper = toupper(new_name))]
-            }
-            cmt_tbl <- private$m_idf_tbl$comment[object_id == id][
-                , `:=`(comment_id = max_cmt_id + seq_along(comment_id),
-                       object_id = rep(max_obj_id + 1L, length(object_id)))]
-
-            old_ids <- private$m_idf_tbl$value[object_id == id, value_id]
-            new_ids <- val_tbl[["value_id"]]
-            val_ref_tbl <- private$m_idf_tbl$value_reference[value_id %in% old_ids][
-                , `:=`(value_id = new_ids[old_ids %in% value_id])]
-
-            private$m_idf_tbl$object <- data.table::rbindlist(list(
-                private$m_idf_tbl$object, obj_tbl
-            ))
-            private$m_idf_tbl$value <- data.table::rbindlist(list(
-                private$m_idf_tbl$value, val_tbl
-            ))
-            private$m_idf_tbl$comment <- data.table::rbindlist(list(
-                private$m_idf_tbl$comment, cmt_tbl
-            ))
-            private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
-                private$m_idf_tbl$value_reference, val_ref_tbl
-            ))
-            # log
-            private$m_log$unsaved <- TRUE
-            private$m_log$order <- data.table::rbindlist(list(
-                private$m_log$order,
-                private$m_log$order[object_id == id][
-                    , `:=`(object_id = max_obj_id + 1L, object_order = 1L)]
-            ))
-
-            private$IdfObject$new(max_obj_id + 1L)
             # }}}
         },
 
@@ -792,6 +796,97 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
+        dup_object = function (index, new_name = NULL) {
+            # duplicate an Object
+            # {{{
+            # first, copy the corresponding row in the private$m_objects
+            target <- self$object(index)
+
+            # can be duplicated?
+            private$assert_can_add_object_in_class(target$class_name())
+
+            can_name <- target$has_name()
+            if (!is.null(new_name)) {
+                if (can_name) {
+                    # check name conflict
+                    old_nm <- target$name()
+                    if (toupper(new_name) == toupper(old_nm)) {
+                        stop("New Name ", backtick(new_name) , " is the same ",
+                            "as the name of target object.", call. = FALSE)
+                    }
+                } else {
+                    warning("Target object does not have name attribute. ",
+                        "`new_name` will be ignored.", call. = FALSE)
+                }
+            } else {
+                if (can_name) {
+                    old_nm <- target$name()
+                    # get all names in the same class
+                    nms <- self$object_names(class = class)
+                    # get existing names that has a prefix of old name
+                    nms_upper <- toupper(nms)
+                    same <- nms_upper[startsWith(nms_upper, paste0(toupper(old_nm), "_"))]
+                    if (length(same) == 0L) {
+                        new_name <- paste0(old_nm, "_1")
+                    } else {
+                        # extract the max duplicated time
+                        suffix <- unlist(purrr::map(strsplit(same, "_", fixed = TRUE), 2L))
+                        max_dup <- max(suppressWarnings(as.integer(suffix)))
+                        new_name <- paste0(old_nm, "_", max_dup + 1L)
+                    }
+                    private$verbose_info("New name of the new object is not \\
+                        given. A name `{new_name}` is assigned to it.")
+                }
+            }
+
+            max_obj_id <- private$m_idf_tbl$object[, max(object_id)]
+            max_val_id <- private$m_idf_tbl$value[, max(value_id)]
+            max_cmt_id <- private$m_idf_tbl$comment[, max(comment_id)]
+
+            obj_tbl <- private$m_idf_tbl$object[object_id == id][
+                , object_id := max_obj_id + 1L]
+            val_tbl <- private$m_idf_tbl$value[object_id == id][
+                , `:=`(value_id = max_val_id + seq_along(value_id),
+                       object_id = rep(max_obj_id + 1L, length(value_id)))]
+            if (can_name) {
+                obj_tbl[, `:=`(
+                    object_name = new_name, object_name_upper = toupper(new_name))]
+                val_tbl[1, `:=`(
+                    value = new_name, value_upper = toupper(new_name))]
+            }
+            cmt_tbl <- private$m_idf_tbl$comment[object_id == id][
+                , `:=`(comment_id = max_cmt_id + seq_along(comment_id),
+                       object_id = rep(max_obj_id + 1L, length(object_id)))]
+
+            old_ids <- private$m_idf_tbl$value[object_id == id, value_id]
+            new_ids <- val_tbl[["value_id"]]
+            val_ref_tbl <- private$m_idf_tbl$value_reference[value_id %in% old_ids][
+                , `:=`(value_id = new_ids[old_ids %in% value_id])]
+
+            private$m_idf_tbl$object <- data.table::rbindlist(list(
+                private$m_idf_tbl$object, obj_tbl
+            ))
+            private$m_idf_tbl$value <- data.table::rbindlist(list(
+                private$m_idf_tbl$value, val_tbl
+            ))
+            private$m_idf_tbl$comment <- data.table::rbindlist(list(
+                private$m_idf_tbl$comment, cmt_tbl
+            ))
+            private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
+                private$m_idf_tbl$value_reference, val_ref_tbl
+            ))
+            # log
+            private$m_log$unsaved <- TRUE
+            private$m_log$order <- data.table::rbindlist(list(
+                private$m_log$order,
+                private$m_log$order[object_id == id][
+                    , `:=`(object_id = max_obj_id + 1L, object_order = 1L)]
+            ))
+
+            private$IdfObject$new(max_obj_id + 1L)
+            # }}}
+        },
+
         ins_object = function (objects) {
             # insert an object from other Idf or file or even clipboard
             # {{{
@@ -837,7 +932,7 @@ Idf <- R6::R6Class(classname = "Idf",
             obj_id <- private$m_idf_tbl$object[, max(object_id)] + 1L
             obj_tbl <- data.table::data.table(object_id = obj_id, class_id = cls_id)
             private$m_idf_tbl$object <- data.table::rbindlist(list(
-                private$m_idf_tbl$object, obj_tbl))
+                private$m_idf_tbl$object, obj_tbl), fill = TRUE)
             idfobj <- private$IdfObject$new(obj_id)
 
             idfobj <- tryCatch(idfobj$set_value(..., defaults = defaults),
@@ -864,22 +959,29 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        set_object = function (id, ...) {
+        set_object = function (index, ...) {
             # set values in an object
             # {{{
-            obj <- self$object(id)
+            obj <- self$object(index)
             obj$set_value(...)
             # log
             private$m_log$unsaved <- TRUE
-            private$m_log$order[object_id == id, object_order := object_order + 1L]
+            private$m_log$order[object_id == obj$id(), object_order := object_order + 1L]
             obj
             # }}}
         },
 
-        del_object = function (id, referenced = FALSE) {
+        del_object = function (index, referenced = FALSE) {
             # delete an object
             # {{{
-            target <- self$object(id)
+            id <- private$id_from_index(index)
+            if (length(id) > 1L){
+                stop("More than one objects [ID: ", backtick_collapse(id),
+                    "] found with the name ", backtick(name),
+                    ". Please specify the object to delete using object id.",
+                    call. = FALSE)
+            }
+            target <- self$object(index)
             cls <- target$class_name()
             # check
             # {{{
@@ -1202,6 +1304,24 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
+        id_from_index = function (index) {
+            # get object id from object index
+            # {{{
+            if (!(all(is.numeric(index)) || all(is.character(index)))) {
+                stop("Index should be either an object id or object name.", call. = FALSE)
+            }
+
+            if (all(is.numeric(index))) {
+                private$assert_valid_ids(index)
+                index
+            } else {
+                private$assert_valid_names(index)
+                nm <- toupper(index)
+                private$m_idf_tbl$object[J(nm), on = "object_name_upper", object_id]
+            }
+            # }}}
+        },
+
         insert_object = function (object) {
             # insert objects from other Idf or file or even clipboard
             # {{{
@@ -1327,17 +1447,27 @@ Idf <- R6::R6Class(classname = "Idf",
         assert_valid_ids = function (ids) {
             # assert that all members in group are valid group names.
             # {{{
-            valid <- ids %in% self$object_ids()
+            valid <- ids %in% private$m_idf_tbl$object$object_id
             assert_that(all(valid),
                 msg = paste0("Invalid object id found for current Idf:",
                              backtick_collapse(ids[!valid]), "."))
             # }}}
         },
 
+        assert_valid_names = function (names) {
+            # assert that all members in group are valid group names.
+            # {{{
+            valid <- toupper(names) %in% private$m_idf_tbl$object$object_name_upper
+            assert_that(all(valid),
+                msg = paste0("Invalid object names found for current Idf:",
+                             backtick_collapse(names[!valid]), "."))
+            # }}}
+        },
+
         assert_valid_options = function (options) {
             # assert that all members in options are valid option names.
             # {{{
-            valid <- options %in% names(private$m_options)
+            valid <- options %in% setdiff(names(private$m_options), "special_format")
             assert_that(all(valid),
                 msg = paste0("Invalid option name found for current Idf: ",
                              backtick_collapse(options[!valid]), "."))
@@ -1409,7 +1539,7 @@ Idf <- R6::R6Class(classname = "Idf",
         have_hvac_template = function () {
             # return TRUE if the model has any "HVACTemplate"
             # {{{
-            cls <- self$class_names(where = "idf")
+            cls <- self$class_names()
             any(startsWith(cls, "HVACTemplate"))
             # }}}
         },
@@ -1710,6 +1840,10 @@ on_failure(Idf$public_methods$is_valid_class) <- function (call, env) {
 
 on_failure(Idf$public_methods$is_valid_id) <- function (call, env) {
     paste0("Invalid object id found for current Idf: ", backtick(eval(call$id, env)), ".")
+}
+
+on_failure(Idf$public_methods$is_valid_name) <- function (call, env) {
+    paste0("Invalid object name found for current Idf: ", backtick(eval(call$name, env)), ".")
 }
 
 #' @export
