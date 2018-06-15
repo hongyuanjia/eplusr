@@ -71,8 +71,8 @@ i_collect_validate <- function (private) {
         i_check_choice(private, input)
         i_check_reference(private, input)
 
-        data.table::setattr(private$m_validate, "class", c("IdfValidity", "list"))
     }
+    data.table::setattr(private$m_validate, "class", c("IdfValidity", "list"))
 }
 # }}}
 # i_is_valid: return true if no validity error found {{{
