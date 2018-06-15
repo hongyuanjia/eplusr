@@ -642,6 +642,9 @@ parse_idf_file <- function (path, idd = NULL) {
             idd <- use_idd(idf_ver)
         # if no version found, use the latest Idd object
         } else {
+            warning("Missing version in input Idf file. The latest Idd version ",
+                .globals$latest_parsed_ver, " will be used. Parsing errors ",
+                "may occur.", call. = FALSE)
             idd <- use_idd(.globals$latest_parsed_ver)
         }
     } else {
