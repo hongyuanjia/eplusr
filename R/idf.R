@@ -397,12 +397,14 @@ read_idf <- function (path, idd = NULL) {
 
     # delete unnecessary methods inherited from parent Idd class
     methods_mask <- c("build", "group_orders", "class_orders",
-        "objects_in_group", "required_objects", "unique_objects")
+        "objects_in_group", "required_objects", "unique_objects",
+        "unique_class_names", "extensible_class_names", "required_class_names")
 
     mask_method <- function (sym, env = idf) {
         unlockBinding(sym, env)
         env[[sym]] <- NULL
         env$.__enclos_env__$self[[sym]] <- NULL
+        lockBinding(sym, env)
     }
     lapply(methods_mask, mask_method)
 
