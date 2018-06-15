@@ -45,7 +45,7 @@ idd_text <- c(
 
 describe("parse_idd_file()", {
     it("can read Idd from string", {
-        expect_silent(idd_str <- read_idd(idd_text))
+        expect_silent(idd_str <- read_idd_str(idd_text))
     })
     it("can parse Idd from string", {
         expect_silent(idd_parsed <- parse_idd_file(idd_text))
@@ -316,7 +316,7 @@ describe("Idd$new()", {
     })
 })
 
-idd <- Idd$new(idd_text)
+idd <- read_idd(idd_text)
 
 describe("$version()", {
     it("can get Idd version", {
@@ -423,8 +423,7 @@ describe("$objects_in_group()", {
     it("can return all IddObjects in a group", {
         expect_is(idd$objects_in_group("TestGroup1"), "list")
         expect_equal(idd$objects_in_group("TestGroup1"),
-                     list(idd$object("TestSimple"),
-                          idd$object("TestSlash")))
+                     list(idd$object("TestSimple")))
     })
     it("can stop when invalid group names are given", {
         expect_error(idd$objects_in_group("WrongGroup"), "Invalid group name found")
