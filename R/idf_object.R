@@ -109,6 +109,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             private$m_class_name <- private$m_idf_tbl$object[
                 object_id == private$m_object_id][
                 private$m_idd_tbl$class, on = "class_id", nomatch = 0L, class_name]
+            private$m_object_name <- private$m_idf_tbl$object[
+                object_id == private$m_object_id, object_name]
             # }}}
         },
 
@@ -124,8 +126,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         name = function () {
             # return object name or NULL if not exists
             # {{{
-            if (!self$has_name()) return(NULL)
-            private$value_tbl(index = 1L)[1, value]
+            private$m_object_name
             # }}}
         },
 
@@ -442,6 +443,18 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 ))
                 data.table::setorder(private$m_idf_tbl$value, value_id)
 
+                # update object name if necessary
+                new_obj_nm <- private$m_temp$value_to_set[
+                    field_order == 1L & field_name == "Name",
+                    list(object_id, value, value_upper)]
+                if (not_empty(new_obj_nm)) {
+                    private$m_idf_tbl$object[
+                        object_id == new_obj_nm$object_id,
+                        `:=`(object_name = new_obj_nm$value,
+                             object_name_upper = new_obj_nm$value_upper)
+                    ]
+                }
+
                 # log order change
                 private$m_log$order[object_id == private$m_object_id,
                     object_order := object_order + 1L]
@@ -645,9 +658,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         print = function (comment = TRUE) {
             # TODO: add the index of this object in the class and required mark
             # {{{
-            id_class <- paste0("[ID: ", private$m_object_id, "] Class ",
-                               backtick(private$m_class_name))
-            cli::cat_line("<<", id_class, ">>")
+            if (is.na(private$m_object_name)) {
+                cli::cat_line("<<[ID:", private$m_object_id, "]>> ",
+                    private$m_class_name)
+            } else {
+                cli::cat_line("<<[ID:", private$m_object_id, "] ",
+                    backtick(private$m_object_name), ">> ",
+                    private$m_class_name)
+            }
 
             value_tbl <- private$value_tbl(with_field = TRUE)
             if (is_empty(value_tbl)) {
@@ -688,6 +706,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         m_log = NULL,
 
         m_object_id = integer(),
+        m_object_name = character(),
         m_validate = list(),
         m_temp = NULL,
 

@@ -939,6 +939,14 @@ parse_idf_file <- function (path, idd = NULL) {
     value <- update_value_num(value_tbl, digits = heading_options$num_digits,
                               in_ip = heading_options$view_in_ip)[
         , list(value_id, value, value_upper, value_num, value_ipnum, object_id, field_id)]
+    data.table::setorder(value, value_id)
+
+    # add object name column
+    object <- value_tbl[field_order == 1L][
+        field_name != "Name", `:=`(value = NA_character_, value_upper = NA_character_)][
+    , list(object_id, class_id, value, value_upper)]
+    data.table::setnames(object, c("value", "value_upper"), c("object_name",  "object_name_upper"))
+    data.table::setorder(object, object_id)
 
     # value reference map
     obj <- value[._get_private(idd)$m_idd_tbl$field_object_list,
