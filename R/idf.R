@@ -839,9 +839,11 @@ Idf <- R6::R6Class(classname = "Idf",
             # {{{
             # first, copy the corresponding row in the private$m_objects
             target <- self$object(index)
+            id <- target$id()
 
             # can be duplicated?
-            private$assert_can_add_object_in_class(target$class_name())
+            cls <- target$class_name()
+            private$assert_can_add_object_in_class(cls)
 
             can_name <- target$has_name()
             if (!is.null(new_name)) {
@@ -860,7 +862,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 if (can_name) {
                     old_nm <- target$name()
                     # get all names in the same class
-                    nms <- self$object_names(class = class)
+                    nms <- self$object_names(cls, simplify = TRUE)
                     # get existing names that has a prefix of old name
                     nms_upper <- toupper(nms)
                     same <- nms_upper[startsWith(nms_upper, paste0(toupper(old_nm), "_"))]
