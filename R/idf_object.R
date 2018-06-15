@@ -208,10 +208,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             # }}}
         },
 
-        get_value = function (index = NULL, name = NULL) {
+        get_value = function (index = NULL, name = NULL, all = FALSE) {
             # return object values
             # {{{
-            value_tbl <- private$value_tbl(index, name, with_field = TRUE)
+            value_tbl <- private$value_tbl(index, name, with_field = TRUE, all = all)
             res <- value_list(value_tbl, private$m_options$view_in_ip)
             data.table::setattr(res, "names", value_tbl[["field_name"]])
             res

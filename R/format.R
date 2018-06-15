@@ -210,6 +210,7 @@ format_index <- function (field_tbl) lpad(field_tbl[["field_order"]])
 # {{{
 format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
                           end = TRUE) {
+    value_tbl[is.na(value), value := ""]
     values <- value_tbl[["value"]]
 
     if (blank) {
@@ -371,30 +372,9 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
 value_list <- function (value_tbl, in_ip = FALSE) {
     assert_that(has_names(value_tbl, c("value", "value_num", "value_ipnum", "type")))
 
-    if (in_ip) {
-        as.list(value_tbl[, {
-            l <- as.list(value)
-
-            is_int <- !is.na(value_ipnum) & type == "integer"
-            l[is_int] <- as.list(round(value_ipnum[is_int]))
-
-            is_dbl <- !is.na(value_ipnum) & type == "real"
-            l[is_dbl] <- as.list(value_ipnum[is_dbl])
-
-            l
-        }])
-    } else {
-        as.list(value_tbl[, {
-            l <- as.list(value)
-
-            is_int <- !is.na(value_num) & type == "integer"
-            l[is_int] <- as.list(round(value_num[is_int]))
-
-            is_dbl <- !is.na(value_num) & type == "real"
-            l[is_dbl] <- as.list(value_num[is_dbl])
-
-            l
-        }])
-    }
+    num_col <- ifelse(in_ip, "value_ipnum", "value_num")
+    value_tbl[, out := as.list(value)]
+    value_tbl[type %in% c("integer", "real"), out := as.list(get(num_col))]
+    value_tbl$out
 }
 # }}}
