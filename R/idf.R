@@ -735,10 +735,10 @@ Idf <- R6::R6Class(classname = "Idf",
                             call. = FALSE)
                     }
                     total <- length(ids)
-                    assert_that(all(index <= total),
+                    assert_that(all(indexes <= total),
                         msg = paste0("Invalid object order found for class ",
                             backtick(class), ": ",
-                            backtick(index[index > total]), ". Only ",
+                            backtick(indexes[indexes > total]), ". Only ",
                             total, ifelse(total > 1L, " objects exist.", " object exists.")
                         )
                     )
@@ -757,8 +757,8 @@ Idf <- R6::R6Class(classname = "Idf",
                     }
                     ids <- ids[valid]
                 }
-                lapply(ids, private$IdfObject$new)
             }
+            lapply(ids, private$IdfObject$new)
             # }}}
         },
 
