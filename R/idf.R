@@ -541,20 +541,25 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        object_names = function (class = NULL, simplify = FALSE, keep_na = FALSE) {
+        object_names = function (class = NULL, simplify = FALSE, keep_all = FALSE) {
             # return all object names in current IDF
             # {{{
             if (is.null(class)) {
                 if (simplify) {
-                    if (keep_na) {
+                    if (keep_all) {
                         private$m_idf_tbl$object$object_name
                     } else {
-                        private$m_idf_tbl$object[!is.na(object_name), object_name]
+                        private$m_idd_tbl$class_property[private$m_idf_tbl$object,
+                            on = "class_id"][has_name == TRUE, object_name]
                     }
                 } else {
                     res <- private$m_idd_tbl$class[private$m_idf_tbl$object,
-                        on = "class_id", nomatch = 0L, list(object_name, class_name)]
-                    if (!keep_na) res <- res[!is.na(object_name)]
+                        on = "class_id", nomatch = 0L,
+                        list(object_name, class_name, class_id)]
+                    if (!keep_all) {
+                        res <- private$m_idd_tbl$class_property[res, on = "class_id"][
+                            has_name == TRUE, list(object_name, class_name)]
+                    }
 
                     lapply(split(res, by = "class_name", keep.by = FALSE),
                         function (x) x[["object_name"]])
@@ -562,14 +567,19 @@ Idf <- R6::R6Class(classname = "Idf",
             } else {
                 assert_that(self$is_valid_class(class))
                 id <- super$class_orders(class)
-                res <- private$m_idd_tbl$class[
-                    private$m_idf_tbl$object[class_id == id], on = "class_id",
-                    list(object_name, class_name)]
-
-                if (!keep_na) {
-                    res[!is.na(object_name), object_name]
+                has_name <- private$m_idd_tbl$class_property[
+                    class_id == id, has_name]
+                if (!has_name) {
+                    if (keep_all) {
+                        n <- private$m_idf_tbl$object[class_id == id, .N]
+                        rep(NA_character_, n)
+                    } else {
+                        character(0)
+                    }
                 } else {
-                    res$object_name
+                    private$m_idd_tbl$class[
+                        private$m_idf_tbl$object[class_id == id], on = "class_id",
+                        object_name]
                 }
             }
             # }}}
