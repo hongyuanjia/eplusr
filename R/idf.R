@@ -970,7 +970,9 @@ Idf <- R6::R6Class(classname = "Idf",
             # add a new object in class
             # {{{
             # can be added?
-            private$assert_can_add_object_in_class(class)
+            if (private$m_options$validate_level == "final") {
+                private$assert_can_add_object_in_class(class)
+            }
             cls_id <- super$class_orders(class)
             obj_id <- private$m_idf_tbl$object[, max(object_id)] + 1L
             obj_tbl <- data.table::data.table(object_id = obj_id, class_id = cls_id)
@@ -1366,8 +1368,6 @@ Idf <- R6::R6Class(classname = "Idf",
                 self$dup_object(object$id())
             } else {
                 cls <- object$class_name()
-                # check if can add an object in the class
-                private$assert_can_add_object_in_class(cls)
                 # get all value
                 val <- object$get_value()
                 self$add_object(cls, val)
