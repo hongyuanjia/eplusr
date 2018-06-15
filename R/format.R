@@ -352,7 +352,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             `:=`(value = as.character(round(value_ipnum, digits = digits)))][
             !is.na(value_ipnum) & type == "integer" & is_integerish(value_ipnum),
             `:=`(value = as.character(round(value_ipnum)))][
-            !is.na(value_ipnum),
+            !is.na(value_ipnum) & !is.na(unit),
             `:=`(value_num = value_ipnum / mult - offset)]
     } else {
         value_tbl[
@@ -360,7 +360,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             `:=`(value = as.character(round(value_num, digits = digits)))][
             !is.na(value_num) & type == "integer" & is_integerish(value_num),
             `:=`(value = as.character(round(value_num)))][
-            !is.na(value_num),
+            !is.na(value_num) & !is.na(unit),
             `:=`(value_ipnum = value_num * mult + offset)]
     }
 
