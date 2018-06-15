@@ -1954,3 +1954,10 @@ str.Idf <- function (object, ...) {
     .subset2(object, "print")()
 }
 # }}}
+
+#' @export
+# names.Idf {{{
+names.Idf <- function (x, ...) {
+    .subset2(x, "object_names")(simplify = TRUE, keep_na = TRUE)
+}
+# }}}
