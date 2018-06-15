@@ -8,6 +8,7 @@ i_collect_validate <- function (private) {
 
     # for "none" level, nothing will be checked
     if (private$m_options$validate_level == "none") {
+        data.table::setattr(private$m_validate, "class", c("IdfValidity", "list"))
         return(private$m_validate)
     }
 
@@ -45,7 +46,7 @@ i_collect_validate <- function (private) {
             if (input$is_set) {
                 input$value_tbl <- private$m_temp$value_to_set
             } else {
-                input$value_tbl <- private$value_tbl(with_field = TRUE)
+                input$value_tbl <- private$value_tbl(with_field = TRUE, all = TRUE)
             }
         } else {
             input$object_tbl <- private$object_tbl(all = TRUE)
@@ -134,7 +135,11 @@ i_check_missing <- function (private, input) {
 # }}}
 # i_exclu_empty: exclude non-required empty fields {{{
 i_exclu_empty <- function (private, input) {
-    input$value_tbl <- input$value_tbl[!(required_field == FALSE & value == "")]
+    if (private$m_options$validate_level == "final") {
+        input$value_tbl <- input$value_tbl[!(required_field == FALSE & value == "")]
+    } else {
+        input$value_tbl <- input$value_tbl[value != ""]
+    }
 }
 # }}}
 # i_check_autosize: invalid autosize fields {{{
