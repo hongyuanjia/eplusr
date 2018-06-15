@@ -224,9 +224,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             assert_that(!self$is_version(), msg = "Cannot modify `Version` object directly.")
             # capture all arguments in dots and flatten into a list
             dots <- purrr::splice(...)
-            assert_that(not_empty(dots), msg = "Please give values to set.")
-            depth <- purrr::vec_depth(dots)
-            assert_that(depth == 2L, msg = "Nested list is not supported.")
+            if (private$m_options$validate_level == "final") {
+                assert_that(not_empty(dots), msg = "Please give values to set.")
+                depth <- purrr::vec_depth(dots)
+                assert_that(depth == 2L, msg = "Nested list is not supported.")
+            }
             # check if there are NA or empty string or "" in the dots
             # check if there are fields to delete
             is_null <- purrr::map_lgl(dots, is.null)
@@ -419,8 +421,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             value_to_set[field_order <= last_ord & is.na(value_id),
                 `:=`(value_id = max_id + seq_along(value_id))]
             # for non-required fields that have no defaults, set value to ""
-            value_to_set <- value_to_set[!is.na(value_id)][
-                required_field == FALSE & is.na(value),
+            value_to_set <- value_to_set[is.na(value),
                 `:=`(value = "", value_upper = "", object_id = private$m_object_id)]
             # set to m_temp for value validation
             private$m_temp$value_to_set <- value_to_set
