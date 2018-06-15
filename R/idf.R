@@ -571,6 +571,8 @@ Idf <- R6::R6Class(classname = "Idf",
             # return current options for current Idf
             # {{{
             res <- as.list.environment(private$m_options)
+            # exclude `special format`
+            res$special_format <- NULL
             if (is.null(options)) {
                 res
             } else {
