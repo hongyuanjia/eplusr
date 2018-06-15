@@ -372,9 +372,44 @@
 #' @importFrom readr write_lines
 #' @importFrom assertthat assert_that
 #' @importFrom uuid UUIDgenerate
-NULL
-
 #' @export
+# read_idf {{{
+read_idf <- function (path, idd = NULL) {
+    # substitute the clone method
+    clone_method <- Idf$clone_method
+    # `deep` arg will be ignored
+    full_clone <- function (deep = TRUE) {
+        deep_cloned <- clone_method(deep = TRUE)
+        enclos_env <- deep_cloned$.__enclos_env__
+        enclos_env$private$IdfObject$self$private_fields$m_uuid <- enclos_env$private$m_uuid
+        enclos_env$private$IdfObject$self$private_fields$m_version <- enclos_env$private$m_version
+        enclos_env$private$IdfObject$self$private_fields$m_idf_tbl <- enclos_env$private$m_idf_tbl
+        enclos_env$private$IdfObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
+        enclos_env$private$IdfObject$self$private_fields$m_options <- enclos_env$private$m_options
+        enclos_env$private$IdfObject$self$private_fields$m_log <- enclos_env$private$m_log
+        enclos_env$private$IdfObject$self$private_fields$IdfObject <- enclos_env$private$IdfObject
+        deep_cloned
+    }
+    Idf$clone_method <- full_clone
+    Idf$public_methods$clone <- full_clone
+
+    idf <- Idf$new(path, idd)
+
+    # delete unnecessary methods inherited from parent Idd class
+    methods_mask <- c("build", "group_orders", "class_orders",
+        "objects_in_group", "required_objects", "unique_objects")
+
+    mask_method <- function (sym, env = idf) {
+        unlockBinding(sym, env)
+        env[[sym]] <- NULL
+        env$.__enclos_env__$self[[sym]] <- NULL
+    }
+    lapply(methods_mask, mask_method)
+
+    idf
+}
+# }}}
+
 # Idf {{{
 Idf <- R6::R6Class(classname = "Idf",
     inherit = Idd,
@@ -621,7 +656,6 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        # TODO: using object name to get object
         object = function (index) {
             # return a single object
             # {{{
@@ -1217,30 +1251,6 @@ Idf <- R6::R6Class(classname = "Idf",
             # }}}
         },
 
-        copy = function () {
-            # thoroughly copy current Idf object
-            # {{{
-            deep_cloned <- self$clone(deep = TRUE)
-            enclos_env <- deep_cloned$.__enclos_env__
-            enclos_env$private$IdfObject$self$private_fields$m_uuid <- enclos_env$private$m_uuid
-            enclos_env$private$IdfObject$self$private_fields$m_version <- enclos_env$private$m_version
-            enclos_env$private$IdfObject$self$private_fields$m_idf_tbl <- enclos_env$private$m_idf_tbl
-            enclos_env$private$IdfObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
-            enclos_env$private$IdfObject$self$private_fields$m_options <- enclos_env$private$m_options
-            enclos_env$private$IdfObject$self$private_fields$m_log <- enclos_env$private$m_log
-            enclos_env$private$IdfObject$self$private_fields$IdfObject <- enclos_env$private$IdfObject
-            deep_cloned
-            # }}}
-        },
-
-        # mask or delete non-useful methods inherited from `Idd` class
-        # TODO: find a nicer way to do so
-        build = function () stop("attempt to apply non-function", call. = FALSE),
-        group_orders = function (...) stop("attempt to apply non-function", call. = FALSE),
-        class_orders = function (...) stop("attempt to apply non-function", call. = FALSE),
-        objects_in_group = function (...) stop("attempt to apply non-function", call. = FALSE),
-        required_objects = function () stop("attempt to apply non-function", call. = FALSE),
-        unique_objects = function () stop("attempt to apply non-function", call. = FALSE),
         print = function (plain = FALSE) {
             # {{{
             if (plain) {
@@ -1810,15 +1820,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 uuid::UUIDgenerate(use.time = TRUE)
             } else if (name == "IdfObject") {
                 # clone the IdfObject R6Class Generator
-                cloned_IdfObject <- clone_generator(value)
-                # # assign shared data to IdfObject R6Class Generator
-                # cloned_IdfObject$self$private_fields$m_uuid <- m_uuid
-                # cloned_IdfObject$self$private_fields$m_version <- private$m_version
-                # cloned_IdfObject$self$private_fields$m_idf_tbl <- private$m_idf_tbl
-                # cloned_IdfObject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
-                # cloned_IdfObject$self$private_fields$m_options <- private$m_options
-                # cloned_IdfObject$self$private_fields$m_log <- private$m_log
-                cloned_IdfObject
+                clone_generator(value)
             } else if (is.environment(value) &  name != "IddObject") {
                 list2env(as.list.environment(value, all.names = TRUE),
                          parent = emptyenv())

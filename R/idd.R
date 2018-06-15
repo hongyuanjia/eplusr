@@ -347,10 +347,44 @@ Idd <- R6::R6Class(classname = "Idd",
                 msg = paste0("Invalid class name found for current IDD",
                              backtick_collapse(classes[!valid]), "."))
             # }}}
+        },
+
+        deep_clone = function (name, value) {
+            # deep clone an Idd object
+            # {{{
+            if (name == "IddObject") {
+                # clone the IddObject R6Class Generator
+                clone_generator(value)
+            } else if (is.environment(value) &  name != "IddObject") {
+                list2env(as.list.environment(value, all.names = TRUE),
+                         parent = emptyenv())
+            } else {
+                value
+            }
+            # }}}
         }
         # }}}
     )
 )
+# }}}
+
+# read_idd {{{
+read_idd <- function (path) {
+    # substitute the clone method
+    clone_method <- Idd$clone_method
+    # `deep` arg will be ignored
+    full_clone <- function (deep = TRUE) {
+        deep_cloned <- clone_method(deep = TRUE)
+        enclos_env <- deep_cloned$.__enclos_env__
+        enclos_env$private$IddObject$self$private_fields$m_version <- enclos_env$private$m_version
+        enclos_env$private$IddObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
+        deep_cloned
+    }
+    Idd$clone_method <- full_clone
+    Idd$public_methods$clone <- full_clone
+
+    Idd$new(path)
+}
 # }}}
 
 # ASSERTION ERROR MESSAGES
@@ -383,8 +417,9 @@ use_idd <- function (idd) {
             res <- get(nm)
         }
     } else {
-        res <- Idd$new(idd)
+        res <- read_idd(idd)
     }
+
     res
 }
 # }}}
