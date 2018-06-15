@@ -665,7 +665,7 @@ Idf <- R6::R6Class(classname = "Idf",
             id <- private$id_from_index(index)
             if (length(id) > 1L){
                 warning("More than one objects [ID: ", backtick_collapse(id),
-                    "] found with the name ", backtick(name),
+                    "] found with the name ", backtick(index),
                     ". Only the first object will be returned.", call. = FALSE)
                 id <- id[1]
             }
