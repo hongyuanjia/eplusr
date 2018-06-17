@@ -415,7 +415,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 `:=`(value_upper = toupper(value),
                      value_num = {
                          is_num = vapply(dots, is.numeric, logical(1));
-                         value_num[is_num] = unlist(vals[is_num]);
+                         value_num[is_num] = unlist(dots[is_num]);
                          value_num[!is_num] = NA_real_;
                          value_num})][,
                 `:=`(value_ipnum = value_num)]
