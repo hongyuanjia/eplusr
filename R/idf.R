@@ -546,8 +546,8 @@ Idf <- R6::R6Class(classname = "Idf",
         object_in_class = function (class)
             i_idfobject_in_class(self, private, class),
 
-        search_object = function (pattern)
-            i_search_object(self, private, pattern),
+        search_object = function (pattern, class = NULL)
+            i_search_object(self, private, pattern, class),
 
         dup_object = function (object, new_name = NULL)
             i_dup_object(self, private, object, new_name),
