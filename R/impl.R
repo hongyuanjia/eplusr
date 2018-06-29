@@ -103,10 +103,7 @@ i_class_index <- function (self, private, name = NULL, type = c("idd", "idf")) {
         else sort(unique(private$m_idf_tbl$object$class_id))
     } else {
         i_assert_valid_class_name(self, private, name, type)
-        if (type == "idd")
-            private$m_idd_tbl$class[J(name), on = "class_name", class_id]
-        else
-            i_object_tbl_from_class(self, private, name)$class_id
+        private$m_idd_tbl$class[J(name), on = "class_name", class_id]
     }
 }
 # }}}
@@ -1220,9 +1217,20 @@ i_idfobject_in_class <- function (self, private, class) {
 # }}}
 
 # i_search_object {{{
-i_search_object <- function (self, private, pattern) {
-    obj_tbl <- private$m_idf_tbl$object[
-        stringr::str_detect(object_name, pattern)]
+i_search_object <- function (self, private, pattern, class = NULL) {
+    obj_tbl <- private$m_idf_tbl$object
+
+    browser()
+    if (not_empty(class)) {
+        if (anyDuplicated(class)) {
+            stop("`class` should not contain any duplication.", call. = FALSE)
+        }
+        cls_id <- i_class_index_from_which(self, private, class, type = "idf")
+        obj_tbl <- obj_tbl[J(cls_id), on = "class_id"]
+    }
+
+
+    obj_tbl <- obj_tbl[stringr::str_detect(object_name, pattern)]
 
     res <- lapply(obj_tbl$object_id, private$m_idfobj_generator$new)
     data.table::setattr(res, "names", obj_tbl$object_name)
