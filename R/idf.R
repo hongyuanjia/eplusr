@@ -375,25 +375,39 @@
 #' @export
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {
-    # substitute the clone method
-    clone_method <- Idf$clone_method
-    # `deep` arg will be ignored
-    full_clone <- function (deep = TRUE) {
-        deep_cloned <- clone_method(deep = TRUE)
-        enclos_env <- deep_cloned$.__enclos_env__
-        enclos_env$private$IdfObject$self$private_fields$m_uuid <- enclos_env$private$m_uuid
-        enclos_env$private$IdfObject$self$private_fields$m_version <- enclos_env$private$m_version
-        enclos_env$private$IdfObject$self$private_fields$m_idf_tbl <- enclos_env$private$m_idf_tbl
-        enclos_env$private$IdfObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
-        enclos_env$private$IdfObject$self$private_fields$m_options <- enclos_env$private$m_options
-        enclos_env$private$IdfObject$self$private_fields$m_log <- enclos_env$private$m_log
-        enclos_env$private$IdfObject$self$private_fields$IdfObject <- enclos_env$private$IdfObject
-        deep_cloned
-    }
-    Idf$clone_method <- full_clone
-    Idf$public_methods$clone <- full_clone
+    # have to clone the generator first in order to leave the original Idf
+    # generator untouched
+    gen <- clone_generator(Idf)
 
-    Idf$new(path, idd)
+    # get the clone method
+    clone <- gen$clone_method
+
+    # get function body
+    ori_expr <- as.list(body(clone))
+
+    # get the body length
+    len <- length(ori_expr)
+
+    # insert new expressions just at the beginning and also before the return
+    # reference:
+    # https://stackoverflow.com/questions/38732663/how-to-insert-expression-into-the-body-of-a-function-in-r
+    new_expr <- append(ori_expr,
+        as.list(
+            expression(
+                shared <- c("m_uuid", "m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator"),
+                for (nm in shared) {
+                    private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
+                }
+            )
+        ), after = len-1)
+    # always use deep clone
+    new_expr <- append(new_expr, as.list(expression(deep <- TRUE)), after = 1L)
+
+    # assign new body
+    body(gen$clone_method) <- as.call(new_expr)
+    body(gen$public_methods$clone) <- as.call(new_expr)
+
+    gen$new(path, idd)
 }
 # }}}
 
