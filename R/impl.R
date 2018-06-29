@@ -1220,7 +1220,6 @@ i_idfobject_in_class <- function (self, private, class) {
 i_search_object <- function (self, private, pattern, class = NULL) {
     obj_tbl <- private$m_idf_tbl$object
 
-    browser()
     if (not_empty(class)) {
         if (anyDuplicated(class)) {
             stop("`class` should not contain any duplication.", call. = FALSE)
@@ -1640,7 +1639,7 @@ i_search_value = function (self, private, pattern) {
 i_replace_value = function (self, private, pattern, replacement) {
     val_before <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
     if (is_empty(val_before)) {
-        message("No matched result found.", call. = FLASE)
+        message("No matched result found.")
         return(invisible())
     }
 
@@ -2756,7 +2755,7 @@ i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.s
             msg = paste0("`path` should have an extension of `idf` or `imf`."))
     }
 
-    str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format, ...)
+    str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
     if (file.exists(path)) {
         if (!overwrite) {
             stop("Target already exists. Please set `overwrite` to ",
@@ -2853,7 +2852,7 @@ i_idf_output_dir <- function (self, private, open = FALSE) {
 
 # i_idf_output_error {{{
 i_idf_output_error <- function (self, private, info = FALSE) {
-    path_err <- private$locate_output(".err", strict = FALSE)
+    path_err <- i_idf_locate_output(".err", strict = FALSE)
 
     err <- parse_err_file(path_err)
 
@@ -2872,7 +2871,7 @@ i_idf_output_sql <- function (self, private) {
 
 # i_idf_locate_output {{{
 i_idf_locate_output <- function (self, private, suffix = ".err", strict = TRUE) {
-    status <- private$sim_status(suffix)
+    status <- i_idf_sim_status(suffix)
     if (is.null(status$prefix)) {
         if (!private$is_local_file()) {
             stop("The Idf was not created from local file. Failed to ",
@@ -3068,8 +3067,8 @@ i_idf_resolve_external_link <- function (self, private, dir) {
     if (!self$is_valid_class("Schedule:File")) return(FALSE)
     # manually change the value instead of using `IdfObject$set_value()`
     # to speed up
-    obj_ids <- self$object_id(class = "Schedule:File")
-    val_info <- private$value_tbl()[object_id %in% obj_ids][
+    obj_ids <- self$object_id(class = "Schedule:File", simplify = TRUE)
+    val_info <- i_value_tbl_from_which(self, private, obj_ids)[
         full_name == "File Name", list(value_id, value)]
     val_ids <- val_info$value_id
     vals <- val_info$value
