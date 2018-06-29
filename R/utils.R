@@ -74,3 +74,13 @@ clone_generator <- function (x) {
     new
 }
 # }}}
+# write_lines_eol {{{
+# NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
+#       Windows.
+write_lines_eol <- function (x, path) {
+    if (is_windows())
+        readr::write_lines(paste0(x, "\r"), path)
+    else
+        readr::write_lines(x, path)
+}
+# }}}

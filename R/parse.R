@@ -327,7 +327,7 @@ parse_idd_file <- function(path) {
     idd_field <- data.table::dcast.data.table(idd_field,
         class_id + field_anid + field_an ~ slash_key,
         value.var = "slash_value",
-        fun.aggregate = list(function(x) paste0(x, collapse = " ")), fill = NA)
+        fun.aggregate = list(function(x) paste0(x, collapse = "\n")), fill = NA)
     # merge line into dcasted table
     idd_field <- merge(idd_field, idd_field_line,
         by = c("class_id", "field_anid"), all.x = TRUE, sort = FALSE)
@@ -344,7 +344,7 @@ parse_idd_file <- function(path) {
     data.table::setnames(idd_field, new_nms)
 
     # order fields per class
-    idd_field[, field_order := seq_along(field_anid), by = list(class_id)]
+    idd_field[, field_index := seq_along(field_anid), by = list(class_id)]
 
     # add columns if there are no data in the IDD
     if (!has_name(idd_field, "autocalculatable")) idd_field[, autocalculatable := FALSE]
@@ -384,15 +384,22 @@ parse_idd_file <- function(path) {
     idd_field[is.na(begin_extensible), begin_extensible := FALSE]
     idd_field[is.na(type) & field_an == "N", type := "real"]
     idd_field[is.na(type) & field_an == "A", type := "alpha"]
+    idd_field[, `:=`(is_extensible = FALSE,
+                     has_default = FALSE,
+                     has_reference = FALSE,
+                     has_object_list = FALSE,
+                     has_external_list = FALSE)]
+    first_ext <- idd_field[begin_extensible == TRUE,
+        list(first_extensible = min(field_index)), by = class_id]
+    idd_field <- first_ext[idd_field, on = "class_id"]
+    idd_field[field_index >= first_extensible, is_extensible := TRUE]
+    idd_field[!is.na(reference), has_reference := TRUE]
+    idd_field[!is.na(object_list), has_object_list := TRUE]
+    idd_field[!is.na(external_list), has_external_list := TRUE]
+    idd_field[!is.na(default), has_default := TRUE]
     # just ignore the ip unit attributes and use the unit conversion table
     idd_field <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1][
         , units := si_name][idd_field[, ip_units := NULL], on = "units"]
-    data.table::setnames(idd_field, "ip_name", "ip_units")
-
-    field_property <- idd_field[, list(field_id, units, ip_units,
-        required_field, type, default, autosizable, autocalculatable, note, begin_extensible)]
-    data.table::setnames(field_property, "default", "field_default")
-
     # add field names
     idd_field[is.na(field), field_name := field_anid]
     idd_field[!is.na(field), field_name := field]
@@ -400,36 +407,54 @@ parse_idd_file <- function(path) {
     idd_field[!is.na(units), unit := paste0("{", units, "}")]
     idd_field[is.na(units), full_name := field_name]
     idd_field[!is.na(units), full_name := paste0(field_name, " ", unit)]
-    idd_field[is.na(ip_units), ip_unit := unit]
-    idd_field[!is.na(ip_units), ip_unit := paste0("{", ip_units, "}")]
-    idd_field[is.na(ip_units), full_ipname := field_name]
-    idd_field[!is.na(ip_units), full_ipname := paste0(field_name, " ", ip_unit)]
+    idd_field[is.na(ip_name), ip_unit := unit]
+    idd_field[!is.na(ip_name), ip_unit := paste0("{", ip_name, "}")]
+    idd_field[is.na(ip_name), full_ipname := field_name]
+    idd_field[!is.na(ip_name), full_ipname := paste0(field_name, " ", ip_unit)]
+    idd_field[, is_name := FALSE]
+    idd_field[(has_reference == TRUE & has_object_list == FALSE) |
+        (full_name == "Name" & type == "alpha"), is_name := TRUE]
 
-    field <- idd_field[, list(field_id, class_id, field_order, field_name, full_name, full_ipname)]
+    # parse default value
+    field_default <- idd_field[has_default == TRUE, .SD, .SDcols = c(
+        "field_id", "default", "type", "si_name", "ip_name", "mult", "offset")][
+        , `:=`(default_upper = toupper(default),
+               default_num = suppressWarnings(as.numeric(default)))][
+        , `:=`(default_ipnum = default_num)]
+    field_default <- update_value_num(field_default, digits = .options$num_digits,
+        in_ip = FALSE, prefix = "default")[, default_id := .I][
+        , .SD, .SDcols = c("default_id", "default", "default_upper",
+            "default_num", "default_ipnum", "field_id")]
 
     # add range helper column
-    idd_field[, `:=`(have_range = FALSE, lower_incbounds = FALSE, upper_incbounds = FALSE)]
-    idd_field[!is.na(minimum), `:=`(have_range = TRUE, lower_incbounds = TRUE)]
-    idd_field[!is.na(maximum), `:=`(have_range = TRUE, upper_incbounds = TRUE)]
-    idd_field[!is.na(`minimum>`), `:=`(have_range = TRUE, minimum = `minimum>`)]
-    idd_field[!is.na(`maximum<`), `:=`(have_range = TRUE, maximum = `maximum<`)]
+    idd_field[, `:=`(has_range = FALSE, lower_incbounds = FALSE, upper_incbounds = FALSE)]
+    idd_field[!is.na(minimum), `:=`(has_range = TRUE, lower_incbounds = TRUE)]
+    idd_field[!is.na(maximum), `:=`(has_range = TRUE, upper_incbounds = TRUE)]
+    idd_field[!is.na(`minimum>`), `:=`(has_range = TRUE, minimum = `minimum>`)]
+    idd_field[!is.na(`maximum<`), `:=`(has_range = TRUE, maximum = `maximum<`)]
     idd_field[, `:=`(`minimum>` = NULL, `maximum<` = NULL)]
-    field_range <- idd_field[have_range == TRUE,
+    field_range <- idd_field[has_range == TRUE,
         list(field_id, minimum, lower_incbounds, maximum, upper_incbounds)][
         , range_id := .I]
     data.table::setcolorder(field_range, c("range_id", "minimum", "lower_incbounds",
                                            "maximum", "upper_incbounds", "field_id"))
 
+    field <- idd_field[, .SD, .SDcols = c("field_id", "class_id", "field_index",
+        "field_name", "full_name", "full_ipname", "units", "ip_name",
+        "required_field", "type", "autosizable", "autocalculatable",
+        "note", "is_name", "is_extensible", "has_default", "has_range",
+        "has_reference", "has_object_list", "has_external_list")]
+    data.table::setnames(field, "ip_name", "ip_units")
+
     # split choice
     target_choice <- idd_field[type == "choice"]
     if (is_empty(target_choice)) {
-        field_choice <- data.table(choice_id = integer(0),
-                                   choice = character(0),
-                                   choice_upper = character(0),
-                                   field_id = integer(0))
+        field_choice <- data.table::data.table(
+            choice_id = integer(0), choice = character(0),
+            choice_upper = character(0), field_id = integer(0))
     } else {
         field_choice <- target_choice[,
-            {s = strsplit(key, " ", fixed = TRUE);
+            {s = strsplit(key, "\n", fixed = TRUE);
              list(field_id = rep(field_id, sapply(s, length)),
                   choice = unlist(s))
             }
@@ -438,14 +463,14 @@ parse_idd_file <- function(path) {
     }
 
     # split reference
-    target_reference <- idd_field[!is.na(reference)]
+    target_reference <- idd_field[has_reference == TRUE]
     if (is_empty(target_reference)) {
-        field_reference <- data.table(reference_id = integer(0),
-                                      reference = character(0),
-                                      field_id = integer(0))
+        field_reference <- data.table::data.table(
+            reference_id = integer(0), reference = character(0),
+            field_id = integer(0))
     } else {
         field_reference <- target_reference[,
-            {s = strsplit(reference, " ", fixed = TRUE);
+            {s = strsplit(reference, "\n", fixed = TRUE);
              list(reference = unlist(s),
                   field_id = rep(field_id, sapply(s, length)))
             }
@@ -456,14 +481,14 @@ parse_idd_file <- function(path) {
     }
 
     # split object-list
-    target_object_list <- idd_field[!is.na(object_list)]
+    target_object_list <- idd_field[has_object_list == TRUE]
     if (is_empty(target_object_list)) {
-        field_object_list <- data.table(object_list_id = integer(0),
-                                        object_list = character(0),
-                                        field_id = integer(0))
+        field_object_list <- data.table::data.table(
+            object_list_id = integer(0), object_list = character(0),
+            field_id = integer(0))
     } else {
         field_object_list <- target_object_list[,
-            {s = strsplit(object_list, " ", fixed = TRUE);
+            {s = strsplit(object_list, "\n", fixed = TRUE);
              list(object_list = unlist(s),
                   field_id = rep(field_id, sapply(s, length)))
             }
@@ -472,14 +497,14 @@ parse_idd_file <- function(path) {
     }
 
     # split external-list
-    target_external_list <- idd_field[!is.na(external_list)]
+    target_external_list <- idd_field[has_external_list == TRUE]
     if (is_empty(target_external_list)) {
-        field_external_list <- data.table(external_list_id = integer(0),
-                                          external_list = character(0),
-                                          field_id = integer(0))
+        field_external_list <- data.table::data.table(
+            external_list_id = integer(0), external_list = character(0),
+            field_id = integer(0))
     } else {
         field_external_list <- target_external_list[,
-            {s = strsplit(external_list, " ", fixed = TRUE);
+            {s = strsplit(external_list, "\n", fixed = TRUE);
              list(external_list = unlist(s),
                   field_id = rep(field_id, sapply(s, length)))
             }
@@ -523,7 +548,7 @@ parse_idd_file <- function(path) {
     idd_class <- data.table::dcast.data.table(idd_class,
         class_id ~ slash_key,
         value.var = "slash_value",
-        fun.aggregate = list(function(x) paste0(x, collapse = " ")), fill = NA)
+        fun.aggregate = list(function(x) paste0(x, collapse = "\n")), fill = NA)
     # delete column "NA" caused by classes without slash such as
     # "SwimmingPool:Indoor"
     if (has_name(idd_class, "NA")) idd_class[, `:=`(`NA` = NULL)]
@@ -557,17 +582,34 @@ parse_idd_file <- function(path) {
 
     # add `has_name`
     idd_class[, has_name := FALSE]
-    idd_class[class_id %in% idd_field[
-        field_order == 1L & field_name == "Name", class_id],
-        has_name := TRUE]
+    idd_class[class_id %in% idd_field[is_name == TRUE, unique(class_id)], has_name := TRUE]
     class_property <- idd_class[, list(class_id, format, memo, min_fields,
         num_fields, required_object, unique_object, has_name, num_extensible)]
     data.table::setnames(class_property, "format", "class_format")
 
+    # add info about the index of last required field
+    last_req <- idd_field[required_field == TRUE,
+        list(last_required = field_index[.N]), by = list(class_id)]
+    class_property <- last_req[class_property, on = "class_id"][
+        is.na(last_required), `:=`(last_required = 0L)]
+    # add first extensible index
+    class_property <- first_ext[class_property, on = "class_id"][
+        is.na(first_extensible), `:=`(first_extensible = 0L)]
+    # add num of extensible group
+    class_property[, `:=`(num_extensible_group = 0)]
+    class_property[num_extensible > 0, `:=`(num_extensible_group =
+        (num_fields - first_extensible + 1L) / num_extensible)]
+
+    class <- class[class_property, on = "class_id"][,
+        .SD, .SDcols = c("class_id", "class_name", "group_id", "class_format",
+            "memo", "min_fields", "num_fields", "required_object",
+            "unique_object", "has_name", "last_required", "num_extensible",
+            "first_extensible", "num_extensible_group")]
+
     # split reference_class_name
     class_reference <- idd_class[!is.na(reference),
         {
-            s = strsplit(reference, " ", fixed = TRUE);
+            s = strsplit(reference, "\n", fixed = TRUE);
             list(reference = unlist(s),
                  class_id = rep(class_id, sapply(s, length)))
         }
@@ -579,48 +621,22 @@ parse_idd_file <- function(path) {
     data.table::setcolorder(class_reference, c("reference_id", "reference", "class_id"))
     # }}}
 
-    # field extensible {{{
-    num_ext <- class_property[num_extensible > 0, list(class_id, num_extensible)]
-    first_ext <- idd_field[begin_extensible == TRUE, list(class_id, field_order)]
-    # NOTE: there are mistakes in EnergyPlus 8.7's idd that an extensible
-    # class "AirflowNetwork:Distribution:DuctViewFactors" has no \extensible
-    # slash key. Sighhhhhhhhhhhhhhhhhhhhhhhhhhh
-    # I don't want to fix that... So here I use inner join
-    targ <- num_ext[first_ext, on = "class_id", nomatch = 0L]
-    if (is_empty(targ)) {
-        field_extensible <- data.table::data.table(extensible_id = integer(0),
-                                                   field_id = integer(0))
-    } else {
-        targ <- targ[,
-            {
-                l = purrr::map2(field_order, num_extensible, ~seq.int(.x, length.out = .y));
-                list(class_id = rep(class_id, sapply(l, length)), field_order = unlist(l))
-            }
-        ]
-        field_extensible <- field[targ, on = c("class_id", "field_order")][
-            , extensible_id := .I][, list(extensible_id, field_id)]
-    }
-    # }}}
-
     pb$update(0.95, tokens = list(what = "Parsing "))
     idd <- list(version = idd_version,
                 build = idd_build,
                 group = group,
                 class = class,
-                class_property = class_property,
                 class_reference = class_reference,
                 field = field,
-                field_property = field_property,
                 field_reference = field_reference,
+                field_default = field_default,
                 field_choice = field_choice,
                 field_range = field_range,
-                field_extensible = field_extensible,
                 field_object_list = field_object_list,
                 field_external_list = field_external_list)
-    # set class to IDD
-    data.table::setattr(idd, "class", c("IddFile", class(idd)))
+
     pb$tick(100L, tokens = list(what = "Complete"))
-    return(idd)
+    idd
 }
 # }}}
 
@@ -634,10 +650,11 @@ parse_idf_file <- function (path, idd = NULL) {
 
     idf_str <- read_idd_str(path)
 
+    # get idf version
+    idf_ver <- get_idf_ver(idf_str)
+
     # if idd is missing, use preparsed Idd object
     if (is.null(idd)) {
-        # get idf version
-        idf_ver <- get_idf_ver(idf_str)
         if (!is.null(idf_ver)) {
             idd <- use_idd(idf_ver)
         # if no version found, use the latest Idd object
@@ -648,7 +665,11 @@ parse_idf_file <- function (path, idd = NULL) {
             idd <- use_idd(.globals$latest_parsed_ver)
         }
     } else {
-        assert_that(is_idd(idd))
+        idd <- use_idd(idd)
+        if (is.null(idf_ver))
+            warning("Missing version field in input Idf file. The given Idd ",
+                "version ", idd$version(), " will be used. Parsing errors ",
+                "may occur.", call. = FALSE)
     }
 
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
@@ -761,9 +782,9 @@ parse_idf_file <- function (path, idd = NULL) {
             option_save <- "sorted"
         } else {
             option_save <- switch(option_save,
-                   SortedOrder = "sorted",
-                   OriginalOrderTop = "new_top",
-                   OriginalOrderBottom = "new_bottom")
+                SortedOrder = "sorted",
+                OriginalOrderTop = "new_top",
+                OriginalOrderBottom = "new_bottom")
         }
     }
 
@@ -863,8 +884,8 @@ parse_idf_file <- function (path, idd = NULL) {
     # get value table
     value <- idf_idd_all[!is.na(class_upper_case), list(row_id, class_id)][
         idf_dt, on = "row_id", roll = Inf][type > type_object][
-        , field_order := seq_along(.I), by = list(object_id)][
-        , value_id := .I][, list(value_id, value, object_id, class_id, field_order, line, string)]
+        , field_index := seq_along(.I), by = list(object_id)][
+        , value_id := .I][, list(value_id, value, object_id, class_id, field_index, line, string)]
 
     # handle `Version` object
     # {{{
@@ -883,7 +904,7 @@ parse_idf_file <- function (path, idd = NULL) {
             value = as.character(idf_version),
             object_id = ver_obj[["object_id"]],
             class_id = 1L,
-            field_order = 1L
+            field_index = 1L
         )
         value <- data.table::rbindlist(list(value, ver_val), fill = TRUE)
     # check if there are multiple `Version` objects
@@ -908,16 +929,15 @@ parse_idf_file <- function (path, idd = NULL) {
     # get field num per object
     num <- value[, list(num_values = .N), by = list(object_id, class_id)]
     # get classes needed to add extensible groups
-    ext <- num[._get_private(idd)$m_idd_tbl$class_property, on = "class_id", nomatch = 0L][
-        ._get_private(idd)$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+    ext <- num[._get_private(idd)$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         num_fields < num_values, list(object_id, class_name, num_fields, num_values, num_extensible)]
     if (not_empty(ext)) {
         # stop if errors were found
         error_num <- ext[num_extensible == 0L]
         if (not_empty(error_num)) {
             e_fld <- error_num[value, on = "object_id", nomatch = 0L][
-                , idx := as.character(field_order), by = line][
-                field_order > num_fields, idx := "X", by = line][
+                , idx := as.character(field_index), by = line][
+                field_index > num_fields, idx := "X", by = line][
                 , msg := paste0("  [", idx, "] -> Line ", line, ": ", string)]
             e_fld[e_fld[, .I[1], by = class_id]$V1,
                   msg := paste0("`", num_values, "` fields found for class ",
@@ -926,6 +946,7 @@ parse_idf_file <- function (path, idd = NULL) {
         }
 
         # add extensible group
+        # TODO: use i_add_extensible_group
         ext_add <- ext[, num_to_add := ceiling((max(num_values) - max(num_fields)) / max(num_extensible))]
         purrr::walk2(ext_add$class_name, ext_add$num_to_add,
             ~idd$object(.x)$add_extensible_group(.y)
@@ -933,20 +954,19 @@ parse_idf_file <- function (path, idd = NULL) {
     }
     # }}}
     value_tbl <- ._get_private(idd)$m_idd_tbl$field[
-        value, on = c("class_id", "field_order")][
+        value, on = c("class_id", "field_index")][
+        grepl("^\\s*$", value), `:=`(value = NA_character_)][
         , `:=`(value_upper = toupper(value),
                value_num = suppressWarnings(as.numeric(value)))][
-        , `:=`(value_ipnum = value_num)][
-        ._get_private(idd)$m_idd_tbl$field_property, on = "field_id",
-        nomatch = 0L]
+        , `:=`(value_ipnum = value_num)]
     value <- update_value_num(value_tbl, digits = heading_options$num_digits,
                               in_ip = heading_options$view_in_ip)[
         , list(value_id, value, value_upper, value_num, value_ipnum, object_id, field_id)]
     data.table::setorder(value, value_id)
 
     # add object name column
-    object <- value_tbl[field_order == 1L][
-        field_name != "Name", `:=`(value = NA_character_, value_upper = NA_character_)][
+    object <- value_tbl[field_index == 1L][
+        is_name == FALSE, `:=`(value = NA_character_, value_upper = NA_character_)][
     , list(object_id, class_id, value, value_upper)]
     data.table::setnames(object, c("value", "value_upper"), c("object_name",  "object_name_upper"))
     data.table::setorder(object, object_id)
@@ -973,7 +993,7 @@ parse_idf_file <- function (path, idd = NULL) {
     data.table::setattr(idf, "is_imf", is_imf)
     data.table::setattr(idf, "idd", idd)
 
-    return(idf)
+    idf
 }
 # }}}
 

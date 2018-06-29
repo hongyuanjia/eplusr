@@ -47,6 +47,9 @@
 #' * `eplusr.num_parallel`: Maximum number of parallel simulations to run.
 #' Default: `parallel::detectCores()`.
 #'
+#' * `eplusr.valid_before_run`: Whether to validate the model at the level
+#' "final" before run the simulation. Default: TRUE.
+#'
 #' @name eplusr-package
 "_PACKAGE"
 
@@ -57,10 +60,49 @@
 .globals$eplus_config <- list()
 
 # package level mutable global options
-.options <- new.env(parent = emptyenv())
+.options <- list()
 .options$num_digits <- 8L
 .options$view_in_ip <- FALSE
-.options$validate_level <- "final"
-.options$verbose_info <- FALSE
+.options$validate_level <- "draft"
+.options$verbose_info <- TRUE
 .options$save_format <- "sorted"
 .options$num_parallel <- parallel::detectCores()
+.options$valid_before_run <- TRUE
+
+# a helper to check if input option is valid
+# get_option {{{
+get_option <- function (option, internal = FALSE) {
+    if (internal) {
+        opt_nm <- names(option)
+        opt_val <- unname(option)
+    } else {
+        opt_nm <- paste0("eplusr.", option)
+        opt_val <- getOption(opt_nm)
+    }
+
+    key <- ifelse(internal, opt_nm, option)
+
+    is_valid <- switch(key,
+        num_digits = is_count(opt_val),
+        view_in_ip = is.logical(opt_val),
+        validate_level = opt_val %in% c("none", "draft", "final"),
+        verbose_info = is.logical(opt_val),
+        save_format = opt_val %in% c("sorted", "new_top", "new_bottom"),
+        num_parallel = is_count(opt_val),
+        valid_before_run = is.logical(opt_val)
+    )
+
+    if (!is_valid) {
+        msg <- switch(key,
+            num_digits = paste0(backtick(opt_nm), " should be a single positive integer."),
+            num_parallel = paste0(backtick(opt_nm), " should be a single positive integer."),
+            validate_level = paste0(backtick(opt_nm), " should be one of `none`, `draft` or `final`."),
+            save_format = paste0(backtick(opt_nm), " should be one of `sorted`, `new_top` or `new_bottom`."),
+            paste0(backtick(opt_nm), " should be either TRUE or FALSE.")
+        )
+        stop(msg, call. = FALSE)
+    }
+
+    opt_val
+}
+# }}}

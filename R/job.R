@@ -285,7 +285,7 @@ Job <- R6::R6Class(classname = "EPJob",
 
             # save the model if necessary
             if (flg_sav) {
-                readr::write_lines(private$m_idf$string(), path_idf)
+                write_lines_eol(private$m_idf$string(), path_idf)
             }
 
             path_epw <- private$m_epw$path()

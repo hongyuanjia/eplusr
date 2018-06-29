@@ -112,6 +112,15 @@ on_failure(is_count) <- function(call, env) {
   paste0(deparse(call$x), " is not a count (a single positive integer)")
 }
 # }}}
+# are_count {{{
+are_count <- function (x) {
+    if (!is_integerish(x)) return(FALSE)
+    all(x > 0)
+}
+on_failure(are_count) <- function(call, env) {
+  paste0(deparse(call$x), " is not a positive integer vector.")
+}
+# }}}
 # is_string {{{
 is_string <- function(x) is.character(x) && length(x) == 1
 on_failure(is_string) <- function(call, env) {
@@ -136,18 +145,24 @@ on_failure(is_integerish) <- function(call, env) {
   paste0(deparse(call$x), " is neither an integer nor can be converted into an integer")
 }
 # }}}
+# are_integerish {{{
+are_integerish <- function(x) {
+    if (!is.numeric(x)) return (rep(FALSE, length(x)))
+    abs(x - round(x)) < .Machine$double.eps^0.5
+}
+# }}}
 # is_flag {{{
 is_flag <- function(x) is.logical(x) && length(x) == 1
 on_failure(is_flag) <- function(call, env) {
-  paste0(deparse(call$x), " is not a flag (a length one logical vector).")
+    paste0(deparse(call$x), " is not a flag (a length one logical vector).")
 }
 # }}}
-# is_writeable {{{
-is_writeable <- function(path) {
+# is_writable {{{
+is_writable <- function(path) {
     assert_that(is_string(path), file.exists(path))
     file.access(path, mode = 2)[[1]] == 0
 }
-on_failure(is_writeable) <- function (call, env) {
+on_failure(is_writable) <- function (call, env) {
     paste0(eval(call$path, env), " is not writeable")
 }
 # }}}
@@ -158,6 +173,15 @@ is_readable <- function(path) {
 }
 on_failure(is_readable) <- function (call, env) {
     paste0(eval(call$path, env), " is not readable")
+}
+# }}}
+# is_same_len {{{
+is_same_len <- function (x, y) {
+    length(x) == length(y)
+}
+on_failure(is_same_len) <- function (call, env) {
+    paste0(backtick(deparse(call$x)), " and ", backtick(deparse(call$y)),
+      " does not have the same length.")
 }
 # }}}
 
