@@ -257,7 +257,7 @@ i_check_reference <- function (self, private, input) {
     if (is_empty(val_tbl))
         return(private$m_log$validate$reference <- list())
 
-    # empty values should not be present
+    # TODO: empty values should not be present
     invalid_ref_empty <- val_tbl[is.na(value)]
 
     # only check non-empty values
@@ -275,7 +275,7 @@ i_check_reference <- function (self, private, input) {
         by = list(value_id, value_upper)]
 
     invalid_ref_id <- val_tbl_ref[
-        !value_upper %in% possible_value_upper, .SD, by = value_id]$value_id
+        !purrr::map2_lgl(value_upper, possible_value_upper, `%in%`), value_id]
     invalid_ref_non_empty <- input$value_tbl[J(invalid_ref_id), on = "value_id"]
 
     # combine
