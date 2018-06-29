@@ -288,7 +288,7 @@ i_field_tbl <- function (self, private, class = NULL) {
 
 # i_field_tbl_from_num: always return the min fields {{{
 i_field_tbl_from_num <- function (self, private, class, num = 0L) {
-    assert_that(is_integerish(num), num >= 0L)
+    assert_that(are_count(num))
     assert_that(is_same_len(class, num))
 
     num <- i_field_num_from_index(self, private, class, num)
@@ -380,7 +380,7 @@ i_field_num_from_index <- function (self, private, class, index = 0L) {
     cls_tbl[min_fields == 0 & last_required == 0, num := num_fields]
     cls_tbl[min_fields >  0 | last_required >  0, num := max(min_fields, last_required)]
 
-    if (index == 0L) return(cls_tbl$num)
+    if (all(index == 0L)) return(cls_tbl$num)
 
     i_assert_valid_field_index_ext(self, private, class, index)
 
@@ -1823,7 +1823,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
                     object_id = value_num_tbl$object_id,
                     class = value_num_tbl$class_id,
                     default = default,
-                    num = value_num_tbl[, max(num_fields, value_num)])
+                    num = value_num_tbl[, ifelse(num_fields > value_num, num_fields, value_num)])
             else
                 val_tbl_ori <- i_empty_value_tbl(self, private,
                     object_id = value_num_tbl$object_id,
@@ -1837,7 +1837,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
             if (all)
                 val_tbl_ori <- i_value_tbl_from_num(self, private,
                     object = value_num_tbl$object_id,
-                    num = val_num_named[, max(num_fields, value_num)])
+                    num = value_num_tbl[, ifelse(num_fields > value_num, num_fields, value_num)])
             else
                 val_tbl_ori <- i_value_tbl_from_num(self, private,
                     object = value_num_tbl$object_id,
@@ -2155,7 +2155,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
         stop("Values should be either all unnamed or all named.", call. = FALSE)
 
     # check duplication of names
-    dup_name <- tbl_nest[vapply(field_name_lower, has_duplicated, integer(1)),
+    dup_name <- tbl_nest[purrr::map_lgl(field_name_lower, has_duplicated),
         .SD, by = object_id]
     if (not_empty(dup_name)) {
         tbl_nest[, `:=`(duplicated_name =
@@ -2248,13 +2248,17 @@ i_value_tbl_from_object_list <- function (self, private, object_list) {
     obj_list_in <- data.table::data.table(
         object_list = object_list, object_list_rleid = seq_along(object_list))
 
-    cls_val <- private$m_idd_tbl$class_reference[obj_list_in,
-        on = c(reference = "object_list")][
-        i_is_valid_class_index(self, private, class_id, type = "idf")][,
-        `:=`(value = i_class_name(self, private, class_id, type = "idf"))][,
-        `:=`(value_upper = toupper(value))][,
-        lapply(.SD, list), .SDcols = c("value", "value_upper"),
-        by = list(object_list_rleid, reference)]
+    if (is_empty(private$m_idd_tbl$class_reference)) {
+        cls_val <- list()
+    } else {
+        cls_val <- private$m_idd_tbl$class_reference[obj_list_in,
+            on = c(reference = "object_list")][
+            i_is_valid_class_index(self, private, class_id, type = "idf")][,
+            `:=`(value = i_class_name(self, private, class_id, type = "idf"))][,
+            `:=`(value_upper = toupper(value))][,
+            lapply(.SD, list), .SDcols = c("value", "value_upper"),
+            by = list(object_list_rleid, reference)]
+    }
 
     fld_val <- private$m_idd_tbl$field_reference[obj_list_in,
         on = c(reference = "object_list")][private$m_idf_tbl$value,
