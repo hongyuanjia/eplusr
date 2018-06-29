@@ -3,7 +3,11 @@
 \docType{class}
 \name{idf}
 \alias{idf}
+\alias{read_idf}
 \title{Read, modify, save, run and analyze EnergyPlus models}
+\usage{
+read_idf(path, idd = NULL)
+}
 \description{
 IDFEditor distributed along with
 \href{https://www.energyplus.net}{EnergyPlus} provides full support for

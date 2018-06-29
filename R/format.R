@@ -1,24 +1,23 @@
 #' @importFrom stringr str_trim
-# format_header: return header of an Idf output
-# {{{
-format_header <- function (options) {
-    format <- switch(options$save_format,
+# format_header: return header of an Idf output {{{
+format_header <- function (format = c("sorted", "new_top", "new_bottom"), view_in_ip = FALSE) {
+    format <- switch(format,
         sorted = "SortedOrder",
         new_top = "OriginalOrderTop",
         new_bottom = "OriginalOrderBottom")
 
-    header_generator <- "!-Generator IDFEditor"
+    header_generator <- "!-Generator eplusr"
 
     header_option <- paste0("!-Option ", format)
 
-    if (options$special_format) {
-        warning("Currently option 'UseSpecialFormat' is not supported. ",
-                "Standard format will be used.",
-                call. = FALSE)
-    }
+    # if (options$special_format) {
+    #     warning("Currently option 'UseSpecialFormat' is not supported. ",
+    #             "Standard format will be used.",
+    #             call. = FALSE)
+    # }
 
     special_format <- NULL
-    if (options$view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
+    if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
 
     header_option <- paste0(header_option, " ", special_format, " ", in_ip)
     header_option <- stringr::str_trim(header_option, "right")
@@ -37,25 +36,40 @@ format_header <- function (options) {
 # }}}
 
 #' @importFrom data.table setorder rleid
-# format_output: return whole Idf output
-# {{{
-format_output <- function (value_tbl, comment_tbl, options) {
-    assert_that(has_names(value_tbl, c("object_id", "class_id", "field_order")))
-    sav_fmt <- options$save_format
+# format_output: return whole Idf output {{{
+format_output <- function (value_tbl, comment_tbl, ...) {
+    assert_that(has_names(value_tbl, c("object_id", "class_id", "class_name", "field_index")))
+
+    dots <- list(...)
+    header <- dots$header %||% TRUE
+    sav_fmt <- dots$format %||% get_option("save_format")
+    sav_fmt <- get_option(c(save_format = sav_fmt), internal = TRUE)
+    leading <- dots$leading %||% 4L
+    in_ip <- dots$in_ip %||% get_option("view_in_ip")
+    sep_at <- dots$sep_at %||% 29L
+    index <- dots$index %||% FALSE
+    blank <- dots$blank %||% FALSE
+    end <- dots$end %||% TRUE
+    required <- dots$required %||% FALSE
+
     if (sav_fmt == "sorted") {
-        data.table::setorder(value_tbl, class_id, object_id, field_order)
+        data.table::setorder(value_tbl, class_id, object_id, field_index)
     } else if (sav_fmt == "new_top") {
-        data.table::setorder(value_tbl, -object_order, object_id, class_id, field_order)
+        data.table::setorder(value_tbl, -object_order, object_id, class_id, field_index)
     } else {
-        data.table::setorder(value_tbl, object_order, object_id, class_id, field_order)
+        data.table::setorder(value_tbl, object_order, object_id, class_id, field_index)
     }
 
     # add field output
-    fld <- format_field(value_tbl, in_ip = options$view_in_ip)
+    fld <- format_field(value_tbl, leading = leading, in_ip = in_ip,
+        sep_at = sep_at, index = index, blank = blank, end = end, required = required)
 
     # add comment output
     if (not_empty(comment_tbl)) {
         has_comment <- TRUE
+        comment_tbl[type == 0L, `:=`(comment = paste0("!", comment))]
+        comment_tbl <- comment_tbl[, lapply(.SD, paste0, collapse = "\n"),
+            .SDcols = "comment", by = object_id]
         tbl <- comment_tbl[value_tbl, on = "object_id"]
     } else {
         has_comment <- FALSE
@@ -63,9 +77,9 @@ format_output <- function (value_tbl, comment_tbl, options) {
     }
 
     tbl[, out := fld]
-    tbl[field_order == 1L, out := paste0(class_name, ",\n", out)]
+    tbl[field_index == 1L, out := paste0(class_name, ",\n", out)]
     if (has_comment) {
-        tbl[field_order == 1L & !is.na(comment), out := paste0(comment, "\n", out)]
+        tbl[field_index == 1L & !is.na(comment), out := paste0(comment, "\n", out)]
     }
 
     # add class output
@@ -77,16 +91,19 @@ format_output <- function (value_tbl, comment_tbl, options) {
             "!-   ===========  ALL OBJECTS IN CLASS: ", toupper(class_name), " ===========",
             "\n\n",
             out)][
-            field_order == 1L, out := paste0("\n", out)]
+            field_index == 1L, out := paste0("\n", out)]
     } else {
-        tbl[field_order == 1L, out := paste0("\n", out)]
+        tbl[field_index == 1L, out := paste0("\n", out)]
     }
 
-    tbl[["out"]]
+    if (header)
+        h <- format_header(format = sav_fmt, view_in_ip = in_ip)
+    else h <- NULL
+
+    c(h, tbl[["out"]])
 }
 # }}}
-# format_refmap: return pretty formatted tree string for IdfObjectRefMap
-# {{{
+# format_refmap: return pretty formatted tree string for IdfObjectRefMap {{{
 format_refmap <- function (ref_map, in_ip = FALSE) {
     assert_that(inherits(ref_map, "IdfObjectRefMap"))
 
@@ -101,9 +118,7 @@ format_refmap <- function (ref_map, in_ip = FALSE) {
 #' @importFrom data.table setnames
 #' @importFrom purrr map map2
 #' @importFrom cli boxx rule
-# format_refmap_sgl: return pretty formatted tree string for IdfObjectRefMap for
-# one direction
-# {{{
+# format_refmap_sgl: return pretty formatted tree string for IdfObjectRefMap for one direction {{{
 format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
     type <- match.arg(type)
     if (not_empty(ref_sgl)) {
@@ -136,11 +151,10 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 # }}}
 
 #' @importFrom data.table setorder
-# format_objects: return pretty formatted tree string for mutiple IdfObjects
-# {{{
+# format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
 format_objects <- function (value_tbl, in_ip = FALSE) {
-    assert_that(has_names(value_tbl, c("class_id", "object_id", "field_order")))
-    data.table::setorder(value_tbl, class_id, object_id, field_order)
+    assert_that(has_names(value_tbl, c("class_id", "object_id", "field_index")))
+    data.table::setorder(value_tbl, class_id, object_id, field_index)
 
     fmt_fld <- format_field(value_tbl, leading = 1L, in_ip = in_ip,
                             sep_at = 20L, index = TRUE, blank = TRUE)
@@ -188,13 +202,18 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
     return(res)
 }
 # }}}
-# format_field: return Idf format field
-# {{{
-format_field <- function (value_tbl, leading = 4L, in_ip = FALSE,
-                          sep_at = 29L, index = FALSE, blank = FALSE, end = TRUE) {
+# format_field: return Idf format field {{{
+format_field <- function (value_tbl, leading = 4L, in_ip = FALSE, sep_at = 29L,
+                          index = FALSE, blank = FALSE, end = TRUE, required = FALSE) {
     idx <- NULL
     if (index) {
-        idx <- paste0(format_index(value_tbl), ":")
+        idx <- paste0(format_index(value_tbl))
+        if (required) {
+            value_tbl[, `:=`(req = " ")]
+            value_tbl[required_field == TRUE, `:=`(req = "*")]
+            idx <- paste0(value_tbl$req, idx)
+        }
+        idx <- paste0(idx, ":")
     }
     val <- format_value(value_tbl, leading = leading, length = sep_at, blank = blank, end = end)
     nm <- format_name(value_tbl, in_ip = in_ip)
@@ -202,12 +221,12 @@ format_field <- function (value_tbl, leading = 4L, in_ip = FALSE,
     paste0(idx, val, nm)
 }
 # }}}
-# format_index: return right aligned field index
-# {{{
-format_index <- function (field_tbl) lpad(field_tbl[["field_order"]])
+# format_index: return right aligned field index {{{
+format_index <- function (field_tbl) {
+    lpad(field_tbl[["field_index"]])
+}
 # }}}
-# format_value: return Idf format value strings
-# {{{
+# format_value: return Idf format value strings {{{
 format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
                           end = TRUE) {
     value_tbl[is.na(value), value := ""]
@@ -218,8 +237,8 @@ format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
     }
 
     if (end) {
-        if (has_names(value_tbl, c("object_id", "field_order"))) {
-            is_end <- value_tbl[, .I[max(seq_along(field_order))], by = object_id]$V1
+        if (has_names(value_tbl, c("object_id", "field_index"))) {
+            is_end <- value_tbl[, .I[max(seq_along(field_index))], by = object_id]$V1
         } else {
             is_end <- length(values)
         }
@@ -239,8 +258,7 @@ format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
     return(res)
 }
 # }}}
-# format_name: return Idf format field names
-# {{{
+# format_name: return Idf format field names {{{
 format_name <- function (field_tbl, in_ip = FALSE) {
     assert_that(has_names(field_tbl, c("full_name", "full_ipname")))
     if (in_ip) {
@@ -250,8 +268,7 @@ format_name <- function (field_tbl, in_ip = FALSE) {
     }
 }
 # }}}
-# format_comment: return Idf format comments and macros
-# {{{
+# format_comment: return Idf format comments and macros {{{
 format_comment <- function (comment_tbl) {
     if (is_empty(comment_tbl)) return(NULL)
 
@@ -266,9 +283,11 @@ format_comment <- function (comment_tbl) {
 
 #' @importFrom cli cat_line
 #' @export
+# print.IdfObjectRefMap {{{
 print.IdfObjectRefMap <- function (x, ...) {
     cli::cat_line(format_refmap(x, ...))
 }
+# }}}
 
 #' @importFrom data.table copy
 #' @export
@@ -334,17 +353,22 @@ print.ErrFile <- function (x, ...) {
 # }}}
 
 #' @importFrom data.table setnames
-# update_value_num: update value string and digits
-# {{{
-update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
-    assert_that(has_names(value_tbl,
-        c("value", "value_upper", "value_num", "value_ipnum", "type")))
+# update_value_num: update value string and digits {{{
+update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "value") {
+    val_suffix <- c("", "_upper", "_num", "_ipnum")
+    req_val <- paste0(prefix, val_suffix)
+    assert_that(has_names(value_tbl, req_val))
 
-    # add unit conversion data
-    value_tbl <- unit_conv_table[value_tbl,
-        on = c(si_name = "units", ip_name = "ip_units")]
-    data.table::setnames(value_tbl, c("si_name", "ip_name"),
-                         c("units", "ip_units"))
+    # add unit conversion data if necessary
+    joined_before <- TRUE
+    if (!has_names(value_tbl, c("si_name", "mult", "offset"))) {
+        joined_before <- FALSE
+        assert_that(has_names(value_tbl, c("type", "units", "ip_units")))
+        value_tbl <- unit_conv_table[value_tbl, on = c(si_name = "units", ip_name = "ip_units")]
+    }
+    data.table::setnames(value_tbl,
+        c("si_name", "ip_name", req_val),
+        c("units", "ip_units", paste0("value", val_suffix)))
 
     if (in_ip) {
         value_tbl[
@@ -352,7 +376,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             `:=`(value = as.character(round(value_ipnum, digits = digits)))][
             !is.na(value_ipnum) & type == "integer" & is_integerish(value_ipnum),
             `:=`(value = as.character(round(value_ipnum)))][
-            !is.na(value_ipnum) & !is.na(unit),
+            !is.na(value_ipnum) & !is.na(units),
             `:=`(value_num = value_ipnum / mult - offset)]
     } else {
         value_tbl[
@@ -360,21 +384,33 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE) {
             `:=`(value = as.character(round(value_num, digits = digits)))][
             !is.na(value_num) & type == "integer" & is_integerish(value_num),
             `:=`(value = as.character(round(value_num)))][
-            !is.na(value_num) & !is.na(unit),
+            !is.na(value_num) & !is.na(units),
             `:=`(value_ipnum = value_num * mult + offset)]
     }
 
     value_tbl[, `:=`(value_upper = toupper(value))]
+
+    if (prefix != "value")
+        data.table::setnames(value_tbl, paste0("value", val_suffix), req_val)
+
+    if (joined_before)
+        data.table::setnames(value_tbl, c("units", "ip_units"), c("si_name", "ip_name"))
+
+    value_tbl
 }
 # }}}
-# value_list: return a list of field values with correct types
-# {{{
+# value_list: return a list of field values with correct types {{{
 value_list <- function (value_tbl, in_ip = FALSE) {
     assert_that(has_names(value_tbl, c("value", "value_num", "value_ipnum", "type")))
 
     num_col <- ifelse(in_ip, "value_ipnum", "value_num")
     value_tbl[, out := as.list(value)]
     value_tbl[type %in% c("integer", "real"), out := as.list(get(num_col))]
-    value_tbl$out
+
+    res <- value_tbl$out
+
+    if (is_scalar(res)) return(as.list(res))
+
+    res
 }
 # }}}

@@ -13,7 +13,7 @@
 #' Normally, you may not need to parse any Energy+.idd file unless your model
 #' is produced by EnergyPlus whose version is lower than 8.5. If so, it is
 #' suggested to store the parsed IDD object and directly pass it to the
-#' \code{idd} argument in \code{eplusr_model$new} in order to avoid the parsing
+#' \code{idd} argument in \code{eplusr_model$new} in index to avoid the parsing
 #' process whenever you read a model of that version.
 #'
 #' @section Usage:
@@ -25,9 +25,9 @@
 #' idd$build()
 #' idd$class_name(group = NULL)
 #' idd$group_name(class = NULL)
-#' idd$group_order(group = NULL)
-#' idd$class_order(class = NULL)
-#' idd$orders()
+#' idd$group_index(group = NULL)
+#' idd$class_index(class = NULL)
+#' idd$indexs()
 #'
 #' idd$object(class)
 #' idd$objects(class = NULL)
@@ -65,10 +65,10 @@
 #' `$class_name(group)` returns class names of that `group`. If `group` not
 #' given, all class names in current IDD are returned.
 #'
-#' `$group_order(group)` returns integer orders (orders of name apperarance in
+#' `$group_index(group)` returns integer indexs (indexs of name apperarance in
 #' the IDD file) of that `group`.
 #'
-#' `$class_order(class)` returns integer orders (orders of name apperarance in
+#' `$class_index(class)` returns integer indexs (indexs of name apperarance in
 #' the IDD file) of that `class`.
 #'
 #' `$object(class)` returns an IDDObject of that `class`.
@@ -84,7 +84,6 @@
 #'
 #' @importFrom R6 R6Class
 #' @importFrom data.table setattr
-#' @importFrom purrr map map_lgl
 #' @importFrom cli cat_rule cat_bullet
 #' @importFrom assertthat assert_that
 #' @return An Idd object
@@ -102,6 +101,10 @@ Idd <- R6::R6Class(classname = "Idd",
     public = list(
         # INITIALIZE {{{
         initialize = function (path) {
+
+            # add a uuid
+            private$m_uuid <- uuid::UUIDgenerate(use.time = TRUE)
+
             idd_file <- parse_idd_file(path)
             private$m_version<- idd_file$version
             private$m_build <- idd_file$build
@@ -110,260 +113,76 @@ Idd <- R6::R6Class(classname = "Idd",
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
             # assign tbls to IddObject R6Class Generator
-            private$create_iddobj_gen(IddObject)
+            private$m_iddobj_generator <- create_iddobj_generator(self, private, IddObject)
         },
         # }}}
 
-        # PROPERTIES GETTERS
-        # {{{
-        version = function () {
-            return(private$m_version)
-        },
+        # PROPERTY GETTERS {{{
+        version = function ()
+            i_version(self, private),
 
-        build = function () {
-            return(private$m_build)
-        },
+        build = function ()
+            i_build(self, private),
 
-        group_names = function (class = NULL) {
-            # {{{
-            if (is.null(class)) {
-                private$m_idd_tbl$group[["group_name"]]
-            } else {
-                private$assert_valid_classes(class)
-                res <- private$m_idd_tbl$group[
-                    private$m_idd_tbl$class[J(class), on = "class_name", list(group_id)]
-                    , on = "group_id", nomatch = 0L, group_name]
-                data.table::setattr(res, "names", class)
-                res
-            }
-            # }}}
-        },
+        group_name = function (class = NULL)
+            i_group_name(self, private, type = "idd"),
 
-        class_names = function (group = NULL) {
-            # {{{
-            if (is.null(group)) {
-                private$m_idd_tbl$class[["class_name"]]
-            } else {
-                private$assert_valid_groups(group)
-                res <- private$m_idd_tbl$class[
-                    private$m_idd_tbl$group[J(group), on = "group_name", list(group_id)]
-                    , on = "group_id", nomatch = 0L, class_name]
-                data.table::setattr(res, "names", group)
-                res
-            }
-            # }}}
-        },
+        from_group = function (class)
+            i_from_group(self, private, class = class),
 
-        required_class_names = function () {
-            # return names of all required classes
-            # {{{
-            private$m_idd_tbl$class[private$m_idd_tbl$class_property, on = "class_id"][
-                required_object == TRUE, class_name]
-            # }}}
-        },
+        class_name = function ()
+            i_class_name(self, private, type = "idd"),
 
-        unique_class_names = function () {
-            # return names of all unique classes
-            # {{{
-            private$m_idd_tbl$class[private$m_idd_tbl$class_property, on = "class_id"][
-                unique_object == TRUE, class_name]
-            # }}}
-        },
+        required_class_name = function ()
+            i_required_class_name(self, private),
 
-        extensible_class_names = function () {
-            # return names of all unique classes
-            # {{{
-            private$m_idd_tbl$class[private$m_idd_tbl$class_property, on = "class_id"][
-                num_extensible > 0L, class_name]
-            # }}}
-        },
+        unique_class_name = function ()
+            i_unique_class_name(self, private),
 
-        group_orders = function (group) {
-            # return group order
-            # {{{
-            private$assert_valid_groups(group)
-            res <- private$m_idd_tbl$group[J(group), on = "group_name", group_id]
-            data.table::setattr(res, "names", group)
-            res
-            # }}}
-        },
+        extensible_class_name = function ()
+            i_extensible_class_name(self, private),
 
-        class_orders = function (class) {
-            # return class order
-            # {{{
-            private$assert_valid_classes(class)
-            res <- private$m_idd_tbl$class[J(class), on = "class_name", class_id]
-            data.table::setattr(res, "names", class)
-            res
-            # }}}
-        },
+        group_index = function (group = NULL)
+            i_group_index(self, private, group = group),
 
-        object = function (class) {
-            # return a single object
-            # {{{
-            private$IddObject$new(class)
-            # }}}
-        },
+        class_index = function (class = NULL)
+            i_class_index(self, private, class = class),
 
-        objects_in_group = function (group) {
-            # return all objects in a group
-            # {{{
-            assert_that(self$is_valid_group(group))
-            purrr::map(
-                private$m_idd_tbl$group[group_name == group][
-                    private$m_idd_tbl$class, on = "group_id", nomatch = 0L,
-                    class_name],
-                private$IddObject$new
-            )
-            # }}}
-        },
-
-        required_objects = function () {
-            # return a list of all required IDDObjects
-            # {{{
-            purrr::map(self$required_class_names(), private$IddObject$new)
-            # }}}
-        },
-
-        unique_objects = function () {
-            # return a list of all unique IDDObjcts
-            # {{{
-            purrr::map(self$unique_class_names(), private$IddObject$new)
-            # }}}
-        },
-
-        reference_map = function (class) {
-            # return reference data
-            # {{{
-            assert_that(self$is_valid_class(class))
-            # check if this class has \reference-class-name
-            if (is_empty(private$m_idd_tbl$class_reference)) {
-                ref_class <- character(0)
-            } else {
-                ref_class <- private$m_idd_tbl$class[class_name == class][
-                    private$m_idd_tbl$class_reference, on = "class_id", nomatch = 0L, list(reference)][
-                    private$m_idd_tbl$field_object_list, on = c(reference = "object_list"), nomatch = 0L, list(field_id)][
-                    private$m_idd_tbl$field, on = "field_id", nomatch = 0L, list(class_id)][
-                    private$m_idd_tbl$class, on = "class_id", unique(class_name), nomatch = 0L]
-            }
-
-            # check if fields in this class has \reference attributes
-            ref_field <- private$m_idd_tbl$class[class_name == class][
-                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id)][
-                private$m_idd_tbl$field_reference, on = "field_id", nomatch = 0L, list(reference)][
-                private$m_idd_tbl$field_object_list, on = c(reference = "object_list"), nomatch = 0L, list(field_id)][
-                private$m_idd_tbl$field, on = "field_id", nomatch = 0L][
-                private$m_idd_tbl$class, on = "class_id", nomatch = 0L, unique(class_name)]
-
-            # check if fields in this class has \object-list attributes
-            object_list <- private$m_idd_tbl$class[class_name == class][
-                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id)][
-                private$m_idd_tbl$field_object_list, on = "field_id", nomatch = 0L, list(object_list)][
-                private$m_idd_tbl$field_reference, on = c(object_list = "reference"), nomatch = 0L, list(field_id)][
-                private$m_idd_tbl$field, on = "field_id", nomatch = 0L, list(class_id)][
-                private$m_idd_tbl$class, on = "class_id", nomatch = 0L, unique(class_name)]
-
-            # check if fields in this class has \external-list attributes
-            external_list <- private$m_idd_tbl$class[class_name == class][
-                private$m_idd_tbl$field, on = "class_id", nomatch = 0L, list(field_id)][
-                private$m_idd_tbl$field_external_list, on = "field_id", nomatch = 0L, list(external_key = unique(external_list))][
-                external_key == "autoRDDvariable", external_list := list("eplusout.rdd")][
-                external_key == "autoRDDmeter", external_list := list("eplusout.mdd")][
-                external_key == "autoRDDvariableMeter", external_list := list(c("eplusout.rdd", "eplusout.mdd"))][
-                , unique(unlist(external_list))]
-
-            res <- list(reference_class = ref_class,
-                        reference_field = ref_field,
-                        object_list = object_list,
-                        external_list = external_list)
-
-            return(res)
-            # }}}
-        },
+        reference_map = function (class)
+            i_reference_map(self, private, class = class),
         # }}}
 
-        # ASSERTIONS
-        # {{{
-        is_valid_group = function (group) {
-            assert_that(is_string(group))
-            group %in% private$m_idd_tbl$group[["group_name"]]
-        },
+        # OBJECT GETTERS {{{
+        object = function (class)
+            i_iddobject(self, private, class = class),
 
-        is_valid_class = function (class) {
-            assert_that(is_string(class))
-            class %in% private$m_idd_tbl$class[["class_name"]]
-        },
+        object_in_group = function (group)
+            i_iddobject_in_group(self, private, group = group),
         # }}}
 
-        print = function () {
-            ver <- paste0("Version: ", private$m_version)
-            bld <- paste0("Build: ", private$m_build)
-            cls <- paste0("Total Class: ", nrow(private$m_idd_tbl$class))
-            cli::cat_rule(left = crayon::bold("EnergyPlus Input Data Dictionary"))
-            cli::cat_bullet(ver)
-            cli::cat_bullet(bld)
-            cli::cat_bullet(cls)
-        }
+        # ASSERTIONS {{{
+        is_valid_group = function (group)
+            i_is_valid_group_name(self, private, group = group),
+
+        is_valid_class = function (class)
+            i_is_valid_class_name(self, private, class = class),
+        # }}}
+
+        print = function ()
+            i_print_idd(self, private)
     ),
 
     private = list(
-        # PRIVATE FIELDS
-        # {{{
-        m_version = character(),
-        m_build = character(),
+        # PRIVATE FIELDS {{{
+        m_uuid = NULL,
+        m_version = NULL,
+        m_build = NULL,
         m_idd_tbl = NULL,
-        IddObject = NULL,
+        m_iddobj_generator = NULL,
         # }}}
 
-        # PRIVATE FUNCTIONS
-        # {{{
-        create_iddobj_gen = function (IddObject) {
-            # create an IddObject R6Class Generator corresponding to this Idd
-            # {{{
-            # clone the IddObject R6Class Generator
-            own_iddobject <- clone_generator(IddObject)
-            # assign shared data to IddObject R6Class Generator
-            own_iddobject$self$private_fields$m_version <- private$m_version
-            own_iddobject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
-            private$IddObject <- own_iddobject
-            # }}}
-        },
-
-        assert_valid_groups = function (groups) {
-            # assert that all members in group are valid group names.
-            # {{{
-            valid <- groups %in% private$m_idd_tbl$group[["group_name"]]
-            assert_that(all(valid),
-                msg = paste0("Invalid group name found for current IDD",
-                             backtick_collapse(groups[!valid]), "."))
-            # }}}
-        },
-
-        assert_valid_classes = function (classes) {
-            # assert that all members in class are valid class names.
-            # {{{
-            valid <- classes %in% private$m_idd_tbl$class[["class_name"]]
-            assert_that(all(valid),
-                msg = paste0("Invalid class name found for current IDD",
-                             backtick_collapse(classes[!valid]), "."))
-            # }}}
-        },
-
-        deep_clone = function (name, value) {
-            # deep clone an Idd object
-            # {{{
-            if (name == "IddObject") {
-                # clone the IddObject R6Class Generator
-                clone_generator(value)
-            } else if (is.environment(value) &  name != "IddObject") {
-                list2env(as.list.environment(value, all.names = TRUE),
-                         parent = emptyenv())
-            } else {
-                value
-            }
-            # }}}
-        }
-        # }}}
+        deep_clone = function (name, value)
+            i_deep_clone(self, private, name, value)
     )
 )
 # }}}
@@ -376,8 +195,10 @@ read_idd <- function (path) {
     full_clone <- function (deep = TRUE) {
         deep_cloned <- clone_method(deep = TRUE)
         enclos_env <- deep_cloned$.__enclos_env__
-        enclos_env$private$IddObject$self$private_fields$m_version <- enclos_env$private$m_version
-        enclos_env$private$IddObject$self$private_fields$m_idd_tbl <- enclos_env$private$m_idd_tbl
+        enclos_env$private$m_iddobj_generator$self$private_fields$m_version <-
+            enclos_env$private$m_version
+        enclos_env$private$m_iddobj_generator$self$private_fields$m_idd_tbl <-
+            enclos_env$private$m_idd_tbl
         deep_cloned
     }
     Idd$clone_method <- full_clone
@@ -386,17 +207,6 @@ read_idd <- function (path) {
     Idd$new(path)
 }
 # }}}
-
-# ASSERTION ERROR MESSAGES
-
-#' @importFrom assertthat "on_failure<-"
-on_failure(Idd$public_methods$is_valid_class) <- function (call, env) {
-    paste0("Invalid class name found: ", backtick(eval(call$class, env)), ".")
-}
-
-on_failure(Idd$public_methods$is_valid_group) <- function (call, env) {
-    paste0("Invalid group name found: ", backtick(eval(call$group, env)), ".")
-}
 
 #' @importFrom assertthat assert_that
 #' @export
@@ -424,7 +234,10 @@ use_idd <- function (idd) {
 }
 # }}}
 
+# [.Idd {{{
+#' @export
 '[.Idd' <- function(x, i, j, ..., drop = FALSE) {
-    m_obj <- .subset2(x, "objects")()
+    m_obj <- .subset2(x, "object")()
     .subset2(m_obj, i)
 }
+# }}}
