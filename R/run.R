@@ -233,28 +233,32 @@ copy_run_files <- function (file, dir) {
 # clean_wd {{{
 clean_wd <- function (model_path) {
 
+    base <- tools::file_path_sans_ext(basename(model_path))
     without_ext <- tools::file_path_sans_ext(model_path)
     wd <- dirname(model_path)
 
     # files_to_delete {{{
     suffix <- c(".Zsz", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dfs",
-                         ".dxf", ".edd", ".eio", ".end", ".epmdet", ".epmidf",
-                         ".err", ".eso", ".expidf", ".inp", ".log", ".mat", ".mdd",
-                         ".mtd", ".mtr", ".rdd", ".rvaudit", ".sci", ".shd", ".sln",
-                         ".sql", ".ssz", ".svg", ".tab", ".txt", ".wrl",
-                         "DElight.dfdmp", "DElight.eldmp", "DElight.in",
-                         "DElight.out", "DFS.csv", "Map.csv", "Map.tab", "Map.txt",
-                         "Meter.csv", "Meter.tab", "Meter.txt", "Screen.csv",
-                         "Spark.log", "Sqlite.err", "Ssz.csv", "Ssz.tab",
-                         "Ssz.txt", "Table.csv", "Table.htm", "Table.html",
-                         "Table.tab", "Table.txt", "Table.xml", "Zsz.csv",
-                         "Zsz.tab", "Zsz.txt")
+        ".dxf", ".edd", ".eio", ".end", ".epmdet", ".epmidf", ".err", ".eso",
+        ".expidf", ".inp", ".log", ".mat", ".mdd", ".mtd", ".mtr", ".rdd",
+        ".rvaudit", ".sci", ".shd", ".sln", ".sql", ".ssz", ".svg", ".tab",
+        ".txt", ".wrl", "DElight.dfdmp", "DElight.eldmp", "DElight.in",
+        "DElight.out", "DFS.csv", "Map.csv", "Map.tab", "Map.txt", "Meter.csv",
+        "Meter.tab", "Meter.txt", "Screen.csv", "Spark.log", "Sqlite.err",
+        "Ssz.csv", "Ssz.tab", "Ssz.txt", "Table.csv", "Table.htm", "Table.html",
+        "Table.tab", "Table.txt", "Table.xml", "Zsz.csv", "Zsz.tab", "Zsz.txt")
     out_files <- paste0(without_ext, suffix)
 
     individual <- c("BasementGHTIn.idf", "audit.out", "expanded.idf",
-                   "expandedidf.err", "in.epw", "in.idf", "in.imf", "in.stat",
-                   "out.idf", "readvars.audit", "slab.int", "sqlite.err",
-                   "test.mvi", "fort.6")
+        "expandedidf.err", "in.epw", "in.idf", "in.imf", "in.stat", "out.idf",
+        "readvars.audit", "slab.int", "sqlite.err", "test.mvi", "fort.6")
+
+    if (base == "in") {
+        individual <- setdiff(individual, c("in.epw", "in.idf"))
+    } else {
+        individual <- setdiff(individual, paste0(base, ".idf"))
+    }
+
     seperates <- normalizePath(file.path(wd, individual), mustWork = FALSE)
 
     target <- c(out_files, seperates)
