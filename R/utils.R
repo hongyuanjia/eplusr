@@ -54,7 +54,7 @@ lpad <- function(x, char = " ", width = NULL) {
 clone_generator <- function (x) {
     # create a new environment with the R6:::capsule environment being its
     # parent
-    new <- new.env(parent = R6:::capsule)
+    new <- new.env(parent = parent.env(x))
 
     # set enclosing environments of all generator funs to the new environment
     new_funs <- lapply(as.list.environment(x, all.names = TRUE), function(x) {
