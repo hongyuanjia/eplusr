@@ -2724,6 +2724,24 @@ i_verbose_info <- function (self, private, ...) {
 i_lower_field_name <- function (field_name) tolower(gsub("[- :]", "_", field_name))
 # }}}
 
+# i_need_update_num {{{
+i_need_update_num <- function (self, private,
+                               view_in_ip = get_option("view_in_ip"),
+                               num_digits = get_option("num_digits")) {
+    if (private$m_log$view_in_ip != view_in_ip) {
+        private$m_log$view_in_ip <- view_in_ip
+        return(TRUE)
+    }
+
+    if (private$m_log$num_digits != num_digits) {
+        private$m_log$num_digits <- num_digits
+        return(TRUE)
+    }
+
+    FALSE
+}
+# }}}
+
 ################################################################################
 #                                 Idf Specific                                 #
 ################################################################################
@@ -3012,7 +3030,8 @@ i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = get
     # delete extra fields
     if(is.null(which)) val_tbl <- val_tbl[!is.na(value_id)]
 
-    val_tbl <- update_value_num(val_tbl, in_ip = in_ip)
+    if (i_need_update_num(self, private, view_in_ip = in_ip))
+        val_tbl <- update_value_num(val_tbl, in_ip = in_ip)
 
     val <- value_list(val_tbl, in_ip = in_ip)
 
@@ -3042,7 +3061,8 @@ i_idfobj_value_table <- function (self, private, object, all = FALSE, unit = TRU
                                   in_ip = get_option("view_in_ip")) {
     val_tbl_full <- i_value_tbl_from_which(self, private, object)
     # change to IP numbers and names if necessary
-    val_tbl_full <- update_value_num(val_tbl_full, get_option("num_digits"), in_ip)
+    if (i_need_update_num(self, private, view_in_ip = in_ip))
+        val_tbl_full <- update_value_num(val_tbl_full, get_option("num_digits"), in_ip)
 
     ip <- ifelse(in_ip, "ip", "")
 
@@ -3134,9 +3154,6 @@ i_idfobj_has_ref_from <- function (self, private, object) {
     not_empty(ref_from)
 }
 # }}}
-
-# TODO:
-# auto-detect changes of option `eplusr.view_in_ip` and `eplusr.num_digits`
 
 ################################################################################
 #                                Print methods                                 #

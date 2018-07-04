@@ -458,17 +458,9 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_log$view_in_ip <- getOption("eplusr.view_in_ip")
             private$m_log$num_digits <- getOption("eplusr.num_digits")
 
-            # # update idf value tbl according current view_in_ip option
-            # if ((private$m_log$view_in_ip != idf_file$options$view_in_ip) ||
-            #     (private$m_log$num_digits != idf_file$options$num_digits))
-            #     update_value_num
-
             # TODO: give verbose info about different save format
             # create the IdfObject R6ClassGenerator for this specific Idf
             private$m_idfobj_generator <- create_idfobj_generator(self, private, IdfObject)
-
-            # # add `Output:SQLite` for collecting simulaton results
-            # private$add_sql_output()
         },
         # }}}
 
