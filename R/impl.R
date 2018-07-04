@@ -2814,7 +2814,7 @@ i_idf_add_output_sqlite <- function (self, private) {
 # }}}
 
 # i_idf_run {{{
-i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE) {
+i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE) {
     if (private$m_version < 8.3)
         stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
              call. = FALSE)
@@ -2824,6 +2824,24 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE) {
         stop("Idf has been modified since read or last saved. Please save Idf ",
             "using $save() before run.", call. = FALSE)
 
+    # check if the model is still running
+    old <- private$m_log$job
+    if (!is.null(old)) {
+        proc <- ._get_private(old)$m_process
+        if (inherits(proc, "process") && proc$is_alive()) {
+            pid <- proc$get_pid()
+            if (force) {
+                old$kill()
+                message("Force to kill current running simulation (PID: ", pid,
+                    ") and start a new simulation...")
+            } else {
+                stop("The simulation of current Idf is still running (PID: ",
+                    pid, "). Please set `force` to TRUE if you want ",
+                    "to kill the running process and start a new simulation.",
+                    call. = FALSE)
+            }
+        }
+    }
     # add Output:SQLite if necessary
     add_sql <- i_idf_add_output_sqlite(self, private)
 
@@ -2851,6 +2869,7 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE) {
 
     job$run(wait = wait)
 
+    private$m_log$job <- job
     job
 }
 # }}}
