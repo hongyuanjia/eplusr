@@ -44,18 +44,19 @@ idd_text <- c(
 # }}}
 
 describe("parse_idd_file()", {
-    it("can read Idd from string", {
-        expect_silent(idd_str <- read_idd_str(idd_text))
-    })
+    # {{{
+    it("can read Idd from string", expect_silent(idd_str <- read_idd_str(idd_text)))
     it("can parse Idd from string", {
+        # {{{
         expect_silent(idd_parsed <- parse_idd_file(idd_text))
         expect_equal(names(idd_parsed),
             c("version", "build",
               "group",
-              "class", "class_property", "class_reference",
-              "field", "field_property", "field_reference",
-              "field_choice", "field_range", "field_extensible",
+              "class", "class_reference",
+              "field", "field_reference",
+              "field_default", "field_choice", "field_range",
               "field_object_list", "field_external_list"))
+        # }}}
     })
 
     idd_parsed <- parse_idd_file(idd_text)
@@ -70,23 +71,22 @@ describe("parse_idd_file()", {
         expect_equal(idd_parsed$group$group_name, c("TestGroup1", "TestGroup2"))
         # }}}
     })
-    it("can parse class data", {
+    it("can parse class property data", {
         # {{{
         expect_equal(idd_parsed$class$class_id, 1:2)
         expect_equal(idd_parsed$class$class_name, c("TestSimple", "TestSlash"))
         expect_equal(idd_parsed$class$group_id, 1:2)
-        # }}}
-    })
-    it("can parse class property data", {
-        # {{{
-        expect_equal(idd_parsed$class_property$class_id, 1:2)
-        expect_equal(idd_parsed$class_property$class_format, c("standard", "singleLine"))
-        expect_equal(idd_parsed$class_property$memo, c(NA_character_, "This is just a test"))
-        expect_equal(idd_parsed$class_property$min_fields, c(0, 3))
-        expect_equal(idd_parsed$class_property$num_fields, c(1, 4))
-        expect_equal(idd_parsed$class_property$required_object, c(FALSE, TRUE))
-        expect_equal(idd_parsed$class_property$unique_object, c(FALSE, TRUE))
-        expect_equal(idd_parsed$class_property$has_name, c(FALSE, FALSE))
+        expect_equal(idd_parsed$class$class_format, c("standard", "singleLine"))
+        expect_equal(idd_parsed$class$memo, c(NA_character_, "This is just a test"))
+        expect_equal(idd_parsed$class$min_fields, c(0, 3))
+        expect_equal(idd_parsed$class$num_fields, c(1, 4))
+        expect_equal(idd_parsed$class$required_object, c(FALSE, TRUE))
+        expect_equal(idd_parsed$class$unique_object, c(FALSE, TRUE))
+        expect_equal(idd_parsed$class$has_name, c(TRUE, FALSE))
+        expect_equal(idd_parsed$class$last_required, c(0, 1))
+        expect_equal(idd_parsed$class$num_extensible, c(0, 4))
+        expect_equal(idd_parsed$class$first_extensible, c(0, 1))
+        expect_equal(idd_parsed$class$num_extensible_group, c(0, 1))
         # }}}
     })
     it("can parse class reference data", {
@@ -96,11 +96,11 @@ describe("parse_idd_file()", {
         expect_equal(idd_parsed$class_reference$class_id, 2)
         # }}}
     })
-    it("can parse field data", {
+    it("can parse field property data", {
         # {{{
         expect_equal(idd_parsed$field$field_id, 1:5)
         expect_equal(idd_parsed$field$class_id, c(1, rep(2,4)))
-        expect_equal(idd_parsed$field$field_order, c(1, 1:4))
+        expect_equal(idd_parsed$field$field_index, c(1, 1:4))
         nms <- c("Test Field",
                  "Test Character Field 1",
                  "Test Numeric Field 1",
@@ -111,28 +111,33 @@ describe("parse_idd_file()", {
                      paste0(nms, c("", "", " {m}", "", "")))
         expect_equal(idd_parsed$field$full_ipname,
                      paste0(nms, c("", "", " {ft}", "", "")))
-        # }}}
-    })
-    it("can parse field property data", {
-        # {{{
-        expect_equal(idd_parsed$field_property$field_id, 1:5)
-        expect_equal(idd_parsed$field_property$units,
+        expect_equal(idd_parsed$field$units,
                      c(NA_character_, NA_character_, "m", NA_character_, NA_character_))
-        expect_equal(idd_parsed$field_property$ip_units,
+        expect_equal(idd_parsed$field$ip_units,
                      c(NA_character_, NA_character_, "ft", NA_character_, NA_character_))
-        expect_equal(idd_parsed$field_property$required_field,
+        expect_equal(idd_parsed$field$required_field,
                      c(FALSE, TRUE, FALSE, FALSE, FALSE))
-        expect_equal(idd_parsed$field_property$type,
+        expect_equal(idd_parsed$field$type,
                      c("alpha", "alpha", "integer", "real", "choice"))
-        expect_equal(idd_parsed$field_property$field_default,
-                     c(NA_character_, NA_character_, "2", NA_character_, NA_character_))
-        expect_equal(idd_parsed$field_property$autosizable,
+        expect_equal(idd_parsed$field$autosizable,
                      c(FALSE, FALSE, TRUE, FALSE, FALSE))
-        expect_equal(idd_parsed$field_property$autocalculatable,
+        expect_equal(idd_parsed$field$autocalculatable,
                      c(FALSE, FALSE, FALSE, TRUE, FALSE))
-        expect_equal(idd_parsed$field_property$note,
+        expect_equal(idd_parsed$field$note,
                      c(NA_character_, "Test Note Parsing", NA_character_, NA_character_, NA_character_))
-        expect_equal(idd_parsed$field_property$begin_extensible,
+        expect_equal(idd_parsed$field$is_name,
+                     c(TRUE, FALSE, FALSE, FALSE, FALSE))
+        expect_equal(idd_parsed$field$is_extensible,
+                     c(FALSE, TRUE, TRUE, TRUE, TRUE))
+        expect_equal(idd_parsed$field$has_default,
+                     c(FALSE, FALSE, TRUE, FALSE, FALSE))
+        expect_equal(idd_parsed$field$has_range,
+                     c(FALSE, FALSE, TRUE, FALSE, FALSE))
+        expect_equal(idd_parsed$field$has_reference,
+                     c(TRUE, FALSE, FALSE, FALSE, FALSE))
+        expect_equal(idd_parsed$field$has_object_list,
+                     c(FALSE, FALSE, FALSE, FALSE, TRUE))
+        expect_equal(idd_parsed$field$has_external_list,
                      c(FALSE, TRUE, FALSE, FALSE, FALSE))
         # }}}
     })
@@ -141,6 +146,16 @@ describe("parse_idd_file()", {
         expect_equal(idd_parsed$field_reference$reference_id, 1)
         expect_equal(idd_parsed$field_reference$reference, "RefTestSimpleA1")
         expect_equal(idd_parsed$field_reference$field_id, 1)
+        # }}}
+    })
+    it("can parse field default data", {
+        # {{{
+        expect_equal(idd_parsed$field_default$field_id, 3)
+        expect_equal(idd_parsed$field_default$default, "2")
+        expect_equal(idd_parsed$field_default$default_upper, "2")
+        expect_equal(idd_parsed$field_default$default_num, 2)
+        expect_equivalent(idd_parsed$field_default$default_ipnum, 6.56168,
+            tolerance = 0.0001)
         # }}}
     })
     it("can parse field choice data", {
@@ -159,12 +174,6 @@ describe("parse_idd_file()", {
         expect_equal(idd_parsed$field_range$maximum, 10)
         expect_equal(idd_parsed$field_range$upper_incbounds, FALSE)
         expect_equal(idd_parsed$field_range$field_id, 3)
-        # }}}
-    })
-    it("can parse field extensible data", {
-        # {{{
-        expect_equal(idd_parsed$field_extensible$extensible_id, 1:4)
-        expect_equal(idd_parsed$field_extensible$field_id, 2:5)
         # }}}
     })
     it("can parse field object list data", {
@@ -295,6 +304,7 @@ describe("parse_idd_file()", {
         expect_error(parse_idd_file(idd_wrong))
         # }}}
     })
+    # }}}
 })
 
 describe("Idd$new()", {
@@ -304,6 +314,8 @@ describe("Idd$new()", {
 
     skip_on_cran()
     it("can parse Idd files from 8.1 to 8.8 without any error", {
+        idd <- Idd$new(here::here("idd/V8-8-0-Energy+.idd"))
+        idd
         expect_silent(Idd$new("../../idd/V8-8-0-Energy+.idd"))
         expect_silent(Idd$new("../../idd/V8-7-0-Energy+.idd"))
         expect_silent(Idd$new("../../idd/V8-6-0-Energy+.idd"))
@@ -330,119 +342,98 @@ describe("$build()", {
     })
 })
 
-describe("$group_names()", {
+describe("$group_name()", {
     it("can get all group names", {
-        expect_equal(idd$group_names(), c("TestGroup1", "TestGroup2"))
+        expect_equal(idd$group_name(), c("TestGroup1", "TestGroup2"))
     })
     it("can get group name of one class", {
-        expect_equal(idd$group_names("TestSimple"), c(TestSimple = "TestGroup1"))
+        expect_equal(idd$from_group("TestSimple"), "TestGroup1")
     })
     it("can return when multiple class names are given", {
-        expect_equal(idd$group_names(c("TestSlash", "TestSimple")),
-            c(TestSlash = "TestGroup2", TestSimple = "TestGroup1"))
+        expect_equal(idd$from_group(c("TestSlash", "TestSimple")),
+            c("TestGroup2", "TestGroup1"))
     })
     it("can stop when invalid class name is given", {
-        expect_error(idd$group_names("WrongClass"), "Invalid class name found")
+        expect_error(idd$from_group("WrongClass"), "Invalid class name found")
     })
 })
 
-describe("$class_names()", {
+describe("$class_name()", {
     it("can return all class names", {
-        expect_equal(idd$class_names(), c("TestSimple", "TestSlash"))
-    })
-    it("can return class names of a single group", {
-        expect_equal(idd$class_names("TestGroup2"), c(TestGroup2 = "TestSlash"))
-    })
-    it("can return when multiple group names are given", {
-        expect_equal(idd$class_names(c("TestGroup2", "TestGroup1")),
-            c(TestGroup2 = "TestSlash", TestGroup1 = "TestSimple"))
-    })
-    it("can stop when invalid group name is given", {
-        expect_error(idd$class_names("WrongGroup"), "Invalid group name found")
+        expect_equal(idd$class_name(), c("TestSimple", "TestSlash"))
     })
 })
 
-describe("$required_class_names()", {
+describe("$required_class_name()", {
     it("can return names of all required classes", {
-        expect_equal(idd$required_class_names(), "TestSlash")
+        expect_equal(idd$required_class_name(), "TestSlash")
     })
 })
 
-describe("$unique_class_names()", {
+describe("$unique_class_name()", {
     it("can return names of all unique classes", {
-        expect_equal(idd$unique_class_names(), "TestSlash")
+        expect_equal(idd$unique_class_name(), "TestSlash")
     })
 })
 
-describe("$extensible_class_names()", {
+describe("$extensible_class_name()", {
     it("can return names of all extensible classes", {
-        expect_equal(idd$extensible_class_names(), "TestSlash")
+        expect_equal(idd$extensible_class_name(), "TestSlash")
     })
 })
 
-describe("$group_order()", {
-    it("can return an order of a single group", {
-        expect_equal(idd$group_orders("TestGroup1"), c("TestGroup1" = 1L))
+describe("$group_index()", {
+    it("can return an index of a single group", {
+        expect_equal(idd$group_index("TestGroup1"), 1)
     })
-    it("can return multiple group orders", {
-        expect_equal(idd$group_orders(c("TestGroup2", "TestGroup1")),
-            c(TestGroup2 = 2L, TestGroup1 = 1L))
+    it("can return multiple group indexes", {
+        expect_equal(idd$group_index(c("TestGroup2", "TestGroup1", "TestGroup2")),
+            c(2L, 1L, 2L))
     })
     it("can stop when invalid group names are given", {
-        expect_error(idd$group_orders("WrongGroup"), "Invalid group name found")
+        expect_error(idd$group_index("WrongGroup"), "Invalid group name found")
     })
 })
 
-describe("$class_order()", {
-    it("can return an order of a single class", {
-        expect_equal(idd$class_orders("TestSlash"), c("TestSlash" = 2L))
+describe("$class_index()", {
+    it("can return an index of a single class", {
+        expect_equal(idd$class_index("TestSlash"), 2L)
     })
-    it("can return multiple group orders", {
-        expect_equal(idd$group_orders(c("TestGroup2", "TestGroup1")),
-            c(TestGroup2 = 2L, TestGroup1 = 1L))
+    it("can return multiple class indexes", {
+        expect_equal(idd$class_index(c("TestSlash", "TestSimple", "TestSimple")),
+            c(2L, 1L, 1L))
     })
     it("can stop when invalid class names are given", {
-        expect_error(idd$class_orders("WrongClass"), "Invalid class name found")
+        expect_error(idd$class_index("WrongClass"), "Invalid class name found")
     })
 
 })
 
 describe("$object()", {
     it("can return a single IddObject using class name", {
-        expect_is(idd$object("TestSimple"), "IddObject")
+        expect_is(idd$object("TestSimple")$TestSimple, "IddObject")
     })
     it("can stop when invalid class names are given", {
         expect_error(idd$object("WrongClass"), "Invalid class name found: `WrongClass`.")
     })
-    it("can stop when multiple class names are given", {
-        expect_error(idd$object(c("TestSimple", "TestSlash")), "class is not a string.")
+    it("can return when multiple class names are given", {
+        expect_equal(idd$object(c("TestSimple", "TestSlash")),
+            list(TestSimple = idd$object("TestSimple")$TestSimple,
+                TestSlash = idd$object("TestSlash")$TestSlash))
     })
 })
 
-describe("$objects_in_group()", {
+describe("$object_in_group()", {
     it("can return all IddObjects in a group", {
-        expect_is(idd$objects_in_group("TestGroup1"), "list")
-        expect_equal(idd$objects_in_group("TestGroup1"),
-                     list(idd$object("TestSimple")))
+        expect_is(idd$object_in_group("TestGroup1"), "list")
+        expect_equal(idd$object_in_group("TestGroup1"), list(TestSimple = idd$object("TestSimple")$TestSimple))
     })
     it("can stop when invalid group names are given", {
-        expect_error(idd$objects_in_group("WrongGroup"), "Invalid group name found")
+        expect_error(idd$object_in_group("WrongGroup"), "Invalid group name found")
     })
     it("can stop when multiple group names are given", {
-        expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")),
+        expect_error(idd$object_in_group(c("TestGroup1", "TestGroup2")),
                      "group is not a string")
-    })
-})
-
-describe("$required_objects()", {
-    it("can return all required IddObjects", {
-        expect_equal(idd$required_objects(), list(idd$object("TestSlash")))
-    })
-})
-
-describe("$unique_objects()", {
-    it("can return all unique IddObjects", {
-        expect_equal(idd$unique_objects(), list(idd$object("TestSlash")))
     })
 })
 

@@ -44,7 +44,7 @@ idd_text <- c(
 # }}}
 
 idd <- read_idd(idd_text)
-slash <- idd$object("TestSlash")
+slash <- idd$object("TestSlash")$TestSlash
 
 describe("methods from IddObject", {
     # {{{
@@ -52,14 +52,14 @@ describe("methods from IddObject", {
        expect_equal(slash$group_name(), "TestGroup2")
     )
 
-    it("can use $group_order()",
-       expect_equal(slash$group_order(), 2L)
+    it("can use $group_index()",
+       expect_equal(slash$group_index(), 2L)
     )
     it("can use $class_name()",
        expect_equal(slash$class_name(), "TestSlash")
     )
-    it("can use $class_order()",
-       expect_equal(slash$class_order(), 2L)
+    it("can use $class_index()",
+       expect_equal(slash$class_index(), 2L)
     )
     it("can use $class_format()",
        expect_equal(slash$class_format(), "singleLine")
@@ -76,20 +76,23 @@ describe("methods from IddObject", {
     it("can use $num_extensible()",
        expect_equal(slash$num_extensible(), 4L)
     )
-    it("can use $reference_class_name()",
-       expect_equal(slash$reference_class_name(), "RefTestSlash")
-    )
-    it("can use $first_extensible()",
+    # it("can use $reference_class_name()",
+    #    expect_equal(slash$reference_class_name(), "RefTestSlash")
+    # )
+    it("can use $first_extensible_index()",
        expect_equal(slash$first_extensible_index(), 1L)
     )
+    it("can use $extensible_group_num()",
+       expect_equal(slash$extensible_group_num(), 1L)
+    )
     it("can use $add_extensible_groups()",
-       expect_equal(slash$add_extensible_group()$num_fields(), 8L)
+       expect_equal(slash$add_extensible_group(1)$num_fields(), 8L)
     )
     it("can use $del_extensible_groups()",
-       expect_equal(slash$del_extensible_group()$num_fields(), 4L)
+       expect_equal(slash$del_extensible_group(1)$num_fields(), 4L)
     )
-    it("can use $is_version()",
-       expect_false(slash$is_version())
+    it("can use $has_name()",
+       expect_false(slash$has_name())
     )
     it("can use $is_required()",
        expect_true(slash$is_required())
@@ -99,9 +102,6 @@ describe("methods from IddObject", {
     )
     it("can use $is_extensible()",
        expect_true(slash$is_extensible())
-    )
-    it("can use $has_name()",
-       expect_false(slash$has_name())
     )
     it("can use $field_name()", {
        expect_error(slash$field_name(slash$num_fields() + 1), "Invalid field index")
@@ -114,10 +114,13 @@ describe("methods from IddObject", {
            c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
     })
     it("can use $field_type()",
-       expect_equivalent(slash$field_type(c(4, 2)), list("choice", "integer"))
+       expect_equivalent(slash$field_type(c(4, 2)), c("choice", "integer"))
+    )
+    it("can use $field_note()",
+       expect_equivalent(slash$field_note(c(2, 1)), c(NA_character_, "Test Note Parsing"))
     )
     it("can use $field_unit()",
-       expect_equivalent(slash$field_unit(c(4, 2)), list(NA_character_, "m"))
+       expect_equivalent(slash$field_unit(c(4, 2)), c(NA_character_, "m"))
     )
     it("can use $field_default()",
        expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
@@ -129,28 +132,24 @@ describe("methods from IddObject", {
        expect_equivalent(slash$field_range(c(4, 2)),
            list(list(NA_real_, NA, NA_real_, NA), list(1L, TRUE, 10, FALSE)))
     )
-    it("can use $field_note()",
-       expect_equivalent(slash$field_note(c(2, 1)), list(NA_character_, "Test Note Parsing"))
-    )
     it("can use $is_valid_field_num()", {
        expect_false(slash$is_valid_field_num(1))
        expect_true(slash$is_valid_field_num(4))
        expect_false(slash$is_valid_field_num(6))
        expect_true(slash$is_valid_field_num(12))
-       expect_true(slash$is_extensible_field_index(12))
     })
     it("can use $is_extensible_field_index()", {
-       expect_true(slash$is_extensible_field_index(1))
-       expect_true(slash$is_extensible_field_index(4))
-       expect_true(slash$is_extensible_field_index(6))
-       expect_true(slash$is_extensible_field_index(12))
+       expect_true(slash$is_extensible_index(1))
+       expect_true(slash$is_extensible_index(4))
+       expect_true(slash$is_extensible_index(6))
+       expect_true(slash$is_extensible_index(12))
     })
     it("can use $is_valid_field_name()", {
        expect_true(slash$is_valid_field_name("Test Character Field 1"))
        expect_true(slash$is_valid_field_name("Test Character Field 2"))
        expect_true(slash$is_valid_field_name("Test Numeric Field 1"))
        expect_true(slash$is_valid_field_name("Test Numeric Field 2"))
-       expect_error(slash$is_valid_field_name(1), "name is not a string")
+       expect_false(slash$is_valid_field_name(1))
        expect_false(slash$is_valid_field_name("wrong"))
     })
     it("can use $is_valid_field_index()", {
@@ -158,7 +157,7 @@ describe("methods from IddObject", {
        expect_true(slash$is_valid_field_index(2))
        expect_true(slash$is_valid_field_index(3))
        expect_true(slash$is_valid_field_index(4))
-       expect_error(slash$is_valid_field_index("wrong"), "index is not a count")
+       expect_false(slash$is_valid_field_index("wrong"))
        expect_false(slash$is_valid_field_index(5))
     })
     it("can use $is_autosizable_field()", {
