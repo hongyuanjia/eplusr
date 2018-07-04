@@ -16,9 +16,9 @@ class. \code{IDDObject} is not entended to be used seperately.
 iddobj <- IDDObject$new(list)
 
 iddobj$group_name()
-iddobj$group_order()
+iddobj$group_index()
 iddobj$class_name()
-iddobj$class_order()
+iddobj$class_index()
 iddobj$class_format()
 iddobj$min_fields()
 iddobj$num_fields()
@@ -35,24 +35,24 @@ iddobj$is_unique()
 iddobj$is_extensible()
 iddobj$has_name()
 
-iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = FALSE)
-iddobj$field_index(name = NULL)
-iddobj$field_type(index = NULL, name = NULL)
-iddobj$field_unit(index = NULL, name = NULL, in_ip = FALSE)
-iddobj$field_reference(index = NULL, name = NULL)
-iddobj$field_object_list(index = NULL, name = NULL)
-iddobj$field_default(index = NULL, name = NULL)
-iddobj$field_choice(index = NULL, name = NULL)
-iddobj$field_range(index = NULL, name = NULL)
+iddobj$field_name(which = NULL, lower = FALSE, unit = FALSE, in_ip = FALSE)
+iddobj$field_which(name = NULL)
+iddobj$field_type(which = NULL, name = NULL)
+iddobj$field_unit(which = NULL, name = NULL, in_ip = FALSE)
+iddobj$field_reference(which = NULL, name = NULL)
+iddobj$field_object_list(which = NULL, name = NULL)
+iddobj$field_default(which = NULL, name = NULL)
+iddobj$field_choice(which = NULL, name = NULL)
+iddobj$field_range(which = NULL, name = NULL)
 
 iddobj$is_valid_field_num(num)
 iddobj$is_valid_field_name(name)
-iddobj$is_valid_field_index(index)
-iddobj$is_autosizable_field(index = NULL, name = NULL)
-iddobj$is_autocalculatable_field(index = NULL, name = NULL)
-iddobj$is_numeric_field(index = NULL, name = NULL)
-iddobj$is_integer_field(index = NULL, name = NULL)
-iddobj$is_required_field(index = NULL, name = NULL)
+iddobj$is_valid_field_index(which)
+iddobj$is_autosizable_field(which = NULL, name = NULL)
+iddobj$is_autocalculatable_field(which = NULL, name = NULL)
+iddobj$is_numeric_field(which = NULL, name = NULL)
+iddobj$is_integer_field(which = NULL, name = NULL)
+iddobj$is_required_field(which = NULL, name = NULL)
 
 iddobj$print()
 
@@ -67,7 +67,7 @@ print(iddobj)
 \item \code{list}: A subset of list with two named members \code{class} and \code{field}.
 Usually a subset of \code{data} list that created by \code{parse_idd} function.
 \item \code{num}: A positive integer.
-\item \code{index}: A valid field index.
+\item \code{which}: A valid field which.
 \item \code{name}: A valid field name.
 }
 }
@@ -80,11 +80,11 @@ Dictionary (IDD) data of a certain class.
 
 \code{$group_name()} returns the name of group this class belongs to.
 
-\code{$group_order()} returns the order of group this class belongs to.
+\code{$group_index()} returns the index of group this class belongs to.
 
 \code{$class_name()} returns the name of this class.
 
-\code{$class_order()} returns the order of this class.
+\code{$class_index()} returns the index of this class.
 
 \code{$min_fields()} returns the minimum fields required for this class.
 If no required, 0 is returned.
@@ -100,7 +100,7 @@ number may change if the class is extensible and after
 \code{$reference_class_name()} returns the name of this class that is referenced
 by other class or objects.
 
-\code{$first_extensible()} returns the index of the first extensible field in this
+\code{$first_extensible()} returns the which of the first extensible field in this
 class. If this class is not extensible, 0 is return.
 
 \code{$extensible_group()} returns the data of extensible group for this class.
@@ -113,36 +113,36 @@ class. If this class is not extensible, 0 is return.
 
 \code{$is_extensible()} returns \code{TRUE} if this class is extensible.
 
-\code{$field_name(index, lower, unit, in_ip)} returns field names of that \code{index}
-or those indice. If \code{index} is NULL, names of all fields in this class are
+\code{$field_name(which, lower, unit, in_ip)} returns field names of that \code{which}
+or those indice. If \code{which} is NULL, names of all fields in this class are
 returned. If \code{lower} is \code{TRUE}, all spaces and dashes is replaced by
 underscores. If \code{unit} is \code{TRUE}, the units of those fields are also
 returned.  If \code{in_ip}, corresponding imperial units are returned. It only has
 effect when \code{unit} is \code{TRUE}.
 
-\code{$field_index(name)} returns field index of that fields or indice of those
+\code{$field_which(name)} returns field which of that fields or indice of those
 fields with \code{name}(s). If \code{name} is NULL, indice of all fields in this class
 are returned.
 
-All other \code{$field_*(index, name)} returns specific field properties. If both
-\code{index} and \code{name} are given, \code{name} is ignored. If both \code{index} and \code{name}
+All other \code{$field_*(which, name)} returns specific field properties. If both
+\code{which} and \code{name} are given, \code{name} is ignored. If both \code{which} and \code{name}
 are NULL, properties of all fields in this class are returned.
 \itemize{
-\item \code{$field_type(index, name)}: returns types of those fields. All possible
+\item \code{$field_type(which, name)}: returns types of those fields. All possible
 values are \code{"integer"}, \code{"real"}, \code{"alpha"} (arbitrary string), \code{"choice"}
 (alpha with specific list of choices), \code{"object-list"} (link to a list of
 objects defined elsewhere), \code{"external-list"} (uses a special list from an
 external source) and \code{"node"} (name used in connecting HVAC components).
-\item \code{$field_unit(index, name)}: returns units of those fields.
-\item \code{$field_reference(index, name)}: returns references of those fields which
+\item \code{$field_unit(which, name)}: returns units of those fields.
+\item \code{$field_reference(which, name)}: returns references of those fields which
 are alternative field names that are referenced by other fields elsewhere.
-\item \code{$field_object_list(index, name)}: returns a list of other field names that
+\item \code{$field_object_list(which, name)}: returns a list of other field names that
 this field referenced.
-\item \code{$field_default(index, name)}: returns a list of default values of those
+\item \code{$field_default(which, name)}: returns a list of default values of those
 fields. If no defaults found, \code{NA}s are returned.
-\item \code{$field_choice(index, name)}: returns a list of all valid choices for those
+\item \code{$field_choice(which, name)}: returns a list of all valid choices for those
 fields. If no choices found, \code{NA}s are returned.
-\item \code{$field_range(index, name)}: returns a list of ranges for those fields.
+\item \code{$field_range(which, name)}: returns a list of ranges for those fields.
 Every range has four components: \code{lower} (lower limit), \code{lower_incbounds}
 (\code{TRUE} if the lower limit should be included), \code{upper} (upper limit), and
 \code{upper_incbounds} (\code{TRUE} if the upper limit should be included). For fields
@@ -162,22 +162,22 @@ number for this class as the number of field in the extensible group is 3.
 \code{$is_valid_field_name(name)} returns \code{TRUE} if \code{name} is a valid field name
 \strong{WITHOUT} unit.
 
-\code{$is_valid_field_index(index)} returns \code{TRUE} if \code{index} is a valid field
-index.
+\code{$is_valid_field_index(which)} returns \code{TRUE} if \code{which} is a valid field
+which.
 
-\code{$is_autosizable_field(index, name)} returns \code{TRUE} if the field can be
+\code{$is_autosizable_field(which, name)} returns \code{TRUE} if the field can be
 assigned to \code{autosize}.
 
-\code{$is_autocalculatable_field(index, name)} returns \code{TRUE} if the field can be
+\code{$is_autocalculatable_field(which, name)} returns \code{TRUE} if the field can be
 assigned to \code{autocalculate}.
 
-\code{$is_numeric_field(index, name)} returns \code{TRUE} if the field value should be
+\code{$is_numeric_field(which, name)} returns \code{TRUE} if the field value should be
 numeric.
 
-\code{$is_integer_field(index, name)} returns \code{TRUE} if the field value should be
+\code{$is_integer_field(which, name)} returns \code{TRUE} if the field value should be
 an integer.
 
-\code{$is_required_field(index, name)} returns \code{TRUE} if the field is required.
+\code{$is_required_field(which, name)} returns \code{TRUE} if the field is required.
 }
 
 \author{

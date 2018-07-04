@@ -22,7 +22,7 @@ take about 5-6 sec to parse an IDD file.
 Normally, you may not need to parse any Energy+.idd file unless your model
 is produced by EnergyPlus whose version is lower than 8.5. If so, it is
 suggested to store the parsed IDD object and directly pass it to the
-\code{idd} argument in \code{eplusr_model$new} in order to avoid the parsing
+\code{idd} argument in \code{eplusr_model$new} in index to avoid the parsing
 process whenever you read a model of that version.
 }
 \section{Usage}{
@@ -33,9 +33,9 @@ idd$version()
 idd$build()
 idd$class_name(group = NULL)
 idd$group_name(class = NULL)
-idd$group_order(group = NULL)
-idd$class_order(class = NULL)
-idd$orders()
+idd$group_index(group = NULL)
+idd$class_index(class = NULL)
+idd$indexs()
 
 idd$object(class)
 idd$objects(class = NULL)
@@ -76,10 +76,10 @@ returns an IDD object.
 \code{$class_name(group)} returns class names of that \code{group}. If \code{group} not
 given, all class names in current IDD are returned.
 
-\code{$group_order(group)} returns integer orders (orders of name apperarance in
+\code{$group_index(group)} returns integer indexs (indexs of name apperarance in
 the IDD file) of that \code{group}.
 
-\code{$class_order(class)} returns integer orders (orders of name apperarance in
+\code{$class_index(class)} returns integer indexs (indexs of name apperarance in
 the IDD file) of that \code{class}.
 
 \code{$object(class)} returns an IDDObject of that \code{class}.
