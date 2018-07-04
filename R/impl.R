@@ -1546,7 +1546,7 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
     # }}}
 
     # log order
-    i_log_new_object_order(self, private, obj_tbl$object_id)
+    i_log_add_object_order(self, private, obj_tbl$object_id)
 
     # log unsaved
     i_log_unsaved_idf(self, private)
@@ -2014,7 +2014,7 @@ i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE) 
 
 # i_value_tbl_from_num {{{
 i_value_tbl_from_num <- function (self, private, object, num = 0L) {
-    assert_that(is_integerish(num), num >= 0L)
+    assert_that(are_count(num))
     assert_that(is_same_len(object, num))
 
     val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
@@ -2732,9 +2732,10 @@ can_locate_idf_file <- function (self, private) {
 }
 # }}}
 
+# TODO: set value or add object using a data.table
 # i_idf_save {{{
 i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.save_format"),
-                        overwrite = FALSE) {
+                        overwrite = FALSE, copy_external = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
             stop("The Idf object is not created from local file. ",
@@ -2763,23 +2764,24 @@ i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.s
         } else {
             i_verbose_info(self, private, "Replace the existing file located ",
                 " at ", normalizePath(path), ".")
-            if (is_windows())
-                write_lines_eol(paste0(str, "\r"), path)
-            else
-                write_lines_eol(str, path)
-
         }
     } else {
         d <- dirname(path)
         if (!dir.exists(d)) {
             tryCatch(dir.create(d, recursive = TRUE),
-                     warning = function (w) {
-                         stop("Failed to creat directory ",
-                              backtick(d), ".", call. = FALSE)
-                     })
+                warning = function (w) {
+                    stop("Failed to creat directory ",
+                        backtick(d), ".", call. = FALSE)
+                }
+            )
         }
-        write_lines_eol(str, path)
     }
+
+    # copy external files into the same directories if necessary
+    i_idf_resolve_external_link(self, private,
+        old = private$m_path, new = path, copy = copy_external)
+
+    write_lines_eol(str, path)
 
     # log saved
     i_log_saved_idf(self, private)
@@ -3058,60 +3060,64 @@ i_idf_run_info <- function (self, private, weather, dir = NULL) {
 }
 # }}}
 
-# i_idf_resolve_external_link {{{
-i_idf_resolve_external_link <- function (self, private, dir) {
-    dir <- normalizePath(dir, mustWork = TRUE)
+# i_idf_resolve_external_link: auto change full file path in `Schedule:File` to
+# relative path and copy those files into the same directory of the model {{{
+i_idf_resolve_external_link <- function (self, private, old, new, copy = TRUE) {
+    # Currently, only `Schedule:File` class is supported
+    if (!i_is_valid_class_name(self, private, "Schedule:File", "idf")) return(FALSE)
+
+    # restore current working directory
     ori <- getwd()
-    setwd(dir)
     on.exit(setwd(ori), add = TRUE)
-    if (!self$is_valid_class("Schedule:File")) return(FALSE)
-    # manually change the value instead of using `IdfObject$set_value()`
-    # to speed up
-    obj_ids <- self$object_id(class = "Schedule:File", simplify = TRUE)
-    val_info <- i_value_tbl_from_which(self, private, obj_ids)[
-        full_name == "File Name", list(value_id, value)]
-    val_ids <- val_info$value_id
-    vals <- val_info$value
-    # get full path of external files
-    val_paths <- normalizePath(vals, mustWork = FALSE)
-    # get files that exist
-    is_exist <- file.exists(val_paths)
 
-    msg_exist <- NULL
-    if (any(!is_exist)) {
+    # set validate level to `none` to speed up
+    ori_level <- get_option("validate_level")
+    options(eplusr.validate_level = "none")
+    on.exit(options(eplusr.validate_level = ori_level), add = TRUE)
+
+    # get full path of old and new
+    old_dir <- normalizePath(dirname(old), mustWork = FALSE)
+    new_dir <- normalizePath(dirname(new), mustWork = FALSE)
+
+    # get object table and value table
+    obj_tbl <- i_object_tbl_from_class(self, private, "Schedule:File")
+    val_tbl <- i_value_tbl_from_which(self, private, object = obj_tbl$object_id)[
+        full_name == "File Name"]
+
+    # check existence of old files
+    setwd(old_dir)
+    val_tbl[, old_full_path := normalizePath(value, mustWork = FALSE)]
+    val_tbl[, old_exist := file.exists(old_full_path)]
+
+    if (not_empty(val_tbl[old_exist == FALSE]))
         warning(paste0("Broken external file link found in Idf: ",
-            backtick(val_paths[!is_exist]), collapse = "\n"), call. = FALSE)
-    }
+            backtick(val_tbl[old_exist == FALSE, old_full_path]), collapse = "\n"),
+        call. = FALSE)
 
-    # get file directory that is not the same as target directory
-    is_same_dir <- normalizePath(dirname(val_paths), mustWork = FALSE) == dir
-    # get files that need copied
-    to_copy <- is_exist & !is_same_dir
-    targ <- val_paths[to_copy]
-    # copy files into the target directory
-    msg_copy <- NULL
-    flgs <- TRUE
-    if (not_empty(targ)) {
-        flgs <- file.copy(targ, dir, overwrite = TRUE, copy.date = TRUE)
+    val_tbl[, same_dir := normalizePath(dirname(old_full_path)) == new_dir]
+
+    targ <- val_tbl[old_exist == TRUE & same_dir == FALSE]
+
+    if (is_empty(targ)) return(FALSE)
+
+    # copy external files and change values to relative paths
+    if (copy) {
+        targ[, file_name := basename(value)]
+        targ[, new_full_path := normalizePath(file.path(new_dir, file_name), mustWork = FALSE)]
+        targ[, new_value := file_name]
+
+        # copy files
+        to_copy <- unique(targ[, list(old_full_path, new_full_path)])
+        flgs <- file.copy(to_copy$old_full_path, to_copy$new_full_path, overwrite = TRUE, copy.date = TRUE)
         if (any(!flgs)) {
             stop(paste0("Failed to copy external file into the ",
                 "output directory: ", backtick(targ[!flgs]), collapse = "\n"),
-                call. = FALSEE)
+                call. = FALSE)
         }
-        # change value tbl
-        targ_ids <- val_ids[to_copy][flgs]
-        new_vals <- basename(targ[flgs])
-        private$m_idf_tbl$value[value_id %in% targ_ids,
-            `:=`(value = new_vals, value_upper = toupper(new_vals))]
-        targ_obj <- obj_ids[to_copy][flgs]
-        private$m_log$order[object_id %in% targ_obj,
-            object_order := object_order + 1L]
-        TRUE
+    # change all paths to full paths
     } else {
-        FALSE
+        targ[, new_value := old_full_path]
     }
-}
-# }}}
 
 # i_idf_have_hvac_template_class {{{
 i_idf_have_hvac_template_class <- function (self, private) {
@@ -3328,6 +3334,10 @@ i_idfobj_has_ref_from <- function (self, private, object) {
 
 # TODO:
 # auto-detect changes of option `eplusr.view_in_ip` and `eplusr.num_digits`
+
+################################################################################
+#                                Print methods                                 #
+################################################################################
 
 # i_print_idf {{{
 i_print_idf <- function (self, private, plain = FALSE) {
