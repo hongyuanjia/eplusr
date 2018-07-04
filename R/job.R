@@ -65,6 +65,9 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         run = function (wait = TRUE)
             i_job_run(self, private, wait),
 
+        kill = function ()
+            i_job_kill(self, private),
+
         status = function ()
             i_job_status(self, private, based_suffix = ".err"),
 
@@ -113,6 +116,20 @@ i_job_run <- function (self, private, wait = TRUE) {
         private$m_path_idf, private$m_path_epw, echo = wait)
 
     private$m_log$end_time <- Sys.time()
+}
+# }}}
+
+# i_job_kill {{{
+i_job_kill <- function (self, private) {
+    if (is.null(private$m_process)) {
+        message("The job has not been run yet.")
+        return(invisible())
+    }
+
+    if (inherits(private$m_process, "process"))
+        private$m_process$kill()
+    else
+        message("The job ran in waiting mode and could not be killed.")
 }
 # }}}
 
