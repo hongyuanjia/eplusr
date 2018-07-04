@@ -1165,6 +1165,10 @@ create_idfobj_generator <- function (self, private, IdfObject) {
     own_idfobject$private_fields$m_idfobj_generator <- own_idfobject
     own_idfobject$self$private_fields$m_idfobj_generator <- own_idfobject
 
+    # add iddobj generator
+    own_idfobject$private_fields$m_iddobj_generator <- private$m_iddobj_generator
+    own_idfobject$self$private_fields$m_iddobj_generator <- private$m_iddobj_generator
+
     own_idfobject
 }
 # }}}
