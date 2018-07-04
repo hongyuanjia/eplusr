@@ -2791,272 +2791,67 @@ i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.s
 }
 # }}}
 
-# i_idf_run {{{
-i_idf_run <- function (self, private, weather = NULL, dir = NULL, wait = TRUE) {
-    # eplus path
-    ver <- private$m_version
-    if (!eplus_available(ver)) {
-        stop("Could not locate EnergyPlus v", private$m_version, " at ",
-             "the default installation path. Please set the path to use ",
-             "using `use_eplus()`.", call. = FALSE)
+# i_idf_add_output_sqlite {{{
+i_idf_add_output_sqlite <- function (self, private) {
+    added <- FALSE
+    if (i_is_valid_class_name(self, private, "Output:SQLite", type = "idf")) {
+        sql <- self$object_in_class("Output:SQLite")[[1]]
+        type <- toupper(sql$get_value()[[1]])
+        if (type != "SIMPLEANDTABULAR") {
+            invisible(sql$set_value("SimpleAndTabular"))
+            i_verbose_info(self, private, "Setting `Option Type` in ",
+                "`Output:SQLite` to from", backtick(type), " to `SimpleAndTabular`.")
+            added <- TRUE
+        }
+    } else {
+        invisible(self$add_object("Output:SQLite", "SimpleAndTabular"))
+        i_verbose_info(self, private, "Adding object `Output:SQLite` and setting ",
+            "`Option Type` to `SimpleAndTabular`.")
+        added <- TRUE
     }
-    if (ver < 8.3) {
+    added
+}
+# }}}
+
+# i_idf_run {{{
+i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE) {
+    if (private$m_version < 8.3)
         stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
              call. = FALSE)
-    }
 
-    if (is_epw(weather))  weather <- weather$path()
+    # stop if unsaved
+    if (self$is_unsaved())
+        stop("Idf has been modified since read or last saved. Please save Idf ",
+            "using $save() before run.", call. = FALSE)
 
-    i_idf_add_output_sqlite(self, private)
+    # add Output:SQLite if necessary
+    add_sql <- i_idf_add_output_sqlite(self, private)
 
-    i_idf_run_info(self, private, weather, dir)
-    config <- eplus_config(ver)
-    eplus <- file.path(config$dir, config$exe)
+    # if necessary, resave the model
+    if (add_sql)
+        i_idf_save(self, private, overwrite = TRUE, copy_external = FALSE)
 
-    expand_obj <- ifelse(i_idf_have_hvac_template_class(self, private), TRUE, FALSE)
+    # save the model to the output dir if necessary
+    if (!can_locate_idf_file(self, private))
+        stop("The Idf object is not created from local file or local file has ",
+            "been deleted from disk. Please save Idf using $save() before run.", call. = FALSE)
 
-    proc <- run_idf(eplus,
-                    private$m_run$path_idf,
-                    private$m_run$path_epw,
-                    private$m_run$out_dir,
-                    echo = wait, expand_obj = expand_obj)
-    private$m_run$proc <- proc
-    private$m_run$wait <- wait
-    proc
-}
-# }}}
-
-# i_idf_output_dir {{{
-i_idf_output_dir <- function (self, private, open = FALSE) {
-    dir <- dirname(i_idf_locate_output(strict = FALSE))
-    if (!open) return(dir)
-    if (open) {
-        if (is.null(dir)) {
-            message("No simulation has been run yet.")
-            return(invisible())
-        }
-
-        # Reference:
-        # http://r.789695.n4.nabble.com/R-command-to-open-a-file-quot-browser-quot-on-Windows-and-Mac-td4710688.html
-        if (is_windows()) {
-            shell.exec(dir)
-        } else if (is_macos()) {
-            system2("open", dir)
-        } else if (is_linux()) {
-            system(paste0("xdg-open ", dir))
-        } else {
-            message("Current platform not supported.")
-        }
-    }
-    dir
-}
-# }}}
-
-# i_idf_output_error {{{
-i_idf_output_error <- function (self, private, info = FALSE) {
-    path_err <- i_idf_locate_output(".err", strict = FALSE)
-
-    err <- parse_err_file(path_err)
-
-    if (!info) err$data <- err$data[!(level == "Info" & begin_environment == FALSE)]
-
-    err
-}
-# }}}
-
-# i_idf_output_sql {{{
-i_idf_output_sql <- function (self, private) {
-    private$m_run$sql <- i_idf_locate_output(".sql")
-    Sql$new(private$m_run$sql)
-}
-# }}}
-
-# i_idf_locate_output {{{
-i_idf_locate_output <- function (self, private, suffix = ".err", strict = TRUE) {
-    status <- i_idf_sim_status(suffix)
-    if (is.null(status$prefix)) {
-        if (!private$is_local_file()) {
-            stop("The Idf was not created from local file. Failed to ",
-                 "locate simulation output.",
-                 call. = FALSE)
-        } else {
-            if (status$terminated) {
-                stop("Simulation was terminated before. Please solve ",
-                     "the problems and re-run the simulation before collect ",
-                     "output", call. = FALSE)
-            } else {
-                stop("Failed to locate simulation output in the Idf file folder", call. = FALSE)
-            }
-        }
-    } else {
-        if (strict) {
-            if (status$terminated) {
-                stop("Simulation was terminated before. Please solve ",
-                     "the problems and re-run the simulation before collect ",
-                     "output", call. = FALSE)
-            }
-
-            if (status$alive) {
-                stop("Simulation is still running. Please wait simulation ",
-                     "to finish before collecting results.", call. = FALSE)
-            }
-
-            if (status$changed_after) {
-                warning("The Idf has been changed since last simulation. ",
-                        "The simulation output may not be correct.", call. = FALSE)
-            }
-
-            if (status$run_before & !status$successful) {
-                warning("Simulation ended with errors. Simulation results ",
-                        "may not be correct.", call. = FALSE)
-            }
-        }
-    }
-    paste0(status$prefix, suffix)
-
-}
-# }}}
-
-# i_idf_sim_status {{{
-i_idf_sim_status <- function (self, private, based_suffix = ".err") {
-    # init
-    local_file <- can_locate_idf_file(self, private) # if the model was created from local file
-    status <- list(
-        run_before = FALSE, # if the model has been run before or is still running
-        changed_after = FALSE, # if the model has been changed after last simulation
-        terminated = FALSE, # if last simulation was terminated
-        successful = FALSE, # if last simulation was successful
-        alive = FALSE, # if simulation is still running
-        prefix = NULL # prefix of simulation output file
-    )
-
-    # if the model has not been run before
-    if (is.null(private$m_run$proc)) {
-        if (local_file) {
-            prefix <- tools::file_path_sans_ext(private$m_path)
-            basefile <- paste0(prefix, based_suffix)
-            if (!utils::file_test("-f", basefile)) return(status)
-            status$prefix <- prefix
-
-            # compare last changed time
-            err_ctime <- file.info(basefile)$ctime
-            idf_ctime <- file.info(private$m_path)$ctime
-            if (err_ctime < idf_ctime) status$changed_after <- TRUE
-        }
-    # if the model has been run before
-    } else {
-        status$run_before <- TRUE
-        status$prefix <- tools::file_path_sans_ext(private$m_run$path_idf)
-        # check if the model was run in waiting mode
-        if (isTRUE(private$m_run$wait)) {
-            # check the exist status of last simulationa
-            exit_status <- private$m_run$proc$status
-            if (is.na(exit_status)) {
-                status$terminated <- TRUE
-            } else if (exit_status == 0) {
-                status$successful <- TRUE
-
-            }
-        } else {
-            # check if the model is still running
-            if (private$m_run$proc$is_alive()) {
-                status$alive <- TRUE
-            } else if (private$m_run$proc$get_exit_status() == 0L) {
-                status$successful <- TRUE
-            }
-        }
-    }
-    status
-}
-# }}}
-
-# i_idf_run_info {{{
-i_idf_run_info <- function (self, private, weather, dir = NULL) {
-    # if the model is not created from a local file
     path_idf <- private$m_path
-    msg <- NULL
-    flg_sav <- FALSE
-    if (is.null(path_idf)) {
-        msg <- "The Idf was not created from local file."
-        # and the output dir is not given
-        if (is.null(dir)) {
-            # save it as a temp file and run it in temp dir
-            msg <- c(msg, "`dir` is not given.",
-            "The Idf will be saved as a temporary file and run in temporary directory.")
-            flg_sav <- TRUE
-            run_dir <- normalizePath(file.path(tempdir(), "eplusr", "idf"),
-                mustWork = FALSE)
-            path_idf <- normalizePath(tempfile(pattern = "idf_", tmpdir = run_dir, fileext = ".idf"),
-                mustWork = FALSE)
-        # but output dir is given
-        } else {
-            # save it to the given output dir with random name and run
-            # it in that dir
-            msg <- c(msg, "The Idf will be saved in the output",
-                     "directory with a randon name.")
-            flg_sav <- TRUE
-            run_dir <- normalizePath(dir, mustWork = FALSE)
-            path_idf <- normalizePath(tempfile("model_", run_dir, ".idf"),
-                mustWork = FALSE)
-        }
-    # if the model is created from a local file
-    } else {
-        # but the output dir is not given
-        if (is.null(dir)) {
-            # use the model path
-            run_dir <- dirname(path_idf)
-            path_idf <- normalizePath(file.path(run_dir, basename(path_idf)),
-                mustWork = FALSE)
-            if (self$is_unsaved()) {
-                msg <- c(msg, "The Idf has been modified before.",
-                         "It will be saved in the output directory",
-                         "before run.")
-                flg_sav <- TRUE
-            }
-        # and the output dir is given
-        } else {
-            # save it with same name in the output dir and run it there
-            run_dir <- normalizePath(dir, mustWork = FALSE)
-            path_idf <- normalizePath(file.path(run_dir, basename(path_idf)),
-                mustWork = FALSE)
-            if (!path_idf == private$m_path) flg_sav <- TRUE
-        }
+    if (is.null(dir))
+        run_dir <- dirname(path_idf)
+    else {
+        i_idf_save(self, private, file.path(dir, basename(path_idf)),
+            overwrite = TRUE, copy_external = TRUE)
+        run_dir <- dir
     }
 
-    name_idf <- tools::file_path_sans_ext(basename(path_idf))
-    # create output dir
-    if (!dir.exists(run_dir)) {
-        if (!flg_sav) {
-            warning("The Idf file has been deleted. It will be created ",
-                    "using `Idf$save()` before run.", call. = FALSE)
-            flg_sav <- TRUE
-        }
-        tryCatch(dir.create(run_dir, recursive = TRUE),
-            warning = function (w) {
-                stop("Failed to create output directory: ",
-                     backtick(run_dir), call. = FALSE)
-            }
-        )
-    }
+    path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = TRUE)
 
-    # resolve external file links
-    flg_res <- i_idf_resolve_external_link(self, private, run_dir)
-    if (flg_res) flg_sav <- TRUE
+    job <- EplusJob$new(path_idf, epw, private$m_version)
 
-    # save the model if necessary
-    if (flg_sav) {
-        write_lines_eol(self$string(), path_idf)
-    }
+    job$run(wait = wait)
 
-    path_epw <- normalizePath(weather, mustWork = FALSE)
-    name_epw <- tools::file_path_sans_ext(basename(weather))
-
-    # save info
-    private$m_run$out_dir <- run_dir
-    private$m_run$path_idf <- path_idf
-    private$m_run$path_epw <- path_epw
-    private$m_run$name_idf <- name_idf
-    private$m_run$name_epw <- name_epw
+    job
 }
 # }}}
 
@@ -3119,28 +2914,13 @@ i_idf_resolve_external_link <- function (self, private, old, new, copy = TRUE) {
         targ[, new_value := old_full_path]
     }
 
-# i_idf_have_hvac_template_class {{{
-i_idf_have_hvac_template_class <- function (self, private) {
-    cls <- self$class_name()
-    any(startsWith(cls, "HVACTemplate"))
-}
-# }}}
+    targ[, input := {
+        l <- as.list(new_value); names(l) <- field_name; list(list(l))},
+        by = list(object_id)]
 
-# i_idf_add_output_sqlite {{{
-i_idf_add_output_sqlite <- function (self, private) {
-    if (self$is_valid_class("Output:SQLite")) {
-        sql <- self$object_in_class("Output:SQLite")[[1]]
-        type <- sql$get_value()[[1]]
-        if (type != "SimpleAndTabular") {
-            invisible(sql$set_value("SimpleAndTabular"))
-            i_verbose_info(self, private, "Setting `Option Type` in ",
-                "`Output:SQLite` to from", backtick(type), " to `SimpleAndTabular`.")
-        }
-    } else {
-        invisible(self$add_object("Output:SQLite", "SimpleAndTabular"))
-        i_verbose_info(self, private, "Adding object `Output:SQLite` and setting ",
-            "`Option Type` to `SimpleAndTabular`.")
-    }
+    i_set_object(self, private, targ$object_id, targ$input)
+
+    TRUE
 }
 # }}}
 
