@@ -123,22 +123,25 @@ i_job_run <- function (self, private, wait = TRUE) {
 i_job_kill <- function (self, private) {
     if (is.null(private$m_process)) {
         message("The job has not been run yet.")
-        return(invisible())
+        return(invisible(FALSE))
     }
 
     if (!inherits(private$m_process, "process")) {
         message("The job ran in waiting mode and could not be killed.")
-        return(invisible())
+        return(invisible(FALSE))
     }
 
-    if (private$m_process$alive()) {
+    if (private$m_process$is_alive()) {
         k <- private$m_process$kill()
-        if (k)
+        if (k) {
             message("The job has been successfully killed.")
-        else
+            return(invisible(TRUE))
+        } else {
             stop("Error found. Could not kill the job.", call. = FASE)
+        }
     } else {
         message("The job is not running.")
+        return(invisible(FALSE))
     }
 }
 # }}}
@@ -181,8 +184,12 @@ i_job_status <- function (self, private, based_suffix = ".err") {
             # check if the model is still running
             if (proc$is_alive()) {
                 status$alive <- TRUE
-            } else if (!is.null(exit_status) && exit_status == 0L) {
-                status$successful <- TRUE
+            } else {
+                if (exit_status == 0L) {
+                    status$successful <- TRUE
+                } else if (exit_status == 2L) {
+                    status$terminated <- TRUE
+                }
             }
         }
     }
