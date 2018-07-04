@@ -181,14 +181,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             i_idfobj_ref_by(self, private, private$m_object_id),
 
         has_ref_by = function ()
-            not_empty(i_idfobj_has_ref_by(self, private, private$m_object_id)),
+            i_idfobj_has_ref_by(self, private, private$m_object_id),
 
         has_ref_from = function ()
-            not_empty(i_idfobj_has_ref_from(self, private, private$m_object_id)),
+            i_idfobj_has_ref_from(self, private, private$m_object_id),
 
         has_ref = function ()
             i_idfobj_has_ref_from(self, private, private$m_object_id) ||
-            i_idfobj_hasref_by(self, private, private$m_object_id),
+            i_idfobj_has_ref_by(self, private, private$m_object_id),
 
         string = function (comment = TRUE, leading = 4L, sep_at = 29L)
             i_object_string(self, private, private$m_object_id, header = FALSE,

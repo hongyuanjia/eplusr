@@ -3100,7 +3100,7 @@ i_idfobj_ref_from <- function (self, private, object) {
 i_idfobj_has_ref_by <- function (self, private, object) {
     val_tbl <- i_value_tbl_from_which(self, private, object)
     ref_by <- i_val_ref_by_tbl(self, private, val_tbl)
-    is_empty(ref_by)
+    not_empty(ref_by)
 }
 # }}}
 
@@ -3108,7 +3108,7 @@ i_idfobj_has_ref_by <- function (self, private, object) {
 i_idfobj_has_ref_from <- function (self, private, object) {
     val_tbl <- i_value_tbl_from_which(self, private, object)
     ref_from <- i_val_ref_from_tbl(self, private, val_tbl)
-    is_empty(ref_from)
+    not_empty(ref_from)
 }
 # }}}
 
