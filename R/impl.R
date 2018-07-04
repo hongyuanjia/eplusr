@@ -886,8 +886,7 @@ i_object_tbl_from_class <- function (self, private, class = NULL) {
     if (is.null(class))
         return(private$m_idd_tbl$class[private$m_idf_tbl$object, on = "class_id"])
 
-    i_assert_valid_class_name(self, private, class, "idf")
-    cls_in <- i_in_tbl_from_which(self, private, "class", class)
+    cls_in <- i_in_tbl_from_which(self, private, "class", class, "idf")
 
     private$m_idd_tbl$class[
         private$m_idf_tbl$object[cls_in, on = "class_id"], on = "class_id",
@@ -2636,8 +2635,10 @@ i_remove_comment_from_which <- function (self, private, object) {
 ################################################################################
 
 # i_in_tbl_from_which {{{
-i_in_tbl_from_which <- function (self, private, type = c("object", "class"), which) {
+i_in_tbl_from_which <- function (self, private, type = c("object", "class"), which,
+                                 where = c("idd", "idf")) {
     type <- match.arg(type)
+    where <- match.arg(where)
 
     if (is.null(which))
         id <- switch(type,
@@ -2646,7 +2647,7 @@ i_in_tbl_from_which <- function (self, private, type = c("object", "class"), whi
     else
         id <- switch(type,
             object = i_object_id_from_which(self, private, which),
-            class = i_class_index_from_which(self, private, which))
+            class = i_class_index_from_which(self, private, which, where))
 
     tbl <- data.table::data.table(id = id, rleid = seq_along(id))
     data.table::setnames(tbl, paste0(type, "_", names(tbl)))
