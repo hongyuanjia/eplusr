@@ -1,6 +1,6 @@
 Package: eplusr
 Title: A Toolkit for Using EnergyPlus in R
-Version: 0.7.0
+Version: 0.7.1
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
@@ -21,12 +21,10 @@ Imports:
     fasttime,
     lubridate,
     stringr,
-    rlang,
-    rvest,
     progress,
     purrr,
+    furrr,
     processx,
-    xml2,
     units,
     uuid,
     cli,
