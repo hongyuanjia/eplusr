@@ -201,6 +201,8 @@ i_job_output_dir <- function (self, private, open = FALSE) {
 
 # i_job_locate_output {{{
 i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE) {
+    out <- paste0(tools::file_path_sans_ext(private$m_path_idf), suffix)
+
     if (strict) {
         status <- i_job_status(self, private, suffix)
 
@@ -220,15 +222,17 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE) 
         if (status$run_before && !status$successful)
             warning("Simulation ended with errors. Simulation results ",
                 "may not be correct.", call. = FALSE)
+
+        assert_that(file.exists(out))
     }
 
-    paste0(tools::file_path_sans_ext(private$m_path_idf), suffix)
+    out
 }
 # }}}
 
 # i_job_output_errors {{{
 i_job_output_errors <- function (self, private, info = FALSE) {
-    path_err <- i_job_locate_output(self, private, ".err", strict = FALSE)
+    path_err <- i_job_locate_output(self, private, ".err", strict = TRUE)
 
     err <- parse_err_file(path_err)
 
