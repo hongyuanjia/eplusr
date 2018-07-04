@@ -1,27 +1,38 @@
-# What actually used by EnergyPlus:
-# dry bulb temperature
-# dew point temperature
-# relative humidity
-# atmospheric pressure
-# horizontal infrared radiation intensity from sky
-# direct normal radiation
-# diffuse horizontal radiation
-# wind direction
-# wind spped
-# present weather observation
-# present weather codes
-# snow depth
-# liquid precipitation depth
-# liquid precipitation rate
+# NOTE: What actually used by EnergyPlus:
+#  1. dry bulb temperature
+#  2. dew point temperature
+#  3. relative humidity
+#  4. atmospheric pressure
+#  5. horizontal infrared radiation intensity from sky
+#  6. direct normal radiation
+#  7. diffuse horizontal radiation
+#  8. wind direction
+#  9. wind spped
+# 10. present weather observation
+# 11. present weather codes
+# 12. snow depth
+# 13. liquid precipitation depth
+# 14. liquid precipitation rate
+
+#' Read EnergyPlus Weather File
+#' @return An `Epw` object
+#' @export
+# read_epw {{{
+read_epw <- function (path) {
+    Epw$new(path)
+}
+# }}}
 
 #' @importFrom R6 R6Class
-#' @importFrom data.table copy fwrite between
+#' @importFrom data.table fread setnames shift copy fwrite between as.ITime
 #' @importFrom readr write_lines
 #' @importFrom cli cat_line rule cat_bullet
-#' @importFrom lubridate year month mday
-#' @importFrom purrr keep
+#' @importFrom lubridate year month mday leap_year minute days
+#' @importFrom purrr map map_lgl keep
 #' @importFrom units ud_units
-#' @export
+#' @importFrom stringr str_trim
+#' @importFrom fasttime fastPOSIXct
+#' @importFrom data.table as.ITime
 # Epw {{{
 Epw <- R6::R6Class(classname = "Epw",
     # ACTIVE {{{
@@ -460,11 +471,6 @@ Epw <- R6::R6Class(classname = "Epw",
 )
 # }}}
 
-#' @importFrom readr read_lines
-#' @importFrom stringr str_trim
-#' @importFrom data.table fread setnames shift
-#' @importFrom purrr map map_lgl
-#' @importFrom fasttime fastPOSIXct
 # parse_epw_file {{{
 parse_epw_file <- function (path, strict = TRUE) {
     num_header <- 8L
@@ -800,9 +806,6 @@ parse_epw_file <- function (path, strict = TRUE) {
     list(header = header_pairs, data = epw_data)
 }
 # }}}
-
-#' @importFrom data.table as.ITime
-#' @importFrom lubridate month mday minute days
 # format_epw_date {{{
 format_epw_date <- function (dt) {
     # recreate minute column
@@ -847,7 +850,6 @@ format_epw_date <- function (dt) {
     dt
 }
 # }}}
-
 # get_epw_week_day {{{
 get_epw_week_day <- function (x, num = FALSE){
     l_x <- tolower(x)
