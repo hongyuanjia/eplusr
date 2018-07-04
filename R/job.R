@@ -385,7 +385,7 @@ i_sql_report_data_dict <- function (self, private) {
 
 # i_sql_report_data {{{
 i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
-                               all = FALSE, year = NULL, tz = "GMT", case = FALSE) {
+                               all = FALSE, year = NULL, tz = "GMT", case = "auto") {
     q <- i_sql_report_data_query(self, private, key_value, name)
     res <- i_sql_get_query(self, private, q)
 
@@ -404,8 +404,14 @@ i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
 
     if (tz != "GMT") res$DateTime <- lubridate::force_tz(res$DateTime, tz)
 
-    if (case) {
-        res[, Case := tools::file_path_sans_ext(basename(private$m_path))]
+    if (not_empty(case)) {
+        if (case == "auto") {
+            case_name <- tools::file_path_sans_ext(basename(private$m_path))
+        } else {
+            assert_that(is_scalar(case))
+            case_name <- as.character(case)
+        }
+        res[, Case := case_name]
         data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
     }
 
