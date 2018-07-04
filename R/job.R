@@ -126,10 +126,20 @@ i_job_kill <- function (self, private) {
         return(invisible())
     }
 
-    if (inherits(private$m_process, "process"))
-        private$m_process$kill()
-    else
+    if (!inherits(private$m_process, "process")) {
         message("The job ran in waiting mode and could not be killed.")
+        return(invisible())
+    }
+
+    if (private$m_process$alive()) {
+        k <- private$m_process$kill()
+        if (k)
+            message("The job has been successfully killed.")
+        else
+            stop("Error found. Could not kill the job.", call. = FASE)
+    } else {
+        message("The job is not running.")
+    }
 }
 # }}}
 
