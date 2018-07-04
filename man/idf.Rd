@@ -34,9 +34,9 @@ you can set fields (using \code{$set}) in the object, duplicate (using
 
 model$version()
 model$path()
-model$group_names(where = c("idf", "idd"))
-model$class_names(where = c("idf", "idd"))
-model$object_ids(class = NULL)
+model$group_name(where = c("idf", "idd"))
+model$class_name(where = c("idf", "idd"))
+model$object_id(class = NULL)
 
 model$get_options(options = NULL)
 model$set_options(...)

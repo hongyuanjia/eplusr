@@ -55,6 +55,8 @@ have the same effect as \code{Save Options} settings \code{"Sorted"}, \code{"Ori
 Default: \code{"sorted"}.
 \item \code{eplusr.num_parallel}: Maximum number of parallel simulations to run.
 Default: \code{parallel::detectCores()}.
+\item \code{eplusr.valid_before_run}: Whether to validate the model at the level
+"final" before run the simulation. Default: TRUE.
 }
 }
 
