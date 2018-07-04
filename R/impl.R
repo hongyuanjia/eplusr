@@ -889,8 +889,7 @@ i_object_tbl_from_class <- function (self, private, class = NULL) {
     cls_in <- i_in_tbl_from_which(self, private, "class", class, "idf")
 
     private$m_idd_tbl$class[
-        private$m_idf_tbl$object[cls_in, on = "class_id"], on = "class_id",
-        allow.cartesian = TRUE]
+        private$m_idf_tbl$object[cls_in, on = "class_id"], on = "class_id"]
 }
 # }}}
 
