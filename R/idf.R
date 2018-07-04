@@ -394,7 +394,7 @@ read_idf <- function (path, idd = NULL) {
     new_expr <- append(ori_expr,
         as.list(
             expression(
-                shared <- c("m_uuid", "m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator"),
+                shared <- c("m_uuid", "m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
                 for (nm in shared) {
                     private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
                 }
