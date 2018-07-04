@@ -279,6 +279,7 @@ run_multi <- function (eplus, models, weathers, output_dirs = NULL,
         ~invisible(suppressWarnings(processx::run(.x, .y,
             windows_verbatim_args = TRUE, echo = TRUE))), .progress = TRUE)
     # close all RScript process after simulation complete
+    # Reference: https://github.com/HenrikBengtsson/future/issues/117
     future:::ClusterRegistry("stop")
 
     # TODO: summary info of multiple simualtions
