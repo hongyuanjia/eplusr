@@ -30,6 +30,11 @@ backtick <- function (x) {
     paste0("`", x, "`")
 }
 # }}}
+# `._get_self`{{{
+`._get_self` <- function (x) {
+    .subset2(.subset2(x, ".__enclos_env__"), "self")
+}
+# }}}
 # `._get_private`{{{
 `._get_private` <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
