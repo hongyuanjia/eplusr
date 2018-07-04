@@ -3085,7 +3085,7 @@ i_idfobj_ref_by <- function (self, private, object) {
 i_idfobj_ref_from <- function (self, private, object) {
     val_tbl <- i_value_tbl_from_which(self, private, object)
     ref_from <- i_val_ref_from_tbl(self, private, val_tbl)
-    obj_id <- unique(ref_from$reference_from_object_id)
+    obj_id <- unique(ref_from$referencing_from_object_id)
     if (is_empty(obj_id)) {
         message("Object does not reference from any other object.")
     } else {
