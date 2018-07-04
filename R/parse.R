@@ -672,6 +672,10 @@ parse_idf_file <- function (path, idd = NULL) {
                 "may occur.", call. = FALSE)
     }
 
+    # get idd internal environment for parsing
+    idd_self <- ._get_self(idd)
+    idd_private <- ._get_private(idd)
+
     idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
 
     # mark type {{{
@@ -866,7 +870,7 @@ parse_idf_file <- function (path, idd = NULL) {
     idf_dt[idf_dt[, .I[1], by = object_id]$V1,
            `:=`(type = type_object, class_upper_case = toupper(value))]
 
-    idf_idd_all <- ._get_private(idd)$m_idd_tbl$class[, class_upper_case := toupper(class_name)][
+    idf_idd_all <- idd_private$m_idd_tbl$class[, class_upper_case := toupper(class_name)][
         idf_dt, on = "class_upper_case", nomatch = NA]
     data.table::setorder(idf_idd_all, object_id, class_id)
 
@@ -891,9 +895,10 @@ parse_idf_file <- function (path, idd = NULL) {
     # {{{
     # TODO: put this block into `Idf$new()`
     ver_dt <- value[class_id == 1L]
+    idd_version <- idd_private$m_version
     if (is_empty(ver_dt)) {
         # add a default version object at the end
-        idf_version <- idd$version()[,c(1,2)]
+        idf_version <- idd_version[,c(1,2)]
         # add a default version object at the end
         ver_obj <- data.table::data.table(
             object_id = max(object[["object_id"]]) + 1L, class_id = 1L
@@ -914,12 +919,12 @@ parse_idf_file <- function (path, idd = NULL) {
     } else {
         # get version
         idf_version <- as.numeric_version(ver_dt[["value"]])
-        if (idf_version != idd$version()) {
-            warning(msg(glue::glue("Version Mismatch. The file parsing is a
-                differnet version `{idf_version}` than the IDD file you are using
-                `{idd$version()}`. Editing and saving the file may make it
-                incompatible with an older version of
-                EnergyPlus.")), call. = FALSE)
+        if (idf_version != idd_version) {
+            warning(msg("Version Mismatch. The file parsing is a differnet ",
+                "version ", backtick(idf_version), " than the IDD file you ",
+                "are using ", backtick(idd_version), ". Editing and saving ",
+                "the file may make it incompatible with an older version of ",
+                "EnergyPlus."), call. = FALSE)
         }
     }
     # }}}
@@ -929,7 +934,7 @@ parse_idf_file <- function (path, idd = NULL) {
     # get field num per object
     num <- value[, list(num_values = .N), by = list(object_id, class_id)]
     # get classes needed to add extensible groups
-    ext <- num[._get_private(idd)$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+    ext <- num[idd_private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         num_fields < num_values, list(object_id, class_name, num_fields, num_values, num_extensible)]
     if (not_empty(ext)) {
         # stop if errors were found
@@ -946,19 +951,21 @@ parse_idf_file <- function (path, idd = NULL) {
         }
 
         # add extensible group
-        # TODO: use i_add_extensible_group
-        ext_add <- ext[, num_to_add := ceiling((max(num_values) - max(num_fields)) / max(num_extensible))]
-        purrr::walk2(ext_add$class_name, ext_add$num_to_add,
-            ~idd$object(.x)$add_extensible_group(.y)
-        )
+        ext_add <- ext[, list(num_values = max(num_values)),
+            by = list(class_id, num_extensible, num_fields)]
+        ext_add[, num_to_add := ceiling(num_values - num_fields / num_extensible)]
+
+        i_add_extensible_group(idd_self, idd_private, ext_add$class_id, ext_add$num_to_add)
     }
     # }}}
-    value_tbl <- ._get_private(idd)$m_idd_tbl$field[
-        value, on = c("class_id", "field_index")][
-        grepl("^\\s*$", value), `:=`(value = NA_character_)][
-        , `:=`(value_upper = toupper(value),
-               value_num = suppressWarnings(as.numeric(value)))][
-        , `:=`(value_ipnum = value_num)]
+    value_tbl <- idd_private$m_idd_tbl$field[
+        value, on = c("class_id", "field_index")]
+
+    value_tbl[grepl("^\\s*$", value), `:=`(value = NA_character_)]
+
+    value_tbl[ , `:=`(value_upper = toupper(value),
+                      value_num = suppressWarnings(as.numeric(value)))]
+    value_tbl[ , `:=`(value_ipnum = value_num)]
     value <- update_value_num(value_tbl, digits = heading_options$num_digits,
                               in_ip = heading_options$view_in_ip)[
         , list(value_id, value, value_upper, value_num, value_ipnum, object_id, field_id)]
@@ -972,9 +979,9 @@ parse_idf_file <- function (path, idd = NULL) {
     data.table::setorder(object, object_id)
 
     # value reference map
-    obj <- value[._get_private(idd)$m_idd_tbl$field_object_list,
+    obj <- value[idd_private$m_idd_tbl$field_object_list,
         on = "field_id", nomatch = 0L, list(value_id, value_upper, object_list)]
-    ref <- value[._get_private(idd)$m_idd_tbl$field_reference,
+    ref <- value[idd_private$m_idd_tbl$field_reference,
         on = "field_id", nomatch = 0L, list(value_id, value_upper, reference)]
     data.table::setnames(ref, "value_id", "reference_value_id")
     value_reference <- unique(obj[ref, on = c(object_list = "reference", "value_upper"),
