@@ -115,8 +115,9 @@ i_check_conflict_name <- function (self, private, input) {
         exist <- i_is_valid_class_index(self, private, cls_id, type = "idf")
         # add existing object table
         if (any(exist)) {
-            obj_tbl <- data.table::rbindlist(list(
-                obj_tbl, i_object_tbl_from_class(self, private, cls_id[exist])), fill = TRUE)
+            obj_tbl_other <- i_object_tbl_from_class(self, private, cls_id[exist])[
+                !J(obj_tbl$object_id), on = "object_id"]
+            obj_tbl <- data.table::rbindlist(list(obj_tbl, obj_tbl_other), fill = TRUE)
         }
     }
 
