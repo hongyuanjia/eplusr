@@ -3157,12 +3157,11 @@ i_print_idd <- function (self, private) {
 # }}}
 
 # i_print_idfobj {{{
-i_print_idfobj <- function (self, private, object, comment = TRUE, ...) {
+i_print_idfobj <- function (self, private, object, comment = TRUE, auto_sep = FALSE) {
     assert_that(is_scalar(object))
 
     obj_tbl <- i_object_tbl_from_which(self, private, object)
     val_tbl <- i_value_tbl_from_which(self, private, object)
-    cmt_tbl <- i_comment_tbl_from_which(self, private, object, nomatch = 0L)
 
     if (is.na(obj_tbl$object_name)) {
         cli::cat_line("<<[ID:", obj_tbl$object_id, "]>> ",
@@ -3175,15 +3174,21 @@ i_print_idfobj <- function (self, private, object, comment = TRUE, ...) {
 
     # comment
     if (comment) {
+        cmt_tbl <- i_comment_tbl_from_which(self, private, object, nomatch = 0L)
         if (not_empty(cmt_tbl)) {
             cli::cat_rule(center = "* COMMENTS *", line = 1)
             cli::cat_line(format_comment(cmt_tbl))
         }
     }
 
+    if (auto_sep)
+        sep_at <- max(nchar(val_tbl$value, keepNA = FALSE)) + 4L
+    else
+        sep_at <- 20L
+
     # value
     fld <- format_field(val_tbl, leading = 1L, in_ip = get_option("view_in_ip"),
-        sep_at = 20L, index = TRUE, blank = TRUE, required = TRUE)
+        sep_at = sep_at, index = TRUE, blank = TRUE, required = TRUE)
 
     # remove class line
     cli::cat_rule(center = "* FIELDS *")
