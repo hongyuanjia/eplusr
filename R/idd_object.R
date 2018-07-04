@@ -306,19 +306,19 @@ IddObject <- R6::R6Class(classname = "IddObject",
         is_valid_field_index = function (index)
             i_is_valid_field_index(self, private, private$m_class_id, index),
 
-        is_autosizable_field = function (which)
+        is_autosizable_field = function (which = NULL)
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$autosizable,
 
-        is_autocalculatable_field = function (which)
+        is_autocalculatable_field = function (which = NULL)
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$autocalculatable,
 
-        is_numeric_field = function (which)
+        is_numeric_field = function (which = NULL)
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type %in% c("integer", "real"),
 
-        is_integer_field = function (which)
+        is_integer_field = function (which = NULL)
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type == "integer",
 
-        is_required_field = function (which)
+        is_required_field = function (which = NULL)
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$required_field,
         # }}}
 
