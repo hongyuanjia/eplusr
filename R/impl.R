@@ -1155,7 +1155,7 @@ create_idfobj_generator <- function (self, private, IdfObject) {
     own_idfobject <- clone_generator(IdfObject)
 
     # assign shared data to IdfObject R6ClassGenerator
-    var_nm <- c("m_uuid", "m_version", "m_idf_tbl", "m_idd_tbl", "m_log")
+    var_nm <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log")
     for (nm in var_nm) {
         own_idfobject$private_fields[[nm]] <- private[[nm]]
         own_idfobject$self$private_fields[[nm]] <- private[[nm]]
@@ -1364,6 +1364,9 @@ i_dup_object = function (self, private, which, new_name = NULL) {
     # log unsaved
     i_log_unsaved_idf(self, private)
 
+    # log uuid
+    i_log_new_uuid(self, private)
+
     i_idfobject(self, private, new_obj_id)
 }
 # }}}
@@ -1428,6 +1431,9 @@ i_add_object = function (self, private, class, value = NULL, comment = NULL, def
 
     # log unsaved
     i_log_unsaved_idf(self, private)
+
+    # log uuid
+    i_log_new_uuid(self, private)
 
     # return new objects
     i_idfobject(self, private, new_obj_id)
@@ -1553,6 +1559,9 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
     # log unsaved
     i_log_unsaved_idf(self, private)
 
+    # log uuid
+    i_log_new_uuid(self, private)
+
     # return new objects
     i_idfobject(self, private, obj_tbl$object_id)
 }
@@ -1613,6 +1622,9 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 
     # log unsaved
     i_log_unsaved_idf(self, private)
+
+    # log uuid
+    i_log_new_uuid(self, private)
 
     self
 }
@@ -1682,6 +1694,9 @@ i_replace_value = function (self, private, pattern, replacement) {
 
     private$m_log$order[object_id %in% value_tbl_after$object_id,
                         object_order := object_order + 1L]
+
+    # log uuid
+    i_log_new_uuid(self, private)
 
     cli::cat_line(format_objects(value_tbl, in_ip = getOption("eplusr.view_in_ip")))
 }
@@ -2679,6 +2694,12 @@ i_new_id <- function (self, private, name, num) {
 }
 # }}}
 
+# i_log_new_uuid {{{
+i_log_new_uuid <- function (self, private) {
+    private$m_log$uuid <- uuid::UUIDgenerate(use.time = TRUE)
+}
+# }}}
+
 # i_log_new_object_order {{{
 i_log_new_object_order <- function (self, private, id) {
     private$m_log$order <- data.table::rbindlist(
@@ -3018,6 +3039,9 @@ i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE,
 
     # log order change
     i_log_add_object_order(self, private, obj_tbl$object_id)
+
+    # log uuid
+    i_log_new_uuid(self, private)
 
     self
 }
