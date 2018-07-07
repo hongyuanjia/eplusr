@@ -607,46 +607,44 @@ Idf <- R6::R6Class(classname = "Idf",
 
 #' @export
 # [.Idf {{{
-'[.Idf' <- function(x, i, j, ..., drop = FALSE) {
-    if (missing(i)) {
-        stop("Missing object id or class name.", call. = FALSE)
-    }
-    if (missing(j)) {
-        if (is.character(i)) {
-            obj <- .subset2(x, "objects_in_class")(i)
-        } else if (is.numeric(i)){
-            obj <- .subset2(x, "objects")(i)
-        }
-    } else {
-        if (is.character(i)) {
-            obj <- .subset2(x, "objects_in_class")(i, j)
-        } else if (is.numeric(i)){
-            stop("j should not be given when i is object ids.", call. = FALSE)
-        }
-    }
-    obj
+'[.Idf' <- function(x, i, j, ...) {
+    obj <- .subset2(x, "object_in_class")(i)
+
+    if (missing(j)) return(obj)
+
+    .subset(obj, j)
 }
 # }}}
 
 #' @export
 # [[.Idf {{{
 '[[.Idf' <- function(x, i, j, ..., drop = FALSE) {
-    if (missing(i)) {
-        stop("Missing object id or class name.", call. = FALSE)
-    }
-    if (missing(j)) {
-        if (is.character(i)) {
-            obj <- .subset2(x, "object_in_class")(i)
-        } else if (is.numeric(i)){
-            obj <- .subset2(x, "object")(i)
-        }
-    } else {
-        if (is.character(i)) {
-            obj <- .subset2(x, "object_in_class")(i, j)
-        } else if (is.numeric(i)){
-            stop("j should not be given when i is an object id.", call. = FALSE)
-        }
-    }
-    obj
+    if (!is_scalar(i))
+        stop("Please give a single object ID or object name.")
+
+    if (!missing(j))
+        stop("Incorrect number of subscripts.")
+
+    .subset2(x, "object")(i)[[1]]
 }
+# }}}
+
+#' @export
+# $.Idf {{{
+'$.Idf' <- function (x, i, ...) {
+    funs <- setdiff(ls(x), "initialize")
+    if (i %in% funs) return(.subset2(x, i))
+
+    in_nm <- i_lower_field_name(i)
+    cls_std <- .subset2(x, "class_name")()
+    cls_lower <- i_lower_field_name(cls_std)
+
+    idx <- match(in_nm, cls_lower)
+
+    if (is.na(idx))
+        stop("Invalid class name found in current Idf: ", backtick(i), ".")
+
+    .subset2(x, "object_in_class")(.subset2(cls_std, idx))
+}
+
 # }}}
