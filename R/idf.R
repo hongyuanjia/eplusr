@@ -420,7 +420,7 @@ Idf <- R6::R6Class(classname = "Idf",
 
             # only store if input is a path
             if (length(path) == 1L) {
-                if (file.exists(path)) private$m_path <- path
+                if (file.exists(path)) private$m_path <- normalizePath(path)
             }
 
             idf_file <- parse_idf_file(path, idd)
