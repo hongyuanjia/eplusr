@@ -452,15 +452,15 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
 # }}}
 # copy_run_files {{{
 copy_run_files <- function (file, dir) {
-    file <- normalizePath(file, mustWork = FALSE)
+    file <- normalizePath(file, mustWork = TRUE)
     loc <- normalizePath(file.path(dir, basename(file)), mustWork = FALSE)
     flag <- FALSE
 
     if (all(file == loc)) return(file)
 
     copy <- unique(data.table::data.table(from = file, to = loc))
-    flag <- file.copy(from = copy$from, to = copy$to, overwrite = TRUE,
-        copy.date = TRUE)
+    flag <- purrr::map2_lgl(copy$from, copy$to, file.copy,
+        overwrite = TRUE, copy.date = TRUE)
 
     if (any(!flag))
         stop("Unable to copy file ", backtick(basename(file[!flag])), "into ",
