@@ -75,7 +75,7 @@ on_failure(is_idf) <- function (call, env) {
 # is_idfobject {{{
 is_idfobject <- function (x) inherits(x, "IdfObject")
 
-on_failure(is_idf) <- function (call, env) {
+on_failure(is_idfobject) <- function (call, env) {
     paste0(deparse(call$x), " is not an IdfObject object")
 }
 # }}}
