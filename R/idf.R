@@ -394,7 +394,7 @@ read_idf <- function (path, idd = NULL) {
     new_expr <- append(ori_expr,
         as.list(
             expression(
-                shared <- c("m_uuid", "m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
+                shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
                 for (nm in shared) {
                     private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
                 }
@@ -417,9 +417,6 @@ Idf <- R6::R6Class(classname = "Idf",
 
         # INITIALIZE {{{
         initialize = function (path, idd = NULL) {
-
-            # add a uuid
-            private$m_uuid <- uuid::UUIDgenerate(use.time = TRUE)
 
             # only store if input is a path
             if (length(path) == 1L) {
@@ -451,10 +448,15 @@ Idf <- R6::R6Class(classname = "Idf",
             )
 
             # init log data
-            private$m_log <- new.env(parent = emptyenv())
+            private$m_log <- new.env(hash = FALSE, parent = emptyenv())
+
+            # add a uuid
+            private$m_log$uuid <- uuid::UUIDgenerate(use.time = TRUE)
+
             private$m_log$unsaved <- FALSE
             private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
                 , object_order := 0L]
+
             private$m_log$view_in_ip <- getOption("eplusr.view_in_ip")
             private$m_log$num_digits <- getOption("eplusr.num_digits")
 
