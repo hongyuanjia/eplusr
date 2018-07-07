@@ -492,3 +492,283 @@ i_job_print <- function (self, private) {
 
 }
 # }}}
+
+Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
+    public = list(
+
+        # INITIALIZE {{{
+        initialize = function (idf, epw) {
+
+            if (is_idf(idf)) {
+                private$m_idf <- idf$clone()
+            } else {
+                private$m_idf <- read_idf(idf)
+            }
+
+            if (is_epw(epw)) {
+                private$m_epw <- epw
+            } else {
+                private$m_epw <- read_epw(epw)
+            }
+        },
+        # }}}
+
+        # PUBLIC FUNCTIONS {{{
+        apply_measure = function (measure, ..., .names = NULL)
+            i_param_apply_measure(self, private, measure, ..., .names = NULL),
+
+        run = function (output_dir = NULL, wait = TRUE, parallel_backend = future::multiprocess)
+            i_param_run(self, private, output_dir, wait, parallel_backend),
+
+        kill = function (which = NULL)
+            i_param_kill(self, private, which),
+
+        status = function (which = NULL)
+            i_param_status(self, private),
+
+        output_dir = function (which = NULL)
+            i_param_output_dir(self, private),
+
+        locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
+            i_param_locate_output(self, private, suffix, strict),
+
+        errors = function (which = NULL, info = FALSE)
+            i_param_output_errors(self, private, which, info),
+
+        report_data_dict = function (which = NULL)
+            i_param_report_data_dict(self, private, which),
+
+        report_data = function (which = NULL, key_value = NULL, name = NULL,
+                                all = FALSE, year = NULL, tz = "GMT")
+            i_param_report_data(self, private, which, key_value, name, all, year, tz),
+
+        tabular_data = function(which = NULL)
+            i_param_tabular_data(self, private, which),
+
+        print = function ()
+            i_param_print(self, private)
+        # }}}
+    ),
+
+    # PRIVATE FIELDS {{{
+    private = list(
+        m_idf = NULL,
+        m_epw = NULL,
+        m_job = NULL,
+        m_sql = NULL,
+        m_log = NULL,
+        m_param = NULL
+    )
+    # }}}
+)
+
+# i_param_apply_measure {{{
+i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
+    measure_wrapper <- function (idf, ...) {
+        assertthat::assert_that(is_idf(idf))
+        idf <- idf$clone()
+        measure(idf, ...)
+    }
+
+    mea_nm <- deparse(substitute(measure, parent.frame()))
+    private$m_log$measure_name <- mea_nm
+
+    out <- mapply(measure_wrapper, ...,
+        MoreArgs = list(idf = private$m_idf), SIMPLIFY = FALSE, USE.NAMES = FALSE)
+
+    if (is.null(.names)) {
+        out_nms <- paste0(mea_nm, "_", seq_along(out))
+    } else {
+        if (!is_same_len(out, .names))
+            stop(length(out), " models created with only ", length(.names),
+                " names given.", call. = FALSE)
+        nms <- as.character(.names)
+        out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")))
+    }
+
+    data.table::setattr(out, "names", out_nms)
+
+    private$m_param <- out
+
+    message("Measure ", backtick(mea_nm), " has been applied with ", length(out),
+        " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
+}
+# }}}
+
+# i_param_job_from_which {{{
+i_param_job_from_which <- function (self, private, which) {
+    jobs <- private$m_job
+
+    if (is.null(jobs))
+        stop("The parametric has not been run before.", call. = FALSE)
+    if (is.null(which)) return(jobs)
+
+    if (is.character(which)) {
+        nms <- names(jobs)
+        valid <- which %in% nms
+        if (any(!valid))
+            stop("Invalid job name found for current Parametric: ",
+                backtick_collapse(which), ".", call. = FALSE)
+
+    } else if (are_count(which)) {
+        valid <- which <= length(jobs)
+        if (any(!valid))
+            stop("Invalid job index found for current Parametric: ",
+                backtick_collapse(which), ".", call. = FALSE)
+    } else {
+        stop("`which` should either be a character or an integer vector.",
+            call. = FALSE)
+    }
+
+    jobs[which]
+}
+# }}}
+
+# i_param_run {{{
+i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel_backend = future::multiprocess) {
+    if (is.null(private$m_param))
+        stop("No measure has been applied.", call. = FALSE)
+
+    ver <- private$m_idf$version()
+
+    nms <- names(private$m_param)
+
+    path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
+    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+
+    if (is.null(output_dir))
+        output_dir <- dirname(path_idf)
+    else {
+        assert_that(is_string(output_dir))
+    }
+
+    if (!dir.exists(output_dir)) {
+        tryCatch(dir.create(output_dir, recursive = TRUE),
+            warning = function (w) {
+                stop("Failed to create output directory: ",
+                     backtick(output_dir), call. = FALSE)
+            }
+        )
+    }
+
+    path_param <- file.path(output_dir, nms, paste0(nms, ".idf"))
+
+    purrr::walk2(private$m_param, path_param,
+        ~.x$save(.y, overwrite = TRUE, copy_external = TRUE))
+
+    private$m_job <- purrr::map(private$m_param, EplusJob$new, epw = path_epw)
+
+    start_time <- Sys.time()
+    proc <- run_multi(ver, path_param, path_epw, parallel_backend = parallel_backend)
+    end_time <- Sys.time()
+
+    assign_proc <- function (job, proc, start_time, end_time) {
+        priv <- ._get_private(job)
+        priv$m_process <- proc
+        priv$m_log$start_time <- start_time
+        priv$m_log$end_time <- end_time
+    }
+
+    purrr::map2(private$m_job, proc, assign_proc,
+        start_time = start_time, end_time = end_time)
+
+    private$m_job
+}
+# }}}
+
+# i_param_kill {{{
+i_param_kill <- function (self, private, which) {
+    job <- i_param_job_from_which(self, private, which)
+    for (j in job) {
+        j$kill()
+    }
+}
+# }}}
+
+# i_param_status {{{
+i_param_status <- function (self, private, which) {
+    job <- i_param_job_from_which(self, private, which)
+    purrr::map(job, ~.x$status())
+}
+# }}}
+
+# i_param_output_dir {{{
+i_param_output_dir <- function (self, private, which) {
+    job <- i_param_job_from_which(self, private, which)
+    purrr::map_chr(job, ~.x$output_dir())
+}
+# }}}
+
+# i_param_locate_output {{{
+i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
+    job <- i_param_job_from_which(self, private, which)
+    purrr::map_chr(job, ~.x$locate_output(suffix = suffix, strict = strict))
+}
+# }}}
+
+# i_param_errors {{{
+i_param_errors <- function (self, private, which, info = FALSE) {
+    job <- i_param_job_from_which(self, private, which)
+    purrr::map(job, ~.x$errors(info = info))
+}
+# }}}
+
+# i_param_report_data_dict {{{
+i_param_report_data_dict <- function (self, private, which) {
+    job <- i_param_job_from_which(self, private, which)
+    purrr::map(job, ~.x$report_data_dict())
+}
+# }}}
+
+# i_param_report_data {{{
+i_param_report_data <- function (self, private, which, key_value = NULL,
+                                 name = NULL, all = FALSE, year = NULL, tz = "GMT") {
+    job <- i_param_job_from_which(self, private, which)
+    data.table::rbindlist(purrr::map(job,
+        ~.x$report_data(key_value = key_value, name = name,
+            all = all, year = year, tz = tz)))
+}
+# }}}
+
+# i_param_tabular_data {{{
+i_param_tabular_data <- function (self, private) {
+    job <- i_param_job_from_which(self, private, which)
+    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
+}
+# }}}
+
+# i_param_tabular_data {{{
+i_param_tabular_data <- function (self, private) {
+    job <- i_param_job_from_which(self, private, which)
+    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
+}
+# }}}
+
+# i_param_tabular_data {{{
+i_param_tabular_data <- function (self, private) {
+    job <- i_param_job_from_which(self, private, which)
+    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
+}
+# }}}
+
+# i_param_print {{{
+i_param_print <- function (self, private) {
+    cli::cat_rule("EnergPlus Parametric")
+    cli::cat_bullet(c(
+        paste0("Seed Model: ", backtick(private$m_idf$path())),
+        paste0("Default Weather: ", backtick(private$m_epw$path()))
+    ))
+
+    if (is.null(private$m_param)) {
+        cli::cat_line("<< No measure has been applied >>")
+        return(invisible())
+    } else {
+        cli::cat_bullet(c(
+            paste0("Applied Measure: ", backtick(private$m_log$measure_name)),
+            paste0("Parametric Models [", length(private$m_param), "]: ")
+        ))
+
+        cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
+    }
+}
+# }}}
