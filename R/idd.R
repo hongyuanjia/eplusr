@@ -1,92 +1,117 @@
 #' Parse EnergyPlus IDD files
 #'
-#' \code{eplusr} provides parsing of and programmatic access to EnergyPlus
+#' eplusr provides parsing of and programmatic access to EnergyPlus
 #' Input Data Dictionary (IDD) files, and objects. It contains all data needed
-#' to parse EnergyPlus models. IDD objects provide parsing and printing
+#' to parse EnergyPlus models. `Idd` class provides parsing and printing while
+#' `IddObject` provides detailed information of curtain class.
 #'
-#' @details The IDD objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
-#' stored internally and will automatically be used when parsing \code{IDF} and
-#' \code{IMF} files. Internally, the powerful \code{data.table} package is used
-#' to speed up the whole process and store the results. However, it will still
-#' take about 5-6 sec to parse an IDD file.
+#' @details The `Idd` objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
+#' stored internally and will automatically be used when parsing IDF files and
+#' strings.  Internally, the powerful \code{data.table} package is used to speed
+#' up the whole process and store the results. However, it will still take about
+#' 5-6 sec to parse an IDD file.
 #'
 #' Normally, you may not need to parse any Energy+.idd file unless your model
 #' is produced by EnergyPlus whose version is lower than 8.5. If so, it is
-#' suggested to store the parsed IDD object and directly pass it to the
-#' \code{idd} argument in \code{eplusr_model$new} in index to avoid the parsing
-#' process whenever you read a model of that version.
+#' suggested to store the parsed IDD object and directly pass it to the `idd`
+#' argument in [read_idf()] in order to avoid the parsing process whenever you
+#' read a model of that version.
+#'
+#' Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
+#' data in `data.frame` format. Every IDD will be parsed and stored in four
+#' tables:
+#'
+#' * `group`: contains group index and group names.
+#' * `class`: contains class names and properties.
+#' * `class_reference`: contains reference names of classes.
+#' * `field`: contains field names and field properties.
+#' * `field_reference`: contains reference names of fields.
+#' * `field_default`: contains default values of fields.
+#' * `field_choice`: contains choices of choice-type fields.
+#' * `field_range`: contains range data of fields.
+#' * `field_object_list`: contains object-list data of fields.
+#' * `field_external_list`: contains external-list data of fields.
 #'
 #' @section Usage:
 #' ```
+#' # read
+#' idd <- use_idd(idd)
 #'
-#' idd <- IDD$new(path)
-#'
+#' # basic info
 #' idd$version()
 #' idd$build()
-#' idd$class_name(group = NULL)
-#' idd$group_name(class = NULL)
+#'
 #' idd$group_index(group = NULL)
-#' idd$class_index(class = NULL)
-#' idd$indexs()
-#'
-#' idd$object(class)
-#' idd$objects(class = NULL)
-#' idd$objects_in_group(group)
-#'
-#' idd$is_valid_class(class)
+#' idd$group_name()
 #' idd$is_valid_group(group)
+#' idd$from_group(class)
+#'
+#' idd$class_index(class = NULL)
+#' idd$class_name()
+#' idd$is_valid_class(class)
+#'
+#' idd$required_class_name()
+#' idd$unique_class_name()
+#' idd$extenesible_class_name()
+#'
+#' # idd object
+#' idd$object(class)
+#' idd$object_in_group(group)
 #'
 #' idd$print()
-#'
 #' print(idd)
-#'
 #' ```
 #'
 #' @section Arguments:
 #'
-#' * `path`: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-#' named as `Energy+.idd`.
-#'
+#' * `idd`: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
+#'     named as `Energy+.idd` or a valid version of pre-parsed IDD (8.3 - 8.9).
 #' * `group`: A valid group name or valid group names.
-#'
 #' * `class`: A valid class name or valid class names.
 #'
 #' @section Detail:
 #'
-#' `IDD$new()` parses an EnergyPlus Input Data Dictionary (IDD) file, and
-#' returns an IDD object.
+#' `use_idd` will parses an EnergyPlus Input Data Dictionary (IDD) file, and
+#' returns an `Idd` object. If `idd` is a valid version of pre-parsed IDD file,
+#' then the pre-parsed `Idd` object will be returned.
 #'
-#' `$version()` returns the version string of current idd file.
+#' `$version` returns the version string.
 #'
-#' `$build()` returns the build tag string of current idd file.
+#' `$build` returns the build tag string.
 #'
-#' `$group_name(class)` returns group name that that `class` belong to.
+#' `$group_index` returns integer indexes (indexes of name appearance in
+#'     the IDD file) of specified groups.
 #'
-#' `$class_name(group)` returns class names of that `group`. If `group` not
-#' given, all class names in current IDD are returned.
+#' `$group_name` returns all group names.
 #'
-#' `$group_index(group)` returns integer indexs (indexs of name apperarance in
-#' the IDD file) of that `group`.
+#' `$from_group` returns the names of group that specified classes belongs to.
 #'
-#' `$class_index(class)` returns integer indexs (indexs of name apperarance in
-#' the IDD file) of that `class`.
+#' `$is_valid_group` return `TRUE` if the input is a valid group name.
 #'
-#' `$object(class)` returns an IDDObject of that `class`.
+#' `$class_index` returns integer indexes (indexes of name appearance in
+#' the IDD file) of specified classes.
 #'
-#' `$objects(class)` returns a list of IDDObjects of `class`es. If `class` is
-#' NULL, all IDDObjects in current IDD are returned.
+#' `$class_name` returns all class names.
 #'
-#' `$objects_in_group(group)` returns a list of IDDObjects in that `group`.
+#' `$required_class_name` returns the names of all required classes.
 #'
-#' `$is_valid_group(group)` return `TRUE` if the input is a valid `group` name.
+#' `$unique_class_name` returns the names of all unique classes.
 #'
-#' `$is_valid_class(class)` return `TRUE` if the input is a valid `class` name.
+#' `$extensible_class_name` returns the names of all extensible classes.
+#'
+#' `$is_valid_class` return `TRUE` if the input is a valid class name.
+#'
+#' `$object` returns a list of `IddObject`s of specified classes.
+#'
+#' `$object_in_group` returns a list of `IddObject`s in that group.
+#'
+#' For details about `IddObject`, please see [idd_object].
 #'
 #' @importFrom R6 R6Class
 #' @importFrom data.table setattr
 #' @importFrom cli cat_rule cat_bullet
 #' @importFrom assertthat assert_that
-#' @return An Idd object
+#' @return For `use_idd`, an Idd object.
 #' @docType class
 #' @name idd
 #' @author Hongyuan Jia
@@ -124,7 +149,7 @@ Idd <- R6::R6Class(classname = "Idd",
         build = function ()
             i_build(self, private),
 
-        group_name = function (class = NULL)
+        group_name = function ()
             i_group_name(self, private, type = "idd"),
 
         from_group = function (class)
@@ -146,10 +171,7 @@ Idd <- R6::R6Class(classname = "Idd",
             i_group_index(self, private, group = group),
 
         class_index = function (class = NULL)
-            i_class_index(self, private, class = class),
-
-        reference_map = function (class)
-            i_reference_map(self, private, class = class),
+            i_class_index(self, private, name = class, type = "idd"),
         # }}}
 
         # OBJECT GETTERS {{{
@@ -165,7 +187,7 @@ Idd <- R6::R6Class(classname = "Idd",
             i_is_valid_group_name(self, private, group = group),
 
         is_valid_class = function (class)
-            i_is_valid_class_name(self, private, class = class),
+            i_is_valid_class_name(self, private, name = class, type = "idd"),
         # }}}
 
         print = function ()

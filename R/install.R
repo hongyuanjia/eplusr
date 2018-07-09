@@ -1,6 +1,6 @@
 #' Download and Install EnergyPlus
 #'
-#' Download specified version of EnergyPlus for your platform from Github and
+#' Download specified version of EnergyPlus for your platform from GitHub and
 #' install it.
 #'
 #' This function will try to install EnergyPlus into the default location, e.g.
@@ -12,7 +12,7 @@
 #' sudo commands used for installation.
 #'
 #' @param ver The EnergyPlus version number, e.g., \code{8.7}; the special value
-#' \code{"latest"} means the latest version (fetched from Github releases).
+#' \code{"latest"} means the latest version (fetched from GitHub releases).
 #'
 #' @param dir Where to save EnergyPlus installer file. Default is current
 #' working directory. Only applicable to `download_eplus()`. For
@@ -21,7 +21,7 @@
 #' @param force Whether to install EnergyPlus even if it has already been
 #' installed.
 #'
-#' @name install
+#' @name install_eplus
 #' @export
 # install_eplus {{{
 install_eplus <- function (ver = "latest", force = FALSE) {
@@ -58,7 +58,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 }
 # }}}
 
-#' @name install
+#' @name install_eplus
 #' @export
 # download_eplus {{{
 download_eplus <- function (ver = "latest", dir = getwd()) {

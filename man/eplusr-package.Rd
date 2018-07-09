@@ -27,7 +27,7 @@ in R.
 }
 }
 
-To learn more about dplyr, start with the vignettes:
+To learn more about eplusr, start with the vignettes:
 \code{browseVignettes(package = "eplusr")}
 }
 \section{Package options}{
@@ -45,7 +45,7 @@ value modification and model error checking. Possible value: \code{"none"},
 \item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
 integer, and choice field values will be done;
 \item For \code{"final"}, besides above, checking of missing required objects,
-duplicated unique objects, object name confliction, missing required
+duplicated unique objects, object name conflicts, missing required
 fields and invalid field value reference will also be done.
 }
 \item \code{eplusr.verbose_info}: Whether to show information messages. Default: \code{TRUE}

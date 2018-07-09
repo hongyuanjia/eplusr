@@ -1,89 +1,206 @@
-#' EnergyPlus IDF objects
+#' EnergyPlus IDF object
 #'
-#' \code{IDFObject} is a R6 class used internally as members in \code{IDF} R6
-#' class. \code{IDFObject} inherits \code{\link{IDDObject}}, so all methods of
-#' \code{IDDObject} are available for \code{IDFobject}.
+#' `IdfObject` is an abstraction of a single object in an `Idf`. It provides
+#' more detail methods to modify objects. `IdfObject` can only be created from
+#' the parent `Idf` object, using `$object`, `$object_in_class` and
+#' `$search_object`. This is because that initialization of an `IdfObject` needs
+#' some shared data from parent `Idf` object.
 #'
 #' @section Usage:
 #' ```
-#'
-#' idfobj <- IDFObject$new(object_id)
-#'
+#' # basic info
 #' idfobj$id()
 #' idfobj$name()
 #'
+#' # definition
+#' idfobj$definition()
+#'
+#' # comment
 #' idfobj$get_comment()
 #' idfobj$set_comment(comment, append = TRUE, width = 0L)
-#' idfobj$get_value(index = NULL, name = NULL)
+#'
+#' # value
+#' idfobj$get_value(which = NULL, all = NULL)
 #' idfobj$set_value(..., defaults = TRUE)
 #'
+#' # validation
 #' idfobj$validate()
-#'
-#' idfobj$reference_map()
-#'
-#' idfobj$value_table(all = FALSE, unit = TRUE, wide = FALSE, string_value =
-#' TRUE)
-#'
 #' idfobj$is_valid()
-#' idfobj$has_reference_by()
-#' idfobj$has_reference_from()
+#'
+#' # object cross reference
+#' idfobj$ref_from_object()
+#' idfobj$ref_by_object()
+#' idfobj$has_ref_by()
+#' idfobj$has_ref_from()
+#' idfobj$has_ref()
+#'
+#' # data extraction
+#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+#'
+#' # formatting
 #' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 #'
-#' idfobj$print(comment = TRUE)
+#' # print
+#' idfobj$print(comment = TRUE, auto_sep = FALSE)
 #' print(iddobj)
 #' ```
 #'
-#' For other methods inherited from `IDDObject`, please see
-#' \code{\link{IDDObject}}.
+#' @section Basic Info:
 #'
-#' @section Detail:
-#'
-#' \subsection{Create}{
 #' ```
-#' idfobj <- IDFObject$new(list, idd)
+#' idfobj$id()
+#' idfobj$name()
 #' ```
 #'
-#' `IDFObject$new(list, idd)` creates an IDFObject using parsed IDF object data
-#' stored in a list and an IDD object.
+#' `$id` will return the object ID.
 #'
-#' **Arguments**:
+#' `$name` will return the object name. If the class does not have name
+#'     attribute, then `NA` will returned.
 #'
-#' * `list`: A list. The list contains three named elements:
-#' `object_id`, `value` and `comment`, where:
-#'     * `object_id`: a unique integer to reference this IDFObject.
-#'     * `value`: a list contains all values of this IDFObject. All values can
-#'     be totally strings, but they will be converted to corresponding types
-#'     during initialization.
-#'     * `comment`: a character vector. Elements will be put line by line when
-#'     saved to `*.idf` files.
-#' * `idd`: An IDD object created by `IDD$new()`.
-#' }
-#'
-#' \subsection{Value}{
+#' @section Definition:
 #' ```
-#' idfobj$get_value(index = NULL, name = NULL)
+#' idfobj$definition()
 #' ```
 #'
-#' `$get_value(index, name)` return values of certain fields specified by
-#' `index` or `name`. The values are returned as a list and returned invisibly.
+#' `$definition` will return the definition, i.e. the `IddObject`, of current
+#'     class. For details of `IddObject`, please see XXX.
 #'
-#' `$set_value(...)` sets values given in `...` to fields.
-#' }
+#' @section Comment:
+#' ```
+#' idfobj$get_comment()
+#' idfobj$set_comment(comment, append = TRUE, width = 0L)
+#' ```
+#'
+#' `$get_comment` will return the comments of current object.
+#'
+#' `$set_comment` will set the comments of current object.
+#'
+#' **Arguments**
+#'
+#' * `comment`: A character vector.
+#' * `append`: If `TRUE`, comment will be appended to existing comments. If
+#'     `FALSE`, comment will be prepended to existing currents. If `NULL`,
+#'     existing comments will be deleted. Default: `FALSE`
+#' * `width`: An integer to indicate where to break long comment lines. If `0`,
+#'     no breaking will be made.
+#'
+#' @section Value:
+#' ```
+#' idfobj$get_value(which = NULL, all = FALSE)
+#' idfobj$set_value(..., default = TRUE)
+#' ```
+#'
+#' `$get_value` will return a named list containing values of specified fields.
+#'
+#' `$set_comment` will set the comments of current object.
+#'
+#' **Arguments**
+#'
+#' * `which`: An integer vector of field indexes or a character vector of field
+#'     names. Field names can be given in "lower-style", e.g. `"Thermal
+#'     Resistance"` can be given as `"thermal_resistance"`.
+#' * `all`: If `TRUE`, values of all fields, including empty fields will be
+#'     returned as well. Default: `FALSE`
+#' * `...`: Values to set. Field names of value can be given. If not named, the
+#'     input values will be set to fields according to their order of
+#'     appearance.
+#' * `default`: If `TRUE`, all empty fields will be filled with their default
+#'     values if possible.
+#'
+#' @section Validation:
+#'
+#' ```
+#' idfobj$validate(level = c("final", "draft", "none"))
+#' idfobj$is_valid(level = c("final", "draft", "none"))
+#' ```
+#'
+#' `$validate` will check if there are errors in current object under different
+#'     strictness level.
+#'
+#' `$is_valid` will check if there are no errors in current object under
+#'     different strictness level.
+#'
+#' There are three different validate levels, i.e. `"none"`, `"draft"` and
+#'     `"final"`:
+#'   * For `"none"`, none validation will be done;
+#'   * For `"draft"`, checking of invalid autosize, autocalculate, numeric,
+#'     integer, and choice field values will be done;
+#'   * For `"final"`, besides above, checking of missing required objects,
+#'     duplicated unique objects, object name conflicts, missing required
+#'     fields and invalid field value reference will also be done.
+#'
+#' @section Cross Reference:
+#'
+#' ```
+#' idfobj$ref_from_object()
+#' idfobj$ref_by_object()
+#' idfobj$has_ref_from()
+#' idfobj$has_ref_by()
+#' idfobj$has_ref()
+#' ```
+#'
+#' `$ref_from_object` will return other objects that current object references
+#'     from.
+#'
+#' `$ref_by_object` will return other objects that reference current object.
+#'
+#' `$has_ref_from` and `$has_ref_by` will return `TRUE` if current object has
+#'     referenced from other objects or has been referenced by other objects,
+#'     respectively.
+#'
+#' `$has_ref` will return `TRUE` if current object has either referenced from
+#'     other objects or has been referenced by other objects.
+#'
+#' @section Data Extraction:
+#'
+#' ```
+#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+#' ```
+#'
+#' `$table` will return a data.table that contains all data of current object.
+#'
+#' **Arguments**
+#' * `all`: If `TRUE`, values of all fields, including empty fields will be
+#'     returned as well. Default: `FALSE`
+#' * `unit`: If `TRUE`, field names with units will be returned. Default:
+#'     `TRUE`.
+#' * `wide`: If `TRUE`, a wide table will be returned. Default: `FALSE`.
+#' * `string_value`: If `TRUE`, all field values will be returned as character.
+#'     Default: `TRUE`
+#' * `in_ip`: If `TRUE`, IP units and values will be returned. Default: the
+#'     value of `getOption("eplusr.view_in_ip")`.
+#'
+#' @section Formatting:
+#'
+#' ```
+#' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
+#' ```
+#'
+#' `$string` will return the text format of current object.
+#'
+#' **Arguments**
+#'
+#' * `comment`: If `FALSE`, all comments will not be included.
+#' * `leading`: An integer to indicate the number of spaces before each fields.
+#'     Default: `4`.
+#' * `sep_at`: An integer to indicate the character width where to separate
+#'     values and field names.  Default: `29`.
+#'
+#' @section Print:
+#'
+#' ```
+#' idfobj$print(comment = TRUE, auto_sep = FALSE)
+#' print(idfobj)
+#' ```
+#'
+#' **Arguments**
+#'
+#' * `comment`: If `FALSE`, all comments will not be included.
+#' * `auto_sep`: If `TRUE`, values and field names will be separate at the
+#'     largest character length of values. Default: `FALSE`.
 #'
 #' @importFrom R6 R6Class
-#' @importFrom glue glue
-#' @importFrom data.table data.table rbindlist setattr setorder setnames
-#' @importFrom purrr splice map_lgl
-#' @importFrom cli cat_line cat_rule cat_bullet
-
-#' @importFrom rlang dots_splice
-#' @importFrom stringr str_pad
-#' @importFrom clisymbols symbol
-#' @importFrom purrr map map_chr map_lgl map2_lgl iwalk
-#' @importFrom assertthat assert_that
-#' @return An IdfObject object
 #' @docType class
-#' @seealso \code{\link{IddObject}}
 #' @name idf_object
 #' @author Hongyuan Jia
 NULL
@@ -115,6 +232,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         name = function ()
             i_object_tbl_from_which(self, private, private$m_object_id, class = FALSE)$object_name,
 
+        definition = function ()
+            i_iddobject(self, private, i_class_name(self, private, private$m_class_id))[[1]],
+
         get_comment = function ()
             i_comment_tbl_from_which(self, private, private$m_object_id, nomatch = 0L)$comment,
 
@@ -129,12 +249,6 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 
         validate = function ()
             i_validate_idfobject(self, private, private$m_object_id),
-
-        definition = function ()
-            i_iddobject(self, private, i_class_name(self, private, private$m_class_id))[[1]],
-
-        table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
-            i_idfobj_value_table(self, private, private$m_object_id, all, unit, wide, string_value, in_ip),
 
         is_valid = function ()
             i_is_valid_idfobject(self, private, private$m_object_id),
@@ -155,13 +269,16 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             i_idfobj_has_ref_from(self, private, private$m_object_id) ||
             i_idfobj_has_ref_by(self, private, private$m_object_id),
 
+        table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+            i_idfobj_value_table(self, private, private$m_object_id, all, unit, wide, string_value, in_ip),
+
         string = function (comment = TRUE, leading = 4L, sep_at = 29L)
             i_object_string(self, private, private$m_object_id, header = FALSE,
                 format = "new_top", comment = comment, leading = leading,
                 sep_at = sep_at, index = FALSE),
 
-        print = function (comment = TRUE, ...)
-            i_print_idfobj(self, private, private$m_object_id, comment, ...)
+        print = function (comment = TRUE, auto_sep = FALSE)
+            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep)
         # }}}
     ),
 

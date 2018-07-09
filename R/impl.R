@@ -1,3 +1,13 @@
+#' @importFrom data.table data.table rbindlist copy dcast
+#' @importFrom data.table setnames setattr setorderv setorder setcolorder
+#' @importFrom purrr pmap map2_int vec_depth flatten modify_depth map_lgl splice
+#' @importFrom stringr str_replace_all str_detect str_match
+#' @importFrom uuid UUIDgenerate
+#' @importFrom cli rule cat_line cat_rule cat_bullet
+#' @importFrom clisymbols symbol
+#' @importFrom assertthat assert_that
+NULL
+
 ################################################################################
 #                                  Basic Info                                  #
 ################################################################################
@@ -62,7 +72,6 @@ i_group_index <- function (self, private, group = NULL) {
 
 # i_is_valid_group_name {{{
 i_is_valid_group_name <- function (self, private, group, type = c("idd", "idf")) {
-    assert_that(is_string(group))
     group %in% i_group_name(self, private, type)
 }
 # }}}
@@ -1580,9 +1589,6 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
     # check if target objects are referenced {{{
     if (not_empty(ref_by_tbl)) {
         if (get_option("validate_level") == "final") {
-            # cli::cat_line(format_refmap_sgl(
-            #     ref_by_tbl, "by", in_ip = private$m_options$view_in_ip
-            # ))
             stop("Delete object that are referenced by others is prohibited ",
                 "in `final` validation level. Failed to delete target object ",
                 "[ID:", backtick_collpase(obj_tbl$object_id), "]\n:",
@@ -1630,7 +1636,7 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 }
 # }}}
 
-# i_serach_value {{{
+# i_search_value {{{
 i_search_value = function (self, private, pattern) {
     val <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
     if (is_empty(val)) {

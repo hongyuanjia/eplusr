@@ -1,3 +1,135 @@
+#' Create and Run EnergyPlus Simulation, and Collect Simulation Results
+#'
+#' `EplusJob` class wraps the EnergyPlus command line interface and provides
+#' methods to extract simulation results.
+#'
+#' eplusr uses the EnergyPlus SQL output for extracting simulation results. In
+#' order to do so, a object in `Output:SQLite` with `Option Type` value of
+#' `SimpleAndTabular` will be automatically created if it does not exists.
+#' `Job` has provide some wrappers that do SQL query to get report data results,
+#' i.e. results from `Output:Variable` and `Output:Meter*`. But for
+#' `Output:Table` results, you have to be familiar with the structure of the
+#' EnergyPlus SQL results, especially for table "TabularDataWithStrings". For
+#' details, please see "2.20 eplusout.sql", especially "2.20.4.4 TabularData
+#' Table" in EnergyPlus "Output Details and Examples" documentation.
+#'
+#' @section Usage:
+#' ```
+#' # create
+#' job <- eplus_job(idf, epw)
+#'
+#' # run and kill
+#' job$run(wait = TRUE)
+#' job$kill()
+#' job$status()
+#'
+#' # errors
+#' job$errors(info = FALSE)
+#'
+#' # results
+#' job$output_dir(open = FALSE)
+#' job$locate_output(suffix = ".err", strict = TRUE)
+#' job$report_data_dict()
+#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
+#' job$tabular_data()
+#'
+#' # print
+#' job$print()
+#' ```
+#' @section Create:
+#' ```
+#' epw <- eplus_job(idf, epw)
+#' ```
+#' **Arguments**
+#'
+#' * `idf`: Path to EnergyPlus IDF or IMF file or an `Idf` object.
+#' * `epw`: Path to EnergyPlus EPW file or an `Epw` object.
+#'
+#' @section Run:
+#' ```
+#' job$run(wait = TRUE)
+#' job$kill()
+#' job$status()
+#' ```
+#'
+#' `$run` runs the simulation using input model and weather file.
+#'
+#' `$kill` kills the background EnergyPlus process if possible. It only
+#'     works when simulation runs in waiting mode.
+#'
+#' `$status` returns a named list of values indicates the status of the job:
+#'
+#'   * `run_before`: `TRUE` if the job has been run before.
+#'   * `changed_after`: `TRUE` if the IDF file has been changed since last
+#'      simulation.
+#'   * `terminated`: `TRUE` if the simulation was terminated during last
+#'       simulation.
+#'   * `successful`: `TRUE` if last simulation ended successfully.
+#'   * `alive`: `TRUE` if the simulation is still running in the background.
+#'   * `wait`: `TRUE` if the simulation was run in waiting mode last time.
+#'
+#' **Arguments**
+#'
+#' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
+#'     information to the console.  If `FALSE`, which is default, a
+#'     [processx::process] object will be return.
+#' * `wait`: If `TRUE`, R will hang on and wait for the simulation to complete.
+#'     Output from EnergyPlus command line interface will be printed into the
+#'     console as well. If `FALSE`, simulation will be run in a background
+#'     process. Default: `TRUE`.
+#'
+#' @section Results Extraction:
+#' ```
+#' job$output_dir(open = FALSE)
+#' job$locate_output(suffix = ".err", strict = TRUE)
+#' job$report_data_dict()
+#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
+#' job$tabular_data()
+#' ```
+#'
+#' `$output_dir` returns the output directory of simulation results.
+#'
+#' `$locate_output` returns the path of a single output file specified by file
+#'     suffix.
+#'
+#' `$report_data_dict` returns a data.table which contains all information about
+#'     report data. For details on the meaning of each columns, please see
+#'     "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
+#'     Examples" documentation.
+#'
+#' `$report_data` extracts the report data using key values and variable names.
+#'
+#' `$tabular_data` extracts all tabular data.
+#'
+#' **Arguments**
+#' * `open`: If `TRUE`, the output directory will be opened. It may only work
+#'     well on Windows.
+#' * `suffix`: A string that indicates the file suffix of simulation output.
+#'     Default: `".err"`.
+#' * `strict`: If `TRUE`, it will check if the simulation was terminated, is
+#'     still running or the file exists or not. Default: `TRUE`.
+#' * `key_value`: A character vector to identify key name of the data. If
+#'    `NULL`, all keys of that variable will be returned. Default: `NULL`.
+#' * `name`: A character vector to specify the actual data name. If `NULL`, all
+#'    variables will be returned. Default: `NULL`.
+#' * `year`: The year of the date and time in column `DateTime`. If `NULL`, it
+#'    will be the current year. Default: `NULL`
+#' * `tz`: Time zone of date and time in column `DateTime`. Default: `"GMT"`.
+#' * `case`: If not `NULL`, a character column will be added indicates the case
+#'     of this simulation. If `"auto"`, the name of the IDF file will be used.
+#'
+#' @docType class
+#' @name eplus_job
+#' @author Hongyuan Jia
+NULL
+
+#' @export
+# eplus_job {{{
+eplus_job <- function (idf, epw) {
+    EplusJob$new(idf, epw)
+}
+# }}}
+
 #' @importFrom R6 R6Class
 #' @importFrom readr read_lines
 #' @importFrom tools file_path_sans_ext
@@ -6,6 +138,7 @@
 #' @importFrom lubridate year force_tz
 #' @importFrom fasttime fastPOSIXct
 #' @importFrom cli cat_rule cat_line
+# EplusJob {{{
 EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
     public = list(
 
@@ -83,8 +216,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         report_data_dict = function ()
             i_sql_report_data_dict(self, private),
 
-        report_data = function (key_value = NULL, name = NULL, all = FALSE,
-                                year = NULL, tz = "GMT", case = FALSE)
+        report_data = function (key_value = NULL, name = NULL, year = NULL,
+                                tz = "GMT", case = "auto")
             i_sql_report_data(self, private, key_value, name, all, year, tz, case),
 
         tabular_data = function()
@@ -107,6 +240,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
     )
     # }}}
 )
+# }}}
 
 # i_job_run {{{
 i_job_run <- function (self, private, wait = TRUE) {
@@ -490,285 +624,5 @@ i_job_print <- function (self, private) {
             backtick(private$m_log$start_time), " and completed successfully.")
     }
 
-}
-# }}}
-
-Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
-    public = list(
-
-        # INITIALIZE {{{
-        initialize = function (idf, epw) {
-
-            if (is_idf(idf)) {
-                private$m_idf <- idf$clone()
-            } else {
-                private$m_idf <- read_idf(idf)
-            }
-
-            if (is_epw(epw)) {
-                private$m_epw <- epw
-            } else {
-                private$m_epw <- read_epw(epw)
-            }
-        },
-        # }}}
-
-        # PUBLIC FUNCTIONS {{{
-        apply_measure = function (measure, ..., .names = NULL)
-            i_param_apply_measure(self, private, measure, ..., .names = NULL),
-
-        run = function (output_dir = NULL, wait = TRUE, parallel_backend = future::multiprocess)
-            i_param_run(self, private, output_dir, wait, parallel_backend),
-
-        kill = function (which = NULL)
-            i_param_kill(self, private, which),
-
-        status = function (which = NULL)
-            i_param_status(self, private),
-
-        output_dir = function (which = NULL)
-            i_param_output_dir(self, private),
-
-        locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
-            i_param_locate_output(self, private, suffix, strict),
-
-        errors = function (which = NULL, info = FALSE)
-            i_param_output_errors(self, private, which, info),
-
-        report_data_dict = function (which = NULL)
-            i_param_report_data_dict(self, private, which),
-
-        report_data = function (which = NULL, key_value = NULL, name = NULL,
-                                all = FALSE, year = NULL, tz = "GMT")
-            i_param_report_data(self, private, which, key_value, name, all, year, tz),
-
-        tabular_data = function(which = NULL)
-            i_param_tabular_data(self, private, which),
-
-        print = function ()
-            i_param_print(self, private)
-        # }}}
-    ),
-
-    # PRIVATE FIELDS {{{
-    private = list(
-        m_idf = NULL,
-        m_epw = NULL,
-        m_job = NULL,
-        m_sql = NULL,
-        m_log = NULL,
-        m_param = NULL
-    )
-    # }}}
-)
-
-# i_param_apply_measure {{{
-i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
-    measure_wrapper <- function (idf, ...) {
-        assertthat::assert_that(is_idf(idf))
-        idf <- idf$clone()
-        measure(idf, ...)
-    }
-
-    mea_nm <- deparse(substitute(measure, parent.frame()))
-    private$m_log$measure_name <- mea_nm
-
-    out <- mapply(measure_wrapper, ...,
-        MoreArgs = list(idf = private$m_idf), SIMPLIFY = FALSE, USE.NAMES = FALSE)
-
-    if (is.null(.names)) {
-        out_nms <- paste0(mea_nm, "_", seq_along(out))
-    } else {
-        if (!is_same_len(out, .names))
-            stop(length(out), " models created with only ", length(.names),
-                " names given.", call. = FALSE)
-        nms <- as.character(.names)
-        out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")))
-    }
-
-    data.table::setattr(out, "names", out_nms)
-
-    private$m_param <- out
-
-    message("Measure ", backtick(mea_nm), " has been applied with ", length(out),
-        " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
-}
-# }}}
-
-# i_param_job_from_which {{{
-i_param_job_from_which <- function (self, private, which) {
-    jobs <- private$m_job
-
-    if (is.null(jobs))
-        stop("The parametric has not been run before.", call. = FALSE)
-    if (is.null(which)) return(jobs)
-
-    if (is.character(which)) {
-        nms <- names(jobs)
-        valid <- which %in% nms
-        if (any(!valid))
-            stop("Invalid job name found for current Parametric: ",
-                backtick_collapse(which), ".", call. = FALSE)
-
-    } else if (are_count(which)) {
-        valid <- which <= length(jobs)
-        if (any(!valid))
-            stop("Invalid job index found for current Parametric: ",
-                backtick_collapse(which), ".", call. = FALSE)
-    } else {
-        stop("`which` should either be a character or an integer vector.",
-            call. = FALSE)
-    }
-
-    jobs[which]
-}
-# }}}
-
-# i_param_run {{{
-i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel_backend = future::multiprocess) {
-    if (is.null(private$m_param))
-        stop("No measure has been applied.", call. = FALSE)
-
-    ver <- private$m_idf$version()
-
-    nms <- names(private$m_param)
-
-    path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
-    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
-
-    if (is.null(output_dir))
-        output_dir <- dirname(path_idf)
-    else {
-        assert_that(is_string(output_dir))
-    }
-
-    if (!dir.exists(output_dir)) {
-        tryCatch(dir.create(output_dir, recursive = TRUE),
-            warning = function (w) {
-                stop("Failed to create output directory: ",
-                     backtick(output_dir), call. = FALSE)
-            }
-        )
-    }
-
-    path_param <- file.path(output_dir, nms, paste0(nms, ".idf"))
-
-    purrr::walk2(private$m_param, path_param,
-        ~.x$save(.y, overwrite = TRUE, copy_external = TRUE))
-
-    private$m_job <- purrr::map(private$m_param, EplusJob$new, epw = path_epw)
-
-    start_time <- Sys.time()
-    proc <- run_multi(ver, path_param, path_epw, parallel_backend = parallel_backend)
-    end_time <- Sys.time()
-
-    assign_proc <- function (job, proc, start_time, end_time) {
-        priv <- ._get_private(job)
-        priv$m_process <- proc
-        priv$m_log$start_time <- start_time
-        priv$m_log$end_time <- end_time
-    }
-
-    purrr::map2(private$m_job, proc, assign_proc,
-        start_time = start_time, end_time = end_time)
-
-    private$m_job
-}
-# }}}
-
-# i_param_kill {{{
-i_param_kill <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    for (j in job) {
-        j$kill()
-    }
-}
-# }}}
-
-# i_param_status {{{
-i_param_status <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$status())
-}
-# }}}
-
-# i_param_output_dir {{{
-i_param_output_dir <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map_chr(job, ~.x$output_dir())
-}
-# }}}
-
-# i_param_locate_output {{{
-i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map_chr(job, ~.x$locate_output(suffix = suffix, strict = strict))
-}
-# }}}
-
-# i_param_errors {{{
-i_param_errors <- function (self, private, which, info = FALSE) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$errors(info = info))
-}
-# }}}
-
-# i_param_report_data_dict {{{
-i_param_report_data_dict <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$report_data_dict())
-}
-# }}}
-
-# i_param_report_data {{{
-i_param_report_data <- function (self, private, which, key_value = NULL,
-                                 name = NULL, all = FALSE, year = NULL, tz = "GMT") {
-    job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job,
-        ~.x$report_data(key_value = key_value, name = name,
-            all = all, year = year, tz = tz)))
-}
-# }}}
-
-# i_param_tabular_data {{{
-i_param_tabular_data <- function (self, private) {
-    job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
-}
-# }}}
-
-# i_param_tabular_data {{{
-i_param_tabular_data <- function (self, private) {
-    job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
-}
-# }}}
-
-# i_param_tabular_data {{{
-i_param_tabular_data <- function (self, private) {
-    job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
-}
-# }}}
-
-# i_param_print {{{
-i_param_print <- function (self, private) {
-    cli::cat_rule("EnergPlus Parametric")
-    cli::cat_bullet(c(
-        paste0("Seed Model: ", backtick(private$m_idf$path())),
-        paste0("Default Weather: ", backtick(private$m_epw$path()))
-    ))
-
-    if (is.null(private$m_param)) {
-        cli::cat_line("<< No measure has been applied >>")
-        return(invisible())
-    } else {
-        cli::cat_bullet(c(
-            paste0("Applied Measure: ", backtick(private$m_log$measure_name)),
-            paste0("Parametric Models [", length(private$m_param), "]: ")
-        ))
-
-        cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
-    }
 }
 # }}}
