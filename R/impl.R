@@ -1914,7 +1914,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
         val_in_unnamed[, `:=`(field_name_in = NULL)]
         val_in_unnamed[, `:=`(field_index = seq_along(value_in)), by = object_rleid]
 
-        i_assert_valid_value_num(self, private, val_num_unnamed, type)
+        i_assert_valid_value_num(self, private, val_num_unnamed, type, default)
 
         val_tbl_unnamed_ori <- i_value_tbl_ori_from_num_tbl(self, private,
             val_num_unnamed, type, default = FALSE, all)
@@ -2383,10 +2383,32 @@ i_val_ref_from_tbl <- function (self, private, value_tbl) {
 # }}}
 
 # i_assert_valid_value_num {{{
-i_assert_valid_value_num <- function (self, private, value_in_tbl, type) {
+i_assert_valid_value_num <- function (self, private, value_in_tbl, type, default = FALSE) {
     invalid_num_unnamed <- value_in_tbl[
         !i_is_valid_field_num(self, private,
             class = class_name, num = value_num)]
+
+    if (default) {
+        less <- invalid_num_unnamed[value_num < min_fields]
+
+        if (not_empty(less)) {
+            less_idx <- less[, list(miss_idx = seq(value_num + 1L, min_fields)),
+                by = list(object_rleid, class_id)]
+
+            less_def <- less_idx[, list(def = unlist(i_field_default(self, private,
+                class_id, miss_idx))), by = list(object_rleid, class_id)]
+
+            invalid_less_rleid <- less_def[is.na(def), object_rleid]
+
+            if (not_empty(invalid_less_rleid)) {
+                valid_rleid <- less[!object_rleid %in% invalid_less_rleid]$object_rleid
+            } else {
+                valid_rleid <- less$object_rleid
+            }
+
+            invalid_num_unnamed <- invalid_num_unnamed[!object_rleid %in% valid_rleid]
+        }
+    }
 
     if (not_empty(invalid_num_unnamed)) {
         msg <- i_msg_invalid_value_num(invalid_num_unnamed, type)
