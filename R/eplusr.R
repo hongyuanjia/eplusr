@@ -6,49 +6,19 @@
 #'
 #' With eplusr, you can do:
 #'
-#' * Read and parse EnergyPlus `IDF` files
+#' * Read, parse and modify EnergyPlus Weather File (EPW).
+#' * Read and parse EnergyPlus IDF files.
 #' * Query on models, including classes, objects and fields
-#' * Directly add, modify, duplicate, and delete objects of `IDF` in R.
+#' * Directly add, modify, duplicate, and delete objects of IDF in R.
 #' * Automatically change referred fields when modifying objects.
 #' * Save the changed models into standard formats in the same way as IDFEditor
 #'   distributed along with EnergyPlus.
-#'   * Run your models directly and collect the simulation output of EnergyPlus
+#' * Run your models directly and collect the simulation output of EnergyPlus
 #'   in R.
+#' * Run parametric analysis parallelly and collect results in one go.
 #'
 #' To learn more about eplusr, start with the vignettes:
 #' `browseVignettes(package = "eplusr")`
-#'
-#' @section Package options:
-#'
-#' * `eplusr.num_digits`: Integer indicating the number of decimal places for
-#' numeric fields. Default: `8L`
-#'
-#' * `eplusr.view_in_ip`: Whether models should be presented in IP units.
-#' Default: `FALSE`
-#'
-#' * `eplusr.validate_level`: The strictness level of validation during field
-#' value modification and model error checking. Possible value: `"none"`,
-#' `"draft"` and `"final"`. Default: `"final"`. Detailed description:
-#'     - For `"none"`, none validation will be done;
-#'     - For `"draft"`, checking of invalid autosize, autocalculate, numeric,
-#'       integer, and choice field values will be done;
-#'     - For `"final"`, besides above, checking of missing required objects,
-#'     duplicated unique objects, object name conflicts, missing required
-#'     fields and invalid field value reference will also be done.
-#'
-#' * `eplusr.verbose_info`: Whether to show information messages. Default: `TRUE`
-#'
-#' * `eplusr.save_format`: The format to use when saving Idf objects to `.idf`
-#' files. Possible values: `"sorted"`, `"new_top"` and `"new_bottom"`, which
-#' have the same effect as `Save Options` settings `"Sorted"`, `"Original with
-#' New at Top"` and `"Original with New at Bottom"` in IDF Editor, respectively.
-#' Default: `"sorted"`.
-#'
-#' * `eplusr.num_parallel`: Maximum number of parallel simulations to run.
-#' Default: `parallel::detectCores()`.
-#'
-#' * `eplusr.valid_before_run`: Whether to validate the model at the level
-#' "final" before run the simulation. Default: TRUE.
 #'
 #' @name eplusr-package
 "_PACKAGE"
@@ -69,40 +39,122 @@
 .options$num_parallel <- parallel::detectCores()
 .options$valid_before_run <- TRUE
 
-# a helper to check if input option is valid
-# get_option {{{
-get_option <- function (option, internal = FALSE) {
-    if (internal) {
-        opt_nm <- names(option)
-        opt_val <- unname(option)
-    } else {
-        opt_nm <- paste0("eplusr.", option)
-        opt_val <- getOption(opt_nm)
+#' Get and Set eplusr options
+#'
+#' Get and set eplusr options which affect the way in which eplusr computes and
+#' displays its results.
+#'
+#' @param ... Any options can be defined, using `name = value`. All available
+#'     options are below. If no options are given, then all values of current
+#'     options are returned.
+#'
+#' @details
+#' * `num_digits`: Integer indicating the number of decimal places for numeric
+#'     fields. Default: `8L`
+#'
+#' * `view_in_ip`: Whether models should be presented in IP units.  Default:
+#'     `FALSE`
+#'
+#' * `validate_level`: The strictness level of validation during field value
+#'     modification and model error checking. Possible value: `"none"`,
+#'     `"draft"` and `"final"`. Default: `"final"`. Detailed description:
+#'   - For `"none"`, none validation will be done;
+#'   - For `"draft"`, checking of invalid autosize, autocalculate, numeric,
+#'     integer, and choice field values will be done;
+#'   - For `"final"`, besides above, checking of missing required objects,
+#'     duplicated unique objects, object name conflicts, missing required fields
+#'     and invalid field value reference will also be done.
+#'
+#' * `verbose_info`: Whether to show information messages. Default: `TRUE`.
+#'
+#' * `save_format`: The format to use when saving Idf objects to `.idf` files.
+#'     Possible values: `"asis"`, `"sorted"`, `"new_top"` and `"new_bottom"`.
+#'     The later three have the same effect as `Save Options` settings
+#'     `"Sorted"`, `"Original with New at Top"` and `"Original with New at
+#'     Bottom"` in IDF Editor, respectively. For `"asis"`, the saving format
+#'     will be set according to the header of IDF file. If no header found,
+#'     `"sorted"` is used. "Default: `"asis"`.
+#'
+#' * `num_parallel`: Maximum number of parallel simulations to run. Default:
+#'     `parallel::detectCores()`.
+#'
+#' * `valid_before_run`: Whether to validate the model at the level "final"
+#'     before run the simulation. Default: FALSE.
+#'
+#' @export
+# eplusr_option {{{
+eplusr_option <- function (...) {
+    opt <- purrr::splice(...)
+    if (is_empty(opt)) return(.options)
+
+    nm <- names(opt)
+
+    if (is_empty(nm)) {
+        nm <- unlist(opt)
+        assert_that(is_string(nm))
+        return(.options[[nm]])
     }
 
-    key <- ifelse(internal, opt_nm, option)
+    valid <- nm %in% c("num_digits", "view_in_ip", "validate_level",
+        "verbose_info", "save_format", "num_parallel", "valid_before_run")
 
-    is_valid <- switch(key,
-        num_digits = is_count(opt_val),
-        view_in_ip = is.logical(opt_val),
-        validate_level = opt_val %in% c("none", "draft", "final"),
-        verbose_info = is.logical(opt_val),
-        save_format = opt_val %in% c("sorted", "new_top", "new_bottom"),
-        num_parallel = is_count(opt_val),
-        valid_before_run = is.logical(opt_val)
+    if (any(!valid))
+        stop("Invalid option names found: ", backtick_collapse(name[!valid]), ".",
+            call. = FALSE)
+
+    choice_opt <- c("validate_level", "save_format")
+    choice_list <- list(
+        validate_level = c("none", "draft", "final"),
+        save_format = c("asis", "sorted", "new_top", "new_bot")
     )
 
-    if (!is_valid) {
-        msg <- switch(key,
-            num_digits = paste0(backtick(opt_nm), " should be a single positive integer."),
-            num_parallel = paste0(backtick(opt_nm), " should be a single positive integer."),
-            validate_level = paste0(backtick(opt_nm), " should be one of `none`, `draft` or `final`."),
-            save_format = paste0(backtick(opt_nm), " should be one of `sorted`, `new_top` or `new_bottom`."),
-            paste0(backtick(opt_nm), " should be either TRUE or FALSE.")
-        )
-        stop(msg, call. = FALSE)
-    }
+    onoff_opt <- c("view_in_ip", "verbose_info", "valid_before_run")
 
-    opt_val
+    count_opt <- c("num_digits", "num_parallel")
+
+    # assign_onoff_opt {{{
+    assign_onoff_opt <- function (input, name) {
+        if (not_empty(input[[name]])) {
+            assert_that(is_scalar(input[[name]]))
+
+            invalid <- !is.logical(input[[name]])
+
+            if (invalid)
+                stop(backtick(name), " should be one of either `TRUE` or `FALSE`.",
+                    call. = FALSE)
+
+            .options[[name]] <<- input[[name]]
+        }
+    }
+    # }}}
+    # assign_choice_opt {{{
+    assign_choice_opt <- function (input, name) {
+        if (not_empty(input[[name]])) {
+            assert_that(is_string(input[[name]]))
+
+            invalid <- !input[[name]] %in% choice_list[[name]]
+
+            if (invalid)
+                stop(backtick(name), " should be one of ",
+                    backtick_collapse(choice_list[[name]]), ".", call. = FALSE)
+
+            .options[[name]] <<- input[[name]]
+        }
+    }
+    # }}}
+    # assign_count_opt {{{
+    assign_count_opt <- function (input, name) {
+        if (not_empty(input[[name]])) {
+            assert_that(is_count(input[[name]]))
+            .options[[name]] <<- input[[name]]
+        }
+    }
+    # }}}
+
+    for (nm_opt in choice_opt) assign_choice_opt(opt, nm_opt)
+    for (nm_opt in onoff_opt) assign_onoff_opt(opt, nm_opt)
+    for (nm_opt in count_opt) assign_count_opt(opt, nm_opt)
+
+    .options[nm]
 }
 # }}}

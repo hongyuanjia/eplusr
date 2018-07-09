@@ -792,7 +792,7 @@ parse_idf_file <- function (path, idd = NULL) {
         }
     }
 
-    heading_options = list(
+    header_options = list(
         save_format = option_save,
         special_format = option_special_format,
         view_in_ip = option_view_in_ip_units,
@@ -966,8 +966,8 @@ parse_idf_file <- function (path, idd = NULL) {
     value_tbl[ , `:=`(value_upper = toupper(value),
                       value_num = suppressWarnings(as.numeric(value)))]
     value_tbl[ , `:=`(value_ipnum = value_num)]
-    value <- update_value_num(value_tbl, digits = heading_options$num_digits,
-                              in_ip = heading_options$view_in_ip)[
+    value <- update_value_num(value_tbl, digits = header_options$num_digits,
+                              in_ip = header_options$view_in_ip)[
         , list(value_id, value, value_upper, value_num, value_ipnum, object_id, field_id)]
     data.table::setorder(value, value_id)
 
@@ -990,7 +990,7 @@ parse_idf_file <- function (path, idd = NULL) {
     # }}}
 
     idf <- list(version = idf_version,
-                options = heading_options,
+                options = header_options,
                 object = object,
                 value = value,
                 value_reference = value_reference,

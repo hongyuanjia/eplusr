@@ -2,84 +2,124 @@
 #' @importFrom purrr map_int map2_lgl map_lgl iwalk
 #' @importFrom cli cat_line cat_bullet
 #' @importFrom clisymbols symbol
-# i_collect_validate: collect_results validate results {{{
-i_collect_validate <- function (private) {
+NULL
+
+# i_init_validate{{{
+i_init_validate <- function (self, private) {
     private$m_log$validate <- list()
-
-    # for "none" level, nothing will be checked
-    if (private$m_options$validate_level == "none") {
-        data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-        return(private$m_log$validate)
-    }
-
-    # prepare check input data
-    input <- new.env(parent = emptyenv(), size = 5L)
-
-    input$cols <- c("value_id", "value", "object_id", "class_id", "class_name",
-                    "field_order", "full_name", "full_ipname")
-    input$is_idfobj <- ifelse(not_empty(private$m_object_id), TRUE, FALSE)
-    input$is_set <- ifelse(input$is_idfobj && not_empty(private$m_temp$value_to_set), TRUE, FALSE)
-
-    if (private$m_options$validate_level == "draft") {
-        # get input
-        if (input$is_idfobj) {
-            if (input$is_set) {
-                input$value_tbl <- private$m_temp$value_to_set
-            } else {
-                input$value_tbl <- private$value_tbl(with_field = TRUE)
-            }
-        } else {
-            input$value_tbl <- private$value_tbl()
-        }
-
-        i_exclu_empty(private, input)
-        i_check_autosize(private, input)
-        i_check_autocalculate(private, input)
-        i_exclude_valid_auto(private, input)
-        i_check_numeric(private, input)
-        i_check_integer(private, input)
-        i_check_choice(private, input)
-    } else if (private$m_options$validate_level == "final"){
-        # get input
-        if (input$is_idfobj) {
-            input$object_tbl <- private$object_tbl()
-            if (input$is_set) {
-                input$value_tbl <- private$m_temp$value_to_set
-            } else {
-                input$value_tbl <- private$value_tbl(with_field = TRUE, all = TRUE)
-            }
-        } else {
-            input$object_tbl <- private$object_tbl(all = TRUE)
-            input$value_tbl <- private$value_tbl()
-        }
-
-        # only for Idf object
-        if (!input$is_idfobj) {
-            i_check_missing_object(private, input)
-            i_check_duplicate_object(private, input)
-            i_exclu_class(private, input)
-        }
-
-        i_check_conflict_name(private, input)
-
-        i_check_missing(private, input)
-        i_exclu_empty(private, input)
-        i_check_autosize(private, input)
-        i_check_autocalculate(private, input)
-        i_exclude_valid_auto(private, input)
-        i_check_numeric(private, input)
-        i_check_integer(private, input)
-        i_check_choice(private, input)
-        i_check_reference(private, input)
-
-    }
     data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
+}
+# }}}
+# i_validate_in_object {{{
+i_validate_in_object <- function (self, private, object_tbl, value_tbl, temp = TRUE) {
+    i_init_validate(self, private)
+
+    if (eplusr_option("validate_level") == "none") return(private$m_log$validate)
+
+    input <- new.env(parent = emptyenv(), size = 3L)
+    input$type <- "in_object"
+    input$object_tbl <- data.table::copy(object_tbl)
+    input$value_tbl <- data.table::copy(value_tbl)
+
+    if (temp) {
+        input$object_tbl[, `:=`(object_id = paste0(" (Temporary ", object_rleid, ")"))]
+        input$value_tbl[, `:=`(object_id = paste0(" (Temporary ", object_rleid, ")"))]
+    }
+
+    i_check_conflict_name(self, private, input)
+    i_check_missing(self, private, input)
+    i_check_autosize(self, private, input)
+    i_check_autocalculate(self, private, input)
+    i_exclude_valid_auto(self, private, input)
+    i_exclude_empty_field(self, private, input)
+    i_check_numeric(self, private, input)
+    i_check_integer(self, private, input)
+    i_check_choice(self, private, input)
+    i_check_range(self, private, input)
+    i_check_reference(self, private, input)
+
+    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
+}
+# }}}
+# i_validate_idfobject {{{
+i_validate_idfobject <- function (self, private, object) {
+    i_init_validate(self, private)
+
+    if (eplusr_option("validate_level") == "none") return(private$m_log$validate)
+
+    input <- new.env(parent = emptyenv(), size = 3L)
+    input$type <- "idfobject"
+    input$object_tbl <- i_object_tbl_from_which(self, private, object)
+    input$value_tbl <- i_value_tbl_from_which(self, private, object)
+    input$value_tbl[, `:=`(class_name = i_class_name(self, private, class_id))]
+
+    i_check_conflict_name(self, private, input)
+    i_check_missing(self, private, input)
+    i_check_autosize(self, private, input)
+    i_check_autocalculate(self, private, input)
+    i_exclude_valid_auto(self, private, input)
+    i_exclude_empty_field(self, private, input)
+    i_check_numeric(self, private, input)
+    i_check_integer(self, private, input)
+    i_check_choice(self, private, input)
+    i_check_range(self, private, input)
+    i_check_reference(self, private, input)
+
+    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
+
+    private$m_log$validate
+}
+# }}}
+# i_validate_idf {{{
+i_validate_idf <- function (self, private) {
+    private$m_log$validate <- list()
+    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
+
+    if (eplusr_option("validate_level") == "none")
+        return(private$m_log$validate) 
+
+    input <- new.env(parent = emptyenv(), size = 3L)
+    input$type <- "idf"
+    input$object_tbl <- i_object_tbl_from_class(self, private)
+    input$value_tbl <- i_value_tbl_from_which(self, private)
+    input$value_tbl[, `:=`(class_name = i_class_name(self, private, class_id))]
+
+    i_check_missing_object(self, private, input)
+    i_check_duplicate_object(self, private, input)
+    i_check_conflict_name(self, private, input)
+    i_check_missing(self, private, input)
+    i_check_autosize(self, private, input)
+    i_check_autocalculate(self, private, input)
+    i_exclude_valid_auto(self, private, input)
+    i_exclude_empty_field(self, private, input)
+    i_check_numeric(self, private, input)
+    i_check_integer(self, private, input)
+    i_check_choice(self, private, input)
+    i_check_range(self, private, input)
+    i_check_reference(self, private, input)
+
+    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
+
+    private$m_log$validate
+}
+# }}}
+
+# i_is_valid_idf: return true if no validity error found {{{
+i_is_valid_idf <- function (self, private) {
+    i_validate_idf(self, private)
+    all(purrr::map_int(private$m_log$validate, is_empty))
+}
+# }}}
+# i_is_valid_idfobject: return true if no validity error found {{{
+i_is_valid_idfobject <- function (self, private, object) {
+    i_validate_idfobject(self, private, object)
+    all(purrr::map_int(private$m_log$validate, is_empty))
 }
 # }}}
 
 # i_check_missing_object: check missing required objects {{{
 i_check_missing_object <- function (self, private, input) {
-    if (get_option("validate_level") != "final")
+    if (eplusr_option("validate_level") != "final")
         return(private$m_log$validate$missing_object <- list())
 
     exist <- unique(i_class_name(self, private, type = "idf"))
@@ -89,7 +129,7 @@ i_check_missing_object <- function (self, private, input) {
 # }}}
 # i_check_duplicate_object: check duplicated unique objects {{{
 i_check_duplicate_object <- function (self, private, input) {
-    if (get_option("validate_level") != "final")
+    if (eplusr_option("validate_level") != "final")
         return(private$m_log$validate$duplicate_object <- list())
 
     dup_uni <- input$object_tbl[unique_object == TRUE, list(num = .N),
@@ -102,7 +142,7 @@ i_check_duplicate_object <- function (self, private, input) {
 # }}}
 # i_check_conflict_name: objects in the same class have exact the same name {{{
 i_check_conflict_name <- function (self, private, input) {
-    if (get_option("validate_level") != "final")
+    if (eplusr_option("validate_level") != "final")
         return(private$m_log$validate$conflict_name <- list())
 
     ori_obj_tbl <- input$object_tbl[!is.na(object_name)]
@@ -251,7 +291,7 @@ i_check_range <- function (self, private, input) {
 # }}}
 # i_check_reference: invalid reference fields {{{
 i_check_reference <- function (self, private, input) {
-    if (get_option("validate_level") != "final") return()
+    if (eplusr_option("validate_level") != "final") return()
 
     val_tbl <- input$value_tbl[has_object_list == TRUE]
 
@@ -357,118 +397,6 @@ i_print_single_validate <- function (res, type) {
 }
 # }}}
 
-# i_init_validate{{{
-i_init_validate <- function (self, private) {
-    private$m_log$validate <- list()
-    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-}
-# }}}
-# i_validate_in_object {{{
-i_validate_in_object <- function (self, private, object_tbl, value_tbl, temp = TRUE) {
-    i_init_validate(self, private)
-
-    if (get_option("validate_level") == "none") return(private$m_log$validate)
-
-    input <- new.env(parent = emptyenv(), size = 3L)
-    input$type <- "in_object"
-    input$object_tbl <- data.table::copy(object_tbl)
-    input$value_tbl <- data.table::copy(value_tbl)
-
-    if (temp) {
-        input$object_tbl[, `:=`(object_id = paste0(" (Temporary ", object_rleid, ")"))]
-        input$value_tbl[, `:=`(object_id = paste0(" (Temporary ", object_rleid, ")"))]
-    }
-
-    i_check_conflict_name(self, private, input)
-    i_check_missing(self, private, input)
-    i_check_autosize(self, private, input)
-    i_check_autocalculate(self, private, input)
-    i_exclude_valid_auto(self, private, input)
-    i_exclude_empty_field(self, private, input)
-    i_check_numeric(self, private, input)
-    i_check_integer(self, private, input)
-    i_check_choice(self, private, input)
-    i_check_range(self, private, input)
-    i_check_reference(self, private, input)
-
-    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-}
-# }}}
-# i_validate_idfobject {{{
-i_validate_idfobject <- function (self, private, object) {
-    i_init_validate(self, private)
-
-    if (get_option("validate_level") == "none") return(private$m_log$validate)
-
-    input <- new.env(parent = emptyenv(), size = 3L)
-    input$type <- "idfobject"
-    input$object_tbl <- i_object_tbl_from_which(self, private, object)
-    input$value_tbl <- i_value_tbl_from_which(self, private, object)
-    input$value_tbl[, `:=`(class_name = i_class_name(self, private, class_id))]
-
-    i_check_conflict_name(self, private, input)
-    i_check_missing(self, private, input)
-    i_check_autosize(self, private, input)
-    i_check_autocalculate(self, private, input)
-    i_exclude_valid_auto(self, private, input)
-    i_exclude_empty_field(self, private, input)
-    i_check_numeric(self, private, input)
-    i_check_integer(self, private, input)
-    i_check_choice(self, private, input)
-    i_check_range(self, private, input)
-    i_check_reference(self, private, input)
-
-    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-
-    private$m_log$validate
-}
-# }}}
-# i_validate_idf {{{
-i_validate_idf <- function (self, private) {
-    private$m_log$validate <- list()
-    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-
-    if (get_option("validate_level") == "none")
-        return(private$m_log$validate) 
-
-    input <- new.env(parent = emptyenv(), size = 3L)
-    input$type <- "idf"
-    input$object_tbl <- i_object_tbl_from_class(self, private)
-    input$value_tbl <- i_value_tbl_from_which(self, private)
-    input$value_tbl[, `:=`(class_name = i_class_name(self, private, class_id))]
-
-    i_check_missing_object(self, private, input)
-    i_check_duplicate_object(self, private, input)
-    i_check_conflict_name(self, private, input)
-    i_check_missing(self, private, input)
-    i_check_autosize(self, private, input)
-    i_check_autocalculate(self, private, input)
-    i_exclude_valid_auto(self, private, input)
-    i_exclude_empty_field(self, private, input)
-    i_check_numeric(self, private, input)
-    i_check_integer(self, private, input)
-    i_check_choice(self, private, input)
-    i_check_range(self, private, input)
-    i_check_reference(self, private, input)
-
-    data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
-
-    private$m_log$validate
-}
-# }}}
-
-# i_is_valid_idf: return true if no validity error found {{{
-i_is_valid_idf <- function (self, private) {
-    i_validate_idf(self, private)
-    all(purrr::map_int(private$m_log$validate, is_empty))
-}
-# }}}
-# i_is_valid_idfobject: return true if no validity error found {{{
-i_is_valid_idfobject <- function (self, private, object) {
-    i_validate_idfobject(self, private, object)
-    all(purrr::map_int(private$m_log$validate, is_empty))
-}
-# }}}
 #' @export
 # print.IdfValidity {{{
 print.IdfValidity <- function (x, ...) {

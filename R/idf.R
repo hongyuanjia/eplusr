@@ -267,8 +267,8 @@
 #' @section Validation:
 #'
 #' ```
-#' model$validate(level = c("final", "draft", "none"))
-#' model$is_valid(level = c("final", "draft", "none"))
+#' model$validate()
+#' model$is_valid()
 #' ```
 #'
 #' `$validate` will check if there are errors in current model under different
@@ -277,15 +277,17 @@
 #' `$is_valid` will check if there are no errors in current model under different
 #'     strictness level.
 #'
-#' There are three different validate levels, i.e. `"none"`, `"draft"` and
-#'     `"final"`:
+#'
+#' The strictness level can be changed using [eplusr_option()]. Default is
+#'     `"final". `There are three different validate levels, i.e. `"none"`,
+#'     `"draft"` and `"final"`:
 #'
 #'   * For `"none"`, none validation will be done;
 #'   * For `"draft"`, checking of invalid autosize, autocalculate, numeric,
 #'     integer, and choice field values will be done;
 #'   * For `"final"`, besides above, checking of missing required objects,
-#'   duplicated unique objects, object name conflicts, missing required
-#'   fields and invalid field value reference will also be done.
+#'     duplicated unique objects, object name conflicts, missing required fields
+#'     and invalid field value reference will also be done.
 #'
 #' @section Format Output:
 #'
@@ -494,10 +496,10 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
                 , object_order := 0L]
 
-            private$m_log$view_in_ip <- getOption("eplusr.view_in_ip")
-            private$m_log$num_digits <- getOption("eplusr.num_digits")
+            private$m_log$view_in_ip <- eplusr_option("view_in_ip")
+            private$m_log$num_digits <- eplusr_option("num_digits")
+            private$m_log$save_format <- idf_file$options$save_format
 
-            # TODO: give verbose info about different save format
             # create the IdfObject R6ClassGenerator for this specific Idf
             private$m_idfobj_generator <- create_idfobj_generator(self, private, IdfObject)
         },
@@ -582,7 +584,7 @@ Idf <- R6::R6Class(classname = "Idf",
         string = function (comment = TRUE, header = TRUE, ...)
             i_object_string(self, private, comment = comment, header = header, ...),
 
-        save = function (path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
+        save = function (path = NULL, format = c("asis", "sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
             i_idf_save(self, private, path, format, overwrite, copy_external),
 
         run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE)

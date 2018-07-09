@@ -35,7 +35,7 @@
 #' idfobj$has_ref()
 #'
 #' # data extraction
-#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 #'
 #' # formatting
 #' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
@@ -110,8 +110,8 @@
 #' @section Validation:
 #'
 #' ```
-#' idfobj$validate(level = c("final", "draft", "none"))
-#' idfobj$is_valid(level = c("final", "draft", "none"))
+#' idfobj$validate()
+#' idfobj$is_valid()
 #' ```
 #'
 #' `$validate` will check if there are errors in current object under different
@@ -120,8 +120,10 @@
 #' `$is_valid` will check if there are no errors in current object under
 #'     different strictness level.
 #'
-#' There are three different validate levels, i.e. `"none"`, `"draft"` and
-#'     `"final"`:
+#' The strictness level can be changed using [eplusr_option()]. Default is
+#'     `"final". `There are three different validate levels, i.e. `"none"`,
+#'     `"draft"` and `"final"`:
+#'
 #'   * For `"none"`, none validation will be done;
 #'   * For `"draft"`, checking of invalid autosize, autocalculate, numeric,
 #'     integer, and choice field values will be done;
@@ -154,7 +156,7 @@
 #' @section Data Extraction:
 #'
 #' ```
-#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 #' ```
 #'
 #' `$table` will return a data.table that contains all data of current object.
@@ -168,7 +170,7 @@
 #' * `string_value`: If `TRUE`, all field values will be returned as character.
 #'     Default: `TRUE`
 #' * `in_ip`: If `TRUE`, IP units and values will be returned. Default: the
-#'     value of `getOption("eplusr.view_in_ip")`.
+#'     value of `eplusr_option("view_in_ip")`.
 #'
 #' @section Formatting:
 #'
@@ -269,7 +271,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             i_idfobj_has_ref_from(self, private, private$m_object_id) ||
             i_idfobj_has_ref_by(self, private, private$m_object_id),
 
-        table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+        table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
             i_idfobj_value_table(self, private, private$m_object_id, all, unit, wide, string_value, in_ip),
 
         string = function (comment = TRUE, leading = 4L, sep_at = 29L)

@@ -39,7 +39,7 @@ idfobj$has_ref_from()
 idfobj$has_ref()
 
 # data extraction
-idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 
 # formatting
 idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
@@ -113,8 +113,8 @@ values if possible.
 }
 
 \section{Validation}{
-\preformatted{idfobj$validate(level = c("final", "draft", "none"))
-idfobj$is_valid(level = c("final", "draft", "none"))
+\preformatted{idfobj$validate()
+idfobj$is_valid()
 }
 
 \code{$validate} will check if there are errors in current object under different
@@ -123,8 +123,9 @@ strictness level.
 \code{$is_valid} will check if there are no errors in current object under
 different strictness level.
 
-There are three different validate levels, i.e. \code{"none"}, \code{"draft"} and
-\code{"final"}:
+The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_option()}}. Default is
+\code{"final".}There are three different validate levels, i.e. \code{"none"},
+\code{"draft"} and \code{"final"}:
 \itemize{
 \item For \code{"none"}, none validation will be done;
 \item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
@@ -157,7 +158,7 @@ other objects or has been referenced by other objects.
 }
 
 \section{Data Extraction}{
-\preformatted{idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+\preformatted{idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 }
 
 \code{$table} will return a data.table that contains all data of current object.
@@ -172,7 +173,7 @@ returned as well. Default: \code{FALSE}
 \item \code{string_value}: If \code{TRUE}, all field values will be returned as character.
 Default: \code{TRUE}
 \item \code{in_ip}: If \code{TRUE}, IP units and values will be returned. Default: the
-value of \code{getOption("eplusr.view_in_ip")}.
+value of \code{eplusr_option("view_in_ip")}.
 }
 }
 
