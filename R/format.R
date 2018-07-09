@@ -10,12 +10,6 @@ format_header <- function (format = c("sorted", "new_top", "new_bottom"), view_i
 
     header_option <- paste0("!-Option ", format)
 
-    # if (options$special_format) {
-    #     warning("Currently option 'UseSpecialFormat' is not supported. ",
-    #             "Standard format will be used.",
-    #             call. = FALSE)
-    # }
-
     special_format <- NULL
     if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
 
@@ -42,10 +36,9 @@ format_output <- function (value_tbl, comment_tbl, ...) {
 
     dots <- list(...)
     header <- dots$header %||% TRUE
-    sav_fmt <- dots$format %||% get_option("save_format")
-    sav_fmt <- get_option(c(save_format = sav_fmt), internal = TRUE)
+    sav_fmt <- dots$format %||% eplusr_option("save_format")
     leading <- dots$leading %||% 4L
-    in_ip <- dots$in_ip %||% get_option("view_in_ip")
+    in_ip <- dots$in_ip %||% eplusr_option("view_in_ip")
     sep_at <- dots$sep_at %||% 29L
     index <- dots$index %||% FALSE
     blank <- dots$blank %||% FALSE

@@ -279,8 +279,8 @@ will also be deleted.
 }
 
 \section{Validation}{
-\preformatted{model$validate(level = c("final", "draft", "none"))
-model$is_valid(level = c("final", "draft", "none"))
+\preformatted{model$validate()
+model$is_valid()
 }
 
 \code{$validate} will check if there are errors in current model under different
@@ -289,15 +289,16 @@ strictness level.
 \code{$is_valid} will check if there are no errors in current model under different
 strictness level.
 
-There are three different validate levels, i.e. \code{"none"}, \code{"draft"} and
-\code{"final"}:
+The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_option()}}. Default is
+\code{"final".}There are three different validate levels, i.e. \code{"none"},
+\code{"draft"} and \code{"final"}:
 \itemize{
 \item For \code{"none"}, none validation will be done;
 \item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
 integer, and choice field values will be done;
 \item For \code{"final"}, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required
-fields and invalid field value reference will also be done.
+duplicated unique objects, object name conflicts, missing required fields
+and invalid field value reference will also be done.
 }
 }
 

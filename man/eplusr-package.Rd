@@ -15,51 +15,21 @@ and makes it less painful to do parametric simulations and analysis.
 
 With eplusr, you can do:
 \itemize{
-\item Read and parse EnergyPlus \code{IDF} files
+\item Read, parse and modify EnergyPlus Weather File (EPW).
+\item Read and parse EnergyPlus IDF files.
 \item Query on models, including classes, objects and fields
-\item Directly add, modify, duplicate, and delete objects of \code{IDF} in R.
+\item Directly add, modify, duplicate, and delete objects of IDF in R.
 \item Automatically change referred fields when modifying objects.
 \item Save the changed models into standard formats in the same way as IDFEditor
 distributed along with EnergyPlus.
-\itemize{
 \item Run your models directly and collect the simulation output of EnergyPlus
 in R.
-}
+\item Run parametric analysis parallelly and collect results in one go.
 }
 
 To learn more about eplusr, start with the vignettes:
 \code{browseVignettes(package = "eplusr")}
 }
-\section{Package options}{
-
-\itemize{
-\item \code{eplusr.num_digits}: Integer indicating the number of decimal places for
-numeric fields. Default: \code{8L}
-\item \code{eplusr.view_in_ip}: Whether models should be presented in IP units.
-Default: \code{FALSE}
-\item \code{eplusr.validate_level}: The strictness level of validation during field
-value modification and model error checking. Possible value: \code{"none"},
-\code{"draft"} and \code{"final"}. Default: \code{"final"}. Detailed description:
-\itemize{
-\item For \code{"none"}, none validation will be done;
-\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;
-\item For \code{"final"}, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required
-fields and invalid field value reference will also be done.
-}
-\item \code{eplusr.verbose_info}: Whether to show information messages. Default: \code{TRUE}
-\item \code{eplusr.save_format}: The format to use when saving Idf objects to \code{.idf}
-files. Possible values: \code{"sorted"}, \code{"new_top"} and \code{"new_bottom"}, which
-have the same effect as \code{Save Options} settings \code{"Sorted"}, \code{"Original with New at Top"} and \code{"Original with New at Bottom"} in IDF Editor, respectively.
-Default: \code{"sorted"}.
-\item \code{eplusr.num_parallel}: Maximum number of parallel simulations to run.
-Default: \code{parallel::detectCores()}.
-\item \code{eplusr.valid_before_run}: Whether to validate the model at the level
-"final" before run the simulation. Default: TRUE.
-}
-}
-
 \seealso{
 Useful links:
 \itemize{

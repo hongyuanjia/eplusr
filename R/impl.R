@@ -483,7 +483,8 @@ i_field_index_from_which <- function (self, private, class, which = NULL, strict
 # }}}
 
 # i_field_name {{{
-i_field_name <- function (self, private, class, index = NULL, lower = FALSE, unit = FALSE, in_ip = get_option("view_in_ip")) {
+i_field_name <- function (self, private, class, index = NULL, lower = FALSE,
+                          unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
     assert_that(is_scalar(class))
 
     fld_tbl <- i_field_tbl(self, private, class)
@@ -554,7 +555,7 @@ i_assert_valid_field_name <- function (self, private, class, name) {
 # }}}
 
 # i_field_unit {{{
-i_field_unit <- function (self, private, class, which = NULL, in_ip = get_option("view_in_ip")) {
+i_field_unit <- function (self, private, class, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     fld_tbl <- i_field_tbl_from_which(self, private, class, which)
 
     if (in_ip)
@@ -565,7 +566,7 @@ i_field_unit <- function (self, private, class, which = NULL, in_ip = get_option
 # }}}
 
 # i_field_default {{{
-i_field_default <- function (self, private, class, which = NULL, in_ip = get_option("view_in_ip")) {
+i_field_default <- function (self, private, class, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     fld_tbl <- i_field_tbl_from_which(self, private, class, which)
 
     fld_def <- private$m_idd_tbl$field_default[fld_tbl, on = "field_id"]
@@ -1066,7 +1067,7 @@ i_assert_can_add_object <- function (self, private, class) {
     if (any(is_version))
         stop("Add `Version` object directly is prohibited.", call. = FALSE)
 
-    if (get_option("validate_level") != "final") return()
+    if (eplusr_option("validate_level") != "final") return()
 
     is_unique <- class %in% i_unique_class_name(self, private)
     if (!all(is_unique)) return()
@@ -1118,7 +1119,7 @@ i_assert_can_del_object <- function (self, private, object) {
     if (anyDuplicated(obj_tbl$object_id))
         stop("`object` should not contain any duplication.", call. = FALSE)
 
-    if (get_option("validate_level") != "final") return()
+    if (eplusr_option("validate_level") != "final") return()
 
     class_name <- obj_tbl$class_name
 
@@ -1279,7 +1280,7 @@ i_dup_object = function (self, private, which, new_name = NULL) {
         }
 
         # check if trying to assign the same name
-        if (get_option("validate_level") == "final") {
+        if (eplusr_option("validate_level") == "final") {
             same_name <- obj_tbl[has_name == TRUE & object_name_upper == new_object_name_upper]
             if (not_empty(same_name)) {
                 stop("Duplicate objects without new names is prohibited in `final` ",
@@ -1588,7 +1589,7 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 
     # check if target objects are referenced {{{
     if (not_empty(ref_by_tbl)) {
-        if (get_option("validate_level") == "final") {
+        if (eplusr_option("validate_level") == "final") {
             stop("Delete object that are referenced by others is prohibited ",
                 "in `final` validation level. Failed to delete target object ",
                 "[ID:", backtick_collpase(obj_tbl$object_id), "]\n:",
@@ -1649,9 +1650,9 @@ i_search_value = function (self, private, pattern) {
         private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L]
 
-    cli::cat_line(format_objects(value_tbl, in_ip = getOption("eplusr.view_in_ip")))
+    cli::cat_line(format_objects(value_tbl, in_ip = eplusr_option("view_in_ip")))
 
-    return(invisible(value_list(value_tbl, in_ip = getOption("eplusr.view_in_ip"))))
+    return(invisible(value_list(value_tbl, in_ip = eplusr_option("view_in_ip"))))
 }
 # }}}
 
@@ -1689,8 +1690,8 @@ i_replace_value = function (self, private, pattern, replacement) {
 
     value_tbl_new <- update_value_num(
         value_tbl_after,
-        get_option("num_digits"),
-        get_option("view_in_ip"))
+        eplusr_option("num_digits"),
+        eplusr_option("view_in_ip"))
 
     private$m_idf_tbl$value[value_id %in% value_tbl_after$value_id, `:=`(
         value = value_tbl_after$value,
@@ -1704,7 +1705,7 @@ i_replace_value = function (self, private, pattern, replacement) {
     # log uuid
     i_log_new_uuid(self, private)
 
-    cli::cat_line(format_objects(value_tbl, in_ip = getOption("eplusr.view_in_ip")))
+    cli::cat_line(format_objects(value_tbl, in_ip = eplusr_option("view_in_ip")))
 }
 # }}}
 
@@ -1765,7 +1766,7 @@ i_assert_valid_input_format <- function (case, value, comment, default, type = c
     type <- match.arg(type)
     key <- switch(type, add = "class", set = "object")
 
-    if (is_empty(value) & type == "add" & get_option("validate_level") == "final")
+    if (is_empty(value) & type == "add" & eplusr_option("validate_level") == "final")
         stop("Adding empty object is prohibited in `final` validation level.",
             call. = FALSE)
 
@@ -1872,7 +1873,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
     # }}}
 
     # stop adding empty objects in `final` validation level {{{
-    if (type == "add" && get_option("validate_level") == "final" && !no_empty) {
+    if (type == "add" && eplusr_option("validate_level") == "final" && !no_empty) {
         msg <- val_in_empty[, paste0("  ", lpad(class_rleid), "| Class ",
             backtick(class_name_in), ".", collpase = "\n")]
         stop("Adding empty objects is prohibited in `final` validation ",
@@ -1993,8 +1994,8 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
     # update value table number
     data.table::setorder(val_tbl, object_rleid, -field_index)
     val_tbl[, `:=`(object_rleid = object_rleid[1]), by = list(cumsum(!is.na(object_rleid)))]
-    val_tbl <- update_value_num(val_tbl, digits = get_option("num_digits"),
-        in_ip = get_option("view_in_ip"), prefix = "value")
+    val_tbl <- update_value_num(val_tbl, digits = eplusr_option("num_digits"),
+        in_ip = eplusr_option("view_in_ip"), prefix = "value")
     data.table::setorder(val_tbl, object_rleid, field_index)
 
     # add class name
@@ -2762,7 +2763,7 @@ i_log_saved_idf <- function (self, private) {
 
 # i_verbose_info {{{
 i_verbose_info <- function (self, private, ...) {
-    if (get_option("verbose_info")) {
+    if (eplusr_option("verbose_info")) {
         cli::cat_rule("Info")
         cat(..., "\n", sep = "")
     }
@@ -2775,8 +2776,8 @@ i_lower_field_name <- function (field_name) tolower(gsub("[- :]", "_", field_nam
 
 # i_need_update_num {{{
 i_need_update_num <- function (self, private,
-                               view_in_ip = get_option("view_in_ip"),
-                               num_digits = get_option("num_digits")) {
+                               view_in_ip = eplusr_option("view_in_ip"),
+                               num_digits = eplusr_option("num_digits")) {
     if (private$m_log$view_in_ip != view_in_ip) {
         private$m_log$view_in_ip <- view_in_ip
         return(TRUE)
@@ -2805,7 +2806,7 @@ can_locate_idf_file <- function (self, private) {
 
 # TODO: set value or add object using a data.table
 # i_idf_save {{{
-i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.save_format"),
+i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save_format"),
                         overwrite = FALSE, copy_external = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
@@ -2827,6 +2828,7 @@ i_idf_save <- function (self, private, path = NULL, format = getOption("eplusr.s
             msg = paste0("`path` should have an extension of `idf` or `imf`."))
     }
 
+    if (format == "asis") format <- private$m_log$save_format
     str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
     if (file.exists(path)) {
         if (!overwrite) {
@@ -2956,9 +2958,9 @@ i_idf_resolve_external_link <- function (self, private, old, new, copy = TRUE) {
     on.exit(setwd(ori), add = TRUE)
 
     # set validate level to `none` to speed up
-    ori_level <- get_option("validate_level")
-    options(eplusr.validate_level = "none")
-    on.exit(options(eplusr.validate_level = ori_level), add = TRUE)
+    ori_level <- eplusr_option("validate_level")
+    eplusr_option(validate_level = "none")
+    on.exit(eplusr_option(validate_level = ori_level), add = TRUE)
 
     # get full path of old and new
     old_dir <- normalizePath(dirname(old), mustWork = FALSE)
@@ -3076,7 +3078,7 @@ i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE,
 # }}}
 
 # i_idfobj_get_value {{{
-i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = get_option("view_in_ip")) {
+i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     val_tbl <- i_value_tbl_from_field_which(self, private, object, which)
 
     # delete extra fields
@@ -3110,11 +3112,11 @@ i_idfobj_set_value <- function (self, private, object, ..., default = TRUE) {
 # i_idfobj_value_table {{{
 i_idfobj_value_table <- function (self, private, object, all = FALSE, unit = TRUE,
                                   wide = FALSE, string_value = TRUE,
-                                  in_ip = get_option("view_in_ip")) {
+                                  in_ip = eplusr_option("view_in_ip")) {
     val_tbl_full <- i_value_tbl_from_which(self, private, object)
     # change to IP numbers and names if necessary
     if (i_need_update_num(self, private, view_in_ip = in_ip))
-        val_tbl_full <- update_value_num(val_tbl_full, get_option("num_digits"), in_ip)
+        val_tbl_full <- update_value_num(val_tbl_full, eplusr_option("num_digits"), in_ip)
 
     ip <- ifelse(in_ip, "ip", "")
 
@@ -3279,7 +3281,7 @@ i_print_idfobj <- function (self, private, object, comment = TRUE, auto_sep = FA
         sep_at <- 20L
 
     # value
-    fld <- format_field(val_tbl, leading = 1L, in_ip = get_option("view_in_ip"),
+    fld <- format_field(val_tbl, leading = 1L, in_ip = eplusr_option("view_in_ip"),
         sep_at = sep_at, index = TRUE, blank = TRUE, required = TRUE)
 
     # remove class line
@@ -3334,7 +3336,7 @@ i_print_iddobj <- function (self, private) {
         `:=`(ext = paste0(" <", clisymbols::symbol$arrow_down, ">"))]
     fld_tbl[required_field == TRUE, `:=`(req = "* ")]
 
-    if (get_option("view_in_ip"))
+    if (eplusr_option("view_in_ip"))
         fld_tbl[, cli::cat_line("  ", idx, ":", req, full_ipname, ext)]
     else
         fld_tbl[, cli::cat_line("  ", idx, ":", req, full_name, ext)]
