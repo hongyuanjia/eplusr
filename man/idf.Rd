@@ -4,369 +4,420 @@
 \name{idf}
 \alias{idf}
 \alias{read_idf}
-\title{Read, modify, save, run and analyze EnergyPlus models}
+\title{Read, modify, and run an EnergyPlus model}
 \usage{
 read_idf(path, idd = NULL)
 }
 \description{
-IDFEditor distributed along with
-\href{https://www.energyplus.net}{EnergyPlus} provides full support for
-preparing EnergyPus IDF and IMF files for simulations. The parsing and
-writing process of IDF and IDD files in \code{eplusr} is basically the same
-as that in IDFEditor. But \code{eplusr} takes advantage of the powerful
-\code{data.table} package to speed up the whole process and store the
-results. The IDD files for EnergyPlus 8.5 to 8.8 have been pre-parsed and
-stored internally and will automatically be used when parsing \code{IDF} and
-\code{IMF} files. The souce codes of IDFEditor can be found on
-\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{GitHub}
-. There is still an option to give an additional IDD file path to parse if
-you want. However, it will still take about 3-4 sec to parse an IDD file
-which is much slower than IDFEditor written in Visual Basic.
+eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
+in a hierarchical structure, which was extremely inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library},
+but with total different data structure under the hook. Please follow the link
+above if you want to know the detailed implementations of IDF in EnergyPlus
+and OpenStudio.
 }
-\details{
-Basically, all model data are stored as \code{data.table}s. And each object
-in the model has an unique \strong{\code{ID}}. Once you have the object ID,
-you can set fields (using \code{$set}) in the object, duplicate (using
-\code{$dup}), delete (using \code{del}) the object.
-}
-\section{Usage}{
-\preformatted{model <- Idf$new(path, idd = NULL)
+\section{Overview}{
 
+
+eplusr uses \code{Idf} class to present the whole IDF file and use \code{IdfObject}
+to present a single object in IDF. Both \code{Idf} and \code{IdfObject} contain member
+functions for helping modify the data in IDF so it complies with the
+underlying IDD (EnergyPlus Input Data Dictionary).
+
+Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
+data in \code{data.frame} format. To speed up the whole process, the
+\code{\link[data.table:data.table]{data.table::data.table()}} is used instead of the base \code{data.frame}. Every
+IDF is parsed and stored in four tables:
+\itemize{
+\item \code{object}: contains object IDs and names.
+\item \code{value}: contains field values.
+\item \code{comment}: contains object comments.
+\item \code{value_reference}: contains cross-reference of field values.
+}
+
+IDD file is parsed and stored in a similar structure. For details, please see
+\link{idd}.
+
+So to modify an EnergyPlus model in eplusr is equal to change the data in
+those four tables accordingly, in the context of specific IDD data.
+}
+
+\section{Usage}{
+\preformatted{# read
+model <- read_idf(path, idd = NULL)
+
+# basic info
 model$version()
 model$path()
-model$group_name(where = c("idf", "idd"))
-model$class_name(where = c("idf", "idd"))
-model$object_id(class = NULL)
+model$group_name(all = FALSE)
+model$class_name(all = FALSE)
+model$is_valid_group(group, all = FALSE)
+model$is_valid_class(class, all = FALSE)
 
-model$get_options(options = NULL)
-model$set_options(...)
-
+# definitaion
 model$definition(class)
 
+# object info
+model$object_id(class = NULL, simplify = FALSE)
+model$object_name(class = NULL, simplify = FALSE)
+model$object_num(class = NULL)
+model$is_valid_id(id)
+model$is_valid_name(name)
+
+# object query
 model$object(id)
-model$objects(ids)
-model$object_in_class(class, index = NULL)
-model$objects_in_class(class, indexes = NULL)
+model$object_in_class(class)
+model$search_object(pattern, class = NULL)
+
+# model modification
+model$dup_object(object, new_name = NULL)
+model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
+model$ins_object(object)
+model$set_object(object)
+model$del_object(object, referenced = FALSE)
 model$search_value(pattern)
 model$replace_value(pattern, replacement)
 
-model$add_object(class, ..., default = TRUE)
-model$dup_object(id, new_name = NULL)
-model$ins_object(objects)
-model$set_object(id, ...)
-model$del_object(id, referenced = FALSE)
-
+# model validation
 model$validate()
+model$is_valid
 
-model$string(header = TRUE, comment = TRUE)
-model$save(path = NULL, overwrite = FALSE)
+# model formatting
+model$string(comment = TRUE, header = TRUE, ...)
 
-model$copy()
-
-model$is_valid_class(class, where = "idf")
-model$is_valid_id(id)
+# model saving
 model$is_unsaved()
-model$is_valid()
+model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 
-model$run(weather = NULL, dir = NULL, wait = TRUE)
-model$errors(info = TRUE)
-model$collect()
-model$output_dir(open = FALSE)
+# model clone
+model$clone()
 
+# run simulation
+model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
+
+# print
 model$print(plain = FALSE)
 }
 }
 
 \section{Read}{
-\preformatted{model <- eplus_model$new(path, idd = NULL)
+\preformatted{model <- read_idf(path, idd = NULL)
 }
+
+\strong{Arguments}
 \itemize{
 \item \code{path}: Path to EnergyPlus \code{IDF} or \code{IMF} file. The file extension does not
-matter. So models stored in \code{TXT} file are still able to correctly be
+matter. So models stored in \code{TXT} format are still able to correctly be
 parsed.
 \item \code{idd}: Path to \code{Energy+.idd} file. If NULL, the pre-parsed \code{Energy+.idd}
-files stored internally from EnergyPlus v8.0 to 8.8 will be used.
+files stored internally from EnergyPlus v8.3 to 8.8 will be used
+according to the version of input model, if possible.
 }
 }
 
-\section{Query}{
-\preformatted{model$all(type, class = NULL)
-model$contains(match, scale)
-model$matches(match, ..., scale)
-model$get(...)
+\section{Basic Info}{
+\preformatted{model$version()
+model$path()
+model$group_name(all = FALSE)
+model$class_name(all = FALSE)
+model$is_valid_group(group, all = FALSE)
+model$is_valid_class(class, all = FALSE)
 }
 
-\code{$all} will give you all valid components you specified using \code{type} in
-current model for type "id" and "class". You can find all available fields
-for all valid class in IDD using \code{$all(type = "field", class = "any_valid_class_in_IDD")} which makes it handy to be used along with
-\code{$add}.
+\code{$version} will return the version of current model.
 
-\code{$contains} and \code{$matches} will search and return objects that contain the
-string or match the regular expression you give.
+\code{$path} will return the path of current model or \code{NULL} if the model is
+created using a character vector.
 
-\code{$get} will return you the objects with valid IDs you give.
+\code{$group_name} will return all groups the model contains when \code{all} is \code{FALSE}
+or all groups the Idd contains when \code{all} is \code{TRUE}.
+
+\code{$class_name} will return all classes the model contains when \code{all} is \code{FALSE}
+or all classes the Idd contains when \code{all} is \code{TRUE}.
+
+\code{$is_valid_group} will return \code{TRUE}s if given group names are valid for
+current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} is
+\code{TRUE}).
+
+\code{$is_valid_class} will return \code{TRUE}s if given class names are valid for
+current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} is
+\code{TRUE}).
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{type}: Should be one of "id", "class" and "field". "id" will give you all
-object IDs in current model. "class" will give you all classes
-existed in current model. "field" will give you all valid fields in
-the class with required fields marked with "*".
-\item \code{class}: An valid class name. Only required when \code{type} is set to "field".
-you can find all valid class names using \code{$all("class")}.
-\item \code{match}: A string for \code{$contains} and a regular expression for \code{$matches}
-you want to search or match. All \code{...} in \code{$matches} will be
-parsed to \code{grepl}. See \code{\link{grepl}}.
-\item \code{scale}: Where you want to search. Should be one of "class" and "field".
-If "class", only class names existing in current model will be
-searched. If "field", only fields in current model will be
-searched. This is a handy option when you want to see if an object
-e.g. one material, is referred by other objects e.g.
-constructions.
-\item \code{...} (in \code{$get}): Valid object IDs. You can find all valid object IDs
-using \code{$all("id")}.
+\item \code{all}: If \code{FALSE}, only values in current model will be returned. If
+\code{TRUE}, all values in Idd will be returned. Default: \code{FALSE}.
+\item \code{group}: A character vector contains group names.
+\item \code{class}: A character vector contains class names.
 }
 }
 
-\section{Modify}{
-\preformatted{model$add(class, ..., min = TRUE)
-model$set(id, ...)
-model$dup(id, new_name = NULL)
-model$del(id, force = FALSE)
-model$hide(id, force = FALSE)
+\section{Definition}{
+\preformatted{model$definition(class)
 }
 
-\code{$add} will add an object in the \code{class} you give. All fields will be set to
-their defaults if applicable.
-
-\code{$set} will set curtain fields in the objects specified by \code{id}.
-
-\code{$dup} will duplicate current object specified by \code{id}.
-
-\code{$del} will delete current object specified by \code{id}. If the object is
-referred by other object(s), an error will given showing the fields that
-were referred. You can still delete the object if you want by setting
-\code{force} to TRUE.
-
-\code{$hide} is the same as \code{$del}, except that \code{$hide} will comment out the
-object instead of deleting it. This make if possible for you to get the
-hidden objects back by uncomment it using any test editor.
-
-All newly added, modified, deleted and hidden fields will be marked with
-"(+)", "(~)", "(-)" and "(!)" respectively. The valid IDs will be appended
-after \code{$add} and \code{$dup}, and the newly added (duplicated) object will have
-the max ID.  \emph{Note} that the IDs of deleted and hidden objects are invalid
-after \code{$del} and cannot be applied to methods \code{$set}, \code{$dup}, \code{$del} and
-\code{$hide}, of course. However, unless you save the model, the deleted and
-hidden objects are still there internally but with a special mark to prevent
-them accessable. This is done by purpose, in order to provide a new method
-call \code{$undo} in the future, which will enable you to un-delete or un-hide
-the objects.
+\code{$definition} will return the definitions, i.e. the \code{IddObject}s, of given
+classes which contain all data used for parsing \code{IdfObject}s. For details
+of \code{IdfObject}, please see \link{idd_object}.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{class}: An valid class name. Only required when \code{type} is set to "field".
-you can find all valid class names using \code{$all("class")}.
-\item \code{id}: A valid object IDs. You can find all valid object IDs using
-\code{$all("id")}.
-\item \code{min}: If TRUE, only minimum fields will be created. Else,
-all valid fields will be created. Default is TRUE.
-\item \code{new_name}: The new name of the duplicated object if applicable. If NULL,
-the duplicated object will have the same name of the original
-object except with a suffix of "_1", "_2" and etc.
-\item \code{force}: Whether delete or hide the object even it has been referred by
-others. Default is FALSE.
-\item \code{...}: Field values you want to add or modify. Currently three types are
-acceptable: (a) directly list all field values with no name. The
-values will be assigned to fields according to the order of values;
-(b) give both field names and values in pair, e.g. Name = "Test",
-\code{Sepcific Heat} = 150. You can find all valid field names (with
-units) using \code{$all("field", class = "class_name_to_query")}; (c)
-some kind of the same as (b), but with all field names in lower
-cases and spaces replaced by "_". Note: All field names should be
-given without units. Error will occur when the type (character or
-numeric), and the value (e.g. range) are not valid.
+\item \code{class}: A character vector contains class names.
 }
 }
 
-\section{Notes}{
-\preformatted{model$notes(id, ..., append = FALSE, wrap = 0L)
+\section{Object Info}{
+\preformatted{model$object_id(class = NULL, simplify = FALSE)
+model$object_name(class = NULL, simplify = FALSE)
+model$object_num(class = NULL)
+model$is_valid_id(id)
+model$is_valid_name(name)
 }
 
-\code{$notes} will show, add or delete notes(comments) for the object specified using \code{id}.
+\code{$object_id} and \code{$object_name} will return all object IDs and names
+in specified class respectively. For \code{$object_name}, if the specified
+class does not have name attributes, such as \code{"SimulationContrl"}, \code{NA}
+will be returned.
+
+\code{$is_valid_id} and \code{$is_valid_name} will return \code{TRUE}s if given integers or
+strings are valid object IDs or object names respectively.
+
+\code{$object_num} will return the number of objects in specified classes.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{id}: A valid object IDs. You can find all valid object IDs using
-\code{$all("id")}.
-\item \code{...}: Any character vectors you want to add as notes for the object. If
-empty, the objects with notes will be printed.
-\item \code{append}: If TRUE, add new notes to the end of existing ones, otherwise
-add notes to the beginning of existing ones. If NULL, the
-already existing notes will be deleted before add new ones.
-\item \code{wrap}: If greater than 0L,long notes will be wrap at the length of \code{wrap}.
+\item \code{id}: An integer vector to check.
+\item \code{name}: A character vector to check.
+\item \code{class}: A character vector contains valid class names.
+\item \code{simplify}: If FALSE, a list with each member being the data per class will
+be returned. Otherwise, an integer vector (for \code{$object_id}) or a
+character vector (for \code{$object_name}) will be returned.
 }
 }
 
-\section{Diff}{
-\preformatted{model$diff(type)
+\section{Object Query}{
+\preformatted{model$object(which)
+model$object_in_class(class)
+model$search_object(pattern, class = NULL)
 }
 
-\code{$diff} will show all modifications you made, including added (or
-duplicated), modified, deleted and hidden objects with markers "(+)",
-"(~)", "(-)" and "(!)" respectively.
+\code{$object} will return a list of \code{IdfObject}s specified by object IDs or
+names.
 
-\strong{Arguments}
-\itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{type}: What type of modifications to show. Should be one of "all", "add",
-"set", "del". Default is "all".
-}
-}
+\code{$object_in_class} will return a list of all \code{IdfObject}s in specified
+classes.
 
-\section{Check}{
-\preformatted{model$check()
-}
+\code{$search_object} will return a list of \code{IdfObject}s whose names meet the
+given pattern in specified classes.
 
-\code{$check} will check the validation of all fields in current model, including
-missing required objected and fields, wrong value types, choices,
-references, any value range exceeds, invalid autosizable and
-autocalculatable fields.
+All three methods will return a named list of \code{IdfObject}s. If the class does
+not have name attribute, then \code{NA} will be used.
+
+\code{IdfObject} is a class that provides more detailed information methods to
+modify a single object in an \code{Idf} object. For detailed explanations,
+please see \link{idf_object}.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
+\item \code{object}: Either an integer vector of valid object IDs or a character vector
+of valid object names.
+\item \code{class}: A character vector of valid class names.
+\item \code{pattern}: A regular expression. It will be directly passed to
+\code{stringr::str_detect}.
+}
+}
+
+\section{Object Modification}{
+\preformatted{model$dup_object(object, new_name = NULL)
+model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
+model$ins_object(object)
+model$set_object(object)
+model$del_object(object, referenced = FALSE)
+model$search_value(pattern)
+model$replace_value(pattern, replacement)
+}
+
+\code{$dup_object} will duplicate objects specified by object IDs or names. The
+newly created objects will be renamed automatically if new names are not
+given, with a suffix \code{"_1"}, \code{"_2"} and etc.
+
+\code{$add_object} will add objects in the specified class.
+
+\code{$ins_object} will insert objects from other IDF into current IDF.
+
+\code{$set_object} will set the value of fields in the objects specified by object
+IDs or names.
+
+\code{$del_object} will delete objects specified by object IDs or names.
+
+\code{$search_value} will return values that match the given pattern.
+
+\code{$replace_value} will return replace values that match the given pattern.
+
+\strong{Arguments}
+\itemize{
+\item \code{object}: Either an integer vector of valid object IDs or a character vector
+of valid object names.
+\item \code{new_name}: A character vector with the same length as the number of
+objects to be duplicated.
+\item \code{value}: A list which contains field values to set to the newly created
+objects. The class of each field value should comply with the definition
+in corresponding IDD. Field names of value in each class can be given. If
+not named, the input values will be set to fields according to their
+order of appearance.
+\item \code{comment}: A list which contains comments to set to the newly created
+objects.
+\item \code{default}: If \code{TRUE}, all empty fields will be filled with their default
+values if possible.
+\item \code{all}: If \code{TRUE}, all fields in the class will be returned, even if there
+are no input values for them. If \code{FALSE}, only minimum fields will be
+returned.
+\item \code{referenced}: If \code{TRUE}, all objects that reference the targets to delete
+will also be deleted.
+\item \code{pattern}: A regular expression used to search for values.
+\item \code{replacement}: A regular expression used to replace values.
+}
+}
+
+\section{Validation}{
+\preformatted{model$validate(level = c("final", "draft", "none"))
+model$is_valid(level = c("final", "draft", "none"))
+}
+
+\code{$validate} will check if there are errors in current model under different
+strictness level.
+
+\code{$is_valid} will check if there are no errors in current model under different
+strictness level.
+
+There are three different validate levels, i.e. \code{"none"}, \code{"draft"} and
+\code{"final"}:
+\itemize{
+\item For \code{"none"}, none validation will be done;
+\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
+integer, and choice field values will be done;
+\item For \code{"final"}, besides above, checking of missing required objects,
+duplicated unique objects, object name conflicts, missing required
+fields and invalid field value reference will also be done.
+}
+}
+
+\section{Format Output}{
+\preformatted{model$string(comment = TRUE, header = TRUE)
+}
+
+\code{$string} will return the text format of an IDF file.
+
+\strong{Arguments}
+\itemize{
+\item \code{comment}: If \code{FALSE}, all comments will not be included.
+\item \code{header}: If \code{FALSE}, the header will not be included.
 }
 }
 
 \section{Save}{
-\preformatted{model$save(confirm = FALSE, format)
-model$saveas(path, format, overwrite = FALSE)
+\preformatted{model$is_unsaved()
+model$save(path = NULL, format = c("asis", "sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 }
 
-\code{$save} is a shortcut of \code{$saveas(path = "the_original_model_path")} and will
-overwrite the current file which has a risk of losing your original file and
-data. So make sure you have a safe copy of you original model.
+\code{$is_unsaved()} will check if there are modifications on the model since it was
+read or since last time it was saved.
 
-\code{$saveas} will save the model as a new file.
+\code{$save()} will save the model into local disk.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{confirm}: Whether to save the model and overwrite the original file.
-Default is FALSE.
-\item \code{format}: The saving format. Should be one of "asis", "sorted", "ori_top",
-and "ori_bot". If "asis", which is the default, the model will be
-saved in the same format as it is. If the model does not contain
-any format saving option, which is typically the case when the
-model was not saved using \code{eplusr} or IDFEditor, the "sorted"
-will be used. "sorted", "ori_top" and "ori_bot" are the same as
-the save options "Sorted", "Original with New at Top", and
-"Original with New at Bottom" in IDFEditor.
-\item \code{path}: The path to save the model.
+\item \code{path}: A path where to save the model. If \code{NULL}, the path of the model
+itself will be used.
+\item \code{format}: A string to specify the saving format. Should be one of \code{"asis"},
+\code{"sorted"}, \code{"new_top"}, and \code{"new_bot"}. If \code{"asis"}, which is the default, the
+model will be saved in the same format as it is. If the model does not
+contain any format saving option, which is typically the case when the
+model was not saved using eplusr or IDFEditor, \code{"sorted"} will be used.
+\code{"sorted"}, \code{"new_top"} and \code{"new_bot"} are the same as the save options
+\code{"Sorted"}, \code{"Original with New at Top"}, and \code{"Original with New at Bottom"}
+in IDFEditor.
 \item \code{overwrite}: Whether to overwrite the file if it already exists. Default is
-FALSE.
+\code{FALSE}.
+\item \code{copy_external}: If \code{TRUE}, the external files will also be copied into the
+same directory. Currently, only \code{Schedule:File} class is supported.
+Default is \code{FALSE}.
 }
 }
 
-\section{Reset}{
-\preformatted{model$reset(confirm = FALSE)
+\section{Clone}{
+\preformatted{model$clone(deep = FALSE)
 }
 
-\code{$reset} will reset the model to the status when it was last saved using
-\code{$save} or \code{$saveas} (if never saved, first read and parsed using
-\code{eplus_model$new}) All your modifications will be lost, so use with
-caution. It is pretty useful if you messed things up during modifications.
+\code{$clone} will copy and returned the cloned model. Because \code{Idf} use
+\code{R6Class} under the hook, \code{idf_2 <- idf_1} does not copy \code{idf_1} at all but
+only create a new binding to \code{idf_1}. Modify \code{idf_1} will also affect \code{idf_2}
+as well, as these two are exactly the same thing underneath.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{confirm}: Whether to reset the model. Default is FALSE.
+\item \code{deep}: Not used. Keep it here just for compatible with the default clone
+method provided by \code{R6Class}.
 }
 }
 
-\section{Run Model and Collect Results}{
-\preformatted{model$run(period = ~., weather = NULL, echo = FALSE, dir = NULL, eplus_home = NULL)
-model$collect(type = c("variable", "meter", long = FALSE))
-model$table(report = NULL, key = NULL, table = NULL, nest = TRUE)
+\section{Run Model}{
+\preformatted{model$run(weather, dir = NULL, wait = TRUE, force = FALSE)
 }
 
-\code{$run} will run the current model within given period using corresponding
-version of EnergyPlus.
+\code{$run} will run the current model within specified weather using
+corresponding version of EnergyPlus. The model and the weather used will
+be copied to the output directory. An \code{EplusJob} will be returned which
+provides detailed info of the simulation and methods to collect
+simulation results. Please see XXX for more detailed.
 
-\code{$collect} will collect the simulation variable (specified in
-\code{Output:Variable} class) and meter (specified in \code{Output:Meter*} classes)
-output of current model
+eplusr uses the EnergyPlus command line interface which was introduced since
+EnergyPlus 8.3.0. So \code{$run} only supports models with version higher
+than 8.3.0.
 
-\code{$table} will extract tables from simulation table (specified in
-\code{Output:Table*} classes) output of current model.
-
-NOTE: The underlying functions in \code{$table} relies on the \code{HTML} format
-output. If the \code{Column Separator} in \code{OutputControl:Table:Style} does not
-contain \code{HTML} format, \code{eplusr} will automatically change it when running
-the model. For example, \code{"Comma"} (which is the default value) will be
-changed into \code{"CommaAndHTML"} and a warning message will be issued.
+eplusr uses the EnergyPlus SQL output for extracting simulation results. In
+order to do so, a object in \code{Output:SQLite} with \code{Option Type} value of
+\code{SimpleAndTabular} will be automatically created if it does not exists.
 
 \strong{Arguments}
 \itemize{
-\item \code{model}: An \code{eplus_model} object.
-\item \code{period}: A formula specified in format \code{from ~ to} to determine what
-period should the model be run. It can be used to override the
-\code{RunPeriod} objects. The original objects in \code{RunPeriod} class
-will be commented out using \code{$hide}. Each side of a \code{period}
-formulais specified as a character in format \code{'MM-DD'}, but
-powerful shorthand is available:
-\itemize{
-\item \code{~.}: Use existing \code{RunPeriod} objects. This is the default.
-\item \code{~"annual"}: Force to run annual simulation only.
-\item \code{~"design_day"}: Force to run design day only.
-\item \code{~4} or \code{~"4"} or \code{~"Apr"}: Force to run from April 1st to April 30th.
-\item \code{2~4} or \code{"2"~"4"} or \code{"Feb"~"Apr"}: Force to run from February 1st to
-April 30th.
-\item \code{"2-1"~"4-30"}: Same as above.
-}
-\item \code{weather}: The weather file used to run simulation. If NULL, the chicago
-weather file ("USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
-in the distributed along with corresponding EnergyPlus will be
-used, and a warning message will be given.
+\item \code{weather}: A path to an \code{.epw} file or an \code{Epw} object.
+\item \code{dir}: The directory to save the simulation results. If \code{NULL}, which is
+the default, the model folder will be used.
 \item \code{echo}: Whether to print the standard output and error of EnergyPlus to
-the screen. Default is FALSE.
-\item \code{dir}: The directory to save the simulation results. If NULL, which is the
-default, the model folder will be used.
-\item \code{eplus_home}: The EnergyPlus installation folder path. If NULL, which is
-the default, \code{eplusr} will try to find if corresponding
-version of EnergyPlus that was installed in the standard
-location, i.e.  "C:/EnergyPlusVX-X-X" on Windows,
-"/usr/local/EnergyPlus-X-X-X" on Linux and
-"/Applications/EnergyPlus-X-X-X" on MacOS.
-\item \code{type}: Should be one of "variabale" (default) and "meter". If "variable",
-results from \code{Output:Variable} will be collected. If "meter",
-results from \code{Output:Meter*} will be collected.
-\item \code{long}: Whether to change the collected data from wide format (which is
-the default format from EnergyPlus) to long format which is much
-easy for data analysis. In long table format, the wide table will
-be melten according to DateTime and the output names will be
-splited into four parts, i.e. key, variable, frequency and unit.
-For more information on "Tidy Data", please read the excellent
-paper of Hadley Wickham
-\href{http://vita.had.co.nz/papers/tidy-data.html}{here}.
-\item \code{report}, \code{key} and \code{table}: Specify what tables to extract from
-EnergyPlus HTML table output. You can find
-valid report values by looking at Table of
-Contents of the file, valid key values by
-looking at the "For" line after each report
-name. For example, the first table in the
-table output can be extract by specifying
-\code{$table(report = "Annual Building Utility Performance Summary", key = "Entire Facility", table = "Site and Source Energy")}.
-\item \code{nest}: If TRUE, which is the default, \code{$table} will return a data.table
-with four columns named \code{"report"}, \code{"key"}, \code{"table"} and
-\code{"content"}. \code{"content"} is a list column which has the extracted
-tables. If FALSE, a list will return with each each number
-containing those data.
+the screen. Default is \code{FALSE}.
+\item \code{force}: Whether to stop the background EnergyPlus process and start the
+simulation again.
 }
+}
+
+\section{Print}{
+\preformatted{model$print(plain = FALSE)
+print(model)
+}
+
+\code{$print} will print the model in the similar format as what you will see in
+IDFEditor.
+
+\strong{Arguments}
+\itemize{
+\item \code{plain}: If \code{TRUE}, the model will be printed in plain text format.
+}
+}
+
+\section{Shortcuts for Query}{
+\preformatted{model$Class
+model[Class]
+model[[Object]]
+}
+
+eplusr provides custom S3 method of \code{\[}, \code{\\$} and \code{\[\[}. Basically,
+\code{model$Class} and \code{model[Class]}, where \code{Class} is a valid class name, is
+equivalent to \code{model$object_in_class(Class)}; \code{model[[Object]]}, where
+\code{Object} is an object ID or name is equivalent to \code{model$object(Object)}.
+
+[[Object]: R:[Object
+[\code{,}\$\code{and}[[\code{. Basically,}model$Class\code{and}model\link{Class}: R:%60,%20%60%5C%5C$%60%20and%20%60%5C[%5C[%60.%20Basically,%0A%60model$Class%60%20and%20%60model[Class
+[[Object]: R:[Object
 }
 
 \author{

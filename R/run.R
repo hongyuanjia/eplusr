@@ -141,9 +141,8 @@ clean_wd <- function (path) {
 #' Run simulations of EnergyPlus models.
 #'
 #' `run_idf` is a wrapper of EnergyPlus command line interface which enables to
-#' run EnergyPlus model with different options.
-#' `run_multi` provides the functionality of running multiple models in
-#' parallel.
+#' run EnergyPlus model with different options.  `run_multi` provides the
+#' functionality of running multiple models in parallel.
 #'
 #' @param eplus An acceptable input of [use_eplus()] and [eplus_config()].
 #' @param model A path of an EnergyPlus IDF or IMF file.
@@ -153,16 +152,18 @@ clean_wd <- function (path) {
 #' @param design_day Force design-day-only simulation. Default: `FALSE`.
 #' @param annual Force design-day-only simulation. Default: `FALSE`.
 #' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
-#'     infomation to the console.  If `FALSE`, which is default, a
+#'     information to the console.  If `FALSE`, which is default, a
 #'     [processx::process] object will be return.
 #' @param parallel_backend Acceptable input for [future::plan()].
 #'
 #' @details
 #' Behind the scene, `run_multi` uses the package `furrr` which provides apply
-#'     mapping functions in parallel using package `future`.
+#' mapping functions in parallel using package `future`. It is suggested to run
+#' simulation using `Job` class, which provides much more controls on simulation
+#' and also methods to extract simulation results.
 #'
 #' @references
-#' [Running Energyplus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
+#' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
 #' @examples
 #' \dontrun{
 #'

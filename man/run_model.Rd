@@ -26,20 +26,21 @@ directory of input model will be used.}
 \item{annual}{Force design-day-only simulation. Default: \code{FALSE}.}
 
 \item{echo}{Only applicable to \code{run_idf}. Show EnergyPlus simulation process
-infomation to the console.  If \code{FALSE}, which is default, a
+information to the console.  If \code{FALSE}, which is default, a
 \link[processx:process]{processx::process} object will be return.}
 
 \item{parallel_backend}{Acceptable input for \code{\link[future:plan]{future::plan()}}.}
 }
 \description{
 \code{run_idf} is a wrapper of EnergyPlus command line interface which enables to
-run EnergyPlus model with different options.
-\code{run_multi} provides the functionality of running multiple models in
-parallel.
+run EnergyPlus model with different options.  \code{run_multi} provides the
+functionality of running multiple models in parallel.
 }
 \details{
 Behind the scene, \code{run_multi} uses the package \code{furrr} which provides apply
-mapping functions in parallel using package \code{future}.
+mapping functions in parallel using package \code{future}. It is suggested to run
+simulation using \code{Job} class, which provides much more controls on simulation
+and also methods to extract simulation results.
 }
 \examples{
 \dontrun{
@@ -48,5 +49,5 @@ run_idf(8.8, "input.idf", "weather.epw")
 }
 }
 \references{
-\href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running Energyplus from Command Line (EnergyPlus GitHub Repository)}
+\href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
 }

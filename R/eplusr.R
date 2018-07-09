@@ -15,7 +15,7 @@
 #'   * Run your models directly and collect the simulation output of EnergyPlus
 #'   in R.
 #'
-#' To learn more about dplyr, start with the vignettes:
+#' To learn more about eplusr, start with the vignettes:
 #' `browseVignettes(package = "eplusr")`
 #'
 #' @section Package options:
@@ -33,7 +33,7 @@
 #'     - For `"draft"`, checking of invalid autosize, autocalculate, numeric,
 #'       integer, and choice field values will be done;
 #'     - For `"final"`, besides above, checking of missing required objects,
-#'     duplicated unique objects, object name confliction, missing required
+#'     duplicated unique objects, object name conflicts, missing required
 #'     fields and invalid field value reference will also be done.
 #'
 #' * `eplusr.verbose_info`: Whether to show information messages. Default: `TRUE`

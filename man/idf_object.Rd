@@ -3,85 +3,208 @@
 \docType{class}
 \name{idf_object}
 \alias{idf_object}
-\title{EnergyPlus IDF objects}
-\value{
-An IdfObject object
-}
+\title{EnergyPlus IDF object}
 \description{
-\code{IDFObject} is a R6 class used internally as members in \code{IDF} R6
-class. \code{IDFObject} inherits \code{\link{IDDObject}}, so all methods of
-\code{IDDObject} are available for \code{IDFobject}.
+\code{IdfObject} is an abstraction of a single object in an \code{Idf}. It provides
+more detail methods to modify objects. \code{IdfObject} can only be created from
+the parent \code{Idf} object, using \code{$object}, \code{$object_in_class} and
+\code{$search_object}. This is because that initialization of an \code{IdfObject} needs
+some shared data from parent \code{Idf} object.
 }
 \section{Usage}{
-\preformatted{
-idfobj <- IDFObject$new(object_id)
-
+\preformatted{# basic info
 idfobj$id()
 idfobj$name()
 
+# definition
+idfobj$definition()
+
+# comment
 idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
-idfobj$get_value(index = NULL, name = NULL)
+
+# value
+idfobj$get_value(which = NULL, all = NULL)
 idfobj$set_value(..., defaults = TRUE)
 
+# validation
 idfobj$validate()
-
-idfobj$reference_map()
-
-idfobj$value_table(all = FALSE, unit = TRUE, wide = FALSE, string_value =
-TRUE)
-
 idfobj$is_valid()
-idfobj$has_reference_by()
-idfobj$has_reference_from()
+
+# object cross reference
+idfobj$ref_from_object()
+idfobj$ref_by_object()
+idfobj$has_ref_by()
+idfobj$has_ref_from()
+idfobj$has_ref()
+
+# data extraction
+idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+
+# formatting
 idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 
-idfobj$print(comment = TRUE)
+# print
+idfobj$print(comment = TRUE, auto_sep = FALSE)
 print(iddobj)
 }
-
-For other methods inherited from \code{IDDObject}, please see
-\code{\link{IDDObject}}.
 }
 
-\section{Detail}{
-
-
-\subsection{Create}{\preformatted{idfobj <- IDFObject$new(list, idd)
+\section{Basic Info}{
+\preformatted{idfobj$id()
+idfobj$name()
 }
 
-\code{IDFObject$new(list, idd)} creates an IDFObject using parsed IDF object data
-stored in a list and an IDD object.
+\code{$id} will return the object ID.
 
-\strong{Arguments}:
+\code{$name} will return the object name. If the class does not have name
+attribute, then \code{NA} will returned.
+}
+
+\section{Definition}{
+\preformatted{idfobj$definition()
+}
+
+\code{$definition} will return the definition, i.e. the \code{IddObject}, of current
+class. For details of \code{IddObject}, please see XXX.
+}
+
+\section{Comment}{
+\preformatted{idfobj$get_comment()
+idfobj$set_comment(comment, append = TRUE, width = 0L)
+}
+
+\code{$get_comment} will return the comments of current object.
+
+\code{$set_comment} will set the comments of current object.
+
+\strong{Arguments}
 \itemize{
-\item \code{list}: A list. The list contains three named elements:
-\code{object_id}, \code{value} and \code{comment}, where:
+\item \code{comment}: A character vector.
+\item \code{append}: If \code{TRUE}, comment will be appended to existing comments. If
+\code{FALSE}, comment will be prepended to existing currents. If \code{NULL},
+existing comments will be deleted. Default: \code{FALSE}
+\item \code{width}: An integer to indicate where to break long comment lines. If \code{0},
+no breaking will be made.
+}
+}
+
+\section{Value}{
+\preformatted{idfobj$get_value(which = NULL, all = FALSE)
+idfobj$set_value(..., default = TRUE)
+}
+
+\code{$get_value} will return a named list containing values of specified fields.
+
+\code{$set_comment} will set the comments of current object.
+
+\strong{Arguments}
 \itemize{
-\item \code{object_id}: a unique integer to reference this IDFObject.
-\item \code{value}: a list contains all values of this IDFObject. All values can
-be totally strings, but they will be converted to corresponding types
-during initialization.
-\item \code{comment}: a character vector. Elements will be put line by line when
-saved to \code{*.idf} files.
-}
-\item \code{idd}: An IDD object created by \code{IDD$new()}.
-}
-}
-
-\subsection{Value}{\preformatted{idfobj$get_value(index = NULL, name = NULL)
-}
-
-\code{$get_value(index, name)} return values of certain fields specified by
-\code{index} or \code{name}. The values are returned as a list and returned invisibly.
-
-\code{$set_value(...)} sets values given in \code{...} to fields.
+\item \code{which}: An integer vector of field indexes or a character vector of field
+names. Field names can be given in "lower-style", e.g. \code{"Thermal Resistance"} can be given as \code{"thermal_resistance"}.
+\item \code{all}: If \code{TRUE}, values of all fields, including empty fields will be
+returned as well. Default: \code{FALSE}
+\item \code{...}: Values to set. Field names of value can be given. If not named, the
+input values will be set to fields according to their order of
+appearance.
+\item \code{default}: If \code{TRUE}, all empty fields will be filled with their default
+values if possible.
 }
 }
 
-\seealso{
-\code{\link{IddObject}}
+\section{Validation}{
+\preformatted{idfobj$validate(level = c("final", "draft", "none"))
+idfobj$is_valid(level = c("final", "draft", "none"))
 }
+
+\code{$validate} will check if there are errors in current object under different
+strictness level.
+
+\code{$is_valid} will check if there are no errors in current object under
+different strictness level.
+
+There are three different validate levels, i.e. \code{"none"}, \code{"draft"} and
+\code{"final"}:
+\itemize{
+\item For \code{"none"}, none validation will be done;
+\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
+integer, and choice field values will be done;
+\item For \code{"final"}, besides above, checking of missing required objects,
+duplicated unique objects, object name conflicts, missing required
+fields and invalid field value reference will also be done.
+}
+}
+
+\section{Cross Reference}{
+\preformatted{idfobj$ref_from_object()
+idfobj$ref_by_object()
+idfobj$has_ref_from()
+idfobj$has_ref_by()
+idfobj$has_ref()
+}
+
+\code{$ref_from_object} will return other objects that current object references
+from.
+
+\code{$ref_by_object} will return other objects that reference current object.
+
+\code{$has_ref_from} and \code{$has_ref_by} will return \code{TRUE} if current object has
+referenced from other objects or has been referenced by other objects,
+respectively.
+
+\code{$has_ref} will return \code{TRUE} if current object has either referenced from
+other objects or has been referenced by other objects.
+}
+
+\section{Data Extraction}{
+\preformatted{idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = getOption("eplusr.view_in_ip"))
+}
+
+\code{$table} will return a data.table that contains all data of current object.
+
+\strong{Arguments}
+\itemize{
+\item \code{all}: If \code{TRUE}, values of all fields, including empty fields will be
+returned as well. Default: \code{FALSE}
+\item \code{unit}: If \code{TRUE}, field names with units will be returned. Default:
+\code{TRUE}.
+\item \code{wide}: If \code{TRUE}, a wide table will be returned. Default: \code{FALSE}.
+\item \code{string_value}: If \code{TRUE}, all field values will be returned as character.
+Default: \code{TRUE}
+\item \code{in_ip}: If \code{TRUE}, IP units and values will be returned. Default: the
+value of \code{getOption("eplusr.view_in_ip")}.
+}
+}
+
+\section{Formatting}{
+\preformatted{idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
+}
+
+\code{$string} will return the text format of current object.
+
+\strong{Arguments}
+\itemize{
+\item \code{comment}: If \code{FALSE}, all comments will not be included.
+\item \code{leading}: An integer to indicate the number of spaces before each fields.
+Default: \code{4}.
+\item \code{sep_at}: An integer to indicate the character width where to separate
+values and field names.  Default: \code{29}.
+}
+}
+
+\section{Print}{
+\preformatted{idfobj$print(comment = TRUE, auto_sep = FALSE)
+print(idfobj)
+}
+
+\strong{Arguments}
+\itemize{
+\item \code{comment}: If \code{FALSE}, all comments will not be included.
+\item \code{auto_sep}: If \code{TRUE}, values and field names will be separate at the
+largest character length of values. Default: \code{FALSE}.
+}
+}
+
 \author{
 Hongyuan Jia
 }

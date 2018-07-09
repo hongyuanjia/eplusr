@@ -1,22 +1,166 @@
-# NOTE: What actually used by EnergyPlus:
-#  1. dry bulb temperature
-#  2. dew point temperature
-#  3. relative humidity
-#  4. atmospheric pressure
-#  5. horizontal infrared radiation intensity from sky
-#  6. direct normal radiation
-#  7. diffuse horizontal radiation
-#  8. wind direction
-#  9. wind spped
-# 10. present weather observation
-# 11. present weather codes
-# 12. snow depth
-# 13. liquid precipitation depth
-# 14. liquid precipitation rate
+#' Read, and modify an EnergyPlus Weather File (EPW)
+#'
+#' `$read_epw` will parse an EPW file and return an `Epw` object. The parsing
+#' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
+#' with some simplifications.
+#'
+#' The first eight lines of a standard EPW file are normally headers which
+#' contains data of location, design conditions, typical/extreme periods, ground
+#' temperatures, holidays/daylight savings, data periods and other comments. For
+#' now, eplusr only parses headers of location, holidays/daylight savings and
+#' data periods. All other headers will be left as they were when parsing and
+#' saving. For details on the data structure of EPW file, please see "Chapter 2
+#' - Weather Converter Program" in EnergyPlus "Auxiliary Programs"
+#' documentation. An online version can be found
+#' [here](https://bigladdersoftware.com/epx/docs/).
+#'
+#' There are about 35 variables in the core weather data. However, not all of
+#' them are used by EnergyPlus. Actually, despite of date and time columns, only
+#' 14 columns are used:
+#'
+#'  1. dry bulb temperature
+#'  2. dew point temperature
+#'  3. relative humidity
+#'  4. atmospheric pressure
+#'  5. horizontal infrared radiation intensity from sky
+#'  6. direct normal radiation
+#'  7. diffuse horizontal radiation
+#'  8. wind direction
+#'  9. wind speed
+#' 10. present weather observation
+#' 11. present weather codes
+#' 12. snow depth
+#' 13. liquid precipitation depth
+#' 14. liquid precipitation rate
+#'
+#' Even though `Epw` class provides methods to replace core weather data, it is
+#' still not recommended.
+#'
+#' @section Usage:
+#' ```
+#' # read
+#' epw <- read_epw(path)
+#'
+#' # basic header info
+#' epw$city
+#' epw$city <- "city"
+#' epw$state_province
+#' epw$state_province <- "state_province"
+#' epw$country
+#' epw$country <- "country"
+#' epw$data_source
+#' epw$data_source <- "data_source"
+#' epw$wmo_number
+#' epw$wmo_number <- "wmo_number"
+#' epw$latitude
+#' epw$latitude <- "latitude"
+#' epw$longitute
+#' epw$longitute <- "longitute"
+#' epw$time_zone
+#' epw$time_zone <- "time_zone"
+#' epw$elevation
+#' epw$elevation <- "elevation"
+#' epw$time_step
+#' epw$time_step <- "time_step"
+#' epw$start_day_of_week
+#' epw$start_day_of_week <- "start_day_of_week"
+#'
+#' # data query and modification
+#' epw$path()
+#' epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
+#' epw$set_data(data)
+#'
+#' # save
+#' epw$save(path, overwrite = FALSE)
+#'
+#' # print
+#' epw$print()
+#' print(epw)
+#' ```
+#'
+#' @section Read:
+#' ```
+#' epw <- read_epw(path)
+#' ```
+#'
+#' **Arguments**
+#'
+#' * `path`: Path to EnergyPlus `EPW` file.
+#'
+#' @section Query and Modify Header:
+#' ```
+#' epw$city
+#' epw$city <- "city"
+#' epw$state_province
+#' epw$state_province <- "state_province"
+#' epw$country
+#' epw$country <- "country"
+#' epw$data_source
+#' epw$data_source <- "data_source"
+#' epw$wmo_number
+#' epw$wmo_number <- "wmo_number"
+#' epw$latitude
+#' epw$latitude <- "latitude"
+#' epw$longitute
+#' epw$longitute <- "longitute"
+#' epw$time_zone
+#' epw$time_zone <- "time_zone"
+#' epw$elevation
+#' epw$elevation <- "elevation"
+#' epw$time_step
+#' epw$time_step <- "time_step"
+#' epw$start_day_of_week
+#' epw$start_day_of_week <- "start_day_of_week"
+#' ```
+#'
+#' `$city`, `$state_province`, `$country`, `$data_source`, `$wmo_number`,
+#' `$latitude`, `$longitute`, `$time_zone`, `$elevation`, `$time_step` and
+#' `$start_day_of_week` are all active bindings, which means that you can get
+#' the value and also set new value to it.
+#'
+#' @section Query and Modify Data:
+#' ```
+#' epw$path()
+#' epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
+#' epw$set_data(data)
+#' ```
+#'
+#' `$path` returns the path of EPW file.
+#'
+#' `$get_data` returns the core weather data.
+#' `$set_data` replaces core weather data with input data. NOTE: This feature is
+#'     experimental. There is no validation when replacing.
+#'
+#' **Arguments**
+#'
+#' * `year`: A integer to indicate the year value in the return `datetime` column.
+#'     If `NULL`, the year will be left as it is in EPW file.
+#' * `tz`: The time zone of Date and Time in `datetime` column.
+#' * `unit`: If `TRUE`, units will be set to all numeric columns using
+#'     [units::set_units()].
+#' * `update`: If `TRUE`, not only `datetime` column, but also `year`, `month`,
+#'     `day`, `hour` and `minute` will also be updated according to the input
+#'     `year` value.
+#' * `data`: A data.frame which has all required columns.
+#'
+#' @section Read:
+#' ```
+#' epw$save(path, overwrite = FALSE)
+#' ```
+#' **Arguments**
+#'
+#' * `path`: A path where to save the weather file. If `NULL`, the path of the
+#'     weather file itself will be used. Default: `NULL`.
+#' * `overwrite`: Whether to overwrite the file if it already exists. Default is
+#'     `FALSE`.
+#'
+#' @docType class
+#' @name epw
+#' @author Hongyuan Jia
+NULL
 
-#' Read EnergyPlus Weather File
-#' @return An `Epw` object
 #' @export
+#' @rdname epw
 # read_epw {{{
 read_epw <- function (path) {
     Epw$new(path)
@@ -237,6 +381,7 @@ Epw <- R6::R6Class(classname = "Epw",
         set_data = function (data) {
             # replace weather data
             # {{{
+            assert_that(has_names(data, private$m_data))
             private$m_data <- private$set_na(data)
             # TODO:
             # set NA
@@ -299,6 +444,7 @@ Epw <- R6::R6Class(classname = "Epw",
             d <- private$drop_na(d)
             # TODO: format integerish double with tailing zeros
             data.table::fwrite(d, path, append = TRUE, col.names = FALSE, eol = "\n")
+            private$m_path <- path
             # }}}
         },
 

@@ -5,57 +5,78 @@
 \alias{idd}
 \title{Parse EnergyPlus IDD files}
 \value{
-An Idd object
+For \code{use_idd}, an Idd object.
 }
 \description{
-\code{eplusr} provides parsing of and programmatic access to EnergyPlus
+eplusr provides parsing of and programmatic access to EnergyPlus
 Input Data Dictionary (IDD) files, and objects. It contains all data needed
-to parse EnergyPlus models. IDD objects provide parsing and printing
+to parse EnergyPlus models. \code{Idd} class provides parsing and printing while
+\code{IddObject} provides detailed information of curtain class.
 }
 \details{
-The IDD objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
-stored internally and will automatically be used when parsing \code{IDF} and
-\code{IMF} files. Internally, the powerful \code{data.table} package is used
-to speed up the whole process and store the results. However, it will still
-take about 5-6 sec to parse an IDD file.
+The \code{Idd} objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
+stored internally and will automatically be used when parsing IDF files and
+strings.  Internally, the powerful \code{data.table} package is used to speed
+up the whole process and store the results. However, it will still take about
+5-6 sec to parse an IDD file.
 
 Normally, you may not need to parse any Energy+.idd file unless your model
 is produced by EnergyPlus whose version is lower than 8.5. If so, it is
-suggested to store the parsed IDD object and directly pass it to the
-\code{idd} argument in \code{eplusr_model$new} in index to avoid the parsing
-process whenever you read a model of that version.
+suggested to store the parsed IDD object and directly pass it to the \code{idd}
+argument in \code{\link[=read_idf]{read_idf()}} in order to avoid the parsing process whenever you
+read a model of that version.
+
+Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
+data in \code{data.frame} format. Every IDD will be parsed and stored in four
+tables:
+\itemize{
+\item \code{group}: contains group index and group names.
+\item \code{class}: contains class names and properties.
+\item \code{class_reference}: contains reference names of classes.
+\item \code{field}: contains field names and field properties.
+\item \code{field_reference}: contains reference names of fields.
+\item \code{field_default}: contains default values of fields.
+\item \code{field_choice}: contains choices of choice-type fields.
+\item \code{field_range}: contains range data of fields.
+\item \code{field_object_list}: contains object-list data of fields.
+\item \code{field_external_list}: contains external-list data of fields.
+}
 }
 \section{Usage}{
-\preformatted{
-idd <- IDD$new(path)
+\preformatted{# read
+idd <- use_idd(idd)
 
+# basic info
 idd$version()
 idd$build()
-idd$class_name(group = NULL)
-idd$group_name(class = NULL)
+
 idd$group_index(group = NULL)
-idd$class_index(class = NULL)
-idd$indexs()
-
-idd$object(class)
-idd$objects(class = NULL)
-idd$objects_in_group(group)
-
-idd$is_valid_class(class)
+idd$group_name()
 idd$is_valid_group(group)
+idd$from_group(class)
+
+idd$class_index(class = NULL)
+idd$class_name()
+idd$is_valid_class(class)
+
+idd$required_class_name()
+idd$unique_class_name()
+idd$extenesible_class_name()
+
+# idd object
+idd$object(class)
+idd$object_in_group(group)
 
 idd$print()
-
 print(idd)
-
 }
 }
 
 \section{Arguments}{
 
 \itemize{
-\item \code{path}: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-named as \code{Energy+.idd}.
+\item \code{idd}: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
+named as \code{Energy+.idd} or a valid version of pre-parsed IDD (8.3 - 8.9).
 \item \code{group}: A valid group name or valid group names.
 \item \code{class}: A valid class name or valid class names.
 }
@@ -64,34 +85,41 @@ named as \code{Energy+.idd}.
 \section{Detail}{
 
 
-\code{IDD$new()} parses an EnergyPlus Input Data Dictionary (IDD) file, and
-returns an IDD object.
+\code{use_idd} will parses an EnergyPlus Input Data Dictionary (IDD) file, and
+returns an \code{Idd} object. If \code{idd} is a valid version of pre-parsed IDD file,
+then the pre-parsed \code{Idd} object will be returned.
 
-\code{$version()} returns the version string of current idd file.
+\code{$version} returns the version string.
 
-\code{$build()} returns the build tag string of current idd file.
+\code{$build} returns the build tag string.
 
-\code{$group_name(class)} returns group name that that \code{class} belong to.
+\code{$group_index} returns integer indexes (indexes of name appearance in
+the IDD file) of specified groups.
 
-\code{$class_name(group)} returns class names of that \code{group}. If \code{group} not
-given, all class names in current IDD are returned.
+\code{$group_name} returns all group names.
 
-\code{$group_index(group)} returns integer indexs (indexs of name apperarance in
-the IDD file) of that \code{group}.
+\code{$from_group} returns the names of group that specified classes belongs to.
 
-\code{$class_index(class)} returns integer indexs (indexs of name apperarance in
-the IDD file) of that \code{class}.
+\code{$is_valid_group} return \code{TRUE} if the input is a valid group name.
 
-\code{$object(class)} returns an IDDObject of that \code{class}.
+\code{$class_index} returns integer indexes (indexes of name appearance in
+the IDD file) of specified classes.
 
-\code{$objects(class)} returns a list of IDDObjects of \code{class}es. If \code{class} is
-NULL, all IDDObjects in current IDD are returned.
+\code{$class_name} returns all class names.
 
-\code{$objects_in_group(group)} returns a list of IDDObjects in that \code{group}.
+\code{$required_class_name} returns the names of all required classes.
 
-\code{$is_valid_group(group)} return \code{TRUE} if the input is a valid \code{group} name.
+\code{$unique_class_name} returns the names of all unique classes.
 
-\code{$is_valid_class(class)} return \code{TRUE} if the input is a valid \code{class} name.
+\code{$extensible_class_name} returns the names of all extensible classes.
+
+\code{$is_valid_class} return \code{TRUE} if the input is a valid class name.
+
+\code{$object} returns a list of \code{IddObject}s of specified classes.
+
+\code{$object_in_group} returns a list of \code{IddObject}s in that group.
+
+For details about \code{IddObject}, please see \link{idd_object}.
 }
 
 \references{
