@@ -184,7 +184,7 @@ read_epw <- function (path) {
 #' @importFrom units ud_units
 #' @importFrom stringr str_trim
 #' @importFrom fasttime fastPOSIXct
-#' @importFrom data.table as.ITime
+#' @importFrom stats na.omit
 # Epw {{{
 Epw <- R6::R6Class(classname = "Epw",
     # ACTIVE {{{
@@ -914,7 +914,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     # check NAs
     epw_data[, `:=`(datetime_shifted = NULL, datetime_delta = NULL,
                     dt_minute = NULL, dt_minute_cal = NULL)]
-    na_epw_data <- stat::na.omit(epw_data, invert = TRUE)
+    na_epw_data <- stats::na.omit(epw_data, invert = TRUE)
     if (not_empty(na_epw_data)) {
         stop("Invalid weather data line found in EPW file ", backtick(path), call. = FALSE)
     }
