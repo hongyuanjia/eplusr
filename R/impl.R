@@ -1593,10 +1593,14 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
     # check if target objects are referenced {{{
     if (not_empty(ref_by_tbl)) {
         if (eplusr_option("validate_level") == "final") {
+            ref <- ref_by_tbl[, list(referenced_by = backtick_collapse(referenced_by_object_id)),
+                by = list(object_rleid, object_id)]
             stop("Delete object that are referenced by others is prohibited ",
                 "in `final` validation level. Failed to delete target object ",
-                "[ID:", backtick_collpase(obj_tbl$object_id), "]\n:",
-                "object [ID: id] was referenced by other objects [ID: ].",
+                "[ID:", backtick_collapse(obj_tbl$object_id), "]:\n",
+                paste0(paste0(ref$object_rleid, ": Object [ID:",backtick(ref$object_id),"] was ",
+                        "referenced by other objects [ID:", ref$referenced_by, "]."),
+                    collapse = "\n"),
                 call. = FALSE)
         }
 
@@ -2346,7 +2350,7 @@ i_value_tbl_from_object_list <- function (self, private, object_list) {
         cls_val <- private$m_idd_tbl$class_reference[obj_list_in,
             on = c(reference = "object_list")][
             i_is_valid_class_index(self, private, class_id, type = "idf")][,
-            `:=`(value = i_class_name(self, private, class_id, type = "idf"))][,
+            `:=`(value = i_class_name(self, private, class_id))][,
             `:=`(value_upper = toupper(value))][,
             lapply(.SD, list), .SDcols = c("value", "value_upper"),
             by = list(object_list_rleid, reference)]
@@ -3246,7 +3250,7 @@ i_idfobj_ref_by <- function (self, private, object) {
     if (is_empty(obj_id)) {
         message("Object is not referenced by any other object.")
     } else {
-        message(length(obj_id), " are found that reference the target object [ID: ",
+        message(length(obj_id), " object found that reference the target object [ID: ",
             unique(ref_by$object_id), "].")
         i_idfobject(sefl, private, obj_id)
     }
@@ -3262,7 +3266,7 @@ i_idfobj_ref_from <- function (self, private, object) {
     if (is_empty(obj_id)) {
         message("Object does not reference from any other object.")
     } else {
-        message(length(obj_id), " are found that are referenced by the target object [ID: ",
+        message(length(obj_id), " object found that are referenced by the target object [ID: ",
             unique(ref_from$object_id), "].")
         i_idfobject(sefl, private, obj_id)
     }
