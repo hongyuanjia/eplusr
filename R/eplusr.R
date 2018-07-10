@@ -33,7 +33,7 @@
 .options <- list()
 .options$num_digits <- 8L
 .options$view_in_ip <- FALSE
-.options$validate_level <- "draft"
+.options$validate_level <- "final"
 .options$verbose_info <- TRUE
 .options$save_format <- "sorted"
 .options$num_parallel <- parallel::detectCores()
