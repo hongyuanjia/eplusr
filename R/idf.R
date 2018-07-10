@@ -637,12 +637,6 @@ Idf <- R6::R6Class(classname = "Idf",
     .subset(obj, j)
 }
 # }}}
-# get_deleted_id {{{
-get_deleted_id <- function (idf) attr(idf, "id_del")
-# }}}
-# get_comment_attach_id {{{
-get_comment_attach_id <- function (idf, id) {
-    obj <- get_value(idf, id)
 
 #' @export
 # [[.Idf {{{
@@ -674,5 +668,4 @@ get_comment_attach_id <- function (idf, id) {
 
     .subset2(x, "object_in_class")(.subset2(cls_std, idx))
 }
-
 # }}}
