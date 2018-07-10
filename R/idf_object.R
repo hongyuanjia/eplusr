@@ -50,12 +50,18 @@
 #' ```
 #' idfobj$id()
 #' idfobj$name()
+#' idfobj$group_name()
+#' idfobj$class_name()
 #' ```
 #'
 #' `$id` will return the object ID.
 #'
 #' `$name` will return the object name. If the class does not have name
 #'     attribute, then `NA` will returned.
+#'
+#' `$group_name` returns the group name of this object belongs to.
+#'
+#' `$class_name` returns the class name of this object belongs to.
 #'
 #' @section Definition:
 #' ```
@@ -233,6 +239,12 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 
         name = function ()
             i_object_tbl_from_which(self, private, private$m_object_id, class = FALSE)$object_name,
+
+        group_name = function ()
+            i_from_group(self, private, private$m_class_id),
+
+        class_name = function ()
+            i_class_tbl_from_which(self, private, private$m_class_id)$class_name,
 
         definition = function ()
             i_iddobject(self, private, i_class_name(self, private, private$m_class_id))[[1]],
