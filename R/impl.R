@@ -733,7 +733,7 @@ i_extensible_group_tbl_from_range <- function (self, private, class, from, to) {
         ext_tbl <- data.table::rbindlist(list(
                 ext_tbl[, .SD, .SDcols = names(new_ext)],
                 new_ext
-        ))
+        ), use.names = TRUE)
     }
 
     data.table::setorderv(ext_tbl, "class_rleid")
@@ -797,7 +797,8 @@ i_add_extensible_group <- function (self, private, class, num) {
     # FIELD
     private$m_idd_tbl$field <- data.table::rbindlist(list(
             private$m_idd_tbl$field,
-            new_ext_fld[, .SD, .SDcols = names(private$m_idd_tbl$field)]))
+            new_ext_fld[, .SD, .SDcols = names(private$m_idd_tbl$field)]),
+        use.names = TRUE)
 
     # i_add_attr_tbl: helper to append field attribute tables {{{
     i_add_attr_tbl <- function (self, private, name, id_tbl) {
@@ -816,7 +817,7 @@ i_add_extensible_group <- function (self, private, class, num) {
         attr_tbl[[paste0(name, "_id")]] <- new_attr_id
 
         private$m_idd_tbl[[tbl_name]] <- data.table::rbindlist(list(
-                private$m_idd_tbl[[tbl_name]], attr_tbl))
+                private$m_idd_tbl[[tbl_name]], attr_tbl), use.names = TRUE)
     }
     # }}}
     i_add_attr_tbl(self, private, "range", id_tbl)
@@ -832,7 +833,8 @@ i_add_extensible_group <- function (self, private, class, num) {
         num_fields = num_fields + num * num_extensible)]
     private$m_idd_tbl$class <- data.table::rbindlist(list(
         private$m_idd_tbl$class[!class_id %in% cls_tbl$class_id],
-        cls_tbl[, .SD, .SDcols = names(private$m_idd_tbl$class)]))
+        cls_tbl[, .SD, .SDcols = names(private$m_idd_tbl$class)]),
+        use.names = TRUE)
     data.table::setorderv(private$m_idd_tbl$class, "class_id")
     self
 }
@@ -881,7 +883,8 @@ i_del_extensible_group <- function (self, private, class, num) {
         num_fields = left_fields)]
     private$m_idd_tbl$class <- data.table::rbindlist(list(
         private$m_idd_tbl$class[!class_id %in% cls_tbl$class_id],
-        cls_tbl[, .SD, .SDcols = names(private$m_idd_tbl$class)]))
+        cls_tbl[, .SD, .SDcols = names(private$m_idd_tbl$class)]),
+        use.names = TRUE)
     data.table::setorderv(private$m_idd_tbl$class, "class_id")
     self
 }
@@ -1753,7 +1756,8 @@ i_assign_object_tbl <- function (self, private, new_tbl) {
 
     private$m_idf_tbl$object <- data.table::rbindlist(list(
         private$m_idf_tbl$object[!object_id %in% new_tbl$object_id],
-        new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$object)]))
+        new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$object)]),
+        use.names = TRUE)
 }
 # }}}
 
@@ -2223,7 +2227,7 @@ i_assign_value_tbl <- function (self, private, new_tbl) {
 
     private$m_idf_tbl$value <- data.table::rbindlist(list(
         private$m_idf_tbl$value[!object_id %in% unique(new_tbl$object_id)],
-        new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$value)]))
+        new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$value)]), use.names = TRUE)
 }
 # }}}
 
@@ -2289,7 +2293,7 @@ i_value_tbl_from_object_list <- function (self, private, object_list) {
         lapply(.SD, list), .SDcols = c("value", "value_upper"),
         by = list(object_list_rleid, reference)]
 
-    val <- data.table::rbindlist(list(cls_val, fld_val))
+    val <- data.table::rbindlist(list(cls_val, fld_val), use.names = TRUE)
 
     # in case there are some object-list that points to both class names and
     # field values
@@ -2661,11 +2665,13 @@ i_assign_comment_tbl <- function (self, private, new_tbl, exclude = TRUE) {
     if (exclude)
         private$m_idf_tbl$comment <- data.table::rbindlist(list(
                 private$m_idf_tbl$comment[!object_id %in% unique(new_tbl$object_id)],
-                new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$comment)]))
+                new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$comment)]),
+            use.names = TRUE)
     else
         private$m_idf_tbl$comment <- data.table::rbindlist(list(
                 private$m_idf_tbl$comment,
-                new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$comment)]))
+                new_tbl[, .SD, .SDcols = names(private$m_idf_tbl$comment)]),
+            use.names = TRUE)
 }
 # }}}
 
@@ -2733,7 +2739,8 @@ i_log_new_uuid <- function (self, private) {
 i_log_new_object_order <- function (self, private, id) {
     private$m_log$order <- data.table::rbindlist(
         list(private$m_log$order,
-            data.table::data.table(object_id = id, object_order = 1L)))
+            data.table::data.table(object_id = id, object_order = 1L)),
+        use.names = TRUE)
 }
 # }}}
 
