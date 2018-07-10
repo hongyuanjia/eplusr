@@ -2847,7 +2847,10 @@ i_lower_field_name <- function (field_name) tolower(gsub("[- :]", "_", field_nam
 # }}}
 
 # i_lower_object_name {{{
-i_lower_object_name <- function (object_name) tolower(gsub("[^[:alnum:]]", "_", object_name))
+i_lower_object_name <- function (object_name) {
+    nm <- tolower(gsub("[^[:alnum:]]", "_", object_name))
+    gsub("_{2,}", "_", nm)
+}
 # }}}
 
 # i_need_update_num {{{
