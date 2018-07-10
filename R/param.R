@@ -111,6 +111,11 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
                 private$m_idf <- read_idf(idf)
             }
 
+            # add sql output
+            idf_self <- ._get_self(private$m_idf)
+            idf_priv <- ._get_private(private$m_idf)
+            i_idf_add_output_sqlite(idf_self, idf_priv)
+
             if (is_epw(epw)) {
                 private$m_epw <- epw
             } else {
@@ -120,6 +125,12 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         # }}}
 
         # PUBLIC FUNCTIONS {{{
+        seed = function ()
+            private$m_idf,
+
+        weather = function ()
+            private$m_epw,
+
         apply_measure = function (measure, ..., .names = NULL)
             i_param_apply_measure(self, private, measure, ..., .names = NULL),
 
