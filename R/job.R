@@ -216,9 +216,9 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         report_data_dict = function ()
             i_sql_report_data_dict(self, private),
 
-        report_data = function (key_value = NULL, name = NULL, year = NULL,
-                                tz = "GMT", case = "auto")
-            i_sql_report_data(self, private, key_value, name, all, year, tz, case),
+        report_data = function (key_value = NULL, name = NULL,
+                                year = NULL, tz = "GMT", case = "auto")
+            i_sql_report_data(self, private, key_value, name, year, tz, case),
 
         tabular_data = function()
             i_sql_tabular_data(self, private),
@@ -553,7 +553,7 @@ i_sql_report_data_dict <- function (self, private) {
 
 # i_sql_report_data {{{
 i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
-                               all = FALSE, year = NULL, tz = "GMT", case = "auto") {
+                               year = NULL, tz = "GMT", case = "auto", all = FALSE) {
     q <- i_sql_report_data_query(self, private, key_value, name)
     res <- i_sql_get_query(self, private, q)
 
@@ -574,7 +574,7 @@ i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
 
     if (not_empty(case)) {
         if (case == "auto") {
-            case_name <- tools::file_path_sans_ext(basename(private$m_path))
+            case_name <- tools::file_path_sans_ext(basename(private$m_path_idf))
         } else {
             assert_that(is_scalar(case))
             case_name <- as.character(case)
@@ -583,7 +583,7 @@ i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
         data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
     }
 
-    res
+    res[]
 }
 # }}}
 
