@@ -584,7 +584,7 @@ Idf <- R6::R6Class(classname = "Idf",
         string = function (comment = TRUE, header = TRUE, ...)
             i_object_string(self, private, comment = comment, header = header, ...),
 
-        save = function (path = NULL, format = c("asis", "sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
+        save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             i_idf_save(self, private, path, format, overwrite, copy_external),
 
         run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE)

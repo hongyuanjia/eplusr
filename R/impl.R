@@ -2908,7 +2908,9 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
             msg = paste0("`path` should have an extension of `idf` or `imf`."))
     }
 
+    format <- match.arg(format, c("asis", "sorted", "new_top", "new_bot"))
     if (format == "asis") format <- private$m_log$save_format
+
     str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
     if (file.exists(path)) {
         if (!overwrite) {
