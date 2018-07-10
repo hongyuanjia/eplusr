@@ -1,4 +1,4 @@
-context("Idf method")
+context("Idf methods")
 
 # idf_text {{{
 idf_text <- "
@@ -46,21 +46,19 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
-idd <- eplusr::idd_8.8
+idd <- use_idd(8.8)
 
 describe("parse_idf_file()", {
-    it("can read Idf stored in strings", {
-        expect_silent(idf_str <- read_idd(idf_text))
-    })
     it("can parse Idf stored in strings", {
         # {{{
-        expect_silent(idf_parsed <- parse_idf_file(idf_text, idd))
+        expect_warning(idf_parsed <- parse_idf_file(idf_text, idd),
+            "Missing version field in input Idf file")
         expect_equal(names(idf_parsed),
             c("version", "options", "object", "value", "value_reference", "comment"))
         # }}}
     })
 
-    idf_parsed <- parse_idf_file(idf_text, idd)
+    idf_parsed <- suppressWarnings(parse_idf_file(idf_text, idd))
     it("can add version according to input Idd object", {
         # {{{
         expect_equal(idf_parsed$version, as.numeric_version("8.8"))
@@ -108,17 +106,16 @@ describe("parse_idf_file()", {
                 0.7800000,               !- Solar Absorptance
                 0.7800000;               !- Visible Absorptance
             ")
-        val <- {s <- strsplit(text_object, "\n")[[1]][-c(1, 11)]
-                gsub("[,;].*", "", trimws(s, "left"))}
-        num <- suppressWarnings(as.double(c(val, "8.8")))
 
-        as.character(idd$object("Material")$field_unit())
-        expect_silent(idf_value <- parse_idf_file(text_object, idd))
+        val <- c("WD01", "MediumSmooth", "0.2", "0.115", "513", "1381", "0.9",
+            "0.78", "0.78", "8.8")
+        num <- suppressWarnings(as.numeric(val))
+        expect_warning(idf_value <- parse_idf_file(text_object, idd))
         expect_equal(names(idf_value$value),
-            c("value_id", "value", "value_upper", "value_num", "object_id"))
+            c("value_id", "value", "value_upper", "value_num", "value_ipnum", "object_id", "field_id"))
         expect_equal(idf_value$value$value_id, 1:10)
-        expect_equal(idf_value$value$value, c(val, "8.8"))
-        expect_equal(idf_value$value$value_upper, toupper(c(val, "8.8")))
+        expect_equal(idf_value$value$value, val)
+        expect_equal(idf_value$value$value_upper, toupper(val))
         expect_equivalent(idf_value$value$value_num, num)
         expect_equal(idf_value$value$object_id, c(rep(1, 9), 2))
         # }}}
@@ -137,21 +134,20 @@ describe("parse_idf_file()", {
                 0.7800000,               !- Solar Absorptance
                 0.7800000;               !- Visible Absorptance
             ")
-        expect_error(parse_idf_file(idf_wrong, idd))
+        expect_error(suppressWarnings(parse_idf_file(idf_wrong, idd)))
         # }}}
     })
 })
 
 describe("Idf$new()",
     # {{{
-    it("can create new Idf object from file", {
-        expect_silent(idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd))
-    })
     it("can create new Idf object from string", {
-        expect_silent(idf <- Idf$new(idf_text, idd))
+        expect_warning(idf <- Idf$new(idf_text, idd))
     })
     # }}}
 )
+
+suppressWarnings(idf <- Idf$new(idf_text, idd))
 
 describe("$version()", {
     # {{{
@@ -160,40 +156,41 @@ describe("$version()", {
     })
     # }}}
 })
-describe("$group_names()", {
+describe("$group_name()", {
     # {{{
     it("can get group names in Idf", {
-        expect_equal(idf$group_names(),
+        expect_equal(idf$group_name(),
                      c("Simulation Parameters",
                        "Surface Construction Elements",
                        "Thermal Zones and Surfaces"))
     })
     it("can get group names in Idd", {
-        expect_equal(idf$group_names(where = "idd"), idd$group_names())
+        expect_equal(idf$group_name(all = TRUE), idd$group_name())
     })
     # }}}
 })
-describe("$class_names()", {
+describe("$class_name()", {
     # {{{
     it("can get class names in Idf", {
-        expect_equal(idf$class_names(),
-                     c("Version",
-                       "Material",
-                       "Construction",
-                       "BuildingSurface:Detailed"))
+        expect_equal(idf$class_name(),
+            c("Version", "Material", "Construction", "BuildingSurface:Detailed"))
     })
     it("can get class names in Idd", {
-        expect_equal(idf$class_names(where = "idd"), idd$class_names())
+        expect_equal(idf$class_name(all = TRUE), idd$class_name())
     })
     # }}}
 })
-describe("$object_ids()", {
+describe("$object_id()", {
     # {{{
     it("can get all object ids", {
-        expect_equivalent(idf$object_ids(), 1:4)
+        expect_equal(idf$object_id(),
+            list(Version = 4L, Material = 1L, Construction = 2L,
+                `BuildingSurface:Detailed` = 3L))
+        expect_equal(idf$object_id(simplify = TRUE), 1L:4L)
     })
     it("can get all object ids of a single class", {
-        expect_equivalent(idf$object_ids("Version"), c(Version = 4))
+        expect_equal(idf$object_id("Version"), list(Version = 4L))
+        expect_equal(idf$object_id("Version", simplify = TRUE), 4L)
     })
     # }}}
 })
@@ -214,140 +211,71 @@ describe("$is_valid_id()", {
     })
     # }}}
 })
-describe("$get_options()", {
-    # {{{
-    it("works", {
-        expect_equal(idf$get_options(),
-                     list(validate_level = "final",
-                          view_in_ip = FALSE,
-                          special_format = FALSE,
-                          save_format = "sorted_order"))
-        expect_equal(idf$get_options(c("view_in_ip", "save_format")),
-                     list(view_in_ip = FALSE, save_format = "sorted_order"))
-    })
-    # }}}
-})
-describe("$set_options()", {
-    # {{{
-    it("works", {
-        expect_error(idf$set_options(), "Please give options to set")
-        expect_error(idf$set_options(Wrong = TRUE), "Invalid option name")
-        expect_error(idf$set_options(validate_level = "wrong")),
-        expect_error(idf$set_options(save_format = "wrong"))
-        ops <- list(validate_level = "draft",
-                    view_in_ip = FALSE,
-                    special_format = FALSE,
-                    save_format = "sorted_order")
-        expect_equal(idf$set_options(ops), ops)
-    })
-    # }}}
-})
 describe("$object()", {
     # {{{
     it("works", {
-        expect_is(idf$object(1), c("IdfObject", "IddObject", "R6"))
+        expect_is(idf$object(1)[[1]], c("IdfObject", "IddObject", "R6"))
         expect_silent(idf$object(1))
-        expect_error(idf$object(1:2))
+        expect_silent(idf$object(1:2))
         expect_error(idf$object("a"))
         expect_error(idf$object(5))
-    })
-    # }}}
-})
-describe("$objects()", {
-    # {{{
-    it("works", {
-        expect_silent(idf$objects(1:2))
-        expect_equal(class(idf$objects(1:2)), "list")
-        expect_equal(length(idf$objects(1:2)), 2L)
-        expect_error(idf$objects(1:5), "not a valid object ID")
+        expect_equal(class(idf$object(1:2)), "list")
+        expect_equal(length(idf$object(1:2)), 2L)
+        expect_error(idf$object(1:5), "Invalid object ID found")
+        expect_equal(idf$object(1)[[1]], idf[[1]])
     })
     # }}}
 })
 describe("$object_in_class()", {
     # {{{
     it("works", {
-        expect_silent(idf$object_in_class("Version"))
-        expect_equivalent(idf$object_in_class("Version"), idf$object(4))
-    })
-    # }}}
-})
-describe("$objects_in_class()", {
-    # {{{
-    it("works", {
-        expect_equivalent(idf$objects_in_class("Version", 1), idf$objects(4))
-        expect_error(idf$objects_in_class("Version", 2))
+        expect_equal(idf$object_in_class("Version"), idf$object(4))
+        expect_error(idf$object_in_class("wrong"))
     })
     # }}}
 })
 describe("$dup_object()", {
     # {{{
     it("works", {
-        idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd)
-        expect_equal(idf$dup_object(66)$get_value(2:5),
-                     idf$object(66)$get_value(2:5))
+        expect_equal(idf$dup_object(1)[[1]]$get_value(2:5),
+                     idf$object(1)[[1]]$get_value(2:5))
+        expect_equal(idf$object(5)[[1]]$name(), "WD01_1")
     })
     # }}}
 })
 describe("$add_object()", {
     # {{{
-    it("", {
+    it("can add multiple objects", {
+        expect_silent(
+            idf$add_object(rep("RunPeriod", 2),
+              value = list(
+                list("rp_test_1", 1, 1, 2, 1),
 
+                list(name = "rp_test_2",
+                     begin_month = 3,
+                     begin_day_of_month = 1,
+                     end_month = 4,
+                     end_day_of_month = 1)
+                ),
+              comment = list(
+                list("Comment for new object 1", "Another comment"),
+                list("Comment for new object 2")),
+              default = TRUE
+            )
+        )
+        expect_equal(unname(unlist(idf$object(6)[[1]]$get_value())),
+            c("rp_test_1", "1", "1", "2", "1", "UseWeatherFile", "Yes", "Yes",
+                "No", "Yes", "Yes"))
     })
     # }}}
 })
 describe("$set_object()", {
     # {{{
-    it("", {
-
-    })
-    # }}}
-})
-describe("$del_object()", {
-    # {{{
-    it("", {
-
-    })
-    # }}}
-})
-describe("$validate()", {
-    # {{{
-    it("", {
-
-    })
-    # }}}
-})
-describe("$string()", {
-    # {{{
-    it("", {
-
-        idf$set_options(validate_level = "draft")
-        idf$add_object("Construction", "try", "add", "object")
-        idf$set_options(save_format = "new_bottom")
-        idf$string()
-        idf$format_idf(header = FALSE)
-        idf$set_options(view_in_ip = TRUE)
-        idf$format_idf(header = FALSE)
-        idf$set_options(num_digits = 4L)
-        idf$format_idf(header = FALSE)
-    })
-    # }}}
-})
-describe("$save()", {
-    # {{{
-    it("", {
-        idf <- Idf$new("files/5Zone_Transformer_8.8.idf", idd)
-        idf$set_options(save_format = "sorted")
-        idf$save("files/test_save.idf", overwrite = TRUE)
-        idf$set_options(save_format = "new_bottom")
-        idf$string()
-        idf$set_options(validate_level = "draft")
-        idf$add_object("Construction", "try", "add", "object")
-        idf$string()
-        idf$format_idf(header = FALSE)
-        idf$set_options(view_in_ip = TRUE)
-        idf$format_idf(header = FALSE)
-        idf$set_options(num_digits = 4L)
-        idf$format_idf(header = FALSE)
+    it("set new values and comments", {
+        expect_silent(
+            idf$set_object("rp_test_1", list(name = "rp_test_3", begin_day_of_month = 2),
+                comment = list(format(Sys.Date()), "begin day has been changed."))
+        )
     })
     # }}}
 })

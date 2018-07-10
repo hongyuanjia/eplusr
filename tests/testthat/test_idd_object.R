@@ -1,4 +1,4 @@
-context("IddObject method")
+context("IddObject methods")
 
 # idd_text {{{
 idd_text <- c(

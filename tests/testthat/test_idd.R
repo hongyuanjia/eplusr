@@ -311,24 +311,9 @@ describe("Idd$new()", {
     it("can create an Idd object from string", {
            expect_silent(idd <- Idd$new(idd_text))
     })
-
-    skip_on_cran()
-    it("can parse Idd files from 8.1 to 8.8 without any error", {
-        idd <- Idd$new(here::here("idd/V8-8-0-Energy+.idd"))
-        idd
-        expect_silent(Idd$new("../../idd/V8-8-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-7-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-6-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-5-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-4-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-3-0-Energy+.idd"))
-        expect_silent(Idd$new("../../idd/V8-2-0-Energy+.idd"))
-        # there is no build tag in this file
-        expect_warning(Idd$new("../../idd/V8-1-0-Energy+.idd"))
-    })
 })
 
-idd <- read_idd(idd_text)
+idd <- use_idd(idd_text)
 
 describe("$version()", {
     it("can get Idd version", {
@@ -364,24 +349,6 @@ describe("$class_name()", {
     })
 })
 
-describe("$required_class_name()", {
-    it("can return names of all required classes", {
-        expect_equal(idd$required_class_name(), "TestSlash")
-    })
-})
-
-describe("$unique_class_name()", {
-    it("can return names of all unique classes", {
-        expect_equal(idd$unique_class_name(), "TestSlash")
-    })
-})
-
-describe("$extensible_class_name()", {
-    it("can return names of all extensible classes", {
-        expect_equal(idd$extensible_class_name(), "TestSlash")
-    })
-})
-
 describe("$group_index()", {
     it("can return an index of a single group", {
         expect_equal(idd$group_index("TestGroup1"), 1)
@@ -409,6 +376,24 @@ describe("$class_index()", {
 
 })
 
+describe("$required_class_name()", {
+    it("can return names of all required classes", {
+        expect_equal(idd$required_class_name(), "TestSlash")
+    })
+})
+
+describe("$unique_class_name()", {
+    it("can return names of all unique classes", {
+        expect_equal(idd$unique_class_name(), "TestSlash")
+    })
+})
+
+describe("$extensible_class_name()", {
+    it("can return names of all extensible classes", {
+        expect_equal(idd$extensible_class_name(), "TestSlash")
+    })
+})
+
 describe("$object()", {
     it("can return a single IddObject using class name", {
         expect_is(idd$object("TestSimple")$TestSimple, "IddObject")
@@ -434,16 +419,6 @@ describe("$object_in_group()", {
     it("can stop when multiple group names are given", {
         expect_error(idd$object_in_group(c("TestGroup1", "TestGroup2")),
                      "group is not a string")
-    })
-})
-
-describe("$reference_map()", {
-    it("can return reference map of a single calss", {
-        expect_equal(idd$reference_map("TestSlash"),
-                     list(reference_class = character(0),
-                          reference_field = character(0),
-                          object_list = "TestSimple",
-                          external_list = "eplusout.rdd"))
     })
 })
 
