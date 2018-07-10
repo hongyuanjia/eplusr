@@ -315,8 +315,8 @@ i_param_locate_output <- function (self, private, which, suffix = ".err", strict
 }
 # }}}
 
-# i_param_errors {{{
-i_param_errors <- function (self, private, which, info = FALSE) {
+# i_param_output_errors {{{
+i_param_output_errors <- function (self, private, which, info = FALSE) {
     job <- i_param_job_from_which(self, private, which)
     purrr::map(job, ~.x$errors(info = info))
 }
@@ -334,15 +334,26 @@ i_param_report_data <- function (self, private, which, key_value = NULL,
                                  name = NULL, all = FALSE, year = NULL, tz = "GMT") {
     job <- i_param_job_from_which(self, private, which)
     data.table::rbindlist(purrr::map(job,
-        ~.x$report_data(key_value = key_value, name = name,
-            all = all, year = year, tz = tz)))
+        ~.x$report_data(key_value = key_value, name = name, year = year, tz = tz)))
 }
 # }}}
 
 # i_param_tabular_data {{{
 i_param_tabular_data <- function (self, private, which = NULL) {
     job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job, ~.x$tabular_data()))
+    res <- data.table::rbindlist(purrr::map(job,
+        ~{
+            d <- .x$tabular_data()
+            case <- tools::file_path_sans_ext(basename(
+                .x$locate_output(".idf", strict = FALSE)))
+            d[, Case := case]
+            d
+        })
+    )
+
+    data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
+
+    res[]
 }
 # }}}
 
