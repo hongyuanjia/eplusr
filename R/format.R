@@ -398,7 +398,8 @@ value_list <- function (value_tbl, in_ip = FALSE) {
 
     num_col <- ifelse(in_ip, "value_ipnum", "value_num")
     value_tbl[, out := as.list(value)]
-    value_tbl[type %in% c("integer", "real"), out := as.list(get(num_col))]
+    value_tbl[type %in% c("integer", "real") & !value_upper %in% c("AUTOSIZE", "AUTOCALCULATE"),
+        out := as.list(get(num_col))]
 
     res <- value_tbl$out
 
