@@ -1695,9 +1695,7 @@ i_replace_value = function (self, private, pattern, replacement, class = NULL) {
         private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
         private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L][,
-        `:=`(field_index = paste0(lpad(field_index, "0"), "(before)"),
-             full_name = paste0(full_name, "\n"),
-             full_ipname = paste0(full_ipname, "\n"))]
+        `:=`(field_index = paste0(lpad(field_index, "0"), "(before)"))]
 
     value_tbl_after <- val_after[
         private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
