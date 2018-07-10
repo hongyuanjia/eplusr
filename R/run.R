@@ -137,16 +137,6 @@ clean_wd <- function (path) {
     for (f in target) unlink(f)
 }
 # }}}
-# cmd_args {{{
-cmd_args <- function (model, weather, output_dir, output_prefix,
-                      output_suffix = "C", expand_obj = TRUE, readvars = TRUE,
-                      annual = FALSE, design_day = FALSE, idd = NULL) {
-    # docs {{{
-    ############################################################################
-    #           Notes on arguments (From EnergyPlus documentation)             #
-    ############################################################################
-    # 1. model
-    # Full path of a model file with extension of idf or imf to use.
 
 #' Run simulations of EnergyPlus models.
 #'
