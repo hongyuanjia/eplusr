@@ -1,81 +1,359 @@
-#' @importFrom processx run process
-#' @importFrom lubridate ymd
 #' @importFrom tools file_path_sans_ext
-#' @importFrom rlang f_lhs f_rhs f_env eval_tidy
-#' @importFrom data.table month mday setattr
+#' @importFrom readr read_lines
+#' @importFrom processx run process
+#' @importFrom data.table data.table
+#' @importFrom future plan
+#' @importFrom furrr future_map2
+NULL
 
-# eplus_path {{{
-eplus_path <- function (ver = NULL, path = NULL) {
-    os <- Sys.info()['sysname']
-    # try to locate EnergyPlus in default location
-    if (!is.null(ver)) {
-        assert_that(is_eplus_ver(ver))
-        ver_dash <- dash_ver(ver)
-        eplus_home <- switch(os,
-            "Windows" = paste0("C:/EnergyPlusV", ver_dash),
-            "Linux" = paste0("/usr/local/EnergyPlus-", ver_dash),
-            "Darwin" = paste0("/Applications/EnergyPlus-", ver_dash))
-        # if failed
-        if (!dir.exists(eplus_home)) {
-            # and path is NULL, error
-            if (is.null(path)) {
-                stop(msg("Cannot locate EnergyPlus V", ver, " at default
-                         installation path ", sQuote(eplus_home), ". Please
-                         give exact 'path' of EnergyPlus installation."))
-            # and path is given, then use path
-            } else {
-                if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-                eplus_home <- path
-            }
+#' Configure which version of EnergyPlus to use
+#'
+#' @param eplus An acceptable EnergyPlus version or an EnergyPlus installation
+#'        path.
+#' @param ver An acceptable EnergyPlus version.
+#'
+#' @details
+#'
+#' `use_eplus` will add an EnergyPlus version into the EnergyPlus version
+#' dictionary in eplusr.
+#'
+#' `eplus_config` will return the configure data of specified version of
+#' EnergyPlus.
+#'
+#' `avail_eplus` will return all available EnergyPlus found.
+#'
+#' `is_avail_eplus` will check if the specified version of EnergyPlus is
+#' available or not.
+#'
+#' @return For `eplus_config`, the configure data of specified version of
+#'         EnergyPlus.
+#' @rdname use_eplus
+#' @examples
+#' \dontrun{
+#'
+#' use_eplus(8.9)
+#' use_eplus("8.8.0")
+#' eplus_config(8.6)
+#' }
+#'
+#' avail_eplus()
+#' is_avail_eplus(8.8)
+#' @export
+# use_eplus {{{
+use_eplus <- function (eplus) {
+    # if eplus is a version, try to locate it in the default path
+    if (is_supported_ver(eplus)) {
+        ver <- standerize_ver(eplus)
+        eplus_dir <- eplus_default_path(eplus)
+        if (!is_valid_eplus_path(eplus_dir)) {
+            stop(msg("Cannot locate EnergyPlus V", trimws(eplus), " at default
+                     installation path ", backtick(eplus_dir), ". Please
+                     give exact path of EnergyPlus installation."),
+                call. = FALSE)
         }
-    # if no version, try path
-    } else if (!is.null(path)) {
-        if (!dir.exists(path)) stop(msg(sQuote(path), " does not exists."), call. = FALSE)
-        eplus_home <- path
-    # if none, error
     } else {
-        stop("Both 'ver' and 'path' are NULL.", call. = FALSE)
+        ver <- get_ver_from_path(eplus)
+        eplus_dir <- eplus
+        if (!is_valid_eplus_path(eplus)) {
+            stop(msg(backtick(eplus_dir), "is not a valid EnergyPlus installation path."),
+                call. = FALSE)
+
+        }
+        if (is.null(ver)) {
+            stop("Failed to detect the version of EnergyPlus located in ",
+                 backtick(eplus_dir), ".", call. = FALSE)
+        }
     }
 
-    ext <- ""
-    if (os == "Windows") ext <- ".exe"
-
-    eplus_exe <- normalizePath(
-        file.path(eplus_home, paste0("energyplus", ext)),
-        winslash = "/", mustWork = FALSE
-    )
-
-    energyplus_idd <- normalizePath(
-        file.path(eplus_home, "Energy+.idd"), winslash = "/", mustWork = FALSE
-    )
-
-    chicago_epw <- normalizePath(
-        file.path(eplus_home, "WeatherData", "USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw"),
-        winslash = "/", mustWork = FALSE
-    )
-
-    if (!file.exists(eplus_exe)) {
-        stop(msg("EnergyPlus executable does not exist in folder ", sQuote(eplus_home), "."))
-    }
-
-    if (!file.exists(energyplus_idd)) {
-        warning(msg(sQuote("Energy+.idd"), " does not exist in EnergyPlus
-                    installation folder."))
-        energyplus_idd <- NULL
-    }
-
-    if (!file.exists(chicago_epw)) chicago_epw <- NULL
-
-    eplus_info <- c(home = eplus_home, eplus = eplus_exe,
-                    idd = energyplus_idd, epw = chicago_epw)
-
-    return(eplus_info)
+    res <- list(version = ver, dir = eplus_dir, exe = paste0("energyplus", exe()))
+    .globals$eplus_config[[as.character(ver)]] <- res
+    message("EnergyPlus v", ver, " has been added to EnergyPlus location dictionary.")
 }
 # }}}
-# dash_ver {{{
-dash_ver <- function (ver) {
+
+#' @rdname use_eplus
+#' @export
+# avail_eplus {{{
+avail_eplus <- function () names(.globals$eplus_config)
+# }}}
+
+#' @rdname use_eplus
+#' @export
+# eplus_config {{{
+eplus_config <- function (ver) {
     assert_that(is_eplus_ver(ver))
-    paste0(sub(".", "-", ver, fixed = TRUE), "-0")
+    ver <- standerize_ver(ver)
+    .globals$eplus_config[[as.character(ver)]]
+}
+# }}}
+
+#' @rdname use_eplus
+#' @export
+# is_avail_eplus {{{
+is_avail_eplus <- function (ver) !is.null(eplus_config(ver))
+# }}}
+
+#' Clean working directory of a previous EnergyPlus simulation
+#'
+#' Clean working directory of an EnergyPlus simulation by deleting all input and
+#' output files of previous simulation.
+#'
+#' @param path An `.idf` or `.imf` file path.
+#' @export
+# clean_wd {{{
+clean_wd <- function (path) {
+
+    base <- tools::file_path_sans_ext(basename(path))
+    without_ext <- tools::file_path_sans_ext(path)
+    wd <- dirname(path)
+
+    # files_to_delete {{{
+    suffix <- c(".Zsz", ".audit", ".bnd", ".csv", ".dbg", ".det", ".dfs",
+        ".dxf", ".edd", ".eio", ".end", ".epmdet", ".epmidf", ".err", ".eso",
+        ".expidf", ".inp", ".log", ".mat", ".mdd", ".mtd", ".mtr", ".rdd",
+        ".rvaudit", ".sci", ".shd", ".sln", ".sql", ".ssz", ".svg", ".tab",
+        ".txt", ".wrl", "DElight.dfdmp", "DElight.eldmp", "DElight.in",
+        "DElight.out", "DFS.csv", "Map.csv", "Map.tab", "Map.txt", "Meter.csv",
+        "Meter.tab", "Meter.txt", "Screen.csv", "Spark.log", "Sqlite.err",
+        "Ssz.csv", "Ssz.tab", "Ssz.txt", "Table.csv", "Table.htm", "Table.html",
+        "Table.tab", "Table.txt", "Table.xml", "Zsz.csv", "Zsz.tab", "Zsz.txt")
+    out_files <- paste0(without_ext, suffix)
+
+    individual <- c("BasementGHTIn.idf", "audit.out", "expanded.idf",
+        "expandedidf.err", "in.epw", "in.idf", "in.imf", "in.stat", "out.idf",
+        "readvars.audit", "slab.int", "sqlite.err", "test.mvi", "fort.6")
+
+    if (base == "in") {
+        individual <- setdiff(individual, c("in.epw", "in.idf"))
+    } else {
+        individual <- setdiff(individual, paste0(base, ".idf"))
+    }
+
+    seperates <- normalizePath(file.path(wd, individual), mustWork = FALSE)
+
+    target <- c(out_files, seperates)
+    # }}}
+
+    for (f in target) unlink(f)
+}
+# }}}
+
+#' Run simulations of EnergyPlus models.
+#'
+#' `run_idf` is a wrapper of EnergyPlus command line interface which enables to
+#' run EnergyPlus model with different options.  `run_multi` provides the
+#' functionality of running multiple models in parallel.
+#'
+#' @param eplus An acceptable input of [use_eplus()] and [eplus_config()].
+#' @param model A path of an EnergyPlus IDF or IMF file.
+#' @param weather A path of an EnergyPlus EPW weather file.
+#' @param output_dir Output directory path. If NULL, which is default, the
+#'     directory of input model will be used.
+#' @param design_day Force design-day-only simulation. Default: `FALSE`.
+#' @param annual Force design-day-only simulation. Default: `FALSE`.
+#' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
+#'     information to the console.  If `FALSE`, which is default, a
+#'     [processx::process] object will be return.
+#' @param expand_obj Where to run ExpandObject preprocessor before simulation.
+#'     Default: `TRUE`.
+#' @param parallel_backend Acceptable input for [future::plan()].
+#'
+#' @details
+#' Behind the scene, `run_multi` uses the package `furrr` which provides apply
+#' mapping functions in parallel using package `future`. It is suggested to run
+#' simulation using `Job` class, which provides much more controls on simulation
+#' and also methods to extract simulation results.
+#'
+#' @references
+#' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
+#' @examples
+#' \dontrun{
+#'
+#' run_idf(8.8, "input.idf", "weather.epw")
+#' }
+#' @rdname run_model
+#' @export
+# run_idf {{{
+run_idf <- function (eplus, model, weather, output_dir = NULL,
+                     design_day = FALSE, annual = FALSE, expand_obj = TRUE,
+                     echo = FALSE) {
+
+    exe <- eplus_exe(eplus)
+
+    model <- normalizePath(model, mustWork = TRUE)
+    weather <- normalizePath(weather, mustWork = TRUE)
+
+    # get output directory
+    if (is.null(output_dir)) output_dir <- dirname(model)
+    output_dir <- normalizePath(output_dir, mustWork = FALSE)
+    if (!dir.exists(output_dir)) {
+        tryCatch(dir.create(output_dir, recursive = TRUE),
+            warning = function (w) {
+                stop("Failed to create output directory: ",
+                     backtick(output_dir), call. = FALSE)
+            }
+        )
+    }
+
+    # copy input files
+    loc_m <- copy_run_files(model, output_dir)
+    loc_w <- copy_run_files(weather, output_dir)
+    # clean output directory
+    clean_wd(model)
+
+    # set working dirctory
+    ori_wd <- getwd()
+    setwd(dirname(loc_m))
+    on.exit(setwd(ori_wd), add = TRUE)
+
+    # get arguments of energyplus
+    args <- cmd_args(loc_m, loc_w, output_dir = output_dir, annual = annual,
+                     design_day = design_day, expand_obj = expand_obj)
+
+    if (echo) {
+        # have to suppress warnings here as it always complains about warnings
+        # on 'can nonly read in bytes in a non-UTF-8 MBCS locale'.
+        out <- invisible(suppressWarnings(processx::run(exe, args,
+            windows_verbatim_args = TRUE, echo = TRUE)))
+    } else {
+        out <- processx::process$new(
+            exe, args,
+            stdout = "|", stderr = "|", cleanup = TRUE,
+            echo_cmd = FALSE, windows_verbatim_args = TRUE,
+            windows_hide_window = FALSE)
+    }
+}
+# }}}
+
+#' @export
+#' @rdname run_model
+# run_multi {{{
+run_multi <- function (eplus, model, weather, output_dir = NULL,
+                       design_day = FALSE, annual = FALSE,
+                       parallel_backend = future::multiprocess) {
+    if (!is_scalar(model)) {
+        if (!is_scalar(weather))
+            assert_that(is_same_len(model, weather))
+
+        if (!is_scalar(eplus))
+            assert_that(is_same_len(model, eplus))
+    }
+
+    model <- normalizePath(model, mustWork = TRUE)
+    weather <- normalizePath(weather, mustWork = TRUE)
+    eplus_exe <- vapply(eplus, eplus_exe, character(1))
+
+    if (anyDuplicated(model) & is.null(output_dir))
+        stop("`model` cannot have any duplications when `output_dir` is not given.",
+            call. = FALSE)
+
+    if (is.null(output_dir)) {
+        output_dir <- dirname(model)
+    } else {
+        assert_that(is_same_len(model, output_dir))
+    }
+
+    output_dir <- normalizePath(output_dir, mustWork = FALSE)
+
+    input <- data.table::data.table(model = model, output_dir = output_dir)
+
+    if (anyDuplicated(input))
+        stop("Duplication found in the combination of `model` and `output_dir`.",
+            " One model could not be run in the same output directory multiple ",
+            "times simultaneously.", call. = FALSE)
+
+    d <- unique(output_dir)[!dir.exists(unique(output_dir))]
+    created <- lapply(d, dir.create, showWarnings = FALSE, recursive = TRUE)
+    if (any(!created))
+        stop("Failed to create output directory:\n",
+            paste0(backtick(d[!created]), collapse = "\n"), call. = FALSE)
+
+    lapply(unique(input$model), clean_wd)
+
+    input[, `:=`(weather = weather, eplus_exe = eplus_exe)]
+    input[, `:=`(loc_model = copy_run_files(model, output_dir),
+                 loc_weather = copy_run_files(weather, output_dir))]
+    input[, index := .I]
+    input[, `:=`(run_args = cmd_args(loc_model, loc_weather, output_dir,
+                     design_day = design_day, annual = annual)), by = index]
+
+    future::plan(parallel_backend)
+    l <- furrr::future_map2(input$eplus_exe, input$run_args,
+        ~invisible(suppressWarnings(processx::run(.x, .y,
+            windows_verbatim_args = TRUE, echo = TRUE))), .progress = TRUE)
+    # close all RScript process after simulation complete
+    # Reference: https://github.com/HenrikBengtsson/future/issues/117
+    future::plan(future::sequential)
+
+    # TODO: summary info of multiple simualtions
+    l
+}
+# }}}
+
+# eplus_default_path {{{
+eplus_default_path <- function (ver) {
+    stopifnot(is_eplus_ver(ver))
+    ver <- standerize_ver(ver)
+    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
+    if (is_windows()) {
+        d <- paste0("C:/EnergyPlusV", ver_dash)
+    } else if (is_linux()) {
+        d <- paste0("/usr/local/EnergyPlus-", ver_dash)
+    } else {
+        d <- paste0("/Applications/EnergyPlus-", ver_dash)
+    }
+    d
+}
+# }}}
+# exe {{{
+exe <- function () if (is_windows()) ".exe" else  ""
+# }}}
+# is_valid_eplus_path {{{
+is_valid_eplus_path <- function (path) {
+    if (!dir.exists(path)) {
+        FALSE
+    } else {
+        all(file.exists(c(file.path(path, paste0("energyplus",exe())),
+                          file.path(path, "Energy+.idd"))))
+    }
+}
+# }}}
+# get_ver_from_path {{{
+get_ver_from_path <- function (path) {
+    # try to get version form EnergyPlus path
+    ver <- tryCatch(gsub("^.*V", "", path), error = function (e) NULL)
+    # then from the first line of Energy+.idd
+    if (is.null(ver)) {
+        h <- readr::read_lines(file.path(path, "Energy+.idd"), n_max = 1L)
+        # if still failed, just return NULL
+        ver <- tryCatch(get_idd_ver(h), error = function (e) NULL)
+    }
+    standerize_ver(ver)
+}
+# }}}
+# eplus_exe {{{
+eplus_exe <- function (eplus) {
+    if (is_eplus_ver(eplus)) {
+        if (!is_avail_eplus(eplus)) use_eplus(eplus)
+    } else {
+        use_eplus(eplus)
+    }
+    config <- eplus_config(eplus)
+    normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
+}
+# }}}
+# standerize_ver {{{
+standerize_ver <- function (ver) {
+    if (is_integerish(ver)) ver <- paste0(ver, ".0")
+    ver <- as.numeric_version(ver)
+    if (is.na(ver[1,3])) ver[1,3] <- 0
+    ver
+}
+# }}}
+# init_avail_eplus {{{
+init_avail_eplus <- function () {
+    lapply(c(8.5, 8.6, 8.7, 8.8, 8.9),
+           function (x) tryCatch(use_eplus(x), error = function (e) NULL))
 }
 # }}}
 # cmd_args {{{
@@ -139,7 +417,7 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
     ############################################################################
 
     # }}}
-    # Get the right format of the input command to EnergyPlus. {{{2
+    # Get the right format of the input command to EnergyPlus. {{{
     # NOTE: `ifelse` function cannot return NULL.
     if (missing(output_prefix) || is.null(output_prefix)) {
         output_prefix <- tools::file_path_sans_ext(basename(model))
@@ -160,8 +438,8 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
     if (annual) cmd_annual <- "--annual" else cmd_annual <- NULL
     if (design_day) cmd_design_day <- "--design-day" else cmd_design_day <- NULL
     if (!is.null(idd)) cmd_idd <- paste0("--idd", shQuote(idd)) else cmd_idd <- NULL
-    # }}}2
-    # In case there are spaces in user input, quote all pathes {{{2
+    # }}}
+    # In case there are spaces in user input, quote all pathes {{{
     args <- paste(
         "--weather", shQuote(weather),
         "--output-directory", shQuote(output_dir),
@@ -170,249 +448,27 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
         cmd_epmacro, cmd_expand_obj, cmd_readvars, cmd_annual, cmd_design_day, cmd_idd,
         shQuote(model)
     )
-    # }}}2
+    # }}}
 
     return(args)
 }
 # }}}
 # copy_run_files {{{
 copy_run_files <- function (file, dir) {
-    loc <- file.path(dir, basename(file))
+    file <- normalizePath(file, mustWork = TRUE)
+    loc <- normalizePath(file.path(dir, basename(file)), mustWork = FALSE)
     flag <- FALSE
 
-    if (file == loc) return(file)
+    if (all(file == loc)) return(file)
 
-    flag <- file.copy(from = file, to = loc, overwrite = TRUE, copy.date = TRUE)
+    copy <- unique(data.table::data.table(from = file, to = loc))
+    flag <- purrr::map2_lgl(copy$from, copy$to, file.copy,
+        overwrite = TRUE, copy.date = TRUE)
 
-    if (!flag) stop(msg(sprintf("Unable to copy file %s into simulation output directory.",
-                                sQuote(basename(file)))),
-                    call. = FALSE)
+    if (any(!flag))
+        stop("Unable to copy file ", backtick(basename(file[!flag])), "into ",
+            "simulation output directory.", call. = FALSE)
 
     return(loc)
-}
-# }}}
-# run_idf {{{
-run_idf <- function (eplus_exe, model, weather, output_dir = NULL,
-                     design_day = FALSE, annual = FALSE, expand_obj = TRUE,
-                     echo = FALSE) {
-    model <- normalizePath(model, winslash = "/", mustWork = FALSE)
-    weather <- normalizePath(weather, winslash = "/", mustWork = FALSE)
-    assert_that(file.exists(model))
-    assert_that(file.exists(weather))
-
-    # get output directory
-    if (is.null(output_dir)) output_dir <- dirname(model)
-    if (!dir.exists(output_dir)) {
-        flag_dir <- dir.create(
-            normalizePath(output_dir, winslash = "/", mustWork = FALSE),
-            recursive = TRUE)
-        assert_that(flag_dir, msg = "Unable to create output directory. Simulation stoped.")
-    }
-
-    # copy input files
-    loc_m <- copy_run_files(model, output_dir)
-    loc_w <- copy_run_files(weather, output_dir)
-
-    # set working dirctory
-    ori_wd <- getwd()
-    setwd(dirname(loc_m))
-    on.exit(setwd(ori_wd))
-
-    # get arguments of energyplus
-    args <- cmd_args(loc_m, loc_w, output_dir = output_dir, annual = annual,
-                     design_day = design_day, expand_obj = expand_obj)
-
-    sim_info <- list(model = loc_m, weather = loc_w, dir = output_dir)
-
-    if (echo) {
-        invisible(processx::run(eplus_exe, args,
-                                windows_verbatim_args = TRUE, echo = TRUE))
-    } else {
-        p <- processx::process$new(
-            eplus_exe, args,
-            stdout = "|", stderr = "|", cleanup = TRUE,
-            echo_cmd = TRUE, windows_verbatim_args = TRUE,
-            windows_hide_window = FALSE)
-        return(list(process = p, info = sim_info))
-    }
-
-}
-# }}}
-
-# days_in_month {{{
-days_in_month <- function (x) {
-    days_all <- c(`1` = 31L, `2` = 28L, `3` = 31L,
-                  `4` = 30L, `5` = 31L, `6` = 30L,
-                  `7` = 31L, `8` = 31L, `9` = 30L,
-                  `10` = 31L, `11` = 30L, `12` = 31L)
-    unname(days_all[which(names(days_all) == month(x))])
-}
-# }}}
-# format_runperiod {{{
-format_runperiod <- function (runperiod, side = c("lhs", "rhs")) {
-
-    side <- match.arg(side)
-
-    # just a random non-leep year
-    const_year <- 2017L
-
-    if (as.character(runperiod) %in% c("asis", "annual", "design_day")) {
-        return(runperiod)
-    }
-
-    split_str <- unlist(strsplit(as.character(runperiod), "[-/.]|[[:space:]]"))
-
-    # handle month
-    if (length(split_str) == 1L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, "-", split_str), truncated = 1L))
-        if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
-
-        if (side == "rhs") {
-            total_days <- days_in_month(out)
-            out <- lubridate::ymd(paste0(const_year, "-", split_str, "-", total_days))
-        }
-
-    } else if (length(split_str) == 2L) {
-        out <- suppressWarnings(lubridate::ymd(paste0(const_year, paste0(split_str, collapse = "-"))))
-    } else {
-        stop("Cannot parse run period.", call. = FALSE)
-    }
-
-    if (is.na(out)) stop("Cannot parse run period.", call. = FALSE)
-
-    return(out)
-}
-# }}}
-# parse_runperiod {{{
-parse_runperiod <- function (runperiod) {
-    # NOTE: inspired by `tibbletime` package.
-    # lhs/rhs list
-    rp <- list(lhs = rlang::f_lhs(runperiod), rhs = rlang::f_rhs(runperiod))
-
-    # Environment to evaluate the sides in
-    rp_env <- rlang::f_env(runperiod)
-    rp_env$. <- "asis"
-
-    # Tidy evaluation
-    rp <- lapply(rp,
-        function(x) {
-            rlang::eval_tidy(x, env = rp_env)
-        }
-    )
-
-    # Double up if 1 sided
-    # length = 2 means that it has ~ and 1 side
-    if (length(runperiod) == 2) {
-        rp$lhs <- rp$rhs
-    }
-
-    out <- list(start = NA, end = NA)
-    out$start <- format_runperiod(rp$lhs, "lhs")
-    out$end <- format_runperiod(rp$rhs, "rhs")
-
-    if (out$end %in% c("annual", "design_day", "asis") &&
-        as.character(out$start) != out$end) {
-        stop(msg("Invalid run period formula. Left hand side should be empty if
-                 right hand side is 'annual', 'design_day', or '.'."),
-                 call. = FALSE)
-    } else if (out$start %in% c("annual", "design_day", "asis") &&
-               out$start != as.character(out$end)) {
-        stop(msg("Invalid run period formula. Formula should be in a format of
-                 '~RHS' if 'annual', 'design_day' or '.' is used."),
-                 call. = FALSE)
-    } else if (out$start > out$end) {
-        stop(msg("Invalid run period formula. Start date should be smaller than
-                 end date."), call. = FALSE)
-    }
-
-    out
-}
-# }}}
-# set_runperiod {{{
-set_runperiod <- function (idf, runperiod, idd, hide_others = TRUE) {
-    rp <- parse_runperiod(runperiod)
-
-    setattr(idf, "runperiod", rp)
-
-    if (rp$end %in% c("asis", "annual", "design_day")) return(idf)
-
-    ids <- get_id(idf, "RunPeriod")
-
-    # if the model has already been set before, use it
-    if (not_empty(ids)) {
-        rp_eplusr <- idf$value[object_id %in% ids][field_order == 1L][
-            value == "run_period_eplusr", object_id]
-        rp_others <- setdiff(ids, rp_eplusr)
-        if (not_empty(rp_eplusr)) {
-            idf <- invisible(
-                set_object(idf, id = rp_eplusr, name = "run_period_eplusr",
-                           begin_month = month(rp$start),
-                           begin_day_of_month = mday(rp$start),
-                           end_month = month(rp$end),
-                           end_day_of_month = mday(rp$end), idd = idd)
-            )
-        } else {
-            idf <- invisible(
-                add_object(idf, class = "RunPeriod", name = "run_period_eplusr",
-                           begin_month = month(rp$start),
-                           begin_day_of_month = mday(rp$start),
-                           end_month = month(rp$end),
-                           end_day_of_month = mday(rp$end), idd = idd)
-            )
-        }
-
-        if (hide_others && not_empty(rp_others)) {
-            for (i in rp_others) {
-                idf <- add_comment(idf, i, append = FALSE, type = 1L,
-                                   "[ * Commented out automatically by eplusr * ]")
-                idf <- del_object(idf, i, idd, hide = TRUE)
-            }
-            warning(msg(sprintf("Objects in class %s with ID %s has/have been
-                                commented out to use the input run period.",
-                                sQuote("RunPeriod"),
-                                paste(rp_others, collapse = ", "))), call. = FALSE)
-        }
-
-    }
-
-    return(idf)
-}
-# }}}
-# set_output_table_stype {{{
-set_output_table_stype <- function (idf, idd) {
-    targ_class <- "OutputControl:Table:Style"
-    id <- tryCatch(get_id(idf, targ_class), error = function (e) NULL)
-
-    if (not_empty(id)) {
-        dict <- c(Comma = "CommaAndHTML", Tab = "TabAndHTML",
-                  XML = "XMLandHTML", Fixed = "All", CommaAndXML = "ALL")
-
-        val <- get_value(idf, id, 1L)[, value]
-        new_val <- dict[which(val == names(dict))]
-
-        if (val %in% names(dict)) {
-            mes <- sprintf("Inorder to extract tabe output using %s, the value of
-                           %s in class %s with ID %s has been changed from %s to
-                           %s.",
-                           sQuote("$table"), sQuote("Column Separator"),
-                           sQuote(targ_class), sQuote(id),
-                           sQuote(val), sQuote(new_val))
-            idf <- invisible(set_object(idf = idf, id = id, new_val, idd = idd))
-            warning(msg(mes), call. = FALSE)
-        }
-
-    } else {
-        mes <- sprintf("In order to extract table output using %s, the value of
-                       %s in class %s has been changed from the default %s to
-                       %s.",
-                       sQuote("$table"), sQuote("Column Separator"),
-                       sQuote(targ_class),
-                       sQuote("Comma"), sQuote("CommaAndHTML"))
-        idf <- invisible(add_object(idf = idf, class = targ_class,
-                                    "CommaAndHTML", "None", idd = idd))
-        warning(msg(mes), call. = FALSE)
-    }
-
-    return(idf)
 }
 # }}}
