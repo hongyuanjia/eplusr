@@ -2235,36 +2235,82 @@ i_assign_value_tbl <- function (self, private, new_tbl) {
 i_update_value_reference_from_id <- function (self, private, old_id, new_id) {
     d <- data.table::data.table(value_id = old_id, new_id = new_id)
 
-    private$m_idf_tbl$value_reference <- d[
-        private$m_idf_tbl$value_reference, on = "value_id"][
-        !is.na(value_id), `:=`(value_id = new_id)][, `:=`(new_id = NULL)]
+    # get old reference table and assign new value id
+    new_val_ref <- private$m_idf_tbl$value_reference[d, on = "value_id", nomatch = 0L][
+        !is.na(reference_value_id), `:=`(value_id = new_id)][, `:=`(new_id = NULL)]
+
+    if (is_empty(new_val_ref)) return()
+    private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
+        private$m_idf_tbl$value_reference, new_val_ref), use.names = TRUE)
 }
 # }}}
 
 # i_update_value_reference_from_tbl {{{
 i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
-    val_tbl <- value_tbl[has_object_list == TRUE]
+    browser()
+    # get object-list fields
+    val_tbl_obj <- value_tbl[has_object_list == TRUE]
 
-    if (is_empty(val_tbl)) return()
+    # get reference fields
+    val_tbl_ref <- value_tbl[has_reference == TRUE]
 
-    val_obj_tbl <- val_tbl[private$m_idd_tbl$field_object_list, on = "field_id",
-        nomatch = 0L, list(value_id, value_upper, object_list)]
+    if (is_empty(val_tbl_ref) && is_empty(val_tbl_ref)) return()
 
-    val_ref_tbl <- val_tbl[private$m_idd_tbl$field_reference, on = "field_id",
-        nomatch = 0L, list(value_id, value_upper, object_list)]
-    data.table::setnames(val_ref_tbl, "value_id", "reference_value_id")
+    # update value reference table
+    if (not_empty(val_tbl_obj)) {
+        # get values that may possiblely reference other fields
+        val_obj_tbl <- value_tbl[private$m_idd_tbl$field_object_list,
+            on = "field_id", nomatch = 0L, list(value_id, value_upper, object_list)]
 
-    if (is_empty(val_ref_tbl)) return()
+        # get all possible values to reference
+        all_val_ref <- private$m_idf_tbl$value[private$m_idd_tbl$field_reference,
+        on = "field_id", nomatch = 0L, list(value_id, value_upper, reference)]
+        data.table::setnames(all_val_ref, "value_id", "reference_value_id")
 
-    val_ref_new <- unique(val_obj_tbl[val_ref_tbl,
-        on = c("object_list", "value_upper"),
-        nomatch = 0L, list(value_id, reference_value_id)])
+        # find references
+        val_ref_new <- unique(val_obj_tbl[all_val_ref,
+            on = c(object_list = "reference", "value_upper"),
+            nomatch = 0L, list(value_id, reference_value_id)])
+        data.table::setorder(val_ref_new, value_id)
 
-    private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
-            private$m_idf_tbl$value_reference[!value_id %in% val_ref_new$value_id],
-            val_ref_new))
+        if (not_empty(val_ref_new)) {
+            private$m_idf_tbl$value_reference <- data.table::rbindlist(list(
+                private$m_idf_tbl$value_reference[!value_id %in% val_ref_new$value_id],
+                val_ref_new), use.names = TRUE)
 
-    data.table::setorderv(value_reference, "value_id")
+            data.table::setorderv(value_reference, "value_id")
+        }
+    }
+
+    # update values that reference the input
+    if (not_empty(val_tbl_ref)) {
+        val_ref_tbl <- value_tbl[private$m_idd_tbl$field_reference,
+            on = "field_id", nomatch = 0L,
+            list(value_id, value, value_upper, value_num ,value_ipnum)]
+
+        # find values that reference input before
+        new_ref_tbl <- val_ref_tbl[private$m_idf_tbl$value_reference,
+            on = c(value_id = "reference_value_id"), nomatch = 0L]
+
+        data.table::setnames(new_ref_tbl, c("ref_value_id", "ref_value",
+            "ref_value_upper", "ref_value_num", "ref_value_ipnum", "value_id"))
+
+        new_val_tbl <- new_ref_tbl[private$m_idf_tbl$value, on = "value_id", nomatch = 0L][
+            , c("ref_value_id", "value", "value_upper", "value_num", "value_ipnum") := NULL]
+
+        data.table::setnames(new_val_tbl,
+            c("ref_value", "ref_value_upper", "ref_value_num", "ref_value_ipnum"),
+            c("value", "value_upper", "value_num", "value_ipnum"))
+
+        # assign new values
+        private$m_idf_tbl$value <- data.table::rbindlist(list(
+            private$m_idf_tbl$value[!new_val_tbl, on = "value_id"], new_val_tbl),
+            use.names = TRUE)
+        data.table::setorder(private$m_idf_tbl$value, object_id, field_id)
+
+        # log new order
+        i_log_add_object_order(self, private, unique(new_val_tbl$object_id))
+    }
 }
 # }}}
 
