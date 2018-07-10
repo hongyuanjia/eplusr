@@ -1,3 +1,11 @@
+#' @importFrom gh gh
+#' @importFrom data.table data.table
+#' @importFrom purrr modify_depth
+#' @importFrom tools file_path_sans_ext file_ext
+#' @importFrom processx run
+#' @importFrom cli rule
+NULL
+
 #' Download and Install EnergyPlus
 #'
 #' Download specified version of EnergyPlus for your platform from GitHub and
@@ -27,7 +35,7 @@
 install_eplus <- function (ver = "latest", force = FALSE) {
     # check if the same version has been installed already
     if (ver == "latest") ver <- eplus_latest_release()
-    ver_exists <- eplus_available(ver)
+    ver_exists <- is_avail_eplus(ver)
     if (ver_exists) {
         if (!force) {
             message(msg(sprintf("It seems EnergyPlus v%s has been already
