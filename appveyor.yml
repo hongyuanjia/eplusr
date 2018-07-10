@@ -64,53 +64,6 @@ environment:
       ENERGYPLUS_VERSION: "8.8.0"
       ENERGYPLUS_SHA: "7c3bbe4830"
 
-    - R_VERSION: 3.1.3
-      R_ARCH: x64
-      RTOOLS_VERSION: 32
-      CRAN: http://cran.rstudio.com
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-
-    - R_VERSION: 3.1.0
-      R_ARCH: x64
-      RTOOLS_VERSION: 32
-      CRAN: http://cran.rstudio.com
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-
-    # For Energyplus 8.3 to 8.7 on x64 platform on the latest release of R
-    - R_VERSION: release
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.7.0"
-      ENERGYPLUS_SHA: "78a111df4a"
-
-    - R_VERSION: release
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.6.0"
-      ENERGYPLUS_SHA: "198c6a3cff"
-
-    - R_VERSION: release
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.5.0"
-      ENERGYPLUS_SHA: "c87e61b44b"
-
-    - R_VERSION: release
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.4.0"
-      ENERGYPLUS_SHA: "832e4bb9cb"
-
-    - R_VERSION: release
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.3.0"
-      ENERGYPLUS_SHA: "6d97d074ea"
-
 build_script:
   - travis-tool.sh install_deps
 
