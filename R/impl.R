@@ -1433,8 +1433,7 @@ i_add_object = function (self, private, class, value = NULL, comment = NULL, def
     if (!is.null(comment)) {
         cmt_tbl <- i_new_comment_tbl(self, private, new_obj_id, comment)
         new_cmt_id <- i_new_id(self, private, "comment", nrow(cmt_tbl))
-        new_obj_id_cmt_tbl <- rep(new_obj_id, times = i_comment_num(self, private, obj_tbl$object_id))
-        cmt_tbl[, `:=`(comment_id = new_cmt_id, object_id = new_obj_id_cmt_tbl)]
+        cmt_tbl[, `:=`(comment_id = new_cmt_id)]
         i_assign_comment_tbl(self, private, cmt_tbl)
     }
     # }}}
@@ -1558,9 +1557,9 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
 
     # COMMENT {{{
     if (!is.null(comment)) {
-        cmt_tbl <- i_new_comment_tbl(self, private, new_obj_id, comment)
+        cmt_tbl <- i_new_comment_tbl(self, private, obj_tbl$object_id, comment)
         new_cmt_id <- i_new_id(self, private, "comment", nrow(cmt_tbl))
-        new_obj_id_cmt_tbl <- rep(new_obj_id, times = i_comment_num(self, private, obj_tbl$object_id))
+        new_obj_id_cmt_tbl <- rep(obj_tbl$object_id, times = i_comment_num(self, private, obj_tbl$object_id))
         cmt_tbl[, `:=`(comment_id = new_cmt_id, object_id = new_obj_id_cmt_tbl)]
         i_assign_comment_tbl(self, private, cmt_tbl)
     }
@@ -2268,7 +2267,6 @@ i_update_value_reference_from_id <- function (self, private, old_id, new_id) {
 
 # i_update_value_reference_from_tbl {{{
 i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
-    browser()
     # get object-list fields
     val_tbl_obj <- value_tbl[has_object_list == TRUE]
 
