@@ -17,7 +17,7 @@ i_validate_in_object <- function (self, private, object_tbl, value_tbl, temp = T
     if (eplusr_option("validate_level") == "none") return(private$m_log$validate)
 
     input <- new.env(parent = emptyenv(), size = 3L)
-    input$type <- "in_object"
+    input$type <- ifelse(temp, "add_object", "set_object")
     input$object_tbl <- data.table::copy(object_tbl)
     input$value_tbl <- data.table::copy(value_tbl)
 
@@ -157,7 +157,7 @@ i_check_conflict_name <- function (self, private, input) {
         if (any(exist)) {
             obj_tbl_other <- i_object_tbl_from_class(self, private, cls_id[exist])
 
-            if (input$type == "idfobject") {
+            if (input$type != "add_object") {
                 obj_tbl_other <- obj_tbl_other[!J(obj_tbl$object_id), on = "object_id"]
             }
             obj_tbl <- data.table::rbindlist(list(obj_tbl, obj_tbl_other), fill = TRUE)
@@ -167,17 +167,17 @@ i_check_conflict_name <- function (self, private, input) {
     conf_id <- obj_tbl[, list(num = .N, id_list = list(object_id)),
         by = list(class_id, object_name_upper)][num > 1L, unlist(id_list)]
 
-    if (not_empty(conf_id)) {
-        other_id <- conf_id[!conf_id %in% ori_obj_tbl$object_id]
+    if (is_empty(conf_id)) return()
 
-        val_tbl <- data.table::rbindlist(list(
-            i_value_tbl_from_which(self, private, other_id)[,
-                `:=`(class_name = i_class_name(self, private, class_id))],
-            input$value_tbl[J(conf_id), on = "object_id", nomatch = 0L]),
-        fill = TRUE)
+    other_id <- conf_id[!conf_id %in% ori_obj_tbl$object_id]
 
-        private$m_log$validate$conflict_name <- val_tbl
-    }
+    val_tbl <- data.table::rbindlist(list(
+        i_value_tbl_from_which(self, private, other_id)[,
+            `:=`(class_name = i_class_name(self, private, class_id))],
+        input$value_tbl[J(conf_id), on = "object_id", nomatch = 0L]),
+    fill = TRUE)
+
+    private$m_log$validate$conflict_name <- val_tbl
 }
 # }}}
 # i_check_missing: missing required fields {{{
