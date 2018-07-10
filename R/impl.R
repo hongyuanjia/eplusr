@@ -1641,8 +1641,15 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 # }}}
 
 # i_search_value {{{
-i_search_value = function (self, private, pattern) {
+i_search_value = function (self, private, pattern, class = NULL) {
     val <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
+
+    if (!is.null(class)) {
+        i_assert_valid_class_name(self, private, class, "idf")
+        cls_in <- i_in_tbl_from_which(self, private, "class", class, "idf")
+        val <- val[cls_in, on = "class_id", nomatch = 0L]
+    }
+
     if (is_empty(val)) {
         message("No matched result found.")
         return(invisible())
@@ -1653,15 +1660,25 @@ i_search_value = function (self, private, pattern) {
         private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L]
 
+    i_verbose_info(self, private, nrow(val), " results found in class",
+        backtick_collapse(unique(value_tbl$class_name)), ".")
+
     cli::cat_line(format_objects(value_tbl, in_ip = eplusr_option("view_in_ip")))
 
-    return(invisible(value_list(value_tbl, in_ip = eplusr_option("view_in_ip"))))
+    return(invisible(i_idfobject(self, private, unique(val$object_id))))
 }
 # }}}
 
 # i_replace_value {{{
-i_replace_value = function (self, private, pattern, replacement) {
+i_replace_value = function (self, private, pattern, replacement, class = NULL) {
     val_before <- private$m_idf_tbl$value[stringr::str_detect(value, pattern)]
+
+    if (!is.null(class)) {
+        i_assert_valid_class_name(self, private, class, "idf")
+        cls_in <- i_in_tbl_from_which(self, private, "class", class, "idf")
+        val_before <- val_before[cls_in, on = "class_id", nomatch = 0L]
+    }
+
     if (is_empty(val_before)) {
         message("No matched result found.")
         return(invisible())
@@ -1674,7 +1691,7 @@ i_replace_value = function (self, private, pattern, replacement) {
         private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
         private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L][,
-        `:=`(field_order = paste0(lpad(field_order, "0"), "(before)"),
+        `:=`(field_index = paste0(lpad(field_index, "0"), "(before)"),
              full_name = paste0(full_name, "\n"),
              full_ipname = paste0(full_ipname, "\n"))]
 
@@ -1682,7 +1699,7 @@ i_replace_value = function (self, private, pattern, replacement) {
         private$m_idf_tbl$object, on = "object_id", nomatch = 0L][
         private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L][,
-        `:=`(field_order = paste0(lpad(field_order, "0"), "(after) "))]
+        `:=`(field_index = paste0(lpad(field_index, "0"), "(after) "))]
 
     value_tbl <- data.table::rbindlist(list(value_tbl_before, value_tbl_after))
 
@@ -1709,6 +1726,8 @@ i_replace_value = function (self, private, pattern, replacement) {
     i_log_new_uuid(self, private)
 
     cli::cat_line(format_objects(value_tbl, in_ip = eplusr_option("view_in_ip")))
+
+    return(invisible(i_idfobject(self, private, unique(value_tbl_new$object_id))))
 }
 # }}}
 
