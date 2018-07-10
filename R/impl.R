@@ -1452,69 +1452,66 @@ i_add_object = function (self, private, class, value = NULL, comment = NULL, def
 }
 # }}}
 
-# # i_ins_object {{{
-# i_ins_object = function (self, private, objects) {
-#     if (is.list(objects)) {
-#         len <- length(objects)
-#         # every component should be an IdfObject
-#         valid <- vapply(objects, is_idfobject, logical(1))
-#         if (!all(valid)) {
-#             stop("When input is a list, every component should be an ",
-#                  "IdfObject.", call. = FALSE)
-#         }
-#         lapply(objects, private$insert_object)
-#     # check if input is a string
-#     } else if (is_idfobject(objects)) {
-#         private$insert_object(objects)
-#     } else if (is_string(objects)) {
-#         # TODO: check if current Idf is parsed using custom Idd object.
-#         # If so, then here we should use the custom Idd
-#         # try to parse the input using same idd
-#         idd <- use_idd(private$m_version)
-#         in_idf <- parse_idf_file(object, idd)
-#         in_ver <- in_idf$version
-#         obj_tbl <- in_idf$object[class_id != 1L]
-#         val_tbl <- in_idf$value[object_id != in_idf$object[class_id == 1L, object_id]]
-#         tbl$value <-  tbl$value[object_id != id_ver]
-#         ids <- in_idf$object_id(simplify = TRUE)
-#         lapply(in_idf$objects(ids), private$insert_object)
-#     } else {
-#         stop("Input should be an IdfObject, a list of IdfObjects, or ",
-#              "any input acceptable for `Idf$new()`.", call. = FALSE)
-#     }
-# }
-# # }}}
+# i_ins_object {{{
+i_ins_object = function (self, private, object) {
+    cur_ver <- i_version(self, private)
 
-# # insert_object {{{
-# insert_object <- function (self, private, object) {
-#     assert_that(is_idfobject(object))
-#     # check if it is a version object
-#     if (object$is_version()) {
-#         stop("Could not insert a `Version` object.", call. = FALSE)
-#     }
-#     # get version which should be the same version as this model
-#     ver_in <- ._get_private(object)$m_version
-#     if (ver_in != private$m_version) {
-#         stop("Input object has a different version ", backtick(ver_in),
-#              " than current Idf object (", private$m_version, ").",
-#              call. = FALSE)
-#     }
-#     # get the uuid to see if it comes from the same object
-#     uuid_in <- ._get_private(object)$m_uuid
-#     if (uuid_in == private$m_uuid) {
-#         private$verbose_info("Object (ID:{backtick(object$id())}) to \\
-#             insert is an object from this model. The target object \\
-#             will be directly duplicated instead of creating a new \\
-#             one with same values.")
-#         self$dup_object(object$id())
-#     } else {
-#         cls <- object$class_name()
-#         # get all value
-#         val <- object$get_value()
-#         self$add_object(cls, val)
-#     }
-# }
-# # }}}
+    if (is_idfobject(object)) {
+        i_insert_single_object(self, private, object)
+    } else if (is.list(object)) {
+        len <- length(object)
+        # every component should be an IdfObject
+        valid <- vapply(object, is_idfobject, logical(1))
+        if (!all(valid)) {
+            stop("When input is a list, every component should be an ",
+                 "IdfObject.", call. = FALSE)
+        }
+        purrr::map(object, ~i_insert_single_object(self, private, .x))
+    } else {
+        stop("Input should be an IdfObject, or a list of IdfObjects.", call. = FALSE)
+    }
+}
+# }}}
+
+# i_insert_single_object {{{
+i_insert_single_object <- function (self, private, object) {
+    browser()
+    assert_that(is_idfobject(object))
+
+    cur_ver <- i_version(self, private)
+
+    in_self <- ._get_self(object)
+    in_priv <- ._get_private(object)
+    in_ver <- i_version(in_self, in_priv)
+
+    # check if it is a version object
+    if (object$class_name() == "Version") {
+        stop("Could not insert a `Version` object.", call. = FALSE)
+    }
+
+    # input version which should be the same version as this model
+    if (cur_ver != in_ver) {
+        stop("Input object has a different version ", backtick(in_ver),
+             " than current Idf object (", backtick(cur_ver), ").",
+             call. = FALSE)
+    }
+
+    # get the uuid to see if it comes from the same object
+    in_uuid <- in_priv$m_log$uuid
+    if (in_uuid == private$m_log$uuid) {
+        i_verbose_info(self, private, "Object (ID:", backtick(object$id()), 
+            ") to insert is an object from current Idf. The target object ",
+            "will be directly duplicated instead of creating a new one with ",
+            "same values.")
+        self$dup_object(object$id())
+    } else {
+        cls <- object$class_name()
+        # get all value
+        val <- object$get_value()
+        self$add_object(cls, val)
+    }
+}
+# }}}
 
 # i_set_object {{{
 i_set_object = function (self, private, object, value = NULL, comment = NULL, default = FALSE) {
