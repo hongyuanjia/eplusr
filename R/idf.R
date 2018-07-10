@@ -358,7 +358,7 @@
 #'     corresponding version of EnergyPlus. The model and the weather used will
 #'     be copied to the output directory. An `EplusJob` will be returned which
 #'     provides detailed info of the simulation and methods to collect
-#'     simulation results. Please see XXX for more detailed.
+#'     simulation results. Please see [eplus_job()] for more detailed.
 #'
 #' eplusr uses the EnergyPlus command line interface which was introduced since
 #'     EnergyPlus 8.3.0. So `$run` only supports models with version higher
