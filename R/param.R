@@ -171,6 +171,8 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
 # i_param_apply_measure {{{
 i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
+    assert_that(is.function(measure))
+
     measure_wrapper <- function (idf, ...) {
         assert_that(is_idf(idf))
         idf <- idf$clone()
