@@ -53,12 +53,18 @@ print(iddobj)
 \section{Basic Info}{
 \preformatted{idfobj$id()
 idfobj$name()
+idfobj$group_name()
+idfobj$class_name()
 }
 
 \code{$id} will return the object ID.
 
 \code{$name} will return the object name. If the class does not have name
 attribute, then \code{NA} will returned.
+
+\code{$group_name} returns the group name of this object belongs to.
+
+\code{$class_name} returns the class name of this object belongs to.
 }
 
 \section{Definition}{

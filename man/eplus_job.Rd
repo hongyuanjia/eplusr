@@ -23,8 +23,8 @@ methods to extract simulation results.
 eplusr uses the EnergyPlus SQL output for extracting simulation results. In
 order to do so, a object in \code{Output:SQLite} with \code{Option Type} value of
 \code{SimpleAndTabular} will be automatically created if it does not exists.
-\code{Job} has provide some wrappers that do SQL query to get report data results,
-i.e. results from \code{Output:Variable} and \code{Output:Meter*}. But for
+\code{EplusJob} has provide some wrappers that do SQL query to get report data
+results, i.e. results from \code{Output:Variable} and \code{Output:Meter*}. But for
 \code{Output:Table} results, you have to be familiar with the structure of the
 EnergyPlus SQL results, especially for table "TabularDataWithStrings". For
 details, please see "2.20 eplusout.sql", especially "2.20.4.4 TabularData
