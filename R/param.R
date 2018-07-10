@@ -389,7 +389,7 @@ i_param_tabular_data <- function (self, private, which = NULL) {
 i_param_print <- function (self, private) {
     cli::cat_rule("EnergPlus Parametric")
     cli::cat_bullet(c(
-        paste0("Seed Model: ", backtick(private$m_idf$path())),
+        paste0("Seed Model: ", backtick(normalizePath(private$m_idf$path(), mustWork = FALSE))),
         paste0("Default Weather: ", backtick(private$m_epw$path()))
     ))
 
