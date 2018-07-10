@@ -35,7 +35,7 @@
 .options$view_in_ip <- FALSE
 .options$validate_level <- "final"
 .options$verbose_info <- TRUE
-.options$save_format <- "sorted"
+.options$save_format <- "asis"
 .options$num_parallel <- parallel::detectCores()
 .options$valid_before_run <- TRUE
 
