@@ -95,6 +95,13 @@
 #' @author Hongyuan Jia
 NULL
 
+#' Create Parametric Analysis
+#'
+#' `param_job` takes an IDF and EPW as input and returns a `ParametricJob`.
+#'
+#' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
+#' @param epw A path to EnergyPlus EPW file or an `Epw` object.
+#' @return A `ParametricJob` object.
 #' @export
 #' @rdname param_job
 # param_job {{{

@@ -155,11 +155,11 @@ repo_releases <- function (owner, repo, ver = "latest", pre_release = FALSE,
         # check if there are other files such as release notes, dependencies on
         # the release file list
         repo_lcase <- tolower(repo)
-        links[, core_file := FALSE]
-        links[grepl(repo, file, ignore.case = TRUE), core_file := TRUE]
+        links[, `:=`(core_file = FALSE)]
+        links[grepl(repo, file, ignore.case = TRUE), `:=`(core_file = TRUE)]
 
         # get file extension
-        links[, ext := tools::file_ext(file)]
+        links[, `:=`(ext = tools::file_ext(file))]
 
         # guess platform using file extension and file name
         links[, os := NA_character_]
@@ -172,9 +172,9 @@ repo_releases <- function (owner, repo, ver = "latest", pre_release = FALSE,
         links[is.na(os) & grepl("[-._](ubuntu)[-._]", file, ignore.case = TRUE), os := "ubuntu"]
 
         # guess architecture using file name
-        links[, arch := NA_character_]
-        links[grepl("i386|32bit|x86", file, ignore.case = TRUE), arch := "32bit"]
-        links[grepl("x86_64|64bit|x64", file, ignore.case = TRUE), arch := "64bit"]
+        links[, `:=`(arch = NA_character_)]
+        links[grepl("i386|32bit|x86", file, ignore.case = TRUE), `:=`(arch = "32bit")]
+        links[grepl("x86_64|64bit|x64", file, ignore.case = TRUE), `:=`(arch = "64bit")]
 
         # if platform specific released core files found, then only return those
         if (links[core_file == TRUE & !is.na(os), .N] > 0L) {
@@ -204,7 +204,7 @@ download_file <- function (url, dest) {
     if (file.exists(dest)) unlink(dest)
     dest_dir <- dirname(dest)
     if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE)
-    res <- download.file(url, dest, mode = "wb")
+    res <- utils::download.file(url, dest, mode = "wb")
     attr(res, "url") <- url
     attr(res, "file") <- dest
     return(res)

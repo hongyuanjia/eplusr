@@ -125,14 +125,14 @@ i_class_name <- function (self, private, index = NULL, type = c("idd", "idf")) {
             private$m_idd_tbl$class$class_name
         } else {
             cls_id <- unique(private$m_idf_tbl$object$class_id)
-            private$m_idd_tbl$class[J(cls_id), on = "class_id", class_name]
+            private$m_idd_tbl$class[J(cls_id), on = "class_id"][order(class_id), class_name]
         }
     } else {
         i_assert_valid_class_index(self, private, index, type)
         if (type == "idd")
             private$m_idd_tbl$class[J(index), on = "class_id", class_name]
         else
-            i_object_tbl_from_class(self, private, index)$class_name
+            i_object_tbl_from_class(self, private, index)[order(class_id), class_name]
     }
 }
 # }}}
@@ -453,7 +453,8 @@ i_field_index <- function (self, private, class, name = NULL) {
 
     invalid <- is.na(res_std) & is.na(res_lc)
     if (any(invalid)) {
-        stop("Invalid field name found for class ", backtick(private$m_class_name),
+        stop("Invalid field name found for class ",
+            backtick(i_class_name(self, private, unique(fld_tbl$class_id))),
             ": ", backtick_collapse(name[invalid]), ".", call. = FALSE)
     }
 
@@ -1019,7 +1020,7 @@ i_assert_valid_object_id <- function (self, private, id) {
     valid <- id %in% private$m_idf_tbl$object$object_id
 
     if (!all(valid))
-        stop("Invalid object id found for current Idf: ",
+        stop("Invalid object ID found for current Idf: ",
             backtick_collapse(id[!valid]), ".", call. = FALSE)
 }
 # }}}
@@ -1196,7 +1197,8 @@ i_iddobject <- function (self, private, class) {
 
 # i_iddobject_in_group {{{
 i_iddobject_in_group <- function (self, private, group) {
-    assert_that(i_is_valid_group_name(self, private, group))
+    assert_that(is_string(group))
+    i_assert_valid_group_name(self, private, group)
 
     cls <- private$m_idd_tbl$group[group_name == group][
         private$m_idd_tbl$class, on = "group_id", nomatch = 0L, class_name]
@@ -1466,7 +1468,7 @@ i_ins_object = function (self, private, object) {
             stop("When input is a list, every component should be an ",
                  "IdfObject.", call. = FALSE)
         }
-        purrr::map(object, ~i_insert_single_object(self, private, .x))
+        purrr::flatten(purrr::map(object, ~i_insert_single_object(self, private, .x)))
     } else {
         stop("Input should be an IdfObject, or a list of IdfObjects.", call. = FALSE)
     }
@@ -2293,7 +2295,7 @@ i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
                 private$m_idf_tbl$value_reference[!value_id %in% val_ref_new$value_id],
                 val_ref_new), use.names = TRUE)
 
-            data.table::setorderv(value_reference, "value_id")
+            data.table::setorderv(private$m_idf_tbl$value_reference, "value_id")
         }
     }
 
@@ -2506,7 +2508,7 @@ i_last_field_index_from_value_name <- function (self, private, value_in_tbl, typ
             by = c("object_rleid", "object_id", "class_id", "num_fields", "value_num")]
 
         if (type == "set")
-            idx_tbl[, `:=`(value_num = i_value_num(slef, private, object_id))]
+            idx_tbl[, `:=`(value_num = i_value_num(self, private, object_id))]
 
         return(idx_tbl)
     }
@@ -2559,7 +2561,7 @@ i_last_field_index_from_value_name <- function (self, private, value_in_tbl, typ
         by = c("object_rleid", "object_id", "class_id", "num_fields", "value_num")]
 
     if (type == "set")
-        idx_tbl[, `:=`(value_num = i_value_num(slef, private, object_id))]
+        idx_tbl[, `:=`(value_num = i_value_num(self, private, object_id))]
 
     idx_tbl
 }
@@ -2834,6 +2836,7 @@ i_verbose_info <- function (self, private, ...) {
     if (eplusr_option("verbose_info")) {
         cli::cat_rule("Info")
         cat(..., "\n", sep = "")
+        cat("\n")
     }
 }
 # }}}
@@ -2874,7 +2877,7 @@ i_need_update_num <- function (self, private,
 # can_locate_idf_file {{{
 can_locate_idf_file <- function (self, private) {
     if (is.null(private$m_path)) return(FALSE)
-    if (!file_test("-f", private$m_path)) return(FALSE)
+    if (!utils::file_test("-f", private$m_path)) return(FALSE)
     TRUE
 }
 # }}}
@@ -3182,7 +3185,7 @@ i_idfobj_set_value <- function (self, private, object, ..., default = TRUE) {
     if (is_empty(value))
         stop("Please give values to set.", call. = FALSE)
 
-    i_set_object(self, private, object, value, comment = NULL, default)
+    i_set_object(self, private, object, value, comment = NULL, default)[[1]]
 }
 # }}}
 
@@ -3248,8 +3251,8 @@ i_idfobj_ref_by <- function (self, private, object) {
         message("Object is not referenced by any other object.")
     } else {
         message(length(obj_id), " object found that reference the target object [ID: ",
-            unique(ref_by$object_id), "].")
-        i_idfobject(sefl, private, obj_id)
+            unique(ref_by$object_id), "].\n")
+        i_idfobject(self, private, obj_id)
     }
 
 }
@@ -3264,8 +3267,8 @@ i_idfobj_ref_from <- function (self, private, object) {
         message("Object does not reference from any other object.")
     } else {
         message(length(obj_id), " object found that are referenced by the target object [ID: ",
-            unique(ref_from$object_id), "].")
-        i_idfobject(sefl, private, obj_id)
+            unique(ref_from$object_id), "].\n")
+        i_idfobject(self, private, obj_id)
     }
 }
 # }}}

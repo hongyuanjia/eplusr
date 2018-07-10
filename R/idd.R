@@ -230,7 +230,17 @@ read_idd <- function (path) {
 }
 # }}}
 
+#' Use a specific EnergyPlud Input Data Dictionary (IDD) file
+#'
+#' `use_idd` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+#' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
+#' class, please see [idd].
+#'
+#' @param idd Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
+#'     named as `Energy+.idd` or a valid version of pre-parsed IDD (8.3 - 8.9).
+#'
 #' @importFrom assertthat assert_that
+#' @return An `Idd` object
 #' @export
 # use_idd {{{
 use_idd <- function (idd) {

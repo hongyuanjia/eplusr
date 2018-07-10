@@ -8,9 +8,19 @@
 \usage{
 param_job(idf, epw)
 }
+\arguments{
+\item{idf}{A path to EnergyPlus IDF or IMF file or an \code{Idf} object.}
+
+\item{epw}{A path to EnergyPlus EPW file or an \code{Epw} object.}
+}
+\value{
+A \code{ParametricJob} object.
+}
 \description{
 \code{ParametricJob} class provides a prototype of conducting parametric analysis
 of EnergyPlus simulations.
+
+\code{param_job} takes an IDF and EPW as input and returns a \code{ParametricJob}.
 }
 \details{
 Basically, it is a collection of multiple \code{EplusJob} objects.

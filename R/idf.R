@@ -96,7 +96,7 @@
 #'
 #' **Arguments**
 #'
-#' * `path`: Path to EnergyPlus `IDF` or `IMF` file. The file extension does not
+#' * `path`: Path to EnergyPlus IDF file. The file extension does not
 #'       matter. So models stored in `TXT` format are still able to correctly be
 #'       parsed.
 #' * `idd`: Path to `Energy+.idd` file. If NULL, the pre-parsed `Energy+.idd`
@@ -399,9 +399,10 @@
 #' ```
 #'
 #' eplusr provides custom S3 method of `\[`, `\$` and `\[\[`. Basically,
-#' `model$Class` and `model[Class]`, where `Class` is a valid class name, is
-#' equivalent to `model$object_in_class(Class)`; `model[[Object]]`, where
-#' `Object` is an object ID or name is equivalent to `model$object(Object)`.
+#' \code{model$Class} and \code{model[Class]}, where `Class` is a valid class
+#' name, is equivalent to \code{model$object_in_class(Class)};
+#' \code{model[[Object]]}, where `Object` is an object ID or name is equivalent
+#' to \code{model$object(Object)}.
 #'
 #' @docType class
 #' @name idf
@@ -410,8 +411,19 @@
 #' @importFrom uuid UUIDgenerate
 NULL
 
+#' Read an EnergyPlus Input Data File (IDF)
+#'
+#' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an
+#' `Idf` object. For more details on `Idf` object, please see [idf].
+#'
+#' @param path A path to an EnergyPlus IDF file or a string that can be parsed as
+#'     an IDF. The file extension does not matter. So models stored in `TXT`
+#'     format are still able to correctly be parsed.
+#' @param idd  A path to an `Energy+.idd` file. If NULL, the pre-parsed
+#'     `Energy+.idd` files stored internally from EnergyPlus v8.3 to 8.8 will be
+#'     used according to the version of input model, if possible.
+#' @return An `Idf` object.
 #' @export
-#' @rdname idf
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {
     # have to clone the generator first in order to leave the original Idf
