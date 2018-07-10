@@ -1475,7 +1475,6 @@ i_ins_object = function (self, private, object) {
 
 # i_insert_single_object {{{
 i_insert_single_object <- function (self, private, object) {
-    browser()
     assert_that(is_idfobject(object))
 
     cur_ver <- i_version(self, private)
