@@ -47,6 +47,16 @@ param$print()
 }
 }
 
+\section{Get Seed Model and Weather}{
+\preformatted{param$seed()
+param$weather()
+}
+
+\code{$seed} will return the input \code{Idf} object.
+
+\code{$weather} will return the input \code{Epw} object.
+}
+
 \section{Apply Design Alternatives}{
 \preformatted{param$apply_measure(measure, ..., .names = NULL)
 }

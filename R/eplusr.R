@@ -15,7 +15,7 @@
 #'   distributed along with EnergyPlus.
 #' * Run your models directly and collect the simulation output of EnergyPlus
 #'   in R.
-#' * Run parametric analysis parallelly and collect results in one go.
+#' * Run parametric analysis in parallel and collect results in one go.
 #'
 #' To learn more about eplusr, start with the vignettes:
 #' `browseVignettes(package = "eplusr")`
