@@ -231,38 +231,38 @@ run_idf <- function (eplus, model, weather, output_dir = NULL,
 run_multi <- function (eplus, model, weather, output_dir = NULL,
                        design_day = FALSE, annual = FALSE,
                        parallel_backend = future::multiprocess) {
-    if (!is_scalar(models)) {
-        if (!is_scalar(weathers))
-            assert_that(is_same_len(models, weathers))
+    if (!is_scalar(model)) {
+        if (!is_scalar(weather))
+            assert_that(is_same_len(model, weather))
 
         if (!is_scalar(eplus))
-            assert_that(is_same_len(models, eplus))
+            assert_that(is_same_len(model, eplus))
     }
 
-    models <- normalizePath(models, mustWork = TRUE)
-    weathers <- normalizePath(weathers, mustWork = TRUE)
+    model <- normalizePath(model, mustWork = TRUE)
+    weather <- normalizePath(weather, mustWork = TRUE)
     eplus_exe <- vapply(eplus, eplus_exe, character(1))
 
-    if (anyDuplicated(models) & is.null(output_dirs))
-        stop("`models` cannot have any duplications when `output_dirs` is not given.",
+    if (anyDuplicated(model) & is.null(output_dir))
+        stop("`model` cannot have any duplications when `output_dir` is not given.",
             call. = FALSE)
 
-    if (is.null(output_dirs)) {
-        output_dirs <- dirname(models)
+    if (is.null(output_dir)) {
+        output_dir <- dirname(model)
     } else {
-        assert_that(is_same_len(models, output_dirs))
+        assert_that(is_same_len(model, output_dir))
     }
 
-    output_dirs <- normalizePath(output_dirs, mustWork = FALSE)
+    output_dir <- normalizePath(output_dir, mustWork = FALSE)
 
-    input <- data.table::data.table(model = models, output_dir = output_dirs)
+    input <- data.table::data.table(model = model, output_dir = output_dir)
 
     if (anyDuplicated(input))
-        stop("Duplication found in the combination of `models` and `output_dirs`.",
+        stop("Duplication found in the combination of `model` and `output_dir`.",
             " One model could not be run in the same output directory multiple ",
             "times simultaneously.", call. = FALSE)
 
-    d <- unique(output_dirs)[!dir.exists(unique(output_dirs))]
+    d <- unique(output_dir)[!dir.exists(unique(output_dir))]
     created <- lapply(d, dir.create, showWarnings = FALSE, recursive = TRUE)
     if (any(!created))
         stop("Failed to create output directory:\n",
@@ -270,7 +270,7 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
 
     lapply(unique(input$model), clean_wd)
 
-    input[, `:=`(weather = weathers, eplus_exe = eplus_exe)]
+    input[, `:=`(weather = weather, eplus_exe = eplus_exe)]
     input[, `:=`(loc_model = copy_run_files(model, output_dir),
                  loc_weather = copy_run_files(weather, output_dir))]
     input[, index := .I]
