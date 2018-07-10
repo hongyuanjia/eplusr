@@ -30,14 +30,13 @@
 .globals$eplus_config <- list()
 
 # package level mutable global options
-.options <- list()
+.options <- new.env(parent = emptyenv())
 .options$num_digits <- 8L
 .options$view_in_ip <- FALSE
 .options$validate_level <- "final"
 .options$verbose_info <- TRUE
 .options$save_format <- "asis"
 .options$num_parallel <- parallel::detectCores()
-.options$valid_before_run <- TRUE
 
 #' Get and Set eplusr options
 #'
@@ -78,14 +77,11 @@
 #' * `num_parallel`: Maximum number of parallel simulations to run. Default:
 #'     `parallel::detectCores()`.
 #'
-#' * `valid_before_run`: Whether to validate the model at the level "final"
-#'     before run the simulation. Default: FALSE.
-#'
 #' @export
 # eplusr_option {{{
 eplusr_option <- function (...) {
     opt <- purrr::splice(...)
-    if (is_empty(opt)) return(.options)
+    if (is_empty(opt)) return(as.list.environment(.options))
 
     nm <- names(opt)
 
@@ -96,10 +92,10 @@ eplusr_option <- function (...) {
     }
 
     valid <- nm %in% c("num_digits", "view_in_ip", "validate_level",
-        "verbose_info", "save_format", "num_parallel", "valid_before_run")
+        "verbose_info", "save_format", "num_parallel")
 
     if (any(!valid))
-        stop("Invalid option names found: ", backtick_collapse(name[!valid]), ".",
+        stop("Invalid option name found: ", backtick_collapse(nm[!valid]), ".",
             call. = FALSE)
 
     choice_opt <- c("validate_level", "save_format")
@@ -108,7 +104,7 @@ eplusr_option <- function (...) {
         save_format = c("asis", "sorted", "new_top", "new_bot")
     )
 
-    onoff_opt <- c("view_in_ip", "verbose_info", "valid_before_run")
+    onoff_opt <- c("view_in_ip", "verbose_info")
 
     count_opt <- c("num_digits", "num_parallel")
 
@@ -123,7 +119,7 @@ eplusr_option <- function (...) {
                 stop(backtick(name), " should be one of either `TRUE` or `FALSE`.",
                     call. = FALSE)
 
-            .options[[name]] <<- input[[name]]
+            .options[[name]] <- input[[name]]
         }
     }
     # }}}
@@ -138,7 +134,7 @@ eplusr_option <- function (...) {
                 stop(backtick(name), " should be one of ",
                     backtick_collapse(choice_list[[name]]), ".", call. = FALSE)
 
-            .options[[name]] <<- input[[name]]
+            .options[[name]] <- input[[name]]
         }
     }
     # }}}
@@ -146,7 +142,7 @@ eplusr_option <- function (...) {
     assign_count_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
             assert_that(is_count(input[[name]]))
-            .options[[name]] <<- input[[name]]
+            .options[[name]] <- input[[name]]
         }
     }
     # }}}
@@ -155,6 +151,6 @@ eplusr_option <- function (...) {
     for (nm_opt in onoff_opt) assign_onoff_opt(opt, nm_opt)
     for (nm_opt in count_opt) assign_count_opt(opt, nm_opt)
 
-    .options[nm]
+    as.list.environment(.options)[nm]
 }
 # }}}
