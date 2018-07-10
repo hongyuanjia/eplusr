@@ -1214,7 +1214,7 @@ i_idfobject <- function (self, private, which) {
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
     res <- lapply(obj_id, private$m_idfobj_generator$new)
-    data.table::setattr(res, "names", i_lower_field_name(obj_nm))
+    data.table::setattr(res, "names", i_lower_object_name(obj_nm))
     res
 }
 # }}}
@@ -1226,7 +1226,7 @@ i_idfobject_in_class <- function (self, private, class) {
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
     res <- lapply(obj_id, private$m_idfobj_generator$new)
-    data.table::setattr(res, "names", i_lower_field_name(obj_nm))
+    data.table::setattr(res, "names", i_lower_object_name(obj_nm))
     res
 }
 # }}}
@@ -2779,6 +2779,10 @@ i_verbose_info <- function (self, private, ...) {
 
 # i_lower_field_name {{{
 i_lower_field_name <- function (field_name) tolower(gsub("[- :]", "_", field_name))
+# }}}
+
+# i_lower_object_name {{{
+i_lower_object_name <- function (object_name) tolower(gsub("[^[:alnum:]]", "_", object_name))
 # }}}
 
 # i_need_update_num {{{
