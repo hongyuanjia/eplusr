@@ -1087,8 +1087,6 @@ parse_err_file <- function (path) {
 }
 # }}}
 
-#' @importFrom glue glue glue_data
-#' @importFrom cli cat_line rule
 # parse_error {{{
 parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, stop = TRUE) {
     type <- match.arg(type)
@@ -1098,21 +1096,21 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
         }
         assert_that(has_name(msg, "line"))
         assert_that(has_name(msg, "string"))
-        msg <- glue::glue_data(msg, "Line {line}: {string}")
+        msg <- paste0("Line ", msg$line, ": ", msg$string)
     }
 
     cli::cat_line(cli::rule(line = 2L))
-    cli::cat_line(glue::glue("[ Error Type ]: {error}"))
-    cli::cat_line(glue::glue("[Total Number]: {num}"))
+    cli::cat_line(paste0("[ Error Type ]: ", error))
+    cli::cat_line(paste0("[Total Number]: ", num))
     if (!is.null(msg)) {
         cli::cat_line(cli::rule(line = 1L))
         cli::cat_line(msg)
     }
     cli::cat_line(cli::rule(line = 2L))
     if (stop) {
-        stop(glue::glue("{toupper(type)} PARSING ERROR."), call. = FALSE)
+        stop(paste0(toupper(type)," PARSING ERROR."), call. = FALSE)
     } else {
-        warning(glue::glue("{toupper(type)} PARSING ERROR."), call. = FALSE)
+        warning(paste0(toupper(type), " PARSING ERROR."), call. = FALSE)
     }
 }
 # }}}
