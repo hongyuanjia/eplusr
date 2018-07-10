@@ -271,7 +271,7 @@ i_job_kill <- function (self, private) {
             message("The job has been successfully killed.")
             return(invisible(TRUE))
         } else {
-            stop("Error found. Could not kill the job.", call. = FASE)
+            stop("Error found. Could not kill the job.", call. = FALSE)
         }
     } else {
         message("The job is not running.")
@@ -414,7 +414,7 @@ i_job_output_errors <- function (self, private, info = FALSE) {
 i_job_output_sql <- function (self, private) {
     path_sql <- i_job_locate_output(self, private, ".sql", strict = TRUE)
     if (!file.exists(path_sql))
-        stop("Simulation SQL output does not exists.", call. = FASE)
+        stop("Simulation SQL output does not exists.", call. = FALSE)
 
     RSQLite::dbConnect(RSQLite::SQLite(), path_sql)
 }

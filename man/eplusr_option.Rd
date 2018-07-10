@@ -41,7 +41,5 @@ will be set according to the header of IDF file. If no header found,
 \code{"sorted"} is used. "Default: \code{"asis"}.
 \item \code{num_parallel}: Maximum number of parallel simulations to run. Default:
 \code{parallel::detectCores()}.
-\item \code{valid_before_run}: Whether to validate the model at the level "final"
-before run the simulation. Default: FALSE.
 }
 }

@@ -3,11 +3,7 @@
 \docType{class}
 \name{idf}
 \alias{idf}
-\alias{read_idf}
 \title{Read, modify, and run an EnergyPlus model}
-\usage{
-read_idf(path, idd = NULL)
-}
 \description{
 eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
 in a hierarchical structure, which was extremely inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library},
@@ -105,7 +101,7 @@ model$print(plain = FALSE)
 
 \strong{Arguments}
 \itemize{
-\item \code{path}: Path to EnergyPlus \code{IDF} or \code{IMF} file. The file extension does not
+\item \code{path}: Path to EnergyPlus IDF file. The file extension does not
 matter. So models stored in \code{TXT} format are still able to correctly be
 parsed.
 \item \code{idd}: Path to \code{Energy+.idd} file. If NULL, the pre-parsed \code{Energy+.idd}
@@ -412,12 +408,11 @@ model[[Object]]
 }
 
 eplusr provides custom S3 method of \code{\[}, \code{\\$} and \code{\[\[}. Basically,
-\code{model$Class} and \code{model[Class]}, where \code{Class} is a valid class name, is
-equivalent to \code{model$object_in_class(Class)}; \code{model[[Object]]}, where
-\code{Object} is an object ID or name is equivalent to \code{model$object(Object)}.
+\code{model$Class} and \code{model[Class]}, where \code{Class} is a valid class
+name, is equivalent to \code{model$object_in_class(Class)};
+\code{model[[Object]]}, where \code{Object} is an object ID or name is equivalent
+to \code{model$object(Object)}.
 
-[[Object]: R:[Object
-[\code{,}\$\code{and}[[\code{. Basically,}model$Class\code{and}model\link{Class}: R:%60,%20%60%5C%5C$%60%20and%20%60%5C[%5C[%60.%20Basically,%0A%60model$Class%60%20and%20%60model[Class
 [[Object]: R:[Object
 }
 

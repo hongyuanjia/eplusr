@@ -1,6 +1,6 @@
 #' Read, and modify an EnergyPlus Weather File (EPW)
 #'
-#' `$read_epw` will parse an EPW file and return an `Epw` object. The parsing
+#' `read_epw` parses an EPW file and returns an `Epw` object. The parsing
 #' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
 #' with some simplifications.
 #'
@@ -85,7 +85,7 @@
 #'
 #' **Arguments**
 #'
-#' * `path`: Path to EnergyPlus `EPW` file.
+#' * `path`: Path of an EnergyPlus `EPW` file.
 #'
 #' @section Query and Modify Header:
 #' ```
@@ -159,6 +159,14 @@
 #' @author Hongyuan Jia
 NULL
 
+#' Read and Parse EnergyPlus Weather File (EPW)
+#'
+#' `read_epw` parses an EPW file and returns an `Epw` object. The parsing
+#' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
+#' with some simplifications.
+#'
+#' @param path A path of an EnergyPlus `EPW` file.
+#' @return An `Epw` object.
 #' @export
 #' @rdname epw
 # read_epw {{{
@@ -906,7 +914,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     # check NAs
     epw_data[, `:=`(datetime_shifted = NULL, datetime_delta = NULL,
                     dt_minute = NULL, dt_minute_cal = NULL)]
-    na_epw_data <- na.omit(epw_data, invert = TRUE)
+    na_epw_data <- stat::na.omit(epw_data, invert = TRUE)
     if (not_empty(na_epw_data)) {
         stop("Invalid weather data line found in EPW file ", backtick(path), call. = FALSE)
     }
@@ -988,7 +996,7 @@ format_epw_date <- function (dt) {
        `:=`(hour = hour - 1L, minute = 60L)]
 
     # update year
-    dt[, year := as.integer(lubridate::year(datetime))]
+    dt[, `:=`(year = as.integer(lubridate::year(datetime)))]
 
     # clean
     dt[, `:=`(time = NULL, offset = NULL)]

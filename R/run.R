@@ -154,6 +154,8 @@ clean_wd <- function (path) {
 #' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
 #'     information to the console.  If `FALSE`, which is default, a
 #'     [processx::process] object will be return.
+#' @param expand_obj Where to run ExpandObject preprocessor before simulation.
+#'     Default: `TRUE`.
 #' @param parallel_backend Acceptable input for [future::plan()].
 #'
 #' @details
@@ -226,7 +228,7 @@ run_idf <- function (eplus, model, weather, output_dir = NULL,
 #' @export
 #' @rdname run_model
 # run_multi {{{
-run_multi <- function (eplus, models, weathers, output_dirs = NULL,
+run_multi <- function (eplus, model, weather, output_dir = NULL,
                        design_day = FALSE, annual = FALSE,
                        parallel_backend = future::multiprocess) {
     if (!is_scalar(models)) {

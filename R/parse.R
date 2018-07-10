@@ -640,7 +640,6 @@ parse_idd_file <- function(path) {
 }
 # }}}
 
-#' @importFrom glue glue
 #' @importFrom data.table data.table setorder setnames between last setattr
 #' @importFrom data.table setcolorder setattr
 #' @importFrom purrr map2

@@ -8,7 +8,7 @@
 run_idf(eplus, model, weather, output_dir = NULL, design_day = FALSE,
   annual = FALSE, expand_obj = TRUE, echo = FALSE)
 
-run_multi(eplus, models, weathers, output_dirs = NULL, design_day = FALSE,
+run_multi(eplus, model, weather, output_dir = NULL, design_day = FALSE,
   annual = FALSE, parallel_backend = future::multiprocess)
 }
 \arguments{
@@ -24,6 +24,9 @@ directory of input model will be used.}
 \item{design_day}{Force design-day-only simulation. Default: \code{FALSE}.}
 
 \item{annual}{Force design-day-only simulation. Default: \code{FALSE}.}
+
+\item{expand_obj}{Where to run ExpandObject preprocessor before simulation.
+Default: \code{TRUE}.}
 
 \item{echo}{Only applicable to \code{run_idf}. Show EnergyPlus simulation process
 information to the console.  If \code{FALSE}, which is default, a
