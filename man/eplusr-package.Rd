@@ -24,7 +24,7 @@ With eplusr, you can do:
 distributed along with EnergyPlus.
 \item Run your models directly and collect the simulation output of EnergyPlus
 in R.
-\item Run parametric analysis parallelly and collect results in one go.
+\item Run parametric analysis in parallel and collect results in one go.
 }
 
 To learn more about eplusr, start with the vignettes:

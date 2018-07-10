@@ -35,6 +35,16 @@
 #' * `idf`: Path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' * `epw`: Path to EnergyPlus EPW file or an `Epw` object.
 #'
+#' @section Get Seed Model and Weather:
+#' ```
+#' param$seed()
+#' param$weather()
+#' ```
+#' 
+#' `$seed` will return the input `Idf` object.
+#'
+#' `$weather` will return the input `Epw` object.
+#'
 #' @section Apply Design Alternatives:
 #' ```
 #' param$apply_measure(measure, ..., .names = NULL)
