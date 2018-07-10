@@ -6,8 +6,8 @@
 #' eplusr uses the EnergyPlus SQL output for extracting simulation results. In
 #' order to do so, a object in `Output:SQLite` with `Option Type` value of
 #' `SimpleAndTabular` will be automatically created if it does not exists.
-#' `Job` has provide some wrappers that do SQL query to get report data results,
-#' i.e. results from `Output:Variable` and `Output:Meter*`. But for
+#' `EplusJob` has provide some wrappers that do SQL query to get report data
+#' results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
 #' `Output:Table` results, you have to be familiar with the structure of the
 #' EnergyPlus SQL results, especially for table "TabularDataWithStrings". For
 #' details, please see "2.20 eplusout.sql", especially "2.20.4.4 TabularData
