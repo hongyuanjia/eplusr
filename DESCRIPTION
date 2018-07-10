@@ -1,6 +1,6 @@
 Package: eplusr
 Title: A Toolkit for Using EnergyPlus in R
-Version: 0.7.1
+Version: 0.8.0
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
@@ -8,29 +8,32 @@ Authors@R:
            email = "hongyuanjia@cqu.edu.cn",
            comment = c(ORCID = "0000-0002-0075-8183"))
 Description: This package provides tools to run EnergyPlus and collect,
-    analyze, summary and plot parametric simulation results in R.
+    analyze, and summary parametric simulation results in R.
 License: GPL-3 + file LICENSE
 URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.2.0)
 Imports:
-    data.table (>= 1.9.8),
-    R6,
-    assertthat,
-    fasttime,
-    lubridate,
-    stringr,
-    progress,
-    purrr,
-    furrr,
-    processx,
-    units,
-    uuid,
-    cli,
-    clisymbols,
-    readr,
+    R6
     RSQLite
+    assertthat
+    cli
+    clisymbols
+    data.table (>= 1.9.8),
+    dygraphs
+    fasttime
+    furrr
+    future
+    gh
+    lubridate
+    processx
+    progress
+    purrr
+    readr
+    stringr
+    units
+    uuid
 Suggests:
     testthat,
     covr
