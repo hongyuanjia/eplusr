@@ -15,24 +15,24 @@ BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
     R (>= 3.2.0)
 Imports:
-    R6
-    RSQLite
-    assertthat
-    cli
-    clisymbols
+    R6,
+    RSQLite,
+    assertthat,
+    cli,
+    clisymbols,
     data.table (>= 1.9.8),
-    dygraphs
-    fasttime
-    furrr
-    future
-    gh
-    lubridate
-    processx
-    progress
-    purrr
-    readr
-    stringr
-    units
+    dygraphs,
+    fasttime,
+    furrr,
+    future,
+    gh,
+    lubridate,
+    processx,
+    progress,
+    purrr,
+    readr,
+    stringr,
+    units,
     uuid
 Suggests:
     testthat,
