@@ -273,3 +273,77 @@ use_idd <- function (idd) {
     .subset2(m_obj, i)
 }
 # }}}
+
+#' Download EnergyPlus Input Data Dictionary (IDD) File
+#'
+#' `download_idd` downloads EnergyPlus Input Data Dictionary (IDD) file from
+#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
+#' useful in case where you only want to edit an EnergyPlus Input Data File
+#' (IDF) directly but donnot want to install whole EnergyPlus software.
+#'
+#' @param ver The EnergyPlus version number, e.g., 8.7, "8.7" or "8.7.0". The
+#'     special value `"latest"` means the latest version (fetched from GitHub
+#'     releases).
+#' @param dir A directory to indicate where to save the IDD file. Default:
+#'     current working directory.
+#' @return A full path of the downloaded IDD file.
+#' @export
+#' @examples
+#' \donotrun{
+#' download_idd()
+#' download_idd(8.8)
+#' }
+# download_idd {{{
+download_idd <- function (ver = "latest", dir = getwd()) {
+    latest <- repo_releases("NREL", "EnergyPlus", "latest")
+    latest_ver <- as.numeric_version(attr(latest, "version"))
+
+    rels <- gh::gh("GET /repos/:owner/:repo/contents/:path", repo = "EnergyPlus",
+        owner = "NREL", path = "idd", ref = paste0("v", latest_ver))
+
+    if (ver == "latest") ver <- latest_ver
+    assert_that(is_eplus_ver(ver))
+    ver <- standerize_ver(as.character(ver))
+
+    file_nm <- purrr::map_chr(rels, "name")
+    file_lnk <- purrr::map_chr(rels, "download_url")
+    names(file_lnk) <- file_nm
+
+    if (ver == latest_ver) {
+        lnk <- file_lnk["Energy+.idd.in"]
+    } else {
+        all_ver_dash <- stringr::str_extract(file_nm, "(?<=V)(\\d-\\d-\\d)(?=-Energy\\+.idd)")
+        all_ver <- as.numeric_version(all_ver_dash[!is.na(all_ver_dash)])
+
+        if (!ver %in% all_ver)
+            stop("Invalid IDD version found: ", ver, ". All possible versions are ",
+                paste0(paste0("  * ", all_ver), collapse = "\n"), call. = FALSE)
+
+        ver_dash <- paste0("V", ver[,1], "-", ver[,2], "-", ver[,3], "-Energy+.idd")
+        lnk <- file_lnk[ver_dash]
+    }
+
+    name <- sub("%2B", "+", basename(lnk))
+    dest <- normalizePath(file.path(dir, name), mustWork = FALSE)
+    res <- download_file(lnk, dest)
+
+    if (res != 0L)
+        stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
+
+    if (ver == latest_ver) {
+        build <- latest[1L, stringr::str_extract(file, "(?<=EnergyPlus-\\d\\.\\d\\.\\d-).{10}(?=-)")]
+
+        l <- readr::read_lines(dest)
+
+        l[1] <- paste0("!IDD_Version ", ver)
+        l[2] <- paste0("!IDD_BUILD ", build)
+
+        readr::write_lines(l, dest)
+    }
+
+    message("EnergyPlus IDD file ", paste0("v", ver), " has been downloaded
+        successfully into ", dir, ".")
+
+    dest
+}
+# }}}
