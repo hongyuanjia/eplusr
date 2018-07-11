@@ -2,9 +2,7 @@
 #'
 #' eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
 #' in a hierarchical structure, which was extremely inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html),
-#' but with total different data structure under the hook. Please follow the link
-#' above if you want to know the detailed implementations of IDF in EnergyPlus
-#' and OpenStudio.
+#' but with total different data structure under the hook.
 #'
 #' @section Overview:
 #'
@@ -29,12 +27,15 @@
 #' So to modify an EnergyPlus model in eplusr is equal to change the data in
 #' those four tables accordingly, in the context of specific IDD data.
 #'
+#' All IDF reading process starts with [read_idf()] which returns an `Idf`
+#' object. The model will be printed in a similar style you see in IDFEditor,
+#' with an additional heading lines show the `Path`, `Version` of the model. The
+#' classes of objects in the model are ordered by group and the number of
+#' objects in classes are shown in square bracket.
+#'
 #' @section Usage:
 #'
 #' ```
-#' # read
-#' model <- read_idf(path, idd = NULL)
-#'
 #' # basic info
 #' model$version()
 #' model$path()
@@ -87,21 +88,6 @@
 #' # print
 #' model$print(plain = FALSE)
 #' ```
-#'
-#' @section Read:
-#'
-#' ```
-#' model <- read_idf(path, idd = NULL)
-#' ```
-#'
-#' **Arguments**
-#'
-#' * `path`: Path to EnergyPlus IDF file. The file extension does not
-#'       matter. So models stored in `TXT` format are still able to correctly be
-#'       parsed.
-#' * `idd`: Path to `Energy+.idd` file. If NULL, the pre-parsed `Energy+.idd`
-#'     files stored internally from EnergyPlus v8.3 to 8.8 will be used
-#'     according to the version of input model, if possible.
 #'
 #' @section Basic Info:
 #' ```
@@ -419,9 +405,10 @@ NULL
 #' @param path A path to an EnergyPlus IDF file or a string that can be parsed as
 #'     an IDF. The file extension does not matter. So models stored in `TXT`
 #'     format are still able to correctly be parsed.
-#' @param idd  A path to an `Energy+.idd` file. If NULL, the pre-parsed
-#'     `Energy+.idd` files stored internally from EnergyPlus v8.3 to 8.8 will be
-#'     used according to the version of input model, if possible.
+#' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
+#'     default, the version of IDF will be passed to [use_idd()]. If the input
+#'     IDF does not have a version field (possible for ".ddy" files), then it
+#'     will be parsed using the latest version of IDD cached, with a warning.
 #' @return An `Idf` object.
 #' @export
 # read_idf {{{

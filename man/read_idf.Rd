@@ -11,9 +11,10 @@ read_idf(path, idd = NULL)
 an IDF. The file extension does not matter. So models stored in \code{TXT}
 format are still able to correctly be parsed.}
 
-\item{idd}{A path to an \code{Energy+.idd} file. If NULL, the pre-parsed
-\code{Energy+.idd} files stored internally from EnergyPlus v8.3 to 8.8 will be
-used according to the version of input model, if possible.}
+\item{idd}{Any acceptable input of \code{\link[=use_idd]{use_idd()}}. If \code{NULL}, which is the
+default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input
+IDF does not have a version field (possible for ".ddy" files), then it
+will be parsed using the latest version of IDD cached, with a warning.}
 }
 \value{
 An \code{Idf} object.

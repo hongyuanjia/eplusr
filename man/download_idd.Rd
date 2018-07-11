@@ -21,10 +21,10 @@ A full path of the downloaded IDD file.
 \code{download_idd} downloads EnergyPlus Input Data Dictionary (IDD) file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
 useful in case where you only want to edit an EnergyPlus Input Data File
-(IDF) directly but donnot want to install whole EnergyPlus software.
+(IDF) directly but do not want to install whole EnergyPlus software.
 }
 \examples{
-\\donotrun{
+\dontrun{
 download_idd()
 download_idd(8.8)
 }

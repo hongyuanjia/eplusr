@@ -43,12 +43,13 @@ idd_text <- c(
        \\object-list RefTestSimpleA1")
 # }}}
 
+idd_parsed <- parse_idd_file(idd_text)
+
 describe("parse_idd_file()", {
     # {{{
     it("can read Idd from string", expect_silent(idd_str <- read_idd_str(idd_text)))
     it("can parse Idd from string", {
         # {{{
-        expect_silent(idd_parsed <- parse_idd_file(idd_text))
         expect_equal(names(idd_parsed),
             c("version", "build",
               "group",
@@ -59,7 +60,6 @@ describe("parse_idd_file()", {
         # }}}
     })
 
-    idd_parsed <- parse_idd_file(idd_text)
 
     it("can get Idd version", {
         expect_equal(idd_parsed$version, as.numeric_version("8.8.0"))
@@ -309,11 +309,11 @@ describe("parse_idd_file()", {
 
 describe("Idd$new()", {
     it("can create an Idd object from string", {
-           expect_silent(idd <- Idd$new(idd_text))
+           expect_silent(idd <- eplusr:::Idd$new(idd_text))
     })
 })
 
-idd <- use_idd(idd_text)
+idd <- eplusr:::Idd$new(idd_text)
 
 describe("$version()", {
     it("can get Idd version", {

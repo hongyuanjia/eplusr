@@ -7,9 +7,7 @@
 \description{
 eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
 in a hierarchical structure, which was extremely inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library},
-but with total different data structure under the hook. Please follow the link
-above if you want to know the detailed implementations of IDF in EnergyPlus
-and OpenStudio.
+but with total different data structure under the hook.
 }
 \section{Overview}{
 
@@ -35,13 +33,16 @@ IDD file is parsed and stored in a similar structure. For details, please see
 
 So to modify an EnergyPlus model in eplusr is equal to change the data in
 those four tables accordingly, in the context of specific IDD data.
+
+All IDF reading process starts with \code{\link[=read_idf]{read_idf()}} which returns an \code{Idf}
+object. The model will be printed in a similar style you see in IDFEditor,
+with an additional heading lines show the \code{Path}, \code{Version} of the model. The
+classes of objects in the model are ordered by group and the number of
+objects in classes are shown in square bracket.
 }
 
 \section{Usage}{
-\preformatted{# read
-model <- read_idf(path, idd = NULL)
-
-# basic info
+\preformatted{# basic info
 model$version()
 model$path()
 model$group_name(all = FALSE)
@@ -92,21 +93,6 @@ model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
 
 # print
 model$print(plain = FALSE)
-}
-}
-
-\section{Read}{
-\preformatted{model <- read_idf(path, idd = NULL)
-}
-
-\strong{Arguments}
-\itemize{
-\item \code{path}: Path to EnergyPlus IDF file. The file extension does not
-matter. So models stored in \code{TXT} format are still able to correctly be
-parsed.
-\item \code{idd}: Path to \code{Energy+.idd} file. If NULL, the pre-parsed \code{Energy+.idd}
-files stored internally from EnergyPlus v8.3 to 8.8 will be used
-according to the version of input model, if possible.
 }
 }
 

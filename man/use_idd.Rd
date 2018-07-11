@@ -14,7 +14,7 @@ named as \code{Energy+.idd} or a valid version of IDD, e.g. 8.9, "8.9.0".}
 downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
 and will be parsed after it is downloaded successfully.It is useful in
 case where you only want to edit an EnergyPlus Input Data File (IDF)
-directly but donnot want to install whole EnergyPlus software.}
+directly but do not want to install whole EnergyPlus software.}
 }
 \value{
 An \code{Idd} object
@@ -30,5 +30,10 @@ installation locations when loading. If argument \code{idd} is a version,
 eplusr will first try to find the cached \code{Idd} object of that version, if
 possible. If failed, and EnergyPlus of that version is available (see
 \code{\link[=avail_eplus]{avail_eplus()}}), the \code{"Energy+.idd"} distributed with EnergyPlus will be
-parsed and stored in eplusr's Idd cache.
+parsed and stored in eplusr Idd cache.
+}
+\examples{
+\dontrun{
+use_idd(8.8)
+}
 }
