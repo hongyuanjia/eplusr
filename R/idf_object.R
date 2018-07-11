@@ -7,7 +7,7 @@
 #' some shared data from parent `Idf` object.
 #'
 #' @section Usage:
-#' ```
+#' \preformatted{
 #' # basic info
 #' idfobj$id()
 #' idfobj$name()
@@ -22,6 +22,10 @@
 #' # value
 #' idfobj$get_value(which = NULL, all = NULL)
 #' idfobj$set_value(..., defaults = TRUE)
+#' idfobj$FieldName
+#' idfobj[[Field]]
+#' idfobj$FieldName <- Value
+#' idfobj[[Field]] <- Value
 #'
 #' # validation
 #' idfobj$validate()
@@ -43,7 +47,7 @@
 #' # print
 #' idfobj$print(comment = TRUE, auto_sep = FALSE)
 #' print(iddobj)
-#' ```
+#' }
 #'
 #' @section Basic Info:
 #'
@@ -79,7 +83,7 @@
 #'
 #' `$get_comment` will return the comments of current object.
 #'
-#' `$set_comment` will set the comments of current object.
+#' `$set_comment` will set comments of current object.
 #'
 #' **Arguments**
 #'
@@ -91,14 +95,25 @@
 #'     no breaking will be made.
 #'
 #' @section Value:
-#' ```
+#' \preformatted{
 #' idfobj$get_value(which = NULL, all = FALSE)
 #' idfobj$set_value(..., default = TRUE)
-#' ```
+#' idfobj$FieldName
+#' idfobj[[Field]]
+#' idfobj$FieldName <- Value
+#' idfobj[[Field]] <- Value
+#' }
 #'
 #' `$get_value` will return a named list containing values of specified fields.
 #'
-#' `$set_comment` will set the comments of current object.
+#' `$set_value` will set values of current object.
+#'
+#' eplusr also provides custom S3 method of `$`, \code{[[} and also `$<-` and
+#' \code{[[<-} to make it more convenient to get and set a single value of an
+#' `IdfObject`. Basically, `idfobj$FieldName` and \code{idfobj[[Field} is equivalent to \code{idfobj$get_value(Field)[[1]]};
+#' `idfobj$FieldName <- Value` and \code{idfobj[[Field]] <- Value} is equivalent
+#' to `idfobj$set_value(Field = Value)`,  where `FieldName` is a single valid
+#' field name and `Field` is a single valid field index or name.
 #'
 #' **Arguments**
 #'
@@ -112,6 +127,10 @@
 #'     appearance.
 #' * `default`: If `TRUE`, all empty fields will be filled with their default
 #'     values if possible.
+#' * `FieldName`: A single length character vector of one valid field name.
+#' * `Field`: A single length character vector of one valid field name or a
+#'     single length integer vector of one valid field index.
+#' * `Value`: A single length vector of value to set.
 #'
 #' @section Validation:
 #'
@@ -292,7 +311,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 sep_at = sep_at, index = FALSE),
 
         print = function (comment = TRUE, auto_sep = FALSE)
-            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep)
+            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep),
+
+        format = function ()
+            i_format_idfobj(self, private, private$m_object_id)
         # }}}
     ),
 
@@ -319,92 +341,88 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 #' @export
 # [.IdfObject {{{
 '[.IdfObject' <- function(x, i, j, ...) {
-    if (!missing(j)) {
-        stop("incorrect number of dimensions.", call. = FALSE)
-    }
-    if (missing(i)) {
-        x
-    } else {
-        if (is.character(i)) {
-            .subset2(x, "get_value")(name = i)
-        } else if (is.numeric(i)){
-            .subset2(x, "get_value")(index = i)
-        } else {
-            stop("i should be an integer or string.", call. = FALSE)
-        }
-    }
+    .subset2(x, "get_value")(i)[j]
 }
 # }}}
 
 #' @export
-# [<-.IdfObject {{{
-'[<-.IdfObject' <- function(x, i, j, ..., value) {
-    if (!missing(j)) {
-        stop("incorrect number of dimensions.", call. = FALSE)
-    }
-    if (missing(i)) {
-        stop("Missing field index or name.", call. = FALSE)
-    } else {
-        if (is.character(i)) {
-            nms <- i
-        } else if (is.numeric(i)){
-            nms <- .subset2(x, "field_name")(index = i)
+# $.IdfObject {{{
+'$.IdfObject' <- function (x, name) {
+    if (is_string(name)) {
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(name)) {
+            .subset2(x, "get_value")(name)[[1]]
         } else {
-            stop("i should either integers or strings.", call. = FALSE)
+            NextMethod()
         }
+    } else {
+        NextMethod()
     }
-    names(value) <- nms
-    .subset2(x, "set_value")(value)
 }
 # }}}
 
 #' @export
 # [[.IdfObject {{{
-'[[.IdfObject' <- function(x, i, j, ..., drop = FALSE) {
-    if (!missing(j)) {
-        stop("incorrect number of dimensions.", call. = FALSE)
-    }
-    if (missing(i)) {
-        stop("Missing field index or name.", call. = FALSE)
-    } else {
-        if (length(i) == 1L) {
-            if (is.character(i)) {
-                .subset2(x, "get_value")(name = i)[[1]]
-            } else if (is.numeric(i)){
-                .subset2(x, "get_value")(index = i)[[1]]
-            } else {
-                stop("i should either integers or strings.", call. = FALSE)
-            }
+'[[.IdfObject' <- function(x, i) {
+    if (is_string(i)) {
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(i)) {
+          .subset2(x, "get_value")(i)[[1]]
         } else {
-            stop("subscript out of bounds.", call. = FALSE)
+            NextMethod()
         }
+    } else if (is_count(i)){
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_index")(i)) {
+            .subset2(x, "get_value")(i)[[1]]
+        } else {
+            NextMethod()
+        }
+    } else {
+        NextMethod()
+    }
+}
+# }}}
+
+#' @export
+# $<-.IdfObject {{{
+'$<-.IdfObject' <- function (x, name, value) {
+    if (is_string(name)) {
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(name)) {
+            names(value) <- name
+            value <- as.list(value)
+            .subset2(x, "set_value")(value)
+            x
+        } else {
+            NextMethod()
+        }
+    } else {
+        NextMethod()
     }
 }
 # }}}
 
 #' @export
 # [[<-.IdfObject {{{
-'[[<-.IdfObject' <- function(x, i, j, ..., value) {
-    if (!missing(j)) {
-        stop("incorrect number of dimensions.", call. = FALSE)
-    }
-    if (missing(i)) {
-        stop("Missing field number or name.", call. = FALSE)
-    } else {
-        if (length(i) == 1L) {
-            if (is.character(i)) {
-                nm <- i
-            } else if (is.numeric(i)){
-                nm <- .subset2(x, "field_name")(i)
-            } else {
-                stop("i should either integers or strings.", call. = FALSE)
-            }
-            names(value) <- nm
+'[[<-.IdfObject' <- function(x, i, value) {
+    if (is_string(i)) {
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(i)) {
+            names(value) <- name
             value <- as.list(value)
             .subset2(x, "set_value")(value)
+            x
         } else {
-            stop("subscript out of bounds.", call. = FALSE)
+            NextMethod()
         }
+    } else if (is_integerish(i)) {
+        if (.subset2(.subset2(x, "definition")(), "is_valid_field_index")(i)) {
+            name <- .subset2(.subset2(x, "definition")(), "field_name")(i)
+            names(value) <- name
+            value <- as.list(value)
+            .subset2(x, "set_value")(value)
+            x
+        } else {
+            NextMethod()
+        }
+    } else {
+        NextMethod()
     }
 }
 # }}}

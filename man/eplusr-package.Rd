@@ -10,7 +10,7 @@ eplusr: A Toolkit for Using EnergyPlus in R
 }
 \details{
 eplusr provides a rich toolkit of using EnergyPlus directly in
-R, which enables programmatical navigation, modification of EnergyPlus models
+R, which enables programmatic navigation, modification of EnergyPlus models
 and makes it less painful to do parametric simulations and analysis.
 
 With eplusr, you can do:

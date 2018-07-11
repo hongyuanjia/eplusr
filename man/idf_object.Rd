@@ -12,7 +12,9 @@ the parent \code{Idf} object, using \code{$object}, \code{$object_in_class} and
 some shared data from parent \code{Idf} object.
 }
 \section{Usage}{
-\preformatted{# basic info
+
+\preformatted{
+# basic info
 idfobj$id()
 idfobj$name()
 
@@ -26,6 +28,10 @@ idfobj$set_comment(comment, append = TRUE, width = 0L)
 # value
 idfobj$get_value(which = NULL, all = NULL)
 idfobj$set_value(..., defaults = TRUE)
+idfobj$FieldName
+idfobj[[Field]]
+idfobj$FieldName <- Value
+idfobj[[Field]] <- Value
 
 # validation
 idfobj$validate()
@@ -82,7 +88,7 @@ idfobj$set_comment(comment, append = TRUE, width = 0L)
 
 \code{$get_comment} will return the comments of current object.
 
-\code{$set_comment} will set the comments of current object.
+\code{$set_comment} will set comments of current object.
 
 \strong{Arguments}
 \itemize{
@@ -96,13 +102,26 @@ no breaking will be made.
 }
 
 \section{Value}{
-\preformatted{idfobj$get_value(which = NULL, all = FALSE)
+
+\preformatted{
+idfobj$get_value(which = NULL, all = FALSE)
 idfobj$set_value(..., default = TRUE)
+idfobj$FieldName
+idfobj[[Field]]
+idfobj$FieldName <- Value
+idfobj[[Field]] <- Value
 }
 
 \code{$get_value} will return a named list containing values of specified fields.
 
-\code{$set_comment} will set the comments of current object.
+\code{$set_value} will set values of current object.
+
+eplusr also provides custom S3 method of \code{$}, \code{[[} and also \code{$<-} and
+\code{[[<-} to make it more convenient to get and set a single value of an
+\code{IdfObject}. Basically, \code{idfobj$FieldName} and \code{idfobj[[Field} is equivalent to \code{idfobj$get_value(Field)[[1]]};
+\code{idfobj$FieldName <- Value} and \code{idfobj[[Field]] <- Value} is equivalent
+to \code{idfobj$set_value(Field = Value)},  where \code{FieldName} is a single valid
+field name and \code{Field} is a single valid field index or name.
 
 \strong{Arguments}
 \itemize{
@@ -115,6 +134,10 @@ input values will be set to fields according to their order of
 appearance.
 \item \code{default}: If \code{TRUE}, all empty fields will be filled with their default
 values if possible.
+\item \code{FieldName}: A single length character vector of one valid field name.
+\item \code{Field}: A single length character vector of one valid field name or a
+single length integer vector of one valid field index.
+\item \code{Value}: A single length vector of value to set.
 }
 }
 
