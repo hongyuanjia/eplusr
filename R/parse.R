@@ -658,13 +658,20 @@ parse_idf_file <- function (path, idd = NULL) {
             idd <- use_idd(idf_ver)
         # if no version found, use the latest Idd object
         } else {
-            warning("Missing version field in input Idf file. The latest Idd version ",
-                .globals$latest_parsed_ver, " will be used. Parsing errors ",
-                "may occur.", call. = FALSE)
-            idd <- use_idd(.globals$latest_parsed_ver)
+            if (!is_parsed_idd_ver(idf_ver))
+                stop("Missing version filed in input IDF and none parsed IDD ",
+                     "found to use.", call. = FALSE)
+
+            latest_ver <- max(as.numeric_version(names(.globals$idd)))
+            warning("Missing version field in input Idf file. The latest Idd ",
+                "version ", latest_ver, " will be used. Parsing errors may ",
+                "occur.", call. = FALSE)
+            idd <- suppressMessages(use_idd(latest_ver))
         }
     } else {
-        idd <- use_idd(idd)
+        if (!is_idd(idd))
+            idd <- use_idd(idd)
+
         if (is.null(idf_ver))
             warning("Missing version field in input Idf file. The given Idd ",
                 "version ", idd$version(), " will be used. Parsing errors ",

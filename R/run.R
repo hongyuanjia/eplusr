@@ -41,8 +41,10 @@ NULL
 #' @export
 # use_eplus {{{
 use_eplus <- function (eplus) {
+    assert_that(is_scalar(eplus))
+
     # if eplus is a version, try to locate it in the default path
-    if (is_supported_ver(eplus)) {
+    if (is_eplus_ver(eplus)) {
         ver <- standerize_ver(eplus)
         eplus_dir <- eplus_default_path(eplus)
         if (!is_valid_eplus_path(eplus_dir)) {
