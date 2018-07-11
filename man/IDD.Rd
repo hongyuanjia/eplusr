@@ -3,32 +3,44 @@
 \docType{class}
 \name{idd}
 \alias{idd}
-\title{Parse EnergyPlus IDD files}
-\value{
-For \code{use_idd}, an Idd object.
-}
+\title{Parse, Query and Modify EnergyPlus Input Data Dictionary (IDD)}
 \description{
 eplusr provides parsing of and programmatic access to EnergyPlus
 Input Data Dictionary (IDD) files, and objects. It contains all data needed
 to parse EnergyPlus models. \code{Idd} class provides parsing and printing while
 \code{IddObject} provides detailed information of curtain class.
 }
-\details{
-The \code{Idd} objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
-stored internally and will automatically be used when parsing IDF files and
-strings.  Internally, the powerful \code{data.table} package is used to speed
-up the whole process and store the results. However, it will still take about
-5-6 sec to parse an IDD file.
+\section{Overview}{
 
-Normally, you may not need to parse any Energy+.idd file unless your model
-is produced by EnergyPlus whose version is lower than 8.5. If so, it is
-suggested to store the parsed IDD object and directly pass it to the \code{idd}
-argument in \code{\link[=read_idf]{read_idf()}} in order to avoid the parsing process whenever you
-read a model of that version.
 
-Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
-data in \code{data.frame} format. Every IDD will be parsed and stored in four
-tables:
+EnergyPlus operates off of text input files written in its own Input
+Data File (IDF) format. IDF files are similar to XML files in that they are
+intended to conform to a data schema written using similar syntax. For XML,
+the schema format is XSD; for IDF, the schema format is IDD. For each release
+of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
+with the release.
+
+eplusr tries to detect all installed EnergyPlus in default installation
+locations when loading, i.e. \file{C:/EnergyPlusVX-X-0} on Windows,
+\file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+\file{/Applications/EnergyPlus-X-Y-0} on MacOS and stores all found locations
+internally. This data is used to locate the distributed "Energy+.idd" file of
+each EnergyPlus version. And also, every time an IDD file is parsed, an \code{Idd}
+object is created and cached in an environment.
+
+Parsing an IDD file starts from \code{\link[=use_idd]{use_idd()}}.  When using \code{\link[=use_idd]{use_idd()}}, eplusr
+will first try to find the cached \code{Idd} object of that version, if possible.
+If failed, and EnergyPlus of that version is available (see \code{\link[=avail_eplus]{avail_eplus()}}),
+the \code{"Energy+.idd"} distributed with EnergyPlus will be parsed and cached. So
+each IDD file only needs to be parsed once and can be used when parsing every
+IDF file of that version.
+
+Internally, the powerful
+\href{https://cran.r-project.org/web/packages/data.table/index.html}{data.table}
+package is used to speed up the whole IDD parsing process and store the
+results. However, it will still take about 3-4 sec per IDD.  Under the hook,
+eplusr uses a SQL-like structure to store both IDF and IDD data in
+\code{data.frame} format. Every IDD will be parsed and stored in four tables:
 \itemize{
 \item \code{group}: contains group index and group names.
 \item \code{class}: contains class names and properties.
@@ -42,11 +54,9 @@ tables:
 \item \code{field_external_list}: contains external-list data of fields.
 }
 }
-\section{Usage}{
-\preformatted{# read
-idd <- use_idd(idd)
 
-# basic info
+\section{Usage}{
+\preformatted{# basic info
 idd$version()
 idd$build()
 
@@ -75,8 +85,7 @@ print(idd)
 \section{Arguments}{
 
 \itemize{
-\item \code{idd}: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-named as \code{Energy+.idd} or a valid version of pre-parsed IDD (8.3 - 8.9).
+\item \code{idd}: An \code{Idd} object.
 \item \code{group}: A valid group name or valid group names.
 \item \code{class}: A valid class name or valid class names.
 }
@@ -84,10 +93,6 @@ named as \code{Energy+.idd} or a valid version of pre-parsed IDD (8.3 - 8.9).
 
 \section{Detail}{
 
-
-\code{use_idd} will parses an EnergyPlus Input Data Dictionary (IDD) file, and
-returns an \code{Idd} object. If \code{idd} is a valid version of pre-parsed IDD file,
-then the pre-parsed \code{Idd} object will be returned.
 
 \code{$version} returns the version string.
 
@@ -123,8 +128,8 @@ For details about \code{IddObject}, please see \link{idd_object}.
 }
 
 \references{
-\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor
-source code}
+\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor}
+\href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library}
 }
 \author{
 Hongyuan Jia

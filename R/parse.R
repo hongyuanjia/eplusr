@@ -1105,18 +1105,29 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
         msg <- paste0("Line ", msg$line, ": ", msg$string)
     }
 
-    cli::cat_line(cli::rule(line = 2L))
-    cli::cat_line(paste0("[ Error Type ]: ", error))
-    cli::cat_line(paste0("[Total Number]: ", num))
+    start_rule <- cli::rule(line = 2L)
+    err_type <- paste0("[ Error Type ]: ", error)
+    err_num <- paste0("[Total Number]: ", num)
+
     if (!is.null(msg)) {
-        cli::cat_line(cli::rule(line = 1L))
-        cli::cat_line(msg)
-    }
-    cli::cat_line(cli::rule(line = 2L))
-    if (stop) {
-        stop(paste0(toupper(type)," PARSING ERROR."), call. = FALSE)
+        msg_rule <- cli::rule(line = 1L)
+        msg_line <- paste(msg, sep = "\n", collapse = "\n")
     } else {
-        warning(paste0(toupper(type), " PARSING ERROR."), call. = FALSE)
+        msg_rule <- NULL
+        msg_line <- NULL
+    }
+    end_rule <- cli::rule(line = 2L)
+
+    all_msg <- paste0(c(start_rule, err_type, err_num, msg_rule, msg_line, end_rule),
+        collapse = "\n")
+
+    ori <- getOption("warning.length")
+    options(warning.length = 8170L)
+    on.exit(options(warning.length = ori), add = TRUE)
+    if (stop) {
+        stop(paste0(toupper(type)," PARSING ERROR.\n"), all_msg, call. = FALSE)
+    } else {
+        warning(paste0(toupper(type), " PARSING ERROR.\n"), all_msg, call. = FALSE)
     }
 }
 # }}}

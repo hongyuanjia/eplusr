@@ -1,25 +1,40 @@
-#' Parse EnergyPlus IDD files
+#' Parse, Query and Modify EnergyPlus Input Data Dictionary (IDD)
 #'
 #' eplusr provides parsing of and programmatic access to EnergyPlus
 #' Input Data Dictionary (IDD) files, and objects. It contains all data needed
 #' to parse EnergyPlus models. `Idd` class provides parsing and printing while
 #' `IddObject` provides detailed information of curtain class.
 #'
-#' @details The `Idd` objects for EnergyPlus 8.5 to 8.8 have been pre-parsed and
-#' stored internally and will automatically be used when parsing IDF files and
-#' strings.  Internally, the powerful \code{data.table} package is used to speed
-#' up the whole process and store the results. However, it will still take about
-#' 5-6 sec to parse an IDD file.
+#' @section Overview:
 #'
-#' Normally, you may not need to parse any Energy+.idd file unless your model
-#' is produced by EnergyPlus whose version is lower than 8.5. If so, it is
-#' suggested to store the parsed IDD object and directly pass it to the `idd`
-#' argument in [read_idf()] in order to avoid the parsing process whenever you
-#' read a model of that version.
+#' EnergyPlus operates off of text input files written in its own Input
+#' Data File (IDF) format. IDF files are similar to XML files in that they are
+#' intended to conform to a data schema written using similar syntax. For XML,
+#' the schema format is XSD; for IDF, the schema format is IDD. For each release
+#' of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
+#' with the release.
 #'
-#' Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
-#' data in `data.frame` format. Every IDD will be parsed and stored in four
-#' tables:
+#' eplusr tries to detect all installed EnergyPlus in default installation
+#' locations when loading, i.e. \file{C:/EnergyPlusVX-X-0} on Windows,
+#' \file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+#' \file{/Applications/EnergyPlus-X-Y-0} on MacOS and stores all found locations
+#' internally. This data is used to locate the distributed "Energy+.idd" file of
+#' each EnergyPlus version. And also, every time an IDD file is parsed, an `Idd`
+#' object is created and cached in an environment.
+#'
+#' Parsing an IDD file starts from [use_idd()].  When using [use_idd()], eplusr
+#' will first try to find the cached `Idd` object of that version, if possible.
+#' If failed, and EnergyPlus of that version is available (see [avail_eplus()]),
+#' the `"Energy+.idd"` distributed with EnergyPlus will be parsed and cached. So
+#' each IDD file only needs to be parsed once and can be used when parsing every
+#' IDF file of that version.
+#'
+#' Internally, the powerful
+#' [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
+#' package is used to speed up the whole IDD parsing process and store the
+#' results. However, it will still take about 3-4 sec per IDD.  Under the hook,
+#' eplusr uses a SQL-like structure to store both IDF and IDD data in
+#' `data.frame` format. Every IDD will be parsed and stored in four tables:
 #'
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
@@ -34,9 +49,6 @@
 #'
 #' @section Usage:
 #' ```
-#' # read
-#' idd <- use_idd(idd)
-#'
 #' # basic info
 #' idd$version()
 #' idd$build()
@@ -64,16 +76,11 @@
 #'
 #' @section Arguments:
 #'
-#' * `idd`: Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-#'     named as `Energy+.idd` or a valid version of pre-parsed IDD (8.3 - 8.9).
+#' * `idd`: An `Idd` object.
 #' * `group`: A valid group name or valid group names.
 #' * `class`: A valid class name or valid class names.
 #'
 #' @section Detail:
-#'
-#' `use_idd` will parses an EnergyPlus Input Data Dictionary (IDD) file, and
-#' returns an `Idd` object. If `idd` is a valid version of pre-parsed IDD file,
-#' then the pre-parsed `Idd` object will be returned.
 #'
 #' `$version` returns the version string.
 #'
@@ -111,13 +118,12 @@
 #' @importFrom data.table setattr
 #' @importFrom cli cat_rule cat_bullet
 #' @importFrom assertthat assert_that
-#' @return For `use_idd`, an Idd object.
 #' @docType class
 #' @name idd
 #' @author Hongyuan Jia
 #' @references
-#' \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor
-#' source code}
+#' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor)
+#' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
 NULL
 
 # Idd {{{
@@ -228,18 +234,22 @@ read_idd <- function (path) {
 #'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
 #'     and will be parsed after it is downloaded successfully.It is useful in
 #'     case where you only want to edit an EnergyPlus Input Data File (IDF)
-#'     directly but donnot want to install whole EnergyPlus software.
+#'     directly but do not want to install whole EnergyPlus software.
 #'
 #' @details eplusr tries to detect all installed EnergyPlus in default
 #'     installation locations when loading. If argument `idd` is a version,
 #'     eplusr will first try to find the cached `Idd` object of that version, if
 #'     possible. If failed, and EnergyPlus of that version is available (see
 #'     [avail_eplus()]), the `"Energy+.idd"` distributed with EnergyPlus will be
-#'     parsed and stored in eplusr's Idd cache.
+#'     parsed and stored in eplusr Idd cache.
 #'
 #' @importFrom assertthat assert_that
 #' @return An `Idd` object
 #' @export
+#' @examples
+#' \dontrun{
+#' use_idd(8.8)
+#' }
 # use_idd {{{
 use_idd <- function (idd, download = FALSE) {
     assert_that(is_scalar(idd))
@@ -293,7 +303,7 @@ use_idd <- function (idd, download = FALSE) {
 #' `download_idd` downloads EnergyPlus Input Data Dictionary (IDD) file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
 #' useful in case where you only want to edit an EnergyPlus Input Data File
-#' (IDF) directly but donnot want to install whole EnergyPlus software.
+#' (IDF) directly but do not want to install whole EnergyPlus software.
 #'
 #' @param ver The EnergyPlus version number, e.g., 8.7, "8.7" or "8.7.0". The
 #'     special value `"latest"` means the latest version (fetched from GitHub
@@ -308,7 +318,7 @@ use_idd <- function (idd, download = FALSE) {
 #' @importFrom readr read_lines write_lines
 #' @export
 #' @examples
-#' \donotrun{
+#' \dontrun{
 #' download_idd()
 #' download_idd(8.8)
 #' }

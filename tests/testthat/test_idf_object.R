@@ -1,4 +1,4 @@
-context("IdfObject method")
+context("IdfObject methods")
 
 # idf_text {{{
 idf_text <- "
@@ -46,9 +46,10 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
-idd <- use_idd(8.8)
 
-idf <- suppressWarnings(Idf$new(idf_text, 8.8))
+idd <- suppressMessages(use_idd(8.8))
+
+suppressWarnings(idf <- Idf$new(idf_text, idd))
 ver <- idf$Version[[1]]
 mat <- idf$Material[[1]]
 surf <- idf$BuildingSurface_Detailed[[1]]
