@@ -21,9 +21,9 @@ of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 with the release.
 
 eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading, i.e. \file{C:/EnergyPlusVX-X-0} on Windows,
-\file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-\file{/Applications/EnergyPlus-X-Y-0} on MacOS and stores all found locations
+locations when loading, i.e. \code{C:\\EnergyPlusVX-X-0} on Windows,
+\code{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+\code{/Applications/EnergyPlus-X-Y-0} on MacOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
 each EnergyPlus version. And also, every time an IDD file is parsed, an \code{Idd}
 object is created and cached in an environment.
@@ -56,7 +56,9 @@ eplusr uses a SQL-like structure to store both IDF and IDD data in
 }
 
 \section{Usage}{
-\preformatted{# basic info
+
+\preformatted{
+# basic info
 idd$version()
 idd$build()
 
@@ -76,6 +78,8 @@ idd$extenesible_class_name()
 # idd object
 idd$object(class)
 idd$object_in_group(group)
+idd$ClassName
+idd[[ClassName]]
 
 idd$print()
 print(idd)
@@ -88,6 +92,7 @@ print(idd)
 \item \code{idd}: An \code{Idd} object.
 \item \code{group}: A valid group name or valid group names.
 \item \code{class}: A valid class name or valid class names.
+\item \code{ClassName}: A single length character vector of one valid class name.
 }
 }
 
@@ -123,6 +128,12 @@ the IDD file) of specified classes.
 \code{$object} returns a list of \code{IddObject}s of specified classes.
 
 \code{$object_in_group} returns a list of \code{IddObject}s in that group.
+
+eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
+more convenient to get a single \code{IddObject}. Basically, \code{idd$ClassName} and
+\code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
+Here, \code{ClassName} is a single valid class name where all characters other
+than letters and numbers are replaced by a underscore \code{_}.
 
 For details about \code{IddObject}, please see \link{idd_object}.
 }

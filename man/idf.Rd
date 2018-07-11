@@ -36,13 +36,16 @@ those four tables accordingly, in the context of specific IDD data.
 
 All IDF reading process starts with \code{\link[=read_idf]{read_idf()}} which returns an \code{Idf}
 object. The model will be printed in a similar style you see in IDFEditor,
-with an additional heading lines show the \code{Path}, \code{Version} of the model. The
+with additional heading lines show the \code{Path}, \code{Version} of the model. The
 classes of objects in the model are ordered by group and the number of
 objects in classes are shown in square bracket.
 }
 
 \section{Usage}{
-\preformatted{# basic info
+
+
+\preformatted{
+# basic info
 model$version()
 model$path()
 model$group_name(all = FALSE)
@@ -64,6 +67,8 @@ model$is_valid_name(name)
 model$object(id)
 model$object_in_class(class)
 model$search_object(pattern, class = NULL)
+model$ClassName
+model[[ClassName]]
 
 # model modification
 model$dup_object(object, new_name = NULL)
@@ -177,9 +182,14 @@ character vector (for \code{$object_name}) will be returned.
 }
 
 \section{Object Query}{
-\preformatted{model$object(which)
+
+
+\preformatted{
+model$object(which)
 model$object_in_class(class)
 model$search_object(pattern, class = NULL)
+model$ClassName
+model[[ClassName]]
 }
 
 \code{$object} will return a list of \code{IdfObject}s specified by object IDs or
@@ -191,7 +201,12 @@ classes.
 \code{$search_object} will return a list of \code{IdfObject}s whose names meet the
 given pattern in specified classes.
 
-All three methods will return a named list of \code{IdfObject}s. If the class does
+eplusr also provides custom S3 method of \code{$} and \code{[[} to make it more
+convenient to get \code{IdfObject}s in class. Basically, \code{model$ClassName} and
+\code{model[[ClassName]]}, where \code{ClassName} is a single valid class name, is
+equivalent to \code{model$object_in_class(ClassName)}.
+
+All above methods will return a named list of \code{IdfObject}s. If the class does
 not have name attribute, then \code{NA} will be used.
 
 \code{IdfObject} is a class that provides more detailed information methods to
@@ -205,6 +220,9 @@ of valid object names.
 \item \code{class}: A character vector of valid class names.
 \item \code{pattern}: A regular expression. It will be directly passed to
 \code{stringr::str_detect}.
+\item \code{ClassName}: A single length character vector of one valid class name,
+where all characters other than letters and numbers are replaced by a
+underscore \code{_}.
 }
 }
 
@@ -385,21 +403,6 @@ IDFEditor.
 \itemize{
 \item \code{plain}: If \code{TRUE}, the model will be printed in plain text format.
 }
-}
-
-\section{Shortcuts for Query}{
-\preformatted{model$Class
-model[Class]
-model[[Object]]
-}
-
-eplusr provides custom S3 method of \code{\[}, \code{\\$} and \code{\[\[}. Basically,
-\code{model$Class} and \code{model[Class]}, where \code{Class} is a valid class
-name, is equivalent to \code{model$object_in_class(Class)};
-\code{model[[Object]]}, where \code{Object} is an object ID or name is equivalent
-to \code{model$object(Object)}.
-
-[[Object]: R:[Object
 }
 
 \author{

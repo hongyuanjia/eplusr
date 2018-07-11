@@ -127,7 +127,7 @@ repo_releases <- function (owner, repo, ver = "latest", pre_release = FALSE,
     # {{{
     ver <- as.character(ver)
     if (ver != "latest") {
-        ver <- standerize_ver(ver)
+        ver <- standardize_ver(ver)
         targ <- res[version == as.character(ver)]
         # check if version is correct
         if (nrow(targ) == 0L) {

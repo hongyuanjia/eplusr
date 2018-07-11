@@ -35,7 +35,7 @@ on_failure(is_supported_ver) <- function (call, env) {
 # }}}
 # is_parsed_idd_ver {{{
 is_parsed_idd_ver <- function (ver) {
-    as.character(standerize_ver(ver)) %in% names(.globals$idd)
+    as.character(standardize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}
 
