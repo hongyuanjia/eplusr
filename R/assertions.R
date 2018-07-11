@@ -33,28 +33,9 @@ on_failure(is_supported_ver) <- function (call, env) {
     paste0("Currently EnergyPlus v8.1 to v8.9 are supported.")
 }
 # }}}
-# is_pre_parsed {{{
-is_pre_parsed <- function (ver) {
-    as.character(standerize_ver(ver)) %in% .globals$pre_parsed_ver
-}
-# }}}
-# is_eplus_exists {{{
-is_eplus_exists <- function (eplus_exe) {
-    file.exists(eplus_exe)
-}
-
-on_failure(is_eplus_exists) <- function (call, env) {
-    paste0("EnergyPlus does not exist")
-}
-# }}}
-# has_macro {{{1
-has_macro <- function (str) {
-    any(sapply(macro_dict, function(x) any(startsWith(str, x))))
-}
-# }}}1
-# has_hvac_template {{{
-has_hvac_template <- function (idf) {
-    idf$class[startsWith(class, "HVACTemplate"), list(unique(class))][, .N] > 0L
+# is_parsed_idd_ver {{{
+is_parsed_idd_ver <- function (ver) {
+    as.character(standerize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}
 
@@ -151,30 +132,6 @@ are_integerish <- function(x) {
     abs(x - round(x)) < .Machine$double.eps^0.5
 }
 # }}}
-# is_flag {{{
-is_flag <- function(x) is.logical(x) && length(x) == 1
-on_failure(is_flag) <- function(call, env) {
-    paste0(deparse(call$x), " is not a flag (a length one logical vector).")
-}
-# }}}
-# is_writable {{{
-is_writable <- function(path) {
-    assert_that(is_string(path), file.exists(path))
-    file.access(path, mode = 2)[[1]] == 0
-}
-on_failure(is_writable) <- function (call, env) {
-    paste0(eval(call$path, env), " is not writeable")
-}
-# }}}
-# is_readable {{{
-is_readable <- function(path) {
-    assert_that(is_string(path), file.exists(path))
-    file.access(path, mode = 4)[[1]] == 0
-}
-on_failure(is_readable) <- function (call, env) {
-    paste0(eval(call$path, env), " is not readable")
-}
-# }}}
 # is_same_len {{{
 is_same_len <- function (x, y) {
     length(x) == length(y)
@@ -218,17 +175,6 @@ on_failure(has_exts) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
     msg("File ", backtick(basename(path)), " should have one of extensions ", backtick_collapse(ext), ".")
-}
-# }}}
-# has_output_ext {{{
-has_output_ext <- function (x) {
-    has_ext(x, "csv") || has_ext(x, "txt") || has_ext(x, "tab")
-}
-
-on_failure(has_output_ext) <- function (call, env = parent.env) {
-    path <- eval(call$path, env)
-    ext <- eval(call$ext, env)
-    msg("File ", backtick(basename(path)), " is not an EnergyPlus output data file.")
 }
 # }}}
 # is_windows {{{

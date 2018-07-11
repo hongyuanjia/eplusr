@@ -208,7 +208,11 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 
 # read_idd {{{
 read_idd <- function (path) {
-    Idd$new(path)
+    idd <- Idd$new(path)
+
+    .globals$idd[[as.character(idd$version())]] <- idd
+
+    idd
 }
 # }}}
 
@@ -218,29 +222,57 @@ read_idd <- function (path) {
 #' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
 #' class, please see [idd].
 #'
-#' @param idd Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-#'     named as `Energy+.idd` or a valid version of pre-parsed IDD (8.3 - 8.9).
+#' @param idd A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
+#'     named as `Energy+.idd` or a valid version of IDD, e.g. 8.9, "8.9.0".
+#' @param download If `"TRUE"` and argument `idd`, the IDD file will be
+#'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
+#'     and will be parsed after it is downloaded successfully.It is useful in
+#'     case where you only want to edit an EnergyPlus Input Data File (IDF)
+#'     directly but donnot want to install whole EnergyPlus software.
+#'
+#' @details eplusr tries to detect all installed EnergyPlus in default
+#'     installation locations when loading. If argument `idd` is a version,
+#'     eplusr will first try to find the cached `Idd` object of that version, if
+#'     possible. If failed, and EnergyPlus of that version is available (see
+#'     [avail_eplus()]), the `"Energy+.idd"` distributed with EnergyPlus will be
+#'     parsed and stored in eplusr's Idd cache.
 #'
 #' @importFrom assertthat assert_that
 #' @return An `Idd` object
 #' @export
 # use_idd {{{
-use_idd <- function (idd) {
-    if (is_idd(idd)) return(idd)
-
+use_idd <- function (idd, download = FALSE) {
     assert_that(is_scalar(idd))
 
     if (is_eplus_ver(idd)) {
         ver <- standerize_ver(idd)
-        if (!is_pre_parsed(idd)) {
-            stop("Currently only Idd of EnergyPlus v8.5.0 to v8.9.0 have been pre-parsed. ",
-                 "Please give a valid path to an `Energy+.idd` file of EnergyPlus version ",
-                 backtick(ver), ".", call. = FALSE)
-        } else {
-            nm <- paste0("idd_", as.character(ver[1,1:2]))
-            res <- get(nm)
-        }
+
+        # if found in cache, return it directly
+        if (is_parsed_idd_ver(ver)) return(.globals$idd[[as.character(ver)]])
+
+        message("Idd v", ver, " has not been parsed before. Try to locate ",
+            "`Energy+.idd` in EnergyPlus installation folder.")
+
+        # stop if corresponding version of EnergyPlus is not found
+        if (!is_avail_eplus(ver))
+            stop("Failed to locate `Energy+.idd` because EnergyPlus v",
+                ver, "is not available.", call. = FALSE)
+
+        config <- eplus_config(ver)
+        path_idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
+
+        # stop if "Energy+.idd" file is not found in EnergyPlus location
+        if (!file.exists(path_idd))
+            stop("`Energy+.idd` file does not exist in EnergyPlus v",
+                config$version, " installation folder ",
+                backtick(config$dir), ".", call. = FALSE)
+
+        message("`Energy+.idd` file found. Start parsing...")
+        # read IDD file and store in cache
+        res <- read_idd(path_idd)
     } else {
+        message("Start parsing...")
+
         res <- read_idd(idd)
     }
 
@@ -269,6 +301,11 @@ use_idd <- function (idd) {
 #' @param dir A directory to indicate where to save the IDD file. Default:
 #'     current working directory.
 #' @return A full path of the downloaded IDD file.
+#' @seealso [use_idd()]
+#' @importFrom gh gh
+#' @importFrom purrr map_chr
+#' @importFrom stringr str_detect
+#' @importFrom readr read_lines write_lines
 #' @export
 #' @examples
 #' \donotrun{
@@ -296,10 +333,11 @@ download_idd <- function (ver = "latest", dir = getwd()) {
     } else {
         all_ver_dash <- stringr::str_extract(file_nm, "(?<=V)(\\d-\\d-\\d)(?=-Energy\\+.idd)")
         all_ver <- as.numeric_version(all_ver_dash[!is.na(all_ver_dash)])
+        all_valid_ver <- all_ver[all_ver >= 7.0]
 
-        if (!ver %in% all_ver)
+        if (!ver %in% all_valid_ver)
             stop("Invalid IDD version found: ", ver, ". All possible versions are ",
-                paste0(paste0("  * ", all_ver), collapse = "\n"), call. = FALSE)
+                paste0(paste0("  * ", all_valid_ver), collapse = "\n"), call. = FALSE)
 
         ver_dash <- paste0("V", ver[,1], "-", ver[,2], "-", ver[,3], "-Energy+.idd")
         lnk <- file_lnk[ver_dash]

@@ -25,9 +25,8 @@
 
 # package level global constant
 .globals <- new.env(parent = emptyenv())
-.globals$latest_parsed_ver <- as.numeric_version("8.9.0")
-.globals$pre_parsed_ver <- paste0(seq(8.5, 8.9, by = 0.1), ".0")
 .globals$eplus_config <- list()
+.globals$idd <- list()
 
 # package level mutable global options
 .options <- new.env(parent = emptyenv())

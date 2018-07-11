@@ -4,11 +4,17 @@
 \alias{use_idd}
 \title{Use a specific EnergyPlud Input Data Dictionary (IDD) file}
 \usage{
-use_idd(idd)
+use_idd(idd, download = FALSE)
 }
 \arguments{
-\item{idd}{Path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-named as \code{Energy+.idd} or a valid version of pre-parsed IDD (8.3 - 8.9).}
+\item{idd}{A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
+named as \code{Energy+.idd} or a valid version of IDD, e.g. 8.9, "8.9.0".}
+
+\item{download}{If \code{"TRUE"} and argument \code{idd}, the IDD file will be
+downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
+and will be parsed after it is downloaded successfully.It is useful in
+case where you only want to edit an EnergyPlus Input Data File (IDF)
+directly but donnot want to install whole EnergyPlus software.}
 }
 \value{
 An \code{Idd} object
@@ -17,4 +23,12 @@ An \code{Idd} object
 \code{use_idd} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
 class, please see \link{idd}.
+}
+\details{
+eplusr tries to detect all installed EnergyPlus in default
+installation locations when loading. If argument \code{idd} is a version,
+eplusr will first try to find the cached \code{Idd} object of that version, if
+possible. If failed, and EnergyPlus of that version is available (see
+\code{\link[=avail_eplus]{avail_eplus()}}), the \code{"Energy+.idd"} distributed with EnergyPlus will be
+parsed and stored in eplusr's Idd cache.
 }
