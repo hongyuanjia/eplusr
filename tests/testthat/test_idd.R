@@ -441,3 +441,8 @@ describe("$print()", {
         expect_output(idd$print())
     })
 })
+
+test_that("S3 subset", {
+    expect_equal(idd$TestSlash, idd$object("TestSlash")[[1]])
+    expect_equal(idd[["TestSlash"]], idd$object("TestSlash")[[1]])
+})

@@ -277,3 +277,7 @@ describe("$set_object()", {
     })
     # }}}
 })
+test_that("S3 subset", {
+    expect_equal(idf$Material, idf$object_in_class("Material"))
+    expect_equal(idf[["Material"]], idf$object_in_class("Material"))
+})

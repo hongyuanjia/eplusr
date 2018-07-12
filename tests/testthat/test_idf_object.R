@@ -253,3 +253,15 @@ describe("$string()", {
     })
     # }}}
 })
+
+test_that("S3 subsetting works", {
+    expect_equal(mat$Roughness, "MediumSmooth")
+    expect_equal(mat[["Roughness"]], "MediumSmooth")
+})
+
+test_that("S3 assigning works", {
+    expect_silent(mat$Roughness <- "Rough")
+    expect_equal(mat$Roughness, "Rough")
+    expect_silent(mat[["Roughness"]] <- "MediumSmooth")
+    expect_equal(mat$Roughness, "MediumSmooth")
+})
