@@ -12,7 +12,7 @@ NULL
 #' install it.
 #'
 #' This function will try to install EnergyPlus into the default location, e.g.
-#' \file{C:/EnergyPlusVX-X-0} on Windows, \file{/usr/local/EnergyPlus-X-Y-0} on
+#' \file{C:/EnergyPlusVX-Y-0} on Windows, \file{/usr/local/EnergyPlus-X-Y-0} on
 #' Linux, and \file{/Applications/EnergyPlus-X-Y-0} on MacOS.
 #'
 #' Note that the installation process requires administrative privileges

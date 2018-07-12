@@ -71,7 +71,7 @@ it less painful to do parametric simulations and analysis.
 ## Warning
 
 This package is still in its infant stage of development and is subject to
-change. Use it at your own risk.
+change. Please use it at your own risk.
 
 ## Installation
 
@@ -99,11 +99,11 @@ devtools::install_github("hongyuanjia/eplusr")
 library(eplusr)
 ```
 
-eplusr uses `Idf` class to present the whole IDF file and use `IdfObject` to
-present a single object in IDF. Both `Idf` and `IdfObject` contain member
-functions for helping modify the data in IDF so it complies with the underlying
-IDD (EnergyPlus Input Data Dictionary). Similarly, IDD file is wrapped in two
-classes, i.e. `Idd` and `IddObject`.
+eplusr uses `Idf` class to present the whole IDF file and use `IdfObject` class
+to present a single object in an IDF. Both `Idf` and `IdfObject` class contain
+member functions for helping modify the data in the IDF so it complies with the
+underlying IDD (EnergyPlus Input Data Dictionary). Similarly, IDD file is
+wrapped in two classes, i.e. `Idd` and `IddObject`.
 
 It is highly recommended to read the documentation of `Idf`, `IdfObject`, `Idd`
 and `IddObject` to get a thorough understanding on what methods them have. You
@@ -122,12 +122,12 @@ classes are shown in square bracket.
 Parsing an IDF file requires the IDD data of that version, which serves as the
 schema. Usually, when you try to edit an IDF file, the corresponding EnergyPlus
 is likely to be installed already. If that EnergyPlus is installed in standard
-location (`C:/EnergyPlusVX-X-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on
+location (`C:/EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on
 Linux and `/Applications/EnergyPlus-X-Y-0` on MacOS), eplusr is able to find
 it and use the `Energy+.idd` file distributed with that release to parse the
-input IDF file. The IDD file will be parsed and an `Idd` object will be created
-and cached. That `Idd` object will be reused whenever parsing IDF files with
-same version. For more details, please see `?use_idd` and `?idd`.
+input IDF file. The IDD file will be parsed first and an `Idd` object will be
+created and cached. That `Idd` object will be reused whenever parsing IDF files
+with that version. For more details, please see `?use_idd` and `?idd`.
 
 Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
@@ -177,7 +177,7 @@ def_mat <- model$definition(class = "Material")[[1]]
 def_mat
 ```
 
-You can also achieve this using methods of `Idd` class.
+You can also achieve this using methods in `Idd` class.
 
 ```{r idd_obj}
 idd <- use_idd(8.8)
@@ -210,8 +210,8 @@ definition.
 vapply(def_val, class, character(1))
 ```
 
-> NOTE: For numeric fields with default values being "autosize" or
-> "autocalculate", the type of returned values will be "character".
+> NOTE: For numeric fields with default values being `"autosize"` or
+> `"autocalculate"`, the type of returned values will be "character".
 
 Please see `?idd_object` for detailed documentation on `IddObject`.
 
@@ -235,7 +235,7 @@ model$object_name(class = c("Version", "Material", "Construction"), simplify = F
 Object number in each class can be retrieved using `$object_num`.
 
 ```{r obj_num}
-model$object_num(c("BuildingSurface:Detailed"))
+model$object_num(c("BuildingSurface:Detailed", "Material", "Output:Variable"))
 ```
 
 Having the object ID or name, you can easily get any object using `$object`.
@@ -258,10 +258,10 @@ If you want to get all objects in a single class, use `$object_in_class`.
 model$object_in_class("Material")
 ```
 
-Shortcuts are provided (`"$"` and `"["`) to get objects in a single class. Class
-names can be given in a style that `:` is replaced by underscore `_`. This is
-handy because you can just use `model$Output_Variable` instead of
-`model$\`Output:Variable\``.
+Custom S3 methods are provided (`"$"` and `"["`) to get objects in a single
+class. Class names can be given in a style that `:` is replaced by underscore
+`_`. This is handy because it makes valid names in R so that you can just use
+`model$Output_Variable` instead of ` model$`Output:Variable` `.
 
 ```{r obj_in_cls_shortcut_1, out.lines = 30}
 model$Material
@@ -269,7 +269,7 @@ model$Material
 # model[["Material"]]
 ```
 
-Based on the above, if you want to get the first object in class `"RunPeriod"`,
+Based on the above, if you want to get the first object in class `RunPeriod`,
 you can simply run:
 
 ```{r rp}
@@ -293,6 +293,18 @@ methods in `IdfObject` class.
 
 ```{r idfobj_methods}
 setdiff(ls(rp), "initialize")
+```
+
+Also, custom S3 methods are provided (`"$"` and `"["`) to get a single value in
+an `IdfObject` class.
+
+```{r s3_obj}
+rp$Begin_Day_of_Month
+```
+
+You can also make a chain. 
+```{r chain}
+model$RunPeriod$WinterDay$Begin_Day_of_Month
 ```
 
 Please run `?idf_object` for detailed documentation on `IdfObject`.
@@ -503,8 +515,8 @@ epw_sf <- read_epw("San_Francisco.epw")
 epw_sf
 ```
 
-`read_epw` returns an `Epw` object will be returned. For details on `Epw` class,
-please see `?epw`. Here are all methods of `Epw`:
+`read_epw` returns an `Epw` object. For details on `Epw` class, please see
+`?epw`. Here are all methods of `Epw`:
 
 ```{r epw_method}
 setdiff(ls(epw_sf), "initialize")
