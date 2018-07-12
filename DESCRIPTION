@@ -21,7 +21,6 @@ Imports:
     cli,
     clisymbols,
     data.table (>= 1.9.8),
-    dygraphs,
     fasttime,
     furrr,
     future,
@@ -36,8 +35,7 @@ Imports:
     uuid
 Suggests:
     testthat,
-    covr,
-    here
+    covr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
