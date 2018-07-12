@@ -134,9 +134,12 @@ input values will be set to fields according to their order of
 appearance.
 \item \code{default}: If \code{TRUE}, all empty fields will be filled with their default
 values if possible.
-\item \code{FieldName}: A single length character vector of one valid field name.
+\item \code{FieldName}: A single length character vector of one valid field name where
+all characters except letters and numbers are replaced by underscores.
 \item \code{Field}: A single length character vector of one valid field name or a
-single length integer vector of one valid field index.
+single length integer vector of one valid field index. Same as above,
+field names should be given in a style where all characters except
+letters and numbers are replaced by underscores.
 \item \code{Value}: A single length vector of value to set.
 }
 }

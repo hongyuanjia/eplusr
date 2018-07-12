@@ -617,25 +617,28 @@ Idf <- R6::R6Class(classname = "Idf",
 # [[.Idf {{{
 '[[.Idf' <- function(x, i) {
     if (is_string(i)) {
-        in_nm <- i_underscore_name(i)
-
-        self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
-        priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
-
-        all_nm <- i_class_name(self, priv, type = "idf")
-
-        all_nm_u <- i_underscore_name(all_nm)
-
-        m <- match(in_nm, all_nm_u)
-
-        if (is.na(m)) {
+        funs <- setdiff(ls(x), "initialize")
+        if (i %in% funs) {
             NextMethod()
         } else {
-            .subset2(x, "object_in_class")(all_nm[m])
+            in_nm <- i_underscore_name(i)
+
+            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
+            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
+
+            all_nm <- i_class_name(self, priv, type = "idf")
+
+            all_nm_u <- i_underscore_name(all_nm)
+
+            m <- match(in_nm, all_nm_u)
+
+            if (is.na(m)) {
+                NextMethod()
+            } else {
+                .subset2(x, "object_in_class")(all_nm[m])
+            }
         }
-
     } else {
-
         NextMethod()
     }
 }
@@ -645,21 +648,26 @@ Idf <- R6::R6Class(classname = "Idf",
 # $.Idf {{{
 '$.Idf' <- function (x, name) {
     if (is_string(name)) {
-        in_nm <- i_underscore_name(name)
-
-        self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
-        priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
-
-        all_nm <- i_class_name(self, priv, type = "idf")
-
-        all_nm_u <- i_underscore_name(all_nm)
-
-        m <- match(in_nm, all_nm_u)
-
-        if (is.na(m)) {
+        funs <- setdiff(ls(x), "initialize")
+        if (name %in% funs) {
             NextMethod()
         } else {
-            .subset2(x, "object_in_class")(all_nm[m])
+            in_nm <- i_underscore_name(name)
+
+            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
+            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
+
+            all_nm <- i_class_name(self, priv, type = "idf")
+
+            all_nm_u <- i_underscore_name(all_nm)
+
+            m <- match(in_nm, all_nm_u)
+
+            if (is.na(m)) {
+                NextMethod()
+            } else {
+                .subset2(x, "object_in_class")(all_nm[m])
+            }
         }
     } else {
         NextMethod()
