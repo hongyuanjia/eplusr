@@ -596,7 +596,6 @@ Idf <- R6::R6Class(classname = "Idf",
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_uuid = NULL,
         m_path = NULL,
         m_is_imf = NULL,
         m_version = NULL,
