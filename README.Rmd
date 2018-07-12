@@ -64,7 +64,8 @@ it less painful to do parametric simulations and analysis.
   * [Run Parametric Analysis](#run-parametric-analysis)
     * [Apply measure](#apply-measure)
     * [Run in parallel and collect results](#run-in-parallel-and-collect-results)
-* [License](#license)
+* [Related Project](#related-project)
+* [Author](#author)
 
 <!-- vim-markdown-toc -->
 
