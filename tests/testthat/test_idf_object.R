@@ -1,4 +1,4 @@
-context("IdfObject method")
+context("IdfObject methods")
 
 # idf_text {{{
 idf_text <- "
@@ -46,9 +46,10 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
-idd <- use_idd(8.8)
 
-idf <- suppressWarnings(Idf$new(idf_text, 8.8))
+idd <- suppressMessages(use_idd(8.8))
+
+suppressWarnings(idf <- Idf$new(idf_text, idd))
 ver <- idf$Version[[1]]
 mat <- idf$Material[[1]]
 surf <- idf$BuildingSurface_Detailed[[1]]
@@ -251,4 +252,16 @@ describe("$string()", {
         expect_equal(mat$string(comment = FALSE), mat_out)
     })
     # }}}
+})
+
+test_that("S3 subsetting works", {
+    expect_equal(mat$Roughness, "MediumSmooth")
+    expect_equal(mat[["Roughness"]], "MediumSmooth")
+})
+
+test_that("S3 assigning works", {
+    expect_silent(mat$Roughness <- "Rough")
+    expect_equal(mat$Roughness, "Rough")
+    expect_silent(mat[["Roughness"]] <- "MediumSmooth")
+    expect_equal(mat$Roughness, "MediumSmooth")
 })

@@ -446,7 +446,7 @@ i_field_index <- function (self, private, class, name = NULL) {
     if (is.null(name)) return(fld_tbl$field_index)
 
     name_std <- fld_tbl$field_name
-    name_lc <- i_lower_field_name(fld_tbl$field_name)
+    name_lc <- i_lower_name(fld_tbl$field_name)
 
     res_std <- match(name, name_std)
     res_lc <- match(name, name_lc)
@@ -506,7 +506,7 @@ i_field_name <- function (self, private, class, index = NULL, lower = FALSE,
     }
 
     if (lower)
-        i_lower_field_name(res)
+        i_lower_name(res)
     else
         res
 }
@@ -520,7 +520,7 @@ i_is_valid_field_name <- function (self, private, class, name) {
 
     fld_nm <- fld_tbl$field_name
 
-    name %in% fld_nm | name %in% i_lower_field_name(fld_nm)
+    name %in% fld_nm | name %in% i_lower_name(fld_nm)
 }
 # }}}
 
@@ -1216,7 +1216,7 @@ i_idfobject <- function (self, private, which) {
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
     res <- lapply(obj_id, private$m_idfobj_generator$new)
-    data.table::setattr(res, "names", i_lower_object_name(obj_nm))
+    data.table::setattr(res, "names", i_underscore_name(obj_nm))
     res
 }
 # }}}
@@ -1228,7 +1228,7 @@ i_idfobject_in_class <- function (self, private, class) {
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
     res <- lapply(obj_id, private$m_idfobj_generator$new)
-    data.table::setattr(res, "names", i_lower_object_name(obj_nm))
+    data.table::setattr(res, "names", i_underscore_name(obj_nm))
     res
 }
 # }}}
@@ -1957,7 +1957,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
             val_num_named, type, default = FALSE, all = TRUE)
 
         # add lower style field name for joining
-        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_field_name(field_name))]
+        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_name(field_name))]
 
         # for name validation, use right join of input value
         val_tbl_named_ori <- i_del_rleid_column(val_tbl_named_ori)
@@ -1976,7 +1976,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
         val_tbl_named_ori <- i_del_rleid_column(val_tbl_named_ori)
 
         # add lower style field name for joining
-        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_field_name(field_name))]
+        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_name(field_name))]
 
         val_tbl_named <- val_in_named[val_tbl_named_ori, on = c("object_id", "class_id", "field_name_lower")]
 
@@ -2166,7 +2166,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
             empty <- list(is_empty(value))
 
             field_name_in <- list(replace_empty(names(value)))
-            field_name_lower <- list(i_lower_field_name(replace_empty(names(value))))
+            field_name_lower <- list(i_lower_name(replace_empty(names(value))))
 
             val_chr <- list(vapply(value,
                 function (val) as.character(replace_empty(val)), character(1)))
@@ -2177,7 +2177,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
             empty <- vapply(value, is_empty, logical(1))
 
             field_name_in <- lapply(value, function (val) replace_empty(names(val)))
-            field_name_lower <- lapply(field_name_in, i_lower_field_name)
+            field_name_lower <- lapply(field_name_in, i_lower_name)
 
             val_chr <- purrr::modify_depth(value, 2, ~as.character(replace_empty(.x)))
 
@@ -2543,7 +2543,7 @@ i_last_field_index_from_value_name <- function (self, private, value_in_tbl, typ
         .SDcols = c("class_rleid", "field_name", "field_index")]
 
     # add lower style field names
-    ext_tbl[, field_name_lower := i_lower_field_name(field_name)]
+    ext_tbl[, field_name_lower := i_lower_name(field_name)]
 
     # join
     ext_match <- ext_tbl[not_found, on = c("class_rleid", "field_name_lower")]
@@ -2841,13 +2841,15 @@ i_verbose_info <- function (self, private, ...) {
 }
 # }}}
 
-# i_lower_field_name {{{
-i_lower_field_name <- function (field_name) tolower(gsub("[- :]", "_", field_name))
+# i_lower_name {{{
+i_lower_name <- function (name) {
+    tolower(i_underscore_name(name))
+}
 # }}}
 
-# i_lower_object_name {{{
-i_lower_object_name <- function (object_name) {
-    nm <- tolower(gsub("[^[:alnum:]]", "_", object_name))
+# i_underscore_name {{{
+i_underscore_name <- function (name) {
+    nm <- gsub("[^[:alnum:]]", "_", name)
     gsub("_{2,}", "_", nm)
 }
 # }}}
@@ -3169,7 +3171,7 @@ i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = epl
 
     val <- value_list(val_tbl, in_ip = in_ip)
 
-    nm <- i_lower_field_name(val_tbl$field_name)
+    nm <- i_lower_name(val_tbl$field_name)
 
     data.table::setattr(val, "names", nm)
 
@@ -3425,4 +3427,3 @@ i_print_iddobj <- function (self, private) {
     cli::cat_rule(line = 1)
 }
 # }}}
-

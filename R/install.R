@@ -12,7 +12,7 @@ NULL
 #' install it.
 #'
 #' This function will try to install EnergyPlus into the default location, e.g.
-#' \file{C:/EnergyPlusVX-X-0} on Windows, \file{/usr/local/EnergyPlus-X-Y-0} on
+#' \file{C:/EnergyPlusVX-Y-0} on Windows, \file{/usr/local/EnergyPlus-X-Y-0} on
 #' Linux, and \file{/Applications/EnergyPlus-X-Y-0} on MacOS.
 #'
 #' Note that the installation process requires administrative privileges
@@ -127,7 +127,7 @@ repo_releases <- function (owner, repo, ver = "latest", pre_release = FALSE,
     # {{{
     ver <- as.character(ver)
     if (ver != "latest") {
-        ver <- standerize_ver(ver)
+        ver <- standardize_ver(ver)
         targ <- res[version == as.character(ver)]
         # check if version is correct
         if (nrow(targ) == 0L) {

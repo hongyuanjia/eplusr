@@ -2,9 +2,7 @@
 #'
 #' eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
 #' in a hierarchical structure, which was extremely inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html),
-#' but with total different data structure under the hook. Please follow the link
-#' above if you want to know the detailed implementations of IDF in EnergyPlus
-#' and OpenStudio.
+#' but with total different data structure under the hook.
 #'
 #' @section Overview:
 #'
@@ -29,12 +27,15 @@
 #' So to modify an EnergyPlus model in eplusr is equal to change the data in
 #' those four tables accordingly, in the context of specific IDD data.
 #'
+#' All IDF reading process starts with [read_idf()] which returns an `Idf`
+#' object. The model will be printed in a similar style you see in IDFEditor,
+#' with additional heading lines show the `Path`, `Version` of the model. The
+#' classes of objects in the model are ordered by group and the number of
+#' objects in classes are shown in square bracket.
+#'
 #' @section Usage:
 #'
-#' ```
-#' # read
-#' model <- read_idf(path, idd = NULL)
-#'
+#' \preformatted{
 #' # basic info
 #' model$version()
 #' model$path()
@@ -57,6 +58,8 @@
 #' model$object(id)
 #' model$object_in_class(class)
 #' model$search_object(pattern, class = NULL)
+#' model$ClassName
+#' model[[ClassName]]
 #'
 #' # model modification
 #' model$dup_object(object, new_name = NULL)
@@ -86,22 +89,7 @@
 #'
 #' # print
 #' model$print(plain = FALSE)
-#' ```
-#'
-#' @section Read:
-#'
-#' ```
-#' model <- read_idf(path, idd = NULL)
-#' ```
-#'
-#' **Arguments**
-#'
-#' * `path`: Path to EnergyPlus IDF file. The file extension does not
-#'       matter. So models stored in `TXT` format are still able to correctly be
-#'       parsed.
-#' * `idd`: Path to `Energy+.idd` file. If NULL, the pre-parsed `Energy+.idd`
-#'     files stored internally from EnergyPlus v8.3 to 8.8 will be used
-#'     according to the version of input model, if possible.
+#' }
 #'
 #' @section Basic Info:
 #' ```
@@ -183,11 +171,13 @@
 #'
 #' @section Object Query:
 #'
-#' ```
+#' \preformatted{
 #' model$object(which)
 #' model$object_in_class(class)
 #' model$search_object(pattern, class = NULL)
-#' ```
+#' model$ClassName
+#' model[[ClassName]]
+#' }
 #'
 #' `$object` will return a list of `IdfObject`s specified by object IDs or
 #'     names.
@@ -198,7 +188,12 @@
 #' `$search_object` will return a list of `IdfObject`s whose names meet the
 #'     given pattern in specified classes.
 #'
-#' All three methods will return a named list of `IdfObject`s. If the class does
+#' eplusr also provides custom S3 method of `$` and \code{[[} to make it more
+#' convenient to get `IdfObject`s in class. Basically, `model$ClassName` and
+#' \code{model[[ClassName]]}, where `ClassName` is a single valid class name, is
+#' equivalent to `model$object_in_class(ClassName)`.
+#'
+#' All above methods will return a named list of `IdfObject`s. If the class does
 #'     not have name attribute, then `NA` will be used.
 #'
 #' `IdfObject` is a class that provides more detailed information methods to
@@ -212,6 +207,9 @@
 #' * `class`: A character vector of valid class names.
 #' * `pattern`: A regular expression. It will be directly passed to
 #'     `stringr::str_detect`.
+#' * `ClassName`: A single length character vector of one valid class name,
+#'     where all characters other than letters and numbers are replaced by a
+#'     underscore `_`.
 #'
 #' @section Object Modification:
 #' ```
@@ -391,19 +389,6 @@
 #'
 #' * `plain`: If `TRUE`, the model will be printed in plain text format.
 #'
-#' @section Shortcuts for Query:
-#' ```
-#' model$Class
-#' model[Class]
-#' model[[Object]]
-#' ```
-#'
-#' eplusr provides custom S3 method of `\[`, `\$` and `\[\[`. Basically,
-#' \code{model$Class} and \code{model[Class]}, where `Class` is a valid class
-#' name, is equivalent to \code{model$object_in_class(Class)};
-#' \code{model[[Object]]}, where `Object` is an object ID or name is equivalent
-#' to \code{model$object(Object)}.
-#'
 #' @docType class
 #' @name idf
 #' @author Hongyuan Jia
@@ -419,9 +404,10 @@ NULL
 #' @param path A path to an EnergyPlus IDF file or a string that can be parsed as
 #'     an IDF. The file extension does not matter. So models stored in `TXT`
 #'     format are still able to correctly be parsed.
-#' @param idd  A path to an `Energy+.idd` file. If NULL, the pre-parsed
-#'     `Energy+.idd` files stored internally from EnergyPlus v8.3 to 8.8 will be
-#'     used according to the version of input model, if possible.
+#' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
+#'     default, the version of IDF will be passed to [use_idd()]. If the input
+#'     IDF does not have a version field (possible for ".ddy" files), then it
+#'     will be parsed using the latest version of IDD cached, with a warning.
 #' @return An `Idf` object.
 #' @export
 # read_idf {{{
@@ -610,7 +596,6 @@ Idf <- R6::R6Class(classname = "Idf",
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_uuid = NULL,
         m_path = NULL,
         m_is_imf = NULL,
         m_version = NULL,
@@ -628,44 +613,63 @@ Idf <- R6::R6Class(classname = "Idf",
 # }}}
 
 #' @export
-# [.Idf {{{
-'[.Idf' <- function(x, i, j, ...) {
-    obj <- .subset2(x, "object_in_class")(i)
-
-    if (missing(j)) return(obj)
-
-    .subset(obj, j)
-}
-# }}}
-
-#' @export
 # [[.Idf {{{
-'[[.Idf' <- function(x, i, j, ..., drop = FALSE) {
-    if (!is_scalar(i))
-        stop("Please give a single object ID or object name.")
+'[[.Idf' <- function(x, i) {
+    if (is_string(i)) {
+        funs <- setdiff(ls(x), "initialize")
+        if (i %in% funs) {
+            NextMethod()
+        } else {
+            in_nm <- i_underscore_name(i)
 
-    if (!missing(j))
-        stop("Incorrect number of subscripts.")
+            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
+            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
 
-    .subset2(x, "object")(i)[[1]]
+            all_nm <- i_class_name(self, priv, type = "idf")
+
+            all_nm_u <- i_underscore_name(all_nm)
+
+            m <- match(in_nm, all_nm_u)
+
+            if (is.na(m)) {
+                NextMethod()
+            } else {
+                .subset2(x, "object_in_class")(all_nm[m])
+            }
+        }
+    } else {
+        NextMethod()
+    }
 }
 # }}}
 
 #' @export
 # $.Idf {{{
-'$.Idf' <- function (x, i, ...) {
-    funs <- setdiff(ls(x), "initialize")
-    if (i %in% funs) return(.subset2(x, i))
+'$.Idf' <- function (x, name) {
+    if (is_string(name)) {
+        funs <- setdiff(ls(x), "initialize")
+        if (name %in% funs) {
+            NextMethod()
+        } else {
+            in_nm <- i_underscore_name(name)
 
-    in_nm <- i_lower_field_name(i)
-    cls_std <- .subset2(x, "class_name")()
-    cls_lower <- i_lower_field_name(cls_std)
+            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
+            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
 
-    idx <- match(in_nm, cls_lower)
+            all_nm <- i_class_name(self, priv, type = "idf")
 
-    if (is.na(idx))
-        stop("Invalid class name found in current Idf: ", backtick(i), ".")
+            all_nm_u <- i_underscore_name(all_nm)
 
-    .subset2(x, "object_in_class")(.subset2(cls_std, idx))
+            m <- match(in_nm, all_nm_u)
+
+            if (is.na(m)) {
+                NextMethod()
+            } else {
+                .subset2(x, "object_in_class")(all_nm[m])
+            }
+        }
+    } else {
+        NextMethod()
+    }
 }
 # }}}
