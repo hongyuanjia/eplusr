@@ -356,7 +356,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
             m <- match(i_underscore_name(name), all_nm)
             if (!is.na(m)) {
-                .subset2(x, "get_value")(name)[[1]]
+                .subset2(x, "get_value")(m)[[1]]
             } else {
                 NextMethod()
             }
@@ -378,7 +378,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
             m <- match(i_underscore_name(i), all_nm)
             if (!is.na(m)) {
-                .subset2(x, "get_value")(i)[[1]]
+                .subset2(x, "get_value")(m)[[1]]
             } else {
                 NextMethod()
             }
