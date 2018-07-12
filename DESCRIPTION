@@ -7,9 +7,10 @@ Authors@R:
            role = c("aut", "cre"),
            email = "hongyuanjia@cqu.edu.cn",
            comment = c(ORCID = "0000-0002-0075-8183"))
-Description: This package provides tools to run EnergyPlus and collect,
-    analyze, and summary parametric simulation results in R.
-License: GPL-3 + file LICENSE
+Description: eplusr provides a rich toolkit of using EnergyPlus directly in R,
+    which enables programmatic navigation, modification of EnergyPlus models and
+    makes it less painful to do parametric simulations and analysis.
+License: GPL-3
 URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
