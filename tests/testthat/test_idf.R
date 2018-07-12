@@ -46,19 +46,18 @@ idf_text <- "
         3.0;                     !- Vertex 4 Z-coordinate {m}
     "
 # }}}
-idd <- use_idd(8.8)
+
+idd <- suppressMessages(use_idd(8.8))
+idf_parsed <- suppressWarnings(parse_idf_file(idf_text, idd))
 
 describe("parse_idf_file()", {
     it("can parse Idf stored in strings", {
         # {{{
-        expect_warning(idf_parsed <- parse_idf_file(idf_text, idd),
-            "Missing version field in input Idf file")
         expect_equal(names(idf_parsed),
             c("version", "options", "object", "value", "value_reference", "comment"))
         # }}}
     })
 
-    idf_parsed <- suppressWarnings(parse_idf_file(idf_text, idd))
     it("can add version according to input Idd object", {
         # {{{
         expect_equal(idf_parsed$version, as.numeric_version("8.8"))
@@ -142,12 +141,12 @@ describe("parse_idf_file()", {
 describe("Idf$new()",
     # {{{
     it("can create new Idf object from string", {
-        expect_warning(idf <- Idf$new(idf_text, idd))
+        expect_warning(idf <- eplusr:::Idf$new(idf_text, idd))
     })
     # }}}
 )
 
-suppressWarnings(idf <- Idf$new(idf_text, idd))
+suppressWarnings(idf <- eplusr:::Idf$new(idf_text, idd))
 
 describe("$version()", {
     # {{{
@@ -222,7 +221,6 @@ describe("$object()", {
         expect_equal(class(idf$object(1:2)), "list")
         expect_equal(length(idf$object(1:2)), 2L)
         expect_error(idf$object(1:5), "Invalid object ID found")
-        expect_equal(idf$object(1)[[1]], idf[[1]])
     })
     # }}}
 })

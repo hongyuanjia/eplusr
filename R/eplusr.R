@@ -1,7 +1,7 @@
 #' eplusr: A Toolkit for Using EnergyPlus in R
 #'
-#' @details eplusr provides a richable toolkit of using EnergyPlus directly in
-#' R, which enables programmatical navigation, modification of EnergyPlus models
+#' @details eplusr provides a rich toolkit of using EnergyPlus directly in
+#' R, which enables programmatic navigation, modification of EnergyPlus models
 #' and makes it less painful to do parametric simulations and analysis.
 #'
 #' With eplusr, you can do:
@@ -25,9 +25,8 @@
 
 # package level global constant
 .globals <- new.env(parent = emptyenv())
-.globals$latest_parsed_ver <- as.numeric_version("8.9.0")
-.globals$pre_parsed_ver <- paste0(seq(8.5, 8.9, by = 0.1), ".0")
 .globals$eplus_config <- list()
+.globals$idd <- list()
 
 # package level mutable global options
 .options <- new.env(parent = emptyenv())

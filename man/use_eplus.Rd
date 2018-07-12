@@ -29,15 +29,15 @@ EnergyPlus.
 Configure which version of EnergyPlus to use
 }
 \details{
-\code{use_eplus} will add an EnergyPlus version into the EnergyPlus version
+\code{use_eplus} adds an EnergyPlus version into the EnergyPlus version
 dictionary in eplusr.
 
-\code{eplus_config} will return the configure data of specified version of
+\code{eplus_config} returns the configure data of specified version of
 EnergyPlus.
 
-\code{avail_eplus} will return all available EnergyPlus found.
+\code{avail_eplus} returns all available EnergyPlus found.
 
-\code{is_avail_eplus} will check if the specified version of EnergyPlus is
+\code{is_avail_eplus} checks if the specified version of EnergyPlus is
 available or not.
 }
 \examples{

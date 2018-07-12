@@ -14,15 +14,15 @@ NULL
 #'
 #' @details
 #'
-#' `use_eplus` will add an EnergyPlus version into the EnergyPlus version
+#' `use_eplus` adds an EnergyPlus version into the EnergyPlus version
 #' dictionary in eplusr.
 #'
-#' `eplus_config` will return the configure data of specified version of
+#' `eplus_config` returns the configure data of specified version of
 #' EnergyPlus.
 #'
-#' `avail_eplus` will return all available EnergyPlus found.
+#' `avail_eplus` returns all available EnergyPlus found.
 #'
-#' `is_avail_eplus` will check if the specified version of EnergyPlus is
+#' `is_avail_eplus` checks if the specified version of EnergyPlus is
 #' available or not.
 #'
 #' @return For `eplus_config`, the configure data of specified version of
@@ -41,9 +41,11 @@ NULL
 #' @export
 # use_eplus {{{
 use_eplus <- function (eplus) {
+    assert_that(is_scalar(eplus))
+
     # if eplus is a version, try to locate it in the default path
-    if (is_supported_ver(eplus)) {
-        ver <- standerize_ver(eplus)
+    if (is_eplus_ver(eplus)) {
+        ver <- standardize_ver(eplus)
         eplus_dir <- eplus_default_path(eplus)
         if (!is_valid_eplus_path(eplus_dir)) {
             stop(msg("Cannot locate EnergyPlus V", trimws(eplus), " at default
@@ -82,7 +84,7 @@ avail_eplus <- function () names(.globals$eplus_config)
 # eplus_config {{{
 eplus_config <- function (ver) {
     assert_that(is_eplus_ver(ver))
-    ver <- standerize_ver(ver)
+    ver <- standardize_ver(ver)
     .globals$eplus_config[[as.character(ver)]]
 }
 # }}}
@@ -293,7 +295,7 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
     stopifnot(is_eplus_ver(ver))
-    ver <- standerize_ver(ver)
+    ver <- standardize_ver(ver)
     ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)
@@ -328,7 +330,7 @@ get_ver_from_path <- function (path) {
         # if still failed, just return NULL
         ver <- tryCatch(get_idd_ver(h), error = function (e) NULL)
     }
-    standerize_ver(ver)
+    standardize_ver(ver)
 }
 # }}}
 # eplus_exe {{{
@@ -342,8 +344,8 @@ eplus_exe <- function (eplus) {
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
 }
 # }}}
-# standerize_ver {{{
-standerize_ver <- function (ver) {
+# standardize_ver {{{
+standardize_ver <- function (ver) {
     if (is_integerish(ver)) ver <- paste0(ver, ".0")
     ver <- as.numeric_version(ver)
     if (is.na(ver[1,3])) ver[1,3] <- 0

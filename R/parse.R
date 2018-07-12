@@ -658,13 +658,20 @@ parse_idf_file <- function (path, idd = NULL) {
             idd <- use_idd(idf_ver)
         # if no version found, use the latest Idd object
         } else {
-            warning("Missing version field in input Idf file. The latest Idd version ",
-                .globals$latest_parsed_ver, " will be used. Parsing errors ",
-                "may occur.", call. = FALSE)
-            idd <- use_idd(.globals$latest_parsed_ver)
+            if (!is_parsed_idd_ver(idf_ver))
+                stop("Missing version filed in input IDF and none parsed IDD ",
+                     "found to use.", call. = FALSE)
+
+            latest_ver <- max(as.numeric_version(names(.globals$idd)))
+            warning("Missing version field in input Idf file. The latest Idd ",
+                "version ", latest_ver, " will be used. Parsing errors may ",
+                "occur.", call. = FALSE)
+            idd <- suppressMessages(use_idd(latest_ver))
         }
     } else {
-        idd <- use_idd(idd)
+        if (!is_idd(idd))
+            idd <- use_idd(idd)
+
         if (is.null(idf_ver))
             warning("Missing version field in input Idf file. The given Idd ",
                 "version ", idd$version(), " will be used. Parsing errors ",
@@ -1098,18 +1105,29 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
         msg <- paste0("Line ", msg$line, ": ", msg$string)
     }
 
-    cli::cat_line(cli::rule(line = 2L))
-    cli::cat_line(paste0("[ Error Type ]: ", error))
-    cli::cat_line(paste0("[Total Number]: ", num))
+    start_rule <- cli::rule(line = 2L)
+    err_type <- paste0("[ Error Type ]: ", error)
+    err_num <- paste0("[Total Number]: ", num)
+
     if (!is.null(msg)) {
-        cli::cat_line(cli::rule(line = 1L))
-        cli::cat_line(msg)
-    }
-    cli::cat_line(cli::rule(line = 2L))
-    if (stop) {
-        stop(paste0(toupper(type)," PARSING ERROR."), call. = FALSE)
+        msg_rule <- cli::rule(line = 1L)
+        msg_line <- paste(msg, sep = "\n", collapse = "\n")
     } else {
-        warning(paste0(toupper(type), " PARSING ERROR."), call. = FALSE)
+        msg_rule <- NULL
+        msg_line <- NULL
+    }
+    end_rule <- cli::rule(line = 2L)
+
+    all_msg <- paste0(c(start_rule, err_type, err_num, msg_rule, msg_line, end_rule),
+        collapse = "\n")
+
+    ori <- getOption("warning.length")
+    options(warning.length = 8170L)
+    on.exit(options(warning.length = ori), add = TRUE)
+    if (stop) {
+        stop(paste0(toupper(type)," PARSING ERROR.\n"), all_msg, call. = FALSE)
+    } else {
+        warning(paste0(toupper(type), " PARSING ERROR.\n"), all_msg, call. = FALSE)
     }
 }
 # }}}
@@ -1138,7 +1156,7 @@ get_idd_ver <- function (idd_str) {
 
     if (length(ver_line) == 1L) {
         ver <- substr(ver_line, 14L, nchar(ver_line))
-        return(standerize_ver(ver))
+        return(standardize_ver(ver))
     } else if (length(ver_line > 1L)) {
         stop("Multiple IDD version found in the input:\n",
              paste0("  ", backtick(ver_line), collapse = "\n"), call. = FALSE)
@@ -1173,9 +1191,9 @@ get_idf_ver <- function (idf_str) {
 
     if (length(ver_normal) == 1L) {
         # for "8.6; !- Version Identifier"
-        standerize_ver(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
+        standardize_ver(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
     } else if (length(ver_special) == 1L){
-        standerize_ver(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
+        standardize_ver(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
     } else {
         return(NULL)
     }
