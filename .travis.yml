@@ -19,13 +19,15 @@ r:
 
 r_packages:
   - covr
-  - devtools
 
 # Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
 env:
   - ENERGYPLUS_VERSION=8.8.0 ENERGYPLUS_SHA=7c3bbe4830 ENERGYPLUS_INSTALL_VERSION=8-8-0
 
 before_install:
+  # install udunits2 library
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install udunits libgit2; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install libudunits2-dev libgit2-dev; fi
   # install EnergyPlus
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then EXT=dmg; PLATFORM=Darwin; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then EXT=sh; PLATFORM=Linux; fi
