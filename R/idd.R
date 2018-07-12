@@ -430,7 +430,7 @@ download_idd <- function (ver = "latest", dir = getwd()) {
 
     if (as.character(ver) == "latest") ver <- latest_ver
     assert_that(is_eplus_ver(ver))
-    ver <- standerize_ver(as.character(ver))
+    ver <- standardize_ver(as.character(ver))
 
     file_nm <- purrr::map_chr(rels, "name")
     file_lnk <- purrr::map_chr(rels, "download_url")
