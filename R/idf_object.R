@@ -127,9 +127,12 @@
 #'     appearance.
 #' * `default`: If `TRUE`, all empty fields will be filled with their default
 #'     values if possible.
-#' * `FieldName`: A single length character vector of one valid field name.
+#' * `FieldName`: A single length character vector of one valid field name where
+#'     all characters except letters and numbers are replaced by underscores.
 #' * `Field`: A single length character vector of one valid field name or a
-#'     single length integer vector of one valid field index.
+#'     single length integer vector of one valid field index. Same as above,
+#'     field names should be given in a style where all characters except
+#'     letters and numbers are replaced by underscores.
 #' * `Value`: A single length vector of value to set.
 #'
 #' @section Validation:
@@ -349,10 +352,17 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 # $.IdfObject {{{
 '$.IdfObject' <- function (x, name) {
     if (is_string(name)) {
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(name)) {
-            .subset2(x, "get_value")(name)[[1]]
-        } else {
+        funs <- setdiff(ls(x), "initialize")
+        if (name %in% funs) {
             NextMethod()
+        } else {
+            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(i_underscore_name(name), all_nm)
+            if (!is.na(m)) {
+                .subset2(x, "get_value")(name)[[1]]
+            } else {
+                NextMethod()
+            }
         }
     } else {
         NextMethod()
@@ -364,16 +374,17 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 # [[.IdfObject {{{
 '[[.IdfObject' <- function(x, i) {
     if (is_string(i)) {
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(i)) {
-          .subset2(x, "get_value")(i)[[1]]
-        } else {
+        funs <- setdiff(ls(x), "initialize")
+        if (i %in% funs) {
             NextMethod()
-        }
-    } else if (is_count(i)){
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_index")(i)) {
-            .subset2(x, "get_value")(i)[[1]]
         } else {
-            NextMethod()
+            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(i_underscore_name(i), all_nm)
+            if (!is.na(m)) {
+                .subset2(x, "get_value")(i)[[1]]
+            } else {
+                NextMethod()
+            }
         }
     } else {
         NextMethod()
@@ -385,13 +396,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 # $<-.IdfObject {{{
 '$<-.IdfObject' <- function (x, name, value) {
     if (is_string(name)) {
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(name)) {
-            names(value) <- name
-            value <- as.list(value)
-            .subset2(x, "set_value")(value)
-            x
-        } else {
+        funs <- setdiff(ls(x), "initialize")
+        if (name %in% funs) {
             NextMethod()
+        } else {
+            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(i_underscore_name(name), all_nm)
+            if (!is.na(m)) {
+                names(value) <- all_nm[m]
+                value <- as.list(value)
+                .subset2(x, "set_value")(value)
+            } else {
+                NextMethod()
+            }
         }
     } else {
         NextMethod()
@@ -403,23 +420,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 # [[<-.IdfObject {{{
 '[[<-.IdfObject' <- function(x, i, value) {
     if (is_string(i)) {
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_name")(i)) {
-            names(value) <- name
-            value <- as.list(value)
-            .subset2(x, "set_value")(value)
-            x
-        } else {
+        funs <- setdiff(ls(x), "initialize")
+        if (i %in% funs) {
             NextMethod()
-        }
-    } else if (is_integerish(i)) {
-        if (.subset2(.subset2(x, "definition")(), "is_valid_field_index")(i)) {
-            name <- .subset2(.subset2(x, "definition")(), "field_name")(i)
-            names(value) <- name
-            value <- as.list(value)
-            .subset2(x, "set_value")(value)
-            x
         } else {
-            NextMethod()
+            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(i_underscore_name(i), all_nm)
+            if (!is.na(m)) {
+                names(value) <- all_nm[m]
+                value <- as.list(value)
+                .subset2(x, "set_value")(value)
+            } else {
+                NextMethod()
+            }
         }
     } else {
         NextMethod()

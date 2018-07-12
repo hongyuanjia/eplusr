@@ -221,7 +221,6 @@ describe("$object()", {
         expect_equal(class(idf$object(1:2)), "list")
         expect_equal(length(idf$object(1:2)), 2L)
         expect_error(idf$object(1:5), "Invalid object ID found")
-        expect_equal(idf$object(1)[[1]], idf[[1]])
     })
     # }}}
 })
