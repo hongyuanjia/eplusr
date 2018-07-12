@@ -413,7 +413,7 @@ avail_idd <- function () names(.globals$idd)
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
     assert_that(is_eplus_ver(ver))
-    ver <- as.character(standardise_ver(ver))
+    ver <- as.character(standardize_ver(ver))
     ver %in% names(.globals$idd)
 }
 # }}}
