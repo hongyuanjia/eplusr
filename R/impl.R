@@ -3427,31 +3427,3 @@ i_print_iddobj <- function (self, private) {
     cli::cat_rule(line = 1)
 }
 # }}}
-
-# i_format_idfobj {{{
-i_format_idfobj <- function (self, private, object) {
-    assert_that(is_scalar(object))
-
-    obj_tbl <- i_object_tbl_from_which(self, private, object)
-    val_tbl <- i_value_tbl_from_which(self, private, object)
-
-    if (is.na(obj_tbl$object_name)) {
-        cli::cat_line("<<[ID:", obj_tbl$object_id, "]>> ",
-            obj_tbl$class_name)
-    } else {
-        cli::cat_line("<<[ID:", obj_tbl$object_id, "] ",
-            backtick(obj_tbl$object_name), ">> ",
-            obj_tbl$class_name)
-    }
-
-    if (i_need_update_num(self, private, view_in_ip = eplusr_option("view_in_ip")))
-        val_tbl <- update_value_num(val_tbl, in_ip = in_ip)
-
-    val <- value_list(val_tbl, eplusr_option("view_in_ip"))
-
-    nm <- val_tbl$field_name
-    data.table::setattr(val, "names", nm)
-
-    cli::cat_line(capture.output(str(val))[-1])
-}
-# }}}

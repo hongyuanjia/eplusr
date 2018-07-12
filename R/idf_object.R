@@ -314,10 +314,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 sep_at = sep_at, index = FALSE),
 
         print = function (comment = TRUE, auto_sep = FALSE)
-            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep),
-
-        format = function ()
-            i_format_idfobj(self, private, private$m_object_id)
+            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep)
         # }}}
     ),
 
