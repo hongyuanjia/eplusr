@@ -10,7 +10,7 @@ Authors@R:
 Description: eplusr provides a rich toolkit of using EnergyPlus directly in R,
     which enables programmatic navigation, modification of EnergyPlus models and
     makes it less painful to do parametric simulations and analysis.
-License: GPL-3
+License: GPL-3 + file LICENSE
 URL: https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
