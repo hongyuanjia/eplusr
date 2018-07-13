@@ -58,7 +58,6 @@ eplusr uses a SQL-like structure to store both IDF and IDD data in
 \section{Usage}{
 
 \preformatted{
-# basic info
 idd$version()
 idd$build()
 
@@ -75,7 +74,6 @@ idd$required_class_name()
 idd$unique_class_name()
 idd$extenesible_class_name()
 
-# idd object
 idd$object(class)
 idd$object_in_group(group)
 idd$ClassName
@@ -135,12 +133,15 @@ more convenient to get a single \code{IddObject}. Basically, \code{idd$ClassName
 Here, \code{ClassName} is a single valid class name where all characters other
 than letters and numbers are replaced by a underscore \code{_}.
 
-For details about \code{IddObject}, please see \link{idd_object}.
+For details about \code{IddObject}, please see \link[=idd_object]{IddObject class}.
 }
 
 \references{
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor}
 \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library}
+}
+\seealso{
+\link[=idd_object]{IddObject class}
 }
 \author{
 Hongyuan Jia

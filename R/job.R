@@ -1,45 +1,40 @@
-#' Create and Run EnergyPlus Simulation, and Collect Simulation Results
+#' Run EnergyPlus Simulation and Collect Outputs
 #'
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
-#' methods to extract simulation results.
+#' methods to extract simulation outputs.
 #'
-#' eplusr uses the EnergyPlus SQL output for extracting simulation results. In
+#' eplusr uses the EnergyPlus SQL output for extracting simulation outputs. In
 #' order to do so, a object in `Output:SQLite` with `Option Type` value of
 #' `SimpleAndTabular` will be automatically created if it does not exists.
 #' `EplusJob` has provide some wrappers that do SQL query to get report data
 #' results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
 #' `Output:Table` results, you have to be familiar with the structure of the
-#' EnergyPlus SQL results, especially for table "TabularDataWithStrings". For
-#' details, please see "2.20 eplusout.sql", especially "2.20.4.4 TabularData
-#' Table" in EnergyPlus "Output Details and Examples" documentation.
+#' EnergyPlus SQL results, especially for table *"TabularDataWithStrings"*. For
+#' details, please see *"2.20 eplusout.sql"*, especially *"2.20.4.4 TabularData
+#' Table"* in EnergyPlus *"Output Details and Examples"* documentation.
 #'
 #' @section Usage:
 #' ```
-#' # create
-#' job <- eplus_job(idf, epw)
-#'
-#' # run and kill
 #' job$run(wait = TRUE)
 #' job$kill()
 #' job$status()
 #'
-#' # errors
 #' job$errors(info = FALSE)
 #'
-#' # results
 #' job$output_dir(open = FALSE)
 #' job$locate_output(suffix = ".err", strict = TRUE)
 #' job$report_data_dict()
 #' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 #' job$tabular_data()
 #'
-#' # print
 #' job$print()
 #' ```
+#'
 #' @section Create:
 #' ```
-#' epw <- eplus_job(idf, epw)
+#' job <- eplus_job(idf, epw)
 #' ```
+#'
 #' **Arguments**
 #'
 #' * `idf`: Path to EnergyPlus IDF or IMF file or an `Idf` object.
@@ -70,7 +65,7 @@
 #'
 #' **Arguments**
 #'
-#' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
+#' * `echo`: Only applicable to `run_idf`. Show EnergyPlus simulation process
 #'     information to the console.  If `FALSE`, which is default, a
 #'     [processx::process] object will be return.
 #' * `wait`: If `TRUE`, R will hang on and wait for the simulation to complete.
@@ -101,7 +96,8 @@
 #'
 #' `$tabular_data` extracts all tabular data.
 #'
-#' **Arguments**
+#' **Arguments**:
+#'
 #' * `open`: If `TRUE`, the output directory will be opened. It may only work
 #'     well on Windows.
 #' * `suffix`: A string that indicates the file suffix of simulation output.
@@ -119,10 +115,21 @@
 #'     of this simulation. If `"auto"`, the name of the IDF file will be used.
 #'
 #' @docType class
-#' @name eplus_job
+#' @name job
+#' @seealso [ParametricJob class][param] for EnergyPlus parametric simulations.
 #' @author Hongyuan Jia
 NULL
 
+#' Create an EnergyPlus Simulation Job
+#'
+#' `eplus_job` takes an IDF and EPW as input, and returns an `EplusJob` object
+#' for running EnergyPlus simulation and collecting outputs. For more details,
+#' please see [job].
+#'
+#' @param idf A path to an EnergyPlus IDF or IMF file or an `Idf` object.
+#' @param epw A path to an EnergyPlus EPW file or an `Epw` object.
+#' @return An `EplusJob` object.
+#' @seealso [param_job()] for creating an EnergyPlus parametric job.
 #' @export
 # eplus_job {{{
 eplus_job <- function (idf, epw) {

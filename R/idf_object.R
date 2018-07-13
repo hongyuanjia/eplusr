@@ -8,18 +8,14 @@
 #'
 #' @section Usage:
 #' \preformatted{
-#' # basic info
 #' idfobj$id()
 #' idfobj$name()
 #'
-#' # definition
 #' idfobj$definition()
 #'
-#' # comment
 #' idfobj$get_comment()
 #' idfobj$set_comment(comment, append = TRUE, width = 0L)
 #'
-#' # value
 #' idfobj$get_value(which = NULL, all = NULL)
 #' idfobj$set_value(..., defaults = TRUE)
 #' idfobj$FieldName
@@ -27,24 +23,19 @@
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
 #'
-#' # validation
 #' idfobj$validate()
 #' idfobj$is_valid()
 #'
-#' # object cross reference
 #' idfobj$ref_from_object()
 #' idfobj$ref_by_object()
 #' idfobj$has_ref_by()
 #' idfobj$has_ref_from()
 #' idfobj$has_ref()
 #'
-#' # data extraction
 #' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 #'
-#' # formatting
 #' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 #'
-#' # print
 #' idfobj$print(comment = TRUE, auto_sep = FALSE)
 #' print(iddobj)
 #' }
@@ -73,7 +64,7 @@
 #' ```
 #'
 #' `$definition` will return the definition, i.e. the `IddObject`, of current
-#'     class. For details of `IddObject`, please see XXX.
+#'     class. For details of `IddObject`, please see [IddObject class][idd_object].
 #'
 #' @section Comment:
 #' ```
@@ -232,6 +223,7 @@
 #' @importFrom R6 R6Class
 #' @docType class
 #' @name idf_object
+#' @seealso [Idf class][idf]
 #' @author Hongyuan Jia
 NULL
 

@@ -7,11 +7,9 @@
 #'
 #' @section Usage:
 #' ```
-#' # create
 #' param <- param_job(idf, epw)
 #' param$apply_measure(measure, ..., .names = NULL)
 #'
-#' # run and collect results
 #' param$run(dir = NULL, parallel_backend = future::multiprocess)
 #' param$kill(which = NULL)
 #' param$status(which = NULL)
@@ -22,7 +20,6 @@
 #' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 #' param$tabular_data(which = NULL)
 #'
-#' # print
 #' param$print()
 #' ```
 #' @section Create:
@@ -40,7 +37,7 @@
 #' param$seed()
 #' param$weather()
 #' ```
-#' 
+#'
 #' `$seed` will return the input `Idf` object.
 #'
 #' `$weather` will return the input `Epw` object.
@@ -62,7 +59,7 @@
 #' * `measure`: A function that takes an `Idf` and other arguments as input and
 #'     returns an `Idf` object as output.
 #' * `...`: Other arguments passed to that `measure`.
-#' * `.names`: A character vector of the names of parametric `Idf`s. If `NULL`, 
+#' * `.names`: A character vector of the names of parametric `Idf`s. If `NULL`,
 #'     the new `Idf`s will be named in format `measure_name + number`.
 #'
 #' @section Run and Collect Results:
@@ -78,9 +75,8 @@
 #' param$tabular_data(which = NULL)
 #' ```
 #'
-#' All those functions have the same meaning in [eplus_job], except that they
-#' only return the results of specified simulation. For details, please see
-#' [eplus_job].
+#' All those functions have the same meaning in [EplusJob class][job], except that they
+#' only return the results of specified simulation.
 #'
 #' **Arguments**
 #'
@@ -88,22 +84,23 @@
 #'     parametric simulations.
 #' * `parallel_backend`: Any acceptable input for [future::plan()].
 #'
-#' All other arguments have the same meanings as in [eplus_job].
+#' All other arguments have the same meanings as in [EplusJob class][job].
 #'
 #' @docType class
-#' @name param_job
+#' @name param
 #' @author Hongyuan Jia
 NULL
 
-#' Create Parametric Analysis
+#' Create An EnergyPlus Parametric Simulation Job
 #'
-#' `param_job` takes an IDF and EPW as input and returns a `ParametricJob`.
+#' `param_job` takes an IDF and EPW as input and returns a `ParametricJob`. For
+#' details on `ParametricJob`, please see [ParametricJob class][param].
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' @param epw A path to EnergyPlus EPW file or an `Epw` object.
 #' @return A `ParametricJob` object.
+#' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
 #' @export
-#' @rdname param_job
 # param_job {{{
 param_job <- function (idf, epw) {
     Parametric$new(idf, epw)

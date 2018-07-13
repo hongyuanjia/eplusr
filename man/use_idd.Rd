@@ -2,18 +2,18 @@
 % Please edit documentation in R/idd.R
 \name{use_idd}
 \alias{use_idd}
+\alias{download_idd}
 \alias{avail_idd}
 \alias{is_avail_idd}
-\alias{download_idd}
 \title{Use a specific EnergyPlus Input Data Dictionary (IDD) file}
 \usage{
 use_idd(idd, download = FALSE)
 
+download_idd(ver = "latest", dir = getwd())
+
 avail_idd()
 
 is_avail_idd(ver)
-
-download_idd(ver = "latest", dir = getwd())
 }
 \arguments{
 \item{idd}{A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
@@ -74,4 +74,7 @@ download_idd(8.8)
 
 is_avail_idd(8.8)
 }
+}
+\seealso{
+\link[=idd]{Idd Class}
 }

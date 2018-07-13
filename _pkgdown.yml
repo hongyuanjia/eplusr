@@ -1,0 +1,41 @@
+reference:
+  - title: IDD
+    desc: Use a specific EnergyPlus Input Data Dictionary (IDD)
+    contents:
+      - idd
+      - idd_object
+      - use_idd
+      - download_idd
+      - avail_idd
+      - is_avail_idd
+  - title: IDF
+    desc: Read, modify and run an EnergyPlus Input Data File (IDF)
+    contents:
+      - idf
+      - idf_object
+      - read_idf
+  - title: EPW
+    desc: Read, modify an EnergyPlus Weather (EPW)
+    contents:
+      - epw
+      - read_epw
+  - title: Configure EnergyPlus
+    contents:
+      - use_eplus
+      - eplus_config
+      - avail_eplus
+      - is_avail_eplus
+  - title: Job
+    desc: Run EnergyPlus and collect outputs
+    contents:
+      - job
+      - param
+      - eplus_job
+      - param_job
+      - run_idf
+      - run_multi
+      - clean_wd
+  - title: eplusr Options
+    contents:
+      - eplusr-package
+      - eplusr_option

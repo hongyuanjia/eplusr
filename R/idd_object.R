@@ -166,9 +166,9 @@
 #'
 #' `$is_required_field` returns `TRUE` if the field is required.
 #'
-#' @return Depends on the method used.
 #' @docType class
 #' @name idd_object
+#' @seealso [Idd Class][idd]
 #' @author Hongyuan Jia
 NULL
 

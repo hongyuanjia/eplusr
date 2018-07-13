@@ -49,7 +49,6 @@
 #'
 #' @section Usage:
 #' \preformatted{
-#' # basic info
 #' idd$version()
 #' idd$build()
 #'
@@ -66,7 +65,6 @@
 #' idd$unique_class_name()
 #' idd$extenesible_class_name()
 #'
-#' # idd object
 #' idd$object(class)
 #' idd$object_in_group(group)
 #' idd$ClassName
@@ -121,7 +119,7 @@
 #' Here, `ClassName` is a single valid class name where all characters other
 #' than letters and numbers are replaced by a underscore `_`.
 #'
-#' For details about `IddObject`, please see [idd_object].
+#' For details about `IddObject`, please see [IddObject class][idd_object].
 #'
 #' @importFrom R6 R6Class
 #' @importFrom data.table setattr
@@ -130,6 +128,7 @@
 #' @docType class
 #' @name idd
 #' @author Hongyuan Jia
+#' @seealso [IddObject class][idd_object]
 #' @references
 #' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor)
 #' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
@@ -339,6 +338,7 @@ read_idd <- function (path) {
 #'     path of the downloaded IDD file; `avail_idd` returns a character vector;
 #'     `is_avail_idd` returns a single logical vector.
 #' @export
+#' @seealso [Idd Class][idd]
 #' @examples
 #' \dontrun{
 #'
@@ -404,22 +404,6 @@ use_idd <- function (idd, download = FALSE) {
 
 #' @rdname use_idd
 #' @export
-# avail_idd {{{
-avail_idd <- function () names(.globals$idd)
-# }}}
-
-#' @rdname use_idd
-#' @export
-# is_avail_idd {{{
-is_avail_idd <- function (ver) {
-    assert_that(is_eplus_ver(ver))
-    ver <- as.character(standardize_ver(ver))
-    ver %in% names(.globals$idd)
-}
-# }}}
-
-#' @rdname use_idd
-#' @export
 # download_idd {{{
 download_idd <- function (ver = "latest", dir = getwd()) {
     latest <- repo_releases("NREL", "EnergyPlus", "latest")
@@ -473,5 +457,21 @@ download_idd <- function (ver = "latest", dir = getwd()) {
         "successfully into ", dir, ".")
 
     dest
+}
+# }}}
+
+#' @rdname use_idd
+#' @export
+# avail_idd {{{
+avail_idd <- function () names(.globals$idd)
+# }}}
+
+#' @rdname use_idd
+#' @export
+# is_avail_idd {{{
+is_avail_idd <- function (ver) {
+    assert_that(is_eplus_ver(ver))
+    ver <- as.character(standardize_ver(ver))
+    ver %in% names(.globals$idd)
 }
 # }}}

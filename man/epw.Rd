@@ -3,29 +3,17 @@
 \docType{class}
 \name{epw}
 \alias{epw}
-\alias{read_epw}
 \title{Read, and modify an EnergyPlus Weather File (EPW)}
-\usage{
-read_epw(path)
-}
-\arguments{
-\item{path}{A path of an EnergyPlus \code{EPW} file.}
-}
-\value{
-An \code{Epw} object.
-}
 \description{
-\code{read_epw} parses an EPW file and returns an \code{Epw} object. The parsing
-process is extreme inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
-with some simplifications.
-
-\code{read_epw} parses an EPW file and returns an \code{Epw} object. The parsing
-process is extreme inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
+Reading an EPW file starts with function \code{\link[=read_epw]{read_epw()}}, which parses an EPW
+file and returns an \code{Epw} object. The parsing process is extremely inspired
+by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
 with some simplifications.
 }
 \details{
-The first eight lines of a standard EPW file are normally headers which
-contains data of location, design conditions, typical/extreme periods, ground
+An EPW file can be devided into two parts, headers and weather data.  The
+first eight lines of a standard EPW file are normally headers which contains
+data of location, design conditions, typical/extreme periods, ground
 temperatures, holidays/daylight savings, data periods and other comments. For
 now, eplusr only parses headers of location, holidays/daylight savings and
 data periods. All other headers will be left as they were when parsing and
@@ -55,15 +43,10 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
 \item liquid precipitation depth
 \item liquid precipitation rate
 }
-
-Even though \code{Epw} class provides methods to replace core weather data, it is
-still not recommended.
 }
 \section{Usage}{
-\preformatted{# read
-epw <- read_epw(path)
+\preformatted{epw <- read_epw(path)
 
-# basic header info
 epw$city
 epw$city <- "city"
 epw$state_province
@@ -87,15 +70,12 @@ epw$time_step <- "time_step"
 epw$start_day_of_week
 epw$start_day_of_week <- "start_day_of_week"
 
-# data query and modification
 epw$path()
 epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
 
-# save
 epw$save(path, overwrite = FALSE)
 
-# print
 epw$print()
 print(epw)
 }
@@ -162,8 +142,12 @@ epw$set_data(data)
 \code{$path} returns the path of EPW file.
 
 \code{$get_data} returns the core weather data.
+
 \code{$set_data} replaces core weather data with input data. NOTE: This feature is
 experimental. There is no validation when replacing.
+
+\strong{NOTE}: Even though \code{Epw} class provides methods to replace core weather data,
+it is still not recommended.
 
 \strong{Arguments}
 \itemize{

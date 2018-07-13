@@ -1,11 +1,13 @@
 #' Read, and modify an EnergyPlus Weather File (EPW)
 #'
-#' `read_epw` parses an EPW file and returns an `Epw` object. The parsing
-#' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
+#' Reading an EPW file starts with function [read_epw()], which parses an EPW
+#' file and returns an `Epw` object. The parsing process is extremely inspired
+#' by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
 #' with some simplifications.
 #'
-#' The first eight lines of a standard EPW file are normally headers which
-#' contains data of location, design conditions, typical/extreme periods, ground
+#' An EPW file can be devided into two parts, headers and weather data.  The
+#' first eight lines of a standard EPW file are normally headers which contains
+#' data of location, design conditions, typical/extreme periods, ground
 #' temperatures, holidays/daylight savings, data periods and other comments. For
 #' now, eplusr only parses headers of location, holidays/daylight savings and
 #' data periods. All other headers will be left as they were when parsing and
@@ -33,15 +35,10 @@
 #' 13. liquid precipitation depth
 #' 14. liquid precipitation rate
 #'
-#' Even though `Epw` class provides methods to replace core weather data, it is
-#' still not recommended.
-#'
 #' @section Usage:
 #' ```
-#' # read
 #' epw <- read_epw(path)
 #'
-#' # basic header info
 #' epw$city
 #' epw$city <- "city"
 #' epw$state_province
@@ -65,15 +62,12 @@
 #' epw$start_day_of_week
 #' epw$start_day_of_week <- "start_day_of_week"
 #'
-#' # data query and modification
 #' epw$path()
 #' epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 #' epw$set_data(data)
 #'
-#' # save
 #' epw$save(path, overwrite = FALSE)
 #'
-#' # print
 #' epw$print()
 #' print(epw)
 #' ```
@@ -128,8 +122,12 @@
 #' `$path` returns the path of EPW file.
 #'
 #' `$get_data` returns the core weather data.
+#'
 #' `$set_data` replaces core weather data with input data. NOTE: This feature is
 #'     experimental. There is no validation when replacing.
+#'
+#' **NOTE**: Even though `Epw` class provides methods to replace core weather data,
+#' it is still not recommended.
 #'
 #' **Arguments**
 #'
@@ -163,12 +161,13 @@ NULL
 #'
 #' `read_epw` parses an EPW file and returns an `Epw` object. The parsing
 #' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
-#' with some simplifications.
+#' with some simplifications. For more details on `Epw`, please see [Epw Class][epw].
 #'
 #' @param path A path of an EnergyPlus `EPW` file.
 #' @return An `Epw` object.
+#' @seealso [Epw class][epw]
 #' @export
-#' @rdname epw
+#' @rdname read_epw
 # read_epw {{{
 read_epw <- function (path) {
     Epw$new(path)
