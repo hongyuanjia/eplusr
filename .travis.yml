@@ -25,6 +25,12 @@ matrix:
 r_packages:
   - covr
 
+apt_packages:
+  - libudunits2-dev
+
+brew_packages:
+  - udunits
+
 # Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
 env:
   - ENERGYPLUS_VERSION=8.8.0 ENERGYPLUS_SHA=7c3bbe4830 ENERGYPLUS_INSTALL_VERSION=8-8-0
