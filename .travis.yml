@@ -25,19 +25,14 @@ matrix:
 r_packages:
   - covr
 
-apt_packages:
-  - libgit2-dev
-  - libudunits2-dev
-
-brew_packages:
-  - libgit2
-  - udunits
-
 # Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
 env:
   - ENERGYPLUS_VERSION=8.8.0 ENERGYPLUS_SHA=7c3bbe4830 ENERGYPLUS_INSTALL_VERSION=8-8-0
 
 before_install:
+  # manually install devtools
+  - Rscript -e 'install.packages("devtools")'
+
   # install EnergyPlus
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then EXT=dmg; PLATFORM=Darwin; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then EXT=sh; PLATFORM=Linux; fi
