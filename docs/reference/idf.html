@@ -130,7 +130,7 @@ IDF is parsed and stored in four tables:</p><ul>
 <li><p><code>value_reference</code>: contains cross-reference of field values.</p></li>
 </ul>
     <p>IDD file is parsed and stored in a similar structure. For details, please see
-<a href='idd.html'>idd</a>.</p>
+<a href='idd.html'>Idd class</a>.</p>
 <p>So to modify an EnergyPlus model in eplusr is equal to change the data in
 those four tables accordingly, in the context of specific IDD data.</p>
 <p>All IDF reading process starts with <code><a href='read_idf.html'>read_idf()</a></code> which returns an <code>Idf</code>
@@ -223,7 +223,7 @@ current model (when <code>all</code> is <code>FALSE</code>) or current Idd (when
 </pre>
     <p><code>$definition</code> will return the definitions, i.e. the <code>IddObject</code>s, of given
 classes which contain all data used for parsing <code>IdfObject</code>s. For details
-of <code>IdfObject</code>, please see <a href='idd_object.html'>idd_object</a>.</p>
+of <code>IdfObject</code>, please see <a href='idd_object.html'>IddObject class</a>.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>class</code>: A character vector contains class names.</p></li>
 </ul>
@@ -238,7 +238,7 @@ model$is_valid_name(name)
 </pre>
     <p><code>$object_id</code> and <code>$object_name</code> will return all object IDs and names
 in specified class respectively. For <code>$object_name</code>, if the specified
-class does not have name attributes, such as <code>"SimulationContrl"</code>, <code>NA</code>
+class does not have name attributes, such as <code>SimulationContrl</code>, <code>NA</code>
 will be returned.</p>
 <p><code>$is_valid_id</code> and <code>$is_valid_name</code> will return <code>TRUE</code>s if given integers or
 strings are valid object IDs or object names respectively.</p>
@@ -276,7 +276,7 @@ equivalent to <code>model$object_in_class(ClassName)</code>.</p>
 not have name attribute, then <code>NA</code> will be used.</p>
 <p><code>IdfObject</code> is a class that provides more detailed information methods to
 modify a single object in an <code>Idf</code> object. For detailed explanations,
-please see <a href='idf_object.html'>idf_object</a>.</p>
+please see <a href='idf_object.html'>IdfObject class</a>.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>object</code>: Either an integer vector of valid object IDs or a character vector
 of valid object names.</p></li>
@@ -436,6 +436,10 @@ IDFEditor.</p>
 <li><p><code>plain</code>: If <code>TRUE</code>, the model will be printed in plain text format.</p></li>
 </ul>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='idf_object.html'>IdfObject class</a></p></div>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -467,6 +471,8 @@ IDFEditor.</p>
       <li><a href="#run-model">Run Model</a></li>
 
       <li><a href="#print">Print</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
     <h2>Author</h2>

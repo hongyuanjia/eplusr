@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create an EnergyPlus Simulation Job — eplus_job • eplusr</title>
+<title>Read and Parse EnergyPlus Weather File (EPW) — read_epw • eplusr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,11 +30,11 @@
 
 
 
-<meta property="og:title" content="Create an EnergyPlus Simulation Job — eplus_job" />
+<meta property="og:title" content="Read and Parse EnergyPlus Weather File (EPW) — read_epw" />
 
-<meta property="og:description" content="eplus_job takes an IDF and EPW as input, and returns an EplusJob object
-for running EnergyPlus simulation and collecting outputs. For more details,
-please see job." />
+<meta property="og:description" content="read_epw parses an EPW file and returns an Epw object. The parsing
+process is extreme inspired by OpenStudio utilities library
+with some simplifications. For more details on Epw, please see Epw Class." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -99,41 +99,37 @@ please see job." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create an EnergyPlus Simulation Job</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/job.R'><code>R/job.R</code></a></small>
-    <div class="hidden name"><code>eplus_job.Rd</code></div>
+    <h1>Read and Parse EnergyPlus Weather File (EPW)</h1>
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/epw.R'><code>R/epw.R</code></a></small>
+    <div class="hidden name"><code>read_epw.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>eplus_job</code> takes an IDF and EPW as input, and returns an <code>EplusJob</code> object
-for running EnergyPlus simulation and collecting outputs. For more details,
-please see <a href='job.html'>job</a>.</p>
+    <p><code>read_epw</code> parses an EPW file and returns an <code>Epw</code> object. The parsing
+process is extreme inspired by <a href='https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html'>OpenStudio utilities library</a>
+with some simplifications. For more details on <code>Epw</code>, please see <a href='epw.html'>Epw Class</a>.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>eplus_job</span>(<span class='no'>idf</span>, <span class='no'>epw</span>)</pre>
+    <pre class="usage"><span class='fu'>read_epw</span>(<span class='no'>path</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>idf</th>
-      <td><p>A path to an EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></td>
-    </tr>
-    <tr>
-      <th>epw</th>
-      <td><p>A path to an EnergyPlus EPW file or an <code>Epw</code> object.</p></td>
+      <th>path</th>
+      <td><p>A path of an EnergyPlus <code>EPW</code> file.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An <code>EplusJob</code> object.</p>
+    <p>An <code>Epw</code> object.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='param_job.html'>param_job()</a></code> for creating an EnergyPlus parametric job.</p></div>
+    <div class='dont-index'><p><a href='epw.html'>Epw class</a></p></div>
     
 
   </div>

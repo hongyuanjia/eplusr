@@ -159,7 +159,6 @@ eplusr uses a SQL-like structure to store both IDF and IDD data in
 
     
     <pre>
-# basic info
 idd$version()
 idd$build()
     idd$group_index(group = NULL)
@@ -172,8 +171,7 @@ idd$is_valid_class(class)
     idd$required_class_name()
 idd$unique_class_name()
 idd$extenesible_class_name()
-    # idd object
-idd$object(class)
+    idd$object(class)
 idd$object_in_group(group)
 idd$ClassName
 idd[[ClassName]]
@@ -215,12 +213,16 @@ more convenient to get a single <code>IddObject</code>. Basically, <code>idd$Cla
 <code>idd[[ClassName]]</code>, is equivalent to <code>idd$object(ClassName)[[1]]</code>.
 Here, <code>ClassName</code> is a single valid class name where all characters other
 than letters and numbers are replaced by a underscore <code>_</code>.</p>
-<p>For details about <code>IddObject</code>, please see <a href='idd_object.html'>idd_object</a>.</p>
+<p>For details about <code>IddObject</code>, please see <a href='idd_object.html'>IddObject class</a>.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><a href='https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor'>IDFEditor</a>
 <a href='https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html'>OpenStudio utilities library</a></p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='idd_object.html'>IddObject class</a></p></div>
     
 
   </div>
@@ -237,6 +239,8 @@ than letters and numbers are replaced by a underscore <code>_</code>.</p>
       <li><a href="#detail">Detail</a></li>
 
       <li><a href="#references">References</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
     <h2>Author</h2>
