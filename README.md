@@ -19,7 +19,6 @@ makes it less painful to do parametric simulations and analysis.
 
 <!-- vim-markdown-toc GFM -->
 
-  - [Warning](#warning)
   - [Installation](#installation)
   - [Features](#features)
   - [Usage](#usage)
@@ -46,11 +45,6 @@ makes it less painful to do parametric simulations and analysis.
   - [Author](#author)
 
 <!-- vim-markdown-toc -->
-
-## Warning
-
-This package is still in its infant stage of development and is subject
-to change. Please use it at your own risk.
 
 ## Installation
 
