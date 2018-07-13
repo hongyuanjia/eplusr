@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create and Run Parametric Analysis, and Collect Results — param_job • eplusr</title>
+<title>Create An EnergyPlus Parametric Simulation Job — param_job • eplusr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,11 +30,10 @@
 
 
 
-<meta property="og:title" content="Create and Run Parametric Analysis, and Collect Results — param_job" />
+<meta property="og:title" content="Create An EnergyPlus Parametric Simulation Job — param_job" />
 
-<meta property="og:description" content="ParametricJob class provides a prototype of conducting parametric analysis
-of EnergyPlus simulations.
-param_job takes an IDF and EPW as input and returns a ParametricJob." />
+<meta property="og:description" content="param_job takes an IDF and EPW as input and returns a ParametricJob. For
+details on ParametricJob, please see ParametricJob class." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -99,16 +98,15 @@ param_job takes an IDF and EPW as input and returns a ParametricJob." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create and Run Parametric Analysis, and Collect Results</h1>
+    <h1>Create An EnergyPlus Parametric Simulation Job</h1>
     <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/param.R'><code>R/param.R</code></a></small>
     <div class="hidden name"><code>param_job.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>ParametricJob</code> class provides a prototype of conducting parametric analysis
-of EnergyPlus simulations.</p>
-<p><code>param_job</code> takes an IDF and EPW as input and returns a <code>ParametricJob</code>.</p>
+    <p><code>param_job</code> takes an IDF and EPW as input and returns a <code>ParametricJob</code>. For
+details on <code>ParametricJob</code>, please see <a href='param.html'>ParametricJob class</a>.</p>
     
     </div>
 
@@ -131,85 +129,9 @@ of EnergyPlus simulations.</p>
 
     <p>A <code>ParametricJob</code> object.</p>
     
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <p>Basically, it is a collection of multiple <code>EplusJob</code> objects.</p>
-    
-    <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
-
-    <pre># create
-param &lt;- param_job(idf, epw)
-param$apply_measure(measure, ..., .names = NULL)
-    # run and collect results
-param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
-param$errors(info = FALSE)
-param$output_dir(which = NULL)
-param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-param$report_data_dict(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-param$tabular_data(which = NULL)
-    # print
-param$print()
-</pre>
-    
-    <h2 class="hasAnchor" id="create"><a class="anchor" href="#create"></a>Create</h2>
-
-    <pre>param &lt;- param_job(idf, epw)
-</pre>
-    <p><strong>Arguments</strong></p><ul>
-<li><p><code>idf</code>: Path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></li>
-<li><p><code>epw</code>: Path to EnergyPlus EPW file or an <code>Epw</code> object.</p></li>
-</ul>
-    
-    <h2 class="hasAnchor" id="get-seed-model-and-weather"><a class="anchor" href="#get-seed-model-and-weather"></a>Get Seed Model and Weather</h2>
-
-    <pre>param$seed()
-param$weather()
-</pre>
-    <p><code>$seed</code> will return the input <code>Idf</code> object.</p>
-<p><code>$weather</code> will return the input <code>Epw</code> object.</p>
-    
-    <h2 class="hasAnchor" id="apply-design-alternatives"><a class="anchor" href="#apply-design-alternatives"></a>Apply Design Alternatives</h2>
-
-    <pre>param$apply_measure(measure, ..., .names = NULL)
-</pre>
-    <p><code>$apply_measure</code> allows to apply a measure to an <code>Idf</code> and creates parametric
-models for analysis. Basically, a measure is just a function that takes
-an <code>Idf</code> object and other arguments as input, and returns a modified <code>Idf</code>
-object as output. Use <code>...</code> to supply different arguments to that
-measure. Under the hook, <code>mapply()</code> is used to create multiple <code>Idf</code>s
-according to the input values.</p>
-<p><strong>Arguments</strong></p><ul>
-<li><p><code>measure</code>: A function that takes an <code>Idf</code> and other arguments as input and
-returns an <code>Idf</code> object as output.</p></li>
-<li><p><code>...</code>: Other arguments passed to that <code>measure</code>.</p></li>
-<li><p><code>.names</code>: A character vector of the names of parametric <code>Idf</code>s. If <code>NULL</code>,
-the new <code>Idf</code>s will be named in format <code>measure_name + number</code>.</p></li>
-</ul>
-    
-    <h2 class="hasAnchor" id="run-and-collect-results"><a class="anchor" href="#run-and-collect-results"></a>Run and Collect Results</h2>
-
-    <pre>param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
-param$errors(info = FALSE)
-param$output_dir(which = NULL)
-param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-param$report_data_dict(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-param$tabular_data(which = NULL)
-</pre>
-    <p>All those functions have the same meaning in <a href='eplus_job.html'>eplus_job</a>, except that they
-only return the results of specified simulation. For details, please see
-<a href='eplus_job.html'>eplus_job</a>.</p>
-<p><strong>Arguments</strong></p><ul>
-<li><p><code>which</code>: An integer vector of the indexes or a character vector or names of
-parametric simulations.</p></li>
-<li><p><code>parallel_backend</code>: Any acceptable input for <code><a href='http://www.rdocumentation.org/packages/future/topics/plan'>future::plan()</a></code>.</p></li>
-</ul>
-    <p>All other arguments have the same meanings as in <a href='eplus_job.html'>eplus_job</a>.</p>
+    <div class='dont-index'><p><code><a href='eplus_job.html'>eplus_job()</a></code> for creating an EnergyPlus single simulation job.</p></div>
     
 
   </div>
@@ -220,22 +142,8 @@ parametric simulations.</p></li>
       
       <li><a href="#value">Value</a></li>
 
-      <li><a href="#details">Details</a></li>
-
-      <li><a href="#usage">Usage</a></li>
-
-      <li><a href="#create">Create</a></li>
-
-      <li><a href="#get-seed-model-and-weather">Get Seed Model and Weather</a></li>
-
-      <li><a href="#apply-design-alternatives">Apply Design Alternatives</a></li>
-
-      <li><a href="#run-and-collect-results">Run and Collect Results</a></li>
+      <li><a href="#see-also">See also</a></li>
           </ul>
-
-    <h2>Author</h2>
-    
-Hongyuan Jia
 
   </div>
 </div>

@@ -121,36 +121,27 @@ some shared data from parent <code>Idf</code> object.</p>
 
     
     <pre>
-# basic info
 idfobj$id()
 idfobj$name()
-    # definition
-idfobj$definition()
-    # comment
-idfobj$get_comment()
+    idfobj$definition()
+    idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
-    # value
-idfobj$get_value(which = NULL, all = NULL)
+    idfobj$get_value(which = NULL, all = NULL)
 idfobj$set_value(..., defaults = TRUE)
 idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName &lt;- Value
 idfobj[[Field]] &lt;- Value
-    # validation
-idfobj$validate()
+    idfobj$validate()
 idfobj$is_valid()
-    # object cross reference
-idfobj$ref_from_object()
+    idfobj$ref_from_object()
 idfobj$ref_by_object()
 idfobj$has_ref_by()
 idfobj$has_ref_from()
 idfobj$has_ref()
-    # data extraction
-idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
-    # formatting
-idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-    # print
-idfobj$print(comment = TRUE, auto_sep = FALSE)
+    idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
+    idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
+    idfobj$print(comment = TRUE, auto_sep = FALSE)
 print(iddobj)
 </pre>
     
@@ -172,7 +163,7 @@ attribute, then <code>NA</code> will returned.</p>
     <pre>idfobj$definition()
 </pre>
     <p><code>$definition</code> will return the definition, i.e. the <code>IddObject</code>, of current
-class. For details of <code>IddObject</code>, please see XXX.</p>
+class. For details of <code>IddObject</code>, please see <a href='idd_object.html'>IddObject class</a>.</p>
     
     <h2 class="hasAnchor" id="comment"><a class="anchor" href="#comment"></a>Comment</h2>
 
@@ -306,6 +297,10 @@ print(idfobj)
 largest character length of values. Default: <code>FALSE</code>.</p></li>
 </ul>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='idf.html'>Idf class</a></p></div>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -331,6 +326,8 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
       <li><a href="#formatting">Formatting</a></li>
 
       <li><a href="#print">Print</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
     <h2>Author</h2>

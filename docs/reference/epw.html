@@ -32,11 +32,9 @@
 
 <meta property="og:title" content="Read, and modify an EnergyPlus Weather File (EPW) — epw" />
 
-<meta property="og:description" content="read_epw parses an EPW file and returns an Epw object. The parsing
-process is extreme inspired by OpenStudio utilities library
-with some simplifications.
-read_epw parses an EPW file and returns an Epw object. The parsing
-process is extreme inspired by OpenStudio utilities library
+<meta property="og:description" content="Reading an EPW file starts with function read_epw(), which parses an EPW
+file and returns an Epw object. The parsing process is extremely inspired
+by OpenStudio utilities library
 with some simplifications." />
 <meta name="twitter:card" content="summary" />
 
@@ -109,34 +107,19 @@ with some simplifications." />
 
     <div class="ref-description">
     
-    <p><code>read_epw</code> parses an EPW file and returns an <code>Epw</code> object. The parsing
-process is extreme inspired by <a href='https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html'>OpenStudio utilities library</a>
-with some simplifications.</p>
-<p><code>read_epw</code> parses an EPW file and returns an <code>Epw</code> object. The parsing
-process is extreme inspired by <a href='https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html'>OpenStudio utilities library</a>
+    <p>Reading an EPW file starts with function <code><a href='read_epw.html'>read_epw()</a></code>, which parses an EPW
+file and returns an <code>Epw</code> object. The parsing process is extremely inspired
+by <a href='https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html'>OpenStudio utilities library</a>
 with some simplifications.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>read_epw</span>(<span class='no'>path</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>path</th>
-      <td><p>A path of an EnergyPlus <code>EPW</code> file.</p></td>
-    </tr>
-    </table>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>An <code>Epw</code> object.</p>
-    
+        
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The first eight lines of a standard EPW file are normally headers which
-contains data of location, design conditions, typical/extreme periods, ground
+    <p>An EPW file can be devided into two parts, headers and weather data.  The
+first eight lines of a standard EPW file are normally headers which contains
+data of location, design conditions, typical/extreme periods, ground
 temperatures, holidays/daylight savings, data periods and other comments. For
 now, eplusr only parses headers of location, holidays/daylight savings and
 data periods. All other headers will be left as they were when parsing and
@@ -163,15 +146,11 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
 <li><p>liquid precipitation depth</p></li>
 <li><p>liquid precipitation rate</p></li>
 </ol>
-    <p>Even though <code>Epw</code> class provides methods to replace core weather data, it is
-still not recommended.</p>
     
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
-    <pre># read
-epw &lt;- read_epw(path)
-    # basic header info
-epw$city
+    <pre>epw &lt;- read_epw(path)
+    epw$city
 epw$city &lt;- "city"
 epw$state_province
 epw$state_province &lt;- "state_province"
@@ -193,14 +172,11 @@ epw$time_step
 epw$time_step &lt;- "time_step"
 epw$start_day_of_week
 epw$start_day_of_week &lt;- "start_day_of_week"
-    # data query and modification
-epw$path()
+    epw$path()
 epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
-    # save
-epw$save(path, overwrite = FALSE)
-    # print
-epw$print()
+    epw$save(path, overwrite = FALSE)
+    epw$print()
 print(epw)
 </pre>
     
@@ -257,9 +233,11 @@ epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
 </pre>
     <p><code>$path</code> returns the path of EPW file.</p>
-<p><code>$get_data</code> returns the core weather data.
-<code>$set_data</code> replaces core weather data with input data. NOTE: This feature is
+<p><code>$get_data</code> returns the core weather data.</p>
+<p><code>$set_data</code> replaces core weather data with input data. NOTE: This feature is
 experimental. There is no validation when replacing.</p>
+<p><strong>NOTE</strong>: Even though <code>Epw</code> class provides methods to replace core weather data,
+it is still not recommended.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>year</code>: A integer to indicate the year value in the return <code>datetime</code> column.
 If <code>NULL</code>, the year will be left as it is in EPW file.</p></li>
@@ -277,10 +255,7 @@ If <code>NULL</code>, the year will be left as it is in EPW file.</p></li>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
 
       <li><a href="#usage">Usage</a></li>
