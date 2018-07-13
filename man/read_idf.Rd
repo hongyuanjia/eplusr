@@ -21,5 +21,8 @@ An \code{Idf} object.
 }
 \description{
 \code{read_idf} takes an EnergyPlus Input Data File (IDF) as input and returns an
-\code{Idf} object. For more details on \code{Idf} object, please see \link{idf}.
+\code{Idf} object. For more details on \code{Idf} object, please see \link[=idf]{Idf class}.
+}
+\seealso{
+\link[=idf]{Idf class}
 }

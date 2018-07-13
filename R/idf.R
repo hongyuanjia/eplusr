@@ -22,7 +22,7 @@
 #' * `value_reference`: contains cross-reference of field values.
 #'
 #' IDD file is parsed and stored in a similar structure. For details, please see
-#' [idd].
+#' [Idd class][idd].
 #'
 #' So to modify an EnergyPlus model in eplusr is equal to change the data in
 #' those four tables accordingly, in the context of specific IDD data.
@@ -134,7 +134,7 @@
 #'
 #' `$definition` will return the definitions, i.e. the `IddObject`s, of given
 #'     classes which contain all data used for parsing `IdfObject`s. For details
-#'     of `IdfObject`, please see [idd_object].
+#'     of `IdfObject`, please see [IddObject class][idd_object].
 #'
 #' **Arguments**
 #'
@@ -152,7 +152,7 @@
 #'
 #' `$object_id` and `$object_name` will return all object IDs and names
 #'     in specified class respectively. For `$object_name`, if the specified
-#'     class does not have name attributes, such as `"SimulationContrl"`, `NA`
+#'     class does not have name attributes, such as `SimulationContrl`, `NA`
 #'     will be returned.
 #'
 #' `$is_valid_id` and `$is_valid_name` will return `TRUE`s if given integers or
@@ -198,7 +198,7 @@
 #'
 #' `IdfObject` is a class that provides more detailed information methods to
 #'     modify a single object in an `Idf` object. For detailed explanations,
-#'     please see [idf_object].
+#'     please see [IdfObject class][idf_object].
 #'
 #' **Arguments**
 #'
@@ -391,6 +391,7 @@
 #'
 #' @docType class
 #' @name idf
+#' @seealso [IdfObject class][idf_object]
 #' @author Hongyuan Jia
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
@@ -399,7 +400,7 @@ NULL
 #' Read an EnergyPlus Input Data File (IDF)
 #'
 #' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an
-#' `Idf` object. For more details on `Idf` object, please see [idf].
+#' `Idf` object. For more details on `Idf` object, please see [Idf class][idf].
 #'
 #' @param path A path to an EnergyPlus IDF file or a string that can be parsed as
 #'     an IDF. The file extension does not matter. So models stored in `TXT`
@@ -409,6 +410,7 @@ NULL
 #'     IDF does not have a version field (possible for ".ddy" files), then it
 #'     will be parsed using the latest version of IDD cached, with a warning.
 #' @return An `Idf` object.
+#' @seealso [Idf class][idf]
 #' @export
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {

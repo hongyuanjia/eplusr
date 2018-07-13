@@ -29,7 +29,7 @@ IDF is parsed and stored in four tables:
 }
 
 IDD file is parsed and stored in a similar structure. For details, please see
-\link{idd}.
+\link[=idd]{Idd class}.
 
 So to modify an EnergyPlus model in eplusr is equal to change the data in
 those four tables accordingly, in the context of specific IDD data.
@@ -144,7 +144,7 @@ current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} 
 
 \code{$definition} will return the definitions, i.e. the \code{IddObject}s, of given
 classes which contain all data used for parsing \code{IdfObject}s. For details
-of \code{IdfObject}, please see \link{idd_object}.
+of \code{IdfObject}, please see \link[=idd_object]{IddObject class}.
 
 \strong{Arguments}
 \itemize{
@@ -162,7 +162,7 @@ model$is_valid_name(name)
 
 \code{$object_id} and \code{$object_name} will return all object IDs and names
 in specified class respectively. For \code{$object_name}, if the specified
-class does not have name attributes, such as \code{"SimulationContrl"}, \code{NA}
+class does not have name attributes, such as \code{SimulationContrl}, \code{NA}
 will be returned.
 
 \code{$is_valid_id} and \code{$is_valid_name} will return \code{TRUE}s if given integers or
@@ -211,7 +211,7 @@ not have name attribute, then \code{NA} will be used.
 
 \code{IdfObject} is a class that provides more detailed information methods to
 modify a single object in an \code{Idf} object. For detailed explanations,
-please see \link{idf_object}.
+please see \link[=idf_object]{IdfObject class}.
 
 \strong{Arguments}
 \itemize{
@@ -405,6 +405,9 @@ IDFEditor.
 }
 }
 
+\seealso{
+\link[=idf_object]{IdfObject class}
+}
 \author{
 Hongyuan Jia
 }

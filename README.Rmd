@@ -538,7 +538,7 @@ After that, you should be able to run your model. `$run` will run the current
 model with specified weather using corresponding version of EnergyPlus. The
 model and the weather used will be copied to the output directory. An `EplusJob`
 will be returned which provides detailed infomation of the simulation and
-methods to collect simulation results. Please see `?eplus_job` for more
+methods to collect simulation results. Please see `?job` for more
 detailed.
 
 ```{r run}
@@ -571,8 +571,8 @@ Table"* in EnergyPlus *"Output Details and Examples"* documentation.
 
 `$report_data_dict` returns a data.frame which contains all information about
 report data. For details on the meaning of each columns, please see
-"2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
-Examples" documentation.
+*"2.20.2.1 ReportDataDictionary Table"* in EnergyPlus *"Output Details and
+Examples"* documentation.
 
 ```{r dict}
 str(job$report_data_dict())
@@ -609,7 +609,7 @@ param
 
 `param_job` returns a `ParametricJob` object which provides a prototype of
 conducting parametric analysis of EnergyPlus simulations. For more details,
-please see `?param_job`.
+please see `?param`.
 
 #### Apply measure
 

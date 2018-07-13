@@ -4,9 +4,6 @@
 \name{idd_object}
 \alias{idd_object}
 \title{EnergyPlus IDD object}
-\value{
-Depends on the method used.
-}
 \description{
 \code{IddObject} is an abstraction of a single object in an \code{Idd}. It provides
 more detail methods to query field properties. \code{IddObject} can only be
@@ -180,6 +177,9 @@ number of field in the extensible group is 3.
 \code{$is_required_field} returns \code{TRUE} if the field is required.
 }
 
+\seealso{
+\link[=idd]{Idd Class}
+}
 \author{
 Hongyuan Jia
 }
