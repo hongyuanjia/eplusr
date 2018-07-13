@@ -6,7 +6,7 @@ branches:
 
 language: R
 sudo: required
-cache: packages
+# cache: packages
 
 os:
   - osx
