@@ -1,36 +1,47 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
 branches:
   only:
   - master
   - develop
 
-language: R
+language: r
 sudo: required
-# cache: packages
+cache: packages
 
-os:
-  - osx
-  - linux
-
-r:
-  - release
-  - oldrel
-  - devel
+matrix:
+  include:
+  - os: linux
+    r: oldrel
+  - os: linux
+    r: release
+  - os: linux
+    r: devel
+  - os: osx
+    r: oldrel
+  - os: osx
+    r: release
 
 r_packages:
   - covr
+
+apt_packages:
+  - libgit2-dev
+  - libudunits2-dev
+
+brew_packages:
+  - libgit2
+  - udunits
 
 # Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
 env:
   - ENERGYPLUS_VERSION=8.8.0 ENERGYPLUS_SHA=7c3bbe4830 ENERGYPLUS_INSTALL_VERSION=8-8-0
 
 before_install:
-  # install udunits2 library
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install udunits libgit2; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install libudunits2-dev libgit2-dev; fi
   # install EnergyPlus
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then EXT=dmg; PLATFORM=Darwin; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then EXT=sh; PLATFORM=Linux; fi
+
   - ENERGYPLUS_DOWNLOAD_BASE_URL=https://github.com/NREL/EnergyPlus/releases/download/v$ENERGYPLUS_VERSION
   - ENERGYPLUS_DOWNLOAD_FILENAME=EnergyPlus-$ENERGYPLUS_VERSION-$ENERGYPLUS_SHA-$PLATFORM-x86_64
   - ENERGYPLUS_DOWNLOAD_URL=$ENERGYPLUS_DOWNLOAD_BASE_URL/$ENERGYPLUS_DOWNLOAD_FILENAME.$EXT
