@@ -30,15 +30,15 @@ knitr::opts_chunk$set(
 knitr::opts_knit$set(root.dir = "C:/Users/hongy/Desktop")
 ```
 
-# eplusr
+# eplusr <img src="man/figures/logo.svg" align="right" />
 
 [![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr) [![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master) [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 
 > A Toolkit for Using EnergyPlus in R.
 
-eplusr provides a rich toolkit of using EnergyPlus directly in R, which
-enables programmatic navigation, modification of EnergyPlus models and makes
-it less painful to do parametric simulations and analysis.
+eplusr provides a rich toolkit of using [EnergyPlus](https://energyplus.net/)
+directly in R, which enables programmatic navigation, modification of EnergyPlus
+models and makes it less painful to do parametric simulations and analysis.
 
 <!-- vim-markdown-toc GFM -->
 
@@ -688,4 +688,6 @@ knitr::kable(total_eng)
 * [eppy: scripting language for E+, Energyplus](https://github.com/santoshphilip/eppy)
 
 ## Author
+
 Hongyuan Jia
+Faculty of Urban Construction and Environmental Engineering, Chongqing University
