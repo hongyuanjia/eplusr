@@ -17,7 +17,10 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   sodipodi:docname="eplusr_logo.svg">
+   sodipodi:docname="logo.svg"
+   inkscape:export-filename="C:\Users\hongy\Dropbox\github_repo\eplusr\man\figures\logo.png"
+   inkscape:export-xdpi="69.5"
+   inkscape:export-ydpi="69.5">
   <defs
      id="defs2">
     <linearGradient
@@ -91,7 +94,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.7474025"
-     inkscape:cx="5.1781362"
+     inkscape:cx="67.816924"
      inkscape:cy="49.919609"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -99,11 +102,11 @@
      inkscape:snap-grids="true"
      inkscape:snap-to-guides="true"
      units="in"
-     inkscape:window-width="2160"
-     inkscape:window-height="1346"
-     inkscape:window-x="-11"
-     inkscape:window-y="-11"
-     inkscape:window-maximized="1">
+     inkscape:window-width="1078"
+     inkscape:window-height="1334"
+     inkscape:window-x="-10"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="axonomgrid"
        id="grid10"
@@ -120,7 +123,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -130,7 +133,7 @@
      id="layer1"
      transform="translate(0,-246.19999)">
     <path
-       style="fill:#dbe3e2;fill-opacity:1;stroke:#663333;stroke-width:4.4000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#f0faf9;fill-opacity:1;stroke:#663333;stroke-width:4.4000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 21.997046,246.19999 C 0,258.89999 0,258.89999 0,258.89999 v 25.4 l 21.997046,12.7 21.997045,-12.7 v -25.4 z"
        id="path3728"
        inkscape:connector-curvature="0"
@@ -187,14 +190,16 @@
        clip-path="url(#clipPath6072)" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.48594856px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#663333;fill-opacity:1;stroke:#dbe3e2;stroke-width:1.14013553;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
+       style="font-style:normal;font-weight:normal;font-size:9.48594856px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#663333;fill-opacity:1;stroke:#f0faf9;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
        x="6.6517992"
        y="269.23853"
-       id="text6078"><tspan
+       id="text6078"
+       inkscape:export-xdpi="69.5"
+       inkscape:export-ydpi="69.5"><tspan
          sodipodi:role="line"
          id="tspan6076"
          x="6.6517992"
          y="269.23853"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Source Han Sans SC Heavy';-inkscape-font-specification:'Source Han Sans SC Heavy, ';fill:#663333;fill-opacity:1;stroke:#dbe3e2;stroke-width:1.14013553;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill">eplusr</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Source Han Sans SC Heavy';-inkscape-font-specification:'Source Han Sans SC Heavy, ';fill:#663333;fill-opacity:1;stroke:#f0faf9;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill">eplusr</tspan></text>
   </g>
 </svg>
