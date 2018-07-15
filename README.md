@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# eplusr <img src="man/figures/logo.png" align="right" />
+# eplusr <img src="man/figures/logo.svg" align="right" />
 
 [![Travis-CI Build
 Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)
