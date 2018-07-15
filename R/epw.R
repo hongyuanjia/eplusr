@@ -11,10 +11,9 @@
 #' temperatures, holidays/daylight savings, data periods and other comments. For
 #' now, eplusr only parses headers of location, holidays/daylight savings and
 #' data periods. All other headers will be left as they were when parsing and
-#' saving. For details on the data structure of EPW file, please see "Chapter 2
-#' - Weather Converter Program" in EnergyPlus "Auxiliary Programs"
-#' documentation. An online version can be found
-#' [here](https://bigladdersoftware.com/epx/docs/).
+#' saving. For details on the data structure of EPW file, please see "Chapter 2 - Weather Converter Program"
+#' in EnergyPlus "Auxiliary Programs" documentation. An online version can be
+#' found [here](https://bigladdersoftware.com/epx/docs/).
 #'
 #' There are about 35 variables in the core weather data. However, not all of
 #' them are used by EnergyPlus. Actually, despite of date and time columns, only

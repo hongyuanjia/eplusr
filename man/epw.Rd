@@ -11,18 +11,15 @@ by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.
 with some simplifications.
 }
 \details{
-An EPW file can be devided into two parts, headers and weather data.  The
+An EPW file can be divided into two parts, headers and weather data.  The
 first eight lines of a standard EPW file are normally headers which contains
 data of location, design conditions, typical/extreme periods, ground
 temperatures, holidays/daylight savings, data periods and other comments. For
 now, eplusr only parses headers of location, holidays/daylight savings and
 data periods. All other headers will be left as they were when parsing and
-saving. For details on the data structure of EPW file, please see "Chapter 2
-\itemize{
-\item Weather Converter Program" in EnergyPlus "Auxiliary Programs"
-documentation. An online version can be found
-\href{https://bigladdersoftware.com/epx/docs/}{here}.
-}
+saving. For details on the data structure of EPW file, please see "Chapter 2 - Weather Converter Program"
+in EnergyPlus "Auxiliary Programs" documentation. An online version can be
+found \href{https://bigladdersoftware.com/epx/docs/}{here}.
 
 There are about 35 variables in the core weather data. However, not all of
 them are used by EnergyPlus. Actually, despite of date and time columns, only

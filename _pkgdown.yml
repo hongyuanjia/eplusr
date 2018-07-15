@@ -21,6 +21,7 @@ reference:
       - read_epw
   - title: Configure EnergyPlus
     contents:
+      - install_eplus
       - use_eplus
       - eplus_config
       - avail_eplus
