@@ -47,7 +47,7 @@ idf_text <- "
     "
 # }}}
 
-idd <- suppressMessages(use_idd(8.8))
+idd <- suppressMessages(use_idd(8.8, download = TRUE))
 
 suppressWarnings(idf <- Idf$new(idf_text, idd))
 ver <- idf$Version[[1]]
