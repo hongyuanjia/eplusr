@@ -5,7 +5,7 @@
 #' by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
 #' with some simplifications.
 #'
-#' An EPW file can be devided into two parts, headers and weather data.  The
+#' An EPW file can be divided into two parts, headers and weather data.  The
 #' first eight lines of a standard EPW file are normally headers which contains
 #' data of location, design conditions, typical/extreme periods, ground
 #' temperatures, holidays/daylight savings, data periods and other comments. For
