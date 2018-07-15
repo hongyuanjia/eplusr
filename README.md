@@ -1471,5 +1471,6 @@ total_eng
 
 ## Author
 
-Hongyuan Jia Faculty of Urban Construction and Environmental
-Engineering, Chongqing University
+Hongyuan Jia
+
+*Faculty of Urban Construction and Environmental Engineering, Chongqing University*
