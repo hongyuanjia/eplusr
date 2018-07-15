@@ -29,8 +29,7 @@
 #' each IDD file only needs to be parsed once and can be used when parsing every
 #' IDF file of that version.
 #'
-#' Internally, the powerful
-#' [data.table](https://cran.r-project.org/web/packages/data.table/index.html)
+#' Internally, the powerful [data.table](https://cran.r-project.org/package=data.table)
 #' package is used to speed up the whole IDD parsing process and store the
 #' results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 #' eplusr uses a SQL-like structure to store both IDF and IDD data in

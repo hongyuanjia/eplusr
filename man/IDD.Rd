@@ -35,8 +35,7 @@ the \code{"Energy+.idd"} distributed with EnergyPlus will be parsed and cached. 
 each IDD file only needs to be parsed once and can be used when parsing every
 IDF file of that version.
 
-Internally, the powerful
-\href{https://cran.r-project.org/web/packages/data.table/index.html}{data.table}
+Internally, the powerful \href{https://cran.r-project.org/package=data.table}{data.table}
 package is used to speed up the whole IDD parsing process and store the
 results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
