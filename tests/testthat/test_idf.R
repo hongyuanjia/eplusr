@@ -47,7 +47,7 @@ idf_text <- "
     "
 # }}}
 
-idd <- suppressMessages(use_idd(8.8, download = TRUE))
+idd <- suppressMessages(use_idd(8.8))
 idf_parsed <- suppressWarnings(parse_idf_file(idf_text, idd))
 
 describe("parse_idf_file()", {
