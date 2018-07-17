@@ -1,5 +1,5 @@
 Package: eplusr
-Title: A Toolkit for Using EnergyPlus in R
+Title: A Toolkit for Using Whole Building Simulation Program "EnergyPlus" in R
 Version: 0.8.1
 Authors@R:
     person(given = "Hongyuan",
@@ -7,11 +7,12 @@ Authors@R:
            role = c("aut", "cre"),
            email = "hongyuanjia@cqu.edu.cn",
            comment = c(ORCID = "0000-0002-0075-8183"))
-Description: This package provides a rich toolkit of using EnergyPlus directly
-    in R, which enables programmatic navigation, modification of EnergyPlus
-    models and makes it less painful to do parametric simulations and analysis.
-License: GPL-3 + file LICENSE
-URL: https://hongyuanjia.github.io/eplusr, https://github.com/hongyuanjia/eplusr
+Description: A rich toolkit of using the whole building simulation program
+    "EnergyPlus" directly in R, which enables programmatic navigation,
+    modification of "EnergyPlus" models and makes it less painful to do
+    parametric simulations and analysis.
+License: GPL-3
+URL: https://hongyuanjia.github.io/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
     R (>= 3.2.0)
