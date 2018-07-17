@@ -16,7 +16,7 @@
 #' idfobj$get_comment()
 #' idfobj$set_comment(comment, append = TRUE, width = 0L)
 #'
-#' idfobj$get_value(which = NULL, all = NULL)
+#' idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
 #' idfobj$set_value(..., defaults = TRUE)
 #' idfobj$FieldName
 #' idfobj[[Field]]
@@ -87,7 +87,7 @@
 #'
 #' @section Value:
 #' \preformatted{
-#' idfobj$get_value(which = NULL, all = FALSE)
+#' idfobj$get_value(which = NULL, all = FALSE, simplify = FALSE)
 #' idfobj$set_value(..., default = TRUE)
 #' idfobj$FieldName
 #' idfobj[[Field]]
@@ -96,6 +96,8 @@
 #' }
 #'
 #' `$get_value` will return a named list containing values of specified fields.
+#'     If simplify is `FALSE`, then all values will be converted into character
+#'     and the converted character vector will be returned.
 #'
 #' `$set_value` will set values of current object.
 #'
@@ -113,6 +115,8 @@
 #'     Resistance"` can be given as `"thermal_resistance"`.
 #' * `all`: If `TRUE`, values of all fields, including empty fields will be
 #'     returned as well. Default: `FALSE`
+#' * `simplify`: If `TRUE`, values of fields will be converted into characters
+#'     and the converted character vector will be returned.
 #' * `...`: Values to set. Field names of value can be given. If not named, the
 #'     input values will be set to fields according to their order of
 #'     appearance.
@@ -269,8 +273,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         set_comment = function (comment, append = TRUE, width = 0L)
             i_idfobj_set_comment(self, private, private$m_object_id, comment, append, width),
 
-        get_value = function (which = NULL, all = FALSE)
-            i_idfobj_get_value(self, private, private$m_object_id, which, all),
+        get_value = function (which = NULL, all = FALSE, simplify = FALSE)
+            i_idfobj_get_value(self, private, private$m_object_id, which, all, simplify),
 
         set_value = function (..., default = TRUE)
             i_idfobj_set_value(self, private, private$m_object_id, ..., default = default),

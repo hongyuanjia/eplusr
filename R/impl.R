@@ -3160,7 +3160,7 @@ i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE,
 # }}}
 
 # i_idfobj_get_value {{{
-i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = eplusr_option("view_in_ip"), simplify = FALSE) {
     val_tbl <- i_value_tbl_from_field_which(self, private, object, which)
 
     # delete extra fields
@@ -3168,6 +3168,8 @@ i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = epl
 
     if (i_need_update_num(self, private, view_in_ip = in_ip))
         val_tbl <- update_value_num(val_tbl, in_ip = in_ip)
+
+    if (simplify) return(val_tbl$value)
 
     val <- value_list(val_tbl, in_ip = in_ip)
 

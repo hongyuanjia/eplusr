@@ -131,6 +131,7 @@ describe("$get_value()", {
     it("can handle cases when both `index` and `name` are NULL", {
         expect_is(mat$get_value(), "list")
         expect_equivalent(mat$get_value(), value, tolerance = 1e-5)
+        expect_equal(mat$get_value(simplify = TRUE), unname(as.character(value)))
     })
 
     it("can detect invaid `index` values", {
@@ -143,6 +144,14 @@ describe("$get_value()", {
     it("can return subset of values in a object using `index`", {
         expect_is(mat$get_value(index), "list")
         expect_equivalent(mat$get_value(index), value[index], tolerance = 1e-5)
+        expect_equal(mat[[2]], "MediumSmooth")
+        expect_equal(mat[c(2,1)], list(Name = "WD01", Roughness = "MediumSmooth"))
+    })
+
+    it("can return subset of values in a object using `name`", {
+        expect_equivalent(mat$get_value("Roughness"), value["Roughness"])
+        expect_equivalent(mat$get_value("Roughness", simplify = TRUE), "MediumSmooth")
+        expect_equal(mat$Roughness, "MediumSmooth")
     })
 
     it("can detect invalid `name` values", {
