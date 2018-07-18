@@ -379,6 +379,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 NextMethod()
             }
         }
+    } else if (is_integerish(i)) {
+        .subset2(x, "get_value")(i)[[1]]
     } else {
         NextMethod()
     }
@@ -427,6 +429,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 NextMethod()
             }
         }
+    } else if (is_integerish(i)) {
+        nm <- .subset2(.subset2(x, "definition")(), "field_name")(i)
+        value <- as.list(value)
+        names(value) <- nm
+        .subset2(x, "set_value")(value)
     } else {
         NextMethod()
     }
