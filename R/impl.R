@@ -1525,6 +1525,7 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
 
     # VALUE
     val_tbl <- i_valid_value_input(self, private, obj_tbl, value, default, type = "set")
+
     # add value id
     num_empty_id <- val_tbl[is.na(value_id), .N]
     if (num_empty_id)
@@ -1546,6 +1547,15 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
         stop("Failed to set new value to object ID ", backtick_collapse(obj_tbl$object_id), ".", call. = FALSE)
     }
     on.exit({private$m_log$validate <- NULL}, add = TRUE)
+
+    # remove empty values
+    last_val <- val_tbl[!is.na(value), list(last_index = max(field_index)),
+        by = list(object_rleid, class_id)]
+
+    last_val[, last_index := as.integer(i_field_num_from_index(
+        self, private, class_id, last_index), by = list(object_rleid))]
+
+    val_tbl <- val_tbl[last_val, on = list(object_rleid, class_id, field_index <= last_index)]
 
     # assign tbl
     i_assign_object_tbl(self, private, obj_tbl)
@@ -1876,7 +1886,6 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
                     class = value_num_tbl$class_id,
                     default = default,
                     num = value_num_tbl$value_num)
-
 
         } else {
 

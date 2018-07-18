@@ -246,24 +246,35 @@ describe("$add_object()", {
     it("can add multiple objects", {
         expect_silent(
             idf$add_object(rep("RunPeriod", 2),
-              value = list(
-                list("rp_test_1", 1, 1, 2, 1),
+                value = list(
+                    list("rp_test_1", 1, 1, 2, 1),
 
-                list(name = "rp_test_2",
-                     begin_month = 3,
-                     begin_day_of_month = 1,
-                     end_month = 4,
-                     end_day_of_month = 1)
-                ),
-              comment = list(
-                list("Comment for new object 1", "Another comment"),
-                list("Comment for new object 2")),
-              default = TRUE
+                    list(name = "rp_test_2",
+                        begin_month = 3,
+                        begin_day_of_month = 1,
+                        end_month = 4,
+                        end_day_of_month = 1)
+                    ),
+                comment = list(
+                    list("Comment for new object 1", "Another comment"),
+                    list("Comment for new object 2")),
+                default = TRUE
             )
         )
         expect_equal(unname(unlist(idf$object(6)[[1]]$get_value())),
             c("rp_test_1", "1", "1", "2", "1", "UseWeatherFile", "Yes", "Yes",
-                "No", "Yes", "Yes"))
+                "No", "Yes", "Yes")
+        )
+    })
+    it("can stop if trying to add a object with same name", {
+        expect_silent(
+            idf$add_object("RunPeriod",
+                value = list("rp_test_4", 1, 1, 2, 1), default = TRUE, all = TRUE)
+        )
+        expect_error(
+            idf$add_object("RunPeriod",
+                value = list("rp_test_4", 1, 1, 2, 1), default = TRUE, all = TRUE)
+        )
     })
     # }}}
 })
@@ -274,6 +285,15 @@ describe("$set_object()", {
             idf$set_object("rp_test_1", list(name = "rp_test_3", begin_day_of_month = 2),
                 comment = list(format(Sys.Date()), "begin day has been changed."))
         )
+    })
+    it("can delete fields", {
+        expect_silent(
+            idf$set_object("rp_test_3",
+                list(use_weather_file_rain_indicators = NA,
+                     use_weather_file_snow_indicators = NA))
+        )
+        expect_silent(idf$set_object("rp_test_4", list(start_year = NA)))
+        expect_equal(length(idf$object("rp_test_4")[[1]]$get_value()), 13)
     })
     # }}}
 })
