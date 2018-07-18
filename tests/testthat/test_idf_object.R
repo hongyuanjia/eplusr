@@ -145,7 +145,8 @@ describe("$get_value()", {
         expect_is(mat$get_value(index), "list")
         expect_equivalent(mat$get_value(index), value[index], tolerance = 1e-5)
         expect_equal(mat[[2]], "MediumSmooth")
-        expect_equal(mat[c(2,1)], list(Name = "WD01", Roughness = "MediumSmooth"))
+        expect_equal(mat[["Roughness"]], "MediumSmooth")
+        expect_equal(mat[c(2,1)], list(Roughness = "MediumSmooth", Name = "WD01"))
     })
 
     it("can return subset of values in a object using `name`", {
@@ -209,9 +210,9 @@ describe("$set_value()", {
                                      vertex_5_y_coordinate = 2,
                                      vertex_5_z_coordinate = 3))
         expect_equal(surf$get_value()[23:25],
-                     list(`vertex_5_x_coordinate` = 1,
-                          `vertex_5_y_coordinate` = 2,
-                          `vertex_5_z_coordinate` = 3))
+                     list(`Vertex_5_X_coordinate` = 1,
+                          `Vertex_5_Y_coordinate` = 2,
+                          `Vertex_5_Z_coordinate` = 3))
     })
 
     it("can change referenced values accordingly", {
@@ -225,6 +226,15 @@ describe("$set_value()", {
     it("can stop when there are invalid references in the input", {
         eplusr_option(validate_level = "final")
         expect_error(con$set_value(layer_6 = "missing"))
+    })
+
+    it("works using `[[<-.IdfObject`", {
+        expect_silent(mat$Name <- "NewMaterial")
+        expect_equal(mat$name(), "NewMaterial")
+        expect_silent(mat[["Name"]] <- "NewMaterialName1")
+        expect_equal(mat$name(), "NewMaterialName1")
+        expect_silent(mat[[1]] <- "NewMaterialName")
+        expect_equal(mat$name(), "NewMaterialName")
     })
     # }}}
 })

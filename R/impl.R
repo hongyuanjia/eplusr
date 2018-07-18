@@ -3183,7 +3183,7 @@ i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = epl
 
     val <- value_list(val_tbl, in_ip = in_ip)
 
-    nm <- i_lower_name(val_tbl$field_name)
+    nm <- i_underscore_name(val_tbl$field_name)
 
     data.table::setattr(val, "names", nm)
 
