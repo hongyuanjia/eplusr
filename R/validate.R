@@ -76,7 +76,7 @@ i_validate_idf <- function (self, private) {
     data.table::setattr(private$m_log$validate, "class", c("IdfValidity", "list"))
 
     if (eplusr_option("validate_level") == "none")
-        return(private$m_log$validate) 
+        return(private$m_log$validate)
 
     input <- new.env(parent = emptyenv(), size = 3L)
     input$type <- "idf"
@@ -172,7 +172,7 @@ i_check_conflict_name <- function (self, private, input) {
     other_id <- conf_id[!conf_id %in% ori_obj_tbl$object_id]
 
     val_tbl <- data.table::rbindlist(list(
-        i_value_tbl_from_which(self, private, other_id)[,
+        i_value_tbl_from_which(self, private, as.integer(other_id))[,
             `:=`(class_name = i_class_name(self, private, class_id))],
         input$value_tbl[J(conf_id), on = "object_id", nomatch = 0L]),
     fill = TRUE)
