@@ -396,7 +396,8 @@ i_field_num_from_index <- function (self, private, class, index = 0L) {
     cls_tbl[, `:=`(input_index = index, last_extensible = 0L)]
     cls_tbl[is.na(input_index), input_index := 0L]
     cls_tbl[num_extensible > 0L & input_index > first_extensible,
-        `:=`(last_extensible = ceiling((input_index - first_extensible + 1L) / num_extensible) * num_extensible + first_extensible - 1L)]
+        `:=`(last_extensible = as.integer(ceiling(
+                (input_index - first_extensible + 1L) / num_extensible) * num_extensible + first_extensible - 1L))]
 
     cls_tbl[input_index >  num_fields, num := last_extensible]
     cls_tbl[input_index <= num_fields, num := max(num, last_extensible, input_index)]
@@ -1996,7 +1997,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
     # assign values and defaults
     val_tbl[delete == FALSE & !is.na(value_in) &
         vapply(value_list, is.numeric, logical(1)),
-        `:=`(value_num = unlist(value_list))]
+        `:=`(value_num = as.numeric(unlist(value_list)))]
 
     val_tbl[delete == FALSE & !is.na(value_in),
         `:=`(value = value_in, value_upper = toupper(value_in),
