@@ -1,6 +1,4 @@
-# eplusr 0.8.1.1
-
-To be released as 0.8.2
+# eplusr 0.8.2
 
 ## New feature
 
