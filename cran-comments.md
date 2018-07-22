@@ -40,3 +40,21 @@ Please fix and resubmit.
 2018-07-17
 
 Addressed all privious comments.
+
+# Version 0.8.2
+
+## Round 1
+### Reviewer comments
+2018-07-22 Swetlana Herbrandt
+
+```
+Thanks, please omit the redundant "in R" in your title.
+
+Please write package names, software names and API names in single 
+quotes (e.g. 'EnergyPlus') in Title and Description.
+
+Please fix and resubmit.
+
+Best,
+Swetlana Herbrandt
+```
