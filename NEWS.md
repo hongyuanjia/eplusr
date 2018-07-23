@@ -5,6 +5,8 @@
 * Fix errors in `$status()`, `$output_dir()` and `$locate_output()` in
   `ParametricJob` class when `which` arg is not given (#12).
 
+* Fix idf input version parsing in `param_job` (#13).
+
 # eplusr 0.8.2
 
 ## New feature
