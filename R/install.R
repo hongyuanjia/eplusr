@@ -72,7 +72,12 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 download_eplus <- function (ver = "latest", dir = getwd()) {
     release <- repo_releases(owner = "NREL", repo = "EnergyPlus", ver = ver)
     ver <- attr(release, "version")
-    url <- release[core_file == TRUE & ext == "exe" & arch == os_arch(), url]
+
+    # fix arch type to 64bit for non-windows platform
+    arch_type <- switch(os_type(), windows = os_arch(), "64bit")
+
+    url <- release[core_file == TRUE & ext == os_exe() & arch == arch_type, url]
+
     dest <- file.path(dir, basename(url))
 
     # download and install
@@ -232,6 +237,11 @@ os_arch <- function () {
     }
 }
 # }}}
+# os_exe: Return the architecture {{{
+os_exe <- function () {
+    switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+}
+# }}}
 # eplus_latest_release: get the latest release version of EnergyPlus {{{
 eplus_latest_release <- function () {
     latest <- gh::gh("GET /repos/:owner/:repo/releases/latest", repo = "EnergyPlus", owner = "NREL")
@@ -244,6 +254,9 @@ eplus_latest_release <- function () {
 install_eplus_win <- function (exec) {
     has_ps <- unname(Sys.which("powershell") != "")
     win_exec <- normalizePath(exec)
+
+    message("NOTE: Administrative privileges required during the installation. ",
+            "Please make sure R is running with an administrator acount.")
 
     if (has_ps) {
         cmd <- sprintf("& %s /S | Out-Null", exec)
@@ -267,6 +280,7 @@ install_eplus_macos <- function (exec) {
 # }}}
 # install_eplus_linux {{{
 install_eplus_linux <- function (exec) {
+    message("NOTE: Administrative privileges required during the installation")
     cmd <- sprintf("sudo chmod +x %s | echo 'y\r' | sudo ./%s", exec, exec)
     run_cmd(commandline = cmd)
 }

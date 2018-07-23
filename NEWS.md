@@ -20,6 +20,8 @@
 
 * Fix idf input version parsing in `param_job` (#13).
 
+* Fix EnergyPlus downloading errors on Linux and MacOS (#14).
+
 # eplusr 0.8.2
 
 ## New feature
