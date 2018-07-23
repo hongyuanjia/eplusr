@@ -68,7 +68,7 @@ models and makes it less painful to do parametric simulations and analysis.
   * [Run Parametric Analysis](#run-parametric-analysis)
     * [Apply measure](#apply-measure)
     * [Run in parallel and collect results](#run-in-parallel-and-collect-results)
-* [Related Project](#related-project)
+* [Acknowledgements](#acknowledgements)
 * [Author](#author)
 
 <!-- vim-markdown-toc -->
@@ -721,7 +721,7 @@ unlink(file.path(root, c(example_name, "San_Francisco.epw", "San_Francisco.ddy")
 ## Acknowledgements
 
 I would like to thank many open souce projects who have heavily inspired the
-development of eplusr package, especially those below:
+development of eplusr package, especially these below:
 
 * [OpenStudio](https://www.openstudio.net)
 * [eppy: scripting language for E+, Energyplus](https://github.com/santoshphilip/eppy)
