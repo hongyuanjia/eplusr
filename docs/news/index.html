@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.2.1</span>
       </span>
     </div>
 
@@ -79,12 +79,7 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -98,12 +93,65 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1>Changelog <small></small></h1>
-      <small>Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
+      
     </div>
 
+    <div id="eplusr-0-8-2-1" class="section level1">
+<h1 class="page-header">
+<a href="#eplusr-0-8-2-1" class="anchor"></a>eplusr 0.8.2.1<small> Unreleased </small>
+</h1>
+<div id="minor-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes" class="anchor"></a>Minor changes</h2>
+<ul>
+<li><p>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</p></li>
+<li><p>When <code>wait</code> is <code>FALSE</code>, <code>$run()</code> in <code>Idf</code>, <code>EplusJob</code> and <code>ParametricJob</code> will return a <code>process</code> object instead of the time when simulation started.</p></li>
+<li><p>A clear message will be given when trying to run <code>$kill()</code> in <code>ParametricJob</code>, which inform the user that currently <code>$kill()</code> does not for parametric simulations.</p></li>
+</ul>
+</div>
+<div id="bug-fixes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (#12).</p></li>
+<li><p>Fix idf input version parsing in <code>param_job</code> (#13).</p></li>
+<li><p>Fix EnergyPlus downloading errors on Linux and MacOS (#14).</p></li>
+<li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and MacOS (#14).</p></li>
+</ul>
+</div>
+</div>
+    <div id="eplusr-0-8-2" class="section level1">
+<h1 class="page-header">
+<a href="#eplusr-0-8-2" class="anchor"></a>eplusr 0.8.2<small> 2018-07-22 </small>
+</h1>
+<div id="new-feature" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-feature" class="anchor"></a>New feature</h2>
+<ul>
+<li>
+<code>$get_value()</code> in <code>IdfObject</code> class new has a new argument <code>simplify</code>. If <code>TRUE</code>, a character vecotr will be returned instead of a named list. Default is <code>FALSE</code>.</li>
+</ul>
+</div>
+<div id="minor-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<ul>
+<li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li>
+</ul>
+</div>
+<div id="bug-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<ul>
+<li><p>Fix warning messages of column type coercion from data.table in <code>Idf</code> and <code>IdfObject</code>.</p></li>
+<li><p><code>$set_value()</code> in <code>IdfObject</code> and <code>$set_object()</code> in <code>Idf</code> now will delete empty fields with empty value. This fix the error when trying to reassign only some empty fields which have been deleted before.</p></li>
+</ul>
+</div>
+</div>
     <div id="eplusr-0-8-1" class="section level1">
 <h1 class="page-header">
-<a href="#eplusr-0-8-1" class="anchor"></a>eplusr 0.8.1</h1>
+<a href="#eplusr-0-8-1" class="anchor"></a>eplusr 0.8.1<small> Unreleased </small>
+</h1>
 <div id="major-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#major-changes" class="anchor"></a>Major changes</h2>
@@ -121,6 +169,8 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#eplusr-0-8-2-1">0.8.2.1</a></li>
+        <li><a href="#eplusr-0-8-2">0.8.2</a></li>
         <li><a href="#eplusr-0-8-1">0.8.1</a></li>
       </ul>
     </div>
