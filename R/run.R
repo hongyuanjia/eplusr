@@ -276,8 +276,8 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
     input[, `:=`(loc_model = copy_run_files(model, output_dir),
                  loc_weather = copy_run_files(weather, output_dir))]
     input[, index := .I]
-    input[, `:=`(run_args = cmd_args(loc_model, loc_weather, output_dir,
-                     design_day = design_day, annual = annual)), by = index]
+    input[, `:=`(run_args = list(cmd_args(loc_model, loc_weather, output_dir,
+                     design_day = design_day, annual = annual))), by = index]
 
     future::plan(parallel_backend)
     l <- furrr::future_map2(input$eplus_exe, input$run_args,
