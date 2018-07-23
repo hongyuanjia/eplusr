@@ -1,4 +1,4 @@
-context("Parametric methods")
+context("Parametric metiods")
 
 if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
@@ -14,10 +14,6 @@ file.copy(path_example, path_idf, overwrite = TRUE)
 
 path_weather <- file.path(cfg$dir, "WeatherData", weather_name)
 path_epw <- file.path(getwd(), weather_name)
-
-test_that("can create a `ParametricJob` object", {
-    expect_silent(param <- param_job(path_idf, path_weather))
-})
 
 param <- param_job(path_idf, path_weather)
 

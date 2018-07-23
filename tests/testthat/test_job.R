@@ -15,10 +15,6 @@ file.copy(path_example, path_idf, overwrite = TRUE)
 path_weather <- file.path(cfg$dir, "WeatherData", weather_name)
 path_epw <- file.path(getwd(), weather_name)
 
-test_that("can create a `EplusJob` object", {
-    expect_silent(job <- eplus_job(path_idf, path_weather))
-})
-
 job <- eplus_job(path_idf, path_weather)
 
 test_that("can run the simulation", {
