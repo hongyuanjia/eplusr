@@ -441,18 +441,15 @@ cmd_args <- function (model, weather, output_dir, output_prefix,
     if (design_day) cmd_design_day <- "--design-day" else cmd_design_day <- NULL
     if (!is.null(idd)) cmd_idd <- paste0("--idd", shQuote(idd)) else cmd_idd <- NULL
     # }}}
-    # In case there are spaces in user input, quote all pathes {{{
-    args <- paste(
-        "--weather", shQuote(weather),
-        "--output-directory", shQuote(output_dir),
-        "--output-prefix", shQuote(output_prefix),
+
+    args <- c(
+        "--weather", weather,
+        "--output-directory", output_dir,
+        "--output-prefix", output_prefix,
         "--output-suffix", output_suffix,
         cmd_epmacro, cmd_expand_obj, cmd_readvars, cmd_annual, cmd_design_day, cmd_idd,
-        shQuote(model)
+        model
     )
-    # }}}
-
-    return(args)
 }
 # }}}
 # copy_run_files {{{

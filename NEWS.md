@@ -22,6 +22,8 @@
 
 * Fix EnergyPlus downloading errors on Linux and MacOS (#14).
 
+* Fix `run_idf()` and `run_multi()` errors on Linux and MacOS (#14).
+
 # eplusr 0.8.2
 
 ## New feature
