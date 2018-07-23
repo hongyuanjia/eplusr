@@ -525,7 +525,7 @@ If the needed version of EnergyPlus was not installed, you can use
 `install_eplus` to install it.
 
 ```{r install, eval = FALSE}
-eplusr::install_eplus(ver = 8.9)
+install_eplus(ver = 8.9)
 ```
 
 Sometimes, before simulation, it may be useful to retrieve weather data from
