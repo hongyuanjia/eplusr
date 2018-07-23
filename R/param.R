@@ -155,13 +155,13 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             i_param_kill(self, private, which),
 
         status = function (which = NULL)
-            i_param_status(self, private),
+            i_param_status(self, private, which),
 
         output_dir = function (which = NULL)
-            i_param_output_dir(self, private),
+            i_param_output_dir(self, private, which),
 
         locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
-            i_param_locate_output(self, private, suffix, strict),
+            i_param_locate_output(self, private, which, suffix, strict),
 
         errors = function (which = NULL, info = FALSE)
             i_param_output_errors(self, private, which, info),
