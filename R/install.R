@@ -72,7 +72,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 download_eplus <- function (ver = "latest", dir = getwd()) {
     release <- repo_releases(owner = "NREL", repo = "EnergyPlus", ver = ver)
     ver <- attr(release, "version")
-    url <- release[core_file == TRUE & ext == "exe" & arch == os_arch(), url]
+    url <- release[core_file == TRUE & ext == os_exe() & arch == os_arch(), url]
     dest <- file.path(dir, basename(url))
 
     # download and install
@@ -230,6 +230,11 @@ os_arch <- function () {
     } else {
         c("32bit")
     }
+}
+# }}}
+# os_exe: Return the architecture {{{
+os_exe <- function () {
+    switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
 }
 # }}}
 # eplus_latest_release: get the latest release version of EnergyPlus {{{
