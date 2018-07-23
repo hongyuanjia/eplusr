@@ -72,7 +72,12 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 download_eplus <- function (ver = "latest", dir = getwd()) {
     release <- repo_releases(owner = "NREL", repo = "EnergyPlus", ver = ver)
     ver <- attr(release, "version")
-    url <- release[core_file == TRUE & ext == os_exe() & arch == os_arch(), url]
+
+    # fix arch type to 64bit for non-windows platform
+    arch_type <- switch(os_type(), windows = os_arch(), "64bit")
+
+    url <- release[core_file == TRUE & ext == os_exe() & arch == arch_type, url]
+
     dest <- file.path(dir, basename(url))
 
     # download and install
@@ -250,6 +255,12 @@ install_eplus_win <- function (exec) {
     has_ps <- unname(Sys.which("powershell") != "")
     win_exec <- normalizePath(exec)
 
+<<<<<<< HEAD
+=======
+    message("NOTE: Administrative privileges required during the installation. ",
+            "Please make sure R is running with an administrator acount.")
+
+>>>>>>> 7172293d644b6f5fe6d255d6c9a39fcd89fa82ed
     if (has_ps) {
         cmd <- sprintf("& %s /S | Out-Null", exec)
         res <- run_cmd(command = "powershell", args = cmd,
@@ -272,6 +283,10 @@ install_eplus_macos <- function (exec) {
 # }}}
 # install_eplus_linux {{{
 install_eplus_linux <- function (exec) {
+<<<<<<< HEAD
+=======
+    message("NOTE: Administrative privileges required during the installation")
+>>>>>>> 7172293d644b6f5fe6d255d6c9a39fcd89fa82ed
     cmd <- sprintf("sudo chmod +x %s | echo 'y\r' | sudo ./%s", exec, exec)
     run_cmd(commandline = cmd)
 }
