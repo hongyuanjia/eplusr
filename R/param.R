@@ -312,6 +312,10 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel
 
 # i_param_kill {{{
 i_param_kill <- function (self, private, which) {
+    message("Currently, parametric simulations can only be run in waiting mode, ",
+        "and cannot be kill.")
+    return(invisible(NULL))
+
     job <- i_param_job_from_which(self, private, which)
     for (j in job) {
         j$kill()

@@ -1,5 +1,18 @@
 # eplusr 0.8.2.1
 
+## Minor changes
+
+* The names of returned list of `$get_value()` in `IdfObject` is "underscore"
+  name, not lower name. This makes its behavior being consistent with
+  `$object()` in `Idf` class.
+
+* When `wait` is `FALSE`, `$run()` in `Idf`, `EplusJob` and `ParametricJob` will
+  return a `process` object instead of the time when simulation started.
+
+* A clear message will be given when trying to run `$kill()` in `ParametricJob`,
+  which inform the user that currently `$kill()` does not for parametric
+  simulations.
+
 ## Bug fixes
 
 * Fix errors in `$status()`, `$output_dir()` and `$locate_output()` in
