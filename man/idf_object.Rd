@@ -22,7 +22,7 @@ idfobj$definition()
 idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
 
-idfobj$get_value(which = NULL, all = NULL)
+idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
 idfobj$set_value(..., defaults = TRUE)
 idfobj$FieldName
 idfobj[[Field]]
@@ -95,7 +95,7 @@ no breaking will be made.
 \section{Value}{
 
 \preformatted{
-idfobj$get_value(which = NULL, all = FALSE)
+idfobj$get_value(which = NULL, all = FALSE, simplify = FALSE)
 idfobj$set_value(..., default = TRUE)
 idfobj$FieldName
 idfobj[[Field]]
@@ -104,6 +104,10 @@ idfobj[[Field]] <- Value
 }
 
 \code{$get_value} will return a named list containing values of specified fields.
+If simplify is \code{FALSE}, then all values will be converted into character
+and the converted character vector will be returned. Note that the field
+names will be coverted into valid R names, i.e. all charaters other than
+letters and numbers will be replaced by underscore("_").
 
 \code{$set_value} will set values of current object.
 
@@ -120,6 +124,8 @@ field name and \code{Field} is a single valid field index or name.
 names. Field names can be given in "lower-style", e.g. \code{"Thermal Resistance"} can be given as \code{"thermal_resistance"}.
 \item \code{all}: If \code{TRUE}, values of all fields, including empty fields will be
 returned as well. Default: \code{FALSE}
+\item \code{simplify}: If \code{TRUE}, values of fields will be converted into characters
+and the converted character vector will be returned.
 \item \code{...}: Values to set. Field names of value can be given. If not named, the
 input values will be set to fields according to their order of
 appearance.

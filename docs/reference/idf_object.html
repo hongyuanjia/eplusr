@@ -65,7 +65,7 @@ some shared data from parent Idf object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.2</span>
       </span>
     </div>
 
@@ -86,12 +86,7 @@ some shared data from parent Idf object." />
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        <li>
-  <a href="https://github.com/hongyuanjia/eplusr">
-    <span class="fa fa-github fa-lg"></span>
-     
-  </a>
-</li>
+        
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -105,7 +100,7 @@ some shared data from parent Idf object." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>EnergyPlus IDF object</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/idf_object.R'><code>R/idf_object.R</code></a></small>
+    
     <div class="hidden name"><code>idf_object.Rd</code></div>
     </div>
 
@@ -129,7 +124,7 @@ idfobj$name()
     idfobj$definition()
     idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
-    idfobj$get_value(which = NULL, all = NULL)
+    idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
 idfobj$set_value(..., defaults = TRUE)
 idfobj$FieldName
 idfobj[[Field]]
@@ -188,14 +183,18 @@ no breaking will be made.</p></li>
 
     
     <pre>
-idfobj$get_value(which = NULL, all = FALSE)
+idfobj$get_value(which = NULL, all = FALSE, simplify = FALSE)
 idfobj$set_value(..., default = TRUE)
 idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName &lt;- Value
 idfobj[[Field]] &lt;- Value
 </pre>
-    <p><code>$get_value</code> will return a named list containing values of specified fields.</p>
+    <p><code>$get_value</code> will return a named list containing values of specified fields.
+If simplify is <code>FALSE</code>, then all values will be converted into character
+and the converted character vector will be returned. Note that the field
+names will be coverted into valid R names, i.e. all charaters other than
+letters and numbers will be replaced by underscore("_").</p>
 <p><code>$set_value</code> will set values of current object.</p>
 <p>eplusr also provides custom S3 method of <code>$</code>, <code>[[</code> and also <code>$&lt;-</code> and
 <code>[[&lt;-</code> to make it more convenient to get and set a single value of an
@@ -208,6 +207,8 @@ field name and <code>Field</code> is a single valid field index or name.</p>
 names. Field names can be given in "lower-style", e.g. <code>"Thermal Resistance"</code> can be given as <code>"thermal_resistance"</code>.</p></li>
 <li><p><code>all</code>: If <code>TRUE</code>, values of all fields, including empty fields will be
 returned as well. Default: <code>FALSE</code></p></li>
+<li><p><code>simplify</code>: If <code>TRUE</code>, values of fields will be converted into characters
+and the converted character vector will be returned.</p></li>
 <li><p><code>...</code>: Values to set. Field names of value can be given. If not named, the
 input values will be set to fields according to their order of
 appearance.</p></li>

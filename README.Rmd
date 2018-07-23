@@ -27,7 +27,8 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 
-knitr::opts_knit$set(root.dir = "C:/Users/hongy/Desktop")
+root <-  "C:/Users/hongy/Desktop"
+knitr::opts_knit$set(root.dir = root)
 ```
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
@@ -70,7 +71,13 @@ models and makes it less painful to do parametric simulations and analysis.
 
 ## Installation
 
-`eplusr` is currently not on CRAN. You can install `eplusr` from GitHub with:
+You can install the latest stable release of eplusr from CRAN eplusr.
+
+```{r cran-install, eval = FALSE}
+install.packages("eplusr")
+```
+
+Alternatively, you can install the development version from GitHub.
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
@@ -92,6 +99,22 @@ devtools::install_github("hongyuanjia/eplusr")
 
 ```{r load}
 library(eplusr)
+```
+
+```{r copy_example, echo = FALSE}
+cfg <- eplus_config(8.8)
+
+example_name <- "5Zone_Transformer.idf"
+weather_name <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+ddy_name <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
+
+path_example <- file.path(cfg$dir, "ExampleFiles", example_name)
+path_weather <- file.path(cfg$dir, "WeatherData", weather_name)
+path_ddy <- file.path(cfg$dir, "WeatherData", ddy_name)
+
+file.copy(path_example, root, overwrite = TRUE)
+file.copy(c(path_weather, path_ddy),
+  file.path(root, c("San_Francisco.epw", "San_Francisco.ddy")), overwrite = TRUE)
 ```
 
 eplusr uses `Idf` class to present the whole IDF file and use `IdfObject` class
@@ -588,6 +611,10 @@ Details and Examples"* documentation.
 str(job$tabular_data())
 ```
 
+```{r del_job, echo = FALSE}
+clean_wd(model$path())
+```
+
 ### Run Parametric Analysis
 
 eplusr provides tools to do parametric simulations which take full advantages of
@@ -681,9 +708,17 @@ total_eng
 knitr::kable(total_eng)
 ```
 
-## Related Project
+```{r del_param, echo = FALSE}
+dir_nms <- paste0("set_infil_rate_", 1:5)
+lapply(dir_nms, unlink, recursive = TRUE, force = TRUE)
+unlink(file.path(root, c(example_name, "San_Francisco.epw", "San_Francisco.ddy")))
+```
 
-* [EnergyPlus](https://energyplus.net/)
+## Acknowledgements
+
+I would like to thank many open souce projects who have heavily inspired the
+development of eplusr package, especially those below:
+
 * [OpenStudio](https://www.openstudio.net)
 * [eppy: scripting language for E+, Energyplus](https://github.com/santoshphilip/eppy)
 
