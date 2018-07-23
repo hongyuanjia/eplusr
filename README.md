@@ -22,29 +22,30 @@ less painful to do parametric simulations and analysis.
 
 <!-- vim-markdown-toc GFM -->
 
-* [Installation](#installation)
-* [Features](#features)
-* [Usage](#usage)
-  * [Read and parse](#read-and-parse)
-  * [Basic Info](#basic-info)
-  * [Class definition](#class-definition)
-  * [Get object](#get-object)
-  * [Modify object](#modify-object)
-    * [Duplicate objects](#duplicate-objects)
-    * [Add new objects](#add-new-objects)
-    * [Set new values and comments](#set-new-values-and-comments)
-    * [Insert objects](#insert-objects)
-    * [Delete object](#delete-object)
-  * [Validate](#validate)
-  * [Save](#save)
-  * [Run and Collect Output](#run-and-collect-output)
-    * [Print simulation errors](#print-simulation-errors)
-    * [Retrieve simulation output](#retrieve-simulation-output)
-  * [Run Parametric Analysis](#run-parametric-analysis)
-    * [Apply measure](#apply-measure)
-    * [Run in parallel and collect results](#run-in-parallel-and-collect-results)
-* [Acknowledgements](#acknowledgements)
-* [Author](#author)
+  - [Installation](#installation)
+  - [Features](#features)
+  - [Usage](#usage)
+      - [Read and parse](#read-and-parse)
+      - [Basic Info](#basic-info)
+      - [Class definition](#class-definition)
+      - [Get object](#get-object)
+      - [Modify object](#modify-object)
+          - [Duplicate objects](#duplicate-objects)
+          - [Add new objects](#add-new-objects)
+          - [Set new values and comments](#set-new-values-and-comments)
+          - [Insert objects](#insert-objects)
+          - [Delete object](#delete-object)
+      - [Validate](#validate)
+      - [Save](#save)
+      - [Run and Collect Output](#run-and-collect-output)
+          - [Print simulation errors](#print-simulation-errors)
+          - [Retrieve simulation output](#retrieve-simulation-output)
+      - [Run Parametric Analysis](#run-parametric-analysis)
+          - [Apply measure](#apply-measure)
+          - [Run in parallel and collect
+            results](#run-in-parallel-and-collect-results)
+  - [Acknowledgements](#acknowledgements)
+  - [Author](#author)
 
 <!-- vim-markdown-toc -->
 
@@ -80,9 +81,6 @@ devtools::install_github("hongyuanjia/eplusr")
 ``` r
 library(eplusr)
 ```
-
-    #> [1] TRUE
-    #> [1] TRUE TRUE
 
 eplusr uses `Idf` class to present the whole IDF file and use
 `IdfObject` class to present a single object in an IDF. Both `Idf` and
@@ -1010,7 +1008,7 @@ If the needed version of EnergyPlus was not installed, you can use
 `install_eplus` to install it.
 
 ``` r
-eplusr::install_eplus(ver = 8.9)
+install_eplus(ver = 8.9)
 ```
 
 Sometimes, before simulation, it may be useful to retrieve weather data
@@ -1164,7 +1162,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Replace the existing file located  at C:\Users\hongy\Desktop\5Zone_Transformer.idf.
 #> 
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.23 11:16
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.23 13:07
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Response Factors
@@ -1240,7 +1238,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Starting Simulation at 07/07 for SUMMERDAY
 #> Writing tabular output file results using HTML format.
 #> Writing final SQL reports
-#> EnergyPlus Run Time=00hr 00min  2.97sec
+#> EnergyPlus Run Time=00hr 00min  1.75sec
 #> EnergyPlus Completed Successfully.
 job
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1248,7 +1246,7 @@ job
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:16:59` and completed successfully after 3.24 secs.
+#>  Simulation started at `2018-07-23 13:07:14` and completed successfully after 1.98 secs.
 ```
 
 #### Print simulation errors
@@ -1424,6 +1422,8 @@ param$run()
 #> 
  Progress: -----------------------------------                         100%
  Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
  Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
@@ -1434,7 +1434,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:17:08` and completed successfully after 12.87 secs.
+#>  Simulation started at `2018-07-23 13:07:18` and completed successfully after 14.95 secs.
 #> 
 #> $set_infil_rate_2
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1442,7 +1442,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:17:08` and completed successfully after 12.87 secs.
+#>  Simulation started at `2018-07-23 13:07:18` and completed successfully after 14.95 secs.
 #> 
 #> $set_infil_rate_3
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1450,7 +1450,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:17:08` and completed successfully after 12.87 secs.
+#>  Simulation started at `2018-07-23 13:07:18` and completed successfully after 14.95 secs.
 #> 
 #> $set_infil_rate_4
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1458,7 +1458,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:17:08` and completed successfully after 12.87 secs.
+#>  Simulation started at `2018-07-23 13:07:18` and completed successfully after 14.95 secs.
 #> 
 #> $set_infil_rate_5
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1466,7 +1466,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 11:17:08` and completed successfully after 12.87 secs.
+#>  Simulation started at `2018-07-23 13:07:18` and completed successfully after 14.95 secs.
 ```
 
 After all simulations completed, let’s see the variations of total

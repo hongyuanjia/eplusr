@@ -105,7 +105,7 @@ devtools::install_github("hongyuanjia/eplusr")
 library(eplusr)
 ```
 
-```{r copy_example, echo = FALSE}
+```{r copy_example, include = FALSE}
 cfg <- eplus_config(8.8)
 
 example_name <- "5Zone_Transformer.idf"
