@@ -18,11 +18,6 @@ path_epw <- file.path(getwd(), weather_name)
 job <- eplus_job(path_idf, path_weather)
 
 test_that("can run the simulation", {
-    expect_true({
-        proc <- job$run(wait = FALSE)
-        Sys.sleep(1)
-        job$kill()
-    })
     expect_output(job$run())
 })
 
