@@ -257,6 +257,8 @@ i_job_run <- function (self, private, wait = TRUE) {
         private$m_path_idf, private$m_path_epw, echo = wait)
 
     private$m_log$end_time <- Sys.time()
+
+    private$m_process
 }
 # }}}
 
