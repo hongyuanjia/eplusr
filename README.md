@@ -10,6 +10,8 @@ Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?br
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
+[![CRAN Download
+Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.rstudio.com/web/packages/eplusr/index.html)
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -127,17 +129,6 @@ argument.
 
 ``` r
 model <- read_idf(path = "5Zone_Transformer.idf", idd = NULL)
-#> Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus installation folder.
-#> IDD file found: `C:\EnergyPlusV8-8-0\Energy+.idd`.
-#> Start parsing...
-#> 
-  Parsing IDD (Parsing ) [=========>------------------------]  30% in  0s
-  Parsing IDD (Parsing ) [=============>--------------------]  40% in  0s
-  Parsing IDD (Parsing ) [================>-----------------]  50% in  1s
-  Parsing IDD (Parsing ) [===================>--------------]  60% in  2s
-  Parsing IDD (Parsing ) [==========================>-------]  80% in  3s
-  Parsing IDD (Parsing ) [===============================>--]  95% in  3s
-  Parsing IDD (Complete) [==================================] 100% in  3s
 
 model
 #> # Path: `C:\Users\hongy\Desktop\5Zone_Transformer.idf`
@@ -1174,7 +1165,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Replace the existing file located  at C:\Users\hongy\Desktop\5Zone_Transformer.idf.
 #> 
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.23 10:59
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.23 11:12
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Response Factors
@@ -1250,7 +1241,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Starting Simulation at 07/07 for SUMMERDAY
 #> Writing tabular output file results using HTML format.
 #> Writing final SQL reports
-#> EnergyPlus Run Time=00hr 00min  2.13sec
+#> EnergyPlus Run Time=00hr 00min  2.26sec
 #> EnergyPlus Completed Successfully.
 job
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1258,7 +1249,7 @@ job
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:49` and completed successfully after 2.49 secs.
+#>  Simulation started at `2018-07-23 11:12:24` and completed successfully after 2.48 secs.
 ```
 
 #### Print simulation errors
@@ -1434,6 +1425,10 @@ param$run()
 #> 
  Progress: -----------------------------------                         100%
  Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
+ Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
@@ -1444,7 +1439,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:55` and completed successfully after 12.78 secs.
+#>  Simulation started at `2018-07-23 11:12:29` and completed successfully after 16.39 secs.
 #> 
 #> $set_infil_rate_2
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1452,7 +1447,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:55` and completed successfully after 12.78 secs.
+#>  Simulation started at `2018-07-23 11:12:29` and completed successfully after 16.39 secs.
 #> 
 #> $set_infil_rate_3
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1460,7 +1455,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:55` and completed successfully after 12.78 secs.
+#>  Simulation started at `2018-07-23 11:12:29` and completed successfully after 16.39 secs.
 #> 
 #> $set_infil_rate_4
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1468,7 +1463,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:55` and completed successfully after 12.78 secs.
+#>  Simulation started at `2018-07-23 11:12:29` and completed successfully after 16.39 secs.
 #> 
 #> $set_infil_rate_5
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1476,7 +1471,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\Desktop\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-23 10:59:55` and completed successfully after 12.78 secs.
+#>  Simulation started at `2018-07-23 11:12:29` and completed successfully after 16.39 secs.
 ```
 
 After all simulations completed, let’s see the variations of total
@@ -1502,21 +1497,6 @@ total_eng
 | set\_infil\_rate\_3 |              1.36 |
 | set\_infil\_rate\_4 |              1.38 |
 | set\_infil\_rate\_5 |              1.39 |
-
-    #> [[1]]
-    #> [1] 0
-    #> 
-    #> [[2]]
-    #> [1] 0
-    #> 
-    #> [[3]]
-    #> [1] 0
-    #> 
-    #> [[4]]
-    #> [1] 0
-    #> 
-    #> [[5]]
-    #> [1] 0
 
 ## Acknowledgements
 

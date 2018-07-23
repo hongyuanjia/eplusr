@@ -33,7 +33,11 @@ knitr::opts_knit$set(root.dir = root)
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr) [![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master) [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
+[![Travis-CI Build Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.org/hongyuanjia/eplusr)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+[![Coverage Status](https://img.shields.io/codecov/c/github/hongyuanjia/eplusr/master.svg)](https://codecov.io/github/hongyuanjia/eplusr?branch=master)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
+[![CRAN Download Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.rstudio.com/web/packages/eplusr/index.html)
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -611,7 +615,7 @@ Details and Examples"* documentation.
 str(job$tabular_data())
 ```
 
-```{r del_job, echo = FALSE}
+```{r del_job, include = FALSE}
 clean_wd(model$path())
 ```
 
@@ -708,7 +712,7 @@ total_eng
 knitr::kable(total_eng)
 ```
 
-```{r del_param, echo = FALSE}
+```{r del_param, include = FALSE}
 dir_nms <- paste0("set_infil_rate_", 1:5)
 lapply(dir_nms, unlink, recursive = TRUE, force = TRUE)
 unlink(file.path(root, c(example_name, "San_Francisco.epw", "San_Francisco.ddy")))
