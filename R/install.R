@@ -55,6 +55,9 @@ install_eplus <- function (ver = "latest", force = FALSE) {
            linux = install_eplus_linux(exec),
            macos = install_eplus_macos(exec))
 
+    message("NOTE: Administrative privileges required during the installation. ",
+            "Please make sure R is running with an administrator acount or equivalent.")
+
     if (res != 0L) {
         stop(sprintf("Failed to install EnergyPlus v%s.", ver), call. = FALSE)
     }
@@ -62,7 +65,10 @@ install_eplus <- function (ver = "latest", force = FALSE) {
     path <- eplus_default_path(ver)
     message(sprintf("EnergyPlus v%s successfully installed into %s.", ver, path))
 
-    return(invisible())
+    # add newly installed EnergyPlus to dictionary
+    use_eplus(ver)
+
+    return(invisible(res))
 }
 # }}}
 
@@ -85,7 +91,7 @@ download_eplus <- function (ver = "latest", dir = getwd()) {
     if (dl != 0L) {
         stop(sprintf("Failed to download EnergyPlus v%s.", ver), call. = FALSE)
     } else {
-        message("EnergyPlus", paste0("v", ver), " has been downloaded successfully into ",
+        message("EnergyPlus ", paste0("v", ver), " has been downloaded successfully into ",
         dir, ".")
     }
     dl
@@ -255,9 +261,6 @@ install_eplus_win <- function (exec) {
     has_ps <- unname(Sys.which("powershell") != "")
     win_exec <- normalizePath(exec)
 
-    message("NOTE: Administrative privileges required during the installation. ",
-            "Please make sure R is running with an administrator acount.")
-
     if (has_ps) {
         cmd <- sprintf("& %s /S | Out-Null", exec)
         res <- run_cmd(command = "powershell", args = cmd,
@@ -273,14 +276,12 @@ install_eplus_win <- function (exec) {
 # install_eplus_macos {{{
 install_eplus_macos <- function (exec) {
     no_ext <- tools::file_path_sans_ext(base)
-    message("NOTE: Administrative privileges required during the installation")
     cmd <- sprintf("sudo hdiutil attach %s | sudo installer -pkg /Volumes/%s/%s.pkg -target /", exec, no_ext, no_ext)
     run_cmd(commandline = cmd)
 }
 # }}}
 # install_eplus_linux {{{
 install_eplus_linux <- function (exec) {
-    message("NOTE: Administrative privileges required during the installation")
     cmd <- sprintf("sudo chmod +x %s | echo 'y\r' | sudo ./%s", exec, exec)
     run_cmd(commandline = cmd)
 }
