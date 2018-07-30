@@ -100,8 +100,8 @@
 #' `$get_value()` returns a named list containing values of specified fields.
 #'     If simplify is `FALSE`, then all values will be converted into character
 #'     and the converted character vector will be returned. Note that the field
-#'     names will be coverted into valid R names, i.e. all charaters other than
-#'     letters and numbers will be replaced by underscore("_").
+#'     names will be converted into valid R names, i.e. all characters other
+#'     than letters and numbers will be replaced by underscore("_").
 #'
 #' `$set_value()` sets values of current object.
 #'

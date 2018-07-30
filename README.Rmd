@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 
-root <-  "C:/Users/hongy"
+root <-  Sys.getenv("USERPROFILE")
 knitr::opts_knit$set(root.dir = root)
 ```
 
@@ -432,6 +432,14 @@ mat$ref_by_object()
 mat$set_value(name = "CC03_renamed")
 
 mat$ref_by_object()
+```
+
+Sometimes, you may want to get all possible values of fields before you change
+them. You can achieve that by using `$possible_value()` method in `IdfObject`
+class.
+
+```{r possible}
+mat$possible_value()
 ```
 
 #### Insert objects

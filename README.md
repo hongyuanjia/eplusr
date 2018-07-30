@@ -583,9 +583,9 @@ setdiff(ls(rp), "initialize")
 #>  [4] "get_comment"     "get_value"       "group_name"     
 #>  [7] "has_ref"         "has_ref_by"      "has_ref_from"   
 #> [10] "id"              "is_valid"        "name"           
-#> [13] "print"           "ref_by_object"   "ref_from_object"
-#> [16] "set_comment"     "set_value"       "string"         
-#> [19] "table"           "validate"
+#> [13] "possible_value"  "print"           "ref_by_object"  
+#> [16] "ref_from_object" "set_comment"     "set_value"      
+#> [19] "string"          "table"           "validate"
 ```
 
 Similarly, you can use `"$"` and `"[["` to get a single value in an
@@ -768,7 +768,7 @@ model$set_object("rp_test_1", list(name = "rp_test_3", begin_day_of_month = 2),
 #> $rp_test_3
 #> <<[ID:326] `rp_test_3`>> RunPeriod
 #> ------------------------------- * COMMENTS * ------------------------------
-#> !2018-07-24
+#> !2018-07-30
 #> !begin day has been changed.
 #> -------------------------------- * FIELDS * -------------------------------
 #>   1: rp_test_3,         !- Name
@@ -824,6 +824,49 @@ mat$ref_by_object()
 #> *1: FLOOR-SLAB-1,      !- Name
 #> *2: CC03_renamed;      !- Outside Layer
 #> ---------------------------------------------------------------------------
+```
+
+Sometimes, you may want to get all possible values of fields before you
+change them. You can achieve that by using `$possible_value()` method in
+`IdfObject` class.
+
+``` r
+mat$possible_value()
+#> -- 1: Field `Name` --------------------------------------------------------
+#> <Not Applicable>
+#> 
+#> -- 2: Field `Roughness` ---------------------------------------------------
+#> * Choice:
+#>   - `VeryRough`
+#>   - `Rough`
+#>   - `MediumRough`
+#>   - `MediumSmooth`
+#>   - `Smooth`
+#>   - `VerySmooth`
+#> 
+#> -- 3: Field `Thickness` ---------------------------------------------------
+#> * Range: (0, Inf)
+#> 
+#> -- 4: Field `Conductivity` ------------------------------------------------
+#> * Range: (0, Inf)
+#> 
+#> -- 5: Field `Density` -----------------------------------------------------
+#> * Range: (0, Inf)
+#> 
+#> -- 6: Field `Specific Heat` -----------------------------------------------
+#> * Range: [100, Inf)
+#> 
+#> -- 7: Field `Thermal Absorptance` -----------------------------------------
+#> * Default: 0.9
+#> * Range: (0, 0.99999]
+#> 
+#> -- 8: Field `Solar Absorptance` -------------------------------------------
+#> * Default: 0.9
+#> * Range: [0, 1]
+#> 
+#> -- 9: Field `Visible Absorptance` -----------------------------------------
+#> * Default: 0.9
+#> * Range: [0, 1]
 ```
 
 #### Insert objects
@@ -1134,7 +1177,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Replace the existing file located  at C:\Users\hongy\5Zone_Transformer.idf.
 #> 
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.24 11:56
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.30 17:09
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Response Factors
@@ -1210,7 +1253,7 @@ job <- model$run(epw_sf, dir = ".", wait = TRUE)
 #> Starting Simulation at 07/07 for SUMMERDAY
 #> Writing tabular output file results using HTML format.
 #> Writing final SQL reports
-#> EnergyPlus Run Time=00hr 00min  1.59sec
+#> EnergyPlus Run Time=00hr 00min  1.66sec
 #> EnergyPlus Completed Successfully.
 job
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1218,7 +1261,7 @@ job
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:53` and completed successfully after 1.78 secs.
+#>  Simulation started at `2018-07-30 17:09:42` and completed successfully after 1.86 secs.
 ```
 
 #### Print simulation errors
@@ -1398,6 +1441,7 @@ using option `num_parallel`.
 param$run()
 #> 
  Progress: -----------------------------------                         100%
+ Progress: -----------------------------------                         100%
  Progress: -----------------------------------------------             100%
  Progress: -----------------------------------------------             100%
  Progress: ----------------------------------------------------------- 100%
@@ -1407,7 +1451,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:57` and completed successfully after 10.18 secs.
+#>  Simulation started at `2018-07-30 17:09:47` and completed successfully after 11.72 secs.
 #> 
 #> $set_infil_rate_2
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1415,7 +1459,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:57` and completed successfully after 10.18 secs.
+#>  Simulation started at `2018-07-30 17:09:47` and completed successfully after 11.72 secs.
 #> 
 #> $set_infil_rate_3
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1423,7 +1467,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:57` and completed successfully after 10.18 secs.
+#>  Simulation started at `2018-07-30 17:09:47` and completed successfully after 11.72 secs.
 #> 
 #> $set_infil_rate_4
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1431,7 +1475,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:57` and completed successfully after 10.18 secs.
+#>  Simulation started at `2018-07-30 17:09:47` and completed successfully after 11.72 secs.
 #> 
 #> $set_infil_rate_5
 #> -- EnergyPlus Simulation Job ----------------------------------------------
@@ -1439,7 +1483,7 @@ param$run()
 #> # Weather: `C:\Users\hongy\San_Francisco.epw`
 #> # EnergyPlus Version: `8.8.0`
 #> # EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#>  Simulation started at `2018-07-24 11:56:57` and completed successfully after 10.18 secs.
+#>  Simulation started at `2018-07-30 17:09:47` and completed successfully after 11.72 secs.
 ```
 
 After all simulations completed, let’s see the variations of total
