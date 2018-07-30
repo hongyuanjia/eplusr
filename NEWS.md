@@ -2,9 +2,9 @@
 
 ## New features
 
-* A new method `$possible()` has been added into `IdfObject` class, which will
-  return all possible values for selected fields, including auto-value (autosize
-  or autocalculate), default, range, choices and references.
+* A new method `$possible_value()` has been added into `IdfObject` class, which
+  will return all possible values for selected fields, including auto-value
+  (autosize or autocalculate), default, range, choices and references.
 
 ## Minor changes
 
