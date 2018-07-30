@@ -24,6 +24,8 @@
 
 * Fix `run_idf()` and `run_multi()` errors on Linux and MacOS (#14).
 
+* Fix missing name attribute in class `NodeList` (#16)
+
 # eplusr 0.8.2
 
 ## New feature
