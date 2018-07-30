@@ -369,7 +369,7 @@ print.IdfFieldPossible <- function (x, ...) {
     dt[!purrr::map_lgl(choice, ~all(is.na(.x))), res := paste0(res, "\n* Choice:\n",
         paste0("  - ", backtick(unlist(choice)), collapse = "\n")), by = field_index]
 
-    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.field_range(.x))))]
+    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.IdfFieldRange(.x))))]
     dt[res_ran == "* Range: <Not Applicable>", res_ran := NA_character_]
     dt[!is.na(res_ran), res := paste0(res, "\n", res_ran)]
 
