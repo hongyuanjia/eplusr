@@ -345,6 +345,75 @@ print.ErrFile <- function (x, ...) {
 }
 # }}}
 
+#' @importFrom data.table copy
+#' @importFrom purrr map_lgl
+#' @importFrom cli cat_line
+#' @export
+# print.IdfFieldPossible {{{
+print.IdfFieldPossible <- function (x, ...) {
+    dt <- data.table::copy(x)
+
+    dt[, header := paste0(cli::rule(paste0(field_index, ": Field ",
+        backtick(field_name)))), by = field_index]
+    dt[-1L, header := paste0("\n", header)]
+
+    dt[, res := header]
+
+    dt[!is.na(auto),
+        res := paste0(res, "\n* Auto value: ", backtick(auto))]
+
+    dt[!purrr::map_lgl(default, is.na),
+        res := paste0(res, "\n* Default: ",
+            ifelse(is.character(default), backtick(default), default))]
+
+    dt[!purrr::map_lgl(choice, ~all(is.na(.x))), res := paste0(res, "\n* Choice:\n",
+        paste0("  - ", backtick(unlist(choice)), collapse = "\n")), by = field_index]
+
+    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.field_range(.x))))]
+    dt[res_ran == "* Range: <Not Applicable>", res_ran := NA_character_]
+    dt[!is.na(res_ran), res := paste0(res, "\n", res_ran)]
+
+    dt[!purrr::map_lgl(reference, is.null), res := paste0(res, "\n* References: \n",
+        paste0(paste0("  - ", backtick(unlist(reference))), collapse = "\n")), by = field_index]
+
+    dt[res == header, res := paste0(res, "\n<Not Applicable>")]
+    cli::cat_line(dt$res)
+}
+# }}}
+
+#' @importFrom cli cat_line
+#' @export
+# print.field_range {{{
+print.field_range <- function (x, ...) {
+    if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
+        cat("<Not Applicable>")
+        return(invisible(NULL))
+    }
+
+    if (!is.na(x$minimum)) {
+        if (x$lower_incbounds) {
+            left <- paste0("[", x$minimum)
+        } else {
+            left <- paste0("(", x$minimum)
+        }
+    } else {
+        left <- "(-Inf"
+    }
+
+    if (!is.na(x$maximum)) {
+        if (x$upper_incbounds) {
+            right <- paste0(x$maximum, "]")
+        } else {
+            right <- paste0(x$maximum, ")")
+        }
+    } else {
+        right <- "Inf)"
+    }
+
+    cli::cat_line(paste0(left, ", ", right))
+}
+# }}}
+
 #' @importFrom data.table setnames
 # update_value_num: update value string and digits {{{
 update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "value") {

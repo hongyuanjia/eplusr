@@ -1,5 +1,11 @@
 # eplusr 0.8.2.1
 
+## New features
+
+* A new method `$possible()` has been added into `IdfObject` class, which will
+  return all possible values for selected fields, including auto-value (autosize
+  or autocalculate), default, range, choices and references.
+
 ## Minor changes
 
 * The names of returned list of `$get_value()` in `IdfObject` is "underscore"

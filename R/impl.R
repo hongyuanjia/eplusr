@@ -285,7 +285,7 @@ i_reference_map <- function (self, private, class) {
 #                                    Field                                     #
 ################################################################################
 
-# i_field_tbl: always return all fields {{{
+# i_field_tbl: return all existing fields {{{
 i_field_tbl <- function (self, private, class = NULL) {
     if (is.null(class)) return(private$m_idd_tbl$field)
 
@@ -295,7 +295,7 @@ i_field_tbl <- function (self, private, class = NULL) {
 }
 # }}}
 
-# i_field_tbl_from_num: always return the min fields {{{
+# i_field_tbl_from_num: return acceptable number of fields {{{
 i_field_tbl_from_num <- function (self, private, class, num = 0L) {
     assert_that(are_count(num))
     assert_that(is_same_len(class, num))
@@ -405,22 +405,14 @@ i_field_num_from_index <- function (self, private, class, index = 0L) {
 }
 # }}}
 
-# i_last_required_field_index {{{
-i_last_required_field_index <- function (self, private, class = NULL) {
-    cls_in <- i_in_tbl_from_which(self, private, "class", class)
-
-    private$m_idd_tbl$field[required_field == TRUE,
-        list(last_required = max(field_index)), by = list(class_id)][
-        cls_in, on = "class_id"][
-        is.na(last_required), `:=`(last_required = 0L)]$last_required
-}
-# }}}
-
 # <========      FUNCTION BELOW ONLY WORK FOR A SINGLE CLASS         ========> #
 ################################################################################
 # i_field_tbl_from_which {{{
-i_field_tbl_from_which <- function (self, private, class, which = NULL) {
+i_field_tbl_from_which <- function (self, private, class, which = NULL, strict = TRUE) {
     assert_that(is_scalar(class))
+
+    if (is.null(which)) return(i_field_tbl(self, private, class))
+
     fld_tbl <- i_field_tbl(self, private, class)
 
     if (is.null(which)) return(fld_tbl)
@@ -601,9 +593,13 @@ i_field_range <- function (self, private, class, which = NULL) {
     fld_tbl <- i_field_tbl_from_which(self, private, class, which)
 
     fld_ran <- private$m_idd_tbl$field_range[fld_tbl,
-        on = "field_id"][, `:=`(range = list(list(
-            minimum = minimum, lower_incbounds = lower_incbounds,
-            maximum = maximum, upper_incbounds = upper_incbounds))
+        on = "field_id"][, `:=`(range = list({
+            r <- list(
+                minimum = minimum, lower_incbounds = lower_incbounds,
+                maximum = maximum, upper_incbounds = upper_incbounds)
+            data.table::setattr(r, "class", c("IdfFieldRange", "list"))
+            r
+        })
         ), by = "field_id"]
 
     fld_ran$range
@@ -751,9 +747,9 @@ i_extensible_group_tbl_from_range <- function (self, private, class, from, to) {
     ext_tbl[, `:=`(
         field_index = fld_idx,
         last_req_ext = i_last_required_extensible_field_index(self, private, class_id),
-        field_name = stringr::str_replace_all(field_name, "(?<=(N| ))\\d+", as.character(ext_index)),
-        full_name = stringr::str_replace_all(full_name, "(?<=(N| ))\\d+", as.character(ext_index)),
-        full_ipname = stringr::str_replace_all(full_ipname, "(?<=(N| ))\\d+", as.character(ext_index)))]
+        field_name = stringr::str_replace_all(field_name, "(?<=(A|N| ))\\d+", as.character(ext_index)),
+        full_name = stringr::str_replace_all(full_name, "(?<=(A|N| ))\\d+", as.character(ext_index)),
+        full_ipname = stringr::str_replace_all(full_ipname, "(?<=(A|N| ))\\d+", as.character(ext_index)))]
 
     ext_tbl[field_index > last_req_ext, `:=`(required_field = FALSE)]
     ext_tbl[, `:=`(last_req_ext = NULL)]
@@ -1501,7 +1497,7 @@ i_insert_single_object <- function (self, private, object) {
     # get the uuid to see if it comes from the same object
     in_uuid <- in_priv$m_log$uuid
     if (in_uuid == private$m_log$uuid) {
-        i_verbose_info(self, private, "Object (ID:", backtick(object$id()), 
+        i_verbose_info(self, private, "Object (ID:", backtick(object$id()),
             ") to insert is an object from current Idf. The target object ",
             "will be directly duplicated instead of creating a new one with ",
             "same values.")
@@ -2683,11 +2679,44 @@ i_value_tbl_from_field_which <- function (self, private, object, which = NULL) {
 
     obj_in <- i_in_tbl_from_which(self, private, "object", object)
 
-    fld_idx <- i_field_index_from_which(self, private, obj_in$class_id, which, strict = TRUE)
+    fld_tbl <- i_field_tbl_from_which(self, private, obj_in$class_id, which)
 
-    val_tbl <- i_value_tbl_from_which(self, private, obj_in$object_id)
+    val_tbl <- i_value_tbl_from_which(self, private, obj_in$object_id, field = FALSE)
 
-    val_tbl[J(fld_idx), on = "field_index"]
+    val_tbl[fld_tbl, on = "field_id"]
+}
+# }}}
+
+# i_value_reference_from_which {{{
+i_value_reference_from_which <- function (self, private, object, which = NULL) {
+    val_tbl <- i_value_tbl_from_field_which(self, private, object, which)[,
+        list(value_id, field_id, type)]
+
+    val_tbl[, reference := list(list(NULL))]
+    val_tbl[type == "node", reference := list(list(i_all_node_value(self, private)))]
+
+    val_tbl_obj_list <- private$m_idd_tbl$field_object_list[
+        val_tbl, on = "field_id", nomatch = 0L, list(value_id, object_list)]
+
+    if (is_empty(val_tbl_obj_list)) return(val_tbl$reference)
+
+    uni_obj_list <- val_tbl_obj_list[, unique(object_list)]
+
+    # get possible values
+    val_tbl_ref <- i_value_tbl_from_object_list(self, private, uni_obj_list)
+
+    ref <- val_tbl_ref[val_tbl_obj_list, on = "object_list"][,
+        list(reference = list(unique(unlist(possible_value)))), by = value_id]
+
+    val_tbl <- ref[val_tbl[, reference := NULL], on = "value_id"]
+
+    val_tbl$reference
+}
+# }}}
+
+# i_all_node_value {{{
+i_all_node_value <- function (self, private) {
+    i_value_tbl_from_which(self, private)[type == "node" & !is.na(value), unique(value)]
 }
 # }}}
 
@@ -3300,6 +3329,31 @@ i_idfobj_has_ref_from <- function (self, private, object) {
     val_tbl <- i_value_tbl_from_which(self, private, object)
     ref_from <- i_val_ref_from_tbl(self, private, val_tbl)
     not_empty(ref_from)
+}
+# }}}
+
+# i_idfobj_possible_values {{{
+i_idfobj_possible_values <- function (self, private, object, which = NULL) {
+    val_tbl <- i_value_tbl_from_field_which(self, private, object, which)
+
+    # delete extra fields if no field is given
+    if (is.null(which)) {
+        val_tbl <- val_tbl[!is.na(value_id)]
+        which <- seq.int(nrow(val_tbl))
+    }
+
+    val_tbl[, auto := NA_character_]
+    val_tbl[autosizable == TRUE, auto := "Autosize"]
+    val_tbl[autocalculatable == TRUE, auto := "Autocalculate"]
+
+    val_tbl[, default := list(i_field_default(self, private, class_id[1L], which))]
+    val_tbl[, choice := list(i_field_choice(self, private, class_id[1L], which))]
+    val_tbl[, range := list(i_field_range(self, private, class_id[1L], which))]
+    val_tbl[, reference := list(i_value_reference_from_which(self, private, object, which))]
+
+    res <- val_tbl[, list(field_index, field_name, auto, default, choice, range, reference)]
+    data.table::setattr(res, "class", c("IdfFieldPossible", class(res)))
+    res
 }
 # }}}
 

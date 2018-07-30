@@ -281,6 +281,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         set_value = function (..., default = TRUE)
             i_idfobj_set_value(self, private, private$m_object_id, ..., default = default),
 
+        possible_value = function (which = NULL)
+            i_idfobj_possible_values(self, private, private$m_object_id, which),
+
         validate = function ()
             i_validate_idfobject(self, private, private$m_object_id),
 
