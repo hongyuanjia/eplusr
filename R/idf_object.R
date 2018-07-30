@@ -2,9 +2,9 @@
 #'
 #' `IdfObject` is an abstraction of a single object in an `Idf`. It provides
 #' more detail methods to modify objects. `IdfObject` can only be created from
-#' the parent `Idf` object, using `$object`, `$object_in_class` and
-#' `$search_object`. This is because that initialization of an `IdfObject` needs
-#' some shared data from parent `Idf` object.
+#' the parent `Idf` object, using `$object`, `$object_in_class()` and
+#' `$search_object()`. This is because that initialization of an `IdfObject`
+#' needs some shared data from parent `Idf` object.
 #'
 #' @section Usage:
 #' \preformatted{
@@ -22,6 +22,7 @@
 #' idfobj[[Field]]
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
+#' idfobj$possible_value(which = NULL)
 #'
 #' idfobj$validate()
 #' idfobj$is_valid()
@@ -49,21 +50,21 @@
 #' idfobj$class_name()
 #' ```
 #'
-#' `$id` will return the object ID.
+#' `$id()` returns the object ID.
 #'
-#' `$name` will return the object name. If the class does not have name
+#' `$name()` returns the object name. If the class does not have name
 #'     attribute, then `NA` will returned.
 #'
-#' `$group_name` returns the group name of this object belongs to.
+#' `$group_name()` returns the group name of this object belongs to.
 #'
-#' `$class_name` returns the class name of this object belongs to.
+#' `$class_name()` returns the class name of this object belongs to.
 #'
 #' @section Definition:
 #' ```
 #' idfobj$definition()
 #' ```
 #'
-#' `$definition` will return the definition, i.e. the `IddObject`, of current
+#' `$definition()` returns the definition, i.e. the `IddObject`, of current
 #'     class. For details of `IddObject`, please see [IddObject class][idd_object].
 #'
 #' @section Comment:
@@ -72,9 +73,9 @@
 #' idfobj$set_comment(comment, append = TRUE, width = 0L)
 #' ```
 #'
-#' `$get_comment` will return the comments of current object.
+#' `$get_comment()` returns the comments of current object.
 #'
-#' `$set_comment` will set comments of current object.
+#' `$set_comment()` sets comments of current object.
 #'
 #' **Arguments**
 #'
@@ -93,15 +94,16 @@
 #' idfobj[[Field]]
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
+#' idfobj$possible_value(which = NULL)
 #' }
 #'
-#' `$get_value` will return a named list containing values of specified fields.
+#' `$get_value()` returns a named list containing values of specified fields.
 #'     If simplify is `FALSE`, then all values will be converted into character
 #'     and the converted character vector will be returned. Note that the field
 #'     names will be coverted into valid R names, i.e. all charaters other than
 #'     letters and numbers will be replaced by underscore("_").
 #'
-#' `$set_value` will set values of current object.
+#' `$set_value()` sets values of current object.
 #'
 #' eplusr also provides custom S3 method of `$`, \code{[[} and also `$<-` and
 #' \code{[[<-} to make it more convenient to get and set a single value of an
@@ -109,6 +111,11 @@
 #' `idfobj$FieldName <- Value` and \code{idfobj[[Field]] <- Value} is equivalent
 #' to `idfobj$set_value(Field = Value)`,  where `FieldName` is a single valid
 #' field name and `Field` is a single valid field index or name.
+#'
+#' `$possible_value()` return all possible values for specified fields,
+#'      including auto-value (`autosize` and `autocalculate`), default value,
+#'      value range, choices and references. Underneath, it returns a data.table
+#'      with custom printing method.
 #'
 #' **Arguments**
 #'
@@ -139,10 +146,10 @@
 #' idfobj$is_valid()
 #' ```
 #'
-#' `$validate` will check if there are errors in current object under different
+#' `$validate()` will check if there are errors in current object under different
 #'     strictness level.
 #'
-#' `$is_valid` will check if there are no errors in current object under
+#' `$is_valid()` will check if there are no errors in current object under
 #'     different strictness level.
 #'
 #' The strictness level can be changed using [eplusr_option()]. Default is
@@ -166,16 +173,16 @@
 #' idfobj$has_ref()
 #' ```
 #'
-#' `$ref_from_object` will return other objects that current object references
+#' `$ref_from_object()` will return other objects that current object references
 #'     from.
 #'
-#' `$ref_by_object` will return other objects that reference current object.
+#' `$ref_by_object()` will return other objects that reference current object.
 #'
-#' `$has_ref_from` and `$has_ref_by` will return `TRUE` if current object has
+#' `$has_ref_from()` and `$has_ref_by` will return `TRUE` if current object has
 #'     referenced from other objects or has been referenced by other objects,
 #'     respectively.
 #'
-#' `$has_ref` will return `TRUE` if current object has either referenced from
+#' `$has_ref()` will return `TRUE` if current object has either referenced from
 #'     other objects or has been referenced by other objects.
 #'
 #' @section Data Extraction:
@@ -184,7 +191,7 @@
 #' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 #' ```
 #'
-#' `$table` will return a data.table that contains all data of current object.
+#' `$table()` will return a data.table that contains all data of current object.
 #'
 #' **Arguments**
 #' * `all`: If `TRUE`, values of all fields, including empty fields will be
@@ -203,7 +210,7 @@
 #' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 #' ```
 #'
-#' `$string` will return the text format of current object.
+#' `$string()` will return the text format of current object.
 #'
 #' **Arguments**
 #'

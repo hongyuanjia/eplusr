@@ -47,12 +47,12 @@
 #' job$status()
 #' ```
 #'
-#' `$run` runs the simulation using input model and weather file.
+#' `$run()` runs the simulation using input model and weather file.
 #'
-#' `$kill` kills the background EnergyPlus process if possible. It only
+#' `$kill()` kills the background EnergyPlus process if possible. It only
 #'     works when simulation runs in waiting mode.
 #'
-#' `$status` returns a named list of values indicates the status of the job:
+#' `$status()` returns a named list of values indicates the status of the job:
 #'
 #'   * `run_before`: `TRUE` if the job has been run before.
 #'   * `changed_after`: `TRUE` if the IDF file has been changed since last
@@ -82,19 +82,19 @@
 #' job$tabular_data()
 #' ```
 #'
-#' `$output_dir` returns the output directory of simulation results.
+#' `$output_dir()` returns the output directory of simulation results.
 #'
-#' `$locate_output` returns the path of a single output file specified by file
+#' `$locate_output()` returns the path of a single output file specified by file
 #'     suffix.
 #'
-#' `$report_data_dict` returns a data.table which contains all information about
+#' `$report_data_dict()` returns a data.table which contains all information about
 #'     report data. For details on the meaning of each columns, please see
 #'     "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 #'     Examples" documentation.
 #'
-#' `$report_data` extracts the report data using key values and variable names.
+#' `$report_data()` extracts the report data using key values and variable names.
 #'
-#' `$tabular_data` extracts all tabular data.
+#' `$tabular_data()` extracts all tabular data.
 #'
 #' **Arguments**:
 #'
@@ -122,7 +122,7 @@ NULL
 
 #' Create an EnergyPlus Simulation Job
 #'
-#' `eplus_job` takes an IDF and EPW as input, and returns an `EplusJob` object
+#' `eplus_job()` takes an IDF and EPW as input, and returns an `EplusJob` object
 #' for running EnergyPlus simulation and collecting outputs. For more details,
 #' please see [job].
 #'

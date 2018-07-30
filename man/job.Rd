@@ -53,12 +53,12 @@ job$kill()
 job$status()
 }
 
-\code{$run} runs the simulation using input model and weather file.
+\code{$run()} runs the simulation using input model and weather file.
 
-\code{$kill} kills the background EnergyPlus process if possible. It only
+\code{$kill()} kills the background EnergyPlus process if possible. It only
 works when simulation runs in waiting mode.
 
-\code{$status} returns a named list of values indicates the status of the job:
+\code{$status()} returns a named list of values indicates the status of the job:
 \itemize{
 \item \code{run_before}: \code{TRUE} if the job has been run before.
 \item \code{changed_after}: \code{TRUE} if the IDF file has been changed since last
@@ -90,19 +90,19 @@ job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "
 job$tabular_data()
 }
 
-\code{$output_dir} returns the output directory of simulation results.
+\code{$output_dir()} returns the output directory of simulation results.
 
-\code{$locate_output} returns the path of a single output file specified by file
+\code{$locate_output()} returns the path of a single output file specified by file
 suffix.
 
-\code{$report_data_dict} returns a data.table which contains all information about
+\code{$report_data_dict()} returns a data.table which contains all information about
 report data. For details on the meaning of each columns, please see
 "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 Examples" documentation.
 
-\code{$report_data} extracts the report data using key values and variable names.
+\code{$report_data()} extracts the report data using key values and variable names.
 
-\code{$tabular_data} extracts all tabular data.
+\code{$tabular_data()} extracts all tabular data.
 
 \strong{Arguments}:
 \itemize{

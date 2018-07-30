@@ -96,35 +96,35 @@ print(idd)
 \section{Detail}{
 
 
-\code{$version} returns the version string.
+\code{$version()} returns the version string.
 
-\code{$build} returns the build tag string.
+\code{$build()} returns the build tag string.
 
-\code{$group_index} returns integer indexes (indexes of name appearance in
+\code{$group_index()} returns integer indexes (indexes of name appearance in
 the IDD file) of specified groups.
 
-\code{$group_name} returns all group names.
+\code{$group_name()} returns all group names.
 
-\code{$from_group} returns the names of group that specified classes belongs to.
+\code{$from_group()} returns the names of group that specified classes belongs to.
 
-\code{$is_valid_group} return \code{TRUE} if the input is a valid group name.
+\code{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
 
-\code{$class_index} returns integer indexes (indexes of name appearance in
+\code{$class_index()} returns integer indexes (indexes of name appearance in
 the IDD file) of specified classes.
 
-\code{$class_name} returns all class names.
+\code{$class_name()} returns all class names.
 
-\code{$required_class_name} returns the names of all required classes.
+\code{$required_class_name()} returns the names of all required classes.
 
-\code{$unique_class_name} returns the names of all unique classes.
+\code{$unique_class_name()} returns the names of all unique classes.
 
-\code{$extensible_class_name} returns the names of all extensible classes.
+\code{$extensible_class_name()} returns the names of all extensible classes.
 
-\code{$is_valid_class} return \code{TRUE} if the input is a valid class name.
+\code{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
 
-\code{$object} returns a list of \code{IddObject}s of specified classes.
+\code{$objectN} returns a list of \code{IddObject}s of specified classes.
 
-\code{$object_in_group} returns a list of \code{IddObject}s in that group.
+\code{$object_in_group()} returns a list of \code{IddObject}s in that group.
 
 eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
 more convenient to get a single \code{IddObject}. Basically, \code{idd$ClassName} and

@@ -13,7 +13,7 @@ read_epw(path)
 An \code{Epw} object.
 }
 \description{
-\code{read_epw} parses an EPW file and returns an \code{Epw} object. The parsing
+\code{read_epw()} parses an EPW file and returns an \code{Epw} object. The parsing
 process is extreme inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
 with some simplifications. For more details on \code{Epw}, please see \link[=epw]{Epw Class}.
 }

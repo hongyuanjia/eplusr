@@ -38,21 +38,21 @@
 #' param$weather()
 #' ```
 #'
-#' `$seed` will return the input `Idf` object.
+#' `$seed()` will return the input `Idf` object.
 #'
-#' `$weather` will return the input `Epw` object.
+#' `$weather()` will return the input `Epw` object.
 #'
 #' @section Apply Design Alternatives:
 #' ```
 #' param$apply_measure(measure, ..., .names = NULL)
 #' ```
 #'
-#' `$apply_measure` allows to apply a measure to an `Idf` and creates parametric
-#'     models for analysis. Basically, a measure is just a function that takes
-#'     an `Idf` object and other arguments as input, and returns a modified `Idf`
-#'     object as output. Use `...` to supply different arguments to that
-#'     measure. Under the hook, [mapply()] is used to create multiple `Idf`s
-#'     according to the input values.
+#' `$apply_measure()` allows to apply a measure to an `Idf` and creates
+#'     parametric models for analysis. Basically, a measure is just a function
+#'     that takes an `Idf` object and other arguments as input, and returns a
+#'     modified `Idf` object as output. Use `...` to supply different arguments
+#'     to that measure. Under the hook, [mapply()] is used to create multiple
+#'     `Idf`s according to the input values.
 #'
 #' **Arguments**
 #'
@@ -93,8 +93,8 @@ NULL
 
 #' Create An EnergyPlus Parametric Simulation Job
 #'
-#' `param_job` takes an IDF and EPW as input and returns a `ParametricJob`. For
-#' details on `ParametricJob`, please see [ParametricJob class][param].
+#' `param_job()` takes an IDF and EPW as input and returns a `ParametricJob`.
+#' For details on `ParametricJob`, please see [ParametricJob class][param].
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' @param epw A path to EnergyPlus EPW file or an `Epw` object.

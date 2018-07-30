@@ -19,7 +19,7 @@ macro_dict <-
 `.` = `.GRP` = `.I` = `.N` = `.SD` = NULL
 utils::globalVariables(c(
     "Case", "DateTime", "Day", "Hour", "J", "KeyValue", "Minute", "Month", "N",
-    "Name", "V1", "all_name_upper", "arch", "assigned_new_name",
+    "Name", "V1", "all_name_upper", "arch", "assigned_new_name", "auto",
     "autocalculatable", "autosizable", "base", "begin_environment",
     "begin_extensible", "check_lower", "check_upper", "choice", "choice_id",
     "class_group", "class_id", "class_name", "class_name_in", "class_rleid",
@@ -34,7 +34,7 @@ utils::globalVariables(c(
     "file_name", "first_extensible", "found", "full_ipname", "full_name",
     "group", "group_id", "group_name", "grp", "has_default",
     "has_external_list", "has_object_list", "has_range", "has_reference",
-    "hour", "id_list", "idx", "index", "info", "input", "input_index",
+    "header", "hour", "id_list", "idx", "index", "info", "input", "input_index",
     "ip_unit", "ip_units", "is_default", "is_extensible", "is_name", "key",
     "last_extensible", "last_index", "last_req_ext", "last_required",
     "leading_spaces", "left_fields", "level", "level_index", "level_num",
@@ -46,14 +46,14 @@ utils::globalVariables(c(
     "num_obj", "num_str", "num_to_add", "num_values", "object_id",
     "object_list", "object_list_id", "object_list_rleid", "object_name",
     "object_name_upper", "object_order", "object_rleid", "old_exist",
-    "old_full_path", "os", "out", "possible_value_upper", "prerelease",
-    "range_id", "reference", "reference_class_name", "reference_id",
-    "reference_value_id", "referenced_by_object_id", "req", "required",
-    "required_field", "required_object", "res", "row_id", "same_dir",
-    "same_name_order", "seperate", "slash_key", "slash_key_value", "slash_loc",
-    "slash_supported", "slash_value", "slash_value_upper", "space_loc",
-    "special_key", "special_loc", "special_value", "string", "time", "type",
-    "unique_object", "unit", "unitsbasedonfield", "upper_incbounds",
-    "use_input_name", "value", "value_count", "value_id", "value_in",
-    "value_ipnum", "value_num", "value_upper"))
+    "old_full_path", "os", "out", "possible_value", "possible_value_upper",
+    "prerelease", "range_id", "reference", "reference_class_name",
+    "reference_id", "reference_value_id", "referenced_by_object_id", "req",
+    "required", "required_field", "required_object", "res", "res_ran", "row_id",
+    "same_dir", "same_name_order", "seperate", "slash_key", "slash_key_value",
+    "slash_loc", "slash_supported", "slash_value", "slash_value_upper",
+    "space_loc", "special_key", "special_loc", "special_value", "string",
+    "time", "type", "unique_object", "unit", "unitsbasedonfield",
+    "upper_incbounds", "use_input_name", "value", "value_count", "value_id",
+    "value_in", "value_ipnum", "value_num", "value_upper"))
 # }}}

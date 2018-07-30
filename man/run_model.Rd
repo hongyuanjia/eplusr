@@ -35,15 +35,20 @@ information to the console.  If \code{FALSE}, which is default, a
 \item{parallel_backend}{Acceptable input for \code{\link[future:plan]{future::plan()}}.}
 }
 \description{
-\code{run_idf} is a wrapper of EnergyPlus command line interface which enables to
-run EnergyPlus model with different options.  \code{run_multi} provides the
-functionality of running multiple models in parallel.
+\code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
+run EnergyPlus model with different options.
 }
 \details{
-Behind the scene, \code{run_multi} uses the package \code{furrr} which provides apply
-mapping functions in parallel using package \code{future}. It is suggested to run
-simulation using \code{Job} class, which provides much more controls on simulation
-and also methods to extract simulation results.
+\code{run_multi()} provides the functionality of running multiple models in
+parallel.
+
+Behind the scene, \code{run_multi()} uses the
+\href{https://cran.r-project.org/package=furrr}{furrr} package which provides
+mapping functions in parallel using
+\href{https://cran.r-project.org/package=future}{future} package. It is suggested
+to run simulations using \link[=job]{EplusJob} class, which provides much more
+detailed controls on the simulation and also methods to extract simulation
+output.
 }
 \examples{
 \dontrun{

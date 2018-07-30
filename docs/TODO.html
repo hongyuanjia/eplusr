@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Object reference • eplusr</title>
+<title>NA • eplusr</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:title" content="Object reference" />
+<meta property="og:title" content="NA" />
 
 
 
@@ -92,14 +92,21 @@
 <div class="row">
   <div class="contents col-md-9">
     <div class="page-header">
-      <h1>Object reference</h1>
+      <h1>NA</h1>
     </div>
 
-<div id="object-reference" class="section level1">
-
-<p>Classes like <code>Branch</code> and <code>ZoneHVAC:EquipmentList</code> reference other objects in fields “Component X Object Type” and “Zone Equipment 1 Object Type”, but they do not have <code>\object-list</code> attributes. This makes it impossible to detect invalid field references.</p>
-<p>One possible way is to use <code>$search_value()</code> to detect if the values in those fields could be targeted or not.</p>
-</div>
+<ul>
+<li>Object reference:
+<ul>
+<li>Classes like <code>Branch</code> and <code>ZoneHVAC:EquipmentList</code> reference other objects in fields “Component X Object Type” and “Zone Equipment 1 Object Type”, but they do not have <code>\object-list</code> attributes. This makes it impossible to detect invalid field references.</li>
+<li>One possible way is to use <code>$search_value()</code> to detect if the values in those fields could be targeted or not.</li>
+</ul>
+</li>
+<li><p>Add an optional <code>path</code> argument in <code>install_eplus()</code> to let the user specify a already downloaded EnergyPlus install exec.</p></li>
+<li><p>Model version conversion</p></li>
+<li><p>Add <code>$field_reference()</code> in <code>IddObject</code> class</p></li>
+<li><p>Add <code>$possible_value()</code> in <code>IdfObject</code> class</p></li>
+</ul>
 
   </div>
 

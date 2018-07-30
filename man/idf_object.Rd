@@ -7,9 +7,9 @@
 \description{
 \code{IdfObject} is an abstraction of a single object in an \code{Idf}. It provides
 more detail methods to modify objects. \code{IdfObject} can only be created from
-the parent \code{Idf} object, using \code{$object}, \code{$object_in_class} and
-\code{$search_object}. This is because that initialization of an \code{IdfObject} needs
-some shared data from parent \code{Idf} object.
+the parent \code{Idf} object, using \code{$object}, \code{$object_in_class()} and
+\code{$search_object()}. This is because that initialization of an \code{IdfObject}
+needs some shared data from parent \code{Idf} object.
 }
 \section{Usage}{
 
@@ -28,6 +28,7 @@ idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
+idfobj$possible_value(which = NULL)
 
 idfobj$validate()
 idfobj$is_valid()
@@ -54,21 +55,21 @@ idfobj$group_name()
 idfobj$class_name()
 }
 
-\code{$id} will return the object ID.
+\code{$id()} returns the object ID.
 
-\code{$name} will return the object name. If the class does not have name
+\code{$name()} returns the object name. If the class does not have name
 attribute, then \code{NA} will returned.
 
-\code{$group_name} returns the group name of this object belongs to.
+\code{$group_name()} returns the group name of this object belongs to.
 
-\code{$class_name} returns the class name of this object belongs to.
+\code{$class_name()} returns the class name of this object belongs to.
 }
 
 \section{Definition}{
 \preformatted{idfobj$definition()
 }
 
-\code{$definition} will return the definition, i.e. the \code{IddObject}, of current
+\code{$definition()} returns the definition, i.e. the \code{IddObject}, of current
 class. For details of \code{IddObject}, please see \link[=idd_object]{IddObject class}.
 }
 
@@ -77,9 +78,9 @@ class. For details of \code{IddObject}, please see \link[=idd_object]{IddObject 
 idfobj$set_comment(comment, append = TRUE, width = 0L)
 }
 
-\code{$get_comment} will return the comments of current object.
+\code{$get_comment()} returns the comments of current object.
 
-\code{$set_comment} will set comments of current object.
+\code{$set_comment()} sets comments of current object.
 
 \strong{Arguments}
 \itemize{
@@ -101,15 +102,16 @@ idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
+idfobj$possible_value(which = NULL)
 }
 
-\code{$get_value} will return a named list containing values of specified fields.
+\code{$get_value()} returns a named list containing values of specified fields.
 If simplify is \code{FALSE}, then all values will be converted into character
 and the converted character vector will be returned. Note that the field
 names will be coverted into valid R names, i.e. all charaters other than
 letters and numbers will be replaced by underscore("_").
 
-\code{$set_value} will set values of current object.
+\code{$set_value()} sets values of current object.
 
 eplusr also provides custom S3 method of \code{$}, \code{[[} and also \code{$<-} and
 \code{[[<-} to make it more convenient to get and set a single value of an
@@ -117,6 +119,11 @@ eplusr also provides custom S3 method of \code{$}, \code{[[} and also \code{$<-}
 \code{idfobj$FieldName <- Value} and \code{idfobj[[Field]] <- Value} is equivalent
 to \code{idfobj$set_value(Field = Value)},  where \code{FieldName} is a single valid
 field name and \code{Field} is a single valid field index or name.
+
+\code{$possible_value()} return all possible values for specified fields,
+including auto-value (\code{autosize} and \code{autocalculate}), default value,
+value range, choices and references. Underneath, it returns a data.table
+with custom printing method.
 
 \strong{Arguments}
 \itemize{
@@ -146,10 +153,10 @@ letters and numbers are replaced by underscores.
 idfobj$is_valid()
 }
 
-\code{$validate} will check if there are errors in current object under different
+\code{$validate()} will check if there are errors in current object under different
 strictness level.
 
-\code{$is_valid} will check if there are no errors in current object under
+\code{$is_valid()} will check if there are no errors in current object under
 different strictness level.
 
 The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_option()}}. Default is
@@ -173,16 +180,16 @@ idfobj$has_ref_by()
 idfobj$has_ref()
 }
 
-\code{$ref_from_object} will return other objects that current object references
+\code{$ref_from_object()} will return other objects that current object references
 from.
 
-\code{$ref_by_object} will return other objects that reference current object.
+\code{$ref_by_object()} will return other objects that reference current object.
 
-\code{$has_ref_from} and \code{$has_ref_by} will return \code{TRUE} if current object has
+\code{$has_ref_from()} and \code{$has_ref_by} will return \code{TRUE} if current object has
 referenced from other objects or has been referenced by other objects,
 respectively.
 
-\code{$has_ref} will return \code{TRUE} if current object has either referenced from
+\code{$has_ref()} will return \code{TRUE} if current object has either referenced from
 other objects or has been referenced by other objects.
 }
 
@@ -190,7 +197,7 @@ other objects or has been referenced by other objects.
 \preformatted{idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 }
 
-\code{$table} will return a data.table that contains all data of current object.
+\code{$table()} will return a data.table that contains all data of current object.
 
 \strong{Arguments}
 \itemize{
@@ -210,7 +217,7 @@ value of \code{eplusr_option("view_in_ip")}.
 \preformatted{idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 }
 
-\code{$string} will return the text format of current object.
+\code{$string()} will return the text format of current object.
 
 \strong{Arguments}
 \itemize{

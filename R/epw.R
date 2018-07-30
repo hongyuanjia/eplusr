@@ -118,11 +118,11 @@
 #' epw$set_data(data)
 #' ```
 #'
-#' `$path` returns the path of EPW file.
+#' `$path()` returns the path of EPW file.
 #'
-#' `$get_data` returns the core weather data.
+#' `$get_data()` returns the core weather data.
 #'
-#' `$set_data` replaces core weather data with input data. NOTE: This feature is
+#' `$set_data()` replaces core weather data with input data. NOTE: This feature is
 #'     experimental. There is no validation when replacing.
 #'
 #' **NOTE**: Even though `Epw` class provides methods to replace core weather data,
@@ -158,7 +158,7 @@ NULL
 
 #' Read and Parse EnergyPlus Weather File (EPW)
 #'
-#' `read_epw` parses an EPW file and returns an `Epw` object. The parsing
+#' `read_epw()` parses an EPW file and returns an `Epw` object. The parsing
 #' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
 #' with some simplifications. For more details on `Epw`, please see [Epw Class][epw].
 #'

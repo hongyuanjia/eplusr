@@ -136,11 +136,11 @@ epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
 }
 
-\code{$path} returns the path of EPW file.
+\code{$path()} returns the path of EPW file.
 
-\code{$get_data} returns the core weather data.
+\code{$get_data()} returns the core weather data.
 
-\code{$set_data} replaces core weather data with input data. NOTE: This feature is
+\code{$set_data()} replaces core weather data with input data. NOTE: This feature is
 experimental. There is no validation when replacing.
 
 \strong{NOTE}: Even though \code{Epw} class provides methods to replace core weather data,

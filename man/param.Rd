@@ -45,21 +45,21 @@ param$print()
 param$weather()
 }
 
-\code{$seed} will return the input \code{Idf} object.
+\code{$seed()} will return the input \code{Idf} object.
 
-\code{$weather} will return the input \code{Epw} object.
+\code{$weather()} will return the input \code{Epw} object.
 }
 
 \section{Apply Design Alternatives}{
 \preformatted{param$apply_measure(measure, ..., .names = NULL)
 }
 
-\code{$apply_measure} allows to apply a measure to an \code{Idf} and creates parametric
-models for analysis. Basically, a measure is just a function that takes
-an \code{Idf} object and other arguments as input, and returns a modified \code{Idf}
-object as output. Use \code{...} to supply different arguments to that
-measure. Under the hook, \code{\link[=mapply]{mapply()}} is used to create multiple \code{Idf}s
-according to the input values.
+\code{$apply_measure()} allows to apply a measure to an \code{Idf} and creates
+parametric models for analysis. Basically, a measure is just a function
+that takes an \code{Idf} object and other arguments as input, and returns a
+modified \code{Idf} object as output. Use \code{...} to supply different arguments
+to that measure. Under the hook, \code{\link[=mapply]{mapply()}} is used to create multiple
+\code{Idf}s according to the input values.
 
 \strong{Arguments}
 \itemize{

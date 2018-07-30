@@ -15,8 +15,8 @@ param_job(idf, epw)
 A \code{ParametricJob} object.
 }
 \description{
-\code{param_job} takes an IDF and EPW as input and returns a \code{ParametricJob}. For
-details on \code{ParametricJob}, please see \link[=param]{ParametricJob class}.
+\code{param_job()} takes an IDF and EPW as input and returns a \code{ParametricJob}.
+For details on \code{ParametricJob}, please see \link[=param]{ParametricJob class}.
 }
 \seealso{
 \code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.

@@ -14,19 +14,20 @@ NULL
 #'
 #' @details
 #'
-#' `use_eplus` adds an EnergyPlus version into the EnergyPlus version
+#' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version
 #' dictionary in eplusr.
 #'
-#' `eplus_config` returns the configure data of specified version of
+#' `eplus_config()` returns the configure data of specified version of
 #' EnergyPlus.
 #'
-#' `avail_eplus` returns all available EnergyPlus found.
+#' `avail_eplus()` returns all available EnergyPlus found.
 #'
-#' `is_avail_eplus` checks if the specified version of EnergyPlus is
+#' `is_avail_eplus()` checks if the specified version of EnergyPlus is
 #' available or not.
 #'
-#' @return For `eplus_config`, the configure data of specified version of
-#'         EnergyPlus.
+#' @return For `eplus_config()`, the configure data (a list) of specified
+#'     version of EnergyPlus; for `avail_eplus()`, a character vector; for
+#'     `is_avis_avail_eplus()`, a scalar logical vector.
 #' @rdname use_eplus
 #' @examples
 #' \dontrun{
@@ -142,9 +143,11 @@ clean_wd <- function (path) {
 
 #' Run simulations of EnergyPlus models.
 #'
-#' `run_idf` is a wrapper of EnergyPlus command line interface which enables to
-#' run EnergyPlus model with different options.  `run_multi` provides the
-#' functionality of running multiple models in parallel.
+#' `run_idf()` is a wrapper of EnergyPlus command line interface which enables to
+#' run EnergyPlus model with different options.
+#'
+#' `run_multi()` provides the functionality of running multiple models in
+#' parallel.
 #'
 #' @param eplus An acceptable input of [use_eplus()] and [eplus_config()].
 #' @param model A path of an EnergyPlus IDF or IMF file.
@@ -161,10 +164,13 @@ clean_wd <- function (path) {
 #' @param parallel_backend Acceptable input for [future::plan()].
 #'
 #' @details
-#' Behind the scene, `run_multi` uses the package `furrr` which provides apply
-#' mapping functions in parallel using package `future`. It is suggested to run
-#' simulation using `Job` class, which provides much more controls on simulation
-#' and also methods to extract simulation results.
+#' Behind the scene, `run_multi()` uses the
+#' [furrr](https://cran.r-project.org/package=furrr) package which provides
+#' mapping functions in parallel using
+#' [future](https://cran.r-project.org/package=future) package. It is suggested
+#' to run simulations using [EplusJob][job] class, which provides much more
+#' detailed controls on the simulation and also methods to extract simulation
+#' output.
 #'
 #' @references
 #' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)

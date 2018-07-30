@@ -15,7 +15,7 @@ eplus_job(idf, epw)
 An \code{EplusJob} object.
 }
 \description{
-\code{eplus_job} takes an IDF and EPW as input, and returns an \code{EplusJob} object
+\code{eplus_job()} takes an IDF and EPW as input, and returns an \code{EplusJob} object
 for running EnergyPlus simulation and collecting outputs. For more details,
 please see \link{job}.
 }

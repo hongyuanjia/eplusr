@@ -45,7 +45,6 @@ objects in classes are shown in square bracket.
 
 
 \preformatted{
-# basic info
 model$version()
 model$path()
 model$group_name(all = FALSE)
@@ -53,24 +52,20 @@ model$class_name(all = FALSE)
 model$is_valid_group(group, all = FALSE)
 model$is_valid_class(class, all = FALSE)
 
-# definitaion
 model$definition(class)
 
-# object info
 model$object_id(class = NULL, simplify = FALSE)
 model$object_name(class = NULL, simplify = FALSE)
 model$object_num(class = NULL)
 model$is_valid_id(id)
 model$is_valid_name(name)
 
-# object query
 model$object(id)
 model$object_in_class(class)
 model$search_object(pattern, class = NULL)
 model$ClassName
 model[[ClassName]]
 
-# model modification
 model$dup_object(object, new_name = NULL)
 model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
 model$ins_object(object)
@@ -79,25 +74,20 @@ model$del_object(object, referenced = FALSE)
 model$search_value(pattern)
 model$replace_value(pattern, replacement)
 
-# model validation
 model$validate()
 model$is_valid
 
-# model formatting
 model$string(comment = TRUE, header = TRUE, ...)
 
-# model saving
 model$is_unsaved()
 model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 
-# model clone
 model$clone()
 
-# run simulation
 model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
 
-# print
 model$print(plain = FALSE)
+print(model)
 }
 }
 
@@ -110,22 +100,22 @@ model$is_valid_group(group, all = FALSE)
 model$is_valid_class(class, all = FALSE)
 }
 
-\code{$version} will return the version of current model.
+\code{$version()} will return the version of current model.
 
-\code{$path} will return the path of current model or \code{NULL} if the model is
+\code{$path()} will return the path of current model or \code{NULL} if the model is
 created using a character vector.
 
-\code{$group_name} will return all groups the model contains when \code{all} is \code{FALSE}
+\code{$group_name()} will return all groups the model contains when \code{all} is \code{FALSE}
 or all groups the Idd contains when \code{all} is \code{TRUE}.
 
-\code{$class_name} will return all classes the model contains when \code{all} is \code{FALSE}
+\code{$class_name()} will return all classes the model contains when \code{all} is \code{FALSE}
 or all classes the Idd contains when \code{all} is \code{TRUE}.
 
-\code{$is_valid_group} will return \code{TRUE}s if given group names are valid for
+\code{$is_valid_group()} will return \code{TRUE}s if given group names are valid for
 current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} is
 \code{TRUE}).
 
-\code{$is_valid_class} will return \code{TRUE}s if given class names are valid for
+\code{$is_valid_class()} will return \code{TRUE}s if given class names are valid for
 current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} is
 \code{TRUE}).
 
@@ -142,7 +132,7 @@ current model (when \code{all} is \code{FALSE}) or current Idd (when \code{all} 
 \preformatted{model$definition(class)
 }
 
-\code{$definition} will return the definitions, i.e. the \code{IddObject}s, of given
+\code{$definition()} will return the definitions, i.e. the \code{IddObject}s, of given
 classes which contain all data used for parsing \code{IdfObject}s. For details
 of \code{IdfObject}, please see \link[=idd_object]{IddObject class}.
 
@@ -160,15 +150,15 @@ model$is_valid_id(id)
 model$is_valid_name(name)
 }
 
-\code{$object_id} and \code{$object_name} will return all object IDs and names
-in specified class respectively. For \code{$object_name}, if the specified
+\code{$object_id()} and \code{$object_name()} will return all object IDs and names
+in specified class respectively. For \code{$object_name()}, if the specified
 class does not have name attributes, such as \code{SimulationContrl}, \code{NA}
 will be returned.
 
-\code{$is_valid_id} and \code{$is_valid_name} will return \code{TRUE}s if given integers or
-strings are valid object IDs or object names respectively.
+\code{$is_valid_id()} and \code{$is_valid_name()} will return \code{TRUE}s if given integers
+or strings are valid object IDs or object names respectively.
 
-\code{$object_num} will return the number of objects in specified classes.
+\code{$object_num()} will return the number of objects in specified classes.
 
 \strong{Arguments}
 \itemize{
@@ -192,13 +182,13 @@ model$ClassName
 model[[ClassName]]
 }
 
-\code{$object} will return a list of \code{IdfObject}s specified by object IDs or
+\code{$object()} will return a list of \code{IdfObject}s specified by object IDs or
 names.
 
-\code{$object_in_class} will return a list of all \code{IdfObject}s in specified
+\code{$object_in_class()} will return a list of all \code{IdfObject}s in specified
 classes.
 
-\code{$search_object} will return a list of \code{IdfObject}s whose names meet the
+\code{$search_object()} will return a list of \code{IdfObject}s whose names meet the
 given pattern in specified classes.
 
 eplusr also provides custom S3 method of \code{$} and \code{[[} to make it more
@@ -236,22 +226,26 @@ model$search_value(pattern)
 model$replace_value(pattern, replacement)
 }
 
-\code{$dup_object} will duplicate objects specified by object IDs or names. The
+\code{$dup_object()} will duplicate objects specified by object IDs or names. The
 newly created objects will be renamed automatically if new names are not
 given, with a suffix \code{"_1"}, \code{"_2"} and etc.
 
-\code{$add_object} will add objects in the specified class.
+\code{$add_object()} will add objects in the specified class.
 
-\code{$ins_object} will insert objects from other IDF into current IDF.
+\code{$ins_object()} will insert objects from other IDF into current IDF.
 
-\code{$set_object} will set the value of fields in the objects specified by object
+\code{$set_object()} will set the value of fields in the objects specified by object
 IDs or names.
 
-\code{$del_object} will delete objects specified by object IDs or names.
+\code{$del_object()} will delete objects specified by object IDs or names.
 
-\code{$search_value} will return values that match the given pattern.
+\code{$search_value()} will return values that match the given pattern.
 
-\code{$replace_value} will return replace values that match the given pattern.
+\code{$replace_value()} will return replace values that match the given pattern.
+
+\strong{NOTE}: There is no field validation when using \code{$replace_value()} to
+change field values. \code{$replace_value()} should be treated as a low-level
+method which should be used with caution.
 
 \strong{Arguments}
 \itemize{
@@ -283,10 +277,10 @@ will also be deleted.
 model$is_valid()
 }
 
-\code{$validate} will check if there are errors in current model under different
+\code{$validate()} will check if there are errors in current model under different
 strictness level.
 
-\code{$is_valid} will check if there are no errors in current model under different
+\code{$is_valid()} will check if there are no errors in current model under different
 strictness level.
 
 The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_option()}}. Default is
@@ -306,7 +300,7 @@ and invalid field value reference will also be done.
 \preformatted{model$string(comment = TRUE, header = TRUE)
 }
 
-\code{$string} will return the text format of an IDF file.
+\code{$string()} will return the text format of an IDF file.
 
 \strong{Arguments}
 \itemize{
@@ -349,10 +343,10 @@ Default is \code{FALSE}.
 \preformatted{model$clone(deep = FALSE)
 }
 
-\code{$clone} will copy and returned the cloned model. Because \code{Idf} use
-\code{R6Class} under the hook, \code{idf_2 <- idf_1} does not copy \code{idf_1} at all but
-only create a new binding to \code{idf_1}. Modify \code{idf_1} will also affect \code{idf_2}
-as well, as these two are exactly the same thing underneath.
+\code{$clone()} will copy and returned the cloned model. Because \code{Idf} use
+\code{R6Class} under the hook, \code{idf_2 <- idf_1} does not copy \code{idf_1} at all
+but only create a new binding to \code{idf_1}. Modify \code{idf_1} will also affect
+\code{idf_2} as well, as these two are exactly the same thing underneath.
 
 \strong{Arguments}
 \itemize{
@@ -365,7 +359,7 @@ method provided by \code{R6Class}.
 \preformatted{model$run(weather, dir = NULL, wait = TRUE, force = FALSE)
 }
 
-\code{$run} will run the current model within specified weather using
+\code{$run()} will run the current model within specified weather using
 corresponding version of EnergyPlus. The model and the weather used will
 be copied to the output directory. An \code{EplusJob} will be returned which
 provides detailed info of the simulation and methods to collect
@@ -396,7 +390,7 @@ simulation again.
 print(model)
 }
 
-\code{$print} will print the model in the similar format as what you will see in
+\code{$print()} will print the model in the similar format as what you will see in
 IDFEditor.
 
 \strong{Arguments}

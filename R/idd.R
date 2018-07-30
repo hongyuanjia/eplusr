@@ -82,35 +82,35 @@
 #'
 #' @section Detail:
 #'
-#' `$version` returns the version string.
+#' `$version()` returns the version string.
 #'
-#' `$build` returns the build tag string.
+#' `$build()` returns the build tag string.
 #'
-#' `$group_index` returns integer indexes (indexes of name appearance in
+#' `$group_index()` returns integer indexes (indexes of name appearance in
 #'     the IDD file) of specified groups.
 #'
-#' `$group_name` returns all group names.
+#' `$group_name()` returns all group names.
 #'
-#' `$from_group` returns the names of group that specified classes belongs to.
+#' `$from_group()` returns the names of group that specified classes belongs to.
 #'
-#' `$is_valid_group` return `TRUE` if the input is a valid group name.
+#' `$is_valid_group()` return `TRUE` if the input is a valid group name.
 #'
-#' `$class_index` returns integer indexes (indexes of name appearance in
+#' `$class_index()` returns integer indexes (indexes of name appearance in
 #' the IDD file) of specified classes.
 #'
-#' `$class_name` returns all class names.
+#' `$class_name()` returns all class names.
 #'
-#' `$required_class_name` returns the names of all required classes.
+#' `$required_class_name()` returns the names of all required classes.
 #'
-#' `$unique_class_name` returns the names of all unique classes.
+#' `$unique_class_name()` returns the names of all unique classes.
 #'
-#' `$extensible_class_name` returns the names of all extensible classes.
+#' `$extensible_class_name()` returns the names of all extensible classes.
 #'
-#' `$is_valid_class` return `TRUE` if the input is a valid class name.
+#' `$is_valid_class()` return `TRUE` if the input is a valid class name.
 #'
-#' `$object` returns a list of `IddObject`s of specified classes.
+#' `$objectN` returns a list of `IddObject`s of specified classes.
 #'
-#' `$object_in_group` returns a list of `IddObject`s in that group.
+#' `$object_in_group()` returns a list of `IddObject`s in that group.
 #'
 #' eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
 #' more convenient to get a single `IddObject`. Basically, `idd$ClassName` and
@@ -293,16 +293,16 @@ read_idd <- function (path) {
 
 #' Use a specific EnergyPlus Input Data Dictionary (IDD) file
 #'
-#' `use_idd` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+#' `use_idd()` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 #' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
 #' class, please see [idd].
 #'
-#' `download_idd` downloads specified version of EnergyPlus IDD file from
+#' `download_idd()` downloads specified version of EnergyPlus IDD file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus).
 #'
-#' `avail_idd` returns versions of all cached `Idd` object.
+#' `avail_idd()` returns versions of all cached `Idd` object.
 #'
-#' `is_avail_idd` returns `TRUE` if input version of IDD file has been parsed
+#' `is_avail_idd()` returns `TRUE` if input version of IDD file has been parsed
 #' and cached.
 #'
 #' @param idd A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
@@ -327,7 +327,7 @@ read_idd <- function (path) {
 #' `"Energy+.idd"` distributed with EnergyPlus will be parsed and stored in
 #' eplusr Idd cache.
 #'
-#' `download_idd` downloads EnergyPlus Input Data Dictionary (IDD) file from
+#' `download_idd()` downloads EnergyPlus Input Data Dictionary (IDD) file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
 #' useful in case where you only want to edit an EnergyPlus Input Data File
 #' (IDF) directly but do not want to install whole EnergyPlus software.

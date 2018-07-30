@@ -2,13 +2,12 @@
 #'
 #' `IddObject` is an abstraction of a single object in an `Idd`. It provides
 #' more detail methods to query field properties. `IddObject` can only be
-#' created from the parent `Idd` object, using `$object` and `$object_in_group`.
-#' This is because that initialization of an `IddObject` needs
-#' some shared data from parent `Idd` object.
+#' created from the parent `Idd` object, using `$object()` and
+#' `$object_in_group()`.  This is because that initialization of an `IddObject`
+#' needs some shared data from parent `Idd` object.
 #'
 #' @section Usage:
 #' ```
-#' # class properties
 #' iddobj$group_name()
 #' iddobj$group_index()
 #' iddobj$class_name()
@@ -21,17 +20,14 @@
 #' iddobj$first_extensible_index()
 #' iddobj$extensible_group_num()
 #'
-#' # extensible group
 #' iddobj$add_extensible_group(num = 1L)
 #' iddobj$del_extensible_group(num = 1L)
 #'
-#' # class property assertions
 #' iddobj$has_name()
 #' iddobj$is_required()
 #' iddobj$is_unique()
 #' iddobj$is_extensible()
 #'
-#' # field properties
 #' iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
 #' iddobj$field_index(name = NULL)
 #' iddobj$field_type(which = NULL)
@@ -41,7 +37,6 @@
 #' iddobj$field_choice(which = NULL)
 #' iddobj$field_range(which = NULL)
 #'
-#' # field property assertions
 #' iddobj$is_valid_field_num(num)
 #' iddobj$is_extensible_index(index)
 #' iddobj$is_valid_field_name(name)
@@ -72,69 +67,69 @@
 #'
 #' @section Detail:
 #'
-#' `$group_index` returns the index of group this class belongs to.
+#' `$group_index()` returns the index of group this class belongs to.
 #'
-#' `$group_name` returns the name of group this class belongs to.
+#' `$group_name()` returns the name of group this class belongs to.
 #'
-#' `$class_index` returns the index of this class.
+#' `$class_index()` returns the index of this class.
 #'
-#' `$class_name` returns the name of this class.
+#' `$class_name()` returns the name of this class.
 #'
-#' `$min_fields` returns the minimum fields required for this class.
+#' `$min_fields()` returns the minimum fields required for this class.
 #'     If no required, `0` is returned.
 #'
-#' `$num_fields` returns current total number of fields in this class. This
+#' `$num_fields()` returns current total number of fields in this class. This
 #'     number may change if the class is extensible and after
-#'     `$add_extensible_group` or `$del_extensible_group`.
+#'     `$add_extensible_group()` or `$del_extensible_group()`.
 #'
-#' `$memo` returns memo of this class.
+#' `$memo()` returns memo of this class.
 #'
-#' `$num_extensible` returns the number of extensible fields in this class.
+#' `$num_extensible()` returns the number of extensible fields in this class.
 #'
-#' `$first_extensible_index` returns the field index of the first extensible
+#' `$first_extensible_index()` returns the field index of the first extensible
 #'     field in this class. If this class is not extensible, `0` is return.
 #'
-#' `$extensible_group_num` returns the number of extensible groups in this
+#' `$extensible_group_num()` returns the number of extensible groups in this
 #'     class.
 #'
-#' `$add_extensible_groups` adds extensible groups in this class.
+#' `$add_extensible_groups()` adds extensible groups in this class.
 #'
-#' `$del_extensible_groups` deletes extensible groups in this class.
+#' `$del_extensible_groups()` deletes extensible groups in this class.
 #'
-#' `$has_name` return `TRUE` if this class has name attribute.
+#' `$has_name()` return `TRUE` if this class has name attribute.
 #'
-#' `$is_unique` return `TRUE` if this class is unique.
+#' `$is_unique()` return `TRUE` if this class is unique.
 #'
-#' `$is_required` returns `TRUE` if this class is required.
+#' `$is_required()` returns `TRUE` if this class is required.
 #'
-#' `$is_extensible` returns `TRUE` if this class is extensible.
+#' `$is_extensible()` returns `TRUE` if this class is extensible.
 #'
-#' `$field_name` returns names of fields specified by field indexes.  If `index`
+#' `$field_name()` returns names of fields specified by field indexes.  If `index`
 #'     is `NULL`, names of all fields in this class are returned. If `lower` is
 #'     `TRUE`, "lower-style" names are returned, i.e. all spaces and dashes is
 #'     replaced by underscores. If `unit` is `TRUE`, the units of those fields
 #'     are also returned.  If `in_ip`, corresponding imperial units are
 #'     returned. It only has effect when `unit` is `TRUE`.
 #'
-#' `$field_index` returns indexes of fields specified by field names. If `name`
+#' `$field_index()` returns indexes of fields specified by field names. If `name`
 #'     is `NULL`, indexes of all fields in this class are returned.
 #'
-#' All other `$field_*` returns specific field properties. If `which` is `NULL`,
+#' All other `$field_*()` returns specific field properties. If `which` is `NULL`,
 #'     properties of all fields in this class are returned.
 #'
-#'   * `$field_type`: returns field types. All possible values are
+#'   * `$field_type`(): returns field types. All possible values are
 #'     `"integer"`, `"real"`, `"alpha"` (arbitrary string), `"choice"` (alpha
 #'     with specific list of choices), `"object-list"` (link to a list of
 #'     objects defined elsewhere), `"external-list"` (uses a special list from
 #'     an external source) and `"node"` (name used in connecting HVAC
 #'     components).
-#'   * `$field_unit`: returns a character vector of field units. If `in_ip` is
+#'   * `$field_unit()`: returns a character vector of field units. If `in_ip` is
 #'     `TRUE`, IP unites are returned.
-#'   * `$field_default`: returns a list of default values of those fields. If
+#'   * `$field_default()`: returns a list of default values of those fields. If
 #'     no defaults found, `NA`s are returned.
-#'   * `$field_choice`: returns a list of all valid choices for those fields.
+#'   * `$field_choice()`: returns a list of all valid choices for those fields.
 #'     If no choices found, `NA`s are returned.
-#'   * `$field_range`: returns a list of ranges for those fields. Every range
+#'   * `$field_range()`: returns a list of ranges for those fields. Every range
 #'     has four components: `minimum` (lower limit), `lower_incbounds` (`TRUE`
 #'     if the lower limit should be included), `maximum` (upper limit), and
 #'     `upper_incbounds` (`TRUE` if the upper limit should be included). For
@@ -143,28 +138,28 @@
 #'     `lower_incbounds` is set to FALSE, `upper` is set to `Inf`, and
 #'     `upper_incbounds` is set to FALSE.
 #'
-#' `$is_valid_field_num` returns `TRUE` if `num` is acceptable as a total number
+#' `$is_valid_field_num()` returns `TRUE` if `num` is acceptable as a total number
 #' of fields in this class. Extensible property is considered. For instance, The
 #' total number of fields defined in IDD for class `BuildingSurfaces:Detailed`
 #' is 390. However, 396 is still a valid field number for this class as the
 #' number of field in the extensible group is 3.
 #'
-#' `$is_valid_field_name` returns `TRUE` if `name` is a valid field name
+#' `$is_valid_field_name()` returns `TRUE` if `name` is a valid field name
 #'     **WITHOUT** unit.
 #'
-#' `$is_valid_field_index` returns `TRUE` if `index` is a valid field index.
+#' `$is_valid_field_index()` returns `TRUE` if `index` is a valid field index.
 #'
-#' `$is_autosizable_field` returns `TRUE` if the field can be assigned to
+#' `$is_autosizable_field()` returns `TRUE` if the field can be assigned to
 #'     `autosize`.
 #'
-#' `$is_autocalculatable_field` returns `TRUE` if the field can be assigned to
+#' `$is_autocalculatable_field()` returns `TRUE` if the field can be assigned to
 #'     `autocalculate`.
 #'
-#' `$is_numeric_field` returns `TRUE` if the field value should be numeric.
+#' `$is_numeric_field()` returns `TRUE` if the field value should be numeric.
 #'
-#' `$is_integer_field` returns `TRUE` if the field value should be an integer.
+#' `$is_integer_field()` returns `TRUE` if the field value should be an integer.
 #'
-#' `$is_required_field` returns `TRUE` if the field is required.
+#' `$is_required_field()` returns `TRUE` if the field is required.
 #'
 #' @docType class
 #' @name idd_object

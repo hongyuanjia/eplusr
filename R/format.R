@@ -383,8 +383,8 @@ print.IdfFieldPossible <- function (x, ...) {
 
 #' @importFrom cli cat_line
 #' @export
-# print.field_range {{{
-print.field_range <- function (x, ...) {
+# print.IdfFieldRange {{{
+print.IdfFieldRange <- function (x, ...) {
     if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
         cat("<Not Applicable>")
         return(invisible(NULL))

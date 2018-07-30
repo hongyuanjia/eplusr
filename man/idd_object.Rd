@@ -7,13 +7,12 @@
 \description{
 \code{IddObject} is an abstraction of a single object in an \code{Idd}. It provides
 more detail methods to query field properties. \code{IddObject} can only be
-created from the parent \code{Idd} object, using \code{$object} and \code{$object_in_group}.
-This is because that initialization of an \code{IddObject} needs
-some shared data from parent \code{Idd} object.
+created from the parent \code{Idd} object, using \code{$object()} and
+\code{$object_in_group()}.  This is because that initialization of an \code{IddObject}
+needs some shared data from parent \code{Idd} object.
 }
 \section{Usage}{
-\preformatted{# class properties
-iddobj$group_name()
+\preformatted{iddobj$group_name()
 iddobj$group_index()
 iddobj$class_name()
 iddobj$class_index()
@@ -25,17 +24,14 @@ iddobj$num_extensible()
 iddobj$first_extensible_index()
 iddobj$extensible_group_num()
 
-# extensible group
 iddobj$add_extensible_group(num = 1L)
 iddobj$del_extensible_group(num = 1L)
 
-# class property assertions
 iddobj$has_name()
 iddobj$is_required()
 iddobj$is_unique()
 iddobj$is_extensible()
 
-# field properties
 iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
 iddobj$field_index(name = NULL)
 iddobj$field_type(which = NULL)
@@ -45,7 +41,6 @@ iddobj$field_default(which = NULL, in_ip = getOption("eplusr.view_in_ip")
 iddobj$field_choice(which = NULL)
 iddobj$field_range(which = NULL)
 
-# field property assertions
 iddobj$is_valid_field_num(num)
 iddobj$is_extensible_index(index)
 iddobj$is_valid_field_name(name)
@@ -81,69 +76,69 @@ names. Field names can be given in "lower-style".
 \section{Detail}{
 
 
-\code{$group_index} returns the index of group this class belongs to.
+\code{$group_index()} returns the index of group this class belongs to.
 
-\code{$group_name} returns the name of group this class belongs to.
+\code{$group_name()} returns the name of group this class belongs to.
 
-\code{$class_index} returns the index of this class.
+\code{$class_index()} returns the index of this class.
 
-\code{$class_name} returns the name of this class.
+\code{$class_name()} returns the name of this class.
 
-\code{$min_fields} returns the minimum fields required for this class.
+\code{$min_fields()} returns the minimum fields required for this class.
 If no required, \code{0} is returned.
 
-\code{$num_fields} returns current total number of fields in this class. This
+\code{$num_fields()} returns current total number of fields in this class. This
 number may change if the class is extensible and after
-\code{$add_extensible_group} or \code{$del_extensible_group}.
+\code{$add_extensible_group()} or \code{$del_extensible_group()}.
 
-\code{$memo} returns memo of this class.
+\code{$memo()} returns memo of this class.
 
-\code{$num_extensible} returns the number of extensible fields in this class.
+\code{$num_extensible()} returns the number of extensible fields in this class.
 
-\code{$first_extensible_index} returns the field index of the first extensible
+\code{$first_extensible_index()} returns the field index of the first extensible
 field in this class. If this class is not extensible, \code{0} is return.
 
-\code{$extensible_group_num} returns the number of extensible groups in this
+\code{$extensible_group_num()} returns the number of extensible groups in this
 class.
 
-\code{$add_extensible_groups} adds extensible groups in this class.
+\code{$add_extensible_groups()} adds extensible groups in this class.
 
-\code{$del_extensible_groups} deletes extensible groups in this class.
+\code{$del_extensible_groups()} deletes extensible groups in this class.
 
-\code{$has_name} return \code{TRUE} if this class has name attribute.
+\code{$has_name()} return \code{TRUE} if this class has name attribute.
 
-\code{$is_unique} return \code{TRUE} if this class is unique.
+\code{$is_unique()} return \code{TRUE} if this class is unique.
 
-\code{$is_required} returns \code{TRUE} if this class is required.
+\code{$is_required()} returns \code{TRUE} if this class is required.
 
-\code{$is_extensible} returns \code{TRUE} if this class is extensible.
+\code{$is_extensible()} returns \code{TRUE} if this class is extensible.
 
-\code{$field_name} returns names of fields specified by field indexes.  If \code{index}
+\code{$field_name()} returns names of fields specified by field indexes.  If \code{index}
 is \code{NULL}, names of all fields in this class are returned. If \code{lower} is
 \code{TRUE}, "lower-style" names are returned, i.e. all spaces and dashes is
 replaced by underscores. If \code{unit} is \code{TRUE}, the units of those fields
 are also returned.  If \code{in_ip}, corresponding imperial units are
 returned. It only has effect when \code{unit} is \code{TRUE}.
 
-\code{$field_index} returns indexes of fields specified by field names. If \code{name}
+\code{$field_index()} returns indexes of fields specified by field names. If \code{name}
 is \code{NULL}, indexes of all fields in this class are returned.
 
-All other \code{$field_*} returns specific field properties. If \code{which} is \code{NULL},
+All other \code{$field_*()} returns specific field properties. If \code{which} is \code{NULL},
 properties of all fields in this class are returned.
 \itemize{
-\item \code{$field_type}: returns field types. All possible values are
+\item \code{$field_type}(): returns field types. All possible values are
 \code{"integer"}, \code{"real"}, \code{"alpha"} (arbitrary string), \code{"choice"} (alpha
 with specific list of choices), \code{"object-list"} (link to a list of
 objects defined elsewhere), \code{"external-list"} (uses a special list from
 an external source) and \code{"node"} (name used in connecting HVAC
 components).
-\item \code{$field_unit}: returns a character vector of field units. If \code{in_ip} is
+\item \code{$field_unit()}: returns a character vector of field units. If \code{in_ip} is
 \code{TRUE}, IP unites are returned.
-\item \code{$field_default}: returns a list of default values of those fields. If
+\item \code{$field_default()}: returns a list of default values of those fields. If
 no defaults found, \code{NA}s are returned.
-\item \code{$field_choice}: returns a list of all valid choices for those fields.
+\item \code{$field_choice()}: returns a list of all valid choices for those fields.
 If no choices found, \code{NA}s are returned.
-\item \code{$field_range}: returns a list of ranges for those fields. Every range
+\item \code{$field_range()}: returns a list of ranges for those fields. Every range
 has four components: \code{minimum} (lower limit), \code{lower_incbounds} (\code{TRUE}
 if the lower limit should be included), \code{maximum} (upper limit), and
 \code{upper_incbounds} (\code{TRUE} if the upper limit should be included). For
@@ -153,28 +148,28 @@ numeric types with no specified ranges, \code{minimum} is set to \code{-Inf},
 \code{upper_incbounds} is set to FALSE.
 }
 
-\code{$is_valid_field_num} returns \code{TRUE} if \code{num} is acceptable as a total number
+\code{$is_valid_field_num()} returns \code{TRUE} if \code{num} is acceptable as a total number
 of fields in this class. Extensible property is considered. For instance, The
 total number of fields defined in IDD for class \code{BuildingSurfaces:Detailed}
 is 390. However, 396 is still a valid field number for this class as the
 number of field in the extensible group is 3.
 
-\code{$is_valid_field_name} returns \code{TRUE} if \code{name} is a valid field name
+\code{$is_valid_field_name()} returns \code{TRUE} if \code{name} is a valid field name
 \strong{WITHOUT} unit.
 
-\code{$is_valid_field_index} returns \code{TRUE} if \code{index} is a valid field index.
+\code{$is_valid_field_index()} returns \code{TRUE} if \code{index} is a valid field index.
 
-\code{$is_autosizable_field} returns \code{TRUE} if the field can be assigned to
+\code{$is_autosizable_field()} returns \code{TRUE} if the field can be assigned to
 \code{autosize}.
 
-\code{$is_autocalculatable_field} returns \code{TRUE} if the field can be assigned to
+\code{$is_autocalculatable_field()} returns \code{TRUE} if the field can be assigned to
 \code{autocalculate}.
 
-\code{$is_numeric_field} returns \code{TRUE} if the field value should be numeric.
+\code{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric.
 
-\code{$is_integer_field} returns \code{TRUE} if the field value should be an integer.
+\code{$is_integer_field()} returns \code{TRUE} if the field value should be an integer.
 
-\code{$is_required_field} returns \code{TRUE} if the field is required.
+\code{$is_required_field()} returns \code{TRUE} if the field is required.
 }
 
 \seealso{

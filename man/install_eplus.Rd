@@ -26,11 +26,15 @@ Download specified version of EnergyPlus for your platform from GitHub and
 install it.
 }
 \details{
-This function will try to install EnergyPlus into the default location, e.g.
-\file{C:/EnergyPlusVX-Y-0} on Windows, \file{/usr/local/EnergyPlus-X-Y-0} on
-Linux, and \file{/Applications/EnergyPlus-X-Y-0} on MacOS.
+\code{download_eplus()} downloads specified version of EnergyPlus from
+\href{https://github.com/NREL/EnergyPlus}{EnergyPlus Github Repository}.
+
+\code{install_eplus()} will try to install EnergyPlus into the default location,
+e.g.  \file{C:/EnergyPlusVX-Y-0} on Windows,
+\file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+\file{/Applications/EnergyPlus-X-Y-0} on MacOS.
 
 Note that the installation process requires administrative privileges
-required during the installation and you may need to pass password to enable
-sudo commands used for installation.
+during the installation and you have to run R with administrator (or with
+sudo if you are on Linux) to make it work.
 }

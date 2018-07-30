@@ -36,7 +36,6 @@
 #' @section Usage:
 #'
 #' \preformatted{
-#' # basic info
 #' model$version()
 #' model$path()
 #' model$group_name(all = FALSE)
@@ -44,24 +43,20 @@
 #' model$is_valid_group(group, all = FALSE)
 #' model$is_valid_class(class, all = FALSE)
 #'
-#' # definitaion
 #' model$definition(class)
 #'
-#' # object info
 #' model$object_id(class = NULL, simplify = FALSE)
 #' model$object_name(class = NULL, simplify = FALSE)
 #' model$object_num(class = NULL)
 #' model$is_valid_id(id)
 #' model$is_valid_name(name)
 #'
-#' # object query
 #' model$object(id)
 #' model$object_in_class(class)
 #' model$search_object(pattern, class = NULL)
 #' model$ClassName
 #' model[[ClassName]]
 #'
-#' # model modification
 #' model$dup_object(object, new_name = NULL)
 #' model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
 #' model$ins_object(object)
@@ -70,25 +65,20 @@
 #' model$search_value(pattern)
 #' model$replace_value(pattern, replacement)
 #'
-#' # model validation
 #' model$validate()
 #' model$is_valid
 #'
-#' # model formatting
 #' model$string(comment = TRUE, header = TRUE, ...)
 #'
-#' # model saving
 #' model$is_unsaved()
 #' model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 #'
-#' # model clone
 #' model$clone()
 #'
-#' # run simulation
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
 #'
-#' # print
 #' model$print(plain = FALSE)
+#' print(model)
 #' }
 #'
 #' @section Basic Info:
@@ -101,22 +91,22 @@
 #' model$is_valid_class(class, all = FALSE)
 #' ```
 #'
-#' `$version` will return the version of current model.
+#' `$version()` will return the version of current model.
 #'
-#' `$path` will return the path of current model or `NULL` if the model is
+#' `$path()` will return the path of current model or `NULL` if the model is
 #'     created using a character vector.
 #'
-#' `$group_name` will return all groups the model contains when `all` is `FALSE`
+#' `$group_name()` will return all groups the model contains when `all` is `FALSE`
 #'     or all groups the Idd contains when `all` is `TRUE`.
 #'
-#' `$class_name` will return all classes the model contains when `all` is `FALSE`
+#' `$class_name()` will return all classes the model contains when `all` is `FALSE`
 #'     or all classes the Idd contains when `all` is `TRUE`.
 #'
-#' `$is_valid_group` will return `TRUE`s if given group names are valid for
+#' `$is_valid_group()` will return `TRUE`s if given group names are valid for
 #'     current model (when `all` is `FALSE`) or current Idd (when `all` is
 #'     `TRUE`).
 #'
-#' `$is_valid_class` will return `TRUE`s if given class names are valid for
+#' `$is_valid_class()` will return `TRUE`s if given class names are valid for
 #'     current model (when `all` is `FALSE`) or current Idd (when `all` is
 #'     `TRUE`).
 #'
@@ -132,7 +122,7 @@
 #' model$definition(class)
 #' ```
 #'
-#' `$definition` will return the definitions, i.e. the `IddObject`s, of given
+#' `$definition()` will return the definitions, i.e. the `IddObject`s, of given
 #'     classes which contain all data used for parsing `IdfObject`s. For details
 #'     of `IdfObject`, please see [IddObject class][idd_object].
 #'
@@ -150,15 +140,15 @@
 #' model$is_valid_name(name)
 #' ```
 #'
-#' `$object_id` and `$object_name` will return all object IDs and names
-#'     in specified class respectively. For `$object_name`, if the specified
+#' `$object_id()` and `$object_name()` will return all object IDs and names
+#'     in specified class respectively. For `$object_name()`, if the specified
 #'     class does not have name attributes, such as `SimulationContrl`, `NA`
 #'     will be returned.
 #'
-#' `$is_valid_id` and `$is_valid_name` will return `TRUE`s if given integers or
-#'     strings are valid object IDs or object names respectively.
+#' `$is_valid_id()` and `$is_valid_name()` will return `TRUE`s if given integers
+#' or strings are valid object IDs or object names respectively.
 #'
-#' `$object_num` will return the number of objects in specified classes.
+#' `$object_num()` will return the number of objects in specified classes.
 #'
 #' **Arguments**
 #'
@@ -179,13 +169,13 @@
 #' model[[ClassName]]
 #' }
 #'
-#' `$object` will return a list of `IdfObject`s specified by object IDs or
+#' `$object()` will return a list of `IdfObject`s specified by object IDs or
 #'     names.
 #'
-#' `$object_in_class` will return a list of all `IdfObject`s in specified
+#' `$object_in_class()` will return a list of all `IdfObject`s in specified
 #'     classes.
 #'
-#' `$search_object` will return a list of `IdfObject`s whose names meet the
+#' `$search_object()` will return a list of `IdfObject`s whose names meet the
 #'     given pattern in specified classes.
 #'
 #' eplusr also provides custom S3 method of `$` and \code{[[} to make it more
@@ -222,22 +212,26 @@
 #' model$replace_value(pattern, replacement)
 #' ```
 #'
-#' `$dup_object` will duplicate objects specified by object IDs or names. The
+#' `$dup_object()` will duplicate objects specified by object IDs or names. The
 #'     newly created objects will be renamed automatically if new names are not
 #'     given, with a suffix `"_1"`, `"_2"` and etc.
 #'
-#' `$add_object` will add objects in the specified class.
+#' `$add_object()` will add objects in the specified class.
 #'
-#' `$ins_object` will insert objects from other IDF into current IDF.
+#' `$ins_object()` will insert objects from other IDF into current IDF.
 #'
-#' `$set_object` will set the value of fields in the objects specified by object
+#' `$set_object()` will set the value of fields in the objects specified by object
 #'     IDs or names.
 #'
-#' `$del_object` will delete objects specified by object IDs or names.
+#' `$del_object()` will delete objects specified by object IDs or names.
 #'
-#' `$search_value` will return values that match the given pattern.
+#' `$search_value()` will return values that match the given pattern.
 #'
-#' `$replace_value` will return replace values that match the given pattern.
+#' `$replace_value()` will return replace values that match the given pattern.
+#'
+#' **NOTE**: There is no field validation when using `$replace_value()` to
+#'     change field values. `$replace_value()` should be treated as a low-level
+#'     method which should be used with caution.
 #'
 #' **Arguments**
 #'
@@ -269,10 +263,10 @@
 #' model$is_valid()
 #' ```
 #'
-#' `$validate` will check if there are errors in current model under different
+#' `$validate()` will check if there are errors in current model under different
 #'     strictness level.
 #'
-#' `$is_valid` will check if there are no errors in current model under different
+#' `$is_valid()` will check if there are no errors in current model under different
 #'     strictness level.
 #'
 #'
@@ -293,7 +287,7 @@
 #' model$string(comment = TRUE, header = TRUE)
 #' ```
 #'
-#' `$string` will return the text format of an IDF file.
+#' `$string()` will return the text format of an IDF file.
 #'
 #' **Arguments**
 #'
@@ -336,10 +330,10 @@
 #' model$clone(deep = FALSE)
 #' ```
 #'
-#' `$clone` will copy and returned the cloned model. Because `Idf` use
-#' `R6Class` under the hook, `idf_2 <- idf_1` does not copy `idf_1` at all but
-#' only create a new binding to `idf_1`. Modify `idf_1` will also affect `idf_2`
-#' as well, as these two are exactly the same thing underneath.
+#' `$clone()` will copy and returned the cloned model. Because `Idf` use
+#'     `R6Class` under the hook, `idf_2 <- idf_1` does not copy `idf_1` at all
+#'     but only create a new binding to `idf_1`. Modify `idf_1` will also affect
+#'     `idf_2` as well, as these two are exactly the same thing underneath.
 #'
 #' **Arguments**
 #'
@@ -352,7 +346,7 @@
 #' model$run(weather, dir = NULL, wait = TRUE, force = FALSE)
 #' ```
 #'
-#' `$run` will run the current model within specified weather using
+#' `$run()` will run the current model within specified weather using
 #'     corresponding version of EnergyPlus. The model and the weather used will
 #'     be copied to the output directory. An `EplusJob` will be returned which
 #'     provides detailed info of the simulation and methods to collect
@@ -382,7 +376,7 @@
 #' print(model)
 #' ```
 #'
-#' `$print` will print the model in the similar format as what you will see in
+#' `$print()` will print the model in the similar format as what you will see in
 #'     IDFEditor.
 #'
 #' **Arguments**

@@ -39,17 +39,17 @@ path of the downloaded IDD file; \code{avail_idd} returns a character vector;
 \code{is_avail_idd} returns a single logical vector.
 }
 \description{
-\code{use_idd} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+\code{use_idd()} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
 class, please see \link{idd}.
 }
 \details{
-\code{download_idd} downloads specified version of EnergyPlus IDD file from
+\code{download_idd()} downloads specified version of EnergyPlus IDD file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
 
-\code{avail_idd} returns versions of all cached \code{Idd} object.
+\code{avail_idd()} returns versions of all cached \code{Idd} object.
 
-\code{is_avail_idd} returns \code{TRUE} if input version of IDD file has been parsed
+\code{is_avail_idd()} returns \code{TRUE} if input version of IDD file has been parsed
 and cached.
 
 eplusr tries to detect all installed EnergyPlus in default installation
@@ -59,7 +59,7 @@ EnergyPlus of that version is available (see \code{\link[=avail_eplus]{avail_epl
 \code{"Energy+.idd"} distributed with EnergyPlus will be parsed and stored in
 eplusr Idd cache.
 
-\code{download_idd} downloads EnergyPlus Input Data Dictionary (IDD) file from
+\code{download_idd()} downloads EnergyPlus Input Data Dictionary (IDD) file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
 useful in case where you only want to edit an EnergyPlus Input Data File
 (IDF) directly but do not want to install whole EnergyPlus software.
