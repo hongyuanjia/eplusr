@@ -413,7 +413,7 @@ parse_idd_file <- function(path) {
     idd_field[!is.na(ip_name), full_ipname := paste0(field_name, " ", ip_unit)]
     idd_field[, is_name := FALSE]
     idd_field[(has_reference == TRUE & has_object_list == FALSE) |
-        (full_name == "Name" & type == "alpha"), is_name := TRUE]
+        (full_name == "Name" & (type == "alpha" | type == "node")), is_name := TRUE]
 
     # parse default value
     field_default <- idd_field[has_default == TRUE, .SD, .SDcols = c(
