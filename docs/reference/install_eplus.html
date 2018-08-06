@@ -108,7 +108,7 @@ install it.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>install_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>install_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())
 
 <span class='fu'>download_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>getwd</span>())</pre>
     
@@ -128,19 +128,22 @@ installed.</p></td>
     <tr>
       <th>dir</th>
       <td><p>Where to save EnergyPlus installer file. Default is current
-working directory. Only applicable to <code>download_eplus()</code>. For
-<code>install_eplus()</code>, it will be saved into <code>tempdir()</code>.</p></td>
+working directory for <code>download_eplus()</code> and <code>tempdir()</code> for
+<code>install_eplus()</code>.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function will try to install EnergyPlus into the default location, e.g.
-<code class="file">C:/EnergyPlusVX-Y-0</code> on Windows, <code class="file">/usr/local/EnergyPlus-X-Y-0</code> on
-Linux, and <code class="file">/Applications/EnergyPlus-X-Y-0</code> on MacOS.</p>
+    <p><code>download_eplus()</code> downloads specified version of EnergyPlus from
+<a href='https://github.com/NREL/EnergyPlus'>EnergyPlus Github Repository</a>.</p>
+<p><code>install_eplus()</code> will try to install EnergyPlus into the default location,
+e.g.  <code class="file">C:/EnergyPlusVX-Y-0</code> on Windows,
+<code class="file">/usr/local/EnergyPlus-X-Y-0</code> on Linux, and
+<code class="file">/Applications/EnergyPlus-X-Y-0</code> on MacOS.</p>
 <p>Note that the installation process requires administrative privileges
-required during the installation and you may need to pass password to enable
-sudo commands used for installation.</p>
+during the installation and you have to run R with administrator (or with
+sudo if you are on Linux) to make it work if you are not in interactive mode.</p>
     
 
   </div>

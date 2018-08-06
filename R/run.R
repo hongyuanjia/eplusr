@@ -288,7 +288,7 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
     future::plan(parallel_backend)
     l <- furrr::future_map2(input$eplus_exe, input$run_args,
         ~invisible(suppressWarnings(processx::run(.x, .y,
-            windows_verbatim_args = TRUE, echo = TRUE))), .progress = TRUE)
+            windows_verbatim_args = TRUE, echo = FALSE))), .progress = TRUE)
     # close all RScript process after simulation complete
     # Reference: https://github.com/HenrikBengtsson/future/issues/117
     future::plan(future::sequential)

@@ -189,22 +189,22 @@ print(idd)
     <h2 class="hasAnchor" id="detail"><a class="anchor" href="#detail"></a>Detail</h2>
 
     
-    <p><code>$version</code> returns the version string.</p>
-<p><code>$build</code> returns the build tag string.</p>
-<p><code>$group_index</code> returns integer indexes (indexes of name appearance in
+    <p><code>$version()</code> returns the version string.</p>
+<p><code>$build()</code> returns the build tag string.</p>
+<p><code>$group_index()</code> returns integer indexes (indexes of name appearance in
 the IDD file) of specified groups.</p>
-<p><code>$group_name</code> returns all group names.</p>
-<p><code>$from_group</code> returns the names of group that specified classes belongs to.</p>
-<p><code>$is_valid_group</code> return <code>TRUE</code> if the input is a valid group name.</p>
-<p><code>$class_index</code> returns integer indexes (indexes of name appearance in
+<p><code>$group_name()</code> returns all group names.</p>
+<p><code>$from_group()</code> returns the names of group that specified classes belongs to.</p>
+<p><code>$is_valid_group()</code> return <code>TRUE</code> if the input is a valid group name.</p>
+<p><code>$class_index()</code> returns integer indexes (indexes of name appearance in
 the IDD file) of specified classes.</p>
-<p><code>$class_name</code> returns all class names.</p>
-<p><code>$required_class_name</code> returns the names of all required classes.</p>
-<p><code>$unique_class_name</code> returns the names of all unique classes.</p>
-<p><code>$extensible_class_name</code> returns the names of all extensible classes.</p>
-<p><code>$is_valid_class</code> return <code>TRUE</code> if the input is a valid class name.</p>
-<p><code>$object</code> returns a list of <code>IddObject</code>s of specified classes.</p>
-<p><code>$object_in_group</code> returns a list of <code>IddObject</code>s in that group.</p>
+<p><code>$class_name()</code> returns all class names.</p>
+<p><code>$required_class_name()</code> returns the names of all required classes.</p>
+<p><code>$unique_class_name()</code> returns the names of all unique classes.</p>
+<p><code>$extensible_class_name()</code> returns the names of all extensible classes.</p>
+<p><code>$is_valid_class()</code> return <code>TRUE</code> if the input is a valid class name.</p>
+<p><code>$objectN</code> returns a list of <code>IddObject</code>s of specified classes.</p>
+<p><code>$object_in_group()</code> returns a list of <code>IddObject</code>s in that group.</p>
 <p>eplusr also provides custom S3 method of <code>$</code> and <code>[[</code> to make it
 more convenient to get a single <code>IddObject</code>. Basically, <code>idd$ClassName</code> and
 <code>idd[[ClassName]]</code>, is equivalent to <code>idd$object(ClassName)[[1]]</code>.

@@ -6,6 +6,9 @@
   will return all possible values for selected fields, including auto-value
   (autosize or autocalculate), default, range, choices and references.
 
+* New parameter `dir` has been added to `install_eplus()`, which makes it
+  possible for keeping the downloaded EnergyPlus installation file.
+
 ## Minor changes
 
 * The names of returned list of `$get_value()` in `IdfObject` is "underscore"
@@ -26,7 +29,7 @@
 
 * Fix idf input version parsing in `param_job` (#13).
 
-* Fix EnergyPlus downloading errors on Linux and MacOS (#14).
+* Fix EnergyPlus downloading and installing errors on Linux and MacOS (#14, #17).
 
 * Fix `run_idf()` and `run_multi()` errors on Linux and MacOS (#14).
 

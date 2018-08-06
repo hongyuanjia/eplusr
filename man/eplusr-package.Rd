@@ -6,7 +6,10 @@
 \alias{eplusr-package}
 \title{eplusr: A Toolkit for Using EnergyPlus in R}
 \description{
-eplusr: A Toolkit for Using EnergyPlus in R
+A rich toolkit of using the whole building simulation program
+    'EnergyPlus', which enables programmatic navigation, modification of
+    'EnergyPlus' models and makes it less painful to do parametric simulations
+    and analysis.
 }
 \details{
 eplusr provides a rich toolkit of using EnergyPlus directly in

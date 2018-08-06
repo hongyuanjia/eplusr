@@ -150,10 +150,10 @@ job$tabular_data()
 job$kill()
 job$status()
 </pre>
-    <p><code>$run</code> runs the simulation using input model and weather file.</p>
-<p><code>$kill</code> kills the background EnergyPlus process if possible. It only
+    <p><code>$run()</code> runs the simulation using input model and weather file.</p>
+<p><code>$kill()</code> kills the background EnergyPlus process if possible. It only
 works when simulation runs in waiting mode.</p>
-<p><code>$status</code> returns a named list of values indicates the status of the job:</p><ul>
+<p><code>$status()</code> returns a named list of values indicates the status of the job:</p><ul>
 <li><p><code>run_before</code>: <code>TRUE</code> if the job has been run before.</p></li>
 <li><p><code>changed_after</code>: <code>TRUE</code> if the IDF file has been changed since last
 simulation.</p></li>
@@ -181,15 +181,15 @@ job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 job$tabular_data()
 </pre>
-    <p><code>$output_dir</code> returns the output directory of simulation results.</p>
-<p><code>$locate_output</code> returns the path of a single output file specified by file
+    <p><code>$output_dir()</code> returns the output directory of simulation results.</p>
+<p><code>$locate_output()</code> returns the path of a single output file specified by file
 suffix.</p>
-<p><code>$report_data_dict</code> returns a data.table which contains all information about
+<p><code>$report_data_dict()</code> returns a data.table which contains all information about
 report data. For details on the meaning of each columns, please see
 "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 Examples" documentation.</p>
-<p><code>$report_data</code> extracts the report data using key values and variable names.</p>
-<p><code>$tabular_data</code> extracts all tabular data.</p>
+<p><code>$report_data()</code> extracts the report data using key values and variable names.</p>
+<p><code>$tabular_data()</code> extracts all tabular data.</p>
 <p><strong>Arguments</strong>:</p><ul>
 <li><p><code>open</code>: If <code>TRUE</code>, the output directory will be opened. It may only work
 well on Windows.</p></li>

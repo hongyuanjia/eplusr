@@ -32,7 +32,7 @@
 
 <meta property="og:title" content="Use a specific EnergyPlus Input Data Dictionary (IDD) file — use_idd" />
 
-<meta property="og:description" content="use_idd takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+<meta property="og:description" content="use_idd() takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named &quot;Energy+.idd&quot; and return an Idd object. For details on Idd
 class, please see idd." />
 <meta name="twitter:card" content="summary" />
@@ -104,7 +104,7 @@ class, please see idd." />
 
     <div class="ref-description">
     
-    <p><code>use_idd</code> takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+    <p><code>use_idd()</code> takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named "Energy+.idd" and return an <code>Idd</code> object. For details on <code>Idd</code>
 class, please see <a href='idd.html'>idd</a>.</p>
     
@@ -156,10 +156,10 @@ path of the downloaded IDD file; <code>avail_idd</code> returns a character vect
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>download_idd</code> downloads specified version of EnergyPlus IDD file from
+    <p><code>download_idd()</code> downloads specified version of EnergyPlus IDD file from
 <a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>.</p>
-<p><code>avail_idd</code> returns versions of all cached <code>Idd</code> object.</p>
-<p><code>is_avail_idd</code> returns <code>TRUE</code> if input version of IDD file has been parsed
+<p><code>avail_idd()</code> returns versions of all cached <code>Idd</code> object.</p>
+<p><code>is_avail_idd()</code> returns <code>TRUE</code> if input version of IDD file has been parsed
 and cached.</p>
 <p>eplusr tries to detect all installed EnergyPlus in default installation
 locations when loading. If argument <code>idd</code> is a version, eplusr will first try
@@ -167,7 +167,7 @@ to find the cached <code>Idd</code> object of that version, if possible. If fail
 EnergyPlus of that version is available (see <code><a href='use_eplus.html'>avail_eplus()</a></code>), the
 <code>"Energy+.idd"</code> distributed with EnergyPlus will be parsed and stored in
 eplusr Idd cache.</p>
-<p><code>download_idd</code> downloads EnergyPlus Input Data Dictionary (IDD) file from
+<p><code>download_idd()</code> downloads EnergyPlus Input Data Dictionary (IDD) file from
 <a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>. It is
 useful in case where you only want to edit an EnergyPlus Input Data File
 (IDF) directly but do not want to install whole EnergyPlus software.</p>

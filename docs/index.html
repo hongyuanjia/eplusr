@@ -141,15 +141,15 @@
 <p>Now let’s read an IDF file distributed with EnergyPlus 8.8.0. As EnergyPlus v8.8.0 has been installed, we can just ignore the <code>idd</code> argument.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_idf.html">read_idf</a></span>(<span class="dt">path =</span> <span class="st">"5Zone_Transformer.idf"</span>, <span class="dt">idd =</span> <span class="ot">NULL</span>)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus installation folder.</span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; IDD file found: `C:\EnergyPlusV8-8-0\Energy+.idd`.</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt; IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.</span></a>
 <a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt; Start parsing...</span></a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb5-6" data-line-number="6">model</a>
-<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; # Path: `C:\Users\hongy\5Zone_Transformer.idf`</span></a>
+<a class="sourceLine" id="cb5-7" data-line-number="7"><span class="co">#&gt; # Path: `/home/hongyuanjia/5Zone_Transformer.idf`</span></a>
 <a class="sourceLine" id="cb5-8" data-line-number="8"><span class="co">#&gt; # Version: `8.8`</span></a>
 <a class="sourceLine" id="cb5-9" data-line-number="9"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb5-10" data-line-number="10"><span class="co">#&gt; Group: `Simulation Parameters`</span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co">#&gt; [01] Version</span></a>
 <a class="sourceLine" id="cb5-13" data-line-number="13"><span class="co">#&gt; [01] SimulationControl</span></a>
 <a class="sourceLine" id="cb5-14" data-line-number="14"><span class="co">#&gt; [01] Building</span></a>
@@ -159,19 +159,19 @@
 <a class="sourceLine" id="cb5-18" data-line-number="18"><span class="co">#&gt; [01] Timestep</span></a>
 <a class="sourceLine" id="cb5-19" data-line-number="19"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb5-20" data-line-number="20"><span class="co">#&gt; Group: `Location and Climate`</span></a>
-<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb5-21" data-line-number="21"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb5-22" data-line-number="22"><span class="co">#&gt; [01] Site:Location</span></a>
 <a class="sourceLine" id="cb5-23" data-line-number="23"><span class="co">#&gt; [02] SizingPeriod:DesignDay</span></a>
 <a class="sourceLine" id="cb5-24" data-line-number="24"><span class="co">#&gt; [02] RunPeriod</span></a>
 <a class="sourceLine" id="cb5-25" data-line-number="25"><span class="co">#&gt; [01] Site:GroundTemperature:BuildingSurface</span></a>
 <a class="sourceLine" id="cb5-26" data-line-number="26"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb5-27" data-line-number="27"><span class="co">#&gt; Group: `Schedules`</span></a>
-<a class="sourceLine" id="cb5-28" data-line-number="28"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb5-28" data-line-number="28"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb5-29" data-line-number="29"><span class="co">#&gt; [06] ScheduleTypeLimits</span></a>
 <a class="sourceLine" id="cb5-30" data-line-number="30"><span class="co">#&gt; [23] Schedule:Compact</span></a>
 <a class="sourceLine" id="cb5-31" data-line-number="31"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb5-32" data-line-number="32"><span class="co">#&gt; Group: `Surface Construction Elements`</span></a>
-<a class="sourceLine" id="cb5-33" data-line-number="33"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb5-33" data-line-number="33"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb5-34" data-line-number="34"><span class="co">#&gt; [10] Material</span></a>
 <a class="sourceLine" id="cb5-35" data-line-number="35"><span class="co">#&gt; [04] Material:NoMass</span></a>
 <a class="sourceLine" id="cb5-36" data-line-number="36"><span class="co">#&gt; [02] Material:AirGap</span></a>
@@ -235,14 +235,14 @@
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">def_mat &lt;-<span class="st"> </span>model<span class="op">$</span><span class="kw">definition</span>(<span class="dt">class =</span> <span class="st">"Material"</span>)[[<span class="dv">1</span>]]</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2">def_mat</a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt; &lt;&lt; Class: `Material` &gt;&gt;</span></a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; --------------------------------- * MEMO * --------------------------------</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt; ───────────────────────────────── * MEMO * ────────────────────────────────</span></a>
 <a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt;   "Regular materials described with full set of thermal properties"</span></a>
-<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; ------------------------------ * PROPERTIES * -----------------------------</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; ────────────────────────────── * PROPERTIES * ─────────────────────────────</span></a>
 <a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt;   Group: `Surface Construction Elements`</span></a>
 <a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt;   Unique: FALSE</span></a>
 <a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt;   Required: FALSE</span></a>
 <a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt;   Total fields: 9</span></a>
-<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb9-11" data-line-number="11"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb9-12" data-line-number="12"><span class="co">#&gt;   1:* Name</span></a>
 <a class="sourceLine" id="cb9-13" data-line-number="13"><span class="co">#&gt;   2:* Roughness</span></a>
 <a class="sourceLine" id="cb9-14" data-line-number="14"><span class="co">#&gt;   3:* Thickness {m}</span></a>
@@ -252,20 +252,20 @@
 <a class="sourceLine" id="cb9-18" data-line-number="18"><span class="co">#&gt;   7:  Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb9-19" data-line-number="19"><span class="co">#&gt;   8:  Solar Absorptance</span></a>
 <a class="sourceLine" id="cb9-20" data-line-number="20"><span class="co">#&gt;   9:  Visible Absorptance</span></a>
-<a class="sourceLine" id="cb9-21" data-line-number="21"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb9-21" data-line-number="21"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 <p>You can also achieve this using methods in <code>Idd</code> class.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">idd &lt;-<span class="st"> </span><span class="kw"><a href="reference/use_idd.html">use_idd</a></span>(<span class="fl">8.8</span>)</a>
 <a class="sourceLine" id="cb10-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb10-3" data-line-number="3">idd<span class="op">$</span>Material</a>
 <a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; &lt;&lt; Class: `Material` &gt;&gt;</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; --------------------------------- * MEMO * --------------------------------</span></a>
+<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; ───────────────────────────────── * MEMO * ────────────────────────────────</span></a>
 <a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt;   "Regular materials described with full set of thermal properties"</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; ------------------------------ * PROPERTIES * -----------------------------</span></a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; ────────────────────────────── * PROPERTIES * ─────────────────────────────</span></a>
 <a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt;   Group: `Surface Construction Elements`</span></a>
 <a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt;   Unique: FALSE</span></a>
 <a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt;   Required: FALSE</span></a>
 <a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt;   Total fields: 9</span></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt;   1:* Name</span></a>
 <a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt;   2:* Roughness</span></a>
 <a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt;   3:* Thickness {m}</span></a>
@@ -275,7 +275,7 @@
 <a class="sourceLine" id="cb10-19" data-line-number="19"><span class="co">#&gt;   7:  Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb10-20" data-line-number="20"><span class="co">#&gt;   8:  Solar Absorptance</span></a>
 <a class="sourceLine" id="cb10-21" data-line-number="21"><span class="co">#&gt;   9:  Visible Absorptance</span></a>
-<a class="sourceLine" id="cb10-22" data-line-number="22"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb10-22" data-line-number="22"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb10-23" data-line-number="23"></a>
 <a class="sourceLine" id="cb10-24" data-line-number="24"><span class="co"># OR</span></a>
 <a class="sourceLine" id="cb10-25" data-line-number="25"><span class="co"># idd$object("Material")[[1]]</span></a></code></pre></div>
@@ -370,7 +370,7 @@
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">model<span class="op">$</span><span class="kw">object</span>(<span class="kw">c</span>(<span class="st">"WD10"</span>, <span class="st">"ROOF-1"</span>))</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2"><span class="co">#&gt; $WD10</span></a>
 <a class="sourceLine" id="cb17-3" data-line-number="3"><span class="co">#&gt; &lt;&lt;[ID:43] `WD10`&gt;&gt; Material</span></a>
-<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb17-4" data-line-number="4"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb17-5" data-line-number="5"><span class="co">#&gt; *1: WD10,              !- Name</span></a>
 <a class="sourceLine" id="cb17-6" data-line-number="6"><span class="co">#&gt; *2: MediumSmooth,      !- Roughness</span></a>
 <a class="sourceLine" id="cb17-7" data-line-number="7"><span class="co">#&gt; *3: 0.667,             !- Thickness {m}</span></a>
@@ -380,22 +380,22 @@
 <a class="sourceLine" id="cb17-11" data-line-number="11"><span class="co">#&gt;  7: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb17-12" data-line-number="12"><span class="co">#&gt;  8: 0.78,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb17-13" data-line-number="13"><span class="co">#&gt;  9: 0.78;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb17-14" data-line-number="14"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb17-14" data-line-number="14"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb17-15" data-line-number="15"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb17-16" data-line-number="16"><span class="co">#&gt; $ROOF_1</span></a>
 <a class="sourceLine" id="cb17-17" data-line-number="17"><span class="co">#&gt; &lt;&lt;[ID:66] `ROOF-1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb17-18" data-line-number="18"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb17-18" data-line-number="18"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb17-19" data-line-number="19"><span class="co">#&gt; *1: ROOF-1,            !- Name</span></a>
 <a class="sourceLine" id="cb17-20" data-line-number="20"><span class="co">#&gt; *2: RG01,              !- Outside Layer</span></a>
 <a class="sourceLine" id="cb17-21" data-line-number="21"><span class="co">#&gt;  3: BR01,              !- Layer 2</span></a>
 <a class="sourceLine" id="cb17-22" data-line-number="22"><span class="co">#&gt;  4: IN46,              !- Layer 3</span></a>
 <a class="sourceLine" id="cb17-23" data-line-number="23"><span class="co">#&gt;  5: WD01;              !- Layer 4</span></a>
-<a class="sourceLine" id="cb17-24" data-line-number="24"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb17-24" data-line-number="24"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 <p>If you want to get all objects in a single class, use <code>$object_in_class()</code>.</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1">model<span class="op">$</span><span class="kw">object_in_class</span>(<span class="st">"Material"</span>)</a>
 <a class="sourceLine" id="cb18-2" data-line-number="2"><span class="co">#&gt; $WD10</span></a>
 <a class="sourceLine" id="cb18-3" data-line-number="3"><span class="co">#&gt; &lt;&lt;[ID:43] `WD10`&gt;&gt; Material</span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb18-5" data-line-number="5"><span class="co">#&gt; *1: WD10,              !- Name</span></a>
 <a class="sourceLine" id="cb18-6" data-line-number="6"><span class="co">#&gt; *2: MediumSmooth,      !- Roughness</span></a>
 <a class="sourceLine" id="cb18-7" data-line-number="7"><span class="co">#&gt; *3: 0.667,             !- Thickness {m}</span></a>
@@ -405,11 +405,11 @@
 <a class="sourceLine" id="cb18-11" data-line-number="11"><span class="co">#&gt;  7: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb18-12" data-line-number="12"><span class="co">#&gt;  8: 0.78,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb18-13" data-line-number="13"><span class="co">#&gt;  9: 0.78;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb18-14" data-line-number="14"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb18-14" data-line-number="14"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb18-15" data-line-number="15"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb18-16" data-line-number="16"><span class="co">#&gt; $RG01</span></a>
 <a class="sourceLine" id="cb18-17" data-line-number="17"><span class="co">#&gt; &lt;&lt;[ID:44] `RG01`&gt;&gt; Material</span></a>
-<a class="sourceLine" id="cb18-18" data-line-number="18"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb18-18" data-line-number="18"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb18-19" data-line-number="19"><span class="co">#&gt; *1: RG01,              !- Name</span></a>
 <a class="sourceLine" id="cb18-20" data-line-number="20"><span class="co">#&gt; *2: Rough,             !- Roughness</span></a>
 <a class="sourceLine" id="cb18-21" data-line-number="21"><span class="co">#&gt; *3: 0.0127,            !- Thickness {m}</span></a>
@@ -419,7 +419,7 @@
 <a class="sourceLine" id="cb18-25" data-line-number="25"><span class="co">#&gt;  7: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb18-26" data-line-number="26"><span class="co">#&gt;  8: 0.65,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb18-27" data-line-number="27"><span class="co">#&gt;  9: 0.65;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb18-28" data-line-number="28"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb18-28" data-line-number="28"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb18-29" data-line-number="29"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb18-30" data-line-number="30"><span class="co">#&gt; $BR01</span></a>
 <a class="sourceLine" id="cb18-31" data-line-number="31"><span class="co">#&gt; &lt;&lt;[ID:45] `BR01`&gt;&gt; Material</span></a>
@@ -428,29 +428,29 @@
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">model<span class="op">$</span>Material_NoMass</a>
 <a class="sourceLine" id="cb19-2" data-line-number="2"><span class="co">#&gt; $CP01</span></a>
 <a class="sourceLine" id="cb19-3" data-line-number="3"><span class="co">#&gt; &lt;&lt;[ID:53] `CP01`&gt;&gt; Material:NoMass</span></a>
-<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb19-5" data-line-number="5"><span class="co">#&gt; *1: CP01,              !- Name</span></a>
 <a class="sourceLine" id="cb19-6" data-line-number="6"><span class="co">#&gt; *2: Rough,             !- Roughness</span></a>
 <a class="sourceLine" id="cb19-7" data-line-number="7"><span class="co">#&gt; *3: 0.367,             !- Thermal Resistance {m2-K/W}</span></a>
 <a class="sourceLine" id="cb19-8" data-line-number="8"><span class="co">#&gt;  4: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb19-9" data-line-number="9"><span class="co">#&gt;  5: 0.75,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb19-10" data-line-number="10"><span class="co">#&gt;  6: 0.75;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb19-12" data-line-number="12"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb19-13" data-line-number="13"><span class="co">#&gt; $MAT_SB_U</span></a>
 <a class="sourceLine" id="cb19-14" data-line-number="14"><span class="co">#&gt; &lt;&lt;[ID:54] `MAT-SB-U`&gt;&gt; Material:NoMass</span></a>
-<a class="sourceLine" id="cb19-15" data-line-number="15"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb19-15" data-line-number="15"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb19-16" data-line-number="16"><span class="co">#&gt; *1: MAT-SB-U,          !- Name</span></a>
 <a class="sourceLine" id="cb19-17" data-line-number="17"><span class="co">#&gt; *2: Rough,             !- Roughness</span></a>
 <a class="sourceLine" id="cb19-18" data-line-number="18"><span class="co">#&gt; *3: 0.11740667,        !- Thermal Resistance {m2-K/W}</span></a>
 <a class="sourceLine" id="cb19-19" data-line-number="19"><span class="co">#&gt;  4: 0.65,              !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb19-20" data-line-number="20"><span class="co">#&gt;  5: 0.65,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb19-21" data-line-number="21"><span class="co">#&gt;  6: 0.65;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb19-22" data-line-number="22"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb19-22" data-line-number="22"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb19-23" data-line-number="23"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb19-24" data-line-number="24"><span class="co">#&gt; $MAT_CLNG_1</span></a>
 <a class="sourceLine" id="cb19-25" data-line-number="25"><span class="co">#&gt; &lt;&lt;[ID:55] `MAT-CLNG-1`&gt;&gt; Material:NoMass</span></a>
-<a class="sourceLine" id="cb19-26" data-line-number="26"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb19-26" data-line-number="26"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb19-27" data-line-number="27"><span class="co">#&gt; *1: MAT-CLNG-1,        !- Name</span></a>
 <a class="sourceLine" id="cb19-28" data-line-number="28"><span class="co">#&gt; *2: Rough,             !- Roughness</span></a>
 <a class="sourceLine" id="cb19-29" data-line-number="29"><span class="co">#&gt; *3: 0.65225929,        !- Thermal Resistance {m2-K/W}</span></a>
@@ -463,7 +463,7 @@
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1">rp &lt;-<span class="st"> </span>model<span class="op">$</span>RunPeriod[[<span class="dv">1</span>]]</a>
 <a class="sourceLine" id="cb20-2" data-line-number="2">rp</a>
 <a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co">#&gt; &lt;&lt;[ID:8] `WinterDay`&gt;&gt; RunPeriod</span></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co">#&gt;   1: WinterDay,         !- Name</span></a>
 <a class="sourceLine" id="cb20-6" data-line-number="6"><span class="co">#&gt; * 2: 1,                 !- Begin Month</span></a>
 <a class="sourceLine" id="cb20-7" data-line-number="7"><span class="co">#&gt; * 3: 14,                !- Begin Day of Month</span></a>
@@ -475,23 +475,23 @@
 <a class="sourceLine" id="cb20-13" data-line-number="13"><span class="co">#&gt;   9: No,                !- Apply Weekend Holiday Rule</span></a>
 <a class="sourceLine" id="cb20-14" data-line-number="14"><span class="co">#&gt;  10: Yes,               !- Use Weather File Rain Indicators</span></a>
 <a class="sourceLine" id="cb20-15" data-line-number="15"><span class="co">#&gt;  11: Yes;               !- Use Weather File Snow Indicators</span></a>
-<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb20-16" data-line-number="16"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 <p><code>$search_object()</code> will search and return a list of objects whose names meet the regular expression you give.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">model<span class="op">$</span><span class="kw">search_object</span>(<span class="st">"Demand"</span>, <span class="dt">class =</span> <span class="st">"Branch"</span>)</a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co">#&gt; $`Heating Demand Inlet Branch`</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"><span class="co">#&gt; &lt;&lt;[ID:222] `Heating Demand Inlet Branch`&gt;&gt; Branch</span></a>
-<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb21-5" data-line-number="5"><span class="co">#&gt; *1: Heating Demand Inlet Branch,  !- Name</span></a>
 <a class="sourceLine" id="cb21-6" data-line-number="6"><span class="co">#&gt;  2: &lt;Blank&gt;,           !- Pressure Drop Curve Name</span></a>
 <a class="sourceLine" id="cb21-7" data-line-number="7"><span class="co">#&gt; *3: Pipe:Adiabatic,    !- Component 1 Object Type</span></a>
 <a class="sourceLine" id="cb21-8" data-line-number="8"><span class="co">#&gt; *4: Heating Demand Inlet Pipe,  !- Component 1 Name</span></a>
 <a class="sourceLine" id="cb21-9" data-line-number="9"><span class="co">#&gt; *5: HW Demand Inlet Node,  !- Component 1 Inlet Node Name</span></a>
 <a class="sourceLine" id="cb21-10" data-line-number="10"><span class="co">#&gt; *6: HW Demand Entrance Pipe Outlet Node;  !- Component 1 Outlet Node Name</span></a>
-<a class="sourceLine" id="cb21-11" data-line-number="11"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb21-11" data-line-number="11"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb21-12" data-line-number="12"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb21-13" data-line-number="13"><span class="co">#&gt; $`Heating Demand Outlet Branch`</span></a>
 <a class="sourceLine" id="cb21-14" data-line-number="14"><span class="co">#&gt; &lt;&lt;[ID:223] `Heating Demand Outlet Branch`&gt;&gt; Branch</span></a>
-<a class="sourceLine" id="cb21-15" data-line-number="15"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb21-15" data-line-number="15"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb21-16" data-line-number="16"><span class="co">#&gt; *1: Heating Demand Outlet Branch,  !- Name</span></a>
 <a class="sourceLine" id="cb21-17" data-line-number="17"><span class="co">#&gt;  2: &lt;Blank&gt;,           !- Pressure Drop Curve Name</span></a>
 <a class="sourceLine" id="cb21-18" data-line-number="18"><span class="co">#&gt; *3: Pipe:Adiabatic,    !- Component 1 Object Type</span></a>
@@ -508,9 +508,9 @@
 <a class="sourceLine" id="cb22-3" data-line-number="3"><span class="co">#&gt;  [4] "get_comment"     "get_value"       "group_name"     </span></a>
 <a class="sourceLine" id="cb22-4" data-line-number="4"><span class="co">#&gt;  [7] "has_ref"         "has_ref_by"      "has_ref_from"   </span></a>
 <a class="sourceLine" id="cb22-5" data-line-number="5"><span class="co">#&gt; [10] "id"              "is_valid"        "name"           </span></a>
-<a class="sourceLine" id="cb22-6" data-line-number="6"><span class="co">#&gt; [13] "print"           "ref_by_object"   "ref_from_object"</span></a>
-<a class="sourceLine" id="cb22-7" data-line-number="7"><span class="co">#&gt; [16] "set_comment"     "set_value"       "string"         </span></a>
-<a class="sourceLine" id="cb22-8" data-line-number="8"><span class="co">#&gt; [19] "table"           "validate"</span></a></code></pre></div>
+<a class="sourceLine" id="cb22-6" data-line-number="6"><span class="co">#&gt; [13] "possible_value"  "print"           "ref_by_object"  </span></a>
+<a class="sourceLine" id="cb22-7" data-line-number="7"><span class="co">#&gt; [16] "ref_from_object" "set_comment"     "set_value"      </span></a>
+<a class="sourceLine" id="cb22-8" data-line-number="8"><span class="co">#&gt; [19] "string"          "table"           "validate"</span></a></code></pre></div>
 <p>Similarly, you can use <code>"$"</code> and <code>"[["</code> to get a single value in an <code>IdfObject</code> class or <code>"["</code> to get multiple values just like normal lists in R.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">rp<span class="op">$</span>Begin_Day_of_Month</a>
 <a class="sourceLine" id="cb23-2" data-line-number="2"><span class="co">#&gt; [1] 14</span></a>
@@ -539,40 +539,40 @@
 <a href="#duplicate-objects" class="anchor"></a>Duplicate objects</h4>
 <p><code>$dup_object()</code> will duplicate objects specified by object IDs or names. If the target classes have a name attribute, you can assign new names to the duplicated objects using argument <code>new_name</code>. If <code>new_name</code> is <code>NULL</code>, which is default, the newly added object will have the same name as the original object except a appended suffix of “<code>_1</code>”, “<code>_2</code>” and etc.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">model<span class="op">$</span><span class="kw">dup_object</span>(<span class="kw">c</span>(<span class="st">"ROOF-1"</span>, <span class="st">"ROOF-1"</span>, <span class="st">"WALL-1"</span>))</a>
-<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co">#&gt; -- Info -------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-3" data-line-number="3"><span class="co">#&gt; New names of duplicated objects were not given. Automatically generated names were assigned:</span></a>
 <a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co">#&gt;   * Target Object [ID: 66] Name `ROOF-1`--&gt; Auto Assigned Name: `ROOF-1_1`</span></a>
 <a class="sourceLine" id="cb25-5" data-line-number="5"><span class="co">#&gt;   * Target Object [ID: 66] Name `ROOF-1`--&gt; Auto Assigned Name: `ROOF-1_2`</span></a>
 <a class="sourceLine" id="cb25-6" data-line-number="6"><span class="co">#&gt;   * Target Object [ID: 67] Name `WALL-1`--&gt; Auto Assigned Name: `WALL-1_1`</span></a>
 <a class="sourceLine" id="cb25-7" data-line-number="7"><span class="co">#&gt; $ROOF_1_1</span></a>
 <a class="sourceLine" id="cb25-8" data-line-number="8"><span class="co">#&gt; &lt;&lt;[ID:323] `ROOF-1_1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb25-9" data-line-number="9"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb25-9" data-line-number="9"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-10" data-line-number="10"><span class="co">#&gt; *1: ROOF-1_1,          !- Name</span></a>
 <a class="sourceLine" id="cb25-11" data-line-number="11"><span class="co">#&gt; *2: RG01,              !- Outside Layer</span></a>
 <a class="sourceLine" id="cb25-12" data-line-number="12"><span class="co">#&gt;  3: BR01,              !- Layer 2</span></a>
 <a class="sourceLine" id="cb25-13" data-line-number="13"><span class="co">#&gt;  4: IN46,              !- Layer 3</span></a>
 <a class="sourceLine" id="cb25-14" data-line-number="14"><span class="co">#&gt;  5: WD01;              !- Layer 4</span></a>
-<a class="sourceLine" id="cb25-15" data-line-number="15"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb25-15" data-line-number="15"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-16" data-line-number="16"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb25-17" data-line-number="17"><span class="co">#&gt; $ROOF_1_2</span></a>
 <a class="sourceLine" id="cb25-18" data-line-number="18"><span class="co">#&gt; &lt;&lt;[ID:324] `ROOF-1_2`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb25-19" data-line-number="19"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb25-19" data-line-number="19"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-20" data-line-number="20"><span class="co">#&gt; *1: ROOF-1_2,          !- Name</span></a>
 <a class="sourceLine" id="cb25-21" data-line-number="21"><span class="co">#&gt; *2: RG01,              !- Outside Layer</span></a>
 <a class="sourceLine" id="cb25-22" data-line-number="22"><span class="co">#&gt;  3: BR01,              !- Layer 2</span></a>
 <a class="sourceLine" id="cb25-23" data-line-number="23"><span class="co">#&gt;  4: IN46,              !- Layer 3</span></a>
 <a class="sourceLine" id="cb25-24" data-line-number="24"><span class="co">#&gt;  5: WD01;              !- Layer 4</span></a>
-<a class="sourceLine" id="cb25-25" data-line-number="25"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb25-25" data-line-number="25"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-26" data-line-number="26"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb25-27" data-line-number="27"><span class="co">#&gt; $WALL_1_1</span></a>
 <a class="sourceLine" id="cb25-28" data-line-number="28"><span class="co">#&gt; &lt;&lt;[ID:325] `WALL-1_1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb25-29" data-line-number="29"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb25-29" data-line-number="29"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb25-30" data-line-number="30"><span class="co">#&gt; *1: WALL-1_1,          !- Name</span></a>
 <a class="sourceLine" id="cb25-31" data-line-number="31"><span class="co">#&gt; *2: WD01,              !- Outside Layer</span></a>
 <a class="sourceLine" id="cb25-32" data-line-number="32"><span class="co">#&gt;  3: PW03,              !- Layer 2</span></a>
 <a class="sourceLine" id="cb25-33" data-line-number="33"><span class="co">#&gt;  4: IN02,              !- Layer 3</span></a>
 <a class="sourceLine" id="cb25-34" data-line-number="34"><span class="co">#&gt;  5: GP01;              !- Layer 4</span></a>
-<a class="sourceLine" id="cb25-35" data-line-number="35"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb25-35" data-line-number="35"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 </div>
 <div id="add-new-objects" class="section level4">
 <h4 class="hasAnchor">
@@ -602,10 +602,10 @@
 <a class="sourceLine" id="cb26-15" data-line-number="15">)</a>
 <a class="sourceLine" id="cb26-16" data-line-number="16"><span class="co">#&gt; $rp_test_1</span></a>
 <a class="sourceLine" id="cb26-17" data-line-number="17"><span class="co">#&gt; &lt;&lt;[ID:326] `rp_test_1`&gt;&gt; RunPeriod</span></a>
-<a class="sourceLine" id="cb26-18" data-line-number="18"><span class="co">#&gt; ------------------------------- * COMMENTS * ------------------------------</span></a>
+<a class="sourceLine" id="cb26-18" data-line-number="18"><span class="co">#&gt; ─────────────────────────────── * COMMENTS * ──────────────────────────────</span></a>
 <a class="sourceLine" id="cb26-19" data-line-number="19"><span class="co">#&gt; !Comment for new object 1</span></a>
 <a class="sourceLine" id="cb26-20" data-line-number="20"><span class="co">#&gt; !Another comment</span></a>
-<a class="sourceLine" id="cb26-21" data-line-number="21"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb26-21" data-line-number="21"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb26-22" data-line-number="22"><span class="co">#&gt;   1: rp_test_1,         !- Name</span></a>
 <a class="sourceLine" id="cb26-23" data-line-number="23"><span class="co">#&gt; * 2: 1,                 !- Begin Month</span></a>
 <a class="sourceLine" id="cb26-24" data-line-number="24"><span class="co">#&gt; * 3: 1,                 !- Begin Day of Month</span></a>
@@ -617,13 +617,13 @@
 <a class="sourceLine" id="cb26-30" data-line-number="30"><span class="co">#&gt;   9: No,                !- Apply Weekend Holiday Rule</span></a>
 <a class="sourceLine" id="cb26-31" data-line-number="31"><span class="co">#&gt;  10: Yes,               !- Use Weather File Rain Indicators</span></a>
 <a class="sourceLine" id="cb26-32" data-line-number="32"><span class="co">#&gt;  11: Yes;               !- Use Weather File Snow Indicators</span></a>
-<a class="sourceLine" id="cb26-33" data-line-number="33"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb26-33" data-line-number="33"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb26-34" data-line-number="34"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb26-35" data-line-number="35"><span class="co">#&gt; $rp_test_2</span></a>
 <a class="sourceLine" id="cb26-36" data-line-number="36"><span class="co">#&gt; &lt;&lt;[ID:327] `rp_test_2`&gt;&gt; RunPeriod</span></a>
-<a class="sourceLine" id="cb26-37" data-line-number="37"><span class="co">#&gt; ------------------------------- * COMMENTS * ------------------------------</span></a>
+<a class="sourceLine" id="cb26-37" data-line-number="37"><span class="co">#&gt; ─────────────────────────────── * COMMENTS * ──────────────────────────────</span></a>
 <a class="sourceLine" id="cb26-38" data-line-number="38"><span class="co">#&gt; !Comment for new object 2</span></a>
-<a class="sourceLine" id="cb26-39" data-line-number="39"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb26-39" data-line-number="39"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb26-40" data-line-number="40"><span class="co">#&gt;   1: rp_test_2,         !- Name</span></a>
 <a class="sourceLine" id="cb26-41" data-line-number="41"><span class="co">#&gt; * 2: 3,                 !- Begin Month</span></a>
 <a class="sourceLine" id="cb26-42" data-line-number="42"><span class="co">#&gt; * 3: 1,                 !- Begin Day of Month</span></a>
@@ -635,7 +635,7 @@
 <a class="sourceLine" id="cb26-48" data-line-number="48"><span class="co">#&gt;   9: No,                !- Apply Weekend Holiday Rule</span></a>
 <a class="sourceLine" id="cb26-49" data-line-number="49"><span class="co">#&gt;  10: Yes,               !- Use Weather File Rain Indicators</span></a>
 <a class="sourceLine" id="cb26-50" data-line-number="50"><span class="co">#&gt;  11: Yes;               !- Use Weather File Snow Indicators</span></a>
-<a class="sourceLine" id="cb26-51" data-line-number="51"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb26-51" data-line-number="51"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 </div>
 <div id="set-new-values-and-comments" class="section level4">
 <h4 class="hasAnchor">
@@ -645,10 +645,10 @@
 <a class="sourceLine" id="cb27-2" data-line-number="2">  <span class="dt">comment =</span> <span class="kw">list</span>(<span class="kw">format</span>(<span class="kw">Sys.Date</span>()), <span class="st">"begin day has been changed."</span>))</a>
 <a class="sourceLine" id="cb27-3" data-line-number="3"><span class="co">#&gt; $rp_test_3</span></a>
 <a class="sourceLine" id="cb27-4" data-line-number="4"><span class="co">#&gt; &lt;&lt;[ID:326] `rp_test_3`&gt;&gt; RunPeriod</span></a>
-<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="co">#&gt; ------------------------------- * COMMENTS * ------------------------------</span></a>
-<a class="sourceLine" id="cb27-6" data-line-number="6"><span class="co">#&gt; !2018-07-24</span></a>
+<a class="sourceLine" id="cb27-5" data-line-number="5"><span class="co">#&gt; ─────────────────────────────── * COMMENTS * ──────────────────────────────</span></a>
+<a class="sourceLine" id="cb27-6" data-line-number="6"><span class="co">#&gt; !2018-08-06</span></a>
 <a class="sourceLine" id="cb27-7" data-line-number="7"><span class="co">#&gt; !begin day has been changed.</span></a>
-<a class="sourceLine" id="cb27-8" data-line-number="8"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb27-8" data-line-number="8"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb27-9" data-line-number="9"><span class="co">#&gt;   1: rp_test_3,         !- Name</span></a>
 <a class="sourceLine" id="cb27-10" data-line-number="10"><span class="co">#&gt; * 2: 1,                 !- Begin Month</span></a>
 <a class="sourceLine" id="cb27-11" data-line-number="11"><span class="co">#&gt; * 3: 2,                 !- Begin Day of Month</span></a>
@@ -660,7 +660,7 @@
 <a class="sourceLine" id="cb27-17" data-line-number="17"><span class="co">#&gt;   9: No,                !- Apply Weekend Holiday Rule</span></a>
 <a class="sourceLine" id="cb27-18" data-line-number="18"><span class="co">#&gt;  10: Yes,               !- Use Weather File Rain Indicators</span></a>
 <a class="sourceLine" id="cb27-19" data-line-number="19"><span class="co">#&gt;  11: Yes;               !- Use Weather File Snow Indicators</span></a>
-<a class="sourceLine" id="cb27-20" data-line-number="20"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb27-20" data-line-number="20"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 <p>Also, if the modified fields are referenced by fields in other objects, the corresponding fields will also be updated. You can check that by comparing the values referencing the target object before and after.</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1">mat &lt;-<span class="st"> </span>model<span class="op">$</span>Material<span class="op">$</span>CC03</a>
 <a class="sourceLine" id="cb28-2" data-line-number="2"></a>
@@ -669,14 +669,14 @@
 <a class="sourceLine" id="cb28-5" data-line-number="5"><span class="co">#&gt; 1 object found that reference the target object [ID: 52].</span></a>
 <a class="sourceLine" id="cb28-6" data-line-number="6"><span class="co">#&gt; $FLOOR_SLAB_1</span></a>
 <a class="sourceLine" id="cb28-7" data-line-number="7"><span class="co">#&gt; &lt;&lt;[ID:69] `FLOOR-SLAB-1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb28-8" data-line-number="8"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb28-8" data-line-number="8"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb28-9" data-line-number="9"><span class="co">#&gt; *1: FLOOR-SLAB-1,      !- Name</span></a>
 <a class="sourceLine" id="cb28-10" data-line-number="10"><span class="co">#&gt; *2: CC03;              !- Outside Layer</span></a>
-<a class="sourceLine" id="cb28-11" data-line-number="11"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb28-11" data-line-number="11"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb28-12" data-line-number="12"></a>
 <a class="sourceLine" id="cb28-13" data-line-number="13">mat<span class="op">$</span><span class="kw">set_value</span>(<span class="dt">name =</span> <span class="st">"CC03_renamed"</span>)</a>
 <a class="sourceLine" id="cb28-14" data-line-number="14"><span class="co">#&gt; &lt;&lt;[ID:52] `CC03_renamed`&gt;&gt; Material</span></a>
-<a class="sourceLine" id="cb28-15" data-line-number="15"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb28-15" data-line-number="15"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb28-16" data-line-number="16"><span class="co">#&gt; *1: CC03_renamed,      !- Name</span></a>
 <a class="sourceLine" id="cb28-17" data-line-number="17"><span class="co">#&gt; *2: MediumRough,       !- Roughness</span></a>
 <a class="sourceLine" id="cb28-18" data-line-number="18"><span class="co">#&gt; *3: 0.1016,            !- Thickness {m}</span></a>
@@ -686,76 +686,113 @@
 <a class="sourceLine" id="cb28-22" data-line-number="22"><span class="co">#&gt;  7: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb28-23" data-line-number="23"><span class="co">#&gt;  8: 0.65,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb28-24" data-line-number="24"><span class="co">#&gt;  9: 0.65;              !- Visible Absorptance</span></a>
-<a class="sourceLine" id="cb28-25" data-line-number="25"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a>
+<a class="sourceLine" id="cb28-25" data-line-number="25"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb28-26" data-line-number="26"></a>
 <a class="sourceLine" id="cb28-27" data-line-number="27">mat<span class="op">$</span><span class="kw">ref_by_object</span>()</a>
 <a class="sourceLine" id="cb28-28" data-line-number="28"><span class="co">#&gt; 1 object found that reference the target object [ID: 52].</span></a>
 <a class="sourceLine" id="cb28-29" data-line-number="29"><span class="co">#&gt; $FLOOR_SLAB_1</span></a>
 <a class="sourceLine" id="cb28-30" data-line-number="30"><span class="co">#&gt; &lt;&lt;[ID:69] `FLOOR-SLAB-1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb28-31" data-line-number="31"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
+<a class="sourceLine" id="cb28-31" data-line-number="31"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb28-32" data-line-number="32"><span class="co">#&gt; *1: FLOOR-SLAB-1,      !- Name</span></a>
 <a class="sourceLine" id="cb28-33" data-line-number="33"><span class="co">#&gt; *2: CC03_renamed;      !- Outside Layer</span></a>
-<a class="sourceLine" id="cb28-34" data-line-number="34"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<a class="sourceLine" id="cb28-34" data-line-number="34"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
+<p>Sometimes, you may want to get all possible values of fields before you change them. You can achieve that by using <code>$possible_value()</code> method in <code>IdfObject</code> class.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">mat<span class="op">$</span><span class="kw">possible_value</span>()</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="co">#&gt; ── 1: Field `Name` ────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="co">#&gt; &lt;Not Applicable&gt;</span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-5" data-line-number="5"><span class="co">#&gt; ── 2: Field `Roughness` ───────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-6" data-line-number="6"><span class="co">#&gt; * Choice:</span></a>
+<a class="sourceLine" id="cb29-7" data-line-number="7"><span class="co">#&gt;   - `VeryRough`</span></a>
+<a class="sourceLine" id="cb29-8" data-line-number="8"><span class="co">#&gt;   - `Rough`</span></a>
+<a class="sourceLine" id="cb29-9" data-line-number="9"><span class="co">#&gt;   - `MediumRough`</span></a>
+<a class="sourceLine" id="cb29-10" data-line-number="10"><span class="co">#&gt;   - `MediumSmooth`</span></a>
+<a class="sourceLine" id="cb29-11" data-line-number="11"><span class="co">#&gt;   - `Smooth`</span></a>
+<a class="sourceLine" id="cb29-12" data-line-number="12"><span class="co">#&gt;   - `VerySmooth`</span></a>
+<a class="sourceLine" id="cb29-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-14" data-line-number="14"><span class="co">#&gt; ── 3: Field `Thickness` ───────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-15" data-line-number="15"><span class="co">#&gt; * Range: (0, Inf)</span></a>
+<a class="sourceLine" id="cb29-16" data-line-number="16"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-17" data-line-number="17"><span class="co">#&gt; ── 4: Field `Conductivity` ────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-18" data-line-number="18"><span class="co">#&gt; * Range: (0, Inf)</span></a>
+<a class="sourceLine" id="cb29-19" data-line-number="19"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-20" data-line-number="20"><span class="co">#&gt; ── 5: Field `Density` ─────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-21" data-line-number="21"><span class="co">#&gt; * Range: (0, Inf)</span></a>
+<a class="sourceLine" id="cb29-22" data-line-number="22"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-23" data-line-number="23"><span class="co">#&gt; ── 6: Field `Specific Heat` ───────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-24" data-line-number="24"><span class="co">#&gt; * Range: [100, Inf)</span></a>
+<a class="sourceLine" id="cb29-25" data-line-number="25"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-26" data-line-number="26"><span class="co">#&gt; ── 7: Field `Thermal Absorptance` ─────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-27" data-line-number="27"><span class="co">#&gt; * Default: 0.9</span></a>
+<a class="sourceLine" id="cb29-28" data-line-number="28"><span class="co">#&gt; * Range: (0, 0.99999]</span></a>
+<a class="sourceLine" id="cb29-29" data-line-number="29"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-30" data-line-number="30"><span class="co">#&gt; ── 8: Field `Solar Absorptance` ───────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-31" data-line-number="31"><span class="co">#&gt; * Default: 0.9</span></a>
+<a class="sourceLine" id="cb29-32" data-line-number="32"><span class="co">#&gt; * Range: [0, 1]</span></a>
+<a class="sourceLine" id="cb29-33" data-line-number="33"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb29-34" data-line-number="34"><span class="co">#&gt; ── 9: Field `Visible Absorptance` ─────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb29-35" data-line-number="35"><span class="co">#&gt; * Default: 0.9</span></a>
+<a class="sourceLine" id="cb29-36" data-line-number="36"><span class="co">#&gt; * Range: [0, 1]</span></a></code></pre></div>
 </div>
 <div id="insert-objects" class="section level4">
 <h4 class="hasAnchor">
 <a href="#insert-objects" class="anchor"></a>Insert objects</h4>
 <p>Sometimes it may be useful to insert objects from other IDFs. For example, you may want to import some design days from a “.ddy” file. You can achieve that using <code>$ins_object()</code>.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="co"># read ddy file as normal IDF</span></a>
-<a class="sourceLine" id="cb29-2" data-line-number="2">ddy &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_idf.html">read_idf</a></span>(<span class="st">"San_Francisco.ddy"</span>, <span class="dt">idd =</span> <span class="fl">8.8</span>)</a>
-<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="co">#&gt; Warning: Missing version field in input Idf file. The given Idd version</span></a>
-<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="co">#&gt; 8.8.0 will be used. Parsing errors may occur.</span></a>
-<a class="sourceLine" id="cb29-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb29-6" data-line-number="6">model<span class="op">$</span><span class="kw">ins_object</span>(ddy<span class="op">$</span>SizingPeriod_DesignDay)</a>
-<a class="sourceLine" id="cb29-7" data-line-number="7"><span class="co">#&gt; $San_Francisco_Intl_Ap_Ann_Htg_99_6_Condns_DB</span></a>
-<a class="sourceLine" id="cb29-8" data-line-number="8"><span class="co">#&gt; &lt;&lt;[ID:328] `San Francisco Intl Ap Ann Htg 99.6% Condns DB`&gt;&gt; SizingPeriod:DesignDay</span></a>
-<a class="sourceLine" id="cb29-9" data-line-number="9"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
-<a class="sourceLine" id="cb29-10" data-line-number="10"><span class="co">#&gt; * 1: San Francisco Intl Ap Ann Htg 99.6% Condns DB,  !- Name</span></a>
-<a class="sourceLine" id="cb29-11" data-line-number="11"><span class="co">#&gt; * 2: 1,                 !- Month</span></a>
-<a class="sourceLine" id="cb29-12" data-line-number="12"><span class="co">#&gt; * 3: 21,                !- Day of Month</span></a>
-<a class="sourceLine" id="cb29-13" data-line-number="13"><span class="co">#&gt; * 4: WinterDesignDay,   !- Day Type</span></a>
-<a class="sourceLine" id="cb29-14" data-line-number="14"><span class="co">#&gt;   5: 3.8,               !- Maximum Dry-Bulb Temperature {C}</span></a>
-<a class="sourceLine" id="cb29-15" data-line-number="15"><span class="co">#&gt;   6: 0,                 !- Daily Dry-Bulb Temperature Range {deltaC}</span></a>
-<a class="sourceLine" id="cb29-16" data-line-number="16"><span class="co">#&gt;   7: DefaultMultipliers,!- Dry-Bulb Temperature Range Modifier Type</span></a>
-<a class="sourceLine" id="cb29-17" data-line-number="17"><span class="co">#&gt;   8: &lt;Blank&gt;,           !- Dry-Bulb Temperature Range Modifier Day Schedule Name</span></a>
-<a class="sourceLine" id="cb29-18" data-line-number="18"><span class="co">#&gt;   9: Wetbulb,           !- Humidity Condition Type</span></a>
-<a class="sourceLine" id="cb29-19" data-line-number="19"><span class="co">#&gt;  10: 3.8,               !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}</span></a>
-<a class="sourceLine" id="cb29-20" data-line-number="20"><span class="co">#&gt;  11: &lt;Blank&gt;,           !- Humidity Condition Day Schedule Name</span></a>
-<a class="sourceLine" id="cb29-21" data-line-number="21"><span class="co">#&gt;  12: &lt;Blank&gt;,           !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}</span></a>
-<a class="sourceLine" id="cb29-22" data-line-number="22"><span class="co">#&gt;  13: &lt;Blank&gt;,           !- Enthalpy at Maximum Dry-Bulb {J/kg}</span></a>
-<a class="sourceLine" id="cb29-23" data-line-number="23"><span class="co">#&gt;  14: &lt;Blank&gt;,           !- Daily Wet-Bulb Temperature Range {deltaC}</span></a>
-<a class="sourceLine" id="cb29-24" data-line-number="24"><span class="co">#&gt;  15: 101301,            !- Barometric Pressure {Pa}</span></a>
-<a class="sourceLine" id="cb29-25" data-line-number="25"><span class="co">#&gt; *16: 2.2,               !- Wind Speed {m/s}</span></a>
-<a class="sourceLine" id="cb29-26" data-line-number="26"><span class="co">#&gt; *17: 150,               !- Wind Direction {deg}</span></a>
-<a class="sourceLine" id="cb29-27" data-line-number="27">....</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="co"># read ddy file as normal IDF</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">ddy &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_idf.html">read_idf</a></span>(<span class="st">"San_Francisco.ddy"</span>, <span class="dt">idd =</span> <span class="fl">8.8</span>)</a>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="co">#&gt; Warning: Missing version field in input Idf file. The given Idd version</span></a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="co">#&gt; 8.8.0 will be used. Parsing errors may occur.</span></a>
+<a class="sourceLine" id="cb30-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb30-6" data-line-number="6">model<span class="op">$</span><span class="kw">ins_object</span>(ddy<span class="op">$</span>SizingPeriod_DesignDay)</a>
+<a class="sourceLine" id="cb30-7" data-line-number="7"><span class="co">#&gt; $San_Francisco_Intl_Ap_Ann_Htg_99_6_Condns_DB</span></a>
+<a class="sourceLine" id="cb30-8" data-line-number="8"><span class="co">#&gt; &lt;&lt;[ID:328] `San Francisco Intl Ap Ann Htg 99.6% Condns DB`&gt;&gt; SizingPeriod:DesignDay</span></a>
+<a class="sourceLine" id="cb30-9" data-line-number="9"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
+<a class="sourceLine" id="cb30-10" data-line-number="10"><span class="co">#&gt; * 1: San Francisco Intl Ap Ann Htg 99.6% Condns DB,  !- Name</span></a>
+<a class="sourceLine" id="cb30-11" data-line-number="11"><span class="co">#&gt; * 2: 1,                 !- Month</span></a>
+<a class="sourceLine" id="cb30-12" data-line-number="12"><span class="co">#&gt; * 3: 21,                !- Day of Month</span></a>
+<a class="sourceLine" id="cb30-13" data-line-number="13"><span class="co">#&gt; * 4: WinterDesignDay,   !- Day Type</span></a>
+<a class="sourceLine" id="cb30-14" data-line-number="14"><span class="co">#&gt;   5: 3.8,               !- Maximum Dry-Bulb Temperature {C}</span></a>
+<a class="sourceLine" id="cb30-15" data-line-number="15"><span class="co">#&gt;   6: 0,                 !- Daily Dry-Bulb Temperature Range {deltaC}</span></a>
+<a class="sourceLine" id="cb30-16" data-line-number="16"><span class="co">#&gt;   7: DefaultMultipliers,!- Dry-Bulb Temperature Range Modifier Type</span></a>
+<a class="sourceLine" id="cb30-17" data-line-number="17"><span class="co">#&gt;   8: &lt;Blank&gt;,           !- Dry-Bulb Temperature Range Modifier Day Schedule Name</span></a>
+<a class="sourceLine" id="cb30-18" data-line-number="18"><span class="co">#&gt;   9: Wetbulb,           !- Humidity Condition Type</span></a>
+<a class="sourceLine" id="cb30-19" data-line-number="19"><span class="co">#&gt;  10: 3.8,               !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}</span></a>
+<a class="sourceLine" id="cb30-20" data-line-number="20"><span class="co">#&gt;  11: &lt;Blank&gt;,           !- Humidity Condition Day Schedule Name</span></a>
+<a class="sourceLine" id="cb30-21" data-line-number="21"><span class="co">#&gt;  12: &lt;Blank&gt;,           !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}</span></a>
+<a class="sourceLine" id="cb30-22" data-line-number="22"><span class="co">#&gt;  13: &lt;Blank&gt;,           !- Enthalpy at Maximum Dry-Bulb {J/kg}</span></a>
+<a class="sourceLine" id="cb30-23" data-line-number="23"><span class="co">#&gt;  14: &lt;Blank&gt;,           !- Daily Wet-Bulb Temperature Range {deltaC}</span></a>
+<a class="sourceLine" id="cb30-24" data-line-number="24"><span class="co">#&gt;  15: 101301,            !- Barometric Pressure {Pa}</span></a>
+<a class="sourceLine" id="cb30-25" data-line-number="25"><span class="co">#&gt; *16: 2.2,               !- Wind Speed {m/s}</span></a>
+<a class="sourceLine" id="cb30-26" data-line-number="26"><span class="co">#&gt; *17: 150,               !- Wind Direction {deg}</span></a>
+<a class="sourceLine" id="cb30-27" data-line-number="27">....</a></code></pre></div>
 </div>
 <div id="delete-object" class="section level4">
 <h4 class="hasAnchor">
 <a href="#delete-object" class="anchor"></a>Delete object</h4>
 <p><code>$del_object()</code> will delete current objects specified by object IDs or names. For example, in current model, there is a material named <code>"MAT-CLNG-1"</code> in class <code>Material:NoMass</code>. You can get objects referencing <code>MAT-CLNG-1</code> by using <code>$ref_by_object()</code> in <code>IdfObject</code>.</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">clng &lt;-<span class="st"> </span>model<span class="op">$</span>Material_NoMass<span class="op">$</span>MAT_CLNG_<span class="dv">1</span></a>
-<a class="sourceLine" id="cb30-2" data-line-number="2">clng<span class="op">$</span><span class="kw">ref_by_object</span>()</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="co">#&gt; 1 object found that reference the target object [ID: 55].</span></a>
-<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="co">#&gt; $CLNG_1</span></a>
-<a class="sourceLine" id="cb30-5" data-line-number="5"><span class="co">#&gt; &lt;&lt;[ID:68] `CLNG-1`&gt;&gt; Construction</span></a>
-<a class="sourceLine" id="cb30-6" data-line-number="6"><span class="co">#&gt; -------------------------------- * FIELDS * -------------------------------</span></a>
-<a class="sourceLine" id="cb30-7" data-line-number="7"><span class="co">#&gt; *1: CLNG-1,            !- Name</span></a>
-<a class="sourceLine" id="cb30-8" data-line-number="8"><span class="co">#&gt; *2: MAT-CLNG-1;        !- Outside Layer</span></a>
-<a class="sourceLine" id="cb30-9" data-line-number="9"><span class="co">#&gt; ---------------------------------------------------------------------------</span></a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">clng &lt;-<span class="st"> </span>model<span class="op">$</span>Material_NoMass<span class="op">$</span>MAT_CLNG_<span class="dv">1</span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">clng<span class="op">$</span><span class="kw">ref_by_object</span>()</a>
+<a class="sourceLine" id="cb31-3" data-line-number="3"><span class="co">#&gt; 1 object found that reference the target object [ID: 55].</span></a>
+<a class="sourceLine" id="cb31-4" data-line-number="4"><span class="co">#&gt; $CLNG_1</span></a>
+<a class="sourceLine" id="cb31-5" data-line-number="5"><span class="co">#&gt; &lt;&lt;[ID:68] `CLNG-1`&gt;&gt; Construction</span></a>
+<a class="sourceLine" id="cb31-6" data-line-number="6"><span class="co">#&gt; ──────────────────────────────── * FIELDS * ───────────────────────────────</span></a>
+<a class="sourceLine" id="cb31-7" data-line-number="7"><span class="co">#&gt; *1: CLNG-1,            !- Name</span></a>
+<a class="sourceLine" id="cb31-8" data-line-number="8"><span class="co">#&gt; *2: MAT-CLNG-1;        !- Outside Layer</span></a>
+<a class="sourceLine" id="cb31-9" data-line-number="9"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a></code></pre></div>
 <p>As we can see, <code>MAT-CLNG-1</code> has been referenced by a construction named <code>"CLNG-1"</code>. In <code>final</code> validate level, if the object is referenced by other object(s), it cannot be deleted.</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="st">"validate_level"</span>)</a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="co">#&gt; [1] "final"</span></a>
-<a class="sourceLine" id="cb31-3" data-line-number="3">model<span class="op">$</span><span class="kw">del_object</span>(<span class="st">"mat-clng-1"</span>)</a>
-<a class="sourceLine" id="cb31-4" data-line-number="4"><span class="co">#&gt; Error: Delete object that are referenced by others is prohibited in `final` validation level. Failed to delete target object [ID:`55`]:</span></a>
-<a class="sourceLine" id="cb31-5" data-line-number="5"><span class="co">#&gt; 1: Object [ID:`55`] was referenced by other objects [ID:`68`].</span></a></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="st">"validate_level"</span>)</a>
+<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="co">#&gt; [1] "final"</span></a>
+<a class="sourceLine" id="cb32-3" data-line-number="3">model<span class="op">$</span><span class="kw">del_object</span>(<span class="st">"mat-clng-1"</span>)</a>
+<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="co">#&gt; Error: Delete object that are referenced by others is prohibited in `final` validation level. Failed to delete target object [ID:`55`]:</span></a>
+<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="co">#&gt; 1: Object [ID:`55`] was referenced by other objects [ID:`68`].</span></a></code></pre></div>
 <p>In some cases, you may still want to delete that object. You can do that by changing validate level to <code>draft</code> or <code>none</code>. For detail explanations on each validate level, please see <code>?eplusr_option()</code>.</p>
 <p>You can also delete objects referencing the target objects as well, by setting <code>referenced</code> to <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="dt">validate_level =</span> <span class="st">"draft"</span>)</a>
-<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="co">#&gt; $validate_level</span></a>
-<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="co">#&gt; [1] "draft"</span></a>
-<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="kw">invisible</span>(model<span class="op">$</span><span class="kw">del_object</span>(<span class="st">"mat-clng-1"</span>, <span class="dt">referenced =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="co">#&gt; -- Info -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb32-6" data-line-number="6"><span class="co">#&gt; Delete target object [ID:`55`] and also objects [ID: `68`] that are referencing target object.</span></a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="dt">validate_level =</span> <span class="st">"draft"</span>)</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="co">#&gt; $validate_level</span></a>
+<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="co">#&gt; [1] "draft"</span></a>
+<a class="sourceLine" id="cb33-4" data-line-number="4"><span class="kw">invisible</span>(model<span class="op">$</span><span class="kw">del_object</span>(<span class="st">"mat-clng-1"</span>, <span class="dt">referenced =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb33-5" data-line-number="5"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb33-6" data-line-number="6"><span class="co">#&gt; Delete target object [ID:`55`] and also objects [ID: `68`] that are referencing target object.</span></a></code></pre></div>
 </div>
 </div>
 <div id="validate" class="section level3">
@@ -763,356 +800,363 @@
 <a href="#validate" class="anchor"></a>Validate</h3>
 <p><code>$validate()</code> will check the validation of all fields in current model, including missing required objects and fields, wrong value types, choices, references, any value range exceeding, invalid autosizable and autocalculatable fields. <code>$is_valid()</code> will return <code>TRUE</code> if no error is found. Validate level can be changed using <code><a href="reference/eplusr_option.html">eplusr_option()</a></code>. The default level is <code>final</code>, which is the strictest level.</p>
 <p>Material <code>MAT-CLNG-1</code> and construction <code>CLNG-1</code> have been all deleted in above. After that, invalid references will be detected during model validation, as construction <code>CLNG-1</code> was referenced by many other objects in <code>BuildingSurface:Detailed</code>. And also, invalid autocalculate fields in this model are detected.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="dt">validate_level =</span> <span class="st">"final"</span>)</a>
-<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="co">#&gt; $validate_level</span></a>
-<a class="sourceLine" id="cb33-3" data-line-number="3"><span class="co">#&gt; [1] "final"</span></a>
-<a class="sourceLine" id="cb33-4" data-line-number="4">model<span class="op">$</span><span class="kw">validate</span>()</a>
-<a class="sourceLine" id="cb33-5" data-line-number="5"><span class="co">#&gt;  x [20] Errors found during validation.</span></a>
-<a class="sourceLine" id="cb33-6" data-line-number="6"><span class="co">#&gt; ===========================================================================</span></a>
-<a class="sourceLine" id="cb33-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb33-8" data-line-number="8"><span class="co">#&gt; -- [10] Invalid Autocalculate Field ---------------------------------------</span></a>
-<a class="sourceLine" id="cb33-9" data-line-number="9"><span class="co">#&gt; (x) Fields below cannot be `autocalculate`.</span></a>
-<a class="sourceLine" id="cb33-10" data-line-number="10"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb33-11" data-line-number="11"><span class="co">#&gt;   Class `AirTerminal:SingleDuct:VAV:Reheat`</span></a>
-<a class="sourceLine" id="cb33-12" data-line-number="12"><span class="co">#&gt;   +- Object [ID:172]</span></a>
-<a class="sourceLine" id="cb33-13" data-line-number="13"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
-<a class="sourceLine" id="cb33-14" data-line-number="14"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
-<a class="sourceLine" id="cb33-15" data-line-number="15"><span class="co">#&gt;   +- Object [ID:173]</span></a>
-<a class="sourceLine" id="cb33-16" data-line-number="16"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
-<a class="sourceLine" id="cb33-17" data-line-number="17"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
-<a class="sourceLine" id="cb33-18" data-line-number="18"><span class="co">#&gt;   +- Object [ID:174]</span></a>
-<a class="sourceLine" id="cb33-19" data-line-number="19"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
-<a class="sourceLine" id="cb33-20" data-line-number="20"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
-<a class="sourceLine" id="cb33-21" data-line-number="21"><span class="co">#&gt;   +- Object [ID:175]</span></a>
-<a class="sourceLine" id="cb33-22" data-line-number="22"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
-<a class="sourceLine" id="cb33-23" data-line-number="23"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
-<a class="sourceLine" id="cb33-24" data-line-number="24"><span class="co">#&gt;   \- Object [ID:176]</span></a>
-<a class="sourceLine" id="cb33-25" data-line-number="25"><span class="co">#&gt;      +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
-<a class="sourceLine" id="cb33-26" data-line-number="26"><span class="co">#&gt;      \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
-<a class="sourceLine" id="cb33-27" data-line-number="27"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb33-28" data-line-number="28"><span class="co">#&gt; -- [10] Invalid Reference -------------------------------------------------</span></a>
-<a class="sourceLine" id="cb33-29" data-line-number="29"><span class="co">#&gt; (x) Fields below are not one of valid references.</span></a>
-<a class="sourceLine" id="cb33-30" data-line-number="30"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb33-31" data-line-number="31"><span class="co">#&gt;   Class `BuildingSurface:Detailed`</span></a>
-<a class="sourceLine" id="cb33-32" data-line-number="32"><span class="co">#&gt;   +- Object [ID:85]</span></a>
-<a class="sourceLine" id="cb33-33" data-line-number="33"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-34" data-line-number="34"><span class="co">#&gt;   +- Object [ID:86]</span></a>
-<a class="sourceLine" id="cb33-35" data-line-number="35"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-36" data-line-number="36"><span class="co">#&gt;   +- Object [ID:87]</span></a>
-<a class="sourceLine" id="cb33-37" data-line-number="37"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-38" data-line-number="38"><span class="co">#&gt;   +- Object [ID:88]</span></a>
-<a class="sourceLine" id="cb33-39" data-line-number="39"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-40" data-line-number="40"><span class="co">#&gt;   +- Object [ID:89]</span></a>
-<a class="sourceLine" id="cb33-41" data-line-number="41"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-42" data-line-number="42"><span class="co">#&gt;   +- Object [ID:91]</span></a>
-<a class="sourceLine" id="cb33-43" data-line-number="43"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-44" data-line-number="44"><span class="co">#&gt;   +- Object [ID:97]</span></a>
-<a class="sourceLine" id="cb33-45" data-line-number="45"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-46" data-line-number="46"><span class="co">#&gt;   +- Object [ID:103]</span></a>
-<a class="sourceLine" id="cb33-47" data-line-number="47"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-48" data-line-number="48"><span class="co">#&gt;   +- Object [ID:109]</span></a>
-<a class="sourceLine" id="cb33-49" data-line-number="49"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
-<a class="sourceLine" id="cb33-50" data-line-number="50"><span class="co">#&gt;   \- Object [ID:114]</span></a>
-<a class="sourceLine" id="cb33-51" data-line-number="51"><span class="co">#&gt;      \- 3: CLNG-1;            !- Construction Name</span></a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="kw"><a href="reference/eplusr_option.html">eplusr_option</a></span>(<span class="dt">validate_level =</span> <span class="st">"final"</span>)</a>
+<a class="sourceLine" id="cb34-2" data-line-number="2"><span class="co">#&gt; $validate_level</span></a>
+<a class="sourceLine" id="cb34-3" data-line-number="3"><span class="co">#&gt; [1] "final"</span></a>
+<a class="sourceLine" id="cb34-4" data-line-number="4">model<span class="op">$</span><span class="kw">validate</span>()</a>
+<a class="sourceLine" id="cb34-5" data-line-number="5"><span class="co">#&gt;  ✖ [20] Errors found during validation.</span></a>
+<a class="sourceLine" id="cb34-6" data-line-number="6"><span class="co">#&gt; ═══════════════════════════════════════════════════════════════════════════</span></a>
+<a class="sourceLine" id="cb34-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb34-8" data-line-number="8"><span class="co">#&gt; ── [10] Invalid Autocalculate Field ───────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb34-9" data-line-number="9"><span class="co">#&gt; ⓧ Fields below cannot be `autocalculate`.</span></a>
+<a class="sourceLine" id="cb34-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb34-11" data-line-number="11"><span class="co">#&gt;   Class `AirTerminal:SingleDuct:VAV:Reheat`</span></a>
+<a class="sourceLine" id="cb34-12" data-line-number="12"><span class="co">#&gt;   +- Object [ID:172]</span></a>
+<a class="sourceLine" id="cb34-13" data-line-number="13"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
+<a class="sourceLine" id="cb34-14" data-line-number="14"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
+<a class="sourceLine" id="cb34-15" data-line-number="15"><span class="co">#&gt;   +- Object [ID:173]</span></a>
+<a class="sourceLine" id="cb34-16" data-line-number="16"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
+<a class="sourceLine" id="cb34-17" data-line-number="17"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
+<a class="sourceLine" id="cb34-18" data-line-number="18"><span class="co">#&gt;   +- Object [ID:174]</span></a>
+<a class="sourceLine" id="cb34-19" data-line-number="19"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
+<a class="sourceLine" id="cb34-20" data-line-number="20"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
+<a class="sourceLine" id="cb34-21" data-line-number="21"><span class="co">#&gt;   +- Object [ID:175]</span></a>
+<a class="sourceLine" id="cb34-22" data-line-number="22"><span class="co">#&gt;   |  +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
+<a class="sourceLine" id="cb34-23" data-line-number="23"><span class="co">#&gt;   |  \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
+<a class="sourceLine" id="cb34-24" data-line-number="24"><span class="co">#&gt;   \- Object [ID:176]</span></a>
+<a class="sourceLine" id="cb34-25" data-line-number="25"><span class="co">#&gt;      +- 17: AUTOCALCULATE,     !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}</span></a>
+<a class="sourceLine" id="cb34-26" data-line-number="26"><span class="co">#&gt;      \- 18: AUTOCALCULATE;     !- Maximum Flow Fraction During Reheat</span></a>
+<a class="sourceLine" id="cb34-27" data-line-number="27"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb34-28" data-line-number="28"><span class="co">#&gt; ── [10] Invalid Reference ─────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb34-29" data-line-number="29"><span class="co">#&gt; ⓧ Fields below are not one of valid references.</span></a>
+<a class="sourceLine" id="cb34-30" data-line-number="30"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb34-31" data-line-number="31"><span class="co">#&gt;   Class `BuildingSurface:Detailed`</span></a>
+<a class="sourceLine" id="cb34-32" data-line-number="32"><span class="co">#&gt;   +- Object [ID:85]</span></a>
+<a class="sourceLine" id="cb34-33" data-line-number="33"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-34" data-line-number="34"><span class="co">#&gt;   +- Object [ID:86]</span></a>
+<a class="sourceLine" id="cb34-35" data-line-number="35"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-36" data-line-number="36"><span class="co">#&gt;   +- Object [ID:87]</span></a>
+<a class="sourceLine" id="cb34-37" data-line-number="37"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-38" data-line-number="38"><span class="co">#&gt;   +- Object [ID:88]</span></a>
+<a class="sourceLine" id="cb34-39" data-line-number="39"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-40" data-line-number="40"><span class="co">#&gt;   +- Object [ID:89]</span></a>
+<a class="sourceLine" id="cb34-41" data-line-number="41"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-42" data-line-number="42"><span class="co">#&gt;   +- Object [ID:91]</span></a>
+<a class="sourceLine" id="cb34-43" data-line-number="43"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-44" data-line-number="44"><span class="co">#&gt;   +- Object [ID:97]</span></a>
+<a class="sourceLine" id="cb34-45" data-line-number="45"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-46" data-line-number="46"><span class="co">#&gt;   +- Object [ID:103]</span></a>
+<a class="sourceLine" id="cb34-47" data-line-number="47"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-48" data-line-number="48"><span class="co">#&gt;   +- Object [ID:109]</span></a>
+<a class="sourceLine" id="cb34-49" data-line-number="49"><span class="co">#&gt;   |  \- 3: CLNG-1;            !- Construction Name</span></a>
+<a class="sourceLine" id="cb34-50" data-line-number="50"><span class="co">#&gt;   \- Object [ID:114]</span></a>
+<a class="sourceLine" id="cb34-51" data-line-number="51"><span class="co">#&gt;      \- 3: CLNG-1;            !- Construction Name</span></a></code></pre></div>
 </div>
 <div id="save" class="section level3">
 <h3 class="hasAnchor">
 <a href="#save" class="anchor"></a>Save</h3>
 <p>You can save your model using <code>$save()</code>. If no path is given, the path of model itself will be used. This may overwrite the current file which has a risk of losing your original file and data. You have to set <code>overwrite</code> to <code>TRUE</code> to confirm the process.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">model<span class="op">$</span><span class="kw">save</span>(<span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb34-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb34-3" data-line-number="3">model<span class="op">$</span><span class="kw">save</span>(<span class="st">"test.idf"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">model<span class="op">$</span><span class="kw">save</span>(<span class="dt">overwrite =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb35-3" data-line-number="3">model<span class="op">$</span><span class="kw">save</span>(<span class="st">"test.idf"</span>)</a></code></pre></div>
 </div>
 <div id="run-and-collect-output" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-and-collect-output" class="anchor"></a>Run and Collect Output</h3>
 <p>eplusr uses the EnergyPlus command line interface which was introduced since EnergyPlus v8.3.0, which means that <code>$run()</code> only supports models with version higher than v8.3.0.</p>
 <p>eplusr will auto-detect already installed EnergyPlus in the standard installation locations. You can get all detected EnergyPlus versions using <code><a href="reference/use_eplus.html">avail_eplus()</a></code>.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="kw"><a href="reference/use_eplus.html">avail_eplus</a></span>()</a>
-<a class="sourceLine" id="cb35-2" data-line-number="2"><span class="co">#&gt; [1] "8.6.0" "8.8.0" "8.9.0"</span></a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw"><a href="reference/use_eplus.html">avail_eplus</a></span>()</a>
+<a class="sourceLine" id="cb36-2" data-line-number="2"><span class="co">#&gt; [1] "8.6.0" "8.8.0"</span></a></code></pre></div>
 <p><code>$run()</code> will issue an error if corresponding version of EnergyPlus is not found. If your EnergyPlus was not installed in standard location, you can add that location into eplusr EnergyPlus location dictionary using <code><a href="reference/use_eplus.html">use_eplus()</a></code>.</p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="kw"><a href="reference/use_eplus.html">use_eplus</a></span>(<span class="st">"C:/EnergyPlusV8-8-0"</span>)</a>
-<a class="sourceLine" id="cb36-2" data-line-number="2"><span class="co">#&gt; EnergyPlus v8.8.0 has been added to EnergyPlus location dictionary.</span></a></code></pre></div>
-<p>If the needed version of EnergyPlus was not installed, you can use <code><a href="http://www.rdocumentation.org/packages/eplusr/topics/install_eplus">install_eplus()</a></code> to install it.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="http://www.rdocumentation.org/packages/eplusr/topics/install_eplus">install_eplus</a></span>(<span class="dt">ver =</span> <span class="fl">8.9</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw"><a href="reference/use_eplus.html">use_eplus</a></span>(<span class="st">"C:/EnergyPlusV8-8-0"</span>)</a></code></pre></div>
+<p>If the needed version of EnergyPlus was not installed, you can use <code><a href="reference/install_eplus.html">install_eplus()</a></code> to install it.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw"><a href="reference/install_eplus.html">install_eplus</a></span>(<span class="dt">ver =</span> <span class="fl">8.9</span>)</a></code></pre></div>
 <p>Sometimes, before simulation, it may be useful to retrieve weather data from EnergyPlus Weather (EPW) file and conduct analysis on the weather. eplusr provides <code><a href="reference/read_epw.html">read_epw()</a></code> to let you read an EPW file and <code>Epw</code> class to query and modify weather data.</p>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">epw_sf &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_epw.html">read_epw</a></span>(<span class="st">"San_Francisco.epw"</span>)</a>
-<a class="sourceLine" id="cb38-2" data-line-number="2">epw_sf</a>
-<a class="sourceLine" id="cb38-3" data-line-number="3"><span class="co">#&gt; -- Location ---------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-4" data-line-number="4"><span class="co">#&gt; * [ City    ]: San Francisco Intl Ap</span></a>
-<a class="sourceLine" id="cb38-5" data-line-number="5"><span class="co">#&gt; * [ State   ]: CA</span></a>
-<a class="sourceLine" id="cb38-6" data-line-number="6"><span class="co">#&gt; * [ Country ]: USA</span></a>
-<a class="sourceLine" id="cb38-7" data-line-number="7"><span class="co">#&gt; * [ Source  ]: TMY3</span></a>
-<a class="sourceLine" id="cb38-8" data-line-number="8"><span class="co">#&gt; * [ WMO Num ]: 724940</span></a>
-<a class="sourceLine" id="cb38-9" data-line-number="9"><span class="co">#&gt; * [Latitude ]: 37.62</span></a>
-<a class="sourceLine" id="cb38-10" data-line-number="10"><span class="co">#&gt; * [Longitude]: -122.4</span></a>
-<a class="sourceLine" id="cb38-11" data-line-number="11"><span class="co">#&gt; * [Time Zone]: -8</span></a>
-<a class="sourceLine" id="cb38-12" data-line-number="12"><span class="co">#&gt; * [Evevation]: 2</span></a>
-<a class="sourceLine" id="cb38-13" data-line-number="13"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb38-14" data-line-number="14"><span class="co">#&gt; -- Data Period ------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-15" data-line-number="15"><span class="co">#&gt; * [Period Num ]: 1</span></a>
-<a class="sourceLine" id="cb38-16" data-line-number="16"><span class="co">#&gt; * [Time Step  ]: 60 min</span></a>
-<a class="sourceLine" id="cb38-17" data-line-number="17"><span class="co">#&gt; * [Date Range ]: Jan 01 - Dec 31</span></a>
-<a class="sourceLine" id="cb38-18" data-line-number="18"><span class="co">#&gt; * [1st Weekday]: Sunday</span></a>
-<a class="sourceLine" id="cb38-19" data-line-number="19"><span class="co">#&gt; * [Real Year  ]: 1</span></a>
-<a class="sourceLine" id="cb38-20" data-line-number="20"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb38-21" data-line-number="21"><span class="co">#&gt; -- Holidays and Daylight Savings ------------------------------------------</span></a>
-<a class="sourceLine" id="cb38-22" data-line-number="22"><span class="co">#&gt; * [ Leap Year ]: FALSE</span></a>
-<a class="sourceLine" id="cb38-23" data-line-number="23"><span class="co">#&gt; * [ DST Range ]: NA</span></a>
-<a class="sourceLine" id="cb38-24" data-line-number="24"><span class="co">#&gt; * [Holiday Num]: 0</span></a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">epw_sf &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_epw.html">read_epw</a></span>(<span class="st">"San_Francisco.epw"</span>)</a>
+<a class="sourceLine" id="cb39-2" data-line-number="2">epw_sf</a>
+<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="co">#&gt; ── Location ───────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="co">#&gt; ● [ City    ]: San Francisco Intl Ap</span></a>
+<a class="sourceLine" id="cb39-5" data-line-number="5"><span class="co">#&gt; ● [ State   ]: CA</span></a>
+<a class="sourceLine" id="cb39-6" data-line-number="6"><span class="co">#&gt; ● [ Country ]: USA</span></a>
+<a class="sourceLine" id="cb39-7" data-line-number="7"><span class="co">#&gt; ● [ Source  ]: TMY3</span></a>
+<a class="sourceLine" id="cb39-8" data-line-number="8"><span class="co">#&gt; ● [ WMO Num ]: 724940</span></a>
+<a class="sourceLine" id="cb39-9" data-line-number="9"><span class="co">#&gt; ● [Latitude ]: 37.62</span></a>
+<a class="sourceLine" id="cb39-10" data-line-number="10"><span class="co">#&gt; ● [Longitude]: -122.4</span></a>
+<a class="sourceLine" id="cb39-11" data-line-number="11"><span class="co">#&gt; ● [Time Zone]: -8</span></a>
+<a class="sourceLine" id="cb39-12" data-line-number="12"><span class="co">#&gt; ● [Evevation]: 2</span></a>
+<a class="sourceLine" id="cb39-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb39-14" data-line-number="14"><span class="co">#&gt; ── Data Period ────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb39-15" data-line-number="15"><span class="co">#&gt; ● [Period Num ]: 1</span></a>
+<a class="sourceLine" id="cb39-16" data-line-number="16"><span class="co">#&gt; ● [Time Step  ]: 60 min</span></a>
+<a class="sourceLine" id="cb39-17" data-line-number="17"><span class="co">#&gt; ● [Date Range ]: 1月 01 - 12月 31</span></a>
+<a class="sourceLine" id="cb39-18" data-line-number="18"><span class="co">#&gt; ● [1st Weekday]: Sunday</span></a>
+<a class="sourceLine" id="cb39-19" data-line-number="19"><span class="co">#&gt; ● [Real Year  ]: 1</span></a>
+<a class="sourceLine" id="cb39-20" data-line-number="20"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb39-21" data-line-number="21"><span class="co">#&gt; ── Holidays and Daylight Savings ──────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb39-22" data-line-number="22"><span class="co">#&gt; ● [ Leap Year ]: FALSE</span></a>
+<a class="sourceLine" id="cb39-23" data-line-number="23"><span class="co">#&gt; ● [ DST Range ]: NA</span></a>
+<a class="sourceLine" id="cb39-24" data-line-number="24"><span class="co">#&gt; ● [Holiday Num]: 0</span></a></code></pre></div>
 <p><code><a href="reference/read_epw.html">read_epw()</a></code> returns an <code>Epw</code> object. For details on <code>Epw</code> class, please see <code><a href="reference/epw.html">?epw</a></code>. Below are all methods of <code>Epw</code>:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">setdiff</span>(<span class="kw">ls</span>(epw_sf), <span class="st">"initialize"</span>)</a>
-<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="co">#&gt;  [1] "city"              "clone"             "country"          </span></a>
-<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="co">#&gt;  [4] "data_source"       "elevation"         "get_data"         </span></a>
-<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="co">#&gt;  [7] "latitude"          "longitude"         "path"             </span></a>
-<a class="sourceLine" id="cb39-5" data-line-number="5"><span class="co">#&gt; [10] "print"             "save"              "set_data"         </span></a>
-<a class="sourceLine" id="cb39-6" data-line-number="6"><span class="co">#&gt; [13] "start_day_of_week" "state_province"    "time_step"        </span></a>
-<a class="sourceLine" id="cb39-7" data-line-number="7"><span class="co">#&gt; [16] "time_zone"         "wmo_number"</span></a></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="kw">setdiff</span>(<span class="kw">ls</span>(epw_sf), <span class="st">"initialize"</span>)</a>
+<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="co">#&gt;  [1] "city"              "clone"             "country"          </span></a>
+<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="co">#&gt;  [4] "data_source"       "elevation"         "get_data"         </span></a>
+<a class="sourceLine" id="cb40-4" data-line-number="4"><span class="co">#&gt;  [7] "latitude"          "longitude"         "path"             </span></a>
+<a class="sourceLine" id="cb40-5" data-line-number="5"><span class="co">#&gt; [10] "print"             "save"              "set_data"         </span></a>
+<a class="sourceLine" id="cb40-6" data-line-number="6"><span class="co">#&gt; [13] "start_day_of_week" "state_province"    "time_step"        </span></a>
+<a class="sourceLine" id="cb40-7" data-line-number="7"><span class="co">#&gt; [16] "time_zone"         "wmo_number"</span></a></code></pre></div>
 <p>You can get all weather data using <code>$get_data()</code>.</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1">epw_data &lt;-<span class="st"> </span>epw_sf<span class="op">$</span><span class="kw">get_data</span>()</a>
-<a class="sourceLine" id="cb40-2" data-line-number="2"><span class="kw">str</span>(epw_data)</a>
-<a class="sourceLine" id="cb40-3" data-line-number="3"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   8760 obs. of  36 variables:</span></a>
-<a class="sourceLine" id="cb40-4" data-line-number="4"><span class="co">#&gt;  $ datetime                                        : POSIXct, format: "1999-01-01 01:00:00" "1999-01-01 02:00:00" ...</span></a>
-<a class="sourceLine" id="cb40-5" data-line-number="5"><span class="co">#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...</span></a>
-<a class="sourceLine" id="cb40-6" data-line-number="6"><span class="co">#&gt;  $ month                                           : int  1 1 1 1 1 1 1 1 1 1 ...</span></a>
-<a class="sourceLine" id="cb40-7" data-line-number="7"><span class="co">#&gt;  $ day                                             : int  1 1 1 1 1 1 1 1 1 1 ...</span></a>
-<a class="sourceLine" id="cb40-8" data-line-number="8"><span class="co">#&gt;  $ hour                                            : int  1 2 3 4 5 6 7 8 9 10 ...</span></a>
-<a class="sourceLine" id="cb40-9" data-line-number="9"><span class="co">#&gt;  $ minute                                          : int  0 0 0 0 0 0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-10" data-line-number="10"><span class="co">#&gt;  $ datasource                                      : chr  "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" ...</span></a>
-<a class="sourceLine" id="cb40-11" data-line-number="11"><span class="co">#&gt;  $ dry_bulb_temperature                            : num  7.2 7.2 6.7 6.1 4.4 4.4 6.1 5 7.8 8.9 ...</span></a>
-<a class="sourceLine" id="cb40-12" data-line-number="12"><span class="co">#&gt;  $ dew_point_temperature                           : num  5.6 5.6 5 5 3.9 3.9 4.4 2.8 5 6.7 ...</span></a>
-<a class="sourceLine" id="cb40-13" data-line-number="13"><span class="co">#&gt;  $ relative_humidity                               : num  90 90 89 93 97 97 89 86 82 86 ...</span></a>
-<a class="sourceLine" id="cb40-14" data-line-number="14"><span class="co">#&gt;  $ atmospheric_pressure                            : num  102200 102100 102200 102200 102200 ...</span></a>
-<a class="sourceLine" id="cb40-15" data-line-number="15"><span class="co">#&gt;  $ extraterrestrial_horizontal_radiation           : num  0 0 0 0 0 0 0 36 243 443 ...</span></a>
-<a class="sourceLine" id="cb40-16" data-line-number="16"><span class="co">#&gt;  $ extraterrestrial_direct_normal_radiation        : num  0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-17" data-line-number="17"><span class="co">#&gt;  $ horizontal_infrared_radiation_intensity_from_sky: num  290 296 291 276 280 280 287 281 295 299 ...</span></a>
-<a class="sourceLine" id="cb40-18" data-line-number="18"><span class="co">#&gt;  $ global_horizontal_radiation                     : num  0 0 0 0 0 0 0 2 121 276 ...</span></a>
-<a class="sourceLine" id="cb40-19" data-line-number="19"><span class="co">#&gt;  $ direct_normal_radiation                         : num  0 0 0 0 0 0 0 69 477 651 ...</span></a>
-<a class="sourceLine" id="cb40-20" data-line-number="20"><span class="co">#&gt;  $ diffuse_horizontal_radiation                    : num  0 0 0 0 0 0 0 1 39 71 ...</span></a>
-<a class="sourceLine" id="cb40-21" data-line-number="21"><span class="co">#&gt;  $ global_horizontal_illuminance                   : num  0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-22" data-line-number="22"><span class="co">#&gt;  $ direct_normal_illuminance                       : num  0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-23" data-line-number="23"><span class="co">#&gt;  $ diffuse_horizontal_illuminance                  : num  0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-24" data-line-number="24"><span class="co">#&gt;  $ zenith_luminance                                : num  0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-25" data-line-number="25"><span class="co">#&gt;  $ wind_direction                                  : num  0 170 210 200 260 180 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-26" data-line-number="26"><span class="co">#&gt;  $ wind_speed                                      : num  0 2.1 2.1 1.5 3.1 2.1 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-27" data-line-number="27"><span class="co">#&gt;  $ total_sky_cover                                 : int  2 4 3 0 3 3 3 3 3 2 ...</span></a>
-<a class="sourceLine" id="cb40-28" data-line-number="28"><span class="co">#&gt;  $ opaque_sky_cover                                : int  2 4 3 0 3 3 3 3 3 2 ...</span></a>
-<a class="sourceLine" id="cb40-29" data-line-number="29"><span class="co">#&gt;  $ visibility                                      : num  16 16 16 16 16 16 16 16 16 16 ...</span></a>
-<a class="sourceLine" id="cb40-30" data-line-number="30"><span class="co">#&gt;  $ ceiling_height                                  : num  77777 77777 77777 77777 77777 ...</span></a>
-<a class="sourceLine" id="cb40-31" data-line-number="31"><span class="co">#&gt;  $ present_weather_observation                     : int  9 9 9 9 9 9 9 9 9 9 ...</span></a>
-<a class="sourceLine" id="cb40-32" data-line-number="32"><span class="co">#&gt;  $ present_weather_codes                           : chr  NA NA NA NA ...</span></a>
-<a class="sourceLine" id="cb40-33" data-line-number="33"><span class="co">#&gt;  $ precipitable_water                              : num  129 120 120 120 120 120 120 110 110 110 ...</span></a>
-<a class="sourceLine" id="cb40-34" data-line-number="34"><span class="co">#&gt;  $ aerosol_optical_depth                           : num  0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 ...</span></a>
-<a class="sourceLine" id="cb40-35" data-line-number="35"><span class="co">#&gt;  $ snow_depth                                      : num  0 0 0 0 0 0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-36" data-line-number="36"><span class="co">#&gt;  $ days_since_last_snow                            : int  88 88 88 88 88 88 88 88 88 88 ...</span></a>
-<a class="sourceLine" id="cb40-37" data-line-number="37"><span class="co">#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 ...</span></a>
-<a class="sourceLine" id="cb40-38" data-line-number="38"><span class="co">#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb40-39" data-line-number="39"><span class="co">#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1 1 1 1 1 ...</span></a>
-<a class="sourceLine" id="cb40-40" data-line-number="40"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">epw_data &lt;-<span class="st"> </span>epw_sf<span class="op">$</span><span class="kw">get_data</span>()</a>
+<a class="sourceLine" id="cb41-2" data-line-number="2"><span class="kw">str</span>(epw_data)</a>
+<a class="sourceLine" id="cb41-3" data-line-number="3"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   8760 obs. of  36 variables:</span></a>
+<a class="sourceLine" id="cb41-4" data-line-number="4"><span class="co">#&gt;  $ datetime                                        : POSIXct, format: "1999-01-01 01:00:00" "1999-01-01 02:00:00" ...</span></a>
+<a class="sourceLine" id="cb41-5" data-line-number="5"><span class="co">#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...</span></a>
+<a class="sourceLine" id="cb41-6" data-line-number="6"><span class="co">#&gt;  $ month                                           : int  1 1 1 1 1 1 1 1 1 1 ...</span></a>
+<a class="sourceLine" id="cb41-7" data-line-number="7"><span class="co">#&gt;  $ day                                             : int  1 1 1 1 1 1 1 1 1 1 ...</span></a>
+<a class="sourceLine" id="cb41-8" data-line-number="8"><span class="co">#&gt;  $ hour                                            : int  1 2 3 4 5 6 7 8 9 10 ...</span></a>
+<a class="sourceLine" id="cb41-9" data-line-number="9"><span class="co">#&gt;  $ minute                                          : int  0 0 0 0 0 0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-10" data-line-number="10"><span class="co">#&gt;  $ datasource                                      : chr  "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" ...</span></a>
+<a class="sourceLine" id="cb41-11" data-line-number="11"><span class="co">#&gt;  $ dry_bulb_temperature                            : num  7.2 7.2 6.7 6.1 4.4 4.4 6.1 5 7.8 8.9 ...</span></a>
+<a class="sourceLine" id="cb41-12" data-line-number="12"><span class="co">#&gt;  $ dew_point_temperature                           : num  5.6 5.6 5 5 3.9 3.9 4.4 2.8 5 6.7 ...</span></a>
+<a class="sourceLine" id="cb41-13" data-line-number="13"><span class="co">#&gt;  $ relative_humidity                               : num  90 90 89 93 97 97 89 86 82 86 ...</span></a>
+<a class="sourceLine" id="cb41-14" data-line-number="14"><span class="co">#&gt;  $ atmospheric_pressure                            : num  102200 102100 102200 102200 102200 ...</span></a>
+<a class="sourceLine" id="cb41-15" data-line-number="15"><span class="co">#&gt;  $ extraterrestrial_horizontal_radiation           : num  0 0 0 0 0 0 0 36 243 443 ...</span></a>
+<a class="sourceLine" id="cb41-16" data-line-number="16"><span class="co">#&gt;  $ extraterrestrial_direct_normal_radiation        : num  0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-17" data-line-number="17"><span class="co">#&gt;  $ horizontal_infrared_radiation_intensity_from_sky: num  290 296 291 276 280 280 287 281 295 299 ...</span></a>
+<a class="sourceLine" id="cb41-18" data-line-number="18"><span class="co">#&gt;  $ global_horizontal_radiation                     : num  0 0 0 0 0 0 0 2 121 276 ...</span></a>
+<a class="sourceLine" id="cb41-19" data-line-number="19"><span class="co">#&gt;  $ direct_normal_radiation                         : num  0 0 0 0 0 0 0 69 477 651 ...</span></a>
+<a class="sourceLine" id="cb41-20" data-line-number="20"><span class="co">#&gt;  $ diffuse_horizontal_radiation                    : num  0 0 0 0 0 0 0 1 39 71 ...</span></a>
+<a class="sourceLine" id="cb41-21" data-line-number="21"><span class="co">#&gt;  $ global_horizontal_illuminance                   : num  0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-22" data-line-number="22"><span class="co">#&gt;  $ direct_normal_illuminance                       : num  0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-23" data-line-number="23"><span class="co">#&gt;  $ diffuse_horizontal_illuminance                  : num  0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-24" data-line-number="24"><span class="co">#&gt;  $ zenith_luminance                                : num  0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-25" data-line-number="25"><span class="co">#&gt;  $ wind_direction                                  : num  0 170 210 200 260 180 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-26" data-line-number="26"><span class="co">#&gt;  $ wind_speed                                      : num  0 2.1 2.1 1.5 3.1 2.1 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-27" data-line-number="27"><span class="co">#&gt;  $ total_sky_cover                                 : int  2 4 3 0 3 3 3 3 3 2 ...</span></a>
+<a class="sourceLine" id="cb41-28" data-line-number="28"><span class="co">#&gt;  $ opaque_sky_cover                                : int  2 4 3 0 3 3 3 3 3 2 ...</span></a>
+<a class="sourceLine" id="cb41-29" data-line-number="29"><span class="co">#&gt;  $ visibility                                      : num  16 16 16 16 16 16 16 16 16 16 ...</span></a>
+<a class="sourceLine" id="cb41-30" data-line-number="30"><span class="co">#&gt;  $ ceiling_height                                  : num  77777 77777 77777 77777 77777 ...</span></a>
+<a class="sourceLine" id="cb41-31" data-line-number="31"><span class="co">#&gt;  $ present_weather_observation                     : int  9 9 9 9 9 9 9 9 9 9 ...</span></a>
+<a class="sourceLine" id="cb41-32" data-line-number="32"><span class="co">#&gt;  $ present_weather_codes                           : chr  NA NA NA NA ...</span></a>
+<a class="sourceLine" id="cb41-33" data-line-number="33"><span class="co">#&gt;  $ precipitable_water                              : num  129 120 120 120 120 120 120 110 110 110 ...</span></a>
+<a class="sourceLine" id="cb41-34" data-line-number="34"><span class="co">#&gt;  $ aerosol_optical_depth                           : num  0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 ...</span></a>
+<a class="sourceLine" id="cb41-35" data-line-number="35"><span class="co">#&gt;  $ snow_depth                                      : num  0 0 0 0 0 0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-36" data-line-number="36"><span class="co">#&gt;  $ days_since_last_snow                            : int  88 88 88 88 88 88 88 88 88 88 ...</span></a>
+<a class="sourceLine" id="cb41-37" data-line-number="37"><span class="co">#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 ...</span></a>
+<a class="sourceLine" id="cb41-38" data-line-number="38"><span class="co">#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb41-39" data-line-number="39"><span class="co">#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1 1 1 1 1 ...</span></a>
+<a class="sourceLine" id="cb41-40" data-line-number="40"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
 <p><code>$run()</code> will run the current model with specified weather using corresponding version of EnergyPlus. The model and the weather used will be copied to the output directory. An <code>EplusJob</code> object will be returned which provides detailed information of the simulation and methods to collect simulation output. Please see <code><a href="reference/job.html">?job</a></code> for more detailed.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="co"># read the model again</span></a>
-<a class="sourceLine" id="cb41-2" data-line-number="2">model &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_idf.html">read_idf</a></span>(<span class="st">"5Zone_Transformer.idf"</span>, <span class="dt">idd =</span> <span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb41-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb41-4" data-line-number="4">job &lt;-<span class="st"> </span>model<span class="op">$</span><span class="kw">run</span>(epw_sf, <span class="dt">dir =</span> <span class="st">"."</span>, <span class="dt">wait =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb41-5" data-line-number="5"><span class="co">#&gt; -- Info -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb41-6" data-line-number="6"><span class="co">#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.</span></a>
-<a class="sourceLine" id="cb41-7" data-line-number="7"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb41-8" data-line-number="8"><span class="co">#&gt; -- Info -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb41-9" data-line-number="9"><span class="co">#&gt; Replace the existing file located  at C:\Users\hongy\5Zone_Transformer.idf.</span></a>
-<a class="sourceLine" id="cb41-10" data-line-number="10"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb41-11" data-line-number="11"><span class="co">#&gt; -- Info -------------------------------------------------------------------</span></a>
-<a class="sourceLine" id="cb41-12" data-line-number="12"><span class="co">#&gt; Replace the existing file located  at C:\Users\hongy\5Zone_Transformer.idf.</span></a>
-<a class="sourceLine" id="cb41-13" data-line-number="13"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb41-14" data-line-number="14"><span class="co">#&gt; EnergyPlus Starting</span></a>
-<a class="sourceLine" id="cb41-15" data-line-number="15"><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.07.24 12:01</span></a>
-<a class="sourceLine" id="cb41-16" data-line-number="16"><span class="co">#&gt; Processing Data Dictionary</span></a>
-<a class="sourceLine" id="cb41-17" data-line-number="17"><span class="co">#&gt; Processing Input File</span></a>
-<a class="sourceLine" id="cb41-18" data-line-number="18"><span class="co">#&gt; Initializing Response Factors</span></a>
-<a class="sourceLine" id="cb41-19" data-line-number="19"><span class="co">#&gt; Calculating CTFs for "ROOF-1", Construction # 1</span></a>
-<a class="sourceLine" id="cb41-20" data-line-number="20"><span class="co">#&gt; Calculating CTFs for "WALL-1", Construction # 2</span></a>
-<a class="sourceLine" id="cb41-21" data-line-number="21"><span class="co">#&gt; Calculating CTFs for "FLOOR-SLAB-1", Construction # 4</span></a>
-<a class="sourceLine" id="cb41-22" data-line-number="22"><span class="co">#&gt; Calculating CTFs for "INT-WALL-1", Construction # 5</span></a>
-<a class="sourceLine" id="cb41-23" data-line-number="23"><span class="co">#&gt; Initializing Window Optical Properties</span></a>
-<a class="sourceLine" id="cb41-24" data-line-number="24"><span class="co">#&gt; Initializing Solar Calculations</span></a>
-<a class="sourceLine" id="cb41-25" data-line-number="25"><span class="co">#&gt; Allocate Solar Module Arrays</span></a>
-<a class="sourceLine" id="cb41-26" data-line-number="26"><span class="co">#&gt; Initializing Zone Report Variables</span></a>
-<a class="sourceLine" id="cb41-27" data-line-number="27"><span class="co">#&gt; Initializing Surface (Shading) Report Variables</span></a>
-<a class="sourceLine" id="cb41-28" data-line-number="28"><span class="co">#&gt; Computing Interior Solar Absorption Factors</span></a>
-<a class="sourceLine" id="cb41-29" data-line-number="29"><span class="co">#&gt; Determining Shadowing Combinations</span></a>
-<a class="sourceLine" id="cb41-30" data-line-number="30"><span class="co">#&gt; Computing Window Shade Absorption Factors</span></a>
-<a class="sourceLine" id="cb41-31" data-line-number="31"><span class="co">#&gt; Proceeding with Initializing Solar Calculations</span></a>
-<a class="sourceLine" id="cb41-32" data-line-number="32"><span class="co">#&gt; Initializing Surfaces</span></a>
-<a class="sourceLine" id="cb41-33" data-line-number="33"><span class="co">#&gt; Initializing Outdoor environment for Surfaces</span></a>
-<a class="sourceLine" id="cb41-34" data-line-number="34"><span class="co">#&gt; Setting up Surface Reporting Variables</span></a>
-<a class="sourceLine" id="cb41-35" data-line-number="35"><span class="co">#&gt; Initializing Temperature and Flux Histories</span></a>
-<a class="sourceLine" id="cb41-36" data-line-number="36"><span class="co">#&gt; Initializing Window Shading</span></a>
-<a class="sourceLine" id="cb41-37" data-line-number="37"><span class="co">#&gt; Computing Interior Absorption Factors</span></a>
-<a class="sourceLine" id="cb41-38" data-line-number="38"><span class="co">#&gt; Computing Interior Diffuse Solar Absorption Factors</span></a>
-<a class="sourceLine" id="cb41-39" data-line-number="39"><span class="co">#&gt; Computing Interior Diffuse Solar Exchange through Interzone Windows</span></a>
-<a class="sourceLine" id="cb41-40" data-line-number="40"><span class="co">#&gt; Initializing Solar Heat Gains</span></a>
-<a class="sourceLine" id="cb41-41" data-line-number="41"><span class="co">#&gt; Initializing Internal Heat Gains</span></a>
-<a class="sourceLine" id="cb41-42" data-line-number="42"><span class="co">#&gt; Initializing Interior Solar Distribution</span></a>
-<a class="sourceLine" id="cb41-43" data-line-number="43"><span class="co">#&gt; Initializing Interior Convection Coefficients</span></a>
-<a class="sourceLine" id="cb41-44" data-line-number="44"><span class="co">#&gt; Gathering Information for Predefined Reporting</span></a>
-<a class="sourceLine" id="cb41-45" data-line-number="45"><span class="co">#&gt; Completed Initializing Surface Heat Balance</span></a>
-<a class="sourceLine" id="cb41-46" data-line-number="46"><span class="co">#&gt; Calculate Outside Surface Heat Balance</span></a>
-<a class="sourceLine" id="cb41-47" data-line-number="47"><span class="co">#&gt; Calculate Inside Surface Heat Balance</span></a>
-<a class="sourceLine" id="cb41-48" data-line-number="48"><span class="co">#&gt; Calculate Air Heat Balance</span></a>
-<a class="sourceLine" id="cb41-49" data-line-number="49"><span class="co">#&gt; Initializing HVAC</span></a>
-<a class="sourceLine" id="cb41-50" data-line-number="50"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-51" data-line-number="51"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-52" data-line-number="52"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-53" data-line-number="53"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-54" data-line-number="54"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-55" data-line-number="55"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-56" data-line-number="56"><span class="co">#&gt; Performing Zone Sizing Simulation</span></a>
-<a class="sourceLine" id="cb41-57" data-line-number="57"><span class="co">#&gt; ...for Sizing Period: #1 CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB</span></a>
-<a class="sourceLine" id="cb41-58" data-line-number="58"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-59" data-line-number="59"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-60" data-line-number="60"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-61" data-line-number="61"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-62" data-line-number="62"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-63" data-line-number="63"><span class="co">#&gt; Warming up</span></a>
-<a class="sourceLine" id="cb41-64" data-line-number="64"><span class="co">#&gt; Performing Zone Sizing Simulation</span></a>
-<a class="sourceLine" id="cb41-65" data-line-number="65"><span class="co">#&gt; ...for Sizing Period: #2 CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB</span></a>
-<a class="sourceLine" id="cb41-66" data-line-number="66"><span class="co">#&gt; Calculating System sizing</span></a>
-<a class="sourceLine" id="cb41-67" data-line-number="67"><span class="co">#&gt; ...for Sizing Period: #1 CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB</span></a>
-<a class="sourceLine" id="cb41-68" data-line-number="68"><span class="co">#&gt; Calculating System sizing</span></a>
-<a class="sourceLine" id="cb41-69" data-line-number="69"><span class="co">#&gt; ...for Sizing Period: #2 CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB</span></a>
-<a class="sourceLine" id="cb41-70" data-line-number="70"><span class="co">#&gt; Initializing Simulation</span></a>
-<a class="sourceLine" id="cb41-71" data-line-number="71"><span class="co">#&gt; Reporting Surfaces</span></a>
-<a class="sourceLine" id="cb41-72" data-line-number="72"><span class="co">#&gt; Beginning Primary Simulation</span></a>
-<a class="sourceLine" id="cb41-73" data-line-number="73"><span class="co">#&gt; Initializing New Environment Parameters</span></a>
-<a class="sourceLine" id="cb41-74" data-line-number="74"><span class="co">#&gt; Warming up {1}</span></a>
-<a class="sourceLine" id="cb41-75" data-line-number="75"><span class="co">#&gt; Warming up {2}</span></a>
-<a class="sourceLine" id="cb41-76" data-line-number="76"><span class="co">#&gt; Warming up {3}</span></a>
-<a class="sourceLine" id="cb41-77" data-line-number="77"><span class="co">#&gt; Warming up {4}</span></a>
-<a class="sourceLine" id="cb41-78" data-line-number="78"><span class="co">#&gt; Warming up {5}</span></a>
-<a class="sourceLine" id="cb41-79" data-line-number="79"><span class="co">#&gt; Warming up {6}</span></a>
-<a class="sourceLine" id="cb41-80" data-line-number="80"><span class="co">#&gt; Starting Simulation at 01/14 for WINTERDAY</span></a>
-<a class="sourceLine" id="cb41-81" data-line-number="81"><span class="co">#&gt; Initializing New Environment Parameters</span></a>
-<a class="sourceLine" id="cb41-82" data-line-number="82"><span class="co">#&gt; Warming up {1}</span></a>
-<a class="sourceLine" id="cb41-83" data-line-number="83"><span class="co">#&gt; Warming up {2}</span></a>
-<a class="sourceLine" id="cb41-84" data-line-number="84"><span class="co">#&gt; Warming up {3}</span></a>
-<a class="sourceLine" id="cb41-85" data-line-number="85"><span class="co">#&gt; Warming up {4}</span></a>
-<a class="sourceLine" id="cb41-86" data-line-number="86"><span class="co">#&gt; Warming up {5}</span></a>
-<a class="sourceLine" id="cb41-87" data-line-number="87"><span class="co">#&gt; Warming up {6}</span></a>
-<a class="sourceLine" id="cb41-88" data-line-number="88"><span class="co">#&gt; Starting Simulation at 07/07 for SUMMERDAY</span></a>
-<a class="sourceLine" id="cb41-89" data-line-number="89"><span class="co">#&gt; Writing tabular output file results using HTML format.</span></a>
-<a class="sourceLine" id="cb41-90" data-line-number="90"><span class="co">#&gt; Writing final SQL reports</span></a>
-<a class="sourceLine" id="cb41-91" data-line-number="91"><span class="co">#&gt; EnergyPlus Run Time=00hr 00min  2.07sec</span></a>
-<a class="sourceLine" id="cb41-92" data-line-number="92"><span class="co">#&gt; EnergyPlus Completed Successfully.</span></a>
-<a class="sourceLine" id="cb41-93" data-line-number="93">job</a>
-<a class="sourceLine" id="cb41-94" data-line-number="94"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb41-95" data-line-number="95"><span class="co">#&gt; # Model: `C:\Users\hongy\5Zone_Transformer.idf`</span></a>
-<a class="sourceLine" id="cb41-96" data-line-number="96"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb41-97" data-line-number="97"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb41-98" data-line-number="98"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb41-99" data-line-number="99"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:35` and completed successfully after 2.29 secs.</span></a></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="co"># read the model again</span></a>
+<a class="sourceLine" id="cb42-2" data-line-number="2">model &lt;-<span class="st"> </span><span class="kw"><a href="reference/read_idf.html">read_idf</a></span>(<span class="st">"5Zone_Transformer.idf"</span>, <span class="dt">idd =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb42-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb42-4" data-line-number="4">job &lt;-<span class="st"> </span>model<span class="op">$</span><span class="kw">run</span>(epw_sf, <span class="dt">dir =</span> <span class="st">"."</span>, <span class="dt">wait =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb42-5" data-line-number="5"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb42-6" data-line-number="6"><span class="co">#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.</span></a>
+<a class="sourceLine" id="cb42-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb42-8" data-line-number="8"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb42-9" data-line-number="9"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/5Zone_Transformer.idf.</span></a>
+<a class="sourceLine" id="cb42-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb42-11" data-line-number="11"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb42-12" data-line-number="12"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/5Zone_Transformer.idf.</span></a>
+<a class="sourceLine" id="cb42-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb42-14" data-line-number="14"><span class="co">#&gt; ExpandObjects Started.</span></a>
+<a class="sourceLine" id="cb42-15" data-line-number="15"><span class="co">#&gt; No expanded file generated.</span></a>
+<a class="sourceLine" id="cb42-16" data-line-number="16"><span class="co">#&gt; ExpandObjects Finished. Time:     0.027</span></a>
+<a class="sourceLine" id="cb42-17" data-line-number="17"><span class="co">#&gt; EnergyPlus Starting</span></a>
+<a class="sourceLine" id="cb42-18" data-line-number="18"><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.06 23:35</span></a>
+<a class="sourceLine" id="cb42-19" data-line-number="19"><span class="co">#&gt; Processing Data Dictionary</span></a>
+<a class="sourceLine" id="cb42-20" data-line-number="20"><span class="co">#&gt; Processing Input File</span></a>
+<a class="sourceLine" id="cb42-21" data-line-number="21"><span class="co">#&gt; Initializing Response Factors</span></a>
+<a class="sourceLine" id="cb42-22" data-line-number="22"><span class="co">#&gt; Calculating CTFs for "ROOF-1", Construction # 1</span></a>
+<a class="sourceLine" id="cb42-23" data-line-number="23"><span class="co">#&gt; Calculating CTFs for "WALL-1", Construction # 2</span></a>
+<a class="sourceLine" id="cb42-24" data-line-number="24"><span class="co">#&gt; Calculating CTFs for "FLOOR-SLAB-1", Construction # 4</span></a>
+<a class="sourceLine" id="cb42-25" data-line-number="25"><span class="co">#&gt; Calculating CTFs for "INT-WALL-1", Construction # 5</span></a>
+<a class="sourceLine" id="cb42-26" data-line-number="26"><span class="co">#&gt; Initializing Window Optical Properties</span></a>
+<a class="sourceLine" id="cb42-27" data-line-number="27"><span class="co">#&gt; Initializing Solar Calculations</span></a>
+<a class="sourceLine" id="cb42-28" data-line-number="28"><span class="co">#&gt; Allocate Solar Module Arrays</span></a>
+<a class="sourceLine" id="cb42-29" data-line-number="29"><span class="co">#&gt; Initializing Zone Report Variables</span></a>
+<a class="sourceLine" id="cb42-30" data-line-number="30"><span class="co">#&gt; Initializing Surface (Shading) Report Variables</span></a>
+<a class="sourceLine" id="cb42-31" data-line-number="31"><span class="co">#&gt; Computing Interior Solar Absorption Factors</span></a>
+<a class="sourceLine" id="cb42-32" data-line-number="32"><span class="co">#&gt; Determining Shadowing Combinations</span></a>
+<a class="sourceLine" id="cb42-33" data-line-number="33"><span class="co">#&gt; Computing Window Shade Absorption Factors</span></a>
+<a class="sourceLine" id="cb42-34" data-line-number="34"><span class="co">#&gt; Proceeding with Initializing Solar Calculations</span></a>
+<a class="sourceLine" id="cb42-35" data-line-number="35"><span class="co">#&gt; Initializing Surfaces</span></a>
+<a class="sourceLine" id="cb42-36" data-line-number="36"><span class="co">#&gt; Initializing Outdoor environment for Surfaces</span></a>
+<a class="sourceLine" id="cb42-37" data-line-number="37"><span class="co">#&gt; Setting up Surface Reporting Variables</span></a>
+<a class="sourceLine" id="cb42-38" data-line-number="38"><span class="co">#&gt; Initializing Temperature and Flux Histories</span></a>
+<a class="sourceLine" id="cb42-39" data-line-number="39"><span class="co">#&gt; Initializing Window Shading</span></a>
+<a class="sourceLine" id="cb42-40" data-line-number="40"><span class="co">#&gt; Computing Interior Absorption Factors</span></a>
+<a class="sourceLine" id="cb42-41" data-line-number="41"><span class="co">#&gt; Computing Interior Diffuse Solar Absorption Factors</span></a>
+<a class="sourceLine" id="cb42-42" data-line-number="42"><span class="co">#&gt; Computing Interior Diffuse Solar Exchange through Interzone Windows</span></a>
+<a class="sourceLine" id="cb42-43" data-line-number="43"><span class="co">#&gt; Initializing Solar Heat Gains</span></a>
+<a class="sourceLine" id="cb42-44" data-line-number="44"><span class="co">#&gt; Initializing Internal Heat Gains</span></a>
+<a class="sourceLine" id="cb42-45" data-line-number="45"><span class="co">#&gt; Initializing Interior Solar Distribution</span></a>
+<a class="sourceLine" id="cb42-46" data-line-number="46"><span class="co">#&gt; Initializing Interior Convection Coefficients</span></a>
+<a class="sourceLine" id="cb42-47" data-line-number="47"><span class="co">#&gt; Gathering Information for Predefined Reporting</span></a>
+<a class="sourceLine" id="cb42-48" data-line-number="48"><span class="co">#&gt; Completed Initializing Surface Heat Balance</span></a>
+<a class="sourceLine" id="cb42-49" data-line-number="49"><span class="co">#&gt; Calculate Outside Surface Heat Balance</span></a>
+<a class="sourceLine" id="cb42-50" data-line-number="50"><span class="co">#&gt; Calculate Inside Surface Heat Balance</span></a>
+<a class="sourceLine" id="cb42-51" data-line-number="51"><span class="co">#&gt; Calculate Air Heat Balance</span></a>
+<a class="sourceLine" id="cb42-52" data-line-number="52"><span class="co">#&gt; Initializing HVAC</span></a>
+<a class="sourceLine" id="cb42-53" data-line-number="53"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-54" data-line-number="54"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-55" data-line-number="55"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-56" data-line-number="56"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-57" data-line-number="57"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-58" data-line-number="58"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-59" data-line-number="59"><span class="co">#&gt; Performing Zone Sizing Simulation</span></a>
+<a class="sourceLine" id="cb42-60" data-line-number="60"><span class="co">#&gt; ...for Sizing Period: #1 CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB</span></a>
+<a class="sourceLine" id="cb42-61" data-line-number="61"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-62" data-line-number="62"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-63" data-line-number="63"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-64" data-line-number="64"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-65" data-line-number="65"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-66" data-line-number="66"><span class="co">#&gt; Warming up</span></a>
+<a class="sourceLine" id="cb42-67" data-line-number="67"><span class="co">#&gt; Performing Zone Sizing Simulation</span></a>
+<a class="sourceLine" id="cb42-68" data-line-number="68"><span class="co">#&gt; ...for Sizing Period: #2 CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB</span></a>
+<a class="sourceLine" id="cb42-69" data-line-number="69"><span class="co">#&gt; Calculating System sizing</span></a>
+<a class="sourceLine" id="cb42-70" data-line-number="70"><span class="co">#&gt; ...for Sizing Period: #1 CHICAGO_IL_USA ANNUAL HEATING 99% DESIGN CONDITIONS DB</span></a>
+<a class="sourceLine" id="cb42-71" data-line-number="71"><span class="co">#&gt; Calculating System sizing</span></a>
+<a class="sourceLine" id="cb42-72" data-line-number="72"><span class="co">#&gt; ...for Sizing Period: #2 CHICAGO_IL_USA ANNUAL COOLING 1% DESIGN CONDITIONS DB/MCWB</span></a>
+<a class="sourceLine" id="cb42-73" data-line-number="73"><span class="co">#&gt; Initializing Simulation</span></a>
+<a class="sourceLine" id="cb42-74" data-line-number="74"><span class="co">#&gt; Reporting Surfaces</span></a>
+<a class="sourceLine" id="cb42-75" data-line-number="75"><span class="co">#&gt; Beginning Primary Simulation</span></a>
+<a class="sourceLine" id="cb42-76" data-line-number="76"><span class="co">#&gt; Initializing New Environment Parameters</span></a>
+<a class="sourceLine" id="cb42-77" data-line-number="77"><span class="co">#&gt; Warming up {1}</span></a>
+<a class="sourceLine" id="cb42-78" data-line-number="78"><span class="co">#&gt; Warming up {2}</span></a>
+<a class="sourceLine" id="cb42-79" data-line-number="79"><span class="co">#&gt; Warming up {3}</span></a>
+<a class="sourceLine" id="cb42-80" data-line-number="80"><span class="co">#&gt; Warming up {4}</span></a>
+<a class="sourceLine" id="cb42-81" data-line-number="81"><span class="co">#&gt; Warming up {5}</span></a>
+<a class="sourceLine" id="cb42-82" data-line-number="82"><span class="co">#&gt; Warming up {6}</span></a>
+<a class="sourceLine" id="cb42-83" data-line-number="83"><span class="co">#&gt; Starting Simulation at 01/14 for WINTERDAY</span></a>
+<a class="sourceLine" id="cb42-84" data-line-number="84"><span class="co">#&gt; Initializing New Environment Parameters</span></a>
+<a class="sourceLine" id="cb42-85" data-line-number="85"><span class="co">#&gt; Warming up {1}</span></a>
+<a class="sourceLine" id="cb42-86" data-line-number="86"><span class="co">#&gt; Warming up {2}</span></a>
+<a class="sourceLine" id="cb42-87" data-line-number="87"><span class="co">#&gt; Warming up {3}</span></a>
+<a class="sourceLine" id="cb42-88" data-line-number="88"><span class="co">#&gt; Warming up {4}</span></a>
+<a class="sourceLine" id="cb42-89" data-line-number="89"><span class="co">#&gt; Warming up {5}</span></a>
+<a class="sourceLine" id="cb42-90" data-line-number="90"><span class="co">#&gt; Warming up {6}</span></a>
+<a class="sourceLine" id="cb42-91" data-line-number="91"><span class="co">#&gt; Starting Simulation at 07/07 for SUMMERDAY</span></a>
+<a class="sourceLine" id="cb42-92" data-line-number="92"><span class="co">#&gt; Writing tabular output file results using HTML format.</span></a>
+<a class="sourceLine" id="cb42-93" data-line-number="93"><span class="co">#&gt; Writing final SQL reports</span></a>
+<a class="sourceLine" id="cb42-94" data-line-number="94"><span class="co">#&gt;  ReadVarsESO program starting.</span></a>
+<a class="sourceLine" id="cb42-95" data-line-number="95"><span class="co">#&gt;  ReadVars Run Time=00hr 00min  0.02sec</span></a>
+<a class="sourceLine" id="cb42-96" data-line-number="96"><span class="co">#&gt;  ReadVarsESO program completed successfully.</span></a>
+<a class="sourceLine" id="cb42-97" data-line-number="97"><span class="co">#&gt;  ReadVarsESO program starting.</span></a>
+<a class="sourceLine" id="cb42-98" data-line-number="98"><span class="co">#&gt;  ReadVars Run Time=00hr 00min  0.02sec</span></a>
+<a class="sourceLine" id="cb42-99" data-line-number="99"><span class="co">#&gt;  ReadVarsESO program completed successfully.</span></a>
+<a class="sourceLine" id="cb42-100" data-line-number="100"><span class="co">#&gt; EnergyPlus Run Time=00hr 00min  1.20sec</span></a>
+<a class="sourceLine" id="cb42-101" data-line-number="101">job</a>
+<a class="sourceLine" id="cb42-102" data-line-number="102"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb42-103" data-line-number="103"><span class="co">#&gt; # Model: `/home/hongyuanjia/5Zone_Transformer.idf`</span></a>
+<a class="sourceLine" id="cb42-104" data-line-number="104"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb42-105" data-line-number="105"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb42-106" data-line-number="106"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb42-107" data-line-number="107"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:28` and completed successfully after 1.28 secs.</span></a></code></pre></div>
 <div id="print-simulation-errors" class="section level4">
 <h4 class="hasAnchor">
 <a href="#print-simulation-errors" class="anchor"></a>Print simulation errors</h4>
 <p>You can get simulation errors using <code>$errors()</code>.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">job<span class="op">$</span><span class="kw">errors</span>()</a>
-<a class="sourceLine" id="cb42-2" data-line-number="2"><span class="co">#&gt; == During Zone Sizing Calculations ========================================</span></a>
-<a class="sourceLine" id="cb42-3" data-line-number="3"><span class="co">#&gt; +----------------------------------------------------------------------------------------------------------+</span></a>
-<a class="sourceLine" id="cb42-4" data-line-number="4"><span class="co">#&gt; |Warning[1/1] Weather file location will be used rather than entered (IDF) Location object.                |</span></a>
-<a class="sourceLine" id="cb42-5" data-line-number="5"><span class="co">#&gt; |  ..Location object=CHICAGO_IL_USA TMY2-94846                                                             |</span></a>
-<a class="sourceLine" id="cb42-6" data-line-number="6"><span class="co">#&gt; |  ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940                                   |</span></a>
-<a class="sourceLine" id="cb42-7" data-line-number="7"><span class="co">#&gt; |  ..due to location differences, Latitude difference=[4.16] degrees, Longitude difference=[34.65] degrees.|</span></a>
-<a class="sourceLine" id="cb42-8" data-line-number="8"><span class="co">#&gt; |  ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95] percent, [188.00] meters.            |</span></a>
-<a class="sourceLine" id="cb42-9" data-line-number="9"><span class="co">#&gt; +----------------------------------------------------------------------------------------------------------+</span></a>
-<a class="sourceLine" id="cb42-10" data-line-number="10"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb42-11" data-line-number="11"><span class="co">#&gt; EnergyPlus completed successfully with 1 Warning.</span></a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">job<span class="op">$</span><span class="kw">errors</span>()</a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="co">#&gt; ══ During Zone Sizing Calculations ════════════════════════════════════════</span></a>
+<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="co">#&gt; ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────┐</span></a>
+<a class="sourceLine" id="cb43-4" data-line-number="4"><span class="co">#&gt; │Warning[1/1] Weather file location will be used rather than entered (IDF) Location object.                │</span></a>
+<a class="sourceLine" id="cb43-5" data-line-number="5"><span class="co">#&gt; │  ..Location object=CHICAGO_IL_USA TMY2-94846                                                             │</span></a>
+<a class="sourceLine" id="cb43-6" data-line-number="6"><span class="co">#&gt; │  ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940                                   │</span></a>
+<a class="sourceLine" id="cb43-7" data-line-number="7"><span class="co">#&gt; │  ..due to location differences, Latitude difference=[4.16] degrees, Longitude difference=[34.65] degrees.│</span></a>
+<a class="sourceLine" id="cb43-8" data-line-number="8"><span class="co">#&gt; │  ..Time Zone difference=[2.0] hour(s), Elevation difference=[98.95] percent, [188.00] meters.            │</span></a>
+<a class="sourceLine" id="cb43-9" data-line-number="9"><span class="co">#&gt; └──────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span></a>
+<a class="sourceLine" id="cb43-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb43-11" data-line-number="11"><span class="co">#&gt; EnergyPlus completed successfully with 1 Warning.</span></a></code></pre></div>
 </div>
 <div id="retrieve-simulation-output" class="section level4">
 <h4 class="hasAnchor">
 <a href="#retrieve-simulation-output" class="anchor"></a>Retrieve simulation output</h4>
 <p>eplusr uses the EnergyPlus SQL output for extracting simulation output. In order to do so, an object in <code>Output:SQLite</code> class with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be automatically created if it does not exists. <code>EplusJob</code> has provided some wrappers that do SQL queries to get report data results, i.e. results from <code>Output:Variable</code> and <code>Output:Meter*</code>. But for <code>Output:Table</code> results, you have to be familiar with the structure of the EnergyPlus SQL output, especially for table <em>“TabularDataWithStrings”</em>. For details, please see <em>“2.20 eplusout.sql”</em>, especially <em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
 <p><code>$report_data_dict()</code> returns a data.frame which contains all information about report data. For details on the meaning of each columns, please see <em>“2.20.2.1 ReportDataDictionary Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">report_data_dict</span>())</a>
-<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   20 obs. of  10 variables:</span></a>
-<a class="sourceLine" id="cb43-3" data-line-number="3"><span class="co">#&gt;  $ ReportDataDictionaryIndex: int  6 8 18 38 238 459 460 461 462 463 ...</span></a>
-<a class="sourceLine" id="cb43-4" data-line-number="4"><span class="co">#&gt;  $ IsMeter                  : int  0 1 1 1 1 0 0 0 0 0 ...</span></a>
-<a class="sourceLine" id="cb43-5" data-line-number="5"><span class="co">#&gt;  $ Type                     : chr  "Avg" "Sum" "Sum" "Sum" ...</span></a>
-<a class="sourceLine" id="cb43-6" data-line-number="6"><span class="co">#&gt;  $ IndexGroup               : chr  "Zone" "Facility:Electricity" "Building:Electricity" "Facility:Electricity:InteriorLights" ...</span></a>
-<a class="sourceLine" id="cb43-7" data-line-number="7"><span class="co">#&gt;  $ TimestepType             : chr  "HVAC System" "HVAC System" "HVAC System" "HVAC System" ...</span></a>
-<a class="sourceLine" id="cb43-8" data-line-number="8"><span class="co">#&gt;  $ KeyValue                 : chr  "Environment" "" "" "" ...</span></a>
-<a class="sourceLine" id="cb43-9" data-line-number="9"><span class="co">#&gt;  $ Name                     : chr  "Site Outdoor Air Drybulb Temperature" "Electricity:Facility" "Electricity:Building" "InteriorLights:Electricity" ...</span></a>
-<a class="sourceLine" id="cb43-10" data-line-number="10"><span class="co">#&gt;  $ ReportingFrequency       : chr  "Zone Timestep" "Zone Timestep" "Zone Timestep" "Zone Timestep" ...</span></a>
-<a class="sourceLine" id="cb43-11" data-line-number="11"><span class="co">#&gt;  $ ScheduleName             : chr  NA NA NA NA ...</span></a>
-<a class="sourceLine" id="cb43-12" data-line-number="12"><span class="co">#&gt;  $ Units                    : chr  "C" "J" "J" "J" ...</span></a>
-<a class="sourceLine" id="cb43-13" data-line-number="13"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">report_data_dict</span>())</a>
+<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   20 obs. of  10 variables:</span></a>
+<a class="sourceLine" id="cb44-3" data-line-number="3"><span class="co">#&gt;  $ ReportDataDictionaryIndex: int  6 8 18 38 238 459 460 461 462 463 ...</span></a>
+<a class="sourceLine" id="cb44-4" data-line-number="4"><span class="co">#&gt;  $ IsMeter                  : int  0 1 1 1 1 0 0 0 0 0 ...</span></a>
+<a class="sourceLine" id="cb44-5" data-line-number="5"><span class="co">#&gt;  $ Type                     : chr  "Avg" "Sum" "Sum" "Sum" ...</span></a>
+<a class="sourceLine" id="cb44-6" data-line-number="6"><span class="co">#&gt;  $ IndexGroup               : chr  "Zone" "Facility:Electricity" "Building:Electricity" "Facility:Electricity:InteriorLights" ...</span></a>
+<a class="sourceLine" id="cb44-7" data-line-number="7"><span class="co">#&gt;  $ TimestepType             : chr  "HVAC System" "HVAC System" "HVAC System" "HVAC System" ...</span></a>
+<a class="sourceLine" id="cb44-8" data-line-number="8"><span class="co">#&gt;  $ KeyValue                 : chr  "Environment" "" "" "" ...</span></a>
+<a class="sourceLine" id="cb44-9" data-line-number="9"><span class="co">#&gt;  $ Name                     : chr  "Site Outdoor Air Drybulb Temperature" "Electricity:Facility" "Electricity:Building" "InteriorLights:Electricity" ...</span></a>
+<a class="sourceLine" id="cb44-10" data-line-number="10"><span class="co">#&gt;  $ ReportingFrequency       : chr  "Zone Timestep" "Zone Timestep" "Zone Timestep" "Zone Timestep" ...</span></a>
+<a class="sourceLine" id="cb44-11" data-line-number="11"><span class="co">#&gt;  $ ScheduleName             : chr  NA NA NA NA ...</span></a>
+<a class="sourceLine" id="cb44-12" data-line-number="12"><span class="co">#&gt;  $ Units                    : chr  "C" "J" "J" "J" ...</span></a>
+<a class="sourceLine" id="cb44-13" data-line-number="13"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
 <p><code>$report_data()</code> extracts the report data using key values and variable names. Basically, <code>key_value</code> equals <code>KeyValue</code> and <code>name</code> equals <code>Name</code> in the report data dictionary you get from <code>$report_data_dict()</code>.</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">report_data</span>(<span class="dt">name =</span> <span class="st">"Site Outdoor Air Drybulb Temperature"</span>))</a>
-<a class="sourceLine" id="cb44-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   192 obs. of  6 variables:</span></a>
-<a class="sourceLine" id="cb44-3" data-line-number="3"><span class="co">#&gt;  $ Case    : chr  "5Zone_Transformer" "5Zone_Transformer" "5Zone_Transformer" "5Zone_Transformer" ...</span></a>
-<a class="sourceLine" id="cb44-4" data-line-number="4"><span class="co">#&gt;  $ DateTime: POSIXct, format: "2018-01-14 00:15:00" "2018-01-14 00:30:00" ...</span></a>
-<a class="sourceLine" id="cb44-5" data-line-number="5"><span class="co">#&gt;  $ KeyValue: chr  "Environment" "Environment" "Environment" "Environment" ...</span></a>
-<a class="sourceLine" id="cb44-6" data-line-number="6"><span class="co">#&gt;  $ Name    : chr  "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" ...</span></a>
-<a class="sourceLine" id="cb44-7" data-line-number="7"><span class="co">#&gt;  $ Units   : chr  "C" "C" "C" "C" ...</span></a>
-<a class="sourceLine" id="cb44-8" data-line-number="8"><span class="co">#&gt;  $ Value   : num  9.9 9.2 8.5 7.8 8.07 ...</span></a>
-<a class="sourceLine" id="cb44-9" data-line-number="9"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">report_data</span>(<span class="dt">name =</span> <span class="st">"Site Outdoor Air Drybulb Temperature"</span>))</a>
+<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   192 obs. of  6 variables:</span></a>
+<a class="sourceLine" id="cb45-3" data-line-number="3"><span class="co">#&gt;  $ Case    : chr  "5Zone_Transformer" "5Zone_Transformer" "5Zone_Transformer" "5Zone_Transformer" ...</span></a>
+<a class="sourceLine" id="cb45-4" data-line-number="4"><span class="co">#&gt;  $ DateTime: POSIXct, format: "2018-01-14 00:15:00" "2018-01-14 00:30:00" ...</span></a>
+<a class="sourceLine" id="cb45-5" data-line-number="5"><span class="co">#&gt;  $ KeyValue: chr  "Environment" "Environment" "Environment" "Environment" ...</span></a>
+<a class="sourceLine" id="cb45-6" data-line-number="6"><span class="co">#&gt;  $ Name    : chr  "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" "Site Outdoor Air Drybulb Temperature" ...</span></a>
+<a class="sourceLine" id="cb45-7" data-line-number="7"><span class="co">#&gt;  $ Units   : chr  "C" "C" "C" "C" ...</span></a>
+<a class="sourceLine" id="cb45-8" data-line-number="8"><span class="co">#&gt;  $ Value   : num  9.9 9.2 8.5 7.8 8.07 ...</span></a>
+<a class="sourceLine" id="cb45-9" data-line-number="9"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
 <p><code>$tabular_data()</code> extracts all tabular data. For details on the meaning of each columns, please see <em>“2.20.4.4 TabularData Table”</em> in EnergyPlus <em>“Output Details and Examples”</em> documentation.</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">tabular_data</span>())</a>
-<a class="sourceLine" id="cb45-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   6662 obs. of  8 variables:</span></a>
-<a class="sourceLine" id="cb45-3" data-line-number="3"><span class="co">#&gt;  $ TabularDataIndex: int  1 2 3 4 5 6 7 8 9 10 ...</span></a>
-<a class="sourceLine" id="cb45-4" data-line-number="4"><span class="co">#&gt;  $ Value           : chr  "        1.34" "        1.34" "        3.65" "        3.65" ...</span></a>
-<a class="sourceLine" id="cb45-5" data-line-number="5"><span class="co">#&gt;  $ ReportName      : chr  "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" ...</span></a>
-<a class="sourceLine" id="cb45-6" data-line-number="6"><span class="co">#&gt;  $ ReportForString : chr  "Entire Facility" "Entire Facility" "Entire Facility" "Entire Facility" ...</span></a>
-<a class="sourceLine" id="cb45-7" data-line-number="7"><span class="co">#&gt;  $ TableName       : chr  "Site and Source Energy" "Site and Source Energy" "Site and Source Energy" "Site and Source Energy" ...</span></a>
-<a class="sourceLine" id="cb45-8" data-line-number="8"><span class="co">#&gt;  $ RowName         : chr  "Total Site Energy" "Net Site Energy" "Total Source Energy" "Net Source Energy" ...</span></a>
-<a class="sourceLine" id="cb45-9" data-line-number="9"><span class="co">#&gt;  $ ColumnName      : chr  "Total Energy" "Total Energy" "Total Energy" "Total Energy" ...</span></a>
-<a class="sourceLine" id="cb45-10" data-line-number="10"><span class="co">#&gt;  $ Units           : chr  "GJ" "GJ" "GJ" "GJ" ...</span></a>
-<a class="sourceLine" id="cb45-11" data-line-number="11"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">str</span>(job<span class="op">$</span><span class="kw">tabular_data</span>())</a>
+<a class="sourceLine" id="cb46-2" data-line-number="2"><span class="co">#&gt; Classes 'data.table' and 'data.frame':   6662 obs. of  8 variables:</span></a>
+<a class="sourceLine" id="cb46-3" data-line-number="3"><span class="co">#&gt;  $ TabularDataIndex: int  1 2 3 4 5 6 7 8 9 10 ...</span></a>
+<a class="sourceLine" id="cb46-4" data-line-number="4"><span class="co">#&gt;  $ Value           : chr  "        1.34" "        1.34" "        3.65" "        3.65" ...</span></a>
+<a class="sourceLine" id="cb46-5" data-line-number="5"><span class="co">#&gt;  $ ReportName      : chr  "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" "AnnualBuildingUtilityPerformanceSummary" ...</span></a>
+<a class="sourceLine" id="cb46-6" data-line-number="6"><span class="co">#&gt;  $ ReportForString : chr  "Entire Facility" "Entire Facility" "Entire Facility" "Entire Facility" ...</span></a>
+<a class="sourceLine" id="cb46-7" data-line-number="7"><span class="co">#&gt;  $ TableName       : chr  "Site and Source Energy" "Site and Source Energy" "Site and Source Energy" "Site and Source Energy" ...</span></a>
+<a class="sourceLine" id="cb46-8" data-line-number="8"><span class="co">#&gt;  $ RowName         : chr  "Total Site Energy" "Net Site Energy" "Total Source Energy" "Net Source Energy" ...</span></a>
+<a class="sourceLine" id="cb46-9" data-line-number="9"><span class="co">#&gt;  $ ColumnName      : chr  "Total Energy" "Total Energy" "Total Energy" "Total Energy" ...</span></a>
+<a class="sourceLine" id="cb46-10" data-line-number="10"><span class="co">#&gt;  $ Units           : chr  "GJ" "GJ" "GJ" "GJ" ...</span></a>
+<a class="sourceLine" id="cb46-11" data-line-number="11"><span class="co">#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt;</span></a></code></pre></div>
 </div>
 </div>
 <div id="run-parametric-analysis" class="section level3">
 <h3 class="hasAnchor">
 <a href="#run-parametric-analysis" class="anchor"></a>Run Parametric Analysis</h3>
 <p>eplusr provides tools to do parametric simulations which take full advantages of eplusr’s model editing and result collecting functionalities. You can create a parametric job using <code><a href="reference/param_job.html">param_job()</a></code>, which takes an IDF file or an <code>Idf</code> object as the <em>seed</em> and an EPW file or an <code>Epw</code> object as <em>weather</em>.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">param &lt;-<span class="st"> </span><span class="kw"><a href="reference/param_job.html">param_job</a></span>(<span class="dt">idf =</span> model, <span class="dt">epw =</span> epw_sf)</a>
-<a class="sourceLine" id="cb46-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb46-3" data-line-number="3">param</a>
-<a class="sourceLine" id="cb46-4" data-line-number="4"><span class="co">#&gt; -- EnergPlus Parametric ---------------------------------------------------</span></a>
-<a class="sourceLine" id="cb46-5" data-line-number="5"><span class="co">#&gt; * Seed Model: `C:\Users\hongy\5Zone_Transformer.idf`</span></a>
-<a class="sourceLine" id="cb46-6" data-line-number="6"><span class="co">#&gt; * Default Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb46-7" data-line-number="7"><span class="co">#&gt; &lt;&lt; No measure has been applied &gt;&gt;</span></a></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">param &lt;-<span class="st"> </span><span class="kw"><a href="reference/param_job.html">param_job</a></span>(<span class="dt">idf =</span> model, <span class="dt">epw =</span> epw_sf)</a>
+<a class="sourceLine" id="cb47-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb47-3" data-line-number="3">param</a>
+<a class="sourceLine" id="cb47-4" data-line-number="4"><span class="co">#&gt; ── EnergPlus Parametric ───────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb47-5" data-line-number="5"><span class="co">#&gt; ● Seed Model: `/home/hongyuanjia/5Zone_Transformer.idf`</span></a>
+<a class="sourceLine" id="cb47-6" data-line-number="6"><span class="co">#&gt; ● Default Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb47-7" data-line-number="7"><span class="co">#&gt; &lt;&lt; No measure has been applied &gt;&gt;</span></a></code></pre></div>
 <p><code><a href="reference/param_job.html">param_job()</a></code> returns a <code>ParametricJob</code> object which provides a prototype of conducting parametric analysis of EnergyPlus simulations. For more details, please see <code><a href="reference/param.html">?param</a></code>.</p>
 <div id="apply-measure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#apply-measure" class="anchor"></a>Apply measure</h4>
 <p><code>$apply_measure()</code> allows to apply a measure to an <code>Idf</code> and create parametric models for simulations. Here, the concept of measure in eplusr is inspired by “measures” in <a href="https://nrel.github.io/OpenStudio-user-documentation/getting_started/about_measures/">OpenStudio</a>. Basically, a measure is just a function that takes an <code>Idf</code> object and other arguments as input, and returns a modified <code>Idf</code> object as output. Use <code>...</code> to supply different arguments to that measure.</p>
 <p>Let’s create a function that modifies infiltration rate:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">set_infil_rate &lt;-<span class="st"> </span><span class="cf">function</span> (idf, infil_rate) {</a>
-<a class="sourceLine" id="cb47-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb47-3" data-line-number="3">    <span class="co"># validate input value</span></a>
-<a class="sourceLine" id="cb47-4" data-line-number="4">    <span class="co"># this is optional, as validations will be performed when setting values</span></a>
-<a class="sourceLine" id="cb47-5" data-line-number="5">    <span class="kw">stopifnot</span>(<span class="kw">is.numeric</span>(infil_rate), infil_rate <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb47-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb47-7" data-line-number="7">    <span class="cf">if</span> (<span class="op">!</span>idf<span class="op">$</span><span class="kw">is_valid_class</span>(<span class="st">"ZoneInfiltration:DesignFlowRate"</span>))</a>
-<a class="sourceLine" id="cb47-8" data-line-number="8">      <span class="kw">stop</span>(<span class="st">"Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`"</span>)</a>
-<a class="sourceLine" id="cb47-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb47-10" data-line-number="10">    ids &lt;-<span class="st"> </span>idf<span class="op">$</span><span class="kw">object_id</span>(<span class="st">"ZoneInfiltration:DesignFlowRate"</span>, <span class="dt">simplify =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb47-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb47-12" data-line-number="12">    idf<span class="op">$</span><span class="kw">set_object</span>(ids,</a>
-<a class="sourceLine" id="cb47-13" data-line-number="13">        <span class="dt">value =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb47-14" data-line-number="14">            <span class="dt">design_flow_rate_calculation_method =</span> <span class="st">"AirChanges/Hour"</span>,</a>
-<a class="sourceLine" id="cb47-15" data-line-number="15">            <span class="dt">air_changes_per_hour =</span> infil_rate)),</a>
-<a class="sourceLine" id="cb47-16" data-line-number="16">            <span class="dt">times =</span> <span class="kw">length</span>(ids))</a>
-<a class="sourceLine" id="cb47-17" data-line-number="17">        )</a>
-<a class="sourceLine" id="cb47-18" data-line-number="18"></a>
-<a class="sourceLine" id="cb47-19" data-line-number="19">    idf</a>
-<a class="sourceLine" id="cb47-20" data-line-number="20">}</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">set_infil_rate &lt;-<span class="st"> </span><span class="cf">function</span> (idf, infil_rate) {</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb48-3" data-line-number="3">    <span class="co"># validate input value</span></a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">    <span class="co"># this is optional, as validations will be performed when setting values</span></a>
+<a class="sourceLine" id="cb48-5" data-line-number="5">    <span class="kw">stopifnot</span>(<span class="kw">is.numeric</span>(infil_rate), infil_rate <span class="op">&gt;=</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb48-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb48-7" data-line-number="7">    <span class="cf">if</span> (<span class="op">!</span>idf<span class="op">$</span><span class="kw">is_valid_class</span>(<span class="st">"ZoneInfiltration:DesignFlowRate"</span>))</a>
+<a class="sourceLine" id="cb48-8" data-line-number="8">      <span class="kw">stop</span>(<span class="st">"Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`"</span>)</a>
+<a class="sourceLine" id="cb48-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb48-10" data-line-number="10">    ids &lt;-<span class="st"> </span>idf<span class="op">$</span><span class="kw">object_id</span>(<span class="st">"ZoneInfiltration:DesignFlowRate"</span>, <span class="dt">simplify =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb48-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb48-12" data-line-number="12">    idf<span class="op">$</span><span class="kw">set_object</span>(ids,</a>
+<a class="sourceLine" id="cb48-13" data-line-number="13">        <span class="dt">value =</span> <span class="kw">rep</span>(<span class="kw">list</span>(<span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb48-14" data-line-number="14">            <span class="dt">design_flow_rate_calculation_method =</span> <span class="st">"AirChanges/Hour"</span>,</a>
+<a class="sourceLine" id="cb48-15" data-line-number="15">            <span class="dt">air_changes_per_hour =</span> infil_rate)),</a>
+<a class="sourceLine" id="cb48-16" data-line-number="16">            <span class="dt">times =</span> <span class="kw">length</span>(ids))</a>
+<a class="sourceLine" id="cb48-17" data-line-number="17">        )</a>
+<a class="sourceLine" id="cb48-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb48-19" data-line-number="19">    idf</a>
+<a class="sourceLine" id="cb48-20" data-line-number="20">}</a></code></pre></div>
 <p>The measure <code>set_infil_rate()</code> is pretty simple. First, it gets all objects in class <code>ZoneInfiltration:DesignFlowRate</code>. Then it sets ACH in all zones to the input value.</p>
 <p>Now, let’s apply this measure to the seed model with different infiltration rates from 0.0 to 4.0, respectively.</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">param<span class="op">$</span><span class="kw">apply_measure</span>(set_infil_rate, <span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dt">by =</span> <span class="dv">1</span>), <span class="dt">.names =</span> <span class="ot">NULL</span>)</a>
-<a class="sourceLine" id="cb48-2" data-line-number="2"><span class="co">#&gt; Measure `set_infil_rate` has been applied with 5 new models created:</span></a>
-<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="co">#&gt; 1: set_infil_rate_1</span></a>
-<a class="sourceLine" id="cb48-4" data-line-number="4"><span class="co">#&gt; 2: set_infil_rate_2</span></a>
-<a class="sourceLine" id="cb48-5" data-line-number="5"><span class="co">#&gt; 3: set_infil_rate_3</span></a>
-<a class="sourceLine" id="cb48-6" data-line-number="6"><span class="co">#&gt; 4: set_infil_rate_4</span></a>
-<a class="sourceLine" id="cb48-7" data-line-number="7"><span class="co">#&gt; 5: set_infil_rate_5</span></a></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">param<span class="op">$</span><span class="kw">apply_measure</span>(set_infil_rate, <span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">4</span>, <span class="dt">by =</span> <span class="dv">1</span>), <span class="dt">.names =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="co">#&gt; Measure `set_infil_rate` has been applied with 5 new models created:</span></a>
+<a class="sourceLine" id="cb49-3" data-line-number="3"><span class="co">#&gt; 1: set_infil_rate_1</span></a>
+<a class="sourceLine" id="cb49-4" data-line-number="4"><span class="co">#&gt; 2: set_infil_rate_2</span></a>
+<a class="sourceLine" id="cb49-5" data-line-number="5"><span class="co">#&gt; 3: set_infil_rate_3</span></a>
+<a class="sourceLine" id="cb49-6" data-line-number="6"><span class="co">#&gt; 4: set_infil_rate_4</span></a>
+<a class="sourceLine" id="cb49-7" data-line-number="7"><span class="co">#&gt; 5: set_infil_rate_5</span></a></code></pre></div>
 <p>As we can see, 5 models have been created. As we left <code>.names</code> as <code>NULL</code>, each newly created models will be named as a combination of measure name and model number.</p>
 </div>
 <div id="run-in-parallel-and-collect-results" class="section level4">
@@ -1122,60 +1166,73 @@
 <blockquote>
 <p>Currently, unlike <code>EplusJob</code>, all simulations in <code>ParametricJob</code> will be run in waiting mode. This may be changed in the future.</p>
 </blockquote>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">param<span class="op">$</span><span class="kw">run</span>()</a>
-<a class="sourceLine" id="cb49-2" data-line-number="2"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb49-3" data-line-number="3"> Progress<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------------</span><span class="st">                         </span><span class="dv">100</span>%</a>
-<a class="sourceLine" id="cb49-4" data-line-number="4"> Progress<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------------</span><span class="st">                         </span><span class="dv">100</span>%</a>
-<a class="sourceLine" id="cb49-5" data-line-number="5"> Progress<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------------</span><span class="st">                         </span><span class="dv">100</span>%</a>
-<a class="sourceLine" id="cb49-6" data-line-number="6"> Progress<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------------------------</span><span class="st">             </span><span class="dv">100</span>%</a>
-<a class="sourceLine" id="cb49-7" data-line-number="7"> Progress<span class="op">:</span><span class="st"> </span><span class="op">-----------------------------------------------------------</span><span class="st"> </span><span class="dv">100</span>%</a>
-<a class="sourceLine" id="cb49-8" data-line-number="8"><span class="co">#&gt; $set_infil_rate_1</span></a>
-<a class="sourceLine" id="cb49-9" data-line-number="9"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb49-10" data-line-number="10"><span class="co">#&gt; # Model: `C:\Users\hongy\set_infil_rate_1\set_infil_rate_1.idf`</span></a>
-<a class="sourceLine" id="cb49-11" data-line-number="11"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb49-12" data-line-number="12"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb49-13" data-line-number="13"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb49-14" data-line-number="14"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:39` and completed successfully after 11.95 secs.</span></a>
-<a class="sourceLine" id="cb49-15" data-line-number="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb49-16" data-line-number="16"><span class="co">#&gt; $set_infil_rate_2</span></a>
-<a class="sourceLine" id="cb49-17" data-line-number="17"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb49-18" data-line-number="18"><span class="co">#&gt; # Model: `C:\Users\hongy\set_infil_rate_2\set_infil_rate_2.idf`</span></a>
-<a class="sourceLine" id="cb49-19" data-line-number="19"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb49-20" data-line-number="20"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb49-21" data-line-number="21"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb49-22" data-line-number="22"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:39` and completed successfully after 11.95 secs.</span></a>
-<a class="sourceLine" id="cb49-23" data-line-number="23"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb49-24" data-line-number="24"><span class="co">#&gt; $set_infil_rate_3</span></a>
-<a class="sourceLine" id="cb49-25" data-line-number="25"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb49-26" data-line-number="26"><span class="co">#&gt; # Model: `C:\Users\hongy\set_infil_rate_3\set_infil_rate_3.idf`</span></a>
-<a class="sourceLine" id="cb49-27" data-line-number="27"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb49-28" data-line-number="28"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb49-29" data-line-number="29"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb49-30" data-line-number="30"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:39` and completed successfully after 11.95 secs.</span></a>
-<a class="sourceLine" id="cb49-31" data-line-number="31"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb49-32" data-line-number="32"><span class="co">#&gt; $set_infil_rate_4</span></a>
-<a class="sourceLine" id="cb49-33" data-line-number="33"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb49-34" data-line-number="34"><span class="co">#&gt; # Model: `C:\Users\hongy\set_infil_rate_4\set_infil_rate_4.idf`</span></a>
-<a class="sourceLine" id="cb49-35" data-line-number="35"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb49-36" data-line-number="36"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb49-37" data-line-number="37"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb49-38" data-line-number="38"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:39` and completed successfully after 11.95 secs.</span></a>
-<a class="sourceLine" id="cb49-39" data-line-number="39"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb49-40" data-line-number="40"><span class="co">#&gt; $set_infil_rate_5</span></a>
-<a class="sourceLine" id="cb49-41" data-line-number="41"><span class="co">#&gt; -- EnergyPlus Simulation Job ----------------------------------------------</span></a>
-<a class="sourceLine" id="cb49-42" data-line-number="42"><span class="co">#&gt; # Model: `C:\Users\hongy\set_infil_rate_5\set_infil_rate_5.idf`</span></a>
-<a class="sourceLine" id="cb49-43" data-line-number="43"><span class="co">#&gt; # Weather: `C:\Users\hongy\San_Francisco.epw`</span></a>
-<a class="sourceLine" id="cb49-44" data-line-number="44"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
-<a class="sourceLine" id="cb49-45" data-line-number="45"><span class="co">#&gt; # EnergyPlus Path: `C:\EnergyPlusV8-8-0`</span></a>
-<a class="sourceLine" id="cb49-46" data-line-number="46"><span class="co">#&gt;  Simulation started at `2018-07-24 12:01:39` and completed successfully after 11.95 secs.</span></a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">param<span class="op">$</span><span class="kw">run</span>()</a>
+<a class="sourceLine" id="cb50-2" data-line-number="2"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-3" data-line-number="3"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/set_infil_rate_1/set_infil_rate_1.idf.</span></a>
+<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-6" data-line-number="6"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/set_infil_rate_2/set_infil_rate_2.idf.</span></a>
+<a class="sourceLine" id="cb50-7" data-line-number="7"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-8" data-line-number="8"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-9" data-line-number="9"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/set_infil_rate_3/set_infil_rate_3.idf.</span></a>
+<a class="sourceLine" id="cb50-10" data-line-number="10"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-11" data-line-number="11"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-12" data-line-number="12"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/set_infil_rate_4/set_infil_rate_4.idf.</span></a>
+<a class="sourceLine" id="cb50-13" data-line-number="13"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-14" data-line-number="14"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-15" data-line-number="15"><span class="co">#&gt; Replace the existing file located  at /home/hongyuanjia/set_infil_rate_5/set_infil_rate_5.idf.</span></a>
+<a class="sourceLine" id="cb50-16" data-line-number="16"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-17" data-line-number="17"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-18" data-line-number="18"> Progress<span class="op">:</span><span class="st"> </span>───────────────────────────────────                         <span class="dv">100</span>%</a>
+<a class="sourceLine" id="cb50-19" data-line-number="19"> Progress<span class="op">:</span><span class="st"> </span>─────────────────────────────────────────────────────────── <span class="dv">100</span>%</a>
+<a class="sourceLine" id="cb50-20" data-line-number="20"> Progress<span class="op">:</span><span class="st"> </span>─────────────────────────────────────────────────────────── <span class="dv">100</span>%</a>
+<a class="sourceLine" id="cb50-21" data-line-number="21"><span class="co">#&gt; $set_infil_rate_1</span></a>
+<a class="sourceLine" id="cb50-22" data-line-number="22"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-23" data-line-number="23"><span class="co">#&gt; # Model: `/home/hongyuanjia/set_infil_rate_1/set_infil_rate_1.idf`</span></a>
+<a class="sourceLine" id="cb50-24" data-line-number="24"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb50-25" data-line-number="25"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb50-26" data-line-number="26"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb50-27" data-line-number="27"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:31` and completed successfully after 2.3 secs.</span></a>
+<a class="sourceLine" id="cb50-28" data-line-number="28"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-29" data-line-number="29"><span class="co">#&gt; $set_infil_rate_2</span></a>
+<a class="sourceLine" id="cb50-30" data-line-number="30"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-31" data-line-number="31"><span class="co">#&gt; # Model: `/home/hongyuanjia/set_infil_rate_2/set_infil_rate_2.idf`</span></a>
+<a class="sourceLine" id="cb50-32" data-line-number="32"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb50-33" data-line-number="33"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb50-34" data-line-number="34"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb50-35" data-line-number="35"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:31` and completed successfully after 2.3 secs.</span></a>
+<a class="sourceLine" id="cb50-36" data-line-number="36"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-37" data-line-number="37"><span class="co">#&gt; $set_infil_rate_3</span></a>
+<a class="sourceLine" id="cb50-38" data-line-number="38"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-39" data-line-number="39"><span class="co">#&gt; # Model: `/home/hongyuanjia/set_infil_rate_3/set_infil_rate_3.idf`</span></a>
+<a class="sourceLine" id="cb50-40" data-line-number="40"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb50-41" data-line-number="41"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb50-42" data-line-number="42"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb50-43" data-line-number="43"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:31` and completed successfully after 2.3 secs.</span></a>
+<a class="sourceLine" id="cb50-44" data-line-number="44"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-45" data-line-number="45"><span class="co">#&gt; $set_infil_rate_4</span></a>
+<a class="sourceLine" id="cb50-46" data-line-number="46"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-47" data-line-number="47"><span class="co">#&gt; # Model: `/home/hongyuanjia/set_infil_rate_4/set_infil_rate_4.idf`</span></a>
+<a class="sourceLine" id="cb50-48" data-line-number="48"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb50-49" data-line-number="49"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb50-50" data-line-number="50"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb50-51" data-line-number="51"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:31` and completed successfully after 2.3 secs.</span></a>
+<a class="sourceLine" id="cb50-52" data-line-number="52"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb50-53" data-line-number="53"><span class="co">#&gt; $set_infil_rate_5</span></a>
+<a class="sourceLine" id="cb50-54" data-line-number="54"><span class="co">#&gt; ── EnergyPlus Simulation Job ──────────────────────────────────────────────</span></a>
+<a class="sourceLine" id="cb50-55" data-line-number="55"><span class="co">#&gt; # Model: `/home/hongyuanjia/set_infil_rate_5/set_infil_rate_5.idf`</span></a>
+<a class="sourceLine" id="cb50-56" data-line-number="56"><span class="co">#&gt; # Weather: `/home/hongyuanjia/San_Francisco.epw`</span></a>
+<a class="sourceLine" id="cb50-57" data-line-number="57"><span class="co">#&gt; # EnergyPlus Version: `8.8.0`</span></a>
+<a class="sourceLine" id="cb50-58" data-line-number="58"><span class="co">#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`</span></a>
+<a class="sourceLine" id="cb50-59" data-line-number="59"><span class="co">#&gt;  Simulation started at `2018-08-06 23:35:31` and completed successfully after 2.3 secs.</span></a></code></pre></div>
 <p>After all simulations completed, let’s see the variations of total energy.</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">tab &lt;-<span class="st"> </span>param<span class="op">$</span><span class="kw">tabular_data</span>()</a>
-<a class="sourceLine" id="cb50-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb50-3" data-line-number="3">total_eng &lt;-<span class="st"> </span>tab[TableName <span class="op">==</span><span class="st"> "Site and Source Energy"</span> <span class="op">&amp;</span></a>
-<a class="sourceLine" id="cb50-4" data-line-number="4"><span class="st">    </span>ColumnName <span class="op">==</span><span class="st"> "Total Energy"</span> <span class="op">&amp;</span></a>
-<a class="sourceLine" id="cb50-5" data-line-number="5"><span class="st">    </span>RowName <span class="op">==</span><span class="st"> "Total Site Energy"</span>,</a>
-<a class="sourceLine" id="cb50-6" data-line-number="6">    <span class="kw">list</span>(Case, <span class="st">`</span><span class="dt">Total Energy (GJ)</span><span class="st">`</span> =<span class="st"> </span><span class="kw">as.numeric</span>(Value))]</a></code></pre></div>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">total_eng</a></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1">tab &lt;-<span class="st"> </span>param<span class="op">$</span><span class="kw">tabular_data</span>()</a>
+<a class="sourceLine" id="cb51-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb51-3" data-line-number="3">total_eng &lt;-<span class="st"> </span>tab[TableName <span class="op">==</span><span class="st"> "Site and Source Energy"</span> <span class="op">&amp;</span></a>
+<a class="sourceLine" id="cb51-4" data-line-number="4"><span class="st">    </span>ColumnName <span class="op">==</span><span class="st"> "Total Energy"</span> <span class="op">&amp;</span></a>
+<a class="sourceLine" id="cb51-5" data-line-number="5"><span class="st">    </span>RowName <span class="op">==</span><span class="st"> "Total Site Energy"</span>,</a>
+<a class="sourceLine" id="cb51-6" data-line-number="6">    <span class="kw">list</span>(Case, <span class="st">`</span><span class="dt">Total Energy (GJ)</span><span class="st">`</span> =<span class="st"> </span><span class="kw">as.numeric</span>(Value))]</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1">total_eng</a></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Case</th>

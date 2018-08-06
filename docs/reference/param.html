@@ -143,19 +143,19 @@ param$tabular_data(which = NULL)
     <pre>param$seed()
 param$weather()
 </pre>
-    <p><code>$seed</code> will return the input <code>Idf</code> object.</p>
-<p><code>$weather</code> will return the input <code>Epw</code> object.</p>
+    <p><code>$seed()</code> will return the input <code>Idf</code> object.</p>
+<p><code>$weather()</code> will return the input <code>Epw</code> object.</p>
     
     <h2 class="hasAnchor" id="apply-design-alternatives"><a class="anchor" href="#apply-design-alternatives"></a>Apply Design Alternatives</h2>
 
     <pre>param$apply_measure(measure, ..., .names = NULL)
 </pre>
-    <p><code>$apply_measure</code> allows to apply a measure to an <code>Idf</code> and creates parametric
-models for analysis. Basically, a measure is just a function that takes
-an <code>Idf</code> object and other arguments as input, and returns a modified <code>Idf</code>
-object as output. Use <code>...</code> to supply different arguments to that
-measure. Under the hook, <code>mapply()</code> is used to create multiple <code>Idf</code>s
-according to the input values.</p>
+    <p><code>$apply_measure()</code> allows to apply a measure to an <code>Idf</code> and creates
+parametric models for analysis. Basically, a measure is just a function
+that takes an <code>Idf</code> object and other arguments as input, and returns a
+modified <code>Idf</code> object as output. Use <code>...</code> to supply different arguments
+to that measure. Under the hook, <code>mapply()</code> is used to create multiple
+<code>Idf</code>s according to the input values.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>measure</code>: A function that takes an <code>Idf</code> and other arguments as input and
 returns an <code>Idf</code> object as output.</p></li>

@@ -41,7 +41,7 @@ Suggests:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Collate:
     'constants.R'
     'utils.R'

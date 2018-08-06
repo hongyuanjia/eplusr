@@ -228,9 +228,9 @@ the value and also set new value to it.</p>
 epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
 </pre>
-    <p><code>$path</code> returns the path of EPW file.</p>
-<p><code>$get_data</code> returns the core weather data.</p>
-<p><code>$set_data</code> replaces core weather data with input data. NOTE: This feature is
+    <p><code>$path()</code> returns the path of EPW file.</p>
+<p><code>$get_data()</code> returns the core weather data.</p>
+<p><code>$set_data()</code> replaces core weather data with input data. NOTE: This feature is
 experimental. There is no validation when replacing.</p>
 <p><strong>NOTE</strong>: Even though <code>Epw</code> class provides methods to replace core weather data,
 it is still not recommended.</p>

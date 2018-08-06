@@ -34,9 +34,9 @@
 
 <meta property="og:description" content="IdfObject is an abstraction of a single object in an Idf. It provides
 more detail methods to modify objects. IdfObject can only be created from
-the parent Idf object, using $object, $object_in_class and
-$search_object. This is because that initialization of an IdfObject needs
-some shared data from parent Idf object." />
+the parent Idf object, using $object, $object_in_class() and
+$search_object(). This is because that initialization of an IdfObject
+needs some shared data from parent Idf object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -108,9 +108,9 @@ some shared data from parent Idf object." />
     
     <p><code>IdfObject</code> is an abstraction of a single object in an <code>Idf</code>. It provides
 more detail methods to modify objects. <code>IdfObject</code> can only be created from
-the parent <code>Idf</code> object, using <code>$object</code>, <code>$object_in_class</code> and
-<code>$search_object</code>. This is because that initialization of an <code>IdfObject</code> needs
-some shared data from parent <code>Idf</code> object.</p>
+the parent <code>Idf</code> object, using <code>$object</code>, <code>$object_in_class()</code> and
+<code>$search_object()</code>. This is because that initialization of an <code>IdfObject</code>
+needs some shared data from parent <code>Idf</code> object.</p>
     
     </div>
 
@@ -130,6 +130,7 @@ idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName &lt;- Value
 idfobj[[Field]] &lt;- Value
+idfobj$possible_value(which = NULL)
     idfobj$validate()
 idfobj$is_valid()
     idfobj$ref_from_object()
@@ -150,17 +151,17 @@ idfobj$name()
 idfobj$group_name()
 idfobj$class_name()
 </pre>
-    <p><code>$id</code> will return the object ID.</p>
-<p><code>$name</code> will return the object name. If the class does not have name
+    <p><code>$id()</code> returns the object ID.</p>
+<p><code>$name()</code> returns the object name. If the class does not have name
 attribute, then <code>NA</code> will returned.</p>
-<p><code>$group_name</code> returns the group name of this object belongs to.</p>
-<p><code>$class_name</code> returns the class name of this object belongs to.</p>
+<p><code>$group_name()</code> returns the group name of this object belongs to.</p>
+<p><code>$class_name()</code> returns the class name of this object belongs to.</p>
     
     <h2 class="hasAnchor" id="definition"><a class="anchor" href="#definition"></a>Definition</h2>
 
     <pre>idfobj$definition()
 </pre>
-    <p><code>$definition</code> will return the definition, i.e. the <code>IddObject</code>, of current
+    <p><code>$definition()</code> returns the definition, i.e. the <code>IddObject</code>, of current
 class. For details of <code>IddObject</code>, please see <a href='idd_object.html'>IddObject class</a>.</p>
     
     <h2 class="hasAnchor" id="comment"><a class="anchor" href="#comment"></a>Comment</h2>
@@ -168,8 +169,8 @@ class. For details of <code>IddObject</code>, please see <a href='idd_object.htm
     <pre>idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
 </pre>
-    <p><code>$get_comment</code> will return the comments of current object.</p>
-<p><code>$set_comment</code> will set comments of current object.</p>
+    <p><code>$get_comment()</code> returns the comments of current object.</p>
+<p><code>$set_comment()</code> sets comments of current object.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>comment</code>: A character vector.</p></li>
 <li><p><code>append</code>: If <code>TRUE</code>, comment will be appended to existing comments. If
@@ -189,19 +190,24 @@ idfobj$FieldName
 idfobj[[Field]]
 idfobj$FieldName &lt;- Value
 idfobj[[Field]] &lt;- Value
+idfobj$possible_value(which = NULL)
 </pre>
-    <p><code>$get_value</code> will return a named list containing values of specified fields.
+    <p><code>$get_value()</code> returns a named list containing values of specified fields.
 If simplify is <code>FALSE</code>, then all values will be converted into character
 and the converted character vector will be returned. Note that the field
-names will be coverted into valid R names, i.e. all charaters other than
-letters and numbers will be replaced by underscore("_").</p>
-<p><code>$set_value</code> will set values of current object.</p>
+names will be converted into valid R names, i.e. all characters other
+than letters and numbers will be replaced by underscore("_").</p>
+<p><code>$set_value()</code> sets values of current object.</p>
 <p>eplusr also provides custom S3 method of <code>$</code>, <code>[[</code> and also <code>$&lt;-</code> and
 <code>[[&lt;-</code> to make it more convenient to get and set a single value of an
 <code>IdfObject</code>. Basically, <code>idfobj$FieldName</code> and <code>idfobj[[Field</code> is equivalent to <code>idfobj$get_value(Field)[[1]]</code>;
 <code>idfobj$FieldName &lt;- Value</code> and <code>idfobj[[Field]] &lt;- Value</code> is equivalent
 to <code>idfobj$set_value(Field = Value)</code>,  where <code>FieldName</code> is a single valid
 field name and <code>Field</code> is a single valid field index or name.</p>
+<p><code>$possible_value()</code> return all possible values for specified fields,
+including auto-value (<code>autosize</code> and <code>autocalculate</code>), default value,
+value range, choices and references. Underneath, it returns a data.table
+with custom printing method.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>which</code>: An integer vector of field indexes or a character vector of field
 names. Field names can be given in "lower-style", e.g. <code>"Thermal Resistance"</code> can be given as <code>"thermal_resistance"</code>.</p></li>
@@ -228,9 +234,9 @@ letters and numbers are replaced by underscores.</p></li>
     <pre>idfobj$validate()
 idfobj$is_valid()
 </pre>
-    <p><code>$validate</code> will check if there are errors in current object under different
+    <p><code>$validate()</code> will check if there are errors in current object under different
 strictness level.</p>
-<p><code>$is_valid</code> will check if there are no errors in current object under
+<p><code>$is_valid()</code> will check if there are no errors in current object under
 different strictness level.</p>
 <p>The strictness level can be changed using <code><a href='eplusr_option.html'>eplusr_option()</a></code>. Default is
 <code>"final".</code>There are three different validate levels, i.e. <code>"none"</code>,
@@ -251,20 +257,20 @@ idfobj$has_ref_from()
 idfobj$has_ref_by()
 idfobj$has_ref()
 </pre>
-    <p><code>$ref_from_object</code> will return other objects that current object references
+    <p><code>$ref_from_object()</code> will return other objects that current object references
 from.</p>
-<p><code>$ref_by_object</code> will return other objects that reference current object.</p>
-<p><code>$has_ref_from</code> and <code>$has_ref_by</code> will return <code>TRUE</code> if current object has
+<p><code>$ref_by_object()</code> will return other objects that reference current object.</p>
+<p><code>$has_ref_from()</code> and <code>$has_ref_by</code> will return <code>TRUE</code> if current object has
 referenced from other objects or has been referenced by other objects,
 respectively.</p>
-<p><code>$has_ref</code> will return <code>TRUE</code> if current object has either referenced from
+<p><code>$has_ref()</code> will return <code>TRUE</code> if current object has either referenced from
 other objects or has been referenced by other objects.</p>
     
     <h2 class="hasAnchor" id="data-extraction"><a class="anchor" href="#data-extraction"></a>Data Extraction</h2>
 
     <pre>idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
 </pre>
-    <p><code>$table</code> will return a data.table that contains all data of current object.</p>
+    <p><code>$table()</code> will return a data.table that contains all data of current object.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>all</code>: If <code>TRUE</code>, values of all fields, including empty fields will be
 returned as well. Default: <code>FALSE</code></p></li>
@@ -281,7 +287,7 @@ value of <code><a href='eplusr_option.html'>eplusr_option("view_in_ip")</a></cod
 
     <pre>idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
 </pre>
-    <p><code>$string</code> will return the text format of current object.</p>
+    <p><code>$string()</code> will return the text format of current object.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>comment</code>: If <code>FALSE</code>, all comments will not be included.</p></li>
 <li><p><code>leading</code>: An integer to indicate the number of spaces before each fields.

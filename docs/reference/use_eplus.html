@@ -130,17 +130,18 @@ path.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>For <code>eplus_config</code>, the configure data of specified version of
-EnergyPlus.</p>
+    <p>For <code>eplus_config()</code>, the configure data (a list) of specified
+version of EnergyPlus; for <code>avail_eplus()</code>, a character vector; for
+<code>is_avis_avail_eplus()</code>, a scalar logical vector.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>use_eplus</code> adds an EnergyPlus version into the EnergyPlus version
+    <p><code>use_eplus()</code> adds an EnergyPlus version into the EnergyPlus version
 dictionary in eplusr.</p>
-<p><code>eplus_config</code> returns the configure data of specified version of
+<p><code>eplus_config()</code> returns the configure data of specified version of
 EnergyPlus.</p>
-<p><code>avail_eplus</code> returns all available EnergyPlus found.</p>
-<p><code>is_avail_eplus</code> checks if the specified version of EnergyPlus is
+<p><code>avail_eplus()</code> returns all available EnergyPlus found.</p>
+<p><code>is_avail_eplus()</code> checks if the specified version of EnergyPlus is
 available or not.</p>
     
 
@@ -150,7 +151,7 @@ available or not.</p>
 <span class='fu'>use_eplus</span>(<span class='st'>"8.8.0"</span>)
 <span class='fu'>eplus_config</span>(<span class='fl'>8.6</span>)
 <span class='co'># }</span><div class='input'>
-<span class='fu'>avail_eplus</span>()</div><div class='output co'>#&gt; [1] "8.6.0" "8.8.0" "8.9.0"</div><div class='input'><span class='fu'>is_avail_eplus</span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div></pre>
+<span class='fu'>avail_eplus</span>()</div><div class='output co'>#&gt; [1] "8.6.0" "8.8.0"</div><div class='input'><span class='fu'>is_avail_eplus</span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

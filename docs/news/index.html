@@ -100,6 +100,14 @@
 <h1 class="page-header">
 <a href="#eplusr-0-8-2-1" class="anchor"></a>eplusr 0.8.2.1<small> Unreleased </small>
 </h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li><p>A new method <code>$possible_value()</code> has been added into <code>IdfObject</code> class, which will return all possible values for selected fields, including auto-value (autosize or autocalculate), default, range, choices and references.</p></li>
+<li><p>New parameter <code>dir</code> has been added to <code><a href="../reference/install_eplus.html">install_eplus()</a></code>, which makes it possible for keeping the downloaded EnergyPlus installation file.</p></li>
+</ul>
+</div>
 <div id="minor-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
@@ -115,8 +123,9 @@
 <ul>
 <li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (#12).</p></li>
 <li><p>Fix idf input version parsing in <code>param_job</code> (#13).</p></li>
-<li><p>Fix EnergyPlus downloading errors on Linux and MacOS (#14).</p></li>
+<li><p>Fix EnergyPlus downloading and installing errors on Linux and MacOS (#14, #17).</p></li>
 <li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and MacOS (#14).</p></li>
+<li><p>Fix missing name attribute in class <code>NodeList</code> (#16)</p></li>
 </ul>
 </div>
 </div>

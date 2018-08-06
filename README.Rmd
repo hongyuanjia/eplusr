@@ -27,7 +27,8 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 
-root <-  Sys.getenv("USERPROFILE")
+root <- Sys.getenv("USERPROFILE")
+if (root == "") root <- Sys.getenv("HOME")
 knitr::opts_knit$set(root.dir = root)
 ```
 
@@ -538,7 +539,7 @@ avail_eplus()
 If your EnergyPlus was not installed in standard location, you can add that
 location into eplusr EnergyPlus location dictionary using `use_eplus()`.
 
-```{r use_eplus}
+```{r use_eplus, eval = FALSE}
 use_eplus("C:/EnergyPlusV8-8-0")
 ```
 

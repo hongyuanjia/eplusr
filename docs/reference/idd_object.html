@@ -34,9 +34,9 @@
 
 <meta property="og:description" content="IddObject is an abstraction of a single object in an Idd. It provides
 more detail methods to query field properties. IddObject can only be
-created from the parent Idd object, using $object and $object_in_group.
-This is because that initialization of an IddObject needs
-some shared data from parent Idd object." />
+created from the parent Idd object, using $object() and
+$object_in_group().  This is because that initialization of an IddObject
+needs some shared data from parent Idd object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -108,17 +108,16 @@ some shared data from parent Idd object." />
     
     <p><code>IddObject</code> is an abstraction of a single object in an <code>Idd</code>. It provides
 more detail methods to query field properties. <code>IddObject</code> can only be
-created from the parent <code>Idd</code> object, using <code>$object</code> and <code>$object_in_group</code>.
-This is because that initialization of an <code>IddObject</code> needs
-some shared data from parent <code>Idd</code> object.</p>
+created from the parent <code>Idd</code> object, using <code>$object()</code> and
+<code>$object_in_group()</code>.  This is because that initialization of an <code>IddObject</code>
+needs some shared data from parent <code>Idd</code> object.</p>
     
     </div>
 
         
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
-    <pre># class properties
-iddobj$group_name()
+    <pre>iddobj$group_name()
 iddobj$group_index()
 iddobj$class_name()
 iddobj$class_index()
@@ -129,16 +128,13 @@ iddobj$memo()
 iddobj$num_extensible()
 iddobj$first_extensible_index()
 iddobj$extensible_group_num()
-    # extensible group
-iddobj$add_extensible_group(num = 1L)
+    iddobj$add_extensible_group(num = 1L)
 iddobj$del_extensible_group(num = 1L)
-    # class property assertions
-iddobj$has_name()
+    iddobj$has_name()
 iddobj$is_required()
 iddobj$is_unique()
 iddobj$is_extensible()
-    # field properties
-iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
+    iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
 iddobj$field_index(name = NULL)
 iddobj$field_type(which = NULL)
 iddobj$field_note(which = NULL)
@@ -146,8 +142,7 @@ iddobj$field_unit(which = NULL, in_ip = getOption("eplusr.view_in_ip")
 iddobj$field_default(which = NULL, in_ip = getOption("eplusr.view_in_ip")
 iddobj$field_choice(which = NULL)
 iddobj$field_range(which = NULL)
-    # field property assertions
-iddobj$is_valid_field_num(num)
+    iddobj$is_valid_field_num(num)
 iddobj$is_extensible_index(index)
 iddobj$is_valid_field_name(name)
 iddobj$is_valid_field_index(which)
@@ -180,50 +175,50 @@ names. Field names can be given in "lower-style".</p></li>
     <h2 class="hasAnchor" id="detail"><a class="anchor" href="#detail"></a>Detail</h2>
 
     
-    <p><code>$group_index</code> returns the index of group this class belongs to.</p>
-<p><code>$group_name</code> returns the name of group this class belongs to.</p>
-<p><code>$class_index</code> returns the index of this class.</p>
-<p><code>$class_name</code> returns the name of this class.</p>
-<p><code>$min_fields</code> returns the minimum fields required for this class.
+    <p><code>$group_index()</code> returns the index of group this class belongs to.</p>
+<p><code>$group_name()</code> returns the name of group this class belongs to.</p>
+<p><code>$class_index()</code> returns the index of this class.</p>
+<p><code>$class_name()</code> returns the name of this class.</p>
+<p><code>$min_fields()</code> returns the minimum fields required for this class.
 If no required, <code>0</code> is returned.</p>
-<p><code>$num_fields</code> returns current total number of fields in this class. This
+<p><code>$num_fields()</code> returns current total number of fields in this class. This
 number may change if the class is extensible and after
-<code>$add_extensible_group</code> or <code>$del_extensible_group</code>.</p>
-<p><code>$memo</code> returns memo of this class.</p>
-<p><code>$num_extensible</code> returns the number of extensible fields in this class.</p>
-<p><code>$first_extensible_index</code> returns the field index of the first extensible
+<code>$add_extensible_group()</code> or <code>$del_extensible_group()</code>.</p>
+<p><code>$memo()</code> returns memo of this class.</p>
+<p><code>$num_extensible()</code> returns the number of extensible fields in this class.</p>
+<p><code>$first_extensible_index()</code> returns the field index of the first extensible
 field in this class. If this class is not extensible, <code>0</code> is return.</p>
-<p><code>$extensible_group_num</code> returns the number of extensible groups in this
+<p><code>$extensible_group_num()</code> returns the number of extensible groups in this
 class.</p>
-<p><code>$add_extensible_groups</code> adds extensible groups in this class.</p>
-<p><code>$del_extensible_groups</code> deletes extensible groups in this class.</p>
-<p><code>$has_name</code> return <code>TRUE</code> if this class has name attribute.</p>
-<p><code>$is_unique</code> return <code>TRUE</code> if this class is unique.</p>
-<p><code>$is_required</code> returns <code>TRUE</code> if this class is required.</p>
-<p><code>$is_extensible</code> returns <code>TRUE</code> if this class is extensible.</p>
-<p><code>$field_name</code> returns names of fields specified by field indexes.  If <code>index</code>
+<p><code>$add_extensible_groups()</code> adds extensible groups in this class.</p>
+<p><code>$del_extensible_groups()</code> deletes extensible groups in this class.</p>
+<p><code>$has_name()</code> return <code>TRUE</code> if this class has name attribute.</p>
+<p><code>$is_unique()</code> return <code>TRUE</code> if this class is unique.</p>
+<p><code>$is_required()</code> returns <code>TRUE</code> if this class is required.</p>
+<p><code>$is_extensible()</code> returns <code>TRUE</code> if this class is extensible.</p>
+<p><code>$field_name()</code> returns names of fields specified by field indexes.  If <code>index</code>
 is <code>NULL</code>, names of all fields in this class are returned. If <code>lower</code> is
 <code>TRUE</code>, "lower-style" names are returned, i.e. all spaces and dashes is
 replaced by underscores. If <code>unit</code> is <code>TRUE</code>, the units of those fields
 are also returned.  If <code>in_ip</code>, corresponding imperial units are
 returned. It only has effect when <code>unit</code> is <code>TRUE</code>.</p>
-<p><code>$field_index</code> returns indexes of fields specified by field names. If <code>name</code>
+<p><code>$field_index()</code> returns indexes of fields specified by field names. If <code>name</code>
 is <code>NULL</code>, indexes of all fields in this class are returned.</p>
-<p>All other <code>$field_*</code> returns specific field properties. If <code>which</code> is <code>NULL</code>,
+<p>All other <code>$field_*()</code> returns specific field properties. If <code>which</code> is <code>NULL</code>,
 properties of all fields in this class are returned.</p><ul>
-<li><p><code>$field_type</code>: returns field types. All possible values are
+<li><p><code>$field_type</code>(): returns field types. All possible values are
 <code>"integer"</code>, <code>"real"</code>, <code>"alpha"</code> (arbitrary string), <code>"choice"</code> (alpha
 with specific list of choices), <code>"object-list"</code> (link to a list of
 objects defined elsewhere), <code>"external-list"</code> (uses a special list from
 an external source) and <code>"node"</code> (name used in connecting HVAC
 components).</p></li>
-<li><p><code>$field_unit</code>: returns a character vector of field units. If <code>in_ip</code> is
+<li><p><code>$field_unit()</code>: returns a character vector of field units. If <code>in_ip</code> is
 <code>TRUE</code>, IP unites are returned.</p></li>
-<li><p><code>$field_default</code>: returns a list of default values of those fields. If
+<li><p><code>$field_default()</code>: returns a list of default values of those fields. If
 no defaults found, <code>NA</code>s are returned.</p></li>
-<li><p><code>$field_choice</code>: returns a list of all valid choices for those fields.
+<li><p><code>$field_choice()</code>: returns a list of all valid choices for those fields.
 If no choices found, <code>NA</code>s are returned.</p></li>
-<li><p><code>$field_range</code>: returns a list of ranges for those fields. Every range
+<li><p><code>$field_range()</code>: returns a list of ranges for those fields. Every range
 has four components: <code>minimum</code> (lower limit), <code>lower_incbounds</code> (<code>TRUE</code>
 if the lower limit should be included), <code>maximum</code> (upper limit), and
 <code>upper_incbounds</code> (<code>TRUE</code> if the upper limit should be included). For
@@ -232,21 +227,21 @@ numeric types with no specified ranges, <code>minimum</code> is set to <code>-In
 <code>lower_incbounds</code> is set to FALSE, <code>upper</code> is set to <code>Inf</code>, and
 <code>upper_incbounds</code> is set to FALSE.</p></li>
 </ul>
-    <p><code>$is_valid_field_num</code> returns <code>TRUE</code> if <code>num</code> is acceptable as a total number
+    <p><code>$is_valid_field_num()</code> returns <code>TRUE</code> if <code>num</code> is acceptable as a total number
 of fields in this class. Extensible property is considered. For instance, The
 total number of fields defined in IDD for class <code>BuildingSurfaces:Detailed</code>
 is 390. However, 396 is still a valid field number for this class as the
 number of field in the extensible group is 3.</p>
-<p><code>$is_valid_field_name</code> returns <code>TRUE</code> if <code>name</code> is a valid field name
+<p><code>$is_valid_field_name()</code> returns <code>TRUE</code> if <code>name</code> is a valid field name
 <strong>WITHOUT</strong> unit.</p>
-<p><code>$is_valid_field_index</code> returns <code>TRUE</code> if <code>index</code> is a valid field index.</p>
-<p><code>$is_autosizable_field</code> returns <code>TRUE</code> if the field can be assigned to
+<p><code>$is_valid_field_index()</code> returns <code>TRUE</code> if <code>index</code> is a valid field index.</p>
+<p><code>$is_autosizable_field()</code> returns <code>TRUE</code> if the field can be assigned to
 <code>autosize</code>.</p>
-<p><code>$is_autocalculatable_field</code> returns <code>TRUE</code> if the field can be assigned to
+<p><code>$is_autocalculatable_field()</code> returns <code>TRUE</code> if the field can be assigned to
 <code>autocalculate</code>.</p>
-<p><code>$is_numeric_field</code> returns <code>TRUE</code> if the field value should be numeric.</p>
-<p><code>$is_integer_field</code> returns <code>TRUE</code> if the field value should be an integer.</p>
-<p><code>$is_required_field</code> returns <code>TRUE</code> if the field is required.</p>
+<p><code>$is_numeric_field()</code> returns <code>TRUE</code> if the field value should be numeric.</p>
+<p><code>$is_integer_field()</code> returns <code>TRUE</code> if the field value should be an integer.</p>
+<p><code>$is_required_field()</code> returns <code>TRUE</code> if the field is required.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 

@@ -2,11 +2,10 @@
 % Please edit documentation in R/install.R
 \name{install_eplus}
 \alias{install_eplus}
-\alias{install_eplus}
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
-install_eplus(ver = "latest", force = FALSE)
+install_eplus(ver = "latest", force = FALSE, dir = tempdir())
 
 download_eplus(ver = "latest", dir = getwd())
 }
@@ -18,8 +17,8 @@ download_eplus(ver = "latest", dir = getwd())
 installed.}
 
 \item{dir}{Where to save EnergyPlus installer file. Default is current
-working directory. Only applicable to \code{download_eplus()}. For
-\code{install_eplus()}, it will be saved into \code{tempdir()}.}
+working directory for \code{download_eplus()} and \code{tempdir()} for
+\code{install_eplus()}.}
 }
 \description{
 Download specified version of EnergyPlus for your platform from GitHub and
@@ -36,5 +35,5 @@ e.g.  \file{C:/EnergyPlusVX-Y-0} on Windows,
 
 Note that the installation process requires administrative privileges
 during the installation and you have to run R with administrator (or with
-sudo if you are on Linux) to make it work.
+sudo if you are on Linux) to make it work if you are not in interactive mode.
 }
