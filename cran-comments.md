@@ -58,3 +58,18 @@ Please fix and resubmit.
 Best,
 Swetlana Herbrandt
 ```
+
+# Version 0.8.3
+## Round 1
+### Test environments
+* local Windows 10 install, R 3.5.0
+* local Manjaro Linux 17.1.11.1 install, R 3.5.1
+* Windows (on appveyor-ci), R oldrel, patched, stable, and release
+* Ubuntu 14.04 (on travis-ci), R oldrel, release, devel
+* OS X (on travis-ci), R oldrel and release
+
+### R CMD check results
+0 errors | 0 warnings | 0 notes
+
+### Reverse dependencies
+eplusr currently has no reverse dependencies.
