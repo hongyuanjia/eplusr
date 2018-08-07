@@ -55,13 +55,12 @@ use_eplus <- function (eplus) {
                 call. = FALSE)
         }
     } else {
-        ver <- get_ver_from_path(eplus)
-        eplus_dir <- eplus
-        if (!is_valid_eplus_path(eplus)) {
-            stop(msg(backtick(eplus_dir), "is not a valid EnergyPlus installation path."),
+        if (!is_valid_eplus_path(eplus))
+            stop(msg(backtick(eplus), "is not a valid EnergyPlus installation path."),
                 call. = FALSE)
 
-        }
+        ver <- get_ver_from_path(eplus)
+        eplus_dir <- eplus
         if (is.null(ver)) {
             stop("Failed to detect the version of EnergyPlus located in ",
                  backtick(eplus_dir), ".", call. = FALSE)
@@ -86,7 +85,11 @@ avail_eplus <- function () names(.globals$eplus_config)
 eplus_config <- function (ver) {
     assert_that(is_eplus_ver(ver))
     ver <- standardize_ver(ver)
-    .globals$eplus_config[[as.character(ver)]]
+    res <- .globals$eplus_config[[as.character(ver)]]
+    if (is.null(res))
+        warning("Failed to find configuration data of EnergyPlus v", ver, ".",
+            call. = FALSE)
+    res
 }
 # }}}
 
@@ -318,24 +321,40 @@ exe <- function () if (is_windows()) ".exe" else  ""
 # }}}
 # is_valid_eplus_path {{{
 is_valid_eplus_path <- function (path) {
-    if (!dir.exists(path)) {
-        FALSE
-    } else {
-        all(file.exists(c(file.path(path, paste0("energyplus",exe())),
-                          file.path(path, "Energy+.idd"))))
-    }
+    if (!dir.exists(path)) return(FALSE)
+
+    file.exists(file.path(path, paste0("energyplus", exe()))) &&
+    not_empty(list.files(path, "\\.idd$", ignore.case = TRUE))
 }
 # }}}
 # get_ver_from_path {{{
 get_ver_from_path <- function (path) {
-    # try to get version form EnergyPlus path
-    ver <- tryCatch(gsub("^.*V", "", path), error = function (e) NULL)
-    # then from the first line of Energy+.idd
-    if (is.null(ver)) {
-        h <- readr::read_lines(file.path(path, "Energy+.idd"), n_max = 1L)
-        # if still failed, just return NULL
-        ver <- tryCatch(get_idd_ver(h), error = function (e) NULL)
+    idd_file <- list.files(path, pattern = "\\.idd$", ignore.case = TRUE,
+        full.names = TRUE)
+
+    if (is_empty(idd_file)) {
+        stop("Failed to locate IDD file in ", backtick(path), ".", call. = FALSE)
     }
+
+    if (!is_scalar(idd_file)) {
+        mes <- paste0("Multiple IDD file found in ", backtick(path), ".")
+        if (any(basename(idd_file) == "Energy+.idd")) {
+            idd_file <- idd_file[basename(idd_file) == "Energy+.idd"]
+            mes_f <- "The default IDD file `Energy+.idd` will be used to parse EnergyPlus version."
+        } else {
+            idd_file <- idd_file[1]
+            mes_f <- paste0("File ", backtick(basename(idd_file)), " will be used ",
+                "to parse EnergyPlus version")
+        }
+        warning(mes," ", mes_f, call. = FALSE)
+    }
+
+    h <- readr::read_lines(idd_file, n_max = 1L)
+
+    ver <- tryCatch(get_idd_ver(h),
+        error = function (e) stop("Failed to parse EnergyPlus version using IDD ",
+            backtick(idd_file), ".", call. = FALSE))
+
     standardize_ver(ver)
 }
 # }}}

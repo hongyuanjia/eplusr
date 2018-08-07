@@ -22,6 +22,8 @@
   which inform the user that currently `$kill()` does not for parametric
   simulations.
 
+* A warning will be given if no configuration data found in `eplus_config()`.
+
 ## Bug fixes
 
 * Fix errors in `$status()`, `$output_dir()` and `$locate_output()` in
@@ -33,7 +35,9 @@
 
 * Fix `run_idf()` and `run_multi()` errors on Linux and MacOS (#14).
 
-* Fix missing name attribute in class `NodeList` (#16)
+* Fix missing name attribute in class `NodeList` (#16).
+
+* Fix errors in `use_eplus()` when input is an EnergyPlus installation path (#18).
 
 # eplusr 0.8.2
 
