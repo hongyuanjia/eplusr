@@ -43,7 +43,6 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
 }
 \section{Usage}{
 \preformatted{epw <- read_epw(path)
-
 epw$city
 epw$city <- "city"
 epw$state_province
@@ -66,13 +65,10 @@ epw$time_step
 epw$time_step <- "time_step"
 epw$start_day_of_week
 epw$start_day_of_week <- "start_day_of_week"
-
 epw$path()
 epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
-
 epw$save(path, overwrite = FALSE)
-
 epw$print()
 print(epw)
 }

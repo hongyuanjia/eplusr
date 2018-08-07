@@ -29,9 +29,6 @@ distributed along with EnergyPlus.
 in R.
 \item Run parametric analysis in parallel and collect results in one go.
 }
-
-To learn more about eplusr, start with the vignettes:
-\code{browseVignettes(package = "eplusr")}
 }
 \seealso{
 Useful links:

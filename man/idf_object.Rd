@@ -16,12 +16,9 @@ needs some shared data from parent \code{Idf} object.
 \preformatted{
 idfobj$id()
 idfobj$name()
-
 idfobj$definition()
-
 idfobj$get_comment()
 idfobj$set_comment(comment, append = TRUE, width = 0L)
-
 idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
 idfobj$set_value(..., defaults = TRUE)
 idfobj$FieldName
@@ -29,20 +26,15 @@ idfobj[[Field]]
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
 idfobj$possible_value(which = NULL)
-
 idfobj$validate()
 idfobj$is_valid()
-
 idfobj$ref_from_object()
 idfobj$ref_by_object()
 idfobj$has_ref_by()
 idfobj$has_ref_from()
 idfobj$has_ref()
-
 idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
-
 idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-
 idfobj$print(comment = TRUE, auto_sep = FALSE)
 print(iddobj)
 }

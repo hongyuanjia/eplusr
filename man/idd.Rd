@@ -59,25 +59,20 @@ eplusr uses a SQL-like structure to store both IDF and IDD data in
 \preformatted{
 idd$version()
 idd$build()
-
 idd$group_index(group = NULL)
 idd$group_name()
 idd$is_valid_group(group)
 idd$from_group(class)
-
 idd$class_index(class = NULL)
 idd$class_name()
 idd$is_valid_class(class)
-
 idd$required_class_name()
 idd$unique_class_name()
 idd$extenesible_class_name()
-
 idd$object(class)
 idd$object_in_group(group)
 idd$ClassName
 idd[[ClassName]]
-
 idd$print()
 print(idd)
 }

@@ -88,3 +88,9 @@ Please fix and resubmit.
 Best,
 Uwe Ligges
 ```
+
+### Submission comments
+2018-08-07
+
+Fix the function that install EnergyPlus which hangs on the tests when there is
+no powershell installed on Windows machine.

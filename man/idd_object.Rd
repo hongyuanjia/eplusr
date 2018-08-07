@@ -23,15 +23,12 @@ iddobj$memo()
 iddobj$num_extensible()
 iddobj$first_extensible_index()
 iddobj$extensible_group_num()
-
 iddobj$add_extensible_group(num = 1L)
 iddobj$del_extensible_group(num = 1L)
-
 iddobj$has_name()
 iddobj$is_required()
 iddobj$is_unique()
 iddobj$is_extensible()
-
 iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
 iddobj$field_index(name = NULL)
 iddobj$field_type(which = NULL)
@@ -40,7 +37,6 @@ iddobj$field_unit(which = NULL, in_ip = getOption("eplusr.view_in_ip")
 iddobj$field_default(which = NULL, in_ip = getOption("eplusr.view_in_ip")
 iddobj$field_choice(which = NULL)
 iddobj$field_range(which = NULL)
-
 iddobj$is_valid_field_num(num)
 iddobj$is_extensible_index(index)
 iddobj$is_valid_field_name(name)
@@ -50,7 +46,6 @@ iddobj$is_autocalculatable_field(which = NULL)
 iddobj$is_numeric_field(which = NULL)
 iddobj$is_integer_field(which = NULL)
 iddobj$is_required_field(which = NULL)
-
 iddobj$print()
 print(iddobj)
 }

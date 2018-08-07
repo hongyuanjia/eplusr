@@ -62,7 +62,7 @@ methods to extract simulation outputs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.2.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
       </span>
     </div>
 
@@ -126,13 +126,13 @@ Table"</em> in EnergyPlus <em>"Output Details and Examples"</em> documentation.<
     <pre>job$run(wait = TRUE)
 job$kill()
 job$status()
-    job$errors(info = FALSE)
-    job$output_dir(open = FALSE)
+job$errors(info = FALSE)
+job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 job$tabular_data()
-    job$print()
+job$print()
 </pre>
     
     <h2 class="hasAnchor" id="create"><a class="anchor" href="#create"></a>Create</h2>

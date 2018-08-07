@@ -63,7 +63,7 @@ but with total different data structure under the hook." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.2.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
       </span>
     </div>
 
@@ -147,32 +147,32 @@ model$group_name(all = FALSE)
 model$class_name(all = FALSE)
 model$is_valid_group(group, all = FALSE)
 model$is_valid_class(class, all = FALSE)
-    model$definition(class)
-    model$object_id(class = NULL, simplify = FALSE)
+model$definition(class)
+model$object_id(class = NULL, simplify = FALSE)
 model$object_name(class = NULL, simplify = FALSE)
 model$object_num(class = NULL)
 model$is_valid_id(id)
 model$is_valid_name(name)
-    model$object(id)
+model$object(id)
 model$object_in_class(class)
 model$search_object(pattern, class = NULL)
 model$ClassName
 model[[ClassName]]
-    model$dup_object(object, new_name = NULL)
+model$dup_object(object, new_name = NULL)
 model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
 model$ins_object(object)
 model$set_object(object)
 model$del_object(object, referenced = FALSE)
 model$search_value(pattern)
 model$replace_value(pattern, replacement)
-    model$validate()
+model$validate()
 model$is_valid
-    model$string(comment = TRUE, header = TRUE, ...)
-    model$is_unsaved()
+model$string(comment = TRUE, header = TRUE, ...)
+model$is_unsaved()
 model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
-    model$clone()
-    model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
-    model$print(plain = FALSE)
+model$clone()
+model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
+model$print(plain = FALSE)
 print(model)
 </pre>
     

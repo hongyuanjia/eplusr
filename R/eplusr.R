@@ -17,9 +17,6 @@
 #'   in R.
 #' * Run parametric analysis in parallel and collect results in one go.
 #'
-#' To learn more about eplusr, start with the vignettes:
-#' `browseVignettes(package = "eplusr")`
-#'
 #' @name eplusr-package
 "_PACKAGE"
 

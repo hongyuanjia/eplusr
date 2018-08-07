@@ -14,7 +14,6 @@ Basically, it is a collection of multiple \code{EplusJob} objects.
 \section{Usage}{
 \preformatted{param <- param_job(idf, epw)
 param$apply_measure(measure, ..., .names = NULL)
-
 param$run(dir = NULL, parallel_backend = future::multiprocess)
 param$kill(which = NULL)
 param$status(which = NULL)
@@ -24,7 +23,6 @@ param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 param$tabular_data(which = NULL)
-
 param$print()
 }
 }

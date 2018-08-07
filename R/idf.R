@@ -42,21 +42,17 @@
 #' model$class_name(all = FALSE)
 #' model$is_valid_group(group, all = FALSE)
 #' model$is_valid_class(class, all = FALSE)
-#'
 #' model$definition(class)
-#'
 #' model$object_id(class = NULL, simplify = FALSE)
 #' model$object_name(class = NULL, simplify = FALSE)
 #' model$object_num(class = NULL)
 #' model$is_valid_id(id)
 #' model$is_valid_name(name)
-#'
 #' model$object(id)
 #' model$object_in_class(class)
 #' model$search_object(pattern, class = NULL)
 #' model$ClassName
 #' model[[ClassName]]
-#'
 #' model$dup_object(object, new_name = NULL)
 #' model$add_object(class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
 #' model$ins_object(object)
@@ -64,19 +60,13 @@
 #' model$del_object(object, referenced = FALSE)
 #' model$search_value(pattern)
 #' model$replace_value(pattern, replacement)
-#'
 #' model$validate()
 #' model$is_valid
-#'
 #' model$string(comment = TRUE, header = TRUE, ...)
-#'
 #' model$is_unsaved()
 #' model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
-#'
 #' model$clone()
-#'
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
-#'
 #' model$print(plain = FALSE)
 #' print(model)
 #' }

@@ -23,15 +23,12 @@ Table"} in EnergyPlus \emph{"Output Details and Examples"} documentation.
 \preformatted{job$run(wait = TRUE)
 job$kill()
 job$status()
-
 job$errors(info = FALSE)
-
 job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 job$tabular_data()
-
 job$print()
 }
 }

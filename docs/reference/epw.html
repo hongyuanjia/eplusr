@@ -64,7 +64,7 @@ with some simplifications." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.2.1</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
       </span>
     </div>
 
@@ -146,7 +146,7 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
     <pre>epw &lt;- read_epw(path)
-    epw$city
+epw$city
 epw$city &lt;- "city"
 epw$state_province
 epw$state_province &lt;- "state_province"
@@ -168,11 +168,11 @@ epw$time_step
 epw$time_step &lt;- "time_step"
 epw$start_day_of_week
 epw$start_day_of_week &lt;- "start_day_of_week"
-    epw$path()
+epw$path()
 epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
-    epw$save(path, overwrite = FALSE)
-    epw$print()
+epw$save(path, overwrite = FALSE)
+epw$print()
 print(epw)
 </pre>
     
