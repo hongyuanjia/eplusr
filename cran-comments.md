@@ -73,3 +73,18 @@ Swetlana Herbrandt
 
 ### Reverse dependencies
 eplusr currently has no reverse dependencies.
+
+### Reviewer comments
+2018-08-07 Uwe Ligges
+
+```
+This hangs on Windows.
+
+Please verify that this works on Windows before submitting to CRAN, or 
+if not possible, declare an OS_type.
+
+Please fix and resubmit.
+
+Best,
+Uwe Ligges
+```

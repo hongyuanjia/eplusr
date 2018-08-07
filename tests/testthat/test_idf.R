@@ -50,7 +50,8 @@ idf_text <- "
 if (is_avail_eplus(8.8)) {
     idd <- suppressMessages(use_idd(8.8))
 } else {
-    idd <- suppressMessages(use_idd(8.8, download = TRUE))
+    idd_path <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.9.0/idd/V8-8-0-Energy%2B.idd"
+    idd <- read_idd(idd_path, download = TRUE)
 }
 
 idf_parsed <- suppressWarnings(parse_idf_file(idf_text, idd))
