@@ -267,25 +267,7 @@ eplus_latest_release <- function () {
 # }}}
 # install_eplus_win {{{
 install_eplus_win <- function (exec) {
-    # change working directory
-    ori_wd <- getwd()
-    on.exit(setwd(ori_wd), add = TRUE)
-
-    exe_dir <- dirname(exec)
-    setwd(exe_dir)
-
-    has_ps <- unname(Sys.which("powershell") != "")
-    win_exec <- normalizePath(exec)
-
-    if (has_ps) {
-        cmd <- sprintf("& %s /S | Out-Null", exec)
-        res <- system2(command = "powershell", args = cmd)
-    } else {
-        message("Cannot install EnergyPlus silently. Will try to install from GUI.")
-        res <- system(command = exec)
-    }
-
-    return(res)
+    system(sprintf("%s /S", exec))
 }
 # }}}
 # install_eplus_macos {{{
