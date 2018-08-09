@@ -38,10 +38,24 @@ apt_packages:
 brew_packages:
   - udunits
 
-# Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
 before_install:
   # manually install devtools
   - Rscript -e 'install.packages("devtools")'
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
+  # automatically update package site
+  - test $TRAVIS_R_VERSION = "release" &&
+    test $TRAVIS_OS_NAME = "linux" &&
+    Rscript -e 'pkgdown::build_site()'
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_PAT
+  keep-history: true
+  local-dir: docs
+  on:
+    branch: master
+    condition: "$TRAVIS_R_VERSION = release"
+    condition: "$TRAVIS_OS_NAME = linux"
