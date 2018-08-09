@@ -96,7 +96,7 @@ eplus_config <- function (ver) {
 #' @rdname use_eplus
 #' @export
 # is_avail_eplus {{{
-is_avail_eplus <- function (ver) !is.null(eplus_config(ver))
+is_avail_eplus <- function (ver) !is.null(suppressWarnings(eplus_config(ver)))
 # }}}
 
 #' Clean working directory of a previous EnergyPlus simulation

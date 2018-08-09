@@ -245,7 +245,8 @@ os_type <- function () {
 # }}}
 # os_arch: Return the architecture {{{
 os_arch <- function () {
-    if (identical(Sys.info()[['machine']], "x86-64")) {
+    if (identical(Sys.info()[['machine']], "x86-64") ||
+        identical(Sys.info()[['machine']], "x86_64")) {
         c("64bit")
     } else {
         c("32bit")
@@ -281,9 +282,8 @@ install_eplus_macos <- function (exec) {
 
     f <- basename(exec)
     no_ext <- tools::file_path_sans_ext(f)
-    cmd <- sprintf("sudo hdiutil attach %s | sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem",
-        f, no_ext, no_ext)
-    system(cmd)
+    system(sprintf("sudo hdiutil attach %s", f))
+    system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
 }
 # }}}
 # install_eplus_linux {{{
@@ -296,8 +296,9 @@ install_eplus_linux <- function (exec) {
     setwd(exe_dir)
 
     f <- basename(exec)
-    v <- gsub("\\.", "-", attr(exec, "version"))
-    system(sprintf("chmod +x %s", f))
-    system(sprintf('echo "y\r" | sudo ./%s | sudo chmod -R a+w /usr/local/EnergyPlus-%s', f, v))
+    v <- gsub("\\.", "-", standardize_ver(attr(exec, "version")))
+    system(sprintf('chmod +x %s', f))
+    system(sprintf('echo "y\r" | sudo ./%s', f))
+    system(sprintf('sudo chmod -R a+w /usr/local/EnergyPlus-%s', v))
 }
 # }}}

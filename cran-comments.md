@@ -94,3 +94,28 @@ Uwe Ligges
 
 Fix the function that install EnergyPlus which hangs on the tests when there is
 no powershell installed on Windows machine.
+
+# Version 0.8.4
+
+## Round 1
+
+### Test environments
+
+* local Manjaro Linux 17.1.11.1 install, R 3.5.1
+* Windows (on appveyor-ci), R oldrel, release and devel
+* Ubuntu 14.04 (on travis-ci), R oldrel, release and devel
+* OS X (on travis-ci), R oldrel and release
+
+### CRAN comments
+
+2018-08-08
+
+The package was archived by CRAN due to leaving 'EnergyPlus' installer file and
+installation in home.
+
+### Submission comments
+
+2018-08-09
+
+Skip tests which download and install 'EnergyPlus' in home folder on CRAN and
+only run those tests locally.

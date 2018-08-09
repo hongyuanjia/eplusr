@@ -13,17 +13,24 @@ matrix:
   include:
   - os: linux
     r: oldrel
+
   - os: linux
     r: release
+
   - os: linux
     r: devel
+
   - os: osx
     r: oldrel
+
   - os: osx
     r: release
 
 r_packages:
   - covr
+
+env:
+  - NOT_CRAN=true
 
 apt_packages:
   - libudunits2-dev
@@ -32,29 +39,9 @@ brew_packages:
   - udunits
 
 # Reference: https://github.com/santoshphilip/eppy/blob/master/.travis.yml
-env:
-  - ENERGYPLUS_VERSION=8.8.0 ENERGYPLUS_SHA=7c3bbe4830 ENERGYPLUS_INSTALL_VERSION=8-8-0
-
 before_install:
   # manually install devtools
   - Rscript -e 'install.packages("devtools")'
-
-  # install EnergyPlus
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then EXT=dmg; PLATFORM=Darwin; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then EXT=sh; PLATFORM=Linux; fi
-
-  - ENERGYPLUS_DOWNLOAD_BASE_URL=https://github.com/NREL/EnergyPlus/releases/download/v$ENERGYPLUS_VERSION
-  - ENERGYPLUS_DOWNLOAD_FILENAME=EnergyPlus-$ENERGYPLUS_VERSION-$ENERGYPLUS_SHA-$PLATFORM-x86_64
-  - ENERGYPLUS_DOWNLOAD_URL=$ENERGYPLUS_DOWNLOAD_BASE_URL/$ENERGYPLUS_DOWNLOAD_FILENAME.$EXT
-  - curl -SLO $ENERGYPLUS_DOWNLOAD_URL
-
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo hdiutil attach $ENERGYPLUS_DOWNLOAD_FILENAME.$EXT; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -pkg /Volumes/$ENERGYPLUS_DOWNLOAD_FILENAME/$ENERGYPLUS_DOWNLOAD_FILENAME.pkg -target LocalSystem; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo chmod +x $ENERGYPLUS_DOWNLOAD_FILENAME.$EXT; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then echo "y\r" | sudo ./$ENERGYPLUS_DOWNLOAD_FILENAME.$EXT; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo chmod -R a+w /usr/local/EnergyPlus-$ENERGYPLUS_INSTALL_VERSION; fi
-
-  - sudo rm $ENERGYPLUS_DOWNLOAD_FILENAME.$EXT
 
 after_success:
   - Rscript -e 'library(covr); codecov()'

@@ -1,3 +1,9 @@
+# eplusr 0.8.4
+
+This is a maintain release. It modifies the tests and excludes those which
+involve downloading and installing EnergyPlus in the home folder in tests to
+avoid CRAN policy violations.
+
 # eplusr 0.8.3
 
 ## New features

@@ -10,22 +10,11 @@ init:
 install:
   - ps: Bootstrap
 
-  # Copied from eppy but fix eplus downloading using curl
-  # Reference: https://github.com/santoshphilip/eppy/blob/master/appveyor.yml
   - ECHO "Filesystem root:"
   - ps: "ls \"C:/\""
 
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
-  # install EnergyPlus
-  - ECHO "Installing EnergyPlus"
-  - ps: $env:ENERGYPLUS_INSTALL_VERSION = $env:ENERGYPLUS_VERSION -replace '\.','-'
-  - ps: $env:ENERGYPLUS_DOWNLOAD_BASE_URL = "https://github.com/NREL/EnergyPlus/releases/download/v$env:ENERGYPLUS_VERSION"
-  - ps: $env:ENERGYPLUS_DOWNLOAD_FILENAME = "EnergyPlus-$env:ENERGYPLUS_VERSION-$env:ENERGYPLUS_SHA-Windows-$env:ARCHITECTURE.exe"
-  - ps: $env:ENERGYPLUS_DOWNLOAD_URL = "$env:ENERGYPLUS_DOWNLOAD_BASE_URL/$env:ENERGYPLUS_DOWNLOAD_FILENAME"
-
-  - ps: curl $env:ENERGYPLUS_DOWNLOAD_URL -OutFile $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME
-  - ps: "& $env:TMP\\$env:ENERGYPLUS_DOWNLOAD_FILENAME /S | Out-Null"
 
 cache:
   - C:\RLibrary
@@ -34,44 +23,22 @@ cache:
 
 matrix:
   fast_finish: true
-
 environment:
   matrix:
-    # For Energyplus 8.8 on x64 platform on every R version
+    - R_VERSION: devel
+      R_ARCH: x64
+
     - R_VERSION: release
       R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-
-    - R_VERSION: stable
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
-
-    - R_VERSION: patched
-      R_ARCH: x64
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
 
     - R_VERSION: oldrel
       R_ARCH: x64
-      RTOOLS_VERSION: 33
-      CRAN: http://cran.rstudio.com
-      ARCHITECTURE: "x86_64"
-      ENERGYPLUS_VERSION: "8.8.0"
-      ENERGYPLUS_SHA: "7c3bbe4830"
 
 build_script:
   - travis-tool.sh install_deps
 
 test_script:
   - travis-tool.sh run_tests
-
-on_success:
-  - Rscript -e "options(covr.gcov = 'C:/Rtools/mingw_64/bin/gcov.exe');covr::codecov()"
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
