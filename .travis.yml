@@ -45,8 +45,7 @@ before_install:
 after_success:
   - Rscript -e 'library(covr); codecov()'
   # automatically update package site
-  - test $TRAVIS_R_VERSION = "release" &&
-    test $TRAVIS_OS_NAME = "linux" &&
+  - test $TRAVIS_R_VERSION_STRING = "release" && test $TRAVIS_OS_NAME = "linux" &&
     Rscript -e 'pkgdown::build_site()'
 
 deploy:
@@ -57,5 +56,4 @@ deploy:
   local-dir: docs
   on:
     branch: master
-    condition: "$TRAVIS_R_VERSION = release"
-    condition: "$TRAVIS_OS_NAME = linux"
+    condition: $TRAVIS_R_VERSION_STRING = "release" && $TRAVIS_OS_NAME = "linux"

@@ -76,7 +76,7 @@ install.packages("eplusr")
 
 Alternatively, you can install the development version from GitHub.
 
-```{r gh-installation, eval = FALSE}
+```{r gh-installation}
 # install.packages("devtools")
 devtools::install_github("hongyuanjia/eplusr")
 ```
