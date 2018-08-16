@@ -335,8 +335,8 @@ print.ErrFile <- function (x, ...) {
             err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
             msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
             msg_dt[is.na(msg_line), msg_line := ""]
-            msg_dt[environment_index == environment_index[1L], msg := paste0(msg_line, "\n", msg_box)]
-            msg_dt[environment_index != environment_index[1L], msg := paste0("\n", msg_line, "\n", msg_box)]
+            msg_dt[environment_index == environment_index[1L], `:=`(msg = paste0(msg_line, "\n", msg_box))]
+            msg_dt[environment_index != environment_index[1L], `:=`(msg = paste0("\n", msg_line, "\n", msg_box))]
 
             cat(c(msg_dt$msg, head), sep = "\n")
         }
@@ -349,8 +349,8 @@ print.ErrFile <- function (x, ...) {
 #' @importFrom purrr map_lgl
 #' @importFrom cli cat_line
 #' @export
-# print.IdfFieldPossible {{{
-print.IdfFieldPossible <- function (x, ...) {
+# print.IddFieldPossible {{{
+print.IddFieldPossible <- function (x, ...) {
     dt <- data.table::copy(x)
 
     dt[, header := paste0(cli::rule(paste0(field_index, ": Field ",
@@ -369,7 +369,7 @@ print.IdfFieldPossible <- function (x, ...) {
     dt[!purrr::map_lgl(choice, ~all(is.na(.x))), res := paste0(res, "\n* Choice:\n",
         paste0("  - ", backtick(unlist(choice)), collapse = "\n")), by = field_index]
 
-    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.IdfFieldRange(.x))))]
+    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.IddFieldRange(.x))))]
     dt[res_ran == "* Range: <Not Applicable>", res_ran := NA_character_]
     dt[!is.na(res_ran), res := paste0(res, "\n", res_ran)]
 
@@ -383,8 +383,8 @@ print.IdfFieldPossible <- function (x, ...) {
 
 #' @importFrom cli cat_line
 #' @export
-# print.IdfFieldRange {{{
-print.IdfFieldRange <- function (x, ...) {
+# print.IddFieldRange {{{
+print.IddFieldRange <- function (x, ...) {
     if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
         cat("<Not Applicable>")
         return(invisible(NULL))
@@ -466,9 +466,10 @@ value_list <- function (value_tbl, in_ip = FALSE) {
     assert_that(has_names(value_tbl, c("value", "value_num", "value_ipnum", "type")))
 
     num_col <- ifelse(in_ip, "value_ipnum", "value_num")
+
     value_tbl[, out := as.list(value)]
     value_tbl[type %in% c("integer", "real") & !value_upper %in% c("AUTOSIZE", "AUTOCALCULATE"),
-        out := as.list(get(num_col))]
+        out := list(as.list(get(num_col)))]
 
     res <- value_tbl$out
 

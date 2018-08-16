@@ -42,9 +42,11 @@ knitr::opts_knit$set(root.dir = root)
 
 > A Toolkit for Using EnergyPlus in R.
 
-eplusr provides a rich toolkit of using [EnergyPlus](https://energyplus.net/)
-directly in R, which enables programmatic navigation, modification of EnergyPlus
-models and makes it less painful to do parametric simulations and analysis.
+eplusr provides a rich toolkit of using whole building energy simulation program
+[EnergyPlus](https://energyplus.net) directly in R, which enables programmatic
+navigation, modification of EnergyPlus models and makes it less painful to do
+parametric simulations and analysis. More information about EnergyPlus can be
+found at [its website](https://energyplus.net).
 
 <!-- vim-markdown-toc GFM -->
 
@@ -137,7 +139,7 @@ Parsing an IDF requires the IDD data of that version, which serves as the
 schema. Usually, when you try to edit an IDF, the corresponding EnergyPlus is
 likely to be installed already. If EnergyPlus is installed in standard location
 (`C:\EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on Linux and
-`/Applications/EnergyPlus-X-Y-0` on MacOS), eplusr is able to find it and use
+`/Applications/EnergyPlus-X-Y-0` on macOS), eplusr is able to find it and use
 the `Energy+.idd` file distributed with that release to parse the input IDF.
 The IDD file will be parsed first and an `Idd` object will be created and
 cached. That `Idd` object will be reused whenever parsing IDFs with that
@@ -608,7 +610,7 @@ EnergyPlus SQL output, especially for table *"TabularDataWithStrings"*. For
 details, please see *"2.20 eplusout.sql"*, especially *"2.20.4.4 TabularData
 Table"* in EnergyPlus *"Output Details and Examples"* documentation.
 
-`$report_data_dict()` returns a data.frame which contains all information about
+`$report_data_dict()` returns a data.table which contains all information about
 report data. For details on the meaning of each columns, please see
 *"2.20.2.1 ReportDataDictionary Table"* in EnergyPlus *"Output Details and
 Examples"* documentation.

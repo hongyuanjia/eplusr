@@ -23,12 +23,12 @@ with the release.
 eplusr tries to detect all installed EnergyPlus in default installation
 locations when loading, i.e. \code{C:\\EnergyPlusVX-X-0} on Windows,
 \code{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-\code{/Applications/EnergyPlus-X-Y-0} on MacOS and stores all found locations
+\code{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
 each EnergyPlus version. And also, every time an IDD file is parsed, an \code{Idd}
 object is created and cached in an environment.
 
-Parsing an IDD file starts from \code{\link[=use_idd]{use_idd()}}.  When using \code{\link[=use_idd]{use_idd()}}, eplusr
+Parsing an IDD file starts from \code{\link[=use_idd]{use_idd()}}. When using \code{\link[=use_idd]{use_idd()}}, eplusr
 will first try to find the cached \code{Idd} object of that version, if possible.
 If failed, and EnergyPlus of that version is available (see \code{\link[=avail_eplus]{avail_eplus()}}),
 the \code{"Energy+.idd"} distributed with EnergyPlus will be parsed and cached. So
@@ -39,7 +39,7 @@ Internally, the powerful \href{https://cran.r-project.org/package=data.table}{da
 package is used to speed up the whole IDD parsing process and store the
 results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
-\code{data.frame} format. Every IDD will be parsed and stored in four tables:
+\code{data.frame} format. Every IDD will be parsed and stored in ten tables:
 \itemize{
 \item \code{group}: contains group index and group names.
 \item \code{class}: contains class names and properties.
@@ -130,12 +130,41 @@ than letters and numbers are replaced by a underscore \code{_}.
 For details about \code{IddObject}, please see \link[=idd_object]{IddObject class}.
 }
 
+\examples{
+# get the Idd object of EnergyPlus v8.8
+idd <- use_idd(8.8, download = "auto")
+
+# version
+idd$version()
+
+# build
+idd$build()
+
+# all group names
+str(idd$group_name())
+
+# all class names
+str(idd$class_name())
+
+# all required class names
+str(idd$required_class_name())
+
+# all unique class names
+str(idd$unique_class_name())
+
+# IddObject of SimulationControl class
+idd$SimulationControl
+# OR
+idd[["SimulationControl"]]
+
+}
 \references{
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor}
 \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library}
 }
 \seealso{
-\link[=idd_object]{IddObject class}
+\link[=idd_object]{IddObject class} which provides detailed information of
+curtain class
 }
 \author{
 Hongyuan Jia

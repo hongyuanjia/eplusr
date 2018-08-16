@@ -3,11 +3,17 @@
 #' `ParametricJob` class provides a prototype of conducting parametric analysis
 #' of EnergyPlus simulations.
 #'
-#' Basically, it is a collection of multiple `EplusJob` objects.
+#' Basically, it is a collection of multiple `EplusJob` objects. However, the
+#'     model is first parsed and the Idf object is stored internally, instead of
+#'     storing only the path of Idf in [`EplusJob`][job] class. Also, an object
+#'     in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
+#'     automatically created if it does not exists like [`Idf`][idf] class.
 #'
 #' @section Usage:
 #' ```
 #' param <- param_job(idf, epw)
+#' param$seed()
+#' param$weater()
 #' param$apply_measure(measure, ..., .names = NULL)
 #' param$run(dir = NULL, parallel_backend = future::multiprocess)
 #' param$kill(which = NULL)
@@ -27,7 +33,7 @@
 #'
 #' **Arguments**
 #'
-#' * `idf`: Path to EnergyPlus IDF or IMF file or an `Idf` object.
+#' * `idf`: Path to EnergyPlus IDF file or an `Idf` object.
 #' * `epw`: Path to EnergyPlus EPW file or an `Epw` object.
 #'
 #' @section Get Seed Model and Weather:
@@ -86,6 +92,21 @@
 #'
 #' @docType class
 #' @name param
+#' @aliases ParametricJob
+#' @examples
+#' if (is_avail_eplus(8.8)) {
+#'     idf_name <- "1ZoneUncontrolled.idf"
+#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'
+#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#'
+#'     # create from local files
+#'     param_job(idf_path, epw_path)
+#'
+#'     # create from an Idf and an Epw object
+#'     param_job(read_idf(idf_path), read_epw(epw_path))
+#' }
 #' @author Hongyuan Jia
 NULL
 
@@ -97,8 +118,23 @@ NULL
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' @param epw A path to EnergyPlus EPW file or an `Epw` object.
 #' @return A `ParametricJob` object.
+#' @examples
+#' if (is_avail_eplus(8.8)) {
+#'     idf_name <- "1ZoneUncontrolled.idf"
+#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'
+#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#'
+#'     # create from local files
+#'     param_job(idf_path, epw_path)
+#'
+#'     # create from an Idf and an Epw object
+#'     param_job(read_idf(idf_path), read_epw(epw_path))
+#' }
 #' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
 #' @export
+#' @author Hongyuan Jia
 # param_job {{{
 param_job <- function (idf, epw) {
     Parametric$new(idf, epw)
@@ -291,7 +327,7 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel
     private$m_job <- purrr::map(private$m_param, EplusJob$new, epw = path_epw)
 
     start_time <- Sys.time()
-    proc <- run_multi(ver, path_param, path_epw, parallel_backend = parallel_backend)
+    proc <- run_multi(ver, path_param, path_epw, NULL, parallel_backend = parallel_backend)
     end_time <- Sys.time()
 
     assign_proc <- function (job, proc, start_time, end_time) {

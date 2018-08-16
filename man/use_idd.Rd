@@ -2,6 +2,7 @@
 % Please edit documentation in R/idd.R
 \name{use_idd}
 \alias{use_idd}
+\alias{Idd}
 \alias{download_idd}
 \alias{avail_idd}
 \alias{is_avail_idd}
@@ -9,43 +10,55 @@
 \usage{
 use_idd(idd, download = FALSE)
 
-download_idd(ver = "latest", dir = getwd())
+download_idd(ver = "latest", dir)
 
 avail_idd()
 
 is_avail_idd(ver)
 }
 \arguments{
-\item{idd}{A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-named as \code{Energy+.idd} or a valid version of IDD, e.g. 8.9, "8.9.0".}
+\item{idd}{Either a path, a connection, or literal data (either a single
+string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
+file, usually named as \code{Energy+.idd}, or a valid version of IDD, e.g.
+8.9, "8.9.0".}
 
-\item{download}{If \code{"TRUE"} and argument \code{idd}, the IDD file will be
+\item{download}{If \code{TRUE} and argument \code{idd}, the IDD file will be
 downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
 and saved to \code{\link[=tempdir]{tempdir()}}. It will be parsed after it is downloaded
-successfully. It is useful in case where you only want to edit an
+successfully. A special value of \code{"auto"} can be given, which will
+automatically download corresponding IDD file if the Idd object is
+currently not available. It is useful in case where you only want to edit an
 EnergyPlus Input Data File (IDF) directly but do not want to install
-whole EnergyPlus software.}
+whole EnergyPlus software. Default is \code{FALSE}.}
 
-\item{ver}{A valid EnergyPlus version, e.g., 8.7, "8.7" or "8.7.0". For
-\code{download_idd}, The special value \code{"latest"} means the latest version
-(fetched from GitHub releases). Default: \code{"latest"}.}
+\item{ver}{A valid EnergyPlus version, e.g. 8, 8.7, "8.7" or "8.7.0". For
+\code{download_idd()}, the special value \code{"latest"}, which is default, means
+the latest version.}
 
-\item{dir}{A directory to indicate where to save the IDD file. Default:
-current working directory.}
+\item{dir}{A directory to indicate where to save the IDD file.}
 }
 \value{
-\code{use_idd} returns an \code{Idd} object; \code{download_idd} returns the full
-path of the downloaded IDD file; \code{avail_idd} returns a character vector;
-\code{is_avail_idd} returns a single logical vector.
+\itemize{
+\item \code{use_idd()} returns an \code{Idd} object
+\item \code{download_idd()} returns an invisible integer \code{0} if succeed. Also an
+attribute named \code{file} which is the full path of the downloaded IDD file;
+\item \code{avail_idd()} returns a character vector or \code{NULL} if no available Idd object
+found
+\item \code{is_avail_idd()} returns a single logical vector.
+}
 }
 \description{
+Use a specific EnergyPlus Input Data Dictionary (IDD) file
+}
+\details{
 \code{use_idd()} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
 class, please see \link{idd}.
-}
-\details{
+
 \code{download_idd()} downloads specified version of EnergyPlus IDD file from
-\href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
+\href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
+useful in case where you only want to edit an EnergyPlus Input Data File
+(IDF) directly but do not want to install whole EnergyPlus software.
 
 \code{avail_idd()} returns versions of all cached \code{Idd} object.
 
@@ -58,23 +71,39 @@ to find the cached \code{Idd} object of that version, if possible. If failed, an
 EnergyPlus of that version is available (see \code{\link[=avail_eplus]{avail_eplus()}}), the
 \code{"Energy+.idd"} distributed with EnergyPlus will be parsed and stored in
 eplusr Idd cache.
-
-\code{download_idd()} downloads EnergyPlus Input Data Dictionary (IDD) file from
-\href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
-useful in case where you only want to edit an EnergyPlus Input Data File
-(IDF) directly but do not want to install whole EnergyPlus software.
 }
 \examples{
 \dontrun{
+# get all available Idd version
+avail_idd()
 
+# check if specific version of Idd is available
+is_avail_idd(8.5)
+
+# download latest IDD file from EnergyPlus GitHub repo
+download_idd("latest", tempdir())
+
+# use specific version of Idd
+# only works if EnergyPlus v8.8 has been found or Idd v8.8 exists
 use_idd(8.8)
 
-download_idd()
-download_idd(8.8)
+# If Idd object is currently not avail_idd, automatically download IDD file
+# from EnergyPlus GitHub repo and parse it
+use_idd(8.8, download = "auto")
 
+# now Idd v8.8 should be available
 is_avail_idd(8.8)
+
+# get specific version of parsed Idd object
+use_idd(8.8)
+
+avail_idd() # should contain "8.8.0"
 }
 }
 \seealso{
-\link[=idd]{Idd Class}
+\link[=idd]{Idd Class} for parsing, querying and making modifications to
+EnergyPlus IDD file
+}
+\author{
+Hongyuan Jia
 }

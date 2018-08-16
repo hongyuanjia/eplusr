@@ -3,13 +3,14 @@
 \docType{class}
 \name{idf_object}
 \alias{idf_object}
+\alias{IdfObject}
 \title{EnergyPlus IDF object}
 \description{
 \code{IdfObject} is an abstraction of a single object in an \code{Idf}. It provides
 more detail methods to modify objects. \code{IdfObject} can only be created from
 the parent \code{Idf} object, using \code{$object}, \code{$object_in_class()} and
-\code{$search_object()}. This is because that initialization of an \code{IdfObject}
-needs some shared data from parent \code{Idf} object.
+\code{$search_object()} or equivalent. This is because that initialization of an
+\code{IdfObject} needs some shared data from parent \code{Idf} object.
 }
 \section{Usage}{
 
@@ -76,12 +77,13 @@ idfobj$set_comment(comment, append = TRUE, width = 0L)
 
 \strong{Arguments}
 \itemize{
-\item \code{comment}: A character vector.
+\item \code{comment}: A character vector. If \code{NULL}, all comments will be deleted.
 \item \code{append}: If \code{TRUE}, comment will be appended to existing comments. If
 \code{FALSE}, comment will be prepended to existing currents. If \code{NULL},
-existing comments will be deleted. Default: \code{FALSE}
-\item \code{width}: An integer to indicate where to break long comment lines. If \code{0},
-no breaking will be made.
+existing comments will be deleted before adding new comments. Default:
+\code{FALSE}.
+\item \code{width}: An integer of character number to indicate where to break long
+comment lines. If \code{0}, no breaking will be made. Default: \code{0}.
 }
 }
 
@@ -101,9 +103,19 @@ idfobj$possible_value(which = NULL)
 If simplify is \code{FALSE}, then all values will be converted into character
 and the converted character vector will be returned. Note that the field
 names will be converted into valid R names, i.e. all characters other
-than letters and numbers will be replaced by underscore("_").
+than letters and numbers will be replaced by underscore \code{"_"}
+("underscore-style").
 
-\code{$set_value()} sets values of current object.
+\code{$set_value()} sets values of current object. Field values should be given in
+following either pattern below:
+\itemize{
+\item directly list all field values with no name. The values will be assigned to
+fields according to the appearance order
+\item give both field names \emph{without units} and values in pair, e.g. \code{Name = "Test", `Begin Month` = 1}. You can find all valid field names using
+\code{$definition()$field_name()}. Field names can also be given in
+underscore-style, e.g. \code{Name = "Test", begin_month = 1} (NOTE: matching is
+case-insensitive).
+}
 
 eplusr also provides custom S3 method of \code{$}, \code{[[} and also \code{$<-} and
 \code{[[<-} to make it more convenient to get and set a single value of an
@@ -115,7 +127,8 @@ field name and \code{Field} is a single valid field index or name.
 \code{$possible_value()} return all possible values for specified fields,
 including auto-value (\code{autosize} and \code{autocalculate}), default value,
 value range, choices and references. Underneath, it returns a data.table
-with custom printing method.
+with custom printing method. It is basically the same as
+\code{$field_possible()} in \link[=idd_object]{IddObject} class.
 
 \strong{Arguments}
 \itemize{
@@ -156,12 +169,16 @@ The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_opt
 \code{"draft"} and \code{"final"}:
 \itemize{
 \item For \code{"none"}, none validation will be done;
-\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;
-\item For \code{"final"}, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required
-fields and invalid field value reference will also be done.
+\item For \code{"draft"}, checking of invalid autosize, autocalculate, character,
+numeric, integer, and choice field values will be done;
+\item For \code{"final"}, besides above, checking of incomplete extensible groups,
+missing required objects, duplicated unique objects, object name
+conflicts, missing required fields and invalid field value reference will
+also be done.
 }
+
+For details about the underlying structure of returned value of
+\code{$validate()}, please \code{$validate()} in \code{\link[=idf]{Idf}} class.
 }
 
 \section{Cross Reference}{
@@ -234,6 +251,149 @@ largest character length of values. Default: \code{FALSE}.
 }
 }
 
+\examples{
+# read an IDF file
+idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+    idd = use_idd(8.8, download = "auto"))
+
+# get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
+mat <- idf$Material$C5_4_IN_HW_CONCRETE
+
+# get object ID
+mat$id()
+
+# get object name
+mat$name()
+
+# NA will be returned if the class does not have name attribute. For example,
+# "Version" class
+idf$Version[[1]]$name()
+
+# get underlying IddObject of current class
+mat$definition()
+
+# get object comments
+mat$get_comment()
+
+# add new object comments
+mat$set_comment(c("This is a material named `WD01`", "This object has an ID of 47"))
+mat$get_comment()
+
+# append new comments
+mat$set_comment("This is an appended comment")
+mat$get_comment()
+
+# prepend new comments
+mat$set_comment("This is a prepended comment", append = FALSE)
+mat$get_comment()
+
+# wrap long comments
+mat$set_comment("This is a very long comment that is needed to be wrapped.", width = 30)
+mat$get_comment()
+
+# delete old comments and add new one
+mat$set_comment("This is the only comment", append = NULL)
+mat$get_comment()
+
+# delete all comments
+mat$set_comment(NULL)
+mat$get_comment()
+
+# get all existing field values
+str(mat$get_value())
+
+# get values of field 1, 3, 5
+str(mat$get_value(c(1, 3, 5)))
+
+# get character format values instead of a named list
+mat$get_value(c(1, 3, 5), simplify = TRUE)
+
+# get values of all field even those that are not set
+str(idf$Zone$ZONE_ONE$get_value())
+
+str(idf$Zone$ZONE_ONE$get_value(all = TRUE))
+
+# get field values using shortcuts
+mat$Roughness
+mat[["Specific_Heat"]]
+mat[c(1,2)]
+mat[c("Name", "Density")]
+
+# set field values
+mat$set_value(name = "new_name", Thickness = 0.02)
+mat[c("Name", "Thickness")]
+
+# When `default` argument is set to TRUE and input field values are empty, i.e.
+# NA and NULL, the field values will be reset to defaults.
+mat[c("Thermal Absorptance", "Solar Absorptance")]
+
+mat$set_value(visible_absorptance = NA, Solar_Absorptance = NA, default = TRUE)
+mat[c("Visible Absorptance", "Solar Absorptance")]
+
+# set field values using shortcuts
+mat$Name <- "another_name"
+mat$Name
+mat[["Thickness"]] <- 0.019
+mat$Thickness
+
+# check validate
+mat$validate()
+mat$is_valid()
+
+# if we set density to a negative number
+mat$definition()$field_range("Density")
+eplusr_option(validate_level = "none") # have to set validate to "none" to do so
+mat$Density <- -1
+eplusr_option(validate_level = "final") # change back to "final" validate level
+mat$is_valid()
+# get other objects that this object refereces
+mat$ref_from_object() # not referencing other objects
+mat$has_ref_from()
+
+
+# get other objects that reference this object
+mat$ref_by_object() # referenced by construction "FLOOR"
+names(mat$ref_by_object())
+
+mat$has_ref_by()
+
+# check if having any referenced objects or is referenced by other objects
+mat$has_ref()
+
+# get all object data in a data.table format without field units
+str(mat$table(unit = FALSE))
+
+# get all object data in a data.table format where all field values are put in a
+# list column and field names without unit
+str(mat$table(string_value = FALSE, unit = FALSE))
+
+# get all object data in a data.table format where all field values are put in a
+# list column and all values are converted into IP units
+str(mat$table(string_value = FALSE, in_ip = TRUE))
+
+# get all object data in a data.table format, including tailing empty fields
+str(idf$Zone$ZONE_ONE$table(all = TRUE))
+
+# get all object data in a data.table format where each field becomes a column
+str(mat$table(wide = TRUE))
+
+# get string format object
+mat$string()
+
+# get string format of object, and decrease the space between field values and
+# field names
+mat$string(sep_at = 15)
+
+# get string format of object, and decrease the leading space of field values
+mat$string(leading = 0)
+
+# print the object without comment
+mat$print(comment = FALSE)
+
+# print the object, and auto separate field values and field names at the
+# largetst character length of field values
+mat$print(auto_sep = TRUE)
+}
 \seealso{
 \link[=idf]{Idf class}
 }

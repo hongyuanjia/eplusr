@@ -17,6 +17,29 @@ An \code{Epw} object.
 process is extreme inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
 with some simplifications. For more details on \code{Epw}, please see \link[=epw]{Epw Class}.
 }
+\examples{
+# read an EPW file from EnergyPlus v8.8 installation folder
+if (is_avail_eplus(8.8)) {
+    path_epw <- file.path(
+        eplus_config(8.8)$dir,
+        "WeatherData",
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+   )
+   epw <- read_epw(path_epw)
+}
+
+\dontrun{
+# read an EPW file from EnergyPlus website
+path_base <- "https://energyplus.net/weather-download"
+path_region <- "north_and_central_america_wmo_region_4/USA/CA"
+path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+path_epw <- file.path(path_base, path_region, path_file)
+epw <- read_epw(path_epw)
+}
+}
 \seealso{
 \link[=epw]{Epw class}
+}
+\author{
+Hongyuan Jia
 }

@@ -3,15 +3,14 @@
 \docType{class}
 \name{job}
 \alias{job}
+\alias{EplusJob}
 \title{Run EnergyPlus Simulation and Collect Outputs}
 \description{
 \code{EplusJob} class wraps the EnergyPlus command line interface and provides
 methods to extract simulation outputs.
 }
 \details{
-eplusr uses the EnergyPlus SQL output for extracting simulation outputs. In
-order to do so, a object in \code{Output:SQLite} with \code{Option Type} value of
-\code{SimpleAndTabular} will be automatically created if it does not exists.
+eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 \code{EplusJob} has provide some wrappers that do SQL query to get report data
 results, i.e. results from \code{Output:Variable} and \code{Output:Meter*}. But for
 \code{Output:Table} results, you have to be familiar with the structure of the
@@ -19,6 +18,23 @@ EnergyPlus SQL results, especially for table \emph{"TabularDataWithStrings"}. Fo
 details, please see \emph{"2.20 eplusout.sql"}, especially \emph{"2.20.4.4 TabularData
 Table"} in EnergyPlus \emph{"Output Details and Examples"} documentation.
 }
+\section{NOTE}{
+
+
+When using \code{$run()} in \link[=idf]{Idf} class, which internally creates an
+\code{EplusJob} object and calls its \code{$run()} method, an object in
+\code{Output:SQLite} with \code{Option Type} value of \code{SimpleAndTabular} will be
+automatically created if it does not exists.
+
+However, when creating an \code{EplusJob} using \code{\link[=eplus_job]{eplus_job()}}, the IDF file is not
+parsed but directly pass its path to EnergyPlus. Thus, that process of
+handling \code{Output:SQLite} class is not performed. If you want to ensure
+that the output collection functionality in \code{EplusJob} class works
+successfully, it is recommended to first read that IDF file using
+\code{\link[=read_idf]{read_idf()}} and then use \code{$run()} method in \link[=idf]{Idf} class by doing
+\code{idf$run()}.
+}
+
 \section{Usage}{
 \preformatted{job$run(wait = TRUE)
 job$kill()
@@ -39,8 +55,22 @@ job$print()
 
 \strong{Arguments}
 \itemize{
-\item \code{idf}: Path to EnergyPlus IDF or IMF file or an \code{Idf} object.
-\item \code{epw}: Path to EnergyPlus EPW file or an \code{Epw} object.
+\item \code{idf}: Path to an local EnergyPlus IDF file or an \code{Idf} object.
+\item \code{epw}: Path to an local EnergyPlus EPW file or an \code{Epw} object.
+}
+}
+
+\section{Basic info}{
+\preformatted{job$path(type = c("all", "idf", "epw"))
+}
+
+\code{$path()} returns the path of idf or epw of current job.
+
+\strong{Arguments}
+\itemize{
+\item \code{type}: If \code{"all"}, both the idf path and epw path are returned. If
+\code{"idf"}, only idf path is returned. If \code{"epw"}, only epw path is
+returned.  Default: \code{"all"}.
 }
 }
 
@@ -97,9 +127,10 @@ report data. For details on the meaning of each columns, please see
 "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 Examples" documentation.
 
-\code{$report_data()} extracts the report data using key values and variable names.
+\code{$report_data()} extracts the report data in a data.table using key values
+and variable names.
 
-\code{$tabular_data()} extracts all tabular data.
+\code{$tabular_data()} extracts all tabular data in a data.table.
 
 \strong{Arguments}:
 \itemize{
@@ -121,6 +152,87 @@ of this simulation. If \code{"auto"}, the name of the IDF file will be used.
 }
 }
 
+\examples{
+\dontrun{
+if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    # copy to tempdir
+    file.copy(c(idf_path, epw_path), tempdir())
+
+    # create an EplusJob from local an IDF and an EPW file
+    job <- eplus_job(file.path(tempdir(), idf_name), file.path(tempdir(), epw_name))
+
+    # get paths of idf and epw
+    job$path("all")
+    job$path("idf")
+    job$path("epw")
+
+    # get current job status
+    job$status()
+
+    # check if the job has been run before
+    job$status()$run_before
+
+    # run the job in waiting mode
+    job$run(wait = TRUE)
+
+    # check the job status again
+    job$status()$run_before
+    job$status()$successful
+    job$status()$wait
+
+    # get output directory
+    job$output_dir()
+
+    # open the output directory
+    job$output_dir(open = TRUE)
+
+    # check simulation errors
+    job$errors()
+
+    # check simulation errors, only including warnings and errors
+    job$errors(info = FALSE)
+
+    # get the file path of an output with a given suffix
+    job$locate_output(".err")
+
+    # give an error when simulation did not complete successfully or that file
+    # does not exist
+    job$locate_output(".exe", strict = TRUE)
+
+    # retreive simulation results will fail if there is no EnergyPlus SQL output.
+    job$report_data_dict()
+
+    # instead, using `$run()` method in Idf class, which will add an
+    # `Output:SQLite` object automatically
+    idf <- read_idf(file.path(tempdir(), idf_name))
+    job <- idf$run(file.path(tempdir(), epw_name), dir = NULL)
+
+    # get report data dictionary
+    str(job$report_data_dict())
+
+    # extract all report data
+    str(job$report_data())
+
+    # extract some report variable
+    str(job$report_data(name = "EnergyTransfer:Building", case = NULL))
+
+    # add a "Case" column in the returned data.table
+    str(job$report_data(name = "EnergyTransfer:Building", case = "Test"))
+
+    # change the format of datetime column in the returned data.table
+    str(job$report_data(name = "EnergyTransfer:Building", year = 2016L, tz = Sys.timezone()))
+
+    # get all tabular data
+    str(job$tabular_data())
+}
+}
+}
 \seealso{
 \link[=param]{ParametricJob class} for EnergyPlus parametric simulations.
 }

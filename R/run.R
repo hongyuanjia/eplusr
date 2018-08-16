@@ -6,106 +6,26 @@
 #' @importFrom furrr future_map2
 NULL
 
-#' Configure which version of EnergyPlus to use
-#'
-#' @param eplus An acceptable EnergyPlus version or an EnergyPlus installation
-#'        path.
-#' @param ver An acceptable EnergyPlus version.
-#'
-#' @details
-#'
-#' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version
-#' dictionary in eplusr.
-#'
-#' `eplus_config()` returns the configure data of specified version of
-#' EnergyPlus.
-#'
-#' `avail_eplus()` returns all available EnergyPlus found.
-#'
-#' `is_avail_eplus()` checks if the specified version of EnergyPlus is
-#' available or not.
-#'
-#' @return For `eplus_config()`, the configure data (a list) of specified
-#'     version of EnergyPlus; for `avail_eplus()`, a character vector; for
-#'     `is_avis_avail_eplus()`, a scalar logical vector.
-#' @rdname use_eplus
-#' @examples
-#' \dontrun{
-#'
-#' use_eplus(8.9)
-#' use_eplus("8.8.0")
-#' eplus_config(8.6)
-#' }
-#'
-#' avail_eplus()
-#' is_avail_eplus(8.8)
-#' @export
-# use_eplus {{{
-use_eplus <- function (eplus) {
-    assert_that(is_scalar(eplus))
-
-    # if eplus is a version, try to locate it in the default path
-    if (is_eplus_ver(eplus)) {
-        ver <- standardize_ver(eplus)
-        eplus_dir <- eplus_default_path(eplus)
-        if (!is_valid_eplus_path(eplus_dir)) {
-            stop(msg("Cannot locate EnergyPlus V", trimws(eplus), " at default
-                     installation path ", backtick(eplus_dir), ". Please
-                     give exact path of EnergyPlus installation."),
-                call. = FALSE)
-        }
-    } else {
-        if (!is_valid_eplus_path(eplus))
-            stop(msg(backtick(eplus), "is not a valid EnergyPlus installation path."),
-                call. = FALSE)
-
-        ver <- get_ver_from_path(eplus)
-        eplus_dir <- eplus
-        if (is.null(ver)) {
-            stop("Failed to detect the version of EnergyPlus located in ",
-                 backtick(eplus_dir), ".", call. = FALSE)
-        }
-    }
-
-    res <- list(version = ver, dir = eplus_dir, exe = paste0("energyplus", exe()))
-    .globals$eplus_config[[as.character(ver)]] <- res
-    message("EnergyPlus v", ver, " has been added to EnergyPlus location dictionary.")
-}
-# }}}
-
-#' @rdname use_eplus
-#' @export
-# avail_eplus {{{
-avail_eplus <- function () names(.globals$eplus_config)
-# }}}
-
-#' @rdname use_eplus
-#' @export
-# eplus_config {{{
-eplus_config <- function (ver) {
-    assert_that(is_eplus_ver(ver))
-    ver <- standardize_ver(ver)
-    res <- .globals$eplus_config[[as.character(ver)]]
-    if (is.null(res))
-        warning("Failed to find configuration data of EnergyPlus v", ver, ".",
-            call. = FALSE)
-    res
-}
-# }}}
-
-#' @rdname use_eplus
-#' @export
-# is_avail_eplus {{{
-is_avail_eplus <- function (ver) !is.null(suppressWarnings(eplus_config(ver)))
-# }}}
-
 #' Clean working directory of a previous EnergyPlus simulation
 #'
 #' Clean working directory of an EnergyPlus simulation by deleting all input and
 #' output files of previous simulation.
 #'
 #' @param path An `.idf` or `.imf` file path.
+#' @details
+#' `clean_wd()` imitates the same process that EnergyPlus does whenever a new
+#' simulation is get to start. It deletes all related output files that have
+#' the same name prefix as the input path. The input model itself and any
+#' weather file is not deleted.
+#'
+#' `clean_wd()` is called internally in functions that call EnergyPlus, such as
+#' `run_idf()`, `run_multi()` and `$run()` in [`EplusJob`][job] class.
+#' @examples
+#' \dontrun{
+#' clean_wd("foo.idf")
+#' }
 #' @export
+#' @author Hongyuan Jia
 # clean_wd {{{
 clean_wd <- function (path) {
 
@@ -155,39 +75,61 @@ clean_wd <- function (path) {
 #' @param eplus An acceptable input of [use_eplus()] and [eplus_config()].
 #' @param model A path of an EnergyPlus IDF or IMF file.
 #' @param weather A path of an EnergyPlus EPW weather file.
-#' @param output_dir Output directory path. If NULL, which is default, the
-#'     directory of input model will be used.
+#' @param output_dir Output directory path. If NULL, the directory of input
+#'     model is used.
 #' @param design_day Force design-day-only simulation. Default: `FALSE`.
 #' @param annual Force design-day-only simulation. Default: `FALSE`.
-#' @param echo Only applicable to `run_idf`. Show EnergyPlus simulation process
-#'     information to the console.  If `FALSE`, which is default, a
-#'     [processx::process] object will be return.
+#' @param echo Only applicable to `run_idf`. If `TRUE`, show EnergyPlus
+#'     simulation process information to the console. If `FALSE`, which is default, a
+#'     [processx::process] object is returned. Default: `TRUE`.
 #' @param expand_obj Where to run ExpandObject preprocessor before simulation.
 #'     Default: `TRUE`.
-#' @param parallel_backend Acceptable input for [future::plan()].
+#' @param parallel_backend Acceptable input for [future::plan()]. Default:
+#'     `future::multiprocess`, which tries to run all models in parallel.
 #'
 #' @details
 #' Behind the scene, `run_multi()` uses the
 #' [furrr](https://cran.r-project.org/package=furrr) package which provides
 #' mapping functions in parallel using
-#' [future](https://cran.r-project.org/package=future) package. It is suggested
-#' to run simulations using [EplusJob][job] class, which provides much more
-#' detailed controls on the simulation and also methods to extract simulation
-#' output.
+#' [future](https://cran.r-project.org/package=future) package.
+#'
+#' It is suggested to run simulations using [EplusJob][job] class, which
+#' provides much more detailed controls on the simulation and also methods to
+#' extract simulation output.
 #'
 #' @references
 #' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
 #' @examples
 #' \dontrun{
+#' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 #'
-#' run_idf(8.8, "input.idf", "weather.epw")
+#' if (is_avail_eplus(8.8)) {
+#'     # run a single model
+#'     epw_path <- file.path(
+#'         eplus_config(8.8)$dir,
+#'         "WeatherData",
+#'         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'     )
+#'
+#'     run_idf(8.8, idf_path, epw_path, output_dir = tempdir())
+#'
+#'     # run multiple model in parallel
+#'     idf_paths <- file.path(eplus_config(8.8)$dir, "ExampleFiles",
+#'         c("1ZoneUncontrolled.idf", "1ZoneUncontrolledFourAlgorithms.idf")
+#'     )
+#'     epw_paths <- rep(epw_path, times = 2L)
+#'     output_dirs <- file.path(tempdir(), tools::file_path_sans_ext(basename(idf_paths)))
+#'     run_multi(8.8, idf_paths, epw_paths, output_dir = output_dirs)
+#' }
 #' }
 #' @rdname run_model
+#' @seealso [EplusJob][job] class and [ParametricJob][param] class which provide
+#' a more friendly interface to run EnergyPlus simulations and collect outputs.
+#' @author Hongyuan Jia
 #' @export
 # run_idf {{{
-run_idf <- function (eplus, model, weather, output_dir = NULL,
-                     design_day = FALSE, annual = FALSE, expand_obj = TRUE,
-                     echo = FALSE) {
+run_idf <- function (eplus, model, weather, output_dir, design_day = FALSE,
+                     annual = FALSE, expand_obj = TRUE, echo = TRUE) {
 
     exe <- eplus_exe(eplus)
 
@@ -232,6 +174,9 @@ run_idf <- function (eplus, model, weather, output_dir = NULL,
             stdout = "|", stderr = "|", cleanup = TRUE,
             echo_cmd = FALSE, windows_verbatim_args = TRUE,
             windows_hide_window = FALSE)
+        message("EnergyPlus is running in the background with PID ",
+            backtick(out$get_pid()), ".\n", sep = "")
+        out
     }
 }
 # }}}
@@ -239,9 +184,8 @@ run_idf <- function (eplus, model, weather, output_dir = NULL,
 #' @export
 #' @rdname run_model
 # run_multi {{{
-run_multi <- function (eplus, model, weather, output_dir = NULL,
-                       design_day = FALSE, annual = FALSE,
-                       parallel_backend = future::multiprocess) {
+run_multi <- function (eplus, model, weather, output_dir, design_day = FALSE,
+                       annual = FALSE, parallel_backend = future::multiprocess) {
     if (!is_scalar(model)) {
         if (!is_scalar(weather))
             assert_that(is_same_len(model, weather))
@@ -274,7 +218,7 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
             "times simultaneously.", call. = FALSE)
 
     d <- unique(output_dir)[!dir.exists(unique(output_dir))]
-    created <- lapply(d, dir.create, showWarnings = FALSE, recursive = TRUE)
+    created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
     if (any(!created))
         stop("Failed to create output directory:\n",
             paste0(backtick(d[!created]), collapse = "\n"), call. = FALSE)
@@ -301,86 +245,11 @@ run_multi <- function (eplus, model, weather, output_dir = NULL,
 }
 # }}}
 
-# eplus_default_path {{{
-eplus_default_path <- function (ver) {
-    stopifnot(is_eplus_ver(ver))
-    ver <- standardize_ver(ver)
-    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
-    if (is_windows()) {
-        d <- paste0("C:/EnergyPlusV", ver_dash)
-    } else if (is_linux()) {
-        d <- paste0("/usr/local/EnergyPlus-", ver_dash)
-    } else {
-        d <- paste0("/Applications/EnergyPlus-", ver_dash)
-    }
-    d
-}
-# }}}
-# exe {{{
-exe <- function () if (is_windows()) ".exe" else  ""
-# }}}
-# is_valid_eplus_path {{{
-is_valid_eplus_path <- function (path) {
-    if (!dir.exists(path)) return(FALSE)
-
-    file.exists(file.path(path, paste0("energyplus", exe()))) &&
-    not_empty(list.files(path, "\\.idd$", ignore.case = TRUE))
-}
-# }}}
-# get_ver_from_path {{{
-get_ver_from_path <- function (path) {
-    idd_file <- list.files(path, pattern = "\\.idd$", ignore.case = TRUE,
-        full.names = TRUE)
-
-    if (is_empty(idd_file)) {
-        stop("Failed to locate IDD file in ", backtick(path), ".", call. = FALSE)
-    }
-
-    if (!is_scalar(idd_file)) {
-        mes <- paste0("Multiple IDD file found in ", backtick(path), ".")
-        if (any(basename(idd_file) == "Energy+.idd")) {
-            idd_file <- idd_file[basename(idd_file) == "Energy+.idd"]
-            mes_f <- "The default IDD file `Energy+.idd` will be used to parse EnergyPlus version."
-        } else {
-            idd_file <- idd_file[1]
-            mes_f <- paste0("File ", backtick(basename(idd_file)), " will be used ",
-                "to parse EnergyPlus version")
-        }
-        warning(mes," ", mes_f, call. = FALSE)
-    }
-
-    h <- readr::read_lines(idd_file, n_max = 1L)
-
-    ver <- tryCatch(get_idd_ver(h),
-        error = function (e) stop("Failed to parse EnergyPlus version using IDD ",
-            backtick(idd_file), ".", call. = FALSE))
-
-    standardize_ver(ver)
-}
-# }}}
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
-    if (is_eplus_ver(eplus)) {
-        if (!is_avail_eplus(eplus)) use_eplus(eplus)
-    } else {
-        use_eplus(eplus)
-    }
-    config <- eplus_config(eplus)
+    if (!is_avail_eplus(eplus)) use_eplus(eplus)
+    config <- tryCatch(eplus_config(eplus), warning = function (w) stop(w))
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
-}
-# }}}
-# standardize_ver {{{
-standardize_ver <- function (ver) {
-    if (is_integerish(ver)) ver <- paste0(ver, ".0")
-    ver <- as.numeric_version(ver)
-    if (is.na(ver[1,3])) ver[1,3] <- 0
-    ver
-}
-# }}}
-# init_avail_eplus {{{
-init_avail_eplus <- function () {
-    lapply(c(8.5, 8.6, 8.7, 8.8, 8.9),
-           function (x) tryCatch(use_eplus(x), error = function (e) NULL))
 }
 # }}}
 # cmd_args {{{

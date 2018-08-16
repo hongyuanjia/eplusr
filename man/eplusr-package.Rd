@@ -7,9 +7,9 @@
 \title{eplusr: A Toolkit for Using EnergyPlus in R}
 \description{
 A rich toolkit of using the whole building simulation program
-    'EnergyPlus', which enables programmatic navigation, modification of
-    'EnergyPlus' models and makes it less painful to do parametric simulations
-    and analysis.
+    'EnergyPlus'<https://energyplus.net>, which enables programmatic navigation,
+    modification of 'EnergyPlus' models and makes it less painful to do
+    parametric simulations and analysis.
 }
 \details{
 eplusr provides a rich toolkit of using EnergyPlus directly in
@@ -23,6 +23,7 @@ With eplusr, you can do:
 \item Query on models, including classes, objects and fields
 \item Directly add, modify, duplicate, and delete objects of IDF in R.
 \item Automatically change referred fields when modifying objects.
+\item Check any possible errors whenever modifications are made.
 \item Save the changed models into standard formats in the same way as IDFEditor
 distributed along with EnergyPlus.
 \item Run your models directly and collect the simulation output of EnergyPlus
@@ -39,6 +40,5 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Hongyuan Jia \email{hongyuanjia@cqu.edu.cn} (0000-0002-0075-8183)
-
+Hongyuan Jia
 }

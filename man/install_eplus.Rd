@@ -5,9 +5,9 @@
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
-install_eplus(ver = "latest", force = FALSE, dir = tempdir())
+install_eplus(ver = "latest", force = FALSE)
 
-download_eplus(ver = "latest", dir = getwd())
+download_eplus(ver = "latest", dir)
 }
 \arguments{
 \item{ver}{The EnergyPlus version number, e.g., \code{8.7}; the special value
@@ -16,9 +16,23 @@ download_eplus(ver = "latest", dir = getwd())
 \item{force}{Whether to install EnergyPlus even if it has already been
 installed.}
 
-\item{dir}{Where to save EnergyPlus installer file. Default is current
-working directory for \code{download_eplus()} and \code{tempdir()} for
-\code{install_eplus()}.}
+\item{dir}{Where to save EnergyPlus installer file. For \code{install_eplus()},
+the installer will be saved into \code{\link[=tempdir]{tempdir()}}}
+}
+\value{
+An invisible integer \code{0} if succeed. Moreover, some attributes will
+also be returned:
+\itemize{
+\item For \code{install_eplus()}:
+\itemize{
+\item \code{path}: the EnergyPlus installation path
+\item \code{installer}: the path of downloaded EnergyPlus installer file
+}
+\item For \code{download_eplus()}:
+\itemize{
+\item \code{file}: the path of downloaded EnergyPlus installer file
+}
+}
 }
 \description{
 Download specified version of EnergyPlus for your platform from GitHub and
@@ -29,11 +43,25 @@ install it.
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus Github Repository}.
 
 \code{install_eplus()} will try to install EnergyPlus into the default location,
-e.g.  \file{C:/EnergyPlusVX-Y-0} on Windows,
-\file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-\file{/Applications/EnergyPlus-X-Y-0} on MacOS.
+e.g.  \code{C:\\EnergyPlusVX-Y-0} on Windows, \code{/usr/local/EnergyPlus-X-Y-0} on
+Linux, and \code{/Applications/EnergyPlus-X-Y-0} on macOS.
 
 Note that the installation process requires administrative privileges
 during the installation and you have to run R with administrator (or with
 sudo if you are on Linux) to make it work if you are not in interactive mode.
+}
+\examples{
+\dontrun{
+
+# for the latest version of EnergyPlus
+download_eplus("latest", dir = tempdir())
+install_eplus("latest")
+
+# for a specific version of EnergyPlus
+download_eplus(8.8)
+install_eplus(8.8)
+}
+}
+\author{
+Hongyuan Jia
 }

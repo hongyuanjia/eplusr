@@ -3,15 +3,28 @@
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
 #' methods to extract simulation outputs.
 #'
-#' eplusr uses the EnergyPlus SQL output for extracting simulation outputs. In
-#' order to do so, a object in `Output:SQLite` with `Option Type` value of
-#' `SimpleAndTabular` will be automatically created if it does not exists.
+#' eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 #' `EplusJob` has provide some wrappers that do SQL query to get report data
 #' results, i.e. results from `Output:Variable` and `Output:Meter*`. But for
 #' `Output:Table` results, you have to be familiar with the structure of the
 #' EnergyPlus SQL results, especially for table *"TabularDataWithStrings"*. For
 #' details, please see *"2.20 eplusout.sql"*, especially *"2.20.4.4 TabularData
 #' Table"* in EnergyPlus *"Output Details and Examples"* documentation.
+#'
+#' @section NOTE:
+#'
+#' When using `$run()` in [Idf][idf] class, which internally creates an
+#'     `EplusJob` object and calls its `$run()` method, an object in
+#'     `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
+#'     automatically created if it does not exists.
+#'
+#' However, when creating an `EplusJob` using [eplus_job()], the IDF file is not
+#'     parsed but directly pass its path to EnergyPlus. Thus, that process of
+#'     handling `Output:SQLite` class is not performed. If you want to ensure
+#'     that the output collection functionality in `EplusJob` class works
+#'     successfully, it is recommended to first read that IDF file using
+#'     [read_idf()] and then use `$run()` method in [Idf][idf] class by doing
+#'     `idf$run()`.
 #'
 #' @section Usage:
 #' ```
@@ -34,8 +47,21 @@
 #'
 #' **Arguments**
 #'
-#' * `idf`: Path to EnergyPlus IDF or IMF file or an `Idf` object.
-#' * `epw`: Path to EnergyPlus EPW file or an `Epw` object.
+#' * `idf`: Path to an local EnergyPlus IDF file or an `Idf` object.
+#' * `epw`: Path to an local EnergyPlus EPW file or an `Epw` object.
+#'
+#' @section Basic info:
+#' ```
+#' job$path(type = c("all", "idf", "epw"))
+#' ```
+#'
+#' `$path()` returns the path of idf or epw of current job.
+#'
+#' **Arguments**
+#'
+#' * `type`: If `"all"`, both the idf path and epw path are returned. If
+#'     `"idf"`, only idf path is returned. If `"epw"`, only epw path is
+#'     returned.  Default: `"all"`.
 #'
 #' @section Run:
 #' ```
@@ -89,9 +115,10 @@
 #'     "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 #'     Examples" documentation.
 #'
-#' `$report_data()` extracts the report data using key values and variable names.
+#' `$report_data()` extracts the report data in a data.table using key values
+#'     and variable names.
 #'
-#' `$tabular_data()` extracts all tabular data.
+#' `$tabular_data()` extracts all tabular data in a data.table.
 #'
 #' **Arguments**:
 #'
@@ -113,6 +140,87 @@
 #'
 #' @docType class
 #' @name job
+#' @aliases EplusJob
+#' @examples
+#' \dontrun{
+#' if (is_avail_eplus(8.8)) {
+#'     idf_name <- "1ZoneUncontrolled.idf"
+#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'
+#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#'
+#'     # copy to tempdir
+#'     file.copy(c(idf_path, epw_path), tempdir())
+#'
+#'     # create an EplusJob from local an IDF and an EPW file
+#'     job <- eplus_job(file.path(tempdir(), idf_name), file.path(tempdir(), epw_name))
+#'
+#'     # get paths of idf and epw
+#'     job$path("all")
+#'     job$path("idf")
+#'     job$path("epw")
+#'
+#'     # get current job status
+#'     job$status()
+#'
+#'     # check if the job has been run before
+#'     job$status()$run_before
+#'
+#'     # run the job in waiting mode
+#'     job$run(wait = TRUE)
+#'
+#'     # check the job status again
+#'     job$status()$run_before
+#'     job$status()$successful
+#'     job$status()$wait
+#'
+#'     # get output directory
+#'     job$output_dir()
+#'
+#'     # open the output directory
+#'     job$output_dir(open = TRUE)
+#'
+#'     # check simulation errors
+#'     job$errors()
+#'
+#'     # check simulation errors, only including warnings and errors
+#'     job$errors(info = FALSE)
+#'
+#'     # get the file path of an output with a given suffix
+#'     job$locate_output(".err")
+#'
+#'     # give an error when simulation did not complete successfully or that file
+#'     # does not exist
+#'     job$locate_output(".exe", strict = TRUE)
+#'
+#'     # retreive simulation results will fail if there is no EnergyPlus SQL output.
+#'     job$report_data_dict()
+#'
+#'     # instead, using `$run()` method in Idf class, which will add an
+#'     # `Output:SQLite` object automatically
+#'     idf <- read_idf(file.path(tempdir(), idf_name))
+#'     job <- idf$run(file.path(tempdir(), epw_name), dir = NULL)
+#'
+#'     # get report data dictionary
+#'     str(job$report_data_dict())
+#'
+#'     # extract all report data
+#'     str(job$report_data())
+#'
+#'     # extract some report variable
+#'     str(job$report_data(name = "EnergyTransfer:Building", case = NULL))
+#'
+#'     # add a "Case" column in the returned data.table
+#'     str(job$report_data(name = "EnergyTransfer:Building", case = "Test"))
+#'
+#'     # change the format of datetime column in the returned data.table
+#'     str(job$report_data(name = "EnergyTransfer:Building", year = 2016L, tz = Sys.timezone()))
+#'
+#'     # get all tabular data
+#'     str(job$tabular_data())
+#' }
+#' }
 #' @seealso [ParametricJob class][param] for EnergyPlus parametric simulations.
 #' @author Hongyuan Jia
 NULL
@@ -123,10 +231,25 @@ NULL
 #' for running EnergyPlus simulation and collecting outputs. For more details,
 #' please see [job].
 #'
-#' @param idf A path to an EnergyPlus IDF or IMF file or an `Idf` object.
-#' @param epw A path to an EnergyPlus EPW file or an `Epw` object.
+#' @param idf A path to an local EnergyPlus IDF file or an `Idf` object.
+#' @param epw A path to an local EnergyPlus EPW file or an `Epw` object.
 #' @return An `EplusJob` object.
+#' @examples
+#' if (is_avail_eplus(8.8)) {
+#'     idf_name <- "1ZoneUncontrolled.idf"
+#'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'
+#'     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+#'     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#'
+#'     # create from local files
+#'     eplus_job(idf_path, epw_path)
+#'
+#'     # create from an Idf and an Epw object
+#'     eplus_job(read_idf(idf_path), read_epw(epw_path))
+#' }
 #' @seealso [param_job()] for creating an EnergyPlus parametric job.
+#' @author Hongyuan Jia
 #' @export
 # eplus_job {{{
 eplus_job <- function (idf, epw) {
@@ -181,24 +304,28 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
             # get Idf version
             if (!is.null(eplus_ver)) {
-                assert_that(is_eplus_ver(eplus_ver))
+                assert_that(is_eplus_ver(eplus_ver, strict = TRUE))
             } else {
                 eplus_ver <- get_idf_ver(stringr::str_trim(readr::read_lines(private$m_path_idf), "both"))
                 if (is.null(eplus_ver))
                     stop("Could not find version of input idf file.", call. = FALSE)
             }
 
-            if (!is_avail_eplus(eplus_ver)) {
-                stop("Could not locate EnergyPlus v", eplus_ver, " at ",
-                     "the default installation path. Please set the path of ",
-                     "EnergyPlus v", eplus_ver, "using `use_eplus()`.", call. = FALSE)
-            }
+            if (eplus_ver < 8.3)
+                stop("Currently, `EplusJob` only supports EnergyPlus V8.3.0 or higher.", call. = FALSE)
+
+            if (!is_avail_eplus(eplus_ver))
+                stop("Could not locate EnergyPlus v", eplus_ver, ". Please set ",
+                    "the path of EnergyPlus v", eplus_ver, "using `use_eplus()`.", call. = FALSE)
 
             private$m_version <- eplus_ver
         },
         # }}}
 
         # PUBLIC FUNCTIONS {{{
+        path = function (type = c("all", "idf", "epw"))
+            i_job_path(self, private, type),
+
         run = function (wait = TRUE)
             i_job_run(self, private, wait),
 
@@ -212,7 +339,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             i_job_output_dir(self, private, open),
 
         locate_output = function (suffix = ".err", strict = TRUE)
-            i_job_locate_output(self, private, suffix, strict),
+            i_job_locate_output(self, private, suffix, strict, must_exist = strict),
 
         errors = function (info = FALSE)
             i_job_output_errors(self, private, info),
@@ -246,16 +373,27 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 )
 # }}}
 
+# i_job_path {{{
+i_job_path <- function (self, private, type = c("all", "idf", "epw")) {
+    type <- match.arg(type)
+
+    switch(type,
+        all = c(private$m_path_idf, private$m_path_epw),
+        idf = private$m_path_idf, epw = private$m_path_epw
+    )
+}
+# }}}
+
 # i_job_run {{{
 i_job_run <- function (self, private, wait = TRUE) {
     private$m_log$start_time <- Sys.time()
 
     private$m_process <- run_idf(private$m_version,
-        private$m_path_idf, private$m_path_epw, echo = wait)
+        private$m_path_idf, private$m_path_epw, output_dir = NULL, echo = wait)
 
     private$m_log$end_time <- Sys.time()
 
-    private$m_process
+    self
 }
 # }}}
 
@@ -267,7 +405,7 @@ i_job_kill <- function (self, private) {
     }
 
     if (!inherits(private$m_process, "process")) {
-        message("The job ran in waiting mode and could not be killed.")
+        message("The job was run in waiting mode and could not be killed.")
         return(invisible(FALSE))
     }
 
@@ -327,7 +465,7 @@ i_job_status <- function (self, private, based_suffix = ".err") {
             } else {
                 if (exit_status == 0L) {
                     status$successful <- TRUE
-                } else if (exit_status == 2L) {
+                } else if (exit_status %in% c(2L, -9L)) {
                     status$terminated <- TRUE
                 }
             }
@@ -374,7 +512,7 @@ i_job_output_dir <- function (self, private, open = FALSE) {
 # }}}
 
 # i_job_locate_output {{{
-i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE) {
+i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
     out <- paste0(tools::file_path_sans_ext(private$m_path_idf), suffix)
 
     if (strict) {
@@ -397,8 +535,9 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE) 
             warning("Simulation ended with errors. Simulation results ",
                 "may not be correct.", call. = FALSE)
 
-        assert_that(file.exists(out))
     }
+
+    if (must_exist) assert_that(file.exists(out))
 
     out
 }
@@ -406,7 +545,7 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE) 
 
 # i_job_output_errors {{{
 i_job_output_errors <- function (self, private, info = FALSE) {
-    path_err <- i_job_locate_output(self, private, ".err", strict = TRUE)
+    path_err <- i_job_locate_output(self, private, ".err")
 
     err <- parse_err_file(path_err)
 
@@ -416,12 +555,23 @@ i_job_output_errors <- function (self, private, info = FALSE) {
 }
 # }}}
 
+# i_job_sql_path {{{
+i_job_sql_path <- function (self, private) {
+    path_sql <- i_job_locate_output(self, private, ".sql", strict = TRUE, must_exist = FALSE)
+    if (!file.exists(path_sql))
+        stop("Simulation SQL output does not exists. ",
+             "eplusr uses the EnergyPlus SQL output for extracting simulation outputs. ",
+             "Please add an object in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` ",
+             "and run the Idf again. It is recommended to first read that IDF file using read_idf() ",
+             "and then use `$run()` method in Idf class by doing `idf$run()` ",
+             "which automatically handle this.", call. = FALSE)
+    path_sql
+}
+# }}}
+
 # i_job_output_sql {{{
 i_job_output_sql <- function (self, private) {
-    path_sql <- i_job_locate_output(self, private, ".sql", strict = TRUE)
-    if (!file.exists(path_sql))
-        stop("Simulation SQL output does not exists.", call. = FALSE)
-
+    path_sql <- i_job_sql_path(self, private)
     RSQLite::dbConnect(RSQLite::SQLite(), path_sql)
 }
 # }}}

@@ -418,8 +418,8 @@ parse_idd_file <- function(path) {
     # parse default value
     field_default <- idd_field[has_default == TRUE, .SD, .SDcols = c(
         "field_id", "default", "type", "si_name", "ip_name", "mult", "offset")][
-        , `:=`(default_upper = toupper(default),
-               default_num = suppressWarnings(as.numeric(default)))][
+        , `:=`(default_upper = toupper(default))][type %in% c("integer", "real"),
+          `:=`(default_num = suppressWarnings(as.numeric(default)))][
         , `:=`(default_ipnum = default_num)]
     field_default <- update_value_num(field_default, digits = .options$num_digits,
         in_ip = FALSE, prefix = "default")[, default_id := .I][
@@ -596,9 +596,9 @@ parse_idd_file <- function(path) {
     class_property <- first_ext[class_property, on = "class_id"][
         is.na(first_extensible), `:=`(first_extensible = 0L)]
     # add num of extensible group
-    class_property[, `:=`(num_extensible_group = 0)]
+    class_property[, `:=`(num_extensible_group = 0L)]
     class_property[num_extensible > 0, `:=`(num_extensible_group =
-        (num_fields - first_extensible + 1L) / num_extensible)]
+        (num_fields - first_extensible + 1L) %/% num_extensible)]
 
     class <- class[class_property, on = "class_id"][,
         .SD, .SDcols = c("class_id", "class_name", "group_id", "class_format",
@@ -652,15 +652,37 @@ parse_idf_file <- function (path, idd = NULL) {
     # get idf version
     idf_ver <- get_idf_ver(idf_str)
 
-    # if idd is missing, use preparsed Idd object
-    if (is.null(idd)) {
+    # handle Idd {{{
+    if (!is.null(idd)) {
+        # if input is not an idd object
+        if (!is_idd(idd)) idd <- use_idd(idd)
+
+        # if missing version info in input IDF, give a warning
+        if (is.null(idf_ver))
+            warning("Missing version field in input Idf file. The given Idd ",
+                "version ", idd$version(), " will be used. Parsing errors ",
+                "may occur.", call. = FALSE)
+    } else {
+        # if input Idf has a version and neither that version of EnergyPlus nor
+        # Idd is available, rewrite the error message
         if (!is.null(idf_ver)) {
+            if (!is_avail_idd(idf_ver) && !is_avail_eplus(idf_ver)) {
+                stop("Idd v", idf_ver, " has not been parsed before. Try to locate ",
+                    "`Energy+.idd` in EnergyPlus v", idf_ver, " installation folder ",
+                    backtick(eplus_default_path(idf_ver)), ".\n",
+                    "Failed to locate `Energy+.idd` because EnergyPlus v", idf_ver,
+                    " is not available. ", call. = FALSE)
+            }
+
             idd <- use_idd(idf_ver)
-        # if no version found, use the latest Idd object
-        } else {
-            if (!is_parsed_idd_ver(idf_ver))
-                stop("Missing version filed in input IDF and none parsed IDD ",
-                     "found to use.", call. = FALSE)
+        }
+
+        # if input Idf does not have a version
+        if (is.null(idf_ver)) {
+            # if no Idd is available
+            if (is_empty(avail_idd()))
+                stop("Missing version field in input Idf file and no parsed ",
+                    "Idd object was available to use.", call. = FALSE)
 
             latest_ver <- max(as.numeric_version(names(.globals$idd)))
             warning("Missing version field in input Idf file. The latest Idd ",
@@ -668,15 +690,8 @@ parse_idf_file <- function (path, idd = NULL) {
                 "occur.", call. = FALSE)
             idd <- suppressMessages(use_idd(latest_ver))
         }
-    } else {
-        if (!is_idd(idd))
-            idd <- use_idd(idd)
-
-        if (is.null(idf_ver))
-            warning("Missing version field in input Idf file. The given Idd ",
-                "version ", idd$version(), " will be used. Parsing errors ",
-                "may occur.", call. = FALSE)
     }
+    # }}}
 
     # get idd internal environment for parsing
     idd_self <- ._get_self(idd)
@@ -899,7 +914,6 @@ parse_idf_file <- function (path, idd = NULL) {
 
     # handle `Version` object
     # {{{
-    # TODO: put this block into `Idf$new()`
     ver_dt <- value[class_id == 1L]
     idd_version <- idd_private$m_version
     if (is_empty(ver_dt)) {
@@ -926,7 +940,7 @@ parse_idf_file <- function (path, idd = NULL) {
         # get version
         idf_version <- as.numeric_version(ver_dt[["value"]])
         if (idf_version != idd_version) {
-            warning(msg("Version Mismatch. The file parsing is a differnet ",
+            warning(paste0("Version Mismatch. The file parsing is a differnet ",
                 "version ", backtick(idf_version), " than the IDD file you ",
                 "are using ", backtick(idd_version), ". Editing and saving ",
                 "the file may make it incompatible with an older version of ",
@@ -951,7 +965,7 @@ parse_idf_file <- function (path, idd = NULL) {
                 field_index > num_fields, idx := "X", by = line][
                 , msg := paste0("  [", idx, "] -> Line ", line, ": ", string)]
             e_fld[e_fld[, .I[1], by = class_id]$V1,
-                  msg := paste0("`", num_values, "` fields found for class ",
+                  msg := paste0(num_values, " fields found for class ",
                 backtick(class_name), " with only max ", num_fields, " fields allowed:\n", msg)]
             parse_error("idf", "Too many fields found for class", nrow(error_num), e_fld[["msg"]])
         }
@@ -969,8 +983,10 @@ parse_idf_file <- function (path, idd = NULL) {
 
     value_tbl[grepl("^\\s*$", value), `:=`(value = NA_character_)]
 
-    value_tbl[ , `:=`(value_upper = toupper(value),
-                      value_num = suppressWarnings(as.numeric(value)))]
+    value_tbl[ , `:=`(value_upper = toupper(value))]
+    # only convert to numbers if the field type indicates so
+    value_tbl[type %in% c("real", "integer"),
+        `:=`(value_num = suppressWarnings(as.numeric(value)))]
     value_tbl[ , `:=`(value_ipnum = value_num)]
     value <- update_value_num(value_tbl, digits = header_options$num_digits,
                               in_ip = header_options$view_in_ip)[
@@ -1087,7 +1103,7 @@ parse_err_file <- function (path) {
           "environment_index", "index", "level_index",
           "seperate", "begin_environment"))
 
-    res <- list(completed = is_completed, successfull = is_successful, data = err_dt)
+    res <- list(completed = is_completed, successful = is_successful, data = err_dt)
     data.table::setattr(res, "class", "ErrFile")
     res
 }
@@ -1189,11 +1205,11 @@ get_idf_ver <- function (idf_str) {
     ver_special_cand <- idf_str[startsWith(idf_str, "Version")]
     ver_special <- ver_special_cand[!startsWith(ver_special_cand, "!")]
 
-    if (length(ver_normal) == 1L) {
+    if (length(ver_normal) >= 1L) {
         # for "8.6; !- Version Identifier"
-        standardize_ver(trimws(strsplit(ver_normal, ";", fixed = TRUE)[[1]][1]))
-    } else if (length(ver_special) == 1L){
-        standardize_ver(trimws(strsplit(ver_special, "[,;]")[[1]][2]))
+        standardize_ver(trimws(strsplit(ver_normal[1], ";", fixed = TRUE)[[1]][1]))
+    } else if (length(ver_special) >= 1L){
+        standardize_ver(trimws(strsplit(ver_special[1], "[,;]")[[1]][2]))
     } else {
         return(NULL)
     }

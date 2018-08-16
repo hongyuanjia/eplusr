@@ -6,11 +6,15 @@
   - One possible way is to use `$search_value()` to detect if the values in
     those fields could be targeted or not.
 
-* Add an optional `path` argument in `install_eplus()` to let the user specify
-  a already downloaded EnergyPlus install exec.
-
 * Model version conversion
 
-* Add `$field_reference()` in `IddObject` class
+* Exclude "memo" in class table and and "note" in field table to speed up
 
-* Add `$possible_value()` in `IdfObject` class
+* Remove unnecessary `as.integer()`
+
+* Fix extensible field names when they should be "A123" or "N123" but not
+  self-explainary
+
+* Using `units` package to add units in the returned data.table
+
+* Apply multiple weather file to a seed in `ParametricJob` class

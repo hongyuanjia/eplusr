@@ -110,8 +110,10 @@ no powershell installed on Windows machine.
 
 2018-08-08
 
+```
 The package was archived by CRAN due to leaving 'EnergyPlus' installer file and
 installation in home.
+```
 
 ### Submission comments
 
@@ -119,3 +121,54 @@ installation in home.
 
 Skip tests which download and install 'EnergyPlus' in home folder on CRAN and
 only run those tests locally.
+
+## Round 2
+
+### Reviewer comments
+
+2018-08-09 Uwe Ligges
+
+```
+Thanks, some more things to fix:
+
+1. your *only* relevant example is
+
+> run_idf(8.8, "input.idf", "weather.epw")
+
+which gives
+Error in normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="input.idf": Das System kann die angegebene Datei nicht finden
+
+on my machine: Can't you add the two required files to the package so that users can really execute your example?
+
+2. Can you pls add a web reference pointing to EnergyPlus in the form <http....> to the Description field of the DESCRIPTION file?
+
+3. Although you do not generate files in the user fikespace during the checks any more, some functions write by default to the user space or even delete files from the user space.
+
+Although some are intended to do so, can't you remove the default and simply let the user specify the directory that is to be used? If you really need a default (which I doubt), use tempdir(). 
+```
+
+### Submission comments
+
+1. Examples have been added to all exported functions and classes. An EnergyPlus
+   v8.8 model named `1ZoneUncontrolled.idf` has been added and shipped with the
+   package, which enables users to successfully run the main function
+   `read_idf()` and thus all `Idf` and `IdfObject` class methods. It is worth
+   noting that parsing an EnergyPlus model also needs an EnergyPlus Input Data
+   Dictionary (IDD) file which usually has a size of 4 MB. In order to reduce
+   the package size, IDD file is not shipped but using `download_idd()` to get
+   it from EnergyPlus GitHub repo. Also, `run_idf()` and other functions which
+   call EnergyPlus require EnergyPlus to be installed, which is usually 100 MB.
+   EnergyPlus has been added into "SystemRequirements", Please see 2.
+
+2. A web reference "(<https://energyplus.net>)" has been added into the
+   Description field in the DESCRIPTION file. Also,
+   "EnergyPlus (<https://energyplus.net>)" has been added into the
+   "SystemRequirements" field in the DESCRIPTION file.
+
+3. All default directory parameters in functions that manipulate local files have
+   been moved, which always ask users to explicitly specify. Those functions
+   include `run_idf()`, `run_multi()`, `$run()` method in `Idf` class,
+   `EplusJob` class and `ParametricJob` class, `download_eplus()`,
+   `download_idd()`. The parameter `dir` has been removed in `install_eplus()`.
+   The downloaded EnergyPlus installer will be saved into `temper()`.

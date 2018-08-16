@@ -9,7 +9,14 @@ eplusr_option(...)
 \arguments{
 \item{...}{Any options can be defined, using \code{name = value}. All available
 options are below. If no options are given, then all values of current
-options are returned.}
+options are returned. If a single option name, then its value is
+returned.}
+}
+\value{
+If called directly, a named list of input option values. If input is
+a single option name, a length-one vector whose type is determined by
+that option. If input is new option values, a named list of newly set
+option values.
 }
 \description{
 Get and set eplusr options which affect the way in which eplusr computes and
@@ -26,11 +33,12 @@ modification and model error checking. Possible value: \code{"none"},
 \code{"draft"} and \code{"final"}. Default: \code{"final"}. Detailed description:
 \itemize{
 \item For \code{"none"}, none validation will be done;
-\item For \code{"draft"}, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;
-\item For \code{"final"}, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required fields
-and invalid field value reference will also be done.
+\item For \code{"draft"}, checking of invalid autosize, autocalculate, character,
+numeric, integer, and choice field values will be done;
+\item For \code{"final"}, besides above, checking of incomplete extensible groups,
+missing required objects, duplicated unique objects, object name
+conflicts, missing required fields and invalid field value reference will
+also be done.
 }
 \item \code{verbose_info}: Whether to show information messages. Default: \code{TRUE}.
 \item \code{save_format}: The format to use when saving Idf objects to \code{.idf} files.
@@ -42,4 +50,14 @@ will be set according to the header of IDF file. If no header found,
 \item \code{num_parallel}: Maximum number of parallel simulations to run. Default:
 \code{parallel::detectCores()}.
 }
+}
+\examples{
+# list all current options
+eplusr_option() # a named list
+
+# get a specific option value
+eplusr_option("verbose_info")
+
+# set options
+eplusr_option(verbose_info = TRUE, view_in_ip = FALSE)
 }

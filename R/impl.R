@@ -386,8 +386,10 @@ i_assert_valid_field_num <- function (self, private, class, num) {
 i_field_num_from_index <- function (self, private, class, index = 0L) {
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
-    cls_tbl[min_fields == 0 & last_required == 0, num := num_fields]
-    cls_tbl[min_fields >  0 | last_required >  0, num := max(min_fields, last_required)]
+    cls_tbl[min_fields == 0L & last_required == 0L,
+        num := as.integer(num_fields), by = list(class_rleid)]
+    cls_tbl[min_fields >  0L | last_required >  0L,
+        num := as.integer(max(min_fields, last_required)), by = list(class_rleid)]
 
     if (all(index == 0L)) return(cls_tbl$num)
 
@@ -397,18 +399,36 @@ i_field_num_from_index <- function (self, private, class, index = 0L) {
     cls_tbl[is.na(input_index), input_index := 0L]
     cls_tbl[num_extensible > 0L & input_index > first_extensible,
         `:=`(last_extensible = as.integer(ceiling(
-                (input_index - first_extensible + 1L) / num_extensible) * num_extensible + first_extensible - 1L))]
+                (input_index - first_extensible + 1L) / num_extensible) * num_extensible + first_extensible - 1L)),
+        by = list(class_rleid)
+    ]
 
-    cls_tbl[input_index >  num_fields, num := last_extensible]
-    cls_tbl[input_index <= num_fields, num := max(num, last_extensible, input_index)]
+    cls_tbl[input_index >  num_fields,
+        num := last_extensible, by = list(class_rleid)]
+    cls_tbl[input_index <= num_fields,
+        num := max(num, last_extensible, input_index), by = list(class_rleid)]
     cls_tbl$num
+}
+# }}}
+
+# i_class_field_name {{{
+i_class_field_name <- function (self, private, class, lower = FALSE) {
+    if (is.null(class)) return(private$m_idd_tbl$field)
+
+    cls_in <- i_in_tbl_from_which(self, private, "class", class)
+
+    fld_tbl <- private$m_idd_tbl$field[cls_in, on = "class_id", allow.cartesian = TRUE]
+
+    if (isTRUE(lower)) fld_tbl[, `:=`(field_name = i_lower_name(field_name))]
+
+    fld_tbl[, list(class_rleid, field_name)][, lapply(.SD, list), by = list(class_rleid)]$field_name
 }
 # }}}
 
 # <========      FUNCTION BELOW ONLY WORK FOR A SINGLE CLASS         ========> #
 ################################################################################
 # i_field_tbl_from_which {{{
-i_field_tbl_from_which <- function (self, private, class, which = NULL, strict = TRUE) {
+i_field_tbl_from_which <- function (self, private, class, which = NULL) {
     assert_that(is_scalar(class))
 
     if (is.null(which)) return(i_field_tbl(self, private, class))
@@ -597,7 +617,7 @@ i_field_range <- function (self, private, class, which = NULL) {
             r <- list(
                 minimum = minimum, lower_incbounds = lower_incbounds,
                 maximum = maximum, upper_incbounds = upper_incbounds)
-            data.table::setattr(r, "class", c("IdfFieldRange", "list"))
+            data.table::setattr(r, "class", c("IddFieldRange", "list"))
             r
         })
         ), by = "field_id"]
@@ -608,25 +628,55 @@ i_field_range <- function (self, private, class, which = NULL) {
 
 # i_field_reference {{{
 i_field_reference <- function (self, private, class, which = NULL) {
-    fld_tbl <- i_field_tbl_from_which(self, private, class, which)
+    if (is.null(private$m_idf_tbl))
+        stop("Function can only be used in IddObjects that are created inside ",
+            "an Idf or IdfObject using `$definition()`.", call. = FALSE)
 
-    fld_ref <- private$m_idd_tbl$field_reference[fld_tbl,
-        on = "field_id"][, lapply(.SD, list), .SDcol = "reference",
-        by = list(field_id, field_name)]
+    fld_tbl <- i_field_tbl_from_which(self, private, class, which)[, list(field_id, type)]
 
-    fld_ref$reference
+    fld_tbl[, reference := list(list(NULL))]
+    fld_tbl[type == "node", reference := list(list(i_all_node_value(self, private)))]
+
+    fld_tbl_obj_list <- private$m_idd_tbl$field_object_list[
+        fld_tbl, on = "field_id", nomatch = 0L, list(object_list, field_id)]
+
+    if (is_empty(fld_tbl_obj_list)) return(fld_tbl$reference)
+
+    uni_obj_list <- fld_tbl_obj_list[, unique(object_list)]
+
+    # get possible values
+    fld_tbl_ref <- i_value_tbl_from_object_list(self, private, uni_obj_list)
+
+    ref <- fld_tbl_ref[fld_tbl_obj_list, on = "object_list"][,
+        list(reference = list(unique(unlist(possible_value)))), by = field_id]
+
+    fld_tbl <- ref[fld_tbl[, reference := NULL], on = "field_id"]
+
+    fld_tbl$reference
 }
 # }}}
 
-# i_field_object_list {{{
-i_field_object_list <- function (self, private, class) {
-    fld_tbl <- i_field_tbl_from_which(self, private, class, which)
+# i_field_possible {{{
+i_field_possible <- function (self, private, class, which = NULL) {
+    if (is.null(private$m_idf_tbl))
+        stop("Function can only be used in IddObjects that are created inside ",
+            "an Idf or IdfObject using `$definition()`.", call. = FALSE)
 
-    fld_obj <- private$m_idd_tbl$field_object_list[fld_tbl,
-        on = "field_id"][, lapply(.SD, list), .SDcol = "object_list",
-        by = list(field_id, field_name)]
+    fld_tbl <- i_field_tbl_from_which(self, private, class, which)[
+        , list(class_id, field_index, field_name, autosizable, autocalculatable)]
 
-    fld_obj$object_list
+    fld_tbl[, auto := NA_character_]
+    fld_tbl[autosizable == TRUE, auto := "Autosize"]
+    fld_tbl[autocalculatable == TRUE, auto := "Autocalculate"]
+
+    fld_tbl[, default := list(i_field_default(self, private, class_id[1L], which))]
+    fld_tbl[, choice := list(i_field_choice(self, private, class_id[1L], which))]
+    fld_tbl[, range := list(i_field_range(self, private, class_id[1L], which))]
+    fld_tbl[, reference := list(i_field_reference(self, private, class_id[1L], which))]
+
+    res <- fld_tbl[, list(field_index, field_name, auto, default, choice, range, reference)]
+    data.table::setattr(res, "class", c("IddFieldPossible", class(res)))
+    res
 }
 # }}}
 
@@ -744,6 +794,7 @@ i_extensible_group_tbl_from_range <- function (self, private, class, from, to) {
     fld_idx <- unlist(i_field_index_from_extensible_index(self, private,
             ext_idx_tbl$class_id, ext_idx_tbl$ext_index))
 
+    # TODO: if extensible field name is "A123", then field name should be
     ext_tbl[, `:=`(
         field_index = fld_idx,
         last_req_ext = i_last_required_extensible_field_index(self, private, class_id),
@@ -1007,7 +1058,7 @@ i_object_id_from_which <- function (self, private, which) {
 
 # i_is_valid_object_id {{{
 i_is_valid_object_id <- function (self, private, id) {
-    assert_that(is_count(id))
+    assert_that(are_count(id))
     id %in% private$m_idf_tbl$object$object_id
 }
 # }}}
@@ -1046,7 +1097,7 @@ i_object_name <- function (self, private, class = NULL, simplify = FALSE, upper 
 
 # i_is_valid_object_name {{{
 i_is_valid_object_name <- function (self, private, name) {
-    assert_that(is_string(name))
+    assert_that(is.character(name))
     toupper(name) %in% private$m_idf_tbl$object[!is.na(object_name), object_name_upper]
 }
 # }}}
@@ -1115,7 +1166,7 @@ i_assert_can_del_object <- function (self, private, object) {
     is_version <- obj_tbl$class_name == "Version"
 
     if (any(is_version))
-        stop("Delete `Version` object is prohibited.", call. = FALSE)
+        stop("Deleting `Version` object is prohibited.", call. = FALSE)
 
     if (anyDuplicated(obj_tbl$object_id))
         stop("`object` should not contain any duplication.", call. = FALSE)
@@ -1126,7 +1177,7 @@ i_assert_can_del_object <- function (self, private, object) {
 
     is_required <- class_name %in% i_required_class_name(self, private)
     if (any(is_required))
-        stop("In `final` validation level, delele an required object is prohibited ",
+        stop("In `final` validation level, deleting an required object is prohibited ",
             "deleted. Class ", backtick(unique(class_name[is_required])),
             " is required object that can not be deleted.", call. = FALSE)
 
@@ -1181,6 +1232,20 @@ create_idfobj_generator <- function (self, private, IdfObject) {
     own_idfobject$self$private_fields$m_iddobj_generator <- private$m_iddobj_generator
 
     own_idfobject
+}
+# }}}
+
+# i_definition {{{
+i_definition <- function (self, private, class) {
+    res <- i_iddobject(self, private, class)
+
+    assign_idf_tbl <- function (iddobj, idf_tbl) {
+        priv <- ._get_private(iddobj)
+        priv$m_idf_tbl <- idf_tbl
+        iddobj
+    }
+
+    lapply(res, assign_idf_tbl, idf_tbl = private$m_idf_tbl)
 }
 # }}}
 
@@ -1245,8 +1310,13 @@ i_search_object <- function (self, private, pattern, class = NULL) {
 
     obj_tbl <- obj_tbl[stringr::str_detect(object_name, pattern)]
 
+    if (is_empty(obj_tbl)) {
+        message("No matched result found.")
+        return(invisible())
+    }
+
     res <- lapply(obj_tbl$object_id, private$m_idfobj_generator$new)
-    data.table::setattr(res, "names", obj_tbl$object_name)
+    data.table::setattr(res, "names", i_underscore_name(obj_tbl$object_name))
     res
 }
 # }}}
@@ -1305,7 +1375,7 @@ i_dup_object = function (self, private, which, new_name = NULL) {
              use_input_name = TRUE)]
 
     # get all name in the same class
-    obj_tbl[, `:=`(all_name_upper = i_object_name(self, private, class_name, upper = TRUE))]
+    obj_tbl[, `:=`(all_name_upper = i_object_name(self, private, class_name, upper = TRUE)), by = list(object_rleid)]
 
     # check if trying to duplicate same object several times
     obj_tbl[, `:=`(same_name_order = seq_along(object_name)), by = object_name_upper]
@@ -1328,6 +1398,19 @@ i_dup_object = function (self, private, which, new_name = NULL) {
     obj_tbl[, `:=`(object_name_upper = toupper(object_name))]
     obj_tbl[is.na(assigned_new_name), `:=`(assigned_new_name = FALSE)]
 
+    # check if user input name is one of existing names
+    if (eplusr_option("validate_level") == "final") {
+        existing_name <- obj_tbl[has_name == TRUE &
+            purrr::map2_lgl(object_name_upper, all_name_upper, `%in%`)]
+        if (not_empty(existing_name)) {
+            stop("Duplicate objects with existing names is prohibited in `final` ",
+                "validation level. Input new name ",
+                backtick_collapse(existing_name$object_name),
+                ifelse(nrow(existing_name) == 1L, " is ", " are "),
+                "one of existing object names in the same class." , call. = FALSE)
+        }
+    }
+
     # logging
     obj_auto_nm <- obj_tbl[!is.na(object_name) & assigned_new_name == FALSE]
     if (not_empty(obj_auto_nm))
@@ -1341,7 +1424,8 @@ i_dup_object = function (self, private, which, new_name = NULL) {
     # }}}
 
     # get value and comment
-    val_tbl <- i_value_tbl_from_which(self, private, obj_tbl$object_id)
+    # allow to duplicate same object multiple times
+    val_tbl <- i_value_tbl_from_which(self, private, obj_tbl$object_id, allow_cartesian = TRUE)
     cmt_tbl <- i_comment_tbl_from_which(self, private, obj_tbl$object_id, nomatch = 0L)
     old_val_id <- val_tbl$value_id
 
@@ -1411,8 +1495,9 @@ i_add_object = function (self, private, class, value = NULL, comment = NULL, def
         `:=`(value = NULL)]
 
     # VALIDATE
-    # only validate fields that do not use default values
-    val_tbl_chk <- val_tbl[is_default == FALSE]
+    # only validate fields that do not use default values and extensible fields
+    val_tbl_chk <- val_tbl[is_default == FALSE | is_extensible == TRUE]
+
     i_validate_in_object(self, private, obj_tbl, val_tbl_chk)
     if (any(vapply(private$m_log$validate, not_empty, logical(1)))) {
         i_print_validate(private$m_log$validate)
@@ -1457,7 +1542,7 @@ i_ins_object = function (self, private, object) {
 
     if (is_idfobject(object)) {
         i_insert_single_object(self, private, object)
-    } else if (is.list(object)) {
+    } else if (is.list(object) && not_empty(object)) {
         len <- length(object)
         # every component should be an IdfObject
         valid <- vapply(object, is_idfobject, logical(1))
@@ -1474,8 +1559,6 @@ i_ins_object = function (self, private, object) {
 
 # i_insert_single_object {{{
 i_insert_single_object <- function (self, private, object) {
-    assert_that(is_idfobject(object))
-
     cur_ver <- i_version(self, private)
 
     in_self <- ._get_self(object)
@@ -1564,8 +1647,7 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
     if (!is.null(comment)) {
         cmt_tbl <- i_new_comment_tbl(self, private, obj_tbl$object_id, comment)
         new_cmt_id <- i_new_id(self, private, "comment", nrow(cmt_tbl))
-        new_obj_id_cmt_tbl <- rep(obj_tbl$object_id, times = i_comment_num(self, private, obj_tbl$object_id))
-        cmt_tbl[, `:=`(comment_id = new_cmt_id, object_id = new_obj_id_cmt_tbl)]
+        cmt_tbl[, `:=`(comment_id = new_cmt_id)]
         i_assign_comment_tbl(self, private, cmt_tbl)
     }
     # }}}
@@ -1599,7 +1681,7 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
         if (eplusr_option("validate_level") == "final") {
             ref <- ref_by_tbl[, list(referenced_by = backtick_collapse(referenced_by_object_id)),
                 by = list(object_rleid, object_id)]
-            stop("Delete object that are referenced by others is prohibited ",
+            stop("Deleting an object that is referenced by others is prohibited ",
                 "in `final` validation level. Failed to delete target object ",
                 "[ID:", backtick_collapse(obj_tbl$object_id), "]:\n",
                 paste0(paste0(ref$object_rleid, ": Object [ID:",backtick(ref$object_id),"] was ",
@@ -1719,13 +1801,25 @@ i_replace_value = function (self, private, pattern, replacement, class = NULL) {
         eplusr_option("num_digits"),
         eplusr_option("view_in_ip"))
 
-    private$m_idf_tbl$value[value_id %in% value_tbl_after$value_id, `:=`(
-        value = value_tbl_after$value,
-        value_upper = value_tbl_after$value_upper,
-        value_num = value_tbl_after$value_num,
-        value_ipnum = value_tbl_after$value_ipnum)]
+    # update object name if necessary
+    if (not_empty(value_tbl_new[is_name == TRUE])) {
+        obj_tbl_new <- value_tbl_new[is_name == TRUE, list(object_id, value, value_upper)]
+        private$m_idf_tbl$object <- obj_tbl_new[private$m_idf_tbl$object, on = "object_id"][
+            !is.na(value), `:=`(object_name = value, object_name_upper = value_upper)][
+            , `:=`(value = NULL, value_upper = NULL)]
+    }
 
-    private$m_log$order[object_id %in% value_tbl_after$object_id,
+    # remove unuseful columns and rename column
+    value_tbl_rep <- value_tbl_new[,
+        list(value_id, new_value = value, new_value_upper = value_upper,
+            new_value_num = value_num, new_value_ipnum = value_ipnum)]
+
+    private$m_idf_tbl$value <- value_tbl_rep[private$m_idf_tbl$value, on = "value_id"][
+        !is.na(new_value), `:=`(value = new_value, value_upper = new_value_upper,
+            value_num = new_value_num, value_ipnum = new_value_ipnum)][
+        , `:=`(new_value = NULL, new_value_upper = NULL, new_value_num = NULL, new_value_ipnum = NULL)]
+
+    private$m_log$order[object_id %in% value_tbl_rep$object_id,
                         object_order := object_order + 1L]
 
     # log uuid
@@ -1791,51 +1885,30 @@ i_assign_object_tbl <- function (self, private, new_tbl) {
 ################################################################################
 
 # i_assert_valid_input_format {{{
-i_assert_valid_input_format <- function (case, value, comment, default, type = c("add", "set")) {
+i_assert_valid_input_format <- function (class_name, value, comment, default, type = c("add", "set")) {
     type <- match.arg(type)
     key <- switch(type, add = "class", set = "object")
 
-    if (is_empty(value) & type == "add" & eplusr_option("validate_level") == "final")
-        stop("Adding empty object is prohibited in `final` validation level.",
-            call. = FALSE)
+    is_valid_input <- function (x) is.null(x) || is_normal_list(x)
 
-    if (length(case) == 1L) {
-        if (type == "set")
-            if (is_empty(value) && is_empty(comment) && !default)
-                stop("`value` and `comment` cannot be all empty when default is ",
-                    "FALSE.", call. = FALSE)
+    if (length(class_name) > 1L &&
+        ((not_empty(value)   && !is_same_len(class_name, value)) ||
+         (not_empty(comment) && !is_same_len(class_name, comment))))
+        stop("`value` and `comment` should have the same length as ",
+            backtick(key), ".", call. = FALSE)
 
-        if (not_empty(value) && !purrr::vec_depth(value) %in% c(1L, 2L))
-            stop("Invalid `value` format found which should be a list, ",
-                "e.g. list('a', 'b').", call. = FALSE)
-
-        if (not_empty(comment) && !purrr::vec_depth(comment) %in% c(1L, 2L))
-            stop("Invalid `comment` format found which should be a list, ",
-                "e.g. list('a', 'b').", call. = FALSE)
-    }
-
-    if (length(case) > 1L) {
-        if (not_empty(value) && !is_same_len(case, value))
-            stop("`value` should have the same length as ", backtick(key), ".", call. = FALSE)
-
-        if (not_empty(comment) && !is_same_len(case, comment))
-            stop("`comment` should have the same length as ", backtick(key), ".", call. = FALSE)
-
-        if (not_empty(value) && purrr::vec_depth(value) != 3L)
-            stop("Invalid `value` format found which should be a nested list, ",
-                "e.g. list(list('a'), list('b')).", call. = FALSE)
-
-        if (not_empty(comment) && !purrr::vec_depth(comment) %in% c(2L, 3L))
-            stop("Invalid `comment` format found which should be a list or a ",
-                "nested list, ", "e.g. list('a', 'b'), or list(list('a'), list('b')).",
-                call. = FALSE)
-
-        if (type == "set") {
-            is_null_val <- vapply(value, is_empty, logical(1))
-            is_null_cmt <- vapply(comment, is_empty, logical(1))
-            if (any(is_null_val && is_null_cmt) & default == FALSE)
-                stop("`value` and `comment` cannot be all empty when `default` is ",
-                    "FALSE.", call. = FALSE)
+    if (is_scalar(class_name)) {
+        if (!is_valid_input(value) || !is_valid_input(comment)) {
+            stop("Invalid `value` or `comment` format found. Each value or ",
+                "comment for a single object should be NULL or a list in format ",
+                "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
+        }
+    } else {
+        if (!all(purrr::map_lgl(value, is_valid_input)) ||
+            !all(purrr::map_lgl(comment, is_valid_input))) {
+            stop("Invalid `value` or `comment` format found. Each value or ",
+                "comment for a single object should be NULL or a list in format ",
+                "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
         }
     }
 }
@@ -1902,11 +1975,18 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 
     # stop adding empty objects in `final` validation level {{{
     if (type == "add" && eplusr_option("validate_level") == "final" && !no_empty) {
-        msg <- val_in_empty[, paste0("  ", lpad(class_rleid), "| Class ",
+        msg <- val_in_empty[, paste0("  ", lpad(object_rleid), "| Class ",
             backtick(class_name_in), ".", collpase = "\n")]
         stop("Adding empty objects is prohibited in `final` validation ",
-            "level. Missing values found in input `value`:\n", msg, call. = FALSE)
+            "level. Empty value found in input `value`:\n", msg, call. = FALSE)
     }
+    # TODO: stop when both value and comment is empty in `$set_object()`
+    # if (type == "set" && !default && !no_empty) {
+    #     msg <- val_in_empty[, paste0("  ", lpad(class_rleid), "| Class ",
+    #         backtick(class_name_in), ".", collpase = "\n")]
+    #     stop("Adding empty objects is prohibited in `final` validation ",
+    #         "level. Missing values found in input `value`:\n", msg, call. = FALSE)
+    # }
     # }}}
 
     # EMPTY CASE {{{
@@ -1943,7 +2023,35 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
         val_in_unnamed[, `:=`(field_name_in = NULL)]
         val_in_unnamed[, `:=`(field_index = seq_along(value_in)), by = object_rleid]
 
-        i_assert_valid_value_num(self, private, val_num_unnamed, type, default)
+        if (!default) {
+            invalid_num_unnamed <- val_num_unnamed[
+                !i_is_valid_field_num(self, private, class = class_name, num = value_num)
+            ]
+        } else {
+            invalid_num_unnamed_more <- val_num_unnamed[value_num >= min_fields &
+                !i_is_valid_field_num(self, private, class = class_name, num = value_num)
+            ]
+
+            less_num_unnamed <- val_num_unnamed[value_num < min_fields][, class_rleid := .I]
+
+            invalid_num_obj_rleid <- less_num_unnamed[,
+                list(object_rleid, class_rleid, value_count = value_num, min_fields)][
+                i_value_tbl_ori_from_num_tbl(self, private, less_num_unnamed,
+                    type, default = FALSE, all),
+                on = list(class_rleid, value_count < field_index, min_fields >= field_index),
+                nomatch = 0L][has_default == FALSE, unique(object_rleid)]
+
+            invalid_num_unnamed_less <- val_num_unnamed[object_rleid %in% invalid_num_obj_rleid]
+
+            invalid_num_unnamed <- data.table::rbindlist(list(
+                invalid_num_unnamed_more, invalid_num_unnamed_less))
+
+        }
+
+        if (not_empty(invalid_num_unnamed)) {
+            msg <- i_msg_invalid_value_num(invalid_num_unnamed, type)
+            stop("Invalid field number found:\n", msg, call. = FALSE)
+        }
 
         val_tbl_unnamed_ori <- i_value_tbl_ori_from_num_tbl(self, private,
             val_num_unnamed, type, default = FALSE, all)
@@ -1958,37 +2066,90 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
     if (!no_named) {
         val_num_named <- i_count_value_in_num(object_tbl, val_in_named)
 
-        # have to get maximum tbl for name validation
-        val_tbl_named_ori <- i_value_tbl_ori_from_num_tbl(self, private,
-            val_num_named, type, default = FALSE, all = TRUE)
+        val_in_named[, `:=`(all_field_name_lower = i_class_field_name(self, private, class_id, lower = TRUE))]
 
-        # add lower style field name for joining
-        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_name(field_name))]
-
-        # for name validation, use right join of input value
-        val_tbl_named_ori <- i_del_rleid_column(val_tbl_named_ori)
-        val_tbl_named_chk <- val_tbl_named_ori[val_in_named, on = c("object_id", "class_id", "field_name_lower")]
-        # also combine class info
-        val_tbl_named_chk[, `:=`(class_name_in = NULL, value_num = NULL)]
-        val_tbl_named_chk <- val_tbl_named_chk[val_num_named, on = c("object_id", "class_id")]
+        val_in_named[, `:=`(field_index = purrr::map2_int(field_name_lower, all_field_name_lower, match))]
 
         # check field names
-        last_idx <- i_last_field_index_from_value_name(self, private, val_tbl_named_chk, type)
-        last_idx[, `:=`(value_num = max(value_num, last_index))]
+        mis_val_in <- val_in_named[is.na(field_index)]
+        if (not_empty(mis_val_in)) {
+
+            # check non-extensible class
+            mis_val_in_nonext <- mis_val_in[!class_name_in %in% i_extensible_class_name(self, private)]
+            if (not_empty(mis_val_in_nonext)) {
+                data.table::setnames(mis_val_in_nonext, "class_name_in", "class_name")
+                msg <- i_msg_invalid_value_name(mis_val_in_nonext, "add")
+                stop("Invalid field name found:\n", msg, call. = FALSE)
+            }
+
+            # get object tbl for mismatched
+            mis_obj_tbl <- val_num_named[J(unique(mis_val_in$object_rleid)), on = "object_rleid"]
+
+            # get possible-extensible field value number per object
+            mis_obj_tbl <- mis_obj_tbl[
+                mis_val_in[, list(mis_val_num = .N), by = list(object_rleid)],
+                on = "object_rleid"]
+
+            # check if value number is acceptable
+            mis_obj_tbl[, `:=`(new_ext_num = mis_val_num %/% num_extensible,
+                               is_complete = (mis_val_num %% num_extensible) == 0L)]
+
+            if (not_empty(mis_obj_tbl[is_complete == FALSE])) {
+                incomp_ext_grp <- mis_val_in[J(mis_obj_tbl[is_complete == FALSE, object_rleid]), on = "object_rleid"]
+                data.table::setnames(incomp_ext_grp, "class_name_in", "class_name")
+                msg <- i_msg_invalid_ext(incomp_ext_grp, type)
+                stop("Incomplete extensible group or invalid field name of ",
+                    "extensible group found:\n", msg, call. = FALSE)
+            }
+
+            # add extensible group
+            ext_in <- mis_obj_tbl[, list(new_ext_num = max(new_ext_num)), by = list(class_id)]
+            purrr::walk2(ext_in$class_id, ext_in$new_ext_num,
+                ~i_add_extensible_group(self, private, .x, .y))
+
+            # match field names again
+            val_in_named[is.na(field_index), `:=`(all_field_name_lower = i_class_field_name(self, private, class_id, lower = TRUE))]
+            val_in_named[is.na(field_index), `:=`(field_index = purrr::map2_int(field_name_lower, all_field_name_lower, match))]
+
+            invalid_ext <- val_in_named[is.na(field_index)]
+            if (not_empty(invalid_ext)) {
+                # delete extensible groups for invalid input
+                valid_obj_id <- val_in_named[!is.na(field_index),
+                    setdiff(object_rleid, invalid_ext$object_rleid)]
+                if (not_empty(valid_obj_id)) {
+                    valid_ext_in <- mis_obj_tbl[object_rleid %in% valid_obj_id, list(class_id, new_ext_num)][
+                        , list(valid_ext_num = max(new_ext_num)), by = list(class_id)]
+                    invalid_ext_in <- valid_ext_in[ext_in, on = "class_id"][
+                        , `:=`(invalid_ext_num = new_ext_num - valid_ext_num)][
+                        invalid_ext_num > 0L]
+                } else {
+                    invalid_ext_in <- ext_in[, `:=`(invalid_ext_num = new_ext_num)]
+                }
+                purrr::walk2(invalid_ext_in$class_id, invalid_ext_in$invalid_ext_num,
+                    ~i_del_extensible_group(self, private, .x, .y))
+
+                data.table::setnames(invalid_ext, "class_name_in", "class_name")
+                msg <- i_msg_invalid_ext(invalid_ext, type)
+                stop("Incomplete extensible group or invalid field name of ",
+                     "extensible group found:\n", msg, call. = FALSE)
+            }
+        }
+
+        val_in_named[, `:=`(all_field_name_lower = NULL)]
+
+        if (type == "set") val_num_named[, `:=`(value_num = i_value_num(self, private, object_id))]
+
+        val_num_named <- val_num_named[val_in_named[, list(last_index = max(field_index)), by = list(object_rleid)],
+            on = "object_rleid"]
+
+        val_num_named[value_num < last_index, `:=`(value_num = last_index)]
 
         val_tbl_named_ori <- i_value_tbl_ori_from_num_tbl(self, private,
-            last_idx, type, default = FALSE, all)
+            val_num_named, type, default = FALSE, all)
 
         val_tbl_named_ori <- i_del_rleid_column(val_tbl_named_ori)
 
-        # add lower style field name for joining
-        val_tbl_named_ori[, `:=`(field_name_lower = i_lower_name(field_name))]
-
-        val_tbl_named <- val_in_named[val_tbl_named_ori, on = c("object_id", "class_id", "field_name_lower")]
-
-        val_tbl_named_chk <- val_num_named[, list(object_id, object_rleid, class_name)][
-            val_tbl_named, on = "object_id"]
-        i_assert_complete_extensible_group(self, private, val_tbl_named_chk, type)
+        val_tbl_named <- val_in_named[val_tbl_named_ori, on = c("object_id", "class_id", "field_index")]
     }
     # }}}
 
@@ -2014,14 +2175,20 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 
     val_tbl[, `:=`(is_default = FALSE)]
     if (default) {
-        if (type == "add")
-            val_tbl[, `:=`(delete = TRUE)]
+        if (type == "add") val_tbl[, `:=`(delete = TRUE)]
+
         val_tbl <- i_value_tbl_assign_default(self, private, val_tbl)
     }
 
     # update value table number
-    data.table::setorder(val_tbl, object_rleid, -field_index)
-    val_tbl[, `:=`(object_rleid = object_rleid[1]), by = list(cumsum(!is.na(object_rleid)))]
+    # fill object rleid
+    data.table::setorder(val_tbl, -object_id, -field_index)
+    val_tbl[order(object_id), `:=`(object_rleid = object_rleid[1L]),
+        by = list(cumsum(!is.na(object_rleid)), object_id)]
+    data.table::setorder(val_tbl, object_id, field_index)
+    val_tbl[order(object_id), `:=`(object_rleid = object_rleid[1L]),
+        by = list(cumsum(!is.na(object_rleid)), object_id)]
+
     val_tbl <- update_value_num(val_tbl, digits = eplusr_option("num_digits"),
         in_ip = eplusr_option("view_in_ip"), prefix = "value")
     data.table::setorder(val_tbl, object_rleid, field_index)
@@ -2039,7 +2206,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 # }}}
 
 # i_value_tbl_from_which {{{
-i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE) {
+i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE, allow_cartesian = FALSE) {
     if (is.null(object)) {
         if (field)
             return(private$m_idd_tbl$field[private$m_idf_tbl$value, on = "field_id"])
@@ -2049,7 +2216,7 @@ i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE) 
 
     in_tbl <- i_in_tbl_from_which(self, private, "object", object)
 
-    val_tbl <- private$m_idf_tbl$value[in_tbl, on = "object_id"]
+    val_tbl <- private$m_idf_tbl$value[in_tbl, on = "object_id", allow.cartesian = allow_cartesian]
 
     if (!field) return(val_tbl)
 
@@ -2135,27 +2302,15 @@ i_empty_value_tbl <- function (self, private, object_id, class, default = TRUE, 
 
 # i_val_in_tbl {{{
 i_val_in_tbl <- function (self, private, object_id, class_id, value) {
-    replace_empty <- function (val, logical = FALSE) {
-        if (is_empty(val))
-            if (logical) NA else NA_character_
-        else val
-    }
-
+    replace_null <- function (val) if (is.null(val)) NA_character_ else val
     has_empty_name <- function (name) any(name == "")
-
-    is_delete <- function (val) {
-        res <- is.na(val)
-        res[length(res) == 0L] <- TRUE
-        unname(res)
-    }
-
     has_duplicated <- function (name) as.logical(anyDuplicated(name))
 
     # get input class names
     cls_id <- class_id
     class_name_in <- i_class_name(self, private, cls_id)
 
-    if (is_empty(value)) {
+    if (is.null(value)) {
         empty <- TRUE
         val_list <- NA_character_
         val_chr <- NA_character_
@@ -2164,30 +2319,35 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
         delete <- FALSE
     } else {
         # get input value list
-        val_list <- purrr::flatten(lapply(value, replace_empty))
+        val_list <- purrr::flatten(lapply(value, replace_null))
 
-        # get input field names and character values
         if (is_scalar(object_id)) {
             # check if there are empty values
             empty <- list(is_empty(value))
 
-            field_name_in <- list(replace_empty(names(value)))
-            field_name_lower <- list(i_lower_name(replace_empty(names(value))))
+            field_name_in <- list(replace_null(names(value)))
+            field_name_lower <- list(i_lower_name(unlist(field_name_in)))
 
-            val_chr <- list(vapply(value,
-                function (val) as.character(replace_empty(val)), character(1)))
+            val_chr <- list(purrr::map_chr(value, as.character))
 
-            delete <- list(vapply(value, is_delete, logical(1)))
+            delete <- list(purrr::map_lgl(value, is.na))
         } else {
             # check if there are empty values
             empty <- vapply(value, is_empty, logical(1))
 
-            field_name_in <- lapply(value, function (val) replace_empty(names(val)))
+            field_name_in <- lapply(value, function (val) replace_null(names(val)))
             field_name_lower <- lapply(field_name_in, i_lower_name)
 
-            val_chr <- purrr::modify_depth(value, 2, ~as.character(replace_empty(.x)))
+            val_chr <- purrr::map2(value, empty,
+               ~{
+                    if (!isTRUE(.y)) purrr::map(.x, ~as.character(replace_null(.x)))
+                    else NA_character_
+                 }
+            )
 
-            delete <- lapply(purrr::modify_depth(value, 2, is_delete), replace_empty, logical = TRUE)
+            delete <- purrr::map2(value, empty,
+                ~{if (!isTRUE(.y)) purrr::map_lgl(.x, is.na) else FALSE}
+            )
         }
 
     }
@@ -2209,9 +2369,9 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
     dup_name <- tbl_nest[purrr::map_lgl(field_name_lower, has_duplicated),
         .SD, by = object_id]
     if (not_empty(dup_name)) {
-        tbl_nest[, `:=`(duplicated_name =
+        dup_name[, `:=`(duplicated_name =
             lapply(field_name_in, function (nm) nm[duplicated(nm)]))]
-        msg <- tbl_nest[, paste0("  ", lpad(class_rleid),
+        msg <- dup_name[, paste0("  ", lpad(class_rleid),
             "| Class ", backtick(class_name_in), ":",
             backtick_collapse(as.character(duplicated_name)), ".", collapse = "\n")]
         stop("Duplicated field names found in input:\n", msg, call. = FALSE)
@@ -2456,123 +2616,6 @@ i_val_ref_from_tbl <- function (self, private, value_tbl) {
 }
 # }}}
 
-# i_assert_valid_value_num {{{
-i_assert_valid_value_num <- function (self, private, value_in_tbl, type, default = FALSE) {
-    invalid_num_unnamed <- value_in_tbl[
-        !i_is_valid_field_num(self, private,
-            class = class_name, num = value_num)]
-
-    if (default) {
-        less <- invalid_num_unnamed[value_num < min_fields]
-
-        if (not_empty(less)) {
-            less_idx <- less[, list(miss_idx = seq(value_num + 1L, min_fields)),
-                by = list(object_rleid, class_id)]
-
-            less_def <- less_idx[, list(def = unlist(i_field_default(self, private,
-                class_id, miss_idx))), by = list(object_rleid, class_id)]
-
-            invalid_less_rleid <- less_def[is.na(def), object_rleid]
-
-            if (not_empty(invalid_less_rleid)) {
-                valid_rleid <- less[!object_rleid %in% invalid_less_rleid]$object_rleid
-            } else {
-                valid_rleid <- less$object_rleid
-            }
-
-            invalid_num_unnamed <- invalid_num_unnamed[!object_rleid %in% valid_rleid]
-        }
-    }
-
-    if (not_empty(invalid_num_unnamed)) {
-        msg <- i_msg_invalid_value_num(invalid_num_unnamed, type)
-        stop("Invalid field number found:\n", msg, call. = FALSE)
-    }
-}
-# }}}
-
-# i_assert_complete_extensible_group {{{
-i_assert_complete_extensible_group <- function (self, private, value_in_tbl, type) {
-    invalid_ext_grp <- value_in_tbl[is_extensible == TRUE & is.na(value_in) & is.na(value)]
-    if (not_empty(invalid_ext_grp)) {
-        if (!has_name(invalid_ext_grp, "class_name"))
-            invalid_ext_grp[, `:=`(class_name = i_class_name(self, private, class_id))]
-
-        msg <- i_msg_invalid_ext_grp(invalid_ext_grp, type)
-        stop("Incomplete extensible group found:\n", msg, call. = FALSE)
-    }
-}
-# }}}
-
-# i_last_field_index_from_value_name {{{
-i_last_field_index_from_value_name <- function (self, private, value_in_tbl, type) {
-    not_found <- value_in_tbl[is.na(field_id)]
-
-    if (is_empty(not_found)) {
-
-        idx_tbl <- value_in_tbl[, list(last_index = field_index[.N]),
-            by = c("object_rleid", "object_id", "class_id", "num_fields", "value_num")]
-
-        if (type == "set")
-            idx_tbl[, `:=`(value_num = i_value_num(self, private, object_id))]
-
-        return(idx_tbl)
-    }
-
-    # check for invalid field name for non-extensible class {{{
-    if (not_empty(not_found[num_extensible == 0L])) {
-        msg <- i_msg_invalid_value_name(not_found[num_extensible == 0L], type)
-        stop("Invalid field name found:\n", msg, call. = FALSE)
-    }
-    # }}}
-
-    # add an indicator column for joinning
-    not_found[, `:=`(class_rleid = .GRP), by = object_rleid]
-
-    # get info for extensible groups
-    ext_in <- not_found[,
-        list(value_num = .N,
-             field_name_in = list(field_name_in),
-             field_name_lower = list(field_name_lower)),
-         by = list(object_rleid, object_id, class_id,
-                   num_extensible, num_extensible_group)]
-    ext_in[,
-        `:=`(new_ext_num = ceiling(value_num / num_extensible),
-             new_ext_from = num_extensible_group + 1L,
-             class_order = .I)][,
-        `:=`(new_ext_to = num_extensible_group + new_ext_num)]
-
-    # get extensible groups
-    ext_tbl <- i_extensible_group_tbl_from_range(self, private,
-        ext_in$class_id, from = ext_in$new_ext_from,
-        to = ext_in$new_ext_to)[, .SD,
-        .SDcols = c("class_rleid", "field_name", "field_index")]
-
-    # add lower style field names
-    ext_tbl[, field_name_lower := i_lower_name(field_name)]
-
-    # join
-    ext_match <- ext_tbl[not_found, on = c("class_rleid", "field_name_lower")]
-
-    # get invalid extensible groups
-    invalid_ext <- ext_match[is.na(field_name)]
-
-    if (not_empty(invalid_ext)) {
-        msg <- i_msg_invalid_ext(invalid_ext, type)
-        stop("Incomplete extensible group or invalid field names of ",
-            "extensible group found:\n", msg, call. = FALSE)
-    }
-
-    idx_tbl <- value_in_tbl[, list(last_index = field_index[.N]),
-        by = c("object_rleid", "object_id", "class_id", "num_fields", "value_num")]
-
-    if (type == "set")
-        idx_tbl[, `:=`(value_num = i_value_num(self, private, object_id))]
-
-    idx_tbl
-}
-# }}}
-
 # i_del_rleid_column {{{
 i_del_rleid_column <- function (tbl) {
     if (has_name(tbl, "object_rleid")) tbl[, `:=`(object_rleid = NULL)]
@@ -2587,6 +2630,7 @@ i_msg_info <- function (msg_tbl, type = c("add", "set")) {
 
     msg_tbl[, which := paste0("Class ", backtick(class_name))]
 
+    if (has_name(msg_tbl, "object_id")) msg_tbl[, object_id := as.character(object_id)]
 
     if (type == "add")
         msg_tbl[, `:=`(object_id = "[Temporary]")]
@@ -2594,7 +2638,6 @@ i_msg_info <- function (msg_tbl, type = c("add", "set")) {
         msg_tbl[, `:=`(object_id = backtick(object_id))]
 
     msg_tbl[, which := paste0("Object ", object_id, " (", which, ")")]
-
 
     msg_tbl[, info := paste0(idx, "| ", which)]
 
@@ -2658,21 +2701,6 @@ i_msg_invalid_ext <- function (value_tbl, type = c("add", "set")) {
 }
 # }}}
 
-# i_msg_invalid_ext_grp {{{
-i_msg_invalid_ext_grp <- function (value_tbl, type = c("add", "set")) {
-    assert_that(has_names(value_tbl, c("field_name", "value_num")))
-
-    by_col <- c("object_rleid", "class_name")
-    if (type == "set") by_col <- c(by_col, "object_id")
-
-    msg_tbl <- value_tbl[, list(invalid_grp = backtick_collapse(field_name)),
-        by = by_col]
-    msg_tbl <- i_msg_info(msg_tbl, type)
-
-    paste0(msg_tbl$info, ": Missing ", msg_tbl$invalid_grp, ".", collapse = "\n")
-}
-# }}}
-
 # i_value_tbl_from_field_which {{{
 i_value_tbl_from_field_which <- function (self, private, object, which = NULL) {
     assert_that(is_scalar(object))
@@ -2683,34 +2711,7 @@ i_value_tbl_from_field_which <- function (self, private, object, which = NULL) {
 
     val_tbl <- i_value_tbl_from_which(self, private, obj_in$object_id, field = FALSE)
 
-    val_tbl[fld_tbl, on = "field_id"]
-}
-# }}}
-
-# i_value_reference_from_which {{{
-i_value_reference_from_which <- function (self, private, object, which = NULL) {
-    val_tbl <- i_value_tbl_from_field_which(self, private, object, which)[,
-        list(value_id, field_id, type)]
-
-    val_tbl[, reference := list(list(NULL))]
-    val_tbl[type == "node", reference := list(list(i_all_node_value(self, private)))]
-
-    val_tbl_obj_list <- private$m_idd_tbl$field_object_list[
-        val_tbl, on = "field_id", nomatch = 0L, list(value_id, object_list)]
-
-    if (is_empty(val_tbl_obj_list)) return(val_tbl$reference)
-
-    uni_obj_list <- val_tbl_obj_list[, unique(object_list)]
-
-    # get possible values
-    val_tbl_ref <- i_value_tbl_from_object_list(self, private, uni_obj_list)
-
-    ref <- val_tbl_ref[val_tbl_obj_list, on = "object_list"][,
-        list(reference = list(unique(unlist(possible_value)))), by = value_id]
-
-    val_tbl <- ref[val_tbl[, reference := NULL], on = "value_id"]
-
-    val_tbl$reference
+    val_tbl[fld_tbl, on = c("class_id", "field_id")]
 }
 # }}}
 
@@ -2998,7 +2999,7 @@ i_idf_add_output_sqlite <- function (self, private) {
             added <- TRUE
         }
     } else {
-        invisible(self$add_object("Output:SQLite", "SimpleAndTabular"))
+        invisible(self$add_object("Output:SQLite", list("SimpleAndTabular")))
         i_verbose_info(self, private, "Adding object `Output:SQLite` and setting ",
             "`Option Type` to `SimpleAndTabular`.")
         added <- TRUE
@@ -3008,7 +3009,7 @@ i_idf_add_output_sqlite <- function (self, private) {
 # }}}
 
 # i_idf_run {{{
-i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE) {
+i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
     if (private$m_version < 8.3)
         stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
              call. = FALSE)
@@ -3039,10 +3040,6 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALS
     # add Output:SQLite if necessary
     add_sql <- i_idf_add_output_sqlite(self, private)
 
-    # if necessary, resave the model
-    if (add_sql)
-        i_idf_save(self, private, overwrite = TRUE, copy_external = FALSE)
-
     # save the model to the output dir if necessary
     if (!can_locate_idf_file(self, private))
         stop("The Idf object is not created from local file or local file has ",
@@ -3052,12 +3049,13 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALS
     if (is.null(dir))
         run_dir <- dirname(path_idf)
     else {
-        i_idf_save(self, private, file.path(dir, basename(path_idf)),
-            overwrite = TRUE, copy_external = TRUE)
         run_dir <- dir
+        path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = FALSE)
     }
 
-    path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = TRUE)
+    # if necessary, resave the model
+    if (add_sql || is.null(dir))
+        i_idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
 
     job <- EplusJob$new(path_idf, epw, private$m_version)
 
@@ -3199,11 +3197,11 @@ i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE,
 # }}}
 
 # i_idfobj_get_value {{{
-i_idfobj_get_value <- function (self, private, object, which = NULL, in_ip = eplusr_option("view_in_ip"), simplify = FALSE) {
+i_idfobj_get_value <- function (self, private, object, which = NULL, all = FALSE,
+                                simplify = FALSE, in_ip = eplusr_option("view_in_ip")) {
     val_tbl <- i_value_tbl_from_field_which(self, private, object, which)
 
-    # delete extra fields
-    if(is.null(which)) val_tbl <- val_tbl[!is.na(value_id)]
+    if(!all) val_tbl <- val_tbl[!is.na(value_id)]
 
     if (i_need_update_num(self, private, view_in_ip = in_ip))
         val_tbl <- update_value_num(val_tbl, in_ip = in_ip)
@@ -3227,7 +3225,6 @@ i_idfobj_set_value <- function (self, private, object, ..., default = TRUE) {
 
     if (is_empty(value))
         stop("Please give values to set.", call. = FALSE)
-
     i_set_object(self, private, object, value, comment = NULL, default)[[1]]
 }
 # }}}
@@ -3236,14 +3233,17 @@ i_idfobj_set_value <- function (self, private, object, ..., default = TRUE) {
 i_idfobj_value_table <- function (self, private, object, all = FALSE, unit = TRUE,
                                   wide = FALSE, string_value = TRUE,
                                   in_ip = eplusr_option("view_in_ip")) {
-    val_tbl_full <- i_value_tbl_from_which(self, private, object)
+    val_tbl_full <- i_value_tbl_from_field_which(self, private, object, NULL)
+
+    if(!all) val_tbl_full <- val_tbl_full[!is.na(value_id)]
+
     # change to IP numbers and names if necessary
     if (i_need_update_num(self, private, view_in_ip = in_ip))
         val_tbl_full <- update_value_num(val_tbl_full, eplusr_option("num_digits"), in_ip)
 
     ip <- ifelse(in_ip, "ip", "")
 
-    if (unit) fld_nm <- paste0("field_", ip, "name")
+    if (unit) fld_nm <- paste0("full_", ip, "name")
     else fld_nm <- "field_name"
 
     cols <- c("field_index", fld_nm, "value", paste0("value_", ip, "num"))
@@ -3334,7 +3334,8 @@ i_idfobj_has_ref_from <- function (self, private, object) {
 
 # i_idfobj_possible_values {{{
 i_idfobj_possible_values <- function (self, private, object, which = NULL) {
-    val_tbl <- i_value_tbl_from_field_which(self, private, object, which)
+    val_tbl <- i_value_tbl_from_field_which(self, private, object, which)[
+        , list(class_id, value_id, field_index, field_name, autosizable, autocalculatable)]
 
     # delete extra fields if no field is given
     if (is.null(which)) {
@@ -3349,10 +3350,10 @@ i_idfobj_possible_values <- function (self, private, object, which = NULL) {
     val_tbl[, default := list(i_field_default(self, private, class_id[1L], which))]
     val_tbl[, choice := list(i_field_choice(self, private, class_id[1L], which))]
     val_tbl[, range := list(i_field_range(self, private, class_id[1L], which))]
-    val_tbl[, reference := list(i_value_reference_from_which(self, private, object, which))]
+    val_tbl[, reference := list(i_field_reference(self, private, class_id[1L], which))]
 
     res <- val_tbl[, list(field_index, field_name, auto, default, choice, range, reference)]
-    data.table::setattr(res, "class", c("IdfFieldPossible", class(res)))
+    data.table::setattr(res, "class", c("IddFieldPossible", class(res)))
     res
 }
 # }}}

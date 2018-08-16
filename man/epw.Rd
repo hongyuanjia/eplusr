@@ -3,6 +3,7 @@
 \docType{class}
 \name{epw}
 \alias{epw}
+\alias{Epw}
 \title{Read, and modify an EnergyPlus Weather File (EPW)}
 \description{
 Reading an EPW file starts with function \code{\link[=read_epw]{read_epw()}}, which parses an EPW
@@ -16,7 +17,7 @@ first eight lines of a standard EPW file are normally headers which contains
 data of location, design conditions, typical/extreme periods, ground
 temperatures, holidays/daylight savings, data periods and other comments. For
 now, eplusr only parses headers of location, holidays/daylight savings and
-data periods. All other headers will be left as they were when parsing and
+data periods. All other headers are left as they were when parsing and
 saving. For details on the data structure of EPW file, please see "Chapter 2 - Weather Converter Program"
 in EnergyPlus "Auxiliary Programs" documentation. An online version can be
 found \href{https://bigladdersoftware.com/epx/docs/}{here}.
@@ -40,6 +41,9 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
 \item liquid precipitation depth
 \item liquid precipitation rate
 }
+
+\strong{NOTE}: Even though \code{Epw} class provides methods to replace core weather data,
+it is still not recommended.
 }
 \section{Usage}{
 \preformatted{epw <- read_epw(path)
@@ -89,7 +93,7 @@ print(epw)
 \strong{Arguments}
 \itemize{
 \item \code{path}: A path where to save the weather file. If \code{NULL}, the path of the
-weather file itself will be used. Default: \code{NULL}.
+weather file itself is used.
 \item \code{overwrite}: Whether to overwrite the file if it already exists. Default is
 \code{FALSE}.
 }
@@ -124,6 +128,10 @@ epw$start_day_of_week <- "start_day_of_week"
 \code{$latitude}, \code{$longitute}, \code{$time_zone}, \code{$elevation}, \code{$time_step} and
 \code{$start_day_of_week} are all active bindings, which means that you can get
 the value and also set new value to it.
+
+NOTE: Please be super careful when trying to modify those data. Some of them
+must be consistent with weather data in order to make the weather file
+successfully parsed by EnergyPlus and eplusr.
 }
 
 \section{Query and Modify Data}{
@@ -132,30 +140,129 @@ epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 epw$set_data(data)
 }
 
-\code{$path()} returns the path of EPW file.
+\code{$path()} returns the path of EPW file. \code{NULL} if Epw is not created from
+local file.
 
-\code{$get_data()} returns the core weather data.
+\code{$get_data()} returns the core weather data in a data.table.
 
 \code{$set_data()} replaces core weather data with input data. NOTE: This feature is
 experimental. There is no validation when replacing.
 
-\strong{NOTE}: Even though \code{Epw} class provides methods to replace core weather data,
-it is still not recommended.
-
 \strong{Arguments}
 \itemize{
 \item \code{year}: A integer to indicate the year value in the return \code{datetime} column.
-If \code{NULL}, the year will be left as it is in EPW file.
-\item \code{tz}: The time zone of Date and Time in \code{datetime} column.
-\item \code{unit}: If \code{TRUE}, units will be set to all numeric columns using
-\code{\link[units:set_units]{units::set_units()}}.
+If \code{NULL}, which is the default, the year is left as it is in EPW file.
+\item \code{tz}: The time zone of Date and Time in \code{datetime} column. Default:
+value of \code{Sys.timezone()}.
+\item \code{unit}: If \code{TRUE}, units are set to all numeric columns using
+\code{\link[units:set_units]{units::set_units()}}. Default: \code{FALSE}.
 \item \code{update}: If \code{TRUE}, not only \code{datetime} column, but also \code{year}, \code{month},
-\code{day}, \code{hour} and \code{minute} will also be updated according to the input
-\code{year} value.
+\code{day}, \code{hour} and \code{minute} are also updated according to the input
+\code{year} value. Default: FALSE
 \item \code{data}: A data.frame which has all required columns.
 }
 }
 
+\examples{
+# read an EPW file from EnergyPlus website
+path_base <- "https://energyplus.net/weather-download"
+path_region <- "north_and_central_america_wmo_region_4/USA/CA"
+path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+path_epw <- file.path(path_base, path_region, path_file)
+epw <- read_epw(path_epw)
+
+# read an EPW file distributed with EnergyPlus
+if (is_avail_eplus(8.8)) {
+    epw_path <- file.path(
+        eplus_config(8.8)$dir,
+        "WeatherData",
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    )
+    epw <- read_epw(path_epw)
+}
+
+# get file path
+epw$path()
+
+# get basic info
+epw$city
+epw$state_province
+epw$country
+epw$data_source
+epw$wmo_number
+epw$latitude
+epw$longitude
+epw$time_zone
+epw$elevation
+epw$time_step
+epw$start_day_of_week
+
+# set basic info
+# NOTE: Use with caution. May mess up your weather data
+epw$city <- "Chongqing"
+epw$city
+
+epw$state_province <- "Chongqing"
+epw$state_province
+
+epw$country <- "China"
+epw$country
+
+epw$data_source <- "TMY"
+epw$data_source
+
+epw$wmo_number <- "724944"
+epw$wmo_number
+
+epw$latitude <- 20.0
+epw$latitude
+
+epw$longitude <- -120.0
+epw$longitude
+
+epw$time_zone <- 8
+epw$time_zone
+
+epw$elevation <- 100
+epw$elevation
+
+epw$time_step <- 2
+epw$time_step
+
+epw$start_day_of_week <- "Monday"
+epw$start_day_of_week
+
+# get weather data
+str(epw$get_data())
+
+# get weather data but change the year to 2018
+# the year column is not changed by default, only the returned datetime column
+str(epw$get_data(year = 2018)$datetime)
+str(epw$get_data(year = 2018)$year)
+# you can force to update the year column
+str(epw$get_data(year = 2018, update = TRUE)$year)
+
+# get weather data with units
+str(epw$get_data(unit = TRUE))
+# with units specified, you can easily perform unit conversion using units
+# package
+t_dry_bulb <- epw$get_data(unit = TRUE)$dry_bulb_temperature
+units(t_dry_bulb) <- with(units::ud_units, "kelvin")
+str(t_dry_bulb)
+
+# change the time zone of datetime column in the returned weather data
+attributes(epw$get_data()$datetime)
+attributes(epw$get_data(tz = "America/Chicago")$datetime)
+
+\dontrun{
+# change the weather data
+# NOTE: This feature is experimental. There is no validation when replacing.
+epw$set_data(epw$get_data())
+}
+
+# save the weather file
+epw$save(file.path(tempdir(), "weather.epw"))
+}
 \author{
 Hongyuan Jia
 }

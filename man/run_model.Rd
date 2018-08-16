@@ -5,10 +5,10 @@
 \alias{run_multi}
 \title{Run simulations of EnergyPlus models.}
 \usage{
-run_idf(eplus, model, weather, output_dir = NULL, design_day = FALSE,
-  annual = FALSE, expand_obj = TRUE, echo = FALSE)
+run_idf(eplus, model, weather, output_dir, design_day = FALSE,
+  annual = FALSE, expand_obj = TRUE, echo = TRUE)
 
-run_multi(eplus, model, weather, output_dir = NULL, design_day = FALSE,
+run_multi(eplus, model, weather, output_dir, design_day = FALSE,
   annual = FALSE, parallel_backend = future::multiprocess)
 }
 \arguments{
@@ -18,8 +18,8 @@ run_multi(eplus, model, weather, output_dir = NULL, design_day = FALSE,
 
 \item{weather}{A path of an EnergyPlus EPW weather file.}
 
-\item{output_dir}{Output directory path. If NULL, which is default, the
-directory of input model will be used.}
+\item{output_dir}{Output directory path. If NULL, the directory of input
+model is used.}
 
 \item{design_day}{Force design-day-only simulation. Default: \code{FALSE}.}
 
@@ -28,11 +28,12 @@ directory of input model will be used.}
 \item{expand_obj}{Where to run ExpandObject preprocessor before simulation.
 Default: \code{TRUE}.}
 
-\item{echo}{Only applicable to \code{run_idf}. Show EnergyPlus simulation process
-information to the console.  If \code{FALSE}, which is default, a
-\link[processx:process]{processx::process} object will be return.}
+\item{echo}{Only applicable to \code{run_idf}. If \code{TRUE}, show EnergyPlus
+simulation process information to the console. If \code{FALSE}, which is default, a
+\link[processx:process]{processx::process} object is returned. Default: \code{TRUE}.}
 
-\item{parallel_backend}{Acceptable input for \code{\link[future:plan]{future::plan()}}.}
+\item{parallel_backend}{Acceptable input for \code{\link[future:plan]{future::plan()}}. Default:
+\code{future::multiprocess}, which tries to run all models in parallel.}
 }
 \description{
 \code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
@@ -45,17 +46,43 @@ parallel.
 Behind the scene, \code{run_multi()} uses the
 \href{https://cran.r-project.org/package=furrr}{furrr} package which provides
 mapping functions in parallel using
-\href{https://cran.r-project.org/package=future}{future} package. It is suggested
-to run simulations using \link[=job]{EplusJob} class, which provides much more
-detailed controls on the simulation and also methods to extract simulation
-output.
+\href{https://cran.r-project.org/package=future}{future} package.
+
+It is suggested to run simulations using \link[=job]{EplusJob} class, which
+provides much more detailed controls on the simulation and also methods to
+extract simulation output.
 }
 \examples{
 \dontrun{
+idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 
-run_idf(8.8, "input.idf", "weather.epw")
+if (is_avail_eplus(8.8)) {
+    # run a single model
+    epw_path <- file.path(
+        eplus_config(8.8)$dir,
+        "WeatherData",
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    )
+
+    run_idf(8.8, idf_path, epw_path, output_dir = tempdir())
+
+    # run multiple model in parallel
+    idf_paths <- file.path(eplus_config(8.8)$dir, "ExampleFiles",
+        c("1ZoneUncontrolled.idf", "1ZoneUncontrolledFourAlgorithms.idf")
+    )
+    epw_paths <- rep(epw_path, times = 2L)
+    output_dirs <- file.path(tempdir(), tools::file_path_sans_ext(basename(idf_paths)))
+    run_multi(8.8, idf_paths, epw_paths, output_dir = output_dirs)
+}
 }
 }
 \references{
 \href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
+}
+\seealso{
+\link[=job]{EplusJob} class and \link[=param]{ParametricJob} class which provide
+a more friendly interface to run EnergyPlus simulations and collect outputs.
+}
+\author{
+Hongyuan Jia
 }

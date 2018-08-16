@@ -7,9 +7,9 @@
 read_idf(path, idd = NULL)
 }
 \arguments{
-\item{path}{A path to an EnergyPlus IDF file or a string that can be parsed as
-an IDF. The file extension does not matter. So models stored in \code{TXT}
-format are still able to correctly be parsed.}
+\item{path}{Either a path, a connection, or literal data (either a single
+string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
+has a extension \code{.idf}.}
 
 \item{idd}{Any acceptable input of \code{\link[=use_idd]{use_idd()}}. If \code{NULL}, which is the
 default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input
@@ -23,6 +23,59 @@ An \code{Idf} object.
 \code{read_idf} takes an EnergyPlus Input Data File (IDF) as input and returns an
 \code{Idf} object. For more details on \code{Idf} object, please see \link[=idf]{Idf class}.
 }
+\details{
+Currently, Imf file is not fully supported. All EpMacro lines will be treated
+as normal comments of the nearest downwards object. If input is an Imf file,
+a warning will be given during parsing. It is recommended to convert the Imf
+file to an Idf file and use \code{\link[=param]{ParametricJob}} class to conduct
+parametric analysis.
+}
+\examples{
+# example model shipped with eplusr from EnergyPlus v8.8
+idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+
+# if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur
+is_avail_eplus(8.8)
+
+is_avail_idd(8.8)
+
+\dontrun{(read_idf(idf_path))}
+
+# if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus
+# installation folder will be used for pasing
+is_avail_eplus(8.8)
+is_avail_idd(8.8)
+
+\dontrun{read_idf(idf_path)}
+
+# if Idd v8.8 is found, it will be used automatically
+is_avail_idd(8.8)
+
+\dontrun{read_idf(idf_path)}
+
+# argument `idd` can be specified explicitly using `use_idd()`
+\dontrun{read_idf(idf_path, idd = use_idd(8.8))}
+
+# you can set `download` arugment to "auto" in `use_idd()` if you want to
+# automatically download corresponding IDD file when necessary
+read_idf(idf_path, use_idd(8.8, download = "auto"))
+
+# Besides use a path to an IDF file, you can also provide IDF in literal
+# string format
+idf_string <-
+    "
+    Version, 8.8;
+    Building,
+        Building;                !- Name
+    "
+
+read_idf(idf_string, use_idd(8.8, download = "auto"))
+}
 \seealso{
-\link[=idf]{Idf class}
+\link[=idf]{Idf class} for modifying EnergyPlus model. \code{\link[=use_idd]{use_idd()}} and
+\code{\link[=download_idd]{download_idd()}} for downloading and parsing EnergyPlus IDD file.
+\code{\link[=use_eplus]{use_eplus()}} for configuring which version of EnergyPlus to use.
+}
+\author{
+Hongyuan Jia
 }

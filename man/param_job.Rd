@@ -18,6 +18,24 @@ A \code{ParametricJob} object.
 \code{param_job()} takes an IDF and EPW as input and returns a \code{ParametricJob}.
 For details on \code{ParametricJob}, please see \link[=param]{ParametricJob class}.
 }
+\examples{
+if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    # create from local files
+    param_job(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    param_job(read_idf(idf_path), read_epw(epw_path))
+}
+}
 \seealso{
 \code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.
+}
+\author{
+Hongyuan Jia
 }

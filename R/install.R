@@ -1,8 +1,5 @@
-#' @importFrom gh gh
-#' @importFrom data.table data.table
-#' @importFrom purrr modify_depth
-#' @importFrom tools file_path_sans_ext file_ext
-#' @importFrom processx run
+#' @importFrom data.table data.table fread
+#' @importFrom tools file_path_sans_ext
 #' @importFrom cli rule
 NULL
 
@@ -17,9 +14,8 @@ NULL
 #' @param force Whether to install EnergyPlus even if it has already been
 #' installed.
 #'
-#' @param dir Where to save EnergyPlus installer file. Default is current
-#' working directory for `download_eplus()` and `tempdir()` for
-#' `install_eplus()`.
+#' @param dir Where to save EnergyPlus installer file. For `install_eplus()`,
+#' the installer will be saved into [tempdir()]
 #'
 #' @details
 #'
@@ -27,49 +23,61 @@ NULL
 #' [EnergyPlus Github Repository](https://github.com/NREL/EnergyPlus).
 #'
 #' `install_eplus()` will try to install EnergyPlus into the default location,
-#' e.g.  \file{C:/EnergyPlusVX-Y-0} on Windows,
-#' \file{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-#' \file{/Applications/EnergyPlus-X-Y-0} on MacOS.
+#' e.g.  `C:\\EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on
+#' Linux, and `/Applications/EnergyPlus-X-Y-0` on macOS.
 #'
 #' Note that the installation process requires administrative privileges
 #' during the installation and you have to run R with administrator (or with
 #' sudo if you are on Linux) to make it work if you are not in interactive mode.
 #'
 #' @name install_eplus
-#' @export
+#' @return An invisible integer `0` if succeed. Moreover, some attributes will
+#' also be returned:
+#' * For `install_eplus()`:
+#'     - `path`: the EnergyPlus installation path
+#'     - `installer`: the path of downloaded EnergyPlus installer file
+#' * For `download_eplus()`:
+#'     - `file`: the path of downloaded EnergyPlus installer file
 #'
+#' @examples
+#' \dontrun{
+#'
+#' # for the latest version of EnergyPlus
+#' download_eplus("latest", dir = tempdir())
+#' install_eplus("latest")
+#'
+#' # for a specific version of EnergyPlus
+#' download_eplus(8.8)
+#' install_eplus(8.8)
+#' }
+#' @author Hongyuan Jia
+#' @export
 # install_eplus {{{
-install_eplus <- function (ver = "latest", force = FALSE, dir = tempdir()) {
+install_eplus <- function (ver = "latest", force = FALSE) {
+    ver <- standardize_ver(ver)
+
     # check if the same version has been installed already
-    if (ver == "latest") ver <- eplus_latest_release()
-    ver_exists <- is_avail_eplus(ver)
-    if (ver_exists) {
-        if (!force) {
-            message(msg(sprintf("It seems EnergyPlus v%s has been already
-                installed at %s. Set 'force' to TRUE to reinstall.",
-                ver, backtick(eplus_config(ver)$dir))))
-            return(invisible())
-        }
-    }
+    if (is_avail_eplus(ver) && !isTRUE(force))
+        stop(paste0("It seems EnergyPlus v", ver, "has been already",
+                "installed at ", backtick(eplus_config(ver)$dir),
+                ". Set `force` to TRUE to reinstall."), call. = FALSE)
 
     message(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
-    dl <- download_eplus(ver = ver, dir = tempdir())
-    exec <- attr(dl, "file")
-    data.table::setattr(exec, "version", ver)
+
+    dl <- download_eplus(ver, tempdir())
 
     message(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
 
     message("NOTE: Administrative privileges required during installation. ",
             "Please make sure R is running with an administrator acount or equivalent.")
 
+    inst <- attr(dl, "file")
     res <- switch(os_type(),
-           windows = install_eplus_win(exec),
-           linux = install_eplus_linux(exec),
-           macos = install_eplus_macos(exec))
+           windows = install_eplus_win(inst),
+           linux = install_eplus_linux(inst),
+           macos = install_eplus_macos(inst))
 
-    if (res != 0L) {
-        stop(sprintf("Failed to install EnergyPlus v%s.", ver), call. = FALSE)
-    }
+    if (res != 0L) stop("Failed to install EnergyPlus v", ver, ".", call. = FALSE)
 
     path <- eplus_default_path(ver)
     message(sprintf("EnergyPlus v%s successfully installed into %s.", ver, path))
@@ -77,213 +85,88 @@ install_eplus <- function (ver = "latest", force = FALSE, dir = tempdir()) {
     # add newly installed EnergyPlus to dictionary
     use_eplus(ver)
 
-    return(invisible(res))
+    res <- 0L
+    attr(res, "path") <- path
+    attr(res, "installer") <- inst
+
+    invisible(res)
 }
 # }}}
 
 #' @name install_eplus
 #' @export
 # download_eplus {{{
-download_eplus <- function (ver = "latest", dir = getwd()) {
-    release <- repo_releases(owner = "NREL", repo = "EnergyPlus", ver = ver)
-    ver <- attr(release, "version")
+download_eplus <- function (ver = "latest", dir) {
+    ver <- standardize_ver(ver)
+    url <- eplus_download_url(ver)
 
-    # fix arch type to 64bit for non-windows platform
-    arch_type <- switch(os_type(), windows = os_arch(), "64bit")
-
-    url <- release[core_file == TRUE & ext == os_exe() & arch == arch_type, url]
-
-    dest <- file.path(dir, basename(url))
-
-    # download and install
+    dest <- normalizePath(file.path(dir, file), mustWork = FALSE)
     dl <- download_file(url, dest)
-    if (dl != 0L) {
-        stop(sprintf("Failed to download EnergyPlus v%s.", ver), call. = FALSE)
-    } else {
-        message("EnergyPlus ", paste0("v", ver), " has been downloaded successfully into ",
-        dir, ".")
-    }
-    dl
+
+    if (dl != 0L) stop("Failed to download EnergyPlus v", ver, ".", call. = FALSE)
+
+    message("The installer file of EnergyPlus ", paste0("v", ver), " ",
+        backtick(file), " has been successfully downloaded into ", dir, ".")
+
+    attr(dl, "file") <- dest
+    invisible(dl)
 }
 # }}}
 
-# repo_releases: Get release versions and download URL using GitHub API {{{
-repo_releases <- function (owner, repo, ver = "latest", pre_release = FALSE,
-                           type = c("binary", "source")) {
-    # get query response
-    # {{{
-    rels <- gh::gh("GET /repos/:owner/:repo/releases", repo = repo, owner = owner)
-    if (all(rels == "")) {
-        stop("GitHub repository ", backtick(paste0(owner, "/", repo)),
-                " does not have any release.", call. = FALSE)
-    }
-    # get all tags
-    tags <- vapply(rels, "[[", "", "tag_name")
-    # get all versions
-    vers <- gsub("^v", "", tags)
-    # check if the version is a major.minor format
-    not_patch <- grepl("^\\d+\\.\\d+(\\.0){0,1}$", vers)
-    # get pre-release indicator
-    prerels <- vapply(rels, "[[", logical(1), "prerelease")
-    # get tarball download URL
-    tars <- paste0(vapply(rels, "[[", "", "tarball_url"), ".tar.gz")
-    # get zipball download URL
-    zips <- paste0(vapply(rels, "[[", "", "zipball_url"), ".zip")
-    # combine into a data.table
-    res <- data.table::data.table(tag = tags, version = vers, patch = !not_patch,
-        prerelease = prerels, tarball = tars, zipball = zips)
-    # }}}
+# eplus_download_url: get EnergyPlus installer download URL {{{
+eplus_download_url <- function (ver) {
+    cmt <- eplus_release_commit(ver)
 
-    # get download binary file data
-    # {{{
-    assets <- lapply(rels, "[[", "assets")
-    name <- purrr::modify_depth(assets, 2, "name")
-    url <- purrr::modify_depth(assets, 2, "browser_download_url")
-    # combine into the data.table
-    res[, `:=`(file = name, url = url)]
-    # }}}
+    if (is_empty(cmt))
+        stop("Failed to get installer data for EnergyPlus v", ver, ". ",
+             "All available version are: ",
+             backtick_collapse(all_cmt$version), ".", call. = FALSE)
 
-    # check the version
-    # {{{
-    ver <- as.character(ver)
-    if (ver != "latest") {
-        ver <- standardize_ver(ver)
-        targ <- res[version == as.character(ver)]
-        # check if version is correct
-        if (nrow(targ) == 0L) {
-            msg_ver <- res[, paste0("  Version: ", backtick(version), ifelse(prerelease, " (Pre-release)", ""),
-                                     collapse = "\n")]
-            stop("Could not find ", backtick(paste0(repo, " v", ver)), ". ",
-                 "Possible values are:\n", msg_ver, call. = FALSE)
-        }
-    } else {
-        if (pre_release) targ <- res[1L] else targ <- res[prerelease == FALSE][1L]
-    }
-    # }}}
-
-    type <- match.arg(type)
-    if (type == "binary") {
-        # {{{
-        links <- targ[, lapply(.SD, unlist), .SDcol = c("file", "url")]
-
-        # check if there is no binary releases
-        if (nrow(links) == 0L) {
-            stop(backtick(repo), " ", targ[["tag"]], " does not release any binary file. ",
-                 "Only source code is available.", call. = FALSE)
-        }
-
-        # check if there are other files such as release notes, dependencies on
-        # the release file list
-        repo_lcase <- tolower(repo)
-        links[, `:=`(core_file = FALSE)]
-        links[grepl(repo, file, ignore.case = TRUE), `:=`(core_file = TRUE)]
-
-        # get file extension
-        links[, `:=`(ext = tools::file_ext(file))]
-
-        # guess platform using file extension and file name
-        links[, os := NA_character_]
-        links[ext %in% c("zip", "exe"), os := "windows"]
-        links[ext %in% c("dmg"), os := "macos"]
-        links[ext %in% c("deb", "sh"), os := "linux"]
-        links[is.na(os) & grepl("[-._](win(dows){0,1})[-._]", file, ignore.case = TRUE), os := "windows"]
-        links[is.na(os) & grepl("[-._](darwin|mac(os){0,1}|apple)[-._]", file, ignore.case = TRUE), os := "macos"]
-        links[is.na(os) & grepl("[-._](linux)[-._]", file, ignore.case = TRUE), os := "linux"]
-        links[is.na(os) & grepl("[-._](ubuntu)[-._]", file, ignore.case = TRUE), os := "ubuntu"]
-
-        # guess architecture using file name
-        links[, `:=`(arch = NA_character_)]
-        links[grepl("i386|32bit|x86", file, ignore.case = TRUE), `:=`(arch = "32bit")]
-        links[grepl("x86_64|64bit|x64", file, ignore.case = TRUE), `:=`(arch = "64bit")]
-
-        # if platform specific released core files found, then only return those
-        if (links[core_file == TRUE & !is.na(os), .N] > 0L) {
-            links <- links[os == os_type() | is.na(os)]
-        }
-        # }}}
-    } else {
-        # {{{
-        url <- ifelse(is_windows(), targ[["zipball"]], targ[["tarball"]])
-        links <- data.table::data.table(
-           file = paste0(repo, tools::file_path_sans_ext(basename(url)), "_src",
-                         ".", tools::file_ext(url)),
-           url = url, core_file = TRUE, ext = tools::file_ext(url),
-           os = os_type(), arch = NA_character_)
-        # }}}
-    }
-
-    attr(links, "tag") <- targ[["tag"]]
-    attr(links, "version") <- targ[["version"]]
-    attr(links, "prerelease") <- targ[["prerelease"]]
-
-    return(links)
-}
-# }}}
-# download_file {{{
-download_file <- function (url, dest) {
-    if (file.exists(dest)) unlink(dest)
-    dest_dir <- dirname(dest)
-    if (!dir.exists(dest_dir)) dir.create(dest_dir, recursive = TRUE)
-    res <- utils::download.file(url, dest, mode = "wb")
-    attr(res, "url") <- url
-    attr(res, "file") <- dest
-    return(res)
-}
-# }}}
-# os_type: Return operation system type {{{
-os_type <- function () {
-    if (.Platform$OS.type == 'windows') {
-        "windows"
-    } else if (Sys.info()[['sysname']] == 'Darwin') {
-        "macos"
-    } else if (Sys.info()[['sysname']] == 'Linux') {
-        "linux"
-    } else {
-        "unknown"
-    }
-}
-# }}}
-# os_arch: Return the architecture {{{
-os_arch <- function () {
-    if (identical(Sys.info()[['machine']], "x86-64") ||
+    os <- switch(os_type(), windows = "Windows", macos = "Darwin", linux = "Linux")
+    if (!is_windows() ||
+        identical(Sys.info()[['machine']], "x86-64") ||
         identical(Sys.info()[['machine']], "x86_64")) {
-        c("64bit")
+        arch <- "x86_64"
     } else {
-        c("32bit")
+        arch <- "i386"
     }
+    ext <- switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+
+    base_url <- "https://github.com/NREL/EnergyPlus/releases/download/"
+    file <- sprintf("EnergyPlus-%s-%s-%s-%s.%s", cmt$version, cmt$commit, os, arch, ext)
+    paste0(base_url,"v", cmt$version, "/", file)
 }
 # }}}
-# os_exe: Return the architecture {{{
-os_exe <- function () {
-    switch(os_type(), windows = "exe", macos = "dmg", linux = "sh")
+# eplus_release_commit: return EnergyPlus release commit data {{{
+eplus_release_commit <- function(ver) {
+    ver <- standardize_ver(ver)
+
+    assert_that(is_eplus_ver(ver))
+
+    all_eplus_release_commit()[version == as.character(ver), commit]
 }
 # }}}
-# eplus_latest_release: get the latest release version of EnergyPlus {{{
-eplus_latest_release <- function () {
-    latest <- gh::gh("GET /repos/:owner/:repo/releases/latest", repo = "EnergyPlus", owner = "NREL")
-    ver <- as.numeric_version(gsub("^v", "", latest[["tag_name"]]))
-    message('The latest EnergyPlus version is ', ver)
-    return(ver)
+# download_file: same as download.file except that it creates the target directory if necessary {{{
+download_file <- function (url, dest) {
+    if (file.exists(dest))
+        tryCatch(unlink(dest),
+            warning = function (w) {
+                stop("Failed to delete the existing file ",
+                    backtick(dest), "before downloading.", call. = FALSE)
+            }
+        )
+
+    dest_dir <- dirname(dest)
+
+    if (!dir.exists(dest_dir))
+        tryCatch(dir.create(dest_dir, recursive = TRUE), warning = function(w) stop(w, call. = FALSE))
+
+    utils::download.file(url, dest, mode = "wb")
 }
 # }}}
 # install_eplus_win {{{
 install_eplus_win <- function (exec) {
     system(sprintf("%s /S", exec))
-}
-# }}}
-# install_eplus_macos {{{
-install_eplus_macos <- function (exec) {
-    # change working directory
-    ori_wd <- getwd()
-    on.exit(setwd(ori_wd), add = TRUE)
-
-    exe_dir <- dirname(exec)
-    setwd(exe_dir)
-
-    f <- basename(exec)
-    no_ext <- tools::file_path_sans_ext(f)
-    system(sprintf("sudo hdiutil attach %s", f))
-    system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
 }
 # }}}
 # install_eplus_linux {{{
@@ -296,9 +179,156 @@ install_eplus_linux <- function (exec) {
     setwd(exe_dir)
 
     f <- basename(exec)
-    v <- gsub("\\.", "-", standardize_ver(attr(exec, "version")))
+    v <- gsub("\\.", "-", stringr::str_match(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
     system(sprintf('chmod +x %s', f))
     system(sprintf('echo "y\r" | sudo ./%s', f))
     system(sprintf('sudo chmod -R a+w /usr/local/EnergyPlus-%s', v))
+}
+# }}}
+
+#' Configure which version of EnergyPlus to use
+#'
+#' @param eplus An acceptable EnergyPlus version or an EnergyPlus installation
+#'        path.
+#' @param ver An acceptable EnergyPlus version.
+#'
+#' @details
+#'
+#' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version
+#'     cache in eplusr. That cache will be used to get corresponding
+#'     [`Idd`][idd] object when parsing IDF files and call corresponding
+#'     EnergyPlus to run models.
+#'
+#' `eplus_config()` returns the a list of configure data of specified version of
+#' EnergyPlus. If no data found, an empty list will be returned.
+#'
+#' `avail_eplus()` returns all versions of available EnergyPlus.
+#'
+#' `is_avail_eplus()` checks if the specified version of EnergyPlus is
+#' available or not.
+#'
+#' @return
+#' * For `use_eplus()` and `eplus_config()`, an (invisible for
+#'   `use_eplus()`) list of three contains EnergyPlus version, directory and
+#'   EnergyPlus executable.  version of EnergyPlus;
+#' * For `avail_eplus()`, a character vector;
+#' * For `is_avis_avail_eplus()`, a scalar logical vector.
+#'
+#' @rdname use_eplus
+#' @examples
+#' \dontrun{
+#' # add specific version of EnergyPlus
+#' use_eplus(8.9)
+#' use_eplus("8.8.0")
+#'
+#' # get configure data of specific EnergyPlus version if avaiable
+#' eplus_config(8.6)
+#' }
+#'
+#' # get all versions of avaiable EnergyPlus
+#' avail_eplus()
+#'
+#' # check if specific version of EnergyPlus is available
+#' is_avail_eplus(8.5)
+#' is_avail_eplus(8.8)
+#'
+#' @seealso [download_eplus()] and [install_eplus()] for downloading and
+#' installing EnergyPlus
+#'
+#' @export
+# use_eplus {{{
+use_eplus <- function (eplus) {
+    # if eplus is a version, try to locate it in the default path
+    if (is_eplus_ver(eplus, strict = TRUE)) {
+        ver <- standardize_ver(eplus)
+        eplus_dir <- eplus_default_path(eplus)
+        if (!is_eplus_path(eplus_dir)) {
+            stop("Cannot locate EnergyPlus v", trimws(eplus), " at default ",
+                "installation path ", backtick(eplus_dir), ". Please specify ",
+                "explicitly the path of EnergyPlus installation.", call. = FALSE)
+        }
+    } else if (is_eplus_path(eplus)){
+        ver <- get_ver_from_path(eplus)
+        eplus_dir <- eplus
+    } else {
+        stop("`eplus` should be either a valid EnergyPlus version or an ",
+            "EnergyPlus installation path.", call. = FALSE)
+    }
+
+    exe <- paste0("energyplus", ifelse(is_windows(), ".exe", ""))
+    res <- list(version = ver, dir = eplus_dir, exe = exe)
+
+    ori <- .globals$eplus_config[[as.character(ver)]]
+    .globals$eplus_config[[as.character(ver)]] <- res
+
+    if (is.null(ori)) {
+        message("EnergyPlus v", ver, " located at ", backtick(eplus_dir),
+            " has been added.")
+    } else if (identical(ori$dir, eplus_dir)) {
+        message("Configure data of EnergyPlus v", ver, " located at ",
+            backtick(eplus_dir), " already exists. No Updating performed.")
+    } else {
+        message("Update configure data of EnergyPlus v", ver, ":\n",
+            "    Former location: ", backtick(ori$dir), " ---> ",
+                   "New location: ", backtick(eplus_dir))
+    }
+
+    invisible(res)
+}
+# }}}
+
+#' @rdname use_eplus
+#' @export
+# eplus_config {{{
+eplus_config <- function (ver) {
+    assert_that(is_eplus_ver(ver, strict = TRUE))
+    ver <- standardize_ver(ver)
+    res <- .globals$eplus_config[[as.character(ver)]]
+    if (is.null(res)) {
+        warning("Failed to find configuration data of EnergyPlus v", ver, ".",
+            call. = FALSE)
+        res <- list()
+    }
+
+    res
+}
+# }}}
+
+#' @rdname use_eplus
+#' @export
+# avail_eplus {{{
+avail_eplus <- function () names(.globals$eplus_config)
+# }}}
+
+#' @rdname use_eplus
+#' @export
+# is_avail_eplus {{{
+is_avail_eplus <- function (ver) !is_empty(suppressWarnings(eplus_config(ver)))
+# }}}
+
+# eplus_default_path {{{
+eplus_default_path <- function (ver) {
+    ver <- standardize_ver(ver)
+    assert_that(is_eplus_ver(ver))
+    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
+    if (is_windows()) {
+        d <- paste0("C:/EnergyPlusV", ver_dash)
+    } else if (is_linux()) {
+        d <- paste0("/usr/local/EnergyPlus-", ver_dash)
+    } else {
+        d <- paste0("/Applications/EnergyPlus-", ver_dash)
+    }
+    d
+}
+# }}}
+# get_ver_from_path {{{
+get_ver_from_path <- function (path) {
+    idd_file <- normalizePath(file.exists(path, "Energy+.idd"), mustWork = TRUE)
+
+    h <- readr::read_lines(idd_file, n_max = 1L)
+
+    tryCatch(get_idd_ver(h),
+        error = function (e) stop("Failed to parse EnergyPlus version using IDD ",
+            backtick(idd_file), ".", call. = FALSE))
 }
 # }}}

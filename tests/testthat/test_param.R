@@ -2,8 +2,8 @@ context("Parametric metiods")
 
 test_that("Parametric methods", {
     skip_on_cran()
+    skip_if_not(is_avail_eplus(8.8))
 
-    install_ep88()
     example <- copy_example()
 
     param <- param_job(example$idf, example$epw)
@@ -14,6 +14,7 @@ test_that("Parametric methods", {
 
     expect_is(param$weather(), "Epw")
 
+    # can apply measure
     # set_infil_rate {{{
     set_infil_rate <- function (idf, infil_rate) {
 
@@ -41,9 +42,8 @@ test_that("Parametric methods", {
     expect_equal(unname(vapply(priv$m_param, is_idf, logical(1))), rep(TRUE, times = 5))
 
     dir_nms <- paste0("set_infil_rate_", 1:5)
-
     # can run the simulation
-    expect_output(param$run())
+    expect_output(param$run(dir = NULL))
 
     # can get status of simulation
     res <- replicate(5, list(run_before = TRUE, changed_after = FALSE, terminated = FALSE,

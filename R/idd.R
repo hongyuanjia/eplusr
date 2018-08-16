@@ -17,12 +17,12 @@
 #' eplusr tries to detect all installed EnergyPlus in default installation
 #' locations when loading, i.e. `C:\\EnergyPlusVX-X-0` on Windows,
 #' `/usr/local/EnergyPlus-X-Y-0` on Linux, and
-#' `/Applications/EnergyPlus-X-Y-0` on MacOS and stores all found locations
+#' `/Applications/EnergyPlus-X-Y-0` on macOS and stores all found locations
 #' internally. This data is used to locate the distributed "Energy+.idd" file of
 #' each EnergyPlus version. And also, every time an IDD file is parsed, an `Idd`
 #' object is created and cached in an environment.
 #'
-#' Parsing an IDD file starts from [use_idd()].  When using [use_idd()], eplusr
+#' Parsing an IDD file starts from [use_idd()]. When using [use_idd()], eplusr
 #' will first try to find the cached `Idd` object of that version, if possible.
 #' If failed, and EnergyPlus of that version is available (see [avail_eplus()]),
 #' the `"Energy+.idd"` distributed with EnergyPlus will be parsed and cached. So
@@ -33,7 +33,7 @@
 #' package is used to speed up the whole IDD parsing process and store the
 #' results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 #' eplusr uses a SQL-like structure to store both IDF and IDD data in
-#' `data.frame` format. Every IDD will be parsed and stored in four tables:
+#' `data.frame` format. Every IDD will be parsed and stored in ten tables:
 #'
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
@@ -121,8 +121,37 @@
 #' @importFrom assertthat assert_that
 #' @docType class
 #' @name idd
+#' @examples
+#' # get the Idd object of EnergyPlus v8.8
+#' idd <- use_idd(8.8, download = "auto")
+#'
+#' # version
+#' idd$version()
+#'
+#' # build
+#' idd$build()
+#'
+#' # all group names
+#' str(idd$group_name())
+#'
+#' # all class names
+#' str(idd$class_name())
+#'
+#' # all required class names
+#' str(idd$required_class_name())
+#'
+#' # all unique class names
+#' str(idd$unique_class_name())
+#'
+#' # IddObject of SimulationControl class
+#' idd$SimulationControl
+#' # OR
+#' idd[["SimulationControl"]]
+#'
+#' @seealso [IddObject class][idd_object] which provides detailed information of
+#' curtain class
+#'
 #' @author Hongyuan Jia
-#' @seealso [IddObject class][idd_object]
 #' @references
 #' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor)
 #' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
@@ -288,33 +317,38 @@ read_idd <- function (path) {
 
 #' Use a specific EnergyPlus Input Data Dictionary (IDD) file
 #'
+#' @param idd Either a path, a connection, or literal data (either a single
+#'     string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
+#'     file, usually named as `Energy+.idd`, or a valid version of IDD, e.g.
+#'     8.9, "8.9.0".
+#' @param download If `TRUE` and argument `idd`, the IDD file will be
+#'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
+#'     and saved to [tempdir()]. It will be parsed after it is downloaded
+#'     successfully. A special value of `"auto"` can be given, which will
+#'     automatically download corresponding IDD file if the Idd object is
+#'     currently not available. It is useful in case where you only want to edit an
+#'     EnergyPlus Input Data File (IDF) directly but do not want to install
+#'     whole EnergyPlus software. Default is `FALSE`.
+#' @param ver A valid EnergyPlus version, e.g. 8, 8.7, "8.7" or "8.7.0". For
+#'     `download_idd()`, the special value `"latest"`, which is default, means
+#'     the latest version.
+#' @param dir A directory to indicate where to save the IDD file.
+#'
+#' @details
 #' `use_idd()` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 #' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
 #' class, please see [idd].
 #'
 #' `download_idd()` downloads specified version of EnergyPlus IDD file from
-#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus).
+#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
+#' useful in case where you only want to edit an EnergyPlus Input Data File
+#' (IDF) directly but do not want to install whole EnergyPlus software.
 #'
 #' `avail_idd()` returns versions of all cached `Idd` object.
 #'
 #' `is_avail_idd()` returns `TRUE` if input version of IDD file has been parsed
 #' and cached.
 #'
-#' @param idd A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-#'     named as `Energy+.idd` or a valid version of IDD, e.g. 8.9, "8.9.0".
-#' @param download If `"TRUE"` and argument `idd`, the IDD file will be
-#'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
-#'     and saved to [tempdir()]. It will be parsed after it is downloaded
-#'     successfully. It is useful in case where you only want to edit an
-#'     EnergyPlus Input Data File (IDF) directly but do not want to install
-#'     whole EnergyPlus software.
-#' @param ver A valid EnergyPlus version, e.g., 8.7, "8.7" or "8.7.0". For
-#'     `download_idd`, The special value `"latest"` means the latest version
-#'     (fetched from GitHub releases). Default: `"latest"`.
-#' @param dir A directory to indicate where to save the IDD file. Default:
-#'     current working directory.
-#'
-#' @details
 #' eplusr tries to detect all installed EnergyPlus in default installation
 #' locations when loading. If argument `idd` is a version, eplusr will first try
 #' to find the cached `Idd` object of that version, if possible. If failed, and
@@ -322,135 +356,154 @@ read_idd <- function (path) {
 #' `"Energy+.idd"` distributed with EnergyPlus will be parsed and stored in
 #' eplusr Idd cache.
 #'
-#' `download_idd()` downloads EnergyPlus Input Data Dictionary (IDD) file from
-#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
-#' useful in case where you only want to edit an EnergyPlus Input Data File
-#' (IDF) directly but do not want to install whole EnergyPlus software.
-#'
 #' @importFrom assertthat assert_that
-#' @return `use_idd` returns an `Idd` object; `download_idd` returns the full
-#'     path of the downloaded IDD file; `avail_idd` returns a character vector;
-#'     `is_avail_idd` returns a single logical vector.
-#' @export
-#' @seealso [Idd Class][idd]
+#' @return
+#' * `use_idd()` returns an `Idd` object
+#' * `download_idd()` returns an invisible integer `0` if succeed. Also an
+#'   attribute named `file` which is the full path of the downloaded IDD file;
+#' * `avail_idd()` returns a character vector or `NULL` if no available Idd object
+#'   found
+#' * `is_avail_idd()` returns a single logical vector.
+#'
 #' @examples
 #' \dontrun{
+#' # get all available Idd version
+#' avail_idd()
 #'
+#' # check if specific version of Idd is available
+#' is_avail_idd(8.5)
+#'
+#' # download latest IDD file from EnergyPlus GitHub repo
+#' download_idd("latest", tempdir())
+#'
+#' # use specific version of Idd
+#' # only works if EnergyPlus v8.8 has been found or Idd v8.8 exists
 #' use_idd(8.8)
 #'
-#' download_idd()
-#' download_idd(8.8)
+#' # If Idd object is currently not avail_idd, automatically download IDD file
+#' # from EnergyPlus GitHub repo and parse it
+#' use_idd(8.8, download = "auto")
 #'
+#' # now Idd v8.8 should be available
 #' is_avail_idd(8.8)
+#'
+#' # get specific version of parsed Idd object
+#' use_idd(8.8)
+#'
+#' avail_idd() # should contain "8.8.0"
 #' }
+#' @aliases Idd
+#' @seealso [Idd Class][idd] for parsing, querying and making modifications to
+#' EnergyPlus IDD file
+#'
+#' @export
+#' @author Hongyuan Jia
 # use_idd {{{
 use_idd <- function (idd, download = FALSE) {
-    assert_that(is_scalar(idd))
-
-    if (is_eplus_ver(idd)) {
+    if (is_idd_ver(idd, strict = TRUE)) {
         ver <- standardize_ver(idd)
 
-        # download Energy+.idd from EnergyPlus repo
-        if (download) {
-
-            message("Try to download Idd v", ver, " from EnergyPlus GitHub Repository...")
-
-            path_idd <- download_idd(ver, dir = tempdir())
+        if (isTRUE(download)) {
+            dl <- download_idd(ver, dir = tempdir())
+            idd <- attr(dl, "file")
 
         } else {
 
             # if found in cache, return it directly
-            if (is_parsed_idd_ver(ver)) return(.globals$idd[[as.character(ver)]])
+            if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
 
             message("Idd v", ver, " has not been parsed before. Try to locate ",
-                "`Energy+.idd` in EnergyPlus installation folder.")
+                "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
+                backtick(eplus_default_path(ver)), ".")
 
-            # stop if corresponding version of EnergyPlus is not found
-            if (!is_avail_eplus(ver))
-                stop("Failed to locate `Energy+.idd` because EnergyPlus v",
-                    ver, " is not available.", call. = FALSE)
+            if (!is_avail_eplus(ver)) {
 
-            config <- eplus_config(ver)
-            path_idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
+                msg_f <- paste0("Failed to locate `Energy+.idd` because EnergyPlus v",
+                    ver, " is not available. ")
 
-            # stop if "Energy+.idd" file is not found in EnergyPlus location
-            if (!file.exists(path_idd))
-                stop("`Energy+.idd` file does not exist in EnergyPlus v",
-                    config$version, " installation folder ",
-                    backtick(config$dir), ".", call. = FALSE)
+                if (!identical(download, "auto")) {
+                    stop(msg_f, "You may want to set `download` to TRUE or ",
+                        "\"auto\" to download the IDD file from EnregyPlus ",
+                        "GitHub repo.", call. = FALSE)
+                }
+
+                message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+
+                dl <- download_idd(ver, dir = tempdir())
+                idd <- attr(dl, "file")
+
+            } else {
+                config <- eplus_config(ver)
+                idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
+
+                if (!file.exists(idd)) {
+                    msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
+                        config$version, " installation folder ", backtick(config$dir), ". ")
+
+                    if (!identical(download, "auto")) {
+                        stop(msg_f, "You may want to set `download` to TRUE or ",
+                            "\"auto\" to download the IDD file from EnregyPlus ",
+                            "GitHub repo.", call. = FALSE)
+                    }
+
+                    message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+
+                    dl <- download_idd(ver, dir = tempdir())
+                    idd <- attr(dl, "file")
+                }
+            }
         }
 
-        message("IDD file found: ", backtick(path_idd), ".\nStart parsing...")
-
-        # read IDD file and store in cache
-        res <- read_idd(path_idd)
-
-    } else {
-
-        message("Start parsing...")
-
-        res <- read_idd(idd)
+        message("IDD file found: ", backtick(idd), ".")
     }
 
-    res
+    message("Start parsing...")
+    read_idd(idd)
 }
 # }}}
 
 #' @rdname use_idd
 #' @export
 # download_idd {{{
-download_idd <- function (ver = "latest", dir = getwd()) {
-    latest <- repo_releases("NREL", "EnergyPlus", "latest")
-    latest_ver <- as.numeric_version(attr(latest, "version"))
+download_idd <- function (ver = "latest", dir) {
+    ver <- standardize_ver(ver)
+    assert_that(is_idd_ver(ver))
 
-    rels <- gh::gh("GET /repos/:owner/:repo/contents/:path", repo = "EnergyPlus",
-        owner = "NREL", path = "idd", ref = paste0("v", latest_ver))
+    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_eplus_ver(), "/idd/")
 
-    if (as.character(ver) == "latest") ver <- latest_ver
-    assert_that(is_eplus_ver(ver))
-    ver <- standardize_ver(as.character(ver))
+    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
 
-    file_nm <- purrr::map_chr(rels, "name")
-    file_lnk <- purrr::map_chr(rels, "download_url")
-    names(file_lnk) <- file_nm
-
-    if (ver == latest_ver) {
-        lnk <- file_lnk["Energy+.idd.in"]
+    if (identical(ver, latest_eplus_ver())) {
+        file_url <- "Energy%2B.idd.in"
     } else {
-        all_ver_dash <- stringr::str_extract(file_nm, "(?<=V)(\\d-\\d-\\d)(?=-Energy\\+.idd)")
-        all_ver <- as.numeric_version(all_ver_dash[!is.na(all_ver_dash)])
-        all_valid_ver <- all_ver[all_ver >= 7.0]
-
-        if (!ver %in% all_valid_ver)
-            stop("Invalid IDD version found: ", ver, ". All possible versions are ",
-                paste0(paste0("  * ", all_valid_ver), collapse = "\n"), call. = FALSE)
-
-        ver_dash <- paste0("V", ver[,1], "-", ver[,2], "-", ver[,3], "-Energy+.idd")
-        lnk <- file_lnk[ver_dash]
+        file_url <- paste0("V", ver_dash, "-Energy%2B.idd")
     }
 
-    name <- sub("%2B", "+", basename(lnk))
-    dest <- normalizePath(file.path(dir, name), mustWork = FALSE)
-    res <- download_file(lnk, dest)
+    url <- paste0(base_url, file_url)
+
+    file <- paste0("V", ver_dash, "-Energy+.idd")
+    dest <- normalizePath(file.path(dir, file), mustWork = FALSE)
+    res <- download_file(url, dest)
 
     if (res != 0L)
         stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
 
-    if (ver == latest_ver) {
-        build <- latest[1L, stringr::str_extract(file, "(?<=EnergyPlus-\\d\\.\\d\\.\\d-).{10}(?=-)")]
+    if (identical(ver, latest_eplus_ver())) {
+        cmt <- all_eplus_release_commit()$commit[1]
 
         l <- readr::read_lines(dest)
 
         l[1] <- paste0("!IDD_Version ", ver)
-        l[2] <- paste0("!IDD_BUILD ", build)
+        l[2] <- paste0("!IDD_BUILD ", cmt)
 
-        readr::write_lines(l, dest)
+        write_lines_eol(l, dest)
     }
 
-    message("EnergyPlus IDD file ", paste0("v", ver), " has been downloaded ",
-        "successfully into ", dir, ".")
+    message("EnergyPlus v", ver, " IDD file ", backtick(file), " has been successfully ",
+        "downloaded into ", normalizePath(dir), ".")
 
-    dest
+    attr(res, "file") <- dest
+    invisible(res)
 }
 # }}}
 
@@ -464,8 +517,7 @@ avail_idd <- function () names(.globals$idd)
 #' @export
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
-    assert_that(is_eplus_ver(ver))
-    ver <- as.character(standardize_ver(ver))
-    ver %in% names(.globals$idd)
+    assert_that(is_idd_ver(ver, strict = TRUE, only_released = FALSE))
+    as.character(standardize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}

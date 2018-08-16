@@ -1,0 +1,11 @@
+test_that("list checking", {
+    expect_true(is_normal_list(list(1, 2)))
+    expect_true(is_normal_list(list(1, NA)))
+    expect_true(is_normal_list(list(1, list(NULL))))
+    expect_false(is_normal_list(list(character(0))))
+    expect_false(is_normal_list(list(NULL)))
+    expect_false(is_normal_list(list(1, NULL)))
+    expect_false(is_normal_list(list(1, character(0))))
+    expect_false(is_normal_list(list(1, list())))
+    expect_false(is_normal_list(list(1, list(1))))
+})

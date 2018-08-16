@@ -3,16 +3,23 @@
 \docType{class}
 \name{param}
 \alias{param}
+\alias{ParametricJob}
 \title{Create and Run Parametric Analysis, and Collect Results}
 \description{
 \code{ParametricJob} class provides a prototype of conducting parametric analysis
 of EnergyPlus simulations.
 }
 \details{
-Basically, it is a collection of multiple \code{EplusJob} objects.
+Basically, it is a collection of multiple \code{EplusJob} objects. However, the
+model is first parsed and the Idf object is stored internally, instead of
+storing only the path of Idf in \code{\link[=job]{EplusJob}} class. Also, an object
+in \code{Output:SQLite} with \code{Option Type} value of \code{SimpleAndTabular} will be
+automatically created if it does not exists like \code{\link[=idf]{Idf}} class.
 }
 \section{Usage}{
 \preformatted{param <- param_job(idf, epw)
+param$seed()
+param$weater()
 param$apply_measure(measure, ..., .names = NULL)
 param$run(dir = NULL, parallel_backend = future::multiprocess)
 param$kill(which = NULL)
@@ -33,7 +40,7 @@ param$print()
 
 \strong{Arguments}
 \itemize{
-\item \code{idf}: Path to EnergyPlus IDF or IMF file or an \code{Idf} object.
+\item \code{idf}: Path to EnergyPlus IDF file or an \code{Idf} object.
 \item \code{epw}: Path to EnergyPlus EPW file or an \code{Epw} object.
 }
 }
@@ -94,6 +101,21 @@ parametric simulations.
 All other arguments have the same meanings as in \link[=job]{EplusJob class}.
 }
 
+\examples{
+if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    # create from local files
+    param_job(idf_path, epw_path)
+
+    # create from an Idf and an Epw object
+    param_job(read_idf(idf_path), read_epw(epw_path))
+}
+}
 \author{
 Hongyuan Jia
 }

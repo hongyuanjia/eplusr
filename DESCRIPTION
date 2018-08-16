@@ -8,9 +8,9 @@ Authors@R:
            email = "hongyuanjia@cqu.edu.cn",
            comment = c(ORCID = "0000-0002-0075-8183"))
 Description: A rich toolkit of using the whole building simulation program
-    'EnergyPlus', which enables programmatic navigation, modification of
-    'EnergyPlus' models and makes it less painful to do parametric simulations
-    and analysis.
+    'EnergyPlus'(<https://energyplus.net>), which enables programmatic
+    navigation, modification of 'EnergyPlus' models and makes it less painful to
+    do parametric simulations and analysis.
 License: GPL-3
 URL: https://hongyuanjia.github.io/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
@@ -41,6 +41,7 @@ Suggests:
     pkgdown
 Encoding: UTF-8
 LazyData: true
+SystemRequirements: EnergyPlus (<https://energyplus.net>)
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 6.1.0
 Collate:

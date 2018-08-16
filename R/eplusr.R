@@ -11,6 +11,7 @@
 #' * Query on models, including classes, objects and fields
 #' * Directly add, modify, duplicate, and delete objects of IDF in R.
 #' * Automatically change referred fields when modifying objects.
+#' * Check any possible errors whenever modifications are made.
 #' * Save the changed models into standard formats in the same way as IDFEditor
 #'   distributed along with EnergyPlus.
 #' * Run your models directly and collect the simulation output of EnergyPlus
@@ -18,6 +19,7 @@
 #' * Run parametric analysis in parallel and collect results in one go.
 #'
 #' @name eplusr-package
+#' @author Hongyuan Jia
 "_PACKAGE"
 
 # package level global constant
@@ -41,7 +43,8 @@
 #'
 #' @param ... Any options can be defined, using `name = value`. All available
 #'     options are below. If no options are given, then all values of current
-#'     options are returned.
+#'     options are returned. If a single option name, then its value is
+#'     returned.
 #'
 #' @details
 #' * `num_digits`: Integer indicating the number of decimal places for numeric
@@ -54,11 +57,12 @@
 #'     modification and model error checking. Possible value: `"none"`,
 #'     `"draft"` and `"final"`. Default: `"final"`. Detailed description:
 #'   - For `"none"`, none validation will be done;
-#'   - For `"draft"`, checking of invalid autosize, autocalculate, numeric,
-#'     integer, and choice field values will be done;
-#'   - For `"final"`, besides above, checking of missing required objects,
-#'     duplicated unique objects, object name conflicts, missing required fields
-#'     and invalid field value reference will also be done.
+#'   - For `"draft"`, checking of invalid autosize, autocalculate, character,
+#'     numeric, integer, and choice field values will be done;
+#'   - For `"final"`, besides above, checking of incomplete extensible groups,
+#'     missing required objects, duplicated unique objects, object name
+#'     conflicts, missing required fields and invalid field value reference will
+#'     also be done.
 #'
 #' * `verbose_info`: Whether to show information messages. Default: `TRUE`.
 #'
@@ -72,7 +76,19 @@
 #'
 #' * `num_parallel`: Maximum number of parallel simulations to run. Default:
 #'     `parallel::detectCores()`.
+#' @return If called directly, a named list of input option values. If input is
+#'     a single option name, a length-one vector whose type is determined by
+#'     that option. If input is new option values, a named list of newly set
+#'     option values.
+#' @examples
+#' # list all current options
+#' eplusr_option() # a named list
 #'
+#' # get a specific option value
+#' eplusr_option("verbose_info")
+#'
+#' # set options
+#' eplusr_option(verbose_info = TRUE, view_in_ip = FALSE)
 #' @export
 # eplusr_option {{{
 eplusr_option <- function (...) {
@@ -150,3 +166,4 @@ eplusr_option <- function (...) {
     as.list.environment(.options)[nm]
 }
 # }}}
+#' @author Hongyuan Jia

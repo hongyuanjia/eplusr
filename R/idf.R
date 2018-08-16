@@ -48,7 +48,7 @@
 #' model$object_num(class = NULL)
 #' model$is_valid_id(id)
 #' model$is_valid_name(name)
-#' model$object(id)
+#' model$object(which)
 #' model$object_in_class(class)
 #' model$search_object(pattern, class = NULL)
 #' model$ClassName
@@ -66,7 +66,7 @@
 #' model$is_unsaved()
 #' model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 #' model$clone()
-#' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
+#' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$print(plain = FALSE)
 #' print(model)
 #' }
@@ -144,10 +144,13 @@
 #'
 #' * `id`: An integer vector to check.
 #' * `name`: A character vector to check.
-#' * `class`: A character vector contains valid class names.
-#' * `simplify`: If FALSE, a list with each member being the data per class will
-#'     be returned. Otherwise, an integer vector (for `$object_id`) or a
-#'     character vector (for `$object_name`) will be returned.
+#' * `class`: A character vector that contains valid class names.
+#' * `simplify`: If `FALSE`, a list with each member being the data per class
+#'     will be returned. The order of classes are the same as it in Idd. If
+#'     `TRUE`, an integer vector (for `$object_id()`) or a character vector (for
+#'     `$object_name`()) will be returned. The order of returned object IDs or
+#'     names will be the same order as objects in the IDF file.  Default:
+#'     `FALSE`.
 #'
 #' @section Object Query:
 #'
@@ -159,19 +162,24 @@
 #' model[[ClassName]]
 #' }
 #'
-#' `$object()` will return a list of `IdfObject`s specified by object IDs or
-#'     names.
+#' `$object()` will return a named list of `IdfObject`s specified by object IDs
+#'     or names.
 #'
-#' `$object_in_class()` will return a list of all `IdfObject`s in specified
+#' `$object_in_class()` will return a named list of all `IdfObject`s in specified
 #'     classes.
 #'
-#' `$search_object()` will return a list of `IdfObject`s whose names meet the
+#' `$search_object()` will return a named list of `IdfObject`s whose names meet the
 #'     given pattern in specified classes.
 #'
+#' The names of returned list by `$object()`, `$object_in_class()` and
+#'     `$search_object()` are the returned object names, except that all names
+#'     are converted into valid R names, i.e.  all other characters except
+#'     letters and numbers are replaced by underscore `_`.
+#'
 #' eplusr also provides custom S3 method of `$` and \code{[[} to make it more
-#' convenient to get `IdfObject`s in class. Basically, `model$ClassName` and
-#' \code{model[[ClassName]]}, where `ClassName` is a single valid class name, is
-#' equivalent to `model$object_in_class(ClassName)`.
+#'     convenient to get `IdfObject`s in class. Basically, `model$ClassName` and
+#'     \code{model[[ClassName]]}, where `ClassName` is a single valid class
+#'     name, is equivalent to `model$object_in_class(ClassName)`.
 #'
 #' All above methods will return a named list of `IdfObject`s. If the class does
 #'     not have name attribute, then `NA` will be used.
@@ -259,17 +267,75 @@
 #' `$is_valid()` will check if there are no errors in current model under different
 #'     strictness level.
 #'
-#'
 #' The strictness level can be changed using [eplusr_option()]. Default is
 #'     `"final". `There are three different validate levels, i.e. `"none"`,
 #'     `"draft"` and `"final"`:
 #'
 #'   * For `"none"`, none validation will be done;
-#'   * For `"draft"`, checking of invalid autosize, autocalculate, numeric,
-#'     integer, and choice field values will be done;
-#'   * For `"final"`, besides above, checking of missing required objects,
-#'     duplicated unique objects, object name conflicts, missing required fields
-#'     and invalid field value reference will also be done.
+#'   * For `"draft"`, checking of invalid autosize, autocalculate, character,
+#'     numeric, integer, and choice field values will be done;
+#'   * For `"final"`, besides above, checking of incomplete extensible groups,
+#'     missing required objects, duplicated unique objects, object name
+#'     conflicts, missing required fields and invalid field value reference will
+#'     also be done.
+#'
+#'  Underlying, `$validate()` returned a list of thirteen components. Except
+#'      `missing_object`, which is a character vector, all other components are
+#'      [data.tables][data.table::data.table()]s. The contents of each component
+#'      are described blow:
+#'
+#'    * `missing_object`: A character vector that contains names of classes
+#'      which are required but currently none object exists.
+#'    * `duplicate_object`: A data.table that contains data of all objects in
+#'      unique class which should only have one object but currently multiple
+#'      objects exist.
+#'    * `conflict_name`: A data.table that contains data of all objects
+#'      that have the same name in the same class.
+#'    * `incomplete_extensible`: A data.table that contains data of all object
+#'      fields that are extensible but with empty value.
+#'    * `missing_value`: A data.table that contains data of all object fields
+#'      that are required but have empty value.
+#'    * `invalid_autosize`: A data.table that contains data of all object
+#'      fields which should not be "Autosize".
+#'    * `autocalculate`: A data.table that contains data of object fields
+#'       which should not be "Autocalculate".
+#'    * `invalid_character`: A data.table that contains data of all object
+#'      fields which should be character type, but currently are not.
+#'    * `invalid_numeric`: A data.table that contains data of all object fields
+#'       which should be numbers, but currently are not.
+#'    * `invalid_integer`: A data.table that contains data of all object fields
+#'      which should be integers, but currently are not.
+#'    * `invalid_choice`: A data.table that contains data of all object fields
+#'      whose values are not one of prescribed choices.
+#'    * `invalid_range`: A data.table that contains data of all object fields
+#'      whose values exceed prescribed ranges.
+#'    * `invalid_reference`: A data.table that contains data of all object
+#'      fields whose values are not one of available reference values.
+#'
+#'  All data.tables above contains thirteen columns:
+#'
+#'    * `object_id`: IDs of objects that contain invalid fields
+#'    * `class_id`: indexes of classes that invalid objects belong to
+#'    * `class_name`: names of classes that invalid objects belong to
+#'    * `field_index`: indexes of object fields that are invalid
+#'    * `field_name`: names (without units) of object fields that are invalid
+#'    * `full_name`: names (with SI units) of object fields that are invalid
+#'    * `full_ipname`: names (with IP units) of object fields that are invalid
+#'    * `type`: types of object fields that are invalid
+#'    * `value_id`: indexes of object field values that are invalid
+#'    * `value`: values (converted to characters) of object field that are invalid
+#'    * `value_upper`: values (converted to upper-case characters) of object
+#'       field that are invalid
+#'    * `value_num`: values (converted to numbers in SI units) of object field
+#'       that are invalid
+#'    * `value_ipnum`: values (converted to numbers in IP units) of object field
+#'       that are invalid
+#'
+#'  Knowing the internal structure of returned data from `$validate()`, it is
+#'      easy to extract data of invalid objects you interested in. For example,
+#'      you can get all IDs of objects that contains invalid value references
+#'      using `$validate()$invalid_reference$object_id`. Then using
+#'      `$set_object()` to correct them.
 #'
 #' @section Format Output:
 #'
@@ -311,7 +377,8 @@
 #' * `overwrite`: Whether to overwrite the file if it already exists. Default is
 #'     `FALSE`.
 #' * `copy_external`: If `TRUE`, the external files will also be copied into the
-#'     same directory. Currently, only `Schedule:File` class is supported.
+#'     same directory. The values of file paths in the Idf will be changed
+#'     automatically. Currently, only `Schedule:File` class is supported.
 #'     Default is `FALSE`.
 #'
 #' @section Clone:
@@ -333,7 +400,7 @@
 #' @section Run Model:
 #'
 #' ```
-#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' ```
 #'
 #' `$run()` will run the current model within specified weather using
@@ -343,7 +410,7 @@
 #'     simulation results. Please see [eplus_job()] for more detailed.
 #'
 #' eplusr uses the EnergyPlus command line interface which was introduced since
-#'     EnergyPlus 8.3.0. So `$run` only supports models with version higher
+#'     EnergyPlus 8.3.0. So `$run()` only supports models with version higher
 #'     than 8.3.0.
 #'
 #' eplusr uses the EnergyPlus SQL output for extracting simulation results. In
@@ -353,12 +420,17 @@
 #' **Arguments**
 #'
 #' * `weather`: A path to an `.epw` file or an `Epw` object.
-#' * `dir`: The directory to save the simulation results. If `NULL`, which is
-#'     the default, the model folder will be used.
+#' * `dir`: The directory to save the simulation results. If `NULL`, the model
+#'   folder will be used.
 #' * `echo`: Whether to print the standard output and error of EnergyPlus to
 #'           the screen. Default is `FALSE`.
 #' * `force`: Whether to stop the background EnergyPlus process and start the
 #'     simulation again.
+#' * `copy_external`: If `TRUE`, the external files will also be copied into the
+#'     simulation output directory. The values of file paths in the Idf will be
+#'     changed automatically. Currently, only `Schedule:File` class is supported.
+#'     This ensures that the output directory will have all files needed for the
+#'     model to run. Default is `FALSE`.
 #'
 #' @section Print:
 #' ```
@@ -371,68 +443,343 @@
 #'
 #' **Arguments**
 #'
-#' * `plain`: If `TRUE`, the model will be printed in plain text format.
+#' * `plain`: If `TRUE`, the model will be printed in plain text format with
+#'     newly added and modified objects at the bottom.
 #'
 #' @docType class
 #' @name idf
+#' @examples
+#' # ===== CREATE =====
+#' # read an IDF file
+#' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+#'     idd = use_idd(8.8, download = "auto"))
+#'
+#' # ===== MODEL BASIC INFO =====
+#' # get version
+#' idf$version()
+#'
+#' # get path
+#' idf$path()
+#'
+#' # get names of all groups in current model
+#' str(idf$group_name())
+#'
+#' # get names of all defined groups in the IDD
+#' str(idf$group_name(all = TRUE))
+#'
+#' # get names of all classes in current model
+#' str(idf$class_name())
+#'
+#' # get names of all defined classes in the IDD
+#' str(idf$class_name(all = TRUE))
+#'
+#' # check if input is a valid group name in current model
+#' idf$is_valid_group("Schedules")
+#'
+#' idf$is_valid_group("Compliance Objects")
+#'
+#' # check if input is a valid group name in IDD
+#' idf$is_valid_group("Compliance Objects", all = TRUE)
+#'
+#' # check if input is a valid class name in current model
+#' idf$is_valid_class("Building")
+#'
+#' idf$is_valid_class("ShadowCalculation")
+#'
+#' # check if input is a valid class name in IDD
+#' idf$is_valid_class("ShadowCalculation", all = TRUE)
+#'
+#' # ===== OBJECT DEFINITION (IDDOBJECT) =====
+#' # get the a list of underlying IddObjects
+#' idf$definition("Version")
+#'
+#' # ===== OBJECT INFO =====
+#' # get IDs of objects in classes
+#' idf$object_id(c("Version", "Zone"))
+#'
+#' # when `simplify` is TRUE, an integer vector will be returned instead of a
+#' # named list
+#' idf$object_id(c("Version", "Zone"), simplify = TRUE)
+#'
+#' # get names of objects in classes
+#' # NA will be returned if targeted class does not have a name attribute
+#' idf$object_name(c("Building", "Zone", "Version"))
+#'
+#' # if `simplify` is TRUE, a character vector will be returned instead of a
+#' # named list
+#' idf$object_name(c("Building", "Zone", "Version"), simplify = TRUE)
+#'
+#' # get number of objects in classes
+#' idf$object_num(c("Zone", "Schedule:Compact"))
+#'
+#' # check if input is a valid object ID, i.e. there is an object whose ID is
+#' # the same with input integer
+#' idf$is_valid_id(c(51, 1000))
+#'
+#' # check if input is a valid object name, i.e., there is an object whose name is
+#' # the same with input string
+#' idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE"))
+#'
+#' # ===== OBJECT QUERY =====
+#' # get objects using object IDs or names
+#' idf$object(c(3,10))
+#' # NOTE: object name matching is case-insensitive
+#' idf$object(c("Simple One Zone (Wireframe DXF)", "zone one"))
+#'
+#' # the names of returned list are "underscore-style" object names
+#' names(idf$object(c("Simple One Zone (Wireframe DXF)", "zone one")))
+#'
+#' # get all objects in classes in a named list
+#' idf$object_in_class("Zone")
+#' names(idf$object_in_class("Zone"))
+#'
+#' # OR using shortcuts
+#' idf$Zone
+#' idf[["Zone"]]
+#'
+#' # search objects using regular expression
+#' length(idf$search_object("R13"))
+#'
+#' names(idf$search_object("R13"))
+#'
+#' # search objects using regular expression in specifc class
+#' length(idf$search_object("R13", class = "Construction"))
+#'
+#' # get more controls on matching using `stringr::regex()`
+#' names(idf$search_object(stringr::regex("zn.*1.*wall", ignore_case = TRUE)))
+#'
+#' # ===== DUPLICATE OBJECTS =====
+#' # duplicate objects in "Construction" class
+#' names(idf$Construction)
+#'
+#' idf$dup_object("R13WALL")
+#' # new objects will have the same names as the duplicated objects but with a
+#' # suffix "_1", "_2" and etc.
+#' names(idf$Construction)
+#'
+#' # new names can also be explicitly specified
+#' idf$dup_object("R13WALL", new_name = "My-R13Wall")
+#'
+#' # duplicate an object multiple times
+#' idf$dup_object(rep("R13WALL", time = 10))
+#'
+#' # ===== ADD OBJECTS =====
+#' # add two new objects in "RunPeriod" class
+#' idf$add_object(rep("RunPeriod", 2),
+#'     value = list(
+#'         list("rp_test_1", 1, 1, 2, 1),
+#'
+#'         list(name = "rp_test_2",
+#'             begin_month = 3,
+#'             begin_day_of_month = 1,
+#'             end_month = 4,
+#'             end_day_of_month = 1)
+#'     ),
+#'     comment = list(
+#'         list("Comment for new object 1", "Another comment"),
+#'         list("Comment for new object 2")),
+#'     default = TRUE
+#' )
+#'
+#' # ===== INSERT OBJECTS =====
+#' # insert objects from other Idf object
+#' idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+#'     idd = use_idd(8.8, download = "auto"))
+#'
+#' idf_1$object_name("Material")
+#'
+#' # rename material name from "C5 - 4 IN HW CONCRETE" to "test", otherwise
+#' # insertion will be aborted as there will be two materials with the same name
+#' # in the idf
+#' idf_1$Material$C5_4_IN_HW_CONCRETE$set_value(name = "test")
+#'
+#' # insert the object
+#' idf$ins_object(idf_1$Material$test)
+#'
+#' # check if material named "test" is there
+#' idf$object_name("Material")
+#'
+#' # $ins_object() is useful when importing design days from a ".ddy" file
+#' \dontrun{idf$ins_object(read_idf("foo.ddy"))}
+#'
+#' # ===== SET OBJECTS =====
+#' # set the thickness of newly inserted material "test" to 0.2 m
+#' idf$set_object("test", value = list(thickness = 0.2))
+#' idf$Material$test$Thickness
+#'
+#' # set thermal absorptance of all material to 0.85
+#' id_mat <- idf$object_id("Material", simplify = TRUE)
+#' idf$set_object(id_mat,
+#'     value = rep(
+#'         list(list(thermal_absorptance = 0.85)),
+#'         times = length(id_mat)
+#'     )
+#' )
+#'
+#' # check results
+#' lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
+#'
+#' # reset thermal absorptance of all material to the default
+#' idf$set_object(id_mat,
+#'     value = rep(
+#'         list(list(thermal_absorptance = NA)),
+#'         times = length(id_mat)
+#'     ),
+#'     default = TRUE
+#' )
+#' # check results
+#' lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
+#'
+#' # ===== DELELTE OBJECTS =====
+#' # delete the added run period "rp_test_1", "rp_test_2" and "test" from above
+#' idf$del_object(c("test", "rp_test_1", "rp_test_2"))
+#' names(idf$Material)
+#' # [1] "C5_4_IN_HW_CONCRETE"
+#' names(idf$RunPeriod)
+#' # [1] NA
+#'
+#' # In "final" validate level, delete will be aborted if the target obejcts are
+#' # referenced by other objects.
+#' # get objects that referenced material "R13LAYER"
+#' eplusr_option("validate_level")
+#'
+#' idf$Material_NoMass$R13LAYER$ref_by_object()
+#' length(idf$Material_NoMass$R13LAYER$ref_by_object())
+#'
+#' \dontrun{idf$del_object("R13LAYER")} # will give an error in "final" validate level
+#' # objects referencing target objects can also be delted by setting `referenced`
+#' # to TRUE
+#' \dontrun{idf$del_object("R13LAYER", referenced = TRUE)} # will give an error in "final" validate level
+#'
+#' # ===== SEARCH ADN REPLACE OBJECT VALUES =====
+#' # get objects whose field values contains both "VAV" and "Node"
+#' idf$search_value("WALL")
+#' length(idf$search_value("WALL"))
+#' names(idf$search_value("WALL"))
+#'
+#' # replace values using regular expression
+#' # NOTE: No field validation will be performed! Should be treated as a low-level
+#' # method. Use with caution.
+#' idf$replace_value("WALL", "A_WALL")
+#'
+#' # ===== VALIDATE MODEL =====
+#' # check if there are errors in current model
+#' idf$validate()
+#' idf$is_valid()
+#'
+#' # change validate level to "none", which will enable invalid modifications
+#' eplusr_option(validate_level = "none")
+#'
+#' # change the outside layer of floor to an invalid material
+#' idf$set_object("FLOOR", list(outside_layer = "wrong_layer"))
+#'
+#' # change validate level back to "final" and validate the model again
+#' eplusr_option(validate_level = "final")
+#'
+#' idf$validate()
+#' idf$is_valid()
+#'
+#' # get IDs of all objects that contains invalid reference fields
+#' idf$validate()$invalid_reference$object_id
+#'
+#' # fix the error
+#' idf$set_object(16, list(outside_layer = idf$Material[[1]]$name()))
+#' idf$validate()
+#' idf$is_valid()
+#'
+#' # ===== FORMAT MODEL =====
+#' # get text format of the model
+#' str(idf$string())
+#'
+#' # get text format of the model, excluding the header and all comments
+#' str(idf$string(comment = FALSE, header = FALSE))
+#'
+#' # ===== SAVE MODEL =====
+#' # check if the model has been modified since read or last saved
+#' idf$is_unsaved()
+#'
+#' # save and overwrite current model
+#' \dontrun{idf$save(overwrite = TRUE)}
+#'
+#' # save the model with newly created and modified objects at the top
+#' \dontrun{idf$save(overwrite = TRUE, format = "new_top")}
+#'
+#' # save the model to a new file
+#' idf$save(path = file.path(tempdir(), "test.idf"))
+#'
+#' # save the model to a new file and copy all external csv files used in
+#' # "Schedule:File" class into the same folder
+#' idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
+#'
+#' # the path of this model will be changed to the saved path
+#' idf$path()
+#'
+#' # ===== CLONE MODEL =====
+#' # Idf object are modified in place and has reference semantic.
+#' idf_2 <- idf
+#' idf_2$object_name("Building")
+#' idf$object_name("Building")
+#'
+#' # modify idf_2 will also affect idf as well
+#' idf_2$Building[[1]]$set_value(name = "Building_Name_Changed")
+#' idf_2$object_name("Building")
+#' idf$object_name("Building")
+#'
+#' # in order to make a copy of an Idf object, use $clone() method
+#' idf_3 <- idf$clone()
+#' idf_3$Building[[1]]$set_value(name = "Building_Name_Changed_Again")
+#' idf_3$object_name("Building")
+#'
+#' idf$object_name("Building")
+#'
+#' # run the model
+#' \dontrun{
+#' if (is_avail_eplus(8.8)) {
+#'
+#'     # save the model to tempdir()
+#'     idf$save(file.path(tempdir(), "test_run.idf"))
+#'
+#'     # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
+#'     # installation path
+#'     epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
+#'         pattern = "\\.epw$", full.names = TRUE)[1]
+#'     basename(epw)
+#'     # [1] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#'
+#'     # if `dir` is NULL, the directory of IDF file will be used as simulation
+#'     # output directory
+#'     job <- idf$run(epw, dir = NULL)
+#'
+#'     # run simulation in the background
+#'     idf$run(epw, dir = tempdir(), wait = FALSE)
+#'
+#'     # copy all external files into the directory run simulation
+#'     idf$run(epw, dir = tempdir(), copy_external = TRUE)
+#'
+#'     # check for simulation errors
+#'     job$errors()
+#'
+#'     # get simulation status
+#'     job$status()
+#'
+#'     # get output directory
+#'     job$output_dir()
+#'
+#'     # re-run the simulation
+#'     job$run()
+#'
+#'     # get simulation results
+#'     job$report_data()
+#' }
+#' }
+#' # print the text format of model
+#' idf$print(plain = TRUE)
+#' @aliases Idf
 #' @seealso [IdfObject class][idf_object]
 #' @author Hongyuan Jia
 #' @importFrom R6 R6Class
 #' @importFrom uuid UUIDgenerate
 NULL
-
-#' Read an EnergyPlus Input Data File (IDF)
-#'
-#' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an
-#' `Idf` object. For more details on `Idf` object, please see [Idf class][idf].
-#'
-#' @param path A path to an EnergyPlus IDF file or a string that can be parsed as
-#'     an IDF. The file extension does not matter. So models stored in `TXT`
-#'     format are still able to correctly be parsed.
-#' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
-#'     default, the version of IDF will be passed to [use_idd()]. If the input
-#'     IDF does not have a version field (possible for ".ddy" files), then it
-#'     will be parsed using the latest version of IDD cached, with a warning.
-#' @return An `Idf` object.
-#' @seealso [Idf class][idf]
-#' @export
-# read_idf {{{
-read_idf <- function (path, idd = NULL) {
-    # have to clone the generator first in order to leave the original Idf
-    # generator untouched
-    gen <- clone_generator(Idf)
-
-    # get the clone method
-    clone <- gen$clone_method
-
-    # get function body
-    ori_expr <- as.list(body(clone))
-
-    # get the body length
-    len <- length(ori_expr)
-
-    # insert new expressions just at the beginning and also before the return
-    # reference:
-    # https://stackoverflow.com/questions/38732663/how-to-insert-expression-into-the-body-of-a-function-in-r
-    new_expr <- append(ori_expr,
-        as.list(
-            expression(
-                shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
-                for (nm in shared) {
-                    private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
-                }
-            )
-        ), after = len-1)
-    # always use deep clone
-    new_expr <- append(new_expr, as.list(expression(deep <- TRUE)), after = 1L)
-
-    # assign new body
-    body(gen$clone_method) <- as.call(new_expr)
-    body(gen$public_methods$clone) <- as.call(new_expr)
-
-    gen$new(path, idd)
-}
-# }}}
 
 # Idf {{{
 Idf <- R6::R6Class(classname = "Idf",
@@ -527,10 +874,10 @@ Idf <- R6::R6Class(classname = "Idf",
             i_is_unsaved_idf(self, private),
 
         definition = function (class)
-            i_iddobject(self, private, class),
+            i_definition(self, private, class),
 
-        object = function (object)
-            i_idfobject(self, private, object),
+        object = function (which)
+            i_idfobject(self, private, which),
 
         object_in_class = function (class)
             i_idfobject_in_class(self, private, class),
@@ -571,8 +918,8 @@ Idf <- R6::R6Class(classname = "Idf",
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             i_idf_save(self, private, path, format, overwrite, copy_external),
 
-        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
-            i_idf_run(self, private, weather, dir, wait, force),
+        run = function (weather = NULL, dir, wait = TRUE, force = FALSE, copy_external = FALSE)
+            i_idf_run(self, private, weather, dir, wait, force, copy_external = copy_external),
 
         print = function (plain = FALSE)
             i_print_idf(self, private, plain)
@@ -596,6 +943,109 @@ Idf <- R6::R6Class(classname = "Idf",
             i_deep_clone(self, private, name, value)
     )
 )
+# }}}
+
+#' Read an EnergyPlus Input Data File (IDF)
+#'
+#' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an
+#' `Idf` object. For more details on `Idf` object, please see [Idf class][idf].
+#'
+#' @param path Either a path, a connection, or literal data (either a single
+#'     string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
+#'     has a extension `.idf`.
+#' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
+#'     default, the version of IDF will be passed to [use_idd()]. If the input
+#'     IDF does not have a version field (possible for ".ddy" files), then it
+#'     will be parsed using the latest version of IDD cached, with a warning.
+#' @details
+#' Currently, Imf file is not fully supported. All EpMacro lines will be treated
+#' as normal comments of the nearest downwards object. If input is an Imf file,
+#' a warning will be given during parsing. It is recommended to convert the Imf
+#' file to an Idf file and use [`ParametricJob`][param] class to conduct
+#' parametric analysis.
+#'
+#' @return An `Idf` object.
+#' @examples
+#' # example model shipped with eplusr from EnergyPlus v8.8
+#' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+#'
+#' # if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur
+#' is_avail_eplus(8.8)
+#'
+#' is_avail_idd(8.8)
+#'
+#' \dontrun{(read_idf(idf_path))}
+#'
+#' # if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus
+#' # installation folder will be used for pasing
+#' is_avail_eplus(8.8)
+#' is_avail_idd(8.8)
+#'
+#' \dontrun{read_idf(idf_path)}
+#'
+#' # if Idd v8.8 is found, it will be used automatically
+#' is_avail_idd(8.8)
+#'
+#' \dontrun{read_idf(idf_path)}
+#'
+#' # argument `idd` can be specified explicitly using `use_idd()`
+#' \dontrun{read_idf(idf_path, idd = use_idd(8.8))}
+#'
+#' # you can set `download` arugment to "auto" in `use_idd()` if you want to
+#' # automatically download corresponding IDD file when necessary
+#' read_idf(idf_path, use_idd(8.8, download = "auto"))
+#'
+#' # Besides use a path to an IDF file, you can also provide IDF in literal
+#' # string format
+#' idf_string <-
+#'     "
+#'     Version, 8.8;
+#'     Building,
+#'         Building;                !- Name
+#'     "
+#'
+#' read_idf(idf_string, use_idd(8.8, download = "auto"))
+#' @seealso [Idf class][idf] for modifying EnergyPlus model. [use_idd()] and
+#' [download_idd()] for downloading and parsing EnergyPlus IDD file.
+#' [use_eplus()] for configuring which version of EnergyPlus to use.
+#' @export
+#' @author Hongyuan Jia
+# read_idf {{{
+read_idf <- function (path, idd = NULL) {
+    # have to clone the generator first in order to leave the original Idf
+    # generator untouched
+    gen <- clone_generator(Idf)
+
+    # get the clone method
+    clone <- gen$clone_method
+
+    # get function body
+    ori_expr <- as.list(body(clone))
+
+    # get the body length
+    len <- length(ori_expr)
+
+    # insert new expressions just at the beginning and also before the return
+    # reference:
+    # https://stackoverflow.com/questions/38732663/how-to-insert-expression-into-the-body-of-a-function-in-r
+    new_expr <- append(ori_expr,
+        as.list(
+            expression(
+                shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
+                for (nm in shared) {
+                    private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
+                }
+            )
+        ), after = len-1)
+    # always use deep clone
+    new_expr <- append(new_expr, as.list(expression(deep <- TRUE)), after = 1L)
+
+    # assign new body
+    body(gen$clone_method) <- as.call(new_expr)
+    body(gen$public_methods$clone) <- as.call(new_expr)
+
+    gen$new(path, idd)
+}
 # }}}
 
 #' @export

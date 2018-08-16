@@ -1,44 +1,53 @@
 #' @importFrom assertthat assert_that "on_failure<-"
 #' @importFrom tools file_ext
 
+# is_version {{{
+is_version <- function (ver) {
+    !is.na(numeric_version(ver, strict = FALSE))
+}
+# }}}
 # is_eplus_ver {{{
-is_eplus_ver <- function (ver) {
+is_eplus_ver <- function (ver, strict = FALSE) {
     assert_that(is_scalar(ver))
-    if (is.numeric_version(ver)) TRUE
-    ver_fmt <- "^[78]\\.[0-9](\\.[0-9]){0,1}$"
-    if (is_integerish(ver)) ver <- paste0(ver, ".0")
-    grepl(ver_fmt, as.character(ver))
+
+    if (isTRUE(strict) && !is_version(ver)) return(FALSE)
+
+    (identical(ver, "latest") || is_version(ver)) &&
+        as.character(standardize_ver(ver)) %in% all_eplus_ver()
 }
 
 on_failure(is_eplus_ver) <- function (call, env) {
-    paste0(backtick(eval(call$ver, env)), " is not a valid EnergyPlus version (which should be a number or string with format '[78].[0-9]').")
+    paste0(backtick(eval(call$ver, env)), " is not a valid or supported EnergyPlus version. ",
+      "Only EnergyPlus v8.3.0 and after are supported.")
 }
 # }}}
-# is_supported_ver {{{
-is_supported_ver <- function (ver) {
-    if (!is_eplus_ver(ver)) return(FALSE)
-    ver <- as.numeric_version(ver)
-    if (!is.na(ver[, 3L])) {
-        if (ver[, 3L] != 0L) {
-            return(FALSE)
-        } else {
-            ver > 8.0
-        }
-    } else {
-        ver > 8.0
-    }
-}
+# is_idd_ver {{{
+is_idd_ver <- function (ver, strict = FALSE, only_released = TRUE) {
+    assert_that(is_scalar(ver))
 
-on_failure(is_supported_ver) <- function (call, env) {
-    paste0("Currently EnergyPlus v8.1 to v8.9 are supported.")
-}
-# }}}
-# is_parsed_idd_ver {{{
-is_parsed_idd_ver <- function (ver) {
-    as.character(standardize_ver(ver)) %in% names(.globals$idd)
-}
-# }}}
+    if (isTRUE(strict) && !is_version(ver)) return(FALSE)
 
+    is_ver <- identical(ver, "latest") || is_version(ver)
+
+    if (only_released)
+        is_ver && as.character(standardize_ver(ver)) %in% all_idd_ver()
+    else is_ver
+}
+on_failure(is_idd_ver) <- function (call, env) {
+    paste0(eval(call$ver, env), " is not a valid Idd version.")
+}
+# }}}
+# is_eplus_path {{{
+is_eplus_path <- function (path) {
+    assert_that(is_scalar(path))
+    eplus <- paste0("energyplus", ifelse(is_windows(), ".exe", ""))
+    all(dir.exists(path), file.exists(file.path(path, c(eplus, "Energy+.idd"))))
+}
+on_failure(is_eplus_path) <- function (call, env) {
+    paste0(eval(call$path, env), " is not a valid EnergyPlus installation path ",
+      "where `energyplus` executable and `Energy+.idd` should exist.")
+}
+# }}}
 # is_idd {{{
 is_idd <- function (x) inherits(x, "Idd")
 
@@ -67,6 +76,7 @@ on_failure(is_epw) <- function (call, env) {
     paste0(deparse(call$x), " is not an Epw object")
 }
 # }}}
+
 # not_empty {{{
 not_empty <- function (x) {
     all((dim(x) %||% length(x)) != 0)
@@ -163,7 +173,7 @@ has_ext <- function (path, ext) {
 on_failure(has_ext) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    msg("File ", backtick(basename(path)), " does not have extension ", backtick(ext), ".")
+    paste0("File ", backtick(basename(path)), " does not have extension ", backtick(ext), ".")
 }
 # }}}
 # has_exts {{{
@@ -174,7 +184,7 @@ has_exts <- function (path, exts) {
 on_failure(has_exts) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    msg("File ", backtick(basename(path)), " should have one of extensions ", backtick_collapse(ext), ".")
+    paste0("File ", backtick(basename(path)), " should have one of extensions ", backtick_collapse(ext), ".")
 }
 # }}}
 # is_windows {{{
