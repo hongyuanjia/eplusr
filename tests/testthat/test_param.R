@@ -2,7 +2,7 @@ context("Parametric metiods")
 
 test_that("Parametric methods", {
     skip_on_cran()
-    skip_if_not(is_avail_eplus(8.8))
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     example <- copy_example()
 

@@ -2,7 +2,7 @@ context("Job methods")
 
 test_that("Job methods", {
     skip_on_cran()
-    skip_if_not(is_avail_eplus(8.8))
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     example <- copy_example()
 

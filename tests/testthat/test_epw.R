@@ -52,9 +52,9 @@ test_that("Epw class", {
     expect_equal(nrow(epw$get_data()), 8760L)
     # can change year in datetime column
     expect_equal(
-        epw$get_data(year = 2018)$datetime,
-        seq(as.POSIXct("2018-01-01 01:00:00", tz = Sys.timezone()),
-            as.POSIXct("2019-01-01 00:00:00", tz = Sys.timezone()),
+        epw$get_data(year = 2018, tz = "GMT")$datetime,
+        seq(as.POSIXct("2018-01-01 01:00:00", tz = "GMT"),
+            as.POSIXct("2019-01-01 00:00:00", tz = "GMT"),
             by = "1 hour"
         )
     )

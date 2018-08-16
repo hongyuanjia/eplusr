@@ -647,6 +647,7 @@
 #' length(idf$Material_NoMass$R13LAYER$ref_by_object())
 #'
 #' \dontrun{idf$del_object("R13LAYER")} # will give an error in "final" validate level
+#'
 #' # objects referencing target objects can also be delted by setting `referenced`
 #' # to TRUE
 #' \dontrun{idf$del_object("R13LAYER", referenced = TRUE)} # will give an error in "final" validate level

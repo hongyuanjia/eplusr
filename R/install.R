@@ -8,11 +8,11 @@ NULL
 #' Download specified version of EnergyPlus for your platform from GitHub and
 #' install it.
 #'
-#' @param ver The EnergyPlus version number, e.g., \code{8.7}; the special value
-#' \code{"latest"} means the latest version (fetched from GitHub releases).
+#' @param ver The EnergyPlus version number, e.g., `8.7`. The special value
+#'     `"latest"`, which is the default, means the latest version.
 #'
 #' @param force Whether to install EnergyPlus even if it has already been
-#' installed.
+#'     installed.
 #'
 #' @param dir Where to save EnergyPlus installer file. For `install_eplus()`,
 #' the installer will be saved into [tempdir()]
