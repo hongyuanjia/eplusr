@@ -103,6 +103,14 @@ i_class_tbl_from_which <- function (self, private, which = NULL) {
 }
 # }}}
 
+# i_class_memo_from_which {{{
+i_class_memo_from_which <- function (self, private, which) {
+    cls_in <- i_in_tbl_from_which(self, private, "class", which)
+
+    private$m_idd_tbl$class_memo[cls_in, on = "class_id", memo]
+}
+# }}}
+
 # i_class_index {{{
 i_class_index <- function (self, private, name = NULL, type = c("idd", "idf")) {
     type <- match.arg(type)
@@ -490,7 +498,7 @@ i_field_index_from_which <- function (self, private, class, which = NULL, strict
     } else if (is.character(which)) {
         i_field_index(self, private, class, which)
     } else {
-        stop("Index should be either a numeric vector or a character vector.",
+        stop("`which` should be either a numeric vector or a character vector.",
             call. = FALSE)
     }
 }
@@ -565,6 +573,22 @@ i_assert_valid_field_name <- function (self, private, class, name) {
     if (!all(valid))
         stop("Invalid field name found for class ", backtick(cls_nm),
             ": ", backtick_collapse(name[!valid]), ".", call. = FALSE)
+}
+# }}}
+
+# i_field_note {{{
+i_field_note <- function (self, private, class, which = NULL) {
+    assert_that(is_scalar(class))
+
+    cls_in <- i_in_tbl_from_which(self, private, "class", class)
+
+    fld_note <- private$m_idd_tbl$field_note[cls_in, on = "class_id", allow.cartesian = TRUE]
+
+    if (is.null(which)) return(fld_note$note)
+
+    fld_idx <- i_field_index_from_which(self, private, cls_in$class_id, which)
+
+    fld_note[J(fld_idx), on = "field_index", note]
 }
 # }}}
 
@@ -3451,7 +3475,7 @@ i_print_iddobj <- function (self, private) {
 
     # memo
     cli::cat_rule(center = "* MEMO *", line = 1)
-    memo <- cls_tbl$memo
+    memo <- private$m_idd_tbl$class_memo[class_id == private$m_class_id, memo]
     if (is.na(memo)) {
         cli::cat_line("  <No Memo>")
     } else {

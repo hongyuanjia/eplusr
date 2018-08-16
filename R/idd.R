@@ -33,12 +33,14 @@
 #' package is used to speed up the whole IDD parsing process and store the
 #' results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 #' eplusr uses a SQL-like structure to store both IDF and IDD data in
-#' `data.frame` format. Every IDD will be parsed and stored in ten tables:
+#' `data.frame` format. Every IDD will be parsed and stored in twelve tables:
 #'
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
+#' * `class`: contains class memos, i.e. a brief description on each class.
 #' * `class_reference`: contains reference names of classes.
 #' * `field`: contains field names and field properties.
+#' * `field_note`: contains field notes.
 #' * `field_reference`: contains reference names of fields.
 #' * `field_default`: contains default values of fields.
 #' * `field_choice`: contains choices of choice-type fields.

@@ -414,7 +414,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
             i_class_tbl_from_which(self, private, private$m_class_id)$num_fields,
 
         memo = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$memo,
+            i_class_memo_from_which(self, private, private$m_class_id),
 
         num_extensible = function ()
             i_class_tbl_from_which(self, private, private$m_class_id)$num_extensible,
@@ -459,7 +459,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
             i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type,
 
         field_note = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$note,
+            i_field_note(self, private, private$m_class_id, which = which),
 
         field_unit = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
             i_field_unit(self, private, private$m_class_id, which = which, in_ip),

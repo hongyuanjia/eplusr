@@ -442,9 +442,11 @@ parse_idd_file <- function(path) {
     field <- idd_field[, .SD, .SDcols = c("field_id", "class_id", "field_index",
         "field_name", "full_name", "full_ipname", "units", "ip_name",
         "required_field", "type", "autosizable", "autocalculatable",
-        "note", "is_name", "is_extensible", "has_default", "has_range",
+        "is_name", "is_extensible", "has_default", "has_range",
         "has_reference", "has_object_list", "has_external_list")]
     data.table::setnames(field, "ip_name", "ip_units")
+
+    field_note <- idd_field[, list(field_id, class_id, field_index, note)]
 
     # split choice
     target_choice <- idd_field[type == "choice"]
@@ -602,9 +604,11 @@ parse_idd_file <- function(path) {
 
     class <- class[class_property, on = "class_id"][,
         .SD, .SDcols = c("class_id", "class_name", "group_id", "class_format",
-            "memo", "min_fields", "num_fields", "required_object",
-            "unique_object", "has_name", "last_required", "num_extensible",
-            "first_extensible", "num_extensible_group")]
+            "min_fields", "num_fields", "required_object", "unique_object",
+            "has_name", "last_required", "num_extensible", "first_extensible",
+            "num_extensible_group")]
+
+    class_memo <- class_property[, list(class_id, memo)]
 
     # split reference_class_name
     class_reference <- idd_class[!is.na(reference),
@@ -626,8 +630,10 @@ parse_idd_file <- function(path) {
                 build = idd_build,
                 group = group,
                 class = class,
+                class_memo = class_memo,
                 class_reference = class_reference,
                 field = field,
+                field_note = field_note,
                 field_reference = field_reference,
                 field_default = field_default,
                 field_choice = field_choice,
