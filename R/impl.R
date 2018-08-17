@@ -485,15 +485,12 @@ i_field_index <- function (self, private, class, name = NULL) {
 # }}}
 
 # i_field_index_from_which {{{
-i_field_index_from_which <- function (self, private, class, which = NULL, strict = FALSE) {
+i_field_index_from_which <- function (self, private, class, which = NULL) {
     assert_that(is_scalar(class))
     if (is.null(which)) return(i_field_index(self, private, class))
 
     if (is.numeric(which)) {
-        if (!strict)
-            i_assert_valid_field_index_ext(self, private, class, which)
-        else
-            i_assert_valid_field_index(self, private, class, which)
+        i_assert_valid_field_index(self, private, class, which)
         which
     } else if (is.character(which)) {
         i_field_index(self, private, class, which)

@@ -89,8 +89,8 @@ test_that("parse_idd_file()", {
     expect_equal(names(idd_parsed), c(
         "version", "build",
         "group",
-        "class", "class_reference",
-        "field", "field_reference",
+        "class", "class_memo", "class_reference",
+        "field", "field_note", "field_reference",
         "field_default", "field_choice", "field_range",
         "field_object_list", "field_external_list"
     ))
@@ -110,7 +110,6 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$class$class_name, c("TestSimple", "TestSlash"))
     expect_equal(idd_parsed$class$group_id, 1:2)
     expect_equal(idd_parsed$class$class_format, c("standard", "singleLine"))
-    expect_equal(idd_parsed$class$memo, c(NA_character_, "This is just a test"))
     expect_equal(idd_parsed$class$min_fields, c(0, 3))
     expect_equal(idd_parsed$class$num_fields, c(1, 4))
     expect_equal(idd_parsed$class$required_object, c(FALSE, TRUE))
@@ -120,6 +119,9 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$class$num_extensible, c(0, 4))
     expect_equal(idd_parsed$class$first_extensible, c(0, 1))
     expect_equal(idd_parsed$class$num_extensible_group, c(0, 1))
+
+    # can parse class memo data
+    expect_equal(idd_parsed$class_memo$memo, c(NA_character_, "This is just a test"))
 
     # can parse class reference data
     expect_equal(idd_parsed$class_reference$reference_id, 1)
@@ -152,8 +154,6 @@ test_that("parse_idd_file()", {
                  c(FALSE, FALSE, TRUE, FALSE, FALSE))
     expect_equal(idd_parsed$field$autocalculatable,
                  c(FALSE, FALSE, FALSE, TRUE, FALSE))
-    expect_equal(idd_parsed$field$note,
-                 c(NA_character_, "Test Note Parsing", NA_character_, NA_character_, NA_character_))
     expect_equal(idd_parsed$field$is_name,
                  c(TRUE, FALSE, FALSE, FALSE, FALSE))
     expect_equal(idd_parsed$field$is_extensible,
@@ -168,6 +168,10 @@ test_that("parse_idd_file()", {
                  c(FALSE, FALSE, FALSE, FALSE, TRUE))
     expect_equal(idd_parsed$field$has_external_list,
                  c(FALSE, TRUE, FALSE, FALSE, FALSE))
+
+    # can parse field note data
+    expect_equal(idd_parsed$field_note$note,
+                 c(NA_character_, "Test Note Parsing", NA_character_, NA_character_, NA_character_))
 
     # can parse field reference data
         expect_equal(idd_parsed$field_reference$reference_id, 1)
