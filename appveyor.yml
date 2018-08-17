@@ -16,6 +16,8 @@ install:
   - ECHO "Installed SDKs:"
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
+  - Rscript -e 'devtools::install_github("hongyuanjia/eplusr");eplusr::install_eplus(8.8)'
+
 cache:
   - C:\RLibrary
 
