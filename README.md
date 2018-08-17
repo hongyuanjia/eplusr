@@ -23,7 +23,8 @@ information about EnergyPlus can be found at [its
 website](https://energyplus.net).
 
 A comprehensive introduction to eplusr can be found using
-`vignette("eplusr")`. You can learn more about eplusr at
+[`vignette("eplusr")`](https://hongyuanjia.github.io/articles/eplusr.html).
+You can learn more about eplusr at
 <https://hongyuanjia.github.io/eplusr>, along with full package
 documentation.
 
@@ -115,15 +116,15 @@ idd <- use_idd(8.8, download = "auto")
   Parsing IDD (Parsing ) [=========>------------------------]  30% in  0s
   Parsing IDD (Parsing ) [=============>--------------------]  40% in  0s
   Parsing IDD (Parsing ) [================>-----------------]  50% in  1s
-  Parsing IDD (Parsing ) [===================>--------------]  60% in  1s
-  Parsing IDD (Parsing ) [==========================>-------]  80% in  2s
-  Parsing IDD (Parsing ) [===============================>--]  95% in  2s
-  Parsing IDD (Complete) [==================================] 100% in  2s
+  Parsing IDD (Parsing ) [===================>--------------]  60% in  2s
+  Parsing IDD (Parsing ) [==========================>-------]  80% in  3s
+  Parsing IDD (Parsing ) [===============================>--]  95% in  3s
+  Parsing IDD (Complete) [==================================] 100% in  3s
 
 model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
 model
-#> # Path: `/home/hongyuanjia/Dropbox/github_repo/eplusr/inst/extdata/1ZoneUncontrolled.idf`
+#> # Path: `/home/hongyuanjia/R/eplusr/extdata/1ZoneUncontrolled.idf`
 #> # Version: `8.8`
 #> 
 #> Group: `Simulation Parameters`
@@ -208,13 +209,13 @@ job <- model$run(
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing file located  at /tmp/RtmpQ2kuDp/model.idf.
+#> Replace the existing file located  at /tmp/Rtmp92Xjmq/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
 #> ExpandObjects Finished. Time:     0.007
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.17 17:33
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.18 01:04
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation

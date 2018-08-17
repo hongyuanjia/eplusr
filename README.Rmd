@@ -46,7 +46,8 @@ navigation, modification of EnergyPlus models and makes it less painful to do
 parametric simulations and analysis. More information about EnergyPlus can be
 found at [its website](https://energyplus.net).
 
-A comprehensive introduction to eplusr can be found using `vignette("eplusr")`.
+A comprehensive introduction to eplusr can be found using
+[`vignette("eplusr")`](https://hongyuanjia.github.io/articles/eplusr.html).
 You can learn more about eplusr at https://hongyuanjia.github.io/eplusr, along
 with full package documentation.
 
