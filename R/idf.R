@@ -662,6 +662,8 @@
 #' idf$replace_value("WALL", "A_WALL")
 #'
 #' # ===== VALIDATE MODEL =====
+#' # CRAN does not like long-time tests
+#' \dontrun{
 #' # check if there are errors in current model
 #' idf$validate()
 #' idf$is_valid()
@@ -685,7 +687,7 @@
 #' idf$set_object(16, list(outside_layer = idf$Material[[1]]$name()))
 #' idf$validate()
 #' idf$is_valid()
-#'
+#' }
 #' # ===== FORMAT MODEL =====
 #' # get text format of the model
 #' str(idf$string())
