@@ -31,13 +31,9 @@ test_that("Job methods", {
 
     # can kill job
     expect_message(job$kill(), "job was run in waiting mode")
-    expect_true({job$run(wait = FALSE);Sys.sleep(0.1);job$kill()})
+    expect_true({job$run(wait = FALSE);Sys.sleep(0.2);job$kill()})
     # can update the status after job was killed
-    expect_equal(
-        job$status(),
-        list(run_before = TRUE, changed_after = FALSE, terminated = TRUE,
-            successful = FALSE, alive = FALSE, wait = FALSE)
-    )
+    expect_true(job$status()$terminated)
     expect_message(job$kill(), "job is not running")
     expect_error(job$errors(), "Simulation was terminated before")
     expect_error(job$locate_output(), "Simulation was terminated before")

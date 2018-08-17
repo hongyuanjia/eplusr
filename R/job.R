@@ -415,7 +415,8 @@ i_job_kill <- function (self, private) {
             message("The job has been successfully killed.")
             return(invisible(TRUE))
         } else {
-            stop("Error found. Could not kill the job.", call. = FALSE)
+            message("Failed to kill the job, because it was already finished/dead.")
+            return(invisible(FALSE))
         }
     } else {
         message("The job is not running.")
