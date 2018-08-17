@@ -247,9 +247,9 @@
 #' # change the weather data
 #' # NOTE: This feature is experimental. There is no validation when replacing.
 #' epw$set_data(epw$get_data())
-#' }
 #' # save the weather file
 #' epw$save(file.path(tempdir(), "weather.epw"))
+#' }
 #' @docType class
 #' @name epw
 #' @aliases Epw

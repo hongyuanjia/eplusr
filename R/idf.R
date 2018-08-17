@@ -582,7 +582,6 @@
 #' )
 #'
 #' # ===== INSERT OBJECTS =====
-#' \dontrun{
 #' # insert objects from other Idf object
 #' idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
 #'     idd = use_idd(8.8, download = "auto"))
@@ -601,8 +600,7 @@
 #' idf$object_name("Material")
 #'
 #' # $ins_object() is useful when importing design days from a ".ddy" file
-#' idf$ins_object(read_idf("foo.ddy"))
-#' }
+#' \dontrun{idf$ins_object(read_idf("foo.ddy"))}
 #'
 #' # ===== SET OBJECTS =====
 #' # set the thickness of newly inserted material "test" to 0.2 m

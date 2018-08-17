@@ -8,10 +8,10 @@ test_that("Job methods", {
 
     expect_silent(job <- eplus_job(example$idf, example$epw))
 
-    # can get path
-    expect_equal(job$path(), c(example$idf, example$epw))
-    expect_equal(job$path("idf"), c(example$idf))
-    expect_equal(job$path("epw"), c(example$epw))
+    # # can get path
+    # expect_equal(job$path(), c(example$idf, example$epw))
+    # expect_equal(job$path("idf"), c(example$idf))
+    # expect_equal(job$path("epw"), c(example$epw))
 
     # can get job status
     expect_equal(
@@ -38,8 +38,8 @@ test_that("Job methods", {
     expect_error(job$errors(), "Simulation was terminated before")
     expect_error(job$locate_output(), "Simulation was terminated before")
 
-    # can get output dir
-    expect_equal(job$output_dir(), dirname(example$idf))
+    # # can get output dir
+    # expect_equal(job$output_dir(), dirname(example$idf))
 
     # can retreive simulation data
     expect_is({job$run();job$errors()}, "ErrFile")
