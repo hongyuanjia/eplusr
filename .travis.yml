@@ -64,7 +64,7 @@ after_success:
   # automatically update package site
   - Rscript -e 'devtools::install_github("hongyuanjia/eplusr")'
   - test $TRAVIS_R_VERSION_STRING = "release" && test $TRAVIS_OS_NAME = "linux" &&
-    Rscript -e 'pkgdown::build_site()'
+    Rscript -e 'pkgdown::build_site(run_dont_run = TRUE)'
 
 deploy:
   provider: pages

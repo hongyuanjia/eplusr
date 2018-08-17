@@ -164,6 +164,7 @@ value of \code{Sys.timezone()}.
 }
 
 \examples{
+\dontrun{
 # read an EPW file from EnergyPlus website
 path_base <- "https://energyplus.net/weather-download"
 path_region <- "north_and_central_america_wmo_region_4/USA/CA"
@@ -254,12 +255,10 @@ str(t_dry_bulb)
 attributes(epw$get_data()$datetime)
 attributes(epw$get_data(tz = "America/Chicago")$datetime)
 
-\dontrun{
 # change the weather data
 # NOTE: This feature is experimental. There is no validation when replacing.
 epw$set_data(epw$get_data())
 }
-
 # save the weather file
 epw$save(file.path(tempdir(), "weather.epw"))
 }

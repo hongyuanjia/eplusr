@@ -579,7 +579,7 @@ names(idf$Construction)
 idf$dup_object("R13WALL", new_name = "My-R13Wall")
 
 # duplicate an object multiple times
-idf$dup_object(rep("R13WALL", time = 10))
+\dontrun{idf$dup_object(rep("R13WALL", time = 10))}
 
 # ===== ADD OBJECTS =====
 # add two new objects in "RunPeriod" class
@@ -600,6 +600,7 @@ idf$add_object(rep("RunPeriod", 2),
 )
 
 # ===== INSERT OBJECTS =====
+\dontrun{
 # insert objects from other Idf object
 idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
     idd = use_idd(8.8, download = "auto"))
@@ -618,7 +619,8 @@ idf$ins_object(idf_1$Material$test)
 idf$object_name("Material")
 
 # $ins_object() is useful when importing design days from a ".ddy" file
-\dontrun{idf$ins_object(read_idf("foo.ddy"))}
+idf$ins_object(read_idf("foo.ddy"))
+}
 
 # ===== SET OBJECTS =====
 # set the thickness of newly inserted material "test" to 0.2 m
@@ -652,9 +654,7 @@ lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
 # delete the added run period "rp_test_1", "rp_test_2" and "test" from above
 idf$del_object(c("test", "rp_test_1", "rp_test_2"))
 names(idf$Material)
-# [1] "C5_4_IN_HW_CONCRETE"
 names(idf$RunPeriod)
-# [1] NA
 
 # In "final" validate level, delete will be aborted if the target obejcts are
 # referenced by other objects.
