@@ -39,12 +39,14 @@ Internally, the powerful \href{https://cran.r-project.org/package=data.table}{da
 package is used to speed up the whole IDD parsing process and store the
 results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
-\code{data.frame} format. Every IDD will be parsed and stored in ten tables:
+\code{data.frame} format. Every IDD will be parsed and stored in twelve tables:
 \itemize{
 \item \code{group}: contains group index and group names.
 \item \code{class}: contains class names and properties.
+\item \code{class}: contains class memos, i.e. a brief description on each class.
 \item \code{class_reference}: contains reference names of classes.
 \item \code{field}: contains field names and field properties.
+\item \code{field_note}: contains field notes.
 \item \code{field_reference}: contains reference names of fields.
 \item \code{field_default}: contains default values of fields.
 \item \code{field_choice}: contains choices of choice-type fields.

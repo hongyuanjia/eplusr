@@ -62,7 +62,7 @@ of EnergyPlus simulations." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ of EnergyPlus simulations." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -111,11 +114,17 @@ of EnergyPlus simulations.</p>
         
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Basically, it is a collection of multiple <code>EplusJob</code> objects.</p>
+    <p>Basically, it is a collection of multiple <code>EplusJob</code> objects. However, the
+model is first parsed and the Idf object is stored internally, instead of
+storing only the path of Idf in <code><a href='job.html'>EplusJob</a></code> class. Also, an object
+in <code>Output:SQLite</code> with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be
+automatically created if it does not exists like <code><a href='idf.html'>Idf</a></code> class.</p>
     
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
     <pre>param &lt;- param_job(idf, epw)
+param$seed()
+param$weater()
 param$apply_measure(measure, ..., .names = NULL)
 param$run(dir = NULL, parallel_backend = future::multiprocess)
 param$kill(which = NULL)
@@ -134,7 +143,7 @@ param$print()
     <pre>param &lt;- param_job(idf, epw)
 </pre>
     <p><strong>Arguments</strong></p><ul>
-<li><p><code>idf</code>: Path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></li>
+<li><p><code>idf</code>: Path to EnergyPlus IDF file or an <code>Idf</code> object.</p></li>
 <li><p><code>epw</code>: Path to EnergyPlus EPW file or an <code>Epw</code> object.</p></li>
 </ul>
     
@@ -186,6 +195,28 @@ parametric simulations.</p></li>
     <p>All other arguments have the same meanings as in <a href='job.html'>EplusJob class</a>.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
+    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+
+    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
+    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
+
+    <span class='co'># create from local files</span>
+    <span class='fu'><a href='param_job.html'>param_job</a></span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
+
+    <span class='co'># create from an Idf and an Epw object</span>
+    <span class='fu'><a href='param_job.html'>param_job</a></span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
+}</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; 
+#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric ────────────────────────────────────────────────────────
+#&gt; ● Seed Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
+#&gt; ● Default Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -202,7 +233,9 @@ parametric simulations.</p></li>
       <li><a href="#apply-design-alternatives">Apply Design Alternatives</a></li>
 
       <li><a href="#run-and-collect-results">Run and Collect Results</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

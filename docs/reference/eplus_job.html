@@ -63,7 +63,7 @@ please see job." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -74,6 +74,9 @@ please see job." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -117,11 +120,11 @@ please see <a href='job.html'>job</a>.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>idf</th>
-      <td><p>A path to an EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></td>
+      <td><p>A path to an local EnergyPlus IDF file or an <code>Idf</code> object.</p></td>
     </tr>
     <tr>
       <th>epw</th>
-      <td><p>A path to an EnergyPlus EPW file or an <code>Epw</code> object.</p></td>
+      <td><p>A path to an local EnergyPlus EPW file or an <code>Epw</code> object.</p></td>
     </tr>
     </table>
     
@@ -134,6 +137,25 @@ please see <a href='job.html'>job</a>.</p>
     <div class='dont-index'><p><code><a href='param_job.html'>param_job()</a></code> for creating an EnergyPlus parametric job.</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
+    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+
+    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
+    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
+
+    <span class='co'># create from local files</span>
+    <span class='fu'>eplus_job</span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
+
+    <span class='co'># create from an Idf and an Epw object</span>
+    <span class='fu'>eplus_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
+}</div><div class='output co'>#&gt; <span class='message'>Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder `/usr/local/EnergyPlus-8-8-0`.</span></div><div class='output co'>#&gt; <span class='message'>IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.</span></div><div class='output co'>#&gt; <span class='message'>Start parsing...</span></div><div class='output co'>#&gt; ── EnergyPlus Simulation Job ───────────────────────────────────────────────────
+#&gt; # Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
+#&gt; # Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; # EnergyPlus Version: `8.8.0`
+#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`
+#&gt; &lt;&lt; Simulation has not been run before &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -143,7 +165,13 @@ please see <a href='job.html'>job</a>.</p>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

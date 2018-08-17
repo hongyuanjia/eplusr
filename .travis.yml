@@ -44,6 +44,7 @@ before_install:
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
+  - Rscript -e 'devtools::install_github("hongyuanjia/eplusr")'
   # automatically update package site
   - test $TRAVIS_R_VERSION_STRING = "release" && test $TRAVIS_OS_NAME = "linux" &&
     Rscript -e 'pkgdown::build_site()'

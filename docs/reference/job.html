@@ -62,7 +62,7 @@ methods to extract simulation outputs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ methods to extract simulation outputs." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -111,15 +114,28 @@ methods to extract simulation outputs.</p>
         
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>eplusr uses the EnergyPlus SQL output for extracting simulation outputs. In
-order to do so, a object in <code>Output:SQLite</code> with <code>Option Type</code> value of
-<code>SimpleAndTabular</code> will be automatically created if it does not exists.
+    <p>eplusr uses the EnergyPlus SQL output for extracting simulation outputs.
 <code>EplusJob</code> has provide some wrappers that do SQL query to get report data
 results, i.e. results from <code>Output:Variable</code> and <code>Output:Meter*</code>. But for
 <code>Output:Table</code> results, you have to be familiar with the structure of the
 EnergyPlus SQL results, especially for table <em>"TabularDataWithStrings"</em>. For
 details, please see <em>"2.20 eplusout.sql"</em>, especially <em>"2.20.4.4 TabularData
 Table"</em> in EnergyPlus <em>"Output Details and Examples"</em> documentation.</p>
+    
+    <h2 class="hasAnchor" id="note"><a class="anchor" href="#note"></a>NOTE</h2>
+
+    
+    <p>When using <code>$run()</code> in <a href='idf.html'>Idf</a> class, which internally creates an
+<code>EplusJob</code> object and calls its <code>$run()</code> method, an object in
+<code>Output:SQLite</code> with <code>Option Type</code> value of <code>SimpleAndTabular</code> will be
+automatically created if it does not exists.</p>
+<p>However, when creating an <code>EplusJob</code> using <code><a href='eplus_job.html'>eplus_job()</a></code>, the IDF file is not
+parsed but directly pass its path to EnergyPlus. Thus, that process of
+handling <code>Output:SQLite</code> class is not performed. If you want to ensure
+that the output collection functionality in <code>EplusJob</code> class works
+successfully, it is recommended to first read that IDF file using
+<code><a href='read_idf.html'>read_idf()</a></code> and then use <code>$run()</code> method in <a href='idf.html'>Idf</a> class by doing
+<code>idf$run()</code>.</p>
     
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
@@ -140,8 +156,19 @@ job$print()
     <pre>job &lt;- eplus_job(idf, epw)
 </pre>
     <p><strong>Arguments</strong></p><ul>
-<li><p><code>idf</code>: Path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></li>
-<li><p><code>epw</code>: Path to EnergyPlus EPW file or an <code>Epw</code> object.</p></li>
+<li><p><code>idf</code>: Path to an local EnergyPlus IDF file or an <code>Idf</code> object.</p></li>
+<li><p><code>epw</code>: Path to an local EnergyPlus EPW file or an <code>Epw</code> object.</p></li>
+</ul>
+    
+    <h2 class="hasAnchor" id="basic-info"><a class="anchor" href="#basic-info"></a>Basic info</h2>
+
+    <pre>job$path(type = c("all", "idf", "epw"))
+</pre>
+    <p><code>$path()</code> returns the path of idf or epw of current job.</p>
+<p><strong>Arguments</strong></p><ul>
+<li><p><code>type</code>: If <code>"all"</code>, both the idf path and epw path are returned. If
+<code>"idf"</code>, only idf path is returned. If <code>"epw"</code>, only epw path is
+returned.  Default: <code>"all"</code>.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="run"><a class="anchor" href="#run"></a>Run</h2>
@@ -188,8 +215,9 @@ suffix.</p>
 report data. For details on the meaning of each columns, please see
 "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
 Examples" documentation.</p>
-<p><code>$report_data()</code> extracts the report data using key values and variable names.</p>
-<p><code>$tabular_data()</code> extracts all tabular data.</p>
+<p><code>$report_data()</code> extracts the report data in a data.table using key values
+and variable names.</p>
+<p><code>$tabular_data()</code> extracts all tabular data in a data.table.</p>
 <p><strong>Arguments</strong>:</p><ul>
 <li><p><code>open</code>: If <code>TRUE</code>, the output directory will be opened. It may only work
 well on Windows.</p></li>
@@ -213,6 +241,86 @@ of this simulation. If <code>"auto"</code>, the name of the IDF file will be use
     <div class='dont-index'><p><a href='param.html'>ParametricJob class</a> for EnergyPlus parametric simulations.</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
+    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+
+    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
+    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
+
+    <span class='co'># copy to tempdir</span>
+    <span class='fu'>file.copy</span>(<span class='fu'>c</span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>), <span class='fu'>tempdir</span>())
+
+    <span class='co'># create an EplusJob from local an IDF and an EPW file</span>
+    <span class='no'>job</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='eplus_job.html'>eplus_job</a></span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='no'>idf_name</span>), <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='no'>epw_name</span>))
+
+    <span class='co'># get paths of idf and epw</span>
+    <span class='no'>job</span>$<span class='fu'>path</span>(<span class='st'>"all"</span>)
+    <span class='no'>job</span>$<span class='fu'>path</span>(<span class='st'>"idf"</span>)
+    <span class='no'>job</span>$<span class='fu'>path</span>(<span class='st'>"epw"</span>)
+
+    <span class='co'># get current job status</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()
+
+    <span class='co'># check if the job has been run before</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>run_before</span>
+
+    <span class='co'># run the job in waiting mode</span>
+    <span class='no'>job</span>$<span class='fu'>run</span>(<span class='kw'>wait</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+    <span class='co'># check the job status again</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>run_before</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>successful</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>wait</span>
+
+    <span class='co'># get output directory</span>
+    <span class='no'>job</span>$<span class='fu'>output_dir</span>()
+
+    <span class='co'># open the output directory</span>
+    <span class='no'>job</span>$<span class='fu'>output_dir</span>(<span class='kw'>open</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+    <span class='co'># check simulation errors</span>
+    <span class='no'>job</span>$<span class='fu'>errors</span>()
+
+    <span class='co'># check simulation errors, only including warnings and errors</span>
+    <span class='no'>job</span>$<span class='fu'>errors</span>(<span class='kw'>info</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+    <span class='co'># get the file path of an output with a given suffix</span>
+    <span class='no'>job</span>$<span class='fu'>locate_output</span>(<span class='st'>".err"</span>)
+
+    <span class='co'># give an error when simulation did not complete successfully or that file</span>
+    <span class='co'># does not exist</span>
+    <span class='no'>job</span>$<span class='fu'>locate_output</span>(<span class='st'>".exe"</span>, <span class='kw'>strict</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+    <span class='co'># retreive simulation results will fail if there is no EnergyPlus SQL output.</span>
+    <span class='no'>job</span>$<span class='fu'>report_data_dict</span>()
+
+    <span class='co'># instead, using `$run()` method in Idf class, which will add an</span>
+    <span class='co'># `Output:SQLite` object automatically</span>
+    <span class='no'>idf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='no'>idf_name</span>))
+    <span class='no'>job</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>$<span class='fu'>run</span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='no'>epw_name</span>), <span class='kw'>dir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+    <span class='co'># get report data dictionary</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>report_data_dict</span>())
+
+    <span class='co'># extract all report data</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>report_data</span>())
+
+    <span class='co'># extract some report variable</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>report_data</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"EnergyTransfer:Building"</span>, <span class='kw'>case</span> <span class='kw'>=</span> <span class='kw'>NULL</span>))
+
+    <span class='co'># add a "Case" column in the returned data.table</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>report_data</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"EnergyTransfer:Building"</span>, <span class='kw'>case</span> <span class='kw'>=</span> <span class='st'>"Test"</span>))
+
+    <span class='co'># change the format of datetime column in the returned data.table</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>report_data</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"EnergyTransfer:Building"</span>, <span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2016L</span>, <span class='kw'>tz</span> <span class='kw'>=</span> <span class='fu'>Sys.timezone</span>()))
+
+    <span class='co'># get all tabular data</span>
+    <span class='fu'>str</span>(<span class='no'>job</span>$<span class='fu'>tabular_data</span>())
+}
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -220,16 +328,22 @@ of this simulation. If <code>"auto"</code>, the name of the IDF file will be use
       
       <li><a href="#details">Details</a></li>
 
+      <li><a href="#note">NOTE</a></li>
+
       <li><a href="#usage">Usage</a></li>
 
       <li><a href="#create">Create</a></li>
+
+      <li><a href="#basic-info">Basic info</a></li>
 
       <li><a href="#run">Run</a></li>
 
       <li><a href="#results-extraction">Results Extraction</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

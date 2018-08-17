@@ -10,8 +10,8 @@ install_eplus(ver = "latest", force = FALSE)
 download_eplus(ver = "latest", dir)
 }
 \arguments{
-\item{ver}{The EnergyPlus version number, e.g., \code{8.7}; the special value
-\code{"latest"} means the latest version (fetched from GitHub releases).}
+\item{ver}{The EnergyPlus version number, e.g., \code{8.7}. The special value
+\code{"latest"}, which is the default, means the latest version.}
 
 \item{force}{Whether to install EnergyPlus even if it has already been
 installed.}

@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -69,6 +69,9 @@
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
@@ -102,10 +105,12 @@
 <li>One possible way is to use <code>$search_value()</code> to detect if the values in those fields could be targeted or not.</li>
 </ul>
 </li>
-<li><p>Add an optional <code>path</code> argument in <code><a href="reference/install_eplus.html">install_eplus()</a></code> to let the user specify a already downloaded EnergyPlus install exec.</p></li>
 <li><p>Model version conversion</p></li>
-<li><p>Add <code>$field_reference()</code> in <code>IddObject</code> class</p></li>
-<li><p>Add <code>$possible_value()</code> in <code>IdfObject</code> class</p></li>
+<li><p>Exclude “memo” in class table and and “note” in field table to speed up</p></li>
+<li><p>Remove unnecessary <code>as.integer()</code></p></li>
+<li><p>Fix extensible field names when they should be “A123” or “N123” but not self-explainary</p></li>
+<li><p>Using <code>units</code> package to add units in the returned data.table</p></li>
+<li><p>Apply multiple weather file to a seed in <code>ParametricJob</code> class</p></li>
 </ul>
 
   </div>

@@ -62,7 +62,7 @@ run EnergyPlus model with different options." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ run EnergyPlus model with different options." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -108,10 +111,10 @@ run EnergyPlus model with different options.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>run_idf</span>(<span class='no'>eplus</span>, <span class='no'>model</span>, <span class='no'>weather</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>design_day</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>annual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>expand_obj</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>echo</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+    <pre class="usage"><span class='fu'>run_idf</span>(<span class='no'>eplus</span>, <span class='no'>model</span>, <span class='no'>weather</span>, <span class='no'>output_dir</span>, <span class='kw'>design_day</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>annual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>expand_obj</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>echo</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
 
-<span class='fu'>run_multi</span>(<span class='no'>eplus</span>, <span class='no'>model</span>, <span class='no'>weather</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>design_day</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+<span class='fu'>run_multi</span>(<span class='no'>eplus</span>, <span class='no'>model</span>, <span class='no'>weather</span>, <span class='no'>output_dir</span>, <span class='kw'>design_day</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>annual</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>parallel_backend</span> <span class='kw'>=</span> <span class='kw pkg'>future</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/future/topics/multiprocess'>multiprocess</a></span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -131,8 +134,8 @@ run EnergyPlus model with different options.</p>
     </tr>
     <tr>
       <th>output_dir</th>
-      <td><p>Output directory path. If NULL, which is default, the
-directory of input model will be used.</p></td>
+      <td><p>Output directory path. If NULL, the directory of input
+model is used.</p></td>
     </tr>
     <tr>
       <th>design_day</th>
@@ -149,13 +152,14 @@ Default: <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>echo</th>
-      <td><p>Only applicable to <code>run_idf</code>. Show EnergyPlus simulation process
-information to the console.  If <code>FALSE</code>, which is default, a
-<a href='http://www.rdocumentation.org/packages/processx/topics/process'>processx::process</a> object will be return.</p></td>
+      <td><p>Only applicable to <code>run_idf</code>. If <code>TRUE</code>, show EnergyPlus
+simulation process information to the console. If <code>FALSE</code>, which is default, a
+<a href='http://www.rdocumentation.org/packages/processx/topics/process'>processx::process</a> object is returned. Default: <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>parallel_backend</th>
-      <td><p>Acceptable input for <code><a href='http://www.rdocumentation.org/packages/future/topics/plan'>future::plan()</a></code>.</p></td>
+      <td><p>Acceptable input for <code><a href='http://www.rdocumentation.org/packages/future/topics/plan'>future::plan()</a></code>. Default:
+<code><a href='http://www.rdocumentation.org/packages/future/topics/multiprocess'>future::multiprocess</a></code>, which tries to run all models in parallel.</p></td>
     </tr>
     </table>
     
@@ -166,19 +170,43 @@ parallel.</p>
 <p>Behind the scene, <code>run_multi()</code> uses the
 <a href='https://cran.r-project.org/package=furrr'>furrr</a> package which provides
 mapping functions in parallel using
-<a href='https://cran.r-project.org/package=future'>future</a> package. It is suggested
-to run simulations using <a href='job.html'>EplusJob</a> class, which provides much more
-detailed controls on the simulation and also methods to extract simulation
-output.</p>
+<a href='https://cran.r-project.org/package=future'>future</a> package.</p>
+<p>It is suggested to run simulations using <a href='job.html'>EplusJob</a> class, which
+provides much more detailed controls on the simulation and also methods to
+extract simulation output.</p>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p><a href='https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md'>Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)</a></p>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='job.html'>EplusJob</a> class and <a href='param.html'>ParametricJob</a> class which provide
+a more friendly interface to run EnergyPlus simulations and collect outputs.</p></div>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>run_idf</span>(<span class='fl'>8.8</span>, <span class='st'>"input.idf"</span>, <span class='st'>"weather.epw"</span>)
+<span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>)
+
+<span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='co'># run a single model</span>
+    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(
+        <span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>,
+        <span class='st'>"WeatherData"</span>,
+        <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+    )
+
+    <span class='fu'>run_idf</span>(<span class='fl'>8.8</span>, <span class='no'>idf_path</span>, <span class='no'>epw_path</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())
+
+    <span class='co'># run multiple model in parallel</span>
+    <span class='no'>idf_paths</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>,
+        <span class='fu'>c</span>(<span class='st'>"1ZoneUncontrolled.idf"</span>, <span class='st'>"1ZoneUncontrolledFourAlgorithms.idf"</span>)
+    )
+    <span class='no'>epw_paths</span> <span class='kw'>&lt;-</span> <span class='fu'>rep</span>(<span class='no'>epw_path</span>, <span class='kw'>times</span> <span class='kw'>=</span> <span class='fl'>2L</span>)
+    <span class='no'>output_dirs</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='kw pkg'>tools</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/tools/topics/fileutils'>file_path_sans_ext</a></span>(<span class='fu'>basename</span>(<span class='no'>idf_paths</span>)))
+    <span class='fu'>run_multi</span>(<span class='fl'>8.8</span>, <span class='no'>idf_paths</span>, <span class='no'>epw_paths</span>, <span class='kw'>output_dir</span> <span class='kw'>=</span> <span class='no'>output_dirs</span>)
+}
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -189,9 +217,15 @@ output.</p>
       <li><a href="#details">Details</a></li>
 
       <li><a href="#references">References</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

@@ -63,7 +63,7 @@ but with total different data structure under the hook." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -74,6 +74,9 @@ but with total different data structure under the hook." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -153,7 +156,7 @@ model$object_name(class = NULL, simplify = FALSE)
 model$object_num(class = NULL)
 model$is_valid_id(id)
 model$is_valid_name(name)
-model$object(id)
+model$object(which)
 model$object_in_class(class)
 model$search_object(pattern, class = NULL)
 model$ClassName
@@ -171,7 +174,7 @@ model$string(comment = TRUE, header = TRUE, ...)
 model$is_unsaved()
 model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
 model$clone()
-model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE)
+model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 model$print(plain = FALSE)
 print(model)
 </pre>
@@ -234,10 +237,13 @@ or strings are valid object IDs or object names respectively.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>id</code>: An integer vector to check.</p></li>
 <li><p><code>name</code>: A character vector to check.</p></li>
-<li><p><code>class</code>: A character vector contains valid class names.</p></li>
-<li><p><code>simplify</code>: If FALSE, a list with each member being the data per class will
-be returned. Otherwise, an integer vector (for <code>$object_id</code>) or a
-character vector (for <code>$object_name</code>) will be returned.</p></li>
+<li><p><code>class</code>: A character vector that contains valid class names.</p></li>
+<li><p><code>simplify</code>: If <code>FALSE</code>, a list with each member being the data per class
+will be returned. The order of classes are the same as it in Idd. If
+<code>TRUE</code>, an integer vector (for <code>$object_id()</code>) or a character vector (for
+<code>$object_name</code>()) will be returned. The order of returned object IDs or
+names will be the same order as objects in the IDF file.  Default:
+<code>FALSE</code>.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="object-query"><a class="anchor" href="#object-query"></a>Object Query</h2>
@@ -250,16 +256,20 @@ model$search_object(pattern, class = NULL)
 model$ClassName
 model[[ClassName]]
 </pre>
-    <p><code>$object()</code> will return a list of <code>IdfObject</code>s specified by object IDs or
-names.</p>
-<p><code>$object_in_class()</code> will return a list of all <code>IdfObject</code>s in specified
+    <p><code>$object()</code> will return a named list of <code>IdfObject</code>s specified by object IDs
+or names.</p>
+<p><code>$object_in_class()</code> will return a named list of all <code>IdfObject</code>s in specified
 classes.</p>
-<p><code>$search_object()</code> will return a list of <code>IdfObject</code>s whose names meet the
+<p><code>$search_object()</code> will return a named list of <code>IdfObject</code>s whose names meet the
 given pattern in specified classes.</p>
+<p>The names of returned list by <code>$object()</code>, <code>$object_in_class()</code> and
+<code>$search_object()</code> are the returned object names, except that all names
+are converted into valid R names, i.e.  all other characters except
+letters and numbers are replaced by underscore <code>_</code>.</p>
 <p>eplusr also provides custom S3 method of <code>$</code> and <code>[[</code> to make it more
 convenient to get <code>IdfObject</code>s in class. Basically, <code>model$ClassName</code> and
-<code>model[[ClassName]]</code>, where <code>ClassName</code> is a single valid class name, is
-equivalent to <code>model$object_in_class(ClassName)</code>.</p>
+<code>model[[ClassName]]</code>, where <code>ClassName</code> is a single valid class
+name, is equivalent to <code>model$object_in_class(ClassName)</code>.</p>
 <p>All above methods will return a named list of <code>IdfObject</code>s. If the class does
 not have name attribute, then <code>NA</code> will be used.</p>
 <p><code>IdfObject</code> is a class that provides more detailed information methods to
@@ -335,12 +345,68 @@ strictness level.</p>
 <code>"final".</code>There are three different validate levels, i.e. <code>"none"</code>,
 <code>"draft"</code> and <code>"final"</code>:</p><ul>
 <li><p>For <code>"none"</code>, none validation will be done;</p></li>
-<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;</p></li>
-<li><p>For <code>"final"</code>, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required fields
-and invalid field value reference will also be done.</p></li>
+<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, character,
+numeric, integer, and choice field values will be done;</p></li>
+<li><p>For <code>"final"</code>, besides above, checking of incomplete extensible groups,
+missing required objects, duplicated unique objects, object name
+conflicts, missing required fields and invalid field value reference will
+also be done.</p></li>
 </ul>
+    <p>Underlying, <code>$validate()</code> returned a list of thirteen components. Except
+<code>missing_object</code>, which is a character vector, all other components are
+<a href='http://www.rdocumentation.org/packages/data.table/topics/data.table'>data.tables</a>s. The contents of each component
+are described blow:</p><ul>
+<li><p><code>missing_object</code>: A character vector that contains names of classes
+which are required but currently none object exists.</p></li>
+<li><p><code>duplicate_object</code>: A data.table that contains data of all objects in
+unique class which should only have one object but currently multiple
+objects exist.</p></li>
+<li><p><code>conflict_name</code>: A data.table that contains data of all objects
+that have the same name in the same class.</p></li>
+<li><p><code>incomplete_extensible</code>: A data.table that contains data of all object
+fields that are extensible but with empty value.</p></li>
+<li><p><code>missing_value</code>: A data.table that contains data of all object fields
+that are required but have empty value.</p></li>
+<li><p><code>invalid_autosize</code>: A data.table that contains data of all object
+fields which should not be "Autosize".</p></li>
+<li><p><code>autocalculate</code>: A data.table that contains data of object fields
+which should not be "Autocalculate".</p></li>
+<li><p><code>invalid_character</code>: A data.table that contains data of all object
+fields which should be character type, but currently are not.</p></li>
+<li><p><code>invalid_numeric</code>: A data.table that contains data of all object fields
+which should be numbers, but currently are not.</p></li>
+<li><p><code>invalid_integer</code>: A data.table that contains data of all object fields
+which should be integers, but currently are not.</p></li>
+<li><p><code>invalid_choice</code>: A data.table that contains data of all object fields
+whose values are not one of prescribed choices.</p></li>
+<li><p><code>invalid_range</code>: A data.table that contains data of all object fields
+whose values exceed prescribed ranges.</p></li>
+<li><p><code>invalid_reference</code>: A data.table that contains data of all object
+fields whose values are not one of available reference values.</p></li>
+</ul>
+    <p>All data.tables above contains thirteen columns:</p><ul>
+<li><p><code>object_id</code>: IDs of objects that contain invalid fields</p></li>
+<li><p><code>class_id</code>: indexes of classes that invalid objects belong to</p></li>
+<li><p><code>class_name</code>: names of classes that invalid objects belong to</p></li>
+<li><p><code>field_index</code>: indexes of object fields that are invalid</p></li>
+<li><p><code>field_name</code>: names (without units) of object fields that are invalid</p></li>
+<li><p><code>full_name</code>: names (with SI units) of object fields that are invalid</p></li>
+<li><p><code>full_ipname</code>: names (with IP units) of object fields that are invalid</p></li>
+<li><p><code>type</code>: types of object fields that are invalid</p></li>
+<li><p><code>value_id</code>: indexes of object field values that are invalid</p></li>
+<li><p><code>value</code>: values (converted to characters) of object field that are invalid</p></li>
+<li><p><code>value_upper</code>: values (converted to upper-case characters) of object
+field that are invalid</p></li>
+<li><p><code>value_num</code>: values (converted to numbers in SI units) of object field
+that are invalid</p></li>
+<li><p><code>value_ipnum</code>: values (converted to numbers in IP units) of object field
+that are invalid</p></li>
+</ul>
+    <p>Knowing the internal structure of returned data from <code>$validate()</code>, it is
+easy to extract data of invalid objects you interested in. For example,
+you can get all IDs of objects that contains invalid value references
+using <code>$validate()$invalid_reference$object_id</code>. Then using
+<code>$set_object()</code> to correct them.</p>
     
     <h2 class="hasAnchor" id="format-output"><a class="anchor" href="#format-output"></a>Format Output</h2>
 
@@ -374,7 +440,8 @@ in IDFEditor.</p></li>
 <li><p><code>overwrite</code>: Whether to overwrite the file if it already exists. Default is
 <code>FALSE</code>.</p></li>
 <li><p><code>copy_external</code>: If <code>TRUE</code>, the external files will also be copied into the
-same directory. Currently, only <code>Schedule:File</code> class is supported.
+same directory. The values of file paths in the Idf will be changed
+automatically. Currently, only <code>Schedule:File</code> class is supported.
 Default is <code>FALSE</code>.</p></li>
 </ul>
     
@@ -393,7 +460,7 @@ method provided by <code>R6Class</code>.</p></li>
     
     <h2 class="hasAnchor" id="run-model"><a class="anchor" href="#run-model"></a>Run Model</h2>
 
-    <pre>model$run(weather, dir = NULL, wait = TRUE, force = FALSE)
+    <pre>model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 </pre>
     <p><code>$run()</code> will run the current model within specified weather using
 corresponding version of EnergyPlus. The model and the weather used will
@@ -401,19 +468,24 @@ be copied to the output directory. An <code>EplusJob</code> will be returned whi
 provides detailed info of the simulation and methods to collect
 simulation results. Please see <code><a href='eplus_job.html'>eplus_job()</a></code> for more detailed.</p>
 <p>eplusr uses the EnergyPlus command line interface which was introduced since
-EnergyPlus 8.3.0. So <code>$run</code> only supports models with version higher
+EnergyPlus 8.3.0. So <code>$run()</code> only supports models with version higher
 than 8.3.0.</p>
 <p>eplusr uses the EnergyPlus SQL output for extracting simulation results. In
 order to do so, a object in <code>Output:SQLite</code> with <code>Option Type</code> value of
 <code>SimpleAndTabular</code> will be automatically created if it does not exists.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>weather</code>: A path to an <code>.epw</code> file or an <code>Epw</code> object.</p></li>
-<li><p><code>dir</code>: The directory to save the simulation results. If <code>NULL</code>, which is
-the default, the model folder will be used.</p></li>
+<li><p><code>dir</code>: The directory to save the simulation results. If <code>NULL</code>, the model
+folder will be used.</p></li>
 <li><p><code>echo</code>: Whether to print the standard output and error of EnergyPlus to
 the screen. Default is <code>FALSE</code>.</p></li>
 <li><p><code>force</code>: Whether to stop the background EnergyPlus process and start the
 simulation again.</p></li>
+<li><p><code>copy_external</code>: If <code>TRUE</code>, the external files will also be copied into the
+simulation output directory. The values of file paths in the Idf will be
+changed automatically. Currently, only <code>Schedule:File</code> class is supported.
+This ensures that the output directory will have all files needed for the
+model to run. Default is <code>FALSE</code>.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="print"><a class="anchor" href="#print"></a>Print</h2>
@@ -424,7 +496,8 @@ print(model)
     <p><code>$print()</code> will print the model in the similar format as what you will see in
 IDFEditor.</p>
 <p><strong>Arguments</strong></p><ul>
-<li><p><code>plain</code>: If <code>TRUE</code>, the model will be printed in plain text format.</p></li>
+<li><p><code>plain</code>: If <code>TRUE</code>, the model will be printed in plain text format with
+newly added and modified objects at the bottom.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
@@ -432,6 +505,1602 @@ IDFEditor.</p>
     <div class='dont-index'><p><a href='idf_object.html'>IdfObject class</a></p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># ===== CREATE =====</span>
+<span class='co'># read an IDF file</span>
+<span class='no'>idf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'>system.file</span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>),
+    <span class='kw'>idd</span> <span class='kw'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>))
+
+<span class='co'># ===== MODEL BASIC INFO =====</span>
+<span class='co'># get version</span>
+<span class='no'>idf</span>$<span class='fu'>version</span>()</div><div class='output co'>#&gt; [1] ‘8.8’</div><div class='input'>
+<span class='co'># get path</span>
+<span class='no'>idf</span>$<span class='fu'>path</span>()</div><div class='output co'>#&gt; [1] "/home/hongyuanjia/Dropbox/github_repo/eplusr/inst/extdata/1ZoneUncontrolled.idf"</div><div class='input'>
+<span class='co'># get names of all groups in current model</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>group_name</span>())</div><div class='output co'>#&gt;  chr [1:8] "Simulation Parameters" "Location and Climate" "Schedules" ...</div><div class='input'>
+<span class='co'># get names of all defined groups in the IDD</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>group_name</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt;  chr [1:58] "Simulation Parameters" "Compliance Objects" ...</div><div class='input'>
+<span class='co'># get names of all classes in current model</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>class_name</span>())</div><div class='output co'>#&gt;  chr [1:27] "Version" "SimulationControl" "Building" ...</div><div class='input'>
+<span class='co'># get names of all defined classes in the IDD</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>class_name</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt;  chr [1:789] "Version" "SimulationControl" "Building" "ShadowCalculation" ...</div><div class='input'>
+<span class='co'># check if input is a valid group name in current model</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_group</span>(<span class='st'>"Schedules"</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='no'>idf</span>$<span class='fu'>is_valid_group</span>(<span class='st'>"Compliance Objects"</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># check if input is a valid group name in IDD</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_group</span>(<span class='st'>"Compliance Objects"</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># check if input is a valid class name in current model</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_class</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='no'>idf</span>$<span class='fu'>is_valid_class</span>(<span class='st'>"ShadowCalculation"</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># check if input is a valid class name in IDD</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_class</span>(<span class='st'>"ShadowCalculation"</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># ===== OBJECT DEFINITION (IDDOBJECT) =====</span>
+<span class='co'># get the a list of underlying IddObjects</span>
+<span class='no'>idf</span>$<span class='fu'>definition</span>(<span class='st'>"Version"</span>)</div><div class='output co'>#&gt; $Version
+#&gt; &lt;&lt; Class: `Version` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "Specifies the EnergyPlus version of the IDF file."
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Simulation Parameters`
+#&gt;   Unique: TRUE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 1
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:  Version Identifier
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># ===== OBJECT INFO =====</span>
+<span class='co'># get IDs of objects in classes</span>
+<span class='no'>idf</span>$<span class='fu'>object_id</span>(<span class='fu'>c</span>(<span class='st'>"Version"</span>, <span class='st'>"Zone"</span>))</div><div class='output co'>#&gt; $Version
+#&gt; [1] 1
+#&gt; 
+#&gt; $Zone
+#&gt; [1] 18
+#&gt; </div><div class='input'>
+<span class='co'># when `simplify` is TRUE, an integer vector will be returned instead of a</span>
+<span class='co'># named list</span>
+<span class='no'>idf</span>$<span class='fu'>object_id</span>(<span class='fu'>c</span>(<span class='st'>"Version"</span>, <span class='st'>"Zone"</span>), <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1]  1 18</div><div class='input'>
+<span class='co'># get names of objects in classes</span>
+<span class='co'># NA will be returned if targeted class does not have a name attribute</span>
+<span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='fu'>c</span>(<span class='st'>"Building"</span>, <span class='st'>"Zone"</span>, <span class='st'>"Version"</span>))</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Simple One Zone (Wireframe DXF)"
+#&gt; 
+#&gt; $Zone
+#&gt; [1] "ZONE ONE"
+#&gt; 
+#&gt; $Version
+#&gt; [1] NA
+#&gt; </div><div class='input'>
+<span class='co'># if `simplify` is TRUE, a character vector will be returned instead of a</span>
+<span class='co'># named list</span>
+<span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='fu'>c</span>(<span class='st'>"Building"</span>, <span class='st'>"Zone"</span>, <span class='st'>"Version"</span>), <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "Simple One Zone (Wireframe DXF)" "ZONE ONE"                       
+#&gt; [3] NA                               </div><div class='input'>
+<span class='co'># get number of objects in classes</span>
+<span class='no'>idf</span>$<span class='fu'>object_num</span>(<span class='fu'>c</span>(<span class='st'>"Zone"</span>, <span class='st'>"Schedule:Compact"</span>))</div><div class='output co'>#&gt; [1] 1 0</div><div class='input'>
+<span class='co'># check if input is a valid object ID, i.e. there is an object whose ID is</span>
+<span class='co'># the same with input integer</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_id</span>(<span class='fu'>c</span>(<span class='fl'>51</span>, <span class='fl'>1000</span>))</div><div class='output co'>#&gt; [1]  TRUE FALSE</div><div class='input'>
+<span class='co'># check if input is a valid object name, i.e., there is an object whose name is</span>
+<span class='co'># the same with input string</span>
+<span class='no'>idf</span>$<span class='fu'>is_valid_name</span>(<span class='fu'>c</span>(<span class='st'>"Simple One Zone (Wireframe DXF)"</span>, <span class='st'>"ZONE ONE"</span>))</div><div class='output co'>#&gt; [1] TRUE TRUE</div><div class='input'>
+<span class='co'># ===== OBJECT QUERY =====</span>
+<span class='co'># get objects using object IDs or names</span>
+<span class='no'>idf</span>$<span class='fu'>object</span>(<span class='fu'>c</span>(<span class='fl'>3</span>,<span class='fl'>10</span>))</div><div class='output co'>#&gt; $Simple_One_Zone_Wireframe_DXF_
+#&gt; &lt;&lt;[ID:3] `Simple One Zone (Wireframe DXF)`&gt;&gt; Building
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;  1: Simple One Zone (Wireframe DXF),  !- Name
+#&gt;  2: 0,                 !- North Axis {deg}
+#&gt;  3: Suburbs,           !- Terrain
+#&gt;  4: 0.04,              !- Loads Convergence Tolerance Value
+#&gt;  5: 0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+#&gt;  6: MinimalShadowing,  !- Solar Distribution
+#&gt;  7: 30,                !- Maximum Number of Warmup Days
+#&gt;  8: 6;                 !- Minimum Number of Warmup Days
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $Denver_Centennial_Golden_N_Ann_Htg_99_Condns_DB
+#&gt; &lt;&lt;[ID:10] `Denver Centennial  Golden   N Ann Htg 99% Condns DB`&gt;&gt; SizingPeriod:DesignDay
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !  WMO=724666 Time Zone=NAM: (GMT-07:00) Mountain Time (US &amp; Canada)
+#&gt; !  Data Source=ASHRAE 2009 Annual Design Conditions
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+#&gt; ! Coldest Month=DEC
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5degC
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; * 1: Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
+#&gt; * 2: 12,                !- Month
+#&gt; * 3: 21,                !- Day of Month
+#&gt; * 4: WinterDesignDay,   !- Day Type
+#&gt;   5: -15.5,             !- Maximum Dry-Bulb Temperature {C}
+#&gt;   6: 0,                 !- Daily Dry-Bulb Temperature Range {deltaC}
+#&gt;   7: &lt;Blank&gt;,           !- Dry-Bulb Temperature Range Modifier Type
+#&gt;   8: &lt;Blank&gt;,           !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+#&gt;   9: Wetbulb,           !- Humidity Condition Type
+#&gt;  10: -15.5,             !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+#&gt;  11: &lt;Blank&gt;,           !- Humidity Condition Day Schedule Name
+#&gt;  12: &lt;Blank&gt;,           !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+#&gt;  13: &lt;Blank&gt;,           !- Enthalpy at Maximum Dry-Bulb {J/kg}
+#&gt;  14: &lt;Blank&gt;,           !- Daily Wet-Bulb Temperature Range {deltaC}
+#&gt;  15: 81198,             !- Barometric Pressure {Pa}
+#&gt; *16: 3,                 !- Wind Speed {m/s}
+#&gt; *17: 340,               !- Wind Direction {deg}
+#&gt;  18: No,                !- Rain Indicator
+#&gt;  19: No,                !- Snow Indicator
+#&gt;  20: No,                !- Daylight Saving Time Indicator
+#&gt;  21: ASHRAEClearSky,    !- Solar Model Indicator
+#&gt;  22: &lt;Blank&gt;,           !- Beam Solar Day Schedule Name
+#&gt;  23: &lt;Blank&gt;,           !- Diffuse Solar Day Schedule Name
+#&gt;  24: &lt;Blank&gt;,           !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+#&gt;  25: &lt;Blank&gt;,           !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+#&gt;  26: 0;                 !- Sky Clearness
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='co'># NOTE: object name matching is case-insensitive</span>
+<span class='no'>idf</span>$<span class='fu'>object</span>(<span class='fu'>c</span>(<span class='st'>"Simple One Zone (Wireframe DXF)"</span>, <span class='st'>"zone one"</span>))</div><div class='output co'>#&gt; $Simple_One_Zone_Wireframe_DXF_
+#&gt; &lt;&lt;[ID:3] `Simple One Zone (Wireframe DXF)`&gt;&gt; Building
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;  1: Simple One Zone (Wireframe DXF),  !- Name
+#&gt;  2: 0,                 !- North Axis {deg}
+#&gt;  3: Suburbs,           !- Terrain
+#&gt;  4: 0.04,              !- Loads Convergence Tolerance Value
+#&gt;  5: 0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+#&gt;  6: MinimalShadowing,  !- Solar Distribution
+#&gt;  7: 30,                !- Maximum Number of Warmup Days
+#&gt;  8: 6;                 !- Minimum Number of Warmup Days
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $ZONE_ONE
+#&gt; &lt;&lt;[ID:18] `ZONE ONE`&gt;&gt; Zone
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: ZONE ONE,          !- Name
+#&gt;  2: 0,                 !- Direction of Relative North {deg}
+#&gt;  3: 0,                 !- X Origin {m}
+#&gt;  4: 0,                 !- Y Origin {m}
+#&gt;  5: 0,                 !- Z Origin {m}
+#&gt;  6: 1,                 !- Type
+#&gt;  7: 1,                 !- Multiplier
+#&gt;  8: autocalculate,     !- Ceiling Height {m}
+#&gt;  9: autocalculate;     !- Volume {m3}
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># the names of returned list are "underscore-style" object names</span>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='fu'>object</span>(<span class='fu'>c</span>(<span class='st'>"Simple One Zone (Wireframe DXF)"</span>, <span class='st'>"zone one"</span>)))</div><div class='output co'>#&gt; [1] "Simple_One_Zone_Wireframe_DXF_" "ZONE_ONE"                      </div><div class='input'>
+<span class='co'># get all objects in classes in a named list</span>
+<span class='no'>idf</span>$<span class='fu'>object_in_class</span>(<span class='st'>"Zone"</span>)</div><div class='output co'>#&gt; $ZONE_ONE
+#&gt; &lt;&lt;[ID:18] `ZONE ONE`&gt;&gt; Zone
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: ZONE ONE,          !- Name
+#&gt;  2: 0,                 !- Direction of Relative North {deg}
+#&gt;  3: 0,                 !- X Origin {m}
+#&gt;  4: 0,                 !- Y Origin {m}
+#&gt;  5: 0,                 !- Z Origin {m}
+#&gt;  6: 1,                 !- Type
+#&gt;  7: 1,                 !- Multiplier
+#&gt;  8: autocalculate,     !- Ceiling Height {m}
+#&gt;  9: autocalculate;     !- Volume {m3}
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='fu'>names</span>(<span class='no'>idf</span>$<span class='fu'>object_in_class</span>(<span class='st'>"Zone"</span>))</div><div class='output co'>#&gt; [1] "ZONE_ONE"</div><div class='input'>
+<span class='co'># OR using shortcuts</span>
+<span class='no'>idf</span>$<span class='no'>Zone</span></div><div class='output co'>#&gt; $ZONE_ONE
+#&gt; &lt;&lt;[ID:18] `ZONE ONE`&gt;&gt; Zone
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: ZONE ONE,          !- Name
+#&gt;  2: 0,                 !- Direction of Relative North {deg}
+#&gt;  3: 0,                 !- X Origin {m}
+#&gt;  4: 0,                 !- Y Origin {m}
+#&gt;  5: 0,                 !- Z Origin {m}
+#&gt;  6: 1,                 !- Type
+#&gt;  7: 1,                 !- Multiplier
+#&gt;  8: autocalculate,     !- Ceiling Height {m}
+#&gt;  9: autocalculate;     !- Volume {m3}
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='no'>idf</span><span class='kw'>[[</span><span class='st'>"Zone"</span>]]</div><div class='output co'>#&gt; $ZONE_ONE
+#&gt; &lt;&lt;[ID:18] `ZONE ONE`&gt;&gt; Zone
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: ZONE ONE,          !- Name
+#&gt;  2: 0,                 !- Direction of Relative North {deg}
+#&gt;  3: 0,                 !- X Origin {m}
+#&gt;  4: 0,                 !- Y Origin {m}
+#&gt;  5: 0,                 !- Z Origin {m}
+#&gt;  6: 1,                 !- Type
+#&gt;  7: 1,                 !- Multiplier
+#&gt;  8: autocalculate,     !- Ceiling Height {m}
+#&gt;  9: autocalculate;     !- Volume {m3}
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># search objects using regular expression</span>
+<span class='fu'>length</span>(<span class='no'>idf</span>$<span class='fu'>search_object</span>(<span class='st'>"R13"</span>))</div><div class='output co'>#&gt; [1] 2</div><div class='input'>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='fu'>search_object</span>(<span class='st'>"R13"</span>))</div><div class='output co'>#&gt; [1] "R13LAYER" "R13WALL" </div><div class='input'>
+<span class='co'># search objects using regular expression in specifc class</span>
+<span class='fu'>length</span>(<span class='no'>idf</span>$<span class='fu'>search_object</span>(<span class='st'>"R13"</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='st'>"Construction"</span>))</div><div class='output co'>#&gt; [1] 1</div><div class='input'>
+<span class='co'># get more controls on matching using `stringr::regex()`</span>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='fu'>search_object</span>(<span class='kw pkg'>stringr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/stringr/topics/modifiers'>regex</a></span>(<span class='st'>"zn.*1.*wall"</span>, <span class='kw'>ignore_case</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)))</div><div class='output co'>#&gt; [1] "Zn001_Wall001" "Zn001_Wall002" "Zn001_Wall003" "Zn001_Wall004"</div><div class='input'>
+<span class='co'># ===== DUPLICATE OBJECTS =====</span>
+<span class='co'># duplicate objects in "Construction" class</span>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='no'>Construction</span>)</div><div class='output co'>#&gt; [1] "R13WALL" "FLOOR"   "ROOF31" </div><div class='input'>
+<span class='no'>idf</span>$<span class='fu'>dup_object</span>(<span class='st'>"R13WALL"</span>)</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; New names of duplicated objects were not given. Automatically generated names were assigned:
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_1`
+#&gt; </div><div class='output co'>#&gt; $R13WALL_1
+#&gt; &lt;&lt;[ID:54] `R13WALL_1`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_1,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='co'># new objects will have the same names as the duplicated objects but with a</span>
+<span class='co'># suffix "_1", "_2" and etc.</span>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='no'>Construction</span>)</div><div class='output co'>#&gt; [1] "R13WALL"   "FLOOR"     "ROOF31"    "R13WALL_1"</div><div class='input'>
+<span class='co'># new names can also be explicitly specified</span>
+<span class='no'>idf</span>$<span class='fu'>dup_object</span>(<span class='st'>"R13WALL"</span>, <span class='kw'>new_name</span> <span class='kw'>=</span> <span class='st'>"My-R13Wall"</span>)</div><div class='output co'>#&gt; $My_R13Wall
+#&gt; &lt;&lt;[ID:55] `My-R13Wall`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: My-R13Wall,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># duplicate an object multiple times</span>
+<span class='no'>idf</span>$<span class='fu'>dup_object</span>(<span class='fu'>rep</span>(<span class='st'>"R13WALL"</span>, <span class='kw'>time</span> <span class='kw'>=</span> <span class='fl'>10</span>))</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; New names of duplicated objects were not given. Automatically generated names were assigned:
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_2`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_3`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_4`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_5`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_6`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_7`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_8`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_9`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_10`
+#&gt;   * Target Object [ID: 15] Name `R13WALL`--&gt; Auto Assigned Name: `R13WALL_11`
+#&gt; </div><div class='output co'>#&gt; $R13WALL_2
+#&gt; &lt;&lt;[ID:56] `R13WALL_2`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_2,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_3
+#&gt; &lt;&lt;[ID:57] `R13WALL_3`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_3,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_4
+#&gt; &lt;&lt;[ID:58] `R13WALL_4`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_4,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_5
+#&gt; &lt;&lt;[ID:59] `R13WALL_5`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_5,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_6
+#&gt; &lt;&lt;[ID:60] `R13WALL_6`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_6,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_7
+#&gt; &lt;&lt;[ID:61] `R13WALL_7`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_7,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_8
+#&gt; &lt;&lt;[ID:62] `R13WALL_8`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_8,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_9
+#&gt; &lt;&lt;[ID:63] `R13WALL_9`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_9,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_10
+#&gt; &lt;&lt;[ID:64] `R13WALL_10`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_10,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_11
+#&gt; &lt;&lt;[ID:65] `R13WALL_11`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_11,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># ===== ADD OBJECTS =====</span>
+<span class='co'># add two new objects in "RunPeriod" class</span>
+<span class='no'>idf</span>$<span class='fu'>add_object</span>(<span class='fu'>rep</span>(<span class='st'>"RunPeriod"</span>, <span class='fl'>2</span>),
+    <span class='kw'>value</span> <span class='kw'>=</span> <span class='fu'>list</span>(
+        <span class='fu'>list</span>(<span class='st'>"rp_test_1"</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>1</span>),
+
+        <span class='fu'>list</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"rp_test_2"</span>,
+            <span class='kw'>begin_month</span> <span class='kw'>=</span> <span class='fl'>3</span>,
+            <span class='kw'>begin_day_of_month</span> <span class='kw'>=</span> <span class='fl'>1</span>,
+            <span class='kw'>end_month</span> <span class='kw'>=</span> <span class='fl'>4</span>,
+            <span class='kw'>end_day_of_month</span> <span class='kw'>=</span> <span class='fl'>1</span>)
+    ),
+    <span class='kw'>comment</span> <span class='kw'>=</span> <span class='fu'>list</span>(
+        <span class='fu'>list</span>(<span class='st'>"Comment for new object 1"</span>, <span class='st'>"Another comment"</span>),
+        <span class='fu'>list</span>(<span class='st'>"Comment for new object 2"</span>)),
+    <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</div><div class='output co'>#&gt; $rp_test_1
+#&gt; &lt;&lt;[ID:66] `rp_test_1`&gt;&gt; RunPeriod
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !Comment for new object 1
+#&gt; !Another comment
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1: rp_test_1,         !- Name
+#&gt; * 2: 1,                 !- Begin Month
+#&gt; * 3: 1,                 !- Begin Day of Month
+#&gt; * 4: 2,                 !- End Month
+#&gt; * 5: 1,                 !- End Day of Month
+#&gt;   6: UseWeatherFile,    !- Day of Week for Start Day
+#&gt;   7: Yes,               !- Use Weather File Holidays and Special Days
+#&gt;   8: Yes,               !- Use Weather File Daylight Saving Period
+#&gt;   9: No,                !- Apply Weekend Holiday Rule
+#&gt;  10: Yes,               !- Use Weather File Rain Indicators
+#&gt;  11: Yes;               !- Use Weather File Snow Indicators
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $rp_test_2
+#&gt; &lt;&lt;[ID:67] `rp_test_2`&gt;&gt; RunPeriod
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !Comment for new object 2
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1: rp_test_2,         !- Name
+#&gt; * 2: 3,                 !- Begin Month
+#&gt; * 3: 1,                 !- Begin Day of Month
+#&gt; * 4: 4,                 !- End Month
+#&gt; * 5: 1,                 !- End Day of Month
+#&gt;   6: UseWeatherFile,    !- Day of Week for Start Day
+#&gt;   7: Yes,               !- Use Weather File Holidays and Special Days
+#&gt;   8: Yes,               !- Use Weather File Daylight Saving Period
+#&gt;   9: No,                !- Apply Weekend Holiday Rule
+#&gt;  10: Yes,               !- Use Weather File Rain Indicators
+#&gt;  11: Yes;               !- Use Weather File Snow Indicators
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># ===== INSERT OBJECTS =====</span>
+<span class='co'># insert objects from other Idf object</span>
+<span class='no'>idf_1</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'>system.file</span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>),
+    <span class='kw'>idd</span> <span class='kw'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>))
+
+<span class='no'>idf_1</span>$<span class='fu'>object_name</span>(<span class='st'>"Material"</span>)</div><div class='output co'>#&gt; $Material
+#&gt; [1] "C5 - 4 IN HW CONCRETE"
+#&gt; </div><div class='input'>
+<span class='co'># rename material name from "C5 - 4 IN HW CONCRETE" to "test", otherwise</span>
+<span class='co'># insertion will be aborted as there will be two materials with the same name</span>
+<span class='co'># in the idf</span>
+<span class='no'>idf_1</span>$<span class='no'>Material</span>$<span class='no'>C5_4_IN_HW_CONCRETE</span>$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"test"</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `test`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: test,              !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
+<span class='co'># insert the object</span>
+<span class='no'>idf</span>$<span class='fu'>ins_object</span>(<span class='no'>idf_1</span>$<span class='no'>Material</span>$<span class='no'>test</span>)</div><div class='output co'>#&gt; $test
+#&gt; &lt;&lt;[ID:68] `test`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: test,              !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># check if material named "test" is there</span>
+<span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='st'>"Material"</span>)</div><div class='output co'>#&gt; $Material
+#&gt; [1] "C5 - 4 IN HW CONCRETE" "test"                 
+#&gt; </div><div class='input'>
+# $ins_object() is useful when importing design days from a ".ddy" file
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>idf</span>$<span class='fu'>ins_object</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='st'>"foo.ddy"</span>))
+<span class='co'># }</span><div class='input'>
+<span class='co'># ===== SET OBJECTS =====</span>
+<span class='co'># set the thickness of newly inserted material "test" to 0.2 m</span>
+<span class='no'>idf</span>$<span class='fu'>set_object</span>(<span class='st'>"test"</span>, <span class='kw'>value</span> <span class='kw'>=</span> <span class='fu'>list</span>(<span class='kw'>thickness</span> <span class='kw'>=</span> <span class='fl'>0.2</span>))</div><div class='output co'>#&gt; $test
+#&gt; &lt;&lt;[ID:68] `test`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: test,              !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.2,               !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='no'>idf</span>$<span class='no'>Material</span>$<span class='no'>test</span>$<span class='no'>Thickness</span></div><div class='output co'>#&gt; [1] 0.2</div><div class='input'>
+<span class='co'># set thermal absorptance of all material to 0.85</span>
+<span class='no'>id_mat</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>$<span class='fu'>object_id</span>(<span class='st'>"Material"</span>, <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='no'>idf</span>$<span class='fu'>set_object</span>(<span class='no'>id_mat</span>,
+    <span class='kw'>value</span> <span class='kw'>=</span> <span class='fu'>rep</span>(
+        <span class='fu'>list</span>(<span class='fu'>list</span>(<span class='kw'>thermal_absorptance</span> <span class='kw'>=</span> <span class='fl'>0.85</span>)),
+        <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'>length</span>(<span class='no'>id_mat</span>)
+    )
+)</div><div class='output co'>#&gt; $C5_4_IN_HW_CONCRETE
+#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.85,              !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $test
+#&gt; &lt;&lt;[ID:68] `test`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: test,              !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.2,               !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.85,              !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># check results</span>
+<span class='fu'>lapply</span>(<span class='no'>idf</span>$<span class='no'>Material</span>, <span class='kw'>function</span> (<span class='no'>mat</span>) <span class='no'>mat</span>$<span class='no'>Thermal_Absorptance</span>)</div><div class='output co'>#&gt; $C5_4_IN_HW_CONCRETE
+#&gt; [1] 0.85
+#&gt; 
+#&gt; $test
+#&gt; [1] 0.85
+#&gt; </div><div class='input'>
+<span class='co'># reset thermal absorptance of all material to the default</span>
+<span class='no'>idf</span>$<span class='fu'>set_object</span>(<span class='no'>id_mat</span>,
+    <span class='kw'>value</span> <span class='kw'>=</span> <span class='fu'>rep</span>(
+        <span class='fu'>list</span>(<span class='fu'>list</span>(<span class='kw'>thermal_absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>)),
+        <span class='kw'>times</span> <span class='kw'>=</span> <span class='fu'>length</span>(<span class='no'>id_mat</span>)
+    ),
+    <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</div><div class='output co'>#&gt; $C5_4_IN_HW_CONCRETE
+#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $test
+#&gt; &lt;&lt;[ID:68] `test`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: test,              !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.2,               !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='co'># check results</span>
+<span class='fu'>lapply</span>(<span class='no'>idf</span>$<span class='no'>Material</span>, <span class='kw'>function</span> (<span class='no'>mat</span>) <span class='no'>mat</span>$<span class='no'>Thermal_Absorptance</span>)</div><div class='output co'>#&gt; $C5_4_IN_HW_CONCRETE
+#&gt; [1] 0.9
+#&gt; 
+#&gt; $test
+#&gt; [1] 0.9
+#&gt; </div><div class='input'>
+<span class='co'># ===== DELELTE OBJECTS =====</span>
+<span class='co'># delete the added run period "rp_test_1", "rp_test_2" and "test" from above</span>
+<span class='no'>idf</span>$<span class='fu'>del_object</span>(<span class='fu'>c</span>(<span class='st'>"test"</span>, <span class='st'>"rp_test_1"</span>, <span class='st'>"rp_test_2"</span>))</div><div class='output co'>#&gt; # Path: `/home/hongyuanjia/Dropbox/github_repo/eplusr/inst/extdata/1ZoneUncontrolled.idf`
+#&gt; # Version: `8.8`
+#&gt; 
+#&gt; Group: `Simulation Parameters`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Version
+#&gt; [01] SimulationControl
+#&gt; [01] Building
+#&gt; [01] SurfaceConvectionAlgorithm:Inside
+#&gt; [01] SurfaceConvectionAlgorithm:Outside
+#&gt; [01] HeatBalanceAlgorithm
+#&gt; [01] Timestep
+#&gt; 
+#&gt; Group: `Location and Climate`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Site:Location
+#&gt; [02] SizingPeriod:DesignDay
+#&gt; [01] RunPeriod
+#&gt; 
+#&gt; Group: `Schedules`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [02] ScheduleTypeLimits
+#&gt; [01] Schedule:Constant
+#&gt; 
+#&gt; Group: `Surface Construction Elements`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Material
+#&gt; [02] Material:NoMass
+#&gt; [15] Construction
+#&gt; 
+#&gt; Group: `Thermal Zones and Surfaces`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] GlobalGeometryRules
+#&gt; [01] Zone
+#&gt; [06] BuildingSurface:Detailed
+#&gt; 
+#&gt; Group: `Internal Gains`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [02] OtherEquipment
+#&gt; 
+#&gt; Group: `Exterior Equipment`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Exterior:Lights
+#&gt; 
+#&gt; Group: `Output Reporting`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Output:VariableDictionary
+#&gt; [01] Output:Surfaces:Drawing
+#&gt; [01] Output:Constructions
+#&gt; [01] Output:Table:SummaryReports
+#&gt; [01] OutputControl:Table:Style
+#&gt; [14] Output:Variable
+#&gt; [03] Output:Meter:MeterFileOnly</div><div class='input'><span class='fu'>names</span>(<span class='no'>idf</span>$<span class='no'>Material</span>)</div><div class='output co'>#&gt; [1] "C5_4_IN_HW_CONCRETE"</div><div class='input'><span class='co'># [1] "C5_4_IN_HW_CONCRETE"</span>
+<span class='fu'>names</span>(<span class='no'>idf</span>$<span class='no'>RunPeriod</span>)</div><div class='output co'>#&gt; [1] NA</div><div class='input'><span class='co'># [1] NA</span>
+
+<span class='co'># In "final" validate level, delete will be aborted if the target obejcts are</span>
+<span class='co'># referenced by other objects.</span>
+<span class='co'># get objects that referenced material "R13LAYER"</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='st'>"validate_level"</span>)</div><div class='output co'>#&gt; [1] "final"</div><div class='input'>
+<span class='no'>idf</span>$<span class='no'>Material_NoMass</span>$<span class='no'>R13LAYER</span>$<span class='fu'>ref_by_object</span>()</div><div class='output co'>#&gt; <span class='message'>13 object found that reference the target object [ID: 12].</span></div><div class='output co'>#&gt; $R13WALL
+#&gt; &lt;&lt;[ID:15] `R13WALL`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL,           !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_1
+#&gt; &lt;&lt;[ID:54] `R13WALL_1`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_1,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $My_R13Wall
+#&gt; &lt;&lt;[ID:55] `My-R13Wall`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: My-R13Wall,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_2
+#&gt; &lt;&lt;[ID:56] `R13WALL_2`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_2,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_3
+#&gt; &lt;&lt;[ID:57] `R13WALL_3`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_3,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_4
+#&gt; &lt;&lt;[ID:58] `R13WALL_4`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_4,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_5
+#&gt; &lt;&lt;[ID:59] `R13WALL_5`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_5,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_6
+#&gt; &lt;&lt;[ID:60] `R13WALL_6`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_6,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_7
+#&gt; &lt;&lt;[ID:61] `R13WALL_7`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_7,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_8
+#&gt; &lt;&lt;[ID:62] `R13WALL_8`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_8,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_9
+#&gt; &lt;&lt;[ID:63] `R13WALL_9`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_9,         !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_10
+#&gt; &lt;&lt;[ID:64] `R13WALL_10`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_10,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; 
+#&gt; $R13WALL_11
+#&gt; &lt;&lt;[ID:65] `R13WALL_11`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: R13WALL_11,        !- Name
+#&gt; *2: R13LAYER;          !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='fu'>length</span>(<span class='no'>idf</span>$<span class='no'>Material_NoMass</span>$<span class='no'>R13LAYER</span>$<span class='fu'>ref_by_object</span>())</div><div class='output co'>#&gt; <span class='message'>13 object found that reference the target object [ID: 12].</span></div><div class='output co'>#&gt; [1] 13</div><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>idf</span>$<span class='fu'>del_object</span>(<span class='st'>"R13LAYER"</span>)
+<span class='co'># }</span><div class='input'> # will give an error in "final" validate level
+
+# objects referencing target objects can also be delted by setting `referenced`
+# to TRUE
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>idf</span>$<span class='fu'>del_object</span>(<span class='st'>"R13LAYER"</span>, <span class='kw'>referenced</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='co'># }</span><div class='input'> <span class='co'># will give an error in "final" validate level</span>
+
+<span class='co'># ===== SEARCH ADN REPLACE OBJECT VALUES =====</span>
+<span class='co'># get objects whose field values contains both "VAV" and "Node"</span>
+<span class='no'>idf</span>$<span class='fu'>search_value</span>(<span class='st'>"WALL"</span>)</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; 16 results found in class`Construction` and `BuildingSurface:Detailed`.
+#&gt; 
+#&gt; 
+#&gt;   Class `Construction`
+#&gt;   +- Object [ID:15]
+#&gt;   |  \- 1: R13WALL;           !- Name
+#&gt;   +- Object [ID:54]
+#&gt;   |  \- 1: R13WALL_1;         !- Name
+#&gt;   +- Object [ID:56]
+#&gt;   |  \- 1: R13WALL_2;         !- Name
+#&gt;   +- Object [ID:57]
+#&gt;   |  \- 1: R13WALL_3;         !- Name
+#&gt;   +- Object [ID:58]
+#&gt;   |  \- 1: R13WALL_4;         !- Name
+#&gt;   +- Object [ID:59]
+#&gt;   |  \- 1: R13WALL_5;         !- Name
+#&gt;   +- Object [ID:60]
+#&gt;   |  \- 1: R13WALL_6;         !- Name
+#&gt;   +- Object [ID:61]
+#&gt;   |  \- 1: R13WALL_7;         !- Name
+#&gt;   +- Object [ID:62]
+#&gt;   |  \- 1: R13WALL_8;         !- Name
+#&gt;   +- Object [ID:63]
+#&gt;   |  \- 1: R13WALL_9;         !- Name
+#&gt;   +- Object [ID:64]
+#&gt;   |  \- 1: R13WALL_10;        !- Name
+#&gt;   \- Object [ID:65]
+#&gt;      \- 1: R13WALL_11;        !- Name
+#&gt; 
+#&gt;   Class `BuildingSurface:Detailed`
+#&gt;   +- Object [ID:21]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:22]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:23]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   \- Object [ID:24]
+#&gt;      \- 3: R13WALL;           !- Construction Name</div><div class='input'><span class='fu'>length</span>(<span class='no'>idf</span>$<span class='fu'>search_value</span>(<span class='st'>"WALL"</span>))</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; 16 results found in class`Construction` and `BuildingSurface:Detailed`.
+#&gt; 
+#&gt; 
+#&gt;   Class `Construction`
+#&gt;   +- Object [ID:15]
+#&gt;   |  \- 1: R13WALL;           !- Name
+#&gt;   +- Object [ID:54]
+#&gt;   |  \- 1: R13WALL_1;         !- Name
+#&gt;   +- Object [ID:56]
+#&gt;   |  \- 1: R13WALL_2;         !- Name
+#&gt;   +- Object [ID:57]
+#&gt;   |  \- 1: R13WALL_3;         !- Name
+#&gt;   +- Object [ID:58]
+#&gt;   |  \- 1: R13WALL_4;         !- Name
+#&gt;   +- Object [ID:59]
+#&gt;   |  \- 1: R13WALL_5;         !- Name
+#&gt;   +- Object [ID:60]
+#&gt;   |  \- 1: R13WALL_6;         !- Name
+#&gt;   +- Object [ID:61]
+#&gt;   |  \- 1: R13WALL_7;         !- Name
+#&gt;   +- Object [ID:62]
+#&gt;   |  \- 1: R13WALL_8;         !- Name
+#&gt;   +- Object [ID:63]
+#&gt;   |  \- 1: R13WALL_9;         !- Name
+#&gt;   +- Object [ID:64]
+#&gt;   |  \- 1: R13WALL_10;        !- Name
+#&gt;   \- Object [ID:65]
+#&gt;      \- 1: R13WALL_11;        !- Name
+#&gt; 
+#&gt;   Class `BuildingSurface:Detailed`
+#&gt;   +- Object [ID:21]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:22]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:23]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   \- Object [ID:24]
+#&gt;      \- 3: R13WALL;           !- Construction Name</div><div class='output co'>#&gt; [1] 16</div><div class='input'><span class='fu'>names</span>(<span class='no'>idf</span>$<span class='fu'>search_value</span>(<span class='st'>"WALL"</span>))</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; 16 results found in class`Construction` and `BuildingSurface:Detailed`.
+#&gt; 
+#&gt; 
+#&gt;   Class `Construction`
+#&gt;   +- Object [ID:15]
+#&gt;   |  \- 1: R13WALL;           !- Name
+#&gt;   +- Object [ID:54]
+#&gt;   |  \- 1: R13WALL_1;         !- Name
+#&gt;   +- Object [ID:56]
+#&gt;   |  \- 1: R13WALL_2;         !- Name
+#&gt;   +- Object [ID:57]
+#&gt;   |  \- 1: R13WALL_3;         !- Name
+#&gt;   +- Object [ID:58]
+#&gt;   |  \- 1: R13WALL_4;         !- Name
+#&gt;   +- Object [ID:59]
+#&gt;   |  \- 1: R13WALL_5;         !- Name
+#&gt;   +- Object [ID:60]
+#&gt;   |  \- 1: R13WALL_6;         !- Name
+#&gt;   +- Object [ID:61]
+#&gt;   |  \- 1: R13WALL_7;         !- Name
+#&gt;   +- Object [ID:62]
+#&gt;   |  \- 1: R13WALL_8;         !- Name
+#&gt;   +- Object [ID:63]
+#&gt;   |  \- 1: R13WALL_9;         !- Name
+#&gt;   +- Object [ID:64]
+#&gt;   |  \- 1: R13WALL_10;        !- Name
+#&gt;   \- Object [ID:65]
+#&gt;      \- 1: R13WALL_11;        !- Name
+#&gt; 
+#&gt;   Class `BuildingSurface:Detailed`
+#&gt;   +- Object [ID:21]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:22]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:23]
+#&gt;   |  \- 3: R13WALL;           !- Construction Name
+#&gt;   \- Object [ID:24]
+#&gt;      \- 3: R13WALL;           !- Construction Name</div><div class='output co'>#&gt;  [1] "R13WALL"       "Zn001_Wall001" "Zn001_Wall002" "Zn001_Wall003"
+#&gt;  [5] "Zn001_Wall004" "R13WALL_1"     "R13WALL_2"     "R13WALL_3"    
+#&gt;  [9] "R13WALL_4"     "R13WALL_5"     "R13WALL_6"     "R13WALL_7"    
+#&gt; [13] "R13WALL_8"     "R13WALL_9"     "R13WALL_10"    "R13WALL_11"   </div><div class='input'>
+<span class='co'># replace values using regular expression</span>
+<span class='co'># NOTE: No field validation will be performed! Should be treated as a low-level</span>
+<span class='co'># method. Use with caution.</span>
+<span class='no'>idf</span>$<span class='fu'>replace_value</span>(<span class='st'>"WALL"</span>, <span class='st'>"A_WALL"</span>)</div><div class='output co'>#&gt; 
+#&gt;   Class `Construction`
+#&gt;   +- Object [ID:15]
+#&gt;   |  +- 1(after) : R13A_WALL,         !- Name
+#&gt;   |  \- 1(before): R13WALL;           !- Name
+#&gt;   +- Object [ID:54]
+#&gt;   |  +- 1(after) : R13A_WALL_1,       !- Name
+#&gt;   |  \- 1(before): R13WALL_1;         !- Name
+#&gt;   +- Object [ID:56]
+#&gt;   |  +- 1(after) : R13A_WALL_2,       !- Name
+#&gt;   |  \- 1(before): R13WALL_2;         !- Name
+#&gt;   +- Object [ID:57]
+#&gt;   |  +- 1(after) : R13A_WALL_3,       !- Name
+#&gt;   |  \- 1(before): R13WALL_3;         !- Name
+#&gt;   +- Object [ID:58]
+#&gt;   |  +- 1(after) : R13A_WALL_4,       !- Name
+#&gt;   |  \- 1(before): R13WALL_4;         !- Name
+#&gt;   +- Object [ID:59]
+#&gt;   |  +- 1(after) : R13A_WALL_5,       !- Name
+#&gt;   |  \- 1(before): R13WALL_5;         !- Name
+#&gt;   +- Object [ID:60]
+#&gt;   |  +- 1(after) : R13A_WALL_6,       !- Name
+#&gt;   |  \- 1(before): R13WALL_6;         !- Name
+#&gt;   +- Object [ID:61]
+#&gt;   |  +- 1(after) : R13A_WALL_7,       !- Name
+#&gt;   |  \- 1(before): R13WALL_7;         !- Name
+#&gt;   +- Object [ID:62]
+#&gt;   |  +- 1(after) : R13A_WALL_8,       !- Name
+#&gt;   |  \- 1(before): R13WALL_8;         !- Name
+#&gt;   +- Object [ID:63]
+#&gt;   |  +- 1(after) : R13A_WALL_9,       !- Name
+#&gt;   |  \- 1(before): R13WALL_9;         !- Name
+#&gt;   +- Object [ID:64]
+#&gt;   |  +- 1(after) : R13A_WALL_10,      !- Name
+#&gt;   |  \- 1(before): R13WALL_10;        !- Name
+#&gt;   \- Object [ID:65]
+#&gt;      +- 1(after) : R13A_WALL_11,      !- Name
+#&gt;      \- 1(before): R13WALL_11;        !- Name
+#&gt; 
+#&gt;   Class `BuildingSurface:Detailed`
+#&gt;   +- Object [ID:21]
+#&gt;   |  +- 3(after) : R13A_WALL,         !- Construction Name
+#&gt;   |  \- 3(before): R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:22]
+#&gt;   |  +- 3(after) : R13A_WALL,         !- Construction Name
+#&gt;   |  \- 3(before): R13WALL;           !- Construction Name
+#&gt;   +- Object [ID:23]
+#&gt;   |  +- 3(after) : R13A_WALL,         !- Construction Name
+#&gt;   |  \- 3(before): R13WALL;           !- Construction Name
+#&gt;   \- Object [ID:24]
+#&gt;      +- 3(after) : R13A_WALL,         !- Construction Name
+#&gt;      \- 3(before): R13WALL;           !- Construction Name</div><div class='input'>
+<span class='co'># ===== VALIDATE MODEL =====</span>
+<span class='co'># check if there are errors in current model</span>
+<span class='no'>idf</span>$<span class='fu'>validate</span>()</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='no'>idf</span>$<span class='fu'>is_valid</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># change validate level to "none", which will enable invalid modifications</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"none"</span>)</div><div class='output co'>#&gt; $validate_level
+#&gt; [1] "none"
+#&gt; </div><div class='input'>
+<span class='co'># change the outside layer of floor to an invalid material</span>
+<span class='no'>idf</span>$<span class='fu'>set_object</span>(<span class='st'>"FLOOR"</span>, <span class='fu'>list</span>(<span class='kw'>outside_layer</span> <span class='kw'>=</span> <span class='st'>"wrong_layer"</span>))</div><div class='output co'>#&gt; $FLOOR
+#&gt; &lt;&lt;[ID:16] `FLOOR`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: FLOOR,             !- Name
+#&gt; *2: wrong_layer;       !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'>
+<span class='co'># change validate level back to "final" and validate the model again</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"final"</span>)</div><div class='output co'>#&gt; $validate_level
+#&gt; [1] "final"
+#&gt; </div><div class='input'>
+<span class='no'>idf</span>$<span class='fu'>validate</span>()</div><div class='output co'>#&gt;  ✖ [1] Errors found during validation.
+#&gt; ════════════════════════════════════════════════════════════════════════════════
+#&gt; 
+#&gt; ── [1] Invalid Reference ───────────────────────────────────────────────────────
+#&gt; ⓧ Fields below are not one of valid references.
+#&gt; 
+#&gt;   Class `Construction`
+#&gt;   \- Object [ID:16]
+#&gt;      \- 2: wrong_layer;       !- Outside Layer
+#&gt; </div><div class='input'><span class='no'>idf</span>$<span class='fu'>is_valid</span>()</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># get IDs of all objects that contains invalid reference fields</span>
+<span class='no'>idf</span>$<span class='fu'>validate</span>()$<span class='no'>invalid_reference</span>$<span class='no'>object_id</span></div><div class='output co'>#&gt; [1] 16</div><div class='input'>
+<span class='co'># fix the error</span>
+<span class='no'>idf</span>$<span class='fu'>set_object</span>(<span class='fl'>16</span>, <span class='fu'>list</span>(<span class='kw'>outside_layer</span> <span class='kw'>=</span> <span class='no'>idf</span>$<span class='no'>Material</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='fu'>name</span>()))</div><div class='output co'>#&gt; $FLOOR
+#&gt; &lt;&lt;[ID:16] `FLOOR`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: FLOOR,             !- Name
+#&gt; *2: C5 - 4 IN HW CONCRETE;  !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='no'>idf</span>$<span class='fu'>validate</span>()</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='no'>idf</span>$<span class='fu'>is_valid</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># ===== FORMAT MODEL =====</span>
+<span class='co'># get text format of the model</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>string</span>())</div><div class='output co'>#&gt;  chr [1:600] "!-Generator eplusr" "!-Option" ...</div><div class='input'>
+<span class='co'># get text format of the model, excluding the header and all comments</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='fu'>string</span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>header</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))</div><div class='output co'>#&gt;  chr [1:503] "" "Version," ...</div><div class='input'>
+<span class='co'># ===== SAVE MODEL =====</span>
+<span class='co'># check if the model has been modified since read or last saved</span>
+<span class='no'>idf</span>$<span class='fu'>is_unsaved</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+# save and overwrite current model
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>idf</span>$<span class='fu'>save</span>(<span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='co'># }</span><div class='input'>
+# save the model with newly created and modified objects at the top
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>idf</span>$<span class='fu'>save</span>(<span class='kw'>overwrite</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>format</span> <span class='kw'>=</span> <span class='st'>"new_top"</span>)
+<span class='co'># }</span><div class='input'>
+<span class='co'># save the model to a new file</span>
+<span class='no'>idf</span>$<span class='fu'>save</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"test.idf"</span>))
+
+<span class='co'># save the model to a new file and copy all external csv files used in</span>
+<span class='co'># "Schedule:File" class into the same folder</span>
+<span class='no'>idf</span>$<span class='fu'>save</span>(<span class='kw'>path</span> <span class='kw'>=</span> <span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"test1.idf"</span>), <span class='kw'>copy_external</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+<span class='co'># the path of this model will be changed to the saved path</span>
+<span class='no'>idf</span>$<span class='fu'>path</span>()</div><div class='output co'>#&gt; [1] "/tmp/RtmpgQVpjC/test1.idf"</div><div class='input'>
+<span class='co'># ===== CLONE MODEL =====</span>
+<span class='co'># Idf object are modified in place and has reference semantic.</span>
+<span class='no'>idf_2</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>
+<span class='no'>idf_2</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Simple One Zone (Wireframe DXF)"
+#&gt; </div><div class='input'><span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Simple One Zone (Wireframe DXF)"
+#&gt; </div><div class='input'>
+<span class='co'># modify idf_2 will also affect idf as well</span>
+<span class='no'>idf_2</span>$<span class='no'>Building</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Building_Name_Changed"</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:3] `Building_Name_Changed`&gt;&gt; Building
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;  1: Building_Name_Changed,  !- Name
+#&gt;  2: 0,                 !- North Axis {deg}
+#&gt;  3: Suburbs,           !- Terrain
+#&gt;  4: 0.04,              !- Loads Convergence Tolerance Value
+#&gt;  5: 0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+#&gt;  6: MinimalShadowing,  !- Solar Distribution
+#&gt;  7: 30,                !- Maximum Number of Warmup Days
+#&gt;  8: 6;                 !- Minimum Number of Warmup Days
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>idf_2</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Building_Name_Changed"
+#&gt; </div><div class='input'><span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Building_Name_Changed"
+#&gt; </div><div class='input'>
+<span class='co'># in order to make a copy of an Idf object, use $clone() method</span>
+<span class='no'>idf_3</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>$<span class='fu'>clone</span>()
+<span class='no'>idf_3</span>$<span class='no'>Building</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"Building_Name_Changed_Again"</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:3] `Building_Name_Changed_Again`&gt;&gt; Building
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;  1: Building_Name_Changed_Again,  !- Name
+#&gt;  2: 0,                 !- North Axis {deg}
+#&gt;  3: Suburbs,           !- Terrain
+#&gt;  4: 0.04,              !- Loads Convergence Tolerance Value
+#&gt;  5: 0.004,             !- Temperature Convergence Tolerance Value {deltaC}
+#&gt;  6: MinimalShadowing,  !- Solar Distribution
+#&gt;  7: 30,                !- Maximum Number of Warmup Days
+#&gt;  8: 6;                 !- Minimum Number of Warmup Days
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>idf_3</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Building_Name_Changed_Again"
+#&gt; </div><div class='input'>
+<span class='no'>idf</span>$<span class='fu'>object_name</span>(<span class='st'>"Building"</span>)</div><div class='output co'>#&gt; $Building
+#&gt; [1] "Building_Name_Changed"
+#&gt; </div><div class='input'>
+# run the model
+</div><span class='co'># NOT RUN {</span>
+<span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+
+    <span class='co'># save the model to tempdir()</span>
+    <span class='no'>idf</span>$<span class='fu'>save</span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"test_run.idf"</span>))
+
+    <span class='co'># use the first epw file in "WeatherData" folder in EnergyPlus v8.8</span>
+    <span class='co'># installation path</span>
+    <span class='no'>epw</span> <span class='kw'>&lt;-</span> <span class='fu'>list.files</span>(<span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>),
+        <span class='kw'>pattern</span> <span class='kw'>=</span> <span class='st'>"\\.epw$"</span>, <span class='kw'>full.names</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)[<span class='fl'>1</span>]
+    <span class='fu'>basename</span>(<span class='no'>epw</span>)
+    <span class='co'># [1] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+
+    <span class='co'># if `dir` is NULL, the directory of IDF file will be used as simulation</span>
+    <span class='co'># output directory</span>
+    <span class='no'>job</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>$<span class='fu'>run</span>(<span class='no'>epw</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+    <span class='co'># run simulation in the background</span>
+    <span class='no'>idf</span>$<span class='fu'>run</span>(<span class='no'>epw</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>(), <span class='kw'>wait</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
+
+    <span class='co'># copy all external files into the directory run simulation</span>
+    <span class='no'>idf</span>$<span class='fu'>run</span>(<span class='no'>epw</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>(), <span class='kw'>copy_external</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+
+    <span class='co'># check for simulation errors</span>
+    <span class='no'>job</span>$<span class='fu'>errors</span>()
+
+    <span class='co'># get simulation status</span>
+    <span class='no'>job</span>$<span class='fu'>status</span>()
+
+    <span class='co'># get output directory</span>
+    <span class='no'>job</span>$<span class='fu'>output_dir</span>()
+
+    <span class='co'># re-run the simulation</span>
+    <span class='no'>job</span>$<span class='fu'>run</span>()
+
+    <span class='co'># get simulation results</span>
+    <span class='no'>job</span>$<span class='fu'>report_data</span>()
+}
+<span class='co'># }</span><div class='input'><span class='co'># print the text format of model</span>
+<span class='no'>idf</span>$<span class='fu'>print</span>(<span class='kw'>plain</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; !-Generator eplusr
+#&gt; !-Option
+#&gt; !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
+#&gt; !-      Use '!' comments if they need to be retained when using the IDFEditor.
+#&gt; 
+#&gt; !1ZoneUncontrolled.idf
+#&gt; ! Basic file description:  Basic test for EnergyPlus.  Resistive Walls.  Regular (no ground contact) floor.
+#&gt; !                          Regular roof.  No Windows.
+#&gt; !
+#&gt; ! Highlights:              Very basic test to see that EnergyPlus "works".
+#&gt; !
+#&gt; !
+#&gt; ! Simulation Location/Run: Denver Centennial  Golden CO USA WMO=724666, 2 design days, 1 run period,
+#&gt; !                          Run Control executes two design days (see RUN PERIOD object)
+#&gt; !
+#&gt; ! Location:                Denver, CO
+#&gt; !
+#&gt; ! Design Days:             Denver Centennial  Golden CO USA Annual Heating 99%, MaxDB=-15.5degC
+#&gt; !                          Denver Centennial  Golden CO USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32degC MWB=15.5degC
+#&gt; !
+#&gt; ! Run Period (Weather File): Full Annual Simulation, DENVER_STAPLETON_CO_USA_WMO_724690
+#&gt; !
+#&gt; ! Run Control:             No zone or system sizing, design day run control (no weather file simulation)
+#&gt; !
+#&gt; ! Building: Fictional 1 zone building with resistive walls.
+#&gt; !
+#&gt; !           The building is oriented due north.
+#&gt; !
+#&gt; ! Floor Area:        232.25 m2
+#&gt; ! Number of Stories: 1
+#&gt; !
+#&gt; ! Zone Description Details:
+#&gt; !
+#&gt; !       (0,15.24,0)                 (15.24,15.24,0)
+#&gt; !              _____________________________
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |                             |
+#&gt; !             |_____________________________|
+#&gt; !
+#&gt; !          (0,0,0)                      (15.24,0,0)
+#&gt; !
+#&gt; ! Internal gains description:     NA
+#&gt; !
+#&gt; ! Interzone Surfaces:             None
+#&gt; ! Internal Mass:                  None
+#&gt; ! People:                         None
+#&gt; ! Lights:                         None
+#&gt; ! Equipment:                      None
+#&gt; ! Windows:                        0
+#&gt; ! Detached Shading:               None
+#&gt; ! Daylight:                       None
+#&gt; ! Natural Ventilation:            None
+#&gt; ! Compact Schedules:              NA (Example of non-Compact Schedules)
+#&gt; ! Solar Distribution:             MinimalShadowing
+#&gt; !
+#&gt; ! HVAC:                           NA
+#&gt; !
+#&gt; ! Zonal Equipment:                NA
+#&gt; ! Central Air Handling Equipment: No
+#&gt; ! System Equipment Autosize:      No
+#&gt; ! Purchased Cooling:              No
+#&gt; ! Purchased Heating:              No
+#&gt; ! Purchased Chilled Water:        No
+#&gt; ! Purchased Hot Water:            No
+#&gt; ! Coils:                          None
+#&gt; ! Pumps:                          None
+#&gt; ! Boilers:                        None
+#&gt; ! Chillers:                       None
+#&gt; ! Towers:                         None
+#&gt; !
+#&gt; ! Results:
+#&gt; ! Standard Reports:               Variable Dictionary, Surfaces (dxf-wireframe), Meter File
+#&gt; ! Timestep or Hourly Variables:   Hourly and Daily
+#&gt; ! Time bins Report:               None
+#&gt; ! HTML Report:                    None
+#&gt; ! Environmental Emissions:        None
+#&gt; ! Utility Tariffs:                None
+#&gt; Version,
+#&gt;     8.8;                     !- Version Identifier
+#&gt; 
+#&gt; Timestep,
+#&gt;     4;                       !- Number of Timesteps per Hour
+#&gt; 
+#&gt; HeatBalanceAlgorithm,
+#&gt;     ConductionTransferFunction;  !- Algorithm
+#&gt; 
+#&gt; SurfaceConvectionAlgorithm:Inside,
+#&gt;     TARP;                    !- Algorithm
+#&gt; 
+#&gt; SurfaceConvectionAlgorithm:Outside,
+#&gt;     DOE-2;                   !- Algorithm
+#&gt; 
+#&gt; SimulationControl,
+#&gt;     No,                      !- Do Zone Sizing Calculation
+#&gt;     No,                      !- Do System Sizing Calculation
+#&gt;     No,                      !- Do Plant Sizing Calculation
+#&gt;     Yes,                     !- Run Simulation for Sizing Periods
+#&gt;     Yes;                     !- Run Simulation for Weather File Run Periods
+#&gt; 
+#&gt; RunPeriod,
+#&gt;     ,                        !- Name
+#&gt;     1,                       !- Begin Month
+#&gt;     1,                       !- Begin Day of Month
+#&gt;     12,                      !- End Month
+#&gt;     31,                      !- End Day of Month
+#&gt;     Tuesday,                 !- Day of Week for Start Day
+#&gt;     Yes,                     !- Use Weather File Holidays and Special Days
+#&gt;     Yes,                     !- Use Weather File Daylight Saving Period
+#&gt;     No,                      !- Apply Weekend Holiday Rule
+#&gt;     Yes,                     !- Use Weather File Rain Indicators
+#&gt;     Yes;                     !- Use Weather File Snow Indicators
+#&gt; 
+#&gt; Site:Location,
+#&gt;     Denver Centennial  Golden   N_CO_USA Design_Conditions,  !- Name
+#&gt;     39.74,                   !- Latitude {deg}
+#&gt;     -105.18,                 !- Longitude {deg}
+#&gt;     -7,                      !- Time Zone {hr}
+#&gt;     1829;                    !- Elevation {m}
+#&gt; 
+#&gt; !  WMO=724666 Time Zone=NAM: (GMT-07:00) Mountain Time (US &amp; Canada)
+#&gt; !  Data Source=ASHRAE 2009 Annual Design Conditions
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating Design Conditions Wind Speed=3m/s Wind Dir=340
+#&gt; ! Coldest Month=DEC
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Heating 99%, MaxDB=-15.5degC
+#&gt; SizingPeriod:DesignDay,
+#&gt;     Denver Centennial  Golden   N Ann Htg 99% Condns DB,  !- Name
+#&gt;     12,                      !- Month
+#&gt;     21,                      !- Day of Month
+#&gt;     WinterDesignDay,         !- Day Type
+#&gt;     -15.5,                   !- Maximum Dry-Bulb Temperature {C}
+#&gt;     0,                       !- Daily Dry-Bulb Temperature Range {deltaC}
+#&gt;     ,                        !- Dry-Bulb Temperature Range Modifier Type
+#&gt;     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+#&gt;     Wetbulb,                 !- Humidity Condition Type
+#&gt;     -15.5,                   !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+#&gt;     ,                        !- Humidity Condition Day Schedule Name
+#&gt;     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+#&gt;     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+#&gt;     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+#&gt;     81198,                   !- Barometric Pressure {Pa}
+#&gt;     3,                       !- Wind Speed {m/s}
+#&gt;     340,                     !- Wind Direction {deg}
+#&gt;     No,                      !- Rain Indicator
+#&gt;     No,                      !- Snow Indicator
+#&gt;     No,                      !- Daylight Saving Time Indicator
+#&gt;     ASHRAEClearSky,          !- Solar Model Indicator
+#&gt;     ,                        !- Beam Solar Day Schedule Name
+#&gt;     ,                        !- Diffuse Solar Day Schedule Name
+#&gt;     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+#&gt;     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+#&gt;     0;                       !- Sky Clearness
+#&gt; 
+#&gt; ! Denver Centennial  Golden   N Annual Cooling Design Conditions Wind Speed=4.9m/s Wind Dir=0
+#&gt; ! Hottest Month=JUL
+#&gt; ! Denver Centennial  Golden   N_CO_USA Annual Cooling (DB=&gt;MWB) 1%, MaxDB=32degC MWB=15.5degC
+#&gt; SizingPeriod:DesignDay,
+#&gt;     Denver Centennial  Golden   N Ann Clg 1% Condns DB=&gt;MWB,  !- Name
+#&gt;     7,                       !- Month
+#&gt;     21,                      !- Day of Month
+#&gt;     SummerDesignDay,         !- Day Type
+#&gt;     32,                      !- Maximum Dry-Bulb Temperature {C}
+#&gt;     15.2,                    !- Daily Dry-Bulb Temperature Range {deltaC}
+#&gt;     ,                        !- Dry-Bulb Temperature Range Modifier Type
+#&gt;     ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name
+#&gt;     Wetbulb,                 !- Humidity Condition Type
+#&gt;     15.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}
+#&gt;     ,                        !- Humidity Condition Day Schedule Name
+#&gt;     ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}
+#&gt;     ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}
+#&gt;     ,                        !- Daily Wet-Bulb Temperature Range {deltaC}
+#&gt;     81198,                   !- Barometric Pressure {Pa}
+#&gt;     4.9,                     !- Wind Speed {m/s}
+#&gt;     0,                       !- Wind Direction {deg}
+#&gt;     No,                      !- Rain Indicator
+#&gt;     No,                      !- Snow Indicator
+#&gt;     No,                      !- Daylight Saving Time Indicator
+#&gt;     ASHRAEClearSky,          !- Solar Model Indicator
+#&gt;     ,                        !- Beam Solar Day Schedule Name
+#&gt;     ,                        !- Diffuse Solar Day Schedule Name
+#&gt;     ,                        !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}
+#&gt;     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
+#&gt;     1;                       !- Sky Clearness
+#&gt; 
+#&gt; Material:NoMass,
+#&gt;     R13LAYER,                !- Name
+#&gt;     Rough,                   !- Roughness
+#&gt;     2.290965,                !- Thermal Resistance {m2-K/W}
+#&gt;     0.9,                     !- Thermal Absorptance
+#&gt;     0.75,                    !- Solar Absorptance
+#&gt;     0.75;                    !- Visible Absorptance
+#&gt; 
+#&gt; Material:NoMass,
+#&gt;     R31LAYER,                !- Name
+#&gt;     Rough,                   !- Roughness
+#&gt;     5.456,                   !- Thermal Resistance {m2-K/W}
+#&gt;     0.9,                     !- Thermal Absorptance
+#&gt;     0.75,                    !- Solar Absorptance
+#&gt;     0.75;                    !- Visible Absorptance
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL,               !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     ROOF31,                  !- Name
+#&gt;     R31LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Zone,
+#&gt;     ZONE ONE,                !- Name
+#&gt;     0,                       !- Direction of Relative North {deg}
+#&gt;     0,                       !- X Origin {m}
+#&gt;     0,                       !- Y Origin {m}
+#&gt;     0,                       !- Z Origin {m}
+#&gt;     1,                       !- Type
+#&gt;     1,                       !- Multiplier
+#&gt;     autocalculate,           !- Ceiling Height {m}
+#&gt;     autocalculate;           !- Volume {m3}
+#&gt; 
+#&gt; ScheduleTypeLimits,
+#&gt;     Fraction,                !- Name
+#&gt;     0,                       !- Lower Limit Value
+#&gt;     1,                       !- Upper Limit Value
+#&gt;     CONTINUOUS;              !- Numeric Type
+#&gt; 
+#&gt; GlobalGeometryRules,
+#&gt;     UpperLeftCorner,         !- Starting Vertex Position
+#&gt;     CounterClockWise,        !- Vertex Entry Direction
+#&gt;     World;                   !- Coordinate System
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Wall001,           !- Name
+#&gt;     Wall,                    !- Surface Type
+#&gt;     R13A_WALL,               !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Outdoors,                !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     SunExposed,              !- Sun Exposure
+#&gt;     WindExposed,             !- Wind Exposure
+#&gt;     0.5,                     !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     0,                       !- Vertex 1 X-coordinate {m}
+#&gt;     0,                       !- Vertex 1 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 1 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 2 X-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 X-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 X-coordinate {m}
+#&gt;     0,                       !- Vertex 4 Y-coordinate {m}
+#&gt;     4.572;                   !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Wall002,           !- Name
+#&gt;     Wall,                    !- Surface Type
+#&gt;     R13A_WALL,               !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Outdoors,                !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     SunExposed,              !- Sun Exposure
+#&gt;     WindExposed,             !- Wind Exposure
+#&gt;     0.5,                     !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     15.24,                   !- Vertex 1 X-coordinate {m}
+#&gt;     0,                       !- Vertex 1 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 1 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 2 X-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 Y-coordinate {m}
+#&gt;     4.572;                   !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Wall003,           !- Name
+#&gt;     Wall,                    !- Surface Type
+#&gt;     R13A_WALL,               !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Outdoors,                !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     SunExposed,              !- Sun Exposure
+#&gt;     WindExposed,             !- Wind Exposure
+#&gt;     0.5,                     !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     15.24,                   !- Vertex 1 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 1 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 1 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 2 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 2 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 3 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 4 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 Y-coordinate {m}
+#&gt;     4.572;                   !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Wall004,           !- Name
+#&gt;     Wall,                    !- Surface Type
+#&gt;     R13A_WALL,               !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Outdoors,                !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     SunExposed,              !- Sun Exposure
+#&gt;     WindExposed,             !- Wind Exposure
+#&gt;     0.5,                     !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     0,                       !- Vertex 1 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 1 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 1 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 2 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 2 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 3 X-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 4 X-coordinate {m}
+#&gt;     0,                       !- Vertex 4 Y-coordinate {m}
+#&gt;     4.572;                   !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Roof001,           !- Name
+#&gt;     Roof,                    !- Surface Type
+#&gt;     ROOF31,                  !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Outdoors,                !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     SunExposed,              !- Sun Exposure
+#&gt;     WindExposed,             !- Wind Exposure
+#&gt;     0,                       !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     0,                       !- Vertex 1 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 1 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 1 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 2 X-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 2 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 X-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Y-coordinate {m}
+#&gt;     4.572,                   !- Vertex 3 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 Y-coordinate {m}
+#&gt;     4.572;                   !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Site Outdoor Air Drybulb Temperature,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Site Daylight Saving Time Status,  !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Site Day Type Index,     !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Mean Air Temperature,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Total Internal Latent Gain Energy,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Mean Radiant Temperature,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Air Heat Balance Surface Convection Rate,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Air Heat Balance Air Energy Storage Rate,  !- Variable Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Surface Inside Face Temperature,  !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Surface Outside Face Temperature,  !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Surface Inside Face Convection Heat Transfer Coefficient,  !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Surface Outside Face Convection Heat Transfer Coefficient,  !- Variable Name
+#&gt;     daily;                   !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Other Equipment Total Heating Energy,  !- Variable Name
+#&gt;     monthly;                 !- Reporting Frequency
+#&gt; 
+#&gt; Output:Variable,
+#&gt;     *,                       !- Key Value
+#&gt;     Zone Other Equipment Total Heating Energy,  !- Variable Name
+#&gt;     monthly;                 !- Reporting Frequency
+#&gt; 
+#&gt; Output:VariableDictionary,
+#&gt;     IDF;                     !- Key Field
+#&gt; 
+#&gt; Output:Surfaces:Drawing,
+#&gt;     dxf:wireframe;           !- Report Type
+#&gt; 
+#&gt; Output:Constructions,
+#&gt;     Constructions;           !- Details Type 1
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt;     ExteriorLights:Electricity,  !- Key Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt;     EnergyTransfer:Building, !- Key Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; Output:Meter:MeterFileOnly,
+#&gt;     EnergyTransfer:Facility, !- Key Name
+#&gt;     hourly;                  !- Reporting Frequency
+#&gt; 
+#&gt; OutputControl:Table:Style,
+#&gt;     ALL;                     !- Column Separator
+#&gt; 
+#&gt; Output:Table:SummaryReports,
+#&gt;     AllSummary;              !- Report 1 Name
+#&gt; 
+#&gt; Exterior:Lights,
+#&gt;     ExtLights,               !- Name
+#&gt;     AlwaysOn,                !- Schedule Name
+#&gt;     5250,                    !- Design Level {W}
+#&gt;     AstronomicalClock,       !- Control Option
+#&gt;     Grounds Lights;          !- End-Use Subcategory
+#&gt; 
+#&gt; ScheduleTypeLimits,
+#&gt;     On/Off,                  !- Name
+#&gt;     0,                       !- Lower Limit Value
+#&gt;     1,                       !- Upper Limit Value
+#&gt;     DISCRETE;                !- Numeric Type
+#&gt; 
+#&gt; OtherEquipment,
+#&gt;     Test 352a,               !- Name
+#&gt;     None,                    !- Fuel Type
+#&gt;     ZONE ONE,                !- Zone or ZoneList Name
+#&gt;     AlwaysOn,                !- Schedule Name
+#&gt;     EquipmentLevel,          !- Design Level Calculation Method
+#&gt;     352,                     !- Design Level {W}
+#&gt;     ,                        !- Power per Zone Floor Area {W/m2}
+#&gt;     ,                        !- Power per Person {W/person}
+#&gt;     0,                       !- Fraction Latent
+#&gt;     0,                       !- Fraction Radiant
+#&gt;     0;                       !- Fraction Lost
+#&gt; 
+#&gt; OtherEquipment,
+#&gt;     Test 352 minus,          !- Name
+#&gt;     None,                    !- Fuel Type
+#&gt;     ZONE ONE,                !- Zone or ZoneList Name
+#&gt;     AlwaysOn,                !- Schedule Name
+#&gt;     EquipmentLevel,          !- Design Level Calculation Method
+#&gt;     -352,                    !- Design Level {W}
+#&gt;     ,                        !- Power per Zone Floor Area {W/m2}
+#&gt;     ,                        !- Power per Person {W/person}
+#&gt;     0,                       !- Fraction Latent
+#&gt;     0,                       !- Fraction Radiant
+#&gt;     0;                       !- Fraction Lost
+#&gt; 
+#&gt; Schedule:Constant,
+#&gt;     AlwaysOn,                !- Name
+#&gt;     On/Off,                  !- Schedule Type Limits Name
+#&gt;     1;                       !- Hourly Value
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_1,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     My-R13Wall,              !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_2,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_3,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_4,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_5,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_6,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_7,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_8,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_9,             !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_10,            !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Construction,
+#&gt;     R13A_WALL_11,            !- Name
+#&gt;     R13LAYER;                !- Outside Layer
+#&gt; 
+#&gt; Building,
+#&gt;     Building_Name_Changed,   !- Name
+#&gt;     0,                       !- North Axis {deg}
+#&gt;     Suburbs,                 !- Terrain
+#&gt;     0.04,                    !- Loads Convergence Tolerance Value
+#&gt;     0.004,                   !- Temperature Convergence Tolerance Value {deltaC}
+#&gt;     MinimalShadowing,        !- Solar Distribution
+#&gt;     30,                      !- Maximum Number of Warmup Days
+#&gt;     6;                       !- Minimum Number of Warmup Days
+#&gt; 
+#&gt; Material,
+#&gt;     C5 - 4 IN HW CONCRETE,   !- Name
+#&gt;     MediumRough,             !- Roughness
+#&gt;     0.1014984,               !- Thickness {m}
+#&gt;     1.729577,                !- Conductivity {W/m-K}
+#&gt;     2242.585,                !- Density {kg/m3}
+#&gt;     836.8,                   !- Specific Heat {J/kg-K}
+#&gt;     0.9,                     !- Thermal Absorptance
+#&gt;     0.65,                    !- Solar Absorptance
+#&gt;     0.65;                    !- Visible Absorptance
+#&gt; 
+#&gt; BuildingSurface:Detailed,
+#&gt;     Zn001:Flr001,            !- Name
+#&gt;     Floor,                   !- Surface Type
+#&gt;     FLOOR,                   !- Construction Name
+#&gt;     ZONE ONE,                !- Zone Name
+#&gt;     Adiabatic,               !- Outside Boundary Condition
+#&gt;     ,                        !- Outside Boundary Condition Object
+#&gt;     NoSun,                   !- Sun Exposure
+#&gt;     NoWind,                  !- Wind Exposure
+#&gt;     1,                       !- View Factor to Ground
+#&gt;     4,                       !- Number of Vertices
+#&gt;     15.24,                   !- Vertex 1 X-coordinate {m}
+#&gt;     0,                       !- Vertex 1 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 1 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 2 X-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 2 Z-coordinate {m}
+#&gt;     0,                       !- Vertex 3 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 3 Y-coordinate {m}
+#&gt;     0,                       !- Vertex 3 Z-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 X-coordinate {m}
+#&gt;     15.24,                   !- Vertex 4 Y-coordinate {m}
+#&gt;     0;                       !- Vertex 4 Z-coordinate {m}
+#&gt; 
+#&gt; Construction,
+#&gt;     FLOOR,                   !- Name
+#&gt;     C5 - 4 IN HW CONCRETE;   !- Outside Layer
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -464,7 +2133,9 @@ IDFEditor.</p>
       <li><a href="#print">Print</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

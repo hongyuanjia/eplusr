@@ -62,7 +62,7 @@ displays its results." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ displays its results." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -117,9 +120,17 @@ displays its results.</p>
       <th>...</th>
       <td><p>Any options can be defined, using <code>name = value</code>. All available
 options are below. If no options are given, then all values of current
-options are returned.</p></td>
+options are returned. If a single option name, then its value is
+returned.</p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>If called directly, a named list of input option values. If input is
+a single option name, a length-one vector whose type is determined by
+that option. If input is new option values, a named list of newly set
+option values.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
@@ -132,11 +143,12 @@ fields. Default: <code>8L</code></p></li>
 modification and model error checking. Possible value: <code>"none"</code>,
 <code>"draft"</code> and <code>"final"</code>. Default: <code>"final"</code>. Detailed description:</p><ul>
 <li><p>For <code>"none"</code>, none validation will be done;</p></li>
-<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;</p></li>
-<li><p>For <code>"final"</code>, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required fields
-and invalid field value reference will also be done.</p></li>
+<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, character,
+numeric, integer, and choice field values will be done;</p></li>
+<li><p>For <code>"final"</code>, besides above, checking of incomplete extensible groups,
+missing required objects, duplicated unique objects, object name
+conflicts, missing required fields and invalid field value reference will
+also be done.</p></li>
 </ul></li>
 <li><p><code>verbose_info</code>: Whether to show information messages. Default: <code>TRUE</code>.</p></li>
 <li><p><code>save_format</code>: The format to use when saving Idf objects to <code>.idf</code> files.
@@ -150,14 +162,47 @@ will be set according to the header of IDF file. If no header found,
 </ul>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># list all current options</span>
+<span class='fu'>eplusr_option</span>() <span class='co'># a named list</span></div><div class='output co'>#&gt; $validate_level
+#&gt; [1] "final"
+#&gt; 
+#&gt; $view_in_ip
+#&gt; [1] FALSE
+#&gt; 
+#&gt; $save_format
+#&gt; [1] "asis"
+#&gt; 
+#&gt; $num_parallel
+#&gt; [1] 8
+#&gt; 
+#&gt; $verbose_info
+#&gt; [1] TRUE
+#&gt; 
+#&gt; $num_digits
+#&gt; [1] 8
+#&gt; </div><div class='input'>
+<span class='co'># get a specific option value</span>
+<span class='fu'>eplusr_option</span>(<span class='st'>"verbose_info"</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># set options</span>
+<span class='fu'>eplusr_option</span>(<span class='kw'>verbose_info</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>view_in_ip</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; $verbose_info
+#&gt; [1] TRUE
+#&gt; 
+#&gt; $view_in_ip
+#&gt; [1] FALSE
+#&gt; </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#value">Value</a></li>
+
       <li><a href="#details">Details</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
   </div>
 </div>

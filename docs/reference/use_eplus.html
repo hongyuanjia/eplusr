@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -72,6 +72,9 @@
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -108,9 +111,9 @@
 
     <pre class="usage"><span class='fu'>use_eplus</span>(<span class='no'>eplus</span>)
 
-<span class='fu'>avail_eplus</span>()
-
 <span class='fu'>eplus_config</span>(<span class='no'>ver</span>)
+
+<span class='fu'>avail_eplus</span>()
 
 <span class='fu'>is_avail_eplus</span>(<span class='no'>ver</span>)</pre>
     
@@ -130,28 +133,48 @@ path.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>For <code>eplus_config()</code>, the configure data (a list) of specified
-version of EnergyPlus; for <code>avail_eplus()</code>, a character vector; for
-<code>is_avis_avail_eplus()</code>, a scalar logical vector.</p>
+    
+<ul>
+<li><p>For <code>use_eplus()</code> and <code>eplus_config()</code>, an (invisible for
+<code>use_eplus()</code>) list of three contains EnergyPlus version, directory and
+EnergyPlus executable.  version of EnergyPlus;</p></li>
+<li><p>For <code>avail_eplus()</code>, a character vector;</p></li>
+<li><p>For <code>is_avis_avail_eplus()</code>, a scalar logical vector.</p></li>
+</ul>
+
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>use_eplus()</code> adds an EnergyPlus version into the EnergyPlus version
-dictionary in eplusr.</p>
-<p><code>eplus_config()</code> returns the configure data of specified version of
-EnergyPlus.</p>
-<p><code>avail_eplus()</code> returns all available EnergyPlus found.</p>
+cache in eplusr. That cache will be used to get corresponding
+<code><a href='idd.html'>Idd</a></code> object when parsing IDF files and call corresponding
+EnergyPlus to run models.</p>
+<p><code>eplus_config()</code> returns the a list of configure data of specified version of
+EnergyPlus. If no data found, an empty list will be returned.</p>
+<p><code>avail_eplus()</code> returns all versions of available EnergyPlus.</p>
 <p><code>is_avail_eplus()</code> checks if the specified version of EnergyPlus is
 available or not.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='install_eplus.html'>download_eplus()</a></code> and <code><a href='install_eplus.html'>install_eplus()</a></code> for downloading and
+installing EnergyPlus</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># add specific version of EnergyPlus</span>
 <span class='fu'>use_eplus</span>(<span class='fl'>8.9</span>)
 <span class='fu'>use_eplus</span>(<span class='st'>"8.8.0"</span>)
+
+<span class='co'># get configure data of specific EnergyPlus version if avaiable</span>
 <span class='fu'>eplus_config</span>(<span class='fl'>8.6</span>)
 <span class='co'># }</span><div class='input'>
-<span class='fu'>avail_eplus</span>()</div><div class='output co'>#&gt; [1] "8.6.0" "8.8.0"</div><div class='input'><span class='fu'>is_avail_eplus</span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div></pre>
+<span class='co'># get all versions of avaiable EnergyPlus</span>
+<span class='fu'>avail_eplus</span>()</div><div class='output co'>#&gt; [1] "8.6.0" "8.8.0"</div><div class='input'>
+<span class='co'># check if specific version of EnergyPlus is available</span>
+<span class='fu'>is_avail_eplus</span>(<span class='fl'>8.5</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='fu'>is_avail_eplus</span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -161,6 +184,8 @@ available or not.</p>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#details">Details</a></li>
+
+      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

@@ -64,7 +64,7 @@ IddObject provides detailed information of curtain class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -75,6 +75,9 @@ IddObject provides detailed information of curtain class." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -125,11 +128,11 @@ with the release.</p>
 <p>eplusr tries to detect all installed EnergyPlus in default installation
 locations when loading, i.e. <code>C:\EnergyPlusVX-X-0</code> on Windows,
 <code>/usr/local/EnergyPlus-X-Y-0</code> on Linux, and
-<code>/Applications/EnergyPlus-X-Y-0</code> on MacOS and stores all found locations
+<code>/Applications/EnergyPlus-X-Y-0</code> on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
 each EnergyPlus version. And also, every time an IDD file is parsed, an <code>Idd</code>
 object is created and cached in an environment.</p>
-<p>Parsing an IDD file starts from <code><a href='use_idd.html'>use_idd()</a></code>.  When using <code><a href='use_idd.html'>use_idd()</a></code>, eplusr
+<p>Parsing an IDD file starts from <code><a href='use_idd.html'>use_idd()</a></code>. When using <code><a href='use_idd.html'>use_idd()</a></code>, eplusr
 will first try to find the cached <code>Idd</code> object of that version, if possible.
 If failed, and EnergyPlus of that version is available (see <code><a href='use_eplus.html'>avail_eplus()</a></code>),
 the <code>"Energy+.idd"</code> distributed with EnergyPlus will be parsed and cached. So
@@ -139,11 +142,13 @@ IDF file of that version.</p>
 package is used to speed up the whole IDD parsing process and store the
 results. However, it will still take about 3-4 sec per IDD.  Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
-<code>data.frame</code> format. Every IDD will be parsed and stored in four tables:</p><ul>
+<code>data.frame</code> format. Every IDD will be parsed and stored in twelve tables:</p><ul>
 <li><p><code>group</code>: contains group index and group names.</p></li>
 <li><p><code>class</code>: contains class names and properties.</p></li>
+<li><p><code>class</code>: contains class memos, i.e. a brief description on each class.</p></li>
 <li><p><code>class_reference</code>: contains reference names of classes.</p></li>
 <li><p><code>field</code>: contains field names and field properties.</p></li>
+<li><p><code>field_note</code>: contains field notes.</p></li>
 <li><p><code>field_reference</code>: contains reference names of fields.</p></li>
 <li><p><code>field_default</code>: contains default values of fields.</p></li>
 <li><p><code>field_choice</code>: contains choices of choice-type fields.</p></li>
@@ -219,9 +224,72 @@ than letters and numbers are replaced by a underscore <code>_</code>.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='idd_object.html'>IddObject class</a></p></div>
+    <div class='dont-index'><p><a href='idd_object.html'>IddObject class</a> which provides detailed information of
+curtain class</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># get the Idd object of EnergyPlus v8.8</span>
+<span class='no'>idd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>)
+
+<span class='co'># version</span>
+<span class='no'>idd</span>$<span class='fu'>version</span>()</div><div class='output co'>#&gt; [1] ‘8.8.0’</div><div class='input'>
+<span class='co'># build</span>
+<span class='no'>idd</span>$<span class='fu'>build</span>()</div><div class='output co'>#&gt; [1] "7c3bbe4830"</div><div class='input'>
+<span class='co'># all group names</span>
+<span class='fu'>str</span>(<span class='no'>idd</span>$<span class='fu'>group_name</span>())</div><div class='output co'>#&gt;  chr [1:58] "Simulation Parameters" "Compliance Objects" ...</div><div class='input'>
+<span class='co'># all class names</span>
+<span class='fu'>str</span>(<span class='no'>idd</span>$<span class='fu'>class_name</span>())</div><div class='output co'>#&gt;  chr [1:789] "Version" "SimulationControl" "Building" "ShadowCalculation" ...</div><div class='input'>
+<span class='co'># all required class names</span>
+<span class='fu'>str</span>(<span class='no'>idd</span>$<span class='fu'>required_class_name</span>())</div><div class='output co'>#&gt;  chr [1:2] "Building" "GlobalGeometryRules"</div><div class='input'>
+<span class='co'># all unique class names</span>
+<span class='fu'>str</span>(<span class='no'>idd</span>$<span class='fu'>unique_class_name</span>())</div><div class='output co'>#&gt;  chr [1:51] "Version" "SimulationControl" "Building" "ShadowCalculation" ...</div><div class='input'>
+<span class='co'># IddObject of SimulationControl class</span>
+<span class='no'>idd</span>$<span class='no'>SimulationControl</span></div><div class='output co'>#&gt; &lt;&lt; Class: `SimulationControl` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "Note that the following 3 fields are related to the Sizing:Zone, Sizing:System,
+#&gt; and Sizing:Plant objects.  Having these fields set to Yes but no corresponding
+#&gt; Sizing object will not cause the sizing to be done. However, having any of these
+#&gt; fields set to No, the corresponding Sizing object is ignored.
+#&gt; Note also, if you want to do system sizing, you must also do zone sizing in the same
+#&gt; run or an error will result."
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Simulation Parameters`
+#&gt;   Unique: TRUE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 7
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:  Do Zone Sizing Calculation
+#&gt;   2:  Do System Sizing Calculation
+#&gt;   3:  Do Plant Sizing Calculation
+#&gt;   4:  Run Simulation for Sizing Periods
+#&gt;   5:  Run Simulation for Weather File Run Periods
+#&gt;   6:  Do HVAC Sizing Simulation for Sizing Periods
+#&gt;   7:  Maximum Number of HVAC Sizing Simulation Passes
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># OR</span>
+<span class='no'>idd</span><span class='kw'>[[</span><span class='st'>"SimulationControl"</span>]]</div><div class='output co'>#&gt; &lt;&lt; Class: `SimulationControl` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "Note that the following 3 fields are related to the Sizing:Zone, Sizing:System,
+#&gt; and Sizing:Plant objects.  Having these fields set to Yes but no corresponding
+#&gt; Sizing object will not cause the sizing to be done. However, having any of these
+#&gt; fields set to No, the corresponding Sizing object is ignored.
+#&gt; Note also, if you want to do system sizing, you must also do zone sizing in the same
+#&gt; run or an error will result."
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Simulation Parameters`
+#&gt;   Unique: TRUE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 7
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:  Do Zone Sizing Calculation
+#&gt;   2:  Do System Sizing Calculation
+#&gt;   3:  Do Plant Sizing Calculation
+#&gt;   4:  Run Simulation for Sizing Periods
+#&gt;   5:  Run Simulation for Weather File Run Periods
+#&gt;   6:  Do HVAC Sizing Simulation for Sizing Periods
+#&gt;   7:  Maximum Number of HVAC Sizing Simulation Passes
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -238,7 +306,9 @@ than letters and numbers are replaced by a underscore <code>_</code>.</p>
       <li><a href="#references">References</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

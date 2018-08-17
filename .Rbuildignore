@@ -5,7 +5,6 @@
 ^appveyor\.yml$
 ^try\.R$
 ^TODO\.md$
-^idd$
 ^README\.Rmd$
 ^README-.*\.png$
 ^codecov\.yml$
@@ -13,4 +12,3 @@
 ^_pkgdown\.yml$
 ^docs$
 ^cran-comments\.md$
-^tools$

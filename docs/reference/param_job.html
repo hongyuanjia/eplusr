@@ -62,7 +62,7 @@ For details on ParametricJob, please see ParametricJob class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ For details on ParametricJob, please see ParametricJob class." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -132,6 +135,28 @@ For details on <code>ParametricJob</code>, please see <a href='param.html'>Param
     <div class='dont-index'><p><code><a href='eplus_job.html'>eplus_job()</a></code> for creating an EnergyPlus single simulation job.</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
+    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+
+    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
+    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
+
+    <span class='co'># create from local files</span>
+    <span class='fu'>param_job</span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
+
+    <span class='co'># create from an Idf and an Epw object</span>
+    <span class='fu'>param_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
+}</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; 
+#&gt; ── Info ────────────────────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric ────────────────────────────────────────────────────────
+#&gt; ● Seed Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
+#&gt; ● Default Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -141,7 +166,13 @@ For details on <code>ParametricJob</code>, please see <a href='param.html'>Param
       <li><a href="#value">Value</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

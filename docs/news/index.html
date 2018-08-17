@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -69,6 +69,9 @@
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -96,36 +99,83 @@
       
     </div>
 
-    <div id="eplusr-0-8-3" class="section level1">
+    <div id="eplusr-0-8-4" class="section level1">
 <h1 class="page-header">
-<a href="#eplusr-0-8-3" class="anchor"></a>eplusr 0.8.3<small> Unreleased </small>
+<a href="#eplusr-0-8-4" class="anchor"></a>eplusr 0.8.4<small> Unreleased </small>
 </h1>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
-<li><p>A new method <code>$possible_value()</code> has been added into <code>IdfObject</code> class, which will return all possible values for selected fields, including auto-value (autosize or autocalculate), default, range, choices and references.</p></li>
-<li><p>New parameter <code>dir</code> has been added to <code><a href="../reference/install_eplus.html">install_eplus()</a></code>, which makes it possible for keeping the downloaded EnergyPlus installation file.</p></li>
+<li><p>Package documentation has been heavily updated. Examples of every exported class and most functions have been added. Also, an example IDF file <code>"1ZoneUncontrolled.idf"</code> from EnergyPus v8.8.0 is included in the package, which makes it possible to run most examples without installing EnergyPlus. Of cause, for examples in <code>EplusJob</code> and <code>ParametricJob</code> class, EnergyPlus installation is needed to run them successfully.</p></li>
+<li><p>A new type of <code>"character"</code> validation has been added, which will check if field values should be characters but are not.</p></li>
+<li><p>A new option <code>copy_external</code> has been added in <code>$run()</code> in <code>Idf</code> class. If <code>TRUE</code>, the external files will also be copied into the output directory. Currently, only <code>Schedule:File</code> class is supported. This ensures that the output directory will have all files needed for the model to run.</p></li>
+<li><p><code>$validate()</code> in <code>Idf</code> and <code>IdfObject</code> class will also check incomplete extensible groups. Extensible groups that only contain any empty field are treated as invalid.</p></li>
+<li><p>New methods <code>$field_reference()</code> and <code>$field_possible()</code> have been added into <code>IddObject</code> class. <code>$field_possible()</code> is basically the same as the <code>$possible_value()</code> in <code>IdfObject</code> class. This makes it possible to show all available references for a class that does not have any object yet. <code>$field_reference()</code> only returns all available reference values for specified fields. <strong>NOTE</strong>: <code>$field_reference()</code> and <code>$field_possible()</code> can only be used in <code>IddObject</code>s that are created using <code>$definition()</code> in <code>Idf</code> class and <code>IdfObject</code> class, and cannot be used in <code>IddObject</code>s that are created using <code>$object()</code> or equivalent in <code>Idd</code> class. This is because both methods need shared Idf value data to collect all reference values.</p></li>
 </ul>
 </div>
 <div id="minor-changes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#minor-changes" class="anchor"></a>Minor changes</h2>
 <ul>
-<li><p>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</p></li>
-<li><p>When <code>wait</code> is <code>FALSE</code>, <code>$run()</code> in <code>Idf</code>, <code>EplusJob</code> and <code>ParametricJob</code> will return a <code>process</code> object instead of the time when simulation started.</p></li>
-<li><p>A clear message will be given when trying to run <code>$kill()</code> in <code>ParametricJob</code>, which inform the user that currently <code>$kill()</code> does not for parametric simulations.</p></li>
+<li><p><code><a href="../reference/use_eplus.html">use_eplus()</a></code> now returns an invisible list of EnergyPlus configure data instead of <code>NULL</code>.</p></li>
+<li><p>The default value of <code>dir</code> argument in <code><a href="../reference/install_eplus.html">download_eplus()</a></code> has been removed, which enforce the user to explicitly specify the directory to save EnergyPlus installer file, as per CRAN reviewer comment.</p></li>
+<li><p>A new option <code>"auto"</code> for <code>download</code> argument in <code><a href="../reference/use_idd.html">use_idd()</a></code> has been added, which will automatically download corresponding EnergyPlus IDD file if the file or Idd object is currently not available.</p></li>
+<li><p>The <code>dir</code> argument in <code><a href="../reference/install_eplus.html">install_eplus()</a></code> has been removed, as per CRAN reviewer comments. The EnergyPlus installer file will be saved into <code>tempdir()</code>.</p></li>
+<li><p>The default value of <code>dir</code> argument in <code>$run()</code> in <code>Idf</code> class has been removed, as per CRAN reviewer comments. Users can explicitly set <code>dir</code> to <code>NULL</code> if they want to use the directory of input IDF file.</p></li>
+<li><p>The default value of <code>echo</code> in <code><a href="../reference/run_model.html">run_idf()</a></code> has been changed to <code>TRUE</code>, which will always show EnergyPlus simulation process to the console.</p></li>
+<li><p>Fix the error of <code>output_dir</code> argument checking in <code>rum_multi()</code>.</p></li>
+<li><p>Now an informative error message is given when there is no SQL output found when tring to read simulation output using <code>$report_data()</code>, <code>$report_data_dict</code> and <code>tabular_data()</code> in <code>EplusJob</code> class.</p></li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h2>
 <ul>
+<li><p>Fix errors when try to get units <code>$field_name()</code>, <code>$field_unit()</code> and <code>$field_default()</code> in <code>IddObject</code> class.</p></li>
+<li><p>Fix the error that <code>$get_value()</code> and <code>$table()</code> in <code>IdfObject</code> class did not return all field values even <code>all</code> was set to <code>TRUE</code>.</p></li>
+<li><p>Fix the error that <code>$table()</code> in <code>IdfObject</code> class did not return field units even <code>unit</code> was set to <code>TRUE</code>.</p></li>
+<li><p>Fix the error that <code>$replace_value()</code> in <code>Idf</code> class did not update object names.</p></li>
+<li><p>Fix the error when <code>unit</code> is set to <code>TRUE</code> in <code>$get_data()</code> in <code>Epw</code> class.</p></li>
+<li><p>Fix the error that <code>$state_province</code> in <code>Epw</code> class always returns <code>NULL</code>.</p></li>
+</ul>
+</div>
+</div>
+    <div id="eplusr-0-8-3" class="section level1">
+<h1 class="page-header">
+<a href="#eplusr-0-8-3" class="anchor"></a>eplusr 0.8.3<small> 2018-08-08 </small>
+</h1>
+<div id="new-features-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features-1" class="anchor"></a>New features</h2>
+<ul>
+<li><p>A new method <code>$possible_value()</code> has been added into <code>IdfObject</code> class, which will return all possible values for selected fields, including auto-value (autosize or autocalculate), default, range, choices and references.</p></li>
+<li><p>New parameter <code>dir</code> has been added to <code><a href="../reference/install_eplus.html">install_eplus()</a></code>, which makes it possible for keeping the downloaded EnergyPlus installation file.</p></li>
+<li><p><code>$dup_object()</code> in <code>Idf</code> class now can duplicate one object multiple times.</p></li>
+</ul>
+</div>
+<div id="minor-changes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<ul>
+<li><p>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</p></li>
+<li><p>When <code>wait</code> is <code>FALSE</code>, <code>$run()</code> in <code>EplusJob</code> and <code>ParametricJob</code> will return itself instead of the time when simulation started.</p></li>
+<li><p>A clear message will be given when trying to run <code>$kill()</code> in <code>ParametricJob</code>, which inform the user that currently <code>$kill()</code> does not for parametric simulations.</p></li>
+<li><p>A warning will be given if no configuration data found in <code><a href="../reference/use_eplus.html">eplus_config()</a></code>.</p></li>
+<li><p>Now the names of returned list from <code>$search_object()</code> in <code>Idf</code> class will also be underscore-style object names, which makes its behavior being consistent with <code>$object()</code> and <code>$object_in_class()</code>. Also, if no results found, <code>$search_object()</code> now will return invisible <code>NULL</code> and give a message.</p></li>
+<li><p><code>$dup_object()</code> will give an error if given <code>new_name</code> is the an existing object name.</p></li>
+</ul>
+</div>
+<div id="bug-fixes-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<ul>
 <li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (#12).</p></li>
 <li><p>Fix idf input version parsing in <code>param_job</code> (#13).</p></li>
-<li><p>Fix EnergyPlus downloading and installing errors on Linux and MacOS (#14, #17).</p></li>
-<li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and MacOS (#14).</p></li>
-<li><p>Fix missing name attribute in class <code>NodeList</code> (#16)</p></li>
+<li><p>Fix EnergyPlus downloading and installing errors on Linux and macOS (#14, #17).</p></li>
+<li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and macOS (#14).</p></li>
+<li><p>Fix missing name attribute in class <code>NodeList</code> (#16).</p></li>
+<li><p>Fix errors in <code><a href="../reference/use_eplus.html">use_eplus()</a></code> when input is an EnergyPlus installation path (#18).</p></li>
 </ul>
 </div>
 </div>
@@ -141,16 +191,16 @@
 <code>$get_value()</code> in <code>IdfObject</code> class new has a new argument <code>simplify</code>. If <code>TRUE</code>, a character vecotr will be returned instead of a named list. Default is <code>FALSE</code>.</li>
 </ul>
 </div>
-<div id="minor-changes-1" class="section level2">
+<div id="minor-changes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#minor-changes-1" class="anchor"></a>Minor changes</h2>
+<a href="#minor-changes-2" class="anchor"></a>Minor changes</h2>
 <ul>
 <li>The names of returned list of <code>$get_value()</code> in <code>IdfObject</code> is “underscore” name, not lower name. This makes its behavior being consistent with <code>$object()</code> in <code>Idf</code> class.</li>
 </ul>
 </div>
-<div id="bug-fixes-1" class="section level2">
+<div id="bug-fixes-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
+<a href="#bug-fixes-2" class="anchor"></a>Bug fixes</h2>
 <ul>
 <li><p>Fix warning messages of column type coercion from data.table in <code>Idf</code> and <code>IdfObject</code>.</p></li>
 <li><p><code>$set_value()</code> in <code>IdfObject</code> and <code>$set_object()</code> in <code>Idf</code> now will delete empty fields with empty value. This fix the error when trying to reassign only some empty fields which have been deleted before.</p></li>
@@ -178,6 +228,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#eplusr-0-8-4">0.8.4</a></li>
         <li><a href="#eplusr-0-8-3">0.8.3</a></li>
         <li><a href="#eplusr-0-8-2">0.8.2</a></li>
         <li><a href="#eplusr-0-8-1">0.8.1</a></li>

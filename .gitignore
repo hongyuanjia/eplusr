@@ -4,6 +4,5 @@
 *.cmd
 *.vbs
 try.R
-R/sysdata\.rda
 docs/*
-idd/*
+inst/doc

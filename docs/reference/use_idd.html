@@ -32,9 +32,7 @@
 
 <meta property="og:title" content="Use a specific EnergyPlus Input Data Dictionary (IDD) file — use_idd" />
 
-<meta property="og:description" content="use_idd() takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
-usually named &quot;Energy+.idd&quot; and return an Idd object. For details on Idd
-class, please see idd." />
+<meta property="og:description" content="Use a specific EnergyPlus Input Data Dictionary (IDD) file" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -63,7 +61,7 @@ class, please see idd." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -74,6 +72,9 @@ class, please see idd." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -104,15 +105,13 @@ class, please see idd." />
 
     <div class="ref-description">
     
-    <p><code>use_idd()</code> takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
-usually named "Energy+.idd" and return an <code>Idd</code> object. For details on <code>Idd</code>
-class, please see <a href='idd.html'>idd</a>.</p>
+    <p>Use a specific EnergyPlus Input Data Dictionary (IDD) file</p>
     
     </div>
 
     <pre class="usage"><span class='fu'>use_idd</span>(<span class='no'>idd</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='fu'>download_idd</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>getwd</span>())
+<span class='fu'>download_idd</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='no'>dir</span>)
 
 <span class='fu'>avail_idd</span>()
 
@@ -123,41 +122,56 @@ class, please see <a href='idd.html'>idd</a>.</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>idd</th>
-      <td><p>A path to an EnergyPlus Input Data Dictionary (IDD) file, usually
-named as <code>Energy+.idd</code> or a valid version of IDD, e.g. 8.9, "8.9.0".</p></td>
+      <td><p>Either a path, a connection, or literal data (either a single
+string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
+file, usually named as <code>Energy+.idd</code>, or a valid version of IDD, e.g.
+8.9, "8.9.0".</p></td>
     </tr>
     <tr>
       <th>download</th>
-      <td><p>If <code>"TRUE"</code> and argument <code>idd</code>, the IDD file will be
+      <td><p>If <code>TRUE</code> and argument <code>idd</code>, the IDD file will be
 downloaded from <a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>,
 and saved to <code>tempdir()</code>. It will be parsed after it is downloaded
-successfully. It is useful in case where you only want to edit an
+successfully. A special value of <code>"auto"</code> can be given, which will
+automatically download corresponding IDD file if the Idd object is
+currently not available. It is useful in case where you only want to edit an
 EnergyPlus Input Data File (IDF) directly but do not want to install
-whole EnergyPlus software.</p></td>
+whole EnergyPlus software. Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>ver</th>
-      <td><p>A valid EnergyPlus version, e.g., 8.7, "8.7" or "8.7.0". For
-<code>download_idd</code>, The special value <code>"latest"</code> means the latest version
-(fetched from GitHub releases). Default: <code>"latest"</code>.</p></td>
+      <td><p>A valid EnergyPlus version, e.g. 8, 8.7, "8.7" or "8.7.0". For
+<code>download_idd()</code>, the special value <code>"latest"</code>, which is default, means
+the latest version.</p></td>
     </tr>
     <tr>
       <th>dir</th>
-      <td><p>A directory to indicate where to save the IDD file. Default:
-current working directory.</p></td>
+      <td><p>A directory to indicate where to save the IDD file.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p><code>use_idd</code> returns an <code>Idd</code> object; <code>download_idd</code> returns the full
-path of the downloaded IDD file; <code>avail_idd</code> returns a character vector;
-<code>is_avail_idd</code> returns a single logical vector.</p>
+    
+<ul>
+<li><p><code>use_idd()</code> returns an <code>Idd</code> object</p></li>
+<li><p><code>download_idd()</code> returns an invisible integer <code>0</code> if succeed. Also an
+attribute named <code>file</code> which is the full path of the downloaded IDD file;</p></li>
+<li><p><code>avail_idd()</code> returns a character vector or <code>NULL</code> if no available Idd object
+found</p></li>
+<li><p><code>is_avail_idd()</code> returns a single logical vector.</p></li>
+</ul>
+
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p><code>download_idd()</code> downloads specified version of EnergyPlus IDD file from
-<a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>.</p>
+    <p><code>use_idd()</code> takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
+usually named "Energy+.idd" and return an <code>Idd</code> object. For details on <code>Idd</code>
+class, please see <a href='idd.html'>idd</a>.</p>
+<p><code>download_idd()</code> downloads specified version of EnergyPlus IDD file from
+<a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>. It is
+useful in case where you only want to edit an EnergyPlus Input Data File
+(IDF) directly but do not want to install whole EnergyPlus software.</p>
 <p><code>avail_idd()</code> returns versions of all cached <code>Idd</code> object.</p>
 <p><code>is_avail_idd()</code> returns <code>TRUE</code> if input version of IDD file has been parsed
 and cached.</p>
@@ -167,24 +181,39 @@ to find the cached <code>Idd</code> object of that version, if possible. If fail
 EnergyPlus of that version is available (see <code><a href='use_eplus.html'>avail_eplus()</a></code>), the
 <code>"Energy+.idd"</code> distributed with EnergyPlus will be parsed and stored in
 eplusr Idd cache.</p>
-<p><code>download_idd()</code> downloads EnergyPlus Input Data Dictionary (IDD) file from
-<a href='https://github.com/NREL/EnergyPlus'>EnergyPlus GitHub Repository</a>. It is
-useful in case where you only want to edit an EnergyPlus Input Data File
-(IDF) directly but do not want to install whole EnergyPlus software.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='idd.html'>Idd Class</a></p></div>
+    <div class='dont-index'><p><a href='idd.html'>Idd Class</a> for parsing, querying and making modifications to
+EnergyPlus IDD file</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># get all available Idd version</span>
+<span class='fu'>avail_idd</span>()
+
+<span class='co'># check if specific version of Idd is available</span>
+<span class='fu'>is_avail_idd</span>(<span class='fl'>8.5</span>)
+
+<span class='co'># download latest IDD file from EnergyPlus GitHub repo</span>
+<span class='fu'>download_idd</span>(<span class='st'>"latest"</span>, <span class='fu'>tempdir</span>())
+
+<span class='co'># use specific version of Idd</span>
+<span class='co'># only works if EnergyPlus v8.8 has been found or Idd v8.8 exists</span>
 <span class='fu'>use_idd</span>(<span class='fl'>8.8</span>)
 
-<span class='fu'>download_idd</span>()
-<span class='fu'>download_idd</span>(<span class='fl'>8.8</span>)
+<span class='co'># If Idd object is currently not avail_idd, automatically download IDD file</span>
+<span class='co'># from EnergyPlus GitHub repo and parse it</span>
+<span class='fu'>use_idd</span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>)
 
+<span class='co'># now Idd v8.8 should be available</span>
 <span class='fu'>is_avail_idd</span>(<span class='fl'>8.8</span>)
+
+<span class='co'># get specific version of parsed Idd object</span>
+<span class='fu'>use_idd</span>(<span class='fl'>8.8</span>)
+
+<span class='fu'>avail_idd</span>() <span class='co'># should contain "8.8.0"</span>
 <span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -200,6 +229,10 @@ useful in case where you only want to edit an EnergyPlus Input Data File
       
       <li><a href="#examples">Examples</a></li>
     </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

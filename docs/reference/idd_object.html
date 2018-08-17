@@ -32,10 +32,10 @@
 
 <meta property="og:title" content="EnergyPlus IDD object — idd_object" />
 
-<meta property="og:description" content="IddObject is an abstraction of a single object in an Idd. It provides
-more detail methods to query field properties. IddObject can only be
-created from the parent Idd object, using $object() and
-$object_in_group().  This is because that initialization of an IddObject
+<meta property="og:description" content="IddObject is an abstraction of a single object in an Idd object. It
+provides more detail methods to query field properties. IddObject can only
+be created from the parent Idd object, using $object() and
+$object_in_group(). This is because that initialization of an IddObject
 needs some shared data from parent Idd object." />
 <meta name="twitter:card" content="summary" />
 
@@ -65,7 +65,7 @@ needs some shared data from parent Idd object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -76,6 +76,9 @@ needs some shared data from parent Idd object." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -106,15 +109,21 @@ needs some shared data from parent Idd object." />
 
     <div class="ref-description">
     
-    <p><code>IddObject</code> is an abstraction of a single object in an <code>Idd</code>. It provides
-more detail methods to query field properties. <code>IddObject</code> can only be
-created from the parent <code>Idd</code> object, using <code>$object()</code> and
-<code>$object_in_group()</code>.  This is because that initialization of an <code>IddObject</code>
+    <p><code>IddObject</code> is an abstraction of a single object in an <code>Idd</code> object. It
+provides more detail methods to query field properties. <code>IddObject</code> can only
+be created from the parent <code>Idd</code> object, using <code>$object()</code> and
+<code>$object_in_group()</code>. This is because that initialization of an <code>IddObject</code>
 needs some shared data from parent <code>Idd</code> object.</p>
     
     </div>
 
         
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>There are lots of properties for every class and field. For details on the
+meaning of each property, please see the heading comments in the
+<code>Energy+.idd</code> file in the EnergyPlus installation path.</p>
+    
     <h2 class="hasAnchor" id="usage"><a class="anchor" href="#usage"></a>Usage</h2>
 
     <pre>iddobj$group_name()
@@ -134,14 +143,16 @@ iddobj$has_name()
 iddobj$is_required()
 iddobj$is_unique()
 iddobj$is_extensible()
-iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = getOption("eplusr.view_in_ip"))
+iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
 iddobj$field_index(name = NULL)
 iddobj$field_type(which = NULL)
 iddobj$field_note(which = NULL)
-iddobj$field_unit(which = NULL, in_ip = getOption("eplusr.view_in_ip")
-iddobj$field_default(which = NULL, in_ip = getOption("eplusr.view_in_ip")
+iddobj$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip")
+iddobj$field_default(which = NULL, in_ip = eplusr_option("view_in_ip")
 iddobj$field_choice(which = NULL)
 iddobj$field_range(which = NULL)
+iddobj$field_reference(which = NULL)
+iddobj$field_possible(which = NULL)
 iddobj$is_valid_field_num(num)
 iddobj$is_extensible_index(index)
 iddobj$is_valid_field_name(name)
@@ -159,6 +170,7 @@ print(iddobj)
 
     
     <ul>
+<li><p><code>iddobj</code>: An IddObject object.</p></li>
 <li><p><code>num</code>: A positive integer.</p></li>
 <li><p><code>index</code>: An integer vector of field indexes.</p></li>
 <li><p><code>name</code>: A character vector or field names. Can be given in "lower-style".
@@ -169,23 +181,33 @@ See below.</p></li>
 <li><p><code>which</code>: An integer vector of field indexes or a character vector of field
 names. Field names can be given in "lower-style".</p></li>
 <li><p><code>unit</code>: If <code>TRUE</code>, field units will be also returned. Default: <code>FALSE</code>.</p></li>
-<li><p><code>in_ip</code>: If <code>TRUE</code>, field names or values will be returned in IP units.</p></li>
+<li><p><code>in_ip</code>: If <code>TRUE</code>, field names or values will be returned in IP units.
+Default: eplusr_option("view_in_ip").</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="detail"><a class="anchor" href="#detail"></a>Detail</h2>
 
     
-    <p><code>$group_index()</code> returns the index of group this class belongs to.</p>
-<p><code>$group_name()</code> returns the name of group this class belongs to.</p>
-<p><code>$class_index()</code> returns the index of this class.</p>
-<p><code>$class_name()</code> returns the name of this class.</p>
+    <p><code>$group_index()</code> returns the index of IDD group it belongs to.</p>
+<p><code>$group_name()</code> returns the name of IDD group it belongs to.</p>
+<p><code>$class_index()</code> returns the index of this IDD class.</p>
+<p><code>$class_name()</code> returns the name of this IDD class.</p>
+<p><code>$class_format()</code> returns the format of this IDD class. This format indicator
+is currently not used by eplusr. <strong>NOTE</strong>: some classes have special
+format when saved in the IDFEditor with the special format option
+enabled. Those special format includes "singleLine", "vertices",
+"compactSchedule", "fluidProperties", "viewFactors" and "spectral".
+eplusr can handle all those format when parsing IDF files. However, when
+saved, all classes are formatted in standard way.</p>
 <p><code>$min_fields()</code> returns the minimum fields required for this class.
 If no required, <code>0</code> is returned.</p>
 <p><code>$num_fields()</code> returns current total number of fields in this class. This
 number may change if the class is extensible and after
 <code>$add_extensible_group()</code> or <code>$del_extensible_group()</code>.</p>
-<p><code>$memo()</code> returns memo of this class.</p>
-<p><code>$num_extensible()</code> returns the number of extensible fields in this class.</p>
+<p><code>$memo()</code> returns memo of this class. Usually a brief description of this
+class.</p>
+<p><code>$num_extensible()</code> returns the number of extensible fields in this class. If
+not zero, it means that objects in this class is dynamically extensible.</p>
 <p><code>$first_extensible_index()</code> returns the field index of the first extensible
 field in this class. If this class is not extensible, <code>0</code> is return.</p>
 <p><code>$extensible_group_num()</code> returns the number of extensible groups in this
@@ -199,9 +221,11 @@ class.</p>
 <p><code>$field_name()</code> returns names of fields specified by field indexes.  If <code>index</code>
 is <code>NULL</code>, names of all fields in this class are returned. If <code>lower</code> is
 <code>TRUE</code>, "lower-style" names are returned, i.e. all spaces and dashes is
-replaced by underscores. If <code>unit</code> is <code>TRUE</code>, the units of those fields
-are also returned.  If <code>in_ip</code>, corresponding imperial units are
-returned. It only has effect when <code>unit</code> is <code>TRUE</code>.</p>
+replaced by underscores. "lower-style" names are useful when use them as
+filed names in <code>$set_value()</code> in <code>IdfObject</code> class and <code>$set_object()</code> in
+<code>Idf</code> class. If <code>unit</code> is <code>TRUE</code>, the units of those fields are also
+returned.  If <code>in_ip</code>, corresponding imperial units are returned. It only
+has effect when <code>unit</code> is <code>TRUE</code>.</p>
 <p><code>$field_index()</code> returns indexes of fields specified by field names. If <code>name</code>
 is <code>NULL</code>, indexes of all fields in this class are returned.</p>
 <p>All other <code>$field_*()</code> returns specific field properties. If <code>which</code> is <code>NULL</code>,
@@ -225,10 +249,26 @@ if the lower limit should be included), <code>maximum</code> (upper limit), and
 fields of character type, empty lists are returned. For fields of
 numeric types with no specified ranges, <code>minimum</code> is set to <code>-Inf</code>,
 <code>lower_incbounds</code> is set to FALSE, <code>upper</code> is set to <code>Inf</code>, and
-<code>upper_incbounds</code> is set to FALSE.</p></li>
+<code>upper_incbounds</code> is set to FALSE. The field range is printed in number
+interval denotation.</p></li>
+<li><p><code>$field_reference()</code>: returns a list of references for those fields that
+have the <code>object-list</code> attribute. Basically, it is a list with all
+possible values collected from other object fields that those fields
+reference.</p></li>
+<li><p><code>$field_possible()</code>: returns all possible values for specified fields,
+including auto-value (<code>autosize</code> and <code>autocalculate</code>), and results from
+<code>$field_default()</code>, <code>$field_range()</code>, <code>$field_choice()</code> and
+<code>$field_reference()</code>. Underneath, it returns a data.table with custom
+printing method.</p></li>
 </ul>
-    <p><code>$is_valid_field_num()</code> returns <code>TRUE</code> if <code>num</code> is acceptable as a total number
-of fields in this class. Extensible property is considered. For instance, The
+    <p><strong>NOTE</strong>: <code>$field_reference()</code> and <code>$field_possible()</code> can only be used in
+<code>IddObject</code>s that are created using <code>$definition()</code> in <code><a href='idf.html'>Idf</a></code> class and
+<code><a href='idf_object.html'>IdfObject</a></code> class, and cannot be used in <code>IddObject</code>s that are
+created using <code>$object()</code> or equivalent in <code><a href='idd.html'>Idd</a></code> class. This is
+because both methods need shared Idf value data to collect all reference
+values.</p>
+<p><code>$is_valid_field_num()</code> returns <code>TRUE</code> if <code>num</code> is acceptable as a total number
+of fields in this class. Extensible property is considered. For instance, the
 total number of fields defined in IDD for class <code>BuildingSurfaces:Detailed</code>
 is 390. However, 396 is still a valid field number for this class as the
 number of field in the extensible group is 3.</p>
@@ -242,17 +282,207 @@ number of field in the extensible group is 3.</p>
 <p><code>$is_numeric_field()</code> returns <code>TRUE</code> if the field value should be numeric.</p>
 <p><code>$is_integer_field()</code> returns <code>TRUE</code> if the field value should be an integer.</p>
 <p><code>$is_required_field()</code> returns <code>TRUE</code> if the field is required.</p>
+<p><code>$print()</code> prints the IdfObject. Basically, the print output can be divided
+into four parts:
+* CLASS: IDD class name of current object
+* MEMO: Brief description of the IDD class
+* PROPERTY: properties of the IDD class, including name of group it
+belongs to, whether it is an unique or required class and current total
+fields. The fields may increase if the IDD class is extensible, such as
+<code>Branch</code>, <code>ZoneList</code> and etc.
+* FIELDS: fields of current IDD class. Required fields are marked with
+<code>*</code>. If the class is extensible, only the first extensible group will
+be printed and two ellipses will be shown at the bottom. Fields in the
+extensible group will be marked with an arrow down surrounded by angle
+brackets.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='idd.html'>Idd Class</a></p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># get a parent Idd object</span>
+<span class='no'>idd</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>)
+
+<span class='co'># get an IddObject of class "Material"</span>
+<span class='no'>mat</span> <span class='kw'>&lt;-</span> <span class='no'>idd</span>$<span class='no'>Material</span>
+
+<span class='co'># get name of IDD group it belongs to</span>
+<span class='no'>mat</span>$<span class='fu'>group_name</span>()</div><div class='output co'>#&gt; [1] "Surface Construction Elements"</div><div class='input'>
+<span class='co'># get index of IDD group it belongs to</span>
+<span class='no'>mat</span>$<span class='fu'>group_index</span>()</div><div class='output co'>#&gt; [1] 5</div><div class='input'>
+<span class='co'># get name of current IDD class</span>
+<span class='no'>mat</span>$<span class='fu'>class_name</span>()</div><div class='output co'>#&gt; [1] "Material"</div><div class='input'>
+<span class='co'># get index of class IDD class</span>
+<span class='no'>mat</span>$<span class='fu'>class_name</span>()</div><div class='output co'>#&gt; [1] "Material"</div><div class='input'>
+<span class='co'># get minimum field number</span>
+<span class='no'>mat</span>$<span class='fu'>min_fields</span>()</div><div class='output co'>#&gt; [1] 6</div><div class='input'>
+<span class='co'># get total field number</span>
+<span class='no'>mat</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 9</div><div class='input'>
+<span class='co'># get memo of current class</span>
+<span class='no'>mat</span>$<span class='fu'>memo</span>()</div><div class='output co'>#&gt; [1] "Regular materials described with full set of thermal properties"</div><div class='input'>
+<span class='co'># get an IddObject of extensible class "Branch"</span>
+<span class='no'>bran</span> <span class='kw'>&lt;-</span> <span class='no'>idd</span>$<span class='no'>Branch</span>
+
+<span class='co'># check if the class is extensible</span>
+<span class='no'>bran</span>$<span class='fu'>is_extensible</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># get number of extensible fields, index of first extensible field and number of</span>
+<span class='co'># current extensible groups in "Branch" class</span>
+<span class='no'>bran</span>$<span class='fu'>num_extensible</span>()</div><div class='output co'>#&gt; [1] 4</div><div class='input'>
+<span class='no'>bran</span>$<span class='fu'>first_extensible_index</span>()</div><div class='output co'>#&gt; [1] 3</div><div class='input'>
+<span class='no'>bran</span>$<span class='fu'>extensible_group_num</span>()</div><div class='output co'>#&gt; [1] 11</div><div class='input'>
+
+<span class='co'># get current number of fields</span>
+<span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 46</div><div class='input'>
+<span class='co'># add ten extensible groups</span>
+<span class='no'>bran</span>$<span class='fu'>add_extensible_group</span>(<span class='fl'>10</span>)</div><div class='output co'>#&gt; &lt;&lt; Class: `Branch` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "List components on the branch in simulation and connection order
+#&gt; Note: this should NOT include splitters or mixers which define
+#&gt; endpoints of branches"
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Node-Branch Management`
+#&gt;   Unique: FALSE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 86
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:* Name
+#&gt;   2:  Pressure Drop Curve Name
+#&gt;   3:* Component 1 Object Type &lt;↓&gt;
+#&gt;   4:* Component 1 Name &lt;↓&gt;
+#&gt;   5:* Component 1 Inlet Node Name &lt;↓&gt;
+#&gt;   6:* Component 1 Outlet Node Name &lt;↓&gt;
+#&gt;   ......
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># the number of fields has been increased by 10 * 4 (= 46)</span>
+<span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 86</div><div class='input'>
+<span class='co'># delete eight extensible groups</span>
+<span class='no'>bran</span>$<span class='fu'>del_extensible_group</span>(<span class='fl'>8</span>)</div><div class='output co'>#&gt; &lt;&lt; Class: `Branch` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "List components on the branch in simulation and connection order
+#&gt; Note: this should NOT include splitters or mixers which define
+#&gt; endpoints of branches"
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Node-Branch Management`
+#&gt;   Unique: FALSE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 54
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:* Name
+#&gt;   2:  Pressure Drop Curve Name
+#&gt;   3:* Component 1 Object Type &lt;↓&gt;
+#&gt;   4:* Component 1 Name &lt;↓&gt;
+#&gt;   5:* Component 1 Inlet Node Name &lt;↓&gt;
+#&gt;   6:* Component 1 Outlet Node Name &lt;↓&gt;
+#&gt;   ......
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># the number of fields has been decreased by 8 * 4 (= 32)</span>
+<span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 54</div><div class='input'>
+<span class='co'># check if current class has name attribute or not</span>
+<span class='no'>mat</span>$<span class='fu'>has_name</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># check if current class is required</span>
+<span class='no'>mat</span>$<span class='fu'>is_required</span>()</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># check if current class is unique</span>
+<span class='no'>mat</span>$<span class='fu'>is_unique</span>()</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># list all field names without units</span>
+<span class='no'>mat</span>$<span class='fu'>field_name</span>()</div><div class='output co'>#&gt; [1] "Name"                "Roughness"           "Thickness"          
+#&gt; [4] "Conductivity"        "Density"             "Specific Heat"      
+#&gt; [7] "Thermal Absorptance" "Solar Absorptance"   "Visible Absorptance"</div><div class='input'>
+<span class='co'># list all field names in lower-style</span>
+<span class='co'># useful when used as field names in "$set_value()" in IdfObject class</span>
+<span class='co'># and "$set_object()" in Idf class.</span>
+<span class='no'>mat</span>$<span class='fu'>field_name</span>(<span class='kw'>lower</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "name"                "roughness"           "thickness"          
+#&gt; [4] "conductivity"        "density"             "specific_heat"      
+#&gt; [7] "thermal_absorptance" "solar_absorptance"   "visible_absorptance"</div><div class='input'>
+<span class='co'># get field indexes</span>
+<span class='no'>mat</span>$<span class='fu'>field_index</span>(<span class='fu'>c</span>(<span class='st'>"thickness"</span>, <span class='st'>"roughness"</span>, <span class='st'>"name"</span>))</div><div class='output co'>#&gt; [1] 3 2 1</div><div class='input'>
+<span class='co'># get field types</span>
+<span class='no'>mat</span>$<span class='fu'>field_type</span>(<span class='fu'>c</span>(<span class='st'>"solar_absorptance"</span>, <span class='st'>"Density"</span>, <span class='st'>"Name"</span>))</div><div class='output co'>#&gt; [1] "real"  "real"  "alpha"</div><div class='input'>
+<span class='co'># get field notes</span>
+<span class='no'>bran</span>$<span class='fu'>field_note</span>(<span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>4</span>))</div><div class='output co'>#&gt; [1] "Optional field to include this branch in plant pressure drop calculations\nThis field is only relevant for branches in PlantLoops and CondenserLoops\nAir loops do not account for pressure drop using this field\nValid curve types are: Curve:Functional:PressureDrop or\none of Curve:{Linear,Quadratic,Cubic,Exponent}')"
+#&gt; [2] NA                                                                                                                                                                                                                                                                                                                            </div><div class='input'>
+<span class='co'># get field SI units</span>
+<span class='no'>mat</span>$<span class='fu'>field_unit</span>(<span class='fu'>c</span>(<span class='fl'>1</span>,<span class='fl'>3</span>,<span class='fl'>5</span>), <span class='kw'>in_ip</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; [1] NA      "m"     "kg/m3"</div><div class='input'>
+<span class='co'># get field IP units</span>
+<span class='no'>mat</span>$<span class='fu'>field_unit</span>(<span class='fu'>c</span>(<span class='fl'>1</span>,<span class='fl'>3</span>,<span class='fl'>5</span>), <span class='kw'>in_ip</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] NA       "ft"     "lb/ft3"</div><div class='input'>
+<span class='co'># get field default values in SI units</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>field_default</span>(<span class='kw'>in_ip</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))</div><div class='output co'>#&gt; List of 9
+#&gt;  $ : chr NA
+#&gt;  $ : chr NA
+#&gt;  $ : num NA
+#&gt;  $ : num NA
+#&gt;  $ : num NA
+#&gt;  $ : num NA
+#&gt;  $ : num 0.9
+#&gt;  $ : num 0.7
+#&gt;  $ : num 0.7</div><div class='input'>
+<span class='co'># get field choices</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>field_choice</span>(<span class='fl'>1</span>:<span class='fl'>3</span>))</div><div class='output co'>#&gt; List of 3
+#&gt;  $ : chr NA
+#&gt;  $ : chr [1:6] "VeryRough" "Rough" "MediumRough" "MediumSmooth" ...
+#&gt;  $ : chr NA</div><div class='input'>
+<span class='co'># get field ranges</span>
+<span class='no'>mat</span>$<span class='fu'>field_range</span>(<span class='fu'>c</span>(<span class='st'>"roughness"</span>, <span class='st'>"thickness"</span>, <span class='st'>"conductivity"</span>, <span class='st'>"solar_absorptance"</span>))</div><div class='output co'>#&gt; [[1]]
+#&gt; &lt;Not Applicable&gt;
+#&gt; [[2]]
+#&gt; (0, Inf)
+#&gt; 
+#&gt; [[3]]
+#&gt; (0, Inf)
+#&gt; 
+#&gt; [[4]]
+#&gt; [0, 1]
+#&gt; </div><div class='input'>
+# get all possible values of fields
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>mat</span>$<span class='fu'>field_possible</span>()
+<span class='co'># }</span><div class='input'>
+<span class='co'># check if input is a valid field number for current class</span>
+<span class='co'>## get required minimum field number</span>
+<span class='no'>mat</span>$<span class='fu'>min_fields</span>()</div><div class='output co'>#&gt; [1] 6</div><div class='input'>
+<span class='co'># (1) if less than required minimum field number</span>
+<span class='no'>mat</span>$<span class='fu'>is_valid_field_num</span>(<span class='fl'>3</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+<span class='co'># (2) if larger than required minimum field number but less than total field</span>
+<span class='co'># number</span>
+<span class='no'>mat</span>$<span class='fu'>is_valid_field_num</span>(<span class='fl'>7</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># (3) if larger than total field number</span>
+<span class='no'>mat</span>$<span class='fu'>is_valid_field_num</span>(<span class='fl'>10</span>)</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='co'># [1] FALSE</span>
+
+<span class='co'># for extensible class</span>
+<span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 54</div><div class='input'><span class='no'>bran</span>$<span class='fu'>num_extensible</span>()</div><div class='output co'>#&gt; [1] 4</div><div class='input'><span class='co'># if larger than required minimum field number</span>
+<span class='co'># (1) but cannot give whole extensible groups</span>
+<span class='no'>bran</span>$<span class='fu'>is_valid_field_num</span>(<span class='fu'>c</span>(<span class='fl'>55</span>, <span class='fl'>57</span>, <span class='fl'>60</span>))</div><div class='output co'>#&gt; [1] FALSE FALSE FALSE</div><div class='input'>
+<span class='co'># (2) and can give whole extensible groups</span>
+<span class='no'>bran</span>$<span class='fu'>is_valid_field_num</span>(<span class='fu'>c</span>(<span class='fl'>58</span>, <span class='fl'>62</span>, <span class='fl'>70</span>))</div><div class='output co'>#&gt; [1] TRUE TRUE TRUE</div><div class='input'>
+<span class='co'># check if input field index is an extensible field index</span>
+<span class='no'>bran</span>$<span class='fu'>is_extensible_index</span>(<span class='fl'>1</span>:<span class='fl'>4</span>)</div><div class='output co'>#&gt; [1] FALSE FALSE  TRUE  TRUE</div><div class='input'>
+# get all field referneces
+</div><span class='co'># NOT RUN {</span>
+<span class='no'>bran</span>$<span class='fu'>field_reference</span>(<span class='fl'>1</span>:<span class='fl'>4</span>)
+<span class='co'># }</span><div class='input'>
+<span class='co'># check if input is valid field name</span>
+<span class='co'># NOTE: lower-style names are treated as valid</span>
+<span class='no'>mat</span>$<span class='fu'>is_valid_field_name</span>(<span class='fu'>c</span>(<span class='st'>"nAmE"</span>, <span class='st'>"specific heat"</span>, <span class='st'>"Specific Heat"</span>, <span class='st'>"specific_heat"</span>))</div><div class='output co'>#&gt; [1] FALSE FALSE  TRUE  TRUE</div><div class='input'>
+<span class='co'># check if input is valid field index</span>
+<span class='no'>bran</span>$<span class='fu'>is_valid_field_index</span>(<span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>4</span>, <span class='fl'>54</span>, <span class='fl'>57</span>))</div><div class='output co'>#&gt; [1]  TRUE  TRUE  TRUE FALSE</div><div class='input'>
+<span class='co'># check if fields are autosizable, i.e. can be set to "Autosize"</span>
+<span class='no'>mat</span>$<span class='fu'>is_autosizable_field</span>(<span class='fl'>1</span>:<span class='fl'>4</span>)</div><div class='output co'>#&gt; [1] FALSE FALSE FALSE FALSE</div><div class='input'>
+<span class='co'># check if fields are autocalculatable, i.e. can be set to "Autocalculate"</span>
+<span class='no'>mat</span>$<span class='fu'>is_autocalculatable_field</span>(<span class='fl'>1</span>:<span class='fl'>4</span>)</div><div class='output co'>#&gt; [1] FALSE FALSE FALSE FALSE</div><div class='input'>
+<span class='co'># check if fields are numeric fields, i.e. field values should be either</span>
+<span class='co'># integers or float numbers</span>
+<span class='no'>mat</span>$<span class='fu'>is_numeric_field</span>(<span class='fu'>c</span>(<span class='st'>"roughness"</span>, <span class='st'>"thickness"</span>, <span class='st'>"density"</span>))</div><div class='output co'>#&gt; [1] FALSE  TRUE  TRUE</div><div class='input'>
+<span class='co'># check if fields are integer fields, i.e. field values should be integers</span>
+<span class='no'>mat</span>$<span class='fu'>is_integer_field</span>(<span class='fu'>c</span>(<span class='st'>"name"</span>, <span class='st'>"specific_heat"</span>))</div><div class='output co'>#&gt; [1] FALSE FALSE</div><div class='input'>
+<span class='co'># check if fields are required, i.e. field values should not be empty</span>
+<span class='no'>mat</span>$<span class='fu'>is_required_field</span>(<span class='fu'>c</span>(<span class='st'>"name"</span>, <span class='st'>"roughness"</span>, <span class='st'>"solar_absorptance"</span>))</div><div class='output co'>#&gt; [1]  TRUE  TRUE FALSE</div><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       
+      <li><a href="#details">Details</a></li>
+
       <li><a href="#usage">Usage</a></li>
 
       <li><a href="#arguments">Arguments</a></li>
@@ -260,7 +490,9 @@ number of field in the extensible group is 3.</p>
       <li><a href="#detail">Detail</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

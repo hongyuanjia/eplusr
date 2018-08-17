@@ -35,8 +35,8 @@
 <meta property="og:description" content="IdfObject is an abstraction of a single object in an Idf. It provides
 more detail methods to modify objects. IdfObject can only be created from
 the parent Idf object, using $object, $object_in_class() and
-$search_object(). This is because that initialization of an IdfObject
-needs some shared data from parent Idf object." />
+$search_object() or equivalent. This is because that initialization of an
+IdfObject needs some shared data from parent Idf object." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -65,7 +65,7 @@ needs some shared data from parent Idf object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -76,6 +76,9 @@ needs some shared data from parent Idf object." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -109,8 +112,8 @@ needs some shared data from parent Idf object." />
     <p><code>IdfObject</code> is an abstraction of a single object in an <code>Idf</code>. It provides
 more detail methods to modify objects. <code>IdfObject</code> can only be created from
 the parent <code>Idf</code> object, using <code>$object</code>, <code>$object_in_class()</code> and
-<code>$search_object()</code>. This is because that initialization of an <code>IdfObject</code>
-needs some shared data from parent <code>Idf</code> object.</p>
+<code>$search_object()</code> or equivalent. This is because that initialization of an
+<code>IdfObject</code> needs some shared data from parent <code>Idf</code> object.</p>
     
     </div>
 
@@ -172,12 +175,13 @@ idfobj$set_comment(comment, append = TRUE, width = 0L)
     <p><code>$get_comment()</code> returns the comments of current object.</p>
 <p><code>$set_comment()</code> sets comments of current object.</p>
 <p><strong>Arguments</strong></p><ul>
-<li><p><code>comment</code>: A character vector.</p></li>
+<li><p><code>comment</code>: A character vector. If <code>NULL</code>, all comments will be deleted.</p></li>
 <li><p><code>append</code>: If <code>TRUE</code>, comment will be appended to existing comments. If
 <code>FALSE</code>, comment will be prepended to existing currents. If <code>NULL</code>,
-existing comments will be deleted. Default: <code>FALSE</code></p></li>
-<li><p><code>width</code>: An integer to indicate where to break long comment lines. If <code>0</code>,
-no breaking will be made.</p></li>
+existing comments will be deleted before adding new comments. Default:
+<code>FALSE</code>.</p></li>
+<li><p><code>width</code>: An integer of character number to indicate where to break long
+comment lines. If <code>0</code>, no breaking will be made. Default: <code>0</code>.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -196,9 +200,18 @@ idfobj$possible_value(which = NULL)
 If simplify is <code>FALSE</code>, then all values will be converted into character
 and the converted character vector will be returned. Note that the field
 names will be converted into valid R names, i.e. all characters other
-than letters and numbers will be replaced by underscore("_").</p>
-<p><code>$set_value()</code> sets values of current object.</p>
-<p>eplusr also provides custom S3 method of <code>$</code>, <code>[[</code> and also <code>$&lt;-</code> and
+than letters and numbers will be replaced by underscore <code>"_"</code>
+("underscore-style").</p>
+<p><code>$set_value()</code> sets values of current object. Field values should be given in
+following either pattern below:</p><ul>
+<li><p>directly list all field values with no name. The values will be assigned to
+fields according to the appearance order</p></li>
+<li><p>give both field names <em>without units</em> and values in pair, e.g. <code>Name = "Test", `Begin Month` = 1</code>. You can find all valid field names using
+<code>$definition()$field_name()</code>. Field names can also be given in
+underscore-style, e.g. <code>Name = "Test", begin_month = 1</code> (NOTE: matching is
+case-insensitive).</p></li>
+</ul>
+    <p>eplusr also provides custom S3 method of <code>$</code>, <code>[[</code> and also <code>$&lt;-</code> and
 <code>[[&lt;-</code> to make it more convenient to get and set a single value of an
 <code>IdfObject</code>. Basically, <code>idfobj$FieldName</code> and <code>idfobj[[Field</code> is equivalent to <code>idfobj$get_value(Field)[[1]]</code>;
 <code>idfobj$FieldName &lt;- Value</code> and <code>idfobj[[Field]] &lt;- Value</code> is equivalent
@@ -207,7 +220,8 @@ field name and <code>Field</code> is a single valid field index or name.</p>
 <p><code>$possible_value()</code> return all possible values for specified fields,
 including auto-value (<code>autosize</code> and <code>autocalculate</code>), default value,
 value range, choices and references. Underneath, it returns a data.table
-with custom printing method.</p>
+with custom printing method. It is basically the same as
+<code>$field_possible()</code> in <a href='idd_object.html'>IddObject</a> class.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>which</code>: An integer vector of field indexes or a character vector of field
 names. Field names can be given in "lower-style", e.g. <code>"Thermal Resistance"</code> can be given as <code>"thermal_resistance"</code>.</p></li>
@@ -242,12 +256,15 @@ different strictness level.</p>
 <code>"final".</code>There are three different validate levels, i.e. <code>"none"</code>,
 <code>"draft"</code> and <code>"final"</code>:</p><ul>
 <li><p>For <code>"none"</code>, none validation will be done;</p></li>
-<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, numeric,
-integer, and choice field values will be done;</p></li>
-<li><p>For <code>"final"</code>, besides above, checking of missing required objects,
-duplicated unique objects, object name conflicts, missing required
-fields and invalid field value reference will also be done.</p></li>
+<li><p>For <code>"draft"</code>, checking of invalid autosize, autocalculate, character,
+numeric, integer, and choice field values will be done;</p></li>
+<li><p>For <code>"final"</code>, besides above, checking of incomplete extensible groups,
+missing required objects, duplicated unique objects, object name
+conflicts, missing required fields and invalid field value reference will
+also be done.</p></li>
 </ul>
+    <p>For details about the underlying structure of returned value of
+<code>$validate()</code>, please <code>$validate()</code> in <code><a href='idf.html'>Idf</a></code> class.</p>
     
     <h2 class="hasAnchor" id="cross-reference"><a class="anchor" href="#cross-reference"></a>Cross Reference</h2>
 
@@ -312,6 +329,395 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
     <div class='dont-index'><p><a href='idf.html'>Idf class</a></p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># read an IDF file</span>
+<span class='no'>idf</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'>system.file</span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>),
+    <span class='kw'>idd</span> <span class='kw'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>))
+
+<span class='co'># get the IdfObject of material named "C5 - 4 IN HW CONCRETE"</span>
+<span class='no'>mat</span> <span class='kw'>&lt;-</span> <span class='no'>idf</span>$<span class='no'>Material</span>$<span class='no'>C5_4_IN_HW_CONCRETE</span>
+
+<span class='co'># get object ID</span>
+<span class='no'>mat</span>$<span class='fu'>id</span>()</div><div class='output co'>#&gt; [1] 14</div><div class='input'>
+<span class='co'># get object name</span>
+<span class='no'>mat</span>$<span class='fu'>name</span>()</div><div class='output co'>#&gt; [1] "C5 - 4 IN HW CONCRETE"</div><div class='input'>
+<span class='co'># NA will be returned if the class does not have name attribute. For example,</span>
+<span class='co'># "Version" class</span>
+<span class='no'>idf</span>$<span class='no'>Version</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='fu'>name</span>()</div><div class='output co'>#&gt; [1] NA</div><div class='input'>
+<span class='co'># get underlying IddObject of current class</span>
+<span class='no'>mat</span>$<span class='fu'>definition</span>()</div><div class='output co'>#&gt; &lt;&lt; Class: `Material` &gt;&gt;
+#&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
+#&gt;   "Regular materials described with full set of thermal properties"
+#&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
+#&gt;   Group: `Surface Construction Elements`
+#&gt;   Unique: FALSE
+#&gt;   Required: FALSE
+#&gt;   Total fields: 9
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt;   1:* Name
+#&gt;   2:* Roughness
+#&gt;   3:* Thickness {m}
+#&gt;   4:* Conductivity {W/m-K}
+#&gt;   5:* Density {kg/m3}
+#&gt;   6:* Specific Heat {J/kg-K}
+#&gt;   7:  Thermal Absorptance
+#&gt;   8:  Solar Absorptance
+#&gt;   9:  Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
+<span class='co'># get object comments</span>
+<span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; character(0)</div><div class='input'>
+<span class='co'># add new object comments</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='fu'>c</span>(<span class='st'>"This is a material named `WD01`"</span>, <span class='st'>"This object has an ID of 47"</span>))</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !This is a material named `WD01`
+#&gt; !This object has an ID of 47
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    </div><div class='input'>
+<span class='co'># append new comments</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is an appended comment"</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !This is a material named `WD01`
+#&gt; !This object has an ID of 47
+#&gt; !This is an appended comment
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    
+#&gt; [3] "This is an appended comment"    </div><div class='input'>
+<span class='co'># prepend new comments</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a prepended comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !This is a prepended comment
+#&gt; !This is a material named `WD01`
+#&gt; !This object has an ID of 47
+#&gt; !This is an appended comment
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a prepended comment"     "This is a material named `WD01`"
+#&gt; [3] "This object has an ID of 47"     "This is an appended comment"    </div><div class='input'>
+<span class='co'># wrap long comments</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a very long comment that is needed to be wrapped."</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>30</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !This is a prepended comment
+#&gt; !This is a material named `WD01`
+#&gt; !This object has an ID of 47
+#&gt; !This is an appended comment
+#&gt; !This is a very long comment
+#&gt; !that is needed to be wrapped.
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a prepended comment"     "This is a material named `WD01`"
+#&gt; [3] "This object has an ID of 47"     "This is an appended comment"    
+#&gt; [5] "This is a very long comment"     "that is needed to be wrapped."  </div><div class='input'>
+<span class='co'># delete old comments and add new one</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is the only comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
+#&gt; !This is the only comment
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is the only comment"</div><div class='input'>
+<span class='co'># delete all comments</span>
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.1014984,         !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; character(0)</div><div class='input'>
+<span class='co'># get all existing field values</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>get_value</span>())</div><div class='output co'>#&gt; List of 9
+#&gt;  $ Name               : chr "C5 - 4 IN HW CONCRETE"
+#&gt;  $ Roughness          : chr "MediumRough"
+#&gt;  $ Thickness          : num 0.101
+#&gt;  $ Conductivity       : num 1.73
+#&gt;  $ Density            : num 2243
+#&gt;  $ Specific_Heat      : num 837
+#&gt;  $ Thermal_Absorptance: num 0.9
+#&gt;  $ Solar_Absorptance  : num 0.65
+#&gt;  $ Visible_Absorptance: num 0.65</div><div class='input'>
+<span class='co'># get values of field 1, 3, 5</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>get_value</span>(<span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>5</span>)))</div><div class='output co'>#&gt; List of 3
+#&gt;  $ Name     : chr "C5 - 4 IN HW CONCRETE"
+#&gt;  $ Thickness: num 0.101
+#&gt;  $ Density  : num 2243</div><div class='input'>
+<span class='co'># get character format values instead of a named list</span>
+<span class='no'>mat</span>$<span class='fu'>get_value</span>(<span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>3</span>, <span class='fl'>5</span>), <span class='kw'>simplify</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; [1] "C5 - 4 IN HW CONCRETE" "0.1014984"             "2242.585"             </div><div class='input'>
+<span class='co'># get values of all field even those that are not set</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='no'>Zone</span>$<span class='no'>ZONE_ONE</span>$<span class='fu'>get_value</span>())</div><div class='output co'>#&gt; List of 9
+#&gt;  $ Name                       : chr "ZONE ONE"
+#&gt;  $ Direction_of_Relative_North: num 0
+#&gt;  $ X_Origin                   : num 0
+#&gt;  $ Y_Origin                   : num 0
+#&gt;  $ Z_Origin                   : num 0
+#&gt;  $ Type                       : num 1
+#&gt;  $ Multiplier                 : num 1
+#&gt;  $ Ceiling_Height             : chr "autocalculate"
+#&gt;  $ Volume                     : chr "autocalculate"</div><div class='input'>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='no'>Zone</span>$<span class='no'>ZONE_ONE</span>$<span class='fu'>get_value</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; List of 13
+#&gt;  $ Name                             : chr "ZONE ONE"
+#&gt;  $ Direction_of_Relative_North      : num 0
+#&gt;  $ X_Origin                         : num 0
+#&gt;  $ Y_Origin                         : num 0
+#&gt;  $ Z_Origin                         : num 0
+#&gt;  $ Type                             : num 1
+#&gt;  $ Multiplier                       : num 1
+#&gt;  $ Ceiling_Height                   : chr "autocalculate"
+#&gt;  $ Volume                           : chr "autocalculate"
+#&gt;  $ Floor_Area                       : num NA
+#&gt;  $ Zone_Inside_Convection_Algorithm : chr NA
+#&gt;  $ Zone_Outside_Convection_Algorithm: chr NA
+#&gt;  $ Part_of_Total_Floor_Area         : chr NA</div><div class='input'>
+<span class='co'># get field values using shortcuts</span>
+<span class='no'>mat</span>$<span class='no'>Roughness</span></div><div class='output co'>#&gt; [1] "MediumRough"</div><div class='input'><span class='no'>mat</span><span class='kw'>[[</span><span class='st'>"Specific_Heat"</span>]]</div><div class='output co'>#&gt; [1] 836.8</div><div class='input'><span class='no'>mat</span>[<span class='fu'>c</span>(<span class='fl'>1</span>,<span class='fl'>2</span>)]</div><div class='output co'>#&gt; $Name
+#&gt; [1] "C5 - 4 IN HW CONCRETE"
+#&gt; 
+#&gt; $Roughness
+#&gt; [1] "MediumRough"
+#&gt; </div><div class='input'><span class='no'>mat</span>[<span class='fu'>c</span>(<span class='st'>"Name"</span>, <span class='st'>"Density"</span>)]</div><div class='output co'>#&gt; $Name
+#&gt; [1] "C5 - 4 IN HW CONCRETE"
+#&gt; 
+#&gt; $Density
+#&gt; [1] 2242.585
+#&gt; </div><div class='input'>
+<span class='co'># set field values</span>
+<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"new_name"</span>, <span class='kw'>Thickness</span> <span class='kw'>=</span> <span class='fl'>0.02</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `new_name`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: new_name,          !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.02,              !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.65,              !- Solar Absorptance
+#&gt;  9: 0.65;              !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>[<span class='fu'>c</span>(<span class='st'>"Name"</span>, <span class='st'>"Thickness"</span>)]</div><div class='output co'>#&gt; $Name
+#&gt; [1] "new_name"
+#&gt; 
+#&gt; $Thickness
+#&gt; [1] 0.02
+#&gt; </div><div class='input'>
+<span class='co'># When `default` argument is set to TRUE and input field values are empty, i.e.</span>
+<span class='co'># NA and NULL, the field values will be reset to defaults.</span>
+<span class='no'>mat</span>[<span class='fu'>c</span>(<span class='st'>"Thermal Absorptance"</span>, <span class='st'>"Solar Absorptance"</span>)]</div><div class='output co'>#&gt; $Thermal_Absorptance
+#&gt; [1] 0.9
+#&gt; 
+#&gt; $Solar_Absorptance
+#&gt; [1] 0.65
+#&gt; </div><div class='input'>
+<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>visible_absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Solar_Absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `new_name`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: new_name,          !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.02,              !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: 2242.585,          !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.7,               !- Solar Absorptance
+#&gt;  9: 0.7;               !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>[<span class='fu'>c</span>(<span class='st'>"Visible Absorptance"</span>, <span class='st'>"Solar Absorptance"</span>)]</div><div class='output co'>#&gt; $Visible_Absorptance
+#&gt; [1] 0.7
+#&gt; 
+#&gt; $Solar_Absorptance
+#&gt; [1] 0.7
+#&gt; </div><div class='input'>
+<span class='co'># set field values using shortcuts</span>
+<span class='no'>mat</span>$<span class='no'>Name</span> <span class='kw'>&lt;-</span> <span class='st'>"another_name"</span>
+<span class='no'>mat</span>$<span class='no'>Name</span></div><div class='output co'>#&gt; [1] "another_name"</div><div class='input'><span class='no'>mat</span><span class='kw'>[[</span><span class='st'>"Thickness"</span>]] <span class='kw'>&lt;-</span> <span class='fl'>0.019</span>
+<span class='no'>mat</span>$<span class='no'>Thickness</span></div><div class='output co'>#&gt; [1] 0.019</div><div class='input'>
+<span class='co'># check validate</span>
+<span class='no'>mat</span>$<span class='fu'>validate</span>()</div><div class='output co'>#&gt;  ✔ No error found.</div><div class='input'><span class='no'>mat</span>$<span class='fu'>is_valid</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># if we set density to a negative number</span>
+<span class='no'>mat</span>$<span class='fu'>definition</span>()$<span class='fu'>field_range</span>(<span class='st'>"Density"</span>)</div><div class='output co'>#&gt; [[1]]
+#&gt; (0, Inf)
+#&gt; </div><div class='input'><span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"none"</span>) <span class='co'># have to set validate to "none" to do so</span></div><div class='output co'>#&gt; $validate_level
+#&gt; [1] "none"
+#&gt; </div><div class='input'><span class='no'>mat</span>$<span class='no'>Density</span> <span class='kw'>&lt;-</span> -<span class='fl'>1</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"final"</span>) <span class='co'># change back to "final" validate level</span></div><div class='output co'>#&gt; $validate_level
+#&gt; [1] "final"
+#&gt; </div><div class='input'><span class='no'>mat</span>$<span class='fu'>is_valid</span>()</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'><span class='co'># get other objects that this object refereces</span>
+<span class='no'>mat</span>$<span class='fu'>ref_from_object</span>() <span class='co'># not referencing other objects</span></div><div class='output co'>#&gt; <span class='message'>Object does not reference from any other object.</span></div><div class='input'><span class='no'>mat</span>$<span class='fu'>has_ref_from</span>()</div><div class='output co'>#&gt; [1] FALSE</div><div class='input'>
+
+<span class='co'># get other objects that reference this object</span>
+<span class='no'>mat</span>$<span class='fu'>ref_by_object</span>() <span class='co'># referenced by construction "FLOOR"</span></div><div class='output co'>#&gt; <span class='message'>1 object found that reference the target object [ID: 14].</span></div><div class='output co'>#&gt; $FLOOR
+#&gt; &lt;&lt;[ID:16] `FLOOR`&gt;&gt; Construction
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: FLOOR,             !- Name
+#&gt; *2: another_name;      !- Outside Layer
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; </div><div class='input'><span class='fu'>names</span>(<span class='no'>mat</span>$<span class='fu'>ref_by_object</span>())</div><div class='output co'>#&gt; <span class='message'>1 object found that reference the target object [ID: 14].</span></div><div class='output co'>#&gt; [1] "FLOOR"</div><div class='input'>
+<span class='no'>mat</span>$<span class='fu'>has_ref_by</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># check if having any referenced objects or is referenced by other objects</span>
+<span class='no'>mat</span>$<span class='fu'>has_ref</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='co'># get all object data in a data.table format without field units</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>table</span>(<span class='kw'>unit</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	9 obs. of  3 variables:
+#&gt;  $ index: num  1 2 3 4 5 6 7 8 9
+#&gt;  $ name : chr  "Name" "Roughness" "Thickness" "Conductivity" ...
+#&gt;  $ value: chr  "another_name" "MediumRough" "0.019" "1.729577" ...
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='co'># get all object data in a data.table format where all field values are put in a</span>
+<span class='co'># list column and field names without unit</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>table</span>(<span class='kw'>string_value</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>unit</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	9 obs. of  3 variables:
+#&gt;  $ index: num  1 2 3 4 5 6 7 8 9
+#&gt;  $ name : chr  "Name" "Roughness" "Thickness" "Conductivity" ...
+#&gt;  $ value:List of 9
+#&gt;   ..$ : chr "another_name"
+#&gt;   ..$ : chr "MediumRough"
+#&gt;   ..$ : num 0.019
+#&gt;   ..$ : num 1.73
+#&gt;   ..$ : num -1
+#&gt;   ..$ : num 837
+#&gt;   ..$ : num 0.9
+#&gt;   ..$ : num 0.7
+#&gt;   ..$ : num 0.7
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='co'># get all object data in a data.table format where all field values are put in a</span>
+<span class='co'># list column and all values are converted into IP units</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>table</span>(<span class='kw'>string_value</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>in_ip</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	9 obs. of  3 variables:
+#&gt;  $ index: num  1 2 3 4 5 6 7 8 9
+#&gt;  $ name : chr  "Name" "Roughness" "Thickness {ft}" "Conductivity {Btu-in/h-ft2-F}" ...
+#&gt;  $ value:List of 9
+#&gt;   ..$ : chr "another_name"
+#&gt;   ..$ : chr "MediumRough"
+#&gt;   ..$ : num 0.0623
+#&gt;   ..$ : num 12
+#&gt;   ..$ : num -0.0624
+#&gt;   ..$ : num 0.2
+#&gt;   ..$ : num 0.9
+#&gt;   ..$ : num 0.7
+#&gt;   ..$ : num 0.7
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='co'># get all object data in a data.table format, including tailing empty fields</span>
+<span class='fu'>str</span>(<span class='no'>idf</span>$<span class='no'>Zone</span>$<span class='no'>ZONE_ONE</span>$<span class='fu'>table</span>(<span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	13 obs. of  3 variables:
+#&gt;  $ index: num  1 2 3 4 5 6 7 8 9 10 ...
+#&gt;  $ name : chr  "Name" "Direction of Relative North {deg}" "X Origin {m}" "Y Origin {m}" ...
+#&gt;  $ value: chr  "ZONE ONE" "0" "0" "0" ...
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='co'># get all object data in a data.table format where each field becomes a column</span>
+<span class='fu'>str</span>(<span class='no'>mat</span>$<span class='fu'>table</span>(<span class='kw'>wide</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	1 obs. of  9 variables:
+#&gt;  $ Name                  : chr "another_name"
+#&gt;  $ Roughness             : chr "MediumRough"
+#&gt;  $ Thickness {m}         : chr "0.019"
+#&gt;  $ Conductivity {W/m-K}  : chr "1.729577"
+#&gt;  $ Density {kg/m3}       : chr "-1"
+#&gt;  $ Specific Heat {J/kg-K}: chr "836.8"
+#&gt;  $ Thermal Absorptance   : chr "0.9"
+#&gt;  $ Solar Absorptance     : chr "0.7"
+#&gt;  $ Visible Absorptance   : chr "0.7"
+#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='co'># get string format object</span>
+<span class='no'>mat</span>$<span class='fu'>string</span>()</div><div class='output co'>#&gt;  [1] ""                                                      
+#&gt;  [2] "Material,"                                             
+#&gt;  [3] "    another_name,            !- Name"                  
+#&gt;  [4] "    MediumRough,             !- Roughness"             
+#&gt;  [5] "    0.019,                   !- Thickness {m}"         
+#&gt;  [6] "    1.729577,                !- Conductivity {W/m-K}"  
+#&gt;  [7] "    -1,                      !- Density {kg/m3}"       
+#&gt;  [8] "    836.8,                   !- Specific Heat {J/kg-K}"
+#&gt;  [9] "    0.9,                     !- Thermal Absorptance"   
+#&gt; [10] "    0.7,                     !- Solar Absorptance"     
+#&gt; [11] "    0.7;                     !- Visible Absorptance"   
+#&gt; [12] ""                                                      </div><div class='input'>
+<span class='co'># get string format of object, and decrease the space between field values and</span>
+<span class='co'># field names</span>
+<span class='no'>mat</span>$<span class='fu'>string</span>(<span class='kw'>sep_at</span> <span class='kw'>=</span> <span class='fl'>15</span>)</div><div class='output co'>#&gt;  [1] ""                                        
+#&gt;  [2] "Material,"                               
+#&gt;  [3] "    another_name,  !- Name"              
+#&gt;  [4] "    MediumRough,  !- Roughness"          
+#&gt;  [5] "    0.019,     !- Thickness {m}"         
+#&gt;  [6] "    1.729577,  !- Conductivity {W/m-K}"  
+#&gt;  [7] "    -1,        !- Density {kg/m3}"       
+#&gt;  [8] "    836.8,     !- Specific Heat {J/kg-K}"
+#&gt;  [9] "    0.9,       !- Thermal Absorptance"   
+#&gt; [10] "    0.7,       !- Solar Absorptance"     
+#&gt; [11] "    0.7;       !- Visible Absorptance"   
+#&gt; [12] ""                                        </div><div class='input'>
+<span class='co'># get string format of object, and decrease the leading space of field values</span>
+<span class='no'>mat</span>$<span class='fu'>string</span>(<span class='kw'>leading</span> <span class='kw'>=</span> <span class='fl'>0</span>)</div><div class='output co'>#&gt;  [1] ""                                                      
+#&gt;  [2] "Material,"                                             
+#&gt;  [3] "another_name,                !- Name"                  
+#&gt;  [4] "MediumRough,                 !- Roughness"             
+#&gt;  [5] "0.019,                       !- Thickness {m}"         
+#&gt;  [6] "1.729577,                    !- Conductivity {W/m-K}"  
+#&gt;  [7] "-1,                          !- Density {kg/m3}"       
+#&gt;  [8] "836.8,                       !- Specific Heat {J/kg-K}"
+#&gt;  [9] "0.9,                         !- Thermal Absorptance"   
+#&gt; [10] "0.7,                         !- Solar Absorptance"     
+#&gt; [11] "0.7;                         !- Visible Absorptance"   
+#&gt; [12] ""                                                      </div><div class='input'>
+<span class='co'># print the object without comment</span>
+<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `another_name`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: another_name,      !- Name
+#&gt; *2: MediumRough,       !- Roughness
+#&gt; *3: 0.019,             !- Thickness {m}
+#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; *5: -1,                !- Density {kg/m3}
+#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,               !- Thermal Absorptance
+#&gt;  8: 0.7,               !- Solar Absorptance
+#&gt;  9: 0.7;               !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
+<span class='co'># print the object, and auto separate field values and field names at the</span>
+<span class='co'># largetst character length of field values</span>
+<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>auto_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `another_name`&gt;&gt; Material
+#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
+#&gt; *1: another_name,  !- Name
+#&gt; *2: MediumRough,   !- Roughness
+#&gt; *3: 0.019,         !- Thickness {m}
+#&gt; *4: 1.729577,      !- Conductivity {W/m-K}
+#&gt; *5: -1,            !- Density {kg/m3}
+#&gt; *6: 836.8,         !- Specific Heat {J/kg-K}
+#&gt;  7: 0.9,           !- Thermal Absorptance
+#&gt;  8: 0.7,           !- Solar Absorptance
+#&gt;  9: 0.7;           !- Visible Absorptance
+#&gt; ────────────────────────────────────────────────────────────────────────────────</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -338,7 +744,9 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
       <li><a href="#print">Print</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
 
     <h2>Author</h2>
     

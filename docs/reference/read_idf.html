@@ -62,7 +62,7 @@ Idf object. For more details on Idf object, please see Idf class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ Idf object. For more details on Idf object, please see Idf class." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -115,9 +118,9 @@ Idf object. For more details on Idf object, please see Idf class." />
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>path</th>
-      <td><p>A path to an EnergyPlus IDF file or a string that can be parsed as
-an IDF. The file extension does not matter. So models stored in <code>TXT</code>
-format are still able to correctly be parsed.</p></td>
+      <td><p>Either a path, a connection, or literal data (either a single
+string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
+has a extension <code>.idf</code>.</p></td>
     </tr>
     <tr>
       <th>idd</th>
@@ -132,11 +135,117 @@ will be parsed using the latest version of IDD cached, with a warning.</p></td>
 
     <p>An <code>Idf</code> object.</p>
     
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Currently, Imf file is not fully supported. All EpMacro lines will be treated
+as normal comments of the nearest downwards object. If input is an Imf file,
+a warning will be given during parsing. It is recommended to convert the Imf
+file to an Idf file and use <code><a href='param.html'>ParametricJob</a></code> class to conduct
+parametric analysis.</p>
+    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='idf.html'>Idf class</a></p></div>
+    <div class='dont-index'><p><a href='idf.html'>Idf class</a> for modifying EnergyPlus model. <code><a href='use_idd.html'>use_idd()</a></code> and
+<code><a href='use_idd.html'>download_idd()</a></code> for downloading and parsing EnergyPlus IDD file.
+<code><a href='use_eplus.html'>use_eplus()</a></code> for configuring which version of EnergyPlus to use.</p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># example model shipped with eplusr from EnergyPlus v8.8</span>
+<span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'>system.file</span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>) <span class='co'># v8.8</span>
+
+<span class='co'># if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur</span>
+<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+<span class='fu'><a href='use_idd.html'>is_avail_idd</a></span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+(<span class='fu'>read_idf</span>(<span class='no'>idf_path</span>))
+<span class='co'># }</span><div class='input'>
+<span class='co'># if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus</span>
+<span class='co'># installation folder will be used for pasing</span>
+<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'><span class='fu'><a href='use_idd.html'>is_avail_idd</a></span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+<span class='fu'>read_idf</span>(<span class='no'>idf_path</span>)
+<span class='co'># }</span><div class='input'>
+<span class='co'># if Idd v8.8 is found, it will be used automatically</span>
+<span class='fu'><a href='use_idd.html'>is_avail_idd</a></span>(<span class='fl'>8.8</span>)</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+<span class='fu'>read_idf</span>(<span class='no'>idf_path</span>)
+<span class='co'># }</span><div class='input'>
+# argument `idd` can be specified explicitly using `use_idd()`
+</div><span class='co'># NOT RUN {</span>
+<span class='fu'>read_idf</span>(<span class='no'>idf_path</span>, <span class='kw'>idd</span> <span class='kw'>=</span> <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>))
+<span class='co'># }</span><div class='input'>
+<span class='co'># you can set `download` arugment to "auto" in `use_idd()` if you want to</span>
+<span class='co'># automatically download corresponding IDD file when necessary</span>
+<span class='fu'>read_idf</span>(<span class='no'>idf_path</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>))</div><div class='output co'>#&gt; # Path: `/home/hongyuanjia/Dropbox/github_repo/eplusr/inst/extdata/1ZoneUncontrolled.idf`
+#&gt; # Version: `8.8`
+#&gt; 
+#&gt; Group: `Simulation Parameters`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Version
+#&gt; [01] SimulationControl
+#&gt; [01] Building
+#&gt; [01] SurfaceConvectionAlgorithm:Inside
+#&gt; [01] SurfaceConvectionAlgorithm:Outside
+#&gt; [01] HeatBalanceAlgorithm
+#&gt; [01] Timestep
+#&gt; 
+#&gt; Group: `Location and Climate`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Site:Location
+#&gt; [02] SizingPeriod:DesignDay
+#&gt; [01] RunPeriod
+#&gt; 
+#&gt; Group: `Schedules`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [02] ScheduleTypeLimits
+#&gt; [01] Schedule:Constant
+#&gt; 
+#&gt; Group: `Surface Construction Elements`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Material
+#&gt; [02] Material:NoMass
+#&gt; [03] Construction
+#&gt; 
+#&gt; Group: `Thermal Zones and Surfaces`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] GlobalGeometryRules
+#&gt; [01] Zone
+#&gt; [06] BuildingSurface:Detailed
+#&gt; 
+#&gt; Group: `Internal Gains`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [02] OtherEquipment
+#&gt; 
+#&gt; Group: `Exterior Equipment`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Exterior:Lights
+#&gt; 
+#&gt; Group: `Output Reporting`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [01] Output:VariableDictionary
+#&gt; [01] Output:Surfaces:Drawing
+#&gt; [01] Output:Constructions
+#&gt; [01] Output:Table:SummaryReports
+#&gt; [01] OutputControl:Table:Style
+#&gt; [14] Output:Variable
+#&gt; [03] Output:Meter:MeterFileOnly</div><div class='input'>
+<span class='co'># Besides use a path to an IDF file, you can also provide IDF in literal</span>
+<span class='co'># string format</span>
+<span class='no'>idf_string</span> <span class='kw'>&lt;-</span>
+    <span class='st'>"
+    Version, 8.8;
+    Building,
+        Building;                !- Name
+    "</span>
+
+<span class='fu'>read_idf</span>(<span class='no'>idf_string</span>, <span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>))</div><div class='output co'>#&gt; # Path: NULL
+#&gt; # Version: `8.8`
+#&gt; 
+#&gt; Group: `Simulation Parameters`
+#&gt; ────────────────────────────────────────────────────────────────────────────────
+#&gt; [1] Version
+#&gt; [1] Building</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -145,8 +254,16 @@ will be parsed using the latest version of IDD cached, with a warning.</p></td>
       
       <li><a href="#value">Value</a></li>
 
+      <li><a href="#details">Details</a></li>
+
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

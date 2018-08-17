@@ -62,7 +62,7 @@ install it." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -73,6 +73,9 @@ install it." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -108,17 +111,17 @@ install it.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>install_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())
+    <pre class="usage"><span class='fu'>install_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>force</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)
 
-<span class='fu'>download_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>getwd</span>())</pre>
+<span class='fu'>download_eplus</span>(<span class='kw'>ver</span> <span class='kw'>=</span> <span class='st'>"latest"</span>, <span class='no'>dir</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>ver</th>
-      <td><p>The EnergyPlus version number, e.g., <code>8.7</code>; the special value
-<code>"latest"</code> means the latest version (fetched from GitHub releases).</p></td>
+      <td><p>The EnergyPlus version number, e.g., <code>8.7</code>. The special value
+<code>"latest"</code>, which is the default, means the latest version.</p></td>
     </tr>
     <tr>
       <th>force</th>
@@ -127,33 +130,63 @@ installed.</p></td>
     </tr>
     <tr>
       <th>dir</th>
-      <td><p>Where to save EnergyPlus installer file. Default is current
-working directory for <code>download_eplus()</code> and <code>tempdir()</code> for
-<code>install_eplus()</code>.</p></td>
+      <td><p>Where to save EnergyPlus installer file. For <code>install_eplus()</code>,
+the installer will be saved into <code>tempdir()</code></p></td>
     </tr>
     </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>An invisible integer <code>0</code> if succeed. Moreover, some attributes will
+also be returned:</p><ul>
+<li><p>For <code>install_eplus()</code>:</p><ul>
+<li><p><code>path</code>: the EnergyPlus installation path</p></li>
+<li><p><code>installer</code>: the path of downloaded EnergyPlus installer file</p></li>
+</ul></li>
+<li><p>For <code>download_eplus()</code>:</p><ul>
+<li><p><code>file</code>: the path of downloaded EnergyPlus installer file</p></li>
+</ul></li>
+</ul>
+
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><code>download_eplus()</code> downloads specified version of EnergyPlus from
 <a href='https://github.com/NREL/EnergyPlus'>EnergyPlus Github Repository</a>.</p>
 <p><code>install_eplus()</code> will try to install EnergyPlus into the default location,
-e.g.  <code class="file">C:/EnergyPlusVX-Y-0</code> on Windows,
-<code class="file">/usr/local/EnergyPlus-X-Y-0</code> on Linux, and
-<code class="file">/Applications/EnergyPlus-X-Y-0</code> on MacOS.</p>
+e.g.  <code>C:\EnergyPlusVX-Y-0</code> on Windows, <code>/usr/local/EnergyPlus-X-Y-0</code> on
+Linux, and <code>/Applications/EnergyPlus-X-Y-0</code> on macOS.</p>
 <p>Note that the installation process requires administrative privileges
 during the installation and you have to run R with administrator (or with
 sudo if you are on Linux) to make it work if you are not in interactive mode.</p>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># for the latest version of EnergyPlus</span>
+<span class='fu'>download_eplus</span>(<span class='st'>"latest"</span>, <span class='kw'>dir</span> <span class='kw'>=</span> <span class='fu'>tempdir</span>())
+<span class='fu'>install_eplus</span>(<span class='st'>"latest"</span>)
+
+<span class='co'># for a specific version of EnergyPlus</span>
+<span class='fu'>download_eplus</span>(<span class='fl'>8.8</span>)
+<span class='fu'>install_eplus</span>(<span class='fl'>8.8</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#value">Value</a></li>
+
       <li><a href="#details">Details</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>

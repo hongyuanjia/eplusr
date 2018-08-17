@@ -38,7 +38,9 @@ Imports:
 Suggests:
     testthat,
     covr,
-    pkgdown
+    pkgdown,
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
 SystemRequirements: EnergyPlus (<https://energyplus.net>)
@@ -64,3 +66,4 @@ Collate:
     'install.R'
     'eplusr.R'
     'zzz.R'
+VignetteBuilder: knitr

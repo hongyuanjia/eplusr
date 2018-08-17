@@ -79,7 +79,7 @@ utils::globalVariables(c(
         "mis_val_num", "miss_idx", "msg", "msg_box", "msg_line", "new_ext_num",
         "new_field_id", "new_full_path", "new_object_name",
         "new_object_name_upper", "new_value", "new_value_num",
-        "new_value_upper", "new_value_ipnum", "num", "num_extensible",
+        "new_value_upper", "new_value_ipnum", "note", "num", "num_extensible",
         "num_extensible_group", "num_fields", "num_obj", "num_str",
         "num_to_add", "num_values", "object_id", "object_list",
         "object_list_id", "object_list_rleid", "object_name",

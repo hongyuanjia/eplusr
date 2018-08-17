@@ -63,7 +63,7 @@ with some simplifications. For more details on Epw, please see Epw Class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.3</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
       </span>
     </div>
 
@@ -74,6 +74,9 @@ with some simplifications. For more details on Epw, please see Epw Class." />
     <span class="fa fa-home fa-lg"></span>
      
   </a>
+</li>
+<li>
+  <a href="../articles/eplusr.html">Get started</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -130,6 +133,23 @@ with some simplifications. For more details on <code>Epw</code>, please see <a h
     <div class='dont-index'><p><a href='epw.html'>Epw class</a></p></div>
     
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># read an EPW file from EnergyPlus v8.8 installation folder</span>
+<span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
+    <span class='no'>path_epw</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(
+        <span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>,
+        <span class='st'>"WeatherData"</span>,
+        <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+   )
+   <span class='no'>epw</span> <span class='kw'>&lt;-</span> <span class='fu'>read_epw</span>(<span class='no'>path_epw</span>)
+}</div><span class='co'># NOT RUN {</span>
+<span class='co'># read an EPW file from EnergyPlus website</span>
+<span class='no'>path_base</span> <span class='kw'>&lt;-</span> <span class='st'>"https://energyplus.net/weather-download"</span>
+<span class='no'>path_region</span> <span class='kw'>&lt;-</span> <span class='st'>"north_and_central_america_wmo_region_4/USA/CA"</span>
+<span class='no'>path_file</span> <span class='kw'>&lt;-</span> <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+<span class='no'>path_epw</span> <span class='kw'>&lt;-</span> <span class='fu'>file.path</span>(<span class='no'>path_base</span>, <span class='no'>path_region</span>, <span class='no'>path_file</span>)
+<span class='no'>epw</span> <span class='kw'>&lt;-</span> <span class='fu'>read_epw</span>(<span class='no'>path_epw</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -139,7 +159,13 @@ with some simplifications. For more details on <code>Epw</code>, please see <a h
       <li><a href="#value">Value</a></li>
 
       <li><a href="#see-also">See also</a></li>
-          </ul>
+      
+      <li><a href="#examples">Examples</a></li>
+    </ul>
+
+    <h2>Author</h2>
+    
+Hongyuan Jia
 
   </div>
 </div>
