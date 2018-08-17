@@ -143,7 +143,7 @@ eplus_release_commit <- function(ver) {
 
     assert_that(is_eplus_ver(ver))
 
-    all_eplus_release_commit()[version == as.character(ver), commit]
+    all_eplus_release_commit()[version == as.character(ver)]
 }
 # }}}
 # download_file: same as download.file except that it creates the target directory if necessary {{{
@@ -306,6 +306,18 @@ avail_eplus <- function () names(.globals$eplus_config)
 is_avail_eplus <- function (ver) !is_empty(suppressWarnings(eplus_config(ver)))
 # }}}
 
+# locate_eplus {{{
+locate_eplus <- function () {
+    find_eplus <- function (ver) {
+        suppressMessages(tryCatch(use_eplus(ver),
+            error = function (e) NULL))
+    }
+
+    lapply(rev(all_eplus_release_commit()$version), find_eplus)
+
+    invisible()
+}
+# }}}
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
     ver <- standardize_ver(ver)

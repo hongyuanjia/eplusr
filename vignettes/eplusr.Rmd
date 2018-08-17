@@ -75,6 +75,10 @@ Note that the installation process in `install_eplus()` requires
 sudo if you are on macOS or Linux) to make it work if you are not in interactive
 mode.
 
+```{r install_eplus, include = FALSE}
+if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
+```
+
 ## Features
 
 * Read, parse and modify EnergyPlus Weather File (EPW)

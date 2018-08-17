@@ -1,9 +1,7 @@
 .onLoad <- function(libname, pkgname) {
-    # detect all available EnergyPlus installed in normal locations
-    find_eplus <- function (ver) {
-        suppressMessages(tryCatch(use_eplus(ver),
-            error = function (e) NULL))
-    }
+    locate_eplus()
+}
 
-    lapply(rev(all_eplus_release_commit()$version), find_eplus)
+.onAttach <- function(libname, pkgname) {
+    locate_eplus()
 }
