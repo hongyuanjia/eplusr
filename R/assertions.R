@@ -118,6 +118,12 @@ on_failure(is_string) <- function(call, env) {
     paste0(deparse(call$x), " is not a string (a length one character vector).")
 }
 # }}}
+# is_flag {{{
+is_flag <- function(x) is.logical(x) && length(x) == 1
+on_failure(is_flag) <- function(call, env) {
+    paste0(deparse(call$x), " is not a flag (a length one logcal vector).")
+}
+# }}}
 # is_scalar {{{
 is_scalar <- function(x) {
     length(x) == 1L

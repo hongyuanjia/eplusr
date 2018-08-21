@@ -1,3 +1,7 @@
+#' @importFrom R6 R6Class
+#' @importFrom uuid UUIDgenerate
+NULL
+
 #' Read, modify, and run an EnergyPlus model
 #'
 #' eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
@@ -421,9 +425,9 @@
 #'
 #' * `weather`: A path to an `.epw` file or an `Epw` object.
 #' * `dir`: The directory to save the simulation results. If `NULL`, the model
-#'   folder will be used.
-#' * `echo`: Whether to print the standard output and error of EnergyPlus to
-#'           the screen. Default is `FALSE`.
+#'    folder will be used.
+#' * `wait`: Whether to wait until the simulation completed and print the
+#'     standard output and error of EnergyPlus to the screen. Default is `TRUE`.
 #' * `force`: Whether to stop the background EnergyPlus process and start the
 #'     simulation again.
 #' * `copy_external`: If `TRUE`, the external files will also be copied into the
@@ -778,8 +782,6 @@
 #' @aliases Idf
 #' @seealso [IdfObject class][idf_object]
 #' @author Hongyuan Jia
-#' @importFrom R6 R6Class
-#' @importFrom uuid UUIDgenerate
 NULL
 
 # Idf {{{

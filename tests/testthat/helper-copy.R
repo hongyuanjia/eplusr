@@ -1,4 +1,6 @@
 copy_example <- function () {
+    if (!is_avail_eplus(8.8)) return()
+
     cfg <- eplus_config(8.8)
 
     example_name <- "5Zone_Transformer.idf"

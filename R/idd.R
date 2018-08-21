@@ -1,3 +1,8 @@
+#' @importFrom R6 R6Class
+#' @importFrom uuid UUIDgenerate
+#' @importFrom readr read_lines
+NULL
+
 #' Parse, Query and Modify EnergyPlus Input Data Dictionary (IDD)
 #'
 #' eplusr provides parsing of and programmatic access to EnergyPlus
@@ -117,10 +122,6 @@
 #'
 #' For details about `IddObject`, please see [IddObject class][idd_object].
 #'
-#' @importFrom R6 R6Class
-#' @importFrom data.table setattr
-#' @importFrom cli cat_rule cat_bullet
-#' @importFrom assertthat assert_that
 #' @docType class
 #' @name idd
 #' @examples
@@ -358,7 +359,6 @@ read_idd <- function (path) {
 #' `"Energy+.idd"` distributed with EnergyPlus will be parsed and stored in
 #' eplusr Idd cache.
 #'
-#' @importFrom assertthat assert_that
 #' @return
 #' * `use_idd()` returns an `Idd` object
 #' * `download_idd()` returns an invisible integer `0` if succeed. Also an

@@ -1,4 +1,11 @@
-#' @importFrom stringr str_trim
+#' @importFrom stringr str_trim str_replace
+#' @importFrom data.table setorder rleid setnames copy
+#' @importFrom cli boxx rule cat_line symbol
+#' @importFrom data.table setorder
+#' @importFrom crayon red green cyan yellow magenta bold
+#' @importFrom utils capture.output
+NULL
+
 # format_header: return header of an Idf output {{{
 format_header <- function (format = c("sorted", "new_top", "new_bottom"), view_in_ip = FALSE) {
     format <- switch(format,
@@ -29,7 +36,6 @@ format_header <- function (format = c("sorted", "new_top", "new_bottom"), view_i
 }
 # }}}
 
-#' @importFrom data.table setorder rleid
 # format_output: return whole Idf output {{{
 format_output <- function (value_tbl, comment_tbl, ...) {
     assert_that(has_names(value_tbl, c("object_id", "class_id", "class_name", "field_index")))
@@ -96,6 +102,7 @@ format_output <- function (value_tbl, comment_tbl, ...) {
     c(h, tbl[["out"]])
 }
 # }}}
+
 # format_refmap: return pretty formatted tree string for IdfObjectRefMap {{{
 format_refmap <- function (ref_map, in_ip = FALSE) {
     assert_that(inherits(ref_map, "IdfObjectRefMap"))
@@ -108,9 +115,6 @@ format_refmap <- function (ref_map, in_ip = FALSE) {
 }
 # }}}
 
-#' @importFrom data.table setnames
-#' @importFrom purrr map map2
-#' @importFrom cli boxx rule
 # format_refmap_sgl: return pretty formatted tree string for IdfObjectRefMap for one direction {{{
 format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
     type <- match.arg(type)
@@ -125,11 +129,13 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
             c("ori_value_id", gsub(prefix, "", nms[is_other], fixed = TRUE)))
         sp_self <- split(unique(self), by = "value_id")
         sp_other <- split(other, by = "ori_value_id")
-        fld_self <- purrr::map(sp_self, format_objects, in_ip = in_ip)
-        fld_other <- purrr::map(sp_other,
-            ~c(paste0(format_objects(.x, in_ip = in_ip), "  "), ""))
-        fld_list <- purrr::map2(fld_self, fld_other,
-            ~c(.x, cli::boxx(.y, padding = 0L, float = "left", align = "left")))
+        fld_self <- lapply(sp_self, format_objects, in_ip = in_ip)
+        fld_other <- lapply(sp_other, function (x) {
+            c(paste0(format_objects(x, in_ip = in_ip), "  "), "")
+        })
+        fld_list <- mapply(function (x, y) {
+            c(x, cli::boxx(y, padding = 0L, float = "left", align = "left"))
+        }, fld_self, fld_other, SIMPLIFY = TRUE)
         fld <- unlist(fld_list, use.names = FALSE)
     } else {
         fld <- "  <NONE>"
@@ -143,7 +149,6 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 }
 # }}}
 
-#' @importFrom data.table setorder
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
 format_objects <- function (value_tbl, in_ip = FALSE) {
     assert_that(has_names(value_tbl, c("class_id", "object_id", "field_index")))
@@ -154,40 +159,61 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
 
     value_tbl[, `:=`(out = as.list(fmt_fld), row_id = .I), by = .I]
 
+    # tree_chars {{{
+    tree_chars <- function() {
+        if (l10n_info()$`UTF-8`) {
+            list("v" = "\u2502",
+                 "h" = "\u2500",
+                 "p" = "\u251C",
+                 "l" = "\u2514",
+                 "j" = "\u251C"
+            )
+        } else {
+            list("v" = "|",
+                 "h" = "-",
+                 "p" = "+",
+                 "l" = "\\",
+                 "j" = "|"
+            )
+        }
+    }
+    # }}}
+    char <- tree_chars()
+
     # add field char
     last_field <- value_tbl[, row_id[.N], by = list(class_name, object_id)]$V1
     first_field <- setdiff(value_tbl[, row_id[1L], by = list(class_name, object_id)]$V1, last_field)
     last_object <- value_tbl[object_id %in% value_tbl[, max(object_id), by = list(class_id)]$V1, unique(object_id)]
     value_tbl[!object_id %in% last_object & row_id %in% last_field,
-           out := list(list(paste0("  |  \\- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$l), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
     value_tbl[!object_id %in% last_object & row_id %in% first_field,
-           out := list(list(paste0("  |  +- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$p), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
     value_tbl[!object_id %in% last_object & !row_id %in% c(first_field, last_field),
-           out := list(list(paste0("  |  |- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$j), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
     value_tbl[object_id %in% last_object & row_id %in% last_field,
-           out := list(list(paste0("     \\- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("     ", crayon::green(char$l), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
     value_tbl[object_id %in% last_object & row_id %in% first_field,
-           out := list(list(paste0("     +- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("     ", crayon::green(char$p), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
     value_tbl[object_id %in% last_object & !row_id %in% c(first_field, last_field),
-           out := list(list(paste0("     |- ", out[[1]]))), by = row_id]
+           out := list(list(paste0("     ", crayon::green(char$j), crayon::green(char$h)," ", out[[1L]]))), by = row_id]
 
     # add object char
-    first_row_per_object <- value_tbl[, row_id[1], by = list(class_id, object_id)]$V1
+    first_row_per_object <- value_tbl[, row_id[1L], by = list(class_id, object_id)]$V1
     first_row_per_last_object <- value_tbl[object_id %in% last_object, row_id[1], by = object_id]$V1
     value_tbl[setdiff(first_row_per_object, first_row_per_last_object),
            out := list(list(
-                c(paste0("  +- Object [ID:", object_id,"]"), out[[1]]))),
+                c(crayon::green(paste0("  ", char$p, char$h, " Object [ID:", object_id,"]")), out[[1L]]))),
            by = list(row_id)]
     value_tbl[first_row_per_last_object,
            out := list(list(
-                c(paste0("  \\- Object [ID:", object_id,"]"), out[[1]]))),
+                c(crayon::green(paste0("  ", char$l, char$h, " Object [ID:", object_id,"]")), out[[1L]]))),
            by = list(row_id)]
 
     # add class char
-    each_class <- value_tbl[, row_id[1], by = class_id]$V1
+    each_class <- value_tbl[, row_id[1L], by = class_id]$V1
     value_tbl[each_class,
            out := list(list(
-                c("", paste0("  Class ", backtick(class_name)), out[[1]]))),
+                c("", crayon::green(paste0("  Class ", backtick(class_name))), out[[1L]]))),
            by = row_id]
 
     res <- unlist(value_tbl[["out"]])
@@ -195,30 +221,57 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
     return(res)
 }
 # }}}
+
 # format_field: return Idf format field {{{
 format_field <- function (value_tbl, leading = 4L, in_ip = FALSE, sep_at = 29L,
                           index = FALSE, blank = FALSE, end = TRUE, required = FALSE) {
+
     idx <- NULL
     if (index) {
-        idx <- paste0(format_index(value_tbl))
-        if (required) {
-            value_tbl[, `:=`(req = " ")]
-            value_tbl[required_field == TRUE, `:=`(req = "*")]
-            idx <- paste0(value_tbl$req, idx)
+        value_tbl[, `:=`(idx = lpad(field_index))]
+
+        if (has_name(value_tbl, "required_field")) {
+            value_tbl[required_field == TRUE, `:=`(
+                idx = crayon::red$bold(idx),
+                req = crayon::red$bold(cli::symbol$star)
+            )]
+
+            value_tbl[required_field == FALSE, `:=`(
+                idx = crayon::cyan(idx),
+                req = crayon::cyan(strrep(" ", nchar(cli::symbol$star)))
+            )]
+        } else {
+            value_tbl[, `:=`(
+                idx = crayon::cyan(idx),
+                req = crayon::cyan(strrep(" ", nchar(cli::symbol$star)))
+            )]
         }
+
+        idx <- value_tbl$idx
+        if (required) idx <- paste0(value_tbl$req, idx)
         idx <- paste0(idx, ":")
     }
+
     val <- format_value(value_tbl, leading = leading, length = sep_at, blank = blank, end = end)
     nm <- format_name(value_tbl, in_ip = in_ip)
 
-    paste0(idx, val, nm)
+    if (has_name(value_tbl, "required_field")) {
+        nm[value_tbl$required_field] <- crayon::red(nm[value_tbl$required_field])
+        nm[!value_tbl$required_field] <- crayon::cyan(nm[!value_tbl$required_field])
+    } else {
+        nm <- crayon::cyan(nm)
+    }
+
+    paste0(idx, crayon::yellow$bold(val), nm)
 }
 # }}}
+
 # format_index: return right aligned field index {{{
 format_index <- function (field_tbl) {
     lpad(field_tbl[["field_index"]])
 }
 # }}}
+
 # format_value: return Idf format value strings {{{
 format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
                           end = TRUE) {
@@ -251,6 +304,7 @@ format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
     return(res)
 }
 # }}}
+
 # format_name: return Idf format field names {{{
 format_name <- function (field_tbl, in_ip = FALSE) {
     assert_that(has_names(field_tbl, c("full_name", "full_ipname")))
@@ -261,6 +315,7 @@ format_name <- function (field_tbl, in_ip = FALSE) {
     }
 }
 # }}}
+
 # format_comment: return Idf format comments and macros {{{
 format_comment <- function (comment_tbl) {
     if (is_empty(comment_tbl)) return(NULL)
@@ -274,147 +329,6 @@ format_comment <- function (comment_tbl) {
 }
 # }}}
 
-#' @importFrom cli cat_line
-#' @export
-# print.IdfObjectRefMap {{{
-print.IdfObjectRefMap <- function (x, ...) {
-    cli::cat_line(format_refmap(x, ...))
-}
-# }}}
-
-#' @importFrom data.table copy
-#' @export
-# print.ErrFile {{{
-print.ErrFile <- function (x, ...) {
-    if (x$completed) {
-        if (x$successful) {
-            sum_line <- "EnergyPlus completed successfully"
-        } else {
-            sum_line <- "EnergyPlus completed unsuccessfully"
-        }
-    } else {
-        sum_line <- "EnergyPlus terminated"
-    }
-    err_dt <- data.table::copy(x$data)
-
-    err_dt[, line := .I]
-    num_sum <- err_dt[, list(num = max(level_index)), by = list(level)][level != "Info"]
-    if (not_empty(num_sum)) {
-        num_line <- num_sum[, paste0(paste0(num, " ", level), collapse = ", ")]
-        head <- paste0("\n", sum_line, " with ", num_line, ".")
-    } else {
-        head <- paste0("\n", sum_line, " or is still running.")
-    }
-
-    dt_num <- err_dt[begin_environment == FALSE, .N, by = list(environment_index, index)]
-
-    if (is_empty(dt_num)) {
-        cat(head, "\n")
-    } else {
-        index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
-        l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
-                         line[.N], by = index]$V1
-
-        err_dt[, level_num := max(level_index), by = list(level)]
-        err_dt[, out := message]
-        err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
-        err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L), by = line]
-
-        err_dt[begin_environment == FALSE & seperate == TRUE,
-               out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
-
-        err_dt[, out := as.list(out)]
-        err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
-
-        if (all(is.na(err_dt$environment_index))) {
-            cat(unlist(err_dt$out), head, sep = "\n")
-        } else {
-            err_dt[is.na(environment_index), environment_index := 0L]
-            err_box_dt <- err_dt[begin_environment == FALSE,
-                list(msg_box = cli::boxx(unlist(out), padding = 0L)), by = environment_index]
-            err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
-            msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
-            msg_dt[is.na(msg_line), msg_line := ""]
-            msg_dt[environment_index == environment_index[1L], `:=`(msg = paste0(msg_line, "\n", msg_box))]
-            msg_dt[environment_index != environment_index[1L], `:=`(msg = paste0("\n", msg_line, "\n", msg_box))]
-
-            cat(c(msg_dt$msg, head), sep = "\n")
-        }
-    }
-
-}
-# }}}
-
-#' @importFrom data.table copy
-#' @importFrom purrr map_lgl
-#' @importFrom cli cat_line
-#' @export
-# print.IddFieldPossible {{{
-print.IddFieldPossible <- function (x, ...) {
-    dt <- data.table::copy(x)
-
-    dt[, header := paste0(cli::rule(paste0(field_index, ": Field ",
-        backtick(field_name)))), by = field_index]
-    dt[-1L, header := paste0("\n", header)]
-
-    dt[, res := header]
-
-    dt[!is.na(auto),
-        res := paste0(res, "\n* Auto value: ", backtick(auto))]
-
-    dt[!purrr::map_lgl(default, is.na),
-        res := paste0(res, "\n* Default: ",
-            ifelse(is.character(default), backtick(default), default))]
-
-    dt[!purrr::map_lgl(choice, ~all(is.na(.x))), res := paste0(res, "\n* Choice:\n",
-        paste0("  - ", backtick(unlist(choice)), collapse = "\n")), by = field_index]
-
-    dt[, res_ran := paste0("* Range: ", purrr::map_chr(range, ~capture.output(print.IddFieldRange(.x))))]
-    dt[res_ran == "* Range: <Not Applicable>", res_ran := NA_character_]
-    dt[!is.na(res_ran), res := paste0(res, "\n", res_ran)]
-
-    dt[!purrr::map_lgl(reference, is.null), res := paste0(res, "\n* References: \n",
-        paste0(paste0("  - ", backtick(unlist(reference))), collapse = "\n")), by = field_index]
-
-    dt[res == header, res := paste0(res, "\n<Not Applicable>")]
-    cli::cat_line(dt$res)
-}
-# }}}
-
-#' @importFrom cli cat_line
-#' @export
-# print.IddFieldRange {{{
-print.IddFieldRange <- function (x, ...) {
-    if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
-        cat("<Not Applicable>")
-        return(invisible(NULL))
-    }
-
-    if (!is.na(x$minimum)) {
-        if (x$lower_incbounds) {
-            left <- paste0("[", x$minimum)
-        } else {
-            left <- paste0("(", x$minimum)
-        }
-    } else {
-        left <- "(-Inf"
-    }
-
-    if (!is.na(x$maximum)) {
-        if (x$upper_incbounds) {
-            right <- paste0(x$maximum, "]")
-        } else {
-            right <- paste0(x$maximum, ")")
-        }
-    } else {
-        right <- "Inf)"
-    }
-
-    cli::cat_line(paste0(left, ", ", right))
-}
-# }}}
-
-#' @importFrom data.table setnames
 # update_value_num: update value string and digits {{{
 update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "value") {
     val_suffix <- c("", "_upper", "_num", "_ipnum")
@@ -461,6 +375,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
     value_tbl
 }
 # }}}
+
 # value_list: return a list of field values with correct types {{{
 value_list <- function (value_tbl, in_ip = FALSE) {
     assert_that(has_names(value_tbl, c("value", "value_num", "value_ipnum", "type")))
@@ -476,5 +391,164 @@ value_list <- function (value_tbl, in_ip = FALSE) {
     if (is_scalar(res)) return(as.list(res))
 
     res
+}
+# }}}
+
+# print.IdfObjectRefMap {{{
+print.IdfObjectRefMap <- function (x, ...) {
+    cli::cat_line(format_refmap(x, ...))
+}
+# }}}
+
+#' @export
+# print.ErrFile {{{
+print.ErrFile <- function (x, ...) {
+    if (x$completed) {
+        if (x$successful) {
+            sum_line <- "EnergyPlus completed successfully"
+        } else {
+            sum_line <- "EnergyPlus completed unsuccessfully"
+        }
+    } else {
+        sum_line <- "EnergyPlus terminated"
+    }
+    err_dt <- data.table::copy(x$data)
+
+    err_dt[, line := .I]
+    num_sum <- err_dt[, list(num = max(level_index)), by = list(level)][level != "Info"]
+    if (not_empty(num_sum)) {
+        num_line <- num_sum[, paste0(paste0(num, " ", level), collapse = ", ")]
+        head <- crayon::bold(paste0("\n", sum_line, " with ", num_line, "."))
+        if (x$successful) head <- crayon::green(head) else head <- crayon::red(head)
+    } else {
+        head <- crayon::bold$red(paste0("\n", sum_line, " or is still running."))
+    }
+
+    dt_num <- err_dt[begin_environment == FALSE, .N, by = list(environment_index, index)]
+
+    if (is_empty(dt_num)) {
+        cat(head, "\n")
+    } else {
+        browser()
+        index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
+        l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
+                         line[.N], by = index]$V1
+
+        err_dt[, level_num := max(level_index), by = list(level)]
+        err_dt[, out := message]
+        err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
+        err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L, col = "green"), by = line]
+
+        err_dt[begin_environment == FALSE & seperate == TRUE,
+               out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
+        err_dt[begin_environment == FALSE & level == "Info",
+            out := crayon::cyan(out)]
+        err_dt[begin_environment == FALSE & level == "Warning",
+            out := crayon::magenta(out)]
+        err_dt[begin_environment == FALSE & !level %in% c("Info", "Warning"),
+            out := crayon::red$bold(out)]
+
+        err_dt[, out := as.list(out)]
+        err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
+
+        if (all(is.na(err_dt$environment_index))) {
+            cat(unlist(err_dt$out), head, sep = "\n")
+        } else {
+            err_dt[is.na(environment_index), environment_index := 0L]
+            err_box_dt <- err_dt[begin_environment == FALSE,
+                list(msg_box = cli::boxx(unlist(out), padding = 0L, col = "green")), by = environment_index]
+            err_line_dt <- err_dt[begin_environment == TRUE, list(msg_line = unlist(out)), by = environment_index]
+            msg_dt <- err_line_dt[err_box_dt, on = "environment_index"]
+            msg_dt[is.na(msg_line), msg_line := ""]
+            msg_dt[environment_index == environment_index[1L], `:=`(msg = paste0(msg_line, "\n", msg_box))]
+            msg_dt[environment_index != environment_index[1L], `:=`(msg = paste0("\n", msg_line, "\n", msg_box))]
+
+            cat(c(msg_dt$msg, head), sep = "\n")
+        }
+    }
+
+}
+# }}}
+
+#' @export
+# print.IddFieldPossible {{{
+print.IddFieldPossible <- function (x, ...) {
+    dt <- data.table::copy(x)
+
+    dt[, header := cli::rule(crayon::bold(paste0(
+        field_index, ": Field ", backtick(field_name))), col = "green"),
+        by = field_index
+    ]
+
+    dt[-1L, header := paste0("\n", header)]
+
+    dt[, res := header]
+
+    dt[!is.na(auto),
+        res := paste0(res, "\n", crayon::cyan(paste0(
+            cli::symbol$bullet, " ", crayon::bold("Auto value"), ": ", backtick(auto))))]
+
+    dt[!vapply(default, is.na, logical(1)),
+        res := paste0(res, "\n", crayon::cyan(paste0(
+            cli::symbol$bullet, " ", crayon::bold("Default"), ": ",
+            ifelse(is.character(default), backtick(default), default)))
+        )
+    ]
+
+    dt[!vapply(choice, function (x) all(is.na(x)), logical(1)),
+        res := paste0(res, "\n", crayon::cyan(paste0(
+            cli::symbol$bullet, " ", crayon::bold("Choice"), ":\n" ,
+            paste0("  - ", backtick(unlist(choice)), collapse = "\n")))),
+        by = field_index
+    ]
+
+    dt[, res_ran := paste0(vapply(range, function (x) utils::capture.output(print.IddFieldRange(x)), character(1)))]
+    dt[res_ran == "<Not Applicable>", res_ran := NA_character_]
+    dt[!is.na(res_ran), res := paste0(res, "\n", crayon::cyan(paste0(
+            cli::symbol$bullet, " ", crayon::bold("Range"), ": ", res_ran
+        ))
+    )]
+
+    dt[!vapply(reference, is.null, logical(1)), res := paste0(res, "\n",
+        crayon::cyan(paste0(cli::symbol$bullet, " ", crayon::bold("References"), ":\n",
+            paste0(paste0("  - ", backtick(unlist(reference))), collapse = "\n"))
+        )),
+        by = field_index
+    ]
+
+    dt[res == header, res := paste0(res, "\n", crayon::magenta("<Not Applicable>"))]
+    cli::cat_line(dt$res)
+}
+# }}}
+
+#' @export
+# print.IddFieldRange {{{
+print.IddFieldRange <- function (x, ...) {
+    if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
+        cat("<Not Applicable>")
+        return(invisible(NULL))
+    }
+
+    if (!is.na(x$minimum)) {
+        if (x$lower_incbounds) {
+            left <- paste0("[", x$minimum)
+        } else {
+            left <- paste0("(", x$minimum)
+        }
+    } else {
+        left <- "(-Inf"
+    }
+
+    if (!is.na(x$maximum)) {
+        if (x$upper_incbounds) {
+            right <- paste0(x$maximum, "]")
+        } else {
+            right <- paste0(x$maximum, ")")
+        }
+    } else {
+        right <- "Inf)"
+    }
+
+    cli::cat_line(paste0(left, ", ", right))
 }
 # }}}

@@ -1,3 +1,10 @@
+#' @importFrom R6 R6Class
+#' @importFrom cli cat_boxx cat_bullet cat_line cat_rule
+#' @importFrom crayon bold
+#' @importFrom data.table rbindlist set setattr setcolorder
+#' @importFrom tools file_path_sans_ext
+NULL
+
 #' Create and Run Parametric Analysis, and Collect Results
 #'
 #' `ParametricJob` class provides a prototype of conducting parametric analysis
@@ -15,9 +22,9 @@
 #' param$seed()
 #' param$weater()
 #' param$apply_measure(measure, ..., .names = NULL)
-#' param$run(dir = NULL, parallel_backend = future::multiprocess)
-#' param$kill(which = NULL)
-#' param$status(which = NULL)
+#' param$run(dir = NULL, wait = TRUE)
+#' param$kill()
+#' param$status()
 #' param$errors(info = FALSE)
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -68,9 +75,9 @@
 #'
 #' @section Run and Collect Results:
 #' ```
-#' param$run(dir = NULL, parallel_backend = future::multiprocess)
-#' param$kill(which = NULL)
-#' param$status(which = NULL)
+#' param$run(dir = NULL, wait = TRUE)
+#' param$kill()
+#' param$status()
 #' param$errors(info = FALSE)
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -79,16 +86,87 @@
 #' param$tabular_data(which = NULL)
 #' ```
 #'
-#' All those functions have the same meaning in [EplusJob class][job], except that they
-#' only return the results of specified simulation.
+#' All those functions have the same meaning as in [EplusJob class][job], except
+#' that they only return the results of specified simulations. Most arguments
+#' have the same meanings as in [EplusJob class][job].
+#'
+#' `$run()` runs the all parametric simulations in parallel. The number of
+#'     parallel EnergyPlus process can be controlled by
+#'     `eplusr_option("num_parallel")`. If `wait` is FALSE, then the job will be
+#'     run in the background. You can get updated job status by just print the
+#'     ParametricJob object.
+#'
+#' `$kill()` kills the all background EnergyPlus processes that are current
+#'     running if possible. It only works when simulation runs in non-waiting
+#'     mode.
+#'
+#' `$status()` returns a named list of values indicates the status of the job:
+#'
+#'   * `run_before`: `TRUE` if the job has been run before. `FALSE` otherwise.
+#'   * `alive`: `TRUE` if the job is still running in the background. `FALSE`
+#'     otherwise.
+#'   * `terminated`: `TRUE` if the job was terminated during last
+#'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
+#'   * `successful`: `TRUE` if last simulation ended successfully. `FALSE`
+#'     otherwise. `NA` if the job has not been run yet.
+#'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
+#'      simulation. `FALSE` otherwise.
+#'
+#' `$output_dir()` returns the output directory of specified simulations.
+#'
+#' `$locate_output()` returns the path of a single output file of specified
+#'     simulations.
+#'
+#' `$report_data_dict()` returns a data.table which contains all information
+#'     about report data for specified simulations. For details on the meaning
+#'     of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
+#'     EnergyPlus "Output Details and Examples" documentation.
+#'
+#' `$report_data()` extracts the report data in a data.table using key values
+#'     and variable names.
+#'
+#' `$tabular_data()` extracts all tabular data in a data.table.
+#'
+#' For `$report_data_dict()`, `$report_data()` and `$tabular_data()`, the
+#'     returned data.table has a `Case` column in the returned data.table that
+#'     indicates the names of parametric models.
 #'
 #' **Arguments**
 #'
 #' * `which`: An integer vector of the indexes or a character vector or names of
-#'     parametric simulations.
-#' * `parallel_backend`: Any acceptable input for [future::plan()].
+#'     parametric simulations. If `NULL`, which is the default, results of all
+#'     parametric simulations are returned.
+#' * `dir`: The parent output directory for all simulation. Outputs of each
+#'    simulation are placed in a separate folder under the parent directory.
+#' * `wait`: If `TRUE`, R will hang on and wait all EnergyPlus simulations
+#'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
+#'     Default: `TRUE`.
+#' * `suffix`: A string that indicates the file suffix of simulation output.
+#'     Default: `".err"`.
+#' * `strict`: If `TRUE`, it will check if the simulation was terminated, is
+#'     still running or the file exists or not. Default: `TRUE`.
+#' * `key_value`: A character vector to identify key name of the data. If
+#'    `NULL`, all keys of that variable will be returned. Default: `NULL`.
+#' * `name`: A character vector to specify the actual data name. If `NULL`, all
+#'    variables will be returned. Default: `NULL`.
+#' * `year`: The year of the date and time in column `DateTime`. If `NULL`, it
+#'    will be the current year. Default: `NULL`
+#' * `tz`: Time zone of date and time in column `DateTime`. Default: `"GMT"`.
 #'
-#' All other arguments have the same meanings as in [EplusJob class][job].
+#' @section Printing:
+#' ```
+#' param$print()
+#' print(param)
+#' ```
+#'
+#' `$print()` shows the core information of this ParametricJob, including the
+#'     path of seed model and weather, the version and path of EnergyPlus used
+#'     to run simulations, the measured that has been applied and parametric
+#'     models generated, and the simulation job status.
+#'
+#' `$print()` is quite useful to get the simulation status, especially when
+#'     `wait` is `FALSE` in `$run()`. The job status will be updated and printed
+#'     whenever `$print()` is called.
 #'
 #' @docType class
 #' @name param
@@ -141,11 +219,6 @@ param_job <- function (idf, epw) {
 }
 # }}}
 
-#' @importFrom R6 R6Class
-#' @importFrom future multiprocess
-#' @importFrom data.table setattr rbindlist
-#' @importFrom purrr walk2 map map2 map_chr
-#' @importFrom cli cat_rule cat_bullet cat_line
 # Parametric {{{
 Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
     public = list(
@@ -163,6 +236,9 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             idf_self <- ._get_self(private$m_idf)
             idf_priv <- ._get_private(private$m_idf)
             i_idf_add_output_sqlite(idf_self, idf_priv)
+
+            # save uuid
+            private$m_log$uuid <- idf_priv$m_log$uuid
 
             if (is_epw(epw)) {
                 private$m_epw <- epw
@@ -182,14 +258,14 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         apply_measure = function (measure, ..., .names = NULL)
             i_param_apply_measure(self, private, measure, ..., .names = NULL),
 
-        run = function (dir = NULL, parallel_backend = future::multiprocess)
-            i_param_run(self, private, dir, wait = TRUE, parallel_backend),
+        run = function (dir = NULL, wait = TRUE)
+            i_param_run(self, private, dir, wait),
 
-        kill = function (which = NULL)
-            i_param_kill(self, private, which),
+        kill = function ()
+            i_param_kill(self, private),
 
-        status = function (which = NULL)
-            i_param_status(self, private, which),
+        status = function ()
+            i_param_status(self, private),
 
         output_dir = function (which = NULL)
             i_param_output_dir(self, private, which),
@@ -232,6 +308,10 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     assert_that(is.function(measure))
 
+    if (length(formals(measure)) == 0L) {
+        stop("'measure' function must have at lease one argument")
+    }
+
     measure_wrapper <- function (idf, ...) {
         assert_that(is_idf(idf))
         idf <- idf$clone()
@@ -263,37 +343,128 @@ i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
 }
 # }}}
 
+# i_param_retreive_data {{{
+i_param_retreive_data <- function (self, private) {
+    status <- i_param_status(self, private)
+
+    if (!status$run_before) return(invisible())
+
+    if (status$alive) {
+
+        private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_output_lines(10000))
+        private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_error_lines(10000))
+
+    } else {
+
+        if (inherits(private$m_job, "r_process")) {
+            private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_all_output_lines())
+            private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_all_error_lines())
+        }
+
+        if (status$successful) {
+
+            if (inherits(private$m_job, "r_process")) {
+                private$m_job <- tryCatch(private$m_job$get_result(),
+                    error = function (e) {
+                        stop("Failed to retreive output of parametric job. ", e, "\n",
+                            private$m_log$stderr, call. = FALSE)
+                    }
+                )
+            }
+
+            if (is.null(private$m_log$end_time)) {
+                end_times <- private$m_job[!is.na(end_time), end_time]
+                if (not_empty(end_times)) private$m_log$end_time <- max(end_times)
+            }
+        }
+    }
+}
+# }}}
+
 # i_param_job_from_which {{{
 i_param_job_from_which <- function (self, private, which) {
+    status <- i_param_status(self, private)
+
+    if (!isTRUE(status$run_before))
+        stop("Parametric job did not run before. Please run it using `$run()` ",
+            "before collect output", call. = FALSE)
+
+    if (isTRUE(status$terminated))
+        stop("Parametric job was terminated before. Please solve ",
+            "the problems and re-run it before collect output.", call. = FALSE)
+
+    if (isTRUE(status$alive))
+        stop("Parametric job is still running. Please wait it ",
+            "to finish before collecting results.", call. = FALSE)
+
+    if (isTRUE(status$run_before) && !isTRUE(status$successful))
+        stop("Parametric job ended with errors. Please solve ",
+            "the problems and re-run it before collect output.", call. = FALSE)
+
+    if (isTRUE(status$changed_after))
+        warning("The seed model has been changed since last run. ",
+            "The job output may not be correct.", call. = FALSE)
+
+    # if success, retreive data
+    i_param_retreive_data(self, private)
+
     jobs <- private$m_job
 
-    if (is.null(jobs))
-        stop("The parametric has not been run before.", call. = FALSE)
-    if (is.null(which)) return(jobs)
+    idx <- i_param_case_from_which(self, private, which, name = FALSE)
+
+    job <- jobs[idx]
+
+    if (not_empty(job[status != "completed"])) {
+        incomplete <- job[status != "completed"]
+        msg <- incomplete[, sim_status(rpad(toupper(status)), index, idf, epw)]
+        stop("Some of jobs failed to completed\n:", paste0(msg, collpase = "\n"),
+            call. = FALSE
+        )
+    }
+
+    if (not_empty(job[exit_status != 0L])) {
+        unsuccessful <- job[exit_status != 0L]
+        msg <- incomplete[, sim_status("UNSUCCESSFUL", index, idf, epw)]
+        stop("Some of jobs completed unsuccessfully\n:", paste0(msg, collpase = "\n"),
+            call. = FALSE
+        )
+    }
+
+    job
+}
+# }}}
+
+# i_param_case_from_which {{{
+i_param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
+    nms <- names(private$m_param)
+    if (is.null(which)) {
+        if (name) return(nms) else return(seq_along(nms))
+    }
 
     if (is.character(which)) {
-        nms <- names(jobs)
-        valid <- which %in% nms
-        if (any(!valid))
-            stop("Invalid job name found for current Parametric: ",
-                backtick_collapse(which), ".", call. = FALSE)
+        valid <- match(which, nms)
+        if (anyNA(valid))
+            stop("Invalid job name found for current parametric job: ",
+                backtick_collapse(which[is.na(valid)]), ".", call. = FALSE)
 
+        idx <- valid
     } else if (are_count(which)) {
-        valid <- which <= length(jobs)
+        valid <- which <= length(nms)
         if (any(!valid))
-            stop("Invalid job index found for current Parametric: ",
-                backtick_collapse(which), ".", call. = FALSE)
+            stop("Invalid job index found for current parametric job: ",
+                backtick_collapse(which[!valid]), ".", call. = FALSE)
+        idx <- which
     } else {
         stop("`which` should either be a character or an integer vector.",
             call. = FALSE)
     }
 
-    jobs[which]
+    if (name) nms[idx] else idx
 }
 # }}}
 
 # i_param_run {{{
-i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel_backend = future::multiprocess) {
+i_param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
     if (is.null(private$m_param))
         stop("No measure has been applied.", call. = FALSE)
 
@@ -321,124 +492,297 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE, parallel
 
     path_param <- file.path(output_dir, nms, paste0(nms, ".idf"))
 
-    purrr::walk2(private$m_param, path_param,
-        ~.x$save(.y, overwrite = TRUE, copy_external = TRUE))
+    apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = TRUE))
 
-    private$m_job <- purrr::map(private$m_param, EplusJob$new, epw = path_epw)
+    private$m_log$start_time <- Sys.time()
+    private$m_log$killed <- NULL
 
-    start_time <- Sys.time()
-    proc <- run_multi(ver, path_param, path_epw, NULL, parallel_backend = parallel_backend)
-    end_time <- Sys.time()
+    tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = wait, eplus = ver)
 
-    assign_proc <- function (job, proc, start_time, end_time) {
-        priv <- ._get_private(job)
-        priv$m_process <- proc
-        priv$m_log$start_time <- start_time
-        priv$m_log$end_time <- end_time
-    }
+    private$m_job <- tbl
 
-    purrr::map2(private$m_job, proc, assign_proc,
-        start_time = start_time, end_time = end_time)
+    if (wait) private$m_log$end_time <- Sys.time()
 
-    private$m_job
+    self
 }
 # }}}
 
 # i_param_kill {{{
-i_param_kill <- function (self, private, which) {
-    message("Currently, parametric simulations can only be run in waiting mode, ",
-        "and cannot be kill.")
-    return(invisible(NULL))
+i_param_kill <- function (self, private) {
 
-    job <- i_param_job_from_which(self, private, which)
-    for (j in job) {
-        j$kill()
+    if (is.null(private$m_job)) {
+
+        message("The parametric job is not running.")
+        return(invisible(FALSE))
+
+    }
+
+    if (!inherits(private$m_job, "process")) {
+
+        message("The parametric job is not running.")
+        return(invisible(FALSE))
+    }
+
+    proc <- private$m_job
+
+    if (!proc$is_alive()) {
+        message("The parametric job is not running.")
+        return(invisible(FALSE))
+    }
+
+    k <- tryCatch(proc$kill(), error = function (e) FALSE)
+
+    if (isTRUE(k)) {
+        message("The parametric job has been successfully killed.")
+        private$m_log$killed <- TRUE
+        return(invisible(TRUE))
+    } else {
+        message("Failed to kill parametric job, because it was already finished/dead.")
+        return(invisible(FALSE))
     }
 }
 # }}}
 
 # i_param_status {{{
-i_param_status <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$status())
+i_param_status <- function (self, private) {
+    status <- list(
+        run_before = FALSE, # if the model has been run before
+        alive = FALSE, # if simulation is still running
+        terminated = NA, # if last simulation was terminated
+        successful = NA, # if last simulation was successful
+        changed_after = NA # if the seed model has been changed after last simulation
+    )
+
+    proc <- private$m_job
+
+    if (is.null(private$m_job)) return(status)
+
+    status$run_before <- TRUE
+
+    if (isTRUE(private$m_log$killed)) {
+        status$terminated <- TRUE
+    } else {
+        status$terminated <- FALSE
+    }
+
+    status$changed_after <- FALSE
+    if (!identical(private$m_log$uuid, ._get_private(private$m_idf)$m_log$uuid)) {
+        status$changed_after <- TRUE
+    }
+
+    if (inherits(proc, "r_process")) {
+        if (proc$is_alive()) {
+            status$alive <- TRUE
+        } else {
+            status$alive <- FALSE
+            proc$wait()
+            exit_status <- proc$get_exit_status()
+            if (!is.na(exit_status) && exit_status == 0L) {
+                status$successful <- TRUE
+            } else {
+                status$successful <- FALSE
+            }
+        }
+
+    } else {
+        status$alive <- FALSE
+        status$successful <- TRUE
+    }
+
+    status
 }
 # }}}
 
 # i_param_output_dir {{{
 i_param_output_dir <- function (self, private, which) {
     job <- i_param_job_from_which(self, private, which)
-    purrr::map_chr(job, ~.x$output_dir())
+    job$output_dir
 }
 # }}}
 
 # i_param_locate_output {{{
 i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
     job <- i_param_job_from_which(self, private, which)
-    purrr::map_chr(job, ~.x$locate_output(suffix = suffix, strict = strict))
+
+    out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
+
+    if (strict && any(!file.exists(out))) {
+        msg <- job[!file.exists(out), sim_status("MISSING", index, idf, epw)]
+        stop("Path does not exist for job:\n", paste0(msg, collpase = "\n"), call. = FALSE)
+    }
+
+    out
 }
 # }}}
 
 # i_param_output_errors {{{
 i_param_output_errors <- function (self, private, which, info = FALSE) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$errors(info = info))
+    path_err <- i_param_locate_output(self, private, which, ".err")
+
+    err <- lapply(path_err, parse_err_file)
+
+    names(err) <- i_param_case_from_which(self, private, which, name = TRUE)
+
+    if (!info) {
+        err <- lapply(err, function (x) {
+            x$data <- x$data[!(level == "Info" & begin_environment == FALSE)]
+            x
+        })
+    }
+
+    err
+}
+# }}}
+
+# i_param_sql_path {{{
+i_param_sql_path <- function (self, private, which) {
+    i_param_locate_output(self, private, which, ".sql")
 }
 # }}}
 
 # i_param_report_data_dict {{{
 i_param_report_data_dict <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
-    purrr::map(job, ~.x$report_data_dict())
+    sqls <- i_param_sql_path(self, private, which)
+    cases <- i_param_case_from_which(self, private, which, name = TRUE)
+
+    dicts <- lapply(sqls, sql_report_data_dict)
+
+    # add case
+    for (idx in seq_along(cases)) {
+        data.table::set(dicts[[idx]], j = "Case", value = cases[idx])
+        data.table::setcolorder(dicts[[idx]], c("Case", setdiff(names(dicts[[idx]]), "Case")))
+    }
+
+    data.table::rbindlist(dicts)
 }
 # }}}
 
 # i_param_report_data {{{
-i_param_report_data <- function (self, private, which, key_value = NULL,
+i_param_report_data <- function (self, private, which = NULL, key_value = NULL,
                                  name = NULL, all = FALSE, year = NULL, tz = "GMT") {
-    job <- i_param_job_from_which(self, private, which)
-    data.table::rbindlist(purrr::map(job,
-        ~.x$report_data(key_value = key_value, name = name, year = year, tz = tz)))
+    sqls <- i_param_sql_path(self, private, which)
+    cases <- i_param_case_from_which(self, private, which, name = TRUE)
+
+    d <- mapply(sql_report_data, sql = sqls, case = cases,
+        MoreArgs = list(key_value = key_value, name = name, all = all, year = year,
+            tz = tz),
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
+    )
+
+    data.table::rbindlist(d)
 }
 # }}}
 
 # i_param_tabular_data {{{
 i_param_tabular_data <- function (self, private, which = NULL) {
-    job <- i_param_job_from_which(self, private, which)
-    res <- data.table::rbindlist(purrr::map(job,
-        ~{
-            d <- .x$tabular_data()
-            case <- tools::file_path_sans_ext(basename(
-                .x$locate_output(".idf", strict = FALSE)))
-            d[, Case := case]
-            d
-        })
-    )
+    sqls <- i_param_sql_path(self, private, which)
+    cases <- i_param_case_from_which(self, private, which, name = TRUE)
 
-    data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
+    d <- lapply(sqls, sql_tabular_data)
 
-    res[]
+    # add case
+    for (idx in seq_along(cases)) {
+        data.table::set(d[[idx]], j = "Case", value = cases[idx])
+        data.table::setcolorder(d[[idx]], c("Case", setdiff(names(d[[idx]]), "Case")))
+    }
+
+    data.table::rbindlist(d)
 }
 # }}}
 
 # i_param_print {{{
 i_param_print <- function (self, private) {
-    cli::cat_rule("EnergPlus Parametric")
+    cli::cat_rule(crayon::bold("EnergPlus Parametric Job"), col = "green")
+    config <- eplus_config(private$m_idf$version())
     cli::cat_bullet(c(
-        paste0("Seed Model: ", backtick(normalizePath(private$m_idf$path(), mustWork = FALSE))),
-        paste0("Default Weather: ", backtick(private$m_epw$path()))
-    ))
+        paste0(crayon::bold("Seed Model"), ": ", backtick(normalizePath(private$m_idf$path(), mustWork = FALSE))),
+        paste0(crayon::bold("Weather"), ": ", backtick(private$m_epw$path())),
+        paste0(crayon::bold("EnergyPlus Version"), ": ", backtick(config$version)),
+        paste0(crayon::bold("EnergyPlus Path"), ": ", backtick(normalizePath(config$dir)))
+    ), col = "cyan", bullet_col = "cyan")
 
     if (is.null(private$m_param)) {
-        cli::cat_line("<< No measure has been applied >>")
+        cli::cat_line("<< No measure has been applied >>",
+            col = "white", background_col = "blue")
         return(invisible())
-    } else {
-        cli::cat_bullet(c(
-            paste0("Applied Measure: ", backtick(private$m_log$measure_name)),
-            paste0("Parametric Models [", length(private$m_param), "]: ")
-        ))
+    }
 
-        cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
+    cli::cat_bullet(c(
+        paste0(crayon::bold("Applied Measure"), ": ", backtick(private$m_log$measure_name)),
+        paste0(crayon::bold("Parametric Models"), " [", length(private$m_param), "]: ")
+    ), col = "cyan", bullet_col = "cyan")
+
+    cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"),
+        col = "cyan"
+    )
+
+    status <- i_param_status(self, private)
+
+    i_param_retreive_data(self, private)
+
+    if (!status$run_before) {
+
+        cli::cat_line("<< Job has not been run before >>",
+            col = "white", background_col = "blue")
+        return(invisible())
+    }
+
+    if (isTRUE(status$terminated)) {
+
+        cli::cat_line(" Job was terminated before.",
+            col = "white", background_col = "red")
+
+    } else if (status$alive) {
+
+        cli::cat_line(" Job started at ",
+            backtick(private$m_log$start_time), " and is still running...",
+            col = "black", background_col = "green"
+        )
+
+    } else if (!isTRUE(status$successful)) {
+
+        cli::cat_line(" Job started at ",
+            backtick(private$m_log$start_time), " and ended unsuccessfully...",
+            col = "white", background_col = "red"
+        )
+
+    } else {
+
+        if (!is.null(private$m_log$end_time)) {
+            run_time <- format(round(difftime(
+                private$m_log$end_time, private$m_log$start_time), digits = 2L)
+            )
+
+            cli::cat_line(" Simulation started at ",
+                backtick(private$m_log$start_time), " and completed successfully after ",
+                run_time, ".",
+                col = "black", background_col = "green"
+            )
+
+        } else {
+
+            cli::cat_line(" Simulation started at ",
+                backtick(private$m_log$start_time), " and completed successfully.",
+                col = "black", background_col = "green"
+            )
+        }
+    }
+
+    if (status$alive) {
+        if (length(private$m_log$stdout))
+            cli::cat_boxx(private$m_log$stdout)
+
+        if (length(private$m_log$stderr)) {
+            stderr <- private$m_log$stderr
+            safe_width <- getOption("width") - 2L
+            stderr_trunc <- vapply(stderr, function (l) {
+                if (nchar(l) > safe_width)
+                    paste0(substr(l, 1, safe_width), "...")
+            }, FUN.VALUE = character(1))
+
+            cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
+                padding = 0)
+        }
     }
 }
 # }}}
-

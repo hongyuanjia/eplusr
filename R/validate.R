@@ -1,7 +1,5 @@
-#' @importFrom data.table data.table rbindlist setattr setnames
-#' @importFrom purrr map_int map2_lgl
-#' @importFrom cli cat_line cat_bullet
-#' @importFrom clisymbols symbol
+#' @importFrom cli cat_bullet cat_line cat_rule symbol
+#' @importFrom data.table copy data.table rbindlist setattr setnames
 NULL
 
 # i_empty_check_dt {{{
@@ -158,13 +156,13 @@ i_validate_idf <- function (self, private) {
 # i_is_valid_idf: return true if no validity error found {{{
 i_is_valid_idf <- function (self, private) {
     i_validate_idf(self, private)
-    all(purrr::map_int(private$m_log$validate, is_empty))
+    all(vapply(private$m_log$validate, is_empty, logical(1)))
 }
 # }}}
 # i_is_valid_idfobject: return true if no validity error found {{{
 i_is_valid_idfobject <- function (self, private, object) {
     i_validate_idfobject(self, private, object)
-    all(purrr::map_int(private$m_log$validate, is_empty))
+    all(vapply(private$m_log$validate, is_empty, logical(1)))
 }
 # }}}
 
@@ -439,7 +437,7 @@ i_check_invalid_reference <- function (self, private, input) {
         by = list(value_id, value_upper)]
 
     invalid_ref_id <- val_tbl_ref[
-        !purrr::map2_lgl(value_upper, possible_value_upper, `%in%`), value_id]
+        !apply2_lgl(value_upper, possible_value_upper, `%in%`), value_id]
     invalid_ref_non_empty <- input$value_tbl[J(invalid_ref_id), on = "value_id"]
 
     # combine
@@ -462,11 +460,11 @@ i_print_validate <- function (validate) {
     error_type <- names(which(error_num_per > 0L))
 
     if (error_num == 0L) {
-        cli::cat_line(" ", clisymbols::symbol$tick, " ", "No error found.")
+        cli::cat_line(" ", cli::symbol$tick, " ", "No error found.")
         return()
     }
 
-    cli::cat_line(" ", clisymbols::symbol$cross, " [", error_num, "] ",
+    cli::cat_line(" ", cli::symbol$cross, " [", error_num, "] ",
         "Errors found during validation.")
     cli::cat_rule(line = 2)
 

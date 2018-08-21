@@ -1,3 +1,6 @@
+#' @importFrom readr write_lines
+NULL
+
 # `%||%` {{{
 `%||%` <- function (x, y) {
     if (is.null(x)) {
@@ -81,7 +84,6 @@ clone_generator <- function (x) {
 }
 # }}}
 
-#' @importFrom readr write_lines
 # write_lines_eol {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
@@ -119,6 +121,39 @@ standardize_ver <- function (ver) {
 
 # is_normal_list {{{
 is_normal_list <- function (x) {
-    is.list(x) && purrr::vec_depth(x) == 2L && all(purrr::map_lgl(x, not_empty))
+    is.list(x) && vec_depth(x) == 2L && all(vapply(x, not_empty, logical(1)))
+}
+# }}}
+
+# vec_depth {{{
+vec_depth <- function (x) {
+    if (is.null(x)) {
+        0L
+    } else if (is.atomic(x)) {
+        1L
+    } else if (is.list(x)) {
+        depths <- vapply(x, vec_depth, integer(1))
+        1L + max(depths, 0L)
+    } else {
+        stop("`x` must be a vector")
+    }
+}
+# }}}
+
+# appply2 {{{
+apply2 <- function (x, y, fun, more_args = NULL) {
+    mapply(FUN = fun, x, y, MoreArgs = more_args, SIMPLIFY = FALSE)
+}
+# }}}
+
+# apply2_int {{{
+apply2_int <- function (x, y, fun, more_args = NULL) {
+    as.integer(unlist(apply2(x, y, fun, more_args)))
+}
+# }}}
+
+# apply2_lgl {{{
+apply2_lgl <- function (x, y, fun, more_args = NULL) {
+    as.logical(unlist(apply2(x, y, fun, more_args)))
 }
 # }}}

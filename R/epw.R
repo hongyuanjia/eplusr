@@ -1,3 +1,15 @@
+#' @importFrom R6 R6Class
+#' @importFrom data.table fread setnames shift copy fwrite between as.ITime setDT
+#' @importFrom readr write_lines
+#' @importFrom cli cat_line rule cat_bullet
+#' @importFrom crayon bold
+#' @importFrom lubridate year month mday hour minute leap_year days force_tz
+#' @importFrom units ud_units drop_units
+#' @importFrom stringr str_trim
+#' @importFrom fasttime fastPOSIXct
+#' @importFrom stats na.omit
+NULL
+
 #' Read, and modify an EnergyPlus Weather File (EPW)
 #'
 #' Reading an EPW file starts with function [read_epw()], which parses an EPW
@@ -292,16 +304,6 @@ read_epw <- function (path) {
 }
 # }}}
 
-#' @importFrom R6 R6Class
-#' @importFrom data.table fread setnames shift copy fwrite between as.ITime
-#' @importFrom readr write_lines
-#' @importFrom cli cat_line rule cat_bullet
-#' @importFrom lubridate year month mday leap_year minute days
-#' @importFrom purrr map map_lgl keep
-#' @importFrom units ud_units
-#' @importFrom stringr str_trim
-#' @importFrom fasttime fastPOSIXct
-#' @importFrom stats na.omit
 # Epw {{{
 Epw <- R6::R6Class(classname = "Epw",
     # ACTIVE {{{
@@ -563,7 +565,7 @@ Epw <- R6::R6Class(classname = "Epw",
             header$holidays_daylight_savings <- paste0(
                 c("HOLIDAYS/DAYLIGHT SAVINGS", hldys_dlt_svgs), collapse = ",")
 
-            header <- purrr::keep(header, not_empty)
+            header <- Filter(not_empty, header)
             write_lines_eol(header, path)
 
             d <- data.table::copy(private$m_data)[, `:=`(datetime = NULL)]
@@ -577,27 +579,27 @@ Epw <- R6::R6Class(classname = "Epw",
         print = function () {
             # print
             # {{{
-            cli::cat_line(cli::rule("Location"))
+            cli::cat_line(crayon::bold(cli::rule("Location")), col = "green")
             loc_keys <- c(
-                "[ City    ]",
-                "[ State   ]",
-                "[ Country ]",
-                "[ Source  ]",
-                "[ WMO Num ]",
-                "[Latitude ]",
-                "[Longitude]",
-                "[Time Zone]",
-                "[Evevation]")
+                crayon::bold("[ City    ]"),
+                crayon::bold("[ State   ]"),
+                crayon::bold("[ Country ]"),
+                crayon::bold("[ Source  ]"),
+                crayon::bold("[ WMO Num ]"),
+                crayon::bold("[Latitude ]"),
+                crayon::bold("[Longitude]"),
+                crayon::bold("[Time Zone]"),
+                crayon::bold("[Evevation]"))
             loc_str <- paste0(loc_keys, ": ", private$m_header$location)
-            cli::cat_bullet(loc_str)
+            cli::cat_bullet(loc_str, col = "cyan", bullet_col = "cyan")
 
-            cli::cat_line("\n", cli::rule("Data Period"))
+            cli::cat_line("\n", cli::rule(crayon::bold("Data Period"), col = "green"))
             dp_keys <- c(
-                "[Period Num ]",
-                "[Time Step  ]",
-                "[Date Range ]",
-                "[1st Weekday]",
-                "[Real Year  ]")
+                crayon::bold("[Period Num ]"),
+                crayon::bold("[Time Step  ]"),
+                crayon::bold("[Date Range ]"),
+                crayon::bold("[1st Weekday]"),
+                crayon::bold("[Real Year  ]"))
             dp <- private$m_header$data_periods
             num <- dp$n_data_periods
             time_step <- paste0(60/ dp$time_step, " min")
@@ -607,13 +609,13 @@ Epw <- R6::R6Class(classname = "Epw",
             weekday <- dp$start_day_of_week
             real_year <- dp$is_real_year
             dp_str <- paste0(dp_keys, ": ", c(num, time_step, range, weekday))
-            cli::cat_bullet(dp_str)
+            cli::cat_bullet(dp_str, col = "cyan", bullet_col = "cyan")
 
-            cli::cat_line("\n", cli::rule("Holidays and Daylight Savings"))
+            cli::cat_line("\n", cli::rule(crayon::bold("Holidays and Daylight Savings"), col = "green"))
             dst_keys <- c(
-                "[ Leap Year ]",
-                "[ DST Range ]",
-                "[Holiday Num]")
+                crayon::bold("[ Leap Year ]"),
+                crayon::bold("[ DST Range ]"),
+                crayon::bold("[Holiday Num]"))
             dst <- private$m_header$holidays_daylight_savings
             if (!is.na(dst$dls_start_day)) {
                 dst_range <- paste0(dst$dls_start_day, " - ", dst$dls_end_day)
@@ -622,7 +624,7 @@ Epw <- R6::R6Class(classname = "Epw",
             }
             hol_num <- dst$num_of_holiday
             dst_str <- paste0(dst_keys, ": ", list(dst$leap_year, dst_range, hol_num))
-            cli::cat_bullet(dst_str)
+            cli::cat_bullet(dst_str, col = "cyan", bullet_col = "cyan")
             # }}}
         }
     ),
@@ -760,9 +762,9 @@ parse_epw_file <- function (path, strict = TRUE) {
     header_key <- c("LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS",
         "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVINGS", "COMMENTS 1",
         "COMMENTS 2", "DATA PERIODS" )
-    l_header_pairs <- purrr::map(header_key, grep, x = header, fixed = TRUE)
+    l_header_pairs <- lapply(header_key, grep, x = header, fixed = TRUE)
     names(l_header_pairs) <- header_key
-    missing_header <- purrr::map_lgl(l_header_pairs, is_empty)
+    missing_header <- vapply(l_header_pairs, is_empty, FUN.VALUE = logical(1))
     to_parse <- c(TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE)
 
     if (any(missing_header)) {
@@ -780,7 +782,7 @@ parse_epw_file <- function (path, strict = TRUE) {
 
         num_header <- max(l_known)
     }
-    header_pairs <- purrr::map(l_header_pairs, ~header[.x])
+    header_pairs <- lapply(l_header_pairs, function (x) header[x])
     names(header_pairs) <- tolower(gsub("[^[:alnum:]]", "_", names(header_pairs)))
     # }}}
 

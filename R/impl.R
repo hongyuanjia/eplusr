@@ -1,11 +1,9 @@
-#' @importFrom data.table data.table rbindlist copy dcast
-#' @importFrom data.table setnames setattr setorderv setorder setcolorder
-#' @importFrom purrr pmap map2_int vec_depth flatten modify_depth map_lgl splice
-#' @importFrom stringr str_replace_all str_detect str_match
+#' @importFrom cli cat_bullet cat_line cat_rule rule symbol
+#' @importFrom crayon bold cyan red strip_style underline
+#' @importFrom data.table copy data.table dcast rbindlist
+#' @importFrom data.table setattr setcolorder setnames setorder setorderv
+#' @importFrom stringr str_detect str_match str_replace_all
 #' @importFrom uuid UUIDgenerate
-#' @importFrom cli rule cat_line cat_rule cat_bullet
-#' @importFrom clisymbols symbol
-#' @importFrom assertthat assert_that
 NULL
 
 ################################################################################
@@ -791,7 +789,7 @@ i_extensible_group_tbl_from_range <- function (self, private, class, from, to) {
         first_ext_per_cls <- split(first_ext, by = "class_rleid")
         new_ext_cls_tbl[, `:=`(first_ext = first_ext_per_cls)]
 
-        new_ext <- data.table::rbindlist(purrr::pmap(new_ext_cls_tbl,
+        new_ext <- data.table::rbindlist(lapply(new_ext_cls_tbl,
             function (new_ext_num, first_ext, ...) {
                 data.table::rbindlist(replicate(
                     new_ext_num, data.table::copy(first_ext), simplify = FALSE
@@ -1403,12 +1401,12 @@ i_dup_object = function (self, private, which, new_name = NULL) {
 
     # get the duplicated times before
     obj_tbl[!is.na(object_name), `:=`(
-        max_suffix_num = purrr::map2_int(all_name_upper, object_name_upper,
-            ~{
-                num <- stringr::str_match(.x, paste0("^", .y, "_(\\d+)$"))[,2]
-                num[is.na(num)] <- "0"
-                max(as.integer(num))
-            }))]
+        max_suffix_num = apply2_int(all_name_upper, object_name_upper, function (x, y) {
+            num <- stringr::str_match(x, paste0("^", y, "_(\\d+)$"))[,2]
+            num[is.na(num)] <- "0"
+            max(as.integer(num))
+        })
+    )]
 
     # get new object name
     obj_tbl[!is.na(object_name), `:=`(object_name = paste0(
@@ -1422,7 +1420,7 @@ i_dup_object = function (self, private, which, new_name = NULL) {
     # check if user input name is one of existing names
     if (eplusr_option("validate_level") == "final") {
         existing_name <- obj_tbl[has_name == TRUE &
-            purrr::map2_lgl(object_name_upper, all_name_upper, `%in%`)]
+            apply2_lgl(object_name_upper, all_name_upper, `%in%`)]
         if (not_empty(existing_name)) {
             stop("Duplicate objects with existing names is prohibited in `final` ",
                 "validation level. Input new name ",
@@ -1571,7 +1569,7 @@ i_ins_object = function (self, private, object) {
             stop("When input is a list, every component should be an ",
                  "IdfObject.", call. = FALSE)
         }
-        purrr::flatten(purrr::map(object, ~i_insert_single_object(self, private, .x)))
+        lapply(object, function (x) i_insert_single_object(self, private, x))
     } else {
         stop("Input should be an IdfObject, or a list of IdfObjects.", call. = FALSE)
     }
@@ -1605,12 +1603,12 @@ i_insert_single_object <- function (self, private, object) {
             ") to insert is an object from current Idf. The target object ",
             "will be directly duplicated instead of creating a new one with ",
             "same values.")
-        self$dup_object(object$id())
+        self$dup_object(object$id())[[1]]
     } else {
         cls <- object$class_name()
         # get all value
         val <- object$get_value()
-        self$add_object(cls, val)
+        self$add_object(cls, val)[[1]]
     }
 }
 # }}}
@@ -1872,7 +1870,7 @@ i_object_string <- function (self, private, object = NULL, comment = TRUE, ...) 
     main <- unlist(strsplit(main, "\n", fixed = TRUE))
 
     # add a blank line at the end like IDFEditor
-    c(main, "")
+    crayon::strip_style(c(main, ""))
 }
 # }}}
 
@@ -1925,8 +1923,8 @@ i_assert_valid_input_format <- function (class_name, value, comment, default, ty
                 "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
         }
     } else {
-        if (!all(purrr::map_lgl(value, is_valid_input)) ||
-            !all(purrr::map_lgl(comment, is_valid_input))) {
+        if (!all(vapply(value, is_valid_input, logical(1))) ||
+            !all(vapply(comment, is_valid_input, logical(1)))) {
             stop("Invalid `value` or `comment` format found. Each value or ",
                 "comment for a single object should be NULL or a list in format ",
                 "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
@@ -2055,12 +2053,21 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 
             less_num_unnamed <- val_num_unnamed[value_num < min_fields][, class_rleid := .I]
 
-            invalid_num_obj_rleid <- less_num_unnamed[,
-                list(object_rleid, class_rleid, value_count = value_num, min_fields)][
-                i_value_tbl_ori_from_num_tbl(self, private, less_num_unnamed,
-                    type, default = FALSE, all),
-                on = list(class_rleid, value_count < field_index, min_fields >= field_index),
-                nomatch = 0L][has_default == FALSE, unique(object_rleid)]
+            if (type == "add") {
+                invalid_num_obj_rleid <- less_num_unnamed[,
+                    list(object_rleid, class_rleid, value_count = value_num, min_fields)][
+                    i_value_tbl_ori_from_num_tbl(self, private, less_num_unnamed,
+                        type, default = FALSE, all),
+                    on = list(class_rleid, value_count < field_index, min_fields >= field_index),
+                    nomatch = 0L][has_default == FALSE, unique(object_rleid)]
+            } else {
+                invalid_num_obj_rleid <- less_num_unnamed[,
+                    list(object_rleid, class_rleid, value_count = value_num, min_fields)][
+                    i_value_tbl_ori_from_num_tbl(self, private, less_num_unnamed,
+                        type, default = FALSE, all),
+                    on = list(object_rleid, value_count < field_index, min_fields >= field_index),
+                    nomatch = 0L][has_default == FALSE, unique(object_rleid)]
+            }
 
             invalid_num_unnamed_less <- val_num_unnamed[object_rleid %in% invalid_num_obj_rleid]
 
@@ -2089,7 +2096,7 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 
         val_in_named[, `:=`(all_field_name_lower = i_class_field_name(self, private, class_id, lower = TRUE))]
 
-        val_in_named[, `:=`(field_index = purrr::map2_int(field_name_lower, all_field_name_lower, match))]
+        val_in_named[, `:=`(field_index = apply2_int(field_name_lower, all_field_name_lower, match))]
 
         # check field names
         mis_val_in <- val_in_named[is.na(field_index)]
@@ -2125,13 +2132,15 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
 
             # add extensible group
             ext_in <- mis_obj_tbl[, list(new_ext_num = max(new_ext_num)), by = list(class_id)]
-            purrr::walk2(ext_in$class_id, ext_in$new_ext_num,
-                ~i_add_extensible_group(self, private, .x, .y))
+
+            apply2(ext_in$class_id, ext_in$new_ext_num, i_add_extensible_group,
+                list(self = self, private = private))
 
             # match field names again
-            val_in_named[is.na(field_index), `:=`(all_field_name_lower = i_class_field_name(self, private, class_id, lower = TRUE))]
-            val_in_named[is.na(field_index), `:=`(field_index = purrr::map2_int(field_name_lower, all_field_name_lower, match))]
-
+            val_in_named[is.na(field_index), `:=`(all_field_name_lower =
+                i_class_field_name(self, private, class_id, lower = TRUE))]
+            val_in_named[is.na(field_index), `:=`(field_index =
+                apply2_int(field_name_lower, all_field_name_lower, match))]
             invalid_ext <- val_in_named[is.na(field_index)]
             if (not_empty(invalid_ext)) {
                 # delete extensible groups for invalid input
@@ -2146,8 +2155,8 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
                 } else {
                     invalid_ext_in <- ext_in[, `:=`(invalid_ext_num = new_ext_num)]
                 }
-                purrr::walk2(invalid_ext_in$class_id, invalid_ext_in$invalid_ext_num,
-                    ~i_del_extensible_group(self, private, .x, .y))
+                apply2(invalid_ext_in$class_id, invalid_ext_in$invalid_ext_num,
+                    i_del_extensible_group, list(self = self, private = private))
 
                 data.table::setnames(invalid_ext, "class_name_in", "class_name")
                 msg <- i_msg_invalid_ext(invalid_ext, type)
@@ -2340,7 +2349,8 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
         delete <- FALSE
     } else {
         # get input value list
-        val_list <- purrr::flatten(lapply(value, replace_null))
+        val_list <- value
+        if (vec_depth(value) == 3L) val_list <- Reduce(c, val_list)
 
         if (is_scalar(object_id)) {
             # check if there are empty values
@@ -2349,9 +2359,9 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
             field_name_in <- list(replace_null(names(value)))
             field_name_lower <- list(i_lower_name(unlist(field_name_in)))
 
-            val_chr <- list(purrr::map_chr(value, as.character))
+            val_chr <- list(vapply(value, as.character, character(1)))
 
-            delete <- list(purrr::map_lgl(value, is.na))
+            delete <- list(vapply(value, is.na, logical(1)))
         } else {
             # check if there are empty values
             empty <- vapply(value, is_empty, logical(1))
@@ -2359,16 +2369,21 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
             field_name_in <- lapply(value, function (val) replace_null(names(val)))
             field_name_lower <- lapply(field_name_in, i_lower_name)
 
-            val_chr <- purrr::map2(value, empty,
-               ~{
-                    if (!isTRUE(.y)) purrr::map(.x, ~as.character(replace_null(.x)))
-                    else NA_character_
-                 }
-            )
+            val_chr <- apply2(value, empty, function (x, y) {
+                if (!isTRUE(y)) {
+                    lapply(x, function (x) as.character(replace_null(x)))
+                } else {
+                    NA_character_ 
+                }
+            })
 
-            delete <- purrr::map2(value, empty,
-                ~{if (!isTRUE(.y)) purrr::map_lgl(.x, is.na) else FALSE}
-            )
+            delete <- apply2(value, empty, function (x, y) {
+                if (!isTRUE(y)) {
+                    vapply(x, is.na, logical(1))
+                } else {
+                    FALSE
+                }
+            })
         }
 
     }
@@ -2387,7 +2402,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
         stop("Values should be either all unnamed or all named.", call. = FALSE)
 
     # check duplication of names
-    dup_name <- tbl_nest[purrr::map_lgl(field_name_lower, has_duplicated),
+    dup_name <- tbl_nest[vapply(field_name_lower, has_duplicated, logical(1)),
         .SD, by = object_id]
     if (not_empty(dup_name)) {
         dup_name[, `:=`(duplicated_name =
@@ -2895,8 +2910,8 @@ i_log_saved_idf <- function (self, private) {
 # i_verbose_info {{{
 i_verbose_info <- function (self, private, ...) {
     if (eplusr_option("verbose_info")) {
-        cli::cat_rule("Info")
-        cat(..., "\n", sep = "")
+        cli::cat_rule(crayon::bold("Info"), col = "green")
+        cat(crayon::green(...), "\n", sep = "")
         cat("\n")
     }
 }
@@ -3030,7 +3045,8 @@ i_idf_add_output_sqlite <- function (self, private) {
 # }}}
 
 # i_idf_run {{{
-i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
+i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
+                       force = FALSE, copy_external = FALSE) {
     if (private$m_version < 8.3)
         stop("Currently, `$run()` only supports EnergyPlus V8.3 or higher.",
              call. = FALSE)
@@ -3043,7 +3059,7 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALS
     # check if the model is still running
     old <- private$m_log$job
     if (!is.null(old)) {
-        proc <- ._get_private(old)$m_process
+        proc <- ._get_private(old)$m_process$process
         if (inherits(proc, "process") && proc$is_alive()) {
             pid <- proc$get_pid()
             if (force) {
@@ -3083,6 +3099,7 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALS
     job$run(wait = wait)
 
     private$m_log$job <- job
+
     job
 }
 # }}}
@@ -3242,7 +3259,10 @@ i_idfobj_get_value <- function (self, private, object, which = NULL, all = FALSE
 # i_idfobj_set_value {{{
 i_idfobj_set_value <- function (self, private, object, ..., default = TRUE) {
     # capture all arguments in dots and flatten into a list
-    value <- purrr::splice(...)
+    value <- list(...)
+
+    # splice for `[[<-.IdfObject` and `$<-.IdfObject`
+    if (length(value) == 1L && vec_depth(value) == 3L) value <- Reduce(c, value)
 
     if (is_empty(value))
         stop("Please give values to set.", call. = FALSE)
@@ -3386,8 +3406,17 @@ i_idfobj_possible_values <- function (self, private, object, which = NULL) {
 # i_print_idf {{{
 i_print_idf <- function (self, private, plain = FALSE) {
     if (plain) {
-        cli::cat_line(i_object_string(self, private))
+        cli::cat_line(i_object_string(self, private), col = "green")
     } else {
+        cli::cat_rule(crayon::bold("EnergPlus Input Data File"), col = "green", line = 2)
+
+        if (is.null(private$m_path)) path <- crayon::bold$bgRed("NOT LOCAL") else path <- backtick(private$m_path)
+
+        cli::cat_bullet(c(
+            paste0(crayon::bold("Path"), ": ", path),
+            paste0(crayon::bold("Version"), ": ", backtick(private$m_version))
+        ), col = "cyan", bullet_col = "cyan")
+
         count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
             private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
             private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
@@ -3397,12 +3426,9 @@ i_print_idf <- function (self, private, plain = FALSE) {
         count[, num_str := paste0("[", lpad(num_obj, "0"), "]")]
         count[, grp := ""]
         count[count[, .I[1L], by = list(group_name)]$V1,
-            grp := paste0("\nGroup: ", backtick(group_name), "\n", cli::rule(), "\n")]
-        out <- count[, paste0(grp, num_str, " ", class_name)]
+            grp := crayon::bold$green(paste0("\nGroup: ", backtick((group_name)), "\n", cli::rule(), "\n"))]
+        out <- count[, paste0(grp, crayon::cyan(num_str), " ", crayon::cyan(class_name))]
 
-        if (is.null(private$m_path)) path <- "NULL" else path <- backtick(private$m_path)
-        cli::cat_line("# Path: ", path)
-        cli::cat_line("# Version: ", backtick(private$m_version))
         cli::cat_line(out)
     }
 }
@@ -3410,13 +3436,12 @@ i_print_idf <- function (self, private, plain = FALSE) {
 
 # i_print_idd {{{
 i_print_idd <- function (self, private) {
-    ver <- paste0("Version: ", private$m_version)
-    bld <- paste0("Build: ", private$m_build)
-    cls <- paste0("Total Class: ", nrow(private$m_idd_tbl$class))
-    cli::cat_rule(left = "EnergyPlus Input Data Dictionary")
-    cli::cat_bullet(ver)
-    cli::cat_bullet(bld)
-    cli::cat_bullet(cls)
+    cli::cat_rule(crayon::bold("EnergyPlus Input Data Dictionary"), col = "green")
+    cli::cat_bullet(c(
+        paste0(crayon::bold("Version"), ": ", backtick(private$m_version)),
+        paste0(crayon::bold("Build"), ": ", backtick(private$m_build)),
+        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_tbl$class))
+    ), col = "cyan", bullet_col = "cyan")
 }
 # }}}
 
@@ -3428,20 +3453,29 @@ i_print_idfobj <- function (self, private, object, comment = TRUE, auto_sep = FA
     val_tbl <- i_value_tbl_from_which(self, private, object)
 
     if (is.na(obj_tbl$object_name)) {
-        cli::cat_line("<<[ID:", obj_tbl$object_id, "]>> ",
-            obj_tbl$class_name)
+        cli::cat_line(
+            crayon::bold$underline(paste0(
+                "IdfObject <<[ID:", obj_tbl$object_id, "]>>",
+                backtick(obj_tbl$class_name)
+            )),
+            col = "inverse"
+        )
     } else {
-        cli::cat_line("<<[ID:", obj_tbl$object_id, "] ",
-            backtick(obj_tbl$object_name), ">> ",
-            obj_tbl$class_name)
+        cli::cat_line(
+            crayon::bold$underline(paste0(
+                "IdfObject <<[ID:", obj_tbl$object_id, "] ", backtick(obj_tbl$object_name), ">>",
+                backtick(obj_tbl$class_name)
+            )),
+            col = "inverse"
+        )
     }
 
     # comment
     if (comment) {
         cmt_tbl <- i_comment_tbl_from_which(self, private, object, nomatch = 0L)
         if (not_empty(cmt_tbl)) {
-            cli::cat_rule(center = "* COMMENTS *", line = 1)
-            cli::cat_line(format_comment(cmt_tbl))
+            cli::cat_rule(center = crayon::bold("* COMMENTS *"), col = "green")
+            cli::cat_line(crayon::italic(format_comment(cmt_tbl)), col = "cyan")
         }
     }
 
@@ -3455,9 +3489,9 @@ i_print_idfobj <- function (self, private, object, comment = TRUE, auto_sep = FA
         sep_at = sep_at, index = TRUE, blank = TRUE, required = TRUE)
 
     # remove class line
-    cli::cat_rule(center = "* FIELDS *")
+    cli::cat_rule(center = crayon::green$bold("* VALUES *"), col = "green")
     cli::cat_line(fld)
-    cli::cat_rule()
+    cli::cat_rule(col = "green")
 }
 # }}}
 
@@ -3468,29 +3502,31 @@ i_print_iddobj <- function (self, private) {
 
     fld_tbl <- private$m_idd_tbl$field[class_id == private$m_class_id]
 
-    cli::cat_line("<< Class: ", backtick(cls_tbl$class_name), " >>")
+    cli::cat_line(crayon::bold$underline(paste0(
+            "IddObject <<Class: ", backtick(cls_tbl$class_name), ">>")),
+        col = "inverse")
 
     # memo
-    cli::cat_rule(center = "* MEMO *", line = 1)
+    cli::cat_rule(center = crayon::bold("* MEMO *"), col = "green")
     memo <- private$m_idd_tbl$class_memo[class_id == private$m_class_id, memo]
     if (is.na(memo)) {
-        cli::cat_line("  <No Memo>")
+        cli::cat_line("  ", crayon::italic("<No Memo>"), col = "cyan")
     } else {
-        cli::cat_line("  \"", memo, "\"")
+        cli::cat_line("  \"", crayon::italic(memo), "\"", col = "cyan")
     }
 
     # property
-    cli::cat_rule(center = "* PROPERTIES *", line = 1)
-    cls_tbl[, `:=`(
-        group =    paste0("  Group: ", backtick(group_name)),
-        unique =   paste0("  Unique: ", unique_object),
-        required = paste0("  Required: ", required_object),
-        num =      paste0("  Total fields: ", num_fields)
-    )]
-    cli::cat_line(unlist(cls_tbl[, list(group, unique, required, num)]))
+    cli::cat_rule(center = crayon::bold("* PROPERTIES *"), col = "green")
+
+    cli::cat_line("   ", cli::symbol$bullet, " ", c(
+        paste0(crayon::bold("Group: "), backtick(cls_tbl$group_name)),
+        paste0(crayon::bold("Unique: "), cls_tbl$unique_object),
+        paste0(crayon::bold("Required: "), cls_tbl$required_object),
+        paste0(crayon::bold("Total fields: "), cls_tbl$num_fields)
+    ), col = "cyan")
 
     # field
-    cli::cat_rule(center = "* FIELDS *", line = 1)
+    cli::cat_rule(center = crayon::bold("* FIELDS *"), col = "green")
 
     if (cls_tbl$num_extensible) {
         cls_tbl[, `:=`(last_extensible = first_extensible + num_extensible - 1L)]
@@ -3501,17 +3537,30 @@ i_print_iddobj <- function (self, private) {
 
     fld_tbl <- fld_tbl[field_index <= cls_tbl$num_print]
 
-    fld_tbl[, `:=`(idx = lpad(field_index), req = "  ", ext = "")]
+    fld_tbl[, `:=`(idx = lpad(field_index), ext = "")]
+
     fld_tbl[is_extensible & field_index <= cls_tbl$last_extensible,
-        `:=`(ext = paste0(" <", clisymbols::symbol$arrow_down, ">"))]
-    fld_tbl[required_field == TRUE, `:=`(req = "* ")]
+        `:=`(ext = crayon::bold$yellow(paste0(" <", cli::symbol$arrow_down, ">")))]
+
+    fld_tbl[required_field == TRUE, `:=`(
+        idx = crayon::red$bold(idx),
+        req = crayon::red$bold(cli::symbol$star),
+        full_name = crayon::red$bold(full_name),
+        full_ipname = crayon::red$bold(full_ipname)
+    )]
+    fld_tbl[required_field == FALSE, `:=`(
+        idx = crayon::cyan(idx),
+        req = crayon::cyan(strrep(" ", nchar(cli::symbol$star))),
+        full_name = crayon::cyan(full_name),
+        full_ipname = crayon::cyan(full_ipname)
+    )]
 
     if (eplusr_option("view_in_ip"))
-        fld_tbl[, cli::cat_line("  ", idx, ":", req, full_ipname, ext)]
+        fld_tbl[, cli::cat_line("  ", req, idx, ": ", full_ipname, ext)]
     else
-        fld_tbl[, cli::cat_line("  ", idx, ":", req, full_name, ext)]
+        fld_tbl[, cli::cat_line("  ", req, idx, ": ", full_name, ext)]
 
-    if (cls_tbl$num_extensible) cli::cat_line("  ......")
-    cli::cat_rule(line = 1)
+    if (cls_tbl$num_extensible) cli::cat_line("  ......", col = "cyan")
+    cli::cat_rule(col = "green")
 }
 # }}}

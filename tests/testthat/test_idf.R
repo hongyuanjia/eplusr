@@ -555,8 +555,14 @@ test_that("Idf class", {
 
     # SEARCH AND REPLACE {{{
     idf$print(plain = TRUE)
-    expect_equal(purrr::map_int(idf$search_value("WALL"), ~.x$id()), c(WALL_1 = 2L, WALL_1PF = 3L))
-    expect_equal(purrr::map_int(idf$replace_value("WALL-1", "WALL-2"), ~.x$id()), c(WALL_2 = 2L, WALL_2PF = 3L))
+    expect_equal(
+        vapply(idf$search_value("WALL"), function (x) x$id(), integer(1)),
+        c(WALL_1 = 2L, WALL_1PF = 3L)
+    )
+    expect_equal(
+        vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1)),
+        c(WALL_2 = 2L, WALL_2PF = 3L)
+    )
     # }}}
 
     # can get idf in string format

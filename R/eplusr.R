@@ -90,10 +90,14 @@
 #' # set options
 #' eplusr_option(verbose_info = TRUE, view_in_ip = FALSE)
 #' @export
+#' @author Hongyuan Jia
 # eplusr_option {{{
 eplusr_option <- function (...) {
-    opt <- purrr::splice(...)
+    opt <- list(...)
+
     if (is_empty(opt)) return(as.list.environment(.options))
+
+    if (vec_depth(opt) == 3L) opt <- Reduce(c, opt)
 
     nm <- names(opt)
 
@@ -119,6 +123,8 @@ eplusr_option <- function (...) {
     onoff_opt <- c("view_in_ip", "verbose_info")
 
     count_opt <- c("num_digits", "num_parallel")
+
+    number_opt <- c()
 
     # assign_onoff_opt {{{
     assign_onoff_opt <- function (input, name) {
@@ -154,7 +160,15 @@ eplusr_option <- function (...) {
     assign_count_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
             assert_that(is_count(input[[name]]))
-            .options[[name]] <- input[[name]]
+            .options[[name]] <- as.integer(input[[name]])
+        }
+    }
+    # }}}
+    # assign_number_opt {{{
+    assign_number_opt <- function (input, name) {
+        if (not_empty(input[[name]])) {
+            assert_that(is.numeric(input[[name]]))
+            .options[[name]] <- as.numeric(input[[name]])
         }
     }
     # }}}
@@ -162,8 +176,8 @@ eplusr_option <- function (...) {
     for (nm_opt in choice_opt) assign_choice_opt(opt, nm_opt)
     for (nm_opt in onoff_opt) assign_onoff_opt(opt, nm_opt)
     for (nm_opt in count_opt) assign_count_opt(opt, nm_opt)
+    for (nm_opt in number_opt) assign_number_opt(opt, nm_opt)
 
     as.list.environment(.options)[nm]
 }
 # }}}
-#' @author Hongyuan Jia

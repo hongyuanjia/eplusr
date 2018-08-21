@@ -1,3 +1,11 @@
+#' @importFrom R6 R6Class
+#' @importFrom readr read_lines
+#' @importFrom cli cat_bullet cat_line cat_rule
+#' @importFrom crayon bold
+#' @importFrom stringr str_trim
+#' @importFrom tools file_path_sans_ext
+NULL
+
 #' Run EnergyPlus Simulation and Collect Outputs
 #'
 #' `EplusJob` class wraps the EnergyPlus command line interface and provides
@@ -71,30 +79,30 @@
 #' ```
 #'
 #' `$run()` runs the simulation using input model and weather file.
+#'     If `wait` is FALSE, then the job will be run in the background. You can
+#'     get updated job status by just print the EplusJob object.
 #'
 #' `$kill()` kills the background EnergyPlus process if possible. It only
-#'     works when simulation runs in waiting mode.
+#'     works when simulation runs in non-waiting mode.
 #'
 #' `$status()` returns a named list of values indicates the status of the job:
 #'
-#'   * `run_before`: `TRUE` if the job has been run before.
-#'   * `changed_after`: `TRUE` if the IDF file has been changed since last
-#'      simulation.
-#'   * `terminated`: `TRUE` if the simulation was terminated during last
-#'       simulation.
-#'   * `successful`: `TRUE` if last simulation ended successfully.
+#'   * `run_before`: `TRUE` if the job has been run before. `FALSE` otherwise.
 #'   * `alive`: `TRUE` if the simulation is still running in the background.
-#'   * `wait`: `TRUE` if the simulation was run in waiting mode last time.
+#'     `FALSE` otherwise.
+#'   * `terminated`: `TRUE` if the simulation was terminated during last
+#'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
+#'   * `successful`: `TRUE` if last simulation ended successfully. `FALSE`
+#'     otherwise. `NA` if the job has not been run yet.
+#'   * `changed_after`: `TRUE` if the IDF file has been changed since last
+#'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
 #'
 #' **Arguments**
 #'
-#' * `echo`: Only applicable to `run_idf`. Show EnergyPlus simulation process
-#'     information to the console.  If `FALSE`, which is default, a
-#'     [processx::process] object will be return.
 #' * `wait`: If `TRUE`, R will hang on and wait for the simulation to complete.
-#'     Output from EnergyPlus command line interface will be printed into the
-#'     console as well. If `FALSE`, simulation will be run in a background
-#'     process. Default: `TRUE`.
+#'     EnergyPlus standard output (stdout) and error (stderr) is printed to the
+#'     R console. If `FALSE`, simulation will be run in a background process.
+#'     Default: `TRUE`.
 #'
 #' @section Results Extraction:
 #' ```
@@ -138,6 +146,20 @@
 #' * `case`: If not `NULL`, a character column will be added indicates the case
 #'     of this simulation. If `"auto"`, the name of the IDF file will be used.
 #'
+#' @section Printing:
+#' ```
+#' job$print()
+#' print(job)
+#' ```
+#'
+#' `$print()` shows the core information of this EplusJob, including the
+#'     path of model and weather, the version and path of EnergyPlus used
+#'     to run simulations, and the simulation job status.
+#'
+#' `$print()` is quite useful to get the simulation status, especially when
+#'     `wait` is `FALSE` in `$run()`. The job status will be updated and printed
+#'     whenever `$print()` is called.
+#'
 #' @docType class
 #' @name job
 #' @aliases EplusJob
@@ -173,7 +195,6 @@
 #'     # check the job status again
 #'     job$status()$run_before
 #'     job$status()$successful
-#'     job$status()$wait
 #'
 #'     # get output directory
 #'     job$output_dir()
@@ -257,14 +278,6 @@ eplus_job <- function (idf, epw) {
 }
 # }}}
 
-#' @importFrom R6 R6Class
-#' @importFrom readr read_lines
-#' @importFrom tools file_path_sans_ext
-#' @importFrom RSQLite SQLite dbConnect dbDisconnect dbGetQuery dbReadTable dbListTables
-#' @importFrom data.table setDT setcolorder setorder
-#' @importFrom lubridate year force_tz
-#' @importFrom fasttime fastPOSIXct
-#' @importFrom cli cat_rule cat_line
 # EplusJob {{{
 EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
     public = list(
@@ -327,7 +340,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             i_job_path(self, private, type),
 
         run = function (wait = TRUE)
-            i_job_run(self, private, wait),
+            i_job_run(self, private, wait = wait),
 
         kill = function ()
             i_job_kill(self, private),
@@ -345,14 +358,14 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             i_job_output_errors(self, private, info),
 
         report_data_dict = function ()
-            i_sql_report_data_dict(self, private),
+            i_job_report_data_dict(self, private),
 
         report_data = function (key_value = NULL, name = NULL,
                                 year = NULL, tz = "GMT", case = "auto")
-            i_sql_report_data(self, private, key_value, name, year, tz, case),
+            i_job_report_data(self, private, key_value, name, year, tz, case),
 
         tabular_data = function()
-            i_sql_tabular_data(self, private),
+            i_job_tabular_data(self, private),
 
         print = function ()
             i_job_print(self, private)
@@ -365,7 +378,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         m_path_idf = NULL,
         m_path_epw = NULL,
         m_eplus_config = NULL,
-        m_process = NULL,
+        m_job = NULL,
         m_sql = NULL,
         m_log = NULL
     )
@@ -387,40 +400,43 @@ i_job_path <- function (self, private, type = c("all", "idf", "epw")) {
 # i_job_run {{{
 i_job_run <- function (self, private, wait = TRUE) {
     private$m_log$start_time <- Sys.time()
+    private$m_log$killed <- NULL
 
-    private$m_process <- run_idf(private$m_version,
-        private$m_path_idf, private$m_path_epw, output_dir = NULL, echo = wait)
+    private$m_job <- run_idf(private$m_path_idf, private$m_path_epw,
+        output_dir = NULL, echo = wait, wait = wait, eplus = private$m_version)
 
-    private$m_log$end_time <- Sys.time()
-
+    if (wait) private$m_log$end_time <- Sys.time()
     self
 }
 # }}}
 
 # i_job_kill {{{
 i_job_kill <- function (self, private) {
-    if (is.null(private$m_process)) {
+    if (is.null(private$m_job)) {
         message("The job has not been run yet.")
         return(invisible(FALSE))
     }
 
-    if (!inherits(private$m_process, "process")) {
-        message("The job was run in waiting mode and could not be killed.")
+    proc <- private$m_job$process
+
+    if (!proc$is_alive()) {
+        message("The job is not running.")
         return(invisible(FALSE))
     }
 
-    if (private$m_process$is_alive()) {
-        k <- private$m_process$kill()
-        if (k) {
-            message("The job has been successfully killed.")
-            return(invisible(TRUE))
-        } else {
-            message("Failed to kill the job, because it was already finished/dead.")
-            return(invisible(FALSE))
-        }
+    k <- tryCatch(proc$kill(), error = function (e) FALSE)
+
+    if (isTRUE(k)) {
+
+        private$m_log$killed <- TRUE
+        message("The job has been successfully killed.")
+        return(invisible(TRUE))
+
     } else {
-        message("The job is not running.")
+
+        message("Failed to kill the job, because it was already finished/dead.")
         return(invisible(FALSE))
+
     }
 }
 # }}}
@@ -430,56 +446,57 @@ i_job_status <- function (self, private, based_suffix = ".err") {
     # init
     status <- list(
         run_before = FALSE, # if the model has been run before
-        changed_after = FALSE, # if the model has been changed after last simulation
-        terminated = FALSE, # if last simulation was terminated
-        successful = FALSE, # if last simulation was successful
         alive = FALSE, # if simulation is still running
-        wait = FALSE # if simulation run in wait mode
+        terminated = NA, # if last simulation was terminated
+        successful = NA, # if last simulation was successful
+        changed_after = NA # if the model has been changed after last simulation
     )
 
-    proc <- private$m_process
+    proc <- private$m_job
+
     # if the model has not been run before
     if (is.null(proc)) {
         if (!file.exists(private$m_path_idf)) {
             warning("Could not find local idf file ", backtick(private$m_path_idf),
                 ".", call. = FALSE)
-            return(status)
         }
-    # if the model has been run before
+        return(status)
+    }
+
+    status$run_before <- TRUE
+
+    if (isTRUE(private$m_log$killed)) {
+        status$terminated <- TRUE
     } else {
-        status$run_before <- TRUE
-        # check if the model was run in waiting mode
-        if (!inherits(proc, "process")) {
-            # check the exist status of last simulationa
-            status$wait <- TRUE
-            exit_status <- proc$status
-            if (is.na(exit_status)) {
-                status$terminated <- TRUE
-            } else if (exit_status == 0) {
-                status$successful <- TRUE
-            }
+        status$terminated <- FALSE
+    }
+
+    # check if the model is still running
+    if (proc$process$is_alive()) {
+        status$alive <- TRUE
+    } else {
+        status$alive <- FALSE
+        proc$process$wait()
+        exit_status <- proc$process$get_exit_status()
+        if (!is.na(exit_status) && exit_status == 0L) {
+            status$successful <- TRUE
         } else {
-            exit_status <- proc$get_exit_status()
-            # check if the model is still running
-            if (proc$is_alive()) {
-                status$alive <- TRUE
-            } else {
-                if (exit_status == 0L) {
-                    status$successful <- TRUE
-                } else if (exit_status %in% c(2L, -9L)) {
-                    status$terminated <- TRUE
-                }
-            }
+            status$successful <- FALSE
         }
     }
 
+    status$changed_after <- FALSE
     prefix <- tools::file_path_sans_ext(private$m_path_idf)
     basefile <- paste0(prefix, based_suffix)
 
     if (!file.exists(basefile)) return(status)
 
-    base_ctime <- file.info(basefile)$ctime
-    idf_ctime <- file.info(private$m_path_idf)$ctime
+    base_ctime <- file.info(basefile)$mtime
+
+    if (!file.exists(private$m_path_idf)) return(status)
+
+    idf_ctime <- file.info(private$m_path_idf)$mtime
+
     if (base_ctime < idf_ctime) status$changed_after <- TRUE
 
     status
@@ -519,20 +536,25 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, 
     if (strict) {
         status <- i_job_status(self, private, suffix)
 
-        if (status$terminated)
+        if (!isTRUE(status$run_before)) {
+            stop("Simulation did not run before. Please run it using `$run()` ",
+                "before collect output", call. = FALSE)
+        }
+
+        if (isTRUE(status$terminated))
             stop("Simulation was terminated before. Please solve ",
                 "the problems and re-run the simulation before collect ",
                 "output", call. = FALSE)
 
-        if (status$alive)
+        if (isTRUE(status$alive))
             stop("Simulation is still running. Please wait simulation ",
                 "to finish before collecting results.", call. = FALSE)
 
-        if (status$changed_after)
+        if (isTRUE(status$changed_after))
             warning("The Idf has been changed since last simulation. ",
                 "The simulation output may not be correct.", call. = FALSE)
 
-        if (status$run_before && !status$successful)
+        if (isTRUE(status$run_before) && !isTRUE(status$successful))
             warning("Simulation ended with errors. Simulation results ",
                 "may not be correct.", call. = FALSE)
 
@@ -558,7 +580,7 @@ i_job_output_errors <- function (self, private, info = FALSE) {
 
 # i_job_sql_path {{{
 i_job_sql_path <- function (self, private) {
-    path_sql <- i_job_locate_output(self, private, ".sql", strict = TRUE, must_exist = FALSE)
+    path_sql <- i_job_locate_output(self, private, ".sql", must_exist = FALSE)
     if (!file.exists(path_sql))
         stop("Simulation SQL output does not exists. ",
              "eplusr uses the EnergyPlus SQL output for extracting simulation outputs. ",
@@ -570,216 +592,90 @@ i_job_sql_path <- function (self, private) {
 }
 # }}}
 
-# i_job_output_sql {{{
-i_job_output_sql <- function (self, private) {
-    path_sql <- i_job_sql_path(self, private)
-    RSQLite::dbConnect(RSQLite::SQLite(), path_sql)
+# i_job_report_data_dict {{{
+i_job_report_data_dict <- function (self, private) {
+    sql <- i_job_sql_path(self, private)
+    sql_report_data_dict(sql)
 }
 # }}}
 
-# i_is_job_not_running {{{
-i_is_job_not_running <- function (self, private) {
-    proc <- private$m_process
-    if (is.null(proc)) return(TRUE)
-
-    if (!inherits(proc, "process")) return(TRUE)
-
-    if (!proc$is_alive()) return(TRUE)
-
-    FALSE
-}
-# }}}
-
-# i_assert_job_not_running {{{
-i_assert_is_not_running <- function (self, private) {
-    not <- i_is_job_not_running(self, private)
-    if (!not)
-        stop("Simulation is still running.", call. = FALSE)
-}
-# }}}
-
-# i_sql_read_table {{{
-i_sql_read_table <- function (self, private, table) {
-    sql <- i_job_output_sql(self, private)
-    on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
-    res <- data.table::setDT(RSQLite::dbReadTable(sql, table))
-    res
-}
-# }}}
-
-# i_sql_get_query {{{
-i_sql_get_query <- function (self, private, query) {
-    sql <- i_job_output_sql(self, private)
-    on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
-
-    res <- RSQLite::dbGetQuery(sql, query)
-    if (is.data.frame(res)) data.table::setDT(res)
-    res
-}
-# }}}
-
-# i_sql_report_data_query {{{
-i_sql_report_data_query <- function (self, private, key_value = NULL, name = NULL) {
-    if (is.null(key_value)) {
-        if (is.null(name)) {
-            where <- "ReportDataDictionary"
-        } else {
-            stopifnot(is.character(name))
-            where <- paste0(
-                "
-                SELECT *
-                FROM ReportDataDictionary
-                WHERE Name IN (", paste0("'", unique(name), "'", collapse = ","),")
-                "
-            )
-        }
-    } else {
-        stopifnot(is.character(key_value))
-        if (is.null(name)) {
-            where <- paste0(
-                "
-                SELECT *
-                FROM ReportDataDictionary
-                WHERE KeyValue IN (", paste0("'", unique(key_value), "'", collapse = ","),")
-                "
-            )
-        } else {
-            where <- paste0(
-                "
-                SELECT *
-                FROM ReportDataDictionary
-                WHERE KeyValue IN (", paste0("'", unique(key_value), "'", collapse = ","),")
-                      AND
-                      Name IN (", paste0("'", unique(name), "'", collapse = ","),")
-                "
-            )
-        }
-    }
-
-    query <- paste0(
-        "
-        SELECT t.Month,
-               t.Day,
-               t.Hour,
-               t.Minute,
-               t.Dst,
-               t.Interval,
-               t.IntervalType,
-               t.SimulationDays,
-               t.DayType,
-               t.EnvironmentPeriodIndex,
-               t.WarmupFlag,
-               rdd.IsMeter,
-               rdd.Type,
-               rdd.IndexGroup,
-               rdd.TimestepType,
-               rdd.KeyValue,
-               rdd.Name,
-               rdd.ReportingFrequency,
-               rdd.ScheduleName,
-               rdd.Units,
-               rd.Value
-        FROM ReportData AS rd
-        INNER JOIN
-            (
-                ", where, "
-            ) As rdd
-            ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex
-        INNER JOIN Time As t
-            ON rd.TimeIndex = t.TimeIndex
-        "
-    )
-
-    query
-}
-# }}}
-
-# i_sql_all_table {{{
-i_sql_all_table <- function (self, private) {
-    sql <- i_job_output_sql(self, private)
-    on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
-    RSQLite::dbListTables(sql)
-}
-# }}}
-
-# i_sql_report_data_dict {{{
-i_sql_report_data_dict <- function (self, private) {
-    i_sql_read_table(self, private, "ReportDataDictionary")
-}
-# }}}
-
-# i_sql_report_data {{{
-i_sql_report_data <- function (self, private, key_value = NULL, name = NULL,
+# i_job_report_data {{{
+i_job_report_data <- function (self, private, key_value = NULL, name = NULL,
                                year = NULL, tz = "GMT", case = "auto", all = FALSE) {
-    q <- i_sql_report_data_query(self, private, key_value, name)
-    res <- i_sql_get_query(self, private, q)
-
-    Year <- year %||% lubridate::year(Sys.Date())
-    res[, DateTime := fasttime::fastPOSIXct(
-        paste0(Year, "-", Month, "-", Day, " ", Hour, ":", Minute, ":00"),
-        required.components = 5L, tz = "GMT")]
-
-    if (!all) {
-        res <- res[, .SD, .SDcols = c("DateTime", "KeyValue", "Name", "Units", "Value")]
-    } else {
-        data.table::setcolorder(res, c("DateTime", setdiff(names(res), "DateTime")))
-    }
-
-    data.table::setorder(res, KeyValue, Name, DateTime)
-
-    if (tz != "GMT") res$DateTime <- lubridate::force_tz(res$DateTime, tz)
-
-    if (not_empty(case)) {
-        if (case == "auto") {
-            case_name <- tools::file_path_sans_ext(basename(private$m_path_idf))
-        } else {
-            assert_that(is_scalar(case))
-            case_name <- as.character(case)
-        }
-        res[, Case := case_name]
-        data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))
-    }
-
-    res[]
+    sql <- i_job_sql_path(self, private)
+    if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_idf))
+    sql_report_data(sql, key_value, name, year, tz, case, all)
 }
 # }}}
 
-# i_sql_tabular_data {{{
-i_sql_tabular_data <- function (self, private) {
-    i_sql_read_table(self, private, "TabularDataWithStrings")
+# i_job_tabular_data {{{
+i_job_tabular_data <- function (self, private) {
+    sql <- i_job_sql_path(self, private)
+    sql_tabular_data(sql)
 }
 # }}}
 
 # i_job_print {{{
 i_job_print <- function (self, private) {
     status <- i_job_status(self, private)
-    cli::cat_rule("EnergyPlus Simulation Job")
-    cli::cat_line("# Model: ", backtick(private$m_path_idf))
-    cli::cat_line("# Weather: ", backtick(private$m_path_epw))
+    cli::cat_rule(crayon::bold("EnergyPlus Simulation Job"), col = "green")
     config <- eplus_config(private$m_version)
-    cli::cat_line("# EnergyPlus Version: ", backtick(config$version))
-    cli::cat_line("# EnergyPlus Path: ", backtick(normalizePath(config$dir)))
+    cli::cat_bullet(c(
+        paste0(crayon::bold("Model"), ": ", backtick(private$m_path_idf)),
+        paste0(crayon::bold("Weather"), ": ", backtick(private$m_path_epw)),
+        paste0(crayon::bold("EnergyPlus Version"), ": ", backtick(config$version)),
+        paste0(crayon::bold("EnergyPlus Path"), ": ", backtick(normalizePath(config$dir)))
+    ), col = "cyan", bullet_col = "cyan")
 
     if (!status$run_before) {
-        cli::cat_line("<< Simulation has not been run before >>")
-    } else if (status$terminated) {
-        cli::cat_line(" Simulation was terminated before.")
+        cli::cat_line("<< Simulation has not been run before >>",
+            col = "white", background_col = "blue")
+    } else if (isTRUE(status$terminated)) {
+        cli::cat_line(" Simulation was terminated before.",
+            col = "white", background_col = "red")
     } else if (status$alive) {
         cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and is still running...")
-    } else if (!status$successful) {
+            backtick(private$m_log$start_time), " and is still running...",
+            col = "black", background_col = "green")
+    } else if (!isTRUE(status$successful)) {
         cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and ended unsuccessfully...")
-    } else if (status$successful && status$wait) {
-        take_time <- format(round(difftime(
-            private$m_log$end_time, private$m_log$start_time), digits = 2L))
-        cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and completed successfully after ",
-            take_time, ".")
+            backtick(private$m_log$start_time), " and ended unsuccessfully...",
+            col = "white", background_col = "red")
     } else {
-        cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and completed successfully.")
-    }
+        if (is.null(private$m_log$end_time)) {
 
+            if (is.null(private$m_job$stdout)) {
+                private$m_job$stdout <- private$m_job$process$read_all_output_lines()
+            }
+
+            if (is.null(private$m_job$stderr)) {
+                private$m_job$stderr <- private$m_job$process$read_all_error_lines()
+            }
+
+            run_time <- get_run_time(private$m_job$stdout)
+
+            if (!is.null(run_time)) {
+                private$m_job$end_time <- run_time + private$m_job$start_time
+                private$m_log$end_time <- private$m_job$end_time
+            }
+        }
+
+        if (!is.null(private$m_log$end_time)) {
+            run_time <- format(round(difftime(
+                private$m_log$end_time, private$m_log$start_time), digits = 2L)
+            )
+
+            cli::cat_line(" Simulation started at ",
+                backtick(private$m_log$start_time), " and completed successfully after ",
+                run_time, ".",
+                col = "black", background_col = "green"
+            )
+        } else {
+            cli::cat_line(" Simulation started at ",
+                backtick(private$m_log$start_time), " and completed successfully.",
+                col = "black", background_col = "green"
+            )
+        }
+    }
 }
 # }}}

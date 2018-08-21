@@ -1,3 +1,6 @@
+#' @importFrom R6 R6Class
+NULL
+
 #' EnergyPlus IDF object
 #'
 #' `IdfObject` is an abstraction of a single object in an `Idf`. It provides
@@ -561,8 +564,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
             m <- match(i_underscore_name(name), all_nm)
             if (!is.na(m)) {
-                names(value) <- all_nm[m]
                 value <- as.list(value)
+                names(value) <- all_nm[m]
                 .subset2(x, "set_value")(value)
             } else {
                 NextMethod()
@@ -585,8 +588,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
             m <- match(i_underscore_name(i), all_nm)
             if (!is.na(m)) {
-                names(value) <- all_nm[m]
                 value <- as.list(value)
+                names(value) <- all_nm[m]
                 .subset2(x, "set_value")(value)
             } else {
                 NextMethod()

@@ -1,3 +1,6 @@
+#' @importFrom R6 R6Class
+NULL
+
 #' EnergyPlus IDD object
 #'
 #' `IddObject` is an abstraction of a single object in an `Idd` object. It
@@ -368,7 +371,6 @@
 #' @author Hongyuan Jia
 NULL
 
-#' @importFrom R6 R6Class
 # IddObject {{{
 IddObject <- R6::R6Class(classname = "IddObject",
 

@@ -1,8 +1,12 @@
+#' @importFrom cli rule
+#' @importFrom data.table ":="
+#' @importFrom data.table between data.table dcast.data.table last rbindlist
+#' @importFrom data.table rleid setattr setcolorder setnames setorder
 #' @importFrom progress progress_bar
-#' @importFrom data.table data.table between setnames dcast.data.table setorder
-#' @importFrom data.table setcolorder setattr
-#' @importFrom stringr str_trim
-#' @importFrom purrr map2
+#' @importFrom readr read_lines
+#' @importFrom stringr str_count str_detect str_match str_trim
+NULL
+
 # parse_idd_file {{{
 parse_idd_file <- function(path) {
     # set progress bar
@@ -646,10 +650,6 @@ parse_idd_file <- function(path) {
 }
 # }}}
 
-#' @importFrom data.table data.table setorder setnames between last setattr
-#' @importFrom data.table setcolorder setattr
-#' @importFrom purrr map2
-#' @importFrom cli cat_line cat_rule rule
 # parse_idf_file {{{
 parse_idf_file <- function (path, idd = NULL) {
 
@@ -1032,9 +1032,6 @@ parse_idf_file <- function (path, idd = NULL) {
 }
 # }}}
 
-#' @importFrom readr read_lines
-#' @importFrom data.table data.table ":=" setattr setcolorder
-#' @importFrom stringr str_match str_detect
 # parse_err_file {{{
 parse_err_file <- function (path) {
     if (file.exists(path)) {
@@ -1154,8 +1151,6 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
 }
 # }}}
 
-#' @importFrom stringr str_trim
-#' @importFrom readr read_lines
 # read_idd_str {{{
 read_idd_str <- function(filepath) {
     idd_str <- readr::read_lines(filepath)
