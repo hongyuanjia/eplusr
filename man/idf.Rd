@@ -439,8 +439,8 @@ order to do so, a object in \code{Output:SQLite} with \code{Option Type} value o
 \item \code{weather}: A path to an \code{.epw} file or an \code{Epw} object.
 \item \code{dir}: The directory to save the simulation results. If \code{NULL}, the model
 folder will be used.
-\item \code{echo}: Whether to print the standard output and error of EnergyPlus to
-the screen. Default is \code{FALSE}.
+\item \code{wait}: Whether to wait until the simulation completed and print the
+standard output and error of EnergyPlus to the screen. Default is \code{TRUE}.
 \item \code{force}: Whether to stop the background EnergyPlus process and start the
 simulation again.
 \item \code{copy_external}: If \code{TRUE}, the external files will also be copied into the

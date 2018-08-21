@@ -1,6 +1,6 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program 'EnergyPlus'
-Version: 0.8.4
+Version: 0.9.0
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
@@ -20,17 +20,15 @@ Imports:
     R6,
     RSQLite,
     assertthat,
+    callr (>= 2.0.4),
     cli,
-    clisymbols,
+    crayon,
     data.table (>= 1.9.8),
     fasttime,
-    furrr,
-    future,
-    gh,
+    later,
     lubridate,
-    processx,
-    progress,
-    purrr,
+    processx (>= 3.2.0),
+    progress (>= 1.2.0),
     readr,
     stringr,
     units,
@@ -61,6 +59,7 @@ Collate:
     'validate.R'
     'format.R'
     'run.R'
+    'sql.R'
     'job.R'
     'param.R'
     'install.R'

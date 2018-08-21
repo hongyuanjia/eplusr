@@ -81,31 +81,31 @@ job$status()
 }
 
 \code{$run()} runs the simulation using input model and weather file.
+If \code{wait} is FALSE, then the job will be run in the background. You can
+get updated job status by just print the EplusJob object.
 
 \code{$kill()} kills the background EnergyPlus process if possible. It only
-works when simulation runs in waiting mode.
+works when simulation runs in non-waiting mode.
 
 \code{$status()} returns a named list of values indicates the status of the job:
 \itemize{
-\item \code{run_before}: \code{TRUE} if the job has been run before.
-\item \code{changed_after}: \code{TRUE} if the IDF file has been changed since last
-simulation.
-\item \code{terminated}: \code{TRUE} if the simulation was terminated during last
-simulation.
-\item \code{successful}: \code{TRUE} if last simulation ended successfully.
+\item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
 \item \code{alive}: \code{TRUE} if the simulation is still running in the background.
-\item \code{wait}: \code{TRUE} if the simulation was run in waiting mode last time.
+\code{FALSE} otherwise.
+\item \code{terminated}: \code{TRUE} if the simulation was terminated during last
+simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
+\item \code{successful}: \code{TRUE} if last simulation ended successfully. \code{FALSE}
+otherwise. \code{NA} if the job has not been run yet.
+\item \code{changed_after}: \code{TRUE} if the IDF file has been changed since last
+simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 }
 
 \strong{Arguments}
 \itemize{
-\item \code{echo}: Only applicable to \code{run_idf}. Show EnergyPlus simulation process
-information to the console.  If \code{FALSE}, which is default, a
-\link[processx:process]{processx::process} object will be return.
 \item \code{wait}: If \code{TRUE}, R will hang on and wait for the simulation to complete.
-Output from EnergyPlus command line interface will be printed into the
-console as well. If \code{FALSE}, simulation will be run in a background
-process. Default: \code{TRUE}.
+EnergyPlus standard output (stdout) and error (stderr) is printed to the
+R console. If \code{FALSE}, simulation will be run in a background process.
+Default: \code{TRUE}.
 }
 }
 
@@ -152,6 +152,20 @@ of this simulation. If \code{"auto"}, the name of the IDF file will be used.
 }
 }
 
+\section{Printing}{
+\preformatted{job$print()
+print(job)
+}
+
+\code{$print()} shows the core information of this EplusJob, including the
+path of model and weather, the version and path of EnergyPlus used
+to run simulations, and the simulation job status.
+
+\code{$print()} is quite useful to get the simulation status, especially when
+\code{wait} is \code{FALSE} in \code{$run()}. The job status will be updated and printed
+whenever \code{$print()} is called.
+}
+
 \examples{
 \dontrun{
 if (is_avail_eplus(8.8)) {
@@ -184,7 +198,6 @@ if (is_avail_eplus(8.8)) {
     # check the job status again
     job$status()$run_before
     job$status()$successful
-    job$status()$wait
 
     # get output directory
     job$output_dir()

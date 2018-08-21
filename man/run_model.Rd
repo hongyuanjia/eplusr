@@ -5,35 +5,54 @@
 \alias{run_multi}
 \title{Run simulations of EnergyPlus models.}
 \usage{
-run_idf(eplus, model, weather, output_dir, design_day = FALSE,
-  annual = FALSE, expand_obj = TRUE, echo = TRUE)
+run_idf(model, weather, output_dir, design_day = FALSE, annual = FALSE,
+  expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL)
 
-run_multi(eplus, model, weather, output_dir, design_day = FALSE,
-  annual = FALSE, parallel_backend = future::multiprocess)
+run_multi(model, weather, output_dir, design_day = FALSE,
+  annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL)
 }
 \arguments{
-\item{eplus}{An acceptable input of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}.}
+\item{model}{A path (for \code{run_idf()}) or a vector of paths (for
+\code{run_multi()}) of EnergyPlus IDF or IMF files.}
 
-\item{model}{A path of an EnergyPlus IDF or IMF file.}
+\item{weather}{A path (for \code{run_idf()}) or a vector of paths (for
+\code{run_multi()}) of EnergyPlus EPW weather files. For \code{run_multi()},
+\code{weather} can also be a single EPW file path. In this case, that weather
+will be used for all simulations; otherwise, \code{model} and \code{weather} should
+have the same length.}
 
-\item{weather}{A path of an EnergyPlus EPW weather file.}
-
-\item{output_dir}{Output directory path. If NULL, the directory of input
-model is used.}
+\item{output_dir}{Output directory path (for \code{rum_idf()}) or paths (for
+\code{run_mult()}). If NULL, the directory of input model is used. For
+\code{run_multi()}, \code{output_dir}, if not \code{NULL}, should have the same length
+as \code{model}. Any duplicated combination of \code{model} and \code{output_dir} is
+prohibited.}
 
 \item{design_day}{Force design-day-only simulation. Default: \code{FALSE}.}
 
 \item{annual}{Force design-day-only simulation. Default: \code{FALSE}.}
 
-\item{expand_obj}{Where to run ExpandObject preprocessor before simulation.
+\item{expand_obj}{Whether to run ExpandObject preprocessor before simulation.
 Default: \code{TRUE}.}
 
-\item{echo}{Only applicable to \code{run_idf}. If \code{TRUE}, show EnergyPlus
-simulation process information to the console. If \code{FALSE}, which is default, a
-\link[processx:process]{processx::process} object is returned. Default: \code{TRUE}.}
+\item{wait}{If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
+finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
+and a \link[processx:process]{processx::process} object is returned. Note that, if \code{FALSE}, R is
+\emph{not blocked} even when \code{echo} is \code{TRUE}. Default: \code{TRUE}.}
 
-\item{parallel_backend}{Acceptable input for \code{\link[future:plan]{future::plan()}}. Default:
-\code{future::multiprocess}, which tries to run all models in parallel.}
+\item{echo}{Whether to show standard output and error from EnergyPlus
+commandline interface for \code{run_idf()} and simulation status for
+\code{run_multi()}.Default: \code{TRUE}.}
+
+\item{eplus}{An acceptable input (for \code{run_idf()}) or inputs (for
+\code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If
+\code{NULL}, which is the default, the version of EnergyPlus to use is
+detemined by the version of input model. For \code{run_multi()}, \code{eplus}, if not
+\code{NULL}, should have the same length as \code{model}.}
+}
+\value{
+A list for \code{run_idf()}. For \code{rum_multi()}, a
+\link[data.table:data.table]{data.table} if \code{wait} is \code{TRUE} or a
+\link[processx:process]{process} if \code{wait} is \code{FALSE}.
 }
 \description{
 \code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
@@ -43,14 +62,58 @@ run EnergyPlus model with different options.
 \code{run_multi()} provides the functionality of running multiple models in
 parallel.
 
-Behind the scene, \code{run_multi()} uses the
-\href{https://cran.r-project.org/package=furrr}{furrr} package which provides
-mapping functions in parallel using
-\href{https://cran.r-project.org/package=future}{future} package.
+\href{https://cran.r-project.org/package=later}{later} package is used to poll the
+standard output and error of background EnergyPlus process or background
+R process that handles parallel simulations. The print interval is set to
+0.5 sec.
 
-It is suggested to run simulations using \link[=job]{EplusJob} class, which
-provides much more detailed controls on the simulation and also methods to
-extract simulation output.
+For \code{run_idf()}, a named list will be returned:
+\itemize{
+\item \code{idf}: The path of IDF file
+\item \code{epw}: The path of EPW file
+\item \code{exit_status}: The exit code of the process if it has finished and NULL
+otherwise. Always being \code{NULL} if \code{wait} is FALSE, but you can manually
+get the exit code using the process object, i.e.
+\code{process$get_exit_status()} after simulation \emph{completed}.
+\item \code{start_time}: When the EnergyPlus process started.
+\item \code{end_time}: When the EnergyPlus process stopped. All being \code{NULL} if
+\code{wait} is \code{FALSE}, but you can manually check EnergyPlus \code{stdout} to get
+the simulation time
+\item \code{output_dir}: The simulation output directory
+\item \code{energyplus}: The path of EnergyPlus executable
+\item \code{stdout}: All standard output from EnergyPlus. Always being \code{NULL} if
+\code{wait} is \code{FALSE}, but you can manually get all standard output using
+\code{process$read_all_output_lines()}.
+\item \code{stderr}: All standard error from EnergyPlus. Always being \code{NULL} if
+\code{wait} is \code{FALSE}, but you can manually get all standard output using
+\code{process$read_all_output_lines()}.
+\item \code{process}: A \link[processx:process]{processx::process} object of current EnergyPlus simulation
+}
+
+For \code{run_multi()}, if \code{wait} is \code{TRUE}, a data.table contains all data
+(excluding \code{process}) with same column names as above, and also another
+two columns:
+\itemize{
+\item \code{index}: The index of simulation
+\item \code{status}: The status of simulation status. Should be one of below:
+\itemize{
+\item \code{"completed"}: the simulation job is completed. This only indicates
+that the job has been run before. But the job can end with error.
+Please check \code{exit_status} to determine whether EnergyPlus ran
+successfully
+\item \code{"terminated"}: the simulation job started but was terminated
+\item \code{"cancelled"}: the simulation job was cancelled
+}
+}
+
+For \code{run_multi()}, if \code{wait} is \code{FALSE}, a \link[callr:r_bg]{r_process}
+object of background R process which handles all simulation jobs is
+returned. You can check if the jobs are completed using \code{$is_alive()} and
+get the final data.table using \code{$get_result()}.
+
+It is suggested to run simulations using \link[=job]{EplusJob} class and
+\link[=param]{ParametricJob} class, which provide much more detailed controls
+on the simulation and also methods to extract simulation outputs.
 }
 \examples{
 \dontrun{
@@ -64,7 +127,7 @@ if (is_avail_eplus(8.8)) {
         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
     )
 
-    run_idf(8.8, idf_path, epw_path, output_dir = tempdir())
+    run_idf(idf_path, epw_path, output_dir = tempdir())
 
     # run multiple model in parallel
     idf_paths <- file.path(eplus_config(8.8)$dir, "ExampleFiles",
@@ -72,7 +135,7 @@ if (is_avail_eplus(8.8)) {
     )
     epw_paths <- rep(epw_path, times = 2L)
     output_dirs <- file.path(tempdir(), tools::file_path_sans_ext(basename(idf_paths)))
-    run_multi(8.8, idf_paths, epw_paths, output_dir = output_dirs)
+    run_multi(idf_paths, epw_paths, output_dir = output_dirs)
 }
 }
 }

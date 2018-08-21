@@ -21,9 +21,9 @@ automatically created if it does not exists like \code{\link[=idf]{Idf}} class.
 param$seed()
 param$weater()
 param$apply_measure(measure, ..., .names = NULL)
-param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
+param$run(dir = NULL, wait = TRUE)
+param$kill()
+param$status()
 param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -77,9 +77,9 @@ the new \code{Idf}s will be named in format \code{measure_name + number}.
 }
 
 \section{Run and Collect Results}{
-\preformatted{param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
+\preformatted{param$run(dir = NULL, wait = TRUE)
+param$kill()
+param$status()
 param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -88,17 +88,89 @@ param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz =
 param$tabular_data(which = NULL)
 }
 
-All those functions have the same meaning in \link[=job]{EplusJob class}, except that they
-only return the results of specified simulation.
+All those functions have the same meaning as in \link[=job]{EplusJob class}, except
+that they only return the results of specified simulations. Most arguments
+have the same meanings as in \link[=job]{EplusJob class}.
+
+\code{$run()} runs the all parametric simulations in parallel. The number of
+parallel EnergyPlus process can be controlled by
+\code{eplusr_option("num_parallel")}. If \code{wait} is FALSE, then the job will be
+run in the background. You can get updated job status by just print the
+ParametricJob object.
+
+\code{$kill()} kills the all background EnergyPlus processes that are current
+running if possible. It only works when simulation runs in non-waiting
+mode.
+
+\code{$status()} returns a named list of values indicates the status of the job:
+\itemize{
+\item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
+\item \code{alive}: \code{TRUE} if the job is still running in the background. \code{FALSE}
+otherwise.
+\item \code{terminated}: \code{TRUE} if the job was terminated during last
+simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
+\item \code{successful}: \code{TRUE} if last simulation ended successfully. \code{FALSE}
+otherwise. \code{NA} if the job has not been run yet.
+\item \code{changed_after}: \code{TRUE} if the \emph{seed model} has been modified since last
+simulation. \code{FALSE} otherwise.
+}
+
+\code{$output_dir()} returns the output directory of specified simulations.
+
+\code{$locate_output()} returns the path of a single output file of specified
+simulations.
+
+\code{$report_data_dict()} returns a data.table which contains all information
+about report data for specified simulations. For details on the meaning
+of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
+EnergyPlus "Output Details and Examples" documentation.
+
+\code{$report_data()} extracts the report data in a data.table using key values
+and variable names.
+
+\code{$tabular_data()} extracts all tabular data in a data.table.
+
+For \code{$report_data_dict()}, \code{$report_data()} and \code{$tabular_data()}, the
+returned data.table has a \code{Case} column in the returned data.table that
+indicates the names of parametric models.
 
 \strong{Arguments}
 \itemize{
 \item \code{which}: An integer vector of the indexes or a character vector or names of
-parametric simulations.
-\item \code{parallel_backend}: Any acceptable input for \code{\link[future:plan]{future::plan()}}.
+parametric simulations. If \code{NULL}, which is the default, results of all
+parametric simulations are returned.
+\item \code{dir}: The parent output directory for all simulation. Outputs of each
+simulation are placed in a separate folder under the parent directory.
+\item \code{wait}: If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
+finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
+Default: \code{TRUE}.
+\item \code{suffix}: A string that indicates the file suffix of simulation output.
+Default: \code{".err"}.
+\item \code{strict}: If \code{TRUE}, it will check if the simulation was terminated, is
+still running or the file exists or not. Default: \code{TRUE}.
+\item \code{key_value}: A character vector to identify key name of the data. If
+\code{NULL}, all keys of that variable will be returned. Default: \code{NULL}.
+\item \code{name}: A character vector to specify the actual data name. If \code{NULL}, all
+variables will be returned. Default: \code{NULL}.
+\item \code{year}: The year of the date and time in column \code{DateTime}. If \code{NULL}, it
+will be the current year. Default: \code{NULL}
+\item \code{tz}: Time zone of date and time in column \code{DateTime}. Default: \code{"GMT"}.
+}
 }
 
-All other arguments have the same meanings as in \link[=job]{EplusJob class}.
+\section{Printing}{
+\preformatted{param$print()
+print(param)
+}
+
+\code{$print()} shows the core information of this ParametricJob, including the
+path of seed model and weather, the version and path of EnergyPlus used
+to run simulations, the measured that has been applied and parametric
+models generated, and the simulation job status.
+
+\code{$print()} is quite useful to get the simulation status, especially when
+\code{wait} is \code{FALSE} in \code{$run()}. The job status will be updated and printed
+whenever \code{$print()} is called.
 }
 
 \examples{

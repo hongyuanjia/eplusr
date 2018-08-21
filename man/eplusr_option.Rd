@@ -61,3 +61,6 @@ eplusr_option("verbose_info")
 # set options
 eplusr_option(verbose_info = TRUE, view_in_ip = FALSE)
 }
+\author{
+Hongyuan Jia
+}

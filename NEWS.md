@@ -1,4 +1,32 @@
-# eplusr 0.8.4
+# eplusr 0.9.0
+
+## Break Changes
+
+* `parallel_backend` argument in `run_multi()` has been removed, due to the
+   reason that supporting remote parallel computing is out of the scope of this
+   package. This makes it possible to remove both `future` and `furrr` package
+   dependencies. The default behavior of `run_multi()` does not change if
+   running on local machine, as it still runs multiple EnergyPlus instances in
+   parallel.
+
+* In `run_idf()` and `run_multi()`, `eplus` argument has been moved to be the
+  last argument with default value setting to `NULL`. This will make them a
+  little bit more convenient to run EnergyPlus without explicitly specify the
+  version. If `NULL`, the version of EnergyPlus is automatically detected using
+  the version field of input model. For example:
+    ```r
+    # before
+    run_idf(8.8, model.idf, weather.epw)
+
+    # after
+    run_idf(model.idf, weather.epw)
+    ```
+
+* Both argument `echo` and `wait` have been added to `run_idf()` and
+  `run_multi()`. Unlike the behavior in eplusr 0.8.3 when `echo` is `TRUE` in
+  `run_idf()`, right now `echo` only control whether to show the output from
+  EnergyPlus commandline interface. Please use `wait` to control whether to wait
+  until the simulation is complete or not.
 
 ## New features
 
@@ -8,6 +36,10 @@
   which makes it possible to run most examples without installing EnergyPlus. Of
   cause, for examples in `EplusJob` and `ParametricJob` class, EnergyPlus
   installation is needed to run them successfully.
+
+* The brilliant package [crayon](https://CRAN.R-project.org/package=crayon) is
+  used to support colorful printing of `Idd`, `Idf`, `IddObject`, `IdfObject`,
+  `Epw`, `EplusJob` and `ParametricJob` classes.
 
 * A new type of `"character"` validation has been added, which will check if
   field values should be characters but are not.
@@ -61,6 +93,9 @@
   when tring to read simulation output using `$report_data()`,
   `$report_data_dict` and `tabular_data()` in `EplusJob` class.
 
+* `run_idf()` and `run_multi()` now does not call `clean_wd()` as this is
+   automatically handled by EnergyPlus itself.
+
 ## Bug fixes
 
 * Fix errors when try to get units `$field_name()`, `$field_unit()` and
@@ -78,6 +113,9 @@
 * Fix the error when `unit` is set to `TRUE` in `$get_data()` in `Epw` class.
 
 * Fix the error that `$state_province` in `Epw` class always returns `NULL`.
+
+* Fix the error of missing expanded IDF files which occured randomly in
+  `run_multi()`.
 
 # eplusr 0.8.3
 

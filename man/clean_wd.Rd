@@ -15,12 +15,9 @@ output files of previous simulation.
 }
 \details{
 \code{clean_wd()} imitates the same process that EnergyPlus does whenever a new
-simulation is get to start. It deletes all related output files that have
+simulation is getting to start. It deletes all related output files that have
 the same name prefix as the input path. The input model itself and any
-weather file is not deleted.
-
-\code{clean_wd()} is called internally in functions that call EnergyPlus, such as
-\code{run_idf()}, \code{run_multi()} and \code{$run()} in \code{\link[=job]{EplusJob}} class.
+weather file are not deleted.
 }
 \examples{
 \dontrun{
