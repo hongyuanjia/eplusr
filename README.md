@@ -113,7 +113,6 @@ idd <- use_idd(8.8, download = "auto")
 #> IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.
 #> Start parsing...
 #> 
-  Parsing IDD (Parsing ) [======>---------------------------]  20% in  0s
   Parsing IDD (Parsing ) [=========>------------------------]  30% in  0s
   Parsing IDD (Parsing ) [=============>--------------------]  40% in  0s
   Parsing IDD (Parsing ) [================>-----------------]  50% in  1s
@@ -154,15 +153,15 @@ model
 #> ───────────────────────────────────────────────────────────────────────────
 #> [01] Material
 #> [02] Material:NoMass
-#> [15] Construction
+#> [03] Construction
 ....
 
 model$Material_NoMass$R13LAYER
 #> IdfObject <<[ID:12] `R13LAYER`>>`Material:NoMass`
 #> ──────────────────────────────── * VALUES * ───────────────────────────────
-#> ★1: R13LAYER,          !- Name
-#> ★2: Rough,             !- Roughness
-#> ★3: 2.290965,          !- Thermal Resistance {m2-K/W}
+#> ●1: R13LAYER,          !- Name
+#> ●2: Rough,             !- Roughness
+#> ●3: 2.290965,          !- Thermal Resistance {m2-K/W}
 #>  4: 0.9,               !- Thermal Absorptance
 #>  5: 0.75,              !- Solar Absorptance
 #>  6: 0.75;              !- Visible Absorptance
@@ -179,13 +178,13 @@ model$add_object("RunPeriod",
     list(name = "run_period", begin_month = 3, begin_day_of_month = 1,
          end_month = 4, end_day_of_month = 1))
 #> $run_period
-#> IdfObject <<[ID:66] `run_period`>>`RunPeriod`
+#> IdfObject <<[ID:54] `run_period`>>`RunPeriod`
 #> ──────────────────────────────── * VALUES * ───────────────────────────────
 #>   1: run_period,        !- Name
-#> ★ 2: 3,                 !- Begin Month
-#> ★ 3: 1,                 !- Begin Day of Month
-#> ★ 4: 4,                 !- End Month
-#> ★ 5: 1,                 !- End Day of Month
+#> ● 2: 3,                 !- Begin Month
+#> ● 3: 1,                 !- Begin Day of Month
+#> ● 4: 4,                 !- End Month
+#> ● 5: 1,                 !- End Day of Month
 #>   6: UseWeatherFile,    !- Day of Week for Start Day
 #>   7: Yes,               !- Use Weather File Holidays and Special Days
 #>   8: Yes,               !- Use Weather File Daylight Saving Period
@@ -207,16 +206,16 @@ job <- model$run(
     weather = file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"),
     dir = NULL)
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
+#> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing file located   at  /tmp/RtmpT0Q86n/model.idf .
+#> Replace the existing file located  at /tmp/RtmpGWmNQZ/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.006
+#> ExpandObjects Finished. Time:     0.005
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.22 10:08
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.22 17:21
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -241,23 +240,20 @@ job <- model$run(
 job$errors()
 #> 
 #> ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-#> │Warning[1/4] Weather file location will be used rather than entered (IDF) Location object.                                                 │
+#> │Warning[1/3] Weather file location will be used rather than entered (IDF) Location object.                                                 │
 #> │  ..Location object=DENVER CENTENNIAL  GOLDEN   N_CO_USA DESIGN_CONDITIONS                                                                 │
 #> │  ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940                                                                    │
 #> │  ..due to location differences, Latitude difference=[2.12] degrees, Longitude difference=[17.22] degrees.                                 │
 #> │  ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89] percent, [1827.00] meters.                                            │
 #> │                                                                                                                                           │
-#> │Warning[2/4] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
+#> │Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
 #> │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB, Standard Pressure (based on elevation) will be used.         │
 #> │                                                                                                                                           │
-#> │Warning[3/4] CheckUsedConstructions: There are 12 nominally unused constructions in input.                                                 │
-#> │  For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;                                           │
-#> │                                                                                                                                           │
-#> │Warning[4/4] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
+#> │Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
 #> │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB, Standard Pressure (based on elevation) will be used.     │
 #> └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 #> 
-#> EnergyPlus completed successfully with 4 Warning.
+#> EnergyPlus completed successfully with 3 Warning.
 
 job$report_data(name = "EnergyTransfer:Facility", case = "example")
 #>          Case            DateTime KeyValue                    Name Units

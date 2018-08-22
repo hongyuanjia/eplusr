@@ -233,17 +233,17 @@ format_field <- function (value_tbl, leading = 4L, in_ip = FALSE, sep_at = 29L,
         if (has_name(value_tbl, "required_field")) {
             value_tbl[required_field == TRUE, `:=`(
                 idx = crayon::red$bold(idx),
-                req = crayon::red$bold(cli::symbol$star)
+                req = crayon::red$bold(cli::symbol$bullet)
             )]
 
             value_tbl[required_field == FALSE, `:=`(
                 idx = crayon::cyan(idx),
-                req = crayon::cyan(strrep(" ", nchar(cli::symbol$star)))
+                req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet)))
             )]
         } else {
             value_tbl[, `:=`(
                 idx = crayon::cyan(idx),
-                req = crayon::cyan(strrep(" ", nchar(cli::symbol$star)))
+                req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet)))
             )]
         }
 

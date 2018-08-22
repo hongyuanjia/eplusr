@@ -35,6 +35,7 @@ in R.
 Useful links:
 \itemize{
   \item \url{https://hongyuanjia.github.io/eplusr}
+  \item \url{https://github.com/hongyuanjia/eplusr}
   \item Report bugs at \url{https://github.com/hongyuanjia/eplusr/issues}
 }
 

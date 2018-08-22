@@ -3544,13 +3544,13 @@ i_print_iddobj <- function (self, private) {
 
     fld_tbl[required_field == TRUE, `:=`(
         idx = crayon::red$bold(idx),
-        req = crayon::red$bold(cli::symbol$star),
+        req = crayon::red$bold(cli::symbol$bullet),
         full_name = crayon::red$bold(full_name),
         full_ipname = crayon::red$bold(full_ipname)
     )]
     fld_tbl[required_field == FALSE, `:=`(
         idx = crayon::cyan(idx),
-        req = crayon::cyan(strrep(" ", nchar(cli::symbol$star))),
+        req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet))),
         full_name = crayon::cyan(full_name),
         full_ipname = crayon::cyan(full_ipname)
     )]
