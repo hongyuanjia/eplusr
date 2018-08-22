@@ -50,13 +50,10 @@ test_that("Parametric methods", {
     # expect_error(param$errors(), "job was terminated before")
     # expect_error(param$locate_output(), "job was terminated before")
 
-    # can run the simulation
     dir_nms <- paste0("set_infil_rate_", 1:5)
-    expect_output(param$run(dir = NULL))
-
-    # can get status of simulation
+    # can run the simulation and get status of simulation
     expect_equal(
-        param$status(),
+        {param$run(dir = NULL); param$status()},
         list(run_before = TRUE, alive = FALSE, terminated = FALSE,
             successful = TRUE, changed_after = FALSE
         )
