@@ -285,7 +285,7 @@ NULL
 #'
 #'  Underlying, `$validate()` returned a list of thirteen components. Except
 #'      `missing_object`, which is a character vector, all other components are
-#'      [data.tables][data.table::data.table()]s. The contents of each component
+#'      [data.tables][data.table::data.table()]. The contents of each component
 #'      are described blow:
 #'
 #'    * `missing_object`: A character vector that contains names of classes

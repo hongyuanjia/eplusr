@@ -19,20 +19,20 @@ is_avail_idd(ver)
 \item{idd}{Either a path, a connection, or literal data (either a single
 string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
 file, usually named as \code{Energy+.idd}, or a valid version of IDD, e.g.
-8.9, "8.9.0".}
+\code{8.9}, \code{"8.9.0"}.}
 
 \item{download}{If \code{TRUE} and argument \code{idd}, the IDD file will be
 downloaded from \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository},
 and saved to \code{\link[=tempdir]{tempdir()}}. It will be parsed after it is downloaded
 successfully. A special value of \code{"auto"} can be given, which will
 automatically download corresponding IDD file if the Idd object is
-currently not available. It is useful in case where you only want to edit an
-EnergyPlus Input Data File (IDF) directly but do not want to install
+currently not available. It is useful in case when you only want to edit
+an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is \code{FALSE}.}
 
-\item{ver}{A valid EnergyPlus version, e.g. 8, 8.7, "8.7" or "8.7.0". For
-\code{download_idd()}, the special value \code{"latest"}, which is default, means
-the latest version.}
+\item{ver}{A valid EnergyPlus version, e.g. \code{8,} \code{8.7,} \code{"8.7"} or \code{"8.7.0"}.
+For \code{download_idd()}, the special value \code{"latest"}, which is default,
+means the latest version.}
 
 \item{dir}{A directory to indicate where to save the IDD file.}
 }

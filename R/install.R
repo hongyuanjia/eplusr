@@ -47,7 +47,7 @@ NULL
 #' install_eplus("latest")
 #'
 #' # for a specific version of EnergyPlus
-#' download_eplus(8.8)
+#' download_eplus(8.8, dir = tempdir())
 #' install_eplus(8.8)
 #' }
 #' @author Hongyuan Jia

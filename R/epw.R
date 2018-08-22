@@ -122,7 +122,7 @@ NULL
 #' `$start_day_of_week` are all active bindings, which means that you can get
 #' the value and also set new value to it.
 #'
-#' NOTE: Please be super careful when trying to modify those data. Some of them
+#' **NOTE**: Please be super careful when trying to modify those data. Some of them
 #' must be consistent with weather data in order to make the weather file
 #' successfully parsed by EnergyPlus and eplusr.
 #'

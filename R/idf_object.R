@@ -238,6 +238,16 @@ NULL
 #' print(idfobj)
 #' ```
 #'
+#' `$print()` prints the IdfObject. Basically, the print output can be divided
+#'     into three parts:
+#'
+#'     * OBJECT: object id and name (if applicable) and IDD class name of
+#'     * COMMENTS: object comments
+#'     * VALUES: fields and values of current IDD class. Required fields are
+#'       marked with bullet marks. Only the minimum fields are printed. E.g.,
+#'       the last printed field is either the last required field or the last
+#'       non-empty field.
+#'
 #' **Arguments**
 #'
 #' * `comment`: If `FALSE`, all comments will not be included.

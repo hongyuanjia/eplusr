@@ -196,19 +196,20 @@ NULL
 #'
 #' `$is_required_field()` returns `TRUE` if the field is required.
 #'
-#' `$print()` prints the IdfObject. Basically, the print output can be divided
+#' `$print()` prints the IddObject. Basically, the print output can be divided
 #'     into four parts:
+#'
 #'     * CLASS: IDD class name of current object
-#'     * MEMO: Brief description of the IDD class
+#'     * MEMO: brief description of the IDD class
 #'     * PROPERTY: properties of the IDD class, including name of group it
 #'       belongs to, whether it is an unique or required class and current total
 #'       fields. The fields may increase if the IDD class is extensible, such as
 #'       `Branch`, `ZoneList` and etc.
 #'     * FIELDS: fields of current IDD class. Required fields are marked with
-#'       `*`. If the class is extensible, only the first extensible group will
-#'       be printed and two ellipses will be shown at the bottom. Fields in the
-#'       extensible group will be marked with an arrow down surrounded by angle
-#'       brackets.
+#'       bullet marks. If the class is extensible, only the first extensible
+#'       group will be printed and two ellipses will be shown at the bottom.
+#'       Fields in the extensible group will be marked with an arrow down
+#'       surrounded by angle brackets.
 #'
 #' @examples
 #' # get a parent Idd object

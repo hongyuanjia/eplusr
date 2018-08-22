@@ -134,18 +134,20 @@ clean_wd <- function (path) {
 #'      `process$read_all_output_lines()`.
 #'   * `process`: A [processx::process] object of current EnergyPlus simulation
 #'
-#' For `run_multi()`, if `wait` is `TRUE`, a data.table contains all data
-#'     (excluding `process`) with same column names as above, and also another
-#'     two columns:
+#' For `run_multi()`, if `wait` is `TRUE`, a
+#'     [data.table][data.table::data.table()] contains all data (excluding
+#'     `process`) with same column names as above, and also another two columns:
 #'
 #'   * `index`: The index of simulation
 #'   * `status`: The status of simulation status. Should be one of below:
 #'       - `"completed"`: the simulation job is completed. This only indicates
-#'          that the job has been run before. But the job can end with error.
-#'          Please check `exit_status` to determine whether EnergyPlus ran
-#'          successfully
+#'          that the calling of EnergyPlus was successfully and EnergyPlus was
+#'          not terminated during simulation. Even `"completed" is `TRUE`, the
+#'          job can still end with error.  Please check `exit_status` to
+#'          determine whether EnergyPlus ran successfully
 #'       - `"terminated"`: the simulation job started but was terminated
-#'       - `"cancelled"`: the simulation job was cancelled
+#'       - `"cancelled"`: the simulation job was cancelled, i.e. did not start
+#'          at all.
 #'
 #' For `run_multi()`, if `wait` is `FALSE`, a [r_process][callr::r_bg()]
 #'     object of background R process which handles all simulation jobs is

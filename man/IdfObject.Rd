@@ -242,6 +242,15 @@ values and field names.  Default: \code{29}.
 print(idfobj)
 }
 
+\code{$print()} prints the IdfObject. Basically, the print output can be divided
+into three parts:\preformatted{* OBJECT: object id and name (if applicable) and IDD class name of
+* COMMENTS: object comments
+* VALUES: fields and values of current IDD class. Required fields are
+  marked with bullet marks. Only the minimum fields are printed. E.g.,
+  the last printed field is either the last required field or the last
+  non-empty field.
+}
+
 \strong{Arguments}
 \itemize{
 \item \code{comment}: If \code{FALSE}, all comments will not be included.

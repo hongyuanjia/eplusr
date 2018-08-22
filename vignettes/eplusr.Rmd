@@ -200,8 +200,9 @@ group and class exists in current model.
 ## Class definition
 
 You can get class definitions using `$definition()`, which returns a list
-of `IddObject`s. All required fields in each class are marked with `*`. For
-example, you can get the `IddObject` of class `Material`:
+of `IddObject`s. All required fields in each class are marked with
+`r cli::symbol$bullet`. For example, you can get the `IddObject` of class
+`Material`:
 
 ```{r all_field}
 def_mat <- model$definition(class = "Material")[[1]]

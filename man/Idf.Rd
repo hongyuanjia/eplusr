@@ -296,7 +296,7 @@ also be done.
 
 Underlying, \code{$validate()} returned a list of thirteen components. Except
 \code{missing_object}, which is a character vector, all other components are
-\link[data.table:data.table]{data.tables}s. The contents of each component
+\link[data.table:data.table]{data.tables}. The contents of each component
 are described blow:
 \itemize{
 \item \code{missing_object}: A character vector that contains names of classes

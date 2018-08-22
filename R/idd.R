@@ -323,18 +323,18 @@ read_idd <- function (path) {
 #' @param idd Either a path, a connection, or literal data (either a single
 #'     string or a raw vector) to an EnergyPlus Input Data Dictionary (IDD)
 #'     file, usually named as `Energy+.idd`, or a valid version of IDD, e.g.
-#'     8.9, "8.9.0".
+#'     `8.9`, `"8.9.0"`.
 #' @param download If `TRUE` and argument `idd`, the IDD file will be
 #'     downloaded from [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus),
 #'     and saved to [tempdir()]. It will be parsed after it is downloaded
 #'     successfully. A special value of `"auto"` can be given, which will
 #'     automatically download corresponding IDD file if the Idd object is
-#'     currently not available. It is useful in case where you only want to edit an
-#'     EnergyPlus Input Data File (IDF) directly but do not want to install
+#'     currently not available. It is useful in case when you only want to edit
+#'     an EnergyPlus Input Data File (IDF) directly but do not want to install
 #'     whole EnergyPlus software. Default is `FALSE`.
-#' @param ver A valid EnergyPlus version, e.g. 8, 8.7, "8.7" or "8.7.0". For
-#'     `download_idd()`, the special value `"latest"`, which is default, means
-#'     the latest version.
+#' @param ver A valid EnergyPlus version, e.g. `8,` `8.7,` `"8.7"` or `"8.7.0"`.
+#'     For `download_idd()`, the special value `"latest"`, which is default,
+#'     means the latest version.
 #' @param dir A directory to indicate where to save the IDD file.
 #'
 #' @details

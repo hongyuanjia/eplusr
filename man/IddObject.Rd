@@ -204,19 +204,19 @@ number of field in the extensible group is 3.
 
 \code{$is_required_field()} returns \code{TRUE} if the field is required.
 
-\code{$print()} prints the IdfObject. Basically, the print output can be divided
-into four parts:
-* CLASS: IDD class name of current object
-* MEMO: Brief description of the IDD class
+\code{$print()} prints the IddObject. Basically, the print output can be divided
+into four parts:\preformatted{* CLASS: IDD class name of current object
+* MEMO: brief description of the IDD class
 * PROPERTY: properties of the IDD class, including name of group it
-belongs to, whether it is an unique or required class and current total
-fields. The fields may increase if the IDD class is extensible, such as
-\code{Branch}, \code{ZoneList} and etc.
+  belongs to, whether it is an unique or required class and current total
+  fields. The fields may increase if the IDD class is extensible, such as
+  `Branch`, `ZoneList` and etc.
 * FIELDS: fields of current IDD class. Required fields are marked with
-\code{*}. If the class is extensible, only the first extensible group will
-be printed and two ellipses will be shown at the bottom. Fields in the
-extensible group will be marked with an arrow down surrounded by angle
-brackets.
+  bullet marks. If the class is extensible, only the first extensible
+  group will be printed and two ellipses will be shown at the bottom.
+  Fields in the extensible group will be marked with an arrow down
+  surrounded by angle brackets.
+}
 }
 
 \examples{
