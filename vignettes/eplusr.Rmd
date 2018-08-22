@@ -33,6 +33,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 })
 
 knitr::opts_knit$set(root.dir = tempdir())
+
+options(crayon.enabled = FALSE)
 ```
 
 eplusr provides a rich toolkit of using whole building energy simulation program
