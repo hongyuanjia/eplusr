@@ -17,7 +17,7 @@ An \code{EplusJob} object.
 \description{
 \code{eplus_job()} takes an IDF and EPW as input, and returns an \code{EplusJob} object
 for running EnergyPlus simulation and collecting outputs. For more details,
-please see \link{job}.
+please see \link{EplusJob}.
 }
 \examples{
 if (is_avail_eplus(8.8)) {

@@ -62,7 +62,7 @@ methods to extract simulation outputs." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -177,27 +177,27 @@ returned.  Default: <code>"all"</code>.</p></li>
 job$kill()
 job$status()
 </pre>
-    <p><code>$run()</code> runs the simulation using input model and weather file.</p>
+    <p><code>$run()</code> runs the simulation using input model and weather file.
+If <code>wait</code> is FALSE, then the job will be run in the background. You can
+get updated job status by just print the EplusJob object.</p>
 <p><code>$kill()</code> kills the background EnergyPlus process if possible. It only
-works when simulation runs in waiting mode.</p>
+works when simulation runs in non-waiting mode.</p>
 <p><code>$status()</code> returns a named list of values indicates the status of the job:</p><ul>
-<li><p><code>run_before</code>: <code>TRUE</code> if the job has been run before.</p></li>
-<li><p><code>changed_after</code>: <code>TRUE</code> if the IDF file has been changed since last
-simulation.</p></li>
+<li><p><code>run_before</code>: <code>TRUE</code> if the job has been run before. <code>FALSE</code> otherwise.</p></li>
+<li><p><code>alive</code>: <code>TRUE</code> if the simulation is still running in the background.
+<code>FALSE</code> otherwise.</p></li>
 <li><p><code>terminated</code>: <code>TRUE</code> if the simulation was terminated during last
-simulation.</p></li>
-<li><p><code>successful</code>: <code>TRUE</code> if last simulation ended successfully.</p></li>
-<li><p><code>alive</code>: <code>TRUE</code> if the simulation is still running in the background.</p></li>
-<li><p><code>wait</code>: <code>TRUE</code> if the simulation was run in waiting mode last time.</p></li>
+simulation. <code>FALSE</code> otherwise. <code>NA</code> if the job has not been run yet.</p></li>
+<li><p><code>successful</code>: <code>TRUE</code> if last simulation ended successfully. <code>FALSE</code>
+otherwise. <code>NA</code> if the job has not been run yet.</p></li>
+<li><p><code>changed_after</code>: <code>TRUE</code> if the IDF file has been changed since last
+simulation. <code>FALSE</code> otherwise. <code>NA</code> if the job has not been run yet.</p></li>
 </ul>
     <p><strong>Arguments</strong></p><ul>
-<li><p><code>echo</code>: Only applicable to <code>run_idf</code>. Show EnergyPlus simulation process
-information to the console.  If <code>FALSE</code>, which is default, a
-<a href='http://www.rdocumentation.org/packages/processx/topics/process'>processx::process</a> object will be return.</p></li>
 <li><p><code>wait</code>: If <code>TRUE</code>, R will hang on and wait for the simulation to complete.
-Output from EnergyPlus command line interface will be printed into the
-console as well. If <code>FALSE</code>, simulation will be run in a background
-process. Default: <code>TRUE</code>.</p></li>
+EnergyPlus standard output (stdout) and error (stderr) is printed to the
+R console. If <code>FALSE</code>, simulation will be run in a background process.
+Default: <code>TRUE</code>.</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="results-extraction"><a class="anchor" href="#results-extraction"></a>Results Extraction</h2>
@@ -236,6 +236,18 @@ will be the current year. Default: <code>NULL</code></p></li>
 of this simulation. If <code>"auto"</code>, the name of the IDF file will be used.</p></li>
 </ul>
     
+    <h2 class="hasAnchor" id="printing"><a class="anchor" href="#printing"></a>Printing</h2>
+
+    <pre>job$print()
+print(job)
+</pre>
+    <p><code>$print()</code> shows the core information of this EplusJob, including the
+path of model and weather, the version and path of EnergyPlus used
+to run simulations, and the simulation job status.</p>
+<p><code>$print()</code> is quite useful to get the simulation status, especially when
+<code>wait</code> is <code>FALSE</code> in <code>$run()</code>. The job status will be updated and printed
+whenever <code>$print()</code> is called.</p>
+    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='param.html'>ParametricJob class</a> for EnergyPlus parametric simulations.</p></div>
@@ -273,7 +285,6 @@ of this simulation. If <code>"auto"</code>, the name of the IDF file will be use
     <span class='co'># check the job status again</span>
     <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>run_before</span>
     <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>successful</span>
-    <span class='no'>job</span>$<span class='fu'>status</span>()$<span class='no'>wait</span>
 
     <span class='co'># get output directory</span>
     <span class='no'>job</span>$<span class='fu'>output_dir</span>()
@@ -339,6 +350,8 @@ of this simulation. If <code>"auto"</code>, the name of the IDF file will be use
       <li><a href="#run">Run</a></li>
 
       <li><a href="#results-extraction">Results Extraction</a></li>
+
+      <li><a href="#printing">Printing</a></li>
 
       <li><a href="#see-also">See also</a></li>
       

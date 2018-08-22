@@ -21,13 +21,13 @@ An \code{Idf} object.
 }
 \description{
 \code{read_idf} takes an EnergyPlus Input Data File (IDF) as input and returns an
-\code{Idf} object. For more details on \code{Idf} object, please see \link[=idf]{Idf class}.
+\code{Idf} object. For more details on \code{Idf} object, please see \link{Idf} class.
 }
 \details{
 Currently, Imf file is not fully supported. All EpMacro lines will be treated
 as normal comments of the nearest downwards object. If input is an Imf file,
 a warning will be given during parsing. It is recommended to convert the Imf
-file to an Idf file and use \code{\link[=param]{ParametricJob}} class to conduct
+file to an Idf file and use \link{ParametricJob} class to conduct
 parametric analysis.
 }
 \examples{
@@ -72,7 +72,7 @@ idf_string <-
 read_idf(idf_string, use_idd(8.8, download = "auto"))
 }
 \seealso{
-\link[=idf]{Idf class} for modifying EnergyPlus model. \code{\link[=use_idd]{use_idd()}} and
+\link{Idf} class for modifying EnergyPlus model. \code{\link[=use_idd]{use_idd()}} and
 \code{\link[=download_idd]{download_idd()}} for downloading and parsing EnergyPlus IDD file.
 \code{\link[=use_eplus]{use_eplus()}} for configuring which version of EnergyPlus to use.
 }

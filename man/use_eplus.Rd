@@ -36,7 +36,7 @@ Configure which version of EnergyPlus to use
 \details{
 \code{use_eplus()} adds an EnergyPlus version into the EnergyPlus version
 cache in eplusr. That cache will be used to get corresponding
-\code{\link[=idd]{Idd}} object when parsing IDF files and call corresponding
+\link{Idd} object when parsing IDF files and call corresponding
 EnergyPlus to run models.
 
 \code{eplus_config()} returns the a list of configure data of specified version of

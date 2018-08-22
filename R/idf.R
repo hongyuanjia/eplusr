@@ -26,7 +26,7 @@ NULL
 #' * `value_reference`: contains cross-reference of field values.
 #'
 #' IDD file is parsed and stored in a similar structure. For details, please see
-#' [Idd class][idd].
+#' [Idd] class.
 #'
 #' So to modify an EnergyPlus model in eplusr is equal to change the data in
 #' those four tables accordingly, in the context of specific IDD data.
@@ -118,7 +118,7 @@ NULL
 #'
 #' `$definition()` will return the definitions, i.e. the `IddObject`s, of given
 #'     classes which contain all data used for parsing `IdfObject`s. For details
-#'     of `IdfObject`, please see [IddObject class][idd_object].
+#'     of `IdfObject`, please see [IddObject] class.
 #'
 #' **Arguments**
 #'
@@ -190,7 +190,7 @@ NULL
 #'
 #' `IdfObject` is a class that provides more detailed information methods to
 #'     modify a single object in an `Idf` object. For detailed explanations,
-#'     please see [IdfObject class][idf_object].
+#'     please see [IdfObject] class.
 #'
 #' **Arguments**
 #'
@@ -450,8 +450,6 @@ NULL
 #' * `plain`: If `TRUE`, the model will be printed in plain text format with
 #'     newly added and modified objects at the bottom.
 #'
-#' @docType class
-#' @name idf
 #' @examples
 #' # ===== CREATE =====
 #' # read an IDF file
@@ -779,8 +777,9 @@ NULL
 #' }
 #' # print the text format of model
 #' idf$print(plain = TRUE)
-#' @aliases Idf
-#' @seealso [IdfObject class][idf_object]
+#' @docType class
+#' @name Idf
+#' @seealso [IdfObject] class
 #' @author Hongyuan Jia
 NULL
 
@@ -951,7 +950,7 @@ Idf <- R6::R6Class(classname = "Idf",
 #' Read an EnergyPlus Input Data File (IDF)
 #'
 #' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an
-#' `Idf` object. For more details on `Idf` object, please see [Idf class][idf].
+#' `Idf` object. For more details on `Idf` object, please see [Idf] class.
 #'
 #' @param path Either a path, a connection, or literal data (either a single
 #'     string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
@@ -964,7 +963,7 @@ Idf <- R6::R6Class(classname = "Idf",
 #' Currently, Imf file is not fully supported. All EpMacro lines will be treated
 #' as normal comments of the nearest downwards object. If input is an Imf file,
 #' a warning will be given during parsing. It is recommended to convert the Imf
-#' file to an Idf file and use [`ParametricJob`][param] class to conduct
+#' file to an Idf file and use [ParametricJob] class to conduct
 #' parametric analysis.
 #'
 #' @return An `Idf` object.
@@ -1008,7 +1007,7 @@ Idf <- R6::R6Class(classname = "Idf",
 #'     "
 #'
 #' read_idf(idf_string, use_idd(8.8, download = "auto"))
-#' @seealso [Idf class][idf] for modifying EnergyPlus model. [use_idd()] and
+#' @seealso [Idf] class for modifying EnergyPlus model. [use_idd()] and
 #' [download_idd()] for downloading and parsing EnergyPlus IDD file.
 #' [use_eplus()] for configuring which version of EnergyPlus to use.
 #' @export

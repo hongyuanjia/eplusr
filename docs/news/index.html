@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -99,15 +99,28 @@
       
     </div>
 
-    <div id="eplusr-0-8-4" class="section level1">
+    <div id="eplusr-0-9-0" class="section level1">
 <h1 class="page-header">
-<a href="#eplusr-0-8-4" class="anchor"></a>eplusr 0.8.4<small> Unreleased </small>
+<a href="#eplusr-0-9-0" class="anchor"></a>eplusr 0.9.0<small> Unreleased </small>
 </h1>
+<div id="break-changes" class="section level2">
+<h2 class="hasAnchor">
+<a href="#break-changes" class="anchor"></a>Break Changes</h2>
+<ul>
+<li><p><code>parallel_backend</code> argument in <code><a href="../reference/run_model.html">run_multi()</a></code> has been removed, due to the reason that supporting remote parallel computing is out of the scope of this package. This makes it possible to remove both <code>future</code> and <code>furrr</code> package dependencies. The default behavior of <code><a href="../reference/run_model.html">run_multi()</a></code> does not change if running on local machine, as it still runs multiple EnergyPlus instances in parallel.</p></li>
+<li>
+<p>In <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code>, <code>eplus</code> argument has been moved to be the last argument with default value setting to <code>NULL</code>. This will make them a little bit more convenient to run EnergyPlus without explicitly specify the version. If <code>NULL</code>, the version of EnergyPlus is automatically detected using the version field of input model. For example: ```r # before run_idf(8.8, model.idf, weather.epw)</p>
+<p># after run_idf(model.idf, weather.epw) ```</p>
+</li>
+<li><p>Both argument <code>echo</code> and <code>wait</code> have been added to <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code>. Unlike the behavior in eplusr 0.8.3 when <code>echo</code> is <code>TRUE</code> in <code><a href="../reference/run_model.html">run_idf()</a></code>, right now <code>echo</code> only control whether to show the output from EnergyPlus commandline interface. Please use <code>wait</code> to control whether to wait until the simulation is complete or not.</p></li>
+</ul>
+</div>
 <div id="new-features" class="section level2">
 <h2 class="hasAnchor">
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
 <li><p>Package documentation has been heavily updated. Examples of every exported class and most functions have been added. Also, an example IDF file <code>"1ZoneUncontrolled.idf"</code> from EnergyPus v8.8.0 is included in the package, which makes it possible to run most examples without installing EnergyPlus. Of cause, for examples in <code>EplusJob</code> and <code>ParametricJob</code> class, EnergyPlus installation is needed to run them successfully.</p></li>
+<li><p>The brilliant package <a href="https://CRAN.R-project.org/package=crayon">crayon</a> is used to support colorful printing of <code>Idd</code>, <code>Idf</code>, <code>IddObject</code>, <code>IdfObject</code>, <code>Epw</code>, <code>EplusJob</code> and <code>ParametricJob</code> classes.</p></li>
 <li><p>A new type of <code>"character"</code> validation has been added, which will check if field values should be characters but are not.</p></li>
 <li><p>A new option <code>copy_external</code> has been added in <code>$run()</code> in <code>Idf</code> class. If <code>TRUE</code>, the external files will also be copied into the output directory. Currently, only <code>Schedule:File</code> class is supported. This ensures that the output directory will have all files needed for the model to run.</p></li>
 <li><p><code>$validate()</code> in <code>Idf</code> and <code>IdfObject</code> class will also check incomplete extensible groups. Extensible groups that only contain any empty field are treated as invalid.</p></li>
@@ -126,6 +139,7 @@
 <li><p>The default value of <code>echo</code> in <code><a href="../reference/run_model.html">run_idf()</a></code> has been changed to <code>TRUE</code>, which will always show EnergyPlus simulation process to the console.</p></li>
 <li><p>Fix the error of <code>output_dir</code> argument checking in <code>rum_multi()</code>.</p></li>
 <li><p>Now an informative error message is given when there is no SQL output found when tring to read simulation output using <code>$report_data()</code>, <code>$report_data_dict</code> and <code>tabular_data()</code> in <code>EplusJob</code> class.</p></li>
+<li><p><code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> now does not call <code><a href="../reference/clean_wd.html">clean_wd()</a></code> as this is automatically handled by EnergyPlus itself.</p></li>
 </ul>
 </div>
 <div id="bug-fixes" class="section level2">
@@ -138,6 +152,7 @@
 <li><p>Fix the error that <code>$replace_value()</code> in <code>Idf</code> class did not update object names.</p></li>
 <li><p>Fix the error when <code>unit</code> is set to <code>TRUE</code> in <code>$get_data()</code> in <code>Epw</code> class.</p></li>
 <li><p>Fix the error that <code>$state_province</code> in <code>Epw</code> class always returns <code>NULL</code>.</p></li>
+<li><p>Fix the error of missing expanded IDF files which occured randomly in <code><a href="../reference/run_model.html">run_multi()</a></code>.</p></li>
 </ul>
 </div>
 </div>
@@ -228,7 +243,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-        <li><a href="#eplusr-0-8-4">0.8.4</a></li>
+        <li><a href="#eplusr-0-9-0">0.9.0</a></li>
         <li><a href="#eplusr-0-8-3">0.8.3</a></li>
         <li><a href="#eplusr-0-8-2">0.8.2</a></li>
         <li><a href="#eplusr-0-8-1">0.8.1</a></li>

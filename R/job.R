@@ -21,7 +21,7 @@ NULL
 #'
 #' @section NOTE:
 #'
-#' When using `$run()` in [Idf][idf] class, which internally creates an
+#' When using `$run()` in [Idf] class, which internally creates an
 #'     `EplusJob` object and calls its `$run()` method, an object in
 #'     `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
 #'     automatically created if it does not exists.
@@ -31,7 +31,7 @@ NULL
 #'     handling `Output:SQLite` class is not performed. If you want to ensure
 #'     that the output collection functionality in `EplusJob` class works
 #'     successfully, it is recommended to first read that IDF file using
-#'     [read_idf()] and then use `$run()` method in [Idf][idf] class by doing
+#'     [read_idf()] and then use `$run()` method in [Idf] class by doing
 #'     `idf$run()`.
 #'
 #' @section Usage:
@@ -160,9 +160,6 @@ NULL
 #'     `wait` is `FALSE` in `$run()`. The job status will be updated and printed
 #'     whenever `$print()` is called.
 #'
-#' @docType class
-#' @name job
-#' @aliases EplusJob
 #' @examples
 #' \dontrun{
 #' if (is_avail_eplus(8.8)) {
@@ -242,7 +239,9 @@ NULL
 #'     str(job$tabular_data())
 #' }
 #' }
-#' @seealso [ParametricJob class][param] for EnergyPlus parametric simulations.
+#' @docType class
+#' @name EplusJob
+#' @seealso [ParametricJob] class for EnergyPlus parametric simulations.
 #' @author Hongyuan Jia
 NULL
 
@@ -250,7 +249,7 @@ NULL
 #'
 #' `eplus_job()` takes an IDF and EPW as input, and returns an `EplusJob` object
 #' for running EnergyPlus simulation and collecting outputs. For more details,
-#' please see [job].
+#' please see [EplusJob].
 #'
 #' @param idf A path to an local EnergyPlus IDF file or an `Idf` object.
 #' @param epw A path to an local EnergyPlus EPW file or an `Epw` object.

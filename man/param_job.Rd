@@ -16,7 +16,7 @@ A \code{ParametricJob} object.
 }
 \description{
 \code{param_job()} takes an IDF and EPW as input and returns a \code{ParametricJob}.
-For details on \code{ParametricJob}, please see \link[=param]{ParametricJob class}.
+For details on \code{ParametricJob}, please see \link{ParametricJob} class.
 }
 \examples{
 if (is_avail_eplus(8.8)) {

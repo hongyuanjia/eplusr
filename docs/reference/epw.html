@@ -64,7 +64,7 @@ with some simplifications." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -256,7 +256,8 @@ value of <code>Sys.timezone()</code>.</p></li>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># read an EPW file from EnergyPlus website</span>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># read an EPW file from EnergyPlus website</span>
 <span class='no'>path_base</span> <span class='kw'>&lt;-</span> <span class='st'>"https://energyplus.net/weather-download"</span>
 <span class='no'>path_region</span> <span class='kw'>&lt;-</span> <span class='st'>"north_and_central_america_wmo_region_4/USA/CA"</span>
 <span class='no'>path_file</span> <span class='kw'>&lt;-</span> <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
@@ -274,283 +275,84 @@ value of <code>Sys.timezone()</code>.</p></li>
 }
 
 <span class='co'># get file path</span>
-<span class='no'>epw</span>$<span class='fu'>path</span>()</div><div class='output co'>#&gt; NULL</div><div class='input'>
+<span class='no'>epw</span>$<span class='fu'>path</span>()
+
 <span class='co'># get basic info</span>
-<span class='no'>epw</span>$<span class='no'>city</span></div><div class='output co'>#&gt; [1] "San Francisco Intl Ap"</div><div class='input'><span class='no'>epw</span>$<span class='no'>state_province</span></div><div class='output co'>#&gt; [1] "CA"</div><div class='input'><span class='no'>epw</span>$<span class='no'>country</span></div><div class='output co'>#&gt; [1] "USA"</div><div class='input'><span class='no'>epw</span>$<span class='no'>data_source</span></div><div class='output co'>#&gt; [1] "TMY3"</div><div class='input'><span class='no'>epw</span>$<span class='no'>wmo_number</span></div><div class='output co'>#&gt; [1] "724940"</div><div class='input'><span class='no'>epw</span>$<span class='no'>latitude</span></div><div class='output co'>#&gt; [1] 37.62</div><div class='input'><span class='no'>epw</span>$<span class='no'>longitude</span></div><div class='output co'>#&gt; [1] -122.4</div><div class='input'><span class='no'>epw</span>$<span class='no'>time_zone</span></div><div class='output co'>#&gt; [1] -8</div><div class='input'><span class='no'>epw</span>$<span class='no'>elevation</span></div><div class='output co'>#&gt; [1] 2</div><div class='input'><span class='no'>epw</span>$<span class='no'>time_step</span></div><div class='output co'>#&gt; [1] 1</div><div class='input'><span class='no'>epw</span>$<span class='no'>start_day_of_week</span></div><div class='output co'>#&gt; [1] "Sunday"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>city</span>
+<span class='no'>epw</span>$<span class='no'>state_province</span>
+<span class='no'>epw</span>$<span class='no'>country</span>
+<span class='no'>epw</span>$<span class='no'>data_source</span>
+<span class='no'>epw</span>$<span class='no'>wmo_number</span>
+<span class='no'>epw</span>$<span class='no'>latitude</span>
+<span class='no'>epw</span>$<span class='no'>longitude</span>
+<span class='no'>epw</span>$<span class='no'>time_zone</span>
+<span class='no'>epw</span>$<span class='no'>elevation</span>
+<span class='no'>epw</span>$<span class='no'>time_step</span>
+<span class='no'>epw</span>$<span class='no'>start_day_of_week</span>
+
 <span class='co'># set basic info</span>
 <span class='co'># NOTE: Use with caution. May mess up your weather data</span>
 <span class='no'>epw</span>$<span class='no'>city</span> <span class='kw'>&lt;-</span> <span class='st'>"Chongqing"</span>
-<span class='no'>epw</span>$<span class='no'>city</span></div><div class='output co'>#&gt; [1] "Chongqing"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>city</span>
+
 <span class='no'>epw</span>$<span class='no'>state_province</span> <span class='kw'>&lt;-</span> <span class='st'>"Chongqing"</span>
-<span class='no'>epw</span>$<span class='no'>state_province</span></div><div class='output co'>#&gt; [1] "Chongqing"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>state_province</span>
+
 <span class='no'>epw</span>$<span class='no'>country</span> <span class='kw'>&lt;-</span> <span class='st'>"China"</span>
-<span class='no'>epw</span>$<span class='no'>country</span></div><div class='output co'>#&gt; [1] "China"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>country</span>
+
 <span class='no'>epw</span>$<span class='no'>data_source</span> <span class='kw'>&lt;-</span> <span class='st'>"TMY"</span>
-<span class='no'>epw</span>$<span class='no'>data_source</span></div><div class='output co'>#&gt; [1] "TMY"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>data_source</span>
+
 <span class='no'>epw</span>$<span class='no'>wmo_number</span> <span class='kw'>&lt;-</span> <span class='st'>"724944"</span>
-<span class='no'>epw</span>$<span class='no'>wmo_number</span></div><div class='output co'>#&gt; [1] "724944"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>wmo_number</span>
+
 <span class='no'>epw</span>$<span class='no'>latitude</span> <span class='kw'>&lt;-</span> <span class='fl'>20.0</span>
-<span class='no'>epw</span>$<span class='no'>latitude</span></div><div class='output co'>#&gt; [1] 20</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>latitude</span>
+
 <span class='no'>epw</span>$<span class='no'>longitude</span> <span class='kw'>&lt;-</span> -<span class='fl'>120.0</span>
-<span class='no'>epw</span>$<span class='no'>longitude</span></div><div class='output co'>#&gt; [1] -120</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>longitude</span>
+
 <span class='no'>epw</span>$<span class='no'>time_zone</span> <span class='kw'>&lt;-</span> <span class='fl'>8</span>
-<span class='no'>epw</span>$<span class='no'>time_zone</span></div><div class='output co'>#&gt; [1] 8</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>time_zone</span>
+
 <span class='no'>epw</span>$<span class='no'>elevation</span> <span class='kw'>&lt;-</span> <span class='fl'>100</span>
-<span class='no'>epw</span>$<span class='no'>elevation</span></div><div class='output co'>#&gt; [1] 100</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>elevation</span>
+
 <span class='no'>epw</span>$<span class='no'>time_step</span> <span class='kw'>&lt;-</span> <span class='fl'>2</span>
-<span class='no'>epw</span>$<span class='no'>time_step</span></div><div class='output co'>#&gt; [1] 2</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>time_step</span>
+
 <span class='no'>epw</span>$<span class='no'>start_day_of_week</span> <span class='kw'>&lt;-</span> <span class='st'>"Monday"</span>
-<span class='no'>epw</span>$<span class='no'>start_day_of_week</span></div><div class='output co'>#&gt; [1] "Monday"</div><div class='input'>
+<span class='no'>epw</span>$<span class='no'>start_day_of_week</span>
+
 <span class='co'># get weather data</span>
-<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>())</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	8760 obs. of  36 variables:
-#&gt;  $ datetime                                        : POSIXct, format: "1999-01-01 01:00:00" "1999-01-01 02:00:00" ...
-#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...
-#&gt;  $ month                                           : int  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  $ day                                             : int  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  $ hour                                            : int  1 2 3 4 5 6 7 8 9 10 ...
-#&gt;  $ minute                                          : int  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;  $ datasource                                      : chr  "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" ...
-#&gt;  $ dry_bulb_temperature                            : num  7.2 7.2 6.7 6.1 4.4 4.4 6.1 5 7.8 8.9 ...
-#&gt;  $ dew_point_temperature                           : num  5.6 5.6 5 5 3.9 3.9 4.4 2.8 5 6.7 ...
-#&gt;  $ relative_humidity                               : num  90 90 89 93 97 97 89 86 82 86 ...
-#&gt;  $ atmospheric_pressure                            : num  102200 102100 102200 102200 102200 ...
-#&gt;  $ extraterrestrial_horizontal_radiation           : num  0 0 0 0 0 0 0 36 243 443 ...
-#&gt;  $ extraterrestrial_direct_normal_radiation        : num  0 0 0 0 0 ...
-#&gt;  $ horizontal_infrared_radiation_intensity_from_sky: num  290 296 291 276 280 280 287 281 295 299 ...
-#&gt;  $ global_horizontal_radiation                     : num  0 0 0 0 0 0 0 2 121 276 ...
-#&gt;  $ direct_normal_radiation                         : num  0 0 0 0 0 0 0 69 477 651 ...
-#&gt;  $ diffuse_horizontal_radiation                    : num  0 0 0 0 0 0 0 1 39 71 ...
-#&gt;  $ global_horizontal_illuminance                   : num  0 0 0 0 0 ...
-#&gt;  $ direct_normal_illuminance                       : num  0 0 0 0 0 ...
-#&gt;  $ diffuse_horizontal_illuminance                  : num  0 0 0 0 0 ...
-#&gt;  $ zenith_luminance                                : num  0 0 0 0 0 ...
-#&gt;  $ wind_direction                                  : num  0 170 210 200 260 180 0 0 0 0 ...
-#&gt;  $ wind_speed                                      : num  0 2.1 2.1 1.5 3.1 2.1 0 0 0 0 ...
-#&gt;  $ total_sky_cover                                 : int  2 4 3 0 3 3 3 3 3 2 ...
-#&gt;  $ opaque_sky_cover                                : int  2 4 3 0 3 3 3 3 3 2 ...
-#&gt;  $ visibility                                      : num  16 16 16 16 16 16 16 16 16 16 ...
-#&gt;  $ ceiling_height                                  : num  77777 77777 77777 77777 77777 ...
-#&gt;  $ present_weather_observation                     : int  9 9 9 9 9 9 9 9 9 9 ...
-#&gt;  $ present_weather_codes                           : chr  NA NA NA NA ...
-#&gt;  $ precipitable_water                              : num  129 120 120 120 120 120 120 110 110 110 ...
-#&gt;  $ aerosol_optical_depth                           : num  0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 ...
-#&gt;  $ snow_depth                                      : num  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;  $ days_since_last_snow                            : int  88 88 88 88 88 88 88 88 88 88 ...
-#&gt;  $ albedo                                          : num  0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 ...
-#&gt;  $ liquid_precip_depth                             : num  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;  $ liquid_precip_rate                              : num  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'>
+<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>())
+
 <span class='co'># get weather data but change the year to 2018</span>
 <span class='co'># the year column is not changed by default, only the returned datetime column</span>
-<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>)$<span class='no'>datetime</span>)</div><div class='output co'>#&gt;  POSIXct[1:8760], format: "2018-01-01 01:00:00" "2018-01-01 02:00:00" "2018-01-01 03:00:00" ...</div><div class='input'><span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>)$<span class='no'>year</span>)</div><div class='output co'>#&gt;  int [1:8760] 1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...</div><div class='input'><span class='co'># you can force to update the year column</span>
-<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>, <span class='kw'>update</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>year</span>)</div><div class='output co'>#&gt;  int [1:8760] 2018 2018 2018 2018 2018 2018 2018 2018 2018 2018 ...</div><div class='input'>
+<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>)$<span class='no'>datetime</span>)
+<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>)$<span class='no'>year</span>)
+<span class='co'># you can force to update the year column</span>
+<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>year</span> <span class='kw'>=</span> <span class='fl'>2018</span>, <span class='kw'>update</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>year</span>)
+
 <span class='co'># get weather data with units</span>
-<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>unit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt; Classes ‘data.table’ and 'data.frame':	8760 obs. of  36 variables:
-#&gt;  $ datetime                                        : POSIXct, format: "1999-01-01 01:00:00" "1999-01-01 02:00:00" ...
-#&gt;  $ year                                            : int  1999 1999 1999 1999 1999 1999 1999 1999 1999 1999 ...
-#&gt;  $ month                                           : int  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  $ day                                             : int  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;  $ hour                                            : int  1 2 3 4 5 6 7 8 9 10 ...
-#&gt;  $ minute                                          : int  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;  $ datasource                                      : chr  "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" "?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9" ...
-#&gt;  $ dry_bulb_temperature                            :Object of class units:
-#&gt;  num  7.2 7.2 6.7 6.1 4.4 4.4 6.1 5 7.8 8.9 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "°C"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ dew_point_temperature                           :Object of class units:
-#&gt;  num  5.6 5.6 5 5 3.9 3.9 4.4 2.8 5 6.7 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "°C"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ relative_humidity                               :Object of class units:
-#&gt;  num  90 90 89 93 97 97 89 86 82 86 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "%"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ atmospheric_pressure                            :Object of class units:
-#&gt;  num  102200 102100 102200 102200 102200 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "Pa"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ extraterrestrial_horizontal_radiation           :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 36 243 443 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ extraterrestrial_direct_normal_radiation        :Object of class units:
-#&gt;  num  0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ horizontal_infrared_radiation_intensity_from_sky:Object of class units:
-#&gt;  num  290 296 291 276 280 280 287 281 295 299 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ global_horizontal_radiation                     :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 2 121 276 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ direct_normal_radiation                         :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 69 477 651 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ diffuse_horizontal_radiation                    :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 1 39 71 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr  "h" "W"
-#&gt;   .. ..$ denominator: chr  "m" "m"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ global_horizontal_illuminance                   :Object of class units:
-#&gt;  num  0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "lx"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ direct_normal_illuminance                       :Object of class units:
-#&gt;  num  0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "lx"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ diffuse_horizontal_illuminance                  :Object of class units:
-#&gt;  num  0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "lx"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ zenith_luminance                                :Object of class units:
-#&gt;  num  0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "lx"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ wind_direction                                  :Object of class units:
-#&gt;  num  0 170 210 200 260 180 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "°"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ wind_speed                                      :Object of class units:
-#&gt;  num  0 2.1 2.1 1.5 3.1 2.1 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "m"
-#&gt;   .. ..$ denominator: chr "s"
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ total_sky_cover                                 :Object of class units:
-#&gt;  int  2 4 3 0 3 3 3 3 3 2 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ opaque_sky_cover                                :Object of class units:
-#&gt;  int  2 4 3 0 3 3 3 3 3 2 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ visibility                                      :Object of class units:
-#&gt;  num  16 16 16 16 16 16 16 16 16 16 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "km"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ ceiling_height                                  :Object of class units:
-#&gt;  num  77777 77777 77777 77777 77777 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "m"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ present_weather_observation                     :Object of class units:
-#&gt;  int  9 9 9 9 9 9 9 9 9 9 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ present_weather_codes                           : chr  NA NA NA NA ...
-#&gt;  $ precipitable_water                              :Object of class units:
-#&gt;  num  129 120 120 120 120 120 120 110 110 110 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "mm"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ aerosol_optical_depth                           :Object of class units:
-#&gt;  num  0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 0.108 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ snow_depth                                      :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "cm"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ days_since_last_snow                            :Object of class units:
-#&gt;  int  88 88 88 88 88 88 88 88 88 88 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ albedo                                          :Object of class units:
-#&gt;  num  0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 0.16 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr 
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ liquid_precip_depth                             :Object of class units:
-#&gt;  num  0 0 0 0 0 0 0 0 0 0 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "mm"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  $ liquid_precip_rate                              :Object of class units:
-#&gt;  num  1 1 1 1 1 1 1 1 1 1 ...
-#&gt;   ..- attr(*, "units")=List of 2
-#&gt;   .. ..$ numerator  : chr "h"
-#&gt;   .. ..$ denominator: chr 
-#&gt;   .. ..- attr(*, "class")= chr "symbolic_units"
-#&gt;  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </div><div class='input'><span class='co'># with units specified, you can easily perform unit conversion using units</span>
+<span class='fu'>str</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>unit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))
+<span class='co'># with units specified, you can easily perform unit conversion using units</span>
 <span class='co'># package</span>
 <span class='no'>t_dry_bulb</span> <span class='kw'>&lt;-</span> <span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>unit</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)$<span class='no'>dry_bulb_temperature</span>
 <span class='fu'>units</span>(<span class='no'>t_dry_bulb</span>) <span class='kw'>&lt;-</span> <span class='fu'>with</span>(<span class='kw pkg'>units</span><span class='kw ns'>::</span><span class='no'><a href='http://www.rdocumentation.org/packages/units/topics/ud_units'>ud_units</a></span>, <span class='st'>"kelvin"</span>)
-<span class='fu'>str</span>(<span class='no'>t_dry_bulb</span>)</div><div class='output co'>#&gt; Object of class units:
-#&gt;  num [1:8760] 280 280 280 279 278 ...
-#&gt;  - attr(*, "units")=List of 2
-#&gt;   ..$ numerator  : chr "K"
-#&gt;   ..$ denominator: chr(0) 
-#&gt;   ..- attr(*, "class")= chr "symbolic_units"</div><div class='input'>
+<span class='fu'>str</span>(<span class='no'>t_dry_bulb</span>)
+
 <span class='co'># change the time zone of datetime column in the returned weather data</span>
-<span class='fu'>attributes</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>()$<span class='no'>datetime</span>)</div><div class='output co'>#&gt; $class
-#&gt; [1] "POSIXct" "POSIXt" 
-#&gt; 
-#&gt; $tzone
-#&gt; [1] "Asia/Shanghai"
-#&gt; </div><div class='input'><span class='fu'>attributes</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>tz</span> <span class='kw'>=</span> <span class='st'>"America/Chicago"</span>)$<span class='no'>datetime</span>)</div><div class='output co'>#&gt; $class
-#&gt; [1] "POSIXct" "POSIXt" 
-#&gt; 
-#&gt; $tzone
-#&gt; [1] "America/Chicago"
-#&gt; </div><div class='input'>
-</div><span class='co'># NOT RUN {</span>
+<span class='fu'>attributes</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>()$<span class='no'>datetime</span>)
+<span class='fu'>attributes</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>(<span class='kw'>tz</span> <span class='kw'>=</span> <span class='st'>"America/Chicago"</span>)$<span class='no'>datetime</span>)
+
 <span class='co'># change the weather data</span>
 <span class='co'># NOTE: This feature is experimental. There is no validation when replacing.</span>
 <span class='no'>epw</span>$<span class='fu'>set_data</span>(<span class='no'>epw</span>$<span class='fu'>get_data</span>())
-<span class='co'># }</span><div class='input'>
 <span class='co'># save the weather file</span>
-<span class='no'>epw</span>$<span class='fu'>save</span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"weather.epw"</span>))</div></pre>
+<span class='no'>epw</span>$<span class='fu'>save</span>(<span class='fu'>file.path</span>(<span class='fu'>tempdir</span>(), <span class='st'>"weather.epw"</span>))
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

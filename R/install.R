@@ -196,7 +196,7 @@ install_eplus_linux <- function (exec) {
 #'
 #' `use_eplus()` adds an EnergyPlus version into the EnergyPlus version
 #'     cache in eplusr. That cache will be used to get corresponding
-#'     [`Idd`][idd] object when parsing IDF files and call corresponding
+#'     [Idd] object when parsing IDF files and call corresponding
 #'     EnergyPlus to run models.
 #'
 #' `eplus_config()` returns the a list of configure data of specified version of

@@ -60,7 +60,7 @@ NULL
 #' ```
 #'
 #' `$definition()` returns the definition, i.e. the `IddObject`, of current
-#'     class. For details of `IddObject`, please see [IddObject class][idd_object].
+#'     class. For details of `IddObject`, please see [IddObject] class.
 #'
 #' @section Comment:
 #' ```
@@ -122,7 +122,7 @@ NULL
 #'      including auto-value (`autosize` and `autocalculate`), default value,
 #'      value range, choices and references. Underneath, it returns a data.table
 #'      with custom printing method. It is basically the same as
-#'      `$field_possible()` in [IddObject][idd_object] class.
+#'      `$field_possible()` in [IddObject] class.
 #'
 #' **Arguments**
 #'
@@ -172,7 +172,7 @@ NULL
 #'     also be done.
 #'
 #' For details about the underlying structure of returned value of
-#' `$validate()`, please `$validate()` in [`Idf`][idf] class.
+#' `$validate()`, please `$validate()` in [Idf] class.
 #'
 #' @section Cross Reference:
 #'
@@ -388,9 +388,8 @@ NULL
 #' # largetst character length of field values
 #' mat$print(auto_sep = TRUE)
 #' @docType class
-#' @name idf_object
-#' @aliases IdfObject
-#' @seealso [Idf class][idf]
+#' @name IdfObject
+#' @seealso [Idf] class
 #' @author Hongyuan Jia
 NULL
 

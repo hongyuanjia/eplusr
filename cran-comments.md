@@ -122,9 +122,29 @@ installation in home.
 Skip tests which download and install 'EnergyPlus' in home folder on CRAN and
 only run those tests locally.
 
-## Round 2
+# Version 0.9.0
 
-### Reviewer comments
+## Round 1
+
+### Test environments
+
+* local Manjaro Linux 17.1.11.1 install, R 3.5.1
+* Windows (on appveyor-ci), R oldrel, release and devel
+* Ubuntu 14.04 (on travis-ci), R oldrel, release and devel
+* OS X (on travis-ci), R oldrel and release
+
+### R CMD check results
+0 errors | 0 warnings | 1 note
+
+```
+The package was archived by CRAN due to leaving 'EnergyPlus' installer file and
+installation in home.
+```
+
+### Reverse dependencies
+eplusr currently has no reverse dependencies.
+
+### Last reviewer comments
 
 2018-08-09 Uwe Ligges
 

@@ -34,7 +34,7 @@
 
 <meta property="og:description" content="eplus_job() takes an IDF and EPW as input, and returns an EplusJob object
 for running EnergyPlus simulation and collecting outputs. For more details,
-please see job." />
+please see EplusJob." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -63,7 +63,7 @@ please see job." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -109,7 +109,7 @@ please see job." />
     
     <p><code>eplus_job()</code> takes an IDF and EPW as input, and returns an <code>EplusJob</code> object
 for running EnergyPlus simulation and collecting outputs. For more details,
-please see <a href='job.html'>job</a>.</p>
+please see <a href='EplusJob.html'>EplusJob</a>.</p>
     
     </div>
 
@@ -150,11 +150,11 @@ please see <a href='job.html'>job</a>.</p>
 
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='fu'>eplus_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
-}</div><div class='output co'>#&gt; <span class='message'>Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder `/usr/local/EnergyPlus-8-8-0`.</span></div><div class='output co'>#&gt; <span class='message'>IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.</span></div><div class='output co'>#&gt; <span class='message'>Start parsing...</span></div><div class='output co'>#&gt; ── EnergyPlus Simulation Job ───────────────────────────────────────────────────
-#&gt; # Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
-#&gt; # Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
-#&gt; # EnergyPlus Version: `8.8.0`
-#&gt; # EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`
+}</div><div class='output co'>#&gt; ── EnergyPlus Simulation Job ───────────────────────────────────────────────────
+#&gt; ● Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
+#&gt; ● Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; ● EnergyPlus Version: `8.8.0`
+#&gt; ● EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`
 #&gt; &lt;&lt; Simulation has not been run before &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

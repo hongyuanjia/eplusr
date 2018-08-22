@@ -62,7 +62,7 @@ of EnergyPlus simulations." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -126,9 +126,9 @@ automatically created if it does not exists like <code><a href='idf.html'>Idf</a
 param$seed()
 param$weater()
 param$apply_measure(measure, ..., .names = NULL)
-param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
+param$run(dir = NULL, wait = TRUE)
+param$kill()
+param$status()
 param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -175,9 +175,9 @@ the new <code>Idf</code>s will be named in format <code>measure_name + number</c
     
     <h2 class="hasAnchor" id="run-and-collect-results"><a class="anchor" href="#run-and-collect-results"></a>Run and Collect Results</h2>
 
-    <pre>param$run(dir = NULL, parallel_backend = future::multiprocess)
-param$kill(which = NULL)
-param$status(which = NULL)
+    <pre>param$run(dir = NULL, wait = TRUE)
+param$kill()
+param$status()
 param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
@@ -185,14 +185,75 @@ param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 param$tabular_data(which = NULL)
 </pre>
-    <p>All those functions have the same meaning in <a href='job.html'>EplusJob class</a>, except that they
-only return the results of specified simulation.</p>
+    <p>All those functions have the same meaning as in <a href='job.html'>EplusJob class</a>, except
+that they only return the results of specified simulations. Most arguments
+have the same meanings as in <a href='job.html'>EplusJob class</a>.</p>
+<p><code>$run()</code> runs the all parametric simulations in parallel. The number of
+parallel EnergyPlus process can be controlled by
+<code><a href='eplusr_option.html'>eplusr_option("num_parallel")</a></code>. If <code>wait</code> is FALSE, then the job will be
+run in the background. You can get updated job status by just print the
+ParametricJob object.</p>
+<p><code>$kill()</code> kills the all background EnergyPlus processes that are current
+running if possible. It only works when simulation runs in non-waiting
+mode.</p>
+<p><code>$status()</code> returns a named list of values indicates the status of the job:</p><ul>
+<li><p><code>run_before</code>: <code>TRUE</code> if the job has been run before. <code>FALSE</code> otherwise.</p></li>
+<li><p><code>alive</code>: <code>TRUE</code> if the job is still running in the background. <code>FALSE</code>
+otherwise.</p></li>
+<li><p><code>terminated</code>: <code>TRUE</code> if the job was terminated during last
+simulation. <code>FALSE</code> otherwise. <code>NA</code> if the job has not been run yet.</p></li>
+<li><p><code>successful</code>: <code>TRUE</code> if last simulation ended successfully. <code>FALSE</code>
+otherwise. <code>NA</code> if the job has not been run yet.</p></li>
+<li><p><code>changed_after</code>: <code>TRUE</code> if the <em>seed model</em> has been modified since last
+simulation. <code>FALSE</code> otherwise.</p></li>
+</ul>
+    <p><code>$output_dir()</code> returns the output directory of specified simulations.</p>
+<p><code>$locate_output()</code> returns the path of a single output file of specified
+simulations.</p>
+<p><code>$report_data_dict()</code> returns a data.table which contains all information
+about report data for specified simulations. For details on the meaning
+of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
+EnergyPlus "Output Details and Examples" documentation.</p>
+<p><code>$report_data()</code> extracts the report data in a data.table using key values
+and variable names.</p>
+<p><code>$tabular_data()</code> extracts all tabular data in a data.table.</p>
+<p>For <code>$report_data_dict()</code>, <code>$report_data()</code> and <code>$tabular_data()</code>, the
+returned data.table has a <code>Case</code> column in the returned data.table that
+indicates the names of parametric models.</p>
 <p><strong>Arguments</strong></p><ul>
 <li><p><code>which</code>: An integer vector of the indexes or a character vector or names of
-parametric simulations.</p></li>
-<li><p><code>parallel_backend</code>: Any acceptable input for <code><a href='http://www.rdocumentation.org/packages/future/topics/plan'>future::plan()</a></code>.</p></li>
+parametric simulations. If <code>NULL</code>, which is the default, results of all
+parametric simulations are returned.</p></li>
+<li><p><code>dir</code>: The parent output directory for all simulation. Outputs of each
+simulation are placed in a separate folder under the parent directory.</p></li>
+<li><p><code>wait</code>: If <code>TRUE</code>, R will hang on and wait all EnergyPlus simulations
+finish. If <code>FALSE</code>, all EnergyPlus simulations are run in the background.
+Default: <code>TRUE</code>.</p></li>
+<li><p><code>suffix</code>: A string that indicates the file suffix of simulation output.
+Default: <code>".err"</code>.</p></li>
+<li><p><code>strict</code>: If <code>TRUE</code>, it will check if the simulation was terminated, is
+still running or the file exists or not. Default: <code>TRUE</code>.</p></li>
+<li><p><code>key_value</code>: A character vector to identify key name of the data. If
+<code>NULL</code>, all keys of that variable will be returned. Default: <code>NULL</code>.</p></li>
+<li><p><code>name</code>: A character vector to specify the actual data name. If <code>NULL</code>, all
+variables will be returned. Default: <code>NULL</code>.</p></li>
+<li><p><code>year</code>: The year of the date and time in column <code>DateTime</code>. If <code>NULL</code>, it
+will be the current year. Default: <code>NULL</code></p></li>
+<li><p><code>tz</code>: Time zone of date and time in column <code>DateTime</code>. Default: <code>"GMT"</code>.</p></li>
 </ul>
-    <p>All other arguments have the same meanings as in <a href='job.html'>EplusJob class</a>.</p>
+    
+    <h2 class="hasAnchor" id="printing"><a class="anchor" href="#printing"></a>Printing</h2>
+
+    <pre>param$print()
+print(param)
+</pre>
+    <p><code>$print()</code> shows the core information of this ParametricJob, including the
+path of seed model and weather, the version and path of EnergyPlus used
+to run simulations, the measured that has been applied and parametric
+models generated, and the simulation job status.</p>
+<p><code>$print()</code> is quite useful to get the simulation status, especially when
+<code>wait</code> is <code>FALSE</code> in <code>$run()</code>. The job status will be updated and printed
+whenever <code>$print()</code> is called.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -209,13 +270,15 @@ parametric simulations.</p></li>
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='fu'><a href='param_job.html'>param_job</a></span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
 }</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
 #&gt; 
 #&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
-#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric ────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
+#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric Job ────────────────────────────────────────────────────
 #&gt; ● Seed Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
-#&gt; ● Default Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; ● Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; ● EnergyPlus Version: `8.8.0`
+#&gt; ● EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`
 #&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -233,6 +296,8 @@ parametric simulations.</p></li>
       <li><a href="#apply-design-alternatives">Apply Design Alternatives</a></li>
 
       <li><a href="#run-and-collect-results">Run and Collect Results</a></li>
+
+      <li><a href="#printing">Printing</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

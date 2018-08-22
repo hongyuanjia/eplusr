@@ -263,8 +263,7 @@ NULL
 #' epw$save(file.path(tempdir(), "weather.epw"))
 #' }
 #' @docType class
-#' @name epw
-#' @aliases Epw
+#' @name Epw
 #' @author Hongyuan Jia
 NULL
 
@@ -272,7 +271,7 @@ NULL
 #'
 #' `read_epw()` parses an EPW file and returns an `Epw` object. The parsing
 #' process is extreme inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html)
-#' with some simplifications. For more details on `Epw`, please see [Epw Class][epw].
+#' with some simplifications. For more details on `Epw`, please see [Epw] class.
 #'
 #' @param path A path of an EnergyPlus `EPW` file.
 #' @return An `Epw` object.
@@ -295,7 +294,7 @@ NULL
 #' path_epw <- file.path(path_base, path_region, path_file)
 #' epw <- read_epw(path_epw)
 #' }
-#' @seealso [Epw class][epw]
+#' @seealso [Epw] class
 #' @author Hongyuan Jia
 #' @export
 # read_epw {{{

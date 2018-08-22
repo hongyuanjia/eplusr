@@ -167,9 +167,9 @@ NULL
 #'      printing method.
 #'
 #' **NOTE**: `$field_reference()` and `$field_possible()` can only be used in
-#' `IddObject`s that are created using `$definition()` in [`Idf`][idf] class and
-#' [`IdfObject`][idf_object] class, and cannot be used in `IddObject`s that are
-#' created using `$object()` or equivalent in [`Idd`][idd] class. This is
+#' `IddObject`s that are created using `$definition()` in [Idf] class and
+#' [IdfObject] class, and cannot be used in `IddObject`s that are
+#' created using `$object()` or equivalent in [Idd] class. This is
 #' because both methods need shared Idf value data to collect all reference
 #' values.
 #'
@@ -210,8 +210,6 @@ NULL
 #'       extensible group will be marked with an arrow down surrounded by angle
 #'       brackets.
 #'
-#' @docType class
-#' @name idd_object
 #' @examples
 #' # get a parent Idd object
 #' idd <- use_idd(8.8, download = "auto")
@@ -366,8 +364,9 @@ NULL
 #' # check if fields are required, i.e. field values should not be empty
 #' mat$is_required_field(c("name", "roughness", "solar_absorptance"))
 #'
-#' @aliases IddObject
-#' @seealso [Idd Class][idd]
+#' @docType class
+#' @name IddObject
+#' @seealso [Idd] Class
 #' @author Hongyuan Jia
 NULL
 

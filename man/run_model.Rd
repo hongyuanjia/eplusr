@@ -111,8 +111,8 @@ object of background R process which handles all simulation jobs is
 returned. You can check if the jobs are completed using \code{$is_alive()} and
 get the final data.table using \code{$get_result()}.
 
-It is suggested to run simulations using \link[=job]{EplusJob} class and
-\link[=param]{ParametricJob} class, which provide much more detailed controls
+It is suggested to run simulations using \link{EplusJob} class and
+\link{ParametricJob} class, which provide much more detailed controls
 on the simulation and also methods to extract simulation outputs.
 }
 \examples{
@@ -143,7 +143,7 @@ if (is_avail_eplus(8.8)) {
 \href{https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md}{Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)}
 }
 \seealso{
-\link[=job]{EplusJob} class and \link[=param]{ParametricJob} class which provide
+\link{EplusJob} class and \link{ParametricJob} class which provide
 a more friendly interface to run EnergyPlus simulations and collect outputs.
 }
 \author{

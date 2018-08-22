@@ -62,7 +62,7 @@ For details on ParametricJob, please see ParametricJob class." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@ For details on ParametricJob, please see ParametricJob class." />
     <div class="ref-description">
     
     <p><code>param_job()</code> takes an IDF and EPW as input and returns a <code>ParametricJob</code>.
-For details on <code>ParametricJob</code>, please see <a href='param.html'>ParametricJob class</a>.</p>
+For details on <code>ParametricJob</code>, please see <a href='ParametricJob.html'>ParametricJob</a> class.</p>
     
     </div>
 
@@ -149,13 +149,15 @@ For details on <code>ParametricJob</code>, please see <a href='param.html'>Param
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='fu'>param_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
 }</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
+#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
 #&gt; 
 #&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
-#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric ────────────────────────────────────────────────────────
+#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
+#&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric Job ────────────────────────────────────────────────────
 #&gt; ● Seed Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
-#&gt; ● Default Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; ● Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
+#&gt; ● EnergyPlus Version: `8.8.0`
+#&gt; ● EnergyPlus Path: `/usr/local/EnergyPlus-8-8-0`
 #&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

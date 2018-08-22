@@ -2,7 +2,6 @@
 % Please edit documentation in R/idd.R
 \name{use_idd}
 \alias{use_idd}
-\alias{Idd}
 \alias{download_idd}
 \alias{avail_idd}
 \alias{is_avail_idd}
@@ -53,7 +52,7 @@ Use a specific EnergyPlus Input Data Dictionary (IDD) file
 \details{
 \code{use_idd()} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
-class, please see \link{idd}.
+class, please see \link{Idd}.
 
 \code{download_idd()} downloads specified version of EnergyPlus IDD file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is
@@ -101,7 +100,7 @@ avail_idd() # should contain "8.8.0"
 }
 }
 \seealso{
-\link[=idd]{Idd Class} for parsing, querying and making modifications to
+\link{Idd} Class for parsing, querying and making modifications to
 EnergyPlus IDD file
 }
 \author{

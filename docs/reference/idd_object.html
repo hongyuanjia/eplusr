@@ -65,7 +65,7 @@ needs some shared data from parent Idd object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -336,44 +336,44 @@ brackets.</p>
 <span class='co'># get current number of fields</span>
 <span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 46</div><div class='input'>
 <span class='co'># add ten extensible groups</span>
-<span class='no'>bran</span>$<span class='fu'>add_extensible_group</span>(<span class='fl'>10</span>)</div><div class='output co'>#&gt; &lt;&lt; Class: `Branch` &gt;&gt;
+<span class='no'>bran</span>$<span class='fu'>add_extensible_group</span>(<span class='fl'>10</span>)</div><div class='output co'>#&gt; IddObject &lt;&lt;Class: `Branch`&gt;&gt;
 #&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
 #&gt;   "List components on the branch in simulation and connection order
 #&gt; Note: this should NOT include splitters or mixers which define
 #&gt; endpoints of branches"
 #&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
-#&gt;   Group: `Node-Branch Management`
-#&gt;   Unique: FALSE
-#&gt;   Required: FALSE
-#&gt;   Total fields: 86
+#&gt;    ● Group: `Node-Branch Management`
+#&gt;    ● Unique: FALSE
+#&gt;    ● Required: FALSE
+#&gt;    ● Total fields: 86
 #&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt;   1:* Name
-#&gt;   2:  Pressure Drop Curve Name
-#&gt;   3:* Component 1 Object Type &lt;↓&gt;
-#&gt;   4:* Component 1 Name &lt;↓&gt;
-#&gt;   5:* Component 1 Inlet Node Name &lt;↓&gt;
-#&gt;   6:* Component 1 Outlet Node Name &lt;↓&gt;
+#&gt;   ★1: Name
+#&gt;    2: Pressure Drop Curve Name
+#&gt;   ★3: Component 1 Object Type &lt;↓&gt;
+#&gt;   ★4: Component 1 Name &lt;↓&gt;
+#&gt;   ★5: Component 1 Inlet Node Name &lt;↓&gt;
+#&gt;   ★6: Component 1 Outlet Node Name &lt;↓&gt;
 #&gt;   ......
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># the number of fields has been increased by 10 * 4 (= 46)</span>
 <span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 86</div><div class='input'>
 <span class='co'># delete eight extensible groups</span>
-<span class='no'>bran</span>$<span class='fu'>del_extensible_group</span>(<span class='fl'>8</span>)</div><div class='output co'>#&gt; &lt;&lt; Class: `Branch` &gt;&gt;
+<span class='no'>bran</span>$<span class='fu'>del_extensible_group</span>(<span class='fl'>8</span>)</div><div class='output co'>#&gt; IddObject &lt;&lt;Class: `Branch`&gt;&gt;
 #&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
 #&gt;   "List components on the branch in simulation and connection order
 #&gt; Note: this should NOT include splitters or mixers which define
 #&gt; endpoints of branches"
 #&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
-#&gt;   Group: `Node-Branch Management`
-#&gt;   Unique: FALSE
-#&gt;   Required: FALSE
-#&gt;   Total fields: 54
+#&gt;    ● Group: `Node-Branch Management`
+#&gt;    ● Unique: FALSE
+#&gt;    ● Required: FALSE
+#&gt;    ● Total fields: 54
 #&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt;   1:* Name
-#&gt;   2:  Pressure Drop Curve Name
-#&gt;   3:* Component 1 Object Type &lt;↓&gt;
-#&gt;   4:* Component 1 Name &lt;↓&gt;
-#&gt;   5:* Component 1 Inlet Node Name &lt;↓&gt;
-#&gt;   6:* Component 1 Outlet Node Name &lt;↓&gt;
+#&gt;   ★1: Name
+#&gt;    2: Pressure Drop Curve Name
+#&gt;   ★3: Component 1 Object Type &lt;↓&gt;
+#&gt;   ★4: Component 1 Name &lt;↓&gt;
+#&gt;   ★5: Component 1 Inlet Node Name &lt;↓&gt;
+#&gt;   ★6: Component 1 Outlet Node Name &lt;↓&gt;
 #&gt;   ......
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='co'># the number of fields has been decreased by 8 * 4 (= 32)</span>
 <span class='no'>bran</span>$<span class='fu'>num_fields</span>()</div><div class='output co'>#&gt; [1] 54</div><div class='input'>

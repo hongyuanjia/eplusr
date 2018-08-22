@@ -42,7 +42,7 @@ NULL
 #'
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
-#' * `class`: contains class memos, i.e. a brief description on each class.
+#' * `class_memo`: contains class memos, i.e. a brief description on each class.
 #' * `class_reference`: contains reference names of classes.
 #' * `field`: contains field names and field properties.
 #' * `field_note`: contains field notes.
@@ -120,10 +120,8 @@ NULL
 #' Here, `ClassName` is a single valid class name where all characters other
 #' than letters and numbers are replaced by a underscore `_`.
 #'
-#' For details about `IddObject`, please see [IddObject class][idd_object].
+#' For details about `IddObject`, please see [IddObject] class.
 #'
-#' @docType class
-#' @name idd
 #' @examples
 #' # get the Idd object of EnergyPlus v8.8
 #' idd <- use_idd(8.8, download = "auto")
@@ -151,7 +149,9 @@ NULL
 #' # OR
 #' idd[["SimulationControl"]]
 #'
-#' @seealso [IddObject class][idd_object] which provides detailed information of
+#' @docType class
+#' @name Idd
+#' @seealso [IddObject] class which provides detailed information of
 #' curtain class
 #'
 #' @author Hongyuan Jia
@@ -340,7 +340,7 @@ read_idd <- function (path) {
 #' @details
 #' `use_idd()` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
 #' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
-#' class, please see [idd].
+#' class, please see [Idd].
 #'
 #' `download_idd()` downloads specified version of EnergyPlus IDD file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
@@ -394,8 +394,7 @@ read_idd <- function (path) {
 #'
 #' avail_idd() # should contain "8.8.0"
 #' }
-#' @aliases Idd
-#' @seealso [Idd Class][idd] for parsing, querying and making modifications to
+#' @seealso [Idd] Class for parsing, querying and making modifications to
 #' EnergyPlus IDD file
 #'
 #' @export

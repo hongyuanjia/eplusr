@@ -429,7 +429,6 @@ print.ErrFile <- function (x, ...) {
     if (is_empty(dt_num)) {
         cat(head, "\n")
     } else {
-        browser()
         index_last_env <- dt_num[, index[.N], by = list(environment_index)]$V1
         l_last <- err_dt[begin_environment == FALSE & !index %in% index_last_env,
                          line[.N], by = index]$V1

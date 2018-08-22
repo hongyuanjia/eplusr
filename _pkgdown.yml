@@ -2,8 +2,8 @@ reference:
   - title: IDD
     desc: Use a specific EnergyPlus Input Data Dictionary (IDD)
     contents:
-      - idd
-      - idd_object
+      - Idd
+      - IddObject
       - use_idd
       - download_idd
       - avail_idd
@@ -11,13 +11,13 @@ reference:
   - title: IDF
     desc: Read, modify and run an EnergyPlus Input Data File (IDF)
     contents:
-      - idf
-      - idf_object
+      - Idf
+      - IdfObject
       - read_idf
   - title: EPW
     desc: Read, modify an EnergyPlus Weather (EPW)
     contents:
-      - epw
+      - Epw
       - read_epw
   - title: Configure EnergyPlus
     contents:
@@ -29,8 +29,8 @@ reference:
   - title: Job
     desc: Run EnergyPlus and collect outputs
     contents:
-      - job
-      - param
+      - EplusJob
+      - ParametricJob
       - eplus_job
       - param_job
       - run_idf

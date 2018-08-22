@@ -12,9 +12,9 @@ NULL
 #'
 #' Basically, it is a collection of multiple `EplusJob` objects. However, the
 #'     model is first parsed and the Idf object is stored internally, instead of
-#'     storing only the path of Idf in [`EplusJob`][job] class. Also, an object
+#'     storing only the path of Idf in [EplusJob] class. Also, an object
 #'     in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
-#'     automatically created if it does not exists like [`Idf`][idf] class.
+#'     automatically created if it does not exists like [Idf] class.
 #'
 #' @section Usage:
 #' ```
@@ -86,9 +86,9 @@ NULL
 #' param$tabular_data(which = NULL)
 #' ```
 #'
-#' All those functions have the same meaning as in [EplusJob class][job], except
+#' All those functions have the same meaning as in [EplusJob] class, except
 #' that they only return the results of specified simulations. Most arguments
-#' have the same meanings as in [EplusJob class][job].
+#' have the same meanings as in [EplusJob] class.
 #'
 #' `$run()` runs the all parametric simulations in parallel. The number of
 #'     parallel EnergyPlus process can be controlled by
@@ -168,9 +168,6 @@ NULL
 #'     `wait` is `FALSE` in `$run()`. The job status will be updated and printed
 #'     whenever `$print()` is called.
 #'
-#' @docType class
-#' @name param
-#' @aliases ParametricJob
 #' @examples
 #' if (is_avail_eplus(8.8)) {
 #'     idf_name <- "1ZoneUncontrolled.idf"
@@ -185,13 +182,15 @@ NULL
 #'     # create from an Idf and an Epw object
 #'     param_job(read_idf(idf_path), read_epw(epw_path))
 #' }
+#' @docType class
+#' @name ParametricJob
 #' @author Hongyuan Jia
 NULL
 
 #' Create An EnergyPlus Parametric Simulation Job
 #'
 #' `param_job()` takes an IDF and EPW as input and returns a `ParametricJob`.
-#' For details on `ParametricJob`, please see [ParametricJob class][param].
+#' For details on `ParametricJob`, please see [ParametricJob] class.
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
 #' @param epw A path to EnergyPlus EPW file or an `Epw` object.

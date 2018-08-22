@@ -152,8 +152,8 @@ clean_wd <- function (path) {
 #'     returned. You can check if the jobs are completed using `$is_alive()` and
 #'     get the final data.table using `$get_result()`.
 #'
-#' It is suggested to run simulations using [EplusJob][job] class and
-#'     [ParametricJob][param] class, which provide much more detailed controls
+#' It is suggested to run simulations using [EplusJob] class and
+#'     [ParametricJob] class, which provide much more detailed controls
 #'     on the simulation and also methods to extract simulation outputs.
 #'
 #' @return A list for `run_idf()`. For `rum_multi()`, a
@@ -186,7 +186,7 @@ clean_wd <- function (path) {
 #' }
 #' }
 #' @rdname run_model
-#' @seealso [EplusJob][job] class and [ParametricJob][param] class which provide
+#' @seealso [EplusJob] class and [ParametricJob] class which provide
 #' a more friendly interface to run EnergyPlus simulations and collect outputs.
 #' @author Hongyuan Jia
 #' @export

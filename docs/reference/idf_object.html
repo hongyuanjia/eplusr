@@ -65,7 +65,7 @@ IdfObject needs some shared data from parent Idf object." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.8.4</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.9.0</span>
       </span>
     </div>
 
@@ -345,82 +345,82 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 <span class='co'># "Version" class</span>
 <span class='no'>idf</span>$<span class='no'>Version</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='fu'>name</span>()</div><div class='output co'>#&gt; [1] NA</div><div class='input'>
 <span class='co'># get underlying IddObject of current class</span>
-<span class='no'>mat</span>$<span class='fu'>definition</span>()</div><div class='output co'>#&gt; &lt;&lt; Class: `Material` &gt;&gt;
+<span class='no'>mat</span>$<span class='fu'>definition</span>()</div><div class='output co'>#&gt; IddObject &lt;&lt;Class: `Material`&gt;&gt;
 #&gt; ─────────────────────────────────── * MEMO * ───────────────────────────────────
 #&gt;   "Regular materials described with full set of thermal properties"
 #&gt; ──────────────────────────────── * PROPERTIES * ────────────────────────────────
-#&gt;   Group: `Surface Construction Elements`
-#&gt;   Unique: FALSE
-#&gt;   Required: FALSE
-#&gt;   Total fields: 9
+#&gt;    ● Group: `Surface Construction Elements`
+#&gt;    ● Unique: FALSE
+#&gt;    ● Required: FALSE
+#&gt;    ● Total fields: 9
 #&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt;   1:* Name
-#&gt;   2:* Roughness
-#&gt;   3:* Thickness {m}
-#&gt;   4:* Conductivity {W/m-K}
-#&gt;   5:* Density {kg/m3}
-#&gt;   6:* Specific Heat {J/kg-K}
-#&gt;   7:  Thermal Absorptance
-#&gt;   8:  Solar Absorptance
-#&gt;   9:  Visible Absorptance
+#&gt;   ★1: Name
+#&gt;   ★2: Roughness
+#&gt;   ★3: Thickness {m}
+#&gt;   ★4: Conductivity {W/m-K}
+#&gt;   ★5: Density {kg/m3}
+#&gt;   ★6: Specific Heat {J/kg-K}
+#&gt;    7: Thermal Absorptance
+#&gt;    8: Solar Absorptance
+#&gt;    9: Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
 <span class='co'># get object comments</span>
 <span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; character(0)</div><div class='input'>
 <span class='co'># add new object comments</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='fu'>c</span>(<span class='st'>"This is a material named `WD01`"</span>, <span class='st'>"This object has an ID of 47"</span>))</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='fu'>c</span>(<span class='st'>"This is a material named `WD01`"</span>, <span class='st'>"This object has an ID of 47"</span>))</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
 #&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
 #&gt; !This is a material named `WD01`
 #&gt; !This object has an ID of 47
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    </div><div class='input'>
 <span class='co'># append new comments</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is an appended comment"</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is an appended comment"</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
 #&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
 #&gt; !This is a material named `WD01`
 #&gt; !This object has an ID of 47
 #&gt; !This is an appended comment
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a material named `WD01`" "This object has an ID of 47"    
 #&gt; [3] "This is an appended comment"    </div><div class='input'>
 <span class='co'># prepend new comments</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a prepended comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a prepended comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
 #&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
 #&gt; !This is a prepended comment
 #&gt; !This is a material named `WD01`
 #&gt; !This object has an ID of 47
 #&gt; !This is an appended comment
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is a prepended comment"     "This is a material named `WD01`"
 #&gt; [3] "This object has an ID of 47"     "This is an appended comment"    </div><div class='input'>
 <span class='co'># wrap long comments</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a very long comment that is needed to be wrapped."</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>30</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is a very long comment that is needed to be wrapped."</span>, <span class='kw'>width</span> <span class='kw'>=</span> <span class='fl'>30</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
 #&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
 #&gt; !This is a prepended comment
 #&gt; !This is a material named `WD01`
@@ -428,13 +428,13 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 #&gt; !This is an appended comment
 #&gt; !This is a very long comment
 #&gt; !that is needed to be wrapped.
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
@@ -442,29 +442,29 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 #&gt; [3] "This object has an ID of 47"     "This is an appended comment"    
 #&gt; [5] "This is a very long comment"     "that is needed to be wrapped."  </div><div class='input'>
 <span class='co'># delete old comments and add new one</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is the only comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='st'>"This is the only comment"</span>, <span class='kw'>append</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
 #&gt; ───────────────────────────────── * COMMENTS * ─────────────────────────────────
 #&gt; !This is the only comment
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'><span class='no'>mat</span>$<span class='fu'>get_comment</span>()</div><div class='output co'>#&gt; [1] "This is the only comment"</div><div class='input'>
 <span class='co'># delete all comments</span>
-<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='kw'>NULL</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt; Material
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: C5 - 4 IN HW CONCRETE,  !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.1014984,         !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+<span class='no'>mat</span>$<span class='fu'>set_comment</span>(<span class='kw'>NULL</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `C5 - 4 IN HW CONCRETE`&gt;&gt;`Material`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: C5 - 4 IN HW CONCRETE,  !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.1014984,         !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
@@ -525,14 +525,14 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 #&gt; [1] 2242.585
 #&gt; </div><div class='input'>
 <span class='co'># set field values</span>
-<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"new_name"</span>, <span class='kw'>Thickness</span> <span class='kw'>=</span> <span class='fl'>0.02</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `new_name`&gt;&gt; Material
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: new_name,          !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.02,              !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>name</span> <span class='kw'>=</span> <span class='st'>"new_name"</span>, <span class='kw'>Thickness</span> <span class='kw'>=</span> <span class='fl'>0.02</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `new_name`&gt;&gt;`Material`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: new_name,          !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.02,              !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.65,              !- Solar Absorptance
 #&gt;  9: 0.65;              !- Visible Absorptance
@@ -550,14 +550,14 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 #&gt; $Solar_Absorptance
 #&gt; [1] 0.65
 #&gt; </div><div class='input'>
-<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>visible_absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Solar_Absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `new_name`&gt;&gt; Material
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: new_name,          !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.02,              !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: 2242.585,          !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+<span class='no'>mat</span>$<span class='fu'>set_value</span>(<span class='kw'>visible_absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>Solar_Absorptance</span> <span class='kw'>=</span> <span class='fl'>NA</span>, <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `new_name`&gt;&gt;`Material`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: new_name,          !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.02,              !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: 2242.585,          !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.7,               !- Solar Absorptance
 #&gt;  9: 0.7;               !- Visible Absorptance
@@ -586,10 +586,10 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 
 <span class='co'># get other objects that reference this object</span>
 <span class='no'>mat</span>$<span class='fu'>ref_by_object</span>() <span class='co'># referenced by construction "FLOOR"</span></div><div class='output co'>#&gt; <span class='message'>1 object found that reference the target object [ID: 14].</span></div><div class='output co'>#&gt; $FLOOR
-#&gt; &lt;&lt;[ID:16] `FLOOR`&gt;&gt; Construction
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: FLOOR,             !- Name
-#&gt; *2: another_name;      !- Outside Layer
+#&gt; IdfObject &lt;&lt;[ID:16] `FLOOR`&gt;&gt;`Construction`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: FLOOR,             !- Name
+#&gt; ★2: another_name;      !- Outside Layer
 #&gt; ────────────────────────────────────────────────────────────────────────────────
 #&gt; </div><div class='input'><span class='fu'>names</span>(<span class='no'>mat</span>$<span class='fu'>ref_by_object</span>())</div><div class='output co'>#&gt; <span class='message'>1 object found that reference the target object [ID: 14].</span></div><div class='output co'>#&gt; [1] "FLOOR"</div><div class='input'>
 <span class='no'>mat</span>$<span class='fu'>has_ref_by</span>()</div><div class='output co'>#&gt; [1] TRUE</div><div class='input'>
@@ -692,28 +692,28 @@ largest character length of values. Default: <code>FALSE</code>.</p></li>
 #&gt; [11] "0.7;                         !- Visible Absorptance"   
 #&gt; [12] ""                                                      </div><div class='input'>
 <span class='co'># print the object without comment</span>
-<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `another_name`&gt;&gt; Material
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: another_name,      !- Name
-#&gt; *2: MediumRough,       !- Roughness
-#&gt; *3: 0.019,             !- Thickness {m}
-#&gt; *4: 1.729577,          !- Conductivity {W/m-K}
-#&gt; *5: -1,                !- Density {kg/m3}
-#&gt; *6: 836.8,             !- Specific Heat {J/kg-K}
+<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>comment</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `another_name`&gt;&gt;`Material`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: another_name,      !- Name
+#&gt; ★2: MediumRough,       !- Roughness
+#&gt; ★3: 0.019,             !- Thickness {m}
+#&gt; ★4: 1.729577,          !- Conductivity {W/m-K}
+#&gt; ★5: -1,                !- Density {kg/m3}
+#&gt; ★6: 836.8,             !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,               !- Thermal Absorptance
 #&gt;  8: 0.7,               !- Solar Absorptance
 #&gt;  9: 0.7;               !- Visible Absorptance
 #&gt; ────────────────────────────────────────────────────────────────────────────────</div><div class='input'>
 <span class='co'># print the object, and auto separate field values and field names at the</span>
 <span class='co'># largetst character length of field values</span>
-<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>auto_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; &lt;&lt;[ID:14] `another_name`&gt;&gt; Material
-#&gt; ────────────────────────────────── * FIELDS * ──────────────────────────────────
-#&gt; *1: another_name,  !- Name
-#&gt; *2: MediumRough,   !- Roughness
-#&gt; *3: 0.019,         !- Thickness {m}
-#&gt; *4: 1.729577,      !- Conductivity {W/m-K}
-#&gt; *5: -1,            !- Density {kg/m3}
-#&gt; *6: 836.8,         !- Specific Heat {J/kg-K}
+<span class='no'>mat</span>$<span class='fu'>print</span>(<span class='kw'>auto_sep</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt; IdfObject &lt;&lt;[ID:14] `another_name`&gt;&gt;`Material`
+#&gt; ────────────────────────────────── * VALUES * ──────────────────────────────────
+#&gt; ★1: another_name,  !- Name
+#&gt; ★2: MediumRough,   !- Roughness
+#&gt; ★3: 0.019,         !- Thickness {m}
+#&gt; ★4: 1.729577,      !- Conductivity {W/m-K}
+#&gt; ★5: -1,            !- Density {kg/m3}
+#&gt; ★6: 836.8,         !- Specific Heat {J/kg-K}
 #&gt;  7: 0.9,           !- Thermal Absorptance
 #&gt;  8: 0.7,           !- Solar Absorptance
 #&gt;  9: 0.7;           !- Visible Absorptance
