@@ -137,8 +137,16 @@ only run those tests locally.
 0 errors | 0 warnings | 1 note
 
 ```
-The package was archived by CRAN due to leaving 'EnergyPlus' installer file and
-installation in home.
+Maintainer: 'Hongyuan Jia <hongyuanjia@cqu.edu.cn>'
+
+New submission
+
+Package was archived on CRAN
+
+CRAN repository db overrides:
+  X-CRAN-Comment: Archived on 2018-08-08 for policy violation.
+
+  Leaves 'EnergyPlus' installer file and installation in home.
 ```
 
 ### Reverse dependencies
