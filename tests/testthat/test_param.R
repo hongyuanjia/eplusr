@@ -122,9 +122,12 @@ test_that("Parametric methods", {
         normalizePath(file.path(dirname(example$idf), dir_nms[2], paste0(dir_nms[2], ".sql"))))
 
     # can return the output directory
-    expect_equal(param$output_dir(), file.path(dirname(example$idf), dir_nms))
-    expect_equal(param$output_dir(2), file.path(dirname(example$idf), dir_nms[2]))
-    expect_equal(param$output_dir("set_infil_rate_2"), file.path(dirname(example$idf), dir_nms[2]))
+    expect_equal(param$output_dir(),
+        normalizePath(file.path(dirname(example$idf), dir_nms)))
+    expect_equal(param$output_dir(2),
+        normalizePath(file.path(dirname(example$idf), dir_nms[2])))
+    expect_equal(param$output_dir("set_infil_rate_2"),
+        normalizePath(file.path(dirname(example$idf), dir_nms[2])))
 
     # clean
     lapply(dir_nms, unlink, recursive = TRUE, force = TRUE)

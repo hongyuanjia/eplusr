@@ -79,7 +79,10 @@ test_that("Job methods", {
     expect_equal(job$output_dir(), dirname(example$idf))
 
     # can get output file path
-    expect_equal(job$locate_output(".err"), file.path(tempdir(), "5Zone_Transformer.err"))
+    expect_equal(
+        job$locate_output(".err"),
+        normalizePath(file.path(tempdir(), "5Zone_Transformer.err"))
+    )
 
     clean_wd(example$idf)
     unlink(c(example$idf, example$epw))
