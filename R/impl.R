@@ -1713,11 +1713,11 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 
         if (referenced) {
             i_verbose_info(self, private, "Delete target object [ID:",
-                backtick_collapse(obj_id), "] and also objects [ID: ",
+                backtick_collapse(obj_id), "] and also objects [ID:",
                 backtick_collapse(by_id), "] that are referencing target object.")
             obj_id <- c(obj_id, by_id)
         } else {
-            i_verbose_info(self, private, "Delete target object [ID: ",
+            i_verbose_info(self, private, "Delete target object [ID:",
                 backtick_collapse(obj_id), "] which was referenced by objects ",
                 "[ID: ", backtick_collapse(by_id), "]. Error may occur during ",
                 "simulation.")
@@ -2911,7 +2911,7 @@ i_log_saved_idf <- function (self, private) {
 i_verbose_info <- function (self, private, ...) {
     if (eplusr_option("verbose_info")) {
         cli::cat_rule(crayon::bold("Info"), col = "green")
-        cat(crayon::green(...), "\n", sep = "")
+        cat(crayon::green(paste0(...)), "\n", sep = "")
         cat("\n")
     }
 }
