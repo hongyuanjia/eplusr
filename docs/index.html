@@ -54,7 +54,14 @@
   <a href="news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/hongyuanjia/eplusr">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -79,7 +86,7 @@
 <p>A Toolkit for Using EnergyPlus in R.</p>
 </blockquote>
 <p>eplusr provides a rich toolkit of using whole building energy simulation program <a href="https://energyplus.net">EnergyPlus</a> directly in R, which enables programmatic navigation, modification of EnergyPlus models and makes it less painful to do parametric simulations and analysis. More information about EnergyPlus can be found at <a href="https://energyplus.net">its website</a>.</p>
-<p>A comprehensive introduction to eplusr can be found using <a href="https://hongyuanjia.github.io/articles/eplusr.html"><code><a href="articles/eplusr.html">vignette("eplusr")</a></code></a>. You can learn more about eplusr at <a href="https://hongyuanjia.github.io/eplusr" class="uri">https://hongyuanjia.github.io/eplusr</a>, along with full package documentation.</p>
+<p>A comprehensive introduction to eplusr can be found using <a href="https://hongyuanjia.github.io/eplusr/articles/eplusr.html"><code><a href="articles/eplusr.html">vignette("eplusr")</a></code></a>. You can learn more about eplusr at <a href="https://hongyuanjia.github.io/eplusr" class="uri">https://hongyuanjia.github.io/eplusr</a>, along with full package documentation.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -166,15 +173,15 @@
 <a class="sourceLine" id="cb4-37" data-line-number="37"><span class="co">#&gt; ───────────────────────────────────────────────────────────────────────────</span></a>
 <a class="sourceLine" id="cb4-38" data-line-number="38"><span class="co">#&gt; [01] Material</span></a>
 <a class="sourceLine" id="cb4-39" data-line-number="39"><span class="co">#&gt; [02] Material:NoMass</span></a>
-<a class="sourceLine" id="cb4-40" data-line-number="40"><span class="co">#&gt; [15] Construction</span></a>
+<a class="sourceLine" id="cb4-40" data-line-number="40"><span class="co">#&gt; [03] Construction</span></a>
 <a class="sourceLine" id="cb4-41" data-line-number="41">....</a>
 <a class="sourceLine" id="cb4-42" data-line-number="42"></a>
 <a class="sourceLine" id="cb4-43" data-line-number="43">model<span class="op">$</span>Material_NoMass<span class="op">$</span>R13LAYER</a>
 <a class="sourceLine" id="cb4-44" data-line-number="44"><span class="co">#&gt; IdfObject &lt;&lt;[ID:12] `R13LAYER`&gt;&gt;`Material:NoMass`</span></a>
 <a class="sourceLine" id="cb4-45" data-line-number="45"><span class="co">#&gt; ──────────────────────────────── * VALUES * ───────────────────────────────</span></a>
-<a class="sourceLine" id="cb4-46" data-line-number="46"><span class="co">#&gt; ★1: R13LAYER,          !- Name</span></a>
-<a class="sourceLine" id="cb4-47" data-line-number="47"><span class="co">#&gt; ★2: Rough,             !- Roughness</span></a>
-<a class="sourceLine" id="cb4-48" data-line-number="48"><span class="co">#&gt; ★3: 2.290965,          !- Thermal Resistance {m2-K/W}</span></a>
+<a class="sourceLine" id="cb4-46" data-line-number="46"><span class="co">#&gt; ●1: R13LAYER,          !- Name</span></a>
+<a class="sourceLine" id="cb4-47" data-line-number="47"><span class="co">#&gt; ●2: Rough,             !- Roughness</span></a>
+<a class="sourceLine" id="cb4-48" data-line-number="48"><span class="co">#&gt; ●3: 2.290965,          !- Thermal Resistance {m2-K/W}</span></a>
 <a class="sourceLine" id="cb4-49" data-line-number="49"><span class="co">#&gt;  4: 0.9,               !- Thermal Absorptance</span></a>
 <a class="sourceLine" id="cb4-50" data-line-number="50"><span class="co">#&gt;  5: 0.75,              !- Solar Absorptance</span></a>
 <a class="sourceLine" id="cb4-51" data-line-number="51"><span class="co">#&gt;  6: 0.75;              !- Visible Absorptance</span></a>
@@ -191,13 +198,13 @@
 <a class="sourceLine" id="cb4-62" data-line-number="62">    <span class="kw">list</span>(<span class="dt">name =</span> <span class="st">"run_period"</span>, <span class="dt">begin_month =</span> <span class="dv">3</span>, <span class="dt">begin_day_of_month =</span> <span class="dv">1</span>,</a>
 <a class="sourceLine" id="cb4-63" data-line-number="63">         <span class="dt">end_month =</span> <span class="dv">4</span>, <span class="dt">end_day_of_month =</span> <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb4-64" data-line-number="64"><span class="co">#&gt; $run_period</span></a>
-<a class="sourceLine" id="cb4-65" data-line-number="65"><span class="co">#&gt; IdfObject &lt;&lt;[ID:66] `run_period`&gt;&gt;`RunPeriod`</span></a>
+<a class="sourceLine" id="cb4-65" data-line-number="65"><span class="co">#&gt; IdfObject &lt;&lt;[ID:54] `run_period`&gt;&gt;`RunPeriod`</span></a>
 <a class="sourceLine" id="cb4-66" data-line-number="66"><span class="co">#&gt; ──────────────────────────────── * VALUES * ───────────────────────────────</span></a>
 <a class="sourceLine" id="cb4-67" data-line-number="67"><span class="co">#&gt;   1: run_period,        !- Name</span></a>
-<a class="sourceLine" id="cb4-68" data-line-number="68"><span class="co">#&gt; ★ 2: 3,                 !- Begin Month</span></a>
-<a class="sourceLine" id="cb4-69" data-line-number="69"><span class="co">#&gt; ★ 3: 1,                 !- Begin Day of Month</span></a>
-<a class="sourceLine" id="cb4-70" data-line-number="70"><span class="co">#&gt; ★ 4: 4,                 !- End Month</span></a>
-<a class="sourceLine" id="cb4-71" data-line-number="71"><span class="co">#&gt; ★ 5: 1,                 !- End Day of Month</span></a>
+<a class="sourceLine" id="cb4-68" data-line-number="68"><span class="co">#&gt; ● 2: 3,                 !- Begin Month</span></a>
+<a class="sourceLine" id="cb4-69" data-line-number="69"><span class="co">#&gt; ● 3: 1,                 !- Begin Day of Month</span></a>
+<a class="sourceLine" id="cb4-70" data-line-number="70"><span class="co">#&gt; ● 4: 4,                 !- End Month</span></a>
+<a class="sourceLine" id="cb4-71" data-line-number="71"><span class="co">#&gt; ● 5: 1,                 !- End Day of Month</span></a>
 <a class="sourceLine" id="cb4-72" data-line-number="72"><span class="co">#&gt;   6: UseWeatherFile,    !- Day of Week for Start Day</span></a>
 <a class="sourceLine" id="cb4-73" data-line-number="73"><span class="co">#&gt;   7: Yes,               !- Use Weather File Holidays and Special Days</span></a>
 <a class="sourceLine" id="cb4-74" data-line-number="74"><span class="co">#&gt;   8: Yes,               !- Use Weather File Daylight Saving Period</span></a>
@@ -219,16 +226,16 @@
 <a class="sourceLine" id="cb4-90" data-line-number="90">    <span class="dt">weather =</span> <span class="kw">file.path</span>(<span class="kw"><a href="reference/use_eplus.html">eplus_config</a></span>(<span class="fl">8.8</span>)<span class="op">$</span>dir, <span class="st">"WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>),</a>
 <a class="sourceLine" id="cb4-91" data-line-number="91">    <span class="dt">dir =</span> <span class="ot">NULL</span>)</a>
 <a class="sourceLine" id="cb4-92" data-line-number="92"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
-<a class="sourceLine" id="cb4-93" data-line-number="93"><span class="co">#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.</span></a>
+<a class="sourceLine" id="cb4-93" data-line-number="93"><span class="co">#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.</span></a>
 <a class="sourceLine" id="cb4-94" data-line-number="94"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-95" data-line-number="95"><span class="co">#&gt; ── Info ───────────────────────────────────────────────────────────────────</span></a>
-<a class="sourceLine" id="cb4-96" data-line-number="96"><span class="co">#&gt; Replace the existing file located   at  /tmp/RtmpUpfgGB/model.idf .</span></a>
+<a class="sourceLine" id="cb4-96" data-line-number="96"><span class="co">#&gt; Replace the existing file located  at /tmp/RtmpdROUsx/model.idf.</span></a>
 <a class="sourceLine" id="cb4-97" data-line-number="97"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-98" data-line-number="98"><span class="co">#&gt; ExpandObjects Started.</span></a>
 <a class="sourceLine" id="cb4-99" data-line-number="99"><span class="co">#&gt; No expanded file generated.</span></a>
-<a class="sourceLine" id="cb4-100" data-line-number="100"><span class="co">#&gt; ExpandObjects Finished. Time:     0.006</span></a>
+<a class="sourceLine" id="cb4-100" data-line-number="100"><span class="co">#&gt; ExpandObjects Finished. Time:     0.004</span></a>
 <a class="sourceLine" id="cb4-101" data-line-number="101"><span class="co">#&gt; EnergyPlus Starting</span></a>
-<a class="sourceLine" id="cb4-102" data-line-number="102"><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.22 08:12</span></a>
+<a class="sourceLine" id="cb4-102" data-line-number="102"><span class="co">#&gt; EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.22 21:44</span></a>
 <a class="sourceLine" id="cb4-103" data-line-number="103"><span class="co">#&gt; Processing Data Dictionary</span></a>
 <a class="sourceLine" id="cb4-104" data-line-number="104"><span class="co">#&gt; Processing Input File</span></a>
 <a class="sourceLine" id="cb4-105" data-line-number="105"><span class="co">#&gt; Initializing Simulation</span></a>
@@ -253,49 +260,46 @@
 <a class="sourceLine" id="cb4-124" data-line-number="124">job<span class="op">$</span><span class="kw">errors</span>()</a>
 <a class="sourceLine" id="cb4-125" data-line-number="125"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb4-126" data-line-number="126"><span class="co">#&gt; ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐</span></a>
-<a class="sourceLine" id="cb4-127" data-line-number="127"><span class="co">#&gt; │Warning[1/4] Weather file location will be used rather than entered (IDF) Location object.                                                 │</span></a>
+<a class="sourceLine" id="cb4-127" data-line-number="127"><span class="co">#&gt; │Warning[1/3] Weather file location will be used rather than entered (IDF) Location object.                                                 │</span></a>
 <a class="sourceLine" id="cb4-128" data-line-number="128"><span class="co">#&gt; │  ..Location object=DENVER CENTENNIAL  GOLDEN   N_CO_USA DESIGN_CONDITIONS                                                                 │</span></a>
 <a class="sourceLine" id="cb4-129" data-line-number="129"><span class="co">#&gt; │  ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940                                                                    │</span></a>
 <a class="sourceLine" id="cb4-130" data-line-number="130"><span class="co">#&gt; │  ..due to location differences, Latitude difference=[2.12] degrees, Longitude difference=[17.22] degrees.                                 │</span></a>
 <a class="sourceLine" id="cb4-131" data-line-number="131"><span class="co">#&gt; │  ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89] percent, [1827.00] meters.                                            │</span></a>
 <a class="sourceLine" id="cb4-132" data-line-number="132"><span class="co">#&gt; │                                                                                                                                           │</span></a>
-<a class="sourceLine" id="cb4-133" data-line-number="133"><span class="co">#&gt; │Warning[2/4] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│</span></a>
+<a class="sourceLine" id="cb4-133" data-line-number="133"><span class="co">#&gt; │Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│</span></a>
 <a class="sourceLine" id="cb4-134" data-line-number="134"><span class="co">#&gt; │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB, Standard Pressure (based on elevation) will be used.         │</span></a>
 <a class="sourceLine" id="cb4-135" data-line-number="135"><span class="co">#&gt; │                                                                                                                                           │</span></a>
-<a class="sourceLine" id="cb4-136" data-line-number="136"><span class="co">#&gt; │Warning[3/4] CheckUsedConstructions: There are 12 nominally unused constructions in input.                                                 │</span></a>
-<a class="sourceLine" id="cb4-137" data-line-number="137"><span class="co">#&gt; │  For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;                                           │</span></a>
-<a class="sourceLine" id="cb4-138" data-line-number="138"><span class="co">#&gt; │                                                                                                                                           │</span></a>
-<a class="sourceLine" id="cb4-139" data-line-number="139"><span class="co">#&gt; │Warning[4/4] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│</span></a>
-<a class="sourceLine" id="cb4-140" data-line-number="140"><span class="co">#&gt; │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB, Standard Pressure (based on elevation) will be used.     │</span></a>
-<a class="sourceLine" id="cb4-141" data-line-number="141"><span class="co">#&gt; └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span></a>
-<a class="sourceLine" id="cb4-142" data-line-number="142"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb4-143" data-line-number="143"><span class="co">#&gt; EnergyPlus completed successfully with 4 Warning.</span></a>
-<a class="sourceLine" id="cb4-144" data-line-number="144"></a>
-<a class="sourceLine" id="cb4-145" data-line-number="145">job<span class="op">$</span><span class="kw">report_data</span>(<span class="dt">name =</span> <span class="st">"EnergyTransfer:Facility"</span>, <span class="dt">case =</span> <span class="st">"example"</span>)</a>
-<a class="sourceLine" id="cb4-146" data-line-number="146"><span class="co">#&gt;          Case            DateTime KeyValue                    Name Units</span></a>
-<a class="sourceLine" id="cb4-147" data-line-number="147"><span class="co">#&gt;    1: example 2018-01-01 01:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-148" data-line-number="148"><span class="co">#&gt;    2: example 2018-01-01 02:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-149" data-line-number="149"><span class="co">#&gt;    3: example 2018-01-01 03:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-150" data-line-number="150"><span class="co">#&gt;    4: example 2018-01-01 04:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-151" data-line-number="151"><span class="co">#&gt;    5: example 2018-01-01 05:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-152" data-line-number="152"><span class="co">#&gt;   ---                                                                   </span></a>
-<a class="sourceLine" id="cb4-153" data-line-number="153"><span class="co">#&gt; 9572: example 2018-12-31 20:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-154" data-line-number="154"><span class="co">#&gt; 9573: example 2018-12-31 21:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-155" data-line-number="155"><span class="co">#&gt; 9574: example 2018-12-31 22:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-156" data-line-number="156"><span class="co">#&gt; 9575: example 2018-12-31 23:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-157" data-line-number="157"><span class="co">#&gt; 9576: example 2019-01-01 00:00:00          EnergyTransfer:Facility     J</span></a>
-<a class="sourceLine" id="cb4-158" data-line-number="158"><span class="co">#&gt;       Value</span></a>
-<a class="sourceLine" id="cb4-159" data-line-number="159"><span class="co">#&gt;    1:     0</span></a>
-<a class="sourceLine" id="cb4-160" data-line-number="160"><span class="co">#&gt;    2:     0</span></a>
-<a class="sourceLine" id="cb4-161" data-line-number="161"><span class="co">#&gt;    3:     0</span></a>
-<a class="sourceLine" id="cb4-162" data-line-number="162"><span class="co">#&gt;    4:     0</span></a>
-<a class="sourceLine" id="cb4-163" data-line-number="163"><span class="co">#&gt;    5:     0</span></a>
-<a class="sourceLine" id="cb4-164" data-line-number="164"><span class="co">#&gt;   ---      </span></a>
-<a class="sourceLine" id="cb4-165" data-line-number="165"><span class="co">#&gt; 9572:     0</span></a>
-<a class="sourceLine" id="cb4-166" data-line-number="166"><span class="co">#&gt; 9573:     0</span></a>
-<a class="sourceLine" id="cb4-167" data-line-number="167"><span class="co">#&gt; 9574:     0</span></a>
-<a class="sourceLine" id="cb4-168" data-line-number="168"><span class="co">#&gt; 9575:     0</span></a>
-<a class="sourceLine" id="cb4-169" data-line-number="169"><span class="co">#&gt; 9576:     0</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-136" data-line-number="136"><span class="co">#&gt; │Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│</span></a>
+<a class="sourceLine" id="cb4-137" data-line-number="137"><span class="co">#&gt; │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=&gt;MWB, Standard Pressure (based on elevation) will be used.     │</span></a>
+<a class="sourceLine" id="cb4-138" data-line-number="138"><span class="co">#&gt; └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span></a>
+<a class="sourceLine" id="cb4-139" data-line-number="139"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb4-140" data-line-number="140"><span class="co">#&gt; EnergyPlus completed successfully with 3 Warning.</span></a>
+<a class="sourceLine" id="cb4-141" data-line-number="141"></a>
+<a class="sourceLine" id="cb4-142" data-line-number="142">job<span class="op">$</span><span class="kw">report_data</span>(<span class="dt">name =</span> <span class="st">"EnergyTransfer:Facility"</span>, <span class="dt">case =</span> <span class="st">"example"</span>)</a>
+<a class="sourceLine" id="cb4-143" data-line-number="143"><span class="co">#&gt;          Case            DateTime KeyValue                    Name Units</span></a>
+<a class="sourceLine" id="cb4-144" data-line-number="144"><span class="co">#&gt;    1: example 2018-01-01 01:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-145" data-line-number="145"><span class="co">#&gt;    2: example 2018-01-01 02:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-146" data-line-number="146"><span class="co">#&gt;    3: example 2018-01-01 03:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-147" data-line-number="147"><span class="co">#&gt;    4: example 2018-01-01 04:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-148" data-line-number="148"><span class="co">#&gt;    5: example 2018-01-01 05:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-149" data-line-number="149"><span class="co">#&gt;   ---                                                                   </span></a>
+<a class="sourceLine" id="cb4-150" data-line-number="150"><span class="co">#&gt; 9572: example 2018-12-31 20:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-151" data-line-number="151"><span class="co">#&gt; 9573: example 2018-12-31 21:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-152" data-line-number="152"><span class="co">#&gt; 9574: example 2018-12-31 22:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-153" data-line-number="153"><span class="co">#&gt; 9575: example 2018-12-31 23:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-154" data-line-number="154"><span class="co">#&gt; 9576: example 2019-01-01 00:00:00          EnergyTransfer:Facility     J</span></a>
+<a class="sourceLine" id="cb4-155" data-line-number="155"><span class="co">#&gt;       Value</span></a>
+<a class="sourceLine" id="cb4-156" data-line-number="156"><span class="co">#&gt;    1:     0</span></a>
+<a class="sourceLine" id="cb4-157" data-line-number="157"><span class="co">#&gt;    2:     0</span></a>
+<a class="sourceLine" id="cb4-158" data-line-number="158"><span class="co">#&gt;    3:     0</span></a>
+<a class="sourceLine" id="cb4-159" data-line-number="159"><span class="co">#&gt;    4:     0</span></a>
+<a class="sourceLine" id="cb4-160" data-line-number="160"><span class="co">#&gt;    5:     0</span></a>
+<a class="sourceLine" id="cb4-161" data-line-number="161"><span class="co">#&gt;   ---      </span></a>
+<a class="sourceLine" id="cb4-162" data-line-number="162"><span class="co">#&gt; 9572:     0</span></a>
+<a class="sourceLine" id="cb4-163" data-line-number="163"><span class="co">#&gt; 9573:     0</span></a>
+<a class="sourceLine" id="cb4-164" data-line-number="164"><span class="co">#&gt; 9574:     0</span></a>
+<a class="sourceLine" id="cb4-165" data-line-number="165"><span class="co">#&gt; 9575:     0</span></a>
+<a class="sourceLine" id="cb4-166" data-line-number="166"><span class="co">#&gt; 9576:     0</span></a></code></pre></div>
 </div>
 </div>
 <div id="acknowledgements" class="section level2">
@@ -327,6 +331,8 @@
 <h2>Links</h2>
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=eplusr">https://​cloud.r-project.org/​package=eplusr</a>
+</li>
+<li>Browse source code at <br><a href="https://github.com/hongyuanjia/eplusr">https://​github.com/​hongyuanjia/​eplusr</a>
 </li>
 <li>Report a bug at <br><a href="https://github.com/hongyuanjia/eplusr/issues">https://​github.com/​hongyuanjia/​eplusr/​issues</a>
 </li>

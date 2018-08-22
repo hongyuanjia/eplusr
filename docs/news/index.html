@@ -82,7 +82,12 @@
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/hongyuanjia/eplusr">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -96,7 +101,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1>Changelog <small></small></h1>
-      
+      <small>Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
     <div id="eplusr-0-9-0" class="section level1">
@@ -112,7 +117,7 @@
 <p>In <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code>, <code>eplus</code> argument has been moved to be the last argument with default value setting to <code>NULL</code>. This will make them a little bit more convenient to run EnergyPlus without explicitly specify the version. If <code>NULL</code>, the version of EnergyPlus is automatically detected using the version field of input model. For example: ```r # before run_idf(8.8, model.idf, weather.epw)</p>
 <p># after run_idf(model.idf, weather.epw) ```</p>
 </li>
-<li><p>Both argument <code>echo</code> and <code>wait</code> have been added to <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code>. Unlike the behavior in eplusr 0.8.3 when <code>echo</code> is <code>TRUE</code> in <code><a href="../reference/run_model.html">run_idf()</a></code>, right now <code>echo</code> only control whether to show the output from EnergyPlus commandline interface. Please use <code>wait</code> to control whether to wait until the simulation is complete or not.</p></li>
+<li><p>Both argument <code>echo</code> and <code>wait</code> have been added to <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code>. Unlike the behavior in eplusr 0.8.3 when <code>echo</code> is <code>TRUE</code> in <code><a href="../reference/run_model.html">run_idf()</a></code>, right now <code>echo</code> only control whether to show the output from EnergyPlus command line interface. Please use <code>wait</code> to control whether to wait until the simulation is complete or not.</p></li>
 </ul>
 </div>
 <div id="new-features" class="section level2">
@@ -185,12 +190,12 @@
 <h2 class="hasAnchor">
 <a href="#bug-fixes-1" class="anchor"></a>Bug fixes</h2>
 <ul>
-<li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (#12).</p></li>
-<li><p>Fix idf input version parsing in <code>param_job</code> (#13).</p></li>
-<li><p>Fix EnergyPlus downloading and installing errors on Linux and macOS (#14, #17).</p></li>
-<li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and macOS (#14).</p></li>
-<li><p>Fix missing name attribute in class <code>NodeList</code> (#16).</p></li>
-<li><p>Fix errors in <code><a href="../reference/use_eplus.html">use_eplus()</a></code> when input is an EnergyPlus installation path (#18).</p></li>
+<li><p>Fix errors in <code>$status()</code>, <code>$output_dir()</code> and <code>$locate_output()</code> in <code>ParametricJob</code> class when <code>which</code> arg is not given (<a href='https://github.com/hongyuanjia/eplusr/issues/12'>#12</a>).</p></li>
+<li><p>Fix idf input version parsing in <code>param_job</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/13'>#13</a>).</p></li>
+<li><p>Fix EnergyPlus downloading and installing errors on Linux and macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/14'>#14</a>, <a href='https://github.com/hongyuanjia/eplusr/issues/17'>#17</a>).</p></li>
+<li><p>Fix <code><a href="../reference/run_model.html">run_idf()</a></code> and <code><a href="../reference/run_model.html">run_multi()</a></code> errors on Linux and macOS (<a href='https://github.com/hongyuanjia/eplusr/issues/14'>#14</a>).</p></li>
+<li><p>Fix missing name attribute in class <code>NodeList</code> (<a href='https://github.com/hongyuanjia/eplusr/issues/16'>#16</a>).</p></li>
+<li><p>Fix errors in <code><a href="../reference/use_eplus.html">use_eplus()</a></code> when input is an EnergyPlus installation path (<a href='https://github.com/hongyuanjia/eplusr/issues/18'>#18</a>).</p></li>
 </ul>
 </div>
 </div>

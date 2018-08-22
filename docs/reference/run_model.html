@@ -86,7 +86,12 @@ run EnergyPlus model with different options." />
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/hongyuanjia/eplusr">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -100,7 +105,7 @@ run EnergyPlus model with different options." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Run simulations of EnergyPlus models.</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/run.R'><code>R/run.R</code></a></small>
     <div class="hidden name"><code>run_model.Rd</code></div>
     </div>
 
@@ -164,7 +169,7 @@ and a <a href='http://www.rdocumentation.org/packages/processx/topics/process'>p
     <tr>
       <th>echo</th>
       <td><p>Whether to show standard output and error from EnergyPlus
-commandline interface for <code>run_idf()</code> and simulation status for
+command line interface for <code>run_idf()</code> and simulation status for
 <code>run_multi()</code>.Default: <code>TRUE</code>.</p></td>
     </tr>
     <tr>
@@ -172,7 +177,7 @@ commandline interface for <code>run_idf()</code> and simulation status for
       <td><p>An acceptable input (for <code>run_idf()</code>) or inputs (for
 <code>run_multi()</code>) of <code><a href='use_eplus.html'>use_eplus()</a></code> and <code><a href='use_eplus.html'>eplus_config()</a></code>. If
 <code>NULL</code>, which is the default, the version of EnergyPlus to use is
-detemined by the version of input model. For <code>run_multi()</code>, <code>eplus</code>, if not
+deterimined by the version of input model. For <code>run_multi()</code>, <code>eplus</code>, if not
 <code>NULL</code>, should have the same length as <code>model</code>.</p></td>
     </tr>
     </table>

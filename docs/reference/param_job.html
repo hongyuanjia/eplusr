@@ -86,7 +86,12 @@ For details on ParametricJob, please see ParametricJob class." />
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/hongyuanjia/eplusr">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -100,7 +105,7 @@ For details on ParametricJob, please see ParametricJob class." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Create An EnergyPlus Parametric Simulation Job</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/param.R'><code>R/param.R</code></a></small>
     <div class="hidden name"><code>param_job.Rd</code></div>
     </div>
 
@@ -149,10 +154,10 @@ For details on <code>ParametricJob</code>, please see <a href='ParametricJob.htm
     <span class='co'># create from an Idf and an Epw object</span>
     <span class='fu'>param_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
 }</div><div class='output co'>#&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #&gt; 
 #&gt; ── Info ────────────────────────────────────────────────────────────────────────
-#&gt; Adding object `Output:SQLite` and setting  `Option Type` to `SimpleAndTabular`.
+#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #&gt; </div><div class='output co'>#&gt; ── EnergPlus Parametric Job ────────────────────────────────────────────────────
 #&gt; ● Seed Model: `/usr/local/EnergyPlus-8-8-0/ExampleFiles/1ZoneUncontrolled.idf`
 #&gt; ● Weather: `/usr/local/EnergyPlus-8-8-0/WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw`
