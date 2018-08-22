@@ -63,12 +63,12 @@ NULL
 #' job$path(type = c("all", "idf", "epw"))
 #' ```
 #'
-#' `$path()` returns the path of idf or epw of current job.
+#' `$path()` returns the path of IDF or EPW of current job.
 #'
 #' **Arguments**
 #'
-#' * `type`: If `"all"`, both the idf path and epw path are returned. If
-#'     `"idf"`, only idf path is returned. If `"epw"`, only epw path is
+#' * `type`: If `"all"`, both the IDF path and EPW path are returned. If
+#'     `"idf"`, only IDF path is returned. If `"epw"`, only EPW path is
 #'     returned.  Default: `"all"`.
 #'
 #' @section Run:

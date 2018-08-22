@@ -93,7 +93,7 @@ clean_wd <- function (path) {
 #' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
 #'     Default: `TRUE`.
 #' @param echo Whether to show standard output and error from EnergyPlus
-#'     commandline interface for `run_idf()` and simulation status for
+#'     command line interface for `run_idf()` and simulation status for
 #'     `run_multi()`.Default: `TRUE`.
 #' @param wait If `TRUE`, R will hang on and wait all EnergyPlus simulations
 #'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
@@ -102,7 +102,7 @@ clean_wd <- function (path) {
 #' @param eplus An acceptable input (for `run_idf()`) or inputs (for
 #'     `run_multi()`) of [use_eplus()] and [eplus_config()]. If
 #'     `NULL`, which is the default, the version of EnergyPlus to use is
-#'     detemined by the version of input model. For `run_multi()`, `eplus`, if not
+#'     deterimined by the version of input model. For `run_multi()`, `eplus`, if not
 #'     `NULL`, should have the same length as `model`.
 #'
 #' @details

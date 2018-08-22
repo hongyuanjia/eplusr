@@ -63,12 +63,12 @@ job$print()
 \preformatted{job$path(type = c("all", "idf", "epw"))
 }
 
-\code{$path()} returns the path of idf or epw of current job.
+\code{$path()} returns the path of IDF or EPW of current job.
 
 \strong{Arguments}
 \itemize{
-\item \code{type}: If \code{"all"}, both the idf path and epw path are returned. If
-\code{"idf"}, only idf path is returned. If \code{"epw"}, only epw path is
+\item \code{type}: If \code{"all"}, both the IDF path and EPW path are returned. If
+\code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is
 returned.  Default: \code{"all"}.
 }
 }

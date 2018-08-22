@@ -40,13 +40,13 @@ and a \link[processx:process]{processx::process} object is returned. Note that, 
 \emph{not blocked} even when \code{echo} is \code{TRUE}. Default: \code{TRUE}.}
 
 \item{echo}{Whether to show standard output and error from EnergyPlus
-commandline interface for \code{run_idf()} and simulation status for
+command line interface for \code{run_idf()} and simulation status for
 \code{run_multi()}.Default: \code{TRUE}.}
 
 \item{eplus}{An acceptable input (for \code{run_idf()}) or inputs (for
 \code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If
 \code{NULL}, which is the default, the version of EnergyPlus to use is
-detemined by the version of input model. For \code{run_multi()}, \code{eplus}, if not
+deterimined by the version of input model. For \code{run_multi()}, \code{eplus}, if not
 \code{NULL}, should have the same length as \code{model}.}
 }
 \value{

@@ -25,7 +25,7 @@
 * Both argument `echo` and `wait` have been added to `run_idf()` and
   `run_multi()`. Unlike the behavior in eplusr 0.8.3 when `echo` is `TRUE` in
   `run_idf()`, right now `echo` only control whether to show the output from
-  EnergyPlus commandline interface. Please use `wait` to control whether to wait
+  EnergyPlus command line interface. Please use `wait` to control whether to wait
   until the simulation is complete or not.
 
 ## New features

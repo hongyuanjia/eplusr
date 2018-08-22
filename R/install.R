@@ -20,7 +20,7 @@ NULL
 #' @details
 #'
 #' `download_eplus()` downloads specified version of EnergyPlus from
-#' [EnergyPlus Github Repository](https://github.com/NREL/EnergyPlus).
+#' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus).
 #'
 #' `install_eplus()` will try to install EnergyPlus into the default location,
 #' e.g.  `C:\\EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on
