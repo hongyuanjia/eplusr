@@ -99,6 +99,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 download_eplus <- function (ver = "latest", dir) {
     ver <- standardize_ver(ver)
     url <- eplus_download_url(ver)
+    file <- basename(url)
 
     dest <- normalizePath(file.path(dir, file), mustWork = FALSE)
     dl <- download_file(url, dest)
@@ -335,7 +336,7 @@ eplus_default_path <- function (ver) {
 # }}}
 # get_ver_from_path {{{
 get_ver_from_path <- function (path) {
-    idd_file <- normalizePath(file.exists(path, "Energy+.idd"), mustWork = TRUE)
+    idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
     h <- readr::read_lines(idd_file, n_max = 1L)
 
