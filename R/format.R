@@ -440,15 +440,22 @@ print.ErrFile <- function (x, ...) {
 
         err_dt[begin_environment == FALSE & seperate == TRUE,
                out := paste0(level, "[", level_index, "/", level_num, "] ", out)]
-        err_dt[begin_environment == FALSE & level == "Info",
-            out := crayon::cyan(out)]
-        err_dt[begin_environment == FALSE & level == "Warning",
-            out := crayon::magenta(out)]
-        err_dt[begin_environment == FALSE & !level %in% c("Info", "Warning"),
-            out := crayon::red$bold(out)]
 
         err_dt[, out := as.list(out)]
         err_dt[line %in% l_last, `:=`(out = {lapply(out, function (x) c(x, ""))})]
+        err_dt[begin_environment == FALSE,
+            `:=`(out = list(strwrap(out[[1]], width = getOption("width")))),
+            by = line]
+
+        err_dt[begin_environment == FALSE & level == "Info",
+            `:=`(out = list(vapply(out[[1]], crayon::cyan, character(1)))),
+            by = line]
+        err_dt[begin_environment == FALSE & level == "Warning",
+            `:=`(out = list(vapply(out[[1]], crayon::magenta, character(1)))),
+            by = line]
+        err_dt[begin_environment == FALSE & !level %in% c("Info", "Warning"),
+            `:=`(out = list(vapply(out[[1]], crayon::red$bold, character(1)))),
+            by = line]
 
         if (all(is.na(err_dt$environment_index))) {
             cat(unlist(err_dt$out), head, sep = "\n")
