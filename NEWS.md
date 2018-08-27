@@ -1,3 +1,9 @@
+# eplusr 0.9.0.1000
+
+## Minor changes
+
+* Long lines in err files now will be wrapped when printed.
+
 # eplusr 0.9.0
 
 ## Break Changes
