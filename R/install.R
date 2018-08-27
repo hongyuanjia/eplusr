@@ -170,6 +170,21 @@ install_eplus_win <- function (exec) {
     system(sprintf("%s /S", exec))
 }
 # }}}
+# install_eplus_macos {{{
+install_eplus_macos <- function (exec) {
+    # change working directory
+    ori_wd <- getwd()
+    on.exit(setwd(ori_wd), add = TRUE)
+
+    exe_dir <- dirname(exec)
+    setwd(exe_dir)
+
+    f <- basename(exec)
+    no_ext <- tools::file_path_sans_ext(f)
+    system(sprintf("sudo hdiutil attach %s", f))
+    system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+}
+# }}}
 # install_eplus_linux {{{
 install_eplus_linux <- function (exec) {
     # change working directory
