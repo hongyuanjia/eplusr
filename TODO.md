@@ -8,8 +8,6 @@
 
 * Model version conversion
 
-* Exclude "memo" in class table and and "note" in field table to speed up
-
 * Remove unnecessary `as.integer()`
 
 * Fix extensible field names when they should be "A123" or "N123" but not
@@ -18,3 +16,5 @@
 * Using `units` package to add units in the returned data.table
 
 * Apply multiple weather file to a seed in `ParametricJob` class
+
+* Add more tests on value reference updating during value modifications.

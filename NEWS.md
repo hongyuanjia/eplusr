@@ -6,7 +6,10 @@
 
 ## Bug fixes
 
-* Fix the error when checking invalid extensible fields.
+* Fix the error when checking invalid extensible fields in value validation.
+
+* Fix the error that value references did not get updated when setting values to
+  `NA` in `$set_value()` in `IdfObject` and `$set_object()` in `Idf`.
 
 # eplusr 0.9.0
 

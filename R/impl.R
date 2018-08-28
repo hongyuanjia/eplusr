@@ -1653,11 +1653,11 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
     last_val[, last_index := as.integer(i_field_num_from_index(
         self, private, class_id, last_index), by = list(object_rleid))]
 
-    val_tbl <- val_tbl[last_val, on = list(object_rleid, class_id, field_index <= last_index)]
+    val_tbl_set <- val_tbl[last_val, on = list(object_rleid, class_id, field_index <= last_index)]
 
     # assign tbl
     i_assign_object_tbl(self, private, obj_tbl)
-    i_assign_value_tbl(self, private, val_tbl)
+    i_assign_value_tbl(self, private, val_tbl_set)
 
     # update value reference
     i_update_value_reference_from_tbl(self, private, val_tbl)
@@ -2467,13 +2467,22 @@ i_update_value_reference_from_id <- function (self, private, old_id, new_id) {
 
 # i_update_value_reference_from_tbl {{{
 i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
+    # delete references to empty fields
+    empty_id <- value_tbl[is.na(value), value_id]
+    if (not_empty(empty_id)) {
+        private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
+            !(reference_value_id %in% empty_id | value_id %in% empty_id)]
+    }
+
+    value_tbl <- value_tbl[!value_id %in% empty_id]
+
     # get object-list fields
     val_tbl_obj <- value_tbl[has_object_list == TRUE]
 
     # get reference fields
     val_tbl_ref <- value_tbl[has_reference == TRUE]
 
-    if (is_empty(val_tbl_ref) && is_empty(val_tbl_ref)) return()
+    if (is_empty(val_tbl_obj) && is_empty(val_tbl_ref)) return()
 
     # update value reference table
     if (not_empty(val_tbl_obj)) {
@@ -2483,7 +2492,7 @@ i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
 
         # get all possible values to reference
         all_val_ref <- private$m_idf_tbl$value[private$m_idd_tbl$field_reference,
-        on = "field_id", nomatch = 0L, list(value_id, value_upper, reference)]
+            on = "field_id", nomatch = 0L, list(value_id, value_upper, reference)]
         data.table::setnames(all_val_ref, "value_id", "reference_value_id")
 
         # find references
