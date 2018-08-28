@@ -4,6 +4,10 @@
 
 * Long lines in err files now will be wrapped when printed.
 
+## Bug fixes
+
+* Fix the error when checking invalid extensible fields.
+
 # eplusr 0.9.0
 
 ## Break Changes

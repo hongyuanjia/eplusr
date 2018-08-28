@@ -275,7 +275,7 @@ i_check_incomplete_extensible <- function (self, private, input) {
         # exclude field that are empty extensible fields that not required
         input$value_tbl <- input$value_tbl[is_extensible == TRUE & required_field == FALSE & is.na(value)]
 
-        if (type == "add_object") {
+        if (input$type == "add_object") {
             incomp_ext <- ext_tbl[object_rleid %in% invalid_obj]
         } else {
             incomp_ext <- ext_tbl[object_id %in% invalid_obj]
