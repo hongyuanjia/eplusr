@@ -36,6 +36,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 knitr::opts_knit$set(root.dir = tempdir())
 
 options(crayon.enabled = FALSE)
+
+can_run <- eplusr:::os_type() != "unknown"
 ```
 
 eplusr provides a rich toolkit of using whole building energy simulation program
@@ -78,11 +80,11 @@ Note that the installation process in `install_eplus()` requires
 sudo if you are on macOS or Linux) to make it work if you are not in interactive
 mode.
 
-```{r install_eplus, include = FALSE}
+```{r install_eplus, include = FALSE, eval = can_run}
 if (!eplusr::is_avail_eplus(8.8)) {
-    if (!eplusr:::is_linux()) {
+    if (eplusr:::is_windows() || eplusr:::is_macos()) {
         eplusr::install_eplus(8.8)
-    } else {
+    } else if (eplusr:::is_linux()) {
         base <- "https://github.com/NREL/EnergyPlus/releases/download/v8.8.0"
         file <- "EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.tar.gz"
         url <- file.path(base, file)
@@ -112,7 +114,7 @@ if (!eplusr::is_avail_eplus(8.8)) {
 
 Below shows the class structure in eplusr.
 
-```{r, results = "asis", echo = FALSE}
+```{r, results = "asis", echo = FALSE, eval = can_run}
 cat('
 <p align="center">
   <img src="../man/figures/class_structure.png"/>
@@ -133,7 +135,7 @@ parametric EnergyPlus simulations and collect all outputs.
 It is highly recommended to read the documentation to get a thorough
 understanding on each class.
 
-```{r copy_example, include = FALSE}
+```{r copy_example, include = FALSE, eval = can_run}
 library(eplusr)
 
 cfg <- eplus_config(8.8)
@@ -183,6 +185,17 @@ use_idd(8.8, download = TRUE)
 
 Now let's read an IDF file distributed with EnergyPlus 8.8.0. As EnergyPlus
 v8.8.0 has been installed, we can just ignore the `idd` argument.
+
+```{r idd_solaris, include = FALSE, eval = !can_run}
+use_idd(8.8, download = TRUE)
+path_example <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/testfiles/5Zone_Transformer.idf"
+path_weather <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+path_ddy <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.ddy"
+
+eplusr:::download_file(path_example, file.path(tempdir(), basename(path_example)))
+eplusr:::download_file(path_weather, file.path(tempdir(), "San_Francisco.epw"))
+eplusr:::download_file(path_ddy, file.path(tempdir(), "San_Francisco.ddy"))
+```
 
 ```{r read, out.lines = 30}
 model <- read_idf(path = "5Zone_Transformer.idf", idd = NULL)
@@ -607,7 +620,7 @@ output directory. An `EplusJob` object will be returned which provides detailed
 information of the simulation and methods to collect simulation output. Please
 see `?job` for more detailed.
 
-```{r run}
+```{r run, eval = can_run}
 # read the model again
 model <- read_idf("5Zone_Transformer.idf", idd = NULL)
 
@@ -619,7 +632,7 @@ job
 
 You can get simulation errors using `$errors()`.
 
-```{r errors}
+```{r errors, eval = can_run}
 job$errors()
 ```
 
@@ -640,7 +653,7 @@ report data. For details on the meaning of each columns, please see
 *"2.20.2.1 ReportDataDictionary Table"* in EnergyPlus *"Output Details and
 Examples"* documentation.
 
-```{r dict}
+```{r dict, eval = can_run}
 str(job$report_data_dict())
 ```
 
@@ -648,7 +661,7 @@ str(job$report_data_dict())
 Basically, `key_value` equals `KeyValue` and `name` equals `Name` in the report
 data dictionary you get from `$report_data_dict()`.
 
-```{r output}
+```{r output, eval = can_run}
 str(job$report_data(name = "Site Outdoor Air Drybulb Temperature"))
 ```
 
@@ -656,11 +669,11 @@ str(job$report_data(name = "Site Outdoor Air Drybulb Temperature"))
 columns, please see *"2.20.4.4 TabularData Table"* in EnergyPlus *"Output
 Details and Examples"* documentation.
 
-```{r tab}
+```{r tab, eval = can_run}
 str(job$tabular_data())
 ```
 
-```{r del_job, include = FALSE}
+```{r del_job, include = FALSE, eval = can_run}
 clean_wd(model$path())
 ```
 
@@ -671,7 +684,7 @@ eplusr's model editing and result collecting functionalities.  You can create a
 parametric job using `param_job()`, which takes an IDF file or an `Idf` object
 as the *seed* and an EPW file or an `Epw` object as *weather*.
 
-```{r param}
+```{r param, eval = can_run}
 param <- param_job(idf = model, epw = epw_sf)
 
 param
@@ -692,7 +705,7 @@ supply different arguments to that measure.
 
 Let's create a function that modifies infiltration rate:
 
-```{r mea}
+```{r mea, eval = can_run}
 set_infil_rate <- function (idf, infil_rate) {
 
     # validate input value
@@ -722,7 +735,7 @@ zones to the input value.
 Now, let's apply this measure to the seed model with different infiltration
 rates from 0.0 to 4.0, respectively.
 
-```{r apply}
+```{r apply, eval = can_run}
 param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = NULL)
 ```
 
@@ -739,13 +752,13 @@ number of parallel EnergyPlus processes can be specified using option
 > Currently, unlike `EplusJob`, all simulations in `ParametricJob` will be run
 > in waiting mode. This may be changed in the future.
 
-```{r param_run}
+```{r param_run, eval = can_run}
 param$run()
 ```
 
 After all simulations completed, let's see the variations of total energy.
 
-```{r param_res}
+```{r param_res, eval = can_run}
 tab <- param$tabular_data()
 
 total_eng <- tab[TableName == "Site and Source Energy" &
@@ -754,16 +767,19 @@ total_eng <- tab[TableName == "Site and Source Energy" &
     list(Case, `Total Energy (GJ)` = as.numeric(Value))]
 ```
 
-```{r eval=FALSE}
+```{r eval = FALSE}
 total_eng
 ```
 
-```{r echo=FALSE, results="asis"}
+```{r echo = FALSE, results="asis", eval = can_run}
 knitr::kable(total_eng)
 ```
 
-```{r del_param, include = FALSE}
+```{r del_param, include = FALSE, eval = can_run}
 dir_nms <- paste0("set_infil_rate_", 1:5)
 lapply(dir_nms, unlink, recursive = TRUE, force = TRUE)
+```
+
+```{r clean_files, include = FALSE}
 unlink(file.path(tempdir(), c(example_name, "San_Francisco.epw", "San_Francisco.ddy")))
 ```
