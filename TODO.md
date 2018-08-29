@@ -18,3 +18,5 @@
 * Apply multiple weather file to a seed in `ParametricJob` class
 
 * Add more tests on value reference updating during value modifications.
+
+* Only use minimal columns in data modifications to speed up the whole process
