@@ -11,7 +11,11 @@
 
 ### R CMD check results
 
-0 errors | 0 warnings | 0 notes
+0 errors | 0 warnings | 1 notes
+
+```
+Days since last update: 2
+```
 
 ### Reverse dependencies
 
@@ -19,4 +23,10 @@ eplusr currently has no reverse dependencies.
 
 ### Submission comments
 
-Fix the error of building vignette on osx and solaris.
+There was a problem generating the vignettes because that EnergyPlus only
+has releases for Windows, macOS and Linux, but not for Solaris platform. Also,
+there is a typo that causes EnergyPlus installation failed on macOS.
+
+I modified the vignette to skip some chunks that call EnergyPlus on Solaris
+platform but keep all chunks that show the model modification functionalities,
+and also fixed the installation on macOS.

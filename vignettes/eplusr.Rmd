@@ -82,15 +82,16 @@ mode.
 
 ```{r install_eplus, include = FALSE, eval = can_run}
 if (!eplusr::is_avail_eplus(8.8)) {
-    if (eplusr:::is_windows() || eplusr:::is_macos()) {
+    if (eplusr:::is_windows()) {
         eplusr::install_eplus(8.8)
-    } else if (eplusr:::is_linux()) {
+    } else {
         base <- "https://github.com/NREL/EnergyPlus/releases/download/v8.8.0"
-        file <- "EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.tar.gz"
+        plat <- switch(eplusr:::os_type(), linux = "Linux", macos = "Darwin")
+        file <- paste0("EnergyPlus-8.8.0-7c3bbe4830-", plat, "-x86_64.tar.gz")
         url <- file.path(base, file)
         dest <- file.path(tempdir(), file)
         dl <- eplusr:::download_file(url, dest)
-        eplus_dir <- "EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64/EnergyPlus-8-8-0"
+        eplus_dir <- paste0("EnergyPlus-8.8.0-7c3bbe4830-", plat, "-x86_64/EnergyPlus-8-8-0")
         untar(dest, exdir = tempdir())
         eplusr::use_eplus(file.path(tempdir(), eplus_dir))
     }
