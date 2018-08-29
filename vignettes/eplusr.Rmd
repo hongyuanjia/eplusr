@@ -15,7 +15,8 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  screenshot.force = FALSE
 )
 
 # the default output hook
@@ -82,9 +83,9 @@ if (!eplusr::is_avail_eplus(8.8)) {
     if (!eplusr:::is_linux()) {
         eplusr::install_eplus(8.8)
     } else {
-        l <- eplusr:::eplus_download_url(8.8)
-        url <- paste0(tools::file_path_sans_ext(l), ".tar.gz")
-        file <- basename(url)
+        base <- "https://github.com/NREL/EnergyPlus/releases/download/v8.8.0"
+        file <- "EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64.tar.gz"
+        url <- file.path(base, file)
         dest <- file.path(tempdir(), file)
         dl <- eplusr:::download_file(url, dest)
         eplus_dir <- "EnergyPlus-8.8.0-7c3bbe4830-Linux-x86_64/EnergyPlus-8-8-0"
@@ -111,9 +112,13 @@ if (!eplusr::is_avail_eplus(8.8)) {
 
 Below shows the class structure in eplusr.
 
+```{r, results = "asis", echo = FALSE}
+cat('
 <p align="center">
   <img src="../man/figures/class_structure.png"/>
 </p>
+')
+```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
 class to present a single object in an IDF. Both `Idf` and `IdfObject` class
