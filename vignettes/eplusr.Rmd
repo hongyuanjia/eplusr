@@ -188,6 +188,7 @@ Now let's read an IDF file distributed with EnergyPlus 8.8.0. As EnergyPlus
 v8.8.0 has been installed, we can just ignore the `idd` argument.
 
 ```{r idd_solaris, include = FALSE, eval = !can_run}
+library(eplusr)
 use_idd(8.8, download = TRUE)
 path_example <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/testfiles/5Zone_Transformer.idf"
 path_weather <- "https://raw.githubusercontent.com/NREL/EnergyPlus/v8.8.0/weather/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
