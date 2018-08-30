@@ -109,8 +109,8 @@ understanding on each class.
 library(eplusr)
 
 idd <- use_idd(8.8, download = "auto")
-#> Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder `/usr/local/EnergyPlus-8-8-0`.
-#> IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.
+#> Idd v8.8.0 has not been parsed before. Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder `C:/EnergyPlusV8-8-0`.
+#> IDD file found: `C:\EnergyPlusV8-8-0\Energy+.idd`.
 #> Start parsing...
 #> 
   Parsing IDD (Parsing ) [======>---------------------------]  20% in  0s
@@ -125,12 +125,12 @@ idd <- use_idd(8.8, download = "auto")
 model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
 model
-#> ══ EnergPlus Input Data File ══════════════════════════════════════════════
-#> ● Path: `/home/hongyuanjia/R/eplusr/extdata/1ZoneUncontrolled.idf`
-#> ● Version: `8.8`
+#> == EnergPlus Input Data File ==============================================
+#> * Path: `C:\Users\hongy\R\eplusr\extdata\1ZoneUncontrolled.idf`
+#> * Version: `8.8`
 #> 
 #> Group: `Simulation Parameters`
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 #> [01] Version
 #> [01] SimulationControl
 #> [01] Building
@@ -140,18 +140,18 @@ model
 #> [01] Timestep
 #> 
 #> Group: `Location and Climate`
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 #> [01] Site:Location
 #> [02] SizingPeriod:DesignDay
 #> [01] RunPeriod
 #> 
 #> Group: `Schedules`
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 #> [02] ScheduleTypeLimits
 #> [01] Schedule:Constant
 #> 
 #> Group: `Surface Construction Elements`
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 #> [01] Material
 #> [02] Material:NoMass
 #> [03] Construction
@@ -159,14 +159,14 @@ model
 
 model$Material_NoMass$R13LAYER
 #> IdfObject <<[ID:12] `R13LAYER`>>`Material:NoMass`
-#> ──────────────────────────────── * VALUES * ───────────────────────────────
-#> ●1: R13LAYER,          !- Name
-#> ●2: Rough,             !- Roughness
-#> ●3: 2.290965,          !- Thermal Resistance {m2-K/W}
+#> -------------------------------- * VALUES * -------------------------------
+#> *1: R13LAYER,          !- Name
+#> *2: Rough,             !- Roughness
+#> *3: 2.290965,          !- Thermal Resistance {m2-K/W}
 #>  4: 0.9,               !- Thermal Absorptance
 #>  5: 0.75,              !- Solar Absorptance
 #>  6: 0.75;              !- Visible Absorptance
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 
 model$RunPeriod[[1]][c("Begin Month", "End Month")]
 #> $Begin_Month
@@ -180,23 +180,23 @@ model$add_object("RunPeriod",
          end_month = 4, end_day_of_month = 1))
 #> $run_period
 #> IdfObject <<[ID:54] `run_period`>>`RunPeriod`
-#> ──────────────────────────────── * VALUES * ───────────────────────────────
+#> -------------------------------- * VALUES * -------------------------------
 #>   1: run_period,        !- Name
-#> ● 2: 3,                 !- Begin Month
-#> ● 3: 1,                 !- Begin Day of Month
-#> ● 4: 4,                 !- End Month
-#> ● 5: 1,                 !- End Day of Month
+#> * 2: 3,                 !- Begin Month
+#> * 3: 1,                 !- Begin Day of Month
+#> * 4: 4,                 !- End Month
+#> * 5: 1,                 !- End Day of Month
 #>   6: UseWeatherFile,    !- Day of Week for Start Day
 #>   7: Yes,               !- Use Weather File Holidays and Special Days
 #>   8: Yes,               !- Use Weather File Daylight Saving Period
 #>   9: No,                !- Apply Weekend Holiday Rule
 #>  10: Yes,               !- Use Weather File Rain Indicators
 #>  11: Yes;               !- Use Weather File Snow Indicators
-#> ───────────────────────────────────────────────────────────────────────────
+#> ---------------------------------------------------------------------------
 
 model$Construction$FLOOR$possible_value("Outside Layer")
-#> ── 2: Field `Outside Layer` ───────────────────────────────────────────────
-#> ● References:
+#> -- 2: Field `Outside Layer` -----------------------------------------------
+#> * References:
 #>   - `R13LAYER`
 #>   - `R31LAYER`
 #>   - `C5 - 4 IN HW CONCRETE`
@@ -206,17 +206,14 @@ model$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 job <- model$run(
     weather = file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"),
     dir = NULL)
-#> ── Info ───────────────────────────────────────────────────────────────────
+#> -- Info -------------------------------------------------------------------
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #> 
-#> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing file located  at /tmp/RtmpoksYNX/model.idf.
+#> -- Info -------------------------------------------------------------------
+#> Replace the existing file located  at C:\Users\hongy\AppData\Local\Temp\Rtmp4Ub7Cl\model.idf.
 #> 
-#> ExpandObjects Started.
-#> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.004
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.30 11:10
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.30 19:52
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -236,30 +233,33 @@ job <- model$run(
 #> Warming up {11}
 #> Warming up {12}
 #> Warming up {13}
+#> Warming up {14}
+#> Warming up {15}
+#> Warming up {16}
 ....
 
 job$errors()
 #> 
-#> ┌─────────────────────────────────────────────────────────────────────────┐
-#> │Warning[1/3] Weather file location will be used rather than entered (IDF)│
-#> │Location object.                                                         │
-#> │..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA DESIGN_CONDITIONS    │
-#> │..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940    │
-#> │..due to location differences, Latitude difference=[2.12] degrees,       │
-#> │Longitude difference=[17.22] degrees.                                    │
-#> │..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]       │
-#> │percent, [1827.00] meters.                                               │
-#> │                                                                         │
-#> │Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 │
-#> │differs by more than 10% from Standard Barometric Pressure=101301.       │
-#> │...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99% CONDNS DB, │
-#> │Standard Pressure (based on elevation) will be used.                     │
-#> │                                                                         │
-#> │Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 │
-#> │differs by more than 10% from Standard Barometric Pressure=101301.       │
-#> │...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1% CONDNS      │
-#> │DB=>MWB, Standard Pressure (based on elevation) will be used.            │
-#> └─────────────────────────────────────────────────────────────────────────┘
+#> +-------------------------------------------------------------------------+
+#> |Warning[1/3] Weather file location will be used rather than entered (IDF)|
+#> |Location object.                                                         |
+#> |..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA DESIGN_CONDITIONS    |
+#> |..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940    |
+#> |..due to location differences, Latitude difference=[2.12] degrees,       |
+#> |Longitude difference=[17.22] degrees.                                    |
+#> |..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]       |
+#> |percent, [1827.00] meters.                                               |
+#> |                                                                         |
+#> |Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 |
+#> |differs by more than 10% from Standard Barometric Pressure=101301.       |
+#> |...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99% CONDNS DB, |
+#> |Standard Pressure (based on elevation) will be used.                     |
+#> |                                                                         |
+#> |Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 |
+#> |differs by more than 10% from Standard Barometric Pressure=101301.       |
+#> |...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1% CONDNS      |
+#> |DB=>MWB, Standard Pressure (based on elevation) will be used.            |
+#> +-------------------------------------------------------------------------+
 #> 
 #> EnergyPlus completed successfully with 3 Warning.
 
@@ -298,6 +298,8 @@ inspired the development of eplusr package, especially these below:
   - [OpenStudio](https://www.openstudio.net)
   - [eppy: scripting language for E+,
     Energyplus](https://github.com/santoshphilip/eppy)
+  - [JEplus - An EnergyPlus simulation manager for
+    parametrics](http://www.jeplus.org)
 
 ## Author
 
