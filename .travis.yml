@@ -11,28 +11,40 @@ cache: packages
 
 matrix:
   include:
-  - os: linux
-    r: oldrel
-    NOT_CRAN: true
+    - os: linux
+      r: oldrel
+      env:
+        - NOT_CRAN: true
 
-  - os: linux
-    r: release
-    NOT_CRAN: true
+    - os: linux
+      r: release
+      env:
+        - NOT_CRAN: true
 
-  - os: linux
-    r: devel
-    NOT_CRAN: true
+    - os: linux
+      r: devel
+      env:
+        - NOT_CRAN: true
 
-  - os: osx
-    r: oldrel
-    NOT_CRAN: true
+    - os: osx
+      r: oldrel
+      env:
+        - NOT_CRAN: true
 
-  - os: osx
-    r: release
-    NOT_CRAN: true
+    - os: osx
+      r: release
+      env:
+        - NOT_CRAN: true
 
-  - os: linux
-    r: release
+    - os: linux
+      r: release
+      env:
+        - NOT_CRAN: false
+
+    - os: osx
+      r: release
+      env:
+        - NOT_CRAN: false
 
 r_packages:
   - covr
