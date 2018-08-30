@@ -113,6 +113,7 @@ idd <- use_idd(8.8, download = "auto")
 #> IDD file found: `/usr/local/EnergyPlus-8-8-0/Energy+.idd`.
 #> Start parsing...
 #> 
+  Parsing IDD (Parsing ) [======>---------------------------]  20% in  0s
   Parsing IDD (Parsing ) [=========>------------------------]  30% in  0s
   Parsing IDD (Parsing ) [=============>--------------------]  40% in  0s
   Parsing IDD (Parsing ) [================>-----------------]  50% in  1s
@@ -209,13 +210,13 @@ job <- model$run(
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular`.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing file located  at /tmp/RtmpGWmNQZ/model.idf.
+#> Replace the existing file located  at /tmp/RtmpoksYNX/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.005
+#> ExpandObjects Finished. Time:     0.004
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.22 17:21
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2018.08.30 11:10
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -239,19 +240,26 @@ job <- model$run(
 
 job$errors()
 #> 
-#> ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-#> │Warning[1/3] Weather file location will be used rather than entered (IDF) Location object.                                                 │
-#> │  ..Location object=DENVER CENTENNIAL  GOLDEN   N_CO_USA DESIGN_CONDITIONS                                                                 │
-#> │  ..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940                                                                    │
-#> │  ..due to location differences, Latitude difference=[2.12] degrees, Longitude difference=[17.22] degrees.                                 │
-#> │  ..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89] percent, [1827.00] meters.                                            │
-#> │                                                                                                                                           │
-#> │Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
-#> │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB, Standard Pressure (based on elevation) will be used.         │
-#> │                                                                                                                                           │
-#> │Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.│
-#> │  ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB, Standard Pressure (based on elevation) will be used.     │
-#> └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+#> ┌─────────────────────────────────────────────────────────────────────────┐
+#> │Warning[1/3] Weather file location will be used rather than entered (IDF)│
+#> │Location object.                                                         │
+#> │..Location object=DENVER CENTENNIAL GOLDEN N_CO_USA DESIGN_CONDITIONS    │
+#> │..Weather File Location=San Francisco Intl Ap CA USA TMY3 WMO#=724940    │
+#> │..due to location differences, Latitude difference=[2.12] degrees,       │
+#> │Longitude difference=[17.22] degrees.                                    │
+#> │..Time Zone difference=[1.0] hour(s), Elevation difference=[99.89]       │
+#> │percent, [1827.00] meters.                                               │
+#> │                                                                         │
+#> │Warning[2/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 │
+#> │differs by more than 10% from Standard Barometric Pressure=101301.       │
+#> │...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99% CONDNS DB, │
+#> │Standard Pressure (based on elevation) will be used.                     │
+#> │                                                                         │
+#> │Warning[3/3] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 │
+#> │differs by more than 10% from Standard Barometric Pressure=101301.       │
+#> │...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1% CONDNS      │
+#> │DB=>MWB, Standard Pressure (based on elevation) will be used.            │
+#> └─────────────────────────────────────────────────────────────────────────┘
 #> 
 #> EnergyPlus completed successfully with 3 Warning.
 
