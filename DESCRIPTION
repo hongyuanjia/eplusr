@@ -41,7 +41,7 @@ Suggests:
     rmarkdown
 Encoding: UTF-8
 LazyData: true
-SystemRequirements: EnergyPlus (<https://energyplus.net>)
+SystemRequirements: EnergyPlus (>= 8.3, optional) (<https://energyplus.net>)
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 6.1.0
 Collate:
