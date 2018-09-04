@@ -2996,7 +2996,6 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
     format <- match.arg(format, c("asis", "sorted", "new_top", "new_bot"))
     if (format == "asis") format <- private$m_log$save_format
 
-    str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
     if (file.exists(path)) {
         if (!overwrite) {
             stop("Target already exists. Please set `overwrite` to ",
@@ -3021,6 +3020,7 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
     i_idf_resolve_external_link(self, private,
         old = private$m_path, new = path, copy = copy_external)
 
+    str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
     write_lines_eol(str, path)
 
     # log saved

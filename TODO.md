@@ -37,3 +37,6 @@
 
 * Add functionality that can set objects using input data.frame instead of
   nested list.
+
+* Add external file dependency (e.g. file existance in `Schedule:File` class)
+  checking in `$validate()`.
