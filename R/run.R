@@ -18,11 +18,13 @@ NULL
 #' output files of previous simulation.
 #'
 #' @param path An `.idf` or `.imf` file path.
+#'
 #' @details
 #' `clean_wd()` imitates the same process that EnergyPlus does whenever a new
-#' simulation is getting to start. It deletes all related output files that have
-#' the same name prefix as the input path. The input model itself and any
-#' weather file are not deleted.
+#'     simulation is getting to start. It deletes all related output files that
+#'     have the same name prefix as the input path. The input model itself and
+#'     any weather file are not deleted. `clean_wd()` is called internally when
+#'     running EnergyPlus models using [run_idf()] and [run_multi()].
 #'
 #' @examples
 #' \dontrun{
@@ -59,7 +61,7 @@ clean_wd <- function (path) {
         individual <- setdiff(individual, paste0(base, ".idf"))
     }
 
-    seperates <- normalizePath(file.path(wd, individual), mustWork = FALSE)
+    seperates <- file.path(wd, individual)
 
     target <- c(out_files, seperates)
     # }}}
@@ -222,6 +224,9 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     # copy input files
     loc_m <- copy_run_files(model, output_dir)
     loc_w <- copy_run_files(weather, output_dir)
+
+    # clean wd
+    clean_wd(loc_m)
 
     res <- energyplus(energyplus_exe, loc_m, loc_w, output_dir = output_dir,
         annual = annual, design_day = design_day, expand_obj = expand_obj,
