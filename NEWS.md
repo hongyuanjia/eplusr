@@ -1,3 +1,20 @@
+# eplusr 0.9.1.9000
+
+## New features
+
+* A new class `EplusSql` has been added. This makes it possible to directly
+  retreive simulation results without creating an `EplusJob` object which can
+  only get simulation outputs after the job was successfully run before. It can
+  be easily created using `eplus_sql()` function.  However, it should be noted
+  that, unlike `EplusJob`, there is no checking on whether the simulation is
+  terminated or completed unsuccessfully, or the parent Idf has been changed
+  since last simulation. This means that you may encounter some problems when
+  retreive data from an unsuccessful simulation. It is suggested to carefully go
+  through the `.err` file to make sure the output data in the SQLite is correct
+  and reliable. Currently, there are only few methods in `EplusSql` class which
+  have some overlaps with thoses in `EplusJob`, but more methods may be added in
+  the future. For more details, please see the documentation of `EplusSql`.
+
 # eplusr 0.9.1
 
 ## Minor changes

@@ -20,3 +20,9 @@
 * Add more tests on value reference updating during value modifications.
 
 * Only use minimal columns in data modifications to speed up the whole process
+
+* Change the column names of returned data.tables to lower case style in
+  `$report_data_dict()` and `$report_data()`.
+
+* Optimize table joins using `data.table::setindex()`, `mult` argument in
+  `data.table::data.table()`
