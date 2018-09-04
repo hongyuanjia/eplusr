@@ -3100,7 +3100,7 @@ i_idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     }
 
     # if necessary, resave the model
-    if (add_sql || is.null(dir))
+    if (add_sql || !is.null(dir))
         i_idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
 
     job <- EplusJob$new(path_idf, epw, private$m_version)

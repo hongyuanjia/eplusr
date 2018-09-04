@@ -15,6 +15,11 @@
   have some overlaps with thoses in `EplusJob`, but more methods may be added in
   the future. For more details, please see the documentation of `EplusSql`.
 
+## Bug fixes
+
+* Fix the error of missing Idf file when `dir` is not `NULL` in `$run()` in
+  `Idf` class.
+
 # eplusr 0.9.1
 
 ## Minor changes

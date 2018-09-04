@@ -26,3 +26,14 @@
 
 * Optimize table joins using `data.table::setindex()`, `mult` argument in
   `data.table::data.table()`
+
+* Change `clean_wd()` to make it work properly in `run_multi()`.
+
+* Use `data.table::fread(sep = NULL)` instead of `readr::read_lines()`
+
+* Add functionality to parse `.rdd` and `.mdd` file and add possible
+  output variables into the Idf, possibly also a gui interface providing
+  autocompletion using `DT::datatable()` and `parse_rdd_file()`.
+
+* Add functionality that can set objects using input data.frame instead of
+  nested list.
