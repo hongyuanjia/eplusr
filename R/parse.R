@@ -1,1034 +1,1401 @@
 #' @importFrom cli rule
-#' @importFrom data.table ":="
-#' @importFrom data.table between data.table dcast.data.table last rbindlist
-#' @importFrom data.table rleid setattr setcolorder setnames setorder
-#' @importFrom progress progress_bar
-#' @importFrom readr read_lines
-#' @importFrom stringr str_count str_detect str_match str_trim
+#' @importFrom data.table ":=" "%chin%"
+#' @importFrom data.table between chmatch data.table dcast.data.table last
+#' @importFrom data.table rbindlist rowidv rleid set setattr setcolorder
+#' @importFrom data.table setnames setorder setindexv
+#' @importFrom stringi stri_count_charclass stri_count_fixed stri_detect_fixed
+#' @importFrom stringi stri_extract_first_regex stri_isempty stri_length
+#' @importFrom stringi stri_locate_first_fixed stri_replace_all_fixed
+#' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub
+#' @importFrom stringi stri_subset_fixed stri_trans_tolower stri_trans_toupper
+#' @importFrom stringi stri_trim_both stri_trim_left stri_trim_right
 NULL
 
 # parse_idd_file {{{
 parse_idd_file <- function(path) {
-    # set progress bar
-    pb <- progress::progress_bar$new(
-           format = "  Parsing IDD (:what) [:bar] :percent in :elapsed",
-           total = 100, clear = FALSE)
-
-    # show progress bar
-    pb$tick(0)
-
-    pb$update(0.1, tokens = list(what = "Initialize"))
     # read idd string, get idd version and build
-    idd_str <- read_idd_str(path)
-    idd_version <- get_idd_ver(idd_str)
-    idd_build <- get_idd_build(idd_str)
+    idd_dt <- read_lines_in_dt(path)
+    idd_version <- get_idd_ver(idd_dt$string)
+    idd_build <- get_idd_build(idd_dt$string)
 
-    idd_dt <- data.table::data.table(
-        line = seq_along(idd_str), string = idd_str, key = "line")
+    # delete all comment and blank lines
+    idd_dt <- clean_idd_lines(idd_dt)
 
-    pb$update(0.2, tokens = list(what = "Parsing "))
-    # Delete all comment and blank lines
-    line_comment <- idd_dt[startsWith(string, "!"), line]
-    line_blank <- idd_dt[nchar(string) == 0L, line]
-    idd_dt[!(line %in% c(line_comment, line_blank))]
-    idd_dt <- idd_dt[-c(line_comment, line_blank)]
-    # mark type{{{
-    # -2, unknown
-    type_unknown <- -2L
-    # -1, clash
-    type_slash <- -1L
-    # 0 , group
-    type_group <- 0L
-    # 1 , class
-    type_class <- 1L
-    # 2 , class slash
-    type_class_slash <- 2L
-    # 3 , field
-    type_field <- 3L
-    # 4 , last field in class
-    type_field_last <- 4L
-    # 5 , field slash
-    type_field_slash <- 5L
-    idd_dt[, type := type_unknown]
-    # trucate to characters left of ! in order to handle cases when there are
-    # inline comments starting with "!", e.g.
-    # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
-    idd_dt[, explpt_loc := regexpr("!", string, fixed = TRUE)]
-    idd_dt[explpt_loc > 1, string := stringr::str_trim(substr(string, 1L, explpt_loc - 1L), "right")]
-    idd_dt[, explpt_loc := NULL]
-    # categorize all slash lines
-    idd_dt[startsWith(string, "\\"), type := type_slash]
-    # categorize all lines with trailing comma into class. Lines that
-    # have one slash can not be a class
-    idd_dt[type == type_unknown & endsWith(string, ","), type := type_class]
-    # categorize field lines
-    idd_dt[grepl("\\", string, fixed = TRUE) & grepl("^[AaNn]", string), type := type_field]
-    # ignore section if exists, e.g. "Simulation Data;"
-    line_section <- idd_dt[type == type_unknown][endsWith(string, ";"), which = TRUE]
-    if (not_empty(line_section)) {
-        idd_dt <- idd_dt[-line_section]
-    }
-    # if there are still known lines, report an error
-    line_error_invalid <- idd_dt[type == type_unknown, which = TRUE]
-    if (not_empty(line_error_invalid)) {
-        parse_error(type = "idd", error = "Invalid line found",
-                    msg = idd_dt[line_error_invalid])
-    }
-    # }}}
+    # type enum
+    type_enum <- list(unknown = 0L, slash = 1L, group = 2L, class = 3L, field = 4L, field_last = 5L)
 
-    pb$update(0.3, tokens = list(what = "Parsing "))
-    # get class names
-    idd_dt[type == type_class, class_name := substr(string, 1L, nchar(string) - 1L)]
+    # separate lines into bodies, slash keys and slash values
+    idd_dt <- sep_idd_lines(idd_dt)
 
-    pb$update(0.4, tokens = list(what = "Parsing "))
-    # get field AN and id
-    # {{{
-    # get location of first slash
-    idd_dt[, slash_loc := regexpr("\\", string, fixed = TRUE)]
-    # get combined field AN and id
-    idd_dt[type == type_field,
-           `:=`(field_anid = stringr::str_trim(substr(string, 1L, slash_loc - 1L), "right"),
-                slash_key_value = substr(string, slash_loc, nchar(string)))]
-    idd_dt[endsWith(field_anid, ";"), `:=`(type = type_field_last)]
-    # clean
-    idd_dt[, slash_loc := NULL]
+    # mark line types
+    idd_dt <- mark_idd_lines(idd_dt, type_enum)
 
-    # handle condensed fields
-    # {{{
-    idd_dt[, field_count := 0L]
-    idd_dt[type %in% c(type_field, type_field_last),
-           field_count := stringr::str_count(field_anid, "[,;]")]
-    # hats off to Matt Dowle:
-    # https://stackoverflow.com/questions/15673662/applying-a-function-to-each-row-of-a-data-table
-    idd_dt <- idd_dt[data.table::between(type, type_field, type_field_last),
-        {s <- strsplit(field_anid, "\\s*[,;]\\s*");
-         list(line = rep(line, sapply(s, length)), V1 = unlist(s))}][
-        idd_dt, on = "line"][field_count == 1L, V1 := field_anid][, field_anid := NULL]
-    data.table::setnames(idd_dt, "V1", "field_anid")
-    # get row numeber of last field per condensed field line in each class
-    idd_dt[, row_id := .I]
-    line_field_last <- idd_dt[field_count> 1L & type == type_field_last,
-        row_id[.N], by = list(line, type)]$V1
-    # set all type of condensed field lines to "field"
-    idd_dt[field_count > 1L, type := type_field]
-    idd_dt[line_field_last, type := type_field_last]
-    idd_dt[, row_id := NULL]
-    # }}}
+    # group table
+    tbl <- sep_group_table(idd_dt, type_enum)
+    tbl_group <- tbl$group
+    idd_dt <- tbl$left
 
-    # seperate field AN and id {{{
-    idd_dt[field_count == 1L,
-        field_anid := stringr::str_trim(substr(field_anid, 1L, nchar(field_anid) - 1L), "right")]
-    idd_dt[field_count >= 1L,
-           `:=`(field_an = substr(field_anid, 1L, 1L),
-                field_id = substr(field_anid, 2L, nchar(field_anid)))]
-    # }}}
+    # class table
+    tbl <- sep_class_table(idd_dt, type_enum)
+    tbl_class <- tbl$class
+    idd_dt <- tbl$left
 
-    # get slash keys and values {{{
-    idd_dt[type == type_slash, slash_key_value := string]
-    # Remove slash
-    idd_dt[!is.na(slash_key_value),
-        slash_key_value := stringr::str_trim(
-            substr(slash_key_value, 2L, nchar(slash_key_value)), "left")]
+    # field table
+    tbl_field <- get_field_table(idd_dt, type_enum)
 
-    # handle informal field slash keys
-    # {{{
-    # have to handle some informal slash keys such as '\minimum >0' which should
-    # be '\minimum> 0', and '\maximum <100' which should be `\maximum< 100`.
-    line_bad_min_exclu <- idd_dt[!is.na(slash_key_value)][
-        startsWith(slash_key_value, "minimum >"), line]
-    if (not_empty(line_bad_min_exclu)) {
-        idd_dt[line %in% line_bad_min_exclu,
-        slash_key_value := paste0(
-            "minimum> ",
-            substr(slash_key_value, 10L, nchar(slash_key_value))
-            )
-        ]
-    }
-
-    line_bad_max_exclu <- idd_dt[!is.na(slash_key_value)][
-        startsWith(slash_key_value, "maximum <"), line]
-    if (not_empty(line_bad_max_exclu)) {
-        idd_dt[line %in% line_bad_max_exclu,
-        slash_key_value := paste0(
-            "maximum< ",
-            substr(slash_key_value, 10L, nchar(slash_key_value))
-            )
-        ]
-    }
-    # }}}
-
-    # seperate slash key and value
-    idd_dt[, space_loc := regexpr(" ", slash_key_value, fixed = TRUE)]
-    # handle cases like "\extensible:2"
-    idd_dt[, colon_loc := regexpr(":", slash_key_value, fixed = TRUE)]
-    idd_dt[(colon_loc > 0L & space_loc > 0L & colon_loc < space_loc) |
-           (space_loc == -1L & colon_loc > 0L), space_loc := colon_loc]
-    idd_dt[, colon_loc := NULL]
-
-    idd_dt[space_loc > 0L,
-           `:=`(slash_key = toupper(substr(slash_key_value, 1L, space_loc - 1L)),
-                slash_value = stringr::str_trim(substr(slash_key_value, space_loc + 1L, nchar(slash_key_value)), "left"))]
-    # for "\extensible:<#>" with comments
-    idd_dt[space_loc > 0L & slash_key == "EXTENSIBLE" & grepl("\\D$", slash_value),
-           slash_value := substr(slash_value, 1L, regexpr("\\D", slash_value) - 1L)]
-    idd_dt[space_loc < 0L, `:=`(slash_key = toupper(slash_key_value))]
-    # remove trailing tabs in slash keys
-    idd_dt[grepl("\t", slash_key), slash_key := gsub(slash_key, "\t", "")]
-
-    # clean up
-    idd_dt[, `:=`(space_loc = NULL)]
-    # }}}
-    # }}}
-
-    pb$update(0.5, tokens = list(what = "Parsing "))
-    # parse slash lines {{{
-    idd_dt[!is.na(slash_key), slash_supported := FALSE]
-    group_slash_key <- c("GROUP")
-    class_slash_key <- c("MEMO", "UNIQUE-OBJECT", "REQUIRED-OBJECT",
-                         "MIN-FIELDS", "FORMAT", "REFERENCE-CLASS-NAME",
-                         "EXTENSIBLE")
-    field_slash_key <- c("FIELD", "NOTE", "REQUIRED-FIELD", "UNITS", "IP-UNITS",
-                         "UNITSBASEDONFIELD", "MINIMUM", "MINIMUM>", "MAXIMUM",
-                         "MAXIMUM<", "DEFAULT", "DEPRECATED", "AUTOSIZABLE",
-                         "AUTOCALCULATABLE", "TYPE", "KEY", "OBJECT-LIST",
-                         "EXTERNAL-LIST", "REFERENCE", "BEGIN-EXTENSIBLE")
-    ignored_slash_key <- c("RETAINCASE", "OBSOLETE")
-    # mark group slash key and values
-    idd_dt[slash_key %in% group_slash_key,
-           `:=`(slash_supported = TRUE, type = type_group, group = slash_value)]
-    # mark class slash key and values
-    idd_dt[slash_key %in% class_slash_key,
-           `:=`(slash_supported = TRUE, type = type_class_slash)]
-    # mark field slash key and values
-    idd_dt[slash_key %in% field_slash_key,
-           `:=`(slash_supported = TRUE, type = type_field_slash)]
-    # mark other ignored slash keys
-    idd_dt[slash_key %in% ignored_slash_key, slash_supported := TRUE]
-    # check for unsupported slash keys
-    line_error_slash_key <- idd_dt[slash_supported == FALSE, which = TRUE]
-    if (length(line_error_slash_key) > 0L) {
-        parse_error(type = "idd", error = "Invalid slash key found.",
-                    msg = idd_dt[line_error_slash_key])
-    }
-    # remove comments for "\extensible:<#>"
-    # check for unsupported slash values
-    idd_dt[, slash_value_upper := toupper(slash_value)]
-    # \type {{{
-    line_error_type <- idd_dt[slash_key == "TYPE" &
-       !(slash_value_upper %in% c("REAL", "INTEGER", "ALPHA", "CHOICE",
-            "OBJECT-LIST", "EXTERNAL-LIST", "NODE")), which = TRUE]
-    if (length(line_error_type) > 0) {
-        parse_error(type = "idd", error = "Invalid `\\type` found", msg = idd_dt[line_error_type])
-    }
-    # }}}
-    # \external-List {{{
-    line_error_external_list <- idd_dt[slash_key == "EXTERNAL-LIST" &
-           !(slash_value_upper %in% c("AUTORDDVARIABLE", "AUTORDDMETER",
-               "AUTORDDVARIABLEMETER")), which = TRUE]
-    if (length(line_error_external_list) > 0) {
-        parse_error(type = "idd", error = "Invalid `\\external-list` found",
-                    msg = idd_dt[line_error_external_list])
-    }
-    # }}}
-    # \format {{{
-    line_error_format <- idd_dt[slash_key %in% "FORMAT" &
-        !(slash_value_upper %in% c("SINGLELINE", "VERTICES", "COMPACTSCHEDULE",
-            "FLUIDPROPERTY", "VIEWFACTOR", "SPECTRAL")), which = TRUE]
-    if (length(line_error_format) > 0) {
-        parse_error(type = "idd", error = "Invalid `\\format` found",
-                    msg = idd_dt[line_error_format])
-    }
-    # }}}
-    # }}}
-
-    # fix duplicated values
-    # {{{
-    # fix duplicated fields in "ZoneHVAC:HighTemperatureRadiant" and
-    # "Foundation:Kiva"
-    # NOTE: there are errors in "ZoneHVAC:HighTemperatureRadiant" that
-    # duplicated fields ANid are used for 'N76', 'N77', 'N87' and
-    # "Foundation:Kiva" for "N16", have to fix it in advanced.
-    # {{{
-    # fill class downwards to make search easiser
-    dup_field_anid <- idd_dt[data.table::between(type, type_class, type_field_slash)][
-        , class_name := class_name[1L], by = list(cumsum(!is.na(class_name)))][
-        type == type_field_slash][!is.na(field_anid), list(line, class_name, field_anid)]
-
-    line_dup <- dup_field_anid[
-        duplicated(dup_field_anid, by = c("class_name", "field_anid")), line]
-    # add a suffix of 'd' to the duplicated field
-    if (not_empty(line_dup)) {
-        idd_dt[line %in% line_dup,
-            `:=`(field_anid = paste0(field_anid, "_dup"),
-                 field_id = paste0(field_id, "_dup"))]
-    }
-    # }}}
-
-    # fix duplicated class slash lines such as "\min-fields 3" in such as
-    # "SurfaceProperty:HeatTransferAlgorithm:SurfaceList"
-    # {{{
-    dup_class_slash <- idd_dt[type %in% c(type_class, type_class_slash)][
-        , class_name := class_name[1L], by = list(cumsum(!is.na(class_name)))][
-        type == type_class_slash, list(line, class_name, slash_key_value)]
-    line_dup <- dup_class_slash[
-        duplicated(dup_class_slash, by = c("class_name", "slash_key_value")), line]
-    # remove duplicated class slash lines
-    if (not_empty(line_dup)) {
-        idd_dt <- idd_dt[!(line %in% line_dup)]
-    }
-    # }}}
-
-    # fix duplicated field slash lines such as "\unit m" in such as
-    # "HVACTemplate:Zone:WaterToAirHeatPump"
-    # {{{
-    dup_field_slash <- idd_dt[
-        type %in% c(type_class, type_field, type_field_last, type_field_slash),
-        list(type, line, class_name, field_anid, slash_key, slash_key_value)][
-        , class_name := class_name[1L], by = list(cumsum(!is.na(class_name)))][
-        slash_key != "NOTE"][, field_anid := field_anid[1L],
-        by = list(class_name, cumsum(!is.na(field_anid)))][
-        type == type_field_slash]
-
-    line_dup <- dup_field_slash[
-        duplicated(dup_field_slash, by = c("class_name", "field_anid", "slash_key_value")),
-        line]
-    # remove duplicated field slash lines
-    if (not_empty(line_dup)) {
-        idd_dt <- idd_dt[!(line %in% line_dup)]
-    }
-    # }}}
-    # }}}
-    # clean
-    idd_dt[, `:=`(slash_key_value = NULL, field_anid = NULL)]
-
-    pb$update(0.6, tokens = list(what = "Parsing "))
-    idd_dt[, row_id := .I]
-    # FIELD data
-    # {{{
-    # extract class data
-    idd_field <- idd_dt[type %in% c(type_class, type_field, type_field_last, type_field_slash),
-        .SD, .SDcol = c("row_id", "class_name", "field_an", "field_id", "slash_key", "slash_value")]
-    # rolling fill downwards for class and field AN and id
-    idd_field[, class_name := class_name[1L], by = list(cumsum(!is.na(class_name)))]
-    idd_field[, field_an := field_an[1L], by = list(cumsum(!is.na(field_an)), class_name)]
-    idd_field[, field_id := field_id[1L], by = list(cumsum(!is.na(field_id)), class_name)]
-    # combine field AN and id again for easing distinguishing fields
-    idd_field[, field_anid := paste0(field_an, field_id)][, field_id := NULL]
-    # As the first line of each class is a class name which has been filled,
-    # delete it
-    idd_field <- idd_field[!is.na(slash_key)]
-    # if slash key exists and slash value not, it must be a logical attribute,
-    # such as "\\unique-object". Set it to TRUE
-    idd_field <- idd_field[is.na(slash_value), slash_value := "TRUE"]
-    # order class as the sequence the appears in IDD
-    idd_field[, class_id := .GRP, by = list(class_name)][, class_name := NULL]
-    # using dcast to cast all field attributes into seperated columns
-    # get line of field AN and id
-    idd_field_line <- idd_field[, list(class_id, field_anid, row_id)]
-    idd_field_line <- idd_field_line[
-        idd_field_line[, .I[1L], by = list(class_id, field_anid)]$V1]
-    # dcast
-    idd_field <- data.table::dcast.data.table(idd_field,
-        class_id + field_anid + field_an ~ slash_key,
-        value.var = "slash_value",
-        fun.aggregate = list(function(x) paste0(x, collapse = "\n")), fill = NA)
-    # merge line into dcasted table
-    idd_field <- merge(idd_field, idd_field_line,
-        by = c("class_id", "field_anid"), all.x = TRUE, sort = FALSE)
-    # set order according to line
-    data.table::setorder(idd_field, row_id)
-    # delete line column
-    idd_field[, row_id := NULL]
-
-    # add field id
-    idd_field[, field_id := .I]
-
-    # set names
-    new_nms <- gsub("-", "_", tolower(names(idd_field)), fixed = TRUE)
-    data.table::setnames(idd_field, new_nms)
-
-    # order fields per class
-    idd_field[, field_index := seq_along(field_anid), by = list(class_id)]
-
-    # add columns if there are no data in the IDD
-    if (!has_name(idd_field, "autocalculatable")) idd_field[, autocalculatable := FALSE]
-    if (!has_name(idd_field, "autosizable")) idd_field[, autosizable := FALSE]
-    if (!has_name(idd_field, "required_field")) idd_field[, required_field := FALSE]
-    if (!has_name(idd_field, "unitsbasedonfield")) idd_field[, unitsbasedonfield := FALSE]
-    if (!has_name(idd_field, "begin_extensible")) idd_field[, begin_extensible := FALSE]
-    if (!has_name(idd_field, "maximum")) idd_field[, maximum := NA_real_]
-    if (!has_name(idd_field, "minimum")) idd_field[, minimum := NA_real_]
-    if (!has_name(idd_field, "maximum<")) idd_field[, `maximum<` := NA_real_]
-    if (!has_name(idd_field, "minimum>")) idd_field[, `minimum>` := NA_real_]
-    if (!has_name(idd_field, "reference")) idd_field[, reference := NA_character_]
-    if (!has_name(idd_field, "key")) idd_field[, key := NA_character_]
-    if (!has_name(idd_field, "default")) idd_field[, default := NA_character_]
-    if (!has_name(idd_field, "object_list")) idd_field[, object_list := NA_character_]
-    if (!has_name(idd_field, "external_list")) idd_field[, external_list := NA_character_]
-    if (!has_name(idd_field, "field")) idd_field[, field := NA_character_]
-    if (!has_name(idd_field, "units")) idd_field[, units := NA_character_]
-    if (!has_name(idd_field, "ip_units")) idd_field[, ip_units := NA_character_]
-    if (!has_name(idd_field, "type")) idd_field[, type := NA_character_]
-
-    # set column type and fill NA
-    idd_field[, `:=`(autocalculatable = as.logical(autocalculatable),
-                     autosizable = as.logical(autosizable),
-                     required_field = as.logical(required_field),
-                     unitsbasedonfield = as.logical(unitsbasedonfield),
-                     begin_extensible = as.logical(begin_extensible),
-                     maximum = as.double(maximum),
-                     minimum = as.double(minimum),
-                     `maximum<` = as.double(`maximum<`),
-                     `minimum>` = as.double(`minimum>`))]
-
-    idd_field[is.na(autocalculatable), autocalculatable := FALSE]
-    idd_field[is.na(autosizable), autosizable := FALSE]
-    idd_field[is.na(required_field), required_field := FALSE]
-    idd_field[is.na(unitsbasedonfield), unitsbasedonfield := FALSE]
-    idd_field[is.na(begin_extensible), begin_extensible := FALSE]
-    idd_field[is.na(type) & field_an == "N", type := "real"]
-    idd_field[is.na(type) & field_an == "A", type := "alpha"]
-    idd_field[, `:=`(is_extensible = FALSE,
-                     has_default = FALSE,
-                     has_reference = FALSE,
-                     has_object_list = FALSE,
-                     has_external_list = FALSE)]
-    first_ext <- idd_field[begin_extensible == TRUE,
-        list(first_extensible = min(field_index)), by = class_id]
-    idd_field <- first_ext[idd_field, on = "class_id"]
-    idd_field[field_index >= first_extensible, is_extensible := TRUE]
-    idd_field[!is.na(reference), has_reference := TRUE]
-    idd_field[!is.na(object_list), has_object_list := TRUE]
-    idd_field[!is.na(external_list), has_external_list := TRUE]
-    idd_field[!is.na(default), has_default := TRUE]
-    # just ignore the ip unit attributes and use the unit conversion table
-    idd_field <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1][
-        , units := si_name][idd_field[, ip_units := NULL], on = "units"]
-    # add field names
-    idd_field[is.na(field), field_name := field_anid]
-    idd_field[!is.na(field), field_name := field]
-    idd_field[is.na(units), unit := ""]
-    idd_field[!is.na(units), unit := paste0("{", units, "}")]
-    idd_field[is.na(units), full_name := field_name]
-    idd_field[!is.na(units), full_name := paste0(field_name, " ", unit)]
-    idd_field[is.na(ip_name), ip_unit := unit]
-    idd_field[!is.na(ip_name), ip_unit := paste0("{", ip_name, "}")]
-    idd_field[is.na(ip_name), full_ipname := field_name]
-    idd_field[!is.na(ip_name), full_ipname := paste0(field_name, " ", ip_unit)]
-    idd_field[, is_name := FALSE]
-    idd_field[(has_reference == TRUE & has_object_list == FALSE) |
-        (full_name == "Name" & (type == "alpha" | type == "node")), is_name := TRUE]
-
-    # parse default value
-    field_default <- idd_field[has_default == TRUE, .SD, .SDcols = c(
-        "field_id", "default", "type", "si_name", "ip_name", "mult", "offset")][
-        , `:=`(default_upper = toupper(default))][type %in% c("integer", "real"),
-          `:=`(default_num = suppressWarnings(as.numeric(default)))][
-        , `:=`(default_ipnum = default_num)]
-    field_default <- update_value_num(field_default, digits = .options$num_digits,
-        in_ip = FALSE, prefix = "default")[, default_id := .I][
-        , .SD, .SDcols = c("default_id", "default", "default_upper",
-            "default_num", "default_ipnum", "field_id")]
-
-    # add range helper column
-    idd_field[, `:=`(has_range = FALSE, lower_incbounds = FALSE, upper_incbounds = FALSE)]
-    idd_field[!is.na(minimum), `:=`(has_range = TRUE, lower_incbounds = TRUE)]
-    idd_field[!is.na(maximum), `:=`(has_range = TRUE, upper_incbounds = TRUE)]
-    idd_field[!is.na(`minimum>`), `:=`(has_range = TRUE, minimum = `minimum>`)]
-    idd_field[!is.na(`maximum<`), `:=`(has_range = TRUE, maximum = `maximum<`)]
-    idd_field[, `:=`(`minimum>` = NULL, `maximum<` = NULL)]
-    field_range <- idd_field[has_range == TRUE,
-        list(field_id, minimum, lower_incbounds, maximum, upper_incbounds)][
-        , range_id := .I]
-    data.table::setcolorder(field_range, c("range_id", "minimum", "lower_incbounds",
-                                           "maximum", "upper_incbounds", "field_id"))
-
-    field <- idd_field[, .SD, .SDcols = c("field_id", "class_id", "field_index",
-        "field_name", "full_name", "full_ipname", "units", "ip_name",
-        "required_field", "type", "autosizable", "autocalculatable",
-        "is_name", "is_extensible", "has_default", "has_range",
-        "has_reference", "has_object_list", "has_external_list")]
-    data.table::setnames(field, "ip_name", "ip_units")
-
-    field_note <- idd_field[, list(field_id, class_id, field_index, note)]
-
-    # split choice
-    target_choice <- idd_field[type == "choice"]
-    if (is_empty(target_choice)) {
-        field_choice <- data.table::data.table(
-            choice_id = integer(0), choice = character(0),
-            choice_upper = character(0), field_id = integer(0))
-    } else {
-        field_choice <- target_choice[,
-            {s = strsplit(key, "\n", fixed = TRUE);
-             list(field_id = rep(field_id, sapply(s, length)),
-                  choice = unlist(s))
-            }
-        ][, `:=`(choice_id = .I, choice_upper = toupper(choice))]
-        data.table::setcolorder(field_choice, c("choice_id", "choice", "choice_upper", "field_id"))
-    }
-
-    # split reference
-    target_reference <- idd_field[has_reference == TRUE]
-    if (is_empty(target_reference)) {
-        field_reference <- data.table::data.table(
-            reference_id = integer(0), reference = character(0),
-            field_id = integer(0))
-    } else {
-        field_reference <- target_reference[,
-            {s = strsplit(reference, "\n", fixed = TRUE);
-             list(reference = unlist(s),
-                  field_id = rep(field_id, sapply(s, length)))
-            }
-        ]
-        data.table::setorder(field_reference, reference, field_id)
-        field_reference[, reference_id := .I]
-        data.table::setcolorder(field_reference, c("reference_id", "reference", "field_id"))
-    }
-
-    # split object-list
-    target_object_list <- idd_field[has_object_list == TRUE]
-    if (is_empty(target_object_list)) {
-        field_object_list <- data.table::data.table(
-            object_list_id = integer(0), object_list = character(0),
-            field_id = integer(0))
-    } else {
-        field_object_list <- target_object_list[,
-            {s = strsplit(object_list, "\n", fixed = TRUE);
-             list(object_list = unlist(s),
-                  field_id = rep(field_id, sapply(s, length)))
-            }
-        ][, object_list_id := .I]
-        data.table::setcolorder(field_object_list, c("object_list_id", "object_list", "field_id"))
-    }
-
-    # split external-list
-    target_external_list <- idd_field[has_external_list == TRUE]
-    if (is_empty(target_external_list)) {
-        field_external_list <- data.table::data.table(
-            external_list_id = integer(0), external_list = character(0),
-            field_id = integer(0))
-    } else {
-        field_external_list <- target_external_list[,
-            {s = strsplit(external_list, "\n", fixed = TRUE);
-             list(external_list = unlist(s),
-                  field_id = rep(field_id, sapply(s, length)))
-            }
-        ][, external_list_id := .I]
-        data.table::setcolorder(field_external_list, c("external_list_id", "external_list", "field_id"))
-    }
-    # }}}
-
-    pb$update(0.8, tokens = list(what = "Parsing "))
-    # CLASS data
-    # {{{
-    # extract class data
-    idd_class <- idd_dt[data.table::between(type, type_group, type_class_slash),
-        .SD, .SDcol = c("group", "class_name", "slash_key", "slash_value")]
-    # rolling fill downwards for group and class
-    idd_class[, group := group[1L], by = list(cumsum(!is.na(group)))]
-    data.table::setnames(idd_class, "group", "group_name")
-    idd_class[, class_name := class_name[1L], by = list(cumsum(!is.na(class_name)))]
-    # As group has been add into a seperated column named "group"and also the
-    # last class in one group has been mis-categorized into the next group by
-    # the filling process, delete group slash_key
-    idd_class <- idd_class[!(slash_key %in% "GROUP")]
-    # as the first na in first group can not be replaced using downward filling
-    idd_class <- idd_class[!is.na(class_name)]
-    # first handle classes without slashes such as "SwimmingPool:Indoor"
-    class_no_slash <- idd_class[, .N, by = list(class_name)][N == 1L, class_name]
-    idd_class <- idd_class[!class_name %in% class_no_slash & !is.na(slash_key) |
-        class_name %in% class_no_slash]
-    # if slash key exists and slash value not, it must be a logical attribute,
-    # such as "\\unique-object". Set it to TRUE
-    idd_class <- idd_class[is.na(slash_value), slash_value := "TRUE"]
-    # order group and class as the sequence the appears in IDD
-    idd_class[, group_id := .GRP, by = list(group_name)]
-    idd_class[, class_id := .GRP, by = list(class_name)]
-
-    group <- unique(idd_class[, list(group_id, group_name)])
-    class <- unique(idd_class[, list(class_id, class_name, group_id)])
-
-    idd_class[, c("group_id", "group_name", "class_name") := NULL]
-    # using dcast to cast all class attributes into seperated columns
-    idd_class <- data.table::dcast.data.table(idd_class,
-        class_id ~ slash_key,
-        value.var = "slash_value",
-        fun.aggregate = list(function(x) paste0(x, collapse = "\n")), fill = NA)
-    # delete column "NA" caused by classes without slash such as
-    # "SwimmingPool:Indoor"
-    if (has_name(idd_class, "NA")) idd_class[, `:=`(`NA` = NULL)]
-    # set names
-    new_nms <- gsub("-", "_", tolower(names(idd_class)), fixed = TRUE)
-    data.table::setnames(idd_class, new_nms)
-    # add columns if there are no data in the IDD
-    if (!has_name(idd_class, "min_fields")) idd_class[, min_fields := NA_integer_]
-    if (!has_name(idd_class, "required_object")) idd_class[, required_object := FALSE]
-    if (!has_name(idd_class, "unique_object")) idd_class[, unique_object := FALSE]
-    if (!has_name(idd_class, "format")) idd_class[, format := NA_character_]
-    if (!has_name(idd_class, "memo")) idd_class[, memo := NA_character_]
-    if (!has_name(idd_class, "extensible")) idd_class[, extensible := NA_integer_]
-    if (!has_name(idd_class, "reference_class_name")) idd_class[, reference_class_name := NA_character_]
-    data.table::setnames(idd_class,
-        c("extensible", "reference_class_name"), c("num_extensible", "reference")
+    # dcast class and field tables
+    tbl_class <- dcast_slash(tbl_class, "class_id",
+        slash_keys()$class, c("group_id", "class_name")
     )
-    # set column type
-    idd_class[, `:=`(min_fields = as.integer(min_fields),
-                     required_object = as.logical(required_object),
-                     unique_object = as.logical(unique_object),
-                     num_extensible = as.integer(num_extensible))]
-    # fill na
-    idd_class[is.na(format), format := "standard"]
-    idd_class[is.na(min_fields), min_fields := 0L]
-    idd_class[is.na(required_object), required_object := FALSE]
-    idd_class[is.na(unique_object), unique_object := FALSE]
-    idd_class[is.na(num_extensible), num_extensible := 0L]
-    # get max field per class
-    idd_class <- idd_field[, list(num_fields = .N), by = class_id][idd_class, on = "class_id"]
+    tbl_field <- dcast_slash(tbl_field, c("field_id", "field_anid"),
+        slash_keys()$field, c("class_id", "class_name")
+    )
+    tbl_field[, `:=`(field_id = .I)]
 
-    # add `has_name`
-    idd_class[, has_name := FALSE]
-    idd_class[class_id %in% idd_field[is_name == TRUE, unique(class_id)], has_name := TRUE]
-    class_property <- idd_class[, list(class_id, format, memo, min_fields,
-        num_fields, required_object, unique_object, has_name, num_extensible)]
-    data.table::setnames(class_property, "format", "class_format")
+    # complete property columns
+    tbl_field <- complete_property(tbl_field, "field")
+    tbl_class <- complete_property(tbl_class, "class", tbl_field)
 
-    # add info about the index of last required field
-    last_req <- idd_field[required_field == TRUE,
-        list(last_required = field_index[.N]), by = list(class_id)]
-    class_property <- last_req[class_property, on = "class_id"][
-        is.na(last_required), `:=`(last_required = 0L)]
-    # add first extensible index
-    class_property <- first_ext[class_property, on = "class_id"][
-        is.na(first_extensible), `:=`(first_extensible = 0L)]
-    # add num of extensible group
-    class_property[, `:=`(num_extensible_group = 0L)]
-    class_property[num_extensible > 0, `:=`(num_extensible_group =
-        (num_fields - first_extensible + 1L) %/% num_extensible)]
+    # extract field reference map
+    tbl <- parse_field_reference_table(tbl_field)
+    tbl_field <- tbl$left
+    tbl_reference <- tbl$reference
 
-    class <- class[class_property, on = "class_id"][,
-        .SD, .SDcols = c("class_id", "class_name", "group_id", "class_format",
-            "min_fields", "num_fields", "required_object", "unique_object",
-            "has_name", "last_required", "num_extensible", "first_extensible",
-            "num_extensible_group")]
+    # set index
+    setindexv(tbl_class, "class_id")
+    setindexv(tbl_field, c("field_id", "class_id", "field_index"))
 
-    class_memo <- class_property[, list(class_id, memo)]
-
-    # split reference_class_name
-    class_reference <- idd_class[!is.na(reference),
-        {
-            s = strsplit(reference, "\n", fixed = TRUE);
-            list(reference = unlist(s),
-                 class_id = rep(class_id, sapply(s, length)))
-        }
-    ]
-    if (not_empty(class_reference)) {
-        data.table::setorder(class_reference, reference, class_id)
-    }
-    class_reference[, reference_id := .I]
-    data.table::setcolorder(class_reference, c("reference_id", "reference", "class_id"))
-    # }}}
-
-    pb$update(0.95, tokens = list(what = "Parsing "))
-    idd <- list(version = idd_version,
-                build = idd_build,
-                group = group,
-                class = class,
-                class_memo = class_memo,
-                class_reference = class_reference,
-                field = field,
-                field_note = field_note,
-                field_reference = field_reference,
-                field_default = field_default,
-                field_choice = field_choice,
-                field_range = field_range,
-                field_object_list = field_object_list,
-                field_external_list = field_external_list)
-
-    pb$tick(100L, tokens = list(what = "Complete"))
-    idd
+    list(version = idd_version, build = idd_build,
+        group = tbl_group, class = tbl_class, field = tbl_field,
+        reference = tbl_reference
+    )
 }
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd = NULL) {
+parse_idf_file <- function (path, idd) {
+    stopifnot(has_names(idd, c("version", "class", "field")))
 
-    idf_str <- read_idd_str(path)
+    # read idf string, get idd version
+    idf_dt <- read_lines_in_dt(path)
+    idf_version <- get_idf_ver(idf_dt$string)
 
-    # get idf version
-    idf_ver <- get_idf_ver(idf_str)
+    # handling Idd object should be moved to Idd$new()
+    # # handle Idd {{{
+    # if (!is.null(idd)) {
+    #     # if input is not an idd object
+    #     if (!is_idd(idd)) idd <- use_idd(idd)
 
-    # handle Idd {{{
-    if (!is.null(idd)) {
-        # if input is not an idd object
-        if (!is_idd(idd)) idd <- use_idd(idd)
+    #     # if missing version info in input IDF, give a warning
+    #     if (is.null(idf_ver))
+    #         warning("Missing version field in input Idf file. The given Idd ",
+    #             "version ", idd$version(), " will be used. Parsing errors ",
+    #             "may occur.", call. = FALSE)
+    # } else {
+    #     # if input Idf has a version and neither that version of EnergyPlus nor
+    #     # Idd is available, rewrite the error message
+    #     if (!is.null(idf_ver)) {
+    #         if (!is_avail_idd(idf_ver) && !is_avail_eplus(idf_ver)) {
+    #             stop("Idd v", idf_ver, " has not been parsed before. Try to locate ",
+    #                 "`Energy+.idd` in EnergyPlus v", idf_ver, " installation folder ",
+    #                 backtick(eplus_default_path(idf_ver)), ".\n",
+    #                 "Failed to locate `Energy+.idd` because EnergyPlus v", idf_ver,
+    #                 " is not available. ", call. = FALSE)
+    #         }
 
-        # if missing version info in input IDF, give a warning
-        if (is.null(idf_ver))
-            warning("Missing version field in input Idf file. The given Idd ",
-                "version ", idd$version(), " will be used. Parsing errors ",
-                "may occur.", call. = FALSE)
-    } else {
-        # if input Idf has a version and neither that version of EnergyPlus nor
-        # Idd is available, rewrite the error message
-        if (!is.null(idf_ver)) {
-            if (!is_avail_idd(idf_ver) && !is_avail_eplus(idf_ver)) {
-                stop("Idd v", idf_ver, " has not been parsed before. Try to locate ",
-                    "`Energy+.idd` in EnergyPlus v", idf_ver, " installation folder ",
-                    backtick(eplus_default_path(idf_ver)), ".\n",
-                    "Failed to locate `Energy+.idd` because EnergyPlus v", idf_ver,
-                    " is not available. ", call. = FALSE)
-            }
+    #         idd <- use_idd(idf_ver)
+    #     }
 
-            idd <- use_idd(idf_ver)
-        }
+    #     # if input Idf does not have a version
+    #     if (is.null(idf_ver)) {
+    #         # if no Idd is available
+    #         if (is_empty(avail_idd()))
+    #             stop("Missing version field in input Idf file and no parsed ",
+    #                 "Idd object was available to use.", call. = FALSE)
 
-        # if input Idf does not have a version
-        if (is.null(idf_ver)) {
-            # if no Idd is available
-            if (is_empty(avail_idd()))
-                stop("Missing version field in input Idf file and no parsed ",
-                    "Idd object was available to use.", call. = FALSE)
+    #         latest_ver <- max(as.numeric_version(names(.globals$idd)))
+    #         warning("Missing version field in input Idf file. The latest Idd ",
+    #             "version ", latest_ver, " will be used. Parsing errors may ",
+    #             "occur.", call. = FALSE)
+    #         idd <- suppressMessages(use_idd(latest_ver))
+    #     }
+    # }
+    # # }}}
 
-            latest_ver <- max(as.numeric_version(names(.globals$idd)))
-            warning("Missing version field in input Idf file. The latest Idd ",
-                "version ", latest_ver, " will be used. Parsing errors may ",
-                "occur.", call. = FALSE)
-            idd <- suppressMessages(use_idd(latest_ver))
-        }
-    }
-    # }}}
+    # # handle `Version` object
+    # # {{{
+    # idd_version <- idd$version
+    # if (is.null(idf_version)) {
 
-    # get idd internal environment for parsing
-    idd_self <- ._get_self(idd)
-    idd_private <- ._get_private(idd)
+    #     # add a default version object at the end
+    #     idf_version <- idd_version[,c(1,2)]
+    #     # add a default version object at the end
+    #     ver_obj <- data.table::data.table(
+    #         object_id = max(object[["object_id"]]) + 1L, class_id = 1L
+    #     )
+    #     object <- data.table::rbindlist(list(object, ver_obj))
+    #     ver_val <- data.table::data.table(
+    #         value_id = max(value[["value_id"]]) + 1L,
+    #         value = as.character(idf_version),
+    #         object_id = ver_obj[["object_id"]],
+    #         class_id = 1L,
+    #         field_index = 1L
+    #     )
+    #     value <- data.table::rbindlist(list(value, ver_val), fill = TRUE)
+    # # check if there are multiple `Version` objects
+    # } else if (nrow(ver_dt) > 1L) {
+    #     parse_error("idf", "Multiple `Version` objects found in the input.",
+    #                 nrow(ver_dt), ver_dt)
+    # } else {
+    #     # get version
+    #     idf_version <- as.numeric_version(ver_dt[["value"]])
+    #     if (idf_version != idd_version) {
+    #         warning(paste0("Version Mismatch. The file parsing is a differnet ",
+    #             "version ", backtick(idf_version), " than the IDD file you ",
+    #             "are using ", backtick(idd_version), ". Editing and saving ",
+    #             "the file may make it incompatible with an older version of ",
+    #             "EnergyPlus."), call. = FALSE)
+    #     }
+    # }
+    # # }}}
 
-    idf_dt <- data.table(line = seq_along(idf_str), string = idf_str)
-
-    # mark type {{{
-    # -3, unknown
-    type_unknown <- -3L
-    # -2, speical comment
-    type_special <- -2L
-    # -1, macro
-    type_macro <- -1L
-    #  0, block comment
-    type_comment <- 0L
-    #  1, object
-    type_object <- 1L
-    #  2, field
-    type_field <- 2L
-    #  3, last field in an object
-    type_field_last <- 3L
-    idf_dt[, type := type_unknown]
-    data.table::setorder(idf_dt, line, type)
+    # type enum
+    type_enum <- list(unknown = 0L, special = 1L, macro = 2L, comment = 3L,
+        object = 4L, object_value = 5L, value = 6L, value_last = 7L
+    )
 
     # delete blank lines
-    idf_dt <- idf_dt[!(string %in% "")]
-    idf_dt[startsWith(string, "##"), type := type_macro]
-    # handle EP-Macro lines {{{
-    idf_macro <- idf_dt[type == type_macro]
-    idf_macro[, space_loc := regexpr(" ", string, fixed = TRUE)]
-    idf_macro[space_loc > 0L,
-        `:=`(macro_key = substr(string, 1L, space_loc - 1L),
-             macro_value = substr(string, space_loc + 1L, nchar(string)))]
-    idf_macro[space_loc < 0L, macro_key := substr(string, 1L, nchar(string))]
-    # unknown marco key {{{
-    idf_errors_unknown_macro <- idf_macro[!(macro_key %in% macro_dict), list(line, string)]
-    if (not_empty(idf_errors_unknown_macro)) {
-        parse_error(type = "idf", error = "Unknown macro found", msg = idf_errors_unknown_macro)
-    }
-    # }}}
-    # mark macro values as macro {{{
-    macro_value <- idf_macro[!is.na(macro_value), unique(macro_value)]
-    is_imf <- ifelse(not_empty(macro_value), TRUE, FALSE)
-    idf_dt[string %in% macro_value, type := type_macro]
-    # }}}
-    # }}}
-    idf_dt[startsWith(string, "!"), type := type_comment]
-    idf_dt[startsWith(string, "!-"), type := type_special]
-    # mark location of "!" and "!-"
-    idf_dt[, explpt_loc := regexpr("!", string, fixed = TRUE)]
-    idf_dt[, special_loc := regexpr("!-", string, fixed = TRUE)]
-    # lines ending with comma and without explaination symbol must be a object
-    idf_dt[explpt_loc < 0L & endsWith(string, ","), type := type_object]
-    # extract comments with leading spaces in order to preserve the indentation.
-    idf_dt[special_loc > 0L,
-           comment := substr(string, explpt_loc + 2L, nchar(string))]
-    idf_dt[special_loc < 0L & explpt_loc > 0L,
-           comment := substr(string, explpt_loc + 1L, nchar(string))]
-    # for commented objects
-    idf_dt[special_loc > 0L & explpt_loc > 0L,
-           comment := substr(string, explpt_loc + 1L, nchar(string))]
-    idf_dt[type == type_macro, comment := string]
-    # get the number of leading spaces in comment
-    idf_dt[, leading_spaces := regexpr("\\S", comment) - 1L]
-    # get the value for lines that have comments
-    idf_dt[explpt_loc > 1L, value := trimws(substr(string, 1L, explpt_loc - 1L), "right")]
-    # get the value for lines without comments
-    idf_dt[explpt_loc < 0L, value := string]
-    # mark the last field in an object
-    idf_dt[endsWith(value, ";"), type := type_field_last]
-    # clean unused columns
-    idf_dt[, `:=`(explpt_loc = NULL, special_loc = NULL)]
-    # }}}
+    idf_dt <- idf_dt[!string == ""]
 
-    # special comment key and value {{{
-    option_idfeditor <- FALSE
-    option_special_format <- FALSE
-    option_view_in_ip_units <- FALSE
-    option_save <- "sorted"
+    # separate lines into bodies, and comments
+    idf_dt <- sep_idf_lines(idf_dt, type_enum)
 
-    idf_option <- idf_dt[type == type_special]
-    idf_option[, space_loc := regexpr(" ", comment, fixed = TRUE)]
-    idf_option[, `:=`(special_key = toupper(substr(comment, 1L, space_loc - 1L)),
-                      special_value = toupper(trimws(substr(comment, space_loc + 1L, nchar(comment)))))]
-    idf_option <- idf_option[special_key %in% c("GENERATOR", "OPTION")]
-    if (not_empty(idf_option)) {
-        idf_option <- idf_option[, strsplit(special_value, " ", fixed = TRUE)[[1]], by = list(line, string, special_key)]
-        data.table::setnames(idf_option, "V1", "special_value")
-        if (idf_option[special_key == "GENERATOR" & substr(special_value, 1L, 9L) == "IDFEDITOR",
-            .N] > 1L) {
-            option_idfeditor <- TRUE
-        }
-        if (idf_option[special_key == "OPTION" & special_value == "USESPECIALFORMAT",
-                .N] == 1L) {
-            option_special_format <- TRUE
-        }
-        if (idf_option[special_key == "OPTION" & special_value == "VIEWINIPUNITS",
-            .N] == 1L) {
-            option_view_in_ip_units <- TRUE
-        }
-        idf_option[special_key == "OPTION" & special_value == "SORTEDORDER",
-                   option_save := "SortedOrder"]
-        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERTOP",
-                   option_save := "OriginalOrderTop"]
-        idf_option[special_key == "OPTION" & special_value == "ORIGINALORDERBOTTOM",
-                   option_save := "OriginalOrderBottom"]
-        idf_option_save <- idf_option[!is.na(option_save), list(line, string, option_save)]
-        option_save <- idf_option_save[, unique(option_save)]
-        if (is_empty(option_save)) {
-            option_save <- "sorted"
-        } else if (!option_save %in% c("SortedOrder", "OriginalOrderBottom", "OriginalOrderTop")) {
-            option_save <- "sorted"
-        } else {
-            option_save <- switch(option_save,
-                SortedOrder = "sorted",
-                OriginalOrderTop = "new_top",
-                OriginalOrderBottom = "new_bottom")
-        }
-    }
+    # mark line types
+    idf_dt <- mark_idf_lines(idf_dt, type_enum)
 
-    header_options = list(
-        save_format = option_save,
-        special_format = option_special_format,
-        view_in_ip = option_view_in_ip_units,
-        num_digits = 8L)
-    # }}}
+    # header options
+    tbl <- sep_header_options(idf_dt, type_enum)
+    options <- tbl$options
+    idf_dt <- tbl$left
 
-    # get rid of special comment lines
-    idf_dt <- idf_dt[type != type_special]
-    # handle condensed values {{{
-    # if the sum of comma and semicolon > 2, then it must be a specially
-    # formatted object or field. It may contain a class name, e.g.
-    # 'Version,8.8;' and it may not, e.g. '0.0,0.0,0.0,' in
-    # 'BuildingSurface:Detailed'.
-    # get number of condensed values
-    idf_dt[!is.na(value), `:=`(value_count = stringr::str_count(value, "[,;]"))]
-    idf_dt[is.na(value), `:=`(value_count = 0L)]
-    idf_dt <- idf_dt[!data.table::between(type, type_macro, type_comment)][,
-        {s = strsplit(value, "\\s*[,;]\\s*");
-         list(line  = rep(line, sapply(s, length)),
-              V1 = unlist(s))}][
-        idf_dt, on = "line"][value_count == 1L, V1 := value][, value := NULL]
-    data.table::setnames(idf_dt, "V1", "value")
-    # get row numeber of last field per condensed field line in each class
-    line_value_last <- idf_dt[
-        value_count > 1L & type == type_field_last,
-        list(line_value_last = data.table::last(.I)),
-        by = list(line, type)][, line_value_last]
-    # set all type of condensed field lines to "field", including class names.
-    idf_dt[value_count > 1L, type := type_field]
-    # mark last field per object in condensed lines
-    idf_dt[line_value_last, type := type_field_last]
-    # make lines that only has one value as "field", excluding recognized class
-    # names.
-    idf_dt[type != type_object & value_count == 1L, type := type_field]
-    # }}}
+    # object table
+    tbl <- sep_object_table(idf_dt, type_enum, idd)
+    tbl_object <- tbl$object
+    idf_dt <- tbl$left
 
-    # set row id
-    idf_dt[, row_id := .I]
-    # mark last field and remove trailing comma or semicolon in values {{{
-    idf_dt[endsWith(value, ","), value := substr(value, 1L, nchar(value) - 1L)]
-    idf_dt[endsWith(value, ";"),
-           `:=`(type = type_field_last,
-                value = substr(value, 1L, nchar(value) - 1L))]
-    # }}}
+    # value table
+    tbl_value <- get_value_table(idf_dt, type_enum, idd)
 
-    # set an id for last field per object {{{
-    # if is the last field, then the line after last field line should be a
-    # class name except the last field is the last non-blank and non-comment
-    # line. Others are just normal fields.
-    idf_dt[type == type_field_last, object_id := .GRP, by = list(row_id)]
-    idf_dt <- idf_dt[!is.na(object_id), list(row_id, object_id)][
-        idf_dt[, object_id := NULL], on = c("row_id"), roll = -Inf]
-    # }}}
+    # combine
+    list_idf <- list(options = options, object = tbl_object, value = tbl_value)
 
-    # COMMENT (MACRO)
-    # {{{
-    idf_comment <- idf_dt[type %in% c(type_macro, type_comment), .SD,
-        .SDcol = c("type", "object_id", "comment")]
-    idf_comment[, comment_id := .I]
-    comment <- idf_comment[, list(comment_id, comment, type, object_id)]
+    # update object name
+    tbl_object <- update_object_name(tbl_object, tbl_value)
 
-    # }}}
+    # IP - SI conversion
+    from <- ifelse(options$view_in_ip, "ip", "si")
+    to <- ifelse(.options$view_in_ip, "ip", "si")
+    tbl_value <- convert_value_unit(tbl_value, from, to)
 
-    # CLASS & FIELD
-    # {{{
-    # get idf without comments
-    # {{{
-    # NOTE: currently, inline comments are not supported.
-    idf_dt <- idf_dt[!(type %in% c(type_macro, type_comment)), .SD,
-         .SDcol = c("row_id", "object_id", "line", "type", "value", "string")]
-    # }}}
+    # value reference map
+    tbl_reference <- update_value_reference(tbl_object, tbl_value, idd$reference)
 
-    # class name should be the same of 'value' column for first line grouped by
-    # object_id
-    idf_dt[idf_dt[, .I[1], by = object_id]$V1,
-           `:=`(type = type_object, class_upper_case = toupper(value))]
+    # extract version
+    ver <- tbl_value[class_name == "Version", standardize_ver(value)]
 
-    idf_idd_all <- idd_private$m_idd_tbl$class[, class_upper_case := toupper(class_name)][
-        idf_dt, on = "class_upper_case", nomatch = NA]
-    data.table::setorder(idf_idd_all, object_id, class_id)
+    list(
+        version = ver, options = options,
+        object = tbl_object, value = tbl_value, reference = tbl_reference
+    )
+}
+# }}}
 
-    # check for un-recognized class names {{{
-    unknown_class <- idf_idd_all[type == type_object][
-        !is.na(value)][is.na(class_id), list(line, string)]
-    if (not_empty(unknown_class)) {
-        parse_error(type = "idf", error = "Object type not recognized", msg = unknown_class)
-    }
-    # }}}
+# read_lines_in_dt {{{
+read_lines_in_dt <- function(filepath) {
+    dt <- data.table::fread(input = filepath, sep = NULL, header = FALSE, col.names = "string")
+    data.table::set(dt, j = "line", value = seq_along(dt[["string"]]))
+    data.table::set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+    dt
+}
+# }}}
 
-    # get object table
-    object <- idf_idd_all[!is.na(class_upper_case) & type == type_object, list(object_id, class_id)]
+# get_idd_ver {{{
+get_idd_ver <- function (idd_str, trim = FALSE) {
+    assert_that(is.character(idd_str))
 
-    # get value table
-    value <- idf_idd_all[!is.na(class_upper_case), list(row_id, class_id)][
-        idf_dt, on = "row_id", roll = Inf][type > type_object][
-        , field_index := seq_along(.I), by = list(object_id)][
-        , value_id := .I][, list(value_id, value, object_id, class_id, field_index, line, string)]
+    ver_line <- stri_subset_fixed(idd_str, "!IDD_Version")
 
-    # handle `Version` object
-    # {{{
-    ver_dt <- value[class_id == 1L]
-    idd_version <- idd_private$m_version
-    if (is_empty(ver_dt)) {
-        # add a default version object at the end
-        idf_version <- idd_version[,c(1,2)]
-        # add a default version object at the end
-        ver_obj <- data.table::data.table(
-            object_id = max(object[["object_id"]]) + 1L, class_id = 1L
-        )
-        object <- data.table::rbindlist(list(object, ver_obj))
-        ver_val <- data.table::data.table(
-            value_id = max(value[["value_id"]]) + 1L,
-            value = as.character(idf_version),
-            object_id = ver_obj[["object_id"]],
-            class_id = 1L,
-            field_index = 1L
-        )
-        value <- data.table::rbindlist(list(value, ver_val), fill = TRUE)
-    # check if there are multiple `Version` objects
-    } else if (nrow(ver_dt) > 1L) {
-        parse_error("idf", "Multiple `Version` objects found in the input.",
-                    nrow(ver_dt), ver_dt)
+    if (trim) ver_line <- stri_trim_both(ver_line)
+
+    if (length(ver_line) == 1L) {
+        ver <- stri_sub(ver_line, 14L)
+        standardize_ver(ver)
+    } else if (length(ver_line > 1L)) {
+        stop("Multiple IDD version found in input IDD:\n",
+             paste0("  ", backtick(ver_line), collapse = "\n"), call. = FALSE)
     } else {
-        # get version
-        idf_version <- as.numeric_version(ver_dt[["value"]])
-        if (idf_version != idd_version) {
-            warning(paste0("Version Mismatch. The file parsing is a differnet ",
-                "version ", backtick(idf_version), " than the IDD file you ",
-                "are using ", backtick(idd_version), ". Editing and saving ",
-                "the file may make it incompatible with an older version of ",
-                "EnergyPlus."), call. = FALSE)
+        stop("No IDD version found in input IDD.", call. = FALSE)
+    }
+}
+# }}}
+
+# get_idd_build {{{
+get_idd_build <- function (idd_str, trim = FALSE) {
+    assert_that(is.character(idd_str))
+
+    build_line <- stri_subset_fixed(idd_str, "!IDD_BUILD")
+
+    if (trim) build_line <- stri_trim_both(build_line)
+
+    if (length(build_line) == 1L) {
+        stri_sub(build_line, 12L)
+    } else if (length(build_line > 1L)) {
+        warning("Multiple build tag found in input IDD:\n",
+             paste0("  ", backtick(build_line), collapse = "\n"), call. = FALSE)
+    } else {
+        warning("No build tag found in input IDD.", call. = FALSE)
+    }
+}
+# }}}
+
+# get_idf_ver {{{
+get_idf_ver <- function (idf_str) {
+    stopifnot(is.character(idf_str))
+
+    ver_normal_cand <- idf_str[endsWith(idf_str, "Version Identifier")]
+    ver_normal <- ver_normal_cand[!startsWith(ver_normal_cand, "!")]
+    ver_special_cand <- idf_str[startsWith(idf_str, "Version")]
+    ver_special <- ver_special_cand[!startsWith(ver_special_cand, "!")]
+
+    if (length(ver_normal) >= 1L) {
+        # for "8.6; !- Version Identifier"
+        standardize_ver(stri_trim_both(
+            stri_split_fixed(ver_normal[1L], ";")[[1L]][1L]
+        ))
+    } else if (length(ver_special) >= 1L){
+        standardize_ver(stri_trim_both(
+            stri_split_charclass(ver_special[1L], "[,;]")[[1L]][2L]
+        ))
+    } else {
+        return(NULL)
+    }
+}
+# }}}
+
+# clean_idd_lines {{{
+clean_idd_lines <- function (dt) {
+    dt <- dt[!(startsWith(string, "!") | string == "")]
+
+    # trucate to characters left of ! in order to handle cases when there are
+    # inline comments starting with "!", e.g.
+    # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
+    dt[, `:=`(excl_loc = stri_locate_first_fixed(string, "!")[, 1L])]
+    dt[!is.na(excl_loc), `:=`(
+        string = stri_trim_right(
+            stri_sub(string, to = excl_loc - 1L)
+        )
+    )]
+
+    set(dt, NULL, "excl_loc", NULL)
+    dt
+}
+# }}}
+
+# slash_keys {{{
+slash_keys <- function () {
+    cls_keys <- list(
+        flat = c("unique-object", "required-object", "min-fields", "format",
+            "extensible"),
+        nest = c("memo")
+    )
+
+    fld_keys <- list(
+        flat = c("field", "required-field", "units", "ip-units",
+            "unitsbasedonfield", "minimum", "minimum>", "maximum", "maximum<",
+            "default", "autosizable", "autocalculatable", "type",
+            "external-list", "begin-extensible"),
+        nest = c("note", "key", "object-list", "reference", "reference-class-name")
+    )
+
+    types <- list(
+        lgl = c("unique-object", "required-object", "required-field",
+            "unitsbasedonfield", "autosizable", "autocalculatable",
+            "begin-extensible", "deprecated", "obsolete", "retaincase"),
+        int = c("min-fields", "extensible"),
+        dbl = c("minimum", "minimum>", "maximum", "maximum<"),
+        chr = c("group", "format", "field", "units", "ip-units", "default", "type",
+            "external-list"),
+        lst = c("memo", "reference-class-name", "note", "key", "object-list",
+            "reference")
+    )
+
+    list(class = cls_keys, field = fld_keys, type = types)
+}
+# }}}
+
+# sep_idd_lines {{{
+sep_idd_lines <- function (dt, col = "string") {
+    # mark first slash
+    dt[, `:=`(slash_loc = stri_locate_first_fixed(string, "\\")[, 1L])]
+
+    setindexv(dt, "slash_loc")
+
+    # separate field and slash
+    dt[is.na(slash_loc), `:=`(body = string)]
+    # also remove slash and delete extra spaces, like "\ group Hybrid Model"
+    dt[!is.na(slash_loc), `:=`(
+        body = stri_trim_right(stri_sub(string, to = slash_loc - 1L)),
+        slash = stri_trim_left(stri_sub(string, slash_loc + 1L))
+    )]
+
+    # locate first space and colon
+    dt[, `:=`(
+        space_loc = stri_locate_first_fixed(slash, " ")[, 1L],
+        colon_loc = stri_locate_first_fixed(slash, ":")[, 1L]
+    )]
+    dt[(colon_loc < space_loc) | (is.na(space_loc) & !is.na(colon_loc)),
+        `:=`(space_loc = colon_loc)
+    ]
+    dt[is.na(space_loc), `:=`(space_loc = 0L)]
+
+    # separate slash key and values
+    dt[!is.na(slash_loc), `:=`(
+        slash_key = stri_trans_tolower(stri_sub(slash, to = space_loc - 1L)),
+        slash_value = stri_trim_left(stri_sub(slash, space_loc + 1L))
+    )]
+
+    setindexv(dt, "slash_key")
+
+    # a) for logical slash key, e.g. "\required-field"
+    dt[slash_key %chin% slash_keys()$type$lgl, `:=`(slash_value = "TRUE")]
+    # b) for numeric value slash with comments, e.g. "\extensible:<#> -some comments"
+    # https://stackoverflow.com/questions/3575331/how-do-extract-decimal-number-from-string-in-c-sharp/3575807
+    dt[slash_key %chin% c(slash_keys()$type$int, slash_keys()$type$dbl), `:=`(
+        slash_value = stri_extract_first_regex(slash_value, "[-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?")
+    )]
+
+    # change all values of reference, object-list and refercne-class-name to
+    # lower case
+    dt[slash_key %chin% c("reference", "reference-class-name", "object-list"),
+        `:=`(slash_value = stri_trans_tolower(slash_value))]
+    # check for mismatched object-list and reference
+    refs <- dt[slash_key %in% c("reference-class-name", "reference"), unique(slash_value)]
+    invld_objlst <- dt[slash_key == "object-list" & !slash_value %chin% refs]
+    if (nrow(invld_objlst)) {
+        parse_error("idd", "Invalid \\object-list value", msg = invld_objlst)
+    }
+
+    # check invalid slash keys
+    invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(slash_keys()$type), which = TRUE]
+    if (length(invld_key))
+        parse_error(type = "idd", error = "Invalid slash key found.", msg = dt[invld_key])
+
+    set(dt, NULL, c("slash", "slash_loc", "space_loc", "colon_loc"), NULL)
+
+    dt
+}
+# }}}
+
+# mark_idd_lines {{{
+mark_idd_lines <- function (dt, type_enum) {
+    setindexv(dt, "slash_key")
+
+    # add type indicator
+    set(dt, NULL, "type", type_enum$unknown)
+
+    # ignore section if exists, e.g. "Simulation Data;"
+    dt <- dt[!(endsWith(body, ";") & is.na(slash_key))]
+
+    # mark slash lines
+    dt[body == "", `:=`(type = type_enum$slash)]
+
+    # mark group
+    dt[slash_key == "group", `:=`(type = type_enum$group)]
+
+    # mark class
+    dt[endsWith(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
+
+    # mark field
+    dt[body != "" & !is.na(slash_key), `:=`(type = type_enum$field)]
+
+    # mark last field per class
+    dt[endsWith(body, ";"), `:=`(type = type_enum$field_last)]
+
+    # if there are still known lines, throw an error
+    if (nrow(dt[type == type_enum$unknown]) > 0L) {
+        parse_error(type = "idd", error = "Invalid line found", msg = dt[type == type_enum$unknown])
+    }
+
+    dt
+}
+# }}}
+
+# sep_group_table {{{
+sep_group_table <- function (dt, type_enum) {
+    setindexv(dt, "type")
+
+    dt[type == type_enum$group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
+
+    tbl_group <- dt[type == type_enum$group, .SD, .SDcols = c("group_id", "group_name")]
+
+    # check missing group
+    if (nrow(dt[line < tbl_group$line[1L]])) {
+        invld_grp <- dt[line < tbl_group$line[1L]]
+        parse_error("idd", "Missing group name", invld_grp[type == type_enum$class, .N], invld_grp)
+    }
+
+    # fill downwards
+    dt[, `:=`(group_id = group_id[1L]), by = cumsum(!is.na(group_id))]
+
+    # remove group lines
+    dt <- dt[type != type_enum$group]
+
+    set(dt, NULL, "group_name", NULL)
+
+    list(left = dt, group = tbl_group)
+}
+# }}}
+
+# sep_class_table {{{
+sep_class_table <- function (dt, type_enum) {
+    setindexv(dt, "type")
+
+    dt[type == type_enum$class, `:=`(
+        class_id = seq_along(body),
+        class_name = stri_trim_right(stri_sub(body, to = -2L))
+    )]
+
+    # check duplicated class names
+    dup_cls <- dt[type == type_enum$class, line[duplicated(class_name)]]
+    if (length(dup_cls)) {
+        invld_cls <- dt[class_name %in% unique(dup_cls$class_name)]
+        parse_error("idd", "Duplicated class names found", length(dup_cls), invld_cls)
+    }
+
+    # fill downwards
+    dt[, `:=`(class_id = class_id[1L], class_name = class_name[1L]), by = cumsum(!is.na(class_id))]
+
+    # check missing class name
+    if (nrow(dt[is.na(class_id)])) {
+        invld_cls <- dt[is.na(class_id)]
+        parse_error("idd", "Missing class name", invld_cls[type == type_enum$field_last, .N], invld_cls)
+    }
+
+    # add expected type indicator
+    dt[, `:=`(type_exp = type)]
+    dt[type > type_enum$class, `:=`(type_exp = type_enum$field)]
+    dt[line %in% dt[type > type_enum$class, line[.N], by = class_id]$V1,
+        `:=`(type_exp = type_enum$field_last)
+    ]
+
+    dt[class_id == 1L]
+    # check missing class name
+    mis_cls <- dt[type == type_enum$field_last & type_exp == type_enum$field]
+    if (nrow(mis_cls)) {
+        invld_cls <- dt[class_id %in% mis_cls$class_id]
+        invld_cls[, `:=`(line_s = line)]
+        invld_cls <- invld_cls[
+            invld_cls[, list(line_s = line[1L] + 1L), by = class_id],
+            on = list(class_id, line_s > line_s)
+        ]
+        if (invld_cls[.N, type] == type_enum$field_last) {
+            n <- invld_cls[type == type_enum$field_last, .N]
+        } else {
+            n <- invld_cls[type == type_enum$field_last, .N] + 1L
+        }
+        parse_error("idd", "Missing class name", n, invld_cls)
+    }
+
+    # check incomplete class
+    incomp_cls <- dt[type == type_enum$field & type_exp == type_enum$field_last, class_id]
+    if (length(incomp_cls)) {
+        invld_cls <- dt[class_id %in% incomp_cls]
+        parse_error("idd", "Incomplete class", length(incomp_cls), invld_cls)
+    }
+
+    # after checking possible errors, resign type
+    dt[type == type_enum$field_last, `:=`(type = type_enum$field)]
+
+    # line when class starts
+    s <- dt[, list(start = line[1L]), by = class_id]
+    # line when class slash ends
+    e <- dt[type == type_enum$field, list(end = line[1L] - 1L), by = class_id]
+    # join
+    i <- merge(s, e, by = "class_id", all = TRUE)
+
+    # manually add "\format" if there is no slash in class
+    if (nrow(i[start == end])) {
+        ins <- dt[i[start == end], on = "class_id", mult = "first"]
+        ins[, `:=`(
+            string = "\\format standard",
+            body = "format standard",
+            slash_key = "format",
+            slash_value = "standard",
+            type = type_enum$slash,
+            line = line + 1L,
+            start = NULL,
+            end = NULL
+        )]
+
+        # insert
+        dt <- rbindlist(list(ins, dt))
+        setorder(dt, "line")
+
+        # change added line number
+        dt[dt[class_id %in% ins$class_id, .I[2L], by = class_id]$V1, `:=`(
+            line = line - 1L
+        )]
+    }
+
+    # get table
+    tbl_class <- i[dt, on = list(class_id, start <= line, end >= line),
+        nomatch = 0L][!is.na(slash_key)]
+
+    setnames(tbl_class, "start", "line")
+
+    dt <- dt[!tbl_class, on = "line"][!line %in% s$start]
+    # remove unuseful columns
+    set(dt, NULL, c("line", "string", "type_exp", "group_id"), NULL)
+    set(tbl_class, NULL, c("line", "string", "body", "type", "end"), NULL)
+
+    list(left = dt, class = tbl_class)
+}
+# }}}
+
+# get_field_table {{{
+get_field_table <- function (dt, type_enum) {
+    # add row indicator
+    set(dt, NULL, "row", seq_len(nrow(dt)))
+
+    setindexv(dt, "type")
+
+    # count field number per line
+    dt[type == type_enum$field, `:=`(field_count = stri_count_charclass(body, "[,;]"))]
+
+    set(dt, NULL, "type", NULL)
+    setindexv(dt, "field_count")
+
+    # get all slash lines
+    slsh <- dt[is.na(field_count)]
+    set(slsh, NULL, "field_count", NULL)
+    set(slsh, NULL, "field_anid", NA_character_)
+
+    # get all single field lines
+    sgl <- dt[field_count == 1L]
+    set(sgl, NULL, "field_count", NULL)
+    sgl[, `:=`(field_anid = stri_trim_right(stri_sub(body, to = -2L)))]
+
+    # get all condensed field lines
+    con <- dt[field_count > 1L]
+    set(con, NULL, "field_count", NULL)
+
+    # split fields and slashes
+    ## hats off to Matt Dowle:
+    ## https://stackoverflow.com/questions/15673662/applying-a-function-to-each-row-of-a-data-table
+    con <- con[, {
+        s <- stri_split_charclass(body, "[,;]", omit_empty = TRUE)
+        l <- vapply(s, length, integer(1L))
+        list(
+            row = rep(row, l),
+            body = rep(body, l),
+            class_id = rep(class_id, l),
+            class_name = rep(class_name, l),
+            slash_key = rep(slash_key, l),
+            slash_value = rep(slash_value, l),
+            field_anid = stri_trim_both(unlist(s))
+        )
+    }]
+
+    # combine
+    tbl_field <- setorderv(rbindlist(list(slsh, sgl, con), use.names = TRUE), "row")
+
+    # fill downwards id and anid
+    set(tbl_field, NULL, "id", seq_len(nrow(tbl_field)))
+    left <- tbl_field[!is.na(field_anid),
+        list(id, field_id = .I, field_anid = stri_trans_toupper(field_anid))
+    ]
+    set(tbl_field, NULL, "field_anid", NULL)
+    tbl_field <- left[tbl_field, on = "id", roll = TRUE]
+    set(tbl_field, NULL, "id", NULL)
+
+    tbl_field
+}
+# }}}
+
+# dcast_slash {{{
+dcast_slash <- function (dt, id, keys, keep = NULL) {
+    stopifnot(has_names(dt, id))
+    stopifnot(has_names(keys, c("flat", "nest")))
+    if (!is.null(keep)) stopifnot(has_names(dt, keep))
+
+    set(dt, NULL, "row", seq_len(nrow(dt)))
+
+    # only use the first line of flat slash value
+    dt[slash_key %chin% keys$flat, by = c(id, "slash_key"),
+        `:=`(slash_value_rleid = seq_along(slash_value))
+    ]
+    dup_slsh <- dt[slash_value_rleid > 1L, row]
+    if (length(dup_slsh)) dt <- dt[-dup_slsh]
+    set(dt, NULL, c("row", "slash_value_rleid"), NULL)
+
+    f <- as.formula(paste0(paste0(id, collapse = "+"), "~slash_key"))
+
+    dt_flat <- dt[slash_key %chin% keys$flat]
+    if (nrow(dt_flat) == 0L) {
+        flat <- dt_flat[, .SD, .SDcols = c(id)]
+    } else {
+        flat <- dcast.data.table(dt_flat, f, value.var = "slash_value")
+    }
+
+    dt_nest <- dt[slash_key %chin% keys$nest]
+    if (nrow(dt_nest) == 0L) {
+        nest <- dt_nest[, .SD, .SDcols = c(id)]
+    } else {
+        nest <- dcast.data.table(dt_nest, f, value.var = "slash_value",
+            fun.aggregate = list(list)
+        )
+    }
+
+    # combine
+    i <- unique(dt[, .SD, .SDcols = c(id, keep)])
+    flat <- merge(i, flat, by = c(id), all = TRUE)
+    nest <- merge(i[, .SD, .SDcols = c(id)], nest, by = id, all = TRUE)
+
+    merge(flat, nest, by = id)
+}
+# }}}
+
+# complete_property {{{
+complete_property <- function (dt, type, ref = NULL) {
+    type <- match.arg(type, c("class", "field"))
+    keys <- switch(type, class = slash_keys()$class, field = slash_keys()$field)
+
+    # get slash type from slash key
+    slash_type <- function (key) {
+        types <- slash_keys()$type
+        chk <- vapply(types, function (type) key %in% type, logical(1L))
+        names(types)[chk]
+    }
+
+    # get slash type conversion function from slash key
+    slash_as_type <- function (key) {
+        t <- slash_type(key)
+        switch(t, lgl = as.logical, int = as.integer, dbl = as.double,
+            chr = as.character, lst = c)
+    }
+
+    # get slash initial value from slash key
+    slash_init_value <- function (key, as_type = FALSE) {
+        t <- slash_type(key)
+        res <- switch(t, lgl = "FALSE", lst = list(), NA_character_)
+        if (!as_type) return(res)
+
+        slash_as_type(key)(res)
+    }
+
+    # add missing property columns if necessary
+    for (key in unlist(keys)) {
+        if (!has_name(dt, key)) set(dt, NULL, key, slash_init_value(key))
+    }
+
+    # convert proerty column types
+    types <- unlist(slash_keys()$type, use.names = FALSE)
+    for (key in intersect(names(dt), types)) {
+        set(dt, NULL, key, slash_as_type(key)(dt[[key]]))
+        set(dt, seq_len(nrow(dt))[is.na(dt[[key]])], key, slash_init_value(key, as_type = TRUE))
+    }
+
+    dt <- switch(type,
+        class = parse_class_property(dt, ref),
+        field = parse_field_property(dt)
+    )
+
+    dt
+}
+# }}}
+
+# parse_class_property {{{
+parse_class_property <- function (dt, ref) {
+    # rename column names to lower case
+    nms <- stri_replace_all_fixed(names(dt), "-", "_")
+    setnames(dt, nms)
+
+    dt[is.na(format), `:=`(format = "standard")]
+    dt[is.na(min_fields), `:=`(min_fields = 0L)]
+    dt[is.na(extensible), `:=`(extensible = 0L)]
+
+    # rename
+    setnames(dt, "extensible", "num_extensible")
+
+    # get max field per class
+    set(dt, NULL, "num_fields", ref[, .N, by = class_id]$N)
+
+    # add `has_name`
+    set(dt, NULL, "has_name", ref[, any(is_name), by = class_id]$V1)
+
+    # add info about the index of last required field
+    set(dt, NULL, "last_required",
+        ref[required_field == TRUE, field_index[.N], by = list(class_id)][
+            J(dt$class_id), on = "class_id"][is.na(V1), `:=`(V1 = 0L)]$V1
+    )
+
+    # add first extensible index
+    set(dt, NULL, "first_extensible",
+        ref[is_extensible == TRUE, field_index[1L], by = list(class_id)][
+            J(dt$class_id), on = "class_id"][is.na(V1), `:=`(V1 = 0L)]$V1
+    )
+
+    # add num of extensible group
+    dt[num_extensible > 0L, `:=`(
+        num_extensible_group = (num_fields - first_extensible + 1L) %/% num_extensible
+    )]
+
+    nms <- c(
+        "class_id", "class_name", "group_id", "format",
+        "min_fields", "num_fields","last_required",
+        "has_name", "required_object", "unique_object",
+        "num_extensible", "first_extensible", "num_extensible_group",
+        "memo"
+    )
+
+    # only keep useful columns
+    ignore <- setdiff(names(dt), nms)
+    if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
+    setcolorder(dt, nms)
+
+    dt
+}
+# }}}
+
+# parse_field_property {{{
+parse_field_property <- function (dt) {
+    # rename column names to lower case
+    nms <- stri_replace_all_fixed(names(dt), "-", "_")
+    setnames(dt, nms)
+
+    # complete types
+    dt[is.na(type) & startsWith(field_anid, "A"), `:=`(type = "alpha")]
+    dt[is.na(type) & startsWith(field_anid, "N"), `:=`(type = "real")]
+
+    # add field index
+    set(dt, NULL, "field_index", rowidv(dt, "class_id"))
+
+    # add extensible indicator
+    set(dt, NULL, "is_extensible", FALSE)
+    dt[dt[begin_extensible == TRUE, list(class_id, field_index)],
+        on = list(class_id, field_index > field_index),
+        `:=`(is_extensible = TRUE)]
+    set(dt, NULL, "begin_extensible", NULL)
+
+    # parse field name
+    dt <- parse_field_property_name(dt)
+
+    # parse field range
+    dt <- parse_field_property_range(dt)
+
+    # rename column `key` to `choice`
+    setnames(dt, "key", "choice")
+
+    # transform all type values to lower-case
+    set(dt, NULL, "type", stri_trans_tolower(dt[["type"]]))
+
+    # add an integer-based field type column
+    t <- stri_replace_all_fixed(names(.globals$type), "_", "-")
+    names(t) <- .globals$type
+    set(dt, NULL, "type_enum", as.integer(chmatch(dt$type, t)))
+
+    nms <- c(
+        "field_id",
+        "class_id", "class_name",
+        "field_index", "field_anid", "field_name", "full_name", "full_ipname",
+        "units", "ip_units",
+        "is_name", 'required_field', "is_extensible",
+        "type", "type_enum",
+        "autosizable", "autocalculatable", "default", "choice", "note",
+        "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
+        "reference", "reference_class_name", "object_list"
+    )
+
+    # only keep useful columns
+    ignore <- setdiff(names(dt), nms)
+    if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
+    setcolorder(dt, nms)
+
+    dt
+}
+# }}}
+
+# parse_field_property_name {{{
+parse_field_property_name <- function (dt) {
+    # add name indicator
+    set(dt, NULL, "is_name", FALSE)
+    ## name fields:
+    ## a) fields with name equal to "Name" with type being "alpha" or "node"
+    ## b) fields can be referenced and does not reference others
+    dt[
+        (field == "Name" & type %chin% c("alpha", "node")) |
+        (
+           !vapply(reference, is.null, logical(1L)) &
+            vapply(object_list, is.null, logical(1L))
+        ),
+        `:=`(is_name = TRUE)
+    ]
+
+    # fill missing ip units
+    unit_tbl <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1,
+        .SD, .SDcols = c("si_name", "ip_name")
+    ]
+    dt <- unit_tbl[dt, on = list(si_name = units)][is.na(ip_units), `:=`(ip_units = ip_name)]
+    setnames(dt, "si_name", "units")
+    set(dt, NULL, "ip_name", NULL)
+    dt[is.na(ip_units) & ip_units == "unknown", `:=`(ip_units = units)]
+
+    # add field names
+    setnames(dt, "field", "field_name")
+    dt[is.na(field_name), `:=`(field_name = field_anid)]
+
+    # add full names
+    dt[is.na(units), `:=`(full_name = field_name, full_ipname = field_name)]
+    dt[!is.na(units), `:=`(
+        full_name = paste0(field_name, " {", units, "}"),
+        full_ipname = paste0(field_name, " {", ip_units, "}")
+    )]
+
+    dt
+}
+# }}}
+
+# parse_field_property_range {{{
+parse_field_property_range <- function (dt) {
+    set(dt, NULL, c("has_range", "lower_incbounds", "upper_incbounds"), FALSE)
+
+    dt[!is.na(minimum), `:=`(has_range = TRUE, lower_incbounds = TRUE)]
+    dt[!is.na(maximum), `:=`(has_range = TRUE, upper_incbounds = TRUE)]
+    dt[!is.na(`minimum>`), `:=`(has_range = TRUE, minimum = `minimum>`)]
+    dt[!is.na(`maximum<`), `:=`(has_range = TRUE, maximum = `maximum<`)]
+
+    set(dt, NULL, c("minimum>", "maximum<"), NULL)
+    dt
+}
+# }}}
+
+# parse_field_reference_table {{{
+parse_field_reference_table <- function (dt) {
+    # mark source type
+    set(dt, NULL, "src_enum", .globals$source$none)
+
+    setindexv(dt, "field_id")
+
+    # for \object-list
+    obj_fld <- dt[, {
+        l <- vapply(object_list, length, integer(1L))
+        list(
+            field_id = rep(field_id[l > 0L], l[l > 0L]),
+            object_list = unlist(object_list)
+        )
+    }]
+    # fix errors when object-list fields having an type of "alpha"
+    dt[obj_fld, on = "field_id", `:=`(type = "object-list")]
+
+    # for \reference-class-name
+    ref_cls <- dt[, {
+        l <- vapply(reference_class_name, length, integer(1L))
+        list(
+            reference = unlist(reference_class_name),
+            src_field_id = rep(field_id[l > 0L], l[l > 0L]),
+            src_enum = .globals$source$class
+        )
+    }]
+    dt[ref_cls, on = list(field_id = src_field_id), `:=`(src_enum = ref_cls$src_enum)]
+
+    # for \reference
+    ref_fld <- dt[, {
+        l <- vapply(reference, length, integer(1L))
+        fld <- l > 0L
+        mx <- fld & src_enum == .globals$source$class
+        src_enum[fld] <- .globals$source$field
+        src_enum[mx] <- .globals$source$mixed
+        list(
+            reference = unlist(reference),
+            src_field_id = rep(field_id[fld], l[fld]),
+            src_enum = rep(src_enum[fld], l[fld])
+        )
+    }]
+    dt[ref_fld, on = list(field_id = src_field_id), `:=`(src_enum = ref_fld$src_enum)]
+
+    # combine \reference and \reference-class-name
+    refs <- rbindlist(list(ref_fld, ref_cls), fill = TRUE)
+
+    # combine object list and reference
+    obj_ref <- refs[obj_fld, on = list(reference = object_list), allow.cartesian = TRUE]
+    set(obj_ref, NULL, "reference", NULL)
+    setcolorder(obj_ref, c("field_id", "src_field_id", "src_enum"))
+
+    # remove unuseful columns
+    set(dt, NULL, c("object_list", "reference", "reference_class_name"), NULL)
+
+    list(left = dt, reference = obj_ref)
+}
+# }}}
+
+# sep_idf_lines {{{
+sep_idf_lines <- function (dt, type_enum) {
+    # mark location of first occurance "!" and "!-"
+    dt[, `:=`(excl_loc = stri_locate_first_fixed(string, "!")[, 1L])]
+    dt[, `:=`(spcl_loc = stri_locate_first_fixed(string, "!-")[, 1L])]
+
+    setindexv(dt, c("excl_loc", "spcl_loc"))
+
+    # sep values and comments
+    dt[is.na(excl_loc), `:=`(body = string, comment = "")]
+    dt[!is.na(excl_loc), `:=`(
+        body = stri_trim_right(stri_sub(string, to = excl_loc - 1L)),
+        comment = stri_sub(string, excl_loc + 1L)
+    )]
+    dt[!is.na(spcl_loc), `:=`(comment = stri_trim_left(stri_sub(comment, 2L)))]
+
+    set(dt, NULL, c("excl_loc", "spcl_loc"), NULL)
+
+    dt
+}
+# }}}
+
+# mark_idf_lines {{{
+mark_idf_lines <- function (dt, type_enum) {
+    # add type indicator
+    set(dt, NULL, "type", type_enum$unknown)
+
+    setindexv(dt, "type")
+
+    # macro line
+    l_m <- dt[startsWith(string, "#"), line]
+    if (length(l_m)) {
+        dt[l_m, c("type", "body", "comment") :=({
+            macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
+            is_m <- macro %in% macro_dict
+            if (any(is_m)) {
+                warning("Currently, Imf file is not fully supported. All ",
+                    "EpMacro lines will be treated as normal comments of ",
+                    "the nearest downwards object.", call. = FALSE)
+                type[is_m] <- type_enum$macro
+                body[is_m] <- ""
+                comment <- string
+            }
+
+            list(type, body, comment)
+        })]
+
+        if (nrow(dt[type == type_enum$macro])) {
+            parse_error("idf", "Marco lines found", msg = dt[type == type_enum$macro], stop = FALSE)
         }
     }
-    # }}}
 
-    # handle extensible group
-    # {{{
-    # get field num per object
-    num <- value[, list(num_values = .N), by = list(object_id, class_id)]
-    # get classes needed to add extensible groups
-    ext <- num[idd_private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
-        num_fields < num_values, list(object_id, class_name, num_fields, num_values, num_extensible)]
-    if (not_empty(ext)) {
-        # stop if errors were found
-        error_num <- ext[num_extensible == 0L]
-        if (not_empty(error_num)) {
-            e_fld <- error_num[value, on = "object_id", nomatch = 0L][
-                , idx := as.character(field_index), by = line][
-                field_index > num_fields, idx := "X", by = line][
-                , msg := paste0("  [", idx, "] -> Line ", line, ": ", string)]
-            e_fld[e_fld[, .I[1], by = class_id]$V1,
-                  msg := paste0(num_values, " fields found for class ",
-                backtick(class_name), " with only max ", num_fields, " fields allowed:\n", msg)]
-            parse_error("idf", "Too many fields found for class", nrow(error_num), e_fld[["msg"]])
+    # normal comments
+    dt[startsWith(string, "!"), `:=`(type = type_enum$comment)]
+
+    # special comments
+    dt[startsWith(string, "!-"), `:=`(type = type_enum$special)]
+
+    # mark values in object
+    dt[endsWith(body, ","), `:=`(type = type_enum$value)]
+
+    # mark last value in object
+    dt[endsWith(body, ";"), `:=`(type = type_enum$value_last)]
+
+    # if there are still known lines, throw an error
+    if (nrow(dt[type == type_enum$unknown]) > 0L) {
+        parse_error(type = "idf", error = "Invalid line found", msg = dt[type == type_enum$unknown])
+    }
+
+    dt
+}
+# }}}
+
+# sep_header_options {{{
+sep_header_options <- function (dt, type_enum) {
+    tbl_opt <- dt[type == type_enum$special]
+    dt <- dt[!tbl_opt, on = "line"]
+
+    s <- stri_split_fixed(tbl_opt[['comment']], " ", n = 2, simplify = TRUE)
+    set(tbl_opt, NULL, "header", stri_trans_tolower(s[, 1L]))
+    set(tbl_opt, NULL, "value", stri_trans_tolower(s[, 2L]))
+
+    # all available options
+    opts <- list(
+        generator = c(idf_editor = "idfeditor"),
+        option = c(
+            special_format = "usespecialformat",
+            view_in_ip = "viewinipunits",
+            sorted = "sortedorder",
+            ori_top = "originalordertop",
+            ori_bot = "originalorderbottom"
+        )
+    )
+
+    # helper
+    get_option <- function (header, value) {
+        if (header %in% names(opts)) {
+            opt <- opts[[header]]
+            vals <- stri_split_fixed(value, " ", omit_empty = TRUE)[[1L]]
+            names(opt)[opt %in% vals]
+        }
+    }
+
+    # only parse lines with valid headers
+    tbl_opt <- tbl_opt[header %in% names(opts)]
+
+    opt <- list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE,
+        save_format = "sorted")
+
+    res <- list(left = dt, options = opt)
+
+    if (nrow(tbl_opt) == 0L) return(res)
+
+    out <- unlist(tbl_opt[, `:=`(options = list(get_option(header, value))), by = line]$options)
+
+    if (length(out) == 0L) return(res)
+
+    for (lgl in setdiff(names(res), "save_format")) res$options[[lgl]] <- TRUE
+    save_format <- c("sorted", "ori_top", "ori_bot")
+    sf <- save_format[save_format %in% out][1L]
+    if (!is.na(sf)) res$options$save_format <- sf
+
+    res
+}
+# }}}
+
+# sep_object_table {{{
+sep_object_table <- function (dt, type_enum, idd) {
+    # object id
+    left <- dt[type == type_enum$value_last, list(line, object_id = seq_along(line))]
+    dt <- left[dt, on = "line", roll = -Inf]
+
+    # check incomplete object
+    incomp_obj <- dt[is.na(object_id) & type >= type_enum$value]
+    if (nrow(incomp_obj)) {
+        parse_error("idf", "Incomplete object", 1L, dt[is.na(object_id)])
+    }
+
+    # extract class names
+    dt[dt[type >= type_enum$value, .I[1L], by = list(object_id)]$V1,
+        c("type", "class_name_lower", "body") :=({
+            n <- stri_locate_first_fixed(body, ",")[, 1L]
+            l <- stri_length(body)
+            class_name_lower <- stri_trans_tolower(stri_sub(body, to = n - 1L))
+            body[n < l] <- stri_trim_left(stri_sub(body[n < l], n[n < l] + 1L))
+            type[n >  l] <- type_enum$object_value
+            type[n == l] <- type_enum$object
+            list(type, class_name_lower, body)
+        })
+    ]
+
+    # add class id and name
+    set(idd$class, NULL, "class_name_lower", stri_trans_tolower(idd$class$class_name))
+    dt[!is.na(class_name_lower), c("class_id", "class_name") := ({
+        nm_in <- class_name_lower
+        cls <- idd$class[, list(class_id, class_name, class_name_lower)][J(nm_in), on = "class_name_lower"]
+        list(cls$class_id, cls$class_name)
+    })]
+    set(idd$class, NULL, "class_name_lower", NULL)
+
+    # check for version
+    id_ver <- dt[class_name == "Version", object_id]
+
+    # if multiple version found, stop
+    if (length(id_ver) > 1L) {
+        parse_error("idf", "Multiple IDF Version found", length(id_ver), dt[object_id %in% id_ver])
+
+    # if no version found, insert one
+    } else if (length(id_ver) == 0L) {
+        v <- idd$version[, 1:2]
+        warning("Missing version field in input IDF. The given IDD ",
+            "version ", idd$version, " will be used. Parsing errors ",
+            "may occur.", call. = FALSE)
+        ins <- dt[1L]
+        ins[, `:=`(
+            line = nrow(dt) + 1L,
+            class_id = 1L,
+            class_name = "Version",
+            object_id = max(dt$object_id, na.rm = TRUE),
+            string = paste0("Version, ", v, ";"),
+            body = paste0(v, ";"),
+            comment = "",
+            type = type_enum$object_value
+        )]
+
+        dt <- rbindlist(list(dt, ins))
+
+    # if only has one version, then compare it with input IDD version
+    } else {
+        b <- dt[object_id == id_ver][type > type_enum$object, body]
+        v <- standardize_ver(stri_trim_right(stri_sub(b, to = -2L)))
+
+        if (v != idd$version) {
+            warning(paste0("Version Mismatch. The IDF file parsing has  a differnet ",
+                "version ", backtick(idf_version), " than the IDD file using ",
+                backtick(idd_version), ". Parsing errors may occur."), call. = FALSE
+            )
+        }
+    }
+
+    # check invalid class name
+    invld_obj <- dt[is.na(class_id) & !is.na(class_name_lower)]
+    if (nrow(invld_obj)) {
+        parse_error("idf", "Invalid class name", msg = invld_obj)
+    }
+
+    # fill class id and class name
+    left <- dt[!is.na(class_id), list(line, class_id, class_name)]
+    set(dt, NULL, c("class_id", "class_name", "class_name_lower"), NULL)
+    dt_cmt <- left[dt[type < type_enum$value], on = "line", roll = -Inf]
+    dt_val <- left[dt[type > type_enum$comment], on = "line", roll = Inf]
+    dt <- setorder(rbindlist(list(dt_cmt, dt_val)), "line")
+
+    # get table
+    tbl_object <- dt[type <= type_enum$object_value, .SD,
+        .SDcols = c("object_id", "class_id", "class_name", "comment")]
+    tbl_object <- tbl_object[, list(
+        class_id = class_id[1L], class_name = class_name[1L], comment = list(comment)),
+        by = object_id
+    ]
+
+    dt <- dt[type > type_enum$object]
+    # remove unuseful columns
+    set(dt, NULL, c("type", "comment"), NULL)
+
+    list(left = dt, object = tbl_object)
+}
+# }}}
+
+# get_value_table {{{
+get_value_table <- function (dt, type_enum, idd) {
+    # count value number per line
+    dt[, `:=`(value_count = stri_count_charclass(body, "[,;]"))]
+
+    setindexv(dt, "value_count")
+
+    # get all comments and single value lines
+    sgl <- dt[value_count < 2L]
+    set(sgl, NULL, "value_count", NULL)
+    sgl[, `:=`(value = stri_trim_right(stri_sub(body, to = -2L)))]
+
+    # get all condensed value lines
+    con <- dt[value_count > 1L]
+    set(con, NULL, "value_count", NULL)
+
+    # split values
+    con <- con[, {
+        s <- stri_split_charclass(body, "[,;]", omit_empty = TRUE)
+        l <- vapply(s, length, integer(1L))
+        list(
+            line = rep(line, l),
+            body = rep(body, l),
+            string = rep(string, l),
+            object_id = rep(object_id, l),
+            class_id = rep(class_id, l),
+            class_name = rep(class_name, l),
+            value = stri_trim_both(unlist(s))
+        )
+    }]
+
+    # combine
+    dt <- setorderv(rbindlist(list(sgl, con), use.names = TRUE), "line")
+
+    # add value id
+    set(dt, NULL, "value_id", seq_len(nrow(dt)))
+    set(dt, NULL, "field_index", rowidv(dt, "object_id"))
+
+    left <- idd$class[, list(class_id, num_extensible, num_fields)]
+    ext <- dt[left, on = list(class_id, field_index > num_fields), nomatch = 0L]
+    setnames(ext, "field_index", "num_fields")
+
+    # add extensible if necessary
+    if (nrow(ext)) {
+        # check invalid field number
+        if (nrow(ext[num_extensible == 0L])) {
+            invld_id <- unique(ext[num_extensible == 0L, list(object_id, num_fields)])
+            invld_obj <- dt[invld_id, on = "object_id"]
+
+            # build error message
+            invld_obj[field_index <= num_fields, `:=`(string = paste0("[O] ", string))]
+            invld_obj[field_index >  num_fields, `:=`(string = paste0("[X] ", string))]
+            invld_obj[invld_obj[, .I[1L], by = object_id]$V1,
+                `:=`(prefix = paste0("For class ", backtick(class_name), "\n"))
+            ]
+            invld_obj[is.na(prefix), `:=`(prefix = "")]
+
+            parse_error("idd", "Invalid field number", nrow(invld_id),
+                invld_obj, invld_obj$prefix
+            )
         }
 
-        # add extensible group
+        # TODO: add extensible groups
         ext_add <- ext[, list(num_values = max(num_values)),
             by = list(class_id, num_extensible, num_fields)]
         ext_add[, num_to_add := ceiling(num_values - num_fields / num_extensible)]
 
         i_add_extensible_group(idd_self, idd_private, ext_add$class_id, ext_add$num_to_add)
     }
-    # }}}
-    value_tbl <- idd_private$m_idd_tbl$field[
-        value, on = c("class_id", "field_index")]
 
-    value_tbl[grepl("^\\s*$", value), `:=`(value = NA_character_)]
+    # replace empty value with NA
+    dt[stri_isempty(value), `:=`(value = NA_character_)]
 
-    value_tbl[ , `:=`(value_upper = toupper(value))]
-    # only convert to numbers if the field type indicates so
-    value_tbl[type %in% c("real", "integer"),
+    # add field id and other attributes
+    ## add full name column based on option
+    col_nm <- ifelse(.options$view_in_ip, "full_ipname", "full_name")
+    cols_add <- c("class_id", "field_index", "field_id", "type_enum", "src_enum",
+        "field_name", col_nm, "units", "ip_units", "is_name")
+    dt <- idd$field[, .SD, .SDcols = cols_add][dt, on = c("class_id", "field_index"), nomatch = 0L]
+
+    # add numeric type values
+    dt[type_enum <= .globals$type$real,
         `:=`(value_num = suppressWarnings(as.numeric(value)))]
-    value_tbl[ , `:=`(value_ipnum = value_num)]
-    value <- update_value_num(value_tbl, digits = header_options$num_digits,
-                              in_ip = header_options$view_in_ip)[
-        , list(value_id, value, value_upper, value_num, value_ipnum, object_id, field_id)]
-    data.table::setorder(value, value_id)
 
-    # add object name column
-    object <- value_tbl[field_index == 1L][
-        is_name == FALSE, `:=`(value = NA_character_, value_upper = NA_character_)][
-    , list(object_id, class_id, value, value_upper)]
-    data.table::setnames(object, c("value", "value_upper"), c("object_name",  "object_name_upper"))
-    data.table::setorder(object, object_id)
+    nms <- c("value_id", "value", "value_num", "object_id", "class_name", cols_add)
 
-    # value reference map
-    obj <- value[idd_private$m_idd_tbl$field_object_list,
-        on = "field_id", nomatch = 0L, list(value_id, value_upper, object_list)]
-    ref <- value[idd_private$m_idd_tbl$field_reference,
-        on = "field_id", nomatch = 0L, list(value_id, value_upper, reference)]
-    data.table::setnames(ref, "value_id", "reference_value_id")
-    value_reference <- unique(obj[ref, on = c(object_list = "reference", "value_upper"),
-        nomatch = 0L, list(value_id, reference_value_id)])
-    data.table::setorder(value_reference, value_id)
-    # }}}
+    # only keep useful columns
+    ignore <- setdiff(names(dt), nms)
+    if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
+    setcolorder(dt, nms)
 
-    idf <- list(version = idf_version,
-                options = header_options,
-                object = object,
-                value = value,
-                value_reference = value_reference,
-                comment = comment)
+    # always use "full_name" to represent current field names
+    setnames(dt, col_nm, "full_name")
 
-    data.table::setattr(idf, "class", c("IdfFile", class(idf)))
-    data.table::setattr(idf, "is_imf", is_imf)
-    data.table::setattr(idf, "idd", idd)
+    dt
+}
+# }}}
 
-    idf
+# update_object_name {{{
+update_object_name <- function (tbl_object, tbl_value) {
+    dt_nm <- tbl_value[is_name == TRUE,
+        list(object_name = value, object_name_lower = stri_trans_tolower(value)),
+        by = list(object_id)]
+    tbl_object[dt_nm, on = "object_id"]
+}
+# }}}
+
+# convert_value_unit {{{
+convert_value_unit <- function (tbl_value, from, to) {
+    from <- match.arg(from, c("si", "ip"))
+    to <- match.arg(to, c("si", "ip"))
+
+    if (identical(from, to)) return(tbl_value)
+
+    val <- tbl_value[!is.na(value_num) & !is.na(units), list(value_id, value_num, units, ip_units)]
+    browser()
+
+    val <- unit_conv_table[val, on = c(si_name = "units", ip_name = "ip_units")]
+    set(val, NULL, c("si_name", "ip_name"), NULL)
+    setnames(val, c("si_standard_name", "ip_standard_name"), c("si", "ip"))
+
+    val[, c("value_num") :=
+        {
+            s <- units::set_units(value_num, get(from)[1L], mode = "standard")
+            s <- units::set_units(s, get(to)[1L], mode = "standard")
+            units::drop_units(s)
+        },
+        by = list(si, ip)
+    ]
+
+    tbl_value[val, on = "value_id", `:=`(value_num = val$value_num)]
+
+    tbl_value
+}
+# }}}
+
+# get_value_sources {{{
+get_value_sources <- function (tbl_value, lower = FALSE) {
+    tbl_val <- tbl_value[!is.na(value)]
+
+    setindexv(tbl_val, "src_enum")
+
+    # a) reference class names
+    cls_src <- tbl_val[
+        src_enum == .globals$source$class,
+        list(
+            src_field_id = field_id,
+            src_value_id = value_id,
+            src_value = class_name,
+            src_enum
+        )
+    ]
+
+    # b) reference field values
+    fld_src <- tbl_val[
+        src_enum == .globals$source$field,
+        list(
+            src_field_id = field_id,
+            src_value_id = value_id,
+            src_value = value,
+            src_enum
+        )
+    ]
+
+    # c) reference both class names and field values
+    ## seperate source enum here
+    mix_src <- tbl_val[
+        src_enum == .globals$source$mixed,
+        {
+            list(
+                src_field_id = c(field_id, field_id),
+                src_value_id = c(value_id, value_id),
+                src_value = c(value, class_name),
+                src_enum = c(.globals$source$field, .globals$source$class)
+            )
+        }
+    ]
+
+    # combine
+    val_src <- rbindlist(list(cls_src, fld_src, mix_src))
+
+    if (lower) set(val_src, NULL, "src_value", stri_trans_tolower(val_src$src_value))
+
+    val_src
+}
+# }}}
+
+# update_value_reference {{{
+update_value_reference <- function (tbl_object, tbl_value, tbl_reference) {
+    # get all values in lower case that are references
+    val_ref <- tbl_value[
+        !is.na(value) & type_enum == .globals$type$object_list,
+        list(value_id, value = stri_trans_tolower(value), field_id)]
+    if (nrow(val_ref) == 0L) return(tbl_value)
+
+    # get all values in lower case that are sources
+    val_src <- get_value_sources(tbl_value, lower = TRUE)
+    if (nrow(val_src) == 0L) return(tbl_value)
+    val_src <- val_src[, lapply(.SD, list), by = list(src_field_id)]
+
+    # remove rows that field ids do not exist in current IDF
+    fld_ref_src <- tbl_reference[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
+    set(fld_ref_src, NULL, "src_enum", NULL)
+
+    # get all values that are references
+    all_ref <- val_ref[fld_ref_src, on = list(field_id), allow.cartesian = TRUE]
+
+    # match
+    ref_src <- val_src[all_ref, on = list(src_field_id)][,
+        {
+            v <- value[1L]
+            # NOTE: If there are multiple value matched, only the first will be
+            # used. This could happen when there are errors that objects in one
+            # class have the same name.
+            # TODO: log this case
+            m <- chmatch(v, unlist(src_value), nomatch = 0L)
+            # set NA if no matched found
+            id <- NA_integer_
+            enum <- NA_integer_
+            if (m) {
+                id <- unlist(src_value_id)[m]
+                enum <- unlist(src_enum)[m]
+            }
+            list(src_value_id = id, src_enum = enum)
+        },
+        by = value_id
+    ]
+
+    ref_src
 }
 # }}}
 
@@ -1113,7 +1480,18 @@ parse_err_file <- function (path) {
 # }}}
 
 # parse_error {{{
-parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, stop = TRUE) {
+parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL,
+                         prefix = NULL, stop = TRUE) {
+
+    start_rule <- cli::rule(line = 2L)
+    if (stop) {
+        err_type <- paste0("[ Error Type ]: ", error)
+        err_num  <- paste0("[Total Number]: ", num)
+    } else {
+        err_type <- paste0("[Warning Type]: ", error)
+        err_num  <- paste0("[Total Number]: ", num)
+    }
+
     type <- match.arg(type)
     if (is.data.frame(msg)) {
         if (missing(num)) {
@@ -1121,12 +1499,11 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
         }
         assert_that(has_name(msg, "line"))
         assert_that(has_name(msg, "string"))
-        msg <- paste0("Line ", msg$line, ": ", msg$string)
+        msg <- paste0(msg[["msg_each"]], "Line ", msg$line, ": ", msg$string)
+        if (!is.null(prefix)) {
+            msg <- paste0(prefix, msg)
+        }
     }
-
-    start_rule <- cli::rule(line = 2L)
-    err_type <- paste0("[ Error Type ]: ", error)
-    err_num <- paste0("[Total Number]: ", num)
 
     if (!is.null(msg)) {
         msg_rule <- cli::rule(line = 1L)
@@ -1146,73 +1523,7 @@ parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL, 
     if (stop) {
         stop(paste0(toupper(type)," PARSING ERROR.\n"), all_msg, call. = FALSE)
     } else {
-        warning(paste0(toupper(type), " PARSING ERROR.\n"), all_msg, call. = FALSE)
-    }
-}
-# }}}
-
-# read_idd_str {{{
-read_idd_str <- function(filepath) {
-    idd_str <- readr::read_lines(filepath)
-    # Have to fix encoding errors in version 8.3 and below
-    idd_str <- gsub("\x92", "'", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("\x93", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("\x94", "\"", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("\xb0", "deg", idd_str, useBytes = TRUE, fixed = TRUE)
-    idd_str <- gsub("\xd0", "D", idd_str, useBytes = TRUE, fixed = TRUE)
-    # Get rid of leading and trailing spaces
-    idd_str <- stringr::str_trim(idd_str, "both")
-
-    return(idd_str)
-}
-# }}}
-
-# get_idd_ver {{{
-get_idd_ver <- function (idd_str) {
-    ver_line <- idd_str[grepl("!IDD_Version", idd_str, fixed = TRUE)]
-
-    if (length(ver_line) == 1L) {
-        ver <- substr(ver_line, 14L, nchar(ver_line))
-        return(standardize_ver(ver))
-    } else if (length(ver_line > 1L)) {
-        stop("Multiple IDD version found in the input:\n",
-             paste0("  ", backtick(ver_line), collapse = "\n"), call. = FALSE)
-    } else {
-        stop("No IDD version found in the input.", call. = FALSE)
-    }
-}
-# }}}
-
-# get_idd_build {{{
-get_idd_build <- function (idd_str) {
-    build_line <- idd_str[grepl("!IDD_BUILD", idd_str, fixed = TRUE)]
-
-    if (length(build_line) == 1L) {
-        build <- substr(build_line, 12L, nchar(build_line))
-        return(build)
-    } else if (length(build_line > 1L)) {
-        warning("Multiple IDD build tag found in the input:\n",
-             paste0("  ", backtick(build_line), collapse = "\n"), call. = FALSE)
-    } else {
-        warning("No IDD build tag found in the input.", call. = FALSE)
-    }
-}
-# }}}
-
-# get_idf_ver {{{
-get_idf_ver <- function (idf_str) {
-    ver_normal_cand <- idf_str[endsWith(idf_str, "Version Identifier")]
-    ver_normal <- ver_normal_cand[!startsWith(ver_normal_cand, "!")]
-    ver_special_cand <- idf_str[startsWith(idf_str, "Version")]
-    ver_special <- ver_special_cand[!startsWith(ver_special_cand, "!")]
-
-    if (length(ver_normal) >= 1L) {
-        # for "8.6; !- Version Identifier"
-        standardize_ver(trimws(strsplit(ver_normal[1], ";", fixed = TRUE)[[1]][1]))
-    } else if (length(ver_special) >= 1L){
-        standardize_ver(trimws(strsplit(ver_special[1], "[,;]")[[1]][2]))
-    } else {
-        return(NULL)
+        warning(paste0(toupper(type), " PARSING WARNING.\n"), all_msg, call. = FALSE)
     }
 }
 # }}}

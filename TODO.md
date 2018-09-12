@@ -49,3 +49,5 @@
 * Add function to reorder objects in a class
 
 * Add a `class` parameter to `$ref_by_object()` in `IdfObject` class
+
+* Add options of postprocessing e.g. "ConvertESOMTR".

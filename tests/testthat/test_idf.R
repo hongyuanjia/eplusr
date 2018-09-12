@@ -112,9 +112,10 @@ test_that("parse_idf_file()", {
     expect_equivalent(idf_value$value$value_num, num)
     expect_equal(idf_value$value$object_id, c(rep(1, 9), 2))
 
-    # can detect error of invalid class name
+    # can detect invalid lines
     idf_wrong <- c(
-        "WrongClass,
+        "Version,8.8;
+         WrongClass<
             WD01,                    !- Name
             MediumSmooth,            !- Roughness
             1.9099999E-02,           !- Thickness {m}
@@ -125,7 +126,51 @@ test_that("parse_idf_file()", {
             0.7800000,               !- Solar Absorptance
             0.7800000;               !- Visible Absorptance
         ")
-    expect_error(suppressWarnings(parse_idf_file(idf_wrong, idd_8_8)))
+    expect_error(parse_idf_file(idf_wrong, idd_8_8))
+
+    # can detect incomplete object
+    idf_wrong <- c(
+        "Version,8.8;
+         WrongClass,
+            WD01,                    !- Name
+            MediumSmooth,            !- Roughness
+            1.9099999E-02,           !- Thickness {m}
+            0.1150000,               !- Conductivity {W/m-K}
+            513.0000,                !- Density {kg/m3}
+            1381.000,                !- Specific Heat {J/kg-K}
+            0.9000000,               !- Thermal Absorptance
+            0.7800000,               !- Solar Absorptance
+            0.7800000,               !- Visible Absorptance
+        ")
+    expect_error(parse_idf_file(idf_wrong, idd_8_8))
+
+    # can detect error of invalid class name
+    idf_wrong <- c(
+        "Version,8.8;
+        ! comment
+         WrongClass,
+            WD01,                    !- Name
+            MediumSmooth,            !- Roughness
+            1.9099999E-02,           !- Thickness {m}
+            0.1150000,               !- Conductivity {W/m-K}
+            513.0000,                !- Density {kg/m3}
+            1381.000,                !- Specific Heat {J/kg-K}
+            0.9000000,               !- Thermal Absorptance
+            0.7800000,               !- Solar Absorptance
+            0.7800000;               !- Visible Absorptance
+        ! comment
+         WrongClass,
+            WD01,                    !- Name
+            MediumSmooth,            !- Roughness
+            1.9099999E-02,           !- Thickness {m}
+            0.1150000,               !- Conductivity {W/m-K}
+            513.0000,                !- Density {kg/m3}
+            1381.000,                !- Specific Heat {J/kg-K}
+            0.9000000,               !- Thermal Absorptance
+            0.7800000,               !- Solar Absorptance
+            0.7800000;               !- Visible Absorptance
+        ")
+    expect_error(parse_idf_file(idf_wrong, idd_8_8))
 
     # can detect error of multiple version
     idf_wrong <- "Version, 8.8;\nVersion, 8.9;"
@@ -137,7 +182,7 @@ test_that("parse_idf_file()", {
         SurfaceConvectionAlgorithm:Inside,
             Simple, !- Algorithm
             TARP; !- Algorithm"
-    expect_error(parse_idf_file(idf_wrong))
+    expect_error(parse_idf_file(idf_wrong, idd_8_8))
 })
 # }}}
 

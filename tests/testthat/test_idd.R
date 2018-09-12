@@ -213,10 +213,8 @@ test_that("parse_idd_file()", {
     idd_wrong <- c(
         "\\group TestGroup
 
-        TestInvalidSlash,
-        A1 ; \\note something
-
-        Some Mess Here"
+        Test,
+        A1 ; \\note something"
     )
     expect_error(parse_idd_file(idd_wrong), "No IDD version found")
 
@@ -226,10 +224,8 @@ test_that("parse_idd_file()", {
          !IDD_Version 9.9.8
          \\group TestGroup
 
-         TestInvalidSlash,
-         A1 ; \\note something
-
-         Some Mess Here"
+         Test,
+         A1 ; \\note something"
     )
     expect_error(parse_idd_file(idd_wrong), "Multiple IDD version found")
 
@@ -238,7 +234,7 @@ test_that("parse_idd_file()", {
         "!IDD_Version 9.9.9
          \\group TestGroup
 
-         TestInvalidSlash,
+         Test,
          A1 ; \\note something"
     )
     expect_warning(parse_idd_file(idd_wrong))
@@ -250,23 +246,105 @@ test_that("parse_idd_file()", {
         !IDD_BUILD def
         \\group TestGroup
 
-        TestInvalidSlash,
+        Test,
         A1 ; \\note something"
     )
     expect_warning(parse_idd_file(idd_wrong))
 
-    # can detect error of invaid line
+    # can detect error of invalid line
     idd_wrong <- c(
         "!IDD_Version 9.9.9
          !IDD_BUILD 7c3bbe4830
          \\group TestGroup
 
-         TestInvalidSlash,
+         Test,
          A1 ; \\note something
 
          Some Mess Here"
     )
     expect_error(parse_idd_file(idd_wrong))
+
+    # can detect missing group lines
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         Test,
+         A1 ; \\note something
+
+         \\group TestGroup
+
+         Test1,
+         A1 ; \\note something
+         "
+    )
+    expect_error(parse_idd_file(idd_wrong))
+
+    # can detect duplicated class names
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         \\group TestGroup
+
+         Test,
+         A1 ; \\note something
+
+         Test,
+         A1 ; \\note something
+         "
+    )
+    expect_error(parse_idd_file(idd_wrong))
+
+    # can detect incomplete class
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         \\group TestGroup
+
+         Test,
+         A1 ; \\note something
+
+         A1 , \\note something
+         A1 ; \\note something
+         A1 , \\note something
+         "
+    )
+    expect_error(parse_idd_file(idd_wrong))
+
+    # can detect missing class names
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         \\group TestGroup
+
+         Test,
+         A1 ; \\note something
+
+         A1 , \\note something
+         A1 ; \\note something
+         "
+    )
+    expect_error(parse_idd_file(idd_wrong))
+
+    # can manually insert class slash
+    idd_cls <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         \\group TestGroup
+
+         Test,
+         A1 ; \\note something
+
+         Test1,
+         A1 , \\note something
+         A1 ; \\note something
+         "
+    )
+    expect_silent(parse_idd_file(idd_cls))
 
     # can detect error of invalid slash key
     idd_wrong <- c(
