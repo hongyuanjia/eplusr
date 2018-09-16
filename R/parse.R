@@ -1091,10 +1091,11 @@ sep_object_table <- function (dt, type_enum, idd) {
 
     # add class id and name
     set(idd$class, NULL, "class_name_lower", stri_trans_tolower(idd$class$class_name))
-    dt[!is.na(class_name_lower), c("class_id", "class_name") := ({
+    dt[!is.na(class_name_lower), c("class_id", "class_name", "group_id") := ({
         nm_in <- class_name_lower
-        cls <- idd$class[, list(class_id, class_name, class_name_lower)][J(nm_in), on = "class_name_lower"]
-        list(cls$class_id, cls$class_name)
+        cls <- idd$class[, list(class_id, class_name, group_id, class_name_lower)][
+            J(nm_in), on = "class_name_lower"]
+        list(cls$class_id, cls$class_name, cls$group_id)
     })]
     set(idd$class, NULL, "class_name_lower", NULL)
 
@@ -1116,6 +1117,7 @@ sep_object_table <- function (dt, type_enum, idd) {
             line = nrow(dt) + 1L,
             class_id = 1L,
             class_name = "Version",
+            group_id = 1L,
             object_id = max(dt$object_id, na.rm = TRUE),
             string = paste0("Version, ", v, ";"),
             body = paste0(v, ";"),
@@ -1131,9 +1133,9 @@ sep_object_table <- function (dt, type_enum, idd) {
         v <- standardize_ver(stri_trim_right(stri_sub(b, to = -2L)))
 
         if (v != idd$version) {
-            warning(paste0("Version Mismatch. The IDF file parsing has  a differnet ",
-                "version ", backtick(idf_version), " than the IDD file using ",
-                backtick(idd_version), ". Parsing errors may occur."), call. = FALSE
+            warning(paste0("Version Mismatch. The IDF file parsing has a differnet ",
+                "version ", backtick(v), " than the IDD file using ",
+                backtick(idd$version), ". Parsing errors may occur."), call. = FALSE
             )
         }
     }
@@ -1145,23 +1147,24 @@ sep_object_table <- function (dt, type_enum, idd) {
     }
 
     # fill class id and class name
-    left <- dt[!is.na(class_id), list(line, class_id, class_name)]
-    set(dt, NULL, c("class_id", "class_name", "class_name_lower"), NULL)
+    left <- dt[!is.na(class_id), list(line, class_id, class_name, group_id)]
+    set(dt, NULL, c("class_id", "class_name", "group_id", "class_name_lower"), NULL)
     dt_cmt <- left[dt[type < type_enum$value], on = "line", roll = -Inf]
     dt_val <- left[dt[type > type_enum$comment], on = "line", roll = Inf]
     dt <- setorder(rbindlist(list(dt_cmt, dt_val)), "line")
 
     # get table
     tbl_object <- dt[type <= type_enum$object_value, .SD,
-        .SDcols = c("object_id", "class_id", "class_name", "comment")]
+        .SDcols = c("object_id", "class_id", "class_name", "group_id", "comment")]
     tbl_object <- tbl_object[, list(
-        class_id = class_id[1L], class_name = class_name[1L], comment = list(comment)),
+        class_id = class_id[1L], class_name = class_name[1L],
+        group_id = group_id[1L], comment = list(comment)),
         by = object_id
     ]
 
     dt <- dt[type > type_enum$object]
     # remove unuseful columns
-    set(dt, NULL, c("type", "comment"), NULL)
+    set(dt, NULL, c("group_id", "type", "comment"), NULL)
 
     list(left = dt, object = tbl_object)
 }
