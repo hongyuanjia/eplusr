@@ -437,7 +437,7 @@ i_param_job_from_which <- function (self, private, which) {
     if (not_empty(job[status != "completed"])) {
         incomplete <- job[status != "completed"]
         msg <- incomplete[, sim_status(rpad(toupper(status)), index, idf, epw)]
-        stop("Some of jobs failed to completed\n:", paste0(msg, collpase = "\n"),
+        stop("Some of jobs failed to completed\n:", paste0(msg, collapse = "\n"),
             call. = FALSE
         )
     }
@@ -465,14 +465,14 @@ i_param_case_from_which <- function (self, private, which = NULL, name = FALSE) 
         valid <- match(which, nms)
         if (anyNA(valid))
             stop("Invalid job name found for current parametric job: ",
-                backtick_collapse(which[is.na(valid)]), ".", call. = FALSE)
+                collapse(which[is.na(valid)]), ".", call. = FALSE)
 
         idx <- valid
     } else if (are_count(which)) {
         valid <- which <= length(nms)
         if (any(!valid))
             stop("Invalid job index found for current parametric job: ",
-                backtick_collapse(which[!valid]), ".", call. = FALSE)
+                collapse(which[!valid]), ".", call. = FALSE)
         idx <- which
     } else {
         stop("`which` should either be a character or an integer vector.",
@@ -628,7 +628,7 @@ i_param_locate_output <- function (self, private, which, suffix = ".err", strict
 
     if (strict && any(!file.exists(out))) {
         msg <- job[!file.exists(out), sim_status("MISSING", index, idf, epw)]
-        stop("Path does not exist for job:\n", paste0(msg, collpase = "\n"), call. = FALSE)
+        stop("Path does not exist for job:\n", paste0(msg, collapse = "\n"), call. = FALSE)
     }
 
     out

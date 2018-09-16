@@ -168,7 +168,7 @@ on_failure(has_name) <- function(call, env) {
 has_names <- function(x, which) all(which %in% names(x))
 on_failure(has_names) <- function(call, env) {
     paste0(deparse(call$x), " does not have all required names: ",
-           backtick_collapse(eval(call$which, env)), ".")
+           collapse(eval(call$which, env)), ".")
 }
 # }}}
 # has_ext {{{
@@ -190,7 +190,7 @@ has_exts <- function (path, exts) {
 on_failure(has_exts) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    paste0("File ", backtick(basename(path)), " should have one of extensions ", backtick_collapse(ext), ".")
+    paste0("File ", backtick(basename(path)), " should have one of extensions ", collapse(ext), ".")
 }
 # }}}
 # is_windows {{{

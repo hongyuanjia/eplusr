@@ -164,7 +164,7 @@ eplusr_option <- function (...) {
         "verbose_info", "save_format", "num_parallel")
 
     if (any(!valid))
-        stop("Invalid option name found: ", backtick_collapse(nm[!valid]), ".",
+        stop("Invalid option name found: ", collapse(nm[!valid]), ".",
             call. = FALSE)
 
     choice_opt <- c("validate_level", "save_format")
@@ -203,7 +203,7 @@ eplusr_option <- function (...) {
 
             if (invalid)
                 stop(backtick(name), " should be one of ",
-                    backtick_collapse(choice_list[[name]]), ".", call. = FALSE)
+                    collapse(choice_list[[name]]), ".", call. = FALSE)
 
             .options[[name]] <- input[[name]]
         }

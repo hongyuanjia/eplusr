@@ -83,7 +83,7 @@ i_assert_valid_group_name <- function (self, private, group, type = c("idd", "id
 
     if (!all(valid))
         stop("Invalid group name found in current ", key, ": ",
-            backtick_collapse(group[!valid]), ".", call. = FALSE)
+            collapse(group[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -162,7 +162,7 @@ i_assert_valid_class_index <- function (self, private, index, type = c("idd", "i
     key <- switch(type, idd = "Idd", idf = "Idf")
     if (any(!valid))
         stop("Invalid class index found in current ", key, ": ",
-            backtick_collapse(index[!valid]), ".", call. = FALSE)
+            collapse(index[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -173,7 +173,7 @@ i_assert_valid_class_name <- function (self, private, name, type = c("idd", "idf
     key <- switch(type, idd = "Idd", idf = "Idf")
     if (any(!valid))
         stop("Invalid class name found in current ", key, ": ",
-            backtick_collapse(name[!valid]), ".", call. = FALSE)
+            collapse(name[!valid]), ".", call. = FALSE)
 
 }
 # }}}
@@ -216,7 +216,7 @@ i_assert_extensible_class <- function (self, private, class) {
 
     valid <- cls_tbl$class_name %in% i_extensible_class_name(self, private)
     if (any(!valid))
-        stop("Non-extensible class found: ", backtick_collapse(class[!valid]),
+        stop("Non-extensible class found: ", collapse(class[!valid]),
             ".", call. = FALSE)
 }
 # }}}
@@ -474,7 +474,7 @@ i_field_index <- function (self, private, class, name = NULL) {
     if (any(invalid)) {
         stop("Invalid field name found for class ",
             backtick(i_class_name(self, private, unique(fld_tbl$class_id))),
-            ": ", backtick_collapse(name[invalid]), ".", call. = FALSE)
+            ": ", collapse(name[invalid]), ".", call. = FALSE)
     }
 
     res_std[is.na(res_std)] <- res_lc[is.na(res_std)]
@@ -555,7 +555,7 @@ i_assert_valid_field_index <- function (self, private, class, index) {
     valid <- index <= cls_tbl$num_fields
     if (!all(valid))
         stop("Invalid field index found for class ", backtick(cls_tbl$class_name),
-            ": ", backtick_collapse(index[!valid]), ".", call. = FALSE)
+            ": ", collapse(index[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -567,7 +567,7 @@ i_assert_valid_field_name <- function (self, private, class, name) {
     else cls_nm <- i_class_name(self, private, class)
     if (!all(valid))
         stop("Invalid field name found for class ", backtick(cls_nm),
-            ": ", backtick_collapse(name[!valid]), ".", call. = FALSE)
+            ": ", collapse(name[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -1088,7 +1088,7 @@ i_assert_valid_object_id <- function (self, private, id) {
 
     if (!all(valid))
         stop("Invalid object ID found for current Idf: ",
-            backtick_collapse(id[!valid]), ".", call. = FALSE)
+            collapse(id[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -1128,7 +1128,7 @@ i_assert_valid_object_name <- function (self, private, name) {
 
     if (!all(valid))
         stop("Invalid object name found for current Idf: ",
-            backtick_collapse(name[!valid]), ".", call. = FALSE)
+            collapse(name[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -1382,7 +1382,7 @@ i_dup_object = function (self, private, which, new_name = NULL) {
         # attribute
         can_not_name <- obj_tbl[has_name == FALSE & !is.na(new_object_name)]
         if (not_empty(can_not_name)) {
-            stop("Target object(s) (ID: ", backtick_collapse(can_not_name$object_id),
+            stop("Target object(s) (ID: ", collapse(can_not_name$object_id),
                 ") does not have name attribute.", call. = FALSE)
         }
 
@@ -1440,7 +1440,7 @@ i_dup_object = function (self, private, which, new_name = NULL) {
         if (not_empty(existing_name)) {
             stop("Duplicate objects with existing names is prohibited in `final` ",
                 "validation level. Input new name ",
-                backtick_collapse(existing_name$object_name),
+                collapse(existing_name$object_name),
                 ifelse(nrow(existing_name) == 1L, " is ", " are "),
                 "one of existing object names in the same class." , call. = FALSE)
         }
@@ -1537,7 +1537,7 @@ i_add_object = function (self, private, class, value = NULL, comment = NULL, def
     if (any(vapply(private$m_log$validate, not_empty, logical(1)))) {
         i_print_validate(private$m_log$validate)
         stop("Failed to add objects in class ",
-            backtick_collapse(unique(cls_tbl$class_name)), ".", call. = FALSE)
+            collapse(unique(cls_tbl$class_name)), ".", call. = FALSE)
     }
     on.exit({private$m_log$validate <- NULL}, add = TRUE)
 
@@ -1658,7 +1658,7 @@ i_set_object = function (self, private, object, value = NULL, comment = NULL, de
     i_validate_in_object(self, private, obj_tbl, val_tbl_chk, temp = FALSE)
     if (any(vapply(private$m_log$validate, not_empty, logical(1)))) {
         i_print_validate(private$m_log$validate)
-        stop("Failed to set new value to object ID ", backtick_collapse(obj_tbl$object_id), ".", call. = FALSE)
+        stop("Failed to set new value to object ID ", collapse(obj_tbl$object_id), ".", call. = FALSE)
     }
     on.exit({private$m_log$validate <- NULL}, add = TRUE)
 
@@ -1714,11 +1714,11 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
     # check if target objects are referenced {{{
     if (not_empty(ref_by_tbl)) {
         if (eplusr_option("validate_level") == "final") {
-            ref <- ref_by_tbl[, list(referenced_by = backtick_collapse(referenced_by_object_id)),
+            ref <- ref_by_tbl[, list(referenced_by = collapse(referenced_by_object_id)),
                 by = list(object_rleid, object_id)]
             stop("Deleting an object that is referenced by others is prohibited ",
                 "in `final` validation level. Failed to delete target object ",
-                "[ID:", backtick_collapse(obj_tbl$object_id), "]:\n",
+                "[ID:", collapse(obj_tbl$object_id), "]:\n",
                 paste0(paste0(ref$object_rleid, ": Object [ID:",backtick(ref$object_id),"] was ",
                         "referenced by other objects [ID:", ref$referenced_by, "]."),
                     collapse = "\n"),
@@ -1729,13 +1729,13 @@ i_del_object <- function (self, private, object, referenced = FALSE) {
 
         if (referenced) {
             i_verbose_info(self, private, "Delete target object [ID:",
-                backtick_collapse(obj_id), "] and also objects [ID:",
-                backtick_collapse(by_id), "] that are referencing target object.")
+                collapse(obj_id), "] and also objects [ID:",
+                collapse(by_id), "] that are referencing target object.")
             obj_id <- c(obj_id, by_id)
         } else {
             i_verbose_info(self, private, "Delete target object [ID:",
-                backtick_collapse(obj_id), "] which was referenced by objects ",
-                "[ID: ", backtick_collapse(by_id), "]. Error may occur during ",
+                collapse(obj_id), "] which was referenced by objects ",
+                "[ID: ", collapse(by_id), "]. Error may occur during ",
                 "simulation.")
         }
     }
@@ -1786,7 +1786,7 @@ i_search_value = function (self, private, pattern, class = NULL) {
         private$m_idd_tbl$field, on = "field_id", nomatch = 0L]
 
     i_verbose_info(self, private, nrow(val), " results found in class",
-        backtick_collapse(unique(value_tbl$class_name)), ".")
+        collapse(unique(value_tbl$class_name)), ".")
 
     cli::cat_line(format_objects(value_tbl, in_ip = eplusr_option("view_in_ip")))
 
@@ -2085,14 +2085,14 @@ i_valid_value_input <- function (self, private, object_tbl, value, default = TRU
     # stop adding empty objects in `final` validation level {{{
     if (type == "add" && eplusr_option("validate_level") == "final" && !no_empty) {
         msg <- val_in_empty[, paste0("  ", lpad(object_rleid), "| Class ",
-            backtick(class_name_in), ".", collpase = "\n")]
+            backtick(class_name_in), ".", collapse = "\n")]
         stop("Adding empty objects is prohibited in `final` validation ",
             "level. Empty value found in input `value`:\n", msg, call. = FALSE)
     }
     # TODO: stop when both value and comment is empty in `$set_object()`
     # if (type == "set" && !default && !no_empty) {
     #     msg <- val_in_empty[, paste0("  ", lpad(class_rleid), "| Class ",
-    #         backtick(class_name_in), ".", collpase = "\n")]
+    #         backtick(class_name_in), ".", collapse = "\n")]
     #     stop("Adding empty objects is prohibited in `final` validation ",
     #         "level. Missing values found in input `value`:\n", msg, call. = FALSE)
     # }
@@ -2499,7 +2499,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
             lapply(field_name_in, function (nm) nm[duplicated(nm)]))]
         msg <- dup_name[, paste0("  ", lpad(class_rleid),
             "| Class ", backtick(class_name_in), ":",
-            backtick_collapse(as.character(duplicated_name)), ".", collapse = "\n")]
+            collapse(as.character(duplicated_name)), ".", collapse = "\n")]
         stop("Duplicated field names found in input:\n", msg, call. = FALSE)
     }
 
@@ -2683,7 +2683,7 @@ i_assert_valid_object_list <- function (self, private, object_list) {
     valid <- object_list %in% private$m_idd_tbl$field_object_list$object_list
     if (any(!valid))
         stop("Invalid object-list string found:",
-            backtick_collapse(reference[!valid]), ".", call. = FALSE)
+            collapse(reference[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -2699,7 +2699,7 @@ i_assert_valid_reference <- function (self, private, reference) {
 
     if (any(!valid))
         stop("Invalid reference string found:",
-            backtick_collapse(reference[!valid]), ".", call. = FALSE)
+            collapse(reference[!valid]), ".", call. = FALSE)
 }
 # }}}
 
@@ -2789,7 +2789,7 @@ i_msg_invalid_value_name <- function (value_tbl, type = c("add", "set")) {
     by_col <- c("object_rleid", "class_name")
     if (type == "set") by_col <- c(by_col, "object_id")
 
-    msg_tbl <- value_tbl[, list(invalid_name = backtick_collapse(field_name_in)),
+    msg_tbl <- value_tbl[, list(invalid_name = collapse(field_name_in)),
         by = c(by_col)]
 
     msg_tbl <- i_msg_info(msg_tbl, type)
@@ -2827,7 +2827,7 @@ i_msg_invalid_ext <- function (value_tbl, type = c("add", "set")) {
     by_col <- c("object_rleid", "class_name")
     if (type == "set") by_col <- c(by_col, "object_id")
 
-    msg_tbl <- value_tbl[, list(invalid_ext = backtick_collapse(field_name_in)),
+    msg_tbl <- value_tbl[, list(invalid_ext = collapse(field_name_in)),
         by = c(by_col)]
 
     msg_tbl <- i_msg_info(msg_tbl, type)

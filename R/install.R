@@ -121,7 +121,7 @@ eplus_download_url <- function (ver) {
     if (is_empty(cmt))
         stop("Failed to get installer data for EnergyPlus v", ver, ". ",
              "All available version are: ",
-             backtick_collapse(all_cmt$version), ".", call. = FALSE)
+             collapse(all_cmt$version), ".", call. = FALSE)
 
     os <- switch(os_type(), windows = "Windows", macos = "Darwin", linux = "Linux")
     if (!is_windows() ||

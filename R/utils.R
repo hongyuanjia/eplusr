@@ -11,8 +11,8 @@ NULL
 }
 # }}}
 
-# backtick_collapse {{{
-backtick_collapse <- function (x) {
+# collapse {{{
+collapse <- function (x) {
     s <- paste0("`", x, "`")
     if (length(s) == 1L) {
         return (s)

@@ -788,7 +788,7 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     if (any(missing_header)) {
         if (any(missing_header[to_parse]))
-            stop("Missing ", backtick_collapse(names(which(missing_header[to_parse]))),
+            stop("Missing ", collapse(names(which(missing_header[to_parse]))),
                 " specifier in EPW file", error_end, ".", call. = FALSE)
 
         l_unknown <- seq_len(num_header)[missing_header]
