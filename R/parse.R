@@ -53,7 +53,7 @@ parse_idd_file <- function(path) {
     tbl_field[, `:=`(field_id = .I)]
 
     # complete property columns
-    tbl_field <- complete_property(tbl_field, "field")
+    tbl_field <- complete_property(tbl_field, "field", tbl_class)
     tbl_class <- complete_property(tbl_class, "class", tbl_field)
 
     # extract field reference map
@@ -666,7 +666,7 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
 # }}}
 
 # complete_property {{{
-complete_property <- function (dt, type, ref = NULL) {
+complete_property <- function (dt, type, ref) {
     type <- match.arg(type, c("class", "field"))
     keys <- switch(type, class = slash_keys()$class, field = slash_keys()$field)
 
@@ -707,7 +707,7 @@ complete_property <- function (dt, type, ref = NULL) {
 
     dt <- switch(type,
         class = parse_class_property(dt, ref),
-        field = parse_field_property(dt)
+        field = parse_field_property(dt, ref)
     )
 
     dt
@@ -741,7 +741,7 @@ parse_class_property <- function (dt, ref) {
 
     # add first extensible index
     set(dt, NULL, "first_extensible",
-        ref[is_extensible == TRUE, field_index[1L], by = list(class_id)][
+        ref[extensible_group == 1L, field_index[1L], by = list(class_id)][
             J(dt$class_id), on = "class_id"][is.na(V1), `:=`(V1 = 0L)]$V1
     )
 
@@ -769,7 +769,7 @@ parse_class_property <- function (dt, ref) {
 # }}}
 
 # parse_field_property {{{
-parse_field_property <- function (dt) {
+parse_field_property <- function (dt, ref) {
     # rename column names to lower case
     nms <- stri_replace_all_fixed(names(dt), "-", "_")
     setnames(dt, nms)
@@ -782,11 +782,7 @@ parse_field_property <- function (dt) {
     set(dt, NULL, "field_index", rowidv(dt, "class_id"))
 
     # add extensible indicator
-    set(dt, NULL, "is_extensible", FALSE)
-    dt[dt[begin_extensible == TRUE, list(class_id, field_index)],
-        on = list(class_id, field_index > field_index),
-        `:=`(is_extensible = TRUE)]
-    set(dt, NULL, "begin_extensible", NULL)
+    dt <- parse_field_extensible_group(dt, ref)
 
     # parse field name
     dt <- parse_field_property_name(dt)
@@ -810,7 +806,7 @@ parse_field_property <- function (dt) {
         "class_id", "class_name",
         "field_index", "field_anid", "field_name", "full_name", "full_ipname",
         "units", "ip_units",
-        "is_name", 'required_field', "is_extensible",
+        "is_name", 'required_field', "extensible_group",
         "type", "type_enum",
         "autosizable", "autocalculatable", "default", "choice", "note",
         "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
@@ -821,6 +817,45 @@ parse_field_property <- function (dt) {
     ignore <- setdiff(names(dt), nms)
     if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
     setcolorder(dt, nms)
+
+    dt
+}
+# }}}
+
+# parse_field_extensible_group {{{
+parse_field_extensible_group <- function (dt, ref) {
+    ext <- dt[begin_extensible == TRUE, list(class_id, first_extensible = field_index)]
+
+    # add extensible field number
+    ext <- ref[, list(class_id, num_extensible = as.integer(extensible))][ext, on = "class_id"]
+    # NOTE: few chances are classes not marked as extensible but with extensible fields
+    ext <- ext[!is.na(num_extensible)]
+
+    # add total field number
+    set(ext, NULL, "num_fields", dt[ext, on = "class_id", .N, by = class_id]$N)
+
+    # add total extensible group number
+    set(ext, NULL, "num_group", 0L)
+    # exclude incomplete groups
+    ext[, `:=`(num_group = as.integer((num_fields - first_extensible + 1L) / num_extensible))]
+
+    # add field extensible group number
+    ext[, `:=`(extensible_group = list(
+            c(rep(0L, first_extensible - 1L), rep(seq_len(num_group), each = num_extensible))
+        )),
+        by = class_id
+    ]
+    ext <- ext[, {
+        n <- num_group * num_extensible + (first_extensible - 1L)
+        group <- unlist(extensible_group)
+        id <- rep(class_id, n)
+        index <- unlist(lapply(n, seq_len))
+        list(class_id = id, field_index = index, extensible_group = group)
+    }]
+
+    # insert into the main dt
+    dt[ext, on = c("class_id", "field_index"), `:=`(extensible_group = ext$extensible_group)]
+    dt[is.na(extensible_group), `:=`(extensible_group = 0L)]
 
     dt
 }
