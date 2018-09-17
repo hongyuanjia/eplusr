@@ -746,6 +746,7 @@ parse_class_property <- function (dt, ref) {
     )
 
     # add num of extensible group
+    set(dt, NULL, "num_extensible_group", 0L)
     dt[num_extensible > 0L, `:=`(
         num_extensible_group = (num_fields - first_extensible + 1L) %/% num_extensible
     )]
