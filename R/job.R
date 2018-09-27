@@ -45,6 +45,7 @@ NULL
 #' job$report_data_dict()
 #' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 #' job$tabular_data()
+#' job$clone(deep = FALSE)
 #' job$print()
 #' ```
 #'
@@ -145,6 +146,22 @@ NULL
 #' * `tz`: Time zone of date and time in column `DateTime`. Default: `"GMT"`.
 #' * `case`: If not `NULL`, a character column will be added indicates the case
 #'     of this simulation. If `"auto"`, the name of the IDF file will be used.
+#'
+#' @section Clone:
+#' ```
+#' job$clone(deep = FALSE)
+#' ```
+#'
+#' `$clone()` copies and returns the cloned job. Because `EplusJob` uses
+#'     `R6Class` under the hook which has "modify-in-place" semantics, `job_2 <-
+#'     job_1` does not copy `job_1` at all but only create a new binding to
+#'     `job_1`.  Modify `job_1` will also affect `job_2` as well, as these two
+#'     are exactly the same thing underneath. In order to create a complete
+#'     cloned copy, please use `$clone(deep = TRUE)`.
+#'
+#' **Arguments**
+#'
+#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired.
 #'
 #' @section Printing:
 #' ```
@@ -371,17 +388,20 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         # }}}
     ),
 
-    # PRIVATE FIELDS {{{
     private = list(
+        # PRIVATE FIELDS {{{
         m_version = NULL,
         m_path_idf = NULL,
         m_path_epw = NULL,
         m_eplus_config = NULL,
         m_job = NULL,
         m_sql = NULL,
-        m_log = NULL
+        m_log = NULL,
+        # }}}
+
+        deep_clone = function (name, value)
+            i_deep_clone(self, private, name, value)
     )
-    # }}}
 )
 # }}}
 

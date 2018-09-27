@@ -71,6 +71,7 @@ NULL
 #' idd$object_in_group(group)
 #' idd$ClassName
 #' idd[[ClassName]]
+#' idd$clone(deep = FALSE)
 #' idd$print()
 #' print(idd)
 #' }
@@ -121,6 +122,13 @@ NULL
 #' than letters and numbers are replaced by a underscore `_`.
 #'
 #' For details about `IddObject`, please see [IddObject] class.
+#'
+#' `$clone()` copies and returns the cloned `Idd` object. Because `Idd` uses
+#' `R6Class` under the hook which has "modify-in-place" semantics, `idd_2 <-
+#' idd_1` does not copy `idd_1` at all but only create a new binding to `idd_1`.
+#' Modify `idd_1` will also affect `idd_2` as well, as these two are exactly the
+#' same thing underneath. In order to create a complete cloned copy, please use
+#' `$clone(deep = TRUE)`.
 #'
 #' @examples
 #' # get the Idd object of EnergyPlus v8.8

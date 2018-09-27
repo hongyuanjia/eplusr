@@ -74,7 +74,7 @@ model$is_valid
 model$string(comment = TRUE, header = TRUE, ...)
 model$is_unsaved()
 model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
-model$clone()
+model$clone(deep = FALSE)
 model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 model$print(plain = FALSE)
 print(model)
@@ -403,15 +403,16 @@ Default is \code{FALSE}.
 \preformatted{model$clone(deep = FALSE)
 }
 
-\code{$clone()} will copy and returned the cloned model. Because \code{Idf} use
-\code{R6Class} under the hook, \code{idf_2 <- idf_1} does not copy \code{idf_1} at all
-but only create a new binding to \code{idf_1}. Modify \code{idf_1} will also affect
-\code{idf_2} as well, as these two are exactly the same thing underneath.
+\code{$clone()} copies and returns the cloned model. Because \code{Idf} uses \code{R6Class}
+under the hook which has "modify-in-place" semantics, \code{idf_2 <- idf_1}
+does not copy \code{idf_1} at all but only create a new binding to \code{idf_1}.
+Modify \code{idf_1} will also affect \code{idf_2} as well, as these two are exactly
+the same thing underneath. In order to create a complete cloned copy,
+please use \code{$clone(deep = TRUE)}.
 
 \strong{Arguments}
 \itemize{
-\item \code{deep}: Not used. Keep it here just for compatible with the default clone
-method provided by \code{R6Class}.
+\item \code{deep}: Has to be \code{TRUE} if a complete cloned copy is desired.
 }
 }
 

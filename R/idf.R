@@ -69,7 +69,7 @@ NULL
 #' model$string(comment = TRUE, header = TRUE, ...)
 #' model$is_unsaved()
 #' model$save(path = NULL, format = c("sorted", "new_top", "new_bot"), overwrite = FALSE, copy_external = TRUE)
-#' model$clone()
+#' model$clone(deep = FALSE)
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$print(plain = FALSE)
 #' print(model)
@@ -391,15 +391,16 @@ NULL
 #' model$clone(deep = FALSE)
 #' ```
 #'
-#' `$clone()` will copy and returned the cloned model. Because `Idf` use
-#'     `R6Class` under the hook, `idf_2 <- idf_1` does not copy `idf_1` at all
-#'     but only create a new binding to `idf_1`. Modify `idf_1` will also affect
-#'     `idf_2` as well, as these two are exactly the same thing underneath.
+#' `$clone()` copies and returns the cloned model. Because `Idf` uses `R6Class`
+#'     under the hook which has "modify-in-place" semantics, `idf_2 <- idf_1`
+#'     does not copy `idf_1` at all but only create a new binding to `idf_1`.
+#'     Modify `idf_1` will also affect `idf_2` as well, as these two are exactly
+#'     the same thing underneath. In order to create a complete cloned copy,
+#'     please use `$clone(deep = TRUE)`.
 #'
 #' **Arguments**
 #'
-#' * `deep`: Not used. Keep it here just for compatible with the default clone
-#'     method provided by `R6Class`.
+#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired.
 #'
 #' @section Run Model:
 #'
@@ -1014,39 +1015,7 @@ Idf <- R6::R6Class(classname = "Idf",
 #' @author Hongyuan Jia
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {
-    # have to clone the generator first in order to leave the original Idf
-    # generator untouched
-    gen <- clone_generator(Idf)
-
-    # get the clone method
-    clone <- gen$clone_method
-
-    # get function body
-    ori_expr <- as.list(body(clone))
-
-    # get the body length
-    len <- length(ori_expr)
-
-    # insert new expressions just at the beginning and also before the return
-    # reference:
-    # https://stackoverflow.com/questions/38732663/how-to-insert-expression-into-the-body-of-a-function-in-r
-    new_expr <- append(ori_expr,
-        as.list(
-            expression(
-                shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log", "m_idfobj_generator", "m_iddobj_generator"),
-                for (nm in shared) {
-                    private_bind_env[["m_idfobj_generator"]][["self"]][["private_fields"]][[nm]] <- private_bind_env[[nm]]
-                }
-            )
-        ), after = len-1)
-    # always use deep clone
-    new_expr <- append(new_expr, as.list(expression(deep <- TRUE)), after = 1L)
-
-    # assign new body
-    body(gen$clone_method) <- as.call(new_expr)
-    body(gen$public_methods$clone) <- as.call(new_expr)
-
-    gen$new(path, idd)
+    Idf$new(path, idd)
 }
 # }}}
 

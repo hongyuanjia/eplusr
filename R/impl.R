@@ -1221,12 +1221,25 @@ i_assert_can_del_object <- function (self, private, object) {
 create_iddobj_generator <- function (self, private, IddObject) {
     # clone the IddObject R6ClassGenerator
     own_iddobject <- clone_generator(IddObject)
+
     # assign shared data to IddObject R6Class Generator
-    own_iddobject$self$private_fields$m_uuid <- private$m_uuid
-    own_iddobject$self$private_fields$m_version <- private$m_version
-    own_iddobject$self$private_fields$m_idd_tbl <- private$m_idd_tbl
-    own_iddobject$self$private_fields$m_iddobj_generator <- own_iddobject
-    own_iddobject
+    assign_idd_shared_data(self, private, own_iddobject)
+}
+# }}}
+# assign_idd_shared_data {{{
+assign_idd_shared_data <- function (self, private, iddobj_gen) {
+    # assign shared data to IddObject R6Class Generator
+    shared <- c("m_uuid", "m_version", "m_idd_tbl")
+    for (nm in shared) {
+        iddobj_gen$self$private_fields[[nm]] <- private[[nm]]
+        iddobj_gen$private_fields[[nm]] <- private[[nm]]
+    }
+
+    # self reference
+    iddobj_gen$self$private_fields$m_iddobj_generator <- iddobj_gen
+    iddobj_gen$self$self$private_fields$m_iddobj_generator <- iddobj_gen
+
+    iddobj_gen
 }
 # }}}
 
@@ -1236,21 +1249,24 @@ create_idfobj_generator <- function (self, private, IdfObject) {
     own_idfobject <- clone_generator(IdfObject)
 
     # assign shared data to IdfObject R6ClassGenerator
-    var_nm <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log")
-    for (nm in var_nm) {
-        own_idfobject$private_fields[[nm]] <- private[[nm]]
-        own_idfobject$self$private_fields[[nm]] <- private[[nm]]
+    assign_idf_shared_data(self, private, own_idfobject)
+}
+# }}}
+# assign_idf_shared_data {{{
+assign_idf_shared_data <- function (self, private, idfobj_gen) {
+    # assign shared data to IddObject R6Class Generator
+    shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log",
+        "m_iddobj_generator", "m_idfobj_generator")
+    for (nm in shared) {
+        idfobj_gen$self$private_fields[[nm]] <- private[[nm]]
+        idfobj_gen$private_fields[[nm]] <- private[[nm]]
     }
 
-    # add self reference
-    own_idfobject$private_fields$m_idfobj_generator <- own_idfobject
-    own_idfobject$self$private_fields$m_idfobj_generator <- own_idfobject
+    # self reference
+    idfobj_gen$self$private_fields$m_idfobj_generator <- idfobj_gen
+    idfobj_gen$self$self$private_fields$m_idfobj_generator <- idfobj_gen
 
-    # add iddobj generator
-    own_idfobject$private_fields$m_iddobj_generator <- private$m_iddobj_generator
-    own_idfobject$self$private_fields$m_iddobj_generator <- private$m_iddobj_generator
-
-    own_idfobject
+    idfobj_gen
 }
 # }}}
 
@@ -1876,9 +1892,16 @@ i_object_string <- function (self, private, object = NULL, comment = TRUE, ...) 
 
 # i_deep_clone {{{
 i_deep_clone <- function (self, private, name, value) {
-    if (class(value) == "R6ClassGenerator") {
+    if (inherits(value, "R6ClassGenerator")) {
         # clone the R6ClassGenerator
         clone_generator(value)
+        if (identical(value$classname, "IdfObject")) {
+            assign_idf_shared_data(self, private, value)
+        } else if (identical(value$classname, "IddObject")) {
+            assign_idd_shared_data(self, private, value)
+        }
+    } else if (inherits(value, "R6")) {
+        value$clone(deep = TRUE)
     } else if (is.environment(value)) {
         list2env(as.list.environment(value, all.names = TRUE),
                  parent = emptyenv())

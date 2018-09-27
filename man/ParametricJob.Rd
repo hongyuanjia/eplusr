@@ -29,6 +29,7 @@ param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
 param$tabular_data(which = NULL)
+job$clone(deep = FALSE)
 param$print()
 }
 }
@@ -154,6 +155,22 @@ variables will be returned. Default: \code{NULL}.
 \item \code{year}: The year of the date and time in column \code{DateTime}. If \code{NULL}, it
 will be the current year. Default: \code{NULL}
 \item \code{tz}: Time zone of date and time in column \code{DateTime}. Default: \code{"GMT"}.
+}
+}
+
+\section{Clone}{
+\preformatted{job$clone(deep = FALSE)
+}
+
+\code{$clone()} copies and returns the cloned job. Because \code{ParametricJob} uses
+\code{R6Class} under the hook which has "modify-in-place" semantics, \code{job_2 <- job_1} does not copy \code{job_1} at all but only create a new binding to
+\code{job_1}. Modify \code{job_1} will also affect \code{job_2} as well, as these two
+are exactly the same thing underneath. In order to create a complete
+cloned copy, please use \code{$clone(deep = TRUE)}.
+
+\strong{Arguments}
+\itemize{
+\item \code{deep}: Has to be \code{TRUE} if a complete cloned copy is desired.
 }
 }
 

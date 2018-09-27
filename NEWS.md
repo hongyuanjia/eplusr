@@ -1,18 +1,31 @@
-# eplusr 0.9.1.9000
+# eplusr 0.9.2
+
+## Break changes
+
+* Clean up the dirty code that manually modifies `$clone()` method in R6 in
+  order to be compatible with (#19). After this, `deep` has to be set to `TRUE`
+  if a completed cloned copy is desired. Also, documentations on `$clone()`
+  method in `Epw`, `EplusJob`, `ParametricJob` have been added.
+
+## Minor changes
+
+* `clean_wd()` is called internally when running EnergyPlus models. This
+  guarantees that the old output file from last simulation is cleaned up before
+  the new simulation starts.
 
 ## New features
 
 * A new class `EplusSql` has been added. This makes it possible to directly
-  retreive simulation results without creating an `EplusJob` object which can
+  retrieve simulation results without creating an `EplusJob` object which can
   only get simulation outputs after the job was successfully run before. It can
   be easily created using `eplus_sql()` function.  However, it should be noted
   that, unlike `EplusJob`, there is no checking on whether the simulation is
   terminated or completed unsuccessfully, or the parent Idf has been changed
   since last simulation. This means that you may encounter some problems when
-  retreive data from an unsuccessful simulation. It is suggested to carefully go
+  retrieve data from an unsuccessful simulation. It is suggested to carefully go
   through the `.err` file to make sure the output data in the SQLite is correct
   and reliable. Currently, there are only few methods in `EplusSql` class which
-  have some overlaps with thoses in `EplusJob`, but more methods may be added in
+  have some overlaps with theses in `EplusJob`, but more methods may be added in
   the future. For more details, please see the documentation of `EplusSql`.
 
 ## Bug fixes

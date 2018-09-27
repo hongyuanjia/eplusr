@@ -75,6 +75,7 @@ idd$object(class)
 idd$object_in_group(group)
 idd$ClassName
 idd[[ClassName]]
+idd$clone(deep = FALSE)
 idd$print()
 print(idd)
 }
@@ -130,6 +131,12 @@ Here, \code{ClassName} is a single valid class name where all characters other
 than letters and numbers are replaced by a underscore \code{_}.
 
 For details about \code{IddObject}, please see \link{IddObject} class.
+
+\code{$clone()} copies and returns the cloned \code{Idd} object. Because \code{Idd} uses
+\code{R6Class} under the hook which has "modify-in-place" semantics, \code{idd_2 <- idd_1} does not copy \code{idd_1} at all but only create a new binding to \code{idd_1}.
+Modify \code{idd_1} will also affect \code{idd_2} as well, as these two are exactly the
+same thing underneath. In order to create a complete cloned copy, please use
+\code{$clone(deep = TRUE)}.
 }
 
 \examples{

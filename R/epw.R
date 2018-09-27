@@ -78,6 +78,7 @@ NULL
 #' epw$get_data(year = NULL, unit = FALSE, tz = Sys.timezone(), update = FALSE)
 #' epw$set_data(data)
 #' epw$save(path, overwrite = FALSE)
+#' epw$clone(deep = FALSE)
 #' epw$print()
 #' print(epw)
 #' ```
@@ -154,16 +155,35 @@ NULL
 #'     `year` value. Default: FALSE
 #' * `data`: A data.frame which has all required columns.
 #'
-#' @section Read:
+#' @section Save:
 #' ```
 #' epw$save(path, overwrite = FALSE)
 #' ```
+#'
 #' **Arguments**
 #'
 #' * `path`: A path where to save the weather file. If `NULL`, the path of the
 #'     weather file itself is used.
 #' * `overwrite`: Whether to overwrite the file if it already exists. Default is
 #'     `FALSE`.
+#'
+#' @section Clone:
+#'
+#' ```
+#' epw$clone(deep = FALSE)
+#' ```
+#'
+#' `$clone()` copies and returns the cloned `Epw` object. Because `Epw` uses
+#'     `R6Class` under the hook which has "modify-in-place" semantics, `epw_2 <-
+#'     epw_1` does not copy `epw_1` at all but only create a new binding to
+#'     `epw_1`.  Modify `epw_1` will also affect `epw_2` as well, as these two
+#'     are exactly the same thing underneath. In order to create a complete
+#'     cloned copy, please use `$clone(deep = TRUE)`.
+#'
+#' **Arguments**
+#'
+#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired.
+#'
 #' @examples
 #' \dontrun{
 #' # read an EPW file from EnergyPlus website
