@@ -51,7 +51,7 @@ test_that("Job methods", {
     expect_error(job$locate_output(".exe"), "Path.*does not exist")
     expect_error(job$report_data_dict(), "Simulation SQL output does not exists")
 
-    # can retreive simulation data
+    # can retrieve simulation data
     idf <- read_idf(example$idf)
     job <- idf$run(example$epw, dir = NULL)
     expect_is(job$report_data_dict(), "data.table")

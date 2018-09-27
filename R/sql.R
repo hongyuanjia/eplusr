@@ -4,9 +4,9 @@
 #' @importFrom lubridate year force_tz
 NULL
 
-#' Retreive Simulation Outputs Using EnergyPlus SQLite Output File
+#' Retrieve Simulation Outputs Using EnergyPlus SQLite Output File
 #'
-#' `EplusSql` class wraps SQL queries that can retreive simulation outputs using
+#' `EplusSql` class wraps SQL queries that can retrieve simulation outputs using
 #'     EnergyPlus SQLite output file.
 #'
 #' SQLite output is an optional output format for EnergyPlus. It will be
@@ -21,14 +21,14 @@ NULL
 #'     described in the EnergyPlus *"Output Details and Examples"*
 #'     documentation.
 #'
-#' `EplusSql` class makes it possible to directly retreive simulation results
+#' `EplusSql` class makes it possible to directly retrieve simulation results
 #'     without creating an [EplusJob] object which can only get simulation
 #'     outputs after the job was successfully run before.
 #'
 #' However, it should be noted that, unlike [EplusJob], there is no checking on
 #'     whether the simulation is terminated or completed unsuccessfully or, the
 #'     parent Idf has been changed since last simulation. This means that you
-#'     may encounter some problems when retreive data from an unsuccessful
+#'     may encounter some problems when retrieve data from an unsuccessful
 #'     simulation. It is suggested to carefully go through the `.err` file to
 #'     make sure the output data in the SQLite is correct and reliable.
 #'

@@ -363,8 +363,8 @@ i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
 }
 # }}}
 
-# i_param_retreive_data {{{
-i_param_retreive_data <- function (self, private) {
+# i_param_retrieve_data {{{
+i_param_retrieve_data <- function (self, private) {
     status <- i_param_status(self, private)
 
     if (!status$run_before) return(invisible())
@@ -386,7 +386,7 @@ i_param_retreive_data <- function (self, private) {
             if (inherits(private$m_job, "r_process")) {
                 private$m_job <- tryCatch(private$m_job$get_result(),
                     error = function (e) {
-                        stop("Failed to retreive output of parametric job. ", e, "\n",
+                        stop("Failed to retrieve output of parametric job. ", e, "\n",
                             private$m_log$stderr, call. = FALSE)
                     }
                 )
@@ -425,8 +425,8 @@ i_param_job_from_which <- function (self, private, which) {
         warning("The seed model has been changed since last run. ",
             "The job output may not be correct.", call. = FALSE)
 
-    # if success, retreive data
-    i_param_retreive_data(self, private)
+    # if success, retrieve data
+    i_param_retrieve_data(self, private)
 
     jobs <- private$m_job
 
@@ -738,7 +738,7 @@ i_param_print <- function (self, private) {
 
     status <- i_param_status(self, private)
 
-    i_param_retreive_data(self, private)
+    i_param_retrieve_data(self, private)
 
     if (!status$run_before) {
 

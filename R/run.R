@@ -104,7 +104,7 @@ clean_wd <- function (path) {
 #' @param eplus An acceptable input (for `run_idf()`) or inputs (for
 #'     `run_multi()`) of [use_eplus()] and [eplus_config()]. If
 #'     `NULL`, which is the default, the version of EnergyPlus to use is
-#'     deterimined by the version of input model. For `run_multi()`, `eplus`, if not
+#'     determined by the version of input model. For `run_multi()`, `eplus`, if not
 #'     `NULL`, should have the same length as `model`.
 #'
 #' @details

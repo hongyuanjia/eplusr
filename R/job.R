@@ -229,7 +229,7 @@ NULL
 #'     # does not exist
 #'     job$locate_output(".exe", strict = TRUE)
 #'
-#'     # retreive simulation results will fail if there is no EnergyPlus SQL output.
+#'     # retrieve simulation results will fail if there is no EnergyPlus SQL output.
 #'     job$report_data_dict()
 #'
 #'     # instead, using `$run()` method in Idf class, which will add an

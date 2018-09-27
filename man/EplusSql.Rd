@@ -3,9 +3,9 @@
 \docType{class}
 \name{EplusSql}
 \alias{EplusSql}
-\title{Retreive Simulation Outputs Using EnergyPlus SQLite Output File}
+\title{Retrieve Simulation Outputs Using EnergyPlus SQLite Output File}
 \description{
-\code{EplusSql} class wraps SQL queries that can retreive simulation outputs using
+\code{EplusSql} class wraps SQL queries that can retrieve simulation outputs using
 EnergyPlus SQLite output file.
 }
 \details{
@@ -21,14 +21,14 @@ eplusout.eio output file. The full description for SQLite outputs is
 described in the EnergyPlus \emph{"Output Details and Examples"}
 documentation.
 
-\code{EplusSql} class makes it possible to directly retreive simulation results
+\code{EplusSql} class makes it possible to directly retrieve simulation results
 without creating an \link{EplusJob} object which can only get simulation
 outputs after the job was successfully run before.
 
 However, it should be noted that, unlike \link{EplusJob}, there is no checking on
 whether the simulation is terminated or completed unsuccessfully or, the
 parent Idf has been changed since last simulation. This means that you
-may encounter some problems when retreive data from an unsuccessful
+may encounter some problems when retrieve data from an unsuccessful
 simulation. It is suggested to carefully go through the \code{.err} file to
 make sure the output data in the SQLite is correct and reliable.
 }
