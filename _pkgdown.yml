@@ -29,6 +29,7 @@ reference:
   - title: Job
     desc: Run EnergyPlus and collect outputs
     contents:
+      - EplusSql
       - EplusJob
       - ParametricJob
       - eplus_job
