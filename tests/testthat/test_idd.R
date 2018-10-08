@@ -17,13 +17,13 @@ idd_text <- c(
        \\unique-object
        \\min-fields 3
        \\format singleLine
-       \\reference-class-name RefTestSlash
        \\extensible 4 !all fields are extensible
      A1 , \\field Test Character Field 1
        \\note Test Note Parsing
+       \\reference-class-name RefTestSlash
        \\required-field
        \\begin-extensible
-       \\external-list autoRDDvariable
+       \\object-list RefTestSimpleA1
      N1 , \\field Test Numeric Field 1
        \\units m
        \\ip-units inch
@@ -39,8 +39,7 @@ idd_text <- c(
      A2 ; \\field Test Character Field 2
        \\type choice
        \\key Key1
-       \\key Key2
-       \\object-list RefTestSimpleA1")
+       \\key Key2")
 # }}}
 
 # download_idd() {{{
@@ -82,17 +81,13 @@ test_that("parse_idd_file()", {
     idd_parsed <- parse_idd_file(idd_text)
 
     # can read Idd from string
-    expect_silent(idd_str <- read_idd_str(idd_text))
+    expect_silent(idd_str <- read_lines_in_dt(idd_text))
 
     # can parse Idd from string
-    expect_equal(names(idd_parsed), c(
-        "version", "build",
-        "group",
-        "class", "class_memo", "class_reference",
-        "field", "field_note", "field_reference",
-        "field_default", "field_choice", "field_range",
-        "field_object_list", "field_external_list"
-    ))
+    expect_equal(
+        names(idd_parsed),
+        c("version", "build", "group", "class", "field", "reference")
+    )
 
     # can get Idd version
     expect_equal(idd_parsed$version, as.numeric_version("9.9.9"))
@@ -108,106 +103,55 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$class$class_id, 1:2)
     expect_equal(idd_parsed$class$class_name, c("TestSimple", "TestSlash"))
     expect_equal(idd_parsed$class$group_id, 1:2)
-    expect_equal(idd_parsed$class$class_format, c("standard", "singleLine"))
+    expect_equal(idd_parsed$class$format, c("standard", "singleLine"))
     expect_equal(idd_parsed$class$min_fields, c(0, 3))
     expect_equal(idd_parsed$class$num_fields, c(1, 4))
+    expect_equal(idd_parsed$class$last_required, c(0, 1))
+    expect_equal(idd_parsed$class$has_name, c(FALSE, FALSE))
     expect_equal(idd_parsed$class$required_object, c(FALSE, TRUE))
     expect_equal(idd_parsed$class$unique_object, c(FALSE, TRUE))
-    expect_equal(idd_parsed$class$has_name, c(TRUE, FALSE))
-    expect_equal(idd_parsed$class$last_required, c(0, 1))
     expect_equal(idd_parsed$class$num_extensible, c(0, 4))
     expect_equal(idd_parsed$class$first_extensible, c(0, 1))
     expect_equal(idd_parsed$class$num_extensible_group, c(0, 1))
-
-    # can parse class memo data
-    expect_equal(idd_parsed$class_memo$memo, c(NA_character_, "This is just a test"))
-
-    # can parse class reference data
-    expect_equal(idd_parsed$class_reference$reference_id, 1)
-    expect_equal(idd_parsed$class_reference$reference, "RefTestSlash")
-    expect_equal(idd_parsed$class_reference$class_id, 2)
+    expect_equal(idd_parsed$class$memo, list(NULL, "This is just a test"))
 
     # can parse field property data
     expect_equal(idd_parsed$field$field_id, 1:5)
     expect_equal(idd_parsed$field$class_id, c(1, rep(2,4)))
+    expect_equal(idd_parsed$field$class_name, c("TestSimple", rep("TestSlash",4)))
     expect_equal(idd_parsed$field$field_index, c(1, 1:4))
+    expect_equal(idd_parsed$field$field_anid, c("A1", "A1", "N1", "N2", "A2"))
     nms <- c("Test Field",
              "Test Character Field 1",
              "Test Numeric Field 1",
              "Test Numeric Field 2",
              "Test Character Field 2")
     expect_equal(idd_parsed$field$field_name, nms)
-    expect_equal(idd_parsed$field$full_name,
-                 paste0(nms, c("", "", " {m}", "", "")))
-    expect_equal(idd_parsed$field$full_ipname,
-                 paste0(nms, c("", "", " {ft}", "", "")))
-    expect_equal(idd_parsed$field$units,
-                 c(NA_character_, NA_character_, "m", NA_character_, NA_character_))
-    expect_equal(idd_parsed$field$ip_units,
-                 c(NA_character_, NA_character_, "ft", NA_character_, NA_character_))
-    expect_equal(idd_parsed$field$required_field,
-                 c(FALSE, TRUE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$type,
-                 c("alpha", "alpha", "integer", "real", "choice"))
-    expect_equal(idd_parsed$field$autosizable,
-                 c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$autocalculatable,
-                 c(FALSE, FALSE, FALSE, TRUE, FALSE))
-    expect_equal(idd_parsed$field$is_name,
-                 c(TRUE, FALSE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$is_extensible,
-                 c(FALSE, TRUE, TRUE, TRUE, TRUE))
-    expect_equal(idd_parsed$field$has_default,
-                 c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$has_range,
-                 c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$has_reference,
-                 c(TRUE, FALSE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$has_object_list,
-                 c(FALSE, FALSE, FALSE, FALSE, TRUE))
-    expect_equal(idd_parsed$field$has_external_list,
-                 c(FALSE, TRUE, FALSE, FALSE, FALSE))
-
-    # can parse field note data
-    expect_equal(idd_parsed$field_note$note,
-                 c(NA_character_, "Test Note Parsing", NA_character_, NA_character_, NA_character_))
+    expect_equal(idd_parsed$field$full_name, paste0(nms, c("", "", " {m}", "", "")))
+    expect_equal(idd_parsed$field$full_ipname, paste0(nms, c("", "", " {inch}", "", "")))
+    expect_equal(idd_parsed$field$units, c(NA_character_, NA_character_, "m", NA_character_, NA_character_))
+    expect_equal(idd_parsed$field$ip_units, c(NA_character_, NA_character_, "inch", NA_character_, NA_character_))
+    expect_equal(idd_parsed$field$is_name, c(FALSE, FALSE, FALSE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$required_field, c(FALSE, TRUE, FALSE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$extensible_group, c(0L, 1L, 1L, 1L, 1L))
+    expect_equal(idd_parsed$field$type, c("alpha", "object-list", "integer", "real", "choice"))
+    expect_equal(idd_parsed$field$type_enum, c(4L, 5L, 1L, 2L, 3L))
+    expect_equal(idd_parsed$field$autosizable, c(FALSE, FALSE, TRUE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$autocalculatable, c(FALSE, FALSE, FALSE, TRUE, FALSE))
+    expect_equal(idd_parsed$field$default, c(NA, NA, "2", NA, NA))
+    expect_equal(idd_parsed$field$choice, list(character(0), character(0), NULL, NULL, c("Key1", "Key2")))
+    expect_equal(idd_parsed$field$note, list(character(0), "Test Note Parsing", NULL, NULL, character(0)))
+    expect_equal(idd_parsed$field$has_range, c(FALSE, FALSE, TRUE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$maximum, c(NA, NA, 10, NA, NA))
+    expect_equal(idd_parsed$field$minimum, c(NA, NA, 1, NA, NA))
+    expect_equal(idd_parsed$field$lower_incbounds, c(FALSE, FALSE, TRUE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$upper_incbounds, c(FALSE, FALSE, FALSE, FALSE, FALSE))
+    expect_equal(idd_parsed$field$src_enum, c(2L, 1L, 0L, 0L, 0L))
 
     # can parse field reference data
-        expect_equal(idd_parsed$field_reference$reference_id, 1)
-        expect_equal(idd_parsed$field_reference$reference, "RefTestSimpleA1")
-        expect_equal(idd_parsed$field_reference$field_id, 1)
-
-    # can parse field default data
-    expect_equal(idd_parsed$field_default$field_id, 3)
-    expect_equal(idd_parsed$field_default$default, "2")
-    expect_equal(idd_parsed$field_default$default_upper, "2")
-    expect_equal(idd_parsed$field_default$default_num, 2)
-    expect_equivalent(idd_parsed$field_default$default_ipnum, 6.56168,
-        tolerance = 0.0001)
-
-    # can parse field choice data
-    expect_equal(idd_parsed$field_choice$choice_id, 1:2)
-    expect_equal(idd_parsed$field_choice$choice, c("Key1", "Key2"))
-    expect_equal(idd_parsed$field_choice$choice_upper, c("KEY1", "KEY2"))
-    expect_equal(idd_parsed$field_choice$field_id, c(5, 5))
-
-    # can parse field range data
-    expect_equal(idd_parsed$field_range$range_id, 1)
-    expect_equal(idd_parsed$field_range$minimum, 1)
-    expect_equal(idd_parsed$field_range$lower_incbounds, TRUE)
-    expect_equal(idd_parsed$field_range$maximum, 10)
-    expect_equal(idd_parsed$field_range$upper_incbounds, FALSE)
-    expect_equal(idd_parsed$field_range$field_id, 3)
-
-    # can parse field object list data
-    expect_equal(idd_parsed$field_object_list$object_list_id, 1)
-    expect_equal(idd_parsed$field_object_list$object_list, "RefTestSimpleA1")
-    expect_equal(idd_parsed$field_object_list$field_id, 5)
-
-    # can parse field external list data
-    expect_equal(idd_parsed$field_external_list$external_list_id, 1)
-    expect_equal(idd_parsed$field_external_list$external_list, "autoRDDvariable")
-    expect_equal(idd_parsed$field_external_list$field_id, 2)
+    expect_equal(idd_parsed$reference$field_id, 2L)
+    expect_equal(idd_parsed$reference$src_field_id, 1L)
+    expect_equal(idd_parsed$reference$src_enum, 2L)
 
     # can detect error of missing IDD version
     idd_wrong <- c(
@@ -237,7 +181,7 @@ test_that("parse_idd_file()", {
          Test,
          A1 ; \\note something"
     )
-    expect_warning(parse_idd_file(idd_wrong))
+    expect_warning(parse_idd_file(idd_wrong), "No build tag")
 
     # can warn about multiple IDD build tags
     idd_wrong <- c(
@@ -249,7 +193,7 @@ test_that("parse_idd_file()", {
         Test,
         A1 ; \\note something"
     )
-    expect_warning(parse_idd_file(idd_wrong))
+    expect_warning(parse_idd_file(idd_wrong), "Multiple build tags")
 
     # can detect error of invalid line
     idd_wrong <- c(
@@ -262,7 +206,7 @@ test_that("parse_idd_file()", {
 
          Some Mess Here"
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Invalid line")
 
     # can detect missing group lines
     idd_wrong <- c(
@@ -278,7 +222,7 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Missing group name")
 
     # can detect duplicated class names
     idd_wrong <- c(
@@ -294,7 +238,7 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Duplicated class names")
 
     # can detect incomplete class
     idd_wrong <- c(
@@ -311,7 +255,7 @@ test_that("parse_idd_file()", {
          A1 , \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Missing class name")
 
     # can detect missing class names
     idd_wrong <- c(
@@ -327,7 +271,7 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Missing class name")
 
     # can manually insert class slash
     idd_cls <- c(
@@ -354,7 +298,7 @@ test_that("parse_idd_file()", {
 
          TestInvalidSlash,
          A1 ; \\invalid-slash-key")
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Invalid slash key")
 
     # can detect error of invaid type key
     idd_wrong <- c(
@@ -365,7 +309,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\type invalid"
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Invalid type value")
 
     # can detect error of invaid external list key
     idd_wrong <- c(
@@ -376,7 +320,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\external-list invalid"
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Invalid external list value")
 
     # can detect error of invalid format key
     idd_wrong <- c(
@@ -387,7 +331,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\format invalid"
     )
-    expect_error(parse_idd_file(idd_wrong))
+    expect_error(parse_idd_file(idd_wrong), "Invalid format value")
 })
 # }}}
 
