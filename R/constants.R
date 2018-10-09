@@ -1,7 +1,7 @@
 # versions {{{
-latest_eplus_ver <- function () as.numeric_version("8.9.0")
+latest_eplus_ver <- function () as.numeric_version("9.0.0")
 
-all_eplus_ver <- function () c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3))
+all_eplus_ver <- function () c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0")
 
 all_idd_ver <- function () {
     c(
@@ -14,13 +14,15 @@ all_idd_ver <- function () {
         paste0("3.", 0:1, ".0"),
         paste0(4:6, ".0.0"),
         paste0("7.", 0:2, ".0"),
-        paste0("8.", 0:9, ".0")
+        paste0("8.", 0:9, ".0"),
+        paste0("9.0.0")
     )
 }
 
 all_eplus_release_commit <- function () {
     data.table::fread("
         version,     commit
+          9.0.0, 2ef880da82
           8.9.0, 40101eaafd
           8.8.0, 7c3bbe4830
           8.7.0, 78a111df4a
