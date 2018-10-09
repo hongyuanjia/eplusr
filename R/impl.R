@@ -2535,9 +2535,9 @@ i_update_value_reference_from_tbl <- function (self, private, value_tbl) {
 
     # update values that reference the input
     if (not_empty(val_tbl_ref)) {
-        val_ref_tbl <- value_tbl[private$m_idd_tbl$field_reference,
+        val_ref_tbl <- unique(value_tbl[private$m_idd_tbl$field_reference,
             on = "field_id", nomatch = 0L,
-            list(value_id, value, value_upper, value_num ,value_ipnum)]
+            list(value_id, value, value_upper, value_num ,value_ipnum)])
 
         # find values that reference input before
         new_ref_tbl <- val_ref_tbl[private$m_idf_tbl$value_reference,
