@@ -1,3 +1,9 @@
+# eplusr 0.9.2.9000
+
+## Bug fixes
+
+* Remove duplicates when update value references (#20).
+
 # eplusr 0.9.2
 
 ## Break changes
