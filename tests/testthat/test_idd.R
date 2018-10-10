@@ -50,7 +50,7 @@ test_that("can download IDD from EnergyPlus repo", {
     expect_true(file.exists(file.path(tempdir(), "V8-8-0-Energy+.idd")))
 
     expect_message(download_idd("latest", tempdir()))
-    expect_true(file.exists(file.path(tempdir(), "V8-9-0-Energy+.idd")))
+    expect_true(file.exists(file.path(tempdir(), "V9-0-0-Energy+.idd")))
 })
 # }}}
 
