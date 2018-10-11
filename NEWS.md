@@ -1,4 +1,8 @@
-# eplusr 0.9.2.9000
+# eplusr 0.9.3
+
+## New features
+
+* Add support for EnergyPlus v9.0.0.
 
 ## Bug fixes
 
