@@ -3184,7 +3184,10 @@ i_idf_resolve_external_link <- function (self, private, old, new, copy = TRUE) {
 
         # copy files
         to_copy <- unique(targ[, list(old_full_path, new_full_path)])
-        flgs <- file.copy(to_copy$old_full_path, to_copy$new_full_path, overwrite = TRUE, copy.date = TRUE)
+        flgs <- logical(nrow(to_copy))
+        for (i in seq_len(nrow(to_copy))) {
+            flgs[i] <- file.copy(to_copy$old_full_path[i], to_copy$new_full_path[i], overwrite = TRUE, copy.date = TRUE)
+        }
         if (any(!flgs)) {
             stop(paste0("Failed to copy external file into the ",
                 "output directory: ", backtick(targ[!flgs]), collapse = "\n"),
