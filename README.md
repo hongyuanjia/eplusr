@@ -50,10 +50,10 @@ download and install it automatically on major operating systems
 (Windows, macOS and Linux):
 
 ``` r
-# install the latest version (currently v8.9.0)
+# install the latest version (currently v9.0.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v8.9.0) and run the installer
+# OR download the latest version (currently v9.0.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
