@@ -31,50 +31,56 @@ parse_idd_file <- function(path) {
     idd_dt <- mark_idd_lines(idd_dt, type_enum)
 
     # group table
-    tbl <- sep_group_table(idd_dt, type_enum)
-    tbl_group <- tbl$group
-    idd_dt <- tbl$left
+    dt <- sep_group_table(idd_dt, type_enum)
+    dt_group <- dt$group
+    idd_dt <- dt$left
 
     # class table
-    tbl <- sep_class_table(idd_dt, type_enum)
-    tbl_class <- tbl$class
-    idd_dt <- tbl$left
+    dt <- sep_class_table(idd_dt, type_enum)
+    dt_class <- dt$class
+    idd_dt <- dt$left
 
     # field table
-    tbl_field <- get_field_table(idd_dt, type_enum)
+    dt_field <- get_field_table(idd_dt, type_enum)
 
     # dcast class and field tables
-    tbl_class <- dcast_slash(tbl_class, "class_id",
+    dt_class <- dcast_slash(dt_class, "class_id",
         slash_keys()$class, c("group_id", "class_name")
     )
-    tbl_field <- dcast_slash(tbl_field, c("field_id", "field_anid"),
+    dt_field <- dcast_slash(dt_field, c("field_id", "field_anid"),
         slash_keys()$field, c("class_id", "class_name")
     )
-    tbl_field[, `:=`(field_id = .I)]
+    dt_field[, `:=`(field_id = .I)]
 
     # complete property columns
-    tbl_field <- complete_property(tbl_field, "field", tbl_class)
-    tbl_class <- complete_property(tbl_class, "class", tbl_field)
+    dt_field <- complete_property(dt_field, "field", dt_class)
+    dt_class <- complete_property(dt_class, "class", dt_field)
 
     # extract field reference map
-    tbl <- parse_field_reference_table(tbl_field)
-    tbl_field <- tbl$left
-    tbl_reference <- tbl$reference
+    dt <- parse_field_reference_table(dt_field)
+    dt_field <- dt$left
+    dt_reference <- dt$reference
+
+    # extract field name table to speed up name matching
+    dt_name <- get_field_name_dt(dt_field)
+    setindexv(dt_name, "field_id")
 
     # set index
-    setindexv(tbl_class, "class_id")
-    setindexv(tbl_field, c("field_id", "class_id", "field_index"))
+    setindexv(dt_class, "class_id")
+    setindexv(dt_field, c("field_id", "class_id", "field_index"))
 
-    list(version = idd_version, build = idd_build,
-        group = tbl_group, class = tbl_class, field = tbl_field,
-        reference = tbl_reference
+    list(version = idd_version, build = idd_build, name = dt_name,
+        group = dt_group, class = dt_class, field = dt_field,
+        reference = dt_reference
     )
 }
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd) {
-    stopifnot(has_names(idd, c("version", "class", "field")))
+parse_idf_file <- function (path, idd_ver, idd_env) {
+    if (!has_names(idd_env, c("class", "field", "name", "reference")) || !is.environment(idd_env)) {
+        abort("error_bad_idd_env", "Invalid IDD input", idd = idd_env)
+    }
 
     # read idf string, get idd version
     idf_dt <- read_lines_in_dt(path)
@@ -137,38 +143,38 @@ parse_idf_file <- function (path, idd) {
     idf_dt <- mark_idf_lines(idf_dt, type_enum)
 
     # header options
-    tbl <- sep_header_options(idf_dt, type_enum)
-    options <- tbl$options
-    idf_dt <- tbl$left
+    dt <- sep_header_options(idf_dt, type_enum)
+    options <- dt$options
+    idf_dt <- dt$left
 
     # object table
-    tbl <- sep_object_table(idf_dt, type_enum, idd)
-    tbl_object <- tbl$object
-    idf_dt <- tbl$left
+    dt <- sep_object_table(idf_dt, type_enum, idd_ver, idd_env)
+    dt_object <- dt$object
+    idf_dt <- dt$left
 
     # value table
-    tbl_value <- get_value_table(idf_dt, type_enum, idd)
+    dt_value <- get_value_table(idf_dt, idd_env)
 
     # combine
-    list_idf <- list(options = options, object = tbl_object, value = tbl_value)
+    list_idf <- list(options = options, object = dt_object, value = dt_value)
 
     # update object name
-    tbl_object <- update_object_name(tbl_object, tbl_value)
+    dt_object <- update_object_name(dt_object, dt_value)
 
     # IP - SI conversion
     from <- ifelse(options$view_in_ip, "ip", "si")
     to <- ifelse(.options$view_in_ip, "ip", "si")
-    tbl_value <- convert_value_unit(tbl_value, from, to)
+    dt_value <- convert_value_unit(dt_value, from, to)
 
     # value reference map
-    tbl_reference <- update_value_reference(tbl_object, tbl_value, idd$reference)
+    dt_reference <- update_value_reference(dt_object, dt_value, idd_env$reference)
 
     # extract version
-    ver <- tbl_value[class_name == "Version", standardize_ver(value)]
+    ver <- dt_value[class_name == "Version", standardize_ver(value)]
 
     list(
         version = ver, options = options,
-        object = tbl_object, value = tbl_value, reference = tbl_reference
+        object = dt_object, value = dt_value, reference = dt_reference
     )
 }
 # }}}
@@ -345,13 +351,13 @@ sep_idd_lines <- function (dt, col = "string") {
     refs <- dt[slash_key %in% c("reference-class-name", "reference"), unique(slash_value)]
     invld_objlst <- dt[slash_key == "object-list" & !slash_value %chin% refs]
     if (nrow(invld_objlst)) {
-        parse_error("idd", "Invalid \\object-list value", msg = invld_objlst)
+        parse_issue("error_idd_object_list", "idd", "Invalid \\object-list value", invld_objlst)
     }
 
     # check invalid slash keys
     invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(slash_keys()$type), which = TRUE]
     if (length(invld_key))
-        parse_error(type = "idd", error = "Invalid slash key found.", msg = dt[invld_key])
+        parse_issue("error_idd_slash_key", "idd", "Invalid slash key", dt[invld_key])
 
     # check invalid slash value {{{
     set(dt, NULL, "slash_value_lower", stri_trans_tolower(dt[["slash_value"]]))
@@ -364,7 +370,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_error(type = "idd", error = "Invalid format value found.", msg = dt[invld_val])
+        parse_issue("error_idd_format_value", "idd", "Invalid format value", dt[invld_val])
 
     # check invalid \type value
     invld_val <- dt[slash_key == "type" &
@@ -373,7 +379,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_error(type = "idd", error = "Invalid type value found.", msg = dt[invld_val])
+        parse_issue("error_idd_type_value", "idd", "Invalid type value", dt[invld_val])
 
     # check invalid \external-list value
     invld_val <- dt[slash_key == "external-list" &
@@ -381,7 +387,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_error(type = "idd", error = "Invalid external list value found.", msg = dt[invld_val])
+        parse_issue("error_idd_external_list_value", "idd", "Invalid external list value", dt[invld_val])
     # }}}
 
     set(dt, NULL, c("slash", "slash_loc", "space_loc", "colon_loc", "slash_value_lower"), NULL)
@@ -417,7 +423,7 @@ mark_idd_lines <- function (dt, type_enum) {
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
-        parse_error(type = "idd", error = "Invalid line found", msg = dt[type == type_enum$unknown])
+        parse_issue("error_idd_line", "idd", "Invalid line", dt[type == type_enum$unknown])
     }
 
     dt
@@ -430,14 +436,16 @@ sep_group_table <- function (dt, type_enum) {
 
     dt[type == type_enum$group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
 
-    tbl_group <- dt[type == type_enum$group, .SD, .SDcols = c("group_id", "group_name", "line")]
+    dt_group <- dt[type == type_enum$group, .SD, .SDcols = c("group_id", "group_name", "line")]
 
     # check missing group
-    if (nrow(dt[line < tbl_group$line[1L]])) {
-        invld_grp <- dt[line < tbl_group$line[1L]]
-        parse_error("idd", "Missing group name", invld_grp[type == type_enum$class, .N], invld_grp)
+    if (nrow(dt[line < dt_group$line[1L]])) {
+        invld_grp <- dt[line < dt_group$line[1L]]
+        parse_issue("error_idd_mis_group", "idd", "Missing group name",
+            invld_grp, invld_grp[type == type_enum$class, .N]
+        )
     }
-    set(tbl_group, NULL, "line", NULL)
+    set(dt_group, NULL, "line", NULL)
 
     # fill downwards
     dt[, `:=`(group_id = group_id[1L]), by = cumsum(!is.na(group_id))]
@@ -447,7 +455,7 @@ sep_group_table <- function (dt, type_enum) {
 
     set(dt, NULL, "group_name", NULL)
 
-    list(left = dt, group = tbl_group)
+    list(left = dt, group = dt_group)
 }
 # }}}
 
@@ -464,7 +472,9 @@ sep_class_table <- function (dt, type_enum) {
     dup_cls <- dt[type == type_enum$class, line[duplicated(class_name)]]
     if (length(dup_cls)) {
         invld_cls <- dt[class_name %in% dt[line %in% dup_cls]$class_name]
-        parse_error("idd", "Duplicated class names found", length(dup_cls), invld_cls)
+        parse_issue("error_idd_dup_class", "idd", "Duplicated class names found",
+            invld_cls, length(dup_cls)
+        )
     }
 
     # fill downwards
@@ -473,7 +483,9 @@ sep_class_table <- function (dt, type_enum) {
     # check missing class name
     if (nrow(dt[is.na(class_id)])) {
         invld_cls <- dt[is.na(class_id)]
-        parse_error("idd", "Missing class name", invld_cls[type == type_enum$field_last, .N], invld_cls)
+        parse_issue("error_idd_mis_class", "idd", "Missing class name",
+            invld_cls, invld_cls[type == type_enum$field_last, .N]
+        )
     }
 
     # add expected type indicator
@@ -498,14 +510,14 @@ sep_class_table <- function (dt, type_enum) {
         } else {
             n <- invld_cls[type == type_enum$field_last, .N] + 1L
         }
-        parse_error("idd", "Missing class name", n, invld_cls)
+        parse_issue("error_idd_mis_class", "idd", "Missing class name", invld_cls, n)
     }
 
     # check incomplete class
     incomp_cls <- dt[type == type_enum$field & type_exp == type_enum$field_last, class_id]
     if (length(incomp_cls)) {
         invld_cls <- dt[class_id %in% incomp_cls]
-        parse_error("idd", "Incomplete class", length(incomp_cls), invld_cls)
+        parse_issue("error_idd_incomplete_class", "idd", "Incomplete class", invld_cls, length(incomp_cls))
     }
 
     # after checking possible errors, resign type
@@ -543,17 +555,17 @@ sep_class_table <- function (dt, type_enum) {
     }
 
     # get table
-    tbl_class <- i[dt, on = list(class_id, start <= line, end >= line),
+    dt_class <- i[dt, on = list(class_id, start <= line, end >= line),
         nomatch = 0L][!is.na(slash_key)]
 
-    setnames(tbl_class, "start", "line")
+    setnames(dt_class, "start", "line")
 
-    dt <- dt[!tbl_class, on = "line"][!line %in% s$start]
+    dt <- dt[!dt_class, on = "line"][!line %in% s$start]
     # remove unuseful columns
     set(dt, NULL, c("line", "string", "type_exp", "group_id"), NULL)
-    set(tbl_class, NULL, c("line", "string", "body", "type", "end"), NULL)
+    set(dt_class, NULL, c("line", "string", "body", "type", "end"), NULL)
 
-    list(left = dt, class = tbl_class)
+    list(left = dt, class = dt_class)
 }
 # }}}
 
@@ -602,18 +614,18 @@ get_field_table <- function (dt, type_enum) {
     }]
 
     # combine
-    tbl_field <- setorderv(rbindlist(list(slsh, sgl, con), use.names = TRUE), "row")
+    dt_field <- setorderv(rbindlist(list(slsh, sgl, con), use.names = TRUE), "row")
 
     # fill downwards id and anid
-    set(tbl_field, NULL, "id", seq_len(nrow(tbl_field)))
-    left <- tbl_field[!is.na(field_anid),
+    set(dt_field, NULL, "id", seq_len(nrow(dt_field)))
+    left <- dt_field[!is.na(field_anid),
         list(id, field_id = .I, field_anid = stri_trans_toupper(field_anid))
     ]
-    set(tbl_field, NULL, "field_anid", NULL)
-    tbl_field <- left[tbl_field, on = "id", roll = TRUE]
-    set(tbl_field, NULL, "id", NULL)
+    set(dt_field, NULL, "field_anid", NULL)
+    dt_field <- left[dt_field, on = "id", roll = TRUE]
+    set(dt_field, NULL, "id", NULL)
 
-    tbl_field
+    dt_field
 }
 # }}}
 
@@ -783,18 +795,6 @@ parse_field_property <- function (dt, ref) {
     # add field index
     set(dt, NULL, "field_index", rowidv(dt, "class_id"))
 
-    # add extensible indicator
-    dt <- parse_field_extensible_group(dt, ref)
-
-    # parse field name
-    dt <- parse_field_property_name(dt)
-
-    # parse field range
-    dt <- parse_field_property_range(dt)
-
-    # rename column `key` to `choice`
-    setnames(dt, "key", "choice")
-
     # transform all type values to lower-case
     set(dt, NULL, "type", stri_trans_tolower(dt[["type"]]))
 
@@ -802,6 +802,21 @@ parse_field_property <- function (dt, ref) {
     t <- stri_replace_all_fixed(names(.globals$type), "_", "-")
     names(t) <- .globals$type
     set(dt, NULL, "type_enum", as.integer(chmatch(dt$type, t)))
+
+    # rename column `key` to `choice`
+    setnames(dt, "key", "choice")
+
+    # add extensible indicator
+    dt <- parse_field_property_extensible_group(dt, ref)
+
+    # parse field name
+    dt <- parse_field_property_name(dt)
+
+    # parse field range
+    dt <- parse_field_property_range(dt)
+
+    # parse field default
+    dt <- parse_field_property_default(dt)
 
     nms <- c(
         "field_id",
@@ -824,9 +839,11 @@ parse_field_property <- function (dt, ref) {
 }
 # }}}
 
-# parse_field_extensible_group {{{
-parse_field_extensible_group <- function (dt, ref) {
-    ext <- dt[begin_extensible == TRUE, list(class_id, first_extensible = field_index)]
+# parse_field_property_extensible_group {{{
+parse_field_property_extensible_group <- function (dt, ref) {
+    ext <- dt[begin_extensible == TRUE, list(class_id, field_index)]
+    # only count once
+    ext <- ext[, list(first_extensible = field_index[1L]), by = class_id]
 
     # handle the case when there is no extensible fields
     if (!has_name(ref, "extensible")) {
@@ -886,10 +903,10 @@ parse_field_property_name <- function (dt) {
     ]
 
     # fill missing ip units
-    unit_tbl <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1,
+    unit_dt <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1,
         .SD, .SDcols = c("si_name", "ip_name")
     ]
-    dt <- unit_tbl[dt, on = list(si_name = units)][is.na(ip_units), `:=`(ip_units = ip_name)]
+    dt <- unit_dt[dt, on = list(si_name = units)][is.na(ip_units), `:=`(ip_units = ip_name)]
     setnames(dt, "si_name", "units")
     set(dt, NULL, "ip_name", NULL)
     dt[is.na(ip_units) & ip_units == "unknown", `:=`(ip_units = units)]
@@ -904,6 +921,29 @@ parse_field_property_name <- function (dt) {
         full_name = paste0(field_name, " {", units, "}"),
         full_ipname = paste0(field_name, " {", ip_units, "}")
     )]
+
+    dt
+}
+# }}}
+
+# parse_field_property_default {{{
+parse_field_property_default <- function (dt) {
+    set(dt, NULL, "value_id", dt$field_id)
+    set(dt, NULL, "value", dt$default)
+    set(dt, NULL, "value_lc", stri_trans_tolower(dt$value))
+    set(dt, NULL, "value_num", NA_real_)
+
+    setindexv(dt, c("type_enum", "value_lc"))
+
+    dt[type_enum <= .globals$type$real, `:=`(value_num = suppressWarnings(as.double(value)))]
+
+    set(dt, NULL, "default", as.list(dt$default))
+    dt[type_enum == .globals$type$integer & !value_lc %in% c("autosize", "autocalculate"),
+        `:=`(default = as.list(as.integer(value_num)))]
+    dt[type_enum == .globals$type$real & !value_lc %in% c("autosize", "autocalculate"),
+        `:=`(default = as.list(value_num))]
+
+    set(dt, NULL, c("value_id", "value", "value_lc", "value_num"), NULL)
 
     dt
 }
@@ -996,6 +1036,15 @@ parse_field_reference_table <- function (dt) {
 }
 # }}}
 
+# get_field_name_dt {{{
+get_field_name_dt <- function (dt_field) {
+    dt_nm <- dt_field[, .SD, .SDcols = c("field_id", "class_id", "field_index", "field_name")]
+    set(dt_nm, NULL, "field_name_lc", stri_trans_tolower(dt_nm[["field_name"]]))
+    set(dt_nm, NULL, "field_name_us", underscore_name(dt_nm[["field_name_lc"]]))
+    dt_nm
+}
+# }}}
+
 # sep_idf_lines {{{
 sep_idf_lines <- function (dt, type_enum) {
     # mark location of first occurance "!" and "!-"
@@ -1044,7 +1093,8 @@ mark_idf_lines <- function (dt, type_enum) {
         })]
 
         if (nrow(dt[type == type_enum$macro])) {
-            parse_error("idf", "Marco lines found", msg = dt[type == type_enum$macro], stop = FALSE)
+            parse_issue("warning_idf_macro", "idf", "Marco lines found",
+                dt[type == type_enum$macro], stop = FALSE)
         }
     }
 
@@ -1062,7 +1112,7 @@ mark_idf_lines <- function (dt, type_enum) {
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
-        parse_error(type = "idf", error = "Invalid line found", msg = dt[type == type_enum$unknown])
+        parse_issue("error_idf_line", "idf", "Invalid line found", dt[type == type_enum$unknown])
     }
 
     dt
@@ -1071,12 +1121,12 @@ mark_idf_lines <- function (dt, type_enum) {
 
 # sep_header_options {{{
 sep_header_options <- function (dt, type_enum) {
-    tbl_opt <- dt[type == type_enum$special]
-    dt <- dt[!tbl_opt, on = "line"]
+    dt_opt <- dt[type == type_enum$special]
+    dt <- dt[!dt_opt, on = "line"]
 
-    s <- stri_split_fixed(tbl_opt[['comment']], " ", n = 2, simplify = TRUE)
-    set(tbl_opt, NULL, "header", stri_trans_tolower(s[, 1L]))
-    set(tbl_opt, NULL, "value", stri_trans_tolower(s[, 2L]))
+    s <- stri_split_fixed(dt_opt[['comment']], " ", n = 2, simplify = TRUE)
+    set(dt_opt, NULL, "header", stri_trans_tolower(s[, 1L]))
+    set(dt_opt, NULL, "value", stri_trans_tolower(s[, 2L]))
 
     # all available options
     opts <- list(
@@ -1100,16 +1150,16 @@ sep_header_options <- function (dt, type_enum) {
     }
 
     # only parse lines with valid headers
-    tbl_opt <- tbl_opt[header %in% names(opts)]
+    dt_opt <- dt_opt[header %in% names(opts)]
 
     opt <- list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE,
         save_format = "sorted")
 
     res <- list(left = dt, options = opt)
 
-    if (nrow(tbl_opt) == 0L) return(res)
+    if (nrow(dt_opt) == 0L) return(res)
 
-    out <- unlist(tbl_opt[, `:=`(options = list(get_option(header, value))), by = line]$options)
+    out <- unlist(dt_opt[, `:=`(options = list(get_option(header, value))), by = line]$options)
 
     if (length(out) == 0L) return(res)
 
@@ -1123,7 +1173,7 @@ sep_header_options <- function (dt, type_enum) {
 # }}}
 
 # sep_object_table {{{
-sep_object_table <- function (dt, type_enum, idd) {
+sep_object_table <- function (dt, type_enum, version, idd) {
     # object id
     left <- dt[type == type_enum$value_last, list(line, object_id = seq_along(line))]
     dt <- left[dt, on = "line", roll = -Inf]
@@ -1131,7 +1181,7 @@ sep_object_table <- function (dt, type_enum, idd) {
     # check incomplete object
     incomp_obj <- dt[is.na(object_id) & type >= type_enum$value]
     if (nrow(incomp_obj)) {
-        parse_error("idf", "Incomplete object", 1L, dt[is.na(object_id)])
+        parse_issue("error_idf_incomplete_object", "idf", "Incomplete object", dt[is.na(object_id)], 1L)
     }
 
     # extract class names
@@ -1141,7 +1191,7 @@ sep_object_table <- function (dt, type_enum, idd) {
             l <- stri_length(body)
             class_name_lower <- stri_trans_tolower(stri_sub(body, to = n - 1L))
             body[n < l] <- stri_trim_left(stri_sub(body[n < l], n[n < l] + 1L))
-            type[n >  l] <- type_enum$object_value
+            type[n <  l] <- type_enum$object_value
             type[n == l] <- type_enum$object
             list(type, class_name_lower, body)
         })
@@ -1157,19 +1207,22 @@ sep_object_table <- function (dt, type_enum, idd) {
     })]
     set(idd$class, NULL, "class_name_lower", NULL)
 
-    # check for version
+    # check for version {{{
     id_ver <- dt[class_name == "Version", object_id]
 
     # if multiple version found, stop
     if (length(id_ver) > 1L) {
-        parse_error("idf", "Multiple IDF Version found", length(id_ver), dt[object_id %in% id_ver])
+        parse_issue("error_idf_multi_ver", "idf", "Multiple IDF Version found",
+            dt[object_id %in% id_ver], length(id_ver)
+        )
 
     # if no version found, insert one
     } else if (length(id_ver) == 0L) {
-        v <- idd$version[, 1:2]
-        warning("Missing version field in input IDF. The given IDD ",
-            "version ", idd$version, " will be used. Parsing errors ",
-            "may occur.", call. = FALSE)
+        v <- version[, 1:2]
+        mes <- paste0("Missing version field in input IDF. The given IDD ",
+            "version ", version, " will be used. Parsing errors may occur."
+        )
+        warn("warning_idf_mis_ver", mes, idd_ver = version)
         ins <- dt[1L]
         ins[, `:=`(
             line = nrow(dt) + 1L,
@@ -1190,18 +1243,20 @@ sep_object_table <- function (dt, type_enum, idd) {
         b <- dt[object_id == id_ver][type > type_enum$object, body]
         v <- standardize_ver(stri_trim_right(stri_sub(b, to = -2L)))
 
-        if (v != idd$version) {
-            warning(paste0("Version Mismatch. The IDF file parsing has a differnet ",
+        if (v != version) {
+            mes <- paste0("Version Mismatch. The IDF file parsing has a differnet ",
                 "version ", backtick(v), " than the IDD file using ",
-                backtick(idd$version), ". Parsing errors may occur."), call. = FALSE
+                backtick(version), ". Parsing errors may occur."
             )
+            warn("waring_idf_idd_mismatch_ver", mes, idf_ver = ver, idd_ver = version)
         }
     }
+    # }}}
 
     # check invalid class name
     invld_obj <- dt[is.na(class_id) & !is.na(class_name_lower)]
     if (nrow(invld_obj)) {
-        parse_error("idf", "Invalid class name", msg = invld_obj)
+        parse_issue("error_idf_invalid_class", "idf", "Invalid class name", invld_obj)
     }
 
     # fill class id and class name
@@ -1211,12 +1266,17 @@ sep_object_table <- function (dt, type_enum, idd) {
     dt_val <- left[dt[type > type_enum$comment], on = "line", roll = Inf]
     dt <- setorder(rbindlist(list(dt_cmt, dt_val)), "line")
 
+    # lines with type "object" and "object_value" are duplicated
+    dt <- unique(dt)
+
     # get table
-    tbl_object <- dt[type <= type_enum$object_value, .SD,
+    dt_object <- dt[type <= type_enum$object_value, .SD,
         .SDcols = c("object_id", "class_id", "class_name", "group_id", "comment")]
-    tbl_object <- tbl_object[, list(
-        class_id = class_id[1L], class_name = class_name[1L],
-        group_id = group_id[1L], comment = list(comment)),
+    dt_object <- dt_object[,
+        list(
+            class_id = class_id[1L], class_name = class_name[1L],
+            group_id = group_id[1L], comment = list(comment)
+        ),
         by = object_id
     ]
 
@@ -1224,12 +1284,12 @@ sep_object_table <- function (dt, type_enum, idd) {
     # remove unuseful columns
     set(dt, NULL, c("group_id", "type", "comment"), NULL)
 
-    list(left = dt, object = tbl_object)
+    list(left = dt, object = dt_object)
 }
 # }}}
 
 # get_value_table {{{
-get_value_table <- function (dt, type_enum, idd) {
+get_value_table <- function (dt, idd) {
     # count value number per line
     dt[, `:=`(value_count = stri_count_charclass(body, "[,;]"))]
 
@@ -1270,46 +1330,29 @@ get_value_table <- function (dt, type_enum, idd) {
     ext <- dt[left, on = list(class_id, field_index > num_fields), nomatch = 0L]
     setnames(ext, "field_index", "num_fields")
 
-    browser()
-
-    t_field_data(idd$class, idd$field, dt$class_id, dt$field_index)
-    # add extensible if necessary
-    if (nrow(ext)) {
-        # check invalid field number
-        if (nrow(ext[num_extensible == 0L])) {
-            invld_id <- unique(ext[num_extensible == 0L, list(object_id, num_fields)])
-            invld_obj <- dt[invld_id, on = "object_id"]
-
-            # build error message
-            invld_obj[field_index <= num_fields, `:=`(string = paste0("[O] ", string))]
-            invld_obj[field_index >  num_fields, `:=`(string = paste0("[X] ", string))]
-            invld_obj[invld_obj[, .I[1L], by = object_id]$V1,
-                `:=`(prefix = paste0("For class ", backtick(class_name), "\n"))
-            ]
-            invld_obj[is.na(prefix), `:=`(prefix = "")]
-
-            parse_error("idd", "Invalid field number", nrow(invld_id),
-                invld_obj, invld_obj$prefix
-            )
-        }
-
-        # TODO: add extensible groups
-        ext_add <- ext[, list(num_values = max(num_values)),
-            by = list(class_id, num_extensible, num_fields)]
-        ext_add[, num_to_add := ceiling(num_values - num_fields / num_extensible)]
-
-        i_add_extensible_group(idd_self, idd_private, ext_add$class_id, ext_add$num_to_add)
-    }
-
     # replace empty value with NA
     dt[stri_isempty(value), `:=`(value = NA_character_)]
 
     # add field id and other attributes
     ## add full name column based on option
     col_nm <- ifelse(.options$view_in_ip, "full_ipname", "full_name")
-    cols_add <- c("class_id", "field_index", "field_id", "type_enum", "src_enum",
-        "field_name", col_nm, "units", "ip_units", "is_name")
-    dt <- idd$field[, .SD, .SDcols = cols_add][dt, on = c("class_id", "field_index"), nomatch = 0L]
+
+    cols_add <- c("field_id", "type_enum", "src_enum", "field_name", col_nm,
+        "units", "ip_units", "is_name"
+    )
+
+    fld <- t_field_data(idd$class, idd$field, idd$name, dt$class_id, dt$field_index,
+        cols = cols_add
+    )
+    idd$class <- attr(fld, "dt_class")
+    idd$field <- attr(fld, "dt_field")
+    idd$name <- attr(fld, "dt_name")
+    setattr(fld, "dt_class", NULL)
+    setattr(fld, "dt_field", NULL)
+    setattr(fld, "dt_name", NULL)
+
+    ## bind columns
+    dt <- cbind(dt, fld)
 
     # add numeric type values
     dt[type_enum <= .globals$type$real,
@@ -1329,23 +1372,22 @@ get_value_table <- function (dt, type_enum, idd) {
 # }}}
 
 # update_object_name {{{
-update_object_name <- function (tbl_object, tbl_value) {
-    dt_nm <- tbl_value[is_name == TRUE,
+update_object_name <- function (dt_object, dt_value) {
+    dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value, object_name_lower = stri_trans_tolower(value)),
         by = list(object_id)]
-    tbl_object[dt_nm, on = "object_id"]
+    dt_nm[dt_object, on = "object_id"]
 }
 # }}}
 
 # convert_value_unit {{{
-convert_value_unit <- function (tbl_value, from, to) {
+convert_value_unit <- function (dt_value, from, to) {
     from <- match.arg(from, c("si", "ip"))
     to <- match.arg(to, c("si", "ip"))
 
-    if (identical(from, to)) return(tbl_value)
+    if (identical(from, to)) return(dt_value)
 
-    val <- tbl_value[!is.na(value_num) & !is.na(units), list(value_id, value_num, units, ip_units)]
-    browser()
+    val <- dt_value[!is.na(value_num) & !is.na(units), list(value_id, value_num, units, ip_units)]
 
     val <- unit_conv_table[val, on = c(si_name = "units", ip_name = "ip_units")]
     set(val, NULL, c("si_name", "ip_name"), NULL)
@@ -1360,20 +1402,20 @@ convert_value_unit <- function (tbl_value, from, to) {
         by = list(si, ip)
     ]
 
-    tbl_value[val, on = "value_id", `:=`(value_num = val$value_num)]
+    dt_value[val, on = "value_id", `:=`(value_num = val$value_num)]
 
-    tbl_value
+    dt_value
 }
 # }}}
 
 # get_value_sources {{{
-get_value_sources <- function (tbl_value, lower = FALSE) {
-    tbl_val <- tbl_value[!is.na(value)]
+get_value_sources <- function (dt_value, lower = FALSE) {
+    dt_val <- dt_value[!is.na(value), list(field_id, value_id, value, src_enum, class_name)]
 
-    setindexv(tbl_val, "src_enum")
+    setindexv(dt_val, "src_enum")
 
     # a) reference class names
-    cls_src <- tbl_val[
+    cls_src <- dt_val[
         src_enum == .globals$source$class,
         list(
             src_field_id = field_id,
@@ -1384,7 +1426,7 @@ get_value_sources <- function (tbl_value, lower = FALSE) {
     ]
 
     # b) reference field values
-    fld_src <- tbl_val[
+    fld_src <- dt_val[
         src_enum == .globals$source$field,
         list(
             src_field_id = field_id,
@@ -1396,7 +1438,7 @@ get_value_sources <- function (tbl_value, lower = FALSE) {
 
     # c) reference both class names and field values
     ## seperate source enum here
-    mix_src <- tbl_val[
+    mix_src <- dt_val[
         src_enum == .globals$source$mixed,
         {
             list(
@@ -1417,48 +1459,77 @@ get_value_sources <- function (tbl_value, lower = FALSE) {
 }
 # }}}
 
-# update_value_reference {{{
-update_value_reference <- function (tbl_object, tbl_value, tbl_reference) {
-    # get all values in lower case that are references
-    val_ref <- tbl_value[
+# get_value_references {{{
+get_value_references <- function (dt_value, lower = FALSE) {
+    val_ref <- dt_value[
         !is.na(value) & type_enum == .globals$type$object_list,
-        list(value_id, value = stri_trans_tolower(value), field_id)]
-    if (nrow(val_ref) == 0L) return(tbl_value)
+        list(value_id, value, field_id)]
+
+    if (lower) set(val_ref, NULL, "value", stri_trans_tolower(val_ref$value))
+
+    val_ref
+}
+# }}}
+
+# update_value_reference {{{
+update_value_reference <- function (dt_object, dt_value, dt_reference) {
+    # get all values in lower case that are references
+    val_ref <- get_value_references(dt_value, lower = TRUE)
+    if (nrow(val_ref) == 0L) return(dt_value)
 
     # get all values in lower case that are sources
-    val_src <- get_value_sources(tbl_value, lower = TRUE)
-    if (nrow(val_src) == 0L) return(tbl_value)
-    val_src <- val_src[, lapply(.SD, list), by = list(src_field_id)]
+    val_src <- get_value_sources(dt_value, lower = TRUE)
+    if (nrow(val_src) == 0L) return(dt_value)
+
+    val_ref_lst <- val_ref[, lapply(.SD, list), by = list(field_id)]
+    val_src_lst <- val_src[, lapply(.SD, list), by = list(src_field_id)]
 
     # remove rows that field ids do not exist in current IDF
-    fld_ref_src <- tbl_reference[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
+    fld_ref_src <- dt_reference[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
     set(fld_ref_src, NULL, "src_enum", NULL)
 
-    # get all values that are references
-    all_ref <- val_ref[fld_ref_src, on = list(field_id), allow.cartesian = TRUE]
+    # combine all references and sources
+    ref_src_lst <- val_src_lst[fld_ref_src, on = list(src_field_id)][,
+        list(
+            src_field_id = list(src_field_id),
+            src_value_id = list(unlist(src_value_id)),
+            src_value = list(unlist(src_value)),
+            src_enum = list(unlist(src_enum))
+        ),
+        by = field_id
+    ][val_ref_lst, on = list(field_id)]
 
     # match
-    ref_src <- val_src[all_ref, on = list(src_field_id)][,
-        {
-            v <- value[1L]
+    ref_src_lst[, {
+        val_id <- unlist(value_id)
+        val <- unlist(value)
+        l <- vapply(value_id, length, integer(1L))
+        list(
+            src_value_id = rep(src_value_id, l),
+            src_value = rep(src_value, l),
+            src_enum = rep(src_enum, l),
+            value_id = val_id,
+            value = val
+            # src_field_id = rep(src_field_id, l),
+            # field_id = rep(field_id, l),
+        )
+    }][, {
             # NOTE: If there are multiple value matched, only the first will be
             # used. This could happen when there are errors that objects in one
             # class have the same name.
             # TODO: log this case
-            m <- chmatch(v, unlist(src_value), nomatch = 0L)
+            m <- chmatch(value, unlist(src_value), nomatch = 0L)
             # set NA if no matched found
-            id <- NA_integer_
+            val_id <- NA_integer_
             enum <- NA_integer_
             if (m) {
-                id <- unlist(src_value_id)[m]
+                val_id <- unlist(src_value_id)[m]
                 enum <- unlist(src_enum)[m]
             }
-            list(src_value_id = id, src_enum = enum)
+            list(src_value_id = val_id, src_enum = enum)
         },
         by = value_id
     ]
-
-    ref_src
 }
 # }}}
 
@@ -1542,52 +1613,55 @@ parse_err_file <- function (path) {
 }
 # }}}
 
-# parse_error {{{
-parse_error <- function (type = c("idf", "idd", "err"), error, num, msg = NULL,
-                         prefix = NULL, stop = TRUE) {
+# parse_issue {{{
+parse_issue <- function (error_type, type = c("idf", "idd", "err"),
+                         title, data = NULL, num = NULL, prefix = NULL, stop = TRUE) {
 
     start_rule <- cli::rule(line = 2L)
 
-    type <- match.arg(type)
-    if (is.data.frame(msg)) {
-        if (missing(num)) {
-            num <- nrow(msg)
+    mes <- NULL
+    if (is.data.frame(data)) {
+        if (is.null(num)) {
+            num <- nrow(data)
         }
-        assert_that(has_name(msg, "line"))
-        assert_that(has_name(msg, "string"))
-        msg <- paste0(msg[["msg_each"]], "Line ", msg$line, ": ", msg$string)
+        assert_that(has_names(data, c("line", "string")))
+        mes <- paste0(data$msg_each, "Line ", data$line, ": ", data$string)
         if (!is.null(prefix)) {
-            msg <- paste0(prefix, msg)
+            mes <- paste0(prefix, mes)
         }
     }
 
     if (stop) {
-        err_type <- paste0("[ Error Type ]: ", error)
+        err_title <- paste0("[ Error Type ]: ", title)
         err_num  <- paste0("[Total Number]: ", num)
     } else {
-        err_type <- paste0("[Warning Type]: ", error)
+        err_title <- paste0("[Warning Type]: ", title)
         err_num  <- paste0("[Total Number]: ", num)
     }
 
-    if (!is.null(msg)) {
-        msg_rule <- cli::rule(line = 1L)
-        msg_line <- paste(msg, sep = "\n", collapse = "\n")
+    if (!is.null(mes)) {
+        mes_rule <- cli::rule(line = 1L)
+        mes_line <- paste(mes, sep = "\n", collapse = "\n")
     } else {
-        msg_rule <- NULL
-        msg_line <- NULL
+        mes_rule <- NULL
+        mes_line <- NULL
     }
     end_rule <- cli::rule(line = 2L)
 
-    all_msg <- paste0(c(start_rule, err_type, err_num, msg_rule, msg_line, end_rule),
+    all_mes <- paste0(c(start_rule, err_title, err_num, mes_rule, mes_line, end_rule),
         collapse = "\n")
 
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
+
+    type <- match.arg(type)
+    key <- ifelse(stop, "ERROR", "WARNING")
+    all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
     if (stop) {
-        stop(paste0(toupper(type)," PARSING ERROR.\n"), all_msg, call. = FALSE)
+        abort(error_type, all_mes, NULL, data = data)
     } else {
-        warning(paste0(toupper(type), " PARSING WARNING.\n"), all_msg, call. = FALSE)
+        warn(error_type, all_mes, NULL, data = data)
     }
 }
 # }}}

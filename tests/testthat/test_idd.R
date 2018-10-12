@@ -26,13 +26,13 @@ idd_text <- c(
        \\object-list RefTestSimpleA1
      N1 , \\field Test Numeric Field 1
        \\units m
-       \\ip-units inch
+       \\ip-units in
        \\unitsbasedonfield A2
        \\minimum 1
        \\maximum< 10
        \\default 2
        \\autosizable
-       \\type integer
+       \\type real
      N2 , \\field Test Numeric Field 2
        \\autocalculatable
        \\type real
@@ -86,7 +86,7 @@ test_that("parse_idd_file()", {
     # can parse Idd from string
     expect_equal(
         names(idd_parsed),
-        c("version", "build", "group", "class", "field", "reference")
+        c("version", "build", "name", "group", "class", "field", "reference")
     )
 
     # can get Idd version
@@ -128,17 +128,17 @@ test_that("parse_idd_file()", {
              "Test Character Field 2")
     expect_equal(idd_parsed$field$field_name, nms)
     expect_equal(idd_parsed$field$full_name, paste0(nms, c("", "", " {m}", "", "")))
-    expect_equal(idd_parsed$field$full_ipname, paste0(nms, c("", "", " {inch}", "", "")))
+    expect_equal(idd_parsed$field$full_ipname, paste0(nms, c("", "", " {in}", "", "")))
     expect_equal(idd_parsed$field$units, c(NA_character_, NA_character_, "m", NA_character_, NA_character_))
-    expect_equal(idd_parsed$field$ip_units, c(NA_character_, NA_character_, "inch", NA_character_, NA_character_))
+    expect_equal(idd_parsed$field$ip_units, c(NA_character_, NA_character_, "in", NA_character_, NA_character_))
     expect_equal(idd_parsed$field$is_name, c(FALSE, FALSE, FALSE, FALSE, FALSE))
     expect_equal(idd_parsed$field$required_field, c(FALSE, TRUE, FALSE, FALSE, FALSE))
     expect_equal(idd_parsed$field$extensible_group, c(0L, 1L, 1L, 1L, 1L))
-    expect_equal(idd_parsed$field$type, c("alpha", "object-list", "integer", "real", "choice"))
-    expect_equal(idd_parsed$field$type_enum, c(4L, 5L, 1L, 2L, 3L))
+    expect_equal(idd_parsed$field$type, c("alpha", "object-list", "real", "real", "choice"))
+    expect_equal(idd_parsed$field$type_enum, c(4L, 5L, 2L, 2L, 3L))
     expect_equal(idd_parsed$field$autosizable, c(FALSE, FALSE, TRUE, FALSE, FALSE))
     expect_equal(idd_parsed$field$autocalculatable, c(FALSE, FALSE, FALSE, TRUE, FALSE))
-    expect_equal(idd_parsed$field$default, c(NA, NA, "2", NA, NA))
+    expect_equal(idd_parsed$field$default, list(NA_character_, NA_character_, 2, NA_real_, NA_character_))
     expect_equal(idd_parsed$field$choice, list(character(0), character(0), NULL, NULL, c("Key1", "Key2")))
     expect_equal(idd_parsed$field$note, list(character(0), "Test Note Parsing", NULL, NULL, character(0)))
     expect_equal(idd_parsed$field$has_range, c(FALSE, FALSE, TRUE, FALSE, FALSE))
@@ -390,7 +390,7 @@ test_that("Idd class", {
     expect_equal(idd$unique_class_name(), "TestSlash")
 
     # can return names of all extensible classes
-    expect_equal(idd$extensible_class_name(), "TestSlash")
+    expect_equal(idd$extensible_class_name(), "TestSimple")
 
     # can return a single IddObject using class name
     expect_is(idd$object("TestSimple")$TestSimple, "IddObject")
@@ -479,6 +479,7 @@ test_that("IddObject class", {
 
     # can use $del_extensible_groups()
     expect_equal(slash$del_extensible_group(1)$num_fields(), 4L)
+    expect_s3_class(catch_cnd(slash$del_extensible_group(1)), "error_del_extensible")
 
     # can use $has_name()
     expect_false(slash$has_name())
@@ -493,32 +494,35 @@ test_that("IddObject class", {
     expect_true(slash$is_extensible())
 
     # can use $field_name()
-    expect_error(slash$field_name(slash$num_fields() + 1), "Invalid field index")
+    expect_error(slash$field_name(slash$num_fields() + 30), "Invalid field index")
     expect_equal(slash$field_name(c(2, 1)),
         c("Test Numeric Field 1", "Test Character Field 1"))
 
     # can use $field_index()
+    expect_equal(slash$field_index(), 1L:4L)
     expect_error(slash$field_index("WrongName"), "Invalid field name")
     expect_equal(slash$field_index(
             c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
     # can use $field_type()
-    expect_equivalent(slash$field_type(c(4, 2)), c("choice", "integer"))
+    expect_equivalent(slash$field_type(c(4, 2)), c("choice", "real"))
 
     # can use $field_note()
-    expect_equivalent(slash$field_note(c(2, 1)), c(NA_character_, "Test Note Parsing"))
+    expect_equivalent(slash$field_note(c(2, 1)), list(NULL, "Test Note Parsing"))
 
     # can use $field_unit()
     expect_equivalent(slash$field_unit(c(4, 2)), c(NA_character_, "m"))
+    expect_equivalent(slash$field_unit(c(4, 2), in_ip = TRUE), c(NA_character_, "in"))
 
     # can use $field_default()
     expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
+    expect_equivalent(slash$field_default(c(4, 2), in_ip = TRUE), list(NA_character_, 78.74016), tolerance = 0.001)
 
     # can use $field_choice()
-    expect_equivalent(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NA_character_))
+    expect_equivalent(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NULL))
 
     # can use $field_range()
     expect_equivalent(slash$field_range(c(4, 2)),
-        list(list(NA_real_, NA, NA_real_, NA), list(1L, TRUE, 10, FALSE)))
+        list(list(NA_real_, FALSE, NA_real_, FALSE), list(1L, TRUE, 10, FALSE)))
 
     # can use $field_reference()
     expect_error(slash$field_reference(c(4, 2)),
@@ -575,10 +579,17 @@ test_that("IddObject class", {
 
     # can use $is_integer_field()
     expect_false(slash$is_integer_field(1))
-    expect_true(slash$is_integer_field(2))
+    expect_false(slash$is_integer_field(2))
     expect_false(slash$is_integer_field(3))
     expect_false(slash$is_integer_field(4))
     expect_error(slash$is_integer_field(5))
+
+    # can use $is_integer_field()
+    expect_false(slash$is_real_field(1))
+    expect_true(slash$is_real_field(2))
+    expect_true(slash$is_real_field(3))
+    expect_false(slash$is_real_field(4))
+    expect_error(slash$is_real_field(5))
 
     # can use $is_required_field()
     expect_true(slash$is_required_field(1))

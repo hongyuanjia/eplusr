@@ -1,4 +1,5 @@
 #' @importFrom readr write_lines
+#' @importFrom stringi stri_replace_all_charclass stri_trans_tolower
 NULL
 
 # `%||%` {{{
@@ -155,5 +156,39 @@ apply2_int <- function (x, y, fun, more_args = NULL) {
 # apply2_lgl {{{
 apply2_lgl <- function (x, y, fun, more_args = NULL) {
     as.logical(unlist(apply2(x, y, fun, more_args)))
+}
+# }}}
+
+# lower_name {{{
+lower_name <- function (name) {
+    stri_trans_tolower(underscore_name(name))
+}
+# }}}
+
+# underscore_name {{{
+underscore_name <- function (name, merge = TRUE) {
+    stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
+}
+# }}}
+
+# abort {{{
+# reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
+abort <- function (subclass, message, call = NULL, ...) {
+    err <- structure(
+        list(message = message, call = call, ...),
+        class = c(subclass, "error", "condition")
+    )
+    stop(err)
+}
+# }}}
+
+# warn {{{
+# reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
+warn <- function (subclass, message, call = NULL, ...) {
+    w <- structure(
+        list(message = message, call = call, ...),
+        class = c(subclass, "warning", "condition")
+    )
+    warning(w)
 }
 # }}}

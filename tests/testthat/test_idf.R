@@ -181,6 +181,7 @@ test_that("parse_idf_file()", {
         Version, 8.8;
         SurfaceConvectionAlgorithm:Inside,
             Simple, !- Algorithm
+            Simple, !- Algorithm
             TARP; !- Algorithm"
     expect_error(parse_idf_file(idf_wrong, idd_8_8))
 })
