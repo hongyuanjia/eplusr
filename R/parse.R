@@ -351,13 +351,13 @@ sep_idd_lines <- function (dt, col = "string") {
     refs <- dt[slash_key %in% c("reference-class-name", "reference"), unique(slash_value)]
     invld_objlst <- dt[slash_key == "object-list" & !slash_value %chin% refs]
     if (nrow(invld_objlst)) {
-        parse_issue("error_idd_object_list", "idd", "Invalid \\object-list value", invld_objlst)
+        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", invld_objlst)
     }
 
     # check invalid slash keys
     invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(slash_keys()$type), which = TRUE]
     if (length(invld_key))
-        parse_issue("error_idd_slash_key", "idd", "Invalid slash key", dt[invld_key])
+        parse_issue("error_slash_key", "idd", "Invalid slash key", dt[invld_key])
 
     # check invalid slash value {{{
     set(dt, NULL, "slash_value_lower", stri_trans_tolower(dt[["slash_value"]]))
@@ -370,7 +370,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_issue("error_idd_format_value", "idd", "Invalid format value", dt[invld_val])
+        parse_issue("error_format_value", "idd", "Invalid format value", dt[invld_val])
 
     # check invalid \type value
     invld_val <- dt[slash_key == "type" &
@@ -379,7 +379,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_issue("error_idd_type_value", "idd", "Invalid type value", dt[invld_val])
+        parse_issue("error_type_value", "idd", "Invalid type value", dt[invld_val])
 
     # check invalid \external-list value
     invld_val <- dt[slash_key == "external-list" &
@@ -387,7 +387,7 @@ sep_idd_lines <- function (dt, col = "string") {
         which = TRUE
     ]
     if (length(invld_val))
-        parse_issue("error_idd_external_list_value", "idd", "Invalid external list value", dt[invld_val])
+        parse_issue("error_external_list_value", "idd", "Invalid external list value", dt[invld_val])
     # }}}
 
     set(dt, NULL, c("slash", "slash_loc", "space_loc", "colon_loc", "slash_value_lower"), NULL)
@@ -423,7 +423,7 @@ mark_idd_lines <- function (dt, type_enum) {
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
-        parse_issue("error_idd_line", "idd", "Invalid line", dt[type == type_enum$unknown])
+        parse_issue("error_unknown_line", "idd", "Invalid line", dt[type == type_enum$unknown])
     }
 
     dt
@@ -441,7 +441,7 @@ sep_group_table <- function (dt, type_enum) {
     # check missing group
     if (nrow(dt[line < dt_group$line[1L]])) {
         invld_grp <- dt[line < dt_group$line[1L]]
-        parse_issue("error_idd_mis_group", "idd", "Missing group name",
+        parse_issue("error_missing_group", "idd", "Missing group name",
             invld_grp, invld_grp[type == type_enum$class, .N]
         )
     }
@@ -472,7 +472,7 @@ sep_class_table <- function (dt, type_enum) {
     dup_cls <- dt[type == type_enum$class, line[duplicated(class_name)]]
     if (length(dup_cls)) {
         invld_cls <- dt[class_name %in% dt[line %in% dup_cls]$class_name]
-        parse_issue("error_idd_dup_class", "idd", "Duplicated class names found",
+        parse_issue("error_duplicated_class", "idd", "Duplicated class names found",
             invld_cls, length(dup_cls)
         )
     }
@@ -483,7 +483,7 @@ sep_class_table <- function (dt, type_enum) {
     # check missing class name
     if (nrow(dt[is.na(class_id)])) {
         invld_cls <- dt[is.na(class_id)]
-        parse_issue("error_idd_mis_class", "idd", "Missing class name",
+        parse_issue("error_missing_class", "idd", "Missing class name",
             invld_cls, invld_cls[type == type_enum$field_last, .N]
         )
     }
@@ -510,14 +510,14 @@ sep_class_table <- function (dt, type_enum) {
         } else {
             n <- invld_cls[type == type_enum$field_last, .N] + 1L
         }
-        parse_issue("error_idd_mis_class", "idd", "Missing class name", invld_cls, n)
+        parse_issue("error_missing_class", "idd", "Missing class name", invld_cls, n)
     }
 
     # check incomplete class
     incomp_cls <- dt[type == type_enum$field & type_exp == type_enum$field_last, class_id]
     if (length(incomp_cls)) {
         invld_cls <- dt[class_id %in% incomp_cls]
-        parse_issue("error_idd_incomplete_class", "idd", "Incomplete class", invld_cls, length(incomp_cls))
+        parse_issue("error_incomplete_class", "idd", "Incomplete class", invld_cls, length(incomp_cls))
     }
 
     # after checking possible errors, resign type
@@ -1093,7 +1093,7 @@ mark_idf_lines <- function (dt, type_enum) {
         })]
 
         if (nrow(dt[type == type_enum$macro])) {
-            parse_issue("warning_idf_macro", "idf", "Marco lines found",
+            parse_issue("warning_macro_line", "idf", "Marco lines found",
                 dt[type == type_enum$macro], stop = FALSE)
         }
     }
@@ -1112,7 +1112,7 @@ mark_idf_lines <- function (dt, type_enum) {
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
-        parse_issue("error_idf_line", "idf", "Invalid line found", dt[type == type_enum$unknown])
+        parse_issue("error_unknown_line", "idf", "Invalid line found", dt[type == type_enum$unknown])
     }
 
     dt
@@ -1181,7 +1181,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     # check incomplete object
     incomp_obj <- dt[is.na(object_id) & type >= type_enum$value]
     if (nrow(incomp_obj)) {
-        parse_issue("error_idf_incomplete_object", "idf", "Incomplete object", dt[is.na(object_id)], 1L)
+        parse_issue("error_incomplete_object", "idf", "Incomplete object", dt[is.na(object_id)], 1L)
     }
 
     # extract class names
@@ -1212,7 +1212,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 
     # if multiple version found, stop
     if (length(id_ver) > 1L) {
-        parse_issue("error_idf_multi_ver", "idf", "Multiple IDF Version found",
+        parse_issue("error_multiple_version", "idf", "Multiple IDF Version found",
             dt[object_id %in% id_ver], length(id_ver)
         )
 
@@ -1256,7 +1256,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     # check invalid class name
     invld_obj <- dt[is.na(class_id) & !is.na(class_name_lower)]
     if (nrow(invld_obj)) {
-        parse_issue("error_idf_invalid_class", "idf", "Invalid class name", invld_obj)
+        parse_issue("error_invalid_class", "idf", "Invalid class name", invld_obj)
     }
 
     # fill class id and class name
@@ -1659,9 +1659,9 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
     key <- ifelse(stop, "ERROR", "WARNING")
     all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
     if (stop) {
-        abort(error_type, all_mes, NULL, data = data)
+        abort(c(error_type, paste0("error_parse_", type)), all_mes, NULL, data = data)
     } else {
-        warn(error_type, all_mes, NULL, data = data)
+        warn(c(error_type, paste0("warning_parse_", type)), all_mes, NULL, data = data)
     }
 }
 # }}}
