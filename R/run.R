@@ -319,7 +319,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         ext_funs <- tempfile("eplusr_run_parallel_jobs_fun", fileext = ".eplusr_temp")
 
         base::dump(list = c("run_parallel_jobs", "kill_jobs", "schedule_next_sim",
-            "run_job", "are_all_completed", "handle_events", "sim_status",
+            "run_job", "are_all_completed", "handle_events", "sim_status", "clean_wd",
             "energyplus", "is_string", "is_flag", "has_ext", "lpad", "backtick"),
             file = ext_funs
         )
@@ -336,7 +336,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         # reference: https://yihui.name/en/2017/10/later-recursion
         watch_proc = function() {
             if (proc_print(proc, c(TRUE, TRUE))) {
-                later::later(watch_proc, eplusr_option("process_print_internal"))
+                later::later(watch_proc, 0.5)
             }
         }
         # }}}
@@ -486,6 +486,9 @@ schedule_next_sim <- function(jobs, options, progress_bar) {
 # }}}
 # run_job {{{
 run_job <- function(jobs, options, progress_bar) {
+    # clean wd
+    lapply(jobs[status == "ready", model], clean_wd)
+
     jobs[status == "ready", `:=`(status = "newly_started",
         process = list(energyplus(eplus = energyplus, model = model,
             weather = weather, output_dir = output_dir, annual = annual,
