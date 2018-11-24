@@ -1236,8 +1236,8 @@ assign_idd_shared_data <- function (self, private, iddobj_gen) {
     }
 
     # self reference
-    iddobj_gen$self$private_fields$m_iddobj_generator <- iddobj_gen
-    iddobj_gen$self$self$private_fields$m_iddobj_generator <- iddobj_gen
+    iddobj_gen$self$private_fields$m_iddobj_gen <- iddobj_gen
+    iddobj_gen$self$self$private_fields$m_iddobj_gen <- iddobj_gen
 
     iddobj_gen
 }
@@ -1256,15 +1256,15 @@ create_idfobj_generator <- function (self, private, IdfObject) {
 assign_idf_shared_data <- function (self, private, idfobj_gen) {
     # assign shared data to IddObject R6Class Generator
     shared <- c("m_version", "m_idf_tbl", "m_idd_tbl", "m_log",
-        "m_iddobj_generator", "m_idfobj_generator")
+        "m_iddobj_gen", "m_idfobj_gen")
     for (nm in shared) {
         idfobj_gen$self$private_fields[[nm]] <- private[[nm]]
         idfobj_gen$private_fields[[nm]] <- private[[nm]]
     }
 
     # self reference
-    idfobj_gen$self$private_fields$m_idfobj_generator <- idfobj_gen
-    idfobj_gen$self$self$private_fields$m_idfobj_generator <- idfobj_gen
+    idfobj_gen$self$private_fields$m_idfobj_gen <- idfobj_gen
+    idfobj_gen$self$self$private_fields$m_idfobj_gen <- idfobj_gen
 
     idfobj_gen
 }
@@ -1286,7 +1286,7 @@ i_definition <- function (self, private, class) {
 
 # i_iddobject {{{
 i_iddobject <- function (self, private, class) {
-    res <- lapply(class, private$m_iddobj_generator$new)
+    res <- lapply(class, private$m_iddobj_gen$new)
     data.table::setattr(res, "names", class)
     res
 }
@@ -1300,7 +1300,7 @@ i_iddobject_in_group <- function (self, private, group) {
     cls <- private$m_idd_tbl$group[group_name == group][
         private$m_idd_tbl$class, on = "group_id", nomatch = 0L, class_name]
 
-    res <- lapply(cls, private$m_iddobj_generator$new)
+    res <- lapply(cls, private$m_iddobj_gen$new)
     data.table::setattr(res, "names", cls)
     res
 }
@@ -1312,7 +1312,7 @@ i_idfobject <- function (self, private, which) {
 
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
-    res <- lapply(obj_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", i_underscore_name(obj_nm))
     res
 }
@@ -1324,7 +1324,7 @@ i_idfobject_in_class <- function (self, private, class) {
 
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
-    res <- lapply(obj_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", i_underscore_name(obj_nm))
     res
 }
@@ -1350,7 +1350,7 @@ i_search_object <- function (self, private, pattern, class = NULL) {
         return(invisible())
     }
 
-    res <- lapply(obj_tbl$object_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_tbl$object_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", i_underscore_name(obj_tbl$object_name))
     res
 }
@@ -1883,6 +1883,8 @@ i_object_string <- function (self, private, object = NULL, comment = TRUE, ...) 
         cmt_tbl <- i_comment_tbl_from_which(self, private)
 
     main <- format_output(val_tbl, cmt_tbl, ...)
+    # keep empty lines
+    main[main == ""] <- "\n"
     main <- unlist(strsplit(main, "\n", fixed = TRUE))
 
     # add a blank line at the end like IDFEditor
@@ -1891,22 +1893,87 @@ i_object_string <- function (self, private, object = NULL, comment = TRUE, ...) 
 # }}}
 
 # i_deep_clone {{{
-i_deep_clone <- function (self, private, name, value) {
-    if (inherits(value, "R6ClassGenerator")) {
-        # clone the R6ClassGenerator
-        clone_generator(value)
-        if (identical(value$classname, "IdfObject")) {
-            assign_idf_shared_data(self, private, value)
-        } else if (identical(value$classname, "IddObject")) {
-            assign_idd_shared_data(self, private, value)
+i_deep_clone <- function (self, private, name, value, type) {
+    env_shared <- name_env_shared(type)
+
+    # normal_copy {{{
+    normal_copy <- function (name, value) {
+        if (inherits(value, "R6")) {
+            value$clone(deep = TRUE)
+        } else if (is.environment(value)) {
+            list2env(as.list.environment(value, all.names = TRUE), parent = emptyenv())
+        } else {
+            value
         }
-    } else if (inherits(value, "R6")) {
-        value$clone(deep = TRUE)
-    } else if (is.environment(value)) {
-        list2env(as.list.environment(value, all.names = TRUE),
-                 parent = emptyenv())
+    }
+    # }}}
+
+    # copy_to_globals {{{
+    copy_to_globals <- function (name, value) {
+        if (name %in% env_shared) {
+            if (!.globals$is_env_cloned[[type]][[name]]) {
+                val <- normal_copy(name, value)
+                .globals$env_cloned[[type]][[name]] <- val
+                .globals$is_env_cloned[[type]][[name]] <- TRUE
+            } else {
+                val <- .globals$env_cloned[[type]][[name]]
+            }
+            val
+        }
+    }
+    # }}}
+
+    # assign_shared {{{
+    assign_shared <- function (name, gen) {
+        for (nm in env_shared) {
+            gen$self$private_fields[[nm]] <- .globals$env_cloned[[type]][[nm]]
+            gen$private_fields[[nm]] <- .globals$env_cloned[[type]][[nm]]
+        }
+
+        # self reference
+        gen$self$private_fields[[name]] <- gen
+        gen$self$self$private_fields[[name]] <- gen
+
+        gen
+    }
+    # }}}
+
+    # done_copy {{{
+    done_copy <- function () {
+        all(unlist(.globals$is_env_cloned[[type]]), unlist(.globals$is_gen_cloned[[type]]))
+    }
+    # }}}
+
+    # done_assign {{{
+    done_assign <- function () {
+        all(unlist(.globals$is_env_assigned[[type]]))
+    }
+    # }}}
+
+    if (inherits(value, "R6ClassGenerator")) {
+        copied <- unlist(.globals$is_env_cloned[[type]], use.names = TRUE)
+        if (any(!copied)) {
+            for (nm in names(!copied)) {
+                copy_to_globals(nm, private[[nm]])
+            }
+            i_deep_clone(self, private, name, value, type)
+        } else {
+            # clone the R6ClassGenerator
+            value <- clone_generator(value)
+            value <- assign_shared(name, value)
+            .globals$is_gen_cloned[[type]][[name]] <- TRUE
+            if (done_copy() && done_assign()) reset_clone_indicator()
+            value
+        }
     } else {
-        value
+        if (name %in% env_shared) {
+            value <- copy_to_globals(name, value)
+            .globals$is_env_assigned[[type]][[name]] <- TRUE
+            if (done_copy() && done_assign()) reset_clone_indicator()
+            value
+        } else {
+            normal_copy(name, value)
+        }
     }
 }
 # }}}
@@ -2396,7 +2463,7 @@ i_val_in_tbl <- function (self, private, object_id, class_id, value) {
                 if (!isTRUE(y)) {
                     lapply(x, function (x) as.character(replace_null(x)))
                 } else {
-                    NA_character_ 
+                    NA_character_
                 }
             })
 

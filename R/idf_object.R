@@ -502,8 +502,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         m_class_id = NULL,
 
         # self reference
-        m_idfobj_generator = NULL,
-        m_iddobj_generator = NULL
+        m_idfobj_gen = NULL,
+        m_iddobj_gen = NULL
         # }}}
     )
 )

@@ -812,7 +812,7 @@ Idf <- R6::R6Class(classname = "Idf",
             # init idd tbl
             private$m_idd_tbl <- ._get_private(idd)$m_idd_tbl
             # get IddObject R6ClassGenerator
-            private$m_iddobj_generator <- ._get_private(idd)$m_iddobj_generator
+            private$m_iddobj_gen <- ._get_private(idd)$m_iddobj_gen
 
             # init idf tbl
             private$m_idf_tbl <- list2env  (
@@ -835,7 +835,7 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_log$save_format <- idf_file$options$save_format
 
             # create the IdfObject R6ClassGenerator for this specific Idf
-            private$m_idfobj_generator <- create_idfobj_generator(self, private, IdfObject)
+            private$m_idfobj_gen <- create_idfobj_generator(self, private, IdfObject)
         },
         # }}}
 
@@ -938,12 +938,13 @@ Idf <- R6::R6Class(classname = "Idf",
         m_idd_tbl = NULL,
         m_idf_tbl = NULL,
         m_log = NULL,
-        m_idfobj_generator = NULL,
-        m_iddobj_generator = NULL,
+        m_idfobj_gen = NULL,
+        m_iddobj_gen = NULL,
         # }}}
 
-        deep_clone = function (name, value)
-            i_deep_clone(self, private, name, value)
+        deep_clone = function (name, value) {
+            i_deep_clone(self, private, name, value, "Idf")
+        }
     )
 )
 # }}}

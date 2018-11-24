@@ -186,7 +186,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
             # assign tbls to IddObject R6Class Generator
-            private$m_iddobj_generator <- create_iddobj_generator(self, private, IddObject)
+            private$m_iddobj_gen <- create_iddobj_generator(self, private, IddObject)
         },
         # }}}
 
@@ -248,7 +248,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         m_version = NULL,
         m_build = NULL,
         m_idd_tbl = NULL,
-        m_iddobj_generator = NULL
+        m_iddobj_gen = NULL
         # }}}
     )
 )

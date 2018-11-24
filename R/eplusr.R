@@ -22,10 +22,63 @@
 #' @author Hongyuan Jia
 "_PACKAGE"
 
+# name_env_shared {{{
+name_env_shared <- function (type = c("Idf", "Idd", "IdfObject", "IddObject")) {
+    type <- match.arg(type)
+    switch(type,
+        Idf = c("m_idd_tbl", "m_idf_tbl", "m_log"),
+        IdfObject = c("m_idd_tbl", "m_idf_tbl", "m_log"),
+        Idd = c("m_idd_tbl"),
+        IddObject = c("m_idd_tbl", "m_idf_tbl")
+    )
+}
+# }}}
+# name_gen_shared {{{
+name_gen_shared <- function (type = c("Idf", "Idd", "IdfObject", "IddObject")) {
+    type <- match.arg(type)
+    switch(type,
+        Idf       = c("m_iddobj_gen", "m_idfobj_gen"),
+        IdfObject = c("m_iddobj_gen", "m_idfobj_gen"),
+        IddObject = c("m_iddobj_gen", "m_idfobj_gen"),
+        Idd       = c("m_iddobj_gen")
+    )
+}
+# }}}
+
 # package level global constant
 .globals <- new.env(parent = emptyenv())
 .globals$eplus_config <- list()
 .globals$idd <- list()
+.globals$env_cloned <- list()
+.globals$is_env_cloned <- list()
+.globals$is_gen_cloned <- list()
+.globals$is_env_assigned <- list()
+
+# reset_clone_indicator {{{
+reset_clone_indicator <- function () {
+    for (type in c("Idf", "Idd", "IddObject", "IdfObject")) {
+        env <- name_env_shared(type)
+        gen <- name_gen_shared(type)
+
+        .globals$env_cloned[[type]] <- list()
+        .globals$is_env_cloned[[type]] <- list()
+        .globals$is_env_assigned[[type]] <- list()
+        .globals$is_gen_cloned[[type]] <- list()
+
+        for (nm in env) {
+            .globals$env_cloned[[type]][[nm]] <- NULL
+            .globals$is_env_cloned[[type]][[nm]] <- FALSE
+            .globals$is_env_assigned[[type]][[nm]] <- FALSE
+        }
+
+        for (nm in gen) {
+            .globals$is_gen_cloned[[type]][[nm]] <- FALSE
+        }
+    }
+}
+# }}}
+
+reset_clone_indicator()
 
 # package level mutable global options
 .options <- new.env(parent = emptyenv())

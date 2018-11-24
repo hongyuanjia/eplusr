@@ -528,7 +528,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
         m_class_id = NULL,
 
         # self reference
-        m_iddobj_generator = NULL
+        m_iddobj_gen = NULL
         # }}}
     )
 )
