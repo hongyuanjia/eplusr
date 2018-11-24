@@ -273,7 +273,7 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             private$m_epw,
 
         apply_measure = function (measure, ..., .names = NULL)
-            i_param_apply_measure(self, private, measure, ..., .names = NULL),
+            i_param_apply_measure(self, private, measure, ..., .names = .names),
 
         run = function (dir = NULL, wait = TRUE)
             i_param_run(self, private, dir, wait),
@@ -444,8 +444,8 @@ i_param_job_from_which <- function (self, private, which) {
 
     if (not_empty(job[exit_status != 0L])) {
         unsuccessful <- job[exit_status != 0L]
-        msg <- incomplete[, sim_status("UNSUCCESSFUL", index, idf, epw)]
-        stop("Some of jobs completed unsuccessfully\n:", paste0(msg, collpase = "\n"),
+        msg <- unsuccessful[, sim_status("UNSUCCESSFUL", index, idf, epw)]
+        stop("Some of jobs completed unsuccessfully:\n", paste0(msg, collpase = "\n"),
             call. = FALSE
         )
     }
