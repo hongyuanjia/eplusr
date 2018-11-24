@@ -43,6 +43,7 @@ format_output <- function (value_tbl, comment_tbl, ...) {
     dots <- list(...)
     header <- dots$header %||% TRUE
     sav_fmt <- dots$format %||% eplusr_option("save_format")
+    if (sav_fmt == "asis") sav_fmt <- "sorted"
     leading <- dots$leading %||% 4L
     in_ip <- dots$in_ip %||% eplusr_option("view_in_ip")
     sep_at <- dots$sep_at %||% 29L
