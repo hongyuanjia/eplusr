@@ -40,3 +40,12 @@
 
 * Add external file dependency (e.g. file existance in `Schedule:File` class)
   checking in `$validate()`.
+
+* Ignore warning in read_idf when reading ddy file
+
+* Add objects directly from clipboard contents created using "Copy" and "Copy
+    for speedsheet" in IDFEditor
+
+* Add function to reorder objects in a class
+
+* Add a `class` parameter to `$ref_by_object()` in `IdfObject` class
