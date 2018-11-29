@@ -6,3 +6,5 @@
 try.R
 docs/*
 inst/doc
+
+R/sysdata\.rda

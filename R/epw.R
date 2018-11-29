@@ -1214,3 +1214,117 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
     res
 }
 # }}}
+
+#' Download EnergyPlus Weather File (EPW) and Design Day File (DDY)
+#'
+#' `download_weather()` makes it easy to download EnergyPlus weather files (EPW)
+#' and design day files (DDY). Basically, it 
+#'
+#' @param pattern A regular expression used to search locations, e.g. `"los
+#' angeles.*tmy3"`.
+#' @param filename File names (without extension) used to save downloaded files.
+#' @param dir Directory to save downloaded files
+#' @param type File type to download. Should be one of `"all"`, `"epw"` and
+#' `"ddy"`. If `"all"`, both weather files and design day files will be
+#' downloaded.
+#' @param ask If `TRUE`, a command line menu will be shown to let you select
+#' which one to download.
+#' @param max_match The max results allowed to download when `ask` is `FALSE`.
+#' @return A character vector containing paths of downloaded files.
+#' @examples
+#' \dontrun{
+#' download_weather("los angeles.*tmy3", "la")
+#' }
+#' @author Hongyuan Jia
+# download_weather {{{
+download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy"),
+                              ask = TRUE, max_match = 3) {
+    pattern <- gsub("\\s+", ".", pattern)
+    d <- data.table::setDT(weather_db)
+    res <- d[stringr::str_detect(title, stringr::regex(pattern, ignore_case = TRUE))]
+
+    mes_location <- function (index = NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude) {
+        if (!is.null(index)) {
+            h <- cli::rule(paste0("[", index, "] ", title))
+        } else {
+            h <- cli::rule(paste0(title))
+        }
+        country <- if (is.na(country)) NULL else paste0(" * Country: ", country)
+        state_province <- if (is.na(state_province)) NULL else paste0(" * State or Province: ", state_province)
+        location <- if (is.na(location)) NULL else paste0(" * Location: ", location)
+        wmo_number <- if (is.na(wmo_number)) NULL else paste0(" * WMO number: ", wmo_number)
+        source_type <- if (is.na(source_type)) NULL else paste0(" * Source type: ", source_type)
+        longitude <- paste0(" * Longitude: ", longitude)
+        latitude <- paste0(" * Latitude: ", latitude)
+        paste(h, country, state_province, location, wmo_number, source_type, longitude, latitude,
+            sep = "\n"
+        )
+    }
+
+    res[, index := .I]
+
+    if (!nrow(res)) {
+        message("No matched result found.")
+        return(invisible(NULL))
+    }
+
+    if (nrow(res) > 1L) {
+        m <- res[, mes_location(index, title, country, state_province, location, wmo_number, source_type, longitude, latitude), by = index]$V1
+        if (ask) {
+            h <- paste0(nrow(res), " matched results found. Please select which one to download:")
+            ch <- c(res$title, "All")
+            r <- menu(ch, title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
+            if (r == 0) return(invisible(NULL))
+            if (r < length(ch)) res <- res[index == r]
+        } else {
+            if (nrow(res) <= max_match) {
+                message(nrow(res), " matched results found. All of them will be downloaded:\n",
+                    paste0(m, collapse = "\n\n")
+                )
+            } else {
+                stop(nrow(res), " matched results found which exceeds current ",
+                    "max allowed match number (", max_match, "). Please modify your search string.\n\n",
+                    paste0("[", res$index, "] ", res$title, collapse = "\n"), call. = FALSE
+                )
+            }
+        }
+    } else {
+        m <- res[, mes_location(NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude), by = index]$V1
+        if (ask) {
+            h <- paste0("One matched result found. Please confirm to start downloading:")
+            r <- menu(c("Yes", "No"), title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
+            if (r != 1) return(invisible(NULL))
+        } else {
+            h <- paste0("One matched results found. Start downloading:")
+            message("One matched results found. Start downloading:\n",
+                paste0(m, collapse = "\n\n")
+            )
+        }
+    }
+
+    type <- match.arg(type)
+    if (!dir.exists(dir)) dir.create(dir)
+    if (is.null(filename)) {
+        res[, `:=`(epw_name = basename(epw_url), ddy_name = basename(ddy_url))]
+    } else {
+        res[, `:=`(epw_name = paste0(filename, ".epw"), ddy_name = paste0(filename, ".ddy"))]
+    }
+
+    res[, `:=`(
+        epw_path = normalizePath(file.path(dir, epw_name), mustWork = FALSE),
+        ddy_path = normalizePath(file.path(dir, ddy_name), mustWork = FALSE))
+    ]
+
+    if (type == "all") {
+        download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
+        download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        c(res$epw_path, res$ddy_path)
+    } else if (type == "ddy") {
+        download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        res$ddy_path
+    } else {
+        download.file(res$epw_url, res$epw_path, method = "libcurl")
+        res$epw_path
+    }
+}
+# }}}
