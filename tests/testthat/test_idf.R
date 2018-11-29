@@ -568,7 +568,8 @@ test_that("Idf class", {
     # can get idf in string format
     idf_string <- c(
         "!-Generator eplusr",
-        "!-Option",
+        "!-Option OriginalOrderTop",
+        "",
         "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
         "!-      Use '!' comments if they need to be retained when using the IDFEditor.",
         "",
@@ -581,7 +582,7 @@ test_that("Idf class", {
         ""
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
-    expect_equal(idf_1$string(), idf_string)
+    expect_equal(idf_1$string(format = "new_top"), idf_string)
 
     # can validate
     expect_is(idf$validate(), "IdfValidity")
