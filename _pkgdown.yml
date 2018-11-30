@@ -15,10 +15,11 @@ reference:
       - IdfObject
       - read_idf
   - title: EPW
-    desc: Read, modify an EnergyPlus Weather (EPW)
+    desc: Download, read and modify an EnergyPlus Weather (EPW)
     contents:
       - Epw
       - read_epw
+      - download_weather
   - title: Configure EnergyPlus
     contents:
       - install_eplus
