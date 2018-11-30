@@ -1221,14 +1221,16 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
 #' and design day files (DDY). Basically, it 
 #'
 #' @param pattern A regular expression used to search locations, e.g. `"los
-#' angeles.*tmy3"`.
+#'     angeles.*tmy3"`. The search is case-insensitive.
 #' @param filename File names (without extension) used to save downloaded files.
+#'     Internally, [make.unique()] is called to ensure unique names.
 #' @param dir Directory to save downloaded files
 #' @param type File type to download. Should be one of `"all"`, `"epw"` and
-#' `"ddy"`. If `"all"`, both weather files and design day files will be
-#' downloaded.
+#'     `"ddy"`. If `"all"`, both weather files and design day files will be
+#'     downloaded.
 #' @param ask If `TRUE`, a command line menu will be shown to let you select
-#' which one to download.
+#'     which one to download. If `FALSE` and the number of returned results is
+#'     less than `max_match`, files are downloaded automatically without asking.
 #' @param max_match The max results allowed to download when `ask` is `FALSE`.
 #' @return A character vector containing paths of downloaded files.
 #' @examples
@@ -1307,7 +1309,10 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     if (is.null(filename)) {
         res[, `:=`(epw_name = basename(epw_url), ddy_name = basename(ddy_url))]
     } else {
-        res[, `:=`(epw_name = paste0(filename, ".epw"), ddy_name = paste0(filename, ".ddy"))]
+        res[, `:=`(
+            epw_name = make.unique(paste0(filename, ".epw"), sep = "_"),
+            ddy_name = make.unique(paste0(filename, ".ddy"), sep = "_")
+        )]
     }
 
     res[, `:=`(
@@ -1323,7 +1328,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
         download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
         res$ddy_path
     } else {
-        download.file(res$epw_url, res$epw_path, method = "libcurl")
+        download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
         res$epw_path
     }
 }
