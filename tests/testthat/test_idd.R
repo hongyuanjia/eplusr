@@ -70,7 +70,6 @@ test_that("can read IDD", {
     expect_true(is_avail_idd("8.5.0"))
 
     expect_message(use_idd(8.7, download = "auto"))
-    expect_true(file.exists(file.path(tempdir(), "V8-7-0-Energy+.idd")))
     expect_equal(avail_idd(), c("8.5.0", "8.7.0"))
 
     expect_message(use_idd(idd_text))

@@ -1,6 +1,6 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program 'EnergyPlus'
-Version: 0.9.3.9000
+Version: 0.9.4
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
@@ -11,7 +11,7 @@ Description: A rich toolkit of using the whole building simulation program
     'EnergyPlus'(<https://energyplus.net>), which enables programmatic
     navigation, modification of 'EnergyPlus' models and makes it less painful to
     do parametric simulations and analysis.
-License: GPL-3
+License: MIT + file LICENSE
 URL: https://hongyuanjia.github.io/eplusr, https://github.com/hongyuanjia/eplusr
 BugReports: https://github.com/hongyuanjia/eplusr/issues
 Depends:
@@ -43,7 +43,7 @@ Encoding: UTF-8
 LazyData: true
 SystemRequirements: EnergyPlus (>= 8.3, optional) (<https://energyplus.net>)
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Collate:
     'constants.R'
     'utils.R'

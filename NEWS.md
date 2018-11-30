@@ -1,3 +1,45 @@
+# eplusr 0.9.4
+
+## New features
+
+* Now you can directly download EnergyPus Weather File (.epw) and Design Day
+  File (.ddy) using new function `download_weather()`. It takes a regular
+  expression as input, searches through EnergyPlus weather data base (stored
+  in this package), download corresponding files and return the saved paths.
+  Below are some examples:
+  - Search locations that contains string `"los angeles"` and `"tmy"`, return a
+    menu to select which one(s) to download. Once selected, download both
+    corresponding weather file(s) and design day file(s):
+    ```r
+    download_weather("los angeles.*tmy", type = "all", ask = TRUE)
+    ```
+  - Same as above, expect that all files will be renamed to `la.epw(ddy)`,
+    `la_1.epw(ddy)`, `la_2.epw(ddy)`:
+    ```r
+    download_weather("los angeles.*tmy", filename = "la", type = "all", ask = TRUE)
+    ```
+  - Search locations that contains string `"beijing"` and `"cswd"`. If no more
+    than 3 results found, directly download all weather files and save them to
+    temperory directory.
+    ```r
+    download_weather("beijing.*cswd", dir = tempdir(), type = "epw", ask = FALSE, max_match = 3)
+    ```
+
+## Minor changes
+
+* Now `clean_wd()` is run before every call to EnergyPlus.
+
+## Bug fixes
+
+* `$clone()` method has been refactored for `Idf` and `Idd` class. This fix the
+  issue that internal shared environments were not cloned in version 0.9.3.
+
+* Fix the error that `$save()` and `$string()` in `Idf` class did not respect
+  `format` argument.
+
+* Fix the error that `$apply_measure()` in `ParametricJob` class did not
+  respect `.names` argument.
+
 # eplusr 0.9.3
 
 ## New features

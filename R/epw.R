@@ -1275,7 +1275,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
         if (ask) {
             h <- paste0(nrow(res), " matched results found. Please select which one to download:")
             ch <- c(res$title, "All")
-            r <- menu(ch, title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
+            r <- utils::menu(ch, title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
             if (r == 0) return(invisible(NULL))
             if (r < length(ch)) res <- res[index == r]
         } else {
@@ -1294,7 +1294,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
         m <- res[, mes_location(NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude), by = index]$V1
         if (ask) {
             h <- paste0("One matched result found. Please confirm to start downloading:")
-            r <- menu(c("Yes", "No"), title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
+            r <- utils::menu(c("Yes", "No"), title = paste0(h, "\n\n", paste(m, collapse = "\n\n")))
             if (r != 1) return(invisible(NULL))
         } else {
             h <- paste0("One matched results found. Start downloading:")
@@ -1321,14 +1321,14 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     ]
 
     if (type == "all") {
-        download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
-        download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        utils::download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
+        utils::download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
         c(res$epw_path, res$ddy_path)
     } else if (type == "ddy") {
-        download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        utils::download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
         res$ddy_path
     } else {
-        download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
+        utils::download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
         res$epw_path
     }
 }
