@@ -1243,7 +1243,7 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
 download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy"),
                               ask = TRUE, max_match = 3) {
     pattern <- gsub("\\s+", ".", pattern)
-    d <- data.table::setDT(weather_db)
+    d <- data.table::as.data.table(weather_db)
     res <- d[stringr::str_detect(title, stringr::regex(pattern, ignore_case = TRUE))]
 
     mes_location <- function (index = NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude) {
