@@ -1238,6 +1238,7 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
 #' download_weather("los angeles.*tmy3", "la")
 #' }
 #' @author Hongyuan Jia
+#' @export
 # download_weather {{{
 download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy"),
                               ask = TRUE, max_match = 3) {
