@@ -592,11 +592,27 @@ install_eplus(ver = 8.9)
 
 Sometimes, before simulation, it may be useful to retrieve weather data from
 EnergyPlus Weather (EPW) file and conduct analysis on the weather. eplusr
-provides `read_epw()` to let you read an EPW file and `Epw` class to query and
-modify weather data.
+provides `download_weather()` to search and download EPW files, `read_epw()`
+to read EPW files and `Epw` class to query and modify weather data.
+
+`download_weather()`You can search weather locations using an 
+
+`download_weather()` takes a regular expression as input, searches through
+EnergyPlus weather data base (stored in this package), download corresponding
+EPW and/or DDY files and return the saved paths.
+
+Let's download San Francisco weather data in TMY3 format, save it with name 
+`"San_Francisco.epw"` in temperory directory.
+
+```{r epw-download}
+epw_sf <- download_weather("san francisco.*tmy3", filename = "San_Francisco",
+    dir = tempdir(), type = "epw", ask = FALSE)
+```
+
+After downloading EPW file, we can read it using `read_epw()`.
 
 ```{r epw}
-epw_sf <- read_epw("San_Francisco.epw")
+epw_sf <- read_epw(epw_sf)
 epw_sf
 ```
 
