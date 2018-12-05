@@ -106,6 +106,7 @@ on_failure(is_count) <- function(call, env) {
 # are_count {{{
 are_count <- function (x) {
     if (!is_integerish(x)) return(FALSE)
+    if (anyNA(x)) return(FALSE)
     all(x > 0)
 }
 on_failure(are_count) <- function(call, env) {
@@ -135,7 +136,8 @@ on_failure(is_scalar) <- function(call, env) {
 # is_integerish {{{
 is_integerish <- function(x) {
     # is.integer(x) || (is.numeric(x) && all(x == as.integer(x)))
-    if (!is.numeric(x)) return (FALSE)
+    if (!is.numeric(x)) return(FALSE)
+    if (is.integer(x)) return(TRUE)
     all(abs(x - round(x)) < .Machine$double.eps^0.5)
 }
 on_failure(is_integerish) <- function(call, env) {
@@ -145,17 +147,23 @@ on_failure(is_integerish) <- function(call, env) {
 # are_integerish {{{
 are_integerish <- function(x) {
     if (!is.numeric(x)) return (rep(FALSE, length(x)))
+    if (is.integer(x)) return(rep(TRUE, length(x)))
     abs(x - round(x)) < .Machine$double.eps^0.5
 }
 # }}}
 # is_same_len {{{
 is_same_len <- function (x, y) {
-    length(x) == length(y)
+    x_len_fun <- ifelse(is.data.frame(x), nrow, length)
+    y_len_fun <- ifelse(is.data.frame(y), nrow, length)
+    x_len_fun(x) == y_len_fun(y)
 }
 on_failure(is_same_len) <- function (call, env) {
     paste0(surround(deparse(call$x)), " and ", surround(deparse(call$y)),
       " does not have the same length.")
 }
+# }}}
+# is_named {{{
+is_named <- function (x) !is.null(names(x))
 # }}}
 
 # has_name {{{

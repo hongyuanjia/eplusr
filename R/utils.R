@@ -181,13 +181,20 @@ underscore_name <- function (name, merge = TRUE) {
 }
 # }}}
 
+# cnd {{{
+cnd <- function (type = c("error", "warning", "message"), subclass, message, call = NULL, ...) {
+    type <- match.arg(type)
+    structure(
+        list(message = message, call = call, ...),
+        class = c(subclass, type, "condition")
+    )
+}
+# }}}
+
 # abort {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
 abort <- function (subclass, message, call = NULL, ...) {
-    err <- structure(
-        list(message = message, call = call, ...),
-        class = c(subclass, "error", "condition")
-    )
+    err <- cnd(type = "error", subclass =  subclass, message = message, call = call, ...)
     stop(err)
 }
 # }}}
@@ -195,10 +202,19 @@ abort <- function (subclass, message, call = NULL, ...) {
 # warn {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
 warn <- function (subclass, message, call = NULL, ...) {
-    w <- structure(
-        list(message = message, call = call, ...),
-        class = c(subclass, "warning", "condition")
-    )
+    w <- cnd(type = "warning", subclass =  subclass, message = message, call = call, ...)
     warning(w)
+}
+# }}}
+
+# names2 {{{
+names2 <- function (x, default = NA_character_) {
+    nm <- names(x)
+    if (is.null(nm)) {
+        return(rep(default, length(x)))
+    }
+
+    nm[stri_isempty(nm)] <- default
+    nm
 }
 # }}}
