@@ -61,15 +61,11 @@ parse_idd_file <- function(path) {
     dt_field <- dt$left
     dt_reference <- dt$reference
 
-    # extract field name table to speed up name matching
-    dt_name <- get_field_name_dt(dt_field)
-    setindexv(dt_name, "field_id")
-
     # set index
     setindexv(dt_class, "class_id")
     setindexv(dt_field, c("field_id", "class_id", "field_index"))
 
-    list(version = idd_version, build = idd_build, name = dt_name,
+    list(version = idd_version, build = idd_build,
         group = dt_group, class = dt_class, field = dt_field,
         reference = dt_reference
     )
@@ -78,7 +74,7 @@ parse_idd_file <- function(path) {
 
 # parse_idf_file {{{
 parse_idf_file <- function (path, idd_ver, idd_env) {
-    if (!has_names(idd_env, c("class", "field", "name", "reference")) || !is.environment(idd_env)) {
+    if (!has_names(idd_env, c("class", "field", "reference")) || !is.environment(idd_env)) {
         abort("error_bad_idd_env", "Invalid IDD input", idd = idd_env)
     }
 
@@ -765,12 +761,15 @@ parse_class_property <- function (dt, ref) {
         num_extensible_group = (num_fields - first_extensible + 1L) %/% num_extensible
     )]
 
+    # add underscore class names
+    set(dt, NULL, "class_name_us", underscore_name(dt$class_name))
+
     nms <- c(
         "class_id", "class_name", "group_id", "format",
         "min_fields", "num_fields","last_required",
         "has_name", "required_object", "unique_object",
         "num_extensible", "first_extensible", "num_extensible_group",
-        "memo"
+        "memo", "class_name_us"
     )
 
     # only keep useful columns
@@ -818,6 +817,9 @@ parse_field_property <- function (dt, ref) {
     # parse field default
     dt <- parse_field_property_default(dt)
 
+    # add underscore name
+    set(dt, NULL, "field_name_us", underscore_name(dt$field_name))
+
     nms <- c(
         "field_id",
         "class_id", "class_name",
@@ -827,7 +829,7 @@ parse_field_property <- function (dt, ref) {
         "type", "type_enum",
         "autosizable", "autocalculatable", "default", "choice", "note",
         "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
-        "reference", "reference_class_name", "object_list"
+        "reference", "reference_class_name", "object_list", "field_name_us"
     )
 
     # only keep useful columns
@@ -1341,15 +1343,7 @@ get_value_table <- function (dt, idd) {
         "units", "ip_units", "is_name"
     )
 
-    fld <- t_field_data(idd$class, idd$field, idd$name, dt$class_id, dt$field_index,
-        cols = cols_add
-    )
-    idd$class <- attr(fld, "dt_class")
-    idd$field <- attr(fld, "dt_field")
-    idd$name <- attr(fld, "dt_name")
-    setattr(fld, "dt_class", NULL)
-    setattr(fld, "dt_field", NULL)
-    setattr(fld, "dt_name", NULL)
+    fld <- t_field_data(idd, dt$class_id, dt$field_index, cols = cols_add)
 
     ## bind columns
     dt <- cbind(dt, fld)
