@@ -1387,6 +1387,8 @@ convert_value_unit <- function (dt_value, from, to) {
 
     val <- dt_value[!is.na(value_num) & !is.na(units), list(value_id, value_num, units, ip_units)]
 
+    if (!nrow(val)) return(dt_value)
+
     val <- unit_conv_table[val, on = c(si_name = "units", ip_name = "ip_units")]
     set(val, NULL, c("si_name", "ip_name"), NULL)
     setnames(val, c("si_standard_name", "ip_standard_name"), c("si", "ip"))
