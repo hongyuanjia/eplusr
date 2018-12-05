@@ -665,9 +665,9 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     nest <- merge(i[, .SD, .SDcols = c(id)], nest, by = id, all = TRUE)
 
     # change empty character member in list to NULL
-    for (nm in setdiff(names(nest), c("field_id", "field_anid"))) {
-        set(nest, nest[["field_id"]][vapply(nest[["note"]], function (x) length(x) == 0L, logical(1L))],
-            "note", list(list(NULL))
+    for (nm in intersect(names(nest), keys$nest)) {
+        set(nest, nest[["field_id"]][vapply(nest[[nm]], function (x) length(x) == 0L, logical(1L))],
+            nm, list(list(NULL))
         )
     }
 
