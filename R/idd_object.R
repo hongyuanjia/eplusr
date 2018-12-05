@@ -50,6 +50,7 @@ NULL
 #' iddobj$is_autocalculatable_field(which = NULL)
 #' iddobj$is_numeric_field(which = NULL)
 #' iddobj$is_integer_field(which = NULL)
+#' iddobj$is_real_field(which = NULL)
 #' iddobj$is_required_field(which = NULL)
 #' iddobj$print()
 #' print(iddobj)
@@ -161,7 +162,7 @@ NULL
 #'     possible values collected from other object fields that those fields
 #'     reference.
 #'   * `$field_possible()`: returns all possible values for specified fields,
-#'      including auto-value (`autosize` and `autocalculate`), and results from 
+#'      including auto-value (`autosize` and `autocalculate`), and results from
 #'      `$field_default()`, `$field_range()`, `$field_choice()` and
 #'      `$field_reference()`. Underneath, it returns a data.table with custom
 #'      printing method.
@@ -190,9 +191,12 @@ NULL
 #' `$is_autocalculatable_field()` returns `TRUE` if the field can be assigned to
 #'     `autocalculate`.
 #'
-#' `$is_numeric_field()` returns `TRUE` if the field value should be numeric.
+#' `$is_numeric_field()` returns `TRUE` if the field value should be numeric (
+#'     an integer or a real number).
 #'
 #' `$is_integer_field()` returns `TRUE` if the field value should be an integer.
+#'
+#' `$is_real_field()` returns `TRUE` if the field value should be a real number.
 #'
 #' `$is_required_field()` returns `TRUE` if the field is required.
 #'
@@ -307,7 +311,7 @@ NULL
 #'
 #' # get field ranges
 #' mat$field_range(c("roughness", "thickness", "conductivity", "solar_absorptance"))
-#' 
+#'
 #' # get all possible values of fields
 #' \dontrun{mat$field_possible()}
 #'
@@ -395,125 +399,127 @@ IddObject <- R6::R6Class(classname = "IddObject",
 
         # CLASS PROPERTY GETTERS {{{
         group_name = function ()
-            i_from_group(self, private, private$m_class_id),
+            iddobj_group_name(self, private),
 
         group_index = function ()
-            i_group_index(self, private, self$group_name()),
+            iddobj_group_index(self, private),
 
         class_name = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$class_name,
+            iddobj_class_name(self, private),
 
         class_index = function ()
-            private$m_class_id,
+            iddobj_class_index(self, private),
 
         class_format = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$class_format,
+            iddobj_class_format(self, private),
 
         min_fields = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$min_fields,
+            iddobj_min_fields(self, private),
 
         num_fields = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$num_fields,
+            iddobj_num_fields(self, private),
 
         memo = function ()
-            i_class_memo_from_which(self, private, private$m_class_id),
+            iddobj_memo(self, private),
 
         num_extensible = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$num_extensible,
+            iddobj_num_extensible(self, private),
 
         first_extensible_index = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$first_extensible,
+            iddobj_first_extensible_index(self, private),
 
         extensible_group_num = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$num_extensible_group,
+            iddobj_extensible_group_num(self, private),
         # }}}
 
         # EXTENSIBLE GROUP {{{
         add_extensible_group = function (num = 1L)
-            i_add_extensible_group(self, private, private$m_class_id, num),
+            iddobj_add_extensible_group(self, private, num),
 
         del_extensible_group = function (num = 1L)
-            i_del_extensible_group(self, private, private$m_class_id, num),
+            iddobj_del_extensible_group(self, private, num),
         # }}}
 
         # CLASS PROPERTY ASSERTIONS {{{
         has_name = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$has_name,
+            iddobj_has_name(self, private),
 
         is_required = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$required_object,
+            iddobj_is_required(self, private),
 
         is_unique = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$unique_object,
+            iddobj_is_unique(self, private),
 
         is_extensible = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$num_extensible > 0,
+            iddobj_is_extensible(self, private),
         # }}}
 
         # FIELD PROPERTY GETTERS {{{
         field_name = function (index = NULL, lower = FALSE, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
-            i_field_name(self, private, private$m_class_id, index, lower, unit, in_ip),
+            iddobj_field_name(self, private, index, lower, unit, in_ip),
 
         field_index = function (name = NULL)
-            i_field_index(self, private, private$m_class_id, name),
+            iddobj_field_index(self, private, name),
 
         field_type = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type,
+            iddobj_field_type(self, private, which = which),
 
         field_note = function (which = NULL)
-            i_field_note(self, private, private$m_class_id, which = which),
+            iddobj_field_note(self, private, which),
 
         field_unit = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
-            i_field_unit(self, private, private$m_class_id, which = which, in_ip),
+            iddobj_field_unit(self, private, which, in_ip),
 
         field_default = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
-            i_field_default(self, private, private$m_class_id, which = which, in_ip = in_ip),
+            iddobj_field_default(self, private, which, in_ip),
 
         field_choice = function (which = NULL)
-            i_field_choice(self, private, private$m_class_id, which = which),
+            iddobj_field_choice(self, private, which),
 
-        # TODO: add IP range
         field_range = function (which = NULL)
-            i_field_range(self, private, private$m_class_id, which = which),
+            iddobj_field_range(self, private, which),
 
         field_reference = function (which = NULL)
-            i_field_reference(self, private, private$m_class_id, which = which),
+            iddobj_field_reference(self, private, which),
 
         field_possible = function (which = NULL)
-            i_field_possible(self, private, private$m_class_id, which = which),
+            iddobj_field_possible(self, private, which),
         # }}}
 
         # FIELD PROPERTY ASSERTIONS {{{
         is_valid_field_num = function (num)
-            i_is_valid_field_num(self, private, rep(private$m_class_id, times = length(num)), num),
+            iddobj_is_valid_field_num(self, private, num),
 
         is_extensible_index = function (index)
-            i_is_extensible_index(self, private, private$m_class_id, index),
+            iddobj_is_extensible_index(self, private, index),
 
-        is_valid_field_name = function (name)
-            i_is_valid_field_name(self, private, private$m_class_id, name),
+        is_valid_field_name = function (name, strict = FALSE)
+            iddobj_is_valid_field_name(self, private, name, strict),
 
         is_valid_field_index = function (index)
-            i_is_valid_field_index(self, private, private$m_class_id, index),
+            iddobj_is_valid_field_index(self, private, index),
 
         is_autosizable_field = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$autosizable,
+            iddobj_is_autosizable_field(self, private, which),
 
         is_autocalculatable_field = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$autocalculatable,
+            iddobj_is_autocalculatable_field(self, private, which),
 
         is_numeric_field = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type %in% c("integer", "real"),
+            iddobj_is_numeric_field(self, private, which),
+
+        is_real_field = function (which = NULL)
+            iddobj_is_real_field(self, private, which),
 
         is_integer_field = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$type == "integer",
+            iddobj_is_integer_field(self, private, which),
 
         is_required_field = function (which = NULL)
-            i_field_tbl_from_which(self, private, private$m_class_id, which = which)$required_field,
+            iddobj_is_required_field(self, private, which),
         # }}}
 
         print = function ()
-            i_print_iddobj(self, private)
+            iddobj_print(self, private)
     ),
 
     private = list(
@@ -532,4 +538,384 @@ IddObject <- R6::R6Class(classname = "IddObject",
         # }}}
     )
 )
+# }}}
+
+# iddobj_group_index {{{
+iddobj_group_index <- function (self, private) {
+    private$m_idd_tbl$class[class_id == private$m_class_id, group_id]
+}
+# }}}
+# iddobj_group_name {{{
+iddobj_group_name <- function (self, private) {
+    grp_id <- iddobj_group_index(self, private)
+    private$m_idd_tbl$group[J(grp_id), on = "group_id", group_name]
+}
+# }}}
+# iddobj_class_index {{{
+iddobj_class_index <- function (self, private) {
+    private$m_class_id
+}
+# }}}
+# iddobj_class_name {{{
+iddobj_class_name <- function (self, private) {
+    private$m_idd_tbl$class[J(private$m_class_id), on = "class_id", class_name]
+}
+# }}}
+# iddobj_class_data {{{
+iddobj_class_data <- function (self, private) {
+    private$m_idd_tbl$class[class_id == private$m_class_id]
+}
+# }}}
+# iddobj_class_format {{{
+iddobj_class_format <- function (self, private) {
+    iddobj_class_data(self, private)$format
+}
+# }}}
+# iddobj_min_fields {{{
+iddobj_min_fields <- function (self, private) {
+    iddobj_class_data(self, private)$min_fields
+}
+# }}}
+# iddobj_num_fields {{{
+iddobj_num_fields <- function (self, private) {
+    iddobj_class_data(self, private)$num_fields
+}
+# }}}
+# iddobj_memo {{{
+iddobj_memo <- function (self, private) {
+    iddobj_class_data(self, private)$memo[[1L]]
+}
+# }}}
+# iddobj_num_extensible {{{
+iddobj_num_extensible <- function (self, private) {
+    iddobj_class_data(self, private)$num_extensible
+}
+# }}}
+# iddobj_first_extensible_index {{{
+iddobj_first_extensible_index <- function (self, private) {
+    iddobj_class_data(self, private)$first_extensible
+}
+# }}}
+# iddobj_extensible_group_num {{{
+iddobj_extensible_group_num <- function (self, private) {
+    iddobj_class_data(self, private)$num_extensible_group
+}
+# }}}
+# iddobj_add_extensible_group {{{
+iddobj_add_extensible_group <- function (self, private, num) {
+    assert_that(is_count(num))
+
+    private$m_idd_tbl <- t_add_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
+
+    verbose_info(num, " extensible group(s) added")
+
+    self
+}
+# }}}
+# iddobj_del_extensible_group {{{
+iddobj_del_extensible_group <- function (self, private, num) {
+    assert_that(is_count(num))
+
+    private$m_idd_tbl <- t_del_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
+
+    verbose_info(num, " extensible group(s) deleted")
+
+    self
+}
+# }}}
+# iddobj_has_name {{{
+iddobj_has_name <- function (self, private) {
+    iddobj_class_data(self, private)$has_name
+}
+# }}}
+# iddobj_is_required {{{
+iddobj_is_required <- function (self, private) {
+    iddobj_class_data(self, private)$required_object
+}
+# }}}
+# iddobj_is_unique {{{
+iddobj_is_unique <- function (self, private) {
+    iddobj_class_data(self, private)$unique_object
+}
+# }}}
+# iddobj_is_extensible {{{
+iddobj_is_extensible <- function (self, private) {
+    iddobj_class_data(self, private)$num_extensible > 0L
+}
+# }}}
+# iddobj_field_data {{{
+iddobj_field_data <- function (self, private, which = NULL, cols = NULL, min = FALSE, no_ext = TRUE) {
+    t_field_data(private$m_idd_tbl, private$m_class_id, which, cols, min, no_ext)
+}
+# }}}
+# iddobj_field_name {{{
+iddobj_field_name <- function (self, private, index = NULL, lower = FALSE,
+                               unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
+    fld <- iddobj_field_data(self, private, index, c("field_name", "full_name", "full_ipname"))
+
+    if (unit) {
+        if (in_ip)
+            res <- fld$full_ipname
+        else
+            res <- fld$full_name
+    } else {
+        res <- fld$field_name
+    }
+
+    if (lower)
+        lower_name(res)
+    else
+        res
+}
+# }}}
+# iddobj_field_index {{{
+iddobj_field_index <- function (self, private, name = NULL) {
+    iddobj_field_data(self, private, name, "field_index")$field_index
+}
+# }}}
+# iddobj_field_type {{{
+iddobj_field_type <- function (self, private, which = NULL) {
+    iddobj_field_data(self, private, which, "type")$type
+}
+# }}}
+# iddobj_field_note {{{
+iddobj_field_note <- function (self, private, which = NULL) {
+    iddobj_field_data(self, private, which, "note")$note
+}
+# }}}
+# iddobj_field_unit {{{
+iddobj_field_unit <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+    fld <- iddobj_field_data(self, private, which, c("units", "ip_units"))
+
+    if (in_ip) {
+        fld$ip_units
+    } else {
+        fld$units
+    }
+}
+# }}}
+# iddobj_field_default {{{
+iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+    fld <- iddobj_field_data(self, private, which,
+        c("field_id", "type_enum", "default", "units", "ip_units")
+    )
+
+    unit_to <- ifelse(in_ip, "ip", "si")
+    fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
+
+    fld$default
+}
+# }}}
+# iddobj_field_choice {{{
+iddobj_field_choice <- function (self, private, which = NULL) {
+    iddobj_field_data(self, private, which, "choice")$choice
+}
+# }}}
+# iddobj_field_range {{{
+iddobj_field_range <- function (self, private, which = NULL) {
+    fld <- iddobj_field_data(self, private, which,
+        c("field_id", "minimum", "lower_incbounds", "maximum", "upper_incbounds")
+    )
+
+    fld[, `:=`(range = list(make_field_range(minimum, lower_incbounds, maximum, upper_incbounds))), by = field_id]
+
+    fld$range
+}
+# }}}
+# iddobj_field_reference {{{
+iddobj_field_reference <- function (self, private, which = NULL) {
+    if (is.null(private$m_idf_tbl)) {
+        mes <- paste0("Function can only be used in IddObjects that are created ",
+            "inside an Idf or IdfObject using `$definition()`.")
+        abort("error_field_reference", mes, class_id = private$m_class_id)
+    }
+
+    fld <- iddobj_field_data(self, private, which, c("field_id", "type_enum"))
+
+    t_field_reference(fld, private$m_idd_tbl$reference, private$m_idf_tbl$value)$src_value
+}
+# }}}
+# iddobj_field_possible {{{
+iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+    if (is.null(private$m_idf_tbl)) {
+        mes <- paste0("Function can only be used in IddObjects that are created ",
+            "inside an Idf or IdfObject using `$definition()`.")
+        abort("error_field_possible", mes, class_id = private$m_class_id)
+    }
+
+    fld <- iddobj_field_data(self, private, which,
+        c("class_id", "class_name", "field_index",
+          "field_id", "type_enum",
+          "autosizable", "autocalculatable",
+          "default", "units", "ip_units",
+          "minimum", "lower_incbounds", "maximum", "upper_incbounds")
+    )
+
+    # auto fields
+    set(fld, NULL, "auto", NA_character_)
+    fld[autosizable == TRUE, `:=`(auto = "Autosize")]
+    fld[autocalculatable == TRUE, `:=`(auto = "Autocalculate")]
+
+    # default
+    unit_to <- ifelse(in_ip, "ip", "si")
+    fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
+
+    # range
+    fld[, `:=`(range = make_field_range(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
+
+    # reference
+    fld <- t_field_reference(fld, private$m_idd_tbl_reference, private$m_idf_tbl$value)
+
+    res <- fld[, list(class_id, class_name, field_index, field_name, auto, default, choice, range, reference = src_value)]
+
+    data.table::setattr(res, "class", c("IddFieldPossible", class(res)))
+    res
+}
+# }}}
+# iddobj_is_valid_field_num {{{
+iddobj_is_valid_field_num <- function (self, private, num) {
+    assert_that(are_count(num))
+
+    cls <- iddobj_class_data(self, private)
+
+    !(
+        # it should be FALSE when num is
+        # 1. less than min-fields OR
+        cls$min_fields > num |
+        # 2. larger than num-fields but not extensible OR
+        (cls$num_extensible == 0L & num > cls$num_fields) |
+        # 3. larger than num-fields and is extensible but not have full
+        #    extensible groups
+        (cls$num_extensible >  0L &
+            ((num - cls$num_fields) %% cls$num_extensible) != 0L
+        )
+    )
+}
+# }}}
+# iddobj_is_extensible_index {{{
+iddobj_is_extensible_index <- function (self, private, index) {
+    assert_that(are_count(index))
+
+    cls <- iddobj_class_data(self, private)
+
+    if (!cls$num_extensible) return(rep(FALSE, length(index)))
+
+    index >= cls$first_extensible
+}
+# }}}
+# iddobj_is_valid_field_name {{{
+iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
+    fld <- iddobj_field_data(self, private, cols = "field_name")
+
+    if (isTRUE(strict)) {
+        name %in% fld$field_name
+    } else {
+        name %in% fld$field_name | name %in% lower_name(fld$field_name)
+    }
+}
+# }}}
+# iddobj_is_valid_field_index {{{
+iddobj_is_valid_field_index <- function (self, private, index) {
+    assert_that(are_count(index))
+    index <= iddobj_class_data(self, private)$num_fields
+}
+# }}}
+# iddobj_is_autosizable_field {{{
+iddobj_is_autosizable_field <- function (self, private, which) {
+    iddobj_field_data(self, private, which, "autosizable")$autosizable
+}
+# }}}
+# iddobj_is_autocalculatable_field {{{
+iddobj_is_autocalculatable_field <- function (self, private, which) {
+    iddobj_field_data(self, private, which, "autocalculatable")$autocalculatable
+}
+# }}}
+# iddobj_is_numeric_field {{{
+iddobj_is_numeric_field <- function (self, private, which) {
+    iddobj_field_type(self, private, which) %in% c("integer", "real")
+}
+# }}}
+# iddobj_is_integer_field {{{
+iddobj_is_integer_field <- function (self, private, which) {
+    iddobj_field_type(self, private, which) == "integer"
+}
+# }}}
+# iddobj_is_real_field {{{
+iddobj_is_real_field <- function (self, private, which) {
+    iddobj_field_type(self, private, which) == "real"
+}
+# }}}
+# iddobj_is_required_field {{{
+iddobj_is_required_field <- function (self, private, which) {
+    iddobj_field_data(self, private, which, "required_field")$required_field
+}
+# }}}
+# iddobj_print {{{
+iddobj_print <- function (self, private) {
+    # CLASS {{{
+    cls <- iddobj_class_data(self, private)
+    cli::cat_line(crayon::bold$underline(paste0(
+            "IddObject <<Class: ", surround(cls$class_name), ">>")),
+        col = "inverse")
+
+    # memo {{{
+    cli::cat_rule(center = crayon::bold("* MEMO *"), col = "green")
+    if (is.null(cls$memo)) {
+        cli::cat_line("  ", crayon::italic("<No Memo>"), col = "cyan")
+    } else {
+        cli::cat_line("  \"", crayon::italic(paste0(cls$memo[[1L]], collapse = "\n")), "\"", col = "cyan")
+    }
+    # }}}
+
+    # property {{{
+    cli::cat_rule(center = crayon::bold("* PROPERTIES *"), col = "green")
+
+    grp <- private$m_idd_tbl$group[J(cls$group_id), on = "group_id", group_name]
+    cli::cat_line("   ", cli::symbol$bullet, " ", c(
+        paste0(crayon::bold("Group: "), surround(grp)),
+        paste0(crayon::bold("Unique: "), cls$unique_object),
+        paste0(crayon::bold("Required: "), cls$required_object),
+        paste0(crayon::bold("Total fields: "), cls$num_fields)
+    ), col = "cyan")
+    # }}}
+    # }}}
+
+    # FIELD {{{
+    cli::cat_rule(center = crayon::bold("* FIELDS *"), col = "green")
+
+    # calculate number of fields to print
+    if (cls$num_extensible) {
+        cls[, `:=`(last_extensible = first_extensible + num_extensible - 1L)]
+        cls[, `:=`(num_print = max(last_required, last_extensible))]
+    } else {
+        cls[, `:=`(num_print = num_fields, last_extensible = 0L)]
+    }
+
+    col_nm <- ifelse(eplusr_option("view_in_ip"), "full_ipname", "full_name")
+    fld <- iddobj_field_data(self, private, seq_len(cls$num_print),
+        c("field_index", "required_field", "extensible_group", col_nm)
+    )
+    setnames(fld, col_nm, "full_name")
+
+    fld[, `:=`(idx = lpad(field_index), ext = "")]
+
+    fld[extensible_group > 0L,
+        `:=`(ext = crayon::bold$yellow(paste0(" <", cli::symbol$arrow_down, ">")))]
+
+    fld[required_field == TRUE, `:=`(
+        idx = crayon::red$bold(idx),
+        req = crayon::red$bold(cli::symbol$bullet),
+        full_name = crayon::red$bold(full_name)
+    )]
+    fld[required_field == FALSE, `:=`(
+        idx = crayon::cyan(idx),
+        req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet))),
+        full_name = crayon::cyan(full_name)
+    )]
+    fld[, cli::cat_line("  ", req, idx, ": ", full_name, ext)]
+
+    if (cls$num_extensible) cli::cat_line("  ......", col = "cyan")
+    cli::cat_rule(col = "green")
+    # }}}
+}
 # }}}
