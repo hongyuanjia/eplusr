@@ -192,54 +192,54 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 
         # PROPERTY GETTERS {{{
         version = function ()
-            i_version(self, private),
+            idd_version(self, private),
 
         build = function ()
-            i_build(self, private),
+            idd_build(self, private),
 
         group_name = function ()
-            i_group_name(self, private, type = "idd"),
+            idd_group_name(self, private),
 
         from_group = function (class)
-            i_from_group(self, private, class = class),
+            idd_from_group(self, private, class),
 
-        class_name = function ()
-            i_class_name(self, private, type = "idd"),
+        class_name = function (index = NULL)
+            idd_class_name(self, private, index = index),
 
         required_class_name = function ()
-            i_required_class_name(self, private),
+            idd_required_class_name(self, private),
 
         unique_class_name = function ()
-            i_unique_class_name(self, private),
+            idd_unique_class_name(self, private),
 
         extensible_class_name = function ()
-            i_extensible_class_name(self, private),
+            idd_extensible_class_name(self, private),
 
         group_index = function (group = NULL)
-            i_group_index(self, private, group = group),
+            idd_group_index(self, private, group),
 
         class_index = function (class = NULL)
-            i_class_index(self, private, name = class, type = "idd"),
+            idd_class_index(self, private, class),
         # }}}
 
         # OBJECT GETTERS {{{
         object = function (class)
-            i_iddobject(self, private, class = class),
+            idd_object(self, private, class = class),
 
         object_in_group = function (group)
-            i_iddobject_in_group(self, private, group = group),
+            idd_object_in_group(self, private, group = group),
         # }}}
 
         # ASSERTIONS {{{
         is_valid_group = function (group)
-            i_is_valid_group_name(self, private, group = group),
+            idd_is_valid_group_name(self, private, group),
 
         is_valid_class = function (class)
-            i_is_valid_class_name(self, private, name = class, type = "idd"),
+            idd_is_valid_class_name(self, private, class),
         # }}}
 
         print = function ()
-            i_print_idd(self, private)
+            idd_print(self, private)
     ),
 
     private = list(
@@ -254,29 +254,119 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 )
 # }}}
 
+# idd_version {{{
+idd_version <- function (self, private) {
+    private$m_version
+}
+# }}}
+# idd_build {{{
+idd_build <- function (self, private) {
+    private$m_build
+}
+# }}}
+# idd_group_name {{{
+idd_group_name <- function (self, private) {
+    t_group_name(private$m_idd_tbl$class, private$m_idd_tbl$group)
+}
+# }}}
+# idd_from_group {{{
+idd_from_group <- function (self, private, class) {
+    t_group_name(private$m_idd_tbl$class, private$m_idd_tbl$group, class)
+}
+# }}}
+# idd_group_index {{{
+idd_group_index <- function (self, private, group) {
+    t_group_index(private$m_idd_tbl$group, group)
+}
+# }}}
+# idd_class_name {{{
+idd_class_name <- function (self, private, index = NULL) {
+    t_class_data(private$m_idd_tbl$class, index)$class_name
+}
+# }}}
+# idd_class_index {{{
+idd_class_index <- function (self, private, class) {
+    t_class_data(private$m_idd_tbl$class, class)$class_id
+}
+# }}}
+# idd_required_class_name {{{
+idd_required_class_name <- function (self, private) {
+    t_class_name_required(private$m_idd_tbl$class)
+}
+# }}}
+# idd_unique_class_name {{{
+idd_unique_class_name <- function (self, private) {
+    t_class_name_unique(private$m_idd_tbl$class)
+}
+# }}}
+# idd_extensible_class_name {{{
+idd_extensible_class_name <- function (self, private) {
+    t_class_name_extensible(private$m_idd_tbl$class)
+}
+# }}}
+# idd_is_valid_group_name {{{
+idd_is_valid_group_name <- function (self, private, group) {
+    group %in% private$m_idd_tbl$group$group_name
+}
+# }}}
+# idd_is_valid_class_name {{{
+idd_is_valid_class_name <- function (self, private, class) {
+    class %in% private$m_idd_tbl$class$class_name
+}
+# }}}
+# idd_object {{{
+idd_object <- function (self, private, class) {
+    res <- lapply(class, private$m_iddobj_generator$new)
+    setattr(res, "names", class)
+    res
+}
+# }}}
+# idd_object_in_group {{{
+idd_object_in_group <- function (self, private, group) {
+    assert_that(is_string(group))
+
+    grp_id <- idd_group_index(self, private, group)
+
+    cls <- private$m_idd_tbl$class[J(grp_id), on = "group_id", class_name]
+
+    res <- lapply(cls, private$m_iddobj_generator$new)
+    setattr(res, "names", cls)
+    res
+}
+# }}}
+# idd_print {{{
+idd_print <- function (self, private) {
+    cli::cat_rule(crayon::bold("EnergyPlus Input Data Dictionary"), col = "green")
+    cli::cat_bullet(c(
+        paste0(crayon::bold("Version"), ": ", surround(private$m_version)),
+        paste0(crayon::bold("Build"), ": ", surround(private$m_build)),
+        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_tbl$class))
+    ), col = "cyan", bullet_col = "cyan")
+}
+# }}}
+
 #' @export
-# [[.Idd {{{
-'[[.Idd' <- function(x, i) {
+# [.Idd {{{
+'[.Idd' <- function(x, i) {
     if (is_string(i)) {
         funs <- setdiff(ls(x), "initialize")
         if (i %in% funs) {
             NextMethod()
         } else {
-            in_nm <- i_underscore_name(i)
+            in_nm <- underscore_name(i)
 
-            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
-            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
+            self <- ._get_self(x)
+            priv <- ._get_private(x)
 
-            all_nm <- i_class_name(self, priv, type = "idd")
+            all_nm <- idd_class_name(self, priv)
+            all_nm_us <- underscore_name(all_nm)
 
-            all_nm_u <- i_underscore_name(all_nm)
-
-            m <- match(in_nm, all_nm_u)
+            m <- match(in_nm, all_nm_us)
 
             if (is.na(m)) {
                 NextMethod()
             } else {
-                .subset2(x, "object")(all_nm[m])[[1]]
+                idd_object(self, priv, all_nm[m])[[1L]]
             }
         }
     } else {
@@ -286,34 +376,35 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 # }}}
 
 #' @export
-# $.Idd {{{
-'$.Idd' <- function (x, name) {
-    if (is_string(name)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (name %in% funs) {
+# [[.Idd {{{
+'[[.Idd' <- function(x, i) {
+    if (all(i %in% setdiff(ls(x), "initialize"))) {
+        NextMethod()
+    } else {
+        assert_that(is_string(i), msg = "Class name should be a string (a length one character vector)")
+
+        in_nm <- underscore_name(i)
+
+        self <- ._get_self(x)
+        priv <- ._get_private(x)
+
+        all_nm <- idd_class_name(self, priv)
+        all_nm_us <- underscore_name(all_nm)
+
+        m <- match(in_nm, all_nm_us)
+
+        if (is.na(m)) {
             NextMethod()
         } else {
-            in_nm <- i_underscore_name(name)
-
-            self <- .subset2(.subset2(x, ".__enclos_env__"), "self")
-            priv <- .subset2(.subset2(x, ".__enclos_env__"), "private")
-
-            all_nm <- i_class_name(self, priv, type = "idd")
-
-            all_nm_u <- i_underscore_name(all_nm)
-
-            m <- match(in_nm, all_nm_u)
-
-            if (is.na(m)) {
-                NextMethod()
-            } else {
-                .subset2(x, "object")(all_nm[m])[[1]]
-            }
+            idd_object(self, priv, all_nm[m])[[1L]]
         }
-    } else {
-        NextMethod()
     }
 }
+# }}}
+
+#' @export
+# $.Idd {{{
+'$.Idd' <- function (x, name) x[[name]]
 # }}}
 
 # read_idd {{{
