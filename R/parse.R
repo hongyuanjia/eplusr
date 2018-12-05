@@ -163,7 +163,7 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
     dt_value <- convert_value_unit(dt_value, from, to)
 
     # value reference map
-    dt_reference <- update_value_reference(dt_object, dt_value, idd_env$reference)
+    dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
 
     # extract version
     ver <- dt_value[class_name == "Version", standardize_ver(value)]
@@ -1465,21 +1465,23 @@ get_value_references <- function (dt_value, lower = FALSE) {
 }
 # }}}
 
-# update_value_reference {{{
-update_value_reference <- function (dt_object, dt_value, dt_reference) {
-    # get all values in lower case that are references
-    val_ref <- get_value_references(dt_value, lower = TRUE)
-    if (nrow(val_ref) == 0L) return(dt_value)
+# get_value_reference_map {{{
+get_value_reference_map <- function (map, src, value) {
+    empty <- data.table(value_id = integer(0L), src_value_id = integer(0L), src_enum = integer(0L))
 
     # get all values in lower case that are sources
-    val_src <- get_value_sources(dt_value, lower = TRUE)
-    if (nrow(val_src) == 0L) return(dt_value)
+    val_src <- get_value_sources(src, lower = TRUE)
+    if (nrow(val_src) == 0L) return(empty)
 
-    val_ref_lst <- val_ref[, lapply(.SD, list), by = list(field_id)]
+    # get all values in lower case that are references
+    val_ref <- get_value_references(value, lower = TRUE)
+    if (nrow(val_ref) == 0L) return(empty)
+
     val_src_lst <- val_src[, lapply(.SD, list), by = list(src_field_id)]
+    val_ref_lst <- val_ref[, lapply(.SD, list), by = list(field_id)]
 
     # remove rows that field ids do not exist in current IDF
-    fld_ref_src <- dt_reference[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
+    fld_ref_src <- map[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
     set(fld_ref_src, NULL, "src_enum", NULL)
 
     # combine all references and sources
