@@ -476,7 +476,7 @@ i_job_status <- function (self, private, based_suffix = ".err") {
     # if the model has not been run before
     if (is.null(proc)) {
         if (!file.exists(private$m_path_idf)) {
-            warning("Could not find local idf file ", backtick(private$m_path_idf),
+            warning("Could not find local idf file ", surround(private$m_path_idf),
                 ".", call. = FALSE)
         }
         return(status)
@@ -640,10 +640,10 @@ i_job_print <- function (self, private) {
     cli::cat_rule(crayon::bold("EnergyPlus Simulation Job"), col = "green")
     config <- eplus_config(private$m_version)
     cli::cat_bullet(c(
-        paste0(crayon::bold("Model"), ": ", backtick(private$m_path_idf)),
-        paste0(crayon::bold("Weather"), ": ", backtick(private$m_path_epw)),
-        paste0(crayon::bold("EnergyPlus Version"), ": ", backtick(config$version)),
-        paste0(crayon::bold("EnergyPlus Path"), ": ", backtick(normalizePath(config$dir)))
+        paste0(crayon::bold("Model"), ": ", surround(private$m_path_idf)),
+        paste0(crayon::bold("Weather"), ": ", surround(private$m_path_epw)),
+        paste0(crayon::bold("EnergyPlus Version"), ": ", surround(config$version)),
+        paste0(crayon::bold("EnergyPlus Path"), ": ", surround(normalizePath(config$dir)))
     ), col = "cyan", bullet_col = "cyan")
 
     if (!status$run_before) {
@@ -654,11 +654,11 @@ i_job_print <- function (self, private) {
             col = "white", background_col = "red")
     } else if (status$alive) {
         cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and is still running...",
+            surround(private$m_log$start_time), " and is still running...",
             col = "black", background_col = "green")
     } else if (!isTRUE(status$successful)) {
         cli::cat_line(" Simulation started at ",
-            backtick(private$m_log$start_time), " and ended unsuccessfully...",
+            surround(private$m_log$start_time), " and ended unsuccessfully...",
             col = "white", background_col = "red")
     } else {
         if (is.null(private$m_log$end_time)) {
@@ -685,13 +685,13 @@ i_job_print <- function (self, private) {
             )
 
             cli::cat_line(" Simulation started at ",
-                backtick(private$m_log$start_time), " and completed successfully after ",
+                surround(private$m_log$start_time), " and completed successfully after ",
                 run_time, ".",
                 col = "black", background_col = "green"
             )
         } else {
             cli::cat_line(" Simulation started at ",
-                backtick(private$m_log$start_time), " and completed successfully.",
+                surround(private$m_log$start_time), " and completed successfully.",
                 col = "black", background_col = "green"
             )
         }

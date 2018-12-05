@@ -216,7 +216,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
         tryCatch(dir.create(output_dir, recursive = TRUE),
             warning = function (w) {
                 stop("Failed to create output directory: ",
-                     backtick(output_dir), call. = FALSE)
+                     surround(output_dir), call. = FALSE)
             }
         )
     }
@@ -270,7 +270,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         })
         ver_miss <- vapply(ver_list, is_empty, logical(1))
         if (any(ver_miss)) {
-            msg <- paste0("  ", seq_along(model)[ver_miss], "| ", backtick(model[ver_miss]),
+            msg <- paste0("  ", seq_along(model)[ver_miss], "| ", surround(model[ver_miss]),
                 collapse = "\n")
             stop("Missing version field in input IDF file. Failed to determine the ",
                 "version of EnergyPlus to use:\n", msg, call. = FALSE)
@@ -304,7 +304,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
     if (any(!created))
         stop("Failed to create output directory:\n",
-            paste0(backtick(d[!created]), collapse = "\n"), call. = FALSE)
+            paste0(surround(d[!created]), collapse = "\n"), call. = FALSE)
 
     jobs[, `:=`(input_weather = weather, energyplus = energyplus_exe)]
     jobs[, `:=`(model = copy_run_files(model, output_dir),
@@ -562,9 +562,9 @@ sim_status <- function (type, index, model, weather) {
     }
 
     paste0(lpad(index), "|", type, " --> ",
-        "[IDF]", backtick(basename(model)),
+        "[IDF]", surround(basename(model)),
         " + ",
-        "[EPW]", backtick(basename(weather))
+        "[EPW]", surround(basename(weather))
     )
 }
 # }}}
@@ -804,7 +804,7 @@ copy_run_files <- function (file, dir) {
     )
 
     if (any(!flag))
-        stop("Unable to copy file ", backtick(basename(file[!flag])), "into ",
+        stop("Unable to copy file ", surround(basename(file[!flag])), "into ",
             "simulation output directory.", call. = FALSE)
 
     return(loc)

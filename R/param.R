@@ -358,7 +358,7 @@ i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
 
     private$m_param <- out
 
-    message("Measure ", backtick(mea_nm), " has been applied with ", length(out),
+    message("Measure ", surround(mea_nm), " has been applied with ", length(out),
         " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
 }
 # }}}
@@ -505,7 +505,7 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
         tryCatch(dir.create(output_dir, recursive = TRUE),
             warning = function (w) {
                 stop("Failed to create output directory: ",
-                     backtick(output_dir), call. = FALSE)
+                     surround(output_dir), call. = FALSE)
             }
         )
     }
@@ -715,10 +715,10 @@ i_param_print <- function (self, private) {
     cli::cat_rule(crayon::bold("EnergPlus Parametric Job"), col = "green")
     config <- eplus_config(private$m_idf$version())
     cli::cat_bullet(c(
-        paste0(crayon::bold("Seed Model"), ": ", backtick(normalizePath(private$m_idf$path(), mustWork = FALSE))),
-        paste0(crayon::bold("Weather"), ": ", backtick(private$m_epw$path())),
-        paste0(crayon::bold("EnergyPlus Version"), ": ", backtick(config$version)),
-        paste0(crayon::bold("EnergyPlus Path"), ": ", backtick(normalizePath(config$dir)))
+        paste0(crayon::bold("Seed Model"), ": ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE))),
+        paste0(crayon::bold("Weather"), ": ", surround(private$m_epw$path())),
+        paste0(crayon::bold("EnergyPlus Version"), ": ", surround(config$version)),
+        paste0(crayon::bold("EnergyPlus Path"), ": ", surround(normalizePath(config$dir)))
     ), col = "cyan", bullet_col = "cyan")
 
     if (is.null(private$m_param)) {
@@ -728,7 +728,7 @@ i_param_print <- function (self, private) {
     }
 
     cli::cat_bullet(c(
-        paste0(crayon::bold("Applied Measure"), ": ", backtick(private$m_log$measure_name)),
+        paste0(crayon::bold("Applied Measure"), ": ", surround(private$m_log$measure_name)),
         paste0(crayon::bold("Parametric Models"), " [", length(private$m_param), "]: ")
     ), col = "cyan", bullet_col = "cyan")
 
@@ -755,14 +755,14 @@ i_param_print <- function (self, private) {
     } else if (status$alive) {
 
         cli::cat_line(" Job started at ",
-            backtick(private$m_log$start_time), " and is still running...",
+            surround(private$m_log$start_time), " and is still running...",
             col = "black", background_col = "green"
         )
 
     } else if (!isTRUE(status$successful)) {
 
         cli::cat_line(" Job started at ",
-            backtick(private$m_log$start_time), " and ended unsuccessfully...",
+            surround(private$m_log$start_time), " and ended unsuccessfully...",
             col = "white", background_col = "red"
         )
 
@@ -774,7 +774,7 @@ i_param_print <- function (self, private) {
             )
 
             cli::cat_line(" Simulation started at ",
-                backtick(private$m_log$start_time), " and completed successfully after ",
+                surround(private$m_log$start_time), " and completed successfully after ",
                 run_time, ".",
                 col = "black", background_col = "green"
             )
@@ -782,7 +782,7 @@ i_param_print <- function (self, private) {
         } else {
 
             cli::cat_line(" Simulation started at ",
-                backtick(private$m_log$start_time), " and completed successfully.",
+                surround(private$m_log$start_time), " and completed successfully.",
                 col = "black", background_col = "green"
             )
         }

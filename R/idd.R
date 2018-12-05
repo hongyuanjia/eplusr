@@ -423,7 +423,7 @@ use_idd <- function (idd, download = FALSE) {
 
             message("Idd v", ver, " has not been parsed before. Try to locate ",
                 "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
-                backtick(eplus_default_path(ver)), ".")
+                surround(eplus_default_path(ver)), ".")
 
             if (!is_avail_eplus(ver)) {
 
@@ -447,7 +447,7 @@ use_idd <- function (idd, download = FALSE) {
 
                 if (!file.exists(idd)) {
                     msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
-                        config$version, " installation folder ", backtick(config$dir), ". ")
+                        config$version, " installation folder ", surround(config$dir), ". ")
 
                     if (!identical(download, "auto")) {
                         stop(msg_f, "You may want to set `download` to TRUE or ",
@@ -463,7 +463,7 @@ use_idd <- function (idd, download = FALSE) {
             }
         }
 
-        message("IDD file found: ", backtick(idd), ".")
+        message("IDD file found: ", surround(idd), ".")
     }
 
     message("Start parsing...")
@@ -508,7 +508,7 @@ download_idd <- function (ver = "latest", dir) {
         write_lines_eol(l, dest)
     }
 
-    message("EnergyPlus v", ver, " IDD file ", backtick(file), " has been successfully ",
+    message("EnergyPlus v", ver, " IDD file ", surround(file), " has been successfully ",
         "downloaded into ", normalizePath(dir), ".")
 
     attr(res, "file") <- dest

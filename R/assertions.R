@@ -17,7 +17,7 @@ is_eplus_ver <- function (ver, strict = FALSE) {
 }
 
 on_failure(is_eplus_ver) <- function (call, env) {
-    paste0(backtick(eval(call$ver, env)), " is not a valid or supported EnergyPlus version. ",
+    paste0(surround(eval(call$ver, env)), " is not a valid or supported EnergyPlus version. ",
       "Only EnergyPlus v8.3.0 and after are supported.")
 }
 # }}}
@@ -153,7 +153,7 @@ is_same_len <- function (x, y) {
     length(x) == length(y)
 }
 on_failure(is_same_len) <- function (call, env) {
-    paste0(backtick(deparse(call$x)), " and ", backtick(deparse(call$y)),
+    paste0(surround(deparse(call$x)), " and ", surround(deparse(call$y)),
       " does not have the same length.")
 }
 # }}}
@@ -179,7 +179,7 @@ has_ext <- function (path, ext) {
 on_failure(has_ext) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    paste0("File ", backtick(basename(path)), " does not have extension ", backtick(ext), ".")
+    paste0("File ", surround(basename(path)), " does not have extension ", surround(ext), ".")
 }
 # }}}
 # has_exts {{{
@@ -190,7 +190,7 @@ has_exts <- function (path, exts) {
 on_failure(has_exts) <- function (call, env = parent.env) {
     path <- eval(call$path, env)
     ext <- eval(call$ext, env)
-    paste0("File ", backtick(basename(path)), " should have one of extensions ", collapse(ext), ".")
+    paste0("File ", surround(basename(path)), " should have one of extensions ", collapse(ext), ".")
 }
 # }}}
 # is_windows {{{

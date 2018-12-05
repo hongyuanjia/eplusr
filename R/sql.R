@@ -249,13 +249,13 @@ i_sql_print <- function (self, private) {
     if (!file.exists(path_idf)) {
         idf <- crayon::bgRed$bold("Not Found")
     } else {
-        idf <- backtick(path_idf)
+        idf <- surround(path_idf)
     }
 
     m_time <- file.info(private$m_path_sql)$mtime
 
     cli::cat_bullet(c(
-        paste0(crayon::bold("File"), ": ", backtick(private$m_path_sql)),
+        paste0(crayon::bold("File"), ": ", surround(private$m_path_sql)),
         paste0(crayon::bold("Last Modified"), ": ", m_time),
         paste0(crayon::bold("Parent Idf"), ": ", idf)
     ), col = "cyan", bullet_col = "cyan")

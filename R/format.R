@@ -218,7 +218,7 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
     each_class <- value_tbl[, row_id[1L], by = class_id]$V1
     value_tbl[each_class,
            out := list(list(
-                c("", crayon::green(paste0("  Class ", backtick(class_name))), out[[1L]]))),
+                c("", crayon::green(paste0("  Class ", surround(class_name))), out[[1L]]))),
            by = row_id]
 
     res <- unlist(value_tbl[["out"]])
@@ -487,7 +487,7 @@ print.IddFieldPossible <- function (x, ...) {
     dt <- data.table::copy(x)
 
     dt[, header := cli::rule(crayon::bold(paste0(
-        field_index, ": Field ", backtick(field_name))), col = "green"),
+        field_index, ": Field ", surround(field_name))), col = "green"),
         by = field_index
     ]
 
@@ -497,19 +497,19 @@ print.IddFieldPossible <- function (x, ...) {
 
     dt[!is.na(auto),
         res := paste0(res, "\n", crayon::cyan(paste0(
-            cli::symbol$bullet, " ", crayon::bold("Auto value"), ": ", backtick(auto))))]
+            cli::symbol$bullet, " ", crayon::bold("Auto value"), ": ", surround(auto))))]
 
     dt[!vapply(default, is.na, logical(1)),
         res := paste0(res, "\n", crayon::cyan(paste0(
             cli::symbol$bullet, " ", crayon::bold("Default"), ": ",
-            ifelse(is.character(default), backtick(default), default)))
+            ifelse(is.character(default), surround(default), default)))
         )
     ]
 
     dt[!vapply(choice, function (x) all(is.na(x)), logical(1)),
         res := paste0(res, "\n", crayon::cyan(paste0(
             cli::symbol$bullet, " ", crayon::bold("Choice"), ":\n" ,
-            paste0("  - ", backtick(unlist(choice)), collapse = "\n")))),
+            paste0("  - ", surround(unlist(choice)), collapse = "\n")))),
         by = field_index
     ]
 
@@ -522,7 +522,7 @@ print.IddFieldPossible <- function (x, ...) {
 
     dt[!vapply(reference, is.null, logical(1)), res := paste0(res, "\n",
         crayon::cyan(paste0(cli::symbol$bullet, " ", crayon::bold("References"), ":\n",
-            paste0(paste0("  - ", backtick(unlist(reference))), collapse = "\n"))
+            paste0(paste0("  - ", surround(unlist(reference))), collapse = "\n"))
         )),
         by = field_index
     ]

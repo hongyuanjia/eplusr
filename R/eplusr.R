@@ -187,7 +187,7 @@ eplusr_option <- function (...) {
             invalid <- !is.logical(input[[name]])
 
             if (invalid)
-                stop(backtick(name), " should be one of either `TRUE` or `FALSE`.",
+                stop(surround(name), " should be one of either `TRUE` or `FALSE`.",
                     call. = FALSE)
 
             .options[[name]] <- input[[name]]
@@ -202,7 +202,7 @@ eplusr_option <- function (...) {
             invalid <- !input[[name]] %in% choice_list[[name]]
 
             if (invalid)
-                stop(backtick(name), " should be one of ",
+                stop(surround(name), " should be one of ",
                     collapse(choice_list[[name]]), ".", call. = FALSE)
 
             .options[[name]] <- input[[name]]

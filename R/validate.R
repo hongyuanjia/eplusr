@@ -513,7 +513,7 @@ i_print_single_validate <- function (res, type) {
     cli::cat_bullet(bullet, bullet = "circle_cross")
 
     if (type == "missing_object") {
-        cli::cat_bullet(backtick(res[[type]]))
+        cli::cat_bullet(surround(res[[type]]))
     } else {
         cli::cat_line(format_objects(res[[type]]))
     }

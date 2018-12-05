@@ -13,22 +13,32 @@ NULL
 # }}}
 
 # collapse {{{
-collapse <- function (x) {
-    s <- paste0("`", x, "`")
-    if (length(s) == 1L) {
-        return (s)
+collapse <- function (x, out = "`") {
+    if (is.null(out)) {
+        s <- x
     } else {
-        b <- paste0(s[-length(s)], collapse = ", ")
-        e <- s[length(s)]
-        out <- paste0(b, " and ", e)
+        out <- as.character(out)
+        if (is_scalar(out)) {
+            out <- c(out, out)
+        }
+        s <- paste0(out[1L], x, out[2L])
     }
-    return(out)
+    if (length(s) == 1L) return (s)
+
+    b <- paste0(s[-length(s)], collapse = ", ")
+    e <- s[length(s)]
+    paste0(b, " and ", e)
 }
 # }}}
 
-# backtick {{{
-backtick <- function (x) {
-    paste0("`", x, "`")
+# surround {{{
+surround <- function (x, out = "`") {
+    if (is.null(out)) return(x)
+    out <- as.character(out)
+    if (is_scalar(out)) {
+        out <- c(out, out)
+    }
+    paste0(out[1L], x, out[2L])
 }
 # }}}
 

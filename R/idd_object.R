@@ -387,7 +387,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
             id <- private$m_idd_tbl$class[class_name == class, class_id]
             if (is_empty(id)) {
                 stop("Failed to create IddObject. Invalid class name found: ",
-                    backtick(class), ".", call. = FALSE)
+                    surround(class), ".", call. = FALSE)
             }
             private$m_class_id <- id
         },

@@ -59,7 +59,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
     # check if the same version has been installed already
     if (is_avail_eplus(ver) && !isTRUE(force))
         stop(paste0("It seems EnergyPlus v", ver, "has been already",
-                "installed at ", backtick(eplus_config(ver)$dir),
+                "installed at ", surround(eplus_config(ver)$dir),
                 ". Set `force` to TRUE to reinstall."), call. = FALSE)
 
     message(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
@@ -107,7 +107,7 @@ download_eplus <- function (ver = "latest", dir) {
     if (dl != 0L) stop("Failed to download EnergyPlus v", ver, ".", call. = FALSE)
 
     message("The installer file of EnergyPlus ", paste0("v", ver), " ",
-        backtick(file), " has been successfully downloaded into ", dir, ".")
+        surround(file), " has been successfully downloaded into ", dir, ".")
 
     attr(dl, "file") <- dest
     invisible(dl)
@@ -153,7 +153,7 @@ download_file <- function (url, dest) {
         tryCatch(unlink(dest),
             warning = function (w) {
                 stop("Failed to delete the existing file ",
-                    backtick(dest), "before downloading.", call. = FALSE)
+                    surround(dest), "before downloading.", call. = FALSE)
             }
         )
 
@@ -260,7 +260,7 @@ use_eplus <- function (eplus) {
         eplus_dir <- eplus_default_path(eplus)
         if (!is_eplus_path(eplus_dir)) {
             stop("Cannot locate EnergyPlus v", trimws(eplus), " at default ",
-                "installation path ", backtick(eplus_dir), ". Please specify ",
+                "installation path ", surround(eplus_dir), ". Please specify ",
                 "explicitly the path of EnergyPlus installation.", call. = FALSE)
         }
     } else if (is_eplus_path(eplus)){
@@ -278,15 +278,15 @@ use_eplus <- function (eplus) {
     .globals$eplus_config[[as.character(ver)]] <- res
 
     if (is.null(ori)) {
-        message("EnergyPlus v", ver, " located at ", backtick(eplus_dir),
+        message("EnergyPlus v", ver, " located at ", surround(eplus_dir),
             " has been added.")
     } else if (identical(ori$dir, eplus_dir)) {
         message("Configure data of EnergyPlus v", ver, " located at ",
-            backtick(eplus_dir), " already exists. No Updating performed.")
+            surround(eplus_dir), " already exists. No Updating performed.")
     } else {
         message("Update configure data of EnergyPlus v", ver, ":\n",
-            "    Former location: ", backtick(ori$dir), " ---> ",
-                   "New location: ", backtick(eplus_dir))
+            "    Former location: ", surround(ori$dir), " ---> ",
+                   "New location: ", surround(eplus_dir))
     }
 
     invisible(res)
@@ -357,6 +357,6 @@ get_ver_from_path <- function (path) {
 
     tryCatch(get_idd_ver(h),
         error = function (e) stop("Failed to parse EnergyPlus version using IDD ",
-            backtick(idd_file), ".", call. = FALSE))
+            surround(idd_file), ".", call. = FALSE))
 }
 # }}}

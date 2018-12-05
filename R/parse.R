@@ -104,7 +104,7 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
     #         if (!is_avail_idd(idf_ver) && !is_avail_eplus(idf_ver)) {
     #             stop("Idd v", idf_ver, " has not been parsed before. Try to locate ",
     #                 "`Energy+.idd` in EnergyPlus v", idf_ver, " installation folder ",
-    #                 backtick(eplus_default_path(idf_ver)), ".\n",
+    #                 surround(eplus_default_path(idf_ver)), ".\n",
     #                 "Failed to locate `Energy+.idd` because EnergyPlus v", idf_ver,
     #                 " is not available. ", call. = FALSE)
     #         }
@@ -201,7 +201,7 @@ get_idd_ver <- function (idd_str, trim = FALSE) {
         standardize_ver(ver)
     } else if (length(ver_line > 1L)) {
         stop("Multiple IDD version found in input IDD:\n",
-             paste0("  ", backtick(ver_line), collapse = "\n"), call. = FALSE)
+             paste0("  ", surround(ver_line), collapse = "\n"), call. = FALSE)
     } else {
         stop("No IDD version found in input IDD.", call. = FALSE)
     }
@@ -220,7 +220,7 @@ get_idd_build <- function (idd_str, trim = FALSE) {
         stri_sub(build_line, 12L)
     } else if (length(build_line > 1L)) {
         warning("Multiple build tags found in input IDD:\n",
-             paste0("  ", backtick(build_line), collapse = "\n"), call. = FALSE)
+             paste0("  ", surround(build_line), collapse = "\n"), call. = FALSE)
     } else {
         warning("No build tag found in input IDD.", call. = FALSE)
     }
@@ -1245,8 +1245,8 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 
         if (v != version) {
             mes <- paste0("Version Mismatch. The IDF file parsing has a differnet ",
-                "version ", backtick(v), " than the IDD file using ",
-                backtick(version), ". Parsing errors may occur."
+                "version ", surround(v), " than the IDD file using ",
+                surround(version), ". Parsing errors may occur."
             )
             warn("waring_idf_idd_mismatch_ver", mes, idf_ver = ver, idd_ver = version)
         }

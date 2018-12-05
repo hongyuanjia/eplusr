@@ -486,11 +486,11 @@ Epw <- R6::R6Class(classname = "Epw",
                 if (private$m_header$holidays_daylight_savings$leap_year &
                     !lubridate::leap_year(year)) {
                     stop("Epw file contains data of a leap year. Input year ",
-                         backtick(year), " is not a leap year.", call. = FALSE)
+                         surround(year), " is not a leap year.", call. = FALSE)
                 }
                 if (!private$m_header$holidays_daylight_savings$leap_year &
                     lubridate::leap_year(year)) {
-                    warning("Input year ", backtick(year), " is a leap year ",
+                    warning("Input year ", surround(year), " is a leap year ",
                             "while Epw file only contains data of a non-leap year. ",
                             "Datetime inconsistency may occur.", call. = FALSE)
                 }
@@ -771,7 +771,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     assert_that(is_scalar(path))
 
     is_path <- file.exists(path)
-    error_end <- ifelse(is_path, paste0(" ", backtick(path)), "")
+    error_end <- ifelse(is_path, paste0(" ", surround(path)), "")
 
     num_header <- 8L
     header <- readr::read_lines(path, n_max = num_header)
@@ -796,7 +796,7 @@ parse_epw_file <- function (path, strict = TRUE) {
 
         if (any(l_unknown < max(l_known)))
             stop("Invalid header line found in EPW file", error_end, ": \n",
-                 paste0(backtick(header[l_unknown]), collapse = "\n"),
+                 paste0(surround(header[l_unknown]), collapse = "\n"),
                  call. = FALSE)
 
         num_header <- max(l_known)
@@ -811,10 +811,10 @@ parse_epw_file <- function (path, strict = TRUE) {
     loc <- stringr::str_trim(strsplit(header_pairs$location, ",")[[1]])
     len_loc <- length(loc)
     if (len_loc < 10L) {
-        stop("Expected 10 location fields rather than ", backtick(len_loc),
+        stop("Expected 10 location fields rather than ", surround(len_loc),
              " fields in EPW file", error_end, ".", call. = FALSE)
     } else if (len_loc > 10L) {
-        warning("Expected 10 location fields rather than ", backtick(len_loc),
+        warning("Expected 10 location fields rather than ", surround(len_loc),
                 " fields in EPW file", error_end, ".", call. = FALSE)
     }
 
@@ -830,19 +830,19 @@ parse_epw_file <- function (path, strict = TRUE) {
     location[["elevation"]] <- suppressWarnings(as.double(loc[10]))
     if (is.na(location[["latitude"]])) {
         stop("Non-numerical latitude found in EPW file", error_end,
-             ": ", backtick(loc[7]), ".", call. = FALSE)
+             ": ", surround(loc[7]), ".", call. = FALSE)
     }
     if (is.na(location[["longitude"]])) {
         stop("Non-numerical longitude found in EPW file", error_end,
-             ": ", backtick(loc[8]), ".", call. = FALSE)
+             ": ", surround(loc[8]), ".", call. = FALSE)
     }
     if (is.na(location[["time_zone"]])) {
         stop("Non-numerical time zone found in EPW file", error_end,
-             ": ", backtick(loc[9]), ".", call. = FALSE)
+             ": ", surround(loc[9]), ".", call. = FALSE)
     }
     if (is.na(location[["elevation"]])) {
         stop("Non-numerical elevation found in EPW file", error_end,
-             ": ", backtick(loc[10]), ".", call. = FALSE)
+             ": ", surround(loc[10]), ".", call. = FALSE)
     }
     # }}}
 
@@ -853,10 +853,10 @@ parse_epw_file <- function (path, strict = TRUE) {
     dp <- stringr::str_trim(strsplit(header_pairs$data_periods, ",")[[1]])
     len_dp <- length(dp)
     if(len_dp < 7L) {
-        stop("Expected 7 data period fields rather than the ", backtick(len_dp),
+        stop("Expected 7 data period fields rather than the ", surround(len_dp),
              " fields in EPW file", error_end, ".", call. = FALSE)
     } else if(len_dp > 7L) {
-        warning("Expected 7 data period fields rather than the ", backtick(len_dp),
+        warning("Expected 7 data period fields rather than the ", surround(len_dp),
                 " fields in EPW file", error_end, ".", call. = FALSE)
     }
     data_periods <- list()
@@ -870,18 +870,18 @@ parse_epw_file <- function (path, strict = TRUE) {
     n <- data_periods[["n_data_periods"]]
     if (is.na(n)) {
         stop("Non-integral number of data periods in EPW file", error_end,
-             ": ", backtick(dp[2]), ".", call. = FALSE)
+             ": ", surround(dp[2]), ".", call. = FALSE)
     } else if (n > 1L){
         stop("More than one data period in EPW file", error_end,
-             ": ", backtick(n), ", which is not supported", call. = FALSE)
+             ": ", surround(n), ", which is not supported", call. = FALSE)
     }
 
     ts <- data_periods[["time_step"]]
     if (is.na(ts)) {
         stop("Non-integral number of timestep in EPW file", error_end, ".",
-             ": ", backtick(dp[3]), ".", call. = FALSE)
+             ": ", surround(dp[3]), ".", call. = FALSE)
     } else if (60L %% ts != 0L){
-        stop("Number of records per hour of ", backtick(ts), " does not result ",
+        stop("Number of records per hour of ", surround(ts), " does not result ",
              "in integral number of minutes between records in EPW file", error_end,
              call. = FALSE);
     }
@@ -889,7 +889,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     dw <- get_epw_week_day(data_periods[["start_day_of_week"]])
     if (is.na(dw)) {
         stop("Bad start day of week found in EPW file", error_end, ": ",
-             backtick(dp[5]), ".", call. = FALSE)
+             surround(dp[5]), ".", call. = FALSE)
     }
 
     start_date <- get_epw_date(path, dp[6], dw, "start")
@@ -908,8 +908,8 @@ parse_epw_file <- function (path, strict = TRUE) {
     len_ho <- length(ho)
     if(len_ho < 5L) {
         stop("Expected at least 5 holidays and daylight saving fields rather ",
-             "than the ", backtick(len_ho), " fields in EPW file ",
-             backtick(path), ".", call. = FALSE)
+             "than the ", surround(len_ho), " fields in EPW file ",
+             surround(path), ".", call. = FALSE)
     }
 
     holidays_dls <- list()
@@ -921,7 +921,7 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     if (!tolower(leap_year) %in% c("yes", "no")) {
         stop("Value of LeapYear Observed is neither `yes` nor `no` in EPW file ",
-             backtick(path), ": ", backtick(leap_year), ".", call. = FALSE)
+             surround(path), ": ", surround(leap_year), ".", call. = FALSE)
     }
     holidays_dls[["leap_year"]] <- ifelse(tolower(leap_year) == "yes", TRUE, FALSE)
 
@@ -938,15 +938,15 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     if (is.na(num_of_holiday)) {
         stop("Non-integral number of holiday number in EPW file", error_end,
-             ": ", backtick(ho[5]), ".", call. = FALSE)
+             ": ", surround(ho[5]), ".", call. = FALSE)
     } else if (num_of_holiday < 0L) {
         stop("Non-positive number of holiday number in EPW file", error_end,
-             ": ", backtick(ho[5]), ".", call. = FALSE)
+             ": ", surround(ho[5]), ".", call. = FALSE)
     } else if (num_of_holiday > 0L){
         if ((length(ho) - 5L) != num_of_holiday * 2L) {
             stop("Expected ", num_of_holiday, " holiday data rather ",
-                 "than the", backtick((length(ho) - 5L) %/% 2L), " in EPW file ",
-                 backtick(path), ".", call. = FALSE)
+                 "than the", surround((length(ho) - 5L) %/% 2L), " in EPW file ",
+                 surround(path), ".", call. = FALSE)
         } else {
             holidays <- ho_data[rep(c(FALSE, TRUE), length = num_of_holiday)]
             names(holidays) <- ho_data[rep(c(TRUE, FALSE), length = num_of_holiday)]
@@ -967,8 +967,8 @@ parse_epw_file <- function (path, strict = TRUE) {
     header_epw_data <- data.table::fread(path, skip = num_header, nrows = 0L)
     if (ncol(header_epw_data) != 35L) {
         stop("Expected 35 fields in EPW data instead of the ",
-             backtick(ncol(epw_data)), " recieved in EPW file ",
-             backtick(path), ".", call. = FALSE)
+             surround(ncol(epw_data)), " recieved in EPW file ",
+             surround(path), ".", call. = FALSE)
     }
 
     epw_data <- data.table::fread(path, skip = num_header,
@@ -1025,10 +1025,10 @@ parse_epw_file <- function (path, strict = TRUE) {
     # check datetime step
     gt_1day <- epw_data[datetime_delta > 1, which = TRUE]
     if (not_empty(gt_1day) && data_periods[["is_real_year"]]) {
-        warning("Successive data points (", backtick(epw_data[gt_1day[1], datetime]), " to ",
-                 backtick(epw_data[gt_1day[1], datetime_shifted]), ", ending on line ",
-                 backtick((gt_1day[1] + 8L)), ") are greater than 1 day apart in EPW file ",
-                 backtick(path), ". Data will be treated as typical (TMY).",
+        warning("Successive data points (", surround(epw_data[gt_1day[1], datetime]), " to ",
+                 surround(epw_data[gt_1day[1], datetime_shifted]), ", ending on line ",
+                 surround((gt_1day[1] + 8L)), ") are greater than 1 day apart in EPW file ",
+                 surround(path), ". Data will be treated as typical (TMY).",
                  call. = FALSE)
     }
     # # check if warp around
@@ -1045,10 +1045,10 @@ parse_epw_file <- function (path, strict = TRUE) {
         dt_minute_cal == 60L, dt_minute_cal := 0L]
     min_mismatch <- epw_data[dt_minute != dt_minute_cal, which = TRUE]
     if (not_empty(min_mismatch)) {
-        warning("Minutes field (", backtick(epw_data[min_mismatch[1], minute]), ") on line ",
-                backtick(min_mismatch[1]), " of EPW file", error_end,
+        warning("Minutes field (", surround(epw_data[min_mismatch[1], minute]), ") on line ",
+                surround(min_mismatch[1]), " of EPW file", error_end,
                 " does not agree with computed value (",
-                backtick(epw_data[min_mismatch[1], dt_minute_cal]),
+                surround(epw_data[min_mismatch[1], dt_minute_cal]),
                 "). Using computed value.")
         data_periods[["minute_match"]] <- FALSE
     } else {
@@ -1091,7 +1091,7 @@ parse_epw_file <- function (path, strict = TRUE) {
         }
     }
     # if (!real_year && wrap_around) {
-    #     stop("Wrap around years not supported for TMY data, EPW file ", backtick(path), call. = FALSE)
+    #     stop("Wrap around years not supported for TMY data, EPW file ", surround(path), call. = FALSE)
     # }
     # }}}
 
@@ -1199,7 +1199,7 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
     len_s <- length(s)
     if (len_s != 2L && len_s != 3L) {
         stop("Bad data period ", type, " date format found in EPW file ",
-             backtick(path), ":", backtick(x), ".", call. = FALSE)
+             surround(path), ":", surround(x), ".", call. = FALSE)
     } else if (len_s == 2L) {
         day <- switch(type, start = x, end = "1-1")
         assume_year <- get_epw_year(year = NULL, start_day_of_week, check_date = day)
