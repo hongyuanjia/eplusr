@@ -664,6 +664,13 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     flat <- merge(i, flat, by = c(id), all = TRUE)
     nest <- merge(i[, .SD, .SDcols = c(id)], nest, by = id, all = TRUE)
 
+    # change empty character member in list to NULL
+    for (nm in setdiff(names(nest), c("field_id", "field_anid"))) {
+        set(nest, nest[["field_id"]][vapply(nest[["note"]], function (x) length(x) == 0L, logical(1L))],
+            "note", list(list(NULL))
+        )
+    }
+
     merge(flat, nest, by = id)
 }
 # }}}
@@ -682,22 +689,19 @@ complete_property <- function (dt, type, ref) {
 
     # get slash type checking function from slash key
     slash_is_type <- function (key) {
-        t <- slash_type(key)
-        switch(t, lgl = is.logical, int = is.integer, dbl = is.double,
+        switch(slash_type(key), lgl = is.logical, int = is.integer, dbl = is.double,
             chr = is.character, lst = is.list)
     }
 
     # get slash type conversion function from slash key
     slash_as_type <- function (key) {
-        t <- slash_type(key)
-        switch(t, lgl = as.logical, int = as.integer, dbl = as.double,
+        switch(slash_type(key), lgl = as.logical, int = as.integer, dbl = as.double,
             chr = as.character, lst = c)
     }
 
     # get slash initial value from slash key
     slash_init_value <- function (key) {
-        t <- slash_type(key)
-        res <- switch(t, lgl = "FALSE", lst = list(), NA_character_)
+        res <- switch(slash_type(key), lgl = "FALSE", lst = list(), NA_character_)
         slash_as_type(key)(res)
     }
 
