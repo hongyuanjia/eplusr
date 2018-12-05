@@ -81,18 +81,24 @@ sudo if you are on macOS or Linux) to make it work if you are not in interactive
 mode.
 
 ```{r install_eplus, include = FALSE, eval = can_run}
+# download portable EnergyPlus
 if (!eplusr::is_avail_eplus(8.8)) {
+    binary_url <- eplusr:::eplus_download_url(8.8)
     if (eplusr:::is_windows()) {
-        eplusr::install_eplus(8.8)
+        ext <- ".zip"
     } else {
-        url <- paste0(tools::file_path_sans_ext(eplusr:::eplus_download_url(8.8)), ".tar.gz")
-        dest <- file.path(tempdir(), basename(url))
-        dl <- eplusr:::download_file(url, dest)
-        eplus_dir <- file.path(tools::file_path_sans_ext(tools::file_path_sans_ext(basename(dest))), "EnergyPlus-8-8-0")
-        eplus_dir <- paste0("EnergyPlus-8.8.0-7c3bbe4830-", plat, "-x86_64/EnergyPlus-8-8-0")
-        untar(dest, exdir = tempdir())
-        eplusr::use_eplus(file.path(tempdir(), eplus_dir))
+        ext <- ".tar.gz"
     }
+    port_url <- paste0(tools::file_path_sans_ext(binary_url), ext)
+    dest <- file.path(tempdir(), basename(port_url))
+    dl <- eplusr:::download_file(port_url, dest)
+    eplus_dir <- file.path(tools::file_path_sans_ext(basename(binary_url)), "EnergyPlus-8-8-0")
+    if (eplusr:::is_windows()) {
+        unzip(dest, exdir = tempdir())
+    } else {
+        untar(dest, exdir = tempdir())
+    }
+    eplusr::use_eplus(file.path(tempdir(), eplus_dir))
 }
 ```
 
