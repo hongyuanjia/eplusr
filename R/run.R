@@ -746,13 +746,13 @@ eplus_run_wait <- function (proc, echo = TRUE) {
     get_output <- function (echo = TRUE) {
         newout <- proc$read_output_lines(2000)
         if (echo) cli::cat_line(newout)
-        if (length(newout) && nzchar(newout)) {
+        if (length(newout) && all(nzchar(newout))) {
             stdout <<- c(stdout, newout)
         }
 
         newerr <- proc$read_error(2000)
         if (echo) cat(crayon::red(newerr), sep = "")
-        if (length(newerr) && nzchar(newerr)) {
+        if (length(newerr) && all(nzchar(newerr))) {
             stderr <<- c(stderr, newerr)
         }
     }
