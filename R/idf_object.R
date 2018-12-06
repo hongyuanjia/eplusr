@@ -407,7 +407,7 @@ NULL
 IdfObject <- R6::R6Class(classname = "IdfObject",
     public = list(
         # INITIALIZE {{{
-        initialize = function (object_id) {
+        initialize = function (object_id, class_id = NULL) {
             # check shared data
             var_shared <- c("m_version", "m_idd_tbl", "m_idf_tbl", "m_log")
             is_null <- vapply(var_shared, function (var) is.null(private[[var]]), logical(1))
@@ -416,10 +416,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                     "has been initialized.", call. = FALSE)
 
             assert_that(is_count(object_id))
+            if (!is.null(class_id)) {
+                assert_that(is_count(class_id))
+            } else {
+                class_id <- t_object_data(private$m_idf_tbl$object, NULL, object_id)$class_id
+            }
 
-            obj_tbl <- i_object_tbl_from_which(self, private, object_id)
-            private$m_object_id <- obj_tbl$object_id
-            private$m_class_id <- obj_tbl$class_id
+            private$m_object_id <- object_id
+            private$m_class_id <- class_id
         },
         # }}}
 
@@ -524,8 +528,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         if (name %in% funs) {
             NextMethod()
         } else {
-            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(i_underscore_name(name), all_nm)
+            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(underscore_name(name), all_nm)
             if (!is.na(m)) {
                 .subset2(x, "get_value")(m)[[1]]
             } else {
@@ -546,8 +550,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         if (i %in% funs) {
             NextMethod()
         } else {
-            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(i_underscore_name(i), all_nm)
+            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(underscore_name(i), all_nm)
             if (!is.na(m)) {
                 .subset2(x, "get_value")(m)[[1]]
             } else {
@@ -570,8 +574,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         if (name %in% funs) {
             NextMethod()
         } else {
-            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(i_underscore_name(name), all_nm)
+            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(underscore_name(name), all_nm)
             if (!is.na(m)) {
                 value <- as.list(value)
                 names(value) <- all_nm[m]
@@ -594,8 +598,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         if (i %in% funs) {
             NextMethod()
         } else {
-            all_nm <- i_underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(i_underscore_name(i), all_nm)
+            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
+            m <- match(underscore_name(i), all_nm)
             if (!is.na(m)) {
                 value <- as.list(value)
                 names(value) <- all_nm[m]

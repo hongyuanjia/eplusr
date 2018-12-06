@@ -80,6 +80,9 @@
   have some overlaps with theses in `EplusJob`, but more methods may be added in
   the future. For more details, please see the documentation of `EplusSql`.
 
+* A new method `$is_double_field()` is added to `IddObject` class to check if
+  specified fields should be double numbers
+
 ## Bug fixes
 
 * Fix the error of missing Idf file when `dir` is not `NULL` in `$run()` in

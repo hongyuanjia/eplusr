@@ -51,3 +51,26 @@
 * Add a `class` parameter to `$ref_by_object()` in `IdfObject` class
 
 * Add options of postprocessing e.g. "ConvertESOMTR".
+
+* Change all `stop()`, `warning()` and `message()` to `abort()`, `warn()` and
+  `inform()`
+
+* Update doc:
+  - `grepl()` instead of `stringi::str_detect()` is used in `$search_object()`
+
+* Add a shiny gadget to edit Idf object and return the modified objects and
+  also the code which can reproduce the process.
+
+* Fix errors in docs of `$set_object()` in `Idf` class.
+
+* Field name matching now is case-sensitive
+
+* Remove fasttime, stringr, uuid, readr, assertthat dependencies
+
+* Move crayon to suggest
+
+* Use recipes to build measures
+
+* Change `full_name` when changing units using `eplusr_option("view_in_ip")`
+
+* Validate: Stop if input string value starts with "!"
