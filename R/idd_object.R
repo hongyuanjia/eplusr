@@ -860,7 +860,7 @@ iddobj_print <- function (self, private) {
 
     # memo {{{
     cli::cat_rule(center = crayon::bold("* MEMO *"), col = "green")
-    if (is.null(cls$memo)) {
+    if (is.null(cls$memo[[1L]])) {
         cli::cat_line("  ", crayon::italic("<No Memo>"), col = "cyan")
     } else {
         cli::cat_line("  \"", crayon::italic(paste0(cls$memo[[1L]], collapse = "\n")), "\"", col = "cyan")
