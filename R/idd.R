@@ -169,7 +169,7 @@ NULL
 NULL
 
 # Idd {{{
-Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
+Idd <- R6::R6Class(classname = "Idd",
 
     public = list(
         # INITIALIZE {{{
@@ -437,9 +437,9 @@ read_idd <- function (path) {
 #' @param dir A directory to indicate where to save the IDD file.
 #'
 #' @details
-#' `use_idd()` takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
-#' usually named "Energy+.idd" and return an `Idd` object. For details on `Idd`
-#' class, please see [Idd].
+#' `use_idd()` takes a valid version or a path of an EnergyPlus Input Data
+#'     Dictionary (IDD) file, usually named "Energy+.idd" and return an `Idd`
+#'     object. For details on `Idd` class, please see [Idd].
 #'
 #' `download_idd()` downloads specified version of EnergyPlus IDD file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
@@ -500,6 +500,8 @@ read_idd <- function (path) {
 #' @author Hongyuan Jia
 # use_idd {{{
 use_idd <- function (idd, download = FALSE) {
+    if (is_idd(idd)) return(idd)
+
     if (is_idd_ver(idd, strict = TRUE)) {
         ver <- standardize_ver(idd)
 
@@ -512,7 +514,7 @@ use_idd <- function (idd, download = FALSE) {
             # if found in cache, return it directly
             if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
 
-            message("Idd v", ver, " has not been parsed before. Try to locate ",
+            message("IDD v", ver, " has not been parsed before.\nTry to locate ",
                 "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
                 surround(eplus_default_path(ver)), ".")
 
@@ -522,9 +524,13 @@ use_idd <- function (idd, download = FALSE) {
                     ver, " is not available. ")
 
                 if (!identical(download, "auto")) {
-                    stop(msg_f, "You may want to set `download` to TRUE or ",
-                        "\"auto\" to download the IDD file from EnregyPlus ",
-                        "GitHub repo.", call. = FALSE)
+                    abort("error_no_matched_idd",
+                        paste0(
+                            msg_f, " You may want to set `download` to TRUE or ",
+                            "\"auto\" to download the IDD file from EnregyPlus ",
+                            "GitHub repo."
+                        )
+                    )
                 }
 
                 message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
@@ -558,7 +564,9 @@ use_idd <- function (idd, download = FALSE) {
     }
 
     message("Start parsing...")
-    read_idd(idd)
+    idd <- read_idd(idd)
+    message("Parsing completed.")
+    idd
 }
 # }}}
 

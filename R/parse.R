@@ -79,50 +79,13 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
     }
 
     # read idf string, get idd version
-    idf_dt <- read_lines_in_dt(path)
-    idf_version <- get_idf_ver(idf_dt$string)
-
-    # handling Idd object should be moved to Idd$new()
-    # # handle Idd {{{
-    # if (!is.null(idd)) {
-    #     # if input is not an idd object
-    #     if (!is_idd(idd)) idd <- use_idd(idd)
-
-    #     # if missing version info in input IDF, give a warning
-    #     if (is.null(idf_ver))
-    #         warning("Missing version field in input Idf file. The given Idd ",
-    #             "version ", idd$version(), " will be used. Parsing errors ",
-    #             "may occur.", call. = FALSE)
-    # } else {
-    #     # if input Idf has a version and neither that version of EnergyPlus nor
-    #     # Idd is available, rewrite the error message
-    #     if (!is.null(idf_ver)) {
-    #         if (!is_avail_idd(idf_ver) && !is_avail_eplus(idf_ver)) {
-    #             stop("Idd v", idf_ver, " has not been parsed before. Try to locate ",
-    #                 "`Energy+.idd` in EnergyPlus v", idf_ver, " installation folder ",
-    #                 surround(eplus_default_path(idf_ver)), ".\n",
-    #                 "Failed to locate `Energy+.idd` because EnergyPlus v", idf_ver,
-    #                 " is not available. ", call. = FALSE)
-    #         }
-
-    #         idd <- use_idd(idf_ver)
-    #     }
-
-    #     # if input Idf does not have a version
-    #     if (is.null(idf_ver)) {
-    #         # if no Idd is available
-    #         if (is_empty(avail_idd()))
-    #             stop("Missing version field in input Idf file and no parsed ",
-    #                 "Idd object was available to use.", call. = FALSE)
-
-    #         latest_ver <- max(as.numeric_version(names(.globals$idd)))
-    #         warning("Missing version field in input Idf file. The latest Idd ",
-    #             "version ", latest_ver, " will be used. Parsing errors may ",
-    #             "occur.", call. = FALSE)
-    #         idd <- suppressMessages(use_idd(latest_ver))
-    #     }
-    # }
-    # # }}}
+    if (inherits(path, "IdfDt")) {
+        idf_dt <- path
+        idf_version <- attr(path, "version")
+    } else {
+        idf_dt <- read_lines_in_dt(path)
+        idf_version <- get_idf_ver(idf_dt$string)
+    }
 
     # type enum
     type_enum <- list(unknown = 0L, special = 1L, macro = 2L, comment = 3L,
@@ -177,9 +140,9 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
 
 # read_lines_in_dt {{{
 read_lines_in_dt <- function(input) {
-    dt <- data.table::fread(input = input, sep = NULL, header = FALSE, col.names = "string")
-    data.table::set(dt, j = "line", value = seq_along(dt[["string"]]))
-    data.table::set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string")
+    set(dt, j = "line", value = seq_along(dt[["string"]]))
+    set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
     dt
 }
 # }}}
@@ -196,10 +159,13 @@ get_idd_ver <- function (idd_str, trim = FALSE) {
         ver <- stri_sub(ver_line, 14L)
         standardize_ver(ver)
     } else if (length(ver_line > 1L)) {
-        stop("Multiple IDD version found in input IDD:\n",
-             paste0("  ", surround(ver_line), collapse = "\n"), call. = FALSE)
+        abort("error_multi_idd_ver",
+            paste0(
+                "Multiple versions found in input IDD:\n  ", collapse(ver_line), "."
+            )
+        )
     } else {
-        stop("No IDD version found in input IDD.", call. = FALSE)
+        abort("error_miss_idd_ver", "No version found in input IDD.")
     }
 }
 # }}}
@@ -215,8 +181,11 @@ get_idd_build <- function (idd_str, trim = FALSE) {
     if (length(build_line) == 1L) {
         stri_sub(build_line, 12L)
     } else if (length(build_line > 1L)) {
-        warning("Multiple build tags found in input IDD:\n",
-             paste0("  ", surround(build_line), collapse = "\n"), call. = FALSE)
+        warn("warning_multi_build",
+            paste0(
+                "Multiple build tags found in input IDD:\n  ", collapse(build_line), "."
+            )
+        )
     } else {
         warning("No build tag found in input IDD.", call. = FALSE)
     }
@@ -1042,15 +1011,6 @@ parse_field_reference_table <- function (dt) {
 }
 # }}}
 
-# get_field_name_dt {{{
-get_field_name_dt <- function (dt_field) {
-    dt_nm <- dt_field[, .SD, .SDcols = c("field_id", "class_id", "field_index", "field_name")]
-    set(dt_nm, NULL, "field_name_lc", stri_trans_tolower(dt_nm[["field_name"]]))
-    set(dt_nm, NULL, "field_name_us", underscore_name(dt_nm[["field_name_lc"]]))
-    dt_nm
-}
-# }}}
-
 # sep_idf_lines {{{
 sep_idf_lines <- function (dt, type_enum) {
     # mark location of first occurance "!" and "!-"
@@ -1087,7 +1047,7 @@ mark_idf_lines <- function (dt, type_enum) {
             macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
             is_m <- macro %in% macro_dict
             if (any(is_m)) {
-                warning("Currently, Imf file is not fully supported. All ",
+                warning("Currently, IMF is not fully supported. All ",
                     "EpMacro lines will be treated as normal comments of ",
                     "the nearest downwards object.", call. = FALSE)
                 type[is_m] <- type_enum$macro

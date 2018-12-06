@@ -784,41 +784,90 @@ NULL
 #' @author Hongyuan Jia
 NULL
 
+# Get Idd object from input IDF version
+#
+# @param idf_ver NULL or a valid IDF version
+# @param idd NULL or valid input for [use_idd()]
+# @param warn If `TRUE`, extra warning message will be shown
+#
+# get_idd_from_ver {{{
+get_idd_from_ver <- function (idf_ver = NULL, idd = NULL) {
+    if (!is.null(idf_ver)) {
+        # if input IDF has a version but neither that version of EnergyPlus nor
+        # IDD is available, rewrite the message
+        idd <- tryCatch(use_idd(idf_ver),
+            error_no_matched_idd = function (e) {
+                mes <- stri_replace_all_fixed(conditionMessage(e),
+                    "You may want to set `download`",
+                    "You may want to use `use_idd()` and set `download`"
+                )
+                stop(mes)
+            }
+        )
+    } else {
+        mes <- "Missing version field in input IDF."
+
+        if (is.null(avail_idd())) {
+            abort("error_no_avail_idd",
+                paste(mes, "No parsed IDD was available to use.")
+            )
+        } else {
+            if (is.null(idd)) {
+                idd <- use_idd(avail_idd()[length(avail_idd())])
+                warn("warn_latest_idd",
+                    paste0(mes,
+                        " The latest parsed IDD version ", idd$version(),
+                        " will be used. Parsing errors may occur."
+                    )
+                )
+            } else {
+                idd <- use_idd(idd)
+                warn("warn_given_idd_used",
+                    paste0(
+                        mes, " The given IDD version ", idd$version(),
+                        " will be used. Parsing errors may occur."
+                    )
+                )
+            }
+        }
+    }
+
+    idd$clone(deep = TRUE)
+}
+# }}}
+
 # Idf {{{
 Idf <- R6::R6Class(classname = "Idf",
     public = list(
 
         # INITIALIZE {{{
         initialize = function (path, idd = NULL) {
-
             # only store if input is a path
             if (length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- normalizePath(path)
             }
 
-            idf_file <- parse_idf_file(path, idd)
-            # warn if input is an imf file
-            is_imf <- attr(idf_file, "is_imf")
-            if (is_imf) {
-                warning("Currently, Imf file is not fully supported. All ",
-                        "EpMacro lines will be treated as normal comments of ",
-                        "the nearest downwards object.", call. = FALSE)
-            }
-            private$m_is_imf <- is_imf
-            private$m_version <- idf_file$version
-            # init options
+            # read IDF string and get version first to get corresponding IDD
+            idf_dt <- read_lines_in_dt(path)
+            idf_ver <- get_idf_ver(idf_dt$string)
+            setattr(idf_dt, "class", c("IdfDt", class(idf_dt)))
+            setattr(idf_dt, "version", idf_ver)
+            idd <- get_idd_from_ver(idf_ver, idd)
 
-            idd <- attr(idf_file, "idd")
+            # parse IDF
+            idf_file <- parse_idf_file(idf_dt, ._get_private(idd)$m_version, ._get_private(idd)$m_idd_tbl)
+
+            # in case there is no version field in input IDF
+            private$m_version <- idf_file$version
+
             # init idd tbl
             private$m_idd_tbl <- ._get_private(idd)$m_idd_tbl
+
             # get IddObject R6ClassGenerator
             private$m_iddobj_gen <- ._get_private(idd)$m_iddobj_gen
 
             # init idf tbl
-            private$m_idf_tbl <- list2env  (
-                idf_file[c("object", "value", "value_reference", "comment")],
-                parent = emptyenv()
-            )
+            private$m_idf_tbl <- list2env(idf_file[c("object", "value", "reference")], parent = emptyenv())
 
             # init log data
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
