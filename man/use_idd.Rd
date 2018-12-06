@@ -50,9 +50,9 @@ found
 Use a specific EnergyPlus Input Data Dictionary (IDD) file
 }
 \details{
-\code{use_idd()} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
-usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
-class, please see \link{Idd}.
+\code{use_idd()} takes a valid version or a path of an EnergyPlus Input Data
+Dictionary (IDD) file, usually named "Energy+.idd" and return an \code{Idd}
+object. For details on \code{Idd} class, please see \link{Idd}.
 
 \code{download_idd()} downloads specified version of EnergyPlus IDD file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is

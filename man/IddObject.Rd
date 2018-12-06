@@ -52,6 +52,7 @@ iddobj$is_autosizable_field(which = NULL)
 iddobj$is_autocalculatable_field(which = NULL)
 iddobj$is_numeric_field(which = NULL)
 iddobj$is_integer_field(which = NULL)
+iddobj$is_real_field(which = NULL)
 iddobj$is_required_field(which = NULL)
 iddobj$print()
 print(iddobj)
@@ -198,9 +199,12 @@ number of field in the extensible group is 3.
 \code{$is_autocalculatable_field()} returns \code{TRUE} if the field can be assigned to
 \code{autocalculate}.
 
-\code{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric.
+\code{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric (
+an integer or a real number).
 
 \code{$is_integer_field()} returns \code{TRUE} if the field value should be an integer.
+
+\code{$is_real_field()} returns \code{TRUE} if the field value should be a real number.
 
 \code{$is_required_field()} returns \code{TRUE} if the field is required.
 
