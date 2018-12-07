@@ -3014,7 +3014,7 @@ i_idfobject <- function (self, private, which) {
 
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
-    res <- lapply(obj_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", underscore_name(obj_nm))
     res
 }
@@ -3026,7 +3026,7 @@ i_idfobject_in_class <- function (self, private, class) {
 
     obj_nm <- private$m_idf_tbl$object[J(obj_id), on = "object_id", object_name]
 
-    res <- lapply(obj_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", underscore_name(obj_nm))
     res
 }
@@ -3052,7 +3052,7 @@ i_search_object <- function (self, private, pattern, class = NULL) {
         return(invisible())
     }
 
-    res <- lapply(obj_tbl$object_id, private$m_idfobj_generator$new)
+    res <- lapply(obj_tbl$object_id, private$m_idfobj_gen$new)
     data.table::setattr(res, "names", underscore_name(obj_tbl$object_name))
     res
 }

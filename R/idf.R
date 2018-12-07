@@ -974,7 +974,7 @@ Idf <- R6::R6Class(classname = "Idf",
             i_idf_run(self, private, weather, dir, wait, force, copy_external = copy_external),
 
         print = function (plain = FALSE)
-            i_print_idf(self, private, plain)
+            idf_print(self, private, plain)
         # }}}
 
     ),
@@ -1079,7 +1079,7 @@ idf_object <- function (self, private, which) {
         cols = c("class_id", "object_id", "object_name")
     )
 
-    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_generator$new)
+    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_gen$new)
     setattr(res, "names", underscore_name(obj$object_name))
     res
 }
@@ -1090,7 +1090,7 @@ idf_object_in_class <- function (self, private, class) {
         cols = c("class_id", "object_id", "object_name")
     )
 
-    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_generator$new)
+    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_gen$new)
     setattr(res, "names", underscore_name(obj$object_name))
     res
 }
@@ -1114,11 +1114,42 @@ idf_search_object <- function (self, private, pattern, class = NULL, ...) {
         return(invisible())
     }
 
-    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_generator$new)
+    res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_gen$new)
     setattr(res, "names", underscore_name(obj$object_name))
     res
 }
 # }}}
+# idf_print {{{
+idf_print <- function (self, private, plain = FALSE) {
+    if (plain) {
+        cli::cat_line(i_object_string(self, private), col = "green")
+    } else {
+        cli::cat_rule(crayon::bold("EnergPlus Input Data File"), col = "green", line = 2)
+
+        if (is.null(private$m_path)) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_path)
+
+        cli::cat_bullet(c(
+            paste0(crayon::bold("Path"), ": ", path),
+            paste0(crayon::bold("Version"), ": ", surround(private$m_version))
+        ), col = "cyan", bullet_col = "cyan")
+
+        count <- private$m_idf_tbl$object[, list(num_obj = .N), by = class_id][
+            private$m_idd_tbl$class, on = "class_id", nomatch = 0L][
+            private$m_idd_tbl$group, on = "group_id", nomatch = 0L][
+            , list(group_name, class_name, num_obj)]
+
+        max_num <- count[, max(num_obj)]
+        count[, num_str := paste0("[", lpad(num_obj, "0"), "]")]
+        count[, grp := ""]
+        count[count[, .I[1L], by = list(group_name)]$V1,
+            grp := crayon::bold$green(paste0("\nGroup: ", surround((group_name)), "\n", cli::rule(), "\n"))]
+        out <- count[, paste0(grp, crayon::cyan(num_str), " ", crayon::cyan(class_name))]
+
+        cli::cat_line(out)
+    }
+}
+# }}}
+
 #' Read an EnergyPlus Input Data File (IDF)
 #'
 #' `read_idf` takes an EnergyPlus Input Data File (IDF) as input and returns an

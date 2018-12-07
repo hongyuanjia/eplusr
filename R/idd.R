@@ -316,7 +316,7 @@ idd_is_valid_class_name <- function (self, private, class) {
 # }}}
 # idd_object {{{
 idd_object <- function (self, private, class) {
-    res <- lapply(class, private$m_iddobj_generator$new)
+    res <- lapply(class, private$m_iddobj_gen$new)
     setattr(res, "names", class)
     res
 }
@@ -329,7 +329,7 @@ idd_object_in_group <- function (self, private, group) {
 
     cls <- private$m_idd_tbl$class[J(grp_id), on = "group_id", class_name]
 
-    res <- lapply(cls, private$m_iddobj_generator$new)
+    res <- lapply(cls, private$m_iddobj_gen$new)
     setattr(res, "names", cls)
     res
 }

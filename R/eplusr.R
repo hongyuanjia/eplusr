@@ -45,14 +45,26 @@ name_gen_shared <- function (type = c("Idf", "Idd", "IdfObject", "IddObject")) {
 }
 # }}}
 
-# package level global constant
+# package level global constant {{{
 .globals <- new.env(parent = emptyenv())
+
+# for storing internal data
 .globals$eplus_config <- list()
 .globals$idd <- list()
+
+# for parsing IDD and IDF
+.globals$type <- list(
+    integer = 1L, real = 2L, choice = 3L, alpha = 4L,
+    object_list = 5L, node = 6L, external_list = 7L
+)
+.globals$source <- list(none = 0L, class = 1L, field = 2L, mixed = 3L)
+
+# for cloning Idd and Idf objects
 .globals$env_cloned <- list()
 .globals$is_env_cloned <- list()
 .globals$is_gen_cloned <- list()
 .globals$is_env_assigned <- list()
+# }}}
 
 # reset_clone_indicator {{{
 reset_clone_indicator <- function () {

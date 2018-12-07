@@ -489,7 +489,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 sep_at = sep_at, index = FALSE),
 
         print = function (comment = TRUE, auto_sep = FALSE)
-            i_print_idfobj(self, private, private$m_object_id, comment, auto_sep)
+            idfobj_print(self, private, private$m_object_id, comment, auto_sep)
         # }}}
     ),
 
@@ -511,6 +511,56 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         # }}}
     )
 )
+# }}}
+
+# idfobj_print {{{
+idfobj_print <- function (self, private, object, comment = TRUE, auto_sep = FALSE) {
+    assert_that(is_scalar(object))
+
+    obj_tbl <- i_object_tbl_from_which(self, private, object)
+    val_tbl <- i_value_tbl_from_which(self, private, object)
+
+    if (is.na(obj_tbl$object_name)) {
+        cli::cat_line(
+            crayon::bold$underline(paste0(
+                "IdfObject <<[ID:", obj_tbl$object_id, "]>>",
+                surround(obj_tbl$class_name)
+            )),
+            col = "inverse"
+        )
+    } else {
+        cli::cat_line(
+            crayon::bold$underline(paste0(
+                "IdfObject <<[ID:", obj_tbl$object_id, "] ", surround(obj_tbl$object_name), ">>",
+                surround(obj_tbl$class_name)
+            )),
+            col = "inverse"
+        )
+    }
+
+    # comment
+    if (comment) {
+        cmt_tbl <- i_comment_tbl_from_which(self, private, object, nomatch = 0L)
+        if (not_empty(cmt_tbl)) {
+            cli::cat_rule(center = crayon::bold("* COMMENTS *"), col = "green")
+            cli::cat_line(crayon::italic(format_comment(cmt_tbl)), col = "cyan")
+        }
+    }
+
+    if (auto_sep)
+        sep_at <- max(nchar(val_tbl$value, keepNA = FALSE)) + 4L
+    else
+        sep_at <- 20L
+
+    # value
+    fld <- format_field(val_tbl, leading = 1L, in_ip = eplusr_option("view_in_ip"),
+        sep_at = sep_at, index = TRUE, blank = TRUE, required = TRUE)
+
+    # remove class line
+    cli::cat_rule(center = crayon::green$bold("* VALUES *"), col = "green")
+    cli::cat_line(fld)
+    cli::cat_rule(col = "green")
+}
 # }}}
 
 #' @export

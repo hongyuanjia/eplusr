@@ -218,3 +218,9 @@ names2 <- function (x, default = NA_character_) {
     nm
 }
 # }}}
+
+# each_length {{{
+each_length <- function (x) {
+    vapply(x, length, integer(1L))
+}
+# }}}

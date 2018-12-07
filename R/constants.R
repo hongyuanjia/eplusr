@@ -1,14 +1,3 @@
-# .globals {{{
-# package level global constant
-.globals <- new.env(parent = emptyenv())
-.globals$eplus_config <- list()
-.globals$idd <- list()
-.globals$type <- list(
-    integer = 1L, real = 2L, choice = 3L, alpha = 4L,
-    object_list = 5L, node = 6L, external_list = 7L
-)
-.globals$source <- list(none = 0L, class = 1L, field = 2L, mixed = 3L)
-# }}}
 # versions {{{
 latest_eplus_ver <- function () as.numeric_version("9.0.0")
 
