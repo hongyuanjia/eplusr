@@ -402,7 +402,7 @@ i_param_retrieve_data <- function (self, private) {
 # }}}
 
 # i_param_job_from_which {{{
-i_param_job_from_which <- function (self, private, which) {
+i_param_job_from_which <- function (self, private, which, keep_unsucess = FALSE) {
     status <- i_param_status(self, private)
 
     if (!isTRUE(status$run_before))
@@ -442,7 +442,9 @@ i_param_job_from_which <- function (self, private, which) {
         )
     }
 
-    if (not_empty(job[exit_status != 0L])) {
+    # setting `keep_unsucess` to TRUE makes it possible to continue to parse
+    # some output files such like .err files. (#24)
+    if (isTRUE(!keep_unsucess) && not_empty(job[exit_status != 0L])) {
         unsuccessful <- job[exit_status != 0L]
         msg <- unsuccessful[, sim_status("UNSUCCESSFUL", index, idf, epw)]
         stop("Some of jobs completed unsuccessfully:\n", paste0(msg, collpase = "\n"),
@@ -621,8 +623,8 @@ i_param_output_dir <- function (self, private, which) {
 # }}}
 
 # i_param_locate_output {{{
-i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
-    job <- i_param_job_from_which(self, private, which)
+i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE, keep_unsucess = FALSE) {
+    job <- i_param_job_from_which(self, private, which, keep_unsucess = keep_unsucess)
 
     out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
 
@@ -637,7 +639,8 @@ i_param_locate_output <- function (self, private, which, suffix = ".err", strict
 
 # i_param_output_errors {{{
 i_param_output_errors <- function (self, private, which, info = FALSE) {
-    path_err <- i_param_locate_output(self, private, which, ".err")
+    # continue to parse err file for jobs having non-zero exits (#24)
+    path_err <- i_param_locate_output(self, private, which, ".err", keep_unsucess = TRUE)
 
     err <- lapply(path_err, parse_err_file)
 
