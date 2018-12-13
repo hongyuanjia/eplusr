@@ -1303,14 +1303,15 @@ get_value_table <- function (dt, idd) {
     ## add full name column based on option
     col_nm <- ifelse(.options$view_in_ip, "full_ipname", "full_name")
 
-    cols_add <- c("field_id", "type_enum", "src_enum", "field_name", col_nm,
-        "units", "ip_units", "is_name"
+    cols_add <- c("class_id", "field_index", "field_id", "type_enum",
+        "src_enum", "field_name", col_nm, "units", "ip_units", "is_name"
     )
 
-    fld <- t_field_data(idd, dt$class_id, dt$field_index, cols = cols_add)
+    dt_query <- unique(dt[, .(class_id, field_index)])
+    fld <- t_field_data(idd, dt_query$class_id, dt_query$field_index, cols = cols_add)
 
     ## bind columns
-    dt <- cbind(dt, fld)
+    dt <- fld[dt, on = .(class_id, field_index)]
 
     # add numeric type values
     dt[type_enum <= .globals$type$real,
