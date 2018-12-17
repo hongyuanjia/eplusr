@@ -156,8 +156,8 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
 format_objects <- function (value_tbl, in_ip = FALSE) {
-    assert_that(has_names(value_tbl, c("class_id", "object_id", "field_index")))
-    data.table::setorder(value_tbl, class_id, object_id, field_index)
+    assert_that(has_names(value_tbl, c("class_id", "object_id", "object_name", "field_index")))
+    setorder(value_tbl, class_id, object_id, field_index)
 
     fmt_fld <- format_field(value_tbl, leading = 1L, in_ip = in_ip,
                             sep_at = 20L, index = TRUE, blank = TRUE)
@@ -205,13 +205,41 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
     # add object char
     first_row_per_object <- value_tbl[, row_id[1L], by = list(class_id, object_id)]$V1
     first_row_per_last_object <- value_tbl[object_id %in% last_object, row_id[1], by = object_id]$V1
+
+    # add object name
+    if (is.integer(value_tbl$object_name)) {
+        set(value_tbl, NULL, "object",
+            ifelse(
+                is.na(value_tbl$object_name),
+                paste0("Object [ID:", value_tbl$object_id, "]"),
+                paste0("Object ", surround(value_tbl$object_name), " [ID:", value_tbl$object_id, "]")
+            )
+        )
+        value_tbl[is.na(object_name), `:=`(object = paste0("Object [ID: ", object_id, "]"))]
+    } else {
+        set(value_tbl, NULL, "object",
+            ifelse(
+                startsWith(value_tbl$object_id, "Input"),
+                paste0("[", value_tbl$object_id, "]"),
+                paste0("[ID: ", value_tbl$object_id, "]")
+            )
+        )
+        set(value_tbl, NULL, "object",
+            ifelse(
+                is.na(value_tbl$object_name),
+                paste0("Object ", value_tbl$object),
+                paste0("Object ", surround(value_tbl$object_name), " ", value_tbl$object)
+            )
+        )
+    }
+
     value_tbl[setdiff(first_row_per_object, first_row_per_last_object),
            out := list(list(
-                c(crayon::green(paste0("  ", char$p, char$h, " Object [ID:", object_id,"]")), out[[1L]]))),
+                c(crayon::green(paste0("  ", char$p, char$h, " ", object,"]")), out[[1L]]))),
            by = list(row_id)]
     value_tbl[first_row_per_last_object,
            out := list(list(
-                c(crayon::green(paste0("  ", char$l, char$h, " Object [ID:", object_id,"]")), out[[1L]]))),
+                c(crayon::green(paste0("  ", char$l, char$h, " ", object,"]")), out[[1L]]))),
            by = list(row_id)]
 
     # add class char
@@ -221,9 +249,7 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
                 c("", crayon::green(paste0("  Class ", surround(class_name))), out[[1L]]))),
            by = row_id]
 
-    res <- unlist(value_tbl[["out"]])
-
-    return(res)
+    unlist(value_tbl[["out"]], use.names = FALSE)
 }
 # }}}
 
@@ -312,12 +338,7 @@ format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
 
 # format_name: return Idf format field names {{{
 format_name <- function (field_tbl, in_ip = FALSE) {
-    assert_that(has_names(field_tbl, c("full_name", "full_ipname")))
-    if (in_ip) {
-        paste0("!- ", field_tbl[["full_ipname"]])
-    } else {
-        paste0("!- ", field_tbl[["full_name"]])
-    }
+    paste0("!- ", field_tbl[["full_name"]])
 }
 # }}}
 
