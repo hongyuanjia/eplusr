@@ -644,8 +644,8 @@ iddobj_is_extensible <- function (self, private) {
 }
 # }}}
 # iddobj_field_data {{{
-iddobj_field_data <- function (self, private, which = NULL, cols = NULL, min = FALSE, no_ext = TRUE) {
-    t_field_data(private$m_idd_tbl, private$m_class_id, which, cols, min, no_ext)
+iddobj_field_data <- function (self, private, which = NULL, cols = NULL, no_ext = TRUE, all = FALSE, complete = FALSE) {
+    t_field_data(private$m_idd_tbl, private$m_class_id, which, cols, no_ext = no_ext, all = all, complete = complete)
 }
 # }}}
 # iddobj_field_name {{{

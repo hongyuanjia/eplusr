@@ -244,10 +244,12 @@ check_conflict_name <- function (dt_idd, dt_idf, env_in) {
     if (env_in$check_whole) {
         obj <- env_in$object[!is.na(object_name)]
     } else {
+        exist <- dt_idf$object[class_id %in% env_in$object$class_id]
+        if (is.character(env_in$object$object_id)) {
+            set(exist, NULL, "object_id", as.character(exist$object_id))
+        }
         # add existing object
-        obj <- ins_dt(
-            dt_idf$object[class_id %in% env_in$object$class_id][, object_id := as.character(object_id)],
-            env_in$object, "object_id")[!is.na(object_name)]
+        obj <- ins_dt(exist, env_in$object, "object_id")[!is.na(object_name)]
     }
 
     if (!nrow(obj)) return(env_in)

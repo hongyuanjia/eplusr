@@ -1181,29 +1181,6 @@ sep_object_table <- function (dt, type_enum, version, idd) {
         parse_issue("error_multiple_version", "idf", "Multiple IDF Version found",
             dt[object_id %in% id_ver], length(id_ver)
         )
-
-    # if no version found, insert one
-    } else if (length(id_ver) == 0L) {
-        v <- version[, 1:2]
-        mes <- paste0("Missing version field in input IDF. The given IDD ",
-            "version ", version, " will be used. Parsing errors may occur."
-        )
-        warn("warning_idf_mis_ver", mes, idd_ver = version)
-        ins <- dt[1L]
-        ins[, `:=`(
-            line = nrow(dt) + 1L,
-            class_id = 1L,
-            class_name = "Version",
-            group_id = 1L,
-            object_id = max(dt$object_id, na.rm = TRUE),
-            string = paste0("Version, ", v, ";"),
-            body = paste0(v, ";"),
-            comment = "",
-            type = type_enum$object_value
-        )]
-
-        dt <- rbindlist(list(dt, ins))
-
     # if only has one version, then compare it with input IDD version
     } else {
         b <- dt[object_id == id_ver][type > type_enum$object, body]
@@ -1307,11 +1284,19 @@ get_value_table <- function (dt, idd) {
         "src_enum", "field_name", col_nm, "units", "ip_units", "is_name"
     )
 
-    dt_query <- unique(dt[, .(class_id, field_index)])
-    fld <- t_field_data(idd, dt_query$class_id, dt_query$field_index, cols = cols_add)
+    dt_query <- unique(dt[, list(rleid = object_id, class_id, field_index)])
 
-    ## bind columns
-    dt <- fld[dt, on = .(class_id, field_index)]
+    # add complete fields
+    fld <- t_field_data(idd, dt_query, dt_query$field_index, cols = c("rleid", cols_add), complete = TRUE)
+
+    # bind columns
+    dt <- dt[fld, on = list(object_id = rleid, class_id, field_index)]
+
+    # fill data for missing fields
+    dt[is.na(line), `:=`(
+        class_name = t_class_data(idd$class, class_id)$class_name,
+        value_id = t_new_id(dt, "value_id", length(value_id))
+    )]
 
     # add numeric type values
     dt[type_enum <= .globals$type$real,
@@ -1332,6 +1317,7 @@ get_value_table <- function (dt, idd) {
 
 # update_object_name {{{
 update_object_name <- function (dt_object, dt_value) {
+    if (!nrow(dt_value)) return(dt_object)
     dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value, object_name_lower = stri_trans_tolower(value)),
         by = list(object_id)]
@@ -1438,17 +1424,18 @@ get_value_reference_map <- function (map, src, value) {
 
     # get all values in lower case that are sources
     val_src <- get_value_sources(src, lower = TRUE)
-    if (nrow(val_src) == 0L) return(empty)
+    if (!nrow(val_src)) return(empty)
 
     # get all values in lower case that are references
     val_ref <- get_value_references(value, lower = TRUE)
-    if (nrow(val_ref) == 0L) return(empty)
+    if (!nrow(val_ref)) return(empty)
 
     val_src_lst <- val_src[, lapply(.SD, list), by = list(src_field_id)]
     val_ref_lst <- val_ref[, lapply(.SD, list), by = list(field_id)]
 
     # remove rows that field ids do not exist in current IDF
     fld_ref_src <- map[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
+    if (!nrow(fld_ref_src)) return(empty)
     set(fld_ref_src, NULL, "src_enum", NULL)
 
     # combine all references and sources

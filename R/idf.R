@@ -807,28 +807,28 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL) {
     } else {
         mes <- "Missing version field in input IDF."
 
-        if (is.null(avail_idd())) {
-            abort("error_no_avail_idd",
-                paste(mes, "No parsed IDD was available to use.")
+        if (!is.null(idd)) {
+            idd <- use_idd(idd)
+            warn("warn_given_idd_used",
+                paste0(
+                    mes, " The given IDD version ", idd$version(),
+                    " will be used. Parsing errors may occur."
+                )
             )
         } else {
-            if (is.null(idd)) {
-                idd <- use_idd(avail_idd()[length(avail_idd())])
-                warn("warn_latest_idd",
-                    paste0(mes,
-                        " The latest parsed IDD version ", idd$version(),
-                        " will be used. Parsing errors may occur."
-                    )
-                )
-            } else {
-                idd <- use_idd(idd)
-                warn("warn_given_idd_used",
-                    paste0(
-                        mes, " The given IDD version ", idd$version(),
-                        " will be used. Parsing errors may occur."
-                    )
+            if (is.null(avail_idd())) {
+                abort("error_no_avail_idd",
+                    paste(mes, "No parsed IDD was available to use.")
                 )
             }
+
+            idd <- use_idd(avail_idd()[length(avail_idd())])
+            warn("warn_latest_idd",
+                paste0(mes,
+                    " The latest parsed IDD version ", idd$version(),
+                    " will be used. Parsing errors may occur."
+                )
+            )
         }
     }
 
@@ -850,11 +850,23 @@ Idf <- R6::R6Class(classname = "Idf",
             # read IDF string and get version first to get corresponding IDD
             idf_dt <- read_lines_in_dt(path)
             idf_ver <- get_idf_ver(idf_dt$string)
-            setattr(idf_dt, "class", c("IdfDt", class(idf_dt)))
-            setattr(idf_dt, "version", idf_ver)
             idd <- get_idd_from_ver(idf_ver, idd)
 
             # parse IDF
+            # insert version line if necessary
+            if (is.null(idf_ver)) {
+                idf_dt <- rbindlist(
+                    list(idf_dt,
+                        data.table(
+                            line = nrow(idf_dt) + 1L,
+                            string = paste0("Version, ", ._get_private(idd)$m_version[, 1L:2L], ";")
+                        )
+                    ),
+                    use.names = TRUE
+                )
+            }
+            setattr(idf_dt, "class", c("IdfDt", class(idf_dt)))
+            setattr(idf_dt, "version", idf_ver)
             idf_file <- parse_idf_file(idf_dt, ._get_private(idd)$m_version, ._get_private(idd)$m_idd_tbl)
 
             # in case there is no version field in input IDF
@@ -937,17 +949,32 @@ Idf <- R6::R6Class(classname = "Idf",
         search_object = function (pattern, class = NULL, ...)
             idf_search_object(self, private, pattern, class, ...),
 
+        dup = function (...)
+            idf_dup(self, private, ...),
+
+        add = function (..., .default = TRUE, .all = FALSE)
+            idf_add(self, private, ..., .default = .default, .all = .all),
+
+        ins = function (...)
+            idf_ins_object(self, private, ...),
+
+        set = function (...)
+            idf_set(self, private, ...),
+
+        del = function (..., .purge = FALSE, .referenced = FALSE)
+            idf_set(self, private, ...),
+
         dup_object = function (object, new_name = NULL)
-            i_dup_object(self, private, object, new_name),
+            idf_dup_object(self, private, object, new_name),
 
         add_object = function (class, value = NULL, comment = NULL, default = TRUE, all = FALSE)
-            i_add_object(self, private, class, value, comment, default, all),
+            idf_add_object(self, private, class, value, comment, default, all),
 
         ins_object = function (object)
-            i_ins_object(self, private, object),
+            idf_ins_object(self, private, object),
 
         set_object = function (object, value = NULL, comment = NULL, default = FALSE)
-            i_set_object(self, private, object, value, comment, default),
+            idf_set_object(self, private, object, value, comment, default),
 
         del_object = function (object, referenced = FALSE)
             i_del_object(self, private, object, referenced),
@@ -959,7 +986,7 @@ Idf <- R6::R6Class(classname = "Idf",
             i_replace_value(self, private, pattern, replacement),
 
         validate = function ()
-            i_validate_idf(self, private),
+            idf_validate(self, private),
 
         is_valid = function ()
             i_is_valid_idf(self, private),
@@ -1117,6 +1144,65 @@ idf_search_object <- function (self, private, pattern, class = NULL, ...) {
     res <- apply2(obj$object_id, obj$class_id, private$m_idfobj_gen$new)
     setattr(res, "names", underscore_name(obj$object_name))
     res
+}
+# }}}
+# idf_dup {{{
+idf_dup <- function (self, private, ...) {
+    dup <- t_dup_object(private$m_idd_tbl, private$m_idf_tbl, ...)
+
+    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, dup$object, "object_id")
+    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, dup$value, "value_id")
+    private$m_idf_tbl$reference <- ins_dt(private$m_idf_tbl$reference, dup$reference, "value_id")
+
+    # log
+    self
+}
+# }}}
+# idf_dup_object {{{
+idf_dup_object <- function (self, private, object, new_name = NULL) {
+    warning("`$dup_object()` is deprecated. Please use `$dup()` instead.", call. = FALSE)
+    idf_dup(self, private, setattr(object, "names", new_name))
+}
+# }}}
+# idf_add {{{
+idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE) {
+    add <- t_add_object(private$m_idd_tbl, private$m_idf_tbl, ..., .default = .default, .all = .all)
+
+    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, add$object, "object_id")
+    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, add$value, "value_id")
+    private$m_idf_tbl$reference <- add$reference
+
+    # log
+    self
+}
+# }}}
+# idf_add_object {{{
+idf_add_object <- function (self, private, class, value = NULL, comment = NULL, default = TRUE, all = FALSE) {
+    warning("`$add_object()` is deprecated. Please use `$add()` instead.", call. = FALSE)
+    input <- old_input(class, value, comment, "add")
+    idf_add(self, private, input, .default = default, .all = all)
+}
+# }}}
+# idf_set {{{
+idf_set <- function (self, private, ..., .default = TRUE) {
+    set <- t_set_object(private$m_idd_tbl, private$m_idf_tbl, ..., .default = .default)
+
+    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, set$object, "object_id")
+    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, set$value, "value_id")
+    private$m_idf_tbl$reference <- set$reference
+    self
+}
+# }}}
+# idf_set_object {{{
+idf_set_object <- function (self, private, object, value, comment, default) {
+    warning("`$set_object()` is deprecated. Please use `$set()` instead.", call. = FALSE)
+    input <- old_input(class, value, comment, "set")
+    idf_set(self, private, input, .default = default)
+}
+# }}}
+# idf_validate {{{
+idf_validate <- function (self, private, level = eplusr_option("validate_level")) {
+    validate_on_level(private$m_idd_tbl, private$m_idf_tbl, level = level)
 }
 # }}}
 # idf_print {{{

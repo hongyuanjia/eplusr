@@ -207,7 +207,7 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
     first_row_per_last_object <- value_tbl[object_id %in% last_object, row_id[1], by = object_id]$V1
 
     # add object name
-    if (is.integer(value_tbl$object_name)) {
+    if (is.integer(value_tbl$object_id)) {
         set(value_tbl, NULL, "object",
             ifelse(
                 is.na(value_tbl$object_name),
@@ -235,11 +235,11 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
 
     value_tbl[setdiff(first_row_per_object, first_row_per_last_object),
            out := list(list(
-                c(crayon::green(paste0("  ", char$p, char$h, " ", object,"]")), out[[1L]]))),
+                c(crayon::green(paste0("  ", char$p, char$h, " ", object)), out[[1L]]))),
            by = list(row_id)]
     value_tbl[first_row_per_last_object,
            out := list(list(
-                c(crayon::green(paste0("  ", char$l, char$h, " ", object,"]")), out[[1L]]))),
+                c(crayon::green(paste0("  ", char$l, char$h, " ", object)), out[[1L]]))),
            by = list(row_id)]
 
     # add class char

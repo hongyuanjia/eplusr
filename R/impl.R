@@ -42,13 +42,13 @@ abort_bad_key <- function (error_type, key, value) {
 }
 # }}}
 # abort_bad_which_type {{{
-abort_bad_which_type <- function (error_type, key) {
-    mes <- paste0(key, " should be either an integer vector or a character vector")
+abort_bad_which_type <- function (error_type, key, ...) {
+    mes <- paste0(key, " should be either an integer vector or a character vector", ...)
     abort(error_type, mes)
 }
 # }}}
 # abort_bad_field {{{
-abort_bad_field <- function (error_type, key, dt) {
+abort_bad_field <- function (error_type, key, dt, ...) {
     h <- paste0("Invalid field ", key, " found:\n")
 
     mes <- switch(key,
@@ -56,7 +56,7 @@ abort_bad_field <- function (error_type, key, dt) {
         name = errormsg_field_name(dt)
     )
 
-    abort(error_type, paste0(h, mes), data = dt)
+    abort(error_type, paste0(h, mes, ...), data = dt)
 }
 # }}}
 # errormsg_info {{{
@@ -67,7 +67,8 @@ errormsg_info <- function (dt) {
 # }}}
 # errormsg_field_index {{{
 errormsg_field_index <- function (dt) {
-    dt <- dt[, list(field_index = collapse(field_index)),
+    dt <- dt[field_index < min_fields | field_index > num_fields,
+        list(field_index = collapse(field_index)),
         by = list(rleid, class_name, min_fields, num_fields)
     ]
 
@@ -80,9 +81,6 @@ errormsg_field_index <- function (dt) {
     dt[min_fields >  0L, msg := paste0(msg,
         " field index should be no less than ", min_fields,
         " and no more than ", num_fields, ".")]
-    # dt[num_extensible >  0L, msg := paste0(msg,
-    #     " Field index should be ", first_extensible - 1L, " + N * ",
-    #     num_extensible, ".")]
 
     paste0(dt$msg, collapse = "\n")
 }
@@ -100,6 +98,7 @@ errormsg_field_name <- function (dt) {
 }
 # }}}
 
+# GROUP
 # t_group_name {{{
 t_group_name <- function (dt_cls, dt_group, class = NULL) {
     if (is.null(class)) {
@@ -123,22 +122,61 @@ t_group_index <- function (dt_group, group = NULL) {
 }
 # }}}
 
+# CLASS
 # t_class_data {{{
-t_class_data <- function (dt_class, class = NULL, cols = NULL, strict = TRUE) {
+# Get class data
+# @param dt_class A data.table containing all class data. Usually generated from
+#        parsing an IDD.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names or a data.table that contains column `class_id`
+#'        or `class_name`. If `NULL`, `dt_class` will be returned directly.
+#' @param cols A character vector of column names in class table to return. If
+#'        `NULL`, all columns from `dt_class` will be returned, plus column
+#'        `rleid`.
+#' @param underscore If `TRUE`, input class name will be converted into
+#'        underscore style name first and column `class_name_us` will be used
+#'        for matching.
+# @return A data.table containing specified columns.
+t_class_data <- function (dt_class, class = NULL, cols = NULL, underscore = FALSE) {
     if (is.null(class)) return(dt_class)
 
-    if (is.character(class)) {
-        col_on <- "class_name"
-        col_key <- "class name"
-    } else if (are_count(class)) {
-        col_on <- "class_id"
-        col_key <- "class index"
+    if (inherits(class, "data.table")) {
+        dt_in <- class
+        if (!has_name(dt_in, "rleid")) add_rleid(dt_in)
+        if (has_name(dt_in, "class_id")) {
+            col_on <- "class_id"
+            col_key <- "class index"
+        } else {
+            stopifnot(has_name(dt_in, "class_name"))
+            if (underscore) {
+                if (!has_name(dt_in, "class_name_us")) {
+                    set(dt_in, NULL, "class_name_us", underscore_name(dt_in$class_name))
+                }
+                col_on <- "class_name_us"
+            } else {
+                col_on <- "class_name"
+            }
+            col_key <- "class name"
+        }
     } else {
-        abort_bad_which_type("error_class_which_type", "class")
+        if (is.character(class)) {
+            if (underscore) {
+                class <- underscore_name(class)
+                col_on <- "class_name_us"
+            } else {
+                col_on <- "class_name"
+            }
+            col_key <- "class name"
+        } else if (are_count(class)) {
+            col_on <- "class_id"
+            col_key <- "class index"
+        } else {
+            abort_bad_which_type("error_class_which_type", "class")
+        }
+        dt_in <- data.table(class = class, rleid = seq_along(class))
+        setnames(dt_in, "class", col_on)
     }
 
-    dt_in <- data.table(class = class, rleid = seq_along(class))
-    setnames(dt_in, "class", col_on)
     res <- dt_class[dt_in, on = col_on, allow.cartesian = TRUE]
 
     if (anyNA(res$group_id)) {
@@ -149,6 +187,26 @@ t_class_data <- function (dt_class, class = NULL, cols = NULL, strict = TRUE) {
     if (is.null(cols)) return(res)
 
     res[, .SD, .SDcols = cols]
+}
+# }}}
+# t_class_id_unique {{{
+t_class_id_unique <- function (dt_class) {
+    dt_class[unique_object == TRUE, class_id]
+}
+# }}}
+# t_class_id_required {{{
+t_class_id_required <- function (dt_class) {
+    dt_class[required_object == TRUE, class_id]
+}
+# }}}
+# t_class_id_extensible {{{
+t_class_id_extensible <- function (dt_class) {
+    dt_class[num_extensible > 0L, class_id]
+}
+# }}}
+# t_class_id_nonextensible {{{
+t_class_id_nonextensible <- function (dt_class) {
+    dt_class[num_extensible == 0L, class_id]
 }
 # }}}
 # t_class_name_unique {{{
@@ -172,33 +230,83 @@ t_class_name_nonextensible <- function (dt_class) {
 }
 # }}}
 
+# OBJECT
 # t_object_data {{{
-t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL, ignore_case = FALSE) {
-    obj <- t_class_data(dt_object, class, cols)
+#' Get object data.
+#'
+#' @param dt_object A data.table containing all object data. Usually generated
+#'        from parsing an IDF.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names or a data.table that contains column `class_id`
+#'        or `class_name` to specify which classes should be considered when
+#'        matching object ID or names. If `class` is a data.table with both
+#'        `class_id` and `class_name` column, `class_id` will be used.
+#' @param object An integer vector of valid object IDs or a character vector
+#'        of valid object names or a data.table that contains column `object_id`
+#'        or `object_name`. If `object` is a data.table with both `object_id`
+#'        and `object_name` column, `object_id` will be used.
+#' @param cols A character vector of column names in class table to return. If
+#'        `NULL`, all columns from `dt_object` will be returned, plus column
+#'        `rleid`.
+#' @param underscore If `TRUE`, input class name will be converted into
+#'        underscore style name first and column `class_name_us` will be used
+#'        for matching.
+#' @param ignore_case If TRUE, object name matching will be case-insensitive.
+#'
+#' If one input object matches multiple objects, an error will be issued.
+#'
+#' @return A data.table containing specified columns.
+#' TODO: remove `for_value`
+t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL,
+                           underscore = FALSE, ignore_case = FALSE, for_value = FALSE) {
+    obj <- t_class_data(dt_object, class, cols, underscore)
 
     if (is.null(object)) return(obj)
 
-    if (is.character(object)) {
-        if (ignore_case) {
-            col_on <- "object_name_lower"
-            object <- stri_trans_tolower(object)
+    if (inherits(object, "data.table")) {
+        dt_in <- object
+
+        if (!has_name(dt_in, "rleid")) add_rleid(dt_in)
+
+        if (has_name(dt_in, "object_id")) {
+            col_on <- "object_id"
+            col_key <- "object id"
         } else {
-            col_on <- "object_name"
+            stopifnot(has_name(dt_in, "object_name"))
+            col_key <- "object name"
+            if (ignore_case) {
+                if (!has_name(dt_in, "object_name_lower")) {
+                    set(dt_in, NULL, "object_name_lower", stri_trans_tolower(dt_in$object_name))
+                }
+                col_on <- "object_name_lower"
+            } else {
+                col_on <- "object_name"
+            }
         }
-        col_key <- "object name"
-    } else if (are_count(object)){
-        col_on <- "object_id"
-        col_key <- "object id"
     } else {
-        abort_bad_which_type("error_object_which_type", "object")
+        if (is.character(object)) {
+            if (ignore_case) {
+                col_on <- "object_name_lower"
+                object <- stri_trans_tolower(object)
+            } else {
+                col_on <- "object_name"
+            }
+            col_key <- "object name"
+        } else if (are_count(object)){
+            col_on <- "object_id"
+            col_key <- "object id"
+        } else {
+            abort_bad_which_type("error_object_which_type", "object")
+        }
+
+        dt_in <- data.table(object = object, rleid = seq_along(object))
+        setnames(dt_in, "object", col_on)
     }
 
-    dt_in <- data.table(object = object, rleid = seq_along(object))
-    setnames(dt_in, "object", col_on)
     res <- obj[dt_in, on = col_on, allow.cartesian = TRUE]
 
-    # Stop if there are objects that have the same name
-    if (!is_same_len(res, dt_in)) {
+    # stop if there are objects that have the same name
+    if (!isTRUE(for_value) && !is_same_len(res, dt_in)) {
         mult_rleid <- res[, .N, by = rleid][N > 1L, rleid]
         mult <- res[J(mult_rleid), on = "rleid"]
 
@@ -285,98 +393,195 @@ t_object_num <- function (dt_object, class = NULL) {
 }
 # }}}
 
+# FIELD
 # t_field_data {{{
-t_field_data <- function (idd_dt, class, field = NULL, cols = NULL, min = FALSE, no_ext = FALSE) {
+# Get specified field data
+#' @param dt_idd An environment contains IDD tables including class, fields, and
+#'        references.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names or a data.table that contains column `class_id`
+#'        and `rleid`. If a data.table that contains a column `object_id`, that
+#'        column will be preserved.
+#' @param field NULL or an integer vector of valid field indexes or a character
+#'        vector of valid field names (in underscore style). If not `NULL`,
+#'        `class` and `field` should have the same length.
+#' @param cols A character vector of column names in field table to return. If
+#'        `NULL`, all columns from IDD field table will be returned, plus column
+#'        `rleid`, `object_id` (if applicable) and `matched_rleid` (if
+#'        `complete` is `TRUE`).
+#' @param underscore If `TRUE`, input class name and field names will be
+#'        converted into underscore style name first and column `class_name_us`
+#'        and `field_name_us` will be used for matching.
+#' @param no_ext Only used when `field` is not `NULL`. If `TRUE`, no new
+#'        extensible groups will be added even if there are no matched input
+#'        found and an error will be issued right away.
+#' @param all If `TRUE` and `field` is NULL or is smaller than the total
+#'        existing field number in that class, data of all fields will be
+#'        returned. Default is `FALSE`, which means that only minimum fields
+#'        will be returned.
+#' @param complete Only used when `field` is not `NULL`. If `TRUE`, at least
+#'        fields till the current whole extensible group will be returned. A new
+#'        column named "matched_rleid" will be created (when `cols` is NULL)
+#'        indicating if given field has been matched or not.
+t_field_data <- function (
+    dt_idd, class, field = NULL, cols = NULL,
+    underscore = TRUE, no_ext = FALSE, all = FALSE, complete = FALSE
+)
+{
+    if (!is.null(field) && !is.character(field) && !are_count(field)) {
+        abort_bad_which_type("error_field_which_type", "field")
+    }
+
     cols_req <- c("rleid",
         "class_id", "class_name", "min_fields", "last_required", "num_fields",
         "first_extensible", "num_extensible", "num_extensible_group"
     )
 
+    if (underscore) cols_req <- c(cols_req, "class_name_us")
+
     # get class data
-    if (is.data.frame(class)) {
+    if (inherits(class, "data.table")) {
         dt_in <- class
-        stopifnot(has_names(dt_in, c("class_id", "rleid")))
-        dt_in <- idd_dt$class[dt_in[, list(class_id, rleid)], on = "class_id"][,
-            .SD, .SDcols = cols_req
-        ]
+        col_obj_id <- c(
+            names(dt_in)[names(dt_in) == "object_id"],
+            names(dt_in)[names(dt_in) == "object_rleid"]
+        )
+        cols_req <- c(cols_req, col_obj_id)
+        dt_in <- dt_idd$class[ dt_in[, .SD, .SDcols = c("class_id", "rleid", col_obj_id)],
+            on = "class_id"][
+            , .SD, .SDcols = cols_req]
     } else {
-        if (is_scalar(class) && !is.null(field)) class <- rep(class, length(field))
-        dt_in <- t_class_data(idd_dt$class, class, cols_req)
+        dt_in <- t_class_data(dt_idd$class, class, cols_req, underscore = underscore)
+        # make sure number of rows of dt_in and the length of input field is the same
+        if (is_scalar(class) && !is.null(field)) dt_in <- dt_in[rep(1L, length(field))]
+        col_obj_id <- c(
+            names(dt_in)[names(dt_in) == "object_id"],
+            names(dt_in)[names(dt_in) == "object_rleid"]
+        )
     }
 
-    if (is.null(cols)) cols <- c("rleid", names(idd_dt$field))
+    if (is.null(cols)) {
+        cols <- c("rleid", names(dt_idd$field), col_obj_id)
+        if (complete) cols <- c(cols, "matched_rleid")
+    }
+
+    # get_index_dt: return an index dt for non-equi join {{{
+    get_index_dt <- function (dt_in, all = FALSE, cols = NULL) {
+        if (!nrow(dt_in) && !has_name(dt_in, "field_index")) {
+            set(dt_in, NULL, "field_index", integer(0))
+        }
+
+        # select last matched field per input
+        if (has_name(dt_in, "field_index")) {
+            dt_last <- dt_in[dt_in[order(rleid, -field_index), .I[1L], by = list(rleid)]$V1]
+        } else {
+            dt_last <- dt_in[dt_in[order(rleid), .I[1L], by = list(rleid)]$V1]
+        }
+
+        # get acceptable field number
+        add_accept_field_num(dt_last, num = dt_last$field_index, all = all, keep_input = TRUE)[
+            , field_index := acceptable_num][
+            , .SD, .SDcols = c("rleid", "class_id", "field_index", cols)]
+    }
+    # }}}
+
+    # field_from_idx: return field data by using an index dt {{{
+    fields_from_idx <- function (dt_idd, dt_idx, col = "field_index") {
+        fld <- dt_idd$field[dt_idx, on = c("class_id", paste0("field_index<=", col))]
+        set(fld, NULL, "field_index", rowidv(fld, c("rleid", "class_id")))
+        fld
+    }
+    # }}}
 
     if (is.null(field)) {
-        if (min) {
-            dt_in <- add_accept_field_num(dt_in)
-            fld <- idd_dt$field[dt_in, on = list(class_id, field_index <= acceptable_num)]
-            set(fld, NULL, "field_index", rowidv(fld, "rleid"))
-        } else {
-            fld <- idd_dt$field[dt_in[, list(rleid, class_id)], on = "class_id"]
-        }
-        return(fld[, .SD, .SDcols = cols])
+        return(
+            fields_from_idx(dt_idd, get_index_dt(dt_in, all = all, cols = col_obj_id))[
+                , .SD, .SDcols = cols]
+        )
     }
 
-    assert_that(is_same_len(class, field))
+    assert_that(is_same_len(dt_in, field))
 
     if (are_count(field)) {
+        # from field index {{{
         col_on <- "field_index"
         set(dt_in, NULL, "field_index", field)
 
-        dt_in <- add_accept_field_num(dt_in, field)
+        dt_idx <- get_index_dt(dt_in, all = all, cols = c(col_obj_id,
+            "input_num", "num_fields", "num_extensible", "num_extensible_group",
+            "last_required")
+        )
 
         # check invalid field index
-        invld_idx <- dt_in[acceptable_num == 0L]
-        if (nrow(invld_idx)) {
+        if (nrow(dt_idx[field_index == 0L])) {
+            invld_idx <- dt_in[dt_idx[field_index == 0L, list(rleid)], on = "rleid"]
             abort_bad_field("error_bad_field_index", "index", invld_idx)
         }
 
         # handle extensible fields
-        set(dt_in, NULL, "num", 0L)
-        dt_in[acceptable_num > num_fields, `:=`(num = as.integer((acceptable_num - num_fields) / num_extensible))]
+        set(dt_idx, NULL, "num", 0L)
+        dt_idx[field_index > num_fields, `:=`(num = as.integer((field_index - num_fields) / num_extensible))]
 
-        if (no_ext && nrow(dt_in[num > 0L])) {
+        if (no_ext && nrow(dt_idx[num > 0L])) {
             abort_bad_field("error_bad_field_index", "index", dt_in[num > 0L])
         }
 
-        dt <- t_add_extensible_group(idd_dt, dt_in)
-
-        fld <- dt$field[dt_in, on = c("class_id", "field_index")]
-
-    } else if (is.character(field)) {
+        dt <- t_add_extensible_group(dt_idd, dt_idx)
+        if (!complete) {
+            fld <- dt_idd$field[dt_in, on = c("class_id", col_on)]
+        } else {
+            fld <- fields_from_idx(dt, dt_idx, "field_index")[dt_in, on = list(rleid, field_index),
+                matched_rleid := .I]
+            fld[is.na(matched_rleid), matched_rleid := 0L]
+        }
+        # }}}
+    } else {
+        # from field name {{{
         # clean up dt for error message printing
         clean_errnm_dt <- function (dt, extensible = FALSE) {
-            set(dt, NULL, "extensible_field", extensible)
-            set(dt, NULL, "field_name", NULL)
-            setnames(dt, "field_name_in", "field_name")
-            if (has_names(dt, c("class_name_in", "class_name"))) {
-                set(dt, NULL, "class_name", NULL)
-                setnames(dt, "class_name_in", "class_name")
+            errnm <- dt[, list(rleid, field_rleid, class_id, class_name = i.class_name,
+                field_name = field_name_in)]
+            if (nrow(errnm)) {
+                set(errnm, NULL, "extensible_field", extensible)
+            } else {
+                set(errnm, NULL, "extensible_field", logical(0L))
             }
-            dt[, .SD, .SDcols = c("rleid", "field_rleid", "class_id", "class_name", "field_name", "extensible_field")]
+            errnm
         }
 
         # add helper columns
         add_rleid(dt_in, "field")
         set(dt_in, NULL, "field_name_in", field)
-        set(dt_in, NULL, "field_name_in_us", underscore_name(dt_in$field_name_in))
+        if (underscore) {
+            col_on <- "field_name_us"
+            set(dt_in, NULL, "field_name_us", underscore_name(field))
+        } else {
+            col_on <- "field_name"
+            set(dt_in, NULL, "field_name", field)
+        }
 
         # join
-        dt_join <- idd_dt$field[dt_in, on = c("class_id", field_name_us = "field_name_in_us")]
-        set(dt_join, NULL, "class_name", NULL)
-        setnames(dt_join, "i.class_name", "class_name")
+        dt_join <- dt_idd$field[dt_in, on = c("class_id", col_on)]
 
         # get no matched
         dt_nom <- dt_join[is.na(field_id)]
-        # get matched
-        dt_m <- dt_join[!dt_nom, on = "field_rleid", .SD, .SDcols = c(cols, "field_rleid")]
 
         # invalid field names for non-extensible classes
-        invld_nm_non_ext <- dt_nom[class_name %chin% t_class_name_nonextensible(idd_dt$class)]
+        invld_nm_non_ext <- dt_nom[class_id %chin% t_class_id_nonextensible(dt_idd$class)]
         invld_nm_non_ext <- clean_errnm_dt(invld_nm_non_ext, FALSE)
 
         # fields for extensible classes
         dt_nom_ext <- dt_nom[!invld_nm_non_ext, on = "field_rleid"]
+
+        # get matched
+        dt_m <- dt_join[!dt_nom, on = "field_rleid"]
+
+        if (complete) {
+            dt_idx <- get_index_dt(dt_m, all = all, cols = col_obj_id)
+            dt_m <- fields_from_idx(dt_idd, dt_idx)[dt_m, on = list(rleid, field_index),
+                matched_rleid := .I]
+            dt_m[is.na(matched_rleid), matched_rleid := 0L]
+        }
 
         # if checking completes and errors are found
         if (no_ext) {
@@ -384,7 +589,7 @@ t_field_data <- function (idd_dt, class, field = NULL, cols = NULL, min = FALSE,
                 abort_bad_field("error_bad_field_name", "name", clean_errnm_dt(dt_na))
             }
 
-            return(dt_join[, .SD, .SDcols = cols])
+            return(dt_m[, .SD, .SDcols = cols])
         }
 
         if (!nrow(dt_nom_ext)) {
@@ -392,7 +597,7 @@ t_field_data <- function (idd_dt, class, field = NULL, cols = NULL, min = FALSE,
                 abort_bad_field("error_bad_field_name", "name", invld_nm_non_ext)
             }
 
-            return(dt_join[, .SD, .SDcols = cols])
+            return(dt_m[, .SD, .SDcols = cols])
         }
 
         # if there is a need to extend classes or there is no error found
@@ -403,25 +608,41 @@ t_field_data <- function (idd_dt, class, field = NULL, cols = NULL, min = FALSE,
         # get extensible number to add per class
         dt_ext[, `:=`(num = ceiling(num / num_extensible))]
 
-        dt <- t_add_extensible_group(idd_dt, dt_ext)
+        dt <- t_add_extensible_group(dt_idd, dt_ext)
         dt_ext_join <- dt$field[
-            dt_nom_ext[, list(rleid, field_rleid, class_id, class_name_in = class_name, field_name_us, field_name_in)],
-            on = c("class_id", "field_name_us")
-        ]
+            dt_nom_ext[, .SD, .SDcols = c("class_id", col_on, setdiff(names(dt_nom_ext), names(dt$field)))],
+            on = c("class_id", col_on)]
 
         # check invalid extensible field names
         invld_nm_ext <- clean_errnm_dt(dt_ext_join[is.na(field_id)], TRUE)
         invld_nm <- rbindlist(list(invld_nm_non_ext, invld_nm_ext))
         if (nrow(invld_nm)) {
-            dt <- t_del_extensible_group(idd_dt, dt_ext)
-            abort_bad_field("error_bad_field_name", "name", invld_nm)
+            dt_ext[, num_fields := num_fields + num * num_extensible]
+            dt <- t_del_extensible_group(dt, dt_ext)
+            abort_bad_field("error_bad_field_name", "name", invld_nm,
+                "\n\nNOTE: For extensible fields, new one will be added only ",
+                "when all previous extensible groups exist."
+            )
         }
 
-        fld <- ins_dt(dt_m, dt_ext_join)
+        fld <- rbindlist(list(dt_m, dt_ext_join), fill = TRUE)
+        if (complete) {
+            dt_ext_idx <- get_index_dt(dt_ext_join, all = all, cols = col_obj_id)
+
+            # combine index data of non-extensible and extensible groups
+            dt_idx <- rbindlist(list(dt_ext, dt_ext_idx))[
+                , list(field_index = max(field_index)), by = c("rleid", col_obj_id, "class_id")]
+
+            # mark those matched field
+            fld <- fields_from_idx(dt_idd, dt_idx)[fld, on = list(rleid, field_index),
+                matched_rleid := .I]
+            fld[is.na(matched_rleid), matched_rleid := 0L]
+        }
+        # }}}
     }
 
-    if (!is_same_len(idd_dt$field, dt$field)) {
-        warning("`idd_dt` is not an environment and IDD data has been changed during query")
+    if (!is_same_len(dt_idd$field, dt$field)) {
+        warning("`dt_idd` is not an environment and IDD data has been changed during query")
     }
 
     fld[, .SD, .SDcols = cols]
@@ -486,10 +707,147 @@ t_field_reference <- function (fld, dt_reference, dt_value) {
 }
 # }}}
 
+# VALUE
+# t_value_data_in_class {{{
+# Return all object value data in a class
+#' @param dt_idd An environment contains IDD tables including class, field, and
+#'        reference.
+#' @param dt_idf An environment contains IDF tables including object, value, and
+#'        reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names or a data.table that contains columns `class_id`
+#'        or `class_name` and `class_name_us` (when `underscore` is TRUE). If
+#'        both `class_id` and `class_name` exist, `class_id` will be used for
+#'        matching.
+#' @param field NULL or an integer vector of valid field indexes or a character
+#'        vector of valid field names (in underscore style). If not `NULL`,
+#'        `class` and `field` should have the same length.
+#' @param cols A character vector of column names in value table to return. If
+#'        `NULL`, all columns from object value table will be returned, plus
+#'        column `rleid`.
+#' @param underscore If `TRUE`, input class name will be converted into
+#'        underscore style name first and column `class_name_us` in IDD class
+#'        table will be used for matching.
+#' @param fill If `TRUE`, all field number will be the same.
+t_value_data_in_class <- function (dt_idd, dt_idf, class, field = NULL, cols = NULL,
+                                   underscore = FALSE, fill = FALSE) {
+    stopifnot(!is.null(class))
+
+    browser()
+    # get all fields
+    fld <- t_field_data(dt_idd, class, field, underscore = underscore)
+    val <- fld[dt_idf$value, on = "field_id"][, .SD, .SDcols = cols]
+
+    if (fill) {
+        browser()
+    }
+
+}
+# }}}
+# t_value_data_in_object {{{
+# Return object value data
+#' @param dt_idd An environment contains IDD tables including class, field, and
+#'        reference.
+#' @param dt_idf An environment contains IDF tables including object, value, and
+#'        reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names or a data.table that contains column `class_id`
+#'        or `class_name` to specify which classes should be considered when
+#'        matching object ID or names. If `class` is a data.table with both
+#'        `class_id` and `class_name` column, `class_id` will be used.
+#' @param object An integer vector of valid object IDs or a character vector
+#'        of valid object names or a data.table that contains column `object_id`
+#'        or `object_name`. If `object` is a data.table with both `object_id`
+#'        and `object_name` column, `object_id` will be used.
+#' @param field NULL or an integer vector of valid field indexes or a character
+#'        vector of valid field names (in underscore style). If not `NULL`,
+#'        `class` and `field` should have the same length.
+#' @param cols A character vector of column names in value table to return. If
+#'        `NULL`, all columns from object value table will be returned, plus
+#'        column `rleid`.
+#' @param underscore If `TRUE`, input class name will be converted into
+#'        underscore style name first and column `class_name_us` in IDD class
+#'        table will be used for matching.
+#' @param ignore_case If TRUE, object name matching will be case-insensitive.
+t_value_data_in_object <- function (dt_idd, dt_idf, class = NULL, object, field = NULL, cols = NULL,
+                                    underscore = FALSE, ignore_case = FALSE) {
+    stopifnot(!is.null(object))
+    if (is.null(cols)) cols <- unique(c(names(object), names(dt_idf$value)))
+
+    obj <- t_object_data(dt_idf$object, class, object,
+        ignore_case = ignore_case, underscore = underscore)
+
+    if (is.null(field)) {
+        return(dt_idf$value[obj, on = "object_id"][, .SD, .SDcols = cols])
+    }
+
+    fld <- t_field_data(dt_idd, obj, field, underscore = underscore,
+        cols = intersect(names(dt_idd$field), names(dt_idf$value)))
+
+    dt_idf$value[, .SD, .SDcols = c("object_id", "value_id", "value", "value_num", "field_id")][
+        cbind(obj[, .SD, .SDcols = setdiff(names(obj), names(fld))], fld),
+        on = c("object_id", "field_id")][, .SD, .SDcols = cols]
+}
+# }}}
 # t_value_data {{{
-t_value_data <- function (dt_value, class = NULL, object = NULL, cols = NULL) {
-    dt_value <- t_object_data(dt_value, class, object, cols)
-    dt_value
+# Get specified value data
+#' @param dt_idd An environment contains IDD tables including class, field, and
+#'        reference.
+#' @param dt_idf An environment contains IDF tables including object, value, and
+#'        reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names to specify classes to search for. If `NULL`, then
+#'        all classes existing in current IDF wil be used.
+#' @param object An integer vector of valid object IDs or a character vector
+#'        of valid object names.
+#' @param field NULL or an integer vector of valid field indexes or a character
+#'        vector of valid field names (in underscore style). If not `NULL`,
+#'        `class` and `field` should have the same length.
+#' @param cols A character vector of column names in field tables to return. If
+#'        `NULL`, all columns from IDD field table will be returned, plus column
+#'        `rleid`, `object_id` (if applicable) and `matched_rleid` (if
+#'        `complete` is `TRUE`).
+#' @param no_ext Only used when `field` is not `NULL`. If `TRUE`, no new
+#'        extensible groups will be added even if there are no matched input
+#'        found and an error will be issued right away.
+#' @param all If `TRUE` and `field` is NULL or is smaller than the total
+#'        existing field number in that class, data of all fields will be
+#'        returned. Default is `FALSE`, which means that only minimum fields
+#'        will be returned.
+#' @param complete Only used when `field` is not `NULL`. If `TRUE`, at least
+#'        fields till the current whole extensible group will be returned. A new
+#'        column named "matched_rleid" will be created indicating if given field
+#'        has been matched or not.
+#' @details
+#' (a) To get all object value data in a specific class:
+#'
+#' t_value_data(dt_idd, dt_idf, class = "XXX", fill = FALSE)
+#'
+#' (b) To get all object value data in a specific class, and make sure returned
+#'     field number is the same across all objects in that class:
+#'
+#' t_value_data(dt_idd, dt_idf, class = "XXX", fill = TRUE)
+#'
+#' (c) To search objects in a specific class:
+#'
+#' t_value_data(dt_idd, dt_idf, class = "XXX", object = c("obj1", "obj2"), fill = FALSE)
+#'
+#' (d) To get specific field values in a specific class, and issue an error if
+#'     some objects do not have that field:
+#'
+#' t_value_data(dt_idd, dt_idf, class = "XXX", field = "Name", fill = FALSE)
+#'
+#' (e) To get specific field values in a specifc class, and automatically add
+#'     those missing fields (temporary, not affacting the actual IDF data)
+#'
+#' t_value_data(dt_idd, dt_idf, class = "XXX", field = "Name", fill = TRUE)
+#'
+#' (f) `field` can also be a data.table that contains at least columns
+#'     `field_id` or `field_name`.
+
+t_value_data <- function (dt_value, class = NULL, object = NULL, field = NULL,
+                          cols = NULL, ignore_case = FALSE, underscore = FALSE) {
+    t_object_data(dt_value, class, object, cols, ignore_case, for_value = TRUE)
 }
 # }}}
 # t_value_all_node {{{
@@ -505,9 +863,10 @@ t_new_id <- function (dt, name, num) {
 }
 # }}}
 
+# EXTENSIBLE GROUP
 # t_add_extensible_group {{{
-t_add_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
-    dt_cls <- get_input_class_data(idd_dt$class, class, num)
+t_add_extensible_group <- function (dt_idd, class, num = NULL, strict = FALSE) {
+    dt_cls <- get_input_class_data(dt_idd$class, class, num)
 
     # stop if non-extensible class found
     if (strict && nrow(dt_cls[num_extensible == 0L])) {
@@ -519,7 +878,7 @@ t_add_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
 
     ext <- dt_cls[num_extensible > 0L & num > 0L]
 
-    if (nrow(ext) == 0L) return(idd_dt)
+    if (!nrow(ext)) return(dt_idd)
 
     # get unique class data
     ext <- ext[,
@@ -533,7 +892,7 @@ t_add_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
     ]
 
     # get the last extensible group
-    ext_fld <- idd_dt$field[ext, on = c("class_id", "extensible_group")]
+    ext_fld <- dt_idd$field[ext, on = c("class_id", "extensible_group")]
     set(ext_fld, NULL, "num", NULL)
 
     ext_fld[, `:=`(
@@ -593,27 +952,27 @@ t_add_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
     new_ext[field_index > last_required, `:=`(required_field = FALSE)]
 
     # get new field id
-    new_fld_id <- t_new_id(idd_dt$field, "field_id", nrow(new_ext))
+    new_fld_id <- t_new_id(dt_idd$field, "field_id", nrow(new_ext))
 
     # assign new field id
     set(new_ext, NULL, "field_id", new_fld_id)
 
     # get field reference data
-    ref <- idd_dt$reference[
+    ref <- dt_idd$reference[
         J(new_ext$field_id), on = "field_id"][
         , `:=`(field_id = new_fld_id)][
         !is.na(src_field_id)]
-    src <- idd_dt$reference[J(new_ext$field_id), on = "src_field_id"][
+    src <- dt_idd$reference[J(new_ext$field_id), on = "src_field_id"][
         , `:=`(src_field_id = new_fld_id)][
         !is.na(field_id)]
     new_ref <- rbindlist(list(ref, src))
 
     # combine into the main field table and name table
-    idd_dt$field <- ins_dt(idd_dt$field, new_ext)
-    idd_dt$reference <- ins_dt(idd_dt$reference, new_ref)
+    dt_idd$field <- ins_dt(dt_idd$field, new_ext)
+    dt_idd$reference <- ins_dt(dt_idd$reference, new_ref)
 
     # update class data
-    idd_dt$class <- copy(idd_dt$class)[ext, on = "class_id",
+    dt_idd$class <- copy(dt_idd$class)[ext, on = "class_id",
         c("num_fields", "num_extensible_group") := {
             num_fields = num_fields + ext$num * ext$num_extensible
             num_extensible_group = num_extensible_group + ext$num
@@ -621,12 +980,12 @@ t_add_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
         }
     ]
 
-    idd_dt
+    dt_idd
 }
 # }}}
 # t_del_extensible_group {{{
-t_del_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
-    dt_cls <- get_input_class_data(idd_dt$class, class, num)
+t_del_extensible_group <- function (dt_idd, class, num = NULL, strict = FALSE) {
+    dt_cls <- get_input_class_data(dt_idd$class, class, num)
 
     # stop if non-extensible class found
     if (strict && nrow(dt_cls[num_extensible == 0L])) {
@@ -638,7 +997,7 @@ t_del_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
 
     ext <- dt_cls[num_extensible > 0L]
 
-    if (nrow(ext) == 0L) return(idd_dt)
+    if (!nrow(ext)) return(dt_idd)
 
     # get unique class data
     ext <- ext[,
@@ -660,21 +1019,21 @@ t_del_extensible_group <- function (idd_dt, class, num = NULL, strict = FALSE) {
     }
 
     # get field id to delete
-    fld_id_del <- idd_dt$field[ext, on = list(class_id, extensible_group > left_group), list(field_id)]
+    fld_id_del <- dt_idd$field[ext, on = list(class_id, extensible_group > left_group), list(field_id)]
 
-    idd_dt$field <- idd_dt$field[!fld_id_del, on = "field_id"]
+    dt_idd$field <- dt_idd$field[!fld_id_del, on = "field_id"]
 
-    idd_dt$reference <- idd_dt$reference[
+    dt_idd$reference <- dt_idd$reference[
         !fld_id_del, on = "field_id"][
         !fld_id_del, on = c(src_field_id = "field_id")
     ]
 
-    idd_dt$class <- copy(idd_dt$class)[ext, on = "class_id", `:=`(
+    dt_idd$class <- copy(dt_idd$class)[ext, on = "class_id", `:=`(
         num_extensible_group = ext$left_group,
         num_fields = ext$left_fields
     )]
 
-    idd_dt
+    dt_idd
 }
 # }}}
 
@@ -685,53 +1044,100 @@ add_rleid <- function (dt, prefix = NULL) {
 }
 # }}}
 # add_accept_field_num {{{
-add_accept_field_num <- function (dt_class, num = NULL) {
+# Get the acceptable field number
+#' @param dt_class A data.table contains class data. Columns below should exist:
+#'        `class_id`, `min_fields`, `last_required`, `num_fields`,
+#'        `num_extensible`, `first_extensible`.
+#' @param num NULL or an positive integer vector indicating how many fields to
+#'        check.
+#' @param all If `TRUE`, the acceptable number returned will always be the total
+#'        number of existing fields in those classes.
+#' @param keep_input If `TRUE`, a column named `input_num` containing all input
+#'        `num`. If `num` is `NULL`, `input_num` will be the same as the
+#'        `num_fields` column in `dt_class`.
+#' @details
+#' Acceptable number is determined in ways below:
+#'     * If `all` is `TRUE`, when `num` is NULL or smaller than the total
+#'       existing field number, the accetable field number is the total existing
+#'       field number in that class.
+#'     * If `all` is `FALSE`:
+#'         * If input number is NULL:
+#'             - For class with no required fields and no minimum field number
+#'               requirement, the acceptable field number is the total existing
+#'               field number in that class.
+#'             - For class with required fields and minimum field number
+#'               requirement, the acceptable number is the bigger one between
+#'               required field number and minimum field number.
+#'         * If input number is smaller than the total existing field number:
+#'             - The acceptable field number is the maximum among the field
+#'               index of the last field in the last extensible group (if
+#'               applicable), the field index of the last required field and
+#'               minimum field number required.
+#'         * If input number is larger than the total existing field number:
+#'             - The acceptable field number will be the field index of the last
+#'               field in the last extensible group.
+add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input = FALSE) {
     stopifnot(has_names(dt_class,
         c("min_fields", "last_required", "num_fields", "num_extensible", "first_extensible"))
     )
 
+    stopifnot(is.null(num) || are_count(num))
+
     dt_class <- add_rleid(dt_class, "class")
 
-    dt_class[
-        min_fields == 0L & last_required == 0L,
-        `:=`(acceptable_num = num_fields),
-        by = list(class_rleid)
-    ]
+    if (all) {
+        if (keep_input) {
+            set(dt_class, NULL, "input_num", dt_class$num_fields)
+        }
+        set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
+        return(dt_class)
+    }
 
-    dt_class[is.na(acceptable_num),
-        `:=`(acceptable_num = max(min_fields, last_required)),
-        by = list(class_rleid)
-    ]
+    if (is.null(num)) {
+        if (all) {
+            if (keep_input) {
+                set(dt_class, NULL, "input_num", dt_class$num_fields)
+            }
+            set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
+            return(dt_class)
+        }
 
-    if (is.null(num)) return(dt_class)
+        set(dt_class, NULL, "input_num", 0L)
+        dt_class[min_fields == 0L & last_required == 0L, input_num := num_fields]
+    } else {
+        stopifnot(is_same_len(dt_class, num))
+        stopifnot(are_count(num))
+        set(dt_class, NULL, "input_num", as.integer(num))
+        if (all) {
+            dt_class[input_num <= num_fields, input_num := num_fields]
+        }
+    }
 
-    stopifnot(is_same_len(dt_class, num))
-    stopifnot(are_count(num))
-
-    set(dt_class, NULL, "input_num", as.integer(num))
+    # get index of the last field in the last extensible group
     set(dt_class, NULL, "last_extensible", 0L)
-
     dt_class[
         num_extensible > 0L & input_num > first_extensible,
-        `:=`(last_extensible = as.integer(
-                ceiling((input_num - first_extensible + 1L) / num_extensible)
-                * num_extensible + first_extensible - 1L
-        )),
+        last_extensible := as.integer(
+            ceiling((input_num - first_extensible + 1L) / num_extensible)
+            * num_extensible + first_extensible - 1L
+        ),
         by = list(class_rleid)
     ]
 
-    dt_class[
-        input_num > num_fields,
-        `:=`(acceptable_num = last_extensible),
-        by = list(class_rleid)
-    ]
+    if (!nrow(dt_class)) {
+        set(dt_class, NULL, "acceptable_num", integer(0L))
+    } else {
+        dt_class[,
+            acceptable_num := max(input_num, min_fields, last_required, last_extensible),
+            by = c("class_rleid")]
+    }
 
-    dt_class[input_num <= num_fields,
-        `:=`(acceptable_num = max(acceptable_num, last_extensible, input_num)),
-        by = list(class_rleid)
-    ]
-
-    set(dt_class, NULL, c("class_rleid", "last_extensible", "input_num"), NULL)
+    if (keep_input) {
+        set(dt_class, NULL, c("class_rleid", "last_extensible"), NULL)
+    } else {
+        set(dt_class, NULL, c("class_rleid", "last_extensible", "input_num"), NULL)
+    }
+    dt_class
 }
 # }}}
 # get_input_class_data {{{
@@ -756,7 +1162,7 @@ get_input_class_data <- function (dt_class, class, num = NULL) {
             )
         )
 
-        dt_cls <- add_accept_field_num(dt_cls)
+        # dt_cls <- add_accept_field_num(dt_cls)
 
         stopifnot(are_count(num))
         stopifnot(is_same_len(class, num))
@@ -795,21 +1201,29 @@ ins_dt <- function (dt, new_dt, base_col = NULL) {
     }
 }
 # }}}
+# ins_all_dt {{{
+ins_all_dt <- function (x, y, base_col = NULL) {
+    for (nm in names(y)) {
+        x[[nm]] <- ins_dt(x[[nm]], y[[nm]], base_col)
+    }
+    x
+}
+# }}}
 
 # t_assert_can_add {{{
-t_assert_can_add <- function (dt_class, dt_object, class) {
+t_assert_can_add <- function (dt_class, dt_object, class_name) {
     # stop if attempt to add Version
-    is_ver <- class == "Version"
+    is_ver <- class_name == "Version"
     if (any(is_ver)) {
         mes <- "Adding `Version` object directly is prohibited."
-        abort("error_add_version_object", mes, class = class)
+        abort("error_add_version_object", mes, class_name = class_name)
     }
 
     # otherwise, only do further checking in final mode
     if (!in_final_mode()) return(TRUE)
 
     # check if attempt to add unique objects
-    uni_cls <- class[class %in% t_class_name_unique(dt_class)]
+    uni_cls <- class_name[class_name %in% t_class_name_unique(dt_class)]
     if (!length(uni_cls)) return(TRUE)
 
     obj_num <- t_object_num(dt_object, uni_cls)
@@ -821,7 +1235,7 @@ t_assert_can_add <- function (dt_class, dt_object, class) {
         mes <- paste0(
             "Existing unique object(s) in class ", collapse(dup_cls), " cannot be duplicated."
         )
-        abort_for_final("error_add_exist_unique_object", mes, class = dup_cls)
+        abort_for_final("error_add_exist_unique_object", mes, class_name = dup_cls)
     }
 
     dup_in <- unique(uni_cls[duplicated(uni_cls)])
@@ -830,7 +1244,7 @@ t_assert_can_add <- function (dt_class, dt_object, class) {
         mes <- paste0(
             "Unique object(s) in class ", collapse(dup_in), " can only be added once."
         )
-        abort_for_final("error_add_new_unique_object", mes, class = dup_in)
+        abort_for_final("error_add_new_unique_object", mes, class_name = dup_in)
     }
 }
 # }}}
@@ -845,31 +1259,86 @@ t_assert_can_set <- function (dt_object) {
         abort("error_set_version_object", mes, class = class)
     }
 
-    if (anyDuplicated(dt_object$object_id)) {
-        dup <- dt_object[duplicated(object_id)]
-        id <- NULL
-        nm <- NULL
-        if (nrow(dup[is.na(object_name)])) {
-            id <- dup[is.na(object_name), paste0("ID ", surround(object_id))]
-        }
-        if (nrow(dup[!is.na(object_name)])) {
-            nm <- dup[!is.na(object_name),
-                paste0("ID ", surround(object_id), "(Name ", surround(object_name), ")"),
-            ]
-        }
-        where <- collapse(c(id, nm), tick = FALSE)
+    # stop if modifying same object multiple times
+    if (anyDuplicated(dt_object, by = "object_id")) {
+        if (!has_name(dt_object, "rleid")) add_rleid(dt_object,)
 
-        mes <- paste0(
-            "Each object can only be modified once a time. Duplicated objects found:\n",
-            where
+        dup <- dt_object[, list(rleid = list(collapse(rleid, NULL)),
+            object_name = unique(object_name)), by = list(object_id)]
+
+        info <- t_object_info(dup, c("id", "name"), numbered = FALSE,
+            prefix = "Targeting to the same ")
+
+        abort("error_set_object_multi_time",
+            paste0(
+                "Cannot modify same object multiple times. Invalid input:\n",
+                paste0("# (", dup$rleid, ")| ", info, collapse = "\n")
+            )
         )
-        abort("error_set_object_multi_time", mes, data = dup)
     }
 }
 # }}}
+# t_assert_can_del {{{
+t_assert_can_del <- function (dt_object) {
+    obj_tbl <- i_object_tbl_from_which(self, private, object)
 
+    is_version <- obj_tbl$class_name == "Version"
+
+    if (any(is_version))
+        stop("Deleting `Version` object is prohibited.", call. = FALSE)
+
+    if (anyDuplicated(obj_tbl$object_id))
+        stop("`object` should not contain any duplication.", call. = FALSE)
+
+    if (eplusr_option("validate_level") != "final") return()
+
+    class_name <- obj_tbl$class_name
+
+    is_required <- class_name %in% i_required_class_name(self, private)
+    if (any(is_required))
+        stop("In `final` validation level, deleting an required object is prohibited ",
+            "deleted. Class ", surround(unique(class_name[is_required])),
+            " is required object that can not be deleted.", call. = FALSE)
+
+    is_unique <- class_name %in% i_unique_class_name(self, private)
+    if (!all(is_unique)) return()
+
+    uni_cls <- class_name[is_unique]
+
+    obj_num <- i_object_num(self, private, uni_cls)
+    if (all(obj_num == 0L)) return()
+
+    dup_cls <- uni_cls[obj_num > 0L]
+
+    if (not_empty(dup_cls))
+        stop("In `final` validation level, existing unique objects cannot be ",
+            "deleted. Class ", surround(dup_cls), " is existing unique object ",
+            "that can ", "not be deleted.", call. = FALSE)
+}
+# }}}
+
+# DOTS
+# old_input {{{
+old_input <- function (which, value = NULL, comment = NULL, type = c("add", "set")) {
+    assert_valid_input_format(class, value, comment, default, type)
+
+    input <- rep(list(list()), length(class))
+
+    if (!is.null(value)) {
+        if (is_scalar(class)) {
+            input <- list(value)
+        } else {
+            null <- vapply(value, is.null, logical(1L))
+            input[null] <- rep(list(list()), sum(null))
+            input[!null] <- value[!null]
+        }
+    }
+
+    setattr(input, "names", class)
+}
+# }}}
 # sep_name_dots {{{
-sep_name_dots <- function (...) {
+sep_name_dots <- function (..., .named = FALSE, .duplicate = TRUE) {
     l <- list(...)
 
     # stop if empty input
@@ -939,226 +1408,341 @@ sep_name_dots <- function (...) {
     list(id = id, name = nm)
 }
 # }}}
-
 # sep_value_dots {{{
-sep_value_dots <- function (...) {
+sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = TRUE) {
     l <- list(...)
 
     # stop if empty input
     if (!length(l)) {
-        abort("error_empty_input", "Please give object(s) to set")
+        abort("error_empty_input", "Please give object(s) to add or set")
     }
 
-    # check name of each element
-    nms <- names2(l)
+    dt_dot <- data.table(rleid = seq_along(l),
+        dep = vapply(l, vec_depth, integer(1L)),
+        dot = l, dot_nm = names2(l)
+    )
 
-    # check depth of each element
-    dep <- vapply(l, vec_depth, integer(1L))
-    dep_0 <- which(dep == 0L)
-    dep_2 <- which(dep == 2L)
-    dep_3 <- which(dep == 3L)
-    dt_0 <- data.table(rleid = dep_0, dot = l[dep_0], dot_nm = nms[dep_0])
-    dt_2 <- data.table(rleid = dep_2, dot = l[dep_2], dot_nm = nms[dep_2])
-    dt_3 <- data.table(rleid = dep_3, dot = l[dep_3], dot_nm = nms[dep_3])
+    id_invalid <- integer(0L)
 
-    # reduce_depth {{{
-    reduce_depth <- function (rleid, dot, dot_nm, dep_rleid = NULL) {
-        # length
-        l <- vapply(dot, length, integer(1L))
-        # reduce one depth
-        dot <- Reduce(c, dot)
+    is_single_value <- function (x) {
+        is.null(x) ||
+        ((is.character(x) || is.numeric(x)) && is_scalar(x) && !is.na(x))
+    }
 
-        # update names
-        if (is.null(dep_rleid)) {
-            list(rleid = rep(rleid, l), dot = dot, dot_nm = names2(dot))
+    empty_input <- data.table(rleid = integer(0), class_name = character(0),
+        field_name = character(0), value_list = list(), empty = logical(0)
+    )
+
+    is_null_list <- function (x) is.null(unlist(x, use.names = FALSE))
+
+    # flatten_input {{{
+    flatten_input <- function (dt) {
+        if (!nrow(dt)) return(empty_input)
+
+        dep <- unique(dt$dep)
+
+        # empty object, e.g. Construction = list(), Construction = list(NULL)
+        if (dep == 1L) {
+            id_nolist <- dt[!vapply(dot, is.list, logical(1L)) | is.na(dot_nm), rleid]
+            id_invalid <<- c(id_invalid, id_nolist)
+
+            dt <- dt[!rleid %in% id_nolist, {
+                list(rleid = rleid,
+                     class_name = dot_nm,
+                     field_name = rep(NA_character_, .N),
+                     value_list = rep(list(NULL), .N),
+                     empty = TRUE
+                )
+            }]
+        } else if (dep == 2L) {
+            # for empty objects:
+            # list(list()) # this is invalid
+            # list(Construction = list())
+            # list(Construction = list(NULL, NULL))
+            id_nonm <- dt[is.na(dot_nm), unique(rleid)]
+            id_empty <- dt[rleid %in% id_nonm][
+                vapply(dot, is_named, logical(1L)) &
+                vapply(dot, is_null_list, logical(1)),
+                unique(rleid)]
+
+            id_invalid <<- c(id_invalid, setdiff(id_nonm, id_empty))
+
+            # for empty object
+            dt_empty <- dt[rleid %in% id_empty, {
+                list(rleid = rleid,
+                     class_name = names(unlist(dot, recursive = FALSE)),
+                     field_name = rep(NA_character_, .N),
+                     value_list = rep(list(NULL), .N),
+                     empty = TRUE
+                )
+            }]
+
+            # for normal objects
+            dt_norm <- dt[!rleid %in% id_nonm, {
+                len <- each_length(dot)
+                value_list <- unlist(dot, recursive = FALSE)
+                list(rleid = rep(rleid, len),
+                     class_name = rep(dot_nm, len),
+                     field_name = names2(value_list),
+                     value_list = value_list,
+                     empty = FALSE
+                )
+            }]
+
+            # only NULL, single number and character is acceptable
+            id_type <- dt_norm[
+                (is.na(field_name) | field_name != ".comment") &
+                !vapply(value_list, is_single_value, logical(1L)),
+                unique(rleid)
+            ]
+            id_invalid <<- c(id_invalid, id_type)
+            dt_norm <- dt_norm[!rleid %in% id_type]
+
+            dt <- rbindlist(list(dt_empty, dt_norm))
+        } else if (dep == 3L){
+            id_nm <- dt[!is.na(dot_nm), rleid]
+            id_invalid <<- c(id_invalid, id_nm)
+
+            dt <- dt[!rleid %in% id_nm, {
+                len <- each_length(dot)
+                dot <- unlist(dot, recursive = FALSE)
+                list(rleid = rep(rleid, len),
+                     dep = rep(dep - 1L, len),
+                     dot = dot,
+                     dot_nm = names2(dot)
+                )
+            }]
+            dt <- flatten_input(dt)
         } else {
-            list(rleid = rep(rleid, l), dot = dot, dot_nm = rep(dot_nm,l),
-                 ele_nm = names2(dot), dep_rleid = rep(dep_rleid, l))
+            id_invalid <<- c(id_invalid, dt[!is.na(dot_nm), rleid])
+            dt <- empty_input
         }
+
+        dt
     }
     # }}}
 
-    set(dt_0, NULL, "ele_nm", NA_character_)
-    set(dt_0, NULL, c("dep_rleid", "ele_len"), 0L)
+    dot_string <- function (dt) {
+        dt[, paste0(" #", lpad(rleid, "0"), "| ", dot, collapse = "\n")]
+    }
 
-    set(dt_2, NULL, "dep_rleid", rowidv(dt_2, "rleid"))
-    dt_21 <- dt_2[, reduce_depth(rleid, dot, dot_nm, dep_rleid)]
-    set(dt_21, NULL, "ele_len", vapply(dt_21[["dot"]], length, integer(1L)))
+    flat <- rbindlist(lapply(split(dt_dot, by = "dep"), flatten_input))
 
-    dt_32 <- dt_3[, reduce_depth(rleid, dot, dot_nm)]
-    set(dt_32, NULL, "dep_rleid", rowidv(dt_32, "rleid"))
-    dt_321 <- dt_32[, reduce_depth(rleid, dot, dot_nm, dep_rleid)]
-    set(dt_321, NULL, "ele_len", vapply(dt_321[["dot"]], length, integer(1L)))
-
-    # seperate object/class and values
-    dt_in <- rbindlist(list(dt_0, dt_21, dt_321), use.names = TRUE)
-    dt_in[, , by = list(rleid, dep_rleid)]
-    browser()
-
-    set(dt_in, NULL, "shit", rowidv(dt_in, c("dep_rleid")))
-    setorderv(dt_in, c("rleid", "dep_rleid"))
-
-    # stop if invalid format found
-    if (any(dep == 1L | dep > 3L) || # not a list
-        any(is.na(nms[dep_2]))    || # no name
-        any(is.na(dt_32$dot_nm))  || # no name
-        any(!is.na(nms[dep_3]))   || # multi name like "Mat = list(Mat = list("name"))"
-        any(dt_val$ele_len != 1L)    # element length not equal 1
-    )
-    {
-        abort("error_wrong_type",
+    # stop if invalid input format {{{
+    if (length(id_invalid) || !nrow(flat)) {
+        abort("error_invalid_value_dot",
             paste0(
-                "Each object must be NULL or an non-empty named list within ",
-                "each element being a single string or number."
+                "Each object must be an empty list or a list where ",
+                "each element being a non-NA single string or number. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% id_invalid])
             )
         )
     }
+    # }}}
 
-    browser()
-    # stop if mix named
-    chk_nm <- dt_val[, list(
-        clean_nmd = any(sum(is.na(ele_nm)) == length(ele_nm),
-                        sum(!is.na(ele_nm)) == length(ele_nm)
-        )), by = dep_rleid]
-    if (!all(chk_nm$clean_nmd)) {
-        abort("error_mix_named", "Elements in each object must be all named or all unnamed")
+    # stop if empty objects {{{
+    if (!.empty && nrow(flat[empty == TRUE])) {
+        abort("error_empty_object",
+            paste0(
+                "Empty input found. Please give field values to add or set. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% flat[empty == TRUE, rleid]])
+            )
+        )
     }
+    # }}}
 
-    # stop if multiple .comment
-    if (any(dt_obj[, .N, by = rleid]$V1 != 1L)) {
-        abort("error_multiple_comment", "Each object can only have one `.comment` element")
+    # stop if duplicated object names {{{
+    if (!.duplicate && anyDuplicated(unique(flat, by = "rleid"), by = "class_name")) {
+        dup <- flat[anyDuplicated(unique(flat, by = "rleid"), by = "class_name"), class_name]
+        invld <- flat[J(dup), on = "class_name", unique(rleid)]
+        abort("error_dup_name",
+            paste0(
+                "Input object name or ID cannot have any duplication. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% invld])
+            )
+        )
     }
+    # }}}
 
-    browser()
-    # separate ids and names
-    id <- dt_in[type == 1L]
-    nm <- dt_in[type == 2L]
+    # stop if mix named {{{
+    mix_nmd <- flat[is.na(field_name), list(named = .N), by = list(rleid)][
+        flat[is.na(field_name) | field_name != ".comment", list(total = .N), by = list(rleid)], on = "rleid"]
+    if (nrow(mix_nmd[named != 0 & named != total])) {
+        abort("error_mix_named",
+            paste0(
+                "Elements in each object must be all named or all unnamed. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% mix_nmd[named != 0 & named != total, rleid]])
+            )
+        )
+    }
+    # }}}
 
-    id <- id[, unnest_dot(rleid, dot, dot_nm, nmd)]
-    nm <- nm[, unnest_dot(rleid, dot, dot_nm, nmd)]
+    # stop if multiple .comment {{{
+    if (nrow(flat[field_name == ".comment", list(num_cmt = .N), by = list(rleid)][num_cmt > 1L])) {
+        id_m_cmt <- flat[field_name == ".comment", list(num_cmt = .N), by = list(rleid)][num_cmt > 1L, rleid]
+        abort("error_multiple_comment",
+            paste0(
+                "Each object can only have one `.comment` element. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% id_m_cmt])
+            )
+        )
+    }
+    # }}}
 
-    list(id = id, name = nm)
+    # stop if duplicated field names (in underscore style) {{{
+    if (any(flat[!is.na(field_name), list(anyDuplicated(underscore_name(field_name)) > 0L), by = list(rleid)]$V1)) {
+        id_dup_nm <- flat[!is.na(field_name),
+            list(anyDuplicated(underscore_name(field_name)) > 0L),
+            by = list(rleid)][
+            V1 == TRUE, rleid]
+
+        abort("error_dup_field_name",
+            paste0(
+                "Field names must be unique. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% id_dup_nm])
+            )
+        )
+    }
+    # }}}
+
+    # stop if value starts with "!" {{{
+    if (nrow(flat[vapply(value_list, function (x) is.character(x) && startsWith(x, "!"), logical(1L))])) {
+        id_exc <- flat[vapply(value_list, function (x) is.character(x) && startsWith(x, "!"), logical(1L)), unique(rleid)]
+        abort("error_exclamation_value",
+            paste0(
+                "Field value cannot starts with `!`. Invalid input:\n",
+                dot_string(dt_dot[rleid %in% id_exc])
+            )
+        )
+    }
+    # }}}
+
+    flat
 }
 # }}}
 
+# value_assign_default {{{
+value_assign_default <- function (dt_value) {
+    if (in_ip_mode()) {
+        dt_value <- t_field_default_to_unit(dt_value, "si", "ip")
+    }
+    dt_value[defaulted == TRUE, `:=`(value = as.character(unlist(default, use.names = FALSE)))]
+    dt_value[defaulted == TRUE & vapply(default, is.numeric, logical(1L)),
+        `:=`(value_num = as.double(unlist(default)))
+    ]
+    dt_value
+}
+# }}}
+# value_assign_id {{{
+value_assign_id <- function (dt_idf, dt_value, keep = FALSE) {
+    if (!keep) {
+        set(dt_value, NULL, "value_id", t_new_id(dt_idf$value, "value_id", nrow(dt_value)))
+    } else {
+        dt_value[is.na(value_id), `:=`(value_id = t_new_id(dt_idf$value, "value_id", .N))]
+    }
+}
+# }}}
+
+# OBJECT MUNIPULATION
 # t_dup_object {{{
-t_dup_object = function (idd_dt, idf_dt, ...) {
+t_dup_object = function (dt_idd, dt_idf, ...) {
     l <- sep_name_dots(...)
 
+    setnames(l$id, "id", "object_id")
+    setnames(l$name, "id", "object_name")
     # match
     if (nrow(l$id)) {
-        obj_id <- t_object_data(idf_dt$object, object = l$id$id)
-        set(obj_id, NULL, "rleid", NULL)
+        obj_id <- t_object_data(dt_idf$object, object = l$id)
     } else {
-        obj_id <- idf_dt$object[0L]
+        obj_id <- dt_idf$object[0L]
+        set(obj_id, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
     }
     if (nrow(l$name)) {
-        obj_nm <- t_object_data(idf_dt$object, object = l$name$id)
-        set(obj_nm, NULL, "rleid", NULL)
+        obj_nm <- t_object_data(dt_idf$object, object = l$name)
     } else {
-        obj_nm <- idf_dt$object[0L]
+        obj_nm <- dt_idf$object[0L]
+        set(obj_nm, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
     }
 
     # remain the input order
-    set(l$id, NULL, "id", NULL)
-    set(l$name, NULL, "id", NULL)
-    obj <- rbindlist(list(cbind(l$id, obj_id), cbind(l$name, obj_nm)))
+    obj <- rbindlist(list(obj_id, obj_nm))
     setorderv(obj, "rleid")
-    add_rleid(obj)
+    # in case when there are input object id or name vectors
+    add_rleid(obj, "object")
 
     # add has_name attribute
-    obj <- idd_dt$class[, list(class_id, has_name)][obj, on = "class_id"]
+    obj <- dt_idd$class[, list(class_id, has_name)][obj, on = "class_id"]
 
     # stop if cannot add objects in specified classes
-    t_assert_can_add(idd_dt$class, idf_dt$object, unique(obj$class_name))
+    t_assert_can_add(dt_idd$class, dt_idf$object, unique(obj$class_name))
 
     # check input new names {{{
     # stop if trying to assign names to objects that do not have name attribute
-    cannot_name <- unique(obj[has_name == FALSE & !is.na(new_name)], by = "object_id")
-    if (nrow(cannot_name)) {
+    if (nrow(obj[has_name == FALSE & !is.na(new_name)])) {
+        cannot_name <- unique(obj[has_name == FALSE & !is.na(new_name)], by = "object_id")
         mes <- paste0("Target object(s) in class that does not have name attribute ",
-            "cannot be renamed:\n",
+            "cannot be renamed. Invalid input:\n",
             t_object_info(cannot_name, collapse = "\n")
         )
         abort(c("error_cannot_rename", "error_dup_object"), mes, data = cannot_name)
     }
 
-    # check if trying to assign the same name
-    # add new object columns
-    set(obj, NULL, "new_name_lower", stri_trans_tolower(obj$new_name))
+    # get value data
+    val <- t_value_data(dt_idf$value, object = obj[, list(rleid, object_rleid, object_id)])
+    # NOTE:
+    # (a) restore old value id for updating reference
+    # (b) Assign new value id in order to correctly print validate message
+    setnames(val, "value_id", "old_value_id")
+    set(val, NULL, "value_id", t_new_id(dt_idf$value, "value_id", nrow(val)))
 
-    if (in_final_mode()) {
-        same_name <- obj[has_name == TRUE & object_name_lower == new_name_lower]
-        if (nrow(same_name)) {
-            mes <- paste0(
-                "Input new name(s) cannot be the same as target object(s):\n",
-                t_object_info(same_name, collapse = "\n")
-            )
-            abort_for_final(c("error_same_name", "error_dup_object"), mes, data = same_name)
-        }
+    # NOTE:
+    # (a) Store old id and name for logging
+    # (b) Change object names for validation
+    setnames(obj, c("object_id", "object_name", "object_name_lower"),
+        c("old_object_id", "old_object_name", "old_object_name_lower")
+    )
+    set(obj, NULL, c("object_name", "object_name_lower"),
+        list(obj$new_name, stri_trans_tolower(obj$new_name)))
+
+    validity <- validate_objects(dt_idd, dt_idf,
+        copy(obj)[, object_id := paste0("Input #", rleid)],
+        copy(val)[, object_id := paste0("Input #", rleid)],
+        unique_name = TRUE
+    )
+
+    if (count_check_error(validity)) {
+        print_validity(validity)
+        abort("error_validity", paste0(
+            "Failed to duplicate object(s). ",
+            "Input new name(s) cannot be the same as target object(s) or ",
+            "any existing object in the same class."
+        ))
     }
     # }}}
 
-    # get new object name {{{
-    # store old id and name for logging
-    obj[, `:=`(old_name = object_name, old_id = object_id)]
+    # assign new object id after validation
+    set(obj, NULL, "object_id", t_new_id(dt_idf$object, "object_id", nrow(obj)))
+    set(val, NULL, "object_id", rep(obj$object_id, times = val[, .N, by = c("object_rleid")]$N))
 
-    # replace object names with input new names
+    # get new object name {{{
+    # get indicator of whether user input new names are used
     set(obj, NULL, "use_input_name", FALSE)
-    obj[has_name == TRUE & !is.na(new_name_lower) & object_name_lower != new_name_lower,
-        `:=`(object_name = new_name,
-             object_name_lower = new_name_lower,
-             use_input_name = TRUE
-        )
+    obj[has_name == TRUE & !is.na(object_name_lower) &
+        (object_name_lower != old_object_name_lower | is.na(old_object_name_lower)),
+        `:=`(use_input_name = TRUE)
     ]
 
     # get all name in the same class
-    obj[, `:=`(all_name_lower = t_object_name(idf_dt$object, class_name, lower = TRUE)), by = list(rleid)]
-
-    # check if user input name is one of existing names {{{
-    if (in_final_mode()) {
-        existing_name <- obj[use_input_name == TRUE][, `:=`(
-            conflicted = apply2_int(object_name_lower, all_name_lower, match, list(nomatch = 0L))
-        )][conflicted > 0L]
-        if (not_empty(existing_name)) {
-            # invalid input number
-            num <- paste0(" #", existing_name$rleid, "| ")
-
-            # new name
-            nm <- surround(existing_name$object_name)
-
-            # input object id and name
-            id_in <- t_object_info(
-                copy(existing_name)[, `:=`(object_name = old_name)],
-                c("id", "name"), numbered = FALSE, first_upper = FALSE,
-                prefix = "New name"
-            )
-
-            # id of conflicted objects
-            existing_name[, `:=`(
-                object_id = apply2_int(t_object_id(idf_dt$object, class_id), conflicted, "[[")
-            )]
-            id_conf <- t_object_info(existing_name, c("id", "class"), numbered = FALSE, first_upper = FALSE)
-
-            b <- paste0(num, "New name ", nm, " for ", id_in, " is the same as ", id_conf)
-
-            mes <- paste0(
-                "Input new name(s) cannot be one of existing object names in the same class:\n",
-                paste0(b, collapse = "\n")
-            )
-            abort(c("error_new_name_confilict", "error_dup_object"), mes, data = existing_name)
-        }
-    }
-    # }}}
+    obj[, `:=`(all_name_lower = t_object_name(dt_idf$object, class_name, lower = TRUE)), by = c("rleid")]
 
     # check if trying to duplicate same object several times
     set(obj, NULL, "dup_time", 0L)
     obj[use_input_name == FALSE, `:=`(dup_time = seq_along(object_id)),
-        by = list(class_id, object_name_lower)]
+        by = list(class_id, old_object_name_lower)]
 
     # get the duplicated times before
-    obj[!is.na(object_name), `:=`(
-        max_suffix_num = apply2_int(all_name_lower, object_name_lower,
+    obj[!is.na(old_object_name), `:=`(
+        max_suffix_num = apply2_int(all_name_lower, old_object_name_lower,
             function (x, y) {
                 num <- stri_match_first_regex(x, paste0("^", y, "_(\\d+)$"))[,2L]
                 num[is.na(num)] <- "0"
@@ -1169,25 +1753,18 @@ t_dup_object = function (idd_dt, idf_dt, ...) {
 
     # assign new object name
     set(obj, NULL, "auto_assigned", FALSE)
-    obj[!is.na(object_name) & use_input_name == FALSE,
-        `:=`(object_name = paste0(object_name, "_", max_suffix_num + dup_time),
+    obj[!is.na(old_object_name) & use_input_name == FALSE,
+        `:=`(object_name = paste0(old_object_name, "_", max_suffix_num + dup_time),
              auto_assigned = TRUE
         )
     ]
     set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
 
-    # remove unuseful columns
-    col_keep <- c(names(idf_dt$object), "rleid", "has_name", "auto_assigned", "old_name", "old_id")
-    set(obj, NULL, setdiff(names(obj), col_keep), NULL)
-
-    # assign new object id
-    set(obj, NULL, "object_id", t_new_id(idf_dt$object, "object_id", nrow(obj)))
-
     # logging
     if (nrow(obj[auto_assigned == TRUE])) {
         auto <- obj[auto_assigned == TRUE]
         id <- rpad(t_object_info(auto, "id"))
-        name <- t_object_info(auto, "name", prefix = " --> Auto-generated ", numbered = FALSE)
+        name <- t_object_info(auto, "name", prefix = " --> New ", numbered = FALSE)
         verbose_info(
             "New names of duplicated objects not given are automatically generated:\n",
             paste0(id, name, collapse = "\n")
@@ -1195,417 +1772,369 @@ t_dup_object = function (idd_dt, idf_dt, ...) {
     }
     # }}}
 
-    # get value
-    val <- t_value_data(idf_dt$value, object = obj$old_id)
-    old_val_id <- val$value_id
-    set(val, NULL, "value_id", t_new_id(idf_dt$value, "value_id", nrow(val)))
-    set(val, NULL, "object_id", rep(obj$object_id, times = val[, .N, by = rleid]$N))
-
     # assign name field
     val[is_name == TRUE, `:=`(value = obj[has_name == TRUE, object_name])]
 
     # value reference
-    ref <- t_value_reference_dt(idf_dt$reference, old_val_id, val$value_id)
+    ref <- t_value_reference_dt(dt_idf$reference, val$old_value_id, val$value_id)
 
-    list(object = obj[, .SD, .SDcols = names(idf_dt$object)],
-         value = val[, .SD, .SDcols = names(idf_dt$value)],
-         reference = ref[, .SD, .SDcols = names(idf_dt$reference)]
+    list(object = obj[, .SD, .SDcols = names(dt_idf$object)],
+         value = val[, .SD, .SDcols = names(dt_idf$value)],
+         reference = ref[, .SD, .SDcols = names(dt_idf$reference)]
     )
 }
 # }}}
-
 # t_add_object {{{
-t_add_object <- function (idd_dt, idf_dt, ..., default = TRUE, all = FALSE) {
-    l <- sep_dots(...)
+t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
+    input <- sep_value_dots(..., .empty = TRUE)
 
-    # get class data
-    cls <- t_class_data(idd_dt$class, names(l))
-
-    # stop if cannot add objects in specified classes
-    t_assert_can_add(idd_dt$class, idf_dt$object, unique(cls$class_name))
+    obj <- input[J(unique(input$rleid)), on = "rleid", mult = "first"]
 
     # new object table
-    obj <- cls[, .SD, .SDcols = c("rleid", "class_id", "class_name", "group_id")]
-    set(obj, NULL, "object_id", t_new_id(idf_dt$object, "object_id", nrow(obj)))
+    obj <- t_class_data(dt_idd$class, obj,
+        cols = c("rleid", "class_id", "class_name", "group_id"),
+        underscore = TRUE
+    )
+
+    # stop if cannot add objects in specified classes
+    t_assert_can_add(dt_idd$class, dt_idf$object, obj$class_name)
+
+    # add object id
+    set(obj, NULL, "object_id", t_new_id(dt_idf$object, "object_id", nrow(obj)))
+
     # get object comments
-    cmt <- lapply(l, "[[", ".comment")
-    cmt <- if (is.null(unlist(cmt))) list()
-    set(obj, NULL, "comment", cmt)
+    obj <- input[field_name == ".comment", list(rleid, comment = value_list)][obj, on = "rleid"]
 
     # new value table
-    val <- obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")]
-    # handle the case when only one object in the input
-    fun_outer <- if (length(l) == 1L) list else c
-    set(val, NULL, "value_in", fun_outer(l))
-    set(val, NULL, "field_name", fun_outer(lapply(l, names2)))
-    set(val, NULL, "num", vapply(l, length, integer(1L)))
-
-    # stop if tring to add empty object
-    if (nrow(val[num == 0L]) && in_final_mode()) {
-        mes <- paste0("Each object must be valued. Empty object(s) found in ",
-            "class ", collapse(val[num == 0L, class_name]), ".")
-        abort_for_final("error_add_empty_object", mes)
-    }
+    val <- input[is.na(field_name) | field_name != ".comment",
+        .SD, .SDcols = c("rleid", "field_name", "value_list", "empty")][
+        obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")],
+        on = "rleid"]
 
     # get empty objects {{{
-    val_empty <- val[num == 0L]
-    val_empty <- t_field_data(idd_dt, val_empty, min = !all)[
-        val_empty[, list(rleid, object_id)], on = "rleid"]
+    val_empty <- val[empty == TRUE]
+    val_empty <- t_field_data(dt_idd, val_empty, all = .all)
+
     # add value and value in number
-    set(val_empty, NULL, "value", NA_character_)
-    set(val_empty, NULL, "value_num", NA_real_)
-    # indicator of whether na or null is given to field
-    set(val_empty, NULL, "delete", TRUE)
+    set(val_empty, NULL, c("value", "value_num"), list(NA_character_, NA_real_))
     # }}}
 
     # get non-empty objects {{{
-    val <- val[!val_empty, on = "rleid"]
+    val_nonempty <- val[empty == FALSE, -"empty"]
 
-    val <- val[, {
-        val <- Reduce(c, value_in)
-        l <- vapply(value_in, length, integer(1L))
-        list(
-            rleid = rep(rleid, l),
-            value_rleid = seq_along(val),
-            class_id = rep(class_id, l),
-            class_name = rep(class_name, l),
-            object_id = rep(object_id, l),
-            field_name = unlist(field_name),
-            value_in = val
-        )
-    }]
-
-    setindexv(val, "field_name")
-
-    # exclude comments
-    val <- val[!val[field_name == ".comment"], on = "value_rleid"]
-
-    # stop if there are unnamed values {{{
-    nm_count <- val[,
-        {
-            unnamed <- sum(is.na(field_name))
-            named <- length(field_name) - unnamed
-            list(unnamed = unnamed, named = named)
-        },
-        by = rleid
-    ]
-    if (nrow(nm_count[unnamed > 0L & named > 0L])) {
-        abort("error_mix_named_value", "Field values must be either all unnamed or all named")
-    }
-    # }}}
-
-    # stop if duplicates in field names {{{
-    dup_nm <- val[!is.na(field_name), list(has_duplicated = anyDuplicated(field_name) > 0L), by = rleid]
-    if (any(dup_nm$has_duplicated)) {
-        invld_obj <- val[dup_nm[has_duplicated == TRUE], on = "rleid"][!is.na(field_name)]
-        invld_obj <- invld_obj[, list(field_name = field_name[duplicated(field_name)]),
-            by = list(rleid, class_name)
-        ]
-
-        mes <- paste0(
-            "Field names for values must be unique. ",
-            "Duplicated field names found:\n",
-            errormsg_field_name(invld_obj)
-        )
-        abort("error_duplicated_field_names", mes, object = invld_obj)
-    }
-    # }}}
+    setindexv(val_nonempty, "field_name")
 
     # get field names and attributes {{{
-    val_unnm <- val[is.na(field_name)]
-    fld_unnm <- tryCatch(
-        t_field_data(idd_dt, val_unnm, rowidv(val_unnm, "rleid"),
-            cols = setdiff(names(idd_dt$field), c("class_id", "class_name"))
-        ),
-        error_bad_field_index = function (e) e
-    )
+    val_unnm <- val_nonempty[is.na(field_name)]
+    fld_unnm <- t_field_data(dt_idd, val_unnm, rowidv(val_unnm, "rleid"), all = .all, complete = TRUE)
 
-    val_nm <- val[!is.na(field_name)]
-    fld_nm <- tryCatch(
-        t_field_data(idd_dt, val_nm, val_nm$field_name,
-            cols = setdiff(names(idd_dt$field), c("class_id", "class_name"))
-        ),
-        error_bad_field_name = function (e) e
-    )
-
-    # stop if invalid field index or/and field name found {{{
-    e <- cnd("error", c("error_bad_field", "error_add_object"), NULL)
-    errored <- FALSE
-    if (inherits(fld_unnm, "error")) {
-        e$message <- fld_unnm$message
-        e$data <- list(fld_unnm$data)
-        errored <- TRUE
-    }
-    if (inherits(fld_nm, "error")) {
-        if (is.null(e$message)) {
-            e$message <- fld_nm$message
-            e$data <- list(fld_nm$data)
-        } else {
-            e$message <- paste0("\n",
-                cli::rule(), "\n",
-                e$message, "\n",
-                cli::rule(), "\n",
-                fld_nm$message, "\n",
-                cli::rule()
-            )
-            e$data <- list(e$data[[1L]], fld_nm$data)
-        }
-        errored <- TRUE
-    }
-
-    if (errored) stop(e)
-    # }}}
+    val_nm <- val_nonempty[!is.na(field_name)]
+    fld_nm <- t_field_data(dt_idd, val_nm, val_nm$field_name, all = .all, complete = TRUE)
 
     # combine field attributes
-    val_unnm <- cbind(set(val_unnm, NULL, "field_name", NULL), fld_unnm)
-    val_nm <- cbind(set(val_nm, NULL, "field_name", NULL), fld_nm)
-    val <- rbindlist(list(val_unnm, val_nm))
+    set(val_unnm, NULL, setdiff(names(val_unnm), "value_list"), NULL)
+    set(val_nm, NULL, setdiff(names(val_nm), "value_list"), NULL)
+
+    add_rleid(val_unnm, "matched")
+    add_rleid(val_nm, "matched")
+
+    val_matched <- rbindlist(list(
+        val_unnm[fld_unnm, on = c("matched_rleid")],
+        val_nm[fld_nm, on = c("matched_rleid")]
+    ))
+    set(val_matched, NULL, "matched_rleid", NULL)
     # }}}
 
-    # indicator of whether na or NULL is given to field
-    set(val, NULL, "delete", FALSE)
-    val[is.na(value_in), `:=`(delete = TRUE)]
-    val[vapply(value_in, is.null, logical(1L)), `:=`(delete = TRUE)]
+    # find fields to be filled with default values
+    set(val_empty, NULL, "defaulted", TRUE)
+    set(val_matched, NULL, "defaulted", vapply(val_matched$value_list, is.null, logical(1L)))
+
     # add value and value in number
-    val[delete == FALSE & vapply(value_in, is.atomic, logical(1L)), `:=`(value = as.character(value_in))]
-    val[vapply(value_in, is.numeric, logical(1L)), `:=`(value_num = as.double(value_in))]
-    set(val, NULL, c("value_rleid", "value_in"), NULL)
+    val_matched[defaulted == FALSE, `:=`(value = as.character(value_list))]
+    val_matched[vapply(value_list, is.numeric, logical(1L)), `:=`(value_num = as.double(value_list))]
+    set(val_matched, NULL, "value_list", NULL)
     # }}}
 
     # combine empty and non-empty objects
-    val <- rbindlist(list(val_empty, val), use.names = TRUE)
+    val <- rbindlist(list(val_empty, val_matched), use.names = TRUE)
 
     # assign default values if needed
-    if (default) {
-        if (in_ip_mode()) {
-            val <- t_field_default_to_unit(val, "si", "ip")
-        }
-        val[delete == TRUE, `:=`(value = as.character(unlist(default)))]
-        val[delete == TRUE & vapply(default, is.numeric, logical(1L)),
-            `:=`(value_num = as.double(unlist(default)))
-        ]
-    }
+    if (.default) val <- value_assign_default(val)
 
     # assign new value id
-    set(val, NULL, "value_id", t_new_id(idf_dt$value, "value_id", nrow(val)))
+    val <- value_assign_id(dt_idf, val)
 
     # update object name
     obj <- update_object_name(obj, val)
+    # add lower name
+    set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
 
-    # validate
-    # only validate fields that do not use default values and extensible fields
-    val_chk <- val[required_field == TRUE | delete == FALSE | extensible_group > 0L]
-    # chk <- validate_object(idd_dt, obj, val_chk)
-
-    # get field reference
-    # include new values in order to find references across input new object
-    ref <- get_value_reference_map(idd_dt$reference,
-        ins_dt(idf_dt$value, val, "value_id"), val
+    # validate {{{
+    # validate fields that do not use default values and all extensible fields
+    val_chk <- val[required_field == TRUE | defaulted == FALSE | extensible_group > 0L]
+    validity <- validate_on_level(dt_idd, dt_idf,
+        copy(obj)[, object_id := paste0("Input #", rleid)],
+        val_chk[, object_id := paste0("Input #", rleid)],
+        level = eplusr_option("validate_level")
     )
 
-    list(object = obj[, .SD, .SDcols = names(idf_dt$object)],
-         value = val[, .SD, .SDcols = names(idf_dt$value)],
+    if (count_check_error(validity)) {
+        print_validity(validity)
+        abort("error_validity",  "Failed to add object(s).")
+    }
+    # }}}
+
+    # get field reference
+    # include new values in order to find references across input new objects
+    ref <- get_value_reference_map(dt_idd$reference,
+        ins_dt(dt_idf$value, val, "value_id"),
+        ins_dt(dt_idf$value, val, "value_id")
+    )
+
+    list(object = obj[, .SD, .SDcols = names(dt_idf$object)],
+         value = val[, .SD, .SDcols = names(dt_idf$value)],
          reference = ref
     )
 }
 # }}}
-
 # t_set_object {{{
-t_set_object <- function (idd_dt, idf_dt, ..., default = TRUE) {
-    l <- sep_dots(...)
+t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
+    input <- sep_value_dots(..., .empty = TRUE, .duplicate = FALSE)
 
-    browser()
-    # split_id_nm {{{
-    split_id_nm <- function (x) {
+    # get object ID in `..X` format
+    setnames(input, "class_name", "object_name")
+    set(input, NULL, "object_id", as.integer(stri_match_first_regex(input$object_name, "^\\.\\.(\\d+)$")[, 2L]))
 
-        stringi::stri_match_all_regex(x, "^\\.\\.\\d+$")
-
-    }
-    # }}}
-    nm <- names(l)
-    split_id_nm(id, nm)
+    # separate
+    in_id <- input[!is.na(object_id)]
+    set(in_id, NULL, "object_name", NULL)
+    in_nm <- input[is.na(object_id)]
+    set(in_nm, NULL, "object_id", NULL)
 
     # get object data
-    obj <- t_object_data(idf_dt$object, object = names(l))
+    in_id <- t_object_data(dt_idf$object, object = in_id)
+    in_nm <- t_object_data(dt_idf$object, object = in_nm)
 
-    # stop if cannot add objects in specified classes
+    # combine
+    in_all <- rbindlist(list(in_id, in_nm))
+
+    # extract object data {{{
+    obj <- in_all[in_all[order(rleid), list(rleid = unique(rleid))], on = "rleid",
+        mult = "first", .SD, .SDcols = c("rleid", names(dt_idf$object))]
+    # replace old comments with input comments
+    cmt <- in_all[field_name == ".comment", list(rleid, comment = value_list)]
+    if (nrow(cmt) == 1L) {
+        obj[cmt, on = "rleid", comment := list(cmt$comment)]
+    } else if (nrow(cmt) >= 2L) {
+        obj[cmt, on = "rleid", comment := cmt$comment]
+    }
+    # }}}
+
+    # stop if cannot set objects
     t_assert_can_set(obj)
 
-    # new object table
-    obj <- cls[, .SD, .SDcols = c("rleid", "class_id", "class_name", "group_id")]
-    set(obj, NULL, "object_id", t_new_id(idf_dt$object, "object_id", nrow(obj)))
-    set(obj, NULL, "comment", lapply(l, "[[", ".comment"))
-
     # new value table
-    val <- obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")]
-    set(val, NULL, "value_in", l)
-    set(val, NULL, "field_name", lapply(l, names2))
-    set(val, NULL, "num", vapply(l, length, integer(1L)))
+    val <- in_all[is.na(field_name) | field_name != ".comment", list(rleid, field_name, value_list, empty)][
+        obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")], on = list(rleid)]
 
-    # stop if tring to add empty object
-    if (nrow(val[num == 0L]) && in_final_mode()) {
-        mes <- paste0("Each object must be valued. Empty object(s) found in ",
-            "class ", collapse(val[num == 0L, class_name]), ".")
-        abort_for_final("error_add_empty_object", mes)
-    }
-
-    # get empty objects {{{
-    val_empty <- val[num == 0L]
-    val_empty <- t_field_data(idd_dt, val_empty, min = !all)[
-        val_empty[, list(rleid, object_id)], on = "rleid"]
-    # add value and value in number
-    set(val_empty, NULL, "value", NA_character_)
-    set(val_empty, NULL, "value_num", NA_real_)
-    # indicator of whether na or null is given to field
-    set(val_empty, NULL, "delete", TRUE)
+    # get objects with empty input {{{
+    val_empty <- val[empty == TRUE]
+    # only include empty fields
+    val_empty <- t_value_data_in_object(dt_idd, dt_idf, object = val_empty)[is.na(value)]
+    set(val_empty, NULL, "value_list", NULL)
     # }}}
 
     # get non-empty objects {{{
-    val <- val[!val_empty, on = "rleid"]
+    val_nonempty <- val[empty == FALSE]
+    val_nonempty <- t_value_data_in_object(dt_idd, dt_idf, object = val_nonempty,
+        field = val_nonempty$field_name, underscore = TRUE)
+    # mark empty fields
+    set(val_nonempty, NULL, "empty", vapply(val_nonempty$value_list, is.null, logical(1L)))
 
-    val <- val[, {
-        val <- Reduce(c, value_in)
-        l <- vapply(value_in, length, integer(1L))
-        list(
-            rleid = rep(rleid, l),
-            value_rleid = seq_along(val),
-            class_id = rep(class_id, l),
-            class_name = rep(class_name, l),
-            object_id = rep(object_id, l),
-            field_name = unlist(field_name),
-            value_in = val
-        )
-    }]
-
-    setindexv(val, "field_name")
-
-    # exclude comments
-    val <- val[!val[field_name == ".comment"], on = "value_rleid"]
-
-    # stop if there are unnamed values {{{
-    nm_count <- val[,
-        {
-            unnamed <- sum(is.na(field_name))
-            named <- length(field_name) - unnamed
-            list(unnamed = unnamed, named = named)
-        },
-        by = rleid
-    ]
-    if (nrow(nm_count[unnamed > 0L & named > 0L])) {
-        abort("error_mix_named_value", "Field values must be either all unnamed or all named")
-    }
+    # set new values
+    val_nonempty[empty == FALSE, value := as.character(value_list)]
+    val_nonempty[empty == FALSE & vapply(value_list, is.numeric, logical(1L)),
+        value_num := as.double(value_list)]
+    set(val_nonempty, NULL, "value_list", NULL)
     # }}}
 
-    # stop if duplicates in field names {{{
-    dup_nm <- val[!is.na(field_name), list(has_duplicated = anyDuplicated(field_name) > 0L), by = rleid]
-    if (any(dup_nm$has_duplicated)) {
-        invld_obj <- val[dup_nm[has_duplicated == TRUE], on = "rleid"][!is.na(field_name)]
-        invld_obj <- invld_obj[, list(field_name = field_name[duplicated(field_name)]),
-            by = list(rleid, class_name)
-        ]
-
-        mes <- paste0(
-            "Field names for values must be unique. ",
-            "Duplicated field names found:\n",
-            errormsg_field_name(invld_obj)
-        )
-        abort("error_duplicated_field_names", mes, object = invld_obj)
-    }
-    # }}}
+    val <- rbindlist(list(val_empty, val_nonempty), use.names = TRUE)
 
     # get field names and attributes {{{
-    val_unnm <- val[is.na(field_name)]
-    fld_unnm <- tryCatch(
-        t_field_data(idd_dt, val_unnm, rowidv(val_unnm, "rleid"),
-            cols = setdiff(names(idd_dt$field), c("class_id", "class_name"))
-        ),
-        error_bad_field_index = function (e) e
-    )
-
-    val_nm <- val[!is.na(field_name)]
-    fld_nm <- tryCatch(
-        t_field_data(idd_dt, val_nm, val_nm$field_name,
-            cols = setdiff(names(idd_dt$field), c("class_id", "class_name"))
-        ),
-        error_bad_field_name = function (e) e
-    )
-
-    # stop if invalid field index or/and field name found {{{
-    e <- cnd("error", c("error_bad_field", "error_add_object"), NULL)
-    errored <- FALSE
-    if (inherits(fld_unnm, "error")) {
-        e$message <- fld_unnm$message
-        e$data <- list(fld_unnm$data)
-        errored <- TRUE
-    }
-    if (inherits(fld_nm, "error")) {
-        if (is.null(e$message)) {
-            e$message <- fld_nm$message
-            e$data <- list(fld_nm$data)
-        } else {
-            e$message <- paste0("\n",
-                cli::rule(), "\n",
-                e$message, "\n",
-                cli::rule(), "\n",
-                fld_nm$message, "\n",
-                cli::rule()
-            )
-            e$data <- list(e$data[[1L]], fld_nm$data)
-        }
-        errored <- TRUE
-    }
-
-    if (errored) stop(e)
-    # }}}
+    fld <- t_field_data(dt_idd, val, val$field_index)
 
     # combine field attributes
-    val_unnm <- cbind(set(val_unnm, NULL, "field_name", NULL), fld_unnm)
-    val_nm <- cbind(set(val_nm, NULL, "field_name", NULL), fld_nm)
-    val <- rbindlist(list(val_unnm, val_nm))
+    val <- fld[val, on = c("rleid", "field_index")][,
+        .SD, .SDcols = unique(c(names(val), names(fld)))]
     # }}}
-
-    # indicator of whether na or NULL is given to field
-    set(val, NULL, "delete", FALSE)
-    val[is.na(value_in), `:=`(delete = TRUE)]
-    val[vapply(value_in, is.null, logical(1L)), `:=`(delete = TRUE)]
-    # add value and value in number
-    val[delete == FALSE & vapply(value_in, is.atomic, logical(1L)), `:=`(value = as.character(value_in))]
-    val[vapply(value_in, is.numeric, logical(1L)), `:=`(value_num = as.double(value_in))]
-    set(val, NULL, c("value_rleid", "value_in"), NULL)
-    # }}}
-
-    # combine empty and non-empty objects
-    val <- rbindlist(list(val_empty, val), use.names = TRUE)
 
     # assign default values if needed
-    if (default) {
-        if (in_ip_mode()) {
-            val <- t_field_default_to_unit(val, "si", "ip")
-        }
-        val[delete == TRUE, `:=`(value = as.character(unlist(default)))]
-        val[delete == TRUE & vapply(default, is.numeric, logical(1L)),
-            `:=`(value_num = as.double(unlist(default)))
-        ]
+    set(val, NULL, "defaulted", FALSE)
+    val[is.na(value) & empty == TRUE, defaulted := TRUE]
+    if (.default) {
+        val <- value_assign_default(val)
     }
 
-    # assign new value id
-    set(val, NULL, "value_id", t_new_id(idf_dt$value, "value_id", nrow(val)))
+    # assign new value id to new fields
+    val <- value_assign_id(dt_idf, val, keep = TRUE)
 
     # update object name
     obj <- update_object_name(obj, val)
 
-    # validate
-    # only validate fields that do not use default values and extensible fields
-    val_chk <- val[required_field == TRUE | delete == FALSE | extensible_group > 0L]
-    # chk <- validate_object(idd_dt, obj, val_chk)
+    # add lower name
+    set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
+
+    # validate {{{
+    # validate fields that do not use default values and all extensible fields
+    val_chk <- val[required_field == TRUE | defaulted == FALSE | extensible_group > 0L]
+    validity <- validate_on_level(dt_idd, dt_idf,
+        copy(obj)[, object_id := paste0("Input #", rleid)],
+        val_chk[, object_id := paste0("Input #", rleid)],
+        level = eplusr_option("validate_level")
+    )
+
+    if (count_check_error(validity)) {
+        print_validity(validity)
+        abort("error_validity",  "Failed to add object(s).")
+    }
+    # }}}
 
     # get field reference
-    ref <- get_value_reference_map(idd_dt$reference, idf_dt$value, val)
+    ref <- get_value_reference_map(dt_idd$reference,
+        ins_dt(dt_idf$value, val, "value_id"),
+        ins_dt(dt_idf$value, val, "value_id")
+    )
 
-    list(object = obj[, .SD, .SDcols = names(idf_dt$object)],
-         value = val[, .SD, .SDcols = names(idf_dt$value)],
+    list(object = obj[, .SD, .SDcols = names(dt_idf$object)],
+         value = val[, .SD, .SDcols = names(dt_idf$value)],
          reference = ref
     )
+}
+# }}}
+# t_del_object {{{
+t_del_object <- function (self, private, object, referenced = FALSE) {
+    i_assert_can_del_object(self, private, object)
+
+    obj_tbl <- i_object_tbl_from_which(self, private, object)
+    val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
+    obj_id <- obj_tbl$object_id
+
+    ref_by_tbl <- i_val_ref_by_tbl(self, private, val_tbl)
+
+    # check if target objects are referenced {{{
+    if (not_empty(ref_by_tbl)) {
+        if (eplusr_option("validate_level") == "final") {
+            ref <- ref_by_tbl[, list(referenced_by = collapse(referenced_by_object_id)),
+                by = list(object_rleid, object_id)]
+            stop("Deleting an object that is referenced by others is prohibited ",
+                "in `final` validation level. Failed to delete target object ",
+                "[ID:", collapse(obj_tbl$object_id), "]:\n",
+                paste0(paste0(ref$object_rleid, ": Object [ID:",surround(ref$object_id),"] was ",
+                        "referenced by other objects [ID:", ref$referenced_by, "]."),
+                    collapse = "\n"),
+                call. = FALSE)
+        }
+
+        by_id <- unique(ref_by_tbl$referenced_by_object_id)
+
+        if (referenced) {
+            i_verbose_info(self, private, "Delete target object [ID:",
+                collapse(obj_id), "] and also objects [ID:",
+                collapse(by_id), "] that are referencing target object.")
+            obj_id <- c(obj_id, by_id)
+        } else {
+            i_verbose_info(self, private, "Delete target object [ID:",
+                collapse(obj_id), "] which was referenced by objects ",
+                "[ID: ", collapse(by_id), "]. Error may occur during ",
+                "simulation.")
+        }
+    }
+    # }}}
+
+    # delete rows in object table
+    private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% obj_id]
+
+    # delete rows in value table and value reference table
+    private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% obj_id]
+
+    # delete rows in value reference table
+    private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
+        !val_tbl, on = "value_id"][
+        !ref_by_tbl, on = c(reference_value_id = "referenced_by_value_id")]
+
+    # log order
+    i_log_del_object_order(self, private, obj_id)
+
+    # log unsaved
+    i_log_unsaved_idf(self, private)
+
+    # log uuid
+    i_log_new_uuid(self, private)
+
+    self
+}
+# }}}
+# i_del_object {{{
+i_del_object <- function (self, private, object, referenced = FALSE) {
+    i_assert_can_del_object(self, private, object)
+
+    obj_tbl <- i_object_tbl_from_which(self, private, object)
+    val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
+    obj_id <- obj_tbl$object_id
+
+    ref_by_tbl <- i_val_ref_by_tbl(self, private, val_tbl)
+
+    # check if target objects are referenced {{{
+    if (not_empty(ref_by_tbl)) {
+        if (eplusr_option("validate_level") == "final") {
+            ref <- ref_by_tbl[, list(referenced_by = collapse(referenced_by_object_id)),
+                by = list(object_rleid, object_id)]
+            stop("Deleting an object that is referenced by others is prohibited ",
+                "in `final` validation level. Failed to delete target object ",
+                "[ID:", collapse(obj_tbl$object_id), "]:\n",
+                paste0(paste0(ref$object_rleid, ": Object [ID:",surround(ref$object_id),"] was ",
+                        "referenced by other objects [ID:", ref$referenced_by, "]."),
+                    collapse = "\n"),
+                call. = FALSE)
+        }
+
+        by_id <- unique(ref_by_tbl$referenced_by_object_id)
+
+        if (referenced) {
+            i_verbose_info(self, private, "Delete target object [ID:",
+                collapse(obj_id), "] and also objects [ID:",
+                collapse(by_id), "] that are referencing target object.")
+            obj_id <- c(obj_id, by_id)
+        } else {
+            i_verbose_info(self, private, "Delete target object [ID:",
+                collapse(obj_id), "] which was referenced by objects ",
+                "[ID: ", collapse(by_id), "]. Error may occur during ",
+                "simulation.")
+        }
+    }
+    # }}}
+
+    # delete rows in object table
+    private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% obj_id]
+
+    # delete rows in value table and value reference table
+    private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% obj_id]
+
+    # delete rows in value reference table
+    private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
+        !val_tbl, on = "value_id"][
+        !ref_by_tbl, on = c(reference_value_id = "referenced_by_value_id")]
+
+    # log order
+    i_log_del_object_order(self, private, obj_id)
+
+    # log unsaved
+    i_log_unsaved_idf(self, private)
+
+    # log uuid
+    i_log_new_uuid(self, private)
+
+    self
 }
 # }}}
 
@@ -1705,6 +2234,38 @@ t_object_info <- function (dt_object, component = c("id", "name", "class"),
 # t_value_reference_dt {{{
 t_value_reference_dt <- function (dt_reference, old_id, new_id) {
     dt_reference[J(old_id), on = "value_id"][, `:=`(value_id = new_id)][!is.na(src_value_id)]
+}
+# }}}
+
+# FOR BACK COMPATIBILITY
+# SHOULD BE REMOVED IN NEXT RELEASE
+# assert_valid_input_format {{{
+assert_valid_input_format <- function (class_name, value, comment, default, type = c("add", "set")) {
+    type <- match.arg(type)
+    key <- switch(type, add = "class", set = "object")
+
+    is_valid_input <- function (x) is.null(x) || is_normal_list(x)
+
+    if (length(class_name) > 1L &&
+        ((!is.null(value)   && !is_same_len(class_name, value)) ||
+         (!is.null(comment) && !is_same_len(class_name, comment))))
+        stop("`value` and `comment` should have the same length as ",
+            surround(key), ".", call. = FALSE)
+
+    if (is_scalar(class_name)) {
+        if (!is_valid_input(value) || !is_valid_input(comment)) {
+            stop("Invalid `value` or `comment` format found. Each value or ",
+                "comment for a single object should be NULL or a list in format ",
+                "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
+        }
+    } else {
+        if (!all(vapply(value, is_valid_input, logical(1))) ||
+            !all(vapply(comment, is_valid_input, logical(1)))) {
+            stop("Invalid `value` or `comment` format found. Each value or ",
+                "comment for a single object should be NULL or a list in format ",
+                "'list(a = 1, b = 2)' or 'list(1, 2)'.", call. = FALSE)
+        }
+    }
 }
 # }}}
 
