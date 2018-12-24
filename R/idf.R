@@ -1368,3 +1368,11 @@ read_idf <- function (path, idd = NULL) {
     }
 }
 # }}}
+
+# new_idf {{{
+new_idf <- function (ver = "latest") {
+    ver <- standardize_ver(ver)
+    text <- paste0("Version,", ver, ";\n")
+    read_idf(text, ver)
+}
+# }}}
