@@ -1552,7 +1552,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = TRUE) {
 
     # stop if duplicated object names {{{
     if (!.duplicate && anyDuplicated(unique(flat, by = "rleid"), by = "class_name")) {
-        dup <- flat[anyDuplicated(unique(flat, by = "rleid"), by = "class_name"), class_name]
+        dup <- flat[duplicated(unique(flat, by = "rleid"), by = "class_name"), class_name]
         invld <- flat[J(dup), on = "class_name", unique(rleid)]
         abort("error_dup_name",
             paste0(
@@ -1616,7 +1616,36 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = TRUE) {
     }
     # }}}
 
-    flat
+    list(value = flat, dot = dt_dot)
+}
+# }}}
+# object_from_l{{{
+object_from_l <- function (dt_idd, dt_idf, l, keep_duplicate = TRUE) {
+    setnames(l$id, "id", "object_id")
+    setnames(l$name, "id", "object_name")
+    # match
+    if (nrow(l$id)) {
+        obj_id <- t_object_data(dt_idf$object, object = l$id)
+    } else {
+        obj_id <- dt_idf$object[0L]
+        set(obj_id, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
+    }
+    if (nrow(l$name)) {
+        obj_nm <- t_object_data(dt_idf$object, object = l$name)
+    } else {
+        obj_nm <- dt_idf$object[0L]
+        set(obj_nm, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
+    }
+
+    # remain the input order
+    obj <- rbindlist(list(obj_id, obj_nm))
+    setorderv(obj, "rleid")
+    # in case when there are input object id or name vectors
+    add_rleid(obj, "object")
+
+    if (keep_duplicate) return(obj)
+
+    unique(obj, by = "object_id")
 }
 # }}}
 
@@ -1645,35 +1674,14 @@ value_assign_id <- function (dt_idf, dt_value, keep = FALSE) {
 # OBJECT MUNIPULATION
 # t_dup_object {{{
 t_dup_object = function (dt_idd, dt_idf, ...) {
-    l <- sep_name_dots(...)
-
-    setnames(l$id, "id", "object_id")
-    setnames(l$name, "id", "object_name")
-    # match
-    if (nrow(l$id)) {
-        obj_id <- t_object_data(dt_idf$object, object = l$id)
-    } else {
-        obj_id <- dt_idf$object[0L]
-        set(obj_id, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
-    }
-    if (nrow(l$name)) {
-        obj_nm <- t_object_data(dt_idf$object, object = l$name)
-    } else {
-        obj_nm <- dt_idf$object[0L]
-        set(obj_nm, NULL, c("rleid", "new_name"), list(integer(0L), character(0L)))
-    }
-
-    # remain the input order
-    obj <- rbindlist(list(obj_id, obj_nm))
-    setorderv(obj, "rleid")
-    # in case when there are input object id or name vectors
-    add_rleid(obj, "object")
+    l <- sep_name_dots(..., .can_name = TRUE)
+    obj <- object_from_l(dt_idd, dt_idf, l, keep_duplicate = TRUE)
 
     # add has_name attribute
     obj <- dt_idd$class[, list(class_id, has_name)][obj, on = "class_id"]
 
     # stop if cannot add objects in specified classes
-    t_assert_can_add(dt_idd$class, dt_idf$object, unique(obj$class_name))
+    t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "dup")
 
     # check input new names {{{
     # stop if trying to assign names to objects that do not have name attribute
@@ -1785,9 +1793,9 @@ t_dup_object = function (dt_idd, dt_idf, ...) {
 # }}}
 # t_add_object {{{
 t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
-    input <- sep_value_dots(..., .empty = TRUE)
+    l <- sep_value_dots(..., .empty = TRUE)
 
-    obj <- input[J(unique(input$rleid)), on = "rleid", mult = "first"]
+    obj <- l$value[J(unique(l$value$rleid)), on = "rleid", mult = "first"]
 
     # new object table
     obj <- t_class_data(dt_idd$class, obj,
@@ -1796,16 +1804,16 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
     )
 
     # stop if cannot add objects in specified classes
-    t_assert_can_add(dt_idd$class, dt_idf$object, obj$class_name)
+    t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "add")
 
     # add object id
     set(obj, NULL, "object_id", t_new_id(dt_idf$object, "object_id", nrow(obj)))
 
     # get object comments
-    obj <- input[field_name == ".comment", list(rleid, comment = value_list)][obj, on = "rleid"]
+    obj <- l$value[field_name == ".comment", list(rleid, comment = value_list)][obj, on = "rleid"]
 
     # new value table
-    val <- input[is.na(field_name) | field_name != ".comment",
+    val <- l$value[is.na(field_name) | field_name != ".comment",
         .SD, .SDcols = c("rleid", "field_name", "value_list", "empty")][
         obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")],
         on = "rleid"]
@@ -1878,8 +1886,8 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
     )
 
     if (count_check_error(validity)) {
-        print_validity(validity)
-        abort("error_validity",  "Failed to add object(s).")
+        on.exit(print_validity(validity), add = TRUE)
+        abort("error_validity",  "Failed to add object(s).\n")
     }
     # }}}
 
@@ -1898,43 +1906,41 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
 # }}}
 # t_set_object {{{
 t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
-    input <- sep_value_dots(..., .empty = TRUE, .duplicate = FALSE)
+    l <- sep_value_dots(..., .empty = TRUE, .duplicate = FALSE)
 
     # get object ID in `..X` format
-    setnames(input, "class_name", "object_name")
-    set(input, NULL, "object_id", as.integer(stri_match_first_regex(input$object_name, "^\\.\\.(\\d+)$")[, 2L]))
+    setnames(l$value, "class_name", "object_name")
+    set(l$value, NULL, "object_id", as.integer(stri_match_first_regex(l$value$object_name, "^\\.\\.(\\d+)$")[, 2L]))
+
+    obj <- l$value[J(unique(l$value$rleid)), on = "rleid", mult = "first"]
 
     # separate
-    in_id <- input[!is.na(object_id)]
-    set(in_id, NULL, "object_name", NULL)
-    in_nm <- input[is.na(object_id)]
-    set(in_nm, NULL, "object_id", NULL)
+    obj_id <- obj[!is.na(object_id)]
+    set(obj_id, NULL, "object_name", NULL)
+    obj_nm <- obj[is.na(object_id)]
+    set(obj_nm, NULL, "object_id", NULL)
 
     # get object data
-    in_id <- t_object_data(dt_idf$object, object = in_id)
-    in_nm <- t_object_data(dt_idf$object, object = in_nm)
+    obj_id <- t_object_data(dt_idf$object, object = obj_id)
+    obj_nm <- t_object_data(dt_idf$object, object = obj_nm)
 
     # combine
-    in_all <- rbindlist(list(in_id, in_nm))
+    obj <- rbindlist(list(obj_id, obj_nm))
 
-    # extract object data {{{
-    obj <- in_all[in_all[order(rleid), list(rleid = unique(rleid))], on = "rleid",
-        mult = "first", .SD, .SDcols = c("rleid", names(dt_idf$object))]
+    # stop if cannot set objects
+    t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "set")
+
     # replace old comments with input comments
-    cmt <- in_all[field_name == ".comment", list(rleid, comment = value_list)]
+    cmt <- l$value[field_name == ".comment", list(rleid, comment = value_list)]
     if (nrow(cmt) == 1L) {
         obj[cmt, on = "rleid", comment := list(cmt$comment)]
     } else if (nrow(cmt) >= 2L) {
         obj[cmt, on = "rleid", comment := cmt$comment]
     }
-    # }}}
-
-    # stop if cannot set objects
-    t_assert_can_set(obj)
 
     # new value table
-    val <- in_all[is.na(field_name) | field_name != ".comment", list(rleid, field_name, value_list, empty)][
-        obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")], on = list(rleid)]
+    val <- l$value[is.na(field_name) | field_name != ".comment", list(rleid, field_name, value_list, empty)][
+        obj[, .SD, .SDcols = c("rleid", "object_id", "class_id", "class_name")], on = "rleid"]
 
     # get objects with empty input {{{
     val_empty <- val[empty == TRUE]
@@ -1993,8 +1999,8 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
     )
 
     if (count_check_error(validity)) {
-        print_validity(validity)
-        abort("error_validity",  "Failed to add object(s).")
+        on.exit(print_validity(validity), add = TRUE)
+        abort("error_validity",  "Failed to set object(s).\n")
     }
     # }}}
 
@@ -2011,129 +2017,81 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
 }
 # }}}
 # t_del_object {{{
-t_del_object <- function (self, private, object, referenced = FALSE) {
-    i_assert_can_del_object(self, private, object)
+t_del_object <- function (dt_idd, dt_idf, ..., .referenced = FALSE) {
+    l <- sep_name_dots(..., .can_name = TRUE)
+    obj <- object_from_l(dt_idd, dt_idf, l, keep_duplicate = TRUE)
 
-    obj_tbl <- i_object_tbl_from_which(self, private, object)
-    val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
-    obj_id <- obj_tbl$object_id
+    t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "del")
 
-    ref_by_tbl <- i_val_ref_by_tbl(self, private, val_tbl)
+    browser()
+    ref <- dt_idf$reference[obj, on = c(src_object_id = "object_id"), nomatch = 0L]
+    setnames(ref,
+        c("object_id", "value_id", "src_object_id", "src_value_id"),
+        c("ref_object_id", "ref_value_id", "object_id", "value_id")
+    )
+
+    # IDs of objects to be deleted
+    id_del <- obj$object_id
 
     # check if target objects are referenced {{{
-    if (not_empty(ref_by_tbl)) {
-        if (eplusr_option("validate_level") == "final") {
-            ref <- ref_by_tbl[, list(referenced_by = collapse(referenced_by_object_id)),
-                by = list(object_rleid, object_id)]
-            stop("Deleting an object that is referenced by others is prohibited ",
-                "in `final` validation level. Failed to delete target object ",
-                "[ID:", collapse(obj_tbl$object_id), "]:\n",
-                paste0(paste0(ref$object_rleid, ": Object [ID:",surround(ref$object_id),"] was ",
-                        "referenced by other objects [ID:", ref$referenced_by, "]."),
-                    collapse = "\n"),
-                call. = FALSE)
+    if (nrow(ref)) {
+        # TODO: what if invalid reference exists?
+        ref_by <- dt_idf$object[, list(object_id, object_name)][
+            dt_idf$value[ref[, list(src_object_id = object_id, src_value_id = value_id, value_id = ref_value_id)], on = "value_id"],
+            on = "object_id"
+        ]
+
+        if (level_checks()$reference) {
+            # dot message
+            m_dot <- dot_string(l$dot[unique(ref, by = "object_id"), on = "rleid"], collapse = NULL)
+
+            # src message
+            m_ref <- t_object_info(unique(ref, by = "object_id"), numbered = FALSE)
+
+            # ref message
+            set(ref, NULL, "mes", t_object_info(ref_by, c("id", "name"), numbered = FALSE, prefix = ""))
+            m_ref_by <- ref[, collapse(mes, NULL), by = "object_id"]$V1
+
+            m <- paste0(m_dot, " | ", m_ref, " is referenced by ", m_ref_by, collapse = "\n")
+            abort("error_del_referenced",
+                paste0(
+                    "Deleting an object referenced by others is prohibited. Invalid input:\n", m
+                ),
+                src = ref,
+                ref = ref_by
+            )
         }
 
-        by_id <- unique(ref_by_tbl$referenced_by_object_id)
-
         if (referenced) {
-            i_verbose_info(self, private, "Delete target object [ID:",
-                collapse(obj_id), "] and also objects [ID:",
-                collapse(by_id), "] that are referencing target object.")
-            obj_id <- c(obj_id, by_id)
+            verbose_info(
+                "Delete object(s) ID [", collapse(id_del, NULL), "]",
+                " and also object(s) ID [", collapse(unique(ref_by$object_id), NULL), "]",
+                " that are referencing target object(s)."
+            )
+            id_del <- unique(c(id_del, ref_by$object_id))
         } else {
-            i_verbose_info(self, private, "Delete target object [ID:",
-                collapse(obj_id), "] which was referenced by objects ",
-                "[ID: ", collapse(by_id), "]. Error may occur during ",
-                "simulation.")
+            verbose_info(
+                "Delete object(s) ID [", collapse(id_del, NULL), "]",
+                " which were referenced by object(s) ID [", collapse(unique(ref_by$object_id), NULL), "].",
+                " Invalid reference(s) may cause simulation errors."
+            )
         }
     }
     # }}}
 
     # delete rows in object table
-    private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% obj_id]
+    dt_object <- dt_idf$object[!J(id_del), on = "object_id"]
 
     # delete rows in value table and value reference table
-    private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% obj_id]
+    dt_value <- dt_idf$value[!J(id_del), on = "object_id"]
 
     # delete rows in value reference table
-    private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
-        !val_tbl, on = "value_id"][
-        !ref_by_tbl, on = c(reference_value_id = "referenced_by_value_id")]
+    dt_reference <- dt_idf$reference[!J(id_del), on = "object_id"][!J(id_del), on = "src_object_id"]
 
-    # log order
-    i_log_del_object_order(self, private, obj_id)
-
-    # log unsaved
-    i_log_unsaved_idf(self, private)
-
-    # log uuid
-    i_log_new_uuid(self, private)
-
-    self
-}
-# }}}
-# i_del_object {{{
-i_del_object <- function (self, private, object, referenced = FALSE) {
-    i_assert_can_del_object(self, private, object)
-
-    obj_tbl <- i_object_tbl_from_which(self, private, object)
-    val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
-    obj_id <- obj_tbl$object_id
-
-    ref_by_tbl <- i_val_ref_by_tbl(self, private, val_tbl)
-
-    # check if target objects are referenced {{{
-    if (not_empty(ref_by_tbl)) {
-        if (eplusr_option("validate_level") == "final") {
-            ref <- ref_by_tbl[, list(referenced_by = collapse(referenced_by_object_id)),
-                by = list(object_rleid, object_id)]
-            stop("Deleting an object that is referenced by others is prohibited ",
-                "in `final` validation level. Failed to delete target object ",
-                "[ID:", collapse(obj_tbl$object_id), "]:\n",
-                paste0(paste0(ref$object_rleid, ": Object [ID:",surround(ref$object_id),"] was ",
-                        "referenced by other objects [ID:", ref$referenced_by, "]."),
-                    collapse = "\n"),
-                call. = FALSE)
-        }
-
-        by_id <- unique(ref_by_tbl$referenced_by_object_id)
-
-        if (referenced) {
-            i_verbose_info(self, private, "Delete target object [ID:",
-                collapse(obj_id), "] and also objects [ID:",
-                collapse(by_id), "] that are referencing target object.")
-            obj_id <- c(obj_id, by_id)
-        } else {
-            i_verbose_info(self, private, "Delete target object [ID:",
-                collapse(obj_id), "] which was referenced by objects ",
-                "[ID: ", collapse(by_id), "]. Error may occur during ",
-                "simulation.")
-        }
-    }
-    # }}}
-
-    # delete rows in object table
-    private$m_idf_tbl$object <- private$m_idf_tbl$object[!object_id %in% obj_id]
-
-    # delete rows in value table and value reference table
-    private$m_idf_tbl$value <- private$m_idf_tbl$value[!object_id %in% obj_id]
-
-    # delete rows in value reference table
-    private$m_idf_tbl$value_reference <- private$m_idf_tbl$value_reference[
-        !val_tbl, on = "value_id"][
-        !ref_by_tbl, on = c(reference_value_id = "referenced_by_value_id")]
-
-    # log order
-    i_log_del_object_order(self, private, obj_id)
-
-    # log unsaved
-    i_log_unsaved_idf(self, private)
-
-    # log uuid
-    i_log_new_uuid(self, private)
-
-    self
+    list(object = dt_object[, .SD, .SDcols = names(dt_idf$object)],
+         value = dt_value[, .SD, .SDcols = names(dt_idf$value)],
+         reference = dt_reference
+    )
 }
 # }}}
 
