@@ -1213,114 +1213,114 @@ ins_all_dt <- function (x, y, base_col = NULL) {
 }
 # }}}
 
-# t_assert_can_add {{{
-t_assert_can_add <- function (dt_class, dt_object, class_name) {
-    # stop if attempt to add Version
-    is_ver <- class_name == "Version"
-    if (any(is_ver)) {
-        mes <- "Adding `Version` object directly is prohibited."
-        abort("error_add_version_object", mes, class_name = class_name)
-    }
+# ASSERT
+# t_assert_can_do {{{
+t_assert_can_do <- function (dt_class, dt_object, dot, object,
+                             action = c("add", "dup", "set", "del")) {
+    find_dot <- function (dot, dt) dot[dt, on = "rleid", mult = "first"]
 
-    # otherwise, only do further checking in final mode
-    if (!in_final_mode()) return(TRUE)
+    # stop attempting to touch Version {{{
+    if (nrow(object[class_name == "Version"])) {
+        invld <- find_dot(dot, object[class_name == "Version"])
 
-    # check if attempt to add unique objects
-    uni_cls <- class_name[class_name %in% t_class_name_unique(dt_class)]
-    if (!length(uni_cls)) return(TRUE)
+        m <- paste0(dot_string(invld, NULL), " | Class ", surround(invld$class_name), collpase = "\n")
 
-    obj_num <- t_object_num(dt_object, uni_cls)
-    if (all(obj_num == 0L)) return(TRUE)
-
-    dup_cls <- uni_cls[obj_num > 0L]
-
-    if (length(dup_cls)) {
-        mes <- paste0(
-            "Existing unique object(s) in class ", collapse(dup_cls), " cannot be duplicated."
-        )
-        abort_for_final("error_add_exist_unique_object", mes, class_name = dup_cls)
-    }
-
-    dup_in <- unique(uni_cls[duplicated(uni_cls)])
-
-    if (length(dup_in)) {
-        mes <- paste0(
-            "Unique object(s) in class ", collapse(dup_in), " can only be added once."
-        )
-        abort_for_final("error_add_new_unique_object", mes, class_name = dup_in)
-    }
-}
-# }}}
-# t_assert_can_set {{{
-t_assert_can_set <- function (dt_object) {
-    stopifnot(has_names(dt_object, c("object_id", "class_name")))
-
-    is_ver <- dt_object$class_name == "Version"
-
-    if (any(is_ver)) {
-        mes <- "Modify `Version` object directly is prohibited."
-        abort("error_set_version_object", mes, class = class)
-    }
-
-    # stop if modifying same object multiple times
-    if (anyDuplicated(dt_object, by = "object_id")) {
-        if (!has_name(dt_object, "rleid")) add_rleid(dt_object,)
-
-        dup <- dt_object[, list(rleid = list(collapse(rleid, NULL)),
-            object_name = unique(object_name)), by = list(object_id)]
-
-        info <- t_object_info(dup, c("id", "name"), numbered = FALSE,
-            prefix = "Targeting to the same ")
-
-        abort("error_set_object_multi_time",
+        abort("error_add_version",
             paste0(
-                "Cannot modify same object multiple times. Invalid input:\n",
-                paste0("# (", dup$rleid, ")| ", info, collapse = "\n")
-            )
+                switch(action, add = "Adding", dup = "Duplicating", set = "Modifying", del = "Deleting"),
+                " `Version` object is prohibited. Invalid input:\n", m
+            ),
+            dot = dot, object = object
         )
     }
-}
-# }}}
-# t_assert_can_del {{{
-t_assert_can_del <- function (dt_object) {
-    obj_tbl <- i_object_tbl_from_which(self, private, object)
+    # }}}
 
-    is_version <- obj_tbl$class_name == "Version"
+    if (level_checks()$unique_object && action %in% c("add", "dup", "del")) {
+        uni <- object[class_id %in% t_class_id_unique(dt_class)]
+        if (nrow(uni)) {
+            # try to add or dup new unique object that already exists {{{
+            if (action %in% c("add", "dup") && nrow(uni[t_object_num(dt_object, class_id) > 0L])) {
+                invld <- find_dot(dot, uni[t_object_num(dt_object, class_id) > 0L])
 
-    if (any(is_version))
-        stop("Deleting `Version` object is prohibited.", call. = FALSE)
+                info <- t_object_info(invld, collapse = NULL)
 
-    if (anyDuplicated(obj_tbl$object_id))
-        stop("`object` should not contain any duplication.", call. = FALSE)
+                m <- paste0(dot_string(invld, NULL), " | ", info, collapse = "\n")
 
-    if (eplusr_option("validate_level") != "final") return()
+                abort(paste0("error_", action, "_unique"),
+                    paste0(
+                        switch(action,
+                            add = "Adding new one to unique class that already has one object is prohibited.",
+                            dup = "Existing object in unique class cannot be duplicated."
+                        ),
+                        " Invalid input:\n", m
+                    ),
+                    dot = dot, object = object
+                )
+            }
+            # }}}
+            # try to add multi objects in unique classes {{{
+            if (action == "add" && nrow(uni[duplicated(class_id)])) {
+                invld <- find_dot(dot, uni[duplicated(class_id)])
 
-    class_name <- obj_tbl$class_name
+                m <- paste0(dot_string(invld, NULL), " | Class: ", surround(invld$class_name), collapse = "\n")
 
-    is_required <- class_name %in% i_required_class_name(self, private)
-    if (any(is_required))
-        stop("In `final` validation level, deleting an required object is prohibited ",
-            "deleted. Class ", surround(unique(class_name[is_required])),
-            " is required object that can not be deleted.", call. = FALSE)
+                abort("error_add_multi_unique",
+                    paste0("Unique object can only be added once. Invalid input\n", m),
+                    dot = dot, object = object
+                )
+            }
+            # }}}
+            # try do del unique object {{{
+            if (action == "del" && nrow(uni[t_object_num(dt_object, class_id) == 0L])) {
 
-    is_unique <- class_name %in% i_unique_class_name(self, private)
-    if (!all(is_unique)) return()
+                invld <- find_dot(dot, uni[t_object_num(dt_object, class_id) == 0L])
 
-    uni_cls <- class_name[is_unique]
+                info <- t_object_info(invld, collapse = NULL)
 
-    obj_num <- i_object_num(self, private, uni_cls)
-    if (all(obj_num == 0L)) return()
+                m <- paste0(dot_string(invld, NULL), " | ", info, collapse = "\n")
+            }
+            # }}}
+        }
+    }
 
-    dup_cls <- uni_cls[obj_num > 0L]
+    # stop attempting to delete required objects {{{
+    if (action == "del" && level_checks()$required_object && nrow(object[class_id %in% t_class_id_required(dt_class)])) {
+        invld <- find_dot(dot, object[class_id %in% t_class_id_required(dt_class)])
 
-    if (not_empty(dup_cls))
-        stop("In `final` validation level, existing unique objects cannot be ",
-            "deleted. Class ", surround(dup_cls), " is existing unique object ",
-            "that can ", "not be deleted.", call. = FALSE)
+        info <- t_object_info(invld, collapse = NULL)
+
+        m <- paste0(dot_string(invld, NULL), " | ", info, collapse = "\n")
+
+        abort("error_del_required",
+            paste0("Deleting a required object is prohibited. Invalid input:\n", m),
+            dot = dot, object = object
+        )
+    }
+    # }}}
+
+    # stop if modifying same object multiple times {{{
+    if (action %in% c("set", "del") && anyDuplicated(object, by = "object_id")) {
+        invld <- find_dot(dot, object[duplicated(class_id)])
+        info <- t_object_info(invld, numbered = FALSE)
+        m <- paste0(dot_string(invld, NULL), " | ", info, collapse = "\n")
+
+        abort(paste0("error_", action, "_multi_time"),
+            paste0("Cannot modify same object multiple times. Invalid input:\n", m),
+            dot = dot, object = object
+        )
+    }
+    # }}}
+
+    TRUE
 }
 # }}}
 
 # DOTS
+# dot_string {{{
+dot_string <- function (dt, collapse = "\n") {
+    dt[, paste0(" #", lpad(rleid, "0"), "| ", dot, collapse = collapse)]
+}
+# }}}
 # old_input {{{
 old_input <- function (which, value = NULL, comment = NULL, type = c("add", "set")) {
     assert_valid_input_format(class, value, comment, default, type)
@@ -1341,12 +1341,12 @@ old_input <- function (which, value = NULL, comment = NULL, type = c("add", "set
 }
 # }}}
 # sep_name_dots {{{
-sep_name_dots <- function (..., .named = FALSE, .duplicate = TRUE) {
+sep_name_dots <- function (..., .can_name = TRUE) {
     l <- list(...)
 
     # stop if empty input
     if (!length(l)) {
-        abort("error_empty_input", "Please give object(s) to set")
+        abort("error_empty_input", "Please give object(s) to modify.")
     }
 
     # check depth of each element
@@ -1377,7 +1377,7 @@ sep_name_dots <- function (..., .named = FALSE, .duplicate = TRUE) {
 
     # warning if mix named
     row_mixnm <- dt_in[!is.na(dot_nm) & nmd == TRUE, which = TRUE]
-    if (length(row_mixnm)) {
+    if (.can_name && length(row_mixnm)) {
         mes <- paste0(
             "Named vectors found in named input element. ",
             "Names of vectors will be used instead of element's name."
@@ -1408,7 +1408,7 @@ sep_name_dots <- function (..., .named = FALSE, .duplicate = TRUE) {
     id <- id[, unnest_dot(rleid, dot, dot_nm, nmd)]
     nm <- nm[, unnest_dot(rleid, dot, dot_nm, nmd)]
 
-    list(id = id, name = nm)
+    list(id = id, name = nm, dot = dt_in)
 }
 # }}}
 # sep_value_dots {{{
@@ -1524,10 +1524,6 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = TRUE) {
         dt
     }
     # }}}
-
-    dot_string <- function (dt) {
-        dt[, paste0(" #", lpad(rleid, "0"), "| ", dot, collapse = "\n")]
-    }
 
     flat <- rbindlist(lapply(split(dt_dot, by = "dep"), flatten_input))
 
