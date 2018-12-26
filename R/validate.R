@@ -73,6 +73,49 @@ exclude_invalid <- function (env_in, invalid, on) {
 }
 # }}}
 
+# custom_validate {{{
+custom_validate <- function (
+    required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
+    extensible = FALSE, required_field = FALSE, autofield = FALSE,
+    type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
+)
+{
+    list(
+        required_object = required_object,
+        unique_object = unique_object,
+        unique_name = unique_name,
+        extensible = extensible,
+        required_field = required_field,
+        autofield = autofield,
+        type = type,
+        choice = choice,
+        range = range,
+        reference = reference
+    )
+}
+# }}}
+# level_checks {{{
+level_checks <- function (level = eplusr_option("validate_level")) {
+    level <- match.arg(level, c("none", "draft", "final"))
+
+    if (level == "none") {
+        custom_validate(
+            autofield = TRUE, type = TRUE
+        )
+    } else if (level == "draft") {
+        custom_validate(
+            autofield = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,
+            range = TRUE
+        )
+    } else {
+        custom_validate(
+            required_object = TRUE, unique_object = TRUE, unique_name = TRUE,
+            extensible = TRUE, required_field = TRUE, autofield = TRUE,
+            type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
+        )
+    }
+}
+# }}}
 # validate_on_level {{{
 # Validate input IDF data on different level
 # @param dt_idd An environment that contains IDD data
@@ -82,19 +125,25 @@ exclude_invalid <- function (env_in, invalid, on) {
 # @param level Strictness level to validate. Should be one of `"none"`,
 #        `"draft"` and `"final"`.
 # @return An IdfValidity object.
-validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL, level = c("none", "draft", "final")) {
-    level <- match.arg(level)
+validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL, level) {
 
-    switch(level,
-        none = empty_validity(),
-        draft = validate_objects(dt_idd, dt_idf, dt_object, dt_value,
-            autofield = TRUE, type = TRUE, choice = TRUE, range = TRUE
-        ),
-        final = validate_objects(dt_idd, dt_idf, dt_object, dt_value,
-            required_object = TRUE, unique_object = TRUE, unique_name = TRUE,
-            extensible = TRUE, required_field = TRUE, autofield = TRUE,
-            type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
-        )
+    if (is.character(level)) {
+        level <- level_checks(level)
+    } else {
+        stopifnot(is.list(level), has_names(level, names(custom_validate())))
+    }
+
+    validate_objects(dt_idd, dt_idf, dt_object, dt_value,
+        required_object = level$required_object,
+        unique_object = level$unique_object,
+        unique_name = level$unique_name,
+        extensible = level$extensible,
+        required_field = level$required_field,
+        autofield = level$autofield,
+        type = level$type,
+        choice = level$choice,
+        range = level$range,
+        reference = level$reference
     )
 }
 # }}}
@@ -136,6 +185,19 @@ validate_objects <- function
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
+
+    stopifnot(
+        is.logical(required_object),
+        is.logical(unique_obj),
+        is.logical(unique_name),
+        is.logical(extensible),
+        is.logical(required_field),
+        is.logical(autofield),
+        is.logical(type),
+        is.logical(choice),
+        is.logical(range),
+        is.logical(reference)
+    )
 
     # if object and value dt are not provided, then this means to validate the
     # whole IDF
