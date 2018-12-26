@@ -1357,7 +1357,7 @@ convert_value_unit <- function (dt_value, from, to) {
 
 # get_value_sources {{{
 get_value_sources <- function (dt_value, lower = FALSE) {
-    dt_val <- dt_value[!is.na(value), list(field_id, value_id, value, src_enum, class_name)]
+    dt_val <- dt_value[!is.na(value), list(object_id, field_id, value_id, value, src_enum, class_name)]
 
     setindexv(dt_val, "src_enum")
 
@@ -1365,6 +1365,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     cls_src <- dt_val[
         src_enum == .globals$source$class,
         list(
+            src_object_id = object_id,
             src_field_id = field_id,
             src_value_id = value_id,
             src_value = class_name,
@@ -1376,6 +1377,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     fld_src <- dt_val[
         src_enum == .globals$source$field,
         list(
+            src_object_id = object_id,
             src_field_id = field_id,
             src_value_id = value_id,
             src_value = value,
@@ -1389,6 +1391,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
         src_enum == .globals$source$mixed,
         {
             list(
+                src_object_id = c(object_id, object_id),
                 src_field_id = c(field_id, field_id),
                 src_value_id = c(value_id, value_id),
                 src_value = c(value, class_name),
@@ -1410,7 +1413,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 get_value_references <- function (dt_value, lower = FALSE) {
     val_ref <- dt_value[
         !is.na(value) & type_enum == .globals$type$object_list,
-        list(value_id, value, field_id)]
+        list(object_id, value_id, value, field_id)]
 
     if (lower) set(val_ref, NULL, "value", stri_trans_tolower(val_ref$value))
 
@@ -1420,7 +1423,11 @@ get_value_references <- function (dt_value, lower = FALSE) {
 
 # get_value_reference_map {{{
 get_value_reference_map <- function (map, src, value) {
-    empty <- data.table(value_id = integer(0L), src_value_id = integer(0L), src_enum = integer(0L))
+    empty <- data.table(
+            object_id = integer(0L),     value_id = integer(0L),
+        src_object_id = integer(0L), src_value_id = integer(0L),
+        src_enum = integer(0L)
+    )
 
     # get all values in lower case that are sources
     val_src <- get_value_sources(src, lower = TRUE)
@@ -1430,8 +1437,8 @@ get_value_reference_map <- function (map, src, value) {
     val_ref <- get_value_references(value, lower = TRUE)
     if (!nrow(val_ref)) return(empty)
 
-    val_src_lst <- val_src[, lapply(.SD, list), by = list(src_field_id)]
-    val_ref_lst <- val_ref[, lapply(.SD, list), by = list(field_id)]
+    val_src_lst <- val_src[, lapply(.SD, list), by = "src_field_id"]
+    val_ref_lst <- val_ref[, lapply(.SD, list), by = "field_id"]
 
     # remove rows that field ids do not exist in current IDF
     fld_ref_src <- map[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
@@ -1441,23 +1448,26 @@ get_value_reference_map <- function (map, src, value) {
     # combine all references and sources
     ref_src_lst <- val_src_lst[fld_ref_src, on = list(src_field_id)][,
         list(
+            src_object_id = list(unlist(src_object_id, use.names = FALSE)),
             src_field_id = list(src_field_id),
-            src_value_id = list(unlist(src_value_id)),
-            src_value = list(unlist(src_value)),
-            src_enum = list(unlist(src_enum))
+            src_value_id = list(unlist(src_value_id, use.names = FALSE)),
+            src_value = list(unlist(src_value, use.names = FALSE)),
+            src_enum = list(unlist(src_enum, use.names = FALSE))
         ),
-        by = field_id
-    ][val_ref_lst, on = list(field_id)]
+        by = "field_id"
+    ][val_ref_lst, on = "field_id"]
 
     # match
     ref_src_lst[, {
-        val_id <- unlist(value_id)
-        val <- unlist(value)
+        val_id <- unlist(value_id, use.names = FALSE)
+        val <- unlist(value, use.names = FALSE)
         l <- vapply(value_id, length, integer(1L))
         list(
+            src_object_id = rep(src_object_id, l),
             src_value_id = rep(src_value_id, l),
             src_value = rep(src_value, l),
             src_enum = rep(src_enum, l),
+            object_id = unlist(object_id, use.names = FALSE),
             value_id = val_id,
             value = val
             # src_field_id = rep(src_field_id, l),
@@ -1468,18 +1478,19 @@ get_value_reference_map <- function (map, src, value) {
             # used. This could happen when there are errors that objects in one
             # class have the same name.
             # TODO: log this case
-            m <- chmatch(value, unlist(src_value), nomatch = 0L)
+            m <- chmatch(value, unlist(src_value, use.names = FALSE), nomatch = 0L)
             # set NA if no matched found
             val_id <- NA_integer_
             enum <- NA_integer_
             if (m) {
-                val_id <- unlist(src_value_id)[m]
-                enum <- unlist(src_enum)[m]
+                obj_id <- unlist(src_object_id, use.names = FALSE)[m]
+                val_id <- unlist(src_value_id, use.names = FALSE)[m]
+                enum <- unlist(src_enum, use.names = FALSE)[m]
             }
-            list(src_value_id = val_id, src_enum = enum)
+            list(object_id = object_id, src_object_id = obj_id, src_value_id = val_id, src_enum = enum)
         },
         by = value_id
-    ]
+    ][, .SD, .SDcols = names(empty)]
 }
 # }}}
 
