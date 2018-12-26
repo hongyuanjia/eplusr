@@ -1123,14 +1123,14 @@ sep_header_options <- function (dt, type_enum) {
 
     res <- list(left = dt, options = opt)
 
-    if (nrow(dt_opt) == 0L) return(res)
+    if (!nrow(dt_opt)) return(res)
 
     out <- unlist(dt_opt[, `:=`(options = list(get_option(header, value))), by = line]$options)
 
-    if (length(out) == 0L) return(res)
+    if (!length(out)) return(res)
 
-    for (lgl in setdiff(names(res), "save_format")) res$options[[lgl]] <- TRUE
     save_format <- c("sorted", "ori_top", "ori_bot")
+    for (lgl in setdiff(out, save_format)) res$options[[lgl]] <- TRUE
     sf <- save_format[save_format %in% out][1L]
     if (!is.na(sf)) res$options$save_format <- sf
 
