@@ -100,11 +100,11 @@ errormsg_field_name <- function (dt) {
 
 # GROUP
 # t_group_name {{{
-t_group_name <- function (dt_cls, dt_group, class = NULL) {
+t_group_name <- function (dt_class, dt_group, class = NULL) {
     if (is.null(class)) {
-        grp_id <- dt_cls[order(group_id), unique(group_id)]
+        grp_id <- dt_class[order(group_id), unique(group_id)]
     } else {
-        grp_id <- t_class_data(dt_cls, class)$group_id
+        grp_id <- t_class_data(dt_class, class)$group_id
     }
 
     dt_group[J(grp_id), on = "group_id", group_name]
@@ -387,9 +387,12 @@ t_object_num <- function (dt_object, class = NULL) {
     if (is.null(class)) return(nrow(dt_object))
 
     col_on <- ifelse(is.character(class), "class_name", "class_id")
-    dt_object[J(class), on = col_on][
-        , .N, by = list(class_id, found = !is.na(object_id))][
-        found == FALSE, `:=`(N = 0L)]$N
+    setindexv(dt_object, col_on)
+    dt_object[
+        J(unique(class)), on = col_on][
+        , .N, by = list(class_id, class_name, found = !is.na(object_id))][
+        found == FALSE, `:=`(N = 0L)][
+        J(class), on = col_on]$N
 }
 # }}}
 
