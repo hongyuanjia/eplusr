@@ -511,7 +511,7 @@ sep_class_table <- function (dt, type_enum) {
 
         # insert
         dt <- rbindlist(list(ins, dt))
-        setorder(dt, "line")
+        setorderv(dt, "line")
 
         # change added line number
         dt[dt[class_id %in% ins$class_id, .I[2L], by = class_id]$V1, `:=`(
@@ -1041,15 +1041,12 @@ mark_idf_lines <- function (dt, type_enum) {
     setindexv(dt, "type")
 
     # macro line
-    l_m <- dt[startsWith(string, "#"), line]
+    l_m <- dt[startsWith(string, "#"), which = TRUE]
     if (length(l_m)) {
         dt[l_m, c("type", "body", "comment") :=({
             macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
             is_m <- macro %in% macro_dict
             if (any(is_m)) {
-                warning("Currently, IMF is not fully supported. All ",
-                    "EpMacro lines will be treated as normal comments of ",
-                    "the nearest downwards object.", call. = FALSE)
                 type[is_m] <- type_enum$macro
                 body[is_m] <- ""
                 comment <- string
@@ -1060,7 +1057,13 @@ mark_idf_lines <- function (dt, type_enum) {
 
         if (nrow(dt[type == type_enum$macro])) {
             parse_issue("warning_macro_line", "idf", "Marco lines found",
-                dt[type == type_enum$macro], stop = FALSE)
+                dt[type == type_enum$macro], stop = FALSE,
+                post = paste0(
+                    "Currently, IMF is not fully supported. All ",
+                    "EpMacro lines will be treated as normal comments of ",
+                    "the nearest downwards object."
+                )
+            )
         }
     }
 
@@ -1207,7 +1210,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     set(dt, NULL, c("class_id", "class_name", "group_id", "class_name_lower"), NULL)
     dt_cmt <- left[dt[type < type_enum$value], on = "line", roll = -Inf]
     dt_val <- left[dt[type > type_enum$comment], on = "line", roll = Inf]
-    dt <- setorder(rbindlist(list(dt_cmt, dt_val)), "line")
+    dt <- setorderv(rbindlist(list(dt_cmt, dt_val)), "line")
 
     # lines with type "object" and "object_value" are duplicated
     dt <- unique(dt)
@@ -1578,7 +1581,8 @@ parse_err_file <- function (path) {
 
 # parse_issue {{{
 parse_issue <- function (error_type, type = c("idf", "idd", "err"),
-                         title, data = NULL, num = NULL, prefix = NULL, stop = TRUE) {
+                         title, data = NULL, num = NULL, prefix = NULL, post = NULL,
+                         stop = TRUE) {
 
     start_rule <- cli::rule(line = 2L)
 
@@ -1611,7 +1615,11 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
     }
     end_rule <- cli::rule(line = 2L)
 
-    all_mes <- paste0(c(start_rule, err_title, err_num, mes_rule, mes_line, end_rule),
+    if (!is.null(post)) {
+        post <- c(cli::rule(line = 1L), post)
+    }
+
+    all_mes <- paste0(c(start_rule, err_title, err_num, mes_rule, mes_line, post, end_rule),
         collapse = "\n")
 
     ori <- getOption("warning.length")
