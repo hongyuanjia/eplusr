@@ -575,7 +575,7 @@ Epw <- R6::R6Class(classname = "Epw",
                          start, end, sep = ",")
 
             hldys_dlt_svgs <- private$m_header$holidays_daylight_savings
-            hldys_dlt_svgs$leap_year <- ifelse(hldys_dlt_svgs$leap_year, "yes", "no")
+            hldys_dlt_svgs$leap_year <- if(hldys_dlt_svgs$leap_year) "yes" else "no"
             if (is.na(hldys_dlt_svgs$dls_start_day)) hldys_dlt_svgs$dls_start_day <- "0"
             if (is.na(hldys_dlt_svgs$dls_end_day)) hldys_dlt_svgs$dls_end_day <- "0"
             if (hldys_dlt_svgs$num_of_holiday == 0L) {
@@ -771,7 +771,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     assert_that(is_scalar(path))
 
     is_path <- file.exists(path)
-    error_end <- ifelse(is_path, paste0(" ", surround(path)), "")
+    error_end <- if(is_path) paste0(" " else surround(path)), ""
 
     num_header <- 8L
     header <- readr::read_lines(path, n_max = num_header)
@@ -914,8 +914,8 @@ parse_epw_file <- function (path, strict = TRUE) {
 
     holidays_dls <- list()
     leap_year <- ho[2]
-    dls_start_day <- ifelse(ho[3] == "0", NA, ho[3])
-    dls_end_day <- ifelse(ho[4] == "0", NA, ho[4])
+    dls_start_day <- if(ho[3] == "0") NA else ho[3]
+    dls_end_day <- if(ho[4] == "0") NA else ho[4]
     num_of_holiday <- suppressWarnings(as.integer(ho[5]))
     ho_data <- ho[-(1:5)]
 
@@ -923,7 +923,7 @@ parse_epw_file <- function (path, strict = TRUE) {
         stop("Value of LeapYear Observed is neither `yes` nor `no` in EPW file ",
              surround(path), ": ", surround(leap_year), ".", call. = FALSE)
     }
-    holidays_dls[["leap_year"]] <- ifelse(tolower(leap_year) == "yes", TRUE, FALSE)
+    holidays_dls[["leap_year"]] <- if(tolower(leap_year) == "yes") TRUE else FALSE
 
     if (!is.na(dls_start_day) & is.na(dls_end_day)) {
         stop("Daylight saving start day specified without daylight saving end day.",
@@ -1218,7 +1218,7 @@ get_epw_date <- function (path, x, start_day_of_week, type = c("start", "end")) 
 #' Download EnergyPlus Weather File (EPW) and Design Day File (DDY)
 #'
 #' `download_weather()` makes it easy to download EnergyPlus weather files (EPW)
-#' and design day files (DDY). Basically, it 
+#' and design day files (DDY).
 #'
 #' @param pattern A regular expression used to search locations, e.g. `"los
 #'     angeles.*tmy3"`. The search is case-insensitive.

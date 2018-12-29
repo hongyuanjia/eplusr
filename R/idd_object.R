@@ -700,7 +700,7 @@ iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_op
         c("field_id", "type_enum", "default", "units", "ip_units")
     )
 
-    unit_to <- ifelse(in_ip, "ip", "si")
+    unit_to <- if(in_ip) "ip" else "si"
     fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
 
     fld$default
@@ -757,7 +757,7 @@ iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_o
     fld[autocalculatable == TRUE, `:=`(auto = "Autocalculate")]
 
     # default
-    unit_to <- ifelse(in_ip, "ip", "si")
+    unit_to <- if(in_ip) "ip" else "si"
     fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
 
     # range
@@ -891,7 +891,7 @@ iddobj_print <- function (self, private) {
         cls[, `:=`(num_print = num_fields, last_extensible = 0L)]
     }
 
-    col_nm <- ifelse(eplusr_option("view_in_ip"), "full_ipname", "full_name")
+    col_nm <- if(eplusr_option("view_in_ip")) "full_ipname" else "full_name"
     fld <- iddobj_field_data(self, private, seq_len(cls$num_print),
         c("field_index", "required_field", "extensible_group", col_nm)
     )

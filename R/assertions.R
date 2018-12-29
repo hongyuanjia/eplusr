@@ -40,7 +40,7 @@ on_failure(is_idd_ver) <- function (call, env) {
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
     assert_that(is_scalar(path))
-    eplus <- paste0("energyplus", ifelse(is_windows(), ".exe", ""))
+    eplus <- paste0("energyplus", if(is_windows()) ".exe" else "")
     all(dir.exists(path), file.exists(file.path(path, c(eplus, "Energy+.idd"))))
 }
 on_failure(is_eplus_path) <- function (call, env) {
@@ -153,8 +153,8 @@ are_integerish <- function(x) {
 # }}}
 # is_same_len {{{
 is_same_len <- function (x, y) {
-    x_len_fun <- ifelse(is.data.frame(x), nrow, length)
-    y_len_fun <- ifelse(is.data.frame(y), nrow, length)
+    x_len_fun <- if(is.data.frame(x)) nrow else length
+    y_len_fun <- if(is.data.frame(y)) nrow else length
     x_len_fun(x) == y_len_fun(y)
 }
 on_failure(is_same_len) <- function (call, env) {

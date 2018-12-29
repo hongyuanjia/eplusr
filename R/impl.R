@@ -294,7 +294,7 @@ t_object_name <- function (dt_object, class = NULL, simplify = FALSE, lower = FA
 t_object_num <- function (dt_object, class = NULL) {
     if (is.null(class)) return(nrow(dt_object))
 
-    col_on <- ifelse(is.character(class), "class_name", "class_id")
+    col_on <- if(is.character(class)) "class_name" else "class_id"
     setindexv(dt_object, col_on)
     dt_object[
         J(unique(class)), on = col_on][
@@ -1913,8 +1913,8 @@ t_paste_object <- function (dt_idd, dt_idf, ver, in_ip = FALSE, unique = TRUE) {
     parsed <- read_idfeditor_copy(ver, in_ip)
 
     # IP - SI conversion if necessary
-    from <- ifelse(in_ip, "ip", "si")
-    to <- ifelse(.options$view_in_ip, "ip", "si")
+    from <- if(in_ip) "ip" else "si"
+    to <- if(.options$view_in_ip) "ip" else "si"
     parsed$value <- convert_value_unit(parsed$value, from, to)
 
     # remove version object
@@ -2303,7 +2303,7 @@ assign_new_id <- function (dt_idf, dt, type = c("object", "value"), keep = FALSE
 # }}}
 # correct_obj_id {{{
 correct_obj_id <- function (dt_object, dt_value) {
-    by_col <- ifelse(has_name(dt_value, "object_rleid"), "object_rleid", "object_id")
+    by_col <- if(has_name(dt_value, "object_rleid")) "object_rleid" else "object_id"
     set(dt_value, NULL, "object_id",
         rep(dt_object$object_id, times = dt_value[, .N, by = c(by_col)]$N))
 }
@@ -5765,7 +5765,7 @@ i_idfobj_value_table <- function (self, private, object, all = FALSE, unit = TRU
     if (i_need_update_num(self, private, view_in_ip = in_ip))
         val_tbl_full <- update_value_num(val_tbl_full, eplusr_option("num_digits"), in_ip)
 
-    ip <- ifelse(in_ip, "ip", "")
+    ip <- if(in_ip) "ip" else ""
 
     if (unit) fld_nm <- paste0("full_", ip, "name")
     else fld_nm <- "field_name"

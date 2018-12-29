@@ -121,8 +121,8 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
     dt_object <- update_object_name(dt_object, dt_value)
 
     # IP - SI conversion
-    from <- ifelse(options$view_in_ip, "ip", "si")
-    to <- ifelse(.options$view_in_ip, "ip", "si")
+    from <- if(options$view_in_ip) "ip" else "si"
+    to <- if(.options$view_in_ip) "ip" else "si"
     dt_value <- convert_value_unit(dt_value, from, to)
 
     # value reference map
@@ -1279,7 +1279,7 @@ get_value_table <- function (dt, idd) {
 
     # add field id and other attributes
     ## add full name column based on option
-    col_nm <- ifelse(.options$view_in_ip, "full_ipname", "full_name")
+    col_nm <- if(.options$view_in_ip) "full_ipname" else "full_name"
 
     cols_add <- c("class_id", "field_index", "field_id", "type_enum",
         "src_enum", "field_name", col_nm, "units", "ip_units", "is_name"
@@ -1619,7 +1619,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
     on.exit(options(warning.length = ori), add = TRUE)
 
     type <- match.arg(type)
-    key <- ifelse(stop, "ERROR", "WARNING")
+    key <- if(stop) "ERROR" else "WARNING"
     all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
     if (stop) {
         abort(c(error_type, paste0("error_parse_", type)), all_mes, NULL, data = data)
