@@ -4,99 +4,9 @@
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringr str_detect str_match str_replace_all
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
-#' @importFrom stringi stri_subset_regex stri_match_first_regex
+#' @importFrom stringi stri_subset_regex stri_match_first_regex stri_rand_strings
 #' @importFrom uuid UUIDgenerate
 NULL
-
-# in_final_mode {{{
-in_final_mode <- function () {
-    eplusr_option("validate_level") == "final"
-}
-# }}}
-# in_ip_mode {{{
-in_ip_mode <- function () {
-    eplusr_option("view_in_ip")
-}
-# }}}
-# verbose_info {{{
-verbose_info <- function (...) {
-    if (eplusr_option("verbose_info")) {
-        cli::cat_rule(crayon::bold("Info"), col = "green")
-        cat(crayon::green(paste0(...)), "\n", sep = "")
-        cat("\n")
-    }
-}
-# }}}
-
-# abort_for_final {{{
-abort_for_final <- function (error_type, mes, ...) {
-    h <- rule(left = "Error for [final] mode")
-    mes <- paste0("\n", h, "\n", mes)
-    abort(c(error_type, "error_final_mode"), mes, ...)
-}
-# }}}
-# abort_bad_key {{{
-abort_bad_key <- function (error_type, key, value) {
-    mes <- paste0("Invalid ", key, " found: ", collapse(value))
-    abort(error_type, mes, value = value)
-}
-# }}}
-# abort_bad_which_type {{{
-abort_bad_which_type <- function (error_type, key, ...) {
-    mes <- paste0(key, " should be either an integer vector or a character vector", ...)
-    abort(error_type, mes)
-}
-# }}}
-# abort_bad_field {{{
-abort_bad_field <- function (error_type, key, dt, ...) {
-    h <- paste0("Invalid field ", key, " found:\n")
-
-    mes <- switch(key,
-        index = errormsg_field_index(dt),
-        name = errormsg_field_name(dt)
-    )
-
-    abort(error_type, paste0(h, mes, ...), data = dt)
-}
-# }}}
-# errormsg_info {{{
-errormsg_info <- function (dt) {
-    if (!has_name(dt, "rleid")) add_rleid(dt)
-    dt[, `:=`(info = paste0(" #", lpad(rleid), "| Class ", surround(class_name)))]
-}
-# }}}
-# errormsg_field_index {{{
-errormsg_field_index <- function (dt) {
-    dt <- dt[field_index < min_fields | field_index > num_fields,
-        list(field_index = collapse(field_index)),
-        by = list(rleid, class_name, min_fields, num_fields)
-    ]
-
-    dt <- errormsg_info(dt)
-
-    dt[, msg := paste0(info, ": ", rpad(field_index), ".")]
-
-    dt[min_fields == 0L, msg := paste0(msg,
-        " Field index should be no more than ", num_fields, ".")]
-    dt[min_fields >  0L, msg := paste0(msg,
-        " field index should be no less than ", min_fields,
-        " and no more than ", num_fields, ".")]
-
-    paste0(dt$msg, collapse = "\n")
-}
-# }}}
-# errormsg_field_name {{{
-errormsg_field_name <- function (dt) {
-    dt <- dt[, list(field_name = collapse(field_name)),
-        by = list(rleid, class_name)
-    ]
-
-    dt <- errormsg_info(dt)
-
-    dt[, msg := paste0(info, ": ", rpad(field_name), ".")]
-    paste0(dt$msg, collapse = "\n")
-}
-# }}}
 
 # GROUP
 # t_group_name {{{
@@ -393,6 +303,103 @@ t_object_num <- function (dt_object, class = NULL) {
         J(class), on = col_on]$N
 }
 # }}}
+# t_object_info {{{
+t_object_info <- function (dt_object, component = c("id", "name", "class"),
+                           by_class = FALSE, numbered = TRUE, collapse = NULL,
+                           prefix = NULL) {
+    stopifnot(all(component %in% c("id", "name", "class")))
+
+    if (is.null(prefix)) {
+        key_obj <- "Object"
+        key_cls <- "Class"
+    } else {
+        key_obj <- "object"
+        key_cls <- "class"
+    }
+
+    order_id <- match("id", component, nomatch = 0L)
+    order_nm <- match("name", component, nomatch = 0L)
+    order_cls <- match("class", component, nomatch = 0L)
+
+    mes <- NULL
+    # if ID is required
+    if (order_id != 0L) {
+        mes_id <- dt_object[,
+            ifelse(object_id < 0L,
+                paste0("Input #", -object_id),
+                paste0("ID [", object_id, "]")
+            )
+        ]
+        mes <- mes_id
+    }
+
+    # if name is required
+    if (order_nm != 0L) {
+        mes_nm <- dt_object[, {
+            mes <- paste0("name ", surround(object_name))
+            mes[is.na(object_name)] <- ""
+            mes
+        }]
+        # if name comes after ID
+        if (order_nm > order_id) {
+            # if ID is not required
+            if (order_id == 0L) {
+                mes <- mes_nm
+            # if ID is required
+            } else {
+                # surround name with parenthesis
+                mes_nm[!stri_isempty(mes_nm)] <- paste0(" (", mes_nm[!stri_isempty(mes_nm)], ")")
+                mes <- paste0(mes, mes_nm)
+            }
+        # if name comes before ID
+        } else {
+            # surround ID with parenthesis
+            mes <- paste0(mes_nm, "(", mes, ")")
+        }
+    }
+
+    # If class is required
+    if (order_cls != 0L) {
+        # If none of ID or name is required
+        if (is.null(mes)) {
+            mes <- dt_object[, paste0(key_cls, " ", surround(class_name))]
+        } else {
+            set(dt_object, NULL, "mes_object", mes)
+            if (by_class) {
+                mes <- dt_object[, {
+                    paste0(key_obj, " ", collapse(mes_object, NULL), " in class ", surround(class_name[1L]))
+                }, by = class_name]$V1
+            } else {
+                mes <- dt_object[, {
+                    paste0(key_obj, " ", mes_object, " in class ", surround(class_name))
+                }]
+            }
+            set(dt_object, NULL, "mes_object", NULL)
+        }
+    } else {
+        if (!is.null(mes)) {
+            mes <- paste0(key_obj, " ", mes)
+        }
+    }
+
+    mes <- paste0(prefix, mes)
+
+    if (numbered) {
+        if (has_name(dt_object, "rleid")) {
+            if (by_class) {
+                num <- rpad(paste0(" #", dt_object[, unique(rleid), by = class_name]$V1, "| "))
+            } else {
+                num <- rpad(paste0(" #", dt_object$rleid, "| "))
+            }
+        } else {
+            num <- rpad(paste0(" #", seq_along(mes), "| "))
+        }
+        mes <- paste0(num, mes)
+    }
+
+    paste0(mes, collapse = collapse)
+}
+# }}}
 
 # FIELD
 # t_field_data {{{
@@ -488,7 +495,7 @@ t_field_data <- function (
 
     # field_from_idx: return field data by using an index dt {{{
     fields_from_idx <- function (dt_idd, dt_idx, col = "field_index") {
-        fld <- dt_idd$field[dt_idx, on = c("class_id", paste0("field_index<=", col))]
+        fld <- dt_idd$field[dt_idx, on = c("class_id", paste0("field_index<=", col)), allow.cartesian = TRUE]
         set(fld, NULL, "field_index", rowidv(fld, c("rleid", "class_id")))
         fld
     }
@@ -856,11 +863,14 @@ t_value_all_node <- function (dt_value) {
     dt_value[type_enum == .globals$type$node & !is.na(value), unique(value)]
 }
 # }}}
+# t_value_fill_attr {{{
+t_value_fill_attr <- function (dt_idd, dt_value, attr_cols = NULL) {
+    fld <- t_field_data(dt_idd, dt_value, dt_value$field_index)
 
-# t_new_id {{{
-t_new_id <- function (dt, name, num) {
-    stopifnot(has_name(dt, name))
-    max(dt[[name]]) + seq_len(num)
+    if (is.null(attr_cols)) attr_cols <- names(fld)
+    # combine field attributes
+    fld[dt_value, on = c("rleid", "field_index")][,
+        .SD, .SDcols = unique(c(names(dt_value), attr_cols))]
 }
 # }}}
 
@@ -1038,179 +1048,6 @@ t_del_extensible_group <- function (dt_idd, class, num = NULL, strict = FALSE) {
 }
 # }}}
 
-# add_rleid {{{
-add_rleid <- function (dt, prefix = NULL) {
-    if (!is.null(prefix)) prefix <- paste0(prefix, "_")
-    set(dt, NULL, paste0(prefix, "rleid"), seq_len(nrow(dt)))
-}
-# }}}
-# add_accept_field_num {{{
-# Get the acceptable field number
-#' @param dt_class A data.table contains class data. Columns below should exist:
-#'        `class_id`, `min_fields`, `last_required`, `num_fields`,
-#'        `num_extensible`, `first_extensible`.
-#' @param num NULL or an positive integer vector indicating how many fields to
-#'        check.
-#' @param all If `TRUE`, the acceptable number returned will always be the total
-#'        number of existing fields in those classes.
-#' @param keep_input If `TRUE`, a column named `input_num` containing all input
-#'        `num`. If `num` is `NULL`, `input_num` will be the same as the
-#'        `num_fields` column in `dt_class`.
-#' @details
-#' Acceptable number is determined in ways below:
-#'     * If `all` is `TRUE`, when `num` is NULL or smaller than the total
-#'       existing field number, the accetable field number is the total existing
-#'       field number in that class.
-#'     * If `all` is `FALSE`:
-#'         * If input number is NULL:
-#'             - For class with no required fields and no minimum field number
-#'               requirement, the acceptable field number is the total existing
-#'               field number in that class.
-#'             - For class with required fields and minimum field number
-#'               requirement, the acceptable number is the bigger one between
-#'               required field number and minimum field number.
-#'         * If input number is smaller than the total existing field number:
-#'             - The acceptable field number is the maximum among the field
-#'               index of the last field in the last extensible group (if
-#'               applicable), the field index of the last required field and
-#'               minimum field number required.
-#'         * If input number is larger than the total existing field number:
-#'             - The acceptable field number will be the field index of the last
-#'               field in the last extensible group.
-add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input = FALSE) {
-    stopifnot(has_names(dt_class,
-        c("min_fields", "last_required", "num_fields", "num_extensible", "first_extensible"))
-    )
-
-    stopifnot(is.null(num) || are_count(num))
-
-    dt_class <- add_rleid(dt_class, "class")
-
-    if (all) {
-        if (keep_input) {
-            set(dt_class, NULL, "input_num", dt_class$num_fields)
-        }
-        set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
-        return(dt_class)
-    }
-
-    if (is.null(num)) {
-        if (all) {
-            if (keep_input) {
-                set(dt_class, NULL, "input_num", dt_class$num_fields)
-            }
-            set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
-            return(dt_class)
-        }
-
-        set(dt_class, NULL, "input_num", 0L)
-        dt_class[min_fields == 0L & last_required == 0L, input_num := num_fields]
-    } else {
-        stopifnot(is_same_len(dt_class, num))
-        stopifnot(are_count(num))
-        set(dt_class, NULL, "input_num", as.integer(num))
-        if (all) {
-            dt_class[input_num <= num_fields, input_num := num_fields]
-        }
-    }
-
-    # get index of the last field in the last extensible group
-    set(dt_class, NULL, "last_extensible", 0L)
-    dt_class[
-        num_extensible > 0L & input_num > first_extensible,
-        last_extensible := as.integer(
-            ceiling((input_num - first_extensible + 1L) / num_extensible)
-            * num_extensible + first_extensible - 1L
-        ),
-        by = list(class_rleid)
-    ]
-
-    if (!nrow(dt_class)) {
-        set(dt_class, NULL, "acceptable_num", integer(0L))
-    } else {
-        dt_class[,
-            acceptable_num := max(input_num, min_fields, last_required, last_extensible),
-            by = c("class_rleid")]
-    }
-
-    if (keep_input) {
-        set(dt_class, NULL, c("class_rleid", "last_extensible"), NULL)
-    } else {
-        set(dt_class, NULL, c("class_rleid", "last_extensible", "input_num"), NULL)
-    }
-    dt_class
-}
-# }}}
-# get_input_class_data {{{
-get_input_class_data <- function (dt_class, class, num = NULL) {
-    if (is.data.frame(class)) {
-        dt_cls <- class
-
-        if (is.null(num)) {
-            stopifnot(has_name(dt_cls, "num"))
-            set(dt_cls, NULL, "num", as.integer(dt_cls$num))
-        } else {
-            stopifnot(are_count(num))
-            set(dt_cls, NULL, "num", as.integer(num))
-        }
-
-    } else {
-        # get class data
-        dt_cls <- t_class_data(dt_class, class,
-            c(
-                "class_id", "class_name", "min_fields", "last_required", "num_fields",
-                "first_extensible", "num_extensible", "num_extensible_group"
-            )
-        )
-
-        # dt_cls <- add_accept_field_num(dt_cls)
-
-        stopifnot(are_count(num))
-        stopifnot(is_same_len(class, num))
-        set(dt_cls, NULL, "num", as.integer(num))
-    }
-}
-# }}}
-# make_field_range {{{
-make_field_range <- function (minimum, lower_incbounds, maximum, upper_incbounds) {
-    r <- list(
-        minimum = minimum, lower_incbounds = lower_incbounds,
-        maximum = maximum, upper_incbounds = upper_incbounds)
-    data.table::setattr(r, "class", c("IddFieldRange", "list"))
-    r
-}
-# }}}
-
-# ins_dt {{{
-ins_dt <- function (dt, new_dt, base_col = NULL) {
-    stopifnot(has_names(new_dt, names(dt)))
-
-    if (is.null(base_col)) {
-        rbindlist(
-            list(
-                dt,
-                new_dt[, .SD, .SDcols = names(dt)]
-            )
-        )
-    } else {
-        rbindlist(
-            list(
-                dt[!new_dt, on = base_col],
-                new_dt[, .SD, .SDcols = names(dt)]
-            )
-        )
-    }
-}
-# }}}
-# ins_all_dt {{{
-ins_all_dt <- function (x, y, base_col = NULL) {
-    for (nm in names(y)) {
-        x[[nm]] <- ins_dt(x[[nm]], y[[nm]], base_col)
-    }
-    x
-}
-# }}}
-
 # ASSERT
 # t_assert_can_do {{{
 t_assert_can_do <- function (dt_class, dt_object, dot, object,
@@ -1308,6 +1145,27 @@ t_assert_can_do <- function (dt_class, dt_object, dot, object,
         )
     }
     # }}}
+
+    TRUE
+}
+# }}}
+# t_assert_valid {{{
+t_assert_valid <- function (dt_idd, dt_idf, object, value, action = c("add", "set")) {
+    action <- match.arg(action)
+    # validate fields that do not use default values and all extensible fields
+    val_chk <- value[required_field == TRUE | defaulted == FALSE | extensible_group > 0L]
+    validity <- validate_on_level(dt_idd, dt_idf,
+        copy(object)[, object_id := -rleid],
+        val_chk[, object_id := -rleid],
+        level = eplusr_option("validate_level")
+    )
+
+    if (count_check_error(validity)) {
+        on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
+        options(warning.length = 8170)
+        m <- paste0(capture.output(print_validity(validity)), collapse = "\n")
+        abort("error_validity",  paste0("Failed to ", action, " object(s).\n\n", m))
+    }
 
     TRUE
 }
@@ -1647,31 +1505,9 @@ object_from_l <- function (dt_idd, dt_idf, l, keep_duplicate = TRUE) {
 }
 # }}}
 
-# value_assign_default {{{
-value_assign_default <- function (dt_value) {
-    if (in_ip_mode()) {
-        dt_value <- t_field_default_to_unit(dt_value, "si", "ip")
-    }
-    dt_value[defaulted == TRUE, `:=`(value = as.character(unlist(default, use.names = FALSE)))]
-    dt_value[defaulted == TRUE & vapply(default, is.numeric, logical(1L)),
-        `:=`(value_num = as.double(unlist(default)))
-    ]
-    dt_value
-}
-# }}}
-# value_assign_id {{{
-value_assign_id <- function (dt_idf, dt_value, keep = FALSE) {
-    if (!keep) {
-        set(dt_value, NULL, "value_id", t_new_id(dt_idf$value, "value_id", nrow(dt_value)))
-    } else {
-        dt_value[is.na(value_id), `:=`(value_id = t_new_id(dt_idf$value, "value_id", .N))]
-    }
-}
-# }}}
-
 # OBJECT MUNIPULATION
-# t_dup_object {{{
-t_dup_object = function (dt_idd, dt_idf, ...) {
+# t_duplicate_object {{{
+t_duplicate_object = function (dt_idd, dt_idf, ...) {
     l <- sep_name_dots(..., .can_name = TRUE)
     obj <- object_from_l(dt_idd, dt_idf, l, keep_duplicate = TRUE)
 
@@ -1726,8 +1562,8 @@ t_dup_object = function (dt_idd, dt_idf, ...) {
     # }}}
 
     # assign new object id after validation
-    set(obj, NULL, "object_id", t_new_id(dt_idf$object, "object_id", nrow(obj)))
-    set(val, NULL, "object_id", rep(obj$object_id, times = val[, .N, by = c("object_rleid")]$N))
+    obj <- assign_new_id(dt_idf, obj, "object")
+    val <- correct_obj_id(obj, val)
 
     # get new object name {{{
     # get indicator of whether user input new names are used
@@ -1781,11 +1617,12 @@ t_dup_object = function (dt_idd, dt_idf, ...) {
     val[is_name == TRUE, `:=`(value = obj[has_name == TRUE, object_name])]
 
     # value reference
-    ref <- t_value_reference_dt(dt_idf$reference, val$old_value_id, val$value_id)
+    ref <- dt_idf$reference[J(val$old_value_id)]
+    set(ref, NULL, "value_id", val$value_id)
 
     list(object = obj[, .SD, .SDcols = names(dt_idf$object)],
          value = val[, .SD, .SDcols = names(dt_idf$value)],
-         reference = ref[, .SD, .SDcols = names(dt_idf$reference)]
+         reference = ins_dt(dt_idf$reference, ref)
     )
 }
 # }}}
@@ -1805,7 +1642,7 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
     t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "add")
 
     # add object id
-    set(obj, NULL, "object_id", t_new_id(dt_idf$object, "object_id", nrow(obj)))
+    obj <- assign_new_id(dt_idf, obj, "object")
 
     # get object comments
     obj <- l$value[field_name == ".comment", list(rleid, comment = value_list)][obj, on = "rleid"]
@@ -1864,30 +1701,18 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
     val <- rbindlist(list(val_empty, val_matched), use.names = TRUE)
 
     # assign default values if needed
-    if (.default) val <- value_assign_default(val)
+    if (.default) val <- assign_default_value(val)
 
     # assign new value id
-    val <- value_assign_id(dt_idf, val)
+    val <- assign_new_id(dt_idf, val, "value")
 
     # update object name
     obj <- update_object_name(obj, val)
     # add lower name
     set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
 
-    # validate {{{
-    # validate fields that do not use default values and all extensible fields
-    val_chk <- val[required_field == TRUE | defaulted == FALSE | extensible_group > 0L]
-    validity <- validate_on_level(dt_idd, dt_idf,
-        copy(obj)[, object_id := paste0("Input #", rleid)],
-        val_chk[, object_id := paste0("Input #", rleid)],
-        level = eplusr_option("validate_level")
-    )
-
-    if (count_check_error(validity)) {
-        on.exit(print_validity(validity), add = TRUE)
-        abort("error_validity",  "Failed to add object(s).\n")
-    }
-    # }}}
+    # validate
+    t_assert_valid(dt_idd, dt_idf, obj, val, action = "add")
 
     # get field reference
     # include new values in order to find references across input new objects
@@ -1963,23 +1788,18 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
 
     val <- rbindlist(list(val_empty, val_nonempty), use.names = TRUE)
 
-    # get field names and attributes {{{
-    fld <- t_field_data(dt_idd, val, val$field_index)
-
-    # combine field attributes
-    val <- fld[val, on = c("rleid", "field_index")][,
-        .SD, .SDcols = unique(c(names(val), names(fld)))]
-    # }}}
+    # get field names and attributes
+    val <- t_value_fill_attr(dt_idd, val)
 
     # assign default values if needed
     set(val, NULL, "defaulted", FALSE)
     val[is.na(value) & empty == TRUE, defaulted := TRUE]
     if (.default) {
-        val <- value_assign_default(val)
+        val <- assign_default_value(val)
     }
 
     # assign new value id to new fields
-    val <- value_assign_id(dt_idf, val, keep = TRUE)
+    val <- assign_new_id(dt_idf, val, "value", keep = TRUE)
 
     # update object name
     obj <- update_object_name(obj, val)
@@ -1987,22 +1807,19 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
     # add lower name
     set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
 
-    # validate {{{
-    # validate fields that do not use default values and all extensible fields
-    val_chk <- val[required_field == TRUE | defaulted == FALSE | extensible_group > 0L]
-    validity <- validate_on_level(dt_idd, dt_idf,
-        copy(obj)[, object_id := paste0("Input #", rleid)],
-        val_chk[, object_id := paste0("Input #", rleid)],
-        level = eplusr_option("validate_level")
-    )
+    # validate
+    t_assert_valid(dt_idd, dt_idf, obj, val, action = "set")
 
-    if (count_check_error(validity)) {
-        on.exit(print_validity(validity), add = TRUE)
-        abort("error_validity",  "Failed to set object(s).\n")
-    }
-    # }}}
+    # update referenced value in other objects if necessary
+    new_val <- dt_idf$reference[src_enum == .globals$source$field][
+        val[, list(value_id, value, value_num)],
+        on = c(src_value_id = "value_id")]
+    dt_idf$value[new_val, on = "value_id",
+        `:=`(value = new_val$value, value_num = new_val$value_num)]
 
     # get field reference
+    # NOTE: it may be more efficient to exclude fields whose references have
+    # already been update in above
     ref <- get_value_reference_map(dt_idd$reference,
         ins_dt(dt_idf$value, val, "value_id"),
         ins_dt(dt_idf$value, val, "value_id")
@@ -2014,14 +1831,13 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
     )
 }
 # }}}
-# t_del_object {{{
-t_del_object <- function (dt_idd, dt_idf, ..., .referenced = FALSE) {
+# t_delete_object {{{
+t_delete_object <- function (dt_idd, dt_idf, ..., .referenced = FALSE) {
     l <- sep_name_dots(..., .can_name = TRUE)
     obj <- object_from_l(dt_idd, dt_idf, l, keep_duplicate = TRUE)
 
     t_assert_can_do(dt_idd$class, dt_idf$object, l$dot, obj, "del")
 
-    browser()
     ref <- dt_idf$reference[obj, on = c(src_object_id = "object_id"), nomatch = 0L]
     setnames(ref,
         c("object_id", "value_id", "src_object_id", "src_value_id"),
@@ -2092,103 +1908,462 @@ t_del_object <- function (dt_idd, dt_idf, ..., .referenced = FALSE) {
     )
 }
 # }}}
+# t_paste_object {{{
+t_paste_object <- function (dt_idd, dt_idf, ver, in_ip = FALSE, unique = TRUE) {
+    parsed <- read_idfeditor_copy(ver, in_ip)
 
-# t_object_info {{{
-t_object_info <- function (dt_object, component = c("id", "name", "class"),
-                           by_class = FALSE, numbered = TRUE, collapse = NULL,
-                           prefix = NULL) {
-    stopifnot(all(component %in% c("id", "name", "class")))
+    # IP - SI conversion if necessary
+    from <- ifelse(in_ip, "ip", "si")
+    to <- ifelse(.options$view_in_ip, "ip", "si")
+    parsed$value <- convert_value_unit(parsed$value, from, to)
 
-    if (is.null(prefix)) {
-        key_obj <- "Object"
-        key_cls <- "Class"
-    } else {
-        key_obj <- "object"
-        key_cls <- "class"
-    }
+    # remove version object
+    obj_ver <- parsed$object[class_name == "Version", object_id]
+    parsed$object <- parsed$object[!J(obj_ver), on = "object_id"]
+    parsed$value <- parsed$value[!J(obj_ver), on = "object_id"]
 
-    order_id <- match("id", component, nomatch = 0L)
-    order_nm <- match("name", component, nomatch = 0L)
-    order_cls <- match("class", component, nomatch = 0L)
+    if (unique) {
+        # get all class ids in input
+        cls <- parsed$object[class_name != "Version", unique(class_id)]
 
-    mes <- NULL
-    # if ID is required
-    if (order_id != 0L) {
-        mes_id <- dt_object[, paste0("ID ", surround(object_id, c("[", "]")))]
-        mes <- mes_id
-    }
+        # NOTE: by default, IDF Editor only copies objects in a single class, which
+        # makes it easy to remove duplicates
+        stopifnot(is_scalar(cls))
 
-    # if name is required
-    if (order_nm != 0L) {
-        mes_nm <- dt_object[, {
-            mes <- paste0("name ", surround(object_name))
-            mes[is.na(object_name)] <- ""
-            mes
-        }]
-        # if name comes after ID
-        if (order_nm > order_id) {
-            # if ID is not required
-            if (order_id == 0L) {
-                mes <- mes_nm
-            # if ID is required
-            } else {
-                # surround name with parenthesis
-                mes_nm[!stri_isempty(mes_nm)] <- paste0(" (", mes_nm[!stri_isempty(mes_nm)], ")")
-                mes <- paste0(mes, mes_nm)
-            }
-        # if name comes before ID
-        } else {
-            # surround ID with parenthesis
-            mes <- paste0(mes_nm, "(", mes, ")")
+        cols <- c("object_id", "class_id", "field_index", "value")
+
+        # extract all object values in the same class
+        # in order to distinguish input from original IDF, set id of objects
+        # from IDF to negative
+        # also note that dcast will automatically order object id, so this makes
+        # that input objects are always in the bottom.
+        val_idf <- dt_idf$value[J(cls), on = "class_id",
+            list(object_id = -object_id, field_index, value)]
+
+        # get all input value
+        val_in <- parsed$value[, list(object_id, field_index, value)]
+
+        # dcast to compare
+        val_d <- dcast(rbindlist(list(val_idf, val_in), fill = TRUE),
+            object_id ~ field_index, value.var = "value")
+
+        # get indicator
+        dup <- duplicated(val_d, by = setdiff(names(val_d), c("object_id", "class_id")))
+
+        # only find duplicates in input
+        obj <- val_d[dup & object_id > 0L, object_id]
+
+        if (length(obj)) {
+            # give info
+            verbose_info(
+                "Duplicated objects in input or objects in input that are the same in current IDF have been removed:\n",
+                {
+                    del <- parsed$object[J(obj), on = "object_id"]
+                    t_object_info(del, "name", collapse = "\n")
+                }
+            )
+            # NOTE: for references, as have to check gloally to get the latest
+            # references, there is no need to exclude objects here
+            parsed$object <- parsed$object[!J(obj), on = "object_id"]
+            parsed$value <- parsed$value[!J(obj), on = "object_id"]
         }
+        browser()
     }
 
-    # If class is required
-    if (order_cls != 0L) {
-        # If none of ID or name is required
-        if (is.null(mes)) {
-            mes <- dt_object[, paste0(key_cls, " ", surround(class_name))]
-        } else {
-            set(dt_object, NULL, "mes_object", mes)
-            if (by_class) {
-                mes <- dt_object[, {
-                    paste0(key_obj, " ", collapse(mes_object, NULL), " in class ", surround(class_name[1L]))
-                }, by = class_name]$V1
-            } else {
-                mes <- dt_object[, {
-                    paste0(key_obj, " ", mes_object, " in class ", surround(class_name))
-                }]
-            }
-            set(dt_object, NULL, "mes_object", NULL)
-        }
-    } else {
-        if (!is.null(mes)) {
-            mes <- paste0(key_obj, " ", mes)
-        }
-    }
+    # add rleid for validation
+    add_rleid(parsed$object)
+    add_rleid(parsed$object, "object")
 
-    mes <- paste0(prefix, mes)
+    # update id
+    parsed$object <- assign_new_id(dt_idf, parsed$object, "object")
+    parsed$value <- assign_new_id(dt_idf, parsed$value, "value")
+    parsed$value <- correct_obj_id(parsed$object, parsed$value)
+    set(parsed$value, NULL, "rleid", parsed$value$object_id)
+    set(parsed$value, NULL, "object_rleid", parsed$value$object_id)
 
-    if (numbered) {
-        if (has_name(dt_object, "rleid")) {
-            if (by_class) {
-                num <- rpad(paste0(" #", dt_object[, unique(rleid), by = class_name]$V1, "| "))
-            } else {
-                num <- rpad(paste0(" #", dt_object$rleid, "| "))
-            }
-        } else {
-            num <- rpad(paste0(" #", seq_along(mes), "| "))
-        }
-        mes <- paste0(num, mes)
-    }
+    # add field attributes for validation
+    parsed$value <- t_value_fill_attr(dt_idd, parsed$value)
+    set(parsed$value, NULL, "defaulted", FALSE)
 
-    paste0(mes, collapse = collapse)
+    # validate
+    t_assert_valid(dt_idd, dt_idf, parsed$object, parsed$value, action = "add")
+
+    # get field reference in whole fields
+    parsed$reference <- get_value_reference_map(dt_idd$reference,
+        ins_dt(dt_idf$value, parsed$value, "value_id"),
+        ins_dt(dt_idf$value, parsed$value, "value_id")
+    )
+
+    parsed
+}
+# }}}
+# t_ins_object {{{
+t_ins_object <- function (dt_idd, dt_idf, object) {
+
+}
+# }}}
+# t_purge_object {{{
+t_purge_object <- function (dt_idd, dt_idf, ...) {
+
 }
 # }}}
 
-# t_value_reference_dt {{{
-t_value_reference_dt <- function (dt_reference, old_id, new_id) {
-    dt_reference[J(old_id), on = "value_id"][, `:=`(value_id = new_id)][!is.na(src_value_id)]
+# IDF Editor Integration
+# read_idfeditor_copy {{{
+read_idfeditor_copy <- function (ver = NULL, in_ip = FALSE) {
+    if (Sys.info()["sysname"] == "Darwin") {
+        clp <- pipe("pbpaste")
+    } else {
+        clp <- "clipboard"
+    }
+
+    text <- readLines(clp, warn = FALSE)
+
+    if (!startsWith(text, "IDF,")) {
+        abort("error_clipboard_string", "Failed to find contents copied from IDF Editor.")
+    }
+    text <- gsub("([,;])", "\\1\n", stri_sub(text, 5L))
+
+    if (isTRUE(in_ip)) {
+        text <- paste0("!-Option SortedOrder ViewInIPunits\n", text)
+    }
+
+    # ignore the warning of using given IDD
+    withCallingHandlers(read_idf_file(text, idd = ver),
+        warn_given_idd_used = function (w) invokeRestart("muffleWarning")
+    )
+}
+# }}}
+
+# LOG
+# log_new_uuid {{{
+log_new_uuid <- function (log) {
+    log$uuid <- unique_id()
+}
+# }}}
+# log_new_order {{{
+log_new_order <- function (log, id) {
+    log$order <- ins_dt(log$order, data.table(object_id = id, object_order = 1L, "object_id"))
+}
+# }}}
+# log_add_order {{{
+log_add_order <- function (log, id) {
+    log$order[J(id), on = "object_id", object_order := object_order + 1L]
+}
+# }}}
+# log_del_order {{{
+log_del_order <- function (log, id) {
+    log$order <- log$order[!J(id), on = "object_id"]
+}
+# }}}
+# log_unsaved {{{
+log_unsaved <- function (log) {
+    log$unsaved <- TRUE
+}
+# }}}
+# log_saved {{{
+log_saved <- function (log) {
+    log$unsaved <- FALSE
+}
+# }}}
+
+# UTILITIES
+# in_final_mode {{{
+in_final_mode <- function () {
+    eplusr_option("validate_level") == "final"
+}
+# }}}
+# in_ip_mode {{{
+in_ip_mode <- function () {
+    eplusr_option("view_in_ip")
+}
+# }}}
+# verbose_info {{{
+verbose_info <- function (...) {
+    if (eplusr_option("verbose_info")) {
+        cli::cat_rule(crayon::bold("Info"), col = "green")
+        cat(crayon::green(paste0(...)), "\n", sep = "")
+        cat("\n")
+    }
+}
+# }}}
+
+# abort_bad_key {{{
+abort_bad_key <- function (error_type, key, value) {
+    mes <- paste0("Invalid ", key, " found: ", collapse(value))
+    abort(error_type, mes, value = value)
+}
+# }}}
+# abort_bad_which_type {{{
+abort_bad_which_type <- function (error_type, key, ...) {
+    mes <- paste0(key, " should be either an integer vector or a character vector", ...)
+    abort(error_type, mes)
+}
+# }}}
+# abort_bad_field {{{
+abort_bad_field <- function (error_type, key, dt, ...) {
+    h <- paste0("Invalid field ", key, " found:\n")
+
+    mes <- switch(key,
+        index = errormsg_field_index(dt),
+        name = errormsg_field_name(dt)
+    )
+
+    abort(error_type, paste0(h, mes, ...), data = dt)
+}
+# }}}
+# errormsg_info {{{
+errormsg_info <- function (dt) {
+    if (!has_name(dt, "rleid")) add_rleid(dt)
+    dt[, `:=`(info = paste0(" #", lpad(rleid), "| Class ", surround(class_name)))]
+}
+# }}}
+# errormsg_field_index {{{
+errormsg_field_index <- function (dt) {
+    dt <- dt[field_index < min_fields | field_index > num_fields,
+        list(field_index = collapse(field_index)),
+        by = list(rleid, class_name, min_fields, num_fields)
+    ]
+
+    dt <- errormsg_info(dt)
+
+    dt[, msg := paste0(info, ": ", rpad(field_index), ".")]
+
+    dt[min_fields == 0L, msg := paste0(msg,
+        " Field index should be no more than ", num_fields, ".")]
+    dt[min_fields >  0L, msg := paste0(msg,
+        " field index should be no less than ", min_fields,
+        " and no more than ", num_fields, ".")]
+
+    paste0(dt$msg, collapse = "\n")
+}
+# }}}
+# errormsg_field_name {{{
+errormsg_field_name <- function (dt) {
+    dt <- dt[, list(field_name = collapse(field_name)),
+        by = list(rleid, class_name)
+    ]
+
+    dt <- errormsg_info(dt)
+
+    dt[, msg := paste0(info, ": ", rpad(field_name), ".")]
+    paste0(dt$msg, collapse = "\n")
+}
+# }}}
+
+# t_new_id {{{
+t_new_id <- function (dt, name, num) {
+    stopifnot(has_name(dt, name))
+    max(dt[[name]], na.rm = TRUE) + seq_len(num)
+}
+# }}}
+# add_rleid {{{
+add_rleid <- function (dt, prefix = NULL) {
+    if (!is.null(prefix)) prefix <- paste0(prefix, "_")
+    set(dt, NULL, paste0(prefix, "rleid"), seq_len(nrow(dt)))
+}
+# }}}
+# add_accept_field_num {{{
+# Get the acceptable field number
+#' @param dt_class A data.table contains class data. Columns below should exist:
+#'        `class_id`, `min_fields`, `last_required`, `num_fields`,
+#'        `num_extensible`, `first_extensible`.
+#' @param num NULL or an positive integer vector indicating how many fields to
+#'        check.
+#' @param all If `TRUE`, the acceptable number returned will always be the total
+#'        number of existing fields in those classes.
+#' @param keep_input If `TRUE`, a column named `input_num` containing all input
+#'        `num`. If `num` is `NULL`, `input_num` will be the same as the
+#'        `num_fields` column in `dt_class`.
+#' @details
+#' Acceptable number is determined in ways below:
+#'     * If `all` is `TRUE`, when `num` is NULL or smaller than the total
+#'       existing field number, the accetable field number is the total existing
+#'       field number in that class.
+#'     * If `all` is `FALSE`:
+#'         * If input number is NULL:
+#'             - For class with no required fields and no minimum field number
+#'               requirement, the acceptable field number is the total existing
+#'               field number in that class.
+#'             - For class with required fields and minimum field number
+#'               requirement, the acceptable number is the bigger one between
+#'               required field number and minimum field number.
+#'         * If input number is smaller than the total existing field number:
+#'             - The acceptable field number is the maximum among the field
+#'               index of the last field in the last extensible group (if
+#'               applicable), the field index of the last required field and
+#'               minimum field number required.
+#'         * If input number is larger than the total existing field number:
+#'             - The acceptable field number will be the field index of the last
+#'               field in the last extensible group.
+add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input = FALSE) {
+    stopifnot(has_names(dt_class,
+        c("min_fields", "last_required", "num_fields", "num_extensible", "first_extensible"))
+    )
+
+    stopifnot(is.null(num) || are_count(num))
+
+    dt_class <- add_rleid(dt_class, "class")
+
+    if (all) {
+        if (keep_input) {
+            set(dt_class, NULL, "input_num", dt_class$num_fields)
+        }
+        set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
+        return(dt_class)
+    }
+
+    if (is.null(num)) {
+        if (all) {
+            if (keep_input) {
+                set(dt_class, NULL, "input_num", dt_class$num_fields)
+            }
+            set(dt_class, NULL, "acceptable_num", dt_class$num_fields)
+            return(dt_class)
+        }
+
+        set(dt_class, NULL, "input_num", 0L)
+        dt_class[min_fields == 0L & last_required == 0L, input_num := num_fields]
+    } else {
+        stopifnot(is_same_len(dt_class, num))
+        stopifnot(are_count(num))
+        set(dt_class, NULL, "input_num", as.integer(num))
+        if (all) {
+            dt_class[input_num <= num_fields, input_num := num_fields]
+        }
+    }
+
+    # get index of the last field in the last extensible group
+    set(dt_class, NULL, "last_extensible", 0L)
+    dt_class[
+        num_extensible > 0L & input_num > first_extensible,
+        last_extensible := as.integer(
+            ceiling((input_num - first_extensible + 1L) / num_extensible)
+            * num_extensible + first_extensible - 1L
+        ),
+        by = list(class_rleid)
+    ]
+
+    if (!nrow(dt_class)) {
+        set(dt_class, NULL, "acceptable_num", integer(0L))
+    } else {
+        dt_class[,
+            acceptable_num := max(input_num, min_fields, last_required, last_extensible),
+            by = c("class_rleid")]
+    }
+
+    if (keep_input) {
+        set(dt_class, NULL, c("class_rleid", "last_extensible"), NULL)
+    } else {
+        set(dt_class, NULL, c("class_rleid", "last_extensible", "input_num"), NULL)
+    }
+    dt_class
+}
+# }}}
+# get_input_class_data {{{
+get_input_class_data <- function (dt_class, class, num = NULL) {
+    if (is.data.frame(class)) {
+        dt_cls <- class
+
+        if (is.null(num)) {
+            stopifnot(has_name(dt_cls, "num"))
+            set(dt_cls, NULL, "num", as.integer(dt_cls$num))
+        } else {
+            stopifnot(are_count(num))
+            set(dt_cls, NULL, "num", as.integer(num))
+        }
+
+    } else {
+        # get class data
+        dt_cls <- t_class_data(dt_class, class,
+            c(
+                "class_id", "class_name", "min_fields", "last_required", "num_fields",
+                "first_extensible", "num_extensible", "num_extensible_group"
+            )
+        )
+
+        # dt_cls <- add_accept_field_num(dt_cls)
+
+        stopifnot(are_count(num))
+        stopifnot(is_same_len(class, num))
+        set(dt_cls, NULL, "num", as.integer(num))
+    }
+}
+# }}}
+# assign_new_id {{{
+assign_new_id <- function (dt_idf, dt, type = c("object", "value"), keep = FALSE) {
+    type <- match.arg(type)
+    col <- paste0(type, "_id")
+    if (!keep) {
+        set(dt, NULL, col, t_new_id(dt_idf[[type]], col, nrow(dt)))
+    } else {
+        dt[is.na(get(col)), `:=`(value_id = t_new_id(dt_idf[[type]], col, .N))]
+    }
+}
+# }}}
+# correct_obj_id {{{
+correct_obj_id <- function (dt_object, dt_value) {
+    by_col <- ifelse(has_name(dt_value, "object_rleid"), "object_rleid", "object_id")
+    set(dt_value, NULL, "object_id",
+        rep(dt_object$object_id, times = dt_value[, .N, by = c(by_col)]$N))
+}
+# }}}
+# assign_default_value {{{
+assign_default_value <- function (dt_value) {
+    if (in_ip_mode()) {
+        dt_value <- t_field_default_to_unit(dt_value, "si", "ip")
+    }
+    dt_value[defaulted == TRUE, `:=`(value = as.character(unlist(default, use.names = FALSE)))]
+    dt_value[defaulted == TRUE & vapply(default, is.numeric, logical(1L)),
+        `:=`(value_num = as.double(unlist(default)))
+    ]
+    dt_value
+}
+# }}}
+# make_field_range {{{
+make_field_range <- function (minimum, lower_incbounds, maximum, upper_incbounds) {
+    r <- list(
+        minimum = minimum, lower_incbounds = lower_incbounds,
+        maximum = maximum, upper_incbounds = upper_incbounds)
+    data.table::setattr(r, "class", c("IddFieldRange", "list"))
+    r
+}
+# }}}
+# ins_dt {{{
+ins_dt <- function (dt, new_dt, base_col = NULL) {
+    stopifnot(has_names(new_dt, names(dt)))
+
+    if (is.null(base_col)) {
+        rbindlist(
+            list(
+                dt,
+                new_dt[, .SD, .SDcols = names(dt)]
+            )
+        )
+    } else {
+        rbindlist(
+            list(
+                dt[!new_dt, on = base_col],
+                new_dt[, .SD, .SDcols = names(dt)]
+            )
+        )
+    }
+}
+# }}}
+# merge_idf_data {{{
+merge_idf_data <- function (dt_idf, dt) {
+    stopifnot(is.environment(dt_idf))
+    stopifnot(has_names(dt, c("object", "value", "reference")))
+    dt_idf$object <- ins_dt(dt_idf$object, dt$object, "object_id")
+    dt_idf$value <- ins_dt(dt_idf$value, dt$value, "value_id")
+    dt_idf$reference <- dt$reference
+
+    dt_idf
+}
+# }}}
+# unique_id {{{
+unique_id <- function () {
+    paste0("id-", stri_rand_strings(1, 15L))
 }
 # }}}
 

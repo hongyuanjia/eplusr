@@ -188,7 +188,7 @@ validate_objects <- function
 
     stopifnot(
         is.logical(required_object),
-        is.logical(unique_obj),
+        is.logical(unique_object),
         is.logical(unique_name),
         is.logical(extensible),
         is.logical(required_field),
@@ -307,9 +307,6 @@ check_conflict_name <- function (dt_idd, dt_idf, env_in) {
         obj <- env_in$object[!is.na(object_name)]
     } else {
         exist <- dt_idf$object[class_id %in% env_in$object$class_id]
-        if (is.character(env_in$object$object_id)) {
-            set(exist, NULL, "object_id", as.character(exist$object_id))
-        }
         # add existing object
         obj <- ins_dt(exist, env_in$object, "object_id")[!is.na(object_name)]
     }
@@ -461,7 +458,7 @@ check_invalid_range <- function (dt_idd, dt_idf, env_in) {
 # check_invalid_reference: invalid reference fields {{{
 check_invalid_reference <- function (dt_idd, dt_idf, env_in) {
     val <- env_in$value[type_enum == .globals$type$object_list,
-        list(value_id, value, field_id, type_enum)]
+        list(object_id, value_id, value, field_id, type_enum)]
 
     if (!nrow(val)) return(env_in)
 

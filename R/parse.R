@@ -1267,6 +1267,7 @@ get_value_table <- function (dt, idd) {
 
     # add value id
     set(dt, NULL, "value_id", seq_len(nrow(dt)))
+    # add field index
     set(dt, NULL, "field_index", rowidv(dt, "object_id"))
 
     left <- idd$class[, list(class_id, num_extensible, num_fields)]
@@ -1480,6 +1481,7 @@ get_value_reference_map <- function (map, src, value) {
             # TODO: log this case
             m <- chmatch(value, unlist(src_value, use.names = FALSE), nomatch = 0L)
             # set NA if no matched found
+            obj_id <- NA_integer_
             val_id <- NA_integer_
             enum <- NA_integer_
             if (m) {
@@ -1623,6 +1625,23 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
         abort(c(error_type, paste0("error_parse_", type)), all_mes, NULL, data = data)
     } else {
         warn(c(error_type, paste0("warning_parse_", type)), all_mes, NULL, data = data)
+    }
+}
+# }}}
+
+# insert_version {{{
+insert_version <- function (x, ver) {
+    if (is.character(x)) {
+        paste0(x, "Version, ", standardize_ver(ver)[, 1L:2L], ";")
+    } else if (inherits(x, "data.table") && has_names(x, c("line", "string"))) {
+        ins_dt(x,
+            data.table(
+                line = nrow(x) + 1L,
+                string = paste0("Version, ", standardize_ver(ver)[, 1L:2L], ";")
+            )
+        )
+    } else {
+        x
     }
 }
 # }}}
