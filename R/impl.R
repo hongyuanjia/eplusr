@@ -1693,6 +1693,8 @@ t_add_object <- function (dt_idd, dt_idf, ..., .default = TRUE, .all = FALSE) {
 
     # add value and value in number
     val_matched[defaulted == FALSE, `:=`(value = as.character(value_list))]
+    # make sure all empty values are set to NA
+    val_matched[grepl("^\\s*$", value), `:=`(value = NA_character_)]
     val_matched[vapply(value_list, is.numeric, logical(1L)), `:=`(value_num = as.double(value_list))]
     set(val_matched, NULL, "value_list", NULL)
     # }}}
@@ -1781,6 +1783,8 @@ t_set_object <- function (dt_idd, dt_idf, ..., .default = TRUE) {
 
     # set new values
     val_nonempty[empty == FALSE, value := as.character(value_list)]
+    # make sure all empty values are set to NA
+    val_matched[grepl("^\\s*$", value), `:=`(value = NA_character_)]
     val_nonempty[empty == FALSE & vapply(value_list, is.numeric, logical(1L)),
         value_num := as.double(value_list)]
     set(val_nonempty, NULL, "value_list", NULL)
