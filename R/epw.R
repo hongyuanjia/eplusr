@@ -771,7 +771,7 @@ parse_epw_file <- function (path, strict = TRUE) {
     assert_that(is_scalar(path))
 
     is_path <- file.exists(path)
-    error_end <- if(is_path) paste0(" " else surround(path)), ""
+    error_end <- if(is_path) paste0(" ", surround(path)) else ""
 
     num_header <- 8L
     header <- readr::read_lines(path, n_max = num_header)
