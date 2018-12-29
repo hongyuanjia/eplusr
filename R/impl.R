@@ -310,22 +310,20 @@ t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL,
         mult_rleid <- res[, .N, by = rleid][N > 1L, rleid]
         mult <- res[J(mult_rleid), on = "rleid"]
 
-        b <- t_object_info(mult, c("id", "class"), by_class = TRUE, numbered = TRUE,
-            prefix = paste0(
-                "Name ",
-                surround(
-                    unique(mult, by = c("rleid", "object_name"))$object_name
-                ),
-                " matches "
-            ),
-            collapse = "\n"
+        set(mult, NULL, "object",
+            t_object_info(mult, c("id", "class"), numbered = FALSE, prefix = "")
         )
 
-        mes <- paste0(
-            "Input object name matched multiple results. Please use object ID instead:\n",
-            b
+        m <- mult[, list(m = paste("Name", surround(object_name[1L]), "matches", collapse(object, NULL))),
+            by = c("rleid", "object_name_lower")][, m := paste0(" #", rpad(rleid), "| ",m)]$m
+
+        abort("error_multiple_matched",
+            paste0(
+                "Input object name matched multiple results. Please use object ID instead:\n",
+                m
+            ),
+            data = res
         )
-        abort("error_multiple_matched", mes, data = res)
     }
 
     if (anyNA(res$group_id)) {
