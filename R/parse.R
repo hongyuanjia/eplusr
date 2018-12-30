@@ -73,19 +73,18 @@ parse_idd_file <- function(path) {
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd_ver, idd_env) {
-    if (!has_names(idd_env, c("class", "field", "reference")) || !is.environment(idd_env)) {
-        abort("error_bad_idd_env", "Invalid IDD input", idd = idd_env)
-    }
+parse_idf_file <- function (path, idd = NULL) {
+    # read IDF string and get version first to get corresponding IDD
+    idf_dt <- read_lines_in_dt(path)
+    idf_ver <- get_idf_ver(idf_dt$string)
+    idd <- get_idd_from_ver(idf_ver, idd)
 
-    # read idf string, get idd version
-    if (inherits(path, "IdfDt")) {
-        idf_dt <- path
-        idf_version <- attr(path, "version")
-    } else {
-        idf_dt <- read_lines_in_dt(path)
-        idf_version <- get_idf_ver(idf_dt$string)
-    }
+    # get idd version and table
+    idd_ver <- ._get_private(idd)$m_version
+    idd_env <- ._get_private(idd)$m_idd_tbl
+
+    # insert version line if necessary
+    if (is.null(idf_ver)) idf_dt <- insert_version(idf_dt, idd_ver)
 
     # type enum
     type_enum <- list(unknown = 0L, special = 1L, macro = 2L, comment = 3L,
@@ -128,11 +127,7 @@ parse_idf_file <- function (path, idd_ver, idd_env) {
     # value reference map
     dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
 
-    # extract version
-    ver <- dt_value[class_name == "Version", standardize_ver(value)]
-
-    list(
-        version = ver, options = options,
+    list(version = idf_ver, options = options,
         object = dt_object, value = dt_value, reference = dt_reference
     )
 }

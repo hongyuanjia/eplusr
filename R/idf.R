@@ -796,12 +796,11 @@ Idf <- R6::R6Class(classname = "Idf",
             }
 
             idf_file <- read_idf_file(path, idd)
-            idd <- use_idd(idf_file$version)$clone(deep = TRUE)
+            idd <- use_idd(idf_file$version)
 
             # in case there is no version field in input IDF
             private$m_version <- idf_file$version
 
-            idd <- attr(idf_file, "idd")
             # init idd tbl
             private$m_idd_tbl <- ._get_private(idd)$m_idd_tbl
 
@@ -953,89 +952,6 @@ Idf <- R6::R6Class(classname = "Idf",
         }
     )
 )
-# }}}
-
-# read_idf_file {{{
-read_idf_file <- function (path, idd = NULL) {
-    # read IDF string and get version first to get corresponding IDD
-    idf_dt <- read_lines_in_dt(path)
-    idf_ver <- get_idf_ver(idf_dt$string)
-    idd <- get_idd_from_ver(idf_ver, idd)
-
-    # parse IDF
-    # insert version line if necessary
-    if (is.null(idf_ver)) {
-        idf_dt <- rbindlist(
-            list(idf_dt,
-                data.table(
-                    line = nrow(idf_dt) + 1L,
-                    string = paste0("Version, ", ._get_private(idd)$m_version[, 1L:2L], ";")
-                )
-            ),
-            use.names = TRUE
-        )
-    }
-
-    setattr(idf_dt, "class", c("IdfDt", class(idf_dt)))
-    setattr(idf_dt, "version", idf_ver)
-
-    parse_idf_file(idf_dt, ._get_private(idd)$m_version, ._get_private(idd)$m_idd_tbl)
-}
-# }}}
-
-# Get Idd object from input IDF version
-#
-# @param idf_ver NULL or a valid IDF version
-# @param idd NULL or valid input for [use_idd()]
-# @param warn If `TRUE`, extra warning message will be shown
-# get_idd_from_ver {{{
-get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
-    if (!is.null(idf_ver)) {
-        # if input IDF has a version but neither that version of EnergyPlus nor
-        # IDD is available, rewrite the message
-        idd <- tryCatch(use_idd(idf_ver),
-            error_no_matched_idd = function (e) {
-                mes <- stri_replace_all_fixed(conditionMessage(e),
-                    "You may want to set `download`",
-                    "You may want to use `use_idd()` and set `download`"
-                )
-                stop(mes)
-            }
-        )
-    } else {
-        mes <- "Missing version field in input IDF."
-
-        if (!is.null(idd)) {
-            idd <- use_idd(idd)
-            if (warn) {
-                warn("warn_given_idd_used",
-                    paste0(
-                        mes, " The given IDD version ", idd$version(),
-                        " will be used. Parsing errors may occur."
-                    )
-                )
-            }
-        } else {
-            if (is.null(avail_idd())) {
-                abort("error_no_avail_idd",
-                    paste(mes, "No parsed IDD was available to use.")
-                )
-            }
-
-            idd <- use_idd(avail_idd()[length(avail_idd())])
-            if (warn) {
-                warn("warn_latest_idd",
-                    paste0(mes,
-                        " The latest parsed IDD version ", idd$version(),
-                        " will be used. Parsing errors may occur."
-                    )
-                )
-            }
-        }
-    }
-
-    idd$clone(deep = TRUE)
-}
 # }}}
 
 # idf_version {{{
