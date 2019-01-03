@@ -581,7 +581,7 @@ print_single_validity <- function (single_validity, type) {
     if (type == "missing_object") {
         cli::cat_bullet(surround(single_validity[[type]]))
     } else {
-        cli::cat_line(format_objects(single_validity[[type]]))
+        cli::cat_line(format_objects(single_validity[[type]], "field"))
     }
 }
 # }}}

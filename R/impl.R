@@ -306,7 +306,7 @@ t_object_num <- function (dt_object, class = NULL) {
 # t_object_info {{{
 t_object_info <- function (dt_object, component = c("id", "name", "class"),
                            by_class = FALSE, numbered = TRUE, collapse = NULL,
-                           prefix = NULL) {
+                           prefix = NULL, name_prefix = TRUE) {
     stopifnot(all(component %in% c("id", "name", "class")))
 
     if (is.null(prefix)) {
@@ -336,7 +336,11 @@ t_object_info <- function (dt_object, component = c("id", "name", "class"),
     # if name is required
     if (order_nm != 0L) {
         mes_nm <- dt_object[, {
-            mes <- paste0("name ", surround(object_name))
+            if (name_prefix) {
+                mes <- paste0("name ", surround(object_name))
+            } else {
+                mes <- surround(object_name)
+            }
             mes[is.na(object_name)] <- ""
             mes
         }]
@@ -362,23 +366,23 @@ t_object_info <- function (dt_object, component = c("id", "name", "class"),
     if (order_cls != 0L) {
         # If none of ID or name is required
         if (is.null(mes)) {
-            mes <- dt_object[, paste0(key_cls, " ", surround(class_name))]
+            mes <- dt_object[, paste0(key_cls, ": ", class_name)]
         } else {
             set(dt_object, NULL, "mes_object", mes)
             if (by_class) {
                 mes <- dt_object[, {
-                    paste0(key_obj, " ", collapse(mes_object, NULL), " in class ", surround(class_name[1L]))
+                    paste0(key_obj, " ", collapse(mes_object, NULL), " in class ", class_name[1L])
                 }, by = class_name]$V1
             } else {
                 mes <- dt_object[, {
-                    paste0(key_obj, " ", mes_object, " in class ", surround(class_name))
+                    paste0(key_obj, " ", mes_object, " in class ", class_name)
                 }]
             }
             set(dt_object, NULL, "mes_object", NULL)
         }
     } else {
         if (!is.null(mes)) {
-            mes <- paste0(key_obj, " ", mes)
+            mes <- paste0(key_obj, ": ", mes)
         }
     }
 

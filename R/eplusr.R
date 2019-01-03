@@ -44,6 +44,11 @@ name_gen_shared <- function (type = c("Idf", "Idd", "IdfObject", "IddObject")) {
     )
 }
 # }}}
+# check_color {{{
+check_color <- function () {
+    (.globals$color <- has_color())
+}
+# }}}
 
 # package level global constant {{{
 .globals <- new.env(parent = emptyenv())
@@ -89,8 +94,6 @@ reset_clone_indicator <- function () {
     }
 }
 # }}}
-
-reset_clone_indicator()
 
 # package level mutable global options
 .options <- new.env(parent = emptyenv())

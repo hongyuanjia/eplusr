@@ -7,104 +7,124 @@
 NULL
 
 # format_header: return header of an Idf output {{{
-format_header <- function (format = c("sorted", "new_top", "new_bot"), view_in_ip = FALSE) {
-    format <- switch(match.arg(format),
+format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
+                           view_in_ip = FALSE, special_format = FALSE) {
+    save_format <- switch(match.arg(save_format),
         sorted = "SortedOrder",
         new_top = "OriginalOrderTop",
         new_bot = "OriginalOrderBottom")
 
     header_generator <- "!-Generator eplusr"
 
-    header_option <- paste0("!-Option ", format)
+    header_option <- paste0("!-Option ", save_format)
 
-    special_format <- NULL
+    if (special_format) {
+        warn("warning_special_format",
+            paste0("Currently, special format for classes such as ",
+                "single line formating for vertices are not support. ",
+                "All objects will be formatted in standard way."
+            )
+        )
+        special_format <- NULL
+    }
     if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
 
     header_option <- paste0(header_option, " ", special_format, " ", in_ip)
-    header_option <- stringr::str_trim(header_option, "right")
+    header_option <- stri_trim_right(header_option)
 
     # TODO: Add "UseSpecialFormat" support
-    header <- c(
+    c(
         header_generator,
         header_option,
         "",
         "!-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.",
         "!-      Use '!' comments if they need to be retained when using the IDFEditor."
     )
-
-    return(header)
 }
 # }}}
 
 # format_output: return whole Idf output {{{
-format_output <- function (value_tbl, comment_tbl, ...) {
-    assert_that(has_names(value_tbl, c("object_id", "class_id", "class_name", "field_index")))
+format_output <- function (
+    dt_value, dt_object = NULL, dt_order = NULL,
+    header = TRUE, comment = TRUE, save_format = c("sorted", "new_top", "new_bot"),
+    special_format = FALSE, leading = 4L, in_ip = FALSE, sep_at = 29L, index = FALSE,
+    blank = FALSE, end = TRUE, required = FALSE
+)
+{
+    stopifnot(has_names(dt_value, c("object_id", "class_id", "class_name", "field_index")))
 
-    dots <- list(...)
-    header <- dots$header %||% TRUE
-    sav_fmt <- dots$format %||% eplusr_option("save_format")
-    if (sav_fmt == "asis") sav_fmt <- "sorted"
-    leading <- dots$leading %||% 4L
-    in_ip <- dots$in_ip %||% eplusr_option("view_in_ip")
-    sep_at <- dots$sep_at %||% 29L
-    index <- dots$index %||% FALSE
-    blank <- dots$blank %||% FALSE
-    end <- dots$end %||% TRUE
-    required <- dots$required %||% FALSE
+    save_format <- match.arg(save_format)
+    stopifnot(is_count(leading))
+    stopifnot(is.logical(in_ip))
+    stopifnot(is_count(sep_at))
+    stopifnot(is.logical(index))
+    stopifnot(is.logical(blank))
+    stopifnot(is.logical(end))
+    stopifnot(is.logical(required))
 
-    if (sav_fmt == "sorted") {
-        data.table::setorder(value_tbl, class_id, object_id, field_index)
-    } else if (sav_fmt == "new_top") {
-        data.table::setorder(value_tbl, -object_order, object_id, class_id, field_index)
-    } else if (sav_fmt == "new_bot"){
-        data.table::setorder(value_tbl, object_order, object_id, class_id, field_index)
+    # object order {{{
+    if (save_format == "sorted") {
+        setorderv(dt_value, c("class_id", "object_id", "field_index"))
     } else {
-        stop("Invalid format found: ", backtick(sav_fmt), ". It should be one of ",
-            "`asis`, `sorted`, `new_top` and `new_bot`.", call. = FALSE
-        )
+        stopifnot(!is.null(dt_order))
+        dt_value <- dt_value[dt_order, on = "object_id"]
+        if (save_format == "new_top") {
+            setorderv(dt_value,
+                c("object_order", "object_id", "class_id", "field_index"),
+                c(-1L, 1L, 1L, 1L)
+            )
+        } else {
+            setorderv(dt_value,
+                c("object_order", "object_id", "class_id", "field_index"),
+                c(1L, 1L, 1L, 1L)
+            )
+        }
+        set(dt_value, NULL, "object_order", NULL)
     }
+    # }}}
 
-    # add field output
-    fld <- format_field(value_tbl, leading = leading, in_ip = in_ip,
+    # get field value
+    fld <- format_field(dt_value, leading = leading, in_ip = in_ip,
         sep_at = sep_at, index = index, blank = blank, end = end, required = required)
 
-    # add comment output
-    if (not_empty(comment_tbl)) {
-        has_comment <- TRUE
-        comment_tbl[type == 0L, `:=`(comment = paste0("!", comment))]
-        comment_tbl <- comment_tbl[, lapply(.SD, paste0, collapse = "\n"),
-            .SDcols = "comment", by = object_id]
-        tbl <- comment_tbl[value_tbl, on = "object_id"]
-    } else {
-        has_comment <- FALSE
-        tbl <- value_tbl
+    # init output as field values
+    set(dt_value, NULL, "output", fld)
+    on.exit({set(dt_value, NULL, "output", NULL);invisible()}, add = TRUE)
+
+    # add class name per object
+    dt_value[field_index == 1L, output := paste0(class_name, ",\n", output)]
+
+    # add comments
+    if (comment) {
+        stopifnot(!is.null(dt_object))
+        cmt <- format_comment(dt_object)
+        dt_value[cmt, on = "object_id", mult = "first",
+            output := paste0(cmt$comment, "\n", output)
+        ]
     }
 
-    tbl[, out := fld]
-    tbl[field_index == 1L, out := paste0(class_name, ",\n", out)]
-    if (has_comment) {
-        tbl[field_index == 1L & !is.na(comment), out := paste0(comment, "\n", out)]
+    # add class heading for sorted format
+    if (save_format == "sorted") {
+        dt_value[dt_value[, .I[1L], by = list(class_id)]$V1,
+            output := paste0(
+                "\n",
+                "!-   ===========  ALL OBJECTS IN CLASS: ", stri_trans_toupper(class_name), " ===========",
+                "\n\n",
+                output
+            )
+        ]
+    } else {
+        dt_value[field_index == 1L, output := paste0("\n", output)]
     }
 
-    # add class output
-    cls_1 <- tbl[, class_group := .GRP, by = list(data.table::rleid(class_id))][
-        , .I[1L], by = list(class_group)]$V1
-    if (sav_fmt == "sorted") {
-        tbl[cls_1, out := paste0(
-            "\n",
-            "!-   ===========  ALL OBJECTS IN CLASS: ", toupper(class_name), " ===========",
-            "\n\n",
-            out)][
-            field_index == 1L, out := paste0("\n", out)]
-    } else {
-        tbl[field_index == 1L, out := paste0("\n", out)]
-    }
+    # add blank line after each object
+    dt_value[dt_value[, .I[.N], by = "object_id"]$V1, output := paste0(output, "\n")]
 
     if (header)
-        h <- format_header(format = sav_fmt, view_in_ip = in_ip)
+        h <- format_header(save_format = save_format, view_in_ip = in_ip, special_format = special_format)
     else h <- NULL
 
-    c(h, tbl[["out"]])
+    c(h, dt_value$output)
 }
 # }}}
 
@@ -130,7 +150,7 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
         is_other <- setdiff(grep(prefix, nms, fixed = TRUE), paste0(prefix, "object"))
         self <- ref_sgl[, .SD, .SDcols = nms[-is_other]]
         other <- ref_sgl[, .SD, .SDcols = c("value_id", nms[is_other])]
-        data.table::setnames(other,
+        setnames(other,
             c("ori_value_id", gsub(prefix, "", nms[is_other], fixed = TRUE)))
         sp_self <- split(unique(self), by = "value_id")
         sp_other <- split(other, by = "ori_value_id")
@@ -155,16 +175,11 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 # }}}
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
-format_objects <- function (value_tbl, in_ip = FALSE) {
-    assert_that(has_names(value_tbl, c("class_id", "object_id", "object_name", "field_index")))
-    setorder(value_tbl, class_id, object_id, field_index)
-
-    fmt_fld <- format_field(value_tbl, leading = 1L, in_ip = in_ip,
-                            sep_at = 20L, index = TRUE, blank = TRUE)
-
-    value_tbl[, `:=`(out = as.list(fmt_fld), row_id = .I), by = .I]
+format_objects <- function (dt_value, zoom = c("group", "class", "object", "field")) {
+    zoom <- match.arg(zoom)
 
     # tree_chars {{{
+    # reference: https://github.com/r-lib/cli/blob/master/R/tree.R#L111
     tree_chars <- function() {
         if (l10n_info()$`UTF-8`) {
             list("v" = "\u2502",
@@ -183,175 +198,208 @@ format_objects <- function (value_tbl, in_ip = FALSE) {
         }
     }
     # }}}
-    char <- tree_chars()
+    # tree {{{
+    tree <- function (dt, leaf, branch, trunk = NULL, sep = FALSE, leading = 2) {
+        char <- tree_chars()
 
-    # add field char
-    last_field <- value_tbl[, row_id[.N], by = list(class_name, object_id)]$V1
-    first_field <- setdiff(value_tbl[, row_id[1L], by = list(class_name, object_id)]$V1, last_field)
-    last_object <- value_tbl[object_id %in% value_tbl[, max(object_id), by = list(class_id)]$V1, unique(object_id)]
-    value_tbl[!object_id %in% last_object & row_id %in% last_field,
-           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$l), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
-    value_tbl[!object_id %in% last_object & row_id %in% first_field,
-           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$p), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
-    value_tbl[!object_id %in% last_object & !row_id %in% c(first_field, last_field),
-           out := list(list(paste0("  ", crayon::green(char$v), "  ", crayon::green(char$j), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
-    value_tbl[object_id %in% last_object & row_id %in% last_field,
-           out := list(list(paste0("     ", crayon::green(char$l), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
-    value_tbl[object_id %in% last_object & row_id %in% first_field,
-           out := list(list(paste0("     ", crayon::green(char$p), crayon::green(char$h), " ", out[[1L]]))), by = row_id]
-    value_tbl[object_id %in% last_object & !row_id %in% c(first_field, last_field),
-           out := list(list(paste0("     ", crayon::green(char$j), crayon::green(char$h)," ", out[[1L]]))), by = row_id]
+        if (sep) {
+            set(dt, NULL, "prefix", paste0(char$v, " \n", strrep(" ", leading), char$v, char$h))
+        } else {
+            set(dt, NULL, "prefix", paste0(char$v, char$h))
+        }
 
-    # add object char
-    first_row_per_object <- value_tbl[, row_id[1L], by = list(class_id, object_id)]$V1
-    first_row_per_last_object <- value_tbl[object_id %in% last_object, row_id[1], by = object_id]$V1
+        dt[dt[, .I[1L], by = c(branch[1L])]$V1, prefix := paste0(char$p, char$h)]
+        dt[dt[, .I[.N], by = c(branch[1L])]$V1, prefix := paste0(char$l, char$h)]
 
-    # add object name
-    if (is.integer(value_tbl$object_id)) {
-        set(value_tbl, NULL, "object",
-            ifelse(
-                is.na(value_tbl$object_name),
-                paste0("Object [ID:", value_tbl$object_id, "]"),
-                paste0("Object ", surround(value_tbl$object_name), " [ID:", value_tbl$object_id, "]")
-            )
-        )
-        value_tbl[is.na(object_name), `:=`(object = paste0("Object [ID: ", object_id, "]"))]
+        if (sep) {
+            dt[setdiff(
+                dt[, .I[.N], by = c(branch[1L])]$V1,
+                dt[, .I[1L], by = c(branch[1L])]$V1),
+            prefix := paste0(char$v, " \n", strrep(" ", leading), prefix)]
+        }
+
+        if (!is.null(trunk)) {
+            set(dt, NULL, "branch_prefix", paste0(char$v, " "))
+            dt[J(dt[, get(branch[1L])[.N], by = c(trunk[1L])]$V1), on = c(branch[1L]), branch_prefix := "  "]
+            set(dt, NULL, "prefix", paste(dt$branch_prefix, dt$prefix))
+            set(dt, NULL, "branch_prefix", NULL)
+        }
+
+        set(dt, NULL, "tree", paste0(strrep(" ", leading), dt$prefix, " ", dt[[leaf]]))
+        set(dt, NULL, "prefix", NULL)
+
+        dt
+    }
+    # }}}
+
+    if (zoom %in% c("group", "class")) stopifnot(has_name(dt_value, "group_name"))
+    if (zoom %in% c("object", "field")) stopifnot(has_name(dt_value, "object_name"))
+
+    if (zoom == "group") {
+        # {{{
+        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id")])
+        setorderv(dt, c("group_id"))
+        dt <- dt[, list(group_name = group_name[1L], num = length(class_id)), by = c("group_id")][
+            , tree := paste0("[", lpad(num, "0"), "] Group: ", group_name)]
+        # }}}
+    } else if (zoom == "class") {
+        # {{{
+        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id", "class_name", "object_id")])
+        setorderv(dt, c("group_id", "class_id"))
+        dt <- dt[,
+            list(group_id = group_id[1L], group_name = group_name[1L],
+                 class_name = class_name[1L], num = length(object_id)
+            ), by = c("class_id")
+        ][, class := paste0("[", lpad(num, "0"), "] Class: ", class_name)]
+
+        dt <- tree(dt, "class", "group_id", leading = 0L)
+
+        dt <- dt[, list(tree = paste0("Group: ", group_name[1L], "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
+        dt[-1L, tree := paste0("\n", tree)]
+        # }}}
+    } else if (zoom == "object") {
+        # {{{
+        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id", "class_name", "object_id", "object_name")])
+        setorderv(dt, c("group_id", "class_id", "object_id"))
+        set(dt, NULL, "object", t_object_info(dt, c("name", "id"), numbered = FALSE, name_prefix = FALSE))
+        dt <- tree(dt, "object", "class_id", "group_id", leading = 0L)
+
+        dt <- dt[,
+            list(group_name = group_name[1L],
+                 group_id = group_id[1L],
+                 tree = paste0("Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n"))
+            ),
+            by = "class_id"
+        ]
+
+        dt <- tree(dt, "tree", branch = "group_id", sep = TRUE, leading = 0L)
+        dt <- dt[, list(tree = paste0("Group: ", group_name, "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
+        dt[-1L, tree := paste0("\n", tree)]
+        # }}}
     } else {
-        set(value_tbl, NULL, "object",
-            ifelse(
-                startsWith(value_tbl$object_id, "Input"),
-                paste0("[", value_tbl$object_id, "]"),
-                paste0("[ID: ", value_tbl$object_id, "]")
+        # {{{
+        setorderv(dt_value, c("class_id", "object_id", "field_index"))
+        set(dt_value, NULL, "field",
+            format_field(dt_value, leading = 1L, sep_at = 20L, index = TRUE, blank = TRUE)
+        )
+        on.exit({set(dt_value, NULL, "field", NULL);invisible()}, add = TRUE)
+
+        dt <- tree(dt_value, "field", "object_id", "class_id", leading = 0L)
+
+        dt <- dt[,
+            list(class_name = class_name[1L],
+                 class_id = class_id[1L],
+                 object_name = object_name[1L],
+                 tree = paste0(tree, collapse = "\n")
+            ),
+            by = "object_id"
+        ]
+
+        set(dt, NULL, "object",
+            paste0(
+                t_object_info(dt, c("name", "id"), numbered = FALSE, name_prefix = FALSE),
+                "\n",
+                dt$tree
             )
         )
-        set(value_tbl, NULL, "object",
-            ifelse(
-                is.na(value_tbl$object_name),
-                paste0("Object ", value_tbl$object),
-                paste0("Object ", surround(value_tbl$object_name), " ", value_tbl$object)
-            )
-        )
+
+        dt <- tree(dt, "object", "class_id", leading = 0L, sep = TRUE)
+
+        dt <- dt[,
+            list(tree = paste0(
+                "Class: ", class_name, "\n", paste0(tree, collapse = "\n")
+            )),
+            by = "class_id"
+        ]
+
+        dt[-1L, tree := paste0("\n", tree)]
+        # }}}
     }
 
-    value_tbl[setdiff(first_row_per_object, first_row_per_last_object),
-           out := list(list(
-                c(crayon::green(paste0("  ", char$p, char$h, " ", object)), out[[1L]]))),
-           by = list(row_id)]
-    value_tbl[first_row_per_last_object,
-           out := list(list(
-                c(crayon::green(paste0("  ", char$l, char$h, " ", object)), out[[1L]]))),
-           by = list(row_id)]
-
-    # add class char
-    each_class <- value_tbl[, row_id[1L], by = class_id]$V1
-    value_tbl[each_class,
-           out := list(list(
-                c("", crayon::green(paste0("  Class ", surround(class_name))), out[[1L]]))),
-           by = row_id]
-
-    unlist(value_tbl[["out"]], use.names = FALSE)
+    dt$tree
 }
 # }}}
 
 # format_field: return Idf format field {{{
-format_field <- function (value_tbl, leading = 4L, in_ip = FALSE, sep_at = 29L,
+format_field <- function (dt_value, leading = 4L, in_ip = FALSE, sep_at = 29L,
                           index = FALSE, blank = FALSE, end = TRUE, required = FALSE) {
 
     idx <- NULL
+
     if (index) {
-        value_tbl[, `:=`(idx = lpad(field_index))]
-
-        if (has_name(value_tbl, "required_field")) {
-            value_tbl[required_field == TRUE, `:=`(
-                idx = crayon::red$bold(idx),
-                req = crayon::red$bold(cli::symbol$bullet)
-            )]
-
-            value_tbl[required_field == FALSE, `:=`(
-                idx = crayon::cyan(idx),
-                req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet)))
-            )]
-        } else {
-            value_tbl[, `:=`(
-                idx = crayon::cyan(idx),
-                req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet)))
-            )]
-        }
-
-        idx <- value_tbl$idx
-        if (required) idx <- paste0(value_tbl$req, idx)
-        idx <- paste0(idx, ":")
+        idx <- paste0(format_index(dt_value, required = required), ":")
     }
 
-    val <- format_value(value_tbl, leading = leading, length = sep_at, blank = blank, end = end)
-    nm <- format_name(value_tbl, in_ip = in_ip)
+    val <- format_value(dt_value, leading = leading, length = sep_at, blank = blank, end = end)
+    nm <- format_name(dt_value, in_ip = in_ip)
 
-    if (has_name(value_tbl, "required_field")) {
-        nm[value_tbl$required_field] <- crayon::red(nm[value_tbl$required_field])
-        nm[!value_tbl$required_field] <- crayon::cyan(nm[!value_tbl$required_field])
-    } else {
-        nm <- crayon::cyan(nm)
-    }
-
-    paste0(idx, crayon::yellow$bold(val), nm)
+    paste0(idx, val, nm)
 }
 # }}}
 
 # format_index: return right aligned field index {{{
-format_index <- function (field_tbl) {
-    lpad(field_tbl[["field_index"]])
+format_index <- function (dt_value, required = FALSE) {
+    if (required) stopifnot(has_name(dt_value, "required_field"))
+
+    idx <- lpad(dt_value$field_index)
+
+    if (required) {
+        req <- rep(" ", nrow(dt_value))
+        req[dt_value$required_field] <- "*"
+        idx <- paste0(idx, req)
+    }
+
+    idx
 }
 # }}}
 
 # format_value: return Idf format value strings {{{
-format_value <- function (value_tbl, leading = 4L, length = 29L, blank = FALSE,
+format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
                           end = TRUE) {
-    value_tbl[is.na(value), value := ""]
-    values <- value_tbl[["value"]]
-
+    values <- dt_value$value
     if (blank) {
-        values[values == ""] <- rep("<Blank>", sum(values == ""))
+        values[is.na(values)] <- s_blk("<Blank>")
+    } else {
+        values[is.na(values)] <- ""
     }
 
-    if (end) {
-        if (has_names(value_tbl, c("object_id", "field_index"))) {
-            is_end <- value_tbl[, .I[max(seq_along(field_index))], by = object_id]$V1
+    if (!end) {
+        res <- paste0(values, ",")
+    } else {
+        if (has_name(dt_value, "object_id")) {
+            is_end <- dt_value[, .I[.N], by = object_id]$V1
         } else {
             is_end <- length(values)
         }
-        res <- values
-        res[is_end] <- paste0(res[is_end], ";")
-        res[-is_end] <- paste0(res[-is_end], ",")
-    } else {
-        res <- paste0(values, ",")
+        res <- character(length(values))
+        res[is_end] <- paste0(values[is_end], ";")
+        res[-is_end] <- paste0(values[-is_end], ",")
     }
 
     res <- paste0(strrep(" ", leading), res)
 
-    long <- nchar(res) > length
-    res[long] <- paste0(res[long], "  ")
-    res[!long] <- rpad(res[!long], width = length)
+    res <- rpad(res, width = length)
+    res[nchar(res) > length] <- paste0(res[nchar(res) > length], "  ")
 
-    return(res)
+    res
 }
 # }}}
 
 # format_name: return Idf format field names {{{
 format_name <- function (field_tbl, in_ip = FALSE) {
-    paste0("!- ", field_tbl[["full_name"]])
+    s_nm(paste0("!- ", field_tbl[["full_name"]]))
 }
 # }}}
 
 # format_comment: return Idf format comments and macros {{{
-format_comment <- function (comment_tbl) {
-    if (is_empty(comment_tbl)) return(NULL)
+# NOTE: return a data.table
+format_comment <- function (dt_object) {
+    if (is.null(dt_object) || !nrow(dt_object)) return(NULL)
 
-    assert_that(has_names(comment_tbl, c("comment", "type")))
-    out <- comment_tbl[, out := comment][
-        type == 0L, out := paste0("!", comment)][["out"]]
-    comment_tbl[, out := NULL]
-
-    return(out)
+    dt_object[!vapply(comment, function (x) all(stri_isempty(x)), logical(1L))][,
+        list(comment = paste0("!", unlist(comment, use.names = FALSE), collapse = "\n")),
+        by = "object_id"
+    ]
 }
 # }}}
 
@@ -368,7 +416,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
         assert_that(has_names(value_tbl, c("type", "units", "ip_units")))
         value_tbl <- unit_conv_table[value_tbl, on = c(si_name = "units", ip_name = "ip_units")]
     }
-    data.table::setnames(value_tbl,
+    setnames(value_tbl,
         c("si_name", "ip_name", req_val),
         c("units", "ip_units", paste0("value", val_suffix)))
 
@@ -393,10 +441,10 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
     value_tbl[, `:=`(value_upper = toupper(value))]
 
     if (prefix != "value")
-        data.table::setnames(value_tbl, paste0("value", val_suffix), req_val)
+        setnames(value_tbl, paste0("value", val_suffix), req_val)
 
     if (joined_before)
-        data.table::setnames(value_tbl, c("units", "ip_units"), c("si_name", "ip_name"))
+        setnames(value_tbl, c("units", "ip_units"), c("si_name", "ip_name"))
 
     value_tbl
 }
@@ -438,7 +486,7 @@ print.ErrFile <- function (x, ...) {
     } else {
         sum_line <- "EnergyPlus terminated"
     }
-    err_dt <- data.table::copy(x$data)
+    err_dt <- copy(x$data)
 
     err_dt[, line := .I]
     num_sum <- err_dt[, list(num = max(level_index)), by = list(level)][level != "Info"]
@@ -461,7 +509,7 @@ print.ErrFile <- function (x, ...) {
 
         err_dt[, level_num := max(level_index), by = list(level)]
         err_dt[, out := message]
-        err_dt[begin_environment == TRUE, out := stringr::str_replace(out, "^Beginning ", "During ")]
+        err_dt[begin_environment == TRUE, out := stri_replace_first_regex(out, "^Beginning ", "During ")]
         err_dt[begin_environment == TRUE, out := cli::rule(out, line = 2L, col = "green"), by = line]
 
         err_dt[begin_environment == FALSE & seperate == TRUE,
@@ -534,7 +582,7 @@ print.IddFieldPossible <- function (x, ...) {
         by = field_index
     ]
 
-    dt[, res_ran := paste0(vapply(range, function (x) utils::capture.output(print.IddFieldRange(x)), character(1)))]
+    dt[, res_ran := paste0(vapply(range, function (x) capture.output(print.IddFieldRange(x)), character(1)))]
     dt[res_ran == "<Not Applicable>", res_ran := NA_character_]
     dt[!is.na(res_ran), res := paste0(res, "\n", crayon::cyan(paste0(
             cli::symbol$bullet, " ", crayon::bold("Range"), ": ", res_ran
@@ -583,4 +631,20 @@ print.IddFieldRange <- function (x, ...) {
 
     cli::cat_line(paste0(left, ", ", right))
 }
+# }}}
+
+# STYLE
+# has_color {{{
+has_color <- function () {
+    requireNamespace("crayon") && crayon::has_color()
+}
+# }}}
+# s_req: style for indices of required fields {{{
+s_req <- function (...) if (.globals$color) crayon::red$bold(...) else c(...)
+# }}}
+# s_nm: style for field names {{{
+s_nm <- function (...) if (.globals$color) crayon::silver(...) else c(...)
+# }}}
+# s_blk: style for blank {{{
+s_blk <- function (...) if (.globals$color) crayon::underline(...) else c(...)
 # }}}
