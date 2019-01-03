@@ -176,7 +176,7 @@ Idd <- R6::R6Class(classname = "Idd",
         initialize = function (path) {
 
             # add a uuid
-            private$m_uuid <- uuid::UUIDgenerate(use.time = TRUE)
+            private$m_uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
             private$m_version<- idd_file$version

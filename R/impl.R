@@ -5,7 +5,6 @@
 #' @importFrom stringr str_detect str_match str_replace_all
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
 #' @importFrom stringi stri_subset_regex stri_match_first_regex stri_rand_strings
-#' @importFrom uuid UUIDgenerate
 NULL
 
 # GROUP

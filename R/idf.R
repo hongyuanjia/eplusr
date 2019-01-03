@@ -814,7 +814,7 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
 
             # add a uuid
-            private$m_log$uuid <- uuid::UUIDgenerate(use.time = TRUE)
+            private$m_log$uuid <- unique_id()
 
             private$m_log$unsaved <- FALSE
             private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
