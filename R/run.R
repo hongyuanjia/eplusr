@@ -201,7 +201,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     model <- normalizePath(model, mustWork = TRUE)
     weather <- normalizePath(weather, mustWork = TRUE)
 
-    eplus <- eplus %||% as.character(get_idf_ver(stringr::str_trim(readr::read_lines(model), "both")))
+    eplus <- eplus %||% as.character(get_idf_ver(read_lines_in_dt(model)))
     energyplus_exe <- eplus_exe(eplus)
 
     if (is_empty(eplus)) {
@@ -266,7 +266,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 
     if (is.null(eplus)) {
         ver_list <- lapply(model, function (x) {
-            as.character(get_idf_ver(stringr::str_trim(readr::read_lines(x), "both")))
+            as.character(get_idf_ver(read_lines_in_dt(x)))
         })
         ver_miss <- vapply(ver_list, is_empty, logical(1))
         if (any(ver_miss)) {

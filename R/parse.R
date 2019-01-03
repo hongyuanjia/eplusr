@@ -15,8 +15,8 @@ NULL
 parse_idd_file <- function(path) {
     # read idd string, get idd version and build
     idd_dt <- read_lines_in_dt(path)
-    idd_version <- get_idd_ver(idd_dt$string)
-    idd_build <- get_idd_build(idd_dt$string)
+    idd_version <- get_idd_ver(idd_dt)
+    idd_build <- get_idd_build(idd_dt)
 
     # delete all comment and blank lines
     idd_dt <- clean_idd_lines(idd_dt)
@@ -76,7 +76,11 @@ parse_idd_file <- function(path) {
 parse_idf_file <- function (path, idd = NULL) {
     # read IDF string and get version first to get corresponding IDD
     idf_dt <- read_lines_in_dt(path)
-    idf_ver <- get_idf_ver(idf_dt$string)
+    # delete blank lines
+    idf_dt <- idf_dt[!string == ""]
+
+    idf_ver <- get_idf_ver(idf_dt)
+
     idd <- get_idd_from_ver(idf_ver, idd)
 
     # get idd version and table
@@ -90,9 +94,6 @@ parse_idf_file <- function (path, idd = NULL) {
     type_enum <- list(unknown = 0L, special = 1L, macro = 2L, comment = 3L,
         object = 4L, object_value = 5L, value = 6L, value_last = 7L
     )
-
-    # delete blank lines
-    idf_dt <- idf_dt[!string == ""]
 
     # separate lines into bodies, and comments
     idf_dt <- sep_idf_lines(idf_dt, type_enum)
@@ -127,86 +128,95 @@ parse_idf_file <- function (path, idd = NULL) {
     # value reference map
     dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
 
-    list(version = idf_ver, options = options,
+    list(version = idd_ver, options = options,
         object = dt_object, value = dt_value, reference = dt_reference
     )
 }
 # }}}
 
 # read_lines_in_dt {{{
-read_lines_in_dt <- function(input) {
-    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string")
+read_lines_in_dt <- function(input, trim = TRUE, ...) {
+    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
     set(dt, j = "line", value = seq_along(dt[["string"]]))
-    set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+    if (trim) {
+        set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+    }
     dt
 }
 # }}}
 
 # get_idd_ver {{{
-get_idd_ver <- function (idd_str, trim = FALSE) {
-    assert_that(is.character(idd_str))
+get_idd_ver <- function (idd_dt) {
+    stopifnot(inherits(idd_dt, "data.table"), has_names(idd_dt, c("line", "string")))
 
-    ver_line <- stri_subset_fixed(idd_str, "!IDD_Version")
+    ver_line <- idd_dt[startsWith(string, "!IDD_Version")]
 
-    if (trim) ver_line <- stri_trim_both(ver_line)
-
-    if (length(ver_line) == 1L) {
-        ver <- stri_sub(ver_line, 14L)
-        standardize_ver(ver)
-    } else if (length(ver_line > 1L)) {
-        abort("error_multi_idd_ver",
-            paste0(
-                "Multiple versions found in input IDD:\n  ", collapse(ver_line), "."
-            )
-        )
-    } else {
+    if (!nrow(ver_line)) {
         abort("error_miss_idd_ver", "No version found in input IDD.")
+    } else if (nrow(ver_line) == 1L) {
+        ver <- tryCatch(standardize_ver(stri_sub(ver_line$string, 14L)),
+            error = function (e) {
+                m <- conditionMessage(e)
+                if (startsWith(m, "invalid version specification")) {
+                    parse_issue("error_invalid_idd_ver", "idd", "Invalid IDD version", ver_line)
+                } else {
+                    stop(e)
+                }
+            }
+        )
+        standardize_ver(ver)
+    } else {
+        parse_issue("error_multi_idd_ver", "idd", "Multiple versions found", ver_line)
     }
 }
 # }}}
 
 # get_idd_build {{{
-get_idd_build <- function (idd_str, trim = FALSE) {
-    assert_that(is.character(idd_str))
+get_idd_build <- function (idd_dt) {
+    stopifnot(inherits(idd_dt, "data.table"), has_names(idd_dt, c("line", "string")))
 
-    build_line <- stri_subset_fixed(idd_str, "!IDD_BUILD")
+    build_line <- stri_subset_fixed(idd_dt, "!IDD_BUILD")
 
-    if (trim) build_line <- stri_trim_both(build_line)
-
-    if (length(build_line) == 1L) {
-        stri_sub(build_line, 12L)
-    } else if (length(build_line > 1L)) {
-        warn("warning_multi_build",
-            paste0(
-                "Multiple build tags found in input IDD:\n  ", collapse(build_line), "."
-            )
-        )
+    if (!nrow(build_line)) {
+        abort("warning_miss_idd_build", "No version found in input IDD.")
+    } else if (nrow(build_line) == 1L) {
+        build <- stri_sub(build_line, 12L)
     } else {
-        warning("No build tag found in input IDD.", call. = FALSE)
+        parse_issue("warning_multi_idd_build", "idd", "Multiple build tags found", build_line)
     }
 }
 # }}}
 
 # get_idf_ver {{{
-get_idf_ver <- function (idf_str) {
-    stopifnot(is.character(idf_str))
+get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
+    stopifnot(inherits(idf_dt, "data.table"), has_names(idf_dt, c("line", "string")))
 
-    ver_normal_cand <- idf_str[endsWith(idf_str, "Version Identifier")]
-    ver_normal <- ver_normal_cand[!startsWith(ver_normal_cand, "!")]
-    ver_special_cand <- idf_str[startsWith(idf_str, "Version")]
-    ver_special <- ver_special_cand[!startsWith(ver_special_cand, "!")]
+    if (!empty_removed) idf_dt <- idf_dt[!stri_isempty(string)]
 
-    if (length(ver_normal) >= 1L) {
-        # for "8.6; !- Version Identifier"
-        standardize_ver(stri_trim_both(
-            stri_split_fixed(ver_normal[1L], ";")[[1L]][1L]
-        ))
-    } else if (length(ver_special) >= 1L){
-        standardize_ver(stri_trim_both(
-            stri_split_charclass(ver_special[1L], "[,;]")[[1L]][2L]
-        ))
+    is_ver <- stringi::stri_startswith_fixed(idf_dt$string, "Version",
+        stringi::stri_opts_fixed(case_insensitive = TRUE)
+    )
+
+    ver_line_spe <- idf_dt[is_ver]
+    ver_line_nor <- idf_dt[which(is_ver) + 1L]
+
+    set(ver_line_spe, NULL, "version",
+        stri_match_first_regex(
+            ver_line_spe$string, "Version\\s*,\\s*(\\d\\.\\d)\\s*;$",
+            stringi::stri_opts_regex(case_insensitive = TRUE)
+        )[, 2L],
+    )
+    set(ver_line_nor, NULL, "version",
+        stri_match_first_regex(ver_line_nor, "^(\\d\\.\\d)\\s*;$")[, 2L],
+    )
+    ver_line <- rbindlist(list(ver_line_spe, ver_line_nor), use.names = FALSE)[!is.na(version)]
+
+    if (!nrow(ver_line)) {
+        NULL
+    } else if (nrow(ver_line) == 1L) {
+        standardize_ver(ver_line$version)
     } else {
-        return(NULL)
+        parse_issue("error_multi_idf_ver", "idf", "Multiple versions found", ver_line)
     }
 }
 # }}}

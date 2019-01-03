@@ -795,7 +795,7 @@ Idf <- R6::R6Class(classname = "Idf",
                 if (file.exists(path)) private$m_path <- normalizePath(path)
             }
 
-            idf_file <- read_idf_file(path, idd)
+            idf_file <- parse_idf_file(path, idd)
             idd <- use_idd(idf_file$version)
 
             # in case there is no version field in input IDF

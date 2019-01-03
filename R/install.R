@@ -271,7 +271,7 @@ use_eplus <- function (eplus) {
             "EnergyPlus installation path.", call. = FALSE)
     }
 
-    exe <- paste0("energyplus", ifelse(is_windows(), ".exe", ""))
+    exe <- paste0("energyplus", if(is_windows()) ".exe" else "")
     res <- list(version = ver, dir = eplus_dir, exe = exe)
 
     ori <- .globals$eplus_config[[as.character(ver)]]
@@ -353,10 +353,22 @@ eplus_default_path <- function (ver) {
 get_ver_from_path <- function (path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
-    h <- readr::read_lines(idd_file, n_max = 1L)
-
-    tryCatch(get_idd_ver(h),
-        error = function (e) stop("Failed to parse EnergyPlus version using IDD ",
-            surround(idd_file), ".", call. = FALSE))
+    tryCatch(get_idd_ver(read_lines_in_dt(idd_file, nrows = 1L)),
+        error_miss_idd_ver = function (e) {
+            stop("Failed to parse EnergyPlus version using IDD ",
+                surround(idd_file), ".\n", conditionMessage(e)
+            )
+        },
+        error_invalid_idd_ver = function (e) {
+            stop("Failed to parse EnergyPlus version using IDD ",
+                surround(idd_file), ".\n", conditionMessage(e)
+            )
+        },
+        error_multi_idd_ver = function (e) {
+            stop("Failed to parse EnergyPlus version using IDD ",
+                surround(idd_file), ".\n", conditionMessage(e)
+            )
+        }
+    )
 }
 # }}}

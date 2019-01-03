@@ -335,7 +335,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             if (!is.null(eplus_ver)) {
                 assert_that(is_eplus_ver(eplus_ver, strict = TRUE))
             } else {
-                eplus_ver <- get_idf_ver(stringr::str_trim(readr::read_lines(private$m_path_idf), "both"))
+                eplus_ver <- get_idf_ver(read_lines_in_dt(private$m_path_idf))
                 if (is.null(eplus_ver))
                     stop("Could not find version of input idf file.", call. = FALSE)
             }
