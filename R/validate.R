@@ -487,8 +487,8 @@ exclude_empty_field <- function (dt_idd, dt_idf, env_in) {
 # exclude_auto_field: exclude valid autosize and autocalculate fields {{{
 exclude_auto_field <- function (dt_idd, dt_idf, env_in) {
     env_in$value <- env_in$value[
-        !(value == "autosize" & autosizable == TRUE) &
-        !(value == "autocalculate" & autocalculatable == TRUE)
+        !(value_lower == "autosize" & autosizable == TRUE) &
+        !(value_lower == "autocalculate" & autocalculatable == TRUE)
     ]
     env_in
 }
