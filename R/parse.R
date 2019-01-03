@@ -6,9 +6,10 @@
 #' @importFrom stringi stri_count_charclass stri_count_fixed stri_detect_fixed
 #' @importFrom stringi stri_extract_first_regex stri_isempty stri_length
 #' @importFrom stringi stri_locate_first_fixed stri_replace_all_fixed
-#' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub
-#' @importFrom stringi stri_subset_fixed stri_trans_tolower stri_trans_toupper
-#' @importFrom stringi stri_trim_both stri_trim_left stri_trim_right
+#' @importFrom stringi stri_startswith_fixed stri_split_charclass
+#' @importFrom stringi stri_split_fixed stri_sub stri_subset_fixed
+#' @importFrom stringi stri_trans_tolower stri_trans_toupper stri_trim_both
+#' @importFrom stringi stri_trim_left stri_trim_right
 NULL
 
 # parse_idd_file {{{
@@ -175,7 +176,7 @@ get_idd_ver <- function (idd_dt) {
 get_idd_build <- function (idd_dt) {
     stopifnot(inherits(idd_dt, "data.table"), has_names(idd_dt, c("line", "string")))
 
-    build_line <- stri_subset_fixed(idd_dt, "!IDD_BUILD")
+    build_line <- idd_dt[startsWith(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
         abort("warning_miss_idd_build", "No version found in input IDD.")
@@ -193,8 +194,8 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
 
     if (!empty_removed) idf_dt <- idf_dt[!stri_isempty(string)]
 
-    is_ver <- stringi::stri_startswith_fixed(idf_dt$string, "Version",
-        stringi::stri_opts_fixed(case_insensitive = TRUE)
+    is_ver <- stri_startswith_fixed(idf_dt$string, "Version",
+        opts_fixed = stringi::stri_opts_fixed(case_insensitive = TRUE)
     )
 
     ver_line_spe <- idf_dt[is_ver]
@@ -203,12 +204,10 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
     set(ver_line_spe, NULL, "version",
         stri_match_first_regex(
             ver_line_spe$string, "Version\\s*,\\s*(\\d\\.\\d)\\s*;$",
-            stringi::stri_opts_regex(case_insensitive = TRUE)
-        )[, 2L],
+            opts_regex = stringi::stri_opts_regex(case_insensitive = TRUE)
+        )[, 2L]
     )
-    set(ver_line_nor, NULL, "version",
-        stri_match_first_regex(ver_line_nor, "^(\\d\\.\\d)\\s*;$")[, 2L],
-    )
+    set(ver_line_nor, NULL, "version", stri_match_first_regex(ver_line_nor$string, "^(\\d\\.\\d)\\s*;$")[, 2L])
     ver_line <- rbindlist(list(ver_line_spe, ver_line_nor), use.names = FALSE)[!is.na(version)]
 
     if (!nrow(ver_line)) {
