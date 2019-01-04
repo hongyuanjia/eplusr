@@ -151,13 +151,13 @@ are_integerish <- function(x) {
     abs(x - round(x)) < .Machine$double.eps^0.5
 }
 # }}}
-# is_same_len {{{
-is_same_len <- function (x, y) {
+# have_same_len {{{
+have_same_len <- function (x, y) {
     x_len_fun <- if(is.data.frame(x)) nrow else length
     y_len_fun <- if(is.data.frame(y)) nrow else length
     x_len_fun(x) == y_len_fun(y)
 }
-on_failure(is_same_len) <- function (call, env) {
+on_failure(have_same_len) <- function (call, env) {
     paste0(surround(deparse(call$x)), " and ", surround(deparse(call$y)),
       " does not have the same length.")
 }

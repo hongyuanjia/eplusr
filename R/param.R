@@ -347,7 +347,7 @@ i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     if (is.null(.names)) {
         out_nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
-        if (!is_same_len(out, .names))
+        if (!have_same_len(out, .names))
             stop(length(out), " models created with only ", length(.names),
                 " names given.", call. = FALSE)
         nms <- as.character(.names)

@@ -215,7 +215,7 @@ t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL,
     res <- obj[dt_in, on = col_on, allow.cartesian = TRUE]
 
     # stop if there are objects that have the same name
-    if (!isTRUE(for_value) && !is_same_len(res, dt_in)) {
+    if (!isTRUE(for_value) && !have_same_len(res, dt_in)) {
         mult_rleid <- res[, .N, by = rleid][N > 1L, rleid]
         mult <- res[J(mult_rleid), on = "rleid"]
 
@@ -511,7 +511,7 @@ t_field_data <- function (
         )
     }
 
-    assert_that(is_same_len(dt_in, field))
+    assert_that(have_same_len(dt_in, field))
 
     if (are_count(field)) {
         # from field index {{{
@@ -652,7 +652,7 @@ t_field_data <- function (
         # }}}
     }
 
-    if (!is_same_len(dt_idd$field, dt$field)) {
+    if (!have_same_len(dt_idd$field, dt$field)) {
         warning("`dt_idd` is not an environment and IDD data has been changed during query")
     }
 
@@ -2232,7 +2232,7 @@ add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input 
         set(dt_class, NULL, "input_num", 0L)
         dt_class[min_fields == 0L & last_required == 0L, input_num := num_fields]
     } else {
-        stopifnot(is_same_len(dt_class, num))
+        stopifnot(have_same_len(dt_class, num))
         stopifnot(are_count(num))
         set(dt_class, NULL, "input_num", as.integer(num))
         if (all) {
@@ -2292,7 +2292,7 @@ get_input_class_data <- function (dt_class, class, num = NULL) {
         # dt_cls <- add_accept_field_num(dt_cls)
 
         stopifnot(are_count(num))
-        stopifnot(is_same_len(class, num))
+        stopifnot(have_same_len(class, num))
         set(dt_cls, NULL, "num", as.integer(num))
     }
 }
@@ -2384,8 +2384,8 @@ assert_valid_input_format <- function (class_name, value, comment, default, type
     is_valid_input <- function (x) is.null(x) || is_normal_list(x)
 
     if (length(class_name) > 1L &&
-        ((!is.null(value)   && !is_same_len(class_name, value)) ||
-         (!is.null(comment) && !is_same_len(class_name, comment))))
+        ((!is.null(value)   && !have_same_len(class_name, value)) ||
+         (!is.null(comment) && !have_same_len(class_name, comment))))
         stop("`value` and `comment` should have the same length as ",
             surround(key), ".", call. = FALSE)
 
@@ -2704,7 +2704,7 @@ i_field_tbl <- function (self, private, class = NULL) {
 # i_field_tbl_from_num: return acceptable number of fields {{{
 i_field_tbl_from_num <- function (self, private, class, num = 0L) {
     assert_that(are_count(num))
-    assert_that(is_same_len(class, num))
+    assert_that(have_same_len(class, num))
 
     num <- i_field_num_from_index(self, private, class, num)
     cls_tbl <- i_class_tbl_from_which(self, private, class)[, `:=`(num = num)]
@@ -2729,7 +2729,7 @@ i_field_tbl_from_num <- function (self, private, class, num = 0L) {
 # i_is_valid_field_index_ext {{{
 i_is_valid_field_index_ext <- function (self, private, class, index) {
     assert_that(are_count(index))
-    assert_that(is_same_len(class, index))
+    assert_that(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -2740,7 +2740,7 @@ i_is_valid_field_index_ext <- function (self, private, class, index) {
 # i_assert_valid_field_index_ext {{{
 i_assert_valid_field_index_ext <- function (self, private, class, index) {
     assert_that(are_count(index))
-    assert_that(is_same_len(class, index))
+    assert_that(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -2756,7 +2756,7 @@ i_assert_valid_field_index_ext <- function (self, private, class, index) {
 # i_is_valid_field_num {{{
 i_is_valid_field_num <- function (self, private, class, num) {
     assert_that(are_count(num))
-    assert_that(is_same_len(class, num))
+    assert_that(have_same_len(class, num))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -3141,7 +3141,7 @@ i_last_required_extensible_field_index <- function (self, private, class = NULL)
 
 # i_field_index_from_extensible_index {{{
 i_field_index_from_extensible_index <- function (self, private, class, index) {
-    assert_that(is_same_len(class, index))
+    assert_that(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
     i_assert_extensible_class(self, private, cls_tbl$class_name)
@@ -3252,7 +3252,7 @@ i_add_extensible_group <- function (self, private, class, num) {
             cls_tbl[num_extensible == 0L, paste0("  ", lpad(class_rleid),
                 "| Class ", surround(class_name), ".", collapse = "\n")], call. = FALSE)
 
-    assert_that(is_same_len(class, num))
+    assert_that(have_same_len(class, num))
 
     new_ext_fld <- i_extensible_group_tbl_from_range(self, private, class,
         from = cls_tbl$num_extensible_group + 1, to = cls_tbl$num_extensible_group + num)
@@ -3321,7 +3321,7 @@ i_del_extensible_group <- function (self, private, class, num) {
                 "| Class ", surround(class_name), ": ", surround(new_ext_num),
                 ".", collapse = "\n")], call. = FALSE)
 
-    assert_that(is_same_len(class, num))
+    assert_that(have_same_len(class, num))
 
     cls_tbl[, `:=`(del_ext_num = num)]
     cls_tbl[, `:=`(left_fields = num_fields - del_ext_num * num_extensible)]
@@ -4402,8 +4402,8 @@ i_assert_valid_input_format <- function (class_name, value, comment, default, ty
     is_valid_input <- function (x) is.null(x) || is_normal_list(x)
 
     if (length(class_name) > 1L &&
-        ((not_empty(value)   && !is_same_len(class_name, value)) ||
-         (not_empty(comment) && !is_same_len(class_name, comment))))
+        ((not_empty(value)   && !have_same_len(class_name, value)) ||
+         (not_empty(comment) && !have_same_len(class_name, comment))))
         stop("`value` and `comment` should have the same length as ",
             surround(key), ".", call. = FALSE)
 
@@ -4755,7 +4755,7 @@ i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE, 
 # i_value_tbl_from_num {{{
 i_value_tbl_from_num <- function (self, private, object, num = 0L) {
     assert_that(are_count(num))
-    assert_that(is_same_len(object, num))
+    assert_that(have_same_len(object, num))
 
     val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
 

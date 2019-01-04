@@ -256,10 +256,10 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     }
 
     if (!is_scalar(model) && !is_scalar(weather))
-        assert_that(is_same_len(model, weather))
+        assert_that(have_same_len(model, weather))
 
     if (!is_scalar(model) && !is.null(eplus) && !is_scalar(eplus))
-        assert_that(is_same_len(model, eplus))
+        assert_that(have_same_len(model, eplus))
 
     model <- normalizePath(model, mustWork = TRUE)
     weather <- normalizePath(weather, mustWork = TRUE)
@@ -288,7 +288,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     if (is.null(output_dir)) {
         output_dir <- dirname(model)
     } else {
-        assert_that(is_same_len(model, output_dir))
+        assert_that(have_same_len(model, output_dir))
     }
 
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
