@@ -585,7 +585,7 @@ Epw <- R6::R6Class(classname = "Epw",
                 c("HOLIDAYS/DAYLIGHT SAVINGS", hldys_dlt_svgs), collapse = ",")
 
             header <- Filter(not_empty, header)
-            write_lines_eol(header, path)
+            write_lines(header, path)
 
             d <- data.table::copy(private$m_data)[, `:=`(datetime = NULL)]
             d <- private$drop_na(d)

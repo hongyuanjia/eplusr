@@ -604,7 +604,7 @@ download_idd <- function (ver = "latest", dir) {
         l[1] <- paste0("!IDD_Version ", ver)
         l[2] <- paste0("!IDD_BUILD ", cmt)
 
-        write_lines_eol(l, dest)
+        write_lines(l, dest)
     }
 
     message("EnergyPlus v", ver, " IDD file ", surround(file), " has been successfully ",
