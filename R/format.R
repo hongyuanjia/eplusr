@@ -18,6 +18,7 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
 
     header_option <- paste0("!-Option ", save_format)
 
+    special_format <- NULL
     if (special_format) {
         warn("warning_special_format",
             paste0("Currently, special format for classes such as ",
@@ -25,12 +26,10 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
                 "All objects will be formatted in standard way."
             )
         )
-        special_format <- NULL
     }
     if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
 
-    header_option <- paste0(header_option, " ", special_format, " ", in_ip)
-    header_option <- stri_trim_right(header_option)
+    header_option <- stri_trim_right(paste0(header_option, " ", special_format, " ", in_ip))
 
     # TODO: Add "UseSpecialFormat" support
     c(
@@ -84,8 +83,8 @@ format_output <- function (
     # }}}
 
     # get field value
-    fld <- format_field(dt_value, leading = leading, in_ip = in_ip,
-        sep_at = sep_at, index = index, blank = blank, end = end, required = required)
+    fld <- format_field(dt_value, leading = leading, sep_at = sep_at,
+        index = index, blank = blank, end = end, required = required)
 
     # init output as field values
     set(dt_value, NULL, "output", fld)
@@ -124,7 +123,9 @@ format_output <- function (
         h <- format_header(save_format = save_format, view_in_ip = in_ip, special_format = special_format)
     else h <- NULL
 
-    c(h, dt_value$output)
+    unlist(stringi::stri_split_lines(c(h, dt_value$output), omit_empty = FALSE),
+        recursive = FALSE, use.names = FALSE
+    )
 }
 # }}}
 
@@ -175,8 +176,10 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 # }}}
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
-format_objects <- function (dt_value, zoom = c("group", "class", "object", "field")) {
+format_objects <- function (dt_value, zoom = c("group", "class", "object", "field"), leading = 0L) {
     zoom <- match.arg(zoom)
+
+    spcs <- strrep(" ", leading)
 
     # tree_chars {{{
     # reference: https://github.com/r-lib/cli/blob/master/R/tree.R#L111
@@ -199,7 +202,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
     }
     # }}}
     # tree {{{
-    tree <- function (dt, leaf, branch, trunk = NULL, sep = FALSE, leading = 2) {
+    tree <- function (dt, leaf, branch, trunk = NULL, sep = FALSE) {
         char <- tree_chars()
 
         if (sep) {
@@ -240,7 +243,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
         dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id")])
         setorderv(dt, c("group_id"))
         dt <- dt[, list(group_name = group_name[1L], num = length(class_id)), by = c("group_id")][
-            , tree := paste0("[", lpad(num, "0"), "] Group: ", group_name)]
+            , tree := paste0(spcs, "[", lpad(num, "0"), "] Group: ", group_name)]
         # }}}
     } else if (zoom == "class") {
         # {{{
@@ -250,11 +253,11 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
             list(group_id = group_id[1L], group_name = group_name[1L],
                  class_name = class_name[1L], num = length(object_id)
             ), by = c("class_id")
-        ][, class := paste0("[", lpad(num, "0"), "] Class: ", class_name)]
+        ][, class := paste0(spcs, "[", lpad(num, "0"), "] Class: ", class_name)]
 
-        dt <- tree(dt, "class", "group_id", leading = 0L)
+        dt <- tree(dt, "class", "group_id")
 
-        dt <- dt[, list(tree = paste0("Group: ", group_name[1L], "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
+        dt <- dt[, list(tree = paste0(spcs, "Group: ", group_name[1L], "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
         dt[-1L, tree := paste0("\n", tree)]
         # }}}
     } else if (zoom == "object") {
@@ -267,13 +270,13 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
         dt <- dt[,
             list(group_name = group_name[1L],
                  group_id = group_id[1L],
-                 tree = paste0("Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n"))
+                 tree = paste0(spcs, "Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n"))
             ),
             by = "class_id"
         ]
 
-        dt <- tree(dt, "tree", branch = "group_id", sep = TRUE, leading = 0L)
-        dt <- dt[, list(tree = paste0("Group: ", group_name, "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
+        dt <- tree(dt, "tree", branch = "group_id", sep = TRUE)
+        dt <- dt[, list(tree = paste0(spcs, "Group: ", group_name, "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
         dt[-1L, tree := paste0("\n", tree)]
         # }}}
     } else {
@@ -284,7 +287,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
         )
         on.exit({set(dt_value, NULL, "field", NULL);invisible()}, add = TRUE)
 
-        dt <- tree(dt_value, "field", "object_id", "class_id", leading = 0L)
+        dt <- tree(dt_value, "field", "object_id", "class_id")
 
         dt <- dt[,
             list(class_name = class_name[1L],
@@ -303,11 +306,11 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
             )
         )
 
-        dt <- tree(dt, "object", "class_id", leading = 0L, sep = TRUE)
+        dt <- tree(dt, "object", "class_id", sep = TRUE)
 
         dt <- dt[,
             list(tree = paste0(
-                "Class: ", class_name, "\n", paste0(tree, collapse = "\n")
+                spcs, "Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n")
             )),
             by = "class_id"
         ]
@@ -321,7 +324,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
 # }}}
 
 # format_field: return Idf format field {{{
-format_field <- function (dt_value, leading = 4L, in_ip = FALSE, sep_at = 29L,
+format_field <- function (dt_value, leading = 4L, sep_at = 29L,
                           index = FALSE, blank = FALSE, end = TRUE, required = FALSE) {
 
     idx <- NULL
@@ -331,7 +334,7 @@ format_field <- function (dt_value, leading = 4L, in_ip = FALSE, sep_at = 29L,
     }
 
     val <- format_value(dt_value, leading = leading, length = sep_at, blank = blank, end = end)
-    nm <- format_name(dt_value, in_ip = in_ip)
+    nm <- format_name(dt_value)
 
     paste0(idx, val, nm)
 }
@@ -386,7 +389,7 @@ format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
 # }}}
 
 # format_name: return Idf format field names {{{
-format_name <- function (field_tbl, in_ip = FALSE) {
+format_name <- function (field_tbl) {
     s_nm(paste0("!- ", field_tbl[["full_name"]]))
 }
 # }}}
