@@ -138,6 +138,7 @@ parse_idf_file <- function (path, idd = NULL) {
 # read_lines_in_dt {{{
 read_lines_in_dt <- function(input, trim = TRUE, ...) {
     dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
+    if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
     if (trim) {
         set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
@@ -1500,86 +1501,6 @@ get_value_reference_map <- function (map, src, value) {
         },
         by = value_id
     ][, .SD, .SDcols = names(empty)]
-}
-# }}}
-
-# parse_err_file {{{
-parse_err_file <- function (path) {
-    if (file.exists(path)) {
-        res <- list(completed = FALSE, successful = FALSE, data = data.table::data.table())
-        data.table::setattr(res, "class", "ErrFile")
-        res
-    }
-
-    err_line <- readr::read_lines(path)
-    err_dt <- data.table::data.table(string = err_line)
-
-    reg_start <- "^\\s+\\*{5,}\\s+(.*)$"
-    reg_w_or_e <- "^\\s*\\**\\s+\\*\\*\\s*([^~\\s\\*]+)\\s*\\*\\*\\s+(.*)$"
-    reg_w_or_e_con <- "^\\s*\\**\\s+\\*\\*\\s*~~~\\s*\\*\\*\\s+(.*)$"
-    reg_comp_success <- "^\\s*\\*+ EnergyPlus Completed Successfully.*"
-    reg_ground_comp_success <- "^\\s*\\*+ GroundTempCalc\\S* Completed Successfully.*"
-    reg_comp_unsuccess <- "^\\s*\\*+ EnergyPlus Terminated.*"
-
-    err_dt[, `:=`(message = stringr::str_match(string, reg_start)[, 2])]
-    err_dt[, `:=`(seperate = !is.na(message),
-                  begin_environment = stringr::str_detect(message, "Beginning"))]
-    err_dt[is.na(begin_environment), begin_environment := FALSE]
-    err_dt[begin_environment == TRUE, environment_index := .GRP, by = list(message)]
-    err_dt[is.na(seperate), seperate := FALSE]
-
-    is_completed <- FALSE
-    is_successful <- FALSE
-    flg_success <- err_dt[seperate == TRUE,
-        any(stringr::str_detect(string, reg_comp_success) |
-            stringr::str_detect(string, reg_ground_comp_success))]
-    if (flg_success) {
-        is_completed <- TRUE
-        is_successful <- TRUE
-    }
-    flg_unsuccess <- err_dt[seperate == TRUE,
-        any(stringr::str_detect(string, reg_comp_unsuccess))]
-    if (flg_unsuccess) is_completed <- TRUE
-
-    l_final <- err_dt[seperate == TRUE & stringr::str_detect(message, "Final|Simulation Error Summary"),
-           which = TRUE]
-    if (is_empty(l_final)) l_final <- Inf
-    l_warm <- err_dt[seperate == TRUE & stringr::str_detect(message, "EnergyPlus Warmup Error Summary"),
-           which = TRUE]
-    if (is_empty(l_warm)) l_warm <- Inf
-    l_last_valid <- min(l_final, l_warm)
-
-    if (l_last_valid > 0L) err_dt <- err_dt[-(l_last_valid:.N)]
-
-    err_dt[is.na(message), c("level", "message") := {
-        res <- stringr::str_match(string, reg_w_or_e)[, 2:3]
-        list(res[,1], res[,2])}]
-    err_dt[is.na(message),
-           `:=`(message = stringr::str_match(string, reg_w_or_e_con)[, 2])]
-    err_dt <- err_dt[!is.na(message)]
-
-    err_dt[!is.na(level), `:=`(seperate = TRUE)]
-    err_dt[is.na(level) & seperate == TRUE, level := "Info"]
-    err_dt[is.na(level) & seperate == FALSE, `:=`(message = paste0("  ", message))]
-    err_dt[seperate == TRUE, index := .I]
-    err_dt[, `:=`(index = index[1L], level = level[1L]), by = list(cumsum(seperate == TRUE))]
-    err_dt[, `:=`(environment_index = environment_index[1L]), by = list(cumsum(begin_environment == TRUE))]
-    err_dt <- err_dt[!is.na(index)]
-
-    err_dt[begin_environment == FALSE & level == "Info", `:=`(level_index = data.table::rleid(index))]
-    err_dt[begin_environment == TRUE, `:=`(level_index = 0)]
-    err_dt[level == "Warning", `:=`(level_index = data.table::rleid(index))]
-    err_dt[level == "Severe", `:=`(level_index = data.table::rleid(index))]
-    err_dt[level == "Fatal", `:=`(level_index = data.table::rleid(index))]
-    err_dt[, `:=`(string = NULL)]
-    data.table::setcolorder(err_dt,
-        c("level", "message",
-          "environment_index", "index", "level_index",
-          "seperate", "begin_environment"))
-
-    res <- list(completed = is_completed, successful = is_successful, data = err_dt)
-    data.table::setattr(res, "class", "ErrFile")
-    res
 }
 # }}}
 
