@@ -7,8 +7,6 @@
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
 #' @importFrom progress progress_bar
-#' @importFrom readr read_lines
-#' @importFrom stringr str_trim
 #' @importFrom tools file_path_sans_ext
 NULL
 
@@ -246,20 +244,20 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
                        annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
-    assert_that(is_flag(design_day))
-    assert_that(is_flag(annual))
-    assert_that(is_flag(wait))
-    assert_that(is_flag(echo))
+    assert(is_flag(design_day))
+    assert(is_flag(annual))
+    assert(is_flag(wait))
+    assert(is_flag(echo))
 
     if (annual && design_day) {
         stop("Cannot force both design-day and annual simulations.", call. = FALSE)
     }
 
     if (!is_scalar(model) && !is_scalar(weather))
-        assert_that(have_same_len(model, weather))
+        assert(have_same_len(model, weather))
 
     if (!is_scalar(model) && !is.null(eplus) && !is_scalar(eplus))
-        assert_that(have_same_len(model, eplus))
+        assert(have_same_len(model, eplus))
 
     model <- normalizePath(model, mustWork = TRUE)
     weather <- normalizePath(weather, mustWork = TRUE)
@@ -288,7 +286,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     if (is.null(output_dir)) {
         output_dir <- dirname(model)
     } else {
-        assert_that(have_same_len(model, output_dir))
+        assert(have_same_len(model, output_dir))
     }
 
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
@@ -381,7 +379,7 @@ proc_print <- function(p, control = c(TRUE, TRUE)) {
 # reference: https://github.com/r-lib/revdepcheck/blob/master/R/event-loop.R
 run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
-    stopifnot(is.integer(options$num_parallel))
+    assert(is_integer(options$num_parallel))
 
     start_time <- Sys.time()
 
@@ -576,18 +574,22 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     output_suffix <- match.arg(output_suffix)
 
-    stopifnot(file.exists(eplus))
-    stopifnot(file.exists(model))
-    stopifnot(file.exists(weather))
-    stopifnot(is.null(output_dir) || dir.exists(output_dir))
-    stopifnot(is.null(output_prefix) || is_string(output_prefix))
-    stopifnot(is_flag(expand_obj))
-    stopifnot(is_flag(readvars))
-    stopifnot(is_flag(annual))
-    stopifnot(is_flag(design_day))
-    stopifnot(is.null(idd) || file.exists(idd))
-    stopifnot(is_flag(echo))
-    stopifnot(is_flag(wait))
+    assert(
+    )
+    assert(
+        file.exists(eplus),
+        file.exists(model),
+        file.exists(weather),
+        is.null(output_dir) || dir.exists(output_dir),
+        is.null(output_prefix) || is_string(output_prefix),
+        is_flag(expand_obj),
+        is_flag(readvars),
+        is_flag(annual),
+        is_flag(design_day),
+        is.null(idd) || file.exists(idd),
+        is_flag(echo),
+        is_flag(wait)
+    )
 
     if (annual && design_day) {
         stop("Cannot force both design-day and annual simulations.", call. = FALSE)

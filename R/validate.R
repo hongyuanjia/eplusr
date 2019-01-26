@@ -130,7 +130,7 @@ validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL
     if (is.character(level)) {
         level <- level_checks(level)
     } else {
-        stopifnot(is.list(level), has_names(level, names(custom_validate())))
+        assert(is.list(level), has_name(level, names(custom_validate())))
     }
 
     validate_objects(dt_idd, dt_idf, dt_object, dt_value,
@@ -186,17 +186,17 @@ validate_objects <- function
 )
 {
 
-    stopifnot(
-        is.logical(required_object),
-        is.logical(unique_object),
-        is.logical(unique_name),
-        is.logical(extensible),
-        is.logical(required_field),
-        is.logical(autofield),
-        is.logical(type),
-        is.logical(choice),
-        is.logical(range),
-        is.logical(reference)
+    assert(
+        is_flag(required_object),
+        is_flag(unique_object),
+        is_flag(unique_name),
+        is_flag(extensible),
+        is_flag(required_field),
+        is_flag(autofield),
+        is_flag(type),
+        is_flag(choice),
+        is_flag(range),
+        is_flag(reference)
     )
 
     # if object and value dt are not provided, then this means to validate the

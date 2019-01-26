@@ -326,14 +326,14 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
 # i_param_apply_measure {{{
 i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
-    assert_that(is.function(measure))
+    assert(is.function(measure))
 
     if (length(formals(measure)) == 0L) {
         stop("'measure' function must have at lease one argument")
     }
 
     measure_wrapper <- function (idf, ...) {
-        assert_that(is_idf(idf))
+        assert(is_idf(idf))
         idf <- idf$clone(deep = TRUE)
         measure(idf, ...)
     }
@@ -468,7 +468,7 @@ i_param_case_from_which <- function (self, private, which = NULL, name = FALSE) 
                 collapse(which[is.na(valid)]), ".", call. = FALSE)
 
         idx <- valid
-    } else if (are_count(which)) {
+    } else if (all(are_count(which))) {
         valid <- which <= length(nms)
         if (any(!valid))
             stop("Invalid job index found for current parametric job: ",
@@ -498,7 +498,7 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
     else {
-        assert_that(is_string(output_dir))
+        assert(is_string(output_dir))
     }
 
     if (!dir.exists(output_dir)) {

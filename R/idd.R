@@ -1,6 +1,4 @@
 #' @importFrom R6 R6Class
-#' @importFrom uuid UUIDgenerate
-#' @importFrom readr read_lines
 NULL
 
 #' Parse, Query and Modify EnergyPlus Input Data Dictionary (IDD)
@@ -323,7 +321,7 @@ idd_object <- function (self, private, class) {
 # }}}
 # idd_object_in_group {{{
 idd_object_in_group <- function (self, private, group) {
-    assert_that(is_string(group))
+    assert(is_string(group))
 
     grp_id <- idd_group_index(self, private, group)
 
@@ -381,7 +379,7 @@ idd_print <- function (self, private) {
     if (all(i %in% setdiff(ls(x), "initialize"))) {
         NextMethod()
     } else {
-        assert_that(is_string(i), msg = "Class name should be a string (a length one character vector)")
+        assert(is_string(i), msg = "Class name should be a string (a length one character vector)")
 
         in_nm <- underscore_name(i)
 
@@ -575,13 +573,13 @@ use_idd <- function (idd, download = FALSE) {
 # download_idd {{{
 download_idd <- function (ver = "latest", dir) {
     ver <- standardize_ver(ver)
-    assert_that(is_idd_ver(ver))
+    assert(is_idd_ver(ver))
 
-    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_eplus_ver(), "/idd/")
+    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", LATEST_EPLUS_VER, "/idd/")
 
     ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
 
-    if (identical(ver, latest_eplus_ver())) {
+    if (identical(ver, LATEST_EPLUS_VER)) {
         file_url <- "Energy%2B.idd.in"
     } else {
         file_url <- paste0("V", ver_dash, "-Energy%2B.idd")
@@ -596,13 +594,12 @@ download_idd <- function (ver = "latest", dir) {
     if (res != 0L)
         stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
 
-    if (identical(ver, latest_eplus_ver())) {
-        cmt <- all_eplus_release_commit()$commit[1]
+    if (identical(ver, LATEST_EPLUS_VER)) {
+        cmt <- ALL_EPLUS_RELEASE_COMMIT$commit[1]
 
-        l <- readr::read_lines(dest)
+        l <- read_lines_in_dt(dest, trim = FALSE)
 
-        l[1] <- paste0("!IDD_Version ", ver)
-        l[2] <- paste0("!IDD_BUILD ", cmt)
+        l[1L:2L, string := c(paste0("!IDD_Version ", ver), paste0("!IDD_BUILD ", cmt))]
 
         write_lines(l, dest)
     }
@@ -625,7 +622,7 @@ avail_idd <- function () names(.globals$idd)
 #' @export
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
-    assert_that(is_idd_ver(ver, strict = TRUE, only_released = FALSE))
+    assert(is_idd_ver(ver, strict = TRUE, only_released = FALSE))
     as.character(standardize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}

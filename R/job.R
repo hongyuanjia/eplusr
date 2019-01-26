@@ -1,8 +1,6 @@
 #' @importFrom R6 R6Class
-#' @importFrom readr read_lines
 #' @importFrom cli cat_bullet cat_line cat_rule
 #' @importFrom crayon bold
-#' @importFrom stringr str_trim
 #' @importFrom tools file_path_sans_ext
 NULL
 
@@ -307,7 +305,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
                     stop("The Idf object is not created from local file. ",
                          "Please give save it to disk before run.", call. = FALSE)
             } else {
-                assert_that(is_string(idf))
+                assert(is_string(idf))
                 private$m_path_idf <- idf
             }
 
@@ -322,7 +320,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
                     stop("The Epw object is not created from local file. ",
                          "Please give save it to disk before run.", call. = FALSE)
             } else {
-                assert_that(is_string(epw))
+                assert(is_string(epw))
                 private$m_path_epw <- epw
             }
 
@@ -333,7 +331,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
             # get Idf version
             if (!is.null(eplus_ver)) {
-                assert_that(is_eplus_ver(eplus_ver, strict = TRUE))
+                assert(is_eplus_ver(eplus_ver, strict = TRUE))
             } else {
                 eplus_ver <- get_idf_ver(read_lines_in_dt(private$m_path_idf))
                 if (is.null(eplus_ver))
@@ -579,7 +577,7 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, 
 
     }
 
-    if (must_exist) assert_that(file.exists(out))
+    if (must_exist) assert(file.exists(out))
 
     out
 }

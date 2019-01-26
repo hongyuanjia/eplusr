@@ -149,7 +149,7 @@ read_lines_in_dt <- function(input, trim = TRUE, ...) {
 
 # get_idd_ver {{{
 get_idd_ver <- function (idd_dt) {
-    stopifnot(inherits(idd_dt, "data.table"), has_names(idd_dt, c("line", "string")))
+    assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
     ver_line <- idd_dt[startsWith(string, "!IDD_Version")]
 
@@ -175,7 +175,7 @@ get_idd_ver <- function (idd_dt) {
 
 # get_idd_build {{{
 get_idd_build <- function (idd_dt) {
-    stopifnot(inherits(idd_dt, "data.table"), has_names(idd_dt, c("line", "string")))
+    assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
     build_line <- idd_dt[startsWith(string, "!IDD_BUILD")]
 
@@ -191,7 +191,7 @@ get_idd_build <- function (idd_dt) {
 
 # get_idf_ver {{{
 get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
-    stopifnot(inherits(idf_dt, "data.table"), has_names(idf_dt, c("line", "string")))
+    assert(inherits(idf_dt, "data.table"), has_name(idf_dt, c("line", "string")))
 
     if (!empty_removed) idf_dt <- idf_dt[!stri_isempty(string)]
 
@@ -601,9 +601,9 @@ get_field_table <- function (dt, type_enum) {
 
 # dcast_slash {{{
 dcast_slash <- function (dt, id, keys, keep = NULL) {
-    stopifnot(has_names(dt, id))
-    stopifnot(has_names(keys, c("flat", "nest")))
-    if (!is.null(keep)) stopifnot(has_names(dt, keep))
+    assert(has_name(dt, id))
+    assert(has_name(keys, c("flat", "nest")))
+    if (!is.null(keep)) assert(has_name(dt, keep))
 
     set(dt, NULL, "row", seq_len(nrow(dt)))
 
@@ -1050,7 +1050,7 @@ mark_idf_lines <- function (dt, type_enum) {
     if (length(l_m)) {
         dt[l_m, c("type", "body", "comment") :=({
             macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
-            is_m <- macro %in% macro_dict
+            is_m <- macro %in% MACRO_DICT
             if (any(is_m)) {
                 type[is_m] <- type_enum$macro
                 body[is_m] <- ""
@@ -1505,7 +1505,7 @@ get_value_reference_map <- function (map, src, value) {
 # }}}
 
 # parse_issue {{{
-parse_issue <- function (error_type, type = c("idf", "idd", "err"),
+parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
                          title, data = NULL, num = NULL, prefix = NULL, post = NULL,
                          stop = TRUE) {
 
@@ -1516,7 +1516,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
         if (is.null(num)) {
             num <- nrow(data)
         }
-        assert_that(has_names(data, c("line", "string")))
+        assert(has_name(data, c("line", "string")))
         mes <- paste0(data$msg_each, "Line ", data$line, ": ", data$string)
         if (!is.null(prefix)) {
             mes <- paste0(prefix, mes)
@@ -1566,7 +1566,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err"),
 insert_version <- function (x, ver) {
     if (is.character(x)) {
         paste0(x, "Version, ", standardize_ver(ver)[, 1L:2L], ";")
-    } else if (inherits(x, "data.table") && has_names(x, c("line", "string"))) {
+    } else if (inherits(x, "data.table") && has_name(x, c("line", "string"))) {
         ins_dt(x,
             data.table(
                 line = nrow(x) + 1L,

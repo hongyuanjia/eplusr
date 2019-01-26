@@ -2,7 +2,6 @@
 #' @importFrom crayon bold cyan red strip_style underline
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
-#' @importFrom stringr str_detect str_match str_replace_all
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
 #' @importFrom stringi stri_subset_regex stri_match_first_regex stri_rand_strings
 NULL
@@ -23,7 +22,7 @@ t_group_name <- function (dt_class, dt_group, class = NULL) {
 t_group_index <- function (dt_group, group = NULL) {
     if (is.null(group)) return(dt_group$group_id)
 
-    stopifnot(is.character(group))
+    assert(is.character(group))
 
     res <- dt_group[J(group), on = "group_name", group_id]
     if (anyNA(res)) abort_bad_key("error_group_name", "group name", group)
@@ -56,7 +55,7 @@ t_class_data <- function (dt_class, class = NULL, cols = NULL, underscore = FALS
             col_on <- "class_id"
             col_key <- "class index"
         } else {
-            stopifnot(has_name(dt_in, "class_name"))
+            assert(has_name(dt_in, "class_name"))
             if (underscore) {
                 if (!has_name(dt_in, "class_name_us")) {
                     set(dt_in, NULL, "class_name_us", underscore_name(dt_in$class_name))
@@ -76,7 +75,7 @@ t_class_data <- function (dt_class, class = NULL, cols = NULL, underscore = FALS
                 col_on <- "class_name"
             }
             col_key <- "class name"
-        } else if (are_count(class)) {
+        } else if (all(are_count(class))) {
             col_on <- "class_id"
             col_key <- "class index"
         } else {
@@ -181,7 +180,7 @@ t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL,
             col_on <- "object_id"
             col_key <- "object id"
         } else {
-            stopifnot(has_name(dt_in, "object_name"))
+            assert(has_name(dt_in, "object_name"))
             col_key <- "object name"
             if (ignore_case) {
                 if (!has_name(dt_in, "object_name_lower")) {
@@ -201,7 +200,7 @@ t_object_data <- function (dt_object, class = NULL, object = NULL, cols = NULL,
                 col_on <- "object_name"
             }
             col_key <- "object name"
-        } else if (are_count(object)){
+        } else if (all(are_count(object))){
             col_on <- "object_id"
             col_key <- "object id"
         } else {
@@ -306,7 +305,7 @@ t_object_num <- function (dt_object, class = NULL) {
 t_object_info <- function (dt_object, component = c("id", "name", "class"),
                            by_class = FALSE, numbered = TRUE, collapse = NULL,
                            prefix = NULL, name_prefix = TRUE) {
-    stopifnot(all(component %in% c("id", "name", "class")))
+    assert(component %in% c("id", "name", "class"))
 
     if (is.null(prefix)) {
         key_obj <- "Object"
@@ -439,7 +438,7 @@ t_field_data <- function (
     underscore = TRUE, no_ext = FALSE, all = FALSE, complete = FALSE
 )
 {
-    if (!is.null(field) && !is.character(field) && !are_count(field)) {
+    if (!is.null(field) && !is.character(field) && !are_counts(field)) {
         abort_bad_which_type("error_field_which_type", "field")
     }
 
@@ -511,9 +510,9 @@ t_field_data <- function (
         )
     }
 
-    assert_that(have_same_len(dt_in, field))
+    assert(have_same_len(dt_in, field))
 
-    if (are_count(field)) {
+    if (all(are_count(field))) {
         # from field index {{{
         col_on <- "field_index"
         set(dt_in, NULL, "field_index", field)
@@ -675,7 +674,7 @@ t_field_default_to_unit <- function (dt_field, from, to) {
 
     dt_field[!is.na(value_num), `:=`(default = as.list(value_num))]
 
-    int_trunc <- dt_field[type_enum == .globals$type$integer & !are_integerish(value_num)]
+    int_trunc <- dt_field[type_enum == .globals$type$integer & !are_integer(value_num)]
     if (nrow(int_trunc)) {
         mes <- paste0("Truncation errors introduced when converting integer ",
             "default values from ", toupper(from), " unit to ", toupper(to), " unit.")
@@ -782,7 +781,7 @@ t_value_data_in_class <- function (dt_idd, dt_idf, class, field = NULL, cols = N
 #' @param ignore_case If TRUE, object name matching will be case-insensitive.
 t_value_data_in_object <- function (dt_idd, dt_idf, class = NULL, object, field = NULL, cols = NULL,
                                     underscore = FALSE, ignore_case = FALSE) {
-    stopifnot(!is.null(object))
+    assert(!is.null(object))
     if (is.null(cols)) cols <- unique(c(names(object), names(dt_idf$value)))
 
     obj <- t_object_data(dt_idf$object, class, object,
@@ -1215,7 +1214,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
     get_type <- function (x) {
         if (is.null(x)) {
             4L
-        } else if (are_count(x)) {
+        } else if (all(are_count(x))) {
             1L
         } else if (is.character(x)) {
             2L
@@ -1935,7 +1934,7 @@ t_paste_object <- function (dt_idd, dt_idf, ver, in_ip = FALSE, unique = TRUE) {
 
         # NOTE: by default, IDF Editor only copies objects in a single class, which
         # makes it easy to remove duplicates
-        stopifnot(is_scalar(cls))
+        assert(is_scalar(cls))
 
         cols <- c("object_id", "class_id", "field_index", "value")
 
@@ -1974,7 +1973,6 @@ t_paste_object <- function (dt_idd, dt_idf, ver, in_ip = FALSE, unique = TRUE) {
             parsed$object <- parsed$object[!J(obj), on = "object_id"]
             parsed$value <- parsed$value[!J(obj), on = "object_id"]
         }
-        browser()
     }
 
     # add rleid for validation
@@ -2160,7 +2158,7 @@ errormsg_field_name <- function (dt) {
 
 # t_new_id {{{
 t_new_id <- function (dt, name, num) {
-    stopifnot(has_name(dt, name))
+    assert(has_name(dt, name))
     max(dt[[name]], na.rm = TRUE) + seq_len(num)
 }
 # }}}
@@ -2204,11 +2202,11 @@ add_rleid <- function (dt, prefix = NULL) {
 #'             - The acceptable field number will be the field index of the last
 #'               field in the last extensible group.
 add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input = FALSE) {
-    stopifnot(has_names(dt_class,
+    assert(has_name(dt_class,
         c("min_fields", "last_required", "num_fields", "num_extensible", "first_extensible"))
     )
 
-    stopifnot(is.null(num) || are_count(num))
+    assert(is.null(num) || are_count(num))
 
     dt_class <- add_rleid(dt_class, "class")
 
@@ -2232,8 +2230,8 @@ add_accept_field_num <- function (dt_class, num = NULL, all = FALSE, keep_input 
         set(dt_class, NULL, "input_num", 0L)
         dt_class[min_fields == 0L & last_required == 0L, input_num := num_fields]
     } else {
-        stopifnot(have_same_len(dt_class, num))
-        stopifnot(are_count(num))
+        assert(have_same_len(dt_class, num))
+        assert(are_count(num))
         set(dt_class, NULL, "input_num", as.integer(num))
         if (all) {
             dt_class[input_num <= num_fields, input_num := num_fields]
@@ -2273,10 +2271,10 @@ get_input_class_data <- function (dt_class, class, num = NULL) {
         dt_cls <- class
 
         if (is.null(num)) {
-            stopifnot(has_name(dt_cls, "num"))
+            assert(has_name(dt_cls, "num"))
             set(dt_cls, NULL, "num", as.integer(dt_cls$num))
         } else {
-            stopifnot(are_count(num))
+            assert(are_count(num))
             set(dt_cls, NULL, "num", as.integer(num))
         }
 
@@ -2291,8 +2289,8 @@ get_input_class_data <- function (dt_class, class, num = NULL) {
 
         # dt_cls <- add_accept_field_num(dt_cls)
 
-        stopifnot(are_count(num))
-        stopifnot(have_same_len(class, num))
+        assert(are_count(num))
+        assert(have_same_len(class, num))
         set(dt_cls, NULL, "num", as.integer(num))
     }
 }
@@ -2327,40 +2325,21 @@ assign_default_value <- function (dt_value) {
     dt_value
 }
 # }}}
-# make_field_range {{{
-make_field_range <- function (minimum, lower_incbounds, maximum, upper_incbounds) {
-    r <- list(
-        minimum = minimum, lower_incbounds = lower_incbounds,
-        maximum = maximum, upper_incbounds = upper_incbounds)
-    data.table::setattr(r, "class", c("IddFieldRange", "list"))
-    r
-}
-# }}}
 # ins_dt {{{
 ins_dt <- function (dt, new_dt, base_col = NULL) {
-    stopifnot(has_names(new_dt, names(dt)))
+    assert(has_name(new_dt, names(dt)))
 
     if (is.null(base_col)) {
-        rbindlist(
-            list(
-                dt,
-                new_dt[, .SD, .SDcols = names(dt)]
-            )
-        )
+        rbindlist(list(dt, new_dt[, .SD, .SDcols = names(dt)]))
     } else {
-        rbindlist(
-            list(
-                dt[!new_dt, on = base_col],
-                new_dt[, .SD, .SDcols = names(dt)]
-            )
-        )
+        rbindlist(list(dt[!new_dt, on = base_col], new_dt[, .SD, .SDcols = names(dt)]))
     }
 }
 # }}}
 # merge_idf_data {{{
 merge_idf_data <- function (dt_idf, dt) {
-    stopifnot(is.environment(dt_idf))
-    stopifnot(has_names(dt, c("object", "value", "reference")))
+    assert(is.environment(dt_idf))
+    assert(has_name(dt, c("object", "value", "reference")))
     dt_idf$object <- ins_dt(dt_idf$object, dt$object, "object_id")
     dt_idf$value <- ins_dt(dt_idf$value, dt$value, "value_id")
     dt_idf$reference <- dt$reference
@@ -2643,7 +2622,7 @@ i_class_reference <- function (self, private, class = NULL) {
 
 # i_reference_map {{{
 i_reference_map <- function (self, private, class) {
-    assert_that(i_is_valid_class_name(self, private, class))
+    assert(i_is_valid_class_name(self, private, class))
     # check if this class has \reference-class-name
     if (is_empty(private$m_idd_tbl$class_reference)) {
         ref_class <- character(0)
@@ -2703,8 +2682,8 @@ i_field_tbl <- function (self, private, class = NULL) {
 
 # i_field_tbl_from_num: return acceptable number of fields {{{
 i_field_tbl_from_num <- function (self, private, class, num = 0L) {
-    assert_that(are_count(num))
-    assert_that(have_same_len(class, num))
+    assert(are_count(num))
+    assert(have_same_len(class, num))
 
     num <- i_field_num_from_index(self, private, class, num)
     cls_tbl <- i_class_tbl_from_which(self, private, class)[, `:=`(num = num)]
@@ -2728,8 +2707,8 @@ i_field_tbl_from_num <- function (self, private, class, num = 0L) {
 
 # i_is_valid_field_index_ext {{{
 i_is_valid_field_index_ext <- function (self, private, class, index) {
-    assert_that(are_count(index))
-    assert_that(have_same_len(class, index))
+    assert(are_count(index))
+    assert(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -2739,8 +2718,8 @@ i_is_valid_field_index_ext <- function (self, private, class, index) {
 
 # i_assert_valid_field_index_ext {{{
 i_assert_valid_field_index_ext <- function (self, private, class, index) {
-    assert_that(are_count(index))
-    assert_that(have_same_len(class, index))
+    assert(are_count(index))
+    assert(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -2755,8 +2734,8 @@ i_assert_valid_field_index_ext <- function (self, private, class, index) {
 
 # i_is_valid_field_num {{{
 i_is_valid_field_num <- function (self, private, class, num) {
-    assert_that(are_count(num))
-    assert_that(have_same_len(class, num))
+    assert(are_count(num))
+    assert(have_same_len(class, num))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
 
@@ -2835,7 +2814,7 @@ i_class_field_name <- function (self, private, class, lower = FALSE) {
 ################################################################################
 # i_field_tbl_from_which {{{
 i_field_tbl_from_which <- function (self, private, class, which = NULL) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
 
     if (is.null(which)) return(i_field_tbl(self, private, class))
 
@@ -2859,7 +2838,7 @@ i_field_tbl_from_which <- function (self, private, class, which = NULL) {
 
 # i_field_index {{{
 i_field_index <- function (self, private, class, name = NULL) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
     fld_tbl <- i_field_tbl(self, private, class)
 
     if (is.null(name)) return(fld_tbl$field_index)
@@ -2884,7 +2863,7 @@ i_field_index <- function (self, private, class, name = NULL) {
 
 # i_field_index_from_which {{{
 i_field_index_from_which <- function (self, private, class, which = NULL) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
     if (is.null(which)) return(i_field_index(self, private, class))
 
     if (is.numeric(which)) {
@@ -2902,7 +2881,7 @@ i_field_index_from_which <- function (self, private, class, which = NULL) {
 # i_field_name {{{
 i_field_name <- function (self, private, class, index = NULL, lower = FALSE,
                           unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
 
     fld_tbl <- i_field_tbl(self, private, class)
 
@@ -2930,7 +2909,7 @@ i_field_name <- function (self, private, class, index = NULL, lower = FALSE,
 
 # i_is_valid_field_name {{{
 i_is_valid_field_name <- function (self, private, class, name) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
 
     fld_tbl <- i_field_tbl(self, private, class)
 
@@ -2942,14 +2921,14 @@ i_is_valid_field_name <- function (self, private, class, name) {
 
 # i_is_valid_field_index {{{
 i_is_valid_field_index <- function (self, private, class, index) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
     index <= i_class_tbl_from_which(self, private, class)$num_fields
 }
 # }}}
 
 # i_assert_valid_field_index {{{
 i_assert_valid_field_index <- function (self, private, class, index) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
     valid <- index <= cls_tbl$num_fields
@@ -2973,7 +2952,7 @@ i_assert_valid_field_name <- function (self, private, class, name) {
 
 # i_field_note {{{
 i_field_note <- function (self, private, class, which = NULL) {
-    assert_that(is_scalar(class))
+    assert(is_scalar(class))
 
     cls_in <- i_in_tbl_from_which(self, private, "class", class)
 
@@ -3036,7 +3015,7 @@ i_field_range <- function (self, private, class, which = NULL) {
             r <- list(
                 minimum = minimum, lower_incbounds = lower_incbounds,
                 maximum = maximum, upper_incbounds = upper_incbounds)
-            data.table::setattr(r, "class", c("IddFieldRange", "list"))
+            data.table::setattr(r, "class", c("FieldRange", "list"))
             r
         })
         ), by = "field_id"]
@@ -3113,8 +3092,8 @@ i_field_external_list <- function (self, private, class) {
 
 # i_is_extensible_index {{{
 i_is_extensible_index <- function (self, private, class, index) {
-    assert_that(is_scalar(class))
-    assert_that(are_count(index))
+    assert(is_scalar(class))
+    assert(are_count(index))
     cls_tbl <- i_class_tbl_from_which(self, private, class)
     if (!cls_tbl$num_extensible)
         return(rep(FALSE, length(index)))
@@ -3141,7 +3120,7 @@ i_last_required_extensible_field_index <- function (self, private, class = NULL)
 
 # i_field_index_from_extensible_index {{{
 i_field_index_from_extensible_index <- function (self, private, class, index) {
-    assert_that(have_same_len(class, index))
+    assert(have_same_len(class, index))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
     i_assert_extensible_class(self, private, cls_tbl$class_name)
@@ -3161,9 +3140,9 @@ i_extensible_group_tbl_from_range <- function (self, private, class, from, to) {
     if (!(length(class) == length(from) & length(from) == length(to)))
         stop("`class`, `from` and `to` should have the same length.", call. = FALSE)
 
-    assert_that(are_count(from))
-    assert_that(are_count(to))
-    assert_that(all(from <= to))
+    assert(are_count(from))
+    assert(are_count(to))
+    assert(all(from <= to))
 
     cls_tbl <- i_class_tbl_from_which(self, private, class)
     fld_tbl <- i_field_tbl(self, private, class)
@@ -3252,7 +3231,7 @@ i_add_extensible_group <- function (self, private, class, num) {
             cls_tbl[num_extensible == 0L, paste0("  ", lpad(class_rleid),
                 "| Class ", surround(class_name), ".", collapse = "\n")], call. = FALSE)
 
-    assert_that(have_same_len(class, num))
+    assert(have_same_len(class, num))
 
     new_ext_fld <- i_extensible_group_tbl_from_range(self, private, class,
         from = cls_tbl$num_extensible_group + 1, to = cls_tbl$num_extensible_group + num)
@@ -3271,7 +3250,7 @@ i_add_extensible_group <- function (self, private, class, num) {
     # i_add_attr_tbl: helper to append field attribute tables {{{
     i_add_attr_tbl <- function (self, private, name, id_tbl) {
         tbl_name <- paste0("field_", name)
-        assert_that(has_name(private$m_idd_tbl, tbl_name))
+        assert(has_name(private$m_idd_tbl, tbl_name))
 
         attr_tbl_full <- private$m_idd_tbl[[tbl_name]][id_tbl, on = "field_id",
             allow.cartesian = TRUE]
@@ -3321,7 +3300,7 @@ i_del_extensible_group <- function (self, private, class, num) {
                 "| Class ", surround(class_name), ": ", surround(new_ext_num),
                 ".", collapse = "\n")], call. = FALSE)
 
-    assert_that(have_same_len(class, num))
+    assert(have_same_len(class, num))
 
     cls_tbl[, `:=`(del_ext_num = num)]
     cls_tbl[, `:=`(left_fields = num_fields - del_ext_num * num_extensible)]
@@ -3477,7 +3456,7 @@ i_object_id_from_which <- function (self, private, which) {
 
 # i_is_valid_object_id {{{
 i_is_valid_object_id <- function (self, private, id) {
-    assert_that(are_count(id))
+    assert(are_count(id))
     id %in% private$m_idf_tbl$object$object_id
 }
 # }}}
@@ -3516,7 +3495,7 @@ i_object_name <- function (self, private, class = NULL, simplify = FALSE, upper 
 
 # i_is_valid_object_name {{{
 i_is_valid_object_name <- function (self, private, name) {
-    assert_that(is.character(name))
+    assert(is.character(name))
     toupper(name) %in% private$m_idf_tbl$object[!is.na(object_name), object_name_upper]
 }
 # }}}
@@ -3694,7 +3673,7 @@ i_iddobject <- function (self, private, class) {
 
 # i_iddobject_in_group {{{
 i_iddobject_in_group <- function (self, private, group) {
-    assert_that(is_string(group))
+    assert(is_string(group))
     i_assert_valid_group_name(self, private, group)
 
     cls <- private$m_idd_tbl$group[group_name == group][
@@ -4381,7 +4360,7 @@ i_deep_clone <- function (self, private, name, value, type) {
 
 # i_assign_object_tbl {{{
 i_assign_object_tbl <- function (self, private, new_tbl) {
-    assert_that(has_names(new_tbl, names(private$m_idf_tbl$object)))
+    assert(has_name(new_tbl, names(private$m_idf_tbl$object)))
 
     private$m_idf_tbl$object <- data.table::rbindlist(list(
         private$m_idf_tbl$object[!object_id %in% new_tbl$object_id],
@@ -4754,8 +4733,8 @@ i_value_tbl_from_which <- function (self, private, object = NULL, field = TRUE, 
 
 # i_value_tbl_from_num {{{
 i_value_tbl_from_num <- function (self, private, object, num = 0L) {
-    assert_that(are_count(num))
-    assert_that(have_same_len(object, num))
+    assert(are_count(num))
+    assert(have_same_len(object, num))
 
     val_tbl <- i_value_tbl_from_which(self, private, object, field = FALSE)
 
@@ -4934,7 +4913,7 @@ i_value_num <- function (self, private, which = NULL) {
 
 # i_assign_value_tbl {{{
 i_assign_value_tbl <- function (self, private, new_tbl) {
-    assert_that(has_names(new_tbl, names(private$m_idf_tbl$value)))
+    assert(has_name(new_tbl, names(private$m_idf_tbl$value)))
 
     private$m_idf_tbl$value <- data.table::rbindlist(list(
         private$m_idf_tbl$value[!object_id %in% unique(new_tbl$object_id)],
@@ -5185,7 +5164,7 @@ i_msg_info <- function (msg_tbl, type = c("add", "set")) {
 
 # i_msg_invalid_value_name {{{
 i_msg_invalid_value_name <- function (value_tbl, type = c("add", "set")) {
-    assert_that(has_name(value_tbl, "field_name_in"))
+    assert(has_name(value_tbl, "field_name_in"))
 
     by_col <- c("object_rleid", "class_name")
     if (type == "set") by_col <- c(by_col, "object_id")
@@ -5201,7 +5180,7 @@ i_msg_invalid_value_name <- function (value_tbl, type = c("add", "set")) {
 
 # i_msg_invalid_value_num {{{
 i_msg_invalid_value_num <- function (value_tbl, type = c("add", "set")) {
-    assert_that(has_names(value_tbl, c("object_rleid", "class_name", "min_fields",
+    assert(has_name(value_tbl, c("object_rleid", "class_name", "min_fields",
         "num_fields", "value_num", "num_extensible", "first_extensible")))
 
     msg_tbl <- i_msg_info(value_tbl, type)
@@ -5223,7 +5202,7 @@ i_msg_invalid_value_num <- function (value_tbl, type = c("add", "set")) {
 
 # i_msg_invalid_ext {{{
 i_msg_invalid_ext <- function (value_tbl, type = c("add", "set")) {
-    assert_that(has_names(value_tbl, c("field_name_in")))
+    assert(has_name(value_tbl, c("field_name_in")))
 
     by_col <- c("object_rleid", "class_name")
     if (type == "set") by_col <- c(by_col, "object_id")
@@ -5239,7 +5218,7 @@ i_msg_invalid_ext <- function (value_tbl, type = c("add", "set")) {
 
 # i_value_tbl_from_field_which {{{
 i_value_tbl_from_field_which <- function (self, private, object, which = NULL) {
-    assert_that(is_scalar(object))
+    assert(is_scalar(object))
 
     obj_in <- i_in_tbl_from_which(self, private, "object", object)
 
@@ -5299,7 +5278,7 @@ i_comment_num <- function (self, private, which = NULL) {
 
 # i_assign_comment_tbl {{{
 i_assign_comment_tbl <- function (self, private, new_tbl, exclude = TRUE) {
-    assert_that(has_names(new_tbl, names(private$m_idf_tbl$comment)))
+    assert(has_name(new_tbl, names(private$m_idf_tbl$comment)))
 
     if (exclude)
         private$m_idf_tbl$comment <- data.table::rbindlist(list(
@@ -5459,7 +5438,7 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
             path <- private$m_path
         }
     } else {
-        assert_that(is_string(path))
+        assert(is_string(path))
     }
 
     if (private$m_is_imf & !has_ext(path, "imf")) {
@@ -5467,7 +5446,7 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
             "file other than `imf` file may cause errors during simulation.",
             call. = FALSE)
     } else {
-        assert_that(has_exts(path, c("idf", "imf")),
+        assert(has_ext(path, c("idf", "imf")),
             msg = paste0("`path` should have an extension of `idf` or `imf`."))
     }
 
@@ -5499,7 +5478,7 @@ i_idf_save <- function (self, private, path = NULL, format = eplusr_option("save
         old = private$m_path, new = path, copy = copy_external)
 
     str <- i_object_string(self, private, header = TRUE, comment = TRUE, save_format = format)
-    write_lines_eol(str, path)
+    write_lines(str, path)
 
     # log saved
     i_log_saved_idf(self, private)
@@ -5669,18 +5648,18 @@ i_idf_resolve_external_link <- function (self, private, old, new, copy = TRUE) {
 
 # i_idfobj_set_comment {{{
 i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE, width = 0L) {
-    assert_that(is_scalar(object))
+    assert(is_scalar(object))
     obj_tbl <- i_object_tbl_from_which(self, private, object)
 
     if (is.null(comment)) {
         i_remove_comment_from_which(self, private, obj_tbl$object_id)
     } else {
-        assert_that(is.character(comment))
+        assert(is.character(comment))
 
         comment <- strsplit(comment, "\n", fixed = TRUE)
 
         if (width != 0L) {
-            assert_that(is_count(width))
+            assert(is_count(width))
             comment <- strwrap(comment, width = width)
         }
 
@@ -5692,7 +5671,7 @@ i_idfobj_set_comment <- function (self, private, object, comment, append = TRUE,
             # add new
             i_assign_comment_tbl(self, private, new_cmt_tbl, exclude = TRUE)
         } else {
-            assert_that(is_scalar(append),
+            assert(is_scalar(append),
                 msg = "`append` should be NULL or a single logical value."
             )
             if (append) {

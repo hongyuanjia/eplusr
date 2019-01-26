@@ -1,7 +1,4 @@
-#' @importFrom stringr str_trim str_replace
-#' @importFrom data.table setorder rleid setnames copy
 #' @importFrom cli boxx rule cat_line symbol
-#' @importFrom data.table setorder
 #' @importFrom crayon red green cyan yellow magenta bold
 #' @importFrom utils capture.output
 NULL
@@ -50,22 +47,24 @@ format_output <- function (
     blank = FALSE, end = TRUE, required = FALSE
 )
 {
-    stopifnot(has_names(dt_value, c("object_id", "class_id", "class_name", "field_index")))
+    assert(has_name(dt_value, c("object_id", "class_id", "class_name", "field_index")))
 
     save_format <- match.arg(save_format)
-    stopifnot(is_count(leading))
-    stopifnot(is.logical(in_ip))
-    stopifnot(is_count(sep_at))
-    stopifnot(is.logical(index))
-    stopifnot(is.logical(blank))
-    stopifnot(is.logical(end))
-    stopifnot(is.logical(required))
+    assert(
+        is_count(leading),
+        is_flag(in_ip),
+        is_count(sep_at),
+        is_flag(index),
+        is_flag(blank),
+        is_flag(end),
+        is_flag(required)
+    )
 
     # object order {{{
     if (save_format == "sorted") {
         setorderv(dt_value, c("class_id", "object_id", "field_index"))
     } else {
-        stopifnot(!is.null(dt_order))
+        assert(!is.null(dt_order))
         dt_value <- dt_value[dt_order, on = "object_id"]
         if (save_format == "new_top") {
             setorderv(dt_value,
@@ -95,7 +94,7 @@ format_output <- function (
 
     # add comments
     if (comment) {
-        stopifnot(!is.null(dt_object))
+        assert(!is.null(dt_object))
         cmt <- format_comment(dt_object)
         dt_value[cmt, on = "object_id", mult = "first",
             output := paste0(cmt$comment, "\n", output)
@@ -131,7 +130,7 @@ format_output <- function (
 
 # format_refmap: return pretty formatted tree string for IdfObjectRefMap {{{
 format_refmap <- function (ref_map, in_ip = FALSE) {
-    assert_that(inherits(ref_map, "IdfObjectRefMap"))
+    assert(inherits(ref_map, "IdfObjectRefMap"))
 
     ref_by <- format_refmap_sgl(ref_map$reference_by, "by", in_ip)
     ref_from <- format_refmap_sgl(ref_map$reference_from, "from", in_ip)
@@ -235,8 +234,8 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
     }
     # }}}
 
-    if (zoom %in% c("group", "class")) stopifnot(has_name(dt_value, "group_name"))
-    if (zoom %in% c("object", "field")) stopifnot(has_name(dt_value, "object_name"))
+    if (zoom %in% c("group", "class")) assert(has_name(dt_value, "group_name"))
+    if (zoom %in% c("object", "field")) assert(has_name(dt_value, "object_name"))
 
     if (zoom == "group") {
         # {{{
@@ -342,7 +341,7 @@ format_field <- function (dt_value, leading = 4L, sep_at = 29L,
 
 # format_index: return right aligned field index {{{
 format_index <- function (dt_value, required = FALSE) {
-    if (required) stopifnot(has_name(dt_value, "required_field"))
+    if (required) assert(has_name(dt_value, "required_field"))
 
     idx <- lpad(dt_value$field_index)
 
@@ -410,13 +409,13 @@ format_comment <- function (dt_object) {
 update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "value") {
     val_suffix <- c("", "_upper", "_num", "_ipnum")
     req_val <- paste0(prefix, val_suffix)
-    assert_that(has_names(value_tbl, req_val))
+    assert(has_name(value_tbl, req_val))
 
     # add unit conversion data if necessary
     joined_before <- TRUE
-    if (!has_names(value_tbl, c("si_name", "mult", "offset"))) {
+    if (!has_name(value_tbl, c("si_name", "mult", "offset"))) {
         joined_before <- FALSE
-        assert_that(has_names(value_tbl, c("type", "units", "ip_units")))
+        assert(has_name(value_tbl, c("type", "units", "ip_units")))
         value_tbl <- unit_conv_table[value_tbl, on = c(si_name = "units", ip_name = "ip_units")]
     }
     setnames(value_tbl,
@@ -427,7 +426,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
         value_tbl[
             !is.na(value_ipnum) & type == "real",
             `:=`(value = as.character(round(value_ipnum, digits = digits)))][
-            !is.na(value_ipnum) & type == "integer" & is_integerish(value_ipnum),
+            !is.na(value_ipnum) & type == "integer" & is_integer(value_ipnum),
             `:=`(value = as.character(round(value_ipnum)))][
             !is.na(value_ipnum) & !is.na(units),
             `:=`(value_num = value_ipnum / mult - offset)]
@@ -435,7 +434,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
         value_tbl[
             !is.na(value_num) & type == "real",
             `:=`(value = as.character(round(value_num, digits = digits)))][
-            !is.na(value_num) & type == "integer" & is_integerish(value_num),
+            !is.na(value_num) & type == "integer" & is_integer(value_num),
             `:=`(value = as.character(round(value_num)))][
             !is.na(value_num) & !is.na(units),
             `:=`(value_ipnum = value_num * mult + offset)]
@@ -455,7 +454,7 @@ update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "v
 
 # value_list: return a list of field values with correct types {{{
 value_list <- function (value_tbl, in_ip = FALSE) {
-    assert_that(has_names(value_tbl, c("value", "value_num", "value_ipnum", "type")))
+    assert(has_name(value_tbl, c("value", "value_num", "value_ipnum", "type")))
 
     num_col <- ifelse(in_ip, "value_ipnum", "value_num")
 
@@ -529,11 +528,42 @@ print.IddFieldPossible <- function (x, ...) {
 # }}}
 
 #' @export
-# print.IddFieldRange {{{
-print.IddFieldRange <- function (x, ...) {
-    if (is.na(x$lower_incbounds) & is.na(x$upper_incbounds)) {
+# format.FieldRange {{{
+format.FieldRange <- function (x, ...) {
+    if (is.na(x$minimum) && is.na(x$maximum)) {
+        return("<Not Applicable>")
+    }
+
+    if (!is.na(x$minimum)) {
+        if (x$lower_incbounds) {
+            left <- paste0("[", x$minimum)
+        } else {
+            left <- paste0("(", x$minimum)
+        }
+    } else {
+        left <- "(-Inf"
+    }
+
+    if (!is.na(x$maximum)) {
+        if (x$upper_incbounds) {
+            right <- paste0(x$maximum, "]")
+        } else {
+            right <- paste0(x$maximum, ")")
+        }
+    } else {
+        right <- "Inf)"
+    }
+
+    paste0(left, ", ", right)
+}
+# }}}
+#' @export
+# print.FieldRange {{{
+print.FieldRange <- function (x, ...) {
+    format.FieldRange(x, ...)
+    if (is.na(x$minimum) && is.na(x$maximum)) {
         cat("<Not Applicable>")
-        return(invisible(NULL))
+        return(invisible(x))
     }
 
     if (!is.na(x$minimum)) {
@@ -557,6 +587,13 @@ print.IddFieldRange <- function (x, ...) {
     }
 
     cli::cat_line(paste0(left, ", ", right))
+    invisible(x)
+}
+# }}}
+#' @export
+# as.character.FieldRange{{{
+as.character.FieldRange <- function (x, ...) {
+    format.FieldRange(x, ...)
 }
 # }}}
 

@@ -99,8 +99,13 @@ clone_generator <- function (x) {
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
 write_lines <- function (x, file = "") {
-    stopifnot(is.character(x))
-    fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE)
+    if (inherits(x, "data.table")) {
+        assert(has_name(x, "string"))
+        fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE)
+    } else {
+        assert(is.character(x))
+        fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE)
+    }
 }
 # }}}
 
@@ -119,11 +124,13 @@ os_type <- function () {
 # }}}
 
 # standardize_ver {{{
-standardize_ver <- function (ver) {
-    if (identical(ver, "latest")) ver <- latest_eplus_ver()
-    if (is_integerish(ver)) ver <- paste0(ver, ".0")
-    ver <- as.numeric_version(ver)
-    if (is.na(ver[1,3])) ver[1,3] <- 0
+standardize_ver <- function (ver, strict = FALSE) {
+    assert(is_scalar(ver))
+    if (!strict && identical(ver, "latest")) ver <- LATEST_EPLUS_VER
+    if (is_integer(ver)) ver <- paste0(ver, ".0")
+    ver <- numeric_version(ver, strict = FALSE)
+    if (is.na(ver)) return(ver)
+    if (is.na(ver[1L, 3L])) ver[1L, 3L] <- 0L
     ver
 }
 # }}}
@@ -220,5 +227,50 @@ names2 <- function (x, default = NA_character_) {
 # each_length {{{
 each_length <- function (x) {
     vapply(x, length, integer(1L))
+}
+# }}}
+
+# in_range {{{
+in_range <- function (x, range) {
+    if (range$lower_incbounds == range$upper_incbounds) {
+        between(x, range$minimum, range$maximum, range$lower_incbounds)
+    } else {
+        if (range$lower_incbounds) {
+            x >= range$minimum & x < range$maximum
+        } else {
+            x > range$minimum & x <= range$maximum
+        }
+    }
+}
+# }}}
+
+# make_field_range {{{
+make_field_range <- function (minimum, lower_incbounds, maximum, upper_incbounds) {
+    assert(is_number(minimum), is_number(maximum), is_falg(lower_incbounds), is_flag(upper_incbounds))
+    setattr(
+        list(
+            minimum = minimum, lower_incbounds = lower_incbounds,
+            maximum = maximum, upper_incbounds = upper_incbounds
+        ),
+        "class", c("FieldRange", "list")
+    )
+}
+# }}}
+
+# ins_dt {{{
+ins_dt <- function (dt, new_dt, base_col = NULL) {
+    assert(has_name(new_dt, names(dt)))
+
+    if (is.null(base_col)) {
+        rbindlist(list(dt, new_dt[, .SD, .SDcols = names(dt)]))
+    } else {
+        rbindlist(list(dt[!new_dt, on = base_col], new_dt[, .SD, .SDcols = names(dt)]))
+    }
+}
+# }}}
+
+# unique_id {{{
+unique_id <- function () {
+    paste0("id-", stri_rand_strings(1, 15L))
 }
 # }}}

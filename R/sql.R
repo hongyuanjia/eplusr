@@ -156,9 +156,9 @@ EplusSql <- R6::R6Class(classname = "EplusSql",
 
         # INITIALIZE {{{
         initialize = function (sql) {
-            assert_that(is_string(sql))
-            assert_that(file.exists(sql))
-            assert_that(eplusr:::has_ext(sql, "sql"))
+            assert(is_string(sql))
+            assert(file.exists(sql))
+            assert(has_ext(sql, "sql"))
             private$m_path_sql <- normalizePath(sql, mustWork = TRUE)
         },
         # }}}
@@ -216,7 +216,7 @@ i_sql_list_table <- function (self, private) {
 
 # i_sql_read_table {{{
 i_sql_read_table <- function (self, private, table) {
-    assert_that(is_string(table))
+    assert(is_string(table))
     sql_read_table(i_sql_path(self, private), table)
 }
 # }}}
@@ -264,7 +264,7 @@ i_sql_print <- function (self, private) {
 
 # sql_connect {{{
 sql_connect <- function (sql) {
-    stopifnot(file.exists(sql))
+    assert(file.exists(sql))
     RSQLite::dbConnect(RSQLite::SQLite(), sql)
 }
 # }}}
@@ -294,7 +294,7 @@ sql_report_data_query <- function (key_value = NULL, name = NULL) {
         if (is.null(name)) {
             where <- "ReportDataDictionary"
         } else {
-            stopifnot(is.character(name))
+            assert(is.character(name))
             where <- paste0(
                 "
                 SELECT *
@@ -304,7 +304,7 @@ sql_report_data_query <- function (key_value = NULL, name = NULL) {
             )
         }
     } else {
-        stopifnot(is.character(key_value))
+        assert(is.character(key_value))
         if (is.null(name)) {
             where <- paste0(
                 "
@@ -394,7 +394,7 @@ sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
     if (tz != "GMT") res$DateTime <- lubridate::force_tz(res$DateTime, tz)
 
     if (not_empty(case)) {
-        assert_that(is_scalar(case))
+        assert(is_scalar(case))
         case_name <- as.character(case)
         res[, Case := case_name]
         data.table::setcolorder(res, c("Case", setdiff(names(res), "Case")))

@@ -415,9 +415,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
                 stop("IdfObject can be created only after a parent Idf object ",
                     "has been initialized.", call. = FALSE)
 
-            assert_that(is_count(object_id))
+            assert(is_count(object_id))
             if (!is.null(class_id)) {
-                assert_that(is_count(class_id))
+                assert(is_count(class_id))
             } else {
                 class_id <- t_object_data(private$m_idf_tbl$object, NULL, object_id)$class_id
             }
@@ -515,7 +515,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 
 # idfobj_print {{{
 idfobj_print <- function (self, private, object, comment = TRUE, auto_sep = FALSE) {
-    assert_that(is_scalar(object))
+    assert(is_scalar(object))
 
     obj_tbl <- i_object_tbl_from_which(self, private, object)
     val_tbl <- i_value_tbl_from_which(self, private, object)
@@ -608,7 +608,7 @@ idfobj_print <- function (self, private, object, comment = TRUE, auto_sep = FALS
                 NextMethod()
             }
         }
-    } else if (is_integerish(i)) {
+    } else if (is_integer(i)) {
         .subset2(x, "get_value")(i)[[1]]
     } else {
         NextMethod()
@@ -658,7 +658,7 @@ idfobj_print <- function (self, private, object, comment = TRUE, auto_sep = FALS
                 NextMethod()
             }
         }
-    } else if (is_integerish(i)) {
+    } else if (is_integer(i)) {
         nm <- .subset2(.subset2(x, "definition")(), "field_name")(i)
         value <- as.list(value)
         names(value) <- nm

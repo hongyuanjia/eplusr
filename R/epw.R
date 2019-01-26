@@ -1,13 +1,11 @@
 #' @importFrom R6 R6Class
 #' @importFrom data.table fread setnames shift copy fwrite between as.ITime setDT
-#' @importFrom readr write_lines
+#' @importFrom data.table "%chin%"
 #' @importFrom cli cat_line rule cat_bullet
-#' @importFrom crayon bold
 #' @importFrom lubridate year month mday hour minute leap_year days force_tz
 #' @importFrom units ud_units drop_units
-#' @importFrom stringr str_trim
-#' @importFrom fasttime fastPOSIXct
 #' @importFrom stats na.omit
+#' @importFrom stringi stri_trans_toupper stri_split_regex stri_replace_first_regex
 NULL
 
 #' Read, and modify an EnergyPlus Weather File (EPW)

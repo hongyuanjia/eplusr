@@ -142,9 +142,9 @@ eplus_download_url <- function (ver) {
 eplus_release_commit <- function(ver) {
     ver <- standardize_ver(ver)
 
-    assert_that(is_eplus_ver(ver))
+    assert(is_eplus_ver(ver))
 
-    all_eplus_release_commit()[version == as.character(ver)]
+    ALL_EPLUS_RELEASE_COMMIT[version == as.character(ver)]
 }
 # }}}
 # download_file: same as download.file except that it creates the target directory if necessary {{{
@@ -195,7 +195,7 @@ install_eplus_linux <- function (exec) {
     setwd(exe_dir)
 
     f <- basename(exec)
-    v <- gsub("\\.", "-", stringr::str_match(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
+    v <- gsub("\\.", "-", stri_match_first_regex(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
     system(sprintf('chmod +x %s', f))
     system(sprintf('echo "y\r" | sudo ./%s', f))
     system(sprintf('sudo chmod -R a+w /usr/local/EnergyPlus-%s', v))
@@ -297,7 +297,7 @@ use_eplus <- function (eplus) {
 #' @export
 # eplus_config {{{
 eplus_config <- function (ver) {
-    assert_that(is_eplus_ver(ver, strict = TRUE))
+    assert(is_eplus_ver(ver, strict = TRUE))
     ver <- standardize_ver(ver)
     res <- .globals$eplus_config[[as.character(ver)]]
     if (is.null(res)) {
@@ -329,7 +329,7 @@ locate_eplus <- function () {
             error = function (e) NULL))
     }
 
-    lapply(rev(all_eplus_release_commit()$version), find_eplus)
+    lapply(rev(ALL_EPLUS_RELEASE_COMMIT$version), find_eplus)
 
     invisible()
 }
@@ -337,7 +337,7 @@ locate_eplus <- function () {
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
     ver <- standardize_ver(ver)
-    assert_that(is_eplus_ver(ver))
+    assert(is_eplus_ver(ver))
     ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)

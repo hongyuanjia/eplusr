@@ -1,40 +1,36 @@
-# versions {{{
-latest_eplus_ver <- function () as.numeric_version("9.0.0")
+# VERSIONS {{{
+LATEST_EPLUS_VER <- as.numeric_version("9.0.0")
 
-all_eplus_ver <- function () c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0")
+ALL_EPLUS_VER <- c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0")
 
-all_idd_ver <- function () {
-    c(
-        # 1.X.X
-        paste0("1.0.", 0:3),
-        paste0("1.1.", 0:1),
-        paste0("1.2.", 0:3),
-        paste0("1.", 3:4, ".0"),
-        paste0("2.", 0:2, ".0"),
-        paste0("3.", 0:1, ".0"),
-        paste0(4:6, ".0.0"),
-        paste0("7.", 0:2, ".0"),
-        paste0("8.", 0:9, ".0"),
-        paste0("9.0.0")
-    )
-}
+ALL_IDD_VER <- c(
+    paste0("1.0.", 0:3),
+    paste0("1.1.", 0:1),
+    paste0("1.2.", 0:3),
+    paste0("1.", 3:4, ".0"),
+    paste0("2.", 0:2, ".0"),
+    paste0("3.", 0:1, ".0"),
+    paste0(4:6, ".0.0"),
+    paste0("7.", 0:2, ".0"),
+    paste0("8.", 0:9, ".0"),
+    paste0("9.0.0")
+)
 
-all_eplus_release_commit <- function () {
-    data.table::fread("
-        version,     commit
-          9.0.0, 2ef880da82
-          8.9.0, 40101eaafd
-          8.8.0, 7c3bbe4830
-          8.7.0, 78a111df4a
-          8.6.0, 198c6a3cff
-          8.5.0, c87e61b44b
-          8.4.0, 832e4bb9cb
-          8.3.0, 6d97d074ea
-    ")
-}
+ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
+    "version,     commit
+     9.0.0, 2ef880da82
+     8.9.0, 40101eaafd
+     8.8.0, 7c3bbe4830
+     8.7.0, 78a111df4a
+     8.6.0, 198c6a3cff
+     8.5.0, c87e61b44b
+     8.4.0, 832e4bb9cb
+     8.3.0, 6d97d074ea
+    "
+)
 # }}}
-# macro_dict {{{
-macro_dict <-
+# MACRO_DICT {{{
+MACRO_DICT <-
       # Incorporating external files
     c("##include", "##fileprefix", "##includesilent", "##nosilent",
       # Selective accepting or skipping lins

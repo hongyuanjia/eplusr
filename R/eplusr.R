@@ -171,7 +171,7 @@ eplusr_option <- function (...) {
 
     if (is_empty(nm)) {
         nm <- unlist(opt)
-        assert_that(is_string(nm))
+        assert(is_string(nm))
         return(.options[[nm]])
     }
 
@@ -197,7 +197,7 @@ eplusr_option <- function (...) {
     # assign_onoff_opt {{{
     assign_onoff_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
-            assert_that(is_scalar(input[[name]]))
+            assert(is_scalar(input[[name]]))
 
             invalid <- !is.logical(input[[name]])
 
@@ -212,7 +212,7 @@ eplusr_option <- function (...) {
     # assign_choice_opt {{{
     assign_choice_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
-            assert_that(is_string(input[[name]]))
+            assert(is_string(input[[name]]))
 
             invalid <- !input[[name]] %in% choice_list[[name]]
 
@@ -227,7 +227,7 @@ eplusr_option <- function (...) {
     # assign_count_opt {{{
     assign_count_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
-            assert_that(is_count(input[[name]]))
+            assert(is_count(input[[name]]))
             .options[[name]] <- as.integer(input[[name]])
         }
     }
@@ -235,7 +235,7 @@ eplusr_option <- function (...) {
     # assign_number_opt {{{
     assign_number_opt <- function (input, name) {
         if (not_empty(input[[name]])) {
-            assert_that(is.numeric(input[[name]]))
+            assert(is.numeric(input[[name]]))
             .options[[name]] <- as.numeric(input[[name]])
         }
     }

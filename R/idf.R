@@ -1,5 +1,4 @@
 #' @importFrom R6 R6Class
-#' @importFrom uuid UUIDgenerate
 NULL
 
 #' Read, modify, and run an EnergyPlus model
@@ -1009,13 +1008,13 @@ idf_is_valid_class_name <- function (self, private, class, all = FALSE) {
 # }}}
 # idf_is_valid_object_id {{{
 idf_is_valid_object_id <- function (self, private, id) {
-    assert_that(are_count(id))
+    assert(are_counts(id))
     id %in% private$m_idf_tbl$object$object_id
 }
 # }}}
 # idf_is_valid_object_name {{{
 idf_is_valid_object_name <- function (self, private, name) {
-    assert_that(is.character(name))
+    assert(is.character(name))
     stri_trans_tolower(name) %in% private$m_idf_tbl$object[!is.na(object_name), object_name_lower]
 }
 # }}}

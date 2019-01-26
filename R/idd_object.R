@@ -386,7 +386,7 @@ IddObject <- R6::R6Class(classname = "IddObject",
                     "has been initialized.", call. = FALSE)
             }
 
-            assert_that(is_string(class))
+            assert(is_string(class))
 
             id <- private$m_idd_tbl$class[class_name == class, class_id]
             if (is_empty(id)) {
@@ -603,7 +603,7 @@ iddobj_extensible_group_num <- function (self, private) {
 # }}}
 # iddobj_add_extensible_group {{{
 iddobj_add_extensible_group <- function (self, private, num) {
-    assert_that(is_count(num))
+    assert(is_count(num))
 
     private$m_idd_tbl <- t_add_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
 
@@ -614,7 +614,7 @@ iddobj_add_extensible_group <- function (self, private, num) {
 # }}}
 # iddobj_del_extensible_group {{{
 iddobj_del_extensible_group <- function (self, private, num) {
-    assert_that(is_count(num))
+    assert(is_count(num))
 
     private$m_idd_tbl <- t_del_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
 
@@ -774,7 +774,7 @@ iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_o
 # }}}
 # iddobj_is_valid_field_num {{{
 iddobj_is_valid_field_num <- function (self, private, num) {
-    assert_that(are_count(num))
+    assert(are_count(num))
 
     cls <- iddobj_class_data(self, private)
 
@@ -794,7 +794,7 @@ iddobj_is_valid_field_num <- function (self, private, num) {
 # }}}
 # iddobj_is_extensible_index {{{
 iddobj_is_extensible_index <- function (self, private, index) {
-    assert_that(are_count(index))
+    assert(are_count(index))
 
     cls <- iddobj_class_data(self, private)
 
@@ -816,7 +816,7 @@ iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
 # }}}
 # iddobj_is_valid_field_index {{{
 iddobj_is_valid_field_index <- function (self, private, index) {
-    assert_that(are_count(index))
+    assert(are_count(index))
     index <= iddobj_class_data(self, private)$num_fields
 }
 # }}}
