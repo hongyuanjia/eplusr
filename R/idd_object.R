@@ -717,7 +717,7 @@ iddobj_field_range <- function (self, private, which = NULL) {
         c("field_id", "minimum", "lower_incbounds", "maximum", "upper_incbounds")
     )
 
-    fld[, `:=`(range = list(make_field_range(minimum, lower_incbounds, maximum, upper_incbounds))), by = field_id]
+    fld[, `:=`(range = list(ranger(minimum, lower_incbounds, maximum, upper_incbounds))), by = field_id]
 
     fld$range
 }
@@ -761,7 +761,7 @@ iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_o
     fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
 
     # range
-    fld[, `:=`(range = make_field_range(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
+    fld[, `:=`(range = ranger(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
 
     # reference
     fld <- t_field_reference(fld, private$m_idd_tbl_reference, private$m_idf_tbl$value)
@@ -909,7 +909,7 @@ iddobj_print <- function (self, private) {
     )]
     fld[required_field == FALSE, `:=`(
         idx = crayon::cyan(idx),
-        req = crayon::cyan(strrep(" ", nchar(cli::symbol$bullet))),
+        req = crayon::cyan(stringi::stri_dup(" ", nchar(cli::symbol$bullet))),
         full_name = crayon::cyan(full_name)
     )]
     fld[, cli::cat_line("  ", req, idx, ": ", full_name, ext)]

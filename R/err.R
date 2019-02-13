@@ -136,8 +136,8 @@ parse_err_file <- function (path) {
     if (length(l)) set(err_dt, l, "prefix", "**   ~~~   **")
 
     # mark normal informative message and number all messages
-    err_dt[!is.na(level) | prefix == strrep("*", 13L), index := .I]
-    err_dt[!is.na(index) & prefix == strrep("*", 13L), level := "Info"]
+    err_dt[!is.na(level) | prefix == stringi::stri_dup("*", 13L), index := .I]
+    err_dt[!is.na(index) & prefix == stringi::stri_dup("*", 13L), level := "Info"]
     err_dt[!is.na(level), index := .I]
 
     # number messages of different level
@@ -198,7 +198,7 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE) {
         )
     )
     # exdent 8 spaces for multiple-line messages
-    dt[dt[, .I[-1L], by = c("index")]$V1, out := paste0(strrep(" ", 8L), out)]
+    dt[dt[, .I[-1L], by = c("index")]$V1, out := paste0(stringi::stri_dup(" ", 8L), out)]
 
     # get all total message number in a level
     dt[, level_num := max(level_index), by = "level"]

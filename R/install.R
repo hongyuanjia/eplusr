@@ -259,7 +259,7 @@ use_eplus <- function (eplus) {
         ver <- standardize_ver(eplus)
         eplus_dir <- eplus_default_path(eplus)
         if (!is_eplus_path(eplus_dir)) {
-            stop("Cannot locate EnergyPlus v", trimws(eplus), " at default ",
+            stop("Cannot locate EnergyPlus v", stringi::stri_trim_both(eplus), " at default ",
                 "installation path ", surround(eplus_dir), ". Please specify ",
                 "explicitly the path of EnergyPlus installation.", call. = FALSE)
         }
