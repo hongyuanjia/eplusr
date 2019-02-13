@@ -151,7 +151,7 @@ read_lines_in_dt <- function(input, trim = TRUE, ...) {
 get_idd_ver <- function (idd_dt) {
     assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
-    ver_line <- idd_dt[startsWith(string, "!IDD_Version")]
+    ver_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_Version")]
 
     if (!nrow(ver_line)) {
         abort("error_miss_idd_ver", "No version found in input IDD.")
@@ -159,7 +159,7 @@ get_idd_ver <- function (idd_dt) {
         ver <- tryCatch(standardize_ver(stri_sub(ver_line$string, 14L)),
             error = function (e) {
                 m <- conditionMessage(e)
-                if (startsWith(m, "invalid version specification")) {
+                if (stringi::stri_startswith_fixed(m, "invalid version specification")) {
                     parse_issue("error_invalid_idd_ver", "idd", "Invalid IDD version", ver_line)
                 } else {
                     stop(e)
@@ -177,7 +177,7 @@ get_idd_ver <- function (idd_dt) {
 get_idd_build <- function (idd_dt) {
     assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
-    build_line <- idd_dt[startsWith(string, "!IDD_BUILD")]
+    build_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
         abort("warning_miss_idd_build", "No version found in input IDD.")
@@ -223,7 +223,7 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
 
 # clean_idd_lines {{{
 clean_idd_lines <- function (dt) {
-    dt <- dt[!(startsWith(string, "!") | string == "")]
+    dt <- dt[!(stringi::stri_startswith_fixed(string, "!") | string == "")]
 
     # trucate to characters left of ! in order to handle cases when there are
     # inline comments starting with "!", e.g.
@@ -374,7 +374,7 @@ mark_idd_lines <- function (dt, type_enum) {
     set(dt, NULL, "type", type_enum$unknown)
 
     # ignore section if exists, e.g. "Simulation Data;"
-    dt <- dt[!(endsWith(body, ";") & is.na(slash_key))]
+    dt <- dt[!(stringi::stri_endswith_fixed(body, ";") & is.na(slash_key))]
 
     # mark slash lines
     dt[body == "", `:=`(type = type_enum$slash)]
@@ -383,13 +383,13 @@ mark_idd_lines <- function (dt, type_enum) {
     dt[slash_key == "group", `:=`(type = type_enum$group)]
 
     # mark class
-    dt[endsWith(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
+    dt[stringi::stri_endswith_fixed(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
 
     # mark field
     dt[body != "" & !is.na(slash_key), `:=`(type = type_enum$field)]
 
     # mark last field per class
-    dt[endsWith(body, ";"), `:=`(type = type_enum$field_last)]
+    dt[stringi::stri_endswith_fixed(body, ";"), `:=`(type = type_enum$field_last)]
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
@@ -766,8 +766,8 @@ parse_field_property <- function (dt, ref) {
     setnames(dt, nms)
 
     # complete types
-    dt[is.na(type) & startsWith(field_anid, "A"), `:=`(type = "alpha")]
-    dt[is.na(type) & startsWith(field_anid, "N"), `:=`(type = "real")]
+    dt[is.na(type) & stringi::stri_startswith_fixed(field_anid, "A"), `:=`(type = "alpha")]
+    dt[is.na(type) & stringi::stri_startswith_fixed(field_anid, "N"), `:=`(type = "real")]
 
     # add field index
     set(dt, NULL, "field_index", rowidv(dt, "class_id"))
@@ -1046,7 +1046,7 @@ mark_idf_lines <- function (dt, type_enum) {
     setindexv(dt, "type")
 
     # macro line
-    l_m <- dt[startsWith(string, "#"), which = TRUE]
+    l_m <- dt[stringi::stri_startswith_fixed(string, "#"), which = TRUE]
     if (length(l_m)) {
         dt[l_m, c("type", "body", "comment") :=({
             macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
@@ -1073,16 +1073,16 @@ mark_idf_lines <- function (dt, type_enum) {
     }
 
     # normal comments
-    dt[startsWith(string, "!"), `:=`(type = type_enum$comment)]
+    dt[stringi::stri_startswith_fixed(string, "!"), `:=`(type = type_enum$comment)]
 
     # special comments
-    dt[startsWith(string, "!-"), `:=`(type = type_enum$special)]
+    dt[stringi::stri_startswith_fixed(string, "!-"), `:=`(type = type_enum$special)]
 
     # mark values in object
-    dt[endsWith(body, ","), `:=`(type = type_enum$value)]
+    dt[stringi::stri_endswith_fixed(body, ","), `:=`(type = type_enum$value)]
 
     # mark last value in object
-    dt[endsWith(body, ";"), `:=`(type = type_enum$value_last)]
+    dt[stringi::stri_endswith_fixed(body, ";"), `:=`(type = type_enum$value_last)]
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
@@ -1521,6 +1521,15 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
         if (!is.null(prefix)) {
             mes <- paste0(prefix, mes)
         }
+
+        # only show the first 15 message
+        if (length(mes) > 10L) {
+            mes <- c(mes[1L:10L], "...[truncated. First 10 are shown.]")
+        }
+
+        # trunc if necessary
+        tr <- nchar(mes) > 0.95 * (options("width")$width)
+        mes[tr] <- paste0(stri_sub(mes[tr], to = 0.95 * (options("width")$width)), "...")
     }
 
     if (stop) {
@@ -1532,7 +1541,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
     }
 
     if (!is.null(mes)) {
-        mes_rule <- cli::rule(line = 1L)
+        mes_rule <- cli::rule("Location", line = 1L)
         mes_line <- paste(mes, sep = "\n", collapse = "\n")
     } else {
         mes_rule <- NULL
@@ -1541,7 +1550,11 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
     end_rule <- cli::rule(line = 2L)
 
     if (!is.null(post)) {
-        post <- c(cli::rule(line = 1L), post)
+        # only show the first 10
+        if (length(post) > 10L) {
+            post <- c(post[1L:10L], "...[truncated. First 10 are shown.]")
+        }
+        post <- c(cli::rule("Detail", line = 1L), post)
     }
 
     all_mes <- paste0(c(start_rule, err_title, err_num, mes_rule, mes_line, post, end_rule),

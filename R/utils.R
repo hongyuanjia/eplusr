@@ -13,7 +13,7 @@ NULL
 # }}}
 
 # collapse {{{
-collapse <- function (x, out = "`") {
+collapse <- function (x, out = "`", or = FALSE) {
     if (is.null(out)) {
         s <- x
     } else {
@@ -27,7 +27,11 @@ collapse <- function (x, out = "`") {
 
     b <- paste0(s[-length(s)], collapse = ", ")
     e <- s[length(s)]
-    paste0(b, " and ", e)
+    if (or) {
+        paste0(b, " or ", e)
+    } else {
+        paste0(b, " and ", e)
+    }
 }
 # }}}
 
@@ -59,14 +63,14 @@ rpad <- function(x, char = " ", width = NULL) {
     if (!length(x)) return(x)
     w <- nchar(x, type = "width")
     if (is.null(width)) width <- max(w)
-    paste0(x, strrep(char, pmax(width - w, 0)))
+    paste0(x, stringi::stri_dup(char, pmax(width - w, 0)))
 }
 
 lpad <- function(x, char = " ", width = NULL) {
     if (!length(x)) return(x)
     w <- nchar(x, type = "width")
     if (is.null(width)) width <- max(w)
-    paste0(strrep(char, pmax(width - w, 0)), x)
+    paste0(stringi::stri_dup(char, pmax(width - w, 0)), x)
 }
 # }}}
 
@@ -98,13 +102,13 @@ clone_generator <- function (x) {
 # write_lines {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
-write_lines <- function (x, file = "") {
+write_lines <- function (x, file = "", append = FALSE) {
     if (inherits(x, "data.table")) {
         assert(has_name(x, "string"))
-        fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE)
+        fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE, append = append)
     } else {
         assert(is.character(x))
-        fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE)
+        fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE, append = append)
     }
 }
 # }}}
@@ -230,29 +234,15 @@ each_length <- function (x) {
 }
 # }}}
 
-# in_range {{{
-in_range <- function (x, range) {
-    if (range$lower_incbounds == range$upper_incbounds) {
-        between(x, range$minimum, range$maximum, range$lower_incbounds)
-    } else {
-        if (range$lower_incbounds) {
-            x >= range$minimum & x < range$maximum
-        } else {
-            x > range$minimum & x <= range$maximum
-        }
-    }
-}
-# }}}
-
-# make_field_range {{{
-make_field_range <- function (minimum, lower_incbounds, maximum, upper_incbounds) {
-    assert(is_number(minimum), is_number(maximum), is_falg(lower_incbounds), is_flag(upper_incbounds))
+# ranger {{{
+ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
+    assert(is_number(minimum), is_number(maximum), is_flag(lower_incbounds), is_flag(upper_incbounds))
     setattr(
         list(
             minimum = minimum, lower_incbounds = lower_incbounds,
             maximum = maximum, upper_incbounds = upper_incbounds
         ),
-        "class", c("FieldRange", "list")
+        "class", c("Range", "list")
     )
 }
 # }}}
@@ -272,5 +262,27 @@ ins_dt <- function (dt, new_dt, base_col = NULL) {
 # unique_id {{{
 unique_id <- function () {
     paste0("id-", stri_rand_strings(1, 15L))
+}
+# }}}
+
+# as_integer {{{
+as_integer <- function (x) {
+    x <- as.double(x)
+    if (any(x[!is.na(x)] != trunc(x[!is.na(x)]))) {
+        x[!is.na(x) & x != trunc(x)] <- NA_integer_
+        warning("NAs introduced by coercion")
+    }
+    x
+}
+# }}}
+
+# fmt_* {{{
+fmt_dbl <- function (x, digits = 2L) sprintf(paste0("%.", digits, "f"), x)
+fmt_int <- function (x, digits = 1L) sprintf(paste0("%.", digits, "f"), x)
+# }}}
+
+# wday {{{
+wday <- function (x, label = FALSE) {
+    lubridate::wday(x, label = label, abbr = FALSE, week_start = 1L, local = "C")
 }
 # }}}

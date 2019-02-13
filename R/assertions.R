@@ -12,7 +12,7 @@ NULL
 # }}}
 # assert {{{
 # a tailored version of assertthat::assert_that
-assert <- function(..., msg = NULL, err_type = NULL, env = parent.frame()) {
+assert <- function(..., msg = NULL, prefix = NULL, err_type = NULL, env = parent.frame()) {
     assertions <- eval(substitute(alist(...)))
 
     for (assertion in assertions) {
@@ -23,10 +23,10 @@ assert <- function(..., msg = NULL, err_type = NULL, env = parent.frame()) {
         # get error type
         if (is.null(err_type)) {
             fnm <- deparse(assertion[[1L]])
-            if (startsWith(fnm, "is") || startsWith(fnm, "are")) {
-                err_type <- paste0("error_not_", sub("[a-z]+_", "", fnm))
+            if (stringi::stri_startswith_fixed(fnm, "is") || stringi::stri_startswith_fixed(fnm, "are")) {
+                err_type <- c(paste0("error_not_", sub("[a-z]+_", "", fnm)), "error_assertion")
             } else {
-                err_type <- paste0("error_not_", fnm)
+                err_type <- c(paste0("error_not_", fnm), "error_assertion")
             }
         }
 
@@ -43,7 +43,7 @@ assert <- function(..., msg = NULL, err_type = NULL, env = parent.frame()) {
         if (is.null(msg_fun)) {
             abort(err_type,
                 sprintf(ngettext(
-                    length(val), "%s is not TRUE.", "%s is not all TRUE."),
+                    length(val), "%s is not TRUE.", "%s are not all TRUE."),
                     surround(deparse(assertion, width.cutoff = 60L))
                 )
             )
@@ -51,7 +51,16 @@ assert <- function(..., msg = NULL, err_type = NULL, env = parent.frame()) {
 
         # match.call does not do well with primitive functions
         if (!is.primitive(f)) assertion <- match.call(f, assertion)
-        abort(err_type, msg_fun(assertion, env))
+
+        if (is.null(prefix)) {
+            abort(err_type, msg_fun(assertion, env))
+        } else {
+            # change message prefix
+            stopifnot(is_string(prefix))
+            abort(err_type,
+                paste0(prefix, sub(".*? (is|are|should|does|do|must|can|contains)", " \\1", msg_fun(assertion, env)))
+            )
+        }
     }
     TRUE
 }
@@ -126,7 +135,21 @@ on_fail(is_epw) <- function (call, env) {
     paste(deparse(call$x), "is not an Epw object.")
 }
 # }}}
+# is_range {{{
+is_range <- function (x) {
+    inherits(x, "Range")
+}
+# }}}
 
+# no_na {{{
+no_na <- function (x, coerce = FALSE) {
+    all(!is.na(x))
+}
+on_fail(no_na) <- function (call, env) {
+    end <- if (eval(call$coerce, env)) " after coercion." else " ."
+    paste0(deparse(call$x), "should not contain any NA", end)
+}
+# }}}
 # not_empty {{{
 not_empty <- function (x) {
     all((dim(x) %||% length(x)) != 0)
@@ -151,12 +174,28 @@ on_fail(is_number) <- function (call, env) {
     paste(deparse(call$x), "is not a number (length one numeric vector).")
 }
 # }}}
+# is_strnum {{{
+is_strnum <- function(x) {
+    length(x) == 1L && is.character(x) && all(!is.na(suppressWarnings(as.double(x))))
+}
+on_fail(is_strnum) <- function (call, env) {
+    paste(deparse(call$x), "is not a coercible number.")
+}
+# }}}
 # is_integer {{{
 is_integer <- function(x) {
     length(x) == 1L && !is.na(x) && (is.integer(x) || (is.numeric(x) && all(x == trunc(x))))
 }
 on_fail(is_integer) <- function (call, env) {
-    paste(deparse(call$x), "is neither a length one integer nor can be converted into one.")
+    paste(deparse(call$x), "is neither a length one integer nor can be coerced into one.")
+}
+# }}}
+# is_strint {{{
+is_strint <- function(x) {
+    is_integer(suppressWarnings(as.double(x)))
+}
+on_fail(is_strint) <- function (call, env) {
+    paste(deparse(call$x), "is not an integer-coercible format.")
 }
 # }}}
 # is_count {{{
@@ -164,26 +203,10 @@ is_count <- function (x, zero = FALSE) {
     if (!is_integer(x)) return(FALSE)
     if (zero) x >= 0L else x > 0L
 }
-on_fail(is_epw) <- function (call, env) {
-    info <- if (eval(call$zero, env)) "non-nagitive integer" else "positive integer"
+on_fail(is_count) <- function (call, env) {
+    zero <- eval(call$zero, env)
+    info <- if (!is.null(zero) && zero) "non-nagitive integer" else "positive integer"
     paste(deparse(call$x), "is not a count (a length one", info, "vector).")
-}
-# }}}
-# are_integer {{{
-are_integer <- function(x) {
-    rep(is.numeric(x), length(x)) & !is.na(x) & (x == trunc(x))
-}
-on_fail(are_integer) <- function (call, env) {
-    paste(deparse(call$x), "is neither an integer vector or can be converted into one.")
-}
-# }}}
-# are_count {{{
-are_count <- function (x, zero = FALSE) {
-    are_integer(x) & if (zero) x >= 0L else x > 0L
-}
-on_fail(are_count) <- function (call, env) {
-    info <- if (eval(call$zero, env)) "non-nagitive integer" else "positive integer"
-    paste(deparse(call$x), "are not counts (a", info, "vector).")
 }
 # }}}
 # is_string {{{
@@ -204,6 +227,89 @@ on_fail(is_scalar) <- function (call, env) {
     paste(deparse(call$x), "is not a scalar (length one vector).")
 }
 # }}}
+# are_string {{{
+are_string <- function(x) is.character(x) && all(!is.na(x))
+on_fail(are_string) <- function (call, env) {
+    paste(deparse(call$x), "is not a character vector.")
+}
+# }}}
+# are_strint {{{
+are_strint <- function(x) {
+    are_integer(suppressWarnings(as.double(x)))
+}
+on_fail(are_strint) <- function (call, env) {
+    paste(deparse(call$x), "is not an integer-coercible vector.")
+}
+# }}}
+# are_integer {{{
+are_integer <- function(x) {
+    is.numeric(x) && all(!is.na(x)) && all(x == trunc(x))
+}
+on_fail(are_integer) <- function (call, env) {
+    paste(deparse(call$x), "is neither an integer vector or can be converted into one.")
+}
+# }}}
+# are_number {{{
+are_number <- function (x) {
+    is.numeric(x) && all(!is.na(x))
+}
+on_fail(are_number) <- function (call, env) {
+    paste(deparse(call$x), "is not a number vector.")
+}
+# }}}
+# are_strnum {{{
+are_strnum <- function(x) {
+    is.character(x) & all(!is.na(suppressWarnings(as.double(x))))
+}
+on_fail(are_strnum) <- function (call, env) {
+    paste(deparse(call$x), "is not a number-coercible vector.")
+}
+# }}}
+# are_count {{{
+are_count <- function (x, zero = FALSE) {
+    are_integer(x) && if (zero) all(x >= 0L) else all(x > 0L)
+}
+on_fail(are_count) <- function (call, env) {
+    zero <- eval(call$zero, env)
+    info <- if (!is.null(zero) && zero) "non-nagitive integer" else "positive integer"
+    paste(deparse(call$x), "are not counts (a", info, "vector).")
+}
+# }}}
+# has_len {{{
+has_len <- function (x, len, step = NULL) {
+    if (is_range(len)) {
+        in_range(length(x), len)
+    } else if (is_integer(len)){
+        if (is.null(step)) {
+            length(x) == len
+        } else {
+            if (!is_integer(step)) stop("`step` should be either NULL or an integer.")
+            length(x) >= len && ((length(x) - len) %% step == 0L)
+        }
+    } else if (are_integer(len)) {
+        if (!is.null(step)) {
+            stop("`step` should not be provided when `len` is an integer vector.")
+        }
+        length(x) %in% len
+    } else {
+        stop("`len` should be either a range or an integer vector.")
+    }
+}
+on_fail(has_len) <- function (call, env) {
+    len <- eval(call$len, env)
+    step <- eval(call$step, env)
+
+    if (is_range(len)) {
+        paste0(deparse(call$x), " does not meet the required length range of ", len, ".")
+    } else {
+        if (is.null(step)) {
+            paste0(deparse(call$x), " does not have the required length of ", collapse(len, or = TRUE), ".")
+        } else {
+            paste0(deparse(call$x), " does not have the required length pattern `", len, " + " , step, " x N`.")
+        }
+    }
+}
+# }}}
 # have_same_len {{{
 have_same_len <- function (x, y) {
     x_len_fun <- if(is.data.frame(x)) nrow else length
@@ -214,22 +320,36 @@ on_fail(have_same_len) <- function (call, env) {
     paste(deparse(call$x), "and", deparse(call$y), "do not have the same length.")
 }
 # }}}
-# is_in_range {{{
-is_in_range <- function (x, minimum, lower_incbounds, maximum, upper_incbounds) {
-    in_range(x, make_field_range(minimum, lower_incbounds, maximum, upper_incbounds))
+# in_range {{{
+in_range <- function (x, range) {
+    if (range$lower_incbounds == range$upper_incbounds) {
+        between(x, range$minimum, range$maximum, range$lower_incbounds)
+    } else {
+        if (range$lower_incbounds) {
+            x >= range$minimum & x < range$maximum
+        } else {
+            x > range$minimum & x <= range$maximum
+        }
+    }
 }
-on_fail(is_in_range) <- function (call, env) {
-    r <- make_field_range(
-        eval(call$minimum, env), eval(call$lower_incbounds, env),
-        eval(call$maximum, env), eval(call$upper_incbounds, env)
-    )
-    paste(deparse(call$x), "is not in range", r)
+on_fail(in_range) <- function (call, env) {
+    paste(deparse(call$x), "is not in range", eval(call$range, env))
 }
 # }}}
 # is_named {{{
 is_named <- function (x) !is.null(names(x))
+on_fail(is_named) <- function (call, env) {
+    paste(deparse(call$x), "must be named.")
+}
 # }}}
-
+# is_choice {{{
+is_choice <- function (x, choices) {
+    is.character(x) & stri_trans_tolower(x) %chin% stri_trans_tolower(choices)
+}
+on_fail(is_choice) <- function (call, env) {
+    paste0(deparse(call$x), " should be one of ", collapse(eval(call$choices, env)))
+}
+# }}}
 # has_name {{{
 has_name <- function(x, which) {
     assert(is.character(which), msg = "Non-character `which` in has_name().")
@@ -262,6 +382,87 @@ on_fail(has_ext) <- function (call, env) {
     )
 }
 # }}}
+# is_epwdate {{{
+is_epwdate <- function (x) {
+    length(x) == 1L && !is.na(epw_date(x))
+}
+on_fail(is_epwdate) <- function (call, env) {
+    paste0(deparse(call$x), " is not a valid EPW date specification.")
+}
+# }}}
+# are_epwdate {{{
+are_epwdate <- function (x) {
+    all(!is.na(epw_date(x)))
+}
+on_fail(are_epwdate) <- function (call, env) {
+    paste0(deparse(call$x), " contains invalid EPW date specification.")
+}
+# }}}
+# not_epwdate_realyear {{{
+not_epwdate_realyear <- function (x, scalar = FALSE, zero = TRUE) {
+    d <- epw_date(x)
+    r <- !is.na(d) & get_epwdate_type(d) != 3L
+    if (!zero) r <- r & get_epwdate_type(d) != 0L
+    if (scalar) {
+        length(x) == 1L && all(r)
+    } else {
+        r
+    }
+}
+on_fail(not_epwdate_realyear) <- function (call, env) {
+    s <- eval(call$scalar, env)
+    if (!is.null(s) && s) {
+        paste0(deparse(call$x), " should not be EPW real-year date specification.")
+    } else {
+        paste0(deparse(call$x), " should not contain any EPW real-year date specification.")
+    }
+}
+# }}}
+# not_epwdate_weekday {{{
+not_epwdate_weekday <- function (x, scalar = FALSE, zero = TRUE) {
+    d <- epw_date(x)
+    r <- !is.na(d) & get_epwdate_type(d) != 5L
+    if (!zero) r <- r & get_epwdate_type(d) != 0L
+    if (scalar) {
+        length(x) == 1L && all(r)
+    } else {
+        r
+    }
+}
+on_fail(not_epwdate_weekday) <- function (call, env) {
+    s <- eval(call$scalar, env)
+    if (!is.null(s) && s) {
+        paste0(deparse(call$x), " is not valid EPW Julian day or Month/Day date specification.")
+    } else {
+        paste0(deparse(call$x), " contains invalid EPW Julian day or Month/Day date specification.")
+    }
+}
+# }}}
+# is_unique {{{
+is_unique <- function (x) {
+    anyDuplicated(x) == 0L
+}
+on_fail(is_unique) <- function (call, env) {
+    paste0(deparse(call$x), " should not contain any duplication.")
+}
+# }}}
+# is_wday {{{
+is_wday <- function (x) {
+    length(x) == 1L && !is.na(get_epw_wday(x))
+}
+on_fail(is_wday) <- function (call, env) {
+    paste0(deparse(call$x), " is not a valid day of week format.")
+}
+# }}}
+# are_wday {{{
+are_wday <- function (x) {
+    all(!is.na(get_epw_wday(x)))
+}
+on_fail(is_wday) <- function (call, env) {
+    paste0(deparse(call$x), " contains invalid day of week format.")
+}
+# }}}
+
 # is_windows {{{
 is_windows <- function () .Platform$OS.type == 'windows'
 # }}}

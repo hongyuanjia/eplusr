@@ -178,7 +178,7 @@ format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
 format_objects <- function (dt_value, zoom = c("group", "class", "object", "field"), leading = 0L) {
     zoom <- match.arg(zoom)
 
-    spcs <- strrep(" ", leading)
+    spcs <- stringi::stri_dup(" ", leading)
 
     # tree_chars {{{
     # reference: https://github.com/r-lib/cli/blob/master/R/tree.R#L111
@@ -205,7 +205,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
         char <- tree_chars()
 
         if (sep) {
-            set(dt, NULL, "prefix", paste0(char$v, " \n", strrep(" ", leading), char$v, char$h))
+            set(dt, NULL, "prefix", paste0(char$v, " \n", stringi::stri_dup(" ", leading), char$v, char$h))
         } else {
             set(dt, NULL, "prefix", paste0(char$v, char$h))
         }
@@ -217,7 +217,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
             dt[setdiff(
                 dt[, .I[.N], by = c(branch[1L])]$V1,
                 dt[, .I[1L], by = c(branch[1L])]$V1),
-            prefix := paste0(char$v, " \n", strrep(" ", leading), prefix)]
+            prefix := paste0(char$v, " \n", stringi::stri_dup(" ", leading), prefix)]
         }
 
         if (!is.null(trunk)) {
@@ -227,7 +227,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
             set(dt, NULL, "branch_prefix", NULL)
         }
 
-        set(dt, NULL, "tree", paste0(strrep(" ", leading), dt$prefix, " ", dt[[leaf]]))
+        set(dt, NULL, "tree", paste0(stringi::stri_dup(" ", leading), dt$prefix, " ", dt[[leaf]]))
         set(dt, NULL, "prefix", NULL)
 
         dt
@@ -378,7 +378,7 @@ format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
         res[-is_end] <- paste0(values[-is_end], ",")
     }
 
-    res <- paste0(strrep(" ", leading), res)
+    res <- paste0(stringi::stri_dup(" ", leading), res)
 
     res <- rpad(res, width = length)
     res[nchar(res) > length] <- paste0(res[nchar(res) > length], "  ")
@@ -508,7 +508,7 @@ print.IddFieldPossible <- function (x, ...) {
         by = field_index
     ]
 
-    dt[, res_ran := paste0(vapply(range, function (x) capture.output(print.IddFieldRange(x)), character(1)))]
+    dt[, res_ran := paste0(vapply(range, function (x) capture.output(print.IddRanger(x)), character(1)))]
     dt[res_ran == "<Not Applicable>", res_ran := NA_character_]
     dt[!is.na(res_ran), res := paste0(res, "\n", crayon::cyan(paste0(
             cli::symbol$bullet, " ", crayon::bold("Range"), ": ", res_ran
@@ -528,8 +528,8 @@ print.IddFieldPossible <- function (x, ...) {
 # }}}
 
 #' @export
-# format.FieldRange {{{
-format.FieldRange <- function (x, ...) {
+# format.Range {{{
+format.Range <- function (x, ...) {
     if (is.na(x$minimum) && is.na(x$maximum)) {
         return("<Not Applicable>")
     }
@@ -558,9 +558,9 @@ format.FieldRange <- function (x, ...) {
 }
 # }}}
 #' @export
-# print.FieldRange {{{
-print.FieldRange <- function (x, ...) {
-    format.FieldRange(x, ...)
+# print.Range {{{
+print.Range <- function (x, ...) {
+    format.Range(x, ...)
     if (is.na(x$minimum) && is.na(x$maximum)) {
         cat("<Not Applicable>")
         return(invisible(x))
@@ -591,9 +591,9 @@ print.FieldRange <- function (x, ...) {
 }
 # }}}
 #' @export
-# as.character.FieldRange{{{
-as.character.FieldRange <- function (x, ...) {
-    format.FieldRange(x, ...)
+# as.character.Range{{{
+as.character.Range <- function (x, ...) {
+    format.Range(x, ...)
 }
 # }}}
 
