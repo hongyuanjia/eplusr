@@ -1,4 +1,19 @@
+#' @importFrom stringi stri_isempty stri_match_first_regex stri_replace_all_charclass
+#' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub "stri_sub<-"
+#' @importFrom stringi stri_trans_tolower stri_trans_totitle stri_trans_toupper 
+#' @importFrom lubridate as_date as_datetime make_date make_datetime force_tz tz
+#' @importFrom lubridate days_in_month minutes hours days years leap_year
+#' @importFrom lubridate mday month yday year "year<-" parse_date_time
+#' @importFrom data.table "%chin%" chmatch copy fread fwrite as.data.table
+#' @importFrom data.table data.table melt.data.table set setattr setcolorder
+#' @importFrom data.table setnames setorderv
+#' @importFrom units set_units drop_units
+#' @importFrom cli cat_rule cat_line
+#' @importFrom utils combn
+#' @importFrom stats na.omit
+#' @include parse.R
 #' @include utils.R
+#' @include assertions.R
 
 # HELPER
 # abort_bad_epw_period {{{
@@ -813,7 +828,7 @@ parse_epw_header_ground <- function (input, ...) {
     )
 
     # change into tidy format
-    temp <- data.table::melt.data.table(temp[, index := .I],
+    temp <- melt.data.table(temp[, index := .I],
         id.vars = c("index", "depth", "soil_conductivity", "soil_density", "soil_specific_heat"),
         variable.name = "month", value.name = "temperature", variable.factor = FALSE
     )
@@ -1146,391 +1161,6 @@ get_epw_month <- function (x, label = FALSE){
     }
 }
 # }}}
-# # EpwDate {{{
-# # S3 class for EPW format date {{{
-# # type:
-# # NOTE: have to store the type, in order to restore the original format if
-# # possible. Here use 1968 as the default year and also will distinguish them
-# # from R's default orgin "1970-01-01". Use other procedures to do double
-# # check.
-# # -1 = invalid
-# #  0 = empty
-# #  1 = julian day of year
-# #  2 = month/day
-# #  3 = year/month/day
-# #  4 = nth day in month
-# #  5 = last day in month
-
-# # EnergyPlus supports multiple formats of date specification
-# # Reference: Table 2.14, Chap 2 Weather Converter Program, Auxillary Program
-# # 0. 0 [type: 0L]
-# # 1. Julian day of year [type: 1L]
-# # 2. num_Month/num_Day  [type: 2L]
-# # 3. num_Month/num_Day/num_Year (only for DataPeriod) [type: 3L]
-# # 4. num_Day alp_Month [type: 2L]
-# # 5. alp_Month num_Day [type: 2L]
-# # 6. num Weekday In Month (only for Holiday/DaylightSavingPeriod) [type: 4L]
-# # 7. last Weekday In Month (only for Holiday/DaylightSavingPeriod) [type: 5L]
-# # }}}
-# # epw_date {{{
-# epw_date <- function (x, leapyear = TRUE) {
-#     assert(is_flag(leapyear))
-#     y <- if (leapyear) 1968L else 1970L
-#     as_EpwDate(x, y)
-# }
-# init_epwdate_vctr <- function (len, init = NA, type = -1L) {
-#     structure(rep(as.Date(init), len), type = rep(as.integer(type), len), class = c("EpwDate", "Date"))
-# }
-# assign_epwdate <- function (x, type) {
-#     setattr(x, "class", c("EpwDate", "Date"))
-#     setattr(x, "type", rep_len(type, length(x)))
-# }
-# get_epwdate_type <- function (x) attr(x, "type")
-# is_epwdate_type <- function (x, type) {
-#     get_epwdate_type(x) %in% type
-# }
-# update_epwdate_type <- function(x, i, type) {
-#     if (missing(i)) return(assign_epwdate(x, type))
-#     if (all(!i)) return(x)
-#     setattr(x, "type", {t <- get_epwdate_type(x); t[i] <- type; t})
-# }
-# update_epwdate_year <- function(x, i, year) {
-#     if (missing(i)) i <- seq_along(x)
-#     if (all(!i)) return(x)
-#     x[i] <- assign_epwdate(
-#         {tmp <- lubridate::as_date(x[i]); lubridate::year(tmp) <- year; tmp},
-#         get_epwdate_type(x[i])
-#     )
-#     x
-# }
-# reset_epwdate_year <- function (x, leapyear) {
-#     # expect empty and real year
-#     update_epwdate_year(x, is_epwdate_type(x, c(1L, 2L, 4L, 5L)), if (leapyear) 1968L else 1970L)
-# }
-# # }}}
-# # as_EpwDate {{{
-# as_EpwDate <- function (x, ...) {
-#     UseMethod("as_EpwDate")
-# }
-# as_EpwDate.default <- function (x, ...) {
-#     stop("Missing method to convert <",class(x)[1L], "> object to <EpwDate>.")
-# }
-# # as_EpwDate.integer {{{
-# as_EpwDate.integer <- function (x, year = 1968L) {
-#     res <- init_epwdate_vctr(length(x))
-
-#     if (length(x) == 0L) return(res)
-
-#     # if is 0, use 1970
-#     # this will make it possible to directly check if an EpwDate is empty by x == 0L
-#     res[!is.na(x) & x == 0L] <- lubridate::make_date()
-#     update_epwdate_type(res, !is.na(x) & x == 0L, 0L)
-
-#     v <- !is.na(x) & in_range(x, ranger(1, TRUE, 366, TRUE))
-#     if (all(!v)) return(res)
-
-#     res[v] <- lubridate::make_date(year) + lubridate::days(x[v] - 1L)
-#     update_epwdate_type(res, v, 1L)
-
-#     res
-# }
-# # }}}
-# # as_EpwDate.numeric {{{
-# as_EpwDate.numeric <- function (x, year = 1968L) {
-#     res <- init_epwdate_vctr(length(x))
-#     if (length(x) == 0L) return(res)
-
-#     # parse julian type first
-#     is_jul <- !is.na(x) & x == trunc(x)
-#     res[is_jul] <- as_EpwDate.integer(as.integer(x[is_jul]))
-
-#     if (sum(is_jul) == length(x)) return(res)
-
-#     res[!is_jul] <- as.Date(suppressWarnings(lubridate::parse_date_time(paste0(year, ".", x[!is_jul]), "Ymd", tz = "UTC")))
-#     update_epwdate_type(res, !is_jul, 2L)
-#     res
-# }
-# # }}}
-# # as_EpwDate.character {{{
-# as_EpwDate.character <- function (x, year = 1968L) {
-#     res <- init_epwdate_vctr(length(x))
-#     if (length(x) == 0L) return(res)
-
-#     # coerce to double first
-#     is_dbl <- !is.na(suppressWarnings(as.double(x)))
-#     res[is_dbl] <- as_EpwDate.numeric(as.double(x[is_dbl]))
-
-#     if (sum(is_dbl) == length(x)) return(res)
-
-#     # init
-#     x <- x[!is_dbl]
-#     d <- res[!is_dbl]
-
-#     # component separator, include "." to support "Month.Day" format
-#     charclass_sep <- "[/\\-\\.]"
-
-#     # count separators
-#     n <- stringi::stri_count_charclass(x, charclass_sep)
-
-#     # month-day type
-#     d[n == 1L] <- parse_epw_monthday(x[n == 1L], year)
-#     update_epwdate_type(d, n == 1L & !is.na(d), 2L)
-
-#     # year-month-day type
-#     d[n == 2L] <- parse_epw_monthday(x[n == 2L])
-#     update_epwdate_type(d, n == 2L & !is.na(d), 3L)
-
-#     # weekday type
-#     # split by space
-#     res_wkd <- parse_epw_dayofweek(x[!n %in% c(1L, 2L)], year)
-#     d[! n %in% c(1L, 2L)] <- res_wkd
-
-#     res[!is_dbl] <- d
-#     res
-# }
-# # }}}
-# # as_EpwDate.logical {{{
-# as_EpwDate.logical <- as_EpwDate.integer
-# # }}}
-# # as_EpwDate.Date {{{
-# as_EpwDate.Date <- function (x, ...) {
-#     # treat as default "yyyy-mm-dd" format
-#     assign_epwdate(copy(x), 3L)
-# }
-# # }}}
-# # as_EpwDate.POSIXt{{{
-# as_EpwDate.POSIXt <- function (x, ...) {
-#     # treat as default "yyyy-mm-dd" format
-#     assign_epwdate(lubridate::as_date(x), 3L)
-# }
-# # }}}
-# # as_EpwDate.EpwDate {{{
-# as_EpwDate.EpwDate <- function (x, ...) x
-# # }}}
-# # parse_epw_monthday {{{
-# parse_epw_monthday <- function (x, year = NULL) {
-#     # parse_date_time will use training set to determine the format for all
-#     # input, which will result in wrong formats
-#     # first check for num_Month/num_Day  [type: 2L]
-#     if (!is.null(year)) x <- paste0(year, "/", x)
-#     d <- as.Date(lubridate::parse_date_time2(x, "Ymd", tz = "UTC"))
-#     d[is.na(x)] <- as.Date(lubridate::parse_date_time(x[is.na(d)], c("Ymd", "Ymd"),
-#         tz = "UTC", quiet = TRUE, train = FALSE
-#     ))
-#     d
-# }
-# # }}}
-# # parse_epw_dayofweek {{{
-# parse_epw_dayofweek <- function (x, year = 1968L) {
-#     res <- init_epwdate_vctr(length(x))
-#     if (length(x) == 0L) return(res)
-
-#     # split by space
-#     x <- stri_split_fixed(x, " ", n = 5L, omit_empty = TRUE, simplify = TRUE)
-
-#     # try to parse "Month Day" format
-#     is_md <- stri_isempty(x[, 3L]) & !stri_isempty(x[, 2L])
-#     # month-day type
-#     res[is_md] <- as.Date(suppressWarnings(lubridate::parse_date_time(
-#         paste0(year, "-", x[is_md, 1L], x[is_md, 2L]), c("Ymd", "Ydm"), tz = "UTC"
-#     )))
-#     update_epwdate_type(res, is_md, 2L)
-
-#     # init component
-#     # n day of week. 0 == "last"
-#     n <- rep(-1L, nrow(x))
-#     # day of week
-#     wkd <- rep(NA_integer_, nrow(x))
-#     # month
-#     mth <- rep(NA_integer_, nrow(x))
-
-#     # get first component
-#     # must start from 1-4 or last
-#     reg <- "^(last|1(?:st)?|2(?:nd)?|3(?:rd)?|4(?:th)?)$"
-#     n_str <- stringi::stri_match_first_regex(x[, 1L], reg, case_insensitive = TRUE)[, 2L]
-#     n[!is.na(n_str) & n_str == "last"] <- 0L
-#     n[!is.na(n_str) & n_str != "last"] <- as.integer(stri_sub(n_str[!is.na(n_str) & n_str != "last"], to = 1L))
-
-#     if (all(n == -1L)) return(res)
-
-#     # "nth/last Month DayOfWeek"
-#     is_sty1 <- n > -1L & !stri_isempty(x[, 3L]) & stri_isempty(x[4L])
-#     wkd[is_sty1] <- get_epw_wday(x[is_sty1])
-#     mth[is_sty1] <- get_epw_month(x[is_sty1])
-
-#     # "last/nth DayOfWeek in/of Month"
-#     is_sty2 <- n > -1L & !stri_isempty(x[, 4L]) & stri_isempty(x[, 5L]) & stri_trans_tolower(x[, 3L]) %chin% c("in", "of")
-#     wkd[is_sty2] <- get_epw_wday(x[, 2L][is_sty2])
-#     mth[is_sty2] <- get_epw_month(x[, 4L][is_sty2])
-
-#     is_wkd <- !is_md & n > -1L & !is.na(wkd) & !is.na(mth)
-#     if (sum(is_wkd) == 0L) return(res)
-
-#     # subset
-#     # n day of week. 0 == "last"
-#     n <- n[is_wkd]
-#     # day of week
-#     wkd <- wkd[is_wkd]
-#     # month
-#     mth <- mth[is_wkd]
-
-#     ref_end <- rep(1L, sum(is_wkd))
-#     ref_end[n == 0L] <- lubridate::days_in_month(mth[n == 0L])
-#     ref_day <- lubridate::make_date(year, mth, ref_end)
-
-#     # get the weekday of first/last day in month
-#     wkd1 <- wday(ref_day)
-#     # locate_wkd {{{
-#     locate_wkd <- function (wkd, ref_day, wkd1, n) {
-#         # for example: wkd1 Sat(6), wkd Mon(1)
-#         if (wkd1 > wkd) {
-#             if (n == 0L) {
-#                 ref_day - lubridate::days(wkd1 - wkd)
-#             } else {
-#                 ref_day + lubridate::days(7L - wkd1 + wkd) * n
-#             }
-#         # for example: wkd1 Mon(1), wkd Sat(6)
-#         } else if (wkd1 < wkd) {
-#             if (n == 0L) {
-#                 ref_day - lubridate::days(wkd1 + 7L - wkd)
-#             } else {
-#                 ref_day + lubridate::days(wkd - wkd1) * n
-#             }
-#         } else {
-#             ref_day
-#         }
-#     }
-#     # }}}
-#     d <- res[is_wkd]
-#     for (i in seq_along(d)) d[i] <- locate_wkd(wkd[i], ref_day[i], wkd1[i], n[i])
-#     get_epwdate_type(d)
-#     update_epwdate_type(d, n == 0L, 5L)
-#     update_epwdate_type(d, n >  0L, 4L)
-
-#     res[is_wkd] <- d
-#     res
-# }
-# # }}}
-# # }}}
-# # is_EpwDate {{{
-# is_EpwDate <- function (x) {
-#     inherits(x, "EpwDate")
-# }
-# # }}}
-# # format.EpwDate {{{
-# format.EpwDate <- function (x, m_spc = FALSE, ...) {
-#     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
-#     Sys.setlocale("LC_TIME", "C")
-#     t <- get_epwdate_type(x)
-#     res <- rep(NA_character_, length(x))
-#     res[t == 0L] <- "0"
-#     res[t == 1L] <- as.character(lubridate::yday(x[t == 1L]))
-#     res[t == 2L] <- paste(lpad(month(x[t == 2L]), width = if (m_spc) 2L else 1L), format.Date(x[t == 2L], "%e"), sep = "/")
-#     res[t == 3L] <- paste(year(x[t == 3L]), lpad(month(x[t == 3L]), width = if (m_spc) 2L else 1L), format.Date(x[t == 3L], "%e"), sep = "/")
-#     res[t == 4L] <- format_epwdate_nthwkd(x[t == 4L])
-#     res[t == 5L] <- format_epwdate_nthwkd(x[t == 5L], last = TRUE)
-#     res
-# }
-# format_epwdate_julian <- function (x) {
-#     suffix <- rep("th", length(x))
-#     suffix[x == 1L] <- "st"
-#     suffix[x == 2L] <- "nd"
-#     suffix[x == 3L] <- "rd"
-#     paste0(x, suffix, " day")
-# }
-# format_epwdate_nthwkd <- function (x, last = FALSE) {
-#     if (last) {
-#         n <- "Last"
-#         suffix <- ""
-#     } else {
-#         n <- floor(lubridate::mday(x) / 7L) + 1L
-#         suffix <- rep("th", length(x))
-#         suffix[n == 1L] <- "st"
-#         suffix[n == 2L] <- "nd"
-#         suffix[n == 3L] <- "rd"
-#     }
-
-#     paste0(n, suffix, " ",
-#         wday(x, label = TRUE),
-#         " in ",
-#         lubridate::month(x, label = TRUE, abbr = TRUE, local = "C")
-#     )
-# }
-# # }}}
-# # print.EpwDate {{{
-# print.EpwDate <- function (x, ...) {
-#     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
-#     Sys.setlocale("LC_TIME", "C")
-#     t <- get_epwdate_type(x)
-#     res <- rep(NA_character_, length(x))
-#     res[t == 0L] <- "0 <empty>"
-#     res[t == 1L] <- format_epwdate_julian(lubridate::yday(x[t == 1L]))
-#     res[t == 2L] <- format.Date(x[t == 2L], "%b %d")
-#     res[t == 3L] <- format.Date(x[t == 3L], "%Y-%m-%d")
-#     res[t == 4L] <- format_epwdate_nthwkd(x[t == 4L])
-#     res[t == 5L] <- format_epwdate_nthwkd(x[t == 5L], last = TRUE)
-
-#     print(res)
-#     invisible(x)
-# }
-# # }}}
-# # [.EpwDate {{{
-# `[.EpwDate` <- function (x, i) {
-#     r <- NextMethod("[")
-#     setattr(r, "type", get_epwdate_type(x)[i])
-#     r
-# }
-# # }}}
-# # [[.EpwDate {{{
-# `[[.EpwDate` <- function (x, i) {
-#     r <- NextMethod("[[")
-#     setattr(r, "type", get_epwdate_type(x)[i])
-#     r
-# }
-# # }}}
-# # [<-.EpwDate {{{
-# `[<-.EpwDate` <- function (x, ..., value) {
-#     r <- NextMethod("[<-.Date", value = value, ...)
-
-#     t <- get_epwdate_type(x)
-#     t[...] <- get_epwdate_type(value) %||% -1L
-#     setattr(r, "type", t)
-
-#     invisible(r)
-# }
-# # }}}
-# # [[<-.EpwDate {{{
-# `[[<-.EpwDate` <- function (x, ..., value) {
-#     r <- NextMethod("[[", value = value, ...)
-
-#     t <- get_epwdate_type(x)
-#     t[[...]] <- get_epwdate_type(value) %||% -1L
-#     setattr(r, "type", t)
-
-#     invisible(r)
-# }
-# # }}}
-# # c.EpwDate {{{
-# c.EpwDate <- function (...) {
-#     t <- unlist(lapply(list(...), get_epwdate_type), use.names = FALSE)
-#     res <- NextMethod(...)
-#     setattr(res, "type", t)
-#     setattr(res, "class", c("EpwDate", "Date"))
-#     res
-# }
-# # }}}
-# # as.Date.EpwDate {{{
-# as.Date.EpwDate <- function (x, ...) {
-#     class(x) <- "Date"
-#     x
-# }
-# # }}}
-# # as.POSIXct.EpwDate {{{
-# as.POSIXct.EpwDate <- function (x, ...) {
-#     lubridate::force_tz(lubridate::as_datetime(as.Date.EpwDate(x)), tzone = Sys.timezone())
-# }
-# # }}}
-# # }}}
 # EpwDate {{{
 # S3 class for EPW format date {{{
 # type:
@@ -1750,7 +1380,7 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
     # get first component
     # must start from 1-4 or last
     reg <- "^(last|1(?:st)?|2(?:nd)?|3(?:rd)?|4(?:th)?)$"
-    n_str <- stringi::stri_match_first_regex(s[, 1L], reg, case_insensitive = TRUE)[, 2L]
+    n_str <- stri_match_first_regex(s[, 1L], reg, case_insensitive = TRUE)[, 2L]
     n[!is.na(n_str) & n_str == "last"] <- 0L
     n[!is.na(n_str) & n_str != "last"] <- as.integer(stri_sub(n_str[!is.na(n_str) & n_str != "last"], to = 1L))
 
@@ -1964,7 +1594,7 @@ read_epw_data <- function (path) {
         # if not a 9-length string, including empty string "", replace with default missing code
         present_weather_codes[nchar(present_weather_codes) != 9L] <- EPW_MISSING_CODE$present_weather_codes
         # replace non-digits with "9"
-        stringi::stri_replace_all_charclass(present_weather_codes, "[^0-9]", "9")
+        stri_replace_all_charclass(present_weather_codes, "[^0-9]", "9")
     }]
 
     # add line index
@@ -2024,7 +1654,7 @@ create_epw_datetime_components <- function (start, end, interval, tz = Sys.timez
     data.table(
         year = as.integer(lubridate::year(ymd)),
         month = as.integer(lubridate::month(ymd)),
-        day = as.integer(lubridate::day(ymd)),
+        day = as.integer(lubridate::mday(ymd)),
         hour = h, minute = m
     )
 }
@@ -2472,7 +2102,7 @@ set_epw_holiday <- function (epw_header, leapyear, dst, holiday) {
                 "`name` and `day` element(column)."
             )
         )
-        holiday <- data.table::as.data.table(holiday)
+        holiday <- as.data.table(holiday)
         set(holiday, NULL, "day", reset_epwdate_year(epw_date(holiday$day), epw_header$holiday$leapyear))
         assert(are_epwdate(holiday$day), prefix = "Holiday")
 
@@ -3037,7 +2667,7 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
     p_other <- epw_header$period$period[other_periods]
 
     # coerce input data into a data.table
-    data <- data.table::as.data.table(data)
+    data <- as.data.table(data)
 
     # add line indicator
     set(data, NULL, "line", seq_len(nrow(data)))
@@ -3311,7 +2941,7 @@ format_epw_header_design <- function (design) {
     res <- paste("1", design$source, "", sep = ",")
     for (i in 2L:4L) {
         res <- paste(res,
-            stringi::stri_trans_totitle(names(design)[i]),
+            stri_trans_totitle(names(design)[i]),
             if (i < 4L) {
                 paste(
                     design[[i]][1L], # month
@@ -3337,7 +2967,7 @@ format_epw_header_typical <- function (typical) {
     paste(nrow(typical),
         typical[, paste(
             name,
-            stringi::stri_trans_totitle(type),
+            stri_trans_totitle(type),
             format(start_day),
             format(end_day),
             sep = ",",
