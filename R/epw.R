@@ -1070,8 +1070,8 @@ format.Epw <- function (x, ...) x$print(...)
 download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all", "epw", "ddy"),
                               ask = TRUE, max_match = 3) {
     pattern <- gsub("\\s+", ".", pattern)
-    d <- data.table::as.data.table(weather_db)
-    res <- d[stringr::str_detect(title, stringr::regex(pattern, ignore_case = TRUE))]
+    d <- as.data.table(weather_db)
+    res <- d[stri_detect_regex(title, pattern, case_insensitive = TRUE)]
 
     mes_location <- function (index = NULL, title, country, state_province, location, wmo_number, source_type, longitude, latitude) {
         if (!is.null(index)) {
