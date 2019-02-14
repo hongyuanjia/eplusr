@@ -17,7 +17,7 @@ parse_err_file <- function (path) {
     if (!file.exists(path)) return(res)
 
     # read err file
-    err_dt <- read_lines_in_dt(path, trim = TRUE)
+    err_dt <- read_lines(path, trim = TRUE)
 
     if (!nrow(err_dt)) return(res)
 

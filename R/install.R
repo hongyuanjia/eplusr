@@ -353,7 +353,7 @@ eplus_default_path <- function (ver) {
 get_ver_from_path <- function (path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
-    tryCatch(get_idd_ver(read_lines_in_dt(idd_file, nrows = 1L)),
+    tryCatch(get_idd_ver(read_lines(idd_file, nrows = 1L)),
         error_miss_idd_ver = function (e) {
             stop("Failed to parse EnergyPlus version using IDD ",
                 surround(idd_file), ".\n", conditionMessage(e)

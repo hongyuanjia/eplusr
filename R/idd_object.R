@@ -381,14 +381,14 @@ IddObject <- R6::R6Class(classname = "IddObject",
     public = list(
         # INITIALIZE {{{
         initialize = function (class) {
-            if (is.null(private$m_uuid) || is.null(private$m_version) || is.null(private$m_idd_tbl)) {
+            if (is.null(private$m_uuid) || is.null(private$m_version) || is.null(private$m_idd_env)) {
                 stop("IddObject can only be created after a parent Idd object ",
                     "has been initialized.", call. = FALSE)
             }
 
             assert(is_string(class))
 
-            id <- private$m_idd_tbl$class[class_name == class, class_id]
+            id <- private$m_idd_env$class[class_name == class, class_id]
             if (is_empty(id)) {
                 stop("Failed to create IddObject. Invalid class name found: ",
                     surround(class), ".", call. = FALSE)
@@ -527,8 +527,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
         # shared data
         m_uuid = NULL,
         m_version = NULL,
-        m_idd_tbl = NULL,
-        m_idf_tbl = NULL,
+        m_idd_env = NULL,
+        m_idf_env = NULL,
 
         # self data
         m_class_id = NULL,
@@ -542,13 +542,13 @@ IddObject <- R6::R6Class(classname = "IddObject",
 
 # iddobj_group_index {{{
 iddobj_group_index <- function (self, private) {
-    private$m_idd_tbl$class[class_id == private$m_class_id, group_id]
+    private$m_idd_env$class[class_id == private$m_class_id, group_id]
 }
 # }}}
 # iddobj_group_name {{{
 iddobj_group_name <- function (self, private) {
     grp_id <- iddobj_group_index(self, private)
-    private$m_idd_tbl$group[J(grp_id), on = "group_id", group_name]
+    private$m_idd_env$group[J(grp_id), on = "group_id", group_name]
 }
 # }}}
 # iddobj_class_index {{{
@@ -558,12 +558,12 @@ iddobj_class_index <- function (self, private) {
 # }}}
 # iddobj_class_name {{{
 iddobj_class_name <- function (self, private) {
-    private$m_idd_tbl$class[J(private$m_class_id), on = "class_id", class_name]
+    private$m_idd_env$class[J(private$m_class_id), on = "class_id", class_name]
 }
 # }}}
 # iddobj_class_data {{{
 iddobj_class_data <- function (self, private) {
-    private$m_idd_tbl$class[class_id == private$m_class_id]
+    private$m_idd_env$class[class_id == private$m_class_id]
 }
 # }}}
 # iddobj_class_format {{{
@@ -605,7 +605,7 @@ iddobj_extensible_group_num <- function (self, private) {
 iddobj_add_extensible_group <- function (self, private, num) {
     assert(is_count(num))
 
-    private$m_idd_tbl <- t_add_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
+    private$m_idd_env <- t_add_extensible_group(private$m_idd_env, private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) added")
 
@@ -616,7 +616,7 @@ iddobj_add_extensible_group <- function (self, private, num) {
 iddobj_del_extensible_group <- function (self, private, num) {
     assert(is_count(num))
 
-    private$m_idd_tbl <- t_del_extensible_group(private$m_idd_tbl, private$m_class_id, num, strict = TRUE)
+    private$m_idd_env <- t_del_extensible_group(private$m_idd_env, private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) deleted")
 
@@ -645,7 +645,7 @@ iddobj_is_extensible <- function (self, private) {
 # }}}
 # iddobj_field_data {{{
 iddobj_field_data <- function (self, private, which = NULL, cols = NULL, no_ext = TRUE, all = FALSE, complete = FALSE) {
-    t_field_data(private$m_idd_tbl, private$m_class_id, which, cols, no_ext = no_ext, all = all, complete = complete)
+    t_field_data(private$m_idd_env, private$m_class_id, which, cols, no_ext = no_ext, all = all, complete = complete)
 }
 # }}}
 # iddobj_field_name {{{
@@ -724,7 +724,7 @@ iddobj_field_range <- function (self, private, which = NULL) {
 # }}}
 # iddobj_field_reference {{{
 iddobj_field_reference <- function (self, private, which = NULL) {
-    if (is.null(private$m_idf_tbl)) {
+    if (is.null(private$m_idf_env)) {
         mes <- paste0("Function can only be used in IddObjects that are created ",
             "inside an Idf or IdfObject using `$definition()`.")
         abort("error_field_reference", mes, class_id = private$m_class_id)
@@ -732,12 +732,12 @@ iddobj_field_reference <- function (self, private, which = NULL) {
 
     fld <- iddobj_field_data(self, private, which, c("field_id", "type_enum"))
 
-    t_field_reference(fld, private$m_idd_tbl$reference, private$m_idf_tbl$value)$src_value
+    t_field_reference(fld, private$m_idd_env$reference, private$m_idf_env$value)$src_value
 }
 # }}}
 # iddobj_field_possible {{{
 iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
-    if (is.null(private$m_idf_tbl)) {
+    if (is.null(private$m_idf_env)) {
         mes <- paste0("Function can only be used in IddObjects that are created ",
             "inside an Idf or IdfObject using `$definition()`.")
         abort("error_field_possible", mes, class_id = private$m_class_id)
@@ -764,7 +764,7 @@ iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_o
     fld[, `:=`(range = ranger(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
 
     # reference
-    fld <- t_field_reference(fld, private$m_idd_tbl_reference, private$m_idf_tbl$value)
+    fld <- t_field_reference(fld, private$m_idd_env_reference, private$m_idf_env$value)
 
     res <- fld[, list(class_id, class_name, field_index, field_name, auto, default, choice, range, reference = src_value)]
 
@@ -870,7 +870,7 @@ iddobj_print <- function (self, private) {
     # property {{{
     cli::cat_rule(center = crayon::bold("* PROPERTIES *"), col = "green")
 
-    grp <- private$m_idd_tbl$group[J(cls$group_id), on = "group_id", group_name]
+    grp <- private$m_idd_env$group[J(cls$group_id), on = "group_id", group_name]
     cli::cat_line("   ", cli::symbol$bullet, " ", c(
         paste0(crayon::bold("Group: "), surround(grp)),
         paste0(crayon::bold("Unique: "), cls$unique_object),

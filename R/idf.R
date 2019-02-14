@@ -801,13 +801,13 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_version <- idf_file$version
 
             # init idd tbl
-            private$m_idd_tbl <- ._get_private(idd)$m_idd_tbl
+            private$m_idd_env <- ._get_private(idd)$m_idd_env
 
             # get IddObject R6ClassGenerator
             private$m_iddobj_gen <- ._get_private(idd)$m_iddobj_gen
 
             # init idf tbl
-            private$m_idf_tbl <- list2env(idf_file[c("object", "value", "reference")], parent = emptyenv())
+            private$m_idf_env <- list2env(idf_file[c("object", "value", "reference")], parent = emptyenv())
 
             # init log data
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
@@ -816,7 +816,7 @@ Idf <- R6::R6Class(classname = "Idf",
             private$m_log$uuid <- unique_id()
 
             private$m_log$unsaved <- FALSE
-            private$m_log$order <- private$m_idf_tbl$object[, list(object_id)][
+            private$m_log$order <- private$m_idf_env$object[, list(object_id)][
                 , object_order := 0L]
 
             private$m_log$view_in_ip <- eplusr_option("view_in_ip")
@@ -939,8 +939,8 @@ Idf <- R6::R6Class(classname = "Idf",
         m_path = NULL,
         m_is_imf = NULL,
         m_version = NULL,
-        m_idd_tbl = NULL,
-        m_idf_tbl = NULL,
+        m_idd_env = NULL,
+        m_idf_env = NULL,
         m_log = NULL,
         m_idfobj_gen = NULL,
         m_iddobj_gen = NULL,
@@ -966,34 +966,34 @@ idf_path <- function (self, private) {
 # idf_group_name {{{
 idf_group_name <- function (self, private, all = FALSE) {
     if (all) {
-        t_group_name(private$m_idd_tbl$class, private$m_idd_tbl$group)
+        t_group_name(private$m_idd_env$class, private$m_idd_env$group)
     } else {
-        t_group_name(private$m_idf_tbl$object, private$m_idd_tbl$group)
+        t_group_name(private$m_idf_env$object, private$m_idd_env$group)
     }
 }
 # }}}
 # idf_class_name {{{
 idf_class_name <- function (self, private, all = FALSE) {
     if (all) {
-        private$m_idd_tbl$class$class_name
+        private$m_idd_env$class$class_name
     } else {
-        private$m_idf_tbl$object[order(class_id), unique(class_name)]
+        private$m_idf_env$object[order(class_id), unique(class_name)]
     }
 }
 # }}}
 # idf_object_id {{{
 idf_object_id <- function (self, private, class = NULL, simplify = FALSE) {
-    t_object_id(private$m_idf_tbl$object, class, simplify)
+    t_object_id(private$m_idf_env$object, class, simplify)
 }
 # }}}
 # idf_object_name {{{
 idf_object_name <- function (self, private, class = NULL, simplify = FALSE) {
-    t_object_name(private$m_idf_tbl$object, class, simplify)
+    t_object_name(private$m_idf_env$object, class, simplify)
 }
 # }}}
 # idf_object_num {{{
 idf_object_num <- function (self, private, class = NULL) {
-    t_object_num(private$m_idf_tbl$object, class)
+    t_object_num(private$m_idf_env$object, class)
 }
 # }}}
 # idf_is_valid_group_name {{{
@@ -1008,14 +1008,14 @@ idf_is_valid_class_name <- function (self, private, class, all = FALSE) {
 # }}}
 # idf_is_valid_object_id {{{
 idf_is_valid_object_id <- function (self, private, id) {
-    assert(are_counts(id))
-    id %in% private$m_idf_tbl$object$object_id
+    assert(are_count(id))
+    id %in% private$m_idf_env$object$object_id
 }
 # }}}
 # idf_is_valid_object_name {{{
 idf_is_valid_object_name <- function (self, private, name) {
     assert(is.character(name))
-    stri_trans_tolower(name) %in% private$m_idf_tbl$object[!is.na(object_name), object_name_lower]
+    stri_trans_tolower(name) %in% private$m_idf_env$object[!is.na(object_name), object_name_lower]
 }
 # }}}
 # idf_is_unsaved {{{
@@ -1030,7 +1030,7 @@ idf_definition <- function (self, private, class) {
 # }}}
 # idf_object {{{
 idf_object <- function (self, private, which) {
-    obj <- t_object_data(private$m_idf_tbl$object, class = NULL, object = which,
+    obj <- t_object_data(private$m_idf_env$object, class = NULL, object = which,
         cols = c("class_id", "object_id", "object_name")
     )
 
@@ -1041,7 +1041,7 @@ idf_object <- function (self, private, which) {
 # }}}
 # idf_object_in_class {{{
 idf_object_in_class <- function (self, private, class) {
-    obj <- t_object_data(private$m_idf_tbl$object, class,
+    obj <- t_object_data(private$m_idf_env$object, class,
         cols = c("class_id", "object_id", "object_name")
     )
 
@@ -1058,7 +1058,7 @@ idf_search_object <- function (self, private, pattern, class = NULL, ...) {
         )
     }
 
-    obj <- t_object_data(private$m_idf_tbl$object, class,
+    obj <- t_object_data(private$m_idf_env$object, class,
         cols = c("class_id", "object_id", "object_name")
     )
 
@@ -1074,33 +1074,33 @@ idf_search_object <- function (self, private, pattern, class = NULL, ...) {
     res
 }
 # }}}
-# idf_dup {{{
-idf_dup <- function (self, private, ...) {
-    dup <- t_dup_object(private$m_idd_tbl, private$m_idf_tbl, ...)
-
-    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, dup$object, "object_id")
-    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, dup$value, "value_id")
-    private$m_idf_tbl$reference <- ins_dt(private$m_idf_tbl$reference, dup$reference, "value_id")
+# idf_duplicate {{{
+idf_duplicate <- function (self, private, ...) {
+    dup <- t_duplicate_object(private$m_idd_env, private$m_idf_env, ...)
+    merge_idf_data(private$m_idf_env, dup)
 
     # log
+    log_new_order(private$m_log, dup$object$object_id)
+    log_unsaved(private$m_log)
+
     self
 }
 # }}}
 # idf_dup_object {{{
 idf_dup_object <- function (self, private, object, new_name = NULL) {
-    warning("`$dup_object()` is deprecated. Please use `$dup()` instead.", call. = FALSE)
+    warning("`$dup_object()` is deprecated. Please use `$duplicate()` instead.", call. = FALSE)
     idf_dup(self, private, setattr(object, "names", new_name))
 }
 # }}}
 # idf_add {{{
 idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE) {
-    add <- t_add_object(private$m_idd_tbl, private$m_idf_tbl, ..., .default = .default, .all = .all)
-
-    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, add$object, "object_id")
-    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, add$value, "value_id")
-    private$m_idf_tbl$reference <- add$reference
+    add <- t_add_object(private$m_idd_env, private$m_idf_env, ..., .default = .default, .all = .all)
+    merge_idf_data(private$m_idf_env, add)
 
     # log
+    log_new_order(private$m_log, add$object$object_id)
+    log_unsaved(private$m_log)
+
     self
 }
 # }}}
@@ -1113,11 +1113,13 @@ idf_add_object <- function (self, private, class, value = NULL, comment = NULL, 
 # }}}
 # idf_set {{{
 idf_set <- function (self, private, ..., .default = TRUE) {
-    set <- t_set_object(private$m_idd_tbl, private$m_idf_tbl, ..., .default = .default)
+    set <- t_set_object(private$m_idd_env, private$m_idf_env, ..., .default = .default)
+    merge_idf_data(private$m_idf_env, set)
 
-    private$m_idf_tbl$object <- ins_dt(private$m_idf_tbl$object, set$object, "object_id")
-    private$m_idf_tbl$value <- ins_dt(private$m_idf_tbl$value, set$value, "value_id")
-    private$m_idf_tbl$reference <- set$reference
+    # log
+    log_add_order(private$m_log, set$object$object_id)
+    log_unsaved(private$m_log)
+
     self
 }
 # }}}

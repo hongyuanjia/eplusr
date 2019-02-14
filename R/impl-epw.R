@@ -460,7 +460,7 @@ read_epw_header <- function (path) {
     # }}}
 
     # read header {{{
-    header <- read_lines_in_dt(path, nrows = num_header)
+    header <- read_lines(path, nrows = num_header)
 
     # split header lines using comma
     set(header, NULL, "contents", stri_split_fixed(header$string, ","))

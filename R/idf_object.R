@@ -409,7 +409,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         # INITIALIZE {{{
         initialize = function (object_id, class_id = NULL) {
             # check shared data
-            var_shared <- c("m_version", "m_idd_tbl", "m_idf_tbl", "m_log")
+            var_shared <- c("m_version", "m_idd_env", "m_idf_env", "m_log")
             is_null <- vapply(var_shared, function (var) is.null(private[[var]]), logical(1))
             if (any(is_null))
                 stop("IdfObject can be created only after a parent Idf object ",
@@ -419,7 +419,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             if (!is.null(class_id)) {
                 assert(is_count(class_id))
             } else {
-                class_id <- t_object_data(private$m_idf_tbl$object, NULL, object_id)$class_id
+                class_id <- t_object_data(private$m_idf_env$object, NULL, object_id)$class_id
             }
 
             private$m_object_id <- object_id
@@ -498,8 +498,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         # shared data from parent Idf object
         m_uuid = NULL,
         m_version = NULL,
-        m_idf_tbl = NULL,
-        m_idd_tbl = NULL,
+        m_idf_env = NULL,
+        m_idd_env = NULL,
         m_log = NULL,
 
         m_object_id = NULL,

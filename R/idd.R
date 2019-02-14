@@ -180,7 +180,7 @@ Idd <- R6::R6Class(classname = "Idd",
             private$m_version<- idd_file$version
             private$m_build <- idd_file$build
 
-            private$m_idd_tbl <- list2env(
+            private$m_idd_env <- list2env(
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
             # assign tbls to IddObject R6Class Generator
@@ -245,7 +245,7 @@ Idd <- R6::R6Class(classname = "Idd",
         m_uuid = NULL,
         m_version = NULL,
         m_build = NULL,
-        m_idd_tbl = NULL,
+        m_idd_env = NULL,
         m_iddobj_gen = NULL
         # }}}
     )
@@ -264,52 +264,52 @@ idd_build <- function (self, private) {
 # }}}
 # idd_group_name {{{
 idd_group_name <- function (self, private) {
-    t_group_name(private$m_idd_tbl$class, private$m_idd_tbl$group)
+    t_group_name(private$m_idd_env$class, private$m_idd_env$group)
 }
 # }}}
 # idd_from_group {{{
 idd_from_group <- function (self, private, class) {
-    t_group_name(private$m_idd_tbl$class, private$m_idd_tbl$group, class)
+    t_group_name(private$m_idd_env$class, private$m_idd_env$group, class)
 }
 # }}}
 # idd_group_index {{{
 idd_group_index <- function (self, private, group) {
-    t_group_index(private$m_idd_tbl$group, group)
+    t_group_index(private$m_idd_env$group, group)
 }
 # }}}
 # idd_class_name {{{
 idd_class_name <- function (self, private, index = NULL) {
-    t_class_data(private$m_idd_tbl$class, index)$class_name
+    t_class_data(private$m_idd_env$class, index)$class_name
 }
 # }}}
 # idd_class_index {{{
 idd_class_index <- function (self, private, class) {
-    t_class_data(private$m_idd_tbl$class, class)$class_id
+    t_class_data(private$m_idd_env$class, class)$class_id
 }
 # }}}
 # idd_required_class_name {{{
 idd_required_class_name <- function (self, private) {
-    t_class_name_required(private$m_idd_tbl$class)
+    t_class_name_required(private$m_idd_env$class)
 }
 # }}}
 # idd_unique_class_name {{{
 idd_unique_class_name <- function (self, private) {
-    t_class_name_unique(private$m_idd_tbl$class)
+    t_class_name_unique(private$m_idd_env$class)
 }
 # }}}
 # idd_extensible_class_name {{{
 idd_extensible_class_name <- function (self, private) {
-    t_class_name_extensible(private$m_idd_tbl$class)
+    t_class_name_extensible(private$m_idd_env$class)
 }
 # }}}
 # idd_is_valid_group_name {{{
 idd_is_valid_group_name <- function (self, private, group) {
-    group %in% private$m_idd_tbl$group$group_name
+    group %in% private$m_idd_env$group$group_name
 }
 # }}}
 # idd_is_valid_class_name {{{
 idd_is_valid_class_name <- function (self, private, class) {
-    class %in% private$m_idd_tbl$class$class_name
+    class %in% private$m_idd_env$class$class_name
 }
 # }}}
 # idd_object {{{
@@ -325,7 +325,7 @@ idd_object_in_group <- function (self, private, group) {
 
     grp_id <- idd_group_index(self, private, group)
 
-    cls <- private$m_idd_tbl$class[J(grp_id), on = "group_id", class_name]
+    cls <- private$m_idd_env$class[J(grp_id), on = "group_id", class_name]
 
     res <- lapply(cls, private$m_iddobj_gen$new)
     setattr(res, "names", cls)
@@ -338,7 +338,7 @@ idd_print <- function (self, private) {
     cli::cat_bullet(c(
         paste0(crayon::bold("Version"), ": ", surround(private$m_version)),
         paste0(crayon::bold("Build"), ": ", surround(private$m_build)),
-        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_tbl$class))
+        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_env$class))
     ), col = "cyan", bullet_col = "cyan")
 }
 # }}}
@@ -597,7 +597,7 @@ download_idd <- function (ver = "latest", dir) {
     if (identical(ver, LATEST_EPLUS_VER)) {
         cmt <- ALL_EPLUS_RELEASE_COMMIT$commit[1]
 
-        l <- read_lines_in_dt(dest, trim = FALSE)
+        l <- read_lines(dest, trim = FALSE)
 
         l[1L:2L, string := c(paste0("!IDD_Version ", ver), paste0("!IDD_BUILD ", cmt))]
 

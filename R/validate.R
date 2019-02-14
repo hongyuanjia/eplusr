@@ -1,5 +1,7 @@
 #' @importFrom cli cat_bullet cat_line cat_rule symbol
 #' @importFrom data.table copy data.table setattr
+#' @include idd.R
+#' @include idf.R
 NULL
 
 # empty_validity {{{
@@ -389,7 +391,7 @@ check_invalid_autocalculate <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_character: invalid numeric fields {{{
 check_invalid_character <- function (dt_idd, dt_idf, env_in) {
-    invalid_character <- env_in$value[type_enum > .globals$type$real & !is.na(value_num)]
+    invalid_character <- env_in$value[type_enum > IDDFIELD_TYPE$real & !is.na(value_num)]
 
     if (!nrow(invalid_character)) return(env_in)
 
@@ -399,7 +401,7 @@ check_invalid_character <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_numeric: invalid numeric fields {{{
 check_invalid_numeric <- function (dt_idd, dt_idf, env_in) {
-    invalid_numeric <- env_in$value[type_enum <= .globals$type$real & is.na(value_num)]
+    invalid_numeric <- env_in$value[type_enum <= IDDFIELD_TYPE$real & is.na(value_num)]
 
     if (!nrow(invalid_numeric)) return(env_in)
 
@@ -409,7 +411,7 @@ check_invalid_numeric <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_integer: invalid integer fields {{{
 check_invalid_integer <- function (dt_idd, dt_idf, env_in) {
-    invalid_integer <- env_in$value[type_enum == .globals$type$integer & is.na(value_num)]
+    invalid_integer <- env_in$value[type_enum == IDDFIELD_TYPE$integer & is.na(value_num)]
 
     if (!nrow(invalid_integer)) return(env_in)
 
@@ -419,7 +421,7 @@ check_invalid_integer <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_choice: invalid choice fields {{{
 check_invalid_choice <- function (dt_idd, dt_idf, env_in) {
-    cho <- env_in$value[type_enum == .globals$type$choice]
+    cho <- env_in$value[type_enum == IDDFIELD_TYPE$choice]
 
     if (!nrow(cho)) return(env_in)
 
@@ -438,7 +440,7 @@ check_invalid_choice <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_range: invalid range fields {{{
 check_invalid_range <- function (dt_idd, dt_idf, env_in) {
-    val <- env_in$value[type_enum <= .globals$type$real & has_range == TRUE]
+    val <- env_in$value[type_enum <= IDDFIELD_TYPE$real & has_range == TRUE]
 
     if (!nrow(val)) return(env_in)
 
@@ -457,7 +459,7 @@ check_invalid_range <- function (dt_idd, dt_idf, env_in) {
 # }}}
 # check_invalid_reference: invalid reference fields {{{
 check_invalid_reference <- function (dt_idd, dt_idf, env_in) {
-    val <- env_in$value[type_enum == .globals$type$object_list,
+    val <- env_in$value[type_enum == IDDFIELD_TYPE$object_list,
         list(object_id, value_id, value, field_id, type_enum)]
 
     if (!nrow(val)) return(env_in)

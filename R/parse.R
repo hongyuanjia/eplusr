@@ -12,10 +12,51 @@
 #' @importFrom stringi stri_trim_left stri_trim_right
 NULL
 
+# IDD_SLASHKEY {{{
+IDD_SLASHKEY <- list (
+    class = list(
+        flat = c("unique-object", "required-object", "min-fields", "format",
+            "extensible"),
+        nest = c("memo")
+    ),
+
+    field = list(
+        flat = c("field", "required-field", "units", "ip-units",
+            "unitsbasedonfield", "minimum", "minimum>", "maximum", "maximum<",
+            "default", "autosizable", "autocalculatable", "type",
+            "external-list", "begin-extensible"),
+        nest = c("note", "key", "object-list", "reference", "reference-class-name")
+    ),
+
+    type = list(
+        lgl = c("unique-object", "required-object", "required-field",
+            "unitsbasedonfield", "autosizable", "autocalculatable",
+            "begin-extensible", "deprecated", "obsolete", "retaincase"),
+        int = c("min-fields", "extensible"),
+        dbl = c("minimum", "minimum>", "maximum", "maximum<"),
+        chr = c("group", "format", "field", "units", "ip-units", "default", "type",
+            "external-list"),
+        lst = c("memo", "reference-class-name", "note", "key", "object-list",
+            "reference")
+    )
+)
+# }}}
+
+# IDDFIELD_TYPE {{{
+IDDFIELD_TYPE <- list(
+    integer = 1L, real = 2L, choice = 3L, alpha = 4L,
+    object_list = 5L, node = 6L, external_list = 7L
+)
+# }}}
+
+# IDDFIELD_SOURCE {{{
+IDDFIELD_SOURCE <- list(none = 0L, class = 1L, field = 2L, mixed = 3L)
+# }}}
+
 # parse_idd_file {{{
 parse_idd_file <- function(path) {
     # read idd string, get idd version and build
-    idd_dt <- read_lines_in_dt(path)
+    idd_dt <- read_lines(path)
     idd_version <- get_idd_ver(idd_dt)
     idd_build <- get_idd_build(idd_dt)
 
@@ -46,10 +87,10 @@ parse_idd_file <- function(path) {
 
     # dcast class and field tables
     dt_class <- dcast_slash(dt_class, "class_id",
-        slash_keys()$class, c("group_id", "class_name")
+        IDD_SLASHKEY$class, c("group_id", "class_name")
     )
     dt_field <- dcast_slash(dt_field, c("field_id", "field_anid"),
-        slash_keys()$field, c("class_id", "class_name")
+        IDD_SLASHKEY$field, c("class_id", "class_name")
     )
     dt_field[, `:=`(field_id = .I)]
 
@@ -76,7 +117,7 @@ parse_idd_file <- function(path) {
 # parse_idf_file {{{
 parse_idf_file <- function (path, idd = NULL) {
     # read IDF string and get version first to get corresponding IDD
-    idf_dt <- read_lines_in_dt(path)
+    idf_dt <- read_lines(path)
     # delete blank lines
     idf_dt <- idf_dt[!string == ""]
 
@@ -86,7 +127,7 @@ parse_idf_file <- function (path, idd = NULL) {
 
     # get idd version and table
     idd_ver <- ._get_private(idd)$m_version
-    idd_env <- ._get_private(idd)$m_idd_tbl
+    idd_env <- ._get_private(idd)$m_idd_env
 
     # insert version line if necessary
     if (is.null(idf_ver)) idf_dt <- insert_version(idf_dt, idd_ver)
@@ -135,14 +176,15 @@ parse_idf_file <- function (path, idd = NULL) {
 }
 # }}}
 
-# read_lines_in_dt {{{
-read_lines_in_dt <- function(input, trim = TRUE, ...) {
+# read_lines {{{
+read_lines <- function(input, trim = TRUE, ...) {
     dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
     if (trim) {
         set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
     }
+    setcolorder(dt, c("line", "string"))
     dt
 }
 # }}}
@@ -240,38 +282,6 @@ clean_idd_lines <- function (dt) {
 }
 # }}}
 
-# slash_keys {{{
-slash_keys <- function () {
-    cls_keys <- list(
-        flat = c("unique-object", "required-object", "min-fields", "format",
-            "extensible"),
-        nest = c("memo")
-    )
-
-    fld_keys <- list(
-        flat = c("field", "required-field", "units", "ip-units",
-            "unitsbasedonfield", "minimum", "minimum>", "maximum", "maximum<",
-            "default", "autosizable", "autocalculatable", "type",
-            "external-list", "begin-extensible"),
-        nest = c("note", "key", "object-list", "reference", "reference-class-name")
-    )
-
-    types <- list(
-        lgl = c("unique-object", "required-object", "required-field",
-            "unitsbasedonfield", "autosizable", "autocalculatable",
-            "begin-extensible", "deprecated", "obsolete", "retaincase"),
-        int = c("min-fields", "extensible"),
-        dbl = c("minimum", "minimum>", "maximum", "maximum<"),
-        chr = c("group", "format", "field", "units", "ip-units", "default", "type",
-            "external-list"),
-        lst = c("memo", "reference-class-name", "note", "key", "object-list",
-            "reference")
-    )
-
-    list(class = cls_keys, field = fld_keys, type = types)
-}
-# }}}
-
 # sep_idd_lines {{{
 sep_idd_lines <- function (dt, col = "string") {
     # mark first slash
@@ -306,10 +316,10 @@ sep_idd_lines <- function (dt, col = "string") {
     setindexv(dt, "slash_key")
 
     # a) for logical slash key, e.g. "\required-field"
-    dt[slash_key %chin% slash_keys()$type$lgl, `:=`(slash_value = "TRUE")]
+    dt[slash_key %chin% IDD_SLASHKEY$type$lgl, `:=`(slash_value = "TRUE")]
     # b) for numeric value slash with comments, e.g. "\extensible:<#> -some comments"
     # https://stackoverflow.com/questions/3575331/how-do-extract-decimal-number-from-string-in-c-sharp/3575807
-    dt[slash_key %chin% c(slash_keys()$type$int, slash_keys()$type$dbl), `:=`(
+    dt[slash_key %chin% c(IDD_SLASHKEY$type$int, IDD_SLASHKEY$type$dbl), `:=`(
         slash_value = stri_extract_first_regex(slash_value, "[-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?")
     )]
 
@@ -325,7 +335,7 @@ sep_idd_lines <- function (dt, col = "string") {
     }
 
     # check invalid slash keys
-    invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(slash_keys()$type), which = TRUE]
+    invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(IDD_SLASHKEY$type), which = TRUE]
     if (length(invld_key))
         parse_issue("error_slash_key", "idd", "Invalid slash key", dt[invld_key])
 
@@ -432,7 +442,6 @@ sep_group_table <- function (dt, type_enum) {
 # sep_class_table {{{
 sep_class_table <- function (dt, type_enum) {
     setindexv(dt, "type")
-
     dt[type == type_enum$class, `:=`(
         class_id = seq_along(body),
         class_name = stri_trim_right(stri_sub(body, to = -2L))
@@ -465,7 +474,6 @@ sep_class_table <- function (dt, type_enum) {
         `:=`(type_exp = type_enum$field_last)
     ]
 
-    dt[class_id == 1L]
     # check missing class name
     mis_cls <- dt[type == type_enum$field_last & type_exp == type_enum$field]
     if (nrow(mis_cls)) {
@@ -604,7 +612,6 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     assert(has_name(dt, id))
     assert(has_name(keys, c("flat", "nest")))
     if (!is.null(keep)) assert(has_name(dt, keep))
-
     set(dt, NULL, "row", seq_len(nrow(dt)))
 
     # only use the first line of flat slash value
@@ -652,11 +659,11 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
 # complete_property {{{
 complete_property <- function (dt, type, ref) {
     type <- match.arg(type, c("class", "field"))
-    keys <- switch(type, class = slash_keys()$class, field = slash_keys()$field)
+    keys <- switch(type, class = IDD_SLASHKEY$class, field = IDD_SLASHKEY$field)
 
     # get slash type from slash key
     slash_type <- function (key) {
-        types <- slash_keys()$type
+        types <- IDD_SLASHKEY$type
         chk <- vapply(types, function (type) key %in% type, logical(1L))
         names(types)[chk]
     }
@@ -680,7 +687,7 @@ complete_property <- function (dt, type, ref) {
     }
 
     # convert proerty column types
-    types <- unlist(slash_keys()$type, use.names = FALSE)
+    types <- unlist(IDD_SLASHKEY$type, use.names = FALSE)
     for (key in intersect(names(dt), types)) {
         if (!slash_is_type(key)(dt[[key]])) {
             set(dt, NULL, key, slash_as_type(key)(dt[[key]]))
@@ -776,8 +783,8 @@ parse_field_property <- function (dt, ref) {
     set(dt, NULL, "type", stri_trans_tolower(dt[["type"]]))
 
     # add an integer-based field type column
-    t <- stri_replace_all_fixed(names(.globals$type), "_", "-")
-    names(t) <- .globals$type
+    t <- stri_replace_all_fixed(names(IDDFIELD_TYPE), "_", "-")
+    names(t) <- IDDFIELD_TYPE
     set(dt, NULL, "type_enum", as.integer(chmatch(dt$type, t)))
 
     # rename column `key` to `choice`
@@ -915,12 +922,12 @@ parse_field_property_default <- function (dt) {
 
     setindexv(dt, c("type_enum", "value_lc"))
 
-    dt[type_enum <= .globals$type$real, `:=`(value_num = suppressWarnings(as.double(value)))]
+    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.double(value)))]
 
     set(dt, NULL, "default", as.list(dt$default))
-    dt[type_enum == .globals$type$integer & !value_lc %in% c("autosize", "autocalculate"),
+    dt[type_enum == IDDFIELD_TYPE$integer & !value_lc %in% c("autosize", "autocalculate"),
         `:=`(default = as.list(as.integer(value_num)))]
-    dt[type_enum == .globals$type$real & !value_lc %in% c("autosize", "autocalculate"),
+    dt[type_enum == IDDFIELD_TYPE$real & !value_lc %in% c("autosize", "autocalculate"),
         `:=`(default = as.list(value_num))]
 
     set(dt, NULL, c("value_id", "value", "value_lc", "value_num"), NULL)
@@ -946,7 +953,7 @@ parse_field_property_range <- function (dt) {
 # parse_field_reference_table {{{
 parse_field_reference_table <- function (dt) {
     # mark source type
-    set(dt, NULL, "src_enum", .globals$source$none)
+    set(dt, NULL, "src_enum", IDDFIELD_SOURCE$none)
 
     setindexv(dt, "field_id")
 
@@ -961,13 +968,13 @@ parse_field_reference_table <- function (dt) {
         )
     }]
     # fix errors when object-list fields having an type of "alpha"
-    dt[obj_fld, on = "field_id", `:=`(type = "object-list", type_enum = .globals$type$object_list)]
+    dt[obj_fld, on = "field_id", `:=`(type = "object-list", type_enum = IDDFIELD_TYPE$object_list)]
 
     # for \reference-class-name
     ref_cls <- dt[, {
         l <- vapply(reference_class_name, length, integer(1L))
         # handle the case when there is no \reference-class-name
-        enum <- {if (all(l == 0L)) integer(0) else .globals$source$class}
+        enum <- {if (all(l == 0L)) integer(0) else IDDFIELD_SOURCE$class}
         list(
             reference = unlist(reference_class_name),
             src_field_id = rep(field_id[l > 0L], l[l > 0L]),
@@ -980,9 +987,9 @@ parse_field_reference_table <- function (dt) {
     ref_fld <- dt[, {
         l <- vapply(reference, length, integer(1L))
         fld <- l > 0L
-        mx <- fld & src_enum == .globals$source$class
-        src_enum[fld] <- .globals$source$field
-        src_enum[mx] <- .globals$source$mixed
+        mx <- fld & src_enum == IDDFIELD_SOURCE$class
+        src_enum[fld] <- IDDFIELD_SOURCE$field
+        src_enum[mx] <- IDDFIELD_SOURCE$mixed
         list(
             reference = unlist(reference),
             src_field_id = rep(field_id[fld], l[fld]),
@@ -1308,7 +1315,7 @@ get_value_table <- function (dt, idd) {
     )]
 
     # add numeric type values
-    dt[type_enum <= .globals$type$real,
+    dt[type_enum <= IDDFIELD_TYPE$real,
         `:=`(value_num = suppressWarnings(as.numeric(value)))]
 
     # only keep useful columns
@@ -1372,7 +1379,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 
     # a) reference class names
     cls_src <- dt_val[
-        src_enum == .globals$source$class,
+        src_enum == IDDFIELD_SOURCE$class,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1384,7 +1391,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 
     # b) reference field values
     fld_src <- dt_val[
-        src_enum == .globals$source$field,
+        src_enum == IDDFIELD_SOURCE$field,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1397,14 +1404,14 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     # c) reference both class names and field values
     ## seperate source enum here
     mix_src <- dt_val[
-        src_enum == .globals$source$mixed,
+        src_enum == IDDFIELD_SOURCE$mixed,
         {
             list(
                 src_object_id = c(object_id, object_id),
                 src_field_id = c(field_id, field_id),
                 src_value_id = c(value_id, value_id),
                 src_value = c(value, class_name),
-                src_enum = c(.globals$source$field, .globals$source$class)
+                src_enum = c(IDDFIELD_SOURCE$field, IDDFIELD_SOURCE$class)
             )
         }
     ]
@@ -1421,7 +1428,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 # get_value_references {{{
 get_value_references <- function (dt_value, lower = FALSE) {
     val_ref <- dt_value[
-        !is.na(value) & type_enum == .globals$type$object_list,
+        !is.na(value) & type_enum == IDDFIELD_TYPE$object_list,
         list(object_id, value_id, value, field_id)]
 
     if (lower) set(val_ref, NULL, "value", stri_trans_tolower(val_ref$value))

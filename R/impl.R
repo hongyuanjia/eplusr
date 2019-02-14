@@ -4,6 +4,8 @@
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
 #' @importFrom stringi stri_subset_regex stri_match_first_regex stri_rand_strings
+#' @include parse.R
+#' @include clone.R
 NULL
 
 # GROUP
@@ -674,14 +676,14 @@ t_field_default_to_unit <- function (dt_field, from, to) {
 
     dt_field[!is.na(value_num), `:=`(default = as.list(value_num))]
 
-    int_trunc <- dt_field[type_enum == .globals$type$integer & !are_integer(value_num)]
+    int_trunc <- dt_field[type_enum == IDDFIELD_TYPE$integer & !are_integer(value_num)]
     if (nrow(int_trunc)) {
         mes <- paste0("Truncation errors introduced when converting integer ",
             "default values from ", toupper(from), " unit to ", toupper(to), " unit.")
         warn("warning_default_int_trunc", mes, int_trunc)
     }
 
-    dt_field[type_enum == .globals$type$integer, `:=`(default = as.list(as.integer(value_num)))]
+    dt_field[type_enum == IDDFIELD_TYPE$integer, `:=`(default = as.list(as.integer(value_num)))]
     set(dt_field, NULL, c("value_id", "value_num"), NULL)
 
     dt_field
@@ -690,10 +692,10 @@ t_field_default_to_unit <- function (dt_field, from, to) {
 # t_field_reference {{{
 t_field_reference <- function (fld, dt_reference, dt_value) {
     # get all nodes
-    fld[type_enum == .globals$type$node, `:=`(node_value = list(t_value_all_node(dt_value)))]
+    fld[type_enum == IDDFIELD_TYPE$node, `:=`(node_value = list(t_value_all_node(dt_value)))]
 
     # get all ids of unique field references
-    fld_id_ref <- fld[type_enum == .globals$type$object_list, list(field_id = unique(field_id))]
+    fld_id_ref <- fld[type_enum == IDDFIELD_TYPE$object_list, list(field_id = unique(field_id))]
 
     # get all ids of field sources
     fld_id_ref_src <- dt_reference[fld_id_ref, on = "field_id", nomatch = 0L, list(field_id, src_field_id)]
@@ -709,7 +711,7 @@ t_field_reference <- function (fld, dt_reference, dt_value) {
         list(src_value = list(unlist(src_value))), by = field_id]
 
     # merge into orignial field table
-    fld <- fld_src[fld, on = "field_id"][type_enum == .globals$type$node, `:=`(src_value = node_value)]
+    fld <- fld_src[fld, on = "field_id"][type_enum == IDDFIELD_TYPE$node, `:=`(src_value = node_value)]
 
     set(fld, NULL, "node_value", NULL)
 
