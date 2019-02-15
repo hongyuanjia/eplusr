@@ -264,7 +264,7 @@ format_objects <- function (dt_value, zoom = c("group", "class", "object", "fiel
         dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id", "class_name", "object_id", "object_name")])
         setorderv(dt, c("group_id", "class_id", "object_id"))
         set(dt, NULL, "object", t_object_info(dt, c("name", "id"), numbered = FALSE, name_prefix = FALSE))
-        dt <- tree(dt, "object", "class_id", "group_id", leading = 0L)
+        dt <- tree(dt, "object", "class_id", "group_id")
 
         dt <- dt[,
             list(group_name = group_name[1L],
@@ -359,11 +359,16 @@ format_index <- function (dt_value, required = FALSE) {
 format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
                           end = TRUE) {
     values <- dt_value$value
+    width <- leading + nchar(values) + 1L
     if (blank) {
+        width[is.na(width)] <- leading + 7L + 1L
         values[is.na(values)] <- s_blk("<Blank>")
     } else {
+        width[is.na(width)] <- leading + 0L + 1L
         values[is.na(values)] <- ""
     }
+    width[width > length] <- length - 1L
+    pad <- stringi::stri_dup(" ", length - width)
 
     if (!end) {
         res <- paste0(values, ",")
@@ -378,12 +383,7 @@ format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
         res[-is_end] <- paste0(values[-is_end], ",")
     }
 
-    res <- paste0(stringi::stri_dup(" ", leading), res)
-
-    res <- rpad(res, width = length)
-    res[nchar(res) > length] <- paste0(res[nchar(res) > length], "  ")
-
-    res
+    paste0(stringi::stri_dup(" ", leading), res, pad)
 }
 # }}}
 
@@ -560,33 +560,7 @@ format.Range <- function (x, ...) {
 #' @export
 # print.Range {{{
 print.Range <- function (x, ...) {
-    format.Range(x, ...)
-    if (is.na(x$minimum) && is.na(x$maximum)) {
-        cat("<Not Applicable>")
-        return(invisible(x))
-    }
-
-    if (!is.na(x$minimum)) {
-        if (x$lower_incbounds) {
-            left <- paste0("[", x$minimum)
-        } else {
-            left <- paste0("(", x$minimum)
-        }
-    } else {
-        left <- "(-Inf"
-    }
-
-    if (!is.na(x$maximum)) {
-        if (x$upper_incbounds) {
-            right <- paste0(x$maximum, "]")
-        } else {
-            right <- paste0(x$maximum, ")")
-        }
-    } else {
-        right <- "Inf)"
-    }
-
-    cli::cat_line(paste0(left, ", ", right))
+    cat(format.Range(x, ...), "\n")
     invisible(x)
 }
 # }}}
@@ -607,7 +581,7 @@ has_color <- function () {
 s_req <- function (...) if (.globals$color) crayon::red$bold(...) else c(...)
 # }}}
 # s_nm: style for field names {{{
-s_nm <- function (...) if (.globals$color) crayon::silver(...) else c(...)
+s_nm <- function (...) if (.globals$color) crayon::italic(...) else c(...)
 # }}}
 # s_blk: style for blank {{{
 s_blk <- function (...) if (.globals$color) crayon::underline(...) else c(...)
