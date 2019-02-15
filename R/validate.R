@@ -310,7 +310,7 @@ check_conflict_name <- function (dt_idd, dt_idf, env_in) {
     } else {
         exist <- dt_idf$object[class_id %in% env_in$object$class_id]
         # add existing object
-        obj <- ins_dt(exist, env_in$object, "object_id")[!is.na(object_name)]
+        obj <- append_dt(exist, env_in$object, "object_id")[!is.na(object_name)]
     }
 
     if (!nrow(obj)) return(env_in)
@@ -323,7 +323,7 @@ check_conflict_name <- function (dt_idd, dt_idf, env_in) {
     # get object name in order to correctly print error messages
     obj <- obj[J(conf_id), on = "object_id", .SD, .SDcols = c("object_id", "object_name")]
     # only show the first 3 fields
-    env_in$validity$conflict_name <- ins_dt(dt_idf$value, env_in$value, "value_id")[
+    env_in$validity$conflict_name <- append_dt(dt_idf$value, env_in$value, "value_id")[
         obj, on = "object_id"][
         field_index <= 3L, .SD, .SDcols = names(env_in$validity$conflict_name)
     ]
@@ -468,7 +468,7 @@ check_invalid_reference <- function (dt_idd, dt_idf, env_in) {
         ref_map <- get_value_reference_map(dt_idd$reference, env_in$value, val)
     } else {
         ref_map <- get_value_reference_map(dt_idd$reference,
-            ins_dt(dt_idf$value, env_in$value, "value_id"), val)
+            append_dt(dt_idf$value, env_in$value, "value_id"), val)
     }
 
     invalid_ref <- ref_map[val, on = list(value_id)][is.na(src_value_id)]

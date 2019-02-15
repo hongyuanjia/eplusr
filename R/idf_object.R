@@ -407,47 +407,57 @@ NULL
 IdfObject <- R6::R6Class(classname = "IdfObject",
     public = list(
         # INITIALIZE {{{
-        initialize = function (object_id, class_id = NULL) {
-            # check shared data
-            var_shared <- c("m_version", "m_idd_env", "m_idf_env", "m_log")
-            is_null <- vapply(var_shared, function (var) is.null(private[[var]]), logical(1))
-            if (any(is_null))
-                stop("IdfObject can be created only after a parent Idf object ",
-                    "has been initialized.", call. = FALSE)
-
-            assert(is_count(object_id))
-            if (!is.null(class_id)) {
-                assert(is_count(class_id))
+        initialize = function (object, class = NULL, parent) {
+            if (missing(parent) || !is_idf(parent)) {
+                abort("error_idfobject_missing_parent",
+                    paste("IdfObject can only be created based a parent Idf object.",
+                        "Please give `parent`, which should be an Idf object.")
+                )
             } else {
-                class_id <- t_object_data(private$m_idf_env$object, NULL, object_id)$class_id
+                private$m_parent <- parent
+            }
+            assert(is_count(object))
+            if (!is.null(class)) {
+                assert(is_count(class))
+            } else {
+                class <- get_idf_object(private$idf_env(), NULL, object)$class_id
             }
 
-            private$m_object_id <- object_id
-            private$m_class_id <- class_id
+            private$m_object_id <- object
+            private$m_class_id <- class
         },
         # }}}
 
         # PUBLIC FUNCTIONS {{{
         id = function ()
-            i_id(self, private),
+            idfobj_id(self, private),
 
         name = function ()
-            i_object_tbl_from_which(self, private, private$m_object_id, class = FALSE)$object_name,
+            idfobj_name(self, private),
 
         group_name = function ()
-            i_from_group(self, private, private$m_class_id),
+            idfobj_group_name(self, private),
 
         class_name = function ()
-            i_class_tbl_from_which(self, private, private$m_class_id)$class_name,
+            idfobj_class_name(self, private),
 
         definition = function ()
-            i_definition(self, private, i_class_name(self, private, private$m_class_id))[[1]],
+            idfobj_definition(self, private),
 
         get_comment = function ()
             i_comment_tbl_from_which(self, private, private$m_object_id, nomatch = 0L)$comment,
 
         set_comment = function (comment, append = TRUE, width = 0L)
             i_idfobj_set_comment(self, private, private$m_object_id, comment, append, width),
+
+        comment = function (comment, append = TRUE, width = 0L)
+            idfobj_comment(self, private, comment, append, width),
+
+        value = function (which = NULL, all = FALSE, simplify = FALSE)
+            idfobj_value(self, private, which, all, simplify),
+
+        set = function (..., default = TRUE)
+            idfobj_set(self, private, ..., default),
 
         get_value = function (which = NULL, all = FALSE, simplify = FALSE)
             i_idfobj_get_value(self, private, private$m_object_id, which, all, simplify),
@@ -456,13 +466,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
             i_idfobj_set_value(self, private, private$m_object_id, ..., default = default),
 
         possible_value = function (which = NULL)
-            i_idfobj_possible_values(self, private, private$m_object_id, which),
+            idfobj_possible_value(self, private, which),
 
-        validate = function ()
-            i_validate_idfobject(self, private, private$m_object_id),
+        validate = function (level = eplusr_option("validate_level"))
+            idfobj_validate(self, private, level),
 
-        is_valid = function ()
-            i_is_valid_idfobject(self, private, private$m_object_id),
+        is_valid = function (level = eplusr_option("validate_level"))
+            idfobj_is_valid(self, private, level),
+
+        ref_from = function ()
+            idfobj_ref_from(self, private),
+
+        ref_by = function ()
+            idfobj_ref_by(self, private),
 
         ref_from_object = function ()
             i_idfobj_ref_from(self, private, private$m_object_id),
@@ -476,90 +492,187 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         has_ref_from = function ()
             i_idfobj_has_ref_from(self, private, private$m_object_id),
 
-        has_ref = function ()
-            i_idfobj_has_ref_from(self, private, private$m_object_id) ||
-            i_idfobj_has_ref_by(self, private, private$m_object_id),
+        has_ref = function (type = c("all", "from", "by"))
+            idfobj_has_ref(self, private, type),
 
         table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
-            i_idfobj_value_table(self, private, private$m_object_id, all, unit, wide, string_value, in_ip),
+            idfobj_table(self, private, all, unit, wide, string_value, in_ip),
 
         string = function (comment = TRUE, leading = 4L, sep_at = 29L)
-            i_object_string(self, private, private$m_object_id, header = FALSE,
-                format = "new_top", comment = comment, leading = leading,
-                sep_at = sep_at, index = FALSE),
+            idfobj_string(self, private, comment, leading, sep_at),
 
-        print = function (comment = TRUE, auto_sep = FALSE)
-            idfobj_print(self, private, private$m_object_id, comment, auto_sep)
+        print = function (comment = TRUE, auto_sep = TRUE, brief = FALSE)
+            idfobj_print(self, private, comment, auto_sep, brief)
         # }}}
     ),
 
     private = list(
         # PRIVATE FIELDS {{{
         # shared data from parent Idf object
-        m_uuid = NULL,
-        m_version = NULL,
-        m_idf_env = NULL,
-        m_idd_env = NULL,
+        m_parent = NULL,
         m_log = NULL,
-
         m_object_id = NULL,
         m_class_id = NULL,
-
-        # self reference
-        m_idfobj_gen = NULL,
-        m_iddobj_gen = NULL
         # }}}
+
+        idf_env = function () {
+            ._get_private(private$m_parent)$m_idf_env
+        },
+
+        idd_env = function () {
+            ._get_private(private$m_parent)$idd_env()
+        }
     )
 )
 # }}}
 
+# idfobj_id {{{
+idfobj_id <- function (self, private) {
+    private$m_object_id
+}
+# }}}
+# idfobj_name {{{
+idfobj_name <- function (self, private) {
+    private$idf_env()$object[J(private$m_object_id), on = "object_id", object_name]
+}
+# }}}
+# idfobj_group_name {{{
+idfobj_group_name <- function (self, private) {
+    get_idd_class_group(private$idd_env(), private$m_class_id)$group_name
+}
+# }}}
+# idfobj_class_name {{{
+idfobj_class_name <- function (self, private) {
+    private$idd_env()$class[J(private$m_class_id), on = "class_id", class_name]
+}
+# }}}
+# idfobj_definition {{{
+idfobj_definition <- function (self, private) {
+    IddObject$new(private$m_class_id, ._get_private(private$m_parent)$m_idd)
+}
+# }}}
+# idfobj_comment {{{
+idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
+    if (missing(comment)) {
+        return(get_idf_object(private$idf_env(), object = private$m_object_id, cols = "comment")[[1L]])
+    }
+
+    obj <- set_idfobj_comment(private$idf_env(), comment, append, width)
+
+    log_add_order(private$m_log, obj$object_id)
+    log_unsaved(private$m_log)
+
+    self
+}
+# }}}
+# idfobj_value {{{
+idfobj_value <- function (self, private, which = NULL, all = FALSE, simplify = FALSE) {
+}
+# }}}
+# idfobj_possible_value {{{
+idfobj_possible_value <- function (self, private, which = NULL, type = "all") {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_set {{{
+idfobj_set <- function (self, private, ..., default = TRUE) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_validate {{{
+idfobj_validate <- function (self, private, level = eplusr_option("validate_level")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_is_valid {{{
+idfobj_is_valid <- function (self, private, level = eplusr_option("validate_level")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_ref_from {{{
+idfobj_ref_from <- function (self, private, level = eplusr_option("validate_level")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_ref_by {{{
+idfobj_ref_by <- function (self, private, level = eplusr_option("validate_level")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_has_ref {{{
+idfobj_has_ref <- function (self, private, level = eplusr_option("validate_level")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_table {{{
+idfobj_table <- function (self, private, all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip")) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
+# idfobj_string {{{
+idfobj_string <- function (self, private, comment = TRUE, leading = 4L, sep_at = 29L) {
+    if (missing(comment)) {
+        
+    }
+}
+# }}}
 # idfobj_print {{{
-idfobj_print <- function (self, private, object, comment = TRUE, auto_sep = FALSE) {
-    assert(is_scalar(object))
+idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief = FALSE) {
+    obj <- get_idf_object(private$idf_env(), object = private$m_object_id)
 
-    obj_tbl <- i_object_tbl_from_which(self, private, object)
-    val_tbl <- i_value_tbl_from_which(self, private, object)
+    if (brief) {
+        if (is.na(obj$object_name)) {
+            cli::cat_line("<IdfObject: ", surround(obj$class_name), "> [ID: ", obj$object_id, "]")
+        } else {
+            cli::cat_line("<IdfObject: ", surround(obj$class_name), "> [ID: ", obj$object_id, "] ", obj$object_name)
+        }
+        return(invisible(self))
+    }
 
-    if (is.na(obj_tbl$object_name)) {
-        cli::cat_line(
-            crayon::bold$underline(paste0(
-                "IdfObject <<[ID:", obj_tbl$object_id, "]>>",
-                surround(obj_tbl$class_name)
-            )),
-            col = "inverse"
-        )
+    val <- get_idf_value_from_which(private$idd_env(), private$idf_env(), object = private$m_object_id)
+
+    if (is.na(obj$object_name)) {
+        cli::cat_line("<IdfObject> [ID: ", obj$object_id, "]")
     } else {
-        cli::cat_line(
-            crayon::bold$underline(paste0(
-                "IdfObject <<[ID:", obj_tbl$object_id, "] ", surround(obj_tbl$object_name), ">>",
-                surround(obj_tbl$class_name)
-            )),
-            col = "inverse"
-        )
+        cli::cat_line("<IdfObject> [ID: ", obj$object_id, "] ", obj$object_name)
     }
 
     # comment
-    if (comment) {
-        cmt_tbl <- i_comment_tbl_from_which(self, private, object, nomatch = 0L)
-        if (not_empty(cmt_tbl)) {
-            cli::cat_rule(center = crayon::bold("* COMMENTS *"), col = "green")
-            cli::cat_line(crayon::italic(format_comment(cmt_tbl)), col = "cyan")
-        }
+    if (comment && !is.null(obj$comment[[1L]])) {
+        cli::cat_rule(crayon::bold("* COMMENTS *"), col = "green")
+        cli::cat_line(paste0(str_trunc(paste0(" !", obj$comment[[1L]])), collapse = "\n"))
     }
 
     if (auto_sep)
-        sep_at <- max(nchar(val_tbl$value, keepNA = FALSE)) + 4L
+        sep_at <- max(nchar(val$value, keepNA = FALSE)) + 4L
     else
         sep_at <- 20L
 
     # value
-    fld <- format_field(val_tbl, leading = 1L, in_ip = eplusr_option("view_in_ip"),
-        sep_at = sep_at, index = TRUE, blank = TRUE, required = TRUE)
-
-    # remove class line
-    cli::cat_rule(center = crayon::green$bold("* VALUES *"), col = "green")
-    cli::cat_line(fld)
-    cli::cat_rule(col = "green")
+    if (brief) {
+        cli::cat_line()
+        cli::cat_line(format_objects(private$idd_env()$group[obj, on = "group_id"], zoom = "object", leading = 1L))
+    } else {
+        cli::cat_rule(crayon::bold("* VALUES *"), col = "green")
+        cli::cat_line(format_objects(obj[, list(object_name, object_id)][val, on = "object_id"], zoom = "field", leading = 1L))
+    }
+    invisible(self)
 }
 # }}}
 

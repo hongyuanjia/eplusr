@@ -99,6 +99,19 @@ clone_generator <- function (x) {
 }
 # }}}
 
+# read_lines {{{
+read_lines <- function(input, trim = TRUE, ...) {
+    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
+    if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
+    set(dt, j = "line", value = seq_along(dt[["string"]]))
+    if (trim) {
+        set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+    }
+    setcolorder(dt, c("line", "string"))
+    dt
+}
+# }}}
+
 # write_lines {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
@@ -236,7 +249,10 @@ each_length <- function (x) {
 
 # ranger {{{
 ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
-    assert(is_number(minimum), is_number(maximum), is_flag(lower_incbounds), is_flag(upper_incbounds))
+    assert(is_scalar(minimum) && is.numeric(minimum),
+           is_scalar(maximum) && is.numeric(maximum),
+           is_flag(lower_incbounds), is_flag(upper_incbounds)
+    )
     setattr(
         list(
             minimum = minimum, lower_incbounds = lower_incbounds,
@@ -247,8 +263,8 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
 }
 # }}}
 
-# ins_dt {{{
-ins_dt <- function (dt, new_dt, base_col = NULL) {
+# append_dt {{{
+append_dt <- function (dt, new_dt, base_col = NULL) {
     assert(has_name(new_dt, names(dt)))
 
     if (is.null(base_col)) {
@@ -284,5 +300,43 @@ fmt_int <- function (x, digits = 1L) sprintf(paste0("%.", digits, "f"), x)
 # wday {{{
 wday <- function (x, label = FALSE) {
     lubridate::wday(x, label = label, abbr = FALSE, week_start = 1L, local = "C")
+}
+# }}}
+
+# .deprecated_fun {{{
+# adopted from tidyverse/lubridate/R/deprecated.R
+.deprecated_fun <- function(name, replacement, class = NULL, version) {
+    class <- if (is.null(class)) "" else paste0(" in ", class, " class")
+    msg <- paste0(sprintf("`%s` is deprecated%s in version `%s`. Please use `%s` instead.",
+        name, class, version, replacement)
+    )
+    .deprecated(msg, version)
+}
+# }}}
+
+# .deprecated {{{
+.deprecated <- function(msg, version) {
+    v <- as.package_version(version)
+    cv <- packageVersion("eplusr")
+
+    # If current major number is greater than last-good major number, or if
+    # current minor number is more than 2 greater than last-good minor number,
+    # give error.
+    if (cv[[1, 1]] > v[[1, 1]]  ||  cv[[1, 2]] > v[[1, 2]] + 2) {
+        abort("error_eplusr_deprecated", msg)
+    } else {
+        warn("warning_eplusr_deprecated", msg)
+    }
+    invisible()
+}
+# }}}
+
+# str_trunc {{{
+str_trunc <- function (x, width = getOption("width")) {
+    # in case invalid UTF-8 character in IDF
+    x <- stringi::stri_encode(x)
+    tr <- nchar(x, "width") > 0.95 * (width)
+    x[tr] <- paste0(stri_sub(x[tr], to = 0.95 * (width)), "...")
+    x
 }
 # }}}

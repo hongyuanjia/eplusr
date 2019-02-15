@@ -380,22 +380,44 @@ IddObject <- R6::R6Class(classname = "IddObject",
 
     public = list(
         # INITIALIZE {{{
-        initialize = function (class) {
-            if (is.null(private$m_uuid) || is.null(private$m_version) || is.null(private$m_idd_env)) {
-                stop("IddObject can only be created after a parent Idd object ",
-                    "has been initialized.", call. = FALSE)
+        initialize = function (class, parent) {
+            if (missing(parent)) {
+                abort("error_iddobject_missing_parent",
+                    paste("IddObject can only be created based a parent Idd object.",
+                        "Please give `parent`, which should be either an IDD version or an Idd object."
+                    )
+                )
+            } else {
+                private$m_parent <- use_idd(parent)
             }
 
-            assert(is_string(class))
+            if (is_count(class)) {
+                id <- private$idd_env()$class[class_id == class, class_id]
+                err_id <- "index"
+            } else if (is_string(class)) {
+                id <- private$idd_env()$class[class_name == class, class_id]
+                err_id <- "name"
+            } else {
+                abort("error_invalid_iddobject_class_type",
+                    paste("Failed to create IddObject. `class` should be either",
+                        "a length one integer or character."
+                    )
+                )
+            }
 
-            id <- private$m_idd_env$class[class_name == class, class_id]
-            if (is_empty(id)) {
-                stop("Failed to create IddObject. Invalid class name found: ",
-                    surround(class), ".", call. = FALSE)
+            if (!length(id)) {
+                abort("error_iddobject_invalid_class",
+                    paste0("Failed to create IddObject. Invalid class ", err_id, " found: ",
+                        surround(class), "."
+                    )
+                )
             }
             private$m_class_id <- id
         },
         # }}}
+
+        version = function ()
+            iddobj_version(self, private),
 
         # CLASS PROPERTY GETTERS {{{
         group_name = function ()
@@ -524,31 +546,37 @@ IddObject <- R6::R6Class(classname = "IddObject",
 
     private = list(
         # PRIVATE FIELDS {{{
-        # shared data
-        m_uuid = NULL,
-        m_version = NULL,
-        m_idd_env = NULL,
-        m_idf_env = NULL,
-
-        # self data
         m_class_id = NULL,
+        m_parent = NULL,
+        # }}}
 
-        # self reference
-        m_iddobj_gen = NULL
+        # PRIVATE FUNCTIONS {{{
+        idd_priv = function () {
+            ._get_private(private$m_parent)
+        },
+
+        idd_env = function () {
+            .subset2(._get_private(private$m_parent), "m_idd_env")
+        }
         # }}}
     )
 )
 # }}}
 
+# iddobj_version {{{
+iddobj_version <- function (self, private) {
+    private$idd_priv()$m_version
+}
+# }}}
 # iddobj_group_index {{{
 iddobj_group_index <- function (self, private) {
-    private$m_idd_env$class[class_id == private$m_class_id, group_id]
+    private$idd_env()$class[class_id == private$m_class_id, group_id]
 }
 # }}}
 # iddobj_group_name {{{
 iddobj_group_name <- function (self, private) {
     grp_id <- iddobj_group_index(self, private)
-    private$m_idd_env$group[J(grp_id), on = "group_id", group_name]
+    private$idd_env()$group[J(grp_id), on = "group_id", group_name]
 }
 # }}}
 # iddobj_class_index {{{
@@ -558,12 +586,12 @@ iddobj_class_index <- function (self, private) {
 # }}}
 # iddobj_class_name {{{
 iddobj_class_name <- function (self, private) {
-    private$m_idd_env$class[J(private$m_class_id), on = "class_id", class_name]
+    private$idd_env()$class[J(private$m_class_id), on = "class_id", class_name]
 }
 # }}}
 # iddobj_class_data {{{
 iddobj_class_data <- function (self, private) {
-    private$m_idd_env$class[class_id == private$m_class_id]
+    private$idd_env()$class[class_id == private$m_class_id]
 }
 # }}}
 # iddobj_class_format {{{
@@ -605,7 +633,8 @@ iddobj_extensible_group_num <- function (self, private) {
 iddobj_add_extensible_group <- function (self, private, num) {
     assert(is_count(num))
 
-    private$m_idd_env <- t_add_extensible_group(private$m_idd_env, private$m_class_id, num, strict = TRUE)
+    private$m_parent$.__enclos_env__$private$m_idd_env <-
+        add_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) added")
 
@@ -616,7 +645,8 @@ iddobj_add_extensible_group <- function (self, private, num) {
 iddobj_del_extensible_group <- function (self, private, num) {
     assert(is_count(num))
 
-    private$m_idd_env <- t_del_extensible_group(private$m_idd_env, private$m_class_id, num, strict = TRUE)
+    private$m_parent$.__enclos_env__$private$m_idd_env <-
+        del_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) deleted")
 
@@ -644,13 +674,16 @@ iddobj_is_extensible <- function (self, private) {
 }
 # }}}
 # iddobj_field_data {{{
-iddobj_field_data <- function (self, private, which = NULL, cols = NULL, no_ext = TRUE, all = FALSE, complete = FALSE) {
-    t_field_data(private$m_idd_env, private$m_class_id, which, cols, no_ext = no_ext, all = all, complete = complete)
+iddobj_field_data <- function (self, private, which = NULL, cols = NULL) {
+    get_idd_field(private$idd_env(), private$m_class_id, which,
+        cols, all = TRUE, underscore = FALSE, no_ext = TRUE
+    )
 }
 # }}}
 # iddobj_field_name {{{
 iddobj_field_name <- function (self, private, index = NULL, lower = FALSE,
                                unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
+    if (!is.null(index)) assert(are_count(index))
     fld <- iddobj_field_data(self, private, index, c("field_name", "full_name", "full_ipname"))
 
     if (unit) {
@@ -670,6 +703,7 @@ iddobj_field_name <- function (self, private, index = NULL, lower = FALSE,
 # }}}
 # iddobj_field_index {{{
 iddobj_field_index <- function (self, private, name = NULL) {
+    if (!is.null(name)) assert(is.character(name))
     iddobj_field_data(self, private, name, "field_index")$field_index
 }
 # }}}
@@ -701,7 +735,7 @@ iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_op
     )
 
     unit_to <- if(in_ip) "ip" else "si"
-    fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
+    fld <- change_field_default_value_unit(fld, from = "si", to = unit_to)
 
     fld$default
 }
@@ -732,46 +766,46 @@ iddobj_field_reference <- function (self, private, which = NULL) {
 
     fld <- iddobj_field_data(self, private, which, c("field_id", "type_enum"))
 
-    t_field_reference(fld, private$m_idd_env$reference, private$m_idf_env$value)$src_value
+    t_field_reference(fld, private$idd_env()$reference, private$m_idf_env$value)$src_value
 }
 # }}}
-# iddobj_field_possible {{{
-iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
-    if (is.null(private$m_idf_env)) {
-        mes <- paste0("Function can only be used in IddObjects that are created ",
-            "inside an Idf or IdfObject using `$definition()`.")
-        abort("error_field_possible", mes, class_id = private$m_class_id)
-    }
+# # iddobj_field_possible {{{
+# iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
+#     if (is.null(private$m_idf_env)) {
+#         mes <- paste0("Function can only be used in IddObjects that are created ",
+#             "inside an Idf or IdfObject using `$definition()`.")
+#         abort("error_field_possible", mes, class_id = private$m_class_id)
+#     }
 
-    fld <- iddobj_field_data(self, private, which,
-        c("class_id", "class_name", "field_index",
-          "field_id", "type_enum",
-          "autosizable", "autocalculatable",
-          "default", "units", "ip_units",
-          "minimum", "lower_incbounds", "maximum", "upper_incbounds")
-    )
+#     fld <- iddobj_field_data(self, private, which,
+#         c("class_id", "class_name", "field_index",
+#           "field_id", "type_enum",
+#           "autosizable", "autocalculatable",
+#           "default", "units", "ip_units",
+#           "minimum", "lower_incbounds", "maximum", "upper_incbounds")
+#     )
 
-    # auto fields
-    set(fld, NULL, "auto", NA_character_)
-    fld[autosizable == TRUE, `:=`(auto = "Autosize")]
-    fld[autocalculatable == TRUE, `:=`(auto = "Autocalculate")]
+#     # auto fields
+#     set(fld, NULL, "auto", NA_character_)
+#     fld[autosizable == TRUE, `:=`(auto = "Autosize")]
+#     fld[autocalculatable == TRUE, `:=`(auto = "Autocalculate")]
 
-    # default
-    unit_to <- if(in_ip) "ip" else "si"
-    fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
+#     # default
+#     unit_to <- if(in_ip) "ip" else "si"
+#     fld <- t_field_default_to_unit(fld, from = "si", to = unit_to)
 
-    # range
-    fld[, `:=`(range = ranger(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
+#     # range
+#     fld[, `:=`(range = ranger(minimum, lower_incbounds, maximum, upper_incbounds)), by = field_id]
 
-    # reference
-    fld <- t_field_reference(fld, private$m_idd_env_reference, private$m_idf_env$value)
+#     # reference
+#     fld <- t_field_reference(fld, private$idd_env()$reference, private$m_idf_env$value)
 
-    res <- fld[, list(class_id, class_name, field_index, field_name, auto, default, choice, range, reference = src_value)]
+#     res <- fld[, list(class_id, class_name, field_index, field_name, auto, default, choice, range, reference = src_value)]
 
-    data.table::setattr(res, "class", c("IddFieldPossible", class(res)))
-    res
-}
-# }}}
+#     data.table::setattr(res, "class", c("IddFieldPossible", class(res)))
+#     res
+# }
+# # }}}
 # iddobj_is_valid_field_num {{{
 iddobj_is_valid_field_num <- function (self, private, num) {
     assert(are_count(num))
@@ -855,11 +889,11 @@ iddobj_print <- function (self, private) {
     # CLASS {{{
     cls <- iddobj_class_data(self, private)
     cli::cat_line(crayon::bold$underline(paste0(
-            "IddObject <<Class: ", surround(cls$class_name), ">>")),
+            "<IddObject: ", surround(cls$class_name), ">")),
         col = "inverse")
 
     # memo {{{
-    cli::cat_rule(center = crayon::bold("* MEMO *"), col = "green")
+    cli::cat_rule(crayon::bold("MEMO"), col = "green")
     if (is.null(cls$memo[[1L]])) {
         cli::cat_line("  ", crayon::italic("<No Memo>"), col = "cyan")
     } else {
@@ -868,9 +902,9 @@ iddobj_print <- function (self, private) {
     # }}}
 
     # property {{{
-    cli::cat_rule(center = crayon::bold("* PROPERTIES *"), col = "green")
+    cli::cat_rule(crayon::bold("PROPERTIES"), col = "green")
 
-    grp <- private$m_idd_env$group[J(cls$group_id), on = "group_id", group_name]
+    grp <- private$idd_env()$group[J(cls$group_id), on = "group_id", group_name]
     cli::cat_line("   ", cli::symbol$bullet, " ", c(
         paste0(crayon::bold("Group: "), surround(grp)),
         paste0(crayon::bold("Unique: "), cls$unique_object),
@@ -881,7 +915,7 @@ iddobj_print <- function (self, private) {
     # }}}
 
     # FIELD {{{
-    cli::cat_rule(center = crayon::bold("* FIELDS *"), col = "green")
+    cli::cat_rule(crayon::bold("FIELDS"), col = "green")
 
     # calculate number of fields to print
     if (cls$num_extensible) {

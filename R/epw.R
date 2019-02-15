@@ -26,7 +26,7 @@ NULL
 #'
 #' There are about 35 variables in the core weather data. However, not all of
 #' them are used by EnergyPlus. Actually, despite of date and time columns, only
-#' 14 columns are used:
+#' 13 columns are used:
 #'
 #'  1. dry bulb temperature
 #'  2. dew point temperature
@@ -41,10 +41,39 @@ NULL
 #' 11. present weather codes
 #' 12. snow depth
 #' 13. liquid precipitation depth
-#' 14. liquid precipitation rate
+#'
+#' Remember that hour 1 for EnergyPlus is the time interval 00:00:01AM to
+#' 1:00:00AM. Hour 2 is 1:00:01AM to 2:00:00AM (hh:mm:ss). With the interpolation
+#' scheme (Last Hour Interpolation) and re- porting weather data values at
+#' timestep resolution, the “hour” values reported should match with the hourly
+#' weather data values.  (Note that reporting “hourly” resolution will not do
+#' this unless your “Number of Timesteps per Hour” is 1).
+#
+#' Missing data on the weather file used will be summarized on the eplusout.err
+#' file. In EnergyPlus, “missing data” is shown only for fields that EnergyPlus
+#' will use. For the “WeatherCodes”, an invalid field count (where the number of
+#' items in the field does not = 9) will be shown. The number of items count
+#' refers to the number of records on the weather file that are in error or
+#' missing – for an hourly weather file, this is the number of hours. Likewise
+#' out of range values (see specific fields in the previous definition) will be
+#' counted for each occurance and summarized. Note that the out of range values
+#' will not be changed by EnergyPlus and could affect your simulation.
 #'
 #' **NOTE**: Even though `Epw` class provides methods to replace core weather data,
 #' it is still not recommended.
+#'
+#' **NOTE**: The Hour column in the core weather data corresponds the period
+#' from (Hour-1)th to (Hour)th. For instance, if the number of interval per hour
+#' is 1, Hour of 1 on a certain day corresponds to the period
+#' between 00:00:00 to 01:00:00, Hour of 2 corresponds to the period between
+#' 01:00:00 to 02:00:00, and etc. The minute column is **not used** to determine
+#' currently sub-hour time. For instance, if the number of interval per hour is
+#' 2, there is no difference between (a) and (b), only the number of rows count.
+#' When EnergyPlus reads the EPW file, both (a) and (b) represent these two time
+#' periods: 00:00:00 - 00:30:00 and 00:30:00 - 01:00:00.
+#'
+#' * (a) 01:00:00, 01:30:00
+#' * (b) 01:30:00, 01:60:00
 #'
 #' @section Usage:
 #' ```
@@ -636,6 +665,7 @@ Epw <- R6::R6Class(classname = "Epw",
             epw_delete(self, private, period),
         # }}}
         # }}}
+
         save = function (path = NULL, overwrite = FALSE)
             epw_save(self, private, path, overwrite),
 
@@ -647,11 +677,14 @@ Epw <- R6::R6Class(classname = "Epw",
         m_path = NULL,
         m_header = NULL,
         m_data = NULL,
-        m_log = NULL
+        m_log = NULL,
+
+        deep_clone = function (name, value) {
+            deep_clone(private, name, value, "Idf")
+        }
     )
 )
 # }}}
-
 # epw_path {{{
 epw_path <- function (self, private) {
     private$m_path

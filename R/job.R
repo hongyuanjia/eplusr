@@ -351,38 +351,38 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
         # PUBLIC FUNCTIONS {{{
         path = function (type = c("all", "idf", "epw"))
-            i_job_path(self, private, type),
+            job_path(self, private, type),
 
         run = function (wait = TRUE)
-            i_job_run(self, private, wait = wait),
+            job_run(self, private, wait = wait),
 
         kill = function ()
-            i_job_kill(self, private),
+            job_kill(self, private),
 
         status = function ()
-            i_job_status(self, private, based_suffix = ".err"),
+            job_status(self, private, based_suffix = ".err"),
 
         output_dir = function (open = FALSE)
-            i_job_output_dir(self, private, open),
+            job_output_dir(self, private, open),
 
         locate_output = function (suffix = ".err", strict = TRUE)
-            i_job_locate_output(self, private, suffix, strict, must_exist = strict),
+            job_locate_output(self, private, suffix, strict, must_exist = strict),
 
         errors = function (info = FALSE)
-            i_job_output_errors(self, private, info),
+            job_output_errors(self, private, info),
 
         report_data_dict = function ()
-            i_job_report_data_dict(self, private),
+            job_report_data_dict(self, private),
 
         report_data = function (key_value = NULL, name = NULL,
                                 year = NULL, tz = "GMT", case = "auto")
-            i_job_report_data(self, private, key_value, name, year, tz, case),
+            job_report_data(self, private, key_value, name, year, tz, case),
 
         tabular_data = function()
-            i_job_tabular_data(self, private),
+            job_tabular_data(self, private),
 
         print = function ()
-            i_job_print(self, private)
+            job_print(self, private)
         # }}}
     ),
 
@@ -403,8 +403,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 )
 # }}}
 
-# i_job_path {{{
-i_job_path <- function (self, private, type = c("all", "idf", "epw")) {
+# job_path {{{
+job_path <- function (self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)
 
     switch(type,
@@ -414,8 +414,8 @@ i_job_path <- function (self, private, type = c("all", "idf", "epw")) {
 }
 # }}}
 
-# i_job_run {{{
-i_job_run <- function (self, private, wait = TRUE) {
+# job_run {{{
+job_run <- function (self, private, wait = TRUE) {
     private$m_log$start_time <- Sys.time()
     private$m_log$killed <- NULL
 
@@ -427,8 +427,8 @@ i_job_run <- function (self, private, wait = TRUE) {
 }
 # }}}
 
-# i_job_kill {{{
-i_job_kill <- function (self, private) {
+# job_kill {{{
+job_kill <- function (self, private) {
     if (is.null(private$m_job)) {
         message("The job has not been run yet.")
         return(invisible(FALSE))
@@ -458,8 +458,8 @@ i_job_kill <- function (self, private) {
 }
 # }}}
 
-# i_job_status {{{
-i_job_status <- function (self, private, based_suffix = ".err") {
+# job_status {{{
+job_status <- function (self, private, based_suffix = ".err") {
     # init
     status <- list(
         run_before = FALSE, # if the model has been run before
@@ -520,8 +520,8 @@ i_job_status <- function (self, private, based_suffix = ".err") {
 }
 # }}}
 
-# i_job_output_dir {{{
-i_job_output_dir <- function (self, private, open = FALSE) {
+# job_output_dir {{{
+job_output_dir <- function (self, private, open = FALSE) {
     dir <- dirname(private$m_path_idf)
     if (!open) return(dir)
     if (open) {
@@ -546,12 +546,12 @@ i_job_output_dir <- function (self, private, open = FALSE) {
 }
 # }}}
 
-# i_job_locate_output {{{
-i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
+# job_locate_output {{{
+job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, must_exist = TRUE) {
     out <- paste0(tools::file_path_sans_ext(private$m_path_idf), suffix)
 
     if (strict) {
-        status <- i_job_status(self, private, suffix)
+        status <- job_status(self, private, suffix)
 
         if (!isTRUE(status$run_before)) {
             stop("Simulation did not run before. Please run it using `$run()` ",
@@ -583,9 +583,9 @@ i_job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, 
 }
 # }}}
 
-# i_job_output_errors {{{
-i_job_output_errors <- function (self, private, info = FALSE) {
-    path_err <- i_job_locate_output(self, private, ".err")
+# job_output_errors {{{
+job_output_errors <- function (self, private, info = FALSE) {
+    path_err <- job_locate_output(self, private, ".err")
 
     err <- parse_err_file(path_err)
 
@@ -595,9 +595,9 @@ i_job_output_errors <- function (self, private, info = FALSE) {
 }
 # }}}
 
-# i_job_sql_path {{{
-i_job_sql_path <- function (self, private) {
-    path_sql <- i_job_locate_output(self, private, ".sql", must_exist = FALSE)
+# job_sql_path {{{
+job_sql_path <- function (self, private) {
+    path_sql <- job_locate_output(self, private, ".sql", must_exist = FALSE)
     if (!file.exists(path_sql))
         stop("Simulation SQL output does not exists. ",
              "eplusr uses the EnergyPlus SQL output for extracting simulation outputs. ",
@@ -609,32 +609,32 @@ i_job_sql_path <- function (self, private) {
 }
 # }}}
 
-# i_job_report_data_dict {{{
-i_job_report_data_dict <- function (self, private) {
-    sql <- i_job_sql_path(self, private)
-    sql_report_data_dict(sql)
+# job_report_data_dict {{{
+job_report_data_dict <- function (self, private) {
+    sql <- job_sql_path(self, private)
+    get_sql_report_data_dict(sql)
 }
 # }}}
 
-# i_job_report_data {{{
-i_job_report_data <- function (self, private, key_value = NULL, name = NULL,
+# job_report_data {{{
+job_report_data <- function (self, private, key_value = NULL, name = NULL,
                                year = NULL, tz = "GMT", case = "auto", all = FALSE) {
-    sql <- i_job_sql_path(self, private)
+    sql <- job_sql_path(self, private)
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_idf))
-    sql_report_data(sql, key_value, name, year, tz, case, all)
+    get_sql_report_data(sql, key_value, name, year, tz, case, all)
 }
 # }}}
 
-# i_job_tabular_data {{{
-i_job_tabular_data <- function (self, private) {
-    sql <- i_job_sql_path(self, private)
-    sql_tabular_data(sql)
+# job_tabular_data {{{
+job_tabular_data <- function (self, private) {
+    sql <- job_sql_path(self, private)
+    get_sql_tabular_data(sql)
 }
 # }}}
 
-# i_job_print {{{
-i_job_print <- function (self, private) {
-    status <- i_job_status(self, private)
+# job_print {{{
+job_print <- function (self, private) {
+    status <- job_status(self, private)
     cli::cat_rule(crayon::bold("EnergyPlus Simulation Job"), col = "green")
     config <- eplus_config(private$m_version)
     cli::cat_bullet(c(

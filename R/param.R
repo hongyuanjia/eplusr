@@ -273,38 +273,38 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             private$m_epw,
 
         apply_measure = function (measure, ..., .names = NULL)
-            i_param_apply_measure(self, private, measure, ..., .names = .names),
+            param_apply_measure(self, private, measure, ..., .names = .names),
 
         run = function (dir = NULL, wait = TRUE)
-            i_param_run(self, private, dir, wait),
+            param_run(self, private, dir, wait),
 
         kill = function ()
-            i_param_kill(self, private),
+            param_kill(self, private),
 
         status = function ()
-            i_param_status(self, private),
+            param_status(self, private),
 
         output_dir = function (which = NULL)
-            i_param_output_dir(self, private, which),
+            param_output_dir(self, private, which),
 
         locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
-            i_param_locate_output(self, private, which, suffix, strict),
+            param_locate_output(self, private, which, suffix, strict),
 
         errors = function (which = NULL, info = FALSE)
-            i_param_output_errors(self, private, which, info),
+            param_output_errors(self, private, which, info),
 
         report_data_dict = function (which = NULL)
-            i_param_report_data_dict(self, private, which),
+            param_report_data_dict(self, private, which),
 
         report_data = function (which = NULL, key_value = NULL, name = NULL,
                                 all = FALSE, year = NULL, tz = "GMT")
-            i_param_report_data(self, private, which, key_value, name, all, year, tz),
+            param_report_data(self, private, which, key_value, name, all, year, tz),
 
         tabular_data = function(which = NULL)
-            i_param_tabular_data(self, private, which),
+            param_tabular_data(self, private, which),
 
         print = function ()
-            i_param_print(self, private)
+            param_print(self, private)
         # }}}
     ),
 
@@ -324,8 +324,8 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 )
 # }}}
 
-# i_param_apply_measure {{{
-i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
+# param_apply_measure {{{
+param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     assert(is.function(measure))
 
     if (length(formals(measure)) == 0L) {
@@ -363,9 +363,9 @@ i_param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
 }
 # }}}
 
-# i_param_retrieve_data {{{
-i_param_retrieve_data <- function (self, private) {
-    status <- i_param_status(self, private)
+# param_retrieve_data {{{
+param_retrieve_data <- function (self, private) {
+    status <- param_status(self, private)
 
     if (!status$run_before) return(invisible())
 
@@ -401,9 +401,9 @@ i_param_retrieve_data <- function (self, private) {
 }
 # }}}
 
-# i_param_job_from_which {{{
-i_param_job_from_which <- function (self, private, which) {
-    status <- i_param_status(self, private)
+# param_job_from_which {{{
+param_job_from_which <- function (self, private, which) {
+    status <- param_status(self, private)
 
     if (!isTRUE(status$run_before))
         stop("Parametric job did not run before. Please run it using `$run()` ",
@@ -426,11 +426,11 @@ i_param_job_from_which <- function (self, private, which) {
             "The job output may not be correct.", call. = FALSE)
 
     # if success, retrieve data
-    i_param_retrieve_data(self, private)
+    param_retrieve_data(self, private)
 
     jobs <- private$m_job
 
-    idx <- i_param_case_from_which(self, private, which, name = FALSE)
+    idx <- param_case_from_which(self, private, which, name = FALSE)
 
     job <- jobs[idx]
 
@@ -454,8 +454,8 @@ i_param_job_from_which <- function (self, private, which) {
 }
 # }}}
 
-# i_param_case_from_which {{{
-i_param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
+# param_case_from_which {{{
+param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
     nms <- names(private$m_param)
     if (is.null(which)) {
         if (name) return(nms) else return(seq_along(nms))
@@ -483,8 +483,8 @@ i_param_case_from_which <- function (self, private, which = NULL, name = FALSE) 
 }
 # }}}
 
-# i_param_run {{{
-i_param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
+# param_run {{{
+param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
     if (is.null(private$m_param))
         stop("No measure has been applied.", call. = FALSE)
 
@@ -527,8 +527,8 @@ i_param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
 }
 # }}}
 
-# i_param_kill {{{
-i_param_kill <- function (self, private) {
+# param_kill {{{
+param_kill <- function (self, private) {
 
     if (is.null(private$m_job)) {
 
@@ -563,8 +563,8 @@ i_param_kill <- function (self, private) {
 }
 # }}}
 
-# i_param_status {{{
-i_param_status <- function (self, private) {
+# param_status {{{
+param_status <- function (self, private) {
     status <- list(
         run_before = FALSE, # if the model has been run before
         alive = FALSE, # if simulation is still running
@@ -613,16 +613,16 @@ i_param_status <- function (self, private) {
 }
 # }}}
 
-# i_param_output_dir {{{
-i_param_output_dir <- function (self, private, which) {
-    job <- i_param_job_from_which(self, private, which)
+# param_output_dir {{{
+param_output_dir <- function (self, private, which) {
+    job <- param_job_from_which(self, private, which)
     job$output_dir
 }
 # }}}
 
-# i_param_locate_output {{{
-i_param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
-    job <- i_param_job_from_which(self, private, which)
+# param_locate_output {{{
+param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
+    job <- param_job_from_which(self, private, which)
 
     out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
 
@@ -635,13 +635,13 @@ i_param_locate_output <- function (self, private, which, suffix = ".err", strict
 }
 # }}}
 
-# i_param_output_errors {{{
-i_param_output_errors <- function (self, private, which, info = FALSE) {
-    path_err <- i_param_locate_output(self, private, which, ".err")
+# param_output_errors {{{
+param_output_errors <- function (self, private, which, info = FALSE) {
+    path_err <- param_locate_output(self, private, which, ".err")
 
     err <- lapply(path_err, parse_err_file)
 
-    names(err) <- i_param_case_from_which(self, private, which, name = TRUE)
+    names(err) <- param_case_from_which(self, private, which, name = TRUE)
 
     if (!info) {
         err <- lapply(err, function (x) {
@@ -654,16 +654,16 @@ i_param_output_errors <- function (self, private, which, info = FALSE) {
 }
 # }}}
 
-# i_param_sql_path {{{
-i_param_sql_path <- function (self, private, which) {
-    i_param_locate_output(self, private, which, ".sql")
+# param_sql_path {{{
+param_sql_path <- function (self, private, which) {
+    param_locate_output(self, private, which, ".sql")
 }
 # }}}
 
-# i_param_report_data_dict {{{
-i_param_report_data_dict <- function (self, private, which) {
-    sqls <- i_param_sql_path(self, private, which)
-    cases <- i_param_case_from_which(self, private, which, name = TRUE)
+# param_report_data_dict {{{
+param_report_data_dict <- function (self, private, which) {
+    sqls <- param_sql_path(self, private, which)
+    cases <- param_case_from_which(self, private, which, name = TRUE)
 
     dicts <- lapply(sqls, sql_report_data_dict)
 
@@ -677,11 +677,11 @@ i_param_report_data_dict <- function (self, private, which) {
 }
 # }}}
 
-# i_param_report_data {{{
-i_param_report_data <- function (self, private, which = NULL, key_value = NULL,
+# param_report_data {{{
+param_report_data <- function (self, private, which = NULL, key_value = NULL,
                                  name = NULL, all = FALSE, year = NULL, tz = "GMT") {
-    sqls <- i_param_sql_path(self, private, which)
-    cases <- i_param_case_from_which(self, private, which, name = TRUE)
+    sqls <- param_sql_path(self, private, which)
+    cases <- param_case_from_which(self, private, which, name = TRUE)
 
     d <- mapply(sql_report_data, sql = sqls, case = cases,
         MoreArgs = list(key_value = key_value, name = name, all = all, year = year,
@@ -693,10 +693,10 @@ i_param_report_data <- function (self, private, which = NULL, key_value = NULL,
 }
 # }}}
 
-# i_param_tabular_data {{{
-i_param_tabular_data <- function (self, private, which = NULL) {
-    sqls <- i_param_sql_path(self, private, which)
-    cases <- i_param_case_from_which(self, private, which, name = TRUE)
+# param_tabular_data {{{
+param_tabular_data <- function (self, private, which = NULL) {
+    sqls <- param_sql_path(self, private, which)
+    cases <- param_case_from_which(self, private, which, name = TRUE)
 
     d <- lapply(sqls, sql_tabular_data)
 
@@ -710,8 +710,8 @@ i_param_tabular_data <- function (self, private, which = NULL) {
 }
 # }}}
 
-# i_param_print {{{
-i_param_print <- function (self, private) {
+# param_print {{{
+param_print <- function (self, private) {
     cli::cat_rule(crayon::bold("EnergPlus Parametric Job"), col = "green")
     config <- eplus_config(private$m_idf$version())
     cli::cat_bullet(c(
@@ -736,9 +736,9 @@ i_param_print <- function (self, private) {
         col = "cyan"
     )
 
-    status <- i_param_status(self, private)
+    status <- param_status(self, private)
 
-    i_param_retrieve_data(self, private)
+    param_retrieve_data(self, private)
 
     if (!status$run_before) {
 

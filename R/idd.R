@@ -172,7 +172,6 @@ Idd <- R6::R6Class(classname = "Idd",
     public = list(
         # INITIALIZE {{{
         initialize = function (path) {
-
             # add a uuid
             private$m_uuid <- unique_id()
 
@@ -183,8 +182,9 @@ Idd <- R6::R6Class(classname = "Idd",
             private$m_idd_env <- list2env(
                 idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
             )
-            # assign tbls to IddObject R6Class Generator
-            private$m_iddobj_gen <- create_iddobj_generator(self, private, IddObject)
+
+            # add current idd to .globals
+            .globals$idd[[as.character(private$m_version)]] <- self
         },
         # }}}
 
@@ -224,8 +224,11 @@ Idd <- R6::R6Class(classname = "Idd",
         object = function (class)
             idd_object(self, private, class = class),
 
-        object_in_group = function (group)
-            idd_object_in_group(self, private, group = group),
+        objects = function (class)
+            idd_objects(self, private, class = class),
+
+        objects_in_group = function (group)
+            idd_objects_in_group(self, private, group = group),
         # }}}
 
         # ASSERTIONS {{{
@@ -245,8 +248,7 @@ Idd <- R6::R6Class(classname = "Idd",
         m_uuid = NULL,
         m_version = NULL,
         m_build = NULL,
-        m_idd_env = NULL,
-        m_iddobj_gen = NULL
+        m_idd_env = NULL
         # }}}
     )
 )
@@ -264,42 +266,42 @@ idd_build <- function (self, private) {
 # }}}
 # idd_group_name {{{
 idd_group_name <- function (self, private) {
-    t_group_name(private$m_idd_env$class, private$m_idd_env$group)
+    get_idd_group_name(private$m_idd_env)
 }
 # }}}
 # idd_from_group {{{
 idd_from_group <- function (self, private, class) {
-    t_group_name(private$m_idd_env$class, private$m_idd_env$group, class)
+    get_idd_class_group(private$m_idd_env, class)$group_name
 }
 # }}}
 # idd_group_index {{{
-idd_group_index <- function (self, private, group) {
-    t_group_index(private$m_idd_env$group, group)
+idd_group_index <- function (self, private, group = NULL) {
+    get_idd_group_index(private$m_idd_env, group)
 }
 # }}}
 # idd_class_name {{{
 idd_class_name <- function (self, private, index = NULL) {
-    t_class_data(private$m_idd_env$class, index)$class_name
+    get_idd_class(private$m_idd_env, index, "class_name")$class_name
 }
 # }}}
 # idd_class_index {{{
 idd_class_index <- function (self, private, class) {
-    t_class_data(private$m_idd_env$class, class)$class_id
+    get_idd_class(private$m_idd_env, class, "class_id")$class_id
 }
 # }}}
 # idd_required_class_name {{{
 idd_required_class_name <- function (self, private) {
-    t_class_name_required(private$m_idd_env$class)
+    get_idd_class_name_required(private$m_idd_env)
 }
 # }}}
 # idd_unique_class_name {{{
 idd_unique_class_name <- function (self, private) {
-    t_class_name_unique(private$m_idd_env$class)
+    get_idd_class_name_unique(private$m_idd_env)
 }
 # }}}
 # idd_extensible_class_name {{{
 idd_extensible_class_name <- function (self, private) {
-    t_class_name_extensible(private$m_idd_env$class)
+    get_idd_class_name_extensible(private$m_idd_env)
 }
 # }}}
 # idd_is_valid_group_name {{{
@@ -314,20 +316,25 @@ idd_is_valid_class_name <- function (self, private, class) {
 # }}}
 # idd_object {{{
 idd_object <- function (self, private, class) {
-    res <- lapply(class, private$m_iddobj_gen$new)
+    IddObject$new(class, self)
+}
+# }}}
+# idd_objects {{{
+idd_objects <- function (self, private, class) {
+    res <- lapply(class, IddObject$new, self)
     setattr(res, "names", class)
     res
 }
 # }}}
-# idd_object_in_group {{{
-idd_object_in_group <- function (self, private, group) {
+# idd_objects_in_group {{{
+idd_objects_in_group <- function (self, private, group) {
     assert(is_string(group))
 
     grp_id <- idd_group_index(self, private, group)
 
     cls <- private$m_idd_env$class[J(grp_id), on = "group_id", class_name]
 
-    res <- lapply(cls, private$m_iddobj_gen$new)
+    res <- lapply(cls, IddObject$new, self)
     setattr(res, "names", cls)
     res
 }
@@ -407,11 +414,7 @@ idd_print <- function (self, private) {
 
 # read_idd {{{
 read_idd <- function (path) {
-    idd <- Idd$new(path)
-
-    .globals$idd[[as.character(idd$version())]] <- idd
-
-    idd
+    Idd$new(path)
 }
 # }}}
 

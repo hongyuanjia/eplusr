@@ -10,6 +10,7 @@
 #' @importFrom stringi stri_split_fixed stri_sub stri_subset_fixed
 #' @importFrom stringi stri_trans_tolower stri_trans_toupper stri_trim_both
 #' @importFrom stringi stri_trim_left stri_trim_right
+#' @include impl.R
 NULL
 
 # IDD_SLASHKEY {{{
@@ -176,19 +177,6 @@ parse_idf_file <- function (path, idd = NULL) {
 }
 # }}}
 
-# read_lines {{{
-read_lines <- function(input, trim = TRUE, ...) {
-    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
-    if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
-    set(dt, j = "line", value = seq_along(dt[["string"]]))
-    if (trim) {
-        set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
-    }
-    setcolorder(dt, c("line", "string"))
-    dt
-}
-# }}}
-
 # get_idd_ver {{{
 get_idd_ver <- function (idd_dt) {
     assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
@@ -222,9 +210,9 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
-        abort("warning_miss_idd_build", "No version found in input IDD.")
+        abort("warning_miss_idd_build", "No build tag found in input IDD.")
     } else if (nrow(build_line) == 1L) {
-        build <- stri_sub(build_line, 12L)
+        build <- stri_sub(build_line$string, 12L)
     } else {
         parse_issue("warning_multi_idd_build", "idd", "Multiple build tags found", build_line)
     }
@@ -646,8 +634,9 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     nest <- merge(i[, .SD, .SDcols = c(id)], nest, by = id, all = TRUE)
 
     # change empty character member in list to NULL
+    idx <- if (stri_startswith_fixed(id[[1L]], "class")) "class_id" else "field_id"
     for (nm in intersect(names(nest), keys$nest)) {
-        set(nest, nest[["field_id"]][vapply(nest[[nm]], function (x) length(x) == 0L, logical(1L))],
+        set(nest, nest[[idx]][vapply(nest[[nm]], function (x) length(x) == 0L, logical(1L))],
             nm, list(list(NULL))
         )
     }
@@ -1230,10 +1219,17 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     # get table
     dt_object <- dt[type <= type_enum$object_value, .SD,
         .SDcols = c("object_id", "class_id", "class_name", "group_id", "comment")]
+
+    # clean comment
+    clean_comment <- function (x) {
+        x <- x[!stri_isempty(x)]
+        if (!length(x)) NULL else x
+    }
+
     dt_object <- dt_object[,
         list(
             class_id = class_id[1L], class_name = class_name[1L],
-            group_id = group_id[1L], comment = list(comment)
+            group_id = group_id[1L], comment = list(clean_comment(comment))
         ),
         by = object_id
     ]
@@ -1303,7 +1299,7 @@ get_value_table <- function (dt, idd) {
     dt_query <- unique(dt[, list(rleid = object_id, class_id, field_index)])
 
     # add complete fields
-    fld <- t_field_data(idd, dt_query, dt_query$field_index, cols = c("rleid", cols_add), complete = TRUE)
+    fld <- get_idd_field(idd, dt_query, dt_query$field_index, cols = c("rleid", cols_add), complete = TRUE)
 
     # bind columns
     dt <- dt[fld, on = list(object_id = rleid, class_id, field_index)]
@@ -1311,7 +1307,7 @@ get_value_table <- function (dt, idd) {
     # fill data for missing fields
     dt[is.na(line), `:=`(
         class_name = t_class_data(idd$class, class_id)$class_name,
-        value_id = t_new_id(dt, "value_id", length(value_id))
+        value_id = new_id(dt, "value_id", length(value_id))
     )]
 
     # add numeric type values
@@ -1336,13 +1332,13 @@ update_object_name <- function (dt_object, dt_value) {
     if (!nrow(dt_value)) return(dt_object)
     dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value, object_name_lower = stri_trans_tolower(value)),
-        by = list(object_id)]
+        by = "object_id"]
     dt_nm[dt_object, on = "object_id"]
 }
 # }}}
 
 # convert_value_unit {{{
-convert_value_unit <- function (dt_value, from, to) {
+convert_value_unit <- function (dt_value, from, to, type = "value") {
     from <- match.arg(from, c("si", "ip"))
     to <- match.arg(to, c("si", "ip"))
 
@@ -1534,9 +1530,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
             mes <- c(mes[1L:10L], "...[truncated. First 10 are shown.]")
         }
 
-        # trunc if necessary
-        tr <- nchar(mes) > 0.95 * (options("width")$width)
-        mes[tr] <- paste0(stri_sub(mes[tr], to = 0.95 * (options("width")$width)), "...")
+        mes <- str_trunc(mes)
     }
 
     if (stop) {
@@ -1587,9 +1581,9 @@ insert_version <- function (x, ver) {
     if (is.character(x)) {
         paste0(x, "Version, ", standardize_ver(ver)[, 1L:2L], ";")
     } else if (inherits(x, "data.table") && has_name(x, c("line", "string"))) {
-        ins_dt(x,
+        append_dt(x,
             data.table(
-                line = nrow(x) + 1L,
+                line = max(x$line) + 1L,
                 string = paste0("Version, ", standardize_ver(ver)[, 1L:2L], ";")
             )
         )

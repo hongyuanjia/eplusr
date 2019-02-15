@@ -85,8 +85,6 @@ on_fail(is_eplus_ver) <- function (call, env) {
 # }}}
 # is_idd_ver {{{
 is_idd_ver <- function (ver, strict = FALSE, only_released = TRUE) {
-    assert(is_scalar(ver))
-
     if (isTRUE(strict) && !is_version(ver)) return(FALSE)
 
     is_ver <- identical(ver, "latest") || is_version(ver)
