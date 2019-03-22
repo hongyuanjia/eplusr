@@ -141,13 +141,13 @@ os_type <- function () {
 # }}}
 
 # standardize_ver {{{
-standardize_ver <- function (ver, strict = FALSE) {
+standardize_ver <- function (ver, strict = FALSE, no_patch = FALSE) {
     assert(is_scalar(ver))
     if (!strict && identical(ver, "latest")) ver <- LATEST_EPLUS_VER
     if (is_integer(ver)) ver <- paste0(ver, ".0")
     ver <- numeric_version(ver, strict = FALSE)
     if (is.na(ver)) return(ver)
-    if (is.na(ver[1L, 3L])) ver[1L, 3L] <- 0L
+    if (no_patch | is.na(ver[1L, 3L])) ver[1L, 3L] <- 0L
     ver
 }
 # }}}

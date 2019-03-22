@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @include impl-idd.R
 NULL
 
 #' Parse, Query and Modify EnergyPlus Input Data Dictionary (IDD)
@@ -176,7 +177,7 @@ Idd <- R6::R6Class(classname = "Idd",
             private$m_uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
-            private$m_version<- idd_file$version
+            private$m_version <- idd_file$version
             private$m_build <- idd_file$build
 
             private$m_idd_env <- list2env(
@@ -345,7 +346,7 @@ idd_print <- function (self, private) {
     cli::cat_bullet(c(
         paste0(crayon::bold("Version"), ": ", surround(private$m_version)),
         paste0(crayon::bold("Build"), ": ", surround(private$m_build)),
-        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_env$class))
+        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_env$class$index))
     ), col = "cyan", bullet_col = "cyan")
 }
 # }}}
@@ -503,7 +504,7 @@ read_idd <- function (path) {
 use_idd <- function (idd, download = FALSE) {
     if (is_idd(idd)) return(idd)
 
-    if (is_idd_ver(idd, strict = TRUE)) {
+    if (is_idd_ver(idd, strict = FALSE)) {
         ver <- standardize_ver(idd)
 
         if (isTRUE(download)) {
@@ -575,14 +576,15 @@ use_idd <- function (idd, download = FALSE) {
 #' @export
 # download_idd {{{
 download_idd <- function (ver = "latest", dir) {
-    ver <- standardize_ver(ver)
+    ver <- standardize_ver(ver, no_patch = TRUE)
     assert(is_idd_ver(ver))
 
     base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", LATEST_EPLUS_VER, "/idd/")
 
     ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
 
-    if (identical(ver, LATEST_EPLUS_VER)) {
+    # only check the main and minor version, not patch
+    if (identical(ver[1L, c(1L, 2L)], LATEST_EPLUS_VER[1L, c(1L, 2L)])) {
         file_url <- "Energy%2B.idd.in"
     } else {
         file_url <- paste0("V", ver_dash, "-Energy%2B.idd")
