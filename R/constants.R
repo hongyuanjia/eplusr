@@ -1,7 +1,7 @@
 # VERSIONS {{{
-LATEST_EPLUS_VER <- as.numeric_version("9.0.1")
+LATEST_EPLUS_VER <- as.numeric_version("9.1.0")
 
-ALL_EPLUS_VER <- c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0", "9.0.1")
+ALL_EPLUS_VER <- c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0", "9.0.1", "9.1.0")
 
 ALL_IDD_VER <- c(
     paste0("1.0.", 0:3),
@@ -13,20 +13,21 @@ ALL_IDD_VER <- c(
     paste0(4:6, ".0.0"),
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"),
-    paste0("9.0.0")
+    paste0("9.", 0:1, ".0")
 )
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(
-    "version,     commit
-     9.0.1, bb7ca4f0da
-     9.0.0, 2ef880da82
-     8.9.0, 40101eaafd
-     8.8.0, 7c3bbe4830
-     8.7.0, 78a111df4a
-     8.6.0, 198c6a3cff
-     8.5.0, c87e61b44b
-     8.4.0, 832e4bb9cb
-     8.3.0, 6d97d074ea
+    "version , commit
+     9.1.0   , 08d2e308bb
+     9.0.1   , bb7ca4f0da
+     9.0.0   , 2ef880da82
+     8.9.0   , 40101eaafd
+     8.8.0   , 7c3bbe4830
+     8.7.0   , 78a111df4a
+     8.6.0   , 198c6a3cff
+     8.5.0   , c87e61b44b
+     8.4.0   , 832e4bb9cb
+     8.3.0   , 6d97d074ea
     "
 )
 # }}}
