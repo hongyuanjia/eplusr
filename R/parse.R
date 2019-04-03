@@ -13,6 +13,20 @@
 #' @include impl.R
 NULL
 
+#' A list that contains all slash keys of EnergyPlus IDD files.
+#'
+#' `IDD_SLASHKEY$class` contains all slash keys used for defining EnergyPlus
+#' classes and similarly, `IDD_SLASHKEY$field` contains all slash keys used for
+#' defining EnergyPlus fields. For those two types, slash keys are further
+#' divided into `flat` and `nest`. The values of `flat` slash keys will be
+#' parsed into atomic vectors, i.e. logical, integer, double and character
+#' vectors, while for `nest` slash keys, values will be parsed and stored into
+#' lists. A common example for `nest` slash key is the `memo` key in class and
+#' `note` key in field.
+#'
+#' IDD_SLASHKEY$type` contains all class and field slash keys which are divided
+#' according to their values: `lgl` for logical, `int` for integer, `dbl` for
+#' double, `chr` for character and `lst` for list.
 # IDD_SLASHKEY {{{
 IDD_SLASHKEY <- list (
     class = list(
@@ -43,6 +57,9 @@ IDD_SLASHKEY <- list (
 )
 # }}}
 
+#' A list that contains all value types of IDD fields in EnergyPlus
+#'
+#' All types are stored as integers.
 # IDDFIELD_TYPE {{{
 IDDFIELD_TYPE <- list(
     integer = 1L, real = 2L, choice = 3L, alpha = 4L,
@@ -50,10 +67,169 @@ IDDFIELD_TYPE <- list(
 )
 # }}}
 
+#' A list that contains all source types of IDD fields in EnergyPlus
+#'
+#' In EnergyPlus, there are a lot of fields whose values references other
+#' fields. Those fields that are referenced by others are called source fields.
+#' THere are 4 types of source fields in total:
+#'
+#' * `none`: Stored as integer `0`. The value of this field has no relation with
+#'   other fields.
+#' * `class`: Stored as integer `1`. The value of this field is not directly
+#'   referenced by others, but parent class name of this field is.
+#' * `field`: Stored as integer `2`. The value of this field is referenced by
+#'   other fields.
+#' * mixed`: Stored as integer `3`. Both the value and parent class name is
+#'   referenced by other fields.
 # IDDFIELD_SOURCE {{{
 IDDFIELD_SOURCE <- list(none = 0L, class = 1L, field = 2L, mixed = 3L)
 # }}}
 
+# CLASS_COLS {{{
+# names of class columns, mainly used for cleaning unuseful columns
+CLASS_COLS <- list(
+    index = c("class_id", "class_name", "class_name_us", "group_id"),
+    property = c("format", "min_fields", "num_fields", "last_required",
+        "unique_object", "required_object", "has_name", "memo",
+        "num_extensible", "first_extensible", "num_extensible_group"
+    )
+)
+# }}}
+
+# FIELD_COLS {{{
+# names of field columns
+FIELD_COLS <- list(
+    index = c("field_id", "class_id", "field_index", "field_name", "field_name_us"),
+    property = c("field_anid", "units", "ip_units", "is_name",
+        "required_field", "extensible_group",
+        "type_enum", "src_enum", "type",
+        "autosizable", "autocalculatable",
+        "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
+        "default", "default_num", "choice", "note"
+    )
+)
+
+# }}}
+
+#' Parse an EnergyPlus Input Dictionary Data (IDD) file
+#'
+#' `parse_idd_file()` takes a file path of EnergyPlus IDD file (usually named
+#' `Energy+.idd`), parse and return a list that contains all IDD data.
+#'
+#' The returned list contains 6 elements:
+#' * `version`: A [base::numeric_version] object. Version of current IDD.
+#' * `build`: A single character vector. Usually consists of 10 characters mixed
+#'   with both alphabets and digits.
+#' * `group`: A [data.table::data.table] that contains 2 columns:
+#'     - `group_id`: A positive integer vector used as unique ID of all groups.
+#'     - `group_name`: A character vector that contains all names for a group of
+#'       related object.
+#' * `class`: A list that contains 2 [data.table::data.table]s named `index` and
+#'   `property`:
+#'     - `index`: A [data.table::data.table] of 4 columns:
+#'         * `class_id`: A positive integer vector used as unique ID of all
+#'           classes.
+#'         * `class_name`: A character vector that contains all class names.
+#'         * `group_id`: A positive integer vector contains the group ID that
+#'           each class belongs to.
+#'         * `class_name_us`: A character vector that contains class names in
+#'           underscore style, i.e.  all colon are replaced with underscore. For
+#'           example, `BuildingSurface:Detailed` becomes
+#'           `BuildingSurface_Detailed`. Underscore style names are used in
+#'           subsetting method in [Idd] class.
+#'    - `property`: A [data.table::data.table] of 12 columns:
+#'         * `class_id`: A positive integer vector that contains unique class
+#'           IDs.
+#'         * `format`: A character vector contains the format of each class.
+#'           This format indicator is used by IDFEditor when `Special Format for
+#'           Some Objects` is switch on in `Save Options`. There are 7 format
+#'           types in total: `standard`, `singleLine`, `compactSchedule`,
+#'           `Spectral`, `vertices`, `ViewFactor` and `fluidProperty`.
+#'           eplusr can parse all IDF objects saved in special format but all
+#'           objects will be formated in starndard way during saving.
+#'         * `min_fields`: A non-negative integer vector contains minimum field
+#'           number required for each class. `0` means this class does not have
+#'           minimum field number requirement.
+#'         * `num_fields`: A positive integer vector contains current total
+#'           field number in each class. Note for class that contains extensible
+#'           groups, the total field number is not a fixed number.
+#'         * `last_required`: A non-negative integer vector contains the index
+#'           of last required field. This data is used to determine how many
+#'           fields should be printed in [IdfObject].
+#'         * `has_name`: A logical vector. `TRUE` means that this class contains
+#'           one field whose value will be used as the name of this [IdfObject].
+#'         * `required_object`: A logical vector. `TRUE` means that at least one
+#'           [IdfObject] should exist in this class in order to proceed the
+#'           simulation.
+#'         * `unique_object`: A logical vector. `TRUE` means that at most one
+#'           [IdfObject] can exist in this class in order to proceed the
+#'           simulation.
+#'         * `num_extensible`: A non-negative integer vector that contains the
+#'           total field number in the extensible group in this class. `0` means
+#'           that there is no extensible group. A positive integer X means that
+#'           those X fields starting from index specified in `first_extensible`
+#'           column are treated as an extensible group and can be repeated
+#'           infinitely.
+#'         * `first_extensible`: A non-negative integer vector that contains the
+#'           index of the first extensible field in this class. `0` means that
+#'           there is no extensible group.
+#'         * `num_extensible_group`: A non-negative integer vector that contains
+#'           the total number of extensible groups in this class. `0` means that
+#'           there is no extensible group.
+#'         * `memo`: A list that contains character vectors describing each
+#'           class. `NULL` means that there is no memo for this class.
+#' * `field`: A list that contains 2 [data.table::data.table]s named `index` and
+#'   `property`:
+#'     - `index`: A [data.table::data.table] of 5 columns:
+#'         * `field_id`: A positive integer vector used as unique ID of all
+#'           classes.
+#'         * `class_id`: A positive integer vector contains the class ID that
+#'           each field belongs to.
+#'         * `field_index`: A positive integer vector contains the index of
+#'           field in each class.
+#'         * `field_name`: A character vector that contains all field names.
+#'         * `field_name_us`: A character vector that contains field names in
+#'           underscore style, i.e. all colon are replaced with underscore. For
+#'           example, `Version Identifier` becomes
+#'           `Version_Identifier`. Underscore style names are used in
+#'           `$add()`, `$set()` and other methods in [Idd] and [IddObject]
+#'           class.
+#'    - `property`: A [data.table::data.table] of 21 columns:
+#'         * `field_id`: A positive integer vector that contains unique field
+#'           IDs.
+#'         * `field_anid`: A character vector formatting as A(or N)1, A(or N)2
+#'           and etc. A means that this is a character field while N means that
+#'           this is a numeric field. The last digit is the current index in all
+#'           character or numeric fields in this class.
+#'         * `units`: A character vector contains standard SI units of all
+#'           fields. `NA` means that there is no unit for this field.
+#'         * `ip_units`: A character vector contains IP units of all
+#'           fields. `NA` means that there is no unit for this field. For those
+#'           fields that only have SI units, IP units are set as the same of SI
+#'           units. This is mainly to simplify the process of unit conversion.
+#'         * `is_name`: A logical vector. `TRUE` means that this field is
+#'           treated as the name of objects in this class. Basically, name
+#'           fields are character fields whose names are equal to "Name" or
+#'           character fields that can be referenced by others but do not
+#'           reference any other fields.
+#'         * `required_field`: A logical vector. `TRUE` means that this field
+#'           must have a value.
+#'         * `extensible_group`: A non-negative integer vector contains the
+#'           extensible group index which this field belongs to. `0` means that
+#'           current field is not extensible.
+#'         * `type_enum`: A non-negative integer vector that represent field
+#'           types. For the meaning of each character, see [IDD_FIELDTYPE]
+#'           total field number in the extensible group in this class. `0` means
+#'           that there is no extensible group.
+#'         * `first_extensible`: A non-negative integer vector that contains the
+#'           index of the first extensible field in this class. `0` means that
+#'           there is no extensible grou
+#'         * `num_extensible_group`: A non-negative integer vector that contains the
+#'           total number of extensible groups in this class. `0` means that
+#'           there is no extensible group.
+#'         * `memo`: A list that contains the memo of each class. `NULL` means
+#'           that there is no memo in this class.
+#' @return A named list. See details.
 # parse_idd_file {{{
 parse_idd_file <- function(path) {
     # read idd string, get idd version and build
@@ -91,7 +267,7 @@ parse_idd_file <- function(path) {
         IDD_SLASHKEY$class, c("group_id", "class_name")
     )
     dt_field <- dcast_slash(dt_field, c("field_id", "field_anid"),
-        IDD_SLASHKEY$field, c("class_id", "class_name")
+        IDD_SLASHKEY$field, c("class_id")
     )
     dt_field[, `:=`(field_id = .I)]
 
@@ -104,23 +280,19 @@ parse_idd_file <- function(path) {
     dt_field <- dt$left
     dt_reference <- dt$reference
 
-    # set index
-    setindexv(dt_class, "class_id")
-    setindexv(dt_field, c("field_id", "class_id", "field_index"))
-
-    list(version = idd_version, build = idd_build,
-        group = dt_group, class = dt_class, field = dt_field,
+    list(version = idd_version, build = idd_build, group = dt_group,
+        class = dt_class, field = dt_field,
         reference = dt_reference
     )
 }
 # }}}
 
 # parse_idf_file {{{
-parse_idf_file <- function (path, idd = NULL) {
+parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     # read IDF string and get version first to get corresponding IDD
     idf_dt <- read_lines(path)
     # delete blank lines
-    idf_dt <- idf_dt[!string == ""]
+    idf_dt <- idf_dt[!J(""), on = "string"]
 
     idf_ver <- get_idf_ver(idf_dt)
 
@@ -169,7 +341,20 @@ parse_idf_file <- function (path, idd = NULL) {
     dt_value <- convert_value_unit(dt_value, from, to)
 
     # value reference map
-    dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
+    if (ref) {
+        dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
+    } else {
+        dt_reference <- data.table(
+                object_id = integer(0L),     value_id = integer(0L),
+            src_object_id = integer(0L), src_value_id = integer(0L),
+            src_enum = integer(0L)
+        )
+    }
+
+    # remove unuseful columns
+    set(dt_value, NULL, setdiff(names(dt_value),
+        c("value_id", "value", "value_num", "object_id", "field_id")), NULL
+    )
 
     list(version = idd_ver, options = options,
         object = dt_object, value = dt_value, reference = dt_reference
@@ -238,7 +423,7 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
             opts_regex = stringi::stri_opts_regex(case_insensitive = TRUE)
         )[, 2L]
     )
-    set(ver_line_nor, NULL, "version", stri_match_first_regex(ver_line_nor$string, "^(\\d\\.\\d)\\s*;$")[, 2L])
+    set(ver_line_nor, NULL, "version", stri_match_first_regex(ver_line_nor$string, "^(\\d\\.\\d)\\s*;")[, 2L])
     ver_line <- rbindlist(list(ver_line_spe, ver_line_nor), use.names = FALSE)[!is.na(version)]
 
     if (!nrow(ver_line)) {
@@ -528,7 +713,7 @@ sep_class_table <- function (dt, type_enum) {
 
     dt <- dt[!dt_class, on = "line"][!line %in% s$start]
     # remove unuseful columns
-    set(dt, NULL, c("line", "string", "type_exp", "group_id"), NULL)
+    set(dt, NULL, c("line", "string", "type_exp", "group_id", "class_name"), NULL)
     set(dt_class, NULL, c("line", "string", "body", "type", "end"), NULL)
 
     list(left = dt, class = dt_class)
@@ -572,7 +757,6 @@ get_field_table <- function (dt, type_enum) {
             row = rep(row, l),
             body = rep(body, l),
             class_id = rep(class_id, l),
-            class_name = rep(class_name, l),
             slash_key = rep(slash_key, l),
             slash_value = rep(slash_value, l),
             field_anid = stri_trim_both(unlist(s))
@@ -738,18 +922,10 @@ parse_class_property <- function (dt, ref) {
     # add underscore class names
     set(dt, NULL, "class_name_us", underscore_name(dt$class_name))
 
-    nms <- c(
-        "class_id", "class_name", "group_id", "format",
-        "min_fields", "num_fields","last_required",
-        "has_name", "required_object", "unique_object",
-        "num_extensible", "first_extensible", "num_extensible_group",
-        "memo", "class_name_us"
-    )
-
     # only keep useful columns
-    ignore <- setdiff(names(dt), nms)
+    ignore <- setdiff(names(dt), unlist(CLASS_COLS, use.names = FALSE))
     if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
-    setcolorder(dt, nms)
+    setcolorder(dt, unlist(CLASS_COLS, use.names = FALSE))
 
     dt
 }
@@ -762,8 +938,8 @@ parse_field_property <- function (dt, ref) {
     setnames(dt, nms)
 
     # complete types
-    dt[is.na(type) & stringi::stri_startswith_fixed(field_anid, "A"), `:=`(type = "alpha")]
-    dt[is.na(type) & stringi::stri_startswith_fixed(field_anid, "N"), `:=`(type = "real")]
+    dt[is.na(type) & stri_startswith_fixed(field_anid, "A"), `:=`(type = "alpha")]
+    dt[is.na(type) & stri_startswith_fixed(field_anid, "N"), `:=`(type = "real")]
 
     # add field index
     set(dt, NULL, "field_index", rowidv(dt, "class_id"))
@@ -791,25 +967,15 @@ parse_field_property <- function (dt, ref) {
     # parse field default
     dt <- parse_field_property_default(dt)
 
-    # add underscore name
-    set(dt, NULL, "field_name_us", underscore_name(dt$field_name))
+    # add lower underscore name
+    set(dt, NULL, "field_name_us", stri_trans_tolower(underscore_name(dt$field_name)))
 
-    nms <- c(
-        "field_id",
-        "class_id", "class_name",
-        "field_index", "field_anid", "field_name", "full_name", "full_ipname",
-        "units", "ip_units",
-        "is_name", 'required_field', "extensible_group",
-        "type", "type_enum",
-        "autosizable", "autocalculatable", "default", "choice", "note",
-        "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
-        "reference", "reference_class_name", "object_list", "field_name_us"
-    )
+    col_ref <- c("reference", "reference_class_name", "object_list")
 
     # only keep useful columns
-    ignore <- setdiff(names(dt), nms)
+    ignore <- setdiff(names(dt), c(unlist(FIELD_COLS, use.names = FALSE), col_ref))
     if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
-    setcolorder(dt, nms)
+    setcolorder(dt, intersect(unlist(FIELD_COLS, use.names = FALSE), names(dt)))
 
     dt
 }
@@ -871,15 +1037,12 @@ parse_field_property_name <- function (dt) {
     ## b) fields can be referenced and does not reference others
     dt[
         (field == "Name" & type %chin% c("alpha", "node")) |
-        (
-           !vapply(reference, is.null, logical(1L)) &
-            vapply(object_list, is.null, logical(1L))
-        ),
+        (!vlapply(reference, is.null) & vlapply(object_list, is.null)),
         `:=`(is_name = TRUE)
     ]
 
     # fill missing ip units
-    unit_dt <- unit_conv_table[unit_conv_table[, .I[1], by = si_name]$V1,
+    unit_dt <- UNIT_CONV_TABLE[UNIT_CONV_TABLE[, .I[1], by = si_name]$V1,
         .SD, .SDcols = c("si_name", "ip_name")
     ]
     dt <- unit_dt[dt, on = list(si_name = units)][is.na(ip_units), `:=`(ip_units = ip_name)]
@@ -891,36 +1054,14 @@ parse_field_property_name <- function (dt) {
     setnames(dt, "field", "field_name")
     dt[is.na(field_name), `:=`(field_name = field_anid)]
 
-    # add full names
-    dt[is.na(units), `:=`(full_name = field_name, full_ipname = field_name)]
-    dt[!is.na(units), `:=`(
-        full_name = paste0(field_name, " {", units, "}"),
-        full_ipname = paste0(field_name, " {", ip_units, "}")
-    )]
-
     dt
 }
 # }}}
 
 # parse_field_property_default {{{
 parse_field_property_default <- function (dt) {
-    set(dt, NULL, "value_id", dt$field_id)
-    set(dt, NULL, "value", dt$default)
-    set(dt, NULL, "value_lc", stri_trans_tolower(dt$value))
-    set(dt, NULL, "value_num", NA_real_)
-
-    setindexv(dt, c("type_enum", "value_lc"))
-
-    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.double(value)))]
-
-    set(dt, NULL, "default", as.list(dt$default))
-    dt[type_enum == IDDFIELD_TYPE$integer & !value_lc %in% c("autosize", "autocalculate"),
-        `:=`(default = as.list(as.integer(value_num)))]
-    dt[type_enum == IDDFIELD_TYPE$real & !value_lc %in% c("autosize", "autocalculate"),
-        `:=`(default = as.list(value_num))]
-
-    set(dt, NULL, c("value_id", "value", "value_lc", "value_num"), NULL)
-
+    set(dt, NULL, "default_num", NA_real_)
+    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(default_num = suppressWarnings(as.double(default)))]
     dt
 }
 # }}}
@@ -950,8 +1091,9 @@ parse_field_reference_table <- function (dt) {
     obj_fld <- dt[, {
         l <- vapply(object_list, length, integer(1L))
         # handle the case when there is no \object-list
-        obj_lst <- {if (all(l == 0L)) character(0) else unlist(object_list)}
+        obj_lst <- if (all(l == 0L)) character(0) else unlist(object_list)
         list(
+            class_id = rep(class_id[l > 0L], l[l > 0L]),
             field_id = rep(field_id[l > 0L], l[l > 0L]),
             object_list = obj_lst
         )
@@ -964,13 +1106,14 @@ parse_field_reference_table <- function (dt) {
         l <- vapply(reference_class_name, length, integer(1L))
         # handle the case when there is no \reference-class-name
         enum <- {if (all(l == 0L)) integer(0) else IDDFIELD_SOURCE$class}
+        dt[J(field_id[l > 0L]), on = "field_id", src_enum := IDDFIELD_SOURCE$class]
         list(
             reference = unlist(reference_class_name),
             src_field_id = rep(field_id[l > 0L], l[l > 0L]),
+            src_class_id = rep(class_id[l > 0L], l[l > 0L]),
             src_enum = enum
         )
     }]
-    dt[ref_cls, on = list(field_id = src_field_id), `:=`(src_enum = ref_cls$src_enum)]
 
     # for \reference
     ref_fld <- dt[, {
@@ -978,21 +1121,24 @@ parse_field_reference_table <- function (dt) {
         fld <- l > 0L
         mx <- fld & src_enum == IDDFIELD_SOURCE$class
         src_enum[fld] <- IDDFIELD_SOURCE$field
-        src_enum[mx] <- IDDFIELD_SOURCE$mixed
+        dt[J(field_id[fld]), on = "field_id", src_enum := IDDFIELD_SOURCE$field]
+        dt[J(field_id[mx]), on = "field_id", src_enum := IDDFIELD_SOURCE$mixed]
         list(
-            reference = unlist(reference),
+            reference = unlist(reference[fld]),
             src_field_id = rep(field_id[fld], l[fld]),
+            src_class_id = rep(class_id[fld], l[fld]),
             src_enum = rep(src_enum[fld], l[fld])
         )
     }]
-    dt[ref_fld, on = list(field_id = src_field_id), `:=`(src_enum = ref_fld$src_enum)]
 
     # handle the case when there is neither no \reference nor \reference-class-name
     if (nrow(ref_fld) == 0L && nrow(ref_cls) == 0L) {
         return(list(
             left = dt,
             reference = data.table(
-                field_id = integer(0), src_field_id = integer(0), src_enum = integer(0)
+                class_id = integer(0), field_id = integer(0),
+                src_class_id = integer(0), src_field_id = integer(0),
+                src_enum = integer(0)
             )
         ))
     }
@@ -1002,8 +1148,20 @@ parse_field_reference_table <- function (dt) {
 
     # combine object list and reference
     obj_ref <- refs[obj_fld, on = list(reference = object_list), allow.cartesian = TRUE]
+
+    # check if \object-list does not have a corresponding \reference
+    if (any(is.na(obj_ref$src_field_id))) {
+        parse_issue("error_object_list_missing_reference", "idd",
+            "\\object-list missing corresponding \\reference or \\reference-class-name",
+            post = paste0(
+                "Paired \\reference nor \\reference-class-name exist for \\object-list below:\n",
+                collapse(obj_ref[is.na(src_field_id), reference])
+            )
+        )
+    }
+
     set(obj_ref, NULL, "reference", NULL)
-    setcolorder(obj_ref, c("field_id", "src_field_id", "src_enum"))
+    setcolorder(obj_ref, c("class_id", "field_id", "src_class_id", "src_field_id", "src_enum"))
 
     # remove unuseful columns
     set(dt, NULL, c("object_list", "reference", "reference_class_name"), NULL)
@@ -1105,8 +1263,8 @@ sep_header_options <- function (dt, type_enum) {
             special_format = "usespecialformat",
             view_in_ip = "viewinipunits",
             sorted = "sortedorder",
-            ori_top = "originalordertop",
-            ori_bot = "originalorderbottom"
+            new_top = "originalordertop",
+            new_bot = "originalorderbottom"
         )
     )
 
@@ -1171,8 +1329,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     set(idd$class, NULL, "class_name_lower", stri_trans_tolower(idd$class$class_name))
     dt[!is.na(class_name_lower), c("class_id", "class_name", "group_id") := ({
         nm_in <- class_name_lower
-        cls <- idd$class[, list(class_id, class_name, group_id, class_name_lower)][
-            J(nm_in), on = "class_name_lower"]
+        cls <- idd$class[J(nm_in), on = "class_name_lower"]
         list(cls$class_id, cls$class_name, cls$group_id)
     })]
     set(idd$class, NULL, "class_name_lower", NULL)
@@ -1185,18 +1342,6 @@ sep_object_table <- function (dt, type_enum, version, idd) {
         parse_issue("error_multiple_version", "idf", "Multiple IDF Version found",
             dt[object_id %in% id_ver], length(id_ver)
         )
-    # if only has one version, then compare it with input IDD version
-    } else {
-        b <- dt[object_id == id_ver][type > type_enum$object, body]
-        v <- standardize_ver(stri_trim_right(stri_sub(b, to = -2L)))
-
-        if (v != version) {
-            mes <- paste0("Version Mismatch. The IDF file parsing has a differnet ",
-                "version ", surround(v), " than the IDD file using ",
-                surround(version), ". Parsing errors may occur."
-            )
-            warn("waring_idf_idd_mismatch_ver", mes, idf_ver = ver, idd_ver = version)
-        }
     }
     # }}}
 
@@ -1217,8 +1362,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     dt <- unique(dt)
 
     # get table
-    dt_object <- dt[type <= type_enum$object_value, .SD,
-        .SDcols = c("object_id", "class_id", "class_name", "group_id", "comment")]
+    dt_object <- dt[type <= type_enum$object_value, .SD, .SDcols = c("object_id", "class_id", "comment")]
 
     # clean comment
     clean_comment <- function (x) {
@@ -1227,16 +1371,13 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     }
 
     dt_object <- dt_object[,
-        list(
-            class_id = class_id[1L], class_name = class_name[1L],
-            group_id = group_id[1L], comment = list(clean_comment(comment))
-        ),
+        list(class_id = class_id[1L], comment = list(clean_comment(comment))),
         by = object_id
     ]
 
     dt <- dt[type > type_enum$object]
     # remove unuseful columns
-    set(dt, NULL, c("group_id", "type", "comment"), NULL)
+    set(dt, NULL, c("class_name", "group_id", "type", "comment"), NULL)
 
     list(left = dt, object = dt_object)
 }
@@ -1245,14 +1386,14 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 # get_value_table {{{
 get_value_table <- function (dt, idd) {
     # count value number per line
-    dt[, `:=`(value_count = stri_count_charclass(body, "[,;]"))]
+    set(dt, NULL, "value_count", stri_count_charclass(dt$body, "[,;]"))
 
     setindexv(dt, "value_count")
 
     # get all comments and single value lines
     sgl <- dt[value_count < 2L]
     set(sgl, NULL, "value_count", NULL)
-    sgl[, `:=`(value = stri_trim_right(stri_sub(body, to = -2L)))]
+    set(sgl, NULL, "value", stri_trim_right(stri_sub(sgl$body, to = -2L)))
 
     # get all condensed value lines
     con <- dt[value_count > 1L]
@@ -1268,7 +1409,6 @@ get_value_table <- function (dt, idd) {
             string = rep(string, l),
             object_id = rep(object_id, l),
             class_id = rep(class_id, l),
-            class_name = rep(class_name, l),
             value = stri_trim_both(unlist(s))
         )
     }]
@@ -1288,40 +1428,42 @@ get_value_table <- function (dt, idd) {
     # replace empty value with NA
     dt[stri_isempty(value), `:=`(value = NA_character_)]
 
-    # add field id and other attributes
-    ## add full name column based on option
-    col_nm <- if(.options$view_in_ip) "full_ipname" else "full_name"
-
-    cols_add <- c("class_id", "field_index", "field_id", "type_enum",
-        "src_enum", "field_name", col_nm, "units", "ip_units", "is_name"
-    )
-
     dt_query <- unique(dt[, list(rleid = object_id, class_id, field_index)])
 
     # add complete fields
-    fld <- get_idd_field(idd, dt_query, dt_query$field_index, cols = c("rleid", cols_add), complete = TRUE)
+    cols <- c(
+        "field_id",
+        # for matching
+        "rleid", "class_id", "field_index",
+        # for updating object names
+        "is_name",
+        # for finding references
+        "type_enum", "src_enum", "class_name",
+        # for unit conversion
+        "units", "ip_units"
+    )
+    fld <- get_idd_field(idd, dt_query, dt_query$field_index,
+        c("type_enum", "src_enum", "is_name", "units", "ip_units"),
+        complete = TRUE
+    )
+    set(fld, NULL, setdiff(names(fld), cols), NULL)
 
     # bind columns
-    dt <- dt[fld, on = list(object_id = rleid, class_id, field_index)]
+    dt <- dt[fld, on = c(object_id = "rleid", "class_id", "field_index")]
 
     # fill data for missing fields
-    dt[is.na(line), `:=`(
-        class_name = t_class_data(idd$class, class_id)$class_name,
-        value_id = new_id(dt, "value_id", length(value_id))
-    )]
+    dt[is.na(line), `:=`(value_id = new_id(dt, "value_id", length(value_id)))]
 
     # add numeric type values
-    dt[type_enum <= IDDFIELD_TYPE$real,
-        `:=`(value_num = suppressWarnings(as.numeric(value)))]
+    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.numeric(value)))]
 
     # only keep useful columns
-    nms <- c("value_id", "value", "value_num", "object_id", "class_name", cols_add)
+    nms <- c("value_id", "value", "value_num", "object_id", "field_id",
+        "is_name", "type_enum", "src_enum", "class_name", "units", "ip_units"
+    )
     ignore <- setdiff(names(dt), nms)
     if (length(ignore) > 0L) set(dt, NULL, ignore, NULL)
     setcolorder(dt, nms)
-
-    # always use "full_name" to represent current field names
-    setnames(dt, col_nm, "full_name")
 
     dt
 }
@@ -1348,7 +1490,7 @@ convert_value_unit <- function (dt_value, from, to, type = "value") {
 
     if (!nrow(val)) return(dt_value)
 
-    val <- unit_conv_table[val, on = c(si_name = "units", ip_name = "ip_units")]
+    val <- UNIT_CONV_TABLE[val, on = c(si_name = "units", ip_name = "ip_units")]
     set(val, NULL, c("si_name", "ip_name"), NULL)
     setnames(val, c("si_standard_name", "ip_standard_name"), c("si", "ip"))
 
@@ -1374,8 +1516,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     setindexv(dt_val, "src_enum")
 
     # a) reference class names
-    cls_src <- dt_val[
-        src_enum == IDDFIELD_SOURCE$class,
+    cls_src <- dt_val[J(IDDFIELD_SOURCE$class), on = "src_enum", nomatch = 0L,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1386,8 +1527,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     ]
 
     # b) reference field values
-    fld_src <- dt_val[
-        src_enum == IDDFIELD_SOURCE$field,
+    fld_src <- dt_val[J(IDDFIELD_SOURCE$field), on = "src_enum", nomatch = 0L,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1399,8 +1539,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 
     # c) reference both class names and field values
     ## seperate source enum here
-    mix_src <- dt_val[
-        src_enum == IDDFIELD_SOURCE$mixed,
+    mix_src <- dt_val[J(IDDFIELD_SOURCE$mixed), on = "src_enum", nomatch = 0L,
         {
             list(
                 src_object_id = c(object_id, object_id),
@@ -1434,76 +1573,31 @@ get_value_references <- function (dt_value, lower = FALSE) {
 # }}}
 
 # get_value_reference_map {{{
-get_value_reference_map <- function (map, src, value) {
+get_value_reference_map <- function (map, src, value, all = TRUE) {
     empty <- data.table(
             object_id = integer(0L),     value_id = integer(0L),
         src_object_id = integer(0L), src_value_id = integer(0L),
         src_enum = integer(0L)
     )
 
-    # get all values in lower case that are sources
-    val_src <- get_value_sources(src, lower = TRUE)
-    if (!nrow(val_src)) return(empty)
-
     # get all values in lower case that are references
     val_ref <- get_value_references(value, lower = TRUE)
     if (!nrow(val_ref)) return(empty)
 
-    val_src_lst <- val_src[, lapply(.SD, list), by = "src_field_id"]
-    val_ref_lst <- val_ref[, lapply(.SD, list), by = "field_id"]
+    # get field reference map in current IDF
+    val_ref_map <- val_ref[map, on = "field_id", nomatch = 0L]
+    set(val_ref_map, NULL, "src_enum", NULL)
 
-    # remove rows that field ids do not exist in current IDF
-    fld_ref_src <- map[field_id %in% val_ref$field_id & src_field_id %in% val_src$src_field_id]
-    if (!nrow(fld_ref_src)) return(empty)
-    set(fld_ref_src, NULL, "src_enum", NULL)
-
-    # combine all references and sources
-    ref_src_lst <- val_src_lst[fld_ref_src, on = list(src_field_id)][,
-        list(
-            src_object_id = list(unlist(src_object_id, use.names = FALSE)),
-            src_field_id = list(src_field_id),
-            src_value_id = list(unlist(src_value_id, use.names = FALSE)),
-            src_value = list(unlist(src_value, use.names = FALSE)),
-            src_enum = list(unlist(src_enum, use.names = FALSE))
-        ),
-        by = "field_id"
-    ][val_ref_lst, on = "field_id"]
+    # get all values in lower case that are sources
+    val_src <- get_value_sources(src[J(unique(val_ref_map$src_field_id)), on = "field_id", nomatch = 0L], lower = TRUE)
 
     # match
-    ref_src_lst[, {
-        val_id <- unlist(value_id, use.names = FALSE)
-        val <- unlist(value, use.names = FALSE)
-        l <- vapply(value_id, length, integer(1L))
-        list(
-            src_object_id = rep(src_object_id, l),
-            src_value_id = rep(src_value_id, l),
-            src_value = rep(src_value, l),
-            src_enum = rep(src_enum, l),
-            object_id = unlist(object_id, use.names = FALSE),
-            value_id = val_id,
-            value = val
-            # src_field_id = rep(src_field_id, l),
-            # field_id = rep(field_id, l),
-        )
-    }][, {
-            # NOTE: If there are multiple value matched, only the first will be
-            # used. This could happen when there are errors that objects in one
-            # class have the same name.
-            # TODO: log this case
-            m <- chmatch(value, unlist(src_value, use.names = FALSE), nomatch = 0L)
-            # set NA if no matched found
-            obj_id <- NA_integer_
-            val_id <- NA_integer_
-            enum <- NA_integer_
-            if (m) {
-                obj_id <- unlist(src_object_id, use.names = FALSE)[m]
-                val_id <- unlist(src_value_id, use.names = FALSE)[m]
-                enum <- unlist(src_enum, use.names = FALSE)[m]
-            }
-            list(object_id = object_id, src_object_id = obj_id, src_value_id = val_id, src_enum = enum)
-        },
-        by = value_id
-    ][, .SD, .SDcols = names(empty)]
+    ref <- val_ref_map[val_src, on = "src_field_id", allow.cartesian = TRUE][
+        value == src_value, .SD, .SDcols = names(empty)]
+
+    # make sure every reference value has a corresponding source even NA
+    if (!all || nrow(ref) == nrow(val_ref)) return(ref)
+    ref[J(val_ref$value_id), on = "value_id"]
 }
 # }}}
 
