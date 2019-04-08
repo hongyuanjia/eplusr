@@ -417,13 +417,14 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
     ver_line_spe <- idf_dt[is_ver]
     ver_line_nor <- idf_dt[which(is_ver) + 1L]
 
+    reg_ver <- "(\\d+\\.\\d+(?:\\.\\d+)*)"
     set(ver_line_spe, NULL, "version",
         stri_match_first_regex(
-            ver_line_spe$string, "Version\\s*,\\s*(\\d\\.\\d)\\s*;$",
+            ver_line_spe$string, paste0("Version\\s*,\\s*", reg_ver, "\\s*;$"),
             opts_regex = stringi::stri_opts_regex(case_insensitive = TRUE)
         )[, 2L]
     )
-    set(ver_line_nor, NULL, "version", stri_match_first_regex(ver_line_nor$string, "^(\\d\\.\\d)\\s*;")[, 2L])
+    set(ver_line_nor, NULL, "version", stri_match_first_regex(ver_line_nor$string, paste0("^", reg_ver, "\\s*;"))[, 2L])
     ver_line <- rbindlist(list(ver_line_spe, ver_line_nor), use.names = FALSE)[!is.na(version)]
 
     if (!nrow(ver_line)) {
