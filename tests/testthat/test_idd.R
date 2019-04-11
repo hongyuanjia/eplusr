@@ -1,47 +1,5 @@
 context("Idd and IddObject")
 
-# idd_text {{{
-idd_text <- c(
-    "!IDD_Version 9.9.9
-     !IDD_BUILD 7c3bbe4830
-     \\group TestGroup1
-
-     TestSimple,
-     A1 ; \\field Test Field
-       \\reference RefTestSimpleA1
-
-     \\group TestGroup2
-     TestSlash,
-       \\memo This is just a test
-       \\required-object
-       \\unique-object
-       \\min-fields 3
-       \\format singleLine
-       \\extensible 4 !all fields are extensible
-     A1 , \\field Test Character Field 1
-       \\note Test Note Parsing
-       \\reference-class-name RefTestSlash
-       \\required-field
-       \\begin-extensible
-       \\object-list RefTestSimpleA1
-     N1 , \\field Test Numeric Field 1
-       \\units m
-       \\ip-units in
-       \\unitsbasedonfield A2
-       \\minimum 1
-       \\maximum< 10
-       \\default 2
-       \\autosizable
-       \\type real
-     N2 , \\field Test Numeric Field 2
-       \\autocalculatable
-       \\type real
-     A2 ; \\field Test Character Field 2
-       \\type choice
-       \\key Key1
-       \\key Key2")
-# }}}
-
 # download_idd() {{{
 test_that("can download IDD from EnergyPlus repo", {
     skip_on_cran()
@@ -71,275 +29,15 @@ test_that("can read IDD", {
     expect_message(use_idd(8.7, download = "auto"))
     expect_equal(avail_idd(), c("8.5.0", "8.7.0"))
 
-    expect_message(use_idd(idd_text))
+    expect_message(use_idd(text("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))
-})
-# }}}
-
-# parse_idd_file() {{{
-test_that("parse_idd_file()", {
-    idd_parsed <- parse_idd_file(idd_text)
-
-    # can read Idd from string
-    expect_silent(idd_str <- read_lines_in_dt(idd_text))
-
-    # can parse Idd from string
-    expect_equal(
-        names(idd_parsed),
-        c("version", "build", "name", "group", "class", "field", "reference")
-    )
-
-    # can get Idd version
-    expect_equal(idd_parsed$version, as.numeric_version("9.9.9"))
-
-    # can get Idd build
-    expect_equal(idd_parsed$build, "7c3bbe4830")
-
-    # can parse group data
-    expect_equal(idd_parsed$group$group_id, 1:2)
-    expect_equal(idd_parsed$group$group_name, c("TestGroup1", "TestGroup2"))
-
-    # can parse class property data
-    expect_equal(idd_parsed$class$class_id, 1:2)
-    expect_equal(idd_parsed$class$class_name, c("TestSimple", "TestSlash"))
-    expect_equal(idd_parsed$class$group_id, 1:2)
-    expect_equal(idd_parsed$class$format, c("standard", "singleLine"))
-    expect_equal(idd_parsed$class$min_fields, c(0, 3))
-    expect_equal(idd_parsed$class$num_fields, c(1, 4))
-    expect_equal(idd_parsed$class$last_required, c(0, 1))
-    expect_equal(idd_parsed$class$has_name, c(FALSE, FALSE))
-    expect_equal(idd_parsed$class$required_object, c(FALSE, TRUE))
-    expect_equal(idd_parsed$class$unique_object, c(FALSE, TRUE))
-    expect_equal(idd_parsed$class$num_extensible, c(0, 4))
-    expect_equal(idd_parsed$class$first_extensible, c(0, 1))
-    expect_equal(idd_parsed$class$num_extensible_group, c(0, 1))
-    expect_equal(idd_parsed$class$memo, list(NULL, "This is just a test"))
-
-    # can parse field property data
-    expect_equal(idd_parsed$field$field_id, 1:5)
-    expect_equal(idd_parsed$field$class_id, c(1, rep(2,4)))
-    expect_equal(idd_parsed$field$class_name, c("TestSimple", rep("TestSlash",4)))
-    expect_equal(idd_parsed$field$field_index, c(1, 1:4))
-    expect_equal(idd_parsed$field$field_anid, c("A1", "A1", "N1", "N2", "A2"))
-    nms <- c("Test Field",
-             "Test Character Field 1",
-             "Test Numeric Field 1",
-             "Test Numeric Field 2",
-             "Test Character Field 2")
-    expect_equal(idd_parsed$field$field_name, nms)
-    expect_equal(idd_parsed$field$full_name, paste0(nms, c("", "", " {m}", "", "")))
-    expect_equal(idd_parsed$field$full_ipname, paste0(nms, c("", "", " {in}", "", "")))
-    expect_equal(idd_parsed$field$units, c(NA_character_, NA_character_, "m", NA_character_, NA_character_))
-    expect_equal(idd_parsed$field$ip_units, c(NA_character_, NA_character_, "in", NA_character_, NA_character_))
-    expect_equal(idd_parsed$field$is_name, c(FALSE, FALSE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$required_field, c(FALSE, TRUE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$extensible_group, c(0L, 1L, 1L, 1L, 1L))
-    expect_equal(idd_parsed$field$type, c("alpha", "object-list", "real", "real", "choice"))
-    expect_equal(idd_parsed$field$type_enum, c(4L, 5L, 2L, 2L, 3L))
-    expect_equal(idd_parsed$field$autosizable, c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$autocalculatable, c(FALSE, FALSE, FALSE, TRUE, FALSE))
-    expect_equal(idd_parsed$field$default, list(NA_character_, NA_character_, 2, NA_real_, NA_character_))
-    expect_equal(idd_parsed$field$choice, list(character(0), character(0), NULL, NULL, c("Key1", "Key2")))
-    expect_equal(idd_parsed$field$note, list(character(0), "Test Note Parsing", NULL, NULL, character(0)))
-    expect_equal(idd_parsed$field$has_range, c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$maximum, c(NA, NA, 10, NA, NA))
-    expect_equal(idd_parsed$field$minimum, c(NA, NA, 1, NA, NA))
-    expect_equal(idd_parsed$field$lower_incbounds, c(FALSE, FALSE, TRUE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$upper_incbounds, c(FALSE, FALSE, FALSE, FALSE, FALSE))
-    expect_equal(idd_parsed$field$src_enum, c(2L, 1L, 0L, 0L, 0L))
-
-    # can parse field reference data
-    expect_equal(idd_parsed$reference$field_id, 2L)
-    expect_equal(idd_parsed$reference$src_field_id, 1L)
-    expect_equal(idd_parsed$reference$src_enum, 2L)
-
-    # can detect error of missing IDD version
-    idd_wrong <- c(
-        "\\group TestGroup
-
-        Test,
-        A1 ; \\note something"
-    )
-    expect_error(parse_idd_file(idd_wrong), "No IDD version found")
-
-    # can detect error of multiple IDD versions
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_Version 9.9.8
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something"
-    )
-    expect_error(parse_idd_file(idd_wrong), "Multiple IDD version found")
-
-    # can warn about missing IDD build tag
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something"
-    )
-    expect_warning(parse_idd_file(idd_wrong), "No build tag")
-
-    # can warn about multiple IDD build tags
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-        !IDD_BUILD abc
-        !IDD_BUILD def
-        \\group TestGroup
-
-        Test,
-        A1 ; \\note something"
-    )
-    expect_warning(parse_idd_file(idd_wrong), "Multiple build tags")
-
-    # can detect error of invalid line
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something
-
-         Some Mess Here"
-    )
-    expect_error(parse_idd_file(idd_wrong), "Invalid line")
-
-    # can detect missing group lines
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-
-         Test,
-         A1 ; \\note something
-
-         \\group TestGroup
-
-         Test1,
-         A1 ; \\note something
-         "
-    )
-    expect_error(parse_idd_file(idd_wrong), "Missing group name")
-
-    # can detect duplicated class names
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something
-
-         Test,
-         A1 ; \\note something
-         "
-    )
-    expect_error(parse_idd_file(idd_wrong), "Duplicated class names")
-
-    # can detect incomplete class
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something
-
-         A1 , \\note something
-         A1 ; \\note something
-         A1 , \\note something
-         "
-    )
-    expect_error(parse_idd_file(idd_wrong), "Missing class name")
-
-    # can detect missing class names
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something
-
-         A1 , \\note something
-         A1 ; \\note something
-         "
-    )
-    expect_error(parse_idd_file(idd_wrong), "Missing class name")
-
-    # can manually insert class slash
-    idd_cls <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-
-         \\group TestGroup
-
-         Test,
-         A1 ; \\note something
-
-         Test1,
-         A1 , \\note something
-         A1 ; \\note something
-         "
-    )
-    expect_silent(parse_idd_file(idd_cls))
-
-    # can detect error of invalid slash key
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-         \\group TestGroup
-
-         TestInvalidSlash,
-         A1 ; \\invalid-slash-key")
-    expect_error(parse_idd_file(idd_wrong), "Invalid slash key")
-
-    # can detect error of invaid type key
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-         \\group TestGroup
-
-         TestInvalidSlash,
-         A1 ; \\type invalid"
-    )
-    expect_error(parse_idd_file(idd_wrong), "Invalid type value")
-
-    # can detect error of invaid external list key
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-         \\group TestGroup
-
-         TestInvalidSlash,
-         A1 ; \\external-list invalid"
-    )
-    expect_error(parse_idd_file(idd_wrong), "Invalid external list value")
-
-    # can detect error of invalid format key
-    idd_wrong <- c(
-        "!IDD_Version 9.9.9
-         !IDD_BUILD 7c3bbe4830
-         \\group TestGroup
-
-         TestInvalidSlash,
-         A1 ; \\format invalid"
-    )
-    expect_error(parse_idd_file(idd_wrong), "Invalid format value")
 })
 # }}}
 
 # Idd class {{{
 test_that("Idd class", {
-    idd <- Idd$new(idd_text)
     # can create an Idd object from string
-    expect_silent(idd <- eplusr:::Idd$new(idd_text))
+    expect_silent(idd <- Idd$new(text("idd", "9.9.9")))
 
     # can get Idd version
     expect_equal(idd$version(), as.numeric_version("9.9.9"))
@@ -390,28 +88,28 @@ test_that("Idd class", {
     expect_equal(idd$unique_class_name(), "TestSlash")
 
     # can return names of all extensible classes
-    expect_equal(idd$extensible_class_name(), "TestSimple")
+    expect_equal(idd$extensible_class_name(), "TestSlash")
 
     # can return a single IddObject using class name
-    expect_is(idd$object("TestSimple")$TestSimple, "IddObject")
+    expect_is(idd$object("TestSimple"), "IddObject")
 
     # can stop when invalid class names are given
-    expect_error(idd$object("WrongClass"), "Invalid class name found: `WrongClass`.")
+    expect_error(idd$object("WrongClass"), "Invalid class name found: `WrongClass`")
 
     # can return when multiple class names are given
-    expect_equal(idd$object(c("TestSimple", "TestSlash")),
-        list(TestSimple = idd$object("TestSimple")$TestSimple,
-            TestSlash = idd$object("TestSlash")$TestSlash))
+    expect_equal(idd$objects(c("TestSimple", "TestSlash")),
+        list(TestSimple = idd$object("TestSimple"),
+            TestSlash = idd$object("TestSlash")))
 
     # can return all IddObjects in a group
-    expect_is(idd$object_in_group("TestGroup1"), "list")
-    expect_equal(idd$object_in_group("TestGroup1"), list(TestSimple = idd$object("TestSimple")$TestSimple))
+    expect_is(idd$objects_in_group("TestGroup1"), "list")
+    expect_equal(idd$objects_in_group("TestGroup1"), list(TestSimple = idd$object("TestSimple")))
 
     # can stop when invalid group names are given
-    expect_error(idd$object_in_group("WrongGroup"), "Invalid group name found")
+    expect_error(idd$objects_in_group("WrongGroup"), "Invalid group name found")
 
     # can stop when multiple group names are given
-    expect_error(idd$object_in_group(c("TestGroup1", "TestGroup2")),
+    expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")),
         "group is not a string")
 
     # can check if input is a valid group
@@ -426,20 +124,21 @@ test_that("Idd class", {
     expect_output(idd$print())
 
     # can get single object using S3 method
-    expect_equal(idd$TestSlash, idd$object("TestSlash")[[1]])
-    expect_equal(idd[["TestSlash"]], idd$object("TestSlash")[[1]])
+    expect_equal(idd$TestSlash, idd$object("TestSlash"))
+    expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
+
+    expect_is(idd$object("TestSlash"), "IddObject")
+    expect_is(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
 })
 # }}}
 
 # IddObject class {{{
 test_that("IddObject class", {
-    idd <- eplusr:::Idd$new(idd_text)
 
-    expect_error(IddObject$new(),
-        "IddObject can only be created after a parent Idd object"
-    )
+    expect_silent(idd <- Idd$new(text("idd", 9.9)))
+    expect_silent(slash <- IddObject$new("TestSlash", idd))
 
-    slash <- idd$object("TestSlash")$TestSlash
+    expect_error(IddObject$new(), "IddObject can only be created based on a parent Idd object")
 
     # can use $group_name()
     expect_equal(slash$group_name(), "TestGroup2")
@@ -495,8 +194,10 @@ test_that("IddObject class", {
 
     # can use $field_name()
     expect_error(slash$field_name(slash$num_fields() + 30), "Invalid field index")
-    expect_equal(slash$field_name(c(2, 1)),
-        c("Test Numeric Field 1", "Test Character Field 1"))
+    expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
+    expect_warning({nm <- slash$field_name(c(2, 1), lower = TRUE)},
+        "Parameter `lower`.*has been deprecated"
+    )
 
     # can use $field_index()
     expect_equal(slash$field_index(), 1L:4L)
@@ -515,22 +216,36 @@ test_that("IddObject class", {
 
     # can use $field_default()
     expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
-    expect_equivalent(slash$field_default(c(4, 2), in_ip = TRUE), list(NA_character_, 78.74016), tolerance = 0.001)
+    expect_warning({val <- slash$field_default(c(4, 2), in_ip = TRUE)},
+        "Parameter `in_ip`.* has been deprecated."
+    )
+    expect_equivalent(unname(val), list(NA_character_, 78.74016), tolerance = 0.001)
 
     # can use $field_choice()
     expect_equivalent(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NULL))
 
     # can use $field_range()
     expect_equivalent(slash$field_range(c(4, 2)),
-        list(list(NA_real_, FALSE, NA_real_, FALSE), list(1L, TRUE, 10, FALSE)))
+        list(ranger(NA_real_, FALSE, NA_real_, FALSE), ranger(1L, TRUE, 10, FALSE)))
 
     # can use $field_reference()
-    expect_error(slash$field_reference(c(4, 2)),
-        "Function can only be used in IddObjects that are created inside an Idf")
+    expect_is(slash$field_relation(c(4, 2)), "list")
+    expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
+    expect_equal(nrow(slash$field_relation(c(4, 2))$ref_by), 0L)
+    expect_equivalent(slash$field_relation(c(1, 3))$ref_to,
+        data.table(
+            class_id = 2L, class_name = "TestSlash",
+            field_index = 1L, field_name = "Test Character Field 1",
+            src_class_id = 1L, src_class_name = "TestSimple",
+            src_field_index = 1L, src_field_name = "Test Field",
+            src_enum = 2L, dep = 0L
+        )
+    )
 
     # can use $field_possible()
-    expect_error(slash$field_possible(c(4, 2)),
-        "Function can only be used in IddObjects that are created inside an Idf")
+    expect_is(slash$field_possible(c(4, 2)), "list")
+    expect_equal(names(slash$field_possible(c(4, 2))), c("possible", "relation"))
+    expect_silent(slash$field_possible(c(4, 2)))
 
     # can use $is_valid_field_num()
     expect_equal(slash$is_valid_field_num(c(1, 4, 6, 12)), c(FALSE, TRUE, FALSE, TRUE))
@@ -553,7 +268,7 @@ test_that("IddObject class", {
     expect_true(slash$is_valid_field_index(2))
     expect_true(slash$is_valid_field_index(3))
     expect_true(slash$is_valid_field_index(4))
-    expect_false(slash$is_valid_field_index("wrong"))
+    expect_error(slash$is_valid_field_index("wrong"), "not counts")
     expect_false(slash$is_valid_field_index(5))
 
     # can use $is_autosizable_field()
@@ -598,6 +313,21 @@ test_that("IddObject class", {
     expect_false(slash$is_required_field(4))
     expect_error(slash$is_required_field(5))
 
+    # can detect if fields have relation with others
+    expect_true(slash$has_relation("Test Character Field 1"))
+    expect_false(slash$has_relation("Test Numeric Field 1"))
+    expect_false(slash$has_ref_by("Test Character Field 1"))
+    expect_false(slash$has_ref_by("Test Numeric Field 1"))
+    expect_true(slash$has_ref_to("Test Character Field 1"))
+    expect_false(slash$has_ref_to("Test Numeric Field 1"))
+
+    # can detect if fields have relation with others
+    expect_true(slash$has_relation())
+    expect_false(slash$has_ref_by())
+    expect_true(slash$has_ref_to())
+
+    slash$to_table(all = TRUE)
+    # print
     expect_output(slash$print())
 })
 # }}}

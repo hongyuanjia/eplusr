@@ -23,12 +23,21 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
             assert(has_name(dt_in, paste0(type, "_name")))
             if (underscore) {
                 if (!has_name(dt_in, paste0(type, "_name_us"))) {
-                    set(dt_in, NULL, paste0(type, "_name_us"), underscore_name(dt_in[[paste0(type, "_name")]]))
+                    set(dt_in, NULL, paste0(type, "_name_us"),
+                        underscore_name(dt_in[[paste0(type, "_name")]])
+                    )
+                    if (type == "field") {
+                        set(dt_in, NULL, paste0(type, "_name_us"),
+                            stri_trans_tolower(dt_in[[paste0(type, "_name")]])
+                        )
+                    }
                 }
                 col_on <- paste0(type, "_name_us")
             } else if (lower) {
                 if (!has_name(dt_in, paste0(type, "_name_lower"))) {
-                    set(dt_in, NULL, paste0(type, "_name_lower"), stri_trans_tolower(dt_in[[paste0(type, "_name")]]))
+                    set(dt_in, NULL, paste0(type, "_name_lower"),
+                        stri_trans_tolower(dt_in[[paste0(type, "_name")]])
+                    )
                 }
                 col_on <- paste0(type, "_name_lower")
             }else {
@@ -41,6 +50,9 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
             if (underscore) {
                 input <- underscore_name(input)
                 col_on <- paste0(type, "_name_us")
+                if (type == "field") {
+                    input <- stri_trans_tolower(input)
+                }
             } else if (lower) {
                 input <- stri_trans_tolower(input)
                 col_on <- paste0(type, "_name_lower")
@@ -66,11 +78,16 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
 # join_from_input {{{
 join_from_input <- function (dt, input, check = "group_id") {
     col_on <- names(input)[[1L]]
-
     res <- dt[input, on = col_on, allow.cartesian = TRUE]
-
-    if (anyNA(res[[check]])) {
-        invld_cls <- res[is.na(get(check))][[col_on]]
+    check_bad_key(res, check, col_on)
+    setcolorder(res, "rleid")
+    res
+}
+# }}}
+# check_bad_key {{{
+check_bad_key <- function (res, col_check, col_on) {
+    if (anyNA(res[[col_check]])) {
+        invld_cls <- res[is.na(get(col_check))][[col_on]]
         if (stri_endswith_fixed(col_on, "id")) {
             if (stri_startswith_fixed(col_on, "object")) {
                 col_key <- "ID"
@@ -83,9 +100,27 @@ join_from_input <- function (dt, input, check = "group_id") {
         col_key <- paste(stri_replace_first_regex(col_on, "_.*", ""), col_key)
         abort_bad_key(paste0("error_", col_on), col_key, invld_cls)
     }
-
-    setcolorder(res, c("rleid", setdiff(names(res), "rleid")))
     res
+}
+# }}}
+# add_joined_cols {{{
+add_joined_cols <- function (base, dt, on, cols) {
+    set(dt, NULL, cols, base[J(dt[[on]]), on = on, .SD, .SDcols = cols])
+}
+# }}}
+# del_redundant_cols {{{
+del_redundant_cols <- function (base, dt, col_on = names(dt)[[1L]]) {
+    col_del <- setdiff(intersect(names(dt), names(base)), col_on)
+    if (length(col_del)) set(dt, NULL, col_del, NULL)
+    dt
+}
+# }}}
+# del_unuseful_cols {{{
+del_unuseful_cols <- function (base, dt) {
+    col_del <- setdiff(names(dt), intersect(names(dt), names(base)))
+    if (length(col_del)) set(dt, NULL, col_del, NULL)
+    setcolorder(dt, names(base))
+    dt
 }
 # }}}
 
@@ -186,7 +221,7 @@ errormsg_field_index <- function (dt) {
     dt[min_fields == 0L, msg := paste0(msg,
         " Field index should be no more than ", num_fields, ".")]
     dt[min_fields >  0L, msg := paste0(msg,
-        " field index should be no less than ", min_fields,
+        " Field index should be no less than ", min_fields,
         " and no more than ", num_fields, ".")]
 
     paste0(dt$msg, collapse = "\n")
@@ -231,5 +266,14 @@ append_dt <- function (dt, new_dt, base_col = NULL) {
 # unique_id {{{
 unique_id <- function () {
     paste0("id-", stri_rand_strings(1, 15L))
+}
+# }}}
+
+# assert_valid_type {{{
+assert_valid_type <- function (x, type) {
+    if (!is.character(x) && !all(are_count(x))) {
+        abort_bad_which_type(paste0("error_",type,"_which_type"), type)
+    }
+    TRUE
 }
 # }}}

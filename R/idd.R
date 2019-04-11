@@ -110,7 +110,7 @@ NULL
 #'
 #' `$is_valid_class()` return `TRUE` if the input is a valid class name.
 #'
-#' `$objectN` returns a list of `IddObject`s of specified classes.
+#' `$object` returns a list of `IddObject`s of specified classes.
 #'
 #' `$object_in_group()` returns a list of `IddObject`s in that group.
 #'
@@ -223,10 +223,13 @@ Idd <- R6::R6Class(classname = "Idd",
 
         # OBJECT GETTERS {{{
         object = function (class)
-            idd_object(self, private, class = class),
+            idd_object(self, private, class),
 
         objects = function (class)
-            idd_objects(self, private, class = class),
+            idd_objects(self, private, class),
+
+        objects_in_relation = function (class, direction = c("ref_by", "ref_to"))
+            idd_objects_in_relation(self, private, class),
 
         objects_in_group = function (group)
             idd_objects_in_group(self, private, group = group),
@@ -272,7 +275,7 @@ idd_group_name <- function (self, private) {
 # }}}
 # idd_from_group {{{
 idd_from_group <- function (self, private, class) {
-    get_idd_class_group(private$m_idd_env, class)$group_name
+    get_idd_class(private$m_idd_env, class, "group_name")$group_name
 }
 # }}}
 # idd_group_index {{{
@@ -282,37 +285,37 @@ idd_group_index <- function (self, private, group = NULL) {
 # }}}
 # idd_class_name {{{
 idd_class_name <- function (self, private, index = NULL) {
-    get_idd_class(private$m_idd_env, index, "class_name")$class_name
+    get_idd_class(private$m_idd_env, index)$class_name
 }
 # }}}
 # idd_class_index {{{
 idd_class_index <- function (self, private, class) {
-    get_idd_class(private$m_idd_env, class, "class_id")$class_id
+    get_idd_class(private$m_idd_env, class)$class_id
 }
 # }}}
 # idd_required_class_name {{{
 idd_required_class_name <- function (self, private) {
-    get_idd_class_name_required(private$m_idd_env)
+    private$m_idd_env$class[required_object == TRUE, class_name]
 }
 # }}}
 # idd_unique_class_name {{{
 idd_unique_class_name <- function (self, private) {
-    get_idd_class_name_unique(private$m_idd_env)
+    private$m_idd_env$class[unique_object == TRUE, class_name]
 }
 # }}}
 # idd_extensible_class_name {{{
 idd_extensible_class_name <- function (self, private) {
-    get_idd_class_name_extensible(private$m_idd_env)
+    private$m_idd_env$class[num_extensible > 0L, class_name]
 }
 # }}}
 # idd_is_valid_group_name {{{
 idd_is_valid_group_name <- function (self, private, group) {
-    group %in% private$m_idd_env$group$group_name
+    group %chin% private$m_idd_env$group$group_name
 }
 # }}}
 # idd_is_valid_class_name {{{
 idd_is_valid_class_name <- function (self, private, class) {
-    class %in% private$m_idd_env$class$class_name
+    class %chin% private$m_idd_env$class$class_name
 }
 # }}}
 # idd_object {{{
@@ -324,6 +327,15 @@ idd_object <- function (self, private, class) {
 idd_objects <- function (self, private, class) {
     res <- lapply(class, IddObject$new, self)
     setattr(res, "names", class)
+    res
+}
+# }}}
+# idd_objects_in_relation {{{
+idd_objects_in_relation <- function (self, private, class, direction = c("ref_to", "ref_by")) {
+    assert(!is.null(class), msg = "Please give class name.")
+    rel <- get_idd_relation(private$m_idd_env, class, max_depth = 0L, direction = direction)
+    res <- lapply(rel$class_id, IddObject$new, self)
+    setattr(res, "names", rel$class_name)
     res
 }
 # }}}
@@ -342,12 +354,12 @@ idd_objects_in_group <- function (self, private, group) {
 # }}}
 # idd_print {{{
 idd_print <- function (self, private) {
-    cli::cat_rule(crayon::bold("EnergyPlus Input Data Dictionary"), col = "green")
-    cli::cat_bullet(c(
-        paste0(crayon::bold("Version"), ": ", surround(private$m_version)),
-        paste0(crayon::bold("Build"), ": ", surround(private$m_build)),
-        paste0(crayon::bold("Total Class"), ": ", nrow(private$m_idd_env$class$index))
-    ), col = "cyan", bullet_col = "cyan")
+    cli::cat_rule("EnergyPlus Input Data Dictionary")
+    cli::cat_line("* ", c(
+        paste0("Version", ": ", private$m_version),
+        paste0("Build", ": ", private$m_build),
+        paste0("Total Class", ": ", nrow(private$m_idd_env$class))
+    ))
 }
 # }}}
 
@@ -367,12 +379,12 @@ idd_print <- function (self, private) {
             all_nm <- idd_class_name(self, priv)
             all_nm_us <- underscore_name(all_nm)
 
-            m <- match(in_nm, all_nm_us)
+            m <- chmatch(in_nm, all_nm_us)
 
             if (is.na(m)) {
                 NextMethod()
             } else {
-                idd_object(self, priv, all_nm[m])[[1L]]
+                idd_objects(self, priv, all_nm[m])
             }
         }
     } else {
@@ -383,34 +395,44 @@ idd_print <- function (self, private) {
 
 #' @export
 # [[.Idd {{{
-'[[.Idd' <- function(x, i) {
-    if (all(i %in% setdiff(ls(x), "initialize"))) {
+`[[.Idd` <- function(x, i) {
+    assert(is_scalar(i))
+    if (i %in% setdiff(ls(x), "initialize")) {
         NextMethod()
     } else {
-        assert(is_string(i), msg = "Class name should be a string (a length one character vector)")
-
-        in_nm <- underscore_name(i)
-
-        self <- ._get_self(x)
-        priv <- ._get_private(x)
-
-        all_nm <- idd_class_name(self, priv)
-        all_nm_us <- underscore_name(all_nm)
-
-        m <- match(in_nm, all_nm_us)
-
-        if (is.na(m)) {
-            NextMethod()
-        } else {
-            idd_object(self, priv, all_nm[m])[[1L]]
-        }
+        .subset2(x, "object")(i)
     }
 }
 # }}}
 
 #' @export
 # $.Idd {{{
-'$.Idd' <- function (x, name) x[[name]]
+`$.Idd` <- function (x, i) {
+    if (is_string(i)) {
+        funs <- setdiff(ls(x), "initialize")
+        if (i %in% funs) {
+            NextMethod()
+        } else {
+            in_nm <- underscore_name(i)
+
+            self <- ._get_self(x)
+            priv <- ._get_private(x)
+
+            all_nm <- idd_class_name(self, priv)
+            all_nm_us <- underscore_name(all_nm)
+
+            m <- chmatch(in_nm, all_nm_us)
+
+            if (is.na(m)) {
+                NextMethod()
+            } else {
+                idd_object(self, priv, all_nm[m])
+            }
+        }
+    } else {
+        NextMethod()
+    }
+}
 # }}}
 
 # read_idd {{{
@@ -503,6 +525,24 @@ read_idd <- function (path) {
 # use_idd {{{
 use_idd <- function (idd, download = FALSE) {
     if (is_idd(idd)) return(idd)
+
+    if (!is_version(idd) || (is_version(idd) && !is_idd_ver(idd))) {
+        return(tryCatch(read_idd(idd), error_read_file = function (e) {
+            abort("error_invalid_idd_input",
+                paste0("Parameter `idd` should be a valid version, a path, or ",
+                    "a single character string of an EnergyPlus Input Data ",
+                    "Dictionary (IDD) file (usually named `Energy+.idd`). ",
+                    "Invalid input found: ",
+                    if (length(idd) > 1L) {
+                        surround(paste0(idd[1L], "..."))
+                    } else {
+                        surround(idd)
+                    },
+                    "."
+                )
+            )
+        }))
+    }
 
     if (is_idd_ver(idd, strict = FALSE)) {
         ver <- standardize_ver(idd)
@@ -640,17 +680,32 @@ is_avail_idd <- function (ver) {
 # @param warn If `TRUE`, extra warning message will be shown
 get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
     if (!is.null(idf_ver)) {
-        # if input IDF has a version but neither that version of EnergyPlus nor
-        # IDD is available, rewrite the message
-        idd <- tryCatch(use_idd(idf_ver),
-            error_no_matched_idd = function (e) {
-                mes <- stri_replace_all_fixed(conditionMessage(e),
-                    "You may want to set `download`",
-                    "You may want to use `use_idd()` and set `download`"
+        if (is.null(idd)) {
+            # if input IDF has a version but neither that version of EnergyPlus
+            # nor IDD is available, rewrite the message
+            idd <- tryCatch(use_idd(idf_ver),
+                error_no_matched_idd = function (e) {
+                    mes <- stri_replace_all_fixed(conditionMessage(e),
+                        "You may want to set `download`",
+                        "You may want to use `use_idd()` and set `download`"
+                    )
+                    stop(mes)
+                }
+            )
+        } else {
+            idd <- use_idd(idd)
+            if (warn && idf_ver != idd$version()) {
+                warn("waring_idf_idd_mismatch_ver",
+                    paste0(
+                        "Version Mismatch. The IDF file parsing has a differnet ",
+                        "version (", idf_ver, ") than the IDD file used (",
+                        idd$version(), "). Parsing errors may occur."
+                    ),
+                    idf_ver = idf_ver,
+                    idd_ver = idd$version()
                 )
-                stop(mes)
             }
-        )
+        }
     } else {
         mes <- "Missing version field in input IDF."
 
