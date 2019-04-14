@@ -54,12 +54,11 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
     res <- join_from_input(idd_env$class, cls_in, "group_id")
     set(res, NULL, "class_name_us", NULL)
 
-    if (!is.null(property)) {
-        if ("group_name" %chin% property) {
-            add_joined_cols(idd_env$group, res, "group_id", "group_name")
-        }
-        clean_class_property(res, property)
+    property <- property %||% ""
+    if ("group_name" %chin% property) {
+        add_joined_cols(idd_env$group, res, "group_id", "group_name")
     }
+    clean_class_property(res, property)
 
     res
 }
@@ -146,7 +145,9 @@ get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = 
     } else {
         res <- get_idd_field_from_which(idd_env, class, field, underscore, no_ext, complete, all)
     }
-    if (!is.null(property)) clean_field_property(res, property)
+    property <- property %||% ""
+    clean_field_property(res, property)
+    if (has_name(res, "field_name_us")) set(res, NULL, "field_name_us", NULL)
     res
 }
 # }}}
@@ -167,7 +168,7 @@ get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = 
 # @param all If `TRUE` data of all fields will be returned. Default is `FALSE`,
 #        which means that only minimum fields will be returned.
 get_idd_field_in_class <- function (idd_env, class, all = FALSE, underscore = TRUE) {
-    prop <- if (!all) c("num_fields", "min_fields", "last_required") else NULL
+    prop <- if (!all) c("num_fields", "min_fields", "last_required") else ""
     cls <- get_idd_class(idd_env, class, prop, underscore)
     set(cls, NULL, "group_id", NULL)
 
@@ -252,7 +253,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 
     # join_field {{{
     join_field <- function (dt, idx) {
-        no_roll <- c("field_in", "value_num", "value", "new_value", "new_value_num")
+        no_roll <- c("field_in", "value_num", "value_chr", "new_value", "new_value_chr", "new_value_num")
         no_roll <- no_roll[no_roll %chin% names(dt)]
         if (!length(no_roll)) {
             dt[get_idd_field_from_idx(idd_env, idx, "field_index"),
@@ -305,6 +306,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
             dt_in <- del_redundant_cols(idd_env$field, dt_in, c("class_id", col_on))
             fld <- idd_env$field[dt_in, on = c("class_id", col_on), nomatch = 0L]
         } else {
+            if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
             dt_in <- del_redundant_cols(idd_env$field, dt_in, "field_index")
             set(dt_idx, NULL, setdiff(names(dt_idx), c("rleid", "class_id", "field_index")), NULL)
             fld <- join_field(dt_in, dt_idx)
@@ -343,10 +345,12 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
         # if all matched
         if (!anyNA(dt_join$field_id)) {
             if (!all && !complete) {
+                if (any(col_prop %in% names(dt_join))) set(dt_join, NULL, intersect(names(dt_join), col_prop), NULL)
                 fld <- dt_join
             } else {
                 dt_idx <- get_index_dt(dt_join, all)
                 set(dt_idx, NULL, setdiff(names(dt_idx), c("rleid", "class_id", "field_index")), NULL)
+                if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
                 dt_join <- del_redundant_cols(idd_env$field, dt_join, "field_index")
 
                 fld <- join_field(dt_join, dt_idx)
@@ -428,6 +432,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                     dt_join[!is.na(field_id), .SD, .SDcols = setdiff(c("field_index", col_keep), col_on)],
                     dt_ext_join[, .SD, .SDcols = setdiff(c("field_index", col_keep), col_on)]
                 ))
+                if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
                 dt_join <- del_redundant_cols(idd_env$field, dt_join, "field_index")
 
                 fld <- join_field(dt_join, dt_idx)
@@ -442,9 +447,10 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 }
 # }}}
 # get_idd_field_from_idx: return field data by using an index dt {{{
-get_idd_field_from_idx <- function (idd_env, dt_idx, on = "field_index") {
-    dt_idx <- del_redundant_cols(idd_env$field, dt_idx, c("class_id", on))
+get_idd_field_from_idx <- function (idd_env, dt_idx, on = "field_index", property = NULL) {
+    dt_idx <- del_redundant_cols(idd_env$field, dt_idx, c("class_id", on, property))
     fld <- idd_env$field[dt_idx, on = c("class_id", paste0("field_index<=", on)), allow.cartesian = TRUE]
+    if (!is.null(property)) clean_field_property(fld, property)
     if (has_name(fld, "object_id")) {
         set(fld, NULL, "field_index", rowidv(fld, c("rleid", "object_id", "class_id")))
     } else {
@@ -461,6 +467,34 @@ clean_field_property <- function (dt, property) {
 # }}}
 
 # REFERENCES
+# get_recref {{{
+get_recref <- function (reference, id, col_on, col_rec, dep, max = Inf) {
+    drill <- if (length(col_on) == 2L) TRUE else FALSE
+    ref <- reference[0L]
+    set(ref, NULL, "dep", integer())
+    dep <- dep
+    col <- col
+
+    get_ref <- function (id) {
+        if (drill) {
+            cur_ref <- reference[J(id), on = col_on[[1L]], nomatch = 0L]
+            drill <<- FALSE
+            col_on <<- col_on[[2L]]
+        } else {
+            cur_ref <- reference[J(id), on = col_on, nomatch = 0L]
+        }
+
+        set(cur_ref, NULL, "dep", dep)
+        if (!nrow(cur_ref)) return(ref)
+        ref <<- rbindlist(list(ref, cur_ref))
+        if (dep == max) return(ref)
+        dep <<- dep + 1L
+        get_ref(cur_ref[[col_rec]])
+    }
+
+    get_ref(id)
+}
+# }}}
 # get_idd_relation {{{
 get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = NULL,
                               name = FALSE, direction = c("ref_to", "ref_by")) {
@@ -474,7 +508,7 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
         } else {
             id <- get_idd_class(idd_env, class)$class_id
         }
-        col_on <- "class_id"
+        col_on <- c("class_id", "field_id")
     } else {
         # if no class is given, assume field are valid field ids
         if (is.null(class)) {
@@ -486,7 +520,7 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
     }
 
     if (direction == "ref_to") {
-        col_rec <- paste0("src_field_id")
+        col_rec <- "src_field_id"
     } else if (direction == "ref_by") {
         col_on <- paste0("src_", col_on)
         col_rec <- "field_id"
@@ -495,46 +529,35 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
     # TODO: for extensible groups, only use the first group
     dep <- 0L
     if (is.null(max_depth)) max_depth <- Inf
-    ref <- idd_env$reference[0L]
-    set(ref, NULL, "dep", integer())
 
-    get_all_ref <- function (idd_env, id, depth = Inf) {
-        cur_ref <- idd_env$reference[J(id), on = col_on, nomatch = 0L]
-        set(cur_ref, NULL, "dep", dep)
-        if (!nrow(cur_ref)) return(ref)
-        ref <<- rbindlist(list(ref, cur_ref))
-        if (depth == dep) return(ref)
-        dep <<- dep + 1L
-        if (is.null(field)) col_on <<- sub("class", "field", col_on)
-        get_all_ref(idd_env, cur_ref[[col_rec]])
-    }
-
-    ref <- get_all_ref(idd_env, id, max_depth)
+    ref <- get_recref(idd_env$reference, id, col_on, col_rec, dep, max_depth)
 
     if (!name) return(ref)
 
+    ref <- add_relation_format_cols(ref)
+
+    cls <- switch(direction, ref_by = "IddRelationBy", ref_to = "IddRelationTo")
+    setattr(ref, "class", c(cls, class(ref)))
+    ref
+}
+# }}}
+# add_relation_format_cols {{{
+add_relation_format_cols <- function (idd_env, ref) {
     # add all necessary columns for printing
-    set(ref, NULL, "class_name", idd_env$class[J(ref$class_id), on = "class_id", class_name])
-    set(ref, NULL, "src_class_name", idd_env$class[J(ref$src_class_id), on = "class_id", class_name])
-    set(ref, NULL, c("field_index", "field_name"),
-        idd_env$field[J(ref$field_id), on = "field_id", .SD,
-            .SDcols = c("field_index", "field_name")
-        ]
-    )
-    set(ref, NULL, c("src_field_index", "src_field_name"),
-        idd_env$field[J(ref$src_field_id), on = "field_id", .SD,
-            .SDcols = c("field_index", "field_name")
-        ]
-    )
+    ref <- add_joined_cols(idd_env$class, ref, "class_id", "class_name")
+    ref <- add_joined_cols(idd_env$class, ref, c(src_class_id = "class_id"),
+        c(src_class_name = "class_name"))
+    ref <- add_joined_cols(idd_env$field, ref, "field_id", c("field_index", "field_name"))
+    ref <- add_joined_cols(idd_env$field, ref, c(src_field_id = "field_id"),
+        c(src_field_index = "field_index", src_field_name = "field_name"))
 
     setcolorder(ref,
-        c("class_id", "class_name", "field_index", "field_name",
-          "src_class_id", "src_class_name", "src_field_index", "src_field_name",
+        c("class_id", "class_name", "field_id", "field_index", "field_name",
+          "src_class_id", "src_class_name", "src_field_id", "src_field_index", "src_field_name",
           "src_enum", "dep"
         )
     )
-    cls <- switch(direction , ref_by = "IddRelationBy", ref_to = "IddRelationTo")
-    setattr(ref, "class", c(cls, class(ref)))
+
     ref
 }
 # }}}
@@ -585,12 +608,12 @@ add_field_full_name <- function (dt) {
 # field_default_to_unit {{{
 field_default_to_unit <- function (dt_field, from, to) {
     set(dt_field, NULL, "value_id", seq_along(dt_field$field_id))
-    setnames(dt_field, c("default", "default_num"), c("value", "value_num"))
+    setnames(dt_field, c("default", "default_num"), c("value_chr", "value_num"))
 
     dt_field <- convert_value_unit(dt_field, from, to)
 
     set(dt_field, NULL, "value_id", NULL)
-    setnames(dt_field, c("value", "value_num"), c("default", "default_num"))
+    setnames(dt_field, c("value_chr", "value_num"), c("default", "default_num"))
     dt_field
 }
 # }}}

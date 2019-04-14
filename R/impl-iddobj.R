@@ -109,7 +109,7 @@ get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
 get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L) {
     fld <- get_idd_field(idd_env, class_id)
     # add fake value in order to correctly format
-    set(fld, NULL, "value", NA_character_)
+    set(fld, NULL, "value_chr", NA_character_)
 
     str_fld <- format_field(fld, leading = leading, sep_at = sep_at)
     str_cls <- paste0(fld$class_name[[1L]], ",")
@@ -117,7 +117,7 @@ get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading
 
     if (!is.null(comment)) {
         assert(is.character(comment))
-        str_cmt <- paste0("!", comment)
+        str_cmt <- c(paste0("!", comment), "")
     }
 
     c(str_cmt, str_cls, str_fld)

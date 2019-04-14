@@ -105,7 +105,11 @@ check_bad_key <- function (res, col_check, col_on) {
 # }}}
 # add_joined_cols {{{
 add_joined_cols <- function (base, dt, on, cols) {
-    set(dt, NULL, cols, base[J(dt[[on]]), on = on, .SD, .SDcols = cols])
+    on_dt <- if (is_named(on)) names(on) else on
+    on <- unname(on)
+    nm <- if (is_named(cols)) names(cols) else cols
+    cols <- unname(cols)
+    set(dt, NULL, nm, base[J(dt[[on_dt]]), on = on, .SD, .SDcols = cols])
 }
 # }}}
 # del_redundant_cols {{{

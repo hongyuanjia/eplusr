@@ -353,7 +353,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     # remove unuseful columns
     set(dt_value, NULL, setdiff(names(dt_value),
-        c("value_id", "value", "value_num", "object_id", "field_id")), NULL
+        c("value_id", "value_chr", "value_num", "object_id", "field_id")), NULL
     )
 
     list(version = idd_ver, options = options,
@@ -1394,7 +1394,7 @@ get_value_table <- function (dt, idd) {
     # get all comments and single value lines
     sgl <- dt[value_count < 2L]
     set(sgl, NULL, "value_count", NULL)
-    set(sgl, NULL, "value", stri_trim_right(stri_sub(sgl$body, to = -2L)))
+    set(sgl, NULL, "value_chr", stri_trim_right(stri_sub(sgl$body, to = -2L)))
 
     # get all condensed value lines
     con <- dt[value_count > 1L]
@@ -1410,7 +1410,7 @@ get_value_table <- function (dt, idd) {
             string = rep(string, l),
             object_id = rep(object_id, l),
             class_id = rep(class_id, l),
-            value = stri_trim_both(unlist(s))
+            value_chr = stri_trim_both(unlist(s))
         )
     }]
 
@@ -1427,7 +1427,7 @@ get_value_table <- function (dt, idd) {
     setnames(ext, "field_index", "num_fields")
 
     # replace empty value with NA
-    dt[stri_isempty(value), `:=`(value = NA_character_)]
+    dt[stri_isempty(value_chr), `:=`(value_chr = NA_character_)]
 
     dt_query <- unique(dt[, list(rleid = object_id, class_id, field_index)])
 
@@ -1456,10 +1456,12 @@ get_value_table <- function (dt, idd) {
     dt[is.na(line), `:=`(value_id = new_id(dt, "value_id", length(value_id)))]
 
     # add numeric type values
-    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.numeric(value)))]
+    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.numeric(value_chr)))]
+    # update value_chr upon the numeric value
+    dt[!is.na(value_num), `:=`(value_chr = as.character(value_num))]
 
     # only keep useful columns
-    nms <- c("value_id", "value", "value_num", "object_id", "field_id",
+    nms <- c("value_id", "value_chr", "value_num", "object_id", "field_id",
         "is_name", "type_enum", "src_enum", "class_name", "units", "ip_units"
     )
     ignore <- setdiff(names(dt), nms)
@@ -1474,7 +1476,7 @@ get_value_table <- function (dt, idd) {
 update_object_name <- function (dt_object, dt_value) {
     if (!nrow(dt_value)) return(dt_object)
     dt_nm <- dt_value[is_name == TRUE,
-        list(object_name = value, object_name_lower = stri_trans_tolower(value)),
+        list(object_name = value_chr, object_name_lower = stri_trans_tolower(value_chr)),
         by = "object_id"]
     dt_nm[dt_object, on = "object_id"]
 }
@@ -1512,7 +1514,7 @@ convert_value_unit <- function (dt_value, from, to, type = "value") {
 
 # get_value_sources {{{
 get_value_sources <- function (dt_value, lower = FALSE) {
-    dt_val <- dt_value[!is.na(value), list(object_id, field_id, value_id, value, src_enum, class_name)]
+    dt_val <- dt_value[!is.na(value_chr), list(object_id, field_id, value_id, value_chr, src_enum, class_name)]
 
     setindexv(dt_val, "src_enum")
 
@@ -1522,7 +1524,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
             src_object_id = object_id,
             src_field_id = field_id,
             src_value_id = value_id,
-            src_value = class_name,
+            src_value_chr = class_name,
             src_enum
         )
     ]
@@ -1533,7 +1535,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
             src_object_id = object_id,
             src_field_id = field_id,
             src_value_id = value_id,
-            src_value = value,
+            src_value_chr = value_chr,
             src_enum
         )
     ]
@@ -1546,7 +1548,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
                 src_object_id = c(object_id, object_id),
                 src_field_id = c(field_id, field_id),
                 src_value_id = c(value_id, value_id),
-                src_value = c(value, class_name),
+                src_value_chr = c(value_chr, class_name),
                 src_enum = c(IDDFIELD_SOURCE$field, IDDFIELD_SOURCE$class)
             )
         }
@@ -1555,7 +1557,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     # combine
     val_src <- rbindlist(list(cls_src, fld_src, mix_src))
 
-    if (lower) set(val_src, NULL, "src_value", stri_trans_tolower(val_src$src_value))
+    if (lower) set(val_src, NULL, "src_value_chr", stri_trans_tolower(val_src$src_value_chr))
 
     val_src
 }
@@ -1564,10 +1566,10 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 # get_value_references {{{
 get_value_references <- function (dt_value, lower = FALSE) {
     val_ref <- dt_value[
-        !is.na(value) & type_enum == IDDFIELD_TYPE$object_list,
-        list(object_id, value_id, value, field_id)]
+        !is.na(value_chr) & type_enum == IDDFIELD_TYPE$object_list,
+        list(object_id, value_id, value_chr, field_id)]
 
-    if (lower) set(val_ref, NULL, "value", stri_trans_tolower(val_ref$value))
+    if (lower) set(val_ref, NULL, "value_chr", stri_trans_tolower(val_ref$value_chr))
 
     val_ref
 }
@@ -1594,7 +1596,7 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
 
     # match
     ref <- val_ref_map[val_src, on = "src_field_id", allow.cartesian = TRUE][
-        value == src_value, .SD, .SDcols = names(empty)]
+        value_chr == src_value_chr, .SD, .SDcols = names(empty)]
 
     # make sure every reference value has a corresponding source even NA
     if (!all || nrow(ref) == nrow(val_ref)) return(ref)

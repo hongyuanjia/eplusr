@@ -532,11 +532,11 @@ IddObject <- R6::R6Class(classname = "IddObject",
             iddobj_has_ref_by(self, private, which),
         # }}}
 
-        to_table = function (all = FALSE, unit = TRUE, wide = FALSE)
-            iddobj_to_table(self, private, all, unit, wide),
+        to_table = function (all = FALSE)
+            iddobj_to_table(self, private, all),
 
-        to_string = function (comment = NULL, leading = 4L)
-            iddobj_to_string(self, private, comment, leading),
+        to_string = function (comment = NULL, leading = 4L, sep_at = 29L)
+            iddobj_to_string(self, private, comment, leading, sep_at = sep_at),
 
         print = function ()
             iddobj_print(self, private)
@@ -864,8 +864,8 @@ iddobj_has_ref_to <- function (self, private, which) {
 }
 # }}}
 # iddobj_to_table {{{
-iddobj_to_table <- function (self, private, all = FALSE, unit = TRUE) {
-    get_iddobj_table(private$idd_env(), all, unit)
+iddobj_to_table <- function (self, private, all = FALSE) {
+    get_iddobj_table(private$idd_env(), private$m_class_id, all)
 }
 # }}}
 # iddobj_to_string {{{
