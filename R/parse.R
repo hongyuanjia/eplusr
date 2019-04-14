@@ -105,7 +105,7 @@ FIELD_COLS <- list(
         "type_enum", "src_enum", "type",
         "autosizable", "autocalculatable",
         "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
-        "default", "default_num", "choice", "note"
+        "default_chr", "default_num", "choice", "note"
     )
 )
 
@@ -1062,6 +1062,7 @@ parse_field_property_name <- function (dt) {
 # parse_field_property_default {{{
 parse_field_property_default <- function (dt) {
     set(dt, NULL, "default_num", NA_real_)
+    set(dt, NULL, "default_chr", dt$default)
     dt[type_enum <= IDDFIELD_TYPE$real, `:=`(default_num = suppressWarnings(as.double(default)))]
     dt
 }
@@ -1429,28 +1430,35 @@ get_value_table <- function (dt, idd) {
     # replace empty value with NA
     dt[stri_isempty(value_chr), `:=`(value_chr = NA_character_)]
 
-    dt_query <- unique(dt[, list(rleid = object_id, class_id, field_index)])
+    # in order to get the object id with wrong field number
+    dt_max <- dt[, list(field_index = max(field_index)), by = c("class_id", "object_id")]
+    dt_uni <- dt_max[, list(field_index = unique(field_index)), by = "class_id"]
 
-    # add complete fields
-    cols <- c(
-        "field_id",
-        # for matching
-        "rleid", "class_id", "field_index",
-        # for updating object names
-        "is_name",
-        # for finding references
-        "type_enum", "src_enum", "class_name",
-        # for unit conversion
-        "units", "ip_units"
+    # only use the max field index to speed up
+    fld <- tryCatch(
+        get_idd_field(idd, dt_uni$class_id, dt_uni$field_index,
+            c("type_enum", "src_enum", "is_name", "units", "ip_units"),
+            complete = TRUE
+        ),
+        error_bad_field_index = function (e) e
     )
-    fld <- get_idd_field(idd, dt_query, dt_query$field_index,
-        c("type_enum", "src_enum", "is_name", "units", "ip_units"),
-        complete = TRUE
-    )
-    set(fld, NULL, setdiff(names(fld), cols), NULL)
+
+    # issue parse error if invalid field number found
+    if (inherits(fld, "error_bad_field_index")) {
+        # get invalid class id and field number
+        invld <- set(fld$data, NULL, "field_index", NULL)
+        # find which object has invalid field number
+        obj <- dt_max[invld, on = c("class_id", field_index = "field_in")]$object_id
+
+        # modify message
+        msg <- gsub(" *#\\d+\\|", "-->", gsub("index", "number", fld$message))
+        parse_issue("error_invalid_field_number", "idf", "Invalid Field Number",
+            dt[J(obj), on = "object_id"], post = msg)
+    }
 
     # bind columns
-    dt <- dt[fld, on = c(object_id = "rleid", "class_id", "field_index")]
+    set(fld, NULL, c("rleid", "field_in"), NULL)
+    dt <- unique(fld, by = "field_id")[dt, on = c("class_id", "field_index")]
 
     # fill data for missing fields
     dt[is.na(line), `:=`(value_id = new_id(dt, "value_id", length(value_id)))]
@@ -1475,6 +1483,7 @@ get_value_table <- function (dt, idd) {
 # update_object_name {{{
 update_object_name <- function (dt_object, dt_value) {
     if (!nrow(dt_value)) return(dt_object)
+    dt_value
     dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value_chr, object_name_lower = stri_trans_tolower(value_chr)),
         by = "object_id"]

@@ -61,7 +61,7 @@ get_iddfield_possible <- function (idd_env, class_id, field_id = NULL) {
         list(
             possible = fld[, list(
                 class_id, class_name, field_id, field_index, field_name,
-                auto, default, default_num, choice, range
+                auto, default_chr, default_num, choice, range
             )],
             relation = ref
         ),
@@ -90,7 +90,7 @@ has_iddfield_ref_to <- function (idd_env, class, field = NULL) {
 get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
     cols <- c("class_name", "field_index", "field_name", "units", "ip_units")
 
-    fld <- get_idd_field(idd_env, class_id, all = all)[, .SD, .SDcols = cols]
+    fld <- get_idd_field(idd_env, class_id, property = c("units", "ip_units"), all = all)[, .SD, .SDcols = cols]
 
     setnames(fld, c("class_name", "field_index", "field_name"), c("class", "index", "field"))
 
@@ -106,8 +106,8 @@ get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
 }
 # }}}
 # get_iddobj_string {{{
-get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L) {
-    fld <- get_idd_field(idd_env, class_id)
+get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
+    fld <- get_idd_field(idd_env, class_id, property = c("units", "ip_units"), all = all)
     # add fake value in order to correctly format
     set(fld, NULL, "value_chr", NA_character_)
 

@@ -535,8 +535,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
         to_table = function (all = FALSE)
             iddobj_to_table(self, private, all),
 
-        to_string = function (comment = NULL, leading = 4L, sep_at = 29L)
-            iddobj_to_string(self, private, comment, leading, sep_at = sep_at),
+        to_string = function (comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
+            iddobj_to_string(self, private, comment, leading, sep_at = sep_at, all = all),
 
         print = function ()
             iddobj_print(self, private)
@@ -704,17 +704,17 @@ iddobj_field_index <- function (self, private, name = NULL) {
 # }}}
 # iddobj_field_type {{{
 iddobj_field_type <- function (self, private, which = NULL) {
-    iddobj_field_data(self, private, which)$type
+    iddobj_field_data(self, private, which, "type")$type
 }
 # }}}
 # iddobj_field_note {{{
 iddobj_field_note <- function (self, private, which = NULL) {
-    iddobj_field_data(self, private, which)$note
+    iddobj_field_data(self, private, which, "note")$note
 }
 # }}}
 # iddobj_field_unit {{{
 iddobj_field_unit <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
-    fld <- iddobj_field_data(self, private, which)
+    fld <- iddobj_field_data(self, private, which, c("units", "ip_units"))
 
     if (in_ip) {
         fld$ip_units
@@ -725,7 +725,9 @@ iddobj_field_unit <- function (self, private, which = NULL, in_ip = eplusr_optio
 # }}}
 # iddobj_field_default {{{
 iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
-    fld <- iddobj_field_data(self, private, which)
+    fld <- iddobj_field_data(self, private, which,
+        c("default_chr", "default_num", "units", "ip_units", "type_enum")
+    )
 
     if (in_ip) {
         .deprecated_arg("in_ip", "0.10.0", "IddObject")
@@ -733,18 +735,18 @@ iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_op
         fld <- field_default_to_unit(fld, "si", "ip")
     }
 
-    setnames(fld, c("default", "default_num"), c("value", "value_num"))
+    setnames(fld, c("default_chr", "default_num"), c("value_chr", "value_num"))
     get_value_list(fld)
 }
 # }}}
 # iddobj_field_choice {{{
 iddobj_field_choice <- function (self, private, which = NULL) {
-    iddobj_field_data(self, private, which)$choice
+    iddobj_field_data(self, private, which, "choice")$choice
 }
 # }}}
 # iddobj_field_range {{{
 iddobj_field_range <- function (self, private, which = NULL) {
-    fld <- iddobj_field_data(self, private, which)
+    fld <- iddobj_field_data(self, private, which, c("minimum", "lower_incbounds", "maximum", "upper_incbounds"))
 
     fld[, `:=`(range = list(ranger(minimum, lower_incbounds, maximum, upper_incbounds))), by = field_id]
 
@@ -766,7 +768,7 @@ iddobj_field_reference <- function (self, private, which = NULL, direction = c("
 # iddobj_field_possible {{{
 iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
     if (in_ip) .deprecated_arg("in_ip", "0.10.0", "IddObject")
-    fld <- iddobj_field_data(self, private, which)
+    fld <- iddobj_field_data(self, private, which, FIELD_COLS$property)
     get_iddfield_possible(private$idd_env(), field_id = fld$field_id)
 }
 # }}}
@@ -805,10 +807,12 @@ iddobj_is_extensible_index <- function (self, private, index) {
 iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
     fld <- iddobj_field_data(self, private)
 
+    name <- as.character(name)
+
     if (isTRUE(strict)) {
-        name %in% fld$field_name
+        name %chin% fld$field_name
     } else {
-        name %in% fld$field_name | name %in% lower_name(fld$field_name)
+        name %chin% fld$field_name | name %chin% lower_name(fld$field_name)
     }
 }
 # }}}
@@ -820,17 +824,17 @@ iddobj_is_valid_field_index <- function (self, private, index) {
 # }}}
 # iddobj_is_autosizable_field {{{
 iddobj_is_autosizable_field <- function (self, private, which) {
-    iddobj_field_data(self, private, which)$autosizable
+    iddobj_field_data(self, private, which, "autosizable")$autosizable
 }
 # }}}
 # iddobj_is_autocalculatable_field {{{
 iddobj_is_autocalculatable_field <- function (self, private, which) {
-    iddobj_field_data(self, private, which)$autocalculatable
+    iddobj_field_data(self, private, which, "autocalculatable")$autocalculatable
 }
 # }}}
 # iddobj_is_numeric_field {{{
 iddobj_is_numeric_field <- function (self, private, which) {
-    iddobj_field_type(self, private, which) %in% c("integer", "real")
+    iddobj_field_type(self, private, which) %chin% c("integer", "real")
 }
 # }}}
 # iddobj_is_integer_field {{{
@@ -845,7 +849,7 @@ iddobj_is_real_field <- function (self, private, which) {
 # }}}
 # iddobj_is_required_field {{{
 iddobj_is_required_field <- function (self, private, which) {
-    iddobj_field_data(self, private, which)$required_field
+    iddobj_field_data(self, private, which, "required_field")$required_field
 }
 # }}}
 # iddobj_has_relation {{{
@@ -869,9 +873,9 @@ iddobj_to_table <- function (self, private, all = FALSE) {
 }
 # }}}
 # iddobj_to_string {{{
-iddobj_to_string <- function (self, private, comment = NULL, leading = 4L, sep_at = 29L) {
+iddobj_to_string <- function (self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
     get_iddobj_string(private$idd_env(), private$m_class_id, comment = comment,
-        leading = leading, sep_at = sep_at
+        leading = leading, sep_at = sep_at, all = FALSE
     )
 }
 # }}}
@@ -917,7 +921,7 @@ iddobj_print <- function (self, private) {
         set(cls, NULL, "num_print", cls$num_fields)
     }
 
-    fld <- iddobj_field_data(self, private, seq_len(cls$num_print))
+    fld <- iddobj_field_data(self, private, seq_len(cls$num_print), "extensible_group")
     set(fld, NULL, "name", format_name(fld))
     set(fld, NULL, "index", format_index(fld))
 

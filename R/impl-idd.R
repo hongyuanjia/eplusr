@@ -37,20 +37,24 @@ get_idd_group_name <- function (idd_env, group = NULL) {
 # @param idd_env An environment or list contains IDD tables including class,
 #        field, and reference.
 # @param class An integer vector of valid class indexes or a character vector
-#        of valid class names or a data.table that contains column `class_id`
-#        or `class_name`. If `NULL`, `dt_class` will be returned directly.
-# @param property A character vector of column names in class table to return. If
-#        `NULL`, all columns from `dt_class` will be returned, plus column
-#        `rleid`.
+#        of valid class names. If `NULL`, all classes are returned.
+# @param property A character vector of column names in class table to return.
+#        If `NULL`, only class index columns are returned, plus column `rleid`.
 # @param underscore If `TRUE`, input class name will be converted into
 #        underscore style name first and column `class_name_us` will be used
 #        for matching.
 # @return A data.table containing specified columns.
 get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = FALSE) {
-    if (is.null(class)) return(copy(idd_env$class))
+    if (is.null(class)) {
+        cols <- setdiff(CLASS_COLS$index, "class_name_us")
+        if (is.null(property)) {
+            return(idd_env$class[, .SD, .SDcols = cols])
+        } else {
+            return(idd_env$class[, .SD, .SDcols = unique(c(cols, property))])
+        }
+    }
 
     cls_in <- recognize_input(class, "class", underscore)
-    cls_in <- del_redundant_cols(idd_env$class, cls_in)
     res <- join_from_input(idd_env$class, cls_in, "group_id")
     set(res, NULL, "class_name_us", NULL)
 
@@ -145,42 +149,26 @@ get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = 
     } else {
         res <- get_idd_field_from_which(idd_env, class, field, underscore, no_ext, complete, all)
     }
-    property <- property %||% ""
-    clean_field_property(res, property)
     if (has_name(res, "field_name_us")) set(res, NULL, "field_name_us", NULL)
+    clean_field_property(res, property %||% "")
     res
 }
 # }}}
 # get_idd_field_in_class {{{
-# Get all field data in a class
-# @param idd_env An environment or list contains IDD tables including class,
-#        field, and reference.
-# @param class An integer vector of valid class indexes or a character vector
-#        of valid class names or a data.table that contains column `class_id`
-#        and `rleid`. If a data.table that contains a column `object_id`, that
-#        column will be preserved.
-# @param property A character vector of column names in field table to return. If
-#        `NULL`, all columns from IDD field table will be returned, plus column
-#        `rleid`, and `object_id` (if applicable).
-# @param underscore If `TRUE`, input class name will be converted into
-#        underscore style name first and column `class_name_us` will be used for
-#        matching.
-# @param all If `TRUE` data of all fields will be returned. Default is `FALSE`,
-#        which means that only minimum fields will be returned.
 get_idd_field_in_class <- function (idd_env, class, all = FALSE, underscore = TRUE) {
-    prop <- if (!all) c("num_fields", "min_fields", "last_required") else ""
+    prop <- if (!all) c("num_fields", "min_fields", "last_required") else NULL
     cls <- get_idd_class(idd_env, class, prop, underscore)
     set(cls, NULL, "group_id", NULL)
 
     if (all) {
-        cls <- del_redundant_cols(idd_env$field, cls, "class_id")
         idd_env$field[cls, on = "class_id"]
     } else {
         set(cls, NULL, "min_required", pmax(cls$min_fields, cls$last_required))
         cls[min_required == 0L, min_required := num_fields]
-        set(get_idd_field_from_idx(idd_env, cls, "min_required"), NULL,
-            c("num_fields", "min_fields", "last_required"), NULL
-        )
+        set(cls, NULL, c("num_fields", "min_fields", "last_required"), NULL)
+        fld <- idd_env$field[cls, on = c("class_id", "field_index<=min_required")]
+        set(fld, NULL, "field_index", rowidv(fld, c("rleid", "class_id")))
+        fld
     }
 }
 # }}}
@@ -212,65 +200,30 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                                       no_ext = FALSE, complete = FALSE, all = FALSE) {
     assert_valid_type(field, "field")
 
-    if (inherits(class, "data.frame")) {
-        col_keep <- unique(c(names(class), "class_id", "class_name"))
-    } else {
-        col_keep <- c("rleid", "class_id", "class_name")
-    }
-
     # class properties used for min required field num calculation
     col_prop <- c("num_fields", "min_fields", "last_required", "num_extensible",
         "first_extensible", "num_extensible_group"
     )
     dt_in <- get_idd_class(idd_env, class, col_prop, underscore)
+    set(dt_in, NULL, "group_id", NULL)
 
     # make sure number of rows of dt_in and the length of input field is the same
-    if (NROW(class) == 1L) dt_in <- dt_in[rep(1L, length(field))]
-
-    # get_index_dt: return an index dt for non-equi join {{{
-    get_index_dt <- function (dt_in, all = FALSE) {
-        # for using field names
-        if (!nrow(dt_in) && !has_name(dt_in, "field_index")) {
-            set(dt_in, NULL, "field_index", integer(0))
-        }
-
-        # select last matched field per input
-        if (has_name(dt_in, "field_index")) {
-            dt_last <- dt_in[dt_in[order(rleid, -field_index), .I[1L], by = "rleid"]$V1]
-        } else {
-            dt_last <- dt_in[dt_in[order(rleid), .I[1L], by = "rleid"]$V1]
-        }
-
-        col_del <- setdiff(names(dt_last), c("rleid", "class_id", "class_name", col_prop, "field_index"))
-        if (length(col_del)) set(dt_last, NULL, col_del, NULL)
-
-        if (all) dt_last[field_index <= num_fields, field_index := num_fields]
-
-        # get acceptable field number
-        get_idd_class_field_num(dt_last, dt_last$field_index)
-    }
-    # }}}
+    if (nrow(dt_in) == 1L) dt_in <- dt_in[rep(1L, length(field))]
 
     # join_field {{{
-    join_field <- function (dt, idx) {
-        no_roll <- c("field_in", "value_num", "value_chr", "new_value", "new_value_chr", "new_value_num")
-        no_roll <- no_roll[no_roll %chin% names(dt)]
-        if (!length(no_roll)) {
-            dt[get_idd_field_from_idx(idd_env, idx, "field_index"),
-               on = c("rleid", "field_index"),
-               roll = TRUE, rollends = c(TRUE, TRUE)
-            ]
-        } else {
-            fld <- dt[, .SD, .SDcols = setdiff(names(dt), no_roll)][
-                get_idd_field_from_idx(idd_env, idx, "field_index"),
-                on = c("rleid", "field_index"),
-                roll = TRUE, rollends = c(TRUE, TRUE)
-            ]
+    join_field <- function (idd_env, dt_in, field_index) {
+        fld <- idd_env$field[
+            dt_in[, .SD, .SDcols = c("rleid", "class_id", "class_name", "field_index")],
+            on = c("class_id", "field_index<=field_index"), allow.cartesian = TRUE
+        ]
 
-            set(fld, NULL, no_roll,
-                dt[fld, on = c("rleid", "field_index")][, .SD, .SDcols = no_roll]
-            )
-        }
+        # recalculate field index
+        set(fld, NULL, "field_index", rowidv(fld, c("rleid", "class_id", "field_index")))
+        # add field in
+        ## reset input field index in order to find right place to insert
+        ## field input column
+        set(dt_in, NULL, "field_index", field_index)
+        set(fld, NULL, "field_in", dt_in[fld, on = c("rleid", "class_id", "field_index"), field_in])
     }
     # }}}
 
@@ -278,38 +231,54 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 
     if (all(are_count(field))) {
         # from field index {{{
+        field <- as.integer(field)
         set(dt_in, NULL, c("field_index", "field_in"), list(field, field))
-        col_on <- "field_index"
-        col_keep <- c(col_keep, col_on, "field_in")
 
-        dt_idx <- get_index_dt(dt_in, all)
+        # return all fields
+        if (all) dt_in[field_index < num_fields, field_index := num_fields]
+
+        # get acceptable field number for each input
+        dt_in <- get_idd_class_field_num(dt_in, dt_in$field_index)
 
         # check invalid field index
-        if (nrow(dt_idx[field_index > acceptable_num])) {
-            invld_idx <- dt_in[dt_idx[field_index > acceptable_num, list(rleid)], on = "rleid"]
+        if (dt_in[field_in > acceptable_num, .N > 0L]) {
+            invld_idx <- dt_in[field_in > acceptable_num]
             abort_bad_field("error_bad_field_index", "index", invld_idx)
         }
 
         # handle extensible fields
-        set(dt_idx, NULL, "num", 0L)
-        dt_idx[field_index > num_fields, `:=`(num = ceiling((field_index - num_fields) / num_extensible))]
+        # there should use dt_max for efficiency
+        set(dt_in, NULL, "num", 0L)
+        # calculate num of groups needed to be added
+        dt_in[field_index > num_fields, `:=`(num = as.integer(ceiling((field_index - num_fields) / num_extensible)))]
 
-        if (no_ext && nrow(dt_idx[num > 0L])) {
-            abort_bad_field("error_bad_field_index", "index", dt_in[dt_idx[num > 0L], on = "rleid"])
+        # stop if adding new extensible groups is not allowed
+        if (no_ext && nrow(dt_in[num > 0L])) {
+            abort_bad_field("error_bad_field_index", "index", dt_in[num > 0L])
         }
 
         # add extensible groups
-        idd_env <- add_idd_extensible_group(idd_env, dt_idx)
-        set(dt_in, NULL, setdiff(names(dt_in), col_keep), NULL)
+        idd_env <- add_idd_extensible_group(idd_env, dt_in)
+
+        # remove unuseful columns
+        set(dt_in, NULL,
+            setdiff(
+                names(dt_in),
+                c("rleid", "class_id", "class_name", "field_index", "field_in",
+                  "acceptable_num"
+                )
+            ),
+            NULL
+        )
+
         # only return specified fields
         if (!all && !complete) {
-            dt_in <- del_redundant_cols(idd_env$field, dt_in, c("class_id", col_on))
-            fld <- idd_env$field[dt_in, on = c("class_id", col_on), nomatch = 0L]
+            fld <- idd_env$field[dt_in, on = c("class_id", "field_index"), allow.cartesian = TRUE]
+            set(fld, NULL, "acceptable_num", NULL)
         } else {
-            if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
-            dt_in <- del_redundant_cols(idd_env$field, dt_in, "field_index")
-            set(dt_idx, NULL, setdiff(names(dt_idx), c("rleid", "class_id", "field_index")), NULL)
-            fld <- join_field(dt_in, dt_idx)
+            set(dt_in, NULL, "field_index", dt_in$acceptable_num)
+
+            fld <- join_field(idd_env, dt_in, dt_in$field_in)
         }
         # }}}
     } else {
@@ -336,24 +305,28 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
             col_on <- "field_name"
             set(dt_in, NULL, "field_name", field)
         }
-        col_keep <- c(col_keep, col_on, "field_in")
 
         # join
-        dt_in <- del_redundant_cols(idd_env$field, dt_in, c("class_id", col_on))
-        dt_join <- idd_env$field[dt_in, on = c("class_id", col_on)]
+        dt_join <- idd_env$field[dt_in, on = c("class_id", col_on), allow.cartesian = TRUE]
 
         # if all matched
         if (!anyNA(dt_join$field_id)) {
             if (!all && !complete) {
-                if (any(col_prop %in% names(dt_join))) set(dt_join, NULL, intersect(names(dt_join), col_prop), NULL)
+                set(dt_join, NULL, c(col_prop, "field_rleid"), NULL)
                 fld <- dt_join
             } else {
-                dt_idx <- get_index_dt(dt_join, all)
-                set(dt_idx, NULL, setdiff(names(dt_idx), c("rleid", "class_id", "field_index")), NULL)
-                if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
-                dt_join <- del_redundant_cols(idd_env$field, dt_join, "field_index")
+                # restore field index in order to insert field name input at the
+                # right place
+                fld_idx <- dt_join$field_index
 
-                fld <- join_field(dt_join, dt_idx)
+                # return all fields
+                if (all) dt_join[field_index < num_fields, field_index := num_fields]
+
+                dt_join <- get_idd_class_field_num(dt_join, dt_join$field_index)
+
+                set(dt_join, NULL, "field_index", dt_join$acceptable_num)
+
+                fld <- join_field(idd_env, dt_join, fld_idx)
             }
         } else {
             # get no matched
@@ -372,7 +345,6 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 
             # get number of field names to check per class
             dt_ext <- dt_nom[, list(
-                rleid = rleid[[1L]],
                 class_name = class_name[[1L]],
                 num_fields = num_fields[[1L]],
                 min_fields = min_fields[[1L]],
@@ -384,12 +356,11 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                 by = class_id
             ]
             # get extensible number to add per class
-            dt_ext[, `:=`(num = ceiling(num / num_extensible))]
+            dt_ext[, `:=`(num = as.integer(ceiling(num / num_extensible)))]
 
             # try to match names in newly added extensible groups
             idd_env <- add_idd_extensible_group(idd_env, dt_ext)
-            dt_nom <- del_redundant_cols(idd_env$field, dt_nom, c("class_id", col_on))
-            dt_ext_join <- idd_env$field[dt_nom, on = c("class_id", col_on)]
+            dt_ext_join <- idd_env$field[dt_nom[, .SD, .SDcols = names(dt_in)], on = c("class_id", col_on)]
 
             # check invalid extensible field names
             if (anyNA(dt_ext_join$field_id)) {
@@ -399,7 +370,8 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                     num_extensible_group = num_extensible_group + num
                     )]
                 idd_env <- del_idd_extensible_group(idd_env, dt_ext)
-                abort_bad_field("error_bad_field_name", "name", get_idd_class(idd_env, invld_nm),
+                abort_bad_field("error_bad_field_name", "name",
+                    add_class_property(idd_env, invld_nm, c("min_fields", "num_fields")),
                     "\n\nNOTE: For extensible fields, new one will be added only ",
                     "when all previous extensible groups exist."
                 )
@@ -408,34 +380,27 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
             # if all matched
             if (!all && !complete) {
                 # {{{
-                col_del <- setdiff(names(dt_join), c("field_rleid", col_keep, names(idd_env$field)))
-
-                fld <- setorderv(
-                    rbindlist(
-                        list(
-                            set(dt_join[!is.na(field_id)], NULL, col_del, NULL),
-                            set(dt_ext_join, NULL, col_del, NULL)
-                        ),
-                         use.names = TRUE
-                    ),
-                    "field_rleid"
-                )
+                set(dt_ext_join, NULL, col_prop, NULL)
+                set(dt_join, NULL, col_prop, NULL)
+                fld <- append_dt(dt_join[!is.na(field_id)], dt_ext_join)
+                set(fld, NULL, "field_rleid", NULL)
                 # }}}
             } else {
                 # {{{
                 # combine index data of non-extensible and extensible groups
-                dt_idx <- get_index_dt(dt_join[!is.na(field_id)], all)
-                dt_ext_idx <- get_index_dt(dt_ext_join, all)
-                dt_idx <- rbindlist(list(dt_idx, dt_ext_idx), use.names = TRUE)[
-                    , list(field_index = max(field_index)), by = c("rleid", "class_id")]
-                dt_join <- rbindlist(list(
-                    dt_join[!is.na(field_id), .SD, .SDcols = setdiff(c("field_index", col_keep), col_on)],
-                    dt_ext_join[, .SD, .SDcols = setdiff(c("field_index", col_keep), col_on)]
-                ))
-                if (any(col_prop %in% names(dt_in))) set(dt_in, NULL, intersect(names(dt_in), col_prop), NULL)
-                dt_join <- del_redundant_cols(idd_env$field, dt_join, "field_index")
+                dt_in <- append_dt(dt_join[!is.na(field_id)], dt_ext_join)
 
-                fld <- join_field(dt_join, dt_idx)
+                fld_idx <- dt_in$field_index
+
+                # return all fields
+                if (all) dt_in[field_index < num_fields, field_index := num_fields]
+
+                # get acceptable field number for each input
+                dt_in <- get_idd_class_field_num(dt_in, dt_in$field_index)
+
+                set(dt_in, NULL, "field_index", dt_in$acceptable_num)
+
+                fld <- join_field(idd_env, dt_in, fld_idx)
                 # }}}
             }
         }
@@ -444,18 +409,6 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 
     set(fld, NULL, "field_name_us", NULL)
     fld
-}
-# }}}
-# get_idd_field_from_idx: return field data by using an index dt {{{
-get_idd_field_from_idx <- function (idd_env, dt_idx, on = "field_index", property = NULL) {
-    dt_idx <- del_redundant_cols(idd_env$field, dt_idx, c("class_id", on, property))
-    fld <- idd_env$field[dt_idx, on = c("class_id", paste0("field_index<=", on)), allow.cartesian = TRUE]
-    if (!is.null(property)) clean_field_property(fld, property)
-    if (has_name(fld, "object_id")) {
-        set(fld, NULL, "field_index", rowidv(fld, c("rleid", "object_id", "class_id")))
-    } else {
-        set(fld, NULL, "field_index", rowidv(fld, c("rleid", "class_id")))
-    }
 }
 # }}}
 # clean_field_property {{{
@@ -534,7 +487,7 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
 
     if (!name) return(ref)
 
-    ref <- add_relation_format_cols(ref)
+    ref <- add_relation_format_cols(idd_env, ref)
 
     cls <- switch(direction, ref_by = "IddRelationBy", ref_to = "IddRelationTo")
     setattr(ref, "class", c(cls, class(ref)))
@@ -608,12 +561,12 @@ add_field_full_name <- function (dt) {
 # field_default_to_unit {{{
 field_default_to_unit <- function (dt_field, from, to) {
     set(dt_field, NULL, "value_id", seq_along(dt_field$field_id))
-    setnames(dt_field, c("default", "default_num"), c("value_chr", "value_num"))
+    setnames(dt_field, c("default_chr", "default_num"), c("value_chr", "value_num"))
 
     dt_field <- convert_value_unit(dt_field, from, to)
 
     set(dt_field, NULL, "value_id", NULL)
-    setnames(dt_field, c("value_chr", "value_num"), c("default", "default_num"))
+    setnames(dt_field, c("value_chr", "value_num"), c("default_chr", "default_num"))
     dt_field
 }
 # }}}
@@ -640,9 +593,9 @@ add_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
     ext <- ext[,
         list(
             num = max(num),
-            extensible_group = num_extensible_group[1L],
-            num_extensible = num_extensible[1L],
-            last_required = last_required[1L]
+            extensible_group = num_extensible_group[[1L]],
+            num_extensible = num_extensible[[1L]],
+            last_required = last_required[[1L]]
         ),
         by = class_id
     ]
@@ -798,6 +751,9 @@ del_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
 get_input_class_data <- function (idd_env, class, num = NULL) {
     if (is.data.frame(class)) {
         dt_cls <- class
+        assert(has_name(dt_cls,
+            c("min_fields", "num_fields", "num_extensible", "last_required", "num_extensible_group")
+        ))
 
         if (is.null(num)) {
             assert(has_name(dt_cls, "num"))
@@ -812,7 +768,7 @@ get_input_class_data <- function (idd_env, class, num = NULL) {
         dt_cls <- get_idd_class(idd_env, class,
             c(
                 "min_fields", "last_required", "num_fields",
-                "first_extensible", "num_extensible", "num_extensible_group"
+                "num_extensible", "num_extensible_group"
             )
         )
 

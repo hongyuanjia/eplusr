@@ -13,62 +13,28 @@ NULL
 recognize_input <- function (input, type = "class", underscore = FALSE, lower = FALSE) {
     if (underscore && lower) stop("underscore and lower cannot all be TRUE.")
 
-    if (inherits(input, "data.table")) {
-        dt_in <- input
-        if (!has_name(dt_in, "rleid")) add_rleid(dt_in)
-        if (has_name(dt_in, paste0(type, "_id"))) {
-            col_on <- paste0(type, "_id")
-            col_key <- paste0(type, " index")
-        } else {
-            assert(has_name(dt_in, paste0(type, "_name")))
-            if (underscore) {
-                if (!has_name(dt_in, paste0(type, "_name_us"))) {
-                    set(dt_in, NULL, paste0(type, "_name_us"),
-                        underscore_name(dt_in[[paste0(type, "_name")]])
-                    )
-                    if (type == "field") {
-                        set(dt_in, NULL, paste0(type, "_name_us"),
-                            stri_trans_tolower(dt_in[[paste0(type, "_name")]])
-                        )
-                    }
-                }
-                col_on <- paste0(type, "_name_us")
-            } else if (lower) {
-                if (!has_name(dt_in, paste0(type, "_name_lower"))) {
-                    set(dt_in, NULL, paste0(type, "_name_lower"),
-                        stri_trans_tolower(dt_in[[paste0(type, "_name")]])
-                    )
-                }
-                col_on <- paste0(type, "_name_lower")
-            }else {
-                col_on <- paste0(type, "_name")
-            }
-            col_key <- paste0(type, " name")
-        }
-    } else {
-        if (is.character(input)) {
-            if (underscore) {
-                input <- underscore_name(input)
-                col_on <- paste0(type, "_name_us")
-                if (type == "field") {
-                    input <- stri_trans_tolower(input)
-                }
-            } else if (lower) {
+    if (is.character(input)) {
+        if (underscore) {
+            input <- underscore_name(input)
+            col_on <- paste0(type, "_name_us")
+            if (type == "field") {
                 input <- stri_trans_tolower(input)
-                col_on <- paste0(type, "_name_lower")
-            } else {
-                col_on <- paste0(type, "_name")
             }
-            col_key <- paste0(type, " name")
-        } else if (all(are_count(input))) {
-            col_on <- paste0(type, "_id")
-            col_key <- paste0(type, " index")
+        } else if (lower) {
+            input <- stri_trans_tolower(input)
+            col_on <- paste0(type, "_name_lower")
         } else {
-            abort_bad_which_type(paste0("error_", type, "_which_type"), type)
+            col_on <- paste0(type, "_name")
         }
-        dt_in <- data.table(input = input, rleid = seq_along(input))
-        setnames(dt_in, "input", col_on)
+        col_key <- paste0(type, " name")
+    } else if (all(are_count(input))) {
+        col_on <- paste0(type, "_id")
+        col_key <- paste0(type, " index")
+    } else {
+        abort_bad_which_type(paste0("error_", type, "_which_type"), type)
     }
+    dt_in <- data.table(input = input, rleid = seq_along(input))
+    setnames(dt_in, "input", col_on)
 
     # make sure the first column is the column used for joinning
     setcolorder(dt_in, c(col_on, setdiff(names(dt_in), col_on)))
