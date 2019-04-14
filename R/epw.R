@@ -1017,9 +1017,7 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
 # }}}
 # epw_set_data {{{
 epw_set_data <- function (self, private, data) {
-    warn("warning_eplusr_deprecated_fun",
-        "`$set_data()` in Epw class is deprecated. Please use `$set() instead."
-    )
+    .deprecated_fun("$set_data()", "$set()", "Epw", "0.10.0")
     self$set(data)
 }
 # }}}
