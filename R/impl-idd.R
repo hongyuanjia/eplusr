@@ -515,19 +515,10 @@ add_relation_format_cols <- function (idd_env, ref) {
 }
 # }}}
 
-# add_group_id {{{
-add_group_id <- function (idd_env, dt) {
-    add_joined_cols(idd_env$class, dt, "class_id", "group_id")
-}
-# }}}
-# add_group_name {{{
-add_group_name <- function (idd_env, dt) {
-    add_joined_cols(idd_env$group, dt, "group_id", "group_name")
-}
-# }}}
-# add_class_property {{{
-add_class_property <- function (idd_env, dt, property) {
-    add_joined_cols(idd_env$class, dt, "class_id", property)
+# add_class_id {{{
+add_class_id <- function (idd_env, dt) {
+    if (has_name(dt, "class_id")) return(dt)
+    add_joined_cols(idd_env$class, dt, "class_name", "class_id")
 }
 # }}}
 # add_class_name {{{
@@ -536,25 +527,14 @@ add_class_name <- function (idd_env, dt) {
     add_joined_cols(idd_env$class, dt, "class_id", "class_name")
 }
 # }}}
-# add_class_id {{{
-add_class_id <- function (idd_env, dt) {
-    if (has_name(dt, "class_id")) return(dt)
-    add_joined_cols(idd_env$class, dt, "class_name", "class_id")
+# add_class_property {{{
+add_class_property <- function (idd_env, dt, property) {
+    add_joined_cols(idd_env$class, dt, "class_id", property)
 }
 # }}}
 # add_field_property {{{
 add_field_property <- function (idd_env, dt, property) {
     add_joined_cols(idd_env$field, dt, "field_id", property)
-}
-# }}}
-# add_field_full_name {{{
-add_field_full_name <- function (dt) {
-    col_unit <- if (in_ip_mode()) "ip_units" else "units"
-
-    dt[is.na(get(col_unit)), full_name := field_name]
-    dt[!is.na(get(col_unit)), full_name := paste0(field_name, " {", get(col_unit), "}")]
-
-    dt
 }
 # }}}
 
