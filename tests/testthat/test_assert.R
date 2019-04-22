@@ -1,3 +1,5 @@
+context("Assertions")
+
 test_that("list checking", {
     expect_true(is_version(8))
     expect_true(is_version(8.8))
@@ -26,7 +28,7 @@ test_that("list checking", {
     expect_true(is_integer(8))
     expect_false(is_integer(8.1))
 
-    expect_equal(are_integer(c(8, 0, NA_integer_)), c(TRUE, TRUE, FALSE))
+    expect_equal(are_integer(c(8, 0, NA_integer_)), FALSE)
     expect_true(is_count(8))
     expect_true(is_count(8.0))
     expect_false(is_count(8.1))
@@ -36,8 +38,8 @@ test_that("list checking", {
     expect_false(is_count(NA_integer_))
 
     expect_equal(are_count(8.0), TRUE)
-    expect_equal(are_count(c(0, 1, 8, NA_integer_)), c(FALSE, TRUE, TRUE, FALSE))
-    expect_equal(are_count(c(0, 8), zero = TRUE), c(TRUE, TRUE))
+    expect_equal(are_count(c(0, 1, 8, NA_integer_)), FALSE)
+    expect_equal(are_count(c(0, 8), zero = TRUE), TRUE)
 
     expect_true(is_string("a"))
     expect_false(is_string(1L))
@@ -54,15 +56,25 @@ test_that("list checking", {
     expect_false(is_scalar(list()))
     expect_false(is_scalar(1:2))
 
+    expect_true(has_len(1:2, 2))
+    expect_true(has_len(1:2, ranger(0)))
+    expect_true(has_len(1:2, c(1,2)))
+    expect_true(has_len(1:2, 1, 1))
+    expect_false(has_len(1:2, 3))
+    expect_false(has_len(1:2, c(0,4)))
+    expect_false(has_len(1:2, 1, 2))
     expect_true(have_same_len(1:2, 3:4))
     expect_true(have_same_len(mtcars, seq_len(nrow(mtcars))))
     expect_false(have_same_len(1, 1:2))
 
-    expect_true(is_in_range(1, 1, TRUE, 2, FALSE))
-    expect_false(is_in_range(1, 1, FALSE, 2, FALSE))
+    expect_true(in_range(1, ranger(1, TRUE, 2, FALSE)))
+    expect_false(in_range(1, ranger(1, FALSE, 2, FALSE)))
 
     expect_true(is_named(list(a = 1)))
     expect_false(is_named(list(1)))
+
+    expect_true(is_choice("yes", c("Yes", "no")))
+    expect_true(is_choice("yes", c("Yes", "no")))
 
     expect_true(has_name(c(a = 1), "a"))
     expect_false(has_name(c(a = 1), "b"))
@@ -75,7 +87,15 @@ test_that("list checking", {
     expect_true(has_ext(tempfile(fileext = ".idf"), c("idf", "imf")))
     expect_false(has_ext(tempfile(fileext = ".idf"), c("epw", "imf")))
 
+    expect_true(is_epwdate(epw_date(1)))
+    expect_false(is_epwdate(epw_date(-1)))
+
+    expect_true(are_epwdate(epw_date(0:5)))
+    expect_false(are_epwdate(epw_date(-1:5)))
+
     expect_true(assert(8 > 5, 2 > 1))
     expect_is(tryCatch(assert(is_scalar(1:2)), error = identity), "error_not_scalar")
     expect_error(assert(is_scalar(1:2)), "1:2 is not a scalar")
+    expect_error(assert(is_scalar(1:2), msg = "a"), "a")
+    expect_error(assert(is_scalar(1:2), prefix = "input"), "input is not a scalar")
 })

@@ -9,47 +9,6 @@ test_that("IdfObject class", {
     surf <- idf$BuildingSurface_Detailed[["WALL-1PF"]]
     con <- idf$Construction[["WALL-1"]]
 
-    # Relation {{{
-    expect_equivalent(con$value_relation(1),
-        list(
-            ref_to = data.table(
-                class_id = 90L, class_name = "Construction",
-                object_id = 2L, object_name = "WALL-1",
-                field_id = 11006L, field_index = 1L, field_name = "Name",
-                value_id = 10L, value_chr = "WALL-1", value_num = NA_real_, type_enum = 4L,
-                src_class_id = NA_integer_, src_class_name = NA_character_,
-                src_object_id = NA_integer_, src_object_name = NA_character_,
-                src_field_id = NA_integer_, src_field_index = NA_integer_, src_field_name = NA_character_,
-                src_value_id = NA_integer_, src_value_chr = NA_character_, src_value_num = NA_real_, src_type_enum = NA_integer_,
-                src_enum = NA_integer_, dep = 0L
-            ),
-            ref_by = data.table(
-                class_id = 103L, class_name = "BuildingSurface:Detailed",
-                object_id = 3L, object_name = "WALL-1PF",
-                field_id = 11624L, field_index = 3L, field_name = "Construction Name",
-                value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
-                src_class_id = 90L, src_class_name = "Construction",
-                src_object_id = 2L, src_object_name = "WALL-1",
-                src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
-                src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
-                src_enum = 2L, dep = 0L
-            )
-        )
-    )
-
-    expect_equal(names(con$ref_to_object()), "WD01")
-    expect_equal(names(con$ref_by_object()), "WALL-1PF")
-
-    expect_true(con$has_ref())
-    expect_true(con$has_ref(1))
-    expect_true(con$has_ref_to())
-    expect_false(con$has_ref_to(1))
-    expect_true(con$has_ref_to(2))
-    expect_true(con$has_ref_by())
-    expect_true(con$has_ref_by(1))
-    expect_false(con$has_ref_by(2))
-    # }}}
-
     # Basic {{{
     # get group name
     expect_equal(con$group_name(), "Surface Construction Elements")
@@ -225,6 +184,47 @@ test_that("IdfObject class", {
             source = list(c("NewMaterialName", "WD02"))
         )
     )
+    # }}}
+
+    # Relation {{{
+    expect_equivalent(con$value_relation(1),
+        list(
+            ref_to = data.table(
+                class_id = 90L, class_name = "Construction",
+                object_id = 2L, object_name = "WALL-1",
+                field_id = 11006L, field_index = 1L, field_name = "Name",
+                value_id = 10L, value_chr = "WALL-1", value_num = NA_real_, type_enum = 4L,
+                src_class_id = NA_integer_, src_class_name = NA_character_,
+                src_object_id = NA_integer_, src_object_name = NA_character_,
+                src_field_id = NA_integer_, src_field_index = NA_integer_, src_field_name = NA_character_,
+                src_value_id = NA_integer_, src_value_chr = NA_character_, src_value_num = NA_real_, src_type_enum = NA_integer_,
+                src_enum = NA_integer_, dep = 0L
+            ),
+            ref_by = data.table(
+                class_id = 103L, class_name = "BuildingSurface:Detailed",
+                object_id = 3L, object_name = "WALL-1PF",
+                field_id = 11624L, field_index = 3L, field_name = "Construction Name",
+                value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
+                src_class_id = 90L, src_class_name = "Construction",
+                src_object_id = 2L, src_object_name = "WALL-1",
+                src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
+                src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
+                src_enum = 2L, dep = 0L
+            )
+        )
+    )
+
+    expect_equal(names(con$ref_to_object()), "WD01")
+    expect_equal(names(con$ref_by_object()), "WALL-1PF")
+
+    expect_true(con$has_ref())
+    expect_true(con$has_ref(1))
+    expect_true(con$has_ref_to())
+    expect_false(con$has_ref_to(1))
+    expect_true(con$has_ref_to(2))
+    expect_true(con$has_ref_by())
+    expect_true(con$has_ref_by(1))
+    expect_false(con$has_ref_by(2))
     # }}}
 
     # Validate {{{

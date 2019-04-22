@@ -1,6 +1,12 @@
 test_that("Epw class", {
+    # clean temp dir
+    clean_tempdir()
+    eplusr_option(verbose_info = FALSE)
+
     # download weather
-    expect_output(path_epw <- download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "epw", dir = tempdir()))
+    expect_message({path_epw <- download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3",
+        ask = FALSE, type = "epw", dir = tempdir())}
+    )
 
     expect_silent(epw <- read_epw(path_epw))
 

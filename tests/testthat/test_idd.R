@@ -7,29 +7,30 @@ test_that("can download IDD from EnergyPlus repo", {
     expect_true(file.exists(file.path(tempdir(), "V8-8-0-Energy+.idd")))
 
     expect_message(download_idd("latest", tempdir()))
-    expect_true(file.exists(file.path(tempdir(), "V9-0-0-Energy+.idd")))
+    expect_true(file.exists(file.path(tempdir(), "V9-1-0-Energy+.idd")))
 })
 # }}}
 
 # use_idd() {{{
 test_that("can read IDD", {
     skip_on_cran()
+    .globals$idd <- list()
     expect_error(is_avail_idd("latest"))
     expect_equal(avail_idd(), NULL)
-    expect_error(use_idd(8.5))
+    expect_error(use_idd(8.4))
 
-    expect_message(use_idd(8.5, download = TRUE))
-    expect_true(file.exists(file.path(tempdir(), "V8-5-0-Energy+.idd")))
-    expect_is(use_idd("8.5.0"), "Idd")
-    expect_equal(avail_idd(), "8.5.0")
-    expect_true(is_avail_idd(8.5))
-    expect_true(is_avail_idd("8.5"))
-    expect_true(is_avail_idd("8.5.0"))
+    expect_message(use_idd(8.4, download = TRUE))
+    expect_true(file.exists(file.path(tempdir(), "V8-4-0-Energy+.idd")))
+    expect_is(use_idd("8.4.0"), "Idd")
+    expect_equal(avail_idd(), "8.4.0")
+    expect_true(is_avail_idd(8.4))
+    expect_true(is_avail_idd("8.4"))
+    expect_true(is_avail_idd("8.4.0"))
 
     expect_message(use_idd(8.7, download = "auto"))
-    expect_equal(avail_idd(), c("8.5.0", "8.7.0"))
+    expect_equal(avail_idd(), c("8.4.0", "8.7.0"))
 
-    expect_message(use_idd(text("idd", "9.9.9")))
+    expect_silent(use_idd(text("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))
 })
 # }}}
@@ -129,205 +130,5 @@ test_that("Idd class", {
 
     expect_is(idd$object("TestSlash"), "IddObject")
     expect_is(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
-})
-# }}}
-
-# IddObject class {{{
-test_that("IddObject class", {
-
-    expect_silent(idd <- Idd$new(text("idd", 9.9)))
-    expect_silent(slash <- IddObject$new("TestSlash", idd))
-
-    expect_error(IddObject$new(), "IddObject can only be created based on a parent Idd object")
-
-    # can use $group_name()
-    expect_equal(slash$group_name(), "TestGroup2")
-
-    # can use $group_index()
-    expect_equal(slash$group_index(), 2L)
-
-    # can use $class_name()
-    expect_equal(slash$class_name(), "TestSlash")
-
-    # can use $class_index()
-    expect_equal(slash$class_index(), 2L)
-
-    # can use $class_format()
-    expect_equal(slash$class_format(), "singleLine")
-
-    # can use $min_fields()
-    expect_equal(slash$min_fields(), 3L)
-
-    # can use $num_fields()
-    expect_equal(slash$num_fields(), 4L)
-
-    # can use $memo()
-    expect_match(slash$memo(), "This is just a test")
-
-    # can use $num_extensible()
-    expect_equal(slash$num_extensible(), 4L)
-
-    # can use $first_extensible_index()
-    expect_equal(slash$first_extensible_index(), 1L)
-
-    # can use $extensible_group_num()
-    expect_equal(slash$extensible_group_num(), 1L)
-
-    # can use $add_extensible_groups()
-    expect_equal(slash$add_extensible_group(1)$num_fields(), 8L)
-
-    # can use $del_extensible_groups()
-    expect_equal(slash$del_extensible_group(1)$num_fields(), 4L)
-    expect_s3_class(catch_cnd(slash$del_extensible_group(1)), "error_del_extensible")
-
-    # can use $has_name()
-    expect_false(slash$has_name())
-
-    # can use $is_required()
-    expect_true(slash$is_required())
-
-    # can use $is_unique()
-    expect_true(slash$is_unique())
-
-    # can use $is_extensible()
-    expect_true(slash$is_extensible())
-
-    # can use $field_name()
-    expect_error(slash$field_name(slash$num_fields() + 30), "Invalid field index")
-    expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
-    expect_warning({nm <- slash$field_name(c(2, 1), lower = TRUE)},
-        "Parameter `lower`.*has been deprecated"
-    )
-
-    # can use $field_index()
-    expect_equal(slash$field_index(), 1L:4L)
-    expect_error(slash$field_index("WrongName"), "Invalid field name")
-    expect_equal(slash$field_index(
-            c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
-    # can use $field_type()
-    expect_equivalent(slash$field_type(c(4, 2)), c("choice", "real"))
-
-    # can use $field_note()
-    expect_equivalent(slash$field_note(c(2, 1)), list(NULL, "Test Note Parsing"))
-
-    # can use $field_unit()
-    expect_equivalent(slash$field_unit(c(4, 2)), c(NA_character_, "m"))
-    expect_equivalent(slash$field_unit(c(4, 2), in_ip = TRUE), c(NA_character_, "in"))
-
-    # can use $field_default()
-    expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
-    expect_warning({val <- slash$field_default(c(4, 2), in_ip = TRUE)},
-        "Parameter `in_ip`.* has been deprecated."
-    )
-    expect_equivalent(unname(val), list(NA_character_, 78.74016), tolerance = 0.001)
-
-    # can use $field_choice()
-    expect_equivalent(slash$field_choice(c(4, 2)), list(c("Key1", "Key2"), NULL))
-
-    # can use $field_range()
-    expect_equivalent(slash$field_range(c(4, 2)),
-        list(ranger(NA_real_, FALSE, NA_real_, FALSE), ranger(1L, TRUE, 10, FALSE)))
-
-    # can use $field_reference()
-    expect_is(slash$field_relation(c(4, 2)), "list")
-    expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
-    expect_equal(nrow(slash$field_relation(c(4, 2))$ref_by), 0L)
-    expect_equivalent(slash$field_relation(c(1, 3))$ref_to,
-        data.table(
-            class_id = 2L, class_name = "TestSlash",
-            field_index = 1L, field_name = "Test Character Field 1",
-            src_class_id = 1L, src_class_name = "TestSimple",
-            src_field_index = 1L, src_field_name = "Test Field",
-            src_enum = 2L, dep = 0L
-        )
-    )
-
-    # can use $field_possible()
-    expect_is(slash$field_possible(c(4, 2)), "list")
-    expect_equal(names(slash$field_possible(c(4, 2))), c("possible", "relation"))
-    expect_silent(slash$field_possible(c(4, 2)))
-
-    # can use $is_valid_field_num()
-    expect_equal(slash$is_valid_field_num(c(1, 4, 6, 12)), c(FALSE, TRUE, FALSE, TRUE))
-
-    # can use $is_extensible_field_index()
-    expect_equal(slash$is_extensible_index(c(1, 4, 6, 12)), rep(TRUE, time = 4L))
-
-    # can use $is_valid_field_name()
-    expect_true(slash$is_valid_field_name("Test Character Field 1"))
-    expect_true(slash$is_valid_field_name("Test Character Field 2"))
-    expect_true(slash$is_valid_field_name("Test Numeric Field 1"))
-    expect_true(slash$is_valid_field_name("Test Numeric Field 2"))
-    expect_true(slash$is_valid_field_name("test_character_field_1"))
-    expect_true(slash$is_valid_field_name("test_numeric_field_1"))
-    expect_false(slash$is_valid_field_name(1))
-    expect_false(slash$is_valid_field_name("wrong"))
-
-    # can use $is_valid_field_index()
-    expect_true(slash$is_valid_field_index(1))
-    expect_true(slash$is_valid_field_index(2))
-    expect_true(slash$is_valid_field_index(3))
-    expect_true(slash$is_valid_field_index(4))
-    expect_error(slash$is_valid_field_index("wrong"), "not counts")
-    expect_false(slash$is_valid_field_index(5))
-
-    # can use $is_autosizable_field()
-    expect_false(slash$is_autosizable_field(1))
-    expect_true(slash$is_autosizable_field(2))
-    expect_false(slash$is_autosizable_field(3))
-    expect_false(slash$is_autosizable_field(4))
-    expect_error(slash$is_autosizable_field(5))
-
-    # can use $is_autocalculatable_field()
-    expect_false(slash$is_autocalculatable_field(1))
-    expect_false(slash$is_autocalculatable_field(2))
-    expect_true(slash$is_autocalculatable_field(3))
-    expect_false(slash$is_autocalculatable_field(4))
-    expect_error(slash$is_autocalculatable_field(5))
-
-    # can use $is_numeric_field()
-    expect_false(slash$is_numeric_field(1))
-    expect_true(slash$is_numeric_field(2))
-    expect_true(slash$is_numeric_field(3))
-    expect_false(slash$is_numeric_field(4))
-    expect_error(slash$is_numeric_field(5))
-
-    # can use $is_integer_field()
-    expect_false(slash$is_integer_field(1))
-    expect_false(slash$is_integer_field(2))
-    expect_false(slash$is_integer_field(3))
-    expect_false(slash$is_integer_field(4))
-    expect_error(slash$is_integer_field(5))
-
-    # can use $is_integer_field()
-    expect_false(slash$is_real_field(1))
-    expect_true(slash$is_real_field(2))
-    expect_true(slash$is_real_field(3))
-    expect_false(slash$is_real_field(4))
-    expect_error(slash$is_real_field(5))
-
-    # can use $is_required_field()
-    expect_true(slash$is_required_field(1))
-    expect_false(slash$is_required_field(2))
-    expect_false(slash$is_required_field(3))
-    expect_false(slash$is_required_field(4))
-    expect_error(slash$is_required_field(5))
-
-    # can detect if fields have relation with others
-    expect_true(slash$has_relation("Test Character Field 1"))
-    expect_false(slash$has_relation("Test Numeric Field 1"))
-    expect_false(slash$has_ref_by("Test Character Field 1"))
-    expect_false(slash$has_ref_by("Test Numeric Field 1"))
-    expect_true(slash$has_ref_to("Test Character Field 1"))
-    expect_false(slash$has_ref_to("Test Numeric Field 1"))
-
-    # can detect if fields have relation with others
-    expect_true(slash$has_relation())
-    expect_false(slash$has_ref_by())
-    expect_true(slash$has_ref_to())
-
-    slash$to_table(all = TRUE)
-    # print
-    expect_output(slash$print())
 })
 # }}}
