@@ -17,8 +17,8 @@ reg_custom_units <- function () {
 }
 # }}}
 
-# unit_conv_table {{{
-unit_conv_table <- fread(
+# UNIT_CONV_TABLE {{{
+UNIT_CONV_TABLE <- fread(
     "
     si_name                        	 si_standard_name 	 ip_name                        	 ip_standard_name
     m                              	 m                	 ft                             	 ft
@@ -615,7 +615,7 @@ several[93] <- TRUE
 several[94] <- TRUE
 # }}}
 
-tabular_unit_conv_table <- data.table::data.table(
+tabular_unit_conv_table <- data.table(
     si_name, ip_name, mult, offset, hint, several
 )
 # }}}

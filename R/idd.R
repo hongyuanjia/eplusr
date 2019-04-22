@@ -35,22 +35,15 @@ NULL
 #'
 #' Internally, the powerful [data.table](https://cran.r-project.org/package=data.table)
 #' package is used to speed up the whole IDD parsing process and store the
-#' results. However, it will still take about 3-4 sec per IDD.  Under the hook,
+#' results. However, it will still take about 2-3 sec per IDD. Under the hook,
 #' eplusr uses a SQL-like structure to store both IDF and IDD data in
-#' `data.frame` format. Every IDD will be parsed and stored in twelve tables:
+#' [data.table::data.table] format. Every IDD will be parsed and stored in
+#' four tables:
 #'
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
-#' * `class_memo`: contains class memos, i.e. a brief description on each class.
-#' * `class_reference`: contains reference names of classes.
 #' * `field`: contains field names and field properties.
-#' * `field_note`: contains field notes.
-#' * `field_reference`: contains reference names of fields.
-#' * `field_default`: contains default values of fields.
-#' * `field_choice`: contains choices of choice-type fields.
-#' * `field_range`: contains range data of fields.
-#' * `field_object_list`: contains object-list data of fields.
-#' * `field_external_list`: contains external-list data of fields.
+#' * `reference`: contains reference names of fields.
 #'
 #' @section Usage:
 #' \preformatted{
@@ -58,19 +51,20 @@ NULL
 #' idd$build()
 #' idd$group_index(group = NULL)
 #' idd$group_name()
-#' idd$is_valid_group(group)
 #' idd$from_group(class)
 #' idd$class_index(class = NULL)
 #' idd$class_name()
-#' idd$is_valid_class(class)
 #' idd$required_class_name()
 #' idd$unique_class_name()
 #' idd$extenesible_class_name()
+#' idd$is_valid_group(group)
+#' idd$is_valid_class(class)
 #' idd$object(class)
+#' idd$objects(class)
+#' idd$objects_in_relation(class, direction = c("ref_by", "ref_to"))
 #' idd$object_in_group(group)
 #' idd$ClassName
 #' idd[[ClassName]]
-#' idd$clone(deep = FALSE)
 #' idd$print()
 #' print(idd)
 #' }
@@ -81,10 +75,12 @@ NULL
 #' * `group`: A valid group name or valid group names.
 #' * `class`: A valid class name or valid class names.
 #' * `ClassName`: A single length character vector of one valid class name.
+#' * `Direciton`: The relation direction to extract. Should be either "ref_by"
+#'   or "ref_to".
 #'
 #' @section Detail:
 #'
-#' `$version()` returns the version string.
+#' `$version()` returns the IDD version in [base::numeric_version()].
 #'
 #' `$build()` returns the build tag string.
 #'
@@ -121,13 +117,6 @@ NULL
 #' than letters and numbers are replaced by a underscore `_`.
 #'
 #' For details about `IddObject`, please see [IddObject] class.
-#'
-#' `$clone()` copies and returns the cloned `Idd` object. Because `Idd` uses
-#' `R6Class` under the hook which has "modify-in-place" semantics, `idd_2 <-
-#' idd_1` does not copy `idd_1` at all but only create a new binding to `idd_1`.
-#' Modify `idd_1` will also affect `idd_2` as well, as these two are exactly the
-#' same thing underneath. In order to create a complete cloned copy, please use
-#' `$clone(deep = TRUE)`.
 #'
 #' @examples
 #' # get the Idd object of EnergyPlus v8.8
@@ -168,7 +157,7 @@ NULL
 NULL
 
 # Idd {{{
-Idd <- R6::R6Class(classname = "Idd",
+Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
 
     public = list(
         # INITIALIZE {{{
@@ -221,9 +210,17 @@ Idd <- R6::R6Class(classname = "Idd",
             idd_class_index(self, private, class),
         # }}}
 
+        # ASSERTIONS {{{
+        is_valid_group = function (group)
+            idd_is_valid_group_name(self, private, group),
+
+        is_valid_class = function (class)
+            idd_is_valid_class_name(self, private, class),
+        # }}}
+
         # OBJECT GETTERS {{{
         object = function (class)
-            idd_object(self, private, class),
+            idd_obj(self, private, class),
 
         objects = function (class)
             idd_objects(self, private, class),
@@ -233,14 +230,6 @@ Idd <- R6::R6Class(classname = "Idd",
 
         objects_in_group = function (group)
             idd_objects_in_group(self, private, group = group),
-        # }}}
-
-        # ASSERTIONS {{{
-        is_valid_group = function (group)
-            idd_is_valid_group_name(self, private, group),
-
-        is_valid_class = function (class)
-            idd_is_valid_class_name(self, private, class),
         # }}}
 
         print = function ()
@@ -318,8 +307,8 @@ idd_is_valid_class_name <- function (self, private, class) {
     class %chin% private$m_idd_env$class$class_name
 }
 # }}}
-# idd_object {{{
-idd_object <- function (self, private, class) {
+# idd_obj {{{
+idd_obj <- function (self, private, class) {
     IddObject$new(class, self)
 }
 # }}}
@@ -426,7 +415,7 @@ idd_print <- function (self, private) {
             if (is.na(m)) {
                 NextMethod()
             } else {
-                idd_object(self, priv, all_nm[m])
+                idd_obj(self, priv, all_nm[m])
             }
         }
     } else {
@@ -455,7 +444,7 @@ read_idd <- function (path) {
 #'     currently not available. It is useful in case when you only want to edit
 #'     an EnergyPlus Input Data File (IDF) directly but do not want to install
 #'     whole EnergyPlus software. Default is `FALSE`.
-#' @param ver A valid EnergyPlus version, e.g. `8,` `8.7,` `"8.7"` or `"8.7.0"`.
+#' @param ver A valid EnergyPlus version, e.g. `8`, `8.7`, `"8.7"` or `"8.7.0"`.
 #'     For `download_idd()`, the special value `"latest"`, which is default,
 #'     means the latest version.
 #' @param dir A directory to indicate where to save the IDD file.
@@ -526,7 +515,7 @@ read_idd <- function (path) {
 use_idd <- function (idd, download = FALSE) {
     if (is_idd(idd)) return(idd)
 
-    if (!is_version(idd) || (is_version(idd) && !is_idd_ver(idd))) {
+    if (!is_version(idd) || (is_version(idd) && !is_idd_ver(idd, only_exist = FALSE))) {
         return(tryCatch(read_idd(idd), error_read_file = function (e) {
             abort("error_invalid_idd_input",
                 paste0("Parameter `idd` should be a valid version, a path, or ",
@@ -544,7 +533,7 @@ use_idd <- function (idd, download = FALSE) {
         }))
     }
 
-    if (is_idd_ver(idd, strict = FALSE)) {
+    if (is_idd_ver(idd, strict = FALSE, only_exist = TRUE)) {
         ver <- standardize_ver(idd)
 
         if (isTRUE(download)) {
@@ -667,7 +656,7 @@ avail_idd <- function () names(.globals$idd)
 #' @export
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
-    assert(is_idd_ver(ver, strict = TRUE, only_released = FALSE))
+    assert(is_idd_ver(ver, strict = TRUE, only_exist = FALSE))
     as.character(standardize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}

@@ -11,7 +11,7 @@ empty_validity <- function () {
 
     chks <- c("missing_object", "duplicate_object", "conflict_name",
         "incomplete_extensible", "missing_value", "invalid_autosize",
-        "invalid_autocalculate", "invaid_character", "invalid_numeric",
+        "invalid_autocalculate", "invalid_character", "invalid_numeric",
         "invalid_integer", "invalid_choice", "invalid_range",
         "invalid_reference"
     )
@@ -25,11 +25,14 @@ empty_validity <- function () {
         object_name = character(0),
         class_id = integer(0),
         class_name = character(0),
+        field_id = integer(0),
         field_index = integer(0),
         field_name = character(0),
-        full_name = character(0),
+        units = character(0),
+        ip_units = character(0),
+        type_enum = integer(0),
         value_id = character(0),
-        value = character(0),
+        value_chr = character(0),
         value_num = character(0)
     )
 
@@ -51,14 +54,15 @@ empty_validity <- function () {
 # @param type A valid IdfValidity type name.
 # @param on Passed to `[.data.table` in order to extract value data.
 # @return NULL
-add_validity <- function (env_in, check, type, on) {
+add_validity <- function (idd_env, idf_env, env_in, check, type, on) {
     if (inherits(check, "data.table")) {
         env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
-            env_in$value, on = "object_id"][check, on = on,
+            env_in$value, on = "object_id"][check, on = on][,
             .SD, .SDcols = names(env_in[["validity"]][[type]])]
+        setdiff(names(env_in[["validity"]]$missing_value), names(check))
     } else {
         env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
-            env_in$value, on = "object_id"][J(check), on = on,
+            env_in$value, on = "object_id"][J(check), on = on,][,
             .SD, .SDcols = names(env_in[["validity"]][[type]])]
     }
 }
@@ -120,14 +124,14 @@ level_checks <- function (level = eplusr_option("validate_level")) {
 # }}}
 # validate_on_level {{{
 # Validate input IDF data on different level
-# @param dt_idd An environment that contains IDD data
-# @param dt_idf An environment that contains IDF data
+# @param idd_env An environment that contains IDD data
+# @param idf_env An environment that contains IDF data
 # @param dt_object A data.table that contains object data to validate
 # @param dt_value A data.table that contains value data to validate
 # @param level Strictness level to validate. Should be one of `"none"`,
 #        `"draft"` and `"final"`.
 # @return An IdfValidity object.
-validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL, level) {
+validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NULL, level) {
 
     if (is.character(level)) {
         level <- level_checks(level)
@@ -135,7 +139,7 @@ validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL
         assert(is.list(level), has_name(level, names(custom_validate())))
     }
 
-    validate_objects(dt_idd, dt_idf, dt_object, dt_value,
+    validate_objects(idd_env, idf_env, dt_object, dt_value,
         required_object = level$required_object,
         unique_object = level$unique_object,
         unique_name = level$unique_name,
@@ -151,13 +155,13 @@ validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL
 # }}}
 # validate_objects {{{
 # Validate input IDF data in terms of various aspects
-# @param dt_idd An environment that contains IDD data
-# @param dt_idf An environment that contains IDF data
+# @param idd_env An environment that contains IDD data
+# @param idf_env An environment that contains IDF data
 # @param dt_object A data.table that contains object data to validate. If
-#        `NULL`, the object data from `dt_idf` will be used, which means to
+#        `NULL`, the object data from `idf_env` will be used, which means to
 #        validate the whole IDF.
 # @param dt_object A data.table that contains value data to validate. If
-#        `NULL`, the value data from `dt_idf` will be used, which means to
+#        `NULL`, the value data from `idf_env` will be used, which means to
 #        validate the whole IDF.
 # @param required_object Whether to check if required objects are missing. This
 #        will only be applied when checking the whole IDF.
@@ -181,7 +185,7 @@ validate_on_level <- function (dt_idd, dt_idf, dt_object = NULL, dt_value = NULL
 # @return An IdfValidity object.
 validate_objects <- function
 (
-    dt_idd, dt_idf, dt_object = NULL, dt_value = NULL,
+    idd_env, idf_env, dt_object = NULL, dt_value = NULL,
     required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
     extensible = FALSE, required_field = FALSE, autofield = FALSE,
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
@@ -204,18 +208,32 @@ validate_objects <- function
     # if object and value dt are not provided, then this means to validate the
     # whole IDF
     if (is.null(dt_object) && is.null(dt_value)) {
-        dt_object <- dt_idf$object
-        dt_value <- dt_idf$value
+        dt_object <- idf_env$object
+        # add class name
+        dt_object <- add_class_name(idd_env, dt_object)
+        on.exit(set(dt_object, NULL, "class_name", NULL), add = TRUE)
+
+        dt_value <- idf_env$value
+        # add class id and name
+        add_joined_cols(dt_object, dt_value, "object_id", c("class_id", "class_name", "object_name"))
+        # add field index
+        add_joined_cols(idd_env$field, dt_value, "field_id", c("field_index", "field_name", "type_enum", "ip_units", "units"))
+        on.exit(
+            set(dt_value, NULL,
+                c("class_id", "class_name", "object_name",
+                  "field_index", "type_enum", "units", "ip_units"),
+            NULL),
+            add = TRUE
+        )
+
         check_whole <- TRUE
     } else {
         check_whole <- FALSE
+        add_joined_cols(idd_env$field, dt_value, "field_id", c("type_enum", "ip_units", "units"))
     }
 
-    # copy in order to leave original dt unaffected
-    dt_object <- copy(dt_object)
-    dt_value <- copy(dt_value)
-
     # add field attributes used for validating {{{
+    # add field index
     cols_add <- character(0)
     if (isTRUE(extensible)) cols_add <- c(cols_add, "extensible_group")
     if (isTRUE(required_field)) cols_add <- c(cols_add, "required_field")
@@ -228,17 +246,21 @@ validate_objects <- function
     }
     # to exclude auto fields
     if (isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
-        cols_add <- c(cols_add, "autosizable", "autocalculatable")
+        cols_add <- c(cols_add, "autosizable", "autocalculatable", "type_enum")
     }
+    # to check reference
+    if (isTRUE(reference)) cols_add <- c(cols_add, "src_enum")
 
-    if (length(setdiff(cols_add, names(dt_value)))) {
-        dt_value <- dt_idd$field[, .SD, .SDcols = c("field_id", setdiff(cols_add, names(dt_value)))][
-            dt_value, on = "field_id"]
+    cols_add <- setdiff(unique(cols_add), names(dt_value))
+    if (length(cols_add)) {
+        dt_value <- add_joined_cols(idd_env$field, dt_value, "field_id", cols_add)
+        on.exit(set(dt_value, NULL, cols_add, NULL), add = TRUE)
     }
     # }}}
 
     # add lower-case value
-    set(dt_value, NULL, "value_lower", stri_trans_tolower(dt_value$value))
+    set(dt_value, NULL, "value_lower", stri_trans_tolower(dt_value$value_chr))
+    on.exit(set(dt_value, NULL, "value_lower", NULL), add = TRUE)
 
     # put all input into an environment
     env_in <- new.env(parent = emptyenv(), size = 4L)
@@ -247,68 +269,69 @@ validate_objects <- function
     env_in$value <- dt_value
     env_in$validity <- empty_validity()
 
-    if (isTRUE(required_object) && check_whole) check_missing_object(dt_idd, dt_idf, env_in)
-    if (isTRUE(unique_object)) check_duplicate_object(dt_idd, dt_idf, env_in)
-    if (isTRUE(unique_name)) check_conflict_name(dt_idd, dt_idf, env_in)
-    if (isTRUE(extensible)) check_incomplete_extensible(dt_idd, dt_idf, env_in)
-    if (isTRUE(required_field)) check_missing_value(dt_idd, dt_idf, env_in)
+    if (isTRUE(required_object) && check_whole) check_missing_object(idd_env, idf_env, env_in)
+    if (isTRUE(unique_object)) check_duplicate_object(idd_env, idf_env, env_in)
+    if (isTRUE(unique_name)) check_conflict_name(idd_env, idf_env, env_in)
+    if (isTRUE(extensible)) check_incomplete_extensible(idd_env, idf_env, env_in)
+    if (isTRUE(required_field)) check_missing_value(idd_env, idf_env, env_in)
 
     # exclude unrequired empty fields
     if (isTRUE(autofield) || isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
-        exclude_empty_field(dt_idd, dt_idf, env_in)
+        exclude_empty_field(idd_env, idf_env, env_in)
     }
 
     if (isTRUE(autofield)) {
-        check_invalid_autosize(dt_idd, dt_idf, env_in)
-        check_invalid_autocalculate(dt_idd, dt_idf, env_in)
+        check_invalid_autosize(idd_env, idf_env, env_in)
+        check_invalid_autocalculate(idd_env, idf_env, env_in)
     }
 
     # exclude autosize and autocalculate fields when checking types, ranges and
     # references
     if (isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
-        exclude_auto_field(dt_idd, dt_idf, env_in)
+        exclude_auto_field(idd_env, idf_env, env_in)
     }
 
     if (isTRUE(type)) {
-        check_invalid_character(dt_idd, dt_idf, env_in)
-        check_invalid_numeric(dt_idd, dt_idf, env_in)
-        check_invalid_integer(dt_idd, dt_idf, env_in)
+        check_invalid_character(idd_env, idf_env, env_in)
+        check_invalid_numeric(idd_env, idf_env, env_in)
+        check_invalid_integer(idd_env, idf_env, env_in)
     }
 
-    if (isTRUE(choice)) check_invalid_choice(dt_idd, dt_idf, env_in)
-    if (isTRUE(range)) check_invalid_range(dt_idd, dt_idf, env_in)
-    if (isTRUE(reference)) check_invalid_reference(dt_idd, dt_idf, env_in)
+    if (isTRUE(choice)) check_invalid_choice(idd_env, idf_env, env_in)
+    if (isTRUE(range)) check_invalid_range(idd_env, idf_env, env_in)
+    if (isTRUE(reference)) check_invalid_reference(idd_env, idf_env, env_in)
 
     env_in$validity
 }
 # }}}
 
 # check_missing_object: check missing required objects {{{
-check_missing_object <- function (dt_idd, dt_idf, env_in) {
-    required <- t_class_name_required(dt_idd$class)
-    env_in$validity$missing_object <- required[!required %in% unique(dt_idf$object$class_name)]
+check_missing_object <- function (idd_env, idf_env, env_in) {
+    required <- idd_env$class[required_object == TRUE, class_id]
+    miss <- required[!required %in% unique(env_in$object$class_id)]
+    env_in$validity$missing_object <- idd_env$class[J(miss), on = "class_id", class_name]
     env_in
 }
 # }}}
 # check_duplicate_object: check duplicated unique objects {{{
-check_duplicate_object <- function (dt_idd, dt_idf, env_in) {
-    dup_uni <- env_in$object[class_name %in% t_class_name_unique(dt_idd$class),
-        list(num = .N), by = list(class_id)][num > 1L]
+check_duplicate_object <- function (idd_env, idf_env, env_in) {
+    dup_uni <- env_in$object[J(idd_env$class[unique_object == TRUE, class_id]),
+        on = "class_id", nomatch = 0L, list(num = .N), by = c("class_id")][num > 1L]
 
     if (nrow(dup_uni)) {
-        add_validity(env_in, duplicate_object, "duplicate_object", "class_id")
+        add_validity(idd_env, idf_env, env_in, dup_uni, "duplicate_object", "class_id")
     }
 
     env_in
 }
 # }}}
 # check_conflict_name: objects in the same class have exact the same name {{{
-check_conflict_name <- function (dt_idd, dt_idf, env_in) {
+check_conflict_name <- function (idd_env, idf_env, env_in) {
     # only check objects that have names
     if (env_in$check_whole) {
         obj <- env_in$object[!is.na(object_name)]
     } else {
-        exist <- dt_idf$object[class_id %in% env_in$object$class_id]
+        exist <- idf_env$object[J(unique(env_in$object$class_id)), on = "class_id", nomatch = 0L]
         # add existing object
         obj <- append_dt(exist, env_in$object, "object_id")[!is.na(object_name)]
     }
@@ -316,33 +339,55 @@ check_conflict_name <- function (dt_idd, dt_idf, env_in) {
     if (!nrow(obj)) return(env_in)
 
     conf_id <- obj[, list(num = .N, id_list = list(object_id)),
-        by = list(class_id, object_name_lower)][num > 1L, unlist(id_list, use.names = FALSE)]
+        by = c("class_id", "object_name_lower")][num > 1L, unlist(id_list, use.names = FALSE)]
 
     if (is.null(conf_id)) return(env_in)
 
     # get object name in order to correctly print error messages
     obj <- obj[J(conf_id), on = "object_id", .SD, .SDcols = c("object_id", "object_name")]
-    # only show the first 3 fields
-    env_in$validity$conflict_name <- append_dt(dt_idf$value, env_in$value, "value_id")[
-        obj, on = "object_id"][
-        field_index <= 3L, .SD, .SDcols = names(env_in$validity$conflict_name)
-    ]
+
+    if (env_in$check_whole) {
+        env_in$validity$conflict_name <- env_in$value[J(obj$object_id), on = "object_id",
+            nomatch = 0L,  .SD, .SDcols = names(env_in$validity$conflict_name)][
+            field_index <= 3L]
+    } else {
+        # conflicted objects in orginal IDF
+        old <- idf_env$value[J(obj$object_id), on = "object_id", nomatch = 0L]
+
+        # add necessary columns
+        # add class id and name
+        add_joined_cols(idf_env$object, old, "object_id", c("class_id", "object_name"))
+        # add class name
+        add_joined_cols(idd_env$class, old, "class_id", c("class_name"))
+        # add field index
+        add_joined_cols(idd_env$field, old, "field_id", c("field_index", "field_name", "type_enum", "ip_units", "units"))
+
+        old <- old[field_index <= 3L]
+
+        new <- env_in$value[field_index <= 3L][J(obj$object_id), on = "object_id", nomatch = 0L]
+        add_joined_cols(env_in$object, new, "object_id", "object_name")
+
+        env_in$validity$conflict_name <- rbindlist(list(
+            new[, .SD, .SDcols = names(env_in$validity$conflict_name)],
+            old[, .SD, .SDcols = names(env_in$validity$conflict_name)]
+        ))
+    }
 
     env_in
 }
 # }}}
 # check_incomplete_extensible: incomplete extensible group {{{
-check_incomplete_extensible <- function (dt_idd, dt_idf, env_in) {
+check_incomplete_extensible <- function (idd_env, idf_env, env_in) {
     # extensible groups in input
     ext <- env_in$value[extensible_group > 0L,
-        list(object_id, field_index, field_id, extensible_group, value)]
+        list(object_id, field_index, field_id, extensible_group, value_chr)]
 
     if (!nrow(ext)) return(env_in)
 
     # check incomplete extensible fields
     # check if fields in an extensible group have any NA or are all NAs
     empty_info <- ext[order(object_id, -extensible_group, -field_index),
-        list(has_any_na = any(is.na(value)), is_all_na = all(is.na(value))),
+        list(has_any_na = any(is.na(value_chr)), is_all_na = all(is.na(value_chr))),
         by = list(object_id, extensible_group)]
     # if fields in one extensible group only have some NAs or do not have any
     # NA, then extensible groups below that group cannot have any NA
@@ -353,74 +398,80 @@ check_incomplete_extensible <- function (dt_idd, dt_idf, env_in) {
     incomplete <- empty_info[has_any_na == TRUE & can_be_na == FALSE, list(object_id, extensible_group)]
 
     if (nrow(incomplete)) {
-        add_validity(env_in, incomplete, "incomplete_extensible", c("object_id", "extensible_group"))
+        add_validity(idd_env, idf_env, env_in, incomplete, "incomplete_extensible", c("object_id", "extensible_group"))
     }
 
     env_in
 }
 # }}}
 # check_missing_value: missing required fields {{{
-check_missing_value <- function (dt_idd, dt_idf, env_in) {
-    missing_value <- env_in$value[required_field == TRUE & is.na(value)]
+check_missing_value <- function (idd_env, idf_env, env_in) {
+    missing_value <- env_in$value[required_field == TRUE & is.na(value_chr)]
 
     if (!nrow(missing_value)) return(env_in)
 
-    add_validity(env_in, missing_value, "missing_value", "value_id")
+    add_validity(idd_env, idf_env, env_in, missing_value, "missing_value", "value_id")
     exclude_invalid(env_in, missing_value, on = "value_id")
+    env_in
 }
 # }}}
 # check_invalid_autosize: invalid autosize fields {{{
-check_invalid_autosize <- function (dt_idd, dt_idf, env_in) {
+check_invalid_autosize <- function (idd_env, idf_env, env_in) {
     invalid_autosize <- env_in$value[value_lower == "autosize" & autosizable == FALSE]
 
     if (!nrow(invalid_autosize)) return(env_in)
 
-    add_validity(env_in, invalid_autosize, "invalid_autosize", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_autosize, "invalid_autosize", "value_id")
     exclude_invalid(env_in, invalid_autosize, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_autocalculate: invalid autocalculate fields {{{
-check_invalid_autocalculate <- function (dt_idd, dt_idf, env_in) {
+check_invalid_autocalculate <- function (idd_env, idf_env, env_in) {
     invalid_autocalculate <- env_in$value[value_lower == "autocalculate" & autocalculatable == FALSE]
 
     if (!nrow(invalid_autocalculate)) return(env_in)
 
-    add_validity(env_in, invalid_autocalculate, "invalid_autocalculate", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_autocalculate, "invalid_autocalculate", "value_id")
     exclude_invalid(env_in, invalid_autocalculate, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_character: invalid numeric fields {{{
-check_invalid_character <- function (dt_idd, dt_idf, env_in) {
+check_invalid_character <- function (idd_env, idf_env, env_in) {
     invalid_character <- env_in$value[type_enum > IDDFIELD_TYPE$real & !is.na(value_num)]
 
     if (!nrow(invalid_character)) return(env_in)
 
-    add_validity(env_in, invalid_character, "invalid_character", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_character, "invalid_character", "value_id")
     exclude_invalid(env_in, invalid_character, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_numeric: invalid numeric fields {{{
-check_invalid_numeric <- function (dt_idd, dt_idf, env_in) {
+check_invalid_numeric <- function (idd_env, idf_env, env_in) {
     invalid_numeric <- env_in$value[type_enum <= IDDFIELD_TYPE$real & is.na(value_num)]
 
     if (!nrow(invalid_numeric)) return(env_in)
 
-    add_validity(env_in, invalid_numeric, "invalid_numeric", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_numeric, "invalid_numeric", "value_id")
     exclude_invalid(env_in, invalid_numeric, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_integer: invalid integer fields {{{
-check_invalid_integer <- function (dt_idd, dt_idf, env_in) {
-    invalid_integer <- env_in$value[type_enum == IDDFIELD_TYPE$integer & is.na(value_num)]
+check_invalid_integer <- function (idd_env, idf_env, env_in) {
+    invalid_integer <- env_in$value[type_enum == IDDFIELD_TYPE$integer & (is.na(value_num) | value_num != trunc(value_num))]
 
     if (!nrow(invalid_integer)) return(env_in)
 
-    add_validity(env_in, invalid_integer, "invalid_integer", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_integer, "invalid_integer", "value_id")
     exclude_invalid(env_in, invalid_integer, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_choice: invalid choice fields {{{
-check_invalid_choice <- function (dt_idd, dt_idf, env_in) {
+check_invalid_choice <- function (idd_env, idf_env, env_in) {
     cho <- env_in$value[type_enum == IDDFIELD_TYPE$choice]
 
     if (!nrow(cho)) return(env_in)
@@ -430,16 +481,17 @@ check_invalid_choice <- function (dt_idd, dt_idf, env_in) {
         `:=`(value_lower = gsub("^for\\s*[:]{0,1}\\s*", "", value_lower))]
 
     set(cho, NULL, "choice", list(lapply(cho$choice, stri_trans_tolower)))
-    invalid_choice <- cho[!apply2_lgl(value_lower, choice, "%in%")]
+    invalid_choice <- cho[!apply2_lgl(value_lower, choice, "%chin%")]
 
     if (!nrow(invalid_choice)) return(env_in)
 
-    add_validity(env_in, invalid_choice, "invalid_choice", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_choice, "invalid_choice", "value_id")
     exclude_invalid(env_in, invalid_choice, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_range: invalid range fields {{{
-check_invalid_range <- function (dt_idd, dt_idf, env_in) {
+check_invalid_range <- function (idd_env, idf_env, env_in) {
     val <- env_in$value[type_enum <= IDDFIELD_TYPE$real & has_range == TRUE]
 
     if (!nrow(val)) return(env_in)
@@ -453,41 +505,56 @@ check_invalid_range <- function (dt_idd, dt_idf, env_in) {
 
     if (!nrow(invalid_range)) return(env_in)
 
-    add_validity(env_in, invalid_range, "invalid_range", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_range, "invalid_range", "value_id")
     exclude_invalid(env_in, invalid_range, "value_id")
+    env_in
 }
 # }}}
 # check_invalid_reference: invalid reference fields {{{
-check_invalid_reference <- function (dt_idd, dt_idf, env_in) {
-    val <- env_in$value[type_enum == IDDFIELD_TYPE$object_list,
-        list(object_id, value_id, value, field_id, type_enum)]
+check_invalid_reference <- function (idd_env, idf_env, env_in) {
+    val <- env_in$value[J(IDDFIELD_TYPE$object_list), on = "type_enum", nomatch = 0L,
+        list(object_id, value_id, value_chr, field_id, type_enum)]
 
     if (!nrow(val)) return(env_in)
 
     if (env_in$check_whole) {
-        ref_map <- get_value_reference_map(dt_idd$reference, env_in$value, val)
+        ref_map <- get_value_reference_map(idd_env$reference, src = env_in$value, value = val)
     } else {
-        ref_map <- get_value_reference_map(dt_idd$reference,
-            append_dt(dt_idf$value, env_in$value, "value_id"), val)
+        # add necessary columns used for getting references
+        add_field_property(idd_env, idf_env$value, "src_enum")
+        add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
+        add_class_name(idd_env, idf_env$value)
+
+        ref_map <- get_value_reference_map(idd_env$reference,
+            src = append_dt(idf_env$value, env_in$value, "value_id"), value = val)
+
+        set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
     }
 
-    invalid_ref <- ref_map[val, on = list(value_id)][is.na(src_value_id)]
+    invalid_ref <- ref_map[val, on = "value_id"][is.na(src_value_id)]
 
-    if (!nrow(invalid_ref)) return(env_in)
+    if (!nrow(invalid_ref)) {
+        # if check new objects, update reference map
+        if (!env_in$check_whole) {
+            idf_env$reference <- append_dt(idf_env$reference, ref_map, "value_id")
+        }
+        return(env_in)
+    }
 
-    add_validity(env_in, invalid_ref, "invalid_reference", "value_id")
+    add_validity(idd_env, idf_env, env_in, invalid_ref, "invalid_reference", "value_id")
     exclude_invalid(env_in, invalid_ref, "value_id")
+    env_in
 }
 # }}}
 
 # exclude_empty_field: exclude non-required empty fields {{{
-exclude_empty_field <- function (dt_idd, dt_idf, env_in) {
-    env_in$value <- env_in$value[!(required_field == FALSE & is.na(value))]
+exclude_empty_field <- function (idd_env, idf_env, env_in) {
+    env_in$value <- env_in$value[!(required_field == FALSE & is.na(value_chr))]
     env_in
 }
 # }}}
 # exclude_auto_field: exclude valid autosize and autocalculate fields {{{
-exclude_auto_field <- function (dt_idd, dt_idf, env_in) {
+exclude_auto_field <- function (idd_env, idf_env, env_in) {
     env_in$value <- env_in$value[
         !(value_lower == "autosize" & autosizable == TRUE) &
         !(value_lower == "autocalculate" & autocalculatable == TRUE)
@@ -506,7 +573,7 @@ count_check_type_error <- function (validity, type) {
         return(length(unique(validity[[type]]$object_id)))
 
     if (identical(type, "incomplete_extensible"))
-        return(validity[[type]][is.na(value), .N])
+        return(validity[[type]][is.na(value_chr), .N])
 
     nrow(validity[[type]])
 }
@@ -562,28 +629,36 @@ print_single_validity <- function (single_validity, type) {
     )
 
     bullet <- switch(type,
-        missing_object = "Objects below are required but not exist.",
-        duplicate_object = "Objects should be unique but have multiple instances.",
-        conflict_name = "Objects below have the same name.",
-        incomplete_extensible = "Fields in each extensible group cannot contain any empty.",
-        missing_value = "Fields below are required but values are not given.",
-        invalid_autosize = "Fields below cannot be `autosize`.",
-        invalid_autocalculate = "Fields below cannot be `autocalculate`.",
-        invalid_numeric = "Fields below should be numbers but are not.",
-        invalid_character = "Fields below should be characters but are not.",
-        invalid_integer = "Fields below are not or cannot be coerced into integers.",
-        invalid_choice = "Fields below are not one of prescribed choices.",
-        invalid_range = "Fields below exceed prescibed ranges.",
-        invalid_reference = "Fields below are not one of valid references.")
+        missing_object = "Objects below are required but not exist:",
+        duplicate_object = "Objects should be unique but have multiple instances:",
+        conflict_name = "Objects below have the same name:",
+        incomplete_extensible = "Fields in each extensible group cannot contain any empty:",
+        missing_value = "Fields below are required but values are not given:",
+        invalid_autosize = "Fields below cannot be `autosize`:",
+        invalid_autocalculate = "Fields below cannot be `autocalculate`:",
+        invalid_numeric = "Fields below should be numbers but are not:",
+        invalid_character = "Fields below should be characters but are not:",
+        invalid_integer = "Fields below are not or cannot be coerced into integers:",
+        invalid_choice = "Fields below are not one of prescribed choices:",
+        invalid_range = "Fields below exceed prescibed ranges:",
+        invalid_reference = "Fields below are not one of valid references:")
 
     cli::cat_line()
     cli::cat_rule(paste0("[", error_num, "] ", title))
-    cli::cat_bullet(bullet, bullet = "circle_cross")
+    cli::cat_line("   ", bullet, "\n")
 
     if (type == "missing_object") {
-        cli::cat_bullet(surround(single_validity[[type]]))
+        cli::cat_line(paste0("   * ", surround(single_validity[[type]])))
     } else {
-        cli::cat_line(format_objects(single_validity[[type]], "field"))
+        cli::cat_line(
+            paste0("    ",
+                unlist(
+                    format_objects(single_validity[[type]],
+                        c("class", "object", "value"), brief = FALSE)$out,
+                    use.names = FALSE
+                )
+            )
+        )
     }
 }
 # }}}

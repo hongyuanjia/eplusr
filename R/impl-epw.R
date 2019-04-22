@@ -1110,28 +1110,32 @@ get_epw_header_data <- function (epw_header, name) {
 # }}}
 # get_epw_wday {{{
 get_epw_wday <- function (x, label = FALSE, abbr = FALSE){
-    wday_std <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-    wday_abbr <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    wd <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     res <- if (label) rep(NA_character_, length(x)) else rep(NA_integer_, length(x))
-    dict <- if (abbr) wday_abbr else wday_std
 
     if (is.numeric(x)) {
         is_ok <- x == trunc(x) & x >= 1L & x <= 7L
         if (!label) {
             res[is_ok] <- as.integer(x[is_ok])
         } else {
-            res[is_ok] <- dict[x[is_ok]]
+            if (abbr) {
+                res[is_ok] <- stri_sub(wd[x[is_ok]], 3L)
+            } else {
+                res[is_ok] <- wd[x[is_ok]]
+            }
         }
     } else {
-        l_x <- stri_trans_tolower(x)
-        m <- chmatch(l_x, stri_trans_tolower(wday_std), nomatch = 0L)
-        m[m == 0L] <- chmatch(l_x[m == 0L], stri_trans_tolower(wday_abbr), nomatch = 0L)
+        m <- match_in_vec(x, wd, label = FALSE)
 
         if (!label) {
             res[m != 0L] <- m[m != 0L]
         } else {
-            res[m != 0L] <- dict[m[m != 0L]]
+            if (abbr) {
+                res[m != 0L] <- stri_sub(wd[m[m != 0L]], to = 3L)
+            } else {
+                res[m != 0L] <- wd[m[m != 0L]]
+            }
         }
     }
 
@@ -1140,25 +1144,8 @@ get_epw_wday <- function (x, label = FALSE, abbr = FALSE){
 # }}}
 # get_epw_month {{{
 get_epw_month <- function (x, label = FALSE){
-    l_x <- stri_trans_tolower(x)
-
-    std <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-    l_std <- c("january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december")
-
-    abbr <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-    l_abbr <- c("jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec")
-
-    m <- chmatch(l_x, l_std, nomatch = 0L)
-    m[m == 0L] <- chmatch(l_x[m == 0L], l_abbr, nomatch = 0L)
-
-    if (!label) {
-        m[m == 0L] <- NA_integer_
-        return(m)
-    } else {
-        res <- rep(NA_character_, length(x))
-        res[m != 0L] <- std[m[m != 0L]]
-        return(res)
-    }
+    mon <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+    match_in_vec(x, mon, label = label)
 }
 # }}}
 # EpwDate {{{
@@ -1278,7 +1265,7 @@ as_EpwDate.numeric <- function (x, leapyear = TRUE) {
     if (sum(is_jul) == length(x)) return(res)
 
     y <- if (leapyear) 8L else 9L
-    s <- stri_split_fixed(res[!is_jul], ".", simplify = TRUE)
+    s <- stri_split_fixed(x[!is_jul], ".", simplify = TRUE)
     res[!is_jul] <- lubridate::make_date(y, s[, 1L], s[, 2L])
     res
 }
@@ -1484,7 +1471,7 @@ format_epwdate_nthwkd <- function (x, last = FALSE) {
     paste0(n, suffix, " ",
         wday(x, label = TRUE),
         " in ",
-        lubridate::month(x, label = TRUE, abbr = FALSE, local = "C")
+        lubridate::month(x, label = TRUE, abbr = FALSE, locale = "C")
     )
 }
 # }}}
@@ -2220,7 +2207,9 @@ get_epw_data_abnormal <- function (epw_data, epw_header, period = 1L, cols = NUL
         l <- p[[type]][[1L]]
     }
 
-    if (!is.null(cols)) {
+    if (is.null(cols)) {
+        cols <- names(which(vlapply(l, function (x) length(x) > 0L)))
+    } else {
         if (!has_name(p$missing[[1L]], cols)) {
             abort("error_invaid_epw_data_column_name",
                 paste0("Invalid EPW data variable name found: ", collapse(cols[!cols %in% names(p[[type]][[1L]])])),
@@ -2284,7 +2273,7 @@ make_epw_data_na <- function (epw_data, epw_header, period = NULL,
     mr <- merge_data_period_abnormal_index(epw_header, period, missing, out_of_range)
 
     if (missing) {
-        epw_data <- make_epw_data_na_line(epw_data, mr$miss)
+        epw_data <- make_epw_data_na_line(epw_data, mr$missing)
     }
 
     if (out_of_range) {
@@ -3014,7 +3003,7 @@ format_epw_header_comment2 <- format_epw_header_comment1
 # }}}
 # format_epw_header_period {{{
 format_epw_header_period <- function (period) {
-    res <- paste(period$interval, nrow(period$period), sep = ",")
+    res <- paste(nrow(period$period), period$interval, sep = ",")
     paste(res,
         period$period[, paste(
             name,

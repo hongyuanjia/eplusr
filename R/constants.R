@@ -13,6 +13,7 @@ ALL_IDD_VER <- c(
     paste0(4:6, ".0.0"),
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"),
+    paste0("9.0.1"),
     paste0("9.", 0:1, ".0")
 )
 
@@ -66,7 +67,7 @@ utils::globalVariables(c(
     "exit_status", "explpt_loc", "ext", "ext_from", "ext_index", "ext_num",
     "extensible", "external_key", "external_list", "external_list_id",
     "field_an", "field_anid", "field_count", "field_id", "field_index",
-    "field_name", "field_name_in", "field_name_lower", "file_name",
+    "field_name", "field_name_lower", "file_name",
     "first_extensible", "found", "full_ipname", "full_name", "group",
     "group_id", "group_name", "grp", "has_any_na", "has_default",
     "has_external_list", "has_object_list", "has_range", "has_reference",

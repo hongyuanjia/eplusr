@@ -450,7 +450,7 @@ get_recref <- function (reference, id, col_on, col_rec, dep, max = Inf) {
 # }}}
 # get_idd_relation {{{
 get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = NULL,
-                              name = FALSE, direction = c("ref_to", "ref_by")) {
+                              name = FALSE, direction = c("ref_to", "ref_by"), keep_all = FALSE) {
     assert(is.null(max_depth) || is_count(max_depth, TRUE))
     direction <- match.arg(direction)
 
@@ -472,6 +472,10 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
         col_on <- "field_id"
     }
 
+    if (keep_all) {
+        fld <- idd_env$field[J(id), on = col_on[[1L]], .SD, .SDcols = c("field_id", "class_id")]
+    }
+
     if (direction == "ref_to") {
         col_rec <- "src_field_id"
     } else if (direction == "ref_by") {
@@ -485,17 +489,44 @@ get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = N
 
     ref <- get_recref(idd_env$reference, id, col_on, col_rec, dep, max_depth)
 
+    if (keep_all) {
+        if (direction == "ref_to") {
+            set(ref, NULL, "class_id", NULL)
+            if (!nrow(ref) || max(ref$dep) == 0L) {
+                ref <- ref[fld, on = "field_id"]
+                set(ref, NULL, "dep", 0L)
+            } else {
+                ref0 <- ref[J(0L), on = "dep"]
+                ref0 <- ref0[fld, on = "field_id"]
+                set(ref0, NULL, "dep", 0L)
+                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
+            }
+        } else {
+            set(ref, NULL, "src_class_id", NULL)
+            setnames(fld, c("src_field_id", "src_class_id"))
+            if (!nrow(ref) || max(ref$dep) == 0L) {
+                ref <- ref[fld, on = "src_field_id"]
+                set(ref, NULL, "dep", 0L)
+            } else {
+                ref0 <- ref[J(0L), on = "dep"]
+                ref0 <- ref0[fld, on = "src_field_id"]
+                set(ref0, NULL, "dep", 0L)
+                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
+            }
+        }
+    }
+
     if (!name) return(ref)
 
-    ref <- add_relation_format_cols(idd_env, ref)
+    ref <- add_idd_relation_format_cols(idd_env, ref)
 
     cls <- switch(direction, ref_by = "IddRelationBy", ref_to = "IddRelationTo")
     setattr(ref, "class", c(cls, class(ref)))
     ref
 }
 # }}}
-# add_relation_format_cols {{{
-add_relation_format_cols <- function (idd_env, ref) {
+# add_idd_relation_format_cols {{{
+add_idd_relation_format_cols <- function (idd_env, ref) {
     # add all necessary columns for printing
     ref <- add_joined_cols(idd_env$class, ref, "class_id", "class_name")
     ref <- add_joined_cols(idd_env$class, ref, c(src_class_id = "class_id"),

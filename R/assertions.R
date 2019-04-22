@@ -84,13 +84,13 @@ on_fail(is_eplus_ver) <- function (call, env) {
 }
 # }}}
 # is_idd_ver {{{
-is_idd_ver <- function (ver, strict = FALSE, only_released = TRUE) {
+is_idd_ver <- function (ver, strict = FALSE, only_exist = TRUE) {
     if (isTRUE(strict) && !is_version(ver)) return(FALSE)
 
     is_ver <- identical(ver, "latest") || is_version(ver)
 
-    if (only_released)
-        is_ver && as.character(standardize_ver(ver)) %in% ALL_IDD_VER
+    if (only_exist)
+        is_ver && as.character(standardize_ver(ver)) %in% c(ALL_IDD_VER, names(.globals$idd))
     else is_ver
 }
 on_fail(is_idd_ver) <- function (call, env) {
@@ -310,9 +310,7 @@ on_fail(has_len) <- function (call, env) {
 # }}}
 # have_same_len {{{
 have_same_len <- function (x, y) {
-    x_len_fun <- if(is.data.frame(x)) nrow else length
-    y_len_fun <- if(is.data.frame(y)) nrow else length
-    x_len_fun(x) == y_len_fun(y)
+    NROW(x) == NROW(y)
 }
 on_fail(have_same_len) <- function (call, env) {
     paste(deparse(call$x), "and", deparse(call$y), "do not have the same length.")
@@ -366,9 +364,9 @@ on_fail(has_name) <- function (call, env) {
 }
 # }}}
 # has_ext {{{
-has_ext <- function (path, exts) tolower(tools::file_ext(path)) %in% tolower(exts)
+has_ext <- function (path, ext) tolower(tools::file_ext(path)) %chin% tolower(ext)
 on_fail(has_ext) <- function (call, env) {
-    ext <- eval(call$which, env)
+    ext <- eval(call$ext, env)
     paste(deparse(call$path),
         sprintf(
             ngettext(length(ext),

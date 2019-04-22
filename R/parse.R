@@ -1186,7 +1186,7 @@ sep_idf_lines <- function (dt, type_enum) {
         body = stri_trim_right(stri_sub(string, to = excl_loc - 1L)),
         comment = stri_sub(string, excl_loc + 1L)
     )]
-    dt[!is.na(spcl_loc), `:=`(comment = stri_trim_left(stri_sub(comment, 2L)))]
+    dt[is.na(excl_loc) & !is.na(spcl_loc), `:=`(comment = stri_trim_left(stri_sub(comment, 2L)))]
 
     set(dt, NULL, c("excl_loc", "spcl_loc"), NULL)
 
@@ -1364,16 +1364,16 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     dt <- unique(dt)
 
     # get table
-    dt_object <- dt[type <= type_enum$object_value, .SD, .SDcols = c("object_id", "class_id", "comment")]
+    dt_object <- dt[type <= type_enum$object_value, .SD, .SDcols = c("object_id", "class_id", "comment", "type")]
 
     # clean comment
-    clean_comment <- function (x) {
-        x <- x[!stri_isempty(x)]
+    clean_comment <- function (x, type) {
+        x <- x[type == type_enum$comment]
         if (!length(x)) NULL else x
     }
 
     dt_object <- dt_object[,
-        list(class_id = class_id[1L], comment = list(clean_comment(comment))),
+        list(class_id = class_id[1L], comment = list(clean_comment(comment, type))),
         by = object_id
     ]
 
@@ -1483,11 +1483,18 @@ get_value_table <- function (dt, idd) {
 # update_object_name {{{
 update_object_name <- function (dt_object, dt_value) {
     if (!nrow(dt_value)) return(dt_object)
-    dt_value
     dt_nm <- dt_value[is_name == TRUE,
         list(object_name = value_chr, object_name_lower = stri_trans_tolower(value_chr)),
         by = "object_id"]
-    dt_nm[dt_object, on = "object_id"]
+    if (!nrow(dt_nm)) {
+        if (!has_name(dt_object, "object_name")) {
+            return(set(dt_object, NULL, c("object_name", "object_name_lower"), NA_character_))
+        } else {
+            return(dt_object)
+        }
+    }
+    dt_object[dt_nm, on = "object_id", `:=`(object_name = dt_nm$object_name, object_name_lower = dt_nm$object_name_lower)]
+    dt_object
 }
 # }}}
 

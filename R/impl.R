@@ -155,7 +155,7 @@ abort_bad_key <- function (error_type, key, value) {
 # }}}
 # abort_bad_which_type {{{
 abort_bad_which_type <- function (error_type, key, ...) {
-    mes <- paste0(key, " should be either an integer vector or a character vector", ...)
+    mes <- paste0(key, " should be either a positive integer vector or a character vector", ...)
     abort(error_type, mes)
 }
 # }}}

@@ -1,7 +1,97 @@
 #' @importFrom cli boxx rule cat_line symbol
 #' @importFrom crayon red green cyan yellow magenta bold
 #' @importFrom utils capture.output
+#' @importFrom stringi stri_dup
+#' @include impl.R
 NULL
+
+# tree_chars {{{
+# reference: https://github.com/r-lib/cli/blob/master/R/tree.R#L111
+tree_chars <- function() {
+    if (l10n_info()$`UTF-8`) {
+        list("v" = "\u2502",
+             "h" = "\u2500",
+             "p" = "\u251C",
+             "l" = "\u2514",
+             "j" = "\u251C",
+             "u" = "^",
+             "d" = "v"
+        )
+    } else {
+        list("v" = "|",
+             "h" = "-",
+             "p" = "+",
+             "l" = "\\",
+             "j" = "|",
+             "u" = "^",
+             "d" = "v"
+        )
+    }
+}
+# }}}
+
+# tree_prefix {{{
+tree_prefix <- function () {
+    list(
+        start = paste0(tree_chars()$p, tree_chars()$h),
+        start_e = "  ",
+        end = paste0(tree_chars()$l, tree_chars()$h),
+        end_e = "  ",
+        mid = paste0(tree_chars()$v, tree_chars()$h),
+        mid2 = paste0(tree_chars()$v, " "),
+        mid_e = "  "
+    )
+}
+# }}}
+
+# add_prefix {{{
+add_prefix <- function (lst) {
+    combine_sub <- function (x, first_prefix, other_prefix = NULL) {
+        apply_fun <- if (is.list(x)) lapply else vcapply
+        if (is.list(x)) {
+            before <- function (x) unlist(x, use.names = FALSE)
+            after <- list
+        } else {
+            before <- identity
+            after <- identity
+        }
+        if (length(x) == 1L) {
+            x <- apply_fun(x, function (x) paste(first_prefix, unlist(x, use.names = FALSE)))
+        } else if (length(x) > 1L) {
+            x[1L] <- apply_fun(x[1L], function (x) paste(first_prefix, unlist(x, use.names = FALSE)))
+            x[-1L] <- apply_fun(x[-1L], function (x) paste(other_prefix, unlist(x, use.names = FALSE)))
+        }
+        x
+    }
+
+    l <- length(lst)
+    apply_fun <- if (is.list(lst)) lapply else vcapply
+    if (l == 1L) {
+        # \- X: Name
+        #    \- Class
+        #       |- X: Field1
+        #       \- X: Field2
+        lst[[1L]] <- combine_sub(lst[[1L]], tree_prefix()$end, tree_prefix()$mid_e)
+    } else {
+        # |- X: Name
+        # |  \- Class
+        # |     |- X: Field1
+        # |     \- X: Field2
+        lst[[1L]] <- combine_sub(lst[[1L]], tree_prefix()$start, tree_prefix()$mid2)
+        # |- X: Name
+        # |  \- Class
+        # |     |- X: Field1
+        # |     \- X: Field2
+        lst[-c(1L, l)] <- apply_fun(lst[-c(1L, l)], combine_sub, first_prefix = tree_prefix()$mid, tree_prefix()$mid2)
+        # \- X: Name
+        #    \- Class
+        #       |- X: Field1
+        #       \- X: Field2
+        lst[[l]] <- combine_sub(lst[[l]], tree_prefix()$end, tree_prefix()$mid_e)
+    }
+    lst
+}
+# }}}
 
 # format_header: return header of an Idf output {{{
 format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
@@ -15,7 +105,6 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
 
     header_option <- paste0("!-Option ", save_format)
 
-    special_format <- NULL
     if (special_format) {
         warn("warning_special_format",
             paste0("Currently, special format for classes such as ",
@@ -24,6 +113,8 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
             )
         )
     }
+    special_format <- NULL
+
     if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
 
     header_option <- stri_trim_right(paste0(header_option, " ", special_format, " ", in_ip))
@@ -39,8 +130,8 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
 }
 # }}}
 
-# format_output: return whole Idf output {{{
-format_output <- function (
+# format_idf: return whole Idf output {{{
+format_idf <- function (
     dt_value, dt_object = NULL, dt_order = NULL,
     header = TRUE, comment = TRUE, save_format = c("sorted", "new_top", "new_bot"),
     special_format = FALSE, leading = 4L, in_ip = FALSE, sep_at = 29L, index = FALSE,
@@ -51,303 +142,685 @@ format_output <- function (
 
     save_format <- match.arg(save_format)
     assert(
-        is_count(leading),
+        is_count(leading, zero = TRUE),
         is_flag(in_ip),
-        is_count(sep_at),
+        is_count(sep_at, zero = TRUE),
         is_flag(index),
         is_flag(blank),
         is_flag(end),
         is_flag(required)
     )
 
-    # object order {{{
-    if (save_format == "sorted") {
-        setorderv(dt_value, c("class_id", "object_id", "field_index"))
-    } else {
-        assert(!is.null(dt_order))
-        dt_value <- dt_value[dt_order, on = "object_id"]
-        if (save_format == "new_top") {
-            setorderv(dt_value,
-                c("object_order", "object_id", "class_id", "field_index"),
-                c(-1L, 1L, 1L, 1L)
-            )
-        } else {
-            setorderv(dt_value,
-                c("object_order", "object_id", "class_id", "field_index"),
-                c(1L, 1L, 1L, 1L)
-            )
-        }
-        set(dt_value, NULL, "object_order", NULL)
-    }
-    # }}}
+    setorderv(dt_value, c("object_id", "field_index"))
 
     # get field value
     fld <- format_field(dt_value, leading = leading, sep_at = sep_at,
         index = index, blank = blank, end = end, required = required)
 
     # init output as field values
-    set(dt_value, NULL, "output", fld)
-    on.exit({set(dt_value, NULL, "output", NULL);invisible()}, add = TRUE)
+    set(dt_value, NULL, "fmt", fld)
+    on.exit(set(dt_value, NULL, "fmt", NULL), add = TRUE)
 
-    # add class name per object
-    dt_value[field_index == 1L, output := paste0(class_name, ",\n", output)]
+    # format objects
+    out <- dt_value[, list(
+        class_id = class_id[[1L]], class_name = class_name[[1L]],
+        fmt = list(object = c(paste0(class_name[[1L]], ","), fmt))),
+        by = c("object_id")
+    ]
 
     # add comments
-    if (comment) {
-        assert(!is.null(dt_object))
-        cmt <- format_comment(dt_object)
-        dt_value[cmt, on = "object_id", mult = "first",
-            output := paste0(cmt$comment, "\n", output)
+    if (!comment) {
+        out[, `:=`(fmt = list(c(list(NULL), fmt))), by = c("object_id")]
+    } else {
+        out[dt_object, on = "object_id",
+            `:=`(fmt = list(
+                {
+                    if (is.null(dt_object$comment[[.GRP]])) {
+                        c(list(NULL), fmt)
+                    } else {
+                        c(list(paste0("!", dt_object$comment[[.GRP]])), fmt)
+                    }
+                }
+            )),
+            by = c("object_id")
         ]
     }
 
-    # add class heading for sorted format
+    # object order {{{
     if (save_format == "sorted") {
-        dt_value[dt_value[, .I[1L], by = list(class_id)]$V1,
-            output := paste0(
-                "\n",
-                "!-   ===========  ALL OBJECTS IN CLASS: ", stri_trans_toupper(class_name), " ===========",
-                "\n\n",
-                output
-            )
+        setorderv(out, c("class_id", "object_id"))
+        # nest by class
+        out <- out[, list(class_name = class_name[[1L]],
+            fmt = list(c(format_class_header(class_name[[1L]]), fmt))),
+            by = c("class_id")
         ]
     } else {
-        dt_value[field_index == 1L, output := paste0("\n", output)]
+        assert(!is.null(dt_order))
+        out[J(dt_order$object_id), on = "object_id", object_order := dt_order$object_order]
+        if (save_format == "new_top") {
+            setorderv(out, c("object_order", "object_id"), c(-1L, 1L))
+        } else {
+            setorderv(out, c("object_order", "object_id"), c(1L, 1L))
+        }
+        set(out, NULL, "object_order", NULL)
     }
-
-    # add blank line after each object
-    dt_value[dt_value[, .I[.N], by = "object_id"]$V1, output := paste0(output, "\n")]
+    # }}}
 
     if (header)
         h <- format_header(save_format = save_format, view_in_ip = in_ip, special_format = special_format)
     else h <- NULL
 
-    unlist(stringi::stri_split_lines(c(h, dt_value$output), omit_empty = FALSE),
-        recursive = FALSE, use.names = FALSE
-    )
+    list(header = h, format = out)
 }
 # }}}
 
-# format_refmap: return pretty formatted tree string for IdfObjectRefMap {{{
-format_refmap <- function (ref_map, in_ip = FALSE) {
-    assert(inherits(ref_map, "IdfObjectRefMap"))
-
-    ref_by <- format_refmap_sgl(ref_map$reference_by, "by", in_ip)
-    ref_from <- format_refmap_sgl(ref_map$reference_from, "from", in_ip)
-
-    out <- c(ref_by, ref_from)
-    return(out)
+# format_class_header {{{
+format_class_header <- function (class) {
+    paste0("!-   ===========  ALL OBJECTS IN CLASS: ", stri_trans_toupper(class), " ===========")
 }
 # }}}
 
-# format_refmap_sgl: return pretty formatted tree string for IdfObjectRefMap for one direction {{{
-format_refmap_sgl <- function (ref_sgl, type = c("by", "from"), in_ip = FALSE) {
-    type <- match.arg(type)
-    if (not_empty(ref_sgl)) {
-
-        nms <- names(ref_sgl)
-        prefix <- switch(type, by = "target_", from = "reference_")
-        is_other <- setdiff(grep(prefix, nms, fixed = TRUE), paste0(prefix, "object"))
-        self <- ref_sgl[, .SD, .SDcols = nms[-is_other]]
-        other <- ref_sgl[, .SD, .SDcols = c("value_id", nms[is_other])]
-        setnames(other,
-            c("ori_value_id", gsub(prefix, "", nms[is_other], fixed = TRUE)))
-        sp_self <- split(unique(self), by = "value_id")
-        sp_other <- split(other, by = "ori_value_id")
-        fld_self <- lapply(sp_self, format_objects, in_ip = in_ip)
-        fld_other <- lapply(sp_other, function (x) {
-            c(paste0(format_objects(x, in_ip = in_ip), "  "), "")
-        })
-        fld_list <- mapply(function (x, y) {
-            c(x, cli::boxx(y, padding = 0L, float = "left", align = "left"))
-        }, fld_self, fld_other, SIMPLIFY = TRUE)
-        fld <- unlist(fld_list, use.names = FALSE)
-    } else {
-        fld <- "  <NONE>"
+# switch_ref_src {{{
+switch_ref_src <- function (dt, types, invert = FALSE) {
+    pair <- function (type, src = FALSE) {
+        if (type == "value") {
+            suffix <- c("_id", "_chr", "_num")
+        } else if (type == "field") {
+            suffix <- c("_id", "_name", "_index")
+        } else if (type == "type_enum") {
+            suffix <- c("")
+        } else {
+            suffix <- c("_id", "_name")
+        }
+        if (src) {
+            paste0(type, suffix)
+        } else {
+            paste0("src_", type, suffix)
+        }
     }
-    header_str <- switch(type,
-        by = "* Fields feferenced by other objects *",
-        from = "* Fields referencing other objects *")
-    header <- cli::rule(center = header_str, line = 1)
-    out <- c("", header, fld)
-    return(out)
+    old <- c(pair("class"), pair("object"), pair("field"), pair("value"), pair("type_enum"),
+        pair("class", TRUE), pair("object", TRUE), pair("field", TRUE), pair("value", TRUE), pair("type_enum", TRUE)
+    )
+    new <- c(pair("class", TRUE), pair("object", TRUE), pair("field", TRUE), pair("value", TRUE), pair("type_enum", TRUE),
+        pair("class"), pair("object"), pair("field"), pair("value"), pair("type_enum")
+    )
+    if (invert) {
+        setnames(dt, new[new %chin% names(dt)], old[new %chin% names(dt)])
+    } else {
+        setnames(dt, old[old %chin% names(dt)], new[old %chin% names(dt)])
+    }
+}
+# }}}
+
+# format_idd_relation: return pretty formatted tree string for Relation {{{
+format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
+    by_field <- attr(ref, "by_field") %||% FALSE
+    if (!nrow(ref)) {
+        if (by_field) {
+            return(data.table(class_id = integer(), field_id = integer(), ref_class = character(), fmt = list()))
+        } else {
+            return(data.table(class_id = integer(), fmt = list()))
+        }
+    }
+    # example {{{
+    # for fields that are referred by others
+    # Class: Construction
+    # |- 1: Name
+    # |  ^
+    # |  |- Class: BuildingSurface:Detailed         [Dep1]
+    # |  |  |- 3: Construction Name
+    # |  |  |  ^
+    # |  |  |  \- Class: BuildingSurface:Detailed   [Dep2]
+    # |  |  |     \- 5: Other Name2
+    # |  |  |
+    # |  |  |- 4: Other Name
+    # |  |  \- 5: Other Name2
+    # |  |
+    # |  \- Class: Wall:Detailed
+    # |     |- 2: Construction Name
+    # |     |- 4: Other Name
+    # |     \- 5: Other Name2
+    # |
+    # \- 2: Name2
+    #    ^
+    #    |- Class: RoofCeiling:Detailed
+    #    |  |- 2: Construction Name
+    #    |  \- 4: Construction Name2
+    #    |
+    #    \- Class: Floor:Detailed
+    #       |- 2: Construction Name
+    #       \- 4: Construction Name2
+    #
+    # for fields that refer others
+    # Class: Construction
+    # |- 1: Name
+    # |  v
+    # |  |- Class: BuildingSurface:Detailed
+    # |  |  |- 3: Construction Name
+    # |  |  |- 4: Other Name
+    # |  |  \- 5: Other Name2
+    # |  |
+    # |  \- Class: Wall:Detailed
+    # |     |- 2: Construction Name
+    # |     |- 4: Other Name
+    # |     \- 5: Other Name2
+    # |
+    # \- 2: Name2
+    #    v
+    #    |- Class: RoofCeiling:Detailed
+    #    |  |- 2: Construction Name
+    #    |  \- 4: Construction Name2
+    #    |
+    #    \- Class: Floor:Detailed
+    #       |- 2: Construction Name
+    #       \- 4: Construction Name2
+    # }}}
+    direction <- match.arg(direction)
+
+    cls <- format_class
+    fld <- function (dt) {
+        paste0("Field: <",
+            format_field(dt, leading = 0L, sep_at = 15L, index = TRUE, prefix = FALSE, pad_char = "0"), ">")
+    }
+    pointer <- switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+
+    d <- max(ref$dep)
+    out <- data.table()
+
+    # simple switch column names
+    if (direction == "ref_by") {
+        switch_ref_src(ref)
+        on.exit(switch_ref_src(ref, invert = TRUE))
+    }
+
+    while (d >= 0L) {
+        ref_dep <- ref[J(d), on = "dep"]
+        set(ref_dep, NULL, "ref_class", cls(ref_dep))
+        set(ref_dep, NULL, "ref_field", fld(ref_dep))
+        set(ref_dep, NULL, "src_class", cls(ref_dep[, list(class_name = src_class_name)]))
+        set(ref_dep, NULL, "src_field",
+            as.list(fld(ref_dep[, list(
+                class_id = src_class_id, field_index = src_field_index,
+                field_name = src_field_name
+            )]))
+        )
+
+        if (nrow(out)) {
+            ref_dep[out, on = c(src_class_id = "class_id", src_field_id = "field_id"),
+                `:=`(src_field = list(c(src_field, out$fmt[[.GRP]]))),
+                by = c("src_class_id", "src_field_id")
+            ]
+        }
+
+        out <- ref_dep[,
+            {
+                if (is.na(src_class_id)) {
+                    fmt <- list()
+                } else {
+                    fmt <- list(c(src_class[[1L]], add_prefix(src_field), ""))
+                }
+
+                list(ref_class = ref_class[[1L]], ref_field = ref_field[[1L]], fmt = fmt)
+            },
+            by = c("class_id", "field_id", "src_class_id")
+        ][,
+            {
+                if (is.null(fmt[[1L]])) {
+                    fmt <- list()
+                } else {
+                    fmt <- list(c(
+                        paste0(pointer, stri_dup("~", nchar(ref_field[[1L]]) - 1L)),
+                        unlist(add_prefix(fmt), use.names = FALSE)
+                    ))
+                }
+                list(ref_class = ref_class[[1L]], ref_field = ref_field[[1L]], fmt = fmt)
+            },
+            by = c("class_id", "field_id")
+        ]
+
+        if (d == 0L) {
+            out <- out[,
+                list(ref_class = ref_class[[1L]],
+                     fmt = list(c(ref_field, unlist(fmt, use.names = FALSE)))
+                ),
+                by = c("class_id", "field_id")
+            ]
+
+            if (by_field) {
+                out[, `:=`(fmt = add_prefix(fmt)), by = "class_id"]
+            } else {
+                out <- out[,
+                    list(fmt = list(c(ref_class[[1L]], unlist(add_prefix(fmt), use.names = FALSE)))),
+                    by = "class_id"
+                ]
+            }
+        }
+
+        d <- d - 1L
+    }
+    setattr(out, "by_field", by_field)
+    out
+}
+# }}}
+
+# format_idf_relation: return pretty formatted tree string for Relation {{{
+format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
+    by_value <- attr(ref, "by_value") %||% FALSE
+    if (!nrow(ref)) {
+        if (by_value) {
+            return(data.table(object_id = integer(), value_id = integer(), fmt = list()))
+        } else {
+            return(data.table(object_id = integer(), fmt = list()))
+        }
+    }
+    # example {{{
+    # for fields that are referred by others
+    # Object [ID:1] <WD01>
+    # |- 1: "WD01", !- Name
+    # |  ^~~~~~~~~~~~~~~~~~
+    # |  |- Object [ID:2]
+    # |  |  \- 3: "WD01", !- Construction Name
+    # |  |
+    # |  \- Object [ID:2]
+    # |     \- 3: "WD01", !- Construction Name
+    # |
+    # \- 2: "WD03", !- XXX
+    #    ^~~~~~~~~~~~~~~~~~
+    #    |- Object [ID:5]
+    #    |  \- 3: "WD03", !- Construction Name
+    #    |
+    #    \- Object [ID:6]
+    #       \- 3: "WD03", !- Construction Name
+    # }}}
+    direction <- match.arg(direction)
+
+    pointer <- switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+
+    d <- max(ref$dep)
+    out <- data.table()
+
+    # simple switch column names
+    if (direction == "ref_by") {
+        switch_ref_src(ref)
+        on.exit(switch_ref_src(ref, invert = TRUE))
+    }
+
+    set(ref, NULL, "ref_class", format_class(ref))
+    set(ref, NULL, "ref_object", format_object(ref))
+    set(ref, NULL, "ref_value", format_field_by_parent(ref, "value"))
+    switch_ref_src(ref, invert = FALSE)
+    set(ref, NULL, "src_class", format_class(ref))
+    set(ref, NULL, "src_object", format_object(ref))
+    set(ref, NULL, "src_value", as.list(format_field_by_parent(ref, "value")))
+    switch_ref_src(ref, invert = TRUE)
+
+    # simple switch column names
+    while (d >= 0L) {
+        ref_dep <- ref[J(d), on = "dep"]
+
+        if (nrow(out)) {
+            ref_dep[out, on = c(src_object_id = "object_id", src_value_id = "value_id"),
+                `:=`(src_value = list(c(src_value, out$fmt[[.GRP]]))),
+                by = c("src_object_id", "src_value_id")
+            ]
+        }
+
+        out <- ref_dep[,
+            {
+                if (is.na(src_object_id)) {
+                    fmt <- list()
+                } else {
+                    fmt <- list(c(
+                        src_class[[1L]],
+                        add_prefix(list(c(src_object[[1L]], add_prefix(src_value)))),
+                        ""
+                    ))
+                }
+                list(ref_class = ref_class[[1L]], ref_object = ref_object[[1L]],
+                    ref_value = ref_value[[1L]], fmt = fmt
+                )
+            },
+            by = c("object_id", "value_id", "src_object_id")
+        ][,
+            {
+                if (is.null(fmt[[1L]])) {
+                    fmt <- list()
+                } else {
+                    fmt <- list(c(
+                        paste0(pointer, stri_dup("~", nchar(ref_value[[1L]]) - 1L)),
+                        unlist(add_prefix(fmt), use.names = FALSE)
+                    ))
+                }
+                list(ref_class = ref_class[[1L]], ref_object = ref_object[[1L]],
+                     ref_value = ref_value[[1L]], fmt = fmt
+                )
+            },
+            by = c("object_id", "value_id")
+        ]
+
+        if (d == 0L) {
+            out <- out[,
+                list(ref_class = ref_class[[1L]],
+                     ref_object = ref_object[[1L]],
+                     fmt = list(c(ref_value, unlist(fmt, use.names = FALSE)))
+                ),
+                by = c("object_id", "value_id")
+            ]
+
+            if (by_value) {
+                out[, `:=`(fmt = add_prefix(fmt)), by = "object_id"]
+            } else {
+                out <- out[,
+                    list(fmt = list(c(
+                        ref_class[[1L]],
+                        add_prefix(list(c(ref_object[[1L]], unlist(add_prefix(fmt), use.names = FALSE))))
+                    ))),
+                    by = "object_id"
+                ]
+            }
+        }
+
+        d <- d - 1L
+    }
+    setattr(out, "by_value", by_value)
+    out
+}
+# }}}
+
+# format_possible: return pretty formatted list of possible field values {{{
+format_possible <- function (x) {
+    set(x, NULL, "field", paste0(x$field_index, ": ", x$field_name))
+    on.exit(set(x, NULL, "field", NULL), add = TRUE)
+
+    cols <- NULL
+
+    # auto {{{
+    if (has_name(x, "auto")) {
+        set(x, NULL, "fmt_auto", paste0("* Auto value: ",
+            {
+                tmp <- paste0("\"", x$auto, "\"")
+                tmp[is.na(x$auto)] <- "<NA>"
+                tmp
+            }
+        ))
+        on.exit(set(x, NULL, "fmt_auto", NULL), add = TRUE)
+        cols <- c(cols, "fmt_auto")
+    }
+    # }}}
+
+    # default {{{
+    if (has_name(x, "default")) {
+        set(x, NULL, "fmt_default", paste0("* Default: ",
+            vcapply(x$default, function (def) {
+                if (is.numeric(def)) {
+                    as.character(def)
+                } else if (is.na(def)) {
+                    "<NA>"
+                } else {
+                    paste0("\"", def, "\"")
+                }
+            })
+        ))
+        on.exit(set(x, NULL, "fmt_default", NULL), add = TRUE)
+        cols <- c(cols, "fmt_default")
+    }
+    # }}}
+
+    # choice {{{
+    if (has_name(x, "choice")) {
+        set(x, NULL, "fmt_choice", paste0("* Choice:",
+            vcapply(x$choice, function (cho) {
+                if (!length(cho)) return(" <NA>")
+                if (length(cho) > 5L) cho <- c(cho[1L:5L], "......")
+                paste0("\n", paste0("  - ", surround(cho, "\""), collapse = "\n"))
+            })
+        ))
+        on.exit(set(x, NULL, "fmt_choice", NULL), add = TRUE)
+        cols <- c(cols, "fmt_choice")
+    }
+    # }}}
+
+    # range {{{
+    if (has_name(x, "ranger")) {
+        set(x, NULL, "range", paste0("* Range: ", vcapply(x$range, format.Range)))
+        on.exit(set(x, NULL, "fmt_range", NULL), add = TRUE)
+        cols <- c(cols, "fmt_range")
+    }
+    # }}}
+
+    # source {{{
+    if (has_name(x, "source")) {
+        set(x, NULL, "fmt_source", paste0("* Source:",
+            vcapply(x$source, function (src) {
+                if (!length(src)) return("<NA>")
+                if (length(src) > 5L) src <- c(src[1L:5L], "......")
+                paste0("\n", paste0("  - ", surround(src, "\""), collapse = "\n"))
+            })
+        ))
+        on.exit(set(x, NULL, "fmt_source", NULL), add = TRUE)
+        cols <- c(cols, "fmt_source")
+    }
+    # }}}
+
+    if (has_name(x, "value_id")) {
+        res <- x[, .SD, .SDcols = c("object_id", "value_id", "field", cols)]
+    } else {
+        res <- x[, .SD, .SDcols = c("class_id", "field_id", "field", cols)]
+    }
+
+    res
+}
+# }}}
+
+# format_group {{{
+format_group <- function (dt) {
+    paste0("Group: <", dt$group_name, ">")
+}
+# }}}
+
+# format_class {{{
+format_class <- function (dt) {
+    paste0("Class: <", dt$class_name, ">")
+}
+# }}}
+
+# format_object {{{
+format_object <- function (dt) {
+    obj_nm <- paste0(" <", dt$object_name, ">")
+    obj_nm[is.na(dt$object_name)] <- ""
+    id <- as.character(dt$object_id)
+    id[!is.na(dt$object_id) & dt$object_id < 0L] <- paste0(
+        "Input #", -dt$object_id[!is.na(dt$object_id) & dt$object_id < 0L])
+    paste0("Object [ID:", id, "]", obj_nm)
+}
+# }}}
+
+# format_field_by_parent {{{
+format_field_by_parent <- function (dt, col = "value", sep_at = 15L) {
+    val <- col == "value"
+    # in order to keep index more tidy, have to format them based on
+    # parent index
+    if (has_name(dt, "object_id")) {
+        col_parent <- "object_id"
+    } else if (has_name(dt, "class_id")) {
+        col_parent <- "class_id"
+    } else if (has_name(dt, "group_id")) {
+        col_parent <- "group_id"
+    } else {
+        col_parent <- NULL
+    }
+
+    if (is.null(col_parent)) {
+        format_field(dt, leading = 0L, sep_at = sep_at, pad_char = "0",
+            value = val, quote = TRUE, blank = TRUE, index = TRUE, prefix = val)
+    } else {
+        l <- dt[, list(l = list(.I)), by = c(col_parent)]$l
+        out <- character(nrow(dt))
+        for (i in seq_along(l)) {
+            out[l[[i]]] <- format_field(dt[l[[i]]],
+                leading = 0L, sep_at = sep_at, pad_char = "0",
+                value = val, quote = TRUE, blank = TRUE, index = TRUE, prefix = val
+            )
+        }
+        out
+    }
 }
 # }}}
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
-format_objects <- function (dt_value, zoom = c("group", "class", "object", "field"), leading = 0L) {
-    zoom <- match.arg(zoom)
+format_objects <- function (dt, component = c("group", "class", "object", "field", "value"),
+                            brief = TRUE, merge = TRUE, sep_at = 15L, nest = TRUE, order = FALSE) {
+    all_comp <- c("group", "class", "object", "field", "value")
+    component <- all_comp[sort(chmatch(component, all_comp))]
+    assert(no_na(component), msg = paste0("`component` should be one or some of ", collapse(all_comp)))
 
-    spcs <- stringi::stri_dup(" ", leading)
+    # create each component {{{
+    if ("group" %chin% component) {
+        assert(has_name(dt, c("group_id", "group_name")), prefix = "Input")
+        set(dt, NULL, "group", format_group(dt))
+    }
 
-    # tree_chars {{{
-    # reference: https://github.com/r-lib/cli/blob/master/R/tree.R#L111
-    tree_chars <- function() {
-        if (l10n_info()$`UTF-8`) {
-            list("v" = "\u2502",
-                 "h" = "\u2500",
-                 "p" = "\u251C",
-                 "l" = "\u2514",
-                 "j" = "\u251C"
-            )
+    if ("class" %chin% component) {
+        assert(has_name(dt, c("class_id", "class_name")), prefix = "Input")
+        set(dt, NULL, "class", format_class(dt))
+    }
+
+    if ("object" %chin% component) {
+        assert(has_name(dt, c("object_id", "object_name")), prefix = "Input")
+        set(dt, NULL, "object", format_object(dt))
+    }
+
+    if ("value" %chin% component) {
+        assert(has_name(dt, c("value_id", "value_chr", "value_num")), prefix = "Input")
+        old_value <- dt[["value_chr"]]
+        if (merge) {
+            assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")))
+            set(dt, NULL, "value", format_field_by_parent(dt, "value", sep_at = sep_at))
+            component <- component[component != "field"]
         } else {
-            list("v" = "|",
-                 "h" = "-",
-                 "p" = "+",
-                 "l" = "\\",
-                 "j" = "|"
+            set(dt, NULL, "value",
+                paste0("Value: <",
+                format_value(dt, leading = 0L, length = 0L, quote = TRUE, end = NULL, blank = TRUE),
+                ">"
+                )
+            )
+        }
+    }
+
+    # should format "field" after "value" as if merge is TRUE, then formatting
+    # field is not necessary
+    if ("field" %chin% component) {
+        assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")), prefix = "Input")
+        if ((!"value" %chin% component) || ("value" %chin% component & !merge)) {
+            set(dt, NULL, "field", paste0("Field: <", format_field_by_parent(dt, "field", sep_at = sep_at), ">")
             )
         }
     }
     # }}}
-    # tree {{{
-    tree <- function (dt, leaf, branch, trunk = NULL, sep = FALSE) {
-        char <- tree_chars()
 
-        if (sep) {
-            set(dt, NULL, "prefix", paste0(char$v, " \n", stringi::stri_dup(" ", leading), char$v, char$h))
-        } else {
-            set(dt, NULL, "prefix", paste0(char$v, char$h))
-        }
+    col_id <- paste0(component, "_id")
 
-        dt[dt[, .I[1L], by = c(branch[1L])]$V1, prefix := paste0(char$p, char$h)]
-        dt[dt[, .I[.N], by = c(branch[1L])]$V1, prefix := paste0(char$l, char$h)]
-
-        if (sep) {
-            dt[setdiff(
-                dt[, .I[.N], by = c(branch[1L])]$V1,
-                dt[, .I[1L], by = c(branch[1L])]$V1),
-            prefix := paste0(char$v, " \n", stringi::stri_dup(" ", leading), prefix)]
-        }
-
-        if (!is.null(trunk)) {
-            set(dt, NULL, "branch_prefix", paste0(char$v, " "))
-            dt[J(dt[, get(branch[1L])[.N], by = c(trunk[1L])]$V1), on = c(branch[1L]), branch_prefix := "  "]
-            set(dt, NULL, "prefix", paste(dt$branch_prefix, dt$prefix))
-            set(dt, NULL, "branch_prefix", NULL)
-        }
-
-        set(dt, NULL, "tree", paste0(stringi::stri_dup(" ", leading), dt$prefix, " ", dt[[leaf]]))
-        set(dt, NULL, "prefix", NULL)
-
-        dt
+    # only one component is required
+    if (length(component) == 1L) {
+        return(setnames(dt[, .SD, .SDcols = c(col_id, component)], component, "out")[])
     }
-    # }}}
 
-    if (zoom %in% c("group", "class")) assert(has_name(dt_value, "group_name"))
-    if (zoom %in% c("object", "field")) assert(has_name(dt_value, "object_name"))
+    if (brief) {
+        # only the last component will be simplified
+        key_child <- stri_trans_toupper(stri_sub(component[[length(component)]], to = 1L))
 
-    if (zoom == "group") {
-        # {{{
-        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id")])
-        setorderv(dt, c("group_id"))
-        dt <- dt[, list(group_name = group_name[1L], num = length(class_id)), by = c("group_id")][
-            , tree := paste0(spcs, "[", lpad(num, "0"), "] Group: ", group_name)]
-        # }}}
-    } else if (zoom == "class") {
-        # {{{
-        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id", "class_name", "object_id")])
-        setorderv(dt, c("group_id", "class_id"))
-        dt <- dt[,
-            list(group_id = group_id[1L], group_name = group_name[1L],
-                 class_name = class_name[1L], num = length(object_id)
-            ), by = c("class_id")
-        ][, class := paste0(spcs, "[", lpad(num, "0"), "] Class: ", class_name)]
+        setorderv(dt, col_id[-length(component)])
 
-        dt <- tree(dt, "class", "group_id")
+        col_id <- col_id[-length(col_id)]
+        component <- component[-length(component)]
 
-        dt <- dt[, list(tree = paste0(spcs, "Group: ", group_name[1L], "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
-        dt[-1L, tree := paste0("\n", tree)]
-        # }}}
-    } else if (zoom == "object") {
-        # {{{
-        dt <- unique(dt_value[, .SD, .SDcols = c("group_id", "group_name", "class_id", "class_name", "object_id", "object_name")])
-        setorderv(dt, c("group_id", "class_id", "object_id"))
-        set(dt, NULL, "object", t_object_info(dt, c("name", "id"), numbered = FALSE, name_prefix = FALSE))
-        dt <- tree(dt, "object", "class_id", "group_id")
+        dt <- dt[, list(num = .N), by = c(col_id, component)]
 
-        dt <- dt[,
-            list(group_name = group_name[1L],
-                 group_id = group_id[1L],
-                 tree = paste0(spcs, "Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n"))
-            ),
-            by = "class_id"
-        ]
+        set(dt, NULL, component[[length(component)]],
+            paste0("[", lpad(dt$num, "0"), "<", key_child, ">] ", dt[[component[[length(component)]]]]))
+    }
 
-        dt <- tree(dt, "tree", branch = "group_id", sep = TRUE)
-        dt <- dt[, list(tree = paste0(spcs, "Group: ", group_name, "\n", paste0(tree, collapse = "\n"))), by = "group_id"]
-        dt[-1L, tree := paste0("\n", tree)]
-        # }}}
-    } else {
-        # {{{
-        setorderv(dt_value, c("class_id", "object_id", "field_index"))
-        set(dt_value, NULL, "field",
-            format_field(dt_value, leading = 1L, sep_at = 20L, index = TRUE, blank = TRUE)
-        )
-        on.exit({set(dt_value, NULL, "field", NULL);invisible()}, add = TRUE)
-
-        dt <- tree(dt_value, "field", "object_id", "class_id")
-
-        dt <- dt[,
-            list(class_name = class_name[1L],
-                 class_id = class_id[1L],
-                 object_name = object_name[1L],
-                 tree = paste0(tree, collapse = "\n")
-            ),
-            by = "object_id"
-        ]
-
-        set(dt, NULL, "object",
-            paste0(
-                t_object_info(dt, c("name", "id"), numbered = FALSE, name_prefix = FALSE),
-                "\n",
-                dt$tree
+    out <- dt
+    i <- length(component)
+    n <- i
+    while (i > 1L) {
+        parents <- NULL
+        for (j in seq.int(i-1L)) {
+            if (j == 1L) next
+            parents <- c(
+                parents,
+                paste0(component[[i-j]], " = ", component[[i-j]], "[[1L]]")
             )
+            j <- j - 1L
+        }
+
+        empty <- if (n == i) ", ''" else NULL
+        childen <- paste0(
+            component[[i-1L]], " = list(",
+            "c(", component[[i-1L]], "[[1L]], add_prefix(", component[[i]], ")", empty, "))"
         )
 
-        dt <- tree(dt, "object", "class_id", sep = TRUE)
+        if (is.null(parents) || stri_isempty(parents)) {
+            code <- paste0("list(", childen, ")")
+        } else {
+            code <- paste0("list(", paste0(parents, collapse = ","), ", ", childen, ")")
+        }
 
-        dt <- dt[,
-            list(tree = paste0(
-                spcs, "Class: ", class_name[1L], "\n", paste0(tree, collapse = "\n")
-            )),
-            by = "class_id"
-        ]
-
-        dt[-1L, tree := paste0("\n", tree)]
-        # }}}
+        if (nest || i != 2L) col_id <- col_id[-i]
+        out <- out[, eval(parse(text = code)), by = c(col_id)]
+        i <- i - 1L
     }
+    setnames(out, component[[1L]], "out")
 
-    dt$tree
+    col_del <- intersect(names(dt), c("group", "class", "field"))
+    if (length(col_del)) set(dt, NULL, col_del, NULL)
+    if (has_name(dt, "value_chr")) set(dt, NULL, "value_chr", old_value)
+
+    if (nest & order) setorderv(out, col_id)
+    out
 }
 # }}}
 
 # format_field: return Idf format field {{{
-format_field <- function (dt_value, leading = 4L, sep_at = 29L,
-                          index = FALSE, blank = FALSE, end = TRUE, required = FALSE) {
-
+format_field <- function (dt,
+                          # index
+                          leading = 4L, sep_at = 29L, index = FALSE, pad_char = " ",
+                          # value
+                          value = TRUE, quote = FALSE, blank = FALSE, end = TRUE, required = FALSE,
+                          # field
+                          prefix = TRUE) {
     idx <- NULL
 
     if (index) {
-        idx <- paste0(format_index(dt_value, required = required), ":")
+        idx <- paste0(format_index(dt, required = required, pad_char = pad_char), ": ")
     }
 
-    val <- format_value(dt_value, leading = leading, length = sep_at, blank = blank, end = end)
-    nm <- format_name(dt_value)
+    if (value) {
+        val <- format_value(dt, leading = leading, length = sep_at, quote = quote, blank = blank, end = end)
+    } else {
+        val <- NULL
+    }
+
+    nm <- format_name(dt, prefix)
 
     paste0(idx, val, nm)
 }
 # }}}
 
 # format_index: return right aligned field index {{{
-format_index <- function (dt_value, required = FALSE) {
-    if (required) assert(has_name(dt_value, "required_field"))
+format_index <- function (dt, required = FALSE, pad_char = " ") {
+    if (required) assert(has_name(dt, "required_field"))
 
-    idx <- lpad(dt_value$field_index)
+    if (any(!is.na(dt$field_index))) {
+        idx <- lpad(dt$field_index, pad_char, width = max(nchar(dt$field_index[!is.na(dt$field_index)], "width")))
+    } else {
+        idx <- as.character(dt$field_index)
+    }
 
     if (required) {
-        req <- rep(" ", nrow(dt_value))
-        req[dt_value$required_field] <- "*"
+        if (all(!dt$required_field)) return(idx)
+        req <- rep(" ", nrow(dt))
+        req[dt$required_field] <- "*"
         idx <- paste0(idx, req)
     }
 
@@ -356,25 +829,80 @@ format_index <- function (dt_value, required = FALSE) {
 # }}}
 
 # format_value: return Idf format value strings {{{
-format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
-                          end = TRUE) {
-    values <- dt_value$value
-    width <- leading + nchar(values) + 1L
-    if (blank) {
-        width[is.na(width)] <- leading + 7L + 1L
-        values[is.na(values)] <- s_blk("<Blank>")
-    } else {
-        width[is.na(width)] <- leading + 0L + 1L
-        values[is.na(values)] <- ""
-    }
-    width[width > length] <- length - 1L
-    pad <- stringi::stri_dup(" ", length - width)
+format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank = FALSE, end = TRUE) {
+    length <- max(length, 0L)
+    old <- dt$value_chr
+    if (is.null(old)) return(paste0(stri_dup(" ", leading), character(nrow(dt))))
 
-    if (!end) {
+    on.exit(set(dt, NULL, c("value_chr", "width"), list(old, NULL)), add = TRUE)
+    set(dt, NULL, "width", leading + nchar(dt$value_chr, "width") + 1L) # 1 for comma(,)
+
+    if (has_name(dt, "value_num")) {
+        dt[!is.na(value_num), `:=`(
+            value_chr = as.character(value_num),
+            width = leading + nchar(value_num, "width") + 1L)
+        ]
+    }
+
+    # get blank character and width {{{
+    if (blank) {
+        blk_chr <- if (quote) s_blk("<\"Blank\">") else s_blk("<Blank>")
+        blk_chr_w <- nchar("<\"Blank\">", "width")
+        blk_num <- s_blk("<Blank>")
+        blk_num_w <- nchar("<Blank>", "width")
+    } else {
+        blk_chr <- if (quote) s_blk("\"\"") else ""
+        blk_chr_w <- nchar("", "width")
+        blk_num <- ""
+        blk_num_w <- blk_chr_w
+    }
+    # }}}
+
+    # format value according to type {{{
+    if (!quote) {
+        dt[is.na(value_chr), `:=`(value_chr = blk_chr, width = leading + blk_chr_w + 1L)]
+    } else {
+        assert(has_name(dt, "type_enum"))
+
+        # character value
+        dt[type_enum > IDDFIELD_TYPE$real,
+            c("value_chr", "width") := ({
+                na <- is.na(value_chr)
+                width[na] <- leading + blk_chr_w + 1L
+                width[!na] <- width[!na] + 2L
+                value_chr[na] <- blk_chr
+                value_chr[!na] <- paste0("\"", value_chr[!na], "\"")
+                list(value_chr, width)
+            })
+        ]
+        # numeric value
+        dt[type_enum <= IDDFIELD_TYPE$real,
+            c("value_chr", "width") := ({
+                na <- is.na(value_chr)
+                value_chr[na] <- blk_num
+                width[na] <- leading + blk_num_w + 1L
+                list(value_chr, width)
+            })
+        ]
+    }
+    # }}}
+
+    if (length <= 0L) {
+        len <- 0L
+    } else {
+        len <- length - dt$width
+        len[len < 0L] <- 2L
+    }
+    pad <- stringi::stri_dup(" ", len)
+
+    values <- dt$value_chr
+    if (is.null(end)) {
+        res <- values
+    } else if (!end) {
         res <- paste0(values, ",")
     } else {
-        if (has_name(dt_value, "object_id")) {
-            is_end <- dt_value[, .I[.N], by = object_id]$V1
+        if (has_name(dt, "object_id")) {
+            is_end <- dt[, .I[.N], by = object_id]$V1
         } else {
             is_end <- length(values)
         }
@@ -388,146 +916,131 @@ format_value <- function (dt_value, leading = 4L, length = 29L, blank = FALSE,
 # }}}
 
 # format_name: return Idf format field names {{{
-format_name <- function (field_tbl) {
-    s_nm(paste0("!- ", field_tbl[["full_name"]]))
+format_name <- function (dt, prefix = TRUE) {
+    col_unit <- if (in_ip_mode()) "ip_units" else "units"
+    pre <- if (prefix) "!- " else NULL
+    u <- character(nrow(dt))
+    u[!is.na(dt[[col_unit]])] <- paste0(" {", dt[[col_unit]][!is.na(dt[[col_unit]])], "}")
+    paste0(pre, dt[["field_name"]], u)
 }
 # }}}
 
 # format_comment: return Idf format comments and macros {{{
-# NOTE: return a data.table
-format_comment <- function (dt_object) {
-    if (is.null(dt_object) || !nrow(dt_object)) return(NULL)
-
-    dt_object[!vapply(comment, function (x) all(stri_isempty(x)), logical(1L))][,
-        list(comment = paste0("!", unlist(comment, use.names = FALSE), collapse = "\n")),
-        by = "object_id"
-    ]
+format_comment <- function (dt) {
+    vcapply(dt$comment,
+        function (cmt) {
+            if (length(cmt)) {
+                paste0("!", unlist(cmt, use.names = FALSE), collapse = "\n")
+            } else {
+                NA_character_
+            }
+        }
+    )
 }
 # }}}
 
-# update_value_num: update value string and digits {{{
-update_value_num <- function (value_tbl, digits = 8L, in_ip = FALSE, prefix = "value") {
-    val_suffix <- c("", "_upper", "_num", "_ipnum")
-    req_val <- paste0(prefix, val_suffix)
-    assert(has_name(value_tbl, req_val))
-
-    # add unit conversion data if necessary
-    joined_before <- TRUE
-    if (!has_name(value_tbl, c("si_name", "mult", "offset"))) {
-        joined_before <- FALSE
-        assert(has_name(value_tbl, c("type", "units", "ip_units")))
-        value_tbl <- unit_conv_table[value_tbl, on = c(si_name = "units", ip_name = "ip_units")]
-    }
-    setnames(value_tbl,
-        c("si_name", "ip_name", req_val),
-        c("units", "ip_units", paste0("value", val_suffix)))
-
-    if (in_ip) {
-        value_tbl[
-            !is.na(value_ipnum) & type == "real",
-            `:=`(value = as.character(round(value_ipnum, digits = digits)))][
-            !is.na(value_ipnum) & type == "integer" & is_integer(value_ipnum),
-            `:=`(value = as.character(round(value_ipnum)))][
-            !is.na(value_ipnum) & !is.na(units),
-            `:=`(value_num = value_ipnum / mult - offset)]
+# Relatioin
+# print.IddRelationBy {{{
+print.IddRelationBy <- function (x, ...) {
+    cli::cat_rule("Referred by Others")
+    if (!nrow(x)) {
+        cli::cat_line("Target(s) is not referred by any other field.")
     } else {
-        value_tbl[
-            !is.na(value_num) & type == "real",
-            `:=`(value = as.character(round(value_num, digits = digits)))][
-            !is.na(value_num) & type == "integer" & is_integer(value_num),
-            `:=`(value = as.character(round(value_num)))][
-            !is.na(value_num) & !is.na(units),
-            `:=`(value_ipnum = value_num * mult + offset)]
+        lapply(format_idd_relation(x, "ref_by")$fmt,
+            function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
+        )
     }
-
-    value_tbl[, `:=`(value_upper = toupper(value))]
-
-    if (prefix != "value")
-        setnames(value_tbl, paste0("value", val_suffix), req_val)
-
-    if (joined_before)
-        setnames(value_tbl, c("units", "ip_units"), c("si_name", "ip_name"))
-
-    value_tbl
+    invisible(x)
+}
+# }}}
+# print.IddRelationTo {{{
+print.IddRelationTo <- function (x, ...) {
+    cli::cat_rule("Refer to Others")
+    if (!nrow(x)) {
+        cli::cat_line("Target(s) does not refer to any other field.")
+    } else {
+        lapply(format_idd_relation(x, "ref_to")$fmt,
+            function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
+        )
+    }
+    invisible(x)
+}
+# }}}
+# print.IddRelation {{{
+print.IddRelation <- function (x, ...) {
+    if (!is.null(x[["ref_to"]])) {print.IddRelationTo(x[["ref_to"]]); cli::cat_line()}
+    if (!is.null(x[["ref_by"]])) print.IddRelationBy(x[["ref_by"]])
+    invisible(x)
+}
+# }}}
+# print.IdfRelationBy {{{
+print.IdfRelationBy <- function (x, ...) {
+    by_value <- attr(x, "by_value") %||% FALSE
+    cli::cat_rule("Referred by Others")
+    if (!nrow(x)) {
+        cli::cat_line("Target(s) is not referred by any other field.")
+    } else {
+        if (by_value) {
+            lapply(format_idf_relation(x, "ref_by", TRUE)$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
+            )
+        } else {
+            lapply(format_idf_relation(x, "ref_by")$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
+            )
+        }
+    }
+    invisible(x)
+}
+# }}}
+# print.IdfRelationTo {{{
+print.IdfRelationTo <- function (x, ...) {
+    by_value <- attr(x, "by_value") %||% FALSE
+    cli::cat_rule("Refer to Others")
+    if (!nrow(x)) {
+        cli::cat_line("Target(s) does not refer to any other field.")
+    } else {
+        if (by_value) {
+            lapply(format_idf_relation(x, "ref_to", TRUE)$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
+            )
+        } else {
+            lapply(format_idf_relation(x, "ref_to")$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
+            )
+        }
+    }
+    invisible(x)
+}
+# }}}
+# print.IdfRelation {{{
+print.IdfRelation <- function (x, ...) {
+    if (!is.null(x[["ref_to"]])) {print.IdfRelationTo(x[["ref_to"]]); cli::cat_line()}
+    if (!is.null(x[["ref_by"]])) print.IdfRelationBy(x[["ref_by"]])
+    invisible(x)
 }
 # }}}
 
-# value_list: return a list of field values with correct types {{{
-value_list <- function (value_tbl, in_ip = FALSE) {
-    assert(has_name(value_tbl, c("value", "value_num", "value_ipnum", "type")))
-
-    num_col <- ifelse(in_ip, "value_ipnum", "value_num")
-
-    value_tbl[, out := as.list(value)]
-    value_tbl[type %in% c("integer", "real") & !value_upper %in% c("AUTOSIZE", "AUTOCALCULATE"),
-        out := list(as.list(get(num_col)))]
-
-    res <- value_tbl$out
-
-    if (is_scalar(res)) return(as.list(res))
-
-    res
-}
-# }}}
-
-# print.IdfObjectRefMap {{{
-print.IdfObjectRefMap <- function (x, ...) {
-    cli::cat_line(format_refmap(x, ...))
-}
-# }}}
-
-#' @export
+# Possible
 # print.IddFieldPossible {{{
 print.IddFieldPossible <- function (x, ...) {
-    dt <- data.table::copy(x)
+    fmt <- format_possible(x)
+    fmt[, field := rule(field), by = c(names(fmt)[1L:2L])]
 
-    dt[, header := cli::rule(crayon::bold(paste0(
-        field_index, ": Field ", surround(field_name))), col = "green"),
-        by = field_index
-    ]
+    cli::cat_line(
+        fmt[, list(out = paste0(Reduce(function (...) paste(..., sep = "\n"), .SD), "\n")),
+            .SDcols = names(fmt)[-c(1L:2L)]
+        ]$out
+    )
 
-    dt[-1L, header := paste0("\n", header)]
-
-    dt[, res := header]
-
-    dt[!is.na(auto),
-        res := paste0(res, "\n", crayon::cyan(paste0(
-            cli::symbol$bullet, " ", crayon::bold("Auto value"), ": ", surround(auto))))]
-
-    dt[!vapply(default, is.na, logical(1)),
-        res := paste0(res, "\n", crayon::cyan(paste0(
-            cli::symbol$bullet, " ", crayon::bold("Default"), ": ",
-            ifelse(is.character(default), surround(default), default)))
-        )
-    ]
-
-    dt[!vapply(choice, function (x) all(is.na(x)), logical(1)),
-        res := paste0(res, "\n", crayon::cyan(paste0(
-            cli::symbol$bullet, " ", crayon::bold("Choice"), ":\n" ,
-            paste0("  - ", surround(unlist(choice)), collapse = "\n")))),
-        by = field_index
-    ]
-
-    dt[, res_ran := paste0(vapply(range, function (x) capture.output(print.IddRanger(x)), character(1)))]
-    dt[res_ran == "<Not Applicable>", res_ran := NA_character_]
-    dt[!is.na(res_ran), res := paste0(res, "\n", crayon::cyan(paste0(
-            cli::symbol$bullet, " ", crayon::bold("Range"), ": ", res_ran
-        ))
-    )]
-
-    dt[!vapply(reference, is.null, logical(1)), res := paste0(res, "\n",
-        crayon::cyan(paste0(cli::symbol$bullet, " ", crayon::bold("References"), ":\n",
-            paste0(paste0("  - ", surround(unlist(reference))), collapse = "\n"))
-        )),
-        by = field_index
-    ]
-
-    dt[res == header, res := paste0(res, "\n", crayon::magenta("<Not Applicable>"))]
-    cli::cat_line(dt$res)
+    invisible(x)
 }
 # }}}
+# print.IdfValuePossible {{{
+print.IdfValuePossible <- print.IddFieldPossible
+# }}}
 
-#' @export
+# Range
 # format.Range {{{
 format.Range <- function (x, ...) {
     if (is.na(x$minimum) && is.na(x$maximum)) {
@@ -557,14 +1070,12 @@ format.Range <- function (x, ...) {
     paste0(left, ", ", right)
 }
 # }}}
-#' @export
 # print.Range {{{
 print.Range <- function (x, ...) {
     cat(format.Range(x, ...), "\n")
     invisible(x)
 }
 # }}}
-#' @export
 # as.character.Range{{{
 as.character.Range <- function (x, ...) {
     format.Range(x, ...)
@@ -572,6 +1083,15 @@ as.character.Range <- function (x, ...) {
 # }}}
 
 # STYLE
+# with_nocolor {{{
+with_nocolor <- function (...) {
+    # inorder to skip color control sequence
+    clr <- .globals$color
+    on.exit({.globals$color <- clr; invisible()}, add = TRUE)
+    .globals$color <- FALSE
+    force(...)
+}
+# }}}
 # has_color {{{
 has_color <- function () {
     requireNamespace("crayon") && crayon::has_color()

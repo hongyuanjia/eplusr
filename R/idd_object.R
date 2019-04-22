@@ -5,9 +5,10 @@ NULL
 #'
 #' `IddObject` is an abstraction of a single object in an `Idd` object. It
 #' provides more detail methods to query field properties. `IddObject` can only
-#' be created from the parent `Idd` object, using `$object()` and
-#' `$object_in_group()`. This is because that initialization of an `IddObject`
-#' needs some shared data from parent `Idd` object.
+#' be created from the parent `Idd` object, using `$object()`,
+#' `$object_in_group()` and other equivalent. This is because that
+#' initialization of an `IddObject` needs some shared data from parent `Idd`
+#' object.
 #'
 #' There are lots of properties for every class and field. For details on the
 #' meaning of each property, please see the heading comments in the
@@ -32,7 +33,7 @@ NULL
 #' iddobj$is_required()
 #' iddobj$is_unique()
 #' iddobj$is_extensible()
-#' iddobj$field_name(index = NULL, lower = FALSE, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
+#' iddobj$field_name(index = NULL, unit = FALSE)
 #' iddobj$field_index(name = NULL)
 #' iddobj$field_type(which = NULL)
 #' iddobj$field_note(which = NULL)
@@ -375,8 +376,14 @@ NULL
 #' @author Hongyuan Jia
 NULL
 
+# idd_object {{{
+idd_object <- function (parent, class) {
+    IddObject$new(class, parent)
+}
+# }}}
+
 # IddObject {{{
-IddObject <- R6::R6Class(classname = "IddObject",
+IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
 
     public = list(
         # INITIALIZE {{{
@@ -487,8 +494,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
         field_reference = function (which = NULL, type = c("all", "ref_by","ref_to"))
             iddobj_field_reference(self, private, which, match.arg(type)),
 
-        field_possible = function (which = NULL)
-            iddobj_field_possible(self, private, which),
+        field_possible = function (which = NULL, in_ip)
+            iddobj_field_possible(self, private, which, in_ip),
         # }}}
 
         # FIELD PROPERTY ASSERTIONS {{{
@@ -522,8 +529,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
         is_required_field = function (which = NULL)
             iddobj_is_required_field(self, private, which),
 
-        has_relation = function (which = NULL)
-            iddobj_has_relation(self, private, which),
+        has_ref = function (which = NULL)
+            iddobj_has_ref(self, private, which),
 
         has_ref_to = function (which = NULL)
             iddobj_has_ref_to(self, private, which),
@@ -544,8 +551,8 @@ IddObject <- R6::R6Class(classname = "IddObject",
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_class_id = NULL,
         m_parent = NULL,
+        m_class_id = NULL,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
@@ -685,7 +692,7 @@ iddobj_field_name <- function (self, private, index = NULL, lower = FALSE,
     if (!is.null(index)) assert(are_count(index))
 
     if (unit) {
-        res <- add_field_full_name(iddobj_field_data(self, private, index), fld)$full_name
+        res <- format_name(iddobj_field_data(self, private, index, "units", "ip_units"))
     } else {
         res <- iddobj_field_data(self, private, index)$field_name
     }
@@ -756,7 +763,14 @@ iddobj_field_range <- function (self, private, which = NULL) {
 # iddobj_field_relation {{{
 iddobj_field_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by")) {
     direction <- match.arg(direction)
-    get_iddfield_relation(private$idd_env(), private$m_class_id, which, TRUE, direction)
+
+    if (is.null(which)) {
+        get_iddobj_relation(private$idd_env(), private$m_class_id, NULL, TRUE, direction, TRUE)
+    } else {
+        fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
+
+        get_iddobj_relation(private$idd_env(), NULL, fld$field_id, TRUE, direction, TRUE)
+    }
 }
 # }}}
 # iddobj_field_reference {{{
@@ -766,10 +780,10 @@ iddobj_field_reference <- function (self, private, which = NULL, direction = c("
 }
 # }}}
 # iddobj_field_possible {{{
-iddobj_field_possible <- function (self, private, which = NULL, in_ip = eplusr_option("view_in_ip")) {
-    if (in_ip) .deprecated_arg("in_ip", "0.10.0", "IddObject")
+iddobj_field_possible <- function (self, private, which = NULL, in_ip) {
+    if (!missing(in_ip)) .deprecated_arg("in_ip", "0.10.0", "IddObject")
     fld <- iddobj_field_data(self, private, which, FIELD_COLS$property)
-    get_iddfield_possible(private$idd_env(), field_id = fld$field_id)
+    get_iddobj_possible(private$idd_env(), field_id = fld$field_id)
 }
 # }}}
 # iddobj_is_valid_field_num {{{
@@ -852,19 +866,35 @@ iddobj_is_required_field <- function (self, private, which) {
     iddobj_field_data(self, private, which, "required_field")$required_field
 }
 # }}}
-# iddobj_has_relation {{{
-iddobj_has_relation <- function (self, private, which = NULL) {
-    has_iddfield_relation(private$idd_env(), private$m_class_id, which)
+# iddobj_has_ref {{{
+iddobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to", "ref_by")) {
+    type <- match.arg(type)
+
+    if (is.null(which)) {
+        rel <- get_iddobj_relation(private$idd_env(), private$m_class_id, direction = type)
+    } else {
+        fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
+
+        rel <- get_iddobj_relation(private$idd_env(), NULL, fld$field_id, direction = type)
+    }
+
+    if (type == "all") {
+        nrow(rel$ref_to[!is.na(src_field_id)]) || nrow(rel$ref_by[!is.na(field_id)])
+    } else if (type == "ref_to") {
+        nrow(rel$ref_to[!is.na(src_field_id)]) > 0L
+    } else {
+        nrow(rel$ref_by[!is.na(field_id)]) > 0L
+    }
 }
 # }}}
 # iddobj_has_ref_by {{{
-iddobj_has_ref_by <- function (self, private, which) {
-    has_iddfield_ref_by(private$idd_env(), private$m_class_id, which)
+iddobj_has_ref_by <- function (self, private, which = NULL) {
+    iddobj_has_ref(self, private, which, "ref_by")
 }
 # }}}
 # iddobj_has_ref_to {{{
-iddobj_has_ref_to <- function (self, private, which) {
-    has_iddfield_ref_to(private$idd_env(), private$m_class_id, which)
+iddobj_has_ref_to <- function (self, private, which = NULL) {
+    iddobj_has_ref(self, private, which, "ref_to")
 }
 # }}}
 # iddobj_to_table {{{
@@ -921,9 +951,9 @@ iddobj_print <- function (self, private) {
         set(cls, NULL, "num_print", cls$num_fields)
     }
 
-    fld <- iddobj_field_data(self, private, seq_len(cls$num_print), "extensible_group")
-    set(fld, NULL, "name", format_name(fld))
-    set(fld, NULL, "index", format_index(fld))
+    fld <- iddobj_field_data(self, private, seq_len(cls$num_print), c("extensible_group", "required_field"))
+    set(fld, NULL, "name", format_name(fld, prefix = FALSE))
+    set(fld, NULL, "index", format_index(fld, required = TRUE))
 
     set(fld, NULL, "ext", "")
     fld[extensible_group > 0L, ext := paste0(" <", cli::symbol$arrow_down, ">")]

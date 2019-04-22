@@ -101,7 +101,14 @@ clone_generator <- function (x) {
 
 # read_lines {{{
 read_lines <- function(input, trim = TRUE, ...) {
-    dt <- fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...)
+    dt <- tryCatch(
+        fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
+        error = function (e) {
+            abort("error_read_file",
+                paste0("Failed to read input file. ", conditionMessage(e))
+            )
+        }
+    )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
     if (trim) {
@@ -173,7 +180,25 @@ vec_depth <- function (x) {
 }
 # }}}
 
-# appply2 {{{
+# vlapply {{{
+vlapply <- function (x, fun, ..., use.names = TRUE) {
+    vapply(x, FUN = fun, FUN.VALUE = logical(1L), ..., USE.NAMES = use.names)
+}
+# }}}
+
+# viapply {{{
+viapply <- function (x, fun, ..., use.names = TRUE) {
+    vapply(x, FUN = fun, FUN.VALUE = integer(1L), ..., USE.NAMES = use.names)
+}
+# }}}
+
+# vcapply {{{
+vcapply <- function (x, fun, ..., use.names = TRUE) {
+    vapply(x, FUN = fun, FUN.VALUE = character(1L), ..., USE.NAMES = use.names)
+}
+# }}}
+
+# apply2 {{{
 apply2 <- function (x, y, fun, more_args = NULL) {
     mapply(FUN = fun, x, y, MoreArgs = more_args, SIMPLIFY = FALSE)
 }
@@ -261,6 +286,9 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
         "class", c("Range", "list")
     )
 }
+# as_Range.character <- function (x) {
+# "([\\(\\[])\\s*(\\d+)\\s*,\\s*(\\d+|Inf)\\s*([\\)\\]])"
+# }
 # }}}
 
 # append_dt {{{
@@ -299,7 +327,7 @@ fmt_int <- function (x, digits = 1L) sprintf(paste0("%.", digits, "f"), x)
 
 # wday {{{
 wday <- function (x, label = FALSE) {
-    lubridate::wday(x, label = label, abbr = FALSE, week_start = 1L, local = "C")
+    lubridate::wday(x, label = label, abbr = FALSE, week_start = 1L, locale = "C")
 }
 # }}}
 
@@ -307,10 +335,25 @@ wday <- function (x, label = FALSE) {
 # adopted from tidyverse/lubridate/R/deprecated.R
 .deprecated_fun <- function(name, replacement, class = NULL, version) {
     class <- if (is.null(class)) "" else paste0(" in ", class, " class")
-    msg <- paste0(sprintf("`%s` is deprecated%s in version `%s`. Please use `%s` instead.",
+    msg <- paste0(sprintf("`%s` is deprecated%s in eplusr version `%s`. Please use `%s` instead.",
         name, class, version, replacement)
     )
     .deprecated(msg, version)
+}
+# }}}
+
+# .deprecated_arg {{{
+.deprecated_arg <- function(arg, version, class = NULL, n_call = 1) {
+    name <- paste0(as.character(sys.call(-n_call)[[1]]), "()")
+    if (!is.null(class)) {
+        name <- sub(".*?_", "$", name)
+        cls <- paste0(" in class '", class, "'")
+    } else {
+        cls <- ""
+    }
+    mes <- sprintf("Parameter `%s` of `%s`%s has been deprecated in eplusr version %s.",
+        arg, name, cls, version)
+    .deprecated(mes, version)
 }
 # }}}
 
@@ -335,8 +378,28 @@ wday <- function (x, label = FALSE) {
 str_trunc <- function (x, width = getOption("width")) {
     # in case invalid UTF-8 character in IDF
     x <- stringi::stri_encode(x)
-    tr <- nchar(x, "width") > 0.95 * (width)
-    x[tr] <- paste0(stri_sub(x[tr], to = 0.95 * (width)), "...")
+    tr <- nchar(x, "width") > (0.95 * width)
+    x[tr] <- paste0(stri_sub(x[tr], to = width - 5L), "...")
     x
+}
+# }}}
+
+# match_in_vec {{{
+match_in_vec <- function (x, vec, abbr = NULL, label = FALSE) {
+    x <- stri_trans_tolower(x)
+    vecl <- stri_trans_tolower(vec)
+    if (is.null(abbr)) abbr <- stri_sub(vecl, to = 3L)
+
+    m <- chmatch(x, vecl, nomatch = 0L)
+    m[m == 0L] <- chmatch(x[m == 0L], abbr, nomatch = 0L)
+
+    if (!label) {
+        m[m == 0L] <- NA_integer_
+        m
+    } else {
+        res <- rep(NA_character_, length(x))
+        res[m != 0L] <- vec[m[m != 0L]]
+        res
+    }
 }
 # }}}
