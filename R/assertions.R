@@ -340,7 +340,7 @@ on_fail(is_named) <- function (call, env) {
 # }}}
 # is_choice {{{
 is_choice <- function (x, choices) {
-    is.character(x) & stri_trans_tolower(x) %chin% stri_trans_tolower(choices)
+    is.character(x) & stri_trans_tolower(x) %in% stri_trans_tolower(choices)
 }
 on_fail(is_choice) <- function (call, env) {
     paste0(deparse(call$x), " should be one of ", collapse(eval(call$choices, env)))
@@ -364,7 +364,7 @@ on_fail(has_name) <- function (call, env) {
 }
 # }}}
 # has_ext {{{
-has_ext <- function (path, ext) tolower(tools::file_ext(path)) %chin% tolower(ext)
+has_ext <- function (path, ext) tolower(tools::file_ext(path)) %in% tolower(ext)
 on_fail(has_ext) <- function (call, env) {
     ext <- eval(call$ext, env)
     paste(deparse(call$path),

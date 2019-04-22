@@ -214,7 +214,7 @@ test_that("Idd formatting", {
         format_objects(get_idf_value(idd_parsed, idf_parsed),
             component = "value", merge = TRUE)$out[c(1,2,4,5)],
         c("1: \"WD01\",        !- Name",
-          "2: \"MediumSmooth\",  !- Roughness",
+          "2: \"MediumSmooth\",!- Roughness",
           "4: 0.115,         !- Conductivity {W/m-K}",
           "5: 513,           !- Density {kg/m3}"
         )
@@ -234,7 +234,7 @@ test_that("Idd formatting", {
             brief = FALSE)$out[[1L]],
         c("Object [ID:1] <WD01>",
           "├─ 1: \"WD01\",        !- Name",
-          "│─ 2: \"MediumSmooth\",  !- Roughness",
+          "│─ 2: \"MediumSmooth\",!- Roughness",
           "│─ 3: 0.019099999,   !- Thickness {m}",
           "│─ 4: 0.115,         !- Conductivity {W/m-K}",
           "│─ 5: 513,           !- Density {kg/m3}",
@@ -303,7 +303,7 @@ test_that("Idd formatting", {
         c("Class: <Material>",
           "├─ Object [ID:1] <WD01>",
           "│  ├─ 1: \"WD01\",        !- Name",
-          "│  │─ 2: \"MediumSmooth\",  !- Roughness",
+          "│  │─ 2: \"MediumSmooth\",!- Roughness",
           "│  │─ 3: 0.019099999,   !- Thickness {m}",
           "│  │─ 4: 0.115,         !- Conductivity {W/m-K}",
           "│  │─ 5: 513,           !- Density {kg/m3}",
@@ -314,7 +314,7 @@ test_that("Idd formatting", {
           "│  ",
           "└─ Object [ID:4] <WD02>",
           "   ├─ 1: \"WD02\",        !- Name",
-          "   │─ 2: \"MediumSmooth\",  !- Roughness",
+          "   │─ 2: \"MediumSmooth\",!- Roughness",
           "   │─ 3: 0.019099999,   !- Thickness {m}",
           "   └─ 4: 0.115;         !- Conductivity {W/m-K}",
           "   "

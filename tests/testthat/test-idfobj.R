@@ -214,7 +214,7 @@ test_that("IdfObject class", {
         )
     )
 
-    expect_equal(names(con$ref_to_object()), "WD01")
+    expect_equal(names(con$ref_to_object()), "NewMaterialName")
     expect_equal(names(con$ref_by_object()), "WALL-1PF")
 
     expect_true(con$has_ref())

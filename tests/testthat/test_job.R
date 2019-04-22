@@ -47,31 +47,70 @@ test_that("Job methods", {
     job <- eplus_job(example$idf, example$epw)
     expect_is({job$run();job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
-    expect_equal(names(job$errors()), c("completed", "successful", "data"))
-    expect_error(job$locate_output(".exe"), "Path.*does not exist")
-    expect_error(job$report_data_dict(), "Simulation SQL output does not exists")
+    expect_silent({err <- job$errors()})
+    expect_equal(names(err), c("eplus_version", "eplus_build", "datetime", "idd_version",
+        "successful", "terminated", "data"
+    ))
+    expect_equal(err$eplus_version, numeric_version("8.8.0"))
+    expect_equal(err$eplus_build, "7c3bbe4830")
+    expect_equal(err$idd_version, numeric_version("8.8.0"))
+    expect_equal(err$successful, TRUE)
+    expect_equal(err$terminated, FALSE)
+    expect_equal(names(err$data), c("index", "environment_index", "environment", "level_index", "level", "message"))
 
     # can retrieve simulation data
     idf <- read_idf(example$idf)
     job <- idf$run(example$epw, dir = NULL)
+    # can get all table names
+    expect_equal(length(job$list_table()), 44L)
+
+    # can read table
+    expect_error(job$read_table("a"), "no such table")
+    expect_is(job$read_table("Zones"), "data.table")
+
+    # can read report data dictionary
     expect_is(job$report_data_dict(), "data.table")
-    expect_is(job$report_data(), "data.table")
-    expect_is(job$tabular_data(), "data.table")
-    expect_false(has_name(job$report_data(name = "EnergyTransfer:Building", case = NULL), "Case"))
-    expect_true(has_name(job$report_data(name = "EnergyTransfer:Building"), "Case"))
-    expect_equal(unique(job$report_data(name = "EnergyTransfer:Building", case = "test")$Case), "test")
-    expect_equal(
-        unique(format(job$report_data(name = "EnergyTransfer:Building", year = 2016L)$DateTime, "%Y")),
-        "2016"
+
+    # can read report data
+    expect_equal(nrow(job$report_data()), 3840L)
+    expect_equal(nrow(job$report_data("")), 1344L)
+    expect_equal(nrow(job$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate")),
+        192L
     )
-    expect_equal(
-        attr(job$report_data(name = "EnergyTransfer:Building", year = 2016L, tz = "America/Chicago")$DateTime, "tzone"),
-        "America/Chicago"
+    expect_equal(nrow(job$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate")),
+        192L
     )
+    expect_equal(year(job$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate", year = 2010)$datetime),
+        rep(2010, 192)
+    )
+    expect_equal(lubridate::tz(job$report_data(tz = "Asia/Shanghai")$datetime),
+        "Asia/Shanghai"
+    )
+    expect_equal(job$report_data(case = "test")$case, rep("test", 3840))
+    expect_equal(names(job$report_data(all = TRUE)),
+        c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
+          "simulation_days", "day_type", "environment_name", "is_meter", "type",
+          "index_group", "timestep_type", "key_value", "name", "reporting_frequency",
+          "schedule_name", "units", "value"
+        )
+    )
+    expect_equal(nrow(job$report_data(period = seq(
+        lubridate::ymd_hms("2019-01-14 0:0:0"), lubridate::ymd_hms("2019-01-15 0:0:0"), "15 min")
+    )), 1900)
+    expect_equal(nrow(job$report_data(month = 1)), 1920)
+    expect_equal(nrow(job$report_data(month = 1, hour = 1)), 80)
+    expect_equal(nrow(job$report_data(minute = 0)), 960)
+    expect_equal(nrow(job$report_data(interval = 15)), 3840)
+    expect_equal(nrow(job$report_data(simulation_days = 1)), 3840)
+    expect_equal(nrow(job$report_data(day_type = "Tuesday")), 3840)
+    expect_equal(nrow(job$report_data(environment_name = "WINTERDAY")), 1920)
 
     skip_on_os("mac")
     # can get path
-    expect_equal(job$path(), c(example$idf, example$epw))
+    expect_equal(job$path(), c(idf = example$idf, epw = example$epw))
     expect_equal(job$path("idf"), c(example$idf))
     expect_equal(job$path("epw"), c(example$epw))
 

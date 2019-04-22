@@ -9,6 +9,10 @@ test_that("Sql methods", {
     expect_output(job <- read_idf(example$idf)$run(example$epw, NULL))
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
+    # path
+    expect_equal(sql$path(), normalizePath(file.path(tempdir(), "5Zone_Transformer.sql")))
+    expect_equal(sql$path_idf(), normalizePath(file.path(tempdir(), "5Zone_Transformer.idf")))
+
     # can get all table names
     expect_equal(length(sql$list_table()), 44L)
 
@@ -20,19 +24,54 @@ test_that("Sql methods", {
     expect_is(sql$report_data_dict(), "data.table")
 
     # can read report data
-    expect_is(sql$report_data(), "data.table")
-    expect_is(sql$tabular_data(), "data.table")
-    expect_false(has_name(sql$report_data(name = "EnergyTransfer:Building", case = NULL), "Case"))
-    expect_true(has_name(sql$report_data(name = "EnergyTransfer:Building"), "Case"))
-    expect_equal(unique(sql$report_data(name = "EnergyTransfer:Building", case = "test")$Case), "test")
-    expect_equal(
-        unique(format(sql$report_data(name = "EnergyTransfer:Building", year = 2016L)$DateTime, "%Y")),
-        "2016"
+    expect_equal(nrow(sql$report_data(sql$report_data_dict())), 3840L)
+    expect_equal(nrow(sql$report_data()), 3840L)
+    expect_equal(nrow(sql$report_data("")), 1344L)
+    expect_equal(nrow(sql$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate")),
+        192L
     )
-    expect_equal(
-        attr(sql$report_data(name = "EnergyTransfer:Building", year = 2016L, tz = "America/Chicago")$DateTime, "tzone"),
-        "America/Chicago"
+    expect_equal(nrow(sql$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate")),
+        192L
     )
+    expect_equal(year(sql$report_data(
+        "TRANSFORMER 1", "Transformer Load Loss Rate", year = 2010)$datetime),
+        rep(2010, 192)
+    )
+    expect_equal(lubridate::tz(sql$report_data(tz = "Asia/Shanghai")$datetime),
+        "Asia/Shanghai"
+    )
+    expect_equal(sql$report_data(case = "test")$case, rep("test", 3840))
+    expect_equal(names(sql$report_data(all = TRUE)),
+        c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
+          "simulation_days", "day_type", "environment_name", "is_meter", "type",
+          "index_group", "timestep_type", "key_value", "name", "reporting_frequency",
+          "schedule_name", "units", "value"
+        )
+    )
+    expect_equal(nrow(sql$report_data(period = seq(
+        lubridate::ymd_hms("2019-01-14 0:0:0"), lubridate::ymd_hms("2019-01-15 0:0:0"), "15 min")
+    )), 1900)
+    expect_equal(nrow(sql$report_data(month = 1)), 1920)
+    expect_equal(nrow(sql$report_data(month = 1, hour = 1)), 80)
+    expect_equal(nrow(sql$report_data(minute = 0)), 960)
+    expect_equal(nrow(sql$report_data(interval = 15)), 3840)
+    expect_equal(nrow(sql$report_data(simulation_days = 1)), 3840)
+    expect_equal(nrow(sql$report_data(day_type = "Tuesday")), 3840)
+    expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)
+
+    expect_equal(nrow(sql$tabular_data()), 6662)
+    expect_equal(nrow(sql$tabular_data(
+        report_name = c(
+            "AnnualBuildingUtilityPerformanceSummary",
+            "Initialization Summary"
+        ))),
+        3774
+    )
+    expect_equal(nrow(sql$tabular_data(table_name = "Site and Source Energy")), 12)
+    expect_equal(nrow(sql$tabular_data(column_name = "Total Energy")), 4)
+    expect_equal(nrow(sql$tabular_data(row_name = "Total Site Energy")), 3)
 
     skip_on_os("mac")
     # can get path

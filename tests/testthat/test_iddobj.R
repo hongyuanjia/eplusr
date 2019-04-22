@@ -4,9 +4,9 @@ test_that("IddObject class", {
 
     expect_silent(idd <- Idd$new(text("idd", 9.9)))
     expect_silent(slash <- IddObject$new("TestSlash", idd))
-    expect_silent(slash <- iddobject("TestSlash", use_idd(text("idd", 9.9))))
+    expect_silent(slash <- idd_object(use_idd(text("idd", 9.9)), "TestSlash"))
 
-    expect_error(iddobject(), "IddObject can only be created based on a parent Idd object")
+    expect_error(idd_object(), "IddObject can only be created based on a parent Idd object")
 
     # Group {{{
     # can use $group_name()

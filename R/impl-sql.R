@@ -218,6 +218,80 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
 }
 # }}}
 
+# get_sql_tabular_data_query {{{
+get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
+                                        table_name = NULL, column_name = NULL,
+                                        row_name = NULL) {
+    # helper {{{
+    sep <- function (x) {
+        if (is.character(x)) {
+            paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+        } else {
+            paste(x, sep = ",", collapse = ",")
+        }
+    }
+    make <- function (arg, assertion = NULL, sql_col = NULL) {
+        a <- substitute(assertion)
+        if (is.null(arg)) return(NULL)
+        eval(a)
+        if (is.null(sql_col)) {
+            sql_col <- stri_trans_totitle(deparse(substitute(arg)))
+        }
+        paste0(sql_col, " IN (", sep(unique(arg)), ")")
+    }
+    `%and%` <- function (x, y) {
+        if (is.null(y)) return(x)
+        if (is.null(x)) return(y)
+        paste0("(", x, ") AND (", y, ")")
+    }
+    # }}}
+    # basic view {{{
+    view <-
+        "
+        SELECT td.TabularDataIndex As tabular_data_index,
+               reportn.Value As report_name,
+               fs.Value As report_for,
+               tn.Value As table_name,
+               cn.Value As column_name,
+               rn.Value As row_name,
+               u.Value As units,
+               td.Value As value
+
+        FROM TabularData As td
+
+        INNER JOIN Strings As reportn
+        ON reportn.StringIndex = td.ReportNameIndex
+
+        INNER JOIN Strings As fs
+        ON fs.StringIndex = td.ReportForStringIndex
+
+        INNER JOIN Strings As tn
+        ON tn.StringIndex = td.TableNameIndex
+
+        INNER JOIN Strings As rn
+        ON rn.StringIndex = td.RowNameIndex
+
+        INNER JOIN Strings As cn
+        ON cn.StringIndex = td.ColumnNameIndex
+
+        INNER JOIN Strings As u
+        ON u.StringIndex = td.UnitsIndex
+        "
+    # }}}
+
+    q <- NULL %and%
+        make(report_name, assert(is.character(report_name), no_na(report_name))) %and%
+        make(report_for, assert(is.character(report_for), no_na(report_for))) %and%
+        make(table_name, assert(is.character(table_name), no_na(table_name))) %and%
+        make(column_name, assert(is.character(column_name), no_na(column_name))) %and%
+        make(row_name, assert(is.character(row_name), no_na(row_name)))
+
+    if (is.null(q)) return(view)
+
+    paste0( "SELECT * FROM (", view, ") WHERE ", q)
+}
+# }}}
+
 # list_sql_table {{{
 list_sql_table <- function (sql) {
     with_sql(sql, RSQLite::dbListTables(con))
@@ -266,8 +340,10 @@ get_sql_report_data_dict <- function (sql) {
 # }}}
 
 # get_sql_tabular_data {{{
-get_sql_tabular_data <- function (sql) {
-    read_sql_table(sql, "TabularDataWithStrings")
+get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
+                                  table_name = NULL, column_name = NULL, row_name = NULL) {
+    q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
+    setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
 }
 # }}}
 

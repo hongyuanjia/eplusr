@@ -318,15 +318,16 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 
         base::dump(list = c("run_parallel_jobs", "kill_jobs", "schedule_next_sim",
             "run_job", "are_all_completed", "handle_events", "sim_status", "clean_wd",
-            "energyplus", "is_string", "is_flag", "has_ext", "lpad", "backtick"),
+            "energyplus", "is_string", "is_flag", "has_ext", "lpad", "surround", "assert",
+            "is_integer", "is_scalar"),
             file = ext_funs
         )
 
         # always echo in order to catch standard output and error
         options$echo <- TRUE
         proc <- callr::r_bg(function (ext_funs, jobs, options) {
-            source(ext_funs)
             requireNamespace("data.table", quietly = TRUE)
+            source(ext_funs)
             run_parallel_jobs(jobs, options)
         }, args = list(ext_funs = ext_funs, jobs = jobs, options = options))
 

@@ -1475,7 +1475,9 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
 
     # in order to delete field values, here get all value numbers in current class
     fld_in <- val[, list(num = max(field_index)), by = c("rleid", "object_id")]
-    fld_cur <- idf_env$value[J(fld_in$object_id), on = "object_id", list(object_id = object_id[[1L]], num = .N)]
+    fld_cur <- idf_env$value[J(fld_in$object_id), on = "object_id",
+        list(object_id = object_id[[1L]], num = .N), by = "object_id"
+    ]
     # get the max field number
     fld_in$num <- pmax(fld_in$num, fld_cur$num)
 
@@ -1542,7 +1544,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
 set_idf_object_in_class <- function (idd_env, idf_env, ..., .default = TRUE) {
     l <- sep_value_dots(..., .empty = FALSE)
 
-    browser()
+    stop("Not implemented yet")
     # separate
     obj_id_in <- l$object[!is.na(object_id)]
     set(obj_id_in, NULL, "object_name", NULL)

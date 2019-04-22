@@ -21,7 +21,7 @@ NULL
 #' param <- param_job(idf, epw)
 #' param$seed()
 #' param$weater()
-#' param$apply_measure(measure, ..., .names = NULL)
+#' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 #' param$run(dir = NULL, wait = TRUE)
 #' param$kill()
 #' param$status()
@@ -129,7 +129,7 @@ NULL
 #' `$tabular_data()` extracts all tabular data in a data.table.
 #'
 #' For `$report_data_dict()`, `$report_data()` and `$tabular_data()`, the
-#'     returned data.table has a `Case` column in the returned data.table that
+#'     returned data.table has a `case` column in the returned data.table that
 #'     indicates the names of parametric models.
 #'
 #' **Arguments**
@@ -244,7 +244,7 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         initialize = function (idf, epw) {
 
             if (is_idf(idf)) {
-                private$m_idf <- idf$clone()
+                private$m_idf <- idf$clone(deep = TRUE)
             } else {
                 private$m_idf <- read_idf(idf)
             }
@@ -252,13 +252,13 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             # add sql output
             idf_self <- ._get_self(private$m_idf)
             idf_priv <- ._get_private(private$m_idf)
-            i_idf_add_output_sqlite(idf_self, idf_priv)
+            idf_add_output_sqlite(private$m_idf)
 
             # save uuid
             private$m_log$uuid <- idf_priv$m_log$uuid
 
             if (is_epw(epw)) {
-                private$m_epw <- epw
+                private$m_epw <- epw$clone(deep = TRUE)
             } else {
                 private$m_epw <- read_epw(epw)
             }
@@ -297,11 +297,22 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             param_report_data_dict(self, private, which),
 
         report_data = function (which = NULL, key_value = NULL, name = NULL,
-                                all = FALSE, year = NULL, tz = "GMT")
-            param_report_data(self, private, which, key_value, name, all, year, tz),
+                                year = NULL, tz = "UTC", all = FALSE,
+                                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                                interval = NULL, simulation_days = NULL, day_type = NULL,
+                                environment_name = NULL)
+            param_report_data(self, private, which,
+                key_value = key_value, name = name, year = year, tz = tz, all = all,
+                period = period, month = month, day = day, hour = hour, minute = minute,
+                interval = interval, simulation_days = simulation_days, day_type = day_type,
+                environment_name = environment_name
+            ),
 
-        tabular_data = function(which = NULL)
-            param_tabular_data(self, private, which),
+        tabular_data = function(which = NULL, report_name = NULL, report_for = NULL,
+                                table_name = NULL, column_name = NULL, row_name = NULL)
+            param_tabular_data(self, private, which, report_name = report_name,
+                report_for = report_for, table_name = table_name,
+                column_name = column_name, row_name = row_name),
 
         print = function ()
             param_print(self, private)
@@ -313,23 +324,29 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         m_idf = NULL,
         m_epw = NULL,
         m_job = NULL,
-        m_sql = NULL,
         m_log = NULL,
-        m_param = NULL,
+        m_param = NULL
         # }}}
-
-        deep_clone = function (name, value)
-            i_deep_clone(self, private, name, value)
     )
 )
 # }}}
 
+# param_seed {{{
+param_seed <- function (self, private) {
+    private$m_idf
+}
+# }}}
+# param_weather {{{
+param_weather <- function (self, private) {
+    private$m_epw
+}
+# }}}
 # param_apply_measure {{{
 param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     assert(is.function(measure))
 
     if (length(formals(measure)) == 0L) {
-        stop("'measure' function must have at lease one argument")
+        abort("error_measure_no_arg", "`measure` function must have at lease one argument.")
     }
 
     measure_wrapper <- function (idf, ...) {
@@ -347,14 +364,15 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     if (is.null(.names)) {
         out_nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
-        if (!have_same_len(out, .names))
-            stop(length(out), " models created with only ", length(.names),
-                " names given.", call. = FALSE)
+        assert(have_same_len(out, .names),
+            msg = paste0(length(out), " models created with only ", length(.names), " names given.")
+        )
+
         nms <- as.character(.names)
         out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")))
     }
 
-    data.table::setattr(out, "names", out_nms)
+    setattr(out, "names", out_nms)
 
     private$m_param <- out
 
@@ -362,7 +380,6 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
         " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
 }
 # }}}
-
 # param_retrieve_data {{{
 param_retrieve_data <- function (self, private) {
     status <- param_status(self, private)
@@ -370,19 +387,14 @@ param_retrieve_data <- function (self, private) {
     if (!status$run_before) return(invisible())
 
     if (status$alive) {
-
         private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_output_lines(10000))
         private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_error_lines(10000))
-
     } else {
-
         if (inherits(private$m_job, "r_process")) {
             private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_all_output_lines())
             private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_all_error_lines())
         }
-
         if (status$successful) {
-
             if (inherits(private$m_job, "r_process")) {
                 private$m_job <- tryCatch(private$m_job$get_result(),
                     error = function (e) {
@@ -391,7 +403,6 @@ param_retrieve_data <- function (self, private) {
                     }
                 )
             }
-
             if (is.null(private$m_log$end_time)) {
                 end_times <- private$m_job[!is.na(end_time), end_time]
                 if (not_empty(end_times)) private$m_log$end_time <- max(end_times)
@@ -400,7 +411,6 @@ param_retrieve_data <- function (self, private) {
     }
 }
 # }}}
-
 # param_job_from_which {{{
 param_job_from_which <- function (self, private, which) {
     status <- param_status(self, private)
@@ -453,7 +463,6 @@ param_job_from_which <- function (self, private, which) {
     job
 }
 # }}}
-
 # param_case_from_which {{{
 param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
     nms <- names(private$m_param)
@@ -482,7 +491,6 @@ param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
     if (name) nms[idx] else idx
 }
 # }}}
-
 # param_run {{{
 param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
     if (is.null(private$m_param))
@@ -526,7 +534,6 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
     self
 }
 # }}}
-
 # param_kill {{{
 param_kill <- function (self, private) {
 
@@ -562,7 +569,6 @@ param_kill <- function (self, private) {
     }
 }
 # }}}
-
 # param_status {{{
 param_status <- function (self, private) {
     status <- list(
@@ -612,16 +618,13 @@ param_status <- function (self, private) {
     status
 }
 # }}}
-
 # param_output_dir {{{
-param_output_dir <- function (self, private, which) {
-    job <- param_job_from_which(self, private, which)
-    job$output_dir
+param_output_dir <- function (self, private, which = NULL) {
+    param_job_from_which(self, private, which)$output_dir
 }
 # }}}
-
 # param_locate_output {{{
-param_locate_output <- function (self, private, which, suffix = ".err", strict = TRUE) {
+param_locate_output <- function (self, private, which = NULL, suffix = ".err", strict = TRUE) {
     job <- param_job_from_which(self, private, which)
 
     out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
@@ -634,7 +637,6 @@ param_locate_output <- function (self, private, which, suffix = ".err", strict =
     out
 }
 # }}}
-
 # param_output_errors {{{
 param_output_errors <- function (self, private, which, info = FALSE) {
     path_err <- param_locate_output(self, private, which, ".err")
@@ -653,73 +655,75 @@ param_output_errors <- function (self, private, which, info = FALSE) {
     err
 }
 # }}}
-
 # param_sql_path {{{
 param_sql_path <- function (self, private, which) {
     param_locate_output(self, private, which, ".sql")
 }
 # }}}
-
 # param_report_data_dict {{{
 param_report_data_dict <- function (self, private, which) {
     sqls <- param_sql_path(self, private, which)
     cases <- param_case_from_which(self, private, which, name = TRUE)
 
-    dicts <- lapply(sqls, sql_report_data_dict)
+    dicts <- lapply(sqls, get_sql_report_data_dict)
 
     # add case
     for (idx in seq_along(cases)) {
-        data.table::set(dicts[[idx]], j = "Case", value = cases[idx])
-        data.table::setcolorder(dicts[[idx]], c("Case", setdiff(names(dicts[[idx]]), "Case")))
+        set(dicts[[idx]], j = "case", value = cases[idx])
+        setcolorder(dicts[[idx]], c("case", setdiff(names(dicts[[idx]]), "case")))
     }
 
-    data.table::rbindlist(dicts)
+    rbindlist(dicts)
 }
 # }}}
-
 # param_report_data {{{
 param_report_data <- function (self, private, which = NULL, key_value = NULL,
-                                 name = NULL, all = FALSE, year = NULL, tz = "GMT") {
+                               name = NULL, year = NULL, tz = "GMT", all = FALSE,
+                               period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                               interval = NULL, simulation_days = NULL, day_type = NULL,
+                               environment_name = NULL) {
     sqls <- param_sql_path(self, private, which)
     cases <- param_case_from_which(self, private, which, name = TRUE)
 
-    d <- mapply(sql_report_data, sql = sqls, case = cases,
+    rbindlist(mapply(get_sql_report_data, sql = sqls, case = cases,
         MoreArgs = list(key_value = key_value, name = name, all = all, year = year,
-            tz = tz),
+            tz = tz, period = period, month = month, day = day, hour = hour, minute = minute,
+            interval = interval, simulation_days = simulation_days, day_type = day_type,
+            environment_name = environment_name),
         SIMPLIFY = FALSE, USE.NAMES = FALSE
-    )
-
-    data.table::rbindlist(d)
+    ))
 }
 # }}}
-
 # param_tabular_data {{{
-param_tabular_data <- function (self, private, which = NULL) {
+param_tabular_data <- function (self, private, which = NULL, report_name = NULL, report_for = NULL,
+                                table_name = NULL, column_name = NULL, row_name = NULL) {
     sqls <- param_sql_path(self, private, which)
     cases <- param_case_from_which(self, private, which, name = TRUE)
 
-    d <- lapply(sqls, sql_tabular_data)
+    d <- lapply(sqls, get_sql_tabular_data,
+        report_name = report_name, report_for = report_for,
+        table_name = table_name, column_name = column_name, row_name = row_name
+    )
 
     # add case
     for (idx in seq_along(cases)) {
-        data.table::set(d[[idx]], j = "Case", value = cases[idx])
-        data.table::setcolorder(d[[idx]], c("Case", setdiff(names(d[[idx]]), "Case")))
+        set(d[[idx]], j = "case", value = cases[idx])
+        setcolorder(d[[idx]], c("case", setdiff(names(d[[idx]]), "case")))
     }
 
-    data.table::rbindlist(d)
+    rbindlist(d)
 }
 # }}}
-
 # param_print {{{
 param_print <- function (self, private) {
     cli::cat_rule(crayon::bold("EnergPlus Parametric Job"), col = "green")
     config <- eplus_config(private$m_idf$version())
-    cli::cat_bullet(c(
-        paste0(crayon::bold("Seed Model"), ": ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE))),
-        paste0(crayon::bold("Weather"), ": ", surround(private$m_epw$path())),
-        paste0(crayon::bold("EnergyPlus Version"), ": ", surround(config$version)),
-        paste0(crayon::bold("EnergyPlus Path"), ": ", surround(normalizePath(config$dir)))
-    ), col = "cyan", bullet_col = "cyan")
+    cli::cat_line(c(
+        str_trunc(paste0("Seed Model: ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE)))),
+        str_trunc(paste0("Weather: ", surround(private$m_epw$path()))),
+        paste0("EnergyPlus Version: ", surround(config$version)),
+        paste0("EnergyPlus Path: ", surround(normalizePath(config$dir)))
+    ))
 
     if (is.null(private$m_param)) {
         cli::cat_line("<< No measure has been applied >>",
@@ -727,60 +731,47 @@ param_print <- function (self, private) {
         return(invisible())
     }
 
-    cli::cat_bullet(c(
-        paste0(crayon::bold("Applied Measure"), ": ", surround(private$m_log$measure_name)),
-        paste0(crayon::bold("Parametric Models"), " [", length(private$m_param), "]: ")
-    ), col = "cyan", bullet_col = "cyan")
+    cli::cat_line(c(
+        paste0("Applied Measure: ", surround(private$m_log$measure_name)),
+        paste0("Parametric Models [", length(private$m_param), "]: ")
+    ))
 
-    cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"),
-        col = "cyan"
-    )
+    cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
 
     status <- param_status(self, private)
 
     param_retrieve_data(self, private)
 
     if (!status$run_before) {
-
         cli::cat_line("<< Job has not been run before >>",
             col = "white", background_col = "blue")
         return(invisible())
     }
 
     if (isTRUE(status$terminated)) {
-
         cli::cat_line(" Job was terminated before.",
             col = "white", background_col = "red")
-
     } else if (status$alive) {
-
         cli::cat_line(" Job started at ",
             surround(private$m_log$start_time), " and is still running...",
             col = "black", background_col = "green"
         )
-
     } else if (!isTRUE(status$successful)) {
-
         cli::cat_line(" Job started at ",
             surround(private$m_log$start_time), " and ended unsuccessfully...",
             col = "white", background_col = "red"
         )
-
     } else {
-
         if (!is.null(private$m_log$end_time)) {
             run_time <- format(round(difftime(
                 private$m_log$end_time, private$m_log$start_time), digits = 2L)
             )
-
             cli::cat_line(" Simulation started at ",
                 surround(private$m_log$start_time), " and completed successfully after ",
                 run_time, ".",
                 col = "black", background_col = "green"
             )
-
         } else {
-
             cli::cat_line(" Simulation started at ",
                 surround(private$m_log$start_time), " and completed successfully.",
                 col = "black", background_col = "green"
