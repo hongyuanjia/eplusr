@@ -1407,6 +1407,7 @@ idf_dup <- function (self, private, ...) {
     # log
     log_new_order(private$m_log, dup$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, dup)
 }
@@ -1425,6 +1426,7 @@ idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE) {
     # log
     log_new_order(private$m_log, add$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, add)
 }
@@ -1444,6 +1446,7 @@ idf_set <- function (self, private, ..., .default = TRUE) {
     # log
     log_add_order(private$m_log, set$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, set)
 }
@@ -1463,6 +1466,7 @@ idf_set_in_class <- function (self, private, ..., .default = TRUE) {
     # log
     log_add_order(private$m_log, set$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, set)
 }
@@ -1480,6 +1484,7 @@ idf_del <- function (self, private, ..., .referenced = FALSE, .recursive = FALSE
     # log
     log_del_order(private$m_log, del$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     invisible(self)
 }
@@ -1499,6 +1504,7 @@ idf_rename <- function (self, private, ...) {
     # log
     log_add_order(private$m_log, ren$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     res <- apply2(ren$object$object_id, ren$object$class_id, IdfObject$new, list(parent = self))
     setattr(res, "names", ren$object$object_name)
@@ -1513,6 +1519,7 @@ idf_insert <- function (self, private, ...) {
     # log
     log_new_order(private$m_log, ins$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, ins)
 }
@@ -1550,6 +1557,7 @@ idf_replace_value <- function (self, private, pattern, replacement, class = NULL
     # log
     log_add_order(private$m_log, rep$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, rep)
 }
@@ -1568,6 +1576,7 @@ idf_paste <- function (self, private, in_ip = FALSE, ver = NULL) {
     # log
     log_new_order(private$m_log, pas$object$object_id)
     log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, pas)
 }

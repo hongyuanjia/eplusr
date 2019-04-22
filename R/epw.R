@@ -562,6 +562,8 @@ Epw <- R6::R6Class(classname = "Epw",
             private$m_log$miss_filled_special <- FALSE
             private$m_log$range_filled_special <- FALSE
             private$m_log$purged <- FALSE
+            private$m_log$unsaved <- FALSE
+            private$m_log$uuid <- unique_id()
         },
         # }}}
 
@@ -666,6 +668,9 @@ Epw <- R6::R6Class(classname = "Epw",
         # }}}
         # }}}
 
+        is_unsaved = function ()
+            epw_is_unsaved(self, private),
+
         save = function (path = NULL, overwrite = FALSE)
             epw_save(self, private, path, overwrite),
 
@@ -680,11 +685,16 @@ Epw <- R6::R6Class(classname = "Epw",
         m_log = NULL,
 
         deep_clone = function (name, value) {
-            deep_clone(private, name, value, "Idf")
+            epw_deep_clone(self, private, name, value)
         }
     )
 )
+
+# set deep default value to `TRUE`
+formals(Epw$clone_method)$deep <- TRUE
+formals(Epw$public_methods$clone)$deep <- TRUE
 # }}}
+
 # epw_path {{{
 epw_path <- function (self, private) {
     private$m_path
@@ -709,13 +719,14 @@ epw_location <- function (self, private,
     if (!length(l)) return(private$m_header$location)
 
     private$m_header <- set_epw_location(private$m_header, l)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     private$m_header$location
 }
 # }}}
 # epw_design_condition {{{
-epw_design_condition <- function (self, private, idfobj = FALSE) {
-    if (!idfobj) return(private$m_header$design)
-    stop("Remember to implement this method!")
+epw_design_condition <- function (self, private) {
+    copy(private$m_header$design)
 }
 # }}}
 # epw_typical_extreme_period {{{
@@ -735,6 +746,8 @@ epw_holiday <- function (self, private, leapyear, dst, holiday) {
     }
 
     private$m_header <- set_epw_holiday(private$m_header, leapyear, dst, holiday)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     copy(private$m_header$holiday)
 }
 # }}}
@@ -744,6 +757,8 @@ epw_comment1 <- function (self, private, comment) {
         return(private$m_header$comment1)
     } else {
         assert(is_string(comment))
+        log_unsaved(private$m_log)
+        log_new_uuid(private$m_log)
         (private$m_header$comment1 <- comment)
     }
 }
@@ -754,6 +769,8 @@ epw_comment2 <- function (self, private, comment) {
         return(private$m_header$comment2)
     } else {
         assert(is_string(comment))
+        log_unsaved(private$m_log)
+        log_new_uuid(private$m_log)
         (private$m_header$comment2 <- comment)
     }
 }
@@ -775,6 +792,8 @@ epw_period <- function (self, private, period, name, start_day_of_week) {
     }
 
     private$m_header <- set_epw_period_basic(private$m_header, period, name, start_day_of_week)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     private$m_header$period$period
 }
 # }}}
@@ -935,6 +954,10 @@ epw_purge <- function (self, private) {
         verbose_info("Redundant data has already been purged before. Skip...")
     } else {
         lst <- purge_epw_data_redundant(private$m_data, private$m_header)
+        if (nrow(lst$data) != nrow(private$m_data)) {
+            log_unsaved(private$m_log)
+            log_new_uuid(private$m_log)
+        }
         private$m_header <- lst$header
         private$m_data <- lst$data
     }
@@ -989,6 +1012,8 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
         )
     }
 
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     invisible(self)
 }
 # }}}
@@ -1012,6 +1037,8 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
         )
     }
 
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     invisible(self)
 }
 # }}}
@@ -1026,7 +1053,14 @@ epw_delete <- function (self, private, period) {
     l <- delete_epw_data(private$m_data, private$m_header, period)
     private$m_header <- l$header
     private$m_data <- l$data
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
     invisible(self)
+}
+# }}}
+# epw_is_unsaved {{{
+epw_is_unsaved <- function (self, private) {
+    private$m_log$unsaved
 }
 # }}}
 # epw_save {{{
@@ -1060,12 +1094,24 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
 
     # update path
     private$m_path <- path
+    log_saved(private$m_log)
     invisible(self)
 }
 # }}}
 # epw_print {{{
 epw_print <- function (self, private) {
     print_epw_header(private$m_header)
+}
+# }}}
+# epw_deep_clone {{{
+epw_deep_clone <- function (self, private, name, value) {
+    if (is_idd(value)) {
+        value
+    } else if (is.environment(value)) {
+        list2env(as.list.environment(value))
+    } else {
+        value
+    }
 }
 # }}}
 # S3 Epw methods {{{

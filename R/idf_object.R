@@ -404,6 +404,7 @@ NULL
 #' @author Hongyuan Jia
 NULL
 
+#' @export
 # idf_object {{{
 idf_object <- function (parent, object = NULL, class = NULL) {
     if (missing(parent) || !is_idf(parent)) {
@@ -534,23 +535,23 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by"))
             idfobj_value_relation(self, private, which, direction),
 
-        ref_to_object = function (which = NULL)
-            idfobj_ref_to_object(self, private, which),
+        ref_to_object = function (which = NULL, class = NULL)
+            idfobj_ref_to_object(self, private, which, class),
 
         ref_from_object = function ()
             idfobj_ref_from_object(self, private),
 
-        ref_by_object = function (which = NULL)
-            idfobj_ref_by_object(self, private, which),
+        ref_by_object = function (which = NULL, class = NULL)
+            idfobj_ref_by_object(self, private, which, class),
 
-        has_ref_to = function (which = NULL)
-            idfobj_has_ref_to(self, private, which),
+        has_ref_to = function (which = NULL, class = NULL)
+            idfobj_has_ref_to(self, private, which, class),
 
         has_ref_from = function ()
             idfobj_has_ref_from(self, private),
 
-        has_ref_by = function (which = NULL)
-            idfobj_has_ref_by(self, private, which),
+        has_ref_by = function (which = NULL, class = NULL)
+            idfobj_has_ref_by(self, private, which, class),
 
         has_ref = function (which = NULL)
             idfobj_has_ref(self, private, which),
@@ -637,6 +638,7 @@ idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
 
     log_add_order(private$log_env(), obj$object_id)
     log_unsaved(private$log_env())
+    log_new_uuid(private$log_env())
 
     # update object in parent
     merge_idfobj_data(private$idf_env(), obj, "object")
@@ -678,6 +680,7 @@ idfobj_set <- function (self, private, ..., .default = TRUE) {
     # log
     log_add_order(private$log_env(), set$object$object_id)
     log_unsaved(private$log_env())
+    log_new_uuid(private$log_env())
 
     self
 }
@@ -726,7 +729,7 @@ idfobj_value_relation <- function (self, private, which = NULL, direction = c("a
 }
 # }}}
 # idfobj_ref_to_object {{{
-idfobj_ref_to_object <- function (self, private, which = NULL) {
+idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
@@ -736,8 +739,21 @@ idfobj_ref_to_object <- function (self, private, which = NULL) {
         max_depth = 0L, direction = "ref_to"
     )[!is.na(src_value_id)]
 
+    # only include specified class
+    if (!is.null(class)) {
+        add_joined_cols(private$idf_env()$object, rel, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
+        cls <- get_idd_class(private$idd_env(), class)
+        rel <- rel[J(cls$class_id), on = "src_class_id"]
+    }
+
     if (!nrow(rel)) {
-        message("Object does not refer to any other object.")
+        if (is.null(class)) {
+            message("Target object does not refer to any other object.")
+        } else {
+            message("Target object does not refer to any other object in class ",
+                collapse(cls$class_name), "."
+            )
+        }
         return(invisible())
     } else {
         message("Target object refers to ", nrow(rel), " object(s) [ID:", rel$object_id, "].\n")
@@ -758,7 +774,7 @@ idfobj_ref_from_object <- function (self, private) {
 }
 # }}}
 # idfobj_ref_by_object {{{
-idfobj_ref_by_object <- function (self, private, which = NULL) {
+idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
@@ -768,8 +784,21 @@ idfobj_ref_by_object <- function (self, private, which = NULL) {
         max_depth = 0L, direction = "ref_by"
     )[!is.na(value_id)]
 
+    # only include specified class
+    if (!is.null(class)) {
+        add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
+        cls <- get_idd_class(private$idd_env(), class)
+        rel <- rel[J(cls$class_id), on = "class_id"]
+    }
+
     if (!nrow(rel)) {
-        message("Object is not referred by any other object.")
+        if (is.null(class)) {
+            message("Target object is not referred by any other object.")
+        } else {
+            message("Target object is not referred by any other object in class ",
+                collapse(cls$class_name), "."
+            )
+        }
         return(invisible())
     } else {
         message("Target object is referred by ", nrow(rel), " object(s) [ID:", rel$object_id, "].\n")
@@ -784,7 +813,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL) {
 }
 # }}}
 # idfobj_has_ref {{{
-idfobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to", "ref_by")) {
+idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c("all", "ref_to", "ref_by")) {
     type <- match.arg(type)
     if (is.null(which)) {
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), private$m_object_id,
@@ -798,6 +827,17 @@ idfobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to
             value_id = val$value_id, direction = type)
     }
 
+    if (!is.null(class)) {
+        cls <- get_idd_class(private$idd_env(), class)
+        if (type %in% c("all", "ref_by")) {
+            add_joined_cols(private$idf_env()$object, rel$ref_by, "object_id", "class_id")
+            rel$ref_by <- rel$ref_by[J(cls$class_id), on = "class_id"]
+        } else if (type %in% c("all", "ref_to")) {
+            add_joined_cols(private$idf_env()$object, rel$ref_to, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
+            rel$ref_to <- rel$ref_to[J(cls$class_id), on = "src_class_id"]
+        }
+    }
+
     if (type == "all") {
         nrow(rel$ref_to[!is.na(src_value_id)]) || nrow(rel$ref_by[!is.na(value_id)])
     } else if (type == "ref_to") {
@@ -808,8 +848,8 @@ idfobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to
 }
 # }}}
 # idfobj_has_ref_to {{{
-idfobj_has_ref_to <- function (self, private, which = NULL) {
-    idfobj_has_ref(self, private, which, "ref_to")
+idfobj_has_ref_to <- function (self, private, which = NULL, class = NULL) {
+    idfobj_has_ref(self, private, which, class, "ref_to")
 }
 # }}}
 # idfobj_has_ref_from {{{
@@ -819,8 +859,8 @@ idfobj_has_ref_from <- function (self, private) {
 }
 # }}}
 # idfobj_has_ref_by {{{
-idfobj_has_ref_by <- function (self, private, which = NULL) {
-    idfobj_has_ref(self, private, which, "ref_by")
+idfobj_has_ref_by <- function (self, private, which = NULL, class = NULL) {
+    idfobj_has_ref(self, private, which, class, "ref_by")
 }
 # }}}
 # idfobj_to_table {{{
@@ -892,21 +932,26 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 }
 # }}}
 
+#' @export
 # format.IdfObject {{{
 format.IdfObject <- function (x, ...) {
-    private <- ._get_private(x)
-    obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
+    x$to_string()
+    # private <- ._get_private(x)
+    # obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
 
-    if (is.na(obj$object_name)) {
-        paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "]")
-    } else {
-        paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "] <", obj$object_name, ">")
-    }
+    # if (is.na(obj$object_name)) {
+    #     paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "]")
+    # } else {
+    #     paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "] <", obj$object_name, ">")
+    # }
 }
 # }}}
 
+#' @export
 # str.IdfObject {{{
-str.IdfObject <- format.IdfObject
+str.IdfObject <- function (x, ...) {
+    x$value()
+}
 # }}}
 
 #' @export
