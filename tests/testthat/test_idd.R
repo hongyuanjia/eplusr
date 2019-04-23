@@ -85,7 +85,7 @@ test_that("Idd class", {
     # can return names of all required classes
     expect_equal(idd$required_class_name(), "TestSlash")
 
-    # can return names of all unique classes
+    # can return names of all unique-object classes
     expect_equal(idd$unique_class_name(), "TestSlash")
 
     # can return names of all extensible classes

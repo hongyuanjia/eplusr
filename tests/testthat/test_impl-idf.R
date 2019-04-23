@@ -577,7 +577,7 @@ test_that("Add", {
     expect_error(add_idf_object(idd_env, idf_env), "Please give object\\(s\\) to add")
     expect_error(add_idf_object(idd_env, idf_env, Version = list(8.8)), "Adding Version object")
     expect_error(add_idf_object(idd_env, idf_env,
-        SimulationControl = list()), "Adding new object in existing unique class")
+        SimulationControl = list()), "Adding new object in existing unique-object class")
     expect_silent({rp <- add_idf_object(idd_env, idf_env,
         RunPeriod = list("Test1", 1, 1, End_Month = 2, 1, "Monday", Apply_Weekend_Holiday_Rule = "No")
     )})
@@ -712,7 +712,7 @@ test_that("Insert", {
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = idf$version(), my_building = idf$Building),
-        "Inserting new object in existing unique class"
+        "Inserting new object in existing unique-object class"
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Version),

@@ -44,6 +44,13 @@ test_that("table manipulation", {
             min_fields = c(3L, 0L)
         )
     )
+    expect_equivalent(
+        get_idd_class(idd_parsed, NULL, "min_fields"),
+        data.table(class_id = c(1L, 2L),
+            class_name = c("TestSimple", "TestSlash"), group_id = c(1L, 2L),
+            min_fields = c(0L, 3L)
+        )
+    )
     # }}}
 
     # EXTENSIBLE GROUP {{{

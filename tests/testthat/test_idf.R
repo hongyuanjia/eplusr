@@ -153,7 +153,7 @@ test_that("Idf class", {
     # adding existing unique
     expect_error(idf$add("Version" = list(8)), "Adding Version object is prohibited")
     expect_silent(idf_full <- read_idf(example()))
-    expect_error(idf_full$add("Building" = list()), "unique class")
+    expect_error(idf_full$add("Building" = list()), "unique-object class")
 
     # adding empty object
     expect_silent(idf$add("Building" = list()))

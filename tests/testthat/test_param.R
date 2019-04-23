@@ -18,19 +18,19 @@ test_that("Parametric methods", {
     # Measure {{{
     # set_infil_rate {{{
     set_infil_rate <- function (idf, infil_rate) {
-    
+
         # validate input value
         # this is optional, as validations will be made when setting values to `Idf`
         stopifnot(is.numeric(infil_rate), infil_rate >= 0)
-    
+
         if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
           stop("Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`")
-    
+
         ids <- idf$object_id("ZoneInfiltration:DesignFlowRate", simplify = TRUE)
         val <- rep(list(list(design_flow_rate_calculation_method = "AirChanges/Hour", air_changes_per_hour = infil_rate)), length(ids))
         setattr(val, "names", paste0("..", ids))
         idf$set(val)
-    
+
         idf
     }
     # }}}
