@@ -1,6 +1,6 @@
 #' @importFrom callr r_bg
 #' @importFrom cli cat_line
-#' @importFrom crayon green red
+#' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
 #' @importFrom later later
 #' @importFrom lubridate hms with_tz
@@ -501,7 +501,7 @@ run_job <- function(jobs, options, progress_bar) {
         ]
 
         if (options$echo) {
-            progress_bar$message(crayon::green(paste0(completed, collapse = "\n")))
+            progress_bar$message(paste0(completed, collapse = "\n"))
         }
         progress_bar$tick(0)
     }
@@ -538,7 +538,7 @@ handle_events <- function(jobs, options, progress_bar) {
         ]
 
         if (options$echo) {
-            progress_bar$message(crayon::green(paste0(completed, collapse = "\n")))
+            progress_bar$message(paste0(completed, collapse = "\n"))
         }
         progress_bar$tick(num)
     }

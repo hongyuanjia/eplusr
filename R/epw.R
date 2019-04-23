@@ -1,7 +1,6 @@
 #' @importFrom data.table as.data.table
 #' @importFrom stringi stri_detect_regex
 #' @importFrom cli rule cat_rule
-#' @importFrom crayon bold green
 #' @importFrom R6 R6Class
 #' @importFrom utils menu download.file
 #' @include impl-epw.R
@@ -544,7 +543,7 @@ Epw <- R6::R6Class(classname = "Epw",
 
         # INITIALIZE {{{
         initialize = function (path, warning = FALSE) {
-            if (is_string(path) & file.exists(path)) {
+            if (is_string(path) && file.exists(path)) {
                 private$m_path <- normalizePath(path)
             }
 
@@ -576,8 +575,8 @@ Epw <- R6::R6Class(classname = "Epw",
             epw_location(self, private, city, state_province, country, data_source,
                          wmo_number, latitude, longitude, time_zone, elevation),
 
-        design_condition = function (idfobj = FALSE)
-            epw_design_condition(self, private, idfobj),
+        design_condition = function ()
+            epw_design_condition(self, private),
 
         typical_extreme_period = function ()
             epw_typical_extreme_period(self, private),
@@ -1001,8 +1000,8 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
         # use nearest as template
         if (after > n) after <- n - 1L
 
-        cli::cat_rule(crayon::bold("Info"), col = "green")
-        cat(crayon::green("New data period has been added successfully:\n"))
+        cli::cat_rule("Info", col = "green")
+        cat("New data period has been added successfully:\n")
 
         print(private$m_header$period$period[after + 1L,
            .(" " = paste0(index, ": "), Name = name,
@@ -1026,8 +1025,8 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
     private$m_data <- rbindlist(lst[names(lst) != "header"])
 
     if (eplusr_option("verbose_info")) {
-        cli::cat_rule(crayon::bold("Info"), col = "green")
-        cat(crayon::green("Data period", paste0("#", period), "has been replaced with input data.\n"))
+        cli::cat_rule("Info", col = "green")
+        cat("Data period", paste0("#", period), "has been replaced with input data.\n")
 
         print(private$m_header$period$period[period,
            .(" " = paste0(index, ": "), Name = name,

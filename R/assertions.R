@@ -71,6 +71,62 @@ is_version <- function (ver) {
     !is.na(numeric_version(ver, strict = FALSE))
 }
 # }}}
+#' Check for Idd, Idf and Epw objects
+#'
+#' These functions test if input is a valid object of Idd, Idf, Epw and other
+#' main classes.
+#'
+#' `is_eplus_ver()` returns `TRUE` if input is a valid EnergyPlus version.
+#'
+#' `is_idd_ver()` returns `TRUE` if input is a valid EnergyPlus IDD version.
+#'
+#' `is_eplus_path()` returns `TRUE` if input path is a valid EnergyPlus path,
+#' i.e. a path where there is an `energyplus` executable and an `Energy+.idd`
+#' file.
+#'
+#' `is_idd()` returns `TRUE` if input is an Idd object.
+#'
+#' `is_idf()` returns `TRUE` if input is an Idf object.
+#'
+#' `is_iddobject()` returns `TRUE` if input is an IddObject object.
+#'
+#' `is_idfobject()` returns `TRUE` if input is an IdfObject object.
+#'
+#' `is_epw()` returns `TRUE` if input is an Epw object.
+#'
+#' `is_epwdate()` returns `TRUE` if input is a valid EPW date specification.
+#'
+#' @param ver A character or numeric vector with suitable numeric version
+#' strings.
+#' @param strict If `FALSE`, `ver` can be a special string "latest" which
+#' represents the lastest version.
+#' @return A logical vector.
+#' @rdname assertion
+#' @export
+#' @examples
+#' is_eplus_ver(8.8)
+#' is_eplus_ver(8.0)
+#' is_eplus_ver("latest", strict = FALSE)
+#'
+#' is_idd_ver("9.0.1")
+#' is_idd_ver("8.0.1")
+#'
+#' is_eplus_path("C:/EnergyPlusV9-0-0")
+#' is_eplus_path("/usr/local/EnergyPlus-9-0-1")
+#'
+#' is_idd(use_idd(8.8, download = "auto"))
+#'
+#' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+#'     idd = use_idd(8.8, download = "auto"))
+#' is_idf(idf)
+#'
+#' is_iddobject(idd_object(8.8, "Version"))
+#'
+#' is_idfobject(idf_object(idf, class = "Material"))
+#'
+#' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
+#'
+#' is_epwdate("1/1")
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver, strict = FALSE) {
     ver <- standardize_ver(ver, strict)
@@ -83,6 +139,12 @@ on_fail(is_eplus_ver) <- function (call, env) {
     )
 }
 # }}}
+
+#' @param only_exist If `TRUE`, check if input is one of supported IDD versions
+#' and already parsed IDD version. If `FALSE`, only check if input is a valid
+#' version specification.
+#' @rdname assertion
+#' @export
 # is_idd_ver {{{
 is_idd_ver <- function (ver, strict = FALSE, only_exist = TRUE) {
     if (isTRUE(strict) && !is_version(ver)) return(FALSE)
@@ -97,10 +159,14 @@ on_fail(is_idd_ver) <- function (call, env) {
     paste0(deparse(call$ver), " is not a valid Idd version.")
 }
 # }}}
+
+#' @param path A path to test.
+#' @rdname assertion
+#' @export
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
     assert(is_scalar(path))
-    eplus <- paste0("energyplus", if(is_windows()) ".exe" else "")
+    eplus <- paste0("energyplus", if (is_windows()) ".exe" else "")
     all(dir.exists(path), file.exists(file.path(path, c(eplus, "Energy+.idd"))))
 }
 on_fail(is_eplus_path) <- function (call, env) {
@@ -109,30 +175,53 @@ on_fail(is_eplus_path) <- function (call, env) {
     )
 }
 # }}}
+
+#' @param x An object to test.
+#' @rdname assertion
+#' @export
 # is_idd {{{
 is_idd <- function (x) inherits(x, "Idd")
 on_fail(is_idd) <- function (call, env) {
     paste(deparse(call$x), "is not an Idd object.")
 }
 # }}}
+
+#' @rdname assertion
+#' @export
 # is_idf {{{
 is_idf <- function (x) inherits(x, "Idf")
 on_fail(is_idf) <- function (call, env) {
     paste(deparse(call$x), "is not an Idf object.")
 }
 # }}}
+
+#' @rdname assertion
+#' @export
+# is_iddobject {{{
+is_iddobject <- function (x) inherits(x, "IddObject")
+on_fail(is_iddobject) <- function (call, env) {
+    paste(deparse(call$x), "is not an IddObject object.")
+}
+# }}}
+
+#' @rdname assertion
+#' @export
 # is_idfobject {{{
 is_idfobject <- function (x) inherits(x, "IdfObject")
 on_fail(is_idfobject) <- function (call, env) {
     paste(deparse(call$x), "is not an IdfObject object.")
 }
 # }}}
+
+#' @rdname assertion
+#' @export
 # is_epw {{{
 is_epw <- function (x) inherits(x, "Epw")
 on_fail(is_epw) <- function (call, env) {
     paste(deparse(call$x), "is not an Epw object.")
 }
 # }}}
+
 # is_range {{{
 is_range <- function (x) {
     inherits(x, "Range")
@@ -378,6 +467,9 @@ on_fail(has_ext) <- function (call, env) {
     )
 }
 # }}}
+
+#' @rdname assertion
+#' @export
 # is_epwdate {{{
 is_epwdate <- function (x) {
     length(x) == 1L && !is.na(epw_date(x))

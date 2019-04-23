@@ -1,6 +1,5 @@
 #' @importFrom R6 R6Class
 #' @importFrom cli cat_bullet cat_line cat_rule
-#' @importFrom crayon bold
 #' @importFrom tools file_path_sans_ext
 NULL
 

@@ -1,4 +1,3 @@
-#' @importFrom readr write_lines
 #' @importFrom stringi stri_replace_all_charclass stri_trans_tolower
 NULL
 

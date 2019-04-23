@@ -55,16 +55,10 @@ empty_validity <- function () {
 # @param on Passed to `[.data.table` in order to extract value data.
 # @return NULL
 add_validity <- function (idd_env, idf_env, env_in, check, type, on) {
-    if (inherits(check, "data.table")) {
-        env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
-            env_in$value, on = "object_id"][check, on = on][,
-            .SD, .SDcols = names(env_in[["validity"]][[type]])]
-        setdiff(names(env_in[["validity"]]$missing_value), names(check))
-    } else {
-        env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
-            env_in$value, on = "object_id"][J(check), on = on,][,
-            .SD, .SDcols = names(env_in[["validity"]][[type]])]
-    }
+    env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
+        env_in$value, on = "object_id"][check, on = on][,
+        .SD, .SDcols = names(env_in[["validity"]][[type]])]
+    setdiff(names(env_in[["validity"]]$missing_value), names(check))
 }
 # }}}
 # exclude_invalid {{{
@@ -79,6 +73,45 @@ exclude_invalid <- function (env_in, invalid, on) {
 }
 # }}}
 
+#' Customize validation components
+#'
+#' `custom_validate()` makes it easy to customize what validation components
+#' should be included during IDF object modifications using `$dup()`, `$add()`,
+#' `$set()` and other methods in [Idf] class.
+#'
+#' There are 10 different validation components in total. Also, there are three
+#' builtin validation level, i.e. `"none"`, `"draft"` and `"final"`. To get what
+#' valiation components those levels contain, see [level_checks()].
+#'
+#' @param required_object Check if required objects are missing in current
+#' model. Default: `FALSE`.
+#' @param unique_object Check if there are multiple objects in one unique-object
+#' class. Default: `FALSE`.
+#' @param unique_name Check if all objects in every class have unique names.
+#' Default: `FALSE`.
+#' @param extensible Check if all fields in an extensible group have values.
+#' Default: `FALSE`.
+#' @param required_field Check if all required fields have values. Default:
+#' `FALSE`.
+#' @param autofield Check if all fields with value `"Autosize"` and
+#' `"Autocalculate"` are valid or not. Default: `FALSE`.
+#' @param type Check if all fields have values with valid types, i.e. 
+#' character, numeric and integer fields should be filled with corresponding
+#' type of values. Default: `FALSE`.
+#' @param choice Check if all choice fields have valid choice values. Default:
+#' `FALSE`.
+#' @param range Check if all numeric fields have values within defined ranges.
+#' Default: `FALSE`.
+#' @param reference Check if all fields whose values refer to other fields are
+#' valid. Default: `FALSE`.
+#'
+#' @return A named list with 10 elements.
+#' @export
+#' @examples
+#' custom_validate(unique_object = TRUE)
+#'
+#' # only check unique name during validation
+#' eplusr_option(validate_level = custom_validate(unique_name = TRUE))
 # custom_validate {{{
 custom_validate <- function (
     required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
@@ -86,6 +119,19 @@ custom_validate <- function (
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
+    assert(
+        is_flag(required_object),
+        is_flag(unique_object),
+        is_flag(unique_name),
+        is_flag(extensible),
+        is_flag(required_field),
+        is_flag(autofield),
+        is_flag(type),
+        is_flag(choice),
+        is_flag(range),
+        is_flag(reference)
+    )
+
     list(
         required_object = required_object,
         unique_object = unique_object,
@@ -100,24 +146,60 @@ custom_validate <- function (
     )
 }
 # }}}
+
+#' Show components of validation strictness level
+#'
+#' `level_checks()` takes input of a built in validation level or a custom
+#' validation level and returns a list with all validation components that level
+#' contains.
+#'
+#' @param level Should be one of `"none"`, `"draft"`, `"final"` or an output of
+#' [custom_validate()].
+#' @return A named list with nine element, e.g. `required_object`,
+#' `unique_object`, `unique_name`, `extensible`, `required_field`, `autofield`,
+#' `type`, `choice`, `range` and `reference`. For the meaning of each validation
+#' component, see[custom_validate()].
+#' @export
+#' @examples
+#' level_checks("draft")
+#' level_checks("final")
+#' level_checks(custom_validate(autofield = TRUE))
+#' level_checks(eplusr_option("validate_level"))
+#' @export
 # level_checks {{{
 level_checks <- function (level = eplusr_option("validate_level")) {
-    level <- match.arg(level, c("none", "draft", "final"))
-
-    if (level == "none") {
-        custom_validate(
-            autofield = TRUE, type = TRUE
-        )
-    } else if (level == "draft") {
-        custom_validate(
-            autofield = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,
-            range = TRUE
-        )
+    if (is_string(level)) {
+        level <- match.arg(level, c("none", "draft", "final"))
+        if (level == "none") {
+            custom_validate(
+                autofield = TRUE, type = TRUE
+            )
+        } else if (level == "draft") {
+            custom_validate(
+                autofield = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,
+                range = TRUE
+            )
+        } else if (level == "final"){
+            custom_validate(
+                required_object = TRUE, unique_object = TRUE, unique_name = TRUE,
+                extensible = TRUE, required_field = TRUE, autofield = TRUE,
+                type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
+            )
+        }
     } else {
+        assert(is.list(level), msg = "`level` should be a string or a list.")
+        assert(has_name(level, names(custom_validate())))
         custom_validate(
-            required_object = TRUE, unique_object = TRUE, unique_name = TRUE,
-            extensible = TRUE, required_field = TRUE, autofield = TRUE,
-            type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
+            required_object = level$required_object,
+            unique_object = level$unique_object,
+            unique_name = level$unique_name,
+            extensible = level$extensible,
+            required_field = level$required_field,
+            autofield = level$autofield,
+            type = level$type,
+            choice = level$choice,
+            range = level$range,
+            reference = level$reference
         )
     }
 }
@@ -133,11 +215,7 @@ level_checks <- function (level = eplusr_option("validate_level")) {
 # @return An IdfValidity object.
 validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NULL, level) {
 
-    if (is.character(level)) {
-        level <- level_checks(level)
-    } else {
-        assert(is.list(level), has_name(level, names(custom_validate())))
-    }
+    level <- level_checks(level)
 
     validate_objects(idd_env, idf_env, dt_object, dt_value,
         required_object = level$required_object,
@@ -191,19 +269,6 @@ validate_objects <- function
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
-
-    assert(
-        is_flag(required_object),
-        is_flag(unique_object),
-        is_flag(unique_name),
-        is_flag(extensible),
-        is_flag(required_field),
-        is_flag(autofield),
-        is_flag(type),
-        is_flag(choice),
-        is_flag(range),
-        is_flag(reference)
-    )
 
     # if object and value dt are not provided, then this means to validate the
     # whole IDF

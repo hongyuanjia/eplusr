@@ -1,5 +1,4 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
-#' @importFrom crayon bold cyan red strip_style underline
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
@@ -1030,9 +1029,9 @@ assert_can_do <- function (idd_env, idf_env, dot, object,
                 abort(paste0("error_", action, "_unique"),
                     paste0(
                         switch(action,
-                            add = "Adding new object in existing unique class is prohibited.",
+                            add = "Adding new object in existing unique-object class is prohibited.",
                             dup = "Existing unique object cannot be duplicated.",
-                            insert = "Inserting new object in existing unique class is prohibited."
+                            insert = "Inserting new object in existing unique-object class is prohibited."
                         ),
                         " Invalid input:\n", m
                     ),
@@ -2349,6 +2348,36 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 }
 # }}}
 
+# TABLE
+# get_idf_table {{{
+get_idf_table <- function (idd_env, idf_env, class = NULL, object, string_value = TRUE, unit = TRUE) {
+    cols <- c("object_id", "object_name", "class_name",
+              "field_index", "field_name", "units", "ip_units", "type_enum",
+              "value_chr", "value_num")
+
+    val <- get_idf_value(idd_env, idf_env, class = class, object = object,
+        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
+
+    setnames(val,
+        c("object_id", "object_name", "class_name", "field_index", "field_name"),
+        c("id", "name", "class", "index", "field"))
+
+    if (string_value) {
+        setnames(val, "value_chr", "value")
+        val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+    } else {
+        lst <- get_value_list(val, unit = unit)
+        if (nrow(val) == 1L) {
+            set(val, NULL, "value", list(lst))
+        } else {
+            set(val, NULL, "value", lst)
+        }
+
+        val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+    }
+}
+# }}}
+
 # SAVE
 # save_idf {{{
 save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
@@ -2421,9 +2450,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # Currently, only `Schedule:File` class is supported
-    if (!"Schedule:File" %in% idf_env$object$class_name) {
-        return(FALSE)
-    }
+    if (!"Schedule:File" %in% idf_env$object$class_name) return(FALSE)
 
     # restore current working directory
     ori <- getwd()
@@ -2446,7 +2473,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
         options(warning.length = 8170)
 
-        m <- paste0(format_objects(val, "field", leading = 4L), collapse = "\n")
+        m <- paste0(format_objects(val, "field"), collapse = "\n")
 
         warn("warning_broken_file_link",
             paste0("Broken external file link found in IDF:\n\n", m)
@@ -2475,7 +2502,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
             on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
             options(warning.length = 8170)
 
-            m <- paste0(format_objects(val[copied == FALSE], "field", leading = 4L), collapse = "\n")
+            m <- paste0(format_objects(val[copied == FALSE], "field"), collapse = "\n")
 
             abort("error_failed_to_copy",
                 paste0("Failed to copy external file into the output directory ",
@@ -2486,6 +2513,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # update object value table
+    browser()
     idf_env$value[J(val$value_id), on = "value_id", value_chr := val$new_value]
 
     TRUE

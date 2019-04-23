@@ -1,11 +1,9 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
-#' @importFrom crayon bold cyan red strip_style underline
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
 #' @importFrom stringi stri_subset_regex stri_match_first_regex stri_rand_strings
 #' @include parse.R
-#' @include clone.R
 NULL
 
 # COMMON
@@ -140,8 +138,8 @@ in_ip_mode <- function () {
 # verbose_info {{{
 verbose_info <- function (...) {
     if (eplusr_option("verbose_info")) {
-        cli::cat_rule(crayon::bold("Info"), col = "green")
-        cat(crayon::green(paste0(...)), "\n", sep = "")
+        cli::cat_rule("Info", col = "green")
+        cat(paste0(...), "\n", sep = "")
         cat("\n")
     }
 }

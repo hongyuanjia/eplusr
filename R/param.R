@@ -1,6 +1,5 @@
 #' @importFrom R6 R6Class
-#' @importFrom cli cat_boxx cat_bullet cat_line cat_rule
-#' @importFrom crayon bold
+#' @importFrom cli cat_boxx cat_line cat_rule
 #' @importFrom data.table rbindlist set setattr setcolorder
 #' @importFrom tools file_path_sans_ext
 NULL
@@ -716,7 +715,7 @@ param_tabular_data <- function (self, private, which = NULL, report_name = NULL,
 # }}}
 # param_print {{{
 param_print <- function (self, private) {
-    cli::cat_rule(crayon::bold("EnergPlus Parametric Job"), col = "green")
+    cli::cat_rule("EnergPlus Parametric Job", col = "green")
     config <- eplus_config(private$m_idf$version())
     cli::cat_line(c(
         str_trunc(paste0("Seed Model: ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE)))),

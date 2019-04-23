@@ -1,5 +1,4 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
-#' @importFrom crayon bold cyan red strip_style underline
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"

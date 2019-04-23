@@ -1,5 +1,4 @@
 #' @importFrom cli boxx rule cat_line symbol
-#' @importFrom crayon red green cyan yellow magenta bold
 #' @importFrom utils capture.output
 #' @importFrom stringi stri_dup
 #' @include impl.R
@@ -1096,9 +1095,6 @@ with_nocolor <- function (...) {
 has_color <- function () {
     requireNamespace("crayon") && crayon::has_color()
 }
-# }}}
-# s_req: style for indices of required fields {{{
-s_req <- function (...) if (.globals$color) crayon::red$bold(...) else c(...)
 # }}}
 # s_nm: style for field names {{{
 s_nm <- function (...) if (.globals$color) crayon::italic(...) else c(...)

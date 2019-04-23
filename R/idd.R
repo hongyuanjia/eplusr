@@ -100,7 +100,7 @@ NULL
 #'
 #' `$required_class_name()` returns the names of all required classes.
 #'
-#' `$unique_class_name()` returns the names of all unique classes.
+#' `$unique_class_name()` returns the names of all unique-object classes.
 #'
 #' `$extensible_class_name()` returns the names of all extensible classes.
 #'
@@ -717,7 +717,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
 
             idd <- use_idd(avail_idd()[length(avail_idd())])
             if (warn) {
-                warn("warn_latest_idd",
+                warn("warn_latest_idd_used",
                     paste0(mes,
                         " The latest parsed IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."

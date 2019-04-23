@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @importFrom crayon bold
 #' @include impl-idf.R
 NULL
 
@@ -94,34 +95,32 @@ NULL
 #' ```
 #'
 #' `$version()` returns the version of current model in a
-#'     [base::numeric_version] format. This makes it easy to direction compare
-#'     versions of different Idfs, e.g. `model1$version() > 8.6` or
-#'     `model1$version() > model2$version()`.
+#' [base::numeric_version] format. This makes it easy to direction compare
+#' versions of different Idfs, e.g. `model1$version() > 8.6` or
+#' `model1$version() > model2$version()`.
 #'
-#' `$path()` returns the path of current model or `NULL` if the model is
-#'     created using a character vector and not saved locally.
+#' `$path()` returns the path of current model or `NULL` if the model is created
+#' using a character vector and not saved locally.
 #'
 #' `$group_name()` returns all groups the model contains when `all` is `FALSE`
-#'     or all groups the Idd contains when `all` is `TRUE`.
+#' or all groups the Idd contains when `all` is `TRUE`.
 #'
 #' `$class_name()` returns all classes the model contains when `all` is `FALSE`
-#'     or all classes the Idd contains when `all` is `TRUE`.
+#' or all classes the Idd contains when `all` is `TRUE`.
 #'
 #' `$is_valid_group()` returns `TRUE`s if given group names are valid for
-#'     current model (when `all` is `FALSE`) or current Idd (when `all` is
-#'     `TRUE`).
+#' current model (when `all` is `FALSE`) or current Idd (when `all` is `TRUE`).
 #'
 #' `$is_valid_class()` returns `TRUE`s if given class names are valid for
-#'     current model (when `all` is `FALSE`) or current Idd (when `all` is
-#'     `TRUE`).
+#' current model (when `all` is `FALSE`) or current Idd (when `all` is `TRUE`).
 #'
 #' **Arguments**
 #'
 #' * `all`: If `FALSE`, only values in current model will be returned. If
-#'     `TRUE`, all values in Idd will be returned. Default: `FALSE`.
+#'   `TRUE`, all values in Idd will be returned. Default: `FALSE`.
 #' * `sorted`: If `TRUE`, duplications in returned values are removed and values
-#'     are also further sorted according to their occurances in IDD. Default:
-#'     `TRUE`.
+#'   are also further sorted according to their occurances in IDD. Default:
+#'   `TRUE`.
 #' * `group`: A character vector contains group names.
 #' * `class`: A character vector contains class names.
 #'
@@ -130,13 +129,13 @@ NULL
 #' model$definition(class)
 #' ```
 #'
-#' `$definition()` returns a list of `IddObject`s, of given
-#'     classes. Those `IddObject`s contain all data used for parsing
-#'     `IdfObject`s. For details on `IdfObject`, please see [IddObject] class.
+#' `$definition()` returns an [IddObject] of given class. IddObject
+#' contains all data used for parsing [IdfObject]. For details, please see
+#' [IddObject] class.
 #'
 #' **Arguments**
 #'
-#' * `class`: A character vector of valid class names in current IDD.
+#' * `class`: A single string of valid class name in current IDD.
 #'
 #' @section Object Info:
 #'
@@ -148,13 +147,13 @@ NULL
 #' model$object_num(class = NULL)
 #' ```
 #'
-#' `$object_id()` and `$object_name()` returns all object IDs and names
-#'     in specified classes respectively. For `$object_name()`, if the specified
-#'     class does not have name attributes, such as `SimulationContrl`, `NA`
-#'     will be returned.
+#' `$object_id()` and `$object_name()` returns all object IDs and names in
+#' specified classes respectively. For `$object_name()`, if the specified class
+#' does not have name attributes, such as `SimulationContrl`, `NA` will be
+#' returned.
 #'
-#' `$is_valid_id()` and `$is_valid_name()` returns `TRUE`s if given integers
-#'    or characters are valid object IDs or object names respectively.
+#' `$is_valid_id()` and `$is_valid_name()` returns `TRUE`s if given integers or
+#' characters are valid object IDs or object names respectively.
 #'
 #' `$object_num()` returns the number of objects in specified classes.
 #'
@@ -182,32 +181,31 @@ NULL
 #' model[[ClassName]]
 #' }
 #'
-#' `$object()` returns an `IdfObject`s specified by an object ID or name.
+#' `$object()` returns an [IdfObject] specified by an object ID or name.
 #'
-#' `$object_unique()` returns an `IdfObject` in unique-object class, e.g.
-#'     `SimulaSimulationContrl`. This makes it easy to directly extract and
-#'     modify those objects, e.g. `model$object_unique("SimulationContrl")$set(...)`.
-#'     If there are multiple objects in that unique class, an error is issued.
+#' `$object_unique()` returns an [IdfObject] in unique-object class, e.g.
+#' `SimulaSimulationContrl`. This makes it easy to directly extract and modify
+#' those objects, e.g. `model$object_unique("SimulationContrl")$set(...)`. If
+#' there are multiple objects in that unique-object class, an error is issued.
 #'
-#' `$objects()` returns a named **list** of `IdfObject`s specified by object IDs
-#'     or names. The names are the same as returned `IdfObject`s. Thus, if
-#'     returned `IdfObject`s do not have names, `NA`s are assigned as the name
-#'     of returned list.
+#' `$objects()` returns a named **list** of [IdfObject]s specified by object IDs
+#' or names. The names are the same as returned [IdfObject]s. Thus, if returned
+#' [IdfObject]s do not have names, `NA`s are assigned as the name of returned
+#' list.
 #'
-#' `$objects_in_class()` returns a named list of all `IdfObject`s in specified
-#'     classes.
+#' `$objects_in_class()` returns a named list of all [IdfObject]s in specified
+#' classes.
 #'
-#' `$search_object()` returns a named list of `IdfObject`s whose names meet the
-#'     given pattern in specified classes.
+#' `$search_object()` returns a named list of [IdfObject]s whose names meet the
+#' given pattern in specified classes.
 #'
 #' eplusr also provides custom S3 method of `$` and \code{[[} to make it more
-#'     convenient to get `IdfObject`s in class. Basically, `model$ClassName` and
-#'     \code{model[[ClassName]]}, where `ClassName` is a single valid class
-#'     name, is equivalent to `model$object_in_class(ClassName)` if `ClassName`
-#'     is not an unique-object class and `model$object_unique(ClassName)` if
-#'     `ClassName` is an unique-object class. For convenience, *underscore* names
-#'     are allowed, e.g. `BuildingSurface_Detailed` is equivalent to
-#'     `BuildingSurface:Detailed`.
+#' convenient to get [IdfObject]s in class. Basically, `model$ClassName` and
+#' \code{model[[ClassName]]}, where `ClassName` is a single valid class name, is
+#' equivalent to `model$objects_in_class(ClassName)` if `ClassName` is not an
+#' unique-object class and `model$object_unique(ClassName)` if `ClassName` is an
+#' unique-object class. For convenience, *underscore* names are allowed, e.g.
+#' `BuildingSurface_Detailed` is equivalent to `BuildingSurface:Detailed`.
 #'
 #' `IdfObject` is a class that provides more detailed information methods to
 #'     modify a single object in an `Idf` object. For detailed explanations,
@@ -497,8 +495,8 @@ NULL
 #'    * `missing_object`: A character vector that contains names of classes
 #'      which are required but currently none object exists.
 #'    * `duplicate_object`: A data.table that contains data of all objects in
-#'      unique class which should only have one object but currently multiple
-#'      objects exist.
+#'      unique-object class which should only have one object but currently
+#'      multiple objects exist.
 #'    * `conflict_name`: A data.table that contains data of all objects
 #'      that have the same name in the same class.
 #'    * `incomplete_extensible`: A data.table that contains data of all object
@@ -766,7 +764,7 @@ NULL
 #' idf$Zone
 #' idf[["Zone"]]
 #'
-#' # get a single object in unique class
+#' # get a single object in unique-object class
 #' idf$object_unique("SimulationControl")
 #' idf$SimulationControl
 #' idf[["SimulationControl"]]
@@ -1176,8 +1174,8 @@ Idf <- R6::R6Class(classname = "Idf",
             idf_string(self, private, comment = comment, header = header,
                        format = format, leading = leading, sep_at = sep_at),
 
-        to_table = function (class = NULL, which)
-            idf_to_table(self, private, class = NULL, object = which),
+        to_table = function (class = NULL, which, string_value = TRUE, unit = FALSE)
+            idf_to_table(self, private, class = NULL, object = which, string_value = string_value, unit = unit),
 
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),
@@ -1324,7 +1322,7 @@ idf_object_unique <- function (self, private, class) {
 
     if (!obj$class_id %in% private$idd_env()$class[unique_object == TRUE, class_id]) {
         abort("error_idf_not_unique_class",
-            paste0(surround(unique(obj$class_name)), " is not a valid unique class index or name.")
+            paste0(surround(unique(obj$class_name)), " is not a valid unique-object class index or name.")
         )
     }
 
@@ -1628,8 +1626,8 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private) {
-    stop("Not implemented")
+idf_to_table <- function (self, private, class = NULL, object, string_value = TRUE, unit = FALSE) {
+    get_idf_table(private$idd_env, private$idf_env, class, object, string_value, unit)
 }
 # }}}
 # idf_save {{{
@@ -1699,13 +1697,15 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
             }
         }
     }
+
     # add Output:SQLite if necessary
     add_sql <- idf_add_output_sqlite(self)
 
     # save the model to the output dir if necessary
-    if (is.null(private$m_path) || !utils::file_test("-f", private$m_path))
+    if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
         stop("The Idf object is not created from local file or local file has ",
             "been deleted from disk. Please save Idf using $save() before run.", call. = FALSE)
+    }
 
     path_idf <- private$m_path
     if (is.null(dir))
@@ -1716,8 +1716,9 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     }
 
     # if necessary, resave the model
-    if (add_sql || !is.null(dir))
+    if (add_sql || !is.null(dir)) {
         idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
+    }
 
     job <- EplusJob$new(path_idf, epw, private$m_version)
 
@@ -1732,7 +1733,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 idf_print <- function (self, private, zoom = c("object", "class", "group", "field"), order = FALSE) {
     zoom <- match.arg(zoom)
 
-    cli::cat_rule(crayon::bold("EnergPlus Input Data File"), line = 1)
+    cli::cat_rule("EnergPlus Input Data File", line = 1)
 
     if (is.null(private$m_path)) path <- crayon::bold$bgRed("NOT LOCAL") else path <- surround(private$m_path)
 

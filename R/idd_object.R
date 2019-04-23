@@ -679,10 +679,10 @@ iddobj_is_extensible <- function (self, private) {
 }
 # }}}
 # iddobj_field_data {{{
-iddobj_field_data <- function (self, private, which = NULL, property = NULL) {
+iddobj_field_data <- function (self, private, which = NULL, property = NULL, underscore = FALSE) {
     all <- if (is.null(which)) TRUE else FALSE
     get_idd_field(private$idd_env(), private$m_class_id, which,
-        property, all = all, underscore = FALSE, no_ext = TRUE
+        property, all = all, underscore = underscore, no_ext = TRUE
     )
 }
 # }}}
@@ -692,9 +692,9 @@ iddobj_field_name <- function (self, private, index = NULL, lower = FALSE,
     if (!is.null(index)) assert(are_count(index))
 
     if (unit) {
-        res <- format_name(iddobj_field_data(self, private, index, "units", "ip_units"))
+        res <- format_name(iddobj_field_data(self, private, index, c("units", "ip_units"), underscore = TRUE))
     } else {
-        res <- iddobj_field_data(self, private, index)$field_name
+        res <- iddobj_field_data(self, private, index, underscore = TRUE)$field_name
     }
 
     if (lower) .deprecated_arg("lower", "0.10.0", "IddObject")

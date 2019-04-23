@@ -296,7 +296,14 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     idf_ver <- get_idf_ver(idf_dt)
 
-    idd <- get_idd_from_ver(idf_ver, idd)
+    if (has_ext(path, "ddy")) {
+        idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
+            warn_given_idd_used = function (w) invokeRestart("muffleWarning"),
+            warn_latest_idd_used = function (w) invokeRestart("muffleWarning")
+        )
+    } else {
+        idd <- get_idd_from_ver(idf_ver, idd)
+    }
 
     # get idd version and table
     idd_ver <- ._get_private(idd)$m_version
