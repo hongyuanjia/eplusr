@@ -831,15 +831,13 @@ format_index <- function (dt, required = FALSE, pad_char = " ") {
 # format_value: return Idf format value strings {{{
 format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank = FALSE, end = TRUE) {
     length <- max(length, 0L)
-    old <- dt$value_chr
-    if (is.null(old)) return(paste0(stri_dup(" ", leading), character(nrow(dt))))
-
-    on.exit(set(dt, NULL, c("value_chr", "width"), list(old, NULL)), add = TRUE)
-    set(dt, NULL, "width", leading + nchar(dt$value_chr, "width") + 1L) # 1 for comma(,)
+    if (is.null(dt$value_chr)) return(paste0(stri_dup(" ", leading), character(nrow(dt))))
+    set(dt, NULL, "value_out", dt$value_chr)
+    set(dt, NULL, "width", leading + nchar(dt$value_out, "width") + 1L) # 1 for comma(,)
 
     if (has_name(dt, "value_num")) {
         dt[!is.na(value_num), `:=`(
-            value_chr = as.character(value_num),
+            value_out = as.character(value_num),
             width = leading + nchar(value_num, "width") + 1L)
         ]
     }
@@ -860,28 +858,28 @@ format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank =
 
     # format value according to type {{{
     if (!quote) {
-        dt[is.na(value_chr), `:=`(value_chr = blk_chr, width = leading + blk_chr_w + 1L)]
+        dt[is.na(value_out), `:=`(value_out = blk_chr, width = leading + blk_chr_w + 1L)]
     } else {
         assert(has_name(dt, "type_enum"))
 
         # character value
         dt[type_enum > IDDFIELD_TYPE$real,
-            c("value_chr", "width") := ({
-                na <- is.na(value_chr)
+            c("value_out", "width") := ({
+                na <- is.na(value_out)
                 width[na] <- leading + blk_chr_w + 1L
                 width[!na] <- width[!na] + 2L
-                value_chr[na] <- blk_chr
-                value_chr[!na] <- paste0("\"", value_chr[!na], "\"")
-                list(value_chr, width)
+                value_out[na] <- blk_chr
+                value_out[!na] <- paste0("\"", value_out[!na], "\"")
+                list(value_out, width)
             })
         ]
         # numeric value
         dt[type_enum <= IDDFIELD_TYPE$real,
-            c("value_chr", "width") := ({
-                na <- is.na(value_chr)
-                value_chr[na] <- blk_num
+            c("value_out", "width") := ({
+                na <- is.na(value_out)
+                value_out[na] <- blk_num
                 width[na] <- leading + blk_num_w + 1L
-                list(value_chr, width)
+                list(value_out, width)
             })
         ]
     }
@@ -895,7 +893,7 @@ format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank =
     }
     pad <- stringi::stri_dup(" ", len)
 
-    values <- dt$value_chr
+    values <- dt$value_out
     if (is.null(end)) {
         res <- values
     } else if (!end) {
@@ -910,6 +908,8 @@ format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank =
         res[is_end] <- paste0(values[is_end], ";")
         res[-is_end] <- paste0(values[-is_end], ",")
     }
+
+    on.exit(set(dt, NULL, c("value_out", "width"), NULL), add = TRUE)
 
     paste0(stringi::stri_dup(" ", leading), res, pad)
 }
@@ -981,7 +981,7 @@ print.IdfRelationBy <- function (x, ...) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
         if (by_value) {
-            lapply(format_idf_relation(x, "ref_by", TRUE)$fmt,
+            lapply(format_idf_relation(x, "ref_by")$fmt,
                 function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
             )
         } else {
@@ -1001,7 +1001,7 @@ print.IdfRelationTo <- function (x, ...) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {
         if (by_value) {
-            lapply(format_idf_relation(x, "ref_to", TRUE)$fmt,
+            lapply(format_idf_relation(x, "ref_to")$fmt,
                 function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
             )
         } else {
