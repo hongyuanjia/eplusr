@@ -68,7 +68,7 @@ assert <- function(..., msg = NULL, prefix = NULL, err_type = NULL, env = parent
 
 # is_version {{{
 is_version <- function (ver) {
-    !is.na(numeric_version(ver, strict = FALSE))
+    !is.na(standardize_ver(ver))
 }
 # }}}
 #' Check for Idd, Idf and Epw objects
@@ -93,8 +93,6 @@ is_version <- function (ver) {
 #' `is_idfobject()` returns `TRUE` if input is an IdfObject object.
 #'
 #' `is_epw()` returns `TRUE` if input is an Epw object.
-#'
-#' `is_epwdate()` returns `TRUE` if input is a valid EPW date specification.
 #'
 #' @param ver A character or numeric vector with suitable numeric version
 #' strings.
@@ -125,13 +123,9 @@ is_version <- function (ver) {
 #' is_idfobject(idf_object(idf, class = "Material"))
 #'
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
-#'
-#' is_epwdate("1/1")
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver, strict = FALSE) {
-    ver <- standardize_ver(ver, strict)
-    if (is.na(ver)) return(FALSE)
-    as.character(ver) %in% ALL_EPLUS_VER
+    as.character(standardize_ver(ver, strict = strict)) %in% c(ALL_EPLUS_VER, names(.globals$eplus_config))
 }
 on_fail(is_eplus_ver) <- function (call, env) {
     paste0(deparse(call$ver), " is not a valid or supported EnergyPlus version. ",
@@ -146,14 +140,8 @@ on_fail(is_eplus_ver) <- function (call, env) {
 #' @rdname assertion
 #' @export
 # is_idd_ver {{{
-is_idd_ver <- function (ver, strict = FALSE, only_exist = TRUE) {
-    if (isTRUE(strict) && !is_version(ver)) return(FALSE)
-
-    is_ver <- identical(ver, "latest") || is_version(ver)
-
-    if (only_exist)
-        is_ver && as.character(standardize_ver(ver)) %in% c(ALL_IDD_VER, names(.globals$idd))
-    else is_ver
+is_idd_ver <- function (ver, strict = FALSE) {
+    as.character(standardize_ver(ver, strict)) %in% c(ALL_IDD_VER, names(.globals$idd))
 }
 on_fail(is_idd_ver) <- function (call, env) {
     paste0(deparse(call$ver), " is not a valid Idd version.")
@@ -165,7 +153,6 @@ on_fail(is_idd_ver) <- function (call, env) {
 #' @export
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
-    assert(is_scalar(path))
     eplus <- paste0("energyplus", if (is_windows()) ".exe" else "")
     all(dir.exists(path), file.exists(file.path(path, c(eplus, "Energy+.idd"))))
 }

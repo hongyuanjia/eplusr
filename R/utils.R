@@ -147,13 +147,34 @@ os_type <- function () {
 # }}}
 
 # standardize_ver {{{
-standardize_ver <- function (ver, strict = FALSE, no_patch = FALSE) {
-    assert(is_scalar(ver))
-    if (!strict && identical(ver, "latest")) ver <- LATEST_EPLUS_VER
-    if (is_integer(ver)) ver <- paste0(ver, ".0")
+standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
+    if (!strict && is.character(ver)) {
+        ver[ver == "latest"] <- LATEST_EPLUS_VER
+    }
+
+    if (is.numeric(ver)) {
+        int <- (!is.na(ver)) & (is.integer(ver) | (is.numeric(ver) & (ver == trunc(ver))))
+        if (any(int)) ver[int] <- paste0(ver[int], ".0")
+    }
+
     ver <- numeric_version(ver, strict = FALSE)
-    if (is.na(ver)) return(ver)
-    if (no_patch | is.na(ver[1L, 3L])) ver[1L, 3L] <- 0L
+
+    # only keep major.minor.patch, and convert others to NAs
+    ver[!is.na(ver[, 4L])] <- numeric_version(NA, strict = FALSE)
+
+    # complete patch version to 0 if not exist
+    if (complete && any(!is.na(ver) & is.na(ver[, 3L]))) {
+        ver[!is.na(ver) & is.na(ver[, 3L]), 3L] <- 0L
+    }
+
+    ver
+}
+# }}}
+# complete_patch_ver {{{
+complete_patch_ver <- function (ver) {
+    if (any(!is.na(ver) & is.na(ver[, 3L]))) {
+        ver[!is.na(ver) & is.na(ver[, 3L]), 3L] <- 0L
+    }
     ver
 }
 # }}}
@@ -359,7 +380,7 @@ wday <- function (x, label = FALSE) {
 # .deprecated {{{
 .deprecated <- function(msg, version) {
     v <- as.package_version(version)
-    cv <- packageVersion("eplusr")
+    cv <- utils::packageVersion("eplusr")
 
     # If current major number is greater than last-good major number, or if
     # current minor number is more than 2 greater than last-good minor number,

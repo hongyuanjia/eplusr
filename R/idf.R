@@ -22,7 +22,7 @@ NULL
 #'
 #' * `object`: contains object IDs, names and comments.
 #' * `value`: contains field values.
-#' * `reference`: contains cross-reference of field values.
+#' * `reference`: contains cross-reference data of field values.
 #'
 #' IDD file is parsed and stored in a similar structure. For details, please see
 #' [Idd] class.
@@ -60,6 +60,8 @@ NULL
 #' model$object_unique(class)
 #' model$objects(which)
 #' model$objects_in_class(class)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
@@ -67,25 +69,26 @@ NULL
 #' model$add(..., .default = TRUE, .all = FALSE)
 #' model$set(..., .default = TRUE)
 #' model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
-#' model$insert(...)
+#' model$insert(..., .unique = TRUE)
 #' model$rename(...)
-#' model$paste(in_ip = FALSE, ver = NULL)
+#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
 #' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$is_unsaved()
 #' model$validate(level = eplusr_option("validate_level"))
 #' model$is_valid(level = eplusr_option("validate_level"))
-#' model$to_string(comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
-#' model$to_table(class = NULL, object)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$clone(deep = TRUE)
-#' model$print(zoom = "class", order = TRUE)
+#' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 #' print(model)
 #' }
 #'
 #' @section Basic Info:
 #' ```
+#' model <- read_idf(path)
 #' model$version()
 #' model$path()
 #' model$group_name(all = FALSE, sorted = TRUE)
@@ -114,8 +117,10 @@ NULL
 #' `$is_valid_class()` returns `TRUE`s if given class names are valid for
 #' current model (when `all` is `FALSE`) or current Idd (when `all` is `TRUE`).
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
+#' * `path`: Either a path, a connection, or literal data (either a single
+#'   string or a raw vector) to an EnergyPlus Input Data File (IDF).
 #' * `all`: If `FALSE`, only values in current model will be returned. If
 #'   `TRUE`, all values in Idd will be returned. Default: `FALSE`.
 #' * `sorted`: If `TRUE`, duplications in returned values are removed and values
@@ -129,11 +134,11 @@ NULL
 #' model$definition(class)
 #' ```
 #'
-#' `$definition()` returns an [IddObject] of given class. IddObject
-#' contains all data used for parsing [IdfObject]. For details, please see
-#' [IddObject] class.
+#' `$definition()` returns an [IddObject] of given class. [IddObject] contains
+#' all data used for parsing an [IdfObject]. For details, please see [IddObject]
+#' class.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
 #' * `class`: A single string of valid class name in current IDD.
 #'
@@ -147,35 +152,37 @@ NULL
 #' model$object_num(class = NULL)
 #' ```
 #'
-#' `$object_id()` and `$object_name()` returns all object IDs and names in
+#' `$object_id()` and `$object_name()` return all object IDs and names in
 #' specified classes respectively. For `$object_name()`, if the specified class
-#' does not have name attributes, such as `SimulationContrl`, `NA` will be
-#' returned.
+#' does not have name attributes, such as `SimulationContrl`, `NA` is be returned.
 #'
 #' `$is_valid_id()` and `$is_valid_name()` returns `TRUE`s if given integers or
-#' characters are valid object IDs or object names respectively.
+#' characters are valid object IDs or object names respectively. Note that for
+#' `$is_valid_name()`, object name matching is **case-insensitive**.
 #'
 #' `$object_num()` returns the number of objects in specified classes.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
 #' * `id`: An integer vector to check.
 #' * `name`: A character vector to check.
 #' * `class`: A character vector that contains valid class names. If `NULL`, all
 #'   classes in current IDF are used. Default: `NULL`.
 #' * `simplify`: If `FALSE`, a list with each member being the data per class
-#'   is returned. The order of classes are the same as it in IDD. If
-#'   `TRUE`, an integer vector (for `$object_id()`) or a character vector (for
-#'   `$object_name`()) is returned. The order of returned object IDs or
-#'   names is the same order as objects in the IDF. Default: `FALSE`.
+#'   is returned. The order of classes are the same as it in IDD. If `TRUE`, an
+#'   integer vector (for `$object_id()`) or a character vector (for
+#'   `$object_name`()) is returned. The order of returned object IDs or names is
+#'   the same order as objects in the IDF. Default: `FALSE`.
 #'
 #' @section Object Query:
 #'
 #' \preformatted{
 #' model$object(which)
-#' model$object_unique(class)
 #' model$objects(which)
+#' model$object_unique(class)
 #' model$objects_in_class(class)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
@@ -196,6 +203,38 @@ NULL
 #' `$objects_in_class()` returns a named list of all [IdfObject]s in specified
 #' classes.
 #'
+#' `$object_relation()` returns an `IdfRelation` object which contains field
+#' value data that have relation with specified object. For instance, if
+#' `model$object_relation(2, "ref_to")` gives results below:
+#'
+#' ```
+#' -- Refer to Others -------------------------------------------------------------------
+#'   Class: <Construction>
+#'   \- Object [ID:2] <WALL-1>
+#'      \- 2: "WD01";        !- Outside Layer
+#'         v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#'         \- Class: <Material>
+#'            \- Object [ID:1] <WD01>
+#'               \- 1: "WD01";        !- Name
+#' ```
+#'
+#' This means that the value of `Outside Layer` in construction `WALL-1` does
+#' refers to material named `WD01`.
+#'
+#' `$objects_in_relation()` returns a list of [IdfObject]s that have relations.
+#' The first element is always the [IdfObject] of that object. If specified
+#' object does not have any relation with other objects, a list that only
+#' contains the [IdfObject] of that object is returned. For instance,
+#' `idf$objects_in_relation("const", "ref_to")` will return a list of an
+#' [IdfObject] of object `const` and also all [IdfObject]s that object `const`
+#' refers to; similarly, `idf$objects_in_relation("const", "ref_by")` will
+#' return a list of an [IdfObject] of class `Construction` and also all
+#' [IdfObject]s that refer to class `Construction`. You can also specify which
+#' class to search relation using `class` argument, e.g. if `mat` is a material
+#' name, `model$objects_in_relation("mat", "ref_by", "Construction")` wll only
+#' search objects in class `Construction` that refer to that material, instead
+#' of the whole model.
+#'
 #' `$search_object()` returns a named list of [IdfObject]s whose names meet the
 #' given pattern in specified classes.
 #'
@@ -204,24 +243,35 @@ NULL
 #' \code{model[[ClassName]]}, where `ClassName` is a single valid class name, is
 #' equivalent to `model$objects_in_class(ClassName)` if `ClassName` is not an
 #' unique-object class and `model$object_unique(ClassName)` if `ClassName` is an
-#' unique-object class. For convenience, *underscore* names are allowed, e.g.
+#' unique-object class. For convenience, underscore-style names are allowed, e.g.
 #' `BuildingSurface_Detailed` is equivalent to `BuildingSurface:Detailed`.
 #'
-#' `IdfObject` is a class that provides more detailed information methods to
-#'     modify a single object in an `Idf` object. For detailed explanations,
-#'     please see [IdfObject] class.
+#' [IdfObject] is a class that provides more detailed methods to modify a single
+#' object in an `Idf` object. For detailed explanations, please see [IdfObject]
+#' class.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
 #' * `which`: Either an integer vector of valid object IDs or a character vector
-#'     of valid object names.
-#' * `class`: A single string of valid class name for `$object_unique()` or a
-#'    character vector of valid class names for `$objects_in_class()`.
+#'   of valid object names. For `$object()`, `$object_relation()` and
+#'   `$objects_in_relation()`, `which` should be one single object ID or name.
+#' * `class`: A single string of valid class name for `$object_unique()` and
+#'   `$objects_in_class()` or a character vector of valid class names for
+#'   `$objects_in_relation()` and `$search_object()`.
 #' * `pattern`, `ignore.case`, `perl`, `fixed` and `useBytes`: All of them are
 #'   directly passed to [base::grepl()].
-#' * `ClassName`: A single string of valid class name or *underscore* class name,
-#'    where all characters other than letters and numbers are replaced by a
-#'    underscore `_`.
+#' * `ClassName`: A single string of valid class name or underscore-style class
+#'   name, where all characters other than letters and numbers are replaced by a
+#'   underscore `_`.
+#' * `direciton`: The relation direction to extract. Should be either `"all"`,
+#'   `"ref_to"` or "ref_by". For `$objects_in_relation()`, only `"ref_to"` and
+#'   `"ref_by"` are acceptable.
+#' * `ignore.case`, `perl`, `fixed` and `useBytes`: All are directly passed to
+#'   [base::grepl()].
+#' * `recursive`: If `TRUE`, the relation is searched recursively, e.g. one
+#'   material named `mat` is referred by a construction named `const`, and
+#'   `const` is also referred by a surface named `surf`, all `mat`, `const` and
+#'   `surf` are returned.
 #'
 #' @section Object Modification:
 #' \subsection{Duplicate Objects}{
@@ -231,10 +281,16 @@ NULL
 #' ```
 #'
 #' `$dup()` takes object name and ID vectors and duplicates objects specified.
-#'     The names of input vector are used as new names of duplicated object. The
-#'     newly created objects will be renamed automatically if new names are not
-#'     given, with a suffix `"_1"`, `"_2"` and etc. A list of resultant
-#'     [IdfObject]s is returned.
+#' The names of input vector are used as new names of duplicated object. The
+#' newly created objects will be renamed automatically if new names are not
+#' given, with a suffix `"_1"`, `"_2"` and etc. A list of resultant [IdfObject]s
+#' is returned.
+#'
+#' **Argument**:
+#'
+#' * `...`: Integer vectors of valid object IDs and character vectors of valid
+#'   object names. If input has names, they will be used as the names of newly
+#'   created objects.
 #'
 #' **Usage**:
 #'
@@ -246,29 +302,43 @@ NULL
 #' \subsection{Add Objects}{
 #'
 #' ```
-#' model$add(...)
+#' model$add(..., .default = TRUE, .all = FALSE)
 #' ```
 #'
 #' `$add()` takes object definitions in list format and adds objects in the
-#'    specified class. Every list should be named with a valid class name. There
-#'    is a special element `.comment` in each list, which will be used as the
-#'    comments of newly added object. Names in list element are treated as
-#'    field names. Values without names will be inserted according to their
-#'    position. A list of resultant [IdfObject]s is returned.
+#' specified class. Every list should be named with a valid class name. There is
+#' a special element `.comment` in each list, which will be used as the comments
+#' of newly added object. Names in list element are treated as field names.
+#' Values without names will be inserted according to their position. A list of
+#' newly added [IdfObject]s is returned.
 #'
 #' **NOTE**:
 #'
 #' * Empty objects can be added using an empty list, e.g. `model$add(building =
 #'   list())`. All empty fields will be filled with corresponding default value
 #'   if `.default` is `TRUE`, leaving other fields as blank. However, adding
-#'   blank objects may not be successful if current [validate level][eplusr_option()] does not allow so.
-#' * Field names are case insensitive and for convenience, *underscore_name* is
-#'   also allowed, e.g. `end_month` is equivalent to `End Month`.
+#'   blank objects may not be successful if current validate level does not
+#'   allow so. For what kind of validations to be performed during
+#'   modifications, see [level_checks()].
+#' * Field name matching is case-insensitive. For convenience, underscore-style
+#'   name is also allowed, e.g. `end_month` is equivalent to `End Month`.
 #' * If not all field names are given, positions of those values without field
 #'   names are determined after those values with names. E.g. in
 #'   `model$add(Construction = list("out_layer", name = "name"))`, `"out_layer"`
 #'   will be treated as the value of field `Outside Layer` in `Construction`, as
 #'   value of field `Name` has been given as `"name"`.
+#'
+#' **Arguments**:
+#'
+#' * `...`: Lists of object definitions. Each list should be named with a valid
+#'   class name. There is a special element `.comment` in each list, which will
+#'   be used as the comments of newly added object.
+#' * `.default`: If `TRUE`, default values are used for those blank fields if
+#'    possible. If `FALSE`, each required field in input object must have one
+#'    value. Otherwise, an error will be issued during validation. Default:
+#'    `TRUE`.
+#' * `.all`: If `TRUE`, all fields are added, otherwise only minimum fields are
+#'   added. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -278,45 +348,47 @@ NULL
 #' * New objects: `model$add(RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"), list(Construction = list("const", "mat"), Material = list("mat")))`.
 #' * New objects with comments: `model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))`.
 #' * Variable inputs: `x <- list(Construction = list("const"), Building = list()); model$add(x)`.
-#'
-#' **Arguments**:
-#'
-#' * `.default`: If `TRUE`, default values are used for those blank fields if
-#'    possible. If `FALSE`, each required field in input object must have one
-#'    value. Otherwise, an error will be issued during validation. Default:
-#'    `TRUE`.
-#' * `.all`: If `TRUE`, all fields are added, otherwise only minimum fields are
-#'   added. Default: `FALSE`.
 #' }
 #'
-#' \subsection{Set Existing Objects}{
+#' \subsection{Set Values of Existing Objects}{
 #'
 #' ```
 #' model$set(..., .default = TRUE)
 #' ```
 #'
-#' `$set()` takes object definitions in list format and sets field values in
-#'    objects specified. Every list in `$set()` should be named with a valid
-#'    object name. Object ID can also be used but have to be combined with two
-#'    prevailing `..`, e.g. `..10` indicates the object with ID `10`. Similar to
-#'    `$add()`, a special element `.comment` in each list will be used as the
-#'    **new** comments for modifed object, overwriting the old ones. Names
-#'    in list element are treated as field names. Values without names will be
-#'    inserted according to their position. A list of resultant [IdfObject]s is
-#'    returned.
+#' `$set()` takes new field value definitions in list format and sets field
+#' values in objects specified. Every list in `$set()` should be named with a
+#' valid object name. Object ID can also be used but have to be combined with
+#' two prevailing `..`, e.g. `..10` indicates the object with ID `10`. Similar
+#' to `$add()`, a special element `.comment` in each list will be used as the
+#' **new** comments for modifed object, overwriting the old ones. Names in list
+#' element are treated as field names. Values without names will be inserted
+#' according to their position. A list of modifed [IdfObject]s is returned.
 #'
 #' **NOTE**:
 #'
-#' * You can delete a field value by assigning `NULL` to it, e.g. `list(layer1 =
-#'   NULL)` means to delete the value of field `layer1`. If `.default` is
-#'   `TRUE`, that field will be filled with default value (if exists).
-#' * Field names are case insensitive and for convenience, *underscore_name* is
-#'   also allowed, e.g. `end_month` is equivalent to `End Month`.
+#' * You can delete a field value by assigning `NULL` to it, e.g. `list(fld =
+#'   NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
+#'   and `fld` is not a required field, it will be deleted. If `.default` is
+#'   `TRUE`, that field will be filled with default value (if applicable).
+#' * Field name matching is case-insensitive. For convenience, underscore-style
+#'   name is also allowed, e.g. `end_month` is equivalent to `End Month`.
 #' * If not all field names are given, positions of those values without field
 #'   names are determined after those values with names. E.g. in
 #'   `model$set(Construction = list("out_layer", name = "name"))`, `"out_layer"`
 #'   will be treated as the value of field `Outside Layer` in `Construction`, as
 #'   value of field `Name` has been given as `"name"`.
+#' * If fields to be modifed do not exist in current [IdfObject], they are
+#'   created on the fly.
+#'
+#' **Arguments**:
+#'
+#' * `...`: Lists of object definitions. Each list should be named with a valid
+#'   object name or a valid object ID denoted in style `..1`, `..2` and etc.
+#'   There is a special element `.comment` in each list, which will be used as
+#'   new comments of modified object, overwriting existing ones..
+#' * `.default`: If `TRUE`, default values are used for those blank fields if
+#'    possible. Default: `TRUE`.
 #'
 #' **Usage**:
 #'
@@ -325,48 +397,56 @@ NULL
 #' * Delete field value: `model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)`.
 #' * Assign default field value: `model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)`.
 #' * Variable input: `a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)`.
-#'
-#' **Arguments**:
-#'
-#' * `.default`: If `TRUE`, default values are used for those blank fields if
-#'    possible. If `FALSE`, each field in input object must have one value.
-#'    Otherwise, an error will be issued. Default: `TRUE`.
+#' * Set all values of field `fld` in a class `cls`:
+#' ```
+#' ids <- model$object_id("cls", simplify = TRUE)
+#' val <- rep(list(list(fld = val)), times = length(ids))
+#' names(val) <- paste0("..", ids)
+#' model$set(val)
+#' ```
 #' }
 #'
-#' \subsection{Deleting Objects}{
+#' \subsection{Deleting Existing Objects}{
 #'
 #' ```
 #' model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
 #' ```
 #'
 #' `$del()` deletes objects specified by valid names and IDs vectors. If
-#'     `.referenced` is `TRUE`, objects whose fields refer to input objects will
-#'     also be deleted.
+#' `.referenced` is `TRUE`, objects whose fields refer to input objects will
+#' also be deleted.
 #'
 #' **NOTE**:
 #'
-#' * If current [validate level][eplusr_option()] includes reference checking,
+#' * If current [validate level][level_checks()] includes reference checking,
 #'   objects will not be able to be deleted if they are referred by other
-#'   object. For example, an error will be issued if you want to delete one
+#'   objects. For example, an error will be issued if you want to delete one
 #'   material that is referred by other constructions, because doing so will
 #'   result in invalid field reference. You may still delete it if you really
 #'   want to by setting `.force` to `TRUE`.
-#'
-#' **Usage**:
-#'
-#' * Specify object with name: `model$add(Object_Name = list(val1, val2, val3, .comment = "new comment will overwrite the old one"))`.
-#' * Specify object with ID: `model$add(..8 = list(val1))`.
-#' * Delete field value: `model$add(Object_Name = list(Field_1 = NULL), .default = FALSE)`.
-#' * Assign default field value: `model$add(Object_Name = list(Field_1 = NULL), .default = TRUE)`.
-#' * Variable input: `x <- list(Object_Name = list(Field_1 = NULL)); model$add(x)`.
+#' * There are recursively reference relations in IDF. For example, one
+#'   material's name is referenced by one construction, and that construction's
+#'   name can be referred by another surface. You can all of them by setting
+#'   `.recursive` to `TRUE`.
 #'
 #' **Arguments**:
 #'
 #' * `.referenced`: If `TRUE`, objects whose fields refer to input objects will
 #'     also be deleted. Default: `FALSE`.
 #' * `.recursive`: If `TRUE`, the reference checking is performed recursively,
-#'   in case that objects whose fields refer to others are also referred by
+#'   in case that objects whose fields refer to target object are also referred by
 #'   another object. Default: `FALSE`.
+#' * `.force`: If `TRUE`, objects are deleted even if they are referred by other
+#'   objects.
+#'
+#' **Usage**:
+#'
+#' * Specify object with name: `model$del("Object_Name1", "Object_Name2")`.
+#' * Specify object with ID: `model$del(1, 2, 10)`.
+#' * Delete objects even they are referred by others: `model$del(1:5, .force = TRUE)`
+#' * Delete an object and objects that refer to it: `model$del(1:5, .referenced = TRUE)`
+#' * Delete an object "A" and objects that refer to it recursively: `model$del(1:5, .referenced = TRUE, .recursive = TRUE)`
+#' * Variable input: `x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)`.
 #' }
 #'
 #' \subsection{Rename Objects}{
@@ -376,9 +456,14 @@ NULL
 #' ```
 #'
 #' `$rename()` takes named character vectors of object names and named integer
-#'     vectors of object ID, and rename them accordingly.  The names of input
-#'     vector are used as new names. An error will be issued if trying to
-#'     "rename" an object which does not have name attribute.
+#' vectors of object IDs.  The names of input vector are used as new names of
+#' specified objects. An error will be issued if trying to "rename" an object
+#' which does not have name attribute.
+#'
+#' **Argument**:
+#'
+#' * `...`: Integer vectors of valid object IDs and character vectors of valid
+#'   object names. Each element should be named.
 #'
 #' **Usage**:
 #'
@@ -389,33 +474,41 @@ NULL
 #' \subsection{Insert Objects}{
 #'
 #' ```
-#' model$insert(...)
+#' model$insert(..., .unique = TRUE)
 #' ```
 #'
-#' `$insert()` takes [IdfObject] or a list of [IdfObject]s as input and insert
-#' them into current Idf. If input is a list of [IdfObject]s, the name of that
-#' list will be used as new names of newly inserted objects.
+#' `$insert()` takes [IdfObject]s or a list of [IdfObject]s as input and insert
+#' them into current Idf. If input is named and inserted objects have name
+#' attributes, names of input will be used as new names of inserted objects.
 #'
 #' **NOTE**:
 #'
 #' * You cannot insert an [IdfObject] which comes from a different version than
 #'   current Idf object.
 #'
+#' **Argument**:
+#'
+#' * `...`: [IdfObject]s or lists of [IdfObject]s. Names of input will be used
+#'   as new names of inserted objects if applicable.
+#' * `.unique`: If there are duplications in input [IdfObject]s or there is same
+#'   object in current Idf, duplications in input are removed. Default: `TRUE`.
+#'
 #' **Usage**:
 #'
 #' * Insert objects without new names: `model1$insert(model2$Material)`.
 #' * Insert objects without new names: `model1$insert(my_material = model2$Material[[1]])`.
+#' * Insert objects and but keep duplications: `model1$insert(model1$Output_Variable)`.
 #' * Variable input: `mat <- model2$Material; names(mat) <- c("mat1", "mat2"); model1$insert(mat)`.
 #' }
 #'
 #' \subsection{Paste Objects from IDF Editor}{
 #'
 #' ```
-#' model$paste(in_ip = FALSE, ver = NULL)
+#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
 #' ```
 #'
-#' `$paste()` reads the contents of IDF Editor from clipboard, parses it and
-#'    inserts objects into current Idf. 
+#' `$paste()` reads the contents of IDF Editor from clipboard (after hitting
+#' `Copy Obj` button), parses it and inserts objects into current Idf. 
 #'
 #' **Note**:
 #'
@@ -425,21 +518,25 @@ NULL
 #'   `$paste()`, or explicitly specify the version of file opened by IDF Editor
 #'   using `ver` parameter. Parsing error may occur if there is a version
 #'   mismatch.
-#' * If there are exactly same objects as those copied from IDF Editor, all same
-#'   objects copied will be automatically removed and not inserted.
-#'
-#' **Usage**:
-#'
-#' * Paste objects from same version: `model$paste()`.
-#' * Paste objects from different version: `model$paste(ver = "version")`.
-#' * Paste objects that are viewed in IP units: `model$paste(in_ip = TRUE)`.
 #'
 #' **Arguments**:
 #'
 #' * `in_ip`: Set to `TRUE` if the IDF file is open with `Inch-Pound`
 #'   view option toggled. Numeric values will automatically converted to SI
 #'   units if necessary. Default: `FALSE`.
-#' * `ver`: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0".
+#' * `ver`: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0". If
+#'   `NULL`, assume that the file has the same version as current Idf object.
+#'   Default: `NULL`.
+#' * `.unique`: If there are duplications in copied objects from IDF Editor or
+#'   there is same object in current Idf, duplications in input are removed.
+#'   Default: `TRUE`.
+#'
+#' **Usage**:
+#'
+#' * Paste objects from same version: `model$paste()`.
+#' * Paste objects from different version: `model$paste(ver = "version")`.
+#' * Paste objects that are viewed in IP units in IDF Editor: `model$paste(in_ip = TRUE)`.
+#' * Paste objects but also keep duplications: `model$paste(unique = FALSE)`.
 #' }
 #'
 #' \subsection{Search and Replace Values}{
@@ -450,15 +547,23 @@ NULL
 #' ```
 #'
 #' `$search_value()` returns a list of [IdfObject]s that contain values which
-#'     match the given pattern.
+#' match the given pattern. If no matched found, `NULL` is returned.
 #'
 #' `$replace_value()` returns a list of [IdfObject]s whose values have been
-#'     replace with given pattern.
+#' replace with given pattern. If no matched found, `NULL` is returned.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
-#' * `pattern`, `replacement`, `ignore.case`, `perl`, `fixed` and `useBytes`: All of them are
-#'   directly passed to [base::grepl()] and [base::gsub()].
+#' * `class`: A character vector of invalid class names in current Idf to search
+#'   for values. If `NULL`, all classes are used.
+#' * `pattern`, `replacement`, `ignore.case`, `perl`, `fixed` and `useBytes`:
+#'   All of them are directly passed to [base::grepl()] and [base::gsub()].
+#'
+#' **Usage**:
+#'
+#' * Search objects contains value `supply`: `model$search_value("supply")`
+#' * Search objects contains value `supply` or `demand` in class `Branch`: `model$search_value("supply|demand", "Branch")`
+#' * Search objects contains value `win` and replace with `windows`: `model$replace_value("win", "windows")`
 #' }
 #'
 #' @section Validation:
@@ -469,90 +574,95 @@ NULL
 #' ```
 #'
 #' `$validate()` checks if there are errors in current model under different
-#'     strictness level.
+#' strictness level and returns an `IdfValidity` object which contains data of
+#' invalid field values.
 #'
 #' `$is_valid()` returns `TRUE` if there are no errors in current model under
-#'     current strictness level and `FALSE` otherwise.
+#' current strictness level and `FALSE` otherwise.
 #'
-#' The strictness level can be changed using [eplusr_option()]. Default is
-#'     `"final". `There are three different validate levels, i.e. `"none"`,
-#'     `"draft"` and `"final"`:
+#' There are 10 different validation check components in total. To get the
+#' meaning of each valiation components, please see [level_checks()].
 #'
-#'   * For `"none"`, none validation will be done. In this case, `$is_valid()`
-#'     will always return `TRUE`;
-#'   * For `"draft"`, checking of invalid autosize, autocalculate, character,
-#'     numeric, integer, and choice field values will be performed;
-#'   * For `"final"`, besides above, checking of incomplete extensible groups,
-#'     missing required objects, duplicated unique objects, object name
-#'     conflicts, missing required fields and invalid field value references
-#'     will also be performed.
+#' Underneath, an `IdfValidity` object which `$validate()` returns is a list of
+#' thirteen components:
 #'
-#'  Underlying, `$validate()` returned a list of thirteen components. Except
-#'      `missing_object`, which is a character vector, all other components are
-#'      [data.table::data.table()]s. The contents of each component
-#'      are described blow:
+#' * `missing_object`
+#' * `duplicate_object`
+#' * `conflict_name`
+#' * `incomplete_extensible`
+#' * `missing_value`
+#' * `invalid_autosize`
+#' * `invalid_autocalculate`
+#' * `invalid_character`
+#' * `invalid_numeric`
+#' * `invalid_integer`
+#' * `invalid_choice`
+#' * `invalid_range`
+#' * `invalid_reference`
 #'
-#'    * `missing_object`: A character vector that contains names of classes
-#'      which are required but currently none object exists.
-#'    * `duplicate_object`: A data.table that contains data of all objects in
-#'      unique-object class which should only have one object but currently
-#'      multiple objects exist.
-#'    * `conflict_name`: A data.table that contains data of all objects
-#'      that have the same name in the same class.
-#'    * `incomplete_extensible`: A data.table that contains data of all object
-#'      fields that are extensible but with empty value.
-#'    * `missing_value`: A data.table that contains data of all object fields
-#'      that are required but have empty value.
-#'    * `invalid_autosize`: A data.table that contains data of all object
-#'      fields which should not be "Autosize".
-#'    * `autocalculate`: A data.table that contains data of object fields
-#'       which should not be "Autocalculate".
-#'    * `invalid_character`: A data.table that contains data of all object
-#'      fields which should be character type, but currently are not.
-#'    * `invalid_numeric`: A data.table that contains data of all object fields
-#'       which should be numbers, but currently are not.
-#'    * `invalid_integer`: A data.table that contains data of all object fields
-#'      which should be integers, but currently are not.
-#'    * `invalid_choice`: A data.table that contains data of all object fields
-#'      whose values are not one of prescribed choices.
-#'    * `invalid_range`: A data.table that contains data of all object fields
-#'      whose values exceed prescribed ranges.
-#'    * `invalid_reference`: A data.table that contains data of all object
-#'      fields whose values are not one of available reference values.
+#' Except `missing_object`, which is a character vector, all other components
+#' are [data.table::data.table()] of 9 columns:
 #'
-#'  All data.tables above contains nine columns:
+#' * `object_id`: IDs of objects that contain invalid values
+#' * `object_name`: names of objects that contain invalid values
+#' * `class_id`: indexes of classes that invalid objects belong to
+#' * `class_name`: names of classes that invalid objects belong to
+#' * `field_id`: indexes (at IDD level) of object fields that are invalid
+#' * `field_index`: indexes of object fields that are invalid
+#' * `field_name`: names (without units) of object fields that are invalid
+#' * `units`: SI units of object fields that are invalid
+#' * `ip_units`: IP units of object fields that are invalid
+#' * `type_enum`: An integer vector indicates types of invalid fields
+#' * `value_id`: indexes of object field values that are invalid
+#' * `value_chr`: values (converted to characters) of object fields that are
+#'   invalid
+#' * `value_num`: values (converted to numbers in SI units) of object fields
+#'    that are invalid
 #'
-#'    * `object_id`: IDs of objects that contain invalid values
-#'    * `object_name`: names of objects that contain invalid values
-#'    * `class_id`: indices of classes that invalid objects belong to
-#'    * `class_name`: names of classes that invalid objects belong to
-#'    * `field_id`: indices (at IDD level) of object fields that are invalid
-#'    * `field_index`: indices of object fields that are invalid
-#'    * `field_name`: names (without units) of object fields that are invalid
-#'    * `units`: SI units of object fields that are invalid
-#'    * `ip_units`: IP units of object fields that are invalid
-#'    * `type_enum`: An integer vector indicates types of invalid fields
-#'    * `value_id`: indices of object field values that are invalid
-#'    * `value_chr`: values (converted to characters) of object field that are invalid
-#'    * `value_num`: values (converted to numbers in SI units) of object field
-#'       that are invalid
+#'  Knowing the internal structure of `IdfValidity`, it is easy to extract data
+#'  of invalid objects you interested in. For example, you can get all IDs of
+#'  objects that contains invalid value references using
+#'  `$validate()$invalid_reference$object_id`. Then using `$set()` to correct
+#'  them.
 #'
-#'  Knowing the internal structure of returned data from `$validate()`, it is
-#'      easy to extract data of invalid objects you interested in. For example,
-#'      you can get all IDs of objects that contains invalid value references
-#'      using `$validate()$invalid_reference$object_id`. Then using
-#'      `$set()` to correct them.
-#'
-#' @section Format Output:
-#'
+#' @section Data Extraction:
 #' ```
-#' model$to_string(comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' ```
+#'
+#' `$to_table()` returns a [data.table::data.table()] that contains core data of
+#' current class. It has 6 columns:
+#'
+#' * `id`: Integer type. Object IDs.
+#' * `name`: Character type. Object names.
+#' * `class`: Character type. Current class name.
+#' * `index`: Integer type. Field indexes.
+#' * `field`: Character type. Field names.
+#' * `value`: Character type if `string_value` is `TRUE` or list type if
+#'   `string_value` is FALSE. Field values.
 #'
 #' `$to_string()` returns the text format of an IDF file.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
+#' * `which`: Either an integer vector of valid object IDs or a character vector
+#'   of valid object names. If `NULL`, the whole Idf is converted. Default:
+#'   `NULL`.
+#' * `class`: A character vector of valid class names. If `NULL`, all classed in
+#'   current Idf is converted. Default: `NULL`.
+#'   `NULL`.
+#' * `all`: If `TRUE`, all values in specified objects are returned. If `FALSE`,
+#'   only mininum required values are returned. Default: `FALSE`.
+#' * `string_value`: If `TRUE`, all field values are returned as character. If
+#'   `FALSE`, `value` column in returned [data.table::data.table()] is a list
+#'   column with each value stored as corresponding type. Note that if the value
+#'   of numeric field is set to `"Autosize"` or `"Autocalculate"`, it is left as
+#'   it is, leaving the returned type being a string instead of a number.
+#'   Default: `TRUE`.
+#' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
+#'   of numeric fields are assigned with units using [units::set_units()] if
+#'   applicable. Default: `FALSE`.
 #' * `comment`: If `FALSE`, all comments will not be included. Default: `TRUE`.
 #' * `header`: If `FALSE`, the header will not be included. Default: `TRUE`.
 #' * `format`: Specific format used when formatting. For details, please see
@@ -569,28 +679,31 @@ NULL
 #' ```
 #'
 #' `$is_unsaved()` checks if there are modifications on the model since it was
-#'     read or since last time it was saved.
+#' read or since last time it was saved.
 #'
 #' `$save()` saves Idf object into local disk.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
 #' * `path`: A path where to save the model. If `NULL`, the path of the model
 #'   itself will be used.
 #' * `format`: A string to specify the saving format. Should be one of `"asis"`,
-#'   `"sorted"`, `"new_top"`, and `"new_bot"`. If `"asis"`, the
-#'   model will be saved in the same format as it is. If the model does not
-#'   contain any format saving option, which is typically the case when the
-#'   model was not saved using eplusr or IDFEditor, `"sorted"` will be used.
-#'   `"sorted"`, `"new_top"` and `"new_bot"` are the same as the save options
-#'   `"Sorted"`, `"Original with New at Top"`, and `"Original with New at Bottom"`
-#'    in IDFEditor. Default: `eplusr_option("save_format")`
+#'   `"sorted"`, `"new_top"`, and `"new_bot"`.
+#'   * If `"asis"`, the model will be saved in the same format as it is. If the
+#'     model does not contain any format saving option, which is typically the
+#'     case when the model was not saved using eplusr or IDFEditor, `"sorted"`
+#'     will be used.
+#'   * `"sorted"`, `"new_top"` and `"new_bot"` are the same as the save options
+#'     `"Sorted"`, `"Original with New at Top"`, and `"Original with New at
+#'     Bottom"` in IDFEditor. Default: `eplusr_option("save_format")`.
+#'
 #' * `overwrite`: Whether to overwrite the file if it already exists. Default:
 #'    `FALSE`.
-#' * `copy_external`: If `TRUE`, the external files will also be copied into the
-#'   same directory. The values of file paths in the Idf will be changed
-#'   automatically. Currently, only `Schedule:File` class is supported.
-#'   Default: `FALSE`.
+#' * `copy_external`: If `TRUE`, the external files that current Idf refers will
+#'   also be copied into the same directory. The values of file paths in the Idf
+#'   will be changed into relative path automatically. This makes it possible to
+#'   create fully reproducible simulation conditions. Currently, only
+#'   `Schedule:File` class is supported. Default: `FALSE`.
 #'
 #' @section Clone:
 #'
@@ -599,15 +712,16 @@ NULL
 #' ```
 #'
 #' `$clone()` copies and returns the cloned model. Because `Idf` uses `R6Class`
-#'     under the hook which has "modify-in-place" semantics, `idf_2 <- idf_1`
-#'     does not copy `idf_1` at all but only create a new binding to `idf_1`.
-#'     Modify `idf_1` will also affect `idf_2` as well, as these two are exactly
-#'     the same thing underneath. In order to create a complete cloned copy,
-#'     please use `$clone(deep = TRUE)`.
+#' under the hook which has "modify-in-place" semantics, `idf_2 <- idf_1` does
+#' not copy `idf_1` at all but only create a new binding to `idf_1`.  Modify
+#' `idf_1` will also affect `idf_2` as well, as these two are exactly the same
+#' thing underneath. In order to create a complete cloned copy, please use
+#' `$clone(deep = TRUE)`.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
-#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired.
+#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired. Default:
+#' `TRUE`.
 #'
 #' @section Run Model:
 #'
@@ -616,20 +730,20 @@ NULL
 #' ```
 #'
 #' `$run()` will run the current model together with specified weather using
-#'     corresponding version of EnergyPlus. The model and the weather used will
-#'     be copied to the output directory. An `EplusJob` will be returned which
-#'     provides detailed info of the simulation and methods to collect
-#'     simulation results. Please see [eplus_job()] for more detailed.
+#' corresponding version of EnergyPlus. The model and the weather used will be
+#' copied to the output directory. An [EplusJob] object is returned which
+#' provides detailed info of the simulation and methods to collect simulation
+#' results.  Please see [EplusJob] for details.
 #'
 #' eplusr uses the EnergyPlus command line interface which was introduced since
-#'     EnergyPlus 8.3.0. So `$run()` only supports models with version higher
-#'     than 8.3.0.
+#' EnergyPlus 8.3.0. So `$run()` only supports models with version no lower than
+#' 8.3.0.
 #'
 #' eplusr uses the EnergyPlus SQL output for extracting simulation results. In
-#'    order to do so, a object in `Output:SQLite` with `Option Type` value of
-#'    `SimpleAndTabular` will be automatically created if it does not exists.
+#' order to do so, a object in `Output:SQLite` with `Option Type` value of
+#' `SimpleAndTabular` will be automatically created if it does not exists.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
 #' * `weather`: A path to an `.epw` file or an [Epw] object.
 #' * `dir`: The directory to save the simulation results. If `NULL`, the model
@@ -639,24 +753,24 @@ NULL
 #' * `force`: Whether to force to stop the background EnergyPlus process and
 #'   start the simulation again.
 #' * `copy_external`: If `TRUE`, the external files will also be copied into the
-#'     simulation output directory. The values of file paths in the Idf will be
-#'     changed automatically. Currently, only `Schedule:File` class is supported.
-#'     This ensures that the output directory will have all files needed for the
-#'     model to run. Default is `FALSE`.
+#'    simulation output directory. The values of file paths in the Idf will be
+#'    changed automatically. Currently, only `Schedule:File` class is supported.
+#'    This ensures that the output directory will have all files needed for the
+#'    model to run. Default is `FALSE`.
 #'
 #' @section Print:
 #' ```
-#' model$print(zoom = "class", order = TRUE)
+#' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 #' print(model)
 #' ```
 #'
-#' `$print()` will print the model in the similar format as what you will see in
-#'     IDF Editor.
+#' `$print()` prints the `Idf` object according to different detail level specified
+#' using `zoom` argument.
 #'
-#' **Arguments**
+#' **Arguments**:
 #'
-#' * `zoom`: Control how detailed of Idf shoud be printed. Should be one of
-#'   `"group"`, `"class"`, `"object"` and `"field"`. Default: `"class"`.
+#' * `zoom`: Control how detailed of the Idf object shoud be printed. Should be
+#'   one of `"group"`, `"class"`, `"object"` and `"field"`. Default: `"group"`.
 #'
 #'   * `"group"`: all group names current existing are shown with prevailing
 #'     square bracket showing how many **C**lasses existing in that group.
@@ -665,12 +779,12 @@ NULL
 #'     parent group name of each class.
 #'   * `"object"`: all object IDs and names are shown, together with parent
 #'     class name of each object.
-#'   * `"field"`: all object IDs and names, field name and values are shown, together with parent
-#'     class name of each object.
+#'   * `"field"`: all object IDs and names, field name and values are shown,
+#'     together with parent class name of each object.
 #'
 #' * `order`: Only applicable when `zoom` is `"object"` or `"field"`. If `TRUE`,
-#'   objects are grouped by classes. If `FALSE`, objects are shown as the same
-#'   order in the IDF. Default: `TRUE`
+#'   objects are shown as the same order in the IDF. If `FALSE`, objects are
+#'   grouped by classes. Default: `TRUE`.
 #'
 #' @examples
 #' # ===== CREATE =====
@@ -951,13 +1065,13 @@ NULL
 #' idf$object_name("Building")
 #'
 #' # modify idf_2 will also affect idf as well
-#' idf_2$Building[[1]]$set_value(name = "Building_Name_Changed")
+#' idf_2$Building$set(name = "Building_Name_Changed")
 #' idf_2$object_name("Building")
 #' idf$object_name("Building")
 #'
 #' # in order to make a copy of an Idf object, use $clone() method
 #' idf_3 <- idf$clone(deep = TRUE)
-#' idf_3$Building[[1]]$set_value(name = "Building_Name_Changed_Again")
+#' idf_3$Building$set(name = "Building_Name_Changed_Again")
 #' idf_3$object_name("Building")
 #'
 #' idf$object_name("Building")
@@ -1003,7 +1117,10 @@ NULL
 #' }
 #' }
 #' # print the text format of model
-#' idf$print(plain = TRUE)
+#' idf$print("group")
+#' idf$print("class")
+#' idf$print("object")
+#' idf$print("field")
 #' @docType class
 #' @name Idf
 #' @seealso [IdfObject] class
@@ -1095,11 +1212,17 @@ Idf <- R6::R6Class(classname = "Idf",
         objects = function (which)
             idf_objects(self, private, which),
 
-        object_in_class = function (class)
-            idf_object_in_class(self, private, class),
-
         objects_in_class = function (class)
             idf_objects_in_class(self, private, class),
+
+        object_relation = function (which, direction = c("all", "ref_to", "ref_by"))
+            idf_object_relation(self, private, which, match.arg(direction)),
+
+        objects_in_relation = function (which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
+            idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive),
+
+        object_in_class = function (class)
+            idf_object_in_class(self, private, class),
 
         search_object = function (pattern, class = NULL, ignore.case = FALSE,
                                   perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -1122,11 +1245,11 @@ Idf <- R6::R6Class(classname = "Idf",
         rename = function (...)
             idf_rename(self, private, ...),
 
-        insert = function (...)
-            idf_insert(self, private, ...),
+        insert = function (..., .unique = TRUE)
+            idf_insert(self, private, ..., .unique = .unique),
 
-        paste = function (in_ip = FALSE, ver = NULL)
-            idf_paste(self, private, in_ip = in_ip, ver = ver),
+        paste = function (in_ip = FALSE, ver = NULL, unique = TRUE)
+            idf_paste(self, private, in_ip = in_ip, ver = ver, unique = unique),
 
         dup_object = function (object, new_name = NULL)
             idf_dup_object(self, private, object, new_name),
@@ -1155,27 +1278,29 @@ Idf <- R6::R6Class(classname = "Idf",
                 ignore.case = ignore.case, perl = perl, fixed = fixed, useBytes = useBytes
             ),
 
-        is_unsaved = function ()
-            idf_is_unsaved(self, private),
-
         validate = function (level = eplusr_option("validate_level"))
             idf_validate(self, private, level),
 
         is_valid = function (level = eplusr_option("validate_level"))
             idf_is_valid(self, private, level),
 
-        to_string = function (comment = TRUE, header = TRUE, format = eplusr_option("save_format"),
+        to_string = function (which = NULL, class = NULL, comment = TRUE,
+                              header = TRUE, format = eplusr_option("save_format"),
                               leading = 4L, sep_at = 29L)
-            idf_to_string(self, private, comment = comment, header = header,
-                         format = format, leading = leading, sep_at = sep_at),
+            idf_to_string(self, private, which, class, comment = comment,
+                          header = header, format = format,
+                          leading = leading, sep_at = sep_at),
 
         string = function (comment = TRUE, header = TRUE, format = eplusr_option("save_format"),
                            leading = 4L, sep_at = 29L)
             idf_string(self, private, comment = comment, header = header,
                        format = format, leading = leading, sep_at = sep_at),
 
-        to_table = function (class = NULL, which, string_value = TRUE, unit = FALSE)
-            idf_to_table(self, private, class = NULL, object = which, string_value = string_value, unit = unit),
+        to_table = function (which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+            idf_to_table(self, private, which = which, class = class, string_value = string_value, unit = unit),
+
+        is_unsaved = function ()
+            idf_is_unsaved(self, private),
 
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),
@@ -1358,10 +1483,81 @@ idf_object_in_class <- function (self, private, class) {
 # }}}
 # idf_objects_in_class {{{
 idf_objects_in_class <- function (self, private, class) {
+    assert(is_scalar(class))
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
     setattr(res, "names", obj$object_name)
+    res
+}
+# }}}
+# idf_object_relation {{{
+idf_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by")) {
+    assert(is_scalar(which))
+    direction <- match.arg(direction)
+
+    obj <- get_idf_object(private$idd_env(), private$idf_env(),
+        object = which, ignore_case = TRUE
+    )
+
+    get_idfobj_relation(private$idd_env(), private$idf_env(),
+        object_id = obj$object_id, name = TRUE, direction = direction,
+        keep_all = FALSE, by_value = FALSE, max_depth = NULL, recursive = TRUE)
+
+
+}
+# }}}
+# idf_objects_in_relation {{{
+idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by"),
+                                     class = NULL, recursive = FALSE) {
+    assert(is_scalar(which))
+    direction <- match.arg(direction)
+
+    obj <- get_idf_object(private$idd_env(), private$idf_env(), object = which, ignore_case = TRUE)
+    rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), obj$object_id,
+        name = FALSE, max_depth = NULL, direction = direction, recursive = recursive
+    )
+
+    # only include specified class
+    if (!is.null(class)) {
+        cls <- get_idd_class(private$idd_env(), class)
+
+        if (direction == "ref_to") {
+            add_joined_cols(private$idf_env()$object, rel, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
+            rel <- rel[J(cls$class_id), on = "src_class_id"]
+        } else {
+            add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
+            rel <- rel[J(cls$class_id), on = "class_id"]
+        }
+    }
+
+    id_self <- obj$object_id
+    if (direction == "ref_to") {
+        id_ref <- rel$ref_to$src_object_id[!is.na(rel$ref_to$src_object_id)]
+    } else {
+        id_ref <- rel$ref_by$object_id[!is.na(rel$ref_by$object_id)]
+    }
+
+    obj_self <- list(IdfObject$new(id_self, obj$class_id, self))
+    setattr(obj_self, "names", obj$object_name)
+
+    if (!length(id_ref)) {
+        dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by")
+        msg <- paste0("Object ", get_object_info(obj), " ", dir, " any other object")
+        if (is.null(class)) {
+            message(paste0(msg, "."))
+        } else {
+            message(paste0(msg, " in class ", collapse(cls$class_name), "."))
+        }
+        return(obj_self)
+    }
+
+    res <- c(obj_self, lapply(id_ref, IdfObject$new, parent = self))
+
+    ref_nm <- private$idf_env()$object[J(id_ref), on = "object_id", object_name]
+
+    setattr(res, "names", c(obj$object_name, ref_nm))
+
     res
 }
 # }}}
@@ -1510,9 +1706,15 @@ idf_rename <- function (self, private, ...) {
 }
 # }}}
 # idf_insert {{{
-idf_insert <- function (self, private, ...) {
-    ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ...)
-    merge_idf_data(private$idf_env(), ins)
+idf_insert <- function (self, private, ..., .unique = TRUE) {
+    ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ..., .unique = .unique)
+
+    if (!nrow(pas$object)) {
+        message("After deleting duplications, nothing to add.")
+        return(invisible())
+    }
+
+    merge_idf_data(private$idf_env(), ins, by_object = TRUE)
 
     # log
     log_new_order(private$m_log, ins$object$object_id)
@@ -1561,11 +1763,13 @@ idf_replace_value <- function (self, private, pattern, replacement, class = NULL
 }
 # }}}
 # idf_paste {{{
-idf_paste <- function (self, private, in_ip = FALSE, ver = NULL) {
-    pas <- paste_idf_object(private$idd_env(), private$idf_env(), version = private$m_version, in_ip = in_ip)
+idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE) {
+    pas <- paste_idf_object(private$idd_env(), private$idf_env(),
+        version = private$m_version, in_ip = in_ip, unique = unique
+    )
 
     if (!nrow(pas$object)) {
-        verbose_info("After deleting duplications, nothing to add.")
+        message("After deleting duplications, nothing to add.")
         return(invisible())
     }
 
@@ -1590,33 +1794,15 @@ idf_is_valid <- function (self, private, level = eplusr_option("validate_level")
 }
 # }}}
 # idf_to_string {{{
-idf_to_string <- function (self, private, comment = TRUE, header = TRUE,
-                         format = eplusr_option("save_format"),
-                         leading = 4L, sep_at = 29L, ...) {
+idf_to_string <- function (self, private, which = NULL, class = NULL,
+                           comment = TRUE, header = TRUE, format = eplusr_option("save_format"),
+                           leading = 4L, sep_at = 29L) {
     if (format == "asis") format <- private$m_log$save_format
 
-    fmt <- with_nocolor(with_format_cols(private$idd_env(), private$idf_env(),
-        format_idf(
-            private$idf_env()$value, private$idf_env()$object, private$m_log$order,
-            comment = comment, header = header, save_format = format,
-            leading = leading, sep_at = sep_at, ...
-        )
-    ))
-
-    if (format == "sorted") {
-        combine_fmt <- function (lst) {
-            head <- if (is.null(lst[[1L]])) "" else c("", lst[[1L]], "")
-            c(head, lst[[2L]][[1L]], lst[[2L]][[2L]], "")
-        }
-
-        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
-    } else {
-        combine_fmt <- function (lst) c(unlist(lst, use.names = FALSE), "")
-
-        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
-    }
-
-    if (header) c(fmt$header, "", body) else body
+    get_idf_string(private$idd_env(), private$idf_env(), private$m_log$order,
+        class, which, comment = comment, header = header, format = format,
+        leading = leading, sep_at = sep_at
+    )
 }
 # }}}
 # idf_string {{{
@@ -1626,8 +1812,8 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, class = NULL, object, string_value = TRUE, unit = FALSE) {
-    get_idf_table(private$idd_env, private$idf_env, class, object, string_value, unit)
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE) {
+    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit)
 }
 # }}}
 # idf_save {{{
@@ -1834,8 +2020,8 @@ idf_add_output_sqlite <- function (idf) {
 #' `Idf` object. For more details on `Idf` object, please see [Idf] class.
 #'
 #' @param path Either a path, a connection, or literal data (either a single
-#'     string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
-#'     has a extension `.idf`.
+#' string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
+#' path, that file usually has a extension `.idf`.
 #' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
 #'     default, the version of IDF will be passed to [use_idd()]. If the input
 #'     IDF does not have a version field (possible for ".ddy" files), then it
@@ -1964,8 +2150,8 @@ format.Idf <- function (x, comment = TRUE, header = TRUE,
 
 # empty_idf {{{
 empty_idf <- function (ver = "latest") {
-    ver <- standardize_ver(ver)[, 1:2]
-    text <- paste0("Version,", ver, ";\n")
+    ver <- standardize_ver(ver)
+    text <- paste0("Version,", ver[, 1L:2L], ";\n")
     read_idf(text, ver)
 }
 # }}}

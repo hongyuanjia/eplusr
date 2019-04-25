@@ -7,7 +7,7 @@ NULL
 #' eplusr provides parsing of and programmatic access to EnergyPlus
 #' Input Data Dictionary (IDD) files, and objects. It contains all data needed
 #' to parse EnergyPlus models. `Idd` class provides parsing and printing while
-#' `IddObject` provides detailed information of curtain class.
+#' [IddObject] provides detailed information of curtain class.
 #'
 #' @section Overview:
 #'
@@ -43,10 +43,12 @@ NULL
 #' * `group`: contains group index and group names.
 #' * `class`: contains class names and properties.
 #' * `field`: contains field names and field properties.
-#' * `reference`: contains reference names of fields.
+#' * `reference`: contains cross-reference data of fields.
 #'
 #' @section Usage:
+#'
 #' \preformatted{
+#' idd <- use_idd(ver)
 #' idd$version()
 #' idd$build()
 #' idd$group_index(group = NULL)
@@ -59,24 +61,38 @@ NULL
 #' idd$extenesible_class_name()
 #' idd$is_valid_group(group)
 #' idd$is_valid_class(class)
+#' idd$object_relation(class, direction = c("all", "ref_by", "ref_to"))
 #' idd$object(class)
 #' idd$objects(class)
-#' idd$objects_in_relation(class, direction = c("ref_by", "ref_to"))
-#' idd$object_in_group(group)
+#' idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))
+#' idd$objects_in_group(group)
 #' idd$ClassName
 #' idd[[ClassName]]
+#' idd$to_table(class, all = FALSE)
+#' idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
 #' idd$print()
 #' print(idd)
 #' }
 #'
 #' @section Arguments:
 #'
+#' * `ver`: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
 #' * `idd`: An `Idd` object.
-#' * `group`: A valid group name or valid group names.
-#' * `class`: A valid class name or valid class names.
-#' * `ClassName`: A single length character vector of one valid class name.
-#' * `Direciton`: The relation direction to extract. Should be either "ref_by"
-#'   or "ref_to".
+#' * `group`: A character vector of valid group names. For
+#'   `$objects_in_group()`, a single string of valid group name.
+#' * `class`: A character vector of valid class names. For `$object_relation()`
+#'   and `$objects_in_relation()`, a single string of valid class name.
+#' * `ClassName`: A single string of valid class name.
+#' * `direciton`: The relation direction to extract. Should be either `"all"`,
+#'   `"ref_to"` or "ref_by". For `$objects_in_relation()`, only `"ref_to"` and
+#'   `"ref_by"` are acceptable.
+#' * `all`: If `TRUE`, all fields in specified classes are returned. If `FALSE`,
+#'   only mininum required fields are returned. Default: `FALSE`.
+#' * `leading`: Leading spaces added to each field. Default: `4L`.
+#' * `sep_at`: The character width to separate value string and field string.
+#'   Default: `29L` which is the same as IDF Editor.
+#' * `sep_each`: An single integer of how many empty strings to insert between
+#'   different classes. Default: `1`.
 #'
 #' @section Detail:
 #'
@@ -106,17 +122,60 @@ NULL
 #'
 #' `$is_valid_class()` return `TRUE` if the input is a valid class name.
 #'
-#' `$object` returns a list of `IddObject`s of specified classes.
+#' `$object()` returns an [IddObject] of specified class.
 #'
-#' `$object_in_group()` returns a list of `IddObject`s in that group.
+#' `$objects()` returns a list of [IddObject]s of specified classes.
+#'
+#' `$object_relation()` returns an `IddRelation` object which contains field
+#' data that have relation with specified class. For instance, if
+#' `idd$object_relation("Class 1", "ref_to")` gives results below:
+#'
+#' ```
+#' -- Refer to Others ---------------------
+#'   Class: <Class 1>
+#'   +- Field: <1: Field 1>
+#'   |  v~~~~~~~~~~~~~~~~~~
+#'   |  \- Class: <Class 2>
+#'   |     \- Field: <2: Field 2>
+#'   |
+#'   \- Field: <2: Field 2>
+#' ```
+#'
+#' This means that `Field 2` in class `Class 1` does not refer to any other fields.
+#' But `Field 1` in class `Class 2` refers to `Field 2` in class named `Class 2`.
+#'
+#' `$objects_in_relation()` returns a list of [IddObject]s that have relations.
+#' The first element is always the [IddObject] of that class. If specified class
+#' does not have any relation with other classes, a list that only contains the
+#' [IddObject] of that class is returned.  For instance,
+#' `idd$objects_in_relation("Construction", "ref_to")` will return a list of an
+#' [IddObject] of class `Construction` and also all [IddObject]s that class
+#' `Construction` refers to; similarly, `idd$objects_in_relation("Construction",
+#' "ref_by")` will return a list of an [IddObject] of class `Construction` and
+#' also all [IddObject]s that refer to class `Construction`.
+#'
+#' `$objects_in_group()` returns a list of [IddObject]s of specified group.
 #'
 #' eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
-#' more convenient to get a single `IddObject`. Basically, `idd$ClassName` and
+#' more convenient to get a single [IddObject]. Basically, `idd$ClassName` and
 #' \code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
 #' Here, `ClassName` is a single valid class name where all characters other
 #' than letters and numbers are replaced by a underscore `_`.
 #'
-#' For details about `IddObject`, please see [IddObject] class.
+#' For details about [IddObject], please see [IddObject] class.
+#'
+#' `$to_table()` returns a [data.table::data.table()] that contains core data of
+#' specified class. It has 3 columns:
+#'
+#' * `class`: Character type. Class names.
+#' * `index`: Integer type. Field indexes.
+#' * `field`: Character type. Field names.
+#'
+#' `$to_string()` returns empty objects of specified class in a character vector
+#' format. It is formated exactly the same as in IDF Editor.
+#'
+#' `$print()` prints basic info ob current Idd object, including version, build
+#' tag and total class number.
 #'
 #' @examples
 #' # get the Idd object of EnergyPlus v8.8
@@ -141,9 +200,32 @@ NULL
 #' str(idd$unique_class_name())
 #'
 #' # IddObject of SimulationControl class
+#' idd$object("SimulationControl")
+#' # OR
 #' idd$SimulationControl
 #' # OR
 #' idd[["SimulationControl"]]
+#'
+#' # IddObject of Construction and Material class
+#' idd$objects(c("Construction", "Material"))
+#'
+#' # show all classes that refer to Construction class
+#' idd$object_relation("Construction", "ref_by")
+#'
+#' # IddObjects that refer to class Construction
+#' idd$objects_in_relation("Construction", "ref_by")
+#'
+#' # IddObjects that class Construction refers to
+#' idd$objects_in_relation("Construction", "ref_to")
+#'
+#' # All IddObjects in group Schedules
+#' idd$objects_in_group("Schedules")
+#'
+#' # Extract core data of class Material and Construction
+#' idd$to_table(c("Material", "Construction"))
+#'
+#' # Get empty Material object and Construction object in a character vector
+#' idd$to_string(c("Material", "Construction"))
 #'
 #' @docType class
 #' @name Idd
@@ -225,12 +307,24 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         objects = function (class)
             idd_objects(self, private, class),
 
-        objects_in_relation = function (class, direction = c("ref_by", "ref_to"))
-            idd_objects_in_relation(self, private, class),
+        object_relation = function (class, direction = c("all", "ref_to", "ref_by"))
+            idd_object_relation(self, private, class, match.arg(direction)),
+
+        objects_in_relation = function (class, direction = c("ref_to", "ref_by"))
+            idd_objects_in_relation(self, private, class, match.arg(direction)),
 
         objects_in_group = function (group)
             idd_objects_in_group(self, private, group = group),
+
+        object_in_group = function (group)
+            idd_object_in_group(self, private, group = group),
         # }}}
+
+        to_table = function (class, all = FALSE)
+            idd_to_table(self, private, class, all),
+
+        to_string = function (class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
+            idd_to_string(self, private, class, leading, sep_at, sep_each, all),
 
         print = function ()
             idd_print(self, private)
@@ -319,12 +413,48 @@ idd_objects <- function (self, private, class) {
     res
 }
 # }}}
+# idd_object_relation {{{
+idd_object_relation <- function (self, private, class, direction = c("all", "ref_to", "ref_by")) {
+    assert(is_scalar(class))
+    direction <- match.arg(direction)
+
+    cls <- get_idd_class(private$m_idd_env, class)
+
+    get_iddobj_relation(private$m_idd_env, cls$class_id, NULL, name = TRUE,
+        direction = direction, by_field = FALSE, max_depth = NULL, keep_all = FALSE
+    )
+}
+# }}}
 # idd_objects_in_relation {{{
 idd_objects_in_relation <- function (self, private, class, direction = c("ref_to", "ref_by")) {
-    assert(!is.null(class), msg = "Please give class name.")
-    rel <- get_idd_relation(private$m_idd_env, class, max_depth = 0L, direction = direction)
-    res <- lapply(rel$class_id, IddObject$new, self)
-    setattr(res, "names", rel$class_name)
+    assert(is_scalar(class))
+    direction <- match.arg(direction)
+    rel <- get_idd_relation(private$m_idd_env, class, max_depth = 0L, direction = direction, keep_all = TRUE)
+
+    if (direction == "ref_to") {
+        id_self <- unique(rel$class_id)
+        id_ref <- rel$src_class_id[!is.na(rel$src_class_id)]
+    } else {
+        id_self <- unique(rel$src_class_id)
+        id_ref <- rel$class_id[!is.na(rel$class_id)]
+    }
+
+    cls_nm <- private$m_idd_env$class[J(id_self), on = "class_id", class_name]
+
+    obj_self <- list(IddObject$new(id_self, self))
+    setattr(obj_self, "names", cls_nm)
+
+    if (!length(id_ref)) {
+        dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by")
+        verbose_info("Class ", surround(cls_nm), " ", dir, " any other class.")
+        return(obj_self)
+    }
+
+    res <- c(obj_self, lapply(id_ref, IddObject$new, parent = self))
+
+    ref_nm <- private$m_idd_env$class[J(id_ref), on = "class_id", class_name]
+    setattr(res, "names", c(cls_nm, ref_nm))
+
     res
 }
 # }}}
@@ -339,6 +469,22 @@ idd_objects_in_group <- function (self, private, group) {
     res <- lapply(cls, IddObject$new, self)
     setattr(res, "names", cls)
     res
+}
+# }}}
+# idd_object_in_group {{{
+idd_object_in_group <- function (self, private, group) {
+    .deprecated_fun("$object_in_group()", "$objects_in_group()", "IdfObject", "0.10.0")
+    idd_objects_in_group(self, private, group)
+}
+# }}}
+# idf_to_table {{{
+idf_to_table <- function (self, private, class, all) {
+    get_idd_table(private$m_idd_env, class, all)
+}
+# }}}
+# idf_to_string {{{
+idf_to_string <- function (self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
+    get_idd_string(private$m_idd_env, class, leading, sep_at, sep_each, all)
 }
 # }}}
 # idd_print {{{
@@ -421,6 +567,28 @@ idd_print <- function (self, private) {
     } else {
         NextMethod()
     }
+}
+# }}}
+
+#' @export
+# str.Idd {{{
+str.Idd <- function (object, ...) {
+    c(cli::rule("EnergyPlus Input Data Dictionary"),
+      paste0("Version", ": ", x$version()),
+      paste0("Build", ": ", x$build()),
+      paste0("Total Class", ": ", length(x$class_index()))
+    )
+}
+# }}}
+
+#' @export
+# format.Idd {{{
+format.Idd <- function (x, ...) {
+    c(cli::rule("EnergyPlus Input Data Dictionary"),
+      paste0("Version", ": ", x$version()),
+      paste0("Build", ": ", x$build()),
+      paste0("Total Class", ": ", length(x$class_index()))
+    )
 }
 # }}}
 
@@ -515,7 +683,10 @@ read_idd <- function (path) {
 use_idd <- function (idd, download = FALSE) {
     if (is_idd(idd)) return(idd)
 
-    if (!is_version(idd) || (is_version(idd) && !is_idd_ver(idd, only_exist = FALSE))) {
+    assert(is_scalar(idd))
+
+    # if input is a file path or literal IDD string
+    if (!is_idd_ver(idd)) {
         return(tryCatch(read_idd(idd), error_read_file = function (e) {
             abort("error_invalid_idd_input",
                 paste0("Parameter `idd` should be a valid version, a path, or ",
@@ -533,67 +704,77 @@ use_idd <- function (idd, download = FALSE) {
         }))
     }
 
-    if (is_idd_ver(idd, strict = FALSE, only_exist = TRUE)) {
-        ver <- standardize_ver(idd)
+    ver <- standardize_ver(idd, complete = FALSE)
 
-        if (isTRUE(download)) {
+    # if no patch version is given
+    if (is.na(ver[, 3L])) {
+        # use the latest ver
+        ori_ver <- ver
+        ver <- numeric_version(ALL_IDD_VER[ver[, 1L:2L] == numeric_version(ALL_IDD_VER)[, 1L:2L]])
+
+        if (length(ver) > 1L) {
+            message("Multiple versions found for IDD v", ori_ver, ": ",
+                collapse(paste0("v", ver)), ". ",
+                "The last patched version v", max(ver), " will be used. ",
+                "Please explicitly give the full version if you want to use the other versions."
+            )
+            ver <- max(ver)
+        }
+    }
+
+    if (isTRUE(download)) {
+        dl <- download_idd(ver, dir = tempdir())
+        idd <- attr(dl, "file")
+    } else {
+        # if found in cache, return it directly
+        if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
+
+        message("IDD v", ver, " has not been parsed before.\nTry to locate ",
+            "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
+            surround(eplus_default_path(ver)), ".")
+
+        # stop if corresponding EnergyPlus folder not found
+        if (!is_avail_eplus(ver)) {
+            msg_f <- paste0("Failed to locate `Energy+.idd` because EnergyPlus v",
+                ver, " is not available. ")
+
+            if (!identical(download, "auto")) {
+                abort("error_no_matched_idd",
+                    paste0(
+                        msg_f, " You may want to set `download` to TRUE or ",
+                        "\"auto\" to download the IDD file from EnregyPlus ",
+                        "GitHub repo."
+                    )
+                )
+            }
+
+            message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+
             dl <- download_idd(ver, dir = tempdir())
             idd <- attr(dl, "file")
-
         } else {
+            config <- eplus_config(ver)
+            idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
 
-            # if found in cache, return it directly
-            if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
-
-            message("IDD v", ver, " has not been parsed before.\nTry to locate ",
-                "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
-                surround(eplus_default_path(ver)), ".")
-
-            if (!is_avail_eplus(ver)) {
-
-                msg_f <- paste0("Failed to locate `Energy+.idd` because EnergyPlus v",
-                    ver, " is not available. ")
+            if (!file.exists(idd)) {
+                msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
+                    config$version, " installation folder ", surround(config$dir), ". ")
 
                 if (!identical(download, "auto")) {
-                    abort("error_no_matched_idd",
-                        paste0(
-                            msg_f, " You may want to set `download` to TRUE or ",
-                            "\"auto\" to download the IDD file from EnregyPlus ",
-                            "GitHub repo."
-                        )
-                    )
+                    stop(msg_f, "You may want to set `download` to TRUE or ",
+                        "\"auto\" to download the IDD file from EnregyPlus ",
+                        "GitHub repo.", call. = FALSE)
                 }
 
                 message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
 
                 dl <- download_idd(ver, dir = tempdir())
                 idd <- attr(dl, "file")
-
-            } else {
-                config <- eplus_config(ver)
-                idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
-
-                if (!file.exists(idd)) {
-                    msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
-                        config$version, " installation folder ", surround(config$dir), ". ")
-
-                    if (!identical(download, "auto")) {
-                        stop(msg_f, "You may want to set `download` to TRUE or ",
-                            "\"auto\" to download the IDD file from EnregyPlus ",
-                            "GitHub repo.", call. = FALSE)
-                    }
-
-                    message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
-
-                    dl <- download_idd(ver, dir = tempdir())
-                    idd <- attr(dl, "file")
-                }
             }
         }
-
-        message("IDD file found: ", surround(idd), ".")
     }
 
+    message("IDD file found: ", surround(idd), ".")
     message("Start parsing...")
     idd <- read_idd(idd)
     message("Parsing completed.")
@@ -605,15 +786,59 @@ use_idd <- function (idd, download = FALSE) {
 #' @export
 # download_idd {{{
 download_idd <- function (ver = "latest", dir) {
-    ver <- standardize_ver(ver, no_patch = TRUE)
-    assert(is_idd_ver(ver))
+    ver <- standardize_ver(ver, complete = FALSE)
+    assert(is_scalar(ver), is_idd_ver(ver))
 
-    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", LATEST_EPLUS_VER, "/idd/")
+    ori_ver <- ver
+    # if no patch version is given
+    if (is.na(ver[, 3L])) {
+        # use the latest ver
+        ver <- numeric_version(ALL_IDD_VER[ver[, 1L:2L] == numeric_version(ALL_IDD_VER)[, 1L:2L]])
 
-    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
+        if (length(ver) > 1L) {
+            message("Multiple versions found for IDD v", ori_ver, ": ",
+                collapse(paste0("v", ver)), ". ",
+                "The last patched version v", max(ver), " will be downloaded. ",
+                "Please explicitly give the full version if you want to downloaded the other versions."
+            )
+            ver <- max(ver)
+        }
 
-    # only check the main and minor version, not patch
-    if (identical(ver[1L, c(1L, 2L)], LATEST_EPLUS_VER[1L, c(1L, 2L)])) {
+        latest_ver <- LATEST_EPLUS_VER
+
+        # If the input is 9 or 9.0, ver will be changed to 9.0.1 from above,
+        # here change the file to download to "V9-0-0-Energy+.idd" as there is
+        # no "V9-0-1-Energy+.idd" and only "V9-0-0-Energy+.idd", which does not
+        # follow past conventions.
+
+        # store the original version in order to rename downloaded file from
+        # "V9-0-0-Energy+idd" to "V9-0-1-Energy+.idd", if applicable
+        ori_ver <- ver
+
+        if (ver == numeric_version("9.0.1")) ver <- numeric_version("9.0.0")
+
+    # in case explicitly download IDD version "9.0.0"
+    # because if ver is "9.0", then "9.0.1" will be downloaded, as there is no
+    # "9.0.0" IDD any more in current latest release.
+    } else if (ver == 9.0) {
+        latest_ver <- "9.0.0"
+    # in case explicitly download IDD version "9.0.1"
+    # change the file to download to "V9-0-0-Energy+.idd" as there is no
+    # "V9-0-1-Energy+.idd" and only "V9-0-0-Energy+.idd", which does not follow
+    # past conventions.
+    } else if (ver == numeric_version("9.0.1")){
+        ver <- numeric_version("9.0.0")
+        latest_ver <- LATEST_EPLUS_VER
+    } else {
+        latest_ver <- LATEST_EPLUS_VER
+    }
+
+    base_url <- paste0("https://raw.githubusercontent.com/NREL/EnergyPlus/v", latest_ver, "/idd/")
+
+    ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
+
+    ver <- as.character(ver)
+    if (ver == latest_ver) {
         file_url <- "Energy%2B.idd.in"
     } else {
         file_url <- paste0("V", ver_dash, "-Energy%2B.idd")
@@ -621,15 +846,19 @@ download_idd <- function (ver = "latest", dir) {
 
     url <- paste0(base_url, file_url)
 
-    file <- paste0("V", ver_dash, "-Energy+.idd")
+    if (ori_ver == numeric_version("9.0.1")) {
+        file <- paste0("V9-0-1-Energy+.idd")
+    } else {
+        file <- paste0("V", ver_dash, "-Energy+.idd")
+    }
     dest <- normalizePath(file.path(dir, file), mustWork = FALSE)
     res <- download_file(url, dest)
 
     if (res != 0L)
         stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
 
-    if (identical(ver, LATEST_EPLUS_VER)) {
-        cmt <- ALL_EPLUS_RELEASE_COMMIT$commit[1]
+    if (ver == latest_ver) {
+        cmt <- ALL_EPLUS_RELEASE_COMMIT[version == ver, commit]
 
         l <- read_lines(dest, trim = FALSE)
 
@@ -656,7 +885,7 @@ avail_idd <- function () names(.globals$idd)
 #' @export
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
-    assert(is_idd_ver(ver, strict = TRUE, only_exist = FALSE))
+    assert(is_idd_ver(ver, strict = TRUE))
     as.character(standardize_ver(ver)) %in% names(.globals$idd)
 }
 # }}}
@@ -683,7 +912,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
             )
         } else {
             idd <- use_idd(idd)
-            if (warn && idf_ver != idd$version()) {
+            if (warn && idf_ver[, 1L:2L] != idd$version()[, 1L:2L]) {
                 warn("waring_idf_idd_mismatch_ver",
                     paste0(
                         "Version Mismatch. The IDF file parsing has a differnet ",

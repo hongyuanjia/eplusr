@@ -18,14 +18,17 @@ test_that("can read IDD", {
     expect_error(is_avail_idd("latest"))
     expect_equal(avail_idd(), NULL)
     expect_error(use_idd(8.4))
+    expect_error(use_idd("latest"), "v9.1.0", fixed = TRUE)
 
     expect_message(use_idd(8.4, download = TRUE))
+    expect_message(use_idd("latest", download = TRUE))
     expect_true(file.exists(file.path(tempdir(), "V8-4-0-Energy+.idd")))
     expect_is(use_idd("8.4.0"), "Idd")
     expect_equal(avail_idd(), "8.4.0")
     expect_true(is_avail_idd(8.4))
     expect_true(is_avail_idd("8.4"))
     expect_true(is_avail_idd("8.4.0"))
+    expect_error(is_avail_idd("latest"))
 
     expect_message(use_idd(8.7, download = "auto"))
     expect_equal(avail_idd(), c("8.4.0", "8.7.0"))
@@ -82,6 +85,10 @@ test_that("Idd class", {
     # can stop when invalid class names are given
     expect_error(idd$class_index("WrongClass"), "Invalid class name found")
 
+    expect_is(idd$object_relation("TestSimple"), "IddRelation")
+    expect_is(idd$object_relation("TestSimple", "ref_to"), "IddRelation")
+    expect_is(idd$object_relation("TestSimple", "ref_by"), "IddRelation")
+
     # can return names of all required classes
     expect_equal(idd$required_class_name(), "TestSlash")
 
@@ -112,6 +119,11 @@ test_that("Idd class", {
     # can stop when multiple group names are given
     expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")),
         "group is not a string")
+
+    expect_is(idd$objects_in_relation("TestSimple", "ref_to"), "list")
+    expect_equal(names(idd$objects_in_relation("TestSimple", "ref_to")), "TestSimple")
+    expect_is(idd$objects_in_relation("TestSimple", "ref_by"), "list")
+    expect_equal(names(idd$objects_in_relation("TestSimple", "ref_by")), c("TestSimple", "TestSlash"))
 
     # can check if input is a valid group
     expect_false(idd$is_valid_group("WrongGroup"))

@@ -1,7 +1,7 @@
 # VERSIONS {{{
-LATEST_EPLUS_VER <- as.numeric_version("9.1.0")
-
 ALL_EPLUS_VER <- c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0", "9.0.1", "9.1.0")
+
+LATEST_EPLUS_VER <- ALL_EPLUS_VER[length(ALL_EPLUS_VER)]
 
 ALL_IDD_VER <- c(
     paste0("1.0.", 0:3),
@@ -50,53 +50,46 @@ MACRO_DICT <-
       "##symboltable", "##clear", "##reverse", "##!")
 # }}}
 # init var{{{
-`.` = `.GRP` = `.I` = `.N` = `.SD` = NULL
+`.` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- J <- N <- V1 <- NULL
+
 utils::globalVariables(c(
-    "Case", "DateTime", "Day", "Hour", "J", "KeyValue", "Minute", "Month", "N",
-    "Name", "V1", "all_cmt", "all_field_name_lower", "all_field_name_upper",
-    "all_name_upper", "annual", "arch", "assigned_new_name", "auto",
-    "autocalculatable", "autosizable", "base", "begin_environment",
-    "begin_extensible", "can_be_na", "check_lower", "check_upper", "choice",
-    "choice_id", "class_group", "class_id", "class_name", "class_name_in",
-    "class_rleid", "class_upper_case", "colon_loc", "comment_id", "commit",
-    "core_file", "country", "datetime", "datetime_delta", "datetime_shifted",
-    "day", "ddy_name", "ddy_url", "def", "default", "default_id",
-    "default_ipnum", "default_num", "default_upper", "del_ext_num", "delete",
-    "design_day", "dt_minute", "dt_minute_cal", "duplicated_name", "empty",
-    "end_time", "environment_index", "epw", "epw_name", "epw_url",
-    "exit_status", "explpt_loc", "ext", "ext_from", "ext_index", "ext_num",
-    "extensible", "external_key", "external_list", "external_list_id",
-    "field_an", "field_anid", "field_count", "field_id", "field_index",
-    "field_name", "field_name_lower", "file_name",
-    "first_extensible", "found", "full_ipname", "full_name", "group",
-    "group_id", "group_name", "grp", "has_any_na", "has_default",
-    "has_external_list", "has_object_list", "has_range", "has_reference",
-    "header", "hour", "id_list", "idf", "idx", "index", "index_str", "info",
-    "input", "input_index", "install_eplus_macos", "invalid_ext_num", "ip_unit",
-    "ip_units", "is_all_na", "is_complete", "is_default", "is_extensible",
-    "is_name", "key", "last_extensible", "last_index", "last_req_ext",
-    "last_required", "latitude", "leading_spaces", "left_fields", "level",
-    "level_index", "level_num", "line", "loc_model", "loc_weather", "location",
-    "longitude", "lower_incbounds", "macro_key", "max_suffix_num", "maximum",
-    "maximum<", "memo", "min_fields", "minimum", "minimum>", "mis_val_num",
-    "miss_idx", "model", "msg", "msg_box", "msg_line", "new_ext_num",
-    "new_field_id", "new_full_path", "new_object_name", "new_object_name_upper",
-    "new_value", "new_value_ipnum", "new_value_num", "new_value_upper", "note",
-    "num", "num_extensible", "num_extensible_group", "num_fields", "num_obj",
-    "num_str", "num_to_add", "num_values", "object_id", "object_list",
-    "object_list_id", "object_list_rleid", "object_name", "object_name_upper",
-    "object_order", "object_rleid", "old_exist", "old_full_path", "os", "out",
-    "output_dir", "possible_value", "possible_value_upper", "prerelease",
-    "range_id", "reference", "reference_class_name", "reference_id",
-    "reference_value_id", "referenced_by_object_id", "req", "required",
-    "required_field", "required_object", "res", "res_ran", "row_id", "same_dir",
-    "same_name_order", "seperate", "slash_key", "slash_key_value", "slash_loc",
-    "slash_supported", "slash_value", "slash_value_upper", "source_type",
-    "space_loc", "special_key", "special_loc", "special_value",
-    "state_province", "status", "string", "time", "title", "type",
-    "unique_object", "unit", "unitsbasedonfield", "upper_incbounds",
-    "use_input_name", "valid_ext_num", "value", "value_count", "value_ext_num",
-    "value_id", "value_in", "value_ipnum", "value_num", "value_upper",
-    "weather", "weather_db", "wmo_number"
+    "acceptable_num", "all_cmt", "all_name_lower", "annual", "auto_assigned",
+    "autocalculatable", "autosizable", "begin_environment", "begin_extensible",
+    "can_be_na", "check", "check_lower", "check_upper", "choice", "class_id",
+    "class_name", "colon_loc", "con", "contents", "copied", "country",
+    "datetime", "datetime1", "day", "day_in", "ddy_name", "ddy_url", "default",
+    "default_chr", "default_num", "defaulted", "dep", "depth", "design_day",
+    "dis", "dot", "dot_nm", "dt", "dup_time", "empty", "end", "end_day",
+    "end_time", "environment_index", "epw", "epw_name", "epw_url", "excl_loc",
+    "exit_status", "ext", "extensible", "extensible_group", "field",
+    "field_anid", "field_anid_an", "field_count", "field_id", "field_in",
+    "field_index", "field_name", "field_name_noid", "field_rleid",
+    "first_extensible", "fmt", "found", "from", "group", "group_id",
+    "group_name", "has_any_na", "has_range", "header", "hour", "hour_in", "id",
+    "id_list", "idf", "index", "index_str", "info", "input_num", "ip",
+    "ip_units", "is_all_na", "is_name", "last_extensible", "last_required",
+    "latitude", "left_fields", "left_group", "level", "level_index",
+    "level_num", "line", "line_s", "ln_miss", "location", "longitude",
+    "lower_incbounds", "max_suffix_num", "maximum", "maximum<", "mes_miss",
+    "mes_object", "min_fields", "min_required", "minimum", "minimum>", "minute",
+    "model", "month_in", "msg", "name", "new_comment", "new_object_name",
+    "new_value", "new_value_num", "nm", "num", "num_extensible",
+    "num_extensible_group", "num_fields", "num_group", "object_id",
+    "object_list", "object_name", "object_name_lower", "object_order",
+    "object_rleid", "old_exist", "old_object_name", "old_object_name_lower",
+    "out", "out_of_range", "output_dir", "prefix", "ref_class", "ref_field",
+    "ref_object", "ref_value", "reference", "reference_class_name",
+    "required_field", "required_object", "res", "rev_field_rleid", "same_dir",
+    "si", "slash", "slash_key", "slash_loc", "slash_value", "slash_value_lower",
+    "slash_value_rleid", "soil_conductivity", "soil_density",
+    "soil_specific_heat", "source_type", "space_loc", "spcl_loc", "src_class",
+    "src_class_id", "src_class_name", "src_enum", "src_field", "src_field_id",
+    "src_field_index", "src_field_name", "src_object", "src_object_id",
+    "src_value", "src_value_chr", "src_value_id", "start", "start_day",
+    "start_day_of_week", "state_province", "status", "string", "temp",
+    "temperature", "title", "to", "type", "type_enum", "type_exp",
+    "unique_object", "upper_incbounds", "use_input_name", "value", "value_chr",
+    "value_count", "value_id", "value_lower", "value_num", "weather",
+    "wmo_number", "x", "year_in", "J"
 ))
 # }}}
