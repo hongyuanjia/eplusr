@@ -1111,7 +1111,7 @@ iddobj_to_table <- function (self, private, all = FALSE) {
 # iddobj_to_string {{{
 iddobj_to_string <- function (self, private, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE) {
     get_iddobj_string(private$idd_env(), private$m_class_id, comment = comment,
-        leading = leading, sep_at = sep_at, all = FALSE
+        leading = leading, sep_at = sep_at, all = all
     )
 }
 # }}}
