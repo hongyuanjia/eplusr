@@ -788,3 +788,36 @@ get_input_class_data <- function (idd_env, class, num = NULL) {
     }
 }
 # }}}
+
+# TABLE
+# get_idd_table {{{
+get_idd_table <- function (idd_env, class, all = FALSE) {
+    assert_valid_type(class, "class")
+    fld <- get_idd_field(idd_env, class, all = all)[
+        , .SD, .SDcols = c("class_name", "field_index", "field_name")
+    ]
+
+    setnames(fld, c("class_name", "field_index", "field_name"), c("class", "index", "field"))
+
+    fld
+}
+# }}}
+
+# STRING
+# get_idd_string {{{
+get_idd_string <- function (idd_env, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
+    assert_valid_type(class, "class")
+    assert(is_count(sep_each, TRUE))
+
+    fld <- get_idd_field(idd_env, class, property = c("units", "ip_units"), all = all)
+
+    # add fake value in order to correctly format
+    set(fld, NULL, "value_chr", NA_character_)
+    set(fld, NULL, "field", format_field(fld, leading = leading, sep_at = sep_at))
+
+    sep <- rep("", sep_each)
+    out <- fld[, list(out = list(c(paste0(class_name[[1L]], ","), field, sep))), by = "class_id"]
+
+    unlist(out$out, use.names = FALSE)
+}
+# }}}

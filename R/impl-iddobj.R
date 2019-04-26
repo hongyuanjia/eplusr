@@ -78,19 +78,11 @@ get_iddobj_possible <- function (idd_env, class_id, field_id = NULL) {
 
 # get_iddobj_table {{{
 get_iddobj_table <- function (idd_env, class_id = NULL, all = FALSE) {
-    cols <- c("class_name", "field_index", "field_name", "units", "ip_units")
-
-    fld <- get_idd_field(idd_env, class_id, property = c("units", "ip_units"), all = all)[, .SD, .SDcols = cols]
+    fld <- get_idd_field(idd_env, class_id, all = all)[
+        , .SD, .SDcols = c("class_name", "field_index", "field_name")
+    ]
 
     setnames(fld, c("class_name", "field_index", "field_name"), c("class", "index", "field"))
-
-    if (in_ip_mode()) {
-        set(fld, NULL, "units", NULL)
-        setnames(fld, "ip_units", "unit")
-    } else {
-        set(fld, NULL, "ip_units", NULL)
-        setnames(fld, "units", "unit")
-    }
 
     fld
 }
