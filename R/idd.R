@@ -478,12 +478,12 @@ idd_object_in_group <- function (self, private, group) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, class, all) {
+idd_to_table <- function (self, private, class, all) {
     get_idd_table(private$m_idd_env, class, all)
 }
 # }}}
 # idf_to_string {{{
-idf_to_string <- function (self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
+idd_to_string <- function (self, private, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
     get_idd_string(private$m_idd_env, class, leading, sep_at, sep_each, all)
 }
 # }}}
