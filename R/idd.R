@@ -573,11 +573,7 @@ idd_print <- function (self, private) {
 #' @export
 # str.Idd {{{
 str.Idd <- function (object, ...) {
-    c(cli::rule("EnergyPlus Input Data Dictionary"),
-      paste0("Version", ": ", x$version()),
-      paste0("Build", ": ", x$build()),
-      paste0("Total Class", ": ", length(x$class_index()))
-    )
+    object$print()
 }
 # }}}
 
