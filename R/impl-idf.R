@@ -14,8 +14,11 @@ dot_string <- function (dt, collapse = "\n") {
     dt[, string := paste0(" #", lpad(rleid, "0"), "| ", dot)]
     dt[!is.na(dot_nm), string := paste0(" #", lpad(rleid, "0"), "| ", dot_nm, " = ", dot, collapse = collapse)]
     on.exit(set(dt, NULL, "string", NULL), add = TRUE)
-    stri_replace_all_fixed(paste0(dt$string, collapse = collapse), "<environment>", "<IdfObject>")
+    str_trunc(stri_replace_all_fixed(paste0(dt$string, collapse = collapse), "<environment>", "<IdfObject>"))
 }
+# }}}
+# find_dot {{{
+find_dot <- function (dot, dt) dt[dot, on = "rleid", mult = "first", nomatch = 0L]
 # }}}
 # old_input {{{
 old_input <- function (which, value = NULL, comment = NULL, type = c("add", "set")) {
@@ -420,14 +423,13 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) 
 
                     # get value in both character and numeric format
                     value_chr[!defaulted] <- as.character(unlist(value_list[!defaulted], use.names = FALSE))
-                    value_num[!defaulted] <- suppressWarnings(as.double(unlist(value_list[!defaulted], use.names = FALSE)))
                     # change empty strings to NA
-                    s <- !defaulted & is.na(value_num)
-                    if (any(s)) {
-                        v <- value_chr[s]
-                        v[stri_detect_regex(v, "^\\s*$")] <- NA_character_
-                        value_chr[s] <- v
-                    }
+                    s <- value_chr[!defaulted]
+                    s <- stri_trim_both(s)
+                    s[stri_isempty(s)] <- NA_character_
+                    value_chr[!defaulted] <- s
+
+                    value_num[!defaulted] <- suppressWarnings(as.double(s))
 
                     # change empty field names to NA
                     field_name[no_nm] <- NA_character_
@@ -536,34 +538,217 @@ sep_object_dots <- function (...) {
     list(data = dt, dot = dt_dot)
 }
 # }}}
+# sep_definition_dots {{{
+sep_definition_dots <- function (..., .version = NULL) {
+    l <- list(...)
+
+    # stop if empty input
+    if (!length(l)) abort("error_empty_input", "Please give object(s) to load.")
+
+    # check type of each element
+    get_depth <- function (x) {
+        if (is.character(x)) {
+            if (anyNA(x)) 0L else 1L
+        } else if (is.data.frame(x)) {
+            if (has_name(x, c("class", "index", "value"))) 2L else 0L
+        } else {
+            0L
+        }
+    }
+    depth <- viapply(l, get_depth)
+
+    # put all data into a data.table
+    dt_dot <- data.table(rleid = seq_along(l), dot = l, dot_nm = names2(l), depth = depth)
+
+    if (any(depth == 0L)) {
+        abort("error_wrong_type",
+            paste0("Each element must be a character vector with no NA or ",
+                "a data frame with column `class`, `index` and `value`. ",
+                "Invalid input:\n", str_trunc(dot_string(dt_dot[J(0L), on = "depth"]))
+            )
+        )
+    }
+
+    if (!any(depth == 1L)) {
+        parsed <- list()
+    } else {
+        str_in <- unlist(dt_dot[J(1L), on = "depth", dot], use.names = FALSE)
+
+        # get total line number in each dot
+        l <- dt_dot[J(1L), on = "depth",
+            {
+                list(line_rleid = seq.int(length(dot[[1L]]) + stri_count_fixed(dot[[1L]], "\n")))
+            },
+            by = "rleid"
+        ]
+
+        # here insert an version string
+        # if there is version definition in the input, there will be an
+        # `error_multi_idf_ver` error
+        str_in <- c(str_in, paste0("Version,", .version, ";"))
+
+        parsed <- withCallingHandlers(
+            parse_idf_file(paste0(str_in, collapse = "\n"), ref = FALSE),
+
+            # ignore the warning of using given IDD
+            warn_given_idd_used = function (w) invokeRestart("muffleWarning"),
+
+            # modify messages if any error occurs
+            error_parse_idf = function (e) {
+                set(l, NULL, "line", seq.int(nrow(l)))
+
+                data <- e$data
+
+                # remove inserted version
+                if (class(e)[[1L]] == "error_multiple_version") {
+                    data <- data[!J(max(line)), on = "line"]
+                }
+
+                add_joined_cols(l, data, "line", c("rleid", "line_rleid"))
+                set(data, NULL, "msg_each", paste0("[Input #", data$rleid, "]"))
+
+                # use line in each input
+                set(data, NULL, "line", data$line_rleid)
+
+                # get line number in each object
+                t <- switch(class(e)[[1L]],
+                    error_multiple_version = "Adding Version object is prohibited",
+                    error_unknown_line = "Invalid line found",
+                    error_incomplete_object = "Incomplete object",
+                    error_invalid_class = "Invalid class name",
+                    error_invalid_field_number = "Invalid field number"
+                )
+
+                parse_issue(class(e)[[1L]], "idf", t, data)
+            }
+        )
+
+        # remove inserted version object
+        parsed$object <- parsed$object[!J(max(object_id)), on = "object_id"]
+        parsed$value <- parsed$value[!J(max(object_id)), on = "object_id"]
+
+        # add rleid for latter error printing
+        set(l, NULL, "line_rleid", NULL)
+        l <- unique(l)[, object_id := .I]
+        set(l, NULL, "object_id", rleid(l$rleid))
+        add_joined_cols(l, parsed$object, "object_id", "rleid")
+        add_joined_cols(l, parsed$value, "object_id", "rleid")
+    }
+
+    # extract_dt_input {{{
+    extract_dt_input <- function (dt, id) {
+        dt <- as.data.table(dt)
+        # check field index duplication
+        if (has_name(dt, "id")) {
+            if (anyDuplicated(dt, by = c("id", "class", "index"))) {
+                abort("error_dot_def_index_dup",
+                    paste0("When input is a data.frame, `id`, `class` and `index` ",
+                        " column combined should not contain any duplication. ",
+                        "Invalid input:\n",
+                        str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
+                    )
+                )
+            }
+            set(dt, NULL, "object_id", rleid(dt$id, dt$class))
+        } else if (anyDuplicated(dt, by = c("class", "index"))) {
+            abort("error_dot_def_index_dup",
+                paste0("When input is a data.frame, `class` and `index` column ",
+                    "combined should not contain any duplication. Invalid input:\n",
+                    str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
+                )
+            )
+        } else {
+            set(dt, NULL, "object_id", rleid(dt$class))
+        }
+
+        # value column should be either character or list
+        if (!is.character(dt$value) && !is.list(dt$value)) {
+            abort("error_dot_def_value_type",
+                paste0("When input is a data.frame, `value` column should be ",
+                    "either a character vector or a list. Invalid input:\n",
+                    str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
+                )
+            )
+        }
+
+        defaulted <- rep(FALSE, nrow(dt))
+
+        # if value is character, trim spaces and convert them into NAs
+        if (is.character(dt$value)) {
+            value_chr <- stri_trim_both(dt$value)
+            value_chr[stri_isempty(value_chr)] <- NA_character_
+            value_num <- suppressWarnings(as.double(value_chr))
+
+            # an indicator of input value type. 1: character, 2: list
+            type = 1L
+
+            # mark NA input as defaulted
+            defaulted[is.na(value_chr)] <- TRUE
+        # if value is a list, each element should be a single character or a
+        # number.
+        } else {
+            get_type <- function (x) {
+                if (!is_scalar(x)) return(0L)
+                if (is.numeric(x)) 1L else if (is.character(x)) 2L else 0L
+            }
+
+            type <- viapply(dt$value, get_type)
+
+            if (any(type == 0L)) {
+                abort("error_dot_def_value_type",
+                    paste0("When input is a data.frame and `value` column is a list, ",
+                        "each element in that list should be a single string or number. ",
+                        "Invalid input:\n",
+                        str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
+                    )
+                )
+            }
+
+            # change empty strings to NA
+            value_chr <- unlist(dt$value, use.names = FALSE)
+            value_chr <- stri_trim_both(value_chr)
+            value_chr[stri_isempty(value_chr)] <- NA_character_
+
+            value_num <- rep(NA_real_, nrow(dt))
+            value_num[type == 1L] <- unlist(dt$value[type == 1L], use.names = FALSE)
+
+            defaulted[is.na(value_chr)] <- TRUE
+
+            # value cannot start with "!"
+            if (any(stri_startswith_fixed(value_chr[!defaulted], "!"))) {
+                abort("error_dot_def_value_type",
+                    paste0("When input is a data.frame and `value` column is a list, ",
+                        "string value shoud not be IDF comment, i.e. starts with `!`. ",
+                        "Invalid input:\n",
+                        str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
+                    )
+                )
+            }
+
+            # an indicator of input value type. 1: character, 2: list
+            type = 2L
+        }
+
+        list(object_id = dt$object_id, class_name = dt$class,
+             field_index = dt$index, value_chr = value_chr,
+             value_num = value_num, defaulted = defaulted, type = type
+        )
+    }
+    # }}}
+
+    if (!any(depth == 2L)) {
+        dt_dt <- data.table()
+    } else  {
+        # copy them before convert them to data.table
+        dt_dt <- dt_dot[J(2L), on = "depth", extract_dt_input(dot[[1L]], rleid), by = "rleid"]
+    }
+
+    list(parsed = parsed, value = dt_dt, dot = dt_dot)
+}
+# }}}
 
 # OBJECT
 # get_idf_object {{{
-#' Get object data.
-#'
-#' @param dt_object A data.table containing all object data. Usually generated
-#'        from parsing an IDF.
-#' @param class An integer vector of valid class indexes or a character vector
-#'        of valid class names or a data.table that contains column `class_id`
-#'        or `class_name` to specify which classes should be considered when
-#'        matching object ID or names. If `class` is a data.table with both
-#'        `class_id` and `class_name` column, `class_id` will be used.
-#' @param object An integer vector of valid object IDs or a character vector
-#'        of valid object names or a data.table that contains column `object_id`
-#'        or `object_name`. If `object` is a data.table with both `object_id`
-#'        and `object_name` column, `object_id` will be used.
-#' @param cols A character vector of column names in class table to return. If
-#'        `NULL`, all columns from `dt_object` will be returned, plus column
-#'        `rleid`.
-#' @param underscore If `TRUE`, input class name will be converted into
-#'        underscore style name first and column `class_name_us` will be used
-#'        for matching.
-#' @param ignore_case If TRUE, object name matching will be case-insensitive.
-#'
-#' If one input object matches multiple objects, an error will be issued.
-#'
-#' @return A data.table containing specified columns.
-#' @noRd
 get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, property = NULL,
                             underscore = FALSE, ignore_case = FALSE) {
     # if no object is specified
@@ -800,16 +985,17 @@ get_object_info <- function (dt_object, component = c("id", "name", "class"),
     if (order_cls != 0L) {
         # If none of ID or name is required
         if (is.null(mes)) {
-            mes <- dt_object[, paste0(key_cls, ": ", class_name)]
+            mes <- dt_object[, paste0(key_cls, ": ", surround(class_name))]
         } else {
             set(dt_object, NULL, "mes_object", mes)
+            dt_object[!stri_isempty(mes_object), mes_object := paste0(" ", mes_object)]
             if (by_class) {
                 mes <- dt_object[, {
-                    paste0(key_obj, " ", collapse(mes_object, NULL), " in class ", class_name[1L])
+                    paste0(key_obj, collapse(mes_object, NULL), " in class ", surround(class_name[1L]))
                 }, by = class_name]$V1
             } else {
                 mes <- dt_object[, {
-                    paste0(key_obj, " ", mes_object, " in class ", class_name)
+                    paste0(key_obj, mes_object, " in class ", surround(class_name))
                 }]
             }
             set(dt_object, NULL, "mes_object", NULL)
@@ -825,12 +1011,12 @@ get_object_info <- function (dt_object, component = c("id", "name", "class"),
     if (numbered) {
         if (has_name(dt_object, "rleid")) {
             if (by_class) {
-                num <- rpad(paste0(" #", dt_object[, unique(rleid), by = class_name]$V1, "| "))
+                num <- paste0(" #", lpad(dt_object[, unique(rleid), by = class_name]$V1, "0"), "| ")
             } else {
-                num <- rpad(paste0(" #", dt_object$rleid, "| "))
+                num <- paste0(" #", lpad(dt_object$rleid, "0"), "| ")
             }
         } else {
-            num <- rpad(paste0(" #", seq_along(mes), "| "))
+            num <- paste0(" #", lpad(seq_along(mes), "0"), "| ")
         }
         mes <- paste0(num, mes)
     }
@@ -986,8 +1172,6 @@ assert_valid_input_format <- function (class_name, value, comment, default, type
 # assert_can_do {{{
 assert_can_do <- function (idd_env, idf_env, dot, object,
                            action = c("add", "dup", "set", "del", "rename", "insert")) {
-    find_dot <- function (dot, dt) dt[dot, on = "rleid", mult = "first", nomatch = 0L]
-
     # stop attempting to touch Version {{{
     if (any(object$class_id == 1L)) {
         invld <- find_dot(dot, object[class_id == 1L])
@@ -1539,115 +1723,6 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
     )
 }
 # }}}
-# set_idf_object_in_class {{{
-set_idf_object_in_class <- function (idd_env, idf_env, ..., .default = TRUE) {
-    l <- sep_value_dots(..., .empty = FALSE)
-
-    stop("Not implemented yet")
-    # separate
-    obj_id_in <- l$object[!is.na(object_id)]
-    set(obj_id_in, NULL, "object_name", NULL)
-    obj_nm_in <- l$object[is.na(object_id)]
-    set(obj_nm_in, NULL, "object_id", NULL)
-
-    # get object data
-    obj_id <- get_idf_object(idd_env, idf_env, object = obj_id_in$object_id)
-    set(obj_id, NULL, names(obj_id_in), obj_id_in)
-    obj_nm <- get_idf_object(idd_env, idf_env, object = obj_nm_in$object_name)
-    set(obj_nm, NULL, names(obj_nm_in), obj_nm_in)
-
-    # combine
-    obj <- rbindlist(list(obj_id, obj_nm))
-
-    obj <- get_idf_object(idd_env, idf_env, l$object$name)
-
-    # update comment
-    # NOTE: have to use `:=` format here as comment is a list
-    obj[!vlapply(new_comment, is.null), `:=`(comment = new_comment)]
-    set(obj, NULL, c("new_comment", "empty"), NULL)
-
-    # stop if cannot set objects
-    assert_can_do(idd_env, idf_env, l$dot, obj, "set")
-
-    # make sure rleid column as the unique id
-    set(obj, NULL, "new_rleid", rleid(obj$rleid, obj$object_rleid))
-
-    # new value table
-    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_rleid"), nomatch = 0L ]
-
-    # clean old rleid
-    set(obj, NULL, c("rleid", "object_rleid"), NULL)
-    set(val, NULL, c("rleid", "object_rleid"), NULL)
-    setnames(obj, "new_rleid", "rleid")
-    setnames(val, "new_rleid", "rleid")
-
-    prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
-        "required_field", "src_enum", "type_enum", "extensible_group"
-    )
-
-    setnames(val, c("value_chr", "value_num"), c("new_value", "new_value_num"))
-
-    if (any(is.na(val$field_name))) {
-        val <- fill_unnamed_field_index(idd_env, idf_env, val)
-        idx <- val$field_index
-    } else {
-        # just to verify field names
-        fld_out <- get_idd_field(idd_env, class = val$class_id, field = val$field_name)
-        # set matched field index
-        set(val, NULL, "field_index", fld_out$field_index)
-        # remove input field name
-        set(val, NULL, "field_name", NULL)
-    }
-
-    fld_in <- val[, list(num = max(field_index)), by = c("rleid", "object_id")]
-    val_out <- get_idf_value(idd_env, idf_env, object = fld_in$object_id, field = fld_in$num,
-        complete = TRUE, property = prop
-    )
-    # reset rleid in val_out
-    set(val_out, NULL, c("rleid"), val$rleid[val_out$rleid])
-    set(val_out, NULL, c("new_value", "new_value_num", "defaulted"),
-        val[val_out, on = c("rleid", "field_index"),
-            .SD, .SDcols = c("new_value", "new_value_num", "defaulted")
-        ]
-    )
-    val <- val_out
-
-    if (.default) val[is.na(value_chr) & is.na(defaulted), defaulted := TRUE]
-    val[is.na(defaulted), defaulted := FALSE]
-
-    # exclude name field if it has been already set before in order to
-    # prevent name conflict checking error
-    val <- val[!(is_name == TRUE & !is.na(value_chr) & is.na(new_value))]
-
-    # order
-    setorderv(val, c("rleid", "field_index"))
-
-    # assign default values if needed
-    if (.default) val <- assign_default_value(val)
-    set(val, NULL, c("default_chr", "default_num"), NULL)
-
-    # assign new values
-    val[!is.na(new_value), `:=`(value_chr = new_value, value_num = new_value_num)]
-    set(val, NULL, c("new_value", "new_value_num"), NULL)
-
-    # assign new value id
-    val[value_id < 0L, value_id := new_id(idf_env$value, "value_id", .N)]
-
-    # update object name
-    obj <- update_object_name(obj, val)
-    set(val, NULL, "is_name", NULL)
-    # add lower name
-    set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
-
-    # validate
-    assert_valid(idd_env, idf_env, obj, val, action = "set")
-
-    list(object = obj[, .SD, .SDcols = names(idf_env$object)],
-         value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
-    )
-}
-# }}}
 # del_idf_object {{{
 del_idf_object <- function (idd_env, idf_env, ..., .referenced = FALSE, .recursive = FALSE, .force = FALSE) {
     l <- sep_name_dots(..., .can_name = TRUE)
@@ -1660,14 +1735,14 @@ del_idf_object <- function (idd_env, idf_env, ..., .referenced = FALSE, .recursi
     id_del <- obj$object_id
 
     # check if target objects are referenced by others
+    # TODO: handle cases when input multiple depths
     ref <- get_idf_relation(idd_env, idf_env, obj$object_id, name = TRUE,
-        direction = "ref_by", max_depth = if (.recursive) NULL else 0L
+        direction = "ref_by", recursive = .recursive
     )
 
     if (nrow(ref)) {
         # stop if objects are referenced {{{
-        if (!.force) {
-
+        if (!.referenced && !.force) {
             abort("error_del_referenced",
                 paste0(
                     "Cannot delete object(s) that are referred by others:\n",
@@ -1754,7 +1829,7 @@ rename_idf_object <- function (idd_env, idf_env, ...) {
 }
 # }}}
 # insert_idf_object {{{
-insert_idf_object <- function (idd_env, idf_env, version, ...) {
+insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) {
     l <- sep_object_dots(...)
     ver <- version
     input <- l$data
@@ -1794,7 +1869,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ...) {
         )), by = "object_rleid"]$V1
     val <- rbindlist(val)
     # update name field
-    val[is_name == TRUE, `:=`(value_chr = obj$object_name, value_num = NA_real_)]
+    val[is_name == TRUE, `:=`(value_chr = obj$object_name[obj$has_name], value_num = NA_real_)]
     # set newly added fields to default value if possible
     set(val, NULL, "defaulted", FALSE)
     val[value_id < 0L, defaulted := TRUE]
@@ -1809,6 +1884,22 @@ insert_idf_object <- function (idd_env, idf_env, version, ...) {
     # stop if cannot insert objects in specified classes
     assert_can_do(idd_env, idf_env, l$dot, obj, "insert")
 
+    # remove empty fields
+    add_class_property(idd_env, val, c("min_fields", "num_extensible"))
+    val <- remove_empty_fields(val)
+
+    # remove duplicated objects
+    if (.unique) {
+        obj_val <- remove_duplicated_objects(idd_env, idf_env, obj, val)
+        obj <- obj_val$object
+        val <- obj_val$value
+    }
+
+    # if all inputs are duplications
+    if (!nrow(obj)) {
+        return(list(object = idf_env$object[0L], value = idf_env$value[0L], reference = idf_env$reference))
+    }
+
     # validate
     assert_valid(idd_env, idf_env, obj, val, action = "insert")
 
@@ -1819,13 +1910,8 @@ insert_idf_object <- function (idd_env, idf_env, version, ...) {
 }
 # }}}
 # paste_idf_object {{{
-paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE) {
+paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique = TRUE, default = TRUE) {
     parsed <- read_idfeditor_copy(version, in_ip)
-
-    # IP - SI conversion if necessary
-    from <- if (in_ip) "ip" else "si"
-    to <- if (.options$view_in_ip) "ip" else "si"
-    parsed$value <- convert_value_unit(parsed$value, from, to)
 
     # add class name
     add_class_name(idd_env, parsed$object)
@@ -1843,60 +1929,13 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE) {
     add_field_property(idd_env, parsed$value, "required_field")
     parsed$value <- remove_empty_fields(parsed$value)
 
-    # get all class ids in input
-    cls <- unique(parsed$object$class_id)
-
-    # NOTE: by default, IDF Editor only copies objects in a single class, which
-    # makes it easy to remove duplicates
-    assert(is_scalar(cls))
-
-    cols <- c("object_id", "class_id", "field_index", "value")
-
-    # extract all object values in the same class
-    # in order to distinguish input from original IDF, set id of objects
-    # from IDF Editor to negative also note that dcast will automatically
-    # order object id, so this makes that input objects are always in the
-    # bottom.
-    # temporary add class id and field index
-    add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
-    add_joined_cols(idd_env$field, idf_env$value, "field_id", "field_index")
-    val_idf <- idf_env$value[J(cls), on = "class_id",
-        list(object_id = -object_id, field_index, value_chr), nomatch = 0L]
-    set(idf_env$value, NULL, c("class_id", "field_index"), NULL)
-
-    # if there are objects in the same class
-    if (nrow(val_idf)) {
-        # get all input value
-        val_in <- parsed$value[, list(object_id, field_index, value_chr)]
-
-        # dcast to compare
-        val_d <- dcast(rbindlist(list(val_idf, val_in), fill = TRUE),
-            object_id ~ field_index, value.var = "value_chr")
-
-        # get indicator
-        dup <- duplicated(val_d, by = setdiff(names(val_d), c("object_id", "class_id")))
-
-        # only find duplicates in input
-        obj <- val_d[dup & object_id > 0L, object_id]
-
-        if (length(obj)) {
-            # give info
-            verbose_info(
-                "Duplicated objects in input or objects in input that are the same in current IDF have been removed:\n",
-                {
-                    del <- parsed$object[J(obj), on = "object_id"]
-                    get_object_info(del, "name", collapse = "\n")
-                }
-            )
-            # NOTE: for references, as have to check gloally to get the latest
-            # references, there is no need to exclude objects here
-            parsed$object <- parsed$object[!J(obj), on = "object_id"]
-            parsed$value <- parsed$value[!J(obj), on = "object_id"]
-        }
+    # remove duplicated objects
+    if (unique) {
+        parsed <- remove_duplicated_objects(idd_env, idf_env, parsed$object, parsed$value)
     }
 
     # if all inputs are duplications
-    if (!nrow(parsed$value)) {
+    if (!nrow(parsed$object)) {
         return(list(object = idf_env$object[0L], value = idf_env$value[0L], reference = idf_env$reference))
     }
 
@@ -1911,8 +1950,13 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE) {
     set(parsed$value, NULL, "rleid", parsed$value$object_id)
     set(parsed$value, NULL, "object_rleid", parsed$value$object_id)
 
-    # add field attributes for validation
+    # add field defaults if possible
     set(parsed$value, NULL, "defaulted", FALSE)
+    if (default) {
+        parsed$value[is.na(value_chr), defaulted := TRUE]
+        add_field_property(idd_env, parsed$value, c("default_chr", "default_num", "units", "ip_units"))
+        parsed$value <- assign_default_value(parsed$value)
+    }
 
     # validate
     # add necessary columns for validation
@@ -1928,6 +1972,164 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE) {
         append_dt(idf_env$value, parsed$value, "value_id")
     )
     set(idf_env$value, NULL, c("class_id", "class_name", "type_enum", "src_enum"), NULL)
+
+    parsed
+}
+# }}}
+# load_idf_object {{{
+load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .default = TRUE) {
+    l <- sep_definition_dots(..., .version = version)
+
+    prop <- c("is_name", "required_field", "src_enum", "type_enum", "extensible_group")
+    if (.default) prop <- c(prop, c("units", "ip_units", "default_chr", "default_num"))
+
+    # get object and value from data.frame input {{{
+    if (!nrow(l$value)) {
+        obj_dt <- data.table()
+        val_dt <- data.table()
+    } else {
+        # verify class name and add class id
+        cls <- tryCatch(get_idd_class(idd_env, l$value$class_name, property = c("has_name")),
+            error_class_name = function (e) {
+                # get input with invalid class name
+                id <- l$value[J(e$value), on = "class_name", rleid]
+                abort("error_class_name",
+                    paste0("Invalid class name ", collapse(unique(e$value)), " found in input:\n",
+                        dot_string(l$dot[J(id), on = "rleid"])
+                    )
+                )
+            }
+        )
+
+        set(l$value, NULL, c("class_id", "class_name", "has_name"),
+            list(cls$class_id, cls$class_name, cls$has_name)
+        )
+
+        obj_dt <- l$value[,
+            list(rleid =  rleid[[1L]], class_id = class_id[[1L]],
+                 class_name = class_name[[1L]], has_name = has_name[[1L]],
+                 num = max(field_index)
+            ),
+            by = "object_id"
+        ]
+
+        # stop of trying to add Version object
+        if (any(obj_dt$class_id == 1L)) {
+            invld <- find_dot(l$dot, obj_dt[class_id == 1L])
+            m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
+            abort("error_add_version",
+                paste0("Adding Version object is prohibited. Invalid input:\n", m)
+            )
+        }
+
+        # verify class name and add class id
+        fld_out <- tryCatch(
+            get_idd_field(idd_env, class = obj_dt$class_id, field = obj_dt$num, complete = TRUE, property = prop),
+            error_bad_field_index = function (e) {
+                # update rleid
+                e$data[, rleid := obj_dt$rleid[e$data$rleid]]
+                abort_bad_field("error_bad_field_index", "index", e$data)
+            }
+        )
+
+        # reset rleid in fld_out
+        set(fld_out, NULL, c("rleid", "object_id"), obj_dt[fld_out$rleid, list(rleid, object_id)])
+
+        # remove unuseful column
+        set(fld_out, NULL, "field_in", NULL)
+
+        # remove duplicated columns
+        set(l$value, NULL, c("class_id", "class_name", "has_name"), NULL)
+        val_dt <- l$value[fld_out, on = c("rleid", "object_id", "field_index")]
+
+        # if input is character vectors, need to reset values since all of them
+        # are coerced regardless of field types
+        val_dt[type == 1L & type_enum > IDDFIELD_TYPE$real, `:=`(value_num = NA_real_)]
+        set(val_dt, NULL, "type", NULL)
+
+        if (.default) val_dt[is.na(defaulted), defaulted := TRUE]
+
+        # order
+        setorderv(val_dt, c("rleid", "field_index"))
+
+        # remove unuseful columns
+        set(obj_dt, NULL, "num", NULL)
+
+        # add comment column
+        set(obj_dt, NULL, "comment", list(list(NULL)))
+    }
+    # }}}
+
+    # get object and value from character input {{{
+    if (!length(l$parsed)) {
+        obj_chr <- data.table()
+        val_chr <- data.table()
+    } else {
+        obj_chr <- l$parsed$object
+        val_chr <- l$parsed$value
+
+        # add class name
+        add_class_name(idd_env, obj_chr)
+        add_class_property(idd_env, obj_chr, "has_name")
+        # add class id and field index
+        add_joined_cols(obj_chr, val_chr, "object_id", c("class_id", "class_name"))
+        add_joined_cols(idd_env$field, val_chr, "field_id", c("field_index", "field_name"))
+        # add field property
+        add_field_property(idd_env, val_chr, prop)
+
+        # add field defaults if possible
+        set(val_chr, NULL, "defaulted", FALSE)
+        if (.default) val_chr[is.na(value_chr), defaulted := TRUE]
+    }
+    # }}}
+
+    obj <- rbindlist(list(obj_chr, obj_dt), fill = TRUE)
+    val <- rbindlist(list(val_chr, val_dt), fill = TRUE)
+    setorderv(val, c("rleid", "object_id", "field_id"))
+
+    # assign object id and value id
+    obj <- assign_new_id(idf_env, obj, "object")
+    val <- assign_new_id(idf_env, val, "value")
+    set(val, NULL, "object_id", rleid(val$rleid, val$object_id))
+    val <- correct_obj_id(obj, val)
+    # update object name
+    obj <- update_object_name(obj, val)
+
+    # assign default
+    if (.default) val <- assign_default_value(val)
+
+    # remove duplicated objects
+    if (.unique) {
+        parsed <- remove_duplicated_objects(idd_env, idf_env, obj, val)
+    } else {
+        parsed <- list(object = obj, value = val)
+    }
+
+    # if all inputs are duplications
+    if (!nrow(parsed$object)) {
+        return(list(object = idf_env$object[0L], value = idf_env$value[0L], reference = idf_env$reference))
+    }
+
+    # check if adding objects in specific class is allowed
+    assert_can_do(idd_env, idf_env, l$dot, parsed$object, action = "add")
+
+    # validate
+    assert_valid(idd_env, idf_env, parsed$object, parsed$value, action = "add")
+
+    # get field reference in whole fields
+    add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
+    add_class_name(idd_env, idf_env$value)
+    add_field_property(idd_env, idf_env$value, c("type_enum", "src_enum"))
+    parsed$reference <- get_value_reference_map(idd_env$reference,
+        append_dt(idf_env$value, parsed$value, "value_id"),
+        append_dt(idf_env$value, parsed$value, "value_id")
+    )
+    set(idf_env$value, NULL, c("class_id", "class_name", "type_enum", "src_enum"), NULL)
+
+    # update object name
+    obj_dt <- update_object_name(obj_dt, val_dt)
+    # add lower name
+    set(obj_dt, NULL, "object_name_lower", stri_trans_tolower(obj_dt$object_name))
 
     parsed
 }
@@ -1997,7 +2199,7 @@ replace_idf_value <- function (idd_env, idf_env, pattern, replacement,
 
     assert_valid(idd_env, idf_env, obj, val, action = "set")
 
-    list(object = obj, value = val, 
+    list(object = obj, value = val,
          reference = update_value_reference(idd_env, idf_env, obj, val, "set")
     )
 }
@@ -2105,36 +2307,144 @@ remove_empty_fields <- function (val) {
     val
 }
 # }}}
+# remove_duplicated_objects {{{
+remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
+    # extract all object values in the same class
+    # in order to distinguish input from original IDF, set id of objects
+    # from IDF Editor to negative also note that dcast will automatically
+    # order object id, so this makes that input objects are always in the
+    # bottom.
+    add_joined_cols(idd_env$field, idf_env$value, "field_id", "field_index")
+    add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
+    val_idf <- idf_env$value[J(unique(obj$class_id)), on = "class_id",
+        list(class_id, object_id = -object_id, field_index, value_chr), nomatch = 0L]
+    set(idf_env$value, NULL, c("class_id", "field_index"), NULL)
+
+    # if there are no objects in the same class
+    if (!nrow(val_idf)) return(list(object = obj, value = val))
+
+    # get all input value
+    val_in <- val[, list(class_id, object_id, field_index, value_chr)]
+
+    # dcast to compare
+    val_d <- dcast(rbindlist(list(val_idf, val_in), fill = TRUE),
+        class_id + object_id ~ field_index, value.var = "value_chr")
+
+    # get indicator
+    dup <- duplicated(val_d, by = setdiff(names(val_d), c("object_id", "class_id")))
+
+    # only find duplicates in input
+    id_dup <- val_d[dup & object_id > 0L, object_id]
+
+    if (length(id_dup)) {
+        # give info
+        verbose_info(
+            "Duplicated objects in input or objects in input that are the same in current IDF have been removed:\n",
+            {
+                del <- obj[J(id_dup), on = "object_id"]
+                setorderv(del, "rleid")
+                get_object_info(del, c("name", "class"), collapse = "\n", name_prefix = FALSE)
+            }
+        )
+
+        obj <- obj[!J(id_dup), on = "object_id"]
+        val <- val[!J(id_dup), on = "object_id"]
+    }
+
+    list(object = obj, value = val)
+}
+# }}}
 
 # REFERENCES
 # get_idf_relation {{{
 get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                               max_depth = NULL, name = FALSE,
-                              direction = c("ref_to", "ref_by"), keep_all = FALSE) {
+                              direction = c("ref_to", "ref_by"), keep_all = FALSE,
+                              recursive = FALSE) {
+    direction <- match.arg(direction)
+
+    ref <- get_idf_relation_at_depth(idd_env, idf_env, object_id, value_id,
+        max_depth, direction, keep_all
+    )
+
+    if (recursive && nrow(ref)) {
+        rec_in <- switch(direction, ref_to = "src_object_id", ref_by = "object_id")
+        new_id <- unique(ref[[rec_in]][!is.na(ref[[rec_in]])])
+
+        get_rec_ref <- function (recref, md, new_id) {
+            if (!length(new_id)) return(ref)
+
+            rec_ref <- get_idf_relation_at_depth(idd_env, idf_env, new_id,
+                NULL, max_depth, direction, keep_all = FALSE
+            )
+
+            # increase the depth
+            set(rec_ref, NULL, "dep", rec_ref$dep + md + 1L)
+
+            # exclude self reference to avoid infinite loop
+            # `Name` <--> `Outside Boundary Condition Object` in `BuildingSurface:Detaild`
+            rec_ref <- rec_ref[!ref, on = c("object_id", "value_id", "src_object_id", "src_value_id")]
+
+            ref <<- rbindlist(list(ref, rec_ref), use.names = TRUE)
+
+            new_id <- unique(rec_ref[[rec_in]][!is.na(rec_ref[[rec_in]])])
+
+            get_rec_ref(rec_ref, max(rec_ref$dep), new_id)
+
+            ref
+        }
+
+        ref <- get_rec_ref(ref, max(ref$dep), new_id)
+    }
+
+    if (!name) return(ref)
+
+    ref <- add_idf_relation_format_cols(idd_env, idf_env, ref)
+
+    cls <- switch(direction, ref_by = "IdfRelationBy", ref_to = "IdfRelationTo")
+    setattr(ref, "class", c(cls, class(ref)))
+    ref
+}
+# }}}
+# get_idf_relation_at_depth {{{
+get_idf_relation_at_depth <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
+                                       max_depth = NULL, direction = c("ref_to", "ref_by"),
+                                       keep_all = FALSE) {
     assert(is.null(max_depth) || is_count(max_depth, TRUE))
     direction <- match.arg(direction)
 
+    # if no value id is given
     if (is.null(value_id)) {
+        # if no object id is given
         if (is.null(object_id)) {
+            # use all objects in current IDF
             id <- idf_env$object$object_id
         } else {
+            # use specified object IDs
             id <- object_id
         }
         col_on <- c("object_id", "value_id")
+    # if value ids are given
     } else {
+        # if no object id is given
         if (is.null(object_id)) {
+            # use specified value id
             id <- value_id
+        # if object IDs are given
         } else {
+            # make sure object IDs and value ids have the same length
             assert(have_same_len(object_id, value_id))
             obj_id <- object_id
             val_id <- value_id
 
+            # find value ids
             id <- idf_env[J(obj_id, val_id), on = c("object_id", "value_id"), value_id]
         }
         col_on <- "value_id"
     }
 
     if (keep_all) {
+        # make sure all input IDs appear in the result
         val <- idf_env$value[J(id), on = col_on[[1L]], .SD, .SDcols = c("value_id", "object_id")]
     }
 
@@ -2150,6 +2460,7 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
 
     ref <- get_recref(idf_env$reference, id, col_on, col_rec, dep, max_depth)
 
+    # keep all input {{{
     if (keep_all) {
         if (direction == "ref_to") {
             set(ref, NULL, "object_id", NULL)
@@ -2176,13 +2487,8 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
             }
         }
     }
+    # }}}
 
-    if (!name) return(ref)
-
-    ref <- add_idf_relation_format_cols(idd_env, idf_env, ref)
-
-    cls <- switch(direction, ref_by = "IdfRelationBy", ref_to = "IdfRelationTo")
-    setattr(ref, "class", c(cls, class(ref)))
     ref
 }
 # }}}
@@ -2350,13 +2656,13 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 
 # TABLE
 # get_idf_table {{{
-get_idf_table <- function (idd_env, idf_env, class = NULL, object, string_value = TRUE, unit = TRUE) {
+get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL, string_value = TRUE, unit = TRUE) {
     cols <- c("object_id", "object_name", "class_name",
               "field_index", "field_name", "units", "ip_units", "type_enum",
               "value_chr", "value_num")
 
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
+        property = c("units", "ip_units", "type_enum"))[, .SD, .SDcols = cols]
 
     setnames(val,
         c("object_id", "object_name", "class_name", "field_index", "field_name"),
@@ -2374,6 +2680,54 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object, string_value 
         }
 
         val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+    }
+}
+# }}}
+
+# STRING
+# get_idf_string {{{
+get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
+                            in_ip = FALSE, comment = TRUE, header = TRUE,
+                            format = c("sorted", "new_top", "new_bot"),
+                            leading = 4L, sep_at = 29L) {
+    format <- match.arg(format)
+
+    if (any(!is.null(class), !is.null(object))) {
+        obj <- get_idf_object(idd_env, idf_env, class, object, ignore_case = TRUE)
+        fmt <- with_nocolor(with_format_cols(idd_env, idf_env,
+            format_idf(
+                idf_env$value[J(obj$object_id), on = "object_id"],
+                idf_env$object[J(obj$object_id), on = "object_id"],
+                dt_order, in_ip = in_ip, header = header, comment = comment,
+                save_format = format
+            )
+        ))
+    } else {
+        fmt <- with_nocolor(with_format_cols(idd_env, idf_env,
+            format_idf(idf_env$value, idf_env$object, dt_order, in_ip = in_ip,
+            header = header, comment = comment, save_format = format)
+        ))
+    }
+
+    if (format == "sorted") {
+        combine_fmt <- function (lst) {
+            head <- if (is.null(lst[[1L]])) "" else c("", lst[[1L]], "")
+            c(head, unlist(lapply(lst[-1L], function (x) c(unlist(x, use.names = FALSE), "")), use.names = FALSE))
+        }
+
+        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
+    } else {
+        combine_fmt <- function (lst) c(unlist(lst, use.names = FALSE), "")
+
+        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
+    }
+
+    if (header) {
+        c(fmt$header, "", body)
+    } else if (format == "sorted") {
+        body[-1L]
+    } else {
+        body
     }
 }
 # }}}
@@ -2413,25 +2767,7 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
 
     resolve_idf_external_link(idd_env, idf_env, oldpath, path, copy_external)
 
-    fmt <- with_nocolor(with_format_cols(idd_env, idf_env,
-        format_idf(idf_env$value, idf_env$object, dt_order, in_ip = in_ip,
-        header = TRUE, comment = TRUE, save_format = format)
-    ))
-
-    if (format == "sorted") {
-        combine_fmt <- function (lst) {
-            head <- if (is.null(lst[[1L]])) "" else c("", lst[[1L]], "")
-            c(head, unlist(lapply(lst[-1L], function (x) c(unlist(x, use.names = FALSE), "")), use.names = FALSE))
-        }
-
-        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
-        str <- c(fmt$header, "", body)
-    } else {
-        combine_fmt <- function (lst) c(unlist(lst, use.names = FALSE), "")
-
-        body <- unlist(lapply(fmt$format$fmt, combine_fmt), use.names = FALSE)
-        str <- c(fmt$header, "", body)
-    }
+    str <- get_idf_string(idd_env, idf_env, dt_order, comment = TRUE, header = TRUE, format = format)
 
     path <- normalizePath(path, mustWork = FALSE)
     write_lines(str, path)
@@ -2513,7 +2849,6 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # update object value table
-    browser()
     idf_env$value[J(val$value_id), on = "value_id", value_chr := val$new_value]
 
     TRUE
