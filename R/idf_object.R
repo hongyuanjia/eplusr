@@ -2,143 +2,236 @@
 #' @include impl-idfobj.R
 NULL
 
-#' EnergyPlus IDF object
+#' Create and Modify an EnergyPlus Object
 #'
-#' `IdfObject` is an abstraction of a single object in an `Idf`. It provides
-#' more detail methods to modify objects. `IdfObject` can only be created from
-#' the parent `Idf` object, using `$object`, `$object_in_class()` and
-#' `$search_object()` or equivalent. This is because that initialization of an
-#' `IdfObject` needs some shared data from parent `Idf` object.
+#' `IdfObject` is an abstraction of a single object in an [Idf]. It provides
+#' more detail methods to modify object values and comments. An `IdfObject`
+#' object can be created using function [idf_object()] or from methods of a
+#' parent [Idf] object, using `$object()`, `$objects_in_class()` and equivalent.
 #'
 #' @section Usage:
 #' \preformatted{
+#' idfobj <- model$object(which)
+#' idfobj <- idf_object(model, which, class = NULL)
+#' idfobj$version()
 #' idfobj$id()
 #' idfobj$name()
 #' idfobj$definition()
-#' idfobj$get_comment()
-#' idfobj$set_comment(comment, append = TRUE, width = 0L)
-#' idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
-#' idfobj$set_value(..., defaults = TRUE)
+#' idfobj$comment(comment, append = TRUE, width = 0L)
+#' idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
+#' idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 #' idfobj$FieldName
 #' idfobj[[Field]]
+#' idfobj$set(..., .defaults = TRUE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
-#' idfobj$possible_value(which = NULL)
-#' idfobj$validate()
-#' idfobj$is_valid()
-#' idfobj$ref_from_object()
-#' idfobj$ref_by_object()
-#' idfobj$has_ref_by()
-#' idfobj$has_ref_from()
-#' idfobj$has_ref()
-#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
-#' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-#' idfobj$print(comment = TRUE, auto_sep = FALSE)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
+#' idfobj$ref_to_object(which = NULL, class = NULL)
+#' idfobj$ref_by_object(which = NULL, class = NULL)
+#' idfobj$has_ref_to(which = NULL, class = NULL)
+#' idfobj$has_ref_by(which = NULL, class = NULL)
+#' idfobj$has_ref(which)
+#' idfobj$validate(level = eplusr_option("validate_level"))
+#' idfobj$is_valid(level = eplusr_option("validate_level"))
+#' idfobj$to_table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE)
+#' idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
+#' idfobj$print(comment = TRUE, auto_sep = FALSE, brief = FALSE)
 #' print(iddobj)
 #' }
 #'
 #' @section Basic Info:
 #'
 #' ```
+#' idfobj <- model$object(which)
+#' idfobj <- idf_object(model, which, class = NULL)
+#' idfobj$version()
 #' idfobj$id()
 #' idfobj$name()
 #' idfobj$group_name()
 #' idfobj$class_name()
 #' ```
 #'
-#' `$id()` returns the object ID.
+#' `$version()` returns the version of parent [Idf] object in a
+#' [base::numeric_version()] format.
 #'
-#' `$name()` returns the object name. If the class does not have name
-#'     attribute, then `NA` will returned.
+#' `$id()` returns current `IdfObject` ID.
 #'
-#' `$group_name()` returns the group name of this object belongs to.
+#' `$name()` returns current `IdfObject` name. If the class does not have name
+#' attribute, `NA` is returned.
 #'
-#' `$class_name()` returns the class name of this object belongs to.
+#' `$group_name()` returns the group name of current [IdfObject] belongs to.
+#'
+#' `$class_name()` returns the class name of current [IdfObject] belongs to.
+#'
+#' **Arguments**:
+#'
+#' * `model`: An [Idf] object.
+#' * `class`: A single string of valid class name.
+#' * `which`: A valid object ID (an integer) or name (a string).
 #'
 #' @section Definition:
 #' ```
 #' idfobj$definition()
 #' ```
 #'
-#' `$definition()` returns the definition, i.e. the `IddObject`, of current
-#'     class. For details of `IddObject`, please see [IddObject] class.
+#' `$definition()` returns an [IddObject] of current class. [IddObject] contains
+#' all data used for parsing and creating an [IdfObject]. For details, please
+#' see [IddObject] class.
 #'
-#' @section Comment:
+#' @section Getting and Setting Comments:
 #' ```
-#' idfobj$get_comment()
-#' idfobj$set_comment(comment, append = TRUE, width = 0L)
+#' idfobj$comment(comment, append = TRUE, width = 0L)
 #' ```
-#'
-#' `$get_comment()` returns the comments of current object.
-#'
-#' `$set_comment()` sets comments of current object.
+#' `$comment()` returns current `IdfObject` comment if `comment` is not given,
+#' or modifies current `IdfObject` comment if `comment` is given.
 #'
 #' **Arguments**
 #'
-#' * `comment`: A character vector. If `NULL`, all comments will be deleted.
-#' * `append`: If `TRUE`, comment will be appended to existing comments. If
-#'     `FALSE`, comment will be prepended to existing currents. If `NULL`,
-#'     existing comments will be deleted before adding new comments. Default:
-#'     `FALSE`.
-#' * `width`: An integer of character number to indicate where to break long
-#'   comment lines. If `0`, no breaking will be made. Default: `0`.
+#' * `comment`: A character vector.
+#'    * If missing, current comments are returned. If there is no comment in
+#'    current `IdfObject`, `NULL` is returned.
+#'    * If `NULL`, all comments in current `IdfObject` is deleted.
+#'    * If a character vector, it is inserted as comments depending on the
+#'    `append` value.
+#' * `append`: Only applicable when `commment` is a character vector. Default: `FALSE`.
+#'    * If `NULL`, existing comments is deleted before adding `comment`.
+#'    * If `TRUE`, comment will be appended to existing comments.
+#'    * If `FALSE`, `comment` is prepended to existing currents.
+#' * `width`: A positive integer giving the target width for wrapping inserted
+#'   `comment`.
 #'
-#' @section Value:
+#' @section Get Field Values:
 #' \preformatted{
-#' idfobj$get_value(which = NULL, all = FALSE, simplify = FALSE)
-#' idfobj$set_value(..., default = TRUE)
+#' idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
+#' idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 #' idfobj$FieldName
 #' idfobj[[Field]]
-#' idfobj$FieldName <- Value
-#' idfobj[[Field]] <- Value
-#' idfobj$possible_value(which = NULL)
 #' }
 #'
-#' `$get_value()` returns a named list containing values of specified fields.
-#'     If simplify is `FALSE`, then all values will be converted into character
-#'     and the converted character vector will be returned. Note that the field
-#'     names will be converted into valid R names, i.e. all characters other
-#'     than letters and numbers will be replaced by underscore `"_"`
-#'     ("underscore-style").
+#' `$value()` takes an integer vector of valid field indexes or a character
+#' vector of valid field names, and returns a named list containing values of
+#' specified fields when `simplify` is `FALSE` and a character vector when
+#' `simplify` is `TRUE`.
 #'
-#' `$set_value()` sets values of current object. Field values should be given in
-#' following either pattern below:
+#' eplusr also provides custom S3 method of `$` and \code{[[} which make
+#' it more convenient to get a single value of current `IdfObject`. Basically,
+#' `idfobj$FieldName` and \code{idfobj[[Field]]} is equivalent to
+#' \code{idfobj$value(FieldName)[[1]]} and \code{idfobj$value(Field)[[1]]}.
 #'
-#' * directly list all field values with no name. The values will be assigned to
-#'   fields according to the appearance order
-#' * give both field names *without units* and values in pair, e.g. `` Name =
-#'   "Test", `Begin Month` = 1 ``. You can find all valid field names using
-#'   `$definition()$field_name()`. Field names can also be given in
-#'   underscore-style, e.g. `Name = "Test", begin_month = 1` (NOTE: matching is
-#'   case-insensitive).
+#' `$possible_value()` takes an integer vector of valid field indexes or a character
+#' vector of valid field names, and returns all possible values for specified
+#' fields. For a specific field, there are 5 types of possible values:
 #'
-#' eplusr also provides custom S3 method of `$`, \code{[[} and also `$<-` and
-#' \code{[[<-} to make it more convenient to get and set a single value of an
-#' `IdfObject`. Basically, `idfobj$FieldName` and \code{idfobj[[Field} is equivalent to \code{idfobj$get_value(Field)[[1]]};
-#' `idfobj$FieldName <- Value` and \code{idfobj[[Field]] <- Value} is equivalent
-#' to `idfobj$set_value(Field = Value)`,  where `FieldName` is a single valid
-#' field name and `Field` is a single valid field index or name.
+#' * `auto`: Whether the field can be filled with `Autosize` and
+#'   `Autocalculate`. This field attribute can also be retrieved using
+#'   `idfobj$definition()$is_autosizable()` and
+#'   `idfobj$definition()$is_autosizable()`.
+#' * `default`: The default value. This value can also be retrieved using
+#'   `idfobj$defintion()$field_default()`.
+#' * `choice`: The choices which the field can be set. This value can also be
+#'   retrieved using `idfobj$definition()$field_choice()`.
+#' * `range`: The range which the field value should fall in. This range can
+#'   also be retrieved using `idfobj$definition()$field_range()`.
+#' * `source`: All values from other objects that current field can refer to.
 #'
-#' `$possible_value()` return all possible values for specified fields,
-#'      including auto-value (`autosize` and `autocalculate`), default value,
-#'      value range, choices and references. Underneath, it returns a data.table
-#'      with custom printing method. It is basically the same as
-#'      `$field_possible()` in [IddObject] class.
+#' `$value_possible()` returns an `IdfValuePossible` object which is a
+#' [data.table::data.table()] with at most 15 columns:
+#'
+#' * `class_id`: index of class that current `IdfObject` belongs to
+#' * `class_name`: name of class that current `IdfObject` belongs to
+#' * `object_id`: ID of current `IdfObject`
+#' * `object_name`: name of current `IdfObject`
+#' * `field_id`: indexes (at Idd level) of object fields specified
+#' * `field_index`: indexes of object fields specified
+#' * `field_name`: names (without units) of object fields specified
+#' * `value_id`: value indexes (at Idf level) of object fields specified
+#' * `value_chr`: values (converted to characters) of object fields specified
+#' * `value_num`: values (converted to numbers in SI units) of object fields
+#'    specified.
+#' * `auto`: Exists only when `"auto"` is one of `type`. Character type.
+#'   Possible values are: `"Autosize"`, `"Autocalculate"` and `NA` (if current
+#'   field is neither `autosizable` nor `autocalculatable`).
+#' * `default`: Exists only when `"default"` is one of `type`. List type. The
+#'   default value of current field. The value is converted into number if
+#'   corresponding field type yells so. Note that if current field is a numeric
+#'   field but the default value is `"Autosize"` or `"Autocalculate"`, it is
+#'   left as it is, leaving the returned type being a string instead of a
+#'   number.
+#' * `range`: Exists only when `"range"` is one of `type`. List type. The range
+#'   that field value should fall in. Every range has four components: `minimum`
+#'   (lower limit), `lower_incbounds` (`TRUE` if the lower limit should be
+#'   included), `maximum` (upper limit), and `upper_incbounds` (`TRUE` if the
+#'   upper limit should be included). For fields of character type, empty lists
+#'   are returned. For fields of numeric types with no specified ranges,
+#'   `minimum` is set to `-Inf`, `lower_incbounds` is set to FALSE, `upper` is
+#'   set to `Inf`, and `upper_incbounds` is set to FALSE. The field range is
+#'   printed in number interval denotation.
+#' * `source`: Exists only when `"source"` is one of `type`. List type. Each
+#'   element is a chracter vector which includes all values from other objects
+#'   that current field can use as sources and refers to.
 #'
 #' **Arguments**
 #'
 #' * `which`: An integer vector of field indexes or a character vector of field
-#'     names. Field names can be given in "lower-style", e.g. `"Thermal
-#'     Resistance"` can be given as `"thermal_resistance"`.
-#' * `all`: If `TRUE`, values of all fields, including empty fields will be
-#'     returned as well. Default: `FALSE`
-#' * `simplify`: If `TRUE`, values of fields will be converted into characters
-#'     and the converted character vector will be returned.
-#' * `...`: Values to set. Field names of value can be given. If not named, the
-#'     input values will be set to fields according to their order of
-#'     appearance.
-#' * `default`: If `TRUE`, all empty fields will be filled with their default
-#'     values if possible.
+#'   names.
+#' * `all`: If `TRUE`, values of all possible fields in current class the
+#'   `IdfObject` belongs to are retured. Default: `FALSE`
+#' * `simplify`: If `TRUE`, values of fields are converted into characters
+#'   and the converted character vector is returned.
+#' * `FieldName`: A single length character vector of one valid field name where
+#'     all characters except letters and numbers are replaced by underscores.
+#' * `Field`: A single length character vector of one valid field name or a
+#'     single length integer vector of one valid field index. Same as above,
+#'     field names should be given in a style where all characters except
+#'     letters and numbers are replaced by underscores.
+#' * `type`: A character vector. What types of possible values should be
+#'   returned. Should be one of or a combination of `"auto"`, `"default"`,
+#'   `"choice"`, `"range"` and `"source"`. Default: All of those.
+#'
+#' @section Set Field Values:
+#' \preformatted{
+#' idfobj$set(..., .default = TRUE)
+#' idfobj$FieldName <- Value
+#' idfobj[[Field]] <- Value
+#' }
+#'
+#' `$set()` takes new field value definitions in `field = value` format or in
+#' list format, sets new values for fields specified, and returns the modified
+#' [IdfObject]. Unlike `$set()` method in [Idf] class, the special element
+#' `.comment` is **not allowed**. To modify object comments, please use
+#' `$comment()`.
+#'
+#' **NOTE**:
+#'
+#' * You can delete a field by assigning `NULL` to it, e.g. `iddobj$set(fld =
+#'   NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
+#'   also `fld` is not a required field and the index of `fld` is larger than
+#'   the number minimum fields required for that class, it will be deleted.
+#'   Otherwise it will be left as blank. If `.default` is `TRUE`, that field
+#'   will be filled with default value if applicable and left as blank if not.
+#' * New fields that currently do not exist in that object can also be set. They
+#'   will be automatically added on the fly.
+#' * Field name matching is **case-insensitive**. For convenience,
+#'   underscore-style field names are also allowed, e.g. `eNd_MoNtH` is
+#'   equivalent to `End Month`.
+#' * If not all field names are given, positions of those values without field
+#'   names are determined after those values with names. E.g. in
+#'   `model$set(Construction = list("out_layer", name = "name"))`, `"out_layer"`
+#'   will be treated as the value of field `Outside Layer` in `Construction`, as
+#'   value of field `Name` has been given as `"name"`.
+#'
+#' eplusr also provides custom S3 method of `$<-` and
+#' \code{[[<-} which makes it more convenient to set a single field value of an
+#' `IdfObject`. Basically, `idfobj$FieldName <- value` and \code{idfobj[[Field]]
+#' <- value} is equivalent to `idfobj$set(FieldName = value)` and
+#' `idfobjset(Field = value)`.
+#'
+#' **Arguments**:
+#'
+#' * `...`: New field value definitions in `field = value` format or in
+#'   list format `list(field = value)`.
+#' * `.default`: If `TRUE`, default values are used for those blank fields if
+#'    possible. Default: `TRUE`.
 #' * `FieldName`: A single length character vector of one valid field name where
 #'     all characters except letters and numbers are replaced by underscores.
 #' * `Field`: A single length character vector of one valid field name or a
@@ -147,90 +240,163 @@ NULL
 #'     letters and numbers are replaced by underscores.
 #' * `Value`: A single length vector of value to set.
 #'
+#' @section Field Value Relation:
+#' \preformatted{
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
+#' idfobj$ref_to_object(which = NULL, class = NULL)
+#' idfobj$ref_by_object(which = NULL, class = NULL)
+#' idfobj$has_ref_to(which = NULL, class = NULL)
+#' idfobj$has_ref_by(which = NULL, class = NULL)
+#' idfobj$has_ref(which)
+#' }
+#'
+#' Many fields in [Idd] can be referred by others. For example, the `Outside
+#' Layer` and other fields in `Construction` class refer to the `Name` field
+#' in `Material` class and other material related classes. Here it means that
+#' the `Outside Layer` field **refers to** the `Name` field and the `Name` field
+#' is **referred by** the `Outside Layer`.
+#'
+#' `$value_relation()` provides a simple interface to get this kind of
+#' relation. It takes field indexes or field names, together a relation
+#' direction, and returns an `IdfRelation` object which contains data presenting
+#' such relation above. For instance, if `idfobj$value_relation("Name", "ref_by")`
+#' gives results below:
+#'
+#' ```
+#' -- Referred by Others ------------------------
+#'   \- 1: "WALL-1";      !- Name
+#'      ^~~~~~~~~~~~~~~~~~~~~~~~~
+#'      \- Class: <BuildingSurface:Detailed>
+#'         \- Object [ID:3] <WALL-1PF>
+#'            \- 3: "WALL-1";      !- Construction Name
+#' ```
+#'
+#' This means that the value `"WALL-1"` of field `Name` is referred by field
+#' `Construction Name` in a surface named `WALL-1PF`. All those objects can be
+#' futher easily extracted using `$ref_by_object()` method.
+#'
+#' `$ref_to_object()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a list of `IdfObject`s that specified
+#' fields refer to.
+#'
+#' `$ref_by_object()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a list of `IdfObject`s that refer to
+#' specified fields.
+#'
+#' `$has_ref_to()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a logical vector showing whether specified
+#' fields refer to other object values or not.
+#'
+#' `$has_ref_by()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a logical vector showing whether there are
+#' other object values ref to specified fields.
+#'
+#' `$has_ref()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a logical vector showing whether there are
+#' other object values ref to specified field values or specified field values
+#' refer to other object values.
+#'
+#' **Arguments**:
+#'
+#' * `which`: An integer vector of field indexes or a character vector of field
+#'   names.
+#' * `class`: A character vector of class names.
+#' * `direciton`: The relation direction to extract. Should be either `"all"`,
+#'   `"ref_to"` or "ref_by".
+#'
 #' @section Validation:
 #'
 #' ```
-#' idfobj$validate()
-#' idfobj$is_valid()
+#' idfobj$validate(level = eplusr_option("validate_level"))
+#' idfobj$is_valid(level = eplusr_option("validate_level"))
 #' ```
 #'
-#' `$validate()` will check if there are errors in current object under different
-#'     strictness level.
+#' `$validate()` checks if there are errors in values in current `IdfObject`
+#' under specified validation level and returns an `IdfValidity` object which
+#' contains data of invalid field values. Different validation result examples
+#' are shown below:
 #'
-#' `$is_valid()` will check if there are no errors in current object under
-#'     different strictness level.
+#' * No error is found:
 #'
-#' The strictness level can be changed using [eplusr_option()]. Default is
-#'     `"final". `There are three different validate levels, i.e. `"none"`,
-#'     `"draft"` and `"final"`:
+#'   ```
+#'   v No error found.
+#'   ```
 #'
-#'   * For `"none"`, none validation will be done;
-#'   * For `"draft"`, checking of invalid autosize, autocalculate, character,
-#'     numeric, integer, and choice field values will be done;
-#'   * For `"final"`, besides above, checking of incomplete extensible groups,
-#'     missing required objects, duplicated unique objects, object name
-#'     conflicts, missing required fields and invalid field value reference will
-#'     also be done.
+#'   Above result shows that there is no error found after conducting all
+#'   validation checks in specified validation level.
 #'
-#' For details about the underlying structure of returned value of
-#' `$validate()`, please `$validate()` in [Idf] class.
+#' * Errors are found:
 #'
-#' @section Cross Reference:
+#'   ```
+#'    x [2] Errors found during validation.
+#'   =========================================================================
 #'
-#' ```
-#' idfobj$ref_from_object()
-#' idfobj$ref_by_object()
-#' idfobj$has_ref_from()
-#' idfobj$has_ref_by()
-#' idfobj$has_ref()
-#' ```
+#'   -- [2] Invalid Autocalculate Field --------------------------------------
+#'      Fields below cannot be `autocalculate`:
 #'
-#' `$ref_from_object()` will return other objects that current object references
-#'     from.
+#'       Class: <AirTerminal:SingleDuct:VAV:Reheat>
+#'       \─ Object [ID:176] <SPACE5-1 VAV Reheat>
+#'          +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+#'          \- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
+#'   ```
 #'
-#' `$ref_by_object()` will return other objects that reference current object.
+#' Above validation results show that after all validation components performed
+#' under current validation level, 2 invalid field values are found. All of them
+#' are in object named `SPACE5-1 VAV Reheat` with ID `176`. They are invalid
+#' because those two fields do not have an autocalculatable attribute but are
+#' given `AUTOCALCULATE` value. Knowing this info, one simple way to fix the
+#' error is to set those two fields to correct value by doing `idf$set(..176 =
+#' list(`Maximum Flow per Zone Floor Area During Reheat` = "autosize",
+#'      `Maximum Flow Fraction During Reheat` = "autosize"
+#' ))`
 #'
-#' `$has_ref_from()` and `$has_ref_by` will return `TRUE` if current object has
-#'     referenced from other objects or has been referenced by other objects,
-#'     respectively.
+#' `$is_valid()` returns `TRUE` if there is no error in current `IdfObject`
+#' object under specified validation level and `FALSE` otherwise.
 #'
-#' `$has_ref()` will return `TRUE` if current object has either referenced from
-#'     other objects or has been referenced by other objects.
+#' Underneath, an `IdfValidity` object which `$validate()` returns is a list of
+#' 13 element. For details about the underlying structure of `IdfValidity`,
+#' please `$validate()` in [Idf] class.
 #'
 #' @section Data Extraction:
 #'
 #' ```
-#' idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
+#' idfobj$to_table(string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)
+#' idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
 #' ```
 #'
-#' `$table()` will return a data.table that contains all data of current object.
+#' `$to_table()` returns a [data.table::data.table()] that contains core data of
+#' current [IdfObject]. It has 6 columns:
 #'
-#' **Arguments**
-#' * `all`: If `TRUE`, values of all fields, including empty fields will be
-#'     returned as well. Default: `FALSE`
-#' * `unit`: If `TRUE`, field names with units will be returned. Default:
-#'     `TRUE`.
-#' * `wide`: If `TRUE`, a wide table will be returned. Default: `FALSE`.
-#' * `string_value`: If `TRUE`, all field values will be returned as character.
-#'     Default: `TRUE`
-#' * `in_ip`: If `TRUE`, IP units and values will be returned. Default: the
-#'     value of `eplusr_option("view_in_ip")`.
+#' * `id`: Integer type. Object IDs.
+#' * `name`: Character type. Object names.
+#' * `class`: Character type. Current class name.
+#' * `index`: Integer type. Field indexes.
+#' * `field`: Character type. Field names.
+#' * `value`: Character type if `string_value` is `TRUE` or list type if
+#'   `string_value` is `FALSE.` Field values.
 #'
-#' @section Formatting:
+#' `$to_string()` returns the text format of an `IdfObject`.
 #'
-#' ```
-#' idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-#' ```
+#' **Arguments**:
 #'
-#' `$string()` will return the text format of current object.
-#'
-#' **Arguments**
-#'
-#' * `comment`: If `FALSE`, all comments will not be included.
-#' * `leading`: An integer to indicate the number of spaces before each fields.
-#'     Default: `4`.
-#' * `sep_at`: An integer to indicate the character width where to separate
-#'     values and field names.  Default: `29`.
+#' * `string_value`: If `TRUE`, all field values are returned as character. If
+#'   `FALSE`, `value` column in returned [data.table::data.table()] is a list
+#'   column with each value stored as corresponding type. Note that if the value
+#'   of numeric field is set to `"Autosize"` or `"Autocalculate"`, it is left as
+#'   it is, leaving the returned type being a string instead of a number.
+#'   Default: `TRUE`.
+#' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
+#'   of numeric fields are assigned with units using [units::set_units()] if
+#'   applicable. Default: `FALSE`.
+#' * `wide`: If `TRUE`, a wide table will be returned, i.e. first three column
+#'   are always `id`, `name` and `class`, and then every field in a separate
+#'   column. Default: `FALSE`.
+#' * `comment`: If `FALSE`, all comments will not be included. Default: `TRUE`.
+#' * `leading`: Leading spaces added to each field. Default: `4L`.
+#' * `sep_at`: The character width to separate value string and field string.
+#'   Default: `29L` which is the same as IDF Editor.
+#' * `all`: If `TRUE`, values of all possible fields in current class the
+#'   `IdfObject` belongs to are retured. Default: `FALSE`
 #'
 #' @section Print:
 #'
@@ -239,21 +405,21 @@ NULL
 #' print(idfobj)
 #' ```
 #'
-#' `$print()` prints the IdfObject. Basically, the print output can be divided
-#'     into three parts:
+#' `$print()` prints the `IdfObject`. Basically, the print output can be divided
+#' into 3 parts:
 #'
-#'     * OBJECT: object id and name (if applicable) and IDD class name of
-#'     * COMMENTS: object comments
-#'     * VALUES: fields and values of current IDD class. Required fields are
-#'       marked with bullet marks. Only the minimum fields are printed. E.g.,
-#'       the last printed field is either the last required field or the last
-#'       non-empty field.
+#' * OBJECT: Class name, object id and name (if applicable).
+#' * COMMENTS: Object comments if exist.
+#' * VALUES: fields and values of current `IdfObject`. Required fields are marked
+#'   with start `*`. String values are quoted. Numeric values are printed as
+#'   they are. Blank string values are printed as `<"Blank">` and blank number
+#'   values are printed as `<Blank>`.
 #'
 #' **Arguments**
 #'
-#' * `comment`: If `FALSE`, all comments will not be included.
-#' * `auto_sep`: If `TRUE`, values and field names will be separate at the
-#'     largest character length of values. Default: `FALSE`.
+#' * `comment`: If `FALSE`, all comments are not included.
+#' * `auto_sep`: If `TRUE`, values and field names are separated at the
+#'   largest character length of values. Default: `FALSE`.
 #'
 #' @importFrom R6 R6Class
 #' @examples
@@ -262,7 +428,7 @@ NULL
 #'     idd = use_idd(8.8, download = "auto"))
 #'
 #' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
-#' mat <- idf$Material$C5_4_IN_HW_CONCRETE
+#' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
 #'
 #' # get object ID
 #' mat$id()
@@ -272,51 +438,51 @@ NULL
 #'
 #' # NA will be returned if the class does not have name attribute. For example,
 #' # "Version" class
-#' idf$Version[[1]]$name()
+#' idf$Version$name()
 #'
 #' # get underlying IddObject of current class
 #' mat$definition()
 #'
 #' # get object comments
-#' mat$get_comment()
+#' mat$comment()
 #'
 #' # add new object comments
-#' mat$set_comment(c("This is a material named `WD01`", "This object has an ID of 47"))
-#' mat$get_comment()
+#' mat$comment(c("This is a material named `WD01`", "This object has an ID of 47"))
+#' mat$comment()
 #'
 #' # append new comments
-#' mat$set_comment("This is an appended comment")
-#' mat$get_comment()
+#' mat$comment("This is an appended comment")
+#' mat$comment()
 #'
 #' # prepend new comments
-#' mat$set_comment("This is a prepended comment", append = FALSE)
-#' mat$get_comment()
+#' mat$comment("This is a prepended comment", append = FALSE)
+#' mat$comment()
 #'
 #' # wrap long comments
-#' mat$set_comment("This is a very long comment that is needed to be wrapped.", width = 30)
-#' mat$get_comment()
+#' mat$comment("This is a very long comment that is needed to be wrapped.", width = 30)
+#' mat$comment()
 #'
 #' # delete old comments and add new one
-#' mat$set_comment("This is the only comment", append = NULL)
-#' mat$get_comment()
+#' mat$comment("This is the only comment", append = NULL)
+#' mat$comment()
 #'
 #' # delete all comments
-#' mat$set_comment(NULL)
-#' mat$get_comment()
+#' mat$comment(NULL)
+#' mat$comment()
 #'
 #' # get all existing field values
-#' str(mat$get_value())
+#' str(mat$value())
 #'
 #' # get values of field 1, 3, 5
-#' str(mat$get_value(c(1, 3, 5)))
+#' str(mat$value(c(1, 3, 5)))
 #'
 #' # get character format values instead of a named list
-#' mat$get_value(c(1, 3, 5), simplify = TRUE)
+#' mat$value(c(1, 3, 5), simplify = TRUE)
 #'
 #' # get values of all field even those that are not set
-#' str(idf$Zone$ZONE_ONE$get_value())
+#' str(idf$Zone$`ZONE ONE`$value())
 #'
-#' str(idf$Zone$ZONE_ONE$get_value(all = TRUE))
+#' str(idf$Zone$`ZONE ONE`$value(all = TRUE))
 #'
 #' # get field values using shortcuts
 #' mat$Roughness
@@ -325,14 +491,14 @@ NULL
 #' mat[c("Name", "Density")]
 #'
 #' # set field values
-#' mat$set_value(name = "new_name", Thickness = 0.02)
+#' mat$set(name = "new_name", Thickness = 0.02)
 #' mat[c("Name", "Thickness")]
 #'
 #' # When `default` argument is set to TRUE and input field values are empty, i.e.
-#' # NA and NULL, the field values will be reset to defaults.
+#' # NULL, the field values will be reset to defaults.
 #' mat[c("Thermal Absorptance", "Solar Absorptance")]
 #'
-#' mat$set_value(visible_absorptance = NA, Solar_Absorptance = NA, default = TRUE)
+#' mat$set(visible_absorptance = NULL, Solar_Absorptance = NULL, .default = TRUE)
 #' mat[c("Visible Absorptance", "Solar Absorptance")]
 #'
 #' # set field values using shortcuts
@@ -352,8 +518,8 @@ NULL
 #' eplusr_option(validate_level = "final") # change back to "final" validate level
 #' mat$is_valid()
 #' # get other objects that this object refereces
-#' mat$ref_from_object() # not referencing other objects
-#' mat$has_ref_from()
+#' mat$ref_to_object() # not referencing other objects
+#' mat$has_ref_to()
 #'
 #'
 #' # get other objects that reference this object
@@ -366,31 +532,27 @@ NULL
 #' mat$has_ref()
 #'
 #' # get all object data in a data.table format without field units
-#' str(mat$table(unit = FALSE))
+#' str(mat$to_table(unit = FALSE))
 #'
 #' # get all object data in a data.table format where all field values are put in a
 #' # list column and field names without unit
-#' str(mat$table(string_value = FALSE, unit = FALSE))
-#'
-#' # get all object data in a data.table format where all field values are put in a
-#' # list column and all values are converted into IP units
-#' str(mat$table(string_value = FALSE, in_ip = TRUE))
+#' str(mat$to_table(string_value = FALSE, unit = FALSE))
 #'
 #' # get all object data in a data.table format, including tailing empty fields
-#' str(idf$Zone$ZONE_ONE$table(all = TRUE))
+#' str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
 #'
 #' # get all object data in a data.table format where each field becomes a column
-#' str(mat$table(wide = TRUE))
+#' str(mat$to_table(wide = TRUE))
 #'
 #' # get string format object
-#' mat$string()
+#' mat$to_string()
 #'
 #' # get string format of object, and decrease the space between field values and
 #' # field names
-#' mat$string(sep_at = 15)
+#' mat$to_string(sep_at = 15)
 #'
 #' # get string format of object, and decrease the leading space of field values
-#' mat$string(leading = 0)
+#' mat$to_string(leading = 0)
 #'
 #' # print the object without comment
 #' mat$print(comment = FALSE)
@@ -404,6 +566,42 @@ NULL
 #' @author Hongyuan Jia
 NULL
 
+#' Create an `IdfObject` object.
+#'
+#' `idf_object()` takes a parent `Idf` object, an object name or class name, and
+#' returns a corresponding [IdfObject].
+#'
+#' Note that there is no validation performed if an empty [IdfObject] is
+#' created. The empty [IdfObject] is directly added into the parent [Idf]
+#' object. It is recommended to use `$validate()` method in [IdfObject] to see
+#' what kinds of further modifications are needed for those empty fields and use
+#' `$set()` method to set field values.
+#'
+#' @param parent An [Idf] object.
+#' @param object A valid object ID (an integer) or name (a string). If `NULL`
+#' and `class` is not `NULL`, an empty [IdfObject] is created with all fields
+#' fill with default values if possible. Default: `NULL`.
+#' @param class A valid class name (a string). If `object` is not `NULL`,
+#' `class` is used to further specify what class is the target object belongs
+#' to. If `object` is `NULL`, an empty [IdfObject] of `class` is created.
+#' @return An [IdfObject] object.
+#' @export
+#' @examples
+#' model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+#'
+#' # get an IdfObject using object ID
+#' idf_object(model, 14)
+#'
+#' # get an IdfObject using object name (case-insensitive)
+#' idf_object(model, "zone one")
+#'
+#' # `class` argument is useful when there are objects with same name in
+#' # different class
+#' idf_object(model, "zone one", "Zone")
+#'
+#' # create a new zone
+#' idf_object(model, class = "Zone")
+#'
 #' @export
 # idf_object {{{
 idf_object <- function (parent, object = NULL, class = NULL) {
@@ -414,6 +612,9 @@ idf_object <- function (parent, object = NULL, class = NULL) {
         )
     }
 
+    idd_env <- ._get_private(parent)$idd_env()
+    idf_env <- ._get_private(parent)$idf_env()
+
     # add an empty object
     if (is.null(object)) {
         assert(!is.null(class),
@@ -421,9 +622,6 @@ idf_object <- function (parent, object = NULL, class = NULL) {
         )
 
         assert(is_string(class))
-
-        idd_env <- ._get_private(idf)$idd_env()
-        idf_env <- ._get_private(idf)$idf_env()
 
         cls <- get_idd_class(idd_env, class)
         fld <- get_idd_field(idd_env, cls$class_id)
@@ -452,6 +650,11 @@ idf_object <- function (parent, object = NULL, class = NULL) {
                 surround(obj$class_name), " created."
             )
         )
+    } else {
+        obj <- get_idf_object(idd_env, idf_env, class, object, ignore_case = TRUE)
+
+        object <- obj$object_id
+        class <- obj$class_id
     }
 
     IdfObject$new(object, class, parent)
@@ -484,6 +687,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         # }}}
 
         # PUBLIC FUNCTIONS {{{
+        version = function ()
+            idfobj_version(self, private),
+
         id = function ()
             idfobj_id(self, private),
 
@@ -556,8 +762,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
         has_ref = function (which = NULL)
             idfobj_has_ref(self, private, which),
 
-        to_table = function (all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE)
-            idfobj_to_table(self, private, all, unit, wide, string_value),
+        to_table = function (string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)
+            idfobj_to_table(self, private, all, string_value, unit, wide),
 
         to_string = function (comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
             idfobj_to_string(self, private, comment, leading, sep_at, all),
@@ -596,6 +802,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject",
 )
 # }}}
 
+# idfobj_version {{{
+idfobj_version <- function (self, private) {
+    private$m_parent$version()
+}
+# }}}
 # idfobj_id {{{
 idfobj_id <- function (self, private) {
     private$m_object_id
@@ -671,7 +882,6 @@ idfobj_get_value <- function (self, private, which = NULL, all = FALSE, simplify
 # }}}
 # idfobj_set {{{
 idfobj_set <- function (self, private, ..., .default = TRUE) {
-    # give warning if "default" is in the input
     set <- set_idfobj_value(private$idd_env(), private$idf_env(),
         private$m_object_id, ..., .default = .default
     )
@@ -698,9 +908,9 @@ idfobj_value_possible <- function (self, private, which = NULL, type = c("auto",
 }
 # }}}
 # idfobj_possible_value {{{
-idfobj_possible_value <- function (self, private, which = NULL, type = "all") {
+idfobj_possible_value <- function (self, private, which = NULL) {
     .deprecated_fun("$possible_value()", "$value_possible()", "IdfObject", "0.10.0")
-    idfobj_value_possible(self, private, which, type)
+    idfobj_value_possible(self, private, which)
 }
 # }}}
 # idfobj_validate {{{
@@ -729,14 +939,14 @@ idfobj_value_relation <- function (self, private, which = NULL, direction = c("a
 }
 # }}}
 # idfobj_ref_to_object {{{
-idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL) {
+idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
     # exclude invalid references
-    rel <- get_idf_relation(private$idd_env(), private$idf_env(), value_id = val$value_id,
-        max_depth = 0L, direction = "ref_to"
+    rel <- get_idf_relation(private$idd_env(), private$idf_env(),
+        value_id = val$value_id, direction = "ref_to", recursive = recursive
     )[!is.na(src_value_id)]
 
     # only include specified class
@@ -780,8 +990,8 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL) {
     )
 
     # exclude invalid references
-    rel <- get_idf_relation(private$idd_env(), private$idf_env(), value_id = val$value_id,
-        max_depth = 0L, direction = "ref_by"
+    rel <- get_idf_relation(private$idd_env(), private$idf_env(),
+        value_id = val$value_id, direction = "ref_by"
     )[!is.na(value_id)]
 
     # only include specified class
@@ -864,8 +1074,8 @@ idfobj_has_ref_by <- function (self, private, which = NULL, class = NULL) {
 }
 # }}}
 # idfobj_to_table {{{
-idfobj_to_table <- function (self, private, all = FALSE, unit = TRUE, wide = FALSE,
-                             string_value = TRUE) {
+idfobj_to_table <- function (self, private, all = FALSE, string_value = TRUE,
+                             unit = TRUE,wide = FALSE) {
     get_idfobj_table(private$idd_env(), private$idf_env(), private$m_object_id,
         all = all, unit = unit, wide = wide, string_value = string_value
     )
@@ -936,21 +1146,18 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 # format.IdfObject {{{
 format.IdfObject <- function (x, ...) {
     x$to_string()
-    # private <- ._get_private(x)
-    # obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
-
-    # if (is.na(obj$object_name)) {
-    #     paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "]")
-    # } else {
-    #     paste0("<IdfObject: ", surround(obj$class_name), "> [ID:", obj$object_id, "] <", obj$object_name, ">")
-    # }
 }
 # }}}
 
 #' @export
+# as.character.IdfObject {{{
+as.character.IdfObject <- format.IdfObject
+# }}}
+
+#' @export
 # str.IdfObject {{{
-str.IdfObject <- function (x, ...) {
-    x$value()
+str.IdfObject <- function (object, ...) {
+    object$value()
 }
 # }}}
 
@@ -1020,8 +1227,8 @@ str.IdfObject <- function (x, ...) {
             m <- match(underscore_name(name), all_nm)
             if (!is.na(m)) {
                 names(value) <- all_nm[m]
-                .subset2(x, "set")(value)
-                x
+                .subset2(x, "set")(c(value))
+                invisible(x)
             } else {
                 NextMethod()
             }
@@ -1045,8 +1252,8 @@ str.IdfObject <- function (x, ...) {
             if (!is.na(m)) {
                 assert(is_scalar(value))
                 names(value) <- all_nm[m]
-                .subset2(x, "set")(value)
-                x
+                .subset2(x, "set")(c(value))
+                invisible(x)
             } else {
                 NextMethod()
             }

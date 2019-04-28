@@ -854,7 +854,7 @@ download_idd <- function (ver = "latest", dir) {
         stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
 
     if (ver == latest_ver) {
-        cmt <- ALL_EPLUS_RELEASE_COMMIT[version == ver, commit]
+        cmt <- ALL_EPLUS_RELEASE_COMMIT[version == ver][["commit"]]
 
         l <- read_lines(dest, trim = FALSE)
 

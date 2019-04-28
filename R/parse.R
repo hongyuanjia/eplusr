@@ -13,20 +13,6 @@
 #' @include impl.R
 NULL
 
-#' A list that contains all slash keys of EnergyPlus IDD files.
-#'
-#' `IDD_SLASHKEY$class` contains all slash keys used for defining EnergyPlus
-#' classes and similarly, `IDD_SLASHKEY$field` contains all slash keys used for
-#' defining EnergyPlus fields. For those two types, slash keys are further
-#' divided into `flat` and `nest`. The values of `flat` slash keys will be
-#' parsed into atomic vectors, i.e. logical, integer, double and character
-#' vectors, while for `nest` slash keys, values will be parsed and stored into
-#' lists. A common example for `nest` slash key is the `memo` key in class and
-#' `note` key in field.
-#'
-#' IDD_SLASHKEY$type` contains all class and field slash keys which are divided
-#' according to their values: `lgl` for logical, `int` for integer, `dbl` for
-#' double, `chr` for character and `lst` for list.
 # IDD_SLASHKEY {{{
 IDD_SLASHKEY <- list (
     class = list(
@@ -57,9 +43,6 @@ IDD_SLASHKEY <- list (
 )
 # }}}
 
-#' A list that contains all value types of IDD fields in EnergyPlus
-#'
-#' All types are stored as integers.
 # IDDFIELD_TYPE {{{
 IDDFIELD_TYPE <- list(
     integer = 1L, real = 2L, choice = 3L, alpha = 4L,
@@ -67,20 +50,6 @@ IDDFIELD_TYPE <- list(
 )
 # }}}
 
-#' A list that contains all source types of IDD fields in EnergyPlus
-#'
-#' In EnergyPlus, there are a lot of fields whose values references other
-#' fields. Those fields that are referenced by others are called source fields.
-#' THere are 4 types of source fields in total:
-#'
-#' * `none`: Stored as integer `0`. The value of this field has no relation with
-#'   other fields.
-#' * `class`: Stored as integer `1`. The value of this field is not directly
-#'   referenced by others, but parent class name of this field is.
-#' * `field`: Stored as integer `2`. The value of this field is referenced by
-#'   other fields.
-#' * mixed`: Stored as integer `3`. Both the value and parent class name is
-#'   referenced by other fields.
 # IDDFIELD_SOURCE {{{
 IDDFIELD_SOURCE <- list(none = 0L, class = 1L, field = 2L, mixed = 3L)
 # }}}
@@ -111,125 +80,6 @@ FIELD_COLS <- list(
 
 # }}}
 
-#' Parse an EnergyPlus Input Dictionary Data (IDD) file
-#'
-#' `parse_idd_file()` takes a file path of EnergyPlus IDD file (usually named
-#' `Energy+.idd`), parse and return a list that contains all IDD data.
-#'
-#' The returned list contains 6 elements:
-#' * `version`: A [base::numeric_version] object. Version of current IDD.
-#' * `build`: A single character vector. Usually consists of 10 characters mixed
-#'   with both alphabets and digits.
-#' * `group`: A [data.table::data.table] that contains 2 columns:
-#'     - `group_id`: A positive integer vector used as unique ID of all groups.
-#'     - `group_name`: A character vector that contains all names for a group of
-#'       related object.
-#' * `class`: A list that contains 2 [data.table::data.table]s named `index` and
-#'   `property`:
-#'     - `index`: A [data.table::data.table] of 4 columns:
-#'         * `class_id`: A positive integer vector used as unique ID of all
-#'           classes.
-#'         * `class_name`: A character vector that contains all class names.
-#'         * `group_id`: A positive integer vector contains the group ID that
-#'           each class belongs to.
-#'         * `class_name_us`: A character vector that contains class names in
-#'           underscore style, i.e.  all colon are replaced with underscore. For
-#'           example, `BuildingSurface:Detailed` becomes
-#'           `BuildingSurface_Detailed`. Underscore style names are used in
-#'           subsetting method in [Idd] class.
-#'    - `property`: A [data.table::data.table] of 12 columns:
-#'         * `class_id`: A positive integer vector that contains unique class
-#'           IDs.
-#'         * `format`: A character vector contains the format of each class.
-#'           This format indicator is used by IDFEditor when `Special Format for
-#'           Some Objects` is switch on in `Save Options`. There are 7 format
-#'           types in total: `standard`, `singleLine`, `compactSchedule`,
-#'           `Spectral`, `vertices`, `ViewFactor` and `fluidProperty`.
-#'           eplusr can parse all IDF objects saved in special format but all
-#'           objects will be formated in starndard way during saving.
-#'         * `min_fields`: A non-negative integer vector contains minimum field
-#'           number required for each class. `0` means this class does not have
-#'           minimum field number requirement.
-#'         * `num_fields`: A positive integer vector contains current total
-#'           field number in each class. Note for class that contains extensible
-#'           groups, the total field number is not a fixed number.
-#'         * `last_required`: A non-negative integer vector contains the index
-#'           of last required field. This data is used to determine how many
-#'           fields should be printed in [IdfObject].
-#'         * `has_name`: A logical vector. `TRUE` means that this class contains
-#'           one field whose value will be used as the name of this [IdfObject].
-#'         * `required_object`: A logical vector. `TRUE` means that at least one
-#'           [IdfObject] should exist in this class in order to proceed the
-#'           simulation.
-#'         * `unique_object`: A logical vector. `TRUE` means that at most one
-#'           [IdfObject] can exist in this class in order to proceed the
-#'           simulation.
-#'         * `num_extensible`: A non-negative integer vector that contains the
-#'           total field number in the extensible group in this class. `0` means
-#'           that there is no extensible group. A positive integer X means that
-#'           those X fields starting from index specified in `first_extensible`
-#'           column are treated as an extensible group and can be repeated
-#'           infinitely.
-#'         * `first_extensible`: A non-negative integer vector that contains the
-#'           index of the first extensible field in this class. `0` means that
-#'           there is no extensible group.
-#'         * `num_extensible_group`: A non-negative integer vector that contains
-#'           the total number of extensible groups in this class. `0` means that
-#'           there is no extensible group.
-#'         * `memo`: A list that contains character vectors describing each
-#'           class. `NULL` means that there is no memo for this class.
-#' * `field`: A list that contains 2 [data.table::data.table]s named `index` and
-#'   `property`:
-#'     - `index`: A [data.table::data.table] of 5 columns:
-#'         * `field_id`: A positive integer vector used as unique ID of all
-#'           classes.
-#'         * `class_id`: A positive integer vector contains the class ID that
-#'           each field belongs to.
-#'         * `field_index`: A positive integer vector contains the index of
-#'           field in each class.
-#'         * `field_name`: A character vector that contains all field names.
-#'         * `field_name_us`: A character vector that contains field names in
-#'           underscore style, i.e. all colon are replaced with underscore. For
-#'           example, `Version Identifier` becomes
-#'           `Version_Identifier`. Underscore style names are used in
-#'           `$add()`, `$set()` and other methods in [Idd] and [IddObject]
-#'           class.
-#'    - `property`: A [data.table::data.table] of 21 columns:
-#'         * `field_id`: A positive integer vector that contains unique field
-#'           IDs.
-#'         * `field_anid`: A character vector formatting as A(or N)1, A(or N)2
-#'           and etc. A means that this is a character field while N means that
-#'           this is a numeric field. The last digit is the current index in all
-#'           character or numeric fields in this class.
-#'         * `units`: A character vector contains standard SI units of all
-#'           fields. `NA` means that there is no unit for this field.
-#'         * `ip_units`: A character vector contains IP units of all
-#'           fields. `NA` means that there is no unit for this field. For those
-#'           fields that only have SI units, IP units are set as the same of SI
-#'           units. This is mainly to simplify the process of unit conversion.
-#'         * `is_name`: A logical vector. `TRUE` means that this field is
-#'           treated as the name of objects in this class. Basically, name
-#'           fields are character fields whose names are equal to "Name" or
-#'           character fields that can be referenced by others but do not
-#'           reference any other fields.
-#'         * `required_field`: A logical vector. `TRUE` means that this field
-#'           must have a value.
-#'         * `extensible_group`: A non-negative integer vector contains the
-#'           extensible group index which this field belongs to. `0` means that
-#'           current field is not extensible.
-#'         * `type_enum`: A non-negative integer vector that represent field
-#'           types. For the meaning of each character, see [IDD_FIELDTYPE]
-#'           total field number in the extensible group in this class. `0` means
-#'           that there is no extensible group.
-#'         * `first_extensible`: A non-negative integer vector that contains the
-#'           index of the first extensible field in this class. `0` means that
-#'           there is no extensible grou
-#'         * `num_extensible_group`: A non-negative integer vector that contains the
-#'           total number of extensible groups in this class. `0` means that
-#'           there is no extensible group.
-#'         * `memo`: A list that contains the memo of each class. `NULL` means
-#'           that there is no memo in this class.
-#' @return A named list. See details.
 # parse_idd_file {{{
 parse_idd_file <- function(path) {
     # read idd string, get idd version and build
@@ -439,7 +289,7 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
     } else if (nrow(ver_line) == 1L) {
         standardize_ver(ver_line$version)
     } else {
-        parse_issue("error_multi_idf_ver", "idf", "Multiple versions found", ver_line)
+        parse_issue("error_multiple_version", "idf", "Multiple versions found", ver_line)
     }
 }
 # }}}
@@ -802,7 +652,7 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     if (length(dup_slsh)) dt <- dt[-dup_slsh]
     set(dt, NULL, c("row", "slash_value_rleid"), NULL)
 
-    f <- as.formula(paste0(paste0(id, collapse = "+"), "~slash_key"))
+    f <- stats::as.formula(paste0(paste0(id, collapse = "+"), "~slash_key"))
 
     dt_flat <- dt[slash_key %chin% keys$flat]
     if (nrow(dt_flat) == 0L) {
@@ -1459,7 +1309,7 @@ get_value_table <- function (dt, idd) {
 
         # modify message
         msg <- gsub(" *#\\d+\\|", "-->", gsub("index", "number", fld$message))
-        parse_issue("error_invalid_field_number", "idf", "Invalid Field Number",
+        parse_issue("error_invalid_field_number", "idf", "Invalid field number",
             dt[J(obj), on = "object_id"], post = msg)
     }
 

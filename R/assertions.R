@@ -134,9 +134,6 @@ on_fail(is_eplus_ver) <- function (call, env) {
 }
 # }}}
 
-#' @param only_exist If `TRUE`, check if input is one of supported IDD versions
-#' and already parsed IDD version. If `FALSE`, only check if input is a valid
-#' version specification.
 #' @rdname assertion
 #' @export
 # is_idd_ver {{{

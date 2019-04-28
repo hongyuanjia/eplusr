@@ -30,7 +30,7 @@ currently not available. It is useful in case when you only want to edit
 an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is \code{FALSE}.}
 
-\item{ver}{A valid EnergyPlus version, e.g. \code{8,} \code{8.7,} \code{"8.7"} or \code{"8.7.0"}.
+\item{ver}{A valid EnergyPlus version, e.g. \code{8}, \code{8.7}, \code{"8.7"} or \code{"8.7.0"}.
 For \code{download_idd()}, the special value \code{"latest"}, which is default,
 means the latest version.}
 

@@ -8,7 +8,7 @@
 eplusr provides parsing of and programmatic access to EnergyPlus
 Input Data Dictionary (IDD) files, and objects. It contains all data needed
 to parse EnergyPlus models. \code{Idd} class provides parsing and printing while
-\code{IddObject} provides detailed information of curtain class.
+\link{IddObject} provides detailed information of curtain class.
 }
 \section{Overview}{
 
@@ -37,45 +37,44 @@ IDF file of that version.
 
 Internally, the powerful \href{https://cran.r-project.org/package=data.table}{data.table}
 package is used to speed up the whole IDD parsing process and store the
-results. However, it will still take about 3-4 sec per IDD.  Under the hook,
+results. However, it will still take about 2-3 sec per IDD. Under the hook,
 eplusr uses a SQL-like structure to store both IDF and IDD data in
-\code{data.frame} format. Every IDD will be parsed and stored in twelve tables:
+\link[data.table:data.table]{data.table::data.table} format. Every IDD will be parsed and stored in
+four tables:
 \itemize{
 \item \code{group}: contains group index and group names.
 \item \code{class}: contains class names and properties.
-\item \code{class_memo}: contains class memos, i.e. a brief description on each class.
-\item \code{class_reference}: contains reference names of classes.
 \item \code{field}: contains field names and field properties.
-\item \code{field_note}: contains field notes.
-\item \code{field_reference}: contains reference names of fields.
-\item \code{field_default}: contains default values of fields.
-\item \code{field_choice}: contains choices of choice-type fields.
-\item \code{field_range}: contains range data of fields.
-\item \code{field_object_list}: contains object-list data of fields.
-\item \code{field_external_list}: contains external-list data of fields.
+\item \code{reference}: contains cross-reference data of fields.
 }
 }
 
 \section{Usage}{
 
+
 \preformatted{
+idd <- use_idd(ver)
 idd$version()
 idd$build()
 idd$group_index(group = NULL)
 idd$group_name()
-idd$is_valid_group(group)
 idd$from_group(class)
 idd$class_index(class = NULL)
 idd$class_name()
-idd$is_valid_class(class)
 idd$required_class_name()
 idd$unique_class_name()
 idd$extenesible_class_name()
+idd$is_valid_group(group)
+idd$is_valid_class(class)
+idd$object_relation(class, direction = c("all", "ref_by", "ref_to"))
 idd$object(class)
-idd$object_in_group(group)
+idd$objects(class)
+idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))
+idd$objects_in_group(group)
 idd$ClassName
 idd[[ClassName]]
-idd$clone(deep = FALSE)
+idd$to_table(class, all = FALSE)
+idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
 idd$print()
 print(idd)
 }
@@ -84,17 +83,30 @@ print(idd)
 \section{Arguments}{
 
 \itemize{
+\item \code{ver}: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
 \item \code{idd}: An \code{Idd} object.
-\item \code{group}: A valid group name or valid group names.
-\item \code{class}: A valid class name or valid class names.
-\item \code{ClassName}: A single length character vector of one valid class name.
+\item \code{group}: A character vector of valid group names. For
+\code{$objects_in_group()}, a single string of valid group name.
+\item \code{class}: A character vector of valid class names. For \code{$object_relation()}
+and \code{$objects_in_relation()}, a single string of valid class name.
+\item \code{ClassName}: A single string of valid class name.
+\item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
+\code{"ref_to"} or "ref_by". For \code{$objects_in_relation()}, only \code{"ref_to"} and
+\code{"ref_by"} are acceptable.
+\item \code{all}: If \code{TRUE}, all fields in specified classes are returned. If \code{FALSE},
+only mininum required fields are returned. Default: \code{FALSE}.
+\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
+\item \code{sep_at}: The character width to separate value string and field string.
+Default: \code{29L} which is the same as IDF Editor.
+\item \code{sep_each}: An single integer of how many empty strings to insert between
+different classes. Default: \code{1}.
 }
 }
 
 \section{Detail}{
 
 
-\code{$version()} returns the version string.
+\code{$version()} returns the IDD version in \code{\link[base:numeric_version]{base::numeric_version()}}.
 
 \code{$build()} returns the build tag string.
 
@@ -114,29 +126,63 @@ the IDD file) of specified classes.
 
 \code{$required_class_name()} returns the names of all required classes.
 
-\code{$unique_class_name()} returns the names of all unique classes.
+\code{$unique_class_name()} returns the names of all unique-object classes.
 
 \code{$extensible_class_name()} returns the names of all extensible classes.
 
 \code{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
 
-\code{$objectN} returns a list of \code{IddObject}s of specified classes.
+\code{$object()} returns an \link{IddObject} of specified class.
 
-\code{$object_in_group()} returns a list of \code{IddObject}s in that group.
+\code{$objects()} returns a list of \link{IddObject}s of specified classes.
+
+\code{$object_relation()} returns an \code{IddRelation} object which contains field
+data that have relation with specified class. For instance, if
+\code{idd$object_relation("Class 1", "ref_to")} gives results below:\preformatted{-- Refer to Others ---------------------
+  Class: <Class 1>
+  +- Field: <1: Field 1>
+  |  v~~~~~~~~~~~~~~~~~~
+  |  \- Class: <Class 2>
+  |     \- Field: <2: Field 2>
+  |
+  \- Field: <2: Field 2>
+}
+
+This means that \code{Field 2} in class \code{Class 1} does not refer to any other fields.
+But \code{Field 1} in class \code{Class 2} refers to \code{Field 2} in class named \code{Class 2}.
+
+\code{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
+The first element is always the \link{IddObject} of that class. If specified class
+does not have any relation with other classes, a list that only contains the
+\link{IddObject} of that class is returned.  For instance,
+\code{idd$objects_in_relation("Construction", "ref_to")} will return a list of an
+\link{IddObject} of class \code{Construction} and also all \link{IddObject}s that class
+\code{Construction} refers to; similarly, \code{idd$objects_in_relation("Construction", "ref_by")} will return a list of an \link{IddObject} of class \code{Construction} and
+also all \link{IddObject}s that refer to class \code{Construction}.
+
+\code{$objects_in_group()} returns a list of \link{IddObject}s of specified group.
 
 eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
-more convenient to get a single \code{IddObject}. Basically, \code{idd$ClassName} and
+more convenient to get a single \link{IddObject}. Basically, \code{idd$ClassName} and
 \code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
 Here, \code{ClassName} is a single valid class name where all characters other
 than letters and numbers are replaced by a underscore \code{_}.
 
-For details about \code{IddObject}, please see \link{IddObject} class.
+For details about \link{IddObject}, please see \link{IddObject} class.
 
-\code{$clone()} copies and returns the cloned \code{Idd} object. Because \code{Idd} uses
-\code{R6Class} under the hook which has "modify-in-place" semantics, \code{idd_2 <- idd_1} does not copy \code{idd_1} at all but only create a new binding to \code{idd_1}.
-Modify \code{idd_1} will also affect \code{idd_2} as well, as these two are exactly the
-same thing underneath. In order to create a complete cloned copy, please use
-\code{$clone(deep = TRUE)}.
+\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
+specified class. It has 3 columns:
+\itemize{
+\item \code{class}: Character type. Class names.
+\item \code{index}: Integer type. Field indexes.
+\item \code{field}: Character type. Field names.
+}
+
+\code{$to_string()} returns empty objects of specified class in a character vector
+format. It is formated exactly the same as in IDF Editor.
+
+\code{$print()} prints basic info ob current Idd object, including version, build
+tag and total class number.
 }
 
 \examples{
@@ -162,9 +208,32 @@ str(idd$required_class_name())
 str(idd$unique_class_name())
 
 # IddObject of SimulationControl class
+idd$object("SimulationControl")
+# OR
 idd$SimulationControl
 # OR
 idd[["SimulationControl"]]
+
+# IddObject of Construction and Material class
+idd$objects(c("Construction", "Material"))
+
+# show all classes that refer to Construction class
+idd$object_relation("Construction", "ref_by")
+
+# IddObjects that refer to class Construction
+idd$objects_in_relation("Construction", "ref_by")
+
+# IddObjects that class Construction refers to
+idd$objects_in_relation("Construction", "ref_to")
+
+# All IddObjects in group Schedules
+idd$objects_in_group("Schedules")
+
+# Extract core data of class Material and Construction
+idd$to_table(c("Material", "Construction"))
+
+# Get empty Material object and Construction object in a character vector
+idd$to_string(c("Material", "Construction"))
 
 }
 \references{

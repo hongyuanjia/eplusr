@@ -7,10 +7,9 @@
 eplusr_option(...)
 }
 \arguments{
-\item{...}{Any options can be defined, using \code{name = value}. All available
-options are below. If no options are given, then all values of current
-options are returned. If a single option name, then its value is
-returned.}
+\item{...}{Any available options to define, using \code{name = value}. All
+available options are shown below. If no options are given, all values of
+current options are returned. If a single option name, its value is returned.}
 }
 \value{
 If called directly, a named list of input option values. If input is
@@ -24,31 +23,23 @@ displays its results.
 }
 \details{
 \itemize{
-\item \code{num_digits}: Integer indicating the number of decimal places for numeric
-fields. Default: \code{8L}
-\item \code{view_in_ip}: Whether models should be presented in IP units.  Default:
-\code{FALSE}
 \item \code{validate_level}: The strictness level of validation during field value
 modification and model error checking. Possible value: \code{"none"},
-\code{"draft"} and \code{"final"}. Default: \code{"final"}. Detailed description:
-\itemize{
-\item For \code{"none"}, none validation will be done;
-\item For \code{"draft"}, checking of invalid autosize, autocalculate, character,
-numeric, integer, and choice field values will be done;
-\item For \code{"final"}, besides above, checking of incomplete extensible groups,
-missing required objects, duplicated unique objects, object name
-conflicts, missing required fields and invalid field value reference will
-also be done.
-}
-\item \code{verbose_info}: Whether to show information messages. Default: \code{TRUE}.
-\item \code{save_format}: The format to use when saving Idf objects to \code{.idf} files.
+\code{"draft"} and \code{"final"} or a custom validation level using
+\code{\link[=custom_validate]{custom_validate()}}. Default: \code{"final"}. For what validation
+components each level contains, see \code{\link[=level_checks]{level_checks()}}.
+\item \code{view_in_ip}: Whether models should be presented in IP units. Default:
+\code{FALSE}. It is not recommended to set this option to \code{TRUE} as currently
+IP-units support in eplusr is not fully tested.
+\item \code{save_format}: The default format to use when saving Idf objects to \code{.idf} files.
 Possible values: \code{"asis"}, \code{"sorted"}, \code{"new_top"} and \code{"new_bottom"}.
 The later three have the same effect as \code{Save Options} settings
 \code{"Sorted"}, \code{"Original with New at Top"} and \code{"Original with New at Bottom"} in IDF Editor, respectively. For \code{"asis"}, the saving format
 will be set according to the header of IDF file. If no header found,
-\code{"sorted"} is used. "Default: \code{"asis"}.
+\code{"sorted"} is used. Default: \code{"asis"}.
 \item \code{num_parallel}: Maximum number of parallel simulations to run. Default:
 \code{parallel::detectCores()}.
+\item \code{verbose_info}: Whether to show information messages. Default: \code{TRUE}.
 }
 }
 \examples{

@@ -445,8 +445,6 @@ NULL
 #'   `model$set(Construction = list("out_layer", name = "name"))`, `"out_layer"`
 #'   will be treated as the value of field `Outside Layer` in `Construction`, as
 #'   value of field `Name` has been given as `"name"`.
-#' * If fields to be modifed do not exist in current [IdfObject], they are
-#'   created on the fly.
 #'
 #' **Arguments**:
 #'
@@ -589,7 +587,7 @@ NULL
 #' `$load()` is similar to `$insert()` except it takes directly character
 #' vectors or data.frames of [IdfObject] definitions, insert corresponding
 #' objects into current `Idf` object and returns a list of newly added
-#' [IdfObect]s. This makes it easy to create objects using the output from
+#' [IdfObject]s. This makes it easy to create objects using the output from
 #' `$to_string()` and `$to_table` method from [Idd], [IddObject], also
 #' Idf and [IdfObject] class.
 #'
@@ -798,7 +796,7 @@ NULL
 #' 13 element as shown below. Each element or several elements represents the
 #' results from a single validation checking component. In total, There are 10
 #' different validation check components. To get the meaning of each component,
-#' please see [level_checks()].
+#' please see [level_checks()] and [custom_validate()].
 #'
 #' * `missing_object`
 #' * `duplicate_object`
@@ -822,13 +820,13 @@ NULL
 #' * `object_name`: names of objects that contain invalid values
 #' * `class_id`: indexes of classes that invalid objects belong to
 #' * `class_name`: names of classes that invalid objects belong to
-#' * `field_id`: indexes (at IDD level) of object fields that are invalid
+#' * `field_id`: indexes (at Idd level) of object fields that are invalid
 #' * `field_index`: indexes of object fields in correspoinding that are invalid
 #' * `field_name`: names (without units) of object fields that are invalid
 #' * `units`: SI units of object fields that are invalid
 #' * `ip_units`: IP units of object fields that are invalid
 #' * `type_enum`: An integer vector indicates types of invalid fields
-#' * `value_id`: indexes of object field values that are invalid
+#' * `value_id`: indexes (at Idf level) of object field values that are invalid
 #' * `value_chr`: values (converted to characters) of object fields that are
 #'   invalid
 #' * `value_num`: values (converted to numbers in SI units) of object fields
@@ -855,7 +853,7 @@ NULL
 #' * `index`: Integer type. Field indexes.
 #' * `field`: Character type. Field names.
 #' * `value`: Character type if `string_value` is `TRUE` or list type if
-#'   `string_value` is FALSE. Field values.
+#'   `string_value` is `FALSE`. Field values.
 #'
 #' `$to_string()` returns the text format of an IDF file.
 #'
@@ -1876,19 +1874,6 @@ idf_set_object <- function (self, private, object, value, comment, default) {
     idf_set(self, private, input, .default = default)
 }
 # }}}
-# idf_set_in_class {{{
-idf_set_in_class <- function (self, private, ..., .default = TRUE) {
-    set <- set_idf_object_in_class(private$idd_env(), private$idf_env(), ..., .default = .default)
-    merge_idf_data(private$idf_env(), set, by_object = TRUE)
-
-    # log
-    log_add_order(private$m_log, set$object$object_id)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
-
-    idf_return_modified(self, private, set)
-}
-# }}}
 # idf_del {{{
 idf_del <- function (self, private, ..., .referenced = FALSE, .recursive = FALSE, .force = FALSE) {
     del <- del_idf_object(private$idd_env(), private$idf_env(), ...,
@@ -2380,8 +2365,8 @@ read_idf <- function (path, idd = NULL) {
 
 #' @export
 # str.idf {{{
-str.Idf <- function (x, zoom = "class", ...) {
-    x$print(zoom)
+str.Idf <- function (object, zoom = "class", ...) {
+    object$print(zoom)
 }
 # }}}
 
@@ -2389,6 +2374,7 @@ str.Idf <- function (x, zoom = "class", ...) {
 #'
 #' Format an [Idf] object into a character vector.
 #'
+#' @param x An [Idf] object.
 #' @param comment If `FALSE`, all comments will not be included. Default: `TRUE`.
 #' @param header If `FALSE`, the header will not be included. Default: `TRUE`.
 #' @param format Specific format used when formatting. For details, please see
@@ -2408,9 +2394,10 @@ str.Idf <- function (x, zoom = "class", ...) {
 # format.idf {{{
 format.Idf <- function (x, comment = TRUE, header = TRUE,
                         format = eplusr_option("save_format"),
-                        leading = 4L, sep_at = 29L, index = FALSE, blank = FALSE,
-                        end = TRUE, required = FALSE, ...) {
-    x$to_string()
+                        leading = 4L, sep_at = 29L, ...) {
+    x$to_string(comment = comment, header = header, format = format,
+        leading = leading, sep_at = sep_at, ...
+    )
 }
 # }}}
 
@@ -2418,8 +2405,8 @@ format.Idf <- function (x, comment = TRUE, header = TRUE,
 #'
 #' Format an [Idf] object into a character vector.
 #'
-#' @return A character vector.
 #' @inheritParams format.Idf
+#' @return A character vector.
 #' @examples
 #' \dontrun{
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")

@@ -79,9 +79,9 @@ exclude_invalid <- function (env_in, invalid, on) {
 #' should be included during IDF object modifications using `$dup()`, `$add()`,
 #' `$set()` and other methods in [Idf] class.
 #'
-#' There are 10 different validation components in total. Also, there are three
-#' builtin validation level, i.e. `"none"`, `"draft"` and `"final"`. To get what
-#' valiation components those levels contain, see [level_checks()].
+#' There are 10 different validation check components in total. Three predefined
+#' validation level are included, i.e. `"none"`, `"draft"` and `"final"`. To get
+#' what valiation components those levels contain, see [level_checks()].
 #'
 #' @param required_object Check if required objects are missing in current
 #' model. Default: `FALSE`.
@@ -171,9 +171,7 @@ level_checks <- function (level = eplusr_option("validate_level")) {
     if (is_string(level)) {
         level <- match.arg(level, c("none", "draft", "final"))
         if (level == "none") {
-            custom_validate(
-                autofield = TRUE, type = TRUE
-            )
+            custom_validate()
         } else if (level == "draft") {
             custom_validate(
                 autofield = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,

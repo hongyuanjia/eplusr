@@ -10,10 +10,10 @@ NULL
 #' of EnergyPlus simulations.
 #'
 #' Basically, it is a collection of multiple `EplusJob` objects. However, the
-#'     model is first parsed and the Idf object is stored internally, instead of
-#'     storing only the path of Idf in [EplusJob] class. Also, an object
-#'     in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
-#'     automatically created if it does not exists like [Idf] class.
+#' model is first parsed and the [Idf] object is stored internally, instead of
+#' storing only the path of Idf like in [EplusJob] class. Also, an object in
+#' `Output:SQLite` with `Option Type` value of `SimpleAndTabular` will be
+#' automatically created if it does not exists, like [Idf] class does.
 #'
 #' @section Usage:
 #' ```
@@ -28,9 +28,10 @@ NULL
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
-#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-#' param$tabular_data(which = NULL)
-#' job$clone(deep = FALSE)
+#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
+#'                   period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+#'                   interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
+#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
 #' param$print()
 #' ```
 #' @section Create:
@@ -49,21 +50,21 @@ NULL
 #' param$weather()
 #' ```
 #'
-#' `$seed()` will return the input `Idf` object.
+#' `$seed()` returns the input [Idf] object.
 #'
-#' `$weather()` will return the input `Epw` object.
+#' `$weather()` returns the input [Epw] object.
 #'
 #' @section Apply Design Alternatives:
 #' ```
 #' param$apply_measure(measure, ..., .names = NULL)
 #' ```
 #'
-#' `$apply_measure()` allows to apply a measure to an `Idf` and creates
-#'     parametric models for analysis. Basically, a measure is just a function
-#'     that takes an `Idf` object and other arguments as input, and returns a
-#'     modified `Idf` object as output. Use `...` to supply different arguments
-#'     to that measure. Under the hook, [mapply()] is used to create multiple
-#'     `Idf`s according to the input values.
+#' `$apply_measure()` allows to apply a measure to an [Idf] and creates
+#' parametric models for analysis. Basically, a measure is just a function that
+#' takes an [Idf] object and other arguments as input, and returns a modified
+#' [Idf] object as output. Use `...` to supply different arguments to that
+#' measure. Under the hook, [base::mapply()] is used to create multiple [Idf]s
+#' according to the input values.
 #'
 #' **Arguments**
 #'
@@ -82,23 +83,23 @@ NULL
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
-#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-#' param$tabular_data(which = NULL)
+#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
+#'                   period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+#'                   interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
+#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
 #' ```
 #'
 #' All those functions have the same meaning as in [EplusJob] class, except
 #' that they only return the results of specified simulations. Most arguments
 #' have the same meanings as in [EplusJob] class.
 #'
-#' `$run()` runs the all parametric simulations in parallel. The number of
-#'     parallel EnergyPlus process can be controlled by
-#'     `eplusr_option("num_parallel")`. If `wait` is FALSE, then the job will be
-#'     run in the background. You can get updated job status by just print the
-#'     ParametricJob object.
+#' `$run()` runs all parametric simulations in parallel. The number of parallel
+#' EnergyPlus process can be controlled by `eplusr_option("num_parallel")`. If
+#' `wait` is FALSE, then the job will be run in the background. You can get
+#' updated job status by just printing the `ParametricJob` object.
 #'
-#' `$kill()` kills the all background EnergyPlus processes that are current
-#'     running if possible. It only works when simulation runs in non-waiting
-#'     mode.
+#' `$kill()` kills all background EnergyPlus processes that are current running
+#' if possible. It only works when simulations run in non-waiting mode.
 #'
 #' `$status()` returns a named list of values indicates the status of the job:
 #'
@@ -112,63 +113,93 @@ NULL
 #'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
 #'      simulation. `FALSE` otherwise.
 #'
+#' $errors() returns an [ErrFile][read_err()] object which contains all contents
+#' of the simulation error file (`.err`). If `info` is `FALSE`, only warnings
+#' and errors are printed.
+#'
 #' `$output_dir()` returns the output directory of specified simulations.
 #'
 #' `$locate_output()` returns the path of a single output file of specified
-#'     simulations.
+#' simulations.
 #'
-#' `$report_data_dict()` returns a data.table which contains all information
-#'     about report data for specified simulations. For details on the meaning
-#'     of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
-#'     EnergyPlus "Output Details and Examples" documentation.
+#' `$report_data_dict()` returns a [data.table::data.table()] which contains all
+#' information about report data for specified simulations. For details on the
+#' meaning of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
+#' EnergyPlus "Output Details and Examples" documentation.
 #'
-#' `$report_data()` extracts the report data in a data.table using key values
-#'     and variable names.
+#' `$report_data()` extracts the report data in a [data.table::data.table()]
+#' using key values, variable names and other arguments.
 #'
-#' `$tabular_data()` extracts all tabular data in a data.table.
+#' `$tabular_data()` extracts tabular data in a [data.table::data.table()].
 #'
 #' For `$report_data_dict()`, `$report_data()` and `$tabular_data()`, the
-#'     returned data.table has a `case` column in the returned data.table that
-#'     indicates the names of parametric models.
+#' returned data.table has a `case` column in the returned
+#' [data.table::data.table()] that indicates the names of parametric models. For
+#' detailed documentation of those methods, please see [EplusSql].
 #'
 #' **Arguments**
 #'
 #' * `which`: An integer vector of the indexes or a character vector or names of
-#'     parametric simulations. If `NULL`, which is the default, results of all
-#'     parametric simulations are returned.
-#' * `dir`: The parent output directory for all simulation. Outputs of each
-#'    simulation are placed in a separate folder under the parent directory.
+#'   parametric simulations. If `NULL`, results of all parametric simulations
+#'   are returned. Default: `NULL`.
+#' * `dir`: The parent output directory for specified simulations. Outputs of
+#'   each simulation are placed in a separate folder under the parent directory.
 #' * `wait`: If `TRUE`, R will hang on and wait all EnergyPlus simulations
-#'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
-#'     Default: `TRUE`.
-#' * `suffix`: A string that indicates the file suffix of simulation output.
-#'     Default: `".err"`.
-#' * `strict`: If `TRUE`, it will check if the simulation was terminated, is
-#'     still running or the file exists or not. Default: `TRUE`.
-#' * `key_value`: A character vector to identify key name of the data. If
-#'    `NULL`, all keys of that variable will be returned. Default: `NULL`.
-#' * `name`: A character vector to specify the actual data name. If `NULL`, all
-#'    variables will be returned. Default: `NULL`.
-#' * `year`: The year of the date and time in column `DateTime`. If `NULL`, it
-#'    will be the current year. Default: `NULL`
-#' * `tz`: Time zone of date and time in column `DateTime`. Default: `"GMT"`.
-#'
-#' @section Clone:
-#'
-#' ```
-#' job$clone(deep = FALSE)
-#' ```
-#'
-#' `$clone()` copies and returns the cloned job. Because `ParametricJob` uses
-#'     `R6Class` under the hook which has "modify-in-place" semantics, `job_2 <-
-#'     job_1` does not copy `job_1` at all but only create a new binding to
-#'     `job_1`. Modify `job_1` will also affect `job_2` as well, as these two
-#'     are exactly the same thing underneath. In order to create a complete
-#'     cloned copy, please use `$clone(deep = TRUE)`.
-#'
-#' **Arguments**
-#'
-#' * `deep`: Has to be `TRUE` if a complete cloned copy is desired.
+#'   finish. If `FALSE`, all EnergyPlus simulations are run in the background.
+#'   Default: `TRUE`.
+#' * `suffix`: A string that indicates the file extensition of simulation output.
+#'   Default: `".err"`.
+#' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
+#'   still running or the file does not exist. Default: `TRUE`.
+#' * `info`: If `FALSE`,only warnings and errors are printed. Default: `FALSE`.
+#' * `key_value`: A character vector to identify key values of the data. If
+#'   `NULL`, all keys of that variable will be returned. `key_value` can also be
+#'   data.frame that contains `key_value` and `name` columns. In this case,
+#'   `name` argument in `$report_data()` is ignored. All available `key_value`
+#'   for current simulation output can be obtained using `$report_data_dict()`.
+#'   Default: `NULL`.
+#' * `name`: A character vector to identify names of the data. If
+#'   `NULL`, all names of that variable will be returned. If `key_value` is a
+#'   data.frame, `name` is ignored. All available `name` for current simulation
+#'   output can be obtained using `$report_data_dict()`.  Default: `NULL`.
+#' * `year`: Year of the date time in column `datetime`. If `NULL`, it
+#'    will calcualte a year value that meets the start day of week restriction
+#'    for each environment. Default: `NULL`.
+#' * `tz`: Time zone of date time in column `datetime`. Default: `"UTC"`.
+#' * `case`: If not `NULL`, a character column will be added indicates the case
+#'   of this simulation. If `"auto"`, the name of the IDF file without extension
+#'   is used.
+#' * `all`: If `TRUE`, extra columns are also included in the returned
+#'   [data.table::data.table()].
+#' * `period`: A Date or POSIXt vector used to specify which time period to
+#'    return. The year value does not matter and only month, day, hour and
+#'    minute value will be used when subsetting. If `NULL`, all time period of
+#'    data is returned. Default: `NULL`.
+#' * `month`, `day`, `hour`, `minute`: Each is an integer vector for month, day,
+#'    hour, minute subsetting of `datetime` column when querying on the SQL
+#'    database. If `NULL`, no subsetting is performed on those components. All
+#'    possible `month`, `day`, `hour` and `minute` can be obtained using
+#'    `$read_table("Time")`.  Default: `NULL`.
+#' * `interval`: An integer vector used to specify which interval length of
+#'    report to extract. If `NULL`, all interval will be used. Default: `NULL`.
+#' * `simulation_days`: An integer vector to specify which simulation day data
+#'    to extract. Note that this number resets after warmup and at the beginning
+#'    of an environment period. All possible `simulation_days` can be obtained
+#'    using `$read_table("Time")`. If `NULL`, all simulation days will be used.
+#'    Default: `NULL`.
+#' * `day_type`: A character vector to specify which day type of data to
+#'    extract. All possible day types are: `Sunday`, `Monday`, `Tuesday`,
+#'   `Wednesday`, `Thursday`, `Friday`, `Saturday`, `Holiday`,
+#'   `SummerDesignDay`, `WinterDesignDay`, `CustomDay1`, and `CustomDay2`. All
+#'   possible values for current simulation output can be obtained using
+#'   `$read_table("Time")`.
+#' * `environment_name`: A character vector to specify which environment data to
+#'    extract. All possible `environment_name` for current simulation output can
+#'    be obtained using `$read_table("EnvironmentPeriods"). `If `NULL`, all
+#'    environment data are returned. Default: `NULL`.
+#' * `report_name`, `report_for`, `table_name`, `column_name`, `row_name`:
+#'   Each is a character vector for subsetting when querying the SQL database.
+#'   For the meaning of each argument, please see the description above.
 #'
 #' @section Printing:
 #' ```
@@ -176,14 +207,14 @@ NULL
 #' print(param)
 #' ```
 #'
-#' `$print()` shows the core information of this ParametricJob, including the
-#'     path of seed model and weather, the version and path of EnergyPlus used
-#'     to run simulations, the measured that has been applied and parametric
-#'     models generated, and the simulation job status.
+#' `$print()` shows the core information of this `ParametricJob`, including the
+#' path of seed model and weather, the version and path of EnergyPlus used to
+#' run simulations, the measure that has been applied and parametric models
+#' generated, and also the simulation job status.
 #'
 #' `$print()` is quite useful to get the simulation status, especially when
-#'     `wait` is `FALSE` in `$run()`. The job status will be updated and printed
-#'     whenever `$print()` is called.
+#' `wait` is `FALSE` in `$run()`. The job status will be updated and printed
+#' whenever `$print()` is called.
 #'
 #' @examples
 #' if (is_avail_eplus(8.8)) {

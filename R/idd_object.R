@@ -538,7 +538,7 @@ NULL
 #' mat$is_integer_field(c("name", "specific_heat"))
 #'
 #' # check if fields are real fields, i.e. field values should be real numbers
-#' but not integers
+#' # but not integers
 #' mat$is_real_field(c("name", "specific_heat"))
 #'
 #' # check if fields are required, i.e. field values should not be empty
@@ -1178,9 +1178,9 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' Format an `IddObject` into an empty object of current class in a character
 #' vector format. It is formated exactly the same as in IDF Editor.
 #'
+#' @param x An [IdfObject] object.
 #' @param all If `TRUE`, all fields in current class are returned, otherwise
 #' only minimum fields are returned.
-#' @param unit If `TRUE`, units are also returned. Default: `FALSE`.
 #' @param comment A character vector to be used as comments of returned string
 #' format object. If `NULL`, no comments are inserted. Default: `NULL`.
 #' @param leading Leading spaces added to each field. Default: `4`.
@@ -1195,7 +1195,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' @export
 # format.IddObject {{{
 format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...)
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all, ...)
 }
 # }}}
 
@@ -1204,8 +1204,8 @@ format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all
 #' Coerce an [IddObject] into an empty object of current class in a character
 #' vector format. It is formated exactly the same as in IDF Editor.
 #'
-#' @return A character vector.
 #' @inheritParams format.IddObject
+#' @return A character vector.
 #' @examples
 #' \dontrun{
 #' as.character(use_idd(8.8, download = "auto")$Materal, leading = 0)
