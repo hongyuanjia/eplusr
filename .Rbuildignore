@@ -1,3 +1,4 @@
+^\.lintr$
 ^\.Rproj\.user$
 \.Rproj$
 ^\.gitignore$

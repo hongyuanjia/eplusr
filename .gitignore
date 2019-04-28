@@ -6,3 +6,4 @@
 try.R
 docs/*
 inst/doc
+.lintr
