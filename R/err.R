@@ -3,14 +3,56 @@
 #' @importFrom stringi stri_endswith_fixed stri_split_fixed stri_startswith_fixed
 #' @importFrom stringi stri_sub stri_wrap
 #' @importFrom cli cat_line cat_rule rule
+NULL
+
+#' Read an EnergyPlus Simulation Error File
+#'
+#' `read_err()` takes a file path of EnergyPlus simulation error file, usually
+#' with an extension `.err`, parses it and returns an `ErrFile` object.
+#'
+#' Basically, an `ErrFile` object is a list with 7 elements:
+#'
+#' * `eplus_version`: A [base::numeric_version()] object. The version of
+#'   EnergyPlus used during the simulation.
+#' * `eplus_build`: A single string. The build tag of EnergyPlus used during the
+#'   simulation.
+#' * `datetime`: A DateTime (POSIXct). The time when the simulation started.
+#' * `idd_version`: A [base::numeric_version()]. The version of IDD used during
+#'   the simulation.
+#' * `successful`: `TRUE` when the simulation ended successfully, and `FALSE`
+#'   otherwise.
+#' * `terminated`: `TRUE` when the simulation was terminated, and `FALSE`
+#'   otherwise.
+#' * `data`: A [data.table::data.table()] that contains parsed error messages.
+#'
+#' @param path a file path of EnergyPlus simulation error file, usually
+#' with an extension `.err`.
+#' @return An `ErrFile` object.
+#' @export
+#' @examples
+#' \dontrun{
+#' # run simulation and get the err file
+#' idf_name <- "1ZoneUncontrolled.idf"
+#' epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+#' idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+#' epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+#' job <- eplus_job(idf_path, epw_path)
+#'
+#' # read the err file
+#' read_err(job$locate_output(".err"))
+#' }
+# read_err {{{
+read_err <- function (path) {
+    parse_err_file(path)
+}
+# }}}
 
 # parse_err_file {{{
 parse_err_file <- function (path) {
     res <- list(
-        eplus_version = NA, eplus_build = NA_character_,
-        datetime = NA_real_, idd_version = NA,
-        successful = FALSE, terminated = FALSE,
-        data = data.table()
+        eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
+        datetime = as.POSIXct(NA), idd_version = NA,
+        successful = FALSE, terminated = FALSE, data = data.table()
     )
     setattr(res, "class", "ErrFile")
 
