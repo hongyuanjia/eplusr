@@ -2505,10 +2505,10 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
             can_update <- TRUE
 
             # align start day of week
-            year <- find_nearst_wday_year(d$datetime[[1L]], p$start_day_of_week,
+            start_year <- find_nearst_wday_year(d$datetime[[1L]], p$start_day_of_week,
                 lubridate::year(Sys.Date()), epw_header$holiday$leapyear
             )
-            set(d, NULL, "datetime", {year(d$datetime) <- year; d$datetime})
+            set(d, NULL, "datetime", {year(d$datetime) <- start_year; d$datetime})
 
             # get the start of next year
             nextyear <- d[month == 12L & day == 31L & hour == 24L & minute == 0L, which = TRUE]
@@ -2521,7 +2521,7 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
                     } else {
                         s <- nextyear[i]:nextyear[i+1]
                     }
-                    set(d, s, "datetime", {year(d$datetime[s]) <- year + i; d$datetime[s]})
+                    set(d, s, "datetime", {year(d$datetime[s]) <- start_year + i; d$datetime[s]})
                 }
             }
         }
@@ -2557,7 +2557,7 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
                 } else {
                     s <- nextyear[[i]]:nextyear[[i+1]]
                 }
-                set(d, s, "datetime", {year(d$datetime[s]) <- year + i; d$datetime[s]})
+                set(d, s, "datetime", {year(d$datetime1[s]) <- start_year + i; d$datetime1[s]})
             }
         }
 
