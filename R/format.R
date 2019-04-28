@@ -452,6 +452,13 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     set(ref, NULL, "src_object", format_object(ref))
     set(ref, NULL, "src_value", as.list(format_field_by_parent(ref, "value")))
     switch_ref_src(ref, invert = TRUE)
+    on.exit(
+        set(ref, NULL,
+            c("ref_class", "ref_object", "ref_value",
+              "src_class", "src_object", "src_value"), NULL
+        ),
+        add = TRUE
+    )
 
     # simple switch column names
     while (d >= 0L) {
