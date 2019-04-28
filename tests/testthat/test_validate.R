@@ -2,7 +2,7 @@ context("validate")
 
 # VALIDTATE {{{
 test_that("Validate method", {
-    idf <- read_idf(example(), 8.8)
+    idf <- read_idf(example(), use_idd(8.8, "auto"))
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 

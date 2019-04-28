@@ -2,8 +2,7 @@ context("IdfObject")
 
 # IdfObject class{{{
 test_that("IdfObject class", {
-
-    idf <- read_idf(text("idf", 8.8))
+    idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto"))
     ver <- idf$Version
     mat <- idf$Material$WD01
     surf <- idf$BuildingSurface_Detailed[["WALL-1PF"]]

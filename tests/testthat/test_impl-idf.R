@@ -1,6 +1,7 @@
 context("IDF Implementation")
 
 eplusr_option(validate_level = "final")
+use_idd(8.8, "auto")
 
 # TABLE {{{
 test_that("table", {
