@@ -2089,8 +2089,11 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
 
     # assign object id and value id
     obj <- assign_new_id(idf_env, obj, "object")
+    # make sure rleid is unique
+    set(obj, NULL, "rleid", seq.int(nrow(obj)))
     val <- assign_new_id(idf_env, val, "value")
     set(val, NULL, "object_id", rleid(val$rleid, val$object_id))
+    set(val, NULL, "rleid", val$object_id)
     val <- correct_obj_id(obj, val)
     # update object name
     obj <- update_object_name(obj, val)

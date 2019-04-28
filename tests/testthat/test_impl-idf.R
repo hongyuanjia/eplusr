@@ -79,8 +79,8 @@ test_that("table", {
     expect_equal(get_idf_object_name(idd_env, idf_env, c("Version", "Material")), list(Version = NA_character_, Material = c("WD01", "WD02")))
     expect_equal(get_idf_object_name(idd_env, idf_env, c("Version", "Material"), simplify = TRUE), c(NA_character_, c("WD01", "WD02")))
     expect_equal(get_idf_object_num(idd_env, idf_env, c("Version", "Material")), c(1L, 2L))
-    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[1])), " #1| Object ID [1] (name `WD01`) in class Material")
-    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[5])), " #1| Object ID [5] in class Version")
+    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[1])), " #1| Object ID [1] (name `WD01`) in class `Material`")
+    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[5])), " #1| Object ID [5] in class `Version`")
     expect_equal(get_object_info(idf_env$object[1], c("id", "name")), " #1| Object ID [1] (name `WD01`)")
     expect_equal(get_object_info(idf_env$object[1], c("name")), " #1| Object name `WD01`")
     # }}}
@@ -359,6 +359,17 @@ test_that("table", {
             src_value_id = c(1L, 10L), src_enum = 2L, dep = 0L
         )
     )
+
+    idf_env <- parse_idf_file(example())
+    idd_env <- ._get_private(use_idd(8.8))$m_idd_env
+    id <- get_idf_object_id(idd_env, idf_env, "Material")$Material
+    expect_equal(
+        get_idf_relation(idd_env, idf_env, id, recursive = TRUE, direction = "ref_by"),
+        data.table(object_id = c(16L, 25L), value_id = c(111L, 220L),
+            src_object_id = c(14L, 16L), src_value_id = c(99L, 110L),
+            src_enum = c(2L, 2L), dep = c(0L, 1L)
+        )
+    )
     # }}}
 })
 # }}}
@@ -536,6 +547,60 @@ test_that("VALUE DOTS", {
 })
 # }}}
 
+# DEFINITION DOTS {{{
+test_that("DEFINITION DOTS", {
+    expect_error(sep_definition_dots(), class = "error_empty_input")
+    expect_error(sep_definition_dots(NULL), class = "error_wrong_type")
+    expect_error(sep_definition_dots(list()), class = "error_wrong_type")
+    expect_error(sep_definition_dots(NA_character_), class = "error_wrong_type")
+    expect_error(sep_definition_dots(c("a", NA_character_)), class = "error_wrong_type")
+    expect_error(sep_definition_dots(data.table()), class = "error_wrong_type")
+
+    expect_error(sep_definition_dots("Version,8.8;"), class = "error_parse_idf")
+
+    idd <- use_idd(8.8)
+    mat1 <- idd$Material$to_table()
+    expect_error(sep_definition_dots(mat1), class = "error_wrong_type")
+
+    set(mat1, NULL, "value", c("", " ", "  ", rep(NA_character_, 3)))
+
+    expect_equal(sep_definition_dots(mat1),
+        list(parsed = list(),
+             value = data.table(rleid = 1L, object_id = 1L, class_name = "Material",
+                 field_index = 1:6, value_chr = NA_character_, value_num = NA_real_,
+                 defaulted = TRUE, type = 1L
+             ),
+             dot = data.table(rleid = 1L, dot = list(mat1), dot_nm = NA_character_, depth = 2L)
+        )
+    )
+
+    const1 <- idd$Construction$to_string(all = TRUE)
+    const2 <- idd$Construction$to_string()
+    expect_equal(sep_definition_dots(const1, const2, .version = 8.8),
+        list(parsed = list(
+                version = numeric_version("8.8.0"),
+                options = list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE, save_format = "sorted"),
+                object = data.table(object_id = 1:2, class_id = 90L, comment = list(NULL),
+                    object_name = NA_character_, object_name_lower = NA_character_, rleid = 1:2
+                ),
+                value = data.table(value_id = 1:13, value_chr = NA_character_,
+                    value_num = NA_real_, object_id = c(rep(1L, 11), rep(2L, 2)),
+                    field_id = c(11006:11016, 11006:11007), rleid = c(rep(1L, 11), rep(2L, 2))
+                ),
+                reference = data.table(object_id = integer(), value_id = integer(),
+                    src_object_id = integer(), src_value_id = integer(),
+                    src_enum = integer()
+                )
+             ),
+             value = data.table(),
+             dot = data.table(rleid = 1:2, dot = list(const1, const2),
+                 dot_nm = NA_character_, depth = 1L
+             )
+        )
+    )
+})
+# }}}
+
 # DUP {{{
 test_that("Dup", {
     # read idf
@@ -660,11 +725,7 @@ test_that("Del", {
         del_idf_object(idd_env, idf_env, "R13WALL", "FLOOR", "ROOF31"),
         "Cannot delete object\\(s\\) that are referred by others"
     )
-    expect_error(
-        del_idf_object(idd_env, idf_env, 21:26, 14, .referenced = TRUE, .recursive = TRUE, .force = FALSE),
-        "Cannot delete object\\(s\\) that are referred by others"
-    )
-    expect_silent({del <- del_idf_object(idd_env, idf_env, 21:26, 14, .referenced = TRUE, .recursive = TRUE, .force = TRUE)})
+    expect_silent({del <- del_idf_object(idd_env, idf_env, 21:26, 14, .referenced = TRUE, .recursive = TRUE)})
     expect_equivalent(setdiff(idf_env$object$object_id, del$object$object_id), c(14L, 16L, 21:26))
 })
 # }}}
@@ -739,6 +800,29 @@ test_that("Insert", {
     expect_equivalent(ins$value$value_chr[[1L]], "new_mat")
     expect_equivalent(ins$value$object_id, rep(54L, 9))
     expect_equivalent(ins$value$field_id, 7081:7089)
+})
+# }}}
+
+# LOAD {{{
+test_that("Load", {
+    # read idf
+    idf <- read_idf(example(), 8.8)
+    idf_env <- ._get_private(idf)$m_idf_env
+    idd_env <- ._get_private(idf)$idd_env()
+
+    expect_error(load_idf_object(idd_env, idf_env, 8.8), class = "error_empty_input")
+
+    mat1 <- idf$definition("Material")$to_string()
+    mat2 <- idf$to_table(class = "Construction")
+
+    mat2[4, class := "construction"]
+    expect_error(load_idf_object(idd_env, idf_env, 8.8, mat1, mat2), class = "error_class_name")
+
+    mat2[4, `:=`(class = "Construction", index = 20L)]
+    expect_error(load_idf_object(idd_env, idf_env, 8.8, mat1, mat2), class = "error_bad_field_index")
+
+    mat2[4, index := 2L]
+    expect_error(load_idf_object(idd_env, idf_env, 8.8, mat1, mat2), class = "error_validity")
 })
 # }}}
 

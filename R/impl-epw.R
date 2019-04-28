@@ -1,6 +1,6 @@
 #' @importFrom stringi stri_isempty stri_match_first_regex stri_replace_all_charclass
 #' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub "stri_sub<-"
-#' @importFrom stringi stri_trans_tolower stri_trans_totitle stri_trans_toupper 
+#' @importFrom stringi stri_trans_tolower stri_trans_totitle stri_trans_toupper
 #' @importFrom lubridate as_datetime make_date make_datetime force_tz tz
 #' @importFrom lubridate days_in_month minutes hours days years leap_year
 #' @importFrom lubridate mday month yday year "year<-" parse_date_time
@@ -35,6 +35,11 @@ combine_date <- function (year = NULL, month, day, hour) {
 # }}}
 # std_atm_press {{{
 std_atm_press <- function (elevation) 101325 * (1 - 2.25577e-05 * elevation)^5.2559
+# }}}
+# as_date {{{
+as_date <- function (x, ...) {
+    as.Date(lubridate::as_date(x, ...))
+}
 # }}}
 
 # CONSTANTS
@@ -306,8 +311,6 @@ EPW_REPORT_MISSING <- list(
 # }}}
 # EPW_REPORT_RANGE {{{
 EPW_REPORT_RANGE <- list(
-    # In EnergyPlus, out of range values of variables below are left as it is
-    # same way as missing, i.e., set to 0
     do_nothing = c(
         "dry_bulb_temperature",
         "relative_humidity",
@@ -390,7 +393,7 @@ parse_epw_file <- function (path, warning = FALSE) {
 
     # parse date time
     # first ignore minute column here
-    epw_data[, datetime := lubridate::make_datetime(year, month, day, hour, tz = Sys.timezone())]
+    epw_data[, datetime := lubridate::make_datetime(year, month, day, hour, tz = "UTC")]
 
     # make sure that each data period exists and get corresponding line number
     epw_header$period$period[, c("from", "to", "missing", "out_of_range") :=
@@ -503,6 +506,13 @@ parse_epw_header <- function (header) {
         fun <- match.fun(paste0("parse_epw_header_", names(epw_header)[i]))
         epw_header[[i]] <- fun(input = header[i, contents][[1L]], data = header[i])
     }
+
+    # update EpwDate year according to leapyear element in HOLIDAYS header
+    set(epw_header$period$period, NULL, c("start_day", "end_day"),
+        list(reset_epwdate_year(epw_header$period$period$start_day, epw_header$holiday$leapyear),
+             reset_epwdate_year(epw_header$period$period$end_day, epw_header$holiday$leapyear)
+        )
+    )
 
     # check if leap day is found in period but leap year is not allowed in the header {{{
     if (!epw_header$holiday$leapyear &&
@@ -1035,7 +1045,7 @@ parse_epw_header_period <- function (input, ...) {
     }
 
     # check if not real year and end day smaller than start day
-    if (period[as.Date(start_day) > as.Date(align_epwdate_type(end_day, start_day)), .N]) {
+    if (period[as_date(start_day) > as_date(align_epwdate_type(end_day, start_day)), .N]) {
         parse_issue("error_invalid_epw_data_period_endday", "epw",
             "Invalid data period end day",
             post = paste0(
@@ -1172,8 +1182,8 @@ get_epw_month <- function (x, label = FALSE){
 # 7. last Weekday In Month (only for Holiday/DaylightSavingPeriod) [type: 5L]
 # }}}
 # epw_date {{{
-epw_date <- function (x) {
-    as_EpwDate(x)
+epw_date <- function (x, leapyear = TRUE) {
+    as_EpwDate(x, leapyear = leapyear)
 }
 init_epwdate_vctr <- function (len, init = NA) {
     structure(rep(as.Date(init), len), class = c("EpwDate", "Date"))
@@ -1196,7 +1206,7 @@ is_epwdate_type <- function (x, type) {
     get_epwdate_type(x) %in% unlist(EPWDATE_TYPE[type], use.names = FALSE)
 }
 set_epwdate_year <- function(x, year) {
-    tmp <- as.Date(x)
+    tmp <- as_date(x)
     lubridate::year(tmp) <- year
     assign_epwdate(tmp)
 }
@@ -1225,7 +1235,7 @@ reset_epwdate_year <- function (x, leapyear) {
     x
 }
 ymd_to_md <- function (x) {
-    is_leap <- lubridate::leap_year(as.Date(x))
+    is_leap <- lubridate::leap_year(as_date(x))
     x[is_leap] <- set_epwdate_year(x[is_leap], EPWDATE_YEAR$leap$md)
     x[!is_leap] <- set_epwdate_year(x[!is_leap], EPWDATE_YEAR$noleap$md)
     x
@@ -1251,7 +1261,7 @@ as_EpwDate.integer <- function (x, leapyear = TRUE) {
     if (all(!v)) return(res)
 
     y <- if (leapyear) 4L else 5L
-    res[v] <- assign_epwdate(lubridate::make_date(y) + lubridate::days(x[v] - 1L))
+    res[v] <- lubridate::make_date(y) + lubridate::days(x[v] - 1L)
 
     res
 }
@@ -1269,7 +1279,7 @@ as_EpwDate.numeric <- function (x, leapyear = TRUE) {
 
     y <- if (leapyear) 8L else 9L
     s <- stri_split_fixed(x[!is_jul], ".", simplify = TRUE)
-    res[!is_jul] <- assign_epwdate(lubridate::make_date(y, s[, 1L], s[, 2L]))
+    res[!is_jul] <- lubridate::make_date(y, s[, 1L], s[, 2L])
     res
 }
 # }}}
@@ -1294,17 +1304,17 @@ as_EpwDate.character <- function (x, leapyear = TRUE) {
 
     # month-day type
     is_md <- stri_isempty(s[, 3L]) & !stri_isempty(s[, 2L])
-    d[is_md] <- assign_epwdate(parse_epwdate_md(x[is_md], leapyear))
+    d[is_md] <- parse_epwdate_md(x[is_md], leapyear)
 
     # year-month-day type
     # only accept numeric values for each field
     is_ymd <- stri_isempty(s[, 4L]) & !stri_isempty(s[, 3L])
     s_ymd <- matrix(suppressWarnings(as.integer(s[is_ymd, ])), ncol = 5L)
-    d[is_ymd] <- assign_epwdate(parse_epwdate_ymd(s_ymd[, 1L], s_ymd[, 2L], s_ymd[, 3L], leapyear))
+    d[is_ymd] <- parse_epwdate_ymd(s_ymd[, 1L], s_ymd[, 2L], s_ymd[, 3L], leapyear)
 
     # weekday type
     # split by space
-    res_wkd <- assign_epwdate(parse_epwdate_wday(x[!is_md & !is_ymd], leapyear))
+    res_wkd <- parse_epwdate_wday(x[!is_md & !is_ymd], leapyear)
     d[!is_md & !is_ymd] <- res_wkd
 
     res[!is_dbl] <- d
@@ -1323,7 +1333,7 @@ as_EpwDate.Date <- function (x, ...) {
 # as_EpwDate.POSIXt{{{
 as_EpwDate.POSIXt <- function (x, ...) {
     # treat as default "yyyy-mm-dd" format
-    assign_epwdate(as.Date(x))
+    assign_epwdate(as_date(x))
 }
 # }}}
 # as_EpwDate.EpwDate {{{
@@ -1331,10 +1341,10 @@ as_EpwDate.EpwDate <- function (x, ...) x
 # }}}
 # parse_epwdate_md {{{
 parse_epwdate_md <- function (x, leapyear = TRUE) {
-    res <- as.Date(lubridate::parse_date_time(
+    res <- as_date(lubridate::parse_date_time(
         paste0(2000L, "-", x), "Ymd", tz = "UTC", quiet = TRUE
     ))
-    res[is.na(res)] <- as.Date(lubridate::parse_date_time(
+    res[is.na(res)] <- as_date(lubridate::parse_date_time(
         paste0(2000L, "-", x[is.na(res)]), "Ydm", tz = "UTC", quiet = TRUE
     ))
     set_epwdate_year(res, if (leapyear) EPWDATE_YEAR$leap$md else EPWDATE_YEAR$noleap$md)
@@ -1342,8 +1352,8 @@ parse_epwdate_md <- function (x, leapyear = TRUE) {
 # }}}
 # parse_epwdate_ymd {{{
 parse_epwdate_ymd <- function (year, month, day, leapyear = TRUE) {
-    res <- as.Date(lubridate::make_date(year, month, day))
-    res[is.na(res)] <- as.Date(lubridate::make_date(day, year, month))
+    res <- as_date(lubridate::make_date(year, month, day))
+    res[is.na(res)] <- as_date(lubridate::make_date(day, year, month))
     res
 }
 # }}}
@@ -1357,7 +1367,7 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
 
     # try to parse "Month Day" format
     is_md <- stri_isempty(s[, 3L]) & !stri_isempty(s[, 2L])
-    res[is_md] <- assign_epwdate(parse_epwdate_md(x[is_md], leapyear))
+    res[is_md] <- parse_epwdate_md(x[is_md], leapyear)
 
     # init component
     # n day of week. 0 == "last"
@@ -1432,6 +1442,11 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
     res
 }
 # }}}
+# }}}
+# is_EpwDate {{{
+is_EpwDate <- function (x) {
+    inherits(x, "EpwDate")
+}
 # }}}
 # format.EpwDate {{{
 format.EpwDate <- function (x, m_spc = FALSE, ...) {
@@ -1524,7 +1539,7 @@ as.Date.EpwDate <- function (x, ...) {
 # }}}
 # as.POSIXct.EpwDate {{{
 as.POSIXct.EpwDate <- function (x, ...) {
-    lubridate::force_tz(lubridate::as_datetime(as.Date.EpwDate(x)), tzone = Sys.timezone())
+    lubridate::force_tz(lubridate::as_datetime(as.Date.EpwDate(x)), tzone = "UTC")
 }
 # }}}
 # }}}
@@ -1594,12 +1609,12 @@ add_epw_raw_string <- function (dt, exclude = c("datetime", "line")) {
 }
 # }}}
 # create_epw_datetime_sequence {{{
-create_epw_datetime_sequence <- function (start, end, interval, tz = Sys.timezone(), leapyear = FALSE) {
+create_epw_datetime_sequence <- function (start, end, interval, tz = "UTC", leapyear = FALSE) {
     if (is_epwdate(start)) start <- reset_epwdate_year(start, leapyear)
     if (is_epwdate(end)) end <- reset_epwdate_year(end, leapyear)
 
-    start <- as.Date(start)
-    end <- as.Date(end)
+    start <- as_date(start)
+    end <- as_date(end)
 
     step <- 60L / interval
     offset <- lubridate::minutes(step)
@@ -1611,12 +1626,12 @@ create_epw_datetime_sequence <- function (start, end, interval, tz = Sys.timezon
 }
 # }}}
 # create_epw_datetime_components {{{
-create_epw_datetime_components <- function (start, end, interval, tz = Sys.timezone(), leapyear = FALSE) {
+create_epw_datetime_components <- function (start, end, interval, tz = "UTC", leapyear = FALSE) {
     if (is_epwdate(start)) start <- reset_epwdate_year(start, leapyear)
     if (is_epwdate(end)) end <- reset_epwdate_year(end, leapyear)
 
-    start <- as.Date(start)
-    end <- as.Date(end)
+    start <- as_date(start)
+    end <- as_date(end)
 
     step <- as.integer(60L / interval)
     offset <- lubridate::minutes(step)
@@ -1632,7 +1647,7 @@ create_epw_datetime_components <- function (start, end, interval, tz = Sys.timez
     m <- rep(seq(start_min, 60L, length.out = interval), times = difftime(e, s, units = "hours"))
 
     # get year, month and day
-    ymd <- rep(seq(as.Date(s), as.Date(e) - lubridate::days(1L), by = "day"),
+    ymd <- rep(seq(as_date(s), as_date(e) - lubridate::days(1L), by = "day"),
         each = 24 * interval
     )
 
@@ -2031,7 +2046,7 @@ set_epw_holiday <- function (epw_header, leapyear, dst, holiday) {
             }
 
         # current is non-leap year but want to change to leap year
-        # for md type, it is ok to change only if that period does not 
+        # for md type, it is ok to change only if that period does not
         # accross Feb, e.g. [01/02, 02/28], [03/01, 12/31]
         # for ymd type, it is always OK
         } else if (!epw_header$holiday$leapyear & leapyear) {
@@ -2297,7 +2312,7 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, period = NULL,
     # get atmospheric pressure at current elevation
     EPW_INIT_MISSING$atmospheric_pressure <- std_atm_press(epw_header$location$elevation)
 
-    # get all abnormal row indice in special periods
+    # get all abnormal row indice in specific periods
     mr <- merge_data_period_abnormal_index(epw_header, period, missing = TRUE, out_of_range = TRUE)
     m <- mr$missing
     r <- mr$out_of_range
@@ -2468,7 +2483,7 @@ purge_epw_data_redundant <- function (epw_data, epw_header) {
 # }}}
 # get_epw_data {{{
 get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
-                          tz = Sys.timezone(), update = FALSE) {
+                          align_wday = FALSE, tz = "UTC", update = FALSE) {
     assert(is_flag(update))
     assert(is_scalar(tz))
     if (!is.null(start_year)) assert(is_count(start_year))
@@ -2482,26 +2497,69 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
 
     can_update <- FALSE
 
-    if (!is.null(start_year)) {
+    # use the year column
+    if (is.null(start_year)) {
+        if (!align_wday) {
+            set(d, NULL, "datetime", {year(d$datetime) <- d$year; d$datetime})
+        } else {
+            can_update <- TRUE
+
+            # align start day of week
+            year <- find_nearst_wday_year(d$datetime[[1L]], p$start_day_of_week,
+                lubridate::year(Sys.Date()), epw_header$holiday$leapyear
+            )
+            set(d, NULL, "datetime", {year(d$datetime) <- year; d$datetime})
+
+            # get the start of next year
+            nextyear <- d[month == 12L & day == 31L & hour == 24L & minute == 0L, which = TRUE]
+
+            # add one year
+            if (length(nextyear)) {
+                for (i in seq_along(nextyear)) {
+                    if (is.na(nextyear[i+1])) {
+                        s <- nextyear[i]:nrow(d)
+                    } else {
+                        s <- nextyear[i]:nextyear[i+1]
+                    }
+                    set(d, s, "datetime", {year(d$datetime[s]) <- year + i; d$datetime[s]})
+                }
+            }
+        }
+    } else {
         can_update <- TRUE
-        dis <- start_year - year(d$datetime[1L])
 
         # if real year and year argument is given, issue an warning
         if (is_epwdate_type(p$start_day, "ymd")) {
-            s <- as.Date(p$start_day)
+            s <- as_date(p$start_day)
             lubridate::year(s) <- start_year
             warn("warning_rewrite_epw_acutal_year",
-                paste0("Data period #", period, " " , surround(p$name),
+                paste0("Data period #", period, " ", surround(p$name),
                     " seems like a real-year data starting from ",
-                    format(as.Date(p$start_day)), " to ",
-                    format(as.Date(p$end_day)), ". ",
+                    format(as_date(p$start_day)), " to ",
+                    format(as_date(p$end_day)), ". ",
                     "The starting date will be overwriten as ",
                     format(s), "."
                 )
             )
         }
 
-        set(d, NULL, "datetime1", d$datetime + lubridate::years(dis))
+        set(d, NULL, "datetime1", d$datetime)
+        set(d, NULL, "datetime1", {year(d$datetime1) <- start_year;d$datetime1})
+
+        # get the start of next year
+        nextyear <- d[month == 12L & day == 31L & hour == 24L & minute == 0L, which = TRUE]
+
+        # add one year
+        if (length(nextyear)) {
+            for (i in seq_along(nextyear)) {
+                if (is.na(nextyear[i+1])) {
+                    s <- nextyear[[i]]:nrow(d)
+                } else {
+                    s <- nextyear[[i]]:nextyear[[i+1]]
+                }
+                set(d, s, "datetime", {year(d$datetime[s]) <- year + i; d$datetime[s]})
+            }
+        }
 
         # original data should not have any NA as this has been checked when
         # parsing. NA will be introduced in cases when input year is a leap year:
@@ -2525,10 +2583,10 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
 
     if (tz != lubridate::tz(d$datime[1L])) {
         can_update <- TRUE
-        set(d, NULL, "datetime", lubridate::force_tz(d$datetime, tz))
+        set(d, NULL, "datetime1", lubridate::force_tz(d$datetime, tz))
 
-        if (any(is.na(d$datetime))) {
-            invld <- d[is.na(datetime)]
+        if (any(is.na(d$datetime1))) {
+            invld <- d[is.na(datetime1)]
             mes <- invld[, paste0("Original: ", datetime, " --> New time zone: ", tz)]
             abort("error_invalid_epw_date_introduced",
                 paste0("Invalid date introduced with input time zone:\n",
@@ -2536,6 +2594,10 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
                 )
             )
         }
+
+        set(d, NULL, "datetime", NULL)
+        setnames(d, "datetime1", "datetime")
+        setcolorder(d, c("datetime", setdiff(names(d), "datetime")))
     }
 
     if (update && can_update) set(d, NULL, "year", year(d$datetime))
@@ -2662,12 +2724,12 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
     # check datetime column type first, then others
     assert(inherits(data$datetime, "POSIXct"),
         msg = paste0("Column `datetime` of input data should be `POSIXct` class, not ",
-            surround(class(data$datetime)), "class."
+            surround(class(data$datetime)[[1L]]), "class."
         )
     )
 
-    # change time zone of input datetime to system time zone
-    set(data, NULL, "datetime", force_tz(data$datetime, Sys.timezone()))
+    # change time zone of input datetime to "UTC"
+    set(data, NULL, "datetime", force_tz(data$datetime, "UTC"))
 
     # get start and end day
     # assume that datetime is sorted
@@ -2890,6 +2952,22 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
     list(header = epw_header, previous = previous, data = data, after = after)
 }
 # }}}
+# find_nearst_wday_year {{{
+find_nearst_wday_year <- function (date, week_day, year = NULL, leap_year = FALSE) {
+    m <- month(date)
+    d <- mday(date)
+
+    # start out from current year if not specified
+    year <- as.integer(year %||% lubridate::year(Sys.Date()))
+    targ <- get_epw_wday(week_day)
+
+    while (wday(make_date(year, m, d)) != targ) {
+        year <- year - 1L
+    }
+
+    year
+}
+# }}}
 
 # FORMAT
 # format_epw {{{
@@ -3060,7 +3138,7 @@ print_epw_header <- function (epw_header) {
     cli::cat_line()
     cli::cat_rule("Data Periods")
     print(epw_header$period$period[,
-       .(Name = name,
+       list(Name = name,
         `StartDayOfWeek` = get_epw_wday(start_day_of_week, label = TRUE),
         `StartDay` = start_day, `EndDay` = end_day)]
     )

@@ -216,7 +216,7 @@ test_that("table manipulation", {
 
     # TABLE {{{
     expect_equal(get_iddobj_table(idd_parsed, 1),
-        data.table(class = "TestSimple", index = 1L, field = "Test Field", unit = NA_character_)
+        data.table(class = "TestSimple", index = 1L, field = "Test Field")
     )
     # }}}
 

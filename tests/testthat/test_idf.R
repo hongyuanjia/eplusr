@@ -65,6 +65,8 @@ test_that("Idf class", {
     expect_equal(idf$object_num(), 5L)
     expect_equal(idf$object_num(c("Version", "Construction")), c(1L, 1L))
     expect_equal(idf$object_num(1), 1L)
+
+    expect_is(idf$object_relation(2), "IdfRelation")
     # }}}
 
     # ASSERTION {{{
@@ -110,6 +112,12 @@ test_that("Idf class", {
     expect_equal(names(obj), NA_character_)
     expect_error(idf$objects_in_class("version"), "Invalid class name")
 
+    # can get all objects in relation
+    expect_is(idf$objects_in_relation(2), "list")
+    expect_equal(names(idf$objects_in_relation(2)), c("WALL-1", "WD01"))
+    expect_is(idf$objects_in_relation("WALL-1", "ref_by"), "list")
+    expect_equal(names(idf$objects_in_relation("WALL-1", "ref_by")), c("WALL-1", "WALL-1PF"))
+
     # can get objects using "[" and "$"
     expect_is(idf$Version, "IdfObject")
     expect_equal(names(idf$Material), c("WD01", "WD02"))
@@ -120,6 +128,7 @@ test_that("Idf class", {
     expect_equal(nm, c("WD01", "WALL-1", "WALL-1PF", "WD02"))
     expect_equal(names(idf$search_object("W")), c("WD01", "WALL-1", "WALL-1PF", "WD02"))
     expect_equal(idf$search_object("ma;ldk"), NULL)
+
     # }}}
 
     # DUPLICATE {{{
@@ -267,7 +276,8 @@ test_that("Idf class", {
         c("R13LAYER", "Rough", "2.290965", "0.9", "0.75", "0.75")
     )
     expect_error(idf$insert(idf_full$Version), "Inserting Version object is prohibited")
-    expect_error(idf$insert(idf$Material_NoMass$R13LAYER), "Conflicted Object Names")
+    expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), "Conflicted Object Names")
+    expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
     # }}}
 
     # DELETE {{{
@@ -324,6 +334,35 @@ test_that("Idf class", {
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
     expect_equal(idf_1$to_string(format = "new_top"), idf_string)
+    # }}}
+
+    # TABLE {{{
+    # can get idf in table format
+    expect_silent(idf <- read_idf(text("idf", 8.8)))
+    expect_equal(
+        idf$to_table(2, unit = TRUE, string_value = TRUE),
+        data.table(id = 2L, name = "WALL-1", class = "Construction", index = 1:5,
+            field = c("Name", "Outside Layer", paste("Layer", 2:4)),
+            value = c("WALL-1", "WD01", "PW03", "IN02", "GP01")
+        )
+    )
+    expect_equal(
+        idf$to_table(2, unit = FALSE, string_value = FALSE),
+        data.table(id = 2L, name = "WALL-1", class = "Construction", index = 1:5,
+            field = c("Name", "Outside Layer", paste("Layer", 2:4)),
+            value = as.list(c("WALL-1", "WD01", "PW03", "IN02", "GP01"))
+        )
+    )
+    expect_equivalent(tolerance = 1e-5,
+        idf$to_table(1, unit = TRUE, string_value = FALSE),
+        data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
+            field = idf$definition("Material")$field_name(),
+            value = list("WD01", "MediumSmooth", units::set_units(0.0191, m),
+                units::set_units(0.115, W/K/m), units::set_units(513, kg/m^3),
+                units::set_units(1381, J/K/kg), 0.9, 0.78, 0.78
+            )
+        )
+    )
     # }}}
 
     # VALIDATE {{{

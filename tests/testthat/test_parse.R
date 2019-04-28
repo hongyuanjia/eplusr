@@ -384,6 +384,6 @@ test_that("parse_idf_file()", {
             Simple, !- Algorithm
             Simple, !- Algorithm
             TARP; !- Algorithm"
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid Field Number")
+    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid field number")
 })
 # }}}

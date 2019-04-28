@@ -64,6 +64,8 @@ test_that("Job methods", {
     # can get all table names
     expect_equal(length(job$list_table()), 44L)
 
+    names(job$report_data())
+    names(job$report_data(all = TRUE))
     # can read table
     expect_error(job$read_table("a"), "no such table")
     expect_is(job$read_table("Zones"), "data.table")

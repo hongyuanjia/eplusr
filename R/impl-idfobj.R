@@ -105,8 +105,26 @@ get_value_list <- function (dt_value, unit = FALSE) {
 # set_idfobj_value {{{
 set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE) {
     nm <- if (is_count(object)) paste0("..", object) else object
-    input <- list(list(...))
+
+    input <- list(...)
+
+    if (length(input) == 1L && length(input[[1L]]) == 1L && is_named(input[[1L]])) {
+        input <- list(as.list(input[[1L]]))
+    } else {
+        # check for .comment
+        if (has_name(input, ".comment")) {
+            abort("error_idfobj_dotcomment",
+                paste0(
+                    "Using `.comment` to set object comments is prohibited in ",
+                    "`IdfObject` class. Please use `$comment()` method instead."
+                )
+            )
+        }
+        input <- list(input)
+    }
+
     setattr(input, "names", nm)
+
     set_idf_object(idd_env, idf_env, input, .default = .default)
 }
 # }}}
@@ -181,12 +199,14 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 # get_idfobj_relation {{{
 get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                                  name = TRUE, direction = c("ref_to", "ref_by", "all"),
-                                 keep_all = FALSE, by_value = FALSE) {
+                                 keep_all = FALSE, by_value = FALSE, max_depth = 0L,
+                                 recursive = FALSE) {
     direction <- match.arg(direction)
     if (direction == "ref_to") {
         res <- list(
             ref_to = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = 0L, name = name, direction = "ref_to", keep_all = keep_all),
+                max_depth = max_depth, name = name, direction = "ref_to",
+                keep_all = keep_all, recursive = recursive),
             ref_by = NULL
         )
         setattr(res$ref_to, "by_value", by_value)
@@ -194,15 +214,18 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
         res <- list(
             ref_to = NULL,
             ref_by = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = 0L, name = name, direction = "ref_by", keep_all = keep_all)
+                max_depth = max_depth, name = name, direction = "ref_by",
+                keep_all = keep_all, recursive = recursive)
         )
         setattr(res$ref_by, "by_value", by_value)
     } else {
         res <- list(
             ref_to = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = 0L, name = name, direction = "ref_to", keep_all = keep_all),
+                max_depth = max_depth, name = name, direction = "ref_to",
+                keep_all = keep_all, recursive = recursive),
             ref_by = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = 0L, name = name, direction = "ref_by", keep_all = keep_all)
+                max_depth = max_depth, name = name, direction = "ref_by",
+                keep_all = keep_all, recursive = recursive)
         )
         setattr(res$ref_to, "by_value", by_value)
         setattr(res$ref_by, "by_value", by_value)

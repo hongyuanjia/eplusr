@@ -114,7 +114,6 @@ test_that("IdfObject class", {
     # can stop when no values are given
     expect_error(con$set(), "Please give field values to add or set")
 
-    # can stop when both named values and unnamed values are given
     expect_error(con$set(name = "named", "unnamed"),
         "Fields below are not one of valid reference")
 
@@ -319,7 +318,7 @@ test_that("IdfObject class", {
           ",         !- Layer 6",
           ",         !- Layer 7",
           ",         !- Layer 8",
-          ",         !- Layer 9" ,
+          ",         !- Layer 9",
           ";         !- Layer 10"
         )
     )

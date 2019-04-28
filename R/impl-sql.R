@@ -3,41 +3,33 @@
 #' @importFrom lubridate year force_tz make_datetime
 NULL
 
-# with_sql {{{
-with_sql <- function (sql, ...) {
-    assert(file.exists(sql))
-    con <- RSQLite::dbConnect(RSQLite::SQLite(), sql)
-    nm <- tempfile()
-    base::attach(list(con = con), name = nm, warn.conflicts = FALSE)
-    on.exit(
-        {
-            RSQLite::dbDisconnect(con)
-            base::detach(nm, character.only = TRUE)
-        },
-        add = TRUE
-    )
-    force(...)
+# conn_sql {{{
+conn_sql <- function (sql) {
+    RSQLite::dbConnect(RSQLite::SQLite(), sql)
 }
 # }}}
-
+# with_sql {{{
+with_sql <- function (sql, expr) {
+    on.exit(RSQLite::dbDisconnect(sql), add = TRUE)
+    force(expr)
+}
+# }}}
 # read_sql_table {{{
 read_sql_table <- function (sql, table) {
-    with_sql(sql,
-        tidy_sql_name(setDT(RSQLite::dbReadTable(con, table)))[]
-    )
+    con <- conn_sql(sql)
+    with_sql(con, tidy_sql_name(setDT(RSQLite::dbReadTable(con, table)))[])
 }
 # }}}
-
 # get_sql_query {{{
 get_sql_query <- function (sql, query) {
-    with_sql(sql, {
+    con <- conn_sql(sql)
+    with_sql(con, {
         res <- RSQLite::dbGetQuery(con, query)
         if (is.data.frame(res)) setDT(res)
         res
     })
 }
 # }}}
-
 # get_sql_report_data_query {{{
 get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                                        period = NULL,
@@ -103,7 +95,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
     if (is.null(time)) {
         time <- paste0("
             SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                   SimulationDays, DayType, EnvironmentName
+                   SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
             FROM (
                 SELECT *
                 FROM ", env, " AS e
@@ -116,7 +108,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
         if (is.null(period)) {
             time <- paste0("
                 SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                       SimulationDays, DayType, EnvironmentName
+                       SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
                 FROM (
                     SELECT *
                     FROM ", env, " AS e
@@ -147,7 +139,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
             dt <- "(Month || \"-\" || Day || \"-\" || Hour || \"-\" || Minute) AS DateTime"
             time <- paste0("
                 SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                       SimulationDays, DayType, EnvironmentName
+                       SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
                 FROM (
                     SELECT *
                     FROM ", env, " AS e
@@ -196,6 +188,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                t.SimulationDays AS simulation_days,
                t.DayType AS day_type,
                t.EnvironmentName AS environment_name,
+               t.EnvironmentPeriodIndex AS environment_period_index,
                rdd.IsMeter AS is_meter,
                rdd.Type AS type,
                rdd.indexgroup AS index_group,
@@ -217,7 +210,6 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
     query
 }
 # }}}
-
 # get_sql_tabular_data_query {{{
 get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
@@ -291,13 +283,12 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
     paste0( "SELECT * FROM (", view, ") WHERE ", q)
 }
 # }}}
-
 # list_sql_table {{{
 list_sql_table <- function (sql) {
-    with_sql(sql, RSQLite::dbListTables(con))
+    con <- conn_sql(sql)
+    with_sql(con, RSQLite::dbListTables(con))
 }
 # }}}
-
 # get_sql_report_data {{{
 get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
                                  tz = "UTC", case = "auto", all = FALSE,
@@ -311,10 +302,40 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     )
     res <- get_sql_query(sql, q)
 
-    year <- year %||% lubridate::year(Sys.Date())
+    # check leap year
+    leap <- any(res$month == 2L & res$day == 29L)
+
+    # get input year
+    if (is.null(year)) {
+        year <- lubridate::year(Sys.Date())
+
+        # get wday per environment
+        w <- get_sql_wday(sql)
+        set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
+        for (i in seq.int(nrow(w))) {
+            set(w, i, "year", find_nearst_wday_year(w$date[i], w$day_type[i], year, leap))
+        }
+
+        res <- add_joined_cols(w, res, "environment_period_index", "year")
+    } else {
+        set(res, NULL, "year", year)
+    }
+
     set(res, NULL, "datetime",
-        lubridate::make_datetime(year, res$month, res$day, res$hour, res$minute, tz = tz)
+        lubridate::make_datetime(res$year, res$month, res$day, res$hour, res$minute, tz = tz)
     )
+
+    # stop if any invalid datetime found
+    if (anyNA(res$datetime)) {
+        invld <- res[is.na(datetime)]
+        mes <- invld[, paste0("Original: ", month, "-", day, " ",  hour, ":", minute,
+            " --> New year: ", year)]
+        abort("error_invalid_epw_date_introduced",
+            paste0("Invalid date introduced with input start year:\n",
+                paste0(mes, collapse = "\n")
+            )
+        )
+    }
 
     if (!all) {
         res <- res[, .SD, .SDcols = c("datetime", "key_value", "name", "units", "value")]
@@ -332,13 +353,11 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     res
 }
 # }}}
-
 # get_sql_report_data_dict {{{
 get_sql_report_data_dict <- function (sql) {
     read_sql_table(sql, "ReportDataDictionary")
 }
 # }}}
-
 # get_sql_tabular_data {{{
 get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL) {
@@ -346,7 +365,20 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
 }
 # }}}
-
+# get_sql_wday {{{
+get_sql_wday <- function (sql) {
+    q <- "
+         SELECT Month AS month,
+                Day AS day,
+                DayType AS day_type,
+                EnvironmentPeriodIndex AS environment_period_index
+         FROM Time
+         WHERE SimulationDays == 1 AND WarmupFlag == 0
+         GROUP BY EnvironmentPeriodIndex
+        "
+    get_sql_query(sql, q)
+}
+# }}}
 # tidy_sql_name {{{
 tidy_sql_name <- function (x) {
     setnames(x, stri_sub(gsub("([A-Z])", "_\\L\\1", names(x), perl = TRUE), 2L))

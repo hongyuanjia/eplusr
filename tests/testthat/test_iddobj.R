@@ -91,9 +91,7 @@ test_that("IddObject class", {
 
     # can use $field_default()
     expect_equivalent(slash$field_default(c(4, 2)), list(NA_character_, 2L))
-    expect_warning({val <- slash$field_default(c(4, 2), in_ip = TRUE)},
-        "Parameter `in_ip`.* has been deprecated."
-    )
+    expect_silent({val <- slash$field_default(c(4, 2), in_ip = TRUE)})
     expect_equivalent(unname(val), list(NA_character_, 78.74016), tolerance = 0.001)
 
     # can use $field_choice()
@@ -211,9 +209,9 @@ test_that("IddObject class", {
     expect_false(slash$has_ref_to("Test Numeric Field 1"))
 
     # can detect if fields have relation with others
-    expect_true(slash$has_ref())
-    expect_false(slash$has_ref_by())
-    expect_true(slash$has_ref_to())
+    expect_equal(slash$has_ref(), c(TRUE, FALSE, FALSE, FALSE))
+    expect_equal(slash$has_ref_by(), rep(FALSE, 4L))
+    expect_equal(slash$has_ref_to(), c(TRUE, FALSE, FALSE, FALSE))
     # }}}
 
     # Table {{{
@@ -222,8 +220,7 @@ test_that("IddObject class", {
         data.table(
             class = rep("TestSlash", 3L),
             index = 1L:3L,
-            field = c("Test Character Field 1", "Test Numeric Field 1", "Test Numeric Field 2"),
-            unit = c(NA_character_, "m", NA_character_)
+            field = c("Test Character Field 1", "Test Numeric Field 1", "Test Numeric Field 2")
         )
     )
     # }}}

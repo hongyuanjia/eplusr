@@ -66,7 +66,6 @@ test_that("Epw class", {
     expect_equal(elevation, 100)
     expect_equal(start_day_of_week, "Monday")
 
-    # location
     expect_equal(epw$location(),
         list(city = "Chongqing",
              state_province = "Chongqing",
@@ -82,7 +81,6 @@ test_that("Epw class", {
     expect_equal(epw$location(city = "chongqing")$city, "chongqing")
     expect_error(epw$location(city = 1), "city in LOCATION is not a string")
 
-    # design condition
     expect_is(epw$design_condition(), "list")
     expect_equal(names(epw$design_condition()), c("source", "heating", "cooling", "extremes"))
     epw$typical_extreme_period()
@@ -131,10 +129,12 @@ test_that("Epw class", {
             by = "1 hour"
         )
     )
+
     # can change the year column
     expect_equal(epw$data(start_year = 2018, update = TRUE)$year, c(rep(2018L, times = 8759), 2019L))
     # can change the time zone of datetime column in the returned weather data
-    expect_equal(attr(epw$data(tz = "America/Chicago")$datetime, "tzone"), "America/Chicago")
+    expect_error(attr(epw$data(tz = "America/Chicago")$datetime, "tzone"), "Invalid date introduced")
+    expect_equal(attr(epw$data(start_year = 2019, tz = "Etc/GMT+8")$datetime, "tzone"), "Etc/GMT+8")
 
     expect_equal(nrow(epw$abnormal_data()), 2170L)
     expect_true("line" %in% names(epw$abnormal_data()))
@@ -155,6 +155,7 @@ test_that("Epw class", {
 
     expect_silent(epw$purge())
 
+    epw <- read_epw(path_epw)
     # can change weather data
     expect_silent(epw$set(epw$data(), warning = FALSE))
     expect_error(epw$add(epw$data(), warning = FALSE), "overlapped")
@@ -167,7 +168,10 @@ test_that("Epw class", {
     )
     expect_equal(epw$period()$index, 1L:3L)
     expect_equal(epw$period()$name, c("Data1", "Data", "Data2"))
-    expect_equal(epw$period()$start_day, epw_date(c("2018/1/1", "1/1", "2019/1/1")))
+    expect_equal(epw$period()$start_day, c(c(epw_date("2018/1/1"), epw_date("1/1", FALSE)), epw_date("2019/1/1")))
+
+    expect_equal(find_nearst_wday_year(make_date(2019, 1, 14), 1, 2019), 2019)
+    expect_equal(find_nearst_wday_year(make_date(2019, 1, 14), 2, 2019), 2014)
 
     # EpwDate Class {{{
     expect_error(epw_date(list()), "Missing method to convert")
