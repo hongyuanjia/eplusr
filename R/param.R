@@ -482,7 +482,9 @@ param_job_from_which <- function (self, private, which) {
         )
     }
 
-    if (not_empty(job[exit_status != 0L])) {
+    # setting `keep_unsucess` to TRUE makes it possible to continue to parse
+    # some output files such like .err files. (#24)
+    if (isTRUE(!keep_unsucess) && not_empty(job[exit_status != 0L])) {
         unsuccessful <- job[exit_status != 0L]
         msg <- unsuccessful[, sim_status("UNSUCCESSFUL", index, idf, epw)]
         stop("Some of jobs completed unsuccessfully:\n", paste0(msg, collpase = "\n"),
