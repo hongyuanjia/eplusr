@@ -1,3 +1,137 @@
+# eplusr 0.10.0
+
+## Break changes
+
+* Right now, all returned object and field names will remain what they are as in
+  the IDF, instead of converting them into `underscore` style names.
+
+* The `num_digits` option has been deprecated as formatting of numeric fields
+  are now handled by R itself.
+
+* `$definition()` now only accepts one class name
+
+* Error will be given instead of warning if there is no build tag or multiple
+  build tags found in input IDD.
+
+## New methods and arguments
+
+* `eplusr_option()` accepts custom validate level using newly-added function
+  `custom_validate()`.
+
+### `Idd` Class
+
+* `$object()` now takes a single class name and returns an `IddObject`.
+
+* New method `$objects()` is added as the successor of `$object()` in previous
+  versions.
+
+* New method `$objects_in_relation()` is added to get all objects that have
+  relation (one refer to others or one referred by others).
+
+* `$object_in_group()` has been deprecated in flavor of `$objects_in_group()`.
+
+### `IddObject` Class
+
+* A constructor `idd_object()` has been added to help directly create
+  `IddObject`. It takes a parent IDD version or an `Idd` object and a valid
+  class name or class index, e.g. `idd_object(8.8, "Material")`,
+  `idd_object(use_idd(8.8), "Construction")`
+
+* New method `$version()` is added to extract the version of parent IDD.
+
+* New method `$field_relation()` is added to extract the field relation in
+  current class with other class fields.
+
+* New method `$is_real_field()` is added to detect if specified fields should
+  have values of real numbers but not integers.
+
+* New method `$has_ref()`, `$has_ref_by()`, `$has_ref_to()` are added to detect
+  if specified fields refer to other fields or can be referred by other field in
+  other classes.
+
+* New method `$to_table()` and `$to_string()` are added to help easily extract
+  internal IDD data in `data.table` format and string format respectively.
+
+* `field_possible()` now does not need `IdfObject` data to run.
+
+* Argument `lower` in `$field_name()` has been deprecated.
+
+* `$field_reference()` in `IddObject` class has been deprecated in flavor of
+  `$field_relation()`.
+
+### `Idf` Class
+
+* An argument `sorted` is added in `$class_name()` and `$group_name()`to control
+  whether to sort the returned value according to the occurances in IDD or not.
+
+* `$definition()` now only accepts one class name and returns a single
+  `IddObject`, not a list of `IddObject`.
+
+* `$object()` now takes a single object ID or name and returns an `IdfObject`.
+
+* New method `$objects()` is added as the successor of `$object()` in previous
+  versions.
+
+* New method `$object_unique()` is added which returns an `IdfObject` in
+  unique-object class, e.g. `SimulaSimulationContrl`. This makes it easy to
+  directly extract and modify those objects, e.g.
+  `model$object_unique("SimulationContrl")$set(...)`.
+
+* `$object_in_class()` now is deprecated in flavor of `$objects_in_class()`.
+
+* `$search_object()`, `$search_value()` and `$replace_value()` now can take same
+  arguments as `base::grepl()` to further control the way it searches objects.
+
+* `$replace_value()` now will perform validations when replacing value.
+
+* Now all methods in `Idf` class that return `IdfObject`s will not convert
+  object names into valid R names. The former conversion behavior is unnecessary
+  and a little bit confusing.
+
+* `$add_object()`, `$set_object()`, `$del_object()`, `$ins_object()` and
+  `$del_object()` are now all deprecated. Please use `$add()`, `$set()`,
+  `$del()` and `insert()` instead, which provide much cleaner syntax.
+
+* New method `$paste()` is added which will parse contents that copied from IDF
+  Editor using the `Copy Obj` button and directly insert them into current `Idf`.
+
+* `$validate()` and `$is_valid()` now accepts an argument `level`. Also, a
+  helper `custom_validate()` is added to customize what kind of validations to
+  check.
+
+* `$string()` is deprecated in flavor of `$to_string()` in `Idf` class.
+
+* New method `$to_table()` is added which can extract object data into a
+  `data.table`.
+
+* The default value of `deep` argument in `$clone()` method is set to `TRUE`. As
+  in almost all cases, a total cloned object is desired when calling `$clone()`.
+
+* `plain` argument is deprecated in `$print()` in IDF class. Because the same
+  thing can be achieved using `$to_string()` and `base::cat()`. New argument
+  `zoom` and `order` are added, which give more control on how detailed should
+  the model be printed.
+
+### New methods and arguments
+
+### Deprecated methods and arguments
+
+## `Idf`
+
+## `IdfObject`
+
+* `$get_comment()`, `$get_value()` now have been deprecated in flavor of
+  `$comment()` and `$value()`
+
+* `$comment()` (former `$get_comment()`) now returns `NULL` if the object does
+  not have any comment.
+
+## `Epw`
+
+* `Epw` class has been totaly rewritten which provides much more
+  functionalities. Please refer to package documentation for details.
+  All headers are parsed and can be retrieve in `Epw` class.
+
 # eplusr 0.9.4
 
 ## New features
