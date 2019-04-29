@@ -154,6 +154,8 @@ on_fail(is_idd_ver) <- function (call, env) {
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
     eplus <- paste0("energyplus", if (is_windows()) ".exe" else "")
+    # in case input is a numeric version
+    path <- as.character(path)
     dir.exists(path) & file.exists(file.path(path, eplus)) & file.exists(file.path(path, "Energy+.idd"))
 }
 on_fail(is_eplus_path) <- function (call, env) {

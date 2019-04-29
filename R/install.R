@@ -58,7 +58,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 
     # check if the same version has been installed already
     if (is_avail_eplus(ver) && !isTRUE(force))
-        stop(paste0("It seems EnergyPlus v", ver, "has been already",
+        stop(paste0("It seems EnergyPlus v", ver, " has been already ",
                 "installed at ", surround(eplus_config(ver)$dir),
                 ". Set `force` to TRUE to reinstall."), call. = FALSE)
 
@@ -264,7 +264,11 @@ use_eplus <- function (eplus) {
 
         # have to check all possible patched versions
         all_ver <- unique(c(ALL_IDD_VER, names(.globals$eplus_config)))
-        ver <- numeric_version(all_ver[ver[, 1L:2L] == numeric_version(all_ver)[, 1L:2L]])
+        if (is.na(ver[, 3L])) {
+            ver <- numeric_version(all_ver[ver == numeric_version(all_ver)[, 1L:2L]])
+        } else {
+            ver <- numeric_version(all_ver[ver == numeric_version(all_ver)])
+        }
         eplus_dir <- eplus_default_path(ver)
         chk <- is_eplus_path(eplus_dir)
         if (any(chk)) {
@@ -274,7 +278,8 @@ use_eplus <- function (eplus) {
                     "The last patched version v", max(ver), " will be used. ",
                     "Please explicitly give the full version if you want to use the other versions."
                 )
-                eplus_dir <- eplus_dir[which.max(ver)]
+                # which.max does not work with numeric_version objects
+                eplus_dir <- eplus_dir[max(order(ver))]
                 ver <- max(ver)
             } else {
                 eplus_dir <- eplus_dir[chk]

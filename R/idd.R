@@ -923,7 +923,8 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
                 )
             }
 
-            idd <- use_idd(avail_idd()[which.max(avail_idd())])
+            # which.max does not work with numeric_version objects
+            idd <- use_idd(avail_idd()[max(order(avail_idd()))])
             if (warn) {
                 warn("warn_latest_idd_used",
                     paste0(mes,
