@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @importFrom cli cat_line cat_rule
 #' @importFrom crayon bold
 #' @include impl-idf.R
 NULL
@@ -6,7 +7,8 @@ NULL
 #' Read, Modify, and Run an EnergyPlus Model
 #'
 #' eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
-#' in a hierarchical structure, which was extremely inspired by [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html),
+#' in a hierarchical structure, which was extremely inspired by
+#' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html),
 #' but with total different data structure under the hook.
 #'
 #' @section Overview:
@@ -1253,10 +1255,10 @@ NULL
 #' }
 #' # ===== FORMAT MODEL =====
 #' # get text format of the model
-#' str(idf$to_string())
+#' head(idf$to_string())
 #'
 #' # get text format of the model, excluding the header and all comments
-#' str(idf$to_string(comment = FALSE, header = FALSE))
+#' head(idf$to_string(comment = FALSE, header = FALSE))
 #'
 #' # ===== SAVE MODEL =====
 #' # check if the model has been modified since read or last saved

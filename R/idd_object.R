@@ -444,7 +444,7 @@ NULL
 #'
 #' # add ten extensible groups
 #' bran$add_extensible_group(10)
-#' # the number of fields has been increased by 10 * 4 (= 46)
+#' # the number of fields has been increased by 10 * 4 (= 40)
 #' bran$num_fields()
 #'
 #' # delete eight extensible groups

@@ -1145,7 +1145,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' @export
 # format.IdfObject {{{
 format.IdfObject <- function (x, ...) {
-    x$to_string()
+    x$to_string(...)
 }
 # }}}
 
@@ -1157,7 +1157,7 @@ as.character.IdfObject <- format.IdfObject
 #' @export
 # str.IdfObject {{{
 str.IdfObject <- function (object, ...) {
-    object$value()
+    object$value(...)
 }
 # }}}
 

@@ -325,6 +325,8 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         lubridate::make_datetime(res$year, res$month, res$day, res$hour, res$minute, tz = tz)
     )
 
+    set(res, NULL, c("year", "environment_period_index"), NULL)
+
     # stop if any invalid datetime found
     if (anyNA(res$datetime)) {
         invld <- res[is.na(datetime)]
