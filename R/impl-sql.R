@@ -60,7 +60,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
     }
     # }}}
     # Query for Time {{{
-    time <- "WarmupFlag == 0" %and%
+    time <- NULL %and%
         make(month, assert(are_count(month), month <= 12L)) %and%
         make(day, assert(are_count(day), day <= 31L)) %and%
         make(hour, assert(are_count(hour, TRUE), hour <= 23L)) %and%
@@ -311,12 +311,22 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 
         # get wday per environment
         w <- get_sql_wday(sql)
+
+        # for WinterDesignDay and SummerDesignDay, set to Monday
         set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
-        for (i in seq.int(nrow(w))) {
-            set(w, i, "year", find_nearst_wday_year(w$date[i], w$day_type[i], year, leap))
+        set(w, NULL, "dt", get_epw_wday(w$day_type))
+        w[day_type %chin% c("WinterDesignDay", "SummerDesignDay"), dt := 1L]
+
+        if (any(!is.na(w$dt))) {
+            for (i in which(!is.na(w$dt))) {
+                set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], year, leap))
+            }
         }
 
-        res <- add_joined_cols(w, res, "environment_period_index", "year")
+        # make sure all environments have a year value
+        w[is.na(dt), year := lubridate::year(Sys.Date())]
+
+        set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
     } else {
         set(res, NULL, "year", year)
     }
@@ -375,7 +385,7 @@ get_sql_wday <- function (sql) {
                 DayType AS day_type,
                 EnvironmentPeriodIndex AS environment_period_index
          FROM Time
-         WHERE SimulationDays == 1 AND WarmupFlag == 0
+         WHERE SimulationDays == 1 AND DayType IS NOT NULL
          GROUP BY EnvironmentPeriodIndex
         "
     get_sql_query(sql, q)

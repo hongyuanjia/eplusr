@@ -1140,12 +1140,12 @@ get_epw_wday <- function (x, label = FALSE, abbr = FALSE){
         m <- match_in_vec(x, wd, label = FALSE)
 
         if (!label) {
-            res[m != 0L] <- m[m != 0L]
+            res[!is.na(m)] <- m[!is.na(m)]
         } else {
             if (abbr) {
-                res[m != 0L] <- stri_sub(wd[m[m != 0L]], to = 3L)
+                res[!is.na(m)] <- stri_sub(wd[m[!is.na(m)]], to = 3L)
             } else {
-                res[m != 0L] <- wd[m[m != 0L]]
+                res[!is.na(m)] <- wd[m[!is.na(m)]]
             }
         }
     }
