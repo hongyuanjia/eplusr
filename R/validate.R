@@ -58,7 +58,7 @@ add_validity <- function (idd_env, idf_env, env_in, check, type, on) {
     env_in[["validity"]][[type]] <- env_in$object[, .SD, .SDcols = c("object_id", "object_name")][
         env_in$value, on = "object_id"][check, on = on][,
         .SD, .SDcols = names(env_in[["validity"]][[type]])]
-    setdiff(names(env_in[["validity"]]$missing_value), names(check))
+    env_in[["validity"]][[type]]
 }
 # }}}
 # exclude_invalid {{{
