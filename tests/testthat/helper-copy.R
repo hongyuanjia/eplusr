@@ -17,3 +17,7 @@ copy_example <- function () {
 
     list(idf = path_idf, epw = path_epw)
 }
+
+clean_tempdir <- function () {
+    unlink(list.files(tempdir(), full.names = TRUE), force = TRUE)
+}

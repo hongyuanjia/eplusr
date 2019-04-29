@@ -10,12 +10,12 @@ eplus_sql(sql)
 \item{sql}{A path to an local EnergyPlus SQLite output file.}
 }
 \value{
-An \code{EplusSql} object.
+An \link{EplusSql} object.
 }
 \description{
 \code{eplus_sql()} takes an EnergyPlus SQLite output file as input, and returns an
-\code{EplusSQL} object for collecting simulation outputs. For more details,
-please see \link{EplusSql}.
+\code{EplusSQL} object for collecting simulation outputs. For more details, please
+see \link{EplusSql}.
 }
 \examples{
 \dontrun{

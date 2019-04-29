@@ -8,28 +8,10 @@
 
 * Model version conversion
 
-* Remove unnecessary `as.integer()`
-
 * Fix extensible field names when they should be "A123" or "N123" but not
   self-explainary
 
-* Using `units` package to add units in the returned data.table
-
 * Apply multiple weather file to a seed in `ParametricJob` class
-
-* Add more tests on value reference updating during value modifications.
-
-* Only use minimal columns in data modifications to speed up the whole process
-
-* Change the column names of returned data.tables to lower case style in
-  `$report_data_dict()` and `$report_data()`.
-
-* Optimize table joins using `data.table::setindex()`, `mult` argument in
-  `data.table::data.table()`
-
-* Change `clean_wd()` to make it work properly in `run_multi()`.
-
-* Use `data.table::fread(sep = NULL)` instead of `readr::read_lines()`
 
 * Add functionality to parse `.rdd` and `.mdd` file and add possible
   output variables into the Idf, possibly also a gui interface providing
@@ -41,11 +23,20 @@
 * Add external file dependency (e.g. file existance in `Schedule:File` class)
   checking in `$validate()`.
 
-* Ignore warning in read_idf when reading ddy file
-
-* Add objects directly from clipboard contents created using "Copy" and "Copy
-    for speedsheet" in IDFEditor
-
 * Add function to reorder objects in a class
 
-* Add a `class` parameter to `$ref_by_object()` in `IdfObject` class
+* Dynamic print the status of job running info
+
+* Remove crayon dep
+
+* Add functionality to check location differences between epw and idf.
+  ```cpp
+  if ( std::abs( Latitude - WeatherFileLatitude ) > 1.0 || std::abs( Longitude - WeatherFileLongitude ) > 1.0 || std::abs( TimeZoneNumber - WeatherFileTimeZone ) > 0.0 || std::abs( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) > 0.10 ) {
+      ShowWarningError( "Weather file location will be used rather than entered (IDF) Location object." );
+      ShowContinueError( "..Location object=" + LocationTitle );
+      ShowContinueError( "..Weather File Location=" + WeatherFileLocationTitle );
+      ShowContinueError( "..due to location differences, Latitude difference=[" + RoundSigDigits( std::abs( Latitude - WeatherFileLatitude ), 2 ) + "] degrees, Longitude difference=[" + RoundSigDigits( std::abs( Longitude - WeatherFileLongitude ), 2 ) + "] degrees." );
+      ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent, [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
+  }
+  ```
+* export the fun `locate_eplus()` to init eplus path

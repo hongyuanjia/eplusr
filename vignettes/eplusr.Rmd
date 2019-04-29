@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 hook_output = knitr::knit_hooks$get('output')
 knitr::knit_hooks$set(output = function(x, options) {
   if (!is.null(n <- options$out.lines)) {
-    x = unlist(stringr::str_split(x, '\n'))
+    x = unlist(strsplit(x, '\n', fix = TRUE))
     if (length(x) > n) {
       # truncate the output
       x = c(head(x, n), '....\n')
@@ -67,10 +67,10 @@ are helper functions in eplusr to download and install it automatically on major
 operating systems (Windows, macOS and Linux):
 
 ```{r eplus-install, eval = FALSE}
-# install the latest version (currently v9.0.0)
+# install the latest version (currently v9.1.0)
 eplusr::install_eplus("latest")
 
-# OR download the latest version (currently v9.0.0) and run the installer
+# OR download the latest version (currently v9.1.0) and run the installer
 # manually by yourself
 eplusr::download_eplus("latest", dir = tempdir())
 ```
@@ -104,8 +104,8 @@ if (!eplusr::is_avail_eplus(8.8)) {
 
 ## Features
 
-* Read, parse and modify EnergyPlus Weather File (EPW)
 * Read, parse and modify EnergyPlus Input Data File (IDF)
+* Read, parse and modify EnergyPlus Weather File (EPW)
 * Query on models, including classes, objects and fields
 * Directly add, modify, duplicate, insert, and delete objects of IDF
 * Automatically change referenced fields when modifying objects
@@ -242,7 +242,7 @@ of `IddObject`s. All required fields in each class are marked with
 `Material`:
 
 ```{r all_field}
-def_mat <- model$definition(class = "Material")[[1]]
+def_mat <- model$definition(class = "Material")
 def_mat
 ```
 
@@ -255,6 +255,8 @@ idd$Material
 
 # OR
 # idd$object("Material")[[1]]
+# OR
+# idd_object(8.8, "Material")
 ```
 
 With the `IddObject`, you can easily get class and field properties using
@@ -312,19 +314,19 @@ Having the object ID or name, you can easily get any object using `$object()`.
 > NOTE: The matching of object names is case-insensitive. For instance,
 > `model$object("rOoF")` is equivalent to `model$object("roof")`.
 
-`$object()` returns a list of `IdfObject`s. The names of returned list are
+`$objects()` returns a list of `IdfObject`s. The names of returned list are
 object names, except that all names are converted into valid R names, i.e. all
 other characters except letters and numbers are replaced by underscore. (Below
 this pattern will be referred as "underscore-style")
 
 ```{r obj}
-model$object(c("WD10", "ROOF-1"))
+model$objects(c("WD10", "ROOF-1"))
 ```
 
-If you want to get all objects in a single class, use `$object_in_class()`.
+If you want to get all objects in a single class, use `$objects_in_class()`.
 
 ```{r obj_in_cls, out.lines = 30}
-model$object_in_class("Material")
+model$objects_in_class("Material")
 ```
 
 Also, you can get all objects in a single class using `"$"` or `"[["`.  Class
@@ -352,10 +354,6 @@ regular expression you give.
 ```{r search_obj, out.lines = 20}
 model$search_object("Demand", class = "Branch")
 ```
-
-> NOTE: Under the hook, `stringr::str_detect` is used for matching, which is
-> case-sensitive by default. If you want more controls on how the matching is
-> performed, build your regular expression using `stringr::regex`.
 
 After you get the objects, you can perform detailed modifications on them using
 methods in `IdfObject`. Below lists all methods it has.
@@ -392,78 +390,81 @@ which works on multiple objects, and the other way is using methods in
 > strictness level (`none`, `draft`, `final`). For detailed explanations,
 > please see `?eplusr_option()`.
 
-You can duplicate, add, insert, modify and delete objects using `$dup_object()`,
-`$add_object()`, `$ins_object()`, `$set_object()` and `$del_object()` in `Idf`,
+You can duplicate, add, insert, modify and delete objects using `$dup()`,
+`$add()`, `$insert()`, `$set()` and `$del()` in `Idf`,
 respectively.
 
-Object IDs will be appended after `$dup_object()`, `$add_object()` and
-`$ins_object()`, and the newly added object will have the max
+Object IDs will be appended after `$dup()`, `$add()` and
+`$insert()`, and the newly added object will have the max
 ID. Object IDs will never be reused, even though their binded objects have
-been deleted using `$del_object()`.
+been deleted using `$del()`.
 
-For modifying object's comments and values, you can also use `$set_comment()`
-and `$set_value()` in `IdfObject` class.
+For modifying object's comments and values, you can also use `$comment()`
+and `$set()` in `IdfObject` class.
 
 ### Duplicate objects
 
-`$dup_object()` will duplicate objects specified by object IDs or names. If the
+`$dup()` will duplicate objects specified by object IDs or names. If the
 target classes have a name attribute, you can assign new names to the duplicated
-objects using argument `new_name`. If `new_name` is `NULL`, which is default,
-the newly added object will have the same name as the original object except a
-appended suffix of "`_1`", "`_2`" and etc.
+objects in form `new_name = "old_name"`. If new name is not given, the newly
+added object will have the same name as the original object except a appended
+suffix of "`_1`", "`_2`" and etc.
 
 ```{r dup}
-model$dup_object(c("ROOF-1", "ROOF-1", "WALL-1"))
+model$dup(c("ROOF-1", "ROOF-1", "WALL-1"))
 ```
 
 ### Add new objects
 
-You can add new objects using `$add_object()`. With `default` being `TRUE`, all
+You can add new objects using `$add()`. With `.default` being `TRUE`, all
 empty fields are filled with default values, if possible. Only minimum fields
-will be added by default. But you can change it by setting `all` to `TRUE`.
+will be added by default. But you can change it by setting `.all` to `TRUE`.
 
-Field values should be given in a list following either pattern below:
+Field values can be given in a list following patterns below:
 
 * directly list all field values with no name. The values will be assigned to
   fields according to the appearance order;
 * give both field names *without units* and values in pair, e.g. `` Name =
   "Test", `Begin Month` = 1 ``. You can find all valid field names using
-  `$definition("class_name")[[1]]$field_name()`. Field names can also be given
+  `$definition("class_name")$field_name()`. Field names can also be given
   in underscore-style, e.g. `Name = "Test", begin_month = 1` (NOTE: matching is
   case-insensitive).
+* mix of above
 
-You can also add new comments alongside with new values.
+You can also add new comments alongside with new values using the special
+element `.comment`.
 
 For example, here we add two new objects in `RunPeriod`:
 
 ```{r add_obj}
-model$add_object(rep("RunPeriod", 2),
-  value = list(
-    list("rp_test_1", 1, 1, 2, 1),
+model$add(
+  RunPeriod = list("rp_test_1", 1, 1, 2, 1,
+    .comment = c("Comment for new object 1", "Another comment")
+  ),
 
-    list(name = "rp_test_2",
-         begin_month = 3,
-         begin_day_of_month = 1,
-         end_month = 4,
-         end_day_of_month = 1)
-    ),
-  comment = list(
-    list("Comment for new object 1", "Another comment"),
-    list("Comment for new object 2")),
-  default = TRUE
+  RunPeriod = list(
+    name = "rp_test_2",
+    begin_month = 3,
+    begin_day_of_month = 1,
+    end_month = 4,
+    end_day_of_month = 1,
+    .comment = "Comment for new object 2"
+  )
 )
 ```
 
 ### Set new values and comments
 
-Changing values of existing objects can be conducted using `$set_object()` in
-`Idf` or `$set_value()` in `IdfObject`. Basic rules above of field values
-provided also apply to `$set_object()`, i.e. you should give either named values
-or non-named values in lists. For example:
+Changing values of existing objects can be conducted using `$set()` in
+`Idf` and `IdfObject`. Basic rules above of field values
+provided also apply to `$set()`. For example:
 
 ```{r set_obj}
-model$set_object("rp_test_1", list(name = "rp_test_3", begin_day_of_month = 2),
-  comment = list(format(Sys.Date()), "begin day has been changed."))
+model$set(
+  rp_test_1 = list(name = "rp_test_3", begin_day_of_month = 2,
+    .comment = c(format(Sys.Date()), "begin day has been changed.")
+  )
+)
 ```
 
 Also, if the modified fields are referenced by fields in other objects, the
@@ -476,7 +477,7 @@ mat <- model$Material$CC03
 # get other objects referencing this object
 mat$ref_by_object()
 
-mat$set_value(name = "CC03_renamed")
+mat$set(name = "CC03_renamed")
 
 mat$ref_by_object()
 ```
@@ -486,31 +487,31 @@ them. You can achieve that by using `$possible_value()` method in `IdfObject`
 class.
 
 ```{r possible}
-mat$possible_value()
+mat$value_possible()
 ```
 
 ### Insert objects
 
 Sometimes it may be useful to insert objects from other IDFs. For example, you
 may want to import some design days from a ".ddy" file. You can achieve that
-using `$ins_object()`.
+using `$insert()`.
 
 ```{r ddy, warning=TRUE, out.lines = 20}
 # read ddy file as normal IDF
 ddy <- read_idf("San_Francisco.ddy", idd = 8.8)
 
-model$ins_object(ddy$SizingPeriod_DesignDay)
+model$insert(ddy$SizingPeriod_DesignDay)
 ```
 
 ### Delete object
 
-`$del_object()` will delete current objects specified by object IDs or names.
+`$del()` will delete current objects specified by object IDs or names.
 For example, in current model, there is a material named `"MAT-CLNG-1"` in class
 `Material:NoMass`. You can get objects referencing `MAT-CLNG-1` by using
 `$ref_by_object()` in `IdfObject`.
 
 ```{r ref_by}
-clng <- model$Material_NoMass$MAT_CLNG_1
+clng <- model$Material_NoMass$`MAT-CLNG-1`
 clng$ref_by_object()
 ```
 As we can see, `MAT-CLNG-1` has been referenced by a construction named
@@ -519,7 +520,7 @@ object(s), it cannot be deleted.
 
 ```{r del, error = TRUE}
 eplusr_option("validate_level")
-model$del_object("mat-clng-1")
+model$del("mat-clng-1")
 ```
 
 In some cases, you may still want to delete that object. You can do that by
@@ -527,11 +528,10 @@ changing validate level to `draft` or `none`. For detail explanations on
 each validate level, please see `?eplusr_option()`.
 
 You can also delete objects referencing the target objects as well, by setting
-`referenced` to `TRUE`.
+`.referenced` to `TRUE` and `.force` to `TRUE` to force deleting.
 
 ```{r del_force}
-eplusr_option(validate_level = "draft")
-invisible(model$del_object("mat-clng-1", referenced = TRUE))
+model$del("mat-clng-1", .referenced = TRUE, .force = TRUE)
 ```
 
 ## Validate
@@ -550,7 +550,7 @@ construction `CLNG-1` was referenced by many other objects in
 are detected.
 
 ```{r valid, error = TRUE}
-eplusr_option(validate_level = "final")
+eplusr_option("validate_level")
 model$validate()
 ```
 
@@ -629,10 +629,10 @@ epw_sf
 setdiff(ls(epw_sf), "initialize")
 ```
 
-You can get all weather data using `$get_data()`.
+You can get all weather data using `$data()`.
 
 ```{r epw_data}
-epw_data <- epw_sf$get_data()
+epw_data <- epw_sf$data()
 str(epw_data)
 ```
 
@@ -644,9 +644,9 @@ see `?job` for more detailed.
 
 ```{r run, eval = can_run}
 # read the model again
-model <- read_idf("5Zone_Transformer.idf", idd = NULL)
+model <- read_idf("5Zone_Transformer.idf")
 
-job <- model$run(epw_sf, dir = ".", wait = TRUE)
+job <- model$run(epw_sf, wait = TRUE)
 job
 ```
 
@@ -730,23 +730,20 @@ Let's create a function that modifies infiltration rate:
 ```{r mea, eval = can_run}
 set_infil_rate <- function (idf, infil_rate) {
 
-    # validate input value
-    # this is optional, as validations will be performed when setting values
-    stopifnot(is.numeric(infil_rate), infil_rate >= 0)
+  # validate input value
+  # this is optional, as validations will be made when setting values to `Idf`
+  stopifnot(is.numeric(infil_rate), infil_rate >= 0)
 
-    if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
-      stop("Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`")
+  if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
+    stop("Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`")
 
-    ids <- idf$object_id("ZoneInfiltration:DesignFlowRate", simplify = TRUE)
+  ids <- idf$object_id("ZoneInfiltration:DesignFlowRate", simplify = TRUE)
+  val <- rep(list(list(design_flow_rate_calculation_method = "AirChanges/Hour", air_changes_per_hour = infil_rate)), length(ids))
+  names(val) <- paste0("..", ids)
 
-    idf$set_object(ids,
-        value = rep(list(list(
-            design_flow_rate_calculation_method = "AirChanges/Hour",
-            air_changes_per_hour = infil_rate)),
-            times = length(ids))
-        )
+  idf$set(val)
 
-    idf
+  idf
 }
 ```
 
@@ -781,12 +778,13 @@ param$run()
 After all simulations completed, let's see the variations of total energy.
 
 ```{r param_res, eval = can_run}
-tab <- param$tabular_data()
+tab <- param$tabular_data(
+  table_name = "Site and Source Energy",
+  column_name = "Total Energy",
+  row_name = "Total Site Energy"
+)
 
-total_eng <- tab[TableName == "Site and Source Energy" &
-    ColumnName == "Total Energy" &
-    RowName == "Total Site Energy",
-    list(Case, `Total Energy (GJ)` = as.numeric(Value))]
+total_eng <- tab[, list(case, `Total Energy (GJ)` = as.numeric(value))]
 ```
 
 ```{r eval = FALSE}

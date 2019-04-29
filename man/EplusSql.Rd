@@ -9,70 +9,216 @@
 EnergyPlus SQLite output file.
 }
 \details{
-SQLite output is an optional output format for EnergyPlus. It will be
-created if there is an object in class \code{Output:SQLite}. If the value of
-field \code{Option} in class \code{Output:SQLite} is set to \code{"SimpleAndTabular"},
-then database tables related to the tabular reports will be included.
+SQLite output is an optional output format for EnergyPlus. It will be created
+if there is an object in class \code{Output:SQLite}. If the value of field
+\code{Option} in class \code{Output:SQLite} is set to \code{"SimpleAndTabular"}, then
+database tables related to the tabular reports will be also included.
 
 There are more than 30 tables in the SQLite output file which contains all of
-the data found in EnergyPlus's tabular output files, standard variable
-and meter output files, plus a number of reports that are found in the
-eplusout.eio output file. The full description for SQLite outputs is
-described in the EnergyPlus \emph{"Output Details and Examples"}
-documentation.
+the data found in EnergyPlus's tabular output files, standard variable and
+meter output files, plus a number of reports that are found in the
+eplusout.eio output file. The full description for SQLite outputs can be
+found in the EnergyPlus \emph{"Output Details and Examples"} documentation.  Note
+that all column names of tables returned have been tidied, i.e. \code{"KeyValue"}
+becomes \code{"key_value"}, \code{"IsMeter"} becomes \code{"is_meter"} and etc.
 
 \code{EplusSql} class makes it possible to directly retrieve simulation results
-without creating an \link{EplusJob} object which can only get simulation
+without creating an \link{EplusJob} object. \link{EplusJob} can only get simulation
 outputs after the job was successfully run before.
 
 However, it should be noted that, unlike \link{EplusJob}, there is no checking on
 whether the simulation is terminated or completed unsuccessfully or, the
-parent Idf has been changed since last simulation. This means that you
-may encounter some problems when retrieve data from an unsuccessful
-simulation. It is suggested to carefully go through the \code{.err} file to
+parent Idf has been changed since last simulation. This means that you may
+encounter some problems when retrieve data from an unsuccessful simulation.
+It is suggested to carefully go through the \code{.err} file using \code{\link[=read_err]{read_err()}} to
 make sure the output data in the SQLite is correct and reliable.
 }
 \section{Usage}{
 \preformatted{epsql <- eplus_sql(sql)
 epsql$path()
+epsql$path_idf()
 epsql$list_table()
 epsql$read_table(table)
-epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto", all = FALSE)
 epsql$report_data_dict()
-epsql$tabular_data()
+epsql$report_data(
+    key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
+    period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+    interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL
+)
+job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
 epsql$print()
 print(epsql)
+}
+}
+
+\section{Basic Info}{
+\preformatted{epsql <- eplus_sql(sql)
+epsql$path()
+epsql$path_idf()
 }
 
 \code{$path()} returns the path of EnergyPlus SQLite file.
 
-\code{$report_data_dict()} returns a data.table which contains all information about
-report data. For details on the meaning of each columns, please see
-"2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
-Examples" documentation.
-
-\code{$report_data()} extracts the report data in a data.table using key values
-and variable names.
-
-\code{$tabular_data()} extracts all tabular data in a data.table.
-
-\code{$print()} shows the core information of this EplusSql object, including the
-path of the EnergyPlus SQLite file, last modified time of the SQLite file
-and the path of the IDF file with the same name in the same folder.
+\code{$path_idf()} returns the IDF file path with same name as the SQLite file in
+the same folder. \code{NULL} is returned if no corresponding IDF is found.
 
 \strong{Arguments}:
 \itemize{
 \item \code{epsql}: An \code{EplusSQL} object.
 \item \code{sql}: A path to an local EnergyPlus SQLite output file.
-\item \code{key_value}: A character vector to identify key name of the data. If
-\code{NULL}, all keys of that variable will be returned. Default: \code{NULL}.
-\item \code{name}: A character vector to specify the actual data name. If \code{NULL}, all
-variables will be returned. Default: \code{NULL}.
-\item \code{year}: The year of the date and time in column \code{DateTime}. If \code{NULL}, it
-will be the current year. Default: \code{NULL}
-\item \code{tz}: Time zone of date and time in column \code{DateTime}. Default: \code{"GMT"}.
+}
+}
+
+\section{Read Tables}{
+\preformatted{epsql$list_table()
+epsql$read_table(table)
+epsql$report_data_dict()
+epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",case = "auto", all = FALSE,
+                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                  interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
+epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+}
+
+\code{$list_table()} returns all available table and view names in the SQLite file.
+
+\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
+returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
+
+\code{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which contains all
+information about report data. For details on the meaning of each columns,
+please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output
+Details and Examples" documentation.
+
+\code{$report_data()} extracts the report data in a \code{\link[data.table:data.table]{data.table::data.table()}}
+using key values, variable names and other specifications. \code{$report_data()}
+can also directly take all or subset output from \code{$report_data_dict()} as
+input, and extract all data specified. The returned column numbers varies
+depending on \code{all} argument.
+\itemize{
+\item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
+\itemize{
+\item \code{case}: Simulation case specified using \code{case} argument
+\item \code{datetime}: The date time of simulation result
+\item \code{key_value}: Key name of the data
+\item \code{name}: Actual report data name
+\item \code{units}: The data units
+\item \code{value}: The data value
+}
+\item \code{all} is \code{TRUE}, besides columns described above, extra columns are also
+included:
+\itemize{
+\item \code{month}: The month of reported date time
+\item \code{day}: The day of month of reported date time
+\item \code{hour}: The hour of reported date time
+\item \code{minute}: The minute of reported date time
+\item \code{dst}: Daylight saving time indicator. Possible values: \code{0} and \code{1}
+\item \code{interval}: Length of reporting interval
+\item \code{simulation_days}: Day of simulation
+\item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
+\item \code{environment_name}: A text string identifying the environment
+\item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
+\code{1}
+\item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
+and \code{Avg}
+\item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \code{HVAC System}
+\item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
+\code{HVAC System Timestep}, \code{Zone Timestep}.
+\item \code{schedule_name}: Name of the the schedule that controls reporting
+frequency.
+}
+}
+
+With the \code{datetime} column, it is quite straightforward to apply time-series
+analysis on the simulation output. However, another painful thing is that
+every simulation run period has its own \code{Day of Week for Start Day}. Randomly
+setting the \code{year} may result in a date time series that does not have
+the same start day of week as specified in the RunPeriod objects.
+
+eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
+which is the default behavior, eplusr will calculate a year value (from
+current year backwards) for each run period that compliance with the start
+day of week restriction.
+
+\code{$tabular_data()} extracts the tabular data in a \code{\link[data.table:data.table]{data.table::data.table()}}
+using report, table, column and row name specifications. The returned
+\code{\link[data.table:data.table]{data.table::data.table()}} has 8 columns:
+\itemize{
+\item \code{index}: Tabular data index
+\item \code{report_name}: The name of the report that the record belongs to
+\item \code{report_for}: The \code{For} text that is associated with the record
+\item \code{table_name}: The name of the table that the record belongs to
+\item \code{column_name}: The name of the column that the record belongs to
+\item \code{row_name}: The name of the row that the record belongs to
+\item \code{units}: The units of the record
+\item \code{value}: The value of the record \strong{in string format}
+}
+
+\strong{Arguments}
+\itemize{
+\item \code{key_value}: A character vector to identify key values of the data. If
+\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
+data.frame that contains \code{key_value} and \code{name} columns. In this case,
+\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
+for current simulation output can be obtained using \code{$report_data_dict()}.
+Default: \code{NULL}.
+\item \code{name}: A character vector to identify names of the data. If
+\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
+data.frame, \code{name} is ignored. All available \code{name} for current simulation
+output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
+\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
+will calcualte a year value that meets the start day of week restriction
+for each environment. Default: \code{NULL}.
+\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
 \item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the SQL file will be used.
+of this simulation. If \code{"auto"}, the name of the IDF file without extension
+is used.
+\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
+\code{\link[data.table:data.table]{data.table::data.table()}}.
+\item \code{period}: A Date or POSIXt vector used to specify which time period to
+return. The year value does not matter and only month, day, hour and
+minute value will be used when subsetting. If \code{NULL}, all time period of
+data is returned. Default: \code{NULL}.
+\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
+hour, minute subsetting of \code{datetime} column when querying on the SQL
+database. If \code{NULL}, no subsetting is performed on those components. All
+possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
+\code{$read_table("Time")}.  Default: \code{NULL}.
+\item \code{interval}: An integer vector used to specify which interval length of
+report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
+\item \code{simulation_days}: An integer vector to specify which simulation day data
+to extract. Note that this number resets after warmup and at the beginning
+of an environment period. All possible \code{simulation_days} can be obtained
+using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
+Default: \code{NULL}.
+\item \code{day_type}: A character vector to specify which day type of data to
+extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
+\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
+\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
+possible values for current simulation output can be obtained using
+\code{$read_table("Time")}.
+\item \code{environment_name}: A character vector to specify which environment data to
+extract. All possible \code{environment_name} for current simulation output can
+be obtained using \code{$read_table("EnvironmentPeriods"). }If \code{NULL}, all
+environment data are returned. Default: \code{NULL}.
+\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
+Each is a character vector for subsetting when querying the SQL database.
+For the meaning of each argument, please see the description above.
+}
+}
+
+\section{Print}{
+\preformatted{epsql$print()
+print(epsql)
+}
+
+\code{$print()} shows the core information of this \code{EplusSql} object, including
+the path of the EnergyPlus SQLite file, last modified time of the SQLite file
+and the path of the IDF file with the same name in the same folder.
+
+\strong{Arguments}
+\itemize{
+\item \code{epsql}: An \code{EplusSQL} object.
 }
 }
 
@@ -95,11 +241,14 @@ if (is_avail_eplus(8.8)) {
     # get sql file path
     sql$path()
 
+    # get the parent IDF file path
+    sql$path_idf()
+
     # list all tables in the sql file
     sql$list_table()
 
     # read a specific table
-    sql$read_table("Zones")
+    sql$read_read("Zones")
 
     # read report data dictionary
     sql$report_data_dict()

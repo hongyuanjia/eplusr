@@ -59,7 +59,7 @@ parse_weather_geojson <- function () {
     # get country codes
     codes <- read_countrycode()
 
-    m <- codes[m, on = .(iso_codes = country_code)]
+    m <- codes[m, on = list(iso_codes = country_code)]
 
     m[country == "China",
         `:=`(
@@ -68,7 +68,7 @@ parse_weather_geojson <- function () {
         )
     ]
 
-    m[, .(title, location, state_province, country, wmo_region, wmo_number,
+    m[, list(title, location, state_province, country, wmo_region, wmo_number,
         source_type, longitude, latitude, epw_url, ddy_url)]
 }
 # }}}

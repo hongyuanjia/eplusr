@@ -20,57 +20,53 @@ Table"} in EnergyPlus \emph{"Output Details and Examples"} documentation.
 \section{NOTE}{
 
 
-When using \code{$run()} in \link{Idf} class, which internally creates an
-\code{EplusJob} object and calls its \code{$run()} method, an object in
-\code{Output:SQLite} with \code{Option Type} value of \code{SimpleAndTabular} will be
-automatically created if it does not exists.
+When using \code{$run()} in \link{Idf} class, which internally creates an \code{EplusJob}
+object and calls its \code{$run()} method, an object in \code{Output:SQLite} with
+\code{Option Type} value of \code{SimpleAndTabular} will be automatically created if it
+does not exists.
 
 However, when creating an \code{EplusJob} using \code{\link[=eplus_job]{eplus_job()}}, the IDF file is not
 parsed but directly pass its path to EnergyPlus. Thus, that process of
-handling \code{Output:SQLite} class is not performed. If you want to ensure
-that the output collection functionality in \code{EplusJob} class works
-successfully, it is recommended to first read that IDF file using
-\code{\link[=read_idf]{read_idf()}} and then use \code{$run()} method in \link{Idf} class by doing
-\code{idf$run()}.
+handling \code{Output:SQLite} class is not performed. If you want to ensure that
+the output collection functionality in \code{EplusJob} class works successfully,
+it is recommended to first read that IDF file using \code{\link[=read_idf]{read_idf()}} and then use
+\code{$run()} method in \link{Idf} class by doing \code{idf$run()}.
 }
 
 \section{Usage}{
-\preformatted{job$run(wait = TRUE)
+\preformatted{job <- eplus_job(idf, epw)
+job$path(type = c("all", "idf", "epw"))
+job$run(wait = TRUE)
 job$kill()
 job$status()
 job$errors(info = FALSE)
 job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
+job$list_table()
+job$read_table(name)
 job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-job$tabular_data()
-job$clone(deep = FALSE)
+job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
+                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
+job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
 job$print()
 }
 }
 
-\section{Create}{
-\preformatted{job <- eplus_job(idf, epw)
-}
-
-\strong{Arguments}
-\itemize{
-\item \code{idf}: Path to an local EnergyPlus IDF file or an \code{Idf} object.
-\item \code{epw}: Path to an local EnergyPlus EPW file or an \code{Epw} object.
-}
-}
-
 \section{Basic info}{
-\preformatted{job$path(type = c("all", "idf", "epw"))
+\preformatted{job <- eplus_job(idf, epw)
+job$path(type = c("all", "idf", "epw"))
 }
 
 \code{$path()} returns the path of IDF or EPW of current job.
 
 \strong{Arguments}
 \itemize{
-\item \code{type}: If \code{"all"}, both the IDF path and EPW path are returned. If
-\code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is
-returned.  Default: \code{"all"}.
+\item \code{idf}: Path to an local EnergyPlus IDF file or an \link{Idf} object.
+\item \code{epw}: Path to an local EnergyPlus EPW file or an \link{Epw} object.
+\item \code{type}: If \code{"all"}, both the \link{Idf} path and \link{Epw} path are returned. If
+\code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is returned.
+Default: \code{"all"}.
 }
 }
 
@@ -78,16 +74,18 @@ returned.  Default: \code{"all"}.
 \preformatted{job$run(wait = TRUE)
 job$kill()
 job$status()
+job$errors(info = FALSE)
 }
 
-\code{$run()} runs the simulation using input model and weather file.
-If \code{wait} is FALSE, then the job will be run in the background. You can
-get updated job status by just print the EplusJob object.
+\code{$run()} runs the simulation using input IDF and EPW file. If \code{wait}
+is \code{FALSE}, the job is run in the background. You can get updated job
+status by just printing the \code{EplusJob} object.
 
-\code{$kill()} kills the background EnergyPlus process if possible. It only
-works when simulation runs in non-waiting mode.
+\code{$kill()} kills the background EnergyPlus process if possible. It only works
+when simulation runs in non-waiting mode.
 
-\code{$status()} returns a named list of values indicates the status of the job:
+\code{$status()} returns a named list of values that indicates the status of the
+job:
 \itemize{
 \item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
 \item \code{alive}: \code{TRUE} if the simulation is still running in the background.
@@ -100,21 +98,30 @@ otherwise. \code{NA} if the job has not been run yet.
 simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 }
 
+$errors() returns an \link[=read_err]{ErrFile} object which contains all contents
+of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only warnings
+and errors are printed.
+
 \strong{Arguments}
 \itemize{
 \item \code{wait}: If \code{TRUE}, R will hang on and wait for the simulation to complete.
-EnergyPlus standard output (stdout) and error (stderr) is printed to the
+EnergyPlus standard output (stdout) and error (stderr) is printed to
 R console. If \code{FALSE}, simulation will be run in a background process.
 Default: \code{TRUE}.
+\item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
 }
 }
 
-\section{Results Extraction}{
+\section{Simulation Output Extraction}{
 \preformatted{job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
+job$list_table()
+job$read_table(table)
 job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "GMT", case = "auto")
-job$tabular_data()
+job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",case = "auto", all = FALSE,
+                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
+job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
 }
 
 \code{$output_dir()} returns the output directory of simulation results.
@@ -122,49 +129,136 @@ job$tabular_data()
 \code{$locate_output()} returns the path of a single output file specified by file
 suffix.
 
-\code{$report_data_dict()} returns a data.table which contains all information about
-report data. For details on the meaning of each columns, please see
-"2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output Details and
-Examples" documentation.
+\code{$list_table()} returns all available table and view names in the SQLite file.
 
-\code{$report_data()} extracts the report data in a data.table using key values
-and variable names.
+\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
+returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
 
-\code{$tabular_data()} extracts all tabular data in a data.table.
+\code{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which contains all
+information about report data. For details on the meaning of each columns,
+please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output
+Details and Examples" documentation.
 
-\strong{Arguments}:
+\code{$report_data()} extracts the report data in a \code{\link[data.table:data.table]{data.table::data.table()}}
+using key values, variable names and other specifications. \code{$report_data()}
+can also directly take all or subset output from \code{$report_data_dict()} as
+input, and extract all data specified. The returned column numbers varies
+depending on \code{all} argument.
 \itemize{
-\item \code{open}: If \code{TRUE}, the output directory will be opened. It may only work
-well on Windows.
-\item \code{suffix}: A string that indicates the file suffix of simulation output.
-Default: \code{".err"}.
-\item \code{strict}: If \code{TRUE}, it will check if the simulation was terminated, is
-still running or the file exists or not. Default: \code{TRUE}.
-\item \code{key_value}: A character vector to identify key name of the data. If
-\code{NULL}, all keys of that variable will be returned. Default: \code{NULL}.
-\item \code{name}: A character vector to specify the actual data name. If \code{NULL}, all
-variables will be returned. Default: \code{NULL}.
-\item \code{year}: The year of the date and time in column \code{DateTime}. If \code{NULL}, it
-will be the current year. Default: \code{NULL}
-\item \code{tz}: Time zone of date and time in column \code{DateTime}. Default: \code{"GMT"}.
-\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the IDF file will be used.
+\item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
+\itemize{
+\item \code{case}: Simulation case specified using \code{case} argument
+\item \code{datetime}: The date time of simulation result
+\item \code{key_value}: Key name of the data
+\item \code{name}: Actual report data name
+\item \code{units}: The data units
+\item \code{value}: The data value
+}
+\item \code{all} is \code{TRUE}, besides columns described above, extra columns are also
+included:
+\itemize{
+\item \code{month}: The month of reported date time
+\item \code{day}: The day of month of reported date time
+\item \code{hour}: The hour of reported date time
+\item \code{minute}: The minute of reported date time
+\item \code{dst}: Daylight saving time indicator. Possible values: \code{0} and \code{1}
+\item \code{interval}: Length of reporting interval
+\item \code{simulation_days}: Day of simulation
+\item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
+\item \code{environment_name}: A text string identifying the environment
+\item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
+\code{1}
+\item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
+and \code{Avg}
+\item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \code{HVAC System}
+\item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
+\code{HVAC System Timestep}, \code{Zone Timestep}.
+\item \code{schedule_name}: Name of the the schedule that controls reporting
+frequency.
 }
 }
 
-\section{Clone}{
-\preformatted{job$clone(deep = FALSE)
-}
+With the \code{datetime} column, it is quite straightforward to apply time-series
+analysis on the simulation output. However, another painful thing is that
+every simulation run period has its own \code{Day of Week for Start Day}. Randomly
+setting the \code{year} may result in a date time series that does not have
+the same start day of week as specified in the RunPeriod objects.
 
-\code{$clone()} copies and returns the cloned job. Because \code{EplusJob} uses
-\code{R6Class} under the hook which has "modify-in-place" semantics, \code{job_2 <- job_1} does not copy \code{job_1} at all but only create a new binding to
-\code{job_1}.  Modify \code{job_1} will also affect \code{job_2} as well, as these two
-are exactly the same thing underneath. In order to create a complete
-cloned copy, please use \code{$clone(deep = TRUE)}.
+eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
+which is the default behavior, eplusr will calculate a year value (from
+current year backwards) for each run period that compliance with the start
+day of week restriction.
+
+\code{$tabular_data()} extracts the tabular data in a \code{\link[data.table:data.table]{data.table::data.table()}}
+using report, table, column and row name specifications. The returned
+\code{\link[data.table:data.table]{data.table::data.table()}} has 8 columns:
+\itemize{
+\item \code{index}: Tabular data index
+\item \code{report_name}: The name of the report that the record belongs to
+\item \code{report_for}: The \code{For} text that is associated with the record
+\item \code{table_name}: The name of the table that the record belongs to
+\item \code{column_name}: The name of the column that the record belongs to
+\item \code{row_name}: The name of the row that the record belongs to
+\item \code{units}: The units of the record
+\item \code{value}: The value of the record \strong{in string format}
+}
 
 \strong{Arguments}
 \itemize{
-\item \code{deep}: Has to be \code{TRUE} if a complete cloned copy is desired.
+\item \code{open}: If \code{TRUE}, the output directory will be opened.
+\item \code{suffix}: A string that indicates the file extension of simulation output.
+Default: \code{".err"}.
+\item \code{strict}: If \code{TRUE}, it will check if the simulation was terminated, is
+still running or the file exists or not. Default: \code{TRUE}.
+\item \code{key_value}: A character vector to identify key values of the data. If
+\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
+data.frame that contains \code{key_value} and \code{name} columns. In this case,
+\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
+for current simulation output can be obtained using \code{$report_data_dict()}.
+Default: \code{NULL}.
+\item \code{name}: A character vector to identify names of the data. If
+\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
+data.frame, \code{name} is ignored. All available \code{name} for current simulation
+output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
+\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
+will calcualte a year value that meets the start day of week restriction
+for each environment. Default: \code{NULL}.
+\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
+\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
+of this simulation. If \code{"auto"}, the name of the IDF file without extension
+is used.
+\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
+\code{\link[data.table:data.table]{data.table::data.table()}}.
+\item \code{period}: A Date or POSIXt vector used to specify which time period to
+return. The year value does not matter and only month, day, hour and
+minute value will be used when subsetting. If \code{NULL}, all time period of
+data is returned. Default: \code{NULL}.
+\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
+hour, minute subsetting of \code{datetime} column when querying on the SQL
+database. If \code{NULL}, no subsetting is performed on those components. All
+possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
+\code{$read_table("Time")}.  Default: \code{NULL}.
+\item \code{interval}: An integer vector used to specify which interval length of
+report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
+\item \code{simulation_days}: An integer vector to specify which simulation day data
+to extract. Note that this number resets after warmup and at the beginning
+of an environment period. All possible \code{simulation_days} can be obtained
+using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
+Default: \code{NULL}.
+\item \code{day_type}: A character vector to specify which day type of data to
+extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
+\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
+\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
+possible values for current simulation output can be obtained using
+\code{$read_table("Time")}.
+\item \code{environment_name}: A character vector to specify which environment data to
+extract. All possible \code{environment_name} for current simulation output can
+be obtained using \code{$read_table("EnvironmentPeriods"). }If \code{NULL}, all
+environment data are returned. Default: \code{NULL}.
+\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
+Each is a character vector for subsetting when querying the SQL database.
+For the meaning of each argument, please see the description above.
 }
 }
 
@@ -173,9 +267,9 @@ cloned copy, please use \code{$clone(deep = TRUE)}.
 print(job)
 }
 
-\code{$print()} shows the core information of this EplusJob, including the
-path of model and weather, the version and path of EnergyPlus used
-to run simulations, and the simulation job status.
+\code{$print()} shows the core information of this \code{EplusJob} object, including
+the path of model and weather, the version and path of EnergyPlus used to run
+simulations, and the simulation job status.
 
 \code{$print()} is quite useful to get the simulation status, especially when
 \code{wait} is \code{FALSE} in \code{$run()}. The job status will be updated and printed
@@ -251,7 +345,7 @@ if (is_avail_eplus(8.8)) {
     # extract some report variable
     str(job$report_data(name = "EnergyTransfer:Building", case = NULL))
 
-    # add a "Case" column in the returned data.table
+    # add a "case" column in the returned data.table
     str(job$report_data(name = "EnergyTransfer:Building", case = "Test"))
 
     # change the format of datetime column in the returned data.table

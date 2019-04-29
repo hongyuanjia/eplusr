@@ -8,16 +8,16 @@ read_idf(path, idd = NULL)
 }
 \arguments{
 \item{path}{Either a path, a connection, or literal data (either a single
-string or a raw vector) to an EnergyPlus Input Data File (IDF), usually
-has a extension \code{.idf}.}
+string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
+path, that file usually has a extension \code{.idf}.}
 
 \item{idd}{Any acceptable input of \code{\link[=use_idd]{use_idd()}}. If \code{NULL}, which is the
-default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input
-IDF does not have a version field (possible for ".ddy" files), then it
-will be parsed using the latest version of IDD cached, with a warning.}
+default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input is an
+\code{.ddy} file which does not have a version field, the latest version of \link{Idf}
+cached will be used.}
 }
 \value{
-An \code{Idf} object.
+An \link{Idf} object.
 }
 \description{
 \code{read_idf} takes an EnergyPlus Input Data File (IDF) as input and returns an

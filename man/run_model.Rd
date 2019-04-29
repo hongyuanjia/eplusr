@@ -99,7 +99,7 @@ For \code{run_multi()}, if \code{wait} is \code{TRUE}, a
 \itemize{
 \item \code{"completed"}: the simulation job is completed. This only indicates
 that the calling of EnergyPlus was successfully and EnergyPlus was
-not terminated during simulation. Even \code{"completed" is}TRUE\code{, the job can still end with error. Please check}exit_status` to
+not terminated during simulation. Even \code{"completed" is }TRUE\code{, the job can still end with error.  Please check }exit_status` to
 determine whether EnergyPlus ran successfully
 \item \code{"terminated"}: the simulation job started but was terminated
 \item \code{"cancelled"}: the simulation job was cancelled, i.e. did not start

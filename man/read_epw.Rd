@@ -4,18 +4,22 @@
 \alias{read_epw}
 \title{Read and Parse EnergyPlus Weather File (EPW)}
 \usage{
-read_epw(path)
+read_epw(path, warning = FALSE)
 }
 \arguments{
 \item{path}{A path of an EnergyPlus \code{EPW} file.}
+
+\item{warning}{If \code{TRUE}, warnings are given if any missing data, out of
+range data and redundant data is found. Default: \code{FALSE}. All these data can
+be also retrieved using methods in \link{Epw} class.}
 }
 \value{
 An \code{Epw} object.
 }
 \description{
 \code{read_epw()} parses an EPW file and returns an \code{Epw} object. The parsing
-process is extreme inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/classopenstudio_1_1_epw_file.html}{OpenStudio utilities library}
-with some simplifications. For more details on \code{Epw}, please see \link{Epw} class.
+process is extremely inspired by [EnergyPlus/WeatherManager.cc] with some
+simplifications. For more details on \code{Epw}, please see \link{Epw} class.
 }
 \examples{
 # read an EPW file from EnergyPlus v8.8 installation folder

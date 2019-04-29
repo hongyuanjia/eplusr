@@ -3,145 +3,250 @@
 \docType{class}
 \name{IdfObject}
 \alias{IdfObject}
-\title{EnergyPlus IDF object}
+\title{Create and Modify an EnergyPlus Object}
 \description{
-\code{IdfObject} is an abstraction of a single object in an \code{Idf}. It provides
-more detail methods to modify objects. \code{IdfObject} can only be created from
-the parent \code{Idf} object, using \code{$object}, \code{$object_in_class()} and
-\code{$search_object()} or equivalent. This is because that initialization of an
-\code{IdfObject} needs some shared data from parent \code{Idf} object.
+\code{IdfObject} is an abstraction of a single object in an \link{Idf}. It provides
+more detail methods to modify object values and comments. An \code{IdfObject}
+object can be created using function \code{\link[=idf_object]{idf_object()}} or from methods of a
+parent \link{Idf} object, using \code{$object()}, \code{$objects_in_class()} and equivalent.
 }
 \section{Usage}{
 
 \preformatted{
+idfobj <- model$object(which)
+idfobj <- idf_object(model, which, class = NULL)
+idfobj$version()
 idfobj$id()
 idfobj$name()
 idfobj$definition()
-idfobj$get_comment()
-idfobj$set_comment(comment, append = TRUE, width = 0L)
-idfobj$get_value(which = NULL, all = NULL, simplify = FALSE)
-idfobj$set_value(..., defaults = TRUE)
+idfobj$comment(comment, append = TRUE, width = 0L)
+idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
+idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 idfobj$FieldName
 idfobj[[Field]]
+idfobj$set(..., .defaults = TRUE)
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
-idfobj$possible_value(which = NULL)
-idfobj$validate()
-idfobj$is_valid()
-idfobj$ref_from_object()
-idfobj$ref_by_object()
-idfobj$has_ref_by()
-idfobj$has_ref_from()
-idfobj$has_ref()
-idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
-idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-idfobj$print(comment = TRUE, auto_sep = FALSE)
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
+idfobj$ref_to_object(which = NULL, class = NULL)
+idfobj$ref_by_object(which = NULL, class = NULL)
+idfobj$has_ref_to(which = NULL, class = NULL)
+idfobj$has_ref_by(which = NULL, class = NULL)
+idfobj$has_ref(which)
+idfobj$validate(level = eplusr_option("validate_level"))
+idfobj$is_valid(level = eplusr_option("validate_level"))
+idfobj$to_table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE)
+idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
+idfobj$print(comment = TRUE, auto_sep = FALSE, brief = FALSE)
 print(iddobj)
 }
 }
 
 \section{Basic Info}{
-\preformatted{idfobj$id()
+\preformatted{idfobj <- model$object(which)
+idfobj <- idf_object(model, which, class = NULL)
+idfobj$version()
+idfobj$id()
 idfobj$name()
 idfobj$group_name()
 idfobj$class_name()
 }
 
-\code{$id()} returns the object ID.
+\code{$version()} returns the version of parent \link{Idf} object in a
+\code{\link[base:numeric_version]{base::numeric_version()}} format.
 
-\code{$name()} returns the object name. If the class does not have name
-attribute, then \code{NA} will returned.
+\code{$id()} returns current \code{IdfObject} ID.
 
-\code{$group_name()} returns the group name of this object belongs to.
+\code{$name()} returns current \code{IdfObject} name. If the class does not have name
+attribute, \code{NA} is returned.
 
-\code{$class_name()} returns the class name of this object belongs to.
+\code{$group_name()} returns the group name of current \link{IdfObject} belongs to.
+
+\code{$class_name()} returns the class name of current \link{IdfObject} belongs to.
+
+\strong{Arguments}:
+\itemize{
+\item \code{model}: An \link{Idf} object.
+\item \code{class}: A single string of valid class name.
+\item \code{which}: A valid object ID (an integer) or name (a string).
+}
 }
 
 \section{Definition}{
 \preformatted{idfobj$definition()
 }
 
-\code{$definition()} returns the definition, i.e. the \code{IddObject}, of current
-class. For details of \code{IddObject}, please see \link{IddObject} class.
+\code{$definition()} returns an \link{IddObject} of current class. \link{IddObject} contains
+all data used for parsing and creating an \link{IdfObject}. For details, please
+see \link{IddObject} class.
 }
 
-\section{Comment}{
-\preformatted{idfobj$get_comment()
-idfobj$set_comment(comment, append = TRUE, width = 0L)
+\section{Getting and Setting Comments}{
+\preformatted{idfobj$comment(comment, append = TRUE, width = 0L)
 }
 
-\code{$get_comment()} returns the comments of current object.
-
-\code{$set_comment()} sets comments of current object.
+\code{$comment()} returns current \code{IdfObject} comment if \code{comment} is not given,
+or modifies current \code{IdfObject} comment if \code{comment} is given.
 
 \strong{Arguments}
 \itemize{
-\item \code{comment}: A character vector. If \code{NULL}, all comments will be deleted.
-\item \code{append}: If \code{TRUE}, comment will be appended to existing comments. If
-\code{FALSE}, comment will be prepended to existing currents. If \code{NULL},
-existing comments will be deleted before adding new comments. Default:
-\code{FALSE}.
-\item \code{width}: An integer of character number to indicate where to break long
-comment lines. If \code{0}, no breaking will be made. Default: \code{0}.
+\item \code{comment}: A character vector.
+\itemize{
+\item If missing, current comments are returned. If there is no comment in
+current \code{IdfObject}, \code{NULL} is returned.
+\item If \code{NULL}, all comments in current \code{IdfObject} is deleted.
+\item If a character vector, it is inserted as comments depending on the
+\code{append} value.
+}
+\item \code{append}: Only applicable when \code{commment} is a character vector. Default: \code{FALSE}.
+\itemize{
+\item If \code{NULL}, existing comments is deleted before adding \code{comment}.
+\item If \code{TRUE}, comment will be appended to existing comments.
+\item If \code{FALSE}, \code{comment} is prepended to existing currents.
+}
+\item \code{width}: A positive integer giving the target width for wrapping inserted
+\code{comment}.
 }
 }
 
-\section{Value}{
+\section{Get Field Values}{
 
 \preformatted{
-idfobj$get_value(which = NULL, all = FALSE, simplify = FALSE)
-idfobj$set_value(..., default = TRUE)
+idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
+idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 idfobj$FieldName
 idfobj[[Field]]
-idfobj$FieldName <- Value
-idfobj[[Field]] <- Value
-idfobj$possible_value(which = NULL)
 }
 
-\code{$get_value()} returns a named list containing values of specified fields.
-If simplify is \code{FALSE}, then all values will be converted into character
-and the converted character vector will be returned. Note that the field
-names will be converted into valid R names, i.e. all characters other
-than letters and numbers will be replaced by underscore \code{"_"}
-("underscore-style").
+\code{$value()} takes an integer vector of valid field indexes or a character
+vector of valid field names, and returns a named list containing values of
+specified fields when \code{simplify} is \code{FALSE} and a character vector when
+\code{simplify} is \code{TRUE}.
 
-\code{$set_value()} sets values of current object. Field values should be given in
-following either pattern below:
+eplusr also provides custom S3 method of \code{$} and \code{[[} which make
+it more convenient to get a single value of current \code{IdfObject}. Basically,
+\code{idfobj$FieldName} and \code{idfobj[[Field]]} is equivalent to
+\code{idfobj$value(FieldName)[[1]]} and \code{idfobj$value(Field)[[1]]}.
+
+\code{$possible_value()} takes an integer vector of valid field indexes or a character
+vector of valid field names, and returns all possible values for specified
+fields. For a specific field, there are 5 types of possible values:
 \itemize{
-\item directly list all field values with no name. The values will be assigned to
-fields according to the appearance order
-\item give both field names \emph{without units} and values in pair, e.g. \code{Name = "Test", `Begin Month` = 1}. You can find all valid field names using
-\code{$definition()$field_name()}. Field names can also be given in
-underscore-style, e.g. \code{Name = "Test", begin_month = 1} (NOTE: matching is
-case-insensitive).
+\item \code{auto}: Whether the field can be filled with \code{Autosize} and
+\code{Autocalculate}. This field attribute can also be retrieved using
+\code{idfobj$definition()$is_autosizable()} and
+\code{idfobj$definition()$is_autosizable()}.
+\item \code{default}: The default value. This value can also be retrieved using
+\code{idfobj$defintion()$field_default()}.
+\item \code{choice}: The choices which the field can be set. This value can also be
+retrieved using \code{idfobj$definition()$field_choice()}.
+\item \code{range}: The range which the field value should fall in. This range can
+also be retrieved using \code{idfobj$definition()$field_range()}.
+\item \code{source}: All values from other objects that current field can refer to.
 }
 
-eplusr also provides custom S3 method of \code{$}, \code{[[} and also \code{$<-} and
-\code{[[<-} to make it more convenient to get and set a single value of an
-\code{IdfObject}. Basically, \code{idfobj$FieldName} and \code{idfobj[[Field} is equivalent to \code{idfobj$get_value(Field)[[1]]};
-\code{idfobj$FieldName <- Value} and \code{idfobj[[Field]] <- Value} is equivalent
-to \code{idfobj$set_value(Field = Value)},  where \code{FieldName} is a single valid
-field name and \code{Field} is a single valid field index or name.
-
-\code{$possible_value()} return all possible values for specified fields,
-including auto-value (\code{autosize} and \code{autocalculate}), default value,
-value range, choices and references. Underneath, it returns a data.table
-with custom printing method. It is basically the same as
-\code{$field_possible()} in \link{IddObject} class.
+\code{$value_possible()} returns an \code{IdfValuePossible} object which is a
+\code{\link[data.table:data.table]{data.table::data.table()}} with at most 15 columns:
+\itemize{
+\item \code{class_id}: index of class that current \code{IdfObject} belongs to
+\item \code{class_name}: name of class that current \code{IdfObject} belongs to
+\item \code{object_id}: ID of current \code{IdfObject}
+\item \code{object_name}: name of current \code{IdfObject}
+\item \code{field_id}: indexes (at Idd level) of object fields specified
+\item \code{field_index}: indexes of object fields specified
+\item \code{field_name}: names (without units) of object fields specified
+\item \code{value_id}: value indexes (at Idf level) of object fields specified
+\item \code{value_chr}: values (converted to characters) of object fields specified
+\item \code{value_num}: values (converted to numbers in SI units) of object fields
+specified.
+\item \code{auto}: Exists only when \code{"auto"} is one of \code{type}. Character type.
+Possible values are: \code{"Autosize"}, \code{"Autocalculate"} and \code{NA} (if current
+field is neither \code{autosizable} nor \code{autocalculatable}).
+\item \code{default}: Exists only when \code{"default"} is one of \code{type}. List type. The
+default value of current field. The value is converted into number if
+corresponding field type yells so. Note that if current field is a numeric
+field but the default value is \code{"Autosize"} or \code{"Autocalculate"}, it is
+left as it is, leaving the returned type being a string instead of a
+number.
+\item \code{range}: Exists only when \code{"range"} is one of \code{type}. List type. The range
+that field value should fall in. Every range has four components: \code{minimum}
+(lower limit), \code{lower_incbounds} (\code{TRUE} if the lower limit should be
+included), \code{maximum} (upper limit), and \code{upper_incbounds} (\code{TRUE} if the
+upper limit should be included). For fields of character type, empty lists
+are returned. For fields of numeric types with no specified ranges,
+\code{minimum} is set to \code{-Inf}, \code{lower_incbounds} is set to FALSE, \code{upper} is
+set to \code{Inf}, and \code{upper_incbounds} is set to FALSE. The field range is
+printed in number interval denotation.
+\item \code{source}: Exists only when \code{"source"} is one of \code{type}. List type. Each
+element is a chracter vector which includes all values from other objects
+that current field can use as sources and refers to.
+}
 
 \strong{Arguments}
 \itemize{
 \item \code{which}: An integer vector of field indexes or a character vector of field
-names. Field names can be given in "lower-style", e.g. \code{"Thermal Resistance"} can be given as \code{"thermal_resistance"}.
-\item \code{all}: If \code{TRUE}, values of all fields, including empty fields will be
-returned as well. Default: \code{FALSE}
-\item \code{simplify}: If \code{TRUE}, values of fields will be converted into characters
-and the converted character vector will be returned.
-\item \code{...}: Values to set. Field names of value can be given. If not named, the
-input values will be set to fields according to their order of
-appearance.
-\item \code{default}: If \code{TRUE}, all empty fields will be filled with their default
-values if possible.
+names.
+\item \code{all}: If \code{TRUE}, values of all possible fields in current class the
+\code{IdfObject} belongs to are retured. Default: \code{FALSE}
+\item \code{simplify}: If \code{TRUE}, values of fields are converted into characters
+and the converted character vector is returned.
+\item \code{FieldName}: A single length character vector of one valid field name where
+all characters except letters and numbers are replaced by underscores.
+\item \code{Field}: A single length character vector of one valid field name or a
+single length integer vector of one valid field index. Same as above,
+field names should be given in a style where all characters except
+letters and numbers are replaced by underscores.
+\item \code{type}: A character vector. What types of possible values should be
+returned. Should be one of or a combination of \code{"auto"}, \code{"default"},
+\code{"choice"}, \code{"range"} and \code{"source"}. Default: All of those.
+}
+}
+
+\section{Set Field Values}{
+
+\preformatted{
+idfobj$set(..., .default = TRUE)
+idfobj$FieldName <- Value
+idfobj[[Field]] <- Value
+}
+
+\code{$set()} takes new field value definitions in \code{field = value} format or in
+list format, sets new values for fields specified, and returns the modified
+\link{IdfObject}. Unlike \code{$set()} method in \link{Idf} class, the special element
+\code{.comment} is \strong{not allowed}. To modify object comments, please use
+\code{$comment()}.
+
+\strong{NOTE}:
+\itemize{
+\item You can delete a field by assigning \code{NULL} to it, e.g. \code{iddobj$set(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
+also \code{fld} is not a required field and the index of \code{fld} is larger than
+the number minimum fields required for that class, it will be deleted.
+Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
+will be filled with default value if applicable and left as blank if not.
+\item New fields that currently do not exist in that object can also be set. They
+will be automatically added on the fly.
+\item Field name matching is \strong{case-insensitive}. For convenience,
+underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
+equivalent to \code{End Month}.
+\item If not all field names are given, positions of those values without field
+names are determined after those values with names. E.g. in
+\code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
+will be treated as the value of field \code{Outside Layer} in \code{Construction}, as
+value of field \code{Name} has been given as \code{"name"}.
+}
+
+eplusr also provides custom S3 method of \code{$<-} and
+\code{[[<-} which makes it more convenient to set a single field value of an
+\code{IdfObject}. Basically, \code{idfobj$FieldName <- value} and \code{idfobj[[Field]]
+<- value} is equivalent to \code{idfobj$set(FieldName = value)} and
+\code{idfobjset(Field = value)}.
+
+\strong{Arguments}:
+\itemize{
+\item \code{...}: New field value definitions in \code{field = value} format or in
+list format \code{list(field = value)}.
+\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
+possible. Default: \code{TRUE}.
 \item \code{FieldName}: A single length character vector of one valid field name where
 all characters except letters and numbers are replaced by underscores.
 \item \code{Field}: A single length character vector of one valid field name or a
@@ -152,88 +257,151 @@ letters and numbers are replaced by underscores.
 }
 }
 
-\section{Validation}{
-\preformatted{idfobj$validate()
-idfobj$is_valid()
+\section{Field Value Relation}{
+
+\preformatted{
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
+idfobj$ref_to_object(which = NULL, class = NULL)
+idfobj$ref_by_object(which = NULL, class = NULL)
+idfobj$has_ref_to(which = NULL, class = NULL)
+idfobj$has_ref_by(which = NULL, class = NULL)
+idfobj$has_ref(which)
 }
 
-\code{$validate()} will check if there are errors in current object under different
-strictness level.
+Many fields in \link{Idd} can be referred by others. For example, the \code{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
+in \code{Material} class and other material related classes. Here it means that
+the \code{Outside Layer} field \strong{refers to} the \code{Name} field and the \code{Name} field
+is \strong{referred by} the \code{Outside Layer}.
 
-\code{$is_valid()} will check if there are no errors in current object under
-different strictness level.
+\code{$value_relation()} provides a simple interface to get this kind of
+relation. It takes field indexes or field names, together a relation
+direction, and returns an \code{IdfRelation} object which contains data presenting
+such relation above. For instance, if \code{idfobj$value_relation("Name", "ref_by")}
+gives results below:\preformatted{-- Referred by Others ------------------------
+  \- 1: "WALL-1";      !- Name
+     ^~~~~~~~~~~~~~~~~~~~~~~~~
+     \- Class: <BuildingSurface:Detailed>
+        \- Object [ID:3] <WALL-1PF>
+           \- 3: "WALL-1";      !- Construction Name
+}
 
-The strictness level can be changed using \code{\link[=eplusr_option]{eplusr_option()}}. Default is
-\code{"final".}There are three different validate levels, i.e. \code{"none"},
-\code{"draft"} and \code{"final"}:
+This means that the value \code{"WALL-1"} of field \code{Name} is referred by field
+\code{Construction Name} in a surface named \code{WALL-1PF}. All those objects can be
+futher easily extracted using \code{$ref_by_object()} method.
+
+\code{$ref_to_object()} takes an integer vector of field indexes or a character
+vector of field names, and returns a list of \code{IdfObject}s that specified
+fields refer to.
+
+\code{$ref_by_object()} takes an integer vector of field indexes or a character
+vector of field names, and returns a list of \code{IdfObject}s that refer to
+specified fields.
+
+\code{$has_ref_to()} takes an integer vector of field indexes or a character
+vector of field names, and returns a logical vector showing whether specified
+fields refer to other object values or not.
+
+\code{$has_ref_by()} takes an integer vector of field indexes or a character
+vector of field names, and returns a logical vector showing whether there are
+other object values ref to specified fields.
+
+\code{$has_ref()} takes an integer vector of field indexes or a character
+vector of field names, and returns a logical vector showing whether there are
+other object values ref to specified field values or specified field values
+refer to other object values.
+
+\strong{Arguments}:
 \itemize{
-\item For \code{"none"}, none validation will be done;
-\item For \code{"draft"}, checking of invalid autosize, autocalculate, character,
-numeric, integer, and choice field values will be done;
-\item For \code{"final"}, besides above, checking of incomplete extensible groups,
-missing required objects, duplicated unique objects, object name
-conflicts, missing required fields and invalid field value reference will
-also be done.
+\item \code{which}: An integer vector of field indexes or a character vector of field
+names.
+\item \code{class}: A character vector of class names.
+\item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
+\code{"ref_to"} or "ref_by".
+}
 }
 
-For details about the underlying structure of returned value of
-\code{$validate()}, please \code{$validate()} in \link{Idf} class.
+\section{Validation}{
+\preformatted{idfobj$validate(level = eplusr_option("validate_level"))
+idfobj$is_valid(level = eplusr_option("validate_level"))
 }
 
-\section{Cross Reference}{
-\preformatted{idfobj$ref_from_object()
-idfobj$ref_by_object()
-idfobj$has_ref_from()
-idfobj$has_ref_by()
-idfobj$has_ref()
+\code{$validate()} checks if there are errors in values in current \code{IdfObject}
+under specified validation level and returns an \code{IdfValidity} object which
+contains data of invalid field values. Different validation result examples
+are shown below:
+\itemize{
+\item No error is found:\preformatted{v No error found.
 }
 
-\code{$ref_from_object()} will return other objects that current object references
-from.
+Above result shows that there is no error found after conducting all
+validation checks in specified validation level.
+\item Errors are found:\preformatted{ x [2] Errors found during validation.
+=========================================================================
 
-\code{$ref_by_object()} will return other objects that reference current object.
+-- [2] Invalid Autocalculate Field --------------------------------------
+   Fields below cannot be `autocalculate`:
 
-\code{$has_ref_from()} and \code{$has_ref_by} will return \code{TRUE} if current object has
-referenced from other objects or has been referenced by other objects,
-respectively.
+    Class: <AirTerminal:SingleDuct:VAV:Reheat>
+    \─ Object [ID:176] <SPACE5-1 VAV Reheat>
+       +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
+       \- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
+}
+}
 
-\code{$has_ref()} will return \code{TRUE} if current object has either referenced from
-other objects or has been referenced by other objects.
+Above validation results show that after all validation components performed
+under current validation level, 2 invalid field values are found. All of them
+are in object named \code{SPACE5-1 VAV Reheat} with ID \code{176}. They are invalid
+because those two fields do not have an autocalculatable attribute but are
+given \code{AUTOCALCULATE} value. Knowing this info, one simple way to fix the
+error is to set those two fields to correct value by doing \code{idf$set(..176 = list(}Maximum Flow per Zone Floor Area During Reheat\code{= "autosize",}Maximum Flow Fraction During Reheat\code{ = "autosize" ))}
+
+\code{$is_valid()} returns \code{TRUE} if there is no error in current \code{IdfObject}
+object under specified validation level and \code{FALSE} otherwise.
+
+Underneath, an \code{IdfValidity} object which \code{$validate()} returns is a list of
+13 element. For details about the underlying structure of \code{IdfValidity},
+please \code{$validate()} in \link{Idf} class.
 }
 
 \section{Data Extraction}{
-\preformatted{idfobj$table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip = eplusr_option("view_in_ip"))
+\preformatted{idfobj$to_table(string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)
+idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
 }
 
-\code{$table()} will return a data.table that contains all data of current object.
-
-\strong{Arguments}
+\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
+current \link{IdfObject}. It has 6 columns:
 \itemize{
-\item \code{all}: If \code{TRUE}, values of all fields, including empty fields will be
-returned as well. Default: \code{FALSE}
-\item \code{unit}: If \code{TRUE}, field names with units will be returned. Default:
-\code{TRUE}.
-\item \code{wide}: If \code{TRUE}, a wide table will be returned. Default: \code{FALSE}.
-\item \code{string_value}: If \code{TRUE}, all field values will be returned as character.
-Default: \code{TRUE}
-\item \code{in_ip}: If \code{TRUE}, IP units and values will be returned. Default: the
-value of \code{eplusr_option("view_in_ip")}.
-}
+\item \code{id}: Integer type. Object IDs.
+\item \code{name}: Character type. Object names.
+\item \code{class}: Character type. Current class name.
+\item \code{index}: Integer type. Field indexes.
+\item \code{field}: Character type. Field names.
+\item \code{value}: Character type if \code{string_value} is \code{TRUE} or list type if
+\code{string_value} is \code{FALSE.} Field values.
 }
 
-\section{Formatting}{
-\preformatted{idfobj$string(comment = TRUE, leading = 4L, sep_at = 29L)
-}
+\code{$to_string()} returns the text format of an \code{IdfObject}.
 
-\code{$string()} will return the text format of current object.
-
-\strong{Arguments}
+\strong{Arguments}:
 \itemize{
-\item \code{comment}: If \code{FALSE}, all comments will not be included.
-\item \code{leading}: An integer to indicate the number of spaces before each fields.
-Default: \code{4}.
-\item \code{sep_at}: An integer to indicate the character width where to separate
-values and field names.  Default: \code{29}.
+\item \code{string_value}: If \code{TRUE}, all field values are returned as character. If
+\code{FALSE}, \code{value} column in returned \code{\link[data.table:data.table]{data.table::data.table()}} is a list
+column with each value stored as corresponding type. Note that if the value
+of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it is left as
+it is, leaving the returned type being a string instead of a number.
+Default: \code{TRUE}.
+\item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
+of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
+applicable. Default: \code{FALSE}.
+\item \code{wide}: If \code{TRUE}, a wide table will be returned, i.e. first three column
+are always \code{id}, \code{name} and \code{class}, and then every field in a separate
+column. Default: \code{FALSE}.
+\item \code{comment}: If \code{FALSE}, all comments will not be included. Default: \code{TRUE}.
+\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
+\item \code{sep_at}: The character width to separate value string and field string.
+Default: \code{29L} which is the same as IDF Editor.
+\item \code{all}: If \code{TRUE}, values of all possible fields in current class the
+\code{IdfObject} belongs to are retured. Default: \code{FALSE}
 }
 }
 
@@ -242,19 +410,21 @@ values and field names.  Default: \code{29}.
 print(idfobj)
 }
 
-\code{$print()} prints the IdfObject. Basically, the print output can be divided
-into three parts:\preformatted{* OBJECT: object id and name (if applicable) and IDD class name of
-* COMMENTS: object comments
-* VALUES: fields and values of current IDD class. Required fields are
-  marked with bullet marks. Only the minimum fields are printed. E.g.,
-  the last printed field is either the last required field or the last
-  non-empty field.
+\code{$print()} prints the \code{IdfObject}. Basically, the print output can be divided
+into 3 parts:
+\itemize{
+\item OBJECT: Class name, object id and name (if applicable).
+\item COMMENTS: Object comments if exist.
+\item VALUES: fields and values of current \code{IdfObject}. Required fields are marked
+with start \code{*}. String values are quoted. Numeric values are printed as
+they are. Blank string values are printed as \code{<"Blank">} and blank number
+values are printed as \code{<Blank>}.
 }
 
 \strong{Arguments}
 \itemize{
-\item \code{comment}: If \code{FALSE}, all comments will not be included.
-\item \code{auto_sep}: If \code{TRUE}, values and field names will be separate at the
+\item \code{comment}: If \code{FALSE}, all comments are not included.
+\item \code{auto_sep}: If \code{TRUE}, values and field names are separated at the
 largest character length of values. Default: \code{FALSE}.
 }
 }
@@ -265,7 +435,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
     idd = use_idd(8.8, download = "auto"))
 
 # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
-mat <- idf$Material$C5_4_IN_HW_CONCRETE
+mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
 
 # get object ID
 mat$id()
@@ -275,51 +445,51 @@ mat$name()
 
 # NA will be returned if the class does not have name attribute. For example,
 # "Version" class
-idf$Version[[1]]$name()
+idf$Version$name()
 
 # get underlying IddObject of current class
 mat$definition()
 
 # get object comments
-mat$get_comment()
+mat$comment()
 
 # add new object comments
-mat$set_comment(c("This is a material named `WD01`", "This object has an ID of 47"))
-mat$get_comment()
+mat$comment(c("This is a material named `WD01`", "This object has an ID of 47"))
+mat$comment()
 
 # append new comments
-mat$set_comment("This is an appended comment")
-mat$get_comment()
+mat$comment("This is an appended comment")
+mat$comment()
 
 # prepend new comments
-mat$set_comment("This is a prepended comment", append = FALSE)
-mat$get_comment()
+mat$comment("This is a prepended comment", append = FALSE)
+mat$comment()
 
 # wrap long comments
-mat$set_comment("This is a very long comment that is needed to be wrapped.", width = 30)
-mat$get_comment()
+mat$comment("This is a very long comment that is needed to be wrapped.", width = 30)
+mat$comment()
 
 # delete old comments and add new one
-mat$set_comment("This is the only comment", append = NULL)
-mat$get_comment()
+mat$comment("This is the only comment", append = NULL)
+mat$comment()
 
 # delete all comments
-mat$set_comment(NULL)
-mat$get_comment()
+mat$comment(NULL)
+mat$comment()
 
 # get all existing field values
-str(mat$get_value())
+str(mat$value())
 
 # get values of field 1, 3, 5
-str(mat$get_value(c(1, 3, 5)))
+str(mat$value(c(1, 3, 5)))
 
 # get character format values instead of a named list
-mat$get_value(c(1, 3, 5), simplify = TRUE)
+mat$value(c(1, 3, 5), simplify = TRUE)
 
 # get values of all field even those that are not set
-str(idf$Zone$ZONE_ONE$get_value())
+str(idf$Zone$`ZONE ONE`$value())
 
-str(idf$Zone$ZONE_ONE$get_value(all = TRUE))
+str(idf$Zone$`ZONE ONE`$value(all = TRUE))
 
 # get field values using shortcuts
 mat$Roughness
@@ -328,14 +498,14 @@ mat[c(1,2)]
 mat[c("Name", "Density")]
 
 # set field values
-mat$set_value(name = "new_name", Thickness = 0.02)
+mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
 
 # When `default` argument is set to TRUE and input field values are empty, i.e.
-# NA and NULL, the field values will be reset to defaults.
+# NULL, the field values will be reset to defaults.
 mat[c("Thermal Absorptance", "Solar Absorptance")]
 
-mat$set_value(visible_absorptance = NA, Solar_Absorptance = NA, default = TRUE)
+mat$set(visible_absorptance = NULL, Solar_Absorptance = NULL, .default = TRUE)
 mat[c("Visible Absorptance", "Solar Absorptance")]
 
 # set field values using shortcuts
@@ -355,8 +525,8 @@ mat$Density <- -1
 eplusr_option(validate_level = "final") # change back to "final" validate level
 mat$is_valid()
 # get other objects that this object refereces
-mat$ref_from_object() # not referencing other objects
-mat$has_ref_from()
+mat$ref_to_object() # not referencing other objects
+mat$has_ref_to()
 
 
 # get other objects that reference this object
@@ -369,31 +539,27 @@ mat$has_ref_by()
 mat$has_ref()
 
 # get all object data in a data.table format without field units
-str(mat$table(unit = FALSE))
+str(mat$to_table(unit = FALSE))
 
 # get all object data in a data.table format where all field values are put in a
 # list column and field names without unit
-str(mat$table(string_value = FALSE, unit = FALSE))
-
-# get all object data in a data.table format where all field values are put in a
-# list column and all values are converted into IP units
-str(mat$table(string_value = FALSE, in_ip = TRUE))
+str(mat$to_table(string_value = FALSE, unit = FALSE))
 
 # get all object data in a data.table format, including tailing empty fields
-str(idf$Zone$ZONE_ONE$table(all = TRUE))
+str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
 
 # get all object data in a data.table format where each field becomes a column
-str(mat$table(wide = TRUE))
+str(mat$to_table(wide = TRUE))
 
 # get string format object
-mat$string()
+mat$to_string()
 
 # get string format of object, and decrease the space between field values and
 # field names
-mat$string(sep_at = 15)
+mat$to_string(sep_at = 15)
 
 # get string format of object, and decrease the leading space of field values
-mat$string(leading = 0)
+mat$to_string(leading = 0)
 
 # print the object without comment
 mat$print(comment = FALSE)

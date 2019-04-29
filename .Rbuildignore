@@ -1,8 +1,10 @@
+^\.lintr$
 ^\.Rproj\.user$
 \.Rproj$
 ^\.gitignore$
 ^\.travis\.yml$
 ^appveyor\.yml$
+^.appveyor_clear_cache.txt$
 ^try\.R$
 ^TODO\.md$
 ^README\.Rmd$

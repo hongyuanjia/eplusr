@@ -1,543 +1,181 @@
 #' @importFrom data.table data.table
+#' @importFrom units install_symbolic_unit install_conversion_constant
 NULL
 
-# conversion_units_record {{{
-# SI names {{{
-si_name <- character(length = 154)
-si_name[1] = "m"
-si_name[2] = "m"
-si_name[3] = "W"
-si_name[4] = "W"
-si_name[5] = "m3/s"
-si_name[6] = "m3/s"
-si_name[7] = "C"
-si_name[8] = "kg/J"
-si_name[9] = "Pa"
-si_name[10] = "Pa"
-si_name[11] = "Pa"
-si_name[12] = "Pa"
-si_name[13] = "W/m-K"
-si_name[14] = "W/K"
-si_name[15] = "deltaC"
-si_name[16] = "m2"
-si_name[17] = "K"
-si_name[18] = "(kg/s)/W"
-si_name[19] = "J/kg"
-si_name[20] = "kgWater/kgDryAir"
-si_name[21] = "kJ/kg"
-si_name[22] = "lux"
-si_name[23] = "kg/m3"
-si_name[24] = "kg/s"
-si_name[25] = "kg/s-m"
-si_name[26] = "m3"
-si_name[27] = "m3"
-si_name[28] = "W/m2-K"
-si_name[29] = "1/m"
-si_name[30] = "J/kg-K"
-si_name[31] = "J/m3-K"
-si_name[32] = "m/s"
-si_name[33] = "m/s"
-si_name[34] = "m2-K/W"
-si_name[35] = "W/m2"
-si_name[36] = "A/K"
-si_name[37] = "g/kg"
-si_name[38] = "g/m-s"
-si_name[39] = "g/m-s-K"
-si_name[40] = "J/K"
-si_name[41] = "J/kg-K2"
-si_name[42] = "J/m3"
-si_name[43] = "kg/kg-K"
-si_name[44] = "kPa"
-si_name[45] = "kPa"
-si_name[46] = "m2/s"
-si_name[47] = "m3/kg"
-si_name[48] = "m3/m3"
-si_name[49] = "N-s/m2"
-si_name[50] = "V/K"
-si_name[51] = "W/m-K2"
-si_name[52] = "m3/s-m"
-si_name[53] = "deg"
-si_name[54] = "hr"
-si_name[55] = "A"
-si_name[56] = "dimensionless"
-si_name[57] = "V"
-si_name[58] = "A/V"
-si_name[59] = "eV"
-si_name[60] = "percent"
-si_name[61] = "percentage (as a real decimal)"
-si_name[62] = "s"
-si_name[63] = "W/m2 or deg C"
-si_name[64] = "W/m2, W or deg C"
-si_name[65] = "1/K"
-si_name[66] = "J/m2-K"
-si_name[67] = "ohms"
-si_name[68] = "cycles/hr"
-si_name[69] = "kg/kg"
-si_name[70] = "J/J"
-si_name[71] = "g/GJ"
-si_name[72] = "L/GJ"
-si_name[73] = "m3/GJ"
-si_name[74] = "m3/s-m2"
-si_name[75] = "m3/s-person"
-si_name[76] = "W/m2-K2"
-si_name[77] = "g/MJ"
-si_name[78] = "L/MJ"
-si_name[79] = "m3/MJ"
-si_name[80] = "W/W"
-si_name[81] = "$/m2"
-si_name[82] = "$"
-si_name[83] = "$/kW"
-si_name[84] = "$/m3"
-si_name[85] = "years"
-si_name[86] = "$/(W/K)"
-si_name[87] = "$/(m3/s)"
-si_name[88] = "W/m"
-si_name[89] = "minutes"
-si_name[90] = "cm"
-si_name[91] = "K/m"
-si_name[92] = "W/s"
-si_name[93] = "kmol"
-si_name[94] = "J"
-si_name[95] = "GJ"
-si_name[96] = "days"
-si_name[97] = "kg/m2"
-si_name[98] = "kg"
-si_name[99] = "kmol/s"
-si_name[100] = "percent/K"
-si_name[101] = "kg/s2"
-si_name[102] = "g/mol"
-si_name[103] = "deltaJ/kg"
-si_name[104] = "person/m2"
-si_name[105] = "m2/person"
-si_name[106] = "W/person"
-si_name[107] = "W/person"
-si_name[108] = "W/m2"
-si_name[109] = "m3/person"
-si_name[110] = "m3/hr-person"
-si_name[111] = "m3/m2"
-si_name[112] = "m3/hr-m2"
-si_name[113] = "m3/hr"
-si_name[114] = "s/m"
-si_name[115] = "W/m2"
-si_name[116] = "m2/m"
-si_name[117] = "L/day"
-si_name[118] = "L/kWh"
-si_name[119] = "kg/Pa-s-m2"
-si_name[120] = "m/hr"
-si_name[121] = "Mode"
-si_name[122] = "Control"
-si_name[123] = "Availability"
-si_name[124] = "rev/min"
-si_name[125] = "W/(m3/s)"
-si_name[126] = "W/m-K"
-si_name[127] = "VA"
-si_name[128] = "N-m"
-si_name[129] = "m3/s-W"
-si_name[130] = "cm2"
-si_name[131] = "kg/m"
-si_name[132] = "Pa"
-si_name[133] = "m/yr"
-si_name[134] = "1/hr"
-si_name[135] = "ppm"
-si_name[136] = "W/m-K3"
-si_name[137] = "kg/m-s"
-si_name[138] = "kg/m-s-K"
-si_name[139] = "kg/m-s-K2"
-si_name[140] = "J/kg-K3"
-si_name[141] = "ms"
-si_name[142] = "Ah"
-si_name[143] = "deltaC/hr"
-si_name[144] = "micron"
-si_name[145] = "W/(m3/s)"
-si_name[146] = "W/((m3/s)-Pa)"
-si_name[147] = "m3/s-m"
-si_name[148] = "m3/s-W"
-si_name[149] = "m3/person"
-si_name[150] = "m3/hr-person"
-si_name[151] = "m3/m2"
-si_name[152] = "m3/hr-m2"
-si_name[153] = "m3/hr"
-si_name[154] = "W/((m3/s)-Pa)"
+# reg_custom_units {{{
+reg_custom_units <- function () {
+    tryCatch(
+        {
+            install_symbolic_unit("person")
+            install_symbolic_unit("dollar")
+            install_conversion_constant("Wh", "J", 3.6E3)
+            install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+        },
+        warning = function (w) NULL,
+        error = function (e) NULL
+    )
+}
 # }}}
 
-# IP names {{{
-ip_name <- character(length = 154)
-ip_name[1] = "ft"
-ip_name[2] = "in"
-ip_name[3] = "Btu/h"
-ip_name[4] = "W"
-ip_name[5] = "ft3/min"
-ip_name[6] = "gal/min"
-ip_name[7] = "F"
-ip_name[8] = "lb/Btu"
-ip_name[9] = "psi"
-ip_name[10] = "inHg"
-ip_name[11] = "inH2O"
-ip_name[12] = "ftH2O"
-ip_name[13] = "Btu-in/h-ft2-F"
-ip_name[14] = "Btu/h-F"
-ip_name[15] = "deltaF"
-ip_name[16] = "ft2"
-ip_name[17] = "R"
-ip_name[18] = "(lbm/sec)/(Btu/hr)"
-ip_name[19] = "Btu/lb"
-ip_name[20] = "lbWater/lbDryAir"
-ip_name[21] = "Btu/lb"
-ip_name[22] = "foot-candles"
-ip_name[23] = "lb/ft3"
-ip_name[24] = "lb/s"
-ip_name[25] = "lb/s-ft"
-ip_name[26] = "ft3"
-ip_name[27] = "gal"
-ip_name[28] = "Btu/h-ft2-F"
-ip_name[29] = "1/ft"
-ip_name[30] = "Btu/lb-F"
-ip_name[31] = "Btu/ft3-F"
-ip_name[32] = "ft/min"
-ip_name[33] = "miles/hr"
-ip_name[34] = "ft2-F-hr/Btu"
-ip_name[35] = "Btu/h-ft2"
-ip_name[36] = "A/F"
-ip_name[37] = "grains/lb"
-ip_name[38] = "lb/ft-s"
-ip_name[39] = "lb/ft-s-F"
-ip_name[40] = "Btu/F"
-ip_name[41] = "Btu/lb-F2"
-ip_name[42] = "Btu/ft3"
-ip_name[43] = "lb/lb-F"
-ip_name[44] = "psi"
-ip_name[45] = "inHg"
-ip_name[46] = "ft2/s"
-ip_name[47] = "ft3/lb"
-ip_name[48] = "ft3/ft3"
-ip_name[49] = "lbf-s/ft2"
-ip_name[50] = "V/F"
-ip_name[51] = "Btu/h-F2-ft"
-ip_name[52] = "ft3/min-ft"
-ip_name[53] = "deg"
-ip_name[54] = "hr"
-ip_name[55] = "A"
-ip_name[56] = "dimensionless"
-ip_name[57] = "V"
-ip_name[58] = "A/V"
-ip_name[59] = "eV"
-ip_name[60] = "percent"
-ip_name[61] = "percentage (as a real decimal)"
-ip_name[62] = "s"
-ip_name[63] = "unknown"
-ip_name[64] = "unknown"
-ip_name[65] = "1/F"
-ip_name[66] = "Btu/ft2-F"
-ip_name[67] = "ohms"
-ip_name[68] = "cycles/hr"
-ip_name[69] = "lb/lb"
-ip_name[70] = "Btu/Btu"
-ip_name[71] = "lb/MWh"
-ip_name[72] = "gal/kWh"
-ip_name[73] = "ft3/MWh"
-ip_name[74] = "ft3/min-ft2"
-ip_name[75] = "ft3/min-person"
-ip_name[76] = "Btu/h-ft2-F2"
-ip_name[77] = "lb/MWh"
-ip_name[78] = "gal/kWh"
-ip_name[79] = "ft3/kWh"
-ip_name[80] = "Btuh/Btuh"
-ip_name[81] = "$/ft2"
-ip_name[82] = "$"
-ip_name[83] = "$/(kBtuh/h)"
-ip_name[84] = "$/ft3"
-ip_name[85] = "years"
-ip_name[86] = "$/(Btu/h-F)"
-ip_name[87] = "$/(ft3/min)"
-ip_name[88] = "Btu/h-ft"
-ip_name[89] = "minutes"
-ip_name[90] = "in"
-ip_name[91] = "F/ft"
-ip_name[92] = "W/s"
-ip_name[93] = "kmol"
-ip_name[94] = "Wh"
-ip_name[95] = "ton-hrs"
-ip_name[96] = "days"
-ip_name[97] = "lb/ft2"
-ip_name[98] = "lb"
-ip_name[99] = "kmol/s"
-ip_name[100] = "percent/F"
-ip_name[101] = "lb/s2"
-ip_name[102] = "lb/mol"
-ip_name[103] = "deltaBtu/lb"
-ip_name[104] = "person/ft2"
-ip_name[105] = "ft2/person"
-ip_name[106] = "Btu/h-person"
-ip_name[107] = "W/person"
-ip_name[108] = "W/m2"
-ip_name[109] = "ft3/person"
-ip_name[110] = "ft3/hr-person"
-ip_name[111] = "ft3/ft2"
-ip_name[112] = "ft3/hr-ft2"
-ip_name[113] = "ft3/hr"
-ip_name[114] = "s/ft"
-ip_name[115] = "W/ft2"
-ip_name[116] = "ft2/ft"
-ip_name[117] = "pint/day"
-ip_name[118] = "pint/kWh"
-ip_name[119] = "lb/psi-s-ft2"
-ip_name[120] = "ft/hr"
-ip_name[121] = "Mode"
-ip_name[122] = "Control"
-ip_name[123] = "Availability"
-ip_name[124] = "rev/min"
-ip_name[125] = "W/(ft3/min)"
-ip_name[126] = "Btu/h-ft-F"
-ip_name[127] = "VA"
-ip_name[128] = "lbf-in"
-ip_name[129] = "(ft3/min)/(Btu/h)"
-ip_name[130] = "inch2"
-ip_name[131] = "lb/ft"
-ip_name[132] = "Pa"
-ip_name[133] = "inch/yr"
-ip_name[134] = "1/hr"
-ip_name[135] = "ppm"
-ip_name[136] = "Btu/h-F3-ft"
-ip_name[137] = "kg/m-s"
-ip_name[138] = "kg/m-s-F"
-ip_name[139] = "kg/m-s-F2"
-ip_name[140] = "J/kg-K3"
-ip_name[141] = "ms"
-ip_name[142] = "Ah"
-ip_name[143] = "deltaF/hr"
-ip_name[144] = "micron"
-ip_name[145] = "W/(gal/min)"
-ip_name[146] = "W/((gal/min)-ftH20)"
-ip_name[147] = "gal/min-ft"
-ip_name[148] = "(gal/min)/(Btu/h)"
-ip_name[149] = "gal/person"
-ip_name[150] = "gal/hr-person"
-ip_name[151] = "gal/ft2"
-ip_name[152] = "gal/hr-ft2"
-ip_name[153] = "gal/hr"
-ip_name[154] = "W/((ft3/min)-inH2O)"
-# }}}
-
-# mult {{{
-mult <- double(length = 154)
-mult[1] = 3.28083989501312
-mult[2] = 39.3700787401575
-mult[3] = 3.4121412858518
-mult[4] = 1
-mult[5] = 2118.88000328931
-mult[6] = 15850.3222370511
-mult[7] = 1.8
-mult[8] = 2325.83774250441
-mult[9] = 1.45037743897283E-04
-mult[10] = 0.00029613
-mult[11] = 0.00401463
-mult[12] = 0.00033455
-mult[13] = 6.93481276005548
-mult[14] = 1.89563404769544
-mult[15] = 1.8
-mult[16] = 10.7639104167097
-mult[17] = 1.8
-mult[18] = 0.646078115385742
-mult[19] = 0.00042986
-mult[20] = 1
-mult[21] = 0.429925
-mult[22] = 0.092902267
-mult[23] = 0.062428
-mult[24] = 2.20462247603796
-mult[25] = 0.67196893069637
-mult[26] = 35.3146667214886
-mult[27] = 264.172037284185
-mult[28] = 0.176110194261872
-mult[29] = 0.3048
-mult[30] = 2.39005736137667E-04
-mult[31] = 1.49237004739337E-05
-mult[32] = 196.850393700787
-mult[33] = 2.2369362920544
-mult[34] = 5.678263
-mult[35] = 0.316957210776545
-mult[36] = 0.555555555555556
-mult[37] = 7
-mult[38] = 0.000671968949659
-mult[39] = 3.73574867724868E-04
-mult[40] = 526.565
-mult[41] = 1.32889924714692E-04
-mult[42] = 2.68096514745308E-05
-mult[43] = 0.555555555555556
-mult[44] = 0.145038
-mult[45] = 0.29523
-mult[46] = 10.7639104167097
-mult[47] = 16.018
-mult[48] = 1
-mult[49] = 2.08857913669065E-02
-mult[50] = 0.555555555555556
-mult[51] = 0.321418310071648
-mult[52] = 645.89
-mult[53] = 1
-mult[54] = 1
-mult[55] = 1
-mult[56] = 1
-mult[57] = 1
-mult[58] = 1
-mult[59] = 1
-mult[60] = 1
-mult[61] = 1
-mult[62] = 1
-mult[63] = 1
-mult[64] = 1
-mult[65] = 0.555555555555556
-mult[66] = 4.89224766847393E-05
-mult[67] = 1
-mult[68] = 1
-mult[69] = 1
-mult[70] = 1
-mult[71] = 7.93664091373665E-03
-mult[72] = 9.51022349025202E-04
-mult[73] = 127.13292
-mult[74] = 196.85
-mult[75] = 2118.6438
-mult[76] = 0.097826
-mult[77] = 7.93664091373665
-mult[78] = 0.951022349025202
-mult[79] = 127.13292
-mult[80] = 1
-mult[81] = 9.28939733269818E-02
-mult[82] = 1
-mult[83] = 0.293083235638921
-mult[84] = 2.83127014102352E-02
-mult[85] = 1
-mult[86] = 0.52667614683731
-mult[87] = 4.72000059660808E-04
-mult[88] = 1.04072
-mult[89] = 1
-mult[90] = 0.3937
-mult[91] = 0.54861322767449
-mult[92] = 1
-mult[93] = 1
-mult[94] = 2.77777777777778E-04
-mult[95] = 78.9889415481832
-mult[96] = 1
-mult[97] = 0.204794053596664
-mult[98] = 2.2046
-mult[99] = 1
-mult[100] = 0.555555555555556
-mult[101] = 2.2046
-mult[102] = 0.0022046
-mult[103] = 0.0004299
-mult[104] = 9.28939733269818E-02
-mult[105] = 10.764961
-mult[106] = 3.4121412858518
-mult[107] = 1
-mult[108] = 1
-mult[109] = 35.3146667214886
-mult[110] = 35.3146667214886
-mult[111] = 3.28083989501312
-mult[112] = 3.28083989501312
-mult[113] = 35.3146667214886
-mult[114] = 0.3048
-mult[115] = 0.09290304
-mult[116] = 3.28083989501312
-mult[117] = 2.11337629827348
-mult[118] = 2.11337629827348
-mult[119] = 1412.00523459398
-mult[120] = 3.28083989501312
-mult[121] = 1
-mult[122] = 1
-mult[123] = 1
-mult[124] = 1
-mult[125] = 0.0004719475
-mult[126] = 0.577796066000163
-mult[127] = 1
-mult[128] = 8.85074900525547
-mult[129] = 621.099127332943
-mult[130] = 0.15500031000062
-mult[131] = 0.67196893069637
-mult[132] = 1
-mult[133] = 39.3700787401575
-mult[134] = 1
-mult[135] = 1
-mult[136] = 0.178565727817582
-mult[137] = 0.67196893069637
-mult[138] = 0.373316072609094
-mult[139] = 0.207397818116164
-mult[140] = 7.38277359526066E-05
-mult[141] = 1
-mult[142] = 1
-mult[143] = 1.8
-mult[144] = 1
-mult[145] = 0.0000630902
-mult[146] = 0.188582274697355
-mult[147] = 4831.17821785317
-mult[148] = 4645.27137336702
-mult[149] = 264.172037284185
-mult[150] = 264.172037284185
-mult[151] = 24.5423853466941
-mult[152] = 24.5423853466941
-mult[153] = 264.172037284185
-mult[154] = 0.117556910599482
-# }}}
-
-# offset {{{
-offset <- double(length = 154)
-offset[7] = 32
-offset[19] = 7.686
-# }}}
-
-# alt {{{
-alt <- logical(length = 154)
-alt[2] = TRUE
-alt[4] = TRUE
-alt[6] = TRUE
-alt[10] = TRUE
-alt[11] = TRUE
-alt[12] = TRUE
-alt[45] = TRUE
-alt[107] = TRUE
-alt[108] = TRUE
-alt[126] = TRUE
-alt[132] = TRUE
-alt[145] = TRUE
-alt[147] = TRUE
-alt[148] = TRUE
-alt[149] = TRUE
-alt[150] = TRUE
-alt[151] = TRUE
-alt[152] = TRUE
-alt[153] = TRUE
-alt[154] = TRUE
-# }}}
-
-# multi_unit_name {{{
-multi_unit_name <- character(length = 154)
-multi_unit_name[1] = "Distance"
-multi_unit_name[3] = "Capacity"
-multi_unit_name[4] = "Power"
-multi_unit_name[5] = "VolumetricFlow"
-multi_unit_name[7] = "Temperature"
-multi_unit_name[9] = "Pressure"
-multi_unit_name[13] = "Conductivity"
-multi_unit_name[15] = "DeltaTemperature"
-multi_unit_name[19] = "Enthalpy"
-multi_unit_name[23] = "Density"
-multi_unit_name[24] = "MassFlow"
-multi_unit_name[28] = "ConvectionCoefficient"
-multi_unit_name[30] = "SpecificHeat"
-multi_unit_name[32] = "Velocity"
-multi_unit_name[49] = "Viscosity"
-multi_unit_name[53] = "Angle"
-multi_unit_name[56] = "Dimensionless"
-multi_unit_name[60] = "Percent"
-multi_unit_name[94] = "Energy"
-multi_unit_name[107] = "ActivityLevel"
-multi_unit_name[120] = "PrecipitationRate"
-multi_unit_name[121] = "Mode"
-multi_unit_name[122] = "Control"
-multi_unit_name[123] = "Availability"
-multi_unit_name[129] = "VolumetricFlowPerPower"
-multi_unit_name[144] = "Wavelength"
-# }}}
-
-unit_conv_table <- data.table::data.table(
-    si_name, ip_name, mult, offset, alt, multi_unit_name
+# UNIT_CONV_TABLE {{{
+UNIT_CONV_TABLE <- fread(
+    "
+    si_name                        	 si_standard_name 	 ip_name                        	 ip_standard_name
+    m                              	 m                	 ft                             	 ft
+    m                              	 m                	 in                             	 in
+    W                              	 W                	 Btu/h                          	 Btu/hr
+    W                              	 W                	 W                              	 W
+    m3/s                           	 m^3/s            	 ft3/min                        	 ft^3/min
+    m3/s                           	 m^3/s            	 gal/min                        	 gallon/min
+    C                              	 degC             	 F                              	 degF
+    kg/J                           	 kg/J             	 lb/Btu                         	 lb/Btu
+    Pa                             	 Pa               	 psi                            	 psi
+    Pa                             	 Pa               	 inHg                           	 inHg
+    Pa                             	 Pa               	 inH2O                          	 inH2O
+    Pa                             	 Pa               	 ftH2O                          	 ftH2O
+    W/m-K                          	 W/m/degK         	 Btu-in/h-ft2-F                 	 Btu*in/h/ft^2/degF
+    W/K                            	 W/degK           	 Btu/h-F                        	 Btu/h/degF
+    deltaC                         	 degC             	 deltaF                         	 degF
+    m2                             	 m^2              	 ft2                            	 ft^2
+    K                              	 degK             	 R                              	 degR
+    (kg/s)/W                       	 (kg/s)/W         	 (lbm/sec)/(Btu/hr)             	 (lb*m/sec)/(Btu/hr)
+    J/kg                           	 J/kg             	 Btu/lb                         	 Btu/lb
+    kgWater/kgDryAir               	 kg/kg            	 lbWater/lbDryAir               	 lb/lb
+    kJ/kg                          	 kJ/kg            	 Btu/lb                         	 Btu/lb
+    lux                            	 lux              	 foot-candles                   	 footcandle
+    kg/m3                          	 kg/m^3           	 lb/ft3                         	 lb/ft^3
+    kg/s                           	 kg/s             	 lb/s                           	 lb/s
+    kg/s-m                         	 kg/s/m           	 lb/s-ft                        	 lb/s/ft
+    m3                             	 m^3              	 ft3                            	 ft^3
+    m3                             	 m^3              	 gal                            	 gallon
+    W/m2-K                         	 W/m^2/degK       	 Btu/h-ft2-F                    	 Btu/h/ft^2/degF
+    1/m                            	 1/m              	 1/ft                           	 1/ft
+    J/kg-K                         	 J/kg/degK        	 Btu/lb-F                       	 Btu/lb/degF
+    J/m3-K                         	 J/m^3/degK       	 Btu/ft3-F                      	 Btu/ft^3/degF
+    m/s                            	 m/s              	 ft/min                         	 ft/min
+    m/s                            	 m/s              	 miles/hr                       	 miles/hr
+    m2-K/W                         	 m^2*degK/W       	 ft2-F-hr/Btu                   	 ft^2*degF*hr/Btu
+    W/m2                           	 W/m^2            	 Btu/h-ft2                      	 Btu/h/ft^2
+    A/K                            	 A/degK           	 A/F                            	 A/degF
+    g/kg                           	 g/kg             	 grains/lb                      	 grains/lb
+    g/m-s                          	 g/m/s            	 lb/ft-s                        	 lb/ft/s
+    g/m-s-K                        	 g/m/s/degK       	 lb/ft-s-F                      	 lb/ft/s/degF
+    J/K                            	 J/degK           	 Btu/F                          	 Btu/degF
+    J/kg-K2                        	 J/kg/degK^2      	 Btu/lb-F2                      	 Btu/lb/degF^2
+    J/m3                           	 J/m^3            	 Btu/ft3                        	 Btu/ft^3
+    kg/kg-K                        	 kg/kg/degK       	 lb/lb-F                        	 lb/lb/degF
+    kPa                            	 kPa              	 psi                            	 psi
+    kPa                            	 kPa              	 inHg                           	 inHg
+    m2/s                           	 m^2/s            	 ft2/s                          	 ft^2/s
+    m3/kg                          	 m^3/kg           	 ft3/lb                         	 ft^3/lb
+    m3/m3                          	 m^3/m^3          	 ft3/ft3                        	 ft^3/ft^3
+    N-s/m2                         	 N*s/m^2          	 lbf-s/ft2                      	 lbf*s/ft^2
+    V/K                            	 V/degK           	 V/F                            	 V/degF
+    W/m-K2                         	 W/m/degK^2       	 Btu/h-F2-ft                    	 Btu/h/degF^2/ft
+    m3/s-m                         	 m^3/s/m          	 ft3/min-ft                     	 ft^3/min/ft
+    deg                            	 arc_degree       	 deg                            	 arc_degree
+    hr                             	 hr               	 hr                             	 hr
+    A                              	 A                	 A                              	 A
+    dimensionless                  	 1                	 dimensionless                  	 1
+    V                              	 V                	 V                              	 V
+    A/V                            	 A/V              	 A/V                            	 A/V
+    eV                             	 eV               	 eV                             	 eV
+    percent                        	 percent          	 percent                        	 percent
+    percentage (as a real decimal) 	 1                	 percentage (as a real decimal) 	 1
+    s                              	 s                	 s                              	 s
+    W/m2 or deg C                  	 1                	 unknown                        	 1
+    W/m2, W or deg C               	 1                	 unknown                        	 1
+    1/K                            	 1/degK           	 1/F                            	 1/degF
+    J/m2-K                         	 J/m^2/degK       	 Btu/ft2-F                      	 Btu/ft^2/degF
+    ohms                           	 ohms             	 ohms                           	 ohms
+    cycles/hr                      	 cycles/hr        	 cycles/hr                      	 cycles/hr
+    kg/kg                          	 kg/kg            	 lb/lb                          	 lb/lb
+    J/J                            	 J/J              	 Btu/Btu                        	 Btu/Btu
+    g/GJ                           	 g/GJ             	 lb/MWh                         	 lb/MWh
+    L/GJ                           	 L/GJ             	 gal/kWh                        	 gallon/kWh
+    m3/GJ                          	 m^3/GJ           	 ft3/MWh                        	 ft^3/MWh
+    m3/s-m2                        	 m^3/s/m^2        	 ft3/min-ft2                    	 ft^3/min/ft^2
+    m3/s-person                    	 m^3/s/person     	 ft3/min-person                 	 ft^3/min/person
+    W/m2-K2                        	 W/m^2/K^2        	 Btu/h-ft2-F2                   	 Btu/h/ft^2/degF^2
+    g/MJ                           	 g/MJ             	 lb/MWh                         	 lb/MWh
+    L/MJ                           	 L/MJ             	 gal/kWh                        	 gallon/kWh
+    m3/MJ                          	 m^3/MJ           	 ft3/kWh                        	 ft^3/kWh
+    W/W                            	 W/W              	 Btuh/Btuh                      	 (Btu/h)/(Btu/h)
+    $/m2                           	 dollar/m^2       	 $/ft2                          	 dollar/ft^2
+    $                              	 dollar           	 $                              	 dollar
+    $/kW                           	 dollar/kW        	 $/(kBtu/h)                    	 dollar/(kBtu/h)
+    $/m3                           	 dollar/m3        	 $/ft3                          	 dollar/ft^3
+    years                          	 years            	 years                          	 years
+    $/(W/K)                        	 dollar/(W/degK)  	 $/(Btu/h-F)                    	 dollar/(Btu/h/degF)
+    $/(m3/s)                       	 dollar/(m^3/s)   	 $/(ft3/min)                    	 dollar/(ft^3/min)
+    W/m                            	 W/m              	 Btu/h-ft                       	 Btu/hr/ft
+    minutes                        	 minutes          	 minutes                        	 minutes
+    cm                             	 cm               	 in                             	 in
+    K/m                            	 K/m              	 F/ft                           	 degF/ft
+    W/s                            	 W/s              	 W/s                            	 W/s
+    kmol                           	 kmol             	 kmol                           	 kmol
+    J                              	 J                	 Wh                             	 Wh
+    GJ                             	 GJ               	 ton-hrs                        	 ton*hr
+    days                           	 days             	 days                           	 days
+    kg/m2                          	 kg/m2            	 lb/ft2                         	 lb/ft^2
+    kg                             	 kg               	 lb                             	 lb
+    kmol/s                         	 kmol/s           	 kmol/s                         	 kmol/s
+    percent/K                      	 percent/degK     	 percent/F                      	 percent/degF
+    kg/s2                          	 kg/s^2           	 lb/s2                          	 lb/s^2
+    g/mol                          	 g/mol            	 lb/mol                         	 lb/mol
+    deltaJ/kg                      	 J/kg             	 deltaBtu/lb                    	 Btu/lb
+    person/m2                      	 person/m^2       	 person/ft2                     	 person/ft^2
+    m2/person                      	 m^2/person       	 ft2/person                     	 ft^2/person
+    W/person                       	 W/person         	 Btu/h-person                   	 Btu/h/person
+    W/person                       	 W/person         	 W/person                       	 W/person
+    W/m2                           	 W/m^2            	 W/m2                           	 W/m^2
+    m3/person                      	 m^3/person       	 ft3/person                     	 ft^3/person
+    m3/hr-person                   	 m^3/hr/person    	 ft3/hr-person                  	 ft^3/hr/person
+    m3/m2                          	 m^3/m^2          	 ft3/ft2                        	 ft^3/ft^2
+    m3/hr-m2                       	 m^3/hr/m^2       	 ft3/hr-ft2                     	 ft^3/hr/ft^2
+    m3/hr                          	 m^3/hr           	 ft3/hr                         	 ft^3/hr
+    s/m                            	 s/m              	 s/ft                           	 s/ft
+    W/m2                           	 W/m^2            	 W/ft2                          	 W/ft^2
+    m2/m                           	 m^2/m            	 ft2/ft                         	 ft^2/ft
+    L/day                          	 L/day            	 pint/day                       	 pint/day
+    L/kWh                          	 L/kWh            	 pint/kWh                       	 pint/kWh
+    kg/Pa-s-m2                     	 kg/Pa/s/m^2      	 lb/psi-s-ft2                   	 lb/psi/s/ft^2
+    m/hr                           	 m/hr             	 ft/hr                          	 ft/hr
+    Mode                           	 1                	 Mode                           	 1
+    Control                        	 1                	 Control                        	 1
+    Availability                   	 1                	 Availability                   	 1
+    rev/min                        	 revolution/min   	 rev/min                        	 revolution/min
+    W/(m3/s)                       	 W/(m^3/s)        	 W/(ft3/min)                    	 W/(ft^3/min)
+    W/m-K                          	 W/m/degK         	 Btu/h-ft-F                     	 Btu/h/ft/degF
+    VA                             	 VA               	 VA                             	 VA
+    N-m                            	 N*m              	 lbf-in                         	 lbf*in
+    m3/s-W                         	 m^3/s/W          	 (ft3/min)/(Btu/h)              	 (ft3/min)/(Btu/h)
+    cm2                            	 cm^2             	 inch2                          	 inch^2
+    kg/m                           	 kg/m             	 lb/ft                          	 lb/ft
+    Pa                             	 Pa               	 Pa                             	 Pa
+    m/yr                           	 m/yr             	 inch/yr                        	 inch/yr
+    1/hr                           	 1/hr             	 1/hr                           	 1/hr
+    ppm                            	 ppm              	 ppm                            	 ppm
+    W/m-K3                         	 W/m/degK^3       	 Btu/h-F3-ft                    	 Btu/h/degF^3/ft
+    kg/m-s                         	 kg/m/s           	 kg/m-s                         	 kg/m/s
+    kg/m-s-K                       	 kg/m/s/degK      	 kg/m-s-F                       	 kg/m/s/degF
+    kg/m-s-K2                      	 kg/m/s/degK^2    	 kg/m-s-F2                      	 kg/m/s/degF^2
+    J/kg-K3                        	 J/kg/degK^3      	 J/kg-K3                        	 J/kg/degK^3
+    ms                             	 ms               	 ms                             	 ms
+    Ah                             	 A*hr             	 Ah                             	 A*hr
+    deltaC/hr                      	 degC/hr          	 deltaF/hr                      	 degF/hr
+    micron                         	 micron           	 micron                         	 micron
+    W/(m3/s)                       	 W/(m^3/s)        	 W/(gal/min)                    	 W/(gallon/min)
+    W/((m3/s)-Pa)                  	 W/((m^3/s)*Pa)   	 W/((gal/min)-ftH2O)            	 W/((gallon/min)*ftH2O)
+    m3/s-m                         	 m^3/s/m          	 gal/min-ft                     	 gallon/min/ft
+    m3/s-W                         	 m^3/s/W          	 (gal/min)/(Btu/h)              	 (gallon/min)/(Btu/h)
+    m3/person                      	 m^3/person       	 gal/person                     	 gallon/person
+    m3/hr-person                   	 m^3/hr/person    	 gal/hr-person                  	 gallon/hr/person
+    m3/m2                          	 m^3/m^2          	 gal/ft2                        	 gallon/ft^2
+    m3/hr-m2                       	 m^3/hr/m^2       	 gal/hr-ft2                     	 gallon/hr/ft^2
+    m3/hr                          	 m^3/hr           	 gal/hr                         	 gallon/hr
+    W/((m3/s)-Pa)                  	 W/((m3/s)*Pa)    	 W/((ft3/min)-inH2O)            	 W/((ft^3/min)*inH2O)
+    "
 )
 # }}}
 
@@ -977,7 +615,7 @@ several[93] <- TRUE
 several[94] <- TRUE
 # }}}
 
-tabular_unit_conv_table <- data.table::data.table(
+tabular_unit_conv_table <- data.table(
     si_name, ip_name, mult, offset, hint, several
 )
 # }}}

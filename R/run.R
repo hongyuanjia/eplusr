@@ -1,14 +1,12 @@
 #' @importFrom callr r_bg
 #' @importFrom cli cat_line
-#' @importFrom crayon green red
+#' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
 #' @importFrom later later
 #' @importFrom lubridate hms with_tz
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
 #' @importFrom progress progress_bar
-#' @importFrom readr read_lines
-#' @importFrom stringr str_trim
 #' @importFrom tools file_path_sans_ext
 NULL
 
@@ -201,7 +199,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     model <- normalizePath(model, mustWork = TRUE)
     weather <- normalizePath(weather, mustWork = TRUE)
 
-    eplus <- eplus %||% as.character(get_idf_ver(stringr::str_trim(readr::read_lines(model), "both")))
+    eplus <- eplus %||% as.character(get_idf_ver(read_lines(model)))
     energyplus_exe <- eplus_exe(eplus)
 
     if (is_empty(eplus)) {
@@ -216,7 +214,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
         tryCatch(dir.create(output_dir, recursive = TRUE),
             warning = function (w) {
                 stop("Failed to create output directory: ",
-                     backtick(output_dir), call. = FALSE)
+                     surround(output_dir), call. = FALSE)
             }
         )
     }
@@ -246,31 +244,31 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
                        annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
-    assert_that(is_flag(design_day))
-    assert_that(is_flag(annual))
-    assert_that(is_flag(wait))
-    assert_that(is_flag(echo))
+    assert(is_flag(design_day))
+    assert(is_flag(annual))
+    assert(is_flag(wait))
+    assert(is_flag(echo))
 
     if (annual && design_day) {
         stop("Cannot force both design-day and annual simulations.", call. = FALSE)
     }
 
     if (!is_scalar(model) && !is_scalar(weather))
-        assert_that(is_same_len(model, weather))
+        assert(have_same_len(model, weather))
 
     if (!is_scalar(model) && !is.null(eplus) && !is_scalar(eplus))
-        assert_that(is_same_len(model, eplus))
+        assert(have_same_len(model, eplus))
 
     model <- normalizePath(model, mustWork = TRUE)
     weather <- normalizePath(weather, mustWork = TRUE)
 
     if (is.null(eplus)) {
         ver_list <- lapply(model, function (x) {
-            as.character(get_idf_ver(stringr::str_trim(readr::read_lines(x), "both")))
+            as.character(get_idf_ver(read_lines(x)))
         })
         ver_miss <- vapply(ver_list, is_empty, logical(1))
         if (any(ver_miss)) {
-            msg <- paste0("  ", seq_along(model)[ver_miss], "| ", backtick(model[ver_miss]),
+            msg <- paste0("  ", seq_along(model)[ver_miss], "| ", surround(model[ver_miss]),
                 collapse = "\n")
             stop("Missing version field in input IDF file. Failed to determine the ",
                 "version of EnergyPlus to use:\n", msg, call. = FALSE)
@@ -288,7 +286,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     if (is.null(output_dir)) {
         output_dir <- dirname(model)
     } else {
-        assert_that(is_same_len(model, output_dir))
+        assert(have_same_len(model, output_dir))
     }
 
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
@@ -304,7 +302,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
     if (any(!created))
         stop("Failed to create output directory:\n",
-            paste0(backtick(d[!created]), collapse = "\n"), call. = FALSE)
+            paste0(surround(d[!created]), collapse = "\n"), call. = FALSE)
 
     jobs[, `:=`(input_weather = weather, energyplus = energyplus_exe)]
     jobs[, `:=`(model = copy_run_files(model, output_dir),
@@ -320,15 +318,16 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 
         base::dump(list = c("run_parallel_jobs", "kill_jobs", "schedule_next_sim",
             "run_job", "are_all_completed", "handle_events", "sim_status", "clean_wd",
-            "energyplus", "is_string", "is_flag", "has_ext", "lpad", "backtick"),
+            "energyplus", "is_string", "is_flag", "has_ext", "lpad", "surround", "assert",
+            "is_integer", "is_scalar"),
             file = ext_funs
         )
 
         # always echo in order to catch standard output and error
         options$echo <- TRUE
         proc <- callr::r_bg(function (ext_funs, jobs, options) {
-            source(ext_funs)
             requireNamespace("data.table", quietly = TRUE)
+            source(ext_funs)
             run_parallel_jobs(jobs, options)
         }, args = list(ext_funs = ext_funs, jobs = jobs, options = options))
 
@@ -381,7 +380,7 @@ proc_print <- function(p, control = c(TRUE, TRUE)) {
 # reference: https://github.com/r-lib/revdepcheck/blob/master/R/event-loop.R
 run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
-    stopifnot(is.integer(options$num_parallel))
+    assert(is_integer(options$num_parallel))
 
     start_time <- Sys.time()
 
@@ -502,7 +501,7 @@ run_job <- function(jobs, options, progress_bar) {
         ]
 
         if (options$echo) {
-            progress_bar$message(crayon::green(paste0(completed, collapse = "\n")))
+            progress_bar$message(paste0(completed, collapse = "\n"))
         }
         progress_bar$tick(0)
     }
@@ -539,7 +538,7 @@ handle_events <- function(jobs, options, progress_bar) {
         ]
 
         if (options$echo) {
-            progress_bar$message(crayon::green(paste0(completed, collapse = "\n")))
+            progress_bar$message(paste0(completed, collapse = "\n"))
         }
         progress_bar$tick(num)
     }
@@ -562,9 +561,9 @@ sim_status <- function (type, index, model, weather) {
     }
 
     paste0(lpad(index), "|", type, " --> ",
-        "[IDF]", backtick(basename(model)),
+        "[IDF]", surround(basename(model)),
         " + ",
-        "[EPW]", backtick(basename(weather))
+        "[EPW]", surround(basename(weather))
     )
 }
 # }}}
@@ -576,18 +575,22 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     output_suffix <- match.arg(output_suffix)
 
-    stopifnot(file.exists(eplus))
-    stopifnot(file.exists(model))
-    stopifnot(file.exists(weather))
-    stopifnot(is.null(output_dir) || dir.exists(output_dir))
-    stopifnot(is.null(output_prefix) || is_string(output_prefix))
-    stopifnot(is_flag(expand_obj))
-    stopifnot(is_flag(readvars))
-    stopifnot(is_flag(annual))
-    stopifnot(is_flag(design_day))
-    stopifnot(is.null(idd) || file.exists(idd))
-    stopifnot(is_flag(echo))
-    stopifnot(is_flag(wait))
+    assert(
+    )
+    assert(
+        file.exists(eplus),
+        file.exists(model),
+        file.exists(weather),
+        is.null(output_dir) || dir.exists(output_dir),
+        is.null(output_prefix) || is_string(output_prefix),
+        is_flag(expand_obj),
+        is_flag(readvars),
+        is_flag(annual),
+        is_flag(design_day),
+        is.null(idd) || file.exists(idd),
+        is_flag(echo),
+        is_flag(wait)
+    )
 
     if (annual && design_day) {
         stop("Cannot force both design-day and annual simulations.", call. = FALSE)
@@ -804,7 +807,7 @@ copy_run_files <- function (file, dir) {
     )
 
     if (any(!flag))
-        stop("Unable to copy file ", backtick(basename(file[!flag])), "into ",
+        stop("Unable to copy file ", surround(basename(file[!flag])), "into ",
             "simulation output directory.", call. = FALSE)
 
     return(loc)

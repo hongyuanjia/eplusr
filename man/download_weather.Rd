@@ -30,7 +30,7 @@ A character vector containing paths of downloaded files.
 }
 \description{
 \code{download_weather()} makes it easy to download EnergyPlus weather files (EPW)
-and design day files (DDY). Basically, it
+and design day files (DDY).
 }
 \examples{
 \dontrun{

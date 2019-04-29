@@ -30,7 +30,7 @@ currently not available. It is useful in case when you only want to edit
 an EnergyPlus Input Data File (IDF) directly but do not want to install
 whole EnergyPlus software. Default is \code{FALSE}.}
 
-\item{ver}{A valid EnergyPlus version, e.g. \code{8,} \code{8.7,} \code{"8.7"} or \code{"8.7.0"}.
+\item{ver}{A valid EnergyPlus version, e.g. \code{8}, \code{8.7}, \code{"8.7"} or \code{"8.7.0"}.
 For \code{download_idd()}, the special value \code{"latest"}, which is default,
 means the latest version.}
 
@@ -41,8 +41,8 @@ means the latest version.}
 \item \code{use_idd()} returns an \code{Idd} object
 \item \code{download_idd()} returns an invisible integer \code{0} if succeed. Also an
 attribute named \code{file} which is the full path of the downloaded IDD file;
-\item \code{avail_idd()} returns a character vector or \code{NULL} if no available Idd object
-found
+\item \code{avail_idd()} returns a \code{\link[base:numeric_version]{base::numeric_version()}} vector or \code{NULL} if no
+available Idd object found.
 \item \code{is_avail_idd()} returns a single logical vector.
 }
 }
@@ -50,9 +50,9 @@ found
 Use a specific EnergyPlus Input Data Dictionary (IDD) file
 }
 \details{
-\code{use_idd()} takes a path of an EnergyPlus Input Data Dictionary (IDD) file,
-usually named "Energy+.idd" and return an \code{Idd} object. For details on \code{Idd}
-class, please see \link{Idd}.
+\code{use_idd()} takes a valid version or a path of an EnergyPlus Input Data
+Dictionary (IDD) file, usually named "Energy+.idd" and return an \code{Idd}
+object. For details on \code{Idd} class, please see \link{Idd}.
 
 \code{download_idd()} downloads specified version of EnergyPlus IDD file from
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}. It is

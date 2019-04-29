@@ -1,6 +1,6 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program 'EnergyPlus'
-Version: 0.9.4
+Version: 0.10.0
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
@@ -19,20 +19,17 @@ Depends:
 Imports:
     R6,
     RSQLite,
-    assertthat,
     callr (>= 2.0.4),
-    cli,
     crayon,
+    cli,
     data.table (>= 1.9.8),
-    fasttime,
     later,
     lubridate,
+    methods,
     processx (>= 3.2.0),
     progress (>= 1.2.0),
-    readr,
-    stringr,
-    units,
-    uuid
+    stringi,
+    units
 Suggests:
     testthat,
     covr,
@@ -41,28 +38,35 @@ Suggests:
     rmarkdown
 Encoding: UTF-8
 LazyData: true
-SystemRequirements: EnergyPlus (>= 8.3, optional) (<https://energyplus.net>)
+SystemRequirements: EnergyPlus (>= 8.3, optional) (<https://energyplus.net>); udunits2
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace", "collate"))
 RoxygenNote: 6.1.1
 Collate:
     'constants.R'
-    'utils.R'
-    'units.R'
     'assertions.R'
+    'eplusr.R'
+    'utils.R'
     'impl.R'
     'parse.R'
+    'impl-epw.R'
     'epw.R'
+    'err.R'
+    'format.R'
+    'impl-idd.R'
     'idd.R'
     'idd_object.R'
+    'impl-idf.R'
     'idf.R'
+    'impl-idfobj.R'
     'idf_object.R'
-    'validate.R'
-    'format.R'
-    'run.R'
-    'sql.R'
+    'impl-iddobj.R'
+    'impl-sql.R'
+    'install.R'
     'job.R'
     'param.R'
-    'install.R'
-    'eplusr.R'
+    'run.R'
+    'sql.R'
+    'units.R'
+    'validate.R'
     'zzz.R'
 VignetteBuilder: knitr
