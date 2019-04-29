@@ -197,6 +197,17 @@ parse_err_file <- function (path) {
 }
 # }}}
 
+#' Print EnergyPlus Error File
+#'
+#' `ErrFile` is mainly used to extract and print data in an EnergyPlus Error
+#' File (`.err`).
+#'
+#' @param x An `ErrFile` created using [read_err()].
+#' @param brief If `TRUE`, only summary data is printed. Default: `FALSE`.
+#' @param info If `FALSE`, informative messages are excluded. Only warnings and
+#' errors are printed. Default: `TRUE`.
+#' @return An `ErrFile` object, invisibly.
+#' @export
 # print.ErrFile {{{
 print.ErrFile <- function (x, brief = FALSE, info = TRUE) {
     cli::cat_rule("EnergyPlus Error File", line = 2)

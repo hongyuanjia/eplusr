@@ -42,9 +42,9 @@ knitr::opts_chunk$set(
 
 eplusr provides a rich toolkit of using whole building energy simulation program
 [EnergyPlus](https://energyplus.net) directly in R, which enables programmatic
-navigation, modification of EnergyPlus models and makes it less painful to do
-parametric simulations and analysis. More information about EnergyPlus can be
-found at [its website](https://energyplus.net).
+navigation, modification of EnergyPlus, conducts parametric simulations and
+retrieves outputs. More information about EnergyPlus can be found at [its
+website](https://energyplus.net).
 
 A comprehensive introduction to eplusr can be found using
 [`vignette("eplusr")`](https://hongyuanjia.github.io/eplusr/articles/eplusr.html).
@@ -91,8 +91,8 @@ if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
 
 ## Features
 
-* Read, parse and modify EnergyPlus Weather File (EPW)
 * Read, parse and modify EnergyPlus Input Data File (IDF)
+* Read, parse and modify EnergyPlus Weather File (EPW)
 * Query on models, including classes, objects and fields
 * Directly add, modify, duplicate, insert, and delete objects of IDF
 * Automatically change referenced fields when modifying objects
@@ -129,36 +129,72 @@ understanding on each class.
 ```{r load, out.lines = 30}
 library(eplusr)
 
+# parse IDD
 idd <- use_idd(8.8, download = "auto")
 
-model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
+# read IDF
+idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
-model
+# print idf
+idf
 
-model$Material_NoMass$R13LAYER
+# extract object
+idf$Material_NoMass$R13LAYER
 
-model$RunPeriod[[1]][c("Begin Month", "End Month")]
+# get object relation
+idf$object_relation("R13LAYER", "all")
 
-model$add_object("RunPeriod",
-    list(name = "run_period", begin_month = 3, begin_day_of_month = 1,
-         end_month = 4, end_day_of_month = 1))
+# extract field value
+idf$RunPeriod[[1]][c("Begin Month", "End Month")]
 
-model$Construction$FLOOR$possible_value("Outside Layer")
+# add new object
+idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 
-model$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
+# get possible values for fields
+idf$Construction$FLOOR$value_possible("Outside Layer")
 
-job <- model$run(
-    weather = file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"),
-    dir = NULL)
+# read EPW
+path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
+epw <- read_epw(path_epw)
 
+# print weather
+epw
+
+# get location
+(loc <- epw$location())
+
+# update Site:Location according to EPW LOCATION header
+idf$Site_Location$set(
+  name = paste(loc$city, loc$state_province, loc$country),
+  loc$latitude, loc$longitude, loc$time_zone, loc$elevation
+)
+
+# save the IDF
+idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
+
+# extract weather data
+head(epw$data())
+
+# run simulation
+job <- idf$run(epw)
+
+# print simulation error
 job$errors()
 
-job$report_data(name = "EnergyTransfer:Facility", case = "example")
+# get report data
+results <- job$report_data("zone one", "zone mean air temperature",
+  case = "example", month = 1:6, hour = 1, day_type = "Monday",
+  all = TRUE
+)
+str(results)
+
+# get tabular data
+job$tabular_data(table_name = "site and source energy", row_name = "total site energy")
 ```
 
 ```{r del_job, include = FALSE}
-clean_wd(model$path())
-unlink(model$path())
+clean_wd(idf$path())
+unlink(idf$path())
 ```
 
 ## Acknowledgements
@@ -166,19 +202,23 @@ unlink(model$path())
 I would like to thank many open source projects who have heavily inspired the
 development of eplusr package, especially these below:
 
-* [OpenStudio](https://www.openstudio.net)
-* [eppy: scripting language for E+, Energyplus](https://github.com/santoshphilip/eppy)
-* [JEplus - An EnergyPlus simulation manager for parametrics](http://www.jeplus.org)
+* [EnergyPlus](https://www.energyplus.net): A whole building energy simulation
+  program.
+* [OpenStudio](https://www.openstudio.net): A cross-platform collection of
+  software tools to support whole building energy modeling using EnergyPlus and
+  advanced daylight analysis using Radiance.
+* [eppy](https://github.com/santoshphilip/eppy): Scripting language for E+,
+  Energyplus.
+* [JEplus](http://www.jeplus.org):  An EnergyPlus simulation manager for
+  parametrics.
 
 
 ## Author
 
 Hongyuan Jia
 
-*Faculty of Urban Construction and Environmental Engineering, Chongqing University*
-
 ## License
 
-The project is released under the terms of the GPLv3.
+The project is released under the terms of MIT License.
 
-Copyright © 2016-2018 Hongyuan Jia
+Copyright © 2016-2019 Hongyuan Jia
