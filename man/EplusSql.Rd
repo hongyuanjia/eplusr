@@ -154,6 +154,8 @@ using report, table, column and row name specifications. The returned
 \item \code{value}: The value of the record \strong{in string format}
 }
 
+For convenience, input character arguments matching are \strong{case-insensitive}.
+
 \strong{Arguments}
 \itemize{
 \item \code{key_value}: A character vector to identify key values of the data. If

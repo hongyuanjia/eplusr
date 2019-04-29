@@ -204,6 +204,9 @@ using report, table, column and row name specifications. The returned
 \item \code{value}: The value of the record \strong{in string format}
 }
 
+For convenience, input character arguments matching in \code{$report_data()} and
+\code{$tabular_data()} are \strong{case-insensitive}.
+
 \strong{Arguments}
 \itemize{
 \item \code{open}: If \code{TRUE}, the output directory will be opened.

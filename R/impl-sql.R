@@ -37,21 +37,29 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                                        interval = NULL, simulation_days = NULL, day_type = NULL,
                                        environment_name = NULL) {
     # helper {{{
-    sep <- function (x) {
+    sep <- function (x, ignore_case = TRUE) {
         if (is.character(x)) {
-            paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+            if (ignore_case) {
+                stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
+            } else {
+                paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+            }
         } else {
             paste(x, sep = ",", collapse = ",")
         }
     }
-    make <- function (arg, assertion = NULL, sql_col = NULL) {
+    make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE) {
         a <- substitute(assertion)
         if (is.null(arg)) return(NULL)
         eval(a)
         if (is.null(sql_col)) {
             sql_col <- stri_trans_totitle(deparse(substitute(arg)))
         }
-        paste0(sql_col, " IN (", sep(unique(arg)), ")")
+        if (is.character(arg) && ignore_case) {
+            paste0("lower(", sql_col, ") IN (", sep(unique(arg), TRUE), ")")
+        } else {
+            paste0(sql_col, " IN (", sep(unique(arg), FALSE), ")")
+        }
     }
     `%and%` <- function (x, y) {
         if (is.null(y)) return(x)
@@ -215,21 +223,27 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
                                         row_name = NULL) {
     # helper {{{
-    sep <- function (x) {
+    sep <- function (x, ignore_case = TRUE) {
         if (is.character(x)) {
-            paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+            if (ignore_case) {
+                stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
+            } else {
+                paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+            }
         } else {
             paste(x, sep = ",", collapse = ",")
         }
     }
-    make <- function (arg, assertion = NULL, sql_col = NULL) {
+    make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE) {
         a <- substitute(assertion)
         if (is.null(arg)) return(NULL)
         eval(a)
-        if (is.null(sql_col)) {
-            sql_col <- stri_trans_totitle(deparse(substitute(arg)))
+        sql_col <- deparse(substitute(arg))
+        if (is.character(arg) && ignore_case) {
+            paste0("lower(", sql_col, ") IN (", sep(unique(arg), TRUE), ")")
+        } else {
+            paste0(sql_col, " IN (", sep(unique(arg), FALSE), ")")
         }
-        paste0(sql_col, " IN (", sep(unique(arg)), ")")
     }
     `%and%` <- function (x, y) {
         if (is.null(y)) return(x)

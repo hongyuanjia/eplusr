@@ -342,7 +342,7 @@ validation checks in specified validation level.
    Fields below cannot be `autocalculate`:
 
     Class: <AirTerminal:SingleDuct:VAV:Reheat>
-    \─ Object [ID:176] <SPACE5-1 VAV Reheat>
+    \- Object [ID:176] <SPACE5-1 VAV Reheat>
        +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
        \- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
 }

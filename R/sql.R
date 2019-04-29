@@ -147,6 +147,9 @@ NULL
 #' * `units`: The units of the record
 #' * `value`: The value of the record **in string format**
 #'
+#' For convenience, input character arguments matching in `$report_data()` and
+#' `$tabular_data()` are **case-insensitive**.
+#'
 #' **Arguments**
 #'
 #' * `key_value`: A character vector to identify key values of the data. If

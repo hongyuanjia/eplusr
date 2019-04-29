@@ -132,6 +132,9 @@ NULL
 #'
 #' `$tabular_data()` extracts tabular data in a [data.table::data.table()].
 #'
+#' For convenience, input character arguments matching in `$report_data()` and
+#' `$tabular_data()` are **case-insensitive**.
+#'
 #' For `$report_data_dict()`, `$report_data()` and `$tabular_data()`, the
 #' returned data.table has a `case` column in the returned
 #' [data.table::data.table()] that indicates the names of parametric models. For

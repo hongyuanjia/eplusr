@@ -135,6 +135,9 @@ using key values, variable names and other arguments.
 
 \code{$tabular_data()} extracts tabular data in a \code{\link[data.table:data.table]{data.table::data.table()}}.
 
+For convenience, input character arguments matching in \code{$report_data()} and
+\code{$tabular_data()} are \strong{case-insensitive}.
+
 For \code{$report_data_dict()}, \code{$report_data()} and \code{$tabular_data()}, the
 returned data.table has a \code{case} column in the returned
 \code{\link[data.table:data.table]{data.table::data.table()}} that indicates the names of parametric models. For
