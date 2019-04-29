@@ -8,7 +8,7 @@
   sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
-\item{x}{An \link{IdfObject} object.}
+\item{x}{An \link{IddObject} object.}
 
 \item{comment}{A character vector to be used as comments of returned string
 format object. If \code{NULL}, no comments are inserted. Default: \code{NULL}.}
@@ -27,7 +27,7 @@ only minimum fields are returned.}
 A character vector.
 }
 \description{
-Format an \code{IddObject} into an empty object of current class in a character
+Format an \link{IddObject} into an empty object of current class in a character
 vector format. It is formated exactly the same as in IDF Editor.
 }
 \examples{

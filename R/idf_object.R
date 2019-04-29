@@ -1167,13 +1167,51 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 }
 # }}}
 
+#' Format an IdfObject
+#'
+#' Format an [IddObject] into a character vector in the same way as in IDF Editor.
+#'
+#' @param x An [IdfObject] object.
+#' @param comment If `FALSE`, all comments will not be included. Default: `TRUE`.
+#' @param leading Leading spaces added to each field. Default: `4L`.
+#' @param sep_at The character width to separate value string and field string.
+#' Default: `29L` which is the same as IDF Editor.
+#' @param all If `TRUE`, values of all possible fields in current class the
+#'   [IdfObject] belongs to are retured. Default: `FALSE`
+#' @return A character vector.
+#' @examples
+#' \dontrun{
+#' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+#'     idd = use_idd(8.8, download = "auto"))
+#'
+#' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
+#' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+#'
+#' format(mat, leading = 0, sep_at = 10)
+#' }
 #' @export
 # format.IdfObject {{{
-format.IdfObject <- function (x, ...) {
-    x$to_string(...)
+format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
 }
 # }}}
 
+#' Coerce an IdfObject into a Character Vector
+#'
+#' Coerce an [IdfObject] into a character vector in the same way as in IDF Editor.
+#'
+#' @inheritParams format.IddObject
+#' @return A character vector.
+#' @examples
+#' \dontrun{
+#' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
+#'     idd = use_idd(8.8, download = "auto"))
+#'
+#' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
+#' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+#'
+#' as.character(mat, leading = 0, sep_at = 10)
+#' }
 #' @export
 # as.character.IdfObject {{{
 as.character.IdfObject <- format.IdfObject
@@ -1182,7 +1220,7 @@ as.character.IdfObject <- format.IdfObject
 #' @export
 # str.IdfObject {{{
 str.IdfObject <- function (object, ...) {
-    object$value(...)
+    object$value()
 }
 # }}}
 

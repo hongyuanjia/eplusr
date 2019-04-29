@@ -1176,10 +1176,10 @@ iddobj_print <- function (self, private, brief = FALSE) {
 
 #' Format an IddObject
 #'
-#' Format an `IddObject` into an empty object of current class in a character
+#' Format an [IddObject] into an empty object of current class in a character
 #' vector format. It is formated exactly the same as in IDF Editor.
 #'
-#' @param x An [IdfObject] object.
+#' @param x An [IddObject] object.
 #' @param all If `TRUE`, all fields in current class are returned, otherwise
 #' only minimum fields are returned.
 #' @param comment A character vector to be used as comments of returned string
@@ -1196,7 +1196,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' @export
 # format.IddObject {{{
 format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all, ...)
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
 }
 # }}}
 
