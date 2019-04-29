@@ -497,26 +497,24 @@ sep_object_dots <- function (...) {
         )
     }
 
-    if (any(depth == 1L, depth == 2L)) {
-        dt <- rbindlist(list(
-            dt_dot[J(1L), on = "dep"],
-            dt_dot[J(2L), on = "dep",
-                {
-                    len <- each_length(dot)
-                    lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
-                    list(dot = lst, dot_nm = names2(lst), dep = 1L)
-                }, by = "rleid"]
-        ))
-    } else if (any(depth == 2L)){
-        dt <- dt_dot[,
+    if (any(depth == 1L)) {
+        dt_1 <- dt_dot[J(1L), on = "dep"]
+    } else {
+        dt_1 <- data.table()
+    }
+
+    if (any(depth == 2L)){
+        dt_2 <- dt_dot[J(2L), on = "dep",
             {
                 len <- each_length(dot)
                 lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
                 list(dot = lst, dot_nm = names2(lst), dep = 1L)
             }, by = "rleid"]
     } else {
-        dt <- copy(dt_dot)
+        dt_2 <- data.table()
     }
+
+    dt <- rbindlist(list(dt_1, dt_2), use.names = TRUE)
     setorderv(dt, "rleid")
     add_rleid(dt, "object")
 
@@ -1861,6 +1859,15 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) 
     )]
     set(obj, NULL, "new_object_name", NULL)
 
+    # stop of trying to add Version object
+    if (any(obj$class_id == 1L)) {
+        invld <- find_dot(l$dot, obj[class_id == 1L])
+        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
+        abort("error_insert_version",
+            paste0("Inserting Version object is prohibited. Invalid input:\n", m)
+        )
+    }
+
     prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
         "required_field", "src_enum", "type_enum", "extensible_group"
     )
@@ -2532,9 +2539,22 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
     # If field reference has been handled and updated during validation, only
     # check sources
     if (level_checks()$reference) {
+        set(object, NULL, "rleid", -object$rleid)
+
         # update object id as new object id during validation
-        idf_env$reference[J(-object$rleid), on = "object_id", object_id := object$object_id]
-        idf_env$reference[J(-object$rleid), on = "src_object_id", object_id := object$object_id]
+        input_ref <- idf_env$reference[object_id < 0L, which = TRUE]
+        if (length(input_ref)) {
+            set(idf_env$reference, input_ref, "object_id",
+                object[J(idf_env$reference$object_id[input_ref]), on = "rleid", object_id]
+            )
+        }
+
+        input_src <- idf_env$reference[src_object_id < 0L, which = TRUE]
+        if (length(input_src)) {
+            set(idf_env$reference, input_src, "src_object_id",
+                object[J(idf_env$reference$src_object_id[input_src]), on = "rleid", object_id]
+            )
+        }
 
         # if have sources
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
