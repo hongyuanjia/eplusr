@@ -52,6 +52,7 @@ model$object(which)
 model$object_unique(class)
 model$objects(which)
 model$objects_in_class(class)
+model$objects_in_group(group)
 model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
 model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -225,6 +226,7 @@ model$object(which)
 model$objects(which)
 model$object_unique(class)
 model$objects_in_class(class)
+model$objects_in_group(group)
 model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 model$ClassName
@@ -249,7 +251,10 @@ sure that \code{$object_unique()} always returns an single \link{IdfObject}.
 or names.
 
 \code{$objects_in_class()} returns a named \strong{list} of all \link{IdfObject}s in
-specified classes.
+specified class.
+
+\code{$objects_in_group()} returns a named \strong{list} of all \link{IdfObject}s in
+specified group.
 
 \code{$objects_in_relation()} returns a named \strong{list} of \link{IdfObject}s that have
 specified relations with given object. The first element of returned list is
@@ -310,6 +315,7 @@ vector of object names for \code{$objects()}.
 \item \code{class}: A single string of class name for \code{$object_unique()} and
 \code{$objects_in_class()}; a character vector of class names for
 \code{$objects_in_relation()} and \code{$search_object()}.
+\item \code{group}: A single string of group name.
 \item \code{pattern}, \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}: All of them are
 directly passed to \code{\link[base:grepl]{base::grepl()}}.
 \item \code{ClassName}: A single string of class name. For \code{[[}, \code{ClassName} can

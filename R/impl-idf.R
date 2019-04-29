@@ -1829,7 +1829,7 @@ rename_idf_object <- function (idd_env, idf_env, ...) {
 }
 # }}}
 # insert_idf_object {{{
-insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) {
+insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
     l <- sep_object_dots(...)
     ver <- version
     input <- l$data

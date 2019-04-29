@@ -50,6 +50,7 @@ NULL
 #' model$object_unique(class)
 #' model$objects(which)
 #' model$objects_in_class(class)
+#' model$objects_in_group(group)
 #' model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
 #' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -222,6 +223,7 @@ NULL
 #' model$objects(which)
 #' model$object_unique(class)
 #' model$objects_in_class(class)
+#' model$objects_in_group(group)
 #' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
@@ -246,7 +248,10 @@ NULL
 #' or names.
 #'
 #' `$objects_in_class()` returns a named **list** of all [IdfObject]s in
-#' specified classes.
+#' specified class.
+#'
+#' `$objects_in_group()` returns a named **list** of all [IdfObject]s in
+#' specified group.
 #'
 #' `$objects_in_relation()` returns a named **list** of [IdfObject]s that have
 #' specified relations with given object. The first element of returned list is
@@ -307,6 +312,7 @@ NULL
 #' * `class`: A single string of class name for `$object_unique()` and
 #'   `$objects_in_class()`; a character vector of class names for
 #'   `$objects_in_relation()` and `$search_object()`.
+#' * `group`: A single string of group name.
 #' * `pattern`, `ignore.case`, `perl`, `fixed` and `useBytes`: All of them are
 #'   directly passed to [base::grepl()].
 #' * `ClassName`: A single string of class name. For \code{[[}, `ClassName` can
@@ -1433,6 +1439,9 @@ Idf <- R6::R6Class(classname = "Idf",
         objects_in_class = function (class)
             idf_objects_in_class(self, private, class),
 
+        objects_in_group = function (group)
+            idf_objects_in_group(self, private, group),
+
         object_relation = function (which, direction = c("all", "ref_to", "ref_by"))
             idf_object_relation(self, private, which, match.arg(direction)),
 
@@ -1704,8 +1713,25 @@ idf_object_in_class <- function (self, private, class) {
 # }}}
 # idf_objects_in_class {{{
 idf_objects_in_class <- function (self, private, class) {
-    assert(is_scalar(class))
+    assert(is_string(class))
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
+
+    res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
+    setattr(res, "names", obj$object_name)
+    res
+}
+# }}}
+# idf_objects_in_group {{{
+idf_objects_in_group <- function (self, private, group) {
+    assert(is_string(group))
+
+    add_joined_cols(private$idd_env()$class, private$idf_env()$object, "class_id", "group_id")
+    add_joined_cols(private$idd_env()$group, private$idf_env()$object, "group_id", "group_name")
+    on.exit(set(private$idf_env()$object, NULL, c("group_id", "group_name"), NULL), add = TRUE)
+
+    grp_in <- recognize_input(group, "group")
+
+    obj <- join_from_input(private$idf_env()$object, grp_in, "group_id")
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
     setattr(res, "names", obj$object_name)
