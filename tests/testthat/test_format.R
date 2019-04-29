@@ -189,8 +189,8 @@ test_that("Idd formatting", {
     )
     # }}}
     # IDF {{{
-    idd_parsed <- parse_idd_file(file.path(eplus_config(8.6)$dir, "Energy+.idd"))
-    idf_parsed <- parse_idf_file(text("idf", "8.6"))
+    idd_parsed <- parse_idd_file(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
+    idf_parsed <- parse_idf_file(text("idf", "8.8"))
     add_joined_cols(idd_parsed$field, idf_parsed$value, "field_id", c("field_index", "type_enum", "units", "ip_units"))
     # object
     expect_equal(format_objects(idf_parsed$object, component = "object")$out,
