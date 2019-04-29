@@ -990,7 +990,10 @@ idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, rec
         }
         return(invisible())
     } else {
-        message("Target object refers to ", nrow(rel), " object(s) [ID:", rel$object_id, "].\n")
+        rel <- rel[, list(src_object_id = unique(src_object_id)), by = "object_id"]
+        message("Target object refers to ", nrow(rel), " object(s) [ID:",
+            collapse(rel$src_object_id), "].\n"
+        )
         res <- apply2(
             rel$src_object_id,
             private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id],
@@ -1035,7 +1038,9 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL) {
         }
         return(invisible())
     } else {
-        message("Target object is referred by ", nrow(rel), " object(s) [ID:", rel$object_id, "].\n")
+        rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
+        message("Target object is referred by ", nrow(rel), " object(s) [ID:",
+            collapse(rel$object_id), "].\n")
         res <- apply2(
             rel$object_id,
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
