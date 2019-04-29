@@ -442,7 +442,7 @@ param_retrieve_data <- function (self, private) {
 }
 # }}}
 # param_job_from_which {{{
-param_job_from_which <- function (self, private, which) {
+param_job_from_which <- function (self, private, which, keep_unsucess = FALSE) {
     status <- param_status(self, private)
 
     if (!isTRUE(status$run_before))
@@ -656,8 +656,8 @@ param_output_dir <- function (self, private, which = NULL) {
 }
 # }}}
 # param_locate_output {{{
-param_locate_output <- function (self, private, which = NULL, suffix = ".err", strict = TRUE) {
-    job <- param_job_from_which(self, private, which)
+param_locate_output <- function (self, private, which = NULL, suffix = ".err", strict = TRUE, keep_unsucess = FALSE) {
+    job <- param_job_from_which(self, private, which, keep_unsucess = keep_unsucess)
 
     out <- paste0(tools::file_path_sans_ext(job$idf), suffix)
 
@@ -671,7 +671,8 @@ param_locate_output <- function (self, private, which = NULL, suffix = ".err", s
 # }}}
 # param_output_errors {{{
 param_output_errors <- function (self, private, which, info = FALSE) {
-    path_err <- param_locate_output(self, private, which, ".err")
+    # continue to parse err file for jobs having non-zero exits (#24)
+    path_err <- param_locate_output(self, private, which, ".err", keep_unsucess = TRUE)
 
     err <- lapply(path_err, parse_err_file)
 
