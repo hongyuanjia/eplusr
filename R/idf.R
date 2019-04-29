@@ -2255,9 +2255,9 @@ idf_add_output_sqlite <- function (idf) {
 #' string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
 #' path, that file usually has a extension `.idf`.
 #' @param idd  Any acceptable input of [use_idd()]. If `NULL`, which is the
-#'     default, the version of IDF will be passed to [use_idd()]. If the input
-#'     IDF does not have a version field (possible for ".ddy" files), then it
-#'     will be parsed using the latest version of IDD cached, with a warning.
+#' default, the version of IDF will be passed to [use_idd()]. If the input is an
+#' `.ddy` file which does not have a version field, the latest version of [Idf]
+#' cached will be used.
 #' @details
 #' Currently, Imf file is not fully supported. All EpMacro lines will be treated
 #' as normal comments of the nearest downwards object. If input is an Imf file,
@@ -2265,7 +2265,7 @@ idf_add_output_sqlite <- function (idf) {
 #' file to an Idf file and use [ParametricJob] class to conduct
 #' parametric analysis.
 #'
-#' @return An `Idf` object.
+#' @return An [Idf] object.
 #' @examples
 #' # example model shipped with eplusr from EnergyPlus v8.8
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
@@ -2420,6 +2420,17 @@ format.Idf <- function (x, comment = TRUE, header = TRUE,
 as.character.Idf <- format.Idf
 # }}}
 
+#' Create an Empty Idf
+#'
+#' `empty_idf()` takes a valid IDD version and creates an empty [Idf] object
+#' that only contains a Version object.
+#'
+#' @param ver Any acceptable input of [use_idd()]. If `latest`, which is the
+#' default, the latest IDD released version is used.
+#' @return An [Idf] object
+#' @export
+#' @examples
+#' if (is_avail_idd(8.8)) empty_idf(8.8)
 # empty_idf {{{
 empty_idf <- function (ver = "latest") {
     ver <- standardize_ver(ver)

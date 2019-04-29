@@ -946,6 +946,7 @@ format_comment <- function (dt) {
 # }}}
 
 # Relatioin
+#' @export
 # print.IddRelationBy {{{
 print.IddRelationBy <- function (x, ...) {
     cli::cat_rule("Referred by Others")
@@ -959,6 +960,7 @@ print.IddRelationBy <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IddRelationTo {{{
 print.IddRelationTo <- function (x, ...) {
     cli::cat_rule("Refer to Others")
@@ -972,6 +974,7 @@ print.IddRelationTo <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IddRelation {{{
 print.IddRelation <- function (x, ...) {
     if (!is.null(x[["ref_to"]])) {print.IddRelationTo(x[["ref_to"]]); cli::cat_line()}
@@ -979,6 +982,7 @@ print.IddRelation <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IdfRelationBy {{{
 print.IdfRelationBy <- function (x, ...) {
     by_value <- attr(x, "by_value") %||% FALSE
@@ -999,6 +1003,7 @@ print.IdfRelationBy <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IdfRelationTo {{{
 print.IdfRelationTo <- function (x, ...) {
     by_value <- attr(x, "by_value") %||% FALSE
@@ -1019,6 +1024,7 @@ print.IdfRelationTo <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IdfRelation {{{
 print.IdfRelation <- function (x, ...) {
     if (!is.null(x[["ref_to"]])) {print.IdfRelationTo(x[["ref_to"]]); cli::cat_line()}
@@ -1028,6 +1034,7 @@ print.IdfRelation <- function (x, ...) {
 # }}}
 
 # Possible
+#' @export
 # print.IddFieldPossible {{{
 print.IddFieldPossible <- function (x, ...) {
     fmt <- format_possible(x)
@@ -1042,11 +1049,13 @@ print.IddFieldPossible <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # print.IdfValuePossible {{{
 print.IdfValuePossible <- print.IddFieldPossible
 # }}}
 
 # Range
+#' @export
 # format.Range {{{
 format.Range <- function (x, ...) {
     if (is.na(x$minimum) && is.na(x$maximum)) {
@@ -1076,12 +1085,14 @@ format.Range <- function (x, ...) {
     paste0(left, ", ", right)
 }
 # }}}
+#' @export
 # print.Range {{{
 print.Range <- function (x, ...) {
     cat(format.Range(x, ...), "\n")
     invisible(x)
 }
 # }}}
+#' @export
 # as.character.Range{{{
 as.character.Range <- function (x, ...) {
     format.Range(x, ...)
