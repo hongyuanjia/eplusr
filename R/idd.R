@@ -209,14 +209,14 @@ NULL
 #' # IddObject of Construction and Material class
 #' idd$objects(c("Construction", "Material"))
 #'
-#' # show all classes that refer to Construction class
-#' idd$object_relation("Construction", "ref_by")
+#' # show all classes that refer to Material class
+#' length(idd$object_relation("Material", "ref_by"))
 #'
 #' # IddObjects that refer to class Construction
-#' idd$objects_in_relation("Construction", "ref_by")
+#' length(idd$objects_in_relation("Construction", "ref_by"))
 #'
 #' # IddObjects that class Construction refers to
-#' idd$objects_in_relation("Construction", "ref_to")
+#' length(idd$objects_in_relation("Construction", "ref_to"))
 #'
 #' # All IddObjects in group Schedules
 #' length(idd$objects_in_group("Schedules"))
