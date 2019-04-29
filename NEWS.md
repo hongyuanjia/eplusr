@@ -82,6 +82,8 @@ break changes. Detailed updates per class are as follow:
 
 * `$object_in_class()` now is deprecated in flavor of `$objects_in_class()`.
 
+* New mthod `$objects_in_group()` is aded to get all objects in specified group.
+
 * `$search_object()`, `$search_value()` and `$replace_value()` now can take same
   arguments as `base::grepl()` to further control the way it searches objects.
 
