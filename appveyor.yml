@@ -27,6 +27,7 @@ matrix:
   fast_finish: true
 
 environment:
+  PKGTYPE: source
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
