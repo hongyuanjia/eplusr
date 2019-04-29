@@ -19,7 +19,9 @@ install:
   - ps: "ls \"C:/Program Files/Microsoft SDKs/Windows\""
 
 cache:
-  - C:\RLibrary
+  # clearing the cache: https://github.com/appveyor/ci/issues/985
+  # change .appveyor_clear_cache.txt to invalidate cache
+  - C:\RLibrary -> .appveyor_clear_cache.txt
 
 # Adapt as necessary starting from here
 
@@ -27,7 +29,6 @@ matrix:
   fast_finish: true
 
 environment:
-  PKGTYPE: source
   matrix:
     - R_VERSION: devel
       R_ARCH: x64
