@@ -1178,7 +1178,7 @@ assert_can_do <- function (idd_env, idf_env, dot, object,
 
         m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
 
-        abort("error_add_version",
+        abort(paste0("error_", action, "_version"),
             paste0(
                 switch(action,
                     add = "Adding",

@@ -95,7 +95,7 @@ test_that("list checking", {
 
     expect_true(assert(8 > 5, 2 > 1))
     expect_is(tryCatch(assert(is_scalar(1:2)), error = identity), "error_not_scalar")
-    expect_error(assert(is_scalar(1:2)), "1:2 is not a scalar")
-    expect_error(assert(is_scalar(1:2), msg = "a"), "a")
-    expect_error(assert(is_scalar(1:2), prefix = "input"), "input is not a scalar")
+    expect_error(assert(is_scalar(1:2)), class = "error_not_scalar")
+    expect_error(assert(is_scalar(1:2), msg = "a"), "a", class = "error_not_scalar")
+    expect_error(assert(is_scalar(1:2), prefix = "input"), "input is not a scalar", class = "error_not_scalar")
 })

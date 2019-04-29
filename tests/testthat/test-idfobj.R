@@ -23,7 +23,7 @@ test_that("IdfObject class", {
     expect_equal(mat$comment(), " this is a test comment for WD01")
 
     # can handle invalid input types of comment
-    expect_error(mat$comment(comment = list("a")), "`comment` should be NULL or a character vector")
+    expect_error(mat$comment(comment = list("a")), class = "error_not_is.atomic")
 
     # can delete comments
     expect_equal(mat$comment(comment = NULL)$comment(), NULL)
@@ -43,7 +43,7 @@ test_that("IdfObject class", {
 
     # can detect invalid `append` value
     expect_error(mat$comment(comment = c("b"), append = 1:2),
-        "`append` should be NULL or a single logical value.")
+        class = "error_not_flag")
 
     # can wrap comment at specified `width`
     expect_equal(mat$comment(comment = c("a", "bb ccc"), append = NULL, width = 1L)$comment(),
@@ -86,8 +86,8 @@ test_that("IdfObject class", {
     )
 
     # can detect invaid `index` values
-    expect_error(mat$value("1"), "Invalid field name")
-    expect_error(mat$value(c(1, 10:11)), "Invalid field index found")
+    expect_error(mat$value("1"), class = "error_bad_field_name")
+    expect_error(mat$value(c(1, 10:11)), class = "error_bad_field_index")
 
     # can return subset of values in a object using `index`
     expect_equivalent(mat$value(c(3, 1, 5)), tolerance = 1e-5,
@@ -103,41 +103,41 @@ test_that("IdfObject class", {
     expect_equal(mat$Roughness, "MediumSmooth")
 
     # can detect invalid `name` values
-    expect_error(mat$value(c("Thickness", "Wrong", "Name")), "Invalid field name")
+    expect_error(mat$value(c("Thickness", "Wrong", "Name")), class = "error_bad_field_name")
     # }}}
 
     # Set Values {{{
     # can stop when trying to directly modify `Version` object
-    expect_error(ver$set(8.8), "Modifying Version object")
+    expect_error(ver$set(8.8), class = "error_set_version")
 
     # can stop when no values are given
-    expect_error(con$set(), "Please give field values to add or set")
+    expect_error(con$set(), class = "error_dot_empty")
 
     expect_error(con$set(name = "named", "unnamed"),
-        "Fields below are not one of valid reference")
+        class = "error_validity")
 
     # can stop when duplicated names are given
     expect_error(con$set(name = "first", name = "second"),
-        "Field names must be unique")
+        class = "error_dot_dup_field_name")
 
     # can stop when invalid names are given for a non-extensible class
     expect_error(mat$set(wrong = "something"),
-        "Invalid field name found")
+        class = "error_bad_field_name")
 
     # can stop when invalid names are given for an extensible class
     expect_error(con$set(name = "first", wrong = "second"),
-        "Invalid field name found")
+        class = "error_bad_field_name")
 
     # can stop when valid names are given, but total field values are not accepatable for an extensible class
     idf$add(Zone = list("PLENUM-1"))
     expect_error(surf$set(vertex_5_x_coordinate = 1, vertex_5_y_coordinate = 2),
-        "Incomplete Extensible Group"
+        class = "error_validity"
     )
 
     # can stop when total field values are acceptable but invalid names are given for an extensible class
     expect_error(
         surf$set(vertex_5_x_coordinate = 1, vertex_5_y_coordinate = 2, vertex_5_z_wrong = 3),
-        "Invalid field name found"
+        class = "error_bad_field_name"
     )
 
     # can add new values for extensible fields
@@ -150,7 +150,7 @@ test_that("IdfObject class", {
     expect_equal(con$value("Outside Layer")[[1]], "NewMaterialName")
 
     # can stop when there are invalid references in the input
-    expect_error(con$set(layer_2 = "missing"), "Invalid Reference")
+    expect_error(con$set(layer_2 = "missing"), class = "error_validity")
 
     # works using `[[<-.IdfObject`
     expect_silent(mat$Name <- "NewMaterial")

@@ -38,14 +38,14 @@ test_that("table", {
     expect_equal(get_idf_object(idd_env, idf_env, 55, c("WD02", "WD01"))$object_id, c(4L, 1L))
     expect_equal(get_idf_object(idd_env, idf_env, "Material")$object_id, c(1L, 4L))
     expect_equal(get_idf_object(idd_env, idf_env, "Material", c("WD02", "WD01"))$object_id, c(4L, 1L))
-    expect_error(get_idf_object(idd_env, idf_env, 2), "Invalid class index")
-    expect_error(get_idf_object(idd_env, idf_env, "Branch"), "Invalid class name")
-    expect_error(get_idf_object(idd_env, idf_env, "Material", "wrong"), "Invalid object name")
-    expect_error(get_idf_object(idd_env, idf_env, "Material", 15), "Invalid object ID")
+    expect_error(get_idf_object(idd_env, idf_env, 2), class = "error_class_id")
+    expect_error(get_idf_object(idd_env, idf_env, "Branch"), class = "error_class_name")
+    expect_error(get_idf_object(idd_env, idf_env, "Material", "wrong"), class = "error_object_name")
+    expect_error(get_idf_object(idd_env, idf_env, "Material", 15), class = "error_object_id")
     expect_equal(get_idf_object(idd_env, idf_env, 55, c("wd02", "wd01"), ignore_case = TRUE)$object_id, c(4L, 1L))
 
-    expect_error(get_idf_object_id(idd_env, idf_env, 10000), "Invalid class index")
-    expect_error(get_idf_object_id(idd_env, idf_env, "Branch"), "Invalid class name")
+    expect_error(get_idf_object_id(idd_env, idf_env, 10000), class = "error_class_id")
+    expect_error(get_idf_object_id(idd_env, idf_env, "Branch"), class = "error_class_name")
     expect_equal(get_idf_object_id(idd_env, idf_env),
         list(Version = 5L, Material = c(1L, 4L), Construction = 2L, `BuildingSurface:Detailed` = 3L)
     )
@@ -69,7 +69,7 @@ test_that("table", {
 
     expect_equal(get_idf_object_num(idd_env, idf_env), 5L)
     expect_equal(get_idf_object_num(idd_env, idf_env, c(55, 55, 100)), c(2L, 2L, 0L))
-    expect_error(get_idf_object_num(idd_env, idf_env, c(55, 55, 10000)), "Invalid class index")
+    expect_error(get_idf_object_num(idd_env, idf_env, c(55, 55, 10000)), class = "error_invalid_class")
     expect_equal(get_idf_object_num(idd_env, idf_env, c("Material", "Material")), c(2L, 2L))
     expect_equal(get_idf_object_num(idd_env, idf_env, c("Material", "Material", "Branch")), c(2L, 2L, 0L))
 
@@ -326,12 +326,12 @@ test_that("table", {
     # }}}
 
     # misc
-    expect_error(get_idf_value(idd_env, idf_env, 10000), "Invalid class index")
-    expect_error(get_idf_value(idd_env, idf_env, ""), "Invalid class name")
-    expect_error(get_idf_value(idd_env, idf_env, object = 10000), "Invalid object ID")
-    expect_error(get_idf_value(idd_env, idf_env, object = ""), "Invalid object name")
-    expect_error(get_idf_value(idd_env, idf_env, "Version", field = 2L), "Invalid field index")
-    expect_error(get_idf_value(idd_env, idf_env, "Version", field = "Version"), "Invalid field name")
+    expect_error(get_idf_value(idd_env, idf_env, 10000), class = "error_class_id")
+    expect_error(get_idf_value(idd_env, idf_env, ""), class = "error_class_name")
+    expect_error(get_idf_value(idd_env, idf_env, object = 10000), class = "error_object_id")
+    expect_error(get_idf_value(idd_env, idf_env, object = ""), class = "error_object_name")
+    expect_error(get_idf_value(idd_env, idf_env, "Version", field = 2L), class = "error_bad_field_index")
+    expect_error(get_idf_value(idd_env, idf_env, "Version", field = "Version"), class = "error_bad_field_name")
 
     expect_equal(get_idf_value(idd_env, idf_env, "Version")$value_id, 44L)
     expect_equal(get_idf_value(idd_env, idf_env, "Version", field = 1L)$value_id, 44L)
@@ -377,16 +377,16 @@ test_that("table", {
 
 # NAME DOTS {{{
 test_that("NAME DOTS", {
-    expect_error(sep_name_dots(), "Please give object\\(s\\) to modify")
-    expect_error(sep_name_dots(NULL), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(list()), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(NA), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(NA_character_), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(TRUE), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(NaN), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(Inf), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(0), "must be a character vector or a positive integer")
-    expect_error(sep_name_dots(list(0)), "must be a character vector or a positive integer")
+    expect_error(sep_name_dots(), class = "error_empty_input")
+    expect_error(sep_name_dots(NULL), class = "error_wrong_type")
+    expect_error(sep_name_dots(list()), class = "error_wrong_type")
+    expect_error(sep_name_dots(NA), class = "error_wrong_type")
+    expect_error(sep_name_dots(NA_character_), class = "error_wrong_type")
+    expect_error(sep_name_dots(TRUE), class = "error_wrong_type")
+    expect_error(sep_name_dots(NaN), class = "error_wrong_type")
+    expect_error(sep_name_dots(Inf), class = "error_wrong_type")
+    expect_error(sep_name_dots(0), class = "error_wrong_type")
+    expect_error(sep_name_dots(list(0)), class = "error_wrong_type")
     expect_warning({
         x <- c("e", "f"); y <- c(5L, 6L); z <- c(z = "g")
         nm <- sep_name_dots(1:2, c("a", "b"), c = 1, d = "z", x, y, z = z)
@@ -417,72 +417,72 @@ test_that("NAME DOTS", {
 
 # VALUE DOTS {{{
 test_that("VALUE DOTS", {
-    expect_error(sep_value_dots(NULL), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list()), "must be an empty list or a list where")
-    expect_error(sep_value_dots(1), "must be an empty list or a list where")
-    expect_error(sep_value_dots("a"), "must be an empty list or a list where")
-    expect_error(sep_value_dots(NA), "must be an empty list or a list where")
-    expect_error(sep_value_dots(NA_character_), "must be an empty list or a list where")
-    expect_error(sep_value_dots(NA_integer_), "must be an empty list or a list where")
-    expect_error(sep_value_dots(character()), "must be an empty list or a list where")
-    expect_error(sep_value_dots(integer()), "must be an empty list or a list where")
-    expect_error(sep_value_dots(double()), "must be an empty list or a list where")
-    expect_error(sep_value_dots(logical()), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = NULL), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = "a"), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = NA_integer_), "must be an empty list or a list where")
+    expect_error(sep_value_dots(NULL), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list()), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(1), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots("a"), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(NA), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(NA_character_), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(NA_integer_), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(character()), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(integer()), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(double()), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(logical()), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = NULL), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = "a"), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = NA_integer_), class = "error_dot_invalid_format")
 
     # can change empty string to NA
     expect_equal(sep_value_dots(cls = list("", "  ", " "))$value$value_chr, rep(NA_character_, 3L))
 
     # missing class name
-    expect_error(sep_value_dots(list(NULL)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, NULL)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, NA)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, c(NA, NA, NA))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, 1)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, c(1, 2))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, "a")), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, NA_character_)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NULL, NA_integer_)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NA)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(NA, "a")), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(list())), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(list(NULL))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(list(NA))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(list("a"))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(list(NULL, NULL), list()), .empty = TRUE), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(NULL, NULL, list()), .empty = TRUE), "must be an empty list or a list where")
+    expect_error(sep_value_dots(list(NULL)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, NULL)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, NA)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, c(NA, NA, NA))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, 1)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, c(1, 2))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, "a")), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, NA_character_)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NULL, NA_integer_)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NA)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(NA, "a")), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(list())), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(list(NULL))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(list(NA))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(list("a"))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(list(NULL, NULL), list()), .empty = TRUE), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(NULL, NULL, list()), .empty = TRUE), class = "error_dot_invalid_format")
 
     # invalid list format
-    expect_error(sep_value_dots(cls = list(list("a")), "must be an empty list or a list where"))
-    expect_error(sep_value_dots(cls = list(1, list())), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(list())), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(list(NULL, NULL))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(cls = list(list()))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(cls = list(list(NULL, NULL)))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(cls = list(1, list()))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(1, list(NULL))), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(1, list("a"))), "must be an empty list or a list where")
+    expect_error(sep_value_dots(cls = list(list("a")), class = "error_dot_invalid_format"))
+    expect_error(sep_value_dots(cls = list(1, list())), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(list())), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(list(NULL, NULL))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(cls = list(list()))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(cls = list(list(NULL, NULL)))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(cls = list(1, list()))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(1, list(NULL))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(1, list("a"))), class = "error_dot_invalid_format")
     expect_error(sep_value_dots(list("Material" = list(), Construction = NULL)))
     expect_error(sep_value_dots(list("Material" = list(), NULL)))
 
     # contains NA
-    expect_error(sep_value_dots(cls = list(NA)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(cls = list(NULL, NA)), "must be an empty list or a list where")
-    expect_error(sep_value_dots(list(cls = list(NULL, NA))), "must be an empty list or a list where")
+    expect_error(sep_value_dots(cls = list(NA)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls = list(NULL, NA)), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(list(cls = list(NULL, NA))), class = "error_dot_invalid_format")
 
     # multiple .comment
-    expect_error(sep_value_dots(cls = list(.comment = c("a"), .comment = NULL)), "only have one `.comment`")
-    expect_error(sep_value_dots(list(cls = list(.comment = c("a"), .comment = NULL))), "only have one `.comment`")
+    expect_error(sep_value_dots(cls = list(.comment = c("a"), .comment = NULL)), class = "error_dot_multi_comment")
+    expect_error(sep_value_dots(list(cls = list(.comment = c("a"), .comment = NULL))), class = "error_dot_multi_comment")
 
     # duplicated field names
-    expect_error(sep_value_dots(cls = list(Name = "const", Name = "const1")), "names must be unique")
-    expect_error(sep_value_dots(list(cls = list(Name = "const", Name = "const1"))), "names must be unique")
+    expect_error(sep_value_dots(cls = list(Name = "const", Name = "const1")), class = "error_dot_dup_field_name")
+    expect_error(sep_value_dots(list(cls = list(Name = "const", Name = "const1"))), class = "error_dot_dup_field_name")
 
     # empty objects
-    expect_error(sep_value_dots(cls = list(), .empty = FALSE), "Empty input found")
-    expect_error(sep_value_dots(list(cls = list()), .empty = FALSE), "Empty input found")
+    expect_error(sep_value_dots(cls = list(), .empty = FALSE), class = "error_dot_empty")
+    expect_error(sep_value_dots(list(cls = list()), .empty = FALSE), class = "error_dot_empty")
     expect_silent({l <- sep_value_dots(
         cls = list(), cls = list(NULL), list(cls = list(), cls = list(NULL)),
         .empty = TRUE)
@@ -609,12 +609,12 @@ test_that("Dup", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(dup_idf_object(idd_env, idf_env), "Please give object\\(s\\) to modify")
-    expect_error(dup_idf_object(idd_env, idf_env, 1), "Duplicating Version object")
+    expect_error(dup_idf_object(idd_env, idf_env), class = "error_empty_input")
+    expect_error(dup_idf_object(idd_env, idf_env, 1), class = "error_dup_version")
     # unique object: SimulationControl
-    expect_error(dup_idf_object(idd_env, idf_env, 7), "Existing unique object")
+    expect_error(dup_idf_object(idd_env, idf_env, 7), class = "error_dup_unique")
 
-    expect_error(dup_idf_object(idd_env, idf_env, shit = 7, fuck = 7), "Existing unique object")
+    expect_error(dup_idf_object(idd_env, idf_env, shit = 7, fuck = 7), class = "error_dup_unique")
 
     expect_silent({dup <- dup_idf_object(idd_env, idf_env, `NewFloor` = "FLOOR")})
     expect_equivalent(dup$object, data.table(object_id = 54L, class_id = 90L,
@@ -627,7 +627,7 @@ test_that("Dup", {
         src_object_id = 14L, src_value_id = 99L, src_enum = 2L))
 
     expect_error(dup_idf_object(idd_env, idf_env, FLOOR = "FLOOR"), fixed = TRUE,
-    "Input new name(s) cannot be the same as target object(s)")
+        class = "error_validity")
     expect_silent({dup <- dup_idf_object(idd_env, idf_env, rep("FLOOR", 10))})
     expect_equal(dup$object$object_name, paste0("FLOOR_", 1:10))
 })
@@ -640,10 +640,10 @@ test_that("Add", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(add_idf_object(idd_env, idf_env), "Please give object\\(s\\) to add")
-    expect_error(add_idf_object(idd_env, idf_env, Version = list(8.8)), "Adding Version object")
+    expect_error(add_idf_object(idd_env, idf_env), class = "error_empty_input")
+    expect_error(add_idf_object(idd_env, idf_env, Version = list(8.8)), class = "error_add_version")
     expect_error(add_idf_object(idd_env, idf_env,
-        SimulationControl = list()), "Adding new object in existing unique-object class")
+        SimulationControl = list()), class = "error_add_unique")
     expect_silent({rp <- add_idf_object(idd_env, idf_env,
         RunPeriod = list("Test1", 1, 1, End_Month = 2, 1, "Monday", Apply_Weekend_Holiday_Rule = "No")
     )})
@@ -682,8 +682,8 @@ test_that("Set", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(set_idf_object(idd_env, idf_env), "Please give object\\(s\\) to add")
-    expect_error(set_idf_object(idd_env, idf_env, ..1 = list(8.8)), "Modifying Version object")
+    expect_error(set_idf_object(idd_env, idf_env), class = "error_empty_input")
+    expect_error(set_idf_object(idd_env, idf_env, ..1 = list(8.8)), class = "error_set_version")
     expect_silent({rp <- set_idf_object(idd_env, idf_env, ..8 = list(Name = "Test"))})
     expect_equal(rp$object, data.table(object_id = 8L, class_id = 22L,
             comment = list(NULL), object_name = "Test", object_name_lower = "test")
@@ -718,13 +718,13 @@ test_that("Del", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(del_idf_object(idd_env, idf_env), "Please give object\\(s\\) to modify")
-    expect_error(del_idf_object(idd_env, idf_env, 1), "Deleting Version object")
-    expect_error(del_idf_object(idd_env, idf_env, c(2, 2)), "Cannot modify same object multiple times")
-    expect_error(del_idf_object(idd_env, idf_env, 3), "Deleting a required object")
+    expect_error(del_idf_object(idd_env, idf_env), class = "error_empty_input")
+    expect_error(del_idf_object(idd_env, idf_env, 1), class = "error_del_version")
+    expect_error(del_idf_object(idd_env, idf_env, c(2, 2)), class = "error_del_multi_time")
+    expect_error(del_idf_object(idd_env, idf_env, 3), class = "error_del_required")
     expect_error(
         del_idf_object(idd_env, idf_env, "R13WALL", "FLOOR", "ROOF31"),
-        "Cannot delete object\\(s\\) that are referred by others"
+        class = "error_del_referenced"
     )
     expect_silent({del <- del_idf_object(idd_env, idf_env, 21:26, 14, .referenced = TRUE, .recursive = TRUE)})
     expect_equivalent(setdiff(idf_env$object$object_id, del$object$object_id), c(14L, 16L, 21:26))
@@ -738,13 +738,13 @@ test_that("Rename", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(rename_idf_object(idd_env, idf_env), "Please give object\\(s\\) to modify")
-    expect_error(rename_idf_object(idd_env, idf_env, 1), "Modifying Version object")
-    expect_error(rename_idf_object(idd_env, idf_env, c(2, 2)), "Cannot modify same object multiple times")
-    expect_error(rename_idf_object(idd_env, idf_env, 3), "Please give new object names")
+    expect_error(rename_idf_object(idd_env, idf_env), class = "error_empty_input")
+    expect_error(rename_idf_object(idd_env, idf_env, 1), class = "error_rename_version")
+    expect_error(rename_idf_object(idd_env, idf_env, c(2, 2)), class = "error_rename_multi_time")
+    expect_error(rename_idf_object(idd_env, idf_env, 3), class = "error_rename_no_new_name")
     expect_error(
         rename_idf_object(idd_env, idf_env, "R13WALL", "FLOOR", "ROOF31"),
-        "Please give new object names"
+        class = "error_rename_no_new_name"
     )
     expect_silent(ren <- rename_idf_object(idd_env, idf_env,
         r13 = "R13WALL", flr = "FLOOR", roof = "ROOF31", r31 = "R31LAYER")
@@ -768,25 +768,25 @@ test_that("Insert", {
     idf_env <- ._get_private(idf)$m_idf_env
     idd_env <- ._get_private(idf)$idd_env()
 
-    expect_error(insert_idf_object(idd_env, idf_env), "Please give object\\(s\\) to insert")
+    expect_error(insert_idf_object(idd_env, idf_env), class = "error_empty_input")
     expect_error(insert_idf_object(idd_env, idf_env, version = idf$version(), 1),
-        "must be an IdfObject or a list of IdfObjects"
+        class = "error_wrong_type"
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = idf$version(), my_building = idf$Building),
-        "Inserting new object in existing unique-object class"
+        class = "error_insert_unique"
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Version),
-        "Inserting Version object"
+        class = "error_insert_version"
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = numeric_version("8.7.0"), idf$Material),
-        "should be IdfObjects with version `8.7.0`"
+        class = "error_not_same_version"
     )
     expect_error(
         insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Material),
-        "Conflicted Object Names"
+        class = "error_validity"
     )
     expect_silent(
         ins <- insert_idf_object(idd_env, idf_env, version = idf$version(), new_mat = idf$Material[[1L]])

@@ -252,11 +252,11 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
-        abort("warning_miss_idd_build", "No build tag found in input IDD.")
+        abort("error_miss_idd_build", "No build tag found in input IDD.")
     } else if (nrow(build_line) == 1L) {
         build <- stri_sub(build_line$string, 12L)
     } else {
-        parse_issue("warning_multi_idd_build", "idd", "Multiple build tags found", build_line)
+        parse_issue("error_multi_idd_build", "idd", "Multiple build tags found", build_line)
     }
 }
 # }}}

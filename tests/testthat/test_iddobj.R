@@ -6,7 +6,7 @@ test_that("IddObject class", {
     expect_silent(slash <- IddObject$new("TestSlash", idd))
     expect_silent(slash <- idd_object(use_idd(text("idd", 9.9)), "TestSlash"))
 
-    expect_error(idd_object(), "IddObject can only be created based on a parent Idd object")
+    expect_error(idd_object(), class = "error_iddobject_missing_parent")
 
     # Group {{{
     # can use $group_name()
@@ -68,7 +68,7 @@ test_that("IddObject class", {
 
     # Field {{{
     # can use $field_name()
-    expect_error(slash$field_name(slash$num_fields() + 30), "Invalid field index")
+    expect_error(slash$field_name(slash$num_fields() + 30), class = "error_bad_field_index")
     expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
     expect_warning({nm <- slash$field_name(c(2, 1), lower = TRUE)},
         "Parameter `lower`.*has been deprecated"
@@ -76,7 +76,7 @@ test_that("IddObject class", {
 
     # can use $field_index()
     expect_equal(slash$field_index(), 1L:4L)
-    expect_error(slash$field_index("WrongName"), "Invalid field name")
+    expect_error(slash$field_index("WrongName"), class = "error_bad_field_name")
     expect_equal(slash$field_index(
             c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
     # can use $field_type()
@@ -155,7 +155,7 @@ test_that("IddObject class", {
     expect_true(slash$is_valid_field_index(2))
     expect_true(slash$is_valid_field_index(3))
     expect_true(slash$is_valid_field_index(4))
-    expect_error(slash$is_valid_field_index("wrong"), "not counts")
+    expect_error(slash$is_valid_field_index("wrong"), class = "error_not_count")
     expect_false(slash$is_valid_field_index(5))
 
     # can use $is_autosizable_field()

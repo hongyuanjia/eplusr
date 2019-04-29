@@ -60,7 +60,7 @@ test_that("Idd class", {
         c("TestGroup2", "TestGroup1"))
 
     # can stop when invalid class name is given
-    expect_error(idd$from_group("WrongClass"), "Invalid class name found")
+    expect_error(idd$from_group("WrongClass"), class = "error_class_name")
 
     # can return all class names
     expect_equal(idd$class_name(), c("TestSimple", "TestSlash"))
@@ -73,7 +73,7 @@ test_that("Idd class", {
         c(2L, 1L, 2L))
 
     # can stop when invalid group names are given
-    expect_error(idd$group_index("WrongGroup"), "Invalid group name found")
+    expect_error(idd$group_index("WrongGroup"), class = "error_group_name")
 
     # can return an index of a single class
     expect_equal(idd$class_index("TestSlash"), 2L)
@@ -83,7 +83,7 @@ test_that("Idd class", {
         c(2L, 1L, 1L))
 
     # can stop when invalid class names are given
-    expect_error(idd$class_index("WrongClass"), "Invalid class name found")
+    expect_error(idd$class_index("WrongClass"), error = "error_class_name")
 
     expect_is(idd$object_relation("TestSimple"), "IddRelation")
     expect_is(idd$object_relation("TestSimple", "ref_to"), "IddRelation")
@@ -102,7 +102,7 @@ test_that("Idd class", {
     expect_is(idd$object("TestSimple"), "IddObject")
 
     # can stop when invalid class names are given
-    expect_error(idd$object("WrongClass"), "Invalid class name found: `WrongClass`")
+    expect_error(idd$object("WrongClass"), error = "error_class_name_us")
 
     # can return when multiple class names are given
     expect_equal(idd$objects(c("TestSimple", "TestSlash")),
@@ -114,11 +114,10 @@ test_that("Idd class", {
     expect_equal(idd$objects_in_group("TestGroup1"), list(TestSimple = idd$object("TestSimple")))
 
     # can stop when invalid group names are given
-    expect_error(idd$objects_in_group("WrongGroup"), "Invalid group name found")
+    expect_error(idd$objects_in_group("WrongGroup"), class = "error_group_name")
 
     # can stop when multiple group names are given
-    expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")),
-        "group is not a string")
+    expect_error(idd$objects_in_group(c("TestGroup1", "TestGroup2")), class = "error_not_string")
 
     expect_is(idd$objects_in_relation("TestSimple", "ref_to"), "list")
     expect_equal(names(idd$objects_in_relation("TestSimple", "ref_to")), "TestSimple")

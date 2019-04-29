@@ -7,18 +7,18 @@ test_that("table manipulation", {
     # GROUP {{{
     expect_equal(get_idd_group_index(idd_parsed), 1L:2L)
     expect_equal(get_idd_group_index(idd_parsed, "TestGroup2"), 2L)
-    expect_error(get_idd_group_index(idd_parsed, "Wrong"), "Invalid group name")
+    expect_error(get_idd_group_index(idd_parsed, "Wrong"), class = "error_group_name")
     expect_equal(get_idd_group_name(idd_parsed), c("TestGroup1", "TestGroup2"))
     expect_equal(get_idd_group_name(idd_parsed, 2L), "TestGroup2")
-    expect_error(get_idd_group_name(idd_parsed, 3), "Invalid group index")
+    expect_error(get_idd_group_name(idd_parsed, 3), class = "error_group_id")
     # }}}
 
     # CLASS {{{
     expect_equal(get_idd_class(idd_parsed),
         idd_parsed$class[, .SD, .SDcols = c("class_id", "class_name", "group_id")]
     )
-    expect_error(get_idd_class(idd_parsed, ""), "Invalid class name")
-    expect_error(get_idd_class(idd_parsed, 10L), "Invalid class index")
+    expect_error(get_idd_class(idd_parsed, ""), class = "error_class_name")
+    expect_error(get_idd_class(idd_parsed, 10L), class = "error_class_id")
 
     expect_equal(
         get_idd_class(idd_parsed, c(2L, 1L)),
@@ -56,7 +56,7 @@ test_that("table manipulation", {
     # EXTENSIBLE GROUP {{{
     # ADD {{{
     expect_equal(add_idd_extensible_group(idd_parsed, "TestSimple", 1)$field, idd_parsed$field)
-    expect_error(add_idd_extensible_group(idd_parsed, "TestSimple", 1, strict = TRUE), "Non-extensible class")
+    expect_error(add_idd_extensible_group(idd_parsed, "TestSimple", 1, strict = TRUE), class = "error_nonextensible_class")
     expect_equal(nrow(idd_added <- add_idd_extensible_group(idd_parsed, "TestSlash", 2)$field), 13L)
     expect_equal(nrow((idd_added <- add_idd_extensible_group(idd_parsed, "TestSlash", 1))$field), 9L)
     expect_equal(idd_added$class$num_fields[2L], 8L)
@@ -85,14 +85,14 @@ test_that("table manipulation", {
     expect_equivalent((idd_del <- del_idd_extensible_group(idd_added, "TestSlash", 1))$field, idd_parsed$field)
     expect_equal(idd_del$class$num_fields[2L], 4L)
     expect_equal(idd_del$class$num_extensible_group[2L], 1L)
-    expect_error(del_idd_extensible_group(idd_del, "TestSlash", 4), "left less than required")
+    expect_error(del_idd_extensible_group(idd_del, "TestSlash", 4), class = "error_del_extensible")
     # }}}
     # }}}
 
     # FIELD {{{
     ## USING CLASS {{{
-    expect_error(get_idd_field(idd_parsed, 10), "Invalid class index")
-    expect_error(get_idd_field(idd_parsed, ""), "Invalid class name")
+    expect_error(get_idd_field(idd_parsed, 10), class = "error_class_id")
+    expect_error(get_idd_field(idd_parsed, ""), class = "error_class_name_us")
     expect_equal(get_idd_field(idd_parsed, c("TestSimple", "TestSlash")),
         data.table(field_id = 1:4, class_id = c(1L, rep(2L, 3)),
             field_index = c(1L, 1:3),
@@ -120,12 +120,9 @@ test_that("table manipulation", {
     )
     # }}}
     ## USING FIELD INDEX {{{
-    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(2, 2)), "Invalid field index")
-    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(2, 2, 3)),
-        "class and field do not have the same length"
-    )
-    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(1, 10), no_ext = TRUE),
-        "should be no less than 3 and no more than 4")
+    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(2, 2)), class = "error_bad_field_index")
+    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(2, 2, 3)), class = "error_not_have_same_len")
+    expect_error(get_idd_field(idd_parsed, c("TestSimple", "TestSlash"), c(1, 10), no_ext = TRUE), class = "error_bad_field_index")
     expect_equal(get_idd_field(idd_parsed, c("TestSimple", "TestSlash", "TestSlash"), c(1, 3, 99)),
         data.table(field_id = c(1L, 4L, 100L), class_id = c(1L, 2L, 2L),
             field_index = c(1L, 3L, 99L),
@@ -165,9 +162,9 @@ test_that("table manipulation", {
             )
         )
     )
-    expect_error(get_idd_field(idd_parsed, "TestSimple", ""), "Invalid field name")
-    expect_error(get_idd_field(idd_parsed, "TestSlash", ""), "Invalid field name")
-    expect_error(get_idd_field(idd_parsed, "TestSlash", "", no_ext = TRUE), "Invalid field name")
+    expect_error(get_idd_field(idd_parsed, "TestSimple", ""), class = "error_bad_field_name")
+    expect_error(get_idd_field(idd_parsed, "TestSlash", ""), class = "error_bad_field_name")
+    expect_error(get_idd_field(idd_parsed, "TestSlash", "", no_ext = TRUE), class = "error_bad_field_name")
     expect_equal(get_idd_field(idd_parsed, c(1L, 2L), c("test_field", "test_numeric_field_3")),
         data.table(field_id = c(1L, 7L), class_id = c(1L, 2L), field_index = c(1L, 6L),
             field_name = c("Test Field", "Test Numeric Field 3"),

@@ -100,17 +100,17 @@ test_that("Idf class", {
 
     # can get IdfObject
     expect_is(idf$object(1), "IdfObject")
-    expect_error(idf$object(1:2), "not a scalar")
+    expect_error(idf$object(1:2), class = "error_not_scalar")
     expect_equal(names(idf$objects("WD01")), "WD01")
     expect_equal(names(idf$objects("WALL-1")), "WALL-1")
     expect_is(idf$objects(1:2), "list")
-    expect_error(idf$objects("a"), "Invalid object name")
-    expect_error(idf$objects(1:6), "Invalid object ID")
+    expect_error(idf$objects("a"), class = "error_object_name_lower")
+    expect_error(idf$objects(1:6), class = "error_object_id")
 
     # can get all objects in a class
     expect_warning(obj <- idf$object_in_class("Version"), "deprecated")
     expect_equal(names(obj), NA_character_)
-    expect_error(idf$objects_in_class("version"), "Invalid class name")
+    expect_error(idf$objects_in_class("version"), class = "error_class_name")
 
     # can get all objects in relation
     expect_is(idf$objects_in_relation(2), "list")
@@ -137,50 +137,50 @@ test_that("Idf class", {
     expect_equal(idf$object(6)$name(), "WD01-DUP")
     expect_equal(idf$object("WD01-DUP")$value(2:5), idf$object("WD01")$value(2:5))
     expect_equal(idf$dup("WD01")[[1L]]$name(), "WD01_1")
-    expect_error(idf$dup("WD01" = "WD01-DUP"), "Conflicted Object Names")
+    expect_error(idf$dup("WD01" = "WD01-DUP"), class = "error_validity")
     expect_equal(names(idf$dup(rep("WD01", times = 10L))),
         paste0("WD01_", 2:11))
     # }}}
 
     # ADD {{{
     # invalid value input format
-    expect_error(idf$add("Material" = list(name = "mat"), "Construction"), "Each object must be ...")
-    expect_error(idf$add("Material" = character(0)), "Each object must be ...")
-    expect_error(idf$add("Material" = list()), "Missing Required Field")
-    expect_error(idf$add(Material =  list(list())), "Each object must be ...")
-    expect_error(idf$add("Material" = list(list(name = "mat"))), "Each object must be ...")
-    expect_error(idf$add(list("Material" = list(), Construction = NULL)), "Each object must be ...")
-    expect_error(idf$add("Material" = character(), "Construction" = list()), "Each object must be ...")
-    expect_error(idf$add("Material" = list(list(1))), "Each object must be ...")
+    expect_error(idf$add("Material" = list(name = "mat"), "Construction"), class = "error_dot_invalid_format")
+    expect_error(idf$add("Material" = character(0)), class = "error_dot_invalid_format")
+    expect_error(idf$add("Material" = list()), class = "error_validity")
+    expect_error(idf$add(Material =  list(list())), class = "error_dot_invalid_format")
+    expect_error(idf$add("Material" = list(list(name = "mat"))), class = "error_dot_invalid_format")
+    expect_error(idf$add(list("Material" = list(), Construction = NULL)), class = "error_dot_invalid_format")
+    expect_error(idf$add("Material" = character(), "Construction" = list()), class = "error_dot_invalid_format")
+    expect_error(idf$add("Material" = list(list(1))), class = "error_dot_invalid_format")
     # invalid comment input format
-    expect_error(idf$add("Material" = list(.comment = "a")), "Missing Required Field")
-    expect_error(idf$add("Material" = list(.comment = character(0))),"Missing Required Field")
+    expect_error(idf$add("Material" = list(.comment = "a")), class = "error_validity")
+    expect_error(idf$add("Material" = list(.comment = character(0))), class = "error_validity")
     # mixed named and unnamed
-    expect_error(idf$add("Material" = list(name = "rough", "rough")), "Missing Required Field")
+    expect_error(idf$add("Material" = list(name = "rough", "rough")), class = "error_validity")
     # duplicated field names
-    expect_error(idf$add("Material" = list(name = "a", name = "a")), "must be unique")
+    expect_error(idf$add("Material" = list(name = "a", name = "a")), class = "error_dot_dup_field_name")
     # adding existing unique
-    expect_error(idf$add("Version" = list(8)), "Adding Version object is prohibited")
+    expect_error(idf$add("Version" = list(8)), class = "error_add_version")
     expect_silent(idf_full <- read_idf(example()))
-    expect_error(idf_full$add("Building" = list()), "unique-object class")
+    expect_error(idf_full$add("Building" = list()), class = "error_add_unique")
 
     # adding empty object
     expect_silent(idf$add("Building" = list()))
 
     # invalid field number
-    expect_error(idf$add("Output:Variable" = list("a", "b", "c", "d", "e")), "Invalid field index")
+    expect_error(idf$add("Output:Variable" = list("a", "b", "c", "d", "e")), class = "error_bad_field_index")
 
     # invalid field names
     # (a) non-extensible classes
-    expect_error(idf$add("Material" = list(wrong = "Rough")), "Invalid field name found")
+    expect_error(idf$add("Material" = list(wrong = "Rough")), class = "error_bad_field_name")
 
     # (b) extensible classes
-    expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_6 = "day6")), "Incomplete Extensible Group")
-    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Name = "algo", Wrong = "Rough")), "For extensible fields")
-    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Name = "algo", Surface_Name_8 = "Rough")), "extensible fields")
-    expect_error(idf$add("Schedule:Week:Compact" =  list(DayType_List_7 = "day7", Schedule_Day_Name_6 = "sch6")), "Incomplete Extensible Group")
-    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Surface_Name_8 = "surf8", Surface_Name_20 = "surf20")), "For extensible fields")
-    expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_8 = "day8", Schedule_Day_Name_8 = "sch8")), "Incomplete Extensible Group")
+    expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_6 = "day6")), class = "error_validity")
+    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Name = "algo", Wrong = "Rough")), class = "error_bad_field_name")
+    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Name = "algo", Surface_Name_8 = "Rough")), class = "error_bad_field_name")
+    expect_error(idf$add("Schedule:Week:Compact" =  list(DayType_List_7 = "day7", Schedule_Day_Name_6 = "sch6")), class = "error_validity")
+    expect_error(idf$add("SurfaceProperty:HeatTransferAlgorithm:SurfaceList" = list(Surface_Name_8 = "surf8", Surface_Name_20 = "surf20")), class = "error_bad_field_name")
+    expect_error(idf$add("Schedule:Week:Compact" = list(DayType_List_8 = "day8", Schedule_Day_Name_8 = "sch8")), class = "error_validity")
     expect_equal(use_idd(8.8)$SurfaceProperty_HeatTransferAlgorithm_SurfaceList$num_fields(), 8L)
     expect_equal(use_idd(8.8)$Schedule_Week_Compact$num_fields(), 17L)
 
@@ -225,7 +225,7 @@ test_that("Idf class", {
     )
 
     # can stop adding objects if trying to add a object with same name
-    expect_error(idf$add(RunPeriod = list("rp_test_1", 1, 1, 2, 1)), "Conflicted Object Names")
+    expect_error(idf$add(RunPeriod = list("rp_test_1", 1, 1, 2, 1)), class = "error_validity")
     # }}}
 
     # SET {{{
@@ -235,7 +235,7 @@ test_that("Idf class", {
         idf$set("rp_test_1" = list(name = "rp_test_3", begin_day_of_month = 2,
             .comment = c(format(Sys.Date()), "begin day has been changed."))
         ),
-        "Conflicted Object Names"
+        class = "error_validity"
     )
     expect_silent(
         idf$set("rp_test_1" = list(name = "rp_test_4", begin_day_of_month = 2,
@@ -269,24 +269,24 @@ test_that("Idf class", {
     # }}}
 
     # INSERT {{{
-    expect_error(idf$insert(list()), "Each element must be an IdfObject or a list of IdfObjects")
+    expect_error(idf$insert(list()), class = "error_wrong_type")
     expect_silent(idf$insert(idf_full$Material_NoMass$R13LAYER))
     expect_equal(idf$object_name("Material:NoMass", simplify = TRUE), "R13LAYER")
     expect_equal(idf_full$Material_NoMass$R13LAYER$value(simplify = TRUE),
         c("R13LAYER", "Rough", "2.290965", "0.9", "0.75", "0.75")
     )
-    expect_error(idf$insert(idf_full$Version), "Inserting Version object is prohibited")
-    expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), "Conflicted Object Names")
+    expect_error(idf$insert(idf_full$Version), class = "error_insert_version")
+    expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), class = "error_validity")
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
     # }}}
 
     # DELETE {{{
-    expect_error(idf$del(5L), "Deleting Version object is prohibited")
-    expect_error(idf$del(c(1, 2, 1)), "Cannot modify same object multiple times")
-    expect_error(idf$del(idf$Building$id()), "Deleting a required object is prohibited")
+    expect_error(idf$del(5L), class = "error_del_version")
+    expect_error(idf$del(c(1, 2, 1)), class = "error_del_multi_time")
+    expect_error(idf$del(idf$Building$id()), class = "error_del_required")
     expect_error(fixed = TRUE,
         idf_full$del(idf_full$Material_NoMass[[1]]$id()),
-        "Cannot delete object(s) that are referred by others"
+        class = "error_del_referenced"
     )
     expect_equal(eplusr_option(validate_level = "none"), list(validate_level = "none"))
     expect_silent(idf_full$del(12, .referenced = TRUE, .force = TRUE))

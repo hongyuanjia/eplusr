@@ -2127,7 +2127,8 @@ set_epw_period_basic <- function (epw_header, period, name, start_day_of_week) {
     } else {
         assert(have_same_len(period, name))
         assert(!name %in% epw_header$period$period$name,
-            msg = "Input new name should not be the same as existing ones."
+            msg = "Input new name should not be the same as existing ones.",
+            err_type = "error_invalid_epw_data_period_name"
         )
         set(epw_header$period$period, period, "name", name)
     }

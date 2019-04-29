@@ -1,9 +1,9 @@
 test_that("eplusr_option()", {
-    expect_error(eplusr_option(validate = TRUE), "Invalid option name found")
+    expect_error(eplusr_option(validate = TRUE), class = "error_not_%in%")
 
     expect_error(eplusr_option(validate_level = "wrong"))
 
-    expect_error(eplusr_option(view_in_ip = 1), "view_in_ip is neither `TRUE` nor `FALSE`")
+    expect_error(eplusr_option(view_in_ip = 1), class = "error_not_flag")
 
     expect_warning(eplusr_option(num_digits = "a"))
 
