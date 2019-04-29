@@ -344,7 +344,7 @@ eplus_config <- function (ver) {
 avail_eplus <- function () {
     res <- names(.globals$eplus_config)
     if (!length(res)) return(NULL)
-    numeric_version(res)
+    sort(numeric_version(res))
 }
 # }}}
 

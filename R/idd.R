@@ -856,7 +856,7 @@ download_idd <- function (ver = "latest", dir) {
 avail_idd <- function () {
     res <- names(.globals$idd)
     if (!length(res)) return(NULL)
-    numeric_version(res)
+    sort(numeric_version(res))
 }
 # }}}
 
@@ -923,7 +923,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
                 )
             }
 
-            idd <- use_idd(avail_idd()[length(avail_idd())])
+            idd <- use_idd(avail_idd()[which.max(avail_idd())])
             if (warn) {
                 warn("warn_latest_idd_used",
                     paste0(mes,
