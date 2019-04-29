@@ -471,7 +471,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
                 )
             }
 
-            private$m_version <- eplus_ver
+            private$m_version <- complete_patch_ver(eplus_ver)
         },
         # }}}
 

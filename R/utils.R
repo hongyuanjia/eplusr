@@ -170,11 +170,45 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
     ver
 }
 # }}}
+
 # complete_patch_ver {{{
 complete_patch_ver <- function (ver) {
     if (any(!is.na(ver) & is.na(ver[, 3L]))) {
         ver[!is.na(ver) & is.na(ver[, 3L]), 3L] <- 0L
     }
+    ver
+}
+# }}}
+
+# match_minor_ver {{{
+match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = TRUE) {
+    assert(is_scalar(ver))
+    if (!length(all_ver)) return(numeric_version(NA, strict = FALSE))
+    all_ver <- unique(all_ver)
+    ori_ver <- ver
+
+    if (is.na(ver[, 3L])) {
+        ver <- numeric_version(all_ver[ver[, 1L:2L] == numeric_version(all_ver)[, 1L:2L]], strict = FALSE)
+    } else {
+        ver <- numeric_version(all_ver[as.character(ver) == all_ver], strict = FALSE)
+    }
+
+    if (!length(ver)) {
+        ver <- numeric_version(NA, strict = FALSE)
+    } else if (length(ver) > 1L) {
+        if (verbose) {
+            type <- match.arg(type)
+            key <- switch(type, idd = "IDD", eplus = "EnergyPlus")
+
+            message("Multiple versions found for ", key, " v", ori_ver, ": ",
+                collapse(paste0("v", ver)), ". ",
+                "The last patched version v", max(ver), " will be used. ",
+                "Please explicitly give the full version if you want to use the other versions."
+            )
+        }
+        ver <- max(ver)
+    }
+
     ver
 }
 # }}}

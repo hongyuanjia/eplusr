@@ -13,8 +13,8 @@ ALL_IDD_VER <- c(
     paste0(4:6, ".0.0"),
     paste0("7.", 0:2, ".0"),
     paste0("8.", 0:9, ".0"),
-    paste0("9.0.1"),
-    paste0("9.", 0:1, ".0")
+    paste0("9.0.", 0:1),
+    paste0("9.1.0")
 )
 
 ALL_EPLUS_RELEASE_COMMIT <- data.table::fread(

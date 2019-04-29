@@ -41,8 +41,8 @@ means the latest version.}
 \item \code{use_idd()} returns an \code{Idd} object
 \item \code{download_idd()} returns an invisible integer \code{0} if succeed. Also an
 attribute named \code{file} which is the full path of the downloaded IDD file;
-\item \code{avail_idd()} returns a character vector or \code{NULL} if no available Idd object
-found
+\item \code{avail_idd()} returns a \code{\link[base:numeric_version]{base::numeric_version()}} vector or \code{NULL} if no
+available Idd object found.
 \item \code{is_avail_idd()} returns a single logical vector.
 }
 }

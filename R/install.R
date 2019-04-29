@@ -97,7 +97,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 #' @export
 # download_eplus {{{
 download_eplus <- function (ver = "latest", dir) {
-    ver <- standardize_ver(ver)
+    ver <- match_minor_ver(standardize_ver(ver, complete = FALSE), ALL_EPLUS_VER, "eplus")
     url <- eplus_download_url(ver)
     file <- basename(url)
 
@@ -227,7 +227,8 @@ install_eplus_linux <- function (exec) {
 #' * For `use_eplus()` and `eplus_config()`, an (invisible for
 #'   `use_eplus()`) list of three contains EnergyPlus version, directory and
 #'   EnergyPlus executable.  version of EnergyPlus;
-#' * For `avail_eplus()`, a character vector;
+#' * For `avail_eplus()`, a [base::numeric_version()] vector or `NULL` if no
+#'   available EnergyPlus is found;
 #' * For `is_avis_avail_eplus()`, a scalar logical vector.
 #'
 #' @rdname use_eplus
@@ -254,14 +255,41 @@ install_eplus_linux <- function (exec) {
 #' @export
 # use_eplus {{{
 use_eplus <- function (eplus) {
+    assert(is_scalar(eplus))
+
     # if eplus is a version, try to locate it in the default path
     if (is_eplus_ver(eplus, strict = TRUE)) {
-        ver <- standardize_ver(eplus)
-        eplus_dir <- eplus_default_path(eplus)
-        if (!is_eplus_path(eplus_dir)) {
-            stop("Cannot locate EnergyPlus v", stringi::stri_trim_both(eplus), " at default ",
-                "installation path ", surround(eplus_dir), ". Please specify ",
-                "explicitly the path of EnergyPlus installation.", call. = FALSE)
+        ver <- standardize_ver(eplus, complete = FALSE)
+        ori_ver <- ver
+
+        # have to check all possible patched versions
+        all_ver <- unique(c(ALL_IDD_VER, names(.globals$eplus_config)))
+        ver <- numeric_version(all_ver[ver[, 1L:2L] == numeric_version(all_ver)[, 1L:2L]])
+        eplus_dir <- eplus_default_path(ver)
+        chk <- is_eplus_path(eplus_dir)
+        if (any(chk)) {
+            if (sum(chk) > 1L) {
+                message("Multiple versions found for EnergyPlus v", ori_ver, ": ",
+                    collapse(paste0("v", ver)), ". ",
+                    "The last patched version v", max(ver), " will be used. ",
+                    "Please explicitly give the full version if you want to use the other versions."
+                )
+                eplus_dir <- eplus_dir[which.max(ver)]
+                ver <- max(ver)
+            } else {
+                eplus_dir <- eplus_dir[chk]
+                ver <- ver[chk]
+            }
+        } else {
+            msg <- NULL
+            if (length(ver) > 1L) {
+                msg <- paste0("Multiple possible versions found for EnergyPlus v", ori_ver, ": ",
+                    collapse(paste0("v", ver)), ".\n")
+            }
+
+            fail <- paste0("Cannot locate EnergyPlus v", stringi::stri_trim_both(eplus), " at default ",
+                "installation path ", surround(eplus_dir), collapse = "\n")
+            stop(msg, fail, "\nPlease specify explicitly the path of EnergyPlus installation.", call. = FALSE)
         }
     } else if (is_eplus_path(eplus)){
         ver <- get_ver_from_path(eplus)
@@ -271,7 +299,7 @@ use_eplus <- function (eplus) {
             "EnergyPlus installation path.", call. = FALSE)
     }
 
-    exe <- paste0("energyplus", if(is_windows()) ".exe" else "")
+    exe <- paste0("energyplus", if (is_windows()) ".exe" else "")
     res <- list(version = ver, dir = eplus_dir, exe = exe)
 
     ori <- .globals$eplus_config[[as.character(ver)]]
@@ -298,28 +326,34 @@ use_eplus <- function (eplus) {
 # eplus_config {{{
 eplus_config <- function (ver) {
     assert(is_eplus_ver(ver, strict = TRUE))
-    ver <- standardize_ver(ver)
-    res <- .globals$eplus_config[[as.character(ver)]]
-    if (is.null(res)) {
+    ver <- standardize_ver(ver, complete = FALSE)
+    ver <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
+    if (is.na(ver)) {
         warning("Failed to find configuration data of EnergyPlus v", ver, ".",
             call. = FALSE)
-        res <- list()
+        return(list())
     }
 
-    res
+    .globals$eplus_config[[as.character(ver)]]
 }
 # }}}
 
 #' @rdname use_eplus
 #' @export
 # avail_eplus {{{
-avail_eplus <- function () names(.globals$eplus_config)
+avail_eplus <- function () {
+    res <- names(.globals$eplus_config)
+    if (!length(res)) return(NULL)
+    numeric_version(res)
+}
 # }}}
 
 #' @rdname use_eplus
 #' @export
 # is_avail_eplus {{{
-is_avail_eplus <- function (ver) !is_empty(suppressWarnings(eplus_config(ver)))
+is_avail_eplus <- function (ver) {
+    length(suppressWarnings(eplus_config(ver))) > 0L
+}
 # }}}
 
 # locate_eplus {{{
@@ -338,7 +372,7 @@ locate_eplus <- function () {
 eplus_default_path <- function (ver) {
     ver <- standardize_ver(ver)
     assert(is_eplus_ver(ver))
-    ver_dash <- paste0(ver[1,1], "-", ver[1,2], "-", ver[1,3])
+    ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)
     } else if (is_linux()) {

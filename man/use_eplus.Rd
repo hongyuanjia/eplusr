@@ -26,7 +26,8 @@ path.}
 \item For \code{use_eplus()} and \code{eplus_config()}, an (invisible for
 \code{use_eplus()}) list of three contains EnergyPlus version, directory and
 EnergyPlus executable.  version of EnergyPlus;
-\item For \code{avail_eplus()}, a character vector;
+\item For \code{avail_eplus()}, a \code{\link[base:numeric_version]{base::numeric_version()}} vector or \code{NULL} if no
+available EnergyPlus is found;
 \item For \code{is_avis_avail_eplus()}, a scalar logical vector.
 }
 }

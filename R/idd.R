@@ -639,8 +639,8 @@ read_idd <- function (path) {
 #' * `use_idd()` returns an `Idd` object
 #' * `download_idd()` returns an invisible integer `0` if succeed. Also an
 #'   attribute named `file` which is the full path of the downloaded IDD file;
-#' * `avail_idd()` returns a character vector or `NULL` if no available Idd object
-#'   found
+#' * `avail_idd()` returns a [base::numeric_version()] vector or `NULL` if no
+#'   available Idd object found.
 #' * `is_avail_idd()` returns a single logical vector.
 #'
 #' @examples
@@ -700,23 +700,12 @@ use_idd <- function (idd, download = FALSE) {
         }))
     }
 
-    ver <- standardize_ver(idd, complete = FALSE)
-
-    # if no patch version is given
-    if (is.na(ver[, 3L])) {
-        # use the latest ver
-        ori_ver <- ver
-        ver <- numeric_version(ALL_IDD_VER[ver[, 1L:2L] == numeric_version(ALL_IDD_VER)[, 1L:2L]])
-
-        if (length(ver) > 1L) {
-            message("Multiple versions found for IDD v", ori_ver, ": ",
-                collapse(paste0("v", ver)), ". ",
-                "The last patched version v", max(ver), " will be used. ",
-                "Please explicitly give the full version if you want to use the other versions."
-            )
-            ver <- max(ver)
-        }
-    }
+    # make sure to print multiple version message only once
+    ver_in <- standardize_ver(idd, complete = FALSE)
+    # first check if version already exists
+    ver <- match_minor_ver(ver_in, c(names(.globals$idd), names(.globals$eplus_config)), "idd")
+    # if not exists, try to find more
+    if (is.na(ver)) ver <- match_minor_ver(ver_in, ALL_IDD_VER, "idd")
 
     if (isTRUE(download)) {
         dl <- download_idd(ver, dir = tempdir())
@@ -788,17 +777,7 @@ download_idd <- function (ver = "latest", dir) {
     ori_ver <- ver
     # if no patch version is given
     if (is.na(ver[, 3L])) {
-        # use the latest ver
-        ver <- numeric_version(ALL_IDD_VER[ver[, 1L:2L] == numeric_version(ALL_IDD_VER)[, 1L:2L]])
-
-        if (length(ver) > 1L) {
-            message("Multiple versions found for IDD v", ori_ver, ": ",
-                collapse(paste0("v", ver)), ". ",
-                "The last patched version v", max(ver), " will be downloaded. ",
-                "Please explicitly give the full version if you want to downloaded the other versions."
-            )
-            ver <- max(ver)
-        }
+        ver <- match_minor_ver(ver, ALL_IDD_VER, "idd", TRUE)
 
         latest_ver <- LATEST_EPLUS_VER
 
@@ -874,7 +853,11 @@ download_idd <- function (ver = "latest", dir) {
 #' @rdname use_idd
 #' @export
 # avail_idd {{{
-avail_idd <- function () names(.globals$idd)
+avail_idd <- function () {
+    res <- names(.globals$idd)
+    if (!length(res)) return(NULL)
+    numeric_version(res)
+}
 # }}}
 
 #' @rdname use_idd
@@ -882,7 +865,7 @@ avail_idd <- function () names(.globals$idd)
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
     assert(is_idd_ver(ver, strict = TRUE))
-    as.character(standardize_ver(ver)) %in% names(.globals$idd)
+    !is.na(match_minor_ver(standardize_ver(ver, complete = FALSE), names(.globals$idd), "idd", verbose = FALSE))
 }
 # }}}
 

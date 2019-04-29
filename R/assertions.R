@@ -125,7 +125,9 @@ is_version <- function (ver) {
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver, strict = FALSE) {
-    as.character(standardize_ver(ver, strict = strict)) %in% c(ALL_EPLUS_VER, names(.globals$eplus_config))
+    ver <- standardize_ver(ver, strict = strict, complete = FALSE)
+    ver <- lapply(ver, match_minor_ver, all_ver = c(ALL_EPLUS_VER, names(.globals$eplus_config)), verbose = FALSE)
+    !viapply(ver, is.na)
 }
 on_fail(is_eplus_ver) <- function (call, env) {
     paste0(deparse(call$ver), " is not a valid or supported EnergyPlus version. ",
@@ -138,7 +140,8 @@ on_fail(is_eplus_ver) <- function (call, env) {
 #' @export
 # is_idd_ver {{{
 is_idd_ver <- function (ver, strict = FALSE) {
-    as.character(standardize_ver(ver, strict)) %in% c(ALL_IDD_VER, names(.globals$idd))
+    ver <- standardize_ver(ver, strict = strict, complete = FALSE)
+    !is.na(match_minor_ver(ver, c(ALL_IDD_VER, names(.globals$idd)), verbose = FALSE))
 }
 on_fail(is_idd_ver) <- function (call, env) {
     paste0(deparse(call$ver), " is not a valid Idd version.")
@@ -151,7 +154,7 @@ on_fail(is_idd_ver) <- function (call, env) {
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
     eplus <- paste0("energyplus", if (is_windows()) ".exe" else "")
-    all(dir.exists(path), file.exists(file.path(path, c(eplus, "Energy+.idd"))))
+    dir.exists(path) & file.exists(file.path(path, eplus)) & file.exists(file.path(path, "Energy+.idd"))
 }
 on_fail(is_eplus_path) <- function (call, env) {
     paste(deparse(call$path), "is not a valid EnergyPlus installation path",

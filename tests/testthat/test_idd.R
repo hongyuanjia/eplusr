@@ -24,14 +24,14 @@ test_that("can read IDD", {
     expect_message(use_idd("latest", download = TRUE))
     expect_true(file.exists(file.path(tempdir(), "V8-4-0-Energy+.idd")))
     expect_is(use_idd("8.4.0"), "Idd")
-    expect_true("8.4.0" %in% avail_idd())
+    expect_true(numeric_version("8.4.0") %in% avail_idd())
     expect_true(is_avail_idd(8.4))
     expect_true(is_avail_idd("8.4"))
     expect_true(is_avail_idd("8.4.0"))
     expect_error(is_avail_idd("latest"))
 
     expect_message(use_idd(8.7, download = "auto"))
-    expect_equal(avail_idd(), c("8.4.0", "8.7.0", "9.1.0"))
+    expect_equal(avail_idd(), numeric_version(c("8.4.0", "8.7.0", "9.1.0")))
 
     expect_silent(use_idd(text("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))
