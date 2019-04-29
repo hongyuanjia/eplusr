@@ -1051,14 +1051,14 @@ idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c(
     type <- match.arg(type)
     if (is.null(which)) {
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), private$m_object_id,
-            NULL, FALSE, direction = type)
+            NULL, FALSE, direction = type, keep_all = TRUE)
     } else {
         val <- get_idf_value(private$idd_env(), private$idf_env(),
             object = private$m_object_id, field = which
         )
 
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(),
-            value_id = val$value_id, direction = type)
+            value_id = val$value_id, direction = type, keep_all = TRUE)
     }
 
     if (!is.null(class)) {
@@ -1191,7 +1191,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' }
 #' @export
 # format.IdfObject {{{
-format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
+format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
     x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
 }
 # }}}

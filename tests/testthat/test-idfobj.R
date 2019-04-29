@@ -215,12 +215,12 @@ test_that("IdfObject class", {
     expect_equal(names(con$ref_to_object()), "NewMaterialName")
     expect_equal(names(con$ref_by_object()), "WALL-1PF")
 
-    expect_true(con$has_ref())
+    expect_equal(con$has_ref(), c(TRUE, TRUE, FALSE, FALSE, FALSE))
     expect_true(con$has_ref(1))
-    expect_true(con$has_ref_to())
+    expect_equal(con$has_ref_to(), c(FALSE, TRUE, FALSE, FALSE, FALSE))
     expect_false(con$has_ref_to(1))
     expect_true(con$has_ref_to(2))
-    expect_true(con$has_ref_by())
+    expect_equal(con$has_ref_by(), c(TRUE, rep(FALSE, 4)))
     expect_true(con$has_ref_by(1))
     expect_false(con$has_ref_by(2))
     # }}}

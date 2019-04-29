@@ -487,31 +487,33 @@ sep_object_dots <- function (...) {
     depth <- viapply(l, get_depth)
 
     # put all data into a data.table
-    dt_dot <- data.table(rleid = seq_along(l), dot = l, dot_nm = names2(l), depth = depth)
+    dt_dot <- data.table(rleid = seq_along(l), dot = l, dot_nm = names2(l), dep = depth)
 
     if (any(depth == 0L)) {
         abort("error_wrong_type",
             paste0("Each element must be an IdfObject or a list of IdfObjects. ",
-                "Invalid input:\n", dot_string(dt_dot[J(0L), on = "depth"])
+                "Invalid input:\n", dot_string(dt_dot[J(0L), on = "dep"])
             )
         )
     }
 
-    if (any(depth == 1L & depth == 2L)) {
+    if (any(depth == 1L, depth == 2L)) {
         dt <- rbindlist(list(
-            dt_dot[J(1L), on = "depth"],
-            dt_dot[J(2L), on = "depth", {
-                len <- each_length(dot)
-                lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
-                list(rleid = rep(rleid, len), dot = lst, dot_nm = names2(lst), dep = 1L)
-            }]
+            dt_dot[J(1L), on = "dep"],
+            dt_dot[J(2L), on = "dep",
+                {
+                    len <- each_length(dot)
+                    lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
+                    list(dot = lst, dot_nm = names2(lst), dep = 1L)
+                }, by = "rleid"]
         ))
     } else if (any(depth == 2L)){
-        dt <- dt_dot[,{
-            len <- each_length(dot)
-            lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
-            list(rleid = rep(rleid, len), dot = lst, dot_nm = names2(lst), dep = 1L)
-        }]
+        dt <- dt_dot[,
+            {
+                len <- each_length(dot)
+                lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
+                list(dot = lst, dot_nm = names2(lst), dep = 1L)
+            }, by = "rleid"]
     } else {
         dt <- copy(dt_dot)
     }
@@ -1881,9 +1883,6 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) 
     # update value id
     val <- assign_new_id(idf_env, val, "value")
 
-    # stop if cannot insert objects in specified classes
-    assert_can_do(idd_env, idf_env, l$dot, obj, "insert")
-
     # remove empty fields
     add_class_property(idd_env, val, c("min_fields", "num_extensible"))
     val <- remove_empty_fields(val)
@@ -1894,6 +1893,9 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) 
         obj <- obj_val$object
         val <- obj_val$value
     }
+
+    # stop if cannot insert objects in specified classes
+    assert_can_do(idd_env, idf_env, l$dot, obj, "insert")
 
     # if all inputs are duplications
     if (!nrow(obj)) {
