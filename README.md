@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+    ## [1] "en_US.UTF-8"
+
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
 [![Travis-CI Build
@@ -120,7 +122,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: `/tmp/RtmpQYXP4l/temp_libpath49b48e0da1f/eplusr/extdata/1Zone...
+#>  * Path: `/tmp/RtmpXTvPlb/temp_libpath400264936e0b/eplusr/extdata/1Zon...
 #>  * Version: `8.8.0`
 #> 
 #> Group: <Simulation Parameters>
@@ -280,7 +282,7 @@ idf$Site_Location$set(
 idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 
 # extract weather data
-head(epw$data())
+(weather <- head(epw$data()))
 #>               datetime year month day hour minute
 #> 1: 2017-01-01 01:00:00 1999     1   1    1      0
 #> 2: 2017-01-01 02:00:00 1999     1   1    2      0
@@ -313,19 +315,25 @@ head(epw$data())
 #> 1:                                        0
 ....
 
+# a date time column added with correct start day of week type
+epw$period()$start_day_of_week
+#> [1] 7
+weekdays(weather$datetime)
+#> [1] "Sunday" "Sunday" "Sunday" "Sunday" "Sunday" "Sunday"
+
 # run simulation
 job <- idf$run(epw)
 #> ── Info ───────────────────────────────────────────────────────────────────
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing IDF located at /tmp/RtmpQYXP4l/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpXTvPlb/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.007
+#> ExpandObjects Finished. Time:     0.009
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.04.30 01:31
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.04.30 02:04
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -349,37 +357,22 @@ job <- idf$run(epw)
 
 # print simulation error
 job$errors()
-#> $eplus_version
-#> [1] '8.8.0'
+#> ══ EnergyPlus Error File ══════════════════════════════════════════════════
+#>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
+#>   * Simulation started: 2019-04-30 02:04:00
+#>   * Terminated: FALSE
+#>   * Successful: TRUE
+#>   * Warning[W]: 2
 #> 
-#> $eplus_build
-#> [1] "7c3bbe4830"
-#> 
-#> $datetime
-#> [1] "2019-04-30 01:31:00 CST"
-#> 
-#> $idd_version
-#> [1] '8.8.0'
-#> 
-#> $successful
-#> [1] TRUE
-#> 
-#> $terminated
-#> [1] FALSE
-#> 
-#> $data
-#>    index environment_index           environment level_index   level
-#> 1:     1                 1 Simulation Initiation           1 Warning
-#> 2:     1                 1 Simulation Initiation           1 Warning
-#> 3:     2                 1 Simulation Initiation           2 Warning
-#> 4:     2                 1 Simulation Initiation           2 Warning
-#>                                                                                                                                 message
-#> 1:       SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.
-#> 2:     ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN HTG 99% CONDNS DB, Standard Pressure (based on elevation) will be used.
-#> 3:       SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by more than 10% from Standard Barometric Pressure=101301.
-#> 4: ...occurs in DesignDay=DENVER CENTENNIAL  GOLDEN   N ANN CLG 1% CONDNS DB=>MWB, Standard Pressure (based on elevation) will be used.
-#> 
-....
+#> ── During Simulation Initiation ───────────────────────────────────────────
+#> [W 1/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs
+#>         by more than 10% from Standard Barometric Pressure=101301.
+#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99%
+#>         CONDNS DB, Standard Pressure (based on elevation) will be used.
+#> [W 2/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs
+#>         by more than 10% from Standard Barometric Pressure=101301.
+#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1% CONDNS
+#>         DB=>MWB, Standard Pressure (based on elevation) will be used.
 
 # get report data
 results <- job$report_data("zone one", "zone mean air temperature",
@@ -410,6 +403,10 @@ str(results)
 #>  $ units              : chr  "C" "C" "C" "C" ...
 #>  $ value              : num  10.8 11.8 13.1 10.5 11.9 ...
 #>  - attr(*, ".internal.selfref")=<externalptr>
+
+# a date time column added with correct day of week type
+all(weekdays(results$datetime) == results$day_type)
+#> [1] TRUE
 
 # get tabular data
 job$tabular_data(table_name = "site and source energy", row_name = "total site energy")

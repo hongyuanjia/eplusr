@@ -28,6 +28,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-"
 )
+
+# Make sure the date is shown in English format not Chinese.
+Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8")
 ```
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
@@ -173,7 +176,11 @@ idf$Site_Location$set(
 idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 
 # extract weather data
-head(epw$data())
+(weather <- head(epw$data()))
+
+# a date time column added with correct start day of week type
+epw$period()$start_day_of_week
+weekdays(weather$datetime)
 
 # run simulation
 job <- idf$run(epw)
@@ -187,6 +194,9 @@ results <- job$report_data("zone one", "zone mean air temperature",
   all = TRUE
 )
 str(results)
+
+# a date time column added with correct day of week type
+all(weekdays(results$datetime) == results$day_type)
 
 # get tabular data
 job$tabular_data(table_name = "site and source energy", row_name = "total site energy")
@@ -209,9 +219,8 @@ development of eplusr package, especially these below:
   advanced daylight analysis using Radiance.
 * [eppy](https://github.com/santoshphilip/eppy): Scripting language for E+,
   Energyplus.
-* [JEplus](http://www.jeplus.org):  An EnergyPlus simulation manager for
+* [JEplus](http://www.jeplus.org): An EnergyPlus simulation manager for
   parametrics.
-
 
 ## Author
 
