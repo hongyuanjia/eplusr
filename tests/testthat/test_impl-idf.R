@@ -773,7 +773,7 @@ test_that("Insert", {
         class = "error_wrong_type"
     )
     expect_error(
-        insert_idf_object(idd_env, idf_env, version = idf$version(), my_building = idf$Building),
+        insert_idf_object(idd_env, idf_env, version = idf$version(), my_building = idf$Building, .unique = FALSE),
         class = "error_insert_unique"
     )
     expect_error(
@@ -785,13 +785,13 @@ test_that("Insert", {
         class = "error_not_same_version"
     )
     expect_error(
-        insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Material),
+        insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Material, .unique = FALSE),
         class = "error_validity"
     )
+    new_mat <- idf$clone()$Material[[1L]]$set(name = "new_mat")
     expect_silent(
-        ins <- insert_idf_object(idd_env, idf_env, version = idf$version(), new_mat = idf$Material[[1L]])
+        ins <- insert_idf_object(idd_env, idf_env, version = idf$version(), new_mat)
     )
-
     expect_equivalent(ins$object,
         data.table(object_id = 54L, class_id = 55L, comment = list(),
             object_name = "new_mat", object_name_lower = "new_mat"

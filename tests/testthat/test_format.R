@@ -384,7 +384,7 @@ test_that("Idd formatting", {
           "!-      Use '!' comments if they need to be retained when using the IDFEditor."
         )
     )
-    expect_equal(fmt$format$class_id, c(1L, 53L, 87L, 100L))
+    expect_equal(fmt$format$class_id, c(1L, 55L, 90L, 103L))
     expect_equal(fmt$format$fmt[[2L]],
         list("!-   ===========  ALL OBJECTS IN CLASS: MATERIAL ===========",
              list(c("! this is a test comment for WD01"),
