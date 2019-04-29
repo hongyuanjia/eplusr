@@ -1183,6 +1183,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' Default: `29L` which is the same as IDF Editor.
 #' @param all If `TRUE`, values of all possible fields in current class the
 #'   [IdfObject] belongs to are retured. Default: `FALSE`
+#' @param ... Further arguments passed to or from other methods.
 #' @return A character vector.
 #' @examples
 #' \dontrun{

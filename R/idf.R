@@ -549,10 +549,7 @@ NULL
 #' ```
 #'
 #' `$insert()` takes [IdfObject]s or lists of [IdfObject]s as input, inserts
-#' them into current Idf, and returns a list of inserted [IdfObject]s. If input
-#' is named and inserted objects have name attributes, names of input will be
-#' used as new names of inserted objects. Otherwise, names of input are ignored
-#' silently.
+#' them into current Idf, and returns a list of inserted [IdfObject]s.
 #'
 #' **NOTE**:
 #'
@@ -566,8 +563,7 @@ NULL
 #'
 #' **Argument**:
 #'
-#' * `...`: [IdfObject]s or lists of [IdfObject]s. Names of input will be used
-#'   as new names of inserted objects if applicable.
+#' * `...`: [IdfObject]s or lists of [IdfObject]s.
 #' * `.unique`: If there are duplications in input [IdfObject]s or there is same
 #'   object in current `Idf` object, duplications in input are removed. Default:
 #'   `TRUE`.

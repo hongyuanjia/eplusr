@@ -546,10 +546,7 @@ object name.
 }
 
 \code{$insert()} takes \link{IdfObject}s or lists of \link{IdfObject}s as input, inserts
-them into current Idf, and returns a list of inserted \link{IdfObject}s. If input
-is named and inserted objects have name attributes, names of input will be
-used as new names of inserted objects. Otherwise, names of input are ignored
-silently.
+them into current Idf, and returns a list of inserted \link{IdfObject}s.
 
 \strong{NOTE}:
 \itemize{
@@ -564,8 +561,7 @@ validation components to be performed during modifications, please see
 
 \strong{Argument}:
 \itemize{
-\item \code{...}: \link{IdfObject}s or lists of \link{IdfObject}s. Names of input will be used
-as new names of inserted objects if applicable.
+\item \code{...}: \link{IdfObject}s or lists of \link{IdfObject}s.
 \item \code{.unique}: If there are duplications in input \link{IdfObject}s or there is same
 object in current \code{Idf} object, duplications in input are removed. Default:
 \code{TRUE}.

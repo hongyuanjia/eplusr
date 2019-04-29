@@ -1848,16 +1848,10 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = FALSE) 
     # get object table
     obj <- input[, list(list(
         set(get_idf_object(idd_env[[1L]], idf_env[[1L]], object = object_id, property = "has_name"),
-            NULL, c("rleid", "new_object_name"), list(object_rleid, dot_nm)
+            NULL, c("rleid"), list(object_rleid)
         )
         )), by = "object_rleid"]$V1
     obj <- rbindlist(obj)
-    # update object name
-    obj[has_name == TRUE & !is.na(new_object_name), `:=`(
-        object_name = new_object_name,
-        object_name_lower = stri_trans_tolower(new_object_name)
-    )]
-    set(obj, NULL, "new_object_name", NULL)
 
     # stop of trying to add Version object
     if (any(obj$class_id == 1L)) {
