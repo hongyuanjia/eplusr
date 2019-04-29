@@ -1085,11 +1085,12 @@ iddobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to
     }
 
     if (type == "all") {
-        !is.na(rel$ref_to$src_field_id) | !is.na(rel$ref_by$field_id)
+        rel$ref_to[, list(.N > 0 && any(!is.na(src_field_id))), by = "field_id"]$V1 |
+        rel$ref_by[, list(.N > 0 && any(!is.na(field_id))), by = "src_field_id"]$V1
     } else if (type == "ref_to") {
-        !is.na(rel$ref_to$src_field_id)
+        rel$ref_to[, list(.N > 0 && any(!is.na(src_field_id))), by = "field_id"]$V1
     } else {
-        !is.na(rel$ref_by$field_id)
+        rel$ref_by[, list(.N > 0 && any(!is.na(field_id))), by = "src_field_id"]$V1
     }
 }
 # }}}

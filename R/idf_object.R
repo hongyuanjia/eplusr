@@ -1073,11 +1073,12 @@ idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c(
     }
 
     if (type == "all") {
-        nrow(rel$ref_to[!is.na(src_value_id)]) || nrow(rel$ref_by[!is.na(value_id)])
+        rel$ref_to[, list(.N > 0 && any(!is.na(src_value_id))), by = "value_id"]$V1 |
+        rel$ref_by[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
     } else if (type == "ref_to") {
-        nrow(rel$ref_to[!is.na(src_value_id)]) > 0L
+        rel$ref_to[, list(.N > 0 && any(!is.na(src_value_id))), by = "value_id"]$V1
     } else {
-        nrow(rel$ref_by[!is.na(value_id)]) > 0L
+        rel$ref_by[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
     }
 }
 # }}}
