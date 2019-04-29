@@ -1,36 +1,28 @@
 # eplusr 0.10.0
 
-## Break changes
+eplusr v0.10.0 introduces dozens of improvements, unfortunately also has some
+break changes. Detailed updates per class are as follow:
 
-* Right now, all returned object and field names will remain what they are as in
-  the IDF, instead of converting them into `underscore` style names.
-
-* The `num_digits` option has been deprecated as formatting of numeric fields
-  are now handled by R itself.
-
-* `$definition()` now only accepts one class name
-
-* Error will be given instead of warning if there is no build tag or multiple
-  build tags found in input IDD.
-
-## New methods and arguments
-
-* `eplusr_option()` accepts custom validate level using newly-added function
-  `custom_validate()`.
-
-### `Idd` Class
+## `Idd` Class
 
 * `$object()` now takes a single class name and returns an `IddObject`.
 
 * New method `$objects()` is added as the successor of `$object()` in previous
   versions.
 
-* New method `$objects_in_relation()` is added to get all objects that have
-  relation (one refer to others or one referred by others).
+* New method `$object_relation()` and `$objects_in_relation()` are added to get
+  all objects that have relation (one refer to others or one referred by others).
 
 * `$object_in_group()` has been deprecated in flavor of `$objects_in_group()`.
 
-### `IddObject` Class
+* New method `$to_table()` and `$to_string()` are added to help easily extract
+  internal IDD data in `data.table` format and string format respectively.
+
+* `$clone()` method is now deprecated.
+
+* S3 method `str.Idd()`, `format.Idd()` are added.
+
+## `IddObject` Class
 
 * A constructor `idd_object()` has been added to help directly create
   `IddObject`. It takes a parent IDD version or an `Idd` object and a valid
@@ -41,6 +33,9 @@
 
 * New method `$field_relation()` is added to extract the field relation in
   current class with other class fields.
+
+* New method `$has_ref()`, `$has_ref_to()`, and `$has_ref_by()` are added to
+  help to detect field relations
 
 * New method `$is_real_field()` is added to detect if specified fields should
   have values of real numbers but not integers.
@@ -59,7 +54,15 @@
 * `$field_reference()` in `IddObject` class has been deprecated in flavor of
   `$field_relation()`.
 
-### `Idf` Class
+* A `brief` argument is added in `$print()` with default value of `FALSE`. If
+  `TRUE`, only the class name of the `IddObject` is printed.
+
+* `$clone()` method is now deprecated.
+
+* S3 method `format.IddObject()`, `as.character.IddObject()` and
+  `str.IddObject()` are added which calls `$to_string()` and `$print()`.
+
+## `Idf` Class
 
 * An argument `sorted` is added in `$class_name()` and `$group_name()`to control
   whether to sort the returned value according to the occurances in IDD or not.
@@ -92,6 +95,8 @@
   `$del_object()` are now all deprecated. Please use `$add()`, `$set()`,
   `$del()` and `insert()` instead, which provide much cleaner syntax.
 
+* New method `$rename()` is added which helps to modify only object names.
+
 * New method `$paste()` is added which will parse contents that copied from IDF
   Editor using the `Copy Obj` button and directly insert them into current `Idf`.
 
@@ -112,13 +117,14 @@
   `zoom` and `order` are added, which give more control on how detailed should
   the model be printed.
 
-### New methods and arguments
+* New method `$object_relation()` and `$objects_in_relation()` are added to
+  extract all objects in relation.
 
-### Deprecated methods and arguments
+## `IdfObject` Class
 
-## `Idf`
+* New constructor `idf_object()` is added.
 
-## `IdfObject`
+* New method `$version()` is added to get the underlying version of IDD.
 
 * `$get_comment()`, `$get_value()` now have been deprecated in flavor of
   `$comment()` and `$value()`
@@ -126,11 +132,105 @@
 * `$comment()` (former `$get_comment()`) now returns `NULL` if the object does
   not have any comment.
 
-## `Epw`
+* `$set_value()` now has been deprecated in flavor of `$set()`
+
+* `$possible_value()` now has been deprecated in flavor of `$value_possible()`.
+
+* `$ref_from_object()` and `$has_ref_from()` now have been deprecated in flavor
+  of `$ref_to_object()` and `$has_ref_to()`.
+
+* `$has_ref_by()`, `$has_ref_to()` and `$has_ref()` now return a logical vector
+  of the same length as field numbers.
+
+* `$validate()` and `$is_valid()` now accepts an argument `level`. Also, a
+  helper `custom_validate()` is added to customize what kind of validations to
+  check.
+
+* `$string()` and `$table()` are now deprecated in flavor of `$to_string()` and
+  `$to_table()`.
+
+* `$clone()` method is now deprecated.
+
+* S3 methods `format.IdfObject()`, `as.character.IdfObject()` and
+  `str.IdfObject()` are added, which calls `$to_string()` and `$value()`.
+
+## `Epw` Class
 
 * `Epw` class has been totaly rewritten which provides much more
   functionalities. Please refer to package documentation for details.
   All headers are parsed and can be retrieve in `Epw` class.
+
+* The default value of `deep` in `$clone()` has been change to `TRUE`.
+
+## `EplusSql` Class
+
+* New method `$path_idf()` is added to return the parent IDF file path.
+
+* New arguments `period`, `month`, `day`, `hour`, `minute`, `interval`,
+  `simulation_days`, `day_type` and `environment_name` are added in
+  `$report_data()` which provide extra subsetting on the SQL file.
+
+* New arguments `report_name`, `report_for`, `table_name`, `column_name` and
+  `row_name` are added in `$tabular_data()` which provide extra subsetting on
+  the SQL file.
+
+* `$clone()` method is now deprecated.
+
+## `EplusJob` Class
+
+* New memthod `$path()` is added to return the path of IDF and/or EPW file of
+  the job.
+
+* New method `$list_table()`, `$read_table()` are added which provide the same
+  functionalities as they are in `EplusSql` class.
+
+* `$clone()` is now deprecated.
+
+* New arguments `period`, `month`, `day`, `hour`, `minute`, `interval`,
+  `simulation_days`, `day_type` and `environment_name` are added in
+  `$report_data()` which provide extra subsetting on the SQL file.
+
+* New arguments `report_name`, `report_for`, `table_name`, `column_name` and
+  `row_name` are added in `$tabular_data()` which provide extra subsetting on
+  the SQL file.
+
+* `$clone()` method is now deprecated.
+
+## `ParametricJob` Class
+
+* New arguments `period`, `month`, `day`, `hour`, `minute`, `interval`,
+  `simulation_days`, `day_type` and `environment_name` are added in
+  `$report_data()` which provide extra subsetting on the SQL file.
+
+* New arguments `report_name`, `report_for`, `table_name`, `column_name` and
+  `row_name` are added in `$tabular_data()` which provide extra subsetting on
+  the SQL file.
+
+* `$clone()` method is now deprecated.
+
+## Miscellaneous
+
+* Function `read_err()` is added which takes a path of an `.err` file, parses it
+  and returns an `ErrFile` object.
+
+* Functions `is_eplus_ver()`, `is_idd_ver()`, `is_eplus_path()`, `is_idd()`,
+  `is_idf()`, `is_iddobject()`, `is_idfobject()` and `is_epw()` are now exported.
+
+* Function `custom_validate()` and `level_checks()` are added to customize
+  validation.
+
+* Right now, all returned object and field names will remain what they are as in
+  the IDF, instead of converting them into `underscore` style names in the
+  retured lists.
+
+* The `num_digits` option has been deprecated as formatting of numeric fields
+  are now handled by R itself.
+
+* Error will be given instead of warning if there is no build tag or multiple
+  build tags found in input IDD.
+
+* `eplusr_option()` accepts custom validate level using newly-added function
+  `custom_validate()`.
 
 # eplusr 0.9.4
 
