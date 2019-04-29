@@ -612,7 +612,7 @@ check_invalid_reference <- function (idd_env, idf_env, env_in) {
 
 # exclude_empty_field: exclude non-required empty fields {{{
 exclude_empty_field <- function (idd_env, idf_env, env_in) {
-    env_in$value <- env_in$value[!(required_field == FALSE & is.na(value_chr))]
+    env_in$value <- env_in$value[!is.na(value_chr)]
     env_in
 }
 # }}}

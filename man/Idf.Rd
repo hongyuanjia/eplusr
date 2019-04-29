@@ -6,7 +6,8 @@
 \title{Read, Modify, and Run an EnergyPlus Model}
 \description{
 eplusr provides parsing EnergyPlus Input Data File (IDF) files and strings
-in a hierarchical structure, which was extremely inspired by \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library},
+in a hierarchical structure, which was extremely inspired by
+\href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library},
 but with total different data structure under the hook.
 }
 \section{Overview}{
@@ -1247,10 +1248,10 @@ idf$is_valid()
 }
 # ===== FORMAT MODEL =====
 # get text format of the model
-str(idf$to_string())
+head(idf$to_string())
 
 # get text format of the model, excluding the header and all comments
-str(idf$to_string(comment = FALSE, header = FALSE))
+head(idf$to_string(comment = FALSE, header = FALSE))
 
 # ===== SAVE MODEL =====
 # check if the model has been modified since read or last saved

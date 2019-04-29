@@ -571,11 +571,15 @@ NULL
 #' `idf_object()` takes a parent `Idf` object, an object name or class name, and
 #' returns a corresponding [IdfObject].
 #'
-#' Note that there is no validation performed if an empty [IdfObject] is
-#' created. The empty [IdfObject] is directly added into the parent [Idf]
-#' object. It is recommended to use `$validate()` method in [IdfObject] to see
-#' what kinds of further modifications are needed for those empty fields and use
-#' `$set()` method to set field values.
+#' If `object` is not given, an empty [IdfObject] of specified class is created,
+#' with all field vlaues filled with defaults, if possible.  Note that
+#' validation is performed when creating, which means that an error may occur if
+#' current [validate level][level_checks()] does not allow empty required fields.
+#'
+#' The empty [IdfObject] is directly added into the parent [Idf] object. It is
+#' recommended to use `$validate()` method in [IdfObject] to see what kinds of
+#' further modifications are needed for those empty fields and use `$set()`
+#' method to set field values.
 #'
 #' @param parent An [Idf] object.
 #' @param object A valid object ID (an integer) or name (a string). If `NULL`
@@ -600,7 +604,11 @@ NULL
 #' idf_object(model, "zone one", "Zone")
 #'
 #' # create a new zone
-#' idf_object(model, class = "Zone")
+#' eplusr_option(validate_level = "draft")
+#' zone <- idf_object(model, class = "Zone")
+#' zone
+#' eplusr_option(validate_level = "final")
+#' zone$validate()
 #'
 #' @export
 # idf_object {{{
@@ -623,8 +631,13 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 
         assert(is_string(class))
 
+        # add field property
+        prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
+            "required_field", "src_enum", "type_enum", "extensible_group"
+        )
+
         cls <- get_idd_class(idd_env, class)
-        fld <- get_idd_field(idd_env, cls$class_id)
+        fld <- get_idd_field(idd_env, cls$class_id, property = prop)
 
         obj <- set(cls, NULL, c("object_id", "object_name", "object_name_lower", "comment"),
             list(new_id(idf_env$object, "object_id", 1L), NA_character_, NA_character_, list())
@@ -634,16 +647,27 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 
         assert_can_do(idd_env, idf_env, dot, obj, action = "add")
 
-        val <- data.table(value_id = new_id(idf_env$value, "value_id", nrow(fld)),
-            value_chr = NA_character_, value_num = NA_real_,
-            object_id = obj$object_id, field_id = fld$field_id
+        val <- set(fld, NULL, c("value_id", "value_chr", "value_num", "object_id", "defaulted"),
+            list(new_id(idf_env$value, "value_id", nrow(fld)),
+                 NA_character_, NA_real_, obj$object_id,
+                 TRUE
+            )
         )
+
+        # assign default values
+        val <- assign_default_value(val)
+
+        # validate
+        assert_valid(idd_env, idf_env, obj, val, action = "add")
 
         idf_env$object <- append_dt(idf_env$object, obj)
         idf_env$value <- append_dt(idf_env$value, val)
 
         object <- obj$object_id
         class <- obj$class_id
+
+        # validate
+        assert_valid(idd_env, idf_env, obj, val, action = "add")
 
         verbose_info(
             paste0("New empty object [ID:", obj$object_id, "] in class ",

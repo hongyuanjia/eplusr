@@ -25,11 +25,15 @@ An \link{IdfObject} object.
 returns a corresponding \link{IdfObject}.
 }
 \details{
-Note that there is no validation performed if an empty \link{IdfObject} is
-created. The empty \link{IdfObject} is directly added into the parent \link{Idf}
-object. It is recommended to use \code{$validate()} method in \link{IdfObject} to see
-what kinds of further modifications are needed for those empty fields and use
-\code{$set()} method to set field values.
+If \code{object} is not given, an empty \link{IdfObject} of specified class is created,
+with all field vlaues filled with defaults, if possible.  Note that
+validation is performed when creating, which means that an error may occur if
+current \link[=level_checks]{validate level} does not allow empty required fields.
+
+The empty \link{IdfObject} is directly added into the parent \link{Idf} object. It is
+recommended to use \code{$validate()} method in \link{IdfObject} to see what kinds of
+further modifications are needed for those empty fields and use \code{$set()}
+method to set field values.
 }
 \examples{
 model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
@@ -45,6 +49,10 @@ idf_object(model, "zone one")
 idf_object(model, "zone one", "Zone")
 
 # create a new zone
-idf_object(model, class = "Zone")
+eplusr_option(validate_level = "draft")
+zone <- idf_object(model, class = "Zone")
+zone
+eplusr_option(validate_level = "final")
+zone$validate()
 
 }

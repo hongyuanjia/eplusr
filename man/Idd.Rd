@@ -227,7 +227,7 @@ idd$objects_in_relation("Construction", "ref_by")
 idd$objects_in_relation("Construction", "ref_to")
 
 # All IddObjects in group Schedules
-idd$objects_in_group("Schedules")
+length(idd$objects_in_group("Schedules"))
 
 # Extract core data of class Material and Construction
 idd$to_table(c("Material", "Construction"))

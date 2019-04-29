@@ -120,7 +120,7 @@ is_version <- function (ver) {
 #'
 #' is_iddobject(idd_object(8.8, "Version"))
 #'
-#' is_idfobject(idf_object(idf, class = "Material"))
+#' is_idfobject(idf_object(idf, 1))
 #'
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
 # is_eplus_ver {{{
