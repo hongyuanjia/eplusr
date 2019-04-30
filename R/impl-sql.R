@@ -100,7 +100,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
         )
     }
 
-    if (is.null(time)) {
+    if (is.null(time) && is.null(period)) {
         time <- paste0("
             SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
                    SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
