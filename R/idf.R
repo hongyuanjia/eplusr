@@ -2018,7 +2018,7 @@ idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE) 
 # }}}
 # idf_load {{{
 idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
-    l <- load_idf_object(private$idd_env(), private$idf_env(), private$version(),
+    l <- load_idf_object(private$idd_env(), private$idf_env(), private$m_version,
         ..., .unique = .unique, .default = .default
     )
 
