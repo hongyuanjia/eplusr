@@ -766,7 +766,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
             "c(", component[[i-1L]], "[[1L]], add_prefix(", component[[i]], ")", empty, "))"
         )
 
-        if (is.null(parents) || stri_isempty(parents)) {
+        if (is.null(parents) || all(stri_isempty(parents))) {
             code <- paste0("list(", childen, ")")
         } else {
             code <- paste0("list(", paste0(parents, collapse = ","), ", ", childen, ")")
