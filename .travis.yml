@@ -59,6 +59,7 @@ brew_packages:
 before_install:
   # manually install devtools
   - Rscript -e 'install.packages("devtools")'
+  - tlmgr install inconsolata
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
