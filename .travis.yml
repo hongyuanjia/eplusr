@@ -59,6 +59,7 @@ brew_packages:
 before_install:
   # manually install devtools
   - Rscript -e 'install.packages("devtools")'
+  - tlmgr update --self
   - tlmgr install inconsolata
 
 after_success:
