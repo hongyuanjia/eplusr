@@ -209,7 +209,7 @@ parse_err_file <- function (path) {
 #' @return An `ErrFile` object, invisibly.
 #' @export
 # print.ErrFile {{{
-print.ErrFile <- function (x, brief = FALSE, info = TRUE) {
+print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("EnergyPlus Error File", line = 2)
 
     if (!is.na(x$eplus_build)) {

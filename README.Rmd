@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 )
 
 # Make sure the date is shown in English format not Chinese.
-Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8")
+invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 ```
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
