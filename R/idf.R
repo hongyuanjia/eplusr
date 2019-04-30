@@ -2383,8 +2383,71 @@ read_idf <- function (path, idd = NULL) {
 # }}}
 
 #' @export
+# $<-.Idf {{{
+`$<-.Idf` <- function (x, name, value) {
+    idd_env <- .subset2(._get_private(x), "idd_env")()
+    idf_env <- .subset2(._get_private(x), "idf_env")()
+
+    cls_id <- chmatch(name, idd_env$class$class_name)
+
+    if (is.na(cls_id)) abort_bad_key("error_invalid_class_name", "class name", name)
+
+    # input should be a list of IdfObjects
+    assert(is.list(value), vlapply(value, is_idfobject), msg = "Value should be a list of IdfObjects.")
+
+    # check if input is from the same model
+    # get uuid if idf
+    uuid_main <- .subset2(.subset2(._get_private(x), "m_log"), "uuid")
+
+    # get uuids of input
+    uuid_in <- vcapply(value, function (obj) .subset2(.subset2(._get_private(obj), "log_env")(), "uuid"))
+    # get id of input
+    obj_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_object_id"))
+
+    obj_main <- get_idf_object(idd_env, idf_env, cls_id)
+
+    # ignore ones that is from the same idf
+    same_idf <- uuid_main == uuid_in
+    same_num <- length(value) == nrow(obj_main)
+    same_id <- obj_id_in %in% obj_main$object_id
+
+    # direct return the idf
+    if (all(same_idf) && same_num && all(same_id)) return(invisible(x))
+
+    # stop if not from the same class
+    cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
+    if (any(cls_id_in != cls_id)) {
+        invld_cls <- vcapply(value[cls_id_in != cls_id], function (obj) .subset2(obj, "class_name")())
+        msg <- paste0(" #", which(cls_id_in != cls_id), "| <IdfObject> --> Class: ", surround(invld_cls),
+            collapse = "\n"
+        )
+        abort("error_invalid_input_object_class",
+            paste0(
+                "Input IdfObjects should all from class `", obj_main$class_name[[1L]]), "`. ",
+                " Invalid input:\n", msg
+
+        )
+    }
+
+    # ignore same objects and insert new ones
+    invisible(.subset2(x, "insert")(value[!same_id], .unique = FALSE))
+
+    # delete objects that are not included in input
+    id_del <- setdiff(obj_main$object_id, obj_id_in)
+    if (!length(id_del)) return(invisible(x))
+
+    invisible(.subset2(x, "del")(id_del, .unique = FALSE))
+}
+# }}}
+
+#' @export
 # [[.Idf {{{
 `[[.Idf` <- `$.Idf`
+# }}}
+
+#' @export
+# [[<-.Idf {{{
+`[[<-.Idf` <- `$<-.Idf`
 # }}}
 
 #' @export

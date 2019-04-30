@@ -210,14 +210,15 @@ idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
 }
 
-\code{$set()} takes new field value definitions in \code{field = value} format or in
-list format, sets new values for fields specified, and returns the modified
-\link{IdfObject}. Unlike \code{$set()} method in \link{Idf} class, the special element
-\code{.comment} is \strong{not allowed}. To modify object comments, please use
+\code{$set()} takes new field value definitions in \code{field = value} format or in a
+single list format, sets new values for fields specified, and returns the
+modified \link{IdfObject}. Unlike \code{$set()} method in \link{Idf} class, the special
+element \code{.comment} is \strong{not allowed}. To modify object comments, please use
 \code{$comment()}.
 
 \strong{NOTE}:
 \itemize{
+\item Only one single list is allowed, e.g. \code{idfobj$set(lst1)} where \code{lst1 <- list(field1 = value1)} is allowed, but \code{idfobj$set(lst1, lst2)} is not.
 \item You can delete a field by assigning \code{NULL} to it, e.g. \code{iddobj$set(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
 also \code{fld} is not a required field and the index of \code{fld} is larger than
 the number minimum fields required for that class, it will be deleted.
@@ -243,8 +244,8 @@ eplusr also provides custom S3 method of \code{$<-} and
 
 \strong{Arguments}:
 \itemize{
-\item \code{...}: New field value definitions in \code{field = value} format or in
-list format \code{list(field = value)}.
+\item \code{...}: New field value definitions in \code{field = value} format or a single
+list in format \code{list(field1 = value1, field2 = value2)}.
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
 \item \code{FieldName}: A single length character vector of one valid field name where

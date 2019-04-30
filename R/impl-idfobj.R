@@ -108,8 +108,30 @@ set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE) {
 
     input <- list(...)
 
-    if (length(input) == 1L && length(input[[1L]]) == 1L && is_named(input[[1L]])) {
-        input <- list(as.list(input[[1L]]))
+    # if single input
+    if (length(input) == 1L) {
+        # if input is an atomic
+        if (is.atomic(input[[1L]])) {
+            # for `<-.IdfObject`
+            if (length(input[[1L]]) == 1L && is_named(input[[1L]])) {
+                input <- list(as.list(input[[1L]]))
+            # for `$set(field = value)`
+            } else {
+                input <- list(input)
+            }
+        # for `$set(list(field1 = value1, field2 = value2))`
+        } else {
+            # check for .comment
+            if (has_name(input[[1L]], ".comment")) {
+                abort("error_idfobj_dotcomment",
+                    paste0(
+                        "Using `.comment` to set object comments is prohibited in ",
+                        "`IdfObject` class. Please use `$comment()` method instead."
+                    )
+                )
+            }
+        }
+    # for `$set(field1 = value1, field2 = value2)`
     } else {
         # check for .comment
         if (has_name(input, ".comment")) {

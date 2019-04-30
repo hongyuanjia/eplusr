@@ -195,14 +195,16 @@ NULL
 #' idfobj[[Field]] <- Value
 #' }
 #'
-#' `$set()` takes new field value definitions in `field = value` format or in
-#' list format, sets new values for fields specified, and returns the modified
-#' [IdfObject]. Unlike `$set()` method in [Idf] class, the special element
-#' `.comment` is **not allowed**. To modify object comments, please use
+#' `$set()` takes new field value definitions in `field = value` format or in a
+#' single list format, sets new values for fields specified, and returns the
+#' modified [IdfObject]. Unlike `$set()` method in [Idf] class, the special
+#' element `.comment` is **not allowed**. To modify object comments, please use
 #' `$comment()`.
 #'
 #' **NOTE**:
 #'
+#' * Only one single list is allowed, e.g. `idfobj$set(lst1)` where `lst1 <-
+#'   list(field1 = value1)` is allowed, but `idfobj$set(lst1, lst2)` is not.
 #' * You can delete a field by assigning `NULL` to it, e.g. `iddobj$set(fld =
 #'   NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
 #'   also `fld` is not a required field and the index of `fld` is larger than
@@ -228,8 +230,8 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `...`: New field value definitions in `field = value` format or in
-#'   list format `list(field = value)`.
+#' * `...`: New field value definitions in `field = value` format or a single
+#'   list in format `list(field1 = value1, field2 = value2)`.
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
 #' * `FieldName`: A single length character vector of one valid field name where
