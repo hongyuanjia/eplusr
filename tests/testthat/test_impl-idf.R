@@ -321,8 +321,11 @@ test_that("table", {
     expect_equivalent(val$class_name, c(rep("Material", 2), "BuildingSurface:Detailed"))
     expect_equivalent(val$object_name, c("WD01", "WD02", "WALL-1PF"))
     # }}}
-    expect_silent({val <- get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), field = c(4, 9), complete = TRUE)})
-    expect_silent({val <- get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 9), complete = TRUE)})
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), field = c(4, 9), complete = TRUE)), 15)
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 9), complete = TRUE)), 31)
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), field = c(4, 9), align = TRUE)), 2)
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01"), field = c(4, 9), align = TRUE)), 2)
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, c("BuildingSurface:Detailed"), field = c(4, 9), align = TRUE)), 2)
     # }}}
 
     # misc

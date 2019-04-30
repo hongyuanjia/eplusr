@@ -1034,6 +1034,7 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
     obj <- get_idf_object(idd_env, idf_env, class, object, NULL, underscore, ignore_case)
     set(obj, NULL, c("object_name_lower", "comment"), NULL)
 
+    sgl <- FALSE
     # if field is not speicifed
     if (is.null(field)) {
         val <- idf_env$value[obj, on = "object_id", allow.cartesian = TRUE]
@@ -1085,6 +1086,12 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
                 ),
                 by = c("class_id", "object_id")
             ]
+
+            # in this case, use input field to create rleid
+            if (is.null(class) || is.null(object)) {
+                sgl <- TRUE
+                set(obj, NULL, "rleid", seq.int(nrow(obj)))
+            }
         } else {
             assert(have_same_len(class, field) || have_same_len(object, field))
             obj[, num := field[[.GRP]], by = "rleid"]
@@ -1095,12 +1102,12 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
         property = property, all = all, complete = complete)
     set(fld, NULL, "field_in", NULL)
 
-    # get the actual field number per object
-    set(obj, NULL, "num", fld[, .N, by = "rleid"]$N)
+    # get the actual field number per input class
+    set(obj, NULL, "num_fld", fld[, .N, by = "rleid"]$N)
 
     # correct rleid and add object id and name in fld
     set(fld, NULL, c("object_id", "object_name"),
-        obj[, list(rep(object_id, num), rep(object_name, num))]
+        obj[, list(rep(object_id, num_fld), rep(object_name, num_fld))]
     )
 
     # merge value and field
@@ -1118,13 +1125,16 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
             nom <- NA
             id <- obj[, .I[which.max(num)], by = c("rleid", "object_id")]$V1
             fld <- fld[J(id), on = c("rleid")]
-            set(fld, NULL, "rleid", obj[id, list(rep(rleid, num))])
+            set(fld, NULL, "rleid", obj[id, list(rep(rleid, num_fld))])
         } else {
             nom <- 0L
-            set(fld, NULL, "rleid", obj[, list(rep(rleid, num))])
+            set(fld, NULL, "rleid", obj[, list(rep(rleid, num_fld))])
         }
         val <- idf_env$value[fld, on = c("object_id", "field_id"), nomatch = nom]
     }
+
+    # correct rleid in order to consistent with other cases
+    if (sgl) set(val, NULL, "rleid", 1L)
 
     val[is.na(value_id), value_id := -.I]
 
