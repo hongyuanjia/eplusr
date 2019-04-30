@@ -578,7 +578,8 @@ format_possible <- function (x) {
             vcapply(x$choice, function (cho) {
                 if (!length(cho)) return(" <NA>")
                 if (length(cho) > 5L) cho <- c(cho[1L:5L], "......")
-                paste0("\n", paste0("  - ", surround(cho, "\""), collapse = "\n"))
+                cho[1L:5L] <- surround(cho[1L:5L], "\"")
+                paste0("\n", paste0("  - ", cho, collapse = "\n"))
             })
         ))
         on.exit(set(x, NULL, "fmt_choice", NULL), add = TRUE)
