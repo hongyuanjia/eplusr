@@ -26,15 +26,15 @@ Default: \code{29L} which is the same as IDF Editor.}
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-A character vector.
+A single length string.
 }
 \description{
-Format an \link{Idf} object into a character vector.
+Format an \link{Idf} object.
 }
 \examples{
 \dontrun{
 idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
-format(read_idf(idf_path, use_idd(8.8, "auto")), leading = 0)
+cat(format(read_idf(idf_path, use_idd(8.8, "auto")), leading = 0))
 }
 }
 \author{

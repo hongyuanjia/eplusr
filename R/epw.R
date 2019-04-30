@@ -1459,8 +1459,15 @@ epw_deep_clone <- function (self, private, name, value) {
 }
 # }}}
 # S3 Epw methods {{{
-str.Epw <- function (x, ...) x$print(...)
-format.Epw <- function (x, ...) x$print(...)
+#' @export
+str.Epw <- function (object, ...) {
+    object$print()
+}
+
+#' @export
+format.Epw <- function (x, ...) {
+    paste0(utils::capture.output(x$print()), collapse = "\n")
+}
 # }}}
 
 #' Download EnergyPlus Weather File (EPW) and Design Day File (DDY)

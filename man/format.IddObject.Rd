@@ -24,14 +24,14 @@ only minimum fields are returned.}
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-A character vector.
+A single length character vector.
 }
 \description{
-Format an \link{IddObject} into an empty object of current class in a character
-vector format. It is formated exactly the same as in IDF Editor.
+Format an \link{IddObject} into a string of an empty object of current class.
+It is formated exactly the same as in IDF Editor.
 }
 \examples{
 \dontrun{
-format(use_idd(8.8, download = "auto")$Materal, leading = 0)
+cat(format(use_idd(8.8, download = "auto")$Materal, leading = 0))
 }
 }

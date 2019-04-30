@@ -426,3 +426,14 @@ sql_print <- function (self, private) {
     ))
 }
 # }}}
+# S3 EplusSql methods {{{
+#' @export
+str.EplusSql <- function (object, ...) {
+    object$print()
+}
+
+#' @export
+format.EplusSql <- function (x, ...) {
+    paste0(utils::capture.output(x$print()), collapse = "\n")
+}
+# }}}

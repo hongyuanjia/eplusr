@@ -1176,8 +1176,8 @@ iddobj_print <- function (self, private, brief = FALSE) {
 
 #' Format an IddObject
 #'
-#' Format an [IddObject] into an empty object of current class in a character
-#' vector format. It is formated exactly the same as in IDF Editor.
+#' Format an [IddObject] into a string of an empty object of current class.
+#' It is formated exactly the same as in IDF Editor.
 #'
 #' @param x An [IddObject] object.
 #' @param all If `TRUE`, all fields in current class are returned, otherwise
@@ -1188,15 +1188,17 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' @param sep_at The character width to separate value string and field string.
 #' Default: `29` which is the same as IDF Editor.
 #' @param ... Further arguments passed to or from other methods.
-#' @return A character vector.
+#' @return A single length character vector.
 #' @examples
 #' \dontrun{
-#' format(use_idd(8.8, download = "auto")$Materal, leading = 0)
+#' cat(format(use_idd(8.8, download = "auto")$Materal, leading = 0))
 #' }
 #' @export
 # format.IddObject {{{
 format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+    paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all),
+        collapse = "\n"
+    )
 }
 # }}}
 
@@ -1213,7 +1215,9 @@ format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all
 #' }
 #' @export
 # as.character.IddObject {{{
-as.character.IddObject <- format.IddObject
+as.character.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+}
 # }}}
 
 #' @export

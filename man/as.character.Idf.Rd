@@ -29,7 +29,7 @@ Default: \code{29L} which is the same as IDF Editor.}
 A character vector.
 }
 \description{
-Format an \link{Idf} object into a character vector.
+Coerce an \link{Idf} object into a character vector.
 }
 \examples{
 \dontrun{

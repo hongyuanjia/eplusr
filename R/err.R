@@ -206,6 +206,7 @@ parse_err_file <- function (path) {
 #' @param brief If `TRUE`, only summary data is printed. Default: `FALSE`.
 #' @param info If `FALSE`, informative messages are excluded. Only warnings and
 #' errors are printed. Default: `TRUE`.
+#' @param ... Further arguments passed to or from other methods.
 #' @return An `ErrFile` object, invisibly.
 #' @export
 # print.ErrFile {{{

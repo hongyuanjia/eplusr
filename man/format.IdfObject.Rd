@@ -36,6 +36,6 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
 
-format(mat, leading = 0, sep_at = 10)
+cat(format(mat, leading = 0, sep_at = 10))
 }
 }

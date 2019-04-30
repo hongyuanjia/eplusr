@@ -833,3 +833,14 @@ param_print <- function (self, private) {
     }
 }
 # }}}
+# S3 ParametricJob methods {{{
+#' @export
+str.ParametricJob <- function (object, ...) {
+    object$print()
+}
+
+#' @export
+format.ParametricJob <- function (x, ...) {
+    paste0(utils::capture.output(x$print()), collapse = "\n")
+}
+# }}}

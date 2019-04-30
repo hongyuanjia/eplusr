@@ -1193,12 +1193,12 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 #' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
 #'
-#' format(mat, leading = 0, sep_at = 10)
+#' cat(format(mat, leading = 0, sep_at = 10))
 #' }
 #' @export
 # format.IdfObject {{{
 format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+    paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all), collapse = "\n")
 }
 # }}}
 
@@ -1220,13 +1220,16 @@ format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all
 #' }
 #' @export
 # as.character.IdfObject {{{
-as.character.IdfObject <- format.IdfObject
+as.character.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
+    x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all)
+}
 # }}}
 
 #' @export
 # str.IdfObject {{{
 str.IdfObject <- function (object, ...) {
-    object$value()
+    object <- object$value()
+    NextMethod()
 }
 # }}}
 

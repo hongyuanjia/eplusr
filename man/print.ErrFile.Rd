@@ -4,7 +4,7 @@
 \alias{print.ErrFile}
 \title{Print EnergyPlus Error File}
 \usage{
-\method{print}{ErrFile}(x, brief = FALSE, info = TRUE)
+\method{print}{ErrFile}(x, brief = FALSE, info = TRUE, ...)
 }
 \arguments{
 \item{x}{An \code{ErrFile} created using \code{\link[=read_err]{read_err()}}.}
@@ -13,6 +13,8 @@
 
 \item{info}{If \code{FALSE}, informative messages are excluded. Only warnings and
 errors are printed. Default: \code{TRUE}.}
+
+\item{...}{Further arguments passed to or from other methods.}
 }
 \value{
 An \code{ErrFile} object, invisibly.

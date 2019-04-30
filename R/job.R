@@ -846,3 +846,14 @@ job_update_endtime <- function (self, private) {
     }
 }
 # }}}
+# S3 EplusJob methods {{{
+#' @export
+str.EplusSql <- function (object, ...) {
+    object$print()
+}
+
+#' @export
+format.EplusSql <- function (x, ...) {
+    paste0(utils::capture.output(x$print()), collapse = "\n")
+}
+# }}}

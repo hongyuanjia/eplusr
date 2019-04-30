@@ -2396,7 +2396,7 @@ str.Idf <- function (object, zoom = "class", ...) {
 
 #' Format an Idf Object
 #'
-#' Format an [Idf] object into a character vector.
+#' Format an [Idf] object.
 #'
 #' @param x An [Idf] object.
 #' @param comment If `FALSE`, all comments will not be included. Default: `TRUE`.
@@ -2407,11 +2407,11 @@ str.Idf <- function (object, zoom = "class", ...) {
 #' @param sep_at The character width to separate value string and field string.
 #' Default: `29L` which is the same as IDF Editor.
 #' @param ... Further arguments passed to or from other methods.
-#' @return A character vector.
+#' @return A single length string.
 #' @examples
 #' \dontrun{
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
-#' format(read_idf(idf_path, use_idd(8.8, "auto")), leading = 0)
+#' cat(format(read_idf(idf_path, use_idd(8.8, "auto")), leading = 0))
 #' }
 #' @export
 #' @author Hongyuan Jia
@@ -2419,15 +2419,18 @@ str.Idf <- function (object, zoom = "class", ...) {
 format.Idf <- function (x, comment = TRUE, header = TRUE,
                         format = eplusr_option("save_format"),
                         leading = 4L, sep_at = 29L, ...) {
-    x$to_string(comment = comment, header = header, format = format,
-        leading = leading, sep_at = sep_at, ...
+    paste0(
+        x$to_string(comment = comment, header = header, format = format,
+            leading = leading, sep_at = sep_at, ...
+        ),
+        collapse = "\n"
     )
 }
 # }}}
 
 #' Coerce an Idf object into a Character Vector
 #'
-#' Format an [Idf] object into a character vector.
+#' Coerce an [Idf] object into a character vector.
 #'
 #' @inheritParams format.Idf
 #' @return A character vector.
@@ -2439,7 +2442,13 @@ format.Idf <- function (x, comment = TRUE, header = TRUE,
 #' @export
 #' @author Hongyuan Jia
 # as.character.Idf {{{
-as.character.Idf <- format.Idf
+as.character.Idf <- function (x, comment = TRUE, header = TRUE,
+                        format = eplusr_option("save_format"),
+                        leading = 4L, sep_at = 29L, ...) {
+    x$to_string(comment = comment, header = header, format = format,
+        leading = leading, sep_at = sep_at, ...
+    )
+}
 # }}}
 
 #' Create an Empty Idf
