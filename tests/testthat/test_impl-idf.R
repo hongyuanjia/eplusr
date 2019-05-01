@@ -308,6 +308,7 @@ test_that("table", {
     expect_equivalent(val$rleid, rep(1L, 24))
     expect_equivalent(val$class_name, rep("BuildingSurface:Detailed", 24))
     expect_equivalent(val$object_name, rep("WALL-1PF", 24))
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, "Material", field = c(8, 9), align = TRUE)), 4L)
     # }}}
     # one field for each class {{{
     expect_silent({val <- get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 9))})
@@ -320,11 +321,12 @@ test_that("table", {
     expect_equivalent(val$rleid, c(1L, 1L, 2L))
     expect_equivalent(val$class_name, c(rep("Material", 2), "BuildingSurface:Detailed"))
     expect_equivalent(val$object_name, c("WD01", "WD02", "WALL-1PF"))
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(9, 24), align = TRUE)), 3)
     # }}}
     expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), field = c(4, 9), complete = TRUE)), 15)
     expect_equal(nrow(get_idf_value(idd_env, idf_env, c("Material", "BuildingSurface:Detailed"), field = c(4, 9), complete = TRUE)), 31)
     expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01", "WD02"), field = c(4, 9), align = TRUE)), 2)
-    expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD01"), field = c(4, 9), align = TRUE)), 2)
+    expect_equal(nrow(get_idf_value(idd_env, idf_env, object = c("WD02"), field = c(4, 9), align = TRUE)), 2)
     expect_equal(nrow(get_idf_value(idd_env, idf_env, c("BuildingSurface:Detailed"), field = c(4, 9), align = TRUE)), 2)
     # }}}
 
@@ -343,8 +345,8 @@ test_that("table", {
     fld_nm <- c("Conductivity", "Visible Absorptance")
     expect_equal(get_idf_value(idd_env, idf_env, "Material", field = c(4L, 9L))$value_id, c(4L, 9L, 43L))
     expect_equal(get_idf_value(idd_env, idf_env, "Material", field = fld_nm)$value_id, c(4L, 9L, 43L))
-    expect_equal(get_idf_value(idd_env, idf_env, "Material", field = c(4L, 9L), align = TRUE)$value_id, c(4L, 43L))
-    expect_equal(get_idf_value(idd_env, idf_env, "Material", field = fld_nm, align = TRUE)$value_id, c(4L, 43L))
+    expect_equal(get_idf_value(idd_env, idf_env, "Material", field = c(4L, 9L), align = TRUE)$value_id, c(4L, 9L, 43L, -1L))
+    expect_equal(get_idf_value(idd_env, idf_env, "Material", field = fld_nm, align = TRUE)$value_id, c(4L, 9L, 43L, -1L))
     expect_equal(get_idf_value(idd_env, idf_env, "Material", field = c(4L, 3L), complete = TRUE)$value_id, c(1:6, 40:43, -1:-2))
     fld_nm <- c("Layer 3", "Visible Absorptance")
     expect_equal(get_idf_value(idd_env, idf_env, c("Construction", "Material"), field = c(4L, 9L))$value_id, c(13L, 9L))
