@@ -457,8 +457,6 @@ on_fail(has_ext) <- function (call, env) {
 }
 # }}}
 
-#' @rdname assertion
-#' @export
 # is_epwdate {{{
 is_epwdate <- function (x) {
     length(x) == 1L && !is.na(epw_date(x))

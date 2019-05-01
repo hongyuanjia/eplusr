@@ -91,12 +91,13 @@ NULL
 #' * `leading`: Leading spaces added to each field. Default: `4L`.
 #' * `sep_at`: The character width to separate value string and field string.
 #'   Default: `29L` which is the same as IDF Editor.
-#' * `sep_each`: An single integer of how many empty strings to insert between
-#'   different classes. Default: `1`.
+#' * `sep_each`: A single integer of how many empty strings to insert between
+#'   different classes. Default: `0`.
 #'
 #' @section Detail:
 #'
-#' `$version()` returns the IDD version in [base::numeric_version()].
+#' `$version()` returns the IDD version in
+#' [numeric_version][base::numeric_version()].
 #'
 #' `$build()` returns the build tag string.
 #'
@@ -164,8 +165,8 @@ NULL
 #'
 #' For details about [IddObject], please see [IddObject] class.
 #'
-#' `$to_table()` returns a [data.table::data.table()] that contains core data of
-#' specified class. It has 3 columns:
+#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
+#' core data of specified class. It has 3 columns:
 #'
 #' * `class`: Character type. Class names.
 #' * `index`: Integer type. Field indexes.
@@ -231,10 +232,9 @@ NULL
 #' @name Idd
 #' @seealso [IddObject] class which provides detailed information of
 #' curtain class
-#'
 #' @author Hongyuan Jia
 #' @references
-#' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor)
+#' [IDFEditor](https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor),
 #' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
 NULL
 
@@ -642,8 +642,8 @@ read_idd <- function (path) {
 #' * `use_idd()` returns an `Idd` object
 #' * `download_idd()` returns an invisible integer `0` if succeed. Also an
 #'   attribute named `file` which is the full path of the downloaded IDD file;
-#' * `avail_idd()` returns a [base::numeric_version()] vector or `NULL` if no
-#'   available Idd object found.
+#' * `avail_idd()` returns a [numeric_version][base::numeric_version()] vector
+#'   or `NULL` if no available Idd object found.
 #' * `is_avail_idd()` returns a single logical vector.
 #'
 #' @examples

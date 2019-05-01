@@ -39,7 +39,7 @@ NULL
 #' 12. snow depth
 #' 13. liquid precipitation depth
 #'
-#' **NOTE** the `hour` column in the core weather data corresponds to the period
+#' **Note** the `hour` column in the core weather data corresponds to the period
 #' from **(Hour-1)th** to **(Hour)th**. For instance, if the number of interval
 #' per hour is 1, hour of 1 on a certain day corresponds to the period between
 #' 00:00:01 to 01:00:00, Hour of 2 corresponds to the period between
@@ -166,7 +166,8 @@ NULL
 #' ```
 #'
 #' `$typical_extreme_period()` returns the parsed values of `TYPICAL/EXTREME
-#' PERIOD` header in a [data.table::data.table()] format with 6 columns:
+#' PERIOD` header in a [data.table][data.table::data.table()] format with 6
+#' columns:
 #'
 #' * `index`: Integer type. The index of typical or extrame period record
 #' * `name`: Character type. The name of typical or extrame period record
@@ -184,7 +185,7 @@ NULL
 #' ```
 #'
 #' `$ground_temperature()` returns the parsed values of `GROUND TEMPERATURE`
-#' header in a [data.table::data.table()] format with 7 columns:
+#' header in a [data.table][data.table::data.table()] format with 7 columns:
 #'
 #' * `index`: Integer type. The index of ground temperature record
 #' * `depth`: Numeric type. The depth of the ground temperature is measured
@@ -209,8 +210,8 @@ NULL
 #' * `leapyear`: A single logical vector. `TRUE` means that the weather data
 #'   contains leap year data
 #' * `dst`: A Date vector contains the start and end day of daylight saving time
-#' * `holiday`: A [data.table::data.table()] contains 2 columns. If no holiday
-#'   specified, an empty [data.table::data.table()]
+#' * `holiday`: A [data.table][data.table::data.table()] contains 2 columns. If
+#'   no holiday specified, an empty [data.table][data.table::data.table()]
 #'   * `name`: Name of the holiday
 #'   * `day`: Date of the holiday
 #'
@@ -291,7 +292,7 @@ NULL
 #' start day of week. If no input is given, data periods in current `Epw` is
 #' returned.
 #'
-#' `$period()` returns a [data.table::data.table()] with 5 columns:
+#' `$period()` returns a [data.table][data.table::data.table()] with 5 columns:
 #'
 #' * `index`: Integer type. The index of data period.
 #' * `name`: Character type. The name of data period.
@@ -356,7 +357,7 @@ NULL
 #' `$data()` returns weather data of specific data period.
 #'
 #' Usually, EPW file downloaded from [EnergyPlus website](https://energyplus.net/)
-#' contains TMY weathe data. As years of weather data is not concesutive, it may
+#' contains TMY weather data. As years of weather data is not concesutive, it may
 #' be more convenient to align the year values to be concesutive, which will
 #' makes it possible to direct analyze and plot weather data. The `start_year`
 #' argument in `$data()` method can help to achieve this. However, randomly
@@ -423,7 +424,7 @@ NULL
 #' epw$purge()
 #' ```
 #'
-#' **NOTE** that all these 5 methods modify the weather data in-place, meaning
+#' **Note** that all these 5 methods modify the weather data in-place, meaning
 #' that the returned data from `$data()` and `$abnormal_data()` may be different
 #' after calling these methods.
 #'
@@ -498,7 +499,8 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `data`: A [data.table::data.table()] of new weather data to add or set.
+#' * `data`: A [data.table][data.table::data.table()] of new weather data to add
+#'   or set.
 #'   Validation is performed according to rules described above.
 #' * `realyear`: Whether input data is AMY data. Default: `FALSE`.
 #' * `name`: A new string used as name of added or set data period. Should not
@@ -608,11 +610,6 @@ NULL
 #'
 #' # change start day of week
 #' epw$(1, start_day_of_week = 3)
-#'
-#' # set basic info
-#' # NOTE: Use with caution. May mess up your weather data
-#' epw$city <- "Chongqing"
-#' epw$city
 #'
 #' # get data specifications
 #' epw$missing_code()

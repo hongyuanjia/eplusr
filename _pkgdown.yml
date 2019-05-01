@@ -4,41 +4,57 @@ reference:
     contents:
       - Idd
       - IddObject
+      - idd_object
       - use_idd
       - download_idd
       - avail_idd
       - is_avail_idd
+      - is_idd
+      - is_idd_ver
+      - is_iddobject
   - title: IDF
     desc: Read, modify and run an EnergyPlus Input Data File (IDF)
     contents:
       - Idf
       - IdfObject
+      - idf_object
       - read_idf
+      - empty_idf
+      - is_idf
+      - is_idfobject
   - title: EPW
     desc: Download, read and modify an EnergyPlus Weather (EPW)
     contents:
       - Epw
       - read_epw
       - download_weather
+      - is_epw
   - title: Configure EnergyPlus
     contents:
       - install_eplus
+      - download_eplus
       - use_eplus
       - eplus_config
       - avail_eplus
       - is_avail_eplus
+      - is_eplus_path
+      - is_eplus_ver
   - title: Job
     desc: Run EnergyPlus and collect outputs
     contents:
       - EplusSql
       - EplusJob
       - ParametricJob
+      - eplus_sql
       - eplus_job
       - param_job
       - run_idf
       - run_multi
       - clean_wd
+      - read_err
   - title: eplusr Options
     contents:
       - eplusr-package
       - eplusr_option
+      - custom_validate
+      - level_checks

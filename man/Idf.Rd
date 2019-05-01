@@ -92,9 +92,9 @@ model$is_valid_class(class, all = FALSE)
 }
 
 \code{$version()} returns the version of current model in a
-\code{\link[base:numeric_version]{base::numeric_version()}} format. This makes it easy to direction compare
-versions of different model, e.g. \code{model1$version() > 8.6} or
-\code{model1$version() > model2$version()}.
+\link[base:numeric_version]{numeric_version} format. This makes it easy to
+direction compare versions of different model, e.g. \code{model1$version() > 8.6}
+or \code{model1$version() > model2$version()}.
 
 \code{$path()} returns the full path of current model or \code{NULL} if the \code{Idf}
 object is created using a character vector and not saved locally.
@@ -245,7 +245,7 @@ name(s) as input.
 those unique objects, e.g.
 \code{model$object_unique("SimulationContrl")$set(...)}. Note that if there are
 multiple objects in that unique-object class, an error is issued. This makes
-sure that \code{$object_unique()} always returns an single \link{IdfObject}.
+sure that \code{$object_unique()} always returns a single \link{IdfObject}.
 
 \code{$objects()} returns a named \strong{list} of \link{IdfObject}s specified by object IDs
 or names.
@@ -295,7 +295,7 @@ instance, \code{model$BuildingSurface_Detailed} and also
 \code{model[["Building"]]} will return the \link{IdfObject} in \code{Building} class which
 is an unique-object class.
 
-\strong{NOTE}: The returned list from \code{$objects()}, \code{$objects_in_class()} and
+\strong{Note}: The returned list from \code{$objects()}, \code{$objects_in_class()} and
 other methods is named using the names of returned \link{IdfObject}s in that list.
 This will makes it easy to using object name to do further subsetting, e.g.
 \code{model$objects_in_class("Material")$mat} will return an \link{IdfObject} named
@@ -345,7 +345,7 @@ objects with a suffix \code{"_1"}, \code{"_2"} and etc, depending on how many ti
 that object has been duplicated. Note an error will be issued if trying to
 assign a new name to an object which does not have name attribute.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item Assign newly added objects with an existing name in current \code{Idf} object is
 prohibited if current validation level includes object name conflicting
@@ -378,7 +378,7 @@ without names will be inserted according to their position. There is a
 special element named \code{.comment} in each list, which will be used as the
 comments of newly added object.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item Empty objects can be added using an empty list, e.g. \code{model$add(building = list())}. All empty fields will be filled with corresponding default value
 if \code{.default} is \code{TRUE}, leaving other fields as blank. However, adding
@@ -436,7 +436,7 @@ Similar to \code{$add()}, a special element \code{.comment} in each list will be
 as the \strong{new} comments for modified object, overwriting the old ones. Names
 in list element are treated as field names.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item You can delete a field by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
 also \code{fld} is not a required field and the index of \code{fld} is larger than
@@ -489,7 +489,7 @@ model$set(val)
 names, and deletes objects specified. If \code{.referenced} is \code{TRUE}, objects
 whose fields refer to input objects will also be deleted.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item If current \link[=level_checks]{validate level} includes reference checking,
 objects will not be allowed to be deleted if they are referred by other
@@ -554,7 +554,7 @@ object name.
 \code{$insert()} takes \link{IdfObject}s or lists of \link{IdfObject}s as input, inserts
 them into current Idf, and returns a list of inserted \link{IdfObject}s.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item You cannot insert an \link{IdfObject} which comes from a different version than
 current \code{Idf} object.
@@ -628,7 +628,7 @@ that each definition is separated by \code{class} column and will issue an error
 if there is any duplication in the \code{index} column.
 }
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item \code{$load()} assume all definitions are from the same version as current \code{Idf}
 object. If input definition is from different version, parsing error may
@@ -696,7 +696,7 @@ units if necessary. Default: \code{FALSE}.
 \item \code{ver}: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0". If
 \code{NULL}, assume that the file has the same version as current Idf object.
 Default: \code{NULL}.
-\item \code{.unique}: If there are duplications in copied objects from IDF Editor or
+\item \code{unique}: If there are duplications in copied objects from IDF Editor or
 there is same object in current Idf, duplications in input are removed.
 Default: \code{TRUE}.
 }
@@ -721,7 +721,7 @@ match the given pattern. If no matched found, \code{NULL} is returned invisibly.
 replace with given pattern. If no matched found, \code{NULL} is returned
 invisibly.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item During matching, all values are treated as characters, including numeric
 values.
@@ -805,8 +805,8 @@ please see \code{\link[=level_checks]{level_checks()}} and \code{\link[=custom_v
 }
 
 Except \code{missing_object}, which is a character vector, all other elements
-are \code{\link[data.table:data.table]{data.table::data.table()}} with 9 columns containing data of invalid
-field values:
+are \link[data.table:data.table]{data.table} with 9 columns containing data of
+invalid field values:
 \itemize{
 \item \code{object_id}: IDs of objects that contain invalid values
 \item \code{object_name}: names of objects that contain invalid values
@@ -837,8 +837,8 @@ to correct them.
 model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 }
 
-\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
-specified objects. It has 6 columns:
+\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+core data of specified objects. It has 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -859,11 +859,11 @@ Default: \code{NULL}.
 \item \code{class}: A character vector of class names. If \code{NULL}, all classed in
 current \code{Idf} object is converted. Default: \code{NULL}.
 \item \code{string_value}: If \code{TRUE}, all field values are returned as character. If
-\code{FALSE}, \code{value} column in returned \code{\link[data.table:data.table]{data.table::data.table()}} is a list
-column with each value stored as corresponding type. Note that if the value
-of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it is left as
-it is, leaving the returned type being a string instead of a number.
-Default: \code{TRUE}.
+\code{FALSE}, \code{value} column in returned \link[data.table:data.table]{data.table}
+is a list column with each value stored as corresponding type. Note that if
+the value of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it
+is left as it is, leaving the returned type being a string instead of a
+number.  Default: \code{TRUE}.
 \item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
 of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
 applicable. Default: \code{FALSE}.
@@ -938,7 +938,7 @@ copied into the output directory. An \link{EplusJob} object is returned which
 provides detailed info of the simulation and methods to collect simulation
 results. Please see \link{EplusJob} for details.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item eplusr uses the EnergyPlus command line interface which was introduced
 since EnergyPlus 8.3.0. So \code{$run()} only supports models with version no
@@ -1162,8 +1162,8 @@ idf$insert(idf_1$Material$test)
 # check if material named "test" is there
 idf$object_name("Material")
 
-# $ins_object() is useful when importing design days from a ".ddy" file
-\dontrun{idf$ins_object(read_idf("foo.ddy"))}
+# $insert() is useful when importing design days from a ".ddy" file
+\dontrun{idf$insert(read_idf("foo.ddy"))}
 
 # ===== SET OBJECTS =====
 # set the thickness of newly inserted material "test" to 0.2 m

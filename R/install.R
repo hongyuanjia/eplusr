@@ -227,7 +227,7 @@ install_eplus_linux <- function (exec) {
 #' * For `use_eplus()` and `eplus_config()`, an (invisible for
 #'   `use_eplus()`) list of three contains EnergyPlus version, directory and
 #'   EnergyPlus executable.  version of EnergyPlus;
-#' * For `avail_eplus()`, a [base::numeric_version()] vector or `NULL` if no
+#' * For `avail_eplus()`, a [numeric_version][base::numeric_version()] vector or `NULL` if no
 #'   available EnergyPlus is found;
 #' * For `is_avis_avail_eplus()`, a scalar logical vector.
 #'

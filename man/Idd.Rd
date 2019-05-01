@@ -98,15 +98,16 @@ only mininum required fields are returned. Default: \code{FALSE}.
 \item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
 \item \code{sep_at}: The character width to separate value string and field string.
 Default: \code{29L} which is the same as IDF Editor.
-\item \code{sep_each}: An single integer of how many empty strings to insert between
-different classes. Default: \code{1}.
+\item \code{sep_each}: A single integer of how many empty strings to insert between
+different classes. Default: \code{0}.
 }
 }
 
 \section{Detail}{
 
 
-\code{$version()} returns the IDD version in \code{\link[base:numeric_version]{base::numeric_version()}}.
+\code{$version()} returns the IDD version in
+\link[base:numeric_version]{numeric_version}.
 
 \code{$build()} returns the build tag string.
 
@@ -170,8 +171,8 @@ than letters and numbers are replaced by a underscore \code{_}.
 
 For details about \link{IddObject}, please see \link{IddObject} class.
 
-\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
-specified class. It has 3 columns:
+\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+core data of specified class. It has 3 columns:
 \itemize{
 \item \code{class}: Character type. Class names.
 \item \code{index}: Integer type. Field indexes.
@@ -237,7 +238,7 @@ idd$to_string(c("Material", "Construction"))
 
 }
 \references{
-\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor}
+\href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor},
 \href{https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html}{OpenStudio utilities library}
 }
 \seealso{

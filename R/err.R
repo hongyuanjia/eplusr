@@ -12,18 +12,19 @@ NULL
 #'
 #' Basically, an `ErrFile` object is a list with 7 elements:
 #'
-#' * `eplus_version`: A [base::numeric_version()] object. The version of
-#'   EnergyPlus used during the simulation.
+#' * `eplus_version`: A [numeric_version][base::numeric_version()] object. The
+#'   version of EnergyPlus used during the simulation.
 #' * `eplus_build`: A single string. The build tag of EnergyPlus used during the
 #'   simulation.
 #' * `datetime`: A DateTime (POSIXct). The time when the simulation started.
-#' * `idd_version`: A [base::numeric_version()]. The version of IDD used during
-#'   the simulation.
+#' * `idd_version`: A [numeric_version][base::numeric_version()]. The version of
+#'   IDD used during the simulation.
 #' * `successful`: `TRUE` when the simulation ended successfully, and `FALSE`
 #'   otherwise.
 #' * `terminated`: `TRUE` when the simulation was terminated, and `FALSE`
 #'   otherwise.
-#' * `data`: A [data.table::data.table()] that contains parsed error messages.
+#' * `data`: A [data.table][data.table::data.table()] that contains parsed error
+#'   messages.
 #'
 #' @param path a file path of EnergyPlus simulation error file, usually
 #' with an extension `.err`.

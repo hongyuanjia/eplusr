@@ -9,7 +9,6 @@
 \alias{is_iddobject}
 \alias{is_idfobject}
 \alias{is_epw}
-\alias{is_epwdate}
 \title{Check for Idd, Idf and Epw objects}
 \usage{
 is_eplus_ver(ver, strict = FALSE)
@@ -27,8 +26,6 @@ is_iddobject(x)
 is_idfobject(x)
 
 is_epw(x)
-
-is_epwdate(x)
 }
 \arguments{
 \item{ver}{A character or numeric vector with suitable numeric version

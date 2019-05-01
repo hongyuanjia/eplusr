@@ -20,18 +20,19 @@ with an extension \code{.err}, parses it and returns an \code{ErrFile} object.
 \details{
 Basically, an \code{ErrFile} object is a list with 7 elements:
 \itemize{
-\item \code{eplus_version}: A \code{\link[base:numeric_version]{base::numeric_version()}} object. The version of
-EnergyPlus used during the simulation.
+\item \code{eplus_version}: A \link[base:numeric_version]{numeric_version} object. The
+version of EnergyPlus used during the simulation.
 \item \code{eplus_build}: A single string. The build tag of EnergyPlus used during the
 simulation.
 \item \code{datetime}: A DateTime (POSIXct). The time when the simulation started.
-\item \code{idd_version}: A \code{\link[base:numeric_version]{base::numeric_version()}}. The version of IDD used during
-the simulation.
+\item \code{idd_version}: A \link[base:numeric_version]{numeric_version}. The version of
+IDD used during the simulation.
 \item \code{successful}: \code{TRUE} when the simulation ended successfully, and \code{FALSE}
 otherwise.
 \item \code{terminated}: \code{TRUE} when the simulation was terminated, and \code{FALSE}
 otherwise.
-\item \code{data}: A \code{\link[data.table:data.table]{data.table::data.table()}} that contains parsed error messages.
+\item \code{data}: A \link[data.table:data.table]{data.table} that contains parsed error
+messages.
 }
 }
 \examples{

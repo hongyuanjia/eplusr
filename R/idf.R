@@ -90,9 +90,9 @@ NULL
 #' ```
 #'
 #' `$version()` returns the version of current model in a
-#' [base::numeric_version()] format. This makes it easy to direction compare
-#' versions of different model, e.g. `model1$version() > 8.6` or
-#' `model1$version() > model2$version()`.
+#' [numeric_version][base::numeric_version()] format. This makes it easy to
+#' direction compare versions of different model, e.g. `model1$version() > 8.6`
+#' or `model1$version() > model2$version()`.
 #'
 #' `$path()` returns the full path of current model or `NULL` if the `Idf`
 #' object is created using a character vector and not saved locally.
@@ -242,7 +242,7 @@ NULL
 #' those unique objects, e.g.
 #' `model$object_unique("SimulationContrl")$set(...)`. Note that if there are
 #' multiple objects in that unique-object class, an error is issued. This makes
-#' sure that `$object_unique()` always returns an single [IdfObject].
+#' sure that `$object_unique()` always returns a single [IdfObject].
 #'
 #' `$objects()` returns a named **list** of [IdfObject]s specified by object IDs
 #' or names.
@@ -292,7 +292,7 @@ NULL
 #' `model[["Building"]]` will return the [IdfObject] in `Building` class which
 #' is an unique-object class.
 #'
-#' **NOTE**: The returned list from `$objects()`, `$objects_in_class()` and
+#' **Note**: The returned list from `$objects()`, `$objects_in_class()` and
 #' other methods is named using the names of returned [IdfObject]s in that list.
 #' This will makes it easy to using object name to do further subsetting, e.g.
 #' `model$objects_in_class("Material")$mat` will return an [IdfObject] named
@@ -342,7 +342,7 @@ NULL
 #' that object has been duplicated. Note an error will be issued if trying to
 #' assign a new name to an object which does not have name attribute.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * Assign newly added objects with an existing name in current `Idf` object is
 #'   prohibited if current validation level includes object name conflicting
@@ -375,7 +375,7 @@ NULL
 #' special element named `.comment` in each list, which will be used as the
 #' comments of newly added object.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * Empty objects can be added using an empty list, e.g. `model$add(building =
 #'   list())`. All empty fields will be filled with corresponding default value
@@ -435,7 +435,7 @@ NULL
 #' as the **new** comments for modified object, overwriting the old ones. Names
 #' in list element are treated as field names.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * You can delete a field by assigning `NULL` to it, e.g. `list(fld =
 #'   NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
@@ -491,7 +491,7 @@ NULL
 #' names, and deletes objects specified. If `.referenced` is `TRUE`, objects
 #' whose fields refer to input objects will also be deleted.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * If current [validate level][level_checks()] includes reference checking,
 #'   objects will not be allowed to be deleted if they are referred by other
@@ -557,7 +557,7 @@ NULL
 #' `$insert()` takes [IdfObject]s or lists of [IdfObject]s as input, inserts
 #' them into current Idf, and returns a list of inserted [IdfObject]s.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * You cannot insert an [IdfObject] which comes from a different version than
 #'   current `Idf` object.
@@ -628,7 +628,7 @@ NULL
 #'   that each definition is separated by `class` column and will issue an error
 #'   if there is any duplication in the `index` column.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * `$load()` assume all definitions are from the same version as current `Idf`
 #'   object. If input definition is from different version, parsing error may
@@ -701,7 +701,7 @@ NULL
 #' * `ver`: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0". If
 #'   `NULL`, assume that the file has the same version as current Idf object.
 #'   Default: `NULL`.
-#' * `.unique`: If there are duplications in copied objects from IDF Editor or
+#' * `unique`: If there are duplications in copied objects from IDF Editor or
 #'   there is same object in current Idf, duplications in input are removed.
 #'   Default: `TRUE`.
 #'
@@ -727,7 +727,7 @@ NULL
 #' replace with given pattern. If no matched found, `NULL` is returned
 #' invisibly.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * During matching, all values are treated as characters, including numeric
 #'   values.
@@ -817,8 +817,8 @@ NULL
 #' * `invalid_reference`
 #'
 #' Except `missing_object`, which is a character vector, all other elements
-#' are [data.table::data.table()] with 9 columns containing data of invalid
-#' field values:
+#' are [data.table][data.table::data.table()] with 9 columns containing data of
+#' invalid field values:
 #'
 #' * `object_id`: IDs of objects that contain invalid values
 #' * `object_name`: names of objects that contain invalid values
@@ -848,8 +848,8 @@ NULL
 #' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' ```
 #'
-#' `$to_table()` returns a [data.table::data.table()] that contains core data of
-#' specified objects. It has 6 columns:
+#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
+#' core data of specified objects. It has 6 columns:
 #'
 #' * `id`: Integer type. Object IDs.
 #' * `name`: Character type. Object names.
@@ -869,11 +869,11 @@ NULL
 #' * `class`: A character vector of class names. If `NULL`, all classed in
 #'   current `Idf` object is converted. Default: `NULL`.
 #' * `string_value`: If `TRUE`, all field values are returned as character. If
-#'   `FALSE`, `value` column in returned [data.table::data.table()] is a list
-#'   column with each value stored as corresponding type. Note that if the value
-#'   of numeric field is set to `"Autosize"` or `"Autocalculate"`, it is left as
-#'   it is, leaving the returned type being a string instead of a number.
-#'   Default: `TRUE`.
+#'   `FALSE`, `value` column in returned [data.table][data.table::data.table()]
+#'   is a list column with each value stored as corresponding type. Note that if
+#'   the value of numeric field is set to `"Autosize"` or `"Autocalculate"`, it
+#'   is left as it is, leaving the returned type being a string instead of a
+#'   number.  Default: `TRUE`.
 #' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
 #'   of numeric fields are assigned with units using [units::set_units()] if
 #'   applicable. Default: `FALSE`.
@@ -949,7 +949,7 @@ NULL
 #' provides detailed info of the simulation and methods to collect simulation
 #' results. Please see [EplusJob] for details.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * eplusr uses the EnergyPlus command line interface which was introduced
 #'   since EnergyPlus 8.3.0. So `$run()` only supports models with version no
@@ -1169,8 +1169,8 @@ NULL
 #' # check if material named "test" is there
 #' idf$object_name("Material")
 #'
-#' # $ins_object() is useful when importing design days from a ".ddy" file
-#' \dontrun{idf$ins_object(read_idf("foo.ddy"))}
+#' # $insert() is useful when importing design days from a ".ddy" file
+#' \dontrun{idf$insert(read_idf("foo.ddy"))}
 #'
 #' # ===== SET OBJECTS =====
 #' # set the thickness of newly inserted material "test" to 0.2 m

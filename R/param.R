@@ -122,23 +122,25 @@ NULL
 #' `$locate_output()` returns the path of a single output file of specified
 #' simulations.
 #'
-#' `$report_data_dict()` returns a [data.table::data.table()] which contains all
-#' information about report data for specified simulations. For details on the
-#' meaning of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
-#' EnergyPlus "Output Details and Examples" documentation.
+#' `$report_data_dict()` returns a [data.table][data.table::data.table()] which
+#' contains all information about report data for specified simulations. For
+#' details on the meaning of each columns, please see "2.20.2.1
+#' ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
+#' documentation.
 #'
-#' `$report_data()` extracts the report data in a [data.table::data.table()]
-#' using key values, variable names and other arguments.
+#' `$report_data()` extracts the report data in a
+#' [data.table][data.table::data.table()] using key values, variable names and other arguments.
 #'
-#' `$tabular_data()` extracts tabular data in a [data.table::data.table()].
+#' `$tabular_data()` extracts tabular data in a
+#' [data.table][data.table::data.table()].
 #'
 #' For convenience, input character arguments matching in `$report_data()` and
 #' `$tabular_data()` are **case-insensitive**.
 #'
 #' For `$report_data_dict()`, `$report_data()` and `$tabular_data()`, the
 #' returned data.table has a `case` column in the returned
-#' [data.table::data.table()] that indicates the names of parametric models. For
-#' detailed documentation of those methods, please see [EplusSql].
+#' [data.table][data.table::data.table()] that indicates the names of parametric
+#' models. For detailed documentation of those methods, please see [EplusSql].
 #'
 #' **Arguments**
 #'
@@ -182,7 +184,7 @@ NULL
 #'   of this simulation. If `"auto"`, the name of the IDF file without extension
 #'   is used.
 #' * `all`: If `TRUE`, extra columns are also included in the returned
-#'   [data.table::data.table()].
+#'   [data.table][data.table::data.table()].
 #' * `period`: A Date or POSIXt vector used to specify which time period to
 #'    return. The year value does not matter and only month, day, hour and
 #'    minute value will be used when subsetting. If `NULL`, all time period of

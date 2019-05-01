@@ -1448,6 +1448,7 @@ is_EpwDate <- function (x) {
     inherits(x, "EpwDate")
 }
 # }}}
+#' @export
 # format.EpwDate {{{
 format.EpwDate <- function (x, m_spc = FALSE, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
@@ -1488,6 +1489,7 @@ format_epwdate_nthwkd <- function (x, last = FALSE) {
     )
 }
 # }}}
+#' @export
 # print.EpwDate {{{
 print.EpwDate <- function (x, ...) {
     on.exit(Sys.setlocale("LC_TIME", Sys.getlocale("LC_TIME")), add = TRUE)
@@ -1505,38 +1507,45 @@ print.EpwDate <- function (x, ...) {
     invisible(x)
 }
 # }}}
+#' @export
 # [.EpwDate {{{
 `[.EpwDate` <- function (x, i) {
     NextMethod("[")
 }
 # }}}
+#' @export
 # [[.EpwDate {{{
 `[[.EpwDate` <- function (x, i) {
     NextMethod("[[")
 }
 # }}}
+#' @export
 # [<-.EpwDate {{{
 `[<-.EpwDate` <- function (x, ..., value) {
     assign_epwdate(NextMethod("[<-.Date", value = value, ...))
 }
 # }}}
+#' @export
 # [[<-.EpwDate {{{
 `[[<-.EpwDate` <- function (x, ..., value) {
     assign_epwdate(NextMethod("[[", value = value, ...))
 }
 # }}}
+#' @export
 # c.EpwDate {{{
 c.EpwDate <- function (...) {
     res <- assign_epwdate(NextMethod(...))
     res
 }
 # }}}
+#' @export
 # as.Date.EpwDate {{{
 as.Date.EpwDate <- function (x, ...) {
     class(x) <- "Date"
     x
 }
 # }}}
+#' @export
 # as.POSIXct.EpwDate {{{
 as.POSIXct.EpwDate <- function (x, ...) {
     lubridate::force_tz(lubridate::as_datetime(as.Date.EpwDate(x)), tzone = "UTC")

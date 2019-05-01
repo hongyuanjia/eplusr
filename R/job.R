@@ -130,20 +130,21 @@ NULL
 #' `$list_table()` returns all available table and view names in the SQLite file.
 #'
 #' `$read_table()` takes a valid `table` name of those from `$list_table()` and
-#' returns that table data in a [data.table::data.table()] format.
+#' returns that table data in a [data.table][data.table::data.table()] format.
 #'
-#' `$report_data_dict()` returns a [data.table::data.table()] which contains all
-#' information about report data. For details on the meaning of each columns,
-#' please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output
-#' Details and Examples" documentation.
+#' `$report_data_dict()` returns a [data.table][data.table::data.table()] which
+#' contains all information about report data. For details on the meaning of
+#' each columns, please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus
+#' "Output Details and Examples" documentation.
 #'
-#' `$report_data()` extracts the report data in a [data.table::data.table()]
-#' using key values, variable names and other specifications. `$report_data()`
-#' can also directly take all or subset output from `$report_data_dict()` as
-#' input, and extract all data specified. The returned column numbers varies
-#' depending on `all` argument.
+#' `$report_data()` extracts the report data in a
+#' [data.table][data.table::data.table()] using key values, variable names and
+#' other specifications. `$report_data()` can also directly take all or subset
+#' output from `$report_data_dict()` as input, and extract all data specified.
+#' The returned column numbers varies depending on `all` argument.
 #'
-#' * `all` is `FALSE`, the returned [data.table::data.table()] has 6 columns:
+#' * `all` is `FALSE`, the returned [data.table][data.table::data.table()] has 6
+#'   columns:
 #'   * `case`: Simulation case specified using `case` argument
 #'   * `datetime`: The date time of simulation result
 #'   * `key_value`: Key name of the data
@@ -184,9 +185,10 @@ NULL
 #' current year backwards) for each run period that compliance with the start
 #' day of week restriction.
 #'
-#' `$tabular_data()` extracts the tabular data in a [data.table::data.table()]
-#' using report, table, column and row name specifications. The returned
-#' [data.table::data.table()] has 8 columns:
+#' `$tabular_data()` extracts the tabular data in a
+#' [data.table][data.table::data.table()] using report, table, column and row
+#' name specifications. The returned [data.table][data.table::data.table()] has
+#' 8 columns:
 #'
 #' * `index`: Tabular data index
 #' * `report_name`: The name of the report that the record belongs to
@@ -225,7 +227,7 @@ NULL
 #'   of this simulation. If `"auto"`, the name of the IDF file without extension
 #'   is used.
 #' * `all`: If `TRUE`, extra columns are also included in the returned
-#'   [data.table::data.table()].
+#'   [data.table][data.table::data.table()].
 #' * `period`: A Date or POSIXt vector used to specify which time period to
 #'    return. The year value does not matter and only month, day, hour and
 #'    minute value will be used when subsetting. If `NULL`, all time period of

@@ -52,7 +52,7 @@ NULL
 #' ```
 #'
 #' `$version()` returns the version of parent [Idf] object in a
-#' [base::numeric_version()] format.
+#' [numeric_version][base::numeric_version()] format.
 #'
 #' `$id()` returns current `IdfObject` ID.
 #'
@@ -135,7 +135,7 @@ NULL
 #' * `source`: All values from other objects that current field can refer to.
 #'
 #' `$value_possible()` returns an `IdfValuePossible` object which is a
-#' [data.table::data.table()] with at most 15 columns:
+#' [data.table][data.table::data.table()] with at most 15 columns:
 #'
 #' * `class_id`: index of class that current `IdfObject` belongs to
 #' * `class_name`: name of class that current `IdfObject` belongs to
@@ -201,7 +201,7 @@ NULL
 #' element `.comment` is **not allowed**. To modify object comments, please use
 #' `$comment()`.
 #'
-#' **NOTE**:
+#' **Note**:
 #'
 #' * Only one single list is allowed, e.g. `idfobj$set(lst1)` where `lst1 <-
 #'   list(field1 = value1)` is allowed, but `idfobj$set(lst1, lst2)` is not.
@@ -369,8 +369,8 @@ NULL
 #' idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
 #' ```
 #'
-#' `$to_table()` returns a [data.table::data.table()] that contains core data of
-#' current [IdfObject]. It has 6 columns:
+#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
+#' core data of current [IdfObject]. It has 6 columns:
 #'
 #' * `id`: Integer type. Object IDs.
 #' * `name`: Character type. Object names.
@@ -385,11 +385,11 @@ NULL
 #' **Arguments**:
 #'
 #' * `string_value`: If `TRUE`, all field values are returned as character. If
-#'   `FALSE`, `value` column in returned [data.table::data.table()] is a list
-#'   column with each value stored as corresponding type. Note that if the value
-#'   of numeric field is set to `"Autosize"` or `"Autocalculate"`, it is left as
-#'   it is, leaving the returned type being a string instead of a number.
-#'   Default: `TRUE`.
+#'   `FALSE`, `value` column in returned [data.table][data.table::data.table()]
+#'   is a list column with each value stored as corresponding type. Note that if
+#'   the value of numeric field is set to `"Autosize"` or `"Autocalculate"`, it
+#'   is left as it is, leaving the returned type being a string instead of a
+#'   number.  Default: `TRUE`.
 #' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
 #'   of numeric fields are assigned with units using [units::set_units()] if
 #'   applicable. Default: `FALSE`.

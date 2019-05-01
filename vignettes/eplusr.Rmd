@@ -57,8 +57,8 @@ install.packages("eplusr")
 Alternatively, you can install the development version from GitHub.
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("hongyuanjia/eplusr")
+# install.packages("remotes")
+remotes::install_github("hongyuanjia/eplusr")
 ```
 
 Since running the IDF files requires EnergyPlus (https://energyplus.net),
@@ -547,6 +547,7 @@ model$insert(ddy$SizingPeriod_DesignDay)
 loc <- ddy$Site_Location$value()
 
 model$Site_Location$set(loc)
+
 ```
 
 ### Load objects
@@ -709,7 +710,7 @@ output directory. An `EplusJob` object will be returned which provides detailed
 information of the simulation and methods to collect simulation output. Please
 see `?EplusJob` for details.
 
-```{r run, eval = can_run}
+```{r run, eval = can_run, out.lines = 10}
 # read the model again
 model <- read_idf("5Zone_Transformer.idf")
 path_epw <- "San_Francisco.epw"
@@ -752,8 +753,10 @@ for the first day of runperiod named `SUMMERDAY`, tag this simulation as case
 `example`, and return all possible output columns.
 
 ```{r output, eval = can_run}
-job$report_data("transformer 1", "transformer input electric power", case = "example",
+power <- job$report_data("transformer 1", "transformer input electric power", case = "example",
   all = TRUE, simulation_days = 1, environment_name = "summerday", hour = 11, minute = 0)
+
+str(power)
 ```
 
 `$tabular_data()` extracts all tabular data. For details on the meaning of each
@@ -851,7 +854,6 @@ number of parallel EnergyPlus processes can be specified using option
 
 ```{r param_run, eval = can_run}
 param$run(wait = TRUE)
-param
 ```
 
 After all simulations completed, let's see the variations of total energy.

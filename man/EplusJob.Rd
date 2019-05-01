@@ -135,20 +135,21 @@ suffix.
 \code{$list_table()} returns all available table and view names in the SQLite file.
 
 \code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
-returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
+returns that table data in a \link[data.table:data.table]{data.table} format.
 
-\code{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which contains all
-information about report data. For details on the meaning of each columns,
-please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus "Output
-Details and Examples" documentation.
+\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
+contains all information about report data. For details on the meaning of
+each columns, please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus
+"Output Details and Examples" documentation.
 
-\code{$report_data()} extracts the report data in a \code{\link[data.table:data.table]{data.table::data.table()}}
-using key values, variable names and other specifications. \code{$report_data()}
-can also directly take all or subset output from \code{$report_data_dict()} as
-input, and extract all data specified. The returned column numbers varies
-depending on \code{all} argument.
+\code{$report_data()} extracts the report data in a
+\link[data.table:data.table]{data.table} using key values, variable names and
+other specifications. \code{$report_data()} can also directly take all or subset
+output from \code{$report_data_dict()} as input, and extract all data specified.
+The returned column numbers varies depending on \code{all} argument.
 \itemize{
-\item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
+\item \code{all} is \code{FALSE}, the returned \link[data.table:data.table]{data.table} has 6
+columns:
 \itemize{
 \item \code{case}: Simulation case specified using \code{case} argument
 \item \code{datetime}: The date time of simulation result
@@ -193,9 +194,10 @@ which is the default behavior, eplusr will calculate a year value (from
 current year backwards) for each run period that compliance with the start
 day of week restriction.
 
-\code{$tabular_data()} extracts the tabular data in a \code{\link[data.table:data.table]{data.table::data.table()}}
-using report, table, column and row name specifications. The returned
-\code{\link[data.table:data.table]{data.table::data.table()}} has 8 columns:
+\code{$tabular_data()} extracts the tabular data in a
+\link[data.table:data.table]{data.table} using report, table, column and row
+name specifications. The returned \link[data.table:data.table]{data.table} has
+8 columns:
 \itemize{
 \item \code{index}: Tabular data index
 \item \code{report_name}: The name of the report that the record belongs to
@@ -235,7 +237,7 @@ for each environment. Default: \code{NULL}.
 of this simulation. If \code{"auto"}, the name of the IDF file without extension
 is used.
 \item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\code{\link[data.table:data.table]{data.table::data.table()}}.
+\link[data.table:data.table]{data.table}.
 \item \code{period}: A Date or POSIXt vector used to specify which time period to
 return. The year value does not matter and only month, day, hour and
 minute value will be used when subsetting. If \code{NULL}, all time period of

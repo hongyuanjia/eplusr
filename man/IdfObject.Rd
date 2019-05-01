@@ -53,7 +53,7 @@ idfobj$class_name()
 }
 
 \code{$version()} returns the version of parent \link{Idf} object in a
-\code{\link[base:numeric_version]{base::numeric_version()}} format.
+\link[base:numeric_version]{numeric_version} format.
 
 \code{$id()} returns current \code{IdfObject} ID.
 
@@ -146,7 +146,7 @@ also be retrieved using \code{idfobj$definition()$field_range()}.
 }
 
 \code{$value_possible()} returns an \code{IdfValuePossible} object which is a
-\code{\link[data.table:data.table]{data.table::data.table()}} with at most 15 columns:
+\link[data.table:data.table]{data.table} with at most 15 columns:
 \itemize{
 \item \code{class_id}: index of class that current \code{IdfObject} belongs to
 \item \code{class_name}: name of class that current \code{IdfObject} belongs to
@@ -216,7 +216,7 @@ modified \link{IdfObject}. Unlike \code{$set()} method in \link{Idf} class, the 
 element \code{.comment} is \strong{not allowed}. To modify object comments, please use
 \code{$comment()}.
 
-\strong{NOTE}:
+\strong{Note}:
 \itemize{
 \item Only one single list is allowed, e.g. \code{idfobj$set(lst1)} where \code{lst1 <- list(field1 = value1)} is allowed, but \code{idfobj$set(lst1, lst2)} is not.
 \item You can delete a field by assigning \code{NULL} to it, e.g. \code{iddobj$set(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
@@ -372,8 +372,8 @@ please \code{$validate()} in \link{Idf} class.
 idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
 }
 
-\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
-current \link{IdfObject}. It has 6 columns:
+\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+core data of current \link{IdfObject}. It has 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -389,11 +389,11 @@ current \link{IdfObject}. It has 6 columns:
 \strong{Arguments}:
 \itemize{
 \item \code{string_value}: If \code{TRUE}, all field values are returned as character. If
-\code{FALSE}, \code{value} column in returned \code{\link[data.table:data.table]{data.table::data.table()}} is a list
-column with each value stored as corresponding type. Note that if the value
-of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it is left as
-it is, leaving the returned type being a string instead of a number.
-Default: \code{TRUE}.
+\code{FALSE}, \code{value} column in returned \link[data.table:data.table]{data.table}
+is a list column with each value stored as corresponding type. Note that if
+the value of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it
+is left as it is, leaving the returned type being a string instead of a
+number.  Default: \code{TRUE}.
 \item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
 of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
 applicable. Default: \code{FALSE}.

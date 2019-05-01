@@ -38,7 +38,7 @@ them are used by EnergyPlus. Actually, despite of date and time columns, only
 \item liquid precipitation depth
 }
 
-\strong{NOTE} the \code{hour} column in the core weather data corresponds to the period
+\strong{Note} the \code{hour} column in the core weather data corresponds to the period
 from \strong{(Hour-1)th} to \strong{(Hour)th}. For instance, if the number of interval
 per hour is 1, hour of 1 on a certain day corresponds to the period between
 00:00:01 to 01:00:00, Hour of 2 corresponds to the period between
@@ -160,7 +160,8 @@ For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
 \subsection{TYPICAL/EXTREME Header}{\preformatted{epw$typical_extreme_period()
 }
 
-\code{$typical_extreme_period()} returns the parsed values of \code{TYPICAL/EXTREME PERIOD} header in a \code{\link[data.table:data.table]{data.table::data.table()}} format with 6 columns:
+\code{$typical_extreme_period()} returns the parsed values of \code{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
+columns:
 \itemize{
 \item \code{index}: Integer type. The index of typical or extrame period record
 \item \code{name}: Character type. The name of typical or extrame period record
@@ -177,7 +178,7 @@ period
 }
 
 \code{$ground_temperature()} returns the parsed values of \code{GROUND TEMPERATURE}
-header in a \code{\link[data.table:data.table]{data.table::data.table()}} format with 7 columns:
+header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
 \item \code{depth}: Numeric type. The depth of the ground temperature is measured
@@ -201,8 +202,8 @@ elements:
 \item \code{leapyear}: A single logical vector. \code{TRUE} means that the weather data
 contains leap year data
 \item \code{dst}: A Date vector contains the start and end day of daylight saving time
-\item \code{holiday}: A \code{\link[data.table:data.table]{data.table::data.table()}} contains 2 columns. If no holiday
-specified, an empty \code{\link[data.table:data.table]{data.table::data.table()}}
+\item \code{holiday}: A \link[data.table:data.table]{data.table} contains 2 columns. If
+no holiday specified, an empty \link[data.table:data.table]{data.table}
 \itemize{
 \item \code{name}: Name of the holiday
 \item \code{day}: Date of the holiday
@@ -281,7 +282,7 @@ week specifiction, and uses that input to replace the data period's name and
 start day of week. If no input is given, data periods in current \code{Epw} is
 returned.
 
-\code{$period()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} with 5 columns:
+\code{$period()} returns a \link[data.table:data.table]{data.table} with 5 columns:
 \itemize{
 \item \code{index}: Integer type. The index of data period.
 \item \code{name}: Character type. The name of data period.
@@ -350,7 +351,7 @@ epw$redundant_data()
 \code{$data()} returns weather data of specific data period.
 
 Usually, EPW file downloaded from \href{https://energyplus.net/}{EnergyPlus website}
-contains TMY weathe data. As years of weather data is not concesutive, it may
+contains TMY weather data. As years of weather data is not concesutive, it may
 be more convenient to align the year values to be concesutive, which will
 makes it possible to direct analyze and plot weather data. The \code{start_year}
 argument in \code{$data()} method can help to achieve this. However, randomly
@@ -418,7 +419,7 @@ epw$drop_unit()
 epw$purge()
 }
 
-\strong{NOTE} that all these 5 methods modify the weather data in-place, meaning
+\strong{Note} that all these 5 methods modify the weather data in-place, meaning
 that the returned data from \code{$data()} and \code{$abnormal_data()} may be different
 after calling these methods.
 
@@ -496,7 +497,8 @@ will be overwritten.
 
 \strong{Arguments}:
 \itemize{
-\item \code{data}: A \code{\link[data.table:data.table]{data.table::data.table()}} of new weather data to add or set.
+\item \code{data}: A \link[data.table:data.table]{data.table} of new weather data to add
+or set.
 Validation is performed according to rules described above.
 \item \code{realyear}: Whether input data is AMY data. Default: \code{FALSE}.
 \item \code{name}: A new string used as name of added or set data period. Should not
@@ -609,11 +611,6 @@ epw$period(1, name = "test")
 
 # change start day of week
 epw$(1, start_day_of_week = 3)
-
-# set basic info
-# NOTE: Use with caution. May mess up your weather data
-epw$city <- "Chongqing"
-epw$city
 
 # get data specifications
 epw$missing_code()

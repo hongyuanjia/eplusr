@@ -135,8 +135,8 @@ clean_wd <- function (path) {
 #'   * `process`: A [processx::process] object of current EnergyPlus simulation
 #'
 #' For `run_multi()`, if `wait` is `TRUE`, a
-#'     [data.table][data.table::data.table()] contains all data (excluding
-#'     `process`) with same column names as above, and also another two columns:
+#' [data.table][data.table::data.table()] contains all data (excluding
+#' `process`) with same column names as above, and also another two columns:
 #'
 #'   * `index`: The index of simulation
 #'   * `status`: The status of simulation status. Should be one of below:

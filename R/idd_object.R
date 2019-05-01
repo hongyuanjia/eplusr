@@ -107,7 +107,7 @@ NULL
 #' `$class_name()` returns the name of this IDD class.
 #'
 #' `$class_format()` returns the format of this IDD class. This format indicator
-#' is currently not used by eplusr. **NOTE**: some classes have special format
+#' is currently not used by eplusr. **Note**: some classes have special format
 #' when saved in the IDFEditor with the special format option enabled. Those
 #' special format includes "singleLine", "vertices", "compactSchedule",
 #' "fluidProperties", "viewFactors" and "spectral".  eplusr can handle all those
@@ -231,8 +231,8 @@ NULL
 #' `$field_relation()`: returns a list of references for those fields that
 #' have the `object-list` and/or `reference` and `reference-class-name`
 #' attribute. Basically, it is a list of two elements `ref_to` and `ref_by`.
-#' Underneath, `ref_to` and `ref_by` are [data.table::data.table()]s which
-#' contain source field data and reference field data with custom printing
+#' Underneath, `ref_to` and `ref_by` are [data.table][data.table::data.table()]s
+#' which contain source field data and reference field data with custom printing
 #' method. For instance, if `iddobj$field_relation(c(1, 2), "ref_to")` gives
 #' results below:
 #'
@@ -334,8 +334,8 @@ NULL
 #' iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
 #' ```
 #'
-#' `$to_table()` returns a [data.table::data.table()] that contains core data of
-#' current class. It has 3 columns:
+#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
+#' core data of current class. It has 3 columns:
 #'
 #' * `class`: Character type. Current class name.
 #' * `index`: Integer type. Field indexes.

@@ -110,7 +110,7 @@ iddobj$is_unique()
 \code{$class_name()} returns the name of this IDD class.
 
 \code{$class_format()} returns the format of this IDD class. This format indicator
-is currently not used by eplusr. \strong{NOTE}: some classes have special format
+is currently not used by eplusr. \strong{Note}: some classes have special format
 when saved in the IDFEditor with the special format option enabled. Those
 special format includes "singleLine", "vertices", "compactSchedule",
 "fluidProperties", "viewFactors" and "spectral".  eplusr can handle all those
@@ -235,8 +235,8 @@ interval denotation.
 \code{$field_relation()}: returns a list of references for those fields that
 have the \code{object-list} and/or \code{reference} and \code{reference-class-name}
 attribute. Basically, it is a list of two elements \code{ref_to} and \code{ref_by}.
-Underneath, \code{ref_to} and \code{ref_by} are \code{\link[data.table:data.table]{data.table::data.table()}}s which
-contain source field data and reference field data with custom printing
+Underneath, \code{ref_to} and \code{ref_by} are \link[data.table:data.table]{data.table}s
+which contain source field data and reference field data with custom printing
 method. For instance, if \code{iddobj$field_relation(c(1, 2), "ref_to")} gives
 results below:\preformatted{-- Refer to Others ---------------------
   +- Field: <1: Field 1>
@@ -333,8 +333,8 @@ referred by specified fields is returned. If \code{"all"}, both are returned.
 iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
 }
 
-\code{$to_table()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} that contains core data of
-current class. It has 3 columns:
+\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+core data of current class. It has 3 columns:
 \itemize{
 \item \code{class}: Character type. Current class name.
 \item \code{index}: Integer type. Field indexes.

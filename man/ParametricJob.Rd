@@ -125,23 +125,25 @@ and errors are printed.
 \code{$locate_output()} returns the path of a single output file of specified
 simulations.
 
-\code{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which contains all
-information about report data for specified simulations. For details on the
-meaning of each columns, please see "2.20.2.1 ReportDataDictionary Table" in
-EnergyPlus "Output Details and Examples" documentation.
+\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
+contains all information about report data for specified simulations. For
+details on the meaning of each columns, please see "2.20.2.1
+ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
+documentation.
 
-\code{$report_data()} extracts the report data in a \code{\link[data.table:data.table]{data.table::data.table()}}
-using key values, variable names and other arguments.
+\code{$report_data()} extracts the report data in a
+\link[data.table:data.table]{data.table} using key values, variable names and other arguments.
 
-\code{$tabular_data()} extracts tabular data in a \code{\link[data.table:data.table]{data.table::data.table()}}.
+\code{$tabular_data()} extracts tabular data in a
+\link[data.table:data.table]{data.table}.
 
 For convenience, input character arguments matching in \code{$report_data()} and
 \code{$tabular_data()} are \strong{case-insensitive}.
 
 For \code{$report_data_dict()}, \code{$report_data()} and \code{$tabular_data()}, the
 returned data.table has a \code{case} column in the returned
-\code{\link[data.table:data.table]{data.table::data.table()}} that indicates the names of parametric models. For
-detailed documentation of those methods, please see \link{EplusSql}.
+\link[data.table:data.table]{data.table} that indicates the names of parametric
+models. For detailed documentation of those methods, please see \link{EplusSql}.
 
 \strong{Arguments}
 \itemize{
@@ -185,7 +187,7 @@ for each environment. Default: \code{NULL}.
 of this simulation. If \code{"auto"}, the name of the IDF file without extension
 is used.
 \item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\code{\link[data.table:data.table]{data.table::data.table()}}.
+\link[data.table:data.table]{data.table}.
 \item \code{period}: A Date or POSIXt vector used to specify which time period to
 return. The year value does not matter and only month, day, hour and
 minute value will be used when subsetting. If \code{NULL}, all time period of
