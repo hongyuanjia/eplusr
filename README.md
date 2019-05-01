@@ -37,8 +37,8 @@ install.packages("eplusr")
 Alternatively, you can install the development version from GitHub.
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("hongyuanjia/eplusr")
+# install.packages("remotes")
+remotes::install_github("hongyuanjia/eplusr")
 ```
 
 Since running the IDF files requires EnergyPlus
@@ -120,7 +120,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: `/tmp/Rtmp2mHzxD/temp_libpathbc564f7fb97/eplusr/extdata/1Zone...
+#>  * Path: `/tmp/RtmpQeQkUa/temp_libpathaca787884db/eplusr/extdata/1Zone...
 #>  * Version: `8.8.0`
 #> 
 #> Group: <Simulation Parameters>
@@ -229,8 +229,8 @@ epw
 #> [Interval ]: 60 mins
 #> 
 #> ── Data Periods ───────────────────────────────────────────────────────────
-#>    Name StartDayOfWeek StartDay  EndDay
-#> 1: Data         Sunday  9-01-01 9-12-31
+#>    Name StartDayOfWeek StartDay EndDay
+#> 1: Data         Sunday     1/ 1  12/31
 #> 
 #> ───────────────────────────────────────────────────────────────────────────
 
@@ -325,13 +325,13 @@ job <- idf$run(epw)
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing IDF located at /tmp/Rtmp2mHzxD/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpQeQkUa/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
 #> ExpandObjects Finished. Time:     0.004
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.04.30 11:36
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.01 23:36
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -357,7 +357,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ══════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2019-04-30 11:36:00
+#>   * Simulation started: 2019-05-01 23:36:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
