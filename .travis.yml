@@ -1,13 +1,51 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+# Default configuration for use with tic package
+# tic documentation to get started: https://ropenscilabs.github.io/tic/
+# Usually you shouldn't need to change the first part of the file
 
-branches:
-  only:
-  - master
-  - develop
+# DO NOT CHANGE THE CODE BELOW
+before_install:
+- R -q -e 'if (!requireNamespace("remotes")) install.packages("remotes")'
+- R -q -e 'if (getRversion() < "3.2" && !requireNamespace("curl")) install.packages("curl")'
+- R -q -e 'remotes::install_github("ropenscilabs/tic"); tic::prepare_all_stages()'
+- R -q -e 'tic::before_install()'
+install: R -q -e 'tic::install()'
+after_install: R -q -e 'tic::after_install()'
+before_script: R -q -e 'tic::before_script()'
+script: R -q -e 'tic::script()'
+after_success: R -q -e 'tic::after_success()'
+after_failure: R -q -e 'tic::after_failure()'
+before_deploy: R -q -e 'tic::before_deploy()'
+deploy:
+  provider: script
+  script: R -q -e 'tic::deploy()'
+  on:
+    all_branches: true
+after_deploy: R -q -e 'tic::after_deploy()'
+after_script: R -q -e 'tic::after_script()'
+# DO NOT CHANGE THE CODE ABOVE
 
+# Custom parts:
+
+# Header
 language: r
-sudo: required
+sudo: true
+dist: trusty
 cache: packages
+latex: true
+
+addons:
+  apt:
+    packages:
+      - libudunits2-dev
+  homebrew:
+    packages:
+      - udunits
+
+env:
+  global:
+  - _R_CHECK_FORCE_SUGGESTS_=false
+  - MAKEFLAGS="-j 2"
 
 matrix:
   include:
@@ -45,36 +83,3 @@ matrix:
       r: release
       env:
         - NOT_CRAN: false
-
-r_packages:
-  - covr
-  - data.table
-
-apt_packages:
-  - libudunits2-dev
-
-brew_packages:
-  - udunits
-
-before_install:
-  # manually install devtools
-  - Rscript -e 'install.packages("devtools")'
-  - tlmgr update --self
-  - tlmgr install inconsolata
-
-after_success:
-  - Rscript -e 'library(covr); codecov()'
-  # automatically update package site
-  - Rscript -e 'devtools::install_github("hongyuanjia/eplusr")'
-  - test $TRAVIS_R_VERSION_STRING = "release" && test $TRAVIS_OS_NAME = "linux" &&
-    Rscript -e 'pkgdown::build_site()'
-
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_PAT
-  keep-history: true
-  local-dir: docs
-  on:
-    branch: master
-    condition: $TRAVIS_R_VERSION_STRING = "release" && $TRAVIS_OS_NAME = "linux"
