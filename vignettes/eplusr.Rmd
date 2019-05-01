@@ -42,9 +42,9 @@ can_run <- eplusr:::os_type() != "unknown"
 
 eplusr provides a rich toolkit of using whole building energy simulation program
 [EnergyPlus](https://energyplus.net) directly in R, which enables programmatic
-navigation, modification of EnergyPlus models and makes it less painful to do
-parametric simulations and analysis. More information about EnergyPlus can be
-found at [its website](https://energyplus.net).
+navigation, modification of EnergyPlus, conducts parametric simulations and
+retrieves outputs. More information about EnergyPlus can be found at [its
+website](https://energyplus.net).
 
 ## Installation
 
@@ -109,7 +109,6 @@ if (!eplusr::is_avail_eplus(8.8)) {
 * Query on models, including classes, objects and fields
 * Directly add, modify, duplicate, insert, and delete objects of IDF
 * Automatically change referenced fields when modifying objects
-* Check any possible errors whenever modifications are made
 * Save changed models into standard formats in the same way as IDFEditor
   distributed along with EnergyPlus
 * Run your models and collect the simulation output
@@ -178,7 +177,9 @@ version. For more details, please see `?use_idd()` and `?idd`.
 
 Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
-`download_idd()` or set `download` to `TRUE` in `use_idd()`.
+`download_idd()` or set `download` to `TRUE` in `use_idd()`. The code below will
+download IDD file for EnergyPlus v8.8.0, parse it and create an `Idd` object
+that will be used whenever parsing all EnergyPlus models of that version.
 
 ```{r idd_dl, eval = FALSE}
 path_idd <- download_idd(8.8)
@@ -188,8 +189,8 @@ use_idd(path_idd)
 use_idd(8.8, download = TRUE)
 ```
 
-Now let's read an IDF file distributed with EnergyPlus 8.8.0. As EnergyPlus
-v8.8.0 has been installed, we can just ignore the `idd` argument.
+Now let's read an IDF file distributed with EnergyPlus 8.8.0. As we have already
+got the IDD, we can just ignore the `idd` argument.
 
 ```{r idd_solaris, include = FALSE, eval = !can_run}
 library(eplusr)
@@ -203,58 +204,104 @@ eplusr:::download_file(path_weather, file.path(tempdir(), "San_Francisco.epw"))
 eplusr:::download_file(path_ddy, file.path(tempdir(), "San_Francisco.ddy"))
 ```
 
-```{r read, out.lines = 30}
+```{r read, out.lines = 10}
 model <- read_idf(path = "5Zone_Transformer.idf", idd = NULL)
 
 model
 ```
 
-`Idf` class contains several methods to help query, modify models. Here lists
-all methods it has.
+`Idf` class provides lots of methods to programmatically query and modify
+EnergyPlus models. See table below.  This vignette will demonstrate some of
+them.
 
-```{r idf_methods}
-setdiff(ls(model), "initialize")
-```
+| Category            | Method                   | Functionality                                     |
+| :---                | :---                     | :---                                              |
+| Basic Info          | `$version()`             | Get Idf version                                   |
+|                     | `$path()`                | Get Idf file path                                 |
+|                     | `$group_name()`          | Get group names                                   |
+|                     | `$class_name()`          | Get class names                                   |
+|                     | `$is_valid_group()`      | Check group existence                             |
+|                     | `$is_valid_class()`      | Check class existence                             |
+| Definition          | `$definition()`          | Get corresponding `IddObject`                     |
+| Object Info         | `$object_id()`           | Get object unqiue ID                              |
+|                     | `$object_name()`         | Get object name                                   |
+|                     | `$object_num()`          | Get object number in class                        |
+|                     | `$is_valid_id()`         | Check object ID existence                         |
+|                     | `$is_valid_name()`       | Check object name existence                       |
+| Object Relation     | `$object_relation()`     | Get object relation with others                   |
+| Object Query        | `$object()`              | Get object relation with others                   |
+|                     | `$object()`              | Get single object                                 |
+|                     | `$objects()`             | Get multiple objects                              |
+|                     | `$object_unique()`       | Get the unique object                             |
+|                     | `$objects_in_class()`    | Get objects in class                              |
+|                     | `$objects_in_group()`    | Get objects in group                              |
+|                     | `$objects_in_relation()` | Get objects in relation                           |
+|                     | `$search_object()`       | Get objects using regular expression              |
+| Object Modification | `$dup()`                 | Duplicate objects                                 |
+|                     | `$add()`                 | Add new objects                                   |
+|                     | `$set()`                 | Modify existing objects                           |
+|                     | `$del()`                 | Delete existing objects                           |
+|                     | `$rename()`              | Change object names                               |
+|                     | `$insert()`              | Add new objects from other `IdfObject`s           |
+|                     | `$load()`                | Add new objects from strings and data.frames      |
+|                     | `$paste()`               | Add new objects from IDF Editor                   |
+|                     | `$search_value()`        | Get objects whose values match regular expression |
+|                     | `$replace_value()`       | Modify object values using regular expression     |
+| Validation          | `$validate()`            | Check any errors in `Idf`                         |
+|                     | `$is_valid()`            | Check if no error exists in `Idf`                 |
+| Data Extraction     | `$to_table()`            | Extract `Idf` data in data.frames                 |
+|                     | `$to_string()`           | Extract `Idf` data in strings                     |
+| Save                | `$is_unsaved()`          | Check if unsaved changes exist                    |
+|                     | `$save()`                | Save `Idf` to an `.idf` file                      |
+| Clone               | `$clone()`               | Create an copy                                    |
+| Run                 | `$run()`                 | Run `Idf` together with an `Epw`                  |
+| Print               | `$print()`               | Print `Idf` in different details                  |
+
+Table: Methods of `Idf` class
 
 Below will show same example usage of methods listed above.
 
 ## Basic Info
 
-If you want to see all groups and classes in your model, use `$group_name()` and
-`$class_name()` respectively.
+If you want to see what groups and classes exist in your model, use
+`$group_name()` and `$class_name()` respectively.
 
-```{r all_grp, out.lines = 14}
+```{r all_grp, out.lines = 5}
 model$group_name()
 ```
 
-```{r all_cls, out.lines = 14}
+```{r all_cls, out.lines = 5}
 model$class_name()
 ```
 
-Also `$is_valid_group()` and `$is_valid_class()` are provided to check if given
-group and class exists in current model.
+You can use `$is_valid_group()` and `$is_valid_class()` to check if curtain
+groups or names exist in current model.
+
+```{r chk_grp}
+model$is_valid_group("Schedules")
+model$is_valid_class("ZoneInfiltration:DesignFlowRate")
+```
 
 ## Class definition
 
-You can get class definitions using `$definition()`, which returns a list
-of `IddObject`s. All required fields in each class are marked with
-`r cli::symbol$bullet`. For example, you can get the `IddObject` of class
-`Material`:
+You can get class definition using `$definition()`, which returns an
+`IddObject`. All required fields in each class are marked with `*`. For example,
+you can get the `IddObject` of class `Material`:
 
 ```{r all_field}
-def_mat <- model$definition(class = "Material")
+def_mat <- model$definition("Material")
 def_mat
 ```
 
 You can also achieve this using methods in `Idd` class.
 
-```{r idd_obj}
+```{r idd_obj, eval = FALSE}
 idd <- use_idd(8.8)
-
 idd$Material
 
 # OR
-# idd$object("Material")[[1]]
+# idd$object("Material")
+
 # OR
 # idd_object(8.8, "Material")
 ```
@@ -262,37 +309,27 @@ idd$Material
 With the `IddObject`, you can easily get class and field properties using
 methods it has.
 
-```{r iddobj_methods}
-setdiff(ls(def_mat), "initialize")
-```
-
-For example, you can get all default field values using `$field_default()`.
-
-```{r mat_def}
-def_val <- def_mat$field_default()
-def_val
-```
-
-As we did not give any field index or name, a list will be returned containing
-default values of all fields. The type of each value will be consistent with the
-field definition.
-
-```{r def_type}
-vapply(def_val, class, character(1))
-```
+For example, you can get all default field values using `$field_default()`.  As
+we did not give any field index or name, a list is returned containing default
+values of all fields. The type of each value will be consistent with the field
+definition.
 
 > NOTE: For numeric fields with default values being `"autosize"` or
 > `"autocalculate"`, the type of returned values will be "character".
 
-Please see `?idd_object` for detailed documentation on `IddObject`.
+```{r mat_def}
+def_val <- def_mat$field_default()
+str(def_val)
+```
+Please see `?IddObject` for detailed documentation on `IddObject` class.
 
 ## Get object
 
 In an `Idf`, all objects in the model are assigned with an unique `ID` according
-to their appearance sequences in the IDF. You can find all valid `ID`s using
+to their appearance sequences in the IDF file. You can find all valid `ID`s using
 `$object_id()`.
 
-```{r all_id, out.lines = 20}
+```{r all_id}
 model$object_id(class = c("Material", "Construction"), simplify = FALSE)
 ```
 
@@ -309,15 +346,12 @@ Object number in each class can be retrieved using `$object_num()`.
 model$object_num(c("BuildingSurface:Detailed", "Material", "Output:Variable"))
 ```
 
-Having the object ID or name, you can easily get any object using `$object()`.
+Having the object ID or name, you can easily get any object using `$object()`
+which returns an `IdfObject` or using `$objects()` which returns a list of
+`IdfObject`s.
 
 > NOTE: The matching of object names is case-insensitive. For instance,
 > `model$object("rOoF")` is equivalent to `model$object("roof")`.
-
-`$objects()` returns a list of `IdfObject`s. The names of returned list are
-object names, except that all names are converted into valid R names, i.e. all
-other characters except letters and numbers are replaced by underscore. (Below
-this pattern will be referred as "underscore-style")
 
 ```{r obj}
 model$objects(c("WD10", "ROOF-1"))
@@ -329,10 +363,10 @@ If you want to get all objects in a single class, use `$objects_in_class()`.
 model$objects_in_class("Material")
 ```
 
-Also, you can get all objects in a single class using `"$"` or `"[["`.  Class
-names can be given in underscore-style, which is handy. For example, you can
-just use `model$Material_NoMass` instead of `` model$`Material:Nomass` `` to
-save some typing.
+Also, you can get all objects in a single class using `"$"` or `"[["`. Class
+names can be given in underscore-style. For example, you can just use
+`model$Material_NoMass` instead of `` model$`Material:Nomass` `` to save some
+typing.
 
 ```{r obj_in_cls_shortcut_1, out.lines = 30}
 model$Material_NoMass
@@ -345,22 +379,43 @@ you can simply run:
 
 ```{r rp}
 rp <- model$RunPeriod[[1]]
-rp
 ```
 
-`$search_object()` will search and return a list of objects whose names meet the
-regular expression you give.
+For unique object, such like `SimulationControl` and `Building`, you can use
+`$object_unique()`
 
-```{r search_obj, out.lines = 20}
-model$search_object("Demand", class = "Branch")
+```{r objuni}
+model$object_unique("Building")
+
+# OR just
+# model$Building
+```
+
+Many fields in a model can be referred by others. For example, the `Outside
+Layer` and other fields in `Construction` class refer to the `Name` field in
+`Material` class and other material related classes. Here it means that the
+`Outside Layer` field **refers to** the `Name` field and the `Name` field is
+**referred by** the `Outside Layer`. `$object_relation()` provides a simple
+interface to get this kind of relation. It takes a single object ID or name and
+also a relation direction, and returns an `IdfRelation` object which contains
+data presenting such relation above.
+
+```{r rel}
+model$object_name("Material:NoMass")
+model$object_relation("mat-clng-1")
+```
+
+Above shows that no-mass material `MAT-CLNG-1` is used at the outside layer of a
+construction named `CLNG-1`. You can extract both of them using
+`$objects_in_relation()`.
+
+```{r obj_rel}
+mat_const <- model$objects_in_relation("mat-clng-1", "ref_by")
+mat_const
 ```
 
 After you get the objects, you can perform detailed modifications on them using
-methods in `IdfObject`. Below lists all methods it has.
-
-```{r idfobj_methods}
-setdiff(ls(rp), "initialize")
-```
+methods `$set()` in both `Idf` and `IdfObject` class.
 
 Similarly, you can use `"$"` and `"[["` to get a single value in
 an `IdfObject` class or `"["` to get multiple values just like normal lists in
@@ -370,8 +425,8 @@ R.
 rp$Begin_Day_of_Month
 
 # OR
-rp[["Begin_Day_of_Month"]]
-rp[[3]]
+# rp[["Begin_Day_of_Month"]]
+# rp[[3]]
 ```
 
 You can also make a chain.
@@ -387,68 +442,50 @@ which works on multiple objects, and the other way is using methods in
 `IdfObject` which only works for a single object.
 
 > NOTE: Validations are performed during object modifications under different
-> strictness level (`none`, `draft`, `final`). For detailed explanations,
-> please see `?eplusr_option()`.
+> strictness level (`none`, `draft`, `final` or custom yours using
+> `custom_validate()`). For detailed explanations, please see `?level_checks`.
 
-You can duplicate, add, insert, modify and delete objects using `$dup()`,
-`$add()`, `$insert()`, `$set()` and `$del()` in `Idf`,
-respectively.
+`Idf` class provides 8 methods for modifying objects, including `$dup()`,
+`$add()`, `$set()`, `$del()`, `$rename()`, `$insert()`, `$load()` and
+`$paste()`.
 
-Object IDs will be appended after `$dup()`, `$add()` and
-`$insert()`, and the newly added object will have the max
-ID. Object IDs will never be reused, even though their binded objects have
-been deleted using `$del()`.
+Object IDs will be appended after new objects are added, and the most-newly
+added object will alway have the max ID. Object IDs will never be reused, even
+though their binded objects have been deleted using `$del()`.
 
 For modifying object's comments and values, you can also use `$comment()`
 and `$set()` in `IdfObject` class.
 
 ### Duplicate objects
 
-`$dup()` will duplicate objects specified by object IDs or names. If the
+`$dup()` duplicates objects specified by object IDs or names. If the
 target classes have a name attribute, you can assign new names to the duplicated
 objects in form `new_name = "old_name"`. If new name is not given, the newly
 added object will have the same name as the original object except a appended
 suffix of "`_1`", "`_2`" and etc.
 
 ```{r dup}
-model$dup(c("ROOF-1", "ROOF-1", "WALL-1"))
+model$dup(c(my_roof = "ROOF-1", "ROOF-1", "WALL-1"))
 ```
 
 ### Add new objects
 
-You can add new objects using `$add()`. With `.default` being `TRUE`, all
-empty fields are filled with default values, if possible. Only minimum fields
-will be added by default. But you can change it by setting `.all` to `TRUE`.
-
-Field values can be given in a list following patterns below:
-
-* directly list all field values with no name. The values will be assigned to
-  fields according to the appearance order;
-* give both field names *without units* and values in pair, e.g. `` Name =
-  "Test", `Begin Month` = 1 ``. You can find all valid field names using
-  `$definition("class_name")$field_name()`. Field names can also be given
-  in underscore-style, e.g. `Name = "Test", begin_month = 1` (NOTE: matching is
-  case-insensitive).
-* mix of above
+You can add new objects using `$add()`. With `.default` being `TRUE`, the
+default behavior, all empty fields are filled with default values, if possible.
+Only minimum fields will be added by default. But you can change it by setting
+`.all` to `TRUE`.
 
 You can also add new comments alongside with new values using the special
 element `.comment`.
 
-For example, here we add two new objects in `RunPeriod`:
+For example, here we add two new objects with comments in `RunPeriod` class:
 
 ```{r add_obj}
-model$add(
-  RunPeriod = list("rp_test_1", 1, 1, 2, 1,
-    .comment = c("Comment for new object 1", "Another comment")
-  ),
+rp1 <- list(RunPeriod = list("rp_test_1", 1, 1, 2, 1, .comment = c("Comment for new object 1", "Another comment")))
 
-  RunPeriod = list(
-    name = "rp_test_2",
-    begin_month = 3,
-    begin_day_of_month = 1,
-    end_month = 4,
-    end_day_of_month = 1,
-    .comment = "Comment for new object 2"
+model$add(rp1,
+  RunPeriod = list(name = "rp_test_2", begin_month = 3, begin_day_of_month = 1,
+    end_month = 4, end_day_of_month = 1, .comment = "Comment for new object 2"
   )
 )
 ```
@@ -456,8 +493,7 @@ model$add(
 ### Set new values and comments
 
 Changing values of existing objects can be conducted using `$set()` in
-`Idf` and `IdfObject`. Basic rules above of field values
-provided also apply to `$set()`. For example:
+`Idf` and `IdfObject`:
 
 ```{r set_obj}
 model$set(
@@ -467,91 +503,161 @@ model$set(
 )
 ```
 
+For setting a single value, you can even write in a chain:
+
+```{r set_chain}
+model$RunPeriod$rp_test_2$End_Day_of_Month <- 2
+model$RunPeriod$rp_test_2$End_Day_of_Month
+```
+
 Also, if the modified fields are referenced by fields in other objects, the
-corresponding fields will also be updated. You can check that by comparing the
-values referencing the target object before and after.
+corresponding fields will also be updated.
 
 ```{r set_ref}
 mat <- model$Material$CC03
 
-# get other objects referencing this object
-mat$ref_by_object()
+mat$value_relation("Name")
 
 mat$set(name = "CC03_renamed")
 
-mat$ref_by_object()
+mat$value_relation("Name")
 ```
 
 Sometimes, you may want to get all possible values of fields before you change
-them. You can achieve that by using `$possible_value()` method in `IdfObject`
+them. You can achieve that by using `$value_possible()` method in `IdfObject`
 class.
 
 ```{r possible}
-mat$value_possible()
+mat$value_possible(c(2, 7))
 ```
 
 ### Insert objects
 
 Sometimes it may be useful to insert objects from other IDFs. For example, you
-may want to import some design days from a ".ddy" file. You can achieve that
-using `$insert()`.
+may want to import some design days and update location data from a ".ddy" file.
+You can achieve that using `$insert()`.
 
 ```{r ddy, warning=TRUE, out.lines = 20}
 # read ddy file as normal IDF
 ddy <- read_idf("San_Francisco.ddy", idd = 8.8)
 
 model$insert(ddy$SizingPeriod_DesignDay)
+
+# get location data
+loc <- ddy$Site_Location$value()
+
+model$Site_Location$set(loc)
+```
+
+### Load objects
+
+Here `load` means **insert**. You can use character vectors or data.frames to
+load new objects.
+
+```{r load_chr}
+mat_chr <- c("Construction,", "new_const1,", paste0(model$Material[[1]]$name(), ";"))
+model$load(mat_chr)
+
+# extract first construction data in a data.table
+dt <- model$Construction[[1L]]$to_table()
+# modify value
+dt[1, value := "new_const2"]
+model$load(dt)
+```
+
+The relation is automatically generated whenever new fields are added or
+modified.
+
+```{r}
+model$object_relation("new_const1")
+model$object_relation("new_const2")
 ```
 
 ### Delete object
 
 `$del()` will delete current objects specified by object IDs or names.
 For example, in current model, there is a material named `"MAT-CLNG-1"` in class
-`Material:NoMass`. You can get objects referencing `MAT-CLNG-1` by using
-`$ref_by_object()` in `IdfObject`.
+`Material:NoMass`. Let's see if it has been referred by other objects.
 
 ```{r ref_by}
-clng <- model$Material_NoMass$`MAT-CLNG-1`
-clng$ref_by_object()
+model$Material_NoMass$`MAT-CLNG-1`$value_relation()
 ```
-As we can see, `MAT-CLNG-1` has been referenced by a construction named
-`"CLNG-1"`. In `final` validate level, if the object is referenced by other
-object(s), it cannot be deleted.
+
+As we can see, `MAT-CLNG-1` has been referred by a construction named
+`"CLNG-1"`.
+
+First, let's try to direct delete Material `MAT-CLNG-1`.
 
 ```{r del, error = TRUE}
-eplusr_option("validate_level")
 model$del("mat-clng-1")
 ```
 
-In some cases, you may still want to delete that object. You can do that by
-changing validate level to `draft` or `none`. For detail explanations on
-each validate level, please see `?eplusr_option()`.
+We got an error, becase directly deleting `MAT-CLNG-1` will introduce invaid
+reference in Construction `CLNG-1`.
 
-You can also delete objects referencing the target objects as well, by setting
-`.referenced` to `TRUE` and `.force` to `TRUE` to force deleting.
+In some cases, you may still want to delete that object. You can achieve this by
+setting `.force` to `TRUE`.
 
-```{r del_force}
-model$del("mat-clng-1", .referenced = TRUE, .force = TRUE)
+```{r del_1}
+model$del("mat-clng-1", .force = TRUE)
 ```
+
+### Paste from IDF Editor
+
+Once an IDF file is opened in IDF Editor, you can copy objects by clicking the
+`Copy Obj` button in IDF Editor, and use `$paste()` to insert those objects into
+current `Idf`. Note that IDF Editor only exists on Windows, which means that
+`$paste()` will also work only on that platfrom.
 
 ## Validate
 
-`$validate()` will check the validation of all fields in current model, including
-missing required objects and fields, wrong value types, choices, references,
-any value range exceeding, invalid autosizable and autocalculatable fields.
-`$is_valid()` will return `TRUE` if no error is found.  Validate level can be
-changed using `eplusr_option()`. The default level is `final`, which is the
-strictest level.
+`$validate()` checks if there are errors in current `Idf` under specified
+validation level. You can customize what kind of errors to check by changin the
+`level` argument. The default validation level is equal to
+`eplusr_option("validate_level")`.
 
-Material `MAT-CLNG-1` and construction `CLNG-1` have been all deleted in above.
-After that, invalid references will be detected during model validation, as
-construction `CLNG-1` was referenced by many other objects in
-`BuildingSurface:Detailed`. And also, invalid autocalculate fields in this model
-are detected.
+There are 10 different validation check components in total. Three predefined
+validation level are included, i.e. `"none"`, `"draft"` and `"final"`. To get
+what valiation components those levels contain, use `level_checks()`.
 
-```{r valid, error = TRUE}
+```{r validate}
 eplusr_option("validate_level")
-model$validate()
+str(level_checks("final"))
+```
+
+In the previous section, we delete Material `MAT-CLNG-1`.
+
+The `final` validation level turns all components on. We can just trigger
+invalid reference checking using `custom_validate()` function.
+
+```{r valid}
+model$validate(custom_validate(reference = TRUE))
+```
+
+As we can see, the invalid reference in construction `CLNG-1` is successfully
+detected.
+
+In this example, we already knows that `CLNG-1` is the invalid object. In many
+cases, we don't know what that infomation in advance, we can extract
+invalid objects for different types directly using `$validate()`. Below, we
+extract all objects that have invalid reference errors.
+
+```{r}
+(id <- model$validate()$invalid_reference$object_id)
+model$objects(id)
+```
+
+Then we can use `$set()` to correct them. We can get all possible values for
+field `Outside Layer` using `$value_possible()` method in `IdfObject` class.
+
+```{r}
+model$object(id)$value_possible("Outside Layer")$source
+```
+
+Now let's change the construction's `Outside Layer` to `WD10`.
+
+```{r}
+model$object(id)$set(Outside_Layer = "WD10")
 ```
 
 ## Save
@@ -583,7 +689,8 @@ avail_eplus()
 
 `$run()` will issue an error if corresponding version of EnergyPlus is not found.
 If your EnergyPlus was not installed in standard location, you can add that
-location into eplusr EnergyPlus location dictionary using `use_eplus()`.
+location using `use_eplus()`. After adding, all models of that version will use
+this path to call EnergyPlus.
 
 ```{r use_eplus, eval = FALSE}
 use_eplus("C:/EnergyPlusV8-8-0")
@@ -593,61 +700,21 @@ If the needed version of EnergyPlus was not installed, you can use
 `install_eplus()` to install it.
 
 ```{r install, eval = FALSE}
-install_eplus(ver = 8.9)
-```
-
-Sometimes, before simulation, it may be useful to retrieve weather data from
-EnergyPlus Weather (EPW) file and conduct analysis on the weather. eplusr
-provides `download_weather()` to search and download EPW files, `read_epw()`
-to read EPW files and `Epw` class to query and modify weather data.
-
-`download_weather()`You can search weather locations using an 
-
-`download_weather()` takes a regular expression as input, searches through
-EnergyPlus weather data base (stored in this package), download corresponding
-EPW and/or DDY files and return the saved paths.
-
-Let's download San Francisco weather data in TMY3 format, save it with name 
-`"San_Francisco.epw"` in temperory directory.
-
-```{r epw-download}
-epw_sf <- download_weather("san francisco.*tmy3", filename = "San_Francisco",
-    dir = tempdir(), type = "epw", ask = FALSE)
-```
-
-After downloading EPW file, we can read it using `read_epw()`.
-
-```{r epw}
-epw_sf <- read_epw(epw_sf)
-epw_sf
-```
-
-`read_epw()` returns an `Epw` object. For details on `Epw` class, please see
-`?epw`. Below are all methods of `Epw`:
-
-```{r epw_method}
-setdiff(ls(epw_sf), "initialize")
-```
-
-You can get all weather data using `$data()`.
-
-```{r epw_data}
-epw_data <- epw_sf$data()
-str(epw_data)
+install_eplus(ver = 8.8)
 ```
 
 `$run()` will run the current model with specified weather using corresponding
 version of EnergyPlus. The model and the weather used will be copied to the
 output directory. An `EplusJob` object will be returned which provides detailed
 information of the simulation and methods to collect simulation output. Please
-see `?job` for more detailed.
+see `?EplusJob` for details.
 
 ```{r run, eval = can_run}
 # read the model again
 model <- read_idf("5Zone_Transformer.idf")
+path_epw <- "San_Francisco.epw"
 
-job <- model$run(epw_sf, wait = TRUE)
-job
+job <- model$run(path_epw, wait = TRUE)
 ```
 
 ### Print simulation errors
@@ -680,19 +747,27 @@ str(job$report_data_dict())
 ```
 
 `$report_data()` extracts the report data using key values and variable names.
-Basically, `key_value` equals `KeyValue` and `name` equals `Name` in the report
-data dictionary you get from `$report_data_dict()`.
+Just for demonstration, let's get the transformer input electric power at 11 p.m
+for the first day of runperiod named `SUMMERDAY`, tag this simulation as case
+`example`, and return all possible output columns.
 
 ```{r output, eval = can_run}
-str(job$report_data(name = "Site Outdoor Air Drybulb Temperature"))
+job$report_data("transformer 1", "transformer input electric power", case = "example",
+  all = TRUE, simulation_days = 1, environment_name = "summerday", hour = 11, minute = 0)
 ```
 
 `$tabular_data()` extracts all tabular data. For details on the meaning of each
 columns, please see *"2.20.4.4 TabularData Table"* in EnergyPlus *"Output
 Details and Examples"* documentation.
 
+Now let's get the total site energy per total building area. Note that the
+`value` column in the returned `data.table` is character types, as some table
+store not just numbers.  We need to manually convert it.
+
 ```{r tab, eval = can_run}
-str(job$tabular_data())
+site_energy <- job$tabular_data(column_name = "energy per total building area", row_name = "total site energy")
+site_energy[, value := as.numeric(value)]
+str(site_energy)
 ```
 
 ```{r del_job, include = FALSE, eval = can_run}
@@ -702,12 +777,12 @@ clean_wd(model$path())
 ## Run Parametric Analysis
 
 eplusr provides tools to do parametric simulations which take full advantages of
-eplusr's model editing and result collecting functionalities.  You can create a
+eplusr's model editing and result collecting functionalities. You can create a
 parametric job using `param_job()`, which takes an IDF file or an `Idf` object
 as the *seed* and an EPW file or an `Epw` object as *weather*.
 
 ```{r param, eval = can_run}
-param <- param_job(idf = model, epw = epw_sf)
+param <- param_job(idf = model, epw = path_epw)
 
 param
 ```
@@ -737,8 +812,14 @@ set_infil_rate <- function (idf, infil_rate) {
   if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
     stop("Input model does not have any object in class `ZoneInfiltration:DesignFlowRate`")
 
+  # get all object IDS
   ids <- idf$object_id("ZoneInfiltration:DesignFlowRate", simplify = TRUE)
-  val <- rep(list(list(design_flow_rate_calculation_method = "AirChanges/Hour", air_changes_per_hour = infil_rate)), length(ids))
+
+  # make a list of new values to set
+  new_val <- list(design_flow_rate_calculation_method = "AirChanges/Hour", air_changes_per_hour = infil_rate)
+
+  # create proper format for all objects in that class
+  val <- rep(list(new_val), length(ids))
   names(val) <- paste0("..", ids)
 
   idf$set(val)
@@ -766,13 +847,11 @@ number.
 
 Now let's run the parametric job. All simulations will be run in parallel. The
 number of parallel EnergyPlus processes can be specified using option
-`num_parallel`.
-
-> Currently, unlike `EplusJob`, all simulations in `ParametricJob` will be run
-> in waiting mode. This may be changed in the future.
+`num_parallel`. Now let's run all simulations and wait them to finish.
 
 ```{r param_run, eval = can_run}
-param$run()
+param$run(wait = TRUE)
+param
 ```
 
 After all simulations completed, let's see the variations of total energy.
