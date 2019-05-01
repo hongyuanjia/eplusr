@@ -90,6 +90,6 @@ utils::globalVariables(c(
     "temperature", "title", "to", "type", "type_enum", "type_exp",
     "unique_object", "upper_incbounds", "use_input_name", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "weather",
-    "wmo_number", "x", "year_in", "J"
+    "wmo_number", "x", "year_in", "J", "num_fld", "max_fld"
 ))
 # }}}
