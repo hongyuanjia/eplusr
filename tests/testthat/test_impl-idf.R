@@ -829,6 +829,20 @@ test_that("Load", {
 
     mat2[4, index := 2L]
     expect_error(load_idf_object(idd_env, idf_env, 8.8, mat1, mat2), class = "error_validity")
+
+    mat_chr <- c("Construction,", "new_const1,", paste0(idf$Material[[1]]$name(), ";"))
+
+    expect_silent(ins <- load_idf_object(idd_env, idf_env, version = idf$version(), mat_chr))
+    expect_equivalent(ins$object,
+        data.table(object_id = 54L, class_id = 90L, comment = list(NULL),
+            object_name = "new_const1", object_name_lower = "new_const1"
+        )
+    )
+    expect_equivalent(ins$value,
+        data.table(value_id = 349:350, value_chr = c("new_const1", "C5 - 4 IN HW CONCRETE"),
+            value_num = rep(NA_real_, 2), object_id = 54L, field_id = 11006:11007
+        )
+    )
 })
 # }}}
 

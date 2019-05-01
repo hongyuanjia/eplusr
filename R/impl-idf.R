@@ -1980,7 +1980,10 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
     )
     set(idf_env$value, NULL, c("class_id", "class_name", "type_enum", "src_enum"), NULL)
 
-    parsed
+    list(object = parsed$object[, .SD, .SDcols = names(idf_env$object)],
+         value = parsed$value[, .SD, .SDcols = names(idf_env$value)],
+         reference = parsed$reference
+    )
 }
 # }}}
 # load_idf_object {{{
@@ -2137,11 +2140,15 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
     set(idf_env$value, NULL, c("class_id", "class_name", "type_enum", "src_enum"), NULL)
 
     # update object name
-    obj_dt <- update_object_name(obj_dt, val_dt)
+    parsed$object <- update_object_name(parsed$object, parsed$value)
     # add lower name
-    set(obj_dt, NULL, "object_name_lower", stri_trans_tolower(obj_dt$object_name))
+    set(parsed$object, NULL, "object_name_lower", stri_trans_tolower(parsed$object$object_name))
+    set(parsed$object, NULL, "has_name", NULL)
 
-    parsed
+    list(object = parsed$object[, .SD, .SDcols = names(idf_env$object)],
+         value = parsed$value[, .SD, .SDcols = names(idf_env$value)],
+         reference = parsed$reference
+    )
 }
 # }}}
 # purge_idf_object {{{
