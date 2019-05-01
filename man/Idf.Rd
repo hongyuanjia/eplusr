@@ -957,8 +957,9 @@ folder will be used. Default: NULL
 \item \code{wait}: Whether to wait until the simulation completes and print the
 standard output and error of EnergyPlus to the screen. If \code{FALSE}, the
 simulation will run in the background. Default is \code{TRUE}.
-\item \code{force}: Only applicable when \code{wait} is \code{FALSE}. Whether force to stop the
-background EnergyPlus process and start the simulation again.
+\item \code{force}: Only applicable when the last simulation runs with \code{wait} equals
+to \code{FALSE} and is still running. If \code{TRUE}, currenting running job is
+forced to stop and a new one will start. Default: \code{FALSE}.
 \item \code{copy_external}: If \code{TRUE}, the external files that current \code{Idf} object
 depends on will also be copied into the simulation output directory. The
 values of file paths in the Idf will be changed automatically. Currently,

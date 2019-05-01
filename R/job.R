@@ -34,7 +34,7 @@ NULL
 #' ```
 #' job <- eplus_job(idf, epw)
 #' job$path(type = c("all", "idf", "epw"))
-#' job$run(wait = TRUE)
+#' job$run(wait = TRUE, force = FALSE)
 #' job$kill()
 #' job$status()
 #' job$errors(info = FALSE)
@@ -68,7 +68,7 @@ NULL
 #'
 #' @section Run:
 #' ```
-#' job$run(wait = TRUE)
+#' job$run(wait = TRUE, force = FALSE)
 #' job$kill()
 #' job$status()
 #' job$errors(info = FALSE)
@@ -104,6 +104,9 @@ NULL
 #'   EnergyPlus standard output (stdout) and error (stderr) is printed to
 #'   R console. If `FALSE`, simulation will be run in a background process.
 #'   Default: `TRUE`.
+#' * `force`: Only applicable when the last job runs with `wait` equals
+#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   forced to stop and a new one will start. Default: `FALSE`.
 #' * `info`: If `FALSE`,only warnings and errors are printed. Default: `FALSE`.
 #'
 #' @section Simulation Output Extraction:
@@ -482,8 +485,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         path = function (type = c("all", "idf", "epw"))
             job_path(self, private, type),
 
-        run = function (wait = TRUE)
-            job_run(self, private, wait = wait),
+        run = function (wait = TRUE, force = FALSE)
+            job_run(self, private, wait = wait, force),
 
         kill = function ()
             job_kill(self, private),
@@ -556,7 +559,26 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 }
 # }}}
 # job_run {{{
-job_run <- function (self, private, wait = TRUE) {
+job_run <- function (self, private, wait = TRUE, force = FALSE) {
+    # check if the model is still running
+    old <- private$m_job
+    if (!is.null(old)) {
+        proc <- old$process
+        if (inherits(proc, "process") && proc$is_alive()) {
+            pid <- proc$get_pid()
+            if (force) {
+                message("Force to kill current running simulation (PID: ", pid,
+                    ") and start a new simulation...")
+                suppressMessages(self$kill())
+            } else {
+                stop("The simulation of current Idf is still running (PID: ",
+                    pid, "). Please set `force` to TRUE if you want ",
+                    "to kill the running process and start a new simulation.",
+                    call. = FALSE)
+            }
+        }
+    }
+
     private$m_log$start_time <- Sys.time()
     private$m_log$killed <- NULL
 

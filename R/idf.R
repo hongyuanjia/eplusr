@@ -967,8 +967,9 @@ NULL
 #' * `wait`: Whether to wait until the simulation completes and print the
 #'    standard output and error of EnergyPlus to the screen. If `FALSE`, the
 #'    simulation will run in the background. Default is `TRUE`.
-#' * `force`: Only applicable when `wait` is `FALSE`. Whether force to stop the
-#'    background EnergyPlus process and start the simulation again.
+#' * `force`: Only applicable when the last simulation runs with `wait` equals
+#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   forced to stop and a new one will start. Default: `FALSE`.
 #' * `copy_external`: If `TRUE`, the external files that current `Idf` object
 #'   depends on will also be copied into the simulation output directory. The
 #'   values of file paths in the Idf will be changed automatically. Currently,
@@ -2119,25 +2120,6 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
             )
         )
 
-    # check if the model is still running
-    old <- private$m_log$job
-    if (!is.null(old)) {
-        proc <- ._get_private(old)$m_process$process
-        if (inherits(proc, "process") && proc$is_alive()) {
-            pid <- proc$get_pid()
-            if (force) {
-                old$kill()
-                message("Force to kill current running simulation (PID: ", pid,
-                    ") and start a new simulation...")
-            } else {
-                stop("The simulation of current Idf is still running (PID: ",
-                    pid, "). Please set `force` to TRUE if you want ",
-                    "to kill the running process and start a new simulation.",
-                    call. = FALSE)
-            }
-        }
-    }
-
     # add Output:SQLite if necessary
     add_sql <- idf_add_output_sqlite(self)
 
@@ -2160,13 +2142,14 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
         idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
     }
 
-    job <- EplusJob$new(path_idf, epw, private$m_version)
+    # check if the model is still running
+    old <- private$m_log$job
+    if (!inherits(old, "EplusJob")) {
+        private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
+    }
 
-    job$run(wait = wait)
-
-    private$m_log$job <- job
-
-    job
+    private$m_log$job$run(wait = wait, force = force)
+    private$m_log$job
 }
 # }}}
 # idf_print {{{
@@ -2437,6 +2420,8 @@ read_idf <- function (path, idd = NULL) {
     if (!length(id_del)) return(invisible(x))
 
     invisible(.subset2(x, "del")(id_del, .unique = FALSE))
+
+    invisible(x)
 }
 # }}}
 

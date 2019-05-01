@@ -290,6 +290,9 @@ This means that the value \code{"WALL-1"} of field \code{Name} is referred by fi
 \code{Construction Name} in a surface named \code{WALL-1PF}. All those objects can be
 futher easily extracted using \code{$ref_by_object()} method.
 
+Note that \code{$value_relation()} shows all fields specified, even some of them
+may do not have relation.
+
 \code{$ref_to_object()} takes an integer vector of field indexes or a character
 vector of field names, and returns a list of \code{IdfObject}s that specified
 fields refer to.

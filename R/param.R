@@ -21,7 +21,7 @@ NULL
 #' param$seed()
 #' param$weater()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
-#' param$run(dir = NULL, wait = TRUE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -76,7 +76,7 @@ NULL
 #'
 #' @section Run and Collect Results:
 #' ```
-#' param$run(dir = NULL, wait = TRUE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -150,6 +150,15 @@ NULL
 #' * `wait`: If `TRUE`, R will hang on and wait all EnergyPlus simulations
 #'   finish. If `FALSE`, all EnergyPlus simulations are run in the background.
 #'   Default: `TRUE`.
+#' * `force`: Only applicable when the last simulation runs with `wait` equals
+#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   forced to stop and a new one will start. Default: `FALSE`.
+#' * `copy_external`: If `TRUE`, the external files that every `Idf` object
+#'   depends on will also be copied into the simulation output directory. The
+#'   values of file paths in the Idf will be changed automatically. Currently,
+#'   only `Schedule:File` class is supported.  This ensures that the output
+#'   directory will have all files needed for the model to run. Default is
+#'   `FALSE`.
 #' * `suffix`: A string that indicates the file extensition of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
@@ -308,8 +317,8 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         apply_measure = function (measure, ..., .names = NULL)
             param_apply_measure(self, private, measure, ..., .names = .names),
 
-        run = function (dir = NULL, wait = TRUE)
-            param_run(self, private, dir, wait),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+            param_run(self, private, dir, wait, force, copy_external),
 
         kill = function ()
             param_kill(self, private),
@@ -527,7 +536,7 @@ param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
+param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
     if (is.null(private$m_param))
         stop("No measure has been applied.", call. = FALSE)
 
@@ -553,9 +562,32 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE) {
         )
     }
 
+    # check if the model is still running
+    old <- private$m_job
+    if (!is.null(old)) {
+        # update status
+        param_retrieve_data(self, private)
+        old <- private$m_job
+
+        # check if running in non-waiting mode
+        if (inherits(old, "process") && old$is_alive()) {
+            pid <- old$get_pid()
+            if (force) {
+                message("Force to kill all current running parametric simulations (",
+                    "Parent R Process PID: ", pid, ") and restart...")
+                suppressMessages(self$kill())
+            } else {
+                stop("Current parametric simulations are still running (Parent R Process PID: ",
+                    pid, "). Please set `force` to TRUE if you want ",
+                    "to kill the running process and restart.",
+                    call. = FALSE)
+            }
+        }
+    }
+
     path_param <- file.path(output_dir, nms, paste0(nms, ".idf"))
 
-    apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = TRUE))
+    apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
 
     private$m_log$start_time <- Sys.time()
     private$m_log$killed <- NULL

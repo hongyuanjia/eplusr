@@ -277,6 +277,9 @@ NULL
 #' `Construction Name` in a surface named `WALL-1PF`. All those objects can be
 #' futher easily extracted using `$ref_by_object()` method.
 #'
+#' Note that `$value_relation()` shows all fields specified, even some of them
+#' may do not have relation.
+#'
 #' `$ref_to_object()` takes an integer vector of field indexes or a character
 #' vector of field names, and returns a list of `IdfObject`s that specified
 #' fields refer to.

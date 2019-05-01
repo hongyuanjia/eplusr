@@ -36,7 +36,7 @@ it is recommended to first read that IDF file using \code{\link[=read_idf]{read_
 \section{Usage}{
 \preformatted{job <- eplus_job(idf, epw)
 job$path(type = c("all", "idf", "epw"))
-job$run(wait = TRUE)
+job$run(wait = TRUE, force = FALSE)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -71,7 +71,7 @@ Default: \code{"all"}.
 }
 
 \section{Run}{
-\preformatted{job$run(wait = TRUE)
+\preformatted{job$run(wait = TRUE, force = FALSE)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -108,6 +108,9 @@ and errors are printed.
 EnergyPlus standard output (stdout) and error (stderr) is printed to
 R console. If \code{FALSE}, simulation will be run in a background process.
 Default: \code{TRUE}.
+\item \code{force}: Only applicable when the last job runs with \code{wait} equals
+to \code{FALSE} and is still running. If \code{TRUE}, currenting running job is
+forced to stop and a new one will start. Default: \code{FALSE}.
 \item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
 }
 }

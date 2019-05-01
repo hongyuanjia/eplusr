@@ -200,6 +200,9 @@ break changes. Detailed updates per class are as follow:
 
 ## `ParametricJob` Class
 
+* New arguments `force` and `copy_external` are added in `$run()` which have the
+  same effect as in `$run()` method in `Idf` class.
+
 * New arguments `period`, `month`, `day`, `hour`, `minute`, `interval`,
   `simulation_days`, `day_type` and `environment_name` are added in
   `$report_data()` which provide extra subsetting on the SQL file.

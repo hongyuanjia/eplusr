@@ -20,7 +20,7 @@ automatically created if it does not exists, like \link{Idf} class does.
 param$seed()
 param$weater()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
-param$run(dir = NULL, wait = TRUE)
+param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -78,7 +78,7 @@ the new \code{Idf}s will be named in format \code{measure_name + number}.
 }
 
 \section{Run and Collect Results}{
-\preformatted{param$run(dir = NULL, wait = TRUE)
+\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -153,6 +153,15 @@ each simulation are placed in a separate folder under the parent directory.
 \item \code{wait}: If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
 finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
 Default: \code{TRUE}.
+\item \code{force}: Only applicable when the last simulation runs with \code{wait} equals
+to \code{FALSE} and is still running. If \code{TRUE}, currenting running job is
+forced to stop and a new one will start. Default: \code{FALSE}.
+\item \code{copy_external}: If \code{TRUE}, the external files that every \code{Idf} object
+depends on will also be copied into the simulation output directory. The
+values of file paths in the Idf will be changed automatically. Currently,
+only \code{Schedule:File} class is supported.  This ensures that the output
+directory will have all files needed for the model to run. Default is
+\code{FALSE}.
 \item \code{suffix}: A string that indicates the file extensition of simulation output.
 Default: \code{".err"}.
 \item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
