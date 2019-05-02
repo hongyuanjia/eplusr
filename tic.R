@@ -17,5 +17,5 @@ if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sy
     get_stage("deploy") %>%
         add_code_step(pkgdown::clean_site())
 
-    do_pkgdown(commit_paths = "docs/*", document = TRUE, checkout = FALSE)
+    do_pkgdown(commit_paths = "docs/*", document = TRUE, checkout = FALSE, orphan = TRUE)
 }
