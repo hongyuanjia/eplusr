@@ -13,5 +13,5 @@ do_package_checks(args = args, build_args = build_args)
 
 # pkgdown
 if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux") {
-    do_pkgdown(commit_paths = "docs/*", document = FALSE, path = "docs", branch = "gh-pages")
+    do_pkgdown(commit_paths = "docs/*", document = TRUE, path = "docs", branch = "gh-pages")
 }
