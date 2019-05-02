@@ -14,25 +14,25 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  screenshot.force = FALSE
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE
 )
 
 # the default output hook
 hook_output = knitr::knit_hooks$get('output')
 knitr::knit_hooks$set(output = function(x, options) {
-  if (!is.null(n <- options$out.lines)) {
-    x <- unlist(strsplit(x, '\n', fixed = TRUE))
-    if (length(x) > n) {
-      # truncate the output
-      x <- c(head(x, n), '....', '')
-    } else {
-      x <- c(x, "")
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
     }
-    x <- paste(x, collapse = '\n') # paste first n lines together
-  }
-  hook_output(x, options)
+    hook_output(x, options)
 })
 
 knitr::opts_knit$set(root.dir = tempdir())
