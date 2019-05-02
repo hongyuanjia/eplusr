@@ -14,8 +14,5 @@ do_package_checks(args = args, build_args = build_args)
 # pkgdown
 # make sure to clean site to rebuild everything
 if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "release") {
-    get_stage("deploy") %>%
-        add_code_step(pkgdown::clean_site())
-
-    do_pkgdown(commit_paths = "docs/*", document = TRUE, checkout = FALSE, orphan = TRUE)
+    do_pkgdown(document = TRUE)
 }
