@@ -46,14 +46,17 @@ environment:
     - R_VERSION: devel
       R_ARCH: x64
       NOT_CRAN: true
+      _R_CHECK_DOC_SIZES_: false
 
     - R_VERSION: release
       R_ARCH: x64
       NOT_CRAN: true
+      _R_CHECK_DOC_SIZES_: false
 
     - R_VERSION: oldrel
       R_ARCH: x64
       NOT_CRAN: true
+      _R_CHECK_DOC_SIZES_: false
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
