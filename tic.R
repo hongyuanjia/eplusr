@@ -12,6 +12,16 @@ if (.Platform$OS.type == "windows" || Sys.getenv("TRAVIS_OS_NAME") == "osx") arg
 do_package_checks(args = args, build_args = build_args)
 
 # pkgdown
+# make sure to clean site to rebuild everything
 if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "release") {
-    do_pkgdown(commit_paths = "docs/*", document = TRUE, path = "docs", branch = "gh-pages")
+    get_stage("before_deploy") %>%
+        add_step(step_setup_ssh()) %>%
+        add_step(step_setup_push_deploy(branch = "gh-pages", orphan = TRUE))
+
+    get_stage("deploy") %>%
+        step_run_code(pkgdown::clean_site())
+
+    get_stage("deploy") %>%
+        add_step(step_build_pkgdown(document = TRUE)) %>%
+        add_step(step_do_push_deploy())
 }
