@@ -59,7 +59,7 @@ NULL
 #' model$dup(...)
 #' model$add(..., .default = TRUE, .all = FALSE)
 #' model$set(..., .default = TRUE)
-#' model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
+#' model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 #' model$insert(..., .unique = TRUE)
 #' model$load(..., .unique = TRUE, .default = TRUE)
 #' model$rename(...)
@@ -484,12 +484,14 @@ NULL
 #' \subsection{Deleting Existing Objects}{
 #'
 #' ```
-#' model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
+#' model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 #' ```
 #'
 #' `$del()` takes integer vectors of object IDs and character vectors of object
-#' names, and deletes objects specified. If `.referenced` is `TRUE`, objects
-#' whose fields refer to input objects will also be deleted.
+#' names, and deletes objects specified. If `.ref_by` is `TRUE`, objects
+#' whose fields refer to input objects will also be deleted. IF `.ref_to` is
+#' `TRUE`, objects whose fields are referred by input objects will also be
+#' deleted.
 #'
 #' **Note**:
 #'
@@ -499,6 +501,11 @@ NULL
 #'   material that is referred by other constructions, because doing so will
 #'   result in invalid field value references. You may bypass this if you really
 #'   want to by setting `.force` to `TRUE`.
+#' * When `.ref_by` or `.ref_to` is `TRUE`, objects are only deleted when they
+#'   only have relation with input objects. For example, a construction `const`
+#'   consist of 4 different materials. If `.ref_to` is `TRUE`, that 4 materials
+#'   will only be deleted when they are only used in `const`, but not used in
+#'   any other objects.
 #' * There are recursively reference relations in `Idf` object. For example, one
 #'   material's name is referenced by one construction, and that construction's
 #'   name can be referred by another surface. You can delete all of them by
@@ -506,12 +513,14 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `.referenced`: If `TRUE`, objects whose fields refer to input objects will
+#' * `.ref_by`: If `TRUE`, objects whose fields refer to input objects will
 #'     also be deleted. Default: `FALSE`.
-#' * `.recursive`: Only applicable when `.referenced` is `TRUE`. If `TRUE`,
-#'   "refering-by" relation searching is performed recursively, in case that
-#'   objects whose fields refer to target object are also referred by another
-#'   objects. Default: `FALSE`.
+#' * `.ref_to`: If `TRUE`, objects whose fields are referred by input objects
+#'   will also be deleted. Default: `FALSE`.
+#' * `.recursive`: If `TRUE`, relation searching is performed recursively, in
+#'   case that objects whose fields refer to target object are also referred by
+#'   another object, and also objects whose fields are referred by target obejct
+#'   are also referred by another object. Default: `FALSE`.
 #' * `.force`: If `TRUE`, objects are deleted even if they are referred by other
 #'   objects.
 #'
@@ -520,8 +529,11 @@ NULL
 #' * Specify object with name: `model$del("Object_Name1", "Object_Name2")`.
 #' * Specify object with ID: `model$del(1, 2, 10)`.
 #' * Delete objects even they are referred by other objects: `model$del(1:5, .force = TRUE)`
-#' * Delete objects and also other objects that refer to them: `model$del(2, "Object_Name1", .referenced = TRUE)`
-#' * Delete objects and also other objects that refer to them recursively: `model$del(1:5, .referenced = TRUE, .recursive = TRUE)`
+#' * Delete objects and also other objects that refer to them: `model$del(2,
+#' "Object_Name1", .ref_by = TRUE)`
+#' * Delete objects and also other objects that refer to them recursively:
+#' `model$del(1:5, .ref_by = TRUE, .recursive = TRUE)`
+#' * Delete objects and also other objects that input objects refer to: `model$del(1:5, .ref_to = TRUE)`
 #' * Variable input: `x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)`.
 #' }
 #'
@@ -1215,10 +1227,10 @@ NULL
 #'
 #' # objects referencing target objects can also be deleted by setting
 #' # `referenced` to TRUE
-#' \dontrun{idf$del("R13LAYER", .referenced = TRUE)} # will give an error in "final" validate level
+#' \dontrun{idf$del("R13LAYER", .ref_by = TRUE)} # will give an error in "final" validate level
 #'
 #' # it is possible to force delete objects
-#' \dontrun{idf$del("R13LAYER", .referenced = TRUE, .force = TRUE)}
+#' \dontrun{idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)}
 #'
 #' # ===== SEARCH ADN REPLACE OBJECT VALUES =====
 #' # get objects whose field values contains both "VAV" and "Node"
@@ -1467,8 +1479,8 @@ Idf <- R6::R6Class(classname = "Idf",
         set = function (..., .default = TRUE)
             idf_set(self, private, ..., .default = .default),
 
-        del = function (..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
-            idf_del(self, private, ..., .referenced = .referenced, .recursive = .recursive, .force = .force),
+        del = function (..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
+            idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = FALSE, .recursive = .recursive, .force = .force),
 
         rename = function (...)
             idf_rename(self, private, ...),
@@ -1900,9 +1912,9 @@ idf_set_object <- function (self, private, object, value, comment, default) {
 }
 # }}}
 # idf_del {{{
-idf_del <- function (self, private, ..., .referenced = FALSE, .recursive = FALSE, .force = FALSE) {
+idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE) {
     del <- del_idf_object(private$idd_env(), private$idf_env(), ...,
-        .referenced = .referenced, .recursive = .recursive, .force = .force
+        .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force
     )
 
     private$m_idf_env$object <- del$object
@@ -1920,7 +1932,7 @@ idf_del <- function (self, private, ..., .referenced = FALSE, .recursive = FALSE
 # idf_del_object {{{
 idf_del_object <- function (self, private, object, referenced = FALSE) {
     .deprecated_fun("$del_object()", "$delete()", "Idf", "0.10.0")
-    idf_del(self, private, object, .referenced = referenced)
+    idf_del(self, private, object, .ref_by = referenced)
 }
 # }}}
 # idf_rename {{{

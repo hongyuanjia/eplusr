@@ -731,7 +731,7 @@ test_that("Del", {
         del_idf_object(idd_env, idf_env, "R13WALL", "FLOOR", "ROOF31"),
         class = "error_del_referenced"
     )
-    expect_silent({del <- del_idf_object(idd_env, idf_env, 21:26, 14, .referenced = TRUE, .recursive = TRUE)})
+    expect_silent({del <- del_idf_object(idd_env, idf_env, 21:26, 14, .ref_by = TRUE, .recursive = TRUE)})
     expect_equivalent(setdiff(idf_env$object$object_id, del$object$object_id), c(14L, 16L, 21:26))
 })
 # }}}

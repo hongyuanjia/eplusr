@@ -1728,7 +1728,8 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
 }
 # }}}
 # del_idf_object {{{
-del_idf_object <- function (idd_env, idf_env, ..., .referenced = FALSE, .recursive = FALSE, .force = FALSE) {
+del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FALSE,
+                            .recursive = FALSE, .force = FALSE) {
     l <- sep_name_dots(..., .can_name = TRUE)
     obj <- get_object_input(idd_env, idf_env, l, keep_duplicate = TRUE)
     set(obj, NULL, c("object_name_lower", "comment", "new_object_name"), NULL)
@@ -1738,38 +1739,112 @@ del_idf_object <- function (idd_env, idf_env, ..., .referenced = FALSE, .recursi
     # get objects to be deleted
     id_del <- obj$object_id
 
-    # check if target objects are referenced by others
-    # TODO: handle cases when input multiple depths
-    ref <- get_idf_relation(idd_env, idf_env, obj$object_id, name = TRUE,
-        direction = "ref_by", recursive = .recursive
+    # always check if targets objects are referred by others
+    dir <- if (.ref_to) "all" else "ref_by"
+
+    rel <- get_idfobj_relation(idd_env, idf_env, id_del, direction = dir,
+        max_depth = NULL, recursive = .recursive, name = eplusr_option("verbose_info")
     )
 
-    if (nrow(ref)) {
-        # stop if objects are referenced {{{
-        if (!.referenced && !.force) {
+    if (nrow(rel$ref_by)) {
+        # stop if objects are referred {{{
+        if (!.ref_by && !.force) {
+            if (!eplusr_option("verbose_info")) {
+                rel$ref_by <- add_idf_relation_format_cols(idd_env, idf_env, rel$ref_by)
+            }
             abort("error_del_referenced",
                 paste0(
                     "Cannot delete object(s) that are referred by others:\n",
                     "\n",
-                    paste0("  ", unlist(format_idf_relation(ref, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
+                    paste0("  ", unlist(format_idf_relation(rel$ref_by, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
                 )
             )
         }
         # }}}
-        if (.referenced) {
-            verbose_info(
-                "Delete object(s) [ID: ", paste(obj$object_id, sep = ", ", collapse = ", "), "] ",
-                "and also object(s) [ID: ", paste(setdiff(ref$object_id, obj$object_id), collapse = ", "), "] ",
-                "that refer to them. Value relation is shown below:\n\n",
-                paste0("  ", unlist(format_idf_relation(ref, "ref_by")$fmt, use.names = FALSE), collapse = "\n")
-            )
-            id_del <- unique(c(id_del, ref$src_object_id, ref$object_id))
+
+        if (eplusr_option("verbose_info")) {
+            msg <- paste0("Deleting object(s) [ID: ", paste(id_del, sep = ", ", collapse = ", "), "]")
+        }
+
+        if (.ref_by) {
+            id_ref_by <- setdiff(unique(rel$ref_by$object_id), id_del)
+
+            # check if objects that refer to targets are also referred by other
+            # objects
+            id_src <- id_ref_by[id_ref_by %in% idf_env$reference$src_object_id]
+            if (length(id_src)) {
+                id_ref_by <- setdiff(id_ref_by, id_src)
+                if (eplusr_option("verbose_info")) {
+                    if (length(id_ref_by)) {
+                        msg <- c(msg,
+                            paste0(
+                                "Including object(s) [ID:", paste(id_ref_by, collapse = ", "), "] that refer to it, ",
+                                "skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is referred by other objects."
+                            )
+                        )
+                    } else {
+                        msg <- c(msg,
+                            paste0("Skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is referred by other objects.")
+                        )
+                    }
+                }
+            } else {
+                if (eplusr_option("verbose_info")) {
+                    msg <- c(msg, "",
+                        paste0("Including object(s) [ID:", paste(id_ref_by, collapse = ", "), "] that refer to it.")
+                    )
+                }
+            }
         }
     }
+
+    # if .ref_to is TRUE and rel$ref_to has contents
+    if (NROW(rel$ref_to)) {
+        id_ref_to <- setdiff(unique(rel$ref_to$src_object_id))
+
+        # check if objects that target refers to are also referred by other
+        # objects
+        id_src <- idf_env$reference[!J(id_del), on = "object_id"][
+            J(rel$ref_to$src_object_id), on = "src_object_id", nomatch = 0L, src_object_id
+        ]
+        id_src <- setdiff(id_src, id_del)
+        if (length(id_src)) {
+            id_ref_to <- setdiff(id_ref_to, id_src)
+            if (eplusr_option("verbose_info")) {
+                if (length(id_ref_to)) {
+                    msg <- c(msg, "",
+                        paste0(
+                            "Including object(s) [ID:", paste(id_ref_to, collapse = ", "), "] that is referred by it, ",
+                            "skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is also referred by other objects."
+                        )
+                    )
+                } else {
+                    msg <- c(msg, "",
+                        paste0("Skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is also referred by other objects.")
+                    )
+                }
+            }
+        } else {
+            if (eplusr_option("verbose_info")) {
+                msg <- c(msg, "",
+                    paste0("Including object(s) [ID:", paste(id_ref_by, collapse = ", "), "] that is referred by it.")
+                )
+            }
+        }
+    }
+
+    if (eplusr_option("verbose_info")) {
+        msg <- paste0(c(msg, "", "Object relation is shown below:", ""), collapse = "\n")
+        msg_rel <- paste0(" ", capture.output(print.IdfRelation(rel)), collapse = "\n")
+        verbose_info(paste0(msg, msg_rel, collapse = "\n"))
+    }
+
+    id_del <- if (.ref_to) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
 
     # delete rows in object table
     dt_object <- idf_env$object[!J(id_del), on = "object_id"]
     dt_value <- idf_env$value[!J(id_del), on = "object_id"]
+    # keep invalid reference
     dt_reference <- idf_env$reference[!J(id_del), on = "object_id"][
         J(id_del), on = "src_object_id",
         `:=`(src_object_id = NA_integer_, src_value_id = NA_integer_)

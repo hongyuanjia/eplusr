@@ -61,7 +61,7 @@ model[[ClassName]]
 model$dup(...)
 model$add(..., .default = TRUE, .all = FALSE)
 model$set(..., .default = TRUE)
-model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
+model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 model$insert(..., .unique = TRUE)
 model$load(..., .unique = TRUE, .default = TRUE)
 model$rename(...)
@@ -482,12 +482,14 @@ model$set(val)
 
 }
 
-\subsection{Deleting Existing Objects}{\preformatted{model$del(..., .referenced = FALSE, .recursive = FALSE, .force = FALSE)
+\subsection{Deleting Existing Objects}{\preformatted{model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 }
 
 \code{$del()} takes integer vectors of object IDs and character vectors of object
-names, and deletes objects specified. If \code{.referenced} is \code{TRUE}, objects
-whose fields refer to input objects will also be deleted.
+names, and deletes objects specified. If \code{.ref_by} is \code{TRUE}, objects
+whose fields refer to input objects will also be deleted. IF \code{.ref_to} is
+\code{TRUE}, objects whose fields are referred by input objects will also be
+deleted.
 
 \strong{Note}:
 \itemize{
@@ -497,6 +499,11 @@ objects. For example, an error will be issued if you want to delete one
 material that is referred by other constructions, because doing so will
 result in invalid field value references. You may bypass this if you really
 want to by setting \code{.force} to \code{TRUE}.
+\item When \code{.ref_by} or \code{.ref_to} is \code{TRUE}, objects are only deleted when they
+only have relation with input objects. For example, a construction \code{const}
+consist of 4 different materials. If \code{.ref_to} is \code{TRUE}, that 4 materials
+will only be deleted when they are only used in \code{const}, but not used in
+any other objects.
 \item There are recursively reference relations in \code{Idf} object. For example, one
 material's name is referenced by one construction, and that construction's
 name can be referred by another surface. You can delete all of them by
@@ -505,12 +512,14 @@ setting \code{.recursive} to \code{TRUE}.
 
 \strong{Arguments}:
 \itemize{
-\item \code{.referenced}: If \code{TRUE}, objects whose fields refer to input objects will
+\item \code{.ref_by}: If \code{TRUE}, objects whose fields refer to input objects will
 also be deleted. Default: \code{FALSE}.
-\item \code{.recursive}: Only applicable when \code{.referenced} is \code{TRUE}. If \code{TRUE},
-"refering-by" relation searching is performed recursively, in case that
-objects whose fields refer to target object are also referred by another
-objects. Default: \code{FALSE}.
+\item \code{.ref_to}: If \code{TRUE}, objects whose fields are referred by input objects
+will also be deleted. Default: \code{FALSE}.
+\item \code{.recursive}: If \code{TRUE}, relation searching is performed recursively, in
+case that objects whose fields refer to target object are also referred by
+another object, and also objects whose fields are referred by target obejct
+are also referred by another object. Default: \code{FALSE}.
 \item \code{.force}: If \code{TRUE}, objects are deleted even if they are referred by other
 objects.
 }
@@ -520,8 +529,10 @@ objects.
 \item Specify object with name: \code{model$del("Object_Name1", "Object_Name2")}.
 \item Specify object with ID: \code{model$del(1, 2, 10)}.
 \item Delete objects even they are referred by other objects: \code{model$del(1:5, .force = TRUE)}
-\item Delete objects and also other objects that refer to them: \code{model$del(2, "Object_Name1", .referenced = TRUE)}
-\item Delete objects and also other objects that refer to them recursively: \code{model$del(1:5, .referenced = TRUE, .recursive = TRUE)}
+\item Delete objects and also other objects that refer to them: \code{model$del(2, "Object_Name1", .ref_by = TRUE)}
+\item Delete objects and also other objects that refer to them recursively:
+\code{model$del(1:5, .ref_by = TRUE, .recursive = TRUE)}
+\item Delete objects and also other objects that input objects refer to: \code{model$del(1:5, .ref_to = TRUE)}
 \item Variable input: \code{x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)}.
 }
 }
@@ -1208,10 +1219,10 @@ length(idf$Material_NoMass$R13LAYER$ref_by_object())
 
 # objects referencing target objects can also be deleted by setting
 # `referenced` to TRUE
-\dontrun{idf$del("R13LAYER", .referenced = TRUE)} # will give an error in "final" validate level
+\dontrun{idf$del("R13LAYER", .ref_by = TRUE)} # will give an error in "final" validate level
 
 # it is possible to force delete objects
-\dontrun{idf$del("R13LAYER", .referenced = TRUE, .force = TRUE)}
+\dontrun{idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)}
 
 # ===== SEARCH ADN REPLACE OBJECT VALUES =====
 # get objects whose field values contains both "VAV" and "Node"
