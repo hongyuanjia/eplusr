@@ -1,10 +1,10 @@
-# Version 0.9.4
+# Version 0.10.0
 
 ## Round 1
 
 ### Test environments
 
-* local Manjaro Linux 17.1.11.1 install, R 3.5.1
+* local Manjaro Linux 17.1.11.1 install, R 3.5.2
 * Windows (on appveyor-ci), R oldrel, release and devel
 * Ubuntu 14.04 (on travis-ci), R oldrel, release and devel
 * OS X (on travis-ci), R oldrel and release
