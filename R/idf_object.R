@@ -513,6 +513,7 @@ NULL
 #' mat$Thickness
 #'
 #' # check validate
+#' \dontrun{
 #' mat$validate()
 #' mat$is_valid()
 #'
@@ -526,7 +527,6 @@ NULL
 #' mat$ref_to_object() # not referencing other objects
 #' mat$has_ref_to()
 #'
-#'
 #' # get other objects that reference this object
 #' mat$ref_by_object() # referenced by construction "FLOOR"
 #' names(mat$ref_by_object())
@@ -535,6 +535,7 @@ NULL
 #'
 #' # check if having any referenced objects or is referenced by other objects
 #' mat$has_ref()
+#' }
 #'
 #' # get all object data in a data.table format without field units
 #' str(mat$to_table(unit = FALSE))
@@ -596,6 +597,7 @@ NULL
 #' @return An [IdfObject] object.
 #' @export
 #' @examples
+#' \dontrun{
 #' model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 #'
 #' # get an IdfObject using object ID
@@ -614,7 +616,7 @@ NULL
 #' zone
 #' eplusr_option(validate_level = "final")
 #' zone$validate()
-#'
+#' }
 #' @export
 # idf_object {{{
 idf_object <- function (parent, object = NULL, class = NULL) {

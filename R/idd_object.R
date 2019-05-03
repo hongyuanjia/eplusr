@@ -480,11 +480,13 @@ NULL
 #' # get field ranges
 #' mat$field_range(c("roughness", "thickness", "conductivity", "solar_absorptance"))
 #'
+#' \dontrun{
 #' # get field relation with other fields
 #' mat$field_relation(type = "all")
 #'
 #' # get all possible values of fields
 #' mat$field_possible()
+#' }
 #'
 #' # check if input is a valid field number for current class
 #' ## get required minimum field number
@@ -514,9 +516,6 @@ NULL
 #' # check if input field index is an extensible field index
 #' bran$is_extensible_index(1:4)
 #'
-#' # get all field referneces
-#' \dontrun{bran$field_reference(1:4)}
-#'
 #' # check if input is valid field name
 #' # NOTE: lower-style names are treated as valid
 #' mat$is_valid_field_name(c("nAmE", "specific heat", "Specific Heat", "specific_heat"))
@@ -544,6 +543,7 @@ NULL
 #' # check if fields are required, i.e. field values should not be empty
 #' mat$is_required_field(c("name", "roughness", "solar_absorptance"))
 #'
+#' \dontrun{
 #' # check if fields refer to or can be referred by other fields
 #' mat$has_ref()
 #'
@@ -552,6 +552,7 @@ NULL
 #'
 #' # check if fields can be referred by other fields
 #' mat$has_ref_by(which = NULL)
+#' }
 #'
 #' # ===== DATA EXTRACTION =====
 #' # get core data of current class
@@ -579,11 +580,13 @@ NULL
 #' @return An [IddObject] object.
 #' @export
 #' @examples
+#' \dontrun{
 #' idd <- use_idd(8.8, download = "auto")
 #'
 #' # get an IddObject using class name
 #' idd_object(idd, "Material")
 #' idd_object(8.8, "Material")
+#' }
 # idd_object {{{
 idd_object <- function (parent, class) {
     IddObject$new(class, parent)

@@ -1133,6 +1133,7 @@ NULL
 #' names(idf$search_object("r\\d", ignore.case = TRUE, class = "Construction"))
 #'
 #' # ===== DUPLICATE OBJECTS =====
+#' \dontrun{
 #' # duplicate objects in "Construction" class
 #' names(idf$Construction)
 #' idf$dup("R13WALL")
@@ -1145,9 +1146,11 @@ NULL
 #' idf$dup(My_R13Wall = "R13WALL")
 #'
 #' # duplicate an object multiple times
-#' \dontrun{idf$dup(rep("R13WALL", times = 10))}
+#' idf$dup(rep("R13WALL", times = 10))
+#' }
 #'
 #' # ===== ADD OBJECTS =====
+#' \dontrun{
 #' # add two new objects in "RunPeriod" class
 #' idf$add(
 #'     RunPeriod = list("rp_test_1", 1, 1, 2, 1,
@@ -1162,8 +1165,10 @@ NULL
 #'         .comment = "Comment for new object 2"
 #'      )
 #' )
+#' }
 #'
 #' # ===== INSERT OBJECTS =====
+#' \dontrun{
 #' # insert objects from other Idf object
 #' idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
 #'     idd = use_idd(8.8, download = "auto"))
@@ -1182,9 +1187,11 @@ NULL
 #' idf$object_name("Material")
 #'
 #' # $insert() is useful when importing design days from a ".ddy" file
-#' \dontrun{idf$insert(read_idf("foo.ddy"))}
+#' idf$insert(read_idf("foo.ddy"))
+#' }
 #'
 #' # ===== SET OBJECTS =====
+#' \dontrun{
 #' # set the thickness of newly inserted material "test" to 0.2 m
 #' idf$set(test = list(thickness = 0.2))
 #' idf$Material$test$Thickness
@@ -1204,12 +1211,16 @@ NULL
 #'
 #' # check results
 #' lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
+#' }
 #'
 #' # ===== RENAME OBJECTS =====
+#' \dontrun{
 #' idf$rename(new_test = "test")
 #' idf$object_name("Material")
+#' }
 #'
 #' # ===== DELELTE OBJECTS =====
+#' \dontrun{
 #' # delete the added run period "rp_test_1", "rp_test_2" and "new_test" from above
 #' idf$del(c("new_test", "rp_test_1", "rp_test_2"))
 #' names(idf$Material)
@@ -1223,14 +1234,15 @@ NULL
 #' idf$Material_NoMass$R13LAYER$ref_by_object()
 #' length(idf$Material_NoMass$R13LAYER$ref_by_object())
 #'
-#' \dontrun{idf$del("R13LAYER")} # will give an error in "final" validate level
+#' idf$del("R13LAYER") # will give an error in "final" validate level
 #'
 #' # objects referencing target objects can also be deleted by setting
 #' # `referenced` to TRUE
-#' \dontrun{idf$del("R13LAYER", .ref_by = TRUE)} # will give an error in "final" validate level
+#' idf$del("R13LAYER", .ref_by = TRUE) # will give an error in "final" validate level
 #'
 #' # it is possible to force delete objects
-#' \dontrun{idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)}
+#' idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)
+#' }
 #'
 #' # ===== SEARCH ADN REPLACE OBJECT VALUES =====
 #' # get objects whose field values contains both "VAV" and "Node"
@@ -1239,10 +1251,9 @@ NULL
 #' names(idf$search_value("WALL"))
 #'
 #' # replace values using regular expression
-#' idf$replace_value("WALL", "A_WALL")
+#' \dontrun{idf$replace_value("WALL", "A_WALL")}
 #'
 #' # ===== VALIDATE MODEL =====
-#' # CRAN does not like long-time tests
 #' \dontrun{
 #' # check if there are errors in current model
 #' idf$validate()
@@ -1279,11 +1290,12 @@ NULL
 #' # check if the model has been modified since read or last saved
 #' idf$is_unsaved()
 #'
+#' \dontrun{
 #' # save and overwrite current model
-#' \dontrun{idf$save(overwrite = TRUE)}
+#' idf$save(overwrite = TRUE)
 #'
 #' # save the model with newly created and modified objects at the top
-#' \dontrun{idf$save(overwrite = TRUE, format = "new_top")}
+#' idf$save(overwrite = TRUE, format = "new_top")
 #'
 #' # save the model to a new file
 #' idf$save(path = file.path(tempdir(), "test.idf"))
@@ -1294,8 +1306,10 @@ NULL
 #'
 #' # the path of this model will be changed to the saved path
 #' idf$path()
+#' }
 #'
 #' # ===== CLONE MODEL =====
+#' \dontrun{
 #' # Idf object are modified in place and has reference semantic.
 #' idf_2 <- idf
 #' idf_2$object_name("Building")
@@ -1312,8 +1326,9 @@ NULL
 #' idf_3$object_name("Building")
 #'
 #' idf$object_name("Building")
+#' }
 #'
-#' # run the model
+#' # ===== RUN MODEL =====
 #' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'
@@ -1353,11 +1368,13 @@ NULL
 #'     job$report_data()
 #' }
 #' }
-#' # print the text format of model
+#' # ===== PRINT MODEL =====
+#' \dontrun{
 #' idf$print("group")
 #' idf$print("class")
 #' idf$print("object")
 #' idf$print("field")
+#' }
 #' @docType class
 #' @name Idf
 #' @seealso [IdfObject] class
@@ -2311,7 +2328,7 @@ idf_add_output_sqlite <- function (idf) {
 #'
 #' # you can set `download` arugment to "auto" in `use_idd()` if you want to
 #' # automatically download corresponding IDD file when necessary
-#' read_idf(idf_path, use_idd(8.8, download = "auto"))
+#' \dontrun{read_idf(idf_path, use_idd(8.8, download = "auto"))}
 #'
 #' # Besides use a path to an IDF file, you can also provide IDF in literal
 #' # string format
@@ -2322,7 +2339,7 @@ idf_add_output_sqlite <- function (idf) {
 #'         Building;                !- Name
 #'     "
 #'
-#' read_idf(idf_string, use_idd(8.8, download = "auto"))
+#' \dontrun{read_idf(idf_string, use_idd(8.8, download = "auto"))}
 #' @seealso [Idf] class for modifying EnergyPlus model. [use_idd()] and
 #' [download_idd()] for downloading and parsing EnergyPlus IDD file.
 #' [use_eplus()] for configuring which version of EnergyPlus to use.
