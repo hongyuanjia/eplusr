@@ -1180,7 +1180,7 @@ assert_can_do <- function (idd_env, idf_env, dot, object,
     if (any(object$class_id == 1L)) {
         invld <- find_dot(dot, object[class_id == 1L])
 
-        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
+        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collapse = "\n")
 
         abort(paste0("error_", action, "_version"),
             paste0(
@@ -1860,7 +1860,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
     # stop of trying to add Version object
     if (any(obj$class_id == 1L)) {
         invld <- find_dot(l$dot, obj[class_id == 1L])
-        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
+        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collapse = "\n")
         abort("error_insert_version",
             paste0("Inserting Version object is prohibited. Invalid input:\n", m)
         )
@@ -2026,7 +2026,7 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
         # stop of trying to add Version object
         if (any(obj_dt$class_id == 1L)) {
             invld <- find_dot(l$dot, obj_dt[class_id == 1L])
-            m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collpase = "\n")
+            m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collapse = "\n")
             abort("error_add_version",
                 paste0("Adding Version object is prohibited. Invalid input:\n", m)
             )

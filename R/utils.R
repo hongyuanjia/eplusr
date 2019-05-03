@@ -295,6 +295,9 @@ cnd <- function (type = c("error", "warning", "message"), subclass, message, cal
 # abort {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
 abort <- function (subclass, message, call = NULL, ...) {
+    ori <- getOption("warning.length")
+    options(warning.length = 8170L)
+    on.exit(options(warning.length = ori), add = TRUE)
     err <- cnd(type = "error", subclass =  subclass, message = message, call = call, ...)
     stop(err)
 }
@@ -303,6 +306,9 @@ abort <- function (subclass, message, call = NULL, ...) {
 # warn {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
 warn <- function (subclass, message, call = NULL, ...) {
+    ori <- getOption("warning.length")
+    options(warning.length = 8170L)
+    on.exit(options(warning.length = ori), add = TRUE)
     w <- cnd(type = "warning", subclass =  subclass, message = message, call = call, ...)
     warning(w)
 }

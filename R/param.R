@@ -501,7 +501,7 @@ param_job_from_which <- function (self, private, which, keep_unsucess = FALSE) {
     if (isTRUE(!keep_unsucess) && not_empty(job[exit_status != 0L])) {
         unsuccessful <- job[exit_status != 0L]
         msg <- unsuccessful[, sim_status("UNSUCCESSFUL", index, idf, epw)]
-        stop("Some of jobs completed unsuccessfully:\n", paste0(msg, collpase = "\n"),
+        stop("Some of jobs completed unsuccessfully:\n", paste0(msg, collapse = "\n"),
             call. = FALSE
         )
     }

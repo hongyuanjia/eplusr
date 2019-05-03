@@ -1531,10 +1531,6 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
     all_mes <- paste0(c(start_rule, err_title, err_num, mes_rule, mes_line, post, end_rule),
         collapse = "\n")
 
-    ori <- getOption("warning.length")
-    options(warning.length = 8170L)
-    on.exit(options(warning.length = ori), add = TRUE)
-
     type <- match.arg(type)
     key <- if(stop) "ERROR" else "WARNING"
     all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
