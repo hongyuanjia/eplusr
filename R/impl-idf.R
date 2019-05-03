@@ -718,7 +718,7 @@ sep_definition_dots <- function (..., .version = NULL) {
             if (any(stri_startswith_fixed(value_chr[!defaulted], "!"))) {
                 abort("error_dot_def_value_type",
                     paste0("When input is a data.frame and `value` column is a list, ",
-                        "string value shoud not be IDF comment, i.e. starts with `!`. ",
+                        "string value should not be IDF comment, i.e. starts with `!`. ",
                         "Invalid input:\n",
                         str_trunc(dot_string(dt_dot[J(id), on = "rleid"]))
                     )
@@ -1746,7 +1746,12 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         max_depth = NULL, recursive = .recursive, name = eplusr_option("verbose_info")
     )
 
+    if (eplusr_option("verbose_info")) {
+        msg <- paste0("Deleting object(s) [ID: ", paste(id_del, sep = ", ", collapse = ", "), "]")
+    }
+
     id_ref_by <- c()
+
     if (nrow(rel$ref_by)) {
         # stop if objects are referred {{{
         if (!.ref_by && !.force) {
@@ -1762,10 +1767,6 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
             )
         }
         # }}}
-
-        if (eplusr_option("verbose_info")) {
-            msg <- paste0("Deleting object(s) [ID: ", paste(id_del, sep = ", ", collapse = ", "), "]")
-        }
 
         if (.ref_by) {
             id_ref_by <- setdiff(unique(rel$ref_by$object_id), id_del)

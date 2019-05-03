@@ -165,7 +165,7 @@ NULL
 #'   data.frame, `name` is ignored. All available `name` for current simulation
 #'   output can be obtained using `$report_data_dict()`.  Default: `NULL`.
 #' * `year`: Year of the date time in column `datetime`. If `NULL`, it
-#'    will calcualte a year value that meets the start day of week restriction
+#'    will calculate a year value that meets the start day of week restriction
 #'    for each environment. Default: `NULL`.
 #' * `tz`: Time zone of date time in column `datetime`. Default: `"UTC"`.
 #' * `case`: If not `NULL`, a character column will be added indicates the case

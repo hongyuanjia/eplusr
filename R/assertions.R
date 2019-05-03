@@ -97,7 +97,7 @@ is_version <- function (ver) {
 #' @param ver A character or numeric vector with suitable numeric version
 #' strings.
 #' @param strict If `FALSE`, `ver` can be a special string "latest" which
-#' represents the lastest version.
+#' represents the latest version.
 #' @return A logical vector.
 #' @rdname assertion
 #' @export

@@ -32,7 +32,7 @@ is_epw(x)
 strings.}
 
 \item{strict}{If \code{FALSE}, \code{ver} can be a special string "latest" which
-represents the lastest version.}
+represents the latest version.}
 
 \item{path}{A path to test.}
 

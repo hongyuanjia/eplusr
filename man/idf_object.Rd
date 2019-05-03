@@ -26,7 +26,7 @@ returns a corresponding \link{IdfObject}.
 }
 \details{
 If \code{object} is not given, an empty \link{IdfObject} of specified class is created,
-with all field vlaues filled with defaults, if possible.  Note that
+with all field values filled with defaults, if possible.  Note that
 validation is performed when creating, which means that an error may occur if
 current \link[=level_checks]{validate level} does not allow empty required fields.
 

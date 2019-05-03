@@ -172,7 +172,7 @@ Default: \code{NULL}.
 data.frame, \code{name} is ignored. All available \code{name} for current simulation
 output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
 \item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calcualte a year value that meets the start day of week restriction
+will calculate a year value that meets the start day of week restriction
 for each environment. Default: \code{NULL}.
 \item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
 \item \code{case}: If not \code{NULL}, a character column will be added indicates the case

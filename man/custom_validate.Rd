@@ -52,7 +52,7 @@ should be included during IDF object modifications using \code{$dup()}, \code{$a
 \details{
 There are 10 different validation check components in total. Three predefined
 validation level are included, i.e. \code{"none"}, \code{"draft"} and \code{"final"}. To get
-what valiation components those levels contain, see \code{\link[=level_checks]{level_checks()}}.
+what validation components those levels contain, see \code{\link[=level_checks]{level_checks()}}.
 }
 \examples{
 custom_validate(unique_object = TRUE)

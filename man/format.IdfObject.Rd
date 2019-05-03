@@ -18,7 +18,7 @@
 Default: \code{29L} which is the same as IDF Editor.}
 
 \item{all}{If \code{TRUE}, values of all possible fields in current class the
-\link{IdfObject} belongs to are retured. Default: \code{FALSE}}
+\link{IdfObject} belongs to are returned. Default: \code{FALSE}}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

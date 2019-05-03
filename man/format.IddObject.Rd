@@ -28,7 +28,7 @@ A single length character vector.
 }
 \description{
 Format an \link{IddObject} into a string of an empty object of current class.
-It is formated exactly the same as in IDF Editor.
+It is formatted exactly the same as in IDF Editor.
 }
 \examples{
 \dontrun{

@@ -1031,7 +1031,7 @@ parse_field_reference_table <- function (dt) {
 
 # sep_idf_lines {{{
 sep_idf_lines <- function (dt, type_enum) {
-    # mark location of first occurance "!" and "!-"
+    # mark location of first occurrence "!" and "!-"
     dt[, `:=`(excl_loc = stri_locate_first_fixed(string, "!")[, 1L])]
     dt[, `:=`(spcl_loc = stri_locate_first_fixed(string, "!-")[, 1L])]
 

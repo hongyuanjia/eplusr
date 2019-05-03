@@ -317,7 +317,7 @@ NULL
 #' * `name`: A character vector or field names. Can be given in underscore style,
 #'   e.g. `"Thermal Resistance"` can be given in format `"thermal_resistance"`.
 #' * `which`: An integer vector of field indexes or a character vector of field
-#'   names. Field names can be given in underscrore style.
+#'   names. Field names can be given in underscore style.
 #' * `unit`: If `TRUE`, field units will be pasted after field names, just like
 #'   the way IDF Editor does. Default: `FALSE`.
 #' * `in_ip`: If `TRUE`, field names or values will be returned in IP units.
@@ -342,7 +342,7 @@ NULL
 #' * `field`: Character type. Field names.
 #'
 #' `$to_string()` returns an empty object of current class in a character vector
-#' format. It is formated exactly the same as in IDF Editor.
+#' format. It is formatted exactly the same as in IDF Editor.
 #'
 #' **Arguments**
 #'
@@ -1177,7 +1177,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' Format an IddObject
 #'
 #' Format an [IddObject] into a string of an empty object of current class.
-#' It is formated exactly the same as in IDF Editor.
+#' It is formatted exactly the same as in IDF Editor.
 #'
 #' @param x An [IddObject] object.
 #' @param all If `TRUE`, all fields in current class are returned, otherwise
@@ -1205,7 +1205,7 @@ format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all
 #' Coerce an IddObject into a Character Vector
 #'
 #' Coerce an [IddObject] into an empty object of current class in a character
-#' vector format. It is formated exactly the same as in IDF Editor.
+#' vector format. It is formatted exactly the same as in IDF Editor.
 #'
 #' @inheritParams format.IddObject
 #' @return A character vector.

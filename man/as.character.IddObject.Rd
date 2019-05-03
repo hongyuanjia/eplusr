@@ -28,7 +28,7 @@ A character vector.
 }
 \description{
 Coerce an \link{IddObject} into an empty object of current class in a character
-vector format. It is formated exactly the same as in IDF Editor.
+vector format. It is formatted exactly the same as in IDF Editor.
 }
 \examples{
 \dontrun{

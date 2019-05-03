@@ -65,7 +65,7 @@ break changes. Detailed updates per class are as follow:
 ## `Idf` Class
 
 * An argument `sorted` is added in `$class_name()` and `$group_name()`to control
-  whether to sort the returned value according to the occurances in IDD or not.
+  whether to sort the returned value according to the occurrence in IDD or not.
 
 * `$definition()` now only accepts one class name and returns a single
   `IddObject`, not a list of `IddObject`.
@@ -82,7 +82,7 @@ break changes. Detailed updates per class are as follow:
 
 * `$object_in_class()` now is deprecated in flavor of `$objects_in_class()`.
 
-* New mthod `$objects_in_group()` is aded to get all objects in specified group.
+* New method `$objects_in_group()` is added to get all objects in specified group.
 
 * `$search_object()`, `$search_value()` and `$replace_value()` now can take same
   arguments as `base::grepl()` to further control the way it searches objects.
@@ -158,7 +158,7 @@ break changes. Detailed updates per class are as follow:
 
 ## `Epw` Class
 
-* `Epw` class has been totaly rewritten which provides much more
+* `Epw` class has been totally rewritten which provides much more
   functionalities. Please refer to package documentation for details.
   All headers are parsed and can be retrieve in `Epw` class.
 
@@ -180,7 +180,7 @@ break changes. Detailed updates per class are as follow:
 
 ## `EplusJob` Class
 
-* New memthod `$path()` is added to return the path of IDF and/or EPW file of
+* New method `$path()` is added to return the path of IDF and/or EPW file of
   the job.
 
 * New method `$list_table()`, `$read_table()` are added which provide the same
@@ -226,7 +226,7 @@ break changes. Detailed updates per class are as follow:
 
 * Right now, all returned object and field names will remain what they are as in
   the IDF, instead of converting them into `underscore` style names in the
-  retured lists.
+  returned lists.
 
 * The `num_digits` option has been deprecated as formatting of numeric fields
   are now handled by R itself.
@@ -241,7 +241,7 @@ break changes. Detailed updates per class are as follow:
 
 ## New features
 
-* Now you can directly download EnergyPus Weather File (.epw) and Design Day
+* Now you can directly download EnergyPlus Weather File (.epw) and Design Day
   File (.ddy) using new function `download_weather()`. It takes a regular
   expression as input, searches through EnergyPlus weather data base (stored
   in this package), download corresponding files and return the saved paths.
@@ -259,7 +259,7 @@ break changes. Detailed updates per class are as follow:
     ```
   - Search locations that contains string `"beijing"` and `"cswd"`. If no more
     than 3 results found, directly download all weather files and save them to
-    temperory directory.
+    temporary directory.
     ```r
     download_weather("beijing.*cswd", dir = tempdir(), type = "epw", ask = FALSE, max_match = 3)
     ```
@@ -374,7 +374,7 @@ break changes. Detailed updates per class are as follow:
 
 * Package documentation has been heavily updated. Examples of every exported
   class and most functions have been added. Also, an example IDF file
-  `"1ZoneUncontrolled.idf"` from EnergyPus v8.8.0 is included in the package,
+  `"1ZoneUncontrolled.idf"` from EnergyPlus v8.8.0 is included in the package,
   which makes it possible to run most examples without installing EnergyPlus. Of
   cause, for examples in `EplusJob` and `ParametricJob` class, EnergyPlus
   installation is needed to run them successfully.
@@ -432,7 +432,7 @@ break changes. Detailed updates per class are as follow:
 * Fix the error of `output_dir` argument checking in `rum_multi()`.
 
 * Now an informative error message is given when there is no SQL output found
-  when tring to read simulation output using `$report_data()`,
+  when trying to read simulation output using `$report_data()`,
   `$report_data_dict` and `tabular_data()` in `EplusJob` class.
 
 * `run_idf()` and `run_multi()` now does not call `clean_wd()` as this is
@@ -456,7 +456,7 @@ break changes. Detailed updates per class are as follow:
 
 * Fix the error that `$state_province` in `Epw` class always returns `NULL`.
 
-* Fix the error of missing expanded IDF files which occured randomly in
+* Fix the error of missing expanded IDF files which occurred randomly in
   `run_multi()`.
 
 # eplusr 0.8.3
@@ -515,7 +515,7 @@ break changes. Detailed updates per class are as follow:
 ## New feature
 
 * `$get_value()` in `IdfObject` class new has a new argument `simplify`. If
-  `TRUE`, a character vecotr will be returned instead of a named list. Default
+  `TRUE`, a character vector will be returned instead of a named list. Default
   is `FALSE`.
 
 ## Minor changes

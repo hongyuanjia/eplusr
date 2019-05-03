@@ -374,7 +374,7 @@ EPWDATE_YEAR <- list(
 #    *. Jan 02 01:00, Jan 02 01:30
 #    *. Jan 02 01:30, Jan 02 01:60
 #
-#    Only the number after the first occurance of that hour counts. Even though
+#    Only the number after the first occurrence of that hour counts. Even though
 #    the "Minute" column is read and stored, EnergyPlus never use that data.
 #
 # 3. The Hour column in the core weather data corresponds the period from
@@ -2056,7 +2056,7 @@ set_epw_holiday <- function (epw_header, leapyear, dst, holiday) {
 
         # current is non-leap year but want to change to leap year
         # for md type, it is ok to change only if that period does not
-        # accross Feb, e.g. [01/02, 02/28], [03/01, 12/31]
+        # across Feb, e.g. [01/02, 02/28], [03/01, 12/31]
         # for ymd type, it is always OK
         } else if (!epw_header$holiday$leapyear & leapyear) {
             is_md <- is_epwdate_type(s, "md")

@@ -54,10 +54,10 @@ file, if \code{DisplayWeatherMissingDataWarnings} is turned on in
 \code{Output:Diagnostics} object. In EnergyPlus, missing data is shown only for
 fields that EnergyPlus will use. EnergyPlus will fill some missing data
 automatically during simulation. Likewise out of range values are counted for
-each occurance and summarized. However, note that the out of range values
+each occurrence and summarized. However, note that the out of range values
 will \strong{not be changed} by EnergyPlus and could affect your simulation.
 
-\code{Epw} class provides methods to easily extract and inspect thoese abnormal
+\code{Epw} class provides methods to easily extract and inspect those abnormal
 (missing and out of range) weather data and also to know what kind of actions
 that EnergyPlus will perform on those data.
 
@@ -163,13 +163,13 @@ For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
 \code{$typical_extreme_period()} returns the parsed values of \code{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
 columns:
 \itemize{
-\item \code{index}: Integer type. The index of typical or extrame period record
-\item \code{name}: Character type. The name of typical or extrame period record
+\item \code{index}: Integer type. The index of typical or extreme period record
+\item \code{name}: Character type. The name of typical or extreme period record
 \item \code{type}: Character type. The type of period. Possible value: \code{typical} and
 \code{extreme}
-\item \code{start_day}: Date type with customing formatting. The start day of the
+\item \code{start_day}: Date type with customized formatting. The start day of the
 period
-\item \code{start_day}: Date type with customing formatting. The end day of the
+\item \code{start_day}: Date type with customized formatting. The end day of the
 period
 }
 }
@@ -182,7 +182,7 @@ header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
 \item \code{depth}: Numeric type. The depth of the ground temperature is measured
-\item \code{month}: Integer type. The month when the ground temperature is meansured
+\item \code{month}: Integer type. The month when the ground temperature is measured
 \item \code{soil_conductivity}: Numeric type. The soil conductivity at measured depth
 \item \code{soil_density}: Numeric type. The soil density at measured depth
 \item \code{soil_specific heat}: Numeric type. The soil specific heat at measured depth
@@ -194,7 +194,7 @@ header in a \link[data.table:data.table]{data.table} format with 7 columns:
 }
 
 \code{$holiday()} takes new value for leap year indicator, daylight saving time
-and holiday specifiations, set these new values and returns the parsed values
+and holiday specifications, set these new values and returns the parsed values
 of \code{HOLIDAYS/DAYLIGHT SAVINGS} header. If no input is given, current values
 of \code{HOLIDAYS/DAYLIGHT SAVINGS} header is returned. It returns a list of 3
 elements:
@@ -216,14 +216,14 @@ indicator:
 \item If current record of \code{leapyear} is \code{TRUE}, but new input is \code{FALSE}, the
 modification is only conducted when all data periods do not cover Feb 29.
 \item If current record of \code{leapyear} is \code{FALSE}, but new input is \code{TRUE}, the
-modification is only conducted when TMY data periods do not accross Feb,
+modification is only conducted when TMY data periods do not across Feb,
 e.g. [01/02, 02/28], [03/01, 12/31]; for AMY data, it is always OK.
 }
 
-The date specifictions in \code{dst} and \code{holiday} should follow the rules of
+The date specifications in \code{dst} and \code{holiday} should follow the rules of
 \strong{"Table 2.14: Weather File Date File Interpretation"} in
 "AuxiliaryPrograms" documentation. eplusr is able to handle all those kinds of
-formats automatically. Basially, 5 formats are allowed:
+formats automatically. Basically, 5 formats are allowed:
 \enumerate{
 \item A single integer is interpreted as the Julian day of year. For example,
 \code{1}, \code{2}, \code{3} and \code{4} will be parsed and presented as \code{1st day}, \code{2nd day}, \code{3rd day} and \code{4th day}.
@@ -248,7 +248,7 @@ way as No.3 format described above.
 daylight saving time. For example, \code{c(3.10, 10.3)}.
 \item \code{holiday}: a list or a data.frame containing two elements (columns) \code{name}
 and \code{day} where \code{name} are the holiday names and \code{day} are valid EPW date
-specifictions. For example, \code{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))}.
+specifications For example, \code{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))}.
 }
 }
 
@@ -278,7 +278,7 @@ current \code{Epw} contains.
 data exist in one hour.
 
 \code{$period()} takes a data period index, a new period name and start day of
-week specifiction, and uses that input to replace the data period's name and
+week specification, and uses that input to replace the data period's name and
 start day of week. If no input is given, data periods in current \code{Epw} is
 returned.
 
@@ -332,7 +332,7 @@ found for corresponding weather data. There are 3 types of actions in total:
 \item \code{do_nothing}: All abnormal values are left as they are.
 \item \code{use_zero}: All abnormal values are reset to zeros.
 \item \code{use_previous}: The first abnormal values of variables will be set to the
-initial missing values. All after are set to privious valid one.
+initial missing values. All after are set to previous valid one.
 }
 
 \strong{Arguments}:
@@ -351,8 +351,8 @@ epw$redundant_data()
 \code{$data()} returns weather data of specific data period.
 
 Usually, EPW file downloaded from \href{https://energyplus.net/}{EnergyPlus website}
-contains TMY weather data. As years of weather data is not concesutive, it may
-be more convenient to align the year values to be concesutive, which will
+contains TMY weather data. As years of weather data is not consecutive, it may
+be more convenient to align the year values to be consecutive, which will
 makes it possible to direct analyze and plot weather data. The \code{start_year}
 argument in \code{$data()} method can help to achieve this. However, randomly
 setting the \code{year} may result in a date time series that does not have the
@@ -387,7 +387,7 @@ occur in the actual EPW file.
 \strong{Arguments}:
 \itemize{
 \item \code{period}: A single positive integer identifying the data period index. Data
-periods infomation can be obtained using \code{$period()} described above.
+periods information can be obtained using \code{$period()} described above.
 \item \code{start_year}: A positive integer identifying the year of first date time in
 specified data period. If \code{NULL}, the values in the \code{year} column are used
 as years of \code{datetime} column. Default: \code{NULL}.
@@ -425,7 +425,7 @@ after calling these methods.
 
 \code{$make_na()} converts specified abnormal data into \code{NA}s in specified data
 period. This makes it easier to find abnormal data directly using
-\code{\link[base:is.na]{base::is.na()}} insteading of using \code{$missing_code()}.
+\code{\link[base:is.na]{base::is.na()}} instead of using \code{$missing_code()}.
 
 \code{$fill_abnormal()} fills specified abnormal data using corresponding actions
 listed in \code{$fill_action()}. For what kinds of actions to be performed, please
@@ -453,7 +453,7 @@ data period.
 \strong{Arguments}:
 \itemize{
 \item \code{period}: A positive integer vector identifying the data period indexes.
-Data periods infomation can be obtained using \code{$period()} described
+Data periods information can be obtained using \code{$period()} described
 above. If \code{NULL}, all data periods are included. Default: \code{NULL}.
 \item \code{missing}: If \code{TRUE}, missing values are included. Default: \code{FALSE}.
 \item \code{out_of_range}: If \code{TRUE}, out-of-range values are included. Default:
@@ -480,11 +480,11 @@ rules following:
 \itemize{
 \item Column \code{datetime} exists and has type of \code{POSIXct}. Note that time zone of
 input date time will be reset to \code{UTC}.
-\item It assumes that input data is already sorted, i.e. no furthing sorting is
-made during validation. This is becasue when input data is TMY data, there
+\item It assumes that input data is already sorted, i.e. no further sorting is
+made during validation. This is because when input data is TMY data, there
 is no way to properly sort input data rows only using \code{datetime} column.
 \item Number of data records per hour should be consistent across input data.
-\item Input number of data records per hour shoud be the same as
+\item Input number of data records per hour should be the same as
 existing data periods.
 \item The date time of input data should not overlap with existing data periods.
 \item Input data should have all 29 weather data columns with right types. The
@@ -503,7 +503,7 @@ Validation is performed according to rules described above.
 \item \code{realyear}: Whether input data is AMY data. Default: \code{FALSE}.
 \item \code{name}: A new string used as name of added or set data period. Should not
 be the same as existing data period names. If \code{NULL}, it is generated
-automatically in format \code{Data}, \code{Data_1} and ect., based on existing data
+automatically in format \code{Data}, \code{Data_1} and etc., based on existing data
 period names. Default: \code{NULL}
 \item \code{start_day_of_week}: A single integer or character specifying start day of
 week of input data period. If \code{NULL}, Sunday is used for TMY data and the

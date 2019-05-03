@@ -315,7 +315,7 @@ fields.
 \item \code{name}: A character vector or field names. Can be given in underscore style,
 e.g. \code{"Thermal Resistance"} can be given in format \code{"thermal_resistance"}.
 \item \code{which}: An integer vector of field indexes or a character vector of field
-names. Field names can be given in underscrore style.
+names. Field names can be given in underscore style.
 \item \code{unit}: If \code{TRUE}, field units will be pasted after field names, just like
 the way IDF Editor does. Default: \code{FALSE}.
 \item \code{in_ip}: If \code{TRUE}, field names or values will be returned in IP units.
@@ -342,7 +342,7 @@ core data of current class. It has 3 columns:
 }
 
 \code{$to_string()} returns an empty object of current class in a character vector
-format. It is formated exactly the same as in IDF Editor.
+format. It is formatted exactly the same as in IDF Editor.
 
 \strong{Arguments}
 \itemize{

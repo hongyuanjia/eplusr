@@ -178,7 +178,7 @@ are returned. For fields of numeric types with no specified ranges,
 set to \code{Inf}, and \code{upper_incbounds} is set to FALSE. The field range is
 printed in number interval denotation.
 \item \code{source}: Exists only when \code{"source"} is one of \code{type}. List type. Each
-element is a chracter vector which includes all values from other objects
+element is a character vector which includes all values from other objects
 that current field can use as sources and refers to.
 }
 
@@ -187,7 +187,7 @@ that current field can use as sources and refers to.
 \item \code{which}: An integer vector of field indexes or a character vector of field
 names.
 \item \code{all}: If \code{TRUE}, values of all possible fields in current class the
-\code{IdfObject} belongs to are retured. Default: \code{FALSE}
+\code{IdfObject} belongs to are returned. Default: \code{FALSE}
 \item \code{simplify}: If \code{TRUE}, values of fields are converted into characters
 and the converted character vector is returned.
 \item \code{FieldName}: A single length character vector of one valid field name where
@@ -405,7 +405,7 @@ column. Default: \code{FALSE}.
 \item \code{sep_at}: The character width to separate value string and field string.
 Default: \code{29L} which is the same as IDF Editor.
 \item \code{all}: If \code{TRUE}, values of all possible fields in current class the
-\code{IdfObject} belongs to are retured. Default: \code{FALSE}
+\code{IdfObject} belongs to are returned. Default: \code{FALSE}
 }
 }
 

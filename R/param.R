@@ -153,7 +153,7 @@ NULL
 #'   finish. If `FALSE`, all EnergyPlus simulations are run in the background.
 #'   Default: `TRUE`.
 #' * `force`: Only applicable when the last simulation runs with `wait` equals
-#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   to `FALSE` and is still running. If `TRUE`, current running job is
 #'   forced to stop and a new one will start. Default: `FALSE`.
 #' * `copy_external`: If `TRUE`, the external files that every `Idf` object
 #'   depends on will also be copied into the simulation output directory. The
@@ -161,7 +161,7 @@ NULL
 #'   only `Schedule:File` class is supported.  This ensures that the output
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
-#' * `suffix`: A string that indicates the file extensition of simulation output.
+#' * `suffix`: A string that indicates the file extension of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
 #'   still running or the file does not exist. Default: `TRUE`.
@@ -177,7 +177,7 @@ NULL
 #'   data.frame, `name` is ignored. All available `name` for current simulation
 #'   output can be obtained using `$report_data_dict()`.  Default: `NULL`.
 #' * `year`: Year of the date time in column `datetime`. If `NULL`, it
-#'    will calcualte a year value that meets the start day of week restriction
+#'    will calculate a year value that meets the start day of week restriction
 #'    for each environment. Default: `NULL`.
 #' * `tz`: Time zone of date time in column `datetime`. Default: `"UTC"`.
 #' * `case`: If not `NULL`, a character column will be added indicates the case

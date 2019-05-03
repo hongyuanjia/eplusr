@@ -225,7 +225,7 @@ them.
 |                     | `$is_valid_group()`      | Check group existence                             |
 |                     | `$is_valid_class()`      | Check class existence                             |
 | Definition          | `$definition()`          | Get corresponding `IddObject`                     |
-| Object Info         | `$object_id()`           | Get object unqiue ID                              |
+| Object Info         | `$object_id()`           | Get object unique ID                              |
 |                     | `$object_name()`         | Get object name                                   |
 |                     | `$object_num()`          | Get object number in class                        |
 |                     | `$is_valid_id()`         | Check object ID existence                         |
@@ -452,7 +452,7 @@ which works on multiple objects, and the other way is using methods in
 `$paste()`.
 
 Object IDs will be appended after new objects are added, and the most-newly
-added object will alway have the max ID. Object IDs will never be reused, even
+added object will always have the max ID. Object IDs will never be reused, even
 though their binded objects have been deleted using `$del()`.
 
 For modifying object's comments and values, you can also use `$comment()`
@@ -595,7 +595,7 @@ First, let's try to direct delete Material `MAT-CLNG-1`.
 model$del("mat-clng-1")
 ```
 
-We got an error, becase directly deleting `MAT-CLNG-1` will introduce invaid
+We got an error, because directly deleting `MAT-CLNG-1` will introduce invalid
 reference in Construction `CLNG-1`.
 
 In some cases, you may still want to delete that object. You can achieve this by
@@ -610,18 +610,18 @@ model$del("mat-clng-1", .force = TRUE)
 Once an IDF file is opened in IDF Editor, you can copy objects by clicking the
 `Copy Obj` button in IDF Editor, and use `$paste()` to insert those objects into
 current `Idf`. Note that IDF Editor only exists on Windows, which means that
-`$paste()` will also work only on that platfrom.
+`$paste()` will also work only on that platform.
 
 ## Validate
 
 `$validate()` checks if there are errors in current `Idf` under specified
-validation level. You can customize what kind of errors to check by changin the
+validation level. You can customize what kind of errors to check by changing the
 `level` argument. The default validation level is equal to
 `eplusr_option("validate_level")`.
 
 There are 10 different validation check components in total. Three predefined
 validation level are included, i.e. `"none"`, `"draft"` and `"final"`. To get
-what valiation components those levels contain, use `level_checks()`.
+what validation components those levels contain, use `level_checks()`.
 
 ```{r validate}
 eplusr_option("validate_level")
@@ -641,7 +641,7 @@ As we can see, the invalid reference in construction `CLNG-1` is successfully
 detected.
 
 In this example, we already knows that `CLNG-1` is the invalid object. In many
-cases, we don't know what that infomation in advance, we can extract
+cases, we don't know what that information in advance, we can extract
 invalid objects for different types directly using `$validate()`. Below, we
 extract all objects that have invalid reference errors.
 
@@ -751,7 +751,7 @@ str(job$report_data_dict())
 
 `$report_data()` extracts the report data using key values and variable names.
 Just for demonstration, let's get the transformer input electric power at 11 p.m
-for the first day of runperiod named `SUMMERDAY`, tag this simulation as case
+for the first day of RunPeriod named `SUMMERDAY`, tag this simulation as case
 `example`, and return all possible output columns.
 
 ```{r output, eval = can_run}

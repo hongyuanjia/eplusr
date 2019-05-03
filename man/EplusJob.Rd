@@ -109,7 +109,7 @@ EnergyPlus standard output (stdout) and error (stderr) is printed to
 R console. If \code{FALSE}, simulation will be run in a background process.
 Default: \code{TRUE}.
 \item \code{force}: Only applicable when the last job runs with \code{wait} equals
-to \code{FALSE} and is still running. If \code{TRUE}, currenting running job is
+to \code{FALSE} and is still running. If \code{TRUE}, current running job is
 forced to stop and a new one will start. Default: \code{FALSE}.
 \item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
 }
@@ -230,7 +230,7 @@ Default: \code{NULL}.
 data.frame, \code{name} is ignored. All available \code{name} for current simulation
 output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
 \item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calcualte a year value that meets the start day of week restriction
+will calculate a year value that meets the start day of week restriction
 for each environment. Default: \code{NULL}.
 \item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
 \item \code{case}: If not \code{NULL}, a character column will be added indicates the case

@@ -120,7 +120,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: `/tmp/RtmppAXxqa/temp_libpath2a756034dfe9/eplusr/extdata/1Zon...
+#>  * Path: `/tmp/RtmpKGrq3w/temp_libpath47de6b1cf74b/eplusr/extdata/1Zon...
 #>  * Version: `8.8.0`
 #> 
 #> Group: <Simulation Parameters>
@@ -325,13 +325,13 @@ job <- idf$run(epw)
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing IDF located at /tmp/RtmppAXxqa/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpKGrq3w/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.008
+#> ExpandObjects Finished. Time:     0.005
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.02 02:43
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.03 15:23
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -357,7 +357,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ══════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2019-05-02 02:43:00
+#>   * Simulation started: 2019-05-03 15:23:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
@@ -422,7 +422,7 @@ job$tabular_data(table_name = "site and source energy", row_name = "total site e
 #> 3: Total Site Energy MJ/m2
 ```
 
-## Acknowledgements
+## Acknowledgement
 
 I would like to thank many open source projects who have heavily
 inspired the development of eplusr package, especially these below:
@@ -434,7 +434,7 @@ inspired the development of eplusr package, especially these below:
     modeling using EnergyPlus and advanced daylight analysis using
     Radiance.
   - [eppy](https://github.com/santoshphilip/eppy): Scripting language
-    for E+, Energyplus.
+    for E+, EnergyPlus.
   - [JEplus](http://www.jeplus.org): An EnergyPlus simulation manager
     for parametrics.
 

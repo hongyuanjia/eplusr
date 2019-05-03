@@ -21,7 +21,7 @@ NULL
 #' Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
 #' data in different [data.table::data.table]s. So to modify an EnergyPlus model
 #' in eplusr is equal to change the data in those IDF tables accordingly, in the
-#' context of specific IDD data. This means that a correspoding [Idd] object is
+#' context of specific IDD data. This means that a corresponding [Idd] object is
 #' needed whenever creating an `Idf` object. eplusr provides several
 #' [helpers][use_idd()] to easily download IDD files and create [Idd] objects.
 #'
@@ -122,7 +122,7 @@ NULL
 #'   underlying [Idd] object. Default: `FALSE`.
 #' * `sorted`: Only applicable when `all` is `FALSE`. If `TRUE`, duplications in
 #'   returned group or class names are removed, and unique names are further
-#'   sorted according to their occurances in the underlying [Idd] object.
+#'   sorted according to their occurrences in the underlying [Idd] object.
 #'   Default: `TRUE`.
 #' * `group`: A character vector of valid group names.
 #' * `class`: A character vector of valid class names.
@@ -207,7 +207,7 @@ NULL
 #' ```
 #'
 #' This means that the value `"WD01"` of `Outside Layer` in a construction named
-#' `WALL-1` refers to a material named `WD01`. All those objects can be futher
+#' `WALL-1` refers to a material named `WD01`. All those objects can be further
 #' easily extracted using `$objects_in_relation()` method described below.
 #'
 #' **Arguments**:
@@ -231,7 +231,7 @@ NULL
 #' }
 #'
 #' `$object()` returns an [IdfObject] specified by an object ID or name. Note
-#' that unlike object ID, which is always unique accross the whole `Idf` object,
+#' that unlike object ID, which is always unique across the whole `Idf` object,
 #' sometimes different objects can have the same name. If the name given matches
 #' multiple objects, an error is issued showing what objects are matched by the
 #' same name. This behavior is consistent in all methods that take an object
@@ -467,7 +467,7 @@ NULL
 #'
 #' * Specify object with name: `model$set(Object_Name = list(val1, val2, val3))`.
 #' * Specify object with ID: `model$set(..8 = list(val1))`.
-#' * Overwrite exisint object comments: `model$set(..8 = list(.comment = c("new", "comment")))`.
+#' * Overwrite existing object comments: `model$set(..8 = list(.comment = c("new", "comment")))`.
 #' * Delete field value: `model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)`.
 #' * Assign default field value: `model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)`.
 #' * Variable input: `a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)`.
@@ -519,7 +519,7 @@ NULL
 #'   will also be deleted. Default: `FALSE`.
 #' * `.recursive`: If `TRUE`, relation searching is performed recursively, in
 #'   case that objects whose fields refer to target object are also referred by
-#'   another object, and also objects whose fields are referred by target obejct
+#'   another object, and also objects whose fields are referred by target object
 #'   are also referred by another object. Default: `FALSE`.
 #' * `.force`: If `TRUE`, objects are deleted even if they are referred by other
 #'   objects.
@@ -609,7 +609,7 @@ NULL
 #'
 #' For object definitions in character vector format, they follow the same rules
 #' as normal IDF file. Each object starts with a class name and a comma (`,`),
-#' seperates each values with a comma (`,`) and ends with a semicolon (`;`).
+#' separates each values with a comma (`,`) and ends with a semicolon (`;`).
 #' Noted that you can also provide headers to indicate if input objects are
 #' presented in IP units, using `!-Option ViewInIPunits`. If this header does
 #' not exist, then all values are treated as in SI units.
@@ -623,7 +623,7 @@ NULL
 #'   [Idd] object. You can get all valid class names using
 #'   `use_idd(model$version())$class_name()`
 #' * `index`: **Mandatory**. Integer type. Valid field indexes for each class.
-#' * `value`: **Mandatory**. Charater type or list type. The value of each field
+#' * `value`: **Mandatory**. Character type or list type. The value of each field
 #'   to be added.
 #'   * If `value` is a character column, usually when `string_value` is `TRUE`
 #'     in method `$to_table()` in `Idf` and [IdfObject] class. Each value should
@@ -648,7 +648,7 @@ NULL
 #'
 #' **Argument**:
 #'
-#' * `...`: Character vectors or data.frames of object defitions. For details,
+#' * `...`: Character vectors or data.frames of object definitions For details,
 #'   see above.
 #' * `.unique`: If there are duplications in input [IdfObject]s or there is same
 #'   object in current Idf, duplications in input are removed. Default: `TRUE`.
@@ -837,7 +837,7 @@ NULL
 #' * `class_id`: indexes of classes that invalid objects belong to
 #' * `class_name`: names of classes that invalid objects belong to
 #' * `field_id`: indexes (at Idd level) of object fields that are invalid
-#' * `field_index`: indexes of object fields in correspoinding that are invalid
+#' * `field_index`: indexes of object fields in corresponding that are invalid
 #' * `field_name`: names (without units) of object fields that are invalid
 #' * `units`: SI units of object fields that are invalid
 #' * `ip_units`: IP units of object fields that are invalid
@@ -980,7 +980,7 @@ NULL
 #'    standard output and error of EnergyPlus to the screen. If `FALSE`, the
 #'    simulation will run in the background. Default is `TRUE`.
 #' * `force`: Only applicable when the last simulation runs with `wait` equals
-#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   to `FALSE` and is still running. If `TRUE`, current running job is
 #'   forced to stop and a new one will start. Default: `FALSE`.
 #' * `copy_external`: If `TRUE`, the external files that current `Idf` object
 #'   depends on will also be copied into the simulation output directory. The
@@ -1006,7 +1006,7 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `zoom`: Control how detailed of the Idf object shoud be printed. Should be
+#' * `zoom`: Control how detailed of the Idf object should be printed. Should be
 #'   one of `"group"`, `"class"`, `"object"` and `"field"`. Default: `"group"`.
 #'
 #'   * `"group"`: all group names current existing are shown with prevailing
@@ -1215,7 +1215,7 @@ NULL
 #' names(idf$Material)
 #' names(idf$RunPeriod)
 #'
-#' # In "final" validate level, delete will be aborted if the target obejcts are
+#' # In "final" validate level, delete will be aborted if the target objects are
 #' # referenced by other objects.
 #' # get objects that referenced material "R13LAYER"
 #' eplusr_option("validate_level")

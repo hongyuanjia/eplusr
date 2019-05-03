@@ -94,7 +94,7 @@ and \code{$objects_in_relation()}, a single string of valid class name.
 \code{"ref_to"} or "ref_by". For \code{$objects_in_relation()}, only \code{"ref_to"} and
 \code{"ref_by"} are acceptable.
 \item \code{all}: If \code{TRUE}, all fields in specified classes are returned. If \code{FALSE},
-only mininum required fields are returned. Default: \code{FALSE}.
+only minimum required fields are returned. Default: \code{FALSE}.
 \item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
 \item \code{sep_at}: The character width to separate value string and field string.
 Default: \code{29L} which is the same as IDF Editor.
@@ -180,7 +180,7 @@ core data of specified class. It has 3 columns:
 }
 
 \code{$to_string()} returns empty objects of specified class in a character vector
-format. It is formated exactly the same as in IDF Editor.
+format. It is formatted exactly the same as in IDF Editor.
 
 \code{$print()} prints basic info ob current Idd object, including version, build
 tag and total class number.

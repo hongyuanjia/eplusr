@@ -56,10 +56,10 @@ NULL
 #' `Output:Diagnostics` object. In EnergyPlus, missing data is shown only for
 #' fields that EnergyPlus will use. EnergyPlus will fill some missing data
 #' automatically during simulation. Likewise out of range values are counted for
-#' each occurance and summarized. However, note that the out of range values
+#' each occurrence and summarized. However, note that the out of range values
 #' will **not be changed** by EnergyPlus and could affect your simulation.
 #'
-#' `Epw` class provides methods to easily extract and inspect thoese abnormal
+#' `Epw` class provides methods to easily extract and inspect those abnormal
 #' (missing and out of range) weather data and also to know what kind of actions
 #' that EnergyPlus will perform on those data.
 #'
@@ -169,13 +169,13 @@ NULL
 #' PERIOD` header in a [data.table][data.table::data.table()] format with 6
 #' columns:
 #'
-#' * `index`: Integer type. The index of typical or extrame period record
-#' * `name`: Character type. The name of typical or extrame period record
+#' * `index`: Integer type. The index of typical or extreme period record
+#' * `name`: Character type. The name of typical or extreme period record
 #' * `type`: Character type. The type of period. Possible value: `typical` and
 #'   `extreme`
-#' * `start_day`: Date type with customing formatting. The start day of the
+#' * `start_day`: Date type with customized formatting. The start day of the
 #'   period
-#' * `start_day`: Date type with customing formatting. The end day of the
+#' * `start_day`: Date type with customized formatting. The end day of the
 #'   period
 #' }
 #'
@@ -189,7 +189,7 @@ NULL
 #'
 #' * `index`: Integer type. The index of ground temperature record
 #' * `depth`: Numeric type. The depth of the ground temperature is measured
-#' * `month`: Integer type. The month when the ground temperature is meansured
+#' * `month`: Integer type. The month when the ground temperature is measured
 #' * `soil_conductivity`: Numeric type. The soil conductivity at measured depth
 #' * `soil_density`: Numeric type. The soil density at measured depth
 #' * `soil_specific heat`: Numeric type. The soil specific heat at measured depth
@@ -202,7 +202,7 @@ NULL
 #' ```
 #'
 #' `$holiday()` takes new value for leap year indicator, daylight saving time
-#' and holiday specifiations, set these new values and returns the parsed values
+#' and holiday specifications, set these new values and returns the parsed values
 #' of `HOLIDAYS/DAYLIGHT SAVINGS` header. If no input is given, current values
 #' of `HOLIDAYS/DAYLIGHT SAVINGS` header is returned. It returns a list of 3
 #' elements:
@@ -221,13 +221,13 @@ NULL
 #'  * If current record of `leapyear` is `TRUE`, but new input is `FALSE`, the
 #'    modification is only conducted when all data periods do not cover Feb 29.
 #'  * If current record of `leapyear` is `FALSE`, but new input is `TRUE`, the
-#'    modification is only conducted when TMY data periods do not accross Feb,
+#'    modification is only conducted when TMY data periods do not across Feb,
 #'    e.g. \[01/02, 02/28\], \[03/01, 12/31\]; for AMY data, it is always OK.
 #'
-#' The date specifictions in `dst` and `holiday` should follow the rules of
+#' The date specifications in `dst` and `holiday` should follow the rules of
 #' **"Table 2.14: Weather File Date File Interpretation"** in
 #' "AuxiliaryPrograms" documentation. eplusr is able to handle all those kinds of
-#' formats automatically. Basially, 5 formats are allowed:
+#' formats automatically. Basically, 5 formats are allowed:
 #'
 #' 1. A single integer is interpreted as the Julian day of year. For example,
 #'    `1`, `2`, `3` and `4` will be parsed and presented as `1st day`, `2nd
@@ -255,7 +255,7 @@ NULL
 #'   daylight saving time. For example, `c(3.10, 10.3)`.
 #' * `holiday`: a list or a data.frame containing two elements (columns) `name`
 #'   and `day` where `name` are the holiday names and `day` are valid EPW date
-#'   specifictions. For example, `list(name = c("New Year's Day", "Christmas
+#'   specifications For example, `list(name = c("New Year's Day", "Christmas
 #'   Day"), day = c("1.1", "25 Dec"))`.
 #' }
 #'
@@ -288,7 +288,7 @@ NULL
 #' data exist in one hour.
 #'
 #' `$period()` takes a data period index, a new period name and start day of
-#' week specifiction, and uses that input to replace the data period's name and
+#' week specification, and uses that input to replace the data period's name and
 #' start day of week. If no input is given, data periods in current `Epw` is
 #' returned.
 #'
@@ -340,7 +340,7 @@ NULL
 #' * `do_nothing`: All abnormal values are left as they are.
 #' * `use_zero`: All abnormal values are reset to zeros.
 #' * `use_previous`: The first abnormal values of variables will be set to the
-#'   initial missing values. All after are set to privious valid one.
+#'   initial missing values. All after are set to previous valid one.
 #'
 #' **Arguments**:
 #'
@@ -357,8 +357,8 @@ NULL
 #' `$data()` returns weather data of specific data period.
 #'
 #' Usually, EPW file downloaded from [EnergyPlus website](https://energyplus.net/)
-#' contains TMY weather data. As years of weather data is not concesutive, it may
-#' be more convenient to align the year values to be concesutive, which will
+#' contains TMY weather data. As years of weather data is not consecutive, it may
+#' be more convenient to align the year values to be consecutive, which will
 #' makes it possible to direct analyze and plot weather data. The `start_year`
 #' argument in `$data()` method can help to achieve this. However, randomly
 #' setting the `year` may result in a date time series that does not have the
@@ -393,7 +393,7 @@ NULL
 #' **Arguments**:
 #'
 #' * `period`: A single positive integer identifying the data period index. Data
-#'   periods infomation can be obtained using `$period()` described above.
+#'   periods information can be obtained using `$period()` described above.
 #' * `start_year`: A positive integer identifying the year of first date time in
 #'   specified data period. If `NULL`, the values in the `year` column are used
 #'   as years of `datetime` column. Default: `NULL`.
@@ -430,7 +430,7 @@ NULL
 #'
 #' `$make_na()` converts specified abnormal data into `NA`s in specified data
 #' period. This makes it easier to find abnormal data directly using
-#' [base::is.na()] insteading of using `$missing_code()`.
+#' [base::is.na()] instead of using `$missing_code()`.
 #'
 #' `$fill_abnormal()` fills specified abnormal data using corresponding actions
 #' listed in `$fill_action()`. For what kinds of actions to be performed, please
@@ -457,7 +457,7 @@ NULL
 #'
 #' **Arguments**:
 #' * `period`: A positive integer vector identifying the data period indexes.
-#'   Data periods infomation can be obtained using `$period()` described
+#'   Data periods information can be obtained using `$period()` described
 #'   above. If `NULL`, all data periods are included. Default: `NULL`.
 #' * `missing`: If `TRUE`, missing values are included. Default: `FALSE`.
 #' * `out_of_range`: If `TRUE`, out-of-range values are included. Default:
@@ -483,11 +483,11 @@ NULL
 #'
 #' * Column `datetime` exists and has type of `POSIXct`. Note that time zone of
 #'   input date time will be reset to `UTC`.
-#' * It assumes that input data is already sorted, i.e. no furthing sorting is
-#'   made during validation. This is becasue when input data is TMY data, there
+#' * It assumes that input data is already sorted, i.e. no further sorting is
+#'   made during validation. This is because when input data is TMY data, there
 #'   is no way to properly sort input data rows only using `datetime` column.
 #' * Number of data records per hour should be consistent across input data.
-#' * Input number of data records per hour shoud be the same as
+#' * Input number of data records per hour should be the same as
 #'   existing data periods.
 #' * The date time of input data should not overlap with existing data periods.
 #' * Input data should have all 29 weather data columns with right types. The
@@ -505,7 +505,7 @@ NULL
 #' * `realyear`: Whether input data is AMY data. Default: `FALSE`.
 #' * `name`: A new string used as name of added or set data period. Should not
 #'   be the same as existing data period names. If `NULL`, it is generated
-#'   automatically in format `Data`, `Data_1` and ect., based on existing data
+#'   automatically in format `Data`, `Data_1` and etc., based on existing data
 #'   period names. Default: `NULL`
 #' * `start_day_of_week`: A single integer or character specifying start day of
 #'   week of input data period. If `NULL`, Sunday is used for TMY data and the

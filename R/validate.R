@@ -81,7 +81,7 @@ exclude_invalid <- function (env_in, invalid, on) {
 #'
 #' There are 10 different validation check components in total. Three predefined
 #' validation level are included, i.e. `"none"`, `"draft"` and `"final"`. To get
-#' what valiation components those levels contain, see [level_checks()].
+#' what validation components those levels contain, see [level_checks()].
 #'
 #' @param required_object Check if required objects are missing in current
 #' model. Default: `FALSE`.

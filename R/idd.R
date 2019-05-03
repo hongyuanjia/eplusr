@@ -87,7 +87,7 @@ NULL
 #'   `"ref_to"` or "ref_by". For `$objects_in_relation()`, only `"ref_to"` and
 #'   `"ref_by"` are acceptable.
 #' * `all`: If `TRUE`, all fields in specified classes are returned. If `FALSE`,
-#'   only mininum required fields are returned. Default: `FALSE`.
+#'   only minimum required fields are returned. Default: `FALSE`.
 #' * `leading`: Leading spaces added to each field. Default: `4L`.
 #' * `sep_at`: The character width to separate value string and field string.
 #'   Default: `29L` which is the same as IDF Editor.
@@ -173,7 +173,7 @@ NULL
 #' * `field`: Character type. Field names.
 #'
 #' `$to_string()` returns empty objects of specified class in a character vector
-#' format. It is formated exactly the same as in IDF Editor.
+#' format. It is formatted exactly the same as in IDF Editor.
 #'
 #' `$print()` prints basic info ob current Idd object, including version, build
 #' tag and total class number.

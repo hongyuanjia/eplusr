@@ -21,7 +21,7 @@ underlying IDD (EnergyPlus Input Data Dictionary).
 Under the hook, eplusr uses a SQL-like structure to store both IDF and IDD
 data in different \link[data.table:data.table]{data.table::data.table}s. So to modify an EnergyPlus model
 in eplusr is equal to change the data in those IDF tables accordingly, in the
-context of specific IDD data. This means that a correspoding \link{Idd} object is
+context of specific IDD data. This means that a corresponding \link{Idd} object is
 needed whenever creating an \code{Idf} object. eplusr provides several
 \link[=use_idd]{helpers} to easily download IDD files and create \link{Idd} objects.
 
@@ -124,7 +124,7 @@ that input group or class names are checked in all existing ones in the
 underlying \link{Idd} object. Default: \code{FALSE}.
 \item \code{sorted}: Only applicable when \code{all} is \code{FALSE}. If \code{TRUE}, duplications in
 returned group or class names are removed, and unique names are further
-sorted according to their occurances in the underlying \link{Idd} object.
+sorted according to their occurrences in the underlying \link{Idd} object.
 Default: \code{TRUE}.
 \item \code{group}: A character vector of valid group names.
 \item \code{class}: A character vector of valid class names.
@@ -207,7 +207,7 @@ gives results below:\preformatted{-- Refer to Others ------------------------
 }
 
 This means that the value \code{"WD01"} of \code{Outside Layer} in a construction named
-\code{WALL-1} refers to a material named \code{WD01}. All those objects can be futher
+\code{WALL-1} refers to a material named \code{WD01}. All those objects can be further
 easily extracted using \code{$objects_in_relation()} method described below.
 
 \strong{Arguments}:
@@ -234,7 +234,7 @@ model[[ClassName]]
 }
 
 \code{$object()} returns an \link{IdfObject} specified by an object ID or name. Note
-that unlike object ID, which is always unique accross the whole \code{Idf} object,
+that unlike object ID, which is always unique across the whole \code{Idf} object,
 sometimes different objects can have the same name. If the name given matches
 multiple objects, an error is issued showing what objects are matched by the
 same name. This behavior is consistent in all methods that take an object
@@ -469,7 +469,7 @@ possible. Default: \code{TRUE}.
 \itemize{
 \item Specify object with name: \code{model$set(Object_Name = list(val1, val2, val3))}.
 \item Specify object with ID: \code{model$set(..8 = list(val1))}.
-\item Overwrite exisint object comments: \code{model$set(..8 = list(.comment = c("new", "comment")))}.
+\item Overwrite existing object comments: \code{model$set(..8 = list(.comment = c("new", "comment")))}.
 \item Delete field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)}.
 \item Assign default field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)}.
 \item Variable input: \code{a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)}.
@@ -518,7 +518,7 @@ also be deleted. Default: \code{FALSE}.
 will also be deleted. Default: \code{FALSE}.
 \item \code{.recursive}: If \code{TRUE}, relation searching is performed recursively, in
 case that objects whose fields refer to target object are also referred by
-another object, and also objects whose fields are referred by target obejct
+another object, and also objects whose fields are referred by target object
 are also referred by another object. Default: \code{FALSE}.
 \item \code{.force}: If \code{TRUE}, objects are deleted even if they are referred by other
 objects.
@@ -605,7 +605,7 @@ Idf and \link{IdfObject} class.
 
 For object definitions in character vector format, they follow the same rules
 as normal IDF file. Each object starts with a class name and a comma (\code{,}),
-seperates each values with a comma (\code{,}) and ends with a semicolon (\code{;}).
+separates each values with a comma (\code{,}) and ends with a semicolon (\code{;}).
 Noted that you can also provide headers to indicate if input objects are
 presented in IP units, using \code{!-Option ViewInIPunits}. If this header does
 not exist, then all values are treated as in SI units.
@@ -619,7 +619,7 @@ column order does not matter.
 \link{Idd} object. You can get all valid class names using
 \code{use_idd(model$version())$class_name()}
 \item \code{index}: \strong{Mandatory}. Integer type. Valid field indexes for each class.
-\item \code{value}: \strong{Mandatory}. Charater type or list type. The value of each field
+\item \code{value}: \strong{Mandatory}. Character type or list type. The value of each field
 to be added.
 \itemize{
 \item If \code{value} is a character column, usually when \code{string_value} is \code{TRUE}
@@ -648,7 +648,7 @@ occur.
 
 \strong{Argument}:
 \itemize{
-\item \code{...}: Character vectors or data.frames of object defitions. For details,
+\item \code{...}: Character vectors or data.frames of object definitions For details,
 see above.
 \item \code{.unique}: If there are duplications in input \link{IdfObject}s or there is same
 object in current Idf, duplications in input are removed. Default: \code{TRUE}.
@@ -824,7 +824,7 @@ invalid field values:
 \item \code{class_id}: indexes of classes that invalid objects belong to
 \item \code{class_name}: names of classes that invalid objects belong to
 \item \code{field_id}: indexes (at Idd level) of object fields that are invalid
-\item \code{field_index}: indexes of object fields in correspoinding that are invalid
+\item \code{field_index}: indexes of object fields in corresponding that are invalid
 \item \code{field_name}: names (without units) of object fields that are invalid
 \item \code{units}: SI units of object fields that are invalid
 \item \code{ip_units}: IP units of object fields that are invalid
@@ -969,7 +969,7 @@ folder will be used. Default: NULL
 standard output and error of EnergyPlus to the screen. If \code{FALSE}, the
 simulation will run in the background. Default is \code{TRUE}.
 \item \code{force}: Only applicable when the last simulation runs with \code{wait} equals
-to \code{FALSE} and is still running. If \code{TRUE}, currenting running job is
+to \code{FALSE} and is still running. If \code{TRUE}, current running job is
 forced to stop and a new one will start. Default: \code{FALSE}.
 \item \code{copy_external}: If \code{TRUE}, the external files that current \code{Idf} object
 depends on will also be copied into the simulation output directory. The
@@ -996,7 +996,7 @@ bracket.
 
 \strong{Arguments}:
 \itemize{
-\item \code{zoom}: Control how detailed of the Idf object shoud be printed. Should be
+\item \code{zoom}: Control how detailed of the Idf object should be printed. Should be
 one of \code{"group"}, \code{"class"}, \code{"object"} and \code{"field"}. Default: \code{"group"}.
 \itemize{
 \item \code{"group"}: all group names current existing are shown with prevailing
@@ -1207,7 +1207,7 @@ idf$del(c("new_test", "rp_test_1", "rp_test_2"))
 names(idf$Material)
 names(idf$RunPeriod)
 
-# In "final" validate level, delete will be aborted if the target obejcts are
+# In "final" validate level, delete will be aborted if the target objects are
 # referenced by other objects.
 # get objects that referenced material "R13LAYER"
 eplusr_option("validate_level")

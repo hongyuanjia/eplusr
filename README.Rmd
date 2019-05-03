@@ -209,7 +209,7 @@ clean_wd(idf$path())
 unlink(idf$path())
 ```
 
-## Acknowledgements
+## Acknowledgement
 
 I would like to thank many open source projects who have heavily inspired the
 development of eplusr package, especially these below:
@@ -220,7 +220,7 @@ development of eplusr package, especially these below:
   software tools to support whole building energy modeling using EnergyPlus and
   advanced daylight analysis using Radiance.
 * [eppy](https://github.com/santoshphilip/eppy): Scripting language for E+,
-  Energyplus.
+  EnergyPlus.
 * [JEplus](http://www.jeplus.org): An EnergyPlus simulation manager for
   parametrics.
 

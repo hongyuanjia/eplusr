@@ -105,7 +105,7 @@ NULL
 #'   R console. If `FALSE`, simulation will be run in a background process.
 #'   Default: `TRUE`.
 #' * `force`: Only applicable when the last job runs with `wait` equals
-#'   to `FALSE` and is still running. If `TRUE`, currenting running job is
+#'   to `FALSE` and is still running. If `TRUE`, current running job is
 #'   forced to stop and a new one will start. Default: `FALSE`.
 #' * `info`: If `FALSE`,only warnings and errors are printed. Default: `FALSE`.
 #'
@@ -220,7 +220,7 @@ NULL
 #'   data.frame, `name` is ignored. All available `name` for current simulation
 #'   output can be obtained using `$report_data_dict()`.  Default: `NULL`.
 #' * `year`: Year of the date time in column `datetime`. If `NULL`, it
-#'    will calcualte a year value that meets the start day of week restriction
+#'    will calculate a year value that meets the start day of week restriction
 #'    for each environment. Default: `NULL`.
 #' * `tz`: Time zone of date time in column `datetime`. Default: `"UTC"`.
 #' * `case`: If not `NULL`, a character column will be added indicates the case

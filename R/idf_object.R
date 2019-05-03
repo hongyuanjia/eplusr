@@ -167,7 +167,7 @@ NULL
 #'   set to `Inf`, and `upper_incbounds` is set to FALSE. The field range is
 #'   printed in number interval denotation.
 #' * `source`: Exists only when `"source"` is one of `type`. List type. Each
-#'   element is a chracter vector which includes all values from other objects
+#'   element is a character vector which includes all values from other objects
 #'   that current field can use as sources and refers to.
 #'
 #' **Arguments**
@@ -175,7 +175,7 @@ NULL
 #' * `which`: An integer vector of field indexes or a character vector of field
 #'   names.
 #' * `all`: If `TRUE`, values of all possible fields in current class the
-#'   `IdfObject` belongs to are retured. Default: `FALSE`
+#'   `IdfObject` belongs to are returned. Default: `FALSE`
 #' * `simplify`: If `TRUE`, values of fields are converted into characters
 #'   and the converted character vector is returned.
 #' * `FieldName`: A single length character vector of one valid field name where
@@ -401,7 +401,7 @@ NULL
 #' * `sep_at`: The character width to separate value string and field string.
 #'   Default: `29L` which is the same as IDF Editor.
 #' * `all`: If `TRUE`, values of all possible fields in current class the
-#'   `IdfObject` belongs to are retured. Default: `FALSE`
+#'   `IdfObject` belongs to are returned. Default: `FALSE`
 #'
 #' @section Print:
 #'
@@ -577,7 +577,7 @@ NULL
 #' returns a corresponding [IdfObject].
 #'
 #' If `object` is not given, an empty [IdfObject] of specified class is created,
-#' with all field vlaues filled with defaults, if possible.  Note that
+#' with all field values filled with defaults, if possible.  Note that
 #' validation is performed when creating, which means that an error may occur if
 #' current [validate level][level_checks()] does not allow empty required fields.
 #'
@@ -1187,7 +1187,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #' @param sep_at The character width to separate value string and field string.
 #' Default: `29L` which is the same as IDF Editor.
 #' @param all If `TRUE`, values of all possible fields in current class the
-#'   [IdfObject] belongs to are retured. Default: `FALSE`
+#'   [IdfObject] belongs to are returned. Default: `FALSE`
 #' @param ... Further arguments passed to or from other methods.
 #' @return A character vector.
 #' @examples
