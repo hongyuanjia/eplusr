@@ -1746,6 +1746,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         max_depth = NULL, recursive = .recursive, name = eplusr_option("verbose_info")
     )
 
+    id_ref_by <- c()
     if (nrow(rel$ref_by)) {
         # stop if objects are referred {{{
         if (!.ref_by && !.force) {
