@@ -1754,7 +1754,11 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
 
     if (nrow(rel$ref_by)) {
         # stop if objects are referred {{{
-        if (!.ref_by && !.force) {
+        # should be able to delete targets objects in at least one condition:
+        # 1. current validate level does not includ reference checking
+        # 2. want to delete both targets and referees
+        # 3. `.force` is TRUE
+        if (level_checks()$reference && !.ref_by && !.force) {
             if (!eplusr_option("verbose_info")) {
                 rel$ref_by <- add_idf_relation_format_cols(idd_env, idf_env, rel$ref_by)
             }

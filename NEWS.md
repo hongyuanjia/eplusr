@@ -1,6 +1,12 @@
 # eplusr 0.10.1
 
-This is a patch update to fix CRAN check errors. No new feature is added.
+This is a patch update mainly to fix CRAN check errors.
+
+## Minor changes
+
+* `$del()` method in `Idf` class now also respects validation settings.
+  You should be able to delete any object if current validation level does not
+  include reference checking.
 
 # eplusr 0.10.0
 
