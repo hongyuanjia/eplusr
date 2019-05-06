@@ -3,10 +3,8 @@ test_that("Epw class", {
     clean_tempdir()
     eplusr_option(verbose_info = FALSE)
 
-    # download weather
-    expect_message({path_epw <- download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3",
-        ask = FALSE, type = "epw", dir = tempdir())}
-    )
+    skip_if_not(is_avail_eplus(8.8))
+    path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- read_epw(path_epw))
 
@@ -240,4 +238,10 @@ test_that("Epw class", {
     expect_equal({d <- epw_date(1:2);d[[1]] <- epw_date(3);d}, epw_date(c(3, 2)))
     # }}}
 
+    # do not test on CRAN
+    skip_on_cran()
+    # download weather
+    expect_message({path_epw <- download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3",
+        ask = FALSE, type = "epw", dir = tempdir())}
+    )
 })
