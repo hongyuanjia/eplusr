@@ -1,4 +1,6 @@
-# eplusr (development version)
+# eplusr 0.10.1
+
+This is a patch update to fix CRAN check errors. No new feature is added.
 
 # eplusr 0.10.0
 
