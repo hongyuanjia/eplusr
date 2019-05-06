@@ -58,7 +58,7 @@ is_avail_idd(8.8)
 
 # you can set `download` arugment to "auto" in `use_idd()` if you want to
 # automatically download corresponding IDD file when necessary
-read_idf(idf_path, use_idd(8.8, download = "auto"))
+\dontrun{read_idf(idf_path, use_idd(8.8, download = "auto"))}
 
 # Besides use a path to an IDF file, you can also provide IDF in literal
 # string format
@@ -69,7 +69,7 @@ idf_string <-
         Building;                !- Name
     "
 
-read_idf(idf_string, use_idd(8.8, download = "auto"))
+\dontrun{read_idf(idf_string, use_idd(8.8, download = "auto"))}
 }
 \seealso{
 \link{Idf} class for modifying EnergyPlus model. \code{\link[=use_idd]{use_idd()}} and

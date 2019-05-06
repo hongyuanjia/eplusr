@@ -519,6 +519,7 @@ mat[["Thickness"]] <- 0.019
 mat$Thickness
 
 # check validate
+\dontrun{
 mat$validate()
 mat$is_valid()
 
@@ -532,7 +533,6 @@ mat$is_valid()
 mat$ref_to_object() # not referencing other objects
 mat$has_ref_to()
 
-
 # get other objects that reference this object
 mat$ref_by_object() # referenced by construction "FLOOR"
 names(mat$ref_by_object())
@@ -541,6 +541,7 @@ mat$has_ref_by()
 
 # check if having any referenced objects or is referenced by other objects
 mat$has_ref()
+}
 
 # get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))

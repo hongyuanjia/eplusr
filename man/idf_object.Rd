@@ -36,6 +36,7 @@ further modifications are needed for those empty fields and use \code{$set()}
 method to set field values.
 }
 \examples{
+\dontrun{
 model <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
 
 # get an IdfObject using object ID
@@ -54,5 +55,5 @@ zone <- idf_object(model, class = "Zone")
 zone
 eplusr_option(validate_level = "final")
 zone$validate()
-
+}
 }
