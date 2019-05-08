@@ -144,7 +144,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     # delete blank lines
     idf_dt <- idf_dt[!J(""), on = "string"]
 
-    idf_ver <- get_idf_ver(idf_dt, complete = FALSE)
+    idf_ver <- get_idf_ver(idf_dt)
 
     if (has_ext(path, "ddy")) {
         idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
@@ -262,7 +262,7 @@ get_idd_build <- function (idd_dt) {
 # }}}
 
 # get_idf_ver {{{
-get_idf_ver <- function (idf_dt, empty_removed = TRUE, complete = TRUE) {
+get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
     assert(inherits(idf_dt, "data.table"), has_name(idf_dt, c("line", "string")))
 
     if (!empty_removed) idf_dt <- idf_dt[!stri_isempty(string)]
@@ -287,7 +287,7 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE, complete = TRUE) {
     if (!nrow(ver_line)) {
         NULL
     } else if (nrow(ver_line) == 1L) {
-        standardize_ver(ver_line$version, complete = complete)
+        standardize_ver(ver_line$version, complete = FALSE)
     } else {
         parse_issue("error_multiple_version", "idf", "Multiple versions found", ver_line)
     }
