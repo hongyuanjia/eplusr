@@ -1436,7 +1436,7 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
     # update path
     private$m_path <- path
     log_saved(private$m_log)
-    invisible(self)
+    invisible(path)
 }
 # }}}
 # epw_print {{{
