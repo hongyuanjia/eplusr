@@ -2801,6 +2801,8 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
                 leapyear <- FALSE
             }
         }
+        # reset leap year indicator
+        epw_header$holiday$leapyear <- leapyear
     }
     # }}}
 
