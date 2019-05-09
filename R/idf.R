@@ -314,7 +314,7 @@ NULL
 #'   `$objects_in_relation()` and `$search_object()`.
 #' * `group`: A single string of group name.
 #' * `pattern`, `ignore.case`, `perl`, `fixed` and `useBytes`: All of them are
-#'   directly passed to [base::grepl()].
+#'   directly passed to [base::grepl][base::grep()].
 #' * `ClassName`: A single string of class name. For \code{[[}, `ClassName` can
 #'   be an underscore-style class name, where all characters other than letters
 #'   and numbers are replaced by underscores `_`.
@@ -325,7 +325,7 @@ NULL
 #'   `const` is also referred by a surface named `surf`, all `mat`, `const` and
 #'   `surf` are returned.
 #' * `ignore.case`, `perl`, `fixed` and `useBytes`: All are directly passed to
-#'   [base::grepl()].
+#'   [base::grepl][base::grep()].
 #'
 #' @section Object Modification:
 #' \subsection{Duplicate Objects}{
@@ -751,7 +751,8 @@ NULL
 #' * `class`: A character vector of invalid class names in current `Idf` object
 #'   to search for values. If `NULL`, all classes are used.
 #' * `pattern`, `replacement`, `ignore.case`, `perl`, `fixed` and `useBytes`:
-#'   All of them are directly passed to [base::grepl()] and [base::gsub()].
+#'   All of them are directly passed to [base::grepl][base::grep()] and
+#'   [base::gsub][base::grep()].
 #'
 #' **Usage**:
 #'

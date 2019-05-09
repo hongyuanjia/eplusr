@@ -317,7 +317,7 @@ vector of object names for \code{$objects()}.
 \code{$objects_in_relation()} and \code{$search_object()}.
 \item \code{group}: A single string of group name.
 \item \code{pattern}, \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}: All of them are
-directly passed to \code{\link[base:grepl]{base::grepl()}}.
+directly passed to \link[base:grep]{base::grepl}.
 \item \code{ClassName}: A single string of class name. For \code{[[}, \code{ClassName} can
 be an underscore-style class name, where all characters other than letters
 and numbers are replaced by underscores \code{_}.
@@ -328,7 +328,7 @@ material named \code{mat} is referred by a construction named \code{const}, and
 \code{const} is also referred by a surface named \code{surf}, all \code{mat}, \code{const} and
 \code{surf} are returned.
 \item \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}: All are directly passed to
-\code{\link[base:grepl]{base::grepl()}}.
+\link[base:grep]{base::grepl}.
 }
 }
 
@@ -745,7 +745,8 @@ error prone. Validation rules also apply during replacing.
 \item \code{class}: A character vector of invalid class names in current \code{Idf} object
 to search for values. If \code{NULL}, all classes are used.
 \item \code{pattern}, \code{replacement}, \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}:
-All of them are directly passed to \code{\link[base:grepl]{base::grepl()}} and \code{\link[base:gsub]{base::gsub()}}.
+All of them are directly passed to \link[base:grep]{base::grepl} and
+\link[base:grep]{base::gsub}.
 }
 
 \strong{Usage}:
