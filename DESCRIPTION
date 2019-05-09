@@ -5,7 +5,7 @@ Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
            role = c("aut", "cre"),
-           email = "hongyuanjia@cqu.edu.cn",
+           email = "hongyuan.jia@bears-berkeley.sg",
            comment = c(ORCID = "0000-0002-0075-8183"))
 Description: A rich toolkit of using the whole building simulation program
     'EnergyPlus'(<https://energyplus.net>), which enables programmatic

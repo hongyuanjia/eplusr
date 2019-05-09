@@ -1,12 +1,19 @@
 # eplusr 0.10.1
 
-This is a patch update mainly to fix CRAN check errors.
+This is a patch update mainly to fix CRAN check errors, with few bug fixes.
 
-## Minor changes
+## Bug fixes
 
+* `$set()` method in `Idf` class now does not try to convert all input strings
+  into numbers (#32)
 * `$del()` method in `Idf` class now also respects validation settings.
   You should be able to delete any object if current validation level does not
-  include reference checking.
+  include reference checking
+* `$del()` method in `Idf` class now will only print object relation only if
+  `.ref_to` or `.ref_by` is `TRUE`
+* Now `$set()` method in `Epw` class will correctly reset leap year flag in the
+  header (#32)
+* Now `$save()` method in `Epw` class returns the path of saved file invisibly
 
 # eplusr 0.10.0
 

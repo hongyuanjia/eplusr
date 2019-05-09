@@ -1,7 +1,11 @@
 # Version 0.10.1
 
+In this version, I change the email from `hongyuanjia@cqu.edu.cn` to
+`hongyuan.jia@bears-berkeley.sg`. As the mail I use before will not available
+for me in June.
+
 This version fixes current checking errors in a *strict Latin-1* locale, as
-kindly stated by Kurt Hornik in email
+kindly stated by Kurt Hornik in email.
 
 ```
 Dear maintainer,
@@ -18,6 +22,9 @@ Best
 -k
 ```
 
+This version also fixes checking errors on Windows which causes by downloading
+failure.
+
 ## Round 1
 
 ### Test environments
@@ -33,11 +40,14 @@ Best
 
 ```
 * checking CRAN incoming feasibility ... NOTE
-Maintainer: ‘Hongyuan Jia <hongyuanjia@cqu.edu.cn>’
+   Maintainer: 'Hongyuan Jia <hongyuan.jia@bears-berkeley.sg>'
 
-Version contains large components (0.10.1)
+   Days since last update: 6
 
-Days since last update: 3
+   New maintainer:
+     Hongyuan Jia <hongyuan.jia@bears-berkeley.sg>
+   Old maintainer(s):
+     Hongyuan Jia <hongyuanjia@cqu.edu.cn>
 ```
 
 ### Reverse dependencies
