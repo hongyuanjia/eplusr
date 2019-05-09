@@ -395,8 +395,9 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) 
 
                     # not NULL, character or numeric {{{
                     # this will find out "list()"
-                    if (any(vlapply(value_list, function (x) !is.null(x) && !is.character(x) && !is.numeric(x)))) {
-                        id <- rleid[vlapply(value_list, function (x) !is.null(x) && !is.character(x) && !is.numeric(x))]
+                    is_num <- vlapply(value_list, is.numeric)
+                    if (any(vlapply(value_list, function (x) !is.null(x) && !is.character(x)) & !is_num)) {
+                        id <- rleid[vlapply(value_list, function (x) !is.null(x) && !is.character(x)) & !is_num]
                         abort_invalid_format(unique(id))
                     }
                     # }}}
@@ -429,7 +430,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) 
                     s[stri_isempty(s)] <- NA_character_
                     value_chr[!defaulted] <- s
 
-                    value_num[!defaulted] <- suppressWarnings(as.double(s))
+                    value_num[!defaulted & is_num] <- unlist(value_list[!defaulted & is_num], use.names = FALSE)
 
                     # change empty field names to NA
                     field_name[no_nm] <- NA_character_
