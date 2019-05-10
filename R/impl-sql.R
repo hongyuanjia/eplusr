@@ -174,7 +174,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
         make(key_value, assert(is.character(key_value), no_na(key_value)), "KeyValue") %and%
         make(name, assert(is.character(name), no_na(name)), "Name")
 
-    if (is.null(key_value)) {
+    if (is.null(key_var)) {
         key_var <- "ReportDataDictionary"
     } else {
         key_var <- paste0("
