@@ -377,7 +377,7 @@ test_that("Idf class", {
     # }}}
 
     # PRINT {{{
-    skip_on_os("windows")
+    testthat::skip_if_not(cli::is_utf8_output())
     idf <- read_idf(example())
     expect_output(idf$print("group"), "[06<C>] Group: <Surface Construction Elements>", fixed = TRUE)
     expect_output(idf$print("group", order = FALSE), "[06<C>] Group: <Surface Construction Elements>", fixed = TRUE)
