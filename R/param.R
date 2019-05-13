@@ -717,7 +717,7 @@ param_output_errors <- function (self, private, which, info = FALSE) {
 
     if (!info) {
         err <- lapply(err, function (x) {
-            x$data <- x$data[!(level == "Info" & begin_environment == FALSE)]
+            x$data <- x$data[!(level == "Info")]
             x
         })
     }
