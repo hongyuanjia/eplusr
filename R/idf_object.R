@@ -989,16 +989,16 @@ idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, rec
 
     if (!nrow(rel)) {
         if (is.null(class)) {
-            message("Target object does not refer to any other object.")
+            verbose_info("Target object does not refer to any other object.")
         } else {
-            message("Target object does not refer to any other object in class ",
+            verbose_info("Target object does not refer to any other object in class ",
                 collapse(cls$class_name), "."
             )
         }
         return(invisible())
     } else {
         rel <- rel[, list(src_object_id = unique(src_object_id)), by = "object_id"]
-        message("Target object refers to ", nrow(rel), " object(s) [ID:",
+        verbose_info("Target object refers to ", nrow(rel), " object(s) [ID:",
             collapse(rel$src_object_id), "].\n"
         )
         res <- apply2(
@@ -1037,16 +1037,16 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL) {
 
     if (!nrow(rel)) {
         if (is.null(class)) {
-            message("Target object is not referred by any other object.")
+            verbose_info("Target object is not referred by any other object.")
         } else {
-            message("Target object is not referred by any other object in class ",
+            verbose_info("Target object is not referred by any other object in class ",
                 collapse(cls$class_name), "."
             )
         }
         return(invisible())
     } else {
         rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
-        message("Target object is referred by ", nrow(rel), " object(s) [ID:",
+        verbose_info("Target object is referred by ", nrow(rel), " object(s) [ID:",
             collapse(rel$object_id), "].\n")
         res <- apply2(
             rel$object_id,
