@@ -391,6 +391,7 @@ test_that("Idf class", {
     # }}}
 
     # S3{{{
+    idf <- read_idf(text("idf", 8.8))
     expect_equal(names(idf$Material), c("WD01", "WD02"))
     expect_null(idf$Wrong)
     expect_silent(idf$Material$WD01$set(thickness = 0.02))
