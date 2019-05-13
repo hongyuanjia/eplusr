@@ -1290,6 +1290,10 @@ as_EpwDate.character <- function (x, leapyear = TRUE) {
 
     # coerce to double first
     is_dbl <- !is.na(suppressWarnings(as.double(x)))
+    # check if ending with zero, e.g. "3.10"
+    is_tenth <- as.double(stri_split_fixed(x[is_dbl], ".", 2L, simplify = TRUE)[, 2L]) %% 10 == 0L
+    is_dbl[is_tenth] <- FALSE
+
     res[is_dbl] <- as_EpwDate.numeric(as.double(x[is_dbl]))
 
     if (sum(is_dbl) == length(x)) return(res)
@@ -1421,14 +1425,14 @@ parse_epwdate_wday <- function (x, leapyear = TRUE) {
             if (n == 0L) {
                 ref_day - lubridate::days(wkd1 - wkd)
             } else {
-                ref_day + lubridate::days(7L - wkd1 + wkd) * n
+                ref_day + lubridate::days(7L - wkd1 + wkd + 7L * (n - 1L))
             }
         # for example: wkd1 Mon(1), wkd Sat(6)
         } else if (wkd1 < wkd) {
             if (n == 0L) {
                 ref_day - lubridate::days(wkd1 + 7L - wkd)
             } else {
-                ref_day + lubridate::days(wkd - wkd1) * n
+                ref_day + lubridate::days(wkd - wkd1 + 7 * (n - 1L))
             }
         } else {
             ref_day

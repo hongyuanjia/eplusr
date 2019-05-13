@@ -192,6 +192,8 @@ test_that("Epw class", {
     expect_equal(format(epw_date(3)), "3")
     expect_output(print(epw_date(3)), "3rd day")
 
+    expect_equal(epw_date("3.10"), init_epwdate_vctr(1, "8-03-10"))
+
     expect_equal(epw_date("01/03"), init_epwdate_vctr(1, "8-01-03"))
     expect_equal(format(epw_date("Apr-01")), "4/ 1")
     expect_output(print(epw_date("Apr-01")), "Apr 01")
@@ -219,6 +221,10 @@ test_that("Epw class", {
     expect_equal(epw_date("1st Mon in Jan"), init_epwdate_vctr(1, "12-01-02"))
     expect_equal(format(epw_date("1st Mon in Jan")), "1st Monday in January")
     expect_output(print(epw_date("1st Mon in Jan")), "1st Monday in January")
+
+    expect_equal(format(epw_date(c("2nd Sunday in March", "1st Sunday in November"))),
+        c("2nd Sunday in March", "1st Sunday in November")
+    )
 
     expect_equal(epw_date("6 Mon in Jan"), init_epwdate_vctr(1))
     expect_equal(format(epw_date("6 Mon in Jan")), NA_character_)
