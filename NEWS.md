@@ -1,3 +1,5 @@
+# eplusr (development version)
+
 # eplusr 0.10.2
 
 This is a patch update mainly to fix CRAN check errors on a strict Latin locale,
