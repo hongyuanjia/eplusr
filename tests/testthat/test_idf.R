@@ -389,6 +389,16 @@ test_that("Idf class", {
     expect_output(idf$print("field"))
     expect_output(idf$print("field", order = FALSE))
     # }}}
+
+    # S3{{{
+    expect_equal(names(idf$Material), c("WD01", "WD02"))
+    expect_null(idf$Wrong)
+    expect_silent(idf$Material$WD01$set(thickness = 0.02))
+    expect_silent(idf$Material$WD01$Thickness <- 0.01)
+    expect_silent(idf$add(SimulationControl = list()))
+    expect_silent(idf$SimulationControl$set(Do_Zone_Sizing_Calculation = "no"))
+    expect_silent(idf$SimulationControl$Do_Zone_Sizing_Calculation <- "No")
+    # }}}
 })
 # }}}
 

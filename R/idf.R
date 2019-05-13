@@ -2405,8 +2405,17 @@ read_idf <- function (path, idd = NULL) {
 
     if (is.na(cls_id)) abort_bad_key("error_invalid_class_name", "class name", name)
 
-    # input should be a list of IdfObjects
-    assert(is.list(value), vlapply(value, is_idfobject), msg = "Value should be a list of IdfObjects.")
+    # check if input class is an unique-object class
+    if (cls_id %in% idd_env$class[unique_object == TRUE, class_id]) {
+        uni <- TRUE
+        # input should be a single IdfObject
+        assert(is_idfobject(value), msg = "When using an unique-object class name, value should be a single IdfObject.")
+        value <- list(value)
+    } else {
+        uni <- FALSE
+        # input should be a list of IdfObjects
+        assert(is.list(value), vlapply(value, is_idfobject), msg = "Value should be a list of IdfObjects.")
+    }
 
     # check if input is from the same model
     # get uuid if idf
