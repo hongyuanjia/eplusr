@@ -1,5 +1,6 @@
 #' @importFrom data.table data.table fread
 #' @importFrom tools file_path_sans_ext
+#' @importFrom utils download.file
 #' @importFrom cli rule
 NULL
 

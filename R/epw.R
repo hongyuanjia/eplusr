@@ -2,7 +2,7 @@
 #' @importFrom stringi stri_detect_regex
 #' @importFrom cli rule cat_rule
 #' @importFrom R6 R6Class
-#' @importFrom utils menu download.file
+#' @importFrom utils menu
 #' @include impl-epw.R
 NULL
 
@@ -1574,14 +1574,14 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     ]
 
     if (type == "all") {
-        utils::download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
-        utils::download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        download_file(res$epw_url, res$epw_path)
+        download_file(res$ddy_url, res$ddy_path)
         c(res$epw_path, res$ddy_path)
     } else if (type == "ddy") {
-        utils::download.file(res$ddy_url, res$ddy_path, method = "libcurl", mode = "wb")
+        download_file(res$ddy_url, res$ddy_path)
         res$ddy_path
     } else {
-        utils::download.file(res$epw_url, res$epw_path, method = "libcurl", mode = "wb")
+        download_file(res$epw_url, res$epw_path)
         res$epw_path
     }
 }
