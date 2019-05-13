@@ -1,3 +1,14 @@
+# eplusr (development version)
+
+## Bug fixes
+
+* `$add()` method and other methods that modify field values can correctly
+  convert field values to numbers if necessary.
+
+## New features
+
+* `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
+
 # eplusr 0.10.2
 
 This is a patch update mainly to fix CRAN check errors on a strict Latin locale,
