@@ -430,7 +430,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) 
                     s[stri_isempty(s)] <- NA_character_
                     value_chr[!defaulted] <- s
 
-                    value_num[!defaulted & is_num] <- unlist(value_list[!defaulted & is_num], use.names = FALSE)
+                    value_num[!defaulted & is_num] <- as.double(unlist(value_list[!defaulted & is_num], use.names = FALSE))
 
                     # change empty field names to NA
                     field_name[no_nm] <- NA_character_
