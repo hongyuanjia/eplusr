@@ -1,5 +1,3 @@
-# eplusr (development version)
-
 # eplusr 0.10.2
 
 This is a patch update mainly to fix CRAN check errors on a strict Latin locale,
@@ -9,6 +7,7 @@ with few bug fixes.
 
 * `$add()` method and other methods that modify field values can correctly
   convert field values to numbers if necessary.
+* `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
 * `$report_data()` method in `EplusSql` class now correctly returns data if
   even if `key_value` is not given (#37)
 
