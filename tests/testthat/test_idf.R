@@ -377,21 +377,18 @@ test_that("Idf class", {
     # }}}
 
     # PRINT {{{
-    testthat::skip_if_not(cli::is_utf8_output())
+    # only test on UTF-8 supported platform
+    skip_if_not(cli::is_utf8_output())
     idf <- read_idf(example())
-    expect_output(idf$print("group"), "[06<C>] Group: <Surface Construction Elements>", fixed = TRUE)
-    expect_output(idf$print("group", order = FALSE), "[06<C>] Group: <Surface Construction Elements>", fixed = TRUE)
-    expect_output(idf$print("class"), fixed = TRUE,
-        "Group: <Schedules>\n├─ [02<O>] Class: <ScheduleTypeLimits>\n└─ [01<O>] Class: <Schedule:Constant>"
-    )
-    expect_output(idf$print("object"), fixed = TRUE,
-        "Class: <Schedule:Constant>\n└─ Object [ID:53] <AlwaysOn>"
-    )
-    expect_output(idf$print("field"), fixed = TRUE,
-        "Class: <Schedule:Constant>\n└─ Object [ID:53] <AlwaysOn>"
-    )
+    expect_output(idf$print("group"))
+    expect_output(idf$print("group", order = FALSE))
+    expect_output(idf$print("class"))
+    expect_output(idf$print("class", order = FALSE))
+    expect_output(idf$print("object"))
+    expect_output(idf$print("object", order = FALSE))
+    expect_output(idf$print("field"))
+    expect_output(idf$print("field", order = FALSE))
     # }}}
-
 })
 # }}}
 

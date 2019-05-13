@@ -2,7 +2,7 @@ context("Format methods")
 
 test_that("Idd formatting", {
     # only test on UTF-8 supported platform
-    testthat::skip_if_not(cli::is_utf8_output())
+    skip_if_not(cli::is_utf8_output())
 
     # IDD {{{
     idd_parsed <- parse_idd_file(text("idd", "9.9.9"))
