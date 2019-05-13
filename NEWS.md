@@ -3,10 +3,12 @@
 # eplusr 0.10.2
 
 This is a patch update mainly to fix CRAN check errors on a strict Latin locale,
-with a bug fix.
+with few bug fixes.
 
 ## Bug fixes
 
+* `$add()` method and other methods that modify field values can correctly
+  convert field values to numbers if necessary.
 * `$report_data()` method in `EplusSql` class now correctly returns data if
   even if `key_value` is not given (#37)
 
