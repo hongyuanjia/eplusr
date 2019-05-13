@@ -1,11 +1,7 @@
-# Version 0.10.1
+# Version 0.10.2
 
-In this version, I change the email from `hongyuanjia@cqu.edu.cn` to
-`hongyuan.jia@bears-berkeley.sg`. As the mail I use before will not available
-for me in June.
-
-This version fixes current checking errors in a *strict Latin-1* locale, as
-kindly stated by Kurt Hornik in email.
+This version completely fixes checking errors of this package in a *strict
+Latin-1* locale, as kindly stated by Kurt Hornik in email.
 
 ```
 Dear maintainer,
@@ -21,9 +17,6 @@ Please fix before 2019-05-19 to safely retain your package on CRAN.
 Best
 -k
 ```
-
-This version also fixes checking errors on Windows which causes by downloading
-failure.
 
 ## Round 1
 
@@ -42,12 +35,7 @@ failure.
 * checking CRAN incoming feasibility ... NOTE
    Maintainer: 'Hongyuan Jia <hongyuan.jia@bears-berkeley.sg>'
 
-   Days since last update: 6
-
-   New maintainer:
-     Hongyuan Jia <hongyuan.jia@bears-berkeley.sg>
-   Old maintainer(s):
-     Hongyuan Jia <hongyuanjia@cqu.edu.cn>
+   Days since last update: 4
 ```
 
 ### Reverse dependencies
