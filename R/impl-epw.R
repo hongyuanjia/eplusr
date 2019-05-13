@@ -1717,6 +1717,8 @@ match_epw_data_period <- function (epw_data, data_period, interval, leapyear, wa
              data$minute_in
         )
     )
+    # reset year
+    set(epw_data, NULL, "datetime", {d <- epw_data$datetime; lubridate::year(d) <- epw_data$year; d})
     # }}}
 
     list(from = from, to = to, missing = abnormal[1L], out_of_range = abnormal[2L])
