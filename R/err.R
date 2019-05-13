@@ -231,15 +231,17 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     }
 
     if (!nrow(dt)) {
-        cat("\n  EnergyPlus terminated without any error message generated.\n", sep = "")
+        cat("\n  [EnergyPlus did not generate any message...]\n", sep = "")
         return(invisible(x))
     }
 
     # error summary
-    num_sum <- dt[level != "Info", list(num = max(level_index)), by = c("level")]
-    set(num_sum, NULL, "level", factor(num_sum$level, c("Warning", "Severe", "Fatal"), ordered = TRUE))
-    err_sm <- num_sum[order(level), paste0("  * ",rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
-    cli::cat_line(err_sm)
+    if (any(dt$level != "Info")) {
+        num_sum <- dt[level != "Info", list(num = max(level_index)), by = c("level")]
+        set(num_sum, NULL, "level", factor(num_sum$level, c("Warning", "Severe", "Fatal"), ordered = TRUE))
+        err_sm <- num_sum[order(level), paste0("  * ",rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
+        cli::cat_line(err_sm)
+    }
 
     if (brief) return(invisible(x))
 
