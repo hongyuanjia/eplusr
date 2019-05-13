@@ -2119,7 +2119,7 @@ set_epw_holiday <- function (epw_header, leapyear, dst, holiday) {
         set(holiday, NULL, "day", reset_epwdate_year(epw_date(holiday$day), epw_header$holiday$leapyear))
         assert(are_epwdate(holiday$day), prefix = "Holiday")
 
-        epw_header$holiday <- holiday
+        epw_header$holiday$holiday <- holiday
     }
 
     epw_header
