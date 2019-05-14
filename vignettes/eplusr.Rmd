@@ -750,7 +750,7 @@ str(job$report_data_dict())
 ```
 
 `$report_data()` extracts the report data using key values and variable names.
-Just for demonstration, let's get the transformer input electric power at 11 p.m
+Just for demonstration, let's get the transformer input electric power at 11 a.m
 for the first day of RunPeriod named `SUMMERDAY`, tag this simulation as case
 `example`, and return all possible output columns.
 
