@@ -22,9 +22,10 @@ EnergyPlus can be found at [its website](https://energyplus.net).
 
 A comprehensive introduction to eplusr can be found using
 [`vignette("eplusr")`](https://hongyuanjia.github.io/eplusr/articles/eplusr.html).
-You can learn more about eplusr at
-<https://hongyuanjia.github.io/eplusr>, along with full package
-documentation.
+There is also an online slides
+[here](https://hongyuanjia.github.io/eplusrIntro). You can learn more
+about eplusr at <https://hongyuanjia.github.io/eplusr>, along with full
+package documentation.
 
 ## Installation
 
@@ -120,7 +121,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: `/tmp/RtmptLtk5U/temp_libpath6ffe2e3be6cb/eplusr/extdata/1Zon...
+#>  * Path: `/tmp/Rtmprp51vL/temp_libpath51df19293cd6/eplusr/extdata/1Zon...
 #>  * Version: `8.8.0`
 #> 
 #> Group: <Simulation Parameters>
@@ -325,13 +326,13 @@ job <- idf$run(epw)
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing IDF located at /tmp/RtmptLtk5U/model.idf.
+#> Replace the existing IDF located at /tmp/Rtmprp51vL/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.005
+#> ExpandObjects Finished. Time:     0.008
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.03 16:13
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.14 22:16
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -357,7 +358,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ══════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2019-05-03 16:13:00
+#>   * Simulation started: 2019-05-14 22:16:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
