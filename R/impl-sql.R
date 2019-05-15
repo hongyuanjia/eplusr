@@ -318,6 +318,9 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 
     # check leap year
     leap <- any(res$month == 2L & res$day == 29L)
+    # month, day, hour, minute may be NA if reporting frequency is Monthly or
+    # RunPeriod
+    if (is.na(leap)) leap <- FALSE
 
     # get input year
     if (is.null(year)) {
@@ -352,8 +355,10 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     set(res, NULL, c("year", "environment_period_index"), NULL)
 
     # stop if any invalid datetime found
-    if (anyNA(res$datetime)) {
-        invld <- res[is.na(datetime)]
+    # month, day, hour, minute may be NA if reporting frequency is Monthly or
+    # RunPeriod
+    if (anyNA(res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute), datetime])) {
+        invld <- res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute)]
         mes <- invld[, paste0("Original: ", month, "-", day, " ",  hour, ":", minute,
             " --> New year: ", year)]
         abort("error_invalid_epw_date_introduced",
