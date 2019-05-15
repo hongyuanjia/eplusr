@@ -2006,7 +2006,7 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
     add_class_name(idd_env, parsed$object)
     # add class id and field index
     add_joined_cols(parsed$object, parsed$value, "object_id", c("class_id", "class_name"))
-    add_joined_cols(idd_env$field, parsed$value, "field_id", "field_index")
+    add_joined_cols(idd_env$field, parsed$value, "field_id", c("field_index", "field_name"))
 
     # remove version object
     obj_ver <- parsed$object[class_name == "Version", object_id]
@@ -2017,6 +2017,9 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
     add_joined_cols(idd_env$class, parsed$value, "class_id", c("min_fields", "num_extensible"))
     add_field_property(idd_env, parsed$value, "required_field")
     parsed$value <- remove_empty_fields(parsed$value)
+
+    # add rleid for validation and message printing
+    add_rleid(parsed$object)
 
     # remove duplicated objects
     if (unique) {
@@ -2750,7 +2753,7 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 
     text <- readLines("clipboard", warn = FALSE)
 
-    if (!stringi::stri_startswith_fixed(text, "IDF,")) {
+    if (length(text) != 1L || !stringi::stri_startswith_fixed(text, "IDF,")) {
         abort("error_clipboard_string", "Failed to find contents copied from IDF Editor.")
     }
     text <- gsub("([,;])", "\\1\n", stri_sub(text, 5L))
