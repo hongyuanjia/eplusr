@@ -138,8 +138,19 @@ the same start day of week as specified in the RunPeriod objects.
 
 eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
 which is the default behavior, eplusr will calculate a year value (from
-current year backwards) for each run period that compliance with the start
+current year backwards) for each run period that compliances with the start
 day of week restriction.
+
+It is worth noting that EnergyPlus uses 24-hour clock system where 24 is only
+used to denote midnight at the end of a calendar day. In EnergyPlus output,
+"00:24:00" with a time interval being 15 mins represents a time period from
+"00:23:45" to "00:24:00", and similarly "00:15:00" represents a time period
+from "00:24:00" to "00:15:00" of the next day. This means that if current day
+is Friday, day of week rule applied in schedule time period "00:23:45" to
+"00:24:00" (presented as "00:24:00" in the output) is also Friday, but not
+Saturday. However, if you try to get the day of week of time "00:24:00" in R,
+you will get Saturday, but not Friday. This introduces inconsistency and may
+cause problems when doing data analysis considering day of week value.
 
 \code{$tabular_data()} extracts the tabular data in a
 \link[data.table:data.table]{data.table} using report, table, column and row
