@@ -10,6 +10,10 @@
 *  Fix `$errors()` error in `ParametricJob` class.
 *  The year of returned date time from `$data()`, `$abnormal_data()` and
    `$redundant_data()` now have correct values (#44).
+*  Reset year after checking datetime in `read_epw()` (#44).
+*  Add field name in input before validation in `paste()` (#45).
+*  Fix datetime calculation in `$report_data()` in `EplusSql` (#46).
+*  Update doc on EnergyPlus time nodation (#47).
 
 ## Minor changes
 
