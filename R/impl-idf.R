@@ -2931,7 +2931,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         )
     }
 
-    set(val, NULL, "same_dir", normalizePath(dirname(dir$old_full_path)) == new_dir)
+    set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path)) == new_dir)
 
     # find files to copy
     val <- val[old_exist == TRUE & same_dir == FALSE]
@@ -2944,7 +2944,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     # change all paths to full paths
     } else {
         set(val, NULL, "file_name", basename(val$value_chr))
-        set(val, NULL, "new_full_path", normalizePath(file.path(val$new_dir, val$file_name), mustWork = FALSE))
+        set(val, NULL, "new_full_path", normalizePath(file.path(new_dir, val$file_name), mustWork = FALSE))
         set(val, NULL, "new_value", val$file_name)
 
         # copy files
