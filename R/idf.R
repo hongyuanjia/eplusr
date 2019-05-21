@@ -2145,7 +2145,7 @@ idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
 # }}}
 # idf_update {{{
 idf_update <- function (self, private, ..., .default = TRUE) {
-    l <- load_idf_object(private$idd_env(), private$idf_env(), private$m_version,
+    l <- update_idf_object(private$idd_env(), private$idf_env(), private$m_version,
         ..., .default = .default
     )
 

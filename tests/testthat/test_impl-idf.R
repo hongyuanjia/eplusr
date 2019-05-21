@@ -582,7 +582,7 @@ test_that("DEFINITION DOTS", {
 
     const1 <- idd$Construction$to_string(all = TRUE)
     const2 <- idd$Construction$to_string()
-    expect_equal(sep_definition_dots(const1, const2, .version = 8.8),
+    expect_equivalent(sep_definition_dots(const1, const2, .version = 8.8),
         list(parsed = list(
                 version = numeric_version("8.8.0"),
                 options = list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE, save_format = "sorted"),
@@ -907,6 +907,8 @@ test_that("Update", {
         )
     )
     expect_equivalent(upd$reference, idf_env$reference)
+
+    expect_silent(update_idf_object(idd_env, idf_env, idf$version(), mat[4]))
 })
 # }}}
 
