@@ -1,5 +1,13 @@
 # eplusr (development version)
 
+## New features
+
+* `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
+* A new method `$update()` is added in `Idf` class which makes it possible to
+  directly modify existing objects using character vectors and data.frames.
+* A new argument `wide` is added in `$to_table()` method in `Idf` class,
+  similar to `$to_table()` method in `IdfObject` class.
+
 ## Bug fixes
 
 * `$add()` method and other methods that modify field values can correctly
@@ -18,12 +26,6 @@
 ## Minor changes
 
 *  Change message types in `$ref_to_object()` and `$ref_by_object()` in `IdfObject`.
-
-## New features
-
-* `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
-* A new method `$update()` is added in `Idf` class which makes it possible to
-  directly modify existing objects using character vectors and data.frames.
 
 # eplusr 0.10.2
 

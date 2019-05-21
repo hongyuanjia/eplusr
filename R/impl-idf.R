@@ -2998,21 +2998,46 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 
 # TABLE
 # get_idf_table {{{
-get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL, string_value = TRUE, unit = TRUE) {
+get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
+                           string_value = TRUE, unit = FALSE, wide = FALSE, all = FALSE) {
     cols <- c("object_id", "object_name", "class_name",
               "field_index", "field_name", "units", "ip_units", "type_enum",
               "value_chr", "value_num")
 
+    if (all && length(unique(val$class_id)) != 1L) {
+        abort("error_multi_class",
+            "Target objects should belong to the same class when `all` is TRUE."
+        )
+    }
+
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum"))[, .SD, .SDcols = cols]
+        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
+
+    if (wide && length(unique(val$class_name)) != 1L) {
+        cls <- unique(val$class_name)
+        if (length(cls) <= 5L) {
+            cls <- collapse(cls)
+        } else {
+            cls <- paste0(c(surround(cls[1:5]), "..."), collapse = ", ")
+        }
+        abort("error_multi_class",
+            paste0("Target objects should belong to a same class when `wide` is TRUE. ",
+                "Multiple classes found: ", cls, "."
+            )
+        )
+    }
 
     setnames(val,
         c("object_id", "object_name", "class_name", "field_index", "field_name"),
         c("id", "name", "class", "index", "field"))
 
     if (string_value) {
-        setnames(val, "value_chr", "value")
-        val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+        if (wide) {
+            dcast(val, id + name + class ~ field, value.var = "value_chr")
+        } else {
+            setnames(val, "value_chr", "value")
+            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+        }
     } else {
         lst <- get_value_list(val, unit = unit)
         if (nrow(val) == 1L) {
@@ -3021,7 +3046,31 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL, string
             set(val, NULL, "value", lst)
         }
 
-        val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+        if (wide) {
+            val <- setcolorder(
+                dcast(val, id + name + class ~ field, value.var = "value"),
+                c("id", "name", "class", val$field[unique(val$index)])
+            )
+
+            cols <- setdiff(names(val), c("id", "name", "class"))
+            if (!unit) {
+                val[, c(cols) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE), .SDcols = cols]
+            } else {
+                # get unit attributes
+                unit <- val[, lapply(.SD, function (x) list(attr(x[[1]], "units"))), .SDcols = cols]
+
+                val[, c(cols) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE), .SDcols = cols]
+
+                for (nm in names(unit)) {
+                    if (!is.null(unit[[nm]][[1L]])) {
+                        set(val, NULL, nm, setattr(setattr(val[[nm]], "units", unit[[nm]][[1L]]), "class", "units"))
+                    }
+                }
+            }
+            val[]
+        } else {
+            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+        }
     }
 }
 # }}}

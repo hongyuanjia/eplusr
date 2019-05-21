@@ -262,44 +262,9 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
 # get_idfobj_table {{{
 get_idfobj_table <- function (idd_env, idf_env, object_id, all = FALSE,
                               unit = TRUE, wide = FALSE, string_value = TRUE) {
-    cols <- c("object_id", "object_name", "class_name",
-              "field_index", "field_name", "units", "ip_units", "type_enum",
-              "value_chr", "value_num")
-
-    val <- get_idf_value(idd_env, idf_env, object = object_id,
-        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
-
-    setnames(val,
-        c("object_id", "object_name", "class_name", "field_index", "field_name"),
-        c("id", "name", "class", "index", "field"))
-
-    if (string_value) {
-        if (wide) {
-            dcast(val, id + name + class ~ field, value.var = "value_chr")
-        } else {
-            setnames(val, "value_chr", "value")
-            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
-        }
-    } else {
-        lst <- get_value_list(val, unit = unit)
-        if (nrow(val) == 1L) {
-            set(val, NULL, "value", list(lst))
-        } else {
-            set(val, NULL, "value", lst)
-        }
-        if (wide) {
-            val <- setcolorder(
-                dcast(val, id + name + class ~ field, value.var = "value"),
-                c("id", "name", "class", val$field)
-            )
-            for (col in setdiff(names(val), c("id", "name", "class"))) {
-                set(val, NULL, col, val[[col]][[1L]])
-            }
-            val
-        } else {
-            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
-        }
-    }
+    get_idf_table(idd_env, idf_env, NULL, object_id, all = all, unit = unit,
+        wide = wide, string_value = string_value
+    )
 }
 # }}}
 # get_idfobj_string {{{

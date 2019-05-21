@@ -936,3 +936,72 @@ test_that("Save", {
     )
 })
 # }}}
+
+# TO_TABLE {{{
+test_that("TO_TABLE", {
+    # read idf
+    idf <- read_idf(example(), 8.8)
+    idf_env <- ._get_private(idf)$m_idf_env
+    idd_env <- ._get_private(idf)$idd_env()
+
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material"),
+        data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
+            index = 1:9,
+            field = c(
+                "Name", "Roughness", "Thickness", "Conductivity", "Density",
+                "Specific Heat", "Thermal Absorptance", "Solar Absorptance",
+                "Visible Absorptance"
+            ),
+            value = c(
+                "C5 - 4 IN HW CONCRETE", "MediumRough", "0.1014984", "1.729577",
+                "2242.585", "836.8", "0.9", "0.65", "0.65"
+            )
+        )
+    )
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE),
+        data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
+            index = 1:9,
+            field = c(
+                "Name", "Roughness", "Thickness", "Conductivity", "Density",
+                "Specific Heat", "Thermal Absorptance", "Solar Absorptance",
+                "Visible Absorptance"
+            ),
+            value = list(
+                "C5 - 4 IN HW CONCRETE", "MediumRough", 0.1014984, 1.729577,
+                2242.585, 836.8, 0.9, 0.65, 0.65
+            )
+        ), tolerance = 1e-5
+    )
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE, unit = TRUE),
+        data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
+            index = 1:9,
+            field = c(
+                "Name", "Roughness", "Thickness", "Conductivity", "Density",
+                "Specific Heat", "Thermal Absorptance", "Solar Absorptance",
+                "Visible Absorptance"
+            ),
+            value = list(
+                "C5 - 4 IN HW CONCRETE", "MediumRough",
+                units::set_units(0.1014984, "m"),
+                units::set_units(1.729577, "W/K/m"),
+                units::set_units(2242.585, "kg/m^3"),
+                units::set_units(836.8, "J/K/kg"),
+                0.9, 0.65, 0.65
+            )
+        ), tolerance = 1e-5
+    )
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE, unit = TRUE, wide = TRUE),
+        data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
+            "Name" = "C5 - 4 IN HW CONCRETE",
+            "Roughness" = "MediumRough",
+            "Thickness" = units::set_units(0.1014984, "m"),
+            "Conductivity" = units::set_units(1.729577, "W/K/m"),
+            "Density" = units::set_units(2242.585, "kg/m^3"),
+            "Specific Heat" = units::set_units(836.8, "J/K/kg"),
+            "Thermal Absorptance" = 0.9,
+            "Solar Absorptance" = 0.65,
+            "Visible Absorptance" = 0.65
+        ), tolerance = 1e-5
+    )
+})
+# }}}

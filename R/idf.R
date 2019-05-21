@@ -70,7 +70,7 @@ NULL
 #' model$is_unsaved()
 #' model$validate(level = eplusr_option("validate_level"))
 #' model$is_valid(level = eplusr_option("validate_level"))
-#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
 #' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
@@ -929,7 +929,7 @@ NULL
 #'
 #' @section Data Extraction:
 #' ```
-#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
 #' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' ```
 #'
@@ -962,6 +962,10 @@ NULL
 #' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
 #'   of numeric fields are assigned with units using [units::set_units()] if
 #'   applicable. Default: `FALSE`.
+#' * `wide`: Only applicable if target objects belong to a same class. If
+#'   `TRUE`, a wide table will be returned, i.e. first three columns are always
+#'   `id`, `name` and `class`, and then every field in a separate column.
+#'   Default: `FALSE`.
 #' * `comment`: If `FALSE`, all comments will not be included. Default: `TRUE`.
 #' * `header`: If `FALSE`, the header will not be included. Default: `TRUE`.
 #' * `format`: Specific format used when formatting. For details, please see
@@ -1632,8 +1636,8 @@ Idf <- R6::R6Class(classname = "Idf",
             idf_string(self, private, comment = comment, header = header,
                        format = format, leading = leading, sep_at = sep_at),
 
-        to_table = function (which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
-            idf_to_table(self, private, which = which, class = class, string_value = string_value, unit = unit),
+        to_table = function (which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
+            idf_to_table(self, private, which = which, class = class, string_value = string_value, unit = unit, wide = wide),
 
         is_unsaved = function ()
             idf_is_unsaved(self, private),
@@ -2188,8 +2192,8 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE) {
-    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit)
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE) {
+    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide)
 }
 # }}}
 # idf_save {{{

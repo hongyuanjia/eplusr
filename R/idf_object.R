@@ -393,7 +393,7 @@ NULL
 #' * `unit`: Only applicable when `string_value` is `FALSE`. If `TRUE`, values
 #'   of numeric fields are assigned with units using [units::set_units()] if
 #'   applicable. Default: `FALSE`.
-#' * `wide`: If `TRUE`, a wide table will be returned, i.e. first three column
+#' * `wide`: If `TRUE`, a wide table will be returned, i.e. first three columns
 #'   are always `id`, `name` and `class`, and then every field in a separate
 #'   column. Default: `FALSE`.
 #' * `comment`: If `FALSE`, all comments will not be included. Default: `TRUE`.
