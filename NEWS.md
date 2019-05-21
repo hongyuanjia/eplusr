@@ -22,6 +22,8 @@
 ## New features
 
 * `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
+* A new method `$update()` is added in `Idf` class which makes it possible to
+  directly modify existing objects using character vectors and data.frames.
 
 # eplusr 0.10.2
 
