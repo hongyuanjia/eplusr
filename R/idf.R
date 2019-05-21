@@ -62,6 +62,7 @@ NULL
 #' model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 #' model$insert(..., .unique = TRUE)
 #' model$load(..., .unique = TRUE, .default = TRUE)
+#' model$update(..., .default = TRUE)
 #' model$rename(...)
 #' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
 #' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -682,6 +683,77 @@ NULL
 #'   dt <- model1$to_table(class = "Material")
 #'   dt[field == "thickness", value := "0.5"]
 #'   model$load(dt)
+#'   ```
+#' }
+#'
+#' \subsection{Update Objects from characters or data.frames}{
+#'
+#' ```
+#' model$update(..., .unique = TRUE, .default = TRUE)
+#' ```
+#'
+#' `$update()` is similar to `$load()` except it update field values.  This
+#' makes it easy to update object values using the output from `$to_string()`
+#' and `$to_table` method from [Idd], [IddObject], also Idf and [IdfObject]
+#' class.
+#'
+#' For object definitions in character vector format, object names are used to
+#' locate which objects to update. Objects that have name attribute should have
+#' valid names. This means that there is no way to update object names using
+#' character vector format, but it can be achieved using data.frame format as it
+#' uses object IDs instead of object names to locate objects.
+#'
+#' For object definitions in data.frame format, it is highly recommended to use
+#' `$to_table()` method in [Idd], [IddObject], `Idf` and [IdfObject] class. A
+#' valid definition requires four columns described below. Note that
+#' column order does not matter.
+#'
+#' * `id`: Integer type. The value in `id` should be valid object IDs for current
+#'   `Idf`.
+#' * `class`: Character type. Valid class names for current `Idf`.
+#' * `index`: Integer type. Valid field indexes for each class. If input field
+#'   does not exist in specified object, it will be added on the fly.
+#' * `value`: Character type or list type. The value of each field
+#'   to be added.
+#'   * If `value` is a character column, usually when `string_value` is `TRUE`
+#'     in method `$to_table()` in `Idf` and [IdfObject] class. Each value should
+#'     be given as a string even if the corresponding field is a numeric type.
+#'   * If `value` is a list column, usually when `string_value` is set to
+#'    `FALSE` in method `$to_table()` in `Idf` and [IdfObject] class. Each value
+#'    should have the right type  as the corresponding field definition.
+#'    Otherwise, errors will be issued during if current validation level
+#'    includes invalid-type checking. For what kind of validation components to
+#'    be performed during modifications, please see [level_checks()].
+#'
+#' **Note**:
+#'
+#' * `$update()` assume all definitions are from the same version as current
+#'   `Idf` object. If input definition is from different version, parsing error
+#'   may occur.
+#'
+#' **Argument**:
+#'
+#' * `...`: Character vectors or data.frames of object definitions For details,
+#'   see above.
+#' * `.default`: If `TRUE`, default values are used for those blank fields if
+#'    possible. Default: `TRUE`.
+#'
+#' **Usage**:
+#'
+#' * Update objects from string definitions:
+#'
+#'   ```
+#'   str <- model$Material[[1]]$to_string()
+#'   str[4] <- "0.8"
+#'   model$update(str)
+#'   ```
+#'
+#' * Update objects from data.frame definitions:
+#'
+#'   ```
+#'   dt <- model1$to_table(class = "Material")
+#'   dt[field == "thickness", value := "0.5"]
+#'   model$update(dt)
 #'   ```
 #' }
 #'
@@ -1509,6 +1581,9 @@ Idf <- R6::R6Class(classname = "Idf",
         load = function (..., .unique = TRUE, .default = TRUE)
             idf_load(self, private, ..., .unique = .unique, .default = .default),
 
+        update = function (..., .default = TRUE)
+            idf_update(self, private, ..., .default = .default),
+
         paste = function (in_ip = FALSE, ver = NULL, unique = TRUE)
             idf_paste(self, private, in_ip = in_ip, ver = ver, unique = unique),
 
@@ -2059,6 +2134,22 @@ idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
     }
 
     merge_idf_data(private$idf_env(), l, by_object = TRUE)
+
+    # log
+    log_new_order(private$m_log, l$object$object_id)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
+
+    idf_return_modified(self, private, l)
+}
+# }}}
+# idf_update {{{
+idf_update <- function (self, private, ..., .default = TRUE) {
+    l <- load_idf_object(private$idd_env(), private$idf_env(), private$m_version,
+        ..., .default = .default
+    )
+
+    merge_idf_data(private$idf_env(), l)
 
     # log
     log_new_order(private$m_log, l$object$object_id)

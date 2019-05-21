@@ -540,18 +540,28 @@ sep_object_dots <- function (...) {
 }
 # }}}
 # sep_definition_dots {{{
-sep_definition_dots <- function (..., .version = NULL) {
+sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
     l <- list(...)
 
     # stop if empty input
-    if (!length(l)) abort("error_empty_input", "Please give object(s) to load.")
+    if (!length(l)) {
+        if (.update) {
+            abort("error_empty_input", "Please give object(s) to update.")
+        } else {
+            abort("error_empty_input", "Please give object(s) to load.")
+        }
+    }
 
     # check type of each element
     get_depth <- function (x) {
         if (is.character(x)) {
             if (anyNA(x)) 0L else 1L
         } else if (is.data.frame(x)) {
-            if (has_name(x, c("class", "index", "value"))) 2L else 0L
+            if (.update) {
+                if (has_name(x, c("id", "class", "index", "value"))) 2L else 0L
+            } else {
+                if (has_name(x, c("class", "index", "value"))) 2L else 0L
+            }
         } else {
             0L
         }
@@ -562,9 +572,11 @@ sep_definition_dots <- function (..., .version = NULL) {
     dt_dot <- data.table(rleid = seq_along(l), dot = l, dot_nm = names2(l), depth = depth)
 
     if (any(depth == 0L)) {
+        cols <- c("class", "index", "value")
+        if (.update) cols <- c("id", cols)
         abort("error_wrong_type",
             paste0("Each element must be a character vector with no NA or ",
-                "a data frame with column `class`, `index` and `value`. ",
+                "a data frame with column ", collapse(cols), ". ",
                 "Invalid input:\n", str_trunc(dot_string(dt_dot[J(0L), on = "depth"]))
             )
         )
@@ -650,7 +662,11 @@ sep_definition_dots <- function (..., .version = NULL) {
                     )
                 )
             }
-            set(dt, NULL, "object_id", rleid(dt$id, dt$class))
+            if (.update) {
+                setnames(dt, "id", "object_id")
+            } else {
+                set(dt, NULL, "object_id", rleid(dt$id, dt$class))
+            }
         } else if (anyDuplicated(dt, by = c("class", "index"))) {
             abort("error_dot_def_index_dup",
                 paste0("When input is a data.frame, `class` and `index` column ",
@@ -681,7 +697,7 @@ sep_definition_dots <- function (..., .version = NULL) {
             value_num <- suppressWarnings(as.double(value_chr))
 
             # an indicator of input value type. 1: character, 2: list
-            type = 1L
+            type <- 1L
 
             # mark NA input as defaulted
             defaulted[is.na(value_chr)] <- TRUE
@@ -727,7 +743,7 @@ sep_definition_dots <- function (..., .version = NULL) {
             }
 
             # an indicator of input value type. 1: character, 2: list
-            type = 2L
+            type <- 2L
         }
 
         list(object_id = dt$object_id, class_name = dt$class,
@@ -1277,7 +1293,7 @@ assert_can_do <- function (idd_env, idf_env, dot, object,
 
     # stop if modifying same object multiple times {{{
     if (action %in% c("set", "del", "rename") && anyDuplicated(object$object_id)) {
-        invld <- find_dot(dot, object[duplicated(class_id)])
+        invld <- find_dot(dot, object[duplicated(object_id)])
         info <- get_object_info(invld, numbered = FALSE)
         m <- paste0(dot_string(invld, NULL), " --> ", info, collapse = "\n")
 
@@ -2236,9 +2252,220 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
     )
 }
 # }}}
-# purge_idf_object {{{
-purge_idf_object <- function (idd_env, idf_env, class = c("Schedule", "Construction", "Material")) {
-    stop("Not implemented")
+# update_idf_object {{{
+update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) {
+    l <- sep_definition_dots(..., .version = version, .update = TRUE)
+
+    prop <- c("is_name", "required_field", "src_enum", "type_enum", "extensible_group")
+    if (.default) prop <- c(prop, c("units", "ip_units", "default_chr", "default_num"))
+
+    # get object and value from data.frame input {{{
+    if (!nrow(l$value)) {
+        obj_dt <- data.table()
+        val_dt <- data.table()
+    } else {
+        obj <- l$value[, list(num = max(field_index)), by = c("rleid", "object_id", "class_name")]
+
+        # verify class name
+        if (!all(obj$class_name %chin% idd_env$class$class_name[idf_env$object$class_id])) {
+            # get input with invalid class name
+            invld <- obj[!class_name %chin% idd_env$class$class_name[idf_env$object$class_id]]
+            abort("error_class_name",
+                paste0("Invalid class name ", collapse(unique(invld$class_name)), " found in input:\n",
+                    dot_string(l$dot[J(unique(invld$rleid)), on = "rleid"])
+                )
+            )
+        }
+
+        # verify object id
+        obj_dt <- tryCatch(get_idf_object(idd_env, idf_env, obj$class_name, obj$object_id, "has_name"),
+            error_object_id = function (e) {
+                # get input with invalid class name
+                invld <- obj[J(e$value), on = "object_id"]
+                obj <- collapse(paste0(surround(invld$object_id), "(Class: ", surround(invld$class_name), ")"), NULL)
+                abort("error_object_id",
+                    paste0("Invalid object id ", obj, " found in input:\n",
+                        dot_string(l$dot[J(invld$rleid), on = "rleid"])
+                    )
+                )
+            }
+        )
+        # reset rleid
+        set(obj_dt, NULL, c("rleid", "num"), list(obj$rleid, obj$num))
+
+        assert_can_do(idd_env, idf_env, l$dot, obj_dt, "set")
+
+        # verify class name and add class id
+        val_dt <- tryCatch(
+            get_idf_value(idd_env, idf_env, object = obj$object_id, field = obj$num,
+                complete = TRUE, property = prop),
+            error_bad_field_index = function (e) {
+                # update rleid
+                e$data[, rleid := l$value$rleid[e$data$rleid]]
+                abort_bad_field("error_bad_field_index", "index", e$data)
+            }
+        )
+
+        # add input new values
+        set(val_dt, NULL, "rleid", l$value$rleid[val_dt$rleid])
+        set(val_dt, NULL, c("new_value", "new_value_num", "defaulted", "type"),
+            l$value[val_dt, on = c("object_id", "field_index"),
+                .SD, .SDcols = c("value_chr", "value_num", "defaulted", "type")
+            ]
+        )
+
+        # if input is character vectors, need to reset values since all of them
+        # are coerced regardless of field types
+        val_dt[type == 1L & type_enum > IDDFIELD_TYPE$real, `:=`(value_num = NA_real_)]
+        set(val_dt, NULL, "type", NULL)
+
+        # reset rleid
+        set(val_dt, NULL, "rleid",
+            obj_dt[J(val_dt$rleid, val_dt$object_id), on = c("rleid", "object_id"), rleid]
+        )
+
+        # delete unuseful columns
+        set(obj_dt, NULL, "num", NULL)
+
+        # order
+        setorderv(val_dt, c("rleid", "field_index"))
+    }
+    # }}}
+
+    # get object and value from character input {{{
+    if (!length(l$parsed)) {
+        obj_chr <- data.table()
+        val_chr <- data.table()
+    } else {
+        obj_chr <- l$parsed$object
+        val_chr <- l$parsed$value
+
+        # add class name
+        add_class_name(idd_env, obj_chr)
+        add_class_property(idd_env, obj_chr, "has_name")
+        # add class id and field index
+        add_joined_cols(obj_chr, val_chr, "object_id", c("class_id", "class_name", "object_name"))
+        add_joined_cols(idd_env$field, val_chr, "field_id", c("field_index", "field_name"))
+        # add field property
+        add_field_property(idd_env, val_chr, prop)
+
+        # add field defaults if possible
+        set(val_chr, NULL, "defaulted", FALSE)
+
+        # check invalid class
+        if (!all(obj_chr$class_id %in% idf_env$object$class_id)) {
+            # get input with invalid class name
+            invld <- obj_chr[!class_id %in% idf_env$object$class_id]
+            set(invld, NULL, "class_name", idd_env$class$class_name[invld$class_id])
+            abort("error_class_name",
+                paste0("Invalid class name ", collapse(unique(invld$class_name)), " found in input:\n",
+                    dot_string(l$dot[J(unique(invld$rleid)), on = "rleid"])
+                )
+            )
+        }
+
+        # if all class are valid, each object in class that has name attribute
+        # should has a valid name
+        if (anyNA(obj_chr$object_name[obj_chr$has_name])) {
+            invld <- obj_chr[J(TRUE, NA_character_), on = c("has_name", "object_name")]
+            abort("error_missing_object_name",
+                paste0("When input is a character vector, object name should be given to locate which object to update. ",
+                    "Missing object name for class ", collapse(unique(invld$class_name)), " found in input:\n",
+                    dot_string(l$dot[J(unique(invld$rleid)), on = "rleid"])
+                )
+            )
+        }
+
+        # verify object name
+        obj_chr_out <- tryCatch(
+            get_idf_object(idd_env, idf_env, obj_chr$class_id, obj_chr$object_name_lower, "has_name", ignore_case = TRUE),
+            error_object_name_lower = function (e) {
+                # get input with invalid class name
+                invld <- obj_chr[J(e$value), on = "object_name_lower"]
+                obj_chr <- collapse(paste0(surround(invld$object_name), "(Class: ", surround(invld$class_name), ")"), NULL)
+                abort("error_object_name",
+                    paste0("Invalid object name ", obj_chr, " found in input:\n",
+                        dot_string(l$dot[J(invld$rleid), on = "rleid"])
+                    )
+                )
+            }
+        )
+
+        # reset rleid
+        # keep the original rleid for error printing
+        obj_chr <- set(obj_chr_out, NULL, c("rleid", "has_name", "old_object_id"),
+            list(obj_chr$rleid, obj_chr$has_name, obj_chr$object_id)
+        )
+
+        # update object ID
+        set(val_chr, NULL, "object_id", obj_chr[J(val_chr$object_id), on = "old_object_id", object_id])
+        set(obj_chr, NULL, "old_object_id", NULL)
+
+        assert_can_do(idd_env, idf_env, l$dot, obj_chr, "set")
+
+        # get existing value id
+        set(val_chr, NULL, "value_id",
+            idf_env$value[J(val_chr$object_id, val_chr$field_id), on = c("object_id", "field_id"), value_id]
+        )
+
+        # add new values
+        set(val_chr, NULL, c("new_value", "new_value_num"),
+            l$parsed$value[J(val_chr$object_id, val_chr$field_id), on = c("object_id", "field_id"),
+                list(value_chr, value_num)]
+        )
+    }
+    # }}}
+
+    obj <- rbindlist(list(obj_dt, obj_chr), fill = TRUE)
+    val <- rbindlist(list(val_dt, val_chr), fill = TRUE)
+    setorderv(val, c("rleid", "object_id", "field_id"))
+
+    if (.default) val[is.na(value_chr) & is.na(defaulted), defaulted := TRUE]
+    val[is.na(defaulted), defaulted := FALSE]
+
+    # exclude name field if it has been already set before in order to
+    # prevent name conflict checking error
+    val[is_name == TRUE & !is.na(value_chr) & is.na(new_value),
+        `:=`(required_field = FALSE)
+    ]
+
+    # make sure rleid is unique
+    set(obj, NULL, "rleid", seq.int(nrow(obj)))
+    set(val, NULL, "rleid", rleid(val$rleid, val$object_id))
+
+    # assign default values if needed
+    if (.default) {
+        val <- assign_default_value(val)
+    } else {
+        # remove
+        val[defaulted == TRUE, `:=`(value_chr = NA_character_, value_num = NA_real_)]
+    }
+    set(val, NULL, c("default_chr", "default_num"), NULL)
+
+    # assign new values
+    val[!is.na(new_value), `:=`(value_chr = new_value, value_num = new_value_num)]
+    set(val, NULL, c("new_value", "new_value_num"), NULL)
+
+    # assign new value id
+    val[value_id < 0L, value_id := new_id(idf_env$value, "value_id", .N)]
+
+    # update object name
+    obj <- update_object_name(obj, val)
+    set(val, NULL, "is_name", NULL)
+    # add lower name
+    set(obj, NULL, "object_name_lower", stri_trans_tolower(obj$object_name))
+
+    # delete fields
+    add_joined_cols(idd_env$class, val, "class_id", c("min_fields", "num_extensible"))
+    val <- remove_empty_fields(val)
+
+    # validate
+    assert_valid(idd_env, idf_env, obj, val, action = "set")
+
+    list(object = obj[, .SD, .SDcols = names(idf_env$object)],
+         value = val[, .SD, .SDcols = names(idf_env$value)],
+         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+    )
 }
 # }}}
 # search_idf_value {{{
