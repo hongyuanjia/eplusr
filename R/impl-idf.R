@@ -3004,24 +3004,19 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
               "field_index", "field_name", "units", "ip_units", "type_enum",
               "value_chr", "value_num")
 
-    if (all && length(unique(val$class_id)) != 1L) {
-        abort("error_multi_class",
-            "Target objects should belong to the same class when `all` is TRUE."
-        )
-    }
-
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
         property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
 
-    if (wide && length(unique(val$class_name)) != 1L) {
+    if ((all || wide) && length(unique(val$class_name)) != 1L) {
         cls <- unique(val$class_name)
         if (length(cls) <= 5L) {
             cls <- collapse(cls)
         } else {
             cls <- paste0(c(surround(cls[1:5]), "..."), collapse = ", ")
         }
+        opt <- if (all) "`all`" else "`wide`"
         abort("error_multi_class",
-            paste0("Target objects should belong to a same class when `wide` is TRUE. ",
+            paste0("Target objects should belong to a same class when ", opt, " is TRUE. ",
                 "Multiple classes found: ", cls, "."
             )
         )
