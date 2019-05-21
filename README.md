@@ -9,8 +9,11 @@ Status](https://travis-ci.org/hongyuanjia/eplusr.svg?branch=master)](https://tra
 Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
+[![CRAN
+Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
 [![CRAN Download
 Badge](https://cranlogs.r-pkg.org/badges/eplusr)](https://cran.r-project.org/package=eplusr)
+[![Dependencies](https://tinyverse.netlify.com/badge/eplusr)](https://cran.r-project.org/package=eplusr)
 
 > A Toolkit for Using EnergyPlus in R.
 
@@ -121,7 +124,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: `/tmp/Rtmprp51vL/temp_libpath51df19293cd6/eplusr/extdata/1Zon...
+#>  * Path: `/tmp/Rtmphx9XfZ/temp_libpath27b05412c106/eplusr/extdata/1Zon...
 #>  * Version: `8.8.0`
 #> 
 #> Group: <Simulation Parameters>
@@ -213,6 +216,33 @@ idf$Construction$FLOOR$value_possible("Outside Layer")
 #>   - "C5 - 4 IN HW CONCRETE"
 #>   - "R13LAYER"
 #>   - "R31LAYER"
+
+# extract object data
+idf$to_table(class = "BuildingSurface:Detailed", string_value = FALSE, unit = TRUE)
+#>      id          name                    class index
+#>   1: 21 Zn001:Wall001 BuildingSurface:Detailed     1
+#>   2: 21 Zn001:Wall001 BuildingSurface:Detailed     2
+#>   3: 21 Zn001:Wall001 BuildingSurface:Detailed     3
+#>   4: 21 Zn001:Wall001 BuildingSurface:Detailed     4
+#>   5: 21 Zn001:Wall001 BuildingSurface:Detailed     5
+#>  ---                                                
+#> 128: 26 Zn001:Roof001 BuildingSurface:Detailed    18
+#> 129: 26 Zn001:Roof001 BuildingSurface:Detailed    19
+#> 130: 26 Zn001:Roof001 BuildingSurface:Detailed    20
+#> 131: 26 Zn001:Roof001 BuildingSurface:Detailed    21
+#> 132: 26 Zn001:Roof001 BuildingSurface:Detailed    22
+#>                           field         value
+#>   1:                       Name Zn001:Wall001
+#>   2:               Surface Type          Wall
+#>   3:          Construction Name       R13WALL
+#>   4:                  Zone Name      ZONE ONE
+#>   5: Outside Boundary Condition      Outdoors
+#>  ---                                         
+#> 128:      Vertex 3 Y-coordinate         0 [m]
+#> 129:      Vertex 3 Z-coordinate     4.572 [m]
+#> 130:      Vertex 4 X-coordinate     15.24 [m]
+#> 131:      Vertex 4 Y-coordinate     15.24 [m]
+#> 132:      Vertex 4 Z-coordinate     4.572 [m]
 
 # read EPW
 path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
@@ -326,13 +356,13 @@ job <- idf$run(epw)
 #> Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
 #> 
 #> ── Info ───────────────────────────────────────────────────────────────────
-#> Replace the existing IDF located at /tmp/Rtmprp51vL/model.idf.
+#> Replace the existing IDF located at /tmp/Rtmphx9XfZ/model.idf.
 #> 
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.008
+#> ExpandObjects Finished. Time:     0.005
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.14 22:16
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.05.22 00:39
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -358,7 +388,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ══════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2019-05-14 22:16:00
+#>   * Simulation started: 2019-05-22 00:39:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2

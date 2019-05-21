@@ -162,6 +162,9 @@ idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 # get possible values for fields
 idf$Construction$FLOOR$value_possible("Outside Layer")
 
+# extract object data
+idf$to_table(class = "BuildingSurface:Detailed", string_value = FALSE, unit = TRUE)
+
 # read EPW
 path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 epw <- read_epw(path_epw)
