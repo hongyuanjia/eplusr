@@ -324,18 +324,6 @@ get_idfobj_string <- function (idd_env, idf_env, object_id, comment = TRUE, lead
     c(cmt, cls, fld)
 }
 # }}}
-# idfobj_to_string {{{
-idfobj_to_string <- function (self, private, comment = TRUE, leading = 4L, sep_at = 29L) {
-    unlist(with_nocolor(with_format_cols(private$idd_env(), private$idf_env(),
-        format_idf(
-            get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id),
-            get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id),
-            comment = comment, header = FALSE, save_format = "sorted",
-            leading = leading, sep_at = sep_at
-        )
-    ))$format$fmt[[1L]][[2L]], use.names = FALSE)
-}
-# }}}
 
 # helper
 # merge_idfobj_data {{{
