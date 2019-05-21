@@ -4,8 +4,8 @@
 #' @importFrom data.table rbindlist rowidv rleid set setattr setcolorder
 #' @importFrom data.table setnames setorder setindexv
 #' @importFrom stringi stri_count_charclass stri_count_fixed stri_detect_fixed
-#' @importFrom stringi stri_extract_first_regex stri_isempty stri_length
-#' @importFrom stringi stri_locate_first_fixed stri_replace_all_fixed
+#' @importFrom stringi stri_endswith_fixed stri_extract_first_regex stri_isempty
+#' @importFrom stringi stri_length stri_locate_first_fixed stri_replace_all_fixed
 #' @importFrom stringi stri_startswith_fixed stri_split_charclass
 #' @importFrom stringi stri_split_fixed stri_sub stri_subset_fixed
 #' @importFrom stringi stri_trans_tolower stri_trans_toupper stri_trim_both
@@ -113,13 +113,13 @@ parse_idd_file <- function(path) {
     dt_field <- get_field_table(idd_dt, type_enum)
 
     # dcast class and field tables
+    # NOTE: "*_id" column should always put first
     dt_class <- dcast_slash(dt_class, "class_id",
         IDD_SLASHKEY$class, c("group_id", "class_name")
     )
     dt_field <- dcast_slash(dt_field, c("field_id", "field_anid"),
         IDD_SLASHKEY$field, c("class_id")
     )
-    dt_field[, `:=`(field_id = .I)]
 
     # complete property columns
     dt_field <- complete_property(dt_field, "field", dt_class)
@@ -129,6 +129,26 @@ parse_idd_file <- function(path) {
     dt <- parse_field_reference_table(dt_field)
     dt_field <- dt$left
     dt_reference <- dt$reference
+
+    # add index
+    setindexv(dt_group, "group_id")
+    setindexv(dt_group, "group_name")
+
+    setindexv(dt_class, "class_id")
+    setindexv(dt_class, "class_name")
+    setindexv(dt_class, "class_name_us")
+
+    setindexv(dt_field, "field_id")
+    setindexv(dt_field, "field_name")
+    setindexv(dt_field, "field_name_us")
+    setindexv(dt_field, c("class_id", "field_index"))
+    setindexv(dt_field, c("class_id", "field_name"))
+    setindexv(dt_field, c("class_id", "field_name_us"))
+
+    setindexv(dt_reference, "class_id")
+    setindexv(dt_reference, "field_id")
+    setindexv(dt_reference, "src_class_id")
+    setindexv(dt_reference, "src_field_id")
 
     list(version = idd_version, build = idd_build, group = dt_group,
         class = dt_class, field = dt_field,
@@ -142,7 +162,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     # read IDF string and get version first to get corresponding IDD
     idf_dt <- read_lines(path)
     # delete blank lines
-    idf_dt <- idf_dt[!J(""), on = "string"]
+    idf_dt <- idf_dt[!stri_isempty(string)]
 
     idf_ver <- get_idf_ver(idf_dt)
 
@@ -213,8 +233,31 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
         c("value_id", "value_chr", "value_num", "object_id", "field_id")), NULL
     )
 
+    # set index
+    setindexv(dt_object, "class_id")
+    setindexv(dt_object, "object_id")
+    setindexv(dt_object, "object_name")
+    setindexv(dt_object, "object_name_lower")
+    setindexv(dt_object, c("class_id", "object_id"))
+    setindexv(dt_object, c("class_id", "object_name"))
+    setindexv(dt_object, c("class_id", "object_name_lower"))
+
+    setindexv(dt_value, "field_id")
+    setindexv(dt_value, "value_id")
+    setindexv(dt_value, "value_chr")
+    setindexv(dt_value, c("object_id", "field_id"))
+    setindexv(dt_value, c("object_id", "value_id"))
+    setindexv(dt_value, c("object_id", "value_chr"))
+
+    setindexv(dt_reference, "object_id")
+    setindexv(dt_reference, "value_id")
+    setindexv(dt_reference, c("object_id", "value_id"))
+    setindexv(dt_reference, "src_object_id")
+    setindexv(dt_reference, "src_value_id")
+    setindexv(dt_reference, c("src_object_id", "src_value_id"))
+
     list(version = idd_ver, options = options,
-        object = dt_object, value = dt_value, reference = dt_reference
+         object = dt_object, value = dt_value, reference = dt_reference
     )
 }
 # }}}
@@ -223,7 +266,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 get_idd_ver <- function (idd_dt) {
     assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
-    ver_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_Version")]
+    ver_line <- idd_dt[stri_startswith_fixed(string, "!IDD_Version")]
 
     if (!nrow(ver_line)) {
         abort("error_miss_idd_ver", "No version found in input IDD.")
@@ -231,7 +274,7 @@ get_idd_ver <- function (idd_dt) {
         ver <- tryCatch(standardize_ver(stri_sub(ver_line$string, 14L)),
             error = function (e) {
                 m <- conditionMessage(e)
-                if (stringi::stri_startswith_fixed(m, "invalid version specification")) {
+                if (stri_startswith_fixed(m, "invalid version specification")) {
                     parse_issue("error_invalid_idd_ver", "idd", "Invalid IDD version", ver_line)
                 } else {
                     stop(e)
@@ -249,7 +292,7 @@ get_idd_ver <- function (idd_dt) {
 get_idd_build <- function (idd_dt) {
     assert(inherits(idd_dt, "data.table"), has_name(idd_dt, c("line", "string")))
 
-    build_line <- idd_dt[stringi::stri_startswith_fixed(string, "!IDD_BUILD")]
+    build_line <- idd_dt[stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
         abort("error_miss_idd_build", "No build tag found in input IDD.")
@@ -296,17 +339,15 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
 
 # clean_idd_lines {{{
 clean_idd_lines <- function (dt) {
-    dt <- dt[!(stringi::stri_startswith_fixed(string, "!") | string == "")]
+    dt <- dt[!(stri_startswith_fixed(string, "!") | stri_isempty(string))]
 
     # trucate to characters left of ! in order to handle cases when there are
     # inline comments starting with "!", e.g.
     # "GrouhdHeatTransfer:Basement:EquivSlab,  ! Supplies ..."
-    dt[, `:=`(excl_loc = stri_locate_first_fixed(string, "!")[, 1L])]
-    dt[!is.na(excl_loc), `:=`(
-        string = stri_trim_right(
-            stri_sub(string, to = excl_loc - 1L)
-        )
-    )]
+    set(dt, NULL, "excl_loc", stri_locate_first_fixed(dt$string, "!")[, 1L])
+    dt[!J(NA_integer_), on = "excl_loc", `:=`(
+        string = stri_trim_right(stri_sub(string, to = excl_loc - 1L)))
+    ]
 
     set(dt, NULL, "excl_loc", NULL)
     dt
@@ -316,14 +357,14 @@ clean_idd_lines <- function (dt) {
 # sep_idd_lines {{{
 sep_idd_lines <- function (dt, col = "string") {
     # mark first slash
-    dt[, `:=`(slash_loc = stri_locate_first_fixed(string, "\\")[, 1L])]
+    set(dt, NULL, "slash_loc", stri_locate_first_fixed(dt$string, "\\")[, 1L])
 
     setindexv(dt, "slash_loc")
 
     # separate field and slash
-    dt[is.na(slash_loc), `:=`(body = string)]
+    dt[J(NA_integer_), on = "slash_loc", `:=`(body = string)]
     # also remove slash and delete extra spaces, like "\ group Hybrid Model"
-    dt[!is.na(slash_loc), `:=`(
+    dt[!J(NA_integer_), on = "slash_loc", `:=`(
         body = stri_trim_right(stri_sub(string, to = slash_loc - 1L)),
         slash = stri_trim_left(stri_sub(string, slash_loc + 1L))
     )]
@@ -336,10 +377,10 @@ sep_idd_lines <- function (dt, col = "string") {
     dt[(colon_loc < space_loc) | (is.na(space_loc) & !is.na(colon_loc)),
         `:=`(space_loc = colon_loc)
     ]
-    dt[is.na(space_loc), `:=`(space_loc = 0L)]
+    dt[J(NA_integer_), on = "space_loc", `:=`(space_loc = 0L)]
 
     # separate slash key and values
-    dt[!is.na(slash_loc), `:=`(
+    dt[!J(NA_integer_), on = "slash_loc", `:=`(
         slash_key = stri_trans_tolower(stri_sub(slash, to = space_loc - 1L)),
         slash_value = stri_trim_left(stri_sub(slash, space_loc + 1L))
     )]
@@ -347,56 +388,55 @@ sep_idd_lines <- function (dt, col = "string") {
     setindexv(dt, "slash_key")
 
     # a) for logical slash key, e.g. "\required-field"
-    dt[slash_key %chin% IDD_SLASHKEY$type$lgl, `:=`(slash_value = "TRUE")]
+    dt[J(IDD_SLASHKEY$type$lgl), on = "slash_key", `:=`(slash_value = "TRUE")]
     # b) for numeric value slash with comments, e.g. "\extensible:<#> -some comments"
     # https://stackoverflow.com/questions/3575331/how-do-extract-decimal-number-from-string-in-c-sharp/3575807
-    dt[slash_key %chin% c(IDD_SLASHKEY$type$int, IDD_SLASHKEY$type$dbl), `:=`(
-        slash_value = stri_extract_first_regex(slash_value, "[-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?")
-    )]
+    dt[J(c(IDD_SLASHKEY$type$int, IDD_SLASHKEY$type$dbl)), on = "slash_key",
+        `:=`(slash_value = stri_extract_first_regex(slash_value, "[-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?"))
+    ]
 
     # change all values of reference, object-list and refercne-class-name to
     # lower case
-    dt[slash_key %chin% c("reference", "reference-class-name", "object-list"),
-        `:=`(slash_value = stri_trans_tolower(slash_value))]
+    dt[J(c("reference", "reference-class-name", "object-list")), on = "slash_key",
+        `:=`(slash_value = stri_trans_tolower(slash_value))
+    ]
     # check for mismatched object-list and reference
-    refs <- dt[slash_key %in% c("reference-class-name", "reference"), unique(slash_value)]
-    invld_objlst <- dt[slash_key == "object-list" & !slash_value %chin% refs]
-    if (nrow(invld_objlst)) {
-        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", invld_objlst)
+    refs <- dt[J(c("reference-class-name", "reference")), on = "slash_key", unique(slash_value), nomatch = 0L]
+    invld_objlst <- which(dt$slash_key == "object-list" & !dt$slash_value %chin% refs)
+    if (length(invld_objlst)) {
+        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", dt[invld_objlst])
     }
 
     # check invalid slash keys
-    invld_key <- dt[!is.na(slash_key) & !slash_key %chin% unlist(IDD_SLASHKEY$type), which = TRUE]
+    invld_key <- dt[!J(c(NA_character_, unlist(IDD_SLASHKEY$type))), on = "slash_key", which = TRUE]
     if (length(invld_key))
         parse_issue("error_slash_key", "idd", "Invalid slash key", dt[invld_key])
 
     # check invalid slash value {{{
     set(dt, NULL, "slash_value_lower", stri_trans_tolower(dt[["slash_value"]]))
-    setindexv(dt, c("slash_key", "slash_value_lower"))
 
     # check invalid \format value
-    invld_val <- dt[slash_key == "format" &
-        !slash_value_lower %chin% c("singleline", "vertices", "compactschedule",
-            "fluidproperty", "viewfactor", "spectral"),
-        which = TRUE
-    ]
+    invld_val <- which(dt$slash_key == "format" &
+         !dt$slash_value_lower %chin% c("singleline", "vertices",
+             "compactschedule", "fluidproperty", "viewfactor", "spectral")
+    )
     if (length(invld_val))
         parse_issue("error_format_value", "idd", "Invalid format value", dt[invld_val])
 
     # check invalid \type value
-    invld_val <- dt[slash_key == "type" &
-        !slash_value_lower %chin% c("integer", "real", "alpha", "choice",
-            "object-list", "external-list", "node"),
-        which = TRUE
-    ]
+    invld_val <- which(
+        dt$slash_key == "type" &
+        !dt$slash_value_lower %chin% c("integer", "real", "alpha", "choice",
+            "object-list", "external-list", "node")
+    )
     if (length(invld_val))
         parse_issue("error_type_value", "idd", "Invalid type value", dt[invld_val])
 
     # check invalid \external-list value
-    invld_val <- dt[slash_key == "external-list" &
-        !slash_value_lower %chin% c("autorddvariable", "autorddmeter", "autorddvariablemeter"),
-        which = TRUE
-    ]
+    invld_val <- which(
+        dt$slash_key == "external-list" &
+        !dt$slash_value_lower %chin% c("autorddvariable", "autorddmeter", "autorddvariablemeter")
+    )
     if (length(invld_val))
         parse_issue("error_external_list_value", "idd", "Invalid external list value", dt[invld_val])
     # }}}
@@ -414,30 +454,33 @@ mark_idd_lines <- function (dt, type_enum) {
     # add type indicator
     set(dt, NULL, "type", type_enum$unknown)
 
+    set(dt, NULL, "semicolon", stri_endswith_fixed(dt$body, ";"))
     # ignore section if exists, e.g. "Simulation Data;"
-    dt <- dt[!(stringi::stri_endswith_fixed(body, ";") & is.na(slash_key))]
+    dt <- dt[!J(TRUE, NA_character_), on = c("semicolon", "slash_key")]
 
+    setindexv(dt, "slash_key")
+    set(dt, NULL, "empty", stri_isempty(dt$body))
     # mark slash lines
-    dt[body == "", `:=`(type = type_enum$slash)]
+    dt[J(TRUE), on = "empty", `:=`(type = type_enum$slash)]
 
     # mark group
-    dt[slash_key == "group", `:=`(type = type_enum$group)]
+    dt[J("group"), on = "slash_key", `:=`(type = type_enum$group)]
 
     # mark class
-    dt[stringi::stri_endswith_fixed(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
+    dt[stri_endswith_fixed(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
 
     # mark field
-    dt[body != "" & !is.na(slash_key), `:=`(type = type_enum$field)]
+    dt[empty == FALSE & !is.na(slash_key), `:=`(type = type_enum$field)]
 
     # mark last field per class
-    dt[stringi::stri_endswith_fixed(body, ";"), `:=`(type = type_enum$field_last)]
+    dt[J(TRUE), on = "semicolon", `:=`(type = type_enum$field_last)]
 
     # if there are still known lines, throw an error
-    if (nrow(dt[type == type_enum$unknown]) > 0L) {
+    if (any(dt$type == type_enum$unknown)) {
         parse_issue("error_unknown_line", "idd", "Invalid line", dt[type == type_enum$unknown])
     }
 
-    dt
+    set(dt, NULL, c("semicolon", "empty"), NULL)
 }
 # }}}
 
@@ -445,12 +488,13 @@ mark_idd_lines <- function (dt, type_enum) {
 sep_group_table <- function (dt, type_enum) {
     setindexv(dt, "type")
 
-    dt[type == type_enum$group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
+    is_group <- dt[J(type_enum$group), on = "type", which = TRUE]
 
-    dt_group <- dt[type == type_enum$group, .SD, .SDcols = c("group_id", "group_name", "line")]
+    dt[is_group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
+    dt_group <- dt[is_group, .SD, .SDcols = c("group_id", "group_name", "line")]
 
     # check missing group
-    if (nrow(dt[line < dt_group$line[1L]])) {
+    if (any(dt$line < dt_group$line[1L])) {
         invld_grp <- dt[line < dt_group$line[1L]]
         parse_issue("error_missing_group", "idd", "Missing group name",
             invld_grp, invld_grp[type == type_enum$class, .N]
@@ -462,9 +506,7 @@ sep_group_table <- function (dt, type_enum) {
     dt[, `:=`(group_id = group_id[1L]), by = cumsum(!is.na(group_id))]
 
     # remove group lines
-    dt <- dt[type != type_enum$group]
-
-    set(dt, NULL, "group_name", NULL)
+    dt <- dt[!J(type_enum$group), on = "type", .SD, .SDcols = !"group_name"]
 
     list(left = dt, group = dt_group)
 }
@@ -473,15 +515,15 @@ sep_group_table <- function (dt, type_enum) {
 # sep_class_table {{{
 sep_class_table <- function (dt, type_enum) {
     setindexv(dt, "type")
-    dt[type == type_enum$class, `:=`(
+    dt[J(type_enum$class), on = "type", `:=`(
         class_id = seq_along(body),
         class_name = stri_trim_right(stri_sub(body, to = -2L))
     )]
 
     # check duplicated class names
-    dup_cls <- dt[type == type_enum$class, line[duplicated(class_name)]]
+    dup_cls <- dt[J(type_enum$class), on = "type", line[duplicated(class_name)], nomatch = 0L]
     if (length(dup_cls)) {
-        invld_cls <- dt[class_name %in% dt[line %in% dup_cls]$class_name]
+        invld_cls <- dt[class_name %in% dt[line %in% dup_cls, class_name]]
         parse_issue("error_duplicated_class", "idd", "Duplicated class names found",
             invld_cls, length(dup_cls)
         )
@@ -491,7 +533,7 @@ sep_class_table <- function (dt, type_enum) {
     dt[, `:=`(class_id = class_id[1L], class_name = class_name[1L]), by = cumsum(!is.na(class_id))]
 
     # check missing class name
-    if (nrow(dt[is.na(class_id)])) {
+    if (anyNA(dt$class_id)) {
         invld_cls <- dt[is.na(class_id)]
         parse_issue("error_missing_class", "idd", "Missing class name",
             invld_cls, invld_cls[type == type_enum$field_last, .N]
@@ -499,14 +541,14 @@ sep_class_table <- function (dt, type_enum) {
     }
 
     # add expected type indicator
-    dt[, `:=`(type_exp = type)]
-    dt[type > type_enum$class, `:=`(type_exp = type_enum$field)]
-    dt[line %in% dt[type > type_enum$class, line[.N], by = class_id]$V1,
-        `:=`(type_exp = type_enum$field_last)
-    ]
+    set(dt, NULL, "type_exp", dt$type)
+    dt[J(c(type_enum$field, type_enum$field_last)), on = "type", `:=`(type_exp = type_enum$field)]
+    l <- dt[J(c(type_enum$field, type_enum$field_last)), on = "type", line[.N], by = class_id, nomatch = 0L]$V1
+    dt[J(l), on = "line", `:=`(type_exp = type_enum$field_last)]
 
+    setindexv(dt, c("type", "type_exp"))
     # check missing class name
-    mis_cls <- dt[type == type_enum$field_last & type_exp == type_enum$field]
+    mis_cls <- dt[J(type_enum$field_last, type_enum$field), on = c("type", "type_exp"), nomatch = 0L]
     if (nrow(mis_cls)) {
         invld_cls <- dt[class_id %in% mis_cls$class_id]
         invld_cls[, `:=`(line_s = line)]
@@ -523,34 +565,33 @@ sep_class_table <- function (dt, type_enum) {
     }
 
     # check incomplete class
-    incomp_cls <- dt[type == type_enum$field & type_exp == type_enum$field_last, class_id]
+    incomp_cls <- dt[J(type_enum$field, type_enum$field_last), on = c("type", "type_exp"), class_id, nomatch = 0L]
     if (length(incomp_cls)) {
         invld_cls <- dt[class_id %in% incomp_cls]
         parse_issue("error_incomplete_class", "idd", "Incomplete class", invld_cls, length(incomp_cls))
     }
 
     # after checking possible errors, resign type
-    dt[type == type_enum$field_last, `:=`(type = type_enum$field)]
+    dt[J(type_enum$field_last), on = "type", `:=`(type = type_enum$field)]
 
     # line when class starts
     s <- dt[, list(start = line[1L]), by = class_id]
     # line when class slash ends
-    e <- dt[type == type_enum$field, list(end = line[1L] - 1L), by = class_id]
+    e <- dt[J(type_enum$field), on = "type", list(end = line[1L] - 1L), by = class_id, nomatch = 0L]
     # join
     i <- merge(s, e, by = "class_id", all = TRUE)
 
     # manually add "\format" if there is no slash in class
-    if (nrow(i[start == end])) {
-        ins <- dt[i[start == end], on = "class_id", mult = "first"]
+    if (any(i$start == i$end)) {
+        setindexv(dt, "class_id")
+        ins <- dt[J(i[start == end, class_id]), on = "class_id", mult = "first"]
         ins[, `:=`(
             string = "\\format standard",
             body = "format standard",
             slash_key = "format",
             slash_value = "standard",
             type = type_enum$slash,
-            line = line + 1L,
-            start = NULL,
-            end = NULL
+            line = line + 1L
         )]
 
         # insert
@@ -558,21 +599,21 @@ sep_class_table <- function (dt, type_enum) {
         setorderv(dt, "line")
 
         # change added line number
-        dt[dt[class_id %in% ins$class_id, .I[2L], by = class_id]$V1, `:=`(
-            line = line - 1L
-        )]
+        dt[dt[J(ins$class_id), on = "class_id", .I[2L], by = class_id, nomatch = 0L]$V1,
+            `:=`(line = line - 1L)]
     }
+
+    setindexv(dt, "line")
 
     # get table
     dt_class <- i[dt, on = list(class_id, start <= line, end >= line),
-        nomatch = 0L][!is.na(slash_key)]
+        nomatch = 0L][!J(NA_character_), on = "slash_key", .SD,
+        .SDcols = -c("string", "body", "type", "type_exp", "end")]
 
-    setnames(dt_class, "start", "line")
+    dt <- dt[!J(c(dt_class$start, s$start)), on = "line", .SD,
+        .SDcols = -c("line", "string", "type_exp", "group_id", "class_name")]
 
-    dt <- dt[!dt_class, on = "line"][!line %in% s$start]
-    # remove unuseful columns
-    set(dt, NULL, c("line", "string", "type_exp", "group_id", "class_name"), NULL)
-    set(dt_class, NULL, c("line", "string", "body", "type", "end"), NULL)
+    set(dt_class, NULL, "start", NULL)
 
     list(left = dt, class = dt_class)
 }
@@ -586,18 +627,18 @@ get_field_table <- function (dt, type_enum) {
     setindexv(dt, "type")
 
     # count field number per line
-    dt[type == type_enum$field, `:=`(field_count = stri_count_charclass(body, "[,;]"))]
+    dt[J(type_enum$field), on = "type", `:=`(field_count = stri_count_charclass(body, "[,;]"))]
 
     set(dt, NULL, "type", NULL)
     setindexv(dt, "field_count")
 
     # get all slash lines
-    slsh <- dt[is.na(field_count)]
+    slsh <- dt[J(NA_integer_), on = "field_count", nomatch = 0L]
     set(slsh, NULL, "field_count", NULL)
     set(slsh, NULL, "field_anid", NA_character_)
 
     # get all single field lines
-    sgl <- dt[field_count == 1L]
+    sgl <- dt[J(1L), on = "field_count", nomatch = 0L]
     set(sgl, NULL, "field_count", NULL)
     sgl[, `:=`(field_anid = stri_trim_right(stri_sub(body, to = -2L)))]
 
@@ -642,48 +683,44 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
     assert(has_name(dt, id))
     assert(has_name(keys, c("flat", "nest")))
     if (!is.null(keep)) assert(has_name(dt, keep))
-    set(dt, NULL, "row", seq_len(nrow(dt)))
+
+    f <- stats::as.formula(paste0(paste0(id[[1L]], collapse = "+"), "~slash_key"))
+
+    setindexv(dt, "slash_key")
+    setindexv(dt, c(id[[1L]], "slash_key"))
+
+    i <- unique(dt[, .SD, .SDcols = c(id, keep)], by = c(id[[1L]]))
+    setindexv(i, id[[1L]])
 
     # only use the first line of flat slash value
-    dt[slash_key %chin% keys$flat, by = c(id, "slash_key"),
-        `:=`(slash_value_rleid = seq_along(slash_value))
+    i_flat <- data.table::CJ(i[[id[[1L]]]], slash_key = keys$flat)
+    setnames(i_flat, "V1", id[[1L]])
+    flat <- dt[i_flat, on = c(id[[1L]], "slash_key"), nomatch = 0L, mult = "first",
+        .SD, .SDcols = c(id[[1L]], "slash_key", "slash_value")]
+    if (nrow(flat)) flat <- dcast.data.table(flat, f, value.var = "slash_value")
+    setindexv(flat, id[[1L]])
+
+    nest <- dt[J(keys$nest), on = "slash_key", nomatch = 0L,
+        {list(slash_value = list(slash_value))}, by = c(id[[1L]], "slash_key")
     ]
-    dup_slsh <- dt[slash_value_rleid > 1L, row]
-    if (length(dup_slsh)) dt <- dt[-dup_slsh]
-    set(dt, NULL, c("row", "slash_value_rleid"), NULL)
-
-    f <- stats::as.formula(paste0(paste0(id, collapse = "+"), "~slash_key"))
-
-    dt_flat <- dt[slash_key %chin% keys$flat]
-    if (nrow(dt_flat) == 0L) {
-        flat <- dt_flat[, .SD, .SDcols = c(id)]
-    } else {
-        flat <- dcast.data.table(dt_flat, f, value.var = "slash_value")
-    }
-
-    dt_nest <- dt[slash_key %chin% keys$nest]
-    if (nrow(dt_nest) == 0L) {
-        nest <- dt_nest[, .SD, .SDcols = c(id)]
-    } else {
-        nest <- dcast.data.table(dt_nest, f, value.var = "slash_value",
-            fun.aggregate = list(list)
-        )
-    }
+    if (nrow(nest)) nest <- dcast.data.table(nest, f, value.var = "slash_value")
+    setindexv(nest, id[[1L]])
 
     # combine
-    i <- unique(dt[, .SD, .SDcols = c(id, keep)])
-    flat <- merge(i, flat, by = c(id), all = TRUE)
-    nest <- merge(i[, .SD, .SDcols = c(id)], nest, by = id, all = TRUE)
-
-    # change empty character member in list to NULL
-    idx <- if (stri_startswith_fixed(id[[1L]], "class")) "class_id" else "field_id"
-    for (nm in intersect(names(nest), keys$nest)) {
-        set(nest, nest[[idx]][vapply(nest[[nm]], function (x) length(x) == 0L, logical(1L))],
-            nm, list(list(NULL))
+    if (nrow(flat) && nrow(nest)) {
+        cbind(
+            # here use all i columns
+            flat[i, on = c(id[[1L]])],
+            # since flat gets all columns in i, here enable to simplify
+            nest[J(i[[id[[1L]]]]), on = c(id[[1L]]), .SD, .SDcols = -id[[1L]]]
         )
+    } else if (!nrow(flat)) {
+        flat[i, on = c(id[[1L]])]
+    } else if (!nrow(nest)){
+        nest[i, on = c(id[[1L]])]
+    } else {
+        dt[0L, .SD, .SDcols = c(id, keep)]
     }
-
-    merge(flat, nest, by = id)
 }
 # }}}
 
@@ -854,7 +891,7 @@ parse_field_property_extensible_group <- function (dt, ref) {
     # add extensible field number
     ext <- ref[, list(class_id, num_extensible = as.integer(extensible))][ext, on = "class_id"]
     # NOTE: few chances are classes not marked as extensible but with extensible fields
-    ext <- ext[!is.na(num_extensible)]
+    ext <- ext[!J(NA_integer_), on = "num_extensible"]
 
     # add total field number
     set(ext, NULL, "num_fields", dt[ext, on = "class_id", .N, by = class_id]$N)
@@ -1059,7 +1096,7 @@ mark_idf_lines <- function (dt, type_enum) {
     setindexv(dt, "type")
 
     # macro line
-    l_m <- dt[stringi::stri_startswith_fixed(string, "#"), which = TRUE]
+    l_m <- dt[stri_startswith_fixed(string, "#"), which = TRUE]
     if (length(l_m)) {
         dt[l_m, c("type", "body", "comment") :=({
             macro <- stri_split_fixed(string, " ", n = 2L, omit_empty = TRUE, simplify = TRUE)[, 1L]
@@ -1086,16 +1123,16 @@ mark_idf_lines <- function (dt, type_enum) {
     }
 
     # normal comments
-    dt[stringi::stri_startswith_fixed(string, "!"), `:=`(type = type_enum$comment)]
+    dt[stri_startswith_fixed(string, "!"), `:=`(type = type_enum$comment)]
 
     # special comments
-    dt[stringi::stri_startswith_fixed(string, "!-"), `:=`(type = type_enum$special)]
+    dt[stri_startswith_fixed(string, "!-"), `:=`(type = type_enum$special)]
 
     # mark values in object
-    dt[stringi::stri_endswith_fixed(body, ","), `:=`(type = type_enum$value)]
+    dt[stri_endswith_fixed(body, ","), `:=`(type = type_enum$value)]
 
     # mark last value in object
-    dt[stringi::stri_endswith_fixed(body, ";"), `:=`(type = type_enum$value_last)]
+    dt[stri_endswith_fixed(body, ";"), `:=`(type = type_enum$value_last)]
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
@@ -1108,7 +1145,7 @@ mark_idf_lines <- function (dt, type_enum) {
 
 # sep_header_options {{{
 sep_header_options <- function (dt, type_enum) {
-    dt_opt <- dt[type == type_enum$special]
+    dt_opt <- dt[J(type_enum$special), on = "type"]
     dt <- dt[!dt_opt, on = "line"]
 
     s <- stri_split_fixed(dt_opt[['comment']], " ", n = 2, simplify = TRUE)
@@ -1162,7 +1199,7 @@ sep_header_options <- function (dt, type_enum) {
 # sep_object_table {{{
 sep_object_table <- function (dt, type_enum, version, idd) {
     # object id
-    left <- dt[type == type_enum$value_last, list(line, object_id = seq_along(line))]
+    left <- dt[J(type_enum$value_last), on = "type", list(line, object_id = seq_along(line)), nomatch = 0L]
     dt <- left[dt, on = "line", roll = -Inf]
 
     # check incomplete object

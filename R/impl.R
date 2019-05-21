@@ -36,6 +36,7 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
 
     # make sure the first column is the column used for joinning
     setcolorder(dt_in, c(col_on, setdiff(names(dt_in), col_on)))
+    setindexv(dt_in, col_on)
     dt_in
 }
 # }}}

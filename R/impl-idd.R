@@ -116,7 +116,7 @@ get_idd_class_field_num <- function (dt_class, num = NULL) {
         ]
     }
 
-    if (nrow(dt_class[input_num > num_fields])) {
+    if (any(dt_class$input_num > dt_class$num_fields)) {
         dt_class[input_num > num_fields,
             acceptable_num := pmax(num_fields, min_fields, last_required, last_extensible)]
         dt_class[input_num <= num_fields,
@@ -304,6 +304,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
             col_on <- "field_name"
             set(dt_in, NULL, "field_name", field)
         }
+        setindexv(dt_in, c("class_id", col_on))
 
         # join
         dt_join <- idd_env$field[dt_in, on = c("class_id", col_on), allow.cartesian = TRUE]
