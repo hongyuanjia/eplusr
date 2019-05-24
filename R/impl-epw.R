@@ -751,7 +751,7 @@ parse_epw_header_design <- function (input, ...) {
             dbl = c(7L:20L, 23L:52L, 55L:70L)
         ),
         range = list(
-            `hours_8_to_4_12.8_20.6` = ranger(0),
+            `hours_8_to_4_12.8_20.6` = ranger(0L, TRUE),
             `coldest_month` = ranger(1L, TRUE, 12L, TRUE),
             `hotest_month` = ranger(1L, TRUE, 12L, TRUE)
         ),

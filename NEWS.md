@@ -12,16 +12,17 @@
 
 * `$add()` method and other methods that modify field values can correctly
   convert field values to numbers if necessary.
-*  Fix the error that holiday header got overwritten (#43).
-*  Fix EPW date parsing error (#42).
-*  Fix warnings in parsing `.err` file when there is no warning nor error.
-*  Fix `$errors()` error in `ParametricJob` class.
-*  The year of returned date time from `$data()`, `$abnormal_data()` and
-   `$redundant_data()` now have correct values (#44).
-*  Reset year after checking datetime in `read_epw()` (#44).
-*  Add field name in input before validation in `paste()` (#45).
-*  Fix datetime calculation in `$report_data()` in `EplusSql` (#46).
-*  Update doc on EnergyPlus time nodation (#47).
+* Fix the error that holiday header got overwritten (#43).
+* Fix EPW date parsing error (#42).
+* Fix warnings in parsing `.err` file when there is no warning nor error.
+* Fix `$errors()` error in `ParametricJob` class.
+* The year of returned date time from `$data()`, `$abnormal_data()` and
+  `$redundant_data()` now have correct values (#44).
+* Reset year after checking datetime in `read_epw()` (#44).
+* Add field name in input before validation in `paste()` (#45).
+* Fix datetime calculation in `$report_data()` in `EplusSql` (#46).
+* Update doc on EnergyPlus time nodation (#47).
+* Fix EPW design condition parsing error when `hours_8_to_4_12.8_20.6` is zero.
 
 ## Minor changes
 
