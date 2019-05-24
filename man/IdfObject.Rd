@@ -397,7 +397,7 @@ number.  Default: \code{TRUE}.
 \item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
 of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
 applicable. Default: \code{FALSE}.
-\item \code{wide}: If \code{TRUE}, a wide table will be returned, i.e. first three column
+\item \code{wide}: If \code{TRUE}, a wide table will be returned, i.e. first three columns
 are always \code{id}, \code{name} and \code{class}, and then every field in a separate
 column. Default: \code{FALSE}.
 \item \code{comment}: If \code{FALSE}, all comments will not be included. Default: \code{TRUE}.

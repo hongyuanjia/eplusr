@@ -64,6 +64,7 @@ model$set(..., .default = TRUE)
 model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
 model$insert(..., .unique = TRUE)
 model$load(..., .unique = TRUE, .default = TRUE)
+model$update(..., .default = TRUE)
 model$rename(...)
 model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
 model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -71,7 +72,7 @@ model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, per
 model$is_unsaved()
 model$validate(level = eplusr_option("validate_level"))
 model$is_valid(level = eplusr_option("validate_level"))
-model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
 model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
 model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
@@ -681,6 +682,74 @@ model$load(dt)
 
 }
 
+\subsection{Update Objects from characters or data.frames}{\preformatted{model$update(..., .unique = TRUE, .default = TRUE)
+}
+
+\code{$update()} is similar to \code{$load()} except it update field values.  This
+makes it easy to update object values using the output from \code{$to_string()}
+and \code{$to_table} method from \link{Idd}, \link{IddObject}, also Idf and \link{IdfObject}
+class.
+
+For object definitions in character vector format, object names are used to
+locate which objects to update. Objects that have name attribute should have
+valid names. This means that there is no way to update object names using
+character vector format, but it can be achieved using data.frame format as it
+uses object IDs instead of object names to locate objects.
+
+For object definitions in data.frame format, it is highly recommended to use
+\code{$to_table()} method in \link{Idd}, \link{IddObject}, \code{Idf} and \link{IdfObject} class. A
+valid definition requires four columns described below. Note that
+column order does not matter.
+\itemize{
+\item \code{id}: Integer type. The value in \code{id} should be valid object IDs for current
+\code{Idf}.
+\item \code{class}: Character type. Valid class names for current \code{Idf}.
+\item \code{index}: Integer type. Valid field indexes for each class. If input field
+does not exist in specified object, it will be added on the fly.
+\item \code{value}: Character type or list type. The value of each field
+to be added.
+\itemize{
+\item If \code{value} is a character column, usually when \code{string_value} is \code{TRUE}
+in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value should
+be given as a string even if the corresponding field is a numeric type.
+\item If \code{value} is a list column, usually when \code{string_value} is set to
+\code{FALSE} in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value
+should have the right type  as the corresponding field definition.
+Otherwise, errors will be issued during if current validation level
+includes invalid-type checking. For what kind of validation components to
+be performed during modifications, please see \code{\link[=level_checks]{level_checks()}}.
+}
+}
+
+\strong{Note}:
+\itemize{
+\item \code{$update()} assume all definitions are from the same version as current
+\code{Idf} object. If input definition is from different version, parsing error
+may occur.
+}
+
+\strong{Argument}:
+\itemize{
+\item \code{...}: Character vectors or data.frames of object definitions For details,
+see above.
+\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
+possible. Default: \code{TRUE}.
+}
+
+\strong{Usage}:
+\itemize{
+\item Update objects from string definitions:\preformatted{str <- model$Material[[1]]$to_string()
+str[4] <- "0.8"
+model$update(str)
+}
+\item Update objects from data.frame definitions:\preformatted{dt <- model1$to_table(class = "Material")
+dt[field == "thickness", value := "0.5"]
+model$update(dt)
+}
+}
+
+}
+
 \subsection{Paste Objects from IDF Editor}{\preformatted{model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
 }
 
@@ -845,7 +914,7 @@ to correct them.
 }
 
 \section{Data Extraction}{
-\preformatted{model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE)
+\preformatted{model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
 model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 }
 
@@ -879,6 +948,10 @@ number.  Default: \code{TRUE}.
 \item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
 of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
 applicable. Default: \code{FALSE}.
+\item \code{wide}: Only applicable if target objects belong to a same class. If
+\code{TRUE}, a wide table will be returned, i.e. first three columns are always
+\code{id}, \code{name} and \code{class}, and then every field in a separate column.
+Default: \code{FALSE}.
 \item \code{comment}: If \code{FALSE}, all comments will not be included. Default: \code{TRUE}.
 \item \code{header}: If \code{FALSE}, the header will not be included. Default: \code{TRUE}.
 \item \code{format}: Specific format used when formatting. For details, please see
