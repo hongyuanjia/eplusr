@@ -260,11 +260,7 @@ parse_err_file <- function (path) {
 print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("EnergyPlus Error File", line = 2)
 
-    eplus_version <- attr(x, "eplus_version")
-    eplus_build <- attr(x, "eplus_build")
-    datetime <- attr(x, "datetime")
-
-    if (!is.na(eplus_build)) {
+    if (!is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
@@ -286,7 +282,7 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
 
     # error summary
     if (any(dt$level != "Info")) {
-        num_sum <- dt[J("Info"), on = "level", list(num = max(level_index)), by = c("level")]
+        num_sum <- dt[!J("Info"), on = "level", list(num = max(level_index)), by = c("level")]
         set(num_sum, NULL, "level", factor(num_sum$level, c("Warning", "Severe", "Fatal"), ordered = TRUE))
         err_sm <- num_sum[order(level), paste0("  * ", rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
         cli::cat_line(err_sm)
