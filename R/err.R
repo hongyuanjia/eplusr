@@ -2,6 +2,7 @@
 #' @importFrom stringi stri_match_first_regex stri_detect_fixed stri_detect_regex
 #' @importFrom stringi stri_endswith_fixed stri_split_fixed stri_startswith_fixed
 #' @importFrom stringi stri_sub stri_wrap
+#' @importFrom lubridate ymd_hm
 #' @importFrom cli cat_line cat_rule rule
 NULL
 
@@ -10,7 +11,8 @@ NULL
 #' `read_err()` takes a file path of EnergyPlus simulation error file, usually
 #' with an extension `.err`, parses it and returns an `ErrFile` object.
 #'
-#' Basically, an `ErrFile` object is a list with 7 elements:
+#' Basically, an `ErrFile` object is a [data.table][data.table::data.table()]
+#' with 6 additional attributes:
 #'
 #' * `eplus_version`: A [numeric_version][base::numeric_version()] object. The
 #'   version of EnergyPlus used during the simulation.
@@ -23,8 +25,6 @@ NULL
 #'   otherwise.
 #' * `terminated`: `TRUE` when the simulation was terminated, and `FALSE`
 #'   otherwise.
-#' * `data`: A [data.table][data.table::data.table()] that contains parsed error
-#'   messages.
 #'
 #' @param path a file path of EnergyPlus simulation error file, usually
 #' with an extension `.err`.
@@ -44,25 +44,41 @@ NULL
 #' }
 # read_err {{{
 read_err <- function (path) {
+    assert(has_ext(path, "err"))
     parse_err_file(path)
 }
 # }}}
 
 # parse_err_file {{{
 parse_err_file <- function (path) {
-    res <- list(
+    # data
+    err <- data.table(index = integer(), environment_index = integer(),
+        environment = character(), level_index = integer(), level = character(),
+        message = character()
+    )
+    # attributes
+    att <- list(
         eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
         datetime = as.POSIXct(NA), idd_version = NA,
-        successful = FALSE, terminated = FALSE, data = data.table()
+        successful = FALSE, terminated = FALSE
     )
-    setattr(res, "class", "ErrFile")
 
-    if (!file.exists(path)) return(res)
+    # return empty err
+    if (!file.exists(path)) {
+        for (i in names(att)) setattr(err, i, att[[i]])
+        setattr(err, "class", c("ErrFile", class(err)))
+        return(err)
+    }
 
     # read err file
     err_dt <- read_lines(path, trim = TRUE)
 
-    if (!nrow(err_dt)) return(res)
+    # return empty err
+    if (!nrow(err_dt)) {
+        for (i in names(att)) setattr(err, i, att[[i]])
+        setattr(err, "class", c("ErrFile", class(err)))
+        return(err)
+    }
 
     # parse header line
     if (err_dt[1L, stri_detect_fixed(string, "Program Version")]) {
@@ -70,16 +86,16 @@ parse_err_file <- function (path) {
 
         # EnergyPlus version and build
         ver_bld <- stri_match_first_regex(err_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
-        if (!is.na(ver_bld[, 2L])) res$eplus_version <- standardize_ver(ver_bld[, 2L])
-        if (!is.na(ver_bld[, 3L])) res$eplus_build <- ver_bld[, 3L]
+        if (!is.na(ver_bld[, 2L])) att$eplus_version <- standardize_ver(ver_bld[, 2L])
+        if (!is.na(ver_bld[, 3L])) att$eplus_build <- ver_bld[, 3L]
 
         # simulation date time
         d <- stri_match_first_regex(err_head[4L], "YMD=(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2})")[, 2L]
-        if(!is.na(d)) res$datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
+        if(!is.na(d)) att$datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
 
         # IDD version
         v <- stri_match_first_regex(err_head[5L], "IDD_Version (\\d\\.\\d\\.\\d)")[, 2L]
-        if (!is.na(v)) res$idd_version <- standardize_ver(v)
+        if (!is.na(v)) att$idd_version <- standardize_ver(v)
 
         # exclude header line
         err_dt <- err_dt[-1L]
@@ -93,18 +109,25 @@ parse_err_file <- function (path) {
     # ..... Reference ...
     # ..... Last severe ...
     err_dt[stri_startswith_fixed(string, "**"),
-        `:=`(prefix = stri_sub(string, to = 13L), message = stri_sub(string, 15L))
+        `:=`(prefix = stri_sub(string, to = 13L), message = stri_sub(string, 15L)
+        )
     ]
-    err_dt[is.na(prefix), `:=`(prefix = "**   ~~~   **", message = string)]
+    # recurring error messages
+    err_dt[stri_startswith_fixed(message, " **"),
+        `:=`(prefix = stri_sub(message, to = 14L), message = stri_sub(message, 16)
+        )
+    ]
+
+    err_dt[J(NA_character_), on = "prefix", `:=`(prefix = "**   ~~~   **", message = string)]
 
     # exclude empty lines
-    err_dt <- err_dt[message != ""]
+    err_dt <- err_dt[!J(""), on = "message"]
 
     # check if simulation complete successfully
     if (nrow(err_dt[stri_detect_regex(message, "^(EnergyPlus|(GroupdTempCalc\\S*)) Completed Successfully")])) {
-        res$successful <- TRUE
+        att$successful <- TRUE
     } else if (nrow(err_dt[stri_startswith_fixed(message, "EnergyPlus Terminated")])) {
-        res$terminated <- TRUE
+        att$terminated <- TRUE
     }
 
     # exclude unuseful lines
@@ -113,6 +136,7 @@ parse_err_file <- function (path) {
 
     # extract environment
     err_dt[stri_startswith_fixed(message, "Beginning"), `:=`(environment = stri_sub(message, 11L))]
+    err_dt[stri_startswith_fixed(message, "===== Recurring Error Summary ====="), `:=`(environment = "Recurring Errors")]
 
     # set environment index
     err_dt[!is.na(environment), environment_index := .I]
@@ -122,7 +146,7 @@ parse_err_file <- function (path) {
         by = list(cumsum(!is.na(environment_index)))]
 
     # for those simulation without sizing and etc.
-    err_dt[is.na(environment_index), `:=`(environment = "Simulation Initiation", environment_index = 0L)]
+    err_dt[J(NA_integer_), on = "environment_index", `:=`(environment = "Simulation Initiation", environment_index = 0L)]
 
     # exclude environment lines
     err_dt <- err_dt[!line %in% err_dt[environment_index > 0L, line[1L], by = c("environment_index")]$V1]
@@ -170,9 +194,18 @@ parse_err_file <- function (path) {
     # ************* ..The nominally unused ...
     # ************* ..extra time during ...
     # ************* ..object. You may ...
+    #
+    # (e) recurring error message
+    # ************* ===== Recurring Error Summary =====
+    # ************* Nominally Unused Constructions
+    # *************  ** Warning ** GetSpecificHeatGlycol: Temperature out of ...
+    # *************  **   ~~~   **   This error occurred 6260 total times;
+    # *************  **   ~~~   **   during Warmup 0 times;
+    # *************  **   ~~~   **   during Sizing 0 times.
+    # *************  **   ~~~   **   Max=34813.033168 {C}  Min=125.270579 {C}
     # }}}
 
-    l <- err_dt[stri_startswith_fixed(message, "The following") |
+    l <- err_dt[(stri_startswith_fixed(message, "The following") & environment != "Recurring Errors") |
                 stri_endswith_fixed(message, "is shown.") |
                 stri_startswith_fixed(message, ".."), which = TRUE
     ]
@@ -186,15 +219,28 @@ parse_err_file <- function (path) {
     # number messages of different level
     err_dt[!is.na(index), level_index := seq_len(.N), by = c("level")]
     err_dt[, index := index[1L], by = list(cumsum(!is.na(index)))]
+
     err_dt[, `:=`(level = level[1L], level_index = level_index[1L]),
         by = list(cumsum(!is.na(level_index)))]
+
+    # extract total recurring times
+    err_dt[J("Recurring Errors"), on = "environment", by = "level_index",
+        num := {
+            num <- stri_match_first_regex(message, "This error occurred (\\d+) total times;")[, 2L]
+            num <- as.integer(num)
+            if (any(!is.na(num))) num <- rep(num[!is.na(num)], length.out = .N)
+            num
+        }
+    ]
 
     set(err_dt, NULL, c("string", "line", "prefix"), NULL)
     setcolorder(err_dt, c("index", "environment_index", "environment", "level_index", "level", "message"))
 
-    res$data <- err_dt
+    # assign attributes
+    for (i in names(att)) setattr(err_dt, i, att[[i]])
+    setattr(err_dt, "class", c("ErrFile", class(err_dt)))
 
-    res
+    err_dt
 }
 # }}}
 
@@ -214,20 +260,23 @@ parse_err_file <- function (path) {
 print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("EnergyPlus Error File", line = 2)
 
-    if (!is.na(x$eplus_build)) {
-        cli::cat_line(paste0("  * EnergyPlus version: ", x$eplus_version, " (", x$eplus_build, ")"))
-    } else {
-        cli::cat_line(paste0("  * EnergyPlus version: ", x$eplus_version))
-    }
+    eplus_version <- attr(x, "eplus_version")
+    eplus_build <- attr(x, "eplus_build")
+    datetime <- attr(x, "datetime")
 
-    cli::cat_line(paste0("  * Simulation started: ", x$datetime))
-    cli::cat_line(paste0("  * Terminated: ", x$terminated))
-    cli::cat_line(paste0("  * Successful: ", x$successful))
+    if (!is.na(eplus_build)) {
+        cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
+    } else {
+        cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
+    }
+    cli::cat_line(paste0("  * Simulation started: ", attr(x, "datetime")))
+    cli::cat_line(paste0("  * Terminated: ", attr(x, "terminated")))
+    cli::cat_line(paste0("  * Successful: ", attr(x, "successful")))
 
     if (info) {
-        dt <- x$data
+        dt <- x
     } else {
-        dt <- x$data[level != "Info"]
+        dt <- x[J("Info"), on = "level"]
     }
 
     if (!nrow(dt)) {
@@ -237,9 +286,9 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
 
     # error summary
     if (any(dt$level != "Info")) {
-        num_sum <- dt[level != "Info", list(num = max(level_index)), by = c("level")]
+        num_sum <- dt[J("Info"), on = "level", list(num = max(level_index)), by = c("level")]
         set(num_sum, NULL, "level", factor(num_sum$level, c("Warning", "Severe", "Fatal"), ordered = TRUE))
-        err_sm <- num_sum[order(level), paste0("  * ",rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
+        err_sm <- num_sum[order(level), paste0("  * ", rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
         cli::cat_line(err_sm)
     }
 
@@ -260,12 +309,22 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     # get all total message number in a level
     dt[, level_num := max(level_index), by = "level"]
     # add "[W 1/n]" prefix at the beginning
-    dt[dt[, .I[1L], by = c("level", "level_index")]$V1,
+    dt[dt[environment != "Recurring Errors", .I[1L], by = c("level", "level_index")]$V1,
        out := paste0("[", stri_sub(level, to = 1L), " ", level_index, "/", level_num, "] ", out)
+    ]
+    dt[dt[environment == "Recurring Errors", .I[1L], by = c("level", "level_index")]$V1,
+       out := {
+           rec_times <- rep("", .N)
+           rec_times[!is.na(num)] <- paste0(" (", num[!is.na(num)], ")")
+           paste0("[", stri_sub(level, to = 1L), " ", level_index, "/", level_num, rec_times, "] ", out)
+       }
     ]
 
     # add environment name heading
-    dt[dt[, .I[1L], by = c("environment_index")]$V1, out := paste0(rule(paste0("During ", environment)), "\n", out), by = "id"]
+    dt[dt[environment != "Recurring Errors", .I[1L], by = c("environment_index")]$V1,
+        out := paste0(rule(paste0("During ", environment)), "\n", out), by = "id"]
+    dt[dt[environment == "Recurring Errors", .I[1L], by = c("environment_index")]$V1,
+        out := paste0(rule(environment), "\n", out), by = "id"]
     # separate different environment
     dt[dt[, .I[1L], by = c("environment_index")]$V1[-1L], out := paste0("\n", out)]
 

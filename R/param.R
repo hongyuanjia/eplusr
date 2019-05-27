@@ -715,12 +715,7 @@ param_output_errors <- function (self, private, which, info = FALSE) {
 
     names(err) <- param_case_from_which(self, private, which, name = TRUE)
 
-    if (!info) {
-        err <- lapply(err, function (x) {
-            x$data <- x$data[!(level == "Info")]
-            x
-        })
-    }
+    if (!info) err <- lapply(err, function (x) x[!(level == "Info")])
 
     err
 }

@@ -23,10 +23,13 @@
 * Fix datetime calculation in `$report_data()` in `EplusSql` (#46).
 * Update doc on EnergyPlus time nodation (#47).
 * Fix EPW design condition parsing error when `hours_8_to_4_12.8_20.6` is zero.
+* Now recurring errors in `.err` file are parsed correctly in `ErrFile`.
 
 ## Minor changes
 
-*  Change message types in `$ref_to_object()` and `$ref_by_object()` in `IdfObject`.
+* Change message types in `$ref_to_object()` and `$ref_by_object()` in `IdfObject`.
+* Now `ErrFile` is stored as a `data.table` with additional attributes instead
+  of a list.
 
 # eplusr 0.10.2
 

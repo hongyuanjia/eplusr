@@ -756,7 +756,7 @@ job_output_errors <- function (self, private, info = FALSE) {
 
     err <- parse_err_file(path_err)
 
-    if (!info) err$data <- err$data[!J("Info"), on = "level"]
+    if (!info) err[!J("Info"), on = "level"] else err
 
     err
 }

@@ -18,7 +18,8 @@ An \code{ErrFile} object.
 with an extension \code{.err}, parses it and returns an \code{ErrFile} object.
 }
 \details{
-Basically, an \code{ErrFile} object is a list with 7 elements:
+Basically, an \code{ErrFile} object is a \link[data.table:data.table]{data.table}
+with 6 additional attributes:
 \itemize{
 \item \code{eplus_version}: A \link[base:numeric_version]{numeric_version} object. The
 version of EnergyPlus used during the simulation.
@@ -31,8 +32,6 @@ IDD used during the simulation.
 otherwise.
 \item \code{terminated}: \code{TRUE} when the simulation was terminated, and \code{FALSE}
 otherwise.
-\item \code{data}: A \link[data.table:data.table]{data.table} that contains parsed error
-messages.
 }
 }
 \examples{
