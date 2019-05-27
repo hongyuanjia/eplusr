@@ -7,6 +7,8 @@
   directly modify existing objects using character vectors and data.frames.
 * A new argument `wide` is added in `$to_table()` method in `Idf` class,
   similar to `$to_table()` method in `IdfObject` class.
+* New function `read_rdd()` and `read_mdd()` are added to help to directly parse
+  `.rdd` and `.mdd` file.
 
 ## Bug fixes
 

@@ -64,6 +64,7 @@ Collate:
     'install.R'
     'job.R'
     'param.R'
+    'rdd.R'
     'run.R'
     'sql.R'
     'units.R'
