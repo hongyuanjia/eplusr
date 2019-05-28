@@ -231,8 +231,7 @@ them.
 |                     | `$is_valid_id()`         | Check object ID existence                         |
 |                     | `$is_valid_name()`       | Check object name existence                       |
 | Object Relation     | `$object_relation()`     | Get object relation with others                   |
-| Object Query        | `$object()`              | Get object relation with others                   |
-|                     | `$object()`              | Get single object                                 |
+| Object Query        | `$object()`              | Get single object                                 |
 |                     | `$objects()`             | Get multiple objects                              |
 |                     | `$object_unique()`       | Get the unique object                             |
 |                     | `$objects_in_class()`    | Get objects in class                              |
@@ -246,7 +245,8 @@ them.
 |                     | `$rename()`              | Change object names                               |
 |                     | `$insert()`              | Add new objects from other `IdfObject`s           |
 |                     | `$load()`                | Add new objects from strings and data.frames      |
-|                     | `$paste()`               | Add new objects from IDF Editor                   |
+|                     | `$update()`              | Update object values from strings and data.frames |
+|                     | `$paste()`               | Add new objects from IDF Editor `Copy obj`        |
 |                     | `$search_value()`        | Get objects whose values match regular expression |
 |                     | `$replace_value()`       | Modify object values using regular expression     |
 | Validation          | `$validate()`            | Check any errors in `Idf`                         |
