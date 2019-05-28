@@ -402,7 +402,7 @@ NULL
 #'   compliance with the start day of week value specified in `DATA PERIODS`
 #'   header.
 #' * `tz`: A valid time zone to be assigned to the `datetime` column. All valid
-#'   time zone names can be obtained using [base::OlsonNames()]. Default:`"UTC"`.
+#'   time zone names can be obtained using `OlsonNames()`. Default:`"UTC"`.
 #' * `update`: If `TRUE`, the `year` column are updated according to the newly
 #'   created `datetime` column using `start_year`. If `FALSE`, original year
 #'   data in the `Epw` object is kept. Default: `FALSE`.
@@ -429,8 +429,8 @@ NULL
 #' after calling these methods.
 #'
 #' `$make_na()` converts specified abnormal data into `NA`s in specified data
-#' period. This makes it easier to find abnormal data directly using
-#' [base::is.na()] instead of using `$missing_code()`.
+#' period. This makes it easier to find abnormal data directly using `is.na()`
+#' instead of using `$missing_code()`.
 #'
 #' `$fill_abnormal()` fills specified abnormal data using corresponding actions
 #' listed in `$fill_action()`. For what kinds of actions to be performed, please

@@ -396,7 +396,7 @@ year value is automatically calculated for specified data period that
 compliance with the start day of week value specified in \code{DATA PERIODS}
 header.
 \item \code{tz}: A valid time zone to be assigned to the \code{datetime} column. All valid
-time zone names can be obtained using \code{\link[base:OlsonNames]{base::OlsonNames()}}. Default:\code{"UTC"}.
+time zone names can be obtained using \code{OlsonNames()}. Default:\code{"UTC"}.
 \item \code{update}: If \code{TRUE}, the \code{year} column are updated according to the newly
 created \code{datetime} column using \code{start_year}. If \code{FALSE}, original year
 data in the \code{Epw} object is kept. Default: \code{FALSE}.
@@ -424,8 +424,8 @@ that the returned data from \code{$data()} and \code{$abnormal_data()} may be di
 after calling these methods.
 
 \code{$make_na()} converts specified abnormal data into \code{NA}s in specified data
-period. This makes it easier to find abnormal data directly using
-\code{\link[base:is.na]{base::is.na()}} instead of using \code{$missing_code()}.
+period. This makes it easier to find abnormal data directly using \code{is.na()}
+instead of using \code{$missing_code()}.
 
 \code{$fill_abnormal()} fills specified abnormal data using corresponding actions
 listed in \code{$fill_action()}. For what kinds of actions to be performed, please
