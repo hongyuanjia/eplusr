@@ -13,19 +13,10 @@
 
 * Apply multiple weather file to a seed in `ParametricJob` class
 
-* Add functionality to parse `.rdd` and `.mdd` file and add possible
-  output variables into the Idf, possibly also a gui interface providing
-  autocompletion using `DT::datatable()` and `parse_rdd_file()`.
-
-* Add functionality that can set objects using input data.frame instead of
-  nested list.
-
 * Add external file dependency (e.g. file existance in `Schedule:File` class)
   checking in `$validate()`.
 
 * Add function to reorder objects in a class
-
-* Dynamic print the status of job running info
 
 * Remove crayon dep
 
@@ -40,3 +31,10 @@
   }
   ```
 * export the fun `locate_eplus()` to init eplus path
+
+* Add functionality to directly delete an object using `$<-.Idf`, such like
+  `Idf$Material$mat <- NULL`, and delete a whole class using `Idf$Material <-
+  NULL`.
+
+* Add a vignette about simulation data extraction and modifying models using
+  functions.
