@@ -40,7 +40,7 @@ NULL
 #' read_rdd(job$locate_output(".rdd"))
 #' read_mdd(job$locate_output(".mdd"))
 #' }
-#' @name rdd
+#' @rdname rdd
 #' @author Hongyuan Jia
 # read_rdd {{{
 read_rdd <- function (path) {
@@ -49,7 +49,7 @@ read_rdd <- function (path) {
 }
 # }}}
 
-#' @name rdd
+#' @rdname rdd
 #' @param path a file path of EnergyPlus EnergyPlus Meter Data Dictionary file,
 #' usually with an extension `.mdd`.
 #' @return An `MddFile` object.
@@ -64,7 +64,7 @@ read_mdd <- function (path) {
 # parse_rdd_file {{{
 parse_rdd_file <- function (path) {
     rdd <- data.table(reported_time_step = character(), report_type = character(),
-        variable = character(), unit = character()
+        variable = character(), units = character()
     )
 
     eplus_version <- numeric_version(NA, strict = FALSE)
@@ -100,10 +100,10 @@ parse_rdd_file <- function (path) {
         error = function (e) {e$message <- paste0("Failed to read RDD/MDD data.\n", e$message); stop(e)}
     )
 
-    set(rdd, NULL, c("variable", "unit"), as.data.table(stri_split_fixed(rdd$variable_unit, "[", n = 2, simplify = TRUE)))
+    set(rdd, NULL, c("variable", "units"), as.data.table(stri_split_fixed(rdd$variable_unit, "[", n = 2, simplify = TRUE)))
     set(rdd, NULL, "variable_unit", NULL)
-    set(rdd, NULL, "unit", stri_sub(rdd$unit, to = -2L))
-    rdd[stri_isempty(unit), `:=`(unit = NA_character_)]
+    set(rdd, NULL, "units", stri_sub(rdd$units, to = -2L))
+    rdd[stri_isempty(units), `:=`(units = NA_character_)]
 
     setattr(rdd, "eplus_version", eplus_version)
     setattr(rdd, "eplus_build", eplus_build)
@@ -127,7 +127,7 @@ parse_mdd_file <- function (path) {
 print.RddFile <- function (x, ...) {
     cli::cat_rule("EnergyPlus Report Data Dictionary File", line = 2)
 
-    if (!is.na(eplus_build)) {
+    if (!is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
@@ -147,7 +147,7 @@ print.RddFile <- function (x, ...) {
 print.MddFile <- function (x, ...) {
     cli::cat_rule("EnergyPlus Meter Data Dictionary File", line = 2)
 
-    if (!is.na(eplus_build)) {
+    if (!is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
