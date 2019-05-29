@@ -2458,7 +2458,7 @@ read_idf <- function (path, idd = NULL) {
 # }}}
 
 # add_idf_class_bindings {{{
-add_idf_class_bindings <- function (idf, class_id = NULL) {
+add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
     # get all classes in current version IDD
     env <- .subset2(idf, ".__enclos_env__")
     self <- .subset2(env, "self")
@@ -2509,6 +2509,11 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
     cls <- private$idd_env()$class$class_name[ext]
     flg <- private$idd_env()$class$unique_object[ext]
 
+    # move deleted class bindings
+    if (update && length(setdiff(ls(idf, pattern = "^[A-Z]"), cls))) {
+        rm(list = setdiff(ls(idf, pattern = "^[A-Z]"), cls), envir = idf)
+    }
+
     # unique classes
     for (i in cls[flg]) {
         makeActiveBinding(i, get_object_unique(env, self, private, i, value), idf)
@@ -2519,13 +2524,10 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
         makeActiveBinding(i, get_objects_in_class(env, self, private, i, value), idf)
     }
 
-    # # lock environment after adding active bindings
-    # lockEnvironment(self)
-    # lockEnvironment(private)
-
     idf
 }
 # }}}
+
 # replace_objects_in_class {{{
 replace_objects_in_class <- function (self, private, class, value, unique_object = FALSE) {
     exist <- self$is_valid_class(class)
@@ -2737,6 +2739,15 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         }
     }
 
+    invisible(x)
+}
+# }}}
+
+#' @export
+# print.Idf {{{
+print.Idf <- function (x, zoom = "class", order = TRUE, ...) {
+    add_idf_class_bindings(x, update = TRUE)
+    x$print(zoom = zoom, order = order)
     invisible(x)
 }
 # }}}

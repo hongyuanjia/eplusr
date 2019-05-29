@@ -412,16 +412,14 @@ test_that("Idf class", {
     expect_silent(idf$SimulationControl <- NULL)
     expect_false(idf$is_valid_class("SimulationControl"))
     expect_null(idf$SimulationControl)
-    # TODO: dynamically modify active bindings
-    # expect_false("SimulationControl" %in% names(idf))
+    expect_false({idf$print(); "SimulationControl" %in% names(idf)})
 
     # can insert unique-object class
     expect_silent(idf$SimulationControl <- tbl)
     expect_true(idf$is_valid_class("SimulationControl"))
     expect_silent(idf$SimulationControl <- NULL)
     expect_silent(idf$SimulationControl <- str)
-    # TODO: dynamically modify active bindings
-    # expect_true("SimulationControl" %in% names(idf))
+    expect_true("SimulationControl" %in% names(idf))
     # }}}
 
     # NORMAL CLASS {{{

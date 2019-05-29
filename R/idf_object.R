@@ -695,7 +695,7 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 # }}}
 
 # add_idfobj_field_bindings {{{
-add_idfobj_field_bindings <- function (obj, field_index = NULL) {
+add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) {
     # create active bindings
     # get first 30 field names in current IDD class
     env <- .subset2(obj, ".__enclos_env__")
@@ -724,13 +724,14 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL) {
         fun
     }
 
+    # move deleted field bindings
+    if (update && length(setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm))) {
+        rm(list = setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm), envir = obj)
+    }
+
     for (i in fld_nm) {
         makeActiveBinding(i, get_field_value(env, self, private, i, value), obj)
     }
-
-    # # lock environment after adding active bindings
-    # lockEnvironment(self)
-    # lockEnvironment(private)
 
     obj
 }
@@ -1281,6 +1282,14 @@ as.character.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29
 str.IdfObject <- function (object, ...) {
     object <- object$value()
     NextMethod()
+}
+# }}}
+
+#' @export
+# print.IdfObject {{{
+print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, ...) {
+    add_idfobj_field_bindings(x, update = TRUE)
+    x$print(comment = comment, auto_sep = auto_sep, brief = brief)
 }
 # }}}
 
