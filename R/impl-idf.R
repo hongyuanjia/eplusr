@@ -3028,7 +3028,10 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 
     if (string_value) {
         if (wide) {
-            dcast(val, id + name + class ~ field, value.var = "value_chr")
+            setcolorder(
+                dcast(val, id + name + class ~ field, value.var = "value_chr"),
+                c("id", "name", "class", unique(val$field))
+            )
         } else {
             setnames(val, "value_chr", "value")
             val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
@@ -3043,8 +3046,8 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 
         if (wide) {
             val <- setcolorder(
-                dcast(val, id + name + class ~ field, value.var = "value"),
-                c("id", "name", "class", val$field[unique(val$index)])
+                dcast(val, id + name + class ~ field, value.var = "value", fill = NA),
+                c("id", "name", "class", unique(val$field))
             )
 
             cols <- setdiff(names(val), c("id", "name", "class"))
