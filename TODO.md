@@ -40,3 +40,5 @@
   functions.
 
 * Use Rcpp to unlock environment. Reference: https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051
+
+* Add `IdfObjectsClass` class to handle `IdfObject`s in same class.
