@@ -41,7 +41,7 @@ test_that("can read IDD", {
 # Idd class {{{
 test_that("Idd class", {
     # can create an Idd object from string
-    expect_silent(idd <- Idd$new(text("idd", "9.9.9")))
+    expect_silent(idd <- use_idd(text("idd", "9.9.9")))
 
     # can get Idd version
     expect_equal(idd$version(), as.numeric_version("9.9.9"))

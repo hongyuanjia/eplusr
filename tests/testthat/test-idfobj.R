@@ -323,9 +323,25 @@ test_that("IdfObject class", {
     )
     # }}}
 
-    # S3 subsetting works
+    # S3 subsetting works {{{
     expect_equal(mat$Roughness, "MediumSmooth")
+    expect_null(mat$rOuGhness)
     expect_equal(mat[["Roughness"]], "MediumSmooth")
+    expect_null(mat[["roughness"]])
+    expect_silent(mat$Roughness <- "Smooth")
+    expect_equal(mat$Roughness, "Smooth")
+    expect_silent(mat[["Roughness"]] <- "MediumSmooth")
+    expect_equal(mat[["Roughness"]], "MediumSmooth")
+
+    expect_error(mat$roughness <- "Smooth", "cannot add bindings to")
+    expect_error(mat[["roughness"]] <- "Smooth", "cannot add bindings to")
+    expect_equal(mat$Visible_Absorptance, 0.78, tolerance = 1e-5)
+    expect_silent(mat$Visible_Absorptance <- 0.8)
+    expect_equal(mat$Visible_Absorptance, 0.8, tolerance = 1e-5)
+    expect_silent(mat[["Visible Absorptance"]] <- 0.8)
+    expect_equal(mat[["Visible Absorptance"]], 0.8, tolerance = 1e-5)
+    expect_silent(mat[["Visible_Absorptance"]] <- 0.8, "cannot add bindings to")
+    # }}}
 
     expect_output(con$print())
 })

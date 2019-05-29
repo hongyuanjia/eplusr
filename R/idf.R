@@ -1459,7 +1459,8 @@ NULL
 NULL
 
 # Idf {{{
-Idf <- R6::R6Class(classname = "Idf",
+Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
+
     public = list(
 
         # INITIALIZE {{{
@@ -1777,7 +1778,7 @@ idf_obj <- function (self, private, which) {
         ignore_case = TRUE
     )
 
-    IdfObject$new(obj$object_id, obj$class_id, parent = self)
+    add_idfobj_field_bindings(IdfObject$new(obj$object_id, obj$class_id, parent = self))
 }
 # }}}
 # idf_object_unique {{{
@@ -1800,7 +1801,7 @@ idf_object_unique <- function (self, private, class) {
         )
     }
 
-    IdfObject$new(obj$object_id, obj$class_id, parent = self)
+    add_idfobj_field_bindings(IdfObject$new(obj$object_id, obj$class_id, parent = self))
 }
 # }}}
 # idf_objects {{{
@@ -1811,6 +1812,7 @@ idf_objects <- function (self, private, which) {
     )
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", obj$object_name)
     res
 }
@@ -1827,6 +1829,7 @@ idf_objects_in_class <- function (self, private, class) {
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", obj$object_name)
     res
 }
@@ -1844,6 +1847,7 @@ idf_objects_in_group <- function (self, private, group) {
     obj <- join_from_input(private$idf_env()$object, grp_in, "group_id")
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", obj$object_name)
     res
 }
@@ -1909,6 +1913,7 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
     }
 
     res <- c(obj_self, lapply(id_ref, IdfObject$new, parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
 
     ref_nm <- private$idf_env()$object[J(id_ref), on = "object_id", object_name]
 
@@ -1938,6 +1943,7 @@ idf_search_object <- function (self, private, pattern, class = NULL, ignore.case
     }
 
     res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", obj$object_name)
     res
 }
@@ -1945,6 +1951,7 @@ idf_search_object <- function (self, private, pattern, class = NULL, ignore.case
 # idf_return_modified {{{
 idf_return_modified <- function (self, private, modified) {
     res <- apply2(modified$object$object_id, modified$object$class_id, IdfObject$new, list(parent = self))
+    res <- lapply(res, add_idfobj_field_bindings)
     setattr(res, "names", modified$object$object_name)
     res
 }
@@ -2443,48 +2450,224 @@ idf_add_output_sqlite <- function (idf) {
 #' @author Hongyuan Jia
 # read_idf {{{
 read_idf <- function (path, idd = NULL) {
-    Idf$new(path, idd)
+    add_idf_class_bindings(Idf$new(path, idd))
+}
+# }}}
+
+# add_idf_class_bindings {{{
+add_idf_class_bindings <- function (idf, class_id = NULL) {
+    # get all classes in current version IDD
+    env <- .subset2(idf, ".__enclos_env__")
+    self <- .subset2(env, "self")
+    private <- .subset2(env, "private")
+
+    get_object_unique <- function (self, private, class, value) {
+        force(self)
+        force(private)
+        force(class)
+        function (value) {
+            if (missing(value)) {
+                if (self$is_valid_class(class)) {
+                    return(self$object_unique(class))
+                } else {
+                    return(NULL)
+                }
+            }
+
+            if (is_idfobject(value)) value <- list(value)
+            replace_objects_in_class(self, private, class, value, TRUE)
+        }
+    }
+
+    get_objects_in_class <- function (self, private, class, value) {
+        force(self)
+        force(private)
+        force(class)
+        function (value) {
+            if (missing(value)) {
+                if (self$is_valid_class(class)) {
+                    return(self$objects_in_class(class))
+                } else {
+                    return(NULL)
+                }
+            }
+
+            replace_objects_in_class(self, private, class, value, FALSE)
+        }
+    }
+
+    if (is.null(class_id)) {
+        ext <- unique(private$idf_env()$object$class_id)
+    } else {
+        ext <- class_id
+    }
+    cls <- private$idd_env()$class$class_name[ext]
+    flg <- private$idd_env()$class$unique_object[ext]
+
+    # unique classes
+    for (i in cls[flg]) {
+        makeActiveBinding(i, get_object_unique(self, private, i, value), idf)
+    }
+
+    # other classes
+    for (i in cls[!flg]) {
+        makeActiveBinding(i, get_objects_in_class(self, private, i, value), idf)
+    }
+
+    # # lock environment after adding active bindings
+    # lockEnvironment(self)
+    # lockEnvironment(private)
+
+    idf
+}
+# }}}
+# replace_objects_in_class {{{
+replace_objects_in_class <- function (self, private, class, value, unique_object = FALSE) {
+    exist <- self$is_valid_class(class)
+
+    # if NULL, delete all objects in class
+    if (is.null(value)) {
+        if (exist) self$del(self$object_id(class, simplify = TRUE))
+
+    # if a character vector or a data.frame, use `$load()`
+    } else if (is.character(value) || is.data.frame(value)) {
+        if (exist) {
+            # get current objects
+            obj_main <- get_idf_object(private$idd_env(), private$idf_env(), class)
+
+            # temporary rename objects to bypass unique name checking
+            obj_dt <- private$idf_env()$object
+            obj_dt[J(obj_main$object_id), on = "object_id",
+                object_name_lower := paste0(object_name_lower, stri_rand_strings(length(object_name_lower), 15L))
+            ]
+        }
+
+        # disable unique object checking
+        if (exist && unique_object) {
+            ori <- eplusr_option("validate_level")
+            on.exit(eplusr_option(validate_level = ori), add = TRUE)
+
+            chk <- level_checks(ori)
+            chk$unique_object <- FALSE
+            eplusr_option(validate_level = chk)
+        }
+
+        # get new object data
+        l <- load_idf_object(private$idd_env(), private$idf_env(), version = private$m_version,
+            value, .unique = FALSE)
+
+        # stop if not from the same class
+        cls_in <- private$idd_env()$class$class_name[l$object$class_id]
+        if (any(cls_in != class)) {
+            if (exist) {
+                # get back original object names
+                obj_dt[J(obj_main$object_id), on = "object_id",
+                    object_name_lower := stri_trans_tolower(object_name)
+                ]
+            }
+
+            invld_cls <- cls_in[cls_in != class]
+            abort("error_invalid_input_object_class",
+                paste0(
+                    "Input IdfObjects should from class `", class, "`. ",
+                    " Invalid input class: ", collapse(invld_cls)
+                )
+            )
+        }
+
+        # if everything looks good, add new objects
+        merge_idf_data(private$idf_env(), l, by_object = TRUE)
+        log_new_order(private$m_log, l$object$object_id)
+        log_unsaved(private$m_log)
+        log_new_uuid(private$m_log)
+
+        # delete original objects
+        if (exist) {
+            invisible(self$del(obj_main$object_id, .force = TRUE))
+        }
+
+    # if a list of IdfObjects, use `$insert()`
+    } else if (is.list(value) && all(vlapply(value, is_idfobject))) {
+        # check if input is from the same model
+        # get uuid if idf
+        uuid_main <- private$m_log$uuid
+
+        # get uuids of input
+        uuid_in <- vcapply(value, function (obj) .subset2(.subset2(._get_private(obj), "log_env")(), "uuid"))
+        # get id of input
+        obj_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_object_id"))
+
+        # ignore ones that is from the same idf
+        if (exist) {
+            obj_main <- get_idf_object(private$idd_env(), private$idf_env(), class)
+            same_num <- length(value) == nrow(obj_main)
+            same_id <- obj_id_in %in% obj_main$object_id
+        } else {
+            same_num <- FALSE
+            same_id <- FALSE
+        }
+
+        # direct return the idf
+        if (all(same_idf) && same_num && all(same_id)) return(invisible(self))
+
+        # stop if not from the same class
+        cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
+        if (any(cls_id_in != cls_id)) {
+            invld_cls <- vcapply(value[cls_id_in != cls_id], function (obj) .subset2(obj, "class_name")())
+            msg <- paste0(" #", which(cls_id_in != cls_id), "| <IdfObject> --> Class: ", surround(invld_cls),
+                collapse = "\n"
+            )
+            abort("error_invalid_input_object_class",
+                paste0(
+                    "Input IdfObjects should from class `", obj_main$class_name[[1L]]), "`. ",
+                    " Invalid input:\n", msg
+
+            )
+        }
+
+        # ignore same objects and insert new ones
+        if (any(!same_id)) .subset2(x, "insert")(value[!same_id], .unique = FALSE)
+
+        # delete objects that are not included in input
+        if (exist) {
+            invisible(self$del(obj_main$object_id, .force = TRUE))
+        }
+
+    } else {
+        mes <- if (unique_object) "an IdfObject" else "a list of IdfObjects"
+        abort("error_invalid_active_binding_value",
+            paste0(
+                "Value should be ", mes, ", a character vector or a data.frame. ",
+                "Input class: ", surround(class(value)[[1]]), "."
+            )
+        )
+    }
+
+    invisible(self)
 }
 # }}}
 
 #' @export
 # $.Idf {{{
 `$.Idf` <- function (x, i) {
-    if (all(i %in% setdiff(ls(x), "initialize"))) {
+    if (i %in% ls(x)) {
         NextMethod()
     } else {
-        assert(is_scalar(i))
+        private <- ._get_private(x)
 
-        priv <- ._get_private(x)
+        cls_id <- chmatch(i, private$idd_env()$class$class_name_us)
 
-        obj <- tryCatch(get_idf_object(priv$idd_env(), priv$idf_env(), i, underscore = TRUE),
-            error = function (e) NULL
-        )
+        # skip if not a valid IDD class name
+        if (is.na(cls_id)) return(NextMethod())
 
-        if (is.null(obj)) return(NULL)
+        # skip if not an existing IDF class name
+        if (!cls_id %in% private$idf_env()$object$class_id) return(NextMethod())
 
-        uni <- FALSE
-        if (obj$class_id[[1L]] %in% priv$idd_env()$class[unique_object == TRUE, class_id]) {
-            if (nrow(obj) == 1L) {
-                uni <- TRUE
-            } else {
-                warn("warning_idf_dup_unique_class",
-                    paste0("Unique object class ", surround(unique(obj$class_name)),
-                        " has more than one objects: ",
-                        get_object_info(obj, c("id", "name"), collapse = "\n"),
-                        "\nAll objects will be returned. Please see `$validate()`",
-                        " for more details."
-                    )
-                )
-            }
-        }
-
-        if (uni) {
-            IdfObject$new(obj$object_id, obj$class_id, parent = x)
+        cls_nm <- private$idd_env()$class$class_name[cls_id]
+        if (private$idd_env()$class$unique_object[cls_id]) {
+            .subset2(x, "object_unique")(cls_nm)
         } else {
-            out <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = x))
-            setattr(out, "names", obj$object_name)
-            out
+            .subset2(x, "objects_in_class")(cls_nm)
         }
     }
 }
@@ -2493,80 +2676,62 @@ read_idf <- function (path, idd = NULL) {
 #' @export
 # $<-.Idf {{{
 `$<-.Idf` <- function (x, name, value) {
-    idd_env <- .subset2(._get_private(x), "idd_env")()
-    idf_env <- .subset2(._get_private(x), "idf_env")()
+    if (name %in% ls(x)) return(NextMethod())
 
-    cls_id <- chmatch(name, idd_env$class$class_name)
+    self <- ._get_self(x)
+    private <- ._get_private(x)
 
-    if (is.na(cls_id)) abort_bad_key("error_invalid_class_name", "class name", name)
+    # match both normal and underscore class names
+    cls_id <- chmatch(name, private$idd_env()$class$class_name)
+    if (is.na(cls_id)) cls_id <- chmatch(name, private$idd_env()$class$class_name_us)
 
-    # check if input class is an unique-object class
-    if (cls_id %in% idd_env$class[unique_object == TRUE, class_id]) {
-        uni <- TRUE
-        # input should be a single IdfObject
-        assert(is_idfobject(value), msg = "When using an unique-object class name, value should be a single IdfObject.")
-        value <- list(value)
-    } else {
-        uni <- FALSE
-        # input should be a list of IdfObjects
-        assert(is.list(value), vlapply(value, is_idfobject), msg = "Value should be a list of IdfObjects.")
+    # skip if not a valid IDD class name
+    # imitate error message of a locked environment
+    if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
+
+    cls_nm <- private$idd_env()$class$class_name[cls_id]
+    uni <- private$idd_env()$class$unique_object[cls_id]
+
+    replace_objects_in_class(self, private, cls_nm, value, uni)
+    # if not an existing IDF class name, add active bindings
+    if (!cls_id %in% private$idf_env()$object$class_id) {
+        add_idf_class_bindings(x, cls_id)
     }
-
-    # check if input is from the same model
-    # get uuid if idf
-    uuid_main <- .subset2(.subset2(._get_private(x), "m_log"), "uuid")
-
-    # get uuids of input
-    uuid_in <- vcapply(value, function (obj) .subset2(.subset2(._get_private(obj), "log_env")(), "uuid"))
-    # get id of input
-    obj_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_object_id"))
-
-    obj_main <- get_idf_object(idd_env, idf_env, cls_id)
-
-    # ignore ones that is from the same idf
-    same_idf <- uuid_main == uuid_in
-    same_num <- length(value) == nrow(obj_main)
-    same_id <- obj_id_in %in% obj_main$object_id
-
-    # direct return the idf
-    if (all(same_idf) && same_num && all(same_id)) return(invisible(x))
-
-    # stop if not from the same class
-    cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
-    if (any(cls_id_in != cls_id)) {
-        invld_cls <- vcapply(value[cls_id_in != cls_id], function (obj) .subset2(obj, "class_name")())
-        msg <- paste0(" #", which(cls_id_in != cls_id), "| <IdfObject> --> Class: ", surround(invld_cls),
-            collapse = "\n"
-        )
-        abort("error_invalid_input_object_class",
-            paste0(
-                "Input IdfObjects should all from class `", obj_main$class_name[[1L]]), "`. ",
-                " Invalid input:\n", msg
-
-        )
-    }
-
-    # ignore same objects and insert new ones
-    invisible(.subset2(x, "insert")(value[!same_id], .unique = FALSE))
-
-    # delete objects that are not included in input
-    id_del <- setdiff(obj_main$object_id, obj_id_in)
-    if (!length(id_del)) return(invisible(x))
-
-    invisible(.subset2(x, "del")(id_del, .unique = FALSE))
 
     invisible(x)
 }
 # }}}
 
 #' @export
-# [[.Idf {{{
-`[[.Idf` <- `$.Idf`
-# }}}
-
-#' @export
 # [[<-.Idf {{{
-`[[<-.Idf` <- `$<-.Idf`
+`[[<-.Idf` <- function (x, name, value) {
+    if (length(name) != 1L) return(NextMethod())
+
+    if (name %in% ls(x)) {
+        NextMethod()
+    } else {
+        self <- ._get_self(x)
+        private <- ._get_private(x)
+
+        # match only normal class names
+        cls_id <- chmatch(name, private$idd_env()$class$class_name)
+
+        # skip if not a valid IDD class name
+        # imitate error message of a locked environment
+        if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
+
+        cls_nm <- private$idd_env()$class$class_name[cls_id]
+        uni <- private$idd_env()$class$unique_object[cls_id]
+
+        replace_objects_in_class(self, private, cls_nm, value, uni)
+        # if not an existing IDF class name, add active bindings
+        if (!cls_id %in% private$idf_env()$object$class_id) {
+            add_idf_class_bindings(x, cls_id)
+        }
+    }
+
+    invisible(x)
+}
 # }}}
 
 #' @export

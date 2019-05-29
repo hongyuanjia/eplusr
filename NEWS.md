@@ -2,6 +2,8 @@
 
 ## New features
 
+* Now you can get autocompletion of class names of `Idd` and `Idf` objects, and
+  field names of `IdfObject` class in RStudio.
 * `[[<-.Idf` and `$<-.Idf` now can work with unique-object classes as well.
 * A new method `$update()` is added in `Idf` class which makes it possible to
   directly modify existing objects using character vectors and data.frames.

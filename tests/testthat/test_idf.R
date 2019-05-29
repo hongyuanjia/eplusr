@@ -390,6 +390,75 @@ test_that("Idf class", {
     expect_output(idf$print("field", order = FALSE))
     # }}}
 
+    # ACTIVE BINDINGS {{{
+    idf <- read_idf(example())
+
+    # UNIQUE-OBJECT CLASS {{{
+    expect_true("SimulationControl" %in% names(idf))
+
+    # get data.frame input
+    tbl <- idf$SimulationControl$to_table()
+    # get string input
+    str <- idf$SimulationControl$to_string()
+    tbl[5, value := "No"]
+
+    # can replace unique-object class
+    expect_silent(idf$SimulationControl <- tbl)
+    expect_equal(idf$SimulationControl$to_table()$value[[5]], "No")
+    expect_silent(idf$SimulationControl <- str)
+    expect_equal(idf$SimulationControl$to_table()$value[[5]], "Yes")
+
+    # can remove unique-object class
+    expect_silent(idf$SimulationControl <- NULL)
+    expect_false(idf$is_valid_class("SimulationControl"))
+    expect_null(idf$SimulationControl)
+    # TODO: dynamically modify active bindings
+    # expect_false("SimulationControl" %in% names(idf))
+
+    # can insert unique-object class
+    expect_silent(idf$SimulationControl <- tbl)
+    expect_true(idf$is_valid_class("SimulationControl"))
+    expect_silent(idf$SimulationControl <- NULL)
+    expect_silent(idf$SimulationControl <- str)
+    # TODO: dynamically modify active bindings
+    # expect_true("SimulationControl" %in% names(idf))
+    # }}}
+
+    # NORMAL CLASS {{{
+    expect_true("Material" %in% names(idf))
+
+    # get data.frame input
+    tbl <- idf$to_table(class = "Material")
+    tbl[3, value := "0.2"]
+    # get string input
+    str <- idf$to_string(class = "Material", header = FALSE)
+
+    # can replace class
+    expect_silent(idf$Material <- tbl)
+    expect_equal(idf$to_table(class = "Material")$value[[3]], "0.2")
+    expect_silent(idf$Material <- str)
+    expect_equal(idf$to_table(class = "Material")$value[[3]], "0.1014984")
+
+    # can remove class
+    expect_error(idf$Material <- NULL, class = "error_del_referenced")
+    eplusr_option(validate_level = {chk <- level_checks("final"); chk$reference <- FALSE; chk})
+    expect_silent(idf$Material <- NULL)
+    expect_false(idf$is_valid_class("Material"))
+    expect_null(idf$Material)
+    # TODO: dynamically modify active bindings
+    # expect_false("Material" %in% names(idf))
+
+    # can insert class
+    expect_silent(idf$Material <- tbl)
+    expect_true(idf$is_valid_class("Material"))
+    expect_silent(idf$Material <- NULL)
+    expect_silent(idf$Material <- str)
+    # TODO: dynamically modify active bindings
+    # expect_true("Material" %in% names(idf))
+    eplusr_option(validate_level = "final")
+    # }}}
+    # }}}
+
     # S3{{{
     idf <- read_idf(text("idf", 8.8))
     expect_equal(names(idf$Material), c("WD01", "WD02"))

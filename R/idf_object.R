@@ -688,12 +688,55 @@ idf_object <- function (parent, object = NULL, class = NULL) {
         class <- obj$class_id
     }
 
-    IdfObject$new(object, class, parent)
+    obj <- IdfObject$new(object, class, parent)
+
+    add_idfobj_field_bindings(obj)
+}
+# }}}
+
+# add_idfobj_field_bindings {{{
+add_idfobj_field_bindings <- function (obj, field_index = NULL) {
+    # create active bindings
+    # get first 30 field names in current IDD class
+    env <- .subset2(obj, ".__enclos_env__")
+    self <- .subset2(env, "self")
+    private <- .subset2(env, "private")
+
+    fld_id <- private$idf_env()$value[J(private$m_object_id), on = "object_id", field_id]
+    if (!is.null(field_index)) {
+        fld_id <- fld_id[field_index]
+    }
+    fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
+
+    get_field_value <- function (self, private, field, value) {
+        force(self)
+        force(private)
+        force(field)
+        function (value) {
+            if (missing(value)) {
+                self$value(field)[[1L]]
+            } else {
+                names(value) <- field
+                self$set(c(value))
+                invisible(self)
+            }
+        }
+    }
+
+    for (i in fld_nm) {
+        makeActiveBinding(i, get_field_value(self, private, i, value), obj)
+    }
+
+    # # lock environment after adding active bindings
+    # lockEnvironment(self)
+    # lockEnvironment(private)
+
+    obj
 }
 # }}}
 
 # IdfObject {{{
-IdfObject <- R6::R6Class(classname = "IdfObject",
+IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
     public = list(
         # INITIALIZE {{{
         initialize = function (object, class = NULL, parent) {
@@ -1250,19 +1293,21 @@ str.IdfObject <- function (object, ...) {
 #' @export
 # $.IdfObject {{{
 '$.IdfObject' <- function (x, name) {
-    if (is_string(name)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (name %in% funs) {
-            NextMethod()
-        } else {
-            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(underscore_name(name), all_nm)
-            if (!is.na(m)) {
-                .subset2(x, "value")(m)[[1]]
-            } else {
-                NextMethod()
-            }
-        }
+    if (name %in% ls(x)) return(NextMethod())
+
+    self <- ._get_self(x)
+    private <- ._get_private(x)
+
+    # In order to make sure `idfobj$nAmE` is not acceptable
+    fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
+    fld_idx <- chmatch(name, underscore_name(fld_nm))
+    if (!is.na(fld_idx)) {
+        tryCatch(
+            get_idfobj_value(private$idd_env(), private$idf_env(),
+                private$m_object_id, which = name, underscore = TRUE
+            )[[1L]],
+            error_bad_field_name = function (e) NextMethod()
+        )
     } else {
         NextMethod()
     }
@@ -1272,48 +1317,54 @@ str.IdfObject <- function (object, ...) {
 #' @export
 # [[.IdfObject {{{
 '[[.IdfObject' <- function(x, i) {
-    if (is_string(i)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (i %in% funs) {
-            NextMethod()
-        } else {
-            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(underscore_name(i), all_nm)
-            if (!is.na(m)) {
-                .subset2(x, "value")(m)[[1]]
-            } else {
-                NextMethod()
-            }
-        }
-    } else if (is_integer(i)) {
-        .subset2(x, "value")(i)[[1]]
-    } else {
+    if (length(i) != 1L) return(NextMethod())
+
+    if (i %in% ls(x)) {
         NextMethod()
+    } else {
+        self <- ._get_self(x)
+        private <- ._get_private(x)
+
+        # In order to make sure `idfobj$nAmE` is not acceptable
+        if (i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
+            tryCatch(
+                get_idfobj_value(private$idd_env(), private$idf_env(),
+                    private$m_object_id, which = i
+                )[[1L]],
+                error_bad_field_name = function (e) NextMethod()
+            )
+        } else {
+            NextMethod()
+        }
     }
 }
 # }}}
 
 #' @export
 # $<-.IdfObject {{{
-'$<-.IdfObject' <- function (x, name, value) {
-    if (is_string(name)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (name %in% funs) {
-            NextMethod()
-        } else {
-            assert(is_scalar(value))
-            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(underscore_name(name), all_nm)
-            if (!is.na(m)) {
-                names(value) <- all_nm[m]
-                .subset2(x, "set")(c(value))
-                invisible(x)
-            } else {
-                NextMethod()
-            }
-        }
+`$<-.IdfObject` <- function (x, name, value) {
+    if (name %in% ls(x)) return(NextMethod())
+
+    self <- ._get_self(x)
+    private <- ._get_private(x)
+
+    assert(is_scalar(value))
+
+    # In order to make sure `idfobj$nAmE <- "a"` is not acceptable
+    fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
+    fld_idx <- chmatch(name, underscore_name(fld_nm))
+    if (!is.na(fld_idx)) {
+        names(value) <- name
+        tryCatch(.subset2(x, "set")(c(value)),
+            error_bad_field_name = function (e) NextMethod()
+        )
+
+        # add bindings
+        add_idfobj_field_bindings(x, fld_idx)
+
+        invisible(x)
     } else {
-        NextMethod()
+        stop("cannot add bindings to a locked environment")
     }
 }
 # }}}
@@ -1321,28 +1372,30 @@ str.IdfObject <- function (object, ...) {
 #' @export
 # [[<-.IdfObject {{{
 '[[<-.IdfObject' <- function(x, i, value) {
-    if (is_string(i)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (i %in% funs) {
-            NextMethod()
-        } else {
-            all_nm <- underscore_name(.subset2(.subset2(x, "definition")(), "field_name")())
-            m <- match(underscore_name(i), all_nm)
-            if (!is.na(m)) {
-                assert(is_scalar(value))
-                names(value) <- all_nm[m]
-                .subset2(x, "set")(c(value))
-                invisible(x)
-            } else {
-                NextMethod()
-            }
-        }
-    } else if (is_integer(i)) {
-        assert(is_scalar(value))
-        names(value) <- .subset2(.subset2(x, "definition")(), "field_name")(i)
-        .subset2(x, "set")(value)
+    if (length(i) != 1) return(NextMethod())
+
+    if (i %in% ls(x)) return(NextMethod())
+
+    self <- ._get_self(x)
+    private <- ._get_private(x)
+
+    assert(is_scalar(value))
+
+    # In order to make sure only standard field name is not acceptable
+    fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
+    fld_idx <- chmatch(i, fld_nm)
+    if (!is.na(fld_idx)) {
+        names(value) <- i
+        tryCatch(.subset2(x, "set")(c(value)),
+            error_bad_field_name = function (e) NextMethod()
+        )
+
+        # add bindings
+        add_idfobj_field_bindings(x, fld_idx)
+
+        invisible(x)
     } else {
-        NextMethod()
+        stop("cannot add bindings to a locked environment")
     }
 }
 # }}}

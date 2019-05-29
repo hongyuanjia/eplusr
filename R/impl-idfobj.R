@@ -43,8 +43,8 @@ set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = T
 # }}}
 # get_idfobj_value {{{
 get_idfobj_value <- function (idd_env, idf_env, object, which = NULL, all = FALSE,
-                              simplify = FALSE, unit = FALSE) {
-    val <- get_idf_value(idd_env, idf_env, NULL, object, which, NULL, all = all, align = TRUE)
+                              simplify = FALSE, unit = FALSE, underscore = FALSE) {
+    val <- get_idf_value(idd_env, idf_env, NULL, object, which, NULL, all = all, align = TRUE, underscore = underscore)
     if (simplify) return(val$value_chr)
     add_field_property(idd_env, val, "type_enum")
 

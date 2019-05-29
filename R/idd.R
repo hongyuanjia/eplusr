@@ -239,7 +239,7 @@ NULL
 NULL
 
 # Idd {{{
-Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
+Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
 
     public = list(
         # INITIALIZE {{{
@@ -320,11 +320,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
             idd_object_in_group(self, private, group = group),
         # }}}
 
+        # DATA EXTRACTION {{{
         to_table = function (class, all = FALSE)
             idd_to_table(self, private, class, all),
-
+        
         to_string = function (class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
             idd_to_string(self, private, class, leading, sep_at, sep_each, all),
+        # }}}
 
         print = function ()
             idd_print(self, private)
@@ -339,6 +341,42 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE,
         # }}}
     )
 )
+# }}}
+
+# add_idd_class_bindings {{{
+add_idd_class_bindings <- function (idd) {
+    # get all classes in current version IDD
+    env <- .subset2(idd, ".__enclos_env__")
+    self <- .subset2(env, "self")
+    private <- .subset2(env, "private")
+
+    get_object <- function (self, private, class, value) {
+        force(self)
+        force(private)
+        force(class)
+        function (value) {
+            if (missing(value)) {
+                if (self$is_valid_class(class)) {
+                    self$object(class)
+                } else {
+                    NULL
+                }
+            } else {
+                stop("cannot add bindings to a locked environment")
+            }
+        }
+    }
+
+    for (i in private$m_idd_env$class$class_name) {
+        makeActiveBinding(i, get_object(self, private, i, value), idd)
+    }
+
+    # lock environment after adding active bindings
+    lockEnvironment(self)
+    lockEnvironment(private)
+
+    idd
+}
 # }}}
 
 # idd_version {{{
@@ -529,48 +567,6 @@ idd_print <- function (self, private) {
 # }}}
 
 #' @export
-# [[.Idd {{{
-`[[.Idd` <- function(x, i) {
-    assert(is_scalar(i))
-    if (i %in% setdiff(ls(x), "initialize")) {
-        NextMethod()
-    } else {
-        .subset2(x, "object")(i)
-    }
-}
-# }}}
-
-#' @export
-# $.Idd {{{
-`$.Idd` <- function (x, i) {
-    if (is_string(i)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (i %in% funs) {
-            NextMethod()
-        } else {
-            in_nm <- underscore_name(i)
-
-            self <- ._get_self(x)
-            priv <- ._get_private(x)
-
-            all_nm <- idd_class_name(self, priv)
-            all_nm_us <- underscore_name(all_nm)
-
-            m <- chmatch(in_nm, all_nm_us)
-
-            if (is.na(m)) {
-                NextMethod()
-            } else {
-                idd_obj(self, priv, all_nm[m])
-            }
-        }
-    } else {
-        NextMethod()
-    }
-}
-# }}}
-
-#' @export
 # str.Idd {{{
 str.Idd <- function (object, ...) {
     object$print()
@@ -593,7 +589,7 @@ format.Idd <- function (x, ...) {
 
 # read_idd {{{
 read_idd <- function (path) {
-    Idd$new(path)
+    add_idd_class_bindings(Idd$new(path))
 }
 # }}}
 
