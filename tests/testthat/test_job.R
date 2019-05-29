@@ -48,15 +48,14 @@ test_that("Job methods", {
     expect_is({job$run();job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
     expect_silent({err <- job$errors()})
-    expect_equal(names(err), c("eplus_version", "eplus_build", "datetime", "idd_version",
-        "successful", "terminated", "data"
+    expect_equal(names(err), c("index", "environment_index", "environment",
+        "level_index", "level", "message"
     ))
-    expect_equal(err$eplus_version, numeric_version("8.8.0"))
-    expect_equal(err$eplus_build, "7c3bbe4830")
-    expect_equal(err$idd_version, numeric_version("8.8.0"))
-    expect_equal(err$successful, TRUE)
-    expect_equal(err$terminated, FALSE)
-    expect_equal(names(err$data), c("index", "environment_index", "environment", "level_index", "level", "message"))
+    expect_equal(attr(err, "eplus_version"), numeric_version("8.8.0"))
+    expect_equal(attr(err, "eplus_build"), "7c3bbe4830")
+    expect_equal(attr(err, "idd_version"), numeric_version("8.8.0"))
+    expect_equal(attr(err, "successful"), TRUE)
+    expect_equal(attr(err, "terminated"), FALSE)
 
     # can retrieve simulation data
     idf <- read_idf(example$idf)
