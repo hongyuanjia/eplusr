@@ -469,6 +469,14 @@ test_that("Idf class", {
     expect_silent(idf$SimulationControl$set(Do_Zone_Sizing_Calculation = "no"))
     expect_silent(idf$SimulationControl$Do_Zone_Sizing_Calculation <- "No")
     # }}}
+
+    # CLONE {{{
+    idf1 <- read_idf(example())
+    idf2 <- idf1$clone()
+    idf1$Zone[[1]]$set(name = "zone")
+    expect_equal(idf1$Zone[[1]]$Name, "zone")
+    expect_equal(idf2$Zone[[1]]$Name, "ZONE ONE")
+    # }}}
 })
 # }}}
 

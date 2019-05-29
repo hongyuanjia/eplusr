@@ -2464,11 +2464,9 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
     self <- .subset2(env, "self")
     private <- .subset2(env, "private")
 
-    get_object_unique <- function (self, private, class, value) {
-        force(self)
-        force(private)
-        force(class)
-        function (value) {
+    get_object_unique <- function (env, self, private, class, value) {
+        fun <- function (value) {
+            class <- class
             if (missing(value)) {
                 if (self$is_valid_class(class)) {
                     return(self$object_unique(class))
@@ -2480,13 +2478,14 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
             if (is_idfobject(value)) value <- list(value)
             replace_objects_in_class(self, private, class, value, TRUE)
         }
+        environment(fun) <- env
+        body(fun)[[2]][[3]] <- class
+        fun
     }
 
-    get_objects_in_class <- function (self, private, class, value) {
-        force(self)
-        force(private)
-        force(class)
-        function (value) {
+    get_objects_in_class <- function (env, self, private, class, value) {
+        fun <- function (value) {
+            class <- class
             if (missing(value)) {
                 if (self$is_valid_class(class)) {
                     return(self$objects_in_class(class))
@@ -2497,6 +2496,9 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
 
             replace_objects_in_class(self, private, class, value, FALSE)
         }
+        environment(fun) <- env
+        body(fun)[[2]][[3]] <- class
+        fun
     }
 
     if (is.null(class_id)) {
@@ -2509,12 +2511,12 @@ add_idf_class_bindings <- function (idf, class_id = NULL) {
 
     # unique classes
     for (i in cls[flg]) {
-        makeActiveBinding(i, get_object_unique(self, private, i, value), idf)
+        makeActiveBinding(i, get_object_unique(env, self, private, i, value), idf)
     }
 
     # other classes
     for (i in cls[!flg]) {
-        makeActiveBinding(i, get_objects_in_class(self, private, i, value), idf)
+        makeActiveBinding(i, get_objects_in_class(env, self, private, i, value), idf)
     }
 
     # # lock environment after adding active bindings
@@ -2611,7 +2613,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         }
 
         # direct return the idf
-        if (all(same_idf) && same_num && all(same_id)) return(invisible(self))
+        if (all(uuid_main == uuid_in) && same_num && all(same_id)) return(invisible(self))
 
         # stop if not from the same class
         cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
@@ -2653,25 +2655,23 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # $.Idf {{{
 `$.Idf` <- function (x, i) {
-    if (i %in% ls(x)) {
-        NextMethod()
+    if (i %chin% ls(x)) return(NextMethod())
+
+    private <- ._get_private(x)
+
+    cls_id <- chmatch(i, private$idd_env()$class$class_name_us)
+
+    # skip if not a valid IDD class name
+    if (is.na(cls_id)) return(NextMethod())
+
+    # skip if not an existing IDF class name
+    if (!cls_id %in% private$idf_env()$object$class_id) return(NextMethod())
+
+    cls_nm <- private$idd_env()$class$class_name[cls_id]
+    if (private$idd_env()$class$unique_object[cls_id]) {
+        .subset2(x, "object_unique")(cls_nm)
     } else {
-        private <- ._get_private(x)
-
-        cls_id <- chmatch(i, private$idd_env()$class$class_name_us)
-
-        # skip if not a valid IDD class name
-        if (is.na(cls_id)) return(NextMethod())
-
-        # skip if not an existing IDF class name
-        if (!cls_id %in% private$idf_env()$object$class_id) return(NextMethod())
-
-        cls_nm <- private$idd_env()$class$class_name[cls_id]
-        if (private$idd_env()$class$unique_object[cls_id]) {
-            .subset2(x, "object_unique")(cls_nm)
-        } else {
-            .subset2(x, "objects_in_class")(cls_nm)
-        }
+        .subset2(x, "objects_in_class")(cls_nm)
     }
 }
 # }}}
@@ -2679,7 +2679,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # $<-.Idf {{{
 `$<-.Idf` <- function (x, name, value) {
-    if (name %in% ls(x)) return(NextMethod())
+    if (name %chin% ls(x)) return(NextMethod())
 
     self <- ._get_self(x)
     private <- ._get_private(x)
@@ -2695,9 +2695,11 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
     cls_nm <- private$idd_env()$class$class_name[cls_id]
     uni <- private$idd_env()$class$unique_object[cls_id]
 
+    if (uni && is_idfobject(value)) value <- list(value)
     replace_objects_in_class(self, private, cls_nm, value, uni)
+
     # if not an existing IDF class name, add active bindings
-    if (!cls_id %in% private$idf_env()$object$class_id) {
+    if (!cls_id %in% ls(x)) {
         add_idf_class_bindings(x, cls_id)
     }
 
@@ -2710,7 +2712,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 `[[<-.Idf` <- function (x, name, value) {
     if (length(name) != 1L) return(NextMethod())
 
-    if (name %in% ls(x)) {
+    if (name %chin% ls(x)) {
         NextMethod()
     } else {
         self <- ._get_self(x)

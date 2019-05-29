@@ -340,7 +340,7 @@ test_that("IdfObject class", {
     expect_equal(mat$Visible_Absorptance, 0.8, tolerance = 1e-5)
     expect_silent(mat[["Visible Absorptance"]] <- 0.8)
     expect_equal(mat[["Visible Absorptance"]], 0.8, tolerance = 1e-5)
-    expect_silent(mat[["Visible_Absorptance"]] <- 0.8, "cannot add bindings to")
+    expect_error(mat[["Visible_Absorptance"]] <- 0.8, "cannot add bindings to")
     # }}}
 
     expect_output(con$print())

@@ -708,11 +708,9 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL) {
     }
     fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
 
-    get_field_value <- function (self, private, field, value) {
-        force(self)
-        force(private)
-        force(field)
-        function (value) {
+    get_field_value <- function (env, self, private, field, value) {
+        fun <- function (value) {
+            field <- field
             if (missing(value)) {
                 self$value(field)[[1L]]
             } else {
@@ -721,10 +719,13 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL) {
                 invisible(self)
             }
         }
+        environment(fun) <- env
+        body(fun)[[2]][[3]] <- field
+        fun
     }
 
     for (i in fld_nm) {
-        makeActiveBinding(i, get_field_value(self, private, i, value), obj)
+        makeActiveBinding(i, get_field_value(env, self, private, i, value), obj)
     }
 
     # # lock environment after adding active bindings
@@ -1286,7 +1287,8 @@ str.IdfObject <- function (object, ...) {
 #' @export
 # [.IdfObject {{{
 '[.IdfObject' <- function(x, i, j, ...) {
-    .subset2(x, "value")(i)[j]
+    if (!missing(j)) stop("incorrect number of dimensions")
+    .subset2(x, "value")(i)
 }
 # }}}
 
@@ -1326,7 +1328,7 @@ str.IdfObject <- function (object, ...) {
         private <- ._get_private(x)
 
         # In order to make sure `idfobj$nAmE` is not acceptable
-        if (i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
+        if (is_integer(i) || i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
             tryCatch(
                 get_idfobj_value(private$idd_env(), private$idf_env(),
                     private$m_object_id, which = i
@@ -1379,11 +1381,14 @@ str.IdfObject <- function (object, ...) {
     self <- ._get_self(x)
     private <- ._get_private(x)
 
-    assert(is_scalar(value))
-
     # In order to make sure only standard field name is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
-    fld_idx <- chmatch(i, fld_nm)
+    if (is_integer(i)) {
+        fld_idx <- i
+        i <- fld_nm[[i]]
+    } else {
+        fld_idx <- chmatch(i, fld_nm)
+    }
     if (!is.na(fld_idx)) {
         names(value) <- i
         tryCatch(.subset2(x, "set")(c(value)),

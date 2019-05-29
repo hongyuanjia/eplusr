@@ -350,11 +350,9 @@ add_idd_class_bindings <- function (idd) {
     self <- .subset2(env, "self")
     private <- .subset2(env, "private")
 
-    get_object <- function (self, private, class, value) {
-        force(self)
-        force(private)
-        force(class)
-        function (value) {
+    get_object <- function (env, self, private, class, value) {
+        fun <- function (value) {
+            class <- class
             if (missing(value)) {
                 if (self$is_valid_class(class)) {
                     self$object(class)
@@ -365,10 +363,13 @@ add_idd_class_bindings <- function (idd) {
                 stop("cannot add bindings to a locked environment")
             }
         }
+        environment(fun) <- env
+        body(fun)[[2]][[3]] <- class
+        fun
     }
 
     for (i in private$m_idd_env$class$class_name) {
-        makeActiveBinding(i, get_object(self, private, i, value), idd)
+        makeActiveBinding(i, get_object(env, self, private, i, value), idd)
     }
 
     # lock environment after adding active bindings
@@ -539,30 +540,33 @@ idd_print <- function (self, private) {
 #' @export
 # [.Idd {{{
 '[.Idd' <- function(x, i) {
-    if (is_string(i)) {
-        funs <- setdiff(ls(x), "initialize")
-        if (i %in% funs) {
-            NextMethod()
-        } else {
-            in_nm <- underscore_name(i)
+    if (!is.character(x)) return(NextMethod())
 
-            self <- ._get_self(x)
-            priv <- ._get_private(x)
+    self <- ._get_self(x)
+    private <- ._get_private(x)
 
-            all_nm <- idd_class_name(self, priv)
-            all_nm_us <- underscore_name(all_nm)
-
-            m <- chmatch(in_nm, all_nm_us)
-
-            if (is.na(m)) {
-                NextMethod()
-            } else {
-                idd_objects(self, priv, all_nm[m])
-            }
-        }
+    if (any(i %chin% private$m_idd_env$class$class_name)) {
+        .subset2(x, "objects")(i)
     } else {
         NextMethod()
     }
+}
+# }}}
+
+#' @export
+# $.Idd {{{
+`$.Idd` <- function (x, i) {
+    if (i %chin% ls(x)) return(NextMethod())
+
+    private <- ._get_private(x)
+
+    cls_id <- chmatch(i, private$m_idd_env$class$class_name_us)
+
+    # skip if not a valid IDD class name
+    if (is.na(cls_id)) return(NextMethod())
+
+    cls_nm <- private$m_idd_env$class$class_name[cls_id]
+    .subset2(x, "object")(cls_nm)
 }
 # }}}
 
