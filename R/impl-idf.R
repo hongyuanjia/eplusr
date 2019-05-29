@@ -48,7 +48,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
 
     # check type of each element
     get_type <- function (x) {
-        if (is.null(x)) {
+        if (is.null(x) || !length(x)) {
             3L
         } else if (all(are_count(x)) && all(is.finite(x))) {
             1L
@@ -87,7 +87,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
         t <- type
         empty <- if (type == 1L) "id" else "name"
 
-        dt_dot[J(t), on = "type", {
+        dt[J(t), on = "type", {
             if (all(is.na(rleid))) return(empty_input[[empty]])
 
             len <- each_length(dot)
@@ -112,7 +112,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
         }]
     }
 
-    res <- list(id = flatten(dt, 1L), name = flatten(dt, 2L), dot = dt_dot)
+    res <- list(id = flatten(dt_dot, 1L), name = flatten(dt_dot, 2L), dot = dt_dot)
 
     if (length(nest_nmd)) {
         warn("warning_nest_named",
