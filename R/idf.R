@@ -1893,9 +1893,9 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
 
     id_self <- obj$object_id
     if (direction == "ref_to") {
-        id_ref <- rel$ref_to$src_object_id[!is.na(rel$ref_to$src_object_id)]
+        id_ref <- unique(rel$ref_to$src_object_id[!is.na(rel$ref_to$src_object_id)])
     } else {
-        id_ref <- rel$ref_by$object_id[!is.na(rel$ref_by$object_id)]
+        id_ref <- unique(rel$ref_by$object_id[!is.na(rel$ref_by$object_id)])
     }
 
     obj_self <- list(IdfObject$new(id_self, obj$class_id, self))
