@@ -2617,16 +2617,18 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 
         # stop if not from the same class
         cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
-        if (any(cls_id_in != cls_id)) {
-            invld_cls <- vcapply(value[cls_id_in != cls_id], function (obj) .subset2(obj, "class_name")())
-            msg <- paste0(" #", which(cls_id_in != cls_id), "| <IdfObject> --> Class: ", surround(invld_cls),
+        cls_in <- private$idd_env()$class$class_name[cls_id_in]
+        if (any(cls_in != class)) {
+            invld_cls <- vcapply(value[cls_in != class], function (obj) .subset2(obj, "class_name")())
+            msg <- paste0(" #", which(cls_in != class), "| <IdfObject> --> Class: ", surround(invld_cls),
                 collapse = "\n"
             )
             abort("error_invalid_input_object_class",
                 paste0(
-                    "Input IdfObjects should from class `", obj_main$class_name[[1L]]), "`. ",
+                    "Input IdfObjects should from class `", class, "`. ",
                     " Invalid input:\n", msg
 
+                )
             )
         }
 
