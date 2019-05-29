@@ -14,6 +14,8 @@
 
 ## Bug fixes
 
+* Now all internal data, specifically all `data.table`s are correctly copied
+  when calling `$clone()` in `Idf` and `Epw` class.
 * `$add()` method and other methods that modify field values can correctly
   convert field values to numbers if necessary.
 * Fix the error that holiday header got overwritten (#43).

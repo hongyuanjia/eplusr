@@ -1446,10 +1446,13 @@ epw_print <- function (self, private) {
 # }}}
 # epw_deep_clone {{{
 epw_deep_clone <- function (self, private, name, value) {
-    if (is_idd(value)) {
-        value
-    } else if (is.environment(value)) {
-        list2env(as.list.environment(value))
+    if (is.environment(value)) {
+        l <- as.list.environment(value)
+        # copy data.table is necessary here
+        l <- lapply(l, function (x) if (inherits(x, "data.table")) copy(x) else x)
+        list2env(l)
+    } else if (inherits(value, "data.table")){
+        copy(value)
     } else {
         value
     }
