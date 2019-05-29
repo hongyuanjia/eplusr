@@ -2514,13 +2514,16 @@ add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
         rm(list = setdiff(ls(idf, pattern = "^[A-Z]"), cls), envir = idf)
     }
 
+    # skip if nothing to add
+    if (!length(setdiff(cls, ls(idf)))) return(idf)
+
     # unique classes
-    for (i in cls[flg]) {
+    for (i in setdiff(cls[flg], ls(idf))) {
         makeActiveBinding(i, get_object_unique(env, self, private, i, value), idf)
     }
 
     # other classes
-    for (i in cls[!flg]) {
+    for (i in setdiff(cls[!flg], ls(idf))) {
         makeActiveBinding(i, get_objects_in_class(env, self, private, i, value), idf)
     }
 

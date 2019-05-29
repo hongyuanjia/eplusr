@@ -729,7 +729,10 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) 
         rm(list = setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm), envir = obj)
     }
 
-    for (i in fld_nm) {
+    # skip if nothing to add
+    if (!length(setdiff(fld_nm, ls(obj)))) return(obj)
+
+    for (i in setdiff(fld_nm, ls(obj))) {
         makeActiveBinding(i, get_field_value(env, self, private, i, value), obj)
     }
 
