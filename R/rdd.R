@@ -23,9 +23,11 @@ NULL
 #'   simulation.
 #' * `datetime`: A DateTime (POSIXct). The time when the simulation started.
 #'
-#' @param path a file path of EnergyPlus EnergyPlus Report Data Dictionary file,
-#' usually with an extension `.rdd`.
-#' @return An `RddFile` object.
+#' @param path For `read_rdd()`, a file path of EnergyPlus EnergyPlus Report Data
+#' Dictionary file with an extension `.rdd`. For `read_mdd()`, a file path of
+#' EnergyPlus EnergyPlus Meter Data Dictionary file with an extension `.rdd`
+#' @return For `read_rdd()`, an `RddFile` object. For `read_mdd()`, a `MddFile`
+#' object.
 #' @export
 #' @examples
 #' \dontrun{
@@ -50,9 +52,6 @@ read_rdd <- function (path) {
 # }}}
 
 #' @rdname rdd
-#' @param path a file path of EnergyPlus EnergyPlus Meter Data Dictionary file,
-#' usually with an extension `.mdd`.
-#' @return An `MddFile` object.
 #' @export
 # read_mdd {{{
 read_mdd <- function (path) {

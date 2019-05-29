@@ -10,16 +10,13 @@ read_rdd(path)
 read_mdd(path)
 }
 \arguments{
-\item{path}{a file path of EnergyPlus EnergyPlus Report Data Dictionary file,
-usually with an extension \code{.rdd}.}
-
-\item{path}{a file path of EnergyPlus EnergyPlus Meter Data Dictionary file,
-usually with an extension \code{.mdd}.}
+\item{path}{For \code{read_rdd()}, a file path of EnergyPlus EnergyPlus Report Data
+Dictionary file with an extension \code{.rdd}. For \code{read_mdd()}, a file path of
+EnergyPlus EnergyPlus Meter Data Dictionary file with an extension \code{.rdd}}
 }
 \value{
-An \code{RddFile} object.
-
-An \code{MddFile} object.
+For \code{read_rdd()}, an \code{RddFile} object. For \code{read_mdd()}, a \code{MddFile}
+object.
 }
 \description{
 \code{read_rdd()} takes a file path of EnergyPlus Report Data Dictionary (RDD)
