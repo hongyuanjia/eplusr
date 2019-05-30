@@ -866,7 +866,7 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
             abort("error_multiple_matched",
                 paste0(
                     "Input object name matched multiple results. Please use object ID instead:\n",
-                    m
+                    paste0(m, collapse = "\n")
                 ),
                 data = obj
             )
