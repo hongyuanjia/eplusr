@@ -63,10 +63,11 @@ get_value_list <- function (dt_value, unit = FALSE) {
 
     val <- dt_value$value_num
     is_double <- dt_value$type_enum == IDDFIELD_TYPE$real
+    exists <- !is.na(val)
     res[num & is_double] <- val[num & is_double]
     res[num & !is_double] <- as.integer(val[num & !is_double])
 
-    if (any(res[num & !is_double] != val[num & !is_double])) {
+    if (any(unlist(res[exists & num & !is_double]) != val[exists & num & !is_double])) {
         warn("warning_value_int_trunc",
             paste0("Truncated error introduced when converting value of field ",
                 collapse(dt_value[["field_name"]][res[num & !is_double] != val[num & !is_double]]),
