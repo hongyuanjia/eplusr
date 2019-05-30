@@ -413,7 +413,7 @@ test_that("Idf class", {
     expect_silent(idf$SimulationControl <- NULL)
     expect_false(idf$is_valid_class("SimulationControl"))
     expect_null(idf$SimulationControl)
-    expect_false({idf$print(); "SimulationControl" %in% names(idf)})
+    expect_false({capture.output(print(idf)); "SimulationControl" %in% names(idf)})
 
     # can insert unique-object class
     expect_silent(idf$SimulationControl <- tbl)
