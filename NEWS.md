@@ -32,6 +32,7 @@
 * Update doc on EnergyPlus time nodation (#47).
 * Fix EPW design condition parsing error when `hours_8_to_4_12.8_20.6` is zero.
 * Now recurring errors in `.err` file are parsed correctly in `ErrFile`.
+* Handle large value references in `get_value_reference_map()`. Fix #50.                              65 minutes ago  Hongyuan Jia  [448f551]
 
 ## Minor changes
 
