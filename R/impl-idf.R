@@ -1882,6 +1882,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
 # rename_idf_object {{{
 rename_idf_object <- function (idd_env, idf_env, ...) {
     l <- sep_name_dots(..., .can_name = TRUE)
+
     obj <- get_object_input(idd_env, idf_env, l, property = "has_name", keep_duplicate = TRUE)
 
     # stop if input object does not have name attribute
@@ -1899,15 +1900,19 @@ rename_idf_object <- function (idd_env, idf_env, ...) {
     val <- val[is_name == TRUE]
     set(val, NULL, "rleid", obj$rleid[val$rleid])
 
+    # check if input new name is the same as the old one
+    set(obj, NULL, "new_object_name_lower", stri_trans_tolower(obj$new_object_name))
+    same <- obj$new_object_name_lower == obj$object_name_lower
     # assign new object name
     set(obj, NULL, c("object_name", "object_name_lower"),
-        list(obj$new_object_name, stri_trans_tolower(obj$new_object_name)))
+        list(obj$new_object_name, obj$new_object_name_lower))
 
     # assign name field in order to make sure new object name is used during
     # error printing
     set(val, NULL, "value_chr", obj$object_name)
 
-    assert_valid(idd_env, idf_env, obj, val, "rename")
+    # only validate new object names
+    assert_valid(idd_env, idf_env, obj[!same], val[!same], "rename")
     # }}}
 
     # value reference

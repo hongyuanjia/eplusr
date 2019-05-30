@@ -299,6 +299,7 @@ test_that("Idf class", {
     idf$rename(test = "C5 - 4 IN HW CONCRETE")
     expect_equal(idf$object_name("Material"), list(Material = "test"))
     expect_equal(idf$Construction$FLOOR$Outside_Layer, "test")
+    expect_silent(idf$rename(test = "test"))
     # }}}
 
     # SEARCH AND REPLACE {{{

@@ -11,6 +11,8 @@
   similar to `$to_table()` method in `IdfObject` class.
 * New function `read_rdd()` and `read_mdd()` are added to help to directly parse
   `.rdd` and `.mdd` file.
+* Now `$rename()` will not give an error if input name is the same as the old
+  one.
 
 ## Bug fixes
 
