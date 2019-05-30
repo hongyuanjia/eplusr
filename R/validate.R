@@ -459,6 +459,7 @@ check_incomplete_extensible <- function (idd_env, idf_env, env_in) {
         by = list(cumsum(!is.na(can_be_na)), object_id)]
     empty_info[is.na(can_be_na), can_be_na := TRUE]
     incomplete <- empty_info[has_any_na == TRUE & can_be_na == FALSE, list(object_id, extensible_group)]
+    setorderv(incomplete, names(incomplete))
 
     if (nrow(incomplete)) {
         add_validity(idd_env, idf_env, env_in, incomplete, "incomplete_extensible", c("object_id", "extensible_group"))

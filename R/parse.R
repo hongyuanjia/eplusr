@@ -1498,7 +1498,7 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
     if (!nrow(val_ref)) return(empty)
 
     # get field reference map in current IDF
-    val_ref_map <- val_ref[map, on = "field_id", nomatch = 0L]
+    val_ref_map <- val_ref[map, on = "field_id", nomatch = 0L, allow.cartesian = TRUE]
     set(val_ref_map, NULL, "src_enum", NULL)
 
     # get all values in lower case that are sources
