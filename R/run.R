@@ -576,8 +576,6 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
     output_suffix <- match.arg(output_suffix)
 
     assert(
-    )
-    assert(
         file.exists(eplus),
         file.exists(model),
         file.exists(weather),

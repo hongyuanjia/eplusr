@@ -333,14 +333,15 @@ use_eplus <- function (eplus) {
 eplus_config <- function (ver) {
     assert(is_eplus_ver(ver, strict = TRUE))
     ver <- standardize_ver(ver, complete = FALSE)
-    ver <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
+    ver_m <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
     if (is.na(ver)) {
-        warning("Failed to find configuration data of EnergyPlus v", ver, ".",
+        warn("warn_miss_eplus_config",
+            "Failed to find configuration data of EnergyPlus v", ver, ".",
             call. = FALSE)
         return(list())
     }
 
-    .globals$eplus_config[[as.character(ver)]]
+    .globals$eplus_config[[as.character(ver_m)]]
 }
 # }}}
 
