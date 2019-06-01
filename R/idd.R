@@ -889,7 +889,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
                         "You may want to set `download`",
                         "You may want to use `use_idd()` and set `download`"
                     )
-                    stop(mes)
+                    abort(error_no_matched_idd, mes)
                 }
             )
         } else {
