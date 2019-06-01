@@ -18,6 +18,7 @@ NULL
 #' @section Usage:
 #' ```
 #' param <- param_job(idf, epw)
+#' param$version()
 #' param$seed()
 #' param$weater()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
@@ -46,9 +47,12 @@ NULL
 #'
 #' @section Get Seed Model and Weather:
 #' ```
+#' param$version()
 #' param$seed()
 #' param$weather()
 #' ```
+#'
+#' `$version()` returns the version of input [Idf] object.
 #'
 #' `$seed()` returns the input [Idf] object.
 #'
@@ -310,11 +314,14 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         # }}}
 
         # PUBLIC FUNCTIONS {{{
+        version = function ()
+            param_version(self, private),
+
         seed = function ()
-            private$m_idf,
+            param_seed(self, private),
 
         weather = function ()
-            private$m_epw,
+            param_weather(self, private),
 
         apply_measure = function (measure, ..., .names = NULL)
             param_apply_measure(self, private, measure, ..., .names = .names),
@@ -375,6 +382,11 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 )
 # }}}
 
+# param_version {{{
+param_version <- function (self, private) {
+    private$m_idf$version()
+}
+# }}}
 # param_seed {{{
 param_seed <- function (self, private) {
     private$m_idf

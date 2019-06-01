@@ -35,6 +35,7 @@ it is recommended to first read that IDF file using \code{\link[=read_idf]{read_
 
 \section{Usage}{
 \preformatted{job <- eplus_job(idf, epw)
+job$version()
 job$path(type = c("all", "idf", "epw"))
 job$run(wait = TRUE, force = FALSE)
 job$kill()
@@ -55,8 +56,11 @@ job$print()
 
 \section{Basic info}{
 \preformatted{job <- eplus_job(idf, epw)
+job$version()
 job$path(type = c("all", "idf", "epw"))
 }
+
+\code{$version()} reutrns the version of IDF that current \code{EplusJob} uses.
 
 \code{$path()} returns the path of IDF or EPW of current job.
 

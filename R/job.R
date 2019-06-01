@@ -33,6 +33,7 @@ NULL
 #' @section Usage:
 #' ```
 #' job <- eplus_job(idf, epw)
+#' job$version()
 #' job$path(type = c("all", "idf", "epw"))
 #' job$run(wait = TRUE, force = FALSE)
 #' job$kill()
@@ -53,8 +54,11 @@ NULL
 #' @section Basic info:
 #' ```
 #' job <- eplus_job(idf, epw)
+#' job$version()
 #' job$path(type = c("all", "idf", "epw"))
 #' ```
+#'
+#' `$version()` reutrns the version of IDF that current `EplusJob` uses.
 #'
 #' `$path()` returns the path of IDF or EPW of current job.
 #'
@@ -495,6 +499,9 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         # }}}
 
         # PUBLIC FUNCTIONS {{{
+        version = function ()
+            job_version(self, private),
+
         path = function (type = c("all", "idf", "epw"))
             job_path(self, private, type),
 
@@ -561,6 +568,11 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 )
 # }}}
 
+# job_version {{{
+job_version <- function (self, private) {
+    private$m_version
+}
+# }}}
 # job_path {{{
 job_path <- function (self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)

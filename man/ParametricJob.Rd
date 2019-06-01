@@ -17,6 +17,7 @@ automatically created if it does not exists, like \link{Idf} class does.
 }
 \section{Usage}{
 \preformatted{param <- param_job(idf, epw)
+param$version()
 param$seed()
 param$weater()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
@@ -47,9 +48,12 @@ param$print()
 }
 
 \section{Get Seed Model and Weather}{
-\preformatted{param$seed()
+\preformatted{param$version()
+param$seed()
 param$weather()
 }
+
+\code{$version()} returns the version of input \link{Idf} object.
 
 \code{$seed()} returns the input \link{Idf} object.
 

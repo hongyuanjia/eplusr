@@ -13,6 +13,8 @@
   `.rdd` and `.mdd` file.
 * Now `$rename()` will not give an error if input name is the same as the old
   one.
+* Now new method `$version()` is added in `EplusJob` and `ParametricJob` class,
+  which returns the version of IDF it uses.
 
 ## Bug fixes
 
