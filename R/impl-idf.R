@@ -3191,7 +3191,9 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     new_dir <- normalizePath(dirname(new), mustWork = FALSE)
 
     # get object table and value table
-    val <- get_idf_value(idd_env, idf_env, class = "Schedule:File", field = "File Name")
+    val <- get_idf_value(idd_env, idf_env, class = "Schedule:File", field = "File Name",
+        property = c("units", "ip_units", "type_enum")
+    )
 
     # check existence of old files
     setwd(old_dir)
@@ -3203,14 +3205,14 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
         options(warning.length = 8170)
 
-        m <- paste0(format_objects(val, "field"), collapse = "\n")
+        m <- paste0("  ", unlist(format_objects(val, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
         warn("warning_broken_file_link",
             paste0("Broken external file link found in IDF:\n\n", m)
         )
     }
 
-    set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path)) == new_dir)
+    set(val, NULL, "same_dir", normalizePath(dirname(val$old_full_path), mustWork = FALSE) == new_dir)
 
     # find files to copy
     val <- val[old_exist == TRUE & same_dir == FALSE]
@@ -3232,7 +3234,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
             on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
             options(warning.length = 8170)
 
-            m <- paste0(format_objects(val[copied == FALSE], "field"), collapse = "\n")
+            m <- paste0("  ", unlist(format_objects(val[copied == FALSE], c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
             abort("error_failed_to_copy",
                 paste0("Failed to copy external file into the output directory ",
