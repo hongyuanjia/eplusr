@@ -37,6 +37,8 @@
 * Handle large value references in `get_value_reference_map()` (#50).
 * Fix the error when extract numeric default values using `$value_possible()`
   (#51).
+* Fix the error that `.ref_to` argument in `$del()` in `Idf` class did not take
+  effect.
 
 ## Minor changes
 

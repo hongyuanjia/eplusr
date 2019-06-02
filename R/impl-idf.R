@@ -1823,12 +1823,12 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
 
     # if .ref_to is TRUE and rel$ref_to has contents
     if (NROW(rel$ref_to)) {
-        id_ref_to <- setdiff(unique(rel$ref_to$src_object_id))
+        id_ref_to <- setdiff(unique(rel$ref_to$src_object_id), id_del)
 
         # check if objects that target refers to are also referred by other
         # objects
         id_src <- idf_env$reference[!J(id_del), on = "object_id"][
-            J(rel$ref_to$src_object_id), on = "src_object_id", nomatch = 0L, src_object_id
+            J(unique(rel$ref_to$src_object_id)), on = "src_object_id", nomatch = 0L, unique(src_object_id)
         ]
         id_src <- setdiff(id_src, id_del)
         if (length(id_src)) {

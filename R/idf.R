@@ -1575,7 +1575,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             idf_set(self, private, ..., .default = .default),
 
         del = function (..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
-            idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = FALSE, .recursive = .recursive, .force = .force),
+            idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force),
 
         rename = function (...)
             idf_rename(self, private, ...),
