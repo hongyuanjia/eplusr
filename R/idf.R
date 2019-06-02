@@ -2160,7 +2160,7 @@ idf_update <- function (self, private, ..., .default = TRUE) {
         ..., .default = .default
     )
 
-    merge_idf_data(private$idf_env(), l)
+    merge_idf_data(private$idf_env(), l, by_object = TRUE)
 
     # log
     log_new_order(private$m_log, l$object$object_id)

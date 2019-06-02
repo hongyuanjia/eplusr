@@ -598,7 +598,7 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
         # here insert an version string
         # if there is version definition in the input, there will be an
         # `error_multi_idf_ver` error
-        str_in <- c(str_in, paste0("Version,", .version, ";"))
+        str_in <- c(paste0("Version,", .version, ";"), str_in)
 
         parsed <- withCallingHandlers(
             parse_idf_file(paste0(str_in, collapse = "\n"), ref = FALSE),
@@ -610,11 +610,11 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
             error_parse_idf = function (e) {
                 set(l, NULL, "line", seq.int(nrow(l)))
 
-                data <- e$data
+                data <- e$data[, line := line - 1L]
 
                 # remove inserted version
                 if (class(e)[[1L]] == "error_multiple_version") {
-                    data <- data[!J(max(line)), on = "line"]
+                    data <- data[!J(0L), on = "line"]
                 }
 
                 add_joined_cols(l, data, "line", c("rleid", "line_rleid"))
@@ -637,8 +637,10 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
         )
 
         # remove inserted version object
-        parsed$object <- parsed$object[!J(max(object_id)), on = "object_id"]
-        parsed$value <- parsed$value[!J(max(object_id)), on = "object_id"]
+        parsed$object <- parsed$object[!J(1L), on = "object_id"]
+        parsed$value <- parsed$value[!J(1L), on = "object_id"]
+        parsed$object[, `:=`(object_id = object_id - 1L)]
+        parsed$value[, `:=`(object_id = object_id - 1L, value_id = value_id - 1L)]
 
         # add rleid for latter error printing
         set(l, NULL, "line_rleid", NULL)
@@ -2271,6 +2273,12 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
         val_dt <- data.table()
     } else {
         obj <- l$value[, list(num = max(field_index)), by = c("rleid", "object_id", "class_name")]
+        # reset by max field number per object
+        set(obj, NULL, "num",
+            pmax(idf_env$value[J(obj$object_id), on = "object_id", list(num = .N), by = "object_id"]$num,
+                 obj$num
+            )
+        )
 
         # verify class name
         if (!all(obj$class_name %chin% idd_env$class$class_name[idf_env$object$class_id])) {
@@ -2330,6 +2338,9 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
             obj_dt[J(val_dt$rleid, val_dt$object_id), on = c("rleid", "object_id"), rleid]
         )
 
+        # add new value id
+        val_dt <- assign_new_id(idf_env, val_dt, "value")
+
         # delete unuseful columns
         set(obj_dt, NULL, "num", NULL)
 
@@ -2349,14 +2360,6 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
         # add class name
         add_class_name(idd_env, obj_chr)
         add_class_property(idd_env, obj_chr, "has_name")
-        # add class id and field index
-        add_joined_cols(obj_chr, val_chr, "object_id", c("class_id", "class_name", "object_name"))
-        add_joined_cols(idd_env$field, val_chr, "field_id", c("field_index", "field_name"))
-        # add field property
-        add_field_property(idd_env, val_chr, prop)
-
-        # add field defaults if possible
-        set(val_chr, NULL, "defaulted", FALSE)
 
         # check invalid class
         if (!all(obj_chr$class_id %in% idf_env$object$class_id)) {
@@ -2409,16 +2412,37 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
 
         assert_can_do(idd_env, idf_env, l$dot, obj_chr, "set")
 
-        # get existing value id
-        set(val_chr, NULL, "value_id",
-            idf_env$value[J(val_chr$object_id, val_chr$field_id), on = c("object_id", "field_id"), value_id]
+        # get field number to extract
+        set(obj_chr, NULL, "num",
+            pmax(val_chr[J(obj_chr$object_id), on = "object_id", list(num = .N), by = "object_id"]$num,
+                 idf_env$value[J(obj_chr$object_id), on = "object_id", list(num = .N), by = "object_id"]$num
+            )
         )
 
-        # add new values
-        set(val_chr, NULL, c("new_value", "new_value_num"),
-            l$parsed$value[J(val_chr$object_id, val_chr$field_id), on = c("object_id", "field_id"),
-                list(value_chr, value_num)]
+        # get all fields involved
+        val_ori <- tryCatch(
+            get_idf_value(idd_env, idf_env, object = obj_chr$object_id, field = obj_chr$num,
+                complete = TRUE, property = prop),
+            error_bad_field_index = function (e) {
+                # update rleid
+                e$data[, rleid := val_chr$rleid[obj_chr$rleid]]
+                abort_bad_field("error_bad_field_index", "index", e$data)
+            }
         )
+
+        # add field defaults if possible
+        set(val_ori, NULL, "defaulted", FALSE)
+        # merge value columns
+        val_ori[J(val_chr$object_id, val_chr$field_id), on = c("object_id", "field_id"),
+            `:=`(new_value = val_chr$value_chr, new_value_num = val_chr$value_num, defaulted = is.na(val_chr$value_chr))
+        ]
+
+        # correct rleid
+        val_chr <- val_ori
+        add_joined_cols(obj_chr, val_chr, "object_id", "rleid")
+
+        # clean
+        set(obj_chr, NULL, "num", NULL)
     }
     # }}}
 
@@ -2426,8 +2450,8 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
     val <- rbindlist(list(val_dt, val_chr), fill = TRUE)
     setorderv(val, c("rleid", "object_id", "field_id"))
 
-    if (.default) val[is.na(value_chr) & is.na(defaulted), defaulted := TRUE]
-    val[is.na(defaulted), defaulted := FALSE]
+    # in case try to update same object multiple times
+    assert_can_do(idd_env, idf_env, l$dot, obj, "set")
 
     # exclude name field if it has been already set before in order to
     # prevent name conflict checking error
@@ -2442,14 +2466,14 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
     # assign default values if needed
     if (.default) {
         val <- assign_default_value(val)
+        set(val, NULL, c("default_chr", "default_num"), NULL)
     } else {
         # remove
         val[defaulted == TRUE, `:=`(value_chr = NA_character_, value_num = NA_real_)]
     }
-    set(val, NULL, c("default_chr", "default_num"), NULL)
 
     # assign new values
-    val[!is.na(new_value), `:=`(value_chr = new_value, value_num = new_value_num)]
+    val[!is.na(new_value) & defaulted == FALSE, `:=`(value_chr = new_value, value_num = new_value_num)]
     set(val, NULL, c("new_value", "new_value_num"), NULL)
 
     # assign new value id

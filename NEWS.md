@@ -39,6 +39,7 @@
   (#51).
 * Fix the error that `.ref_to` argument in `$del()` in `Idf` class did not take
   effect.
+* Fix field deletion in `$update()` in `Idf` class.
 
 ## Minor changes
 
