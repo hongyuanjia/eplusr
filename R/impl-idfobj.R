@@ -197,15 +197,22 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 
     # source
     if ("source" %chin% type) {
-        setnames(idf_env$value, "field_id", "src_field_id")
+        # handle NODE
+        node <- val[J(IDDFIELD_TYPE$node), on = "type_enum", nomatch = 0L, list(field_id)]
+        if (nrow(node)) {
+            add_field_property(idd_env, idf_env$value, "type_enum")
+            nodes <- idf_env$value[J(IDDFIELD_TYPE$node), on = "type_enum", unique(value_chr)]
+            set(idf_env$value, NULL, "type_enum", NULL)
+            set(node, NULL, "source", list(list(nodes)))
+        }
 
+        setnames(idf_env$value, "field_id", "src_field_id")
         src <- get_idd_relation(idd_env, NULL, val$field_id, max_depth = 0L, direction = "ref_to")
         src <- idf_env$value[src, on = c("src_field_id"), allow.cartesian = TRUE, nomatch = 0L][,
              list(source = list(value_chr)), by = "field_id"]
-
         setnames(idf_env$value, "src_field_id", "field_id")
 
-        add_joined_cols(src, val, "field_id", "source")
+        add_joined_cols(rbindlist(list(node, src)), val, "field_id", "source")
     }
 
     res <- val[, .SD, .SDcols = c(

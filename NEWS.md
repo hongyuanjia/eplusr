@@ -15,6 +15,7 @@
   one.
 * Now new method `$version()` is added in `EplusJob` and `ParametricJob` class,
   which returns the version of IDF it uses.
+* Add Node support into `$value_possible()` in `IdfObject` class.
 
 ## Bug fixes
 
@@ -40,6 +41,7 @@
 * Fix the error that `.ref_to` argument in `$del()` in `Idf` class did not take
   effect.
 * Fix field deletion in `$update()` in `Idf` class.
+* Fix reference parsing error with mixed source types.
 
 ## Minor changes
 
