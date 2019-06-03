@@ -1777,7 +1777,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         # 1. current validate level does not includ reference checking
         # 2. want to delete both targets and referees
         # 3. `.force` is TRUE
-        if (level_checks()$reference && !.ref_by && !.force && length(id_ref_by)) {
+        if (level_checks()$reference && !.ref_by && !.force && nrow(rel$ref_by)) {
             rel$ref_by <- rel$ref_by[!J(id_del), on = "object_id"]
 
             if (!eplusr_option("verbose_info")) {
@@ -1859,7 +1859,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         }
     }
 
-    if (eplusr_option("verbose_info") && (.ref_to || .ref_by)) {
+    if (eplusr_option("verbose_info") && (.ref_to || .ref_by || .force)) {
         msg <- paste0(c(msg, "", "Object relation is shown below:", ""), collapse = "\n")
         msg_rel <- paste0(" ", capture.output(print.IdfRelation(rel)), collapse = "\n")
         verbose_info(paste0(msg, msg_rel, collapse = "\n"))

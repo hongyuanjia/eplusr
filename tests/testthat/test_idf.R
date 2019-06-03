@@ -284,6 +284,7 @@ test_that("Idf class", {
     expect_error(idf$del(5L), class = "error_del_version")
     expect_error(idf$del(c(1, 2, 1)), class = "error_del_multi_time")
     expect_error(idf$del(idf$Building$id()), class = "error_del_required")
+    expect_silent(idf_full <- read_idf(example()))
     expect_error(fixed = TRUE,
         idf_full$del(idf_full$Material_NoMass[[1]]$id()),
         class = "error_del_referenced"
