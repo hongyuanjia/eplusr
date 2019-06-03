@@ -3208,13 +3208,14 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     # Currently, only `Schedule:File` class is supported
     if (!"Schedule:File" %in% idf_env$object$class_name) return(FALSE)
 
-    # restore current working directory
-    ori <- getwd()
-    on.exit(setwd(ori), add = TRUE)
-
     # get full path of old and new
     old_dir <- normalizePath(dirname(old), mustWork = FALSE)
     new_dir <- normalizePath(dirname(new), mustWork = FALSE)
+
+    # restore current working directory
+    ori <- getwd()
+    on.exit(setwd(ori), add = TRUE)
+    setwd(old_dir)
 
     # get object table and value table
     val <- get_idf_value(idd_env, idf_env, class = "Schedule:File", field = "File Name",
@@ -3222,7 +3223,6 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     )
 
     # check existence of old files
-    setwd(old_dir)
     set(val, NULL, "old_full_path", normalizePath(val$value_chr, mustWork = FALSE))
     set(val, NULL, "old_exist", file.exists(val$old_full_path))
 
@@ -3251,16 +3251,17 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     # change all paths to full paths
     } else {
         set(val, NULL, "file_name", basename(val$value_chr))
-        set(val, NULL, "new_full_path", normalizePath(file.path(new_dir, val$file_name), mustWork = FALSE))
         set(val, NULL, "new_value", val$file_name)
 
         # copy files
-        set(val, NULL, "copied", file.copy(val$old_full_path, val$new_full_path, overwrite = TRUE, copy.date = TRUE))
-        if (val[copied == FALSE, .N]) {
+        to_copy <- unique(val$old_full_path)
+        flag <- file.copy(to_copy, new_dir, copy.date = TRUE)
+        if (any(!flag)) {
             on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
             options(warning.length = 8170)
 
-            m <- paste0("  ", unlist(format_objects(val[copied == FALSE], c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
+            invld <- val[J(to_copy[!flag]), on = c("old_full_path")]
+            m <- paste0("  ", unlist(format_objects(invld, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
             abort("error_failed_to_copy",
                 paste0("Failed to copy external file into the output directory ",

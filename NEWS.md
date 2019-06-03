@@ -42,6 +42,8 @@
   effect.
 * Fix field deletion in `$update()` in `Idf` class.
 * Fix reference parsing error with mixed source types.
+* External files used in `Schedule:File` class are now only copied once when
+  `copy_external` is `TRUE` in `$save()` in `Idf` class.
 
 ## Minor changes
 
