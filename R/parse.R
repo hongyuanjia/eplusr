@@ -1505,7 +1505,7 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
 
     # match
     ref <- val_ref_map[val_src, on = c(value_chr = "src_value_chr", "src_enum", "src_field_id"),
-        allow.cartesian = TRUE, .(object_id, value_id, src_object_id, src_value_id, src_enum)]
+        allow.cartesian = TRUE, list(object_id, value_id, src_object_id, src_value_id, src_enum)]
 
     # make sure every reference value has a corresponding source even NA
     if (!all || nrow(ref) == nrow(val_ref)) return(ref)
