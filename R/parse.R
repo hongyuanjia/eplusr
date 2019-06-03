@@ -1459,7 +1459,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
                 src_field_id = c(field_id, field_id),
                 src_value_id = c(value_id, value_id),
                 src_value_chr = c(value_chr, class_name),
-                src_enum = c(IDDFIELD_SOURCE$field, IDDFIELD_SOURCE$class)
+                src_enum = rep(c(IDDFIELD_SOURCE$field, IDDFIELD_SOURCE$class), each = .N)
             )
         }
     ]
@@ -1499,14 +1499,13 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
 
     # get field reference map in current IDF
     val_ref_map <- val_ref[map, on = "field_id", nomatch = 0L, allow.cartesian = TRUE]
-    set(val_ref_map, NULL, "src_enum", NULL)
 
     # get all values in lower case that are sources
     val_src <- get_value_sources(src[J(unique(val_ref_map$src_field_id)), on = "field_id", nomatch = 0L], lower = TRUE)
 
     # match
-    ref <- val_ref_map[val_src, on = "src_field_id", allow.cartesian = TRUE][
-        value_chr == src_value_chr, .SD, .SDcols = names(empty)]
+    ref <- val_ref_map[val_src, on = c(value_chr = "src_value_chr", "src_enum", "src_field_id"),
+        allow.cartesian = TRUE, .(object_id, value_id, src_object_id, src_value_id, src_enum)]
 
     # make sure every reference value has a corresponding source even NA
     if (!all || nrow(ref) == nrow(val_ref)) return(ref)
