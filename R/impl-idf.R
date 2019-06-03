@@ -2273,12 +2273,6 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
         val_dt <- data.table()
     } else {
         obj <- l$value[, list(num = max(field_index)), by = c("rleid", "object_id", "class_name")]
-        # reset by max field number per object
-        set(obj, NULL, "num",
-            pmax(idf_env$value[J(obj$object_id), on = "object_id", list(num = .N), by = "object_id"]$num,
-                 obj$num
-            )
-        )
 
         # verify class name
         if (!all(obj$class_name %chin% idd_env$class$class_name[idf_env$object$class_id])) {
@@ -2303,6 +2297,13 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
                     )
                 )
             }
+        )
+
+        # reset by max field number per object
+        set(obj, NULL, "num",
+            pmax(idf_env$value[J(obj$object_id), on = "object_id", list(num = .N), by = "object_id"]$num,
+                 obj$num
+            )
         )
         # reset rleid
         set(obj_dt, NULL, c("rleid", "num"), list(obj$rleid, obj$num))
