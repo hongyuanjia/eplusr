@@ -1,4 +1,14 @@
-#' @export
+# Run Post Processor HVAC-Diagram
+#
+# `hvac_diagram()` takes an EnergyPlus version and a file paht of `Bind Node
+# Detail` (`.bnd`) file as input, runs post processor program `HVAC-Diagram`
+# and returns the path of generated `.svg` file.
+#
+# @param eplus A valid EnergyPlus version.
+# @param path A path of EnergyPlus `Bind Node Detail` (`.bnd`) file.
+# @return File path of the generated `.svg` file if successful. Otherwise
+# `NULL`.
+# @export
 # hvac_diagram {{{
 hvac_diagram <- function (eplus, path) {
     assert(file.exists(path), has_ext(path, "bnd"))
@@ -34,6 +44,8 @@ hvac_diagram <- function (eplus, path) {
         svg <- normalizePath(file.path(dirname(path), paste0(nm, ".svg")), mustWork = FALSE)
         file.copy(file.path(wd, "eplusout.svg"), svg, copy.date = TRUE, overwrite = TRUE)
         invisible(svg)
+    } else {
+        invisible(NULL)
     }
 }
 # }}}
