@@ -212,7 +212,7 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
              list(source = list(value_chr)), by = "field_id"]
         setnames(idf_env$value, "src_field_id", "field_id")
 
-        add_joined_cols(rbindlist(list(node, src)), val, "field_id", "source")
+        add_joined_cols(rbindlist(list(node, src), fill = TRUE), val, "field_id", "source")
     }
 
     res <- val[, .SD, .SDcols = c(
