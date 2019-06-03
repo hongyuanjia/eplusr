@@ -2340,7 +2340,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
         )
 
         # add new value id
-        val_dt <- assign_new_id(idf_env, val_dt, "value")
+        val_dt <- assign_new_id(idf_env, val_dt, "value", keep = TRUE)
 
         # delete unuseful columns
         set(obj_dt, NULL, "num", NULL)
