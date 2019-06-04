@@ -1776,14 +1776,18 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
     # only existing one in input class
     # get_exclude_class {{{
     get_exclude_class <- function (dt) {
+        if (!has_name(dt, "src_class_id")) {
+            add_joined_cols(idf_env$object, dt, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
+        }
         dt[,
             {
                 # check if class-name reference exists
                 if (!any(src_enum == 1L)) {
                     list(whole = FALSE)
                 } else {
+                    cls <- src_class_id
                     # get all object IDs in target class
-                    all <- idf_env$object[J(src_class_id), on = "class_id", object_id]
+                    all <- idf_env$object[J(cls), on = "class_id", object_id]
 
                     # only delete if there is only one object existing in input
                     # class or all objects in input class are extracted by

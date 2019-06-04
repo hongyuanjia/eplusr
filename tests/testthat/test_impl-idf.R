@@ -718,6 +718,7 @@ test_that("Set", {
 
 # DEL {{{
 test_that("Del", {
+    eplusr_option(verbose_info = FALSE)
     # read idf
     idf <- read_idf(example(), 8.8)
     idf_env <- ._get_private(idf)$m_idf_env
