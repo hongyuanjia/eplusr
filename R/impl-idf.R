@@ -785,6 +785,7 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
             col_key <- col_on
             if (col_on == "class_id") {
                 cls_in <- add_class_name(idd_env, cls_in)
+                set(cls_in, NULL, "original", NULL)
             } else {
                 # get class id
                 cls_in <- join_from_input(
@@ -818,9 +819,11 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
             if (!is.null(property)) obj <- add_class_property(idd_env, obj, property)
         # if class is specified
         } else {
+            set(obj_in, NULL, "original", NULL)
             cls_in <- recognize_input(class, "class", underscore)
             if (names(cls_in)[[1L]] == "class_id") {
                 cls_in <- add_class_name(idd_env, cls_in)
+                set(cls_in, NULL, "original", NULL)
             } else {
                 # get class id
                 cls_in <- join_from_input(

@@ -47,6 +47,7 @@ join_from_input <- function (dt, input, check = "group_id") {
     col_on <- names(input)[[1L]]
     res <- dt[input, on = col_on, allow.cartesian = TRUE]
     check_bad_key(res, check, col_on)
+    if (has_name(res, "original")) on.exit(set(res, NULL, "original", NULL), add = TRUE)
     setcolorder(res, "rleid")
     res
 }

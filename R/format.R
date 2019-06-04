@@ -484,6 +484,7 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
 
         if (nrow(out)) {
             set(ref_dep, NULL, "rleid", seq_len(nrow(ref_dep)))
+            added <- NULL
             ref_dep[src_object_id %in% out$object_id,
                 `:=`(src_value = {
                     # out$object_id
@@ -492,6 +493,7 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                     # handle cases when a field references both class names and
                     # field values
                     un_list <- function (...) unlist(c(...), use.names = FALSE)
+                    re_list <- function (...) as.list(un_list(...))
                     same <- out$field_index[m] == src_field_index
                     if (any(same)) {
                         src_value <- list(c(src_value, re_list(out$fmt[m][same])))
