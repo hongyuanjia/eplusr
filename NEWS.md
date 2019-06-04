@@ -54,6 +54,8 @@
 * Objects detected using `.ref_to` and `.ref_by` in `$del()` in `Idf` class can
   now be successfully deleted, even if they still have relations with other
   objects.
+* Now invalid input object name is kept as it is, instead of converted to lower
+  case.
 
 ## Minor changes
 

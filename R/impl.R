@@ -11,6 +11,8 @@ NULL
 recognize_input <- function (input, type = "class", underscore = FALSE, lower = FALSE) {
     if (underscore && lower) stop("underscore and lower cannot all be TRUE.")
 
+    # store the original input
+    ori <- input
     if (is.character(input)) {
         if (underscore) {
             input <- underscore_name(input)
@@ -31,7 +33,7 @@ recognize_input <- function (input, type = "class", underscore = FALSE, lower = 
     } else {
         abort_bad_which_type(paste0("error_", type, "_which_type"), type)
     }
-    dt_in <- data.table(input = input, rleid = seq_along(input))
+    dt_in <- data.table(input = input, rleid = seq_along(input), original = ori)
     setnames(dt_in, "input", col_on)
 
     # make sure the first column is the column used for joinning
@@ -52,7 +54,11 @@ join_from_input <- function (dt, input, check = "group_id") {
 # check_bad_key {{{
 check_bad_key <- function (res, col_check, col_on) {
     if (anyNA(res[[col_check]])) {
-        invld_cls <- res[is.na(get(col_check))][[col_on]]
+        if (has_name(res, "original")) {
+            invld_cls <- res[is.na(get(col_check))][["original"]]
+        } else {
+            invld_cls <- res[is.na(get(col_check))][[col_on]]
+        }
         if (stri_endswith_fixed(col_on, "id")) {
             if (stri_startswith_fixed(col_on, "object")) {
                 col_key <- "ID"

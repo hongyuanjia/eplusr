@@ -1778,7 +1778,9 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
     get_exclude_class <- function (dt) {
         whole <- NULL
         if (!has_name(dt, "src_class_id")) {
-            add_joined_cols(idf_env$object, dt, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
+            add_joined_cols(idf_env$object, dt, c(src_object_id = "object_id"),
+                c(src_class_id = "class_id")
+            )
         }
         dt[,
             {
