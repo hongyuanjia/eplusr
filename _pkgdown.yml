@@ -46,6 +46,8 @@ reference:
       - run_multi
       - clean_wd
       - read_err
+      - read_rdd
+      - read_mdd
   - title: Assertion
     desc: Check Types
     contents:
