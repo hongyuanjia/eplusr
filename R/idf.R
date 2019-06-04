@@ -2646,7 +2646,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 
         # delete objects that are not included in input
         if (exist) {
-            invisible(self$del(obj_main$object_id, .force = TRUE))
+            invisible(self$del(setdiff(obj_main$object_id, obj_id_in), .force = TRUE))
         }
 
     } else {
