@@ -47,10 +47,13 @@
 * Fix reference parsing error with mixed source types.
 * External files used in `Schedule:File` class are now only copied once when
   `copy_external` is `TRUE` in `$save()` in `Idf` class.
-* When `.ref_to` or `.ref_by` is `TRUE` in `$del()`, objects whose class names
-  are referenced by input will not be deleted, except all objects in referenced
-  class are detected by field value reference or there is only one object in
-  referenced class.
+* When `.ref_to` or `.ref_by` is `TRUE` in `$del()` in `Idf` class, objects
+  whose class names are referenced by input will not be deleted, except all
+  objects in referenced class are detected by field value reference or there is
+  only one object in referenced class.
+* Objects detected using `.ref_to` and `.ref_by` in `$del()` in `Idf` class can
+  now be successfully deleted, even if they still have relations with other
+  objects.
 
 ## Minor changes
 

@@ -1837,7 +1837,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
             # objects
             id_ref_by <- setdiff(unique(rel$ref_by$object_id), id_del)
             id_src <- id_ref_by[id_ref_by %in% idf_env$reference$src_object_id]
-            if (length(id_src)) {
+            if (!.force && length(id_src)) {
                 id_ref_by <- setdiff(id_ref_by, id_src)
                 if (eplusr_option("verbose_info")) {
                     if (length(id_ref_by)) {
@@ -1885,7 +1885,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
             J(unique(rel$ref_to$src_object_id)), on = "src_object_id", nomatch = 0L, unique(src_object_id)
         ]
         id_src <- setdiff(id_src, id_del)
-        if (length(id_src)) {
+        if (!.force && length(id_src)) {
             id_ref_to <- setdiff(id_ref_to, id_src)
             if (eplusr_option("verbose_info")) {
                 if (length(id_ref_to)) {

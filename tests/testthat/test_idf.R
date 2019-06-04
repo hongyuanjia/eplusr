@@ -287,8 +287,11 @@ test_that("Idf class", {
     expect_silent(idf_full <- read_idf(example()))
     expect_error(idf_full$del(idf_full$Material_NoMass[[1]]$id()), class = "error_del_referenced")
     expect_equal(eplusr_option(validate_level = "none"), list(validate_level = "none"))
-    expect_silent(idf_full$del(12, .ref_by = TRUE, .force = TRUE))
+    expect_silent(idf_full$del(12, .ref_by = TRUE))
     expect_equal(idf_full$is_valid_id(c(12, 15)), c(FALSE, TRUE))
+    expect_silent(idf_full <- read_idf(example()))
+    expect_silent(idf_full$del(12, .ref_by = TRUE, .force = TRUE))
+    expect_equal(idf_full$is_valid_id(c(12, 15)), c(FALSE, FALSE))
     expect_equal(eplusr_option(validate_level = "final"), list(validate_level = "final"))
     # }}}
 
