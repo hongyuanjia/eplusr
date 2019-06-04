@@ -53,7 +53,7 @@ model$object_unique(class)
 model$objects(which)
 model$objects_in_class(class)
 model$objects_in_group(group)
-model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
 model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 model$ClassName
@@ -185,7 +185,7 @@ with each element being the data per class is returned. If \code{class} is
 }
 
 \section{Object Relation}{
-\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = TRUE)
 }
 
 Many fields in \link{Idd} can be referred by others. For example, the \code{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
@@ -216,6 +216,10 @@ easily extracted using \code{$objects_in_relation()} method described below.
 \item \code{which}: Either a single integer of object ID or a string of object name.
 \item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
 \code{"ref_to"} or "ref_by".
+\item \code{recursive}: If \code{TRUE}, the relation is searched recursively. A simple
+example of recursive reference: one material named \code{mat} is referred by a
+construction named \code{const}, and \code{const} is also referred by a surface named
+\code{surf}.
 }
 }
 

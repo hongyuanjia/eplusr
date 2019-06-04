@@ -16,6 +16,9 @@
 * Now new method `$version()` is added in `EplusJob` and `ParametricJob` class,
   which returns the version of IDF it uses.
 * Add Node support into `$value_possible()` in `IdfObject` class.
+* Recursive relation support has been added to `$object_relation()` in `Idf`
+  class, and `$value_relation()`, `$ref_to_object()`, `$ref_by_object()` in
+  `IdfObject` class.
 
 ## Bug fixes
 

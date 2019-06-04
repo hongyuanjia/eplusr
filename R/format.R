@@ -321,7 +321,13 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
         paste0("Field: <",
             format_field(dt, leading = 0L, sep_at = 15L, index = TRUE, prefix = FALSE, pad_char = "0"), ">")
     }
-    pointer <- switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+    pointer <- function (src_enum) {
+        if (src_enum == IDDFIELD_SOURCE$class) {
+            switch(direction, ref_by = "b", ref_to = "p")
+        } else {
+            switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+        }
+    }
 
     d <- max(ref$dep)
     out <- data.table()
@@ -359,7 +365,8 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                     fmt <- list(c(src_class[[1L]], add_prefix(src_field), ""))
                 }
 
-                list(ref_class = ref_class[[1L]], ref_field = ref_field[[1L]], fmt = fmt)
+                list(ref_class = ref_class[[1L]], ref_field = ref_field[[1L]],
+                     src_enum = src_enum[[1L]], fmt = fmt)
             },
             by = c("class_id", "field_id", "src_class_id")
         ][,
@@ -368,7 +375,7 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                     fmt <- list()
                 } else {
                     fmt <- list(c(
-                        paste0(pointer, stri_dup("~", nchar(ref_field[[1L]]) - 1L)),
+                        paste0(pointer(src_enum[[1L]]), stri_dup("~", nchar(ref_field[[1L]]) - 1L)),
                         unlist(add_prefix(fmt), use.names = FALSE)
                     ))
                 }
@@ -433,9 +440,16 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     # }}}
     direction <- match.arg(direction)
 
-    pointer <- switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+    pointer <- function (src_enum) {
+        if (src_enum == IDDFIELD_SOURCE$class) {
+            switch(direction, ref_by = "b", ref_to = "p")
+        } else {
+            switch(direction, ref_by = tree_chars()$u, ref_to = tree_chars()$d)
+        }
+    }
 
     d <- max(ref$dep)
+    d_min <- min(ref$dep)
     out <- data.table()
 
     # simple switch column names
@@ -461,12 +475,24 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     )
 
     # simple switch column names
-    while (d >= 0L) {
+    while (d >= d_min) {
         ref_dep <- ref[J(d), on = "dep"]
 
         if (nrow(out)) {
-            ref_dep[out, on = c(src_object_id = "object_id", src_value_id = "value_id"),
-                `:=`(src_value = list(c(src_value, out$fmt[[.GRP]]))),
+            ref_dep[out, on = c(src_object_id = "object_id"),
+                `:=`(src_value = {
+                    i <- out$object_id == src_object_id
+
+                    fmt <- unlist(out$fmt[i], use.names = FALSE)
+
+                    # merge all values
+                    if (any(out$field_index[i] == src_field_index)) {
+                        list(c(src_value, fmt))
+                    } else {
+                        fmt <- list(c(out$ref_value[i], fmt))
+                        list(c(src_value, fmt))[order(src_field_index, out$field_index[i])]
+                    }
+                }),
                 by = c("src_object_id", "src_value_id")
             ]
         }
@@ -478,22 +504,21 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                 } else {
                     fmt <- list(c(
                         src_class[[1L]],
-                        add_prefix(list(c(src_object[[1L]], add_prefix(src_value)))),
-                        ""
+                        add_prefix(list(c(src_object[[1L]], add_prefix(src_value))))
                     ))
                 }
                 list(ref_class = ref_class[[1L]], ref_object = ref_object[[1L]],
-                    ref_value = ref_value[[1L]], fmt = fmt
+                     ref_value = ref_value[[1L]], src_enum = src_enum, fmt = fmt
                 )
             },
-            by = c("object_id", "value_id", "src_object_id")
+            by = c("object_id", "field_index", "src_object_id")
         ][,
             {
                 if (is.null(fmt[[1L]])) {
                     fmt <- list()
                 } else {
                     fmt <- list(c(
-                        paste0(pointer, stri_dup("~", nchar(ref_value[[1L]]) - 1L)),
+                        paste0(pointer(src_enum[[1L]]), stri_dup("~", nchar(ref_value[[1L]]) - 1L)),
                         unlist(add_prefix(fmt), use.names = FALSE)
                     ))
                 }
@@ -501,16 +526,16 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                      ref_value = ref_value[[1L]], fmt = fmt
                 )
             },
-            by = c("object_id", "value_id")
+            by = c("object_id", "field_index")
         ]
 
-        if (d == 0L) {
+        if (d == d_min) {
             out <- out[,
                 list(ref_class = ref_class[[1L]],
                      ref_object = ref_object[[1L]],
                      fmt = list(c(ref_value, unlist(fmt, use.names = FALSE)))
                 ),
-                by = c("object_id", "value_id")
+                by = c("object_id", "field_index")
             ]
 
             if (by_value) {
@@ -988,6 +1013,14 @@ print.IddRelation <- function (x, ...) {
 print.IdfRelationBy <- function (x, ...) {
     by_value <- attr(x, "by_value") %||% FALSE
     cli::cat_rule("Referred by Others")
+    if (!all(has_name(x, c(
+        "class_name", "object_name", "field_name",
+         "src_class_name", "src_object_name", "src_field_name"
+        )))) {
+        NextMethod("print")
+        return(invisible(x))
+    }
+
     if (!nrow(x)) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
@@ -1009,6 +1042,15 @@ print.IdfRelationBy <- function (x, ...) {
 print.IdfRelationTo <- function (x, ...) {
     by_value <- attr(x, "by_value") %||% FALSE
     cli::cat_rule("Refer to Others")
+
+    if (!all(has_name(x, c(
+        "class_name", "object_name", "field_name",
+         "src_class_name", "src_object_name", "src_field_name"
+        )))) {
+        NextMethod("print")
+        return(invisible(x))
+    }
+
     if (!nrow(x)) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {

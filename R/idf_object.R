@@ -25,9 +25,9 @@ NULL
 #' idfobj$set(..., .defaults = TRUE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
-#' idfobj$ref_to_object(which = NULL, class = NULL)
-#' idfobj$ref_by_object(which = NULL, class = NULL)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", recursive = FALSE))
+#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
+#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
 #' idfobj$has_ref_to(which = NULL, class = NULL)
 #' idfobj$has_ref_by(which = NULL, class = NULL)
 #' idfobj$has_ref(which)
@@ -244,9 +244,9 @@ NULL
 #'
 #' @section Field Value Relation:
 #' \preformatted{
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
-#' idfobj$ref_to_object(which = NULL, class = NULL)
-#' idfobj$ref_by_object(which = NULL, class = NULL)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
+#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
+#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
 #' idfobj$has_ref_to(which = NULL, class = NULL)
 #' idfobj$has_ref_by(which = NULL, class = NULL)
 #' idfobj$has_ref(which)
@@ -308,6 +308,10 @@ NULL
 #' * `class`: A character vector of class names.
 #' * `direciton`: The relation direction to extract. Should be either `"all"`,
 #'   `"ref_to"` or "ref_by".
+#' * `recursive`: If `TRUE`, the relation is searched recursively. A simple
+#'   example of recursive reference: one material named `mat` is referred by a
+#'   construction named `const`, and `const` is also referred by a surface named
+#'   `surf`.
 #'
 #' @section Validation:
 #'
@@ -817,17 +821,17 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         is_valid = function (level = eplusr_option("validate_level"))
             idfobj_is_valid(self, private, level),
 
-        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by"))
-            idfobj_value_relation(self, private, which, direction),
+        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
+            idfobj_value_relation(self, private, which, direction, recursive),
 
-        ref_to_object = function (which = NULL, class = NULL)
-            idfobj_ref_to_object(self, private, which, class),
+        ref_to_object = function (which = NULL, class = NULL, recursive = FALSE)
+            idfobj_ref_to_object(self, private, which, class, recursive),
 
         ref_from_object = function ()
             idfobj_ref_from_object(self, private),
 
-        ref_by_object = function (which = NULL, class = NULL)
-            idfobj_ref_by_object(self, private, which, class),
+        ref_by_object = function (which = NULL, class = NULL, recursive = FALSE)
+            idfobj_ref_by_object(self, private, which, class, recursive),
 
         has_ref_to = function (which = NULL, class = NULL)
             idfobj_has_ref_to(self, private, which, class),
@@ -1005,7 +1009,9 @@ idfobj_is_valid <- function (self, private, level = eplusr_option("validate_leve
 }
 # }}}
 # idfobj_value_relation {{{
-idfobj_value_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by")) {
+idfobj_value_relation <- function (self, private, which = NULL,
+                                   direction = c("all", "ref_to", "ref_by"),
+                                   recursive = FALSE) {
     direction <- match.arg(direction)
 
     val <- get_idf_value(private$idd_env(), private$idf_env(),
@@ -1014,7 +1020,7 @@ idfobj_value_relation <- function (self, private, which = NULL, direction = c("a
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         value_id = val$value_id, name = TRUE, direction = direction,
-        keep_all = TRUE, by_value = TRUE)
+        keep_all = TRUE, by_value = TRUE, recursive = recursive)
 }
 # }}}
 # idfobj_ref_to_object {{{
@@ -1066,14 +1072,14 @@ idfobj_ref_from_object <- function (self, private) {
 }
 # }}}
 # idfobj_ref_by_object {{{
-idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL) {
+idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
     # exclude invalid references
     rel <- get_idf_relation(private$idd_env(), private$idf_env(),
-        value_id = val$value_id, direction = "ref_by"
+        value_id = val$value_id, direction = "ref_by", recursive = recursive
     )[!is.na(value_id)]
 
     # only include specified class

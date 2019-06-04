@@ -27,9 +27,9 @@ idfobj[[Field]]
 idfobj$set(..., .defaults = TRUE)
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
-idfobj$ref_to_object(which = NULL, class = NULL)
-idfobj$ref_by_object(which = NULL, class = NULL)
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", recursive = FALSE))
+idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
+idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
 idfobj$has_ref_to(which = NULL, class = NULL)
 idfobj$has_ref_by(which = NULL, class = NULL)
 idfobj$has_ref(which)
@@ -261,9 +261,9 @@ letters and numbers are replaced by underscores.
 \section{Field Value Relation}{
 
 \preformatted{
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"))
-idfobj$ref_to_object(which = NULL, class = NULL)
-idfobj$ref_by_object(which = NULL, class = NULL)
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
+idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
+idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
 idfobj$has_ref_to(which = NULL, class = NULL)
 idfobj$has_ref_by(which = NULL, class = NULL)
 idfobj$has_ref(which)
@@ -321,6 +321,10 @@ names.
 \item \code{class}: A character vector of class names.
 \item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
 \code{"ref_to"} or "ref_by".
+\item \code{recursive}: If \code{TRUE}, the relation is searched recursively. A simple
+example of recursive reference: one material named \code{mat} is referred by a
+construction named \code{const}, and \code{const} is also referred by a surface named
+\code{surf}.
 }
 }
 

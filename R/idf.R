@@ -51,7 +51,7 @@ NULL
 #' model$objects(which)
 #' model$objects_in_class(class)
 #' model$objects_in_group(group)
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
 #' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
@@ -181,7 +181,7 @@ NULL
 #'
 #' @section Object Relation:
 #' ```
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"))
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = TRUE)
 #' ```
 #'
 #' Many fields in [Idd] can be referred by others. For example, the `Outside
@@ -216,6 +216,10 @@ NULL
 #' * `which`: Either a single integer of object ID or a string of object name.
 #' * `direciton`: The relation direction to extract. Should be either `"all"`,
 #'   `"ref_to"` or "ref_by".
+#' * `recursive`: If `TRUE`, the relation is searched recursively. A simple
+#'   example of recursive reference: one material named `mat` is referred by a
+#'   construction named `const`, and `const` is also referred by a surface named
+#'   `surf`.
 #'
 #' @section Object Query:
 #'
@@ -1550,8 +1554,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         objects_in_group = function (group)
             idf_objects_in_group(self, private, group),
 
-        object_relation = function (which, direction = c("all", "ref_to", "ref_by"))
-            idf_object_relation(self, private, which, match.arg(direction)),
+        object_relation = function (which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
+            idf_object_relation(self, private, which, match.arg(direction), recursive = recursive),
 
         objects_in_relation = function (which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
             idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive),
@@ -1853,7 +1857,7 @@ idf_objects_in_group <- function (self, private, group) {
 }
 # }}}
 # idf_object_relation {{{
-idf_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by")) {
+idf_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE) {
     assert(is_scalar(which))
     direction <- match.arg(direction)
 
@@ -1863,7 +1867,7 @@ idf_object_relation <- function (self, private, which, direction = c("all", "ref
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         object_id = obj$object_id, name = TRUE, direction = direction,
-        keep_all = FALSE, by_value = FALSE, max_depth = NULL, recursive = FALSE
+        keep_all = FALSE, by_value = FALSE, max_depth = NULL, recursive = recursive
     )
 }
 # }}}
