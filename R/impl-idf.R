@@ -1771,7 +1771,42 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
 
     id_ref_by <- c()
 
+    # do not delete objects that reference input class names except the whole
+    # class are included in the value-reference relation, or input object is the
+    # only existing one in input class
+    # get_exclude_class {{{
+    get_exclude_class <- function (dt) {
+        dt[,
+            {
+                # check if class-name reference exists
+                if (!any(src_enum == 1L)) {
+                    list(whole = FALSE)
+                } else {
+                    # get all object IDs in target class
+                    all <- idf_env$object[J(src_class_id), on = "class_id", object_id]
+
+                    # only delete if there is only one object existing in input
+                    # class or all objects in input class are extracted by
+                    # value reference
+                    list(whole = length(all) == 1L || !as.logical(length(setdiff(all, src_object_id[src_enum == 2L]))))
+                }
+            },
+            by = "src_class_id"][
+            whole == FALSE, src_class_id
+        ]
+    }
+    # }}}
+
+    # ref by {{{
+    # exclude invalid reference
     if (nrow(rel$ref_by)) {
+        rel$ref_by <- rel$ref_by[!J(NA_integer_), on = "object_id"]
+
+        exclude <- get_exclude_class(rel$ref_by)
+        if (length(exclude)) {
+            rel$ref_by <- rel$ref_by[!J(1L, exclude), on = c("src_enum", "src_class_id")]
+        }
+
         # stop if objects are referred {{{
         # should be able to delete targets objects in at least one condition:
         # 1. current validate level does not includ reference checking
@@ -1793,7 +1828,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         }
         # }}}
 
-        if (.ref_by) {
+        if (.ref_by && nrow(rel$ref_by)) {
             # check if objects that refer to targets are also referred by other
             # objects
             id_ref_by <- setdiff(unique(rel$ref_by$object_id), id_del)
@@ -1816,16 +1851,28 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
                 }
             } else {
                 if (eplusr_option("verbose_info")) {
-                    msg <- c(msg, "",
+                    msg <- c(msg,
                         paste0("Including object(s) [ID:", paste(id_ref_by, collapse = ", "), "] that refer to it.")
                     )
                 }
             }
         }
     }
+    # }}}
 
     # if .ref_to is TRUE and rel$ref_to has contents
+    # ref to {{{
     if (NROW(rel$ref_to)) {
+        # exclude invalid reference
+        rel$ref_to <- rel$ref_to[!J(NA_integer_), on = "src_object_id"]
+
+        # same as ref_by, if input refers to a class name, delete objects in
+        # that class only if there is only one object left in that class
+        exclude <- get_exclude_class(rel$ref_to)
+        if (length(exclude)) {
+            rel$ref_to <- rel$ref_to[!J(1L, exclude), on = c("src_enum", "src_class_id")]
+        }
+
         id_ref_to <- setdiff(unique(rel$ref_to$src_object_id), id_del)
 
         # check if objects that target refers to are also referred by other
@@ -1838,26 +1885,27 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
             id_ref_to <- setdiff(id_ref_to, id_src)
             if (eplusr_option("verbose_info")) {
                 if (length(id_ref_to)) {
-                    msg <- c(msg, "",
+                    msg <- c(msg,
                         paste0(
                             "Including object(s) [ID:", paste(id_ref_to, collapse = ", "), "] that is referred by it, ",
                             "skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is also referred by other objects."
                         )
                     )
                 } else {
-                    msg <- c(msg, "",
+                    msg <- c(msg,
                         paste0("Skipping object(s) [ID: ", paste0(id_src, collapse = ","), "] that is also referred by other objects.")
                     )
                 }
             }
         } else {
             if (eplusr_option("verbose_info")) {
-                msg <- c(msg, "",
+                msg <- c(msg,
                     paste0("Including object(s) [ID:", paste(id_ref_by, collapse = ", "), "] that is referred by it.")
                 )
             }
         }
     }
+    # }}}
 
     if (eplusr_option("verbose_info") && (.ref_to || .ref_by || .force)) {
         msg <- paste0(c(msg, "", "Object relation is shown below:", ""), collapse = "\n")
