@@ -458,6 +458,7 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
         on.exit(switch_ref_src(ref, invert = TRUE))
     }
 
+    # add foramt columns {{{
     set(ref, NULL, "ref_class", format_class(ref))
     set(ref, NULL, "ref_object", format_object(ref))
     set(ref, NULL, "ref_value", format_field_by_parent(ref, "value"))
@@ -473,38 +474,52 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
         ),
         add = TRUE
     )
+    # }}}
 
     # simple switch column names
     while (d >= d_min) {
+        # get data at depth
         ref_dep <- ref[J(d), on = "dep"]
+        set(ref_dep, NULL, "added", FALSE)
 
         if (nrow(out)) {
-            ref_dep[out, on = c(src_object_id = "object_id"),
+            set(ref_dep, NULL, "rleid", seq_len(nrow(ref_dep)))
+            ref_dep[src_object_id %in% out$object_id,
                 `:=`(src_value = {
-                    i <- out$object_id == src_object_id
+                    # out$object_id
+                    m <- out$object_id == src_object_id
 
-                    fmt <- unlist(out$fmt[i], use.names = FALSE)
-
-                    # merge all values
-                    if (any(out$field_index[i] == src_field_index)) {
-                        list(c(src_value, fmt))
-                    } else {
-                        fmt <- list(c(out$ref_value[i], fmt))
-                        list(c(src_value, fmt))[order(src_field_index, out$field_index[i])]
+                    # handle cases when a field references both class names and
+                    # field values
+                    un_list <- function (...) unlist(c(...), use.names = FALSE)
+                    same <- out$field_index[m] == src_field_index
+                    if (any(same)) {
+                        src_value <- list(c(src_value, re_list(out$fmt[m][same])))
                     }
-                }),
-                by = c("src_object_id", "src_value_id")
+
+                    merge <- apply2(out$ref_value[m][!same], out$fmt[m][!same], un_list, use.names = FALSE)
+                    list(add_prefix(c(src_value, merge)[order(c(src_field_index, out$field_index[m][!same]))]))
+                }, added = TRUE),
+                by = "rleid"
             ]
+            set(ref_dep, NULL, "rleid", NULL)
         }
 
+        # for a single 
         out <- ref_dep[,
             {
+                # handle invalid reference
                 if (is.na(src_object_id)) {
                     fmt <- list()
                 } else {
                     fmt <- list(c(
                         src_class[[1L]],
-                        add_prefix(list(c(src_object[[1L]], add_prefix(src_value))))
+                        # format all values referenced in a single object
+                        if (any(added)) {
+                            add_prefix(list(c(src_object[[1L]], src_value)))
+                        } else {
+                            add_prefix(list(c(src_object[[1L]], add_prefix(src_value))))
+                        }
                     ))
                 }
                 list(ref_class = ref_class[[1L]], ref_object = ref_object[[1L]],
@@ -514,10 +529,12 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
             by = c("object_id", "field_index", "src_object_id")
         ][,
             {
+                # handle invalid reference
                 if (is.null(fmt[[1L]])) {
                     fmt <- list()
                 } else {
                     fmt <- list(c(
+                        # add a line indicator to show the value that is referenced
                         paste0(pointer(src_enum[[1L]]), stri_dup("~", nchar(ref_value[[1L]]) - 1L)),
                         unlist(add_prefix(fmt), use.names = FALSE)
                     ))

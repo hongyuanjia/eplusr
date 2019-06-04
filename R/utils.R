@@ -253,8 +253,8 @@ vcapply <- function (x, fun, ..., use.names = TRUE) {
 # }}}
 
 # apply2 {{{
-apply2 <- function (x, y, fun, more_args = NULL) {
-    mapply(FUN = fun, x, y, MoreArgs = more_args, SIMPLIFY = FALSE)
+apply2 <- function (x, y, fun, more_args = NULL, simplify = FALSE, use.names = TRUE) {
+    mapply(FUN = fun, x, y, MoreArgs = more_args, SIMPLIFY = simplify, USE.NAMES = use.names)
 }
 # }}}
 
