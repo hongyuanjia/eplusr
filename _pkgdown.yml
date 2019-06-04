@@ -1,3 +1,5 @@
+development:
+  mode: auto
 reference:
   - title: IDD
     desc: Use a specific EnergyPlus Input Data Dictionary (IDD)
