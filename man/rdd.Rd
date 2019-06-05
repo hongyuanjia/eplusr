@@ -12,7 +12,7 @@ read_mdd(path)
 \arguments{
 \item{path}{For \code{read_rdd()}, a file path of EnergyPlus EnergyPlus Report Data
 Dictionary file with an extension \code{.rdd}. For \code{read_mdd()}, a file path of
-EnergyPlus EnergyPlus Meter Data Dictionary file with an extension \code{.rdd}}
+EnergyPlus EnergyPlus Meter Data Dictionary file with an extension \code{.mdd}}
 }
 \value{
 For \code{read_rdd()}, an \code{RddFile} object. For \code{read_mdd()}, a \code{MddFile}
@@ -20,12 +20,11 @@ object.
 }
 \description{
 \code{read_rdd()} takes a file path of EnergyPlus Report Data Dictionary (RDD)
-file, parses it and returns a \code{RddFile} object.
+file, parses it and returns a \code{RddFile} object. \code{read_mdd()} takes a file
+path of EnergyPlus Meter Data Dictionary (MDD) file, parses it and returns a
+\code{MddFile} object.
 }
 \details{
-\code{read_mdd()} takes a file path of EnergyPlus Meter Data Dictionary (MDD)
-file, parses it and returns a \code{MddFile} object.
-
 Basically, a \code{RddFile} and \code{MddFile} object is a
 \link[data.table:data.table]{data.table} with 3 additional attributes:
 \itemize{

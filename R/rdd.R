@@ -9,10 +9,9 @@ NULL
 #' Read an EnergyPlus Report Data Dictionary File
 #'
 #' `read_rdd()` takes a file path of EnergyPlus Report Data Dictionary (RDD)
-#' file, parses it and returns a `RddFile` object.
-#'
-#' `read_mdd()` takes a file path of EnergyPlus Meter Data Dictionary (MDD)
-#' file, parses it and returns a `MddFile` object.
+#' file, parses it and returns a `RddFile` object. `read_mdd()` takes a file
+#' path of EnergyPlus Meter Data Dictionary (MDD) file, parses it and returns a
+#' `MddFile` object.
 #'
 #' Basically, a `RddFile` and `MddFile` object is a
 #' [data.table][data.table::data.table()] with 3 additional attributes:
@@ -25,7 +24,7 @@ NULL
 #'
 #' @param path For `read_rdd()`, a file path of EnergyPlus EnergyPlus Report Data
 #' Dictionary file with an extension `.rdd`. For `read_mdd()`, a file path of
-#' EnergyPlus EnergyPlus Meter Data Dictionary file with an extension `.rdd`
+#' EnergyPlus EnergyPlus Meter Data Dictionary file with an extension `.mdd`
 #' @return For `read_rdd()`, an `RddFile` object. For `read_mdd()`, a `MddFile`
 #' object.
 #' @export
