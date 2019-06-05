@@ -1,4 +1,4 @@
-# eplusr (development version)
+# eplusr 0.10.2.9000
 
 ## New features
 
