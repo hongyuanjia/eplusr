@@ -16,7 +16,8 @@ vignette: >
 knitr::opts_chunk$set(
     collapse = TRUE,
     comment = "#>",
-    screenshot.force = FALSE
+    screenshot.force = FALSE,
+    fig.align = "center"
 )
 
 # the default output hook
@@ -120,12 +121,8 @@ if (!eplusr::is_avail_eplus(8.8)) {
 
 Below shows the class structure in eplusr.
 
-```{r, results = "asis", echo = FALSE, eval = can_run, include = can_run}
-cat('
-<p align="center">
-  <img src="../man/figures/class_structure.png"/>
-</p>
-')
+```{r, echo = FALSE, eval = can_run, include = can_run, figure.width = "400px"}
+knitr::include_graphics("../man/figures/class_structure.png")
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`

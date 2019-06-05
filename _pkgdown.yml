@@ -1,5 +1,20 @@
 development:
   mode: auto
+navbar:
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: "Get started"
+      href: articles/eplusr.html
+    - text: "Slides"
+      href: https://github.com/hongyuanjia/eplusrIntro
+    - text: "Reference"
+      href: reference/index.html
+    - text: Changelog
+      href: news/index.html
+  right:
+    - icon: fa-github fa-lg
+      href: https://github.com/hongyuanjia/eplusr
 reference:
   - title: IDD
     desc: Use a specific EnergyPlus Input Data Dictionary (IDD)

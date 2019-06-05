@@ -4,6 +4,5 @@
 *.cmd
 *.vbs
 try.R
-docs/*
 inst/doc
 .lintr

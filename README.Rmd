@@ -55,10 +55,9 @@ website](https://energyplus.net).
 
 A comprehensive introduction to eplusr can be found using
 [`vignette("eplusr")`](https://hongyuanjia.github.io/eplusr/articles/eplusr.html).
-There is also an online slides
-[here](https://hongyuanjia.github.io/eplusrIntro).
-You can learn more about eplusr at https://hongyuanjia.github.io/eplusr, along
-with full package documentation.
+There is also an online slides here ([Interfacing EnergyPlus Using
+R](https://hongyuanjia.github.io/eplusrIntro)).  You can learn more about eplusr
+at https://hongyuanjia.github.io/eplusr, along with full package documentation.
 
 ## Installation
 
@@ -116,9 +115,9 @@ if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
 
 Below shows the class structure in eplusr.
 
-<p align="center">
-  <img src="man/figures/class_structure.png"/>
-</p>
+```{r, echo = FALSE, fig.align = "center"}
+knitr::include_graphics("man/figures/class_structure.png")
+```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
 class to present a single object in an IDF. Both `Idf` and `IdfObject` class
