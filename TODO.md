@@ -44,3 +44,10 @@
 * Add `IdfObjectsClass` class to handle `IdfObject`s in same class.
 
 * Use `rc.options()` to register custom completor. Reference: https://github.com/jimhester/completeme
+
+* Add validation to check if character field value input contains comma or semi-colon.
+
+* Add validation to check if character field value input length excess 100
+  characters
+
+* Add a `depth` argument in `$object_relation()` and others.

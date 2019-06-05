@@ -1,5 +1,12 @@
+url: https://hongyuanjia.github.io/eplusr
+
+authors:
+  Hongyuan Jia
+
 development:
-  mode: auto
+  mode: devel
+  destination: dev
+
 navbar:
   left:
     - icon: fa-home fa-lg
