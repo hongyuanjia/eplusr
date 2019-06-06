@@ -3,4 +3,7 @@ pkgdown: 1.3.0
 pkgdown_sha: ~
 articles:
   eplusr: eplusr.html
+urls:
+  reference: https://hongyuanjia.github.io/eplusr/reference
+  article: https://hongyuanjia.github.io/eplusr/articles
 

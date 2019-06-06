@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create An EnergyPlus Parametric Simulation Job — param_job • eplusr</title>
+<title>Read an EnergyPlus Report Data Dictionary File — read_rdd • eplusr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -36,10 +36,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Create An EnergyPlus Parametric Simulation Job — param_job" />
+<meta property="og:title" content="Read an EnergyPlus Report Data Dictionary File — read_rdd" />
 
-<meta property="og:description" content="param_job() takes an IDF and EPW as input and returns a ParametricJob.
-For details on ParametricJob, please see ParametricJob class." />
+<meta property="og:description" content="read_rdd() takes a file path of EnergyPlus Report Data Dictionary (RDD)
+file, parses it and returns a RddFile object. read_mdd() takes a file
+path of EnergyPlus Meter Data Dictionary (MDD) file, parses it and returns a
+MddFile object." />
 
 <meta property="og:image" content="https://hongyuanjia.github.io/eplusr/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -123,66 +125,65 @@ For details on ParametricJob, please see ParametricJob class." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create An EnergyPlus Parametric Simulation Job</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/param.R'><code>R/param.R</code></a></small>
-    <div class="hidden name"><code>param_job.Rd</code></div>
+    <h1>Read an EnergyPlus Report Data Dictionary File</h1>
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/rdd.R'><code>R/rdd.R</code></a></small>
+    <div class="hidden name"><code>rdd.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>param_job()</code> takes an IDF and EPW as input and returns a <code>ParametricJob</code>.
-For details on <code>ParametricJob</code>, please see <a href='ParametricJob.html'>ParametricJob</a> class.</p>
+    <p><code>read_rdd()</code> takes a file path of EnergyPlus Report Data Dictionary (RDD)
+file, parses it and returns a <code>RddFile</code> object. <code>read_mdd()</code> takes a file
+path of EnergyPlus Meter Data Dictionary (MDD) file, parses it and returns a
+<code>MddFile</code> object.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>param_job</span>(<span class='no'>idf</span>, <span class='no'>epw</span>)</pre>
+    <pre class="usage"><span class='fu'>read_rdd</span>(<span class='no'>path</span>)
+
+<span class='fu'>read_mdd</span>(<span class='no'>path</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>idf</th>
-      <td><p>A path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></td>
-    </tr>
-    <tr>
-      <th>epw</th>
-      <td><p>A path to EnergyPlus EPW file or an <code>Epw</code> object.</p></td>
+      <th>path</th>
+      <td><p>For <code>read_rdd()</code>, a file path of EnergyPlus EnergyPlus Report Data
+Dictionary file with an extension <code>.rdd</code>. For <code>read_mdd()</code>, a file path of
+EnergyPlus EnergyPlus Meter Data Dictionary file with an extension <code>.mdd</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>ParametricJob</code> object.</p>
+    <p>For <code>read_rdd()</code>, an <code>RddFile</code> object. For <code>read_mdd()</code>, a <code>MddFile</code>
+object.</p>
     
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <div class='dont-index'><p><code><a href='eplus_job.html'>eplus_job()</a></code> for creating an EnergyPlus single simulation job.</p></div>
+    <p>Basically, a <code>RddFile</code> and <code>MddFile</code> object is a
+<a href='https://www.rdocumentation.org/packages/data.table/topics/data.table'>data.table</a> with 3 additional attributes:</p><ul>
+<li><p><code>eplus_version</code>: A <a href='https://www.rdocumentation.org/packages/base/topics/numeric_version'>numeric_version</a> object. The
+version of EnergyPlus used during the simulation.</p></li>
+<li><p><code>eplus_build</code>: A single string. The build tag of EnergyPlus used during the
+simulation.</p></li>
+<li><p><code>datetime</code>: A DateTime (POSIXct). The time when the simulation started.</p></li>
+</ul>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
-    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
-    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># run simulation and get the err file</span>
+<span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
+<span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
+<span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
+<span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
+<span class='no'>job</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='eplus_job.html'>eplus_job</a></span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
 
-    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
-    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
-
-    <span class='co'># create from local files</span>
-    <span class='fu'>param_job</span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
-
-    <span class='co'># create from an Idf and an Epw object</span>
-    <span class='fu'>param_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
-}</div><div class='output co'>#&gt; -- Info ------------------------------------------------------------------------
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#&gt; 
-#&gt; -- Info ------------------------------------------------------------------------
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#&gt; </div><div class='output co'>#&gt; -- EnergPlus Parametric Job ----------------------------------------------------
-#&gt; Seed Model: `C:\EnergyPlusV8-8-0\ExampleFiles\1ZoneUncontrolled.idf`
-#&gt; Weather: `C:\EnergyPlusV8-8-0\WeatherData\USA_CA_San.Francisco.Intl.AP.7249...
-#&gt; EnergyPlus Version: `8.8.0`
-#&gt; EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
+<span class='co'># read the err file</span>
+<span class='fu'>read_rdd</span>(<span class='no'>job</span>$<span class='fu'>locate_output</span>(<span class='st'>".rdd"</span>))
+<span class='fu'>read_mdd</span>(<span class='no'>job</span>$<span class='fu'>locate_output</span>(<span class='st'>".mdd"</span>))
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -191,7 +192,7 @@ For details on <code>ParametricJob</code>, please see <a href='ParametricJob.htm
       
       <li><a href="#value">Value</a></li>
 
-      <li><a href="#see-also">See also</a></li>
+      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

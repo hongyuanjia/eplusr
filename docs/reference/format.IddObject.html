@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Create An EnergyPlus Parametric Simulation Job — param_job • eplusr</title>
+<title>Format an IddObject — format.IddObject • eplusr</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -36,10 +36,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
 
 
-<meta property="og:title" content="Create An EnergyPlus Parametric Simulation Job — param_job" />
+<meta property="og:title" content="Format an IddObject — format.IddObject" />
 
-<meta property="og:description" content="param_job() takes an IDF and EPW as input and returns a ParametricJob.
-For details on ParametricJob, please see ParametricJob class." />
+<meta property="og:description" content="Format an IddObject into a string of an empty object of current class.
+It is formatted exactly the same as in IDF Editor." />
 
 <meta property="og:image" content="https://hongyuanjia.github.io/eplusr/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -123,66 +123,63 @@ For details on ParametricJob, please see ParametricJob class." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Create An EnergyPlus Parametric Simulation Job</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/param.R'><code>R/param.R</code></a></small>
-    <div class="hidden name"><code>param_job.Rd</code></div>
+    <h1>Format an IddObject</h1>
+    <small class="dont-index">Source: <a href='https://github.com/hongyuanjia/eplusr/blob/master/R/idd_object.R'><code>R/idd_object.R</code></a></small>
+    <div class="hidden name"><code>format.IddObject.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>param_job()</code> takes an IDF and EPW as input and returns a <code>ParametricJob</code>.
-For details on <code>ParametricJob</code>, please see <a href='ParametricJob.html'>ParametricJob</a> class.</p>
+    <p>Format an <a href='IddObject.html'>IddObject</a> into a string of an empty object of current class.
+It is formatted exactly the same as in IDF Editor.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>param_job</span>(<span class='no'>idf</span>, <span class='no'>epw</span>)</pre>
+    <pre class="usage"><span class='co'># S3 method for IddObject</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/format'>format</a></span>(<span class='no'>x</span>, <span class='kw'>comment</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>leading</span> <span class='kw'>=</span> <span class='fl'>4L</span>,
+  <span class='kw'>sep_at</span> <span class='kw'>=</span> <span class='fl'>29L</span>, <span class='kw'>all</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>idf</th>
-      <td><p>A path to EnergyPlus IDF or IMF file or an <code>Idf</code> object.</p></td>
+      <th>x</th>
+      <td><p>An <a href='IddObject.html'>IddObject</a> object.</p></td>
     </tr>
     <tr>
-      <th>epw</th>
-      <td><p>A path to EnergyPlus EPW file or an <code>Epw</code> object.</p></td>
+      <th>comment</th>
+      <td><p>A character vector to be used as comments of returned string
+format object. If <code>NULL</code>, no comments are inserted. Default: <code>NULL</code>.</p></td>
+    </tr>
+    <tr>
+      <th>leading</th>
+      <td><p>Leading spaces added to each field. Default: <code>4</code>.</p></td>
+    </tr>
+    <tr>
+      <th>sep_at</th>
+      <td><p>The character width to separate value string and field string.
+Default: <code>29</code> which is the same as IDF Editor.</p></td>
+    </tr>
+    <tr>
+      <th>all</th>
+      <td><p>If <code>TRUE</code>, all fields in current class are returned, otherwise
+only minimum fields are returned.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Further arguments passed to or from other methods.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A <code>ParametricJob</code> object.</p>
-    
-    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
-
-    <div class='dont-index'><p><code><a href='eplus_job.html'>eplus_job()</a></code> for creating an EnergyPlus single simulation job.</p></div>
+    <p>A single length character vector.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='use_eplus.html'>is_avail_eplus</a></span>(<span class='fl'>8.8</span>)) {
-    <span class='no'>idf_name</span> <span class='kw'>&lt;-</span> <span class='st'>"1ZoneUncontrolled.idf"</span>
-    <span class='no'>epw_name</span> <span class='kw'>&lt;-</span>  <span class='st'>"USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"</span>
-
-    <span class='no'>idf_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"ExampleFiles"</span>, <span class='no'>idf_name</span>)
-    <span class='no'>epw_path</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/file.path'>file.path</a></span>(<span class='fu'><a href='use_eplus.html'>eplus_config</a></span>(<span class='fl'>8.8</span>)$<span class='no'>dir</span>, <span class='st'>"WeatherData"</span>, <span class='no'>epw_name</span>)
-
-    <span class='co'># create from local files</span>
-    <span class='fu'>param_job</span>(<span class='no'>idf_path</span>, <span class='no'>epw_path</span>)
-
-    <span class='co'># create from an Idf and an Epw object</span>
-    <span class='fu'>param_job</span>(<span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='no'>idf_path</span>), <span class='fu'><a href='read_epw.html'>read_epw</a></span>(<span class='no'>epw_path</span>))
-}</div><div class='output co'>#&gt; -- Info ------------------------------------------------------------------------
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#&gt; 
-#&gt; -- Info ------------------------------------------------------------------------
-#&gt; Adding object `Output:SQLite` and setting `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#&gt; </div><div class='output co'>#&gt; -- EnergPlus Parametric Job ----------------------------------------------------
-#&gt; Seed Model: `C:\EnergyPlusV8-8-0\ExampleFiles\1ZoneUncontrolled.idf`
-#&gt; Weather: `C:\EnergyPlusV8-8-0\WeatherData\USA_CA_San.Francisco.Intl.AP.7249...
-#&gt; EnergyPlus Version: `8.8.0`
-#&gt; EnergyPlus Path: `C:\EnergyPlusV8-8-0`
-#&gt; &lt;&lt; No measure has been applied &gt;&gt;</div></pre>
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/cat'>cat</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/format'>format</a></span>(<span class='fu'><a href='use_idd.html'>use_idd</a></span>(<span class='fl'>8.8</span>, <span class='kw'>download</span> <span class='kw'>=</span> <span class='st'>"auto"</span>)$<span class='no'>Materal</span>, <span class='kw'>leading</span> <span class='kw'>=</span> <span class='fl'>0</span>))
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -190,14 +187,10 @@ For details on <code>ParametricJob</code>, please see <a href='ParametricJob.htm
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-
-      <li><a href="#see-also">See also</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
 
-    <h2>Author</h2>
-    <p>Hongyuan Jia</p>
   </div>
 </div>
 

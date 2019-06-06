@@ -29,13 +29,19 @@
 <script src="../pkgdown.js"></script>
 
 
+<!-- docsearch -->
+<script src="../docsearch.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+
 
 <meta property="og:title" content="Download and Install EnergyPlus — install_eplus" />
 
 <meta property="og:description" content="Download specified version of EnergyPlus for your platform from GitHub and
 install it." />
 
-<meta property="og:image" content="/logo.png" />
+<meta property="og:image" content="https://hongyuanjia.github.io/eplusr/logo.png" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -100,6 +106,12 @@ install it." />
   </a>
 </li>
       </ul>
+      
+      <form class="navbar-form navbar-right" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
+        </div>
+      </form>
       
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -203,7 +215,7 @@ sudo if you are on Linux) to make it work if you are not in interactive mode.</p
 
       <footer>
       <div class="copyright">
-  <p>Developed by Hongyuan Jia.</p>
+  <p>Developed by <a href='https://github.com/hongyuanjia'>Hongyuan Jia</a>.</p>
 </div>
 
 <div class="pkgdown">
@@ -213,6 +225,23 @@ sudo if you are on Linux) to make it work if you are not in interactive mode.</p
    </div>
 
   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script>
+<script>
+  docsearch({
+    
+    
+    apiKey: '158ff4599f27d2efdd371e5200cdb538',
+    indexName: 'eplusr',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+
 
   </body>
 </html>
