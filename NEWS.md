@@ -19,6 +19,9 @@
 * Recursive relation support has been added to `$object_relation()` in `Idf`
   class, and `$value_relation()`, `$ref_to_object()`, `$ref_by_object()` in
   `IdfObject` class.
+* A new argument `by_group` is added in `$class_index()`, `$class_name()` in
+  `Idd` class and `$class_name()` in `Idf` class. If `TRUE`, a list is returned
+  which separate class indexes/names by the group they belong to.
 
 ## Bug fixes
 

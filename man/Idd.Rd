@@ -59,8 +59,8 @@ idd$build()
 idd$group_index(group = NULL)
 idd$group_name()
 idd$from_group(class)
-idd$class_index(class = NULL)
-idd$class_name()
+idd$class_index(class = NULL, by_group = FALSE)
+idd$class_name(index = NULL, by_group = FALSE)
 idd$required_class_name()
 idd$unique_class_name()
 idd$extenesible_class_name()
@@ -87,6 +87,8 @@ print(idd)
 \item \code{idd}: An \code{Idd} object.
 \item \code{group}: A character vector of valid group names. For
 \code{$objects_in_group()}, a single string of valid group name.
+\item \code{index}: An integer vector giving indexes of name appearance in
+the IDD file of specified classes.
 \item \code{class}: A character vector of valid class names. For \code{$object_relation()}
 and \code{$objects_in_relation()}, a single string of valid class name.
 \item \code{ClassName}: A single string of valid class name.
@@ -100,6 +102,8 @@ only minimum required fields are returned. Default: \code{FALSE}.
 Default: \code{29L} which is the same as IDF Editor.
 \item \code{sep_each}: A single integer of how many empty strings to insert between
 different classes. Default: \code{0}.
+\item \code{by_group}: If \code{TRUE}, a list is returned which separates class indexes or
+names by the group they belongs to. Default: \code{FALSE}.
 }
 }
 
@@ -121,9 +125,13 @@ the IDD file) of specified groups.
 \code{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
 
 \code{$class_index()} returns integer indexes (indexes of name appearance in
-the IDD file) of specified classes.
+the IDD file) of specified classes. If \code{by_group} is \code{TRUE}, a list is returned
+which separate class indexes by the group they belong to. Otherwise, an
+integer vector is returned.
 
-\code{$class_name()} returns all class names.
+\code{$class_name()} returns class names of specified class indexes. If \code{by_group}
+is \code{TRUE}, a list is returned which separate class names by the group they
+belong to. Otherwise, a character vector is returned.
 
 \code{$required_class_name()} returns the names of all required classes.
 

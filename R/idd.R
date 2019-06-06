@@ -54,8 +54,8 @@ NULL
 #' idd$group_index(group = NULL)
 #' idd$group_name()
 #' idd$from_group(class)
-#' idd$class_index(class = NULL)
-#' idd$class_name()
+#' idd$class_index(class = NULL, by_group = FALSE)
+#' idd$class_name(index = NULL, by_group = FALSE)
 #' idd$required_class_name()
 #' idd$unique_class_name()
 #' idd$extenesible_class_name()
@@ -80,6 +80,8 @@ NULL
 #' * `idd`: An `Idd` object.
 #' * `group`: A character vector of valid group names. For
 #'   `$objects_in_group()`, a single string of valid group name.
+#' * `index`: An integer vector giving indexes of name appearance in
+#'   the IDD file of specified classes.
 #' * `class`: A character vector of valid class names. For `$object_relation()`
 #'   and `$objects_in_relation()`, a single string of valid class name.
 #' * `ClassName`: A single string of valid class name.
@@ -93,6 +95,8 @@ NULL
 #'   Default: `29L` which is the same as IDF Editor.
 #' * `sep_each`: A single integer of how many empty strings to insert between
 #'   different classes. Default: `0`.
+#' * `by_group`: If `TRUE`, a list is returned which separates class indexes or
+#'   names by the group they belongs to. Default: `FALSE`.
 #'
 #' @section Detail:
 #'
@@ -111,9 +115,13 @@ NULL
 #' `$is_valid_group()` return `TRUE` if the input is a valid group name.
 #'
 #' `$class_index()` returns integer indexes (indexes of name appearance in
-#' the IDD file) of specified classes.
+#' the IDD file) of specified classes. If `by_group` is `TRUE`, a list is returned
+#' which separate class indexes by the group they belong to. Otherwise, an
+#' integer vector is returned.
 #'
-#' `$class_name()` returns all class names.
+#' `$class_name()` returns class names of specified class indexes. If `by_group`
+#' is `TRUE`, a list is returned which separate class names by the group they
+#' belong to. Otherwise, a character vector is returned.
 #'
 #' `$required_class_name()` returns the names of all required classes.
 #'
@@ -273,8 +281,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         from_group = function (class)
             idd_from_group(self, private, class),
 
-        class_name = function (index = NULL)
-            idd_class_name(self, private, index = index),
+        class_name = function (index = NULL, by_group = TRUE)
+            idd_class_name(self, private, index = index, by_group = by_group),
 
         required_class_name = function ()
             idd_required_class_name(self, private),
@@ -288,8 +296,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         group_index = function (group = NULL)
             idd_group_index(self, private, group),
 
-        class_index = function (class = NULL)
-            idd_class_index(self, private, class),
+        class_index = function (class = NULL, by_group = TRUE)
+            idd_class_index(self, private, class, by_group = by_group),
         # }}}
 
         # ASSERTIONS {{{
@@ -406,13 +414,19 @@ idd_group_index <- function (self, private, group = NULL) {
 }
 # }}}
 # idd_class_name {{{
-idd_class_name <- function (self, private, index = NULL) {
-    get_idd_class(private$m_idd_env, index)$class_name
+idd_class_name <- function (self, private, index = NULL, by_group = FALSE) {
+    if (!by_group) return(get_idd_class(private$m_idd_env, index)$class_name)
+    cls <- get_idd_class(private$m_idd_env, index, property = "group_name")
+    res <- cls[, list(class_name = list(class_name)), by = "group_name"]
+    setattr(res$class_name, "names", res$group_name)[]
 }
 # }}}
 # idd_class_index {{{
-idd_class_index <- function (self, private, class) {
-    get_idd_class(private$m_idd_env, class)$class_id
+idd_class_index <- function (self, private, class = NULL, by_group = FALSE) {
+    if (!by_group) return(get_idd_class(private$m_idd_env, index)$class_id)
+    cls <- get_idd_class(private$m_idd_env, index, property = "group_name")
+    res <- cls[, list(class_id = list(class_id)), by = "group_name"]
+    setattr(res$class_id, "names", res$group_name)[]
 }
 # }}}
 # idd_required_class_name {{{

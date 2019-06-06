@@ -39,7 +39,7 @@ model <- read_idf(path)
 model$version()
 model$path()
 model$group_name(all = FALSE, sorted = TRUE)
-model$class_name(all = FALSE, sorted = TRUE)
+model$class_name(all = FALSE, sorted = TRUE, by_group = FALSE)
 model$is_valid_group(group, all = FALSE)
 model$is_valid_class(class, all = FALSE)
 model$definition(class)
@@ -87,7 +87,7 @@ print(model)
 model$version()
 model$path()
 model$group_name(all = FALSE, sorted = TRUE)
-model$class_name(all = FALSE, sorted = TRUE)
+model$class_name(all = FALSE, sorted = TRUE, by_group = FALSE)
 model$is_valid_group(group, all = FALSE)
 model$is_valid_class(class, all = FALSE)
 }
@@ -127,6 +127,8 @@ underlying \link{Idd} object. Default: \code{FALSE}.
 returned group or class names are removed, and unique names are further
 sorted according to their occurrences in the underlying \link{Idd} object.
 Default: \code{TRUE}.
+\item \code{by_group}: Only applicable when \code{all} or \code{sorted} is \code{TRUE}. If \code{TRUE}, a
+list is returned which separate class names by the group they belong to.
 \item \code{group}: A character vector of valid group names.
 \item \code{class}: A character vector of valid class names.
 }

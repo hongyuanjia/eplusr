@@ -37,7 +37,7 @@ NULL
 #' model$version()
 #' model$path()
 #' model$group_name(all = FALSE, sorted = TRUE)
-#' model$class_name(all = FALSE, sorted = TRUE)
+#' model$class_name(all = FALSE, sorted = TRUE, by_group = FALSE)
 #' model$is_valid_group(group, all = FALSE)
 #' model$is_valid_class(class, all = FALSE)
 #' model$definition(class)
@@ -85,7 +85,7 @@ NULL
 #' model$version()
 #' model$path()
 #' model$group_name(all = FALSE, sorted = TRUE)
-#' model$class_name(all = FALSE, sorted = TRUE)
+#' model$class_name(all = FALSE, sorted = TRUE, by_group = FALSE)
 #' model$is_valid_group(group, all = FALSE)
 #' model$is_valid_class(class, all = FALSE)
 #' ```
@@ -125,6 +125,8 @@ NULL
 #'   returned group or class names are removed, and unique names are further
 #'   sorted according to their occurrences in the underlying [Idd] object.
 #'   Default: `TRUE`.
+#' * `by_group`: Only applicable when `all` or `sorted` is `TRUE`. If `TRUE`, a
+#'   list is returned which separate class names by the group they belong to.
 #' * `group`: A character vector of valid group names.
 #' * `class`: A character vector of valid class names.
 #'
@@ -1512,8 +1514,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         group_name = function (all = FALSE, sorted = TRUE)
             idf_group_name(self, private, all, sorted),
 
-        class_name = function (all = FALSE, sorted = TRUE)
-            idf_class_name(self, private, all, sorted),
+        class_name = function (all = FALSE, sorted = TRUE, simplify = TRUE)
+            idf_class_name(self, private, all, sorted, simplify),
 
         is_valid_group = function (group, all = FALSE)
             idf_is_valid_group_name(self, private, group, all),
@@ -1712,14 +1714,24 @@ idf_group_name <- function (self, private, all = FALSE, sorted = TRUE) {
 }
 # }}}
 # idf_class_name {{{
-idf_class_name <- function (self, private, all = FALSE, sorted = TRUE) {
+idf_class_name <- function (self, private, all = FALSE, sorted = TRUE, by_group = FALSE) {
     if (all) {
-        private$idd_env()$class$class_name
+        if (!by_group) return(private$idd_env()$class$class_name)
+        cls <- get_idd_class(private$idd_env(), property = "group_name")
+        res <- cls[, list(class_name = list(class_name)), by = "group_name"]
+        setattr(res$class_name, "names", res$group_name)[]
     } else {
         add_class_name(private$idd_env(), private$idf_env()$object)
         on.exit(set(private$idf_env()$object, NULL, "class_name", NULL), add = TRUE)
         if (sorted) {
-            private$idf_env()$object[order(class_id), unique(class_name)]
+            if (!by_group) {
+                private$idf_env()$object[order(class_id), unique(class_name)]
+            } else {
+                cls <- get_idd_class(private$idd_env(), order(unique(private$idf_env()$object$class_id)),
+                    property = "group_name")
+                res <- cls[, list(class_name = list(class_name)), by = "group_name"]
+                setattr(res$class_name, "names", res$group_name)[]
+            }
         } else {
             private$idf_env()$object$class_name
         }

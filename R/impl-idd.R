@@ -49,7 +49,20 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
         if (is.null(property)) {
             return(idd_env$class[, .SD, .SDcols = cols])
         } else {
-            return(idd_env$class[, .SD, .SDcols = unique(c(cols, property))])
+            if ("group_name" %chin% property) {
+                property <- setdiff(property, "group_name")
+                add_group <- TRUE
+            } else {
+                add_group <- FALSE
+            }
+
+            res <- idd_env$class[, .SD, .SDcols = unique(c(cols, property))]
+
+            if (add_group) {
+                add_joined_cols(idd_env$group, res, "group_id", "group_name")
+            }
+
+            return(res)
         }
     }
 
