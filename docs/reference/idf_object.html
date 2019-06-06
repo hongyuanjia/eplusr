@@ -66,7 +66,7 @@ returns a corresponding IdfObject." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.2.9000</span>
       </span>
     </div>
 
@@ -80,6 +80,9 @@ returns a corresponding IdfObject." />
 </li>
 <li>
   <a href="../articles/eplusr.html">Get started</a>
+</li>
+<li>
+  <a href="https://github.com/hongyuanjia/eplusrIntro">Slides</a>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
@@ -150,7 +153,7 @@ to. If <code>object</code> is <code>NULL</code>, an empty <a href='IdfObject.htm
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>If <code>object</code> is not given, an empty <a href='IdfObject.html'>IdfObject</a> of specified class is created,
-with all field vlaues filled with defaults, if possible.  Note that
+with all field values filled with defaults, if possible.  Note that
 validation is performed when creating, which means that an error may occur if
 current <a href='level_checks.html'>validate level</a> does not allow empty required fields.</p>
 <p>The empty <a href='IdfObject.html'>IdfObject</a> is directly added into the parent <a href='Idf.html'>Idf</a> object. It is
@@ -160,66 +163,26 @@ method to set field values.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>))
+    <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='read_idf.html'>read_idf</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/system.file'>system.file</a></span>(<span class='st'>"extdata/1ZoneUncontrolled.idf"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"eplusr"</span>))
 
 <span class='co'># get an IdfObject using object ID</span>
-<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='fl'>14</span>)</div><div class='output co'>#&gt; &lt;IdfObject: `Material`&gt; [ID:14] `C5 - 4 IN HW CONCRETE`
-#&gt; Class: &lt;Material&gt;
-#&gt; ├─ 1: "C5 - 4 IN HW CONCRETE",  !- Name
-#&gt; │─ 2: "MediumRough",      !- Roughness
-#&gt; │─ 3: 0.1014984,          !- Thickness {m}
-#&gt; │─ 4: 1.729577,           !- Conductivity {W/m-K}
-#&gt; │─ 5: 2242.585,           !- Density {kg/m3}
-#&gt; │─ 6: 836.8,              !- Specific Heat {J/kg-K}
-#&gt; │─ 7: 0.9,                !- Thermal Absorptance
-#&gt; │─ 8: 0.65,               !- Solar Absorptance
-#&gt; └─ 9: 0.65;               !- Visible Absorptance</div><div class='input'>
+<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='fl'>14</span>)
+
 <span class='co'># get an IdfObject using object name (case-insensitive)</span>
-<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='st'>"zone one"</span>)</div><div class='output co'>#&gt; &lt;IdfObject: `Zone`&gt; [ID:18] `ZONE ONE`
-#&gt; Class: &lt;Zone&gt;
-#&gt; ├─ 1: "ZONE ONE",      !- Name
-#&gt; │─ 2: 0,               !- Direction of Relative North {deg}
-#&gt; │─ 3: 0,               !- X Origin {m}
-#&gt; │─ 4: 0,               !- Y Origin {m}
-#&gt; │─ 5: 0,               !- Z Origin {m}
-#&gt; │─ 6: 1,               !- Type
-#&gt; │─ 7: 1,               !- Multiplier
-#&gt; │─ 8: autocalculate,   !- Ceiling Height {m}
-#&gt; └─ 9: autocalculate;   !- Volume {m3}</div><div class='input'>
+<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='st'>"zone one"</span>)
+
 <span class='co'># `class` argument is useful when there are objects with same name in</span>
 <span class='co'># different class</span>
-<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='st'>"zone one"</span>, <span class='st'>"Zone"</span>)</div><div class='output co'>#&gt; &lt;IdfObject: `Zone`&gt; [ID:18] `ZONE ONE`
-#&gt; Class: &lt;Zone&gt;
-#&gt; ├─ 1: "ZONE ONE",      !- Name
-#&gt; │─ 2: 0,               !- Direction of Relative North {deg}
-#&gt; │─ 3: 0,               !- X Origin {m}
-#&gt; │─ 4: 0,               !- Y Origin {m}
-#&gt; │─ 5: 0,               !- Z Origin {m}
-#&gt; │─ 6: 1,               !- Type
-#&gt; │─ 7: 1,               !- Multiplier
-#&gt; │─ 8: autocalculate,   !- Ceiling Height {m}
-#&gt; └─ 9: autocalculate;   !- Volume {m3}</div><div class='input'>
+<span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='st'>"zone one"</span>, <span class='st'>"Zone"</span>)
+
 <span class='co'># create a new zone</span>
-<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"draft"</span>)</div><div class='output co'>#&gt; $validate_level
-#&gt; [1] "draft"
-#&gt; </div><div class='input'><span class='no'>zone</span> <span class='kw'>&lt;-</span> <span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='st'>"Zone"</span>)</div><div class='output co'>#&gt; <span style='color: #00BB00;'>──</span><span> </span><span style='color: #00BB00;'>Info</span><span> </span><span style='color: #00BB00;'>────────────────────────────────────────────────────────────────────────</span><span>
-#&gt; New empty object [ID:54] in class `Zone` created.
-#&gt; </div><div class='input'><span class='no'>zone</span></div><div class='output co'>#&gt; &lt;IdfObject: `Zone`&gt; [ID:54]
-#&gt; Class: &lt;Zone&gt;
-#&gt; └─ 1: </span><span style='text-decoration: underline;'>&lt;"Blank"&gt;</span><span>;  !- Name</div><div class='input'><span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"final"</span>)</div><div class='output co'>#&gt; $validate_level
-#&gt; [1] "final"
-#&gt; </div><div class='input'><span class='no'>zone</span>$<span class='fu'>validate</span>()</div><div class='output co'>#&gt;  ✖ [1] Errors found during validation.
-#&gt; ════════════════════════════════════════════════════════════════════════════════
-#&gt; 
-#&gt; ── [1] Missing Required Field ──────────────────────────────────────────────────
-#&gt;    Fields below are required but values are not given:
-#&gt; 
-#&gt;     Class: &lt;Zone&gt;
-#&gt;     └─ Object [ID:54]
-#&gt;        └─ 1: </span><span style='text-decoration: underline;'>&lt;"Blank"&gt;</span><span>;     !- Name
-#&gt;        
-#&gt; </div><div class='input'>
-</div></span></pre>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"draft"</span>)
+<span class='no'>zone</span> <span class='kw'>&lt;-</span> <span class='fu'>idf_object</span>(<span class='no'>model</span>, <span class='kw'>class</span> <span class='kw'>=</span> <span class='st'>"Zone"</span>)
+<span class='no'>zone</span>
+<span class='fu'><a href='eplusr_option.html'>eplusr_option</a></span>(<span class='kw'>validate_level</span> <span class='kw'>=</span> <span class='st'>"final"</span>)
+<span class='no'>zone</span>$<span class='fu'>validate</span>()
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

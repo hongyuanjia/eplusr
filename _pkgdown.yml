@@ -1,11 +1,5 @@
-url: https://hongyuanjia.github.io/eplusr
-
-authors:
-  Hongyuan Jia
-
 development:
-  mode: devel
-  destination: dev
+  model: auto
 
 navbar:
   left:
@@ -22,6 +16,7 @@ navbar:
   right:
     - icon: fa-github fa-lg
       href: https://github.com/hongyuanjia/eplusr
+
 reference:
   - title: IDD
     desc: Use a specific EnergyPlus Input Data Dictionary (IDD)

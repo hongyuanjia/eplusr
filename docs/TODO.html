@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">eplusr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.10.2.9000</span>
       </span>
     </div>
 
@@ -77,6 +77,9 @@
 </li>
 <li>
   <a href="articles/eplusr.html">Get started</a>
+</li>
+<li>
+  <a href="https://github.com/hongyuanjia/eplusrIntro">Slides</a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
@@ -119,11 +122,8 @@
 <li><p>Model version conversion</p></li>
 <li><p>Fix extensible field names when they should be “A123” or “N123” but not self-explainary</p></li>
 <li><p>Apply multiple weather file to a seed in <code>ParametricJob</code> class</p></li>
-<li><p>Add functionality to parse <code>.rdd</code> and <code>.mdd</code> file and add possible output variables into the Idf, possibly also a gui interface providing autocompletion using <code><a href="https://www.rdocumentation.org/packages/DT/topics/datatable">DT::datatable()</a></code> and <code>parse_rdd_file()</code>.</p></li>
-<li><p>Add functionality that can set objects using input data.frame instead of nested list.</p></li>
 <li><p>Add external file dependency (e.g. file existance in <code>Schedule:File</code> class) checking in <code>$validate()</code>.</p></li>
 <li><p>Add function to reorder objects in a class</p></li>
-<li><p>Dynamic print the status of job running info</p></li>
 <li><p>Remove crayon dep</p></li>
 <li>
 <p>Add functionality to check location differences between epw and idf.</p>
@@ -136,6 +136,14 @@
 <a class="sourceLine" id="cb1-7" title="7">}</a></code></pre></div>
 </li>
 <li><p>export the fun <code>locate_eplus()</code> to init eplus path</p></li>
+<li><p>Add functionality to directly delete an object using <code>$&lt;-.Idf</code>, such like <code>Idf$Material$mat &lt;- NULL</code>, and delete a whole class using <code>Idf$Material &lt;- NULL</code>.</p></li>
+<li><p>Add a vignette about simulation data extraction and modifying models using functions.</p></li>
+<li><p>Use Rcpp to unlock environment. Reference: <a href="https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051" class="uri">https://stackoverflow.com/questions/25910778/unlockenvironment-implemented-via-rcpp-instead-of-inline/25922051#25922051</a></p></li>
+<li><p>Add <code>IdfObjectsClass</code> class to handle <code>IdfObject</code>s in same class.</p></li>
+<li><p>Use <code><a href="https://www.rdocumentation.org/packages/utils/topics/rcompgen">rc.options()</a></code> to register custom completor. Reference: <a href="https://github.com/jimhester/completeme" class="uri">https://github.com/jimhester/completeme</a></p></li>
+<li><p>Add validation to check if character field value input contains comma or semi-colon.</p></li>
+<li><p>Add validation to check if character field value input length excess 100 characters</p></li>
+<li><p>Add a <code>depth</code> argument in <code>$object_relation()</code> and others.</p></li>
 </ul>
 
   </div>
