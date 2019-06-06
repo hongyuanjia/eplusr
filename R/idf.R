@@ -1727,7 +1727,7 @@ idf_class_name <- function (self, private, all = FALSE, sorted = TRUE, by_group 
             if (!by_group) {
                 private$idf_env()$object[order(class_id), unique(class_name)]
             } else {
-                cls <- get_idd_class(private$idd_env(), order(unique(private$idf_env()$object$class_id)),
+                cls <- get_idd_class(private$idd_env(), sort(unique(private$idf_env()$object$class_id)),
                     property = "group_name")
                 res <- cls[, list(class_name = list(class_name)), by = "group_name"]
                 setattr(res$class_name, "names", res$group_name)[]
