@@ -1514,8 +1514,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         group_name = function (all = FALSE, sorted = TRUE)
             idf_group_name(self, private, all, sorted),
 
-        class_name = function (all = FALSE, sorted = TRUE, simplify = TRUE)
-            idf_class_name(self, private, all, sorted, simplify),
+        class_name = function (all = FALSE, sorted = TRUE, by_group = TRUE)
+            idf_class_name(self, private, all, sorted, by_group),
 
         is_valid_group = function (group, all = FALSE)
             idf_is_valid_group_name(self, private, group, all),
