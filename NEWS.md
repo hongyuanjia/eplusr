@@ -59,6 +59,8 @@
   objects.
 * Now invalid input object name is kept as it is, instead of converted to lower
   case.
+* Now `$value_possible()` returns correct source values when fields refer to
+  class names rather than field values.
 
 ## Minor changes
 

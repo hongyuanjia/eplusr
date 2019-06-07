@@ -208,8 +208,11 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 
         setnames(idf_env$value, "field_id", "src_field_id")
         src <- get_idd_relation(idd_env, NULL, val$field_id, max_depth = 0L, direction = "ref_to")
-        src <- idf_env$value[src, on = c("src_field_id"), allow.cartesian = TRUE, nomatch = 0L][,
-             list(source = list(value_chr)), by = "field_id"]
+        src <- idf_env$value[src, on = c("src_field_id"), allow.cartesian = TRUE, nomatch = 0L]
+        # add class name in case of class-name reference
+        add_joined_cols(idd_env$class, src, c(src_class_id = "class_id"), c(src_class_name = "class_name"))
+        src[J(1L), on = "src_enum", `:=`(value_chr = src_class_name)]
+        src <- src[, list(source = list(value_chr)), by = "field_id"]
         setnames(idf_env$value, "src_field_id", "field_id")
 
         add_joined_cols(rbindlist(list(node, src), fill = TRUE), val, "field_id", "source")
