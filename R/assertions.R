@@ -122,7 +122,9 @@ is_version <- function (ver) {
 #'
 #' is_idfobject(idf_object(idf, 1))
 #'
+#' \dontrun{
 #' is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
+#' }
 # is_eplus_ver {{{
 is_eplus_ver <- function (ver, strict = FALSE) {
     ver <- standardize_ver(ver, strict = strict, complete = FALSE)
