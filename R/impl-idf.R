@@ -1917,7 +1917,9 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
     }
     # }}}
 
-    if (eplusr_option("verbose_info") && (.ref_to || .ref_by || .force)) {
+    if (eplusr_option("verbose_info") &&
+        ((.ref_to && NROW(rel$ref_to)) || (.ref_by && NROW(ref$ref_by)) ||
+            (.force && (NROW(rel$ref_to) || NROW(rel$ref_by))))) {
         msg <- paste0(c(msg, "", "Object relation is shown below:", ""), collapse = "\n")
         msg_rel <- paste0(" ", capture.output(print.IdfRelation(rel)), collapse = "\n")
         verbose_info(paste0(msg, msg_rel, collapse = "\n"))

@@ -641,7 +641,7 @@ format_possible <- function (x) {
 
     # source {{{
     if (has_name(x, "source")) {
-        set(x, NULL, "fmt_source", paste0("* Source:",
+        set(x, NULL, "fmt_source", paste0("* Source: ",
             vcapply(x$source, function (src) {
                 if (!length(src)) return("<NA>")
                 if (length(src) > 5L) src <- c(src[1L:5L], "......")
