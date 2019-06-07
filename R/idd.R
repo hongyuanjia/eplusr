@@ -281,7 +281,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         from_group = function (class)
             idd_from_group(self, private, class),
 
-        class_name = function (index = NULL, by_group = TRUE)
+        class_name = function (index = NULL, by_group = FALSE)
             idd_class_name(self, private, index = index, by_group = by_group),
 
         required_class_name = function ()
@@ -296,7 +296,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         group_index = function (group = NULL)
             idd_group_index(self, private, group),
 
-        class_index = function (class = NULL, by_group = TRUE)
+        class_index = function (class = NULL, by_group = FALSE)
             idd_class_index(self, private, class, by_group = by_group),
         # }}}
 
@@ -423,8 +423,8 @@ idd_class_name <- function (self, private, index = NULL, by_group = FALSE) {
 # }}}
 # idd_class_index {{{
 idd_class_index <- function (self, private, class = NULL, by_group = FALSE) {
-    if (!by_group) return(get_idd_class(private$m_idd_env, index)$class_id)
-    cls <- get_idd_class(private$m_idd_env, index, property = "group_name")
+    if (!by_group) return(get_idd_class(private$m_idd_env, class)$class_id)
+    cls <- get_idd_class(private$m_idd_env, class, property = "group_name")
     res <- cls[, list(class_id = list(class_id)), by = "group_name"]
     setattr(res$class_id, "names", res$group_name)[]
 }
