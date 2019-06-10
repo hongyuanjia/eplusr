@@ -1060,6 +1060,7 @@ idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, rec
             private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id],
             IdfObject$new, list(parent = private$m_parent)
         )
+        res <- lapply(res, add_idfobj_field_bindings)
         setattr(res, "names", private$idf_env()$object[J(rel$src_object_id), on = "object_id", object_name])
         res
     }
@@ -1107,6 +1108,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, rec
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
             IdfObject$new, list(parent = private$m_parent)
         )
+        res <- lapply(res, add_idfobj_field_bindings)
         setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
         res
     }
