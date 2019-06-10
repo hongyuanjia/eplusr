@@ -1678,6 +1678,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             private$m_idf_env
         },
 
+        log_env = function () {
+            private$m_log
+        },
+
         deep_clone = function (name, value) {
             idf_deep_clone(self, private, name, value)
         }
