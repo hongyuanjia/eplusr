@@ -1694,7 +1694,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
         complete = TRUE, property = prop
     )
     # reset rleid in val_out
-    set(val_out, NULL, c("rleid"), val$rleid[val_out$rleid])
+    set(val_out, NULL, c("rleid"), unique(val$rleid)[val_out$rleid])
     set(val_out, NULL, c("new_value", "new_value_num", "defaulted"),
         val[val_out, on = c("rleid", "field_index"),
             .SD, .SDcols = c("new_value", "new_value_num", "defaulted")
