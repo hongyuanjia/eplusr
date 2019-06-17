@@ -51,3 +51,7 @@
   characters
 
 * Add a `depth` argument in `$object_relation()` and others.
+
+* Add node support in value reference handling.
+
+* Create a RStudio Addin to insert field names in `$add()`, `$set()`.
