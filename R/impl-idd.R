@@ -11,7 +11,7 @@ NULL
 get_idd_group_index <- function (idd_env, group = NULL) {
     if (is.null(group)) return(idd_env$group$group_id)
 
-    assert(is.character(group))
+    assert(are_string(group))
 
     res <- idd_env$group[J(group), on = "group_name", group_id]
     if (anyNA(res)) abort_bad_key("error_group_name", "group name", group)
