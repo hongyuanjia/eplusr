@@ -1271,6 +1271,9 @@ sep_object_table <- function (dt, type_enum, version, idd) {
         by = object_id
     ]
 
+    # if trailing comments are found, give message
+    if (dt_object[.N, is.na(class_id)]) dt_object <- dt_object[-.N]
+
     dt <- dt[type > type_enum$object]
     # remove unuseful columns
     set(dt, NULL, c("class_name", "group_id", "type", "comment"), NULL)

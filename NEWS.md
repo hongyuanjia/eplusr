@@ -62,6 +62,7 @@
 * Now `$value_possible()` returns correct source values when fields refer to
   class names rather than field values.
 * Now `$del()` method in `Idf` class works correctly with multiple inputs.
+* Now trailing comments in IDF will be removed in `read_idf()`.
 
 ## Minor changes
 
