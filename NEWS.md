@@ -63,6 +63,7 @@
   class names rather than field values.
 * Now `$del()` method in `Idf` class works correctly with multiple inputs.
 * Now trailing comments in IDF will be removed in `read_idf()`.
+* Now `$to_table()` in `Idf` class will keep the input object order.
 
 ## Minor changes
 

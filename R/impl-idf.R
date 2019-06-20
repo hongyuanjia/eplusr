@@ -3096,7 +3096,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
               "value_chr", "value_num")
 
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = cols]
+        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = c("rleid", cols)]
 
     if ((all || wide) && length(unique(val$class_name)) != 1L) {
         cls <- unique(val$class_name)
@@ -3119,10 +3119,11 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 
     if (string_value) {
         if (wide) {
-            setcolorder(
-                dcast(val, id + name + class ~ field, value.var = "value_chr"),
+            res <- setcolorder(
+                dcast(val, rleid + id + name + class ~ field, value.var = "value_chr"),
                 c("id", "name", "class", unique(val$field))
             )
+            set(res, NULL, "rleid", NULL)[]
         } else {
             setnames(val, "value_chr", "value")
             val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
@@ -3137,9 +3138,10 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 
         if (wide) {
             val <- setcolorder(
-                dcast(val, id + name + class ~ field, value.var = "value", fill = NA),
+                dcast(val, rleid + id + name + class ~ field, value.var = "value", fill = NA),
                 c("id", "name", "class", unique(val$field))
             )
+            set(val, NULL, "rleid", NULL)
 
             cols <- setdiff(names(val), c("id", "name", "class"))
             if (!unit) {
