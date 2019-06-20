@@ -70,6 +70,8 @@
 * Change message types in `$ref_to_object()` and `$ref_by_object()` in `IdfObject`.
 * Now `ErrFile` is stored as a `data.table` with additional attributes instead
   of a list.
+* Now when argument `.unqiue` is `TRUE` in `$insert()`, `$load()` and `$paste()`
+  in `Idf` class, object comparison are performed case-insensitively.
 
 # eplusr 0.10.2
 
