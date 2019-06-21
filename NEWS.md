@@ -15,13 +15,24 @@
   one.
 * Now new method `$version()` is added in `EplusJob` and `ParametricJob` class,
   which returns the version of IDF it uses.
-* Add Node support into `$value_possible()` in `IdfObject` class.
-* Recursive relation support has been added to `$object_relation()` in `Idf`
-  class, and `$value_relation()`, `$ref_to_object()`, `$ref_by_object()` in
-  `IdfObject` class.
 * A new argument `by_group` is added in `$class_index()`, `$class_name()` in
   `Idd` class and `$class_name()` in `Idf` class. If `TRUE`, a list is returned
   which separate class indexes/names by the group they belong to.
+* Recursive relation support has been added to `$object_relation()` in `Idf`
+  class, and `$value_relation()`, `$ref_to_object()`, `$ref_by_object()` in
+  `IdfObject` class. All type of relations can be searched recursively by
+  setting newly added argument `recursive` to `TRUE`. There is also a new
+  argument called `depth` to control how many recursive searching steps should
+  be performed.
+* Add Node support into `$value_possible()` in `IdfObject` class, i.e. if
+  specified fields are nodes, all nodes are returned in the `source` component.
+* Now component node references support has been added. A new option `"node"`
+  has been added to the `direction` argument in `$object_relation`,
+  `$objects_in_relation()` in `Idf` class and `$value_relation()` in `IdfObject`
+  class. New methods `$ref_to_node()` and `$has_ref_node()` have been added in
+  `IdfObject` class. Now `$has_ref()` in `IdfObject` class will return `FALSE`
+  only when all `$has_ref_to()`, `$has_ref_by()` and `$has_ref_node()` are all
+  `FALSE`.
 
 ## Bug fixes
 

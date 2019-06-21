@@ -2783,7 +2783,7 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
 get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                               max_depth = NULL, name = FALSE,
                               direction = c("ref_to", "ref_by"), keep_all = FALSE,
-                              recursive = FALSE) {
+                              recursive = FALSE, recursive_depth = 1L) {
     direction <- match.arg(direction)
 
     ref <- get_idf_relation_at_depth(idd_env, idf_env, object_id, value_id,
@@ -2791,8 +2791,12 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
     )
 
     if (recursive && nrow(ref)) {
+        if (is.null(recursive_depth)) recursive_depth <- Inf
+        assert(is_count(recursive_depth))
+
         rec_in <- switch(direction, ref_to = "src_object_id", ref_by = "object_id")
         new_id <- unique(ref[[rec_in]][!is.na(ref[[rec_in]])])
+        dep <- 1L
 
         get_rec_ref <- function (recref, md, new_id) {
             if (!length(new_id)) return(ref)
@@ -2809,6 +2813,9 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
             rec_ref <- rec_ref[!ref, on = c("object_id", "value_id", "src_object_id", "src_value_id")]
 
             ref <<- rbindlist(list(ref, rec_ref), use.names = TRUE)
+
+            if (dep == recursive_depth) return(ref)
+            dep <<- dep + 1L
 
             new_id <- unique(rec_ref[[rec_in]][!is.na(rec_ref[[rec_in]])])
 
@@ -3062,6 +3069,97 @@ update_referenced_value <- function (idd_env, idf_env, value, action = c("add", 
     }
 
     idf_env
+}
+# }}}
+
+# NODES
+# get_idf_node_relation {{{
+get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
+                                   name = FALSE, keep_all = FALSE, recursive = FALSE,
+                                   recursive_depth = 1L) {
+    assert(!is.null(object_id) || !is.null(value_id))
+
+    # extract all node data
+    nodes_all <- add_field_property(idd_env, property = "type_enum",
+        idf_env$value[!J(NA_character_), on = "value_chr", .SD,
+            .SDcols = c("object_id", "field_id", "value_id", "value_chr")])
+    nodes_all <- nodes_all[J(IDDFIELD_TYPE$node), on = "type_enum", nomatch = 0L]
+    set(nodes_all, NULL, c("type_enum", "field_id"), NULL)
+    set(nodes_all, NULL, "value_chr", stri_trans_tolower(nodes_all$value_chr))
+
+    dt_all <- if (keep_all) idf_env$value else nodes_all
+
+    # get initial input
+    if (!is.null(object_id) & !is.null(value_id)) {
+        # make sure object IDs and value ids have the same length
+        assert(have_same_len(object_id, value_id))
+        obj_id <- object_id
+        val_id <- value_id
+        col_on <- c("object_id", "value_id")
+    } else if (is.null(value_id)) {
+        id <- object_id
+        col_on <- "object_id"
+    } else {
+        id <- value_id
+        col_on <- "value_id"
+    }
+
+    nom <- if (keep_all) NA else 0L
+    if (length(col_on) == 1L) {
+        nodes_in <- dt_all[J(id), on = col_on, nomatch = nom]
+    } else {
+        nodes_in <- dt_all[J(obj_id, value_id), on = col_on, nomatch = nom]
+    }
+
+    if (keep_all) {
+        set(nodes_in, NULL, c("value_num", "field_id"), NULL)
+        set(nodes_in, NULL, "value_chr", stri_trans_tolower(nodes_in$value_chr))
+    }
+
+    # rename columns
+    setnames(nodes_in, paste0("src_", names(nodes_in)))
+
+    ref <- idf_env$reference[0L]
+    set(ref, NULL, "dep", integer())
+    dep <- 0L
+
+    if (recursive) {
+        if (is.null(recursive_depth)) recursive_depth <- Inf
+        assert(is_count(recursive_depth))
+        # unlike value relation, depth equals 0L should be counted
+        recursive_depth <- recursive_depth + 1L
+    } else {
+        recursive_depth <- 1L
+    }
+
+    get_ref <- function (input) {
+        cur_ref <- unique(nodes_all[!J(c(input$src_value_id, input$value_id)), on = "value_id"][
+            input, on = c(value_chr = "src_value_chr"), nomatch = nom])
+
+        set(cur_ref, NULL, "value_chr", NULL)
+        set(cur_ref, NULL, c("src_enum", "dep"), list(2L, dep))
+
+        if (!nrow(cur_ref)) return(ref)
+        ref <<- rbindlist(list(ref, cur_ref), use.names = TRUE)
+        dep <<- dep + 1L
+        if (dep == recursive_depth) return(ref)
+
+        next_input <- nodes_all[!J(c(ref$value_id, ref$src_value_id)), on = "value_id"][
+            J(cur_ref$object_id), on = "object_id", nomatch = 0L]
+        if (!nrow(next_input)) return(ref)
+
+        set(next_input, NULL, "value_chr", stri_trans_tolower(next_input$value_chr))
+        setnames(next_input, paste0("src_", names(next_input)))
+        get_ref(next_input)
+    }
+
+    ref <- get_ref(nodes_in)
+
+    if (!name) return(ref)
+
+    ref <- add_idf_relation_format_cols(idd_env, idf_env, ref)
+    setattr(ref, "class", c("IdfRelationNode", class(ref)))
+    ref
 }
 # }}}
 

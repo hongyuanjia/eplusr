@@ -231,42 +231,44 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 # }}}
 # get_idfobj_relation {{{
 get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
-                                 name = TRUE, direction = c("ref_to", "ref_by", "all"),
+                                 name = TRUE, direction = c("ref_to", "ref_by", "node", "all"),
                                  keep_all = FALSE, by_value = FALSE, max_depth = 0L,
-                                 recursive = FALSE) {
-    direction <- match.arg(direction)
-    if (direction == "ref_to") {
-        res <- list(
-            ref_to = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = max_depth, name = name, direction = "ref_to",
-                keep_all = keep_all, recursive = recursive),
-            ref_by = NULL
+                                 recursive = FALSE, recursive_depth = 1L) {
+    all_dir <- c("ref_to", "ref_by", "node", "all")
+    direction <- all_dir[sort(chmatch(direction, all_dir))]
+    assert(no_na(direction), msg = paste0("`direction` should be one or some of ", collapse(all_dir)))
+
+    rel <- list(ref_to = NULL, ref_by = NULL, node = NULL)
+
+    if ("all" %in% direction) direction <- unique(c(direction, all_dir))
+
+    if ("ref_to" %in% direction) {
+        rel$ref_to <- get_idf_relation(idd_env, idf_env, object_id, value_id,
+            max_depth = max_depth, name = name, direction = "ref_to",
+            keep_all = keep_all, recursive = recursive, recursive_depth = recursive_depth
         )
-        setattr(res$ref_to, "by_value", by_value)
-    } else if (direction == "ref_by") {
-        res <- list(
-            ref_to = NULL,
-            ref_by = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = max_depth, name = name, direction = "ref_by",
-                keep_all = keep_all, recursive = recursive)
-        )
-        setattr(res$ref_by, "by_value", by_value)
-    } else {
-        res <- list(
-            ref_to = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = max_depth, name = name, direction = "ref_to",
-                keep_all = keep_all, recursive = recursive),
-            ref_by = get_idf_relation(idd_env, idf_env, object_id, value_id,
-                max_depth = max_depth, name = name, direction = "ref_by",
-                keep_all = keep_all, recursive = recursive)
-        )
-        setattr(res$ref_to, "by_value", by_value)
-        setattr(res$ref_by, "by_value", by_value)
+        setattr(rel$ref_to, "by_value", by_value)
     }
 
-    setattr(res, "class", c("IdfRelation", class(res)))
+    if ("ref_by" %in% direction) {
+        rel$ref_by <- get_idf_relation(idd_env, idf_env, object_id, value_id,
+            max_depth = max_depth, name = name, direction = "ref_by",
+            keep_all = keep_all, recursive = recursive, recursive_depth = recursive_depth
+        )
+        setattr(rel$ref_by, "by_value", by_value)
+    }
 
-    res
+    if ("node" %in% direction) {
+        rel$node <- get_idf_node_relation(idd_env, idf_env, object_id, value_id,
+            name = name, keep_all = keep_all, recursive = recursive, recursive_depth = recursive_depth
+        )
+        setattr(rel$node, "by_value", by_value)
+    }
+
+
+    setattr(rel, "class", c("IdfRelation", class(rel)))
+
+    rel
 }
 # }}}
 

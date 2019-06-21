@@ -51,8 +51,8 @@ NULL
 #' model$objects(which)
 #' model$objects_in_class(class)
 #' model$objects_in_group(group)
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
-#' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
@@ -183,14 +183,18 @@ NULL
 #'
 #' @section Object Relation:
 #' ```
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = TRUE)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = TRUE, depth = 1L)
 #' ```
 #'
 #' Many fields in [Idd] can be referred by others. For example, the `Outside
 #' Layer` and other fields in `Construction` class refer to the `Name` field
 #' in `Material` class and other material related classes. Here it means that
 #' the `Outside Layer` field **refers to** the `Name` field and the `Name` field
-#' is **referred by** the `Outside Layer`.
+#' is **referred by** the `Outside Layer`. In EnergyPlus, there is also a
+#' special type of field called `Node`, which together with `Branch` and
+#' `BranchList` define the topography of the HVAC connections. A outlet node of
+#' a component can be referred by another component as its inlet node, but can
+#' also exists independently, such as zone air node.
 #'
 #' `$object_relation()` provides a simple interface to get this kind of
 #' relation. It takes a single object ID or name and also a relation direction,
@@ -222,6 +226,9 @@ NULL
 #'   example of recursive reference: one material named `mat` is referred by a
 #'   construction named `const`, and `const` is also referred by a surface named
 #'   `surf`.
+#' * `depth`: Only applicable when `recursive` is `TRUE`. This is a depth to
+#'   when searching value relations recursively. If `NULL`, all recursive
+#'   relations are returned. Default: `1`.
 #'
 #' @section Object Query:
 #'
@@ -231,7 +238,7 @@ NULL
 #' model$object_unique(class)
 #' model$objects_in_class(class)
 #' model$objects_in_group(group)
-#' model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
 #' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
@@ -331,6 +338,9 @@ NULL
 #'   material named `mat` is referred by a construction named `const`, and
 #'   `const` is also referred by a surface named `surf`, all `mat`, `const` and
 #'   `surf` are returned.
+#' * `depth`: Only applicable when `recursive` is `TRUE`. This is a depth to
+#'   when searching value relations recursively. If `NULL`, all recursive
+#'   relations are returned. Default: `1`.
 #' * `ignore.case`, `perl`, `fixed` and `useBytes`: All are directly passed to
 #'   [base::grepl][base::grep()].
 #'
@@ -1556,11 +1566,11 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         objects_in_group = function (group)
             idf_objects_in_group(self, private, group),
 
-        object_relation = function (which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
-            idf_object_relation(self, private, which, match.arg(direction), recursive = recursive),
+        object_relation = function (which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+            idf_object_relation(self, private, which, match.arg(direction), recursive = recursive, recursive_depth = depth),
 
-        objects_in_relation = function (which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
-            idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive),
+        objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
+            idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive, recursive_depth = depth),
 
         object_in_class = function (class)
             idf_object_in_class(self, private, class),
@@ -1873,9 +1883,10 @@ idf_objects_in_group <- function (self, private, group) {
 }
 # }}}
 # idf_object_relation {{{
-idf_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE) {
+idf_object_relation <- function (self, private, which,
+                                 direction = c("all", "ref_to", "ref_by", "node"),
+                                 recursive = FALSE, recursive_depth = 1L) {
     assert(is_scalar(which))
-    direction <- match.arg(direction)
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(),
         object = which, ignore_case = TRUE
@@ -1883,19 +1894,21 @@ idf_object_relation <- function (self, private, which, direction = c("all", "ref
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         object_id = obj$object_id, name = TRUE, direction = direction,
-        keep_all = FALSE, by_value = FALSE, max_depth = NULL, recursive = recursive
+        keep_all = FALSE, by_value = FALSE, max_depth = NULL,
+        recursive = recursive, recursive_depth = recursive_depth
     )
 }
 # }}}
 # idf_objects_in_relation {{{
-idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by"),
-                                     class = NULL, recursive = FALSE) {
+idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by", "node"),
+                                     class = NULL, recursive = FALSE, recursive_depth = 1L) {
     assert(is_scalar(which))
     direction <- match.arg(direction)
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = which, ignore_case = TRUE)
     rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), obj$object_id,
-        name = FALSE, max_depth = NULL, direction = direction, recursive = recursive
+        name = FALSE, max_depth = NULL, direction = direction,
+        recursive = recursive, recursive_depth = recursive_depth
     )
 
     # only include specified class
@@ -1906,8 +1919,8 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
             add_joined_cols(private$idf_env()$object, rel$ref_to, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
             rel$ref_to <- rel$ref_to[J(cls$class_id), on = "src_class_id"]
         } else {
-            add_joined_cols(private$idf_env()$object, rel$ref_by, "object_id", "class_id")
-            rel$ref_by <- rel$ref_by[J(cls$class_id), on = "class_id"]
+            add_joined_cols(private$idf_env()$object, rel[[direction]], "object_id", "class_id")
+            rel[[direction]] <- rel[[direction]][J(cls$class_id), on = "class_id"]
         }
     }
 
@@ -1915,14 +1928,16 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
     if (direction == "ref_to") {
         id_ref <- unique(rel$ref_to$src_object_id[!is.na(rel$ref_to$src_object_id)])
     } else {
-        id_ref <- unique(rel$ref_by$object_id[!is.na(rel$ref_by$object_id)])
+        id_ref <- unique(rel[[direction]]$object_id[!is.na(rel[[direction]]$object_id)])
     }
 
     obj_self <- list(IdfObject$new(id_self, obj$class_id, self))
     setattr(obj_self, "names", obj$object_name)
 
     if (!length(id_ref)) {
-        dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by")
+        dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
+            node = "has no node or their nodes have no reference to"
+        )
         msg <- paste0(get_object_info(obj, numbered = FALSE), " ", dir, " any other object")
         if (is.null(class)) {
             message(paste0(msg, "."))

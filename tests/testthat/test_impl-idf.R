@@ -376,6 +376,10 @@ test_that("table", {
             src_enum = c(2L, 2L), dep = c(0L, 1L)
         )
     )
+    expect_equal(
+        get_idf_node_relation(idd_env, idf_env, id, recursive = TRUE),
+        set(idf_env$reference[0L], NULL, "dep", integer())
+    )
     # }}}
 })
 # }}}

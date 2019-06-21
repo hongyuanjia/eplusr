@@ -507,7 +507,7 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
             set(ref_dep, NULL, "rleid", NULL)
         }
 
-        # for a single 
+        # for a single
         out <- ref_dep[,
             {
                 # handle invalid reference
@@ -1087,10 +1087,40 @@ print.IdfRelationTo <- function (x, ...) {
 }
 # }}}
 #' @export
+# print.IdfRelationNode {{{
+print.IdfRelationNode <- function (x, ...) {
+    by_value <- attr(x, "by_value") %||% FALSE
+    cli::cat_rule("Node Relation")
+    if (!all(has_name(x, c(
+        "class_name", "object_name", "field_name",
+         "src_class_name", "src_object_name", "src_field_name"
+        )))) {
+        NextMethod("print")
+        return(invisible(x))
+    }
+
+    if (!nrow(x)) {
+        cli::cat_line("Target(s) has no node or their nodes have no reference to other object.")
+    } else {
+        if (by_value) {
+            lapply(format_idf_relation(x, "ref_by")$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
+            )
+        } else {
+            lapply(format_idf_relation(x, "ref_by")$fmt,
+                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
+            )
+        }
+    }
+    invisible(x)
+}
+# }}}
+#' @export
 # print.IdfRelation {{{
 print.IdfRelation <- function (x, ...) {
     if (!is.null(x[["ref_to"]])) {print.IdfRelationTo(x[["ref_to"]]); cli::cat_line()}
-    if (!is.null(x[["ref_by"]])) print.IdfRelationBy(x[["ref_by"]])
+    if (!is.null(x[["ref_by"]])) {print.IdfRelationBy(x[["ref_by"]]); cli::cat_line()}
+    if (!is.null(x[["node"]])) print.IdfRelationNode(x[["node"]])
     invisible(x)
 }
 # }}}

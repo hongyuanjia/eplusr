@@ -25,11 +25,13 @@ NULL
 #' idfobj$set(..., .defaults = TRUE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", recursive = FALSE))
-#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
-#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+#' idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$has_ref_to(which = NULL, class = NULL)
 #' idfobj$has_ref_by(which = NULL, class = NULL)
+#' idfobj$has_ref_node(which = NULL, class = NULL)
 #' idfobj$has_ref(which)
 #' idfobj$validate(level = eplusr_option("validate_level"))
 #' idfobj$is_valid(level = eplusr_option("validate_level"))
@@ -244,11 +246,13 @@ NULL
 #'
 #' @section Field Value Relation:
 #' \preformatted{
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
-#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE)
-#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+#' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+#' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+#' idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$has_ref_to(which = NULL, class = NULL)
 #' idfobj$has_ref_by(which = NULL, class = NULL)
+#' idfobj$has_ref_node(which = NULL, class = NULL)
 #' idfobj$has_ref(which)
 #' }
 #'
@@ -256,13 +260,17 @@ NULL
 #' Layer` and other fields in `Construction` class refer to the `Name` field
 #' in `Material` class and other material related classes. Here it means that
 #' the `Outside Layer` field **refers to** the `Name` field and the `Name` field
-#' is **referred by** the `Outside Layer`.
+#' is **referred by** the `Outside Layer`. In EnergyPlus, there is also a
+#' special type of field called `Node`, which together with `Branch` and
+#' `BranchList` define the topography of the HVAC connections. A outlet node of
+#' a component can be referred by another component as its inlet node, but can
+#' also exists independently, such as zone air node.
 #'
 #' `$value_relation()` provides a simple interface to get this kind of
 #' relation. It takes field indexes or field names, together a relation
 #' direction, and returns an `IdfRelation` object which contains data presenting
-#' such relation above. For instance, if `idfobj$value_relation("Name", "ref_by")`
-#' gives results below:
+#' such relation described above. For instance, if
+#' `idfobj$value_relation("Name", "ref_by")` gives results below:
 #'
 #' ```
 #' -- Referred by Others ------------------------
@@ -288,6 +296,10 @@ NULL
 #' vector of field names, and returns a list of `IdfObject`s that refer to
 #' specified fields.
 #'
+#' `$ref_to_node()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a list of `IdfObject`s whose nodes are
+#' referred by specified fields.
+#'
 #' `$has_ref_to()` takes an integer vector of field indexes or a character
 #' vector of field names, and returns a logical vector showing whether specified
 #' fields refer to other object values or not.
@@ -296,10 +308,15 @@ NULL
 #' vector of field names, and returns a logical vector showing whether there are
 #' other object values ref to specified fields.
 #'
+#' `$has_ref_node()` takes an integer vector of field indexes or a character
+#' vector of field names, and returns a logical vector showing whether specified
+#' fields refer to other objects' nodes.
+#'
 #' `$has_ref()` takes an integer vector of field indexes or a character
 #' vector of field names, and returns a logical vector showing whether there are
 #' other object values ref to specified field values or specified field values
-#' refer to other object values.
+#' refer to other object values or specified field values refer to other
+#' objects' nodes.
 #'
 #' **Arguments**:
 #'
@@ -312,6 +329,9 @@ NULL
 #'   example of recursive reference: one material named `mat` is referred by a
 #'   construction named `const`, and `const` is also referred by a surface named
 #'   `surf`.
+#' * `depth`: Only applicable when `recursive` is `TRUE`. This is a depth to
+#'   when searching value relations recursively. If `NULL`, all recursive
+#'   relations are returned. Default: `1`.
 #'
 #' @section Validation:
 #'
@@ -821,17 +841,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         is_valid = function (level = eplusr_option("validate_level"))
             idfobj_is_valid(self, private, level),
 
-        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
-            idfobj_value_relation(self, private, which, direction, recursive),
+        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+            idfobj_value_relation(self, private, which, match.arg(direction), recursive, depth),
 
-        ref_to_object = function (which = NULL, class = NULL, recursive = FALSE)
-            idfobj_ref_to_object(self, private, which, class, recursive),
+        ref_to_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+            idfobj_ref_to_object(self, private, which, class, recursive, depth),
 
         ref_from_object = function ()
             idfobj_ref_from_object(self, private),
 
-        ref_by_object = function (which = NULL, class = NULL, recursive = FALSE)
-            idfobj_ref_by_object(self, private, which, class, recursive),
+        ref_by_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+            idfobj_ref_by_object(self, private, which, class, recursive, depth),
+
+        ref_to_node = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
+            idfobj_ref_to_node(self, private, which, class, recursive, depth),
 
         has_ref_to = function (which = NULL, class = NULL)
             idfobj_has_ref_to(self, private, which, class),
@@ -841,6 +864,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
 
         has_ref_by = function (which = NULL, class = NULL)
             idfobj_has_ref_by(self, private, which, class),
+
+        has_ref_node = function (which = NULL, class = NULL)
+            idfobj_has_ref_node(self, private, which, class),
 
         has_ref = function (which = NULL)
             idfobj_has_ref(self, private, which),
@@ -1010,8 +1036,8 @@ idfobj_is_valid <- function (self, private, level = eplusr_option("validate_leve
 # }}}
 # idfobj_value_relation {{{
 idfobj_value_relation <- function (self, private, which = NULL,
-                                   direction = c("all", "ref_to", "ref_by"),
-                                   recursive = FALSE) {
+                                   direction = c("all", "ref_to", "ref_by", "node"),
+                                   recursive = FALSE, recursive_depth = 1L) {
     direction <- match.arg(direction)
 
     val <- get_idf_value(private$idd_env(), private$idf_env(),
@@ -1024,7 +1050,7 @@ idfobj_value_relation <- function (self, private, which = NULL,
 }
 # }}}
 # idfobj_ref_to_object {{{
-idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE) {
+idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
@@ -1073,7 +1099,7 @@ idfobj_ref_from_object <- function (self, private) {
 }
 # }}}
 # idfobj_ref_by_object {{{
-idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE) {
+idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
@@ -1114,8 +1140,50 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, rec
     }
 }
 # }}}
+# idfobj_ref_to_node {{{
+idfobj_ref_to_node <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
+    val <- get_idf_value(private$idd_env(), private$idf_env(),
+        object = private$m_object_id, field = which
+    )
+
+    # exclude invalid references
+    rel <- get_idf_node_relation(private$idd_env(), private$idf_env(),
+        value_id = val$value_id, recursive = recursive, recursive_depth = recursive_depth
+    )[!is.na(value_id)]
+
+    # only include specified class
+    if (!is.null(class)) {
+        add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
+        cls <- get_idd_class(private$idd_env(), class)
+        rel <- rel[J(cls$class_id), on = "class_id"]
+    }
+
+    if (!nrow(rel)) {
+        if (is.null(class)) {
+            verbose_info("Target object has no node or its nodes have no reference to other object.")
+        } else {
+            verbose_info("Target object has no node referring to any object in class ",
+                collapse(cls$class_name), "."
+            )
+        }
+        return(invisible())
+    } else {
+        rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
+        verbose_info("Target object has node(s) referring to ", nrow(rel), " object(s) [ID:",
+            collapse(rel$object_id), "].\n")
+        res <- apply2(
+            rel$object_id,
+            private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
+            IdfObject$new, list(parent = private$m_parent)
+        )
+        res <- lapply(res, add_idfobj_field_bindings)
+        setattr(res, "names", private$idf_env()$object[J(rel$object_id), on = "object_id", object_name])
+        res
+    }
+}
+# }}}
 # idfobj_has_ref {{{
-idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c("all", "ref_to", "ref_by")) {
+idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c("all", "ref_to", "ref_by", "node")) {
     type <- match.arg(type)
     if (is.null(which)) {
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), private$m_object_id,
@@ -1137,16 +1205,22 @@ idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c(
         } else if (type %in% c("all", "ref_to")) {
             add_joined_cols(private$idf_env()$object, rel$ref_to, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
             rel$ref_to <- rel$ref_to[J(cls$class_id), on = "src_class_id"]
+        } else if (type %in% c("all", "node")) {
+            add_joined_cols(private$idf_env()$object, rel$node, "object_id", "class_id")
+            rel$node <- rel$node[J(cls$class_id), on = "class_id"]
         }
     }
 
     if (type == "all") {
         rel$ref_to[, list(.N > 0 && any(!is.na(src_value_id))), by = "value_id"]$V1 |
-        rel$ref_by[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
+        rel$ref_by[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1 |
+        rel$node[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
     } else if (type == "ref_to") {
         rel$ref_to[, list(.N > 0 && any(!is.na(src_value_id))), by = "value_id"]$V1
-    } else {
+    } else if (type == "ref_by") {
         rel$ref_by[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
+    } else {
+        rel$node[, list(.N > 0 && any(!is.na(value_id))), by = "src_value_id"]$V1
     }
 }
 # }}}
@@ -1164,6 +1238,11 @@ idfobj_has_ref_from <- function (self, private) {
 # idfobj_has_ref_by {{{
 idfobj_has_ref_by <- function (self, private, which = NULL, class = NULL) {
     idfobj_has_ref(self, private, which, class, "ref_by")
+}
+# }}}
+# idfobj_has_ref_node {{{
+idfobj_has_ref_node <- function (self, private, which = NULL, class = NULL) {
+    idfobj_has_ref(self, private, which, class, "node")
 }
 # }}}
 # idfobj_to_table {{{
