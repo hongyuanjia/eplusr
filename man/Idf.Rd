@@ -53,8 +53,8 @@ model$object_unique(class)
 model$objects(which)
 model$objects_in_class(class)
 model$objects_in_group(group)
-model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = FALSE)
-model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
+model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
 model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 model$ClassName
 model[[ClassName]]
@@ -187,13 +187,17 @@ with each element being the data per class is returned. If \code{class} is
 }
 
 \section{Object Relation}{
-\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by"), recursive = TRUE)
+\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = TRUE, depth = 1L)
 }
 
 Many fields in \link{Idd} can be referred by others. For example, the \code{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
 in \code{Material} class and other material related classes. Here it means that
 the \code{Outside Layer} field \strong{refers to} the \code{Name} field and the \code{Name} field
-is \strong{referred by} the \code{Outside Layer}.
+is \strong{referred by} the \code{Outside Layer}. In EnergyPlus, there is also a
+special type of field called \code{Node}, which together with \code{Branch} and
+\code{BranchList} define the topography of the HVAC connections. A outlet node of
+a component can be referred by another component as its inlet node, but can
+also exists independently, such as zone air node.
 
 \code{$object_relation()} provides a simple interface to get this kind of
 relation. It takes a single object ID or name and also a relation direction,
@@ -222,6 +226,9 @@ easily extracted using \code{$objects_in_relation()} method described below.
 example of recursive reference: one material named \code{mat} is referred by a
 construction named \code{const}, and \code{const} is also referred by a surface named
 \code{surf}.
+\item \code{depth}: Only applicable when \code{recursive} is \code{TRUE}. This is a depth to
+when searching value relations recursively. If \code{NULL}, all recursive
+relations are returned. Default: \code{1}.
 }
 }
 
@@ -234,7 +241,7 @@ model$objects(which)
 model$object_unique(class)
 model$objects_in_class(class)
 model$objects_in_group(group)
-model$objects_in_relation(which, direction = c("ref_to", "ref_by"), class = NULL, recursive = FALSE)
+model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
 model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
 model$ClassName
 model[[ClassName]]
@@ -334,6 +341,9 @@ or "ref_by".
 material named \code{mat} is referred by a construction named \code{const}, and
 \code{const} is also referred by a surface named \code{surf}, all \code{mat}, \code{const} and
 \code{surf} are returned.
+\item \code{depth}: Only applicable when \code{recursive} is \code{TRUE}. This is a depth to
+when searching value relations recursively. If \code{NULL}, all recursive
+relations are returned. Default: \code{1}.
 \item \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}: All are directly passed to
 \link[base:grep]{base::grepl}.
 }

@@ -85,5 +85,7 @@ is_iddobject(idd_object(8.8, "Version"))
 
 is_idfobject(idf_object(idf, 1))
 
+\dontrun{
 is_epw(read_epw(download_weather("los angeles.*tmy3", type = "epw", ask = FALSE, max_match = 1)))
+}
 }
