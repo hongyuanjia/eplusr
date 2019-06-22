@@ -208,6 +208,17 @@ test_that("IdfObject class", {
                 src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
                 src_enum = 2L, dep = 0L
+            ),
+            node = data.table(
+                class_id = NA_integer_, class_name = NA_character_,
+                object_id = NA_integer_, object_name = NA_character_,
+                field_id = NA_integer_, field_index = NA_integer_, field_name = NA_character_,
+                value_id = NA_integer_, value_chr = NA_character_, value_num = NA_real_, type_enum = NA_integer_,
+                src_class_id = 90L, src_class_name = "Construction",
+                src_object_id = 2L, src_object_name = "WALL-1",
+                src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
+                src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_real_, src_type_enum = 4L,
+                src_enum = 2L, dep = 0L
             )
         )
     )
