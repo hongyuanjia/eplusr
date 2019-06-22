@@ -9,7 +9,7 @@ template:
     docsearch:
       api_key: "158ff4599f27d2efdd371e5200cdb538"
       index_name: "eplusr"
-      ganalytics: UA-141601756-1
+    ganalytics: UA-141601756-1
 
 development:
   model: auto
