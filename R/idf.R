@@ -2413,7 +2413,7 @@ idf_add_output_sqlite <- function (idf) {
         }
     } else {
         invisible(idf$add(Output_SQLite = list("SimpleAndTabular")))
-        verbose_info("Adding object `Output:SQLite` and setting ",
+        verbose_info("Adding an object in class `Output:SQLite` and setting its ",
             "`Option Type` to `SimpleAndTabular` in order to create SQLite output file.")
         added <- TRUE
     }
