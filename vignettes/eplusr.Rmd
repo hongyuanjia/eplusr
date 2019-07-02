@@ -45,8 +45,8 @@ can_run <- eplusr:::os_type() != "unknown"
 
 eplusr provides a rich toolkit of using whole building energy simulation program
 [EnergyPlus](https://energyplus.net) directly in R, which enables programmatic
-navigation, modification of EnergyPlus, conducts parametric simulations and
-retrieves outputs. More information about EnergyPlus can be found at [its
+navigation, modification of EnergyPlus models, conducts parametric simulations
+and retrieves outputs. More information about EnergyPlus can be found at [its
 website](https://energyplus.net).
 
 ## Installation
@@ -65,9 +65,9 @@ remotes::install_github("hongyuanjia/eplusr")
 ```
 
 Since running the IDF files requires EnergyPlus (https://energyplus.net),
-EnergyPlus has to be installed if you want to run EnergyPlus models in R.  There
-are helper functions in eplusr to download and install it automatically on major
-operating systems (Windows, macOS and Linux):
+EnergyPlus has to be installed before running any models. There are helper
+functions in eplusr to download and install it automatically on major operating
+systems (Windows, macOS and Linux):
 
 ```{r eplus-install, eval = FALSE}
 # install the latest version (currently v9.1.0)
@@ -79,9 +79,9 @@ eplusr::download_eplus("latest", dir = tempdir())
 ```
 
 Note that the installation process in `install_eplus()` requires
-**administrative privileges**. You have to run R with administrator (or with
-sudo if you are on macOS or Linux) to make it work if you are not in interactive
-mode.
+**administrative privileges**. If you are not in interactive mode, you have to
+run R with administrator (or with sudo if you are on macOS or Linux) to make it
+work.
 
 ```{r install_eplus, include = FALSE, eval = can_run}
 # download portable EnergyPlus
@@ -178,10 +178,10 @@ Sometimes you may just want to edit the model without installing the whole
 EnergyPlus software. You can just download the IDD file of that version using
 `download_idd()` or set `download` to `TRUE` in `use_idd()`. The code below will
 download IDD file for EnergyPlus v8.8.0, parse it and create an `Idd` object
-that will be used whenever parsing all EnergyPlus models of that version.
+that will be used whenever parsing all EnergyPlus models of version v8.8.
 
 ```{r idd_dl, eval = FALSE}
-path_idd <- download_idd(8.8)
+path_idd <- download_idd(8.8, dir = tempdir())
 use_idd(path_idd)
 
 # OR
@@ -310,7 +310,7 @@ methods it has.
 
 For example, you can get all default field values using `$field_default()`.  As
 we did not give any field index or name, a list is returned containing default
-values of all fields. The type of each value will be consistent with the field
+values of all fields. The type of each value will be consistent with field
 definition.
 
 > NOTE: For numeric fields with default values being `"autosize"` or
@@ -324,8 +324,8 @@ Please see `?IddObject` for detailed documentation on `IddObject` class.
 
 ## Get object
 
-In an `Idf`, all objects in the model are assigned with an unique `ID` according
-to their appearance sequences in the IDF file. You can find all valid `ID`s using
+In an `Idf`, each object in the model is assigned with an unique `ID` according
+to its appearance sequence in the IDF file. You can find all valid `ID`s using
 `$object_id()`.
 
 ```{r all_id}
@@ -444,9 +444,9 @@ which works on multiple objects, and the other way is using methods in
 > strictness level (`none`, `draft`, `final` or custom yours using
 > `custom_validate()`). For detailed explanations, please see `?level_checks`.
 
-`Idf` class provides 8 methods for modifying objects, including `$dup()`,
-`$add()`, `$set()`, `$del()`, `$rename()`, `$insert()`, `$load()` and
-`$paste()`.
+`Idf` class provides 9 methods for modifying objects, including `$dup()`,
+`$add()`, `$set()`, `$del()`, `$rename()`, `$insert()`, `$load()` `$update()`
+and `$paste()`.
 
 Object IDs will be appended after new objects are added, and the most-newly
 added object will always have the max ID. Object IDs will never be reused, even
@@ -505,8 +505,7 @@ model$set(
 For setting a single value, you can even write in a chain:
 
 ```{r set_chain}
-model$RunPeriod$rp_test_2$End_Day_of_Month <- 2
-model$RunPeriod$rp_test_2$End_Day_of_Month
+(model$RunPeriod$rp_test_2$End_Day_of_Month <- 2)
 ```
 
 Also, if the modified fields are referenced by fields in other objects, the
@@ -573,9 +572,27 @@ model$object_relation("new_const1")
 model$object_relation("new_const2")
 ```
 
+### Update objects
+
+Here `update` means **set**. You can use character vectors or data.frames to
+update existing objects.
+
+```{r update_chr}
+mat_chr <- model$Material$WD10$to_string()
+# change material density
+mat_chr[6] <- "600,"
+model$update(mat_chr)
+
+# extract roof construction data in a data.table
+dt <- model$Construction$`ROOF-1`$to_table()
+# modify value
+dt[1, value := "ROOF"]
+model$update(dt)
+```
+
 ### Delete object
 
-`$del()` will delete current objects specified by object IDs or names.
+`$del()` will delete objects specified by object IDs or names.
 For example, in current model, there is a material named `"MAT-CLNG-1"` in class
 `Material:NoMass`. Let's see if it has been referred by other objects.
 
@@ -625,10 +642,10 @@ eplusr_option("validate_level")
 str(level_checks("final"))
 ```
 
-In the previous section, we delete Material `MAT-CLNG-1`.
+In the previous section, we deleted a material named `MAT-CLNG-1`.
 
-The `final` validation level turns all components on. We can just trigger
-invalid reference checking using `custom_validate()` function.
+The `final` validation level turns all checking components on. We can just
+trigger invalid reference checking using `custom_validate()` function.
 
 ```{r valid}
 model$validate(custom_validate(reference = TRUE))
@@ -638,9 +655,10 @@ As we can see, the invalid reference in construction `CLNG-1` is successfully
 detected.
 
 In this example, we already knows that `CLNG-1` is the invalid object. In many
-cases, we don't know what that information in advance, we can extract
-invalid objects for different types directly using `$validate()`. Below, we
-extract all objects that have invalid reference errors.
+cases, we don't know that information in advance. As `$validate()` returns a
+list of `data.table`s, we can extract invalid objects for different types
+directly using `$validate()`. Below we extract all objects that have invalid
+reference errors.
 
 ```{r}
 (id <- model$validate()$invalid_reference$object_id)
@@ -758,13 +776,21 @@ power <- job$report_data("transformer 1", "transformer input electric power", ca
 str(power)
 ```
 
-`$tabular_data()` extracts all tabular data. For details on the meaning of each
+`$report_data()` can also directly take the whole or subset results of
+`$report_data_dict()` to extract report data. In some case this may be quite
+handy. Let's get all report variable with celsius degree unit.
+
+```{r dict_extract, eval = can_run}
+str(job$report_data(job$report_data_dict()[unit == "C"]))
+```
+
+`$tabular_data()` extracts tabular data. For details on the meaning of each
 columns, please see *"2.20.4.4 TabularData Table"* in EnergyPlus *"Output
 Details and Examples"* documentation.
 
 Now let's get the total site energy per total building area. Note that the
 `value` column in the returned `data.table` is character types, as some table
-store not just numbers.  We need to manually convert it.
+store not just numbers. We need to manually convert it.
 
 ```{r tab, eval = can_run}
 site_energy <- job$tabular_data(column_name = "energy per total building area", row_name = "total site energy")
@@ -808,7 +834,7 @@ Let's create a function that modifies infiltration rate:
 set_infil_rate <- function (idf, infil_rate) {
 
   # validate input value
-  # this is optional, as validations will be made when setting values to `Idf`
+  # this is optional, as validations will be made when setting values
   stopifnot(is.numeric(infil_rate), infil_rate >= 0)
 
   if (!idf$is_valid_class("ZoneInfiltration:DesignFlowRate"))
