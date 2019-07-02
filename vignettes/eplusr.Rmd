@@ -781,7 +781,7 @@ str(power)
 handy. Let's get all report variable with celsius degree unit.
 
 ```{r dict_extract, eval = can_run}
-str(job$report_data(job$report_data_dict()[unit == "C"]))
+str(job$report_data(job$report_data_dict()[units == "C"]))
 ```
 
 `$tabular_data()` extracts tabular data. For details on the meaning of each

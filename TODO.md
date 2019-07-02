@@ -30,11 +30,6 @@
       ShowContinueError( "..Time Zone difference=[" + RoundSigDigits( std::abs( TimeZoneNumber - WeatherFileTimeZone ), 1 ) + "] hour(s), Elevation difference=[" + RoundSigDigits( std::abs( ( Elevation - WeatherFileElevation ) / max( Elevation, 1.0 ) ) * 100.0, 2 ) + "] percent, [" + RoundSigDigits( std::abs( Elevation - WeatherFileElevation ), 2 ) + "] meters." );
   }
   ```
-* export the fun `locate_eplus()` to init eplus path
-
-* Add functionality to directly delete an object using `$<-.Idf`, such like
-  `Idf$Material$mat <- NULL`, and delete a whole class using `Idf$Material <-
-  NULL`.
 
 * Add a vignette about simulation data extraction and modifying models using
   functions.
@@ -49,9 +44,5 @@
 
 * Add validation to check if character field value input length excess 100
   characters
-
-* Add a `depth` argument in `$object_relation()` and others.
-
-* Add node support in value reference handling.
 
 * Create a RStudio Addin to insert field names in `$add()`, `$set()`.
