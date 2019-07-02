@@ -406,9 +406,11 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     }
 
     measure_wrapper <- function (idf, ...) {
-        assert(is_idf(idf))
+        assert(is_idf(idf), msg = paste0("Measure should take an `Idf` object as input, not `", class(idf)[[1]], "`."))
         idf <- idf$clone(deep = TRUE)
-        measure(idf, ...)
+        idf <- measure(idf, ...)
+        assert(is_idf(idf), msg = paste0("Measure should return an `Idf` object, not `", class(idf)[[1]], "`."))
+        idf
     }
 
     mea_nm <- deparse(substitute(measure, parent.frame()))
