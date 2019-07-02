@@ -9,7 +9,7 @@
 \usage{
 use_idd(idd, download = FALSE)
 
-download_idd(ver = "latest", dir)
+download_idd(ver = "latest", dir = ".")
 
 avail_idd()
 
@@ -34,7 +34,8 @@ whole EnergyPlus software. Default is \code{FALSE}.}
 For \code{download_idd()}, the special value \code{"latest"}, which is default,
 means the latest version.}
 
-\item{dir}{A directory to indicate where to save the IDD file.}
+\item{dir}{A directory to indicate where to save the IDD file. Default:
+current working directory.}
 }
 \value{
 \itemize{

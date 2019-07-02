@@ -83,6 +83,7 @@
   of a list.
 * Now when argument `.unqiue` is `TRUE` in `$insert()`, `$load()` and `$paste()`
   in `Idf` class, object comparison are performed case-insensitively.
+* A new default value `"."` of `dir` in `download_idd()` is add.
 
 # eplusr 0.10.2
 

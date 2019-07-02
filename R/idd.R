@@ -628,7 +628,8 @@ read_idd <- function (path) {
 #' @param ver A valid EnergyPlus version, e.g. `8`, `8.7`, `"8.7"` or `"8.7.0"`.
 #'     For `download_idd()`, the special value `"latest"`, which is default,
 #'     means the latest version.
-#' @param dir A directory to indicate where to save the IDD file.
+#' @param dir A directory to indicate where to save the IDD file. Default:
+#'     current working directory.
 #'
 #' @details
 #' `use_idd()` takes a valid version or a path of an EnergyPlus Input Data
@@ -787,7 +788,7 @@ use_idd <- function (idd, download = FALSE) {
 #' @rdname use_idd
 #' @export
 # download_idd {{{
-download_idd <- function (ver = "latest", dir) {
+download_idd <- function (ver = "latest", dir = ".") {
     ver <- standardize_ver(ver, complete = FALSE)
     assert(is_scalar(ver), is_idd_ver(ver))
 
