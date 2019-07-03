@@ -46,7 +46,7 @@ NULL
 # read_rdd {{{
 read_rdd <- function (path) {
     assert(has_ext(path, "rdd"))
-    parse_rdd_file(path)
+    parse_rdd_file(path)[]
 }
 # }}}
 
@@ -55,12 +55,12 @@ read_rdd <- function (path) {
 # read_mdd {{{
 read_mdd <- function (path) {
     assert(has_ext(path, "mdd"))
-    parse_mdd_file(path)
+    parse_rdd_file(path, mdd = TRUE)[]
 }
 # }}}
 
 # parse_rdd_file {{{
-parse_rdd_file <- function (path) {
+parse_rdd_file <- function (path, mdd = FALSE) {
     rdd <- data.table(reported_time_step = character(), report_type = character(),
         variable = character(), units = character()
     )
@@ -80,43 +80,75 @@ parse_rdd_file <- function (path) {
     # read first line
     header <- read_lines(path, nrows = 1)
 
-    if (stri_startswith_fixed(header$string, "Program Version")) {
-        rdd_head <- stri_split_fixed(header$string, ",")[[1L]]
-
-        # EnergyPlus eplus_version and eplus_build
-        ver_bld <- stri_match_first_regex(rdd_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
-        if (!is.na(ver_bld[, 2L])) eplus_version <- standardize_ver(ver_bld[, 2L])
-        if (!is.na(ver_bld[, 3L])) eplus_build <- ver_bld[, 3L]
-
-        # simulation date time
-        d <- stri_match_first_regex(rdd_head[4L], "YMD=(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2})")[, 2L]
-        if(!is.na(d)) datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
+    if (!stri_startswith_fixed(header$string, "Program Version") &&
+        !stri_startswith_fixed(header$string, "! Program Version")) {
+        type <- if (mdd) "mdd" else "rdd"
+        abort(paste0("error_invalid_", type),
+            paste0("Input file is not a valid EnergyPlus ", stri_trans_toupper(type), " file.")
+        )
     }
 
-    rdd <- tryCatch(
-        fread(path, skip = 1, sep = ",", header = TRUE, col.names = c("reported_time_step", "report_type", "variable_unit")),
-        error = function (e) {e$message <- paste0("Failed to read RDD/MDD data.\n", e$message); stop(e)}
-    )
+    rdd_head <- stri_split_fixed(header$string, ",")[[1L]]
 
-    set(rdd, NULL, c("variable", "units"), as.data.table(stri_split_fixed(rdd$variable_unit, "[", n = 2, simplify = TRUE)))
-    set(rdd, NULL, "variable_unit", NULL)
+    idf_fmt <- stri_startswith_fixed(rdd_head[[1L]], "!")
+
+    # EnergyPlus eplus_version and eplus_build
+    ver_bld <- stri_match_first_regex(rdd_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
+    if (!is.na(ver_bld[, 2L])) eplus_version <- standardize_ver(ver_bld[, 2L])
+    if (!is.na(ver_bld[, 3L])) eplus_build <- ver_bld[, 3L]
+
+    # simulation date time
+    d <- stri_match_first_regex(rdd_head[4L], "YMD=(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2})")[, 2L]
+    if(!is.na(d)) datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
+
+    if (idf_fmt) {
+        drop_num <- if (mdd) 1L else 1L:2L
+        rdd <- tryCatch(
+            fread(path, skip = 2, sep = ",", header = FALSE, drop = drop_num,
+                col.names = c("variable", "step_type_units")),
+            error = function (e) {
+                e$message <- paste0("Failed to read ", if (mdd) "MDD" else "RDD", " data.\n", e$message)
+                stop(e, call. = FALSE)
+            }
+        )
+
+        if (mdd) {
+            rdd <- unique(rdd)
+            set(rdd, NULL, "units", stri_split_fixed(rdd$step_type_units, " [", n = 2, simplify = TRUE)[, 2L])
+            set(rdd, NULL, c("reported_time_step", "report_type"), list("Zone", "Meter"))
+            set(rdd, NULL, "step_type_units", NULL)
+        } else {
+            set(rdd, NULL, c("reported_time_step", "type_units"),
+                as.data.table(
+                    stri_split_fixed(
+                        stri_split_fixed(rdd$step_type_units, "!- ", n = 2, simplify = TRUE)[, 2L],
+                        " ", n = 2, simplify = TRUE
+                    )
+                )
+            )
+            set(rdd, NULL, c("report_type", "units"), as.data.table(stri_split_fixed(rdd$type_units, " [", n = 2, simplify = TRUE)))
+            set(rdd, NULL, c("step_type_units", "type_units"), NULL)
+        }
+    } else {
+        rdd <- tryCatch(
+            fread(path, skip = 1, sep = ",", header = TRUE, col.names = c("reported_time_step", "report_type", "variable_unit")),
+            error = function (e) {e$message <- paste0("Failed to read RDD/MDD data.\n", e$message); stop(e)}
+        )
+        set(rdd, NULL, c("variable", "units"), as.data.table(stri_split_fixed(rdd$variable_unit, " [", n = 2, simplify = TRUE)))
+        set(rdd, NULL, "variable_unit", NULL)
+    }
+
     set(rdd, NULL, "units", stri_sub(rdd$units, to = -2L))
     rdd[stri_isempty(units), `:=`(units = NA_character_)]
+    setcolorder(rdd, c("reported_time_step", "report_type", "variable", "units"))
 
     setattr(rdd, "eplus_version", eplus_version)
     setattr(rdd, "eplus_build", eplus_build)
     setattr(rdd, "datetime", datetime)
-    setattr(rdd, "class", c("RddFile", class(rdd)))
+    cls <- if (mdd) "MddFile" else "RddFile"
+    setattr(rdd, "class", c(cls, class(rdd)))
 
-    rdd[]
-}
-# }}}
-
-# parse_mdd_file {{{
-parse_mdd_file <- function (path) {
-    mdd <- parse_rdd_file(path)
-    setattr(mdd, "class", c("MddFile", class(mdd)))
-    mdd[]
+    rdd
 }
 # }}}
 
