@@ -77,6 +77,8 @@
 * Now `$to_table()` in `Idf` class will keep the input object order.
 * Now `$set()` method in `IdfObject` can successfully delete fields when field
   values are set to `NULL`.
+* Now `$run()` method in `Idf` will use the correct model path to run
+  simulation.
 
 ## Minor changes
 

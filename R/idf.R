@@ -2313,10 +2313,14 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     old <- private$m_log$job
     if (!inherits(old, "EplusJob")) {
         private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
+    # recreate job if the model has been changed since last ran
+    } else if (
+        normalizePath(path_idf, mustWork = FALSE) !=
+        normalizePath(private$m_log$job$path("idf"), mustWork = FALSE)){
+        private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
     }
 
     private$m_log$job$run(wait = wait, force = force)
-    private$m_log$job
 }
 # }}}
 # idf_print {{{
