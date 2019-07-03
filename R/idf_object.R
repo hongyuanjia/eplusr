@@ -994,7 +994,7 @@ idfobj_set <- function (self, private, ..., .default = TRUE) {
     set <- set_idfobj_value(private$idd_env(), private$idf_env(),
         private$m_object_id, ..., .default = .default
     )
-    merge_idf_data(private$idf_env(), set)
+    merge_idf_data(private$idf_env(), set, by_object = TRUE)
 
     # log
     log_add_order(private$log_env(), set$object$object_id)

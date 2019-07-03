@@ -2714,7 +2714,7 @@ remove_empty_fields <- function (val) {
                     if (all(rev_field_rleid == rev(seq.int(.N)))) {
                         list(value_id = value_id)
                     } else {
-                        list(vlaue_id = NA_integer_)
+                        list(value_id = NA_integer_)
                     }
                 }
             }

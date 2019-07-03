@@ -75,6 +75,8 @@
 * Now `$del()` method in `Idf` class works correctly with multiple inputs.
 * Now trailing comments in IDF will be removed in `read_idf()`.
 * Now `$to_table()` in `Idf` class will keep the input object order.
+* Now `$set()` method in `IdfObject` can successfully delete fields when field
+  values are set to `NULL`.
 
 ## Minor changes
 
