@@ -2446,6 +2446,7 @@ idf_add_output_sqlite <- function (idf) {
 #'
 #' @return An [Idf] object.
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' # example model shipped with eplusr from EnergyPlus v8.8
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 #'

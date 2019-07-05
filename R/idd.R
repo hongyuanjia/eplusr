@@ -187,6 +187,7 @@ NULL
 #' tag and total class number.
 #'
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' # get the Idd object of EnergyPlus v8.8
 #' idd <- use_idd(8.8, download = "auto")
 #'

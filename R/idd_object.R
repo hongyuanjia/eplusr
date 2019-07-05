@@ -377,6 +377,7 @@ NULL
 #' * `brief`: If `TRUE`, only class name part is printed. Default: `FALSE`.
 #'
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' # ===== CREATE =====
 #' # get a parent Idd object
 #' idd <- use_idd(8.8, download = "auto")

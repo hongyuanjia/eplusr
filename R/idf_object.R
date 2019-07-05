@@ -452,6 +452,7 @@ NULL
 #'
 #' @importFrom R6 R6Class
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' # read an IDF file
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
 #'     idd = use_idd(8.8, download = "auto"))
