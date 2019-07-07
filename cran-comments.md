@@ -1,10 +1,14 @@
 # Version 0.10.3
 
-This version eliminates the checking notes of `"for non-standard things in the
-check directory"` caused by examples that download files from EnergyPlus
+This is a resubmission of v0.10.3. Previous submission failed to pass CRAN
+pretest due to a NOTE caused by using more than 2 cores in examples. In this
+submission, I explicitly limit the maximum cores to be used in exammples to 2.
+
+This version also eliminates the checking notes of `"for non-standard things in
+the check directory"` caused by examples that download files from EnergyPlus
 website.
 
-## Round 1
+## Resubmission
 
 ### Test environments
 
