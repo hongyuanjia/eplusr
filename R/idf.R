@@ -1117,6 +1117,7 @@ NULL
 #'   grouped and ordered by classes. Default: `TRUE`.
 #'
 #' @examples
+#' \dontrun{
 #' # ===== CREATE =====
 #' # read an IDF file
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
@@ -1226,7 +1227,6 @@ NULL
 #' names(idf$search_object("r\\d", ignore.case = TRUE, class = "Construction"))
 #'
 #' # ===== DUPLICATE OBJECTS =====
-#' \dontrun{
 #' # duplicate objects in "Construction" class
 #' names(idf$Construction)
 #' idf$dup("R13WALL")
@@ -1240,10 +1240,8 @@ NULL
 #'
 #' # duplicate an object multiple times
 #' idf$dup(rep("R13WALL", times = 10))
-#' }
 #'
 #' # ===== ADD OBJECTS =====
-#' \dontrun{
 #' # add two new objects in "RunPeriod" class
 #' idf$add(
 #'     RunPeriod = list("rp_test_1", 1, 1, 2, 1,
@@ -1258,10 +1256,9 @@ NULL
 #'         .comment = "Comment for new object 2"
 #'      )
 #' )
-#' }
+#'
 #'
 #' # ===== INSERT OBJECTS =====
-#' \dontrun{
 #' # insert objects from other Idf object
 #' idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
 #'     idd = use_idd(8.8, download = "auto"))
@@ -1281,10 +1278,8 @@ NULL
 #'
 #' # $insert() is useful when importing design days from a ".ddy" file
 #' idf$insert(read_idf("foo.ddy"))
-#' }
 #'
 #' # ===== SET OBJECTS =====
-#' \dontrun{
 #' # set the thickness of newly inserted material "test" to 0.2 m
 #' idf$set(test = list(thickness = 0.2))
 #' idf$Material$test$Thickness
@@ -1304,16 +1299,13 @@ NULL
 #'
 #' # check results
 #' lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
-#' }
+#'
 #'
 #' # ===== RENAME OBJECTS =====
-#' \dontrun{
 #' idf$rename(new_test = "test")
 #' idf$object_name("Material")
-#' }
 #'
 #' # ===== DELELTE OBJECTS =====
-#' \dontrun{
 #' # delete the added run period "rp_test_1", "rp_test_2" and "new_test" from above
 #' idf$del(c("new_test", "rp_test_1", "rp_test_2"))
 #' names(idf$Material)
@@ -1335,7 +1327,6 @@ NULL
 #'
 #' # it is possible to force delete objects
 #' idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)
-#' }
 #'
 #' # ===== SEARCH ADN REPLACE OBJECT VALUES =====
 #' # get objects whose field values contains both "VAV" and "Node"
@@ -1344,10 +1335,9 @@ NULL
 #' names(idf$search_value("WALL"))
 #'
 #' # replace values using regular expression
-#' \dontrun{idf$replace_value("WALL", "A_WALL")}
+#' idf$replace_value("WALL", "A_WALL")
 #'
 #' # ===== VALIDATE MODEL =====
-#' \dontrun{
 #' # check if there are errors in current model
 #' idf$validate()
 #' idf$is_valid()
@@ -1371,7 +1361,7 @@ NULL
 #' idf$set(..16 = list(outside_layer = idf$Material[[1]]$name()))
 #' idf$validate()
 #' idf$is_valid()
-#' }
+#'
 #' # ===== FORMAT MODEL =====
 #' # get text format of the model
 #' head(idf$to_string())
@@ -1383,7 +1373,6 @@ NULL
 #' # check if the model has been modified since read or last saved
 #' idf$is_unsaved()
 #'
-#' \dontrun{
 #' # save and overwrite current model
 #' idf$save(overwrite = TRUE)
 #'
@@ -1399,10 +1388,8 @@ NULL
 #'
 #' # the path of this model will be changed to the saved path
 #' idf$path()
-#' }
 #'
 #' # ===== CLONE MODEL =====
-#' \dontrun{
 #' # Idf object are modified in place and has reference semantic.
 #' idf_2 <- idf
 #' idf_2$object_name("Building")
@@ -1419,10 +1406,8 @@ NULL
 #' idf_3$object_name("Building")
 #'
 #' idf$object_name("Building")
-#' }
 #'
 #' # ===== RUN MODEL =====
-#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'
 #'     # save the model to tempdir()
@@ -1460,9 +1445,8 @@ NULL
 #'     # get simulation results
 #'     job$report_data()
 #' }
-#' }
+#'
 #' # ===== PRINT MODEL =====
-#' \dontrun{
 #' idf$print("group")
 #' idf$print("class")
 #' idf$print("object")
@@ -2446,35 +2430,25 @@ idf_add_output_sqlite <- function (idf) {
 #'
 #' @return An [Idf] object.
 #' @examples
-#' \dontshow{data.table::setDTthreads(2)}
+#' \dontrun{
 #' # example model shipped with eplusr from EnergyPlus v8.8
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 #'
 #' # if neither EnergyPlus v8.8 nor Idd v8.8 was found, error will occur
-#' is_avail_eplus(8.8)
-#'
-#' is_avail_idd(8.8)
-#'
-#' \dontrun{(read_idf(idf_path))}
-#'
 #' # if EnergyPlus v8.8 is found but Idd v8.8 was not, `Energy+.idd` in EnergyPlus
 #' # installation folder will be used for pasing
+#' # if Idd v8.8 is found, it will be used automatically
 #' is_avail_eplus(8.8)
 #' is_avail_idd(8.8)
 #'
-#' \dontrun{read_idf(idf_path)}
-#'
-#' # if Idd v8.8 is found, it will be used automatically
-#' is_avail_idd(8.8)
-#'
-#' \dontrun{read_idf(idf_path)}
+#' read_idf(idf_path)
 #'
 #' # argument `idd` can be specified explicitly using `use_idd()`
-#' \dontrun{read_idf(idf_path, idd = use_idd(8.8))}
+#' read_idf(idf_path, idd = use_idd(8.8))
 #'
 #' # you can set `download` arugment to "auto" in `use_idd()` if you want to
 #' # automatically download corresponding IDD file when necessary
-#' \dontrun{read_idf(idf_path, use_idd(8.8, download = "auto"))}
+#' read_idf(idf_path, use_idd(8.8, download = "auto"))
 #'
 #' # Besides use a path to an IDF file, you can also provide IDF in literal
 #' # string format
@@ -2485,7 +2459,8 @@ idf_add_output_sqlite <- function (idf) {
 #'         Building;                !- Name
 #'     "
 #'
-#' \dontrun{read_idf(idf_string, use_idd(8.8, download = "auto"))}
+#' read_idf(idf_string, use_idd(8.8, download = "auto"))
+#' }
 #' @seealso [Idf] class for modifying EnergyPlus model. [use_idd()] and
 #' [download_idd()] for downloading and parsing EnergyPlus IDD file.
 #' [use_eplus()] for configuring which version of EnergyPlus to use.

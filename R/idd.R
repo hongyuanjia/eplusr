@@ -187,7 +187,7 @@ NULL
 #' tag and total class number.
 #'
 #' @examples
-#' \dontshow{data.table::setDTthreads(2)}
+#' \dontrun{
 #' # get the Idd object of EnergyPlus v8.8
 #' idd <- use_idd(8.8, download = "auto")
 #'
@@ -236,7 +236,7 @@ NULL
 #'
 #' # Get empty Material object and Construction object in a character vector
 #' idd$to_string(c("Material", "Construction"))
-#'
+#' }
 #' @docType class
 #' @name Idd
 #' @seealso [IddObject] class which provides detailed information of

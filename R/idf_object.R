@@ -452,7 +452,7 @@ NULL
 #'
 #' @importFrom R6 R6Class
 #' @examples
-#' \dontshow{data.table::setDTthreads(2)}
+#' \dontrun{
 #' # read an IDF file
 #' idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
 #'     idd = use_idd(8.8, download = "auto"))
@@ -538,7 +538,6 @@ NULL
 #' mat$Thickness
 #'
 #' # check validate
-#' \dontrun{
 #' mat$validate()
 #' mat$is_valid()
 #'
@@ -560,7 +559,6 @@ NULL
 #'
 #' # check if having any referenced objects or is referenced by other objects
 #' mat$has_ref()
-#' }
 #'
 #' # get all object data in a data.table format without field units
 #' str(mat$to_table(unit = FALSE))
@@ -591,6 +589,7 @@ NULL
 #' # print the object, and auto separate field values and field names at the
 #' # largetst character length of field values
 #' mat$print(auto_sep = TRUE)
+#' }
 #' @docType class
 #' @name IdfObject
 #' @seealso [Idf] class

@@ -263,7 +263,7 @@ NULL
 #' * Choice:
 #'   - "Key1"
 #'   - "Key2"
-#' 
+#'
 #' -- 2: Field 2 ----------
 #' * Auto value: "Autosize"
 #' * Default: 2
@@ -377,7 +377,7 @@ NULL
 #' * `brief`: If `TRUE`, only class name part is printed. Default: `FALSE`.
 #'
 #' @examples
-#' \dontshow{data.table::setDTthreads(2)}
+#' \dontrun{
 #' # ===== CREATE =====
 #' # get a parent Idd object
 #' idd <- use_idd(8.8, download = "auto")
@@ -481,13 +481,11 @@ NULL
 #' # get field ranges
 #' mat$field_range(c("roughness", "thickness", "conductivity", "solar_absorptance"))
 #'
-#' \dontrun{
 #' # get field relation with other fields
 #' mat$field_relation(type = "all")
 #'
 #' # get all possible values of fields
 #' mat$field_possible()
-#' }
 #'
 #' # check if input is a valid field number for current class
 #' ## get required minimum field number
@@ -544,7 +542,6 @@ NULL
 #' # check if fields are required, i.e. field values should not be empty
 #' mat$is_required_field(c("name", "roughness", "solar_absorptance"))
 #'
-#' \dontrun{
 #' # check if fields refer to or can be referred by other fields
 #' mat$has_ref()
 #'
@@ -553,7 +550,6 @@ NULL
 #'
 #' # check if fields can be referred by other fields
 #' mat$has_ref_by(which = NULL)
-#' }
 #'
 #' # ===== DATA EXTRACTION =====
 #' # get core data of current class
@@ -564,7 +560,7 @@ NULL
 #'
 #' # ===== PRINT =====
 #' mat$print()
-#'
+#' }
 #' @docType class
 #' @name IddObject
 #' @seealso [Idd] Class
