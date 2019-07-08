@@ -1106,6 +1106,7 @@ grouped and ordered by classes. Default: \code{TRUE}.
 }
 
 \examples{
+\dontrun{
 # ===== CREATE =====
 # read an IDF file
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
@@ -1215,7 +1216,6 @@ length(idf$search_object("r\\\\d", ignore.case = TRUE, class = "Construction"))
 names(idf$search_object("r\\\\d", ignore.case = TRUE, class = "Construction"))
 
 # ===== DUPLICATE OBJECTS =====
-\dontrun{
 # duplicate objects in "Construction" class
 names(idf$Construction)
 idf$dup("R13WALL")
@@ -1229,10 +1229,8 @@ idf$dup(My_R13Wall = "R13WALL")
 
 # duplicate an object multiple times
 idf$dup(rep("R13WALL", times = 10))
-}
 
 # ===== ADD OBJECTS =====
-\dontrun{
 # add two new objects in "RunPeriod" class
 idf$add(
     RunPeriod = list("rp_test_1", 1, 1, 2, 1,
@@ -1247,10 +1245,23 @@ idf$add(
         .comment = "Comment for new object 2"
      )
 )
-}
+
+# ===== LOAD OBJECTS =====
+# load objects from character vector
+idf$load("RunPeriod, rp_test_3, 1, 1, 2, 1;")
+
+# load objects from data.frames
+dt <- idf$definition("RunPeriod")$to_table()
+
+## (a) values can be supplied as characters
+dt[1:5, value := c("rp_test_4", "2", "1", "3", "1")]
+idf$load(dt)
+
+## (b) values can be supplied as list
+dt[1:5, value := list("rp_test_5", 3, 1, 4, 1)]
+idf$load(dt)
 
 # ===== INSERT OBJECTS =====
-\dontrun{
 # insert objects from other Idf object
 idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
     idd = use_idd(8.8, download = "auto"))
@@ -1270,10 +1281,8 @@ idf$object_name("Material")
 
 # $insert() is useful when importing design days from a ".ddy" file
 idf$insert(read_idf("foo.ddy"))
-}
 
 # ===== SET OBJECTS =====
-\dontrun{
 # set the thickness of newly inserted material "test" to 0.2 m
 idf$set(test = list(thickness = 0.2))
 idf$Material$test$Thickness
@@ -1293,16 +1302,20 @@ idf$set(val)
 
 # check results
 lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
-}
+
+# ===== UPDATE OBJECTS =====
+# update roughness of new added material "test" to "Smooth"
+idf$update("Material, test, smooth;")
+
+# update solar absorptance of all materials to 0.8
+dt <- idf$to_table(class = "Material", string_value = TRUE)
+idf$update(dt[field == "Solar Absorptance", value := "0.8"])
 
 # ===== RENAME OBJECTS =====
-\dontrun{
 idf$rename(new_test = "test")
 idf$object_name("Material")
-}
 
 # ===== DELELTE OBJECTS =====
-\dontrun{
 # delete the added run period "rp_test_1", "rp_test_2" and "new_test" from above
 idf$del(c("new_test", "rp_test_1", "rp_test_2"))
 names(idf$Material)
@@ -1324,7 +1337,6 @@ idf$del("R13LAYER", .ref_by = TRUE) # will give an error in "final" validate lev
 
 # it is possible to force delete objects
 idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)
-}
 
 # ===== SEARCH ADN REPLACE OBJECT VALUES =====
 # get objects whose field values contains both "VAV" and "Node"
@@ -1333,10 +1345,9 @@ length(idf$search_value("WALL"))
 names(idf$search_value("WALL"))
 
 # replace values using regular expression
-\dontrun{idf$replace_value("WALL", "A_WALL")}
+idf$replace_value("WALL", "A_WALL")
 
 # ===== VALIDATE MODEL =====
-\dontrun{
 # check if there are errors in current model
 idf$validate()
 idf$is_valid()
@@ -1360,7 +1371,7 @@ idf$validate()$invalid_reference$object_id
 idf$set(..16 = list(outside_layer = idf$Material[[1]]$name()))
 idf$validate()
 idf$is_valid()
-}
+
 # ===== FORMAT MODEL =====
 # get text format of the model
 head(idf$to_string())
@@ -1372,7 +1383,6 @@ head(idf$to_string(comment = FALSE, header = FALSE))
 # check if the model has been modified since read or last saved
 idf$is_unsaved()
 
-\dontrun{
 # save and overwrite current model
 idf$save(overwrite = TRUE)
 
@@ -1388,10 +1398,8 @@ idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
 
 # the path of this model will be changed to the saved path
 idf$path()
-}
 
 # ===== CLONE MODEL =====
-\dontrun{
 # Idf object are modified in place and has reference semantic.
 idf_2 <- idf
 idf_2$object_name("Building")
@@ -1408,10 +1416,8 @@ idf_3$Building$set(name = "Building_Name_Changed_Again")
 idf_3$object_name("Building")
 
 idf$object_name("Building")
-}
 
 # ===== RUN MODEL =====
-\dontrun{
 if (is_avail_eplus(8.8)) {
 
     # save the model to tempdir()
@@ -1449,9 +1455,8 @@ if (is_avail_eplus(8.8)) {
     # get simulation results
     job$report_data()
 }
-}
+
 # ===== PRINT MODEL =====
-\dontrun{
 idf$print("group")
 idf$print("class")
 idf$print("object")

@@ -565,7 +565,6 @@ NULL
 #' source, WMO station, leap year indicator, interval and data periods.
 #'
 #' @examples
-#' \dontshow{data.table::setDTthreads(2)}
 #' \dontrun{
 #' # read an EPW file from EnergyPlus website
 #' path_base <- "https://energyplus.net/weather-download"

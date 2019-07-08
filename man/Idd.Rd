@@ -195,6 +195,7 @@ tag and total class number.
 }
 
 \examples{
+\dontrun{
 # get the Idd object of EnergyPlus v8.8
 idd <- use_idd(8.8, download = "auto")
 
@@ -243,7 +244,7 @@ idd$to_table(c("Material", "Construction"))
 
 # Get empty Material object and Construction object in a character vector
 idd$to_string(c("Material", "Construction"))
-
+}
 }
 \references{
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor},

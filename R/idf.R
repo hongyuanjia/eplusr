@@ -1257,6 +1257,20 @@ NULL
 #'      )
 #' )
 #'
+#' # ===== LOAD OBJECTS =====
+#' # load objects from character vector
+#' idf$load("RunPeriod, rp_test_3, 1, 1, 2, 1;")
+#'
+#' # load objects from data.frames
+#' dt <- idf$definition("RunPeriod")$to_table()
+#'
+#' ## (a) values can be supplied as characters
+#' dt[1:5, value := c("rp_test_4", "2", "1", "3", "1")]
+#' idf$load(dt)
+#'
+#' ## (b) values can be supplied as list
+#' dt[1:5, value := list("rp_test_5", 3, 1, 4, 1)]
+#' idf$load(dt)
 #'
 #' # ===== INSERT OBJECTS =====
 #' # insert objects from other Idf object
@@ -1300,6 +1314,13 @@ NULL
 #' # check results
 #' lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
 #'
+#' # ===== UPDATE OBJECTS =====
+#' # update roughness of new added material "test" to "Smooth"
+#' idf$update("Material, test, smooth;")
+#'
+#' # update solar absorptance of all materials to 0.8
+#' dt <- idf$to_table(class = "Material", string_value = TRUE)
+#' idf$update(dt[field == "Solar Absorptance", value := "0.8"])
 #'
 #' # ===== RENAME OBJECTS =====
 #' idf$rename(new_test = "test")

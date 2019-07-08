@@ -458,6 +458,7 @@ largest character length of values. Default: \code{FALSE}.
 }
 
 \examples{
+\dontrun{
 # read an IDF file
 idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
     idd = use_idd(8.8, download = "auto"))
@@ -543,7 +544,6 @@ mat[["Thickness"]] <- 0.019
 mat$Thickness
 
 # check validate
-\dontrun{
 mat$validate()
 mat$is_valid()
 
@@ -565,7 +565,6 @@ mat$has_ref_by()
 
 # check if having any referenced objects or is referenced by other objects
 mat$has_ref()
-}
 
 # get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))
@@ -596,6 +595,7 @@ mat$print(comment = FALSE)
 # print the object, and auto separate field values and field names at the
 # largetst character length of field values
 mat$print(auto_sep = TRUE)
+}
 }
 \seealso{
 \link{Idf} class
