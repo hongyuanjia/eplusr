@@ -707,6 +707,7 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
         # number.
         } else {
             get_type <- function (x) {
+                if (is.null(x)) return(3L)
                 if (!is_scalar(x)) return(0L)
                 if (is.numeric(x)) 1L else if (is.character(x)) 2L else 0L
             }
@@ -722,6 +723,9 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
                     )
                 )
             }
+
+            # change NULL to NA
+            dt$value[type == 3] <- NA_character_
 
             # change empty strings to NA
             value_chr <- unlist(dt$value, use.names = FALSE)
