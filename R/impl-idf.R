@@ -2024,7 +2024,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
         set(get_idf_object(idd_env[[1L]], idf_env[[1L]], object = object_id, property = "has_name"),
             NULL, c("rleid"), list(object_rleid)
         )
-        )), by = "object_rleid"]$V1
+        )), by = "uuid"]$V1
     obj <- rbindlist(obj)
 
     # stop of trying to add Version object
@@ -2039,11 +2039,10 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
     prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
         "required_field", "src_enum", "type_enum", "extensible_group"
     )
-    val <- input[, list(list(
-        set(get_idf_value(idd_env[[1L]], idf_env[[1L]], object = object_id, complete = TRUE, property = prop),
-            NULL, "rleid", object_rleid
-        )
-        )), by = "object_rleid"]$V1
+    val <- input[, list(list({
+        val_per <- get_idf_value(idd_env[[1L]], idf_env[[1L]], object = object_id, complete = TRUE, property = prop)
+        set(val_per, NULL, "rleid", rep(unique(object_rleid), table(val_per$rleid)))
+    })), by = "uuid"]$V1
     val <- rbindlist(val)
     # update name field
     val[is_name == TRUE, `:=`(value_chr = obj$object_name[obj$has_name], value_num = NA_real_)]
