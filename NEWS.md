@@ -1,5 +1,9 @@
 # eplusr 0.10.3.9000
 
+## Bug fixes
+
+* Fix the error in `$set()` when `$add_unit()` is performed in Epw class (#56).
+
 # eplusr 0.10.3
 
 ## New features

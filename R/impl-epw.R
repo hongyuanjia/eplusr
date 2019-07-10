@@ -1883,8 +1883,9 @@ find_epw_data_abnormal_line <- function (epw_data, offset = 0L, warning = FALSE,
         mes_first <- NULL
 
         for (name in names(miss)) {
-            m <- ln[!in_range(get(name), EPW_RANGE_EXIST[[name]])]
-            r <- setdiff(ln[!in_range(get(name), EPW_RANGE_VALID[[name]])], m)
+            val <- if (inherits(get(name), "units")) units::drop_units(get(name)) else get(name)
+            m <- ln[!in_range(val, EPW_RANGE_EXIST[[name]])]
+            r <- setdiff(ln[!in_range(val, EPW_RANGE_VALID[[name]])], m)
             if (name %in% rpt_miss && length(m)) {
                 mes_miss <- c(mes_miss, paste0(gsub("_", " ", name, fixed = TRUE), " is missing"))
             }
