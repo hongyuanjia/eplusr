@@ -1,8 +1,22 @@
 # eplusr 0.10.3.9000
 
+## New features
+
+* A new method `$models()` has been added in `ParametricJob` class. It returns a
+  list of all parametric models generated after a measure has been applied. If
+  no measure is applied, `NULL` is returned (#59). Thanks @yidan1214 for this
+  feature request.
+
 ## Bug fixes
 
 * Fix the error in `$set()` when `$add_unit()` is performed in Epw class (#56).
+* Now IDF file located in a folder whose name contains spaces can be
+  successfully simulated (#60). Thanks @yidan1214 for reporting this bug.
+
+## Minor changes
+
+* Describe on how the arguments are matched in `$apply_measure()` (#57). Thanks
+  @yidan1214 for pointing this out.
 
 # eplusr 0.10.3
 

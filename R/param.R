@@ -20,7 +20,7 @@ NULL
 #' param <- param_job(idf, epw)
 #' param$version()
 #' param$seed()
-#' param$weater()
+#' param$weather()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 #' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' param$kill()
@@ -78,6 +78,20 @@ NULL
 #'   `measure`.
 #' * `.names`: A character vector of the names of parametric `Idf`s. If `NULL`,
 #'     the new `Idf`s will be named in format `measure_name + number`.
+#'
+#' @section Extract models:
+#' ```
+#' param$models()
+#' ```
+#'
+#' `$models()` returns a list of parametric models generated using input [Idf]
+#' object and `$apply_measure()` method. Model names are assigned in the same
+#' way as the `.names` arugment in `$apply_measure()`. If no measure has been
+#' applied, `NULL` is returned. Note that it is not recommended to conduct any
+#' extra modification on those models directly, after they were created using
+#' `$apply_measure()`, as this may lead to an un-reproducible process. A warning
+#' message will be issued if any of those models has been modified when running
+#' simulations.
 #'
 #' @section Run and Collect Results:
 #' ```
@@ -321,6 +335,9 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         seed = function ()
             param_seed(self, private),
 
+        models = function ()
+            param_models(self, private),
+
         weather = function ()
             param_weather(self, private),
 
@@ -393,6 +410,11 @@ param_seed <- function (self, private) {
     private$m_idf
 }
 # }}}
+# param_models {{{
+param_models <- function (self, private) {
+    private$m_param
+}
+# }}}
 # param_weather {{{
 param_weather <- function (self, private) {
     private$m_epw
@@ -428,12 +450,15 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
         )
 
         nms <- as.character(.names)
-        out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")))
+        out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")), unique = TRUE)
     }
 
     setattr(out, "names", out_nms)
 
     private$m_param <- out
+
+    # log unique ids
+    private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
     message("Measure ", surround(mea_nm), " has been applied with ", length(out),
         " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
@@ -554,8 +579,25 @@ param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
 # }}}
 # param_run {{{
 param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
-    if (is.null(private$m_param))
-        stop("No measure has been applied.", call. = FALSE)
+    if (is.null(private$m_param)) {
+        abort("error_no_measured_applied", "No measure has been applied.")
+    }
+
+    # check if generated models have been modified outside
+    uuid <- vapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid, character(1))
+    if (any(uuid != private$m_log$uuid)) {
+        warn("warn_param_modified",
+            paste0(
+                "Some of the parametric models have been modified after created using `$apply_measure()`. ",
+                "Running these models will result in simulation outputs that may be not reproducible. ",
+                "It is recommended to re-apply your original measure using `$apply_measure()` and call `$run()` again. ",
+                "Models that have been modified are listed below:\n",
+                paste0(" # ", seq_along(uuid)[uuid != private$m_log$uuid]," | ",
+                    names(uuid)[uuid != private$m_log$uuid], collapse = "\n"
+                )
+            )
+        )
+    }
 
     ver <- private$m_idf$version()
 

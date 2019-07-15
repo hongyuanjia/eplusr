@@ -19,7 +19,7 @@ automatically created if it does not exists, like \link{Idf} class does.
 \preformatted{param <- param_job(idf, epw)
 param$version()
 param$seed()
-param$weater()
+param$weather()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 param$kill()
@@ -80,6 +80,20 @@ returns an \code{Idf} object as output.
 \item \code{.names}: A character vector of the names of parametric \code{Idf}s. If \code{NULL},
 the new \code{Idf}s will be named in format \code{measure_name + number}.
 }
+}
+
+\section{Extract models}{
+\preformatted{param$models()
+}
+
+\code{$models()} returns a list of parametric models generated using input \link{Idf}
+object and \code{$apply_measure()} method. Model names are assigned in the same
+way as the \code{.names} arugment in \code{$apply_measure()}. If no measure has been
+applied, \code{NULL} is returned. Note that it is not recommended to conduct any
+extra modification on those models directly, after they were created using
+\code{$apply_measure()}, as this may lead to an un-reproducible process. A warning
+message will be issued if any of those models has been modified when running
+simulations.
 }
 
 \section{Run and Collect Results}{
