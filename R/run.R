@@ -687,7 +687,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     # run energyplus
     proc <- processx::process$new(command = eplus, args = args, wd = dirname(model),
-        cleanup = TRUE, windows_verbatim_args = TRUE,
+        cleanup = TRUE, windows_verbatim_args = FALSE,
         stdout = "|", stderr = "|", post_process = function () Sys.time()
     )
 
