@@ -67,15 +67,16 @@ param$weather()
 \code{$apply_measure()} allows to apply a measure to an \link{Idf} and creates
 parametric models for analysis. Basically, a measure is just a function that
 takes an \link{Idf} object and other arguments as input, and returns a modified
-\link{Idf} object as output. Use \code{...} to supply different arguments to that
-measure. Under the hook, \code{\link[base:mapply]{base::mapply()}} is used to create multiple \link{Idf}s
-according to the input values.
+\link{Idf} object as output. Use \code{...} to supply different arguments, \strong{except for
+the first \code{Idf} argument}, to that measure. Under the hook, \code{\link[base:mapply]{base::mapply()}}
+is used to create multiple \link{Idf}s according to the input values.
 
 \strong{Arguments}
 \itemize{
 \item \code{measure}: A function that takes an \code{Idf} and other arguments as input and
 returns an \code{Idf} object as output.
-\item \code{...}: Other arguments passed to that \code{measure}.
+\item \code{...}: Arguments \strong{except first \code{Idf} argument} that are passed to that
+\code{measure}.
 \item \code{.names}: A character vector of the names of parametric \code{Idf}s. If \code{NULL},
 the new \code{Idf}s will be named in format \code{measure_name + number}.
 }

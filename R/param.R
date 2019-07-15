@@ -66,15 +66,16 @@ NULL
 #' `$apply_measure()` allows to apply a measure to an [Idf] and creates
 #' parametric models for analysis. Basically, a measure is just a function that
 #' takes an [Idf] object and other arguments as input, and returns a modified
-#' [Idf] object as output. Use `...` to supply different arguments to that
-#' measure. Under the hook, [base::mapply()] is used to create multiple [Idf]s
-#' according to the input values.
+#' [Idf] object as output. Use `...` to supply different arguments, **except for
+#' the first `Idf` argument**, to that measure. Under the hook, [base::mapply()]
+#' is used to create multiple [Idf]s according to the input values.
 #'
 #' **Arguments**
 #'
 #' * `measure`: A function that takes an `Idf` and other arguments as input and
 #'     returns an `Idf` object as output.
-#' * `...`: Other arguments passed to that `measure`.
+#' * `...`: Arguments **except first `Idf` argument** that are passed to that
+#'   `measure`.
 #' * `.names`: A character vector of the names of parametric `Idf`s. If `NULL`,
 #'     the new `Idf`s will be named in format `measure_name + number`.
 #'
