@@ -64,6 +64,23 @@ test_that("Parametric methods", {
     # expect_error(param$errors(), "job was terminated before")
     # expect_error(param$locate_output(), "job was terminated before")
 
+    # Save {{{
+    expect_silent(paths <- param$save())
+    expect_equal(paths,
+        data.table::data.table(
+            model = normalizePath(file.path(tempdir(), paste0("set_infil_rate_", 1:5), paste0("set_infil_rate_", 1:5, ".idf"))),
+            weather = normalizePath(file.path(tempdir(), paste0("set_infil_rate_", 1:5), basename(param$weather()$path())))
+        )
+    )
+    expect_silent(paths <- param$save(separate = FALSE))
+    expect_equal(paths,
+        data.table::data.table(
+            model = normalizePath(file.path(tempdir(), paste0("set_infil_rate_", 1:5, ".idf"))),
+            weather = normalizePath(file.path(tempdir(), basename(param$weather()$path())))
+        )
+    )
+    # }}}
+
     # Run and Status {{{
 
     # Can detect if models are modified before running

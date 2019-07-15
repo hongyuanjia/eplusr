@@ -21,6 +21,7 @@ param$version()
 param$seed()
 param$weather()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
+param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
 param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 param$kill()
 param$status()
@@ -84,6 +85,7 @@ the new \code{Idf}s will be named in format \code{measure_name + number}.
 
 \section{Extract models}{
 \preformatted{param$models()
+param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
 }
 
 \code{$models()} returns a list of parametric models generated using input \link{Idf}
@@ -94,6 +96,29 @@ extra modification on those models directly, after they were created using
 \code{$apply_measure()}, as this may lead to an un-reproducible process. A warning
 message will be issued if any of those models has been modified when running
 simulations.
+
+\code{$save()} saves all parametric models in specified folder. An error will be
+issued if no measure has been applied. \code{$save()} returns a
+\link[data.table:data.table]{data.table} with two columns:
+\itemize{
+\item model: The path of saved parametric model files.
+\item weather: The path of saved weather files.
+}
+
+\strong{Arguments}
+\itemize{
+\item \code{dir}: The parent output directory for models to be saved. If \code{NULL}, the
+directory of the seed model will be used. Default: \code{NULL}.
+\item \code{separate}: If \code{TRUE}, all models are saved in a separate folder with each
+model's name under specified directory. If \code{FALSE}, all models are saved in
+the specified directory. Default: \code{TRUE}.
+\item \code{copy_external}: Only applicable when \code{separate} is \code{TRUE}. If \code{TRUE}, the
+external files that every \code{Idf} object depends on will also be copied into
+the saving directory. The values of file paths in the Idf will be changed
+automatically. Currently, only \code{Schedule:File} class is supported.  This
+ensures that the output directory will have all files needed for the model
+to run. Default: \code{FALSE}.
+}
 }
 
 \section{Run and Collect Results}{

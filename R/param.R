@@ -22,6 +22,7 @@ NULL
 #' param$seed()
 #' param$weather()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
+#' param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
 #' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' param$kill()
 #' param$status()
@@ -82,6 +83,7 @@ NULL
 #' @section Extract models:
 #' ```
 #' param$models()
+#' param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
 #' ```
 #'
 #' `$models()` returns a list of parametric models generated using input [Idf]
@@ -92,6 +94,27 @@ NULL
 #' `$apply_measure()`, as this may lead to an un-reproducible process. A warning
 #' message will be issued if any of those models has been modified when running
 #' simulations.
+#'
+#' `$save()` saves all parametric models in specified folder. An error will be
+#' issued if no measure has been applied. `$save()` returns a
+#' [data.table][data.table::data.table()] with two columns:
+#'
+#' * model: The path of saved parametric model files.
+#' * weather: The path of saved weather files.
+#'
+#' **Arguments**
+#'
+#' * `dir`: The parent output directory for models to be saved. If `NULL`, the
+#'   directory of the seed model will be used. Default: `NULL`.
+#' * `separate`: If `TRUE`, all models are saved in a separate folder with each
+#'   model's name under specified directory. If `FALSE`, all models are saved in
+#'   the specified directory. Default: `TRUE`.
+#' * `copy_external`: Only applicable when `separate` is `TRUE`. If `TRUE`, the
+#'   external files that every `Idf` object depends on will also be copied into
+#'   the saving directory. The values of file paths in the Idf will be changed
+#'   automatically. Currently, only `Schedule:File` class is supported.  This
+#'   ensures that the output directory will have all files needed for the model
+#'   to run. Default: `FALSE`.
 #'
 #' @section Run and Collect Results:
 #' ```
@@ -318,7 +341,7 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             idf_add_output_sqlite(private$m_idf)
 
             # save uuid
-            private$m_log$uuid <- idf_priv$m_log$uuid
+            private$m_log$seed_uuid <- idf_priv$m_log$uuid
 
             if (is_epw(epw)) {
                 private$m_epw <- epw$clone(deep = TRUE)
@@ -343,6 +366,9 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
         apply_measure = function (measure, ..., .names = NULL)
             param_apply_measure(self, private, measure, ..., .names = .names),
+
+        save = function (dir = NULL, separate = TRUE, copy_external = FALSE)
+            param_save(self, private, dir, separate, copy_external),
 
         run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
             param_run(self, private, dir, wait, force, copy_external),
@@ -660,6 +686,59 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     self
 }
 # }}}
+# param_save {{{
+param_save <- function (self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
+    if (is.null(private$m_param)) {
+        abort("error_no_measured_applied",
+            "No parametric models found since no measure has been applied."
+        )
+    }
+
+    # restore uuid
+    uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
+
+    path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
+    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    nms <- names(private$m_param)
+
+    if (is.null(dir))
+        dir <- dirname(path_idf)
+    else {
+        assert(is_string(dir))
+    }
+
+    if (!dir.exists(dir)) {
+        tryCatch(dir.create(dir, recursive = TRUE),
+            warning = function (w) {
+                stop("Failed to create output directory: ",
+                     surround(dir), call. = FALSE)
+            }
+        )
+    }
+
+    if (separate) {
+        path_param <- file.path(dir, nms, paste0(nms, ".idf"))
+    } else {
+        copy_external <- FALSE
+        path_param <- file.path(dir, paste0(nms, ".idf"))
+    }
+
+    # save model
+    path_param <- apply2_chr(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
+    # copy weather
+    path_weather <- copy_run_files(path_epw, unique(dirname(path_param)))
+
+    # assign original uuid in case it is updated when saving
+    # if not assign original here, the model modification checkings in `$run()`
+    # may be incorrect.
+    for (i in seq_along(uuid)) {
+        log <- ._get_private(private$m_param[[i]])$m_log
+        log$uuid <- uuid[[i]]
+    }
+
+    data.table::data.table(model = path_param, weather = path_weather)
+}
+# }}}
 # param_kill {{{
 param_kill <- function (self, private) {
 
@@ -718,7 +797,7 @@ param_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    if (!identical(private$m_log$uuid, ._get_private(private$m_idf)$m_log$uuid)) {
+    if (!identical(private$m_log$seed_uuid, ._get_private(private$m_idf)$m_log$uuid)) {
         status$changed_after <- TRUE
     }
 

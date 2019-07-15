@@ -2267,6 +2267,10 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
         path = path, in_ip = private$m_log$view_in_ip, format = format,
         overwrite = overwrite, copy_external = copy_external, oldpath = oldpath)
 
+    # if values are updated, assign new uuid
+    if (attr(path, "path_updated")) log_new_uuid(private$m_log)
+    attr(path, "path_updated") <- NULL
+
     # log saved
     log_saved(private$m_log)
 

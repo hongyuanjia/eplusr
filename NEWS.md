@@ -6,6 +6,10 @@
   list of all parametric models generated after a measure has been applied. If
   no measure is applied, `NULL` is returned (#59). Thanks @yidan1214 for this
   feature request.
+* A new method `$save()` has been added in `ParametricJob` class. It saves all
+  generated parametric models and weather file into speicifed directory. You can
+  use `separate` argument to determine whether each model is to be saved in a
+  separate folder (#58). Thanks @yidan1214 for this feature request.
 
 ## Bug fixes
 

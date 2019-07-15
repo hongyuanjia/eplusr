@@ -3351,14 +3351,14 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
         new_file <- TRUE
     }
 
-    resolve_idf_external_link(idd_env, idf_env, oldpath, path, copy_external)
+    modified <- resolve_idf_external_link(idd_env, idf_env, oldpath, path, copy_external)
 
     str <- get_idf_string(idd_env, idf_env, dt_order, comment = TRUE, header = TRUE, format = format)
 
     path <- normalizePath(path, mustWork = FALSE)
     write_lines(str, path)
 
-    path
+    setattr(path, "path_updated", modified)
 }
 # }}}
 # resolve_idf_external_link {{{
@@ -3438,9 +3438,12 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
     }
 
     # update object value table
-    idf_env$value[J(val$value_id), on = "value_id", value_chr := val$new_value]
-
-    TRUE
+    if (all(val$value_chr == val$new_value)) {
+        FALSE
+    } else {
+        idf_env$value[J(val$value_id), on = "value_id", value_chr := val$new_value]
+        TRUE
+    }
 }
 # }}}
 

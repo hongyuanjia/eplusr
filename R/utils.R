@@ -270,6 +270,12 @@ apply2_lgl <- function (x, y, fun, more_args = NULL) {
 }
 # }}}
 
+# apply2_chr {{{
+apply2_chr <- function (x, y, fun, more_args = NULL) {
+    as.character(unlist(apply2(x, y, fun, more_args)))
+}
+# }}}
+
 # lower_name {{{
 lower_name <- function (name) {
     stri_trans_tolower(underscore_name(name))
