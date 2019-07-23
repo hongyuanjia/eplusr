@@ -53,9 +53,12 @@ model$object_unique(class)
 model$objects(which)
 model$objects_in_class(class)
 model$objects_in_group(group)
-model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
-model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
-model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"),
+                      recursive = FALSE, depth = 1L)
+model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"),
+                          class = NULL, recursive = FALSE, depth = 1L)
+model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+                    fixed = FALSE, useBytes = FALSE)
 model$ClassName
 model[[ClassName]]
 model$dup(...)
@@ -67,8 +70,10 @@ model$load(..., .unique = TRUE, .default = TRUE)
 model$update(..., .default = TRUE)
 model$rename(...)
 model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
-model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
-model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+                   fixed = FALSE, useBytes = FALSE)
+model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
+                    perl = FALSE, fixed = FALSE, useBytes = FALSE)
 model$is_unsaved()
 model$validate(level = eplusr_option("validate_level"))
 model$is_valid(level = eplusr_option("validate_level"))
@@ -76,7 +81,8 @@ model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE,
                wide = FALSE, align = FALSE, all = FALSE)
 model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
-model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
+model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
+           copy_external = TRUE)
 model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 model$clone(deep = TRUE)
 model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
@@ -189,7 +195,8 @@ with each element being the data per class is returned. If \code{class} is
 }
 
 \section{Object Relation}{
-\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = TRUE, depth = 1L)
+\preformatted{model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"),
+                      recursive = TRUE, depth = 1L)
 }
 
 Many fields in \link{Idd} can be referred by others. For example, the \code{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
@@ -243,8 +250,10 @@ model$objects(which)
 model$object_unique(class)
 model$objects_in_class(class)
 model$objects_in_group(group)
-model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
-model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"),
+                          class = NULL, recursive = FALSE, depth = 1L)
+model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+                    fixed = FALSE, useBytes = FALSE)
 model$ClassName
 model[[ClassName]]
 }
@@ -258,10 +267,12 @@ name(s) as input.
 
 \code{$object_unique()} returns the \link{IdfObject} in unique-object class, e.g.
 \code{SimulationControl} class. This makes it easy to directly extract and modify
-those unique objects, e.g.
-\code{model$object_unique("SimulationContrl")$set(...)}. Note that if there are
-multiple objects in that unique-object class, an error is issued. This makes
-sure that \code{$object_unique()} always returns a single \link{IdfObject}.
+those unique objects, e.g.\preformatted{model$object_unique("SimulationContrl")$set(...)
+}
+
+Note that if there are multiple objects in that unique-object class, an error
+is issued. This makes sure that \code{$object_unique()} always returns a single
+\link{IdfObject}.
 
 \code{$objects()} returns a named \strong{list} of \link{IdfObject}s specified by object IDs
 or names.
@@ -287,7 +298,8 @@ will return a named list of an \link{IdfObject} named \code{const} and also all 
 to directly extract groups of related objects and then use \code{$insert()} method
 described below to insert them. For example, copy a construction named
 \code{const} from an \code{Idf} object \code{model1} to another \code{Idf} object \code{model2} is
-simply to do \code{model2$insert(model1$objects_in_relation("const", "ref_to"))}.
+simply to do:\preformatted{model2$insert(model1$objects_in_relation("const", "ref_to"))
+}
 
 There are lots of recursive references in a model. For instance, a material
 can be referred by a construction, that construction can be referred by a
@@ -358,8 +370,8 @@ relations are returned. Default: \code{1}.
 
 \code{$dup()} takes integer vectors of object IDs and character vectors of object
 names, duplicates objects specified, and returns a list of newly created
-\link{IdfObject}s. The names of input are used as new names for created
-\link{IdfObject}s. If input is not named, new names are the names of duplicated
+[IdfObject]s. The names of input are used as new names for created
+[IdfObject]s. If input is not named, new names are the names of duplicated
 objects with a suffix \code{"_1"}, \code{"_2"} and etc, depending on how many times
 that object has been duplicated. Note an error will be issued if trying to
 assign a new name to an object which does not have name attribute.
@@ -382,15 +394,20 @@ created objects.
 \itemize{
 \item Without new names: \code{model$dup(c("name1", "name2"), 6:10)}.
 \item With new names: \code{model$dup(c(new_name1 = "name1", new_name2 = "name2"), new_name3 = 6)}.
-\item Variable inputs: \code{a <- c("name1", new_name2 = "name2"); b <- 10:20; c <- c(new_name3 = 10); model$dup(a, b, c)}.
+\item Variable inputs:\preformatted{a <- c("name1", new_name2 = "name2")
+b <- 10:20
+c <- c(new_name3 = 10)
+model$dup(a, b, c)
 }
+}
+
 }
 
 \subsection{Add Objects}{\preformatted{model$add(..., .default = TRUE, .all = FALSE)
 }
 
 \code{$add()} takes object definitions in list format, adds corresponding
-objects in specified classes, returns a list of newly added \link{IdfObject}s.
+objects in specified classes, returns a list of newly added [IdfObject]s.
 Every list should be named with a valid class name. Underscore-style class
 name is allowed. Names in list element are treated as field names. Values
 without names will be inserted according to their position. There is a
@@ -404,14 +421,20 @@ if \code{.default} is \code{TRUE}, leaving other fields as blank. However, addin
 blank objects may not be successful if required fields are not valued and
 current validate level includes missing-required-field checking. For what
 kind of validation components to be performed during modifications, please
-see \code{\link[=level_checks]{level_checks()}}.
+see [level_checks()].
 \item Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
 equivalent to \code{End Month}.
 \item There is no need to give all field values if only specific fields are
 interested, unless other fields are not required. For example, to define a
-new object in \code{RunPeriod} class, the following is enough:
-\code{model$add(RunPeriod = list(begin_month = 1, begin_day_of_month = 1, end_month = 1, end_day_of_month = 31), .default = TRUE)}.
+new object in \code{RunPeriod} class, the following is enough:\preformatted{model$add(
+    RunPeriod = list(
+        begin_month = 1, begin_day_of_month = 1,
+        end_month = 1, end_day_of_month = 31
+    ),
+    .default = TRUE
+)
+}
 \item If not all field names are given, positions of those values without field
 names are determined after those values with names. E.g. in
 \code{model$add(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
@@ -437,275 +460,288 @@ added. Default: \code{FALSE}.
 \item Empty object with default values: \code{model$add(Building = list(), .default = TRUE)}.
 \item Empty object with comments: \code{model$add(Building = list(.comment = c("This", "is", "a", "comment")))}.
 \item Empty object with all fields: \code{model$add(Building = list(), .all = TRUE)}.
-\item New objects: \code{model$add(RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"), list(Construction = list("const", "mat"), Material = list("mat")))}.
-\item New objects with comments: \code{model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))}.
-\item Variable inputs: \code{x <- list(Construction = list("const"), Building = list()); model$add(x)}.
+\item New objects:\preformatted{model$add(
+    RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"),
+    list(Construction = list("const", "mat"), Material = list("mat"))
+)
 }
+}\preformatted{
+* New objects with comments: `model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))`.
+* Variable inputs: `x <- list(Construction = list("const"), Building = list()); model$add(x)`.
 }
 
-\subsection{Set Values of Existing Objects}{\preformatted{model$set(..., .default = TRUE)
+\subsection{Set Values of Existing Objects}{
+
 }
 
-\code{$set()} takes new field value definitions in list format, sets new
+model$set(..., .default = TRUE)\preformatted{
+`$set()` takes new field value definitions in list format, sets new
 values for fields in objects specified, and returns a list of modified
-\link{IdfObject}s. Every list in \code{$set()} should be named with a
+[IdfObject]s. Every list in `$set()` should be named with a
 valid object name. Object ID can also be used but have to be combined with
-prevailing two periods \code{..}, e.g. \code{..10} indicates the object with ID \code{10}.
-Similar to \code{$add()}, a special element \code{.comment} in each list will be used
-as the \strong{new} comments for modified object, overwriting the old ones. Names
+prevailing two periods `..`, e.g. `..10` indicates the object with ID `10`.
+Similar to `$add()`, a special element `.comment` in each list will be used
+as the **new** comments for modified object, overwriting the old ones. Names
 in list element are treated as field names.
 
-\strong{Note}:
-\itemize{
-\item You can delete a field by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
-also \code{fld} is not a required field and the index of \code{fld} is larger than
-the number minimum fields required for that class, it will be deleted.
-Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
-will be filled with default value if applicable and left as blank if not.
-\item New fields that currently do not exist in that object can also be set. They
-will be automatically added on the fly.
-\item Field name matching is \strong{case-insensitive}. For convenience,
-underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
-equivalent to \code{End Month}.
-\item If not all field names are given, positions of those values without field
-names are determined after those values with names. E.g. in
-\code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
-will be treated as the value of field \code{Outside Layer} in \code{Construction}, as
-value of field \code{Name} has been given as \code{"name"}.
+**Note**:
+
+* You can delete a field by assigning `NULL` to it, e.g. `list(fld =
+  NULL)` means to delete the value of field `fld`. If `.default` is FALSE,
+  also `fld` is not a required field and the index of `fld` is larger than
+  the number minimum fields required for that class, it will be deleted.
+  Otherwise it will be left as blank. If `.default` is `TRUE`, that field
+  will be filled with default value if applicable and left as blank if not.
+* New fields that currently do not exist in that object can also be set. They
+  will be automatically added on the fly.
+* Field name matching is **case-insensitive**. For convenience,
+  underscore-style field names are also allowed, e.g. `eNd_MoNtH` is
+  equivalent to `End Month`.
+* If not all field names are given, positions of those values without field
+  names are determined after those values with names. E.g. in
+  `model$set(Construction = list("out_layer", name = "name"))`, `"out_layer"`
+  will be treated as the value of field `Outside Layer` in `Construction`, as
+  value of field `Name` has been given as `"name"`.
+
+**Arguments**:
+
+* `...`: Lists of object definitions. Each list should be named with a valid
+  object name or a valid object ID denoted in style `..1`, `..2` and etc.
+  There is a special element `.comment` in each list, which will be used as
+  new comments of modified object, overwriting existing ones.
+* `.default`: If `TRUE`, default values are used for those blank fields if
+   possible. Default: `TRUE`.
+
+**Usage**:
+
+* Specify object with name: `model$set(Object_Name = list(val1, val2, val3))`.
+* Specify object with ID: `model$set(..8 = list(val1))`.
+* Overwrite existing object comments: `model$set(..8 = list(.comment = c("new", "comment")))`.
+* Delete field value: `model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)`.
+* Assign default field value: `model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)`.
+* Variable input: `a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)`.
+* Set all values of field `fld` in a class `cls`:
+
 }
 
-\strong{Arguments}:
-\itemize{
-\item \code{...}: Lists of object definitions. Each list should be named with a valid
-object name or a valid object ID denoted in style \code{..1}, \code{..2} and etc.
-There is a special element \code{.comment} in each list, which will be used as
-new comments of modified object, overwriting existing ones.
-\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
-possible. Default: \code{TRUE}.
-}
-
-\strong{Usage}:
-\itemize{
-\item Specify object with name: \code{model$set(Object_Name = list(val1, val2, val3))}.
-\item Specify object with ID: \code{model$set(..8 = list(val1))}.
-\item Overwrite existing object comments: \code{model$set(..8 = list(.comment = c("new", "comment")))}.
-\item Delete field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)}.
-\item Assign default field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)}.
-\item Variable input: \code{a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)}.
-\item Set all values of field \code{fld} in a class \code{cls}:
-}\preformatted{ids <- model$object_id("cls", simplify = TRUE)
+ids <- model$object_id("cls", simplify = TRUE)
 val <- rep(list(list(fld = val)), times = length(ids))
 names(val) <- paste0("..", ids)
-model$set(val)
-}
+model$set(val)\preformatted{}
+
+\subsection{Deleting Existing Objects}{
 
 }
 
-\subsection{Deleting Existing Objects}{\preformatted{model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
-}
-
-\code{$del()} takes integer vectors of object IDs and character vectors of object
-names, and deletes objects specified. If \code{.ref_by} is \code{TRUE}, objects
-whose fields refer to input objects will also be deleted. IF \code{.ref_to} is
-\code{TRUE}, objects whose fields are referred by input objects will also be
+model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)\preformatted{
+`$del()` takes integer vectors of object IDs and character vectors of object
+names, and deletes objects specified. If `.ref_by` is `TRUE`, objects
+whose fields refer to input objects will also be deleted. IF `.ref_to` is
+`TRUE`, objects whose fields are referred by input objects will also be
 deleted.
 
-\strong{Note}:
-\itemize{
-\item If current \link[=level_checks]{validate level} includes reference checking,
-objects will not be allowed to be deleted if they are referred by other
-objects. For example, an error will be issued if you want to delete one
-material that is referred by other constructions, because doing so will
-result in invalid field value references. You may bypass this if you really
-want to by setting \code{.force} to \code{TRUE}.
-\item When \code{.ref_by} or \code{.ref_to} is \code{TRUE}, objects are only deleted when they
-only have relation with input objects. For example, a construction \code{const}
-consist of 4 different materials. If \code{.ref_to} is \code{TRUE}, that 4 materials
-will only be deleted when they are only used in \code{const}, but not used in
-any other objects.
-\item There are recursively reference relations in \code{Idf} object. For example, one
-material's name is referenced by one construction, and that construction's
-name can be referred by another surface. You can delete all of them by
-setting \code{.recursive} to \code{TRUE}.
+**Note**:
+
+* If current [validate level][level_checks()] includes reference checking,
+  objects will not be allowed to be deleted if they are referred by other
+  objects. For example, an error will be issued if you want to delete one
+  material that is referred by other constructions, because doing so will
+  result in invalid field value references. You may bypass this if you really
+  want to by setting `.force` to `TRUE`.
+* When `.ref_by` or `.ref_to` is `TRUE`, objects are only deleted when they
+  only have relation with input objects. For example, a construction `const`
+  consist of 4 different materials. If `.ref_to` is `TRUE`, that 4 materials
+  will only be deleted when they are only used in `const`, but not used in
+  any other objects.
+* There are recursively reference relations in `Idf` object. For example, one
+  material's name is referenced by one construction, and that construction's
+  name can be referred by another surface. You can delete all of them by
+  setting `.recursive` to `TRUE`.
+
+**Arguments**:
+
+* `.ref_by`: If `TRUE`, objects whose fields refer to input objects will
+    also be deleted. Default: `FALSE`.
+* `.ref_to`: If `TRUE`, objects whose fields are referred by input objects
+  will also be deleted. Default: `FALSE`.
+* `.recursive`: If `TRUE`, relation searching is performed recursively, in
+  case that objects whose fields refer to target object are also referred by
+  another object, and also objects whose fields are referred by target object
+  are also referred by another object. Default: `FALSE`.
+* `.force`: If `TRUE`, objects are deleted even if they are referred by other
+  objects.
+
+**Usage**:
+
+* Specify object with name: `model$del("Object_Name1", "Object_Name2")`.
+* Specify object with ID: `model$del(1, 2, 10)`.
+* Delete objects even they are referred by other objects: `model$del(1:5, .force = TRUE)`
+* Delete objects and also other objects that refer to them: `model$del(2,
+  "Object_Name1", .ref_by = TRUE)`
+* Delete objects and also other objects that refer to them recursively:
+
 }
 
-\strong{Arguments}:
-\itemize{
-\item \code{.ref_by}: If \code{TRUE}, objects whose fields refer to input objects will
-also be deleted. Default: \code{FALSE}.
-\item \code{.ref_to}: If \code{TRUE}, objects whose fields are referred by input objects
-will also be deleted. Default: \code{FALSE}.
-\item \code{.recursive}: If \code{TRUE}, relation searching is performed recursively, in
-case that objects whose fields refer to target object are also referred by
-another object, and also objects whose fields are referred by target object
-are also referred by another object. Default: \code{FALSE}.
-\item \code{.force}: If \code{TRUE}, objects are deleted even if they are referred by other
-objects.
+model$del(1:5, .ref_by = TRUE, .recursive = TRUE)\preformatted{
+* Delete objects and also other objects that input objects refer to: `model$del(1:5, .ref_to = TRUE)`
+* Variable input: `x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)`.
 }
 
-\strong{Usage}:
-\itemize{
-\item Specify object with name: \code{model$del("Object_Name1", "Object_Name2")}.
-\item Specify object with ID: \code{model$del(1, 2, 10)}.
-\item Delete objects even they are referred by other objects: \code{model$del(1:5, .force = TRUE)}
-\item Delete objects and also other objects that refer to them: \code{model$del(2, "Object_Name1", .ref_by = TRUE)}
-\item Delete objects and also other objects that refer to them recursively:
-\code{model$del(1:5, .ref_by = TRUE, .recursive = TRUE)}
-\item Delete objects and also other objects that input objects refer to: \code{model$del(1:5, .ref_to = TRUE)}
-\item Variable input: \code{x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)}.
-}
+\subsection{Rename Objects}{
+
 }
 
-\subsection{Rename Objects}{\preformatted{model$rename(...)
-}
-
-\code{$rename()} takes named character vectors of object names and named integer
+model$rename(...)\preformatted{
+`$rename()` takes named character vectors of object names and named integer
 vectors of object IDs, renames specified object to names of input vectors and
-returns a list of renamed \link{IdfObject}s. An error will be issued if trying to
+returns a list of renamed [IdfObject]s. An error will be issued if trying to
 "rename" an object which does not have name attribute.
 
-\strong{Argument}:
-\itemize{
-\item \code{...}: Integer vectors of valid object IDs and character vectors of valid
-object names. Each element should be named. That name is used at the new
-object name.
+**Argument**:
+
+* `...`: Integer vectors of valid object IDs and character vectors of valid
+  object names. Each element should be named. That name is used at the new
+  object name.
+
+**Usage**:
+
+* Rename objects: `model$rename(c(new_name1 = "name1", new_name2 = "name2"), new_name3 = 6)`.
+* Variable inputs:
 }
 
-\strong{Usage}:
-\itemize{
-\item Rename objects: \code{model$rename(c(new_name1 = "name1", new_name2 = "name2"), new_name3 = 6)}.
-\item Variable inputs: \code{a <- c(new_name1 = "name1", new_name2 = "name2"); b <- c(new_name3 = 10); model$rename(a, b)}.
-}
+a <- c(new_name1 = "name1", new_name2 = "name2")
+b <- c(new_name3 = 10)
+model$rename(a, b)\preformatted{}
+
+\subsection{Insert Objects}{
+
 }
 
-\subsection{Insert Objects}{\preformatted{model$insert(..., .unique = TRUE)
+model$insert(..., .unique = TRUE)\preformatted{
+`$insert()` takes [IdfObject]s or lists of [IdfObject]s as input, inserts
+them into current Idf, and returns a list of inserted [IdfObject]s.
+
+**Note**:
+
+* You cannot insert an [IdfObject] which comes from a different version than
+  current `Idf` object.
+* If input [IdfObject] has the same name as one [IdfObject] in current `Idf`
+  object but field values are not equal, an error may be issued if current
+  validation level includes conflicted-name checking. For what kind of
+  validation components to be performed during modifications, please see
+  [level_checks()].
+
+**Argument**:
+
+* `...`: [IdfObject]s or lists of [IdfObject]s.
+* `.unique`: If there are duplications in input [IdfObject]s or there is same
+  object in current `Idf` object, duplications in input are removed. Default:
+  `TRUE`.
+
+**Usage**:
+
+* Insert objects without new names: `model1$insert(model2$Material)`.
+* Insert an object without new name: `model1$insert(my_material = model2$Material[[1]])`.
+* Insert objects but keep duplications: `model1$insert(model1$Output_Variable)`.
+* Variable input: `mat <- model2$Material; names(mat) <- c("mat1", "mat2"); model1$insert(mat)`.
 }
 
-\code{$insert()} takes \link{IdfObject}s or lists of \link{IdfObject}s as input, inserts
-them into current Idf, and returns a list of inserted \link{IdfObject}s.
+\subsection{Load Objects from characters or data.frames}{
 
-\strong{Note}:
-\itemize{
-\item You cannot insert an \link{IdfObject} which comes from a different version than
-current \code{Idf} object.
-\item If input \link{IdfObject} has the same name as one \link{IdfObject} in current \code{Idf}
-object but field values are not equal, an error may be issued if current
-validation level includes conflicted-name checking. For what kind of
-validation components to be performed during modifications, please see
-\code{\link[=level_checks]{level_checks()}}.
 }
 
-\strong{Argument}:
-\itemize{
-\item \code{...}: \link{IdfObject}s or lists of \link{IdfObject}s.
-\item \code{.unique}: If there are duplications in input \link{IdfObject}s or there is same
-object in current \code{Idf} object, duplications in input are removed. Default:
-\code{TRUE}.
-}
-
-\strong{Usage}:
-\itemize{
-\item Insert objects without new names: \code{model1$insert(model2$Material)}.
-\item Insert an object without new name: \code{model1$insert(my_material = model2$Material[[1]])}.
-\item Insert objects but keep duplications: \code{model1$insert(model1$Output_Variable)}.
-\item Variable input: \code{mat <- model2$Material; names(mat) <- c("mat1", "mat2"); model1$insert(mat)}.
-}
-}
-
-\subsection{Load Objects from characters or data.frames}{\preformatted{model$load(..., .unique = TRUE, .default = TRUE)
-}
-
-\code{$load()} is similar to \code{$insert()} except it takes directly character
-vectors or data.frames of \link{IdfObject} definitions, insert corresponding
-objects into current \code{Idf} object and returns a list of newly added
-\link{IdfObject}s. This makes it easy to create objects using the output from
-\code{$to_string()} and \code{$to_table} method from \link{Idd}, \link{IddObject}, also
-Idf and \link{IdfObject} class.
+model$load(..., .unique = TRUE, .default = TRUE)\preformatted{
+`$load()` is similar to `$insert()` except it takes directly character
+vectors or data.frames of [IdfObject] definitions, insert corresponding
+objects into current `Idf` object and returns a list of newly added
+[IdfObject]s. This makes it easy to create objects using the output from
+`$to_string()` and `$to_table` method from [Idd], [IddObject], also
+Idf and [IdfObject] class.
 
 For object definitions in character vector format, they follow the same rules
-as normal IDF file. Each object starts with a class name and a comma (\code{,}),
-separates each values with a comma (\code{,}) and ends with a semicolon (\code{;}).
+as normal IDF file. Each object starts with a class name and a comma (`,`),
+separates each values with a comma (`,`) and ends with a semicolon (`;`).
 Noted that you can also provide headers to indicate if input objects are
-presented in IP units, using \code{!-Option ViewInIPunits}. If this header does
+presented in IP units, using `!-Option ViewInIPunits`. If this header does
 not exist, then all values are treated as in SI units.
 
 For object definitions in data.frame format, it is highly recommended to use
-\code{$to_table()} method in \link{Idd}, \link{IddObject}, \code{Idf} and \link{IdfObject} class. A
+`$to_table()` method in [Idd], [IddObject], `Idf` and [IdfObject] class. A
 valid definition requires at least three columns described below. Note that
 column order does not matter.
-\itemize{
-\item \code{class}: \strong{Mandatory}. Character type. Valid class names in the underlying
-\link{Idd} object. You can get all valid class names using
-\code{use_idd(model$version())$class_name()}
-\item \code{index}: \strong{Mandatory}. Integer type. Valid field indexes for each class.
-\item \code{value}: \strong{Mandatory}. Character type or list type. The value of each field
-to be added.
-\itemize{
-\item If \code{value} is a character column, usually when \code{string_value} is \code{TRUE}
-in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value should
-be given as a string even if the corresponding field is a numeric type.
-\item If \code{value} is a list column, usually when \code{string_value} is set to
-\code{FALSE} in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value
-should have the right type  as the corresponding field definition.
-Otherwise, errors will be issued during if current validation level
-includes invalid-type checking. For what kind of validation components to
-be performed during modifications, please see \code{\link[=level_checks]{level_checks()}}.
-}
-\item \code{id}: \strong{Optional}. Integer type. If input data.frame includes multiple
-object definitions in a same class, the value in \code{id} will be used to
-distinguish each definition. If \code{id} column does not exists, it assumes
-that each definition is separated by \code{class} column and will issue an error
-if there is any duplication in the \code{index} column.
+
+* `class`: **Mandatory**. Character type. Valid class names in the underlying
+  [Idd] object. You can get all valid class names using
+  `use_idd(model$version())$class_name()`
+* `index`: **Mandatory**. Integer type. Valid field indexes for each class.
+* `value`: **Mandatory**. Character type or list type. The value of each field
+  to be added.
+  * If `value` is a character column, usually when `string_value` is `TRUE`
+    in method `$to_table()` in `Idf` and [IdfObject] class. Each value should
+    be given as a string even if the corresponding field is a numeric type.
+  * If `value` is a list column, usually when `string_value` is set to
+   `FALSE` in method `$to_table()` in `Idf` and [IdfObject] class. Each value
+   should have the right type  as the corresponding field definition.
+   Otherwise, errors will be issued during if current validation level
+   includes invalid-type checking. For what kind of validation components to
+   be performed during modifications, please see [level_checks()].
+* `id`: **Optional**. Integer type. If input data.frame includes multiple
+  object definitions in a same class, the value in `id` will be used to
+  distinguish each definition. If `id` column does not exists, it assumes
+  that each definition is separated by `class` column and will issue an error
+  if there is any duplication in the `index` column.
+
+**Note**:
+
+* `$load()` assume all definitions are from the same version as current `Idf`
+  object. If input definition is from different version, parsing error may
+  occur.
+
+**Argument**:
+
+* `...`: Character vectors or data.frames of object definitions For details,
+  see above.
+* `.unique`: If there are duplications in input [IdfObject]s or there is same
+  object in current Idf, duplications in input are removed. Default: `TRUE`.
+* `.default`: If `TRUE`, default values are used for those blank fields if
+   possible. Default: `TRUE`.
+
+**Usage**:
+
+* Load objects from string definitions:
+
 }
 
-\strong{Note}:
-\itemize{
-\item \code{$load()} assume all definitions are from the same version as current \code{Idf}
-object. If input definition is from different version, parsing error may
-occur.
+model$load(c(
+"Material,",
+"    mat,                     !- Name",
+"    MediumSmooth,            !- Roughness",
+"    0.667,                   !- Thickness {m}",
+"    0.115,                   !- Conductivity {W/m-K}",
+"    513,                     !- Density {kg/m3}",
+"    1381;                    !- Specific Heat {J/kg-K}",\preformatted{  "Construction,
+   const,
+   mat;
+  "
 }
 
-\strong{Argument}:
-\itemize{
-\item \code{...}: Character vectors or data.frames of object definitions For details,
-see above.
-\item \code{.unique}: If there are duplications in input \link{IdfObject}s or there is same
-object in current Idf, duplications in input are removed. Default: \code{TRUE}.
-\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
-possible. Default: \code{TRUE}.
+))\preformatted{
+* Load objects from data.frame definitions:
+
 }
 
-\strong{Usage}:
-\itemize{
-\item Load objects from string definitions:\preformatted{model$load(c(
-    "Material,",
-    "    mat,                     !- Name",
-    "    MediumSmooth,            !- Roughness",
-    "    0.667,                   !- Thickness {m}",
-    "    0.115,                   !- Conductivity {W/m-K}",
-    "    513,                     !- Density {kg/m3}",
-    "    1381;                    !- Specific Heat {J/kg-K}",
-
-    "Construction,
-     const,
-     mat;
-    "
-))
-}
-\item Load objects from data.frame definitions:\preformatted{dt <- model1$to_table(class = "Material")
+dt <- model1$to_table(class = "Material")
 dt[field == "thickness", value := "0.5"]
-model$load(dt)
-}
-}
+model$load(dt)\preformatted{}
+
+\subsection{Update Objects from characters or data.frames}{
 
 }
 
-\subsection{Update Objects from characters or data.frames}{\preformatted{model$update(..., .unique = TRUE, .default = TRUE)
-}
-
-\code{$update()} is similar to \code{$load()} except it update field values.  This
-makes it easy to update object values using the output from \code{$to_string()}
-and \code{$to_table} method from \link{Idd}, \link{IddObject}, also Idf and \link{IdfObject}
+model$update(..., .unique = TRUE, .default = TRUE)\preformatted{
+`$update()` is similar to `$load()` except it update field values.  This
+makes it easy to update object values using the output from `$to_string()`
+and `$to_table` method from [Idd], [IddObject], also Idf and [IdfObject]
 class.
 
 For object definitions in character vector format, object names are used to
@@ -715,133 +751,189 @@ character vector format, but it can be achieved using data.frame format as it
 uses object IDs instead of object names to locate objects.
 
 For object definitions in data.frame format, it is highly recommended to use
-\code{$to_table()} method in \link{Idd}, \link{IddObject}, \code{Idf} and \link{IdfObject} class. A
+`$to_table()` method in [Idd], [IddObject], `Idf` and [IdfObject] class. A
 valid definition requires four columns described below. Note that
 column order does not matter.
-\itemize{
-\item \code{id}: Integer type. The value in \code{id} should be valid object IDs for current
-\code{Idf}.
-\item \code{class}: Character type. Valid class names for current \code{Idf}.
-\item \code{index}: Integer type. Valid field indexes for each class. If input field
-does not exist in specified object, it will be added on the fly.
-\item \code{value}: Character type or list type. The value of each field
-to be added.
-\itemize{
-\item If \code{value} is a character column, usually when \code{string_value} is \code{TRUE}
-in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value should
-be given as a string even if the corresponding field is a numeric type.
-\item If \code{value} is a list column, usually when \code{string_value} is set to
-\code{FALSE} in method \code{$to_table()} in \code{Idf} and \link{IdfObject} class. Each value
-should have the right type  as the corresponding field definition.
-Otherwise, errors will be issued during if current validation level
-includes invalid-type checking. For what kind of validation components to
-be performed during modifications, please see \code{\link[=level_checks]{level_checks()}}.
-}
+
+* `id`: Integer type. The value in `id` should be valid object IDs for current
+  `Idf`.
+* `class`: Character type. Valid class names for current `Idf`.
+* `index`: Integer type. Valid field indexes for each class. If input field
+  does not exist in specified object, it will be added on the fly.
+* `value`: Character type or list type. The value of each field
+  to be added.
+  * If `value` is a character column, usually when `string_value` is `TRUE`
+    in method `$to_table()` in `Idf` and [IdfObject] class. Each value should
+    be given as a string even if the corresponding field is a numeric type.
+  * If `value` is a list column, usually when `string_value` is set to
+   `FALSE` in method `$to_table()` in `Idf` and [IdfObject] class. Each value
+   should have the right type  as the corresponding field definition.
+   Otherwise, errors will be issued during if current validation level
+   includes invalid-type checking. For what kind of validation components to
+   be performed during modifications, please see [level_checks()].
+
+**Note**:
+
+* `$update()` assume all definitions are from the same version as current
+  `Idf` object. If input definition is from different version, parsing error
+  may occur.
+
+**Argument**:
+
+* `...`: Character vectors or data.frames of object definitions For details,
+  see above.
+* `.default`: If `TRUE`, default values are used for those blank fields if
+   possible. Default: `TRUE`.
+
+**Usage**:
+
+* Update objects from string definitions:
+
 }
 
-\strong{Note}:
-\itemize{
-\item \code{$update()} assume all definitions are from the same version as current
-\code{Idf} object. If input definition is from different version, parsing error
-may occur.
-}
-
-\strong{Argument}:
-\itemize{
-\item \code{...}: Character vectors or data.frames of object definitions For details,
-see above.
-\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
-possible. Default: \code{TRUE}.
-}
-
-\strong{Usage}:
-\itemize{
-\item Update objects from string definitions:\preformatted{str <- model$Material[[1]]$to_string()
+str <- model$Material[[1]]$to_string()
 str[4] <- "0.8"
-model$update(str)
+model$update(str)\preformatted{
+* Update objects from data.frame definitions:
+
 }
-\item Update objects from data.frame definitions:\preformatted{dt <- model1$to_table(class = "Material")
+
+dt <- model1$to_table(class = "Material")
 dt[field == "thickness", value := "0.5"]
-model$update(dt)
-}
-}
+model$update(dt)\preformatted{}
+
+\subsection{Paste Objects from IDF Editor}{
 
 }
 
-\subsection{Paste Objects from IDF Editor}{\preformatted{model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
-}
-
-\code{$paste()} reads the contents (from clipboard) of copied objects from IDF
-Editor (after hitting \code{Copy Obj} button), parses it and inserts corresponding
+model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)\preformatted{
+`$paste()` reads the contents (from clipboard) of copied objects from IDF
+Editor (after hitting `Copy Obj` button), parses it and inserts corresponding
 objects into current Idf. As IDF Editor only available on Windows platform,
-\code{$paste()} only works on Windows too.
+`$paste()` only works on Windows too.
 
-\strong{Note}:
-\itemize{
-\item There is no version data copied to the clipboard when copying objects in
-IDF Editor. It is possible that IDF Editor opens an IDF with different
-version than current IDF. Please check the version before running
-\code{$paste()}, or explicitly specify the version of file opened by IDF Editor
-using \code{ver} parameter. Parsing error may occur if there is a version
-mismatch.
+**Note**:
+
+* There is no version data copied to the clipboard when copying objects in
+  IDF Editor. It is possible that IDF Editor opens an IDF with different
+  version than current IDF. Please check the version before running
+  `$paste()`, or explicitly specify the version of file opened by IDF Editor
+  using `ver` parameter. Parsing error may occur if there is a version
+  mismatch.
+
+**Arguments**:
+
+* `in_ip`: Set to `TRUE` if the IDF file is open with `Inch-Pound`
+  view option toggled. Numeric values will automatically converted to SI
+  units if necessary. Default: `FALSE`.
+* `ver`: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0". If
+  `NULL`, assume that the file has the same version as current Idf object.
+  Default: `NULL`.
+* `unique`: If there are duplications in copied objects from IDF Editor or
+  there is same object in current Idf, duplications in input are removed.
+  Default: `TRUE`.
+
+**Usage**:
+
+* Paste objects from same version: `model$paste()`.
+* Paste objects from different version: `model$paste(ver = "version")`.
+* Paste objects that are viewed in IP units in IDF Editor: `model$paste(in_ip = TRUE)`.
+* Paste objects but also keep duplications: `model$paste(unique = FALSE)`.
 }
 
-\strong{Arguments}:
-\itemize{
-\item \code{in_ip}: Set to \code{TRUE} if the IDF file is open with \code{Inch-Pound}
-view option toggled. Numeric values will automatically converted to SI
-units if necessary. Default: \code{FALSE}.
-\item \code{ver}: The version of IDF file opened by IDF Editor, e.g. 8.6, "8.8.0". If
-\code{NULL}, assume that the file has the same version as current Idf object.
-Default: \code{NULL}.
-\item \code{unique}: If there are duplications in copied objects from IDF Editor or
-there is same object in current Idf, duplications in input are removed.
-Default: \code{TRUE}.
+\subsection{Search and Replace Values}{
+
 }
 
-\strong{Usage}:
-\itemize{
-\item Paste objects from same version: \code{model$paste()}.
-\item Paste objects from different version: \code{model$paste(ver = "version")}.
-\item Paste objects that are viewed in IP units in IDF Editor: \code{model$paste(in_ip = TRUE)}.
-\item Paste objects but also keep duplications: \code{model$paste(unique = FALSE)}.
-}
-}
+model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+fixed = FALSE, useBytes = FALSE)
+model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
+perl = FALSE, fixed = FALSE, useBytes = FALSE)\preformatted{
+`$search_value()` returns a list of [IdfObject]s that contain values which
+match the given pattern. If no matched found, `NULL` is returned invisibly.
 
-\subsection{Search and Replace Values}{\preformatted{model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
-model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
-}
-
-\code{$search_value()} returns a list of \link{IdfObject}s that contain values which
-match the given pattern. If no matched found, \code{NULL} is returned invisibly.
-
-\code{$replace_value()} returns a list of \link{IdfObject}s whose values have been
-replace with given pattern. If no matched found, \code{NULL} is returned
+`$replace_value()` returns a list of [IdfObject]s whose values have been
+replace with given pattern. If no matched found, `NULL` is returned
 invisibly.
 
-\strong{Note}:
-\itemize{
-\item During matching, all values are treated as characters, including numeric
-values.
-\item Replacing values using regular expression is not recommended, because it is
-error prone. Validation rules also apply during replacing.
+**Note**:
+
+* During matching, all values are treated as characters, including numeric
+  values.
+* Replacing values using regular expression is not recommended, because it is
+  error prone. Validation rules also apply during replacing.
+
+**Arguments**:
+
+* `class`: A character vector of invalid class names in current `Idf` object
+  to search for values. If `NULL`, all classes are used.
+* `pattern`, `replacement`, `ignore.case`, `perl`, `fixed` and `useBytes`:
+  All of them are directly passed to [base::grepl][base::grep()] and
+  [base::gsub][base::grep()].
+
+**Usage**:
+
+* Search values that contains `supply`: `model$search_value("supply")`
+* Search values that contains `supply` or `demand` in class `Branch`:
+
 }
 
-\strong{Arguments}:
-\itemize{
-\item \code{class}: A character vector of invalid class names in current \code{Idf} object
-to search for values. If \code{NULL}, all classes are used.
-\item \code{pattern}, \code{replacement}, \code{ignore.case}, \code{perl}, \code{fixed} and \code{useBytes}:
-All of them are directly passed to \link[base:grep]{base::grepl} and
-\link[base:grep]{base::gsub}.
+model$search_value("supply|demand", "Branch")\preformatted{
+* Search values that contains `win` and replace them with `windows`:
+
 }
 
-\strong{Usage}:
-\itemize{
-\item Search values that contains \code{supply}: \code{model$search_value("supply")}
-\item Search values that contains \code{supply} or \code{demand} in class \code{Branch}: \code{model$search_value("supply|demand", "Branch")}
-\item Search values that contains \code{win} and replace them with \code{windows}: \code{model$replace_value("win", "windows")}
-}
+model$replace_value("win", "windows")\preformatted{}
+
+
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[level_checks()]: R:level_checks()
+[IdfObject]: R:IdfObject
+[level_checks()]: R:level_checks()
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[level_checks()]: R:level_checks()
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[1]: R:1
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[Idd]: R:Idd
+[IddObject]: R:IddObject
+[IdfObject]: R:IdfObject
+[Idd]: R:Idd
+[IddObject]: R:IddObject
+[IdfObject]: R:IdfObject
+[Idd]: R:Idd
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[level_checks()]: R:level_checks()
+[IdfObject]: R:IdfObject
+[field == "thickness", value := "0.5"]: R:field\%20==\%20\%22thickness\%22,\%20value\%20:=\%20\%220.5\%22
+[Idd]: R:Idd
+[IddObject]: R:IddObject
+[IdfObject]: R:IdfObject
+[Idd]: R:Idd
+[IddObject]: R:IddObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[level_checks()]: R:level_checks()
+[1]: R:1
+[4]: R:4
+[field == "thickness", value := "0.5"]: R:field\%20==\%20\%22thickness\%22,\%20value\%20:=\%20\%220.5\%22
+[IdfObject]: R:IdfObject
+[IdfObject]: R:IdfObject
+[base::grep()]: R:base::grep()
+[base::grep()]: R:base::grep()
 }
 }
 
@@ -989,7 +1081,8 @@ Default: \code{29L} which is the same as IDF Editor.
 
 \section{Save}{
 \preformatted{model$is_unsaved()
-model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
+model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
+           copy_external = TRUE)
 }
 
 \code{$is_unsaved()} returns \code{TRUE} if there are modifications on the model since

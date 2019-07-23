@@ -40,12 +40,12 @@ epsql$path_idf()
 epsql$list_table()
 epsql$read_table(table)
 epsql$report_data_dict()
-epsql$report_data(
-    key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-    period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-    interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL
-)
-job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+                all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+                minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+                environment_name = NULL)
+epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+                   column_name = NULL, row_name = NULL)
 epsql$print()
 print(epsql)
 }
@@ -73,10 +73,12 @@ the same folder. \code{NULL} is returned if no corresponding IDF is found.
 \preformatted{epsql$list_table()
 epsql$read_table(table)
 epsql$report_data_dict()
-epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",case = "auto", all = FALSE,
-                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                  interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+                all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+                minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+                environment_name = NULL)
+epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+                   column_name = NULL, row_name = NULL)
 }
 
 \code{$list_table()} returns all available table and view names in the SQLite file.
@@ -214,9 +216,10 @@ extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday
 possible values for current simulation output can be obtained using
 \code{$read_table("Time")}.
 \item \code{environment_name}: A character vector to specify which environment data to
-extract. All possible \code{environment_name} for current simulation output can
-be obtained using \code{$read_table("EnvironmentPeriods"). }If \code{NULL}, all
-environment data are returned. Default: \code{NULL}.
+extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
+All possible \code{environment_name} for current simulation output can
+be obtained using.\preformatted{$read_table("EnvironmentPeriods")
+}
 \item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
 Each is a character vector for subsetting when querying the SQL database.
 For the meaning of each argument, please see the description above.

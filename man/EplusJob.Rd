@@ -46,10 +46,12 @@ job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
 job$read_table(name)
 job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+                all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+                minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+                environment_name = NULL)
+job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+                 column_name = NULL, row_name = NULL)
 job$print()
 }
 }
@@ -125,10 +127,12 @@ job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
 job$read_table(table)
 job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",case = "auto", all = FALSE,
-                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+                all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+                minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+                environment_name = NULL)
+job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+                 column_name = NULL, row_name = NULL)
 }
 
 \code{$output_dir()} returns the output directory of simulation results.
@@ -277,8 +281,10 @@ possible values for current simulation output can be obtained using
 \code{$read_table("Time")}.
 \item \code{environment_name}: A character vector to specify which environment data to
 extract. All possible \code{environment_name} for current simulation output can
-be obtained using \code{$read_table("EnvironmentPeriods"). }If \code{NULL}, all
-environment data are returned. Default: \code{NULL}.
+be obtained using\preformatted{$read_table("EnvironmentPeriods")
+}
+
+If \code{NULL}, all environment data are returned. Default: \code{NULL}.
 \item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
 Each is a character vector for subsetting when querying the SQL database.
 For the meaning of each argument, please see the description above.

@@ -156,7 +156,7 @@ NULL
 #' `$objects_in_relation()` returns a list of [IddObject]s that have relations.
 #' The first element is always the [IddObject] of that class. If specified class
 #' does not have any relation with other classes, a list that only contains the
-#' [IddObject] of that class is returned.  For instance,
+#' [IddObject] of that class is returned. For instance,
 #' `idd$objects_in_relation("Construction", "ref_to")` will return a list of an
 #' [IddObject] of class `Construction` and also all [IddObject]s that class
 #' `Construction` refers to; similarly, `idd$objects_in_relation("Construction",

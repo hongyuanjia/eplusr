@@ -70,7 +70,8 @@ NULL
 #' @section Usage:
 #' ```
 #' epw <- read_epw(path)
-#' epw$location(city, state_province, country, data_source, wmo_number, latitude, longitude, time_zone, elevation)
+#' epw$location(city, state_province, country, data_source, wmo_number, latitude,
+#'              longitude, time_zone, elevation)
 #' epw$design_condition()
 #' epw$typical_extreme_period()
 #' epw$ground_temperature()
@@ -86,7 +87,8 @@ NULL
 #' epw$range_valid()
 #' epw$fill_action()
 #' epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-#' epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE, type = c("both", "missing", "out_of_range"))
+#' epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
+#'                   type = c("both", "missing", "out_of_range"))
 #' epw$redundant_data()
 #' epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)
 #' epw$fill_abnormal(period = NULL, missing = FALSE, out_of_range = FALSE, special = FALSE)
@@ -116,7 +118,8 @@ NULL
 #'
 #' \subsection{LOCATION Header}{
 #' ```
-#' epw$location(city, state_province, country, data_source, wmo_number, latitude, longitude, time_zone, elevation)
+#' epw$location(city, state_province, country, data_source, wmo_number, latitude,
+#'              longitude, time_zone, elevation)
 #' ```
 #'
 #' `$location()` takes new values for `LOCATION` header fields and  returns the
@@ -255,8 +258,11 @@ NULL
 #'   daylight saving time. For example, `c(3.10, 10.3)`.
 #' * `holiday`: a list or a data.frame containing two elements (columns) `name`
 #'   and `day` where `name` are the holiday names and `day` are valid EPW date
-#'   specifications For example, `list(name = c("New Year's Day", "Christmas
-#'   Day"), day = c("1.1", "25 Dec"))`.
+#'   specifications. For example:
+#'
+#'   ```
+#'   list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
+#'   ```
 #' }
 #'
 #' \subsection{COMMENT1 and COMMENT2 Header}{
@@ -350,7 +356,8 @@ NULL
 #' @section Query Weather Data:
 #' ```
 #' epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-#' epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE, type = c("both", "missing", "out_of_range"))
+#' epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
+#'                   type = c("both", "missing", "out_of_range"))
 #' epw$redundant_data()
 #' ```
 #'

@@ -29,10 +29,12 @@ param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                  interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+                  case = "auto", all = FALSE, period = NULL, month = NULL,
+                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
+                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
+param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
+                   column_name = NULL, row_name = NULL)
 param$print()
 }
 }
@@ -129,10 +131,12 @@ param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                  interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+                  case = "auto", all = FALSE, period = NULL, month = NULL,
+                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
+                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
+param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
+                   column_name = NULL, row_name = NULL)
 }
 
 All those functions have the same meaning as in \link{EplusJob} class, except
@@ -255,9 +259,10 @@ extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday
 possible values for current simulation output can be obtained using
 \code{$read_table("Time")}.
 \item \code{environment_name}: A character vector to specify which environment data to
-extract. All possible \code{environment_name} for current simulation output can
-be obtained using \code{$read_table("EnvironmentPeriods"). }If \code{NULL}, all
-environment data are returned. Default: \code{NULL}.
+extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
+All possible \code{environment_name} for current simulation output can
+be obtained using\preformatted{$read_table("EnvironmentPeriods")
+}
 \item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
 Each is a character vector for subsetting when querying the SQL database.
 For the meaning of each argument, please see the description above.

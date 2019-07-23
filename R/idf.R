@@ -51,9 +51,12 @@ NULL
 #' model$objects(which)
 #' model$objects_in_class(class)
 #' model$objects_in_group(group)
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
-#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
-#' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"),
+#'                       recursive = FALSE, depth = 1L)
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"),
+#'                           class = NULL, recursive = FALSE, depth = 1L)
+#' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+#'                     fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
 #' model$dup(...)
@@ -65,8 +68,10 @@ NULL
 #' model$update(..., .default = TRUE)
 #' model$rename(...)
 #' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
-#' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
-#' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+#' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+#'                    fixed = FALSE, useBytes = FALSE)
+#' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
+#'                     perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' model$is_unsaved()
 #' model$validate(level = eplusr_option("validate_level"))
 #' model$is_valid(level = eplusr_option("validate_level"))
@@ -74,7 +79,8 @@ NULL
 #'                wide = FALSE, align = FALSE, all = FALSE)
 #' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
 #'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
-#' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
+#' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
+#'            copy_external = TRUE)
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$clone(deep = TRUE)
 #' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
@@ -185,7 +191,8 @@ NULL
 #'
 #' @section Object Relation:
 #' ```
-#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"), recursive = TRUE, depth = 1L)
+#' model$object_relation(which, direction = c("all", "ref_to", "ref_by", "node"),
+#'                       recursive = TRUE, depth = 1L)
 #' ```
 #'
 #' Many fields in [Idd] can be referred by others. For example, the `Outside
@@ -240,8 +247,10 @@ NULL
 #' model$object_unique(class)
 #' model$objects_in_class(class)
 #' model$objects_in_group(group)
-#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
-#' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+#' model$objects_in_relation(which, direction = c("ref_to", "ref_by", "node"),
+#'                           class = NULL, recursive = FALSE, depth = 1L)
+#' model$search_object(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+#'                     fixed = FALSE, useBytes = FALSE)
 #' model$ClassName
 #' model[[ClassName]]
 #' }
@@ -256,9 +265,12 @@ NULL
 #' `$object_unique()` returns the [IdfObject] in unique-object class, e.g.
 #' `SimulationControl` class. This makes it easy to directly extract and modify
 #' those unique objects, e.g.
-#' `model$object_unique("SimulationContrl")$set(...)`. Note that if there are
-#' multiple objects in that unique-object class, an error is issued. This makes
-#' sure that `$object_unique()` always returns a single [IdfObject].
+#' ```
+#' model$object_unique("SimulationContrl")$set(...)
+#' ```
+#' Note that if there are multiple objects in that unique-object class, an error
+#' is issued. This makes sure that `$object_unique()` always returns a single
+#' [IdfObject].
 #'
 #' `$objects()` returns a named **list** of [IdfObject]s specified by object IDs
 #' or names.
@@ -284,7 +296,11 @@ NULL
 #' to directly extract groups of related objects and then use `$insert()` method
 #' described below to insert them. For example, copy a construction named
 #' `const` from an `Idf` object `model1` to another `Idf` object `model2` is
-#' simply to do `model2$insert(model1$objects_in_relation("const", "ref_to"))`.
+#' simply to do:
+#'
+#' ```
+#' model2$insert(model1$objects_in_relation("const", "ref_to"))
+#' ```
 #'
 #' There are lots of recursive references in a model. For instance, a material
 #' can be referred by a construction, that construction can be referred by a
@@ -377,7 +393,14 @@ NULL
 #'
 #' * Without new names: `model$dup(c("name1", "name2"), 6:10)`.
 #' * With new names: `model$dup(c(new_name1 = "name1", new_name2 = "name2"), new_name3 = 6)`.
-#' * Variable inputs: `a <- c("name1", new_name2 = "name2"); b <- 10:20; c <- c(new_name3 = 10); model$dup(a, b, c)`.
+#' * Variable inputs:
+#'
+#'   ```
+#'   a <- c("name1", new_name2 = "name2")
+#'   b <- 10:20
+#'   c <- c(new_name3 = 10)
+#'   model$dup(a, b, c)
+#'   ```
 #' }
 #'
 #' \subsection{Add Objects}{
@@ -409,8 +432,17 @@ NULL
 #' * There is no need to give all field values if only specific fields are
 #'   interested, unless other fields are not required. For example, to define a
 #'   new object in `RunPeriod` class, the following is enough:
-#'   `model$add(RunPeriod = list(begin_month = 1, begin_day_of_month = 1,
-#'   end_month = 1, end_day_of_month = 31), .default = TRUE)`.
+#'
+#'   ```
+#'   model$add(
+#'       RunPeriod = list(
+#'           begin_month = 1, begin_day_of_month = 1,
+#'           end_month = 1, end_day_of_month = 31
+#'       ),
+#'       .default = TRUE
+#'   )
+#'   ```
+#'
 #' * If not all field names are given, positions of those values without field
 #'   names are determined after those values with names. E.g. in
 #'   `model$add(Construction = list("out_layer", name = "name"))`, `"out_layer"`
@@ -434,7 +466,15 @@ NULL
 #' * Empty object with default values: `model$add(Building = list(), .default = TRUE)`.
 #' * Empty object with comments: `model$add(Building = list(.comment = c("This", "is", "a", "comment")))`.
 #' * Empty object with all fields: `model$add(Building = list(), .all = TRUE)`.
-#' * New objects: `model$add(RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"), list(Construction = list("const", "mat"), Material = list("mat")))`.
+#' * New objects:
+#'
+#'   ```
+#'   model$add(
+#'       RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"),
+#'       list(Construction = list("const", "mat"), Material = list("mat"))
+#'   )
+#'  ```
+#'
 #' * New objects with comments: `model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))`.
 #' * Variable inputs: `x <- list(Construction = list("const"), Building = list()); model$add(x)`.
 #' }
@@ -549,9 +589,13 @@ NULL
 #' * Specify object with ID: `model$del(1, 2, 10)`.
 #' * Delete objects even they are referred by other objects: `model$del(1:5, .force = TRUE)`
 #' * Delete objects and also other objects that refer to them: `model$del(2,
-#' "Object_Name1", .ref_by = TRUE)`
+#'   "Object_Name1", .ref_by = TRUE)`
 #' * Delete objects and also other objects that refer to them recursively:
-#' `model$del(1:5, .ref_by = TRUE, .recursive = TRUE)`
+#'
+#'   ```
+#'   model$del(1:5, .ref_by = TRUE, .recursive = TRUE)
+#'   ```
+#'
 #' * Delete objects and also other objects that input objects refer to: `model$del(1:5, .ref_to = TRUE)`
 #' * Variable input: `x <- c("Object_Name1", "Object_Name2"); y <- c(1:5); model$del(x, y)`.
 #' }
@@ -576,7 +620,12 @@ NULL
 #' **Usage**:
 #'
 #' * Rename objects: `model$rename(c(new_name1 = "name1", new_name2 = "name2"), new_name3 = 6)`.
-#' * Variable inputs: `a <- c(new_name1 = "name1", new_name2 = "name2"); b <- c(new_name3 = 10); model$rename(a, b)`.
+#' * Variable inputs:
+#'   ```
+#'   a <- c(new_name1 = "name1", new_name2 = "name2")
+#'   b <- c(new_name3 = 10)
+#'   model$rename(a, b)
+#'   ```
 #' }
 #'
 #' \subsection{Insert Objects}{
@@ -818,8 +867,10 @@ NULL
 #' \subsection{Search and Replace Values}{
 #'
 #' ```
-#' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
-#' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)
+#' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
+#'                    fixed = FALSE, useBytes = FALSE)
+#' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
+#'                     perl = FALSE, fixed = FALSE, useBytes = FALSE)
 #' ```
 #'
 #' `$search_value()` returns a list of [IdfObject]s that contain values which
@@ -847,8 +898,17 @@ NULL
 #' **Usage**:
 #'
 #' * Search values that contains `supply`: `model$search_value("supply")`
-#' * Search values that contains `supply` or `demand` in class `Branch`: `model$search_value("supply|demand", "Branch")`
-#' * Search values that contains `win` and replace them with `windows`: `model$replace_value("win", "windows")`
+#' * Search values that contains `supply` or `demand` in class `Branch`:
+#'
+#'   ```
+#'   model$search_value("supply|demand", "Branch")
+#'   ```
+#'
+#' * Search values that contains `win` and replace them with `windows`:
+#'
+#'   ```
+#'   model$replace_value("win", "windows")
+#'   ```
 #' }
 #'
 #' @section Validation:
@@ -1003,7 +1063,8 @@ NULL
 #'
 #' ```
 #' model$is_unsaved()
-#' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
+#' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
+#'            copy_external = TRUE)
 #' ```
 #'
 #' `$is_unsaved()` returns `TRUE` if there are modifications on the model since

@@ -27,7 +27,8 @@ idfobj[[Field]]
 idfobj$set(..., .defaults = TRUE)
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+                      recursive = FALSE, depth = 1L)
 idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
@@ -135,9 +136,9 @@ vector of valid field names, and returns all possible values for specified
 fields. For a specific field, there are 5 types of possible values:
 \itemize{
 \item \code{auto}: Whether the field can be filled with \code{Autosize} and
-\code{Autocalculate}. This field attribute can also be retrieved using
-\code{idfobj$definition()$is_autosizable()} and
-\code{idfobj$definition()$is_autosizable()}.
+\code{Autocalculate}. This field attribute can also be retrieved using:\preformatted{idfobj$definition()$is_autosizable_field()
+idfobj$definition()$is_autocalculatable_field()
+}
 \item \code{default}: The default value. This value can also be retrieved using
 \code{idfobj$defintion()$field_default()}.
 \item \code{choice}: The choices which the field can be set. This value can also be
@@ -247,7 +248,8 @@ eplusr also provides custom S3 method of \code{$<-} and
 \strong{Arguments}:
 \itemize{
 \item \code{...}: New field value definitions in \code{field = value} format or a single
-list in format \code{list(field1 = value1, field2 = value2)}.
+list in format\preformatted{list(field1 = value1, field2 = value2)
+}
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
 \item \code{FieldName}: A single length character vector of one valid field name where
@@ -263,7 +265,8 @@ letters and numbers are replaced by underscores.
 \section{Field Value Relation}{
 
 \preformatted{
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+                      recursive = FALSE, depth = 1L)
 idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)

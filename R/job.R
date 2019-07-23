@@ -44,10 +44,12 @@ NULL
 #' job$list_table()
 #' job$read_table(name)
 #' job$report_data_dict()
-#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-#'                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-#'                 interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+#'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+#'                 minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+#'                 environment_name = NULL)
+#' job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+#'                  column_name = NULL, row_name = NULL)
 #' job$print()
 #' ```
 #'
@@ -120,10 +122,12 @@ NULL
 #' job$list_table()
 #' job$read_table(table)
 #' job$report_data_dict()
-#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",case = "auto", all = FALSE,
-#'                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-#'                 interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+#' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
+#'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
+#'                 minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
+#'                 environment_name = NULL)
+#' job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
+#'                  column_name = NULL, row_name = NULL)
 #' ```
 #'
 #' `$output_dir()` returns the output directory of simulation results.
@@ -267,8 +271,13 @@ NULL
 #'   `$read_table("Time")`.
 #' * `environment_name`: A character vector to specify which environment data to
 #'    extract. All possible `environment_name` for current simulation output can
-#'    be obtained using `$read_table("EnvironmentPeriods"). `If `NULL`, all
-#'    environment data are returned. Default: `NULL`.
+#'    be obtained using
+#'
+#'    ```
+#'    $read_table("EnvironmentPeriods")
+#'    ```
+#'
+#'    If `NULL`, all environment data are returned. Default: `NULL`.
 #' * `report_name`, `report_for`, `table_name`, `column_name`, `row_name`:
 #'   Each is a character vector for subsetting when querying the SQL database.
 #'   For the meaning of each argument, please see the description above.

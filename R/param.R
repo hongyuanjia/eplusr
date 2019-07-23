@@ -30,10 +30,12 @@ NULL
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
-#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-#'                   period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-#'                   interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+#'                   case = "auto", all = FALSE, period = NULL, month = NULL,
+#'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
+#'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
+#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
+#'                    column_name = NULL, row_name = NULL)
 #' param$print()
 #' ```
 #' @section Create:
@@ -125,10 +127,12 @@ NULL
 #' param$output_dir(which = NULL)
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
-#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto", all = FALSE,
-#'                   period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-#'                   interval = NULL, simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL, column_name = NULL, row_name = NULL)
+#' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+#'                   case = "auto", all = FALSE, period = NULL, month = NULL,
+#'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
+#'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
+#' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
+#'                    column_name = NULL, row_name = NULL)
 #' ```
 #'
 #' All those functions have the same meaning as in [EplusJob] class, except
@@ -250,9 +254,14 @@ NULL
 #'   possible values for current simulation output can be obtained using
 #'   `$read_table("Time")`.
 #' * `environment_name`: A character vector to specify which environment data to
-#'    extract. All possible `environment_name` for current simulation output can
-#'    be obtained using `$read_table("EnvironmentPeriods"). `If `NULL`, all
-#'    environment data are returned. Default: `NULL`.
+#'    extract. If `NULL`, all environment data are returned. Default: `NULL`.
+#'    All possible `environment_name` for current simulation output can
+#'    be obtained using
+#'
+#'    ```
+#'    $read_table("EnvironmentPeriods")
+#'    ```
+#'
 #' * `report_name`, `report_for`, `table_name`, `column_name`, `row_name`:
 #'   Each is a character vector for subsetting when querying the SQL database.
 #'   For the meaning of each argument, please see the description above.

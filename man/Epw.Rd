@@ -67,7 +67,8 @@ In order to streamline the error-prone process of creating custom EPW file,
 }
 \section{Usage}{
 \preformatted{epw <- read_epw(path)
-epw$location(city, state_province, country, data_source, wmo_number, latitude, longitude, time_zone, elevation)
+epw$location(city, state_province, country, data_source, wmo_number, latitude,
+             longitude, time_zone, elevation)
 epw$design_condition()
 epw$typical_extreme_period()
 epw$ground_temperature()
@@ -83,7 +84,8 @@ epw$range_exist()
 epw$range_valid()
 epw$fill_action()
 epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE, type = c("both", "missing", "out_of_range"))
+epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
+                  type = c("both", "missing", "out_of_range"))
 epw$redundant_data()
 epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)
 epw$fill_abnormal(period = NULL, missing = FALSE, out_of_range = FALSE, special = FALSE)
@@ -114,7 +116,8 @@ print(epw)
 \section{Query and Modify Header}{
 
 
-\subsection{LOCATION Header}{\preformatted{epw$location(city, state_province, country, data_source, wmo_number, latitude, longitude, time_zone, elevation)
+\subsection{LOCATION Header}{\preformatted{epw$location(city, state_province, country, data_source, wmo_number, latitude,
+             longitude, time_zone, elevation)
 }
 
 \code{$location()} takes new values for \code{LOCATION} header fields and  returns the
@@ -248,8 +251,10 @@ way as No.3 format described above.
 daylight saving time. For example, \code{c(3.10, 10.3)}.
 \item \code{holiday}: a list or a data.frame containing two elements (columns) \code{name}
 and \code{day} where \code{name} are the holiday names and \code{day} are valid EPW date
-specifications For example, \code{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))}.
+specifications. For example:\preformatted{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
 }
+}
+
 }
 
 \subsection{COMMENT1 and COMMENT2 Header}{\preformatted{epw$comment1(comment)
@@ -344,7 +349,8 @@ and \code{"out_of_range"}. Default: \code{"missing"}.
 
 \section{Query Weather Data}{
 \preformatted{epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE, type = c("both", "missing", "out_of_range"))
+epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
+                  type = c("both", "missing", "out_of_range"))
 epw$redundant_data()
 }
 

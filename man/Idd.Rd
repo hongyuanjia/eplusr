@@ -163,7 +163,7 @@ But \code{Field 1} in class \code{Class 2} refers to \code{Field 2} in class nam
 \code{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
 The first element is always the \link{IddObject} of that class. If specified class
 does not have any relation with other classes, a list that only contains the
-\link{IddObject} of that class is returned.  For instance,
+\link{IddObject} of that class is returned. For instance,
 \code{idd$objects_in_relation("Construction", "ref_to")} will return a list of an
 \link{IddObject} of class \code{Construction} and also all \link{IddObject}s that class
 \code{Construction} refers to; similarly, \code{idd$objects_in_relation("Construction", "ref_by")} will return a list of an \link{IddObject} of class \code{Construction} and

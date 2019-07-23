@@ -25,7 +25,8 @@ NULL
 #' idfobj$set(..., .defaults = TRUE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+#'                       recursive = FALSE, depth = 1L)
 #' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
@@ -125,9 +126,13 @@ NULL
 #' fields. For a specific field, there are 5 types of possible values:
 #'
 #' * `auto`: Whether the field can be filled with `Autosize` and
-#'   `Autocalculate`. This field attribute can also be retrieved using
-#'   `idfobj$definition()$is_autosizable()` and
-#'   `idfobj$definition()$is_autosizable()`.
+#'   `Autocalculate`. This field attribute can also be retrieved using:
+#'
+#'   ```
+#'   idfobj$definition()$is_autosizable_field()
+#'   idfobj$definition()$is_autocalculatable_field()
+#'   ```
+#'
 #' * `default`: The default value. This value can also be retrieved using
 #'   `idfobj$defintion()$field_default()`.
 #' * `choice`: The choices which the field can be set. This value can also be
@@ -233,7 +238,10 @@ NULL
 #' **Arguments**:
 #'
 #' * `...`: New field value definitions in `field = value` format or a single
-#'   list in format `list(field1 = value1, field2 = value2)`.
+#'   list in format
+#'   ```
+#'   list(field1 = value1, field2 = value2)
+#'   ```
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
 #' * `FieldName`: A single length character vector of one valid field name where
@@ -246,7 +254,8 @@ NULL
 #'
 #' @section Field Value Relation:
 #' \preformatted{
-#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
+#' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+#'                       recursive = FALSE, depth = 1L)
 #' idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
 #' idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
