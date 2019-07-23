@@ -16,6 +16,8 @@
 * Fix the error in `$set()` when `$add_unit()` is performed in Epw class (#56).
 * Now IDF file located in a folder whose name contains spaces can be
   successfully simulated (#60). Thanks @yidan1214 for reporting this bug.
+* Now `$ref_to_object()` and `$ref_by_object()` can give correct results when
+  `class` argument is specified.
 
 ## Minor changes
 

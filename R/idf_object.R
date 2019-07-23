@@ -1064,7 +1064,7 @@ idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, rec
     if (!is.null(class)) {
         add_joined_cols(private$idf_env()$object, rel, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
         cls <- get_idd_class(private$idd_env(), class)
-        rel <- rel[J(cls$class_id), on = "src_class_id"]
+        rel <- rel[J(cls$class_id), on = "src_class_id", nomatch = 0L]
     }
 
     if (!nrow(rel)) {
@@ -1113,7 +1113,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, rec
     if (!is.null(class)) {
         add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
         cls <- get_idd_class(private$idd_env(), class)
-        rel <- rel[J(cls$class_id), on = "class_id"]
+        rel <- rel[J(cls$class_id), on = "class_id", nomatch = 0L]
     }
 
     if (!nrow(rel)) {
