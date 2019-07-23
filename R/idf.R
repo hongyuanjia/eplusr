@@ -70,8 +70,10 @@ NULL
 #' model$is_unsaved()
 #' model$validate(level = eplusr_option("validate_level"))
 #' model$is_valid(level = eplusr_option("validate_level"))
-#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
-#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE,
+#'                wide = FALSE, align = FALSE, all = FALSE)
+#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
+#'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
 #' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$clone(deep = TRUE)
@@ -945,8 +947,10 @@ NULL
 #'
 #' @section Data Extraction:
 #' ```
-#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
-#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE, format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
+#' model$to_table(which = NULL, class = NULL, string_value = TRUE, unit = FALSE,
+#'                wide = FALSE, align = FALSE, all = FALSE)
+#' model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
+#'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' ```
 #'
 #' `$to_table()` returns a [data.table][data.table::data.table()] that contains
@@ -982,6 +986,11 @@ NULL
 #'   `TRUE`, a wide table will be returned, i.e. first three columns are always
 #'   `id`, `name` and `class`, and then every field in a separate column.
 #'   Default: `FALSE`.
+#' * `align`: If `TRUE`, all objects in the same class will have the same field
+#'   number. The number of fields is the same as the object that have the most
+#'   fields among objects specified. Default: `FALSE`.
+#' * `all`: If `TRUE`, all available fields defined in IDD of the class that
+#'   objects specified belong to will be returned. Default: `FALSE`.
 #' * `comment`: If `FALSE`, all comments will not be included. Default: `TRUE`.
 #' * `header`: If `FALSE`, the header will not be included. Default: `TRUE`.
 #' * `format`: Specific format used when formatting. For details, please see
@@ -1658,8 +1667,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             idf_string(self, private, comment = comment, header = header,
                        format = format, leading = leading, sep_at = sep_at),
 
-        to_table = function (which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE)
-            idf_to_table(self, private, which = which, class = class, string_value = string_value, unit = unit, wide = wide),
+        to_table = function (which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE)
+            idf_to_table(self, private, which = which, class = class, string_value = string_value, unit = unit, wide = wide, align = align, all = all),
 
         is_unsaved = function ()
             idf_is_unsaved(self, private),
@@ -2239,8 +2248,8 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE) {
-    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide)
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE) {
+    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide, align, all)
 }
 # }}}
 # idf_save {{{

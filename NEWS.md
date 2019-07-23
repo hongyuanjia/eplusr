@@ -10,6 +10,11 @@
   generated parametric models and weather file into speicifed directory. You can
   use `separate` argument to determine whether each model is to be saved in a
   separate folder (#58). Thanks @yidan1214 for this feature request.
+* New arguments `align` and `all` have been added to `$to_table()` method in
+  `Idf` class. Setting `align` to `TRUE` will make sure that all returned object
+  data per class have the same field number. The number of fields is the same as
+  the object that have the most fields among those you specified. Setting `all`
+  to `TRUE` will return all available fields in that class definition in IDD.
 
 ## Bug fixes
 

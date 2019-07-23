@@ -3194,13 +3194,16 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 # TABLE
 # get_idf_table {{{
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
-                           string_value = TRUE, unit = FALSE, wide = FALSE, all = FALSE) {
+                           string_value = TRUE, unit = FALSE, wide = FALSE,
+                           align = FALSE, all = FALSE) {
     cols <- c("object_id", "object_name", "class_name",
               "field_index", "field_name", "units", "ip_units", "type_enum",
               "value_chr", "value_num")
 
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum"), all = all)[, .SD, .SDcols = c("rleid", cols)]
+        property = c("units", "ip_units", "type_enum"),
+        align = align, complete = TRUE, all = all)[
+        , .SD, .SDcols = c("rleid", cols)]
 
     if ((all || wide) && length(unique(val$class_name)) != 1L) {
         cls <- unique(val$class_name)
