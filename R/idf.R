@@ -1945,9 +1945,9 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
         )
         msg <- paste0(get_object_info(obj, numbered = FALSE), " ", dir, " any other object")
         if (is.null(class)) {
-            message(paste0(msg, "."))
+            verbose_info(paste0(msg, "."))
         } else {
-            message(paste0(msg, " in class ", collapse(cls$class_name), "."))
+            verbose_info(paste0(msg, " in class ", collapse(cls$class_name), "."))
         }
         return(obj_self)
     }
@@ -2100,7 +2100,7 @@ idf_insert <- function (self, private, ..., .unique = TRUE) {
     ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ..., .unique = .unique)
 
     if (!nrow(ins$object)) {
-        message("After deleting duplications, nothing to add.")
+        verbose_info("After deleting duplications, nothing to add.")
         return(invisible())
     }
 
@@ -2159,7 +2159,7 @@ idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE) 
     )
 
     if (!nrow(pas$object)) {
-        message("After deleting duplications, nothing to add.")
+        verbose_info("After deleting duplications, nothing to add.")
         return(invisible())
     }
 
@@ -2180,7 +2180,7 @@ idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
     )
 
     if (!nrow(l$object)) {
-        message("After deleting duplications, nothing to add.")
+        verbose_info("After deleting duplications, nothing to add.")
         return(invisible())
     }
 

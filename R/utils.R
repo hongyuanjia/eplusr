@@ -200,7 +200,7 @@ match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = T
             type <- match.arg(type)
             key <- switch(type, idd = "IDD", eplus = "EnergyPlus")
 
-            message("Multiple versions found for ", key, " v", ori_ver, ": ",
+            verbose_info("Multiple versions found for ", key, " v", ori_ver, ": ",
                 collapse(paste0("v", ver)), ". ",
                 "The last patched version v", max(ver), " will be used. ",
                 "Please explicitly give the full version if you want to use the other versions."

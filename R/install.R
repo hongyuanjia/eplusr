@@ -63,13 +63,13 @@ install_eplus <- function (ver = "latest", force = FALSE) {
                 "installed at ", surround(eplus_config(ver)$dir),
                 ". Set `force` to TRUE to reinstall."), call. = FALSE)
 
-    message(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
+    verbose_info(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
 
     dl <- download_eplus(ver, tempdir())
 
-    message(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
+    verbose_info(sprintf("Starting to install EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
 
-    message("NOTE: Administrative privileges required during installation. ",
+    verbose_info("NOTE: Administrative privileges required during installation. ",
             "Please make sure R is running with an administrator acount or equivalent.")
 
     inst <- attr(dl, "file")
@@ -81,7 +81,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
     if (res != 0L) stop("Failed to install EnergyPlus v", ver, ".", call. = FALSE)
 
     path <- eplus_default_path(ver)
-    message(sprintf("EnergyPlus v%s successfully installed into %s.", ver, path))
+    verbose_info(sprintf("EnergyPlus v%s successfully installed into %s.", ver, path))
 
     # add newly installed EnergyPlus to dictionary
     use_eplus(ver)
@@ -107,7 +107,7 @@ download_eplus <- function (ver = "latest", dir) {
 
     if (dl != 0L) stop("Failed to download EnergyPlus v", ver, ".", call. = FALSE)
 
-    message("The installer file of EnergyPlus ", paste0("v", ver), " ",
+    verbose_info("The installer file of EnergyPlus ", paste0("v", ver), " ",
         surround(file), " has been successfully downloaded into ", dir, ".")
 
     attr(dl, "file") <- dest
@@ -274,7 +274,7 @@ use_eplus <- function (eplus) {
         chk <- is_eplus_path(eplus_dir)
         if (any(chk)) {
             if (sum(chk) > 1L) {
-                message("Multiple versions found for EnergyPlus v", ori_ver, ": ",
+                verbose_info("Multiple versions found for EnergyPlus v", ori_ver, ": ",
                     collapse(paste0("v", ver)), ". ",
                     "The last patched version v", max(ver), " will be used. ",
                     "Please explicitly give the full version if you want to use the other versions."
@@ -312,13 +312,13 @@ use_eplus <- function (eplus) {
     .globals$eplus_config[[as.character(ver)]] <- res
 
     if (is.null(ori)) {
-        message("EnergyPlus v", ver, " located at ", surround(eplus_dir),
+        verbose_info("EnergyPlus v", ver, " located at ", surround(eplus_dir),
             " has been added.")
     } else if (identical(ori$dir, eplus_dir)) {
-        message("Configure data of EnergyPlus v", ver, " located at ",
+        verbose_info("Configure data of EnergyPlus v", ver, " located at ",
             surround(eplus_dir), " already exists. No Updating performed.")
     } else {
-        message("Update configure data of EnergyPlus v", ver, ":\n",
+        verbose_info("Update configure data of EnergyPlus v", ver, ":\n",
             "    Former location: ", surround(ori$dir), " ---> ",
                    "New location: ", surround(eplus_dir))
     }

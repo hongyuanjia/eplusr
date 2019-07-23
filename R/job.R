@@ -592,7 +592,7 @@ job_run <- function (self, private, wait = TRUE, force = FALSE) {
         if (inherits(proc, "process") && proc$is_alive()) {
             pid <- proc$get_pid()
             if (force) {
-                message("Force to kill current running simulation (PID: ", pid,
+                verbose_info("Force to kill current running simulation (PID: ", pid,
                     ") and start a new simulation...")
                 suppressMessages(self$kill())
             } else {
@@ -617,14 +617,14 @@ job_run <- function (self, private, wait = TRUE, force = FALSE) {
 # job_kill {{{
 job_kill <- function (self, private) {
     if (is.null(private$m_job)) {
-        message("The job has not been run yet.")
+        verbose_info("The job has not been run yet.")
         return(invisible(FALSE))
     }
 
     proc <- private$m_job$process
 
     if (!proc$is_alive()) {
-        message("The job is not running.")
+        verbose_info("The job is not running.")
         return(invisible(FALSE))
     }
 
@@ -632,10 +632,10 @@ job_kill <- function (self, private) {
 
     if (isTRUE(k)) {
         private$m_log$killed <- TRUE
-        message("The job has been successfully killed.")
+        verbose_info("The job has been successfully killed.")
         return(invisible(TRUE))
     } else {
-        message("Failed to kill the job, because it was already finished/dead.")
+        verbose_info("Failed to kill the job, because it was already finished/dead.")
         return(invisible(FALSE))
     }
 }
@@ -707,7 +707,7 @@ job_output_dir <- function (self, private, open = FALSE) {
     if (!open) return(dir)
     if (open) {
         if (is.null(dir)) {
-            message("No simulation has been run yet.")
+            verbose_info("No simulation has been run yet.")
             return(invisible())
         }
 
@@ -720,7 +720,7 @@ job_output_dir <- function (self, private, open = FALSE) {
         } else if (is_linux()) {
             system(paste0("xdg-open ", dir))
         } else {
-            message("Current platform not supported.")
+            verbose_info("Current platform not supported.")
         }
     }
     dir

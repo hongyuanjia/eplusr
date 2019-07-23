@@ -733,7 +733,7 @@ use_idd <- function (idd, download = FALSE) {
         # if found in cache, return it directly
         if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
 
-        message("IDD v", ver, " has not been parsed before.\nTry to locate ",
+        verbose_info("IDD v", ver, " has not been parsed before.\nTry to locate ",
             "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
             surround(eplus_default_path(ver)), ".")
 
@@ -752,7 +752,7 @@ use_idd <- function (idd, download = FALSE) {
                 )
             }
 
-            message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+            verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
 
             dl <- download_idd(ver, dir = tempdir())
             idd <- attr(dl, "file")
@@ -770,7 +770,7 @@ use_idd <- function (idd, download = FALSE) {
                         "GitHub repo.", call. = FALSE)
                 }
 
-                message(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+                verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
 
                 dl <- download_idd(ver, dir = tempdir())
                 idd <- attr(dl, "file")
@@ -778,10 +778,10 @@ use_idd <- function (idd, download = FALSE) {
         }
     }
 
-    message("IDD file found: ", surround(idd), ".")
-    message("Start parsing...")
+    verbose_info("IDD file found: ", surround(idd), ".")
+    verbose_info("Start parsing...")
     idd <- read_idd(idd)
-    message("Parsing completed.")
+    verbose_info("Parsing completed.")
     idd
 }
 # }}}
@@ -861,7 +861,7 @@ download_idd <- function (ver = "latest", dir = ".") {
         write_lines(l, dest)
     }
 
-    message("EnergyPlus v", ver, " IDD file ", surround(file), " has been successfully ",
+    verbose_info("EnergyPlus v", ver, " IDD file ", surround(file), " has been successfully ",
         "downloaded into ", normalizePath(dir), ".")
 
     attr(res, "file") <- dest

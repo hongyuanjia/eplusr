@@ -1522,7 +1522,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
     res[, index := .I]
 
     if (!nrow(res)) {
-        message("No matched result found.")
+        verbose_info("No matched result found.")
         return(invisible(NULL))
     }
 
@@ -1536,7 +1536,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
             if (r < length(ch)) res <- res[index == r]
         } else {
             if (nrow(res) <= max_match) {
-                message(nrow(res), " matched results found. All of them will be downloaded:\n",
+                verbose_info(nrow(res), " matched results found. All of them will be downloaded:\n",
                     paste0(m, collapse = "\n\n")
                 )
             } else {
@@ -1554,7 +1554,7 @@ download_weather <- function (pattern, filename = NULL, dir = ".", type = c("all
             if (r != 1) return(invisible(NULL))
         } else {
             h <- paste0("One matched results found. Start downloading:")
-            message("One matched results found. Start downloading:\n",
+            verbose_info("One matched results found. Start downloading:\n",
                 paste0(m, collapse = "\n\n")
             )
         }

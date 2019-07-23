@@ -486,7 +486,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     # log unique ids
     private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
-    message("Measure ", surround(mea_nm), " has been applied with ", length(out),
+    verbose_info("Measure ", surround(mea_nm), " has been applied with ", length(out),
         " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
 }
 # }}}
@@ -658,7 +658,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
         if (inherits(old, "process") && old$is_alive()) {
             pid <- old$get_pid()
             if (force) {
-                message("Force to kill all current running parametric simulations (",
+                verbose_info("Force to kill all current running parametric simulations (",
                     "Parent R Process PID: ", pid, ") and restart...")
                 suppressMessages(self$kill())
             } else {
@@ -744,32 +744,32 @@ param_kill <- function (self, private) {
 
     if (is.null(private$m_job)) {
 
-        message("The parametric job is not running.")
+        verbose_info("The parametric job is not running.")
         return(invisible(FALSE))
 
     }
 
     if (!inherits(private$m_job, "process")) {
 
-        message("The parametric job is not running.")
+        verbose_info("The parametric job is not running.")
         return(invisible(FALSE))
     }
 
     proc <- private$m_job
 
     if (!proc$is_alive()) {
-        message("The parametric job is not running.")
+        verbose_info("The parametric job is not running.")
         return(invisible(FALSE))
     }
 
     k <- tryCatch(proc$kill(), error = function (e) FALSE)
 
     if (isTRUE(k)) {
-        message("The parametric job has been successfully killed.")
+        verbose_info("The parametric job has been successfully killed.")
         private$m_log$killed <- TRUE
         return(invisible(TRUE))
     } else {
-        message("Failed to kill parametric job, because it was already finished/dead.")
+        verbose_info("Failed to kill parametric job, because it was already finished/dead.")
         return(invisible(FALSE))
     }
 }

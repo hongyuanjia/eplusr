@@ -145,11 +145,7 @@ in_ip_mode <- function () {
 # }}}
 # verbose_info {{{
 verbose_info <- function (...) {
-    if (eplusr_option("verbose_info")) {
-        cli::cat_rule("Info", col = "green")
-        cat(paste0(...), "\n", sep = "")
-        cat("\n")
-    }
+    if (eplusr_option("verbose_info")) message(...)
 }
 # }}}
 
