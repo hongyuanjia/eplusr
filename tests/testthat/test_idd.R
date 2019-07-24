@@ -1,5 +1,7 @@
 context("Idd and IddObject")
 
+eplusr_option(verbose_info = FALSE)
+
 # download_idd() {{{
 test_that("can download IDD from EnergyPlus repo", {
     skip_on_cran()

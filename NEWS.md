@@ -44,6 +44,9 @@
 * A new function `transition()` has been added. Basically it is an
   R implementation of IDFVersionUpdater. Currently the lowest version of IDF is
   v8.2.
+* Now the way of find IDD file has been changed to take advantage of IDD files
+  distributed along with IDFVersionUpdater. This update makes it possible to
+  directly read IDF of most versions without downloading corresponding IDD.
 
 ## Bug fixes
 
@@ -63,6 +66,8 @@
 * Now the `echo` argument in `run_idf()` and `run_multi()` will only take effect
   when `wait` is `TRUE`. This makes it possible to remove the dependency on the
   later package.
+* All messages can be suppressed by setting the `verbose_info` option to
+  `FALSE`.
 
 # eplusr 0.10.3
 
