@@ -23,6 +23,7 @@
   successfully simulated (#60). Thanks @yidan1214 for reporting this bug.
 * Now `$ref_to_object()` and `$ref_by_object()` can give correct results when
   `class` argument is specified.
+* Now IDD version lower than 8.3 can successfully be downloaded and parsed.
 
 ## Minor changes
 

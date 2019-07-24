@@ -295,7 +295,7 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt[stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
-        abort("error_miss_idd_build", "No build tag found in input IDD.")
+        warn("warn_miss_idd_build", "No build tag found in input IDD.")
     } else if (nrow(build_line) == 1L) {
         build <- stri_sub(build_line$string, 12L)
     } else {

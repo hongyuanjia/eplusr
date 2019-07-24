@@ -159,8 +159,9 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
 
     ver <- numeric_version(ver, strict = FALSE)
 
-    # only keep major.minor.patch, and convert others to NAs
-    ver[!is.na(ver[, 4L])] <- numeric_version(NA, strict = FALSE)
+    # only keep major.minor.patch, and remove others
+    has_trail <- suppressWarnings(!is.na(ver[, 4L]))
+    ver[has_trail] <- ver[has_trail, 1L:3L]
 
     # complete patch version to 0 if not exist
     if (complete && any(!is.na(ver) & is.na(ver[, 3L]))) {

@@ -331,7 +331,7 @@ use_eplus <- function (eplus) {
 #' @export
 # eplus_config {{{
 eplus_config <- function (ver) {
-    assert(is_eplus_ver(ver, strict = TRUE))
+    assert(is_idd_ver(ver, strict = TRUE))
     ver <- standardize_ver(ver, complete = FALSE)
     ver_m <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
     if (is.na(ver)) {
@@ -378,7 +378,7 @@ locate_eplus <- function () {
 # eplus_default_path {{{
 eplus_default_path <- function (ver) {
     ver <- standardize_ver(ver)
-    assert(is_eplus_ver(ver))
+    assert(is_idd_ver(ver))
     ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
     if (is_windows()) {
         d <- paste0("C:/EnergyPlusV", ver_dash)
