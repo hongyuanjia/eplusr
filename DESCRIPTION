@@ -67,6 +67,7 @@ Collate:
     'rdd.R'
     'run.R'
     'sql.R'
+    'transition.R'
     'units.R'
     'validate.R'
     'zzz.R'

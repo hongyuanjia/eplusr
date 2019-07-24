@@ -41,6 +41,9 @@
   `ParametricJob` class. It is only applicable when `wait` is `TRUE`. If `FALSE`,
   the simulation will be run silently without echoing any message from
   EnergyPlus.
+* A new function `transition()` has been added. Basically it is an
+  R implementation of IDFVersionUpdater. Currently the lowest version of IDF is
+  v8.2.
 
 ## Bug fixes
 
