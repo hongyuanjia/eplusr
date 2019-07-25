@@ -1,4 +1,4 @@
-#' @importFrom stringi stri_replace_all_charclass stri_trans_tolower
+#' @importFrom stringi stri_enc_toutf8 stri_replace_all_charclass stri_trans_tolower
 NULL
 
 # `%||%` {{{
@@ -111,7 +111,17 @@ read_lines <- function(input, trim = TRUE, ...) {
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
     if (trim) {
-        set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
+        dt <- tryCatch(
+            set(dt, j = "string", value = stri_trim_both(dt[["string"]])),
+            # fix invalid UTF-8 sequence error in older version of IDD
+            error = function (e) {
+                if (grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
+                    set(dt, j = "string", value = stri_trim_both(stri_enc_toutf8(dt[["string"]], is_unknown_8bit = TRUE)))
+                } else {
+                    signalCondition(e)
+                }
+            }
+        )
     }
     setcolorder(dt, c("line", "string"))
     dt
