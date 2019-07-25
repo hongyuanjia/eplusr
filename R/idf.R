@@ -265,9 +265,11 @@ NULL
 #' `$object_unique()` returns the [IdfObject] in unique-object class, e.g.
 #' `SimulationControl` class. This makes it easy to directly extract and modify
 #' those unique objects, e.g.
+#'
 #' ```
 #' model$object_unique("SimulationContrl")$set(...)
 #' ```
+#'
 #' Note that if there are multiple objects in that unique-object class, an error
 #' is issued. This makes sure that `$object_unique()` always returns a single
 #' [IdfObject].
