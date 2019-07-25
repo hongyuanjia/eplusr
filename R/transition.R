@@ -49,7 +49,7 @@ setindexv(REPORTVAR_RULES, c("from", "to"))
 #' specified version.
 #'
 #' @param idf An [Idf] object or a path of IDF file.
-#' @param A valid EnergyPlus version, e.g. `9`, `8.8`, or `"8.8.0"`.
+#' @param ver A valid EnergyPlus version, e.g. `9`, `8.8`, or `"8.8.0"`.
 #' @param keep_all If `TRUE`, a list will be return which contains all
 #' [Idf] objects of intermediate versions. The list will be named using first
 #' two number of that version, e.g. `8.1`, `8.2`.
@@ -63,10 +63,12 @@ transition <- function (idf, ver, keep_all = FALSE) {
     assert(is_idd_ver(ver))
     ver <- standardize_ver(ver)[, 1L:2L]
 
-    if (idf$version() <= 8.2) {
+    if (idf$version() < 8.2) {
         abort("error_trans_not_supported",
-            "Input IDF has version ", surround(idf$version()), ". ",
-            "Currently only EnergyPlus v8.2 and above are suppored."
+            paste0(
+                "Input IDF has version ", surround(idf$version()), ". ",
+                "Currently only EnergyPlus v8.2 and above are suppored."
+            )
         )
     }
 
@@ -103,17 +105,14 @@ trans_apply <- function (idf, ver, keep_all) {
     # apply transition functions
     if (!keep_all) {
         for (i in funs)  idf <- trans_funs[[i]](idf)
-
         idf
     } else {
         res <- vector("list", length(funs) + 1L)
+        res[[1L]] <- idf
 
         for (i in seq_along(res)) {
-            if (i == 1L) {
-                res[[i]] <- idf
-            } else {
-                res[[i + 1L]] <- trans_funs[[i]](res[[i]])
-            }
+            if (i == length(res)) break
+            res[[i + 1L]] <- trans_funs[[funs[[i]]]](res[[i]])
         }
         nms <- paste0(stri_sub(funs, 5L, 5L), ".", stri_sub(funs, 6L, 6L))
         setattr(res, "names", c(as.character(idf$version()[, 1L:2L]), nms))
@@ -1490,6 +1489,7 @@ trans_postprocess <- function (idf, from, to) {
             set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
         }
 
+        new <- NULL # eliminate check warning of no visible binding
         # delete deprecatd variable first
         dt <- dt[!mapping[is.na(new)], on = c(value_lower = "old")]
 
