@@ -1212,6 +1212,8 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     dt[dt[type >= type_enum$value, .I[1L], by = list(object_id)]$V1,
         c("type", "class_name_lower", "body") :=({
             n <- stri_locate_first_fixed(body, ",")[, 1L]
+            # in case there are invalid class names ends with semicolon
+            n[is.na(n)] <- 0L
             l <- stri_length(body)
             class_name_lower <- stri_trans_tolower(stri_sub(body, to = n - 1L))
             body[n < l] <- stri_trim_left(stri_sub(body[n < l], n[n < l] + 1L))

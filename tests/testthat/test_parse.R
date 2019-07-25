@@ -350,26 +350,15 @@ test_that("parse_idf_file()", {
         "Version,8.8;
         ! comment
          WrongClass,
-            WD01,                    !- Name
-            MediumSmooth,            !- Roughness
-            1.9099999E-02,           !- Thickness {m}
-            0.1150000,               !- Conductivity {W/m-K}
-            513.0000,                !- Density {kg/m3}
-            1381.000,                !- Specific Heat {J/kg-K}
-            0.9000000,               !- Thermal Absorptance
-            0.7800000,               !- Solar Absorptance
-            0.7800000;               !- Visible Absorptance
+            WD01;                    !- Name
         ! comment
          WrongClass,
-            WD01,                    !- Name
-            MediumSmooth,            !- Roughness
-            1.9099999E-02,           !- Thickness {m}
-            0.1150000,               !- Conductivity {W/m-K}
-            513.0000,                !- Density {kg/m3}
-            1381.000,                !- Specific Heat {J/kg-K}
-            0.9000000,               !- Thermal Absorptance
-            0.7800000,               !- Solar Absorptance
-            0.7800000;               !- Visible Absorptance
+            WD01;                    !- Name
+        ")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "error_invalid_class")
+    idf_wrong <- c(
+        "Version,8.8;
+         WrongClass, WD01;
         ")
     expect_error(parse_idf_file(idf_wrong, 8.8), class = "error_invalid_class")
 
