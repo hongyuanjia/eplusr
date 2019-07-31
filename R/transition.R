@@ -50,14 +50,22 @@ setindexv(REPORTVAR_RULES, c("from", "to"))
 #'
 #' @param idf An [Idf] object or a path of IDF file.
 #' @param ver A valid EnergyPlus version, e.g. `9`, `8.8`, or `"8.8.0"`.
+#' @param save If `TRUE`, the models will be saved into specified directory.
+#' Default: `FALSE`.
+#' @param dir Only applicable when `save` is `TRUE`. The directory to save the
+#' new IDF files. If the directory does not exist, it will be created before
+#' save. If `NULL`, the directory of input [Idf] object or IDF file will be
+#' used. Default: `NULL`.
 #' @param keep_all If `TRUE`, a list will be return which contains all
 #' [Idf] objects of intermediate versions. The list will be named using first
-#' two number of that version, e.g. `8.1`, `8.2`.
+#' two number of that version, e.g. `8.1`, `8.2`. If `FALSE`, only the [Idf]
+#' object of the version specified by `ver` will be returned. Default: `FALSE`.
 #' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
 #' if `keep_all` is `TRUE`.
 #' @export
 # transition {{{
-transition <- function (idf, ver, keep_all = FALSE) {
+# TODO: how to give the names of saved files
+transition <- function (idf, ver, save = FALSE, dir = NULL, keep_all = FALSE) {
     if (!is_idf(idf)) idf <- read_idf(idf)
 
     assert(is_idd_ver(ver))
@@ -1721,5 +1729,174 @@ with_option <- function (opts, expr) {
     do.call(eplusr_option, opts)
 
     force(expr)
+}
+# }}}
+
+#' Run IDFVersionUpdater to Update Model Versions
+#'
+#' `version_updater()` is a wrapper of IDFVersionUpdater preprocessor
+#' distributed with EnergyPlus. It takes a path of IDF file or an [Idf] object,
+#' a target version to update to and a directory to save the new models.
+#'
+#' @inheritParams transition
+#' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
+#' if `keep_all` is `TRUE`.
+#' @export
+# TODO: combine all VCpErr file into a data.table
+# version_updater {{{
+version_updater <- function (idf, ver, dir = NULL, keep_all = TRUE) {
+    # parse file
+    if (!is_idf(idf)) idf <- read_idf(idf)
+
+    assert(is_idd_ver(ver))
+
+    # save the model to the output dir if necessary
+    if (is.null(idf$path()) || !utils::file_test("-f", idf$path())) {
+        abort("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file or local file has ",
+                "been deleted from disk. Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    # stop if unsaved
+    if (idf$is_unsaved()) {
+        abort("error_idf_not_saved",
+            paste0("Idf has been modified since read or last saved. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    if (is.null(dir)) {
+        dir <- dirname(idf$path())
+    } else if (!dir.exists(dir)){
+        dir.create(dir, recursive = TRUE)
+    }
+
+    # stop if there is no newer version of EnergyPlus installed
+    ver <- standardize_ver(ver)
+
+    # skip if input is already at the specified version
+    if (idf$version()[, 1:2] == ver[, 1:2]) {
+        verbose_info("IDF is already at latest version ", ver, ". No transition needed.")
+        if (keep_all) {
+            res <- list(idf)
+            setattr(res, "names", as.character(idf$version()[, 1L:2L]))
+            return(res)
+        } else {
+            return(idf)
+        }
+    }
+
+    latest_ver <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
+    if (!length(latest_ver)) {
+        abort("error_updater_not_avail", paste0(
+            "EnergyPlus v", ver, " or newer are not installed."
+        ))
+    }
+
+    # save the original file with trailing version number
+    original <- paste0(tools::file_path_sans_ext(basename(idf$path())), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
+    idf$save(file.path(dir, original), overwrite = TRUE)
+
+    # get the directory of IDFVersionUpdater
+    path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
+
+    # get upper versions toward target version
+    vers <- trans_upper_versions(idf, ver)
+    # only include main versions, exclude patch versions
+    vers <- vers[vers[, 3L] == 0L]
+
+    # get fun names
+    exe <- if (is_windows()) ".exe" else NULL
+    from <- vers[-length(vers)]
+    to <- vers[-1L]
+    trans_exe <- paste0("Transition-",
+        "V", from[, 1L], "-", from[, 2L], "-0", "-to-",
+        "V",   to[, 1L], "-",   to[, 2L], "-0", exe
+    )
+
+    # results
+    models <- vector("list", 1L + length(to))
+    names(models) <- as.character(c(idf$version()[, 1:2], to[, 1:2]))
+
+    # paths
+    paths <- character(1L + length(to))
+    names(paths) <- names(models)
+
+    while (idf$version()[, 1:2] != max(to)[, 1:2]) {
+        # restore paths
+        paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
+
+        # restore models
+        models[names(models) == as.character(idf$version()[, 1:2])] <- list(idf)
+
+        current_exe <- trans_exe[from[, 1:2] == idf$version()[, 1:2]]
+        toward <- to[from[, 1:2] == idf$version()[, 1:2]]
+
+        verbose_info(
+            "Input file: ", idf$path(), "\n",
+            " From  Ver: ", idf$version(), "\n",
+            "Toward Ver: ", toward
+        )
+
+        trans_path <- file.path(path_updater, current_exe)
+
+        if (!file.exists(trans_path)) {
+            abort("error_version_updater_exe_not_exist",
+                paste0(
+                    "Transition executable ", surround(trans_path), " does not exist."
+                )
+            )
+        }
+
+        job <- processx::run(trans_path, idf$path(), wd = path_updater)
+
+        if (job$status != 0L) {
+            abort("error_updater_failed",
+                paste0("Failed to update file ", idf$path(),
+                    " from V", idf$version(), " to V", toward, "."
+                )
+            )
+        }
+
+        verbose_info("[", idf$version(), " --> ", toward, "] SUCCEEDED.\n")
+
+        # delete the new IDF file with old name since there is another new IDF file
+        # with ".idfold" extenstion
+        unlink(idf$path(), force = TRUE)
+
+        # rename the old file
+        file.rename(paste0(tools::file_path_sans_ext(idf$path()), ".idfold"), idf$path())
+
+        # name of the new file
+        path_new <- paste0(tools::file_path_sans_ext(idf$path()), ".idfnew")
+        # replace the old Idf object
+        idf <- read_idf(path_new)
+
+        # resave using eplusr
+        new_name <- paste0(stri_sub(tools::file_path_sans_ext(path_new), to = -4L), toward[, 1L], toward[, 2L], "0.idf")
+        idf$save(new_name, overwrite = TRUE)
+        # rename the orignal new file
+        unlink(path_new, force = TRUE)
+
+        # remove log file generated
+        unlink(file.path(path_updater, c("fort.6", "Energy+.ini", "Transition.audit")), force = TRUE)
+
+        # restore paths
+        paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
+
+        # restore models
+        models[names(models) == as.character(idf$version()[, 1:2])] <- list(idf)
+    }
+
+    if (keep_all) {
+        models
+    } else {
+        unlink(paths[-length(paths)], force = TRUE)
+        models[[length(models)]]
+    }
 }
 # }}}
