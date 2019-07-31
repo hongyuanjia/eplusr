@@ -1868,6 +1868,9 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = TRUE) {
         # with ".idfold" extenstion
         unlink(idf$path(), force = TRUE)
 
+        # remove VCpErr file generated
+        unlink(paste0(tools::file_path_sans_ext(idf$path()), ".VCpErr"), force = TRUE)
+
         # rename the old file
         file.rename(paste0(tools::file_path_sans_ext(idf$path()), ".idfold"), idf$path())
 
