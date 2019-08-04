@@ -2370,13 +2370,24 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
         )
     }
 
+    # save the model to the output dir if necessary
+    if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
+        abort("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file or local file has ",
+                "been deleted from disk. Please save Idf using $save() before run."
+            )
+        )
+    }
+
     # stop if unsaved
-    if (self$is_unsaved())
+    if (self$is_unsaved()) {
         abort("error_idf_not_saved",
             paste0("Idf has been modified since read or last saved. ",
                 "Please save Idf using $save() before run."
             )
         )
+    }
 
     # add Output:SQLite if necessary
     add_sql <- idf_add_output_sqlite(self)
