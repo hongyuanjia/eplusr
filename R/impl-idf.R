@@ -1168,6 +1168,7 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
     val
 }
 # }}}
+
 # get_idf_value_all_node {{{
 get_idf_value_all_node <- function (idf_env) {
     idf_env$value[type_enum == IDDFIELD_TYPE$node & !is.na(value_chr), unique(value_chr)]
@@ -1587,7 +1588,7 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
             # set matched field index
             set(val, NULL, "field_index", fld_out$field_index)
             # remove input field name
-            set(val, NULL, "field_name", NULL)
+            if (has_name(val, "field_in")) set(val, NULL, "field_in", NULL)
         }
 
         # now all field indices have been detected
@@ -1758,15 +1759,15 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
 
     if (any(is.na(val$field_name))) {
         val <- fill_unnamed_field_index(idd_env, idf_env, val)
-        idx <- val$field_index
     } else {
         # just to verify field names
         fld_out <- get_idd_field(idd_env, class = val$class_id, field = val$field_name)
         # set matched field index
         set(val, NULL, "field_index", fld_out$field_index)
         # remove input field name
-        set(val, NULL, "field_name", NULL)
+        if (has_name(val, "field_in")) set(val, NULL, "field_in", NULL)
     }
+
     list(object = obj, value = val)
 }
 # }}}
