@@ -1636,62 +1636,9 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
     l <- sep_value_dots(..., .empty = FALSE)
 
-    # get object ID in `..X` format
-    setnames(l$object, c("name", "comment"), c("object_name", "new_comment"))
-    set(l$object, NULL, "object_id", as.integer(stri_match_first_regex(l$object$object_name, "^\\.\\.(\\d+)$")[, 2L]))
-
-    # separate
-    obj_id_in <- l$object[!is.na(object_id)]
-    set(obj_id_in, NULL, "object_name", NULL)
-    obj_nm_in <- l$object[is.na(object_id)]
-    set(obj_nm_in, NULL, "object_id", NULL)
-
-    # get object data
-    obj_id <- get_idf_object(idd_env, idf_env, object = obj_id_in$object_id)
-    set(obj_id, NULL, names(obj_id_in), obj_id_in)
-    obj_nm <- get_idf_object(idd_env, idf_env, object = obj_nm_in$object_name, ignore_case = TRUE)
-    set(obj_nm, NULL, names(obj_nm_in), obj_nm_in)
-
-    # combine
-    obj <- rbindlist(list(obj_id, obj_nm))
-
-    # update comment
-    # NOTE: have to use `:=` format here as comment is a list
-    obj[!vlapply(new_comment, is.null), `:=`(comment = new_comment)]
-    set(obj, NULL, c("new_comment", "empty"), NULL)
-
-    # stop if cannot set objects
-    assert_can_do(idd_env, idf_env, l$dot, obj, "set")
-
-    # make sure rleid column as the unique id
-    set(obj, NULL, "new_rleid", rleid(obj$rleid, obj$object_rleid))
-
-    # new value table
-    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_rleid"), nomatch = 0L ]
-
-    # clean old rleid
-    set(obj, NULL, c("rleid", "object_rleid"), NULL)
-    set(val, NULL, c("rleid", "object_rleid"), NULL)
-    setnames(obj, "new_rleid", "rleid")
-    setnames(val, "new_rleid", "rleid")
-
-    prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
-        "required_field", "src_enum", "type_enum", "extensible_group"
-    )
-
-    setnames(val, c("value_chr", "value_num"), c("new_value", "new_value_num"))
-
-    if (any(is.na(val$field_name))) {
-        val <- fill_unnamed_field_index(idd_env, idf_env, val)
-        idx <- val$field_index
-    } else {
-        # just to verify field names
-        fld_out <- get_idd_field(idd_env, class = val$class_id, field = val$field_name)
-        # set matched field index
-        set(val, NULL, "field_index", fld_out$field_index)
-        # remove input field name
-        set(val, NULL, "field_name", NULL)
-    }
+    obj_val <- match_set_idf_data(idd_env, idf_env, l)
+    obj <- obj_val$object
+    val <- obj_val$value
 
     # in order to delete field values, here get all value numbers in current class
     fld_in <- val[, list(num = max(field_index)), by = c("rleid", "object_id")]
@@ -1700,6 +1647,10 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
     ]
     # get the max field number
     fld_in$num <- pmax(fld_in$num, fld_cur$num)
+
+    prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
+        "required_field", "src_enum", "type_enum", "extensible_group"
+    )
 
     val_out <- get_idf_value(idd_env, idf_env, object = fld_in$object_id, field = fld_in$num,
         complete = TRUE, property = prop
@@ -1758,6 +1709,63 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
          value = val[, .SD, .SDcols = names(idf_env$value)],
          reference = update_value_reference(idd_env, idf_env, obj, val, "set")
     )
+}
+# }}}
+# match_set_idf_data {{{
+match_set_idf_data <- function (idd_env, idf_env, l) {
+    # get object ID in `..X` format
+    setnames(l$object, c("name", "comment"), c("object_name", "new_comment"))
+    set(l$object, NULL, "object_id", as.integer(stri_match_first_regex(l$object$object_name, "^\\.\\.(\\d+)$")[, 2L]))
+
+    # separate
+    obj_id_in <- l$object[!is.na(object_id)]
+    set(obj_id_in, NULL, "object_name", NULL)
+    obj_nm_in <- l$object[is.na(object_id)]
+    set(obj_nm_in, NULL, "object_id", NULL)
+
+    # get object data
+    obj_id <- get_idf_object(idd_env, idf_env, object = obj_id_in$object_id)
+    set(obj_id, NULL, names(obj_id_in), obj_id_in)
+    obj_nm <- get_idf_object(idd_env, idf_env, object = obj_nm_in$object_name, ignore_case = TRUE)
+    set(obj_nm, NULL, names(obj_nm_in), obj_nm_in)
+
+    # combine
+    obj <- rbindlist(list(obj_id, obj_nm))
+
+    # update comment
+    # NOTE: have to use `:=` format here as comment is a list
+    obj[!vlapply(new_comment, is.null), `:=`(comment = new_comment)]
+    set(obj, NULL, c("new_comment", "empty"), NULL)
+
+    # stop if cannot set objects
+    assert_can_do(idd_env, idf_env, l$dot, obj, "set")
+
+    # make sure rleid column as the unique id
+    set(obj, NULL, "new_rleid", rleid(obj$rleid, obj$object_rleid))
+
+    # new value table
+    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_rleid"), nomatch = 0L ]
+
+    # clean old rleid
+    set(obj, NULL, c("rleid", "object_rleid"), NULL)
+    set(val, NULL, c("rleid", "object_rleid"), NULL)
+    setnames(obj, "new_rleid", "rleid")
+    setnames(val, "new_rleid", "rleid")
+
+    setnames(val, c("value_chr", "value_num"), c("new_value", "new_value_num"))
+
+    if (any(is.na(val$field_name))) {
+        val <- fill_unnamed_field_index(idd_env, idf_env, val)
+        idx <- val$field_index
+    } else {
+        # just to verify field names
+        fld_out <- get_idd_field(idd_env, class = val$class_id, field = val$field_name)
+        # set matched field index
+        set(val, NULL, "field_index", fld_out$field_index)
+        # remove input field name
+        set(val, NULL, "field_name", NULL)
+    }
+    list(object = obj, value = val)
 }
 # }}}
 # del_idf_object {{{
