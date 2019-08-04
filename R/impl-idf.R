@@ -341,8 +341,8 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
                     value_list <- unname(fld_val)
 
                     # init value in character and numeric format
-                    value_chr <- rep(NA_character_, sum(len))
-                    value_num <- rep(NA_real_, sum(len))
+                    value_chr <- apply2(as.list(rep(NA_character_, sum(len))), each_len, rep)
+                    value_num <- apply2(as.list(rep(NA_real_, sum(len))), each_len, rep)
 
                     # init default value indicator
                     defaulted <- each_length(value_list) == 0L
