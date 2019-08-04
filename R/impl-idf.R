@@ -128,7 +128,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
 }
 # }}}
 # sep_value_dots {{{
-sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) {
+sep_value_dots <- function (..., .empty = !in_final_mode()) {
     l <- list(...)
 
     # stop if empty input
@@ -164,10 +164,17 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .duplicate = FALSE) 
     }
 
     abort_invalid_format <- function (id) {
-        abort_invalid_input(id, "invalid_format",
-            c("Each object must be an empty list or a list where ",
-              "each element being a non-NA single string or number.")
-        )
+        if (.empty) {
+            abort_invalid_input(id, "invalid_format",
+                c("Each object must be an empty list or a list where ",
+                  "each element being a non-NA single string or number.")
+            )
+        } else {
+            abort_invalid_input(id, "invalid_format",
+                c("Each object must be a list where ",
+                  "each element being a non-NA single string or number.")
+            )
+        }
     }
 
     abort_empty_dot <- function (id) {
