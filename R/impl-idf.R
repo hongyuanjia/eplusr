@@ -345,7 +345,13 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
                     value_num <- apply2(as.list(rep(NA_real_, sum(len))), each_len, rep)
 
                     # init default value indicator
-                    defaulted <- each_length(value_list) == 0L
+                    defaulted <- each_len == 0L
+                    if (!.default && any(defaulted)) {
+                        abort_invalid_format(rleid[defaulted])
+                    }
+                    # init defaulted values
+                    value_chr[defaulted] <- NA_character_
+                    value_num[defaulted] <- NA_real_
 
                     # contains NA: "cls = list(NA), list(cls = list(NA))" {{{
                     # put this before check comment to make sure there is no NA
