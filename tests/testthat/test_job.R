@@ -25,7 +25,7 @@ test_that("Job methods", {
     )
 
     # can kill job
-    expect_message(job$kill(), "job is not running")
+    expect_silent(job$kill())
 
     # # can kill backgroun R process
     # add a full-year run period to lengthen simulation time
