@@ -1589,7 +1589,7 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ...) {
     if (!all && min_fields > max(dt$index)) {
         cur_max <- max(dt$index)
         num_obj <- length(unique(dt$id))
-        miss <- dt[rep(1L, min_fields - cur_max), on = "index", allow.cartesian = TRUE][
+        miss <- dt[J(rep(1L, min_fields - cur_max)), on = "index", allow.cartesian = TRUE][
             , index := seq(cur_max + 1L, min_fields), by = "id"]
         set(miss, NULL, c("field", "value"), NA_character_)
         dt <- rbindlist(list(dt, miss))
