@@ -480,6 +480,7 @@ test_that("VALUE DOTS", {
     expect_error(sep_value_dots(cls = list(NA)), class = "error_dot_invalid_format")
     expect_error(sep_value_dots(cls = list(NULL, NA)), class = "error_dot_invalid_format")
     expect_error(sep_value_dots(list(cls = list(NULL, NA))), class = "error_dot_invalid_format")
+    expect_error(sep_value_dots(cls1 = list(fld1 = c(NA_character_, 1)), .scalar = FALSE), class = "error_dot_invalid_format")
 
     # multiple .comment
     expect_error(sep_value_dots(cls = list(.comment = c("a"), .comment = NULL)), class = "error_dot_multi_comment")
@@ -552,6 +553,32 @@ test_that("VALUE DOTS", {
             defaulted = c(rep(TRUE, 4L), FALSE, FALSE, TRUE, FALSE, FALSE,
                 rep(TRUE, 4L), FALSE, TRUE, FALSE, TRUE
             )
+        )
+    )
+
+    # multiple values support
+    expect_silent(
+        l <- sep_value_dots(
+            cls1 = list(fld1 = c(1, 2, 3), fld2 = c("a", "b", "c")),
+            list(cls2 = list(fld3 = c(4, 5), fld4 = c("d", "e"))),
+            .scalar = FALSE
+        )
+    )
+    expect_equivalent(l$object,
+        data.table(rleid = 1L:2L,
+            object_rleid = rep(1L, 2L),
+            name = paste0("cls", 1L:2L),
+            empty = rep(FALSE, 2L),
+            comment = rep(list(NULL), 2L)
+        )
+    )
+    expect_equivalent(l$value,
+        data.table(rleid = c(rep(1L, 2L), rep(2L, 2L)),
+            object_rleid = rep(1L, 4L),
+            field_name = paste0("fld", 1L:4L),
+            value_chr = list(c("1", "2", "3"), c("a", "b", "c"), c("4", "5"), c("d", "e")),
+            value_num = list(c(1, 2, 3), rep(NA_real_, 3L), c(4, 5), rep(NA_real_, 2L)),
+            defaulted = rep(FALSE, 4L)
         )
     )
 })
