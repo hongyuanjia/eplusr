@@ -131,6 +131,152 @@ trans_apply <- function (idf, ver, keep_all) {
 # }}}
 
 trans_funs <- new.env(parent = emptyenv())
+# trans_810_820 {{{
+trans_funs$f810t820 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.1)
+
+    target_cls <- c(
+        "ZoneHVAC:UnitVentilator",                       # 1
+        "ZoneHVAC:UnitHeater",                           # 2
+        "PlantLoop",                                     # 3
+        "CondenserLoop",                                 # 4
+        "HVACTemplate:Plant:ChilledWaterLoop",           # 5
+        "HVACTemplate:Plant:HotWaterLoop",               # 6
+        "Sizing:System",                                 # 7
+        "ZoneHVAC:Baseboard:RadiantConvective:Water",    # 8
+        "ZoneHVAC:HighTemperatureRadiant",               # 9
+        "ZoneHVAC:Baseboard:RadiantConvective:Steam",    # 10
+        "ZoneHVAC:Baseboard:RadiantConvective:Electric", # 11
+        "ZoneHVAC:Baseboard:Convective:Water",           # 12
+        "ZoneHVAC:Baseboard:Convective:Electric",        # 13
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow",   # 14
+        "ZoneHVAC:LowTemperatureRadiant:Electric"        # 15
+    )
+
+    new_idf <- trans_preprocess(idf, 8.2, target_cls)
+
+    # 1: ZoneHVAC:UnitVentilator {{{
+    dt1 <- trans_action(idf, "ZoneHVAC:UnitVentilator", min_fields = 16L,
+        insert = list(17L)
+    )
+    # }}}
+    # 2: ZoneHVAC:UnitHeater {{{
+    dt2 <- trans_action(idf, class = "ZoneHVAC:UnitVentilator", all = TRUE,
+        reset = list(8L, 11L),
+        insert = list(10L)
+    )
+    if (nrow(dt2)) {
+        dt2[J(11L), on = "index", value := {
+            value[stri_trans_tolower(value) == "onoff"] <- "No"
+            value[stri_trans_tolower(value) == "continuous"] <- "Yes"
+            if (any(!value %in% c("No", "Yes"))) {
+                warn("warn_trans_810_820",
+                    "Invalid fan control type in original v8.1 idf...expected onoff or continuous...assuming onoff"
+                )
+                value[!value %in% c("No", "Yes")] <- "No"
+            }
+        }]
+    }
+    # }}}
+    # 3: PlantLoop {{{
+    dt3 <- trans_action(idf, "PlantLoop", min_fields = 19L,
+        reset = list(19L, "Sequential", "SequentialLoad"),
+        reset = list(19L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 4: CondenserLoop {{{
+    dt4 <- trans_action(idf, "CondenserLoop", min_fields = 19L,
+        reset = list(19L, "Sequential", "SequentialLoad"),
+        reset = list(19L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 5: HVACTemplate:Plant:ChilledWaterLoop {{{
+    dt5 <- trans_action(idf, "HVACTemplate:Plant:ChilledWaterLoop", min_fields = 33L,
+        reset = list(32L, "Sequential", "SequentialLoad"),
+        reset = list(32L, "Uniform", "UniformLoad"),
+        reset = list(33L, "Sequential", "SequentialLoad"),
+        reset = list(33L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 6: HVACTemplate:Plant:HotWaterLoop {{{
+    dt6 <- trans_action(idf, "HVACTemplate:Plant:HotWaterLoop", min_fields = 21L,
+        reset = list(21L, "Sequential", "SequentialLoad"),
+        reset = list(21L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 7: HVACTemplate:Plant:MixedWaterLoop {{{
+    dt7 <- trans_action(idf, "HVACTemplate:Plant:MixedWaterLoop", min_fields = 17L,
+        reset = list(17L, "Sequential", "SequentialLoad"),
+        reset = list(17L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 8: Sizing:System {{{
+    dt8 <- trans_action(idf, "Sizing:System", min_fields = 21L,
+        insert = list(18:20),
+        insert = list(23:26)
+    )
+    # }}}
+    # 9: ZoneHVAC:Baseboard:RadiantConvective:Water {{{
+    dt9 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Water", min_fields = 8L,
+        offset = list(7L, 8L),
+        add = list(7L, "HeatingDesignCapacity")
+    )
+    # }}}
+    # 10: ZoneHVAC:HighTemperatureRadiant {{{
+    dt10 <- trans_action(idf, "ZoneHVAC:HighTemperatureRadiant", min_fields = 4L,
+        insert = list(4L, "HeatingDesignCapacity"),
+        insert = list(6:7)
+    )
+    # }}}
+    # 11: ZoneHVAC:Baseboard:RadiantConvective:Steam {{{
+    dt11 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Steam", min_fields = 4L,
+        insert = list(5L, "HeatingDesignCapacity"),
+        insert = list(6L, "Autosize"),
+        insert = list(7:8)
+    )
+    # }}}
+    # 12: ZoneHVAC:Baseboard:RadiantConvective:Electric {{{
+    dt12 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Electric", min_fields = 3L,
+        insert = list(3L, "HeatingDesignCapacity"),
+        insert = list(5:6)
+    )
+    # }}}
+    # 13: ZoneHVAC:Baseboard:Convective:Water {{{
+    dt13 <- trans_action(idf, "ZoneHVAC:Baseboard:Convective:Water", min_fields = 4L,
+        insert = list(5L, "HeatingDesignCapacity"),
+        insert = list(6L, "Autosize"),
+        insert = list(7:8)
+    )
+    # }}}
+    # 14: ZoneHVAC:Baseboard:Convective:Electric {{{
+    dt14 <- trans_action(idf, "ZoneHVAC:Baseboard:Convective:Electric", min_fields = 4L,
+        insert = list(3L, "HeatingDesignCapacity"),
+        insert = list(5:6)
+    )
+    # }}}
+    # 15: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
+    dt15 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", min_fields = 12L,
+        insert = list(8L, "HeatingDesignCapacity"),
+        insert = list(9L, "Autosize"),
+        insert = list(10:11),
+        insert = list(17L, "CoolingDesignCapacity"),
+        insert = list(18L, "Autosize")
+        insert = list(19:20)
+    )
+    # }}}
+    # 16: ZoneHVAC:LowTemperatureRadiant:Electric {{{
+    dt16 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:Electric", min_fields = 5L,
+        insert = list(8L, "HeatingDesignCapacity"),
+        insert = list(7:8)
+    )
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:5)))
+    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 # trans_820_830 {{{
 trans_funs$f820t830 <- function (idf) {
     assert(idf$version()[, 1:2] == 8.2)
