@@ -6,8 +6,8 @@
 #' @importFrom stringi stri_count_charclass stri_count_fixed stri_detect_fixed
 #' @importFrom stringi stri_endswith_fixed stri_extract_first_regex stri_isempty
 #' @importFrom stringi stri_length stri_locate_first_fixed stri_replace_all_fixed
-#' @importFrom stringi stri_startswith_fixed stri_split_charclass
-#' @importFrom stringi stri_split_fixed stri_sub stri_subset_fixed
+#' @importFrom stringi stri_startswith_charclass stri_startswith_fixed
+#' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub stri_subset_fixed
 #' @importFrom stringi stri_trans_tolower stri_trans_toupper stri_trim_both
 #' @importFrom stringi stri_trim_left stri_trim_right
 #' @include impl.R
@@ -456,32 +456,37 @@ mark_idd_lines <- function (dt, type_enum) {
     set(dt, NULL, "type", type_enum$unknown)
 
     set(dt, NULL, "semicolon", stri_endswith_fixed(dt$body, ";"))
-    # ignore section if exists, e.g. "Simulation Data;"
-    dt <- dt[!J(TRUE, NA_character_), on = c("semicolon", "slash_key")]
 
     setindexv(dt, "slash_key")
-    set(dt, NULL, "empty", stri_isempty(dt$body))
+
     # mark slash lines
-    dt[J(TRUE), on = "empty", `:=`(type = type_enum$slash)]
+    dt[stri_isempty(body), `:=`(type = type_enum$slash)]
 
     # mark group
     dt[J("group"), on = "slash_key", `:=`(type = type_enum$group)]
 
     # mark class
-    dt[stri_endswith_fixed(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
+    # cannot use empty slash_key as an indicator because in some versions, class
+    # slash may in the same line as class names
+    dt[stri_endswith_fixed(body, ","), `:=`(type = type_enum$class)]
 
     # mark field
-    dt[empty == FALSE & !is.na(slash_key), `:=`(type = type_enum$field)]
+    dt[stri_detect_regex(body, "^([AN]\\d+\\s*,\\s*)+|(([AN]\\d+\\s*,\\s*)*[AN]\\d+\\s*;)$"),
+        `:=`(type = type_enum$field)
+    ]
 
     # mark last field per class
-    dt[J(TRUE), on = "semicolon", `:=`(type = type_enum$field_last)]
+    dt[J(type_enum$field, TRUE), on = c("type", "semicolon"), `:=`(type = type_enum$field_last)]
+
+    # ignore section if exists, e.g. "Simulation Data;"
+    dt <- dt[!J(TRUE, type_enum$unknown), on = c("semicolon", "type")]
 
     # if there are still known lines, throw an error
     if (any(dt$type == type_enum$unknown)) {
         parse_issue("error_unknown_line", "idd", "Invalid line", dt[type == type_enum$unknown])
     }
 
-    set(dt, NULL, c("semicolon", "empty"), NULL)
+    set(dt, NULL, "semicolon", NULL)
 }
 # }}}
 
@@ -601,9 +606,10 @@ sep_class_table <- function (dt, type_enum) {
     i <- merge(s, e, by = "class_id", all = TRUE)
 
     # manually add "\format" if there is no slash in class
-    if (any(i$start == i$end)) {
+    if (any(same <- i$start == i$end)) {
         setindexv(dt, "class_id")
-        ins <- dt[J(i[start == end, class_id]), on = "class_id", mult = "first"]
+        # in case that class slash is on the same line as clas name
+        ins <- dt[J(i[same, class_id], NA_character_), on = c("class_id", "slash_key"), mult = "first", nomatch = 0L]
         ins[, `:=`(
             string = "\\format standard",
             body = "format standard",
@@ -1550,7 +1556,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
             num <- nrow(data)
         }
         assert(has_name(data, c("line", "string")))
-        mes <- paste0(data$msg_each, "Line ", data$line, ": ", data$string)
+        mes <- paste0(data$msg_each, "Line ", lpad(data$line), ": ", data$string)
         if (!is.null(prefix)) {
             mes <- paste0(prefix, mes)
         }
