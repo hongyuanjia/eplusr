@@ -102,7 +102,7 @@ test_that("parse_idd_file()", {
          Test,
          A1 ; \\note something"
     )
-    expect_warning(parse_idd_file(idd_wrong), class = "warn_miss_idd_build")
+    expect_warning(parse_idd_file(idd_wrong), class = "warning_miss_idd_build")
 
     # can warn about multiple IDD build tags
     idd_wrong <- c(

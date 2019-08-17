@@ -604,7 +604,7 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
             parse_idf_file(paste0(str_in, collapse = "\n"), ref = FALSE),
 
             # ignore the warning of using given IDD
-            warn_given_idd_used = function (w) invokeRestart("muffleWarning"),
+            warning_given_idd_used = function (w) invokeRestart("muffleWarning"),
 
             # modify messages if any error occurs
             error_parse_idf = function (e) {
@@ -3186,7 +3186,7 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 
     # ignore the warning of using given IDD
     withCallingHandlers(parse_idf_file(text, idd = version, ref = FALSE),
-        warn_given_idd_used = function (w) invokeRestart("muffleWarning")
+        warning_given_idd_used = function (w) invokeRestart("muffleWarning")
     )
 }
 # }}}

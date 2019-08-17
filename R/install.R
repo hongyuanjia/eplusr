@@ -343,7 +343,7 @@ eplus_config <- function (ver) {
     ver <- standardize_ver(ver, complete = FALSE)
     ver_m <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
     if (is.na(ver)) {
-        warn("warn_miss_eplus_config",
+        warn("warning_miss_eplus_config",
             "Failed to find configuration data of EnergyPlus v", ver, ".",
             call. = FALSE)
         return(list())

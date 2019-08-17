@@ -170,7 +170,7 @@ trans_funs$f810t820 <- function (idf) {
             value[stri_trans_tolower(value) == "onoff"] <- "No"
             value[stri_trans_tolower(value) == "continuous"] <- "Yes"
             if (any(!value %in% c("No", "Yes"))) {
-                warn("warn_trans_810_820",
+                warn("warning_trans_810_820",
                     "Invalid fan control type in original v8.1 idf...expected onoff or continuous...assuming onoff"
                 )
                 value[!value %in% c("No", "Yes")] <- "No"
@@ -1057,7 +1057,7 @@ trans_funs$f870t880 <- function (idf) {
                         dt[J(2L), on = "index", value := "BySegment"]
                         dt[J(c(3L, 4L)), on = "index", value := NA_character_]
                         dt[index > 4L, value := "Yes"]
-                        warn("warn_trans_870_880",
+                        warn("warning_trans_870_880",
                             paste0(
                                 "Foundation floors now require a ",
                                 "`SurfaceProperty:ExposedFoundationPerimeter` ",
@@ -1097,7 +1097,7 @@ trans_funs$f870t880 <- function (idf) {
                         dt[J(2L), on = "index", value := "BySegment"]
                         dt[J(c(3L, 4L)), on = "index", value := NA_character_]
                         dt[index > 4L, value := "Yes"]
-                        warn("warn_trans_870_880",
+                        warn("warning_trans_870_880",
                             paste0(
                                 "Foundation floors now require a ",
                                 "`SurfaceProperty:ExposedFoundationPerimeter` ",
@@ -1342,7 +1342,7 @@ trans_funs$f890t900 <- function (idf) {
     if (nrow(dt6)) {
         dt6[index == 8L, {
             if (any(tolower(value) == "useweatherfile")) {
-                warn("warn_trans_890_900",
+                warn("warning_trans_890_900",
                     paste0("Run period start day of week `UseWeatherFile` option ",
                         "has been removed, start week day is set by the input start date."
                     )
@@ -1403,7 +1403,7 @@ trans_funs$f890t900 <- function (idf) {
                 }
 
                 if (!is.na(value[8L]) && tolower(value[8L]) == "useweatherfile") {
-                    warn("warn_trans_890_900",
+                    warn("warning_trans_890_900",
                         paste0("Run period start day of week `UseWeatherFile` option ",
                             "has been removed, start week day is set by the input start date."
                         )

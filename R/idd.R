@@ -988,7 +988,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
         if (!is.null(idd)) {
             idd <- use_idd(idd)
             if (warn) {
-                warn("warn_given_idd_used",
+                warn("warning_given_idd_used",
                     paste0(
                         mes, " The given IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."
@@ -1005,7 +1005,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
             # which.max does not work with numeric_version objects
             idd <- use_idd(avail_idd()[max(order(avail_idd()))])
             if (warn) {
-                warn("warn_latest_idd_used",
+                warn("warning_latest_idd_used",
                     paste0(mes,
                         " The latest parsed IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."

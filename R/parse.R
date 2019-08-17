@@ -168,8 +168,8 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     if (has_ext(path, "ddy")) {
         idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
-            warn_given_idd_used = function (w) invokeRestart("muffleWarning"),
-            warn_latest_idd_used = function (w) invokeRestart("muffleWarning")
+            warning_given_idd_used = function (w) invokeRestart("muffleWarning"),
+            warning_latest_idd_used = function (w) invokeRestart("muffleWarning")
         )
     } else {
         idd <- get_idd_from_ver(idf_ver, idd)
@@ -295,7 +295,7 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt[stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
-        warn("warn_miss_idd_build", "No build tag found in input IDD.")
+        warn("warning_miss_idd_build", "No build tag found in input IDD.")
     } else if (nrow(build_line) == 1L) {
         build <- stri_sub(build_line$string, 12L)
     } else {
