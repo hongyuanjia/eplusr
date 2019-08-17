@@ -759,7 +759,7 @@ use_idd <- function (idd, download = FALSE) {
                 # else issue an error
                 } else {
                     abort("error_no_matched_idd",
-                        paste0("Failed to locate IDD v", ver,
+                        paste0("Failed to locate IDD v", ver, ".\n",
                             "You may want to set `download` to TRUE or ",
                             "\"auto\" to download the IDD file from EnregyPlus ",
                             "GitHub repo."
