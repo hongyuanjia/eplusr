@@ -908,7 +908,7 @@ parse_field_property_extensible_group <- function (dt, ref) {
     ext <- ext[, list(first_extensible = field_index[1L]), by = class_id]
 
     # handle the case when there is no extensible fields
-    if (!has_name(ref, "extensible")) {
+    if (!has_name(ref, "extensible") | !nrow(ext)) {
         set(dt, NULL, "extensible_group", 0L)
         return(dt)
     }
