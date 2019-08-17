@@ -405,7 +405,9 @@ sep_idd_lines <- function (dt, col = "string") {
     refs <- dt[J(c("reference-class-name", "reference")), on = "slash_key", unique(slash_value), nomatch = 0L]
     invld_objlst <- which(dt$slash_key == "object-list" & !dt$slash_value %chin% refs)
     if (length(invld_objlst)) {
-        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", dt[invld_objlst])
+        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", dt[invld_objlst],
+            post = "Neither paired \\reference nor \\reference-class-name exist for \\object-list above."
+        )
     }
 
     # check invalid slash keys
@@ -1069,17 +1071,6 @@ parse_field_reference_table <- function (dt) {
 
     # combine object list and reference
     obj_ref <- refs[obj_fld, on = list(reference = object_list), allow.cartesian = TRUE]
-
-    # check if \object-list does not have a corresponding \reference
-    if (any(is.na(obj_ref$src_field_id))) {
-        parse_issue("error_object_list_missing_reference", "idd",
-            "\\object-list missing corresponding \\reference or \\reference-class-name",
-            post = paste0(
-                "Paired \\reference nor \\reference-class-name exist for \\object-list below:\n",
-                collapse(obj_ref[is.na(src_field_id), reference])
-            )
-        )
-    }
 
     set(obj_ref, NULL, "reference", NULL)
     setcolorder(obj_ref, c("class_id", "field_id", "src_class_id", "src_field_id", "src_enum"))
