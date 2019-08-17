@@ -488,17 +488,35 @@ mark_idd_lines <- function (dt, type_enum) {
 sep_group_table <- function (dt, type_enum) {
     setindexv(dt, "type")
 
-    is_group <- dt[J(type_enum$group), on = "type", which = TRUE]
+    is_group <- dt[J(type_enum$group), on = "type", which = TRUE, nomatch = 0L]
 
     dt[is_group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
     dt_group <- dt[is_group, .SD, .SDcols = c("group_id", "group_name", "line")]
 
+    # assign default group if necessary
+    if (!nrow(dt_group)) {
+        parse_issue("warning_no_group", "idd", "Missing group name", num = 1L,
+            post = "No `\\group` key found. All classes will be assgined to a group named `Default Group`. ",
+            stop = FALSE
+        )
+
+        set(dt, NULL, c("group_id", "group_name"), list(1L, "Default Group"))
+        dt_group <- data.table(group_id = 1L, group_name = "Default Group", line = 0L)
+    }
+
     # check missing group
     if (any(dt$line < dt_group$line[1L])) {
         invld_grp <- dt[line < dt_group$line[1L]]
-        parse_issue("error_missing_group", "idd", "Missing group name",
-            invld_grp, invld_grp[type == type_enum$class, .N]
+        parse_issue("warning_missing_group", "idd", "Missing group name",
+            invld_grp, invld_grp[type == type_enum$class, .N], stop = FALSE,
+            post = "Those classes will be assgined to a group named `Default Group`. ",
         )
+
+        dt[invld_grp, on = "line", `:=`(group_id = 1L, group_name = "Default Group")]
+        dt_group <- rbindlist(list(
+            data.table(group_id = 1L, group_name = "Default Group", line = 0L),
+            dt_group[, `:=`(group_id = group_id + 1L)]
+        ))
     }
     set(dt_group, NULL, "line", NULL)
 

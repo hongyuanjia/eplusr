@@ -143,7 +143,9 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong), class = "error_missing_group")
+    expect_warning(idd_parsed <- parse_idd_file(idd_wrong), class = "warning_missing_group")
+    expect_equal(idd_parsed$group$group_id, 1L:2L)
+    expect_equal(idd_parsed$group$group_name, c("Default Group", "TestGroup"))
 
     # can detect duplicated class names
     idd_wrong <- c(
