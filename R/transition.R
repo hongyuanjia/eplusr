@@ -176,6 +176,407 @@ trans_apply <- function (idf, ver, keep_all) {
 # }}}
 
 trans_funs <- new.env(parent = emptyenv())
+# trans_720_800 {{{
+trans_funs$f720t800 <- function (idf) {
+    assert(idf$version()[, 1:2] == 7.2)
+
+    target_cls <- c(
+        "ShadowCalculation",                                       # 1
+        "Coil:Heating:DX:MultiSpeed",                              # 2
+        "EnergyManagementSystem:OutputVariable",                   # 3
+        "EnergyManagementSystem:MeteredOutputVariable",            # 4
+        "Branch",                                                  # 5
+        "PlantEquipmentList",                                      # 6
+        "CondenserEquipmentList",                                  # 7
+        "HeatExchanger:WatersideEconomizer",                       # 8
+        "HeatExchanger:Hydronic",                                  # 9
+        "HeatExchanger:Plate",                                     # 10
+        "BuildingSurface:Detailed",                                # 11
+        "Wall:Detailed",                                           # 12
+        "RoofCeiling:Detailed",                                    # 13
+        "Floor:Detailed",                                          # 14
+        "FenestrationSurface:Detailed",                            # 15
+        "Shading:Site:Detailed",                                   # 16
+        "Shading:Building:Detailed",                               # 17
+        "Shading:Zone:Detailed",                                   # 18
+        "AirflowNetwork:Distribution:Component:ConstantVolumeFan", # 19
+        "ZoneHVAC:HighTemperatureRadiant",                         # 20
+        "AirConditioner:VariableRefrigerantFlow",                  # 21
+        "ZoneHVAC:WaterToAirHeatPump",                             # 22
+        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",                  # 23
+        "Boiler:HotWater",                                         # 24
+        "Chiller:Electric",                                        # 25
+        "Chiller:ConstantCOP",                                     # 26
+        "Chiller:EngineDriven",                                    # 27
+        "Chiller:CombustionTurbine",                               # 28
+        "Chiller:Electric:EIR",                                    # 29
+        "Chiller:Electric:ReformulatedEIR",                        # 30
+        "Chiller:Absorption",                                      # 31
+        "Chiller:Absorption:Indirect"                              # 32
+    )
+
+    new_idf <- trans_preprocess(idf, 8.0, target_cls)
+
+    # 1: ShadowCalculation {{{
+    dt1 <- trans_action(idf, "ShadowCalculation", insert = list(1L, "AverageOverDaysInFrequency"))
+    # }}}
+    # 2: Coil:Heating:DX:MultiSpeed {{{
+    dt2 <- trans_action(idf, class = "Coil:Heating:DX:MultiSpeed",
+        insert = list(6L),
+        insert = list(17L),
+        insert = list(22L),
+        insert = list(33L),
+        insert = list(44L),
+        insert = list(55L)
+    )
+    # }}}
+    # 3: EnergyManagementSystem:OutputVariable {{{
+    dt3 <- trans_action(idf, "EnergyManagementSystem:OutputVariable")
+    # TODO: Handle units
+    # }}}
+    # 4: EnergyManagementSystem:MeteredOutputVariable {{{
+    dt4 <- trans_action(idf, "EnergyManagementSystem:MeteredOutputVariable")
+    # }}}
+    # 5: Branch {{{
+    dt5 <- trans_action(idf, "Branch")
+    if (nrow(dt5)) {
+        dt5[(index - 4L) %% 5L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 6: PlantEquipmentList {{{
+    dt6 <- trans_action(idf, "PlantEquipmentList")
+    if (nrow(dt6)) {
+        dt6[(index - 2L) %% 2L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 7: CondenserEquipmentList {{{
+    dt7 <- trans_action(idf, "CondenserEquipmentList")
+    if (nrow(dt7)) {
+        dt7[(index - 2L) %% 2L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 8: HeatExchanger:WatersideEconomizer {{{
+    dt8 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:WatersideEconomizer"), all = TRUE,
+        offset = list(
+            c(3L, 6L, 7L, 9L, 4L, 5L, 8L, 2L),
+            c(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L)
+        ),
+        reset = list(9L, "PlateFrame", "CrossFlowBothUnmixed"),
+        insert = list(11L, "CoolingDifferentialOnOff"),
+        insert = list(12L),
+        add = list(14L, "FreeCooling")
+    )
+    # }}}
+    # 9: HeatExchanger:Hydronic {{{
+    dt9 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:Hydronic"), all = TRUE,
+        delete = list(18L),
+        offset = list(
+            c(5L, 6L, 13L, 7L, 8L, 14L, 11L, 12L, 17L, 15L,  9L),
+            c(3L, 4L,  5L, 6L, 7L,  8L,  9L, 10L, 15L, 16L, 17L)
+        ),
+        reset = list(2L, NA_character_),
+        reset = list(9L, "UFactorTimesAreaEffectiveness", "CrossFlowBothUnMixed"),
+        add = list(11L, "CoolingSetpointOnOffWithComponentOverride"),
+        add = list(12L),
+        add = list(13L, "0.0"),
+        add = list(14L, "FreeCooling")
+    )
+    if (nrow(dt9)) {
+        dt9[, value := {value[12L] <- value[7L]; value}, by = "id"]
+
+        # create corresponding SetpointManager:Schedule objects
+        dt9 <- trans_action(idf, c("SetpointManager:Scheduled" = "HeatExchanger:Hydronic"), min_fields = 8L)[
+            J(c(1L, 2L, 4L, 8L)), on = "index"]
+        dt9[J(1L), on = "index", value := paste0(value, " Setpoint Manager")]
+        dt9[J(2L), on = "index", value := "Temperature"]
+        dt9[, index := .I, by = "id"]
+        new_idf$load(dt9)
+    }
+    # }}}
+    # 10: HeatExchanger:Plate {{{
+    dt10 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:Plate"), all = TRUE,
+        offset = list(
+            c(4L, 5L, 10L, 11L,  8L,  9L),
+            c(3L, 4L,  5L,  8L,  9L, 10L)
+        ),
+        reset = list(2L, NA_character_),
+        reset = list(9L, "UFactorTimesAreaEffectiveness", "CrossFlowBothUnMixed"),
+        add = list(11L, "UncontrolledOn"),
+        add = list(12L:13L),
+        add = list(14L, "LoopToLoop"),
+        add = list(15L:17L)
+    )
+    # }}}
+
+    # standardize_vertices {{{
+    standardize_vertices <- function (idf, class, start) {
+        dt <- trans_action(idf, class)
+        if (nrow(dt)) dt[index >= start & is.na(value), value := "0.0"]
+        dt
+    }
+    # }}}
+    # 11: BuildingSurface:Detailed {{{
+    dt11 <- standardize_vertices(idf, "BuildingSurface:Detailed", 11L)
+    # }}}
+    # 12: Wall:Detailed {{{
+    dt12 <- standardize_vertices(idf, "Wall:Detailed", 10L)
+    # }}}
+    # 13: RoofCeiling:Detailed {{{
+    dt13 <- standardize_vertices(idf, "RoofCeiling:Detailed", 10L)
+    # }}}
+    # 14: Floor:Detailed {{{
+    dt14 <- standardize_vertices(idf, "Floor:Detailed", 10L)
+    # }}}
+    # 15: FenestrationSurface:Detailed {{{
+    dt15 <- standardize_vertices(idf, "FenestrationSurface:Detailed", 11L)
+    # }}}
+    # 16: Shading:Site:Detailed {{{
+    dt16 <- standardize_vertices(idf, "Shading:Site:Detailed", 4L)
+    # }}}
+    # 17: Shading:Building:Detailed {{{
+    dt17 <- standardize_vertices(idf, "Shading:Building:Detailed", 4L)
+    # }}}
+    # 18: Shading:Zone:Detailed {{{
+    dt18 <- standardize_vertices(idf, "Shading:Zone:Detailed", 5L)
+    # }}}
+    # 19: AirflowNetwork:Distribution:Component:ConstantVolumeFan {{{
+    dt19 <- trans_action(idf, c("AirflowNetwork:Distribution:Component:Fan" = "AirflowNetwork:Distribution:Component:ConstantVolumeFan"))
+    # }}}
+    # 20: ZoneHVAC:HighTemperatureRadiant {{{
+    dt20 <- trans_action(idf, "ZoneHVAC:HighTemperatureRadiant",
+        reset = list(5L, "electric", "Electricity"),
+        reset = list(5L, "gas", "NaturalGas")
+    )
+    # }}}
+    # 21: AirConditioner:VariableRefrigerantFlow {{{
+    dt21 <- trans_action(idf, "AirConditioner:VariableRefrigerantFlow",
+        reset = list(67L, "electric", "Electricity")
+    )
+    # }}}
+
+    # warning_reset {{{
+    warning_reset <- function (idf, class, index = NULL, old = NULL, new = NULL) {
+        if (is.null(index)) return(trans_action(idf, class))
+
+        dt <- trans_action(idf, class, reset = list(index, old, new))
+
+        if (nrow(dt)) {
+            warn("warning_trans_720_800",
+                paste0("Default values for some fields in class ",
+                    "`", class, "` have been changed. ",
+                    "Results may be different than previous. ",
+                    "See InputOutputReference document for details."
+                )
+            )
+        }
+
+        dt
+    }
+    # }}}
+    # 22: ZoneHVAC:WaterToAirHeatPump {{{
+    dt22 <- warning_reset(idf, "ZoneHVAC:WaterToAirHeatPump")
+    # }}}
+    # 23: AirLoopHVAC:UnitaryHeatPump:WaterToAir {{{
+    dt23 <- warning_reset(idf, "AirLoopHVAC:UnitaryHeatPump:WaterToAir")
+    # }}}
+    # 24: Boiler:HotWater {{{
+    dt24 <- warning_reset(idf, "Boiler:HotWater", 15L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 25: Chiller:Electric {{{
+    dt25 <- warning_reset(idf, "Chiller:Electric", 27L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 26: Chiller:ConstantCOP {{{
+    dt26 <- warning_reset(idf, "Chiller:ConstantCOP", 11L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 27: Chiller:EngineDriven {{{
+    dt27 <- warning_reset(idf, "Chiller:EngineDriven", 41L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 28: Chiller:CombustionTurbine {{{
+    dt28 <- warning_reset(idf, "Chiller:CombustionTurbine", 54L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 29: Chiller:Electric:EIR {{{
+    dt29 <- warning_reset(idf, "Chiller:Electric:EIR", 23L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 30: Chiller:Electric:ReformulatedEIR {{{
+    dt30 <- warning_reset(idf, "Chiller:Electric:ReformulatedEIR", 21L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 31: Chiller:Absorption {{{
+    dt31 <- warning_reset(idf, "Chiller:Absorption", 23L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 32: Chiller:Absorption:Indirect {{{
+    dt32 <- warning_reset(idf, "Chiller:Absorption:Indirect", 16L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:32)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_800_810 {{{
+trans_funs$f800t810 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.0)
+
+    target_cls <- c(
+        "People",                                            # 1
+        "CoolingTower:SingleSpeed",                          # 2
+        "CoolingTower:TwoSpeed",                             # 3
+        "EvaporativeCooler:SingleSpeed",                     # 4
+        "EvaporativeCooler:TwoSpeed",                        # 5
+        "FluidCooler:TwoSpeed",                              # 6
+        "HeatPump:WaterToWater:EquationFit:Heating",         # 7
+        "HeatPump:WaterToWater:EquationFit:Cooling",         # 8
+        "HeatPump:WaterToWater:ParameterEstimation:Heating", # 9
+        "HeatPump:WaterToWater:ParameterEstimation:Cooling", # 10
+        "HVACTemplate:Zone:PTAC",                            # 11
+        "HVACTemplate:Zone:PTHP",                            # 12
+        "HVACTemplate:Zone:WaterToAirHeatPump",              # 13
+        "HVACTemplate:System:Unitary",                       # 14
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir"       # 15
+    )
+
+    new_idf <- trans_preprocess(idf, 8.1, target_cls)
+
+    # 1: People {{{
+    dt1 <- trans_action(idf, "People",
+        insert = list(16L, "ClothingInsulationSchedule"),
+        insert = list(17L)
+    )
+    # }}}
+    # 2: CoolingTower:SingleSpeed {{{
+    dt2 <- trans_action(idf, class = "CoolingTower:SingleSpeed", min_fields = 12L,
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        reset = list(10L, "autosize", "Autocalculate"),
+        insert = list(11L),
+        insert = list(13L),
+        insert = list(16L)
+    )
+    # }}}
+    # 3: CoolingTower:TwoSpeed {{{
+    dt3 <- trans_action(idf, "CoolingTower:TwoSpeed", min_fields = 16L,
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        reset = list(10L, "autosize", "Autocalculate"),
+        insert = list(11L),
+        insert = list(13L),
+        insert = list(14L, "autosize", "Autocalculate"),
+        insert = list(15L),
+        insert = list(16L, "autosize", "Autocalculate"),
+        insert = list(17L),
+        insert = list(19L),
+        insert = list(22L),
+        insert = list(24L)
+    )
+    # }}}
+    # 4: EvaporativeCooler:SingleSpeed {{{
+    dt4 <- trans_action(idf, "EvaporativeCooler:SingleSpeed", min_fields = 9L,
+        insert = list(9L)
+    )
+    # }}}
+    # 5: EvaporativeCooler:TwoSpeed {{{
+    dt5 <- trans_action(idf, "EvaporativeCooler:TwoSpeed", min_fields = 17L,
+        reset = list(6L, "autosize", "Autocalculate"),
+        insert = list(7L),
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        insert = list(13L),
+        insert = list(16L),
+        reset = list(18L, "autosize", "Autocalculate"),
+        insert = list(19L),
+        insert = list(23L)
+    )
+    # }}}
+    # 6: FluidCooler:TwoSpeed {{{
+    dt6 <- trans_action(idf, "FluidCooler:TwoSpeed", min_fields = 16L,
+        reset = list(6L, "autosize", "Autocalculate"),
+        insert = list(7L),
+        insert = list(10L),
+        reset = list(17L, "autosize", "Autocalculate"),
+        insert = list(18L),
+        reset = list(19L, "autosize", "Autocalculate"),
+        insert = list(20L)
+    )
+    # }}}
+    # 7: HeatPump:WaterToWater:EquationFit:Heating {{{
+    dt7 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Heating", min_fields = 19L)
+    # }}}
+    # 8: HeatPump:WaterToWater:EquationFit:Cooling {{{
+    dt8 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Cooling", min_fields = 19L)
+    # }}}
+    # 9: HeatPump:WaterToWater:ParameterEstimation:Heating {{{
+    dt9 <- trans_action(idf, "HeatPump:WaterToWater:ParameterEstimation:Heating", min_fields = 20L)
+    # }}}
+    # 10: HeatPump:WaterToWater:ParameterEstimation:Cooling {{{
+    dt10 <- trans_action(idf, "HeatPump:WaterToWater:ParameterEstimation:Cooling", min_fields = 20L)
+    # }}}
+
+    # Add `Any Number` ScheduleTypeLimits {{{
+    if (any(idf$is_valid_class(
+        "HVACTemplate:Zone:PTAC", "HVACTemplate:Zone:PTHP",
+        "HVACTemplate:Zone:WaterToAirHeatPump", "HVACTemplate:System:Unitary",
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir"
+    ))) {
+        # check if there are any `Any Number` ScheduleTypeLimits objects
+        if (idf$is_valid_class("ScheduleTypeLimits")) {
+            nm_schtype <- idf$object_name(class = "ScheduleTypeLimits", simplify = TRUE)
+            if (!any(stri_trans_tolower(nm_schtype) == "any number")) {
+                new_idf$add(ScheduleTypeLimits = list("Any Number"))
+            }
+        }
+    }
+    # }}}
+    # update_hvactemplate_fan {{{
+    update_hvactemplate_fan <- function (new_idf, idf, class, min_fields) {
+        dt <- trans_action(idf, class = class, min_fields = min_fields)
+
+        if (!nrow(dt)) return(dt)
+
+        dt[, value := {
+            if (!is.na(value[min_fields])) {
+                if (stri_trans_tolower(value[min_fields]) == "cycling") {
+                    sch <- "CyclingFanSchedule"
+                    len <- 100L - nchar(paste0(class, sch)) - 1L
+                    value[min_fields] <- paste0(class, stri_sub(value[1L], to = len), sch)
+                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", "0"))
+                } else if (stri_trans_tolower(value[min_fields]) == "continuous") {
+                    sch <- "ContinuousFanSchedule"
+                    len <- 100L - nchar(paste0(class, sch)) - 1L
+                    value[min_fields] <- paste0(class, stri_sub(value[1L], to = len), sch)
+                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", "1"))
+                }
+            }
+            value
+        }, by = "id"]
+
+        dt
+    }
+    # }}}
+    # 11: HVACTemplate:Zone:PTAC {{{
+    dt11 <- trans_action(new_idf, idf, "HVACTemplate:Zone:PTAC", min_fields = 13L)
+    # }}}
+    # 12: HVACTemplate:Zone:PTHP {{{
+    dt12 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:Zone:PTHP", min_fields = 13L)
+    # }}}
+    # 13: HVACTemplate:Zone:WaterToAirHeatPump {{{
+    dt13 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:Zone:WaterToAirHeatPump", min_fields = 13L)
+    # }}}
+    # 14: HVACTemplate:System:Unitary {{{
+    dt14 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:System:Unitary", min_fields = 5L)
+    # }}}
+    # 15: HVACTemplate:System:UnitaryHeatPump:AirToAir {{{
+    dt15 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:System:UnitaryHeatPump:AirToAir", min_fields = 7L)
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:15)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 # trans_810_820 {{{
 trans_funs$f810t820 <- function (idf) {
     assert(idf$version()[, 1:2] == 8.1)
