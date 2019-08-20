@@ -76,8 +76,8 @@ read_mdd <- function (path) {
 
 # parse_rdd_file {{{
 parse_rdd_file <- function (path, mdd = FALSE) {
-    rdd <- data.table(reported_time_step = character(), report_type = character(),
-        variable = character(), units = character()
+    rdd <- data.table(index = integer(), reported_time_step = character(),
+        report_type = character(), variable = character(), units = character()
     )
 
     eplus_version <- numeric_version(NA, strict = FALSE)
