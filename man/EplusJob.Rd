@@ -45,6 +45,8 @@ job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
 job$read_table(name)
+job$read_rdd()
+job$read_mdd()
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -125,7 +127,9 @@ forced to stop and a new one will start. Default: \code{FALSE}.
 \preformatted{job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
-job$read_table(table)
+job$read_table(name)
+job$read_rdd()
+job$read_mdd()
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -142,8 +146,12 @@ suffix.
 
 \code{$list_table()} returns all available table and view names in the SQLite file.
 
-\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
+\code{$read_table()} takes a valid table name of those from \code{$list_table()} and
 returns that table data in a \link[data.table:data.table]{data.table} format.
+
+\code{$read_rdd()} and \code{$read_mdd()} return the core data of Report Data
+Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
+details, please see \code{\link[=read_rdd]{read_rdd()}}.
 
 \code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
 contains all information about report data. For details on the meaning of

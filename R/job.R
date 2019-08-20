@@ -43,6 +43,8 @@ NULL
 #' job$locate_output(suffix = ".err", strict = TRUE)
 #' job$list_table()
 #' job$read_table(name)
+#' job$read_rdd()
+#' job$read_mdd()
 #' job$report_data_dict()
 #' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
 #'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -120,7 +122,9 @@ NULL
 #' job$output_dir(open = FALSE)
 #' job$locate_output(suffix = ".err", strict = TRUE)
 #' job$list_table()
-#' job$read_table(table)
+#' job$read_table(name)
+#' job$read_rdd()
+#' job$read_mdd()
 #' job$report_data_dict()
 #' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
 #'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -137,8 +141,12 @@ NULL
 #'
 #' `$list_table()` returns all available table and view names in the SQLite file.
 #'
-#' `$read_table()` takes a valid `table` name of those from `$list_table()` and
+#' `$read_table()` takes a valid table name of those from `$list_table()` and
 #' returns that table data in a [data.table][data.table::data.table()] format.
+#'
+#' `$read_rdd()` and `$read_mdd()` return the core data of Report Data
+#' Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
+#' details, please see [read_rdd()].
 #'
 #' `$report_data_dict()` returns a [data.table][data.table::data.table()] which
 #' contains all information about report data. For details on the meaning of
@@ -542,6 +550,12 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         list_table = function ()
             job_list_table(self, private),
 
+        read_rdd = function ()
+            job_read_rdd(self, private),
+
+        read_mdd = function ()
+            job_read_mdd(self, private),
+
         read_table = function (name)
             job_read_table(self, private, name),
 
@@ -776,7 +790,11 @@ job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, mu
 
     }
 
-    if (must_exist) assert(file.exists(out))
+    if (must_exist) {
+        assert(file.exists(out), msg = paste0("File ", surround(out), " does not exists."),
+            err_type = "error_file_not_exist"
+        )
+    }
 
     out
 }
@@ -794,18 +812,50 @@ job_output_errors <- function (self, private, info = FALSE) {
 job_sql_path <- function (self, private) {
     path_sql <- job_locate_output(self, private, ".sql", must_exist = FALSE)
     if (!file.exists(path_sql))
-        stop("Simulation SQL output does not exists. ",
+        abort("error_sql_not_exist", paste0(
+             "Simulation SQL output does not exist. ",
              "eplusr uses the EnergyPlus SQL output for extracting simulation outputs. ",
              "Please add an object in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` ",
              "and run the Idf again. It is recommended to first read that IDF file using `read_idf()` ",
              "and then use `$run()` method in Idf class by doing `idf$run()` ",
-             "which automatically handle this.", call. = FALSE)
+             "which automatically handle this."
+        ))
     path_sql
+}
+# }}}
+# job_rdd_path {{{
+job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
+    type <- match.arg(type)
+    path <- job_locate_output(self, private, paste0(".", type), must_exist = FALSE)
+    name <- switch(type,
+        rdd = "Report Data Dictionary (RDD) file",
+        mdd = "Meter Data Dictionary (MDD) file"
+    )
+    if (!file.exists(path))
+        assert("error_rdd_not_exist", paste0(
+             name, " does not exist. ",
+             "Please add an object in `Output:VariableDictionary` class ",
+             "and run the Idf again. It is recommended to first read that IDF file using `read_idf()` ",
+             "and then use `$run()` method in Idf class by doing `idf$run()` ",
+             "which automatically handle this."
+        ))
+
+    path
 }
 # }}}
 # job_list_table {{{
 job_list_table <- function (self, private) {
     list_sql_table(job_sql_path(self, private))
+}
+# }}}
+# job_read_rdd {{{
+job_read_rdd <- function (self, private) {
+    read_rdd(job_rdd_path(self, private, "rdd"))
+}
+# }}}
+# job_read_mdd {{{
+job_read_mdd <- function (self, private) {
+    read_mdd(job_rdd_path(self, private, "mdd"))
 }
 # }}}
 # job_read_table {{{

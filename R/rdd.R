@@ -14,7 +14,22 @@ NULL
 #' `MddFile` object.
 #'
 #' Basically, a `RddFile` and `MddFile` object is a
-#' [data.table][data.table::data.table()] with 3 additional attributes:
+#' [data.table][data.table::data.table()] with 5 columns and 3 additional
+#' attributes:
+#'
+#' 5 Columns:
+#'
+#' *`index`: Integer. Index of each variable.
+#' * `reported_time_step`: Character. Reported time step for the variables.
+#'   Possible value: `Zone` and `HVAC`.
+#' * `report_type`: Character. Report types. Possible value: `Average`, `Sum`
+#'   and `Meter`. Note that `Meter` is only for MDD file. All variables will
+#'   have `report_type` being `Meter`.
+#' * `variable`: Character. Report variable names.
+#' * `units`: Character. Units of reported values. `NA` if report values do not
+#'   have units.
+#'
+#' 3 Attributes:
 #'
 #' * `eplus_version`: A [numeric_version][base::numeric_version()] object. The
 #'   version of EnergyPlus used during the simulation.
@@ -138,9 +153,12 @@ parse_rdd_file <- function (path, mdd = FALSE) {
         set(rdd, NULL, "variable_unit", NULL)
     }
 
+    # add index
+    rdd[, index := .I]
+
     set(rdd, NULL, "units", stri_sub(rdd$units, to = -2L))
     rdd[stri_isempty(units), `:=`(units = NA_character_)]
-    setcolorder(rdd, c("reported_time_step", "report_type", "variable", "units"))
+    setcolorder(rdd, c("index", "reported_time_step", "report_type", "variable", "units"))
 
     setattr(rdd, "eplus_version", eplus_version)
     setattr(rdd, "eplus_build", eplus_build)

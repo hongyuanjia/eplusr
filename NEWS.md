@@ -26,6 +26,11 @@
 * Now `$print()` in `ParametricJob` will give you more informative details on
   each simulation job status, especially when `wait` is set to `FALSE` in
   `$run()`.
+* A new column `index` is added in the returned `RddFile` and `MddFile`. It
+  contains index of each variable.
+* Two new methods `$read_rdd()` and `$read_mdd()` have been added in `EplusJob`
+  class. `$read_rdd()` and `$read_mdd()` which parse the simulation RDD and MDD
+  file (#84).
 
 ## Bug fixes
 
