@@ -23,6 +23,9 @@
 * Now `$status()` in `ParametricJob` class includes a new member named
   `job_status` which is data.table containing detailed information on each
   simulation job (#70).
+* Now `$print()` in `ParametricJob` will give you more informative details on
+  each simulation job status, especially when `wait` is set to `FALSE` in
+  `$run()`.
 
 ## Bug fixes
 

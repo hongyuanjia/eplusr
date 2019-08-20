@@ -396,7 +396,7 @@ run_parallel_jobs <- function(jobs, options) {
     on.exit(kill_jobs(jobs, options), add = TRUE)
 
     # initialize job status and worker
-    jobs[, `:=`(status = "waiting", index_str = lpad(index), process = list(),
+    jobs[, `:=`(status = "waiting", index_str = lpad(index, "0"), process = list(),
         stdout = list(), stderr = list(), exit_status = NA_integer_
     )]
 
@@ -563,11 +563,11 @@ sim_status <- function (type, index, model, weather) {
     }
 
     if (is.null(unlist(weather))) {
-        paste0(lpad(index), "|", type, " --> ",
+        paste0(lpad(index, "0"), "|", type, " --> ",
             "[IDF]", surround(basename(model))
         )
     } else {
-        paste0(lpad(index), "|", type, " --> ",
+        paste0(lpad(index, "0"), "|", type, " --> ",
             "[IDF]", surround(basename(model)),
             " + ",
             "[EPW]", surround(basename(weather))

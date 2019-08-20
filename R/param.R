@@ -505,7 +505,9 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
     verbose_info("Measure ", surround(mea_nm), " has been applied with ", length(out),
-        " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
+        " new models created:\n", paste0("[", lpad(seq_along(out_nms), "0"), "]", ": ",
+            surround(out_nms), collapse = "\n")
+    )
 }
 # }}}
 # param_retrieve_data {{{
@@ -518,7 +520,7 @@ param_retrieve_data <- function (self, private) {
         private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_output_lines(10000))
         private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_error_lines(10000))
     } else {
-        if (inherits(private$m_job, "r_process")) {
+        if (inherits(private$m_job, "r_process") & !status$terminated) {
             private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_all_output_lines())
             private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_all_error_lines())
         }
@@ -696,8 +698,12 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 
     apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
 
+    # reset status
     private$m_log$start_time <- Sys.time()
     private$m_log$killed <- NULL
+    private$m_log$stdout <- NULL
+    private$m_log$stderr <- NULL
+    private$m_job <- NULL
 
     tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = wait, eplus = ver)
 
@@ -963,18 +969,59 @@ param_print <- function (self, private) {
         paste0("Parametric Models [", length(private$m_param), "]: ")
     ))
 
-    cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
-
     status <- param_status(self, private)
 
     param_retrieve_data(self, private)
 
+    nm <- paste0("[", lpad(seq_along(private$m_param), 0), "]: ", surround(names(private$m_param)))
+
     if (!status$run_before) {
+        cli::cat_line(paste0(nm, collapse = "\n"))
         cli::cat_line("<< Job has not been run before >>",
             col = "white", background_col = "blue")
         return(invisible())
     }
 
+    # each job status {{{
+    if (status$alive) {
+        if (length(private$m_log$stderr)) {
+            stderr <- private$m_log$stderr
+            # keep the latest status
+            job_status <- as.data.table(stri_split_fixed(stderr, "|", n = 2L, simplify = TRUE))
+            job_status <- unique(job_status, fromLast = TRUE, by = "V1")
+            # get index
+            set(job_status, NULL, "index", as.integer(job_status$V1))
+            # order by index
+            setorder(job_status, "index")
+            # make sure all models are included
+            job_status <- job_status[J(seq_along(nm)), on = "index"]
+            # for models that are idle
+            job_status[J(NA_character_), on = "V2", V2 := paste0(
+                "IDLE       --> [IDF]", surround(names(private$m_param)[index]))]
+            stderr <- paste0(lpad(job_status$index, "0"), "|" ,job_status$V2)
+            safe_width <- getOption("width") - 2L
+            stderr_trunc <- vcapply(stderr, function (l) {
+                if (nchar(l) > safe_width) {
+                    paste0(substr(l, 1, safe_width), "...")
+                } else {
+                    l
+                }
+            })
+
+            cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
+                padding = 0)
+        }
+    } else {
+        if (isTRUE(status$terminated)) {
+            cli::cat_line(paste0(rpad(nm), " <-- TERMINATED", collapse = "\n"))
+        } else {
+            nm <- private$m_job[, paste0(rpad(nm), ifelse(exit_status == 0L, " <-- SUCCEEDED", " <-- FAILED"))]
+            cli::cat_line(paste0(nm, collapse = "\n"))
+        }
+    }
+    # }}}
+
+    # print summary status {{{
     if (isTRUE(status$terminated)) {
         cli::cat_line(" Job was terminated before.",
             col = "white", background_col = "red")
@@ -1005,23 +1052,7 @@ param_print <- function (self, private) {
             )
         }
     }
-
-    if (status$alive) {
-        if (length(private$m_log$stdout))
-            cli::cat_boxx(private$m_log$stdout)
-
-        if (length(private$m_log$stderr)) {
-            stderr <- private$m_log$stderr
-            safe_width <- getOption("width") - 2L
-            stderr_trunc <- vapply(stderr, function (l) {
-                if (nchar(l) > safe_width)
-                    paste0(substr(l, 1, safe_width), "...")
-            }, FUN.VALUE = character(1))
-
-            cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
-                padding = 0)
-        }
-    }
+    # }}}
 }
 # }}}
 # S3 ParametricJob methods {{{
