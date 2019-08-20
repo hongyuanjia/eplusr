@@ -213,6 +213,17 @@ on_fail(is_epw) <- function (call, env) {
 }
 # }}}
 
+# is_rdd {{{
+is_rdd <- function (x) inherits(x, "RddFile")
+is_mdd <- function (x) inherits(x, "MddFile")
+on_fail(is_rdd) <- function (call, env) {
+    paste(deparse(call$x), "is not a RddFile object.")
+}
+on_fail(is_mdd) <- function (call, env) {
+    paste(deparse(call$x), "is not a MddFile object.")
+}
+# }}}
+
 # is_range {{{
 is_range <- function (x) {
     inherits(x, "Range")
