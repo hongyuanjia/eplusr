@@ -467,16 +467,21 @@ NULL
 #' * Empty object with comments: `model$add(Building = list(.comment = c("This", "is", "a", "comment")))`.
 #' * Empty object with all fields: `model$add(Building = list(), .all = TRUE)`.
 #' * New objects:
-#'
 #'   ```
 #'   model$add(
 #'       RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"),
 #'       list(Construction = list("const", "mat"), Material = list("mat"))
 #'   )
-#'  ```
+#'   ```
+#' * New objects with comments:
+#'   ```
+#'   model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))
+#'   ```
+#' * Variable inputs:
+#'   ```
+#'   x <- list(Construction = list("const"), Building = list())
+#'   model$add(x)
 #'
-#' * New objects with comments: `model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))`.
-#' * Variable inputs: `x <- list(Construction = list("const"), Building = list()); model$add(x)`.
 #' }
 #'
 #' \subsection{Set Values of Existing Objects}{

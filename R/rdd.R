@@ -240,7 +240,7 @@ rdd_to_load <- function (rdd, key_value, reporting_frequency) {
 
     if (!missing(reporting_frequency)) {
         rep_freq <- validate_report_freq(reporting_frequency)
-        set(mdd, NULL, "reporting_frequency", rep_freq)
+        set(rdd, NULL, "reporting_frequency", rep_freq)
     } else if (!has_name(rdd, "reporting_frequency")) {
         set(rdd, NULL, "reporting_frequency", "Timestep")
     } else {

@@ -331,10 +331,14 @@ if (is_avail_eplus(8.8)) {
 
         if (new > 360) {
             new <- new \%\% 360
-            warning("Calculated new north axis is greater than 360. Final north axis will be ", new)
+            warning("Calculated new north axis is greater than 360. ",
+                "Final north axis will be ", new
+            )
         } else if (new < -360) {
             new <- new \%\% -360
-            warning("Calculated new north axis is smaller than -360. Final north axis will be ", new)
+            warning("Calculated new north axis is smaller than -360. ",
+                "Final north axis will be ", new
+            )
         }
 
         idf$Building$North_Axis <- new

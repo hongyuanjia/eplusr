@@ -50,17 +50,17 @@ MACRO_DICT <-
       "##symboltable", "##clear", "##reverse", "##!")
 # }}}
 # init var{{{
-`.` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- J <- N <- V1 <- NULL
+`.` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- J <- N <- V1 <- V2 <- NULL
 
 utils::globalVariables(c(
     "acceptable_num", "all_cmt", "all_name_lower", "annual", "auto_assigned",
-    "autocalculatable", "autosizable", "begin_environment", "begin_extensible",
+    "autocalculatable", "autosizable", "begin_extensible",
     "can_be_na", "check", "check_lower", "check_upper", "choice", "class_id",
     "class_name", "colon_loc", "con", "contents", "copied", "country",
     "datetime", "datetime1", "day", "day_in", "ddy_name", "ddy_url", "default",
     "default_chr", "default_num", "defaulted", "dep", "depth", "design_day",
     "dis", "dot", "dot_nm", "dt", "dup_time", "empty", "end", "end_day",
-    "end_time", "environment_index", "epw", "epw_name", "epw_url", "excl_loc",
+    "end_time", "envir", "envir_index", "epw", "epw_name", "epw_url", "excl_loc",
     "exit_status", "ext", "extensible", "extensible_group", "field",
     "field_anid", "field_anid_an", "field_count", "field_id", "field_in",
     "field_index", "field_name", "field_name_noid", "field_rleid",

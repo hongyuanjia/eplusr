@@ -5,6 +5,7 @@ test_that("Sql methods", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     example <- copy_example()
+    idf <- read_idf(example$idf)
 
     expect_silent(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE))
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
