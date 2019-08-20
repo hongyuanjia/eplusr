@@ -2370,6 +2370,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 
     # add Output:SQLite if necessary
     add_sql <- idf_add_output_sqlite(self)
+    add_dict <- idf_add_output_vardict(self)
 
     # save the model to the output dir if necessary
     if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
@@ -2390,7 +2391,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     }
 
     # if necessary, resave the model
-    if (add_sql || !is.null(dir)) {
+    if (add_sql || add_dict || !is.null(dir)) {
         idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
     }
 
@@ -2510,7 +2511,7 @@ idf_add_output_sqlite <- function (idf) {
         sql <- idf$objects_in_class("Output:SQLite")[[1L]]
         type <- toupper(sql$value()[[1]])
         if (type != "SIMPLEANDTABULAR") {
-            invisible(sql$set("SimpleAndTabular"))
+            sql$set("SimpleAndTabular")
             verbose_info("Setting `Option Type` in ",
                 "`Output:SQLite` to from", surround(type), " to `SimpleAndTabular`.")
             added <- TRUE
@@ -2519,6 +2520,28 @@ idf_add_output_sqlite <- function (idf) {
         invisible(idf$add(Output_SQLite = list("SimpleAndTabular")))
         verbose_info("Adding an object in class `Output:SQLite` and setting its ",
             "`Option Type` to `SimpleAndTabular` in order to create SQLite output file.")
+        added <- TRUE
+    }
+    added
+}
+# }}}
+# idf_add_output_vardict {{{
+idf_add_output_vardict <- function (idf) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+    added <- FALSE
+    if (idf$is_valid_class("Output:VariableDictionary")) {
+        dict <- idf$objects_in_class("Output:VariableDictionary")[[1L]]
+        key <- toupper(dict$value()[[1]])
+        if (!key %chin% c("IDF", "REGULAR")) {
+            dict$set("IDF")
+            verbose_info("Setting `Key Field` in ",
+                "`Output:VariableDictionary` to from", surround(key), " to `IDF`.")
+            added <- TRUE
+        }
+    } else {
+        invisible(idf$add(Output_VariableDictionary = list("IDF")))
+        verbose_info("Adding an object in class `Output:VariableDictionary` and setting its ",
+            "`Key Field` to `IDF` in order to create RDD and MDD output file.")
         added <- TRUE
     }
     added

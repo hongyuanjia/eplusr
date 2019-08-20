@@ -31,6 +31,9 @@
 * Two new methods `$read_rdd()` and `$read_mdd()` have been added in `EplusJob`
   class. `$read_rdd()` and `$read_mdd()` which parse the simulation RDD and MDD
   file (#84).
+* Similar as `Output:SQLite`, when `$run()` in `Idf` object is called, an object
+  in class `Output:VariableDictionary` is automatically created with `Key Field`
+  being `IDF` (#85).
 
 ## Bug fixes
 

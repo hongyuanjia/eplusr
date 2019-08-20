@@ -441,6 +441,7 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             idf_self <- ._get_self(private$m_idf)
             idf_priv <- ._get_private(private$m_idf)
             idf_add_output_sqlite(private$m_idf)
+            idf_add_output_vardict(private$m_idf)
 
             # save uuid
             private$m_log$seed_uuid <- idf_priv$m_log$uuid
