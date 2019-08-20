@@ -12,7 +12,19 @@ NULL
 #' with an extension `.err`, parses it and returns an `ErrFile` object.
 #'
 #' Basically, an `ErrFile` object is a [data.table][data.table::data.table()]
-#' with 6 additional attributes:
+#' with 6 columns and 6 additional attributes:
+#'
+#' 6 Columns:
+#'
+#' * `index`: Integer. Index of messages.
+#' * `envir_index`: Integer. Index of simulation environments.
+#' * `envir`: Character. Names of simulation environments.
+#' * `level_index`: Integer. Index for each severe level.
+#' * `level`: Character. Name of severe levels. Possible values: `Info`,
+#'   `Warning`, `Severe`, and etc.
+#' * `message`: Character. Error messages.
+#'
+#' 6 Attributes:
 #'
 #' * `eplus_version`: A [numeric_version][base::numeric_version()] object. The
 #'   version of EnergyPlus used during the simulation.
@@ -52,8 +64,8 @@ read_err <- function (path) {
 # parse_err_file {{{
 parse_err_file <- function (path) {
     # data
-    err <- data.table(index = integer(), environment_index = integer(),
-        environment = character(), level_index = integer(), level = character(),
+    err <- data.table(index = integer(), envir_index = integer(),
+        envir = character(), level_index = integer(), level = character(),
         message = character()
     )
     # attributes
@@ -134,25 +146,25 @@ parse_err_file <- function (path) {
     l_end <- err_dt[stri_detect_regex(message, "(Final|(EnergyPlus Warmup|Sizing)) Error Summary"), which = TRUE]
     if (length(l_end)) err_dt <- err_dt[-(min(l_end):.N)]
 
-    # extract environment
-    err_dt[stri_startswith_fixed(message, "Beginning"), `:=`(environment = stri_sub(message, 11L))]
-    err_dt[stri_startswith_fixed(message, "===== Recurring Error Summary ====="), `:=`(environment = "Recurring Errors")]
+    # extract envir
+    err_dt[stri_startswith_fixed(message, "Beginning"), `:=`(envir = stri_sub(message, 11L))]
+    err_dt[stri_startswith_fixed(message, "===== Recurring Error Summary ====="), `:=`(envir = "Recurring Errors")]
 
-    # set environment index
-    err_dt[!is.na(environment), environment_index := .I]
+    # set envir index
+    err_dt[!is.na(envir), envir_index := .I]
 
     # fill downwards
-    err_dt[, `:=`(environment_index = environment_index[1L], environment = environment[1L]),
-        by = list(cumsum(!is.na(environment_index)))]
+    err_dt[, `:=`(envir_index = envir_index[1L], envir = envir[1L]),
+        by = list(cumsum(!is.na(envir_index)))]
 
     # for those simulation without sizing and etc.
-    err_dt[J(NA_integer_), on = "environment_index", `:=`(environment = "Simulation Initiation", environment_index = 0L)]
+    err_dt[J(NA_integer_), on = "envir_index", `:=`(envir = "Simulation Initiation", envir_index = 0L)]
 
-    # exclude environment lines
-    err_dt <- err_dt[!line %in% err_dt[environment_index > 0L, line[1L], by = c("environment_index")]$V1]
+    # exclude envir lines
+    err_dt <- err_dt[!line %in% err_dt[envir_index > 0L, line[1L], by = c("envir_index")]$V1]
 
-    # make sure environment index starts from 1L
-    if (!min(err_dt$environment_index)) set(err_dt, NULL, "environment_index", err_dt$environment_index + 1L)
+    # make sure envir index starts from 1L
+    if (!min(err_dt$envir_index)) set(err_dt, NULL, "envir_index", err_dt$envir_index + 1L)
 
     # extract log level
     err_dt[, level := stri_match_first_regex(prefix, "[^~\\s\\*]+")[, 1L]]
@@ -205,7 +217,7 @@ parse_err_file <- function (path) {
     # *************  **   ~~~   **   Max=34813.033168 {C}  Min=125.270579 {C}
     # }}}
 
-    l <- err_dt[(stri_startswith_fixed(message, "The following") & environment != "Recurring Errors") |
+    l <- err_dt[(stri_startswith_fixed(message, "The following") & envir != "Recurring Errors") |
                 stri_endswith_fixed(message, "is shown.") |
                 stri_startswith_fixed(message, ".."), which = TRUE
     ]
@@ -224,7 +236,7 @@ parse_err_file <- function (path) {
         by = list(cumsum(!is.na(level_index)))]
 
     # extract total recurring times
-    err_dt[J("Recurring Errors"), on = "environment", by = "level_index",
+    err_dt[J("Recurring Errors"), on = "envir", by = "level_index",
         num := {
             num <- stri_match_first_regex(message, "This error occurred (\\d+) total times;")[, 2L]
             num <- as.integer(num)
@@ -234,7 +246,7 @@ parse_err_file <- function (path) {
     ]
 
     set(err_dt, NULL, c("string", "line", "prefix"), NULL)
-    setcolorder(err_dt, c("index", "environment_index", "environment", "level_index", "level", "message"))
+    setcolorder(err_dt, c("index", "envir_index", "envir", "level_index", "level", "message"))
 
     # assign attributes
     for (i in names(att)) setattr(err_dt, i, att[[i]])
@@ -305,10 +317,10 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     # get all total message number in a level
     dt[, level_num := max(level_index), by = "level"]
     # add "[W 1/n]" prefix at the beginning
-    dt[dt[environment != "Recurring Errors", .I[1L], by = c("level", "level_index")]$V1,
+    dt[dt[!J("Recurring Errors"), on = "envir", .I[1L], by = c("level", "level_index")]$V1,
        out := paste0("[", stri_sub(level, to = 1L), " ", level_index, "/", level_num, "] ", out)
     ]
-    dt[dt[environment == "Recurring Errors", .I[1L], by = c("level", "level_index")]$V1,
+    dt[dt[J("Recurring Errors"), on = "envir", .I[1L], nomatch = 0L, by = c("level", "level_index")]$V1,
        out := {
            rec_times <- rep("", .N)
            rec_times[!is.na(num)] <- paste0(" (", num[!is.na(num)], ")")
@@ -316,13 +328,13 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
        }
     ]
 
-    # add environment name heading
-    dt[dt[environment != "Recurring Errors", .I[1L], by = c("environment_index")]$V1,
-        out := paste0(rule(paste0("During ", environment)), "\n", out), by = "id"]
-    dt[dt[environment == "Recurring Errors", .I[1L], by = c("environment_index")]$V1,
-        out := paste0(rule(environment), "\n", out), by = "id"]
-    # separate different environment
-    dt[dt[, .I[1L], by = c("environment_index")]$V1[-1L], out := paste0("\n", out)]
+    # add envir name heading
+    dt[dt[!J("Recurring Errors"), on = "envir", .I[1L], by = c("envir_index")]$V1,
+        out := paste0(rule(paste0("During ", envir)), "\n", out), by = "id"]
+    dt[dt[J("Recurring Errors"), on = "envir", .I[1L], nomatch = 0L, by = c("envir_index")]$V1,
+        out := paste0(rule(envir), "\n", out), by = "id"]
+    # separate different envir
+    dt[dt[, .I[1L], by = c("envir_index")]$V1[-1L], out := paste0("\n", out)]
 
     cli::cat_line(dt$out)
 

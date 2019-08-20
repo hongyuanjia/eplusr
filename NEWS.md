@@ -35,6 +35,8 @@
 * Now `$ref_to_object()` and `$ref_by_object()` can give correct results when
   `class` argument is specified.
 * Now IDD version lower than 8.3 can successfully be downloaded and parsed.
+* Now `ErrFile` objects returned from `$errors()` in `ParametricJob` can be
+  successfully printed.
 
 ## Minor changes
 
