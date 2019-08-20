@@ -134,9 +134,9 @@ job$read_rdd()
 job$read_mdd()
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-                all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
-                minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
-                environment_name = NULL)
+                all = FALSE, wide = FALSE, period = NULL, month = NULL, day = NULL,
+                hour = NULL, minute = NULL, interval = NULL, simulation_days = NULL,
+                day_type = NULL, environment_name = NULL)
 job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
                  column_name = NULL, row_name = NULL)
 }
@@ -223,6 +223,13 @@ Saturday. However, if you try to get the day of week of time "00:24:00" in R,
 you will get Saturday, but not Friday. This introduces inconsistency and may
 cause problems when doing data analysis considering day of week value.
 
+With \code{wide} equals \code{TRUE}, \code{$report_data()} will format the simulation output
+in the same way as standard EnergyPlus csv output file. Sometimes this can be
+useful as there may be existing tools/workflows that depend on this format.
+When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
+and date time components are also returned, including: \code{environment_name},
+\code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
+
 \code{$tabular_data()} extracts the tabular data in a
 \link[data.table:data.table]{data.table} using report, table, column and row
 name specifications. The returned \link[data.table:data.table]{data.table} has
@@ -267,6 +274,8 @@ of this simulation. If \code{"auto"}, the name of the IDF file without extension
 is used.
 \item \code{all}: If \code{TRUE}, extra columns are also included in the returned
 \link[data.table:data.table]{data.table}.
+\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
+EnergyPlus csv output file.
 \item \code{period}: A Date or POSIXt vector used to specify which time period to
 return. The year value does not matter and only month, day, hour and
 minute value will be used when subsetting. If \code{NULL}, all time period of

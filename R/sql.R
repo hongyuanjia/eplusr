@@ -39,10 +39,11 @@ NULL
 #' epsql$list_table()
 #' epsql$read_table(table)
 #' epsql$report_data_dict()
-#' epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-#'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
-#'                 minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
-#'                 environment_name = NULL)
+#' epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL,
+#'                   month = NULL, day = NULL, hour = NULL, minute = NULL,
+#'                   interval = NULL, simulation_days = NULL, day_type = NULL,
+#'                   environment_name = NULL)
 #' epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
 #'                    column_name = NULL, row_name = NULL)
 #' epsql$print()
@@ -71,10 +72,11 @@ NULL
 #' epsql$list_table()
 #' epsql$read_table(table)
 #' epsql$report_data_dict()
-#' epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-#'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
-#'                 minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
-#'                 environment_name = NULL)
+#' epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",
+#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL,
+#'                   month = NULL, day = NULL, hour = NULL, minute = NULL,
+#'                   interval = NULL, simulation_days = NULL, day_type = NULL,
+#'                   environment_name = NULL)
 #' epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
 #'                    column_name = NULL, row_name = NULL)
 #' ```
@@ -148,6 +150,13 @@ NULL
 #' you will get Saturday, but not Friday. This introduces inconsistency and may
 #' cause problems when doing data analysis considering day of week value.
 #'
+#' With `wide` equals `TRUE`, `$report_data()` will format the simulation output
+#' in the same way as standard EnergyPlus csv output file. Sometimes this can be
+#' useful as there may be existing tools/workflows that depend on this format.
+#' When both `wide` and `all` are `TRUE`, columns of runperiod environment names
+#' and date time components are also returned, including: `environment_name`,
+#' `datetime`, `month`, `day`, `hour`, `minute`, `day_type`.
+#'
 #' `$tabular_data()` extracts the tabular data in a
 #' [data.table][data.table::data.table()] using report, table, column and row
 #' name specifications. The returned [data.table][data.table::data.table()] has
@@ -186,6 +195,8 @@ NULL
 #'   is used.
 #' * `all`: If `TRUE`, extra columns are also included in the returned
 #'   [data.table][data.table::data.table()].
+#' * `wide`: If `TRUE`, the output is formated in the same way as standard
+#'   EnergyPlus csv output file.
 #' * `period`: A Date or POSIXt vector used to specify which time period to
 #'    return. The year value does not matter and only month, day, hour and
 #'    minute value will be used when subsetting. If `NULL`, all time period of
@@ -351,12 +362,12 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
             sql_report_data_dict(self, private),
 
         report_data = function (key_value = NULL, name = NULL, year = NULL,
-                                tz = "UTC", case = "auto", all = FALSE,
+                                tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                 interval = NULL, simulation_days = NULL, day_type = NULL,
                                 environment_name = NULL)
             sql_report_data(self, private, key_value = key_value, name = name, year = year,
-                tz = tz, case = case, all = all,
+                tz = tz, case = case, all = all, wide = wide,
                 period = period, month = month, day = day, hour = hour, minute = minute,
                 interval = interval, simulation_days = simulation_days, day_type = day_type,
                 environment_name = environment_name
@@ -405,14 +416,14 @@ sql_report_data_dict <- function (self, private) {
 # }}}
 # sql_report_data {{{
 sql_report_data <- function (self, private, key_value = NULL, name = NULL, year = NULL,
-                             tz = "UTC", case = "auto", all = FALSE,
+                             tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                              period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                              interval = NULL, simulation_days = NULL, day_type = NULL,
                              environment_name = NULL) {
     if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_sql))
     get_sql_report_data(private$m_path_sql,
         key_value = key_value, name = name, year = year,
-        tz = tz, case = case, all = all,
+        tz = tz, case = case, all = all, wide = wide,
         period = period, month = month, day = day, hour = hour, minute = minute,
         interval = interval, simulation_days = simulation_days, day_type = day_type,
         environment_name = environment_name

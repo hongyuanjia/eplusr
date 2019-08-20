@@ -31,7 +31,7 @@ NULL
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
 #' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-#'                   case = "auto", all = FALSE, period = NULL, month = NULL,
+#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
 #'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
 #'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
 #' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
@@ -129,7 +129,7 @@ NULL
 #' param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 #' param$report_data_dict(which = NULL)
 #' param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-#'                   case = "auto", all = FALSE, period = NULL, month = NULL,
+#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
 #'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
 #'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
 #' param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
@@ -238,6 +238,8 @@ NULL
 #'   is used.
 #' * `all`: If `TRUE`, extra columns are also included in the returned
 #'   [data.table][data.table::data.table()].
+#' * `wide`: If `TRUE`, the output is formated in the same way as standard
+#'   EnergyPlus csv output file.
 #' * `period`: A Date or POSIXt vector used to specify which time period to
 #'    return. The year value does not matter and only month, day, hour and
 #'    minute value will be used when subsetting. If `NULL`, all time period of
@@ -503,12 +505,12 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             param_report_data_dict(self, private, which),
 
         report_data = function (which = NULL, key_value = NULL, name = NULL,
-                                year = NULL, tz = "UTC", all = FALSE,
+                                year = NULL, tz = "UTC", all = FALSE, wide = FALSE,
                                 period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                 interval = NULL, simulation_days = NULL, day_type = NULL,
                                 environment_name = NULL)
             param_report_data(self, private, which,
-                key_value = key_value, name = name, year = year, tz = tz, all = all,
+                key_value = key_value, name = name, year = year, tz = tz, all = all, wide = wide,
                 period = period, month = month, day = day, hour = hour, minute = minute,
                 interval = interval, simulation_days = simulation_days, day_type = day_type,
                 environment_name = environment_name
@@ -1004,7 +1006,7 @@ param_report_data_dict <- function (self, private, which) {
 # }}}
 # param_report_data {{{
 param_report_data <- function (self, private, which = NULL, key_value = NULL,
-                               name = NULL, year = NULL, tz = "GMT", all = FALSE,
+                               name = NULL, year = NULL, tz = "GMT", all = FALSE, wide = FALSE,
                                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                interval = NULL, simulation_days = NULL, day_type = NULL,
                                environment_name = NULL) {
@@ -1012,12 +1014,12 @@ param_report_data <- function (self, private, which = NULL, key_value = NULL,
     cases <- param_case_from_which(self, private, which, name = TRUE)
 
     rbindlist(mapply(get_sql_report_data, sql = sqls, case = cases,
-        MoreArgs = list(key_value = key_value, name = name, all = all, year = year,
+        MoreArgs = list(key_value = key_value, name = name, all = all, wide = wide, year = year,
             tz = tz, period = period, month = month, day = day, hour = hour, minute = minute,
             interval = interval, simulation_days = simulation_days, day_type = day_type,
             environment_name = environment_name),
         SIMPLIFY = FALSE, USE.NAMES = FALSE
-    ))
+    ), fill = TRUE)
 }
 # }}}
 # param_tabular_data {{{
@@ -1037,7 +1039,7 @@ param_tabular_data <- function (self, private, which = NULL, report_name = NULL,
         setcolorder(d[[idx]], c("case", setdiff(names(d[[idx]]), "case")))
     }
 
-    rbindlist(d)
+    rbindlist(d, fill = TRUE)
 }
 # }}}
 # param_print {{{

@@ -30,7 +30,7 @@ param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, period = NULL, month = NULL,
+                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
 param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
@@ -133,7 +133,7 @@ param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
 param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, period = NULL, month = NULL,
+                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
 param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
@@ -243,6 +243,8 @@ of this simulation. If \code{"auto"}, the name of the IDF file without extension
 is used.
 \item \code{all}: If \code{TRUE}, extra columns are also included in the returned
 \link[data.table:data.table]{data.table}.
+\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
+EnergyPlus csv output file.
 \item \code{period}: A Date or POSIXt vector used to specify which time period to
 return. The year value does not matter and only month, day, hour and
 minute value will be used when subsetting. If \code{NULL}, all time period of

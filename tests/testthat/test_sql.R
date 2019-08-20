@@ -77,6 +77,54 @@ test_that("Sql methods", {
     skip_on_os("mac")
     # can get path
     expect_equal(sql$path(), job$locate_output(".sql"))
+    clean_wd(example$idf)
+    unlink(c(example$idf, example$epw))
+
+    skip_on_travis()
+    skip_on_appveyor()
+    # can handle multiple time resolution
+    example <- copy_example()
+    all_freq <- c("Detailed", "Timestep", "Hourly", "Daily", "Monthly",
+          "RunPeriod", "Environment", "Annual"
+    )
+    idf <- read_idf(example$idf)
+    job <- idf$run(NULL, echo = FALSE)
+    # remove original run periods
+    idf$RunPeriod <- NULL
+    # define new run periods
+    idf$add(RunPeriod = list("Long", 1, 1, 12, 31), RunPeriod = list("Short", 7, 1, 8, 15))
+
+    # add new output variables to cover all possible report frequency
+    idf$`Output:Variable` <- NULL
+    idf$`Output:Meter:MeterFileOnly` <- NULL
+    rdd <- job$read_rdd()[seq_along(all_freq)][, reporting_frequency := all_freq]
+    mdd <- job$read_mdd()[seq_along(all_freq)][, reporting_frequency := all_freq]
+    idf$load(rdd_to_load(rdd))
+    idf$load(mdd_to_load(mdd))
+
+    # save as temp file
+    idf$save(tempfile(fileext = ".idf"))
+    # run with weather file
+    job <- idf$run(example$epw, echo = FALSE)
+
+    res1 <- job$report_data(wide = TRUE)
+    res2 <- job$report_data(all = TRUE, wide = TRUE)
+    expect_equal(nrow(res1), nrow(res2))
+
+    jobs <- lapply(all_freq, function (freq) {
+        idf$`Output:Variable`<- NULL
+
+        dt <- idf$to_table(class = "Output:Meter")
+        dt[index == 2L, value := freq]
+        idf$update(dt)
+
+        idf$save(tempfile(fileext = ".idf"))
+
+        idf$run(NULL, echo = FALSE)
+    })
+
+    expect_silent(data_all <- lapply(jobs, function (job) get_sql_report_data(job$locate_output(".sql"), all = TRUE)))
+    expect_silent(data_wide <- lapply(jobs, function (job) get_sql_report_data(job$locate_output(".sql"), all = TRUE, wide = TRUE)))
 
     clean_wd(example$idf)
     unlink(c(example$idf, example$epw))

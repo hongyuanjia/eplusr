@@ -55,15 +55,6 @@ test_that("Parametric methods", {
     expect_equal(unname(vlapply(priv$m_param, is_idf)), rep(TRUE, times = 5))
     # }}}
 
-    # # can kill the master background R process
-    # expect_message(param$kill(), "job is not running")
-    # expect_true({param$run(wait = FALSE);Sys.sleep(0.2);param$kill()})
-    # # can update the status after job was killed
-    # expect_true(param$status()$terminated)
-    # expect_message(param$kill(), "job is not running")
-    # expect_error(param$errors(), "job was terminated before")
-    # expect_error(param$locate_output(), "job was terminated before")
-
     # Save {{{
     expect_silent(paths <- param$save())
     expect_equal(paths,

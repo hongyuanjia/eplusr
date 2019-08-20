@@ -36,45 +36,14 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                                        month = NULL, day = NULL, hour = NULL, minute = NULL,
                                        interval = NULL, simulation_days = NULL, day_type = NULL,
                                        environment_name = NULL) {
-    # helper {{{
-    sep <- function (x, ignore_case = TRUE) {
-        if (is.character(x)) {
-            if (ignore_case) {
-                stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
-            } else {
-                paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
-            }
-        } else {
-            paste(x, sep = ",", collapse = ",")
-        }
-    }
-    make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE) {
-        a <- substitute(assertion)
-        if (is.null(arg)) return(NULL)
-        eval(a)
-        if (is.null(sql_col)) {
-            sql_col <- stri_trans_totitle(deparse(substitute(arg)))
-        }
-        if (is.character(arg) && ignore_case) {
-            paste0("lower(", sql_col, ") IN (", sep(unique(arg), TRUE), ")")
-        } else {
-            paste0(sql_col, " IN (", sep(unique(arg), FALSE), ")")
-        }
-    }
-    `%and%` <- function (x, y) {
-        if (is.null(y)) return(x)
-        if (is.null(x)) return(y)
-        paste0("(", x, ") AND (", y, ")")
-    }
-    # }}}
     # Query for Time {{{
     time <- NULL %and%
-        make(month, assert(are_count(month), month <= 12L)) %and%
-        make(day, assert(are_count(day), day <= 31L)) %and%
-        make(hour, assert(are_count(hour, TRUE), hour <= 23L)) %and%
-        make(minute, assert(are_count(minute, TRUE), minute <= 59L)) %and%
-        make(interval, assert(are_count(interval))) %and%
-        make(simulation_days, assert(are_count(simulation_days)), "SimulationDays")
+        .sql_make(month, assert(are_count(month), month <= 12L), "Month") %and%
+        .sql_make(day, assert(are_count(day), day <= 31L), "Day") %and%
+        .sql_make(hour, assert(are_count(hour, TRUE), hour <= 23L), "Hour") %and%
+        .sql_make(minute, assert(are_count(minute, TRUE), minute <= 59L), "Minute") %and%
+        .sql_make(interval, assert(are_count(interval)), "Interval") %and%
+        .sql_make(simulation_days, assert(are_count(simulation_days)), "SimulationDays")
 
     if (!is.null(day_type)) {
         dt <- match_in_vec(day_type, label = TRUE,
@@ -84,7 +53,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
             )
         )
         assert(!is.na(dt), msg = paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
-        time <- time %and% make(dt, sql_col = "DayType")
+        time <- time %and% .sql_make(dt, sql_col = "DayType")
     }
 
     if (is.null(environment_name)) {
@@ -95,7 +64,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
             (
             SELECT *
             FROM EnvironmentPeriods
-            WHERE ", make(environment_name, sql_col = "EnvironmentName"), "
+            WHERE ", .sql_make(environment_name, sql_col = "EnvironmentName"), "
             )"
         )
     }
@@ -142,7 +111,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                 lubridate::minute(p),
                 sep = "-"
             )
-            period <- make(period, sql_col = "DateTime")
+            period <- .sql_make(period, sql_col = "DateTime")
 
             dt <- "(Month || \"-\" || Day || \"-\" || Hour || \"-\" || Minute) AS DateTime"
             time <- paste0("
@@ -171,8 +140,8 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
     }
 
     key_var <- NULL %and%
-        make(key_value, assert(is.character(key_value), no_na(key_value)), "KeyValue") %and%
-        make(name, assert(is.character(name), no_na(name)), "Name")
+        .sql_make(key_value, assert(is.character(key_value), no_na(key_value)), "KeyValue") %and%
+        .sql_make(name, assert(is.character(name), no_na(name)), "Name")
 
     if (is.null(key_var)) {
         key_var <- "ReportDataDictionary"
@@ -222,35 +191,6 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
 get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
                                         row_name = NULL) {
-    # helper {{{
-    sep <- function (x, ignore_case = TRUE) {
-        if (is.character(x)) {
-            if (ignore_case) {
-                stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
-            } else {
-                paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
-            }
-        } else {
-            paste(x, sep = ",", collapse = ",")
-        }
-    }
-    make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE) {
-        a <- substitute(assertion)
-        if (is.null(arg)) return(NULL)
-        eval(a)
-        sql_col <- deparse(substitute(arg))
-        if (is.character(arg) && ignore_case) {
-            paste0("lower(", sql_col, ") IN (", sep(unique(arg), TRUE), ")")
-        } else {
-            paste0(sql_col, " IN (", sep(unique(arg), FALSE), ")")
-        }
-    }
-    `%and%` <- function (x, y) {
-        if (is.null(y)) return(x)
-        if (is.null(x)) return(y)
-        paste0("(", x, ") AND (", y, ")")
-    }
-    # }}}
     # basic view {{{
     view <-
         "
@@ -286,11 +226,11 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
     # }}}
 
     q <- NULL %and%
-        make(report_name, assert(is.character(report_name), no_na(report_name))) %and%
-        make(report_for, assert(is.character(report_for), no_na(report_for))) %and%
-        make(table_name, assert(is.character(table_name), no_na(table_name))) %and%
-        make(column_name, assert(is.character(column_name), no_na(column_name))) %and%
-        make(row_name, assert(is.character(row_name), no_na(row_name)))
+        .sql_make(report_name, assert(is.character(report_name), no_na(report_name))) %and%
+        .sql_make(report_for, assert(is.character(report_for), no_na(report_for))) %and%
+        .sql_make(table_name, assert(is.character(table_name), no_na(table_name))) %and%
+        .sql_make(column_name, assert(is.character(column_name), no_na(column_name))) %and%
+        .sql_make(row_name, assert(is.character(row_name), no_na(row_name)))
 
     if (is.null(q)) return(view)
 
@@ -305,7 +245,7 @@ list_sql_table <- function (sql) {
 # }}}
 # get_sql_report_data {{{
 get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
-                                 tz = "UTC", case = "auto", all = FALSE,
+                                 tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
                                  environment_name = NULL) {
@@ -329,21 +269,26 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         # get wday per environment
         w <- get_sql_wday(sql)
 
-        # for WinterDesignDay and SummerDesignDay, set to Monday
-        set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
-        set(w, NULL, "dt", get_epw_wday(w$day_type))
-        w[day_type %chin% c("WinterDesignDay", "SummerDesignDay"), dt := 1L]
+        # in case there is no valid day type and get_sql_wday() returns nothing
+        if (!nrow(w)) {
+            set(res, NULL, "year", year)
+        } else {
+            # for WinterDesignDay and SummerDesignDay, set to Monday
+            set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
+            set(w, NULL, "dt", get_epw_wday(w$day_type))
+            w[day_type %chin% c("WinterDesignDay", "SummerDesignDay"), dt := 1L]
 
-        if (any(!is.na(w$dt))) {
-            for (i in which(!is.na(w$dt))) {
-                set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], year, leap))
+            if (any(!is.na(w$dt))) {
+                for (i in which(!is.na(w$dt))) {
+                    set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], year, leap))
+                }
             }
+
+            # make sure all environments have a year value
+            w[is.na(dt), year := lubridate::year(Sys.Date())]
+
+            set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
         }
-
-        # make sure all environments have a year value
-        w[is.na(dt), year := lubridate::year(Sys.Date())]
-
-        set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
     } else {
         set(res, NULL, "year", year)
     }
@@ -352,26 +297,93 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         lubridate::make_datetime(res$year, res$month, res$day, res$hour, res$minute, tz = tz)
     )
 
-    set(res, NULL, c("year", "environment_period_index"), NULL)
+    set(res, NULL, "year", NULL)
 
-    # stop if any invalid datetime found
+    # warning if any invalid datetime found
     # month, day, hour, minute may be NA if reporting frequency is Monthly or
     # RunPeriod
     if (anyNA(res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute), datetime])) {
         invld <- res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute)]
         mes <- invld[, paste0("Original: ", month, "-", day, " ",  hour, ":", minute,
             " --> New year: ", year)]
-        abort("error_invalid_epw_date_introduced",
+        warn("warn_invalid_epw_date_introduced",
             paste0("Invalid date introduced with input start year:\n",
                 paste0(mes, collapse = "\n")
             )
         )
     }
 
-    if (!all) {
+    if (!all & !wide) {
         res <- res[, .SD, .SDcols = c("datetime", "key_value", "name", "units", "value")]
     } else {
         setcolorder(res, c("datetime", setdiff(names(res), "datetime")))
+    }
+
+    # change to wide table {{{
+    if (wide) {
+        # change detailed level frequency to "Each Call"
+        res[, Variable := reporting_frequency]
+        res[J(c("Zone Timestep", "HVAC System Timestep")), on = "reporting_frequency", Variable := "Each Call"]
+        # combine key_value, name, and unit
+        res[J(1L), on = "is_meter", Variable := paste0(name, " [", units, "](", Variable, ")")]
+        res[J(0L), on = "is_meter", Variable := paste0(key_value, ":", name, " [", units, "](", Variable, ")")]
+
+        # handle RunPeriod frequency
+        if ("Run Period" %in% unique(res$reporting_frequency)) {
+            last_day <- res[!is.na(datetime), .SD[.N],
+                .SDcols = c("datetime", "month", "day", "hour", "minute"),
+                by = "environment_period_index"
+            ]
+            set(last_day, NULL, "reporting_frequency", "Run Period")
+
+            res[last_day, on = c("environment_period_index", "reporting_frequency"),
+                `:=`(datetime = i.datetime, month = i.month, day = i.day,
+                     hour = i.hour, minute = i.minute
+                )
+            ]
+        }
+
+        # format datetime
+        res[, `Date/Time` := paste0(" ",
+            stringi::stri_pad(month, 2, pad = "0"), "/",
+            stringi::stri_pad(day, 2, pad = "0"), "  ",
+            stringi::stri_pad(hour, 2, pad = "0"), ":",
+            stringi::stri_pad(minute, 2, pad = "0")
+        )]
+
+        # handle special cases
+        if (nrow(res) & all(is.na(res$datetime))) {
+            res[reporting_frequency != "Monthly", `Date/Time` := paste0("simdays=", simulation_days)]
+            res[reporting_frequency == "Monthly", `Date/Time` := {
+                m <- get_sql_date(sql, .BY$environment_period_index, simulation_days)$month
+                get_epw_month(m, label = TRUE)
+            }, by = "environment_period_index"]
+        }
+
+        if (all) {
+            # fill day_type
+            res[is.na(day_type) & !is.na(datetime) & hour == 24L,
+                `:=`(day_type = wday(datetime - hours(1L), label = TRUE))
+            ]
+            res[is.na(day_type) & !is.na(datetime) & hour != 24L,
+                `:=`(day_type = wday(datetime, label = TRUE))
+            ]
+
+            res <- dcast.data.table(res,
+                environment_period_index + simulation_days + environment_name +
+                datetime + month + day + hour + minute +
+                day_type + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        } else {
+            res <- dcast.data.table(res,
+                environment_period_index + simulation_days + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        }
+    }
+    # }}}
+
+    if (has_name(res, "environment_period_index")) {
+        set(res, NULL, "environment_period_index", NULL)
     }
 
     if (not_empty(case)) {
@@ -410,8 +422,58 @@ get_sql_wday <- function (sql) {
     get_sql_query(sql, q)
 }
 # }}}
+# get_sql_date {{{
+get_sql_date <- function (sql, environment_period_index, simulation_days) {
+    cond <- NULL %and%
+        .sql_make(environment_period_index, sql_col = "EnvironmentPeriodIndex") %and%
+        .sql_make(simulation_days, sql_col = "SimulationDays")
+    q <- paste0("
+         SELECT DISTINCT
+                EnvironmentPeriodIndex as environment_period_index,
+                SimulationDays as simulation_days,
+                Month AS month,
+                Day AS day
+         FROM Time
+         WHERE ", cond, " AND (Month IS NOT NULL) AND (Day IS NOT NULL)"
+        )
+    get_sql_query(sql, q)
+    # cat(q, sep = "\n")
+}
+# }}}
 # tidy_sql_name {{{
 tidy_sql_name <- function (x) {
     setnames(x, stri_sub(gsub("([A-Z])", "_\\L\\1", names(x), perl = TRUE), 2L))
+}
+# }}}
+
+# helper {{{
+.sql_sep <- function (x, ignore_case = TRUE) {
+    if (is.character(x)) {
+        if (ignore_case) {
+            stri_trans_tolower(paste(paste0("\"", x, "\""), sep = ",", collapse = ","))
+        } else {
+            paste(paste0("\"", x, "\""), sep = ",", collapse = ",")
+        }
+    } else {
+        paste(x, sep = ",", collapse = ",")
+    }
+}
+.sql_make <- function (arg, assertion = NULL, sql_col = NULL, ignore_case = TRUE, env = parent.frame()) {
+    a <- substitute(assertion, env)
+    if (is.null(arg)) return(NULL)
+    eval(a)
+    if (is.null(sql_col)) {
+        sql_col <- deparse(substitute(arg))
+    }
+    if (is.character(arg) && ignore_case) {
+        paste0("lower(", sql_col, ") IN (", .sql_sep(unique(arg), TRUE), ")")
+    } else {
+        paste0(sql_col, " IN (", .sql_sep(unique(arg), FALSE), ")")
+    }
+}
+`%and%` <- function (x, y) {
+    if (is.null(y)) return(x)
+    if (is.null(x)) return(y)
+    paste0("(", x, ") AND (", y, ")")
 }
 # }}}

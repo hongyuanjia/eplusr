@@ -50,7 +50,7 @@ MACRO_DICT <-
       "##symboltable", "##clear", "##reverse", "##!")
 # }}}
 # init var{{{
-`.` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- J <- N <- V1 <- V2 <- NULL
+`.` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- `.BY` <- J <- N <- V1 <- V2 <- NULL
 
 utils::globalVariables(c(
     "acceptable_num", "all_cmt", "all_name_lower", "annual", "auto_assigned",
@@ -78,7 +78,7 @@ utils::globalVariables(c(
     "object_list", "object_name", "object_name_lower", "object_order",
     "object_rleid", "old_exist", "old_object_name", "old_object_name_lower",
     "out", "out_of_range", "output_dir", "prefix", "ref_class", "ref_field",
-    "ref_object", "ref_value", "reference", "reference_class_name",
+    "ref_object", "ref_value", "reference", "reference_class_name", "reporting_freqency",
     "required_field", "required_object", "res", "rev_field_rleid", "same_dir",
     "si", "slash", "slash_key", "slash_loc", "slash_value", "slash_value_lower",
     "slash_value_rleid", "soil_conductivity", "soil_density",
@@ -90,6 +90,7 @@ utils::globalVariables(c(
     "temperature", "title", "to", "type", "type_enum", "type_exp",
     "unique_object", "upper_incbounds", "use_input_name", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "weather",
-    "wmo_number", "x", "year_in", "J", "num_fld", "max_fld"
+    "wmo_number", "x", "year_in", "J", "num_fld", "max_fld", "Date/Time",
+    "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month"
 ))
 # }}}
