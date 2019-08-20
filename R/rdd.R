@@ -244,8 +244,9 @@ rdd_to_load <- function (rdd, key_value, reporting_frequency) {
     } else if (!has_name(rdd, "reporting_frequency")) {
         set(rdd, NULL, "reporting_frequency", "Timestep")
     } else {
-        set(rdd, NULL, "reporting_frequency", as.character(rdd$reporting_frequency))
-        validate_report_freq(rdd$reporting_frequency, scalar = FALSE)
+        set(rdd, NULL, "reporting_frequency",
+            validate_report_freq(as.character(rdd$reporting_frequency), scalar = FALSE)
+        )
     }
 
     setnames(rdd, c("index", "key_value", "variable", "reporting_frequency"),
@@ -289,8 +290,9 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
     } else if (!has_name(mdd, "reporting_frequency")) {
         set(mdd, NULL, "reporting_frequency", "Timestep")
     } else {
-        set(mdd, NULL, "reporting_frequency", as.character(mdd$reporting_frequency))
-        validate_report_freq(mdd$reporting_frequency, scalar = FALSE)
+        set(mdd, NULL, "reporting_frequency",
+            validate_report_freq(as.character(mdd$reporting_frequency), scalar = FALSE)
+        )
     }
 
     setnames(mdd, c("index", "variable", "reporting_frequency"),
@@ -320,7 +322,7 @@ validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
 
     assert(no_na(freq),
         msg = paste0("Invalid reporting frequency found: ",
-            collapse(reporting_frequency[is.na(freq)]), ". All possible values: ",
+            collapse(unique(reporting_frequency[is.na(freq)])), ". All possible values: ",
             collapse(all_freq), "."
         ),
         err_type = "error_invalid_reporting_frequency"
