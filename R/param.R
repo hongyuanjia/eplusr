@@ -464,8 +464,8 @@ param_weather <- function (self, private) {
 param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     assert(is.function(measure))
 
-    if (length(formals(measure)) == 0L) {
-        abort("error_measure_no_arg", "`measure` function must have at lease one argument.")
+    if (length(formals(measure)) < 2L) {
+        abort("error_measure_no_arg", "`measure` function must have at least two argument.")
     }
 
     measure_wrapper <- function (idf, ...) {
