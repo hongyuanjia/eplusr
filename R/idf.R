@@ -1746,7 +1746,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),
 
-        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+        run = function (weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
             idf_run(self, private, weather, dir, wait, force, copy_external = copy_external, echo),
 
         print = function (zoom = "class", order = TRUE)

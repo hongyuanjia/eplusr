@@ -51,12 +51,48 @@ acceptable format for \code{$load()} method in \link{Idf} class.
 }
 \examples{
 \dontrun{
-idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"))
-job <- idf$run(dir = tempdir())
-rdd_to_load(job$read_rdd())
-mdd_to_load(job$read_mdd())
+# read an example distributed with eplusr
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+idf <- read_idf(path_idf)
 
-# using $load() to add output objects
-idf$load(mdd_to_load(job$read_mdd()))
+# run Design-Day-Only simulation silently
+job <- idf$run(NULL, tempdir(), echo = FALSE)
+
+# read RDD and MDD
+rdd <- job$read_rdd()
+mdd <- job$read_mdd()
+
+# perform subsetting on the variables
+# e.g.:
+rdd_sub <- rdd[grepl("Site", variable)]
+mdd_sub <- mdd[grepl("Electricity", variable)]
+
+# use newly added helper `rdd_to_load()` and `mdd_to_load()` and `$load()` to
+# add `Output:Variable` and `Output:Meter*`
+idf$load(rdd_to_load(rdd_sub))
+idf$load(mdd_to_load(mdd_sub))
+
+# default `Key Value` is `"*"` and `Reporting Frequency` is `Timestep`
+# can overwrite using `key_value` and `reporting_freqency` arg
+rdd_to_load(rdd_sub, key_value = "Environment", reporting_frequency = "hourly")
+
+# if input has column `key_value`, default is to use it, unless `key_value` is
+# explicitly specified
+rdd_to_load(rdd_sub[, key_value := "Environment"])
+rdd_to_load(rdd_sub[, key_value := "Environment"], key_value = "*")
+
+# `reporting_frequency` arg works in the same way as `key_value` arg, i.e.:
+# if input has column `reporting_frequency`, use it, unless
+# `reporting_frequency` is explicitly specified
+rdd_to_load(rdd_sub[,  reporting_frequency := "monthly"])
+rdd_to_load(rdd_sub[,  reporting_frequency := "monthly"], reporting_frequency = "detailed")
+
+# if input has column `key_value`, default is to use it, unless `key_value` is
+# explicitly specified
+rdd_to_load(rdd_sub[, key_value := "Environment"])
+rdd_to_load(rdd_sub[, key_value := "Environment"], key_value = "*")
+
+# meter class can be further specified using `class` arg
+mdd_to_load(mdd_sub, class = "Output:Meter:MeterFileOnly")
 }
 }

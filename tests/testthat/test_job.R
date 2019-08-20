@@ -27,22 +27,6 @@ test_that("Job methods", {
     # can kill job
     expect_silent(job$kill())
 
-    # # can kill backgroun R process
-    # add a full-year run period to lengthen simulation time
-    # idf <- read_idf(example$idf)
-    # idf$dup_object("WinterDay", "FullYear")
-    # full <- idf$RunPeriod$FullYear
-    # full$End_Month <- 12
-    # idf$save(example$idf, overwrite = TRUE)
-    # job <- eplus_job(example$idf, example$epw)
-    # expect_true({job$run(wait = FALSE);Sys.sleep(0.4);job$kill()})
-    # # can update the status after job was killed
-    # # can stop retreiving data when simulation was killed
-    # expect_true(job$status()$terminated)
-    # expect_message(job$kill(), "job is not running")
-    # expect_error(job$errors(), "Simulation was terminated before")
-    # expect_error(job$locate_output(), "Simulation was terminated before")
-
     example <- copy_example()
     job <- eplus_job(example$idf, example$epw)
     expect_is({job$run(echo = FALSE);job$errors()}, "ErrFile")

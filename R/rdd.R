@@ -212,7 +212,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
 #' idf <- read_idf(path_idf)
 #'
 #' # run Design-Day-Only simulation silently
-#' job <- idf$run(dir = tempdir(), echo = FALSE)
+#' job <- idf$run(NULL, tempdir(), echo = FALSE)
 #'
 #' # read RDD and MDD
 #' rdd <- job$read_rdd()
