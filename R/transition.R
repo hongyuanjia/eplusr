@@ -108,10 +108,7 @@ transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
     idf <- idf$clone(TRUE)
 
     # perform transition
-    res <- with_option(
-        list(verbose_info = FALSE, validate_level = "none"),
-        trans_apply(idf, ver, keep_all)
-    )
+    res <- trans_apply(idf, ver, keep_all)
 
     # directly return if no saving is required
     if (!save) return(res)
@@ -157,7 +154,17 @@ trans_apply <- function (idf, ver, keep_all) {
 
     # apply transition functions
     if (!keep_all) {
-        for (i in funs)  idf <- trans_funs[[i]](idf)
+        for (i in seq_along(funs))  {
+            verbose_info(
+                " From  Ver: ", vers[i], "\n",
+                "Toward Ver: ", vers[i + 1L]
+            )
+            idf <- with_option(
+                list(verbose_info = FALSE, validate_level = "none"),
+                trans_funs[[funs[i]]](idf)
+            )
+            verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
+        }
         idf
     } else {
         res <- vector("list", length(funs) + 1L)
@@ -165,7 +172,15 @@ trans_apply <- function (idf, ver, keep_all) {
 
         for (i in seq_along(res)) {
             if (i == length(res)) break
-            res[[i + 1L]] <- trans_funs[[funs[[i]]]](res[[i]])
+            verbose_info(
+                " From  Ver: ", vers[i], "\n",
+                "Toward Ver: ", vers[i + 1L]
+            )
+            res[[i + 1L]] <- with_option(
+                list(verbose_info = FALSE,validate_level = "none"),
+                trans_funs[[funs[[i]]]](res[[i]])
+            )
+            verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
         setattr(res, "names", c(as.character(idf$version()[, 1L:2L]), nms))
