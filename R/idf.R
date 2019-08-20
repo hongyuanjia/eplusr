@@ -2404,7 +2404,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 
     # when no epw is given, at least one design day object should exists
     if (is.null(epw)) {
-        if (!idf$is_valid_class("SizingPeriod:DesignDay")) {
+        if (!self$is_valid_class("SizingPeriod:DesignDay")) {
             assert("error_run_no_ddy",
                 paste0("When no weather file is given, input IDF should contain ",
                     "`SizingPeriod:DesignDay` object to enable Design-Day-only ",
