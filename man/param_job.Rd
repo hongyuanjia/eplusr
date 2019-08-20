@@ -9,7 +9,10 @@ param_job(idf, epw)
 \arguments{
 \item{idf}{A path to EnergyPlus IDF or IMF file or an \code{Idf} object.}
 
-\item{epw}{A path to EnergyPlus EPW file or an \code{Epw} object.}
+\item{epw}{A path to EnergyPlus EPW file or an \code{Epw} object. \code{epw} can also
+be \code{NULL} which will force design-day-only simulation when
+\code{\link[=ParametricJob]{$run()}} method is called. Note this needs at least one
+\code{Sizing:DesignDay} object exists in the \link{Idf}.}
 }
 \value{
 A \code{ParametricJob} object.

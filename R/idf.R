@@ -81,7 +81,7 @@ NULL
 #'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
 #'            copy_external = TRUE)
-#' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' model$clone(deep = TRUE)
 #' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 #' print(model)
@@ -1115,7 +1115,7 @@ NULL
 #' @section Run Model:
 #'
 #' ```
-#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' ```
 #'
 #' `$run()` calls corresponding version of EnergyPlus to run the current model
@@ -1136,7 +1136,9 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `weather`: A path to an `.epw` file or an [Epw] object.
+#' * `weather`: A path to an `.epw` file or an [Epw] object. `weather` can also
+#'   be `NULL` which will force design-day-only simulation. Note this needs at
+#'   least one `Sizing:DesignDay` object exists in the `Idf`.
 #' * `dir`: The directory to save the simulation results. If `NULL`, the model
 #'    folder will be used. Default: NULL
 #' * `wait`: Whether to wait until the simulation completes and print the
@@ -1151,6 +1153,8 @@ NULL
 #'   only `Schedule:File` class is supported.  This ensures that the output
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
+#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to show standard
+#'   output and error from EnergyPlus. Default: same as `wait`.
 #'
 #' @section Print:
 #' ```
@@ -1737,8 +1741,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),
 
-        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
-            idf_run(self, private, weather, dir, wait, force, copy_external = copy_external),
+        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+            idf_run(self, private, weather, dir, wait, force, copy_external = copy_external, echo),
 
         print = function (zoom = "class", order = TRUE)
             idf_print(self, private, zoom, order)
@@ -2351,7 +2355,7 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
 # }}}
 # idf_run {{{
 idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
-                     force = FALSE, copy_external = FALSE) {
+                     force = FALSE, copy_external = FALSE, echo = wait) {
     if (private$m_version < 8.3) {
         abort("error_eplus_lower_8.3",
             "Currently, `$run()` only supports EnergyPlus V8.3 or higher."
@@ -2368,11 +2372,16 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 
     # add Output:SQLite if necessary
     add_sql <- idf_add_output_sqlite(self)
+    add_dict <- idf_add_output_vardict(self)
 
     # save the model to the output dir if necessary
     if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
-        stop("The Idf object is not created from local file or local file has ",
-            "been deleted from disk. Please save Idf using $save() before run.", call. = FALSE)
+        assert("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file or local file has ",
+                "been deleted from disk. Please save Idf using $save() before run."
+            )
+        )
     }
 
     path_idf <- private$m_path
@@ -2384,8 +2393,20 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     }
 
     # if necessary, resave the model
-    if (add_sql || !is.null(dir)) {
+    if (add_sql || add_dict || !is.null(dir)) {
         idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
+    }
+
+    # when no epw is given, at least one design day object should exists
+    if (is.null(epw)) {
+        if (!idf$is_valid_class("SizingPeriod:DesignDay")) {
+            assert("error_run_no_ddy",
+                paste0("When no weather file is given, input IDF should contain ",
+                    "`SizingPeriod:DesignDay` object to enable Design-Day-only ",
+                    "simulation."
+                )
+            )
+        }
     }
 
     # check if the model is still running
@@ -2399,7 +2420,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
         private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
     }
 
-    private$m_log$job$run(wait = wait, force = force)
+    private$m_log$job$run(wait = wait, force = force, echo = echo)
 }
 # }}}
 # idf_print {{{
@@ -2489,7 +2510,7 @@ idf_add_output_sqlite <- function (idf) {
         sql <- idf$objects_in_class("Output:SQLite")[[1L]]
         type <- toupper(sql$value()[[1]])
         if (type != "SIMPLEANDTABULAR") {
-            invisible(sql$set("SimpleAndTabular"))
+            sql$set("SimpleAndTabular")
             verbose_info("Setting `Option Type` in ",
                 "`Output:SQLite` to from", surround(type), " to `SimpleAndTabular`.")
             added <- TRUE
@@ -2498,6 +2519,28 @@ idf_add_output_sqlite <- function (idf) {
         invisible(idf$add(Output_SQLite = list("SimpleAndTabular")))
         verbose_info("Adding an object in class `Output:SQLite` and setting its ",
             "`Option Type` to `SimpleAndTabular` in order to create SQLite output file.")
+        added <- TRUE
+    }
+    added
+}
+# }}}
+# idf_add_output_vardict {{{
+idf_add_output_vardict <- function (idf) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+    added <- FALSE
+    if (idf$is_valid_class("Output:VariableDictionary")) {
+        dict <- idf$objects_in_class("Output:VariableDictionary")[[1L]]
+        key <- toupper(dict$value()[[1]])
+        if (!key %chin% c("IDF", "REGULAR")) {
+            dict$set("IDF")
+            verbose_info("Setting `Key Field` in ",
+                "`Output:VariableDictionary` to from", surround(key), " to `IDF`.")
+            added <- TRUE
+        }
+    } else {
+        invisible(idf$add(Output_VariableDictionary = list("IDF")))
+        verbose_info("Adding an object in class `Output:VariableDictionary` and setting its ",
+            "`Key Field` to `IDF` in order to create RDD and MDD output file.")
         added <- TRUE
     }
     added

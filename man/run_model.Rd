@@ -39,9 +39,9 @@ finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
 and a \link[processx:process]{processx::process} object is returned. Note that, if \code{FALSE}, R is
 \emph{not blocked} even when \code{echo} is \code{TRUE}. Default: \code{TRUE}.}
 
-\item{echo}{Whether to show standard output and error from EnergyPlus
-command line interface for \code{run_idf()} and simulation status for
-\code{run_multi()}.Default: \code{TRUE}.}
+\item{echo}{Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
+output and error from EnergyPlus command line interface for \code{run_idf()}
+and simulation status for \code{run_multi()}.Default: \code{TRUE}.}
 
 \item{eplus}{An acceptable input (for \code{run_idf()}) or inputs (for
 \code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If
@@ -61,11 +61,6 @@ run EnergyPlus model with different options.
 \details{
 \code{run_multi()} provides the functionality of running multiple models in
 parallel.
-
-\href{https://cran.r-project.org/package=later}{later} package is used to poll the
-standard output and error of background EnergyPlus process or background
-R process that handles parallel simulations. The print interval is set to
-0.5 sec.
 
 For \code{run_idf()}, a named list will be returned:
 \itemize{

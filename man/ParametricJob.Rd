@@ -22,7 +22,7 @@ param$seed()
 param$weather()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -60,7 +60,8 @@ param$weather()
 
 \code{$seed()} returns the input \link{Idf} object.
 
-\code{$weather()} returns the input \link{Epw} object.
+\code{$weather()} returns the input \link{Epw} object. If no \link{Epw} is provided when
+creating the \code{ParametricJob} object, \code{NULL} is returned.
 }
 
 \section{Apply Design Alternatives}{
@@ -124,7 +125,7 @@ to run. Default: \code{FALSE}.
 }
 
 \section{Run and Collect Results}{
-\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -162,6 +163,10 @@ simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 otherwise. \code{NA} if the job has not been run yet.
 \item \code{changed_after}: \code{TRUE} if the \emph{seed model} has been modified since last
 simulation. \code{FALSE} otherwise.
+\item \code{job_status}: A \link[data.table:data.table]{data.table} contains meta data
+for each simulation job. For details, please see \code{\link[=run_multi]{run_multi()}}. If the
+job has not been run before, a null
+\link[data.table:data.table]{data.table} is returned.
 }
 
 $errors() returns an \link[=read_err]{ErrFile} object which contains all contents
@@ -212,6 +217,8 @@ values of file paths in the Idf will be changed automatically. Currently,
 only \code{Schedule:File} class is supported.  This ensures that the output
 directory will have all files needed for the model to run. Default is
 \code{FALSE}.
+\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to simulation
+status. Default: \code{TRUE}.
 \item \code{suffix}: A string that indicates the file extension of simulation output.
 Default: \code{".err"}.
 \item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
@@ -285,6 +292,7 @@ whenever \code{$print()} is called.
 }
 
 \examples{
+\dontrun{
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -296,7 +304,91 @@ if (is_avail_eplus(8.8)) {
     param_job(idf_path, epw_path)
 
     # create from an Idf and an Epw object
-    param_job(read_idf(idf_path), read_epw(epw_path))
+    param <- param_job(read_idf(idf_path), read_epw(epw_path))
+
+    # get the seed model
+    param$seed()
+
+    # get the weather
+    param$weather()
+
+    # get status of current job
+    param$status()
+
+    # create a measure to change the orientation of the building
+    rotate_building <- function (idf, degree = 0L) {
+        if (!idf$is_valid_class("Building")) {
+           stop("Input model does not have a Building object")
+        }
+
+        if (degree > 360 || degree < -360 ) {
+            stop("Input degree should in range [-360, 360]")
+        }
+
+        cur <- idf$Building$North_Axis
+
+        new <- cur + degree
+
+        if (new > 360) {
+            new <- new \%\% 360
+            warning("Calculated new north axis is greater than 360. Final north axis will be ", new)
+        } else if (new < -360) {
+            new <- new \%\% -360
+            warning("Calculated new north axis is smaller than -360. Final north axis will be ", new)
+        }
+
+        idf$Building$North_Axis <- new
+
+        idf
+    }
+
+    # apply measure
+    # this will create 12 models
+    param$apply_measure(rotate_building, degree = seq(30, 360, 30))
+    # apply measure with new names specified
+    param$apply_measure(rotate_building, degree = seq(30, 360, 30),
+        .names = paste0("rotate_", seq(30, 360, 30))
+    )
+
+    # extract all parametric models
+    param$models()
+
+    # save all parametric models with each model in a separate folder
+    param$save(tempdir())
+
+    # save all parametric models with all models in the same folder
+    param$save(tempdir(), separate = FALSE)
+
+    # run parametric simulations
+    param$run(wait = TRUE)
+
+    # run in background
+    param$run(wait = FALSE)
+    # get detailed job status by printing
+    print(param)
+
+    # status now includes a data.table with detailed information on each simulation
+    param$status()
+
+    # print simulation errors
+    param$errors()
+
+    # extract output of all simulations
+    param$report_data()
+
+    # extract only some simulations
+    param$report_data(c(1, 3))
+    param$tabular_data(c(1, 3))
+    param$report_data(c("rotate_30", "rotate_120"))
+    param$tabular_data(c("rotate_30", "rotate_120"))
+
+    # get output directory
+    param$output_dir()
+    param$output_dir(c(1, 3))
+
+    # get path of specific output file
+    param$locate_output(c(1, 3), ".csv")
+}
 }
 }
 \author{

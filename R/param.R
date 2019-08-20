@@ -23,7 +23,7 @@ NULL
 #' param$weather()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 #' param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -59,7 +59,8 @@ NULL
 #'
 #' `$seed()` returns the input [Idf] object.
 #'
-#' `$weather()` returns the input [Epw] object.
+#' `$weather()` returns the input [Epw] object. If no [Epw] is provided when
+#' creating the `ParametricJob` object, `NULL` is returned.
 #'
 #' @section Apply Design Alternatives:
 #' ```
@@ -120,7 +121,7 @@ NULL
 #'
 #' @section Run and Collect Results:
 #' ```
-#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -158,6 +159,10 @@ NULL
 #'     otherwise. `NA` if the job has not been run yet.
 #'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
 #'      simulation. `FALSE` otherwise.
+#'   * `job_status`: A [data.table][data.table::data.table()] contains meta data
+#'     for each simulation job. For details, please see [run_multi()]. If the
+#'     job has not been run before, a null
+#'     [data.table][data.table::data.table()] is returned.
 #'
 #' $errors() returns an [ErrFile][read_err()] object which contains all contents
 #' of the simulation error file (`.err`). If `info` is `FALSE`, only warnings
@@ -207,6 +212,8 @@ NULL
 #'   only `Schedule:File` class is supported.  This ensures that the output
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
+#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to simulation
+#' status. Default: `TRUE`.
 #' * `suffix`: A string that indicates the file extension of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
@@ -282,6 +289,7 @@ NULL
 #' whenever `$print()` is called.
 #'
 #' @examples
+#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'     idf_name <- "1ZoneUncontrolled.idf"
 #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -293,7 +301,91 @@ NULL
 #'     param_job(idf_path, epw_path)
 #'
 #'     # create from an Idf and an Epw object
-#'     param_job(read_idf(idf_path), read_epw(epw_path))
+#'     param <- param_job(read_idf(idf_path), read_epw(epw_path))
+#'
+#'     # get the seed model
+#'     param$seed()
+#'
+#'     # get the weather
+#'     param$weather()
+#'
+#'     # get status of current job
+#'     param$status()
+#'
+#'     # create a measure to change the orientation of the building
+#'     rotate_building <- function (idf, degree = 0L) {
+#'         if (!idf$is_valid_class("Building")) {
+#'            stop("Input model does not have a Building object")
+#'         }
+#'
+#'         if (degree > 360 || degree < -360 ) {
+#'             stop("Input degree should in range [-360, 360]")
+#'         }
+#'
+#'         cur <- idf$Building$North_Axis
+#'
+#'         new <- cur + degree
+#'
+#'         if (new > 360) {
+#'             new <- new %% 360
+#'             warning("Calculated new north axis is greater than 360. Final north axis will be ", new)
+#'         } else if (new < -360) {
+#'             new <- new %% -360
+#'             warning("Calculated new north axis is smaller than -360. Final north axis will be ", new)
+#'         }
+#'
+#'         idf$Building$North_Axis <- new
+#'
+#'         idf
+#'     }
+#'
+#'     # apply measure
+#'     # this will create 12 models
+#'     param$apply_measure(rotate_building, degree = seq(30, 360, 30))
+#'     # apply measure with new names specified
+#'     param$apply_measure(rotate_building, degree = seq(30, 360, 30),
+#'         .names = paste0("rotate_", seq(30, 360, 30))
+#'     )
+#'
+#'     # extract all parametric models
+#'     param$models()
+#'
+#'     # save all parametric models with each model in a separate folder
+#'     param$save(tempdir())
+#'
+#'     # save all parametric models with all models in the same folder
+#'     param$save(tempdir(), separate = FALSE)
+#'
+#'     # run parametric simulations
+#'     param$run(wait = TRUE)
+#'
+#'     # run in background
+#'     param$run(wait = FALSE)
+#'     # get detailed job status by printing
+#'     print(param)
+#'
+#'     # status now includes a data.table with detailed information on each simulation
+#'     param$status()
+#'
+#'     # print simulation errors
+#'     param$errors()
+#'
+#'     # extract output of all simulations
+#'     param$report_data()
+#'
+#'     # extract only some simulations
+#'     param$report_data(c(1, 3))
+#'     param$tabular_data(c(1, 3))
+#'     param$report_data(c("rotate_30", "rotate_120"))
+#'     param$tabular_data(c("rotate_30", "rotate_120"))
+#'
+#'     # get output directory
+#'     param$output_dir()
+#'     param$output_dir(c(1, 3))
+#'
+#'     # get path of specific output file
+#'     param$locate_output(c(1, 3), ".csv")
+#' }
 #' }
 #' @docType class
 #' @name ParametricJob
@@ -306,7 +398,10 @@ NULL
 #' For details on `ParametricJob`, please see [ParametricJob] class.
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
-#' @param epw A path to EnergyPlus EPW file or an `Epw` object.
+#' @param epw A path to EnergyPlus EPW file or an `Epw` object. `epw` can also
+#' be `NULL` which will force design-day-only simulation when
+#' [`$run()`][ParametricJob] method is called. Note this needs at least one
+#' `Sizing:DesignDay` object exists in the [Idf].
 #' @return A `ParametricJob` object.
 #' @examples
 #' if (is_avail_eplus(8.8)) {
@@ -348,11 +443,14 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             idf_self <- ._get_self(private$m_idf)
             idf_priv <- ._get_private(private$m_idf)
             idf_add_output_sqlite(private$m_idf)
+            idf_add_output_vardict(private$m_idf)
 
             # save uuid
             private$m_log$seed_uuid <- idf_priv$m_log$uuid
 
-            if (is_epw(epw)) {
+            if (is.null(epw)) {
+                private$m_epw <- NULL
+            } else if (is_epw(epw)) {
                 private$m_epw <- epw$clone(deep = TRUE)
             } else {
                 private$m_epw <- read_epw(epw)
@@ -379,8 +477,8 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         save = function (dir = NULL, separate = TRUE, copy_external = FALSE)
             param_save(self, private, dir, separate, copy_external),
 
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
-            param_run(self, private, dir, wait, force, copy_external),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+            param_run(self, private, dir, wait, force, copy_external, echo),
 
         kill = function ()
             param_kill(self, private),
@@ -459,8 +557,8 @@ param_weather <- function (self, private) {
 param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     assert(is.function(measure))
 
-    if (length(formals(measure)) == 0L) {
-        abort("error_measure_no_arg", "`measure` function must have at lease one argument.")
+    if (length(formals(measure)) < 2L) {
+        abort("error_measure_no_arg", "`measure` function must have at least two argument.")
     }
 
     measure_wrapper <- function (idf, ...) {
@@ -496,7 +594,9 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
     verbose_info("Measure ", surround(mea_nm), " has been applied with ", length(out),
-        " new models created:\n", paste0(seq_along(out_nms), ": ", out_nms, collapse = "\n"))
+        " new models created:\n", paste0("[", lpad(seq_along(out_nms), "0"), "]", ": ",
+            surround(out_nms), collapse = "\n")
+    )
 }
 # }}}
 # param_retrieve_data {{{
@@ -509,7 +609,7 @@ param_retrieve_data <- function (self, private) {
         private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_output_lines(10000))
         private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_error_lines(10000))
     } else {
-        if (inherits(private$m_job, "r_process")) {
+        if (inherits(private$m_job, "r_process") & !status$terminated) {
             private$m_log$stdout <- c(private$m_log$stdout, private$m_job$read_all_output_lines())
             private$m_log$stderr <- c(private$m_log$stderr, private$m_job$read_all_error_lines())
         }
@@ -613,7 +713,7 @@ param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
+param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     if (is.null(private$m_param)) {
         abort("error_no_measured_applied", "No measure has been applied.")
     }
@@ -639,7 +739,11 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     nms <- names(private$m_param)
 
     path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
-    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    if (is.null(private$m_epw)) {
+        path_epw <- NULL
+    } else {
+        path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    }
 
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
@@ -683,10 +787,14 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 
     apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
 
+    # reset status
     private$m_log$start_time <- Sys.time()
     private$m_log$killed <- NULL
+    private$m_log$stdout <- NULL
+    private$m_log$stderr <- NULL
+    private$m_job <- NULL
 
-    tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = wait, eplus = ver)
+    tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = echo, eplus = ver)
 
     private$m_job <- tbl
 
@@ -790,7 +898,8 @@ param_status <- function (self, private) {
         alive = FALSE, # if simulation is still running
         terminated = NA, # if last simulation was terminated
         successful = NA, # if last simulation was successful
-        changed_after = NA # if the seed model has been changed after last simulation
+        changed_after = NA, # if the seed model has been changed after last simulation
+        job_status = data.table() # if no simulation has been run
     )
 
     proc <- private$m_job
@@ -822,11 +931,14 @@ param_status <- function (self, private) {
             } else {
                 status$successful <- FALSE
             }
+
+            status$job_status <- tryCatch(proc$get_result(), error = function (e) data.table())
         }
 
     } else {
         status$alive <- FALSE
         status$successful <- TRUE
+        status$job_status <- proc
     }
 
     status
@@ -930,7 +1042,7 @@ param_print <- function (self, private) {
     config <- eplus_config(private$m_idf$version())
     cli::cat_line(c(
         str_trunc(paste0("Seed Model: ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE)))),
-        str_trunc(paste0("Weather: ", surround(private$m_epw$path()))),
+        str_trunc(paste0("Weather: ", if (is.null(private$m_epw)) "<< Not specified >>" else surround(private$m_epw$path()))),
         paste0("EnergyPlus Version: ", surround(config$version)),
         paste0("EnergyPlus Path: ", surround(normalizePath(config$dir)))
     ))
@@ -946,18 +1058,59 @@ param_print <- function (self, private) {
         paste0("Parametric Models [", length(private$m_param), "]: ")
     ))
 
-    cli::cat_line(paste0("  - ", names(private$m_param), collapse = "\n"))
-
     status <- param_status(self, private)
 
     param_retrieve_data(self, private)
 
+    nm <- paste0("[", lpad(seq_along(private$m_param), 0), "]: ", surround(names(private$m_param)))
+
     if (!status$run_before) {
+        cli::cat_line(paste0(nm, collapse = "\n"))
         cli::cat_line("<< Job has not been run before >>",
             col = "white", background_col = "blue")
         return(invisible())
     }
 
+    # each job status {{{
+    if (status$alive) {
+        if (length(private$m_log$stderr)) {
+            stderr <- private$m_log$stderr
+            # keep the latest status
+            job_status <- as.data.table(stri_split_fixed(stderr, "|", n = 2L, simplify = TRUE))
+            job_status <- unique(job_status, fromLast = TRUE, by = "V1")
+            # get index
+            set(job_status, NULL, "index", as.integer(job_status$V1))
+            # order by index
+            setorder(job_status, "index")
+            # make sure all models are included
+            job_status <- job_status[J(seq_along(nm)), on = "index"]
+            # for models that are idle
+            job_status[J(NA_character_), on = "V2", V2 := paste0(
+                "IDLE       --> [IDF]", surround(names(private$m_param)[index]))]
+            stderr <- paste0(lpad(job_status$index, "0"), "|" ,job_status$V2)
+            safe_width <- getOption("width") - 2L
+            stderr_trunc <- vcapply(stderr, function (l) {
+                if (nchar(l) > safe_width) {
+                    paste0(substr(l, 1, safe_width), "...")
+                } else {
+                    l
+                }
+            })
+
+            cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
+                padding = 0)
+        }
+    } else {
+        if (isTRUE(status$terminated)) {
+            cli::cat_line(paste0(rpad(nm), " <-- TERMINATED", collapse = "\n"))
+        } else {
+            nm <- private$m_job[, paste0(rpad(nm), ifelse(exit_status == 0L, " <-- SUCCEEDED", " <-- FAILED"))]
+            cli::cat_line(paste0(nm, collapse = "\n"))
+        }
+    }
+    # }}}
+
+    # print summary status {{{
     if (isTRUE(status$terminated)) {
         cli::cat_line(" Job was terminated before.",
             col = "white", background_col = "red")
@@ -988,23 +1141,7 @@ param_print <- function (self, private) {
             )
         }
     }
-
-    if (status$alive) {
-        if (length(private$m_log$stdout))
-            cli::cat_boxx(private$m_log$stdout)
-
-        if (length(private$m_log$stderr)) {
-            stderr <- private$m_log$stderr
-            safe_width <- getOption("width") - 2L
-            stderr_trunc <- vapply(stderr, function (l) {
-                if (nchar(l) > safe_width)
-                    paste0(substr(l, 1, safe_width), "...")
-            }, FUN.VALUE = character(1))
-
-            cli::cat_boxx(stderr_trunc, col = "green", border_col = "green",
-                padding = 0)
-        }
-    }
+    # }}}
 }
 # }}}
 # S3 ParametricJob methods {{{

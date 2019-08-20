@@ -15,6 +15,32 @@
   data per class have the same field number. The number of fields is the same as
   the object that have the most fields among those you specified. Setting `all`
   to `TRUE` will return all available fields in that class definition in IDD.
+* Now the `weather` argument in `$run()` method in `Idf` class can be set to
+  `NULL`. If so, design-day-only simulation is performed. Note that this needs
+  at least one `Sizing:DesignDay` object exists in the `Idf` object (#80).
+* Similar as above, the `epw` argument in `eplus_job()` and `param_job()` can
+  also be `NULL` to force a design-day-only simulation.
+* Now `$status()` in `ParametricJob` class includes a new member named
+  `job_status` which is data.table containing detailed information on each
+  simulation job (#70).
+* Now `$print()` in `ParametricJob` will give you more informative details on
+  each simulation job status, especially when `wait` is set to `FALSE` in
+  `$run()`.
+* A new column `index` is added in the returned `RddFile` and `MddFile`. It
+  contains index of each variable.
+* Two new methods `$read_rdd()` and `$read_mdd()` have been added in `EplusJob`
+  class. `$read_rdd()` and `$read_mdd()` which parse the simulation RDD and MDD
+  file (#84).
+* Two new function `rdd_to_load()` and `mdd_to_load()` have been added, which
+  format `RddFile` and `MddFile` into a data.table in acceptable format for
+  `$load()` method in `Idf` class.
+* Similar as `Output:SQLite`, when `$run()` in `Idf` object is called, an object
+  in class `Output:VariableDictionary` is automatically created with `Key Field`
+  being `IDF` (#85).
+* A new argument `echo` has been added in `$run()` in `Idf`, `EplusJob` and
+  `ParametricJob` class. It is only applicable when `wait` is `TRUE`. If `FALSE`,
+  the simulation will be run silently without echoing any message from
+  EnergyPlus.
 
 ## Bug fixes
 
@@ -24,11 +50,16 @@
 * Now `$ref_to_object()` and `$ref_by_object()` can give correct results when
   `class` argument is specified.
 * Now IDD version lower than 8.3 can successfully be downloaded and parsed.
+* Now `ErrFile` objects returned from `$errors()` in `ParametricJob` can be
+  successfully printed.
 
 ## Minor changes
 
 * Describe on how the arguments are matched in `$apply_measure()` (#57). Thanks
   @yidan1214 for pointing this out.
+* Now the `echo` argument in `run_idf()` and `run_multi()` will only take effect
+  when `wait` is `TRUE`. This makes it possible to remove the dependency on the
+  later package.
 
 # eplusr 0.10.3
 

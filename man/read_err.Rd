@@ -19,7 +19,20 @@ with an extension \code{.err}, parses it and returns an \code{ErrFile} object.
 }
 \details{
 Basically, an \code{ErrFile} object is a \link[data.table:data.table]{data.table}
-with 6 additional attributes:
+with 6 columns and 6 additional attributes:
+
+6 Columns:
+\itemize{
+\item \code{index}: Integer. Index of messages.
+\item \code{envir_index}: Integer. Index of simulation environments.
+\item \code{envir}: Character. Names of simulation environments.
+\item \code{level_index}: Integer. Index for each severe level.
+\item \code{level}: Character. Name of severe levels. Possible values: \code{Info},
+\code{Warning}, \code{Severe}, and etc.
+\item \code{message}: Character. Error messages.
+}
+
+6 Attributes:
 \itemize{
 \item \code{eplus_version}: A \link[base:numeric_version]{numeric_version} object. The
 version of EnergyPlus used during the simulation.

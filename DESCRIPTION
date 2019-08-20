@@ -23,7 +23,6 @@ Imports:
     crayon,
     cli,
     data.table (>= 1.9.8),
-    later,
     lubridate,
     methods,
     processx (>= 3.2.0),

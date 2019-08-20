@@ -2,7 +2,6 @@
 #' @importFrom cli cat_line
 #' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
-#' @importFrom later later
 #' @importFrom lubridate hms with_tz
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
@@ -92,9 +91,9 @@ clean_wd <- function (path) {
 #' @param annual Force design-day-only simulation. Default: `FALSE`.
 #' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
 #'     Default: `TRUE`.
-#' @param echo Whether to show standard output and error from EnergyPlus
-#'     command line interface for `run_idf()` and simulation status for
-#'     `run_multi()`.Default: `TRUE`.
+#' @param echo Only applicable when `wait` is `TRUE`. Whether to show standard
+#'     output and error from EnergyPlus command line interface for `run_idf()`
+#'     and simulation status for `run_multi()`.Default: `TRUE`.
 #' @param wait If `TRUE`, R will hang on and wait all EnergyPlus simulations
 #'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
 #'     and a [processx::process] object is returned. Note that, if `FALSE`, R is
@@ -106,11 +105,6 @@ clean_wd <- function (path) {
 #'     `NULL`, should have the same length as `model`.
 #'
 #' @details
-#'
-#' [later](https://cran.r-project.org/package=later) package is used to poll the
-#'     standard output and error of background EnergyPlus process or background
-#'     R process that handles parallel simulations. The print interval is set to
-#'     0.5 sec.
 #'
 #' For `run_idf()`, a named list will be returned:
 #'
@@ -197,7 +191,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
                      annual = FALSE, expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL) {
 
     model <- normalizePath(model, mustWork = TRUE)
-    weather <- normalizePath(weather, mustWork = TRUE)
+    if (!is.null(weather)) weather <- normalizePath(weather, mustWork = TRUE)
 
     eplus <- eplus %||% as.character(get_idf_ver(read_lines(model)))
     energyplus_exe <- eplus_exe(eplus)
@@ -221,7 +215,11 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 
     # copy input files
     loc_m <- copy_run_files(model, output_dir)
-    loc_w <- copy_run_files(weather, output_dir)
+    if (is.null(weather)) {
+        loc_w <- NULL
+    } else {
+        loc_w <- copy_run_files(weather, output_dir)
+    }
 
     # clean wd
     clean_wd(loc_m)
@@ -253,14 +251,14 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         stop("Cannot force both design-day and annual simulations.", call. = FALSE)
     }
 
-    if (!is_scalar(model) && !is_scalar(weather))
+    if (!is_scalar(model) && !is.null(weather) && !is_scalar(weather))
         assert(have_same_len(model, weather))
 
     if (!is_scalar(model) && !is.null(eplus) && !is_scalar(eplus))
         assert(have_same_len(model, eplus))
 
     model <- normalizePath(model, mustWork = TRUE)
-    weather <- normalizePath(weather, mustWork = TRUE)
+    if (!is.null(weather)) weather <- normalizePath(weather, mustWork = TRUE)
 
     if (is.null(eplus)) {
         ver_list <- lapply(model, function (x) {
@@ -304,10 +302,16 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         stop("Failed to create output directory:\n",
             paste0(surround(d[!created]), collapse = "\n"), call. = FALSE)
 
-    jobs[, `:=`(input_weather = weather, energyplus = energyplus_exe)]
-    jobs[, `:=`(model = copy_run_files(model, output_dir),
-                 weather = copy_run_files(weather, output_dir),
-                 index = .I, annual = annual, design_day = design_day)]
+    jobs[, `:=`(
+        energyplus = energyplus_exe,
+        model = copy_run_files(model, output_dir),
+        index = .I, annual = annual, design_day = design_day
+    )]
+    if (!is.null(weather)) {
+        jobs[, `:=`(input_weather = weather, weather = copy_run_files(weather, output_dir))]
+    } else {
+        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL))]
+    }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo)
 
@@ -330,17 +334,6 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
             source(ext_funs)
             run_parallel_jobs(jobs, options)
         }, args = list(ext_funs = ext_funs, jobs = jobs, options = options))
-
-        # watch_proc {{{
-        # reference: https://yihui.name/en/2017/10/later-recursion
-        watch_proc = function() {
-            if (proc_print(proc, c(TRUE, TRUE))) {
-                later::later(watch_proc, 0.5)
-            }
-        }
-        # }}}
-
-        if (echo) watch_proc()
 
         proc
     }
@@ -382,13 +375,11 @@ run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
     assert(is_integer(options$num_parallel))
 
-    start_time <- Sys.time()
-
     ## Kill all child processes if we quit from this function
     on.exit(kill_jobs(jobs, options), add = TRUE)
 
     # initialize job status and worker
-    jobs[, `:=`(status = "waiting", index_str = lpad(index), process = list(),
+    jobs[, `:=`(status = "waiting", index_str = lpad(index, "0"), process = list(),
         stdout = list(), stderr = list(), exit_status = NA_integer_
     )]
 
@@ -421,13 +412,6 @@ run_parallel_jobs <- function(jobs, options) {
     jobs[, .SD, .SDcols = c("index", "status", "idf", "epw", "exit_status",
         "start_time", "end_time", "energyplus", "output_dir", "stdout", "stderr"
     )]
-
-    end_time <- Sys.time()
-
-    data.table::setattr(jobs, "start_time", start_time)
-    data.table::setattr(jobs, "end_time", end_time)
-
-    jobs
 }
 # }}}
 # kill_jobs {{{
@@ -490,11 +474,10 @@ run_job <- function(jobs, options, progress_bar) {
 
     jobs[status == "ready", `:=`(status = "newly_started",
         process = list(energyplus(eplus = energyplus, model = model,
-            weather = weather, output_dir = output_dir, annual = annual,
+            weather = unlist(weather), output_dir = output_dir, annual = annual,
             design_day = design_day, wait = FALSE, echo = FALSE)$process)
     )]
 
-    data.table::data.table(x = 1:5)[, c("y", "z") := list("a", "b")][]
     if (any(jobs$status == "newly_started")) {
         completed <- jobs[status == "newly_started",
             sim_status("run", index_str, model, weather)
@@ -507,7 +490,9 @@ run_job <- function(jobs, options, progress_bar) {
     }
 
     jobs[status == "newly_started", `:=`(status = "running",
-        start_time = do.call("c", lapply(process, function (x) x$get_start_time()))
+        start_time = do.call("c", lapply(process,
+            function (x) lubridate::with_tz(x$get_start_time(), Sys.timezone())
+        ))
     )]
 
     jobs
@@ -560,11 +545,17 @@ sim_status <- function (type, index, model, weather) {
         )
     }
 
-    paste0(lpad(index), "|", type, " --> ",
-        "[IDF]", surround(basename(model)),
-        " + ",
-        "[EPW]", surround(basename(weather))
-    )
+    if (is.null(unlist(weather))) {
+        paste0(lpad(index, "0"), "|", type, " --> ",
+            "[IDF]", surround(basename(model))
+        )
+    } else {
+        paste0(lpad(index, "0"), "|", type, " --> ",
+            "[IDF]", surround(basename(model)),
+            " + ",
+            "[EPW]", surround(basename(weather))
+        )
+    }
 }
 # }}}
 # energyplus {{{
@@ -578,7 +569,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
     assert(
         file.exists(eplus),
         file.exists(model),
-        file.exists(weather),
+        is.null(weather) || file.exists(weather),
         is.null(output_dir) || dir.exists(output_dir),
         is.null(output_prefix) || is_string(output_prefix),
         is_flag(expand_obj),
@@ -669,8 +660,9 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
     if (!is.null(idd)) cmd_idd <- paste0("--idd", shQuote(idd)) else cmd_idd <- NULL
     # }}}
 
+    arg_weather <- if (is.null(weather)) NULL else c("--weather", weather)
     args <- c(
-        "--weather", weather,
+        arg_weather,
         "--output-directory", output_dir,
         "--output-prefix", output_prefix,
         "--output-suffix", output_suffix,
@@ -709,16 +701,6 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
         res <- eplus_run_wait(proc, echo = echo)
     } else {
-        # watch_proc {{{
-        # reference: https://yihui.name/en/2017/10/later-recursion
-        watch_proc = function() {
-            if (proc_print(proc, c(TRUE, TRUE))) {
-                later::later(watch_proc, 0.5)
-            }
-        }
-        # }}}
-        if (echo) watch_proc()
-
         # TODO: exit time
         # just return the process
         res <- list(

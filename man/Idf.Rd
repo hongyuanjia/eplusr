@@ -83,7 +83,7 @@ model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
            copy_external = TRUE)
-model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 model$clone(deep = TRUE)
 model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 print(model)
@@ -1132,7 +1132,7 @@ use \code{$clone(deep = TRUE)}.
 }
 
 \section{Run Model}{
-\preformatted{model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+\preformatted{model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 }
 
 \code{$run()} calls corresponding version of EnergyPlus to run the current model
@@ -1154,7 +1154,9 @@ exists.
 
 \strong{Arguments}:
 \itemize{
-\item \code{weather}: A path to an \code{.epw} file or an \link{Epw} object.
+\item \code{weather}: A path to an \code{.epw} file or an \link{Epw} object. \code{weather} can also
+be \code{NULL} which will force design-day-only simulation. Note this needs at
+least one \code{Sizing:DesignDay} object exists in the \code{Idf}.
 \item \code{dir}: The directory to save the simulation results. If \code{NULL}, the model
 folder will be used. Default: NULL
 \item \code{wait}: Whether to wait until the simulation completes and print the
@@ -1169,6 +1171,8 @@ values of file paths in the Idf will be changed automatically. Currently,
 only \code{Schedule:File} class is supported.  This ensures that the output
 directory will have all files needed for the model to run. Default is
 \code{FALSE}.
+\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
+output and error from EnergyPlus. Default: same as \code{wait}.
 }
 }
 

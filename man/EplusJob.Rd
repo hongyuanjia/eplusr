@@ -37,7 +37,7 @@ it is recommended to first read that IDF file using \code{\link[=read_idf]{read_
 \preformatted{job <- eplus_job(idf, epw)
 job$version()
 job$path(type = c("all", "idf", "epw"))
-job$run(wait = TRUE, force = FALSE)
+job$run(wait = TRUE, force = FALSE, echo = wait)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -45,6 +45,8 @@ job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
 job$read_table(name)
+job$read_rdd()
+job$read_mdd()
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -72,12 +74,12 @@ job$path(type = c("all", "idf", "epw"))
 \item \code{epw}: Path to an local EnergyPlus EPW file or an \link{Epw} object.
 \item \code{type}: If \code{"all"}, both the \link{Idf} path and \link{Epw} path are returned. If
 \code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is returned.
-Default: \code{"all"}.
+Default: \code{"all"}. If \code{epw} is \code{NULL}, \code{NA} is returned for EPW path.
 }
 }
 
 \section{Run}{
-\preformatted{job$run(wait = TRUE, force = FALSE)
+\preformatted{job$run(wait = TRUE, force = FALSE, echo = wait)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -114,6 +116,8 @@ and errors are printed.
 EnergyPlus standard output (stdout) and error (stderr) is printed to
 R console. If \code{FALSE}, simulation will be run in a background process.
 Default: \code{TRUE}.
+\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
+output and error from EnergyPlus. Default: same as \code{wait}.
 \item \code{force}: Only applicable when the last job runs with \code{wait} equals
 to \code{FALSE} and is still running. If \code{TRUE}, current running job is
 forced to stop and a new one will start. Default: \code{FALSE}.
@@ -125,7 +129,9 @@ forced to stop and a new one will start. Default: \code{FALSE}.
 \preformatted{job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
-job$read_table(table)
+job$read_table(name)
+job$read_rdd()
+job$read_mdd()
 job$report_data_dict()
 job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
@@ -142,8 +148,12 @@ suffix.
 
 \code{$list_table()} returns all available table and view names in the SQLite file.
 
-\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
+\code{$read_table()} takes a valid table name of those from \code{$list_table()} and
 returns that table data in a \link[data.table:data.table]{data.table} format.
+
+\code{$read_rdd()} and \code{$read_mdd()} return the core data of Report Data
+Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
+details, please see \code{\link[=read_rdd]{read_rdd()}}.
 
 \code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
 contains all information about report data. For details on the meaning of

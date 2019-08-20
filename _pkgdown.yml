@@ -78,6 +78,8 @@ reference:
       - read_err
       - read_rdd
       - read_mdd
+      - rdd_to_load
+      - mdd_to_load
   - title: Assertion
     desc: Check Types
     contents:
