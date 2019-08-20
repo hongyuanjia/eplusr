@@ -65,17 +65,17 @@ setindexv(REPORTVAR_RULES, c("from", "to"))
 #' @export
 # transition {{{
 # TODO: how to give the names of saved files
-transition <- function (idf, ver, save = FALSE, dir = NULL, keep_all = FALSE) {
+transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
     if (!is_idf(idf)) idf <- read_idf(idf)
 
     assert(is_idd_ver(ver))
     ver <- standardize_ver(ver)[, 1L:2L]
 
-    if (idf$version() < 8.2) {
+    if (idf$version() < 7.2) {
         abort("error_trans_not_supported",
             paste0(
                 "Input IDF has version ", surround(idf$version()), ". ",
-                "Currently only EnergyPlus v8.2 and above are suppored."
+                "Currently only EnergyPlus v7.2 and above are suppored."
             )
         )
     }
@@ -92,13 +92,58 @@ transition <- function (idf, ver, save = FALSE, dir = NULL, keep_all = FALSE) {
         }
     # cannot go reverse
     } else if (idf$version()[, 1L:2L] > ver) {
-        abort("error_trans_reverse", "Only version update is supported. Downgrade is not supported.")
+        abort("error_trans_reverse", "Only version updating is supported. Downgrading is not supported.")
     }
 
-    with_option(
+    # stop if unsaved
+    if (idf$is_unsaved()) {
+        abort("error_idf_not_saved",
+            paste0("Idf has been modified since read or last saved. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    # clone original input
+    idf <- idf$clone(TRUE)
+
+    # perform transition
+    res <- with_option(
         list(verbose_info = FALSE, validate_level = "none"),
         trans_apply(idf, ver, keep_all)
     )
+
+    # directly return if no saving is required
+    if (!save) return(res)
+
+    # check if original file exists
+    if (is.null(idf$path())) {
+        abort("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    if (is.null(dir)) {
+        dir <- dirname(idf$path())
+    } else if (!dir.exists(dir)){
+        dir.create(dir, recursive = TRUE)
+    }
+
+    save_new <- function (idf, dir, path) {
+        nm <- paste0(tools::file_path_sans_ext(basename(path)), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
+        idf$save(file.path(dir, nm), overwrite = TRUE)
+    }
+
+    if (!keep_all) {
+        save_new(res, dir, path = idf$path())
+    } else {
+        lapply(res, save_new, dir = dir, path = idf$path())
+    }
+
+    res
 }
 # }}}
 
@@ -122,7 +167,7 @@ trans_apply <- function (idf, ver, keep_all) {
             if (i == length(res)) break
             res[[i + 1L]] <- trans_funs[[funs[[i]]]](res[[i]])
         }
-        nms <- paste0(stri_sub(funs, 5L, 5L), ".", stri_sub(funs, 6L, 6L))
+        nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
         setattr(res, "names", c(as.character(idf$version()[, 1L:2L]), nms))
 
         res
@@ -260,7 +305,7 @@ trans_funs$f810t820 <- function (idf) {
         insert = list(9L, "Autosize"),
         insert = list(10:11),
         insert = list(17L, "CoolingDesignCapacity"),
-        insert = list(18L, "Autosize")
+        insert = list(18L, "Autosize"),
         insert = list(19:20)
     )
     # }}}
@@ -272,7 +317,7 @@ trans_funs$f810t820 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:5)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -329,7 +374,7 @@ trans_funs$f820t830 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:5)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -585,7 +630,7 @@ trans_funs$f830t840 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:18)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -607,7 +652,7 @@ trans_funs$f840t850 <- function (idf) {
     )
     # }}}
 
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -913,7 +958,7 @@ trans_funs$f850t860 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:18)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -994,7 +1039,7 @@ trans_funs$f860t870 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:9)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1157,7 +1202,7 @@ trans_funs$f870t880 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:16)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1278,7 +1323,7 @@ trans_funs$f880t890 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:8)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1507,7 +1552,7 @@ trans_funs$f890t900 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:11)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1543,7 +1588,7 @@ trans_funs$f900t910 <- function (idf) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:2)))
-    if (nrow(dt)) new_idf$load(dt, .default = FALSE)
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1555,7 +1600,7 @@ trans_funs$f900t910 <- function (idf) {
 # 3. update IDD data
 # 4. update version
 # 5. assign new uuid
-trans_preprocess <- function (idf, version, class) {
+trans_preprocess <- function (idf, version, class = NULL) {
     # clone old IDF
     new_idf <- idf$clone(deep = TRUE)
     # get new IDD
@@ -1565,7 +1610,7 @@ trans_preprocess <- function (idf, version, class) {
     class_del <- setdiff(use_idd(idf$version())$class_name(), new_idd$class_name())
 
     # get all classes to be deleted
-    class <- c(CLASS_DEL_COMMON, class_del, class)
+    class <- unique(c(CLASS_DEL_COMMON, class_del, class))
 
     # del all related class
     class <- class[idf$is_valid_class(class)]
@@ -1885,12 +1930,15 @@ with_option <- function (opts, expr) {
 #' a target version to update to and a directory to save the new models.
 #'
 #' @inheritParams transition
+#' @param dir The directory to save the new IDF files. If the directory does not
+#' exist, it will be created before save. If `NULL`, the directory of input
+#' [Idf] object or IDF file will be used. Default: `NULL`.
 #' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
 #' if `keep_all` is `TRUE`.
 #' @export
 # TODO: combine all VCpErr file into a data.table
 # version_updater {{{
-version_updater <- function (idf, ver, dir = NULL, keep_all = TRUE) {
+version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     # parse file
     if (!is_idf(idf)) idf <- read_idf(idf)
 
@@ -1945,6 +1993,8 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = TRUE) {
 
     # save the original file with trailing version number
     original <- paste0(tools::file_path_sans_ext(basename(idf$path())), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
+    # clone original
+    idf <- idf$clone(TRUE)
     idf$save(file.path(dir, original), overwrite = TRUE)
 
     # get the directory of IDFVersionUpdater
