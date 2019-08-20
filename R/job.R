@@ -388,7 +388,10 @@ NULL
 #' please see [EplusJob].
 #'
 #' @param idf A path to an local EnergyPlus IDF file or an `Idf` object.
-#' @param epw A path to an local EnergyPlus EPW file or an `Epw` object.
+#' @param epw A path to an local EnergyPlus EPW file or an `Epw` object. `epw`
+#' can also be `NULL` which will force design-day-only simulation when
+#' [`$run()`][EplusJob] method is called. Note this needs at least one
+#' `Sizing:DesignDay` object exists in the [Idf].
 #' @return An `EplusJob` object.
 #' @examples
 #' if (is_avail_eplus(8.8)) {
@@ -418,7 +421,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
     public = list(
 
         # INITIALIZE {{{
-        initialize = function (idf, epw, eplus_ver = NULL) {
+        initialize = function (idf, epw = NULL, eplus_ver = NULL) {
 
             if (is_idf(idf)) {
                 private$m_path_idf <- idf$path()
@@ -449,34 +452,38 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 
             private$m_path_idf <- normalizePath(private$m_path_idf, mustWork = TRUE)
 
-            if (is_epw(epw)) {
-                private$m_path_epw <- epw$path()
-                if (is.null(private$m_path_epw)) {
-                    abort("error_epw_not_local",
-                        paste0(
-                            "The Epw object is not created from local file. ",
-                            "Please give save it to disk before run."
-                        )
-                    )
-                }
-
-                if (epw$is_unsaved()) {
-                    abort("error_epw_not_saved",
-                        paste0("Epw has been modified since read or last saved. ",
-                            "Please save Epw using $save() before run."
-                        )
-                    )
-                }
+            if (is.null(epw)) {
+                private$m_path_epw <- NULL
             } else {
-                assert(is_string(epw))
-                private$m_path_epw <- epw
-            }
+                if (is_epw(epw)) {
+                    private$m_path_epw <- epw$path()
+                    if (is.null(private$m_path_epw)) {
+                        abort("error_epw_not_local",
+                            paste0(
+                                "The Epw object is not created from local file. ",
+                                "Please give save it to disk before run."
+                            )
+                        )
+                    }
 
-            if (!file.exists(private$m_path_epw)) {
-                abort("error_epw_not_exist", "Input epw file does not exists.")
-            }
+                    if (epw$is_unsaved()) {
+                        abort("error_epw_not_saved",
+                            paste0("Epw has been modified since read or last saved. ",
+                                "Please save Epw using $save() before run."
+                            )
+                        )
+                    }
+                } else {
+                    assert(is_string(epw))
+                    private$m_path_epw <- epw
+                }
 
-            private$m_path_epw <- normalizePath(private$m_path_epw, mustWork = TRUE)
+                if (!file.exists(private$m_path_epw)) {
+                    abort("error_epw_not_exist", "Input epw file does not exists.")
+                }
+
+                private$m_path_epw <- normalizePath(private$m_path_epw, mustWork = TRUE)
+            }
 
             # get Idf version
             if (!is.null(eplus_ver)) {
@@ -586,9 +593,10 @@ job_version <- function (self, private) {
 job_path <- function (self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)
 
+    path_epw <- private$m_path_epw %||% NA_character_
     switch(type,
-        all = c(idf = private$m_path_idf, epw = private$m_path_epw),
-        idf = private$m_path_idf, epw = private$m_path_epw
+        all = c(idf = private$m_path_idf, epw = path_epw),
+        idf = private$m_path_idf, epw = path_epw
     )
 }
 # }}}
@@ -617,7 +625,9 @@ job_run <- function (self, private, wait = TRUE, force = FALSE) {
     private$m_log$killed <- NULL
 
     private$m_job <- run_idf(private$m_path_idf, private$m_path_epw,
-        output_dir = NULL, echo = wait, wait = wait, eplus = private$m_version)
+        output_dir = NULL, echo = wait, wait = wait, eplus = private$m_version,
+        design_day = is.null(private$m_path_epw)
+    )
 
     if (wait) private$m_log$end_time <- Sys.time()
     self

@@ -15,6 +15,11 @@
   data per class have the same field number. The number of fields is the same as
   the object that have the most fields among those you specified. Setting `all`
   to `TRUE` will return all available fields in that class definition in IDD.
+* Now the `weather` argument in `$run()` method in `Idf` class can be set to
+  `NULL`. If so, design-day-only simulation is performed. Note that this needs
+  at least one `Sizing:DesignDay` object exists in the `Idf` object (#80).
+* Similar as above, the `epw` argument in `eplus_job()` and `param_job()` can
+  also be `NULL` to force a design-day-only simulation.
 
 ## Bug fixes
 

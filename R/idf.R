@@ -81,7 +81,7 @@ NULL
 #'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
 #'            copy_external = TRUE)
-#' model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 #' model$clone(deep = TRUE)
 #' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 #' print(model)
@@ -1136,7 +1136,9 @@ NULL
 #'
 #' **Arguments**:
 #'
-#' * `weather`: A path to an `.epw` file or an [Epw] object.
+#' * `weather`: A path to an `.epw` file or an [Epw] object. `weather` can also
+#'   be `NULL` which will force design-day-only simulation. Note this needs at
+#'   least one `Sizing:DesignDay` object exists in the `Idf`.
 #' * `dir`: The directory to save the simulation results. If `NULL`, the model
 #'    folder will be used. Default: NULL
 #' * `wait`: Whether to wait until the simulation completes and print the
@@ -2371,8 +2373,12 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 
     # save the model to the output dir if necessary
     if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
-        stop("The Idf object is not created from local file or local file has ",
-            "been deleted from disk. Please save Idf using $save() before run.", call. = FALSE)
+        assert("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file or local file has ",
+                "been deleted from disk. Please save Idf using $save() before run."
+            )
+        )
     }
 
     path_idf <- private$m_path
@@ -2386,6 +2392,21 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     # if necessary, resave the model
     if (add_sql || !is.null(dir)) {
         idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
+    }
+
+    # when no epw is given, at least one design day object should exists
+    ddy_only <- FALSE
+    if (is.null(epw)) {
+        if (!idf$is_valid_class("SizingPeriod:DesignDay")) {
+            assert("error_run_no_ddy",
+                paste0("When no weather file is given, input IDF should contain ",
+                    "`SizingPeriod:DesignDay` object to enable Design-Day-only ",
+                    "simulation."
+                )
+            )
+        }
+
+        ddy_only <- TRUE
     }
 
     # check if the model is still running

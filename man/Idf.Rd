@@ -83,7 +83,7 @@ model$to_string(which = NULL, class = NULL, comment = TRUE, header = TRUE,
                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
            copy_external = TRUE)
-model$run(weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
 model$clone(deep = TRUE)
 model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 print(model)
@@ -1154,7 +1154,9 @@ exists.
 
 \strong{Arguments}:
 \itemize{
-\item \code{weather}: A path to an \code{.epw} file or an \link{Epw} object.
+\item \code{weather}: A path to an \code{.epw} file or an \link{Epw} object. \code{weather} can also
+be \code{NULL} which will force design-day-only simulation. Note this needs at
+least one \code{Sizing:DesignDay} object exists in the \code{Idf}.
 \item \code{dir}: The directory to save the simulation results. If \code{NULL}, the model
 folder will be used. Default: NULL
 \item \code{wait}: Whether to wait until the simulation completes and print the

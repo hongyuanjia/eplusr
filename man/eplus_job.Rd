@@ -9,7 +9,10 @@ eplus_job(idf, epw)
 \arguments{
 \item{idf}{A path to an local EnergyPlus IDF file or an \code{Idf} object.}
 
-\item{epw}{A path to an local EnergyPlus EPW file or an \code{Epw} object.}
+\item{epw}{A path to an local EnergyPlus EPW file or an \code{Epw} object. \code{epw}
+can also be \code{NULL} which will force design-day-only simulation when
+\code{\link[=EplusJob]{$run()}} method is called. Note this needs at least one
+\code{Sizing:DesignDay} object exists in the \link{Idf}.}
 }
 \value{
 An \code{EplusJob} object.

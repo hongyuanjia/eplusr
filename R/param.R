@@ -306,7 +306,10 @@ NULL
 #' For details on `ParametricJob`, please see [ParametricJob] class.
 #'
 #' @param idf A path to EnergyPlus IDF or IMF file or an `Idf` object.
-#' @param epw A path to EnergyPlus EPW file or an `Epw` object.
+#' @param epw A path to EnergyPlus EPW file or an `Epw` object. `epw` can also
+#' be `NULL` which will force design-day-only simulation when
+#' [`$run()`][ParametricJob] method is called. Note this needs at least one
+#' `Sizing:DesignDay` object exists in the [Idf].
 #' @return A `ParametricJob` object.
 #' @examples
 #' if (is_avail_eplus(8.8)) {
@@ -352,7 +355,9 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             # save uuid
             private$m_log$seed_uuid <- idf_priv$m_log$uuid
 
-            if (is_epw(epw)) {
+            if (is.null(epw)) {
+                private$m_epw <- NULL
+            } else if (is_epw(epw)) {
                 private$m_epw <- epw$clone(deep = TRUE)
             } else {
                 private$m_epw <- read_epw(epw)
@@ -639,7 +644,11 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     nms <- names(private$m_param)
 
     path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
-    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    if (is.null(private$m_epw)) {
+        path_epw <- NULL
+    } else {
+        path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    }
 
     if (is.null(output_dir))
         output_dir <- dirname(path_idf)
@@ -930,7 +939,7 @@ param_print <- function (self, private) {
     config <- eplus_config(private$m_idf$version())
     cli::cat_line(c(
         str_trunc(paste0("Seed Model: ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE)))),
-        str_trunc(paste0("Weather: ", surround(private$m_epw$path()))),
+        str_trunc(paste0("Weather: ", if (is.null(private$m_epw)) "<< Not specified >>" else surround(private$m_epw$path()))),
         paste0("EnergyPlus Version: ", surround(config$version)),
         paste0("EnergyPlus Path: ", surround(normalizePath(config$dir)))
     ))
