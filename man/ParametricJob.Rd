@@ -60,7 +60,8 @@ param$weather()
 
 \code{$seed()} returns the input \link{Idf} object.
 
-\code{$weather()} returns the input \link{Epw} object.
+\code{$weather()} returns the input \link{Epw} object. If no \link{Epw} is provided when
+creating the \code{ParametricJob} object, \code{NULL} is returned.
 }
 
 \section{Apply Design Alternatives}{

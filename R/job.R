@@ -70,7 +70,7 @@ NULL
 #' * `epw`: Path to an local EnergyPlus EPW file or an [Epw] object.
 #' * `type`: If `"all"`, both the [Idf] path and [Epw] path are returned. If
 #'   `"idf"`, only IDF path is returned. If `"epw"`, only EPW path is returned.
-#'   Default: `"all"`.
+#'   Default: `"all"`. If `epw` is `NULL`, `NA` is returned for EPW path.
 #'
 #' @section Run:
 #' ```

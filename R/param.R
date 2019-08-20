@@ -59,7 +59,8 @@ NULL
 #'
 #' `$seed()` returns the input [Idf] object.
 #'
-#' `$weather()` returns the input [Epw] object.
+#' `$weather()` returns the input [Epw] object. If no [Epw] is provided when
+#' creating the `ParametricJob` object, `NULL` is returned.
 #'
 #' @section Apply Design Alternatives:
 #' ```

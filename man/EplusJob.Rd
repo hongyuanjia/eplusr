@@ -72,7 +72,7 @@ job$path(type = c("all", "idf", "epw"))
 \item \code{epw}: Path to an local EnergyPlus EPW file or an \link{Epw} object.
 \item \code{type}: If \code{"all"}, both the \link{Idf} path and \link{Epw} path are returned. If
 \code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is returned.
-Default: \code{"all"}.
+Default: \code{"all"}. If \code{epw} is \code{NULL}, \code{NA} is returned for EPW path.
 }
 }
 
