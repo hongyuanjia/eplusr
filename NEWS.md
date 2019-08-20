@@ -37,6 +37,10 @@
 * Similar as `Output:SQLite`, when `$run()` in `Idf` object is called, an object
   in class `Output:VariableDictionary` is automatically created with `Key Field`
   being `IDF` (#85).
+* A new argument `echo` has been added in `$run()` in `Idf`, `EplusJob` and
+  `ParametricJob` class. It is only applicable when `wait` is `TRUE`. If `FALSE`,
+  the simulation will be run silently without echoing any message from
+  EnergyPlus.
 
 ## Bug fixes
 
@@ -53,6 +57,9 @@
 
 * Describe on how the arguments are matched in `$apply_measure()` (#57). Thanks
   @yidan1214 for pointing this out.
+* Now the `echo` argument in `run_idf()` and `run_multi()` will only take effect
+  when `wait` is `TRUE`. This makes it possible to remove the dependency on the
+  later package.
 
 # eplusr 0.10.3
 

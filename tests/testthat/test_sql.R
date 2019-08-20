@@ -6,7 +6,7 @@ test_that("Sql methods", {
 
     example <- copy_example()
 
-    expect_output(job <- read_idf(example$idf)$run(example$epw, NULL))
+    expect_silent(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE))
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
     # path

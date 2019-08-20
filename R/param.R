@@ -23,7 +23,7 @@ NULL
 #' param$weather()
 #' param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 #' param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -121,7 +121,7 @@ NULL
 #'
 #' @section Run and Collect Results:
 #' ```
-#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' param$kill()
 #' param$status()
 #' param$errors(info = FALSE)
@@ -212,6 +212,8 @@ NULL
 #'   only `Schedule:File` class is supported.  This ensures that the output
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
+#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to simulation
+#' status. Default: `TRUE`.
 #' * `suffix`: A string that indicates the file extension of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
@@ -475,8 +477,8 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         save = function (dir = NULL, separate = TRUE, copy_external = FALSE)
             param_save(self, private, dir, separate, copy_external),
 
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
-            param_run(self, private, dir, wait, force, copy_external),
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+            param_run(self, private, dir, wait, force, copy_external, echo),
 
         kill = function ()
             param_kill(self, private),
@@ -711,7 +713,7 @@ param_case_from_which <- function (self, private, which = NULL, name = FALSE) {
 }
 # }}}
 # param_run {{{
-param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE) {
+param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     if (is.null(private$m_param)) {
         abort("error_no_measured_applied", "No measure has been applied.")
     }
@@ -792,7 +794,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     private$m_log$stderr <- NULL
     private$m_job <- NULL
 
-    tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = wait, eplus = ver)
+    tbl <- run_multi(path_param, path_epw, NULL, wait = wait, echo = echo, eplus = ver)
 
     private$m_job <- tbl
 

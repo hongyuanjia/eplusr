@@ -5,7 +5,7 @@ test_that("Rdd", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     idf <- read_idf(example())
-    job <- idf$run(dir = tempdir())
+    job <- idf$run(dir = tempdir(), echo = FALSE)
 
     expect_silent(rdd <- job$read_rdd())
     expect_silent(mdd <- job$read_mdd())

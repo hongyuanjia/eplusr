@@ -16,7 +16,7 @@ test_that("Job methods", {
     )
 
     # can run job in waiting mode
-    expect_output(job$run(wait = TRUE))
+    expect_silent(job$run(wait = TRUE, echo = FALSE))
 
     # can refresh job status
     expect_equal(job$status(),
@@ -45,7 +45,7 @@ test_that("Job methods", {
 
     example <- copy_example()
     job <- eplus_job(example$idf, example$epw)
-    expect_is({job$run();job$errors()}, "ErrFile")
+    expect_is({job$run(echo = FALSE);job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
     expect_silent({err <- job$errors()})
     expect_equal(names(err), c("index", "envir_index", "envir",
@@ -59,7 +59,7 @@ test_that("Job methods", {
 
     # can retrieve simulation data
     idf <- read_idf(example$idf)
-    job <- idf$run(example$epw, dir = NULL)
+    job <- idf$run(example$epw, dir = NULL, echo = FALSE)
     # can get all table names
     expect_equal(length(job$list_table()), 44L)
 

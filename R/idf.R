@@ -81,7 +81,7 @@ NULL
 #'                 format = eplusr_option("save_format"), leading = 4L, sep_at = 29L)
 #' model$save(path = NULL, format = eplusr_option("save_format"), overwrite = FALSE,
 #'            copy_external = TRUE)
-#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' model$clone(deep = TRUE)
 #' model$print(zoom = c("object", "class", "group", "field"), order = TRUE)
 #' print(model)
@@ -1115,7 +1115,7 @@ NULL
 #' @section Run Model:
 #'
 #' ```
-#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+#' model$run(weather, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 #' ```
 #'
 #' `$run()` calls corresponding version of EnergyPlus to run the current model
@@ -1153,6 +1153,8 @@ NULL
 #'   only `Schedule:File` class is supported.  This ensures that the output
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
+#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to show standard
+#'   output and error from EnergyPlus. Default: same as `wait`.
 #'
 #' @section Print:
 #' ```
@@ -1739,8 +1741,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),
 
-        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
-            idf_run(self, private, weather, dir, wait, force, copy_external = copy_external),
+        run = function (weather = NULL, dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+            idf_run(self, private, weather, dir, wait, force, copy_external = copy_external, echo),
 
         print = function (zoom = "class", order = TRUE)
             idf_print(self, private, zoom, order)
@@ -2353,7 +2355,7 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
 # }}}
 # idf_run {{{
 idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
-                     force = FALSE, copy_external = FALSE) {
+                     force = FALSE, copy_external = FALSE, echo = wait) {
     if (private$m_version < 8.3) {
         abort("error_eplus_lower_8.3",
             "Currently, `$run()` only supports EnergyPlus V8.3 or higher."
@@ -2396,7 +2398,6 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     }
 
     # when no epw is given, at least one design day object should exists
-    ddy_only <- FALSE
     if (is.null(epw)) {
         if (!idf$is_valid_class("SizingPeriod:DesignDay")) {
             assert("error_run_no_ddy",
@@ -2406,8 +2407,6 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
                 )
             )
         }
-
-        ddy_only <- TRUE
     }
 
     # check if the model is still running
@@ -2421,7 +2420,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
         private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
     }
 
-    private$m_log$job$run(wait = wait, force = force)
+    private$m_log$job$run(wait = wait, force = force, echo = echo)
 }
 # }}}
 # idf_print {{{

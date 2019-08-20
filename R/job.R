@@ -35,7 +35,7 @@ NULL
 #' job <- eplus_job(idf, epw)
 #' job$version()
 #' job$path(type = c("all", "idf", "epw"))
-#' job$run(wait = TRUE, force = FALSE)
+#' job$run(wait = TRUE, force = FALSE, echo = wait)
 #' job$kill()
 #' job$status()
 #' job$errors(info = FALSE)
@@ -76,7 +76,7 @@ NULL
 #'
 #' @section Run:
 #' ```
-#' job$run(wait = TRUE, force = FALSE)
+#' job$run(wait = TRUE, force = FALSE, echo = wait)
 #' job$kill()
 #' job$status()
 #' job$errors(info = FALSE)
@@ -112,6 +112,8 @@ NULL
 #'   EnergyPlus standard output (stdout) and error (stderr) is printed to
 #'   R console. If `FALSE`, simulation will be run in a background process.
 #'   Default: `TRUE`.
+#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to show standard
+#'   output and error from EnergyPlus. Default: same as `wait`.
 #' * `force`: Only applicable when the last job runs with `wait` equals
 #'   to `FALSE` and is still running. If `TRUE`, current running job is
 #'   forced to stop and a new one will start. Default: `FALSE`.
@@ -529,8 +531,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         path = function (type = c("all", "idf", "epw"))
             job_path(self, private, type),
 
-        run = function (wait = TRUE, force = FALSE)
-            job_run(self, private, wait = wait, force),
+        run = function (wait = TRUE, force = FALSE, echo = wait)
+            job_run(self, private, wait = wait, force, echo),
 
         kill = function ()
             job_kill(self, private),
@@ -615,7 +617,7 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 }
 # }}}
 # job_run {{{
-job_run <- function (self, private, wait = TRUE, force = FALSE) {
+job_run <- function (self, private, wait = TRUE, force = FALSE, echo = wait) {
     # check if the model is still running
     old <- private$m_job
     if (!is.null(old)) {
@@ -639,7 +641,7 @@ job_run <- function (self, private, wait = TRUE, force = FALSE) {
     private$m_log$killed <- NULL
 
     private$m_job <- run_idf(private$m_path_idf, private$m_path_epw,
-        output_dir = NULL, echo = wait, wait = wait, eplus = private$m_version,
+        output_dir = NULL, echo = echo, wait = wait, eplus = private$m_version,
         design_day = is.null(private$m_path_epw)
     )
 

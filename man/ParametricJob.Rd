@@ -22,7 +22,7 @@ param$seed()
 param$weather()
 param$apply_measure(measure, ..., .names = NULL, .mix = FALSE)
 param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -125,7 +125,7 @@ to run. Default: \code{FALSE}.
 }
 
 \section{Run and Collect Results}{
-\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE)
+\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
 param$errors(info = FALSE)
@@ -217,6 +217,8 @@ values of file paths in the Idf will be changed automatically. Currently,
 only \code{Schedule:File} class is supported.  This ensures that the output
 directory will have all files needed for the model to run. Default is
 \code{FALSE}.
+\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to simulation
+status. Default: \code{TRUE}.
 \item \code{suffix}: A string that indicates the file extension of simulation output.
 Default: \code{".err"}.
 \item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
