@@ -20,6 +20,9 @@
   at least one `Sizing:DesignDay` object exists in the `Idf` object (#80).
 * Similar as above, the `epw` argument in `eplus_job()` and `param_job()` can
   also be `NULL` to force a design-day-only simulation.
+* Now `$status()` in `ParametricJob` class includes a new member named
+  `job_status` which is data.table containing detailed information on each
+  simulation job (#70).
 
 ## Bug fixes
 

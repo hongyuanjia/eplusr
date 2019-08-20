@@ -158,6 +158,10 @@ NULL
 #'     otherwise. `NA` if the job has not been run yet.
 #'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
 #'      simulation. `FALSE` otherwise.
+#'   * `job_status`: A [data.table][data.table::data.table()] contains meta data
+#'     for each simulation job. For details, please see [run_multi()]. If the
+#'     job has not been run before, a null
+#'     [data.table][data.table::data.table()] is returned.
 #'
 #' $errors() returns an [ErrFile][read_err()] object which contains all contents
 #' of the simulation error file (`.err`). If `info` is `FALSE`, only warnings
@@ -799,7 +803,8 @@ param_status <- function (self, private) {
         alive = FALSE, # if simulation is still running
         terminated = NA, # if last simulation was terminated
         successful = NA, # if last simulation was successful
-        changed_after = NA # if the seed model has been changed after last simulation
+        changed_after = NA, # if the seed model has been changed after last simulation
+        job_status = data.table() # if no simulation has been run
     )
 
     proc <- private$m_job
@@ -831,11 +836,14 @@ param_status <- function (self, private) {
             } else {
                 status$successful <- FALSE
             }
+
+            status$job_status <- tryCatch(proc$get_result(), error = function (e) data.table())
         }
 
     } else {
         status$alive <- FALSE
         status$successful <- TRUE
+        status$job_status <- proc
     }
 
     status
