@@ -146,7 +146,7 @@ is_idd_ver <- function (ver, strict = FALSE) {
     !is.na(match_minor_ver(ver, c(ALL_IDD_VER, names(.globals$idd)), verbose = FALSE))
 }
 on_fail(is_idd_ver) <- function (call, env) {
-    paste0(deparse(call$ver), " is not a valid Idd version.")
+    paste0(collapse(eval(call$ver, env)), " is not a valid Idd version.")
 }
 # }}}
 
