@@ -2,7 +2,6 @@
 #' @importFrom cli cat_line
 #' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
-#' @importFrom later later
 #' @importFrom lubridate hms with_tz
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
@@ -92,9 +91,9 @@ clean_wd <- function (path) {
 #' @param annual Force design-day-only simulation. Default: `FALSE`.
 #' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
 #'     Default: `TRUE`.
-#' @param echo Whether to show standard output and error from EnergyPlus
-#'     command line interface for `run_idf()` and simulation status for
-#'     `run_multi()`.Default: `TRUE`.
+#' @param echo Only applicable when `wait` is `TRUE`. Whether to show standard
+#'     output and error from EnergyPlus command line interface for `run_idf()`
+#'     and simulation status for `run_multi()`.Default: `TRUE`.
 #' @param wait If `TRUE`, R will hang on and wait all EnergyPlus simulations
 #'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
 #'     and a [processx::process] object is returned. Note that, if `FALSE`, R is
@@ -106,11 +105,6 @@ clean_wd <- function (path) {
 #'     `NULL`, should have the same length as `model`.
 #'
 #' @details
-#'
-#' [later](https://cran.r-project.org/package=later) package is used to poll the
-#'     standard output and error of background EnergyPlus process or background
-#'     R process that handles parallel simulations. The print interval is set to
-#'     0.5 sec.
 #'
 #' For `run_idf()`, a named list will be returned:
 #'
@@ -340,17 +334,6 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
             source(ext_funs)
             run_parallel_jobs(jobs, options)
         }, args = list(ext_funs = ext_funs, jobs = jobs, options = options))
-
-        # watch_proc {{{
-        # reference: https://yihui.name/en/2017/10/later-recursion
-        watch_proc = function() {
-            if (proc_print(proc, c(TRUE, TRUE))) {
-                later::later(watch_proc, 0.5)
-            }
-        }
-        # }}}
-
-        if (echo) watch_proc()
 
         proc
     }
@@ -718,16 +701,6 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
         res <- eplus_run_wait(proc, echo = echo)
     } else {
-        # watch_proc {{{
-        # reference: https://yihui.name/en/2017/10/later-recursion
-        watch_proc = function() {
-            if (proc_print(proc, c(TRUE, TRUE))) {
-                later::later(watch_proc, 0.5)
-            }
-        }
-        # }}}
-        if (echo) watch_proc()
-
         # TODO: exit time
         # just return the process
         res <- list(
