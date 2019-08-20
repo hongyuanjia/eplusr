@@ -379,6 +379,12 @@ if (is_avail_eplus(8.8)) {
     param$report_data(c("rotate_30", "rotate_120"))
     param$tabular_data(c("rotate_30", "rotate_120"))
 
+    # get output directory
+    param$output_dir()
+    param$output_dir(c(1, 3))
+
+    # get path of specific output file
+    param$locate_output(c(1, 3), ".csv")
 }
 }
 }

@@ -286,6 +286,7 @@ NULL
 #' whenever `$print()` is called.
 #'
 #' @examples
+#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'     idf_name <- "1ZoneUncontrolled.idf"
 #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -297,7 +298,91 @@ NULL
 #'     param_job(idf_path, epw_path)
 #'
 #'     # create from an Idf and an Epw object
-#'     param_job(read_idf(idf_path), read_epw(epw_path))
+#'     param <- param_job(read_idf(idf_path), read_epw(epw_path))
+#'
+#'     # get the seed model
+#'     param$seed()
+#'
+#'     # get the weather
+#'     param$weather()
+#'
+#'     # get status of current job
+#'     param$status()
+#'
+#'     # create a measure to change the orientation of the building
+#'     rotate_building <- function (idf, degree = 0L) {
+#'         if (!idf$is_valid_class("Building")) {
+#'            stop("Input model does not have a Building object")
+#'         }
+#'
+#'         if (degree > 360 || degree < -360 ) {
+#'             stop("Input degree should in range [-360, 360]")
+#'         }
+#'
+#'         cur <- idf$Building$North_Axis
+#'
+#'         new <- cur + degree
+#'
+#'         if (new > 360) {
+#'             new <- new %% 360
+#'             warning("Calculated new north axis is greater than 360. Final north axis will be ", new)
+#'         } else if (new < -360) {
+#'             new <- new %% -360
+#'             warning("Calculated new north axis is smaller than -360. Final north axis will be ", new)
+#'         }
+#'
+#'         idf$Building$North_Axis <- new
+#'
+#'         idf
+#'     }
+#'
+#'     # apply measure
+#'     # this will create 12 models
+#'     param$apply_measure(rotate_building, degree = seq(30, 360, 30))
+#'     # apply measure with new names specified
+#'     param$apply_measure(rotate_building, degree = seq(30, 360, 30),
+#'         .names = paste0("rotate_", seq(30, 360, 30))
+#'     )
+#'
+#'     # extract all parametric models
+#'     param$models()
+#'
+#'     # save all parametric models with each model in a separate folder
+#'     param$save(tempdir())
+#'
+#'     # save all parametric models with all models in the same folder
+#'     param$save(tempdir(), separate = FALSE)
+#'
+#'     # run parametric simulations
+#'     param$run(wait = TRUE)
+#'
+#'     # run in background
+#'     param$run(wait = FALSE)
+#'     # get detailed job status by printing
+#'     print(param)
+#'
+#'     # status now includes a data.table with detailed information on each simulation
+#'     param$status()
+#'
+#'     # print simulation errors
+#'     param$errors()
+#'
+#'     # extract output of all simulations
+#'     param$report_data()
+#'
+#'     # extract only some simulations
+#'     param$report_data(c(1, 3))
+#'     param$tabular_data(c(1, 3))
+#'     param$report_data(c("rotate_30", "rotate_120"))
+#'     param$tabular_data(c("rotate_30", "rotate_120"))
+#'
+#'     # get output directory
+#'     param$output_dir()
+#'     param$output_dir(c(1, 3))
+#'
+#'     # get path of specific output file
+#'     param$locate_output(c(1, 3), ".csv")
+#' }
 #' }
 #' @docType class
 #' @name ParametricJob
