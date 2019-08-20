@@ -91,10 +91,17 @@ test_that("Parametric methods", {
     dir_nms <- paste0("set_infil_rate_", 1:5)
     param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = NULL)
     # can run the simulation and get status of simulation
-    expect_equal(
-        {param$run(dir = NULL); param$status()},
+    expect_equal({param$run(dir = NULL); status <- param$status(); names(status)},
+        c("run_before", "alive", "terminated", "successful", "changed_after", "job_status")
+    )
+    expect_equal(status[c("run_before", "alive", "terminated", "successful", "changed_after")],
         list(run_before = TRUE, alive = FALSE, terminated = FALSE,
             successful = TRUE, changed_after = FALSE
+        )
+    )
+    expect_equal(names(status$job_status),
+        c("index", "status", "idf", "epw", "exit_status", "start_time", "end_time",
+          "energyplus", "output_dir", "stdout", "stderr"
         )
     )
     # }}}

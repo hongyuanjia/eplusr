@@ -48,7 +48,7 @@ test_that("Job methods", {
     expect_is({job$run();job$errors()}, "ErrFile")
     expect_is(job$errors(info = TRUE), "ErrFile")
     expect_silent({err <- job$errors()})
-    expect_equal(names(err), c("index", "environment_index", "environment",
+    expect_equal(names(err), c("index", "envir_index", "envir",
         "level_index", "level", "message"
     ))
     expect_equal(attr(err, "eplus_version"), numeric_version("8.8.0"))
