@@ -392,8 +392,6 @@ run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
     assert(is_integer(options$num_parallel))
 
-    start_time <- Sys.time()
-
     ## Kill all child processes if we quit from this function
     on.exit(kill_jobs(jobs, options), add = TRUE)
 
@@ -431,13 +429,6 @@ run_parallel_jobs <- function(jobs, options) {
     jobs[, .SD, .SDcols = c("index", "status", "idf", "epw", "exit_status",
         "start_time", "end_time", "energyplus", "output_dir", "stdout", "stderr"
     )]
-
-    end_time <- Sys.time()
-
-    data.table::setattr(jobs, "start_time", start_time)
-    data.table::setattr(jobs, "end_time", end_time)
-
-    jobs
 }
 # }}}
 # kill_jobs {{{
@@ -516,7 +507,9 @@ run_job <- function(jobs, options, progress_bar) {
     }
 
     jobs[status == "newly_started", `:=`(status = "running",
-        start_time = do.call("c", lapply(process, function (x) x$get_start_time()))
+        start_time = do.call("c", lapply(process,
+            function (x) lubridate::with_tz(x$get_start_time(), Sys.timezone())
+        ))
     )]
 
     jobs
