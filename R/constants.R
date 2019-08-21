@@ -82,7 +82,7 @@ utils::globalVariables(c(
     "object_list", "object_name", "object_name_lower", "object_order",
     "object_rleid", "old_exist", "old_object_name", "old_object_name_lower",
     "out", "out_of_range", "output_dir", "prefix", "ref_class", "ref_field",
-    "ref_object", "ref_value", "reference", "reference_class_name", "reporting_freqency",
+    "ref_object", "ref_value", "reference", "reference_class_name", "reporting_frequency",
     "required_field", "required_object", "res", "rev_field_rleid", "same_dir",
     "si", "slash", "slash_key", "slash_loc", "slash_value", "slash_value_lower",
     "slash_value_rleid", "soil_conductivity", "soil_density",
