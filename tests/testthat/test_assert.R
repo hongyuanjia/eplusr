@@ -7,7 +7,7 @@ test_that("list checking", {
     expect_false(is_version("8.a"))
 
     expect_false(is_eplus_ver("a"))
-    expect_false(is_eplus_ver(8))
+    expect_true(is_eplus_ver(8))
     expect_true(is_eplus_ver(8.5))
     expect_true(is_eplus_ver("latest"))
     expect_false(is_eplus_ver("8.8.8"))
