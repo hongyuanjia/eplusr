@@ -2464,7 +2464,19 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
             )
         }
 
-        job <- processx::run(trans_path, idf$path(), wd = path_updater)
+        job <- tryCatch(processx::run(trans_path, idf$path(), wd = path_updater),
+            error = function (e) {
+                if (grepl("System command error", conditionMessage(e))) {
+                    abort("error_updater_failed",
+                        paste0("Failed to update file ", idf$path(),
+                            " from V", idf$version(), " to V", toward, "."
+                        )
+                    )
+                } else {
+                    stop(e)
+                }
+            }
+        )
 
         if (job$status != 0L) {
             abort("error_updater_failed",
