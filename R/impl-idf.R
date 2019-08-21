@@ -128,7 +128,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
 }
 # }}}
 # sep_value_dots {{{
-sep_value_dots <- function (..., .empty = !in_final_mode()) {
+sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .default = TRUE) {
     l <- list(...)
 
     # stop if empty input
@@ -142,15 +142,27 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
         dot = l, dot_nm = names2(l)
     )
 
-    empty_input <- list(
-        object = data.table(rleid = integer(), object_rleid = integer(),
-            name = character(), comment = list(), empty = logical()
-        ),
-        value = data.table(rleid = integer(), object_rleid = integer(),
-            field_name = character(), value_chr = character(), value_num = double(),
-            defaulted = logical()
+    if (.scalar) {
+        empty_input <- list(
+            object = data.table(rleid = integer(), object_rleid = integer(),
+                name = character(), comment = list(), empty = logical()
+            ),
+            value = data.table(rleid = integer(), object_rleid = integer(),
+                field_name = character(), value_chr = character(), value_num = double(),
+                defaulted = logical()
+            )
         )
-    )
+    } else {
+        empty_input <- list(
+            object = data.table(rleid = integer(), object_rleid = integer(),
+                name = character(), comment = list(), empty = logical()
+            ),
+            value = data.table(rleid = integer(), object_rleid = integer(),
+                field_name = character(), value_chr = list(), value_num = list(),
+                defaulted = logical()
+            )
+        )
+    }
 
     is_empty_list <- function (x) is.list(x) && length(x) == 0L
 
@@ -164,15 +176,28 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
     }
 
     abort_invalid_format <- function (id) {
+        if (.default) {
+            if (.scalar) {
+                fmt <- "NULL, a non-NA single string or number."
+            } else {
+                fmt <- "NULL, a non-NA character or numeric vector."
+            }
+        } else {
+            if (.scalar) {
+                fmt <- "a non-NA single string or number."
+            } else {
+                fmt <- "non-NA a character or numeric vector."
+            }
+        }
         if (.empty) {
             abort_invalid_input(id, "invalid_format",
                 c("Each object must be an empty list or a list where ",
-                  "each element being a non-NA single string or number.")
+                  "each element being ", fmt)
             )
         } else {
             abort_invalid_input(id, "invalid_format",
                 c("Each object must be a list where ",
-                  "each element being a non-NA single string or number.")
+                  "each element being ", fmt)
             )
         }
     }
@@ -239,7 +264,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
             }
             set(dt, NULL, "empty", vlapply(dt$dot, is_empty_list))
 
-            if (!.empty && any(dt$empty)) abort_empty_dot(dt$rleid[dt$empty])
+            if ((!.empty || !.default) && any(dt$empty)) abort_empty_dot(dt$rleid[dt$empty])
 
             if (all(dt$empty)) {
                 val <- empty_input$value
@@ -264,6 +289,10 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
 
                     value_chr <- rep(NA_character_, len)
                     value_num <- rep(NA_real_, len)
+                    if (!.scalar) {
+                        value_chr <- as.list(value_chr)
+                        value_num <- as.list(value_num)
+                    }
 
                     list(rleid = rep(rleid, len),
                          object_rleid = rep(object_rleid, len),
@@ -300,7 +329,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
             set(obj, NULL, "empty", vlapply(obj$dot, is_empty_list))
 
             # stop if empty object is not allowed
-            if (!.empty && any(obj$empty)) abort_empty_dot(unique(obj$rleid[obj$empty]))
+            if ((!.empty || !.default) && any(obj$empty)) abort_empty_dot(unique(obj$rleid[obj$empty]))
 
             # change object_rleid into integer vector
             set(obj, NULL, "object_rleid", unlist(obj$object_rleid, use.names = FALSE))
@@ -339,6 +368,8 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
                     # set field name and value
                     field_name <- names2(fld_val, "")
                     value_list <- unname(fld_val)
+
+                    each_len <- each_length(value_list)
 
                     # init value in character and numeric format
                     value_chr <- apply2(as.list(rep(NA_character_, sum(len))), each_len, rep)
@@ -396,13 +427,16 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
                         value_chr <- value_chr[!is_cmt]
                         value_num <- value_num[!is_cmt]
                         defaulted <- defaulted[!is_cmt]
+
+                        # update length
+                        each_len <- each_length(value_list)
                     }
                     # }}}
 
+
                     # not scalar: "cls = list(1:5)" {{{
-                    if (any(each_length(value_list) > 1L)) {
-                        el <- each_length(value_list)
-                        abort_invalid_format(unique(rep(rleid, el)[el > 1L]))
+                    if (.scalar & any(each_len > 1L)) {
+                        abort_invalid_format(unique(rep(rleid, each_len)[each_len > 1L]))
                     }
                     # }}}
 
@@ -436,17 +470,22 @@ sep_value_dots <- function (..., .empty = !in_final_mode()) {
                     # }}}
 
                     # get value in both character and numeric format
-                    value_chr[!defaulted] <- as.character(unlist(value_list[!defaulted], use.names = FALSE))
                     # change empty strings to NA
-                    s <- value_chr[!defaulted]
-                    s <- stri_trim_both(s)
-                    s[stri_isempty(s)] <- NA_character_
-                    value_chr[!defaulted] <- s
+                    value_chr[!defaulted] <- lapply(value_list[!defaulted], function (val) {
+                        val <- as.character(val)
+                        val[stri_isempty(stri_trim_both(val))] <- NA_character_
+                        val
+                    })
 
-                    value_num[!defaulted & is_num] <- as.double(unlist(value_list[!defaulted & is_num], use.names = FALSE))
+                    value_num[!defaulted & is_num] <- lapply(value_list[!defaulted & is_num], as.double)
 
                     # change empty field names to NA
                     field_name[no_nm] <- NA_character_
+
+                    if (.scalar) {
+                        value_num <- unlist(value_num)
+                        value_chr <- unlist(value_chr)
+                    }
 
                     list(rleid = rleid,
                          object_rleid = object_rleid,
@@ -1526,7 +1565,7 @@ dup_idf_object <- function (idd_env, idf_env, ...) {
 # }}}
 # add_idf_object {{{
 add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE) {
-    l <- sep_value_dots(..., .empty = TRUE)
+    l <- sep_value_dots(..., .empty = TRUE, .default = .default)
 
     # new object table
     obj <- get_idd_class(idd_env, setnames(l$object, "name", "class_name")$class_name, underscore = TRUE)
@@ -1641,7 +1680,7 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 # }}}
 # set_idf_object {{{
 set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
-    l <- sep_value_dots(..., .empty = FALSE)
+    l <- sep_value_dots(..., .empty = FALSE, .default = .default)
 
     obj_val <- match_set_idf_data(idd_env, idf_env, l)
     obj <- obj_val$object
