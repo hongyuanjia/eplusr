@@ -460,15 +460,10 @@ added. Default: \code{FALSE}.
 \item Empty object with default values: \code{model$add(Building = list(), .default = TRUE)}.
 \item Empty object with comments: \code{model$add(Building = list(.comment = c("This", "is", "a", "comment")))}.
 \item Empty object with all fields: \code{model$add(Building = list(), .all = TRUE)}.
-\item New objects:
-\preformatted{
-  model$add(
-      RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"),
-      list(Construction = list("const", "mat"), Material = list("mat"))
-  )
-  }
-\item New objects with comments: \code{model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))}.
-\item Variable inputs: \code{x <- list(Construction = list("const"), Building = list()); model$add(x)}.
+\item New objects:\preformatted{model$add(
+    RunPeriod = list("rp", 1, 1, end_month = 2, 1, "Monday"),
+    list(Construction = list("const", "mat"), Material = list("mat"))
+)
 }
 \item New objects with comments:\preformatted{model$add(RunPeriod = list("rp", 1, 1, 2, 1, .comment = "comment1"))
 }

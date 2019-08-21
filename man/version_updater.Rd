@@ -4,17 +4,16 @@
 \alias{version_updater}
 \title{Run IDFVersionUpdater to Update Model Versions}
 \usage{
-version_updater(idf, ver, dir = NULL, keep_all = TRUE)
+version_updater(idf, ver, dir = NULL, keep_all = FALSE)
 }
 \arguments{
 \item{idf}{An \link{Idf} object or a path of IDF file.}
 
 \item{ver}{A valid EnergyPlus version, e.g. \code{9}, \code{8.8}, or \code{"8.8.0"}.}
 
-\item{dir}{Only applicable when \code{save} is \code{TRUE}. The directory to save the
-new IDF files. If the directory does not exist, it will be created before
-save. If \code{NULL}, the directory of input \link{Idf} object or IDF file will be
-used. Default: \code{NULL}.}
+\item{dir}{The directory to save the new IDF files. If the directory does not
+exist, it will be created before save. If \code{NULL}, the directory of input
+\link{Idf} object or IDF file will be used. Default: \code{NULL}.}
 
 \item{keep_all}{If \code{TRUE}, a list will be return which contains all
 \link{Idf} objects of intermediate versions. The list will be named using first

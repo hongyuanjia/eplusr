@@ -4,12 +4,17 @@
 \alias{transition}
 \title{Perform version transition of EnergyPlus model}
 \usage{
-transition(idf, ver, save = FALSE, dir = NULL, keep_all = FALSE)
+transition(idf, ver, keep_all = FALSE, save = FALSE, dir = NULL)
 }
 \arguments{
 \item{idf}{An \link{Idf} object or a path of IDF file.}
 
 \item{ver}{A valid EnergyPlus version, e.g. \code{9}, \code{8.8}, or \code{"8.8.0"}.}
+
+\item{keep_all}{If \code{TRUE}, a list will be return which contains all
+\link{Idf} objects of intermediate versions. The list will be named using first
+two number of that version, e.g. \code{8.1}, \code{8.2}. If \code{FALSE}, only the \link{Idf}
+object of the version specified by \code{ver} will be returned. Default: \code{FALSE}.}
 
 \item{save}{If \code{TRUE}, the models will be saved into specified directory.
 Default: \code{FALSE}.}
@@ -18,11 +23,6 @@ Default: \code{FALSE}.}
 new IDF files. If the directory does not exist, it will be created before
 save. If \code{NULL}, the directory of input \link{Idf} object or IDF file will be
 used. Default: \code{NULL}.}
-
-\item{keep_all}{If \code{TRUE}, a list will be return which contains all
-\link{Idf} objects of intermediate versions. The list will be named using first
-two number of that version, e.g. \code{8.1}, \code{8.2}. If \code{FALSE}, only the \link{Idf}
-object of the version specified by \code{ver} will be returned. Default: \code{FALSE}.}
 }
 \value{
 An \link{Idf} object if \code{keep_all} is \code{FALSE} or a list of \link{Idf} objects
