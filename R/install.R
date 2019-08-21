@@ -323,6 +323,14 @@ use_eplus <- function (eplus) {
                    "New location: ", surround(eplus_dir))
     }
 
+    if (ver < 8.3) {
+        verbose_info("NOTE: Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
+            "This is because eplusr uses EnergyPlus command line interface ",
+            "which is available only in EnergyPlus v8.3 and above. ",
+            "However, IDF modifications are supported regardless of versions."
+        )
+    }
+
     invisible(res)
 }
 # }}}

@@ -743,7 +743,7 @@ use_idd <- function (idd, download = FALSE) {
 
         # if corresponding EnergyPlus folder not found
         if (!is_avail_eplus(ver)) {
-            msg_f <- paste0("Failed to locate `Energy+.idd` because EnergyPlus v",
+            verbose_info("Failed to locate `Energy+.idd` because EnergyPlus v",
                 ver, " is not available.")
 
             # try to locate using latest IDFVersionUpdater
@@ -753,7 +753,7 @@ use_idd <- function (idd, download = FALSE) {
             if (is.null(idd)) {
                 # download IDD if auto is specified
                 if (identical(download, "auto")) {
-                    verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+                    verbose_info("Starting to download the IDD file from EnergyPlus GitHub repo...")
                     dl <- download_idd(ver, dir = tempdir())
                     idd <- attr(dl, "file")
                 # else issue an error
@@ -774,8 +774,9 @@ use_idd <- function (idd, download = FALSE) {
 
             # but IDD file is missing
             if (!file.exists(idd)) {
-                msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
-                    config$version, " installation folder ", surround(config$dir), ".")
+                verbose_info("`Energy+.idd` file does not exist in EnergyPlus v",
+                    config$version, " installation folder ", surround(config$dir), "."
+                )
 
                 # try to locate using latest IDFVersionUpdater
                 idd <- find_idd_from_updater(ver)
@@ -784,7 +785,7 @@ use_idd <- function (idd, download = FALSE) {
                 if (is.null(idd)) {
                     # download IDD if auto is specified
                     if (identical(download, "auto")) {
-                        verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
+                        verbose_info("Starting to download the IDD file from EnergyPlus GitHub repo...")
                         dl <- download_idd(ver, dir = tempdir())
                         idd <- attr(dl, "file")
                     # else issue an error
