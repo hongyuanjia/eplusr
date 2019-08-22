@@ -9,39 +9,6 @@ CLASS_DEL_COMMON <- c(
 )
 # }}}
 
-# REPORTVAR_RULES{{{
-REPORTVAR_RULES <- fread("
-    from , to  , old                                                       , new
-    8.3  , 8.4 , Zone Supply Air Mass Flow Rate                            , Zone Air Mass Balance Supply Mass Flow Rate
-    8.3  , 8.4 , Zone Exhaust Air Mass Flow Rate                           , Zone Air Mass Balance Exhaust Mass Flow Rate
-    8.3  , 8.4 , Zone Return Air Mass Flow Rate                            , Zone Air Mass Balance Return Mass Flow Rate
-    8.3  , 8.4 , Zone Mixing Receiving Air Mass Flow Rate                  , Zone Air Mass Balance Mixing Receiving Mass Flow Rate
-    8.3  , 8.4 , Zone Mixing Source Air Mass Flow Rate                     , Zone Air Mass Balance Mixing Source Mass Flow Rate
-    8.3  , 8.4 , Zone Infiltration Air Mass Flow Balance Status            , Zone Air Mass Balance Infiltration Status
-    8.3  , 8.4 , Zone Mass Balance Infiltration Air Mass Flow Rate         , Zone Air Mass Balance Infiltration Mass Flow Rate
-    8.4  , 8.5 , Wall Interface Heat Flux                                  , GroundDomain Basement Wall Interface Heat Flux
-    8.4  , 8.5 , Wall Interface Temperature                                , GroundDomain Basement Wall Interface Temperature
-    8.4  , 8.5 , Floor Interface Heat Flux                                 , GroundDomain Basement Floor Interface Heat Flux
-    8.4  , 8.5 , Floor Interface Temperature                               , GroundDomain Basement Floor Interface Temperature
-    8.4  , 8.5 , Zone Coupled Surface Heat Flux                            , GroundDomain Slab Zone Coupled Surface Heat Flux
-    8.4  , 8.5 , Zone Coupled Surface Temperature                          , GroundDomain Slab Zone Coupled Surface Temperature
-    8.4  , 8.5 , Availability Manager Optimum Start Hours Before Occupancy , Availability Manager Optimum Start Time Before Occupancy
-    8.4  , 8.5 , Electric Storage Charge State                             , Electric Storage Simple Charge State
-    8.4  , 8.5 , Electric Storage Charge State                             , Electric Storage Battery Charge Sate
-    8.5  , 8.6 , EMPD Surface Inside Face Humidity Ratio                   ,
-    8.5  , 8.6 , EMPD Surface Inside Face Relative Humidity                ,
-    8.5  , 8.6 , Zone Mixing Current Density Air Volume Flow Rate          , Zone Mixing Current Density Volume Flow Rate
-    8.5  , 8.6 , Zone Mixing Standard Density Air Volume Flow Rate         , Zone Mixing Standard Density Volume Flow Rate
-    8.5  , 8.6 , Zone Mixing Current Density Volumetric Flow Rate          , Zone Mixing Current Density Volume Flow Rate
-    8.5  , 8.6 , Zone Mixing Standard Density Volumetric Flow Rate         , Zone Mixing Standard Density Volume Flow Rate
-    8.8  , 8.9 , Heating Coil Total Heating Rate                           , Heating Coil Heating Rate
-    8.8  , 8.9 , Heating Coil Total Heating Energy                         , Heating Coil Heating Energy
-    8.8  , 8.9 , Heating Coil Air Heating Rate                             , Heating Coil Heating Rate
-    8.8  , 8.9 , Heating Coil Air Heating Energy                           , Heating Coil Heating Energy
-")
-setindexv(REPORTVAR_RULES, c("from", "to"))
-# }}}
-
 #' Perform version transition of EnergyPlus model
 #'
 #' `transition()` takes an [Idf] object or a path of IDF file and a target
