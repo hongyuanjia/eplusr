@@ -75,8 +75,11 @@ test_that("Transition Helper", {
     # }}}
 
     # versions {{{
-    expect_equivalent(trans_upper_versions(idf, 9.1),
+    expect_equivalent(trans_upper_versions(idf, 9.1, patch = TRUE),
         numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.0.1", "9.1.0"))
+    )
+    expect_equivalent(trans_upper_versions(idf, 9.1),
+        numeric_version(c("8.8.0", "8.9.0", "9.0.0", "9.1.0"))
     )
     # }}}
 
