@@ -2285,7 +2285,7 @@ trans_postprocess <- function (idf, from, to) {
         # remove delete rules
         mapping <- mapping[!is.na(new)]
 
-        if (!nrow(dt)) return(set(dt, NULL, "value_lower", NULL))
+        if (!nrow(dt) || !nrow(mapping)) return(set(dt, NULL, "value_lower", NULL))
 
         # calculate field index
         if (!is.null(step)) {
@@ -2306,7 +2306,7 @@ trans_postprocess <- function (idf, from, to) {
         }]
 
         # special case from v7.2 to v8.0 {{{
-        if (unique(mapping$from) == 7.2) {
+        if (nrow(mapping) && unique(mapping$from) == 7.2) {
             stopifnot(is_idf(idf))
 
             has_chiller <- any(idf$is_valid_class(c(
