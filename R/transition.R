@@ -305,7 +305,7 @@ trans_funs$f720t800 <- function (idf) {
             value
         }]
         dt9_spm[J(2L), on = "index", value := "Temperature"]
-        dt9_spm[, index := .I, by = "id"]
+        dt9_spm[, index := seq_len(.N), by = "id"]
         new_idf$load(dt9_spm, .unique = FALSE, .default = FALSE)
     }
     # }}}
@@ -1123,23 +1123,23 @@ trans_funs$f850t860 <- function (idf) {
     # }}}
     # 2: HVACTemplate:System:UnitarySystem {{{
     dt2 <- trans_action(idf, "HVACTemplate:System:UnitarySystem", all = TRUE, delete = list(57))
-    if (nrow(dt2)) dt2[, index := .I, by = "id"]
+    if (nrow(dt2)) dt2[, index := seq_len(.N), by = "id"]
     # }}}
     # 3: HVACTemplate:System:Unitary {{{
     dt3 <- trans_action(idf, "HVACTemplate:System:Unitary", all = TRUE, delete = list(40L))
-    if (nrow(dt3)) dt3[, index := .I, by = "id"]
+    if (nrow(dt3)) dt3[, index := seq_len(.N), by = "id"]
     # }}}
     # 4: ChillerHeater:Absorption:DirectFired {{{
     dt4 <- trans_action(idf, "ChillerHeater:Absorption:DirectFired", delete = list(33L))
-    if (nrow(dt4)) dt4[, index := .I, by = "id"]
+    if (nrow(dt4)) dt4[, index := seq_len(.N), by = "id"]
     # }}}
     # 5: SetpointManager:SingleZone:Humidity:Minimum {{{
     dt5 <- trans_action(idf, "SetpointManager:SingleZone:Humidity:Minimum", delete = list(2:3))
-    if (nrow(dt5)) dt5[, index := .I, by = "id"]
+    if (nrow(dt5)) dt5[, index := seq_len(.N), by = "id"]
     # }}}
     # 6: SetpointManager:SingleZone:Humidity:Maximum {{{
     dt6 <- trans_action(idf, "SetpointManager:SingleZone:Humidity:Maximum", delete = list(2:3))
-    if (nrow(dt2)) dt6[, index := .I, by = "id"]
+    if (nrow(dt2)) dt6[, index := seq_len(.N), by = "id"]
     # }}}
     # 7: AirTerminal:SingleDuct:VAV:Reheat {{{
     dt7 <- trans_action(idf, "AirTerminal:SingleDuct:VAV:Reheat", all = TRUE)
@@ -1154,7 +1154,7 @@ trans_funs$f850t860 <- function (idf) {
     # }}}
     # 8: Branch {{{
     dt8 <- trans_action(idf, "Branch", delete = list(2), delete = list(8, step = 5))
-    if (nrow(dt8)) dt8[, index := .I, by = "id"]
+    if (nrow(dt8)) dt8[, index := seq_len(.N), by = "id"]
     # }}}
     # 9: AirTerminal:SingleDuct:InletSideMixer {{{
     dt9 <- trans_action(idf, all = TRUE,
@@ -1497,7 +1497,7 @@ trans_funs$f860t870 <- function (idf) {
     # }}}
     # 6: AirflowNetwork:SimulationControl {{{
     dt6 <- trans_action(idf, "AirflowNetwork:SimulationControl", delete = list(4L))
-    if (nrow(dt6)) dt6[, index := .I, by = "id"]
+    if (nrow(dt6)) dt6[, index := seq_len(.N), by = "id"]
     # }}}
     # 7: ZoneCapacitanceMultiplier:ResearchSpecial {{{
     dt7 <- trans_action(idf, "ZoneCapacitanceMultiplier:ResearchSpecial",
@@ -1683,7 +1683,7 @@ trans_funs$f870t880 <- function (idf) {
     # }}}
     # 13: ZoneHVAC:PackagedTerminalHeatPump {{{
     dt13 <- trans_action(idf, "ZoneHVAC:PackagedTerminalHeatPump", delete = list(18))
-    if (nrow(dt13)) dt13[, index := .I, by = "id"]
+    if (nrow(dt13)) dt13[, index := seq_len(.N), by = "id"]
     # }}}
     # 14: ZoneHVAC:IdealLoadsAirSystem {{{
     dt14 <- trans_action(idf, "ZoneHVAC:IdealLoadsAirSystem", insert = list(5))
@@ -1886,15 +1886,15 @@ trans_funs$f890t900 <- function (idf) {
     # }}}
     # 3: Boiler:HotWater {{{
     dt3 <- trans_action(idf, "Boiler:HotWater", delete = list(7L))
-    if (nrow(dt3)) dt3[, index := .I, by = "id"]
+    if (nrow(dt3)) dt3[, index := seq_len(.N), by = "id"]
     # }}}
     # 4: FenestrationSurface:Detailed {{{
     dt4 <- trans_action(idf, "FenestrationSurface:Detailed", delete = list(7L))
-    if (nrow(dt4)) dt4[, index := .I, by = "id"]
+    if (nrow(dt4)) dt4[, index := seq_len(.N), by = "id"]
     # }}}
     # 5: GlazedDoor {{{
     dt5 <- trans_action(idf, "GlazedDoor", delete = list(4L))
-    if (nrow(dt5)) dt5[, index := .I, by = "id"]
+    if (nrow(dt5)) dt5[, index := seq_len(.N), by = "id"]
     # }}}
     # 6: RunPeriod:CustomRange {{{
     dt6 <- trans_action(idf, c("RunPeriod" = "RunPeriod:CustomRange"))
@@ -2009,7 +2009,7 @@ trans_funs$f890t900 <- function (idf) {
     # }}}
     # 10: Window {{{
     dt10 <- trans_action(idf, "Window", delete = list(4L))
-    if (nrow(dt10)) dt10[, index := .I, by = "id"]
+    if (nrow(dt10)) dt10[, index := seq_len(.N), by = "id"]
     # }}}
     # 11: WindowProperty:ShadingControl {{{
     if (!idf$is_valid_class("WindowProperty:ShadingControl")) {
