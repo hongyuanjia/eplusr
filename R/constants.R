@@ -95,6 +95,8 @@ utils::globalVariables(c(
     "unique_object", "upper_incbounds", "use_input_name", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "weather",
     "wmo_number", "x", "year_in", "J", "num_fld", "max_fld", "Date/Time",
-    "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month"
+    "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month",
+    "i.object_id", "i.rleid", "old", "key_value", "i.key_value", "i.value",
+    "field_num"
 ))
 # }}}

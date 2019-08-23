@@ -890,11 +890,11 @@ test_that("Update", {
 
     mat <- idf$Material[[1]]$to_table()
     expect_equivalent(upd$value,
-        data.table(value_id = c(108:113, 99:107),
-            value_chr = c(const$value, mat$value),
-            value_num = c(suppressWarnings(as.double(c(const$value, mat$value)))),
-            object_id = c(rep(15:17, each = 2), rep(14L, 9)),
-            field_id = c(rep(11006:11007, 3), 7081:7089)
+        data.table(value_id = c(99:113),
+            value_chr = c(mat$value, const$value),
+            value_num = c(suppressWarnings(as.double(c(mat$value, const$value)))),
+            object_id = c(rep(14L, 9), rep(15:17, each = 2)),
+            field_id = c(7081:7089, rep(11006:11007, 3))
         )
     )
     expect_equivalent(upd$reference, idf_env$reference)
