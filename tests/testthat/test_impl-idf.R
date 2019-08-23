@@ -591,11 +591,11 @@ test_that("DEFINITION DOTS", {
                 version = numeric_version("8.8.0"),
                 options = list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE, save_format = "sorted"),
                 object = data.table(object_id = 1:2, class_id = 90L, comment = list(NULL),
-                    object_name = NA_character_, object_name_lower = NA_character_, rleid = 1:2
+                    object_name = NA_character_, object_name_lower = NA_character_, rleid = 1L
                 ),
                 value = data.table(value_id = 1:13, value_chr = NA_character_,
                     value_num = NA_real_, object_id = c(rep(1L, 11), rep(2L, 2)),
-                    field_id = c(11006:11016, 11006:11007), rleid = c(rep(1L, 11), rep(2L, 2))
+                    field_id = c(11006:11016, 11006:11007), rleid = 1L
                 ),
                 reference = data.table(object_id = integer(), value_id = integer(),
                     src_object_id = integer(), src_value_id = integer(),

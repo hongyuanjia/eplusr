@@ -642,12 +642,12 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
         parsed$object[, `:=`(object_id = object_id - 1L)]
         parsed$value[, `:=`(object_id = object_id - 1L, value_id = value_id - 1L)]
 
+        # after parsing all input character as a whole, there is no way to know
+        # how many objects are extracted from each input
+        # object ID should be sufficent for distinguishing all objects
         # add rleid for latter error printing
-        set(l, NULL, "line_rleid", NULL)
-        l <- unique(l)[, object_id := .I]
-        set(l, NULL, "object_id", rleid(l$rleid))
-        add_joined_cols(l, parsed$object, "object_id", "rleid")
-        add_joined_cols(l, parsed$value, "object_id", "rleid")
+        set(parsed$object, NULL, "rleid", 1L)
+        set(parsed$value, NULL, "rleid", 1L)
     }
 
     # extract_dt_input {{{
@@ -667,7 +667,7 @@ sep_definition_dots <- function (..., .version = NULL, .update = FALSE) {
             if (.update) {
                 setnames(dt, "id", "object_id")
             } else {
-                set(dt, NULL, "object_id", rleid(dt$id, dt$class))
+                dt[, object_id := .GRP, by = c("id", "class")]
             }
         } else if (anyDuplicated(dt, by = c("class", "index"))) {
             abort("error_dot_def_index_dup",
@@ -1551,8 +1551,10 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
     } else {
         set(val_empty, NULL, c("empty", "comment", "group_id"), NULL)
         val_empty_fld <- get_idd_field(idd_env, val_empty$class_id, all = .all, underscore = FALSE, property = prop)
-        # insert object id back
-        val_empty <- add_joined_cols(val_empty, val_empty_fld, "rleid", "object_id")
+        # insert rleid and object id back
+        val_empty <- val_empty_fld[val_empty[, object_rleid := .I], on = c("rleid" = "object_rleid"),
+            `:=`(object_id = i.object_id, rleid = i.rleid)
+        ]
 
         # add input field index indicator
         set(val_empty, NULL, "field_in", NA_integer_)
@@ -2174,7 +2176,7 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
         cls <- tryCatch(get_idd_class(idd_env, l$value$class_name, property = c("has_name")),
             error_class_name = function (e) {
                 # get input with invalid class name
-                id <- l$value[J(e$value), on = "class_name", rleid]
+                id <- l$value[J(unique(e$value)), on = "class_name", unique(rleid)]
                 abort("error_class_name",
                     paste0("Invalid class name ", collapse(unique(e$value)), " found in input:\n",
                         dot_string(l$dot[J(id), on = "rleid"])
@@ -2262,6 +2264,9 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
         # add field defaults if possible
         set(val_chr, NULL, "defaulted", FALSE)
         if (.default) val_chr[is.na(value_chr), defaulted := TRUE]
+
+        # always tag rleid of character input as negative
+        set(val_chr, NULL, "rleid", -val_chr$rleid)
     }
     # }}}
 
