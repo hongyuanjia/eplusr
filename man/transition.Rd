@@ -33,3 +33,10 @@ if \code{keep_all} is \code{TRUE}.
 version, performs version transitions and returns an \link{Idf} object of
 specified version.
 }
+\seealso{
+See \code{\link[=version_updater]{version_updater()}} which directly call EnergyPlus preprocessor
+\code{IDFVersionUpdater} to perform the version transitions.
+}
+\author{
+Hongyuan Jia
+}

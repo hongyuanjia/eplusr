@@ -43,7 +43,7 @@
   EnergyPlus.
 * A new function `transition()` has been added. Basically it is an
   R implementation of IDFVersionUpdater. Currently the lowest version of IDF is
-  v8.2.
+  v7.2. It should be much faster than IDFVersionUpdater.
 * Now the way of find IDD file has been changed to take advantage of IDD files
   distributed along with IDFVersionUpdater. This update makes it possible to
   directly read IDF of most versions without downloading corresponding IDD.

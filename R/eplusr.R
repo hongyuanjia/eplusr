@@ -179,3 +179,23 @@ eplusr_option <- function (...) {
     as.list.environment(.options)[nm]
 }
 # }}}
+# with_option {{{
+with_option <- function (opts, expr) {
+    # get options
+    ori <- eplusr_option()
+
+    if (!is.list(opts) || is.null(names(opts))) {
+        stop("`opts` should be a named list.")
+    }
+
+    if (any(!names(opts) %in% names(ori))) {
+        stop("Invalid eplusr option found: ", sQuote(names(opts)[!names(opts) %in% names(ori)]))
+    }
+
+    # set new option values
+    on.exit(do.call(eplusr_option, ori), add = TRUE)
+    do.call(eplusr_option, opts)
+
+    force(expr)
+}
+# }}}
