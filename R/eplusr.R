@@ -105,7 +105,7 @@ check_color <- function () {
 eplusr_option <- function (...) {
     opt <- list(...)
 
-    if (is_empty(opt)) return(as.list.environment(.options))
+    if (is_empty(opt)) return(as.list.environment(.options, sorted = TRUE))
 
     nm <- names(opt)
 
