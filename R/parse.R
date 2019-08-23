@@ -1314,11 +1314,10 @@ get_value_table <- function (dt, idd) {
 
     # get all condensed value lines
     con <- dt[value_count > 1L]
-    set(con, NULL, "value_count", NULL)
 
     # split values
     con <- con[, {
-        s <- stri_split_charclass(body, "[,;]", omit_empty = TRUE)
+        s <- stri_split_charclass(body, "[,;]", n = value_count, omit_empty = NA, tokens_only = TRUE)
         l <- vapply(s, length, integer(1L))
         list(
             line = rep(line, l),

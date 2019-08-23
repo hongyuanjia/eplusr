@@ -58,6 +58,8 @@
 * Now IDD version lower than 8.3 can successfully be downloaded and parsed.
 * Now `ErrFile` objects returned from `$errors()` in `ParametricJob` can be
   successfully printed.
+* Now one-line empty objects, e.g. "Output:Surfaces:List,,;", can be
+  successfully parsed (#88).
 
 ## Minor changes
 

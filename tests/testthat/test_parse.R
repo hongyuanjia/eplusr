@@ -309,6 +309,18 @@ test_that("parse_idf_file()", {
     num <- suppressWarnings(as.numeric(val))
     num[10] <- NA_real_
 
+    # can parse one-line empty object
+    expect_silent(idf_parsed <- parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
+    expect_equivalent(idf_parsed$object,
+        data.table(object_id = 1:2, class_id = c(1L, 764L),
+        comment = list(), object_name = rep(NA_character_, 2), object_name_lower = rep(NA_character_, 2))
+    )
+    expect_equivalent(idf_parsed$value,
+        data.table(object_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
+        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 58822L, 58823L))
+    )
+
+    expect_silent(parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
     expect_warning(idf_value <- parse_idf_file(text_object, 8.8))
     expect_equal(names(idf_value$value),
         c("value_id", "value_chr", "value_num", "object_id", "field_id"))
