@@ -90,15 +90,17 @@ test_that("Transition Helper", {
 
 test_that("Transition", {
     skip_on_cran()
-    skip_if_not(is_avail_eplus(9.1))
+    if (!is_avail_eplus(9.1)) install_eplus(9.1)
+    eplusr_option(verbose_info = FALSE)
 
     # suppress build tag missing warnings
     suppressWarnings(use_idd(7.2))
     suppressWarnings(use_idd(8.0))
-
-    expect_error(transition(idf, 7.3), class = "error_not_idd_ver")
+    suppressWarnings(use_idd(8.1))
 
     # basic workflow {{{
+    idf <- temp_idf(7.2)
+    expect_error(transition(idf, 7.3), class = "error_not_idd_ver")
     expect_silent(res <- transition(idf, 8.0))
     expect_silent(res <- transition(idf, 8.0, keep_all = TRUE))
     expect_equal(names(res), c("7.2", "8.0"))
@@ -107,20 +109,183 @@ test_that("Transition", {
         c("7.2" = paste0(prefix(idf), "V720.idf"),
           "8.0" = paste0(prefix(idf), "V800.idf"))
     )
-    expect_true(all(file.exists(file.path(tempfile(), "eplusr", paste0(tools::file_path_sans_ext(basename(idf$path())), "V720.idf")))))
-    expect_silent(res_eplus <- version_updater(idf, 8.0, dir = file.path(tempdir(), "eplus"), keep_all = TRUE))
+    expect_true(all(file.exists(file.path(tempdir(), "eplusr", paste0(tools::file_path_sans_ext(basename(idf$path())), c("V720.idf", "V800.idf"))))))
+    expect_silent(res_eplus <- version_updater(idf, 8.0, dir = file.path(tempdir(), "ep"), keep_all = TRUE))
     expect_identical(lapply(res, content), lapply(res_eplus, content))
+
+    # can handle newly added extensible fields
+    expect_silent(idf <- temp_idf(7.2, "Refrigeration:CompressorList" = list("a", "b", "c", "d", "e", "f")))
+    expect_silent(transition(idf, 8.0))
     # }}}
-    expect_identical_trans(7.2, 8.0)
-    expect_identical_trans(8.0, 8.1)
-    expect_identical_trans(8.1, 8.2)
-    expect_identical_trans(8.2, 8.3)
-    expect_identical_trans(8.3, 8.4)
-    expect_identical_trans(8.4, 8.5)
-    expect_identical_trans(8.5, 8.6)
-    expect_identical_trans(8.6, 8.7)
-    expect_identical_trans(8.7, 8.8)
-    expect_identical_trans(8.8, 8.9)
-    expect_identical_trans(8.9, 9.0)
-    expect_identical_trans(9.0, 9.1)
+    # v7.2 --> v8.0 {{{
+    # can handle forkeq variables
+    expect_warning(idf <- transition(ver = 8,
+        idf = temp_idf(7.2,
+            Chiller_Electric_EIR = list("chiller"),
+            ChillerHeater_Absorption_DirectFired = list("heater"),
+            Output_Variable = list("*", "Chiller Diesel Consumption")
+        )
+    ), class = "warning_trans_720_800")
+    expect_equal(
+        idf$to_table(class = "Output:Variable")[index == 2L, value],
+        c("Chiller Diesel Energy", "Chiller Heater Diesel Energy")
+    )
+
+    # can handle confd nodal temperature from v7.2 to v8.0
+    idf <- transition(temp_idf(7.2, Output_Variable = list("*", "condfd nodal temperature")), 8)
+    expect_equal(
+        idf$to_table(class = "Output:Variable")[index == 2L, value],
+        paste("CondFD Surface Temperature Node", 1:10)
+    )
+
+    expect_identical_transition(7.2, 8.0,
+        .exclude = list(class = c(
+            # IDFVersionUpdater reports one less vertex which is incorrect
+            "BuildingSurface:Detailed",
+            # IDFVersionUpdater reports different order if include this
+            "HeatExchanger:WatersideEconomizer"
+        )),
+        .report_vars = FALSE
+    )
+
+    expect_identical_transition(7.2, 8.0,
+        "BuildingSurface:Detailed" = list(
+            "surf", "wall", "const", "zone",
+            "outdoors", NULL, "sunexposed", "windexposed", 0.5,
+            3, 1, 1, 1, 2, 2, 2, 3, 3, 3
+        ),
+        "HeatExchanger:WatersideEconomizer" = list(),
+        .report_vars = FALSE
+    )
+    # }}}
+    # v8.0 --> v8.1 {{{
+    expect_identical_transition(8.0, 8.1,
+        # IDFVersionUpdater will create one `Any Number` schedule type for every
+        # HVACTemplate:* instead of only creating only once
+        .exclude = list(post_class = "ScheduleTypeLimits"),
+
+        # IDFVersionUpdater only reports fields that meet the \min-fields
+        # requirement for v8.0 but not v8.1
+        .skip_after = list(
+            "HVACTemplate:Zone:PTAC" =
+                use_idd(8.0)$object("HVACTemplate:Zone:PTAC")$min_fields(),
+
+            "HVACTemplate:Zone:PTHP" =
+                use_idd(8.0)$object("HVACTemplate:Zone:PTHP")$min_fields(),
+
+            "HVACTemplate:Zone:WaterToAirHeatPump" =
+                use_idd(8.0)$object("HVACTemplate:Zone:WaterToAirHeatPump")$min_fields(),
+
+            "HVACTemplate:System:Unitary" =
+                use_idd(8.0)$object("HVACTemplate:System:Unitary")$min_fields(),
+
+            "HVACTemplate:System:UnitaryHeatPump:AirToAir" =
+                use_idd(8.0)$object("HVACTemplate:System:UnitaryHeatPump:AirToAir")$min_fields()
+        )
+    )
+
+    # can add Any Number ScheduleTypeLimits
+    trans <- get_both_trans(8.0, 8.1, "HVACTemplate:System:UnitaryHeatPump:AirToAir" = list())
+    expect_equal(trans$eplusr$class_name(), trans$energyplus$class_name())
+    expect_equal(
+        trans$eplusr$to_string(class = c("ScheduleTypeLimits", "Schedule:Constant")),
+        trans$energyplus$to_string(class = c("ScheduleTypeLimits", "Schedule:Constant"))
+    )
+    # }}}
+    # v8.1 --> v8.2 {{{
+    # IDFVersionUpdater fails to update variable names
+    expect_identical_transition(8.1, 8.2, .report_vars = FALSE)
+    # }}}
+    # v8.2 --> v8.3 {{{
+    # IDFVersionUpdater truncates number at 5 digits but R round at 5 digits
+    expect_identical_transition(8.2, 8.3,
+        .skip_equal = list(
+            "EvaporativeCooler:Indirect:ResearchSpecial" = 13L
+        )
+    )
+    # }}}
+    # v8.3 --> v8.4 {{{
+    expect_identical_transition(8.3, 8.4,
+        .exclude = list(
+            class = c(
+                # will change the object order if include this
+                "PipingSystem:Underground:Domain",
+                # IDFVersionUpdater fails to update variable names for class
+                # "Meter:CustomDecrement"
+                "Meter:CustomDecrement"
+            )
+        ),
+        .skip_equal = list(
+            # IDFVersionUpdater changes this field into upper case unnecessarily
+            "WaterHeater:HeatPump:PumpedCondenser" = 21L
+        ),
+        .skip_after = list(
+            # IDFVersionUpdater did not output all fields
+            "WaterHeater:HeatPump:PumpedCondenser" = 36L
+        ),
+        .report_vars = FALSE
+    )
+    # }}}
+    # v8.4 --> v8.5 {{{
+    # IDFVersionUpdater fails to update variable names
+    expect_identical_transition(8.4, 8.5, .report_vars = FALSE)
+    # }}}
+    # v8.5 --> v8.6 {{{
+    # IDFVersionUpdater fails to update variable names
+    expect_identical_transition(8.5, 8.6,
+        .exclude = list(
+            # IDFVersionUpdater fails to delete variable names
+            class = c("Output:Table:Monthly", "Meter:Custom", "Meter:CustomDecrement")
+        ),
+        .skip_after = list(
+            # IDFVersionUpdater alway adds defaults for `Fraction of Zone
+            # Controlled by Reference Point 1` and `Illuminance Setpoint at
+            # Reference Point
+            # 1 {lux}`, even there is no matched reference point
+            "Daylighting:Controls" = 14L
+        ),
+        .skip_equal = list(
+            # different trailing digits of Water Vapor Diffusion Resistance Factor
+            "MaterialProperty:MoisturePenetrationDepth:Settings" = 2L
+        ),
+        .report_vars = FALSE
+    )
+    # }}}
+    # v8.6 --> 8.7{{{
+    expect_identical_transition(8.6, 8.7)
+    # }}}
+    # v8.7 --> 8.8 {{{
+
+    expect_identical_transition(8.7, 8.8,
+        .skip_after = list(
+            # IDFVersionUpdater fails to output vertices if input vertex number
+            # is "autocalculate"
+            "BuildingSurface:Detailed" = 9L,
+            "Floor:Detailed" = 8L
+        )
+    )
+    # }}}
+    # v8.7 --> v8.8 {{{
+    expect_identical_transition(8.7, 8.8)
+    # }}}
+    # v8.8 --> v8.9 {{{
+    expect_identical_transition(8.8, 8.9,
+        .skip_equal = list(
+            # IDFVersionUpdater truncates numbers but R round numbers
+            "Site:GroundTemperature:Undisturbed:KusudaAchenbach" = 4L,
+            "GroundHeatExchanger:Vertical:Properties" = 4L
+        ),
+    # IDFVersionUpdater fails to rename variable names
+        .report_vars = FALSE
+    )
+    # }}}
+    # v8.9 --> v9.0 {{{
+    # include both `RunPeriod` and `RunPeriod:CustomRange` will change the
+    # output object order
+    expect_identical_transition(8.9, 9.0, .exclude = list(class = "RunPeriod:CustomRange"))
+    expect_identical_transition(8.9, 9.0, "RunPeriod" = list(), .report_vars = FALSE)
+    # }}}
+    # v9.0 --> v9.1 {{{
+    expect_identical_transition(9.0, 9.1)
+    # }}}
 })
