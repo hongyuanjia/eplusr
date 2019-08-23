@@ -2312,14 +2312,19 @@ with_option <- function (opts, expr) {
 #' distributed with EnergyPlus. It takes a path of IDF file or an [Idf] object,
 #' a target version to update to and a directory to save the new models.
 #'
+#' An attribute named `errors` is attached which is a list of
+#' [ErrFiles][read_err()] that contain all error messages from transition error
+#' (.VCpErr) files.
+#'
 #' @inheritParams transition
 #' @param dir The directory to save the new IDF files. If the directory does not
 #' exist, it will be created before save. If `NULL`, the directory of input
 #' [Idf] object or IDF file will be used. Default: `NULL`.
 #' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
-#' if `keep_all` is `TRUE`.
+#' if `keep_all` is `TRUE`. An attribute named `errors` is attached which
+#' contains all error messages from transition error (.VCpErr) files.
+#' @author Hongyuan Jia
 #' @export
-# TODO: combine all VCpErr file into a data.table
 # version_updater {{{
 version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     # parse file
@@ -2381,12 +2386,14 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     idf$save(file.path(dir, original), overwrite = TRUE)
 
     # get the directory of IDFVersionUpdater
+    # avoid to use IDFVersionUpdater v9.0 as there are fital errors
+    if (length(latest_ver[latest_ver != 9.0])) latest_ver <- latest_ver[latest_ver != 9.0]
     path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
 
     # get upper versions toward target version
     vers <- trans_upper_versions(idf, ver)
-    # only include main versions, exclude patch versions
-    vers <- vers[vers[, 3L] == 0L]
+    # remove patch version
+    vers <- vers[!duplicated(as.character(vers[, 1:2]))]
 
     # get fun names
     exe <- if (is_windows()) ".exe" else NULL
@@ -2404,6 +2411,10 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     # paths
     paths <- character(1L + length(to))
     names(paths) <- names(models)
+
+    # errors
+    errors <- vector("list", 1L + length(to))
+    names(errors) <- names(models)
 
     while (idf$version()[, 1:2] != max(to)[, 1:2]) {
         # restore paths
@@ -2436,7 +2447,8 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
                 if (grepl("System command error", conditionMessage(e))) {
                     abort("error_updater_failed",
                         paste0("Failed to update file ", idf$path(),
-                            " from V", idf$version(), " to V", toward, "."
+                            " from V", idf$version(), " to V", toward, ":\n",
+                            conditionMessage(e)
                         )
                     )
                 } else {
@@ -2459,8 +2471,11 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
         # with ".idfold" extenstion
         unlink(idf$path(), force = TRUE)
 
+        # read error file
+        path_err <- paste0(tools::file_path_sans_ext(idf$path()), ".VCpErr")
+        err <- read_err(path_err)
         # remove VCpErr file generated
-        unlink(paste0(tools::file_path_sans_ext(idf$path()), ".VCpErr"), force = TRUE)
+        unlink(path_err, force = TRUE)
 
         # rename the old file
         file.rename(paste0(tools::file_path_sans_ext(idf$path()), ".idfold"), idf$path())
@@ -2484,13 +2499,17 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
         # restore models
         models[names(models) == as.character(idf$version()[, 1:2])] <- list(idf)
+
+        # restore errors
+        errors[names(errors) == as.character(idf$version()[, 1:2])] <- list(err)
     }
 
-    if (keep_all) {
-        models
-    } else {
+    if (!keep_all) {
         unlink(paths[-length(paths)], force = TRUE)
-        models[[length(models)]]
+        models <- models[[length(models)]]
     }
+
+    attr(models, "errors") <- errors
+    models
 }
 # }}}

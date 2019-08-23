@@ -57,7 +57,7 @@ NULL
 #' }
 # read_err {{{
 read_err <- function (path) {
-    assert(has_ext(path, "err"))
+    assert(has_ext(path, c("err", "vcperr")))
     parse_err_file(path)
 }
 # }}}
@@ -77,7 +77,7 @@ parse_err_file <- function (path) {
         cls <- c("TransitionErrFile", "ErrFile", class(data.table()))
 
         att <- list(
-            path = normalizePath(path),
+            path = normalizePath(path, mustWork = FALSE),
             from = numeric_version(NA, strict = FALSE),
             to = numeric_version(NA, strict = FALSE),
             successful = FALSE
@@ -86,7 +86,7 @@ parse_err_file <- function (path) {
         cls <- c("ErrFile", class(data.table()))
 
         att <- list(
-            path = normalizePath(path),
+            path = normalizePath(path, mustWork = FALSE),
             eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
             datetime = as.POSIXct(NA), idd_version = NA,
             successful = FALSE, terminated = FALSE

@@ -22,10 +22,19 @@ object of the version specified by \code{ver} will be returned. Default: \code{F
 }
 \value{
 An \link{Idf} object if \code{keep_all} is \code{FALSE} or a list of \link{Idf} objects
-if \code{keep_all} is \code{TRUE}.
+if \code{keep_all} is \code{TRUE}. An attribute named \code{errors} is attached which
+contains all error messages from transition error (.VCpErr) files.
 }
 \description{
 \code{version_updater()} is a wrapper of IDFVersionUpdater preprocessor
 distributed with EnergyPlus. It takes a path of IDF file or an \link{Idf} object,
 a target version to update to and a directory to save the new models.
+}
+\details{
+An attribute named \code{errors} is attached which is a list of
+\link[=read_err]{ErrFiles} that contain all error messages from transition error
+(.VCpErr) files.
+}
+\author{
+Hongyuan Jia
 }
