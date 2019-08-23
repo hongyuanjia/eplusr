@@ -477,6 +477,18 @@ test_that("Idf class", {
     expect_equal(idf1$Zone[[1]]$Name, "zone")
     expect_equal(idf2$Zone[[1]]$Name, "ZONE ONE")
     # }}}
+
+    expect_silent(
+        idf <- with_option(
+            list(validate_level = "none", verbose_info = FALSE),
+            {
+                idf <- empty_idf(8.8)
+                idf$add(Building = list(), Building = list())
+                idf
+            }
+        )
+    )
+    expect_error(idf$object_unique("Building"), class = "error_idf_dup_unique_class")
 })
 # }}}
 

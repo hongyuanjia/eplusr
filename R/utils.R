@@ -1,4 +1,4 @@
-#' @importFrom stringi stri_replace_all_charclass stri_trans_tolower
+#' @importFrom stringi stri_enc_toutf8 stri_replace_all_charclass stri_trans_tolower
 NULL
 
 # `%||%` {{{
@@ -110,10 +110,16 @@ read_lines <- function(input, trim = TRUE, ...) {
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
-    if (trim) {
-        set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
-    }
+
+    # fix encoding issue in older versions of IDD files
+    dt[!stringi::stri_enc_isutf8(string), string := tryCatch(
+        stringi::stri_encode(string, "windows-1252", "UTF-8"),
+        error = function (e) string
+    )]
+
+    if (trim) set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
     setcolorder(dt, c("line", "string"))
+
     dt
 }
 # }}}

@@ -323,6 +323,14 @@ use_eplus <- function (eplus) {
                    "New location: ", surround(eplus_dir))
     }
 
+    if (ver < 8.3) {
+        verbose_info("NOTE: Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
+            "This is because eplusr uses EnergyPlus command line interface ",
+            "which is available only in EnergyPlus v8.3 and above. ",
+            "However, IDF modifications are supported regardless of versions."
+        )
+    }
+
     invisible(res)
 }
 # }}}
@@ -335,7 +343,7 @@ eplus_config <- function (ver) {
     ver <- standardize_ver(ver, complete = FALSE)
     ver_m <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
     if (is.na(ver)) {
-        warn("warn_miss_eplus_config",
+        warn("warning_miss_eplus_config",
             "Failed to find configuration data of EnergyPlus v", ver, ".",
             call. = FALSE)
         return(list())

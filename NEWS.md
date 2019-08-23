@@ -41,6 +41,21 @@
   `ParametricJob` class. It is only applicable when `wait` is `TRUE`. If `FALSE`,
   the simulation will be run silently without echoing any message from
   EnergyPlus.
+* A new function `transition()` has been added. Basically it is an
+  R implementation of IDFVersionUpdater. Currently the lowest version of IDF is
+  v7.2. It should be much faster than IDFVersionUpdater.
+* Now the way of find IDD file has been changed to take advantage of IDD files
+  distributed along with IDFVersionUpdater. This update makes it possible to
+  directly read IDF of most versions without downloading corresponding IDD.
+* A new option `autocomplete` with default value being `interactive()` has been
+  added. It is used to control whether to turn on autocompletion on class and
+  field names. Underneath, `makeActiveBinding()` is used to add or move active
+  bindings in `Idf` and `IdfObject`s to directly return objects in class or
+  field values. This will make it possible to dynamically show current class
+  and field names in both RStudio and in the terminal. However, this process
+  does come in with a penalty on the performance. It can make adding or
+  modifying large mounts of [Idf] and [IdfObject]s extremely slow. Default value
+  make sure autocompletion works in interactive mode.
 
 ## Bug fixes
 
@@ -52,6 +67,8 @@
 * Now IDD version lower than 8.3 can successfully be downloaded and parsed.
 * Now `ErrFile` objects returned from `$errors()` in `ParametricJob` can be
   successfully printed.
+* Now one-line empty objects, e.g. `"Output:Surfaces:List,,;\n"`, can be
+  successfully parsed (#88).
 
 ## Minor changes
 
@@ -60,6 +77,8 @@
 * Now the `echo` argument in `run_idf()` and `run_multi()` will only take effect
   when `wait` is `TRUE`. This makes it possible to remove the dependency on the
   later package.
+* All messages can be suppressed by setting the `verbose_info` option to
+  `FALSE`.
 
 # eplusr 0.10.3
 

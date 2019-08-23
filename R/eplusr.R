@@ -43,6 +43,7 @@ check_color <- function () {
 .options$view_in_ip <- FALSE
 .options$save_format <- "asis"
 .options$num_parallel <- parallel::detectCores()
+.options$autocomplete <- interactive()
 
 #' Get and Set eplusr options
 #'
@@ -77,6 +78,14 @@ check_color <- function () {
 #'
 #' * `verbose_info`: Whether to show information messages. Default: `TRUE`.
 #'
+#' * `autocomplete`: Whether to turn on autocompletion on class and field names.
+#'   Underneath, [makeActiveBinding()] is used to add or move active bindings in
+#'   [Idf] and [IdfObject]s to directly return objects in class or field values.
+#'   This will make it possible to dynamically show current class and field
+#'   names in both RStudio and in the terminal. However, this process does have
+#'   a penalty on the performance. It can make adding or modifying large mounts
+#'   of [Idf] and [IdfObject]s extremely slower. Default: `interactive()`.
+#'
 #' @return If called directly, a named list of input option values. If input is
 #'     a single option name, a length-one vector whose type is determined by
 #'     that option. If input is new option values, a named list of newly set
@@ -96,7 +105,7 @@ check_color <- function () {
 eplusr_option <- function (...) {
     opt <- list(...)
 
-    if (is_empty(opt)) return(as.list.environment(.options))
+    if (is_empty(opt)) return(as.list.environment(.options, sorted = TRUE))
 
     nm <- names(opt)
 
@@ -126,7 +135,7 @@ eplusr_option <- function (...) {
         save_format = c("asis", "sorted", "new_top", "new_bot")
     )
 
-    onoff_opt <- c("view_in_ip", "verbose_info")
+    onoff_opt <- c("view_in_ip", "verbose_info", "autocomplete")
 
     count_opt <- c("num_parallel")
 
@@ -177,5 +186,25 @@ eplusr_option <- function (...) {
     }
 
     as.list.environment(.options)[nm]
+}
+# }}}
+# with_option {{{
+with_option <- function (opts, expr) {
+    # get options
+    ori <- eplusr_option()
+
+    if (!is.list(opts) || is.null(names(opts))) {
+        stop("`opts` should be a named list.")
+    }
+
+    if (any(!names(opts) %in% names(ori))) {
+        stop("Invalid eplusr option found: ", sQuote(names(opts)[!names(opts) %in% names(ori)]))
+    }
+
+    # set new option values
+    on.exit(do.call(eplusr_option, ori), add = TRUE)
+    do.call(eplusr_option, opts)
+
+    force(expr)
 }
 # }}}

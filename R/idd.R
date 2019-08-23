@@ -634,8 +634,8 @@ read_idd <- function (path) {
 #'
 #' @details
 #' `use_idd()` takes a valid version or a path of an EnergyPlus Input Data
-#'     Dictionary (IDD) file, usually named "Energy+.idd" and return an `Idd`
-#'     object. For details on `Idd` class, please see [Idd].
+#' Dictionary (IDD) file, usually named "Energy+.idd" and return an `Idd`
+#'  object. For details on `Idd` class, please see [Idd].
 #'
 #' `download_idd()` downloads specified version of EnergyPlus IDD file from
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus). It is
@@ -648,11 +648,14 @@ read_idd <- function (path) {
 #' and cached.
 #'
 #' eplusr tries to detect all installed EnergyPlus in default installation
-#' locations when loading. If argument `idd` is a version, eplusr will first try
-#' to find the cached `Idd` object of that version, if possible. If failed, and
-#' EnergyPlus of that version is available (see [avail_eplus()]), the
-#' `"Energy+.idd"` distributed with EnergyPlus will be parsed and stored in
-#' eplusr Idd cache.
+#' locations when loading. If argument `idd` is a version, eplusr will try the
+#' follow ways sequentially to find corresponding IDD:
+#'
+#' * The cached `Idd` object of that version
+#' * `"Energy+.idd"` file distributed with EnergyPlus of that version (see
+#'   [avail_eplus()]).
+#' * The `"VX-Y-Z-Energy+.idd"` file distributed along with IDFVersionUpdater
+#'   from the latest EnergyPlus detected.
 #'
 #' @return
 #' * `use_idd()` returns an `Idd` object
@@ -726,6 +729,7 @@ use_idd <- function (idd, download = FALSE) {
     # if not exists, try to find more
     if (is.na(ver)) ver <- match_minor_ver(ver_in, ALL_IDD_VER, "idd")
 
+    # directly download if specified
     if (isTRUE(download)) {
         dl <- download_idd(ver, dir = tempdir())
         idd <- attr(dl, "file")
@@ -737,43 +741,64 @@ use_idd <- function (idd, download = FALSE) {
             "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
             surround(eplus_default_path(ver)), ".")
 
-        # stop if corresponding EnergyPlus folder not found
+        # if corresponding EnergyPlus folder not found
         if (!is_avail_eplus(ver)) {
-            msg_f <- paste0("Failed to locate `Energy+.idd` because EnergyPlus v",
-                ver, " is not available. ")
+            verbose_info("Failed to locate `Energy+.idd` because EnergyPlus v",
+                ver, " is not available.")
 
-            if (!identical(download, "auto")) {
-                abort("error_no_matched_idd",
-                    paste0(
-                        msg_f, " You may want to set `download` to TRUE or ",
-                        "\"auto\" to download the IDD file from EnregyPlus ",
-                        "GitHub repo."
+            # try to locate using latest IDFVersionUpdater
+            idd <- find_idd_from_updater(ver)
+
+            # if still failed
+            if (is.null(idd)) {
+                # download IDD if auto is specified
+                if (identical(download, "auto")) {
+                    verbose_info("Starting to download the IDD file from EnergyPlus GitHub repo...")
+                    dl <- download_idd(ver, dir = tempdir())
+                    idd <- attr(dl, "file")
+                # else issue an error
+                } else {
+                    abort("error_no_matched_idd",
+                        paste0("Failed to locate IDD v", ver, ".\n",
+                            "You may want to set `download` to TRUE or ",
+                            "\"auto\" to download the IDD file from EnregyPlus ",
+                            "GitHub repo."
+                        )
                     )
-                )
+                }
             }
-
-            verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
-
-            dl <- download_idd(ver, dir = tempdir())
-            idd <- attr(dl, "file")
+        # if corresponding EnergyPlus folder is found
         } else {
             config <- eplus_config(ver)
             idd <- normalizePath(file.path(config$dir, "Energy+.idd"), mustWork = FALSE)
 
+            # but IDD file is missing
             if (!file.exists(idd)) {
-                msg_f <- paste0("`Energy+.idd` file does not exist in EnergyPlus v",
-                    config$version, " installation folder ", surround(config$dir), ". ")
+                verbose_info("`Energy+.idd` file does not exist in EnergyPlus v",
+                    config$version, " installation folder ", surround(config$dir), "."
+                )
 
-                if (!identical(download, "auto")) {
-                    stop(msg_f, "You may want to set `download` to TRUE or ",
-                        "\"auto\" to download the IDD file from EnregyPlus ",
-                        "GitHub repo.", call. = FALSE)
+                # try to locate using latest IDFVersionUpdater
+                idd <- find_idd_from_updater(ver)
+
+                # if still failed
+                if (is.null(idd)) {
+                    # download IDD if auto is specified
+                    if (identical(download, "auto")) {
+                        verbose_info("Starting to download the IDD file from EnergyPlus GitHub repo...")
+                        dl <- download_idd(ver, dir = tempdir())
+                        idd <- attr(dl, "file")
+                    # else issue an error
+                    } else {
+                        abort("error_no_matched_idd",
+                            paste0("Failed to locate IDD v", ver,
+                                "You may want to set `download` to TRUE or ",
+                                "\"auto\" to download the IDD file from EnregyPlus ",
+                                "GitHub repo."
+                            )
+                        )
+                    }
                 }
-
-                verbose_info(msg_f, "\nStarting to download the IDD file from EnergyPlus GitHub repo...")
-
-                dl <- download_idd(ver, dir = tempdir())
-                idd <- attr(dl, "file")
             }
         }
     }
@@ -888,6 +913,41 @@ is_avail_idd <- function (ver) {
 }
 # }}}
 
+# find_idd_from_updater {{{
+find_idd_from_updater <- function (ver) {
+    ver <- standardize_ver(ver, strict = TRUE)
+    # check if there are any EnergyPlus detected whose version is
+    # newer than specified version
+    vers <- rev(avail_eplus()[avail_eplus() > ver])
+
+    if (!length(vers)) return(NULL)
+
+    # use the IDD file distributed with IDFVersionUpdater
+    file <- paste0("V", ver[, 1L], "-", ver[, 2L], "-0-Energy+.idd")
+    idd <- NULL
+
+    msg <- NULL
+    for (i in seq_along(vers)) {
+        line_break <- if (i == 1L) "" else "\n"
+        dir <- file.path(eplus_config(vers[i])$dir, "PreProcess", "IDFVersionUpdater")
+        idd_path <- normalizePath(file.path(dir, file), mustWork = FALSE)
+        msg <- paste0(msg, line_break, "Try to locate `", file, "` in EnergyPlus v",
+            vers[i], " IDFVersionUpdater folder ", surround(dir), "."
+        )
+
+        if (!file.exists(idd_path)) {
+            msg <- paste0(msg, " --> Failed")
+        } else {
+            msg <- paste0(msg, " --> Succeeded")
+            idd <- idd_path
+            break
+        }
+    }
+
+    verbose_info(msg)
+    idd
+}
+# }}}
 # get_idd_from_ver {{{
 # Get Idd object from input IDF version
 #
@@ -928,7 +988,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
         if (!is.null(idd)) {
             idd <- use_idd(idd)
             if (warn) {
-                warn("warn_given_idd_used",
+                warn("warning_given_idd_used",
                     paste0(
                         mes, " The given IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."
@@ -945,7 +1005,7 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
             # which.max does not work with numeric_version objects
             idd <- use_idd(avail_idd()[max(order(avail_idd()))])
             if (warn) {
-                warn("warn_latest_idd_used",
+                warn("warning_latest_idd_used",
                     paste0(mes,
                         " The latest parsed IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."

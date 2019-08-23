@@ -26,6 +26,7 @@ NULL
 #'
 #' 6 Attributes:
 #'
+#' * `path`: A single string. The path of input file.
 #' * `eplus_version`: A [numeric_version][base::numeric_version()] object. The
 #'   version of EnergyPlus used during the simulation.
 #' * `eplus_build`: A single string. The build tag of EnergyPlus used during the
@@ -56,7 +57,7 @@ NULL
 #' }
 # read_err {{{
 read_err <- function (path) {
-    assert(has_ext(path, "err"))
+    assert(has_ext(path, c("err", "vcperr")))
     parse_err_file(path)
 }
 # }}}
@@ -68,17 +69,34 @@ parse_err_file <- function (path) {
         envir = character(), level_index = integer(), level = character(),
         message = character()
     )
+
+    is_trans <- tolower(tools::file_ext(path)) == "vcperr"
+
     # attributes
-    att <- list(
-        eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
-        datetime = as.POSIXct(NA), idd_version = NA,
-        successful = FALSE, terminated = FALSE
-    )
+    if (is_trans) {
+        cls <- c("TransitionErrFile", "ErrFile", class(data.table()))
+
+        att <- list(
+            path = normalizePath(path, mustWork = FALSE),
+            from = numeric_version(NA, strict = FALSE),
+            to = numeric_version(NA, strict = FALSE),
+            successful = FALSE
+        )
+    } else {
+        cls <- c("ErrFile", class(data.table()))
+
+        att <- list(
+            path = normalizePath(path, mustWork = FALSE),
+            eplus_version = numeric_version(NA, strict = FALSE), eplus_build = NA_character_,
+            datetime = as.POSIXct(NA), idd_version = NA,
+            successful = FALSE, terminated = FALSE
+        )
+    }
 
     # return empty err
     if (!file.exists(path)) {
         for (i in names(att)) setattr(err, i, att[[i]])
-        setattr(err, "class", c("ErrFile", class(err)))
+        setattr(err, "class", cls)
         return(err)
     }
 
@@ -88,7 +106,7 @@ parse_err_file <- function (path) {
     # return empty err
     if (!nrow(err_dt)) {
         for (i in names(att)) setattr(err, i, att[[i]])
-        setattr(err, "class", c("ErrFile", class(err)))
+        setattr(err, "class", cls)
         return(err)
     }
 
@@ -96,18 +114,30 @@ parse_err_file <- function (path) {
     if (err_dt[1L, stri_detect_fixed(string, "Program Version")]) {
         err_head <- stri_split_fixed(err_dt$string[[1L]], ",")[[1L]]
 
-        # EnergyPlus version and build
-        ver_bld <- stri_match_first_regex(err_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
-        if (!is.na(ver_bld[, 2L])) att$eplus_version <- standardize_ver(ver_bld[, 2L])
-        if (!is.na(ver_bld[, 3L])) att$eplus_build <- ver_bld[, 3L]
+        # EnergyPlus {{{
+        if (!is_trans) {
+            # EnergyPlus version and build
+            ver_bld <- stri_match_first_regex(err_head[3L], "Version (\\d\\.\\d\\.\\d)-([0-9a-z]{10})")
+            if (!is.na(ver_bld[, 2L])) att$eplus_version <- standardize_ver(ver_bld[, 2L])
+            if (!is.na(ver_bld[, 3L])) att$eplus_build <- ver_bld[, 3L]
 
-        # simulation date time
-        d <- stri_match_first_regex(err_head[4L], "YMD=(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2})")[, 2L]
-        if(!is.na(d)) att$datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
+            # simulation date time
+            d <- stri_match_first_regex(err_head[4L], "YMD=(\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2})")[, 2L]
+            if(!is.na(d)) att$datetime <- lubridate::ymd_hm(d, tz = Sys.timezone())
 
-        # IDD version
-        v <- stri_match_first_regex(err_head[5L], "IDD_Version (\\d\\.\\d\\.\\d)")[, 2L]
-        if (!is.na(v)) att$idd_version <- standardize_ver(v)
+            # IDD version
+            v <- stri_match_first_regex(err_head[5L], "IDD_Version (\\d\\.\\d\\.\\d)")[, 2L]
+            if (!is.na(v)) att$idd_version <- standardize_ver(v)
+        # }}}
+        # IDFVersionUpdater {{{
+        } else {
+            trans_ver <- stri_match_first_regex(err_head[2L], "Conversion (\\d\\.\\d) => (\\d\\.\\d)")
+            if (!is.na(trans_ver[, 2L])) att$from <- standardize_ver(trans_ver[, 2L])
+            if (!is.na(trans_ver[, 3L])) att$to <- standardize_ver(trans_ver[, 3L])
+            att$successful <- stri_detect_fixed(err_dt[.N, string], "Conversion Completed Successfully")
+            err_dt <- err_dt[-.N]
+        }
+        # }}}
 
         # exclude header line
         err_dt <- err_dt[-1L]
@@ -250,7 +280,8 @@ parse_err_file <- function (path) {
 
     # assign attributes
     for (i in names(att)) setattr(err_dt, i, att[[i]])
-    setattr(err_dt, "class", c("ErrFile", class(err_dt)))
+
+    setattr(err_dt, "class", cls)
 
     err_dt
 }
@@ -284,7 +315,7 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     if (info) {
         dt <- x
     } else {
-        dt <- x[J("Info"), on = "level"]
+        dt <- x[!J("Info"), on = "level"]
     }
 
     if (!nrow(dt)) {
@@ -303,6 +334,52 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     if (brief) return(invisible(x))
 
     cli::cat_line()
+    cli::cat_line(format_errdt(dt, info))
+
+    return(invisible(x))
+}
+# }}}
+
+# print.TransitionErrFile {{{
+print.TransitionErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
+    cli::cat_rule("IDFVersionUpdater Error File", line = 2)
+
+    path <- attr(x, "path")
+    path_idf <- normalizePath(paste0(tools::file_path_sans_ext(path), ".idf"), mustWork = FALSE)
+    cli::cat_line(paste0("  * Input file: ", path_idf))
+    cli::cat_line(paste0("  *  From  Ver: ", attr(x, "from")))
+    cli::cat_line(paste0("  * Toward Ver: ", attr(x, "to")))
+
+    if (info) {
+        dt <- x
+    } else {
+        dt <- x[!J("Info"), on = "level"]
+    }
+
+    if (!nrow(dt)) {
+        cat("\n  [IDFVersionUpdater did not generate any message...]\n", sep = "")
+        return(invisible(x))
+    }
+
+    # error summary
+    if (any(dt$level != "Info")) {
+        num_sum <- dt[!J("Info"), on = "level", list(num = max(level_index)), by = c("level")]
+        set(num_sum, NULL, "level", factor(num_sum$level, c("Warning", "Severe", "Fatal"), ordered = TRUE))
+        err_sm <- num_sum[order(level), paste0("  * ", rpad(paste0(as.character(level), "[", stri_sub(as.character(level), to = 1L, ), "]: "), " "), num)]
+        cli::cat_line(err_sm)
+    }
+
+    if (brief) return(invisible(x))
+
+    cli::cat_line()
+    cli::cat_line(format_errdt(dt, info))
+
+    return(invisible(x))
+}
+# }}}
+
+# format_errdt {{{
+format_errdt <- function (dt, info = TRUE) {
     # add row id
     set(dt, NULL, "id", seq_len(nrow(dt)))
     # line wrap long message and extend 8 spaces
@@ -336,10 +413,10 @@ print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     # separate different envir
     dt[dt[, .I[1L], by = c("envir_index")]$V1[-1L], out := paste0("\n", out)]
 
-    cli::cat_line(dt$out)
-
     # clean
-    if (info) set(dt, NULL, c("id", "out", "level_num"), NULL)
-    return(invisible(x))
+    if (info) set(dt, NULL, c("id", "level_num"), NULL)
+
+    on.exit(set(dt, NULL, "out", NULL), add = TRUE)
+    dt$out
 }
 # }}}

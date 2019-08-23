@@ -66,11 +66,15 @@ useful in case where you only want to edit an EnergyPlus Input Data File
 and cached.
 
 eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading. If argument \code{idd} is a version, eplusr will first try
-to find the cached \code{Idd} object of that version, if possible. If failed, and
-EnergyPlus of that version is available (see \code{\link[=avail_eplus]{avail_eplus()}}), the
-\code{"Energy+.idd"} distributed with EnergyPlus will be parsed and stored in
-eplusr Idd cache.
+locations when loading. If argument \code{idd} is a version, eplusr will try the
+follow ways sequentially to find corresponding IDD:
+\itemize{
+\item The cached \code{Idd} object of that version
+\item \code{"Energy+.idd"} file distributed with EnergyPlus of that version (see
+\code{\link[=avail_eplus]{avail_eplus()}}).
+\item The \code{"VX-Y-Z-Energy+.idd"} file distributed along with IDFVersionUpdater
+from the latest EnergyPlus detected.
+}
 }
 \examples{
 \dontrun{

@@ -106,6 +106,10 @@ clean_wd <- function (path) {
 #'
 #' @details
 #'
+#' `run_idf()` and `run_multi()` currently only support EnergyPlus v8.3 and
+#'     above. This is because eplusr uses EnergyPlus command line interface
+#'     which is a new feature as of EnergyPlus v8.3.
+#'
 #' For `run_idf()`, a named list will be returned:
 #'
 #'   * `idf`: The path of IDF file
@@ -770,6 +774,16 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 eplus_exe <- function (eplus) {
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
     config <- tryCatch(eplus_config(eplus), warning = function (w) stop(w))
+
+    if (config$version < 8.3) {
+        abort("error_eplus_lower_8.3", paste(
+            "Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
+            "This is because eplusr uses EnergyPlus command line interface ",
+            "which is available only in EnergyPlus v8.3 and above. ",
+            "You can update the version of your model using `version_updater()` and try again."
+        ))
+    }
+
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
 }
 # }}}

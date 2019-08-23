@@ -6,8 +6,8 @@
 #' @importFrom stringi stri_count_charclass stri_count_fixed stri_detect_fixed
 #' @importFrom stringi stri_endswith_fixed stri_extract_first_regex stri_isempty
 #' @importFrom stringi stri_length stri_locate_first_fixed stri_replace_all_fixed
-#' @importFrom stringi stri_startswith_fixed stri_split_charclass
-#' @importFrom stringi stri_split_fixed stri_sub stri_subset_fixed
+#' @importFrom stringi stri_startswith_charclass stri_startswith_fixed
+#' @importFrom stringi stri_split_charclass stri_split_fixed stri_sub stri_subset_fixed
 #' @importFrom stringi stri_trans_tolower stri_trans_toupper stri_trim_both
 #' @importFrom stringi stri_trim_left stri_trim_right
 #' @include impl.R
@@ -168,8 +168,8 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     if (has_ext(path, "ddy")) {
         idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
-            warn_given_idd_used = function (w) invokeRestart("muffleWarning"),
-            warn_latest_idd_used = function (w) invokeRestart("muffleWarning")
+            warning_given_idd_used = function (w) invokeRestart("muffleWarning"),
+            warning_latest_idd_used = function (w) invokeRestart("muffleWarning")
         )
     } else {
         idd <- get_idd_from_ver(idf_ver, idd)
@@ -295,7 +295,8 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt[stri_startswith_fixed(string, "!IDD_BUILD")]
 
     if (!nrow(build_line)) {
-        warn("warn_miss_idd_build", "No build tag found in input IDD.")
+        warn("warning_miss_idd_build", "No build tag found in input IDD.")
+        NA_character_
     } else if (nrow(build_line) == 1L) {
         build <- stri_sub(build_line$string, 12L)
     } else {
@@ -404,7 +405,9 @@ sep_idd_lines <- function (dt, col = "string") {
     refs <- dt[J(c("reference-class-name", "reference")), on = "slash_key", unique(slash_value), nomatch = 0L]
     invld_objlst <- which(dt$slash_key == "object-list" & !dt$slash_value %chin% refs)
     if (length(invld_objlst)) {
-        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", dt[invld_objlst])
+        parse_issue("error_object_list_value", "idd", "Invalid \\object-list value", dt[invld_objlst],
+            post = "Neither paired \\reference nor \\reference-class-name exist for \\object-list above."
+        )
     }
 
     # check invalid slash keys
@@ -455,32 +458,37 @@ mark_idd_lines <- function (dt, type_enum) {
     set(dt, NULL, "type", type_enum$unknown)
 
     set(dt, NULL, "semicolon", stri_endswith_fixed(dt$body, ";"))
-    # ignore section if exists, e.g. "Simulation Data;"
-    dt <- dt[!J(TRUE, NA_character_), on = c("semicolon", "slash_key")]
 
     setindexv(dt, "slash_key")
-    set(dt, NULL, "empty", stri_isempty(dt$body))
+
     # mark slash lines
-    dt[J(TRUE), on = "empty", `:=`(type = type_enum$slash)]
+    dt[stri_isempty(body), `:=`(type = type_enum$slash)]
 
     # mark group
     dt[J("group"), on = "slash_key", `:=`(type = type_enum$group)]
 
     # mark class
-    dt[stri_endswith_fixed(body, ",") & is.na(slash_key), `:=`(type = type_enum$class)]
+    # cannot use empty slash_key as an indicator because in some versions, class
+    # slash may in the same line as class names
+    dt[stri_endswith_fixed(body, ","), `:=`(type = type_enum$class)]
 
     # mark field
-    dt[empty == FALSE & !is.na(slash_key), `:=`(type = type_enum$field)]
+    dt[stri_detect_regex(body, "^([AN]\\d+\\s*,\\s*)+|(([AN]\\d+\\s*,\\s*)*[AN]\\d+\\s*;)$"),
+        `:=`(type = type_enum$field)
+    ]
 
     # mark last field per class
-    dt[J(TRUE), on = "semicolon", `:=`(type = type_enum$field_last)]
+    dt[J(type_enum$field, TRUE), on = c("type", "semicolon"), `:=`(type = type_enum$field_last)]
+
+    # ignore section if exists, e.g. "Simulation Data;"
+    dt <- dt[!J(TRUE, type_enum$unknown), on = c("semicolon", "type")]
 
     # if there are still known lines, throw an error
     if (any(dt$type == type_enum$unknown)) {
         parse_issue("error_unknown_line", "idd", "Invalid line", dt[type == type_enum$unknown])
     }
 
-    set(dt, NULL, c("semicolon", "empty"), NULL)
+    set(dt, NULL, "semicolon", NULL)
 }
 # }}}
 
@@ -488,17 +496,35 @@ mark_idd_lines <- function (dt, type_enum) {
 sep_group_table <- function (dt, type_enum) {
     setindexv(dt, "type")
 
-    is_group <- dt[J(type_enum$group), on = "type", which = TRUE]
+    is_group <- dt[J(type_enum$group), on = "type", which = TRUE, nomatch = 0L]
 
     dt[is_group, `:=`(group_id = seq_along(slash_key), group_name = slash_value)]
     dt_group <- dt[is_group, .SD, .SDcols = c("group_id", "group_name", "line")]
 
+    # assign default group if necessary
+    if (!nrow(dt_group)) {
+        parse_issue("warning_no_group", "idd", "Missing group name", num = 1L,
+            post = "No `\\group` key found. All classes will be assgined to a group named `Default Group`. ",
+            stop = FALSE
+        )
+
+        set(dt, NULL, c("group_id", "group_name"), list(1L, "Default Group"))
+        dt_group <- data.table(group_id = 1L, group_name = "Default Group", line = 0L)
+    }
+
     # check missing group
     if (any(dt$line < dt_group$line[1L])) {
         invld_grp <- dt[line < dt_group$line[1L]]
-        parse_issue("error_missing_group", "idd", "Missing group name",
-            invld_grp, invld_grp[type == type_enum$class, .N]
+        parse_issue("warning_missing_group", "idd", "Missing group name",
+            invld_grp, invld_grp[type == type_enum$class, .N], stop = FALSE,
+            post = "Those classes will be assgined to a group named `Default Group`. ",
         )
+
+        dt[invld_grp, on = "line", `:=`(group_id = 1L, group_name = "Default Group")]
+        dt_group <- rbindlist(list(
+            data.table(group_id = 1L, group_name = "Default Group", line = 0L),
+            dt_group[, `:=`(group_id = group_id + 1L)]
+        ))
     }
     set(dt_group, NULL, "line", NULL)
 
@@ -582,9 +608,10 @@ sep_class_table <- function (dt, type_enum) {
     i <- merge(s, e, by = "class_id", all = TRUE)
 
     # manually add "\format" if there is no slash in class
-    if (any(i$start == i$end)) {
+    if (any(same <- i$start == i$end)) {
         setindexv(dt, "class_id")
-        ins <- dt[J(i[start == end, class_id]), on = "class_id", mult = "first"]
+        # in case that class slash is on the same line as clas name
+        ins <- dt[J(i[same, class_id], NA_character_), on = c("class_id", "slash_key"), mult = "first", nomatch = 0L]
         ins[, `:=`(
             string = "\\format standard",
             body = "format standard",
@@ -883,7 +910,7 @@ parse_field_property_extensible_group <- function (dt, ref) {
     ext <- ext[, list(first_extensible = field_index[1L]), by = class_id]
 
     # handle the case when there is no extensible fields
-    if (!has_name(ref, "extensible")) {
+    if (!has_name(ref, "extensible") | !nrow(ext)) {
         set(dt, NULL, "extensible_group", 0L)
         return(dt)
     }
@@ -1045,17 +1072,6 @@ parse_field_reference_table <- function (dt) {
     # combine object list and reference
     obj_ref <- refs[obj_fld, on = list(reference = object_list), allow.cartesian = TRUE]
 
-    # check if \object-list does not have a corresponding \reference
-    if (any(is.na(obj_ref$src_field_id))) {
-        parse_issue("error_object_list_missing_reference", "idd",
-            "\\object-list missing corresponding \\reference or \\reference-class-name",
-            post = paste0(
-                "Paired \\reference nor \\reference-class-name exist for \\object-list below:\n",
-                collapse(obj_ref[is.na(src_field_id), reference])
-            )
-        )
-    }
-
     set(obj_ref, NULL, "reference", NULL)
     setcolorder(obj_ref, c("class_id", "field_id", "src_class_id", "src_field_id", "src_enum"))
 
@@ -1212,6 +1228,8 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     dt[dt[type >= type_enum$value, .I[1L], by = list(object_id)]$V1,
         c("type", "class_name_lower", "body") :=({
             n <- stri_locate_first_fixed(body, ",")[, 1L]
+            # in case there are invalid class names ends with semicolon
+            n[is.na(n)] <- 0L
             l <- stri_length(body)
             class_name_lower <- stri_trans_tolower(stri_sub(body, to = n - 1L))
             body[n < l] <- stri_trim_left(stri_sub(body[n < l], n[n < l] + 1L))
@@ -1296,11 +1314,10 @@ get_value_table <- function (dt, idd) {
 
     # get all condensed value lines
     con <- dt[value_count > 1L]
-    set(con, NULL, "value_count", NULL)
 
     # split values
     con <- con[, {
-        s <- stri_split_charclass(body, "[,;]", omit_empty = TRUE)
+        s <- stri_split_charclass(body, "[,;]", n = value_count, omit_empty = NA, tokens_only = TRUE)
         l <- vapply(s, length, integer(1L))
         list(
             line = rep(line, l),
@@ -1529,7 +1546,7 @@ parse_issue <- function (error_type, type = c("idf", "idd", "err", "epw"),
             num <- nrow(data)
         }
         assert(has_name(data, c("line", "string")))
-        mes <- paste0(data$msg_each, "Line ", data$line, ": ", data$string)
+        mes <- paste0(data$msg_each, "Line ", lpad(data$line), ": ", data$string)
         if (!is.null(prefix)) {
             mes <- paste0(prefix, mes)
         }

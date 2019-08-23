@@ -34,6 +34,7 @@ with 6 columns and 6 additional attributes:
 
 6 Attributes:
 \itemize{
+\item \code{path}: A single string. The path of input file.
 \item \code{eplus_version}: A \link[base:numeric_version]{numeric_version} object. The
 version of EnergyPlus used during the simulation.
 \item \code{eplus_build}: A single string. The build tag of EnergyPlus used during the

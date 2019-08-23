@@ -49,6 +49,8 @@ reference:
       - idf_object
       - read_idf
       - empty_idf
+      - transition
+      - version_updater
   - title: EPW
     desc: Download, read and modify an EnergyPlus Weather (EPW)
     contents:

@@ -727,7 +727,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     # check if generated models have been modified outside
     uuid <- vapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid, character(1))
     if (any(uuid != private$m_log$uuid)) {
-        warn("warn_param_modified",
+        warn("warning_param_modified",
             paste0(
                 "Some of the parametric models have been modified after created using `$apply_measure()`. ",
                 "Running these models will result in simulation outputs that may be not reproducible. ",

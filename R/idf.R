@@ -265,9 +265,11 @@ NULL
 #' `$object_unique()` returns the [IdfObject] in unique-object class, e.g.
 #' `SimulationControl` class. This makes it easy to directly extract and modify
 #' those unique objects, e.g.
+#'
 #' ```
 #' model$object_unique("SimulationContrl")$set(...)
 #' ```
+#'
 #' Note that if there are multiple objects in that unique-object class, an error
 #' is issued. This makes sure that `$object_unique()` always returns a single
 #' [IdfObject].
@@ -1900,7 +1902,7 @@ idf_object_unique <- function (self, private, class) {
     assert(is_scalar(class))
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
 
-    if (!obj$class_id %in% private$idd_env()$class[unique_object == TRUE, class_id]) {
+    if (!unique(obj$class_id) %in% private$idd_env()$class[unique_object == TRUE, class_id]) {
         abort("error_idf_not_unique_class",
             paste0(surround(unique(obj$class_name)), " is not a valid unique-object class index or name.")
         )
@@ -1909,8 +1911,9 @@ idf_object_unique <- function (self, private, class) {
     if (nrow(obj) > 1L) {
         abort("error_idf_dup_unique_class",
             paste0(surround(unique(obj$class_name)), " class have more than one ",
-                "objects: ", get_object_info(obj, c("id", "name"), collapse = "\n"),
-                ". Please see `$validate()` for more details."
+                "objects:\n",
+                get_object_info(obj[, rleid := .I], c("id", "name"), collapse = "\n"),
+                "\nPlease see `$validate()` for more details."
             )
         )
     }

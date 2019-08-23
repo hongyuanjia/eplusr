@@ -1,5 +1,9 @@
 # VERSIONS {{{
-ALL_EPLUS_VER <- c(paste0("8.", 3:9, ".0"), paste0("8.3.", 1:3), "9.0.0", "9.0.1", "9.1.0")
+ALL_EPLUS_VER <- c(
+    paste0("7.", 0:2, ".0"),
+    paste0("8.", 0:9, ".0"), paste0("8.3.", 1:3),
+    "9.0.0", "9.0.1", "9.1.0"
+)
 
 LATEST_EPLUS_VER <- ALL_EPLUS_VER[length(ALL_EPLUS_VER)]
 
@@ -78,7 +82,7 @@ utils::globalVariables(c(
     "object_list", "object_name", "object_name_lower", "object_order",
     "object_rleid", "old_exist", "old_object_name", "old_object_name_lower",
     "out", "out_of_range", "output_dir", "prefix", "ref_class", "ref_field",
-    "ref_object", "ref_value", "reference", "reference_class_name", "reporting_freqency",
+    "ref_object", "ref_value", "reference", "reference_class_name", "reporting_frequency",
     "required_field", "required_object", "res", "rev_field_rleid", "same_dir",
     "si", "slash", "slash_key", "slash_loc", "slash_value", "slash_value_lower",
     "slash_value_rleid", "soil_conductivity", "soil_density",
@@ -91,6 +95,8 @@ utils::globalVariables(c(
     "unique_object", "upper_incbounds", "use_input_name", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "weather",
     "wmo_number", "x", "year_in", "J", "num_fld", "max_fld", "Date/Time",
-    "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month"
+    "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month",
+    "i.object_id", "i.rleid", "old", "key_value", "i.key_value", "i.value",
+    "field_num"
 ))
 # }}}

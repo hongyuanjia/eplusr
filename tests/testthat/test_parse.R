@@ -102,7 +102,8 @@ test_that("parse_idd_file()", {
          Test,
          A1 ; \\note something"
     )
-    expect_warning(parse_idd_file(idd_wrong), class = "warn_miss_idd_build")
+    expect_warning(idd_parsed <- parse_idd_file(idd_wrong), class = "warning_miss_idd_build")
+    expect_equal(idd_parsed$build, NA_character_)
 
     # can warn about multiple IDD build tags
     idd_wrong <- c(
@@ -143,7 +144,9 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong), class = "error_missing_group")
+    expect_warning(idd_parsed <- parse_idd_file(idd_wrong), class = "warning_missing_group")
+    expect_equal(idd_parsed$group$group_id, 1L:2L)
+    expect_equal(idd_parsed$group$group_name, c("Default Group", "TestGroup"))
 
     # can detect duplicated class names
     idd_wrong <- c(
@@ -306,6 +309,18 @@ test_that("parse_idf_file()", {
     num <- suppressWarnings(as.numeric(val))
     num[10] <- NA_real_
 
+    # can parse one-line empty object
+    expect_silent(idf_parsed <- parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
+    expect_equivalent(idf_parsed$object,
+        data.table(object_id = 1:2, class_id = c(1L, 764L),
+        comment = list(), object_name = rep(NA_character_, 2), object_name_lower = rep(NA_character_, 2))
+    )
+    expect_equivalent(idf_parsed$value,
+        data.table(object_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
+        value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 58822L, 58823L))
+    )
+
+    expect_silent(parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
     expect_warning(idf_value <- parse_idf_file(text_object, 8.8))
     expect_equal(names(idf_value$value),
         c("value_id", "value_chr", "value_num", "object_id", "field_id"))
@@ -350,26 +365,15 @@ test_that("parse_idf_file()", {
         "Version,8.8;
         ! comment
          WrongClass,
-            WD01,                    !- Name
-            MediumSmooth,            !- Roughness
-            1.9099999E-02,           !- Thickness {m}
-            0.1150000,               !- Conductivity {W/m-K}
-            513.0000,                !- Density {kg/m3}
-            1381.000,                !- Specific Heat {J/kg-K}
-            0.9000000,               !- Thermal Absorptance
-            0.7800000,               !- Solar Absorptance
-            0.7800000;               !- Visible Absorptance
+            WD01;                    !- Name
         ! comment
          WrongClass,
-            WD01,                    !- Name
-            MediumSmooth,            !- Roughness
-            1.9099999E-02,           !- Thickness {m}
-            0.1150000,               !- Conductivity {W/m-K}
-            513.0000,                !- Density {kg/m3}
-            1381.000,                !- Specific Heat {J/kg-K}
-            0.9000000,               !- Thermal Absorptance
-            0.7800000,               !- Solar Absorptance
-            0.7800000;               !- Visible Absorptance
+            WD01;                    !- Name
+        ")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "error_invalid_class")
+    idf_wrong <- c(
+        "Version,8.8;
+         WrongClass, WD01;
         ")
     expect_error(parse_idf_file(idf_wrong, 8.8), class = "error_invalid_class")
 

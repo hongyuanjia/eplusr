@@ -146,7 +146,7 @@ is_idd_ver <- function (ver, strict = FALSE) {
     !is.na(match_minor_ver(ver, c(ALL_IDD_VER, names(.globals$idd)), verbose = FALSE))
 }
 on_fail(is_idd_ver) <- function (call, env) {
-    paste0(deparse(call$ver), " is not a valid Idd version.")
+    paste0(collapse(eval(call$ver, env)), " is not a valid Idd version.")
 }
 # }}}
 
@@ -156,9 +156,12 @@ on_fail(is_idd_ver) <- function (call, env) {
 # is_eplus_path {{{
 is_eplus_path <- function (path) {
     eplus <- paste0("energyplus", if (is_windows()) ".exe" else "")
+    eplus1 <- paste0("EnergyPlus", if (is_windows()) ".exe" else "")
     # in case input is a numeric version
     path <- as.character(path)
-    dir.exists(path) & file.exists(file.path(path, eplus)) & file.exists(file.path(path, "Energy+.idd"))
+    dir.exists(path) &
+        (file.exists(file.path(path, eplus)) | file.exists(file.path(path, eplus1))) &
+        file.exists(file.path(path, "Energy+.idd"))
 }
 on_fail(is_eplus_path) <- function (call, env) {
     paste(deparse(call$path), "is not a valid EnergyPlus installation path",

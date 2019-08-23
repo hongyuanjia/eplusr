@@ -1,0 +1,2818 @@
+# CLASS_DEL_COMMON {{{
+CLASS_DEL_COMMON <- c(
+    "PROGRAMCONTROL",
+    "SKY RADIANCE DISTRIBUTION",
+    "AIRFLOW MODEL",
+    "GENERATOR:FC:BATTERY DATA",
+    "AIRFLOWNETWORK:MULTIZONE:SITEWINDCONDITIONS",
+    "WATER HEATER:SIMPLE"
+)
+# }}}
+
+#' Perform version transition of EnergyPlus model
+#'
+#' `transition()` takes an [Idf] object or a path of IDF file and a target
+#' version, performs version transitions and returns an [Idf] object of
+#' specified version.
+#'
+#' @param idf An [Idf] object or a path of IDF file.
+#' @param ver A valid EnergyPlus version, e.g. `9`, `8.8`, or `"8.8.0"`.
+#' @param save If `TRUE`, the models will be saved into specified directory.
+#' Default: `FALSE`.
+#' @param dir Only applicable when `save` is `TRUE`. The directory to save the
+#' new IDF files. If the directory does not exist, it will be created before
+#' save. If `NULL`, the directory of input [Idf] object or IDF file will be
+#' used. Default: `NULL`.
+#' @param keep_all If `TRUE`, a list will be return which contains all
+#' [Idf] objects of intermediate versions. The list will be named using first
+#' two number of that version, e.g. `8.1`, `8.2`. If `FALSE`, only the [Idf]
+#' object of the version specified by `ver` will be returned. Default: `FALSE`.
+#' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
+#' if `keep_all` is `TRUE`.
+#' @seealso See [version_updater()] which directly call EnergyPlus preprocessor
+#' `IDFVersionUpdater` to perform the version transitions.
+#' @author Hongyuan Jia
+#' @export
+# transition {{{
+# TODO: how to give the names of saved files
+transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
+    if (!is_idf(idf)) idf <- read_idf(idf)
+
+    assert(is_idd_ver(ver))
+    ver <- standardize_ver(ver)[, 1L:2L]
+
+    if (idf$version() < 7.2) {
+        abort("error_trans_not_supported",
+            paste0(
+                "Input IDF has version ", surround(idf$version()), ". ",
+                "Currently only EnergyPlus v7.2 and above are suppored."
+            )
+        )
+    }
+
+    # only compare Major and Mversioninor version, skip patch version
+    if (idf$version()[, 1L:2L] == ver) {
+        verbose_info("IDF is already at latest version ", ver, ". No transition needed.")
+        if (keep_all) {
+            res <- list(idf)
+            setattr(res, "names", as.character(idf$version()[, 1L:2L]))
+            return(res)
+        } else {
+            return(idf)
+        }
+    # cannot go reverse
+    } else if (idf$version()[, 1L:2L] > ver) {
+        abort("error_trans_reverse", "Only version updating is supported. Downgrading is not supported.")
+    }
+
+    # stop if unsaved
+    if (idf$is_unsaved()) {
+        abort("error_idf_not_saved",
+            paste0("Idf has been modified since read or last saved. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    # clone original input
+    idf <- idf$clone(TRUE)
+
+    # perform transition
+    res <- trans_apply(idf, ver, keep_all)
+
+    # directly return if no saving is required
+    if (!save) return(res)
+
+    # check if original file exists
+    if (is.null(idf$path())) {
+        abort("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    if (is.null(dir)) {
+        dir <- dirname(idf$path())
+    } else if (!dir.exists(dir)){
+        dir.create(dir, recursive = TRUE)
+    }
+
+    save_new <- function (idf, dir, path) {
+        nm <- paste0(tools::file_path_sans_ext(basename(path)), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
+        idf$save(file.path(dir, nm), overwrite = TRUE)
+    }
+
+    if (!keep_all) {
+        save_new(res, dir, path = idf$path())
+    } else {
+        lapply(res, save_new, dir = dir, path = idf$path())
+    }
+
+    res
+}
+# }}}
+
+# trans_apply {{{
+trans_apply <- function (idf, ver, keep_all) {
+    # get all versions needed to handle
+    vers <- trans_upper_versions(idf, ver)
+
+    # get corresponding transition function names
+    funs <- trans_fun_names(vers)
+
+    # apply transition functions
+    if (!keep_all) {
+        for (i in seq_along(funs))  {
+            verbose_info(
+                " From  Ver: ", vers[i], "\n",
+                "Toward Ver: ", vers[i + 1L]
+            )
+            idf <- with_option(
+                list(verbose_info = FALSE, validate_level = "none"),
+                trans_funs[[funs[i]]](idf)
+            )
+            verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
+        }
+        idf
+    } else {
+        res <- vector("list", length(funs) + 1L)
+        res[[1L]] <- idf
+
+        for (i in seq_along(res)) {
+            if (i == length(res)) break
+            verbose_info(
+                " From  Ver: ", vers[i], "\n",
+                "Toward Ver: ", vers[i + 1L]
+            )
+            res[[i + 1L]] <- with_option(
+                list(verbose_info = FALSE,validate_level = "none"),
+                trans_funs[[funs[[i]]]](res[[i]])
+            )
+            verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
+        }
+        nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
+        setattr(res, "names", c(as.character(idf$version()[, 1L:2L]), nms))
+
+        res
+    }
+}
+# }}}
+
+trans_funs <- new.env(parent = emptyenv())
+# trans_720_800 {{{
+trans_funs$f720t800 <- function (idf) {
+    assert(idf$version()[, 1:2] == 7.2)
+
+    target_cls <- c(
+        "ShadowCalculation",                                       # 1
+        "Coil:Heating:DX:MultiSpeed",                              # 2
+        "EnergyManagementSystem:OutputVariable",                   # 3
+        "EnergyManagementSystem:MeteredOutputVariable",            # 4
+        "Branch",                                                  # 5
+        "PlantEquipmentList",                                      # 6
+        "CondenserEquipmentList",                                  # 7
+        "HeatExchanger:WatersideEconomizer",                       # 8
+        "HeatExchanger:Hydronic",                                  # 9
+        "HeatExchanger:Plate",                                     # 10
+        "BuildingSurface:Detailed",                                # 11
+        "Wall:Detailed",                                           # 12
+        "RoofCeiling:Detailed",                                    # 13
+        "Floor:Detailed",                                          # 14
+        "FenestrationSurface:Detailed",                            # 15
+        "Shading:Site:Detailed",                                   # 16
+        "Shading:Building:Detailed",                               # 17
+        "Shading:Zone:Detailed",                                   # 18
+        "AirflowNetwork:Distribution:Component:ConstantVolumeFan", # 19
+        "ZoneHVAC:HighTemperatureRadiant",                         # 20
+        "AirConditioner:VariableRefrigerantFlow",                  # 21
+        "ZoneHVAC:WaterToAirHeatPump",                             # 22
+        "AirLoopHVAC:UnitaryHeatPump:WaterToAir",                  # 23
+        "Boiler:HotWater",                                         # 24
+        "Chiller:Electric",                                        # 25
+        "Chiller:ConstantCOP",                                     # 26
+        "Chiller:EngineDriven",                                    # 27
+        "Chiller:CombustionTurbine",                               # 28
+        "Chiller:Electric:EIR",                                    # 29
+        "Chiller:Electric:ReformulatedEIR",                        # 30
+        "Chiller:Absorption",                                      # 31
+        "Chiller:Absorption:Indirect"                              # 32
+    )
+
+    new_idf <- trans_preprocess(idf, 8.0, target_cls)
+
+    # 1: ShadowCalculation {{{
+    dt1 <- trans_action(idf, "ShadowCalculation", insert = list(1L, "AverageOverDaysInFrequency"))
+    # }}}
+    # 2: Coil:Heating:DX:MultiSpeed {{{
+    dt2 <- trans_action(idf, class = "Coil:Heating:DX:MultiSpeed",
+        insert = list(6L),
+        insert = list(17L),
+        insert = list(22L),
+        insert = list(33L),
+        insert = list(44L),
+        insert = list(55L)
+    )
+    # }}}
+    # 3: EnergyManagementSystem:OutputVariable {{{
+    dt3 <- trans_action(idf, "EnergyManagementSystem:OutputVariable", add = list(6L))
+    if (nrow(dt3)) {
+        # add unit if applicable
+        units <- dt3[J(1L), on = "index"][, c("value", "unit") := {
+            as.data.table(stri_match_first_regex(value, "^(.+)\\s+\\[(.*)\\]$"))[, 2:3]
+        }][!is.na(value)]
+
+        # update key value
+        dt3[units, on = c("id", "index"), value := i.value]
+        # update unit
+        set(units, NULL, "index", 6L)
+        dt3[units, on = c("id", "index"), value := i.unit]
+    }
+    # }}}
+    # 4: EnergyManagementSystem:MeteredOutputVariable {{{
+    dt4 <- trans_action(idf, "EnergyManagementSystem:MeteredOutputVariable", add = list(9L))
+    if (nrow(dt4)) {
+        # add unit if applicable
+        units <- dt4[J(1L), on = "index"][, c("value", "unit") := {
+            as.data.table(stri_match_first_regex(value, "^(.+)\\s+\\[(.*)\\]$"))[, 2:3]
+        }][!is.na(value)]
+
+        # update key value
+        dt4[units, on = c("id", "index"), value := i.value]
+        # update unit
+        set(units, NULL, "index", 6L)
+        dt4[units, on = c("id", "index"), value := i.unit]
+    }
+    # }}}
+    # 5: Branch {{{
+    dt5 <- trans_action(idf, "Branch")
+    if (nrow(dt5)) {
+        dt5[(index - 4L) %% 5L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 6: PlantEquipmentList {{{
+    dt6 <- trans_action(idf, "PlantEquipmentList")
+    if (nrow(dt6)) {
+        dt6[(index - 2L) %% 2L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 7: CondenserEquipmentList {{{
+    dt7 <- trans_action(idf, "CondenserEquipmentList")
+    if (nrow(dt7)) {
+        dt7[(index - 2L) %% 2L == 0L & stri_trans_tolower(value) %in% paste0("heatexchanger:", c("watersideeconomizer", "hydronic", "plate")),
+            value := "HeatExchanger:FluidToFluid"]
+    }
+    # }}}
+    # 8: HeatExchanger:WatersideEconomizer {{{
+    dt8 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:WatersideEconomizer"), all = TRUE,
+        offset = list(
+            c(3L, 6L, 7L, 9L, 4L, 5L, 8L, 2L),
+            c(2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L)
+        ),
+        reset = list(9L, "PlateFrame", "CrossFlowBothUnmixed"),
+        insert = list(11L, "CoolingDifferentialOnOff"),
+        insert = list(12L),
+        add = list(14L, "FreeCooling")
+    )
+    # }}}
+    # 9: HeatExchanger:Hydronic {{{
+    dt9 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:Hydronic"), all = TRUE,
+        delete = list(18L),
+        offset = list(
+            c(5L, 6L, 13L, 7L, 8L, 14L, 11L, 12L, 17L, 15L,  9L),
+            c(3L, 4L,  5L, 6L, 7L,  8L,  9L, 10L, 15L, 16L, 17L)
+        ),
+        reset = list(2L, NA_character_),
+        reset = list(9L, "UFactorTimesAreaEffectiveness", "CrossFlowBothUnMixed"),
+        add = list(11L, "CoolingSetpointOnOffWithComponentOverride"),
+        add = list(12L),
+        add = list(13L, "0.0"),
+        add = list(14L, "FreeCooling")
+    )
+    if (nrow(dt9)) {
+        dt9[, value := {value[12L] <- value[7L]; value}, by = "id"]
+
+        # create corresponding SetpointManager:Schedule objects
+        dt9_spm <- trans_action(idf, c("SetpointManager:Scheduled" = "HeatExchanger:Hydronic"), min_fields = 8L)[
+            J(c(1L, 2L, 4L, 8L)), on = "index"]
+        dt9_spm[J(1L), on = "index", value := {
+            if (any(!is.na(value))) {
+                value[!is.na(value)] <- paste0(value[!is.na(value)], " Setpoint Manager")
+            }
+            value
+        }]
+        dt9_spm[J(2L), on = "index", value := "Temperature"]
+        dt9_spm[, index := seq_len(.N), by = "id"]
+        new_idf$load(dt9_spm, .unique = FALSE, .default = FALSE)
+    }
+    # }}}
+    # 10: HeatExchanger:Plate {{{
+    dt10 <- trans_action(idf, c("HeatExchanger:FluidToFluid" = "HeatExchanger:Plate"), all = TRUE,
+        offset = list(
+            c(4L, 5L, 10L, 11L,  8L,  9L),
+            c(3L, 4L,  5L,  8L,  9L, 10L)
+        ),
+        reset = list(2L, NA_character_),
+        reset = list(9L, "UFactorTimesAreaEffectiveness", "CrossFlowBothUnMixed"),
+        add = list(11L, "UncontrolledOn"),
+        add = list(12L:13L),
+        add = list(14L, "LoopToLoop"),
+        add = list(15L:17L)
+    )
+    # }}}
+
+    # standardize_vertices {{{
+    standardize_vertices <- function (idf, class, start) {
+        dt <- trans_action(idf, class)
+        if (nrow(dt)) dt[index >= start & is.na(value), value := "0.0"]
+        dt
+    }
+    # }}}
+    # 11: BuildingSurface:Detailed {{{
+    dt11 <- standardize_vertices(idf, "BuildingSurface:Detailed", 11L)
+    # }}}
+    # 12: Wall:Detailed {{{
+    dt12 <- standardize_vertices(idf, "Wall:Detailed", 10L)
+    # }}}
+    # 13: RoofCeiling:Detailed {{{
+    dt13 <- standardize_vertices(idf, "RoofCeiling:Detailed", 10L)
+    # }}}
+    # 14: Floor:Detailed {{{
+    dt14 <- standardize_vertices(idf, "Floor:Detailed", 10L)
+    # }}}
+    # 15: FenestrationSurface:Detailed {{{
+    dt15 <- standardize_vertices(idf, "FenestrationSurface:Detailed", 11L)
+    # }}}
+    # 16: Shading:Site:Detailed {{{
+    dt16 <- standardize_vertices(idf, "Shading:Site:Detailed", 4L)
+    # }}}
+    # 17: Shading:Building:Detailed {{{
+    dt17 <- standardize_vertices(idf, "Shading:Building:Detailed", 4L)
+    # }}}
+    # 18: Shading:Zone:Detailed {{{
+    dt18 <- standardize_vertices(idf, "Shading:Zone:Detailed", 5L)
+    # }}}
+    # 19: AirflowNetwork:Distribution:Component:ConstantVolumeFan {{{
+    dt19 <- trans_action(idf, c("AirflowNetwork:Distribution:Component:Fan" = "AirflowNetwork:Distribution:Component:ConstantVolumeFan"))
+    # }}}
+    # 20: ZoneHVAC:HighTemperatureRadiant {{{
+    dt20 <- trans_action(idf, "ZoneHVAC:HighTemperatureRadiant",
+        reset = list(5L, "electric", "Electricity"),
+        reset = list(5L, "gas", "NaturalGas")
+    )
+    # }}}
+    # 21: AirConditioner:VariableRefrigerantFlow {{{
+    dt21 <- trans_action(idf, "AirConditioner:VariableRefrigerantFlow",
+        reset = list(67L, "electric", "Electricity")
+    )
+    # }}}
+
+    # warning_reset {{{
+    warning_reset <- function (idf, class, index = NULL, old = NULL, new = NULL) {
+        if (is.null(index)) return(trans_action(idf, class))
+
+        dt <- trans_action(idf, class, reset = list(index, old, new))
+
+        if (nrow(dt)) {
+            warn("warning_trans_720_800",
+                paste0("Default values for some fields in class ",
+                    "`", class, "` have been changed. ",
+                    "Results may be different than previous. ",
+                    "See InputOutputReference document for details."
+                )
+            )
+        }
+
+        dt
+    }
+    # }}}
+    # 22: ZoneHVAC:WaterToAirHeatPump {{{
+    dt22 <- warning_reset(idf, "ZoneHVAC:WaterToAirHeatPump")
+    # }}}
+    # 23: AirLoopHVAC:UnitaryHeatPump:WaterToAir {{{
+    dt23 <- warning_reset(idf, "AirLoopHVAC:UnitaryHeatPump:WaterToAir")
+    # }}}
+    # 24: Boiler:HotWater {{{
+    dt24 <- warning_reset(idf, "Boiler:HotWater", 15L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 25: Chiller:Electric {{{
+    dt25 <- warning_reset(idf, "Chiller:Electric", 27L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 26: Chiller:ConstantCOP {{{
+    dt26 <- warning_reset(idf, "Chiller:ConstantCOP", 11L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 27: Chiller:EngineDriven {{{
+    dt27 <- warning_reset(idf, "Chiller:EngineDriven", 41L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 28: Chiller:CombustionTurbine {{{
+    dt28 <- warning_reset(idf, "Chiller:CombustionTurbine", 54L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 29: Chiller:Electric:EIR {{{
+    dt29 <- warning_reset(idf, "Chiller:Electric:EIR", 23L, "VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 30: Chiller:Electric:ReformulatedEIR {{{
+    dt30 <- warning_reset(idf, "Chiller:Electric:ReformulatedEIR", 21L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 31: Chiller:Absorption {{{
+    dt31 <- warning_reset(idf, "Chiller:Absorption", 23L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+    # 32: Chiller:Absorption:Indirect {{{
+    dt32 <- warning_reset(idf, "Chiller:Absorption:Indirect", 16L,"VariableFlow", "LeavingSetpointModulated")
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:32)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_800_810 {{{
+trans_funs$f800t810 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.0)
+
+    target_cls <- c(
+        "People",                                            # 1
+        "CoolingTower:SingleSpeed",                          # 2
+        "CoolingTower:TwoSpeed",                             # 3
+        "EvaporativeFluidCooler:SingleSpeed",                # 4
+        "EvaporativeFluidCooler:TwoSpeed",                   # 5
+        "FluidCooler:TwoSpeed",                              # 6
+        "HeatPump:WaterToWater:EquationFit:Heating",         # 7
+        "HeatPump:WaterToWater:EquationFit:Cooling",         # 8
+        "HeatPump:WaterToWater:ParameterEstimation:Heating", # 9
+        "HeatPump:WaterToWater:ParameterEstimation:Cooling", # 10
+        "HVACTemplate:Zone:PTAC",                            # 11
+        "HVACTemplate:Zone:PTHP",                            # 12
+        "HVACTemplate:Zone:WaterToAirHeatPump",              # 13
+        "HVACTemplate:System:Unitary",                       # 14
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir"       # 15
+    )
+
+    new_idf <- trans_preprocess(idf, 8.1, target_cls)
+
+    # 1: People {{{
+    dt1 <- trans_action(idf, "People",
+        insert = list(16L, "ClothingInsulationSchedule"),
+        insert = list(17L)
+    )
+    # }}}
+    # 2: CoolingTower:SingleSpeed {{{
+    dt2 <- trans_action(idf, class = "CoolingTower:SingleSpeed", min_fields = 12L,
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        reset = list(10L, "autosize", "Autocalculate"),
+        insert = list(11L),
+        insert = list(13L),
+        insert = list(16L)
+    )
+    # }}}
+    # 3: CoolingTower:TwoSpeed {{{
+    dt3 <- trans_action(idf, "CoolingTower:TwoSpeed", min_fields = 16L,
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        reset = list(10L, "autosize", "Autocalculate"),
+        insert = list(11L),
+        insert = list(13L),
+        reset = list(14L, "autosize", "Autocalculate"),
+        insert = list(15L),
+        reset = list(16L, "autosize", "Autocalculate"),
+        insert = list(17L),
+        insert = list(19L),
+        insert = list(22L),
+        insert = list(24L)
+    )
+    # }}}
+    # 4: EvaporativeFluidCooler:SingleSpeed {{{
+    dt4 <- trans_action(idf, "EvaporativeFluidCooler:SingleSpeed", min_fields = 9L,
+        insert = list(9L)
+    )
+    # }}}
+    # 5: EvaporativeFluidCooler:TwoSpeed {{{
+    dt5 <- trans_action(idf, "EvaporativeFluidCooler:TwoSpeed", min_fields = 17L,
+        reset = list(6L, "autosize", "Autocalculate"),
+        insert = list(7L),
+        reset = list(8L, "autosize", "Autocalculate"),
+        insert = list(9L),
+        insert = list(13L),
+        insert = list(16L),
+        reset = list(18L, "autosize", "Autocalculate"),
+        insert = list(19L),
+        insert = list(23L)
+    )
+    # }}}
+    # 6: FluidCooler:TwoSpeed {{{
+    dt6 <- trans_action(idf, "FluidCooler:TwoSpeed", min_fields = 16L,
+        reset = list(6L, "autosize", "Autocalculate"),
+        insert = list(7L),
+        insert = list(10L),
+        reset = list(17L, "autosize", "Autocalculate"),
+        insert = list(18L),
+        reset = list(19L, "autosize", "Autocalculate"),
+        insert = list(20L)
+    )
+    # }}}
+    # 7: HeatPump:WaterToWater:EquationFit:Heating {{{
+    dt7 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Heating", min_fields = 19L,
+        delete = list(20L)
+    )
+    # }}}
+    # 8: HeatPump:WaterToWater:EquationFit:Cooling {{{
+    dt8 <- trans_action(idf, "HeatPump:WaterToWater:EquationFit:Cooling", min_fields = 19L,
+        delete = list(20L)
+    )
+    # }}}
+    # 9: HeatPump:WaterToWater:ParameterEstimation:Heating {{{
+    dt9 <- trans_action(idf, "HeatPump:WaterToWater:ParameterEstimation:Heating", min_fields = 20L,
+        delete = list(23L)
+    )
+    # }}}
+    # 10: HeatPump:WaterToWater:ParameterEstimation:Cooling {{{
+    dt10 <- trans_action(idf, "HeatPump:WaterToWater:ParameterEstimation:Cooling", min_fields = 20L,
+        delete = list(23L)
+    )
+    # }}}
+
+    # Add `Any Number` ScheduleTypeLimits {{{
+    if (any(idf$is_valid_class(c(
+        "HVACTemplate:Zone:PTAC", "HVACTemplate:Zone:PTHP",
+        "HVACTemplate:Zone:WaterToAirHeatPump", "HVACTemplate:System:Unitary",
+        "HVACTemplate:System:UnitaryHeatPump:AirToAir"
+    )))) {
+        # check if there are any `Any Number` ScheduleTypeLimits objects
+        if (idf$is_valid_class("ScheduleTypeLimits")) {
+            nm_schtype <- idf$object_name(class = "ScheduleTypeLimits", simplify = TRUE)
+            if (!any(stri_trans_tolower(nm_schtype) == "any number")) {
+                new_idf$add(ScheduleTypeLimits = list("Any Number"))
+            }
+        } else {
+            new_idf$add(ScheduleTypeLimits = list("Any Number"))
+        }
+    }
+    # }}}
+    # update_hvactemplate_fan {{{
+    update_hvactemplate_fan <- function (new_idf, idf, class, min_fields) {
+        dt <- trans_action(idf, class = class, min_fields = min_fields)
+
+        if (!nrow(dt)) return(dt)
+
+        dt[, value := {
+            if (!is.na(value[min_fields])) {
+                if (stri_trans_tolower(value[min_fields]) == "cycling") {
+                    sch <- "CyclingFanSchedule"
+                    len <- 100L - nchar(paste0(class, sch)) - 1L
+                    nm <- stri_sub(value[1L], to = len)
+                    if (is.na(nm)) nm <- ""
+                    value[min_fields] <- paste0(class, nm, sch)
+                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", "0"))
+                } else if (stri_trans_tolower(value[min_fields]) == "continuous") {
+                    sch <- "ContinuousFanSchedule"
+                    len <- 100L - nchar(paste0(class, sch)) - 1L
+                    nm <- stri_sub(value[1L], to = len)
+                    if (is.na(nm)) nm <- ""
+                    value[min_fields] <- paste0(class, nm, sch)
+                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", "1"))
+                }
+            }
+            value
+        }, by = "id"]
+
+        dt
+    }
+    # }}}
+    # 11: HVACTemplate:Zone:PTAC {{{
+    dt11 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:Zone:PTAC", min_fields = 13L)
+    # }}}
+    # 12: HVACTemplate:Zone:PTHP {{{
+    dt12 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:Zone:PTHP", min_fields = 13L)
+    # }}}
+    # 13: HVACTemplate:Zone:WaterToAirHeatPump {{{
+    dt13 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:Zone:WaterToAirHeatPump", min_fields = 13L)
+    # }}}
+    # 14: HVACTemplate:System:Unitary {{{
+    dt14 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:System:Unitary", min_fields = 5L)
+    # }}}
+    # 15: HVACTemplate:System:UnitaryHeatPump:AirToAir {{{
+    dt15 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:System:UnitaryHeatPump:AirToAir", min_fields = 7L)
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:15)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_810_820 {{{
+trans_funs$f810t820 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.1)
+
+    target_cls <- c(
+        "ZoneHVAC:UnitVentilator",                       # 1
+        "ZoneHVAC:UnitHeater",                           # 2
+        "PlantLoop",                                     # 3
+        "CondenserLoop",                                 # 4
+        "HVACTemplate:Plant:ChilledWaterLoop",           # 5
+        "HVACTemplate:Plant:HotWaterLoop",               # 6
+        "HVACTemplate:Plant:MixedWaterLoop",             # 7
+        "Sizing:System",                                 # 8
+        "ZoneHVAC:Baseboard:RadiantConvective:Water",    # 9
+        "ZoneHVAC:HighTemperatureRadiant",               # 10
+        "ZoneHVAC:Baseboard:RadiantConvective:Steam",    # 11
+        "ZoneHVAC:Baseboard:RadiantConvective:Electric", # 12
+        "ZoneHVAC:Baseboard:Convective:Water",           # 13
+        "ZoneHVAC:Baseboard:Convective:Electric",        # 14
+        "ZoneHVAC:LowTemperatureRadiant:VariableFlow",   # 15
+        "ZoneHVAC:LowTemperatureRadiant:Electric"        # 16
+    )
+
+    new_idf <- trans_preprocess(idf, 8.2, target_cls)
+
+    # 1: ZoneHVAC:UnitVentilator {{{
+    dt1 <- trans_action(idf, "ZoneHVAC:UnitVentilator", min_fields = 16L,
+        insert = list(17L)
+    )
+    # }}}
+    # 2: ZoneHVAC:UnitHeater {{{
+    dt2 <- trans_action(idf, class = "ZoneHVAC:UnitHeater", all = TRUE,
+        offset = list(8L, 11L),
+        insert = list(10L)
+    )
+    if (nrow(dt2)) {
+        dt2[J(11L), on = "index", value := {
+            value[stri_trans_tolower(value) == "onoff"] <- "No"
+            value[stri_trans_tolower(value) == "continuous"] <- "Yes"
+            if (any(!value %in% c("No", "Yes"))) {
+                warn("warning_trans_810_820",
+                    "Invalid fan control type in original v8.1 idf...expected onoff or continuous...assuming onoff"
+                )
+                value[!value %in% c("No", "Yes")] <- "No"
+            }
+        }]
+    }
+    # }}}
+    # 3: PlantLoop {{{
+    dt3 <- trans_action(idf, "PlantLoop", min_fields = 19L,
+        reset = list(19L, "Sequential", "SequentialLoad"),
+        reset = list(19L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 4: CondenserLoop {{{
+    dt4 <- trans_action(idf, "CondenserLoop", min_fields = 19L,
+        reset = list(19L, "Sequential", "SequentialLoad"),
+        reset = list(19L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 5: HVACTemplate:Plant:ChilledWaterLoop {{{
+    dt5 <- trans_action(idf, "HVACTemplate:Plant:ChilledWaterLoop", min_fields = 33L,
+        reset = list(32L, "Sequential", "SequentialLoad"),
+        reset = list(32L, "Uniform", "UniformLoad"),
+        reset = list(33L, "Sequential", "SequentialLoad"),
+        reset = list(33L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 6: HVACTemplate:Plant:HotWaterLoop {{{
+    dt6 <- trans_action(idf, "HVACTemplate:Plant:HotWaterLoop", min_fields = 21L,
+        reset = list(21L, "Sequential", "SequentialLoad"),
+        reset = list(21L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 7: HVACTemplate:Plant:MixedWaterLoop {{{
+    dt7 <- trans_action(idf, "HVACTemplate:Plant:MixedWaterLoop", min_fields = 17L,
+        reset = list(17L, "Sequential", "SequentialLoad"),
+        reset = list(17L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 8: Sizing:System {{{
+    dt8 <- trans_action(idf, "Sizing:System", min_fields = 21L,
+        insert = list(18:20),
+        insert = list(23:26)
+    )
+    # }}}
+    # 9: ZoneHVAC:Baseboard:RadiantConvective:Water {{{
+    dt9 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Water", min_fields = 8L,
+        insert = list(7L, "HeatingDesignCapacity"),
+        insert = list(9:10)
+    )
+    # }}}
+    # 10: ZoneHVAC:HighTemperatureRadiant {{{
+    dt10 <- trans_action(idf, "ZoneHVAC:HighTemperatureRadiant", min_fields = 4L,
+        insert = list(4L, "HeatingDesignCapacity"),
+        insert = list(6:7)
+    )
+    # }}}
+    # 11: ZoneHVAC:Baseboard:RadiantConvective:Steam {{{
+    dt11 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Steam", min_fields = 4L,
+        insert = list(5L, "HeatingDesignCapacity"),
+        insert = list(6L, "Autosize"),
+        insert = list(7:8)
+    )
+    # }}}
+    # 12: ZoneHVAC:Baseboard:RadiantConvective:Electric {{{
+    dt12 <- trans_action(idf, "ZoneHVAC:Baseboard:RadiantConvective:Electric", min_fields = 3L,
+        insert = list(3L, "HeatingDesignCapacity"),
+        insert = list(5:6)
+    )
+    # }}}
+    # 13: ZoneHVAC:Baseboard:Convective:Water {{{
+    dt13 <- trans_action(idf, "ZoneHVAC:Baseboard:Convective:Water", min_fields = 4L,
+        insert = list(5L, "HeatingDesignCapacity"),
+        insert = list(6L, "Autosize"),
+        insert = list(7:8)
+    )
+    # }}}
+    # 14: ZoneHVAC:Baseboard:Convective:Electric {{{
+    dt14 <- trans_action(idf, "ZoneHVAC:Baseboard:Convective:Electric", min_fields = 4L,
+        insert = list(3L, "HeatingDesignCapacity"),
+        insert = list(5:6)
+    )
+    # }}}
+    # 15: ZoneHVAC:LowTemperatureRadiant:VariableFlow {{{
+    dt15 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:VariableFlow", min_fields = 12L,
+        insert = list(8L, "HeatingDesignCapacity"),
+        insert = list(9L, "Autosize"),
+        insert = list(10:11),
+        insert = list(17L, "CoolingDesignCapacity"),
+        insert = list(18L, "Autosize"),
+        insert = list(19:20)
+    )
+    # }}}
+    # 16: ZoneHVAC:LowTemperatureRadiant:Electric {{{
+    dt16 <- trans_action(idf, "ZoneHVAC:LowTemperatureRadiant:Electric", min_fields = 5L,
+        insert = list(5L, "HeatingDesignCapacity"),
+        insert = list(7:8)
+    )
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:16)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_820_830 {{{
+trans_funs$f820t830 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.2)
+
+    target_cls <- c(
+        "Chiller:Electric:ReformulatedEIR",           # 1
+        "Site:GroundDomain",                          # 2
+        "GroundHeatExchanger:Vertical",               # 3
+        "EvaporativeCooler:Indirect:ResearchSpecial", # 4
+        "EvaporativeCooler:Direct:ResearchSpecial"    # 5
+    )
+
+    new_idf <- trans_preprocess(idf, 8.3, target_cls)
+
+    # 1: Chiller:Electric:ReformulatedEIR {{{
+    dt1 <- trans_action(idf, "Chiller:Electric:ReformulatedEIR", min_fields = 10L,
+        insert = list(10L, "LeavingCondenserWaterTemperature")
+    )
+    # }}}
+    # 2: Site:GroundDomain {{{
+    dt2 <- trans_action(idf, class = c("Site:GroundDomain:Slab" = "Site:GroundDomain"))
+    # }}}
+    # 3: GroundHeatExchanger:Vertical {{{
+    dt3 <- trans_action(idf, "GroundHeatExchanger:Vertical", offset = list(11L, 4L))
+    if (nrow(dt3)) dt3[index > 10L, index := index - 1L]
+    # }}}
+    # 4: EvaporativeCooler:Indirect:ResearchSpecial {{{
+    dt4 <- trans_action(idf, "EvaporativeCooler:Indirect:ResearchSpecial", all = TRUE,
+        reset = list(4L, NA_character_),
+        insert = list(5L:6L),
+        insert = list(8L:9L),
+        insert = list(11L, "1.0"),
+        insert = list(12L, "Autosize"),
+        reset = list(17L, "Autosize"),
+        insert = list(20L)
+    )
+    if (nrow(dt4)) {
+        dt4[J(c(13L:14L)), on = "index", value := {
+            val <- suppressWarnings(as.double(value))
+            value[1L] <- sprintf("%.5f", val[[2L]] / val[[1L]])
+            value[2L] <- NA_character_
+            value
+        }, by = "id"]
+    }
+    # }}}
+    # 5: EvaporativeCooler:Direct:ResearchSpecial {{{
+    dt5 <- trans_action(idf, "EvaporativeCooler:Direct:ResearchSpecial",
+        insert = list(4L),
+        insert = list(6L:7L)
+    )
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:5)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_830_840 {{{
+trans_funs$f830t840 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.3)
+
+    target_cls <- c(
+        "Coil:WaterHeating:AirToWaterHeatPump",     # 1
+        "WaterHeater:Stratified",                   # 2
+        "WaterHeater:HeatPump",                     # 3
+        "Branch",                                   # 4
+        "ZoneHVAC:EquipmentList",                   # 5
+        "PlantEquipmentList",                       # 6
+        "EvaporativeCooler:Direct:ResearchSpecial", # 7
+        "Controller:MechanicalVentilation",         # 8
+        "Site:GroundDomain:Slab",                   # 9
+        "Site:GroundDomain:Basement",               # 10
+        "PipingSystem:Underground:Domain",          # 11
+        "Pipe:Underground",                         # 12
+        "GroundHeatExchanger:HorizontalTrench",     # 13
+        "GroundHeatExchanger:Slinky",               # 14
+        "HVACTemplate:Plant:ChilledWaterLoop",      # 15
+        "HVACTemplate:Plant:HotWaterLoop",          # 16
+        "HVACTemplate:Plant:MixedWaterLoop",        # 17
+        "ZoneAirMassFlowConservation"               # 18
+    )
+
+    new_idf <- trans_preprocess(idf, 8.4, target_cls)
+
+    # 1: Coil:WaterHeating:AirToWaterHeatPump {{{
+    dt1 <- trans_action(idf, class = c("Coil:WaterHeating:AirToWaterHeatPump:Pumped" = "Coil:WaterHeating:AirToWaterHeatPump"))
+    # }}}
+    # 2: WaterHeater:Stratified {{{
+    dt2 <- trans_action(idf, "WaterHeater:Stratified", all = TRUE, insert = list(64L:65L))
+    # }}}
+    # 3: WaterHeater:HeatPump {{{
+    dt3 <- trans_action(idf, all = TRUE,
+        class = c("WaterHeater:HeatPump:PumpedCondenser" = "WaterHeater:HeatPump"),
+        reset = list(21L, "Coil:WaterHeating:AirToWaterHeatPump", "Coil:WaterHeating:AirToWaterHeatPump:Pumped"),
+        insert = list(24L),
+        add = list(37L:39L)
+    )
+    if (nrow(dt3)) {
+        dt3[, value := {
+            if (is.na(value[17L])) {
+                heater_num <- 0L
+            } else if (stri_trans_tolower(value[17L]) == "waterheater:stratified") {
+                heater_num <- 0L
+            } else if (stri_trans_tolower(value[36L]) == "heater1") {
+                heater_num <- 1L
+            } else if (stri_trans_tolower(value[36L]) == "heater2") {
+                heater_num <- 2L
+            } else {
+                heater_num <- 0L
+            }
+            value[36L] <- NA_character_
+
+            if (heater_num > 0L) {
+                tank <- idf$object(.BY$id)$ref_to_object(18L)[[1L]]
+                if (length(tank)) {
+                    if (stri_trans_tolower(tank$class_name()) == "waterheater:stratified") {
+                        if (heater_num == 1L) {
+                            value[37L] <- as.character(tank$Heater_1_Height)
+                        } else {
+                            value[37L] <- as.character(tank$Heater_2_Height)
+                        }
+                    }
+                }
+            }
+            value
+
+        }, by = "id"]
+    }
+    # }}}
+    # 4: Branch {{{
+    dt4 <- trans_action(idf, "Branch")
+    if (nrow(dt4)) {
+        dt4[(index - 4L) %% 5L == 0L & stri_trans_tolower(value) == "waterheater:heatpump",
+            value := "WaterHeater:HeatPump:PumpedCondenser"
+        ]
+    }
+    # }}}
+    # 5: ZoneHVAC:EquipmentList {{{
+    dt5 <- trans_action(idf, "ZoneHVAC:EquipmentList")
+    if (nrow(dt5)) {
+        dt5[(index - 2L) %% 4L == 0L & stri_trans_tolower(value) == "waterheater:heatpump",
+            value := "WaterHeater:HeatPump:PumpedCondenser"
+        ]
+    }
+    # }}}
+    # 6: PlantEquipmentList {{{
+    dt6 <- trans_action(idf, "PlantEquipmentList")
+    if (nrow(dt6)) {
+        dt6[(index - 2L) %% 2L == 0L & stri_trans_tolower(value) == "waterheater:heatpump",
+            value := "WaterHeater:HeatPump:PumpedCondenser"
+        ]
+    }
+    # }}}
+    # 7: EvaporativeCooler:Direct:ResearchSpecial {{{
+    dt7 <- trans_action(idf, "EvaporativeCooler:Direct:ResearchSpecial", min_fields = 5L,
+        insert = list(5L, "Autosize")
+    )
+    # }}}
+    # 8: Controller:MechanicalVentilation {{{
+    dt8 <- trans_action(idf, "Controller:MechanicalVentilation",
+        reset = list(4L, "ProportionalControl", "ProportionalControlBasedonOccupancySchedule")
+    )
+    # }}}
+    ka_num <- 0L
+    # 9: Site:GroundDomain:Slab {{{
+    dt9 <- trans_action(idf, "Site:GroundDomain:Slab", all = TRUE)
+    if (nrow(dt9)) {
+        dt9_2 <- dt9[J(c(1L, 5L:7L, 10L:12L)), on = "index"]
+        set(dt9_2, NULL, "index", rowidv(dt9_2, "id"))
+        set(dt9_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt9_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+
+        dt9_1 <- dt9[!J(12L), on = "index"][
+            J(10L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(11L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt9_1, NULL, "index", rowidv(dt9_1, "id"))
+
+        dt9 <- rbindlist(list(dt9_1, dt9_2))
+        ka_num <- ka_num + length(unique(dt9_1$id))
+    }
+    # }}}
+    # 10: Site:GroundDomain:Basement {{{
+    dt10 <- trans_action(idf, "Site:GroundDomain:Basement", all = TRUE)
+    if (nrow(dt10)) {
+        dt10_2 <- dt10[J(c(1L, 5L:7L, 10L:12L)), on = "index"]
+        set(dt10_2, NULL, "index", rowidv(dt10_2, "id"))
+        set(dt10_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt10_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+
+        dt10_1 <- dt10[!J(12L), on = "index"][
+            J(10L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(11L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt10_1, NULL, "index", rowidv(dt10_1, "id"))
+
+        dt10 <- rbindlist(list(dt10_1, dt10_2))
+        ka_num <- ka_num + length(unique(dt10_1$id))
+    }
+    # }}}
+    # 11: PipingSystem:Underground:Domain {{{
+    dt11 <- trans_action(idf, "PipingSystem:Underground:Domain", all = TRUE)
+    if (nrow(dt11)) {
+        dt11_2 <- dt11[J(c(1L, 14L:16L, 19L:21L)), on = "index"]
+        set(dt11_2, NULL, "index", rowidv(dt11_2, "id"))
+        set(dt11_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt11_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+
+        dt11_1 <- dt11[!J(21L), on = "index"][
+            J(19L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(20L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt11_1, NULL, "index", rowidv(dt11_1, "id"))
+
+        dt11 <- rbindlist(list(dt11_1, dt11_2))
+        ka_num <- ka_num + length(unique(dt11_1$id))
+    }
+    # }}}
+    # 12: Pipe:Underground {{{
+    dt12 <- trans_action(idf, "Pipe:Underground", all = TRUE)
+    if (nrow(dt12)) {
+        dt12_2 <- dt12[J(c(1L:3L, 8L:11L)), on = "index"]
+        set(dt12_2, NULL, "index", rowidv(dt12_2, "id"))
+        set(dt12_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt12_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        dt12_2[J(c(2L:4L)), on = "index", value := {
+            # get material properties
+            mat <- idf$object(.BY$id)$ref_to_object(8L, "Material")[[1L]]
+            if (length(mat)) {
+                value <- mat$value(simplify = TRUE)[2L:4L]
+            }
+            value
+        }, by = "id"]
+
+        dt12_1 <- dt12[!J(11L), on = "index"][
+            J(9L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(10L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt12_1, NULL, "index", rowidv(dt12_1, "id"))
+
+        dt12 <- rbindlist(list(dt12_1, dt12_2))
+        ka_num <- ka_num + length(unique(dt12_1$id))
+    }
+    # }}}
+    # 13: GroundHeatExchanger:HorizontalTrench {{{
+    dt13 <- trans_action(idf, "GroundHeatExchanger:HorizontalTrench", all = TRUE)
+    if (nrow(dt13)) {
+        dt13_2 <- dt13[J(c(1L, 11L:13L, 19L:21L)), on = "index"]
+        set(dt13_2, NULL, "index", rowidv(dt13_2, "id"))
+        set(dt13_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt13_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+
+        dt13_1 <- dt13[!J(21L), on = "index"][
+            J(19L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(20L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt13_1, NULL, "index", rowidv(dt13_1, "id"))
+
+        dt13 <- rbindlist(list(dt13_1, dt13_2))
+        ka_num <- ka_num + length(unique(dt13_1$id))
+    }
+    # }}}
+    # 14: GroundHeatExchanger:Slinky {{{
+    dt14 <- trans_action(idf, "GroundHeatExchanger:Slinky", all = TRUE)
+    if (nrow(dt14)) {
+        dt14_2 <- dt14[J(c(1L, 5L:7L, 20L:22L)), on = "index"]
+        set(dt14_2, NULL, "index", rowidv(dt14_2, "id"))
+        set(dt14_2, NULL, "class", "Site:GroundTemperature:Undisturbed:KusudaAchenbach")
+        dt14_2[J(1L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+
+        dt14_1 <- dt14[!J(22L), on = "index"][
+            J(20L), on = "index", value := "Site:GroundTemperature:Undisturbed:KusudaAchenbach"][
+            J(21L), on = "index", value := paste("KATemp", seq.int(.N) + ka_num)]
+        set(dt14_1, NULL, "index", rowidv(dt14_1, "id"))
+
+        dt14 <- rbindlist(list(dt14_1, dt14_2))
+        ka_num <- ka_num + length(unique(dt14_1$id))
+    }
+    # }}}
+    # 15: HVACTemplate:Plant:ChilledWaterLoop {{{
+    dt15 <- trans_action(idf, "HVACTemplate:Plant:ChilledWaterLoop",
+        reset = list(32L, "Sequential", "SequentialLoad"),
+        reset = list(32L, "Uniform", "UniformLoad"),
+        reset = list(33L, "Sequential", "SequentialLoad"),
+        reset = list(33L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 16: HVACTemplate:Plant:HotWaterLoop {{{
+    dt16 <- trans_action(idf, "HVACTemplate:Plant:HotWaterLoop",
+        reset = list(21L, "Sequential", "SequentialLoad"),
+        reset = list(21L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 17: HVACTemplate:Plant:MixedWaterLoop {{{
+    dt17 <- trans_action(idf, "HVACTemplate:Plant:MixedWaterLoop",
+        reset = list(17L, "Sequential", "SequentialLoad"),
+        reset = list(17L, "Uniform", "UniformLoad")
+    )
+    # }}}
+    # 18: ZoneAirMassFlowConservation {{{
+    dt18 <- trans_action(idf, "ZoneAirMassFlowConservation",
+        add = list(3L, "MixingSourceZonesOnly")
+    )
+    if (nrow(dt18)) {
+        dt18[, value := {
+            if (stri_trans_tolower(value[1L]) != "yes") {
+                value[2L] <- "None"
+            }
+            value
+        }, by = "id"]
+    }
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:18)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_840_850 {{{
+trans_funs$f840t850 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.4)
+
+    target_cls <- c(
+        "EnergyManagementSystem:Actuator" # 1
+    )
+
+    new_idf <- trans_preprocess(idf, 8.5, target_cls)
+
+    # 1: EnergyManagementSystem:Actuator {{{
+    dt <- trans_action(idf, "EnergyManagementSystem:Actuator",
+        reset = list(4L, "outdoor air dryblub temperature", "Outdoor Air Drybulb Temperature"),
+        reset = list(4L, "outdoor air wetblub temperature", "Outdoor Air Wetbulb Temperature")
+    )
+    # }}}
+
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_850_860 {{{
+trans_funs$f850t860 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.5)
+
+    target_cls <- c(
+        "Exterior:FuelEquipment",                             # 1
+        "HVACTemplate:System:UnitarySystem",                  # 2
+        "HVACTemplate:System:Unitary",                        # 3
+        "ChillerHeater:Absorption:DirectFired",               # 4
+        "SetpointManager:SingleZone:Humidity:Minimum",        # 5
+        "SetpointManager:SingleZone:Humidity:Maximum",        # 6
+        "AirTerminal:SingleDuct:VAV:Reheat",                  # 7
+        "Branch",                                             # 8
+        "AirTerminal:SingleDuct:InletSideMixer",              # 9
+        "AirTerminal:SingleDuct:SupplySideMixer",             # 10
+        "ZoneHVAC:AirDistributionUnit",                       # 11
+        "OtherEquipment",                                     # 12
+        "Coil:Heating:Gas",                                   # 13
+        "Daylighting:Controls",                               # 14
+        "Daylighting:DELight:ReferencePoint",                 # 15
+        "Daylighting:DELight:Controls",                       # 16
+        "MaterialProperty:MoisturePenetrationDepth:Settings", # 17
+        "EnergyManagementSystem:Actuator"                     # 18
+    )
+
+    new_idf <- trans_preprocess(idf, 8.6, target_cls)
+
+    # 1: Exterior:FuelEquipment {{{
+    dt1 <- trans_action(idf, "Exterior:FuelEquipment",
+        reset = list(2L, "Gas", "NaturalGas"),
+        reset = list(2L, "LPG", "PropaneGas")
+    )
+    # }}}
+    # 2: HVACTemplate:System:UnitarySystem {{{
+    dt2 <- trans_action(idf, "HVACTemplate:System:UnitarySystem", all = TRUE, delete = list(57))
+    if (nrow(dt2)) dt2[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 3: HVACTemplate:System:Unitary {{{
+    dt3 <- trans_action(idf, "HVACTemplate:System:Unitary", all = TRUE, delete = list(40L))
+    if (nrow(dt3)) dt3[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 4: ChillerHeater:Absorption:DirectFired {{{
+    dt4 <- trans_action(idf, "ChillerHeater:Absorption:DirectFired", delete = list(33L))
+    if (nrow(dt4)) dt4[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 5: SetpointManager:SingleZone:Humidity:Minimum {{{
+    dt5 <- trans_action(idf, "SetpointManager:SingleZone:Humidity:Minimum", delete = list(2:3))
+    if (nrow(dt5)) dt5[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 6: SetpointManager:SingleZone:Humidity:Maximum {{{
+    dt6 <- trans_action(idf, "SetpointManager:SingleZone:Humidity:Maximum", delete = list(2:3))
+    if (nrow(dt2)) dt6[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 7: AirTerminal:SingleDuct:VAV:Reheat {{{
+    dt7 <- trans_action(idf, "AirTerminal:SingleDuct:VAV:Reheat", all = TRUE)
+    if (nrow(dt7)) {
+        dt7[, value := {
+            if (!anyNA(value[16L:18L]) & stri_trans_tolower(value[16]) == "reverse") {
+                value[16] <- "ReverseWithLimits"
+            }
+            value
+        }, by = "id"]
+    }
+    # }}}
+    # 8: Branch {{{
+    dt8 <- trans_action(idf, "Branch", delete = list(2), delete = list(8, step = 5))
+    if (nrow(dt8)) dt8[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 9: AirTerminal:SingleDuct:InletSideMixer {{{
+    dt9 <- trans_action(idf, all = TRUE,
+        class = c("AirTerminal:SingleDuct:Mixer" = "AirTerminal:SingleDuct:InletSideMixer"),
+        add = list(7L, "InletSide")
+    )
+    # }}}
+    # 10: AirTerminal:SingleDuct:SupplySideMixer {{{
+    dt10 <- trans_action(idf, all = TRUE,
+        class = c("AirTerminal:SingleDuct:Mixer" = "AirTerminal:SingleDuct:SupplySideMixer"),
+        add = list(7L, "SupplySide")
+    )
+    # }}}
+    # 11: ZoneHVAC:AirDistributionUnit {{{
+    dt11 <- trans_action(idf, "ZoneHVAC:AirDistributionUnit", all = TRUE,
+        reset = list(3L, "AirTerminal:SingleDuct:InletSideMixer", "AirTerminal:SingleDuct:InletSideMixer"),
+        reset = list(3L, "AirTerminal:SingleDuct:SupplySideMixer", "AirTerminal:SingleDuct:InletSideMixer")
+    )
+    # }}}
+    # 12: OtherEquipment {{{
+    dt12 <- trans_action(idf, "OtherEquipment", insert = list(2L, "None"))
+    # }}}
+    # 13: Coil:Heating:Gas {{{
+    dt13 <- trans_action(idf, min_fields = 2L,
+        class = c("Coil:Heating:Fuel" = "Coil:Heating:Gas"),
+        insert = list(3L, "NaturalGas"))
+    # }}}
+    # 14: Daylighting:Controls {{{
+    dt14_1 <- trans_action(idf, "Daylighting:Controls", all = TRUE,
+        offset = list(
+            c(20L, 16:19, 13L, 14:15, 9L,  11L, 10L, 12L),
+            c(4L,  6:9,   5L,  11:12, 15L, 16L, 18L, 19L)
+        ),
+        add = list(c(10L, 13L, 14L, 17L)),
+        reset = list(3, "SplitFlux"),
+        reset = list(8, "0", NA_character_),
+        reset = list(13, NA_character_)
+    )
+
+    if (!nrow(dt14_1)) {
+        dt14_2 <- data.table()
+        dt14_3 <- data.table()
+    } else {
+        dt14_1[, value := {
+            nm <- if (is.na(value[1L])) "" else value[1L]
+            value[10L] <- paste0(nm, "_DaylRefPt1")
+            value[14L] <- paste0(nm, "_DaylRefPt1")
+            if (value[2L] == "2") {
+                value[17L] <- paste0(nm, "_DaylRefPt2")
+            } else {
+                value[17L:19L] <- NA_character_
+            }
+            value[2L] <- value[1L]
+            value[1L] <- paste0(nm, "_DaylCtrl")
+
+            value
+        }, by = "id"]
+
+        # remove #2 ref point if applicable
+        obj_id <- dt14_1[J(17L:19L), on = "index", list(all(is.na(value))), by = "id"][V1 == TRUE, id]
+        if (length(obj_id)) {
+            dt14_1 <- dt14_1[!data.table::CJ(id = obj_id, index = 17L:19L), on = c("id", "index")]
+        }
+
+        dt14_1[J(5L), on = "index", value := {
+            if (is.na(value)) {
+                "Continuous"
+            } else if (value == "1") {
+                "Continuous"
+            } else if (value == "2") {
+                "Stepped"
+            } else if (value == "3") {
+                "ContinuousOff"
+            } else {
+                "Continuous"
+            }
+        }, by = "id"]
+
+        # add reference points
+        dt14_2 <- trans_action(idf, all = TRUE,
+            class = c("Daylighting:ReferencePoint" = "Daylighting:Controls")
+        )
+        dt14_3 <- dt14_2[J(c(1L, 2L, 6L:8L)), on = "index"]
+
+        dt14_2 <- dt14_2[index <= 5L]
+        dt14_2[, value := {
+            value[2L] <- value[1L]
+            value[1L] <- if (is.na(value[1L])) "_DaylRefPt1" else paste0(value[1L], "_DaylRefPt1")
+            value
+        }, by = "id"]
+
+        obj_id <- dt14_3[J(2L, "2"), on = c("index", "value"), id, nomatch = 0L]
+        if (!length(obj_id)) {
+            dt14_3 <- data.table()
+        } else {
+            dt14_3 <- dt14_3[J(obj_id), on = "id"][
+                J(c(6L:8L)), on = "index", value := c(3L:5L), by = "id"
+            ][, value := {
+                value[2L] <- value[1L]
+                value[1L] <- if (is.na(value[1L])) "_DaylRefPt2" else paste0(value[1L], "_DaylRefPt2")
+                value
+            }, by = "id"]
+        }
+    }
+    dt14 <- rbindlist(list(dt14_1, dt14_2, dt14_3))
+    # }}}
+    # 15: Daylighting:DELight:ReferencePoint {{{
+    dt15 <- trans_action(idf, min_fields = 5L,
+        class = c("Daylighting:ReferencePoint" = "Daylighting:DELight:ReferencePoint")
+    )
+    if (nrow(dt15)) {
+        dt15 <- dt15[index <= 5L]
+        nm_zone <- vcapply(unique(dt15$id),
+            function (id) {
+                zone <- idf$object(id)$ref_to_object(2L, class = "Zone", recursive = TRUE)[[1L]]
+                if (!length(zone)) NA_character_ else zone$name()
+            }
+        )
+        dt15[J(2L), on = "index", value := nm_zone]
+    }
+    # }}}
+    # 16: Daylighting:DElight:Controls {{{
+    dt16 <- trans_action(idf, all = TRUE,
+        class = c("Daylighting:Controls" = "Daylighting:DELight:Controls"),
+        insert = list(3L, "DElight"),
+        insert = list(4L, NA_character_),
+        add = list(11L:13L, c("0", NA_character_, NA_character_))
+    )
+    if (nrow(dt16)) {
+        dt16_1 <- dt16[index <= 13L][, value := {
+            if (is.na(value[5L])) {
+                value[5L] <- "Continuous"
+            } else if (value[5L] == "1") {
+                value[5L] <- "Continuous"
+            } else if (value[5L] == "2") {
+                value[5L] <- "Stepped"
+            } else if (value[5L] == "3") {
+                value[5L] <- "ContinuousOff"
+            } else {
+                value[5L] <- "Continuous"
+            }
+
+            val <- value[8L]
+            if (!is.na(value[8L]) && value[8L] == "0") value[8L] <- NA_character_
+            value[13L] <- value[10L]
+            value[10L] <- NA_character_
+
+            value
+        }, by = "id"]
+
+        # extract reference point name, zone name, and illuminance setpoint
+        dt16_2 <- lapply(unique(dt16_1$id),
+            function (id) {
+                refp <- idf$object(id)$ref_by_object(1L, "Daylighting:DELight:ReferencePoint")
+                if (!length(refp)) {
+                    data.table()
+                } else {
+                    dt <- rbindlist(lapply(refp, function (x) x$to_table()))[index %in% c(1L, 6L, 7L)]
+                    # update object id
+                    set(dt, NULL, "id", id)
+                    set(dt, NULL, "class", "Daylighting:Controls")
+                    set(dt, NULL, "index", seq.int(nrow(dt)) + 13L)
+                }
+            }
+        )
+
+        dt16 <- rbindlist(c(list(dt16_1), dt16_2))
+    }
+    # }}}
+    # 17: MaterialProperty:MoisturePenetrationDepth:Settings {{{
+    dt17 <- trans_action(idf, all = TRUE,
+        class = "MaterialProperty:MoisturePenetrationDepth:Settings",
+        add = list(7L:10L, "0")
+    )
+    if (nrow(dt17)) {
+        # cal_mu_empd {{{
+        # reference: CalculateMuEMPD() in UtilityRoutines.f90 under Transition
+        cal_mu_empd <- function (a, b, c, d, d_empd, density) {
+            TEMP <- 24
+            RH <- 0.45
+            P_ambient <- 101325
+            Seconds <- 24L * 60L * 60L
+
+            slope_MC <- a * b * RH ** (b - 1) + c * d * RH ** (d - 1)
+            PV_sat = psat_fn_tdb(TEMP) * 1000
+            diffusivity_EMPD = d_empd ** 2 * 3.1415926535 * slope_MC * density / (Seconds * PV_sat)
+            diffusivity_air = 2.0e-7 * (TEMP + 273.15) ** 0.81 / P_ambient
+            diffusivity_air / diffusivity_EMPD
+        }
+        # }}}
+        # psat_fn_tdb {{{
+        # reference: GetSatVapPressFromDryBulb() in UtilityRoutines.f90 under Transition
+        psat_fn_tdb <- function (tdb) {
+            tk <- tdb + 273.15
+            C1 <- -5674.5359
+            C2 <- 6.3925247
+            C3 <- -0.009677843
+            C4 <- 0.00000062215701
+            C5 <- 2.0747825E-09
+            C6 <- -9.484024E-13
+            C7 <- 4.1635019
+            C8 <- -5800.2206
+            C9 <- 1.3914993
+            C10 <- -0.048640239
+            C11 <- 0.000041764768
+            C12 <- -0.000000014452093
+            C13 <- 6.5459673
+            psat <- rep(NA_real_, length(tdb))
+            psat[tdb <= 0] = exp(C1/tk + C2 + C3*tk + C4*tk**2 + C5*tk**3 + C6*tk**4 + C7*log(tk)) / 1000
+            psat[tdb  > 0] = exp(C8/tk + C9 + C10*tk + C11*tk**2 + C12*tk**3 + C13*log(tk)) / 1000
+            psat
+        }
+        # }}}
+        dt17 <- dt17[,
+            value := {
+                value[7L] <- value[2L]
+
+                # get material density
+                mat <- idf$object(.BY$id)$ref_to_object(1L, "Material")[[1L]]
+                if (!length(mat)) {
+                    warn("warning_tran_850_860",
+                        paste0(
+                            "Material match issue:\n",
+                            "Did not find a material component match for name `",
+                            idf$object(.BY$id)$name(), "`."
+                        )
+                    )
+                }
+                den <- mat$Density
+
+                # calculate
+                coeffs <- suppressWarnings(as.double(value[3L:6L]))
+                d_empd <- suppressWarnings(as.double(value[2L]))
+                mu <- cal_mu_empd(coeffs[1L], coeffs[2L], coeffs[3L], coeffs[4L], d_empd, den)
+                if (is.na(mu)) {
+                    value[2L] <- paste0("Could not find Material Match for ",
+                        if (is.na(value[1L])) "" else value[1L]
+                    )
+                } else {
+                    value[2L] <- sprintf("%.7f", mu)
+                }
+                value
+            },
+            by = "id"
+        ]
+    }
+    # }}}
+    # 18: EnergyManagementSystem:Actuator {{{
+    dt18 <- trans_action(idf, "EnergyManagementSystem:Actuator",
+        reset = list(4L, "outdoor air dryblub temperature", "Outdoor Air Drybulb Temperature"),
+        reset = list(4L, "outdoor air wetblub temperature", "Outdoor Air Wetbulb Temperature")
+    )
+    # }}}
+    # 19: Output:Variable {{{
+    # For Output:Variable that reference a specific Daylighting:Controls object
+    # need update to the new reference point name
+    if (new_idf$is_valid_class("Output:Variable")) {
+        dt19 <- new_idf$to_table(class = "Output:Variable", wide = TRUE)
+        set(dt19, NULL, "key_value", stri_trans_tolower(stri_trim_both(dt19$`Key Value`)))
+        set(dt19, NULL, "variable_name", stri_trans_tolower(stri_trim_both(dt19$`Variable Name`)))
+
+        dt19_1 <- dt19[key_value != "*" & stri_sub(variable_name, to = 27L) == "daylighting reference point"]
+        if (nrow(dt19_1)) {
+            # DELight Reference Point
+            if (nrow(dt15)) {
+                refpt <- dt15[index == 1L, list(id, key_value = stri_trans_tolower(stri_trim_both(value)))]
+                dt19_1[!refpt, on = key_value, list(id, class, index = 1L, value = paste0(stri_trim_both(`Key Value`), "_DaylCtrl"))]
+            } else {
+                dt19_1 <- dt19_1[, list(id, class = class, index = 1L, value = paste0(stri_trim_both(`Key Value`), "_DaylCtrl"))]
+            }
+        } else {
+            dt19_1 <- data.table()
+        }
+
+        dt19_2 <- dt19[key_value != "*" & variable_name == "daylighting lighting power multiplier"]
+        if (nrow(dt19_2)) {
+            # DELight Reference Point
+            if (nrow(dt15)) {
+                refpt <- dcast.data.table(dt15[J(c(1:2)), on = "index"], class ~ field, value.var = "value")
+                # add control name
+                refpt[, `:=`(ctrlname = idf$object(id[[1L]])$value(2L)[[1L]]), by = "id"]
+                dt19_2 <- dt19_2[refpt, on = key_value, list(id, class, index = 1L, value = ctrlname), nomatch = 0L]
+            } else {
+                dt19_2 <- dt19_2[, list(id, class = class, index = 1L, value = paste0(stri_trim_both(`Key Value`), "_DaylCtrl"))]
+            }
+        } else {
+            dt19_2 <- data.table()
+        }
+
+        dt19 <- rbindlist(list(dt19_1, dt19_2))
+
+        if (nrow(dt19)) new_idf$update(dt19, .default = FALSE)
+    }
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:18)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_860_870 {{{
+trans_funs$f860t870 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.6)
+
+    target_cls <- c(
+        "Coil:Cooling:DX:MultiSpeed",                # 1
+        "Coil:Heating:DX:MultiSpeed",                # 2
+        "CoolingTower:SingleSpeed",                  # 3
+        "CoolingTower:TwoSpeed",                     # 4
+        "CoolingTower:VariableSpeed:Merkel",         # 5
+        "AirflowNetwork:SimulationControl",           # 6
+        "ZoneCapacitanceMultiplier:ResearchSpecial", # 7
+        "WaterHeater:HeatPump:WrappedCondenser",     # 8
+        "AirflowNetwork:Distribution:Component:Duct" # 9
+    )
+
+    new_idf <- trans_preprocess(idf, 8.7, target_cls)
+
+    # 1: Coil:Cooling:DX:MultiSpeed {{{
+    dt1 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed",
+        reset = list(16, NA_character_, "NaturalGas"),
+        reset = list(16, "PropaneGas", "Propane")
+    )
+    # }}}
+    # 2: Coil:Heating:DX:MultiSpeed {{{
+    dt2 <- trans_action(idf, "Coil:Heating:DX:MultiSpeed",
+        reset = list(16, NA_character_, "NaturalGas"),
+        reset = list(16, "PropaneGas", "Propane")
+    )
+    # }}}
+    # 3: CoolingTower:SingleSpeed {{{
+    dt3 <- trans_action(idf, "CoolingTower:SingleSpeed", insert = list(17:20))
+    # }}}
+    # 4: CoolingTower:TwoSpeed {{{
+    dt4 <- trans_action(idf, "CoolingTower:TwoSpeed", insert = list(25:28))
+    # }}}
+    # 5: CoolingTower:VariableSpeed:Merkel {{{
+    dt5 <- trans_action(idf, "CoolingTower:VariableSpeed:Merkel", insert = list(25:28))
+    # }}}
+    # 6: AirflowNetwork:SimulationControl {{{
+    dt6 <- trans_action(idf, "AirflowNetwork:SimulationControl", delete = list(4L))
+    if (nrow(dt6)) dt6[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 7: ZoneCapacitanceMultiplier:ResearchSpecial {{{
+    dt7 <- trans_action(idf, "ZoneCapacitanceMultiplier:ResearchSpecial",
+        insert = list(1:2, c("Multiplier", NA_character_))
+    )
+    # }}}
+    # 8: WaterHeater:HeatPump:WrappedCondenser {{{
+    dt8 <- trans_action(idf, "WaterHeater:HeatPump:WrappedCondenser",
+        reset = list(35, "MutuallyExlcusive", "MutuallyExclusive"))
+    # }}}
+    # 9: AirflowNetwork:Distribution:Component:Duct {{{
+    dt9 <- trans_action(idf, "AirflowNetwork:Distribution:Component:Duct", all = TRUE,
+        add = list(9:10)
+    )
+    if (nrow(dt9)) {
+        dt9[index >= 7L, value := {
+            AFNDuctFracRcond <- 0.815384615
+            AFNDuctFracRout <- 0.153846154
+            AFNDuctFracRin <- 0.030769231
+
+            val <- suppressWarnings(as.double(value))
+            # 7
+            value[1L] <- sprintf("%.6f", val[1L] / AFNDuctFracRcond)
+            # 9
+            value[3L] <- sprintf("%.6f", val[1L] / AFNDuctFracRout)
+            # 10
+            value[4L] <- sprintf("%.6f", val[1L] / AFNDuctFracRin)
+
+            value
+        }, by = "id"]
+    }
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:9)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_870_880 {{{
+trans_funs$f870t880 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.7)
+
+    target_cls <- c(
+        "Output:Surfaces:List",                           # 1
+        "Table:TwoIndependentVariables",                  # 2
+       # Only used to check corresponding perimeter object
+       #"BuildingSurface:Detailed",                       # 3
+       # Only used to check corresponding perimeter object
+       #"Floor:Detailed",                                 # 4
+        "SurfaceProperty:ExposedFoundationPerimeter",     # 5
+        "Foundation:Kiva:Settings",                       # 6
+        "UnitarySystemPerformance:Multispeed",            # 7
+        "Coil:Cooling:DX:SingleSpeed",                    # 8
+        "Coil:Cooling:DX:TwoSpeed",                       # 9
+        "Coil:Cooling:DX:MultiSpeed",                     # 10
+        "Coil:Cooling:DX:VariableSpeed",                  # 11
+        "Coil:Cooling:DX:TwoStageWithHumidityControlMode",# 12
+        "ZoneHVAC:PackagedTerminalHeatPump",              # 13
+        "ZoneHVAC:IdealLoadsAirSystem",                   # 14
+        "ZoneControl:ContaminantController",              # 15
+        "AvailabilityManager:NightCycle"                  # 16
+    )
+
+    new_idf <- trans_preprocess(idf, 8.8, target_cls)
+
+    # 1: Output:Surfaces:List {{{
+    dt1 <- trans_action(idf, "Output:Surfaces:List",
+        reset = list(1, "DecayCurvesfromZoneComponentLoads", "DecayCurvesFromComponentLoadsSummary")
+    )
+    # }}}
+    # 2: Table:TwoIndependentVariables {{{
+    dt2 <- trans_action(idf, "Table:TwoIndependentVariables", insert = list(14))
+    # }}}
+    # 3: BuildingSurface:Detailed {{{
+    dt3 <- trans_action(idf, "BuildingSurface:Detailed", min_fields = 5L)
+    if (nrow(dt3)) {
+        targets <- dt3[index == 5L, !is.na(value) & tolower(value) == "foundation"] &
+                   dt3[index == 2L, !is.na(value) & tolower(value) == "floor"]
+        obj_id <- dt3[index == 1L, id][targets]
+
+        if (!length(obj_id)) {
+            dt3 <- data.table()
+        } else {
+            # check if surface has a corresponding perimeter object
+            # if not, give a warning and add one
+            dt3 <- rbindlist(lapply(obj_id,
+                function (i) {
+                    perim <- idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]]
+
+                    if (!length(perim)) {
+                        dt <- dt3[J(i), on = "id"]
+                        n <- ceiling((nrow(dt) - 10L) / 3L)
+                        dt <- dt[index <= 4L + n]
+                        dt[J(2L), on = "index", value := "BySegment"]
+                        dt[J(c(3L, 4L)), on = "index", value := NA_character_]
+                        dt[index > 4L, value := "Yes"]
+                        warn("warning_trans_870_880",
+                            paste0(
+                                "Foundation floors now require a ",
+                                "`SurfaceProperty:ExposedFoundationPerimeter` ",
+                                "object. One was added with each segment of the ",
+                                "floor surface exposed (`",idf$object(i)$name(),"`). ",
+                                "Please check your inputs to make sure this ",
+                                "reflects your foundation."
+                            )
+                        )
+                    } else {
+                        data.table()
+                    }
+                }
+            ))
+        }
+    }
+    # }}}
+    # 4: Floor:Detailed {{{
+    dt4 <- trans_action(idf, "Floor:Detailed", min_fields = 4L)
+    if (nrow(dt4)) {
+        targets <- dt4[index == 4L, !is.na(value) & tolower(value) == "foundation"]
+        obj_id <- dt4[index == 1L, id][targets]
+
+        if (!length(obj_id)) {
+            dt4 <- data.table()
+        } else {
+            # check if surface has a corresponding perimeter object
+            # if not, give a warning and add one
+            dt4 <- rbindlist(lapply(obj_id,
+                function (i) {
+                    perim <- idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]]
+
+                    if (!length(perim)) {
+                        dt <- dt4[J(i), on = "id"]
+                        n <- ceiling((nrow(dt) - 9L) / 3L)
+                        dt <- dt[index <= 4L + n]
+                        dt[J(2L), on = "index", value := "BySegment"]
+                        dt[J(c(3L, 4L)), on = "index", value := NA_character_]
+                        dt[index > 4L, value := "Yes"]
+                        warn("warning_trans_870_880",
+                            paste0(
+                                "Foundation floors now require a ",
+                                "`SurfaceProperty:ExposedFoundationPerimeter` ",
+                                "object. One was added with each segment of the ",
+                                "floor surface exposed (`",idf$object(i)$name(),"`). ",
+                                "Please check your inputs to make sure this ",
+                                "reflects your foundation."
+                            )
+                        )
+                    } else {
+                        data.table()
+                    }
+                }
+            ))
+        }
+    }
+    # }}}
+    # 5: SurfaceProperty:ExposedFoundationPerimeter {{{
+    dt5 <- trans_action(idf, "SurfaceProperty:ExposedFoundationPerimeter",
+        insert = list(2L, "BySegment")
+    )
+    # }}}
+    # 6: Foundation:Kiva:Settings {{{
+    dt6 <- trans_action(idf, "Foundation:Kiva:Settings",
+        reset = list(8L, "autocalculate", "autoselect")
+    )
+    # }}}
+    # 7: UnitarySystemPerformance:Multispeed {{{
+    dt7 <- trans_action(idf, "UnitarySystemPerformance:Multispeed", insert = list(5))
+    # }}}
+    # 8: Coil:Cooling:DX:SingleSpeed {{{
+    dt8 <- trans_action(idf, "Coil:Cooling:DX:SingleSpeed", insert = list(15))
+    # }}}
+    # 9: Coil:Cooling:DX:TwoSpeed {{{
+    dt9 <- trans_action(idf, "Coil:Cooling:DX:TwoSpeed", insert = list(23))
+    # }}}
+    # 10: Coil:Cooling:DX:MultiSpeed {{{
+    dt10 <- trans_action(idf, "Coil:Cooling:DX:MultiSpeed", insert = list(7))
+    # }}}
+    # 11: Coil:Cooling:DX:VariableSpeed {{{
+    dt11 <- trans_action(idf, "Coil:Cooling:DX:VariableSpeed", insert = list(16))
+    # }}}
+    # 12: Coil:Cooling:DX:TwoStageWithHumidityControlMode {{{
+    dt12 <- trans_action(idf, "Coil:Cooling:DX:TwoStageWithHumidityControlMode", insert = list(19))
+    # }}}
+    # 13: ZoneHVAC:PackagedTerminalHeatPump {{{
+    dt13 <- trans_action(idf, "ZoneHVAC:PackagedTerminalHeatPump", delete = list(18))
+    if (nrow(dt13)) dt13[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 14: ZoneHVAC:IdealLoadsAirSystem {{{
+    dt14 <- trans_action(idf, "ZoneHVAC:IdealLoadsAirSystem", insert = list(5))
+    # }}}
+    # 15: ZoneControl:ContaminantController{{{
+    dt15 <- trans_action(idf, "ZoneControl:ContaminantController", insert = list(6))
+    # }}}
+    # 16: AvailabilityManager:NightCycle {{{
+    dt16 <- trans_action(idf, "AvailabilityManager:NightCycle", insert = list(6, "FixedRunTime"))
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:16)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_880_890 {{{
+trans_funs$f880t890 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.8)
+
+    target_cls <- c(
+        "ZoneHVAC:EquipmentList",          # 1
+        "GroundHeatExchanger:Vertical",    # 2
+        "Branch",                          # 3
+        "CondenserEquipmentList",          # 4
+        "ElectricEquipment:ITE:AirCooled", # 5
+        "Schedule:Day:Interval",           # 6
+        "Schedule:Day:List",               # 7
+        "Schedule:Compact"                 # 8
+    )
+
+    new_idf <- trans_preprocess(idf, 8.9, target_cls)
+
+    # 1: ZoneHVAC:EquipmentList {{{
+    dt1 <- trans_action(idf, "ZoneHVAC:EquipmentList", insert = list(2, "SequentialLoad"))
+    # }}}
+    # 2: GroundHeatExchanger:Vertical {{{
+    # GroundHeatExchanger:System {{{
+    dt2_1 <- trans_action(idf, min_fields = 9,
+        class = c("GroundHeatExchanger:System" = "GroundHeatExchanger:Vertical"),
+        # this will remove #9
+        offset = list(8:9, 7:8),
+        reset = list(5L, "Site:GroundTemperature:Undisturbed:KusudaAchenbach"),
+        add = list(9L)
+    )
+    if (nrow(dt2_1)) {
+        dt2_1 <- dt2_1[index <= 9L]
+        dt2_1[, value := {
+            name <- if (is.na(value[1L])) "" else value[1L]
+            value[6L] <- paste(name, "Ground Temps")
+            value[9L] <- paste(name, "Response Factors")
+            value
+        }, by = "id"]
+    }
+    # }}}
+    # GroundHeatExchanger:Vertical:Properties {{{
+    dt2_2 <- trans_action(idf, min_fields = 15L,
+        class = c("GroundHeatExchanger:Vertical:Properties" = "GroundHeatExchanger:Vertical"),
+        offset = list(c(6L, 7L, 11L, 12L, 13L, 15L, 14L),
+                      c(3L, 4L,  5L,  7L,  9L, 10L, 11L)
+        ),
+        reset = list(2L, "1"),
+        add = list(6L, "3.90e+6"),
+        reset = list(8L, "1.77e+6")
+    )
+
+    if (nrow(dt2_2)) {
+        dt2_2 <- dt2_2[index <= 11L]
+        dt2_2[J(1L), on = "index", value := {
+            paste(if (is.na(value)) "" else value, "Properties")
+        }, by = "id"]
+        dt2_2[J(4L), on = "index", value := as.character(as.double(value) * 2)]
+    }
+    # }}}
+    # Site:GroundTemperature:Undisturbed:KusudaAchenbach {{{
+    dt2_3 <- trans_action(idf, min_fields = 10L,
+        class = c("Site:GroundTemperature:Undisturbed:KusudaAchenbach" = "GroundHeatExchanger:Vertical"),
+        offset = list(c(8L, 9L, 10L),
+                      c(2L, 4L,  5L)
+        ),
+        reset = list(3L, "920"),
+        reset = list(6L, "3.2"),
+        reset = list(7L, "8")
+    )
+    if (nrow(dt2_3)) {
+        dt2_3 <- dt2_3[index <= 7L]
+        dt2_3[J(1L), on = "index", value := {
+            value[!is.na(value)] <- paste(value[!is.na(value)], "Ground Temps")
+            value
+        }]
+        dt2_3[J(4L), on = "index", value := {
+            val <- suppressWarnings(as.double(value))
+            val[is.na(val)] <- 0.0
+            val <- val / 920
+            sprintf("%.5f", val)
+        }, by = "id"]
+    }
+    # }}}
+    # GroundHeatExchanger:ResponseFactors {{{
+    dt2_4 <- trans_action(idf, min_fields = 17L,
+        class = c("GroundHeatExchanger:ResponseFactors" = "GroundHeatExchanger:Vertical"),
+        offset = list(c(5L, 17L),
+                      c(3L,  4L)
+        ),
+        delete = list(c(6:18))
+    )
+    if (nrow(dt2_4)) {
+        dt2_4[index >= 19L, index := index - 14L]
+        dt2_4[J(c(1L, 2L)), on = "index", value := {
+            nm <- if (is.na(value[1L])) "" else value[1L]
+            value[1L] <- paste(nm, "Response Factors")
+            value[2L] <- paste(nm, "Properties")
+            value
+        }, by = "id"]
+    }
+    # }}}
+    dt2 <- rbindlist(list(dt2_1, dt2_2, dt2_3, dt2_4))
+    # }}}
+    # 3: Branch {{{
+    dt3 <- trans_action(idf, "Branch")
+    if (nrow(dt3)) {
+        dt3[(index - 2L) %% 4L == 1, value := gsub("GroundHeatExchanger:Vertical", "GroundHeatExchanger:System", value, ignore.case = TRUE)]
+    }
+    # }}}
+    # 4: CondenserEquipmentList {{{
+    dt4 <- trans_action(idf, "CondenserEquipmentList")
+    if (nrow(dt4)) {
+        dt4[(index - 2L) %% 2L == 0L, value := gsub("GroundHeatExchanger:Vertical",
+            "GroundHeatExchanger:System", value, ignore.case = TRUE)
+        ]
+    }
+    # }}}
+    # 5: ElectricEquipment:ITE:AirCooled {{{
+    dt5 <- trans_action(idf, "ElectricEquipment:ITE:AirCooled", insert = list(3L, "FlowFromSystem"))
+    # }}}
+    # 6: Schedule:Day:Interval {{{
+    dt6 <- trans_action(idf, "Schedule:Day:Interval", reset = list(3L, "yes", "Average"))
+    # }}}
+    # 7: Schedule:Day:List {{{
+    dt7 <- trans_action(idf, "Schedule:Day:List", reset = list(3L, "yes", "Average"))
+    # }}}
+    # 8: Schedule:Compact {{{
+    dt8 <- trans_action(idf, "Schedule:Compact")
+    if (nrow(dt8)) {
+        dt8[index >= 3L & grepl("interpolate.+yes", value, ignore.case = TRUE), value := "Interpolate:Average"]
+    }
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:8)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_890_900 {{{
+trans_funs$f890t900 <- function (idf) {
+    assert(idf$version()[, 1:2] == 8.9)
+
+    target_cls <- c(
+        "AirflowNetwork:Distribution:Component:OutdoorAirFlow", # 1
+        "AirflowNetwork:Distribution:Component:ReliefAirFlow",  # 2
+        "Boiler:HotWater",                                      # 3
+        "FenestrationSurface:Detailed",                         # 4
+        "GlazedDoor",                                           # 5
+        "RunPeriod:CustomRange",                                # 6
+        "RunPeriod",                                            # 7
+        "Table:OneIndependentVariable",                         # 8
+        "WindowMaterial:ComplexShade",                          # 9
+        "Window",                                               # 10
+        "WindowProperty:ShadingControl"                         # 11
+    )
+
+    new_idf <- trans_preprocess(idf, 9.0, target_cls)
+
+    # 1: AirflowNetwork:Distribution:Component:OutdoorAirFlow {{{
+    dt1 <- trans_action(idf,
+        class = "AirflowNetwork:Distribution:Component:OutdoorAirFlow",
+        insert = list(2,
+            tryCatch(idf$object_name("OutdoorAir:Mixer", simplify = TRUE)[[1L]],
+                error_class_name = function (e) NA_character_
+            )
+        )
+    )
+    if (nrow(dt1) && idf$object_num("OutdoorAir:Mixer") > 1L) {
+        warn("Multiple `OutdoorAir:Mixer` object found.")
+    }
+    # }}}
+    # 2: AirflowNetwork:Distribution:Component:ReliefAirFlow {{{
+    dt2 <- trans_action(idf, "AirflowNetwork:Distribution:Component:ReliefAirFlow",
+        insert = list(2,
+            tryCatch(idf$object_name("OutdoorAir:Mixer", simplify = TRUE)[[1L]],
+                error_class_name = function (e) NA_character_
+            )
+        )
+    )
+    if (nrow(dt2) && idf$object_num("OutdoorAir:Mixer") > 1L) {
+        warn("Multiple `OutdoorAir:Mixer` object found.")
+    }
+    # }}}
+    # 3: Boiler:HotWater {{{
+    dt3 <- trans_action(idf, "Boiler:HotWater", delete = list(7L))
+    if (nrow(dt3)) dt3[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 4: FenestrationSurface:Detailed {{{
+    dt4 <- trans_action(idf, "FenestrationSurface:Detailed", delete = list(7L))
+    if (nrow(dt4)) dt4[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 5: GlazedDoor {{{
+    dt5 <- trans_action(idf, "GlazedDoor", delete = list(4L))
+    if (nrow(dt5)) dt5[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 6: RunPeriod:CustomRange {{{
+    dt6 <- trans_action(idf, c("RunPeriod" = "RunPeriod:CustomRange"))
+    if (nrow(dt6)) {
+        dt6[index == 8L, value := {
+            if (any(usewthrfile <- tolower(value) == "useweatherfile")) {
+                warn("warning_trans_890_900",
+                    paste0("Run period start day of week `UseWeatherFile` option ",
+                        "has been removed, start week day is set by the input start date."
+                    )
+                )
+                value[usewthrfile] <- NA_character_
+            }
+            value
+        }]
+    }
+    # }}}
+    # 7: RunPeriod {{{
+    dt7 <- trans_action(idf, "RunPeriod", all = TRUE,
+        insert = list(c(`Begin Year` = 4L)),
+        insert = list(c(`End Year` = 7L))
+    )
+
+    # calculate start year and do some checkings
+    if (nrow(dt7)) {
+        dt7[, value :=
+            {
+                start_year <- value[14L + 2L]
+                num_rep <- value[12L + 2L]
+
+                if (!is.na(start_year)) {
+                    assert(is_strint(start_year), prefix = "`Start Year`")
+                    # if start year is set in the old run period, use it
+                    value[4L] <- start_year
+                    start_year <- as.integer(start_year)
+                }
+
+                # convert num of repeats to integer
+                if (!is.na(num_rep)) {
+                    assert(is_strint(num_rep), prefix = "`Number of Times Runperiod to be Repeated`")
+                    num_rep <- as.integer(num_rep)
+                } else {
+                    num_rep <- 0L
+                }
+
+                # if start year is not set but repeat times larger than 1
+                if (!is.na(start_year) & num_rep > 1L) {
+                    # in case of leap year
+                    start_date <- lubridate::make_date(year = 2016L, month = value[2L], day = value[3L])
+                    if (is.na(start_date)) {
+                        abort("error_trans_890_900",
+                            "Invalid `Start Month` or `Start Day of Month` in `RunPeriod` found."
+                        )
+                    }
+
+                    weekday <- if (is.na(value[8L])) "Sunday" else value[8L]
+                    start_year <- find_nearst_wday_year(start_date, weekday, 2017,
+                        start_date == lubridate::as_date("2016-02-29")
+                    )
+
+                    value[4L] <- start_year
+                }
+
+                if (num_rep > 1L) {
+                    # if start year is blank, end year should also be
+                    if (is.na(start_year)) {
+                        value[7L] <- NA_character_
+                    } else {
+                        # end year
+                        end_year <- start_year + num_rep
+                        value[7L] <- as.character(end_year)
+
+                        assert(is_strint(value[5L]), prefix = "End Month")
+                        assert(is_strint(value[6L]), prefix = "End Day of Month")
+
+                        # check if leap day of end date is specified in an non-leap year
+                        if ((!leap_year(end_year)) && as.integer(value[5L]) == 2L && as.integer(value[6L]) == 29L) {
+                            warn("error_trans_890_900", msg = paste0(
+                                "With `Number of Times Runperiod to be Repeated` being ", num_rep,
+                                "the end year will be ", end_year, ", which is not a leap year. ",
+                                "The end date will be reset to Feb 28th."
+                            ))
+                            value[6L] <- "28"
+                        }
+                    }
+
+                    # as year, month, day has been calculate, day of week for
+                    # start day should be empty
+                    value[8L] <- NA_character_
+                } else if (!is.na(value[8L]) && tolower(value[8L]) == "useweatherfile") {
+                    warn("warning_trans_890_900",
+                        paste0("Run period start day of week `UseWeatherFile` option ",
+                            "has been removed, start week day is set by the input start date."
+                        )
+                    )
+                    value[8L] <- NA_character_
+                }
+                value
+            },
+            by = "id"
+        ]
+        dt7 <- dt7[!J(c(15L:16L)), on = "index"][J(14L), on = "index", value := NA_character_]
+    }
+    # }}}
+    # 8: Table:OneIndependentVariable {{{
+    dt8 <- trans_action(idf, "Table:OneIndependentVariable", reset = list(2L, "exponent", NA_character_))
+    # }}}
+    # 9: WindowMaterial:ComplexShade {{{
+    dt9 <- trans_action(idf, "WindowMaterial:ComplexShade",
+        reset = list(2L, "venetian", "VenetianHorizontal")
+    )
+    # }}}
+    # 10: Window {{{
+    dt10 <- trans_action(idf, "Window", delete = list(4L))
+    if (nrow(dt10)) dt10[, index := seq_len(.N), by = "id"]
+    # }}}
+    # 11: WindowProperty:ShadingControl {{{
+    if (!idf$is_valid_class("WindowProperty:ShadingControl")) {
+        dt11 <- data.table()
+    } else {
+        # get all old shading control objects
+        shadctrl <- idf$objects_in_class("WindowProperty:ShadingControl")
+
+        # get zone that is being controled {{{
+        fene_daylight_zone <- lapply(shadctrl,
+            function (ctrl) {
+                # get all fenestrations that uses this control
+                fene <- ctrl$ref_by_object("Name",
+                    class = c("FenestrationSurface:Detailed", "Window", "GlazedDoor")
+                )
+
+                if (!length(fene)) {
+                    fenestration <- NA_character_
+                    zone <- NA_character_
+                    daylgt <- NA_character_
+                } else {
+                    fenestration <- names(fene)
+
+                    # get zone name this fenestration belongs to
+                    zone <- vcapply(fene, function (fenestration) {
+                        fenestration$ref_to_object(
+                            "Building Surface Name",
+                            class = "Zone",
+                            recursive = TRUE, depth = NULL
+                        )[[1L]]$name()
+                    }, use.names = FALSE)
+
+                    if (length(zone)) {
+                        assert(length(unique(tolower(zone))) == 1L)
+                        zone <- zone[[1L]]
+
+                        # get daylighting control of this zone if exists
+                        daylgt <- idf$object(zone)$ref_by_object("Name", class = "Daylighting:Controls")
+                        daylgt <- if (length(daylgt)) daylgt[[1L]]$name() else NA_character_
+                    } else {
+                        zone <- NA_character_
+                        daylgt <- NA_character_
+                    }
+                }
+
+                list(fenestration = fenestration, zone = zone, daylighting = daylgt)
+            }
+        )
+        # }}}
+
+        dt11 <- trans_action(idf, all = TRUE,
+            class = c("WindowShadingControl" = "WindowProperty:ShadingControl"),
+            insert = list(c(`Zone Name` = 2L, `Shading Control Sequence Number` = 3L)),
+            add = list(c(`Daylighting Control Object Name` = 15L,
+                         `Multiple Surface Control Type` = 16L
+            ))
+        )
+
+        # update name with zone name suffix
+        setindexv(dt11, "index")
+        dt11[J(1L), on = "index", value := {
+            zone <- vcapply(fene_daylight_zone, "[[", "zone")
+
+            found <- !is.na(value) & !is.na(zone)
+            if (any(found)) {
+                value[found] <- paste(value[found], "-", zone[found])
+            }
+            value
+        }]
+        # update zone name
+        dt11[J(2L), on = "index", value := vcapply(fene_daylight_zone, "[[", "zone")]
+
+        # if unused, remove and throw a warning
+        if (nrow(empty <- dt11[J(2L, NA_character_), on = c("index", "value")])) {
+            warn("warning_trans_890_900", paste0(
+                "WindowProperty:ShadingControl = ",
+                surround(empty[J(1L), on = "index", ifelse(is.na(value), "", value)]),
+                " was not used by any surfaces, so it has not been deleted.",
+                collpase = "\n"
+            ))
+            dt11 <- dt11[!empty, on = "id"]
+        }
+
+        if (!nrow(dt11)) {
+            dt11 <- data.table()
+        } else {
+            # update control sequence
+            dt11[J(3L), on = "index", value := as.character(seq_along(fene_daylight_zone))]
+            # update multiple surface control type name
+            dt11[, value := {
+                if (!is.na(value[[4L]]) & tolower(value[[4L]]) == "switchableglazing" &&
+                    !is.na(value[6L]) & tolower(value[[6L]]) == "meetdaylightilluminancesetpoint"
+                ) {
+                    value[[16]] <- "Group"
+                } else {
+                    value[[16]] <- "Sequential"
+                }
+                value
+            }, by = "id"]
+            # update daylighting control name
+            dt11[J(15L), on = "index", value := vcapply(fene_daylight_zone, "[[", "daylighting")]
+            # add fenestration surface names
+            fene <- lapply(fene_daylight_zone, "[[", "fenestration")
+            # extract rows
+            ka_num <- each_length(fene)
+            new_fene <- data.table(id = rep(unique(dt11$id), ka_num), name = rep(names(fene), ka_num),
+                class = "WindowShadingControl",
+                index = unlist(lapply(ka_num, seq_len)) + 16L,
+                field = NA_character_, value = unlist(fene)
+            )
+            dt11 <- rbindlist(list(dt11, new_fene), use.names = TRUE)
+            setorderv(dt11, c("id", "index"))
+        }
+    }
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:11)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+# trans_900_910 {{{
+trans_funs$f900t910 <- function (idf) {
+    assert(idf$version()[, 1:2] == 9.0)
+
+    target_cls <- c(
+        "HybridModel:Zone",      # 1
+        "ZoneHVAC:EquipmentList" # 2
+    )
+
+    new_idf <- trans_preprocess(idf, 9.1, target_cls)
+
+    # 1: HybridModel:Zone {{{
+    dt1 <- trans_action(idf, "HybridModel:Zone", all = 9L,
+        # Old [6:9] --> New [17:20]
+        offset = list(6:9, 17:20),
+        # Old NA    --> New [7:16]
+        add = list(7:16),
+        # Old [5]   --> New [6]
+        offset = list(5L, 6L),
+        # Old NA    --> New [5]
+        add = list(5L, "No")
+    )
+    # }}}
+    # 2: ZoneHVAC:EquipmentList {{{
+    dt2 <- trans_action(idf, "ZoneHVAC:EquipmentList", min_fields = 6L,
+        # Old NA    --> New [7:8] with step 4
+        insert = list(7:8, NA, 4L)
+    )
+
+    dt2[1:20]
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:2)))
+    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
+
+# trans_preprocess {{{
+# 1. delete objects in deprecated class
+# 2. delete all old objects
+# 3. update IDD data
+# 4. update version
+# 5. assign new uuid
+trans_preprocess <- function (idf, version, class = NULL) {
+    # clone old IDF
+    new_idf <- idf$clone(deep = TRUE)
+    # get new IDD
+    new_idd <- use_idd(version, "auto")
+
+    # delete deprecated classes
+    class_del <- setdiff(use_idd(idf$version())$class_name(), new_idd$class_name())
+
+    # get all classes to be deleted
+    class <- unique(c(CLASS_DEL_COMMON, class_del, class))
+
+    # del all related class
+    class <- class[idf$is_valid_class(class)]
+
+    if (length(class)) {
+        new_idf$del(new_idf$object_id(class, simplify = TRUE), .force = TRUE)
+    }
+
+    priv <- ._get_private(new_idf)
+
+    # use old class name in object and value table
+    add_joined_cols(priv$idd_env()$class, priv$idf_env()$object, "class_id", "class_name")
+    add_joined_cols(priv$idf_env()$object, priv$idf_env()$value, "object_id", "class_name")
+
+    # add field index in value table
+    set(priv$idf_env()$value, NULL, "field_index", rowidv(priv$idf_env()$value, "object_id"))
+
+    # update IDD
+    priv$m_idd <- new_idd
+
+    # update class id in object table
+    add_joined_cols(priv$idd_env()$class, priv$idf_env()$object, "class_name", "class_id")
+    set(priv$idf_env()$object, NULL, "class_name", NULL)
+
+    # add class names in field table
+    add_joined_cols(priv$idd_env()$class, priv$idd_env()$field, "class_id", "class_name")
+    # update field id in value table
+    set(priv$idf_env()$value, NULL, "field_id",
+        priv$idd_env()$field[priv$idf_env()$value, on = c("class_name", "field_index"), "field_id"]
+    )
+
+    # check if there are newly added extensible groups
+    if (anyNA(priv$idf_env()$value$field_id)) {
+        # get id of object that has new extensible fields
+        id_obj <- priv$idf_env()$value[is.na(field_id), unique(object_id)]
+        # get field number per object
+        dt_obj <- priv$idf_env()$value[J(id_obj), on = "object_id", list(field_num = .N), by = c("class_name", "object_id")]
+
+        # merge with class table
+        dt_cls <- priv$idd_env()$class[dt_obj, on = "class_name"]
+        # calculate num of group to add
+        dt_cls[, `:=`(num = as.integer((field_num - num_fields) / num_extensible))]
+        # add extensible groups
+        add_idd_extensible_group(priv$idd_env(), dt_cls)
+
+        # update field id in value table
+        set(priv$idf_env()$value, NULL, "field_id",
+            priv$idd_env()$field[priv$idf_env()$value, on = c("class_name", "field_index"), "field_id"]
+        )
+    }
+
+    set(priv$idf_env()$value, NULL, c("class_name", "field_index"), NULL)
+
+    # update version
+    priv$m_version <- priv$m_idd$version()
+    priv$idf_env()$value[field_id == 1L, `:=`(
+        value_chr = as.character(priv$m_version[, 1:2]),
+        value_num = NA_real_
+    )]
+
+    # remove path
+    priv$m_path <- NULL
+
+    # reset log
+    priv$m_log$unsaved <- TRUE
+    priv$m_log$uuid <- unique_id()
+    priv$m_log$job <- NULL
+
+    new_idf
+}
+# }}}
+# trans_postprocess {{{
+trans_postprocess <- function (idf, from, to) {
+    # reset_key {{{
+    reset_key <- function (dt, field_index = 1L) {
+        if (!nrow(dt)) return(dt)
+        dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
+    }
+    # }}}
+    # update_var {{{
+    update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
+        if (!nrow(dt)) return(dt)
+        if (!nrow(mapping)) return(dt)
+
+        if (!has_name(dt, "value_lower")) {
+            set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
+        }
+
+        new <- NULL # eliminate check warning of no visible binding
+
+        # delete deprecatd variable first
+        id_obj <- dt[mapping[is.na(new)], on = c(value_lower = "old"), unique(id)]
+        dt <- dt[!J(id_obj), on = "id"]
+
+        # remove delete rules
+        mapping <- mapping[!is.na(new)]
+
+        if (!nrow(dt) || !nrow(mapping)) return(set(dt, NULL, "value_lower", NULL))
+
+        # calculate field index
+        if (!is.null(step)) {
+            n <- (nrow(dt) - field_index) %/% step
+            field_index <- as.integer(c(field_index, seq.int(n) * step + field_index))
+        }
+
+        # update variable names
+        dt[J(field_index), on = "index", value := {
+            # from v7.2 to v8.0 there are duplicated old vars
+            # use the first and then handle the other
+            mapping[J(value_lower), on = "old", mult = "first", {
+                updated <- new
+                # if no match, keep the old
+                updated[is.na(new)] <- value[is.na(new)]
+                updated
+            }]
+        }]
+
+        # special case from v7.2 to v8.0 {{{
+        if (nrow(mapping) && unique(mapping$from) == 7.2) {
+            stopifnot(is_idf(idf))
+
+            has_chiller <- any(idf$is_valid_class(c(
+                "Chiller:Electric:EIR",
+                "Chiller:Electric:ReformulatedEIR",
+                "Chiller:Electric",
+                "Chiller:Absorption:Indirect",
+                "Chiller:Absorption",
+                "Chiller:ConstantCOP",
+                "Chiller:EngineDriven",
+                "Chiller:CombustionTurbine"
+            )))
+
+            has_heater <- any(idf$is_valid_class(c(
+                "ChillerHeater:Absorption:DirectFired",
+                "ChillerHeater:Absorption:DoubleEffect"
+            )))
+
+            # there are duplicated old vars should add new rows {{{
+            # remove the first case
+            if (has_chiller & has_heater) {
+                dup <- mapping[duplicated(old)]
+
+                # update variable names
+                sec <- dt[J(field_index), on = "index", nomatch = 0L]
+
+                if (nrow(sec)) {
+                    sec <- sec[, value := {
+                        # in this case, no matched will return NA
+                        dup[J(value_lower), on = "old", new]
+                    }][!is.na(value)]
+
+                    # get other fields
+                    sec_1 <- dt[J(sec$id), on = "id"][!J(sec$index), on = "index"]
+                    # combine and change old id to negative
+                    sec <- rbindlist(list(sec, sec_1))[, id := -id]
+                    setorderv(sec, c("id", "index"))
+
+                    # combine them all
+                    dt <- rbindlist(list(dt, sec))
+                }
+            }
+            # }}}
+            # handle CondFD Nodal Temperature {{{
+            if (!is_meter) {
+                dt[index == 2, value_lower]
+                # can still use the old name as value_lower has not been changed
+                nodal <- dt[J(field_index, "condfd nodal temperature"),
+                    on = c("index", "value_lower"), nomatch = 0L
+                ]
+
+                if (nrow(nodal)) {
+                    key <- dt[J(nodal$index - 1L, nodal$id), on = c("index", "id")][,
+                        value_lower := stri_trim_both(value_lower)
+                    ][stri_isempty(value_lower), value_lower := NA_character_]
+
+                    # if key value is "*" or NA
+                    id_wild <- key[is.na(value_lower) | value_lower == "*", id]
+
+                    # duplicate 10 times
+                    if (length(id_wild)) {
+                        obj_wild <- dt[J(id_wild), on = "id"]
+                        # remove the original
+                        dt <- dt[!J(id_wild), on = "id"]
+
+                        # get the smallest negative id in case processes above
+                        # also assign negative id for distinguishing purpose
+                        id_ne <- if (!nrow(dt)) 0L else min(dt$id)
+                        obj_wild <- rbindlist(lapply(id_ne - (1L:10L),
+                            function (dt, id) set(copy(dt), NULL, "id", id),
+                            dt = obj_wild
+                        ))
+
+                        obj_wild[J("condfd nodal temperature"), on = "value_lower",
+                            value := paste0("CondFD Surface Temperature Node ", rep(1L:10L, each = length(id_wild)))
+                        ]
+
+                        dt <- rbindlist(list(dt, obj_wild))
+                    }
+
+                    nodal <- nodal[!J(id_wild), on = "id"]
+                    key <- key[!J(id_wild), on = "id"]
+
+                    # use the key if given
+                    key[, c("key_value", "variable") := as.data.table(stri_match_first_regex(value, "(.*)#(.*)"))[, 1L:2L]]
+                    key <- key[!is.na(key_value)][, key_value := stri_sub(key_value, to = -5L)]
+                    nodal <- nodal[J(key$id), on = "id"]
+
+                    # update the original input
+                    dt[key, on = c("id", "index"), value := i.key_value]
+                    dt[nodal, on = c("id", "index"), value := i.value]
+                }
+            }
+            # }}}
+        }
+        # }}}
+
+        set(dt, NULL, "value_lower", NULL)
+    }
+    # }}}
+
+    f <- as.double(as.character(standardize_ver(from)[, 1:2]))
+    t <- as.double(as.character(standardize_ver(to)[, 1:2]))
+    rep_vars <- REPORTVAR_RULES[J(f, t), on = c("from", "to")]
+    if (nrow(rep_vars)) set(rep_vars, NULL, "old", stri_trans_tolower(rep_vars$old))
+
+    # 1: Output:Variable {{{
+    dt1 <- trans_action(idf, "Output:Variable", .clean = TRUE)
+    dt1 <- reset_key(dt1, 1L)
+    dt1 <- update_var(dt1, rep_vars, 2L, idf = idf)
+    # }}}
+    # 2: Output:Meter:* {{{
+    dt2 <- rbindlist(lapply(
+        c("Output:Meter",
+          "Output:Meter:MeterFileOnly",
+          "Output:Meter:Cumulative",
+          "Output:Meter:Cumulative:MeterFileOnly"
+        ),
+        trans_action, idf = idf, .clean = TRUE
+    ))
+    dt2 <- update_var(dt2, rep_vars, 1L, is_meter = TRUE, idf = idf)
+    # }}}
+    # 3: Output:Table:TimeBins {{{
+    dt3 <- trans_action(idf, "Output:Table:TimeBins", .clean = TRUE)
+    dt3 <- reset_key(dt3, 1L)
+    dt3 <- update_var(dt3, rep_vars, 2L, idf = idf)
+    # }}}
+    # 4: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
+    dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable", .clean = TRUE)
+    dt4_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable", .clean = TRUE)
+    dt4 <- rbindlist(list(dt4_1, dt4_2))
+    dt4 <- reset_key(dt4, 1L)
+    dt4 <- update_var(dt4, rep_vars, 2L, idf = idf)
+    # }}}
+    # 5: EnergyManagementSystem:Sensor {{{
+    dt5 <- trans_action(idf, "EnergyManagementSystem:Sensor", .clean = TRUE)
+    dt5 <- update_var(dt5, rep_vars, 3L, idf = idf)
+    # }}}
+    # 6: Output:Table:Monthly {{{
+    dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L, .clean = TRUE)
+    dt6 <- update_var(dt6, rep_vars, 3L, step = 2, idf = idf)
+    # }}}
+    # 7: Meter:Custom {{{
+    dt7 <- trans_action(idf, "Meter:Custom", .clean = TRUE)
+    dt7 <- update_var(dt7, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
+    # }}}
+    # 8: Meter:CustomDecrement {{{
+    dt8 <- trans_action(idf, "Meter:CustomDecrement", .clean = TRUE)
+    dt8 <- update_var(dt8, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
+    # }}}
+
+    dt <- rbindlist(mget(paste0("dt", 1:8)))
+    if (nrow(dt)) idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    idf
+}
+# }}}
+
+# trans_action {{{
+trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ..., .clean = FALSE) {
+    assert(idf$is_valid_class(class, all = TRUE))
+    if (!idf$is_valid_class(class)) return(data.table())
+
+    dt <- idf$to_table(class = class, align = TRUE, all = all)
+
+    if (.clean) idf$del(idf$object_id(class, simplify = TRUE))
+
+    # make sure min fields are returned
+    if (!all && min_fields > max(dt$index)) {
+        cur_max <- max(dt$index)
+        num_obj <- length(unique(dt$id))
+        miss <- dt[J(rep(1L, min_fields - cur_max)), on = "index", allow.cartesian = TRUE][
+            , index := seq(cur_max + 1L, min_fields), by = "id"]
+        set(miss, NULL, c("field", "value"), NA_character_)
+        dt <- rbindlist(list(dt, miss))
+    }
+
+    setindexv(dt, c("index"))
+    setindexv(dt, c("id"))
+    setindexv(dt, c("id", "index"))
+    if (is_named(class)) set(dt, NULL, "class", names(class))
+
+    act <- list(...)
+    if (!length(act)) return(dt)
+
+    new <- data.table()
+
+    for (i in seq_along(act)) {
+        action <- names(act)[[i]]
+        content <- act[[i]]
+
+        new1 <- data.table()
+        if (action == "reset") {
+            if (length(content) == 2L) {
+                dt[J(content[[1L]]), on = "index", `:=`(value = content[[2L]])]
+            } else if (length(content) >= 3L) {
+                set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
+                dt[J(content[[1L]], stri_trans_tolower(content[[2L]])), on = c("index", "value_lower"),
+                    `:=`(value = content[[3L]])
+                ]
+                set(dt, NULL, "value_lower", NULL)
+            }
+        } else if (action == "offset") {
+            # delete original first
+            dt <- dt[!J(setdiff(content[[2L]], content[[1L]])), on = "index"]
+            dt[J(content[[1L]]), on = "index", `:=`(index = content[[2L]]), by = "id"]
+        } else if (action == "add") {
+            # if no new value is given, assign NA
+            if (length(content) == 1L) content[[2L]] <- rep(NA_character_, length(content[[1L]]))
+            content[[2L]] <- rep(content[[2L]], length.out = length(content[[1L]]))
+
+            new1 <- dt[J(rep(1L, length(content[[1L]]))), on = "index", allow.cartesian = TRUE][
+                , `:=`(index = content[[1L]], field = names2(content[[1L]]), value = content[[2L]]), by = "id"
+            ]
+        } else if (action == "insert") {
+            # if no new value is given, assign NA
+            if (length(content) == 1L) content[[2]] <- rep(NA_character_, length(content[[1L]]))
+            # if no step value is given, assgin zero
+            if (length(content) == 2L) content[[3L]] <- 0L
+
+            # calculate new index of group rows to insert
+            num_grp <- dt[index >= content[[1L]][[1L]],
+                {
+                    if (content[[3L]] == 0L) {
+                        num <- 1L
+                    } else {
+                        num <- .N / content[[3L]] + 1L
+                        assert(is_integer(num), msg = "Invalid step for row insertion.")
+                    }
+                    index <- content[[1L]] + rep((length(content[[1L]]) + content[[3L]]) * (seq_len(num) - 1L), each = length(content[[1L]]))
+                    value <- rep(rep(content[[2L]], length.out = length(content[[1L]])), num)
+                    field <- rep(rep(names2(content[[1L]]), length.out = length(content[[1L]])), num)
+
+                    list(index = 1L, new_index = as.integer(index),
+                        new_value = value, new_field = field
+                    )
+                },
+                by = "id"
+            ]
+
+            # extract group of groups
+            new1 <- dt[num_grp, on = c("id", "index")]
+            set(new1, NULL, c("index", "value", "field"), NULL)
+            setnames(new1, c("new_index", "new_field", "new_value"), c("index", "field", "value"))
+
+            # update index of field left
+            dt[index >= content[[1L]][[1L]], index := {
+                if (content[[3L]] == 0L) {
+                    num <- 1L
+                } else {
+                    num <- .N / content[[3L]]
+                }
+
+                as.integer(index + length(content[[1L]]) *
+                    rep(seq_len(num), each = if (content[[3L]]) content[[3L]] else 1L)
+                )
+
+            }, by = "id"]
+        } else if (action == "delete") {
+            if (length(content) < 2L) {
+                dt <- dt[!J(content[[1L]]), on = "index"]
+            } else {
+                dt <- dt[(index - content[[1L]]) %% content[[2L]] != 0L]
+            }
+        }
+
+        new <- rbindlist(list(new, new1), use.names = TRUE)
+    }
+
+    new_dt <- rbindlist(list(dt, new), use.names = TRUE)
+    setorderv(new_dt, c("id", "index"))
+    setindexv(new_dt, c("index"))
+    setindexv(new_dt, c("id"))
+    setindexv(new_dt, c("id", "index"))
+    setorderv(new_dt, c("id", "index"))
+    new_dt
+}
+# }}}
+# trans_upper_versions {{{
+trans_upper_versions <- function (idf, ver, patch = FALSE) {
+    # get all versions needed to handle
+    all_vers <- standardize_ver(ALL_IDD_VER)
+    vers <- all_vers[all_vers >= idf$version() & all_vers <= standardize_ver(ver)]
+
+    # remove patch version
+    if (length(vers) & !patch) {
+        vers <- vers[!duplicated(as.character(vers[, 1:2]))]
+    }
+
+    vers
+}
+# }}}
+# trans_fun_names {{{
+trans_fun_names <- function (vers) {
+    # get corresponding transition function names
+    vers <- gsub(".", "", as.character(vers), fixed = TRUE)
+    vers[vers == "901"] <- "900"
+    vers <- unique(vers)
+    funs <- paste0("f", vers[-length(vers)], "t", vers[-1L])
+    # only include transition functions available
+    funs[funs %in% names(trans_funs)]
+}
+# }}}
+
+#' Run IDFVersionUpdater to Update Model Versions
+#'
+#' `version_updater()` is a wrapper of IDFVersionUpdater preprocessor
+#' distributed with EnergyPlus. It takes a path of IDF file or an [Idf] object,
+#' a target version to update to and a directory to save the new models.
+#'
+#' An attribute named `errors` is attached which is a list of
+#' [ErrFiles][read_err()] that contain all error messages from transition error
+#' (.VCpErr) files.
+#'
+#' @inheritParams transition
+#' @param dir The directory to save the new IDF files. If the directory does not
+#' exist, it will be created before save. If `NULL`, the directory of input
+#' [Idf] object or IDF file will be used. Default: `NULL`.
+#' @return An [Idf] object if `keep_all` is `FALSE` or a list of [Idf] objects
+#' if `keep_all` is `TRUE`. An attribute named `errors` is attached which
+#' contains all error messages from transition error (.VCpErr) files.
+#' @author Hongyuan Jia
+#' @export
+# version_updater {{{
+version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
+    # parse file
+    if (!is_idf(idf)) idf <- read_idf(idf)
+
+    assert(is_idd_ver(ver))
+
+    # save the model to the output dir if necessary
+    if (is.null(idf$path()) || !utils::file_test("-f", idf$path())) {
+        abort("error_idf_not_local",
+            paste0(
+                "The Idf object is not created from local file or local file has ",
+                "been deleted from disk. Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    # stop if unsaved
+    if (idf$is_unsaved()) {
+        abort("error_idf_not_saved",
+            paste0("Idf has been modified since read or last saved. ",
+                "Please save Idf using $save() before transition."
+            )
+        )
+    }
+
+    if (is.null(dir)) {
+        dir <- dirname(idf$path())
+    } else if (!dir.exists(dir)){
+        dir.create(dir, recursive = TRUE)
+    }
+
+    # stop if there is no newer version of EnergyPlus installed
+    ver <- standardize_ver(ver)
+
+    # skip if input is already at the specified version
+    if (idf$version()[, 1:2] == ver[, 1:2]) {
+        verbose_info("IDF is already at latest version ", ver, ". No transition needed.")
+        if (keep_all) {
+            res <- list(idf)
+            setattr(res, "names", as.character(idf$version()[, 1L:2L]))
+            return(res)
+        } else {
+            return(idf)
+        }
+    }
+
+    latest_ver <- avail_eplus()[avail_eplus()[, 1:2] >= ver[, 1:2]]
+    if (!length(latest_ver)) {
+        abort("error_updater_not_avail", paste0(
+            "EnergyPlus v", ver, " or newer are not installed."
+        ))
+    }
+
+    # save the original file with trailing version number
+    original <- paste0(tools::file_path_sans_ext(basename(idf$path())), "V", idf$version()[, 1L], idf$version()[, 2L], "0.idf")
+    # clone original
+    idf <- idf$clone(TRUE)
+    idf$save(file.path(dir, original), overwrite = TRUE)
+
+    # get the directory of IDFVersionUpdater
+    # avoid to use IDFVersionUpdater v9.0 as there are fital errors
+    if (length(latest_ver[latest_ver != 9.0])) latest_ver <- latest_ver[latest_ver != 9.0]
+    path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
+
+    # get upper versions toward target version
+    vers <- trans_upper_versions(idf, ver)
+
+    # get fun names
+    exe <- if (is_windows()) ".exe" else NULL
+    from <- vers[-length(vers)]
+    to <- vers[-1L]
+    trans_exe <- paste0("Transition-",
+        "V", from[, 1L], "-", from[, 2L], "-0", "-to-",
+        "V",   to[, 1L], "-",   to[, 2L], "-0", exe
+    )
+
+    # results
+    models <- vector("list", 1L + length(to))
+    names(models) <- as.character(c(idf$version()[, 1:2], to[, 1:2]))
+
+    # paths
+    paths <- character(1L + length(to))
+    names(paths) <- names(models)
+
+    # errors
+    errors <- vector("list", 1L + length(to))
+    names(errors) <- names(models)
+
+    while (idf$version()[, 1:2] != max(to)[, 1:2]) {
+        # restore paths
+        paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
+
+        # restore models
+        models[names(models) == as.character(idf$version()[, 1:2])] <- list(idf)
+
+        current_exe <- trans_exe[from[, 1:2] == idf$version()[, 1:2]]
+        toward <- to[from[, 1:2] == idf$version()[, 1:2]]
+
+        verbose_info(
+            "Input file: ", idf$path(), "\n",
+            " From  Ver: ", idf$version(), "\n",
+            "Toward Ver: ", toward
+        )
+
+        trans_path <- file.path(path_updater, current_exe)
+
+        if (!file.exists(trans_path)) {
+            abort("error_version_updater_exe_not_exist",
+                paste0(
+                    "Transition executable ", surround(trans_path), " does not exist."
+                )
+            )
+        }
+
+        job <- tryCatch(processx::run(trans_path, idf$path(), wd = path_updater),
+            error = function (e) {
+                if (grepl("System command error", conditionMessage(e))) {
+                    abort("error_updater_failed",
+                        paste0("Failed to update file ", idf$path(),
+                            " from V", idf$version(), " to V", toward, ":\n",
+                            conditionMessage(e)
+                        )
+                    )
+                } else {
+                    stop(e)
+                }
+            }
+        )
+
+        if (job$status != 0L) {
+            abort("error_updater_failed",
+                paste0("Failed to update file ", idf$path(),
+                    " from V", idf$version(), " to V", toward, "."
+                )
+            )
+        }
+
+        verbose_info("[", idf$version(), " --> ", toward, "] SUCCEEDED.\n")
+
+        # delete the new IDF file with old name since there is another new IDF file
+        # with ".idfold" extenstion
+        unlink(idf$path(), force = TRUE)
+
+        # read error file
+        path_err <- paste0(tools::file_path_sans_ext(idf$path()), ".VCpErr")
+        err <- read_err(path_err)
+        # remove VCpErr file generated
+        unlink(path_err, force = TRUE)
+
+        # rename the old file
+        file.rename(paste0(tools::file_path_sans_ext(idf$path()), ".idfold"), idf$path())
+
+        # name of the new file
+        path_new <- paste0(tools::file_path_sans_ext(idf$path()), ".idfnew")
+        # replace the old Idf object
+        idf <- read_idf(path_new)
+
+        # resave using eplusr
+        new_name <- paste0(stri_sub(tools::file_path_sans_ext(path_new), to = -4L), toward[, 1L], toward[, 2L], "0.idf")
+        idf$save(new_name, overwrite = TRUE)
+        # rename the orignal new file
+        unlink(path_new, force = TRUE)
+
+        # remove log file generated
+        unlink(file.path(path_updater, c("fort.6", "Energy+.ini", "Transition.audit")), force = TRUE)
+
+        # restore paths
+        paths[names(paths) == as.character(idf$version()[, 1:2])] <- idf$path()
+
+        # restore models
+        models[names(models) == as.character(idf$version()[, 1:2])] <- list(idf)
+
+        # restore errors
+        errors[names(errors) == as.character(idf$version()[, 1:2])] <- list(err)
+    }
+
+    if (!keep_all) {
+        unlink(paths[-length(paths)], force = TRUE)
+        models <- models[[length(models)]]
+    }
+
+    attr(models, "errors") <- errors
+    models
+}
+# }}}

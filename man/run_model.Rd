@@ -62,6 +62,10 @@ run EnergyPlus model with different options.
 \code{run_multi()} provides the functionality of running multiple models in
 parallel.
 
+\code{run_idf()} and \code{run_multi()} currently only support EnergyPlus v8.3 and
+above. This is because eplusr uses EnergyPlus command line interface
+which is a new feature as of EnergyPlus v8.3.
+
 For \code{run_idf()}, a named list will be returned:
 \itemize{
 \item \code{idf}: The path of IDF file
