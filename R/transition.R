@@ -2586,10 +2586,17 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ..., .clean 
 }
 # }}}
 # trans_upper_versions {{{
-trans_upper_versions <- function (idf, ver) {
+trans_upper_versions <- function (idf, ver, patch = FALSE) {
     # get all versions needed to handle
     all_vers <- standardize_ver(ALL_IDD_VER)
-    all_vers[all_vers >= idf$version() & all_vers <= standardize_ver(ver)]
+    vers <- all_vers[all_vers >= idf$version() & all_vers <= standardize_ver(ver)]
+
+    # remove patch version
+    if (length(vers) & !patch) {
+        vers <- vers[!duplicated(as.character(vers[, 1:2]))]
+    }
+
+    vers
 }
 # }}}
 # trans_fun_names {{{
@@ -2690,8 +2697,6 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
     # get upper versions toward target version
     vers <- trans_upper_versions(idf, ver)
-    # remove patch version
-    vers <- vers[!duplicated(as.character(vers[, 1:2]))]
 
     # get fun names
     exe <- if (is_windows()) ".exe" else NULL
