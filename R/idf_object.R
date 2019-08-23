@@ -729,6 +729,8 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 
 # add_idfobj_field_bindings {{{
 add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) {
+    if (!.options$autocomplete) return(obj)
+
     # create active bindings
     # get first 30 field names in current IDD class
     env <- .subset2(obj, ".__enclos_env__")
