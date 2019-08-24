@@ -35,6 +35,25 @@ An attribute named \code{errors} is attached which is a list of
 \link[=read_err]{ErrFiles} that contain all error messages from transition error
 (.VCpErr) files.
 }
+\examples{
+\dontrun{
+if (any(avail_eplus()) > 7.2) {
+    # create an empty IDF
+    idf <- empty_idf(7.2)
+    idf$save(tempfile(fileext = ".idf"))
+
+    # convert it from v7.2 to the latest EnergyPlus installed
+    updated <- version_updater(idf, max(avail_eplus()))
+
+    # convert it from v7.2 to the latest EnergyPlus installed and keep all
+    intermediate versions
+    updated <- version_updater(idf, max(avail_eplus()), keep_all = TRUE)
+
+    # see transition error messages
+    attr(updated, "errors")
+}
+}
+}
 \author{
 Hongyuan Jia
 }

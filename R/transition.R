@@ -32,6 +32,27 @@ CLASS_DEL_COMMON <- c(
 #' @seealso See [version_updater()] which directly call EnergyPlus preprocessor
 #' `IDFVersionUpdater` to perform the version transitions.
 #' @author Hongyuan Jia
+#' @examples
+#' \dontrun{
+#' if (any(avail_eplus()) > 7.2) {
+#'     # create an empty IDF
+#'     idf <- empty_idf(7.2)
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed
+#'     transition(idf, max(avail_eplus()))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions
+#'     transition(idf, max(avail_eplus()), keep_all = TRUE)
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions and save all them
+#'     idf$save(tempfile(fileext = ".idf"))
+#'     transition(idf, max(avail_eplus()), keep_all = TRUE,
+#'         save = TRUE, dir = tempdir()
+#'     )
+#' }
+#' }
 #' @export
 # transition {{{
 # TODO: how to give the names of saved files
@@ -2679,6 +2700,24 @@ trans_fun_names <- function (vers) {
 #' if `keep_all` is `TRUE`. An attribute named `errors` is attached which
 #' contains all error messages from transition error (.VCpErr) files.
 #' @author Hongyuan Jia
+#' @examples
+#' \dontrun{
+#' if (any(avail_eplus()) > 7.2) {
+#'     # create an empty IDF
+#'     idf <- empty_idf(7.2)
+#'     idf$save(tempfile(fileext = ".idf"))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed
+#'     updated <- version_updater(idf, max(avail_eplus()))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions
+#'     updated <- version_updater(idf, max(avail_eplus()), keep_all = TRUE)
+#'
+#'     # see transition error messages
+#'     attr(updated, "errors")
+#' }
+#' }
 #' @export
 # version_updater {{{
 version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
