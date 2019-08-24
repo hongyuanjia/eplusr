@@ -128,7 +128,7 @@ sep_name_dots <- function (..., .can_name = TRUE) {
 }
 # }}}
 # sep_value_dots {{{
-sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .default = TRUE) {
+sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .null = TRUE) {
     l <- list(...)
 
     # stop if empty input
@@ -176,7 +176,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .def
     }
 
     abort_invalid_format <- function (id) {
-        if (.default) {
+        if (.null) {
             if (.scalar) {
                 fmt <- "NULL, a non-NA single string or number."
             } else {
@@ -264,7 +264,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .def
             }
             set(dt, NULL, "empty", vlapply(dt$dot, is_empty_list))
 
-            if ((!.empty || !.default) && any(dt$empty)) abort_empty_dot(dt$rleid[dt$empty])
+            if ((!.empty || !.null) && any(dt$empty)) abort_empty_dot(dt$rleid[dt$empty])
 
             if (all(dt$empty)) {
                 val <- empty_input$value
@@ -329,7 +329,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .def
             set(obj, NULL, "empty", vlapply(obj$dot, is_empty_list))
 
             # stop if empty object is not allowed
-            if ((!.empty || !.default) && any(obj$empty)) abort_empty_dot(unique(obj$rleid[obj$empty]))
+            if ((!.empty || !.null) && any(obj$empty)) abort_empty_dot(unique(obj$rleid[obj$empty]))
 
             # change object_rleid into integer vector
             set(obj, NULL, "object_rleid", unlist(obj$object_rleid, use.names = FALSE))
@@ -377,7 +377,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .def
 
                     # init default value indicator
                     defaulted <- each_len == 0L
-                    if (!.default && any(defaulted)) {
+                    if (!.null && any(defaulted)) {
                         abort_invalid_format(rleid[defaulted])
                     }
                     # init defaulted values
@@ -1565,7 +1565,8 @@ dup_idf_object <- function (idd_env, idf_env, ...) {
 # }}}
 # add_idf_object {{{
 add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE) {
-    l <- sep_value_dots(..., .empty = TRUE, .default = .default)
+    # .null in sep_value_dots controls whether list(field = NULL) is acceptable
+    l <- sep_value_dots(..., .empty = TRUE, .null = TRUE)
 
     # new object table
     obj <- get_idd_class(idd_env, setnames(l$object, "name", "class_name")$class_name, underscore = TRUE)
@@ -1682,7 +1683,8 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 # }}}
 # set_idf_object {{{
 set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
-    l <- sep_value_dots(..., .empty = FALSE, .default = .default)
+    # .null in sep_value_dots controls whether list(field = NULL) is acceptable
+    l <- sep_value_dots(..., .empty = FALSE, .null = TRUE)
 
     obj_val <- match_set_idf_data(idd_env, idf_env, l)
     obj <- obj_val$object
