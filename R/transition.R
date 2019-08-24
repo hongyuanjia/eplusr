@@ -2720,7 +2720,7 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
     # get the directory of IDFVersionUpdater
     # avoid to use IDFVersionUpdater v9.0 as there are fital errors
-    if (length(latest_ver[latest_ver != "9.0.0"])) latest_ver <- latest_ver[latest_ver != "9.0.0"]
+    if (length(latest_ver[latest_ver[, 1:2] != 9.0])) latest_ver <- latest_ver[latest_ver[, 1:2] != 9.0]
     path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
 
     # get upper versions toward target version
