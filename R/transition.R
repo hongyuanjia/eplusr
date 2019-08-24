@@ -129,10 +129,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            idf <- with_option(
-                list(verbose_info = FALSE, validate_level = "none"),
-                trans_funs[[funs[i]]](idf)
-            )
+            idf <- without_checking(trans_funs[[funs[i]]](idf))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         idf
@@ -146,10 +143,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            res[[i + 1L]] <- with_option(
-                list(verbose_info = FALSE,validate_level = "none"),
-                trans_funs[[funs[[i]]]](res[[i]])
-            )
+            res[[i + 1L]] <- without_checking(trans_funs[[funs[[i]]]](res[[i]]))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
@@ -379,7 +373,7 @@ trans_funs$f720t800 <- function (idf) {
         if (nrow(dt)) {
             warn("warning_trans_720_800",
                 paste0("Default values for some fields in class ",
-                    "`", class, "` have been changed. ",
+                    "`", class, "` have been changed from v7.2 to v8.0. ",
                     "Results may be different than previous. ",
                     "See InputOutputReference document for details."
                 )
@@ -2193,7 +2187,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
     class <- class[idf$is_valid_class(class)]
 
     if (length(class)) {
-        new_idf$del(new_idf$object_id(class, simplify = TRUE), .force = TRUE)
+        with_silent(new_idf$del(new_idf$object_id(class, simplify = TRUE), .force = TRUE))
     }
 
     priv <- ._get_private(new_idf)
@@ -2459,7 +2453,7 @@ trans_postprocess <- function (idf, from, to) {
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:8)))
-    if (nrow(dt)) idf$load(dt, .unique = FALSE, .default = FALSE)
+    if (nrow(dt)) with_silent(idf$load(dt, .unique = FALSE, .default = FALSE))
 
     idf
 }
@@ -2472,7 +2466,7 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ..., .clean 
 
     dt <- idf$to_table(class = class, align = TRUE, all = all)
 
-    if (.clean) idf$del(idf$object_id(class, simplify = TRUE))
+    if (.clean) with_silent(idf$del(idf$object_id(class, simplify = TRUE)))
 
     # make sure min fields are returned
     if (!all && min_fields > max(dt$index)) {
@@ -2692,7 +2686,7 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
 
     # get the directory of IDFVersionUpdater
     # avoid to use IDFVersionUpdater v9.0 as there are fital errors
-    if (length(latest_ver[latest_ver != 9.0])) latest_ver <- latest_ver[latest_ver != 9.0]
+    if (length(latest_ver[latest_ver != "9.0.0"])) latest_ver <- latest_ver[latest_ver != "9.0.0"]
     path_updater <- file.path(eplus_config(max(latest_ver))$dir, "PreProcess/IDFVersionUpdater")
 
     # get upper versions toward target version

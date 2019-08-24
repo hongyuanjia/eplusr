@@ -208,3 +208,13 @@ with_option <- function (opts, expr) {
     force(expr)
 }
 # }}}
+# with_silent {{{
+with_silent <- function (expr) {
+    with_option(list(verbose_info = FALSE), expr)
+}
+# }}}
+# without_checking {{{
+without_checking <- function (expr) {
+    with_option(list(validate_level = "none"), expr)
+}
+# }}}
