@@ -32,6 +32,27 @@ CLASS_DEL_COMMON <- c(
 #' @seealso See [version_updater()] which directly call EnergyPlus preprocessor
 #' `IDFVersionUpdater` to perform the version transitions.
 #' @author Hongyuan Jia
+#' @examples
+#' \dontrun{
+#' if (any(avail_eplus()) > 7.2) {
+#'     # create an empty IDF
+#'     idf <- empty_idf(7.2)
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed
+#'     transition(idf, max(avail_eplus()))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions
+#'     transition(idf, max(avail_eplus()), keep_all = TRUE)
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions and save all them
+#'     idf$save(tempfile(fileext = ".idf"))
+#'     transition(idf, max(avail_eplus()), keep_all = TRUE,
+#'         save = TRUE, dir = tempdir()
+#'     )
+#' }
+#' }
 #' @export
 # transition {{{
 # TODO: how to give the names of saved files
@@ -2222,6 +2243,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
         )
     }
 
+    set(priv$idd_env()$field, NULL, c("class_name"), NULL)
     set(priv$idf_env()$value, NULL, c("class_name", "field_index"), NULL)
 
     # update version
@@ -2245,6 +2267,27 @@ trans_preprocess <- function (idf, version, class = NULL) {
 # trans_process {{{
 trans_process <- function (new_idf, old_idf, dt) {
     if (!nrow(dt))  return(new_idf)
+
+    # remove redundant empty fields
+    dt[._get_private(new_idf)$idd_env()$class, on = c("class" = "class_name"),
+        `:=`(class_id = i.class_id, min_fields = i.min_fields, num_extensible = i.num_extensible)
+        ]
+    dt[._get_private(new_idf)$idd_env()$field, on = c("class_id", index = "field_index"),
+        `:=`(extensible_group = i.extensible_group, required_field = i.required_field)
+    ]
+
+    # check if there are newly added extensible groups
+    # if detected, set extensible_group to a random number
+    # since extensible_group is only used to detect if current field is
+    # extensible, it will be enough to assign newly-added extensible fields with
+    # a non-zero integer
+    dt[J(NA_integer_), on = "extensible_group", `:=`(required_field = FALSE, extensible_group = -1L)]
+
+    # add fake value id
+    dt[, value_id := .I]
+    setnames(dt, c("id", "index", "value"), c("object_id", "field_index", "value_chr"))
+    dt <- remove_empty_fields(dt)
+    setnames(dt, c("object_id", "field_index", "value_chr"), c("id", "index", "value"))
 
     # get object table from old input
     old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id"]
@@ -2657,6 +2700,24 @@ trans_fun_names <- function (vers) {
 #' if `keep_all` is `TRUE`. An attribute named `errors` is attached which
 #' contains all error messages from transition error (.VCpErr) files.
 #' @author Hongyuan Jia
+#' @examples
+#' \dontrun{
+#' if (any(avail_eplus()) > 7.2) {
+#'     # create an empty IDF
+#'     idf <- empty_idf(7.2)
+#'     idf$save(tempfile(fileext = ".idf"))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed
+#'     updated <- version_updater(idf, max(avail_eplus()))
+#'
+#'     # convert it from v7.2 to the latest EnergyPlus installed and keep all
+#'     intermediate versions
+#'     updated <- version_updater(idf, max(avail_eplus()), keep_all = TRUE)
+#'
+#'     # see transition error messages
+#'     attr(updated, "errors")
+#' }
+#' }
 #' @export
 # version_updater {{{
 version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {

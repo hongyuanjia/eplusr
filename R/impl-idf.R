@@ -2366,6 +2366,10 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
     # check if adding objects in specific class is allowed
     assert_can_do(idd_env, idf_env, l$dot, parsed$object, action = "add")
 
+    # delete fields
+    add_joined_cols(idd_env$class, parsed$value, "class_id", c("min_fields", "num_extensible"))
+    parsed$value <- remove_empty_fields(parsed$value)
+
     # validate
     assert_valid(idd_env, idf_env, parsed$object, parsed$value, action = "add")
 
@@ -2769,23 +2773,33 @@ remove_empty_fields <- function (val) {
     # 3. field index should be consecutive from the end
     # 4. should be a whole extensible group
     val[, rev_field_rleid := rev(field_index), by = "object_id"]
+
     id_del <- val[required_field == FALSE & is.na(value_chr) & field_index > min_fields,
         {
-            if (!.N) {
+            # skip if no field found or field index not consecutive
+            if (!.N || !length(idx <- rev_field_rleid[rev_field_rleid == rev(seq_len(.N))])) {
                 list(value_id = NA_integer_)
+            # all are non-extensible fields
+            } else if (num_extensible[[1L]] == 0L) {
+                list(value_id = rev(value_id)[idx])
+            # handle extensible fields
             } else {
-                whole_ext <- TRUE
-                if (num_extensible[[1L]] > 0) {
-                    whole_ext <- .N %% num_extensible[[1L]] == 0L
-                }
+                # get extensible group numbers
+                ext_num <- length(idx) %/% num_extensible[[1L]]
 
-                if (!whole_ext) {
+                # skip if not contain even one whole group
+                if (!ext_num) {
                     list(value_id = NA_integer_)
                 } else {
-                    if (all(rev_field_rleid == rev(seq.int(.N)))) {
-                        list(value_id = value_id)
+                    # extensible field index
+                    idx_ext <- seq_len(ext_num * num_extensible[[1L]])
+
+                    # if all rest are non-extensible fields, save to remove them
+                    # all
+                    if (length(idx[-idx_ext]) && rev(extensible_group)[idx[-idx_ext]][1L] == 0L) {
+                        list(value_id = rev(value_id)[idx])
                     } else {
-                        list(value_id = NA_integer_)
+                        list(value_id = rev(value_id)[idx_ext])
                     }
                 }
             }

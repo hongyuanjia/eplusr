@@ -122,9 +122,25 @@ test_that("Transition", {
     expect_silent(idf <- temp_idf(7.2, "Refrigeration:CompressorList" = list("a", "b", "c", "d", "e", "f")))
     expect_silent(transition(idf, 8.0))
 
+    # can handle newly added extensible fields that are added during transition
+    expect_silent(idf <- temp_idf(7.2))
+    expect_silent(without_checking(idf$add(Branch = as.list(seq.int(60)), .all = TRUE)))
+    expect_silent(idf$save(overwrite = TRUE))
+    expect_length(without_checking(transition(idf, 8.0))$Branch$`1`$value(), 63)
+
     # can preserve object comment
     expect_silent(idf <- temp_idf(7.2, "ZoneHVAC:EquipmentList" = list("a", .comment = "comment")))
     expect_equal(transition(idf, 8.0)$object("a")$comment(), "comment")
+
+    # can remove empty lines
+    expect_silent(
+        idf <- transition(temp_idf(7.2,
+            Branch = list("a", 0, "a", "a", "a", "a", "a", "a", "a"),
+            Branch = list("b", 0, "b", "b")
+        ), 8.0)
+    )
+    expect_equal(nrow(idf$object("a")$to_table()), 13L)
+    expect_equal(nrow(idf$object("b")$to_table()), 8L)
     # }}}
     # v7.2 --> v8.0 {{{
     # can handle forkeq variables
