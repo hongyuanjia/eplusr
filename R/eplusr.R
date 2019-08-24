@@ -213,6 +213,11 @@ with_silent <- function (expr) {
     with_option(list(verbose_info = FALSE), expr)
 }
 # }}}
+# with_speed {{{
+with_speed <- function (expr) {
+    with_option(list(validate_level = "none", autocomplete = FALSE), expr)
+}
+# }}}
 # without_checking {{{
 without_checking <- function (expr) {
     with_option(list(validate_level = "none"), expr)

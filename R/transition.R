@@ -129,7 +129,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            idf <- without_checking(trans_funs[[funs[i]]](idf))
+            idf <- with_speed(trans_funs[[funs[i]]](idf))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         idf
@@ -143,7 +143,7 @@ trans_apply <- function (idf, ver, keep_all) {
                 " From  Ver: ", vers[i], "\n",
                 "Toward Ver: ", vers[i + 1L]
             )
-            res[[i + 1L]] <- without_checking(trans_funs[[funs[[i]]]](res[[i]]))
+            res[[i + 1L]] <- with_speed(trans_funs[[funs[[i]]]](res[[i]]))
             verbose_info("[", vers[i], " --> ", vers[i + 1L], "] SUCCEEDED.\n")
         }
         nms <- paste0(stri_sub(funs, 6L, 6L), ".", stri_sub(funs, 7L, 7L))
@@ -417,8 +417,7 @@ trans_funs$f720t800 <- function (idf) {
     dt32 <- warning_reset(idf, "Chiller:Absorption:Indirect", 16L,"VariableFlow", "LeavingSetpointModulated")
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:32)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:32))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -592,8 +591,7 @@ trans_funs$f800t810 <- function (idf) {
     dt15 <- update_hvactemplate_fan(new_idf, idf, "HVACTemplate:System:UnitaryHeatPump:AirToAir", min_fields = 7L)
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:15)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:15))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -739,8 +737,7 @@ trans_funs$f810t820 <- function (idf) {
     )
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:16)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:16))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -797,8 +794,7 @@ trans_funs$f820t830 <- function (idf) {
     )
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:5)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:5))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1054,8 +1050,7 @@ trans_funs$f830t840 <- function (idf) {
     }
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:18)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:18))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1077,7 +1072,7 @@ trans_funs$f840t850 <- function (idf) {
     )
     # }}}
 
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, dt)
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1402,7 +1397,7 @@ trans_funs$f850t860 <- function (idf) {
         reset = list(4L, "outdoor air wetblub temperature", "Outdoor Air Wetbulb Temperature")
     )
     # }}}
-    # 19: Output:Variable {{{
+    # 19: Output:Variable (DIRECTLY UPDATE) {{{
     # For Output:Variable that reference a specific Daylighting:Controls object
     # need update to the new reference point name
     if (new_idf$is_valid_class("Output:Variable")) {
@@ -1444,8 +1439,7 @@ trans_funs$f850t860 <- function (idf) {
     }
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:18)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:18))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1460,7 +1454,7 @@ trans_funs$f860t870 <- function (idf) {
         "CoolingTower:SingleSpeed",                  # 3
         "CoolingTower:TwoSpeed",                     # 4
         "CoolingTower:VariableSpeed:Merkel",         # 5
-        "AirflowNetwork:SimulationControl",           # 6
+        "AirflowNetwork:SimulationControl",          # 6
         "ZoneCapacitanceMultiplier:ResearchSpecial", # 7
         "WaterHeater:HeatPump:WrappedCondenser",     # 8
         "AirflowNetwork:Distribution:Component:Duct" # 9
@@ -1525,8 +1519,7 @@ trans_funs$f860t870 <- function (idf) {
     }
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:9)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:9))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1689,8 +1682,7 @@ trans_funs$f870t880 <- function (idf) {
     dt16 <- trans_action(idf, "AvailabilityManager:NightCycle", insert = list(6, "FixedRunTime"))
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:16)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:16))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -1827,8 +1819,7 @@ trans_funs$f880t890 <- function (idf) {
     }
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:8)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:8))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -2120,8 +2111,7 @@ trans_funs$f890t900 <- function (idf) {
     }
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:11)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:11))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -2158,8 +2148,7 @@ trans_funs$f900t910 <- function (idf) {
     dt2[1:20]
     # }}}
 
-    dt <- rbindlist(mget(paste0("dt", 1:2)))
-    if (nrow(dt)) new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:2))))
 
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
@@ -2249,6 +2238,51 @@ trans_preprocess <- function (idf, version, class = NULL) {
     priv$m_log$unsaved <- TRUE
     priv$m_log$uuid <- unique_id()
     priv$m_log$job <- NULL
+
+    new_idf
+}
+# }}}
+# trans_process {{{
+trans_process <- function (new_idf, old_idf, dt) {
+    if (!nrow(dt))  return(new_idf)
+
+    # get object table from old input
+    old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id"]
+
+    # get object table before inserting new objects
+    new_before <- ._get_private(new_idf)$idf_env()$object
+
+    # insert new objects
+    new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    # update
+    ._get_private(new_idf)$idf_env()$object[
+        !new_before, on = "object_id", comment := {
+            if (.N != nrow(old)) {
+                warn(
+                    paste0("warning_trans_",
+                        gsub(".", "0", as.character(old_idf$version()), fixed = TRUE)), "_",
+                        gsub(".", "0", as.character(new_idf$version()), fixed = TRUE),
+
+                    paste0("Failed to preserve comments of objects involved during transition ",
+                        "from ", old_idf$version()[, 1:2], " to ", new_idf$version()[, 1:2], ". ",
+                        "Comments of objects below will be removed:\n",
+                        get_object_info(.SD, c("name", "id"), collapse = "\n")
+                    )
+                )
+                if (length(comment) == 1L && is.null(comment[[1L]])) {
+                    list(list(NULL))
+                } else {
+                    comment
+                }
+            } else {
+                if (length(old$comment) == 1L && is.null(old$comment[[1L]])) {
+                    list(list(NULL))
+                } else {
+                    old$comment
+                }
+            }
+    }]
 
     new_idf
 }

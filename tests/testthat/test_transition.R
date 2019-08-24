@@ -121,6 +121,10 @@ test_that("Transition", {
     # can handle newly added extensible fields
     expect_silent(idf <- temp_idf(7.2, "Refrigeration:CompressorList" = list("a", "b", "c", "d", "e", "f")))
     expect_silent(transition(idf, 8.0))
+
+    # can preserve object comment
+    expect_silent(idf <- temp_idf(7.2, "ZoneHVAC:EquipmentList" = list("a", .comment = "comment")))
+    expect_equal(transition(idf, 8.0)$object("a")$comment(), "comment")
     # }}}
     # v7.2 --> v8.0 {{{
     # can handle forkeq variables
