@@ -303,7 +303,7 @@ parse_err_file <- function (path) {
 print.ErrFile <- function (x, brief = FALSE, info = TRUE, ...) {
     cli::cat_rule("EnergyPlus Error File", line = 2)
 
-    if (!is.na(attr(x, "eplus_build"))) {
+    if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))

@@ -373,7 +373,7 @@ validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
 print.RddFile <- function (x, ...) {
     cli::cat_rule("EnergyPlus Report Data Dictionary File", line = 2)
 
-    if (!is.na(attr(x, "eplus_build"))) {
+    if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
@@ -393,7 +393,7 @@ print.RddFile <- function (x, ...) {
 print.MddFile <- function (x, ...) {
     cli::cat_rule("EnergyPlus Meter Data Dictionary File", line = 2)
 
-    if (!is.na(attr(x, "eplus_build"))) {
+    if (!is.null(attr(x, "eplus_build")) && !is.na(attr(x, "eplus_build"))) {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version"), " (", attr(x, "eplus_build"), ")"))
     } else {
         cli::cat_line(paste0("  * EnergyPlus version: ", attr(x, "eplus_version")))
