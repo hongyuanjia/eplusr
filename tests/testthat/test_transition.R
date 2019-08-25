@@ -228,6 +228,10 @@ test_that("Transition", {
             "EvaporativeCooler:Indirect:ResearchSpecial" = 13L
         )
     )
+
+    # can hanle min-fields requirement update
+    expect_silent(idf <- transition(temp_idf(8.2, `Sizing:System` = list()), 8.3))
+    expect_length(idf$Sizing_System[[1L]]$value(), use_idd(8.3)$Sizing_System$min_fields())
     # }}}
     # v8.3 --> v8.4 {{{
     expect_identical_transition(8.3, 8.4,
