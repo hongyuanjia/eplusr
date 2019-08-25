@@ -2685,7 +2685,7 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ..., .clean 
             if (length(content) < 2L) {
                 dt <- dt[!J(content[[1L]]), on = "index"]
             } else {
-                dt <- dt[(index - content[[1L]]) %% content[[2L]] != 0L]
+                dt <- dt[index < content[[1L]] | (index - content[[1L]]) %% content[[2L]] != 0L]
             }
         }
 
