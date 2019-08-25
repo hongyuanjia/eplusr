@@ -2209,12 +2209,14 @@ trans_preprocess <- function (idf, version, class = NULL) {
     # add field index in value table
     set(priv$idf_env()$value, NULL, "field_index", rowidv(priv$idf_env()$value, "object_id"))
 
+    # store old idd table for comparison on min fields requirements
+    old_class <- priv$idd_env()$class
+
     # update IDD
     priv$m_idd <- new_idd
 
     # update class id in object table
     add_joined_cols(priv$idd_env()$class, priv$idf_env()$object, "class_name", "class_id")
-    set(priv$idf_env()$object, NULL, "class_name", NULL)
 
     # add class names in field table
     add_joined_cols(priv$idd_env()$class, priv$idd_env()$field, "class_id", "class_name")
@@ -2243,8 +2245,51 @@ trans_preprocess <- function (idf, version, class = NULL) {
         )
     }
 
-    set(priv$idd_env()$field, NULL, c("class_name"), NULL)
+    # should remove class_name and field_index column before calling append_dt
     set(priv$idf_env()$value, NULL, c("class_name", "field_index"), NULL)
+
+    # if min-fields increased, should add new fields
+    priv$idf_env()$object[old_class, on = "class_name", old_min_fields := i.min_fields]
+    priv$idf_env()$object[priv$idd_env()$class, on = "class_name", min_fields := i.min_fields]
+    # get objects in classes whose min-fields requirements increased
+    obj <- priv$idf_env()$object[min_fields > old_min_fields]
+    if (nrow(obj)) {
+        # get current field num
+        obj[, field_num := priv$idf_env()$value[J(obj$object_id), on = "object_id", .N, by = "object_id"]$N]
+
+        # check if there is a need to insert new fields
+        if (nrow(obj <- obj[field_num < min_fields])) {
+            obj <- obj[, list(
+                field_index = seq(field_num + 1L, min_fields, 1L),
+                class_id = class_id[[1L]]
+            ), by = "object_id"]
+
+            add_rleid(obj)
+
+            val <- get_idd_field(priv$idd_env(), obj$class_id, obj$field_index,
+                property = c("units", "ip_units", "default_chr", "default_num",
+                    "required_field", "src_enum", "type_enum"
+                )
+            )
+            set(val, NULL, "defaulted", TRUE)
+            # assign default values
+            val <- assign_default_value(val)
+
+            # assign old object id
+            val[obj, on = "rleid", object_id := i.object_id]
+
+            # assign new value id
+            set(val, NULL, "value_id", new_id(priv$idf_env()$value, "value_id", nrow(val)))
+
+            # merge data
+            idf_env <- priv$idf_env()
+            idf_env$value <- append_dt(idf_env$value, val, "value_id")
+            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val, "set"))
+        }
+    }
+
+    set(priv$idf_env()$object, NULL, c("class_name", "old_min_fields", "min_fields"), NULL)
+    set(priv$idd_env()$field, NULL, c("class_name"), NULL)
 
     # update version
     priv$m_version <- priv$m_idd$version()
