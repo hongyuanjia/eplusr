@@ -1123,6 +1123,13 @@ trans_funs$f850t860 <- function (idf) {
         "EnergyManagementSystem:Actuator"                     # 18
     )
 
+    # SPECIAL
+    # replace all "Coil:Heating:Gas" with "Coil:Heating:Fuel"
+    ._get_private(idf)$idf_env()$value[
+        stri_detect_fixed(value_chr, "coil:heating:gas", case_insensitive = TRUE),
+        value_chr := "Coil:Heating:Fuel"
+    ]
+
     new_idf <- trans_preprocess(idf, 8.6, target_cls)
 
     # 1: Exterior:FuelEquipment {{{

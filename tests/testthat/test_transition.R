@@ -281,6 +281,10 @@ test_that("Transition", {
     )
     expect_silent(idf <- transition(temp_idf(8.5, Branch = list("branch", 0, "curve", "type", "name", "in", "out")), 8.6))
     expect_equivalent(idf$Branch$branch$value(), list("branch", "curve", "type", "name", "in", "out"))
+
+    # can replace all Coil:Heating:Gas to Coil:Heating:Fuel
+    expect_silent(idf <- transition(temp_idf(8.5, "Branch" = list("branch", 0, "curve", "Coil:Heating:Gas", "gas")), 8.6))
+    expect_equal(idf$Branch$branch$value(3, simplify = TRUE), "Coil:Heating:Fuel")
     # }}}
     # v8.6 --> 8.7{{{
     expect_identical_transition(8.6, 8.7)
