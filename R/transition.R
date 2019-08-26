@@ -2341,45 +2341,7 @@ trans_process <- function (new_idf, old_idf, dt) {
     dt <- remove_empty_fields(dt)
     setnames(dt, c("object_id", "field_index", "value_chr"), c("id", "index", "value"))
 
-    # get object table from old input
-    old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id"]
-
-    # get object table before inserting new objects
-    new_before <- ._get_private(new_idf)$idf_env()$object
-
-    # insert new objects
-    new_idf$load(dt, .unique = FALSE, .default = FALSE)
-
-    # update
-    ._get_private(new_idf)$idf_env()$object[
-        !new_before, on = "object_id", comment := {
-            if (.N != nrow(old)) {
-                warn(
-                    paste0("warning_trans_",
-                        gsub(".", "0", as.character(old_idf$version()), fixed = TRUE)), "_",
-                        gsub(".", "0", as.character(new_idf$version()), fixed = TRUE),
-
-                    paste0("Failed to preserve comments of objects involved during transition ",
-                        "from ", old_idf$version()[, 1:2], " to ", new_idf$version()[, 1:2], ". ",
-                        "Comments of objects below will be removed:\n",
-                        get_object_info(.SD, c("name", "id"), collapse = "\n")
-                    )
-                )
-                if (length(comment) == 1L && is.null(comment[[1L]])) {
-                    list(list(NULL))
-                } else {
-                    comment
-                }
-            } else {
-                if (length(old$comment) == 1L && is.null(old$comment[[1L]])) {
-                    list(list(NULL))
-                } else {
-                    old$comment
-                }
-            }
-    }]
-
-    new_idf
+    trans_process_load(new_idf, old_idf, dt)
 }
 # }}}
 # trans_postprocess {{{
@@ -2537,7 +2499,7 @@ trans_postprocess <- function (idf, from, to) {
     if (nrow(rep_vars)) set(rep_vars, NULL, "old", stri_trans_tolower(rep_vars$old))
 
     # 1: Output:Variable {{{
-    dt1 <- trans_action(idf, "Output:Variable", .clean = TRUE)
+    dt1 <- trans_action(idf, "Output:Variable")
     dt1 <- reset_key(dt1, 1L)
     dt1 <- update_var(dt1, rep_vars, 2L, idf = idf)
     # }}}
@@ -2548,54 +2510,52 @@ trans_postprocess <- function (idf, from, to) {
           "Output:Meter:Cumulative",
           "Output:Meter:Cumulative:MeterFileOnly"
         ),
-        trans_action, idf = idf, .clean = TRUE
+        trans_action, idf = idf
     ))
     dt2 <- update_var(dt2, rep_vars, 1L, is_meter = TRUE, idf = idf)
     # }}}
     # 3: Output:Table:TimeBins {{{
-    dt3 <- trans_action(idf, "Output:Table:TimeBins", .clean = TRUE)
+    dt3 <- trans_action(idf, "Output:Table:TimeBins")
     dt3 <- reset_key(dt3, 1L)
     dt3 <- update_var(dt3, rep_vars, 2L, idf = idf)
     # }}}
     # 4: ExternalInterface:FunctionalMockupUnitImport:From:Variable & ExternalInterface:FunctionalMockupUnitExport:From:Variable {{{
-    dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable", .clean = TRUE)
-    dt4_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable", .clean = TRUE)
+    dt4_1 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitImport:From:Variable")
+    dt4_2 <- trans_action(idf, "ExternalInterface:FunctionalMockupUnitExport:From:Variable")
     dt4 <- rbindlist(list(dt4_1, dt4_2))
     dt4 <- reset_key(dt4, 1L)
     dt4 <- update_var(dt4, rep_vars, 2L, idf = idf)
     # }}}
     # 5: EnergyManagementSystem:Sensor {{{
-    dt5 <- trans_action(idf, "EnergyManagementSystem:Sensor", .clean = TRUE)
+    dt5 <- trans_action(idf, "EnergyManagementSystem:Sensor")
     dt5 <- update_var(dt5, rep_vars, 3L, idf = idf)
     # }}}
     # 6: Output:Table:Monthly {{{
-    dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L, .clean = TRUE)
+    dt6 <- trans_action(idf, "Output:Table:Monthly", min_fields = 4L)
     dt6 <- update_var(dt6, rep_vars, 3L, step = 2, idf = idf)
     # }}}
     # 7: Meter:Custom {{{
-    dt7 <- trans_action(idf, "Meter:Custom", .clean = TRUE)
+    dt7 <- trans_action(idf, "Meter:Custom")
     dt7 <- update_var(dt7, rep_vars, 4L, step = 2L, is_meter = TRUE, idf = idf)
     # }}}
     # 8: Meter:CustomDecrement {{{
-    dt8 <- trans_action(idf, "Meter:CustomDecrement", .clean = TRUE)
+    dt8 <- trans_action(idf, "Meter:CustomDecrement")
     dt8 <- update_var(dt8, rep_vars, 3L, 2L, is_meter = TRUE, idf = idf)
     # }}}
 
     dt <- rbindlist(mget(paste0("dt", 1:8)))
-    if (nrow(dt)) with_silent(idf$load(dt, .unique = FALSE, .default = FALSE))
+    if (!nrow(dt)) return(idf)
 
-    idf
+    trans_process_load(idf$clone()$del(unique(dt$id)), idf, dt)
 }
 # }}}
 
 # trans_action {{{
-trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ..., .clean = FALSE) {
+trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ...) {
     assert(idf$is_valid_class(class, all = TRUE))
     if (!idf$is_valid_class(class)) return(data.table())
 
     dt <- idf$to_table(class = class, align = TRUE, all = all)
-
-    if (.clean) with_silent(idf$del(idf$object_id(class, simplify = TRUE)))
 
     # make sure min fields are returned
     if (!all && min_fields > max(dt$index)) {
@@ -2731,6 +2691,51 @@ trans_fun_names <- function (vers) {
     funs <- paste0("f", vers[-length(vers)], "t", vers[-1L])
     # only include transition functions available
     funs[funs %in% names(trans_funs)]
+}
+# }}}
+# trans_process_load {{{
+trans_process_load <- function (new_idf, old_idf, dt) {
+    if (!nrow(dt)) return(new_idf)
+
+    # get object table from old input
+    old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id"]
+
+    # get object table before inserting new objects
+    new_before <- ._get_private(new_idf)$idf_env()$object
+
+    # insert new objects
+    new_idf$load(dt, .unique = FALSE, .default = FALSE)
+
+    # update
+    ._get_private(new_idf)$idf_env()$object[
+        !new_before, on = "object_id", comment := {
+            if (.N != nrow(old)) {
+                warn(
+                    paste0("warning_trans_",
+                        gsub(".", "0", as.character(old_idf$version()), fixed = TRUE)), "_",
+                        gsub(".", "0", as.character(new_idf$version()), fixed = TRUE),
+
+                    paste0("Failed to preserve comments of objects involved during transition ",
+                        "from ", old_idf$version()[, 1:2], " to ", new_idf$version()[, 1:2], ". ",
+                        "Comments of objects below will be removed:\n",
+                        get_object_info(.SD, c("name", "id"), collapse = "\n")
+                    )
+                )
+                if (length(comment) == 1L && is.null(comment[[1L]])) {
+                    list(list(NULL))
+                } else {
+                    list(comment)
+                }
+            } else {
+                if (length(old$comment) == 1L && is.null(old$comment[[1L]])) {
+                    list(list(NULL))
+                } else {
+                    list(old$comment)
+                }
+            }
+    }]
+
+    new_idf
 }
 # }}}
 
