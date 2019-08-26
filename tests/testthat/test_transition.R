@@ -298,6 +298,10 @@ test_that("Transition", {
     # can replace all Coil:Heating:Gas to Coil:Heating:Fuel
     expect_silent(idf <- transition(temp_idf(8.5, "Branch" = list("branch", 0, "curve", "Coil:Heating:Gas", "gas")), 8.6))
     expect_equal(idf$Branch$branch$value(3, simplify = TRUE), "Coil:Heating:Fuel")
+
+    # can handle 2 ref points
+    expect_silent(idf <- transition(temp_idf(8.5, "Daylighting:Controls" = list("zone", 2)), 8.6))
+    expect_equal(idf$object_num("Daylighting:ReferencePoint"), 2L)
     # }}}
     # v8.6 --> 8.7{{{
     expect_identical_transition(8.6, 8.7)

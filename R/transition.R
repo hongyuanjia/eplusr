@@ -1268,12 +1268,14 @@ trans_funs$f850t860 <- function (idf) {
             dt14_3 <- data.table()
         } else {
             dt14_3 <- dt14_3[J(obj_id), on = "id"][
-                J(c(6L:8L)), on = "index", value := c(3L:5L), by = "id"
+                J(c(6L:8L)), on = "index", index := c(3L:5L), by = "id"
             ][, value := {
                 value[2L] <- value[1L]
                 value[1L] <- if (is.na(value[1L])) "_DaylRefPt2" else paste0(value[1L], "_DaylRefPt2")
                 value
             }, by = "id"]
+            # in order to distinguish from first ref point's id
+            dt14_3[, id := -id]
         }
     }
     dt14 <- rbindlist(list(dt14_1, dt14_2, dt14_3))
