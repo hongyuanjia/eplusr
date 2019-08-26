@@ -1206,9 +1206,9 @@ trans_funs$f850t860 <- function (idf) {
             c(4L,  6:9,   5L,  11:12, 15L, 16L, 18L, 19L)
         ),
         add = list(c(10L, 13L, 14L, 17L)),
-        reset = list(3, "SplitFlux"),
-        reset = list(8, "0", NA_character_),
-        reset = list(13, NA_character_)
+        reset = list(3L, "SplitFlux"),
+        reset = list(8L, "0", NA_character_),
+        reset = list(13L, NA_character_)
     )
 
     if (!nrow(dt14_1)) {
@@ -2706,14 +2706,21 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     # insert new objects
     new_idf$load(dt, .unique = FALSE, .default = FALSE)
 
+    if (is.null(unlist(old$comment, use.names = FALSE))) return(new_idf)
+
     # update
+    input <- dt[, list(object_id = id[[1L]]), by = rleid(id, class)]
+    input[old, on = "object_id", comment := i.comment]
+
     ._get_private(new_idf)$idf_env()$object[
         !new_before, on = "object_id", comment := {
-            if (.N != nrow(old)) {
+            if (.N == nrow(input)) {
+                list(input$comment)
+            } else {
                 warn(
                     paste0("warning_trans_",
-                        gsub(".", "0", as.character(old_idf$version()), fixed = TRUE)), "_",
-                        gsub(".", "0", as.character(new_idf$version()), fixed = TRUE),
+                        gsub(".", "", as.character(old_idf$version()), fixed = TRUE), "_",
+                        gsub(".", "", as.character(new_idf$version()), fixed = TRUE)),
 
                     paste0("Failed to preserve comments of objects involved during transition ",
                         "from ", old_idf$version()[, 1:2], " to ", new_idf$version()[, 1:2], ". ",
@@ -2721,17 +2728,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
                         get_object_info(.SD, c("name", "id"), collapse = "\n")
                     )
                 )
-                if (length(comment) == 1L && is.null(comment[[1L]])) {
-                    list(list(NULL))
-                } else {
-                    list(comment)
-                }
-            } else {
-                if (length(old$comment) == 1L && is.null(old$comment[[1L]])) {
-                    list(list(NULL))
-                } else {
-                    list(old$comment)
-                }
+                list(comment)
             }
     }]
 

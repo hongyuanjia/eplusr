@@ -129,13 +129,21 @@ test_that("Transition", {
     expect_length(without_checking(transition(idf, 8.0))$Branch$`1`$value(), 63)
 
     # can preserve object comment
-    expect_silent(idf <- temp_idf(7.2,
+    expect_silent(idf <- temp_idf(8.5,
         "ZoneHVAC:EquipmentList" = list("a", .comment = "comment"),
+        "Daylighting:Controls" = list(.comment = "comment2"),
         "Output:Variable" = list(.comment = "comment1")
     ))
-    expect_silent(idf <- transition(idf, 8.0))
-    expect_equal(idf$object("a")$comment(), "comment")
-    expect_equal(idf$object(3)$comment(), "comment1")
+    expect_silent(idf <- transition(idf, 8.6))
+    expect_equal(lapply(idf$object_id(), function (id) idf$object(id)$comment()),
+        list(
+            Version = NULL,
+            `Daylighting:Controls` = "comment2",
+            `Daylighting:ReferencePoint` = "comment2",
+            `ZoneHVAC:EquipmentList` = "comment",
+            `Output:Variable` = "comment1"
+        )
+    )
 
     # can remove empty lines
     expect_silent(
