@@ -487,11 +487,10 @@ Similar to \code{$add()}, a special element \code{.comment} in each list will be
 as the \strong{new} comments for modified object, overwriting the old ones. Names
 in list element are treated as field names.
 
-There is a special syntax \code{class := list(field = value)} in \code{$set()} has been
-added. Note the use of \code{:=} instead of \code{=}. The main difference is that,
-unlike \code{=}, the left hand side of \code{:=} should be a valid class name in
-current \code{Idf} object.  It will set the field of all objects in specified
-class to specified value.
+There is a special syntax \code{class := list(field = value)} in \code{$set()}. Note
+the use of \code{:=} instead of \code{=}. The main difference is that, unlike \code{=}, the
+left hand side of \code{:=} should be a valid class name in current \code{Idf} object.
+It will set the field of all objects in specified class to specified value.
 
 \strong{Note}:
 \itemize{

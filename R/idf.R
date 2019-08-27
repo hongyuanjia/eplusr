@@ -501,11 +501,10 @@ NULL
 #' as the **new** comments for modified object, overwriting the old ones. Names
 #' in list element are treated as field names.
 #'
-#' There is a special syntax `class := list(field = value)` in `$set()` has been
-#' added. Note the use of `:=` instead of `=`. The main difference is that,
-#' unlike `=`, the left hand side of `:=` should be a valid class name in
-#' current `Idf` object.  It will set the field of all objects in specified
-#' class to specified value.
+#' There is a special syntax `class := list(field = value)` in `$set()`. Note
+#' the use of `:=` instead of `=`. The main difference is that, unlike `=`, the
+#' left hand side of `:=` should be a valid class name in current `Idf` object.
+#' It will set the field of all objects in specified class to specified value.
 #'
 #' **Note**:
 #'
