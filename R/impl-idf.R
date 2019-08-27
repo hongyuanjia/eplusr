@@ -1825,6 +1825,7 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
         l$value[obj_nm, on = c("rleid", "object_rleid"), `:=`(sgl_object_id = i.object_id)]
         l$value <- cls_nm[, list(rleid, object_id)][l$value, on = "rleid", allow.cartesian = TRUE][
             !is.na(sgl_object_id), object_id := sgl_object_id]
+        set(l$value, NULL, c("i.object_rleid", "sgl_object_id"), NULL)
     }
 
     # combine
