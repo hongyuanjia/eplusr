@@ -487,6 +487,12 @@ Similar to \code{$add()}, a special element \code{.comment} in each list will be
 as the \strong{new} comments for modified object, overwriting the old ones. Names
 in list element are treated as field names.
 
+There is a special syntax \code{class := list(field = value)} in \code{$set()} has been
+added. Note the use of \code{:=} instead of \code{=}. The main difference is that,
+unlike \code{=}, the left hand side of \code{:=} should be a valid class name in
+current \code{Idf} object.  It will set the field of all objects in specified
+class to specified value.
+
 \strong{Note}:
 \itemize{
 \item You can delete a field by assigning \code{NULL} to it, e.g. \code{list(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
@@ -524,13 +530,8 @@ possible. Default: \code{TRUE}.
 \item Delete field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)}.
 \item Assign default field value: \code{model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)}.
 \item Variable input: \code{a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)}.
-\item Set all values of field \code{fld} in a class \code{cls}:
-}\preformatted{ids <- model$object_id("cls", simplify = TRUE)
-val <- rep(list(list(fld = val)), times = length(ids))
-names(val) <- paste0("..", ids)
-model$set(val)
+\item Set all values of field \code{fld} in a class \code{cls}: \code{model$set(cls := list(fld = val))}.
 }
-
 }
 
 \subsection{Deleting Existing Objects}{\preformatted{model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
