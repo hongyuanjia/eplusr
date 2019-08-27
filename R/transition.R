@@ -1327,7 +1327,7 @@ trans_funs$f850t860 <- function (idf) {
         # extract reference point name, zone name, and illuminance setpoint
         dt16_2 <- lapply(unique(dt16_1$id),
             function (id) {
-                refp <- idf$object(id)$ref_by_object(1L, "Daylighting:DELight:ReferencePoint")
+                refp <- with_silent(idf$object(id)$ref_by_object(1L, "Daylighting:DELight:ReferencePoint"))
                 if (!length(refp)) {
                     data.table()
                 } else {
@@ -1603,7 +1603,7 @@ trans_funs$f870t880 <- function (idf) {
             # if not, give a warning and add one
             dt3 <- rbindlist(lapply(obj_id,
                 function (i) {
-                    perim <- idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]]
+                    perim <- with_silent(idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
 
                     if (!length(perim)) {
                         dt <- dt3[J(i), on = "id"]
@@ -1643,7 +1643,7 @@ trans_funs$f870t880 <- function (idf) {
             # if not, give a warning and add one
             dt4 <- rbindlist(lapply(obj_id,
                 function (i) {
-                    perim <- idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]]
+                    perim <- with_silent(idf$object(i)$ref_by_object(1L, "SurfaceProperty:ExposedFoundationPerimeter")[[1L]])
 
                     if (!length(perim)) {
                         dt <- dt4[J(i), on = "id"]
@@ -1884,7 +1884,7 @@ trans_funs$f890t900 <- function (idf) {
         )
     )
     if (nrow(dt1) && idf$object_num("OutdoorAir:Mixer") > 1L) {
-        warn("Multiple `OutdoorAir:Mixer` object found.")
+        warn("warning_trans_890_900", "Multiple `OutdoorAir:Mixer` object found.")
     }
     # }}}
     # 2: AirflowNetwork:Distribution:Component:ReliefAirFlow {{{
@@ -1896,7 +1896,7 @@ trans_funs$f890t900 <- function (idf) {
         )
     )
     if (nrow(dt2) && idf$object_num("OutdoorAir:Mixer") > 1L) {
-        warn("Multiple `OutdoorAir:Mixer` object found.")
+        warn("warning_trans_890_900", "Multiple `OutdoorAir:Mixer` object found.")
     }
     # }}}
     # 3: Boiler:HotWater {{{
@@ -2174,8 +2174,6 @@ trans_funs$f900t910 <- function (idf) {
         # Old NA    --> New [7:8] with step 4
         insert = list(7:8, NA, 4L)
     )
-
-    dt2[1:20]
     # }}}
 
     trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:2))))
