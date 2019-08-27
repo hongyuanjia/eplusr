@@ -501,6 +501,12 @@ NULL
 #' as the **new** comments for modified object, overwriting the old ones. Names
 #' in list element are treated as field names.
 #'
+#' There is a special syntax `class := list(field = value)` in `$set()` has been
+#' added. Note the use of `:=` instead of `=`. The main difference is that,
+#' unlike `=`, the left hand side of `:=` should be a valid class name in
+#' current `Idf` object.  It will set the field of all objects in specified
+#' class to specified value.
+#'
 #' **Note**:
 #'
 #' * You can delete a field by assigning `NULL` to it, e.g. `list(fld =
@@ -537,14 +543,7 @@ NULL
 #' * Delete field value: `model$set(Object_Name = list(Field_1 = NULL), .default = FALSE)`.
 #' * Assign default field value: `model$set(Object_Name = list(Field_1 = NULL), .default = TRUE)`.
 #' * Variable input: `a <- list(Object_Name = list(Field_1 = val1)); model$set(a, .default = TRUE)`.
-#' * Set all values of field `fld` in a class `cls`:
-#'
-#' ```
-#' ids <- model$object_id("cls", simplify = TRUE)
-#' val <- rep(list(list(fld = val)), times = length(ids))
-#' names(val) <- paste0("..", ids)
-#' model$set(val)
-#' ```
+#' * Set all values of field `fld` in a class `cls`: `model$set(cls := list(fld = val))`.
 #' }
 #'
 #' \subsection{Deleting Existing Objects}{
@@ -2098,8 +2097,8 @@ idf_dup_object <- function (self, private, object, new_name = NULL) {
 }
 # }}}
 # idf_add {{{
-idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE) {
-    add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all)
+idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = parent.frame(2)) {
+    add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all, .env = .env)
     merge_idf_data(private$idf_env(), add)
 
     # log
@@ -2118,8 +2117,8 @@ idf_add_object <- function (self, private, class, value = NULL, comment = NULL, 
 }
 # }}}
 # idf_set {{{
-idf_set <- function (self, private, ..., .default = TRUE) {
-    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default)
+idf_set <- function (self, private, ..., .default = TRUE, .env = parent.frame(2)) {
+    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .env = .env)
     merge_idf_data(private$idf_env(), set, by_object = TRUE)
 
     # log

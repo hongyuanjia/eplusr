@@ -128,18 +128,29 @@ sep_name_dots <- function (..., .can_name = TRUE) {
 }
 # }}}
 # sep_value_dots {{{
-sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .null = TRUE) {
-    l <- list(...)
+sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .null = TRUE, .env = parent.frame()) {
+    l <- eval(substitute(alist(...)))
 
     # stop if empty input
-    if (!length(l)) {
-        abort("error_empty_input", "Please give object(s) to add or set")
+    if (!length(l)) abort("error_empty_input", "Please give object(s) to modify.")
+
+    dot_nm <- names2(l)
+    is_cls <- rep(FALSE, length(l))
+
+    # only the first depth is supported
+    for (i in seq_along(l)) {
+        if (!is.null(l[[i]]) && length(l[[i]]) > 2L && is.call(l[[i]]) && as.character(l[[i]][[1L]]) == ":=") {
+            dot_nm[[i]] <- as.character(l[[i]][[2L]])
+            l[[i]] <- l[[i]][-c(1:2)][[1L]]
+            is_cls[[i]] <- TRUE
+        }
+        l[i] <- list(eval(l[[i]], envir = .env))
     }
 
     dt_dot <- data.table(rleid = seq_along(l),
         object_rleid = as.list(rep(1L, length(l))),
         dep = vapply(l, vec_depth, integer(1L)),
-        dot = l, dot_nm = names2(l)
+        dot = l, dot_nm = dot_nm, class = is_cls
     )
 
     if (.scalar) {
@@ -512,7 +523,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
     }
     # }}}
 
-    flat <- lapply(split(dt_dot, by = "dep"), flatten_input)
+    flat <- lapply(split(copy(dt_dot)[, class := NULL], by = "dep"), flatten_input)
 
     list(object = rbindlist(lapply(flat, .subset2, "object"), use.names = TRUE),
          value = rbindlist(lapply(flat, .subset2, "value"), use.names = TRUE),
@@ -1564,9 +1575,14 @@ dup_idf_object <- function (idd_env, idf_env, ...) {
 }
 # }}}
 # add_idf_object {{{
-add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE) {
+add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE, .env = parent.frame()) {
     # .null in sep_value_dots controls whether list(field = NULL) is acceptable
-    l <- sep_value_dots(..., .empty = TRUE, .null = TRUE)
+    l <- sep_value_dots(..., .empty = TRUE, .null = TRUE, .env = .env)
+
+    # stop if `:=`
+    if (any(l$dot$class)) {
+        abort("error_invalid_add_class", "`:=` can only be used when setting objects not adding.")
+    }
 
     # new object table
     obj <- get_idd_class(idd_env, setnames(l$object, "name", "class_name")$class_name, underscore = TRUE)
@@ -1682,9 +1698,9 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 }
 # }}}
 # set_idf_object {{{
-set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE) {
+set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .env = parent.frame()) {
     # .null in sep_value_dots controls whether list(field = NULL) is acceptable
-    l <- sep_value_dots(..., .empty = FALSE, .null = TRUE)
+    l <- sep_value_dots(..., .empty = FALSE, .null = TRUE, .env = .env)
 
     obj_val <- match_set_idf_data(idd_env, idf_env, l)
     obj <- obj_val$object
@@ -1770,17 +1786,50 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
     # separate
     obj_id_in <- l$object[!is.na(object_id)]
     set(obj_id_in, NULL, "object_name", NULL)
-    obj_nm_in <- l$object[is.na(object_id)]
-    set(obj_nm_in, NULL, "object_id", NULL)
+
+    # handle when trying to match whole class
+    if (nrow(l_cls <- l$dot[J(TRUE), on = "class", nomatch = 0L])) {
+        set(l_cls, NULL, "object_rleid", unlist(l_cls$object_rleid))
+        obj_nm_in <- l$object[is.na(object_id)][!l_cls, on = c("rleid", "object_rleid")]
+        set(obj_nm_in, NULL, "object_id", NULL)
+        cls_nm_in <- l$object[is.na(object_id)][!obj_nm_in, on = c("rleid", "object_rleid")]
+        set(cls_nm_in, NULL, "object_id", NULL)
+    } else {
+        obj_nm_in <- l$object[is.na(object_id)]
+        set(obj_nm_in, NULL, "object_id", NULL)
+        cls_nm_in <- obj_nm_in[0L]
+    }
 
     # get object data
     obj_id <- get_idf_object(idd_env, idf_env, object = obj_id_in$object_id)
     set(obj_id, NULL, names(obj_id_in), obj_id_in)
     obj_nm <- get_idf_object(idd_env, idf_env, object = obj_nm_in$object_name, ignore_case = TRUE)
-    set(obj_nm, NULL, names(obj_nm_in), obj_nm_in)
+    set(obj_nm, NULL, setdiff(names(obj_nm_in), "object_name"), obj_nm_in[, -"object_name"])
+
+    if (!nrow(cls_nm_in)) {
+        cls_nm <- obj_nm[0L]
+        # make sure each object can be matched in value table
+        l$value[obj_id, on = c("rleid", "object_rleid"), `:=`(object_id = i.object_id)]
+        l$value[obj_nm, on = c("rleid", "object_rleid"), `:=`(object_id = i.object_id)]
+    } else {
+        # get all objects in class
+        cls_nm <- get_idf_object(idd_env, idf_env, class = cls_nm_in$object_name, underscore = TRUE)
+        # make sure each object can be matched in object table
+        cls_nm_in[, new_rleid := .GRP, by = c("rleid", "object_rleid")]
+        cls_nm <- cls_nm[cls_nm_in[, -c("object_name")], on = c(rleid = "new_rleid")][
+            , `:=`(rleid = i.rleid, i.rleid = NULL, class_name_us = NULL)][
+            , object_rleid := seq_len(.N), by = "rleid"]
+
+        # make sure each object can be matched in value table
+        l$value[obj_id, on = c("rleid", "object_rleid"), `:=`(sgl_object_id = i.object_id)]
+        l$value[obj_nm, on = c("rleid", "object_rleid"), `:=`(sgl_object_id = i.object_id)]
+        l$value <- cls_nm[, list(rleid, object_id)][l$value, on = "rleid", allow.cartesian = TRUE][
+            !is.na(sgl_object_id), object_id := sgl_object_id]
+        set(l$value, NULL, "sgl_object_id", NULL)
+    }
 
     # combine
-    obj <- rbindlist(list(obj_id, obj_nm))
+    obj <- rbindlist(list(obj_id, obj_nm, cls_nm), use.names = TRUE)
 
     # update comment
     # NOTE: have to use `:=` format here as comment is a list
@@ -1794,7 +1843,7 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
     set(obj, NULL, "new_rleid", rleid(obj$rleid, obj$object_rleid))
 
     # new value table
-    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_rleid"), nomatch = 0L ]
+    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_id"), nomatch = 0L]
 
     # clean old rleid
     set(obj, NULL, c("rleid", "object_rleid"), NULL)

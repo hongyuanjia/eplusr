@@ -581,6 +581,17 @@ test_that("VALUE DOTS", {
             defaulted = rep(FALSE, 4L)
         )
     )
+
+    # whole-class support
+    expect_silent(l <- sep_value_dots(cls1 := list(fld1 = 1, fld2 = 2)))
+    expect_equivalent(l$object,
+        data.table(rleid = 1L, object_rleid = 1L, name = "cls1", empty = FALSE, comment = list())
+    )
+    expect_equivalent(l$value,
+        data.table(rleid = 1L, object_rleid = 1L, field_name = paste0("fld", 1L:2L),
+            value_chr = c("1", "2"), value_num = c(1, 2), defaulted = rep(FALSE, 2L)
+        )
+    )
 })
 # }}}
 
@@ -744,6 +755,17 @@ test_that("Set", {
     expect_equal(nrow(set_idf_object(idd_env, idf_env,
         ..8 = list(name = "name", start_year = NULL), .default = FALSE)$value),
         11L)
+
+    # can set whole class
+    expect_silent({mat <- set_idf_object(idd_env, idf_env,
+        Material_NoMass := list(roughness = "smooth", thermal_absorptance = 0.8))})
+    expect_equivalent(mat$object,
+        data.table(object_id = c(12L, 13L), class_id = 56L, comment = list(),
+            object_name = c("R13LAYER", "R31LAYER"), object_name_lower = c("r13layer", "r31layer")
+        )
+    )
+    expect_equivalent(mat$value[field_id == 7091, value_chr], c("smooth", "smooth"))
+    expect_equivalent(mat$value[field_id == 7093, value_chr], c("0.8", "0.8"))
 })
 # }}}
 

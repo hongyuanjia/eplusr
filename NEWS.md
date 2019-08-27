@@ -56,6 +56,10 @@
   does come in with a penalty on the performance. It can make adding or
   modifying large mounts of [Idf] and [IdfObject]s extremely slow. Default value
   make sure autocompletion works in interactive mode.
+* A new syntax `class := list(field = value)` in `$set()` has been added. Note
+  the use of `:=` instead of `=`. The main difference is that, unlike `=`, the
+  left hand side of `:=` should be a valid class name in current `Idf` object.
+  It will set the field of all objects in specified class to specified value.
 
 ## Bug fixes
 
