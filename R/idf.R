@@ -2097,8 +2097,8 @@ idf_dup_object <- function (self, private, object, new_name = NULL) {
 }
 # }}}
 # idf_add {{{
-idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE) {
-    add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all)
+idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = parent.frame(2)) {
+    add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all, .env = .env)
     merge_idf_data(private$idf_env(), add)
 
     # log
@@ -2117,8 +2117,8 @@ idf_add_object <- function (self, private, class, value = NULL, comment = NULL, 
 }
 # }}}
 # idf_set {{{
-idf_set <- function (self, private, ..., .default = TRUE) {
-    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default)
+idf_set <- function (self, private, ..., .default = TRUE, .env = parent.frame(2)) {
+    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .env = .env)
     merge_idf_data(private$idf_env(), set, by_object = TRUE)
 
     # log
