@@ -2037,43 +2037,78 @@ trans_funs$f890t900 <- function (idf) {
         fene_daylight_zone <- lapply(shadctrl,
             function (ctrl) {
                 # get all fenestrations that uses this control
-                fene <- ctrl$ref_by_object("Name",
+                fene <- with_silent(ctrl$ref_by_object("Name",
                     class = c("FenestrationSurface:Detailed", "Window", "GlazedDoor")
-                )
+                ))
 
                 if (!length(fene)) {
-                    fenestration <- NA_character_
-                    zone <- NA_character_
-                    daylgt <- NA_character_
+                    data.table(id_ctrl = ctrl$id(), name_ctrl = ctrl$name(),
+                        id_fene = NA_integer_, name_fene = NA_character_,
+                        id_zone = NA_integer_, name_zone = NA_character_,
+                        id_daylgt = NA_integer_, name_daylgt = NA_character_
+                    )
                 } else {
-                    fenestration <- names(fene)
+                    # use low-level API to speed up
+                    fene <- data.table(id_fene = viapply(fene, function (f) f$id()), name_fene = names(fene))
+
+                    surf <- get_idf_value(
+                        ._get_private(idf)$idd_env(),
+                        ._get_private(idf)$idf_env(),
+                        object = fene$id_fene, field = rep("Building Surface Name", nrow(fene)),
+                        align = TRUE
+                    )
+                    # combine
+                    fene[surf, on = c("id_fene" = "object_id"), `:=`(id_surf = i.value_id, name_surf = i.value_chr)]
 
                     # get zone name this fenestration belongs to
-                    zone <- vcapply(fene, function (fenestration) {
-                        fenestration$ref_to_object(
-                            "Building Surface Name",
-                            class = "Zone",
-                            recursive = TRUE, depth = NULL
-                        )[[1L]]$name()
-                    }, use.names = FALSE)
+                    zone <- get_idf_relation(
+                        ._get_private(idf)$idd_env(),
+                        ._get_private(idf)$idf_env(),
+                        value_id = unique(fene$id_surf), name = TRUE,
+                        direction = "ref_to", keep_all = TRUE, recursive = TRUE, recursive_depth = 1
+                    )
+                    # get surface name
+                    surf <- zone[dep == 0, list(id_surf = src_object_id, name_surf = value_chr)]
+                    # get zone name
+                    zone <- zone[J(1L, "Zone"), on = c("dep", "src_class_name")][
+                        surf, on = c("object_id" = "id_surf"), list(id_zone = src_object_id, name_zone = value_chr)]
 
-                    if (length(zone)) {
-                        assert(length(unique(tolower(zone))) == 1L)
-                        zone <- zone[[1L]]
+                    # combine
+                    set(fene, NULL, c("id_zone", "name_zone"), zone)
 
-                        # get daylighting control of this zone if exists
-                        daylgt <- idf$object(zone)$ref_by_object("Name", class = "Daylighting:Controls")
-                        daylgt <- if (length(daylgt)) daylgt[[1L]]$name() else NA_character_
+                    # get daylighting control for each zone
+                    daylgt <- get_idf_relation(
+                        ._get_private(idf)$idd_env(),
+                        ._get_private(idf)$idf_env(),
+                        object_id = unique(zone$id_zone), name = TRUE,
+                        direction = "ref_by", keep_all = TRUE
+                    )[class_name == "Daylighting:Controls",
+                        list(id_zone = src_object_id, id_daylgt = object_id)]
+                    # get daylighting control name
+                    if (!nrow(daylgt)) {
+                        set(daylgt, NULL, "name_daylgt", character())
                     } else {
-                        zone <- NA_character_
-                        daylgt <- NA_character_
+                        daylgt[._get_private(idf)$idf_env()$object, on = c("id_daylgt" = "object_id"),
+                            name_daylgt := i.object_name
+                        ]
                     }
-                }
 
-                list(fenestration = fenestration, zone = zone, daylighting = daylgt)
+                    # combine
+                    fene[daylgt, on = "id_zone", `:=`(id_daylgt = i.id_daylgt, name_daylgt = i.name_daylgt)]
+
+                    # add control id and name
+                    set(fene, NULL, c("id_ctrl", "name_ctrl"), list(ctrl$id(), ctrl$name()))
+
+                    # clean
+                    set(fene, NULL, c("id_surf", "name_surf"), NULL)
+                }
             }
         )
         # }}}
+        fene_daylight_zone <- rbindlist(fene_daylight_zone, use.names = TRUE)[,
+            list(rleid = .GRP, name_fene = list(name_fene)),
+            by = c("id_ctrl", "id_zone", "name_ctrl", "name_zone", "name_daylgt")
+        ]
 
         dt11 <- trans_action(idf, all = TRUE,
             class = c("WindowShadingControl" = "WindowProperty:ShadingControl"),
@@ -2083,25 +2118,33 @@ trans_funs$f890t900 <- function (idf) {
             ))
         )
 
-        # update name with zone name suffix
-        setindexv(dt11, "index")
-        dt11[J(1L), on = "index", value := {
-            zone <- vcapply(fene_daylight_zone, "[[", "zone")
+        # duplicate
+        dt11 <- rbindlist(lapply(seq.int(nrow(fene_daylight_zone)), function (i) {
+            set(copy(dt11), NULL, "rleid", i)
+        }))
 
-            found <- !is.na(value) & !is.na(zone)
-            if (any(found)) {
-                value[found] <- paste(value[found], "-", zone[found])
-            }
+        # update name with zone name suffix
+        set(fene_daylight_zone, NULL, "index", 1L)
+        dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := {
+            found <- !is.na(value) & !is.na(i.name_zone)
+            value[found] <- paste0(value[found], "-", i.name_zone[found])
             value
         }]
+
         # update zone name
-        dt11[J(2L), on = "index", value := vcapply(fene_daylight_zone, "[[", "zone")]
+        set(fene_daylight_zone, NULL, "index", 2L)
+        dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := i.name_zone]
+
+        # assign new object ID
+        fene_daylight_zone[, id_ctrl := new_id(._get_private(idf)$idf_env()$object, "object_id", .N)]
+        # update dt
+        dt11[fene_daylight_zone, on = "rleid", id := i.id_ctrl]
 
         # if unused, remove and throw a warning
-        if (nrow(empty <- dt11[J(2L, NA_character_), on = c("index", "value")])) {
+        if (nrow(empty <- dt11[J(2L, NA_character_), on = c("index", "value"), nomatch = 0L])) {
             warn("warning_trans_890_900", paste0(
                 "WindowProperty:ShadingControl = ",
-                surround(empty[J(1L), on = "index", ifelse(is.na(value), "", value)]),
+                surround(empty[, {ifelse(is.na(name), "", name)}]),
                 " was not used by any surfaces, so it has not been deleted.",
                 collpase = "\n"
             ))
@@ -2112,11 +2155,14 @@ trans_funs$f890t900 <- function (idf) {
             dt11 <- data.table()
         } else {
             # update control sequence
-            dt11[J(3L), on = "index", value := as.character(seq_along(fene_daylight_zone))]
+            set(fene_daylight_zone, NULL, "index", 3L)
+            fene_daylight_zone[, ctrl_seq := seq_along(.N), by = "id_zone"]
+            dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := ctrl_seq]
+
             # update multiple surface control type name
             dt11[, value := {
                 if (!is.na(value[[4L]]) & tolower(value[[4L]]) == "switchableglazing" &&
-                    !is.na(value[6L]) & tolower(value[[6L]]) == "meetdaylightilluminancesetpoint"
+                    !is.na(value[[6L]]) & tolower(value[[6L]]) == "meetdaylightilluminancesetpoint"
                 ) {
                     value[[16]] <- "Group"
                 } else {
@@ -2124,20 +2170,25 @@ trans_funs$f890t900 <- function (idf) {
                 }
                 value
             }, by = "id"]
+
             # update daylighting control name
-            dt11[J(15L), on = "index", value := vcapply(fene_daylight_zone, "[[", "daylighting")]
+            set(fene_daylight_zone, NULL, "index", 15L)
+            dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := i.name_daylgt]
+
             # add fenestration surface names
-            fene <- lapply(fene_daylight_zone, "[[", "fenestration")
-            # extract rows
-            ka_num <- each_length(fene)
-            new_fene <- data.table(id = rep(unique(dt11$id), ka_num), name = rep(names(fene), ka_num),
+            fene_fld <- fene_daylight_zone[, list(
+                name = NA_character_,
                 class = "WindowShadingControl",
-                index = unlist(lapply(ka_num, seq_len)) + 16L,
-                field = NA_character_, value = unlist(fene)
-            )
-            dt11 <- rbindlist(list(dt11, new_fene), use.names = TRUE)
+                index = seq_along(unlist(name_fene)) + 16L,
+                field = NA_character_,
+                value = unlist(name_fene)
+            ), by = "rleid"]
+            fene_fld[dt11, on = "rleid", id := i.id]
+
+            dt11 <- rbindlist(list(dt11, fene_fld), use.names = TRUE)
             setorderv(dt11, c("id", "index"))
         }
+        set(dt11, NULL, "rleid", NULL)
     }
     # }}}
 

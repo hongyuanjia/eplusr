@@ -56,10 +56,12 @@ build_trans_test_idf <- function (ver, ..., .exclude = NULL, .report_vars = TRUE
             idf$save(overwrite = TRUE)
         # for 8.9
         } else if (ver == 8.9) {
-            # add necessary input for the RunPeriod object
-            rp <- idf$objects_in_class("RunPeriod")[[1L]]
-            rp$set("name", 1, 2, 3, 4, .default = FALSE)
-            idf$save(overwrite = TRUE)
+            if (idf$is_valid_class("RunPeriod")) {
+                # add necessary input for the RunPeriod object
+                rp <- idf$objects_in_class("RunPeriod")[[1L]]
+                rp$set("name", 1, 2, 3, 4, .default = FALSE)
+                idf$save(overwrite = TRUE)
+            }
         }
     }
 

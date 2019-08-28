@@ -336,6 +336,8 @@ test_that("Transition", {
     # output object order
     expect_identical_transition(8.9, 9.0, .exclude = list(class = "RunPeriod:CustomRange"))
     expect_identical_transition(8.9, 9.0, "RunPeriod" = list(), .report_vars = FALSE)
+    # can remove shading control that is not used by any zone
+    expect_identical_transition(8.9, 9.0, "WindowProperty:ShadingControl" = list(), .report_vars = FALSE)
     # }}}
     # v9.0 --> v9.1 {{{
     expect_identical_transition(9.0, 9.1)
