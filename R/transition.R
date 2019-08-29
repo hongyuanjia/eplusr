@@ -2157,7 +2157,7 @@ trans_funs$f890t900 <- function (idf) {
             # update control sequence
             set(fene_daylight_zone, NULL, "index", 3L)
             fene_daylight_zone[, ctrl_seq := seq_along(.N), by = "id_zone"]
-            dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := ctrl_seq]
+            dt11[fene_daylight_zone, on = c("rleid", "id" = "id_ctrl", "index"), value := as.character(ctrl_seq)]
 
             # update multiple surface control type name
             dt11[, value := {
