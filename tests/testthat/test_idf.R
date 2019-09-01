@@ -341,6 +341,8 @@ test_that("Idf class", {
     # TABLE {{{
     # can get idf in table format
     expect_silent(idf <- read_idf(text("idf", 8.8)))
+    expect_silent(idf$to_table())
+    expect_silent(idf$to_string())
     expect_equal(
         idf$to_table(2, unit = TRUE, string_value = TRUE),
         data.table(id = 2L, name = "WALL-1", class = "Construction", index = 1:5,

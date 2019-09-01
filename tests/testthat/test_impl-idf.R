@@ -33,7 +33,7 @@ test_that("table", {
             class_name = "Version", num_fields = 1L, rleid = 1L
         )
     )
-    expect_equal(get_idf_object(idd_env, idf_env), add_class_name(idd_env, copy(idf_env$object)))
+    expect_equal(get_idf_object(idd_env, idf_env), add_rleid(add_class_name(idd_env, copy(idf_env$object))))
     expect_equal(get_idf_object(idd_env, idf_env, 55)$object_id, c(1L, 4L))
     expect_equal(get_idf_object(idd_env, idf_env, 55, c("WD02", "WD01"))$object_id, c(4L, 1L))
     expect_equal(get_idf_object(idd_env, idf_env, "Material")$object_id, c(1L, 4L))
@@ -91,7 +91,7 @@ test_that("table", {
     expect_equivalent(nrow(get_idf_value(idd_env, idf_env)), 44L)
     expect_equivalent(names(get_idf_value(idd_env, idf_env)),
         c("value_id", "value_chr", "value_num", "object_id", "field_id",
-        "class_id", "object_name", "class_name", "field_index", "field_name"
+        "class_id", "object_name", "class_name", "rleid", "field_index", "field_name"
         )
     )
     # }}}

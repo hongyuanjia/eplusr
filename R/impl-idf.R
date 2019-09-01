@@ -881,6 +881,8 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
             if (!is.null(property)) {
                 obj <- add_class_property(idd_env, idf_env$object, property)
             }
+            # add rleid
+            add_rleid(obj)
         # if class is specified
         } else {
             cls_in <- recognize_input(class, "class", underscore)

@@ -73,6 +73,7 @@
   successfully printed.
 * Now one-line empty objects, e.g. `"Output:Surfaces:List,,;\n"`, can be
   successfully parsed (#88).
+* Fix the error of `$to_table()` when no arguments were provided (#103).
 
 ## Minor changes
 

@@ -98,6 +98,7 @@ utils::globalVariables(c(
     "Variable", "i.datetime", "i.day", "i.hour", "i.minute", "i.month",
     "i.object_id", "i.rleid", "old", "key_value", "i.key_value", "i.value",
     "field_num", "i.class_id", "i.min_fields", "i.num_extensible",
-    "i.extensible_group", "i.required_field", "i.comment", "old_min_fields"
+    "i.extensible_group", "i.required_field", "i.comment", "old_min_fields",
+    "new_rleid", "sgl_object_id"
 ))
 # }}}
