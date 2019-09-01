@@ -134,15 +134,27 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
     # stop if empty input
     if (!length(l)) abort("error_empty_input", "Please give object(s) to modify.")
 
-    dot_nm <- names2(l)
+    dot_nm <- as.list(names2(l))
     is_cls <- rep(FALSE, length(l))
 
     # only the first depth is supported
     for (i in seq_along(l)) {
         if (!is.null(l[[i]]) && length(l[[i]]) > 2L && is.call(l[[i]]) && as.character(l[[i]][[1L]]) == ":=") {
-            dot_nm[[i]] <- as.character(l[[i]][[2L]])
+            if (length(l[[i]][[2L]]) > 1L && l[[i]][[2L]][[1L]] == ".") {
+                dot_nm[[i]] <- as.list(l[[i]][[2L]][-1L])
+                # for ..x
+                dot_nm[[i]] <- unlist(lapply(dot_nm[[i]], function (d) {
+                    if (grepl("\\.\\.\\d+", as.character(d))) {
+                        as.character(d)
+                    } else {
+                        eval(d, envir = .env)
+                    }
+                }))
+            } else {
+                dot_nm[[i]] <- as.character(l[[i]][[2L]])
+                is_cls[[i]] <- TRUE
+            }
             l[[i]] <- l[[i]][-c(1:2)][[1L]]
-            is_cls[[i]] <- TRUE
         }
         l[i] <- list(eval(l[[i]], envir = .env))
     }
@@ -184,6 +196,10 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
                 dot_string(dt_dot[J(id), on = "rleid"])
             )
         )
+    }
+
+    abort_invalid_name <- function (id) {
+        abort_invalid_input(id, "invalid_name", "Object ID and name connot contains NA")
     }
 
     abort_invalid_format <- function (id) {
@@ -265,6 +281,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
             }
 
             set(dt, NULL, "object_rleid", unlist(dt$object_rleid, use.names = FALSE))
+            set(dt, NULL, "dot_nm", unlist(dt$dot_nm, use.names = FALSE))
             set(dt, NULL, "dep", NULL)
             setnames(dt, "dot_nm", "name")
 
@@ -320,13 +337,31 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
         } else if (dep == 2L) {
             # {{{
             # check if is format "list(cls = list(NULL), cls = list())"
-            dot_nmd <- !is.na(dt$dot_nm)
+            dot_nmd <- vlapply(dt$dot_nm, function (x) !anyNA(x))
+            len_nm <- each_length(dt$dot_nm)
+
+            # stop if input name contains NA
+            if (any(len_nm > 1L & !dot_nmd)) {
+                abort_invalid_name(dt$rleid[len_nm > 1L & !dot_nmd])
+            }
 
             # correct object rleid
-            dt[!dot_nmd, `:=`(object_rleid = list(seq_len(each_length(dot)))), by = "rleid"]
+            dt[!dot_nmd, `:=`(object_rleid = list(seq.int(each_length(dot))) ), by = "rleid"]
+            if (any(len_nm > 1L & dot_nmd)) {
+                dt[len_nm > 1L & dot_nmd, `:=`(object_rleid = list(seq.int(dot_nm[[1L]]))), by = "rleid"]
+            }
 
             # flatten format: "list(cls = list(), cls = list(NULL, NULL))"
             dt_unnmd <- flatten(dt[!dot_nmd])
+            dt_multi <- dt[len_nm > 1L & dot_nmd][, {
+                len <- each_length(object_rleid)
+                list(rleid = rep(rleid, len),
+                     object_rleid = unlist(object_rleid),
+                     dep = rep(dep, len),
+                     dot = rep(dot, len),
+                     dot_nm = unlist(lapply(dot_nm, function (x) if (is.numeric(x)) paste0("..", x) else x))
+                )
+            }]
 
             # stop if object without names: "list(list(), list(NULL), list(NULL, NULL))"
             if (anyNA(dt_unnmd$dot_nm) | any(vlapply(dt_unnmd$dot, is.null))) {
@@ -334,7 +369,8 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
             }
 
             # combine
-            obj <- rbindlist(list(dt_unnmd, dt[dot_nmd]))
+            obj <- rbindlist(list(dt_unnmd, dt_multi, dt[len_nm == 1L & dot_nmd]))
+            obj[, dot_nm := unlist(dot_nm)]
 
             # check if empty object
             set(obj, NULL, "empty", vlapply(obj$dot, is_empty_list))
@@ -513,7 +549,7 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
             # }}}
         } else if (dep == 3L) {
             if (any(!is.na(dt$dot_nm))) abort_invalid_format(dt[!is.na(dot_nm), rleid])
-            dt[, `:=`(object_rleid = list(seq_len(each_length(dot)))), by = "rleid"]
+            dt[, `:=`(object_rleid = list(seq.int(each_length(dot)))), by = "rleid"]
             res <- flatten_input(flatten(dt, 1L))
         } else {
             abort_invalid_format(dt$rleid)
@@ -1830,6 +1866,7 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
 
     # combine
     obj <- rbindlist(list(obj_id, obj_nm, cls_nm), use.names = TRUE)
+    setorderv(obj, c("rleid", "object_rleid"))
 
     # update comment
     # NOTE: have to use `:=` format here as comment is a list
@@ -1843,13 +1880,11 @@ match_set_idf_data <- function (idd_env, idf_env, l) {
     set(obj, NULL, "new_rleid", rleid(obj$rleid, obj$object_rleid))
 
     # new value table
-    val <- l$value[obj[, -c("comment")], on = c("rleid", "object_id"), nomatch = 0L]
+    val <- l$value[obj[, -c("object_rleid", "comment")], on = c("rleid", "object_id"), nomatch = 0L]
 
     # clean old rleid
-    set(obj, NULL, c("rleid", "object_rleid"), NULL)
-    set(val, NULL, c("rleid", "object_rleid"), NULL)
-    setnames(obj, "new_rleid", "rleid")
-    setnames(val, "new_rleid", "rleid")
+    setnames(obj, c("new_rleid", "rleid", "object_rleid"), c("rleid", "input_rleid", "input_object_rleid"))
+    setnames(val, c("new_rleid", "rleid", "object_rleid"), c("rleid", "input_rleid", "input_object_rleid"))
 
     setnames(val, c("value_chr", "value_num"), c("new_value", "new_value_num"))
 

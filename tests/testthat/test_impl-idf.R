@@ -592,6 +592,19 @@ test_that("VALUE DOTS", {
             value_chr = c("1", "2"), value_num = c(1, 2), defaulted = rep(FALSE, 2L)
         )
     )
+
+    # multi-object support
+    expect_silent(l <- sep_value_dots(.(..1, ..2) := list(fld1 = 1, fld2 = 2)))
+    expect_equivalent(l$object,
+        data.table(rleid = 1L, object_rleid = 1L:2L, name = c("..1", "..2"), empty = FALSE, comment = list())
+    )
+    expect_equivalent(l$value,
+        data.table(rleid = 1L, object_rleid = c(1L, 1L, 2L, 2L),
+            field_name = rep(paste0("fld", 1L:2L), 2L),
+            value_chr = rep(c("1", "2"), 2L),
+            value_num = rep(c(1, 2), 2L), defaulted = FALSE
+        )
+    )
 })
 # }}}
 
