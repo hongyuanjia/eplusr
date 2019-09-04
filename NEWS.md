@@ -60,6 +60,10 @@
   the use of `:=` instead of `=`. The main difference is that, unlike `=`, the
   left hand side of `:=` should be a valid class name in current `Idf` object.
   It will set the field of all objects in specified class to specified value.
+* A new function `dt_to_load()` has been added, which formats a data.table from
+  `Idf$to_table()` and `IdfObject$to_table()` with `wide` being to `TRUE` into a
+  data.table in acceptable format for `Idf$load()` method and `Idf$update()`
+  method.
 
 ## Bug fixes
 

@@ -3441,6 +3441,73 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 }
 # }}}
 
+#' Format Long Table to Standard Input for `Idf$load()` Method
+#'
+#' `dt_to_load()` takes a [data.table][data.table::data.table()], usually
+#' created from [`Idf$to_table()`][Idf] or [`IdfObject$to_table()`][IdfObject]
+#' with `wide` being `TRUE`, and format it into a
+#' [data.table][data.table::data.table()] in acceptable format for `$load()`
+#' method in [Idf] class.
+#'
+#' @param dt A data.table created using `Idf$to_table()` and
+#' `IdfObject$to_table()`. `dt` should at least contain column `id` (indicator
+#' used to distinguish object definitions), `class` (class names). If a `name`
+#' column exists, it will be preserved.
+#' @param string_value If `TRUE`, all value will be coerced into character and
+#' the `value` column of returned [datat.table][data.table::data.table()] will
+#' be character type. If `FALSE`, the original value will be preserved and the
+#' `value` column of returned [data.table][data.table::data.table()] will be
+#' list type.
+#' @return
+#' A [data.table][data.table::data.table()] with 5 columns:
+#'
+#' * `id`: Integer type. Used to distinguish each object definition.
+#' * `class`: Character type.
+#' * `index`: Integer type. Field indices.
+#' * `field`: Character type. Field names.
+#' * `value`: Character or list type. The value of each field to be added.
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' # read an example distributed with eplusr
+#' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+#' idf <- read_idf(path_idf)
+#'
+#' # extract all material object data and return it as a wide table
+#' dt <- idf$to_table(class = "Material", wide = TRUE)
+#'
+#' dt_to_load(dt)
+#' }
+#' @export
+#' @export
+# dt_to_load {{{
+dt_to_load <- function (dt, string_value = TRUE) {
+    assert(has_name(dt, c("id", "class")))
+    has_nm <- has_name(dt, "name")
+
+    dt <- copy(dt)[, rleid := .I]
+    id_cols <- if (has_name(dt, "name")) c("rleid", "id", "name", "class") else c("rleid", "id", "class")
+    val_cols <- setdiff(names(dt), id_cols)
+
+    if (string_value && length(val_cols)) {
+        dt[, c(val_cols) := lapply(.SD, as.character), .SDcols = val_cols]
+    } else if (!string_value && length(val_cols)) {
+        dt[, c(val_cols) := lapply(.SD, as.list), .SDcols = val_cols]
+    }
+
+    dt <- melt.data.table(copy(dt)[, rleid := .I],
+        id.vars = id_cols,
+        variable.name = "field", variable.factor = FALSE
+    )
+
+    setorderv(dt, "rleid")
+    dt[, index := seq.int(.N), by = "rleid"]
+    set(dt, NULL, "rleid", NULL)
+    setcolorder(dt, c(setdiff(id_cols, "rleid"), "index"))[]
+}
+# }}}
+
 # STRING
 # get_idf_string {{{
 get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
