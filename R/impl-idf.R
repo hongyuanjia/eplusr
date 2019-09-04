@@ -3659,7 +3659,7 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
 
         # copy files
         to_copy <- unique(val$old_full_path)
-        flag <- file.copy(to_copy, new_dir, copy.date = TRUE)
+        flag <- file.copy(to_copy, new_dir, copy.date = TRUE, overwrite = TRUE)
         if (any(!flag)) {
             on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
             options(warning.length = 8170)
