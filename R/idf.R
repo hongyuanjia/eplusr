@@ -2843,6 +2843,31 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
     private <- ._get_private(x)
 
     cls_id <- chmatch(i, private$idd_env()$class$class_name_us)
+    if (is.na(cls_id)) cls_id <- chmatch(i, private$idd_env()$class$class_name)
+
+    # skip if not a valid IDD class name
+    if (is.na(cls_id)) return(NextMethod())
+
+    # skip if not an existing IDF class name
+    if (!cls_id %in% private$idf_env()$object$class_id) return(NextMethod())
+
+    cls_nm <- private$idd_env()$class$class_name[cls_id]
+    if (private$idd_env()$class$unique_object[cls_id]) {
+        .subset2(x, "object_unique")(cls_nm)
+    } else {
+        .subset2(x, "objects_in_class")(cls_nm)
+    }
+}
+# }}}
+
+#' @export
+# [[.Idf {{{
+`[[.Idf` <- function (x, i) {
+    if (i %chin% ls(x)) return(NextMethod())
+
+    private <- ._get_private(x)
+
+    cls_id <- chmatch(i, private$idd_env()$class$class_name)
 
     # skip if not a valid IDD class name
     if (is.na(cls_id)) return(NextMethod())
