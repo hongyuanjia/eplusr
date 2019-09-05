@@ -1412,11 +1412,13 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
     # In order to make sure `idfobj$nAmE` is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
-    fld_idx <- chmatch(name, underscore_name(fld_nm))
+    fld_idx <- chmatch(name, fld_nm)
+    if (is.na(fld_idx)) fld_idx <- chmatch(name, underscore_name(fld_nm))
+
     if (!is.na(fld_idx)) {
         tryCatch(
             get_idfobj_value(private$idd_env(), private$idf_env(),
-                private$m_object_id, which = name, underscore = TRUE
+                private$m_object_id, which = fld_idx
             )[[1L]],
             error_bad_field_name = function (e) NextMethod()
         )
@@ -1440,9 +1442,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
         # In order to make sure `idfobj$nAmE` is not acceptable
         if (is_integer(i) || i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
             tryCatch(
-                get_idfobj_value(private$idd_env(), private$idf_env(),
-                    private$m_object_id, which = i
-                )[[1L]],
+                get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which = i)[[1L]],
                 error_bad_field_name = function (e) NextMethod()
             )
         } else {
@@ -1464,12 +1464,12 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
     # In order to make sure `idfobj$nAmE <- "a"` is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
-    fld_idx <- chmatch(name, underscore_name(fld_nm))
+    fld_idx <- chmatch(name, fld_nm)
+    if (is.na(fld_idx)) fld_idx <- chmatch(name, underscore_name(fld_nm))
+
     if (!is.na(fld_idx)) {
         names(value) <- name
-        tryCatch(.subset2(x, "set")(c(value)),
-            error_bad_field_name = function (e) NextMethod()
-        )
+        tryCatch(.subset2(x, "set")(c(value)), error_bad_field_name = function (e) NextMethod())
 
         # add bindings
         add_idfobj_field_bindings(x, fld_idx)
@@ -1501,9 +1501,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
     }
     if (!is.na(fld_idx)) {
         names(value) <- i
-        tryCatch(.subset2(x, "set")(c(value)),
-            error_bad_field_name = function (e) NextMethod()
-        )
+        tryCatch(.subset2(x, "set")(c(value)), error_bad_field_name = function (e) NextMethod())
 
         # add bindings
         add_idfobj_field_bindings(x, fld_idx)
