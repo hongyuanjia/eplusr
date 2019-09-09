@@ -314,7 +314,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     if (!is.null(weather)) {
         jobs[, `:=`(input_weather = weather, weather = copy_run_files(weather, output_dir))]
     } else {
-        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL))]
+        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL), design_day = TRUE)]
     }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo)
