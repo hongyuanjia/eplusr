@@ -90,6 +90,10 @@
   `FALSE`.
 * `$delete()` method in `Epw` class has been deprected in flavor of `$del()` to
   provide a similar API as `Idf` class.
+* When `all` is `TRUE` in `$report_data()` in `EplusSql`, `EplusJob` and
+  `ParametricJob` class, an extra column `environment_period_index` is returned
+  which contains the indice of each run period environment. This helps to
+  distinguish different run period environment when no name is assigned.
 
 # eplusr 0.10.3
 

@@ -120,7 +120,8 @@ included:
 \item \code{interval}: Length of reporting interval
 \item \code{simulation_days}: Day of simulation
 \item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
-\item \code{environment_name}: A text string identifying the environment
+\item \code{environment_period_index}: The indice of environment.
+\item \code{environment_name}: A text string identifying the environment.
 \item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
 \code{1}
 \item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
@@ -160,7 +161,8 @@ With \code{wide} equals \code{TRUE}, \code{$report_data()} will format the simul
 in the same way as standard EnergyPlus csv output file. Sometimes this can be
 useful as there may be existing tools/workflows that depend on this format.
 When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
-and date time components are also returned, including: \code{environment_name},
+and date time components are also returned, including:
+\code{environment_period_index", "environment_name}, \code{simulation_days},
 \code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
 
 \code{$tabular_data()} extracts the tabular data in a

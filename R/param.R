@@ -181,7 +181,8 @@ NULL
 #' documentation.
 #'
 #' `$report_data()` extracts the report data in a
-#' [data.table][data.table::data.table()] using key values, variable names and other arguments.
+#' [data.table][data.table::data.table()] using key values, variable names and
+#' other arguments.
 #'
 #' `$tabular_data()` extracts tabular data in a
 #' [data.table][data.table::data.table()].
@@ -214,7 +215,7 @@ NULL
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
 #' * `echo`: Only applicable when `wait` is `TRUE`. Whether to simulation
-#' status. Default: `TRUE`.
+#'   status. Default: `TRUE`.
 #' * `suffix`: A string that indicates the file extension of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is

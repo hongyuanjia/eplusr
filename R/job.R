@@ -47,9 +47,9 @@ NULL
 #' job$read_mdd()
 #' job$report_data_dict()
 #' job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-#'                 all = FALSE, period = NULL, month = NULL, day = NULL, hour = NULL,
-#'                 minute = NULL, interval = NULL, simulation_days = NULL, day_type = NULL,
-#'                 environment_name = NULL)
+#'                 all = FALSE, wide = FALSE, period = NULL, month = NULL, day = NULL,
+#'                 hour = NULL, minute = NULL, interval = NULL, simulation_days = NULL,
+#'                 day_type = NULL, environment_name = NULL)
 #' job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
 #'                  column_name = NULL, row_name = NULL)
 #' job$print()
@@ -179,7 +179,8 @@ NULL
 #'   * `interval`: Length of reporting interval
 #'   * `simulation_days`: Day of simulation
 #'   * `day_type`: The type of day, e.g. `Monday`, `Tuesday` and etc.
-#'   * `environment_name`: A text string identifying the environment
+#'   * `environment_period_index`: The indice of environment.
+#'   * `environment_name`: A text string identifying the environment.
 #'   * `is_meter`: Whether report data is a meter data. Possible values: `0` and
 #'     `1`
 #'   * `type`: Nature of data type with respect to state. Possible values: `Sum`
@@ -218,7 +219,8 @@ NULL
 #' in the same way as standard EnergyPlus csv output file. Sometimes this can be
 #' useful as there may be existing tools/workflows that depend on this format.
 #' When both `wide` and `all` are `TRUE`, columns of runperiod environment names
-#' and date time components are also returned, including: `environment_name`,
+#' and date time components are also returned, including:
+#' `environment_period_index", "environment_name`, `simulation_days`,
 #' `datetime`, `month`, `day`, `hour`, `minute`, `day_type`.
 #'
 #' `$tabular_data()` extracts the tabular data in a

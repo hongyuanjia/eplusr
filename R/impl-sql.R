@@ -438,26 +438,28 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
 
         if (has_name(dt, "case")) {
             dt <- dcast.data.table(dt, case +
-                environment_period_index + simulation_days + environment_name +
+                environment_period_index + environment_name + simulation_days +
                 datetime + month + day + hour + minute +
                 day_type + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
+                value.var = "value")
         } else {
             dt <- dcast.data.table(dt,
-                environment_period_index + simulation_days + environment_name +
+                environment_period_index + environment_name + simulation_days +
                 datetime + month + day + hour + minute +
                 day_type + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
+                value.var = "value")
         }
     } else {
         if (has_name(dt, "case")) {
             dt <- dcast.data.table(dt, case +
-                environment_period_index + simulation_days + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
+                environment_period_index + environment_name + simulation_days +
+                `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:4)]
         } else {
             dt <- dcast.data.table(dt,
-                environment_period_index + simulation_days + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
+                environment_period_index + environment_name + simulation_days +
+                `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:3)]
         }
     }
 

@@ -186,7 +186,8 @@ ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
 documentation.
 
 \code{$report_data()} extracts the report data in a
-\link[data.table:data.table]{data.table} using key values, variable names and other arguments.
+\link[data.table:data.table]{data.table} using key values, variable names and
+other arguments.
 
 \code{$tabular_data()} extracts tabular data in a
 \link[data.table:data.table]{data.table}.
