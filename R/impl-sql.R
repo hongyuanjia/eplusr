@@ -319,72 +319,8 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         setcolorder(res, c("datetime", setdiff(names(res), "datetime")))
     }
 
-    # change to wide table {{{
-    if (wide) {
-        # change detailed level frequency to "Each Call"
-        res[, Variable := reporting_frequency]
-        res[J(c("Zone Timestep", "HVAC System Timestep")), on = "reporting_frequency", Variable := "Each Call"]
-        # combine key_value, name, and unit
-        res[J(1L), on = "is_meter", Variable := paste0(name, " [", units, "](", Variable, ")")]
-        res[J(0L), on = "is_meter", Variable := paste0(key_value, ":", name, " [", units, "](", Variable, ")")]
-
-        # handle RunPeriod frequency
-        if ("Run Period" %in% unique(res$reporting_frequency)) {
-            last_day <- res[!is.na(datetime), .SD[.N],
-                .SDcols = c("datetime", "month", "day", "hour", "minute"),
-                by = "environment_period_index"
-            ]
-            set(last_day, NULL, "reporting_frequency", "Run Period")
-
-            res[last_day, on = c("environment_period_index", "reporting_frequency"),
-                `:=`(datetime = i.datetime, month = i.month, day = i.day,
-                     hour = i.hour, minute = i.minute
-                )
-            ]
-        }
-
-        # format datetime
-        res[, `Date/Time` := paste0(" ",
-            stringi::stri_pad(month, 2, pad = "0"), "/",
-            stringi::stri_pad(day, 2, pad = "0"), "  ",
-            stringi::stri_pad(hour, 2, pad = "0"), ":",
-            stringi::stri_pad(minute, 2, pad = "0")
-        )]
-
-        # handle special cases
-        if (nrow(res) & all(is.na(res$datetime))) {
-            res[reporting_frequency != "Monthly", `Date/Time` := paste0("simdays=", simulation_days)]
-            res[reporting_frequency == "Monthly", `Date/Time` := {
-                m <- get_sql_date(sql, .BY$environment_period_index, simulation_days)$month
-                get_epw_month(m, label = TRUE)
-            }, by = "environment_period_index"]
-        }
-
-        if (all) {
-            # fill day_type
-            res[is.na(day_type) & !is.na(datetime) & hour == 24L,
-                `:=`(day_type = wday(datetime - hours(1L), label = TRUE))
-            ]
-            res[is.na(day_type) & !is.na(datetime) & hour != 24L,
-                `:=`(day_type = wday(datetime, label = TRUE))
-            ]
-
-            res <- dcast.data.table(res,
-                environment_period_index + simulation_days + environment_name +
-                datetime + month + day + hour + minute +
-                day_type + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
-        } else {
-            res <- dcast.data.table(res,
-                environment_period_index + simulation_days + `Date/Time` ~ Variable,
-                value.var = "value")[, .SD, .SDcols = -(1:2)]
-        }
-    }
-    # }}}
-
-    if (has_name(res, "environment_period_index")) {
-        set(res, NULL, "environment_period_index", NULL)
-    }
+    # change to wide table
+    if (wide) res <- report_dt_to_wide(res, all)
 
     if (not_empty(case)) {
         assert(is_scalar(case))
@@ -437,12 +373,95 @@ get_sql_date <- function (sql, environment_period_index, simulation_days) {
          WHERE ", cond, " AND (Month IS NOT NULL) AND (Day IS NOT NULL)"
         )
     get_sql_query(sql, q)
-    # cat(q, sep = "\n")
 }
 # }}}
 # tidy_sql_name {{{
 tidy_sql_name <- function (x) {
     setnames(x, stri_sub(gsub("([A-Z])", "_\\L\\1", names(x), perl = TRUE), 2L))
+}
+# }}}
+# report_dt_to_wide {{{
+report_dt_to_wide <- function (dt, date_components = FALSE) {
+    assert(has_name(dt, c("datetime", "month", "day", "hour", "minute",
+        "key_value", "name", "environment_period_index", "environment_name",
+        "reporting_frequency", "is_meter", "simulation_days", "day_type"
+    )))
+
+    # change detailed level frequency to "Each Call"
+    dt[, Variable := reporting_frequency]
+    dt[J("HVAC System Timestep"), on = "reporting_frequency", Variable := "Each Call"]
+    dt[J("Zone Timestep"), on = "reporting_frequency", Variable := "TimeStep"]
+    # combine key_value, name, and unit
+    dt[J(1L), on = "is_meter", Variable := paste0(name, " [", units, "](", Variable, ")")]
+    dt[J(0L), on = "is_meter", Variable := paste0(key_value, ":", name, " [", units, "](", Variable, ")")]
+
+    # handle RunPeriod frequency
+    if ("Run Period" %in% unique(dt$reporting_frequency)) {
+        last_day <- dt[!is.na(datetime), .SD[.N],
+            .SDcols = c("datetime", "month", "day", "hour", "minute"),
+            by = "environment_period_index"
+        ]
+        set(last_day, NULL, "reporting_frequency", "Run Period")
+
+        dt[last_day, on = c("environment_period_index", "reporting_frequency"),
+            `:=`(datetime = i.datetime, month = i.month, day = i.day,
+                 hour = i.hour, minute = i.minute
+            )
+        ]
+    }
+
+    # format datetime
+    dt[, `Date/Time` := paste0(" ",
+        stringi::stri_pad(month, 2, pad = "0"), "/",
+        stringi::stri_pad(day, 2, pad = "0"), "  ",
+        stringi::stri_pad(hour, 2, pad = "0"), ":",
+        stringi::stri_pad(minute, 2, pad = "0")
+    )]
+
+    # handle special cases
+    if (nrow(dt) & all(is.na(dt$datetime))) {
+        dt[reporting_frequency != "Monthly", `Date/Time` := paste0("simdays=", simulation_days)]
+        dt[reporting_frequency == "Monthly", `Date/Time` := {
+            m <- get_sql_date(sql, .BY$environment_period_index, simulation_days)$month
+            get_epw_month(m, label = TRUE)
+        }, by = "environment_period_index"]
+    }
+
+    if (date_components) {
+        # fill day_type
+        dt[is.na(day_type) & !is.na(datetime) & hour == 24L,
+            `:=`(day_type = wday(datetime - hours(1L), label = TRUE))
+        ]
+        dt[is.na(day_type) & !is.na(datetime) & hour != 24L,
+            `:=`(day_type = wday(datetime, label = TRUE))
+        ]
+
+        if (has_name(dt, "case")) {
+            dt <- dcast.data.table(dt, case +
+                environment_period_index + simulation_days + environment_name +
+                datetime + month + day + hour + minute +
+                day_type + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        } else {
+            dt <- dcast.data.table(dt,
+                environment_period_index + simulation_days + environment_name +
+                datetime + month + day + hour + minute +
+                day_type + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        }
+    } else {
+        if (has_name(dt, "case")) {
+            dt <- dcast.data.table(dt, case +
+                environment_period_index + simulation_days + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        } else {
+            dt <- dcast.data.table(dt,
+                environment_period_index + simulation_days + `Date/Time` ~ Variable,
+                value.var = "value")[, .SD, .SDcols = -(1:2)]
+        }
+    }
+
+    dt
 }
 # }}}
 
