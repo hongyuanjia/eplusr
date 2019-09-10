@@ -94,7 +94,7 @@ epw$drop_unit()
 epw$purge()
 epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
 epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-epw$delete(period)
+epw$del(period)
 epw$clone(deep = TRUE)
 epw$is_unsaved()
 epw$save(path, overwrite = FALSE)
@@ -473,7 +473,7 @@ missing code described in \code{$missing_code()}.
 \section{Set Weather Data}{
 \preformatted{epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
 epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-epw$delete(period)
+epw$del(period)
 }
 
 \code{$add()} adds a new data period into current \code{Epw} object at specified
@@ -499,7 +499,7 @@ be created according to values in the \code{datetime} column. Existing values
 will be overwritten.
 }
 
-\code{$delete(period)} removes one specified data period.
+\code{$del(period)} removes one specified data period.
 
 \strong{Arguments}:
 \itemize{

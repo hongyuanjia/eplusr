@@ -97,7 +97,7 @@ NULL
 #' epw$purge()
 #' epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
 #' epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-#' epw$delete(period)
+#' epw$del(period)
 #' epw$clone(deep = TRUE)
 #' epw$is_unsaved()
 #' epw$save(path, overwrite = FALSE)
@@ -477,7 +477,7 @@ NULL
 #' ```
 #' epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
 #' epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-#' epw$delete(period)
+#' epw$del(period)
 #' ```
 #'
 #' `$add()` adds a new data period into current `Epw` object at specified
@@ -502,7 +502,7 @@ NULL
 #'   be created according to values in the `datetime` column. Existing values
 #'   will be overwritten.
 #'
-#' `$delete(period)` removes one specified data period.
+#' `$del(period)` removes one specified data period.
 #'
 #' **Arguments**:
 #'
@@ -1011,6 +1011,9 @@ Epw <- R6::R6Class(classname = "Epw",
         set = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
             epw_set(self, private, data, realyear, name, start_day_of_week, period, warning),
 
+        del = function (period)
+            epw_del(self, private, period),
+
         delete = function (period)
             epw_delete(self, private, period),
         # }}}
@@ -1396,14 +1399,20 @@ epw_set_data <- function (self, private, data) {
     self$set(data)
 }
 # }}}
-# epw_delete {{{
-epw_delete <- function (self, private, period) {
-    l <- delete_epw_data(private$m_data, private$m_header, period)
+# epw_del {{{
+epw_del <- function (self, private, period) {
+    l <- del_epw_data(private$m_data, private$m_header, period)
     private$m_header <- l$header
     private$m_data <- l$data
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
     invisible(self)
+}
+# }}}
+# epw_delete {{{
+epw_delete <- function (self, private, period) {
+    .deprecated_fun("$delete()", "$del()", "Epw", "0.10.3")
+    epw_del(self, private, period)
 }
 # }}}
 # epw_is_unsaved {{{

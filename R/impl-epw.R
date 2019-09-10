@@ -2622,8 +2622,8 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
     d
 }
 # }}}
-# delete_epw_data {{{
-delete_epw_data <- function (epw_data, epw_header, period) {
+# del_epw_data {{{
+del_epw_data <- function (epw_data, epw_header, period) {
     assert(is_count(period))
     period <- get_epw_data_period(epw_header, period)
 

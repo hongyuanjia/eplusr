@@ -88,6 +88,8 @@
   later package.
 * All messages can be suppressed by setting the `verbose_info` option to
   `FALSE`.
+* `$delete()` method in `Epw` class has been deprected in flavor of `$del()` to
+  provide a similar API as `Idf` class.
 
 # eplusr 0.10.3
 
