@@ -16,6 +16,8 @@ NULL
 #' idfobj$version()
 #' idfobj$id()
 #' idfobj$name()
+#' idfobj$class_name()
+#' idfobj$group_name()
 #' idfobj$definition()
 #' idfobj$comment(comment, append = TRUE, width = 0L)
 #' idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
