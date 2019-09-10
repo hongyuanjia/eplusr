@@ -19,9 +19,10 @@ be character type. If \code{FALSE}, the original value will be preserved and the
 list type.}
 }
 \value{
-A \link[data.table:data.table]{data.table} with 5 columns:
+A \link[data.table:data.table]{data.table} with 5 or 6 columns:
 \itemize{
 \item \code{id}: Integer type. Used to distinguish each object definition.
+\item \code{name}: Character type. Only exists when input \code{dt} has a \code{name} column.
 \item \code{class}: Character type.
 \item \code{index}: Integer type. Field indices.
 \item \code{field}: Character type. Field names.

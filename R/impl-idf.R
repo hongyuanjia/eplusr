@@ -3459,9 +3459,10 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 #' `value` column of returned [data.table][data.table::data.table()] will be
 #' list type.
 #' @return
-#' A [data.table][data.table::data.table()] with 5 columns:
+#' A [data.table][data.table::data.table()] with 5 or 6 columns:
 #'
 #' * `id`: Integer type. Used to distinguish each object definition.
+#' * `name`: Character type. Only exists when input `dt` has a `name` column.
 #' * `class`: Character type.
 #' * `index`: Integer type. Field indices.
 #' * `field`: Character type. Field names.
