@@ -161,8 +161,9 @@ test_that("Parametric methods", {
     )
     expect_equal(names(param$report_data(2, all = TRUE)),
         c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
-          "simulation_days", "day_type", "environment_name", "is_meter", "type",
-          "index_group", "timestep_type", "key_value", "name", "reporting_frequency",
+          "simulation_days", "day_type", "environment_name",
+          "environment_period_index", "is_meter", "type", "index_group",
+          "timestep_type", "key_value", "name", "reporting_frequency",
           "schedule_name", "units", "value"
         )
     )
@@ -197,8 +198,9 @@ test_that("Parametric methods", {
     )
     expect_equal(names(param$report_data(all = TRUE)),
         c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
-          "simulation_days", "day_type", "environment_name", "is_meter", "type",
-          "index_group", "timestep_type", "key_value", "name", "reporting_frequency",
+          "simulation_days", "day_type", "environment_name",
+          "environment_period_index", "is_meter", "type", "index_group",
+          "timestep_type", "key_value", "name", "reporting_frequency",
           "schedule_name", "units", "value"
         )
     )

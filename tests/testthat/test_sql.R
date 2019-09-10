@@ -46,8 +46,9 @@ test_that("Sql methods", {
     expect_equal(sql$report_data(case = "test")$case, rep("test", 3840))
     expect_equal(names(sql$report_data(all = TRUE)),
         c("case", "datetime", "month", "day", "hour", "minute", "dst", "interval",
-          "simulation_days", "day_type", "environment_name", "is_meter", "type",
-          "index_group", "timestep_type", "key_value", "name", "reporting_frequency",
+          "simulation_days", "day_type", "environment_name",
+          "environment_period_index", "is_meter", "type", "index_group",
+          "timestep_type", "key_value", "name", "reporting_frequency",
           "schedule_name", "units", "value"
         )
     )
