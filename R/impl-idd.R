@@ -690,20 +690,17 @@ add_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
     new_fld_id <- new_id(idd_env$field, "field_id", nrow(new_ext))
 
     # assign new field id
-    set(new_ext, NULL, "field_id", new_fld_id)
+    set(new_ext, NULL, "new_fld_id", new_fld_id)
 
     # get field reference data
-    ref <- idd_env$reference[
-        J(new_ext$field_id), on = "field_id"][
-        , `:=`(field_id = new_fld_id)][
-        !is.na(src_field_id)]
-    src <- idd_env$reference[J(new_ext$field_id), on = "src_field_id"][
-        , `:=`(src_field_id = new_fld_id)][
-        !is.na(field_id)]
+    ref <- idd_env$reference[new_ext[, list(field_id, new_fld_id)], on = "field_id"][
+        , `:=`(field_id = new_fld_id)][!is.na(src_field_id)]
+    src <- idd_env$reference[new_ext[, list(src_field_id = field_id, new_fld_id)], on = "src_field_id"][
+        , `:=`(src_field_id = new_fld_id)][!is.na(field_id)]
     new_ref <- rbindlist(list(ref, src))
 
     # combine into the main field table and name table
-    idd_env$field <- append_dt(idd_env$field, new_ext)
+    idd_env$field <- append_dt(idd_env$field, new_ext[, field_id := new_fld_id])
     idd_env$reference <- append_dt(idd_env$reference, new_ref)
 
     # update class data

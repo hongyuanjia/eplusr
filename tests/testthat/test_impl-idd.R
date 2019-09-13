@@ -80,6 +80,12 @@ test_that("table manipulation", {
     expect_equal(idd_added$field$field_anid[6:9], c("A3", "N3", "N4", "A4"))
     expect_equal(idd_added$field$required_field[6:9], rep(FALSE, 4L))
     expect_equal(idd_added$field$extensible_group[6:9], rep(2L, 4L))
+
+    # references of extensible fields should be automatically generated
+    expect_silent(idd_added <- add_idd_extensible_group(idd_parsed, "TestSlash", 1))
+    expect_equal(idd_added$reference,
+        data.table(class_id = 2L, field_id = c(2L, 6L), src_class_id = 1L, src_field_id = 1L, src_enum = 2L)
+    )
     # }}}
     # DEL {{{
     expect_equivalent((idd_del <- del_idd_extensible_group(idd_added, "TestSlash", 1))$field, idd_parsed$field)
