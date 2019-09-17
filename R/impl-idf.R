@@ -3228,7 +3228,7 @@ update_referenced_value <- function (idd_env, idf_env, value, action = c("add", 
             set(ref_at_depth, NULL, "src_value_chr", src_val$value_chr)
         } else {
             set(ref_at_depth, NULL, "src_value_chr",
-                idf_env$value[J(ref_at_depth$src_value_id), .SD, .SDcols = "value_chr"]
+                idf_env$value[J(ref_at_depth$src_value_id), on = "value_id", .SD, .SDcols = "value_chr"]
             )
         }
 
