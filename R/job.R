@@ -450,7 +450,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
                     abort("error_idf_not_local",
                         paste0(
                             "The Idf object is not created from local file. ",
-                             "Please give save it to disk before run."
+                             "Please save it to disk using `$save()` before run."
                         )
                     )
                 }

@@ -6,6 +6,8 @@ test_that("Parametric methods", {
 
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
+    expect_error(param_job(empty_idf(8.8), NULL), class = "error_idf_not_local")
+
     example <- copy_example()
 
     param <- param_job(example$idf, example$epw)

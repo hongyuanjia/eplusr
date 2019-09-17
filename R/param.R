@@ -443,6 +443,23 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
             if (is_idf(idf)) {
                 private$m_idf <- idf$clone(deep = TRUE)
+                if (is.null(idf$path())) {
+                    abort("error_idf_not_local",
+                        paste0(
+                            "The Idf object is not created from local file. ",
+                            "Please save it to disk using `$save()` before creating ",
+                            "parametric simulations."
+                        )
+                    )
+                }
+                if (idf$is_unsaved()) {
+                    abort("error_idf_not_saved",
+                        paste0("Idf has been modified since read or last saved. ",
+                            "Please save it using `$save()` before creating ",
+                            "parametric simulations."
+                        )
+                    )
+                }
             } else {
                 private$m_idf <- read_idf(idf)
             }
@@ -460,6 +477,23 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
                 private$m_epw <- NULL
             } else if (is_epw(epw)) {
                 private$m_epw <- epw$clone(deep = TRUE)
+                if (is.null(epw$path())) {
+                    abort("error_epw_not_local",
+                        paste0(
+                            "The Epw object is not created from local file. ",
+                            "Please save it to disk using `$save()` before creating ",
+                            "parametric simulations."
+                        )
+                    )
+                }
+                if (epw$is_unsaved()) {
+                    abort("error_epw_not_saved",
+                        paste0("Epw has been modified since read or last saved. ",
+                            "Please save it using `$save()` before creating ",
+                            "parametric simulations."
+                        )
+                    )
+                }
             } else {
                 private$m_epw <- read_epw(epw)
             }

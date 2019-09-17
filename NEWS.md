@@ -98,6 +98,8 @@
   `ParametricJob` class, an extra column `environment_period_index` is returned
   which contains the indice of each run period environment. This helps to
   distinguish different run period environment when no name is assigned.
+* `param_job()` now gives more informative error message if input `Idf` object
+  and `Epw` object is not created from a local file (#112).
 
 # eplusr 0.10.3
 
