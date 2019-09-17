@@ -2552,7 +2552,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
 
         # if input is character vectors, need to reset values since all of them
         # are coerced regardless of field types
-        val_dt[type == 1L & type_enum > IDDFIELD_TYPE$real, `:=`(value_num = NA_real_)]
+        val_dt[type == 1L & type_enum > IDDFIELD_TYPE$real, `:=`(value_num = NA_real_, new_value_num = NA_real_)]
         set(val_dt, NULL, "type", NULL)
 
         # reset rleid

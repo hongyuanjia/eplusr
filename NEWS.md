@@ -80,6 +80,8 @@
 * Fix the error of `$to_table()` when no arguments were provided (#103).
 * The references of newly added extensible fields are now correctly handled
   (#109).
+* `$update()` now works for class `Schedule:Compact` with type checking on
+  (#111).
 
 ## Minor changes
 
