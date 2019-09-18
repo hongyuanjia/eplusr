@@ -82,6 +82,8 @@
   (#109).
 * `$update()` now works for class `Schedule:Compact` with type checking on
   (#111).
+* Fix the error in `$ref_to_node()` when no objects in specified class is found
+  (#110).
 
 ## Minor changes
 
