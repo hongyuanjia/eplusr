@@ -65,7 +65,8 @@
   data.table in acceptable format for `Idf$load()` method and `Idf$update()`
   method.
 * Now `read_epw()` support EPW files with non-integer timezones fail to load
-  (#113).
+  (#113). `$location()` in `Epw` class also support setting the timezone to
+  non-integer one.
 
 ## Bug fixes
 

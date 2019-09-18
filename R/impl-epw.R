@@ -2001,8 +2001,7 @@ set_epw_location <- function (epw_header, input) {
     res <- parse_epw_header_basic("location", input,
         type = list(
             chr = c("city", "state_province", "country", "data_source", "wmo_number"),
-            dbl = c("latitude", "longitude", "elevation"),
-            int = c("time_zone")
+            dbl = c("latitude", "longitude", "elevation", "time_zone")
         ),
         range = list(
             latitude = ranger(-90, TRUE, 90, TRUE),
