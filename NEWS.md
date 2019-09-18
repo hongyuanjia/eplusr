@@ -64,6 +64,8 @@
   `Idf$to_table()` and `IdfObject$to_table()` with `wide` being to `TRUE` into a
   data.table in acceptable format for `Idf$load()` method and `Idf$update()`
   method.
+* Now `read_epw()` support EPW files with non-integer timezones fail to load
+  (#113).
 
 ## Bug fixes
 

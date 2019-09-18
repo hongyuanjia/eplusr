@@ -635,10 +635,7 @@ parse_epw_header_location <- function (input, ...) {
             "city", "state_province", "country", "data_source", "wmo_number",
             "latitude", "longitude", "time_zone", "elevation"
         ),
-        type = list(
-            dbl = c("latitude", "longitude", "elevation"),
-            int = c("time_zone")
-        ),
+        type = list(dbl = c("latitude", "longitude", "elevation", "time_zone")),
         range = list(
             latitude = ranger(-90, TRUE, 90, TRUE),
             longitude = ranger(-180, TRUE, 180, TRUE),
@@ -3150,10 +3147,14 @@ print_epw_header <- function (epw_header) {
     # }}}
     loc <- epw_header$location
     cli::cat_line(sprintf("[Location ]: %s, %s, %s", loc$city, loc$state_province, loc$country))
+    # format time zone into UTC offset
+    tz <- loc$time_zone
+    h <- abs(trunc(tz))
+    m <- round((abs(tz) - h) * 60)
     cli::cat_line(sprintf("             {%s}, {%s}, {UTC%s}",
             lat_lon(loc$latitude),
             lat_lon(loc$longitude, TRUE),
-            paste0(if (loc$time_zone >= 0) "+" else "-", lpad(abs(loc$time_zone), "0", 2L), ":00")
+            paste0(if (tz >= 0) "+" else "-", lpad(h, "0", 2L), ":", lpad(m, "0", 2L))
     ))
     cli::cat_line(sprintf("[Elevation]: %.fm %s see level", abs(loc$elevation), if (loc$elevation >= 0) "above" else "below"))
     cli::cat_line(sprintf("[Data Src ]: %s", loc$data_source))
