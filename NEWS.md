@@ -105,6 +105,9 @@
   distinguish different run period environment when no name is assigned.
 * `param_job()` now gives more informative error message if input `Idf` object
   and `Epw` object is not created from a local file (#112).
+* `param_job()` now preserve parametric model names from argument `.names` in
+  `$apply_measure()` instead of calling `make.name()` to convert them into valid
+  R names (#115).
 
 # eplusr 0.10.3
 
