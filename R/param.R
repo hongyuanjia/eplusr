@@ -618,17 +618,16 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
         MoreArgs = list(idf = private$m_idf), SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     if (is.null(.names)) {
-        out_nms <- paste0(mea_nm, "_", seq_along(out))
+        nms <- paste0(make.names(mea_nm), "_", seq_along(out))
     } else {
         assert(have_same_len(out, .names),
             msg = paste0(length(out), " models created with only ", length(.names), " names given.")
         )
 
-        nms <- as.character(.names)
-        out_nms <- make.names(gsub(" ", "_", fixed = TRUE, make.unique(nms, sep = "_")), unique = TRUE)
+        nms <- make.unique(as.character(.names), sep = "_")
     }
 
-    setattr(out, "names", out_nms)
+    setattr(out, "names", nms)
 
     private$m_param <- out
 
@@ -636,8 +635,8 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
     verbose_info("Measure ", surround(mea_nm), " has been applied with ", length(out),
-        " new models created:\n", paste0("[", lpad(seq_along(out_nms), "0"), "]", ": ",
-            surround(out_nms), collapse = "\n")
+        " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
+        nms, collapse = "\n")
     )
 }
 # }}}
@@ -778,8 +777,6 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 
     ver <- private$m_idf$version()
 
-    nms <- names(private$m_param)
-
     path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
     if (is.null(private$m_epw)) {
         path_epw <- NULL
@@ -825,7 +822,10 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
         }
     }
 
-    path_param <- file.path(output_dir, nms, paste0(nms, ".idf"))
+    nms <- names(private$m_param)
+    nms[nchar(nms) > 100] <- substring(nms[nchar(nms) > 100], 1L, 100L)
+    filename <- make.unique(nms, "_")
+    path_param <- file.path(output_dir, filename, paste0(filename, ".idf"))
 
     apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
 
@@ -858,7 +858,6 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 
     path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
     path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
-    nms <- names(private$m_param)
 
     if (is.null(dir))
         dir <- dirname(path_idf)
@@ -875,11 +874,15 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
         )
     }
 
+    nms <- names(private$m_param)
+    nms[nchar(nms) > 100] <- substring(nms[nchar(nms) > 100], 1L, 100L)
+    filename <- make.unique(nms, "_")
+
     if (separate) {
-        path_param <- file.path(dir, nms, paste0(nms, ".idf"))
+        path_param <- file.path(dir, filename, paste0(filename, ".idf"))
     } else {
         copy_external <- FALSE
-        path_param <- file.path(dir, paste0(nms, ".idf"))
+        path_param <- file.path(dir, paste0(filename, ".idf"))
     }
 
     # save model

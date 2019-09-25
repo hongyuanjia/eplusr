@@ -58,6 +58,18 @@ test_that("Parametric methods", {
     # }}}
 
     # Save {{{
+    # can preserve name
+    param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = 1:5)
+    expect_equal(names(param$models()), as.character(1:5))
+    expect_silent(paths <- param$save())
+    expect_equal(paths,
+        data.table::data.table(
+            model = normalizePath(file.path(tempdir(), 1:5, paste0(1:5, ".idf"))),
+            weather = normalizePath(file.path(tempdir(), 1:5, basename(param$weather()$path())))
+        )
+    )
+
+    param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = NULL)
     expect_silent(paths <- param$save())
     expect_equal(paths,
         data.table::data.table(
