@@ -618,12 +618,12 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
         MoreArgs = list(idf = private$m_idf), SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     if (is.null(.names)) {
-        nms <- paste0(make.names(mea_nm), "_", seq_along(out))
+        if (length(mea_nm) > 1L) mea_nm <- "case"
+        nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
         assert(have_same_len(out, .names),
             msg = paste0(length(out), " models created with only ", length(.names), " names given.")
         )
-
         nms <- make.unique(as.character(.names), sep = "_")
     }
 
@@ -634,10 +634,19 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     # log unique ids
     private$m_log$uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
-    verbose_info("Measure ", surround(mea_nm), " has been applied with ", length(out),
-        " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
-        nms, collapse = "\n")
-    )
+    if (eplusr_option("verbose_info")) {
+        if (length(private$m_log$measure_name) > 1L) {
+            mea_nm <- "function"
+        } else {
+            mea_nm <- surround(mea_nm)
+        }
+        verbose_info("Measure ", mea_nm, " has been applied with ", length(out),
+            " new models created:\n", paste0("[", lpad(seq_along(nms), "0"), "]", ": ",
+            nms, collapse = "\n")
+        )
+    }
+
+    invisible(self)
 }
 # }}}
 # param_retrieve_data {{{
@@ -823,8 +832,7 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     }
 
     nms <- names(private$m_param)
-    nms[nchar(nms) > 100] <- substring(nms[nchar(nms) > 100], 1L, 100L)
-    filename <- make.unique(nms, "_")
+    filename <- make_filename(nms)
     path_param <- file.path(output_dir, filename, paste0(filename, ".idf"))
 
     apply2(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
@@ -875,8 +883,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     }
 
     nms <- names(private$m_param)
-    nms[nchar(nms) > 100] <- substring(nms[nchar(nms) > 100], 1L, 100L)
-    filename <- make.unique(nms, "_")
+    filename <- make_filename(nms)
 
     if (separate) {
         path_param <- file.path(dir, filename, paste0(filename, ".idf"))

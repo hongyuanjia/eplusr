@@ -295,6 +295,22 @@ underscore_name <- function (name, merge = TRUE) {
 }
 # }}}
 
+# make_filename {{{
+make_filename <- function (x, len = 100, unique = TRUE) {
+    # reference: https://stackoverflow.com/questions/6730009/validate-a-file-name-on-windows/6804755#6804755
+    x <- stri_replace_all_charclass(x, "[<>:\"/\\\\|?*\\x00-\\x1F]", "_")
+    # cannot start with "."
+    x <- stri_replace_first_regex(x, "^\\.", "_")
+
+    x[nchar(x) > 100] <- substring(x[nchar(x) > 100], 1L, 100L)
+
+    # make unique
+    if (!unique) return(x)
+
+    make.unique(x, "_")
+}
+# }}}
+
 # cnd {{{
 cnd <- function (type = c("error", "warning", "message"), subclass, message, call = NULL, ...) {
     type <- match.arg(type)
