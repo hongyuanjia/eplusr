@@ -108,6 +108,8 @@
 * `param_job()` now preserve parametric model names from argument `.names` in
   `$apply_measure()` instead of calling `make.name()` to convert them into valid
   R names (#115).
+* `$save()` works if weather was not given during initialization for
+  `ParametricJob` (#120).
 
 # eplusr 0.10.3
 
