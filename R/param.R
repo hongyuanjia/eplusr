@@ -1185,18 +1185,25 @@ param_print <- function (self, private) {
             col = "white", background_col = "red"
         )
     } else {
+        suc <- sum(private$m_job$exit_status == 0L)
+        if (suc == nrow(private$m_job)) {
+            mes <- "successfully"
+        } else {
+            mes <- paste0("with ", nrow(private$m_job) - suc, " jobs failed")
+        }
+
         if (!is.null(private$m_log$end_time)) {
             run_time <- format(round(difftime(
                 private$m_log$end_time, private$m_log$start_time), digits = 2L)
             )
             cli::cat_line(" Simulation started at ",
-                surround(private$m_log$start_time), " and completed successfully after ",
+                surround(private$m_log$start_time), " and completed ", mes, " after ",
                 run_time, ".",
                 col = "black", background_col = "green"
             )
         } else {
             cli::cat_line(" Simulation started at ",
-                surround(private$m_log$start_time), " and completed successfully.",
+                surround(private$m_log$start_time), " and completed ", mes, ".",
                 col = "black", background_col = "green"
             )
         }

@@ -69,6 +69,9 @@
   non-integer one.
 * A new method `$parent()` has been added in `IddObject` and `IdfObject` class
   to get parent `Idd` and `Idf` object, respectively (#76).
+* Simulation status will be updated in the progress message in `run_multi()` and
+  `$run()` method in `ParametricJob` class, instead of only showing `COMPLETED`
+  (#124).
 
 ## Bug fixes
 
