@@ -9,6 +9,9 @@ test_that("IdfObject class", {
     con <- idf$Construction[["WALL-1"]]
 
     # Basic {{{
+    # get parent Idf
+    expect_is(ver$parent(), "Idf")
+
     # get group name
     expect_equal(con$group_name(), "Surface Construction Elements")
 

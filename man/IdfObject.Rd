@@ -16,6 +16,7 @@ parent \link{Idf} object, using \code{$object()}, \code{$objects_in_class()} and
 idfobj <- model$object(which)
 idfobj <- idf_object(model, which, class = NULL)
 idfobj$version()
+idfobj$parent()
 idfobj$id()
 idfobj$name()
 idfobj$class_name()
@@ -51,6 +52,7 @@ print(iddobj)
 \preformatted{idfobj <- model$object(which)
 idfobj <- idf_object(model, which, class = NULL)
 idfobj$version()
+idfobj$parent()
 idfobj$id()
 idfobj$name()
 idfobj$group_name()
@@ -59,6 +61,8 @@ idfobj$class_name()
 
 \code{$version()} returns the version of parent \link{Idf} object in a
 \link[base:numeric_version]{numeric_version} format.
+
+\code{$parent()} returns the parent \link{Idf} object.
 
 \code{$id()} returns current \code{IdfObject} ID.
 
@@ -476,6 +480,9 @@ mat$id()
 
 # get object name
 mat$name()
+
+# get parent Idf object
+mat$parent()
 
 # NA will be returned if the class does not have name attribute. For example,
 # "Version" class

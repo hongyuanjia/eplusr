@@ -21,6 +21,7 @@ meaning of each property, please see the heading comments in the
 \preformatted{iddobj <- idd$object(class)
 iddobj <- idd_object(idd, class)
 iddobj$version()
+iddobj$parent()
 iddobj$group_name()
 iddobj$group_index()
 iddobj$class_name()
@@ -72,12 +73,15 @@ print(iddobj)
 \preformatted{iddobj <- idd$object(class)
 iddobj <- idd_object(idd, class)
 iddobj$version()
+iddobj$parent()
 }
 
 An \code{IddObject} can be created from the parent \link{Idd} object, using
 \code{$object()}, \link{idd_object} and other equivalent.
 
 \code{$version()} returns the version of parent IDD current object belongs to.
+
+\code{$parent()} returns the parent Idd object.
 
 \strong{Arguments}
 \itemize{

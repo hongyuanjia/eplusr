@@ -19,6 +19,7 @@ NULL
 #' iddobj <- idd$object(class)
 #' iddobj <- idd_object(idd, class)
 #' iddobj$version()
+#' iddobj$parent()
 #' iddobj$group_name()
 #' iddobj$group_index()
 #' iddobj$class_name()
@@ -70,12 +71,15 @@ NULL
 #' iddobj <- idd$object(class)
 #' iddobj <- idd_object(idd, class)
 #' iddobj$version()
+#' iddobj$parent()
 #' ```
 #'
 #' An `IddObject` can be created from the parent [Idd] object, using
 #' `$object()`, [idd_object] and other equivalent.
 #'
 #' `$version()` returns the version of parent IDD current object belongs to.
+#'
+#' `$parent()` returns the parent Idd object.
 #'
 #' **Arguments**
 #'
@@ -614,6 +618,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         version = function ()
             iddobj_version(self, private),
 
+        parent = function ()
+            iddobj_parent(self, private),
+
         # CLASS PROPERTY GETTERS {{{
         group_name = function ()
             iddobj_group_name(self, private),
@@ -779,6 +786,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
 # iddobj_version {{{
 iddobj_version <- function (self, private) {
     private$idd_priv()$m_version
+}
+# }}}
+# iddobj_parent {{{
+iddobj_parent <- function (self, private) {
+    private$m_parent
 }
 # }}}
 # iddobj_group_index {{{
