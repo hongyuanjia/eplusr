@@ -857,7 +857,11 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     uuid <- vcapply(private$m_param, function (idf) ._get_private(idf)$m_log$uuid)
 
     path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
-    path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    if (is.null(private$m_epw)) {
+        path_epw <- NULL
+    } else {
+        path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+    }
 
     if (is.null(dir))
         dir <- dirname(path_idf)
@@ -888,7 +892,11 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     # save model
     path_param <- apply2_chr(private$m_param, path_param, function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external))
     # copy weather
-    path_weather <- copy_run_files(path_epw, unique(dirname(path_param)))
+    if (!is.null(path_epw)) {
+        path_epw <- copy_run_files(path_epw, unique(dirname(path_param)))
+    } else {
+        path_epw <- NA_character_
+    }
 
     # assign original uuid in case it is updated when saving
     # if not assign original here, the model modification checkings in `$run()`
@@ -898,7 +906,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
         log$uuid <- uuid[[i]]
     }
 
-    data.table::data.table(model = path_param, weather = path_weather)
+    data.table::data.table(model = path_param, weather = path_epw)
 }
 # }}}
 # param_kill {{{

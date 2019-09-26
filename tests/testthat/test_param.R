@@ -84,6 +84,20 @@ test_that("Parametric methods", {
             weather = normalizePath(file.path(tempdir(), basename(param$weather()$path())))
         )
     )
+    # can save when no weather are provided
+    expect_silent(paths <- {
+        empty <- empty_idf()
+        empty$save(tempfile(fileext = ".idf"))
+        par <- param_job(empty, NULL)
+        par$apply_measure(function (idf, x) idf, 1:2, .names = 1:2)
+        par$save()
+    })
+    expect_equal(paths,
+        data.table::data.table(
+            model = normalizePath(file.path(tempdir(), 1:2, paste0(1:2, ".idf"))),
+            weather = NA_character_
+        )
+    )
     # }}}
 
     # Run and Status {{{
