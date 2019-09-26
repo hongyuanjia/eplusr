@@ -67,6 +67,8 @@
 * Now `read_epw()` support EPW files with non-integer timezones fail to load
   (#113). `$location()` in `Epw` class also support setting the timezone to
   non-integer one.
+* A new method `$parent()` has been added in `IddObject` and `IdfObject` class
+  to get parent `Idd` and `Idf` object, respectively (#76).
 
 ## Bug fixes
 

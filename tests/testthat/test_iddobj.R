@@ -8,6 +8,8 @@ test_that("IddObject class", {
 
     expect_error(idd_object(), class = "error_iddobject_missing_parent")
 
+    expect_is(slash$parent(), "Idd")
+
     # Group {{{
     # can use $group_name()
     expect_equal(slash$group_name(), "TestGroup2")

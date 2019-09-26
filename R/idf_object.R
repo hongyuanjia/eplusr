@@ -14,6 +14,7 @@ NULL
 #' idfobj <- model$object(which)
 #' idfobj <- idf_object(model, which, class = NULL)
 #' idfobj$version()
+#' idfobj$parent()
 #' idfobj$id()
 #' idfobj$name()
 #' idfobj$class_name()
@@ -50,6 +51,7 @@ NULL
 #' idfobj <- model$object(which)
 #' idfobj <- idf_object(model, which, class = NULL)
 #' idfobj$version()
+#' idfobj$parent()
 #' idfobj$id()
 #' idfobj$name()
 #' idfobj$group_name()
@@ -58,6 +60,8 @@ NULL
 #'
 #' `$version()` returns the version of parent [Idf] object in a
 #' [numeric_version][base::numeric_version()] format.
+#'
+#' `$parent()` returns the parent [Idf] object.
 #'
 #' `$id()` returns current `IdfObject` ID.
 #'
@@ -477,6 +481,9 @@ NULL
 #' # get object name
 #' mat$name()
 #'
+#' # get parent Idf object
+#' mat$parent()
+#'
 #' # NA will be returned if the class does not have name attribute. For example,
 #' # "Version" class
 #' idf$Version$name()
@@ -806,6 +813,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         version = function ()
             idfobj_version(self, private),
 
+        parent = function ()
+            idfobj_parent(self, private),
+
         id = function ()
             idfobj_id(self, private),
 
@@ -927,6 +937,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
 # idfobj_version {{{
 idfobj_version <- function (self, private) {
     private$m_parent$version()
+}
+# }}}
+# idfobj_parent {{{
+idfobj_parent <- function (self, private) {
+    private$m_parent
 }
 # }}}
 # idfobj_id {{{
