@@ -429,8 +429,8 @@ kill_jobs <- function(jobs, options) {
 
     if (any(jobs$status == "terminated")) {
         jobs[status == "terminated", `:=`(
-            stdout = lapply(process, function (x) x$read_all_output_lines()),
-            stderr = lapply(process, function (x) x$read_all_error_lines()),
+            stdout = lapply(process, function (x) tryCatch(x$read_all_output_lines(), error = function (e) NA_character_)),
+            stderr = lapply(process, function (x) tryCatch(x$read_all_error_lines(), error = function (e) NA_character_)),
             exit_status = vapply(process, function (x) x$get_exit_status(), integer(1))
         )]
     }
@@ -523,7 +523,7 @@ handle_events <- function(jobs, options, progress_bar) {
         num <- sum(jobs$status == "newly_completed")
 
         completed <- jobs[status == "newly_completed",
-            sim_status("complete", index_str, model, weather)
+            sim_status("complete", index_str, model, weather, exit_status)
         ]
 
         if (options$echo) {
@@ -538,7 +538,7 @@ handle_events <- function(jobs, options, progress_bar) {
 }
 # }}}
 # sim_status {{{
-sim_status <- function (type, index, model, weather) {
+sim_status <- function (type, index, model, weather, exit_code = NULL) {
     status <- c("run", "complete", "cancel", "terminate")
     if (type %in% status) {
         type <- switch(type,
@@ -547,6 +547,7 @@ sim_status <- function (type, index, model, weather) {
             cancel    = "CANCELLED ",
             terminate = "TERMINATED"
         )
+        if (!is.null(exit_code)) type[exit_code != 0L] <- "FAILED    "
     }
 
     if (is.null(unlist(weather))) {
