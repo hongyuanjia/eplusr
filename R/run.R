@@ -233,7 +233,8 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
         wait = wait, echo = echo)
 
     res$idf <- model
-    res$epw <- weather
+    # in case no weather is given
+    res["epw"] <- list(weather)
     res$version <- as.character(eplus_config(eplus)$version)
 
     res[c("idf", "epw", "exit_status", "start_time", "end_time", "output_dir",
