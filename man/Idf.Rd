@@ -1106,6 +1106,10 @@ lower than 8.3.0.
 order to do so, an object in \code{Output:SQLite} class with \code{Option Type} value
 being \code{SimpleAndTabular} will be automatically created if it does not
 exists.
+\item In order to make sure \code{.rdd} (Report Data Dictionary) and \code{.mdd} (Meter Data
+Dictionary) files are created during simulation, an object in
+\code{Output:VariableDictionary} class with \code{Key Field} value being \code{IDF} will
+be automatically created if it does not exists.
 }
 
 \strong{Arguments}:

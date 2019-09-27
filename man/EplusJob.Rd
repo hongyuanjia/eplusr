@@ -15,29 +15,21 @@ results, i.e. results from \code{Output:Variable} and \code{Output:Meter*}. But 
 \code{Output:Table} results, you have to be familiar with the structure of the
 EnergyPlus SQL results, especially for table \emph{"TabularDataWithStrings"}. For
 details, please see \emph{"2.20 eplusout.sql"}, especially \emph{"2.20.4.4 TabularData
-Table"} in EnergyPlus \emph{"Output Details and Examples"} documentation.
+Table"} in EnergyPlus \emph{"Output Details and Examples"} documentation. An
+object in \code{Output:SQLite} with \code{Option Type} value of \code{SimpleAndTabular} will
+be automatically created if it does not exists, to ensure that the output
+collection functionality works successfully.
+
+In order to make sure \code{.rdd} (Report Data Dictionary) and \code{.mdd} (Meter Data
+Dictionary) files are created during simulation, an object in
+\code{Output:VariableDictionary} class with \code{Key Field} value being \code{IDF} will be
+automatically created if it does not exists.
 }
-\section{NOTE}{
-
-
-When using \code{$run()} in \link{Idf} class, which internally creates an \code{EplusJob}
-object and calls its \code{$run()} method, an object in \code{Output:SQLite} with
-\code{Option Type} value of \code{SimpleAndTabular} will be automatically created if it
-does not exists.
-
-However, when creating an \code{EplusJob} using \code{\link[=eplus_job]{eplus_job()}}, the IDF file is not
-parsed but directly pass its path to EnergyPlus. Thus, that process of
-handling \code{Output:SQLite} class is not performed. If you want to ensure that
-the output collection functionality in \code{EplusJob} class works successfully,
-it is recommended to first read that IDF file using \code{\link[=read_idf]{read_idf()}} and then use
-\code{$run()} method in \link{Idf} class by doing \code{idf$run()}.
-}
-
 \section{Usage}{
 \preformatted{job <- eplus_job(idf, epw)
 job$version()
 job$path(type = c("all", "idf", "epw"))
-job$run(wait = TRUE, force = FALSE, echo = wait)
+job$run(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -79,7 +71,7 @@ Default: \code{"all"}. If \code{epw} is \code{NULL}, \code{NA} is returned for E
 }
 
 \section{Run}{
-\preformatted{job$run(wait = TRUE, force = FALSE, echo = wait)
+\preformatted{job$run(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
 job$kill()
 job$status()
 job$errors(info = FALSE)
@@ -88,6 +80,9 @@ job$errors(info = FALSE)
 \code{$run()} runs the simulation using input IDF and EPW file. If \code{wait}
 is \code{FALSE}, the job is run in the background. You can get updated job
 status by just printing the \code{EplusJob} object.
+
+Parameter \code{epw} can be used to reset the EPW file to use for simulation. If
+not given, the \code{epw} input for \code{\link[=eplus_job]{eplus_job()}} will be used.
 
 \code{$kill()} kills the background EnergyPlus process if possible. It only works
 when simulation runs in non-waiting mode.
@@ -112,6 +107,12 @@ and errors are printed.
 
 \strong{Arguments}
 \itemize{
+\item \code{epw}: A path to an \code{.epw} file or an \link{Epw} object. \code{epw} can also be
+\code{NULL} which will force design-day-only simulation. Note this needs at
+least one \code{Sizing:DesignDay} object exists in the \code{Idf}. If not given, the
+EPW file input of \code{\link[=eplus_job]{eplus_job()}} is used.
+\item \code{dir}: The directory to save the simulation results. If \code{NULL}, the input
+\code{idf} folder will be used. Default: \code{NULL}.
 \item \code{wait}: If \code{TRUE}, R will hang on and wait for the simulation to complete.
 EnergyPlus standard output (stdout) and error (stderr) is printed to
 R console. If \code{FALSE}, simulation will be run in a background process.
@@ -121,7 +122,13 @@ output and error from EnergyPlus. Default: same as \code{wait}.
 \item \code{force}: Only applicable when the last job runs with \code{wait} equals
 to \code{FALSE} and is still running. If \code{TRUE}, current running job is
 forced to stop and a new one will start. Default: \code{FALSE}.
-\item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
+\item \code{copy_external}: If \code{TRUE}, the external files that current \code{Idf} object
+depends on will also be copied into the simulation output directory. The
+values of file paths in the Idf will be changed automatically. Currently,
+only \code{Schedule:File} class is supported.  This ensures that the output
+directory will have all files needed for the model to run. Default is
+\code{FALSE}.
+\item \code{info}: If \code{FALSE}, only warnings and errors are printed. Default: \code{FALSE}.
 }
 }
 

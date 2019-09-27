@@ -1144,6 +1144,10 @@ NULL
 #'   order to do so, an object in `Output:SQLite` class with `Option Type` value
 #'   being `SimpleAndTabular` will be automatically created if it does not
 #'   exists.
+#' * In order to make sure `.rdd` (Report Data Dictionary) and `.mdd` (Meter Data
+#'   Dictionary) files are created during simulation, an object in
+#'   `Output:VariableDictionary` class with `Key Field` value being `IDF` will
+#'   be automatically created if it does not exists.
 #'
 #' **Arguments**:
 #'
@@ -2368,82 +2372,20 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
 # idf_run {{{
 idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
                      force = FALSE, copy_external = FALSE, echo = wait) {
-    if (private$m_version < 8.3) {
-        abort("error_eplus_lower_8.3",
-            "Currently, `$run()` only supports EnergyPlus V8.3 or higher."
-        )
-    }
-
-    # save the model to the output dir if necessary
-    if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
-        abort("error_idf_not_local",
-            paste0(
-                "The Idf object is not created from local file or local file has ",
-                "been deleted from disk. Please save Idf using $save() before run."
-            )
-        )
-    }
-
-    # stop if unsaved
-    if (self$is_unsaved()) {
-        abort("error_idf_not_saved",
-            paste0("Idf has been modified since read or last saved. ",
-                "Please save Idf using $save() before run."
-            )
-        )
-    }
-
-    # add Output:SQLite if necessary
-    add_sql <- idf_add_output_sqlite(self)
-    add_dict <- idf_add_output_vardict(self)
-
-    # save the model to the output dir if necessary
-    if (is.null(private$m_path) || !utils::file_test("-f", private$m_path)) {
-        assert("error_idf_not_local",
-            paste0(
-                "The Idf object is not created from local file or local file has ",
-                "been deleted from disk. Please save Idf using $save() before run."
-            )
-        )
-    }
-
-    path_idf <- private$m_path
-    if (is.null(dir))
-        run_dir <- dirname(path_idf)
-    else {
-        run_dir <- dir
-        path_idf <- normalizePath(file.path(run_dir, basename(path_idf)), mustWork = FALSE)
-    }
-
-    # if necessary, resave the model
-    if (add_sql || add_dict || !is.null(dir)) {
-        idf_save(self, private, path_idf, overwrite = TRUE, copy_external = copy_external)
-    }
-
-    # when no epw is given, at least one design day object should exists
-    if (is.null(epw)) {
-        if (!self$is_valid_class("SizingPeriod:DesignDay")) {
-            assert("error_run_no_ddy",
-                paste0("When no weather file is given, input IDF should contain ",
-                    "`SizingPeriod:DesignDay` object to enable Design-Day-only ",
-                    "simulation."
-                )
-            )
-        }
-    }
-
     # check if the model is still running
     old <- private$m_log$job
     if (!inherits(old, "EplusJob")) {
-        private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
+        private$m_log$job <- EplusJob$new(self, epw)
     # recreate job if the model has been changed since last ran
     } else if (
-        normalizePath(path_idf, mustWork = FALSE) !=
+        normalizePath(private$m_path, mustWork = FALSE) !=
         normalizePath(private$m_log$job$path("idf"), mustWork = FALSE)){
-        private$m_log$job <- EplusJob$new(path_idf, epw, private$m_version)
+        private$m_log$job <- EplusJob$new(self, epw)
     }
 
-    private$m_log$job$run(wait = wait, force = force, echo = echo)
+    private$m_log$job$run(dir = dir, wait = wait, force = force, echo = echo,
+        copy_external = copy_external
+    )
 }
 # }}}
 # idf_print {{{
