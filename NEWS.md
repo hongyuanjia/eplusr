@@ -72,6 +72,13 @@
 * Simulation status will be updated in the progress message in `run_multi()` and
   `$run()` method in `ParametricJob` class, instead of only showing `COMPLETED`
   (#124, #125).
+* `EplusJob` class now will parse and store input IDF and EPW. It will also add
+  `Output:SQLite` and `Output:VariableDictionary` object if necessary. This
+  change makes sure using `EplusJob` can always have the ability to extract
+  simulation results instead of totally relying on the input IDF (#118).
+* As a result of previous change, the `$run()` method in `EplusJob` now takes
+  the same parameters as `$run()` method in `Idf`, i.e. you can also change the
+  EPW file to use and output directory using `epw` and `dir` argument (#118).
 
 ## Bug fixes
 
