@@ -220,7 +220,7 @@ only \code{Schedule:File} class is supported.  This ensures that the output
 directory will have all files needed for the model to run. Default is
 \code{FALSE}.
 \item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to simulation
-status. Default: \code{TRUE}.
+status. Default: The same value of \code{wait}.
 \item \code{suffix}: A string that indicates the file extension of simulation output.
 Default: \code{".err"}.
 \item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
