@@ -565,6 +565,15 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 # job_run {{{
 job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE) {
+    # stop if idf object has been changed accidentally
+    if (!identical(._get_private(private$m_idf)$m_log$uuid, $m_log$seed_uuid)) {
+        abort("error_job_idf_modified", paste0(
+            "The idf has been modified after job was created. ",
+            "Running this idf will result in simulation outputs that may be not reproducible.",
+            "Please recreate the job using new idf and then run it."
+        ))
+    }
+
     if (missing(epw)) epw <- private$m_epw
 
     if (is.null(epw)) {
@@ -659,7 +668,7 @@ job_kill <- function (self, private) {
 }
 # }}}
 # job_status {{{
-job_status <- function (self, private, based_suffix = ".err") {
+job_status <- function (self, private) {
     # init
     status <- list(
         run_before = FALSE, # if the model has been run before
@@ -703,18 +712,9 @@ job_status <- function (self, private, based_suffix = ".err") {
     }
 
     status$changed_after <- FALSE
-    prefix <- tools::file_path_sans_ext(private$m_idf$path())
-    basefile <- paste0(prefix, based_suffix)
-
-    if (!file.exists(basefile)) return(status)
-
-    base_ctime <- file.info(basefile)$mtime
-
-    if (!file.exists(private$m_idf$path())) return(status)
-
-    idf_ctime <- file.info(private$m_idf$path())$mtime
-
-    if (base_ctime < idf_ctime) status$changed_after <- TRUE
+    if (!identical(private$m_log$seed_uuid, ._get_private(private$m_idf)$m_log$uuid)) {
+        status$changed_after <- TRUE
+    }
 
     status
 }
