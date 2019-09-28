@@ -464,7 +464,7 @@ wday <- function (x, label = FALSE) {
 # }}}
 
 # str_trunc {{{
-str_trunc <- function (x, width = getOption("width")) {
+str_trunc <- function (x, width = getOption("width", 60L)) {
     # in case invalid UTF-8 character in IDF
     x <- stringi::stri_encode(x)
     tr <- nchar(x, "width") > (0.95 * width)

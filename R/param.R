@@ -215,7 +215,7 @@ NULL
 #'   directory will have all files needed for the model to run. Default is
 #'   `FALSE`.
 #' * `echo`: Only applicable when `wait` is `TRUE`. Whether to simulation
-#'   status. Default: `TRUE`.
+#'   status. Default: The same value of `wait`.
 #' * `suffix`: A string that indicates the file extension of simulation output.
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
@@ -440,63 +440,7 @@ Parametric <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
         # INITIALIZE {{{
         initialize = function (idf, epw) {
-
-            if (is_idf(idf)) {
-                private$m_idf <- idf$clone(deep = TRUE)
-                if (is.null(idf$path())) {
-                    abort("error_idf_not_local",
-                        paste0(
-                            "The Idf object is not created from local file. ",
-                            "Please save it to disk using `$save()` before creating ",
-                            "parametric simulations."
-                        )
-                    )
-                }
-                if (idf$is_unsaved()) {
-                    abort("error_idf_not_saved",
-                        paste0("Idf has been modified since read or last saved. ",
-                            "Please save it using `$save()` before creating ",
-                            "parametric simulations."
-                        )
-                    )
-                }
-            } else {
-                private$m_idf <- read_idf(idf)
-            }
-
-            # add sql output
-            idf_self <- ._get_self(private$m_idf)
-            idf_priv <- ._get_private(private$m_idf)
-            idf_add_output_sqlite(private$m_idf)
-            idf_add_output_vardict(private$m_idf)
-
-            # save uuid
-            private$m_log$seed_uuid <- idf_priv$m_log$uuid
-
-            if (is.null(epw)) {
-                private$m_epw <- NULL
-            } else if (is_epw(epw)) {
-                private$m_epw <- epw$clone(deep = TRUE)
-                if (is.null(epw$path())) {
-                    abort("error_epw_not_local",
-                        paste0(
-                            "The Epw object is not created from local file. ",
-                            "Please save it to disk using `$save()` before creating ",
-                            "parametric simulations."
-                        )
-                    )
-                }
-                if (epw$is_unsaved()) {
-                    abort("error_epw_not_saved",
-                        paste0("Epw has been modified since read or last saved. ",
-                            "Please save it using `$save()` before creating ",
-                            "parametric simulations."
-                        )
-                    )
-                }
-            } else {
-                private$m_epw <- read_epw(epw)
-            }
+            job_initialize(self, private, idf, epw)
         },
         # }}}
 
@@ -786,11 +730,11 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 
     ver <- private$m_idf$version()
 
-    path_idf <- normalizePath(private$m_idf$path(), mustWork = TRUE)
+    path_idf <- private$m_idf$path()
     if (is.null(private$m_epw)) {
         path_epw <- NULL
     } else {
-        path_epw <- normalizePath(private$m_epw$path(), mustWork = TRUE)
+        path_epw <- private$m_epw$path()
     }
 
     if (is.null(output_dir))
@@ -1098,14 +1042,13 @@ param_tabular_data <- function (self, private, which = NULL, report_name = NULL,
 # }}}
 # param_print {{{
 param_print <- function (self, private) {
-    cli::cat_rule("EnergPlus Parametric Job", col = "green")
-    config <- eplus_config(private$m_idf$version())
-    cli::cat_line(c(
-        str_trunc(paste0("Seed Model: ", surround(normalizePath(private$m_idf$path(), mustWork = FALSE)))),
-        str_trunc(paste0("Weather: ", if (is.null(private$m_epw)) "<< Not specified >>" else surround(private$m_epw$path()))),
-        paste0("EnergyPlus Version: ", surround(config$version)),
-        paste0("EnergyPlus Path: ", surround(normalizePath(config$dir)))
-    ))
+    path_epw <- if (is.null(private$m_epw)) NULL else private$m_epw$path()
+    print_job_header(title = "EnergPlus Parametric Job",
+        path_idf = private$m_idf$path(),
+        path_epw = path_epw,
+        eplus_ver = private$m_idf$version(),
+        name_idf = "Seed", name_epw = "Weather"
+    )
 
     if (is.null(private$m_param)) {
         cli::cat_line("<< No measure has been applied >>",
