@@ -566,7 +566,7 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE) {
     # stop if idf object has been changed accidentally
-    if (!identical(._get_private(private$m_idf)$m_log$uuid, $m_log$seed_uuid)) {
+    if (!identical(._get_private(private$m_idf)$m_log$uuid, private$m_log$seed_uuid)) {
         abort("error_job_idf_modified", paste0(
             "The idf has been modified after job was created. ",
             "Running this idf will result in simulation outputs that may be not reproducible.",
