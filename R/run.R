@@ -137,13 +137,10 @@ clean_wd <- function (path) {
 #' `process`) with same column names as above, and also another two columns:
 #'
 #'   * `index`: The index of simulation
-#'   * `status`: The status of simulation status. Should be one of below:
-#'       - `"completed"`: the simulation job is completed. This only indicates
-#'          that the calling of EnergyPlus was successfully and EnergyPlus was
-#'          not terminated during simulation. Even `"completed" is `TRUE`, the
-#'          job can still end with error.  Please check `exit_status` to
-#'          determine whether EnergyPlus ran successfully
-#'       - `"terminated"`: the simulation job started but was terminated
+#'   * `status`: The status of simulation. Should be one of below:
+#'       - `"completed"`: the simulation job is completed successfully.
+#'       - `"failed"`: the simulation job ended with error.
+#'       - `"terminated"`: the simulation job started but was terminated.
 #'       - `"cancelled"`: the simulation job was cancelled, i.e. did not start
 #'          at all.
 #'
@@ -247,23 +244,43 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
                        annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
-    assert(is_flag(design_day))
-    assert(is_flag(annual))
     assert(is_flag(wait))
     assert(is_flag(echo))
 
-    if (annual && design_day) {
-        stop("Cannot force both design-day and annual simulations.", call. = FALSE)
+    if (!is_scalar(model)) {
+        if (!is.null(weather) && !is_scalar(weather)) {
+            assert(have_same_len(model, weather))
+        }
+        if (!is_scalar(eplus)) {
+            assert(have_same_len(model, eplus))
+        }
+        if (!is_scalar(design_day)) {
+            assert(have_same_len(model, design_day))
+            assert(is.logical(design_day), no_na(design_day))
+        }
+        if (!is_scalar(annual)) {
+            assert(have_same_len(model, annual))
+            assert(is.logical(annual), no_na(annual))
+        }
     }
 
-    if (!is_scalar(model) && !is.null(weather) && !is_scalar(weather))
-        assert(have_same_len(model, weather))
-
-    if (!is_scalar(model) && !is.null(eplus) && !is_scalar(eplus))
-        assert(have_same_len(model, eplus))
+    if (any(annual & design_day)) {
+        abort("error_run_both_ddy_annual", "Cannot force both design-day and annual simulations.")
+    }
 
     model <- normalizePath(model, mustWork = TRUE)
-    if (!is.null(weather)) weather <- normalizePath(weather, mustWork = TRUE)
+
+    if (is.null(weather)) {
+        input_weather <- rep(NA_character_, length(model))
+        weather <- list(NULL)
+    } else {
+        if (length(weather) == 1L) weather <- rep(weather, length(model))
+        input_weather <- vcapply(weather,
+            function (x) if (is.null(x)) NA_character_ else normalizePath(x, mustWork = TRUE)
+        )
+        weather <- as.list(input_weather)
+        weather[is.na(input_weather)] <- list(NULL)
+    }
 
     if (is.null(eplus)) {
         ver_list <- lapply(model, function (x) {
@@ -273,8 +290,10 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         if (any(ver_miss)) {
             msg <- paste0("  ", seq_along(model)[ver_miss], "| ", surround(model[ver_miss]),
                 collapse = "\n")
-            stop("Missing version field in input IDF file. Failed to determine the ",
-                "version of EnergyPlus to use:\n", msg, call. = FALSE)
+            abort("error_miss_idf_ver", paste0(
+                "Missing version field in input IDF file. Failed to determine the ",
+                "version of EnergyPlus to use:\n", msg
+            ))
         }
 
         eplus <- unlist(ver_list)
@@ -282,9 +301,11 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 
     energyplus_exe <- vapply(eplus, eplus_exe, FUN.VALUE = character(1))
 
-    if (anyDuplicated(model) & is.null(output_dir))
-        stop("`model` cannot have any duplications when `output_dir` is NULL.",
-            call. = FALSE)
+    if (anyDuplicated(model) & is.null(output_dir)) {
+        abort("error_run_duplicated_model",
+            "`model` cannot have any duplications when `output_dir` is NULL."
+        )
+    }
 
     if (is.null(output_dir)) {
         output_dir <- dirname(model)
@@ -297,25 +318,32 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     jobs <- data.table::data.table(input_model = model, output_dir = output_dir)
 
     if (anyDuplicated(jobs))
-        stop("Duplication found in the combination of `model` and `output_dir`.",
+        abort("error_run_duplicated_job", paste0(
+            "Duplication found in the combination of `model` and `output_dir`.",
             " One model could not be run in the same output directory multiple ",
-            "times simultaneously.", call. = FALSE)
+            "times simultaneously."
+        ))
 
-    d <- output_dir[!dir.exists(output_dir)]
+    d <- unique(output_dir[!dir.exists(output_dir)])
     created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
-    if (any(!created))
-        stop("Failed to create output directory:\n",
-            paste0(surround(d[!created]), collapse = "\n"), call. = FALSE)
+    if (any(!created)) {
+        abort("error_create_output_dir", paste0("Failed to create output directory:\n",
+            paste0(surround(d[!created]), collapse = "\n")
+        ))
+    }
 
     jobs[, `:=`(
         energyplus = energyplus_exe,
         model = copy_run_files(model, output_dir),
         index = .I, annual = annual, design_day = design_day
     )]
-    if (!is.null(weather)) {
-        jobs[, `:=`(input_weather = weather, weather = copy_run_files(weather, output_dir))]
-    } else {
+    if (is.null(weather)) {
         jobs[, `:=`(input_weather = NA_character_, weather = list(NULL), design_day = TRUE)]
+    } else {
+        weather[!is.na(input_weather)] <- as.list(
+            copy_run_files(unlist(weather[!is.na(input_weather)]), output_dir[!is.na(input_weather)])
+        )
+        jobs[, `:=`(input_weather = input_weather, weather = weather)]
     }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo)
@@ -505,17 +533,17 @@ run_job <- function(jobs, options, progress_bar) {
 # }}}
 # are_all_completed {{{
 are_all_completed <- function(jobs) {
-    all(jobs$status == "completed")
+    all(jobs$status %chin% c("completed", "failed"))
 }
 # }}}
 # handle_events {{{
 handle_events <- function(jobs, options, progress_bar) {
     jobs[status == "running" &
-         vapply(process, function (x) {!is.null(x) && !x$is_alive()}, logical(1)),
+         vlapply(process, function (x) !is.null(x) && !x$is_alive()),
         `:=`(
             stdout = lapply(process, function (x) x$read_all_output_lines()),
             stderr = lapply(process, function (x) x$read_all_error_lines()),
-            exit_status = vapply(process, function (x) x$get_exit_status(), integer(1)),
+            exit_status = viapply(process, function (x) x$get_exit_status()),
             status = "newly_completed", end_time = Sys.time()
         )
     ]
@@ -533,7 +561,7 @@ handle_events <- function(jobs, options, progress_bar) {
         progress_bar$tick(num)
     }
 
-    jobs[status == "newly_completed", `:=`(status = "completed")]
+    jobs[status == "newly_completed", `:=`(status = ifelse(exit_status == 0L, "completed", "failed"))]
 
     jobs
 }
@@ -551,7 +579,7 @@ sim_status <- function (type, index, model, weather, exit_code = NULL) {
         if (!is.null(exit_code)) type[exit_code != 0L] <- "FAILED    "
     }
 
-    if (is.null(unlist(weather))) {
+    if (is.null(unlist(weather)) || is.na(weather)) {
         paste0(lpad(index, "0"), "|", type, " --> ",
             "[IDF]", surround(basename(model))
         )
@@ -559,7 +587,7 @@ sim_status <- function (type, index, model, weather, exit_code = NULL) {
         paste0(lpad(index, "0"), "|", type, " --> ",
             "[IDF]", surround(basename(model)),
             " + ",
-            "[EPW]", surround(basename(weather))
+            "[EPW]", surround(basename(unlist(weather)))
         )
     }
 }

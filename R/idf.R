@@ -1576,7 +1576,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         # INITIALIZE {{{
         initialize = function (path, idd = NULL) {
             # only store if input is a path
-            if (length(path) == 1L) {
+            if (is.character(path) && length(path) == 1L) {
                 if (file.exists(path)) private$m_path <- normalizePath(path)
             }
 

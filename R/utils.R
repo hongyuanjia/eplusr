@@ -12,7 +12,7 @@ NULL
 # }}}
 
 # collapse {{{
-collapse <- function (x, out = "`", or = FALSE) {
+collapse <- function (x, out = "'", or = FALSE) {
     if (is.null(out)) {
         s <- x
     } else {
@@ -35,7 +35,7 @@ collapse <- function (x, out = "`", or = FALSE) {
 # }}}
 
 # surround {{{
-surround <- function (x, out = "`") {
+surround <- function (x, out = "'") {
     if (is.null(out)) return(x)
     out <- as.character(out)
     if (is_scalar(out)) {
