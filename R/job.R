@@ -470,7 +470,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
             job_kill(self, private),
 
         status = function ()
-            job_status(self, private, based_suffix = ".err"),
+            job_status(self, private),
 
         output_dir = function (open = FALSE)
             job_output_dir(self, private, open),
@@ -749,7 +749,7 @@ job_locate_output <- function (self, private, suffix = ".err", strict = TRUE, mu
     out <- paste0(tools::file_path_sans_ext(private$m_idf$path()), suffix)
 
     if (strict) {
-        status <- job_status(self, private, suffix)
+        status <- job_status(self, private)
 
         if (!isTRUE(status$run_before)) {
             stop("Simulation did not run before. Please run it using `$run()` ",
