@@ -588,9 +588,11 @@ sim_status <- function (type, index, model, weather, exit_code = NULL) {
         "[IDF]", surround(basename(model))
     )
 
-    has_epw <- vlapply(weather, function (x) (!is.null(x)) | (!is.na(x)))
+    has_epw <- !vlapply(weather, function (x) is.null(x) || is.na(x))
 
-    mes[has_epw] <- paste0(mes, " + ", "[EPW]", surround(basename(unlist(weather[has_epw]))))
+    if (any(has_epw)) {
+        mes[has_epw] <- paste0(mes, " + ", "[EPW]", surround(basename(unlist(weather[has_epw]))))
+    }
 
     mes
 }
