@@ -26,10 +26,13 @@ param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
 param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
-param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-param$report_data_dict(which = NULL)
+param$errors(which = NULL, info = FALSE)
+param$list_table(which = NULL)
+param$read_table(which = NULL, table)
+param$read_rdd(which = NULL)
+param$read_mdd(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
@@ -47,7 +50,10 @@ param$print()
 \strong{Arguments}
 \itemize{
 \item \code{idf}: Path to EnergyPlus IDF file or an \code{Idf} object.
-\item \code{epw}: Path to EnergyPlus EPW file or an \code{Epw} object.
+\item \code{epw}: Path to EnergyPlus EPW file or an \code{Epw} object. \code{epw} can also be
+\code{NULL} which will force design-day-only simulation when \code{$run()} method is
+called. Note this needs at least one \code{Sizing:DesignDay} object exists in
+the \link{Idf}.
 }
 }
 
@@ -129,9 +135,13 @@ to run. Default: \code{FALSE}.
 \preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
 param$kill()
 param$status()
-param$errors(info = FALSE)
 param$output_dir(which = NULL)
 param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
+param$errors(which = NULL, info = FALSE)
+param$list_table(which = NULL)
+param$read_table(which = NULL, table)
+param$read_rdd(which = NULL)
+param$read_mdd(which = NULL)
 param$report_data_dict(which = NULL)
 param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
@@ -179,6 +189,16 @@ and errors are printed.
 \code{$locate_output()} returns the path of a single output file of specified
 simulations.
 
+\code{$list_table()} returns a list of character vectors containing all available
+table and view names in the SQLite file.
+
+\code{$read_table()} takes a valid table name of those from \code{$list_table()} and
+returns that table data in a \link[data.table:data.table]{data.table} format.
+
+\code{$read_rdd()} and \code{$read_mdd()} return the core data of Report Data
+Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
+details, please see \code{\link[=read_rdd]{read_rdd()}}.
+
 \code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
 contains all information about report data for specified simulations. For
 details on the meaning of each columns, please see "2.20.2.1
@@ -195,10 +215,11 @@ other arguments.
 For convenience, input character arguments matching in \code{$report_data()} and
 \code{$tabular_data()} are \strong{case-insensitive}.
 
-For \code{$report_data_dict()}, \code{$report_data()} and \code{$tabular_data()}, the
-returned data.table has a \code{case} column in the returned
-\link[data.table:data.table]{data.table} that indicates the names of parametric
-models. For detailed documentation of those methods, please see \link{EplusSql}.
+For \code{$read_table()}, \code{$read_rdd()}, \code{$read_mdd()}, \code{$report_data_dict()},
+\code{$report_data()} and \code{$tabular_data()}, the returned data.table has a \code{case}
+column in the returned \link[data.table:data.table]{data.table} that indicates
+the names of models. For detailed documentation on the results of those
+methods, please see \link{EplusJob}.
 
 \strong{Arguments}
 \itemize{
