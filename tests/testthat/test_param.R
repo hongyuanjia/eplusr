@@ -41,20 +41,20 @@ test_that("Parametric methods", {
     # }}}
     # names are unique
     param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = rep("A", 5))
-    expect_equal(names(priv$m_param), c("A", paste0("A_", 1:4)))
+    expect_equal(names(priv$m_idfs), c("A", paste0("A_", 1:4)))
 
     # auto assign name
     param$apply_measure(set_infil_rate, seq(0, 4, by = 1), .names = NULL)
-    expect_equal(length(priv$m_param), 5)
-    expect_equal(names(priv$m_param), paste0("set_infil_rate_", 1:5))
-    expect_equal(unname(vlapply(priv$m_param, is_idf)), rep(TRUE, times = 5))
+    expect_equal(length(priv$m_idfs), 5)
+    expect_equal(names(priv$m_idfs), paste0("set_infil_rate_", 1:5))
+    expect_equal(unname(vlapply(priv$m_idfs, is_idf)), rep(TRUE, times = 5))
     # }}}
 
     # Models {{{
     expect_is(param$models(), "list")
     expect_equal(length(param$models()), 5)
     expect_equal(names(param$models()), paste0("set_infil_rate_", 1:5))
-    expect_equal(unname(vlapply(priv$m_param, is_idf)), rep(TRUE, times = 5))
+    expect_equal(unname(vlapply(priv$m_idfs, is_idf)), rep(TRUE, times = 5))
     # }}}
 
     # Save {{{

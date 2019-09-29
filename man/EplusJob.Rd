@@ -136,7 +136,7 @@ directory will have all files needed for the model to run. Default is
 \preformatted{job$output_dir(open = FALSE)
 job$locate_output(suffix = ".err", strict = TRUE)
 job$list_table()
-job$read_table(name)
+job$read_table(table)
 job$read_rdd()
 job$read_mdd()
 job$report_data_dict()
@@ -264,6 +264,8 @@ For convenience, input character arguments matching in \code{$report_data()} and
 Default: \code{".err"}.
 \item \code{strict}: If \code{TRUE}, it will check if the simulation was terminated, is
 still running or the file exists or not. Default: \code{TRUE}.
+\item \code{table}: A string specifying which table to read. Valid table names can be
+obtained using \code{$list_table()}.
 \item \code{key_value}: A character vector to identify key values of the data. If
 \code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
 data.frame that contains \code{key_value} and \code{name} columns. In this case,

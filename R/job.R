@@ -133,7 +133,7 @@ NULL
 #' job$output_dir(open = FALSE)
 #' job$locate_output(suffix = ".err", strict = TRUE)
 #' job$list_table()
-#' job$read_table(name)
+#' job$read_table(table)
 #' job$read_rdd()
 #' job$read_mdd()
 #' job$report_data_dict()
@@ -256,6 +256,8 @@ NULL
 #'   Default: `".err"`.
 #' * `strict`: If `TRUE`, it will check if the simulation was terminated, is
 #'   still running or the file exists or not. Default: `TRUE`.
+#' * `table`: A string specifying which table to read. Valid table names can be
+#'   obtained using `$list_table()`.
 #' * `key_value`: A character vector to identify key values of the data. If
 #'   `NULL`, all keys of that variable will be returned. `key_value` can also be
 #'   data.frame that contains `key_value` and `name` columns. In this case,
@@ -490,8 +492,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         read_mdd = function ()
             job_read_mdd(self, private),
 
-        read_table = function (name)
-            job_read_table(self, private, name),
+        read_table = function (table)
+            job_read_table(self, private, table),
 
         report_data_dict = function ()
             job_report_data_dict(self, private),
@@ -796,15 +798,9 @@ job_output_errors <- function (self, private, info = FALSE) {
 # job_sql_path {{{
 job_sql_path <- function (self, private) {
     path_sql <- job_locate_output(self, private, ".sql", must_exist = FALSE)
-    if (!file.exists(path_sql))
-        abort("error_sql_not_exist", paste0(
-             "Simulation SQL output does not exist. ",
-             "eplusr uses the EnergyPlus SQL output for extracting simulation outputs. ",
-             "Please add an object in `Output:SQLite` with `Option Type` value of `SimpleAndTabular` ",
-             "and run the Idf again. It is recommended to first read that IDF file using `read_idf()` ",
-             "and then use `$run()` method in Idf class by doing `idf$run()` ",
-             "which automatically handle this."
-        ))
+    if (!file.exists(path_sql)) {
+        abort("error_sql_not_exist", paste0("Simulation SQL output does not exist."))
+    }
     path_sql
 }
 # }}}
@@ -816,14 +812,9 @@ job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
         rdd = "Report Data Dictionary (RDD) file",
         mdd = "Meter Data Dictionary (MDD) file"
     )
-    if (!file.exists(path))
-        assert("error_rdd_not_exist", paste0(
-             name, " does not exist. ",
-             "Please add an object in `Output:VariableDictionary` class ",
-             "and run the Idf again. It is recommended to first read that IDF file using `read_idf()` ",
-             "and then use `$run()` method in Idf class by doing `idf$run()` ",
-             "which automatically handle this."
-        ))
+    if (!file.exists(path)) {
+        assert(paste0("error_", type, "_not_exist"), paste0(name, " does not exist."))
+    }
 
     path
 }

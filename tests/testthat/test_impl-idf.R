@@ -80,10 +80,10 @@ test_that("table", {
     expect_equal(get_idf_object_name(idd_env, idf_env, c("Version", "Material")), list(Version = NA_character_, Material = c("WD01", "WD02")))
     expect_equal(get_idf_object_name(idd_env, idf_env, c("Version", "Material"), simplify = TRUE), c(NA_character_, c("WD01", "WD02")))
     expect_equal(get_idf_object_num(idd_env, idf_env, c("Version", "Material")), c(1L, 2L))
-    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[1])), " #1| Object ID [1] (name `WD01`) in class `Material`")
-    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[5])), " #1| Object ID [5] in class `Version`")
-    expect_equal(get_object_info(idf_env$object[1], c("id", "name")), " #1| Object ID [1] (name `WD01`)")
-    expect_equal(get_object_info(idf_env$object[1], c("name")), " #1| Object name `WD01`")
+    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[1])), " #1| Object ID [1] (name 'WD01') in class 'Material'")
+    expect_equal(get_object_info(add_class_name(idd_env, idf_env$object[5])), " #1| Object ID [5] in class 'Version'")
+    expect_equal(get_object_info(idf_env$object[1], c("id", "name")), " #1| Object ID [1] (name 'WD01')")
+    expect_equal(get_object_info(idf_env$object[1], c("name")), " #1| Object name 'WD01'")
     # }}}
 
     # VALUE {{{

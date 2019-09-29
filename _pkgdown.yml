@@ -70,9 +70,11 @@ reference:
     contents:
       - EplusSql
       - EplusJob
+      - EplusGroupJob
       - ParametricJob
       - eplus_sql
       - eplus_job
+      - group_job
       - param_job
       - run_idf
       - run_multi

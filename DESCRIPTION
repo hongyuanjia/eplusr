@@ -52,6 +52,7 @@ Collate:
     'epw.R'
     'err.R'
     'format.R'
+    'group.R'
     'impl-idd.R'
     'idd.R'
     'idd_object.R'

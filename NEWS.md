@@ -79,6 +79,10 @@
 * As a result of previous change, the `$run()` method in `EplusJob` now takes
   the same parameters as `$run()` method in `Idf`, i.e. you can also change the
   EPW file to use and output directory using `epw` and `dir` argument (#118).
+* A new class `EplusGroupJob` is added. It can be created using
+  `group_job()`. `EplusGroupJob` provides a wrapper of `run_multi()` to group
+  multiple EnergyPlus simulations together for running and collecting different
+  EnergyPlus outputs (#117).
 
 ## Bug fixes
 
