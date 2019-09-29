@@ -338,11 +338,16 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         index = .I, annual = annual, design_day = design_day
     )]
     if (is.null(weather)) {
-        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL), design_day = TRUE)]
+        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL))]
     } else {
-        weather[!is.na(input_weather)] <- as.list(
-            copy_run_files(unlist(weather[!is.na(input_weather)]), output_dir[!is.na(input_weather)])
-        )
+        if (any(!is.na(input_weather))) {
+            weather[!is.na(input_weather)] <- as.list(
+                copy_run_files(
+                    unlist(weather[!is.na(input_weather)]),
+                    output_dir[!is.na(input_weather)]
+                )
+            )
+        }
         jobs[, `:=`(input_weather = input_weather, weather = weather)]
     }
 

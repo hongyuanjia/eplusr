@@ -436,8 +436,13 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
 
     if (is.null(private$m_epws)) {
         path_epw <- NULL
+        design_day <- TRUE
     } else {
         path_epw <- lapply(private$m_epws, function (epw) if (!is.null(epw)) epw$path())
+        if (length(path_epw) == 1L) {
+            path_epw <- rep(path_epw, length(path_idf))
+        }
+        design_day <- vlapply(path_epw, is.null)
     }
 
     if (is.null(output_dir))
@@ -495,7 +500,9 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
     private$m_job <- NULL
 
     ver <- vcapply(private$m_idfs, function (idf) as.character(idf$version()))
-    tbl <- run_multi(path_group, path_epw, NULL, wait = wait, echo = echo, eplus = ver)
+    tbl <- run_multi(path_group, path_epw, NULL, design_day = design_day,
+        wait = wait, echo = echo, eplus = ver
+    )
 
     private$m_job <- tbl
 
@@ -575,7 +582,7 @@ epgroup_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    if (!identical(private$m_log$seed_uuid, ._get_private(private$m_idf)$m_log$uuid)) {
+    if (!identical(private$m_log$seed_uuid, ._get_private(private$m_seed)$m_log$uuid)) {
         status$changed_after <- TRUE
     }
 
