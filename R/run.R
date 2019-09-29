@@ -574,7 +574,7 @@ handle_events <- function(jobs, options, progress_bar) {
 # sim_status {{{
 sim_status <- function (type, index, model, weather, exit_code = NULL) {
     status <- c("run", "complete", "cancel", "terminate")
-    if (type %in% status) {
+    if (length(type) ==1L && type %in% status) {
         type <- switch(type,
             run       = "RUNNING   ",
             complete  = "COMPLETED ",
@@ -584,17 +584,15 @@ sim_status <- function (type, index, model, weather, exit_code = NULL) {
         if (!is.null(exit_code)) type[exit_code != 0L] <- "FAILED    "
     }
 
-    if (is.null(unlist(weather)) || is.na(weather)) {
-        paste0(lpad(index, "0"), "|", type, " --> ",
-            "[IDF]", surround(basename(model))
-        )
-    } else {
-        paste0(lpad(index, "0"), "|", type, " --> ",
-            "[IDF]", surround(basename(model)),
-            " + ",
-            "[EPW]", surround(basename(unlist(weather)))
-        )
-    }
+    mes <- paste0(lpad(index, "0"), "|", type, " --> ",
+        "[IDF]", surround(basename(model))
+    )
+
+    has_epw <- vlapply(weather, function (x) (!is.null(x)) | (!is.na(x)))
+
+    mes[has_epw] <- paste0(mes, " + ", "[EPW]", surround(basename(unlist(weather[has_epw]))))
+
+    mes
 }
 # }}}
 # energyplus {{{
