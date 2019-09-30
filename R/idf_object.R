@@ -1337,8 +1337,8 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
     }
 
     # value
-    add_joined_cols(private$idd_env()$field, val, "field_id", c("units", "ip_units", "type_enum"))
-    fmt <- format_objects(val, c("class", "value"), brief = FALSE, sep_at = sep_at)$out[[1L]]
+    add_joined_cols(private$idd_env()$field, val, "field_id", c("units", "ip_units", "type_enum", "required_field"))
+    fmt <- format_objects(val, c("class", "value"), brief = FALSE, sep_at = sep_at, required = TRUE)$out[[1L]]
     # remove trailing blank line
     cli::cat_line(str_trunc(fmt[-length(fmt)]))
 

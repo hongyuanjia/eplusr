@@ -1174,7 +1174,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 
     fld <- iddobj_field_data(self, private, seq_len(cls$num_print), c("extensible_group", "required_field"))
     set(fld, NULL, "name", format_name(fld, prefix = FALSE))
-    set(fld, NULL, "index", format_index(fld, required = TRUE))
+    set(fld, NULL, "index", format_index(fld, required = TRUE, pad_char = "0"))
 
     set(fld, NULL, "ext", "")
     fld[extensible_group > 0L, ext := paste0(" <", cli::symbol$arrow_down, ">")]
