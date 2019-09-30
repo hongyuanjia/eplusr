@@ -251,7 +251,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         if (!is.null(weather) && !is_scalar(weather)) {
             assert(have_same_len(model, weather))
         }
-        if (!is_scalar(eplus)) {
+        if (!is.null(eplus) && !is_scalar(eplus)) {
             assert(have_same_len(model, eplus))
         }
         if (!is_scalar(design_day)) {
