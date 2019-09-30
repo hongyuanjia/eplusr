@@ -2762,7 +2762,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     new_before <- ._get_private(new_idf)$idf_env()$object
 
     # insert new objects
-    new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    new_idf$load(dt, .unique = FALSE, .default = FALSE, .empty = TRUE)
 
     if (is.null(unlist(old$comment, use.names = FALSE))) return(new_idf)
 
