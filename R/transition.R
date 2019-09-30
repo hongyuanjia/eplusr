@@ -580,14 +580,14 @@ trans_funs$f800t810 <- function (idf) {
                     nm <- stri_sub(value[1L], to = len)
                     if (is.na(nm)) nm <- ""
                     value[min_fields] <- paste0(class, nm, sch)
-                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", "0"))
+                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", 0))
                 } else if (stri_trans_tolower(value[min_fields]) == "continuous") {
                     sch <- "ContinuousFanSchedule"
                     len <- 100L - nchar(paste0(class, sch)) - 1L
                     nm <- stri_sub(value[1L], to = len)
                     if (is.na(nm)) nm <- ""
                     value[min_fields] <- paste0(class, nm, sch)
-                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", "1"))
+                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", 1))
                 }
             }
             value
