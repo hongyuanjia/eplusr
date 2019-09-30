@@ -201,24 +201,14 @@ test_that("Transition", {
         # IDFVersionUpdater will create one `Any Number` schedule type for every
         # HVACTemplate:* instead of only creating only once
         .exclude = list(post_class = "ScheduleTypeLimits"),
-
         # IDFVersionUpdater only reports fields that meet the \min-fields
         # requirement for v8.0 but not v8.1
-        .skip_after = list(
-            "HVACTemplate:Zone:PTAC" =
-                use_idd(8.0)$object("HVACTemplate:Zone:PTAC")$min_fields(),
-
-            "HVACTemplate:Zone:PTHP" =
-                use_idd(8.0)$object("HVACTemplate:Zone:PTHP")$min_fields(),
-
-            "HVACTemplate:Zone:WaterToAirHeatPump" =
-                use_idd(8.0)$object("HVACTemplate:Zone:WaterToAirHeatPump")$min_fields(),
-
-            "HVACTemplate:System:Unitary" =
-                use_idd(8.0)$object("HVACTemplate:System:Unitary")$min_fields(),
-
-            "HVACTemplate:System:UnitaryHeatPump:AirToAir" =
-                use_idd(8.0)$object("HVACTemplate:System:UnitaryHeatPump:AirToAir")$min_fields()
+        .less_length = c(
+            "HVACTemplate:Zone:PTAC",
+            "HVACTemplate:Zone:PTHP",
+            "HVACTemplate:Zone:WaterToAirHeatPump",
+            "HVACTemplate:System:Unitary",
+            "HVACTemplate:System:UnitaryHeatPump:AirToAir"
         )
     )
 
@@ -236,11 +226,7 @@ test_that("Transition", {
     # }}}
     # v8.2 --> v8.3 {{{
     # IDFVersionUpdater truncates number at 5 digits but R round at 5 digits
-    expect_identical_transition(8.2, 8.3,
-        .skip_equal = list(
-            "EvaporativeCooler:Indirect:ResearchSpecial" = 13L
-        )
-    )
+    expect_identical_transition(8.2, 8.3)
 
     # can hanle min-fields requirement update
     expect_silent(idf <- transition(temp_idf(8.2, `Sizing:System` = list()), 8.3))
@@ -257,11 +243,11 @@ test_that("Transition", {
                 "Meter:CustomDecrement"
             )
         ),
-        .skip_equal = list(
+        .ignore_case = list(
             # IDFVersionUpdater changes this field into upper case unnecessarily
             "WaterHeater:HeatPump:PumpedCondenser" = 21L
         ),
-        .skip_after = list(
+        .less_length = list(
             # IDFVersionUpdater did not output all fields
             "WaterHeater:HeatPump:PumpedCondenser" = 36L
         ),
@@ -279,18 +265,14 @@ test_that("Transition", {
             # IDFVersionUpdater fails to delete variable names
             class = c("Output:Table:Monthly", "Meter:Custom", "Meter:CustomDecrement")
         ),
-        .skip_after = list(
+        .ignore_field = list(
             # IDFVersionUpdater alway adds defaults for `Fraction of Zone
             # Controlled by Reference Point 1` and `Illuminance Setpoint at
             # Reference Point
             # 1 {lux}`, even there is no matched reference point
-            "Daylighting:Controls" = 14L
+            "Daylighting:Controls" = c(15L, 16L)
         ),
-        .skip_equal = list(
-            # different trailing digits of Water Vapor Diffusion Resistance Factor
-            "MaterialProperty:MoisturePenetrationDepth:Settings" = 2L
-        ),
-        .report_vars = FALSE
+        .report_vars = FALSE, .tolerance = 1e-5
     )
     expect_silent(idf <- transition(temp_idf(8.5, Branch = list("branch", 0, "curve", "type", "name", "in", "out")), 8.6))
     expect_equivalent(idf$Branch$branch$value(), list("branch", "curve", "type", "name", "in", "out"))
@@ -307,27 +289,14 @@ test_that("Transition", {
     expect_identical_transition(8.6, 8.7)
     # }}}
     # v8.7 --> 8.8 {{{
-
-    expect_identical_transition(8.7, 8.8,
-        .skip_after = list(
-            # IDFVersionUpdater fails to output vertices if input vertex number
-            # is "autocalculate"
-            "BuildingSurface:Detailed" = 9L,
-            "Floor:Detailed" = 8L
-        )
-    )
+    expect_identical_transition(8.7, 8.8)
     # }}}
     # v8.7 --> v8.8 {{{
     expect_identical_transition(8.7, 8.8)
     # }}}
     # v8.8 --> v8.9 {{{
     expect_identical_transition(8.8, 8.9,
-        .skip_equal = list(
-            # IDFVersionUpdater truncates numbers but R round numbers
-            "Site:GroundTemperature:Undisturbed:KusudaAchenbach" = 4L,
-            "GroundHeatExchanger:Vertical:Properties" = 4L
-        ),
-    # IDFVersionUpdater fails to rename variable names
+        # IDFVersionUpdater fails to rename variable names
         .report_vars = FALSE
     )
     # }}}
