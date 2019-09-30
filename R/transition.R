@@ -2771,9 +2771,13 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     input[old, on = "object_id", comment := i.comment]
 
     ._get_private(new_idf)$idf_env()$object[
-        !new_before, on = "object_id", comment := {
+        !new_before, on = "object_id", `:=`(comment = {
             if (.N == nrow(input)) {
-                list(input$comment)
+                if (.N == 1L) {
+                    list(input$comment)
+                } else {
+                    input$comment
+                }
             } else {
                 warn(
                     paste0("warning_trans_",
@@ -2788,7 +2792,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
                 )
                 list(comment)
             }
-    }]
+    })]
 
     new_idf
 }
