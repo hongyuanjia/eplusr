@@ -25,7 +25,7 @@ NULL
 #' idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 #' idfobj$FieldName
 #' idfobj[[Field]]
-#' idfobj$set(..., .defaults = TRUE)
+#' idfobj$set(..., .defaults = TRUE. .empty = FALSE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
 #' idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
@@ -203,7 +203,7 @@ NULL
 #'
 #' @section Set Field Values:
 #' \preformatted{
-#' idfobj$set(..., .default = TRUE)
+#' idfobj$set(..., .default = TRUE, .empty = FALSE)
 #' idfobj$FieldName <- Value
 #' idfobj[[Field]] <- Value
 #' }
@@ -224,6 +224,9 @@ NULL
 #'   the number minimum fields required for that class, it will be deleted.
 #'   Otherwise it will be left as blank. If `.default` is `TRUE`, that field
 #'   will be filled with default value if applicable and left as blank if not.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `.empty` to `TRUE`.
 #' * New fields that currently do not exist in that object can also be set. They
 #'   will be automatically added on the fly.
 #' * Field name matching is **case-insensitive**. For convenience,
@@ -250,6 +253,7 @@ NULL
 #'   ```
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
+#' * `.empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #' * `FieldName`: A single length character vector of one valid field name where
 #'     all characters except letters and numbers are replaced by underscores.
 #' * `Field`: A single length character vector of one valid field name or a
@@ -846,8 +850,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         get_value = function (which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
             idfobj_get_value(self, private, which, all, simplify, unit),
 
-        set = function (..., .default = TRUE)
-            idfobj_set(self, private, ..., .default = .default),
+        set = function (..., .default = TRUE, .empty = FALSE)
+            idfobj_set(self, private, ..., .default = .default, .empty = .empty),
 
         set_value = function (..., .default = TRUE)
             idfobj_set_value(self, private, ..., .default = .default),
@@ -1018,9 +1022,9 @@ idfobj_get_value <- function (self, private, which = NULL, all = FALSE, simplify
 }
 # }}}
 # idfobj_set {{{
-idfobj_set <- function (self, private, ..., .default = TRUE) {
+idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
     set <- set_idfobj_value(private$idd_env(), private$idf_env(),
-        private$m_object_id, ..., .default = .default
+        private$m_object_id, ..., .default = .default, .empty = .empty
     )
     merge_idf_data(private$idf_env(), set, by_object = TRUE)
 

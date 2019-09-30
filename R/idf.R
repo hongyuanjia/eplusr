@@ -61,13 +61,13 @@ NULL
 #' model[[ClassName]]
 #' model$dup(...)
 #' model$add(..., .default = TRUE, .all = FALSE)
-#' model$set(..., .default = TRUE)
+#' model$set(..., .default = TRUE, .empty = FALSE)
 #' model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
-#' model$insert(..., .unique = TRUE)
-#' model$load(..., .unique = TRUE, .default = TRUE)
-#' model$update(..., .default = TRUE)
+#' model$insert(..., .unique = TRUE, .empty = FALSE)
+#' model$load(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
+#' model$update(..., .default = TRUE, .empty = FALSE)
 #' model$rename(...)
-#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
+#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
 #' model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
 #'                    fixed = FALSE, useBytes = FALSE)
 #' model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
@@ -489,7 +489,7 @@ NULL
 #' \subsection{Set Values of Existing Objects}{
 #'
 #' ```
-#' model$set(..., .default = TRUE)
+#' model$set(..., .default = TRUE, .empty = FALSE)
 #' ```
 #'
 #' `$set()` takes new field value definitions in list format, sets new
@@ -520,6 +520,9 @@ NULL
 #'   the number minimum fields required for that class, it will be deleted.
 #'   Otherwise it will be left as blank. If `.default` is `TRUE`, that field
 #'   will be filled with default value if applicable and left as blank if not.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `.empty` to `TRUE`.
 #' * New fields that currently do not exist in that object can also be set. They
 #'   will be automatically added on the fly.
 #' * Field name matching is **case-insensitive**. For convenience,
@@ -539,6 +542,7 @@ NULL
 #'   new comments of modified object, overwriting existing ones.
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
+#' * `.empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -642,7 +646,7 @@ NULL
 #' \subsection{Insert Objects}{
 #'
 #' ```
-#' model$insert(..., .unique = TRUE)
+#' model$insert(..., .unique = TRUE, .empty = FALSE)
 #' ```
 #'
 #' `$insert()` takes [IdfObject]s or lists of [IdfObject]s as input, inserts
@@ -652,6 +656,9 @@ NULL
 #'
 #' * You cannot insert an [IdfObject] which comes from a different version than
 #'   current `Idf` object.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `.empty` to `TRUE`.
 #' * If input [IdfObject] has the same name as one [IdfObject] in current `Idf`
 #'   object but field values are not equal, an error may be issued if current
 #'   validation level includes conflicted-name checking. For what kind of
@@ -664,6 +671,7 @@ NULL
 #' * `.unique`: If there are duplications in input [IdfObject]s or there is same
 #'   object in current `Idf` object, duplications in input are removed. Default:
 #'   `TRUE`.
+#' * `.empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -676,7 +684,7 @@ NULL
 #' \subsection{Load Objects from characters or data.frames}{
 #'
 #' ```
-#' model$load(..., .unique = TRUE, .default = TRUE)
+#' model$load(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
 #' ```
 #'
 #' `$load()` is similar to `$insert()` except it takes directly character
@@ -724,6 +732,9 @@ NULL
 #' * `$load()` assume all definitions are from the same version as current `Idf`
 #'   object. If input definition is from different version, parsing error may
 #'   occur.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `.empty` to `TRUE`.
 #'
 #' **Argument**:
 #'
@@ -733,6 +744,7 @@ NULL
 #'   object in current Idf, duplications in input are removed. Default: `TRUE`.
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
+#' * `.empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -767,7 +779,7 @@ NULL
 #' \subsection{Update Objects from characters or data.frames}{
 #'
 #' ```
-#' model$update(..., .unique = TRUE, .default = TRUE)
+#' model$update(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
 #' ```
 #'
 #' `$update()` is similar to `$load()` except it update field values.  This
@@ -808,6 +820,9 @@ NULL
 #' * `$update()` assume all definitions are from the same version as current
 #'   `Idf` object. If input definition is from different version, parsing error
 #'   may occur.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `.empty` to `TRUE`.
 #'
 #' **Argument**:
 #'
@@ -815,6 +830,7 @@ NULL
 #'   see above.
 #' * `.default`: If `TRUE`, default values are used for those blank fields if
 #'    possible. Default: `TRUE`.
+#' * `.empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -838,7 +854,7 @@ NULL
 #' \subsection{Paste Objects from IDF Editor}{
 #'
 #' ```
-#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
+#' model$paste(in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
 #' ```
 #'
 #' `$paste()` reads the contents (from clipboard) of copied objects from IDF
@@ -854,6 +870,9 @@ NULL
 #'   `$paste()`, or explicitly specify the version of file opened by IDF Editor
 #'   using `ver` parameter. Parsing error may occur if there is a version
 #'   mismatch.
+#' * By default, trailing empty fields that are not required will be removed and
+#'   only minimum required fields are kept. You can keep the trailing empty
+#'   fields by setting `empty` to `TRUE`.
 #'
 #' **Arguments**:
 #'
@@ -866,6 +885,7 @@ NULL
 #' * `unique`: If there are duplications in copied objects from IDF Editor or
 #'   there is same object in current Idf, duplications in input are removed.
 #'   Default: `TRUE`.
+#' * `empty`: If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #'
 #' **Usage**:
 #'
@@ -1681,8 +1701,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         add = function (..., .default = TRUE, .all = FALSE)
             idf_add(self, private, ..., .default = .default, .all = .all),
 
-        set = function (..., .default = TRUE)
-            idf_set(self, private, ..., .default = .default),
+        set = function (..., .default = TRUE, .empty = FALSE)
+            idf_set(self, private, ..., .default = .default, .empty = .empty),
 
         del = function (..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
             idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force),
@@ -1690,17 +1710,17 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         rename = function (...)
             idf_rename(self, private, ...),
 
-        insert = function (..., .unique = TRUE)
-            idf_insert(self, private, ..., .unique = .unique),
+        insert = function (..., .unique = TRUE, .empty = FALSE)
+            idf_insert(self, private, ..., .unique = .unique, .empty = .empty),
 
-        load = function (..., .unique = TRUE, .default = TRUE)
-            idf_load(self, private, ..., .unique = .unique, .default = .default),
+        load = function (..., .unique = TRUE, .default = TRUE, .empty = FALSE)
+            idf_load(self, private, ..., .unique = .unique, .default = .default, .empty = .empty),
 
-        update = function (..., .default = TRUE)
-            idf_update(self, private, ..., .default = .default),
+        update = function (..., .default = TRUE, .empty = FALSE)
+            idf_update(self, private, ..., .default = .default, .empty = .empty),
 
-        paste = function (in_ip = FALSE, ver = NULL, unique = TRUE)
-            idf_paste(self, private, in_ip = in_ip, ver = ver, unique = unique),
+        paste = function (in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
+            idf_paste(self, private, in_ip = in_ip, ver = ver, unique = unique, empty = empty),
 
         dup_object = function (object, new_name = NULL)
             idf_dup_object(self, private, object, new_name),
@@ -2126,8 +2146,8 @@ idf_add_object <- function (self, private, class, value = NULL, comment = NULL, 
 }
 # }}}
 # idf_set {{{
-idf_set <- function (self, private, ..., .default = TRUE, .env = parent.frame(2)) {
-    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .env = .env)
+idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env = parent.frame(2)) {
+    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .empty = .empty, .env = .env)
     merge_idf_data(private$idf_env(), set, by_object = TRUE)
 
     # log
@@ -2186,8 +2206,8 @@ idf_rename <- function (self, private, ...) {
 }
 # }}}
 # idf_insert {{{
-idf_insert <- function (self, private, ..., .unique = TRUE) {
-    ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ..., .unique = .unique)
+idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
+    ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ..., .unique = .unique, .empty = .empty)
 
     if (!nrow(ins$object)) {
         verbose_info("After deleting duplications, nothing to add.")
@@ -2243,9 +2263,9 @@ idf_replace_value <- function (self, private, pattern, replacement, class = NULL
 }
 # }}}
 # idf_paste {{{
-idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE) {
+idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE) {
     pas <- paste_idf_object(private$idd_env(), private$idf_env(),
-        version = private$m_version, in_ip = in_ip, unique = unique
+        version = private$m_version, in_ip = in_ip, unique = unique, empty = empty
     )
 
     if (!nrow(pas$object)) {
@@ -2264,9 +2284,9 @@ idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE) 
 }
 # }}}
 # idf_load {{{
-idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
+idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE, .empty = FALSE) {
     l <- load_idf_object(private$idd_env(), private$idf_env(), private$m_version,
-        ..., .unique = .unique, .default = .default
+        ..., .unique = .unique, .default = .default, .empty = .empty
     )
 
     if (!nrow(l$object)) {
@@ -2285,9 +2305,9 @@ idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE) {
 }
 # }}}
 # idf_update {{{
-idf_update <- function (self, private, ..., .default = TRUE) {
+idf_update <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
     l <- update_idf_object(private$idd_env(), private$idf_env(), private$m_version,
-        ..., .default = .default
+        ..., .default = .default, .empty = .empty
     )
 
     merge_idf_data(private$idf_env(), l, by_object = TRUE)

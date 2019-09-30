@@ -266,6 +266,14 @@ test_that("Idf class", {
         ), .default = FALSE)
     )
     expect_equal(length(idf$RunPeriod$rp_test_4$value()), 11)
+    expect_silent(
+        idf$set(rp_test_4 = list(start_year = NULL), .default = FALSE, .empty = TRUE)
+    )
+    expect_equal(length(idf$RunPeriod$rp_test_4$value()), 14)
+    expect_silent(
+        idf$set(rp_test_4 = list(start_year = NULL), .default = FALSE, .empty = FALSE)
+    )
+    expect_equal(length(idf$RunPeriod$rp_test_4$value()), 11)
     # }}}
 
     # INSERT {{{

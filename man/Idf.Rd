@@ -63,13 +63,13 @@ model$ClassName
 model[[ClassName]]
 model$dup(...)
 model$add(..., .default = TRUE, .all = FALSE)
-model$set(..., .default = TRUE)
+model$set(..., .default = TRUE, .empty = FALSE)
 model$del(..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
-model$insert(..., .unique = TRUE)
-model$load(..., .unique = TRUE, .default = TRUE)
-model$update(..., .default = TRUE)
+model$insert(..., .unique = TRUE, .empty = FALSE)
+model$load(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
+model$update(..., .default = TRUE, .empty = FALSE)
 model$rename(...)
-model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
+model$paste(in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
 model$search_value(pattern, class = NULL, ignore.case = FALSE, perl = FALSE,
                    fixed = FALSE, useBytes = FALSE)
 model$replace_value(pattern, class = NULL, replacement, ignore.case = FALSE,
@@ -475,7 +475,7 @@ model$add(x)
 
 }
 
-\subsection{Set Values of Existing Objects}{\preformatted{model$set(..., .default = TRUE)
+\subsection{Set Values of Existing Objects}{\preformatted{model$set(..., .default = TRUE, .empty = FALSE)
 }
 
 \code{$set()} takes new field value definitions in list format, sets new
@@ -506,6 +506,9 @@ also \code{fld} is not a required field and the index of \code{fld} is larger th
 the number minimum fields required for that class, it will be deleted.
 Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
 will be filled with default value if applicable and left as blank if not.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
 \item New fields that currently do not exist in that object can also be set. They
 will be automatically added on the fly.
 \item Field name matching is \strong{case-insensitive}. For convenience,
@@ -526,6 +529,7 @@ There is a special element \code{.comment} in each list, which will be used as
 new comments of modified object, overwriting existing ones.
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
+\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 }
 
 \strong{Usage}:
@@ -621,7 +625,7 @@ model$rename(a, b)
 
 }
 
-\subsection{Insert Objects}{\preformatted{model$insert(..., .unique = TRUE)
+\subsection{Insert Objects}{\preformatted{model$insert(..., .unique = TRUE, .empty = FALSE)
 }
 
 \code{$insert()} takes \link{IdfObject}s or lists of \link{IdfObject}s as input, inserts
@@ -631,6 +635,9 @@ them into current Idf, and returns a list of inserted \link{IdfObject}s.
 \itemize{
 \item You cannot insert an \link{IdfObject} which comes from a different version than
 current \code{Idf} object.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
 \item If input \link{IdfObject} has the same name as one \link{IdfObject} in current \code{Idf}
 object but field values are not equal, an error may be issued if current
 validation level includes conflicted-name checking. For what kind of
@@ -644,6 +651,7 @@ validation components to be performed during modifications, please see
 \item \code{.unique}: If there are duplications in input \link{IdfObject}s or there is same
 object in current \code{Idf} object, duplications in input are removed. Default:
 \code{TRUE}.
+\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 }
 
 \strong{Usage}:
@@ -655,7 +663,7 @@ object in current \code{Idf} object, duplications in input are removed. Default:
 }
 }
 
-\subsection{Load Objects from characters or data.frames}{\preformatted{model$load(..., .unique = TRUE, .default = TRUE)
+\subsection{Load Objects from characters or data.frames}{\preformatted{model$load(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
 }
 
 \code{$load()} is similar to \code{$insert()} except it takes directly character
@@ -706,6 +714,9 @@ if there is any duplication in the \code{index} column.
 \item \code{$load()} assume all definitions are from the same version as current \code{Idf}
 object. If input definition is from different version, parsing error may
 occur.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \strong{Argument}:
@@ -716,6 +727,7 @@ see above.
 object in current Idf, duplications in input are removed. Default: \code{TRUE}.
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
+\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 }
 
 \strong{Usage}:
@@ -743,7 +755,7 @@ model$load(dt)
 
 }
 
-\subsection{Update Objects from characters or data.frames}{\preformatted{model$update(..., .unique = TRUE, .default = TRUE)
+\subsection{Update Objects from characters or data.frames}{\preformatted{model$update(..., .unique = TRUE, .default = TRUE, .empty = FALSE)
 }
 
 \code{$update()} is similar to \code{$load()} except it update field values.  This
@@ -787,6 +799,9 @@ be performed during modifications, please see \code{\link[=level_checks]{level_c
 \item \code{$update()} assume all definitions are from the same version as current
 \code{Idf} object. If input definition is from different version, parsing error
 may occur.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
 }
 
 \strong{Argument}:
@@ -795,6 +810,7 @@ may occur.
 see above.
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
+\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 }
 
 \strong{Usage}:
@@ -811,7 +827,7 @@ model$update(dt)
 
 }
 
-\subsection{Paste Objects from IDF Editor}{\preformatted{model$paste(in_ip = FALSE, ver = NULL, unique = TRUE)
+\subsection{Paste Objects from IDF Editor}{\preformatted{model$paste(in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE)
 }
 
 \code{$paste()} reads the contents (from clipboard) of copied objects from IDF
@@ -827,6 +843,9 @@ version than current IDF. Please check the version before running
 \code{$paste()}, or explicitly specify the version of file opened by IDF Editor
 using \code{ver} parameter. Parsing error may occur if there is a version
 mismatch.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{empty} to \code{TRUE}.
 }
 
 \strong{Arguments}:
@@ -840,6 +859,7 @@ Default: \code{NULL}.
 \item \code{unique}: If there are duplications in copied objects from IDF Editor or
 there is same object in current Idf, duplications in input are removed.
 Default: \code{TRUE}.
+\item \code{empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 }
 
 \strong{Usage}:

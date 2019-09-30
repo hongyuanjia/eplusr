@@ -83,6 +83,9 @@
   `group_job()`. `EplusGroupJob` provides a wrapper of `run_multi()` to group
   multiple EnergyPlus simulations together for running and collecting different
   EnergyPlus outputs (#117).
+* A new parameter named `.empty` has been added in `$set()`, `$insert()`,
+  `$load()`, `$update()`, `$paste()` methods in `Idf` class and `$set()` method
+  in `IdfObject` class (#133).
 
 ## Bug fixes
 
