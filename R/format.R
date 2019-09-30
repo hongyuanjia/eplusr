@@ -687,7 +687,7 @@ format_object <- function (dt) {
 # }}}
 
 # format_field_by_parent {{{
-format_field_by_parent <- function (dt, col = "value", sep_at = 15L) {
+format_field_by_parent <- function (dt, col = "value", sep_at = 15L, required = FALSE) {
     val <- col == "value"
     # in order to keep index more tidy, have to format them based on
     # parent index
@@ -703,14 +703,14 @@ format_field_by_parent <- function (dt, col = "value", sep_at = 15L) {
 
     if (is.null(col_parent)) {
         format_field(dt, leading = 0L, sep_at = sep_at, pad_char = "0",
-            value = val, quote = TRUE, blank = TRUE, index = TRUE, prefix = val)
+            value = val, quote = TRUE, blank = TRUE, index = TRUE, required = required, prefix = val)
     } else {
         l <- dt[, list(l = list(.I)), by = c(col_parent)]$l
         out <- character(nrow(dt))
         for (i in seq_along(l)) {
             out[l[[i]]] <- format_field(dt[l[[i]]],
                 leading = 0L, sep_at = sep_at, pad_char = "0",
-                value = val, quote = TRUE, blank = TRUE, index = TRUE, prefix = val
+                value = val, quote = TRUE, blank = TRUE, index = TRUE, required = required, prefix = val
             )
         }
         out
@@ -720,7 +720,8 @@ format_field_by_parent <- function (dt, col = "value", sep_at = 15L) {
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
 format_objects <- function (dt, component = c("group", "class", "object", "field", "value"),
-                            brief = TRUE, merge = TRUE, sep_at = 15L, nest = TRUE, order = FALSE) {
+                            brief = TRUE, merge = TRUE, sep_at = 15L, nest = TRUE,
+                            order = FALSE, required = FALSE) {
     all_comp <- c("group", "class", "object", "field", "value")
     component <- all_comp[sort(chmatch(component, all_comp))]
     assert(no_na(component), msg = paste0("`component` should be one or some of ", collapse(all_comp)))
@@ -746,7 +747,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
         old_value <- dt[["value_chr"]]
         if (merge) {
             assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")))
-            set(dt, NULL, "value", format_field_by_parent(dt, "value", sep_at = sep_at))
+            set(dt, NULL, "value", format_field_by_parent(dt, "value", sep_at = sep_at, required = required))
             component <- component[component != "field"]
         } else {
             set(dt, NULL, "value",
@@ -763,7 +764,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
     if ("field" %chin% component) {
         assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")), prefix = "Input")
         if ((!"value" %chin% component) || ("value" %chin% component & !merge)) {
-            set(dt, NULL, "field", paste0("Field: <", format_field_by_parent(dt, "field", sep_at = sep_at), ">")
+            set(dt, NULL, "field", paste0("Field: <", format_field_by_parent(dt, "field", sep_at = sep_at, required = required), ">")
             )
         }
     }

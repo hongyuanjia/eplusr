@@ -126,6 +126,7 @@
   R names (#115).
 * `$save()` works if weather was not given during initialization for
   `ParametricJob` (#120).
+* Required fields in `IdfObject` are now marked with `*` when printing (#135).
 
 # eplusr 0.10.3
 
