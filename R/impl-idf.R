@@ -1736,9 +1736,9 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 }
 # }}}
 # set_idf_object {{{
-set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .env = parent.frame()) {
+set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .empty = FALSE, .env = parent.frame()) {
     # .null in sep_value_dots controls whether list(field = NULL) is acceptable
-    l <- sep_value_dots(..., .empty = FALSE, .null = TRUE, .env = .env)
+    l <- sep_value_dots(..., .empty = .empty, .null = TRUE, .env = .env)
 
     obj_val <- match_set_idf_data(idd_env, idf_env, l)
     obj <- obj_val$object
@@ -1804,7 +1804,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .env = paren
 
     # delete fields
     add_joined_cols(idd_env$class, val, "class_id", c("min_fields", "num_extensible"))
-    val <- remove_empty_fields(val)
+    if (!.empty) val <- remove_empty_fields(val)
 
     # validate
     assert_valid(idd_env, idf_env, obj, val, action = "set")
@@ -2154,7 +2154,7 @@ rename_idf_object <- function (idd_env, idf_env, ...) {
 }
 # }}}
 # insert_idf_object {{{
-insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
+insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .empty = FALSE) {
     l <- sep_object_dots(...)
     ver <- version
     input <- l$data
@@ -2210,7 +2210,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
 
     # remove empty fields
     add_class_property(idd_env, val, c("min_fields", "num_extensible"))
-    val <- remove_empty_fields(val)
+    if (!.empty) val <- remove_empty_fields(val)
 
     # remove duplicated objects
     if (.unique) {
@@ -2237,7 +2237,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE) {
 }
 # }}}
 # paste_idf_object {{{
-paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique = TRUE, default = TRUE) {
+paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique = TRUE, default = TRUE, empty = FALSE) {
     parsed <- read_idfeditor_copy(version, in_ip)
 
     # add class name
@@ -2254,7 +2254,7 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
     # delete empty fields
     add_joined_cols(idd_env$class, parsed$value, "class_id", c("min_fields", "num_extensible"))
     add_field_property(idd_env, parsed$value, "required_field")
-    parsed$value <- remove_empty_fields(parsed$value)
+    if (!empty) parsed$value <- remove_empty_fields(parsed$value)
 
     # add rleid for validation and message printing
     add_rleid(parsed$object)
@@ -2310,7 +2310,7 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
 }
 # }}}
 # load_idf_object {{{
-load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .default = TRUE) {
+load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .default = TRUE, .empty = FALSE) {
     l <- sep_definition_dots(..., .version = version)
 
     prop <- c("is_name", "required_field", "src_enum", "type_enum", "extensible_group")
@@ -2454,7 +2454,7 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
 
     # delete fields
     add_joined_cols(idd_env$class, parsed$value, "class_id", c("min_fields", "num_extensible"))
-    parsed$value <- remove_empty_fields(parsed$value)
+    if (!.empty) parsed$value <- remove_empty_fields(parsed$value)
 
     # validate
     assert_valid(idd_env, idf_env, parsed$object, parsed$value, action = "add")
@@ -2482,7 +2482,7 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
 }
 # }}}
 # update_idf_object {{{
-update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) {
+update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE, .empty = FALSE) {
     l <- sep_definition_dots(..., .version = version, .update = TRUE)
 
     prop <- c("is_name", "required_field", "src_enum", "type_enum", "extensible_group")
@@ -2709,7 +2709,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE) 
 
     # delete fields
     add_joined_cols(idd_env$class, val, "class_id", c("min_fields", "num_extensible"))
-    val <- remove_empty_fields(val)
+    if (!.empty) val <- remove_empty_fields(val)
 
     # validate
     assert_valid(idd_env, idf_env, obj, val, action = "set")

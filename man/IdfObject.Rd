@@ -27,7 +27,7 @@ idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
 idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
 idfobj$FieldName
 idfobj[[Field]]
-idfobj$set(..., .defaults = TRUE)
+idfobj$set(..., .defaults = TRUE. .empty = FALSE)
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
 idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
@@ -214,7 +214,7 @@ returned. Should be one of or a combination of \code{"auto"}, \code{"default"},
 \section{Set Field Values}{
 
 \preformatted{
-idfobj$set(..., .default = TRUE)
+idfobj$set(..., .default = TRUE, .empty = FALSE)
 idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
 }
@@ -233,6 +233,9 @@ also \code{fld} is not a required field and the index of \code{fld} is larger th
 the number minimum fields required for that class, it will be deleted.
 Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
 will be filled with default value if applicable and left as blank if not.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
 \item New fields that currently do not exist in that object can also be set. They
 will be automatically added on the fly.
 \item Field name matching is \strong{case-insensitive}. For convenience,
@@ -258,6 +261,7 @@ list in format\preformatted{list(field1 = value1, field2 = value2)
 }
 \item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
 possible. Default: \code{TRUE}.
+\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
 \item \code{FieldName}: A single length character vector of one valid field name where
 all characters except letters and numbers are replaced by underscores.
 \item \code{Field}: A single length character vector of one valid field name or a

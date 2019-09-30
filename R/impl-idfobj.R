@@ -104,7 +104,7 @@ get_value_list <- function (dt_value, unit = FALSE) {
 }
 # }}}
 # set_idfobj_value {{{
-set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE) {
+set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE, .empty = FALSE) {
     nm <- if (is_count(object)) paste0("..", object) else object
 
     input <- list(...)
@@ -148,7 +148,7 @@ set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE) {
 
     setattr(input, "names", nm)
 
-    set_idf_object(idd_env, idf_env, input, .default = .default)
+    set_idf_object(idd_env, idf_env, input, .default = .default, .empty = .empty)
 }
 # }}}
 # get_idfobj_possible {{{
