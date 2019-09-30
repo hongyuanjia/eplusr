@@ -2403,6 +2403,7 @@ trans_postprocess <- function (idf, from, to) {
         dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
     }
     # }}}
+    id_del <- NULL
     # update_var {{{
     update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
         if (!nrow(dt)) return(dt)
@@ -2416,6 +2417,7 @@ trans_postprocess <- function (idf, from, to) {
 
         # delete deprecatd variable first
         id_obj <- dt[mapping[is.na(new)], on = c(value_lower = "old"), unique(id)]
+        id_del <<- c(id_del, id_obj[!is.na(id_obj)])
         dt <- dt[!J(id_obj), on = "id"]
 
         # remove delete rules
@@ -2506,6 +2508,7 @@ trans_postprocess <- function (idf, from, to) {
                     if (length(id_wild)) {
                         obj_wild <- dt[J(id_wild), on = "id"]
                         # remove the original
+                        id_del <<- c(id_del, id_wild[!is.na(id_wild)])
                         dt <- dt[!J(id_wild), on = "id"]
 
                         # get the smallest negative id in case processes above
@@ -2597,7 +2600,11 @@ trans_postprocess <- function (idf, from, to) {
     dt <- rbindlist(mget(paste0("dt", 1:8)))
     if (!nrow(dt)) return(idf)
 
-    trans_process_load(idf$clone()$del(unique(dt$id)), idf, dt)
+    if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
+        trans_process_load(idf$clone()$del(id_del), idf, dt)
+    } else {
+        trans_process_load(idf$clone(), idf, dt)
+    }
 }
 # }}}
 
