@@ -649,8 +649,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
         )
     }
 
-    nms <- names(private$m_idfs)
-    filename <- make_filename(nms)
+    filename <- make_filename(names(private$m_idfs))
 
     if (separate) {
         path_param <- file.path(dir, filename, paste0(filename, ".idf"))
