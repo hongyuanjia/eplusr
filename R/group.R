@@ -431,7 +431,7 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 # }}}
 # epgroup_run_models {{{
 epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
-    nms <- names(private$m_idfs)
+    nms <- make_filename(names(private$m_idfs))
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
     if (is.null(private$m_epws)) {
