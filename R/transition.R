@@ -580,14 +580,14 @@ trans_funs$f800t810 <- function (idf) {
                     nm <- stri_sub(value[1L], to = len)
                     if (is.na(nm)) nm <- ""
                     value[min_fields] <- paste0(class, nm, sch)
-                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", "0"))
+                    new_idf$add(`Schedule:Constant` = list(value[[min_fields]], "Any Number", 0))
                 } else if (stri_trans_tolower(value[min_fields]) == "continuous") {
                     sch <- "ContinuousFanSchedule"
                     len <- 100L - nchar(paste0(class, sch)) - 1L
                     nm <- stri_sub(value[1L], to = len)
                     if (is.na(nm)) nm <- ""
                     value[min_fields] <- paste0(class, nm, sch)
-                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", "1"))
+                    new_idf$add(`Schedule:Constant` = list(value[[13]], "Any Number", 1))
                 }
             }
             value
@@ -2403,6 +2403,7 @@ trans_postprocess <- function (idf, from, to) {
         dt[J(field_index, NA_character_), on = c("index", "value"), value := "*"]
     }
     # }}}
+    id_del <- NULL
     # update_var {{{
     update_var <- function (dt, mapping, field_index, step = NULL, is_meter = FALSE, idf = NULL) {
         if (!nrow(dt)) return(dt)
@@ -2416,6 +2417,7 @@ trans_postprocess <- function (idf, from, to) {
 
         # delete deprecatd variable first
         id_obj <- dt[mapping[is.na(new)], on = c(value_lower = "old"), unique(id)]
+        id_del <<- c(id_del, id_obj[!is.na(id_obj)])
         dt <- dt[!J(id_obj), on = "id"]
 
         # remove delete rules
@@ -2506,6 +2508,7 @@ trans_postprocess <- function (idf, from, to) {
                     if (length(id_wild)) {
                         obj_wild <- dt[J(id_wild), on = "id"]
                         # remove the original
+                        id_del <<- c(id_del, id_wild[!is.na(id_wild)])
                         dt <- dt[!J(id_wild), on = "id"]
 
                         # get the smallest negative id in case processes above
@@ -2597,7 +2600,11 @@ trans_postprocess <- function (idf, from, to) {
     dt <- rbindlist(mget(paste0("dt", 1:8)))
     if (!nrow(dt)) return(idf)
 
-    trans_process_load(idf$clone()$del(unique(dt$id)), idf, dt)
+    if (length(id_del <- unique(c(id_del, dt[id > 0, id])))) {
+        trans_process_load(idf$clone()$del(id_del), idf, dt)
+    } else {
+        trans_process_load(idf$clone(), idf, dt)
+    }
 }
 # }}}
 
@@ -2755,7 +2762,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     new_before <- ._get_private(new_idf)$idf_env()$object
 
     # insert new objects
-    new_idf$load(dt, .unique = FALSE, .default = FALSE)
+    new_idf$load(dt, .unique = FALSE, .default = FALSE, .empty = TRUE)
 
     if (is.null(unlist(old$comment, use.names = FALSE))) return(new_idf)
 
@@ -2764,9 +2771,13 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     input[old, on = "object_id", comment := i.comment]
 
     ._get_private(new_idf)$idf_env()$object[
-        !new_before, on = "object_id", comment := {
+        !new_before, on = "object_id", `:=`(comment = {
             if (.N == nrow(input)) {
-                list(input$comment)
+                if (.N == 1L) {
+                    list(input$comment)
+                } else {
+                    input$comment
+                }
             } else {
                 warn(
                     paste0("warning_trans_",
@@ -2781,7 +2792,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
                 )
                 list(comment)
             }
-    }]
+    })]
 
     new_idf
 }

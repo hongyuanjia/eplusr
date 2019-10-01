@@ -158,7 +158,8 @@ get_both_trans <- function (from, to, ..., .exclude = NULL, .report_vars = TRUE)
 
 # expect_identical_transition {{{
 expect_identical_transition <- function (from, to, ..., .exclude = NULL, .report_vars = TRUE,
-                                         .skip_equal = NULL, .skip_after = NULL) {
+                                         .ignore_field = NULL, .ignore_case = NULL,
+                                         .less_length = NULL, .tolerance = 1e-6) {
     trans <- get_both_trans(from, to, ..., .exclude = .exclude, .report_vars = .report_vars)
 
     # check output version
@@ -177,34 +178,52 @@ expect_identical_transition <- function (from, to, ..., .exclude = NULL, .report
 
     # check object contents
     for (cls in trans$eplusr$class_name()) {
-        str_eplusr <- trans$eplusr$to_string(class = cls, header = FALSE, format = "new_top", comment = FALSE)
-        str_energyplus <- trans$energyplus$to_string(class = cls, header = FALSE, format = "new_top", comment = FALSE)
+        val_eplusr <- lapply(trans$eplusr$objects_in_class(cls), function (obj) obj$value())
+        val_energyplus <- lapply(trans$energyplus$objects_in_class(cls), function (obj) obj$value())
 
-        if (cls %in% names(.skip_after)) {
-            if (length(str_eplusr) >= .skip_after[[cls]]) {
-                str_eplusr <- c(
-                    str_eplusr[1L],
-                    str_eplusr[-1L][setdiff(1:(.skip_after[[cls]] - 1L), .skip_equal[[cls]])]
-                )
-            }
-            if (length(str_energyplus) >= .skip_after[[cls]]) {
-                str_energyplus <- c(
-                    str_energyplus[1L],
-                    str_energyplus[-1L][setdiff(1:(.skip_after[[cls]] - 1L), .skip_equal[[cls]])])
-            }
-        } else if (cls %in% names(.skip_equal)) {
-            if (any(length(str_eplusr) >= (.skip_equal[[cls]] + 1L))) {
-                str_eplusr <- str_eplusr[-(.skip_equal[[cls]] + 1L)]
-            }
-            if (any(length(str_energyplus) >= (.skip_equal[[cls]] + 1L))) {
-                str_energyplus <- str_energyplus[-(.skip_equal[[cls]] + 1L)]
-            }
-        }
-
-        expect_equal(str_eplusr, str_energyplus,
+        expect_equal(length(val_eplusr), length(val_energyplus),
             label = paste0("eplusr transition output objects of class ", surround(cls)),
             expected.label = paste0("IDFVersionUpdater transition output"),
             info = paste0("Transition ", from, " --> ", to)
+        )
+
+        for (i in seq_along(val_eplusr)) {
+            if (length(val_eplusr[[i]]) < length(val_energyplus[[i]]))
+                val_energyplus[[i]] <- val_energyplus[[i]][seq_along(val_eplusr[[i]])]
+
+            if (cls %in% .less_length) {
+                if (length(val_eplusr[[i]]) > length(val_energyplus[[i]]))
+                    val_eplusr[[i]] <- val_eplusr[[i]][seq_along(val_energyplus[[i]])]
+            }
+
+            if (cls %in% names(.ignore_case)) {
+                if (any(idx <- length(val_eplusr[[i]]) >= .ignore_case[[cls]])) {
+                    for (index in .ignore_case[[cls]][idx]) {
+                        val_eplusr[[i]][index] <- tolower(val_eplusr[[i]][index])
+                    }
+                }
+                if (any(idx <- length(val_energyplus[[i]]) >= .ignore_case[[cls]])) {
+                    for (index in .ignore_case[[cls]][idx]) {
+                        val_energyplus[[i]][index] <- tolower(val_energyplus[[i]][index])
+                    }
+                }
+            }
+
+            if (cls %in% names(.ignore_field)) {
+                if (any(idx <- length(val_eplusr[[i]]) >= .ignore_field[[cls]])) {
+                    val_eplusr[[i]][idx] <- NULL
+                }
+                if (any(idx <- length(val_energyplus[[i]]) >= .ignore_field[[cls]])) {
+                    val_energyplus[[i]][idx] <- NULL
+                }
+            }
+        }
+
+        expect_equal(unname(val_eplusr), unname(val_energyplus),
+            label = paste0("eplusr transition output objects of class ", surround(cls)),
+            expected.label = paste0("IDFVersionUpdater transition output"),
+            info = paste0("Transition ", from, " --> ", to),
+            tolerance = .tolerance
         )
     }
 }
