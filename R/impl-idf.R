@@ -1624,8 +1624,8 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 
     # new object table
     obj <- get_idd_class(idd_env, setnames(l$object, "name", "class_name")$class_name, underscore = TRUE)
-    set(obj, NULL, c("object_rleid", "comment", "empty"),
-        l$object[obj$rleid, .SD, .SDcols = c("object_rleid", "comment", "empty")]
+    set(obj, NULL, c("rleid", "object_rleid", "comment", "empty"),
+        l$object[obj$rleid, .SD, .SDcols = c("rleid", "object_rleid", "comment", "empty")]
     )
 
     # stop if cannot add objects in specified classes
