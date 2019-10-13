@@ -776,6 +776,7 @@ get_epgroup_input <- function (idfs, epws) {
 
     # check length
     if (!is.null(epws)) {
+        if (length(epws) == 1L) epws <- replicate(length(idfs), epws[[1L]]$clone())
         assert(have_same_len(idfs, epws))
         nm_epw <- tools::file_path_sans_ext(basename(vcapply(epws, function (epw) epw$path())))
         setattr(epws, "names", make.unique(nm_epw, "_"))

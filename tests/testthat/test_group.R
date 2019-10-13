@@ -12,6 +12,7 @@ test_that("Group methods", {
         "\\.epw", full.names = TRUE)[1:5]
 
     expect_error(group_job(empty_idf(8.8)), class = "error_idf_not_local")
+    expect_silent(group_job(path_idfs, path_epws[1L]))
     expect_silent(grp <- group_job(path_idfs, NULL))
     expect_equal(grp$status(),
         list(run_before = FALSE, alive = FALSE, terminated = NA,
