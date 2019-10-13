@@ -27,8 +27,10 @@ For details on \code{EplusGroupJob}, please see \link{EplusGroupJob} class.
 \examples{
 if (is_avail_eplus(8.8)) {
     dir <- eplus_config(8.8)$dir
-    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf")[1:5]
-    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw")[1:5]
+    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
+        full.names = TRUE)[1:5]
+    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw",
+        full.names = TRUE)[1:5]
 
     # create from local files
     group <- group_job(path_idfs, path_epws)
