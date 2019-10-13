@@ -355,11 +355,15 @@ sep_value_dots <- function (..., .empty = !in_final_mode(), .scalar = TRUE, .nul
             dt_unnmd <- flatten(dt[!dot_nmd])
             dt_multi <- dt[len_nm > 1L & dot_nmd][, {
                 len <- each_length(object_rleid)
+                object_rleid <- unlist(object_rleid)
+                dot_nm <- unlist(lapply(dot_nm, function (x) if (is.numeric(x)) paste0("..", x) else x))
+                if (is.null(object_rleid)) object_rleid <- integer()
+                if (is.null(dot_nm)) dot_nm <- character()
                 list(rleid = rep(rleid, len),
-                     object_rleid = unlist(object_rleid),
+                     object_rleid = object_rleid,
                      dep = rep(dep, len),
                      dot = rep(dot, len),
-                     dot_nm = unlist(lapply(dot_nm, function (x) if (is.numeric(x)) paste0("..", x) else x))
+                     dot_nm = dot_nm
                 )
             }]
 
