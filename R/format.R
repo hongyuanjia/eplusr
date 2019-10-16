@@ -824,7 +824,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
     }
     setnames(out, component[[1L]], "out")
 
-    col_del <- intersect(names(dt), c("group", "class", "field"))
+    col_del <- intersect(names(dt), c("group", "class", "object", "field", "value"))
     if (length(col_del)) set(dt, NULL, col_del, NULL)
     if (has_name(dt, "value_chr")) set(dt, NULL, "value_chr", old_value)
 
