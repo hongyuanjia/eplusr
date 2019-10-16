@@ -86,6 +86,7 @@
 * A new parameter named `.empty` has been added in `$set()`, `$insert()`,
   `$load()`, `$update()`, `$paste()` methods in `Idf` class and `$set()` method
   in `IdfObject` class (#133).
+* EnergyPlus v9.2 support has been added (#138).
 
 ## Bug fixes
 
