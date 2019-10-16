@@ -24,21 +24,24 @@ build_trans_test_idf <- function (ver, ..., .exclude = NULL, .report_vars = TRUE
     on.exit(eplusr_option(validate_level = level, verbose_info = verbose, autocomplete = comp), add = TRUE)
 
     ver <- standardize_ver(ver)
-    # For 8.2. Otherwise IDFVersionUpdater will fail {{{
+    # For 8.2. Otherwise IDFVersionUpdater will fail
     if (ver == 8.2) {
         # use a defined file
         idf <- read_idf("files/v8.2.idf")
         idf$save(tempfile(fileext = ".idf"))
-    # }}}
     # For 8.8. Otherwise IDFVersionUpdater will fail
     } else if (ver == 8.8) {
         # use a defined file
         idf <- read_idf("files/v8.8.idf")
         idf$save(tempfile(fileext = ".idf"))
+    } else if (ver == 9.1) {
+        # use a defined file
+        idf <- read_idf("files/v9.1.idf")
+        idf$save(tempfile(fileext = ".idf"))
     } else {
         idf <- temp_idf(ver, ...)
         if (!length(list(...)) && !is.character(.report_vars)) {
-            cls <- class_updated[[as.character(ver[, 1:2])]]
+            cls <- CLASS_UPDATED[[as.character(ver[, 1:2])]]
 
             lst <- rep(list(list()), length(cls))
             names(lst) <- cls
@@ -187,6 +190,17 @@ expect_identical_transition <- function (from, to, ..., .exclude = NULL, .report
             info = paste0("Transition ", from, " --> ", to)
         )
 
+        # if all named
+        if (!anyNA(names(val_eplusr))) {
+            expect_equal(sort(names(val_eplusr)), sort(names(val_energyplus)),
+                label = paste0("eplusr transition output object names of class ", surround(cls)),
+                expected.label = paste0("IDFVersionUpdater transition output"),
+                info = paste0("Transition ", from, " --> ", to)
+            )
+            # make sure the same order
+            val_energyplus <- val_energyplus[names(val_eplusr)]
+        }
+
         for (i in seq_along(val_eplusr)) {
             if (length(val_eplusr[[i]]) < length(val_energyplus[[i]]))
                 val_energyplus[[i]] <- val_energyplus[[i]][seq_along(val_eplusr[[i]])]
@@ -229,8 +243,8 @@ expect_identical_transition <- function (from, to, ..., .exclude = NULL, .report
 }
 # }}}
 
-# class_updated {{{
-class_updated <- list(
+# CLASS_UPDATED {{{
+CLASS_UPDATED <- list(
     `7.2` = c(
         "ShadowCalculation",                                       # 1
         "Coil:Heating:DX:MultiSpeed",                              # 2
@@ -418,6 +432,17 @@ class_updated <- list(
     `9.0` = c(
         "HybridModel:Zone",      # 1
         "ZoneHVAC:EquipmentList" # 2
+    ),
+
+    `9.1` = c(
+        "Foundation:Kiva",               # 1
+        "RunPeriod",                     # 2
+        "Schedule:File",                 # 3
+        "Table:OneIndependentVariable",  # 4
+        "Table:TwoIndependentVariables", # 5
+        "Table:MultiVariableLookup",     # 6
+        "ThermalStorage:Ice:Detailed",   # 7
+        "ZoneHVAC:EquipmentList"         # 8
     )
 )
 # }}}
