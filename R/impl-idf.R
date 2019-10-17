@@ -1915,7 +1915,21 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
     obj <- get_object_input(idd_env, idf_env, l, keep_duplicate = TRUE)
     set(obj, NULL, c("object_name_lower", "comment", "new_object_name"), NULL)
 
-    assert_can_do(idd_env, idf_env, l$dot, obj, "del")
+    # enable to delete even required objects if .force is TRUE
+    if (!.force) {
+        assert_can_do(idd_env, idf_env, l$dot, obj, "del")
+    } else {
+        ori <- eplusr_option("validate_level")
+        on.exit(eplusr_option(validate_level = ori), add = TRUE)
+
+        # disable required-object and unique-object checking
+        chks <- level_checks(ori)
+        chks$required_object <- FALSE
+        chks$unique_object <- FALSE
+        eplusr_option(validate_level = chks)
+
+        assert_can_do(idd_env, idf_env, l$dot, obj, "del")
+    }
 
     # get objects to be deleted
     id_del <- obj$object_id
