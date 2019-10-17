@@ -35,13 +35,7 @@ on_finish: R -q -e "tic::after_script()"
 environment:
   PKGTYPE: binary
   matrix:
-    - R_VERSION: devel
-      R_ARCH: x64
-
     - R_VERSION: release
-      R_ARCH: x64
-
-    - R_VERSION: oldrel
       R_ARCH: x64
 
 artifacts:
