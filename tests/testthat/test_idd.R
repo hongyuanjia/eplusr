@@ -9,7 +9,7 @@ test_that("can download IDD from EnergyPlus repo", {
     expect_true(file.exists(file.path(tempdir(), "V8-8-0-Energy+.idd")))
 
     expect_silent(download_idd("latest", tempdir()))
-    expect_true(file.exists(file.path(tempdir(), "V9-1-0-Energy+.idd")))
+    expect_true(file.exists(file.path(tempdir(), "V9-2-0-Energy+.idd")))
 })
 # }}}
 
@@ -37,7 +37,7 @@ test_that("can read IDD", {
     expect_error(is_avail_idd("latest"))
 
     expect_silent(use_idd(8.7, download = "auto"))
-    expect_equal(avail_idd(), numeric_version(c("8.4.0", "8.7.0", "9.1.0")))
+    expect_equal(avail_idd(), numeric_version(c("8.4.0", "8.7.0", "9.2.0")))
 
     expect_silent(use_idd(text("idd", "9.9.9")))
     expect_true(is_avail_idd("9.9.9"))

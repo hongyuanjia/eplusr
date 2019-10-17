@@ -51,27 +51,7 @@ env:
 matrix:
   include:
     - os: linux
-      r: oldrel
-      env:
-        - NOT_CRAN: true
-
-    - os: linux
-      r: release
-      env:
-        - NOT_CRAN: true
-
-    - os: linux
       r: devel
-      env:
-        - NOT_CRAN: true
-
-    - os: osx
-      r: oldrel
-      env:
-        - NOT_CRAN: true
-
-    - os: osx
-      r: release
       env:
         - NOT_CRAN: true
 
