@@ -74,7 +74,7 @@ install_eplus <- function (ver = "latest", force = FALSE) {
 
     inst <- attr(dl, "file")
     res <- switch(os_type(),
-           windows = install_eplus_win(inst),
+           windows = install_eplus_win(inst, qtifw = ver >= 9.2),
            linux = install_eplus_linux(inst),
            macos = install_eplus_macos(inst))
 
@@ -167,8 +167,52 @@ download_file <- function (url, dest) {
 }
 # }}}
 # install_eplus_win {{{
-install_eplus_win <- function (exec) {
-    system(sprintf("%s /S", exec))
+install_eplus_win <- function (exec, qtifw = FALSE) {
+    if (!qtifw) {
+        system(sprintf("%s /S", exec))
+    } else {
+        # create a tempfile of QTIFW control script
+        ctrl <- tempfile(fileext = ".qs")
+        write_lines(file = ctrl, x = "
+            function Controller() {
+                installer.autoRejectMessageBoxes();
+                installer.installationFinished.connect(function() {
+                    gui.clickButton(buttons.NextButton);
+                })
+            }
+
+            Controller.prototype.IntroductionPageCallback = function() {
+                // click delay here because the next button is initially disabled for ~1 second
+                gui.clickButton(buttons.NextButton, 3000);
+            }
+
+            Controller.prototype.TargetDirectoryPageCallback = function() {
+                gui.clickButton(buttons.NextButton);
+            }
+
+            Controller.prototype.ComponentSelectionPageCallback = function() {
+                gui.clickButton(buttons.NextButton);
+            }
+
+            Controller.prototype.LicenseAgreementPageCallback = function() {
+                gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
+                gui.clickButton(buttons.NextButton);
+            }
+
+            Controller.prototype.StartMenuDirectoryPageCallback = function() {
+                gui.clickButton(buttons.NextButton);
+            }
+
+            Controller.prototype.ReadyForInstallationPageCallback = function() {
+                gui.clickButton(buttons.NextButton);
+            }
+
+            Controller.prototype.FinishedPageCallback = function() {
+                gui.clickButton(buttons.FinishButton);
+            }
+        ")
+        system(sprintf("%s --script %s", exec, ctrl))
+    }
 }
 # }}}
 # install_eplus_macos {{{

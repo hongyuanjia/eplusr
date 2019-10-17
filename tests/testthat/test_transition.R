@@ -95,7 +95,7 @@ test_that("Transition", {
     skip_on_cran()
     # EnergyPlus v9.1 failed to install on Linux
     skip_on_travis()
-    if (!is_avail_eplus(9.1)) install_eplus(9.1)
+    if (!is_avail_eplus(9.2)) install_eplus(9.2)
     eplusr_option(verbose_info = FALSE)
 
     # suppress build tag missing warnings
@@ -310,5 +310,13 @@ test_that("Transition", {
     # }}}
     # v9.0 --> v9.1 {{{
     expect_identical_transition(9.0, 9.1)
+    # }}}
+    # v9.1 --> v9.2 {{{
+    expect_identical_transition(9.1, 9.2,
+        .ignore_field = list(
+            # See https://github.com/NREL/EnergyPlus/issues/7560
+            "Table:Lookup" = 3L
+        )
+    )
     # }}}
 })

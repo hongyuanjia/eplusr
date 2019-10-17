@@ -2232,6 +2232,586 @@ trans_funs$f900t910 <- function (idf) {
     trans_postprocess(new_idf, idf$version(), new_idf$version())
 }
 # }}}
+# trans_910_920 {{{
+trans_funs$f910t920 <- function (idf) {
+    assert(idf$version()[, 1:2] == 9.1)
+
+    target_cls <- c(
+        "Foundation:Kiva",               # 1
+        "RunPeriod",                     # 2
+        "Schedule:File",                 # 3
+        "Table:OneIndependentVariable",  # 4
+        "Table:TwoIndependentVariables", # 5
+        "Table:MultiVariableLookup",     # 6
+        "ThermalStorage:Ice:Detailed",   # 7
+        "ZoneHVAC:EquipmentList"         # 8
+    )
+
+    new_idf <- trans_preprocess(idf, 9.2, target_cls)
+
+    # 1: Foundation:Kiva {{{
+    dt1 <- trans_action(idf, "Foundation:Kiva", insert = list(2L))
+    # }}}
+    # 2: RunPeriod {{{
+    dt2 <- trans_action(idf, "RunPeriod")
+    if (nrow(dt2)) {
+        dt2[J(1L), on = "index", value := {
+            # get exiting run period number
+            existing <- stri_match_first_regex(stri_trans_tolower(value), "^runperiod (\\d+)$")[, 2L]
+            existing <- as.integer(existing)
+            # get number of run period without names
+            n <- sum(is.na(value))
+
+            # valid index left
+            valid <- setdiff(seq.int(.N), existing)
+            if (n >= length(valid)) {
+                new <- c(valid, seq(max(valid) + 1L, length.out = n - length(valid)))
+            } else {
+                new <- valid[seq.int(n)]
+            }
+
+            value[is.na(value)] <- paste("RUNPERIOD", new)
+            value
+        }]
+    }
+    # }}}
+    # 3: Schedule:File {{{
+    dt3 <- trans_action(idf, "Schedule:File", reset = list(7, "fixed", "SPACE"))
+    # }}}
+
+    id_max <- 0L
+    # init_var_dt {{{
+    init_var_dt <- function (dt, i_expr = NULL, min_max, type) {
+        dt <- if (is.null(i_expr)) copy(dt) else dt[eval(i_expr)]
+
+        # calculate fields should be added
+        to_add <- setdiff(c(min_max, type), c(4L:5L, 7L))
+        # only add fields with index no more than 10
+        if (length(to_add)) to_add <- to_add[to_add <= 10L]
+
+        trans_action_dt(dt,
+            offset = list(min_max, 4L:5L),
+            offset = list(type, 7L),
+            add = list(to_add, NA_character_),
+            reset = list(6L, NA_character_),
+            reset = list(8L:10L, NA_character_)
+        )
+    }
+    # }}}
+    # init_var_type {{{
+    init_var_type <- function (dt, index_cond = 3L) {
+        set(dt, NULL, "value_lower", stri_trans_tolower(dt$value))
+        id_const <- dt[index == index_cond & value_lower == "linearinterpolationoftable", id]
+        id_linear <- dt[index == index_cond & value_lower == "lagrangeinterpolationlinearextrapolation", id]
+        set(dt, NULL, "value_lower", NULL)
+        dt[J(id_const), on = "id", value := {
+            value[2] <- "Linear"
+            value[3] <- "Constant"
+            value
+        }, by = "id"]
+        dt[J(id_linear), on = "id", value := {
+            value[2] <- "Cubic"
+            value[3] <- "Linear"
+            value
+        }, by = "id"]
+        dt[!J(c(id_const, id_linear)), on = "id", value := {
+            value[2] <- "Cubic"
+            value[3] <- "Constant"
+            value
+        }, by = "id"]
+        dt[J(1L, NA_character_), on = c("index", "value"), value := ""]
+        dt[, index := seq.int(.N), by = "id"]
+    }
+    # }}}
+    # init_list_dt {{{
+    init_list_dt <- function (dt, num) {
+        if (is.integer(num)) {
+            dt <- dt[J(rep(1L, num + 1L)), on = "index"]
+        } else if (is.data.frame(num)) {
+            dt <- dt[num, on = c("id", "index")]
+            dt[dt[J(1L), on = "index"], on = "id", value := i.value]
+        }
+        dt[, index := seq.int(.N), by = "id"]
+
+        set(dt, NULL, "class", "Table:IndependentVariableList")
+        dt[is.na(value), value := ""]
+        dt[J(1L), on = "index", value := paste0(value, "_IndependentVariableList")]
+
+        dt[index > 1L, value := paste0(value, "_IndependentVariable", seq.int(.N)), by = "id"]
+        setorderv(dt, "id")
+
+        dt
+    }
+    # }}}
+    # init_lookup_dt {{{
+    init_lookup_dt <- function (dt, i_expr = NULL, ref = 10L, min_max = 6L:7L, type = 9L, del = NULL) {
+        dt <- if (is.null(i_expr)) copy(dt) else dt[eval(i_expr)]
+        dt[, class := "Table:Lookup"]
+
+        dt[J(1L, NA_character_), on = c("index", "value"), value := ""]
+        dt[J(c(1L:2L)), on = "index", value := {
+            value[2L] <- paste0(value[1L], "_IndependentVariableList")
+            value
+        }, by = "id"]
+
+        # calculate fields should be added
+        to_add <- setdiff(c(ref, min_max, type), c(4L:7L))
+        # only add fields with index no more than 10
+        if (length(to_add)) to_add <- to_add[to_add <= 10L]
+
+        dt <- trans_action_dt(dt,
+            offset = list(ref, 4L),
+            offset = list(min_max, 5L:6L),
+            offset = list(type, 7L),
+            add = list(to_add),
+            reset = list(8L:10L, NA_character_)
+        )
+
+        if (!is.null(del)) dt <- dt[!J(del), on = "index"]
+
+        dt[J(c(3L, 4L)), on = "index", value := {
+            value[[1L]] <- if (is.na(value[[2L]])) NA_character_ else "DivisorOnly"
+            value
+        }, by = "id"]
+
+        dt[, index := seq.int(.N), by = "id"]
+        dt
+    }
+    # }}}
+    # warn_removed_as_comment {{{
+    warn_removed_as_comment <- function (idf, class) {
+        warn("warning_trans_910_920", paste0(
+            "Class '", class, "' has been removed in EnergyPlus v9.2. ",
+            "Objects in that class will be listed as comments in the new output file."
+        ))
+
+        # separate by objects
+        cmt <- idf$to_string(class = class, header = FALSE, format = "new_top")
+        sep <- which(stri_isempty(cmt))
+        cmt <- apply2(c(1L, sep[-length(sep)] + 1L), sep - 1L,
+            function (start, end) cmt[start:end]
+        )
+
+        # assign to object table
+        ids <- idf$object_id(class = class, simplify = TRUE)
+        ._get_private(idf)$idf_env()$object[J(ids), on = "object_id", comment := list(cmt)]
+    }
+    # }}}
+    # warn_table_convert {{{
+    warn_table_convert <- function (dt, class, idx, ascending = NULL) {
+        dt_file <- dt[index == idx & !is.na(value)]
+        if (!nrow(dt_file)) return(dt)
+
+        # rename column for formatting object info
+        setnames(dt_file, c("id", "name", "class"), c("object_id", "object_name", "class_name"))
+        obj <- get_object_info(dt_file, c("name", "id"), numbered = TRUE)
+
+        # get file path
+        files <- dt_file$value
+        warn("warning_trans_910_920", paste0(
+            "Objects in Class '", class, "' references external ",
+            "file. External files must be converted to the new format and saved ",
+            "to CSV with a name suffix '-New':\n",
+            paste0(obj, ": ", surround(files))
+        ))
+
+        # convert
+        if (is.null(ascending)) {
+            tables <- lapply(files, trans_table_convert)
+        } else {
+            assert(have_same_len(files, ascending))
+            tables <- apply2(files, ascending, trans_table_convert)
+        }
+
+        # save
+        files <- paste0(tools::file_path_sans_ext(basename(files)), "-New.csv")
+        apply2(tables, files, function (x, file) fwrite(x, file))
+
+        # update field value
+        dt[index == idx & !is.na(value), value := normalizePath(files)]
+
+        dt
+    }
+    # }}}
+    # assert_integer {{{
+    assert_integer <- function (dt, idx = NULL, col = "value", name) {
+        if (!is.null(idx)) dt <- dt[J(idx), on = "index"]
+
+        set(dt, NULL, col, suppressWarnings(as.integer(dt[[col]])))
+
+        if (!anyNA(dt[[col]])) return(dt)
+
+        abort("error_trans_910_920", paste0("Failed to get ", name, "objects below:\n", obj_info(dt)))
+    }
+    # }}}
+    # obj_info {{{
+    obj_info <- function (dt, numbered = TRUE, collapse = "\n") {
+        setnames(dt, c("id", "name", "class"), c("object_id", "object_name", "class_name"))
+        get_object_info(dt, c("name", "id"), numbered = numbered, collapse = collapse)
+    }
+    # }}}
+    # 4: Table:OneIndependentVariable {{{
+    dt4 <- trans_action(idf, min_fields = 10L, c("Table:IndependentVariable" = "Table:OneIndependentVariable"))
+    if (nrow(dt4)) {
+        warn_removed_as_comment(idf, "Table:OneIndependentVariable")
+
+        # independent variable
+        dt4_1 <- init_var_dt(dt4,
+            quote(index <= 10L | (index > 10L & (index - 11) %% 2 == 0)),
+            min_max = 4L:5L, type = 8L
+        )
+        dt4_1 <- init_var_type(dt4_1, 3L)
+        dt4_1[J(1L), on = "index", value := paste0(value, "_IndependentVariable1")]
+
+        # variable list
+        dt4_2 <- init_list_dt(dt4, 1L)
+        dt4_2[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt4_2$id)
+
+        # lookup
+        dt4_3 <- init_lookup_dt(dt4,
+            quote(index <= 10L | (index > 10L & (index - 12) %% 2 == 0)),
+            ref = 10L, min_max = 6L:7L, type = 9L
+        )
+        dt4_3[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt4_3$id)
+
+        dt4 <- rbindlist(list(dt4_1, dt4_2, dt4_3))
+    }
+    # }}}
+    # 5: Table:TwoIndependentVariables {{{
+    dt5 <- trans_action(idf, min_fields = 14L, align = FALSE,
+        c("Table:IndependentVariable" = "Table:TwoIndependentVariables")
+    )
+    if (nrow(dt5)) {
+        warn_removed_as_comment(idf, "Table:TwoIndependentVariables")
+        dt5 <- warn_table_convert(dt5, "Table:TwoIndependentVariables", 14L)
+
+        # independent variable
+        ## X
+        dt5_11 <- init_var_dt(dt5,
+            quote(index <= 10L | (index > 14L & (index - 15L) %% 3L == 0)),
+            min_max = 4L:5L, type = 10L
+        )
+        dt5_11 <- init_var_type(dt5_11, 3L)
+        dt5_11[J(1L), on = "index", value := paste0(value, "_IndependentVariable1")]
+
+        ## Y
+        dt5_12 <- init_var_dt(dt5,
+            quote(index <= 11L | (index > 15L & (index - 16L) %% 3L == 0)),
+            min_max = 6L:7L, type = 11L
+        )
+        dt5_12 <- init_var_type(dt5_12, 3L)
+        dt5_12[J(1L), on = "index", value := paste0(value, "_IndependentVariable2")]
+        dt5_12[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt5_12$id)
+
+        ## merge
+        dt5_1 <- rbindlist(list(dt5_11, dt5_12))
+
+        # variable list
+        dt5_2 <- init_list_dt(dt5, 2L)
+        dt5_2[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt5_2$id)
+
+        # lookup
+        dt5_3 <- init_lookup_dt(dt5,
+            quote(index <= 13L | (index > 16L & (index - 17L) %% 3L == 0L)),
+            ref = 13L, min_max = 8L:9L, type = 12L, del = 11L
+        )
+
+        # extract values {{{
+        # extract_values {{{
+        extract_values <- function (dt, var) {
+            dt <- dt[, .SD, .SDcols = paste0(c("id", "var"), var)]
+            setnames(dt, c("id", "value"))
+            dt[, list(value = as.character(unique(value))), by = "id"][
+               , `:=`(
+                   index = seq.int(.N) + 10L,
+                   class = "Table:IndependentVariable"
+               ), by = "id"
+            ]
+        }
+        # }}}
+
+        dt5_vals <- cbind(
+            dt5_11[index > 10L, list(id1 = id, var1 = as.numeric(value))],
+            dt5_12[index > 10L, list(id2 = id, var2 = as.numeric(value))],
+            dt5_3[index > 10L, list(out = as.numeric(value))]
+        )
+        setorderv(dt5_vals, c("id1", "var1", "var2"), c(-1L, 1L, 1L))
+
+        # extract values
+        dt5_11 <- rbindlist(list(dt5_11[index <= 10L], extract_values(dt5_vals, 1L)), fill = TRUE)
+        dt5_12 <- rbindlist(list(dt5_12[index <= 10L], extract_values(dt5_vals, 2L)), fill = TRUE)
+        dt5_1 <- rbindlist(list(dt5_11, dt5_12))
+
+        dt5_3[index > 10L, value := as.character(dt5_vals$out)]
+        # }}}
+        dt5_3[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt5_3$id)
+
+        dt5 <- rbindlist(list(dt5_1, dt5_2, dt5_3))
+    }
+    # }}}
+    # 6: Table:MultiVariableLookup {{{
+    dt6 <- trans_action(idf, min_fields = 31L, align = FALSE,
+        c("Table:IndependentVariable" = "Table:MultiVariableLookup")
+    )
+    if (nrow(dt6)) {
+        warn_removed_as_comment(idf, "Table:MultiVariableLookup")
+
+        # get sort order
+        asc <- dt6[J(c(7L, 8L)), on = "index",
+            list(asc = list(is.na(value) | stri_trans_tolower(value) == c("ascending", "ascending"))),
+            by = "id"]$asc
+
+        # convert external file if possible
+        dt6 <- warn_table_convert(dt6, "Table:MultiVariableLookup", 6L, asc)
+
+        # independent variable {{{
+        # get independent variable number
+        num_vars <- dt6[J(31L), on = "index"]
+        set(num_vars, NULL, "value", suppressWarnings(as.integer(num_vars$value)))
+        if (anyNA(num_vars$value)) {
+            abort("error_trans_910_920", paste0("Failed to get number of ",
+                "independent variables for 'Table:MultiVariableLookup' objects ",
+                "objects below:\n", obj_info(num_vars[is.na(value)])
+            ))
+        }
+
+        # get indices for different fields
+        meta <- num_vars[, {
+            idx <- seq.int(value)
+            list(idx_var = idx,
+                 min = as.integer(10L + 2 * (idx - 1L)),
+                 max = as.integer(11L + 2 * (idx - 1L)),
+                 type = 23L + idx,
+                 number = 31L + idx
+            )
+        }, by = "id"]
+
+        # get value number
+        meta[dt6, on = c("id", "number" = "index"), val_number := suppressWarnings(as.integer(i.value))]
+        if (anyNA(meta$val_number)) {
+            invld <- meta[is.na(val_number), list(id, idx_var)]
+            invld <- num_vars[invld, on = "id"]
+            obj <- obj_info(invld, collapse = NULL)
+            mes <- paste0(obj, " for independent variable #", invld$idx_var)
+
+            abort("error_trans_910_920", paste0(
+                "Failed to get value number of independent variables for 'Table:MultiVariableLookup' ",
+                "objects below:\n", mes)
+            )
+        }
+
+        meta[, cum := cumsum(data.table::shift(val_number, fill = 0L)), by = "id"]
+        meta[, c("start", "end") := {
+            start <- number + max(idx_var) - idx_var + 1L + cum
+            list(start = start, end = start + val_number - 1L)
+        }, by = "id"]
+
+        # assign id
+        meta[, object_id := id]
+        meta[idx_var > 1L, object_id := -.I + id_max]
+        id_max <- min(meta$object_id)
+
+        # reusable fields
+        dt6_1 <- init_var_type(dt6[index <= 10L], 2L)
+        meta_1 <- data.table::CJ(
+            object_id = meta$object_id, index = c(1L:3L, 6L, 8L:10L))[
+            meta[, list(id, object_id)], on = "object_id"]
+        dt6_11 <- dt6_1[meta_1, on = c("id", "index")][
+            index %in% 8L:10L, value := NA_character_]
+        dt6_11[J(1L), on = "index", value := paste0(value, "_IndependentVariable", seq.int(.N)), by = "id"]
+
+        # melt
+        meta_2 <- melt.data.table(meta, id.vars = c("id", "idx_var", "object_id"),
+            measure.vars = c("min", "max", "type"), value.name = "index"
+        )
+        meta_2[J("min"), on = "variable", field_index := 4L]
+        meta_2[J("max"), on = "variable", field_index := 5L]
+        meta_2[J("type"), on = "variable", field_index := 7L]
+        dt6_12 <- dt6[meta_2[, list(id, index, object_id, field_index)], on = c("id", "index")]
+        set(dt6_12, NULL, "index", NULL)
+        setnames(dt6_12, "field_index", "index")
+
+        # variable values
+        meta_3 <- meta[,
+            list(id = rep(id, val_number),
+                 index = seq(start, end),
+                 field_index = seq.int(val_number) + 10L
+            ),
+            by = "object_id"
+        ]
+        dt6_13 <- dt6[meta_3, on = c("id", "index")]
+        set(dt6_13, NULL, "index", NULL)
+        setnames(dt6_13, "field_index", "index")
+
+        dt6_1 <- rbindlist(list(dt6_11, dt6_12, dt6_13), use.names = TRUE)
+        # retain object order
+        setorderv(dt6_1, c("id", "index"))
+        dt6_1 <- dt6_1[J(meta$object_id), on = "object_id"]
+
+        # update object id
+        set(dt6_1, NULL, "id", NULL)
+        setnames(dt6_1, "object_id", "id")
+        setcolorder(dt6_1, "id")
+        # }}}
+
+        # variable list
+        dt6_2 <- init_list_dt(dt6,
+            rbindlist(list(
+                num_vars[, list(id, index = 1L)],
+                meta[, list(id, index = idx_var)]
+            ))
+        )
+        dt6_2[, id := -.GRP + id_max, by = "id"]
+        id_max <- min(dt6_2$id)
+
+        # lookup object {{{
+        dt6_31 <- init_lookup_dt(dt6, quote(index <= 30L),
+            ref = 9L, min_max = 22L:23L, type = 30L
+        )[index <= 10L]
+
+        meta_out <- meta[
+            , list(# where to start
+                   start = max(end) + 1L,
+                   # variable #3 above should be listed before output data
+                   step = if (.N <= 2L) 0L else .N - 2L,
+                   # number of output data per variable #1
+                   num = if (.N <= 2L) 0L else val_number[[1L]] * val_number[[2L]]
+            ), by = "id"][
+            dt6[, list(end = max(which(!is.na(value)))), by = "id"], on = "id"]
+
+        # get exact field index for each value
+        meta_out <- meta_out[, list(index = {
+            # for case when variable number no more than 2
+            if (step == 0L) {
+                seq(start, end)
+            } else {
+                # for case when variable number more than 2
+                unlist(lapply(seq(start + step, end, by = step + num), seq, length.out = num))
+            }
+        }), by = "id"]
+
+        dt6_32 <- dt6[meta_out, on = c("id", "index")]
+        dt6_32[, index := seq.int(.N) + 10L, by = "id"]
+        dt6_32[, class := "Table:Lookup"]
+
+        # split by independent variables in each object
+        vars <- split(dt6_13[, list(id, object_id, value = suppressWarnings(as.numeric(value)))],
+            by = c("id", "object_id"), flatten = FALSE, keep.by = FALSE
+        )
+        # reverse the order of independent variables and unlist
+        vars <- apply2(vars, asc, function (var, ascending) {
+            var <- lapply(var, unlist, use.names = FALSE)
+            if (!ascending[1L] && length(var) >= 1L) var[[1L]] <- rev(var[[1L]])
+            if (!ascending[2L] && length(var) >= 2L) var[[2L]] <- rev(var[[2L]])
+            var
+        })
+        vars <- lapply(vars, rev)
+
+        # get combination
+        cj <- function (...) data.table::CJ(..., sorted = FALSE, unique = FALSE)
+        vars <- lapply(vars, function (x) do.call(cj, x))
+
+        # get output
+        outs <- split(dt6_32[, list(id, value)], by = "id", keep.by = FALSE)
+        outs <- lapply(outs, unlist, use.names = FALSE)
+
+        # combine value and output
+        vals <- apply2(vars, outs, function (var, out) set(var, NULL, "value", out))
+        # change order
+        vals <- lapply(vals, function (dt) setorderv(dt, rev(setdiff(names(dt), "value"))))
+        # replace with ordered values
+        set(dt6_32, NULL, "value", as.character(unlist(lapply(vals, "[[", "value"))))
+        dt6_3 <- rbindlist(list(dt6_31, dt6_32))
+        dt6_3[, id := -.GRP + id_max, by = "id"]
+        # }}}
+
+        dt6 <- rbindlist(list(dt6_1, dt6_2, dt6_3))
+    }
+    # }}}
+
+    # 7: ThermalStorage:Ice:Detailed {{{
+    dt7 <- trans_action(idf, "ThermalStorage:Ice:Detailed",
+        reset = list(6L, "quadraticlinear", "FractionDischargedLMTD"),
+        reset = list(6L, "cubiclinear", "LMTDMassFlow"),
+        reset = list(8L, "quadraticlinear", "FractionDischargedLMTD"),
+        reset = list(8L, "cubiclinear", "LMTDMassFlow")
+    )
+    # }}}
+    # 8: ZoneHVAC:EquipmentList {{{
+    dt8 <- trans_action(idf, "ZoneHVAC:EquipmentList")
+    if (nrow(dt8)) {
+        clg <- dt8[index > 2L & (index - 2L) - 5L %% 6 == 0L & !is.na(value)]
+        if (!nrow(clg)) {
+            dt8_1 <- data.table()
+        } else {
+            clg[, object_id := -.I + id_max]
+            clg[is.na(name), name := ""]
+            dt8_1 <- clg[, list(id, class = "Schedule:Constant", index = 1L:3L,
+                value = c(
+                    paste0(name, " CoolingFrac", as.integer((index - 3L) / 6L + 1L)),
+                    "ZoneEqList ScheduleTypeLimits",
+                    value
+                )
+            ), by = "object_id"]
+            id_max <- min(clg$object_id)
+
+            # update value
+            set(clg, NULL, "value", dt8_1[index == 1L, value])
+            dt8[clg, on = c("id", index), value := i.value]
+
+            # clean
+            set(dt8_1, NULL, "id", NULL)
+            setnames(dt8_1, "object_id", "id")
+        }
+
+        htg <- dt8[index > 2L & (index - 2L) - 6L %% 6 == 0L & !is.na(value)]
+        if (!nrow(htg)) {
+            dt8_2 <- data.table()
+        } else {
+            htg[, object_id := -.I + id_max]
+            htg[is.na(name), name := ""]
+            dt8_2 <- htg[, list(id, class = "Schedule:Constant", index = 1L:3L,
+                value = c(
+                    paste0(name, " HeatingFrac", as.integer((index - 3L) / 6L + 1L)),
+                    "ZoneEqList ScheduleTypeLimits",
+                    value
+                )
+            ), by = "object_id"]
+            id_max <- min(htg$object_id)
+
+            # update value
+            set(htg, NULL, "value", dt8_2[index == 1L, value])
+            dt8[htg, on = c("id", index), value := i.value]
+
+            # clean
+            set(dt8_2, NULL, "id", NULL)
+            setnames(dt8_2, "object_id", "id")
+        }
+
+        # add a schedule type object for sequential clg/htg fraction
+        if (nrow(dt8_1) || nrow(dt8_2) &&
+            (
+                !idf$is_valid_class("ScheduleTypeLimits") ||
+                !"ZoneEqList ScheduleTypeLimits" %chin% tolower(idf$object_name("ScheduleTypeLimits"))
+            )
+        ) {
+            idf$add(ScheduleTypeLimits = list("ZoneEqList ScheduleTypeLimits", 0.0, 1.0, "Continuous"))
+        }
+
+        dt8 <- rbindlist(list(dt8, dt8_1, dt8_2), fill = TRUE)
+    }
+    # }}}
+
+    trans_process(new_idf, idf, rbindlist(mget(paste0("dt", 1:8))))
+
+    trans_postprocess(new_idf, idf$version(), new_idf$version())
+}
+# }}}
 
 # trans_preprocess {{{
 # 1. delete objects in deprecated class
@@ -2609,11 +3189,11 @@ trans_postprocess <- function (idf, from, to) {
 # }}}
 
 # trans_action {{{
-trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ...) {
+trans_action <- function (idf, class, min_fields = 1L, all = FALSE, align = TRUE, ...) {
     assert(idf$is_valid_class(class, all = TRUE))
     if (!idf$is_valid_class(class)) return(data.table())
 
-    dt <- idf$to_table(class = class, align = TRUE, all = all)
+    dt <- idf$to_table(class = class, align = align, all = all)
 
     # make sure min fields are returned
     if (!all && min_fields > max(dt$index)) {
@@ -2630,6 +3210,11 @@ trans_action <- function (idf, class, min_fields = 1L, all = FALSE, ...) {
     setindexv(dt, c("id", "index"))
     if (is_named(class)) set(dt, NULL, "class", names(class))
 
+    trans_action_dt(dt, ...)
+}
+# }}}
+# trans_action_dt {{{
+trans_action_dt <- function (dt, ...) {
     act <- list(...)
     if (!length(act)) return(dt)
 
@@ -2756,7 +3341,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     if (!nrow(dt)) return(new_idf)
 
     # get object table from old input
-    old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id"]
+    old <- ._get_private(old_idf)$idf_env()$object[J(unique(dt$id)), on = "object_id", nomatch = 0L]
 
     # get object table before inserting new objects
     new_before <- ._get_private(new_idf)$idf_env()$object
@@ -2767,7 +3352,7 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     if (is.null(unlist(old$comment, use.names = FALSE))) return(new_idf)
 
     # update
-    input <- dt[, list(object_id = id[[1L]]), by = rleid(id, class)]
+    input <- dt[, list(rleid = .GRP), by = list(object_id = id, class)]
     input[old, on = "object_id", comment := i.comment]
 
     ._get_private(new_idf)$idf_env()$object[
@@ -2795,6 +3380,43 @@ trans_process_load <- function (new_idf, old_idf, dt) {
     })]
 
     new_idf
+}
+# }}}
+# trans_table_convert {{{
+trans_table_convert <- function (path, ascending = c(TRUE, TRUE)) {
+    vars <- fread(path, nrows = 1, header = FALSE)
+    val_vars <- lapply(seq.int(vars$V1), function (row) unlist(fread(path, nrows = 1, skip = row)))
+
+    # reorder if necessary
+    if (any(!ascending) && vars$V1 >= 2L) {
+        val_vars <- apply2(val_vars, ascending, function (val, asc) if (!asc) rev(val) else val)
+    }
+
+    # check consistency between value number specified and found
+    num_vals <- viapply(val_vars, length)
+    if (any(mismatch <- (num_vals != unlist(vars[, -"V1"])))) {
+        invld <- unlist(vars[, .SD, .SDcols = setdiff(names(vars), "V1")[mismatch]])
+        abort("error_trans_910_920", paste0(
+            "Number of independent variable values found mismatches with description in header:\n",
+            "  #", which(mismatch), "| ", invld, " specified in header but ",
+            num_vals[mismatch], " values found"
+        ))
+    }
+
+    # get cross joined table
+    dt_vars <- do.call(data.table::CJ, rev(val_vars))
+    # change column order
+    setcolorder(dt_vars, rev(names(dt_vars)))
+    # rename columns
+    setnames(dt_vars, paste0("var", seq.int(ncol(dt_vars))))
+
+    # read tabular data and change it to one row matrix
+    table <- matrix(t(as.matrix(fread(path, skip = 1 + num_vars, header = FALSE))), nrow = 1L)
+    # add value column
+    dt_vars[, value := as.vector(table)]
+
+    # change row order
+    setorderv(dt_vars, setdiff(names(dt_vars), "value"))
 }
 # }}}
 
