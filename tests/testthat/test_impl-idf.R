@@ -779,6 +779,17 @@ test_that("Set", {
     )
     expect_equivalent(mat$value[field_id == 7091, value_chr], c("smooth", "smooth"))
     expect_equivalent(mat$value[field_id == 7093, value_chr], c("0.8", "0.8"))
+
+    # can reset object comments
+    expect_silent(cmt <- set_idf_object(idd_env, idf_env,
+        R13LAYER = list(.comment = c("new", "comment"))))
+    expect_equivalent(cmt$object,
+        data.table(object_id = 12L, class_id = 56L, comment = list(c("new", "comment")),
+            object_name = "R13LAYER", object_name_lower = "r13layer"
+        )
+    )
+    expect_equivalent(cmt$value, data.table())
+    expect_equivalent(cmt$reference, idf_env$reference)
 })
 # }}}
 

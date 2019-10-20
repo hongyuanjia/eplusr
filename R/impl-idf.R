@@ -1748,6 +1748,16 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .empty = FAL
     obj <- obj_val$object
     val <- obj_val$value
 
+    # incase only want to reset object comments
+    if (nrow(obj) && !nrow(val)) {
+        return(
+            list(object = obj[, .SD, .SDcols = names(idf_env$object)],
+                 value = data.table(),
+                 reference = idf_env$reference
+            )
+        )
+    }
+
     # in order to delete field values, here get all value numbers in current class
     fld_in <- val[, list(num = max(field_index)), by = c("rleid", "object_id")]
     fld_cur <- idf_env$value[J(fld_in$object_id), on = "object_id",
@@ -3738,10 +3748,13 @@ merge_idf_data <- function (idf_env, dt, by_object = FALSE) {
     assert(has_name(dt, c("object", "value", "reference")))
 
     idf_env$object <- append_dt(idf_env$object, dt$object, "object_id")
-    if (by_object) {
-        idf_env$value <- append_dt(idf_env$value, dt$value, "object_id")
-    } else {
-        idf_env$value <- append_dt(idf_env$value, dt$value, "value_id")
+
+    if (nrow(dt$value)) {
+        if (by_object) {
+            idf_env$value <- append_dt(idf_env$value, dt$value, "object_id")
+        } else {
+            idf_env$value <- append_dt(idf_env$value, dt$value, "value_id")
+        }
     }
     idf_env$reference <- dt$reference
 
