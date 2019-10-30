@@ -2762,7 +2762,7 @@ trans_funs$f910t920 <- function (idf) {
 
             # update value
             set(clg, NULL, "value", dt8_1[index == 1L, value])
-            dt8[clg, on = c("id", index), value := i.value]
+            dt8[clg, on = c("id", "index"), value := i.value]
 
             # clean
             set(dt8_1, NULL, "id", NULL)
@@ -2786,7 +2786,7 @@ trans_funs$f910t920 <- function (idf) {
 
             # update value
             set(htg, NULL, "value", dt8_2[index == 1L, value])
-            dt8[htg, on = c("id", index), value := i.value]
+            dt8[htg, on = c("id", "index"), value := i.value]
 
             # clean
             set(dt8_2, NULL, "id", NULL)
