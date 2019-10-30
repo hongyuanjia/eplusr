@@ -2794,13 +2794,13 @@ trans_funs$f910t920 <- function (idf) {
         }
 
         # add a schedule type object for sequential clg/htg fraction
-        if (nrow(dt8_1) || nrow(dt8_2) &&
+        if ((nrow(dt8_1) || nrow(dt8_2)) &&
             (
                 !idf$is_valid_class("ScheduleTypeLimits") ||
-                !"ZoneEqList ScheduleTypeLimits" %chin% tolower(idf$object_name("ScheduleTypeLimits"))
+                !idf$is_valid_name("ZoneEqList ScheduleTypeLimits")
             )
         ) {
-            idf$add(ScheduleTypeLimits = list("ZoneEqList ScheduleTypeLimits", 0.0, 1.0, "Continuous"))
+            new_idf$add(ScheduleTypeLimits = list("ZoneEqList ScheduleTypeLimits", 0.0, 1.0, "Continuous"))
         }
 
         dt8 <- rbindlist(list(dt8, dt8_1, dt8_2), fill = TRUE)
