@@ -2745,7 +2745,7 @@ trans_funs$f910t920 <- function (idf) {
     # 8: ZoneHVAC:EquipmentList {{{
     dt8 <- trans_action(idf, "ZoneHVAC:EquipmentList")
     if (nrow(dt8)) {
-        clg <- dt8[index > 2L & (index - 2L) - 5L %% 6 == 0L & !is.na(value)]
+        clg <- dt8[index > 2L & ((index - 2L) - 5L) %% 6 == 0L & !is.na(value)]
         if (!nrow(clg)) {
             dt8_1 <- data.table()
         } else {
@@ -2769,7 +2769,7 @@ trans_funs$f910t920 <- function (idf) {
             setnames(dt8_1, "object_id", "id")
         }
 
-        htg <- dt8[index > 2L & (index - 2L) - 6L %% 6 == 0L & !is.na(value)]
+        htg <- dt8[index > 2L & ((index - 2L) - 6L) %% 6 == 0L & !is.na(value)]
         if (!nrow(htg)) {
             dt8_2 <- data.table()
         } else {
