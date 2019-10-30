@@ -2745,7 +2745,7 @@ trans_funs$f910t920 <- function (idf) {
     # 8: ZoneHVAC:EquipmentList {{{
     dt8 <- trans_action(idf, "ZoneHVAC:EquipmentList")
     if (nrow(dt8)) {
-        clg <- dt8[index > 2L & (index - 2L) - 5L %% 6 == 0L & !is.na(value)]
+        clg <- dt8[index > 2L & ((index - 2L) - 5L) %% 6 == 0L & !is.na(value)]
         if (!nrow(clg)) {
             dt8_1 <- data.table()
         } else {
@@ -2762,14 +2762,14 @@ trans_funs$f910t920 <- function (idf) {
 
             # update value
             set(clg, NULL, "value", dt8_1[index == 1L, value])
-            dt8[clg, on = c("id", index), value := i.value]
+            dt8[clg, on = c("id", "index"), value := i.value]
 
             # clean
             set(dt8_1, NULL, "id", NULL)
             setnames(dt8_1, "object_id", "id")
         }
 
-        htg <- dt8[index > 2L & (index - 2L) - 6L %% 6 == 0L & !is.na(value)]
+        htg <- dt8[index > 2L & ((index - 2L) - 6L) %% 6 == 0L & !is.na(value)]
         if (!nrow(htg)) {
             dt8_2 <- data.table()
         } else {
@@ -2786,7 +2786,7 @@ trans_funs$f910t920 <- function (idf) {
 
             # update value
             set(htg, NULL, "value", dt8_2[index == 1L, value])
-            dt8[htg, on = c("id", index), value := i.value]
+            dt8[htg, on = c("id", "index"), value := i.value]
 
             # clean
             set(dt8_2, NULL, "id", NULL)
@@ -2794,13 +2794,13 @@ trans_funs$f910t920 <- function (idf) {
         }
 
         # add a schedule type object for sequential clg/htg fraction
-        if (nrow(dt8_1) || nrow(dt8_2) &&
+        if ((nrow(dt8_1) || nrow(dt8_2)) &&
             (
                 !idf$is_valid_class("ScheduleTypeLimits") ||
-                !"ZoneEqList ScheduleTypeLimits" %chin% tolower(idf$object_name("ScheduleTypeLimits"))
+                !idf$is_valid_name("ZoneEqList ScheduleTypeLimits")
             )
         ) {
-            idf$add(ScheduleTypeLimits = list("ZoneEqList ScheduleTypeLimits", 0.0, 1.0, "Continuous"))
+            new_idf$add(ScheduleTypeLimits = list("ZoneEqList ScheduleTypeLimits", 0.0, 1.0, "Continuous"))
         }
 
         dt8 <- rbindlist(list(dt8, dt8_1, dt8_2), fill = TRUE)
