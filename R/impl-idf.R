@@ -3401,16 +3401,14 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
         align = align, complete = TRUE, all = all, ignore_case = TRUE)[
         , .SD, .SDcols = c("rleid", cols)]
 
-    if ((all || wide) && length(unique(val$class_name)) != 1L) {
-        cls <- unique(val$class_name)
+    if (wide && length(cls <- unique(val$class_name)) != 1L) {
         if (length(cls) <= 5L) {
             cls <- collapse(cls)
         } else {
             cls <- paste0(c(surround(cls[1:5]), "..."), collapse = ", ")
         }
-        opt <- if (all) "`all`" else "`wide`"
         abort("error_multi_class",
-            paste0("Target objects should belong to a same class when ", opt, " is TRUE. ",
+            paste0("Target objects should belong to a same class when 'wide' is TRUE. ",
                 "Multiple classes found: ", cls, "."
             )
         )
