@@ -28,180 +28,6 @@ and modify EnergyPlus models. Below is the detailed documentation on each
 method.
 }
 \examples{
-\dontrun{
-
-# ===== LOAD OBJECTS =====
-# load objects from character vector
-idf$load("RunPeriod, rp_test_3, 1, 1, 2, 1;")
-
-# load objects from data.frames
-dt <- idf$definition("RunPeriod")$to_table()
-
-## (a) values can be supplied as characters
-dt[1:5, value := c("rp_test_4", "2", "1", "3", "1")]
-idf$load(dt)
-
-## (b) values can be supplied as list
-dt[1:5, value := list("rp_test_5", 3, 1, 4, 1)]
-idf$load(dt)
-
-# ===== INSERT OBJECTS =====
-# insert objects from other Idf object
-idf_1 <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-    idd = use_idd(8.8, download = "auto"))
-
-idf_1$object_name("Material")
-
-# rename material name from "C5 - 4 IN HW CONCRETE" to "test", otherwise
-# insertion will be aborted as there will be two materials with the same name
-# in the idf
-idf_1$Material$`C5 - 4 IN HW CONCRETE`$set(name = "test")
-
-# insert the object
-idf$insert(idf_1$Material$test)
-
-# check if material named "test" is there
-idf$object_name("Material")
-
-# $insert() is useful when importing design days from a ".ddy" file
-idf$insert(read_idf("foo.ddy"))
-
-# ===== SET OBJECTS =====
-# set the thickness of newly inserted material "test" to 0.2 m
-idf$set(test = list(thickness = 0.2))
-idf$Material$test$Thickness
-
-# set thermal absorptance of all material to 0.85
-val <- rep(list(list(thermal_absorptance = 0.85)), idf$object_num("Material"))
-names(val) <- idf$object_name("Material", simplify = TRUE)
-idf$set(val)
-
-# check results
-lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
-
-# reset thermal absorptance of all material to the default
-val <- rep(list(list(thermal_absorptance = NULL)), idf$object_num("Material"))
-names(val) <- idf$object_name("Material", simplify = TRUE)
-idf$set(val)
-
-# check results
-lapply(idf$Material, function (mat) mat$Thermal_Absorptance)
-
-# ===== UPDATE OBJECTS =====
-# update roughness of new added material "test" to "Smooth"
-idf$update("Material, test, smooth;")
-
-# update solar absorptance of all materials to 0.8
-dt <- idf$to_table(class = "Material", string_value = TRUE)
-idf$update(dt[field == "Solar Absorptance", value := "0.8"])
-
-# ===== RENAME OBJECTS =====
-idf$rename(new_test = "test")
-idf$object_name("Material")
-
-# ===== DELELTE OBJECTS =====
-# delete the added run period "rp_test_1", "rp_test_2" and "new_test" from above
-idf$del(c("new_test", "rp_test_1", "rp_test_2"))
-names(idf$Material)
-names(idf$RunPeriod)
-
-# In "final" validate level, delete will be aborted if the target objects are
-# referenced by other objects.
-# get objects that referenced material "R13LAYER"
-eplusr_option("validate_level")
-
-idf$Material_NoMass$R13LAYER$ref_by_object()
-length(idf$Material_NoMass$R13LAYER$ref_by_object())
-
-idf$del("R13LAYER") # will give an error in "final" validate level
-
-# objects referencing target objects can also be deleted by setting
-# `referenced` to TRUE
-idf$del("R13LAYER", .ref_by = TRUE) # will give an error in "final" validate level
-
-# it is possible to force delete objects
-idf$del("R13LAYER", .ref_by = TRUE, .force = TRUE)
-
-# ===== SEARCH ADN REPLACE OBJECT VALUES =====
-# get objects whose field values contains both "VAV" and "Node"
-idf$search_value("WALL")
-length(idf$search_value("WALL"))
-names(idf$search_value("WALL"))
-
-# replace values using regular expression
-idf$replace_value("WALL", "A_WALL")
-
-# ===== VALIDATE MODEL =====
-# check if there are errors in current model
-idf$validate()
-idf$is_valid()
-
-# change validate level to "none", which will enable invalid modifications
-eplusr_option(validate_level = "none")
-
-# change the outside layer of floor to an invalid material
-idf$set(FLOOR = list(outside_layer = "wrong_layer"))
-
-# change validate level back to "final" and validate the model again
-eplusr_option(validate_level = "final")
-
-idf$validate()
-idf$is_valid()
-
-# get IDs of all objects that contains invalid reference fields
-idf$validate()$invalid_reference$object_id
-
-# fix the error
-idf$set(..16 = list(outside_layer = idf$Material[[1]]$name()))
-idf$validate()
-idf$is_valid()
-
-# ===== FORMAT MODEL =====
-# get text format of the model
-head(idf$to_string())
-
-# get text format of the model, excluding the header and all comments
-head(idf$to_string(comment = FALSE, header = FALSE))
-
-# ===== SAVE MODEL =====
-# check if the model has been modified since read or last saved
-idf$is_unsaved()
-
-# save and overwrite current model
-idf$save(overwrite = TRUE)
-
-# save the model with newly created and modified objects at the top
-idf$save(overwrite = TRUE, format = "new_top")
-
-# save the model to a new file
-idf$save(path = file.path(tempdir(), "test.idf"))
-
-# save the model to a new file and copy all external csv files used in
-# "Schedule:File" class into the same folder
-idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
-
-# the path of this model will be changed to the saved path
-idf$path()
-
-# ===== CLONE MODEL =====
-# Idf object are modified in place and has reference semantic.
-idf_2 <- idf
-idf_2$object_name("Building")
-idf$object_name("Building")
-
-# modify idf_2 will also affect idf as well
-idf_2$Building$set(name = "Building_Name_Changed")
-idf_2$object_name("Building")
-idf$object_name("Building")
-
-# in order to make a copy of an Idf object, use $clone() method
-idf_3 <- idf$clone(deep = TRUE)
-idf_3$Building$set(name = "Building_Name_Changed_Again")
-idf_3$object_name("Building")
-
-idf$object_name("Building")
-
-}
 # example model shipped with eplusr from EnergyPlus v8.8
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 
@@ -250,7 +76,7 @@ idf$version()
 idf$path()
 
 # return `NULL` if Idf is not created from a file
-read_idf("Version, 8.8;\\n")$path()
+Idf$new("Version, 8.8;\\n")$path()
 
 
 ## ------------------------------------------------
@@ -304,17 +130,17 @@ idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
 ## ------------------------------------------------
 
 # check if input is a valid group name in current Idf
-idf$is_valid_group(c("Building", "ShadowCalculation"))
+idf$is_valid_class(c("Building", "ShadowCalculation"))
 
 # check if input is a valid group name in underlying Idd
-idf$is_valid_group(c("Building", "ShadowCalculation"), all = TRUE)
+idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 
 
 ## ------------------------------------------------
 ## Method `Idf$definition`
 ## ------------------------------------------------
 
-# get the [IddObject] object for specified class
+# get the IddObject object for specified class
 idf$definition("Version")
 
 
@@ -378,10 +204,10 @@ idf$is_valid_id(c(51, 1000))
 ## Method `Idf$is_valid_name`
 ## ------------------------------------------------
 
-idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE"))
+idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
 
 # name matching is case-insensitive
-idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one"))
+idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
 
 
 ## ------------------------------------------------
@@ -437,7 +263,7 @@ idf[["Zone"]]
 ## ------------------------------------------------
 
 # get all objects in Schedules group
-idf$objects_in_class("Schedules")
+idf$objects_in_group("Schedules")
 
 
 ## ------------------------------------------------
@@ -450,11 +276,6 @@ idf$object_relation("floor", "ref_to")
 # check where is this construction being used
 idf$object_relation("floor", "ref_by")
 
-# check what other components are connected to a variable volume fan
-if (idf$is_valid_class("Fan:VariableVolume")) {
-idf$Fan_VariableVolume[[1L]]$object_relation(direction = "node")
-}
-
 
 ## ------------------------------------------------
 ## Method `Idf$objects_in_relation`
@@ -464,13 +285,7 @@ idf$Fan_VariableVolume[[1L]]$object_relation(direction = "node")
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
-idf$object_relation("floor", "ref_by", "BuildingSurface:Detailed")
-
-# get the first variable volume fan and all objects that are
-# connected to it
-if (idf$is_valid_class("Fan:VariableVolume")) {
-idf$Fan_VariableVolume[[1L]]$object_relation(direction = "node")
-}
+idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
 
 
 ## ------------------------------------------------
@@ -486,10 +301,10 @@ idf$search_object("floor", ignore.case = TRUE)
 ## ------------------------------------------------
 
 # duplicate an object named "FLOOR"
-idf$dup("floor")
+idf$dup("floor") # New object name 'FLOOR_1' is auto-generated
 
 # duplicate that object again by specifing object ID
-idf$dup(16)
+idf$dup(16) # New object name 'FLOOR_2' is auto-generated
 
 # duplicate that object two times and giving new names
 idf$dup(new_floor = "floor", new_floor2 = 16)
@@ -577,7 +392,7 @@ idf$del(39, 40)
 
 # cannot delete objects that are referred by others
 level_checks()$reference # reference-checking is enable by default
-\\donotrun{idf$del("r13layer")} # error
+\dontrun{idf$del("r13layer")} # error
 
 # force to delete objects even thay are referred by others
 idf$del("r13layer", .force = TRUE)
@@ -600,33 +415,21 @@ idf$del(ids)
 ## Method `Idf$rename`
 ## ------------------------------------------------
 
-idf$objects(c("fraction", "floor"))
-idf$rename(frac = "Fraction", myfloor = 16)
+idf$objects(c("on/off", "test 352a"))
+idf$rename(on_off = "on/off", test_352a = 51)
 
 
 ## ------------------------------------------------
 ## Method `Idf$insert`
 ## ------------------------------------------------
 
-# insert new objects from other IDF
-path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFile/5ZoneTDV.idf")
-
-idf
-
-path_ddy <- file.path(
-    eplus_config(avail_eplus()[1])$dir,
-    "WeatherData/USA_CO_Golden-NREL.724666_TMY3.ddy"
-)
-
-idf$insert()
+# insert all material from another IDF
+path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneTDV.idf")
+idf2 <- Idf$new(path_idf2)
+idf$insert(idf2$Material)
 
 # insert objects from same Idf is equivalent to using Idf$dup()
-idf$dup(idf$SizingPeriod_DesignDay)
-
-* Insert objects without new names: `model1$insert(model2$Material)`.
-* Insert an object without new name: `model1$insert(my_material = model2$Material[[1]])`.
-* Insert objects but keep duplications: `model1$insert(model1$Output_Variable)`.
-* Variable input: `mat <- model2$Material; names(mat) <- c("mat1", "mat2"); model1$insert(mat)`.
+idf$insert(idf$SizingPeriod_DesignDay)
 
 
 ## ------------------------------------------------
@@ -643,7 +446,7 @@ idf$load(
       "    513,                     !- Density {kg/m3}",
       "    1381;                    !- Specific Heat {J/kg-K}"),
 
-    "Construction, const, mat;\\n"
+    "Construction, const, mat;"
 )
 
 # load objects from data.frame definitions
@@ -656,10 +459,10 @@ idf$load(dt)
 idf$load(idf$to_table(class = "Material"))
 
 # keep empty fields as they are
-idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;\\n", .default = FALSE)
+idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;", .default = FALSE)
 
 # keep trailing empty fields
-idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;\\n",
+idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
     .default = FALSE, .empty = TRUE
 )
 
@@ -668,37 +471,26 @@ idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;\\n",
 ## Method `Idf$update`
 ## ------------------------------------------------
 
-
 # update objects from string definitions:
-str <- model$Material[[1]]$to_string()
-str[4] <- "0.8"
-model$update(str)
+str <- idf$to_string("wd10", header = FALSE, format = "new_top")
+str[4] <- "0.8,"
+idf$update(str)
 
 # update objects from data.frame definitions:
-dt <- model1$to_table(class = "Material")
-dt[field == "thickness", value := "0.5"]
-model$update(dt)
-
-
-## ------------------------------------------------
-## Method `Idf$paste`
-## ------------------------------------------------
-
-# Paste objects from same version: `model$paste()`.
-# Paste objects from different version: `model$paste(ver = "version")`.
-# Paste objects that are viewed in IP units in IDF Editor: `model$paste(in_ip = TRUE)`.
-# Paste objects but also keep duplications: `model$paste(unique = FALSE)`.
+dt <- idf$to_table("WD10")
+dt[field == "Thickness", value := "0.5"]
+idf$update(dt)
 
 
 ## ------------------------------------------------
 ## Method `Idf$search_value`
 ## ------------------------------------------------
 
-# search values that contains "supply"
-idf$search_value("supply")
+# search values that contains "floor"
+idf$search_value("floor", ignore.case = TRUE)
 
-# search values that contains "supply" or "demand" in class Branch
-idf$search_value("supply|demand", "Branch")
+# search values that contains "floor" in class Construction
+idf$search_value("floor", "Construction", ignore.case = TRUE)
 
 
 ## ------------------------------------------------
@@ -706,71 +498,110 @@ idf$search_value("supply|demand", "Branch")
 ## ------------------------------------------------
 
 # search values that contains "win" and replace them with "windows"
-idf$replace_value("win", "windows")
+\dontrun{idf$replace_value("win", "windows")}
 
 
 ## ------------------------------------------------
 ## Method `Idf$validate`
 ## ------------------------------------------------
 
-level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+idf$validate()
+
+# check at predefined validate level
+idf$validate("none")
+idf$validate("draft")
+idf$validate("final")
+
+# custom validate checking components
+idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid`
 ## ------------------------------------------------
 
-level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+idf$is_valid()
+
+# check at predefined validate level
+idf$is_valid("none")
+idf$is_valid("draft")
+idf$is_valid("final")
+
+# custom validate checking components
+idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 
 
 ## ------------------------------------------------
 ## Method `Idf$to_string`
 ## ------------------------------------------------
 
-level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+# get text format of the whole Idf
+head(idf$to_string())
+
+# get text format of the whoe Idf, excluding the header and all comments
+head(idf$to_string(comment = FALSE, header = FALSE))
+
+# get text format of all objects in class Material
+head(idf$to_string(class = "Material", comment = FALSE, header = FALSE))
+
+# get text format of some objects
+head(idf$to_string(c("floor", "zone one")))
+
+# tweak output formatting
+head(idf$to_string("floor", leading = 0, sep_at = 0))
 
 
 ## ------------------------------------------------
 ## Method `Idf$to_table`
 ## ------------------------------------------------
 
-level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+# extract whole Idf data
+idf$to_table()
+
+# extract all data from class Material
+idf$to_table(class = "Material")
+
+# extract multiple object data
+idf$to_table(c("FLOOR", "ZONE ONE"))
+
+# keep value types and put actual values into a list column
+idf$to_table(c("FLOOR", "ZONE ONE"), string_value = FALSE)$value
+
+# add the unit to each value
+idf$to_table(c("FLOOR", "ZONE ONE"), string_value = FALSE, unit = TRUE)
+
+# get all possible fields
+idf$to_table("ZONE ONE", all = TRUE)
+
+# make sure all objects in same class have the same number of fields
+idf$to_table(class = "Construction", align = TRUE)
+
+# get a wide table with string values
+idf$to_table(class = "Construction", wide = TRUE)
+
+# get a wide table with actual values
+idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_unsaved`
 ## ------------------------------------------------
 
-level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+idf$is_unsaved()
 
 
 ## ------------------------------------------------
 ## Method `Idf$save`
 ## ------------------------------------------------
 
-# save and overwrite current model
+# save Idf as a new file
+idf$save(tempfile(fileext = ".idf"))
+
+# save and overwrite current file
 idf$save(overwrite = TRUE)
 
 # save the model with newly created and modified objects at the top
 idf$save(overwrite = TRUE, format = "new_top")
-
-# save the model to a new file
-idf$save(path = file.path(tempdir(), "test.idf"))
 
 # save the model to a new file and copy all external csv files used in
 # "Schedule:File" class into the same folder
@@ -781,42 +612,40 @@ idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
 ## Method `Idf$run`
 ## ------------------------------------------------
 
-if (is_avail_eplus(8.8)) {
+\dontrun{
+idf <- Idf$new(path_idf)
+# save the model to tempdir()
+idf$save(file.path(tempdir(), "test_run.idf"))
 
-    # save the model to tempdir()
-    idf$save(file.path(tempdir(), "test_run.idf"))
+# use the first epw file in "WeatherData" folder in EnergyPlus v8.8
+# installation path
+epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
+    pattern = "\\\\.epw$", full.names = TRUE)[1]
 
-    # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
-    # installation path
-    epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-        pattern = "\\\\.epw$", full.names = TRUE)[1]
-    basename(epw)
-    # [1] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+# if `dir` is NULL, the directory of IDF file will be used as simulation
+# output directory
+job <- idf$run(epw, dir = NULL)
 
-    # if `dir` is NULL, the directory of IDF file will be used as simulation
-    # output directory
-    job <- idf$run(epw, dir = NULL)
+# run simulation in the background
+idf$run(epw, dir = tempdir(), wait = FALSE)
 
-    # run simulation in the background
-    idf$run(epw, dir = tempdir(), wait = FALSE)
+# copy all external files into the directory run simulation
+idf$run(epw, dir = tempdir(), copy_external = TRUE)
 
-    # copy all external files into the directory run simulation
-    idf$run(epw, dir = tempdir(), copy_external = TRUE)
+# check for simulation errors
+job$errors()
 
-    # check for simulation errors
-    job$errors()
+# get simulation status
+job$status()
 
-    # get simulation status
-    job$status()
+# get output directory
+job$output_dir()
 
-    # get output directory
-    job$output_dir()
+# re-run the simulation
+job$run()
 
-    # re-run the simulation
-    job$run()
-
-    # get simulation results
-    job$report_data()
+# get simulation results
+job$report_data()
 }
 
 
@@ -828,6 +657,10 @@ idf$print("group")
 idf$print("class")
 idf$print("object")
 idf$print("field")
+
+# order objects by there classes
+idf$print("object", order = FALSE)
+idf$print("field", order = FALSE)
 
 }
 \seealso{
@@ -1000,7 +833,7 @@ locally.
 idf$path()
 
 # return `NULL` if Idf is not created from a file
-read_idf("Version, 8.8;\\n")$path()
+Idf$new("Version, 8.8;\\n")$path()
 
 }
 \if{html}{\out{</div>}}
@@ -1194,10 +1027,10 @@ vector.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# check if input is a valid group name in current Idf
-idf$is_valid_group(c("Building", "ShadowCalculation"))
+idf$is_valid_class(c("Building", "ShadowCalculation"))
 
 # check if input is a valid group name in underlying Idd
-idf$is_valid_group(c("Building", "ShadowCalculation"), all = TRUE)
+idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 
 }
 \if{html}{\out{</div>}}
@@ -1232,7 +1065,7 @@ An \link{IddObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get the [IddObject] object for specified class
+\preformatted{# get the IddObject object for specified class
 idf$definition("Version")
 
 }
@@ -1466,10 +1299,10 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE"))
+\preformatted{idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
 
 # name matching is case-insensitive
-idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one"))
+idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
 
 }
 \if{html}{\out{</div>}}
@@ -1722,7 +1555,7 @@ A named list of \link{IdfObject} objects.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# get all objects in Schedules group
-idf$objects_in_class("Schedules")
+idf$objects_in_group("Schedules")
 
 }
 \if{html}{\out{</div>}}
@@ -1809,11 +1642,6 @@ idf$object_relation("floor", "ref_to")
 # check where is this construction being used
 idf$object_relation("floor", "ref_by")
 
-# check what other components are connected to a variable volume fan
-if (idf$is_valid_class("Fan:VariableVolume")) {
-idf$Fan_VariableVolume[[1L]]$object_relation(direction = "node")
-}
-
 }
 \if{html}{\out{</div>}}
 
@@ -1897,13 +1725,7 @@ An named list of \link{IdfObject} objects.
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
-idf$object_relation("floor", "ref_by", "BuildingSurface:Detailed")
-
-# get the first variable volume fan and all objects that are
-# connected to it
-if (idf$is_valid_class("Fan:VariableVolume")) {
-idf$Fan_VariableVolume[[1L]]$object_relation(direction = "node")
-}
+idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
 
 }
 \if{html}{\out{</div>}}
@@ -1998,10 +1820,10 @@ A named list of \link{IdfObject} objects.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# duplicate an object named "FLOOR"
-idf$dup("floor")
+idf$dup("floor") # New object name 'FLOOR_1' is auto-generated
 
 # duplicate that object again by specifing object ID
-idf$dup(16)
+idf$dup(16) # New object name 'FLOOR_2' is auto-generated
 
 # duplicate that object two times and giving new names
 idf$dup(new_floor = "floor", new_floor2 = 16)
@@ -2327,7 +2149,7 @@ idf$del(39, 40)
 
 # cannot delete objects that are referred by others
 level_checks()$reference # reference-checking is enable by default
-\\donotrun{idf$del("r13layer")} # error
+\dontrun{idf$del("r13layer")} # error
 
 # force to delete objects even thay are referred by others
 idf$del("r13layer", .force = TRUE)
@@ -2385,8 +2207,8 @@ A named list of renamed \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$objects(c("fraction", "floor"))
-idf$rename(frac = "Fraction", myfloor = 16)
+\preformatted{idf$objects(c("on/off", "test 352a"))
+idf$rename(on_off = "on/off", test_352a = 51)
 
 }
 \if{html}{\out{</div>}}
@@ -2443,25 +2265,13 @@ A named list of inserted \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# insert new objects from other IDF
-path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFile/5ZoneTDV.idf")
-
-idf
-
-path_ddy <- file.path(
-    eplus_config(avail_eplus()[1])$dir,
-    "WeatherData/USA_CO_Golden-NREL.724666_TMY3.ddy"
-)
-
-idf$insert()
+\preformatted{# insert all material from another IDF
+path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneTDV.idf")
+idf2 <- Idf$new(path_idf2)
+idf$insert(idf2$Material)
 
 # insert objects from same Idf is equivalent to using Idf$dup()
-idf$dup(idf$SizingPeriod_DesignDay)
-
-* Insert objects without new names: `model1$insert(model2$Material)`.
-* Insert an object without new name: `model1$insert(my_material = model2$Material[[1]])`.
-* Insert objects but keep duplications: `model1$insert(model1$Output_Variable)`.
-* Variable input: `mat <- model2$Material; names(mat) <- c("mat1", "mat2"); model1$insert(mat)`.
+idf$insert(idf$SizingPeriod_DesignDay)
 
 }
 \if{html}{\out{</div>}}
@@ -2599,7 +2409,7 @@ idf$load(
       "    513,                     !- Density {kg/m3}",
       "    1381;                    !- Specific Heat {J/kg-K}"),
 
-    "Construction, const, mat;\\n"
+    "Construction, const, mat;"
 )
 
 # load objects from data.frame definitions
@@ -2612,10 +2422,10 @@ idf$load(dt)
 idf$load(idf$to_table(class = "Material"))
 
 # keep empty fields as they are
-idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;\\n", .default = FALSE)
+idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;", .default = FALSE)
 
 # keep trailing empty fields
-idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;\\n",
+idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
     .default = FALSE, .empty = TRUE
 )
 
@@ -2734,16 +2544,15 @@ A named list of updated \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{
-# update objects from string definitions:
-str <- model$Material[[1]]$to_string()
-str[4] <- "0.8"
-model$update(str)
+\preformatted{# update objects from string definitions:
+str <- idf$to_string("wd10", header = FALSE, format = "new_top")
+str[4] <- "0.8,"
+idf$update(str)
 
 # update objects from data.frame definitions:
-dt <- model1$to_table(class = "Material")
-dt[field == "thickness", value := "0.5"]
-model$update(dt)
+dt <- idf$to_table("WD10")
+dt[field == "Thickness", value := "0.5"]
+idf$update(dt)
 
 }
 \if{html}{\out{</div>}}
@@ -2802,18 +2611,6 @@ trailing empty fields by setting \code{.empty} to \code{TRUE}.
 \subsection{Returns}{
 A named list of loaded \link{IdfObject} objects.
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{# Paste objects from same version: `model$paste()`.
-# Paste objects from different version: `model$paste(ver = "version")`.
-# Paste objects that are viewed in IP units in IDF Editor: `model$paste(in_ip = TRUE)`.
-# Paste objects but also keep duplications: `model$paste(unique = FALSE)`.
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-search_value"></a>}}
@@ -2858,11 +2655,11 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# search values that contains "supply"
-idf$search_value("supply")
+\preformatted{# search values that contains "floor"
+idf$search_value("floor", ignore.case = TRUE)
 
-# search values that contains "supply" or "demand" in class Branch
-idf$search_value("supply|demand", "Branch")
+# search values that contains "floor" in class Construction
+idf$search_value("floor", "Construction", ignore.case = TRUE)
 
 }
 \if{html}{\out{</div>}}
@@ -2923,7 +2720,7 @@ A named list of \link{IdfObject} objects.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# search values that contains "win" and replace them with "windows"
-idf$replace_value("win", "windows")
+\dontrun{idf$replace_value("win", "windows")}
 
 }
 \if{html}{\out{</div>}}
@@ -3095,10 +2892,15 @@ An \code{IdfValidity} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+\preformatted{idf$validate()
+
+# check at predefined validate level
+idf$validate("none")
+idf$validate("draft")
+idf$validate("final")
+
+# custom validate checking components
+idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{</div>}}
@@ -3135,10 +2937,15 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+\preformatted{idf$is_valid()
+
+# check at predefined validate level
+idf$is_valid("none")
+idf$is_valid("draft")
+idf$is_valid("final")
+
+# custom validate checking components
+idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 
 }
 \if{html}{\out{</div>}}
@@ -3207,10 +3014,20 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+\preformatted{# get text format of the whole Idf
+head(idf$to_string())
+
+# get text format of the whoe Idf, excluding the header and all comments
+head(idf$to_string(comment = FALSE, header = FALSE))
+
+# get text format of all objects in class Material
+head(idf$to_string(class = "Material", comment = FALSE, header = FALSE))
+
+# get text format of some objects
+head(idf$to_string(c("floor", "zone one")))
+
+# tweak output formatting
+head(idf$to_string("floor", leading = 0, sep_at = 0))
 
 }
 \if{html}{\out{</div>}}
@@ -3259,16 +3076,18 @@ type being a string instead of a number. Default: \code{TRUE}.}
 \item{\code{wide}}{Only applicable if target objects belong to a same class.
 If \code{TRUE}, a wide table will be returned, i.e. first three
 columns are always \code{id}, \code{name} and \code{class}, and then every
-field in a separate column. Default: \code{FALSE}.}
+field in a separate column. Note that this requires all
+objects specified must from the same class.
+Default: \code{FALSE}.}
 
 \item{\code{align}}{If \code{TRUE}, all objects in the same class will have the
 same field number. The number of fields is the same as the
 object that have the most fields among objects specified.
 Default: \code{FALSE}.}
 
-\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD of the
-class that objects specified belong to will be returned.
-Default: \code{FALSE}.}
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for the
+class that objects belong to will be returned. Default:
+\code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -3292,10 +3111,32 @@ A \link[data.table:data.table]{data.table} with 6 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+\preformatted{# extract whole Idf data
+idf$to_table()
+
+# extract all data from class Material
+idf$to_table(class = "Material")
+
+# extract multiple object data
+idf$to_table(c("FLOOR", "ZONE ONE"))
+
+# keep value types and put actual values into a list column
+idf$to_table(c("FLOOR", "ZONE ONE"), string_value = FALSE)$value
+
+# add the unit to each value
+idf$to_table(c("FLOOR", "ZONE ONE"), string_value = FALSE, unit = TRUE)
+
+# get all possible fields
+idf$to_table("ZONE ONE", all = TRUE)
+
+# make sure all objects in same class have the same number of fields
+idf$to_table(class = "Construction", align = TRUE)
+
+# get a wide table with string values
+idf$to_table(class = "Construction", wide = TRUE)
+
+# get a wide table with actual values
+idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
 
 }
 \if{html}{\out{</div>}}
@@ -3322,10 +3163,7 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{level_checks("draft")
-level_checks("final")
-level_checks(custom_validate(auto_field = TRUE))
-level_checks(eplusr_option("validate_level"))
+\preformatted{idf$is_unsaved()
 
 }
 \if{html}{\out{</div>}}
@@ -3390,14 +3228,14 @@ A length-one character vector, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# save and overwrite current model
+\preformatted{# save Idf as a new file
+idf$save(tempfile(fileext = ".idf"))
+
+# save and overwrite current file
 idf$save(overwrite = TRUE)
 
 # save the model with newly created and modified objects at the top
 idf$save(overwrite = TRUE, format = "new_top")
-
-# save the model to a new file
-idf$save(path = file.path(tempdir(), "test.idf"))
 
 # save the model to a new file and copy all external csv files used in
 # "Schedule:File" class into the same folder
@@ -3491,42 +3329,40 @@ An \link{EplusJob} object of current simulation.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{if (is_avail_eplus(8.8)) {
+\preformatted{\dontrun{
+idf <- Idf$new(path_idf)
+# save the model to tempdir()
+idf$save(file.path(tempdir(), "test_run.idf"))
 
-    # save the model to tempdir()
-    idf$save(file.path(tempdir(), "test_run.idf"))
+# use the first epw file in "WeatherData" folder in EnergyPlus v8.8
+# installation path
+epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
+    pattern = "\\\\.epw$", full.names = TRUE)[1]
 
-    # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
-    # installation path
-    epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-        pattern = "\\\\.epw$", full.names = TRUE)[1]
-    basename(epw)
-    # [1] "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+# if `dir` is NULL, the directory of IDF file will be used as simulation
+# output directory
+job <- idf$run(epw, dir = NULL)
 
-    # if `dir` is NULL, the directory of IDF file will be used as simulation
-    # output directory
-    job <- idf$run(epw, dir = NULL)
+# run simulation in the background
+idf$run(epw, dir = tempdir(), wait = FALSE)
 
-    # run simulation in the background
-    idf$run(epw, dir = tempdir(), wait = FALSE)
+# copy all external files into the directory run simulation
+idf$run(epw, dir = tempdir(), copy_external = TRUE)
 
-    # copy all external files into the directory run simulation
-    idf$run(epw, dir = tempdir(), copy_external = TRUE)
+# check for simulation errors
+job$errors()
 
-    # check for simulation errors
-    job$errors()
+# get simulation status
+job$status()
 
-    # get simulation status
-    job$status()
+# get output directory
+job$output_dir()
 
-    # get output directory
-    job$output_dir()
+# re-run the simulation
+job$run()
 
-    # re-run the simulation
-    job$run()
-
-    # get simulation results
-    job$report_data()
+# get simulation results
+job$report_data()
 }
 
 }
@@ -3588,6 +3424,10 @@ The \code{Idf} object itself, invisibly.
 idf$print("class")
 idf$print("object")
 idf$print("field")
+
+# order objects by there classes
+idf$print("object", order = FALSE)
+idf$print("field", order = FALSE)
 
 }
 \if{html}{\out{</div>}}
