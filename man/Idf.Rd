@@ -38,10 +38,10 @@ path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v
 
 # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
-idf <- read_idf(path_idf)
+\dontrun{idf <- read_idf(path_idf)}
 
 # argument `idd` can be specified explicitly using `use_idd()`
-idf <- read_idf(path_idf, idd = use_idd(8.8))
+\dontrun{idf <- read_idf(path_idf, idd = use_idd(8.8))}
 
 # you can set `download` arugment to "auto" in `use_idd()` if you
 # want to automatically download corresponding IDD file when
@@ -726,13 +726,14 @@ Create an \code{Idf} object
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{path}}{Either a path, a connection, or literal data (either a single
-string or a raw vector) to an EnergyPlus Input Data File (IDF). If a file
-path, that file usually has a extension \code{.idf}.}
+string or a raw vector) to an EnergyPlus Input Data File
+(IDF). If a file path, that file usually has a extension
+\code{.idf}.}
 
 \item{\code{idd}}{Any acceptable input of \code{\link[=use_idd]{use_idd()}}. If \code{NULL}, which is the
-default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If the input is an
-\code{.ddy} file which does not have a version field, the latest version of \link{Idf}
-cached will be used.}
+default, the version of IDF will be passed to \code{\link[=use_idd]{use_idd()}}. If
+the input is an \code{.ddy} file which does not have a version
+field, the latest version of \link{Idf} cached will be used.}
 }
 \if{html}{\out{</div>}}
 }
@@ -754,10 +755,10 @@ An \code{Idf} object.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
-idf <- read_idf(path_idf)
+\dontrun{idf <- read_idf(path_idf)}
 
 # argument `idd` can be specified explicitly using `use_idd()`
-idf <- read_idf(path_idf, idd = use_idd(8.8))
+\dontrun{idf <- read_idf(path_idf, idd = use_idd(8.8))}
 
 # you can set `download` arugment to "auto" in `use_idd()` if you
 # want to automatically download corresponding IDD file when
