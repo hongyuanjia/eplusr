@@ -3552,13 +3552,15 @@ get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, obj
                 idf_env$value[J(obj$object_id), on = "object_id"],
                 idf_env$object[J(obj$object_id), on = "object_id"],
                 dt_order, in_ip = in_ip, header = header, comment = comment,
-                save_format = format
+                save_format = format, leading = leading, sep_at = sep_at
             )
         ))
     } else {
         fmt <- with_nocolor(with_format_cols(idd_env, idf_env,
             format_idf(idf_env$value, idf_env$object, dt_order, in_ip = in_ip,
-            header = header, comment = comment, save_format = format)
+                header = header, comment = comment, save_format = format,
+                leading = leading, sep_at = sep_at
+            )
         ))
     }
 
