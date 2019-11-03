@@ -33,7 +33,7 @@ A \link[data.table:data.table]{data.table} with 5 or 6 columns:
 \code{dt_to_load()} takes a \link[data.table:data.table]{data.table}, usually
 created from \code{\link[=Idf]{Idf$to_table()}} or \code{\link[=IdfObject]{IdfObject$to_table()}}
 with \code{wide} being \code{TRUE}, and format it into a
-\link[data.table:data.table]{data.table} in acceptable format for \code{$load()}
+\link[data.table:data.table]{data.table} in acceptable format for \verb{$load()}
 method in \link{Idf} class.
 }
 \examples{

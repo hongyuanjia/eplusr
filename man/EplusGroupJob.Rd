@@ -73,15 +73,15 @@ that they only return the results of specified simulations. Most arguments
 have the same meanings as in \link{EplusJob} class, except that there is an
 argument \code{which} to select specific simulations.
 
-\code{$run()} runs all parametric simulations in parallel. The number of parallel
+\verb{$run()} runs all parametric simulations in parallel. The number of parallel
 EnergyPlus process can be controlled by \code{eplusr_option("num_parallel")}. If
 \code{wait} is FALSE, then the job will be run in the background. You can get
 updated job status by just printing the \code{ParametricJob} object.
 
-\code{$kill()} kills all background EnergyPlus processes that are current running
+\verb{$kill()} kills all background EnergyPlus processes that are current running
 if possible. It only works when simulations run in non-waiting mode.
 
-\code{$status()} returns a named list of values indicates the status of the job:
+\verb{$status()} returns a named list of values indicates the status of the job:
 \itemize{
 \item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
 \item \code{alive}: \code{TRUE} if the job is still running in the background. \code{FALSE}
@@ -110,43 +110,43 @@ $errors() returns an \link[=read_err]{ErrFile} object which contains all content
 of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only warnings
 and errors are printed.
 
-\code{$output_dir()} returns the output directory of specified simulations.
+\verb{$output_dir()} returns the output directory of specified simulations.
 
-\code{$locate_output()} returns the path of a single output file of specified
+\verb{$locate_output()} returns the path of a single output file of specified
 simulations.
 
 $errors() returns a list of \link[=read_err]{ErrFile} objects which contain all
 contents of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only
 warnings and errors are printed.
 
-\code{$list_table()} returns a list of character vectors containing all available
+\verb{$list_table()} returns a list of character vectors containing all available
 table and view names in the SQLite file.
 
-\code{$read_table()} takes a valid table name of those from \code{$list_table()} and
+\verb{$read_table()} takes a valid table name of those from \verb{$list_table()} and
 returns that table data in a \link[data.table:data.table]{data.table} format.
 
-\code{$read_rdd()} and \code{$read_mdd()} return the core data of Report Data
+\verb{$read_rdd()} and \verb{$read_mdd()} return the core data of Report Data
 Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
 details, please see \code{\link[=read_rdd]{read_rdd()}}.
 
-\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
+\verb{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
 contains all information about report data for specified simulations. For
 details on the meaning of each columns, please see "2.20.2.1
 ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
 documentation.
 
-\code{$report_data()} extracts the report data in a
+\verb{$report_data()} extracts the report data in a
 \link[data.table:data.table]{data.table} using key values, variable names and
 other arguments.
 
-\code{$tabular_data()} extracts tabular data in a
+\verb{$tabular_data()} extracts tabular data in a
 \link[data.table:data.table]{data.table}.
 
-For convenience, input character arguments matching in \code{$report_data()} and
-\code{$tabular_data()} are \strong{case-insensitive}.
+For convenience, input character arguments matching in \verb{$report_data()} and
+\verb{$tabular_data()} are \strong{case-insensitive}.
 
-For \code{$read_table()}, \code{$read_rdd()}, \code{$read_mdd()}, \code{$report_data_dict()},
-\code{$report_data()} and \code{$tabular_data()}, the returned data.table has a \code{case}
+For \verb{$read_table()}, \verb{$read_rdd()}, \verb{$read_mdd()}, \verb{$report_data_dict()},
+\verb{$report_data()} and \verb{$tabular_data()}, the returned data.table has a \code{case}
 column in the returned \link[data.table:data.table]{data.table} that indicates
 the names of models. For detailed documentation on the results of those
 methods, please see \link{EplusJob}.
@@ -169,20 +169,20 @@ status. Default: \code{TRUE}.
 \item \code{suffix}: A string that indicates the file extension of simulation output.
 Default: \code{".err"}.
 \item \code{table}: A string specifying which table to read. Valid table names can be
-obtained using \code{$list_table()}.
+obtained using \verb{$list_table()}.
 \item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
 still running or the file does not exist. Default: \code{TRUE}.
 \item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
 \item \code{key_value}: A character vector to identify key values of the data. If
 \code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
 data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \code{$report_data_dict()}.
+\code{name} argument in \verb{$report_data()} is ignored. All available \code{key_value}
+for current simulation output can be obtained using \verb{$report_data_dict()}.
 Default: \code{NULL}.
 \item \code{name}: A character vector to identify names of the data. If
 \code{NULL}, all names of that variable will be returned. If \code{key_value} is a
 data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
+output can be obtained using \verb{$report_data_dict()}.  Default: \code{NULL}.
 \item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
 will calculate a year value that meets the start day of week restriction
 for each environment. Default: \code{NULL}.
@@ -202,20 +202,20 @@ data is returned. Default: \code{NULL}.
 hour, minute subsetting of \code{datetime} column when querying on the SQL
 database. If \code{NULL}, no subsetting is performed on those components. All
 possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\code{$read_table("Time")}.  Default: \code{NULL}.
+\verb{$read_table("Time")}.  Default: \code{NULL}.
 \item \code{interval}: An integer vector used to specify which interval length of
 report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
 \item \code{simulation_days}: An integer vector to specify which simulation day data
 to extract. Note that this number resets after warmup and at the beginning
 of an environment period. All possible \code{simulation_days} can be obtained
-using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
+using \verb{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
 Default: \code{NULL}.
 \item \code{day_type}: A character vector to specify which day type of data to
 extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
 \code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
 \code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
 possible values for current simulation output can be obtained using
-\code{$read_table("Time")}.
+\verb{$read_table("Time")}.
 \item \code{environment_name}: A character vector to specify which environment data to
 extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
 All possible \code{environment_name} for current simulation output can
@@ -232,12 +232,12 @@ For the meaning of each argument, please see the description above.
 print(group)
 }
 
-\code{$print()} shows the core information of this \code{EplusGroupJob}, including the
+\verb{$print()} shows the core information of this \code{EplusGroupJob}, including the
 path of IDFs and EPWs and also the simulation job status.
 
-\code{$print()} is quite useful to get the simulation status, especially when
-\code{wait} is \code{FALSE} in \code{$run()}. The job status will be updated and printed
-whenever \code{$print()} is called.
+\verb{$print()} is quite useful to get the simulation status, especially when
+\code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated and printed
+whenever \verb{$print()} is called.
 }
 
 \examples{

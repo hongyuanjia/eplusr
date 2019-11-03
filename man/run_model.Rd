@@ -5,11 +5,28 @@
 \alias{run_multi}
 \title{Run simulations of EnergyPlus models.}
 \usage{
-run_idf(model, weather, output_dir, design_day = FALSE, annual = FALSE,
-  expand_obj = TRUE, wait = TRUE, echo = TRUE, eplus = NULL)
+run_idf(
+  model,
+  weather,
+  output_dir,
+  design_day = FALSE,
+  annual = FALSE,
+  expand_obj = TRUE,
+  wait = TRUE,
+  echo = TRUE,
+  eplus = NULL
+)
 
-run_multi(model, weather, output_dir, design_day = FALSE,
-  annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL)
+run_multi(
+  model,
+  weather,
+  output_dir,
+  design_day = FALSE,
+  annual = FALSE,
+  wait = TRUE,
+  echo = TRUE,
+  eplus = NULL
+)
 }
 \arguments{
 \item{model}{A path (for \code{run_idf()}) or a vector of paths (for
@@ -106,8 +123,8 @@ at all.
 
 For \code{run_multi()}, if \code{wait} is \code{FALSE}, a \link[callr:r_bg]{r_process}
 object of background R process which handles all simulation jobs is
-returned. You can check if the jobs are completed using \code{$is_alive()} and
-get the final data.table using \code{$get_result()}.
+returned. You can check if the jobs are completed using \verb{$is_alive()} and
+get the final data.table using \verb{$get_result()}.
 
 It is suggested to run simulations using \link{EplusJob} class and
 \link{ParametricJob} class, which provide much more detailed controls

@@ -58,9 +58,9 @@ epsql$path()
 epsql$path_idf()
 }
 
-\code{$path()} returns the path of EnergyPlus SQLite file.
+\verb{$path()} returns the path of EnergyPlus SQLite file.
 
-\code{$path_idf()} returns the IDF file path with same name as the SQLite file in
+\verb{$path_idf()} returns the IDF file path with same name as the SQLite file in
 the same folder. \code{NULL} is returned if no corresponding IDF is found.
 
 \strong{Arguments}:
@@ -83,20 +83,20 @@ epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
                    column_name = NULL, row_name = NULL)
 }
 
-\code{$list_table()} returns all available table and view names in the SQLite file.
+\verb{$list_table()} returns all available table and view names in the SQLite file.
 
-\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
+\verb{$read_table()} takes a valid \code{table} name of those from \verb{$list_table()} and
 returns that table data in a \link[data.table:data.table]{data.table} format.
 
-\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
+\verb{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
 contains all information about report data. For details on the meaning of
 each columns, please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus
 "Output Details and Examples" documentation.
 
-\code{$report_data()} extracts the report data in a
+\verb{$report_data()} extracts the report data in a
 \link[data.table:data.table]{data.table} using key values, variable names and
-other specifications. \code{$report_data()} can also directly take all or subset
-output from \code{$report_data_dict()} as input, and extract all data specified.
+other specifications. \verb{$report_data()} can also directly take all or subset
+output from \verb{$report_data_dict()} as input, and extract all data specified.
 The returned column numbers varies depending on \code{all} argument.
 \itemize{
 \item \code{all} is \code{FALSE}, the returned \link[data.table:data.table]{data.table} has 6
@@ -127,9 +127,9 @@ included:
 \item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
 and \code{Avg}
 \item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
-\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \code{HVAC System}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \verb{HVAC System}
 \item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
-\code{HVAC System Timestep}, \code{Zone Timestep}.
+\verb{HVAC System Timestep}, \verb{Zone Timestep}.
 \item \code{schedule_name}: Name of the the schedule that controls reporting
 frequency.
 }
@@ -137,7 +137,7 @@ frequency.
 
 With the \code{datetime} column, it is quite straightforward to apply time-series
 analysis on the simulation output. However, another painful thing is that
-every simulation run period has its own \code{Day of Week for Start Day}. Randomly
+every simulation run period has its own \verb{Day of Week for Start Day}. Randomly
 setting the \code{year} may result in a date time series that does not have
 the same start day of week as specified in the RunPeriod objects.
 
@@ -157,15 +157,15 @@ Saturday. However, if you try to get the day of week of time "00:24:00" in R,
 you will get Saturday, but not Friday. This introduces inconsistency and may
 cause problems when doing data analysis considering day of week value.
 
-With \code{wide} equals \code{TRUE}, \code{$report_data()} will format the simulation output
+With \code{wide} equals \code{TRUE}, \verb{$report_data()} will format the simulation output
 in the same way as standard EnergyPlus csv output file. Sometimes this can be
 useful as there may be existing tools/workflows that depend on this format.
 When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
 and date time components are also returned, including:
-\code{environment_period_index", "environment_name}, \code{simulation_days},
+\verb{environment_period_index", "environment_name}, \code{simulation_days},
 \code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
 
-\code{$tabular_data()} extracts the tabular data in a
+\verb{$tabular_data()} extracts the tabular data in a
 \link[data.table:data.table]{data.table} using report, table, column and row
 name specifications. The returned \link[data.table:data.table]{data.table} has
 8 columns:
@@ -180,21 +180,21 @@ name specifications. The returned \link[data.table:data.table]{data.table} has
 \item \code{value}: The value of the record \strong{in string format}
 }
 
-For convenience, input character arguments matching in \code{$report_data()} and
-\code{$tabular_data()} are \strong{case-insensitive}.
+For convenience, input character arguments matching in \verb{$report_data()} and
+\verb{$tabular_data()} are \strong{case-insensitive}.
 
 \strong{Arguments}
 \itemize{
 \item \code{key_value}: A character vector to identify key values of the data. If
 \code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
 data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \code{$report_data_dict()}.
+\code{name} argument in \verb{$report_data()} is ignored. All available \code{key_value}
+for current simulation output can be obtained using \verb{$report_data_dict()}.
 Default: \code{NULL}.
 \item \code{name}: A character vector to identify names of the data. If
 \code{NULL}, all names of that variable will be returned. If \code{key_value} is a
 data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
+output can be obtained using \verb{$report_data_dict()}.  Default: \code{NULL}.
 \item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
 will calculate a year value that meets the start day of week restriction
 for each environment. Default: \code{NULL}.
@@ -214,20 +214,20 @@ data is returned. Default: \code{NULL}.
 hour, minute subsetting of \code{datetime} column when querying on the SQL
 database. If \code{NULL}, no subsetting is performed on those components. All
 possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\code{$read_table("Time")}.  Default: \code{NULL}.
+\verb{$read_table("Time")}.  Default: \code{NULL}.
 \item \code{interval}: An integer vector used to specify which interval length of
 report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
 \item \code{simulation_days}: An integer vector to specify which simulation day data
 to extract. Note that this number resets after warmup and at the beginning
 of an environment period. All possible \code{simulation_days} can be obtained
-using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
+using \verb{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
 Default: \code{NULL}.
 \item \code{day_type}: A character vector to specify which day type of data to
 extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
 \code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
 \code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
 possible values for current simulation output can be obtained using
-\code{$read_table("Time")}.
+\verb{$read_table("Time")}.
 \item \code{environment_name}: A character vector to specify which environment data to
 extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
 All possible \code{environment_name} for current simulation output can
@@ -244,7 +244,7 @@ For the meaning of each argument, please see the description above.
 print(epsql)
 }
 
-\code{$print()} shows the core information of this \code{EplusSql} object, including
+\verb{$print()} shows the core information of this \code{EplusSql} object, including
 the path of the EnergyPlus SQLite file, last modified time of the SQLite file
 and the path of the IDF file with the same name in the same folder.
 

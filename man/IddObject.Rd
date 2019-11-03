@@ -7,8 +7,8 @@
 \description{
 \code{IddObject} is an abstraction of a single object in an \link{Idd} object. It
 provides more detail methods to query field properties. \code{IddObject} can only
-be created from the parent \link{Idd} object, using \code{$object()},
-\code{$object_in_group()} and other equivalent. This is because that
+be created from the parent \link{Idd} object, using \verb{$object()},
+\verb{$object_in_group()} and other equivalent. This is because that
 initialization of an \code{IddObject} needs some shared data from parent \link{Idd}
 object.
 }
@@ -77,11 +77,11 @@ iddobj$parent()
 }
 
 An \code{IddObject} can be created from the parent \link{Idd} object, using
-\code{$object()}, \link{idd_object} and other equivalent.
+\verb{$object()}, \link{idd_object} and other equivalent.
 
-\code{$version()} returns the version of parent IDD current object belongs to.
+\verb{$version()} returns the version of parent IDD current object belongs to.
 
-\code{$parent()} returns the parent Idd object.
+\verb{$parent()} returns the parent Idd object.
 
 \strong{Arguments}
 \itemize{
@@ -105,15 +105,15 @@ iddobj$is_required()
 iddobj$is_unique()
 }
 
-\code{$group_index()} returns the index of IDD group it belongs to.
+\verb{$group_index()} returns the index of IDD group it belongs to.
 
-\code{$group_name()} returns the name of IDD group it belongs to.
+\verb{$group_name()} returns the name of IDD group it belongs to.
 
-\code{$class_index()} returns the index of this IDD class.
+\verb{$class_index()} returns the index of this IDD class.
 
-\code{$class_name()} returns the name of this IDD class.
+\verb{$class_name()} returns the name of this IDD class.
 
-\code{$class_format()} returns the format of this IDD class. This format indicator
+\verb{$class_format()} returns the format of this IDD class. This format indicator
 is currently not used by eplusr. \strong{Note}: some classes have special format
 when saved in the IDFEditor with the special format option enabled. Those
 special format includes "singleLine", "vertices", "compactSchedule",
@@ -121,21 +121,21 @@ special format includes "singleLine", "vertices", "compactSchedule",
 format when parsing IDF files. However, when saved, all classes are formatted
 in standard way.
 
-\code{$min_fields()} returns the minimum fields required for this class.  If no
+\verb{$min_fields()} returns the minimum fields required for this class.  If no
 required, \code{0} is returned.
 
-\code{$num_fields()} returns current total number of fields in this class. This
+\verb{$num_fields()} returns current total number of fields in this class. This
 number may change if the class is extensible and after
-\code{$add_extensible_group()} or \code{$del_extensible_group()}.
+\verb{$add_extensible_group()} or \verb{$del_extensible_group()}.
 
-\code{$memo()} returns memo of this class. Usually a brief description of this
+\verb{$memo()} returns memo of this class. Usually a brief description of this
 class.
 
-\code{$has_name()} return \code{TRUE} if this class has name attribute.
+\verb{$has_name()} return \code{TRUE} if this class has name attribute.
 
-\code{$is_unique()} return \code{TRUE} if this class is unique.
+\verb{$is_unique()} return \code{TRUE} if this class is unique.
 
-\code{$is_required()} returns \code{TRUE} if this class is required.
+\verb{$is_required()} returns \code{TRUE} if this class is required.
 }
 
 \section{Extensible Group}{
@@ -147,20 +147,20 @@ iddobj$add_extensible_group(num = 1L)
 iddobj$del_extensible_group(num = 1L)
 }
 
-\code{$is_extensible()} returns \code{TRUE} if this class is extensible.
+\verb{$is_extensible()} returns \code{TRUE} if this class is extensible.
 
-\code{$num_extensible()} returns the number of extensible fields in this class. If
+\verb{$num_extensible()} returns the number of extensible fields in this class. If
 not zero, it means that objects in this class is dynamically extensible.
 
-\code{$first_extensible_index()} returns the field index of the first extensible
+\verb{$first_extensible_index()} returns the field index of the first extensible
 field in this class. If this class is not extensible, \code{0} is return.
 
-\code{$extensible_group_num()} returns the number of extensible groups in this
+\verb{$extensible_group_num()} returns the number of extensible groups in this
 class.
 
-\code{$add_extensible_groups()} adds extensible groups in this class.
+\verb{$add_extensible_groups()} adds extensible groups in this class.
 
-\code{$del_extensible_groups()} deletes extensible groups in this class.
+\verb{$del_extensible_groups()} deletes extensible groups in this class.
 
 \strong{Arguments}
 \itemize{
@@ -195,38 +195,38 @@ iddobj$has_ref_to(which = NULL)
 iddobj$has_ref_by(which = NULL)
 }
 
-\code{$field_name()} returns names of fields specified by field indexes. If
+\verb{$field_name()} returns names of fields specified by field indexes. If
 \code{index} is \code{NULL}, names of all fields in this class are returned. If \code{lower}
 is \code{TRUE}, "lower-style" names are returned, i.e. all spaces and dashes is
 replaced by underscores. "lower-style" names are useful when use them as
-filed names in \code{$set_value()} in \code{IdfObject} class and \code{$set_object()} in
+filed names in \verb{$set_value()} in \code{IdfObject} class and \verb{$set_object()} in
 \code{Idf} class. If \code{unit} is \code{TRUE}, the units of those fields are also
 returned. If \code{in_ip}, corresponding imperial units are returned. It only has
 effect when \code{unit} is \code{TRUE}.
 
-\code{$field_index()} returns indexes of fields specified by field names. If
+\verb{$field_index()} returns indexes of fields specified by field names. If
 \code{name} is \code{NULL}, indexes of all fields in this class are returned.
 
-All other \code{$field_*()} returns specific field properties. If \code{which} is
+All other \verb{$field_*()} returns specific field properties. If \code{which} is
 \code{NULL}, properties of all fields in this class are returned.
 
-\code{$field_type}(): returns field types. All possible values are
+\verb{$field_type}(): returns field types. All possible values are
 \code{"integer"}, \code{"real"}, \code{"alpha"} (arbitrary string), \code{"choice"} (alpha
 with specific list of choices), \code{"object-list"} (link to a list of
 objects defined elsewhere), \code{"external-list"} (uses a special list from
 an external source) and \code{"node"} (name used in connecting HVAC
 components).
 
-\code{$field_unit()}: returns a character vector of field units. If \code{in_ip} is
+\verb{$field_unit()}: returns a character vector of field units. If \code{in_ip} is
 \code{TRUE}, IP unites are returned.
 
-\code{$field_default()}: returns a list of default values of those fields. If
+\verb{$field_default()}: returns a list of default values of those fields. If
 no defaults found, \code{NA}s are returned.
 
-\code{$field_choice()}: returns a list of all valid choices for those fields.
+\verb{$field_choice()}: returns a list of all valid choices for those fields.
 If no choices found, \code{NA}s are returned.
 
-\code{$field_range()}: returns a list of ranges for those fields. Every range
+\verb{$field_range()}: returns a list of ranges for those fields. Every range
 has four components: \code{minimum} (lower limit), \code{lower_incbounds} (\code{TRUE}
 if the lower limit should be included), \code{maximum} (upper limit), and
 \code{upper_incbounds} (\code{TRUE} if the upper limit should be included). For
@@ -236,7 +236,7 @@ numeric types with no specified ranges, \code{minimum} is set to \code{-Inf},
 \code{upper_incbounds} is set to FALSE. The field range is printed in number
 interval denotation.
 
-\code{$field_relation()}: returns a list of references for those fields that
+\verb{$field_relation()}: returns a list of references for those fields that
 have the \code{object-list} and/or \code{reference} and \code{reference-class-name}
 attribute. Basically, it is a list of two elements \code{ref_to} and \code{ref_by}.
 Underneath, \code{ref_to} and \code{ref_by} are \link[data.table:data.table]{data.table}s
@@ -245,19 +245,19 @@ method. For instance, if \code{iddobj$field_relation(c(1, 2), "ref_to")} gives
 results below:\preformatted{-- Refer to Others ---------------------
   +- Field: <1: Field 1>
   |  v~~~~~~~~~~~~~~~~~~
-  |  \- Class: <Class 2>
-  |     \- Field: <2: Field 2>
+  |  \\- Class: <Class 2>
+  |     \\- Field: <2: Field 2>
   |
-  \- Field: <2: Field 2>
+  \\- Field: <2: Field 2>
 }
 
-This means that \code{Field 2} in current class does not refer to any other fields.
-But \code{Field 1} in current class refers to \code{Field 2} in class named \code{Class 2}.
+This means that \verb{Field 2} in current class does not refer to any other fields.
+But \verb{Field 1} in current class refers to \verb{Field 2} in class named \verb{Class 2}.
 
-\code{$field_possible()}: returns all possible values for specified fields,
+\verb{$field_possible()}: returns all possible values for specified fields,
 including auto-value (\code{Autosize}, \code{Autocalculate}, and \code{NA} if not
-applicable), and results from \code{$field_default()}, \code{$field_range()},
-\code{$field_choice()}. Underneath, it returns a data.table with custom
+applicable), and results from \verb{$field_default()}, \verb{$field_range()},
+\verb{$field_choice()}. Underneath, it returns a data.table with custom
 printing method. For instance, if \code{iddobj$field_possible(c(4, 2))} gives
 results below:\preformatted{-- 4: Field 4 ----------
 * Auto value: <NA>
@@ -272,45 +272,45 @@ results below:\preformatted{-- 4: Field 4 ----------
 * Choice: <NA>
 }
 
-This means that \code{Field 4} in current class cannot be "autosized" or
+This means that \verb{Field 4} in current class cannot be "autosized" or
 "autocalculated", and it does not have any default value. Its value should be
-a choice from \code{"Key1"} or \code{"Key2"}. For \code{Field 2} in current class, it has a
+a choice from \code{"Key1"} or \code{"Key2"}. For \verb{Field 2} in current class, it has a
 default value of \code{2} but can also be filled with value \code{"Autosize"}.
 
-\code{$is_valid_field_num()} returns \code{TRUE} if \code{num} is acceptable as a total
+\verb{$is_valid_field_num()} returns \code{TRUE} if \code{num} is acceptable as a total
 number of fields in this class. Extensible property is considered. For
 instance, the total number of fields defined in IDD for class
 \code{BuildingSurfaces:Detailed} is 390. However, 396 is still a valid field
 number for this class as the number of field in the extensible group is 3.
 
-\code{$is_valid_field_name()} returns \code{TRUE} if \code{name} is a valid field name
+\verb{$is_valid_field_name()} returns \code{TRUE} if \code{name} is a valid field name
 \strong{WITHOUT} unit. Note \code{name} can be given in underscore style, e.g.
 \code{"outside_layer"} is equivalent to \code{"Outside Layer"}.
 
-\code{$is_valid_field_index()} returns \code{TRUE} if \code{index} is a valid field index.
+\verb{$is_valid_field_index()} returns \code{TRUE} if \code{index} is a valid field index.
 
-\code{$is_autosizable_field()} returns \code{TRUE} if the field can be assigned to
+\verb{$is_autosizable_field()} returns \code{TRUE} if the field can be assigned to
 \code{autosize}.
 
-\code{$is_autocalculatable_field()} returns \code{TRUE} if the field can be assigned to
+\verb{$is_autocalculatable_field()} returns \code{TRUE} if the field can be assigned to
 \code{autocalculate}.
 
-\code{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric (
+\verb{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric (
 an integer or a real number).
 
-\code{$is_integer_field()} returns \code{TRUE} if the field value should be an integer.
+\verb{$is_integer_field()} returns \code{TRUE} if the field value should be an integer.
 
-\code{$is_real_field()} returns \code{TRUE} if the field value should be a real number
+\verb{$is_real_field()} returns \code{TRUE} if the field value should be a real number
 but not an integer.
 
-\code{$is_required_field()} returns \code{TRUE} if the field is required.
+\verb{$is_required_field()} returns \code{TRUE} if the field is required.
 
-\code{$has_ref()} returns \code{TRUE} if the field refers to or can be referred by
+\verb{$has_ref()} returns \code{TRUE} if the field refers to or can be referred by
 other fields.
 
-\code{$has_ref_to()} returns \code{TRUE} if the field refers to other fields.
+\verb{$has_ref_to()} returns \code{TRUE} if the field refers to other fields.
 
-\code{$has_ref_by()} returns \code{TRUE} if the field refers can be referred by other
+\verb{$has_ref_by()} returns \code{TRUE} if the field refers can be referred by other
 fields.
 
 \strong{Arguments}
@@ -337,7 +337,7 @@ referred by specified fields is returned. If \code{"all"}, both are returned.
 iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
 }
 
-\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
 core data of current class. It has 3 columns:
 \itemize{
 \item \code{class}: Character type. Current class name.
@@ -345,7 +345,7 @@ core data of current class. It has 3 columns:
 \item \code{field}: Character type. Field names.
 }
 
-\code{$to_string()} returns an empty object of current class in a character vector
+\verb{$to_string()} returns an empty object of current class in a character vector
 format. It is formatted exactly the same as in IDF Editor.
 
 \strong{Arguments}
@@ -364,10 +364,10 @@ Default: \code{29L} which is the same as IDF Editor.
 \section{Print}{
 
 
-\code{$print()} prints the IddObject. Basically, the print output can be divided
+\verb{$print()} prints the IddObject. Basically, the print output can be divided
 into 4 parts:
 \itemize{
-\item CLASS: IDD class name of current object in format \code{<IddObject: CLASS>}.
+\item CLASS: IDD class name of current object in format \verb{<IddObject: CLASS>}.
 \item MEMO: brief description of the IDD class
 \item PROPERTY: properties of the IDD class, including name of group it belongs
 to, whether it is an unique or required class and current total fields. The

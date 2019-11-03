@@ -4,8 +4,7 @@
 \alias{as.character.IdfObject}
 \title{Coerce an IdfObject into a Character Vector}
 \usage{
-\method{as.character}{IdfObject}(x, comment = TRUE, leading = 4L,
-  sep_at = 29L, all = FALSE, ...)
+\method{as.character}{IdfObject}(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
 \item{x}{An \link{IddObject} object.}

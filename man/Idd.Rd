@@ -21,9 +21,9 @@ of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 with the release.
 
 eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading, i.e. \code{C:\\EnergyPlusVX-X-0} on Windows,
-\code{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-\code{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
+locations when loading, i.e. \verb{C:\\\\EnergyPlusVX-X-0} on Windows,
+\verb{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+\verb{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
 each EnergyPlus version. And also, every time an IDD file is parsed, an \code{Idd}
 object is created and cached in an environment.
@@ -86,14 +86,14 @@ print(idd)
 \item \code{ver}: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
 \item \code{idd}: An \code{Idd} object.
 \item \code{group}: A character vector of valid group names. For
-\code{$objects_in_group()}, a single string of valid group name.
+\verb{$objects_in_group()}, a single string of valid group name.
 \item \code{index}: An integer vector giving indexes of name appearance in
 the IDD file of specified classes.
-\item \code{class}: A character vector of valid class names. For \code{$object_relation()}
-and \code{$objects_in_relation()}, a single string of valid class name.
+\item \code{class}: A character vector of valid class names. For \verb{$object_relation()}
+and \verb{$objects_in_relation()}, a single string of valid class name.
 \item \code{ClassName}: A single string of valid class name.
 \item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
-\code{"ref_to"} or "ref_by". For \code{$objects_in_relation()}, only \code{"ref_to"} and
+\code{"ref_to"} or "ref_by". For \verb{$objects_in_relation()}, only \code{"ref_to"} and
 \code{"ref_by"} are acceptable.
 \item \code{all}: If \code{TRUE}, all fields in specified classes are returned. If \code{FALSE},
 only minimum required fields are returned. Default: \code{FALSE}.
@@ -110,57 +110,57 @@ names by the group they belongs to. Default: \code{FALSE}.
 \section{Detail}{
 
 
-\code{$version()} returns the IDD version in
+\verb{$version()} returns the IDD version in
 \link[base:numeric_version]{numeric_version}.
 
-\code{$build()} returns the build tag string.
+\verb{$build()} returns the build tag string.
 
-\code{$group_index()} returns integer indexes (indexes of name appearance in
+\verb{$group_index()} returns integer indexes (indexes of name appearance in
 the IDD file) of specified groups.
 
-\code{$group_name()} returns all group names.
+\verb{$group_name()} returns all group names.
 
-\code{$from_group()} returns the names of group that specified classes belongs to.
+\verb{$from_group()} returns the names of group that specified classes belongs to.
 
-\code{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
+\verb{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
 
-\code{$class_index()} returns integer indexes (indexes of name appearance in
+\verb{$class_index()} returns integer indexes (indexes of name appearance in
 the IDD file) of specified classes. If \code{by_group} is \code{TRUE}, a list is returned
 which separate class indexes by the group they belong to. Otherwise, an
 integer vector is returned.
 
-\code{$class_name()} returns class names of specified class indexes. If \code{by_group}
+\verb{$class_name()} returns class names of specified class indexes. If \code{by_group}
 is \code{TRUE}, a list is returned which separate class names by the group they
 belong to. Otherwise, a character vector is returned.
 
-\code{$required_class_name()} returns the names of all required classes.
+\verb{$required_class_name()} returns the names of all required classes.
 
-\code{$unique_class_name()} returns the names of all unique-object classes.
+\verb{$unique_class_name()} returns the names of all unique-object classes.
 
-\code{$extensible_class_name()} returns the names of all extensible classes.
+\verb{$extensible_class_name()} returns the names of all extensible classes.
 
-\code{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
+\verb{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
 
-\code{$object()} returns an \link{IddObject} of specified class.
+\verb{$object()} returns an \link{IddObject} of specified class.
 
-\code{$objects()} returns a list of \link{IddObject}s of specified classes.
+\verb{$objects()} returns a list of \link{IddObject}s of specified classes.
 
-\code{$object_relation()} returns an \code{IddRelation} object which contains field
+\verb{$object_relation()} returns an \code{IddRelation} object which contains field
 data that have relation with specified class. For instance, if
 \code{idd$object_relation("Class 1", "ref_to")} gives results below:\preformatted{-- Refer to Others ---------------------
   Class: <Class 1>
   +- Field: <1: Field 1>
   |  v~~~~~~~~~~~~~~~~~~
-  |  \- Class: <Class 2>
-  |     \- Field: <2: Field 2>
+  |  \\- Class: <Class 2>
+  |     \\- Field: <2: Field 2>
   |
-  \- Field: <2: Field 2>
+  \\- Field: <2: Field 2>
 }
 
-This means that \code{Field 2} in class \code{Class 1} does not refer to any other fields.
-But \code{Field 1} in class \code{Class 2} refers to \code{Field 2} in class named \code{Class 2}.
+This means that \verb{Field 2} in class \verb{Class 1} does not refer to any other fields.
+But \verb{Field 1} in class \verb{Class 2} refers to \verb{Field 2} in class named \verb{Class 2}.
 
-\code{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
+\verb{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
 The first element is always the \link{IddObject} of that class. If specified class
 does not have any relation with other classes, a list that only contains the
 \link{IddObject} of that class is returned. For instance,
@@ -169,17 +169,17 @@ does not have any relation with other classes, a list that only contains the
 \code{Construction} refers to; similarly, \code{idd$objects_in_relation("Construction", "ref_by")} will return a list of an \link{IddObject} of class \code{Construction} and
 also all \link{IddObject}s that refer to class \code{Construction}.
 
-\code{$objects_in_group()} returns a list of \link{IddObject}s of specified group.
+\verb{$objects_in_group()} returns a list of \link{IddObject}s of specified group.
 
 eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
 more convenient to get a single \link{IddObject}. Basically, \code{idd$ClassName} and
 \code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
 Here, \code{ClassName} is a single valid class name where all characters other
-than letters and numbers are replaced by a underscore \code{_}.
+than letters and numbers are replaced by a underscore \verb{_}.
 
 For details about \link{IddObject}, please see \link{IddObject} class.
 
-\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
 core data of specified class. It has 3 columns:
 \itemize{
 \item \code{class}: Character type. Class names.
@@ -187,10 +187,10 @@ core data of specified class. It has 3 columns:
 \item \code{field}: Character type. Field names.
 }
 
-\code{$to_string()} returns empty objects of specified class in a character vector
+\verb{$to_string()} returns empty objects of specified class in a character vector
 format. It is formatted exactly the same as in IDF Editor.
 
-\code{$print()} prints basic info ob current Idd object, including version, build
+\verb{$print()} prints basic info ob current Idd object, including version, build
 tag and total class number.
 }
 

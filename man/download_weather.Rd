@@ -4,8 +4,14 @@
 \alias{download_weather}
 \title{Download EnergyPlus Weather File (EPW) and Design Day File (DDY)}
 \usage{
-download_weather(pattern, filename = NULL, dir = ".", type = c("all",
-  "epw", "ddy"), ask = TRUE, max_match = 3)
+download_weather(
+  pattern,
+  filename = NULL,
+  dir = ".",
+  type = c("all", "epw", "ddy"),
+  ask = TRUE,
+  max_match = 3
+)
 }
 \arguments{
 \item{pattern}{A regular expression used to search locations, e.g. \code{"los angeles.*tmy3"}. The search is case-insensitive.}

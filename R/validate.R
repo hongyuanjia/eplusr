@@ -93,7 +93,7 @@ exclude_invalid <- function (env_in, invalid, on) {
 #' Default: `FALSE`.
 #' @param required_field Check if all required fields have values. Default:
 #' `FALSE`.
-#' @param autofield Check if all fields with value `"Autosize"` and
+#' @param auto_field Check if all fields with value `"Autosize"` and
 #' `"Autocalculate"` are valid or not. Default: `FALSE`.
 #' @param type Check if all fields have values with valid types, i.e. 
 #' character, numeric and integer fields should be filled with corresponding
@@ -115,7 +115,7 @@ exclude_invalid <- function (env_in, invalid, on) {
 # custom_validate {{{
 custom_validate <- function (
     required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
-    extensible = FALSE, required_field = FALSE, autofield = FALSE,
+    extensible = FALSE, required_field = FALSE, auto_field = FALSE,
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
@@ -125,7 +125,7 @@ custom_validate <- function (
         is_flag(unique_name),
         is_flag(extensible),
         is_flag(required_field),
-        is_flag(autofield),
+        is_flag(auto_field),
         is_flag(type),
         is_flag(choice),
         is_flag(range),
@@ -138,7 +138,7 @@ custom_validate <- function (
         unique_name = unique_name,
         extensible = extensible,
         required_field = required_field,
-        autofield = autofield,
+        auto_field = auto_field,
         type = type,
         choice = choice,
         range = range,
@@ -155,15 +155,15 @@ custom_validate <- function (
 #'
 #' @param level Should be one of `"none"`, `"draft"`, `"final"` or an output of
 #' [custom_validate()].
-#' @return A named list with nine element, e.g. `required_object`,
-#' `unique_object`, `unique_name`, `extensible`, `required_field`, `autofield`,
+#' @return A named list with 10 elements, e.g. `required_object`,
+#' `unique_object`, `unique_name`, `extensible`, `required_field`, `auto_field`,
 #' `type`, `choice`, `range` and `reference`. For the meaning of each validation
 #' component, see[custom_validate()].
 #' @export
 #' @examples
 #' level_checks("draft")
 #' level_checks("final")
-#' level_checks(custom_validate(autofield = TRUE))
+#' level_checks(custom_validate(auto_field = TRUE))
 #' level_checks(eplusr_option("validate_level"))
 #' @export
 # level_checks {{{
@@ -174,13 +174,13 @@ level_checks <- function (level = eplusr_option("validate_level")) {
             custom_validate()
         } else if (level == "draft") {
             custom_validate(
-                autofield = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,
+                auto_field = TRUE, type = TRUE, unique_name = TRUE, choice = TRUE,
                 range = TRUE
             )
         } else if (level == "final"){
             custom_validate(
                 required_object = TRUE, unique_object = TRUE, unique_name = TRUE,
-                extensible = TRUE, required_field = TRUE, autofield = TRUE,
+                extensible = TRUE, required_field = TRUE, auto_field = TRUE,
                 type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
             )
         }
@@ -193,7 +193,7 @@ level_checks <- function (level = eplusr_option("validate_level")) {
             unique_name = level$unique_name,
             extensible = level$extensible,
             required_field = level$required_field,
-            autofield = level$autofield,
+            auto_field = level$auto_field,
             type = level$type,
             choice = level$choice,
             range = level$range,
@@ -221,7 +221,7 @@ validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NU
         unique_name = level$unique_name,
         extensible = level$extensible,
         required_field = level$required_field,
-        autofield = level$autofield,
+        auto_field = level$auto_field,
         type = level$type,
         choice = level$choice,
         range = level$range,
@@ -248,7 +248,7 @@ validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NU
 # @param extensible Whether to check if there are incomplete extensible.
 # @param required_field Whether to check if there are missing value for
 #        required fields.
-# @param autofield Whether to check if there are non-autosizable or
+# @param auto_field Whether to check if there are non-autosizable or
 #        non-autocalculatable fields that are assigned "autosize" or
 #        "autocalculate".
 # @param type Whether to check if there are input values whose type are not
@@ -263,7 +263,7 @@ validate_objects <- function
 (
     idd_env, idf_env, dt_object = NULL, dt_value = NULL,
     required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
-    extensible = FALSE, required_field = FALSE, autofield = FALSE,
+    extensible = FALSE, required_field = FALSE, auto_field = FALSE,
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
@@ -300,11 +300,11 @@ validate_objects <- function
     cols_add <- character(0)
     if (isTRUE(extensible)) cols_add <- c(cols_add, "extensible_group")
     if (isTRUE(required_field)) cols_add <- c(cols_add, "required_field")
-    if (isTRUE(autofield)) cols_add <- c(cols_add, "autosizable", "autocalculatable")
+    if (isTRUE(auto_field)) cols_add <- c(cols_add, "autosizable", "autocalculatable")
     if (isTRUE(choice)) cols_add <- c(cols_add, "choice")
     if (isTRUE(range)) cols_add <- c(cols_add, "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds")
     # to exclude empty fields
-    if (isTRUE(autofield) || isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
+    if (isTRUE(auto_field) || isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
         cols_add <- c(cols_add, "required_field")
     }
     # to exclude auto fields
@@ -339,11 +339,11 @@ validate_objects <- function
     if (isTRUE(required_field)) check_missing_value(idd_env, idf_env, env_in)
 
     # exclude unrequired empty fields
-    if (isTRUE(autofield) || isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
+    if (isTRUE(auto_field) || isTRUE(type) || isTRUE(choice) || isTRUE(range) || isTRUE(reference)) {
         exclude_empty_field(idd_env, idf_env, env_in)
     }
 
-    if (isTRUE(autofield)) {
+    if (isTRUE(auto_field)) {
         check_invalid_autosize(idd_env, idf_env, env_in)
         check_invalid_autocalculate(idd_env, idf_env, env_in)
     }

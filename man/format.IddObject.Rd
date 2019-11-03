@@ -4,8 +4,7 @@
 \alias{format.IddObject}
 \title{Format an IddObject}
 \usage{
-\method{format}{IddObject}(x, comment = NULL, leading = 4L,
-  sep_at = 29L, all = FALSE, ...)
+\method{format}{IddObject}(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
 \item{x}{An \link{IddObject} object.}

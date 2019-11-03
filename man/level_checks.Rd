@@ -11,8 +11,8 @@ level_checks(level = eplusr_option("validate_level"))
 \code{\link[=custom_validate]{custom_validate()}}.}
 }
 \value{
-A named list with nine element, e.g. \code{required_object},
-\code{unique_object}, \code{unique_name}, \code{extensible}, \code{required_field}, \code{autofield},
+A named list with 10 elements, e.g. \code{required_object},
+\code{unique_object}, \code{unique_name}, \code{extensible}, \code{required_field}, \code{auto_field},
 \code{type}, \code{choice}, \code{range} and \code{reference}. For the meaning of each validation
 component, see\code{\link[=custom_validate]{custom_validate()}}.
 }
@@ -24,6 +24,6 @@ contains.
 \examples{
 level_checks("draft")
 level_checks("final")
-level_checks(custom_validate(autofield = TRUE))
+level_checks(custom_validate(auto_field = TRUE))
 level_checks(eplusr_option("validate_level"))
 }

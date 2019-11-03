@@ -120,7 +120,7 @@ print(epw)
              longitude, time_zone, elevation)
 }
 
-\code{$location()} takes new values for \code{LOCATION} header fields and  returns the
+\verb{$location()} takes new values for \code{LOCATION} header fields and  returns the
 parsed values of \code{LOCATION} header in a list format. If no input is given,
 current \code{LOCATION} header value is returned.
 
@@ -134,21 +134,21 @@ current \code{LOCATION} header value is returned.
 \item \code{wmo_number}: A string of WMO (World Meteorological Organization) number
 recorded in the \code{LOCATION} header.
 \item \code{latitude}: A number of latitude recorded in the \code{LOCATION} header. North
-latitude is positive and south latitude is negative. Should in range \code{[-90, +90]}.
+latitude is positive and south latitude is negative. Should in range \verb{[-90, +90]}.
 \item \code{longitude}: A number of longitude recorded in the \code{LOCATION} header. East
 longitude is positive and west longitude is negative. Should in range
-\code{[-180, +180]}.
+\verb{[-180, +180]}.
 \item \code{time_zone}: A number of time zone recorded in the \code{LOCATION} header. Usually
-presented as the offset hours from UTC time. Should in range \code{[-12, +14]}.
+presented as the offset hours from UTC time. Should in range \verb{[-12, +14]}.
 \item \code{elevation}: A number of elevation recorded in the \code{LOCATION} header.
-Should in range \code{[-1000, 9999.9)}.
+Should in range \verb{[-1000, 9999.9)}.
 }
 }
 
 \subsection{DESIGN CONDITION Header}{\preformatted{epw$design_condition()
 }
 
-\code{$design_condition()} returns the parsed values of \code{DESIGN CONDITION} header in
+\verb{$design_condition()} returns the parsed values of \verb{DESIGN CONDITION} header in
 a list format with 4 elements:
 \itemize{
 \item \code{source}: A string of source field
@@ -163,7 +163,7 @@ For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
 \subsection{TYPICAL/EXTREME Header}{\preformatted{epw$typical_extreme_period()
 }
 
-\code{$typical_extreme_period()} returns the parsed values of \code{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
+\verb{$typical_extreme_period()} returns the parsed values of \verb{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
 columns:
 \itemize{
 \item \code{index}: Integer type. The index of typical or extreme period record
@@ -180,7 +180,7 @@ period
 \subsection{GROUND TEMPERATURE Header}{\preformatted{epw$ground_temperature()
 }
 
-\code{$ground_temperature()} returns the parsed values of \code{GROUND TEMPERATURE}
+\verb{$ground_temperature()} returns the parsed values of \verb{GROUND TEMPERATURE}
 header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
@@ -188,7 +188,7 @@ header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \item \code{month}: Integer type. The month when the ground temperature is measured
 \item \code{soil_conductivity}: Numeric type. The soil conductivity at measured depth
 \item \code{soil_density}: Numeric type. The soil density at measured depth
-\item \code{soil_specific heat}: Numeric type. The soil specific heat at measured depth
+\item \verb{soil_specific heat}: Numeric type. The soil specific heat at measured depth
 \item \code{temperature}: Numeric type. The measured group temperature
 }
 }
@@ -196,10 +196,10 @@ header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \subsection{HOLIDAYS/DAYLIGHT SAVINGS Header}{\preformatted{epw$holiday(leapyear, dst, holiday)
 }
 
-\code{$holiday()} takes new value for leap year indicator, daylight saving time
+\verb{$holiday()} takes new value for leap year indicator, daylight saving time
 and holiday specifications, set these new values and returns the parsed values
-of \code{HOLIDAYS/DAYLIGHT SAVINGS} header. If no input is given, current values
-of \code{HOLIDAYS/DAYLIGHT SAVINGS} header is returned. It returns a list of 3
+of \verb{HOLIDAYS/DAYLIGHT SAVINGS} header. If no input is given, current values
+of \verb{HOLIDAYS/DAYLIGHT SAVINGS} header is returned. It returns a list of 3
 elements:
 \itemize{
 \item \code{leapyear}: A single logical vector. \code{TRUE} means that the weather data
@@ -229,15 +229,15 @@ The date specifications in \code{dst} and \code{holiday} should follow the rules
 formats automatically. Basically, 5 formats are allowed:
 \enumerate{
 \item A single integer is interpreted as the Julian day of year. For example,
-\code{1}, \code{2}, \code{3} and \code{4} will be parsed and presented as \code{1st day}, \code{2nd day}, \code{3rd day} and \code{4th day}.
+\code{1}, \code{2}, \code{3} and \code{4} will be parsed and presented as \verb{1st day}, \verb{2nd day}, \verb{3rd day} and \verb{4th day}.
 \item A single number is interpreted as \code{Month.Day}. For example, \code{1.2} and \code{5.6}
-will be parsed and presented as \code{Jan 02} and \code{May 06}.
+will be parsed and presented as \verb{Jan 02} and \verb{May 06}.
 \item A string giving \code{MonthName / DayNumber}, \code{DayNumber / MonthName}, and
 \code{MonthNumber / DayNumber}. A year number can be also included. For
 example, \code{"Jan/1"}, \code{"05/Dec"}, \code{"7/8"}, \code{"02/10/2019"}, and
-\code{"2019/04/05"} will be parsed and presented as \code{Jan 02}, \code{Dec 06}, \code{Jul 8}, \code{2019-02-10} and \code{2019-04-15}.
-\item A string giving \code{number Weekday in Month}. For example, \code{"2 Sunday in Jan"} will be parsed and presented as \code{2th Sunday in January}.
-\item A string giving \code{Last Weekday in Month}. For example, \code{"last Sunday in Dec"} will be parsed and presented as \code{Last Sunday in December}.
+\code{"2019/04/05"} will be parsed and presented as \verb{Jan 02}, \verb{Dec 06}, \verb{Jul 8}, \code{2019-02-10} and \code{2019-04-15}.
+\item A string giving \verb{number Weekday in Month}. For example, \code{"2 Sunday in Jan"} will be parsed and presented as \verb{2th Sunday in January}.
+\item A string giving \verb{Last Weekday in Month}. For example, \code{"last Sunday in Dec"} will be parsed and presented as \verb{Last Sunday in December}.
 }
 
 For convenience, besides all the formats described above, \code{dst} and days in
@@ -261,7 +261,7 @@ specifications. For example:\preformatted{list(name = c("New Year's Day", "Chris
 epw$comment2(comment)
 }
 
-\code{$comment1()} and \code{$comment2()} both takes a single string of new comments
+\verb{$comment1()} and \verb{$comment2()} both takes a single string of new comments
 and replaces the old comment with input one. If no input is given, current
 comment is returned.
 
@@ -276,18 +276,18 @@ epw$interval()
 epw$period(period, name, start_day_of_week)
 }
 
-\code{$num_period()} returns a single positive integer of how many data periods
+\verb{$num_period()} returns a single positive integer of how many data periods
 current \code{Epw} contains.
 
-\code{$interval()} returns a single positive integer of how many records of weather
+\verb{$interval()} returns a single positive integer of how many records of weather
 data exist in one hour.
 
-\code{$period()} takes a data period index, a new period name and start day of
+\verb{$period()} takes a data period index, a new period name and start day of
 week specification, and uses that input to replace the data period's name and
 start day of week. If no input is given, data periods in current \code{Epw} is
 returned.
 
-\code{$period()} returns a \link[data.table:data.table]{data.table} with 5 columns:
+\verb{$period()} returns a \link[data.table:data.table]{data.table} with 5 columns:
 \itemize{
 \item \code{index}: Integer type. The index of data period.
 \item \code{name}: Character type. The name of data period.
@@ -316,22 +316,22 @@ epw$range_valid()
 epw$fill_action(type = c("missing", "out_of_range"))
 }
 
-\code{$missing_code()} returns a list of 29 elements containing the value used as
+\verb{$missing_code()} returns a list of 29 elements containing the value used as
 missing value identifier for all weather data.
 
-\code{$initial_missing_value()} returns a list of 16 elements containing the
+\verb{$initial_missing_value()} returns a list of 16 elements containing the
 initial value used to replace missing values for corresponding weather data.
 
-\code{$range_exist()} returns a list of 28 elements containing the range each
+\verb{$range_exist()} returns a list of 28 elements containing the range each
 numeric weather data should fall in. Any values out of this range are treated
 as missing.
 
-\code{$range_valid()} returns a list of 28 elements containing the range each
+\verb{$range_valid()} returns a list of 28 elements containing the range each
 numeric weather data should fall in. Any values out of this range are treated
 as invalid.
 
-\code{$fill_action()} returns a list containing \code{action}s that EnergyPlus and also
-\code{$fill_abnormal()} in \code{Epw} class will perform when certain abnormal data
+\verb{$fill_action()} returns a list containing \code{action}s that EnergyPlus and also
+\verb{$fill_abnormal()} in \code{Epw} class will perform when certain abnormal data
 found for corresponding weather data. There are 3 types of actions in total:
 \itemize{
 \item \code{do_nothing}: All abnormal values are left as they are.
@@ -354,15 +354,15 @@ epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
 epw$redundant_data()
 }
 
-\code{$data()} returns weather data of specific data period.
+\verb{$data()} returns weather data of specific data period.
 
 Usually, EPW file downloaded from \href{https://energyplus.net/}{EnergyPlus website}
 contains TMY weather data. As years of weather data is not consecutive, it may
 be more convenient to align the year values to be consecutive, which will
 makes it possible to direct analyze and plot weather data. The \code{start_year}
-argument in \code{$data()} method can help to achieve this. However, randomly
+argument in \verb{$data()} method can help to achieve this. However, randomly
 setting the \code{year} may result in a date time series that does not have the
-same start day of week as specified in the \code{DATA PERIODS} header. eplusr
+same start day of week as specified in the \verb{DATA PERIODS} header. eplusr
 provides a simple solution for this. By setting \code{year} to \code{NULL} and
 \code{align_wday} to \code{TRUE}, eplusr will calculate a year value (from current year
 backwards) for each data period that compliance with the start day of week
@@ -376,30 +376,30 @@ year but input \code{start_year} is not a leap year. An error will also be issue
 if applying specified time zone specified using \code{tz} introduces invalid date
 time.
 
-\code{$abnormal_data()} returns abnormal data of specific data period. Basically,
+\verb{$abnormal_data()} returns abnormal data of specific data period. Basically,
 there are 2 types of abnormal data in \code{Epw}, i.e. missing values and
 out-of-range values. Sometimes, it may be useful to extract and inspect those
-data especially when inserting measured weather data. \code{$abnormal_data()}
+data especially when inserting measured weather data. \verb{$abnormal_data()}
 does this.
 
-\code{$redundant_data()} returns weather data in \code{Epw} object that do not belong
-to any data period. This data can be further removed using \code{$pruge()} method
+\verb{$redundant_data()} returns weather data in \code{Epw} object that do not belong
+to any data period. This data can be further removed using \verb{$pruge()} method
 described below.
 
-For \code{$abnormal_data()} and \code{$redundant_data()}, a new column named \code{line} is
+For \verb{$abnormal_data()} and \verb{$redundant_data()}, a new column named \code{line} is
 created indicating the line numbers where abnormal data and redundant data
 occur in the actual EPW file.
 
 \strong{Arguments}:
 \itemize{
 \item \code{period}: A single positive integer identifying the data period index. Data
-periods information can be obtained using \code{$period()} described above.
+periods information can be obtained using \verb{$period()} described above.
 \item \code{start_year}: A positive integer identifying the year of first date time in
 specified data period. If \code{NULL}, the values in the \code{year} column are used
 as years of \code{datetime} column. Default: \code{NULL}.
 \item \code{align_wday}: Only applicable when \code{start_year} is \code{NULL}. If \code{TRUE}, a
 year value is automatically calculated for specified data period that
-compliance with the start day of week value specified in \code{DATA PERIODS}
+compliance with the start day of week value specified in \verb{DATA PERIODS}
 header.
 \item \code{tz}: A valid time zone to be assigned to the \code{datetime} column. All valid
 time zone names can be obtained using \code{OlsonNames()}. Default:\code{"UTC"}.
@@ -426,47 +426,47 @@ epw$purge()
 }
 
 \strong{Note} that all these 5 methods modify the weather data in-place, meaning
-that the returned data from \code{$data()} and \code{$abnormal_data()} may be different
+that the returned data from \verb{$data()} and \verb{$abnormal_data()} may be different
 after calling these methods.
 
-\code{$make_na()} converts specified abnormal data into \code{NA}s in specified data
+\verb{$make_na()} converts specified abnormal data into \code{NA}s in specified data
 period. This makes it easier to find abnormal data directly using \code{is.na()}
-instead of using \code{$missing_code()}.
+instead of using \verb{$missing_code()}.
 
-\code{$fill_abnormal()} fills specified abnormal data using corresponding actions
-listed in \code{$fill_action()}. For what kinds of actions to be performed, please
-see \code{$fill_action()} method described above. Note that only if \code{special} is
-\code{TRUE}, special actions listed in \code{$fill_action()} is performed. If \code{special}
+\verb{$fill_abnormal()} fills specified abnormal data using corresponding actions
+listed in \verb{$fill_action()}. For what kinds of actions to be performed, please
+see \verb{$fill_action()} method described above. Note that only if \code{special} is
+\code{TRUE}, special actions listed in \verb{$fill_action()} is performed. If \code{special}
 is \code{FALSE}, all abnormal data, including both missing values and out-of-range
 values, are filled with corresponding missing codes.
 
-\code{$make_na()} and \code{$fill_abnormal()} are reversible, i.e. \code{$make_na()} can be
-used to counteract the effects introduced by \code{$fill_abnormal()}, and vise a
+\verb{$make_na()} and \verb{$fill_abnormal()} are reversible, i.e. \verb{$make_na()} can be
+used to counteract the effects introduced by \verb{$fill_abnormal()}, and vise a
 versa.
 
-\code{$add_unit()} assigns units to numeric weather data using
+\verb{$add_unit()} assigns units to numeric weather data using
 \code{\link[units:set_units]{units::set_units()}} if applicable.
 
-\code{$drop_unit()} removes all units of numeric weather data.
+\verb{$drop_unit()} removes all units of numeric weather data.
 
-Similarly, \code{$add_unit()} and \code{$drop_unit()} are reversible, i.e.
-\code{$add_unit()} can be used to counteract the effects introduced by
-\code{$drop_unit()}, and vise a versa.
+Similarly, \verb{$add_unit()} and \verb{$drop_unit()} are reversible, i.e.
+\verb{$add_unit()} can be used to counteract the effects introduced by
+\verb{$drop_unit()}, and vise a versa.
 
-\code{$purge()} deletes weather data in \code{Epw} object that do not belong to any
+\verb{$purge()} deletes weather data in \code{Epw} object that do not belong to any
 data period.
 
 \strong{Arguments}:
 \itemize{
 \item \code{period}: A positive integer vector identifying the data period indexes.
-Data periods information can be obtained using \code{$period()} described
+Data periods information can be obtained using \verb{$period()} described
 above. If \code{NULL}, all data periods are included. Default: \code{NULL}.
 \item \code{missing}: If \code{TRUE}, missing values are included. Default: \code{FALSE}.
 \item \code{out_of_range}: If \code{TRUE}, out-of-range values are included. Default:
 \code{FALSE}.
 \item \code{special}: If \code{TRUE}, abnormal data are filled using corresponding actions
-listed \code{$fill_action()}. If \code{FALSE}, all abnormal data are fill with
-missing code described in \code{$missing_code()}.
+listed \verb{$fill_action()}. If \code{FALSE}, all abnormal data are fill with
+missing code described in \verb{$missing_code()}.
 }
 }
 
@@ -476,10 +476,10 @@ epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 
 epw$del(period)
 }
 
-\code{$add()} adds a new data period into current \code{Epw} object at specified
+\verb{$add()} adds a new data period into current \code{Epw} object at specified
 position.
 
-\code{$set()} replaces existing data period using input new weather data.
+\verb{$set()} replaces existing data period using input new weather data.
 
 The validity of input data is checked before adding or setting according to
 rules following:
@@ -499,7 +499,7 @@ be created according to values in the \code{datetime} column. Existing values
 will be overwritten.
 }
 
-\code{$del(period)} removes one specified data period.
+\verb{$del(period)} removes one specified data period.
 
 \strong{Arguments}:
 \itemize{
@@ -528,11 +528,11 @@ data are found. Default: \code{TRUE}.
 epw$save(path, overwrite = FALSE, purge = FALSE)
 }
 
-\code{$is_unsaved()} returns \code{TRUE} if there are any modifications to the \code{Epw}
+\verb{$is_unsaved()} returns \code{TRUE} if there are any modifications to the \code{Epw}
 object since it was saved or since it was created if not saved before.
 
-\code{$save()} saves current \code{Epw} to an EPW file. Note that if missing values and
-out-of-range values are converted to \code{NA}s using \code{$make_na()}, they will be
+\verb{$save()} saves current \code{Epw} to an EPW file. Note that if missing values and
+out-of-range values are converted to \code{NA}s using \verb{$make_na()}, they will be
 filled with corresponding missing codes during saving.
 
 \strong{Arguments}
@@ -549,11 +549,11 @@ weather file itself is used. Default: \code{NULL}.
 \preformatted{epw$clone(deep = TRUE)
 }
 
-\code{$clone()} copies and returns the cloned \code{Epw} object. Because \code{Epw} uses
+\verb{$clone()} copies and returns the cloned \code{Epw} object. Because \code{Epw} uses
 \code{R6Class} under the hook which has "modify-in-place" semantics, \code{epw_2 <- epw_1} does not copy \code{epw_1} at all but only create a new binding to \code{epw_1}.
 Modify \code{epw_1} will also affect \code{epw_2} as well, as these two are exactly the
 same thing underneath. In order to create a complete cloned copy, please use
-\code{$clone(deep = TRUE)}.
+\verb{$clone(deep = TRUE)}.
 
 \strong{Arguments}
 \itemize{
@@ -567,7 +567,7 @@ same thing underneath. In order to create a complete cloned copy, please use
 print(epw)
 }
 
-\code{$print()} prints the \code{Epw} object, including location, elevation, data
+\verb{$print()} prints the \code{Epw} object, including location, elevation, data
 source, WMO station, leap year indicator, interval and data periods.
 }
 

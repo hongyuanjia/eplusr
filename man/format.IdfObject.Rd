@@ -4,8 +4,7 @@
 \alias{format.IdfObject}
 \title{Format an IdfObject}
 \usage{
-\method{format}{IdfObject}(x, comment = TRUE, leading = 4L,
-  sep_at = 29L, all = FALSE, ...)
+\method{format}{IdfObject}(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
 \item{x}{An \link{IdfObject} object.}

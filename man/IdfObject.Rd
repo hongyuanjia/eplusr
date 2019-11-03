@@ -8,7 +8,7 @@
 \code{IdfObject} is an abstraction of a single object in an \link{Idf}. It provides
 more detail methods to modify object values and comments. An \code{IdfObject}
 object can be created using function \code{\link[=idf_object]{idf_object()}} or from methods of a
-parent \link{Idf} object, using \code{$object()}, \code{$objects_in_class()} and equivalent.
+parent \link{Idf} object, using \verb{$object()}, \verb{$objects_in_class()} and equivalent.
 }
 \section{Usage}{
 
@@ -59,19 +59,19 @@ idfobj$group_name()
 idfobj$class_name()
 }
 
-\code{$version()} returns the version of parent \link{Idf} object in a
+\verb{$version()} returns the version of parent \link{Idf} object in a
 \link[base:numeric_version]{numeric_version} format.
 
-\code{$parent()} returns the parent \link{Idf} object.
+\verb{$parent()} returns the parent \link{Idf} object.
 
-\code{$id()} returns current \code{IdfObject} ID.
+\verb{$id()} returns current \code{IdfObject} ID.
 
-\code{$name()} returns current \code{IdfObject} name. If the class does not have name
+\verb{$name()} returns current \code{IdfObject} name. If the class does not have name
 attribute, \code{NA} is returned.
 
-\code{$group_name()} returns the group name of current \link{IdfObject} belongs to.
+\verb{$group_name()} returns the group name of current \link{IdfObject} belongs to.
 
-\code{$class_name()} returns the class name of current \link{IdfObject} belongs to.
+\verb{$class_name()} returns the class name of current \link{IdfObject} belongs to.
 
 \strong{Arguments}:
 \itemize{
@@ -85,7 +85,7 @@ attribute, \code{NA} is returned.
 \preformatted{idfobj$definition()
 }
 
-\code{$definition()} returns an \link{IddObject} of current class. \link{IddObject} contains
+\verb{$definition()} returns an \link{IddObject} of current class. \link{IddObject} contains
 all data used for parsing and creating an \link{IdfObject}. For details, please
 see \link{IddObject} class.
 }
@@ -94,7 +94,7 @@ see \link{IddObject} class.
 \preformatted{idfobj$comment(comment, append = TRUE, width = 0L)
 }
 
-\code{$comment()} returns current \code{IdfObject} comment if \code{comment} is not given,
+\verb{$comment()} returns current \code{IdfObject} comment if \code{comment} is not given,
 or modifies current \code{IdfObject} comment if \code{comment} is given.
 
 \strong{Arguments}
@@ -127,17 +127,17 @@ idfobj$FieldName
 idfobj[[Field]]
 }
 
-\code{$value()} takes an integer vector of valid field indexes or a character
+\verb{$value()} takes an integer vector of valid field indexes or a character
 vector of valid field names, and returns a named list containing values of
 specified fields when \code{simplify} is \code{FALSE} and a character vector when
 \code{simplify} is \code{TRUE}.
 
-eplusr also provides custom S3 method of \code{$} and \code{[[} which make
+eplusr also provides custom S3 method of \verb{$} and \code{[[} which make
 it more convenient to get a single value of current \code{IdfObject}. Basically,
 \code{idfobj$FieldName} and \code{idfobj[[Field]]} is equivalent to
 \code{idfobj$value(FieldName)[[1]]} and \code{idfobj$value(Field)[[1]]}.
 
-\code{$possible_value()} takes an integer vector of valid field indexes or a character
+\verb{$possible_value()} takes an integer vector of valid field indexes or a character
 vector of valid field names, and returns all possible values for specified
 fields. For a specific field, there are 5 types of possible values:
 \itemize{
@@ -154,7 +154,7 @@ also be retrieved using \code{idfobj$definition()$field_range()}.
 \item \code{source}: All values from other objects that current field can refer to.
 }
 
-\code{$value_possible()} returns an \code{IdfValuePossible} object which is a
+\verb{$value_possible()} returns an \code{IdfValuePossible} object which is a
 \link[data.table:data.table]{data.table} with at most 15 columns:
 \itemize{
 \item \code{class_id}: index of class that current \code{IdfObject} belongs to
@@ -219,11 +219,11 @@ idfobj$FieldName <- Value
 idfobj[[Field]] <- Value
 }
 
-\code{$set()} takes new field value definitions in \code{field = value} format or in a
+\verb{$set()} takes new field value definitions in \code{field = value} format or in a
 single list format, sets new values for fields specified, and returns the
-modified \link{IdfObject}. Unlike \code{$set()} method in \link{Idf} class, the special
+modified \link{IdfObject}. Unlike \verb{$set()} method in \link{Idf} class, the special
 element \code{.comment} is \strong{not allowed}. To modify object comments, please use
-\code{$comment()}.
+\verb{$comment()}.
 
 \strong{Note}:
 \itemize{
@@ -240,15 +240,15 @@ fields by setting \code{.empty} to \code{TRUE}.
 will be automatically added on the fly.
 \item Field name matching is \strong{case-insensitive}. For convenience,
 underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
-equivalent to \code{End Month}.
+equivalent to \verb{End Month}.
 \item If not all field names are given, positions of those values without field
 names are determined after those values with names. E.g. in
 \code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
-will be treated as the value of field \code{Outside Layer} in \code{Construction}, as
+will be treated as the value of field \verb{Outside Layer} in \code{Construction}, as
 value of field \code{Name} has been given as \code{"name"}.
 }
 
-eplusr also provides custom S3 method of \code{$<-} and
+eplusr also provides custom S3 method of \verb{$<-} and
 \code{[[<-} which makes it more convenient to set a single field value of an
 \code{IdfObject}. Basically, \code{idfobj$FieldName <- value} and \code{idfobj[[Field]]
 <- value} is equivalent to \code{idfobj$set(FieldName = value)} and
@@ -286,59 +286,59 @@ idfobj$has_ref_node(which = NULL, class = NULL)
 idfobj$has_ref(which)
 }
 
-Many fields in \link{Idd} can be referred by others. For example, the \code{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
+Many fields in \link{Idd} can be referred by others. For example, the \verb{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
 in \code{Material} class and other material related classes. Here it means that
-the \code{Outside Layer} field \strong{refers to} the \code{Name} field and the \code{Name} field
-is \strong{referred by} the \code{Outside Layer}. In EnergyPlus, there is also a
+the \verb{Outside Layer} field \strong{refers to} the \code{Name} field and the \code{Name} field
+is \strong{referred by} the \verb{Outside Layer}. In EnergyPlus, there is also a
 special type of field called \code{Node}, which together with \code{Branch} and
 \code{BranchList} define the topography of the HVAC connections. A outlet node of
 a component can be referred by another component as its inlet node, but can
 also exists independently, such as zone air node.
 
-\code{$value_relation()} provides a simple interface to get this kind of
+\verb{$value_relation()} provides a simple interface to get this kind of
 relation. It takes field indexes or field names, together a relation
 direction, and returns an \code{IdfRelation} object which contains data presenting
 such relation described above. For instance, if
 \code{idfobj$value_relation("Name", "ref_by")} gives results below:\preformatted{-- Referred by Others ------------------------
-  \- 1: "WALL-1";      !- Name
+  \\- 1: "WALL-1";      !- Name
      ^~~~~~~~~~~~~~~~~~~~~~~~~
-     \- Class: <BuildingSurface:Detailed>
-        \- Object [ID:3] <WALL-1PF>
-           \- 3: "WALL-1";      !- Construction Name
+     \\- Class: <BuildingSurface:Detailed>
+        \\- Object [ID:3] <WALL-1PF>
+           \\- 3: "WALL-1";      !- Construction Name
 }
 
 This means that the value \code{"WALL-1"} of field \code{Name} is referred by field
-\code{Construction Name} in a surface named \code{WALL-1PF}. All those objects can be
-futher easily extracted using \code{$ref_by_object()} method.
+\verb{Construction Name} in a surface named \verb{WALL-1PF}. All those objects can be
+futher easily extracted using \verb{$ref_by_object()} method.
 
-Note that \code{$value_relation()} shows all fields specified, even some of them
+Note that \verb{$value_relation()} shows all fields specified, even some of them
 may do not have relation.
 
-\code{$ref_to_object()} takes an integer vector of field indexes or a character
+\verb{$ref_to_object()} takes an integer vector of field indexes or a character
 vector of field names, and returns a list of \code{IdfObject}s that specified
 fields refer to.
 
-\code{$ref_by_object()} takes an integer vector of field indexes or a character
+\verb{$ref_by_object()} takes an integer vector of field indexes or a character
 vector of field names, and returns a list of \code{IdfObject}s that refer to
 specified fields.
 
-\code{$ref_to_node()} takes an integer vector of field indexes or a character
+\verb{$ref_to_node()} takes an integer vector of field indexes or a character
 vector of field names, and returns a list of \code{IdfObject}s whose nodes are
 referred by specified fields.
 
-\code{$has_ref_to()} takes an integer vector of field indexes or a character
+\verb{$has_ref_to()} takes an integer vector of field indexes or a character
 vector of field names, and returns a logical vector showing whether specified
 fields refer to other object values or not.
 
-\code{$has_ref_by()} takes an integer vector of field indexes or a character
+\verb{$has_ref_by()} takes an integer vector of field indexes or a character
 vector of field names, and returns a logical vector showing whether there are
 other object values ref to specified fields.
 
-\code{$has_ref_node()} takes an integer vector of field indexes or a character
+\verb{$has_ref_node()} takes an integer vector of field indexes or a character
 vector of field names, and returns a logical vector showing whether specified
 fields refer to other objects' nodes.
 
-\code{$has_ref()} takes an integer vector of field indexes or a character
+\verb{$has_ref()} takes an integer vector of field indexes or a character
 vector of field names, and returns a logical vector showing whether there are
 other object values ref to specified field values or specified field values
 refer to other object values or specified field values refer to other
@@ -366,7 +366,7 @@ relations are returned. Default: \code{1}.
 idfobj$is_valid(level = eplusr_option("validate_level"))
 }
 
-\code{$validate()} checks if there are errors in values in current \code{IdfObject}
+\verb{$validate()} checks if there are errors in values in current \code{IdfObject}
 under specified validation level and returns an \code{IdfValidity} object which
 contains data of invalid field values. Different validation result examples
 are shown below:
@@ -383,25 +383,25 @@ validation checks in specified validation level.
    Fields below cannot be `autocalculate`:
 
     Class: <AirTerminal:SingleDuct:VAV:Reheat>
-    \- Object [ID:176] <SPACE5-1 VAV Reheat>
-       +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-       \- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
+    \\- Object [ID:176] <SPACE5-1 VAV Reheat>
+       +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat \{m3/s-m2\}
+       \\- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
 }
 }
 
 Above validation results show that after all validation components performed
 under current validation level, 2 invalid field values are found. All of them
-are in object named \code{SPACE5-1 VAV Reheat} with ID \code{176}. They are invalid
+are in object named \verb{SPACE5-1 VAV Reheat} with ID \code{176}. They are invalid
 because those two fields do not have an autocalculatable attribute but are
 given \code{AUTOCALCULATE} value. Knowing this info, one simple way to fix the
-error is to set those two fields to correct value by doing \code{idf$set(..176 = list(}Maximum Flow per Zone Floor Area During Reheat\code{= "autosize",}Maximum Flow Fraction During Reheat\code{ = "autosize" ))}
+error is to set those two fields to correct value by doing \verb{idf$set(..176 = list(}Maximum Flow per Zone Floor Area During Reheat\verb{= "autosize",}Maximum Flow Fraction During Reheat\verb{ = "autosize" ))}
 
-\code{$is_valid()} returns \code{TRUE} if there is no error in current \code{IdfObject}
+\verb{$is_valid()} returns \code{TRUE} if there is no error in current \code{IdfObject}
 object under specified validation level and \code{FALSE} otherwise.
 
-Underneath, an \code{IdfValidity} object which \code{$validate()} returns is a list of
+Underneath, an \code{IdfValidity} object which \verb{$validate()} returns is a list of
 13 element. For details about the underlying structure of \code{IdfValidity},
-please \code{$validate()} in \link{Idf} class.
+please \verb{$validate()} in \link{Idf} class.
 }
 
 \section{Data Extraction}{
@@ -409,7 +409,7 @@ please \code{$validate()} in \link{Idf} class.
 idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
 }
 
-\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
 core data of current \link{IdfObject}. It has 6 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
@@ -421,7 +421,7 @@ core data of current \link{IdfObject}. It has 6 columns:
 \code{string_value} is \code{FALSE.} Field values.
 }
 
-\code{$to_string()} returns the text format of an \code{IdfObject}.
+\verb{$to_string()} returns the text format of an \code{IdfObject}.
 
 \strong{Arguments}:
 \itemize{
@@ -451,15 +451,15 @@ Default: \code{29L} which is the same as IDF Editor.
 print(idfobj)
 }
 
-\code{$print()} prints the \code{IdfObject}. Basically, the print output can be divided
+\verb{$print()} prints the \code{IdfObject}. Basically, the print output can be divided
 into 3 parts:
 \itemize{
 \item OBJECT: Class name, object id and name (if applicable).
 \item COMMENTS: Object comments if exist.
 \item VALUES: fields and values of current \code{IdfObject}. Required fields are marked
-with start \code{*}. String values are quoted. Numeric values are printed as
-they are. Blank string values are printed as \code{<"Blank">} and blank number
-values are printed as \code{<Blank>}.
+with start \verb{*}. String values are quoted. Numeric values are printed as
+they are. Blank string values are printed as \verb{<"Blank">} and blank number
+values are printed as \verb{<Blank>}.
 }
 
 \strong{Arguments}

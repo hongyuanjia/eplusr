@@ -7,9 +7,12 @@
 \usage{
 rdd_to_load(rdd, key_value, reporting_frequency)
 
-mdd_to_load(mdd, reporting_frequency, class = c("Output:Meter",
-  "Output:Meter:MeterFileOnly", "Output:Meter:Cumulative",
-  "Output:Meter:Cumulative:MeterFileOnly"))
+mdd_to_load(
+  mdd,
+  reporting_frequency,
+  class = c("Output:Meter", "Output:Meter:MeterFileOnly", "Output:Meter:Cumulative",
+    "Output:Meter:Cumulative:MeterFileOnly")
+)
 }
 \arguments{
 \item{rdd, mdd}{A \code{RddFile} object created using \code{\link[=read_rdd]{read_rdd()}} and a \code{MddFile}
@@ -47,7 +50,7 @@ attribute named \code{eplus_version} extracted from the original \code{RddFile} 
 \description{
 \code{rdd_to_load()} and \code{mdd_to_load()} takes a \code{RddFile} and \code{MddFile} object
 respectively and format it into a \link[data.table:data.table]{data.table} in
-acceptable format for \code{$load()} method in \link{Idf} class.
+acceptable format for \verb{$load()} method in \link{Idf} class.
 }
 \examples{
 \dontrun{

@@ -31,8 +31,8 @@ validation is performed when creating, which means that an error may occur if
 current \link[=level_checks]{validate level} does not allow empty required fields.
 
 The empty \link{IdfObject} is directly added into the parent \link{Idf} object. It is
-recommended to use \code{$validate()} method in \link{IdfObject} to see what kinds of
-further modifications are needed for those empty fields and use \code{$set()}
+recommended to use \verb{$validate()} method in \link{IdfObject} to see what kinds of
+further modifications are needed for those empty fields and use \verb{$set()}
 method to set field values.
 }
 \examples{

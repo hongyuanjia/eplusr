@@ -4,9 +4,15 @@
 \alias{as.character.Idf}
 \title{Coerce an Idf object into a Character Vector}
 \usage{
-\method{as.character}{Idf}(x, comment = TRUE, header = TRUE,
-  format = eplusr_option("save_format"), leading = 4L, sep_at = 29L,
-  ...)
+\method{as.character}{Idf}(
+  x,
+  comment = TRUE,
+  header = TRUE,
+  format = eplusr_option("save_format"),
+  leading = 4L,
+  sep_at = 29L,
+  ...
+)
 }
 \arguments{
 \item{x}{An \link{Idf} object.}
@@ -16,7 +22,7 @@
 \item{header}{If \code{FALSE}, the header will not be included. Default: \code{TRUE}.}
 
 \item{format}{Specific format used when formatting. For details, please see
-\code{$save()}. Default: \code{eplusr_option("save_format")}}
+\verb{$save()}. Default: \code{eplusr_option("save_format")}}
 
 \item{leading}{Leading spaces added to each field. Default: \code{4L}.}
 
