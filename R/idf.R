@@ -1217,6 +1217,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of inserted [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # insert all material from another IDF
         #' path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneTDV.idf")
         #' idf2 <- Idf$new(path_idf2)
@@ -1224,6 +1225,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # insert objects from same Idf is equivalent to using Idf$dup()
         #' idf$insert(idf$SizingPeriod_DesignDay)
+        #' }
         #'
         insert = function (..., .unique = TRUE, .empty = FALSE)
             idf_insert(self, private, ..., .unique = .unique, .empty = .empty),

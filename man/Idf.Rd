@@ -423,6 +423,7 @@ idf$rename(on_off = "on/off", test_352a = 51)
 ## Method `Idf$insert`
 ## ------------------------------------------------
 
+\dontrun{
 # insert all material from another IDF
 path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneTDV.idf")
 idf2 <- Idf$new(path_idf2)
@@ -430,6 +431,7 @@ idf$insert(idf2$Material)
 
 # insert objects from same Idf is equivalent to using Idf$dup()
 idf$insert(idf$SizingPeriod_DesignDay)
+}
 
 
 ## ------------------------------------------------
@@ -2266,13 +2268,15 @@ A named list of inserted \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# insert all material from another IDF
+\preformatted{\dontrun{
+# insert all material from another IDF
 path_idf2 <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5ZoneTDV.idf")
 idf2 <- Idf$new(path_idf2)
 idf$insert(idf2$Material)
 
 # insert objects from same Idf is equivalent to using Idf$dup()
 idf$insert(idf$SizingPeriod_DesignDay)
+}
 
 }
 \if{html}{\out{</div>}}
