@@ -1314,7 +1314,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # cannot delete objects that are referred by others
         #' level_checks()$reference # reference-checking is enable by default
-        #' \donotrun{idf$del("r13layer")} # error
+        #' \dontrun{idf$del("r13layer")} # error
         #'
         #' # force to delete objects even thay are referred by others
         #' idf$del("r13layer", .force = TRUE)
