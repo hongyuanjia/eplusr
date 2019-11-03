@@ -109,6 +109,7 @@
   (#111).
 * Fix the error in `$ref_to_node()` when no objects in specified class is found
   (#110).
+* Now `leading` and `sep_at` argument work as expected in `Idf$to_string()` (#160).
 
 ## Minor changes
 
