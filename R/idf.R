@@ -170,6 +170,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         # }}}
 
         # group_name {{{
+        #' @description
+        #' Get names of groups
+        #'
         #' @details
         #' `$group_name()` returns names of groups current `Idf` contains or
         #' the underlying [Idd] object contains.
@@ -199,6 +202,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         # }}}
 
         # class_name {{{
+        #' @description
+        #' Get names of classes
+        #'
         #' @details
         #' `$class_name()` returns names of classes current `Idf` contains or
         #' the underlying [Idd] object contains.

@@ -847,6 +847,7 @@ Idf$new("Version, 8.8;\\n")$path()
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-group_name"></a>}}
 \subsection{Method \code{group_name()}}{
+Get names of groups
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$group_name(all = FALSE, sorted = TRUE)}\if{html}{\out{</div>}}
 }
@@ -893,6 +894,7 @@ idf$group_name(all = TRUE)
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-class_name"></a>}}
 \subsection{Method \code{class_name()}}{
+Get names of classes
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$class_name(all = FALSE, sorted = TRUE, by_group = FALSE)}\if{html}{\out{</div>}}
 }
