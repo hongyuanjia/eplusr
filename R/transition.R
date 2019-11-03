@@ -3411,7 +3411,7 @@ trans_table_convert <- function (path, ascending = c(TRUE, TRUE)) {
     setnames(dt_vars, paste0("var", seq.int(ncol(dt_vars))))
 
     # read tabular data and change it to one row matrix
-    table <- matrix(t(as.matrix(fread(path, skip = 1 + num_vars, header = FALSE))), nrow = 1L)
+    table <- matrix(t(as.matrix(fread(path, skip = 1 + num_vals, header = FALSE))), nrow = 1L)
     # add value column
     dt_vars[, value := as.vector(table)]
 
