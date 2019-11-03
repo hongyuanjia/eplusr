@@ -3398,7 +3398,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
 
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
         property = c("units", "ip_units", "type_enum"),
-        align = align, complete = TRUE, all = all)[
+        align = align, complete = TRUE, all = all, ignore_case = TRUE)[
         , .SD, .SDcols = c("rleid", cols)]
 
     if ((all || wide) && length(unique(val$class_name)) != 1L) {
