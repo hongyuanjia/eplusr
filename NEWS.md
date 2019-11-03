@@ -109,6 +109,7 @@
   (#111).
 * Fix the error in `$ref_to_node()` when no objects in specified class is found
   (#110).
+* Now `Idf$to_table()` matches object names case-insensitively (#157).
 
 ## Minor changes
 
