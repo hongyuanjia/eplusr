@@ -1706,6 +1706,18 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 # set deep default value to `TRUE`
 formals(Idf$clone_method)$deep <- TRUE
 formals(Idf$public_methods$clone)$deep <- TRUE
+
+# Manually remove IDF clss active bindings before cloning. See #164
+b <- as.list(body(Idf$clone_method))
+b <- as.call(c(
+    list(b[[1]],
+         quote(enclosing <- .subset2(self, ".__enclos_env__")),
+         quote(rm(list = grep("^[A-Z]", names(enclosing$self), value = TRUE), envir = enclosing$self))
+    ),
+    b[-1]
+))
+body(Idf$clone_method) <- b
+body(Idf$public_methods$clone) <- b
 # }}}
 
 # idf_version {{{
