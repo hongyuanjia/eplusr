@@ -1,3 +1,9 @@
+# eplusr 0.10.4
+
+This is a bug fix release which make sure eplusr is compatible with new version
+of R6 [#164](https://github.com/hongyuanjia/eplusr/issues/164). No new feature
+is included.
+
 # eplusr 0.10.3
 
 ## New features
