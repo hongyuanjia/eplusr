@@ -9,7 +9,12 @@ build_args <- c("--force")
 # https://github.com/travis-ci/travis-ci/issues/7875
 if (.Platform$OS.type == "windows" || Sys.getenv("TRAVIS_OS_NAME") == "osx") args <- c("--no-manual", args)
 
-do_package_checks(args = args, build_args = build_args)
+# test with specific R6 version
+# see #164
+get_stage("before_install") %>%
+    tic::add_code_step(remotes::install_github("r-lib/R6@rc-v2.4.1"))
+
+tic::do_package_checks(args = args, build_args = build_args)
 
 # pkgdown
 # make sure to clean site to rebuild everything
