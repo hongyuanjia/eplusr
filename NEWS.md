@@ -1,4 +1,4 @@
-# eplusr 0.10.3.9000
+# eplusr 0.10.4.9000
 
 ## New features
 
@@ -135,6 +135,12 @@
 * `$save()` works if weather was not given during initialization for
   `ParametricJob` (#120).
 * Required fields in `IdfObject` are now marked with `*` when printing (#135).
+
+# eplusr 0.10.4
+
+This is a bug fix release which make sure eplusr is compatible with new version
+of R6 [#164](https://github.com/hongyuanjia/eplusr/issues/164). No new feature
+is included.
 
 # eplusr 0.10.3
 
