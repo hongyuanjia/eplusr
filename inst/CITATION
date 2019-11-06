@@ -3,7 +3,7 @@ note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
          title = "{eplusr}: A Toolkit for Using EnergyPlus in R",
-         author = c(person("Jia", "Hongyuan")),
+         author = c(person("Hongyuan", "Jia")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=eplusr")
