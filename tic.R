@@ -16,3 +16,7 @@ do_package_checks(args = args, build_args = build_args)
 if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "release") {
     do_pkgdown(document = TRUE, orphan = TRUE)
 }
+
+# codecov
+get_stage("deploy") %>%
+  add_code_step(covr::codecov())

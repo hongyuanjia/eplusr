@@ -2614,43 +2614,6 @@ add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
     self <- .subset2(env, "self")
     private <- .subset2(env, "private")
 
-    get_object_unique <- function (env, self, private, class, value) {
-        fun <- function (value) {
-            class <- class
-            if (missing(value)) {
-                if (self$is_valid_class(class)) {
-                    return(self$object_unique(class))
-                } else {
-                    return(NULL)
-                }
-            }
-
-            if (is_idfobject(value)) value <- list(value)
-            replace_objects_in_class(self, private, class, value, TRUE)
-        }
-        environment(fun) <- env
-        body(fun)[[2]][[3]] <- class
-        fun
-    }
-
-    get_objects_in_class <- function (env, self, private, class, value) {
-        fun <- function (value) {
-            class <- class
-            if (missing(value)) {
-                if (self$is_valid_class(class)) {
-                    return(self$objects_in_class(class))
-                } else {
-                    return(NULL)
-                }
-            }
-
-            replace_objects_in_class(self, private, class, value, FALSE)
-        }
-        environment(fun) <- env
-        body(fun)[[2]][[3]] <- class
-        fun
-    }
-
     if (is.null(class_id)) {
         ext <- unique(private$idf_env()$object$class_id)
     } else {
@@ -2667,14 +2630,44 @@ add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
     # skip if nothing to add
     if (!length(setdiff(cls, ls(idf)))) return(idf)
 
+    # see https://github.com/r-lib/covr/issues/398
     # unique classes
+    b <- quote({
+        if (missing(value)) {
+            if (self$is_valid_class(class)) {
+                return(self$object_unique(class))
+            } else {
+                return(NULL)
+            }
+        }
+
+        if (is_idfobject(value)) value <- list(value)
+        replace_objects_in_class(self, private, class, value, TRUE)
+    })
     for (i in setdiff(cls[flg], ls(idf))) {
-        makeActiveBinding(i, get_object_unique(env, self, private, i, value), idf)
+        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
+        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
+        makeActiveBinding(i, fun, idf)
     }
 
+    # see https://github.com/r-lib/covr/issues/398
     # other classes
+    b <- quote({
+        if (missing(value)) {
+            if (self$is_valid_class(class)) {
+                return(self$objects_in_class(class))
+            } else {
+                return(NULL)
+            }
+        }
+
+        if (is_idfobject(value)) value <- list(value)
+        replace_objects_in_class(self, private, class, value, TRUE)
+    })
     for (i in setdiff(cls[!flg], ls(idf))) {
-        makeActiveBinding(i, get_objects_in_class(env, self, private, i, value), idf)
+        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
+        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
+        makeActiveBinding(i, fun, idf)
     }
 
     idf

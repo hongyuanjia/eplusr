@@ -756,22 +756,6 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) 
     }
     fld_nm <- private$idd_env()$field[J(fld_id), on = "field_id", field_name]
 
-    get_field_value <- function (env, self, private, field, value) {
-        fun <- function (value) {
-            field <- field
-            if (missing(value)) {
-                self$value(field)[[1L]]
-            } else {
-                names(value) <- field
-                self$set(c(value))
-                invisible(self)
-            }
-        }
-        environment(fun) <- env
-        body(fun)[[2]][[3]] <- field
-        fun
-    }
-
     # move deleted field bindings
     if (update && length(setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm))) {
         rm(list = setdiff(ls(obj, pattern = "^[A-Z]"), fld_nm), envir = obj)
@@ -780,8 +764,20 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) 
     # skip if nothing to add
     if (!length(setdiff(fld_nm, ls(obj)))) return(obj)
 
+    # see https://github.com/r-lib/covr/issues/398
+    b <- quote({
+        if (missing(value)) {
+            self$value(field)[[1L]]
+        } else {
+            names(value) <- field
+            self$set(c(value))
+            invisible(self)
+        }
+    })
     for (i in setdiff(fld_nm, ls(obj))) {
-        makeActiveBinding(i, get_field_value(env, self, private, i, value), obj)
+        b_ <- as.call(c(list(b[[1]], substitute(field <- nm, list(nm = i))), as.list(b[-1])))
+        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
+        makeActiveBinding(i, fun, obj)
     }
 
     obj
