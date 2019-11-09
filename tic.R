@@ -18,5 +18,7 @@ if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sy
 }
 
 # codecov
-get_stage("deploy") %>%
-  add_code_step(covr::codecov())
+if (Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sys.getenv("TRAVIS_R_VERSION_STRING") == "release") {
+    get_stage("deploy") %>% add_code_step(covr::codecov())
+}
+
