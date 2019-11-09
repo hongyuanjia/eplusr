@@ -143,7 +143,7 @@ test_that("Idd class", {
 
     # can get single object using S3 method
     expect_equal(idd$TestSlash, idd$object("TestSlash"))
-    expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
+    if (.options$autocomplete) expect_equal(idd[["TestSlash"]], idd$object("TestSlash"))
 
     expect_is(idd$object("TestSlash"), "IddObject")
     expect_is(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
