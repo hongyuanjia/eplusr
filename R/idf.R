@@ -2630,6 +2630,7 @@ add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
     # skip if nothing to add
     if (!length(setdiff(cls, ls(idf)))) return(idf)
 
+    # see https://github.com/r-lib/covr/issues/398
     # unique classes
     b <- quote({
         if (missing(value)) {
@@ -2649,6 +2650,7 @@ add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
         makeActiveBinding(i, fun, idf)
     }
 
+    # see https://github.com/r-lib/covr/issues/398
     # other classes
     b <- quote({
         if (missing(value)) {

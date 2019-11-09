@@ -764,6 +764,7 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) 
     # skip if nothing to add
     if (!length(setdiff(fld_nm, ls(obj)))) return(obj)
 
+    # see https://github.com/r-lib/covr/issues/398
     b <- quote({
         if (missing(value)) {
             self$value(field)[[1L]]
