@@ -359,26 +359,22 @@ add_idd_class_bindings <- function (idd) {
     self <- .subset2(env, "self")
     private <- .subset2(env, "private")
 
-    get_object <- function (env, self, private, class, value) {
-        fun <- function (value) {
-            class <- class
-            if (missing(value)) {
-                if (self$is_valid_class(class)) {
-                    self$object(class)
-                } else {
-                    NULL
-                }
+    # see https://github.com/r-lib/covr/issues/398
+    b <- quote({
+        if (missing(value)) {
+            if (self$is_valid_class(class)) {
+                self$object(class)
             } else {
-                stop("cannot add bindings to a locked environment")
+                NULL
             }
+        } else {
+            stop("cannot add bindings to a locked environment")
         }
-        environment(fun) <- env
-        body(fun)[[2]][[3]] <- class
-        fun
-    }
-
+    })
     for (i in private$m_idd_env$class$class_name) {
-        makeActiveBinding(i, get_object(env, self, private, i, value), idd)
+        b_ <- as.call(c(list(b[[1]], substitute(class <- nm, list(nm = i))), as.list(b[-1])))
+        fun <- eval(call("function", as.pairlist(alist(value = )), b_), env)
+        makeActiveBinding(i, fun, idd)
     }
 
     # lock environment after adding active bindings
