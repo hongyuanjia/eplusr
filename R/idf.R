@@ -2609,6 +2609,8 @@ read_idf <- function (path, idd = NULL) {
 
 # add_idf_class_bindings {{{
 add_idf_class_bindings <- function (idf, class_id = NULL, update = FALSE) {
+    if (!.options$autocomplete) return(idf)
+
     # get all classes in current version IDD
     env <- .subset2(idf, ".__enclos_env__")
     self <- .subset2(env, "self")

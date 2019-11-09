@@ -354,6 +354,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
 
 # add_idd_class_bindings {{{
 add_idd_class_bindings <- function (idd) {
+    if (!.options$autocomplete) return(idd)
+
     # get all classes in current version IDD
     env <- .subset2(idd, ".__enclos_env__")
     self <- .subset2(env, "self")
