@@ -46,6 +46,7 @@ test_that("can read IDD", {
 
 # Idd class {{{
 test_that("Idd class", {
+    .options$autocomplete <- TRUE
     # can create an Idd object from string
     expect_silent(idd <- use_idd(text("idd", "9.9.9")))
 

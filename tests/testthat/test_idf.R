@@ -403,6 +403,7 @@ test_that("Idf class", {
     # }}}
 
     # ACTIVE BINDINGS {{{
+    .options$autocomplete <- TRUE
     idf <- read_idf(example())
 
     # UNIQUE-OBJECT CLASS {{{
