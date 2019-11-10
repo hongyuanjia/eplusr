@@ -403,10 +403,11 @@ test_that("Idf class", {
     # }}}
 
     # ACTIVE BINDINGS {{{
+    .options$autocomplete <- TRUE
     idf <- read_idf(example())
 
     # UNIQUE-OBJECT CLASS {{{
-    if (.options$autocomplete) expect_true("SimulationControl" %in% names(idf))
+    expect_true("SimulationControl" %in% names(idf))
 
     # get data.frame input
     tbl <- idf$SimulationControl$to_table()
@@ -431,11 +432,11 @@ test_that("Idf class", {
     expect_true(idf$is_valid_class("SimulationControl"))
     expect_silent(idf$SimulationControl <- NULL)
     expect_silent(idf$SimulationControl <- str)
-    if (.options$autocomplete) expect_true("SimulationControl" %in% names(idf))
+    expect_true("SimulationControl" %in% names(idf))
     # }}}
 
     # NORMAL CLASS {{{
-    if (.options$autocomplete) expect_true("Material" %in% names(idf))
+    expect_true("Material" %in% names(idf))
 
     # get data.frame input
     tbl <- idf$to_table(class = "Material")
