@@ -351,12 +351,12 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
     f <- basename(exec)
     v <- gsub("\\.", "-", stri_match_first_regex(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
     system(sprintf('chmod +x %s', f))
-    if (sudo) {
-        system(sprintf('echo "y\n%s\n%s" | sudo ./%s', dir, dir_bin, f))
-        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, v))
-    } else {
+    if (local) {
         system(sprintf('echo "y\n%s\n%s" | ./%s', dir, dir_bin, f))
         system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, v))
+    } else {
+        system(sprintf('echo "y\n%s\n%s" | sudo ./%s', dir, dir_bin, f))
+        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, v))
     }
 }
 # }}}
