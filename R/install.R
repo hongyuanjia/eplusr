@@ -47,7 +47,7 @@ NULL
 #' [EnergyPlus GitHub Repository](https://github.com/NREL/EnergyPlus).
 #'
 #' `install_eplus()` will try to install EnergyPlus into the default location,
-#' e.g. `C:\\EnergyPlusVX-Y-0` on Windows, `/usr/local/EnergyPlus-X-Y-0` on
+#' e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, `/usr/local/EnergyPlus-X-Y-0` on
 #' Linux, and `/Applications/EnergyPlus-X-Y-0` on macOS.
 #'
 #' Note that installing to the default location requires administrative
@@ -61,7 +61,7 @@ NULL
 #'
 #' * Windows:
 #'   - `dir(Sys.getenv("LOCALAPPDATA"), "EnergyPlusVX-Y-0")` OR
-#'   - `C:\Users\<User>\AppData\Local\EnergyPlusVX-Y-0` if environment
+#'   - \verb{C:\Users\<User>\AppData\Local\EnergyPlusVX-Y-0} if environment
 #'     variable `"LOCALAPPDATA"` is not set
 #' * macOS: `/Users/<User>/Applications/EnergyPlus-X-Y-0`
 #' * Linux: `"~/.local/EnergyPlus-X-Y-0"`
@@ -342,7 +342,7 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
     }
 
     if (!is.null(dir_bin)) assert(is_string(dir_bin))
-    if (!dir.exists(dir)) dir.create(dir)
+    if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     if (!dir.exists(dir_bin)) dir.create(dir_bin, recursive = TRUE)
 
     exe_dir <- dirname(exec)
@@ -431,6 +431,7 @@ use_eplus <- function (eplus) {
 
         # try user-level first
         eplus_dir <- eplus_default_path(ver, local = TRUE)
+        dir_cache <- eplus_dir
         if (any(chk <- is_eplus_path(eplus_dir))) {
             if (sum(chk) > 1L) {
                 verbose_info("Multiple versions found for EnergyPlus v", ori_ver, " in user directory: ",
@@ -470,7 +471,7 @@ use_eplus <- function (eplus) {
             }
 
             fail <- paste0("Cannot locate EnergyPlus v", stringi::stri_trim_both(eplus), " at default ",
-                "installation path ", surround(c(eplus_dir_l, eplus_dir)), collapse = "\n")
+                "installation path ", surround(c(dir_cache, eplus_dir)), collapse = "\n")
             abort("error_cannot_locate_eplus", paste0(msg, fail, "\n",
                 "Please specify explicitly the path of EnergyPlus installation."
             ))

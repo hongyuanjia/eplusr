@@ -5,7 +5,8 @@
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
-install_eplus(ver = "latest", force = FALSE)
+install_eplus(ver = "latest", local = FALSE, dir = NULL,
+  force = FALSE, ...)
 
 download_eplus(ver = "latest", dir)
 }
@@ -13,11 +14,37 @@ download_eplus(ver = "latest", dir)
 \item{ver}{The EnergyPlus version number, e.g., \code{8.7}. The special value
 \code{"latest"}, which is the default, means the latest version.}
 
+\item{local}{Whether to install EnergyPlus only for current user. For Windows
+and Linux, if \code{FALSE}, administrative privileges are required to
+install EnergyPlus to the default system-level location. See details.
+\code{local} should be also set to \code{FALSE} if you do not have the write
+access to the directory specified via \code{dir}. Default: \code{FALSE}. For
+macOS, administrative privileges are always required no matter you
+want EnergyPlus to be install at \code{/Applications} or \code{~/Applications}.}
+
+\item{dir}{\itemize{
+\item For \code{download_eplus()}, where to save EnergyPlus installer file.
+Default: \code{"."}.
+\itemize{
+\item For \code{install_eplus()}, the installer will always be saved into
+\code{\link[=tempdir]{tempdir()}}. But you can use \code{dir} to specify the \strong{parent} directory
+of EnergyPlus installation, i.e. the \strong{parent} directory of
+\code{EnergyPlusVX-Y-0} on Windows and \code{EnergyPlus-X-Y-0} on Linux. macOS is
+not supported. If \code{NULL}, the default installation path will be used.
+See details for more information. Please note that \code{dir} does not work
+on macOS and EnergyPlus will always be installed into the default
+location. Default: \code{NULL}.
+}
+}}
+
 \item{force}{Whether to install EnergyPlus even if it has already been
 installed.}
 
-\item{dir}{Where to save EnergyPlus installer file. For \code{install_eplus()},
-the installer will be saved into \code{\link[=tempdir]{tempdir()}}}
+\item{...}{Other arguments to be passed to the installer. Current only one
+additional argument exists and is only for Linux:
+* dir_bin: A path where symbolic links will be created to the software
+executables. The default is \code{/usr/local/bin} if \code{local} is \code{FALSE}
+and \code{~/.local/bin} if \code{local} is \code{TRUE}.}
 }
 \value{
 An invisible integer \code{0} if succeed. Moreover, some attributes will
@@ -43,23 +70,49 @@ install it.
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
 
 \code{install_eplus()} will try to install EnergyPlus into the default location,
-e.g.  \code{C:\\EnergyPlusVX-Y-0} on Windows, \code{/usr/local/EnergyPlus-X-Y-0} on
+e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, \code{/usr/local/EnergyPlus-X-Y-0} on
 Linux, and \code{/Applications/EnergyPlus-X-Y-0} on macOS.
 
-Note that the installation process requires administrative privileges
-during the installation and you have to run R with administrator (or with
-sudo if you are on Linux) to make it work if you are not in interactive mode.
+Note that installing to the default location requires administrative
+privileges and you have to run R with administrator (or with sudo if you are
+on Linux) to make it work if you are not in interactive mode.
+
+If you cann't run R with administrator, it is possible to install EnergyPlus
+to your home corresponding directory by setting \code{local} to \code{TRUE}.
+
+The user level EnergyPlus installation path is:
+\itemize{
+\item Windows:
+\itemize{
+\item \code{dir(Sys.getenv("LOCALAPPDATA"), "EnergyPlusVX-Y-0")} OR
+\item \verb{C:\Users\<User>\AppData\Local\EnergyPlusVX-Y-0} if environment
+variable \code{"LOCALAPPDATA"} is not set
+}
+\item macOS: \code{/Users/<User>/Applications/EnergyPlus-X-Y-0}
+\item Linux: \code{"~/.local/EnergyPlus-X-Y-0"}
+}
+
+On Windows and Linux, you can also specify your custom directory using the
+\code{dir} argument. Remember to change \code{local} to \code{FALSE} in order to ask for
+administrator privileges if you do not have the write access to that
+directory.
 }
 \examples{
 \dontrun{
-
-# for the latest version of EnergyPlus
+# download the latest version of EnergyPlus
 download_eplus("latest", dir = tempdir())
+# install the latest version of EnergyPlus system-wide which is the default
 install_eplus("latest")
 
 # for a specific version of EnergyPlus
 download_eplus(8.8, dir = tempdir())
 install_eplus(8.8)
+
+# install EnergyPlus in your home directory
+install_eplus(8.8, local = TRUE)
+
+# custom EnergyPlus install home directory
+install_eplus(8.8, dir = "~/MyPrograms", local = TRUE)
 }
 }
 \author{
