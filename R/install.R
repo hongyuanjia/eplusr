@@ -318,7 +318,7 @@ install_eplus_macos <- function (exec, local = FALSE) {
 
     f <- basename(exec)
     no_ext <- tools::file_path_sans_ext(f)
-    system(sprintf("hdiutil mount %s", f))
+    system(sprintf("sudo hdiutil mount %s", f))
     if (local) {
         system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target ~", no_ext, no_ext))
     } else {
