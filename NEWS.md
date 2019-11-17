@@ -89,6 +89,16 @@
 * EnergyPlus v9.2 support has been added (#138).
 * Now required objects and unique objects can be deleted in `$del()` when
   `.force` is set to `TRUE` (#149).
+* Now for Windows and Linux, `install_eplus()` supports to install EnergyPlus to
+  your home directory or your customized directory without requiring
+  administrator privileges (#167).
+  ```r
+  # install to your home directory
+  install_eplus(8.8, local = TRUE)
+  # install to custom directory
+  install_eplus(8.8, local = TRUE, dir = "~/MyPrograms")
+  ```
+  Please see `?install_eplus` for details.
 
 ## Bug fixes
 
