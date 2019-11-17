@@ -341,6 +341,9 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
         if (is.null(dir_bin)) dir_bin <- "/usr/local/bin"
     }
 
+    dir <- normalizePath(dir, mustWork = TRUE)
+    dir_bin <- normalizePath(dir_bin, mustWork = TRUE)
+
     if (!is.null(dir_bin)) assert(is_string(dir_bin))
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     if (!dir.exists(dir_bin)) dir.create(dir_bin, recursive = TRUE)
