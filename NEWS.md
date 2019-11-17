@@ -91,7 +91,7 @@
   `.force` is set to `TRUE` (#149).
 * Now for Windows and Linux, `install_eplus()` supports to install EnergyPlus to
   your home directory or your customized directory without requiring
-  administrator privileges.
+  administrator privileges (#167).
   ```r
   # install to your home directory
   install_eplus(8.8, local = TRUE)
