@@ -5,8 +5,7 @@
 \alias{download_eplus}
 \title{Download and Install EnergyPlus}
 \usage{
-install_eplus(ver = "latest", local = FALSE, dir = NULL,
-  force = FALSE, ...)
+install_eplus(ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...)
 
 download_eplus(ver = "latest", dir)
 }
@@ -20,7 +19,7 @@ install EnergyPlus to the default system-level location. See details.
 \code{local} should be also set to \code{FALSE} if you do not have the write
 access to the directory specified via \code{dir}. Default: \code{FALSE}. For
 macOS, administrative privileges are always required no matter you
-want EnergyPlus to be install at \code{/Applications} or \code{~/Applications}.}
+want EnergyPlus to be install at \verb{/Applications} or \verb{~/Applications}.}
 
 \item{dir}{\itemize{
 \item For \code{download_eplus()}, where to save EnergyPlus installer file.
@@ -43,8 +42,8 @@ installed.}
 \item{...}{Other arguments to be passed to the installer. Current only one
 additional argument exists and is only for Linux:
 * dir_bin: A path where symbolic links will be created to the software
-executables. The default is \code{/usr/local/bin} if \code{local} is \code{FALSE}
-and \code{~/.local/bin} if \code{local} is \code{TRUE}.}
+executables. The default is \verb{/usr/local/bin} if \code{local} is \code{FALSE}
+and \verb{~/.local/bin} if \code{local} is \code{TRUE}.}
 }
 \value{
 An invisible integer \code{0} if succeed. Moreover, some attributes will
@@ -70,8 +69,8 @@ install it.
 \href{https://github.com/NREL/EnergyPlus}{EnergyPlus GitHub Repository}.
 
 \code{install_eplus()} will try to install EnergyPlus into the default location,
-e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, \code{/usr/local/EnergyPlus-X-Y-0} on
-Linux, and \code{/Applications/EnergyPlus-X-Y-0} on macOS.
+e.g. \verb{C:\EnergyPlusVX-Y-0} on Windows, \verb{/usr/local/EnergyPlus-X-Y-0} on
+Linux, and \verb{/Applications/EnergyPlus-X-Y-0} on macOS.
 
 Note that installing to the default location requires administrative
 privileges and you have to run R with administrator (or with sudo if you are
@@ -88,7 +87,7 @@ The user level EnergyPlus installation path is:
 \item \verb{C:\Users\<User>\AppData\Local\EnergyPlusVX-Y-0} if environment
 variable \code{"LOCALAPPDATA"} is not set
 }
-\item macOS: \code{/Users/<User>/Applications/EnergyPlus-X-Y-0}
+\item macOS: \verb{/Users/<User>/Applications/EnergyPlus-X-Y-0}
 \item Linux: \code{"~/.local/EnergyPlus-X-Y-0"}
 }
 

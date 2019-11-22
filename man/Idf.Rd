@@ -622,7 +622,7 @@ idf$save(file.path(tempdir(), "test_run.idf"))
 # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
 # installation path
 epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-    pattern = "\\\\.epw$", full.names = TRUE)[1]
+    pattern = "\\.epw$", full.names = TRUE)[1]
 
 # if `dir` is NULL, the directory of IDF file will be used as simulation
 # output directory
@@ -714,6 +714,7 @@ Hongyuan Jia
 \item \href{#method-save}{\code{Idf$save()}}
 \item \href{#method-run}{\code{Idf$run()}}
 \item \href{#method-print}{\code{Idf$print()}}
+\item \href{#method-clone}{\code{Idf$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -3344,7 +3345,7 @@ idf$save(file.path(tempdir(), "test_run.idf"))
 # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
 # installation path
 epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-    pattern = "\\\\.epw$", full.names = TRUE)[1]
+    pattern = "\\.epw$", full.names = TRUE)[1]
 
 # if `dir` is NULL, the directory of IDF file will be used as simulation
 # output directory
@@ -3441,5 +3442,21 @@ idf$print("field", order = FALSE)
 
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$clone(deep = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
 }
 }
