@@ -321,7 +321,7 @@ get_idf_ver <- function (idf_dt, empty_removed = TRUE) {
     reg_ver <- "(\\d+\\.\\d+(?:\\.\\d+)*)"
     set(ver_line_spe, NULL, "version",
         stri_match_first_regex(
-            ver_line_spe$string, paste0("Version\\s*,\\s*", reg_ver, "\\s*;\\s*!.*$"),
+            ver_line_spe$string, paste0("Version\\s*,\\s*", reg_ver, "\\s*;(?:\\s*!.*)*$"),
             opts_regex = stringi::stri_opts_regex(case_insensitive = TRUE)
         )[, 2L]
     )
