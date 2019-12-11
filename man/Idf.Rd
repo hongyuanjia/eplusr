@@ -474,13 +474,13 @@ idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
 ## ------------------------------------------------
 
 # update objects from string definitions:
-str <- idf$to_string("wd10", header = FALSE, format = "new_top")
-str[4] <- "0.8,"
+str <- idf$to_string("zone one", header = FALSE, format = "new_top")
+str[8] <- "2," # Multiplier
 idf$update(str)
 
 # update objects from data.frame definitions:
-dt <- idf$to_table("WD10")
-dt[field == "Thickness", value := "0.5"]
+dt <- idf$to_table("zone one")
+dt[field == "Multiplier", value := "1"]
 idf$update(dt)
 
 
@@ -2553,13 +2553,13 @@ A named list of updated \link{IdfObject} objects.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# update objects from string definitions:
-str <- idf$to_string("wd10", header = FALSE, format = "new_top")
-str[4] <- "0.8,"
+str <- idf$to_string("zone one", header = FALSE, format = "new_top")
+str[8] <- "2," # Multiplier
 idf$update(str)
 
 # update objects from data.frame definitions:
-dt <- idf$to_table("WD10")
-dt[field == "Thickness", value := "0.5"]
+dt <- idf$to_table("zone one")
+dt[field == "Multiplier", value := "1"]
 idf$update(dt)
 
 }

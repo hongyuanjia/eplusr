@@ -1464,13 +1464,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @examples
         #' # update objects from string definitions:
-        #' str <- idf$to_string("wd10", header = FALSE, format = "new_top")
-        #' str[4] <- "0.8,"
+        #' str <- idf$to_string("zone one", header = FALSE, format = "new_top")
+        #' str[8] <- "2," # Multiplier
         #' idf$update(str)
         #'
         #' # update objects from data.frame definitions:
-        #' dt <- idf$to_table("WD10")
-        #' dt[field == "Thickness", value := "0.5"]
+        #' dt <- idf$to_table("zone one")
+        #' dt[field == "Multiplier", value := "1"]
         #' idf$update(dt)
         #'
         update = function (..., .default = TRUE, .empty = FALSE)
