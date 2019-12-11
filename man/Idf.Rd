@@ -24,8 +24,18 @@ needed whenever creating an \code{Idf} object. eplusr provides several
 
 All IDF reading process starts with function \code{\link[=read_idf]{read_idf()}} which returns an
 \code{Idf} object. \code{Idf} class provides lots of methods to programmatically query
-and modify EnergyPlus models. Below is the detailed documentation on each
-method.
+and modify EnergyPlus models.
+
+Internally, the powerful \href{https://cran.r-project.org/package=data.table}{data.table}
+package is used to speed up the whole IDF parsing process and store the
+results. Under the hook, eplusr uses a SQL-like structure to store both IDF
+and IDD data in \link[data.table:data.table]{data.table::data.table} format. Every IDF will be parsed and
+stored in three tables:
+\itemize{
+\item \code{object}: contains object IDs, names and comments.
+\item \code{value}: contains field values
+\item \code{reference}: contains cross-reference data of field values.
+}
 }
 \examples{
 # example model shipped with eplusr from EnergyPlus v8.8
@@ -666,7 +676,7 @@ idf$print("field", order = FALSE)
 
 }
 \seealso{
-\link{IdfObject} class
+\link{IdfObject} class for a single object in an IDF.
 }
 \author{
 Hongyuan Jia

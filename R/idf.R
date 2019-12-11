@@ -25,14 +25,23 @@ NULL
 #'
 #' All IDF reading process starts with function [read_idf()] which returns an
 #' `Idf` object. `Idf` class provides lots of methods to programmatically query
-#' and modify EnergyPlus models. Below is the detailed documentation on each
-#' method.
+#' and modify EnergyPlus models.
+#'
+#' Internally, the powerful [data.table](https://cran.r-project.org/package=data.table)
+#' package is used to speed up the whole IDF parsing process and store the
+#' results. Under the hook, eplusr uses a SQL-like structure to store both IDF
+#' and IDD data in [data.table::data.table] format. Every IDF will be parsed and
+#' stored in three tables:
+#'
+#' * `object`: contains object IDs, names and comments.
+#' * `value`: contains field values
+#' * `reference`: contains cross-reference data of field values.
 #'
 #' @examples
 #' # example model shipped with eplusr from EnergyPlus v8.8
 #' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 #'
-#' @seealso [IdfObject] class
+#' @seealso [IdfObject] class for a single object in an IDF.
 #' @author Hongyuan Jia
 #' @name Idf
 #'
