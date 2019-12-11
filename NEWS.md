@@ -121,6 +121,8 @@
   (#110).
 * Now `leading` and `sep_at` argument work as expected in `Idf$to_string()` (#160).
 * Now `Idf$to_table()` matches object names case-insensitively (#157).
+* One-line-formatted `Version` object with trailing comments can be successfully
+  parsed, e.g. `Version, 8.6; !- ABC` (#170).
 
 ## Minor changes
 

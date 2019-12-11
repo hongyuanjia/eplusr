@@ -261,6 +261,23 @@ test_that("parse_idd_file()", {
 
 # parse_idf_file() {{{
 test_that("parse_idf_file()", {
+    # get version {{{
+    # Normal formatted
+    expect_equal(
+        get_idf_ver(data.table(string = c("Version,", "8.6;"), line = 1:2)),
+        numeric_version(8.6)
+    )
+    # One line formatted
+    expect_equal(
+        get_idf_ver(data.table(string = "Version, 8.6;", line = 1)),
+        numeric_version(8.6)
+    )
+    expect_equal(
+        get_idf_ver(data.table(string = "Version, 8.6; !- Version", line = 1)),
+        numeric_version(8.6)
+    )
+    # }}}
+
     expect_warning(idf_parsed <- parse_idf_file(text("idf"), 8.8),
         "Missing version field in input IDF"
     )
