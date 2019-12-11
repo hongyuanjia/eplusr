@@ -81,15 +81,15 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @examples
         #' # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
         #' # occur. If Idd v8.8 is found, it will be used automatically.
-        #' \dontrun{idf <- read_idf(path_idf)}
+        #' \dontrun{idf <- Idf$new(path_idf)}
         #'
         #' # argument `idd` can be specified explicitly using `use_idd()`
-        #' \dontrun{idf <- read_idf(path_idf, idd = use_idd(8.8))}
+        #' \dontrun{idf <- Idf$new(path_idf, idd = use_idd(8.8))}
         #'
         #' # you can set `download` arugment to "auto" in `use_idd()` if you
         #' # want to automatically download corresponding IDD file when
         #' # necessary
-        #' idf <- read_idf(path_idf, use_idd(8.8, download = "auto"))
+        #' idf <- Idf$new(path_idf, use_idd(8.8, download = "auto"))
         #'
         #' # Besides use a path to an IDF file, you can also provide IDF in literal
         #' # string format
@@ -100,7 +100,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'         Building;                !- Name
         #'     "
         #'
-        #' read_idf(string_idf, use_idd(8.8, download = "auto"))
+        #' Idf$new(string_idf, use_idd(8.8, download = "auto"))
         #'
         initialize = function (path, idd = NULL) {
             # only store if input is a path
