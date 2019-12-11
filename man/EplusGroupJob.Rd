@@ -244,8 +244,8 @@ whenever \verb{$print()} is called.
 \dontrun{
 if (is_avail_eplus(8.8)) {
     dir <- eplus_config(8.8)$dir
-    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf")[1:5]
-    path_epws <- list.files(file.path(dir, "WeatherData"), "\\.epw")[1:5]
+    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf")[1:5]
+    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw")[1:5]
 
     group <- group_job(path_idfs, path_epws)
 

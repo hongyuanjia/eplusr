@@ -76,7 +76,7 @@ idf$version()
 idf$path()
 
 # return `NULL` if Idf is not created from a file
-Idf$new("Version, 8.8;\\n")$path()
+Idf$new("Version, 8.8;\n")$path()
 
 
 ## ------------------------------------------------
@@ -622,7 +622,7 @@ idf$save(file.path(tempdir(), "test_run.idf"))
 # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
 # installation path
 epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-    pattern = "\\.epw$", full.names = TRUE)[1]
+    pattern = "\\\\.epw$", full.names = TRUE)[1]
 
 # if `dir` is NULL, the directory of IDF file will be used as simulation
 # output directory
@@ -837,7 +837,7 @@ locally.
 idf$path()
 
 # return `NULL` if Idf is not created from a file
-Idf$new("Version, 8.8;\\n")$path()
+Idf$new("Version, 8.8;\n")$path()
 
 }
 \if{html}{\out{</div>}}
@@ -1444,13 +1444,13 @@ class. An error will be issued if there are multiple objects in that
 class or input class is not an \code{unique-object} class. This makes sure
 that \verb{$object_unique()} always returns a single \link{IdfObject}.
 
-\code{Idf} class also provides custom S3 method of \verb{$} and \code{[[} to
+\code{Idf} class also provides custom S3 method of \code{$} and \code{[[} to
 make it more convenient to get the \link{IdfObject} in \code{unique-object}
 class. Basically, \code{idf$ClassName} and \code{idf[["ClassName"]]},
 where \code{ClassName} is a single valid class name, is equivalent to
 \code{idf$object_unique(ClassName)} if \code{ClassName} is an \code{unique-object}
 class. For convenience, underscore-style names are allowed when using
-\verb{$}, e.g.  \code{Site_Location} is equivalent to \code{Site:Location}. For
+\code{$}, e.g.  \code{Site_Location} is equivalent to \code{Site:Location}. For
 instance, \code{idf$Site_Location} and also \code{idf[["Site_Location"]]} will
 both return the \link{IdfObject}s in \code{Site:Location} class. Note that
 unlike \verb{$object_unique()}, \code{idf$ClassName} and \code{idf[["ClassName"]]}
@@ -1498,14 +1498,14 @@ object.}
 \verb{$objects_in_class()} returns a named list of all \link{IdfObject} objects
 in specified class. The returned list is named using object names.
 
-\code{Idf} class also provides custom S3 method of \verb{$} and \code{[[} to
+\code{Idf} class also provides custom S3 method of \code{$} and \code{[[} to
 make it more convenient to get all \link{IdfObject} objects in one class.
 Basically, \code{idf$ClassName} and \code{idf[["ClassName"]]}, where
 \code{ClassName} is a single valid class name, is equivalent to
 \code{idf$objects_in_class(ClassName)} if \code{ClassName} is not an
 \code{unique-object} class. For convenience, \emph{underscore-style} names are
 allowed, e.g.  \code{BuildingSurface_Detailed} is equivalent to
-\code{BuildingSurface:Detailed} when using \verb{$}. For instance,
+\code{BuildingSurface:Detailed} when using \code{$}. For instance,
 \code{idf$BuildingSurface_Detailed} and also
 \code{idf[["BuildingSurface:Detailed"]]} will both return all \link{IdfObject}
 objects in \code{BuildingSurface:Detailed} class. Note that
@@ -1988,7 +1988,7 @@ There is two special syntaxes in \verb{$set()}, which is inspired by the
 \href{https://cran.r-project.org/package=eplusr}{data.table} package:
 \itemize{
 \item \code{class := list(field = value)}: Note the use of \verb{:=} instead of
-\verb{=}. The main difference is that, unlike \verb{=}, the left hand side of
+\code{=}. The main difference is that, unlike \code{=}, the left hand side of
 \verb{:=} should be a valid class name in current \code{Idf} object. It will
 set the field of all objects in specified class to specified value.
 \item \code{.(object, object) := list(field = value)}: Simimar like above, but
@@ -3345,7 +3345,7 @@ idf$save(file.path(tempdir(), "test_run.idf"))
 # use the first epw file in "WeatherData" folder in EnergyPlus v8.8
 # installation path
 epw <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-    pattern = "\\.epw$", full.names = TRUE)[1]
+    pattern = "\\\\.epw$", full.names = TRUE)[1]
 
 # if `dir` is NULL, the directory of IDF file will be used as simulation
 # output directory

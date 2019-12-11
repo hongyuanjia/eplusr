@@ -132,7 +132,7 @@ vector of valid field names, and returns a named list containing values of
 specified fields when \code{simplify} is \code{FALSE} and a character vector when
 \code{simplify} is \code{TRUE}.
 
-eplusr also provides custom S3 method of \verb{$} and \code{[[} which make
+eplusr also provides custom S3 method of \code{$} and \code{[[} which make
 it more convenient to get a single value of current \code{IdfObject}. Basically,
 \code{idfobj$FieldName} and \code{idfobj[[Field]]} is equivalent to
 \code{idfobj$value(FieldName)[[1]]} and \code{idfobj$value(Field)[[1]]}.
@@ -457,7 +457,7 @@ into 3 parts:
 \item OBJECT: Class name, object id and name (if applicable).
 \item COMMENTS: Object comments if exist.
 \item VALUES: fields and values of current \code{IdfObject}. Required fields are marked
-with start \verb{*}. String values are quoted. Numeric values are printed as
+with start \code{*}. String values are quoted. Numeric values are printed as
 they are. Blank string values are printed as \verb{<"Blank">} and blank number
 values are printed as \verb{<Blank>}.
 }
