@@ -108,7 +108,6 @@ test_that("Idf class", {
     expect_error(idf$objects(1:6), class = "error_object_id")
 
     # can get all objects in a class
-    expect_equal(idf$object_in_class("Version"), idf$object(4))
     expect_error(idf$objects_in_class("version"), class = "error_class_name")
 
     # can get all objects in relation
