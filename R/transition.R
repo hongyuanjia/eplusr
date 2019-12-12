@@ -2144,11 +2144,11 @@ trans_funs$f890t900 <- function (idf) {
         if (nrow(empty <- dt11[J(2L, NA_character_), on = c("index", "value"), nomatch = 0L])) {
             warn("warning_trans_890_900", paste0(
                 "WindowProperty:ShadingControl = ",
-                surround(empty[, {ifelse(is.na(name), "", name)}]),
+                collapse(unique(empty[, {ifelse(is.na(name), "", (name))}])),
                 " was not used by any surfaces, so it has not been deleted.",
                 collpase = "\n"
             ))
-            dt11 <- dt11[!empty, on = "id"]
+            dt11 <- dt11[!empty, on = c("id", "name")]
         }
 
         if (!nrow(dt11)) {
