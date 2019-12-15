@@ -66,7 +66,7 @@ idd <- use_idd(8.8, download = TRUE)
 ## ------------------------------------------------
 
 # get version
-idf$version()
+idd$version()
 
 
 ## ------------------------------------------------
@@ -336,7 +336,7 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{# get version
-idf$version()
+idd$version()
 
 }
 \if{html}{\out{</div>}}

@@ -116,7 +116,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A [base::numeric_version()] object.
         #' @examples
         #' # get version
-        #' idf$version()
+        #' idd$version()
         #'
         version = function ()
             idd_version(self, private),
