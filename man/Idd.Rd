@@ -58,7 +58,7 @@ four tables:
 \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
 
 # Preferable way
-idd <- use_idd(8.8, download = TRUE)
+idd <- use_idd(8.8, download = "auto")
 
 
 ## ------------------------------------------------
@@ -89,7 +89,7 @@ idd$group_name()
 ## Method `Idd$from_group`
 ## ------------------------------------------------
 
-idd$from_group(c("Version", "Schedules"))
+idd$from_group(c("Version", "Schedule:Compact"))
 
 
 ## ------------------------------------------------
@@ -307,7 +307,7 @@ An \code{Idd} object.
 \preformatted{\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
 
 # Preferable way
-idd <- use_idd(8.8, download = TRUE)
+idd <- use_idd(8.8, download = "auto")
 
 }
 \if{html}{\out{</div>}}
@@ -423,7 +423,7 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$from_group(c("Version", "Schedules"))
+\preformatted{idd$from_group(c("Version", "Schedule:Compact"))
 
 }
 \if{html}{\out{</div>}}

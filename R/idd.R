@@ -83,7 +83,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
         #'
         #' # Preferable way
-        #' idd <- use_idd(8.8, download = TRUE)
+        #' idd <- use_idd(8.8, download = "auto")
         #'
         initialize = function (path) {
             # add a uuid
@@ -170,7 +170,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
-        #' idd$from_group(c("Version", "Schedules"))
+        #' idd$from_group(c("Version", "Schedule:Compact"))
         #'
         from_group = function (class)
             idd_from_group(self, private, class),
