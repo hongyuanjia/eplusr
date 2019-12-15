@@ -139,10 +139,10 @@ idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
 ## Method `Idf$is_valid_class`
 ## ------------------------------------------------
 
-# check if input is a valid group name in current Idf
+# check if input is a valid class name in current Idf
 idf$is_valid_class(c("Building", "ShadowCalculation"))
 
-# check if input is a valid group name in underlying Idd
+# check if input is a valid class name in underlying Idd
 idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 
 
@@ -550,7 +550,7 @@ idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 # get text format of the whole Idf
 head(idf$to_string())
 
-# get text format of the whoe Idf, excluding the header and all comments
+# get text format of the whole Idf, excluding the header and all comments
 head(idf$to_string(comment = FALSE, header = FALSE))
 
 # get text format of all objects in class Material
@@ -923,7 +923,7 @@ unique names are further sorted according to their occurrences
 in the underlying \link{Idd}. Default: \code{TRUE}.}
 
 \item{\code{by_group}}{Only applicable when \code{all} or \code{sorted} is \code{TRUE}. If
-\code{TRUE}, a list is returned which separate class names by the
+\code{TRUE}, a list is returned which separates class names by the
 group they belong to.}
 }
 \if{html}{\out{</div>}}
@@ -1042,10 +1042,10 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check if input is a valid group name in current Idf
+\preformatted{# check if input is a valid class name in current Idf
 idf$is_valid_class(c("Building", "ShadowCalculation"))
 
-# check if input is a valid group name in underlying Idd
+# check if input is a valid class name in underlying Idd
 idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 
 }
@@ -1380,7 +1380,7 @@ idf$object("simple one zone (wireframe dxf)")
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects"></a>}}
 \subsection{Method \code{objects()}}{
-Extract multiple \link{IdfObject} object using object IDs or names.
+Extract multiple \link{IdfObject} objects using object IDs or names.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$objects(which)}\if{html}{\out{</div>}}
 }
@@ -1388,7 +1388,7 @@ Extract multiple \link{IdfObject} object using object IDs or names.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{which}}{An integer vector specifying object IDs or an character
+\item{\code{which}}{An integer vector specifying object IDs or a character
 vector specifying object names.}
 }
 \if{html}{\out{</div>}}
@@ -1684,8 +1684,8 @@ Extract multiple \link{IdfObject} objects referencing each others.
 \item{\code{which}}{A single integer specifying object ID or a single string
 specifying object name.}
 
-\item{\code{direction}}{The relation direction to extract. Should be either
-\code{"all"}, \code{"ref_to"}, \code{"ref_by"} and \code{"node"}.}
+\item{\code{direction}}{The relation direction to extract. Should be one of
+\code{"ref_to"}, \code{"ref_by"} or \code{"node"}.}
 
 \item{\code{class}}{A character vector of valid class names in the
 underlying \link{Idd}. It is used to restrict the classes to be
@@ -3035,7 +3035,7 @@ A character vector.
 \preformatted{# get text format of the whole Idf
 head(idf$to_string())
 
-# get text format of the whoe Idf, excluding the header and all comments
+# get text format of the whole Idf, excluding the header and all comments
 head(idf$to_string(comment = FALSE, header = FALSE))
 
 # get text format of all objects in class Material

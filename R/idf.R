@@ -226,7 +226,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        unique names are further sorted according to their occurrences
         #'        in the underlying [Idd]. Default: `TRUE`.
         #' @param by_group Only applicable when `all` or `sorted` is `TRUE`. If
-        #'        `TRUE`, a list is returned which separate class names by the
+        #'        `TRUE`, a list is returned which separates class names by the
         #'        group they belong to.
         #'
         #' @return A character vector if `by_group` is `FALSE` and a list of
@@ -307,10 +307,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
-        #' # check if input is a valid group name in current Idf
+        #' # check if input is a valid class name in current Idf
         #' idf$is_valid_class(c("Building", "ShadowCalculation"))
         #'
-        #' # check if input is a valid group name in underlying Idd
+        #' # check if input is a valid class name in underlying Idd
         #' idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
         #'
         is_valid_class = function (class, all = FALSE)
@@ -542,7 +542,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 
         # objects {{{
         #' @description
-        #' Extract multiple [IdfObject] object using object IDs or names.
+        #' Extract multiple [IdfObject] objects using object IDs or names.
         #'
         #' @details
         #' `$objects()` returns a named list of [IdfObject] objects using object
@@ -560,7 +560,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' behavior is consistent in all methods that take object name(s) as
         #' input.
         #'
-        #' @param which An integer vector specifying object IDs or an character
+        #' @param which An integer vector specifying object IDs or a character
         #'        vector specifying object names.
         #'
         #' @return A named list of [IdfObject] objects.
@@ -785,8 +785,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @param which A single integer specifying object ID or a single string
         #'        specifying object name.
-        #' @param direction The relation direction to extract. Should be either
-        #'        `"all"`, `"ref_to"`, `"ref_by"` and `"node"`.
+        #' @param direction The relation direction to extract. Should be one of
+        #'        `"ref_to"`, `"ref_by"` or `"node"`.
         #' @param class A character vector of valid class names in the
         #'        underlying [Idd]. It is used to restrict the classes to be
         #'        returned. If `NULL`, all possible classes are considered and
@@ -1844,7 +1844,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # get text format of the whole Idf
         #' head(idf$to_string())
         #'
-        #' # get text format of the whoe Idf, excluding the header and all comments
+        #' # get text format of the whole Idf, excluding the header and all comments
         #' head(idf$to_string(comment = FALSE, header = FALSE))
         #'
         #' # get text format of all objects in class Material
