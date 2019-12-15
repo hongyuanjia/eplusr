@@ -276,7 +276,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
         #'
         #' # Preferable way
-        #' idd <- use_idd(8.8)
+        #' idd <- use_idd(8.8, download = TRUE)
         #'
         initialize = function (path) {
             # add a uuid
