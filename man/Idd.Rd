@@ -822,13 +822,13 @@ presenting such relation above. For instance, if
   |- Field: <02: Outside Layer>
   |  v~~~~~~~~~~~~~~~~~~~~~~~~~
   |  |- Class: <Material>
-  |  |  └- Field: <1: Name>
+  |  |  \\- Field: <1: Name>
   |  |
   |  |- Class: <Material:NoMass>
-  |  |  └- Field: <1: Name>
+  |  |  \\- Field: <1: Name>
   |  |
   |  |- Class: <Material:InfraredTransparent>
-  |  |  └- Field: <1: Name>
+  |  |  \\- Field: <1: Name>
   |  |
   ......
 }

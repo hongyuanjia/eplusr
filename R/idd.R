@@ -382,6 +382,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
             idd_obj(self, private, class),
         # }}}
 
+        # objects {{{
         #' @description
         #' Extract multiple [IddObject] objects using class indices or names.
         #'
@@ -407,7 +408,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         objects = function (class)
             idd_objects(self, private, class),
+        # }}}
 
+        # object_relation {{{
         #' @description
         #' Extract the relationship between class fields.
         #'
@@ -430,13 +433,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'   |- Field: <02: Outside Layer>
         #'   |  v~~~~~~~~~~~~~~~~~~~~~~~~~
         #'   |  |- Class: <Material>
-        #'   |  |  └- Field: <1: Name>
+        #'   |  |  \- Field: <1: Name>
         #'   |  |
         #'   |  |- Class: <Material:NoMass>
-        #'   |  |  └- Field: <1: Name>
+        #'   |  |  \- Field: <1: Name>
         #'   |  |
         #'   |  |- Class: <Material:InfraredTransparent>
-        #'   |  |  └- Field: <1: Name>
+        #'   |  |  \- Field: <1: Name>
         #'   |  |
         #'   ......
         #' ```
@@ -466,6 +469,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         object_relation = function (class, direction = c("all", "ref_to", "ref_by"))
             idd_object_relation(self, private, class, match.arg(direction)),
+        # }}}
 
         # objects_in_relation {{{
         #' @description
@@ -605,9 +609,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @examples
         #' idd$print()
         #'
-        # }}}
         print = function ()
             idd_print(self, private)
+        # }}}
     ),
 
     private = list(
