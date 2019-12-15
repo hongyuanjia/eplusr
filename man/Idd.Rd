@@ -49,202 +49,7 @@ four tables:
 }
 }
 
-\section{Usage}{
-
-
-\preformatted{
-idd <- use_idd(ver)
-idd$version()
-idd$build()
-idd$group_index(group = NULL)
-idd$group_name()
-idd$from_group(class)
-idd$class_index(class = NULL, by_group = FALSE)
-idd$class_name(index = NULL, by_group = FALSE)
-idd$required_class_name()
-idd$unique_class_name()
-idd$extenesible_class_name()
-idd$is_valid_group(group)
-idd$is_valid_class(class)
-idd$object_relation(class, direction = c("all", "ref_by", "ref_to"))
-idd$object(class)
-idd$objects(class)
-idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))
-idd$objects_in_group(group)
-idd$ClassName
-idd[[ClassName]]
-idd$to_table(class, all = FALSE)
-idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
-idd$print()
-print(idd)
-}
-}
-
-\section{Arguments}{
-
-\itemize{
-\item \code{ver}: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
-\item \code{idd}: An \code{Idd} object.
-\item \code{group}: A character vector of valid group names. For
-\verb{$objects_in_group()}, a single string of valid group name.
-\item \code{index}: An integer vector giving indexes of name appearance in
-the IDD file of specified classes.
-\item \code{class}: A character vector of valid class names. For \verb{$object_relation()}
-and \verb{$objects_in_relation()}, a single string of valid class name.
-\item \code{ClassName}: A single string of valid class name.
-\item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
-\code{"ref_to"} or "ref_by". For \verb{$objects_in_relation()}, only \code{"ref_to"} and
-\code{"ref_by"} are acceptable.
-\item \code{all}: If \code{TRUE}, all fields in specified classes are returned. If \code{FALSE},
-only minimum required fields are returned. Default: \code{FALSE}.
-\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
-\item \code{sep_at}: The character width to separate value string and field string.
-Default: \code{29L} which is the same as IDF Editor.
-\item \code{sep_each}: A single integer of how many empty strings to insert between
-different classes. Default: \code{0}.
-\item \code{by_group}: If \code{TRUE}, a list is returned which separates class indexes or
-names by the group they belongs to. Default: \code{FALSE}.
-}
-}
-
-\section{Detail}{
-
-
-\verb{$version()} returns the IDD version in
-\link[base:numeric_version]{numeric_version}.
-
-\verb{$build()} returns the build tag string.
-
-\verb{$group_index()} returns integer indexes (indexes of name appearance in
-the IDD file) of specified groups.
-
-\verb{$group_name()} returns all group names.
-
-\verb{$from_group()} returns the names of group that specified classes belongs to.
-
-\verb{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
-
-\verb{$class_index()} returns integer indexes (indexes of name appearance in
-the IDD file) of specified classes. If \code{by_group} is \code{TRUE}, a list is returned
-which separate class indexes by the group they belong to. Otherwise, an
-integer vector is returned.
-
-\verb{$class_name()} returns class names of specified class indexes. If \code{by_group}
-is \code{TRUE}, a list is returned which separate class names by the group they
-belong to. Otherwise, a character vector is returned.
-
-\verb{$required_class_name()} returns the names of all required classes.
-
-\verb{$unique_class_name()} returns the names of all unique-object classes.
-
-\verb{$extensible_class_name()} returns the names of all extensible classes.
-
-\verb{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
-
-\verb{$object()} returns an \link{IddObject} of specified class.
-
-\verb{$objects()} returns a list of \link{IddObject}s of specified classes.
-
-\verb{$object_relation()} returns an \code{IddRelation} object which contains field
-data that have relation with specified class. For instance, if
-\code{idd$object_relation("Class 1", "ref_to")} gives results below:\preformatted{-- Refer to Others ---------------------
-  Class: <Class 1>
-  +- Field: <1: Field 1>
-  |  v~~~~~~~~~~~~~~~~~~
-  |  \\- Class: <Class 2>
-  |     \\- Field: <2: Field 2>
-  |
-  \\- Field: <2: Field 2>
-}
-
-This means that \verb{Field 2} in class \verb{Class 1} does not refer to any other fields.
-But \verb{Field 1} in class \verb{Class 2} refers to \verb{Field 2} in class named \verb{Class 2}.
-
-\verb{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
-The first element is always the \link{IddObject} of that class. If specified class
-does not have any relation with other classes, a list that only contains the
-\link{IddObject} of that class is returned. For instance,
-\code{idd$objects_in_relation("Construction", "ref_to")} will return a list of an
-\link{IddObject} of class \code{Construction} and also all \link{IddObject}s that class
-\code{Construction} refers to; similarly, \code{idd$objects_in_relation("Construction", "ref_by")} will return a list of an \link{IddObject} of class \code{Construction} and
-also all \link{IddObject}s that refer to class \code{Construction}.
-
-\verb{$objects_in_group()} returns a list of \link{IddObject}s of specified group.
-
-eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
-more convenient to get a single \link{IddObject}. Basically, \code{idd$ClassName} and
-\code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
-Here, \code{ClassName} is a single valid class name where all characters other
-than letters and numbers are replaced by a underscore \verb{_}.
-
-For details about \link{IddObject}, please see \link{IddObject} class.
-
-\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
-core data of specified class. It has 3 columns:
-\itemize{
-\item \code{class}: Character type. Class names.
-\item \code{index}: Integer type. Field indexes.
-\item \code{field}: Character type. Field names.
-}
-
-\verb{$to_string()} returns empty objects of specified class in a character vector
-format. It is formatted exactly the same as in IDF Editor.
-
-\verb{$print()} prints basic info ob current Idd object, including version, build
-tag and total class number.
-}
-
 \examples{
-\dontrun{
-# get the Idd object of EnergyPlus v8.8
-idd <- use_idd(8.8, download = "auto")
-
-# version
-idd$version()
-
-# build
-idd$build()
-
-# all group names
-str(idd$group_name())
-
-# all class names
-str(idd$class_name())
-
-# all required class names
-str(idd$required_class_name())
-
-# all unique class names
-str(idd$unique_class_name())
-
-# IddObject of SimulationControl class
-idd$object("SimulationControl")
-# OR
-idd$SimulationControl
-# OR
-idd[["SimulationControl"]]
-
-# IddObject of Construction and Material class
-idd$objects(c("Construction", "Material"))
-
-# show all classes that refer to Material class
-length(idd$object_relation("Material", "ref_by"))
-
-# IddObjects that refer to class Construction
-length(idd$objects_in_relation("Construction", "ref_by"))
-
-# IddObjects that class Construction refers to
-length(idd$objects_in_relation("Construction", "ref_to"))
-
-# All IddObjects in group Schedules
-length(idd$objects_in_group("Schedules"))
-
-# Extract core data of class Material and Construction
-idd$to_table(c("Material", "Construction"))
-
-# Get empty Material object and Construction object in a character vector
-idd$to_string(c("Material", "Construction"))
-}
 
 ## ------------------------------------------------
 ## Method `Idd$new`
@@ -253,7 +58,7 @@ idd$to_string(c("Material", "Construction"))
 \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
 
 # Preferable way
-idd <- use_idd(8.8)
+idd <- use_idd(8.8, download = TRUE)
 
 
 ## ------------------------------------------------
@@ -502,7 +307,7 @@ An \code{Idd} object.
 \preformatted{\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
 
 # Preferable way
-idd <- use_idd(8.8)
+idd <- use_idd(8.8, download = TRUE)
 
 }
 \if{html}{\out{</div>}}
