@@ -234,6 +234,8 @@ install_eplus_win <- function (exec, local = FALSE, dir = NULL, qtifw = FALSE) {
     } else {
         # create a tempfile of QTIFW control script
         ctrl <- tempfile(fileext = ".qs")
+        # NOTE: shoud escape slash twice here
+        dir <- gsub("\\", "\\\\", dir, fixed = TRUE)
         write_lines(file = ctrl, x = paste0("
             function Controller() {
                 installer.autoRejectMessageBoxes();
@@ -249,7 +251,7 @@ install_eplus_win <- function (exec, local = FALSE, dir = NULL, qtifw = FALSE) {
 
             Controller.prototype.TargetDirectoryPageCallback = function() {
                 var page = gui.pageWidgetByObjectName('TargetDirectoryPage');
-                page.TargetDirectoryLineEdit.setText(", dir, ");
+                page.TargetDirectoryLineEdit.setText(\"", dir, "\");
                 gui.clickButton(buttons.NextButton);
             }
 
