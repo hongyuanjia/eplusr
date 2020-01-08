@@ -1705,7 +1705,7 @@ match_epw_data_period <- function (epw_data, data_period, interval, leapyear, wa
     abnormal <- find_epw_data_abnormal_line(data, offset = from - 1L, warning,
         period_name = paste0("#", data_period$index, " ", surround(data_period$name),
             " (", 60/interval, " mins interval)"
-        )
+        ), from = from
     )
 
     # update datetime and minute column {{{
@@ -1844,7 +1844,7 @@ match_epw_data_datetime <- function (epw_data, index, name, start, end, interval
 }
 # }}}
 # find_epw_data_abnormal_line {{{
-find_epw_data_abnormal_line <- function (epw_data, offset = 0L, warning = FALSE, period_name = NULL) {
+find_epw_data_abnormal_line <- function (epw_data, offset = 0L, warning = FALSE, period_name = NULL, from = 0L) {
     # data period name for reporting
     nm <- if (is.null(period_name)) "." else paste0(" for data period ", period_name, ".")
 
@@ -1975,7 +1975,7 @@ find_epw_data_na_line <- function (epw_data, offset = 0L, warning = FALSE, perio
                 paste0("NA found in data", nm),
                 data = add_epw_raw_string(.SD[ln_na]),
                 num = length(unlist(na, use.names = FALSE)),
-                post = paste0("At ", combine_date(year[ln_na], month[ln_na], day[ln_miss], hour[ln_miss]), ": ", mes_miss),
+                post = paste0("At ", combine_date(year[ln_na], month[ln_na], day[ln_na], hour[ln_na]), ": ", mes_na),
                 stop = FALSE
             )
         }
@@ -2722,8 +2722,8 @@ set_epw_data <- function (epw_data, epw_header, data, realyear = FALSE,
 # }}}
 # check_epw_new_data {{{
 check_epw_new_data <- function (epw_data, epw_header, data, target_period, other_periods,
-                                  reset = FALSE, realyear = FALSE, name = NULL,
-                                  start_day_of_week = NULL, warning = TRUE) {
+                                reset = FALSE, realyear = FALSE, name = NULL,
+                                start_day_of_week = NULL, warning = TRUE) {
     # get current data period and other periods
     p <- epw_header$period$period[target_period]
     p_other <- epw_header$period$period[other_periods]
@@ -2737,7 +2737,7 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
     # check datetime column type first, then others
     assert(inherits(data$datetime, "POSIXct"),
         msg = paste0("Column `datetime` of input data should be `POSIXct` class, not ",
-            surround(class(data$datetime)[[1L]]), "class."
+            surround(class(data$datetime)[[1L]]), " class."
         )
     )
 
