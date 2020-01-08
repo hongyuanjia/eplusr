@@ -2840,7 +2840,6 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
     )
 
     # update datetime components
-    set(data, NULL, "year", as.integer(lubridate::year(data$datetime)))
     set(data, NULL, c("month", "day", "hour", "minute"),
         create_epw_datetime_components(start, end, interval, leapyear = leapyear)[, -"year"]
     )
