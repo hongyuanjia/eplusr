@@ -236,7 +236,7 @@ validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NU
 # @param dt_object A data.table that contains object data to validate. If
 #        `NULL`, the object data from `idf_env` will be used, which means to
 #        validate the whole IDF.
-# @param dt_object A data.table that contains value data to validate. If
+# @param dt_value A data.table that contains value data to validate. If
 #        `NULL`, the value data from `idf_env` will be used, which means to
 #        validate the whole IDF.
 # @param required_object Whether to check if required objects are missing. This
