@@ -154,8 +154,11 @@ test_that("Epw class", {
     expect_silent(epw$purge())
 
     epw <- read_epw(path_epw)
+    # keep input year values
+    y <- epw$data()$year
     # can change weather data
     expect_silent(epw$set(epw$data(), warning = FALSE))
+    expect_equal(epw$data()$year, y)
     expect_error(epw$add(epw$data(), warning = FALSE), class = "error_epw_data_overlap")
     expect_error(epw$add(epw$data(start_year = 2016L), realyear = TRUE, warning = FALSE), class = "error_invalid_epw_data_date")
     expect_silent(epw$add(epw$data(start_year = 2018L), realyear = TRUE, warning = FALSE))
