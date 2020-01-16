@@ -120,7 +120,7 @@ read_lines <- function(input, trim = TRUE, ...) {
 
                 # fix encoding issue in older versions of IDD files
                 dt[!stringi::stri_enc_isutf8(string), string :=
-                    stringi::stri_encode(string, "windows-1252", "UTF-8"),
+                    stringi::stri_encode(string, "windows-1252", "UTF-8")
                 ]
 
                 set(dt, j = "string", value = stri_trim_both(dt[["string"]]))
