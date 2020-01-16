@@ -971,7 +971,12 @@ iddobj_field_choice <- function (self, private, which = NULL) {
 # }}}
 # iddobj_field_range {{{
 iddobj_field_range <- function (self, private, which = NULL) {
-    fld <- iddobj_field_data(self, private, which, c("minimum", "lower_incbounds", "maximum", "upper_incbounds"), underscore = TRUE)
+    fld <- iddobj_field_data(self, private, which, c("type_enum", "has_range",
+            "minimum", "lower_incbounds", "maximum", "upper_incbounds"), underscore = TRUE)
+
+    # set limits to Inf for numeric values that do not have ranges
+    fld[type_enum < IDDFIELD_TYPE$choice & has_range == FALSE,
+        `:=`(maximum = Inf, minimum = -Inf)]
 
     fld[, `:=`(range = list(ranger(minimum, lower_incbounds, maximum, upper_incbounds))), by = field_id]
 
