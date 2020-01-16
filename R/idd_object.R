@@ -14,557 +14,6 @@ NULL
 #' meaning of each property, please see the heading comments in the
 #' `Energy+.idd` file in the EnergyPlus installation path.
 #'
-#' @section Usage:
-#' ```
-#' iddobj <- idd$object(class)
-#' iddobj <- idd_object(idd, class)
-#' iddobj$version()
-#' iddobj$parent()
-#' iddobj$group_name()
-#' iddobj$group_index()
-#' iddobj$class_name()
-#' iddobj$class_index()
-#' iddobj$class_format()
-#' iddobj$min_fields()
-#' iddobj$num_fields()
-#' iddobj$memo()
-#' iddobj$has_name()
-#' iddobj$is_required()
-#' iddobj$is_unique()
-#' iddobj$is_extensible()
-#' iddobj$num_extensible()
-#' iddobj$first_extensible_index()
-#' iddobj$extensible_group_num()
-#' iddobj$add_extensible_group(num = 1L)
-#' iddobj$del_extensible_group(num = 1L)
-#' iddobj$field_name(index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_index(name = NULL)
-#' iddobj$field_type(which = NULL)
-#' iddobj$field_note(which = NULL)
-#' iddobj$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_default(which = NULL, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_choice(which = NULL)
-#' iddobj$field_range(which = NULL)
-#' iddobj$field_relation(which = NULL, type = c("all", "ref_by", "ref_to"))
-#' iddobj$field_possible(which = NULL)
-#' iddobj$is_valid_field_num(num)
-#' iddobj$is_extensible_index(index)
-#' iddobj$is_valid_field_name(name)
-#' iddobj$is_valid_field_index(which)
-#' iddobj$is_autosizable_field(which = NULL)
-#' iddobj$is_autocalculatable_field(which = NULL)
-#' iddobj$is_numeric_field(which = NULL)
-#' iddobj$is_integer_field(which = NULL)
-#' iddobj$is_real_field(which = NULL)
-#' iddobj$is_required_field(which = NULL)
-#' iddobj$has_ref(which = NULL)
-#' iddobj$has_ref_to(which = NULL)
-#' iddobj$has_ref_by(which = NULL)
-#' iddobj$to_table(all = FALSE)
-#' iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
-#' iddobj$print(brief = FALSE)
-#' print(iddobj)
-#' ```
-#'
-#' @section Basic:
-#' ```
-#' iddobj <- idd$object(class)
-#' iddobj <- idd_object(idd, class)
-#' iddobj$version()
-#' iddobj$parent()
-#' ```
-#'
-#' An `IddObject` can be created from the parent [Idd] object, using
-#' `$object()`, [idd_object] and other equivalent.
-#'
-#' `$version()` returns the version of parent IDD current object belongs to.
-#'
-#' `$parent()` returns the parent Idd object.
-#'
-#' **Arguments**
-#'
-#' * `idd`: An [Idd] object.
-#' * `class`: A valid class name (a string).
-#' * `iddobj`: An IddObject object.
-#'
-#' @section Class Property:
-#' ```
-#' iddobj$group_name()
-#' iddobj$group_index()
-#' iddobj$class_name()
-#' iddobj$class_index()
-#' iddobj$class_format()
-#' iddobj$min_fields()
-#' iddobj$num_fields()
-#' iddobj$memo()
-#' iddobj$has_name()
-#' iddobj$is_required()
-#' iddobj$is_unique()
-#' ```
-#'
-#' `$group_index()` returns the index of IDD group it belongs to.
-#'
-#' `$group_name()` returns the name of IDD group it belongs to.
-#'
-#' `$class_index()` returns the index of this IDD class.
-#'
-#' `$class_name()` returns the name of this IDD class.
-#'
-#' `$class_format()` returns the format of this IDD class. This format indicator
-#' is currently not used by eplusr. **Note**: some classes have special format
-#' when saved in the IDFEditor with the special format option enabled. Those
-#' special format includes "singleLine", "vertices", "compactSchedule",
-#' "fluidProperties", "viewFactors" and "spectral".  eplusr can handle all those
-#' format when parsing IDF files. However, when saved, all classes are formatted
-#' in standard way.
-#'
-#' `$min_fields()` returns the minimum fields required for this class.  If no
-#' required, `0` is returned.
-#'
-#' `$num_fields()` returns current total number of fields in this class. This
-#' number may change if the class is extensible and after
-#' `$add_extensible_group()` or `$del_extensible_group()`.
-#'
-#' `$memo()` returns memo of this class. Usually a brief description of this
-#' class.
-#'
-#' `$has_name()` return `TRUE` if this class has name attribute.
-#'
-#' `$is_unique()` return `TRUE` if this class is unique.
-#'
-#' `$is_required()` returns `TRUE` if this class is required.
-#'
-#' @section Extensible Group:
-#' ```
-#' iddobj$is_extensible()
-#' iddobj$num_extensible()
-#' iddobj$first_extensible_index()
-#' iddobj$extensible_group_num()
-#' iddobj$add_extensible_group(num = 1L)
-#' iddobj$del_extensible_group(num = 1L)
-#' ```
-#'
-#' `$is_extensible()` returns `TRUE` if this class is extensible.
-#'
-#' `$num_extensible()` returns the number of extensible fields in this class. If
-#' not zero, it means that objects in this class is dynamically extensible.
-#'
-#' `$first_extensible_index()` returns the field index of the first extensible
-#' field in this class. If this class is not extensible, `0` is return.
-#'
-#' `$extensible_group_num()` returns the number of extensible groups in this
-#' class.
-#'
-#' `$add_extensible_groups()` adds extensible groups in this class.
-#'
-#' `$del_extensible_groups()` deletes extensible groups in this class.
-#'
-#' **Arguments**
-#'
-#' * `num`: A positive integer of how many extensible groups to add or delete.
-#'   Default: `1`.
-#'
-#' @section Field Property:
-#' ```
-#' iddobj$field_name(index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_index(name = NULL)
-#' iddobj$field_type(which = NULL)
-#' iddobj$field_note(which = NULL)
-#' iddobj$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_default(which = NULL, in_ip = eplusr_option("view_in_ip")
-#' iddobj$field_choice(which = NULL)
-#' iddobj$field_range(which = NULL)
-#' iddobj$field_relation(which = NULL, type = c("all", "ref_by", "ref_to"))
-#' iddobj$field_possible(which = NULL)
-#' iddobj$is_valid_field_num(num)
-#' iddobj$is_extensible_index(index)
-#' iddobj$is_valid_field_name(name)
-#' iddobj$is_valid_field_index(which)
-#' iddobj$is_autosizable_field(which = NULL)
-#' iddobj$is_autocalculatable_field(which = NULL)
-#' iddobj$is_numeric_field(which = NULL)
-#' iddobj$is_integer_field(which = NULL)
-#' iddobj$is_real_field(which = NULL)
-#' iddobj$is_required_field(which = NULL)
-#' iddobj$has_ref(which = NULL)
-#' iddobj$has_ref_to(which = NULL)
-#' iddobj$has_ref_by(which = NULL)
-#' ```
-#'
-#' `$field_name()` returns names of fields specified by field indexes. If
-#' `index` is `NULL`, names of all fields in this class are returned. If `lower`
-#' is `TRUE`, "lower-style" names are returned, i.e. all spaces and dashes is
-#' replaced by underscores. "lower-style" names are useful when use them as
-#' filed names in `$set_value()` in `IdfObject` class and `$set_object()` in
-#' `Idf` class. If `unit` is `TRUE`, the units of those fields are also
-#' returned. If `in_ip`, corresponding imperial units are returned. It only has
-#' effect when `unit` is `TRUE`.
-#'
-#' `$field_index()` returns indexes of fields specified by field names. If
-#' `name` is `NULL`, indexes of all fields in this class are returned.
-#'
-#' All other `$field_*()` returns specific field properties. If `which` is
-#' `NULL`, properties of all fields in this class are returned.
-#'
-#' `$field_type`(): returns field types. All possible values are
-#' `"integer"`, `"real"`, `"alpha"` (arbitrary string), `"choice"` (alpha
-#' with specific list of choices), `"object-list"` (link to a list of
-#' objects defined elsewhere), `"external-list"` (uses a special list from
-#' an external source) and `"node"` (name used in connecting HVAC
-#' components).
-#'
-#' `$field_unit()`: returns a character vector of field units. If `in_ip` is
-#' `TRUE`, IP unites are returned.
-#'
-#' `$field_default()`: returns a list of default values of those fields. If
-#' no defaults found, `NA`s are returned.
-#'
-#' `$field_choice()`: returns a list of all valid choices for those fields.
-#' If no choices found, `NA`s are returned.
-#'
-#' `$field_range()`: returns a list of ranges for those fields. Every range
-#' has four components: `minimum` (lower limit), `lower_incbounds` (`TRUE`
-#' if the lower limit should be included), `maximum` (upper limit), and
-#' `upper_incbounds` (`TRUE` if the upper limit should be included). For
-#' fields of character type, empty lists are returned. For fields of
-#' numeric types with no specified ranges, `minimum` is set to `-Inf`,
-#' `lower_incbounds` is set to FALSE, `upper` is set to `Inf`, and
-#' `upper_incbounds` is set to FALSE. The field range is printed in number
-#' interval denotation.
-#'
-#' `$field_relation()`: returns a list of references for those fields that
-#' have the `object-list` and/or `reference` and `reference-class-name`
-#' attribute. Basically, it is a list of two elements `ref_to` and `ref_by`.
-#' Underneath, `ref_to` and `ref_by` are [data.table][data.table::data.table()]s
-#' which contain source field data and reference field data with custom printing
-#' method. For instance, if `iddobj$field_relation(c(1, 2), "ref_to")` gives
-#' results below:
-#'
-#' ```
-#' -- Refer to Others ---------------------
-#'   +- Field: <1: Field 1>
-#'   |  v~~~~~~~~~~~~~~~~~~
-#'   |  \- Class: <Class 2>
-#'   |     \- Field: <2: Field 2>
-#'   |
-#'   \- Field: <2: Field 2>
-#' ```
-#'
-#' This means that `Field 2` in current class does not refer to any other fields.
-#' But `Field 1` in current class refers to `Field 2` in class named `Class 2`.
-#'
-#' `$field_possible()`: returns all possible values for specified fields,
-#' including auto-value (`Autosize`, `Autocalculate`, and `NA` if not
-#' applicable), and results from `$field_default()`, `$field_range()`,
-#' `$field_choice()`. Underneath, it returns a data.table with custom
-#' printing method. For instance, if `iddobj$field_possible(c(4, 2))` gives
-#' results below:
-#'
-#' ```
-#' -- 4: Field 4 ----------
-#' * Auto value: <NA>
-#' * Default: <NA>
-#' * Choice:
-#'   - "Key1"
-#'   - "Key2"
-#'
-#' -- 2: Field 2 ----------
-#' * Auto value: "Autosize"
-#' * Default: 2
-#' * Choice: <NA>
-#' ```
-#'
-#' This means that `Field 4` in current class cannot be "autosized" or
-#' "autocalculated", and it does not have any default value. Its value should be
-#' a choice from `"Key1"` or `"Key2"`. For `Field 2` in current class, it has a
-#' default value of `2` but can also be filled with value `"Autosize"`.
-#'
-#' `$is_valid_field_num()` returns `TRUE` if `num` is acceptable as a total
-#' number of fields in this class. Extensible property is considered. For
-#' instance, the total number of fields defined in IDD for class
-#' `BuildingSurfaces:Detailed` is 390. However, 396 is still a valid field
-#' number for this class as the number of field in the extensible group is 3.
-#'
-#' `$is_valid_field_name()` returns `TRUE` if `name` is a valid field name
-#' **WITHOUT** unit. Note `name` can be given in underscore style, e.g.
-#' `"outside_layer"` is equivalent to `"Outside Layer"`.
-#'
-#' `$is_valid_field_index()` returns `TRUE` if `index` is a valid field index.
-#'
-#' `$is_autosizable_field()` returns `TRUE` if the field can be assigned to
-#' `autosize`.
-#'
-#' `$is_autocalculatable_field()` returns `TRUE` if the field can be assigned to
-#' `autocalculate`.
-#'
-#' `$is_numeric_field()` returns `TRUE` if the field value should be numeric (
-#' an integer or a real number).
-#'
-#' `$is_integer_field()` returns `TRUE` if the field value should be an integer.
-#'
-#' `$is_real_field()` returns `TRUE` if the field value should be a real number
-#' but not an integer.
-#'
-#' `$is_required_field()` returns `TRUE` if the field is required.
-#'
-#' `$has_ref()` returns `TRUE` if the field refers to or can be referred by
-#' other fields.
-#'
-#' `$has_ref_to()` returns `TRUE` if the field refers to other fields.
-#'
-#' `$has_ref_by()` returns `TRUE` if the field refers can be referred by other
-#' fields.
-#'
-#' **Arguments**
-#'
-#' * `index`: An integer vector of field indexes.
-#' * `name`: A character vector or field names. Can be given in underscore style,
-#'   e.g. `"Thermal Resistance"` can be given in format `"thermal_resistance"`.
-#' * `which`: An integer vector of field indexes or a character vector of field
-#'   names. Field names can be given in underscore style.
-#' * `unit`: If `TRUE`, field units will be pasted after field names, just like
-#'   the way IDF Editor does. Default: `FALSE`.
-#' * `in_ip`: If `TRUE`, field names or values will be returned in IP units.
-#'   Default: the value of `eplusr_option("view_in_ip")`.
-#' * `type`: The direction of relation to search. Should be one of `"all"`,
-#'   `"ref_by"` and `"ref_to"`. If `"ref_by"`, the relation data of specified
-#'   fields and fields that refer to specified fields is returned. If
-#'   `"ref_to"`, the relation data of specified fields and fields that are
-#'   referred by specified fields is returned. If `"all"`, both are returned.
-#'
-#' @section Data Extraction:
-#' ```
-#' iddobj$to_table(all = FALSE)
-#' iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
-#' ```
-#'
-#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
-#' core data of current class. It has 3 columns:
-#'
-#' * `class`: Character type. Current class name.
-#' * `index`: Integer type. Field indexes.
-#' * `field`: Character type. Field names.
-#'
-#' `$to_string()` returns an empty object of current class in a character vector
-#' format. It is formatted exactly the same as in IDF Editor.
-#'
-#' **Arguments**
-#'
-#' * `all`: If `TRUE`, all fields in current class are returned, otherwise only
-#'   minimum fields are returned.
-#' * `unit`: If `TRUE`, units are also returned. Default: `FALSE`.
-#' * `comment`: A character vector to be used as comments of returned string
-#'   format object. If `NULL`, no comments are inserted. Default: `NULL`.
-#' * `leading`: Leading spaces added to each field. Default: `4L`.
-#' * `sep_at`: The character width to separate value string and field string.
-#'   Default: `29L` which is the same as IDF Editor.
-#'
-#' @section Print:
-#'
-#' `$print()` prints the IddObject. Basically, the print output can be divided
-#' into 4 parts:
-#'
-#' * CLASS: IDD class name of current object in format `<IddObject: CLASS>`.
-#' * MEMO: brief description of the IDD class
-#' * PROPERTY: properties of the IDD class, including name of group it belongs
-#'   to, whether it is an unique or required class and current total fields. The
-#'   fields may increase if the IDD class is extensible, such as `Branch`,
-#'   `ZoneList` and etc.
-#' * FIELDS: fields of current IDD class. Required fields are marked with bullet
-#'   marks. If the class is extensible, only the first extensible group will be
-#'   printed and two ellipses will be shown at the bottom. Fields in the
-#'   extensible group will be marked with an arrow down surrounded by angle
-#'   brackets.
-#'
-#' **Argument**:
-#'
-#' * `brief`: If `TRUE`, only class name part is printed. Default: `FALSE`.
-#'
-#' @examples
-#' \dontrun{
-#' # ===== CREATE =====
-#' # get a parent Idd object
-#' idd <- use_idd(8.8, download = "auto")
-#'
-#' # get an IddObject of class "Material"
-#' mat <- idd$Material
-#' # OR
-#' mat <- idd_object(idd, "Material")
-#'
-#' # ===== BASIC INFO =====
-#' # get the version of parent IDD
-#' mat$version()
-#'
-#' # ===== CLASS PROPERTY =====
-#' # get name of IDD group it belongs to
-#' mat$group_name()
-#'
-#' # get index of IDD group it belongs to
-#' mat$group_index()
-#'
-#' # get name of current IDD class
-#' mat$class_name()
-#'
-#' # get index of current IDD class
-#' mat$class_index()
-#'
-#' # get the format of current IDD class
-#' mat$class_format()
-#'
-#' # get minimum field number
-#' mat$min_fields()
-#'
-#' # get total field number
-#' mat$num_fields()
-#'
-#' # get memo of current class
-#' mat$memo()
-#'
-#' # check if current class has name attribute or not
-#' mat$has_name()
-#'
-#' # check if current class is required
-#' mat$is_required()
-#'
-#' # check if current class is unique
-#' mat$is_unique()
-#'
-#' # ===== EXTENSIBLE GROUP =====
-#' # get an IddObject of extensible class "Branch"
-#' bran <- idd$Branch
-#'
-#' # check if the class is extensible
-#' bran$is_extensible()
-#'
-#' # get number of extensible fields, index of first extensible field and number of
-#' # current extensible groups in "Branch" class
-#' bran$num_extensible()
-#'
-#' bran$first_extensible_index()
-#'
-#' bran$extensible_group_num()
-#'
-#' # get current number of fields
-#' bran$num_fields()
-#'
-#' # add ten extensible groups
-#' bran$add_extensible_group(10)
-#' # the number of fields has been increased by 10 * 4 (= 40)
-#' bran$num_fields()
-#'
-#' # delete eight extensible groups
-#' bran$del_extensible_group(8)
-#' # the number of fields has been decreased by 8 * 4 (= 32)
-#' bran$num_fields()
-#'
-#' # ===== FIELD PROPERTY =====
-#' # list all field names without units
-#' mat$field_name()
-#'
-#' # get field indexes
-#' mat$field_index(c("thickness", "roughness", "name"))
-#'
-#' # get field types
-#' mat$field_type(c("solar_absorptance", "Density", "Name"))
-#'
-#' # get field notes
-#' bran$field_note(c(2, 4))
-#'
-#' # get field SI units
-#' mat$field_unit(c(1,3,5), in_ip = FALSE)
-#'
-#' # get field IP units
-#' mat$field_unit(c(1,3,5), in_ip = TRUE)
-#'
-#' # get field default values in SI units
-#' str(mat$field_default(in_ip = FALSE))
-#'
-#' # get field choices
-#' str(mat$field_choice(1:3))
-#'
-#' # get field ranges
-#' mat$field_range(c("roughness", "thickness", "conductivity", "solar_absorptance"))
-#'
-#' # get field relation with other fields
-#' mat$field_relation(type = "all")
-#'
-#' # get all possible values of fields
-#' mat$field_possible()
-#'
-#' # check if input is a valid field number for current class
-#' ## get required minimum field number
-#' mat$min_fields()
-#'
-#' # (1) if less than required minimum field number
-#' mat$is_valid_field_num(3)
-#'
-#' # (2) if larger than required minimum field number but less than total field
-#' # number
-#' mat$is_valid_field_num(7)
-#'
-#' # (3) if larger than total field number
-#' mat$is_valid_field_num(10)
-#' # [1] FALSE
-#'
-#' # for extensible class
-#' bran$num_fields()
-#' bran$num_extensible()
-#' # if larger than required minimum field number
-#' # (1) but cannot give whole extensible groups
-#' bran$is_valid_field_num(c(55, 57, 60))
-#'
-#' # (2) and can give whole extensible groups
-#' bran$is_valid_field_num(c(58, 62, 70))
-#'
-#' # check if input field index is an extensible field index
-#' bran$is_extensible_index(1:4)
-#'
-#' # check if input is valid field name
-#' # NOTE: lower-style names are treated as valid
-#' mat$is_valid_field_name(c("nAmE", "specific heat", "Specific Heat", "specific_heat"))
-#'
-#' # check if input is valid field index
-#' bran$is_valid_field_index(c(1, 4, 54, 57))
-#'
-#' # check if fields are autosizable, i.e. can be set to "Autosize"
-#' mat$is_autosizable_field(1:4)
-#'
-#' # check if fields are autocalculatable, i.e. can be set to "Autocalculate"
-#' mat$is_autocalculatable_field(1:4)
-#'
-#' # check if fields are numeric fields, i.e. field values should be either
-#' # integers or float numbers
-#' mat$is_numeric_field(c("roughness", "thickness", "density"))
-#'
-#' # check if fields are integer fields, i.e. field values should be integers
-#' mat$is_integer_field(c("name", "specific_heat"))
-#'
-#' # check if fields are real fields, i.e. field values should be real numbers
-#' # but not integers
-#' mat$is_real_field(c("name", "specific_heat"))
-#'
-#' # check if fields are required, i.e. field values should not be empty
-#' mat$is_required_field(c("name", "roughness", "solar_absorptance"))
-#'
-#' # check if fields refer to or can be referred by other fields
-#' mat$has_ref()
-#'
-#' # check if fields refer to other fields
-#' mat$has_ref_to()
-#'
-#' # check if fields can be referred by other fields
-#' mat$has_ref_by(which = NULL)
-#'
-#' # ===== DATA EXTRACTION =====
-#' # get core data of current class
-#' mat$to_table()
-#'
-#' # get an empty string-foramt object of current class
-#' mat$to_string()
-#'
-#' # ===== PRINT =====
-#' mat$print()
-#' }
 #' @docType class
 #' @name IddObject
 #' @seealso [Idd] Class
@@ -581,24 +30,39 @@ NULL
 #' @return An [IddObject] object.
 #' @export
 #' @examples
-#' \dontrun{
 #' idd <- use_idd(8.8, download = "auto")
 #'
 #' # get an IddObject using class name
 #' idd_object(idd, "Material")
 #' idd_object(8.8, "Material")
-#' }
 # idd_object {{{
 idd_object <- function (parent, class) {
     IddObject$new(class, parent)
 }
 # }}}
 
+#' @export
 # IddObject {{{
 IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
 
     public = list(
         # INITIALIZE {{{
+        #' @description
+        #' Create an `IddObject` object
+        #'
+        #' @details
+        #' Note that an `IddObject` can be created from the parent [Idd] object,
+        #' using `$object()`, [idd_object] and other equivalent.
+        #'
+        #' @param class A single integer specifying the class index or a single
+        #'        string specifying the class name.
+        #' @param parent An [Idd] object or a valid input for [use_idd()].
+        #'
+        #' @return An `IddObject` object.
+        #'
+        #' @examples
+        #' surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
+        #'
         initialize = function (class, parent) {
             if (missing(parent)) {
                 abort("error_iddobject_missing_parent",
@@ -615,153 +79,1192 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         },
         # }}}
 
+        # META {{{
+        # version {{{
+        #' @description
+        #' Get the version of parent `Idd`
+        #'
+        #' @details
+        #' `$version()` returns the version of parent `Idd` in a
+        #' [base::numeric_version()] format. This makes it easy to direction
+        #' compare versions of different `IddObject`s, e.g. `iddobj$version() > 8.6` or
+        #' `iddobj1$version() > iddobj2$version()`.
+        #'
+        #' @return A [base::numeric_version()] object.
+        #'
+        #' @examples
+        #' # get version
+        #' surf$version()
+        #'
         version = function ()
             iddobj_version(self, private),
+        # }}}
 
+        # parent {{{
+        #' @description
+        #' Get parent [Idd]
+        #'
+        #' @details
+        #' `$parent()` returns parent [Idd] object.
+        #'
+        #' @return A [Idd] object.
+        #'
+        #' @examples
+        #' surf$parent()
+        #'
         parent = function ()
             iddobj_parent(self, private),
+        # }}}
+        # }}}
 
         # CLASS PROPERTY GETTERS {{{
+        # group_name {{{
+        #' @description
+        #' Get the group name
+        #'
+        #' @details
+        #' `$group_name()` returns the group name of current `IddObject`.
+        #'
+        #' @return A single string.
+        #'
+        #' @examples
+        #' surf$group_name()
+        #'
         group_name = function ()
             iddobj_group_name(self, private),
+        # }}}
 
+        # group_index {{{
+        #' @description
+        #' Get the group index
+        #'
+        #' @details
+        #' `$group_index()` returns the group index of current `IddObject`. A
+        #' group index is just an integer indicating its appearance order in the
+        #' [Idd].
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$group_index()
+        #'
         group_index = function ()
             iddobj_group_index(self, private),
+        # }}}
 
+        # class_name {{{
+        #' @description
+        #' Get the class name of current `IddObject`
+        #'
+        #' @details
+        #' `$class_name()` returns the class name of current `IddObject`.
+        #'
+        #' @return A single string.
+        #'
+        #' @examples
+        #' surf$class_name()
+        #'
         class_name = function ()
             iddobj_class_name(self, private),
+        # }}}
 
+        # class_index {{{
+        #' @description
+        #' Get the class index
+        #'
+        #' @details
+        #' `$class_index()` returns the class index of current `IddObject`. A
+        #' class index is just an integer indicating its appearance order in the
+        #' [Idd].
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$class_index()
+        #'
         class_index = function ()
             iddobj_class_index(self, private),
+        # }}}
 
+        # class_foramt {{{
+        #' @description
+        #' Get the class format
+        #'
+        #' @details
+        #' `$class_format()` returns the format of this IDD class. This format
+        #' indicator is currently not used by eplusr.
+        #'
+        #' @note
+        #' Some classes have special format when saved in the IDFEditor with the
+        #' special format option enabled. Those special format includes
+        #' "singleLine", "vertices", "compactSchedule", "fluidProperties",
+        #' "viewFactors" and "spectral". eplusr can handle all those format when
+        #' parsing IDF files. However, when saved, all classes are formatted in
+        #' standard way.
+        #'
+        #' @return A single character.
+        #'
+        #' @examples
+        #' surf$class_format()
+        #'
         class_format = function ()
             iddobj_class_format(self, private),
+        # }}}
 
+        # min_fields {{{
+        #' @description
+        #' Get the minimum field number of current class
+        #'
+        #' @details
+        #' `$min_fields()` returns the minimum fields required for current class.
+        #' If no required, `0` is returned.
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$min_fields()
+        #'
         min_fields = function ()
             iddobj_min_fields(self, private),
+        # }}}
 
+        # num_fields {{{
+        #' @description
+        #' Get the total field number of current class
+        #'
+        #' @details
+        #' `$num_fields()` returns current total number of fields in current
+        #' class.
+        #'
+        #' @note
+        #' This number may change if the class is extensible and after
+        #' `$add_extensible_group()` or `$del_extensible_group()`.
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$num_fields()
+        #'
         num_fields = function ()
             iddobj_num_fields(self, private),
+        # }}}
 
+        # memo {{{
+        #' @description
+        #' Get the memo string of current class
+        #'
+        #' @details
+        #' `$memo()` returns memo of current class, usually a brief description
+        #' of this class.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' surf$memo()
+        #'
         memo = function ()
             iddobj_memo(self, private),
+        # }}}
 
+        # num_extensible{{{
+        #' @description
+        #' Get the field number of the extensible group in current class
+        #'
+        #' @details
+        #' `$num_extensible()` returns the field number of the extensible group
+        #' in current class.
+        #'
+        #' An extensible group is a set of fields that should be treated as a
+        #' whole, such like the X, Y and Z vertices of a building surfaces. An
+        #' extensible group should be added or deleted together.
+        #'
+        #' If there is no extensible group in current class, `0` is returned.
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$num_extensible()
+        #'
         num_extensible = function ()
             iddobj_num_extensible(self, private),
+        # }}}
 
+        # first_extensible_index {{{
+        #' @description
+        #' Get the minimum field number of current class
+        #'
+        #' @details
+        #' `$first_extensible_index()` returns the field index of first
+        #' extensible field in current class.
+        #'
+        #' An extensible group is a set of fields that should be treated as a
+        #' whole, such like the X, Y and Z vertices of a building surfaces. An
+        #' extensible group should be added or deleted together.
+        #'
+        #' If there is no extensible group in current class, `0` is returned.
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$first_extensible_index()
+        #'
         first_extensible_index = function ()
             iddobj_first_extensible_index(self, private),
+        # }}}
 
+        # extensible_group_num{{{
+        #' @description
+        #' Get the number of extensible groups in current class
+        #'
+        #' @details
+        #' `$extensible_group_num()` returns the number of extensible groups in
+        #' current class.
+        #'
+        #' An extensible group is a set of fields that should be treated as a
+        #' whole, such like the X, Y and Z vertices of a building surfaces. An
+        #' extensible group should be added or deleted together.
+        #'
+        #' If there is no extensible group in current class, `0` is returned.
+        #'
+        #' @return A single integer.
+        #'
+        #' @examples
+        #' surf$extensible_group_num()
+        #'
         extensible_group_num = function ()
             iddobj_extensible_group_num(self, private),
         # }}}
+        # }}}
 
         # EXTENSIBLE GROUP {{{
+        # add_extensible_group {{{
+        #' @description
+        #' Add extensible groups in current class
+        #'
+        #' @details
+        #' `$add_extensible_groups()` adds extensible groups in this class.
+        #'
+        #' An extensible group is a set of fields that should be treated as a
+        #' whole, such like the X, Y and Z vertices of a building surfaces. An
+        #' extensible group should be added or deleted together.
+        #'
+        #' An error will be issued if current class contains no extensible
+        #' group.
+        #'
+        #' @param num An integer indicating the number of extensible groups to
+        #'        be added.
+        #'
+        #' @return The modified `IddObject` itself.
+        #'
+        #' @examples
+        #' # field number before adding
+        #' surf$num_fields()
+        #' # extensible group number before adding
+        #' surf$extensible_group_num()
+        #'
+        #' # add 2 more extensible groups
+        #' surf$add_extensible_group(2)
+        #'
+        #' # field number after adding
+        #' surf$num_fields()
+        #' # extensible group number after adding
+        #' surf$extensible_group_num()
+        #'
         add_extensible_group = function (num = 1L)
             iddobj_add_extensible_group(self, private, num),
+        # }}}
 
+        # del_extensible_group {{{
+        #' @description
+        #' Delete extensible groups in current class
+        #'
+        #' @details
+        #' `$del_extensible_groups()` deletes extensible groups in this class.
+        #'
+        #' An extensible group is a set of fields that should be treated as a
+        #' whole, such like the X, Y and Z vertices of a building surfaces. An
+        #' extensible group should be added or deleted together.
+        #'
+        #' An error will be issued if current class contains no extensible
+        #' group.
+        #'
+        #' @param num An integer indicating the number of extensible groups to
+        #'        be deleted.
+        #'
+        #' @return The modified `IddObject` itself.
+        #'
+        #' @examples
+        #' # field number before deleting
+        #' surf$num_fields()
+        #' # extensible group number before deleting
+        #' surf$extensible_group_num()
+        #'
+        #' # delete 2 more extensible groups
+        #' surf$del_extensible_group(2)
+        #'
+        #' # field number after deleting
+        #' surf$num_fields()
+        #' # extensible group number after deleting
+        #' surf$extensible_group_num()
+        #'
         del_extensible_group = function (num = 1L)
             iddobj_del_extensible_group(self, private, num),
         # }}}
+        # }}}
 
         # CLASS PROPERTY ASSERTIONS {{{
+        # has_name {{{
+        #' @description
+        #' Check if current class has name attribute
+        #'
+        #' @details
+        #' `$has_name()` return `TRUE` if current class has name attribute, and
+        #' `FALSE` otherwise.
+        #'
+        #' A class with name attribute means that objects in this class can have
+        #' names.
+        #'
+        #' @return A single logical value (`TRUE` or `FALSE`).
+        #'
+        #' @examples
+        #' surf$has_name()
+        #'
         has_name = function ()
             iddobj_has_name(self, private),
+        # }}}
 
+        # is_required {{{
+        #' @description
+        #' Check if current class is required
+        #'
+        #' @details
+        #' `$is_required()` returns `TRUE` if current class is required and
+        #' `FALSE` otherwise.
+        #'
+        #' A required class means that for any model, there should be at least
+        #' one object in this class. One example is `Building` class.
+        #'
+        #' @return A single logical value (`TRUE` or `FALSE`).
+        #'
+        #' @examples
+        #' surf$is_required()
+        #'
         is_required = function ()
             iddobj_is_required(self, private),
+        # }}}
 
+        # is_unique {{{
+        #' @description
+        #' Check if current class is unique
+        #'
+        #' @details
+        #' `$is_unique()` returns `TRUE` if current class is unique and
+        #' `FALSE` otherwise.
+        #'
+        #' A unique class means that for any model, there should be at most
+        #' one object in this class. One example is `Building` class.
+        #'
+        #' @return A single logical value (`TRUE` or `FALSE`).
+        #'
+        #' @examples
+        #' surf$is_unique()
+        #'
         is_unique = function ()
             iddobj_is_unique(self, private),
+        # }}}
 
+        # is_extensible {{{
+        #' @description
+        #' Check if current class is extensible
+        #'
+        #' @details
+        #' `$is_extensible()` returns `TRUE` if current class is extensible and
+        #' `FALSE` otherwise.
+        #'
+        #' A extensible class means that for there are curtain number of fields
+        #' in this class that can be dynamically added or deleted, such like the
+        #' X, Y and Z vertices of a building surface.
+        #'
+        #' @return A single logical value (`TRUE` or `FALSE`).
+        #'
+        #' @examples
+        #' surf$is_extensible()
+        #'
         is_extensible = function ()
             iddobj_is_extensible(self, private),
         # }}}
+        # }}}
 
         # FIELD PROPERTY GETTERS {{{
+
+        # field_name {{{
+        #' @description
+        #' Get field names
+        #'
+        #' @details
+        #' `$field_name()` returns a character vector of names of fields
+        #' specified by field indices in current class.
+        #'
+        #' @param index An integer vector of field indices. If `NULL`, names of
+        #'        all fields in this class are returned. Default: `NULL`.
+        #'
+        #' @param unit If `TRUE`, the units of those fields are also returned.
+        #'        Default: `FALSE`.
+        #'
+        #' @param in_ip If `in_ip`, corresponding imperial units are returned.
+        #'        It only has effect when `unit` is `TRUE`. Default:
+        #'        `eplusr_option("view_in_ip")`.
+        #'
+        #' @param lower If `TRUE`, "lower-style" names are returned, i.e. all
+        #'        spaces and dashes is replaced by underscores. "lower-style"
+        #'        names are useful when use them as filed names in
+        #'        `$set_value()` in `IdfObject` class and `$set_object()` in
+        #'        [Idf] class. Default: `FALSE`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get all field names
+        #' surf$field_name()
+        #'
+        #' # get field units also
+        #' surf$field_name(unit = TRUE)
+        #'
+        #' # get field units in IP
+        #' surf$field_name(unit = TRUE)
+        #'
+        #' # change field name to lower-style
+        #' surf$field_name(unit = TRUE, in_ip = TRUE)
+        #'
         field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE)
             iddobj_field_name(self, private, index, unit, in_ip, lower),
+        # }}}
 
+        # field_index {{{
+        #' @description
+        #' Get field indices
+        #'
+        #' @details
+        #' `$field_index()` returns an integer vector of names of fields
+        #' specified by field names in current class.
+        #'
+        #' @param name A character vector of field names. Can be in
+        #'        "lower-style", i.e. all spaces and dashes is replaced by
+        #'        underscores. If `NULL`, indices of all fields in this class
+        #'        are returned. Default: `NULL`.
+        #'
+        #' @return An integer vector.
+        #'
+        #' @examples
+        #' # get all field indices
+        #' surf$field_index()
+        #'
+        #' # get field indices for specific fields
+        #' surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+        #'
         field_index = function (name = NULL)
             iddobj_field_index(self, private, name),
+        # }}}
 
+        # field_type {{{
+        #' @description
+        #' Get field types
+        #'
+        #' @details
+        #' `$field_type()` returns a character vector of field types of
+        #' specified fields in current class. All possible values are:
+        #'
+        #' * `"integer"`
+        #' * `"real"`
+        #' * `"alpha"` (arbitrary string)
+        #' * `"choice"` (alpha with specific list of choices)
+        #' * `"object-list"` (link to a list of objects defined elsewhere)
+        #' * `"external-list"` (uses a special list from an external source)
+        #' * `"node"` (name used in connecting HVAC components).
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get all field types
+        #' surf$field_type()
+        #'
+        #' # get field types for specific fields
+        #' surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+        #'
         field_type = function (which = NULL)
             iddobj_field_type(self, private, which = which),
+        # }}}
 
+        # field_note {{{
+        #' @description
+        #' Get field notes
+        #'
+        #' @details
+        #' `$field_note()` returns a list of character vectors that contains
+        #' field notes of specified fields in current class, usually serving as
+        #' field descriptions. If no notes are found for current fields, `NULL`
+        #' is returned.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A list of character vectors.
+        #'
+        #' @examples
+        #' # get all field notes
+        #' surf$field_note()
+        #'
+        #' # get field types for specific fields
+        #' surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
+        #'
         field_note = function (which = NULL)
             iddobj_field_note(self, private, which),
+        # }}}
 
+        # field_unit {{{
+        #' @description
+        #' Get field units
+        #'
+        #' @details
+        #' `$field_unit()` returns a character vector that contains units of
+        #' specified fields in current class. If there is no unit found for
+        #' current field, `NA` is returned.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @param in_ip If `in_ip`, corresponding imperial units are returned.
+        #'        Default: `eplusr_option("view_in_ip")`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get all field units
+        #' surf$field_unit()
+        #'
+        #' # get field units for specific fields
+        #' surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+        #'
         field_unit = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_unit(self, private, which, in_ip),
+        # }}}
 
+        # field_default {{{
+        #' @description
+        #' Get field default value
+        #'
+        #' @details
+        #' `$field_default()` returns a list that contains default values of
+        #' specified fields in current class. If there is no default value found
+        #' for current field, `NA` is returned.
+        #'
+        #' @note
+        #' The type of each default value will be consistent with field
+        #' definition. However, for numeric fields with default values being
+        #' `"autosize"` or `"autocalculate"`, the type of returned values will
+        #' be character.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @param in_ip If `in_ip`, values in corresponding imperial units are
+        #'        returned. Default: `eplusr_option("view_in_ip")`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get all field default values
+        #' surf$field_default()
+        #'
+        #' # get default values for specific fields
+        #' surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+        #'
         field_default = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_default(self, private, which, in_ip),
+        # }}}
 
+        # field_choice {{{
+        #' @description
+        #' Get choices of field values
+        #'
+        #' @details
+        #' `$field_value()` returns a list of character vectors that contains
+        #' choices of specified field values in current class. If there is no
+        #' choice found for current field, `NULL` is returned.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A list of character vectors.
+        #'
+        #' @examples
+        #' # get all field value choices
+        #' surf$field_choice()
+        #'
+        #' # get field value choices for specific fields
+        #' surf$field_choice(c("name", "sun exposure", "wind exposure"))
+        #'
         field_choice = function (which = NULL)
             iddobj_field_choice(self, private, which),
+        # }}}
 
+        # field_range {{{
+        #' @description
+        #' Get field value ranges
+        #'
+        #' @details
+        #' `$field_range()` returns a list of value ranges of specified fields
+        #' in current class.
+        #'
+        #' Every range has four components:
+        #'
+        #' * `minimum`: lower limit
+        #' * `lower_incbounds`: `TRUE` if the lower limit should be included
+        #' * `maximum`: upper limit
+        #' * `upper_incbounds`: `TRUE` if the upper limit should be included
+        #'
+        #' For fields of character type,
+        #'
+        #' * `minimum` and `maximum` are always set to `NA`
+        #' * `lower_incbounds` and `upper_incbounds` are always set to `FALSE`
+        #'
+        #' For fields of numeric types with no specified ranges,
+        #'
+        #' * `minimum` is set to `-Inf`
+        #' * `lower_incbounds` is set to `FALSE`
+        #' * `upper` is set to `Inf`
+        #' * `upper_incbounds` is set to `FALSE`
+        #'
+        #' The field range is printed in number interval denotation.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A list of ranges.
+        #'
+        #' @examples
+        #' # get all field value ranges
+        #' surf$field_range()
+        #'
+        #' # get value ranges for specific fields
+        #' surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+        #'
         field_range = function (which = NULL)
             iddobj_field_range(self, private, which),
+        # }}}
 
-        field_relation = function (which = NULL, type = c("all", "ref_by", "ref_to"))
-            iddobj_field_relation(self, private, which, match.arg(type)),
+        # field_relation {{{
+        #' @description
+        #' Extract the relationship among fields
+        #'
+        #' @details
+        #' Many fields in [Idd] can be referred by others. For example, the
+        #' `Outside Layer` and other fields in `Construction` class refer to the
+        #' `Name` field in `Material` class and other material related classes.
+        #' Here it means that the `Outside Layer` field **refers to** the `Name`
+        #' field and the `Name` field is **referred by** the `Outside Layer`.
+        #'
+        #' `$field_relation()` provides a simple interface to get this kind of
+        #' relation. It takes a field specification and a relation
+        #' direction, and returns an `IddRelation` object which contains data
+        #' presenting such relation above.
+        #'
+        #' `$field_relation()` returns a list of references for those fields
+        #' that have the `object-list` and/or `reference` and
+        #' `reference-class-name` attribute. Basically, it is a list of two
+        #' elements `ref_to` and `ref_by`. Underneath, `ref_to` and `ref_by`
+        #' are [data.table][data.table::data.table()]s which contain source
+        #' field data and reference field data with custom printing method. For
+        #' instance, if `iddobj$field_relation(c(1, 2), "ref_to")` gives results
+        #' below:
+        #'
+        #' ```
+        #' -- Refer to Others ---------------------
+        #'   +- Field: <1: Field 1>
+        #'   |  v~~~~~~~~~~~~~~~~~~
+        #'   |  \- Class: <Class 2>
+        #'   |     \- Field: <2: Field 2>
+        #'   |
+        #'   \- Field: <2: Field 2>
+        #' ```
+        #'
+        #' This means that `Field 2` in current class does not refer to any other fields.
+        #' But `Field 1` in current class refers to `Field 2` in class named `Class 2`.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @param direction The relation direction to extract. Should be one of
+        #'        `"all"`, `"ref_to"` or `"ref_by"`.
+        #'
+        #' @return An `IddRelation` object.
+        #'
+        #' @examples
+        #' # get field relation for specific fields
+        #' surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+        #'
+        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"))
+            iddobj_field_relation(self, private, which, match.arg(direction)),
+        # }}}
 
-        field_reference = function (which = NULL)
-            iddobj_field_reference(self, private, which),
-
+        # field_possible {{{
+        #' @description
+        #' Get field possible values
+        #'
+        #' @details
+        #' `$field_possible()` returns all possible values for specified fields,
+        #' including auto-value (`Autosize`, `Autocalculate`, and `NA` if not
+        #' applicable), and results from `$field_default()`, `$field_range()`,
+        #' `$field_choice()`. Underneath, it returns a data.table with custom
+        #' printing method. For instance, if `iddobj$field_possible(c(4, 2))`
+        #' gives results below:
+        #'
+        #' ```
+        #' -- 4: Field 4 ----------
+        #' * Auto value: <NA>
+        #' * Default: <NA>
+        #' * Choice:
+        #'   - "Key1"
+        #'   - "Key2"
+        #'
+        #' -- 2: Field 2 ----------
+        #' * Auto value: "Autosize"
+        #' * Default: 2
+        #' * Choice: <NA>
+        #' ```
+        #'
+        #' This means that `Field 4` in current class cannot be "autosized" or
+        #' "autocalculated", and it does not have any default value. Its value should be
+        #' a choice from `"Key1"` or `"Key2"`. For `Field 2` in current class, it has a
+        #' default value of `2` but can also be filled with value `"Autosize"`.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @param in_ip Deprecated. The field value unit is determined by
+        #'        `eplusr_option("view_in_ip")`.
+        #'
+        #' @return A `IddFieldPossible` object which is a
+        #' [data.table::data.table()] with 9 columns.
+        #'
+        #' @examples
+        #' # get field possible values for specific fields
+        #' surf$field_possible(6:10)
+        #'
         field_possible = function (which = NULL, in_ip)
             iddobj_field_possible(self, private, which, in_ip),
         # }}}
+        # }}}
 
         # FIELD PROPERTY ASSERTIONS {{{
+        # is_valid_field_num {{{
+        #' @description
+        #' Check if input is a valid field number
+        #'
+        #' @details
+        #' `$is_valid_field_num()` returns `TRUE` if input `num` is acceptable
+        #' as a total number of fields in this class. Extensible property is
+        #' considered.
+        #'
+        #' For instance, the total number of fields defined in IDD for class
+        #' `BuildingSurfaces:Detailed` is 390. However, 396 is still a valid
+        #' field number for this class as the number of field in the extensible
+        #' group is 3.
+        #'
+        #' @param num An integer vector to test.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_valid_field_num(c(10, 14, 100))
+        #'
         is_valid_field_num = function (num)
             iddobj_is_valid_field_num(self, private, num),
+        # }}}
 
+        # is_extensible_index {{{
+        #' @description
+        #' Check if input field index indicates an extensible field
+        #'
+        #' @details
+        #' `$is_extensible_index()` returns `TRUE` if input `index` indicates an
+        #' index of extensible field in current class.
+        #'
+        #' Extensible fields mean that these fields can be dynamically added or
+        #' deleted, such like the X, Y and Z vertices of a building surface.
+        #'
+        #' @param index An integer vector of field indices.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_extensible_index(c(10, 14, 100))
+        #'
         is_extensible_index = function (index)
             iddobj_is_extensible_index(self, private, index),
+        # }}}
 
+        # is_valid_field_name {{{
+        #' @description
+        #' Check if input character is a valid field name
+        #'
+        #' @details
+        #' `$is_valid_field_name()` returns `TRUE` if `name` is a valid field
+        #' name **WITHOUT** unit. Note `name` can be given in underscore style,
+        #' e.g.  `"outside_layer"` is equivalent to `"Outside Layer"`.
+        #'
+        #' @param name A character vector to test.
+        #'
+        #' @param strict If `TRUE`, only exact match is accepted. Default:
+        #'        `FALSE`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_valid_field_name(c("name", "sun_exposure"))
+        #'
+        #' # exact match
+        #' surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+        #'
         is_valid_field_name = function (name, strict = FALSE)
             iddobj_is_valid_field_name(self, private, name, strict),
+        # }}}
 
+        # is_valid_field_index {{{
+        #' @description
+        #' Check if input integer is a valid field index
+        #'
+        #' @details
+        #' `$is_valid_field_index()` returns `TRUE` if `index` is a valid field
+        #' index. For extensible class, `TRUE` is always returned.
+        #'
+        #' @param index An integer vector to test.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_valid_field_index(1:10)
+        #'
         is_valid_field_index = function (index)
             iddobj_is_valid_field_index(self, private, index),
+        # }}}
 
+        # is_autosizable_field {{{
+        #' @description
+        #' Check if input field can be autosized
+        #'
+        #' @details
+        #' `$is_autosizable_field()` returns `TRUE` if input field can be
+        #' assigned to `autosize`.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_autosizable_field()
+        #'
+        #' surf$is_autosizable_field(c("name", "sun_exposure"))
+        #'
         is_autosizable_field = function (which = NULL)
             iddobj_is_autosizable_field(self, private, which),
+        # }}}
 
+        # is_autocalculatable_field {{{
+        #' @description
+        #' Check if input field can be autocalculated
+        #'
+        #' @details
+        #' `$is_autocalculatable_field()` returns `TRUE` if input field can be
+        #' assigned to `autocalculate`.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_autocalculatable_field()
+        #'
+        #' surf$is_autocalculatable_field(c("name", "sun_exposure"))
+        #'
         is_autocalculatable_field = function (which = NULL)
             iddobj_is_autocalculatable_field(self, private, which),
+        # }}}
 
+        # is_numeric_field {{{
+        #' @description
+        #' Check if input field value should be numeric
+        #'
+        #' @details
+        #' `$is_numeric_field()` returns `TRUE` if the value of input field
+        #' should be numeric ( an integer or a real number).
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_numeric_field()
+        #'
+        #' surf$is_numeric_field(c("name", "sun_exposure"))
+        #'
         is_numeric_field = function (which = NULL)
             iddobj_is_numeric_field(self, private, which),
+        # }}}
 
+        # is_real_field {{{
+        #' @description
+        #' Check if input field value should be a real number
+        #'
+        #' @details
+        #' `$is_real_field()` returns `TRUE` if the field value should be a real
+        #' number but not an integer.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_real_field()
+        #'
+        #' surf$is_real_field(c("name", "number of vertices"))
+        #'
         is_real_field = function (which = NULL)
             iddobj_is_real_field(self, private, which),
+        # }}}
 
+        # is_integer_field {{{
+        #' @description
+        #' Check if input field value should be an integer
+        #'
+        #' @details
+        #' `$is_real_field()` returns `TRUE` if the field value should be an
+        #' integer.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_integer_field()
+        #'
+        #' surf$is_integer_field(c("name", "number of vertices"))
+        #'
         is_integer_field = function (which = NULL)
             iddobj_is_integer_field(self, private, which),
+        # }}}
 
+        # is_required_field {{{
+        #' @description
+        #' Check if input field is required
+        #'
+        #' @details
+        #' `$is_required_field()` returns `TRUE` if the field is required.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$is_required_field()
+        #'
+        #' surf$is_required_field(c("name", "number of vertices"))
+        #'
         is_required_field = function (which = NULL)
             iddobj_is_required_field(self, private, which),
+        # }}}
 
+        # has_ref {{{
+        #' @description
+        #' Check if input field can refer to or can be referred by other fields
+        #'
+        #' @details
+        #' `$has_ref()` returns `TRUE` if input field refers to or can be referred
+        #' by other fields.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$has_ref()
+        #'
+        #' surf$has_ref(c("name", "zone name"))
+        #'
         has_ref = function (which = NULL)
             iddobj_has_ref(self, private, which),
+        # }}}
 
+        # has_ref_to {{{
+        #' @description
+        #' Check if input field can refer to other fields
+        #'
+        #' @details
+        #' `$has_ref_to()` returns `TRUE` if input field can refer to other
+        #' fields.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$has_ref_to()
+        #'
+        #' surf$has_ref_to(c("name", "zone name"))
+        #'
         has_ref_to = function (which = NULL)
             iddobj_has_ref_to(self, private, which),
+        # }}}
 
+        # has_ref_by {{{
+        #' @description
+        #' Check if input field can be referred by other fields
+        #'
+        #' @details
+        #' `$has_ref_by()` returns `TRUE` if input field can be referred by
+        #' other fields.
+        #'
+        #' @param which An integer vector of field indices or a character vector
+        #'        of field names in current class. If `NULL`, all fields in this
+        #'        class are used. Default: `NULL`.
+        #'
+        #' @return A logical vector.
+        #'
+        #' @examples
+        #' surf$has_ref_by()
+        #'
+        #' surf$has_ref_by(c("name", "zone name"))
+        #'
         has_ref_by = function (which = NULL)
             iddobj_has_ref_by(self, private, which),
         # }}}
+        # }}}
 
+        # DATA EXTRACTION {{{
+        # to_table {{{
+        #' @description
+        #' Format an `IddObject` as a data.frame
+        #'
+        #' @details
+        #' `$to_table()` returns a [data.table][data.table::data.table()] that
+        #' contains basic data of current class.
+        #' The returned [data.table][data.table::data.table()] has 3 columns:
+        #'
+        #' * `class`: Character type. Current class name.
+        #' * `index`: Integer type. Field indexes.
+        #' * `field`: Character type. Field names.
+        #'
+        #' @param all If `TRUE`, all available fields defined in IDD for
+        #'        specified class will be returned. If `FALSE`, only the minimum
+        #'        field number is returned. Default: `FALSE`.
+        #'
+        #' @return A [data.table][data.table::data.table()] with 3 columns.
+        #'
+        #' @examples
+        #' surf$to_table()
+        #'
+        #' surf$to_table(TRUE)
         to_table = function (all = FALSE)
             iddobj_to_table(self, private, all),
+        # }}}
 
+        # to_string {{{
+        #' @description
+        #' Format an `IdfObject` as a character vector
+        #'
+        #' @details
+        #' `$to_string()` returns the text format of current class. The returned
+        #' character vector can be pasted into an IDF file as an empty object of
+        #' specified class.
+        #'
+        #' @param comment A character vector to be used as comments of returned
+        #'        string format object.
+        #' @param leading Leading spaces added to each field. Default: `4L`.
+        #' @param sep_at The character width to separate value string and field
+        #'        string. Default: `29L` which is the same as IDF Editor.
+        #' @param all If `TRUE`, all available fields defined in IDD for
+        #'        specified class will be returned. Default: `FALSE`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get text format of class BuildingSurface:Detailed
+        #' surf$to_string()
+        #'
+        #' # tweak output formatting
+        #' surf$to_string(leading = 0, sep_at = 0)
+        #'
+        #' # add comments
+        #' surf$to_string(c("This", "will", "be", "comments"))
+        #'
         to_string = function (comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
             iddobj_to_string(self, private, comment, leading, sep_at = sep_at, all = all),
+        # }}}
+        # }}}
 
+        # print {{{
+        #' @description
+        #' Print `IddObject` object
+        #'
+        #' @details
+        #' `$print()` prints the `IddObject` object giving the information of
+        #' class name, class properties, field indices and field names.
+        #'
+        #' `$print()` prints the IddObject. Basically, the print output can be
+        #' divided into 4 parts:
+        #'
+        #' * CLASS: IDD class name of current object in format `<IddObject: CLASS>`.
+        #' * MEMO: brief description of the IDD class.
+        #' * PROPERTY: properties of the IDD class, including name of group it
+        #'   belongs to, whether it is an unique or required class and current
+        #'   total fields. The fields may increase if the IDD class is
+        #'   extensible, such as `Branch`, `ZoneList` and etc.
+        #' * FIELDS: fields of current IDD class. Required fields are marked
+        #'   with stars (`*`). If the class is extensible, only the first
+        #'   extensible group will be printed and two ellipses will be shown at
+        #'   the bottom. Fields in the extensible group will be marked with an
+        #'   arrow down surrounded by angle brackets (`<v>`).
+        #'
+        #' @param brief If `TRUE`, only class name part is printed. Default:
+        #'        `FALSE`.
+        #'
+        #' @return The `IddObject` object itself, invisibly.
+        #'
+        #' @examples
+        #' surf
+        #'
+        #' surf$print(brief = TRUE)
+        #'
         print = function (brief = FALSE)
             iddobj_print(self, private, brief)
+        # }}}
     ),
 
     private = list(

@@ -801,8 +801,8 @@ Extract the relationship between class fields.
 \item{\code{class}}{A single integer specifying the class index or a single
 string specifying the class name.}
 
-\item{\code{direction}}{The relation direction to extract. Should be either
-\code{"all"}, \code{"ref_to"}, \code{"ref_by"}.}
+\item{\code{direction}}{The relation direction to extract. Should be one of
+\code{"all"}, \code{"ref_to"} or \code{"ref_by"}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -967,7 +967,7 @@ specified class will be returned. Default: \code{FALSE}.}
 }
 \subsection{Details}{
 \verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
-contains core data of specified classes.
+contains basic data of specified classes.
 The returned \link[data.table:data.table]{data.table} has 3 columns:
 \itemize{
 \item \code{class}: Character type. Current class name.

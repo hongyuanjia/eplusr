@@ -17,232 +17,1533 @@ There are lots of properties for every class and field. For details on the
 meaning of each property, please see the heading comments in the
 \code{Energy+.idd} file in the EnergyPlus installation path.
 }
-\section{Usage}{
-\preformatted{iddobj <- idd$object(class)
-iddobj <- idd_object(idd, class)
-iddobj$version()
-iddobj$parent()
-iddobj$group_name()
-iddobj$group_index()
-iddobj$class_name()
-iddobj$class_index()
-iddobj$class_format()
-iddobj$min_fields()
-iddobj$num_fields()
-iddobj$memo()
-iddobj$has_name()
-iddobj$is_required()
-iddobj$is_unique()
-iddobj$is_extensible()
-iddobj$num_extensible()
-iddobj$first_extensible_index()
-iddobj$extensible_group_num()
-iddobj$add_extensible_group(num = 1L)
-iddobj$del_extensible_group(num = 1L)
-iddobj$field_name(index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")
-iddobj$field_index(name = NULL)
-iddobj$field_type(which = NULL)
-iddobj$field_note(which = NULL)
-iddobj$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip")
-iddobj$field_default(which = NULL, in_ip = eplusr_option("view_in_ip")
-iddobj$field_choice(which = NULL)
-iddobj$field_range(which = NULL)
-iddobj$field_relation(which = NULL, type = c("all", "ref_by", "ref_to"))
-iddobj$field_possible(which = NULL)
-iddobj$is_valid_field_num(num)
-iddobj$is_extensible_index(index)
-iddobj$is_valid_field_name(name)
-iddobj$is_valid_field_index(which)
-iddobj$is_autosizable_field(which = NULL)
-iddobj$is_autocalculatable_field(which = NULL)
-iddobj$is_numeric_field(which = NULL)
-iddobj$is_integer_field(which = NULL)
-iddobj$is_real_field(which = NULL)
-iddobj$is_required_field(which = NULL)
-iddobj$has_ref(which = NULL)
-iddobj$has_ref_to(which = NULL)
-iddobj$has_ref_by(which = NULL)
-iddobj$to_table(all = FALSE)
-iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
-iddobj$print(brief = FALSE)
-print(iddobj)
-}
-}
+\note{
+Some classes have special format when saved in the IDFEditor with the
+special format option enabled. Those special format includes
+"singleLine", "vertices", "compactSchedule", "fluidProperties",
+"viewFactors" and "spectral". eplusr can handle all those format when
+parsing IDF files. However, when saved, all classes are formatted in
+standard way.
 
-\section{Basic}{
-\preformatted{iddobj <- idd$object(class)
-iddobj <- idd_object(idd, class)
-iddobj$version()
-iddobj$parent()
-}
-
-An \code{IddObject} can be created from the parent \link{Idd} object, using
-\verb{$object()}, \link{idd_object} and other equivalent.
-
-\verb{$version()} returns the version of parent IDD current object belongs to.
-
-\verb{$parent()} returns the parent Idd object.
-
-\strong{Arguments}
-\itemize{
-\item \code{idd}: An \link{Idd} object.
-\item \code{class}: A valid class name (a string).
-\item \code{iddobj}: An IddObject object.
-}
-}
-
-\section{Class Property}{
-\preformatted{iddobj$group_name()
-iddobj$group_index()
-iddobj$class_name()
-iddobj$class_index()
-iddobj$class_format()
-iddobj$min_fields()
-iddobj$num_fields()
-iddobj$memo()
-iddobj$has_name()
-iddobj$is_required()
-iddobj$is_unique()
-}
-
-\verb{$group_index()} returns the index of IDD group it belongs to.
-
-\verb{$group_name()} returns the name of IDD group it belongs to.
-
-\verb{$class_index()} returns the index of this IDD class.
-
-\verb{$class_name()} returns the name of this IDD class.
-
-\verb{$class_format()} returns the format of this IDD class. This format indicator
-is currently not used by eplusr. \strong{Note}: some classes have special format
-when saved in the IDFEditor with the special format option enabled. Those
-special format includes "singleLine", "vertices", "compactSchedule",
-"fluidProperties", "viewFactors" and "spectral".  eplusr can handle all those
-format when parsing IDF files. However, when saved, all classes are formatted
-in standard way.
-
-\verb{$min_fields()} returns the minimum fields required for this class.  If no
-required, \code{0} is returned.
-
-\verb{$num_fields()} returns current total number of fields in this class. This
-number may change if the class is extensible and after
+This number may change if the class is extensible and after
 \verb{$add_extensible_group()} or \verb{$del_extensible_group()}.
 
-\verb{$memo()} returns memo of this class. Usually a brief description of this
-class.
+The type of each default value will be consistent with field
+definition. However, for numeric fields with default values being
+\code{"autosize"} or \code{"autocalculate"}, the type of returned values will
+be character.
+}
+\examples{
 
-\verb{$has_name()} return \code{TRUE} if this class has name attribute.
+## ------------------------------------------------
+## Method `IddObject$new`
+## ------------------------------------------------
 
-\verb{$is_unique()} return \code{TRUE} if this class is unique.
+surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
 
-\verb{$is_required()} returns \code{TRUE} if this class is required.
+
+## ------------------------------------------------
+## Method `IddObject$version`
+## ------------------------------------------------
+
+# get version
+surf$version()
+
+
+## ------------------------------------------------
+## Method `IddObject$parent`
+## ------------------------------------------------
+
+surf$parent()
+
+
+## ------------------------------------------------
+## Method `IddObject$group_name`
+## ------------------------------------------------
+
+surf$group_name()
+
+
+## ------------------------------------------------
+## Method `IddObject$group_index`
+## ------------------------------------------------
+
+surf$group_index()
+
+
+## ------------------------------------------------
+## Method `IddObject$class_name`
+## ------------------------------------------------
+
+surf$class_name()
+
+
+## ------------------------------------------------
+## Method `IddObject$class_index`
+## ------------------------------------------------
+
+surf$class_index()
+
+
+## ------------------------------------------------
+## Method `IddObject$class_format`
+## ------------------------------------------------
+
+surf$class_format()
+
+
+## ------------------------------------------------
+## Method `IddObject$min_fields`
+## ------------------------------------------------
+
+surf$min_fields()
+
+
+## ------------------------------------------------
+## Method `IddObject$num_fields`
+## ------------------------------------------------
+
+surf$num_fields()
+
+
+## ------------------------------------------------
+## Method `IddObject$memo`
+## ------------------------------------------------
+
+surf$memo()
+
+
+## ------------------------------------------------
+## Method `IddObject$num_extensible`
+## ------------------------------------------------
+
+surf$num_extensible()
+
+
+## ------------------------------------------------
+## Method `IddObject$first_extensible_index`
+## ------------------------------------------------
+
+surf$first_extensible_index()
+
+
+## ------------------------------------------------
+## Method `IddObject$extensible_group_num`
+## ------------------------------------------------
+
+surf$extensible_group_num()
+
+
+## ------------------------------------------------
+## Method `IddObject$add_extensible_group`
+## ------------------------------------------------
+
+# field number before adding
+surf$num_fields()
+# extensible group number before adding
+surf$extensible_group_num()
+
+# add 2 more extensible groups
+surf$add_extensible_group(2)
+
+# field number after adding
+surf$num_fields()
+# extensible group number after adding
+surf$extensible_group_num()
+
+
+## ------------------------------------------------
+## Method `IddObject$del_extensible_group`
+## ------------------------------------------------
+
+# field number before deleting
+surf$num_fields()
+# extensible group number before deleting
+surf$extensible_group_num()
+
+# delete 2 more extensible groups
+surf$del_extensible_group(2)
+
+# field number after deleting
+surf$num_fields()
+# extensible group number after deleting
+surf$extensible_group_num()
+
+
+## ------------------------------------------------
+## Method `IddObject$has_name`
+## ------------------------------------------------
+
+surf$has_name()
+
+
+## ------------------------------------------------
+## Method `IddObject$is_required`
+## ------------------------------------------------
+
+surf$is_required()
+
+
+## ------------------------------------------------
+## Method `IddObject$is_unique`
+## ------------------------------------------------
+
+surf$is_unique()
+
+
+## ------------------------------------------------
+## Method `IddObject$is_extensible`
+## ------------------------------------------------
+
+surf$is_extensible()
+
+
+## ------------------------------------------------
+## Method `IddObject$field_name`
+## ------------------------------------------------
+
+# get all field names
+surf$field_name()
+
+# get field units also
+surf$field_name(unit = TRUE)
+
+# get field units in IP
+surf$field_name(unit = TRUE)
+
+# change field name to lower-style
+surf$field_name(unit = TRUE, in_ip = TRUE)
+
+
+## ------------------------------------------------
+## Method `IddObject$field_index`
+## ------------------------------------------------
+
+# get all field indices
+surf$field_index()
+
+# get field indices for specific fields
+surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_type`
+## ------------------------------------------------
+
+# get all field types
+surf$field_type()
+
+# get field types for specific fields
+surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_note`
+## ------------------------------------------------
+
+# get all field notes
+surf$field_note()
+
+# get field types for specific fields
+surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_unit`
+## ------------------------------------------------
+
+# get all field units
+surf$field_unit()
+
+# get field units for specific fields
+surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_default`
+## ------------------------------------------------
+
+# get all field default values
+surf$field_default()
+
+# get default values for specific fields
+surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_choice`
+## ------------------------------------------------
+
+# get all field value choices
+surf$field_choice()
+
+# get field value choices for specific fields
+surf$field_choice(c("name", "sun exposure", "wind exposure"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_range`
+## ------------------------------------------------
+
+# get all field value ranges
+surf$field_range()
+
+# get value ranges for specific fields
+surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_relation`
+## ------------------------------------------------
+
+# get field relation for specific fields
+surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+
+
+## ------------------------------------------------
+## Method `IddObject$field_possible`
+## ------------------------------------------------
+
+# get field possible values for specific fields
+surf$field_possible(6:10)
+
+
+## ------------------------------------------------
+## Method `IddObject$is_valid_field_num`
+## ------------------------------------------------
+
+surf$is_valid_field_num(c(10, 14, 100))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_extensible_index`
+## ------------------------------------------------
+
+surf$is_extensible_index(c(10, 14, 100))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_valid_field_name`
+## ------------------------------------------------
+
+surf$is_valid_field_name(c("name", "sun_exposure"))
+
+# exact match
+surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+
+
+## ------------------------------------------------
+## Method `IddObject$is_valid_field_index`
+## ------------------------------------------------
+
+surf$is_valid_field_index(1:10)
+
+
+## ------------------------------------------------
+## Method `IddObject$is_autosizable_field`
+## ------------------------------------------------
+
+surf$is_autosizable_field()
+
+surf$is_autosizable_field(c("name", "sun_exposure"))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_autocalculatable_field`
+## ------------------------------------------------
+
+surf$is_autocalculatable_field()
+
+surf$is_autocalculatable_field(c("name", "sun_exposure"))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_numeric_field`
+## ------------------------------------------------
+
+surf$is_numeric_field()
+
+surf$is_numeric_field(c("name", "sun_exposure"))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_real_field`
+## ------------------------------------------------
+
+surf$is_real_field()
+
+surf$is_real_field(c("name", "number of vertices"))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_integer_field`
+## ------------------------------------------------
+
+surf$is_integer_field()
+
+surf$is_integer_field(c("name", "number of vertices"))
+
+
+## ------------------------------------------------
+## Method `IddObject$is_required_field`
+## ------------------------------------------------
+
+surf$is_required_field()
+
+surf$is_required_field(c("name", "number of vertices"))
+
+
+## ------------------------------------------------
+## Method `IddObject$has_ref`
+## ------------------------------------------------
+
+surf$has_ref()
+
+surf$has_ref(c("name", "zone name"))
+
+
+## ------------------------------------------------
+## Method `IddObject$has_ref_to`
+## ------------------------------------------------
+
+surf$has_ref_to()
+
+surf$has_ref_to(c("name", "zone name"))
+
+
+## ------------------------------------------------
+## Method `IddObject$has_ref_by`
+## ------------------------------------------------
+
+surf$has_ref_by()
+
+surf$has_ref_by(c("name", "zone name"))
+
+
+## ------------------------------------------------
+## Method `IddObject$to_table`
+## ------------------------------------------------
+
+surf$to_table()
+
+surf$to_table(TRUE)
+
+## ------------------------------------------------
+## Method `IddObject$to_string`
+## ------------------------------------------------
+
+# get text format of class BuildingSurface:Detailed
+surf$to_string()
+
+# tweak output formatting
+surf$to_string(leading = 0, sep_at = 0)
+
+# add comments
+surf$to_string(c("This", "will", "be", "comments"))
+
+
+## ------------------------------------------------
+## Method `IddObject$print`
+## ------------------------------------------------
+
+surf
+
+surf$print(brief = TRUE)
+
+}
+\seealso{
+\link{Idd} Class
+}
+\author{
+Hongyuan Jia
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{IddObject$new()}}
+\item \href{#method-version}{\code{IddObject$version()}}
+\item \href{#method-parent}{\code{IddObject$parent()}}
+\item \href{#method-group_name}{\code{IddObject$group_name()}}
+\item \href{#method-group_index}{\code{IddObject$group_index()}}
+\item \href{#method-class_name}{\code{IddObject$class_name()}}
+\item \href{#method-class_index}{\code{IddObject$class_index()}}
+\item \href{#method-class_format}{\code{IddObject$class_format()}}
+\item \href{#method-min_fields}{\code{IddObject$min_fields()}}
+\item \href{#method-num_fields}{\code{IddObject$num_fields()}}
+\item \href{#method-memo}{\code{IddObject$memo()}}
+\item \href{#method-num_extensible}{\code{IddObject$num_extensible()}}
+\item \href{#method-first_extensible_index}{\code{IddObject$first_extensible_index()}}
+\item \href{#method-extensible_group_num}{\code{IddObject$extensible_group_num()}}
+\item \href{#method-add_extensible_group}{\code{IddObject$add_extensible_group()}}
+\item \href{#method-del_extensible_group}{\code{IddObject$del_extensible_group()}}
+\item \href{#method-has_name}{\code{IddObject$has_name()}}
+\item \href{#method-is_required}{\code{IddObject$is_required()}}
+\item \href{#method-is_unique}{\code{IddObject$is_unique()}}
+\item \href{#method-is_extensible}{\code{IddObject$is_extensible()}}
+\item \href{#method-field_name}{\code{IddObject$field_name()}}
+\item \href{#method-field_index}{\code{IddObject$field_index()}}
+\item \href{#method-field_type}{\code{IddObject$field_type()}}
+\item \href{#method-field_note}{\code{IddObject$field_note()}}
+\item \href{#method-field_unit}{\code{IddObject$field_unit()}}
+\item \href{#method-field_default}{\code{IddObject$field_default()}}
+\item \href{#method-field_choice}{\code{IddObject$field_choice()}}
+\item \href{#method-field_range}{\code{IddObject$field_range()}}
+\item \href{#method-field_relation}{\code{IddObject$field_relation()}}
+\item \href{#method-field_possible}{\code{IddObject$field_possible()}}
+\item \href{#method-is_valid_field_num}{\code{IddObject$is_valid_field_num()}}
+\item \href{#method-is_extensible_index}{\code{IddObject$is_extensible_index()}}
+\item \href{#method-is_valid_field_name}{\code{IddObject$is_valid_field_name()}}
+\item \href{#method-is_valid_field_index}{\code{IddObject$is_valid_field_index()}}
+\item \href{#method-is_autosizable_field}{\code{IddObject$is_autosizable_field()}}
+\item \href{#method-is_autocalculatable_field}{\code{IddObject$is_autocalculatable_field()}}
+\item \href{#method-is_numeric_field}{\code{IddObject$is_numeric_field()}}
+\item \href{#method-is_real_field}{\code{IddObject$is_real_field()}}
+\item \href{#method-is_integer_field}{\code{IddObject$is_integer_field()}}
+\item \href{#method-is_required_field}{\code{IddObject$is_required_field()}}
+\item \href{#method-has_ref}{\code{IddObject$has_ref()}}
+\item \href{#method-has_ref_to}{\code{IddObject$has_ref_to()}}
+\item \href{#method-has_ref_by}{\code{IddObject$has_ref_by()}}
+\item \href{#method-to_table}{\code{IddObject$to_table()}}
+\item \href{#method-to_string}{\code{IddObject$to_string()}}
+\item \href{#method-print}{\code{IddObject$print()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{IddObject} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$new(class, parent)}\if{html}{\out{</div>}}
 }
 
-\section{Extensible Group}{
-\preformatted{iddobj$is_extensible()
-iddobj$num_extensible()
-iddobj$first_extensible_index()
-iddobj$extensible_group_num()
-iddobj$add_extensible_group(num = 1L)
-iddobj$del_extensible_group(num = 1L)
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single integer specifying the class index or a single
+string specifying the class name.}
+
+\item{\code{parent}}{An \link{Idd} object or a valid input for \code{\link[=use_idd]{use_idd()}}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Note that an \code{IddObject} can be created from the parent \link{Idd} object,
+using \verb{$object()}, \link{idd_object} and other equivalent.
 }
 
-\verb{$is_extensible()} returns \code{TRUE} if this class is extensible.
+\subsection{Returns}{
+An \code{IddObject} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
 
-\verb{$num_extensible()} returns the number of extensible fields in this class. If
-not zero, it means that objects in this class is dynamically extensible.
+}
+\if{html}{\out{</div>}}
 
-\verb{$first_extensible_index()} returns the field index of the first extensible
-field in this class. If this class is not extensible, \code{0} is return.
+}
 
-\verb{$extensible_group_num()} returns the number of extensible groups in this
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-version"></a>}}
+\subsection{Method \code{version()}}{
+Get the version of parent \code{Idd}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$version()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$version()} returns the version of parent \code{Idd} in a
+\code{\link[base:numeric_version]{base::numeric_version()}} format. This makes it easy to direction
+compare versions of different \code{IddObject}s, e.g. \code{iddobj$version() > 8.6} or
+\code{iddobj1$version() > iddobj2$version()}.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get version
+surf$version()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-parent"></a>}}
+\subsection{Method \code{parent()}}{
+Get parent \link{Idd}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$parent()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$parent()} returns parent \link{Idd} object.
+}
+
+\subsection{Returns}{
+A \link{Idd} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$parent()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-group_name"></a>}}
+\subsection{Method \code{group_name()}}{
+Get the group name
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$group_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$group_name()} returns the group name of current \code{IddObject}.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$group_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-group_index"></a>}}
+\subsection{Method \code{group_index()}}{
+Get the group index
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$group_index()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$group_index()} returns the group index of current \code{IddObject}. A
+group index is just an integer indicating its appearance order in the
+\link{Idd}.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$group_index()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_name"></a>}}
+\subsection{Method \code{class_name()}}{
+Get the class name of current \code{IddObject}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$class_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$class_name()} returns the class name of current \code{IddObject}.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$class_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_index"></a>}}
+\subsection{Method \code{class_index()}}{
+Get the class index
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$class_index()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$class_index()} returns the class index of current \code{IddObject}. A
+class index is just an integer indicating its appearance order in the
+\link{Idd}.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$class_index()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_format"></a>}}
+\subsection{Method \code{class_format()}}{
+Get the class format
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$class_format()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$class_format()} returns the format of this IDD class. This format
+indicator is currently not used by eplusr.
+}
+
+\subsection{Returns}{
+A single character.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$class_format()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-min_fields"></a>}}
+\subsection{Method \code{min_fields()}}{
+Get the minimum field number of current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$min_fields()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$min_fields()} returns the minimum fields required for current class.
+If no required, \code{0} is returned.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$min_fields()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-num_fields"></a>}}
+\subsection{Method \code{num_fields()}}{
+Get the total field number of current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$num_fields()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$num_fields()} returns current total number of fields in current
 class.
+}
 
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$num_fields()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-memo"></a>}}
+\subsection{Method \code{memo()}}{
+Get the memo string of current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$memo()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$memo()} returns memo of current class, usually a brief description
+of this class.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$memo()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-num_extensible"></a>}}
+\subsection{Method \code{num_extensible()}}{
+Get the field number of the extensible group in current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$num_extensible()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$num_extensible()} returns the field number of the extensible group
+in current class.
+
+An extensible group is a set of fields that should be treated as a
+whole, such like the X, Y and Z vertices of a building surfaces. An
+extensible group should be added or deleted together.
+
+If there is no extensible group in current class, \code{0} is returned.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$num_extensible()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-first_extensible_index"></a>}}
+\subsection{Method \code{first_extensible_index()}}{
+Get the minimum field number of current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$first_extensible_index()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$first_extensible_index()} returns the field index of first
+extensible field in current class.
+
+An extensible group is a set of fields that should be treated as a
+whole, such like the X, Y and Z vertices of a building surfaces. An
+extensible group should be added or deleted together.
+
+If there is no extensible group in current class, \code{0} is returned.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$first_extensible_index()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-extensible_group_num"></a>}}
+\subsection{Method \code{extensible_group_num()}}{
+Get the number of extensible groups in current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$extensible_group_num()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$extensible_group_num()} returns the number of extensible groups in
+current class.
+
+An extensible group is a set of fields that should be treated as a
+whole, such like the X, Y and Z vertices of a building surfaces. An
+extensible group should be added or deleted together.
+
+If there is no extensible group in current class, \code{0} is returned.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$extensible_group_num()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_extensible_group"></a>}}
+\subsection{Method \code{add_extensible_group()}}{
+Add extensible groups in current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$add_extensible_group(num = 1L)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{num}}{An integer indicating the number of extensible groups to
+be added.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$add_extensible_groups()} adds extensible groups in this class.
 
+An extensible group is a set of fields that should be treated as a
+whole, such like the X, Y and Z vertices of a building surfaces. An
+extensible group should be added or deleted together.
+
+An error will be issued if current class contains no extensible
+group.
+}
+
+\subsection{Returns}{
+The modified \code{IddObject} itself.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# field number before adding
+surf$num_fields()
+# extensible group number before adding
+surf$extensible_group_num()
+
+# add 2 more extensible groups
+surf$add_extensible_group(2)
+
+# field number after adding
+surf$num_fields()
+# extensible group number after adding
+surf$extensible_group_num()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-del_extensible_group"></a>}}
+\subsection{Method \code{del_extensible_group()}}{
+Delete extensible groups in current class
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$del_extensible_group(num = 1L)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{num}}{An integer indicating the number of extensible groups to
+be deleted.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$del_extensible_groups()} deletes extensible groups in this class.
 
-\strong{Arguments}
+An extensible group is a set of fields that should be treated as a
+whole, such like the X, Y and Z vertices of a building surfaces. An
+extensible group should be added or deleted together.
+
+An error will be issued if current class contains no extensible
+group.
+}
+
+\subsection{Returns}{
+The modified \code{IddObject} itself.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# field number before deleting
+surf$num_fields()
+# extensible group number before deleting
+surf$extensible_group_num()
+
+# delete 2 more extensible groups
+surf$del_extensible_group(2)
+
+# field number after deleting
+surf$num_fields()
+# extensible group number after deleting
+surf$extensible_group_num()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_name"></a>}}
+\subsection{Method \code{has_name()}}{
+Check if current class has name attribute
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$has_name()} return \code{TRUE} if current class has name attribute, and
+\code{FALSE} otherwise.
+
+A class with name attribute means that objects in this class can have
+names.
+}
+
+\subsection{Returns}{
+A single logical value (\code{TRUE} or \code{FALSE}).
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$has_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_required"></a>}}
+\subsection{Method \code{is_required()}}{
+Check if current class is required
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_required()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$is_required()} returns \code{TRUE} if current class is required and
+\code{FALSE} otherwise.
+
+A required class means that for any model, there should be at least
+one object in this class. One example is \code{Building} class.
+}
+
+\subsection{Returns}{
+A single logical value (\code{TRUE} or \code{FALSE}).
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_required()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_unique"></a>}}
+\subsection{Method \code{is_unique()}}{
+Check if current class is unique
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_unique()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$is_unique()} returns \code{TRUE} if current class is unique and
+\code{FALSE} otherwise.
+
+A unique class means that for any model, there should be at most
+one object in this class. One example is \code{Building} class.
+}
+
+\subsection{Returns}{
+A single logical value (\code{TRUE} or \code{FALSE}).
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_unique()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_extensible"></a>}}
+\subsection{Method \code{is_extensible()}}{
+Check if current class is extensible
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_extensible()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$is_extensible()} returns \code{TRUE} if current class is extensible and
+\code{FALSE} otherwise.
+
+A extensible class means that for there are curtain number of fields
+in this class that can be dynamically added or deleted, such like the
+X, Y and Z vertices of a building surface.
+}
+
+\subsection{Returns}{
+A single logical value (\code{TRUE} or \code{FALSE}).
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_extensible()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_name"></a>}}
+\subsection{Method \code{field_name()}}{
+Get field names
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_name(
+  index = NULL,
+  unit = FALSE,
+  in_ip = eplusr_option("view_in_ip"),
+  lower = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{An integer vector of field indices. If \code{NULL}, names of
+all fields in this class are returned. Default: \code{NULL}.}
+
+\item{\code{unit}}{If \code{TRUE}, the units of those fields are also returned.
+Default: \code{FALSE}.}
+
+\item{\code{in_ip}}{If \code{in_ip}, corresponding imperial units are returned.
+It only has effect when \code{unit} is \code{TRUE}. Default:
+\code{eplusr_option("view_in_ip")}.}
+
+\item{\code{lower}}{If \code{TRUE}, "lower-style" names are returned, i.e. all
+spaces and dashes is replaced by underscores. "lower-style"
+names are useful when use them as filed names in
+\verb{$set_value()} in \code{IdfObject} class and \verb{$set_object()} in
+\link{Idf} class. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_name()} returns a character vector of names of fields
+specified by field indices in current class.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field names
+surf$field_name()
+
+# get field units also
+surf$field_name(unit = TRUE)
+
+# get field units in IP
+surf$field_name(unit = TRUE)
+
+# change field name to lower-style
+surf$field_name(unit = TRUE, in_ip = TRUE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_index"></a>}}
+\subsection{Method \code{field_index()}}{
+Get field indices
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_index(name = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{A character vector of field names. Can be in
+"lower-style", i.e. all spaces and dashes is replaced by
+underscores. If \code{NULL}, indices of all fields in this class
+are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_index()} returns an integer vector of names of fields
+specified by field names in current class.
+}
+
+\subsection{Returns}{
+An integer vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field indices
+surf$field_index()
+
+# get field indices for specific fields
+surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_type"></a>}}
+\subsection{Method \code{field_type()}}{
+Get field types
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_type(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_type()} returns a character vector of field types of
+specified fields in current class. All possible values are:
 \itemize{
-\item \code{num}: A positive integer of how many extensible groups to add or delete.
-Default: \code{1}.
+\item \code{"integer"}
+\item \code{"real"}
+\item \code{"alpha"} (arbitrary string)
+\item \code{"choice"} (alpha with specific list of choices)
+\item \code{"object-list"} (link to a list of objects defined elsewhere)
+\item \code{"external-list"} (uses a special list from an external source)
+\item \code{"node"} (name used in connecting HVAC components).
 }
 }
 
-\section{Field Property}{
-\preformatted{iddobj$field_name(index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")
-iddobj$field_index(name = NULL)
-iddobj$field_type(which = NULL)
-iddobj$field_note(which = NULL)
-iddobj$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip")
-iddobj$field_default(which = NULL, in_ip = eplusr_option("view_in_ip")
-iddobj$field_choice(which = NULL)
-iddobj$field_range(which = NULL)
-iddobj$field_relation(which = NULL, type = c("all", "ref_by", "ref_to"))
-iddobj$field_possible(which = NULL)
-iddobj$is_valid_field_num(num)
-iddobj$is_extensible_index(index)
-iddobj$is_valid_field_name(name)
-iddobj$is_valid_field_index(which)
-iddobj$is_autosizable_field(which = NULL)
-iddobj$is_autocalculatable_field(which = NULL)
-iddobj$is_numeric_field(which = NULL)
-iddobj$is_integer_field(which = NULL)
-iddobj$is_real_field(which = NULL)
-iddobj$is_required_field(which = NULL)
-iddobj$has_ref(which = NULL)
-iddobj$has_ref_to(which = NULL)
-iddobj$has_ref_by(which = NULL)
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field types
+surf$field_type()
+
+# get field types for specific fields
+surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\verb{$field_name()} returns names of fields specified by field indexes. If
-\code{index} is \code{NULL}, names of all fields in this class are returned. If \code{lower}
-is \code{TRUE}, "lower-style" names are returned, i.e. all spaces and dashes is
-replaced by underscores. "lower-style" names are useful when use them as
-filed names in \verb{$set_value()} in \code{IdfObject} class and \verb{$set_object()} in
-\code{Idf} class. If \code{unit} is \code{TRUE}, the units of those fields are also
-returned. If \code{in_ip}, corresponding imperial units are returned. It only has
-effect when \code{unit} is \code{TRUE}.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_note"></a>}}
+\subsection{Method \code{field_note()}}{
+Get field notes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_note(which = NULL)}\if{html}{\out{</div>}}
+}
 
-\verb{$field_index()} returns indexes of fields specified by field names. If
-\code{name} is \code{NULL}, indexes of all fields in this class are returned.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_note()} returns a list of character vectors that contains
+field notes of specified fields in current class, usually serving as
+field descriptions. If no notes are found for current fields, \code{NULL}
+is returned.
+}
 
-All other \verb{$field_*()} returns specific field properties. If \code{which} is
-\code{NULL}, properties of all fields in this class are returned.
+\subsection{Returns}{
+A list of character vectors.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field notes
+surf$field_note()
 
-\verb{$field_type}(): returns field types. All possible values are
-\code{"integer"}, \code{"real"}, \code{"alpha"} (arbitrary string), \code{"choice"} (alpha
-with specific list of choices), \code{"object-list"} (link to a list of
-objects defined elsewhere), \code{"external-list"} (uses a special list from
-an external source) and \code{"node"} (name used in connecting HVAC
-components).
+# get field types for specific fields
+surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
 
-\verb{$field_unit()}: returns a character vector of field units. If \code{in_ip} is
-\code{TRUE}, IP unites are returned.
+}
+\if{html}{\out{</div>}}
 
-\verb{$field_default()}: returns a list of default values of those fields. If
-no defaults found, \code{NA}s are returned.
+}
 
-\verb{$field_choice()}: returns a list of all valid choices for those fields.
-If no choices found, \code{NA}s are returned.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_unit"></a>}}
+\subsection{Method \code{field_unit()}}{
+Get field units
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_unit(which = NULL, in_ip = eplusr_option("view_in_ip"))}\if{html}{\out{</div>}}
+}
 
-\verb{$field_range()}: returns a list of ranges for those fields. Every range
-has four components: \code{minimum} (lower limit), \code{lower_incbounds} (\code{TRUE}
-if the lower limit should be included), \code{maximum} (upper limit), and
-\code{upper_incbounds} (\code{TRUE} if the upper limit should be included). For
-fields of character type, empty lists are returned. For fields of
-numeric types with no specified ranges, \code{minimum} is set to \code{-Inf},
-\code{lower_incbounds} is set to FALSE, \code{upper} is set to \code{Inf}, and
-\code{upper_incbounds} is set to FALSE. The field range is printed in number
-interval denotation.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
 
-\verb{$field_relation()}: returns a list of references for those fields that
-have the \code{object-list} and/or \code{reference} and \code{reference-class-name}
-attribute. Basically, it is a list of two elements \code{ref_to} and \code{ref_by}.
-Underneath, \code{ref_to} and \code{ref_by} are \link[data.table:data.table]{data.table}s
-which contain source field data and reference field data with custom printing
-method. For instance, if \code{iddobj$field_relation(c(1, 2), "ref_to")} gives
-results below:\preformatted{-- Refer to Others ---------------------
+\item{\code{in_ip}}{If \code{in_ip}, corresponding imperial units are returned.
+Default: \code{eplusr_option("view_in_ip")}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_unit()} returns a character vector that contains units of
+specified fields in current class. If there is no unit found for
+current field, \code{NA} is returned.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field units
+surf$field_unit()
+
+# get field units for specific fields
+surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_default"></a>}}
+\subsection{Method \code{field_default()}}{
+Get field default value
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_default(which = NULL, in_ip = eplusr_option("view_in_ip"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+
+\item{\code{in_ip}}{If \code{in_ip}, values in corresponding imperial units are
+returned. Default: \code{eplusr_option("view_in_ip")}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_default()} returns a list that contains default values of
+specified fields in current class. If there is no default value found
+for current field, \code{NA} is returned.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field default values
+surf$field_default()
+
+# get default values for specific fields
+surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_choice"></a>}}
+\subsection{Method \code{field_choice()}}{
+Get choices of field values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_choice(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_value()} returns a list of character vectors that contains
+choices of specified field values in current class. If there is no
+choice found for current field, \code{NULL} is returned.
+}
+
+\subsection{Returns}{
+A list of character vectors.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field value choices
+surf$field_choice()
+
+# get field value choices for specific fields
+surf$field_choice(c("name", "sun exposure", "wind exposure"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_range"></a>}}
+\subsection{Method \code{field_range()}}{
+Get field value ranges
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_range(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_range()} returns a list of value ranges of specified fields
+in current class.
+
+Every range has four components:
+\itemize{
+\item \code{minimum}: lower limit
+\item \code{lower_incbounds}: \code{TRUE} if the lower limit should be included
+\item \code{maximum}: upper limit
+\item \code{upper_incbounds}: \code{TRUE} if the upper limit should be included
+}
+
+For fields of character type,
+\itemize{
+\item \code{minimum} and \code{maximum} are always set to \code{NA}
+\item \code{lower_incbounds} and \code{upper_incbounds} are always set to \code{FALSE}
+}
+
+For fields of numeric types with no specified ranges,
+\itemize{
+\item \code{minimum} is set to \code{-Inf}
+\item \code{lower_incbounds} is set to \code{FALSE}
+\item \code{upper} is set to \code{Inf}
+\item \code{upper_incbounds} is set to \code{FALSE}
+}
+
+The field range is printed in number interval denotation.
+}
+
+\subsection{Returns}{
+A list of ranges.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all field value ranges
+surf$field_range()
+
+# get value ranges for specific fields
+surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_relation"></a>}}
+\subsection{Method \code{field_relation()}}{
+Extract the relationship among fields
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_relation(
+  which = NULL,
+  direction = c("all", "ref_by", "ref_to")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+
+\item{\code{direction}}{The relation direction to extract. Should be one of
+\code{"all"}, \code{"ref_to"} or \code{"ref_by"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Many fields in \link{Idd} can be referred by others. For example, the
+\verb{Outside Layer} and other fields in \code{Construction} class refer to the
+\code{Name} field in \code{Material} class and other material related classes.
+Here it means that the \verb{Outside Layer} field \strong{refers to} the \code{Name}
+field and the \code{Name} field is \strong{referred by} the \verb{Outside Layer}.
+
+\verb{$field_relation()} provides a simple interface to get this kind of
+relation. It takes a field specification and a relation
+direction, and returns an \code{IddRelation} object which contains data
+presenting such relation above.
+
+\verb{$field_relation()} returns a list of references for those fields
+that have the \code{object-list} and/or \code{reference} and
+\code{reference-class-name} attribute. Basically, it is a list of two
+elements \code{ref_to} and \code{ref_by}. Underneath, \code{ref_to} and \code{ref_by}
+are \link[data.table:data.table]{data.table}s which contain source
+field data and reference field data with custom printing method. For
+instance, if \code{iddobj$field_relation(c(1, 2), "ref_to")} gives results
+below:\preformatted{-- Refer to Others ---------------------
   +- Field: <1: Field 1>
   |  v~~~~~~~~~~~~~~~~~~
   |  \\- Class: <Class 2>
@@ -253,13 +1554,49 @@ results below:\preformatted{-- Refer to Others ---------------------
 
 This means that \verb{Field 2} in current class does not refer to any other fields.
 But \verb{Field 1} in current class refers to \verb{Field 2} in class named \verb{Class 2}.
+}
 
-\verb{$field_possible()}: returns all possible values for specified fields,
+\subsection{Returns}{
+An \code{IddRelation} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get field relation for specific fields
+surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-field_possible"></a>}}
+\subsection{Method \code{field_possible()}}{
+Get field possible values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_possible(which = NULL, in_ip)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+
+\item{\code{in_ip}}{Deprecated. The field value unit is determined by
+\code{eplusr_option("view_in_ip")}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$field_possible()} returns all possible values for specified fields,
 including auto-value (\code{Autosize}, \code{Autocalculate}, and \code{NA} if not
 applicable), and results from \verb{$field_default()}, \verb{$field_range()},
 \verb{$field_choice()}. Underneath, it returns a data.table with custom
-printing method. For instance, if \code{iddobj$field_possible(c(4, 2))} gives
-results below:\preformatted{-- 4: Field 4 ----------
+printing method. For instance, if \code{iddobj$field_possible(c(4, 2))}
+gives results below:\preformatted{-- 4: Field 4 ----------
 * Auto value: <NA>
 * Default: <NA>
 * Choice:
@@ -276,305 +1613,645 @@ This means that \verb{Field 4} in current class cannot be "autosized" or
 "autocalculated", and it does not have any default value. Its value should be
 a choice from \code{"Key1"} or \code{"Key2"}. For \verb{Field 2} in current class, it has a
 default value of \code{2} but can also be filled with value \code{"Autosize"}.
+}
 
-\verb{$is_valid_field_num()} returns \code{TRUE} if \code{num} is acceptable as a total
-number of fields in this class. Extensible property is considered. For
-instance, the total number of fields defined in IDD for class
-\code{BuildingSurfaces:Detailed} is 390. However, 396 is still a valid field
-number for this class as the number of field in the extensible group is 3.
+\subsection{Returns}{
+A \code{IddFieldPossible} object which is a
+\code{\link[data.table:data.table]{data.table::data.table()}} with 9 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get field possible values for specific fields
+surf$field_possible(6:10)
 
-\verb{$is_valid_field_name()} returns \code{TRUE} if \code{name} is a valid field name
-\strong{WITHOUT} unit. Note \code{name} can be given in underscore style, e.g.
-\code{"outside_layer"} is equivalent to \code{"Outside Layer"}.
+}
+\if{html}{\out{</div>}}
 
-\verb{$is_valid_field_index()} returns \code{TRUE} if \code{index} is a valid field index.
+}
 
-\verb{$is_autosizable_field()} returns \code{TRUE} if the field can be assigned to
-\code{autosize}.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid_field_num"></a>}}
+\subsection{Method \code{is_valid_field_num()}}{
+Check if input is a valid field number
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_valid_field_num(num)}\if{html}{\out{</div>}}
+}
 
-\verb{$is_autocalculatable_field()} returns \code{TRUE} if the field can be assigned to
-\code{autocalculate}.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{num}}{An integer vector to test.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_field_num()} returns \code{TRUE} if input \code{num} is acceptable
+as a total number of fields in this class. Extensible property is
+considered.
 
-\verb{$is_numeric_field()} returns \code{TRUE} if the field value should be numeric (
-an integer or a real number).
+For instance, the total number of fields defined in IDD for class
+\code{BuildingSurfaces:Detailed} is 390. However, 396 is still a valid
+field number for this class as the number of field in the extensible
+group is 3.
+}
 
-\verb{$is_integer_field()} returns \code{TRUE} if the field value should be an integer.
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_valid_field_num(c(10, 14, 100))
 
-\verb{$is_real_field()} returns \code{TRUE} if the field value should be a real number
-but not an integer.
+}
+\if{html}{\out{</div>}}
 
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_extensible_index"></a>}}
+\subsection{Method \code{is_extensible_index()}}{
+Check if input field index indicates an extensible field
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_extensible_index(index)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{An integer vector of field indices.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_extensible_index()} returns \code{TRUE} if input \code{index} indicates an
+index of extensible field in current class.
+
+Extensible fields mean that these fields can be dynamically added or
+deleted, such like the X, Y and Z vertices of a building surface.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_extensible_index(c(10, 14, 100))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid_field_name"></a>}}
+\subsection{Method \code{is_valid_field_name()}}{
+Check if input character is a valid field name
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_valid_field_name(name, strict = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{A character vector to test.}
+
+\item{\code{strict}}{If \code{TRUE}, only exact match is accepted. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_field_name()} returns \code{TRUE} if \code{name} is a valid field
+name \strong{WITHOUT} unit. Note \code{name} can be given in underscore style,
+e.g.  \code{"outside_layer"} is equivalent to \code{"Outside Layer"}.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_valid_field_name(c("name", "sun_exposure"))
+
+# exact match
+surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid_field_index"></a>}}
+\subsection{Method \code{is_valid_field_index()}}{
+Check if input integer is a valid field index
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_valid_field_index(index)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{An integer vector to test.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_field_index()} returns \code{TRUE} if \code{index} is a valid field
+index. For extensible class, \code{TRUE} is always returned.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_valid_field_index(1:10)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_autosizable_field"></a>}}
+\subsection{Method \code{is_autosizable_field()}}{
+Check if input field can be autosized
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_autosizable_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_autosizable_field()} returns \code{TRUE} if input field can be
+assigned to \code{autosize}.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_autosizable_field()
+
+surf$is_autosizable_field(c("name", "sun_exposure"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_autocalculatable_field"></a>}}
+\subsection{Method \code{is_autocalculatable_field()}}{
+Check if input field can be autocalculated
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_autocalculatable_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_autocalculatable_field()} returns \code{TRUE} if input field can be
+assigned to \code{autocalculate}.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_autocalculatable_field()
+
+surf$is_autocalculatable_field(c("name", "sun_exposure"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_numeric_field"></a>}}
+\subsection{Method \code{is_numeric_field()}}{
+Check if input field value should be numeric
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_numeric_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_numeric_field()} returns \code{TRUE} if the value of input field
+should be numeric ( an integer or a real number).
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_numeric_field()
+
+surf$is_numeric_field(c("name", "sun_exposure"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_real_field"></a>}}
+\subsection{Method \code{is_real_field()}}{
+Check if input field value should be a real number
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_real_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_real_field()} returns \code{TRUE} if the field value should be a real
+number but not an integer.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_real_field()
+
+surf$is_real_field(c("name", "number of vertices"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_integer_field"></a>}}
+\subsection{Method \code{is_integer_field()}}{
+Check if input field value should be an integer
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_integer_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_real_field()} returns \code{TRUE} if the field value should be an
+integer.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_integer_field()
+
+surf$is_integer_field(c("name", "number of vertices"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_required_field"></a>}}
+\subsection{Method \code{is_required_field()}}{
+Check if input field is required
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$is_required_field(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$is_required_field()} returns \code{TRUE} if the field is required.
+}
 
-\verb{$has_ref()} returns \code{TRUE} if the field refers to or can be referred by
-other fields.
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$is_required_field()
 
-\verb{$has_ref_to()} returns \code{TRUE} if the field refers to other fields.
+surf$is_required_field(c("name", "number of vertices"))
 
-\verb{$has_ref_by()} returns \code{TRUE} if the field refers can be referred by other
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref"></a>}}
+\subsection{Method \code{has_ref()}}{
+Check if input field can refer to or can be referred by other fields
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$has_ref()} returns \code{TRUE} if input field refers to or can be referred
+by other fields.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$has_ref()
+
+surf$has_ref(c("name", "zone name"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref_to"></a>}}
+\subsection{Method \code{has_ref_to()}}{
+Check if input field can refer to other fields
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_to(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$has_ref_to()} returns \code{TRUE} if input field can refer to other
 fields.
-
-\strong{Arguments}
-\itemize{
-\item \code{index}: An integer vector of field indexes.
-\item \code{name}: A character vector or field names. Can be given in underscore style,
-e.g. \code{"Thermal Resistance"} can be given in format \code{"thermal_resistance"}.
-\item \code{which}: An integer vector of field indexes or a character vector of field
-names. Field names can be given in underscore style.
-\item \code{unit}: If \code{TRUE}, field units will be pasted after field names, just like
-the way IDF Editor does. Default: \code{FALSE}.
-\item \code{in_ip}: If \code{TRUE}, field names or values will be returned in IP units.
-Default: the value of \code{eplusr_option("view_in_ip")}.
-\item \code{type}: The direction of relation to search. Should be one of \code{"all"},
-\code{"ref_by"} and \code{"ref_to"}. If \code{"ref_by"}, the relation data of specified
-fields and fields that refer to specified fields is returned. If
-\code{"ref_to"}, the relation data of specified fields and fields that are
-referred by specified fields is returned. If \code{"all"}, both are returned.
-}
 }
 
-\section{Data Extraction}{
-\preformatted{iddobj$to_table(all = FALSE)
-iddobj$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$has_ref_to()
+
+surf$has_ref_to(c("name", "zone name"))
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
-core data of current class. It has 3 columns:
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref_by"></a>}}
+\subsection{Method \code{has_ref_by()}}{
+Check if input field can be referred by other fields
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_by(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indices or a character vector
+of field names in current class. If \code{NULL}, all fields in this
+class are used. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$has_ref_by()} returns \code{TRUE} if input field can be referred by
+other fields.
+}
+
+\subsection{Returns}{
+A logical vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$has_ref_by()
+
+surf$has_ref_by(c("name", "zone name"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_table"></a>}}
+\subsection{Method \code{to_table()}}{
+Format an \code{IddObject} as a data.frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$to_table(all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for
+specified class will be returned. If \code{FALSE}, only the minimum
+field number is returned. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
+contains basic data of current class.
+The returned \link[data.table:data.table]{data.table} has 3 columns:
 \itemize{
 \item \code{class}: Character type. Current class name.
 \item \code{index}: Integer type. Field indexes.
 \item \code{field}: Character type. Field names.
 }
-
-\verb{$to_string()} returns an empty object of current class in a character vector
-format. It is formatted exactly the same as in IDF Editor.
-
-\strong{Arguments}
-\itemize{
-\item \code{all}: If \code{TRUE}, all fields in current class are returned, otherwise only
-minimum fields are returned.
-\item \code{unit}: If \code{TRUE}, units are also returned. Default: \code{FALSE}.
-\item \code{comment}: A character vector to be used as comments of returned string
-format object. If \code{NULL}, no comments are inserted. Default: \code{NULL}.
-\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
-\item \code{sep_at}: The character width to separate value string and field string.
-Default: \code{29L} which is the same as IDF Editor.
-}
 }
 
-\section{Print}{
+\subsection{Returns}{
+A \link[data.table:data.table]{data.table} with 3 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf$to_table()
 
+surf$to_table(TRUE)
+}
+\if{html}{\out{</div>}}
 
-\verb{$print()} prints the IddObject. Basically, the print output can be divided
-into 4 parts:
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_string"></a>}}
+\subsection{Method \code{to_string()}}{
+Format an \code{IdfObject} as a character vector
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$to_string(comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{A character vector to be used as comments of returned
+string format object.}
+
+\item{\code{leading}}{Leading spaces added to each field. Default: \code{4L}.}
+
+\item{\code{sep_at}}{The character width to separate value string and field
+string. Default: \code{29L} which is the same as IDF Editor.}
+
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for
+specified class will be returned. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_string()} returns the text format of current class. The returned
+character vector can be pasted into an IDF file as an empty object of
+specified class.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get text format of class BuildingSurface:Detailed
+surf$to_string()
+
+# tweak output formatting
+surf$to_string(leading = 0, sep_at = 0)
+
+# add comments
+surf$to_string(c("This", "will", "be", "comments"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{IddObject} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$print(brief = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{brief}}{If \code{TRUE}, only class name part is printed. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$print()} prints the \code{IddObject} object giving the information of
+class name, class properties, field indices and field names.
+
+\verb{$print()} prints the IddObject. Basically, the print output can be
+divided into 4 parts:
 \itemize{
 \item CLASS: IDD class name of current object in format \verb{<IddObject: CLASS>}.
-\item MEMO: brief description of the IDD class
-\item PROPERTY: properties of the IDD class, including name of group it belongs
-to, whether it is an unique or required class and current total fields. The
-fields may increase if the IDD class is extensible, such as \code{Branch},
-\code{ZoneList} and etc.
-\item FIELDS: fields of current IDD class. Required fields are marked with bullet
-marks. If the class is extensible, only the first extensible group will be
-printed and two ellipses will be shown at the bottom. Fields in the
-extensible group will be marked with an arrow down surrounded by angle
-brackets.
-}
-
-\strong{Argument}:
-\itemize{
-\item \code{brief}: If \code{TRUE}, only class name part is printed. Default: \code{FALSE}.
+\item MEMO: brief description of the IDD class.
+\item PROPERTY: properties of the IDD class, including name of group it
+belongs to, whether it is an unique or required class and current
+total fields. The fields may increase if the IDD class is
+extensible, such as \code{Branch}, \code{ZoneList} and etc.
+\item FIELDS: fields of current IDD class. Required fields are marked
+with stars (\code{*}). If the class is extensible, only the first
+extensible group will be printed and two ellipses will be shown at
+the bottom. Fields in the extensible group will be marked with an
+arrow down surrounded by angle brackets (\verb{<v>}).
 }
 }
 
-\examples{
-\dontrun{
-# ===== CREATE =====
-# get a parent Idd object
-idd <- use_idd(8.8, download = "auto")
-
-# get an IddObject of class "Material"
-mat <- idd$Material
-# OR
-mat <- idd_object(idd, "Material")
-
-# ===== BASIC INFO =====
-# get the version of parent IDD
-mat$version()
-
-# ===== CLASS PROPERTY =====
-# get name of IDD group it belongs to
-mat$group_name()
-
-# get index of IDD group it belongs to
-mat$group_index()
-
-# get name of current IDD class
-mat$class_name()
-
-# get index of current IDD class
-mat$class_index()
-
-# get the format of current IDD class
-mat$class_format()
-
-# get minimum field number
-mat$min_fields()
-
-# get total field number
-mat$num_fields()
-
-# get memo of current class
-mat$memo()
-
-# check if current class has name attribute or not
-mat$has_name()
-
-# check if current class is required
-mat$is_required()
-
-# check if current class is unique
-mat$is_unique()
-
-# ===== EXTENSIBLE GROUP =====
-# get an IddObject of extensible class "Branch"
-bran <- idd$Branch
-
-# check if the class is extensible
-bran$is_extensible()
-
-# get number of extensible fields, index of first extensible field and number of
-# current extensible groups in "Branch" class
-bran$num_extensible()
-
-bran$first_extensible_index()
-
-bran$extensible_group_num()
-
-# get current number of fields
-bran$num_fields()
-
-# add ten extensible groups
-bran$add_extensible_group(10)
-# the number of fields has been increased by 10 * 4 (= 40)
-bran$num_fields()
-
-# delete eight extensible groups
-bran$del_extensible_group(8)
-# the number of fields has been decreased by 8 * 4 (= 32)
-bran$num_fields()
-
-# ===== FIELD PROPERTY =====
-# list all field names without units
-mat$field_name()
-
-# get field indexes
-mat$field_index(c("thickness", "roughness", "name"))
-
-# get field types
-mat$field_type(c("solar_absorptance", "Density", "Name"))
-
-# get field notes
-bran$field_note(c(2, 4))
-
-# get field SI units
-mat$field_unit(c(1,3,5), in_ip = FALSE)
-
-# get field IP units
-mat$field_unit(c(1,3,5), in_ip = TRUE)
-
-# get field default values in SI units
-str(mat$field_default(in_ip = FALSE))
-
-# get field choices
-str(mat$field_choice(1:3))
-
-# get field ranges
-mat$field_range(c("roughness", "thickness", "conductivity", "solar_absorptance"))
-
-# get field relation with other fields
-mat$field_relation(type = "all")
-
-# get all possible values of fields
-mat$field_possible()
-
-# check if input is a valid field number for current class
-## get required minimum field number
-mat$min_fields()
-
-# (1) if less than required minimum field number
-mat$is_valid_field_num(3)
-
-# (2) if larger than required minimum field number but less than total field
-# number
-mat$is_valid_field_num(7)
-
-# (3) if larger than total field number
-mat$is_valid_field_num(10)
-# [1] FALSE
-
-# for extensible class
-bran$num_fields()
-bran$num_extensible()
-# if larger than required minimum field number
-# (1) but cannot give whole extensible groups
-bran$is_valid_field_num(c(55, 57, 60))
-
-# (2) and can give whole extensible groups
-bran$is_valid_field_num(c(58, 62, 70))
-
-# check if input field index is an extensible field index
-bran$is_extensible_index(1:4)
-
-# check if input is valid field name
-# NOTE: lower-style names are treated as valid
-mat$is_valid_field_name(c("nAmE", "specific heat", "Specific Heat", "specific_heat"))
-
-# check if input is valid field index
-bran$is_valid_field_index(c(1, 4, 54, 57))
-
-# check if fields are autosizable, i.e. can be set to "Autosize"
-mat$is_autosizable_field(1:4)
-
-# check if fields are autocalculatable, i.e. can be set to "Autocalculate"
-mat$is_autocalculatable_field(1:4)
-
-# check if fields are numeric fields, i.e. field values should be either
-# integers or float numbers
-mat$is_numeric_field(c("roughness", "thickness", "density"))
-
-# check if fields are integer fields, i.e. field values should be integers
-mat$is_integer_field(c("name", "specific_heat"))
-
-# check if fields are real fields, i.e. field values should be real numbers
-# but not integers
-mat$is_real_field(c("name", "specific_heat"))
-
-# check if fields are required, i.e. field values should not be empty
-mat$is_required_field(c("name", "roughness", "solar_absorptance"))
-
-# check if fields refer to or can be referred by other fields
-mat$has_ref()
-
-# check if fields refer to other fields
-mat$has_ref_to()
-
-# check if fields can be referred by other fields
-mat$has_ref_by(which = NULL)
-
-# ===== DATA EXTRACTION =====
-# get core data of current class
-mat$to_table()
-
-# get an empty string-foramt object of current class
-mat$to_string()
-
-# ===== PRINT =====
-mat$print()
+\subsection{Returns}{
+The \code{IddObject} object itself, invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{surf
+
+surf$print(brief = TRUE)
+
 }
-\seealso{
-\link{Idd} Class
+\if{html}{\out{</div>}}
+
 }
-\author{
-Hongyuan Jia
+
+}
 }

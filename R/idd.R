@@ -453,8 +453,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' @param class A single integer specifying the class index or a single
         #'        string specifying the class name.
-        #' @param direction The relation direction to extract. Should be either
-        #'        `"all"`, `"ref_to"`, `"ref_by"`.
+        #' @param direction The relation direction to extract. Should be one of
+        #'        `"all"`, `"ref_to"` or `"ref_by"`.
         #'
         #' @return An `IddRelation` object, which is a list of 3
         #' [data.table::data.table()]s named `ref_to` and `ref_by`.
@@ -537,7 +537,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' @details
         #' `$to_table()` returns a [data.table][data.table::data.table()] that
-        #' contains core data of specified classes.
+        #' contains basic data of specified classes.
         #' The returned [data.table][data.table::data.table()] has 3 columns:
         #'
         #' * `class`: Character type. Current class name.
