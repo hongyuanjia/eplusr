@@ -3,7 +3,7 @@ context("Job methods")
 test_that("Job methods", {
     eplusr_option(verbose_info = FALSE)
     skip_on_cran()
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    if (!is_avail_eplus(8.8)) install_eplus(8.8, local = TRUE)
 
     example <- copy_example()
 
