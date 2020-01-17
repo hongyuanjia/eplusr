@@ -4,7 +4,7 @@ test_that("Group methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)
 
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    if (!is_avail_eplus(8.8)) install_eplus(8.8, local = TRUE)
 
     path_idfs <- list.files(file.path(eplus_config(8.8)$dir, "ExampleFiles"),
         "\\.idf", full.names = TRUE)[1:5]

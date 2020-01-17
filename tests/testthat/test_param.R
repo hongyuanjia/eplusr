@@ -4,7 +4,7 @@ test_that("Parametric methods", {
     skip_on_cran()
     eplusr_option(verbose_info = FALSE)
 
-    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    if (!is_avail_eplus(8.8)) install_eplus(8.8, local = TRUE)
 
     expect_error(param_job(empty_idf(8.8), NULL), class = "error_idf_not_local")
 
