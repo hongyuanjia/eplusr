@@ -6,286 +6,702 @@ NULL
 
 #' Create and Run Parametric Analysis, and Collect Results
 #'
-#' `EplusGroupJob` class is a wrapper of [run_multi()] and provides an interface to
-#' group multiple EnergyPlus simulations together for running and collecting
+#' `EplusGroupJob` class is a wrapper of [run_multi()] and provides an interface
+#' to group multiple EnergyPlus simulations together for running and collecting
 #' outputs.
 #'
-#' @section Usage:
-#' ```
-#' group <- group_job(idfs, epws)
-#' group$run(dir = NULL, wait = TRUE, force = FALSE, echo = wait)
-#' group$kill()
-#' group$status()
-#' group$output_dir(which = NULL)
-#' group$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-#' group$errors(which = NULL, info = FALSE)
-#' group$list_table(which = NULL)
-#' group$read_table(which = NULL, table)
-#' group$read_rdd(which = NULL)
-#' group$read_mdd(which = NULL)
-#' group$report_data_dict(which = NULL)
-#' group$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-#'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
-#'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' group$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-#'                    column_name = NULL, row_name = NULL)
-#' group$print()
-#' ```
-#' @section Create:
-#' ```
-#' group <- group_job(idfs, epws)
-#' ```
-#'
-#' **Arguments**
-#'
-#' * `idfs`: Paths to EnergyPlus IDF files or a list of IDF files and [Idf]
-#'   objects.
-#' * `epws`: Paths to EnergyPlus EPW files or a list of EPW files and [Epw]
-#'   objects. Each element in the list can be `NULL`, which will force
-#'   design-day-only simulation. Note this needs at least one `Sizing:DesignDay`
-#'   object exists in that [Idf]. If `epws` is `NULL`, design-day-only
-#'   simulation will be conducted for all input models.
-#'
-#' @section Run and Collect Results:
-#' ```
-#' group$run(dir = NULL, wait = TRUE, force = FALSE, echo = wait)
-#' group$kill()
-#' group$status()
-#' group$errors(info = FALSE)
-#' group$output_dir(which = NULL)
-#' group$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-#' group$list_table(which = NULL)
-#' group$read_table(which = NULL, table)
-#' group$read_rdd(which = NULL)
-#' group$read_mdd(which = NULL)
-#' group$report_data_dict(which = NULL)
-#' group$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-#'                   case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-#'                   day = NULL, hour = NULL, minute = NULL, interval = NULL,
-#'                   simulation_days = NULL, day_type = NULL, environment_name = NULL)
-#' group$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-#'                    column_name = NULL, row_name = NULL)
-#' ```
-#'
-#' All those functions have the same meaning as in [EplusJob] class, except
-#' that they only return the results of specified simulations. Most arguments
-#' have the same meanings as in [EplusJob] class, except that there is an
-#' argument `which` to select specific simulations.
-#'
-#' `$run()` runs all parametric simulations in parallel. The number of parallel
-#' EnergyPlus process can be controlled by `eplusr_option("num_parallel")`. If
-#' `wait` is FALSE, then the job will be run in the background. You can get
-#' updated job status by just printing the `ParametricJob` object.
-#'
-#' `$kill()` kills all background EnergyPlus processes that are current running
-#' if possible. It only works when simulations run in non-waiting mode.
-#'
-#' `$status()` returns a named list of values indicates the status of the job:
-#'
-#'   * `run_before`: `TRUE` if the job has been run before. `FALSE` otherwise.
-#'   * `alive`: `TRUE` if the job is still running in the background. `FALSE`
-#'     otherwise.
-#'   * `terminated`: `TRUE` if the job was terminated during last
-#'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
-#'   * `successful`: `TRUE` if all simulations ended successfully. `FALSE` if
-#'     there is any simulation failed. `NA` if the job has not been run yet.
-#'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
-#'      simulation. `FALSE` otherwise.
-#'   * `job_status`: A [data.table][data.table::data.table()] contains meta data
-#'     for each simulation job. For details, please see [run_multi()]. If the
-#'     job has not been run before, a [data.table][data.table::data.table()]
-#'     with 4 columns is returned:
-#'     - `index`: The index of simulation
-#'     - `status`: The status of simulation. As the simulation has not been run,
-#'       `status` will always be "idle".
-#'     - `idf`: The path of input IDF file.
-#'     - `epw`: The path of input EPW file. If not provided, `NA` will be
-#'       assigned.
-#'
-#' $errors() returns an [ErrFile][read_err()] object which contains all contents
-#' of the simulation error file (`.err`). If `info` is `FALSE`, only warnings
-#' and errors are printed.
-#'
-#' `$output_dir()` returns the output directory of specified simulations.
-#'
-#' `$locate_output()` returns the path of a single output file of specified
-#' simulations.
-#'
-#' $errors() returns a list of [ErrFile][read_err()] objects which contain all
-#' contents of the simulation error file (`.err`). If `info` is `FALSE`, only
-#' warnings and errors are printed.
-#'
-#' `$list_table()` returns a list of character vectors containing all available
-#' table and view names in the SQLite file.
-#'
-#' `$read_table()` takes a valid table name of those from `$list_table()` and
-#' returns that table data in a [data.table][data.table::data.table()] format.
-#'
-#' `$read_rdd()` and `$read_mdd()` return the core data of Report Data
-#' Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
-#' details, please see [read_rdd()].
-#'
-#' `$report_data_dict()` returns a [data.table][data.table::data.table()] which
-#' contains all information about report data for specified simulations. For
-#' details on the meaning of each columns, please see "2.20.2.1
-#' ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
-#' documentation.
-#'
-#' `$report_data()` extracts the report data in a
-#' [data.table][data.table::data.table()] using key values, variable names and
-#' other arguments.
-#'
-#' `$tabular_data()` extracts tabular data in a
-#' [data.table][data.table::data.table()].
-#'
-#' For convenience, input character arguments matching in `$report_data()` and
-#' `$tabular_data()` are **case-insensitive**.
-#'
-#' For `$read_table()`, `$read_rdd()`, `$read_mdd()`, `$report_data_dict()`,
-#' `$report_data()` and `$tabular_data()`, the returned data.table has a `case`
-#' column in the returned [data.table][data.table::data.table()] that indicates
-#' the names of models. For detailed documentation on the results of those
-#' methods, please see [EplusJob].
-#'
-#' **Arguments**
-#'
-#' * `which`: An integer vector of the indexes or a character vector or names of
-#'   parametric simulations. If `NULL`, results of all parametric simulations
-#'   are returned. Default: `NULL`.
-#' * `dir`: The parent output directory for specified simulations. Outputs of
-#'   each simulation are placed in a separate folder under the parent directory.
-#' * `wait`: If `TRUE`, R will hang on and wait all EnergyPlus simulations
-#'   finish. If `FALSE`, all EnergyPlus simulations are run in the background.
-#'   Default: `TRUE`.
-#' * `force`: Only applicable when the last simulation runs with `wait` equals
-#'   to `FALSE` and is still running. If `TRUE`, current running job is
-#'   forced to stop and a new one will start. Default: `FALSE`.
-#' * `echo`: Only applicable when `wait` is `TRUE`. Whether to simulation
-#'   status. Default: `TRUE`.
-#' * `suffix`: A string that indicates the file extension of simulation output.
-#'   Default: `".err"`.
-#' * `table`: A string specifying which table to read. Valid table names can be
-#'   obtained using `$list_table()`.
-#' * `strict`: If `TRUE`, it checks if the simulation was terminated, is
-#'   still running or the file does not exist. Default: `TRUE`.
-#' * `info`: If `FALSE`,only warnings and errors are printed. Default: `FALSE`.
-#' * `key_value`: A character vector to identify key values of the data. If
-#'   `NULL`, all keys of that variable will be returned. `key_value` can also be
-#'   data.frame that contains `key_value` and `name` columns. In this case,
-#'   `name` argument in `$report_data()` is ignored. All available `key_value`
-#'   for current simulation output can be obtained using `$report_data_dict()`.
-#'   Default: `NULL`.
-#' * `name`: A character vector to identify names of the data. If
-#'   `NULL`, all names of that variable will be returned. If `key_value` is a
-#'   data.frame, `name` is ignored. All available `name` for current simulation
-#'   output can be obtained using `$report_data_dict()`.  Default: `NULL`.
-#' * `year`: Year of the date time in column `datetime`. If `NULL`, it
-#'    will calculate a year value that meets the start day of week restriction
-#'    for each environment. Default: `NULL`.
-#' * `tz`: Time zone of date time in column `datetime`. Default: `"UTC"`.
-#' * `case`: If not `NULL`, a character column will be added indicates the case
-#'   of this simulation. If `"auto"`, the name of the IDF file without extension
-#'   is used.
-#' * `all`: If `TRUE`, extra columns are also included in the returned
-#'   [data.table][data.table::data.table()].
-#' * `wide`: If `TRUE`, the output is formated in the same way as standard
-#'   EnergyPlus csv output file.
-#' * `period`: A Date or POSIXt vector used to specify which time period to
-#'    return. The year value does not matter and only month, day, hour and
-#'    minute value will be used when subsetting. If `NULL`, all time period of
-#'    data is returned. Default: `NULL`.
-#' * `month`, `day`, `hour`, `minute`: Each is an integer vector for month, day,
-#'    hour, minute subsetting of `datetime` column when querying on the SQL
-#'    database. If `NULL`, no subsetting is performed on those components. All
-#'    possible `month`, `day`, `hour` and `minute` can be obtained using
-#'    `$read_table("Time")`.  Default: `NULL`.
-#' * `interval`: An integer vector used to specify which interval length of
-#'    report to extract. If `NULL`, all interval will be used. Default: `NULL`.
-#' * `simulation_days`: An integer vector to specify which simulation day data
-#'    to extract. Note that this number resets after warmup and at the beginning
-#'    of an environment period. All possible `simulation_days` can be obtained
-#'    using `$read_table("Time")`. If `NULL`, all simulation days will be used.
-#'    Default: `NULL`.
-#' * `day_type`: A character vector to specify which day type of data to
-#'    extract. All possible day types are: `Sunday`, `Monday`, `Tuesday`,
-#'   `Wednesday`, `Thursday`, `Friday`, `Saturday`, `Holiday`,
-#'   `SummerDesignDay`, `WinterDesignDay`, `CustomDay1`, and `CustomDay2`. All
-#'   possible values for current simulation output can be obtained using
-#'   `$read_table("Time")`.
-#' * `environment_name`: A character vector to specify which environment data to
-#'    extract. If `NULL`, all environment data are returned. Default: `NULL`.
-#'    All possible `environment_name` for current simulation output can
-#'    be obtained using
-#'
-#'    ```
-#'    $read_table("EnvironmentPeriods")
-#'    ```
-#'
-#' * `report_name`, `report_for`, `table_name`, `column_name`, `row_name`:
-#'   Each is a character vector for subsetting when querying the SQL database.
-#'   For the meaning of each argument, please see the description above.
-#'
-#' @section Printing:
-#' ```
-#' group$print()
-#' print(group)
-#' ```
-#'
-#' `$print()` shows the core information of this `EplusGroupJob`, including the
-#' path of IDFs and EPWs and also the simulation job status.
-#'
-#' `$print()` is quite useful to get the simulation status, especially when
-#' `wait` is `FALSE` in `$run()`. The job status will be updated and printed
-#' whenever `$print()` is called.
-#'
-#' @examples
-#' \dontrun{
-#' if (is_avail_eplus(8.8)) {
-#'     dir <- eplus_config(8.8)$dir
-#'     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf")[1:5]
-#'     path_epws <- list.files(file.path(dir, "WeatherData"), "\\.epw")[1:5]
-#'
-#'     group <- group_job(path_idfs, path_epws)
-#'
-#'     # get status of current job
-#'     group$status()
-#'
-#'     # run parametric simulations
-#'     group$run(wait = TRUE)
-#'
-#'     # run in background
-#'     group$run(wait = FALSE)
-#'     # get detailed job status by printing
-#'     print(group)
-#'
-#'     # status now includes a data.table with detailed information on each simulation
-#'     group$status()
-#'
-#'     # print simulation errors
-#'     group$errors()
-#'
-#'     # extract output of all simulations
-#'     group$report_data()
-#'
-#'     # extract only some simulations
-#'     group$report_data(c(1, 3))
-#'     group$tabular_data(c(1, 3))
-#'     group$report_data(c("rotate_30", "rotate_120"))
-#'     group$tabular_data(c("rotate_30", "rotate_120"))
-#'
-#'     # get output directory
-#'     group$output_dir()
-#'     group$output_dir(c(1, 3))
-#'
-#'     # get path of specific output file
-#'     group$locate_output(c(1, 3), ".csv")
-#' }
-#' }
 #' @docType class
 #' @name EplusGroupJob
 #' @author Hongyuan Jia
 NULL
+
+#' @export
+# EplusGroupJob {{{
+EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
+    public = list(
+
+        # INITIALIZE {{{
+        #' @description
+        #' Create an `EplusGroupJob` object
+        #'
+        #' @param idfs Paths to EnergyPlus IDF files or a list of IDF files and
+        #'        [Idf] objects.
+        #' @param epws Paths to EnergyPlus EPW files or a list of EPW files and
+        #'        [Epw] objects. Each element in the list can be `NULL`, which
+        #'        will force design-day-only simulation. Note this needs at
+        #'        least one `Sizing:DesignDay` object exists in that [Idf]. If
+        #'        `epws` is `NULL`, design-day-only simulation will be conducted
+        #'        for all input models.
+        #'
+        #' @return An `EplusGroupJob` object.
+        #'
+        #' @examples
+        #' if (is_avail_eplus(8.8)) {
+        #'     dir <- eplus_config(8.8)$dir
+        #'     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf",
+        #'         full.names = TRUE)[1:5]
+        #'     path_epws <- list.files(file.path(dir, "WeatherData"), "\\.epw",
+        #'         full.names = TRUE)[1:5]
+        #'
+        #'     group <- EplusGroupJob$new(path_idfs, path_epws)
+        #' }
+        initialize = function (idfs, epws) {
+            input <- get_epgroup_input(idfs, epws)
+            private$m_idfs <- input$idfs
+            private$m_epws <- input$epws
+
+            # add Output:SQLite if necessary
+            add_sql <- vlapply(private$m_idfs, idf_add_output_sqlite)
+            # add Output:VariableDictionary if necessary
+            add_dict <- vlapply(private$m_idfs, idf_add_output_vardict)
+            # log if the input idf has been changed
+            private$m_log$unsaved <- add_sql | add_dict
+
+            # save uuid
+            private$m_log$uuid <- vcapply(private$idfs, function (idf) ._get_private(idf)$m_log$uuid)
+        },
+        # }}}
+
+        # PUBLIC FUNCTIONS {{{
+        # run {{{
+        #' @description
+        #' Run grouped simulations
+        #'
+        #' @details
+        #' `$run()` runs all grouped simulations in parallel. The number of
+        #' parallel EnergyPlus process can be controlled by
+        #' `eplusr_option("num_parallel")`. If `wait` is FALSE, then the job
+        #' will be run in the background. You can get updated job status by just
+        #' printing the `EplusGroupJob` object.
+        #'
+        #' @param dir The parent output directory for specified simulations.
+        #'        Outputs of each simulation are placed in a separate folder
+        #'        under the parent directory.
+        #' @param wait If `TRUE`, R will hang on and wait all EnergyPlus
+        #'        simulations finish. If `FALSE`, all EnergyPlus simulations are
+        #'        run in the background.  Default: `TRUE`.
+        #' @param force Only applicable when the last simulation runs with
+        #'        `wait` equals to `FALSE` and is still running. If `TRUE`,
+        #'        current running job is forced to stop and a new one will
+        #'        start. Default: `FALSE`.
+        #' @param copy_external If `TRUE`, the external files that current `Idf`
+        #'        object depends on will also be copied into the simulation
+        #'        output directory. The values of file paths in the Idf will be
+        #'        changed automatically. Currently, only `Schedule:File` class
+        #'        is supported.  This ensures that the output directory will
+        #'        have all files needed for the model to run. Default is
+        #'        `FALSE`.
+        #' @param echo Only applicable when `wait` is `TRUE`. Whether to
+        #'        simulation status. Default: same as `wait`.
+        #'
+        #' @return The `EplusGroupJob` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # only run design day
+        #' group$run(NULL)
+        #'
+        #' # specify output directory
+        #' group$run(tempdir())
+        #'
+        #' # run in the background
+        #' group$run(wait = TRUE)
+        #' # see group job status
+        #' group$status()
+        #'
+        #' # force to kill background group job before running the new one
+        #' group$run(force = TRUE)
+        #'
+        #' # do not show anything in the console
+        #' group$run(echo = FALSE)
+        #'
+        #' # copy external files used in the model to simulation output directory
+        #' group$run(copy_external = TRUE)
+        #' }
+        #'
+        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
+            epgroup_run(self, private, dir, wait, force, copy_external, echo),
+        # }}}
+
+        # kill {{{
+        #' @description
+        #' Kill current running jobs
+        #'
+        #' @details
+        #' `$kill()` kills all background EnergyPlus processes that are current
+        #' running if possible. It only works when simulations run in
+        #' non-waiting mode.
+        #'
+        #' @return A single logical value of `TRUE` or `FALSE`, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$kill()
+        #' }
+        #'
+        kill = function ()
+            epgroup_kill(self, private),
+        # }}}
+
+        # status {{{
+        #' @description
+        #' Get the group job status
+        #'
+        #' @details
+        #' `$status()` returns a named list of values indicates the status of the job:
+        #'
+        #'   * `run_before`: `TRUE` if the job has been run before. `FALSE` otherwise.
+        #'   * `alive`: `TRUE` if the job is still running in the background. `FALSE`
+        #'     otherwise.
+        #'   * `terminated`: `TRUE` if the job was terminated during last
+        #'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
+        #'   * `successful`: `TRUE` if all simulations ended successfully. `FALSE` if
+        #'     there is any simulation failed. `NA` if the job has not been run yet.
+        #'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
+        #'      simulation. `FALSE` otherwise.
+        #'   * `job_status`: A [data.table::data.table()] contains meta data
+        #'     for each simulation job. For details, please see [run_multi()]. If the
+        #'     job has not been run before, a [data.table::data.table()]
+        #'     with 4 columns is returned:
+        #'     - `index`: The index of simulation
+        #'     - `status`: The status of simulation. As the simulation has not been run,
+        #'       `status` will always be "idle".
+        #'     - `idf`: The path of input IDF file.
+        #'     - `epw`: The path of input EPW file. If not provided, `NA` will be
+        #'       assigned.
+        #' @return A named list.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$status()
+        #' }
+        #'
+        status = function ()
+            epgroup_status(self, private),
+        # }}}
+
+        # errors {{{
+        #' @description
+        #' Read group simulation errors
+        #'
+        #' @details
+        #' $errors() returns a list of [ErrFile][read_err()] objects which
+        #' contain all contents of the simulation error files (`.err`). If
+        #' `info` is `FALSE`, only warnings and errors are printed.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #' @param info If `FALSE`, only warnings and errors are printed.
+        #'        Default: `FALSE`.
+        #'
+        #' @return A list of [ErrFile][read_err()] objects.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$errors()
+        #'
+        #' # show all information
+        #' group$errors(info = TRUE)
+        #'
+        #' }
+        errors = function (which = NULL, info = FALSE)
+            epgroup_output_errors(self, private, which, info),
+        # }}}
+
+        # output_dir {{{
+        #' @description
+        #' Get simulation output directory
+        #'
+        #' @details
+        #' `$output_dir()` returns the output directory of simulation results.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # get output directories of all simulations
+        #' group$output_dir()
+        #'
+        #' # get output directories of specified simulations
+        #' group$output_dir(c(1, 4))
+        #' }
+        #'
+        output_dir = function (which = NULL)
+            epgroup_output_dir(self, private, which),
+        # }}}
+
+        # locate_output {{{
+        #' @description
+        #' Get paths of output file
+        #'
+        #' @details
+        #' `$locate_output()` returns the path of a single output file of specified
+        #' simulations.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #' @param suffix A string that indicates the file extension of
+        #'        simulation output. Default: `".err"`.
+        #' @param strict If `TRUE`, it will check if the simulation was
+        #'        terminated, is still running or the file exists or not.
+        #'        Default: `TRUE`.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # get the file path of the error file
+        #' group$locate_output(c(1, 4), ".err", strict = FALSE)
+        #'
+        #' # can use to detect if certain output file exists
+        #' group$locate_output(c(1, 4), ".expidf", strict = TRUE)
+        #' }
+        #'
+        locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
+            epgroup_locate_output(self, private, which, suffix, strict),
+        # }}}
+
+        # list_table {{{
+        #' @description
+        #' List all table names in EnergyPlus SQL outputs
+        #'
+        #' @details
+        #' `$list_table()` returns a list of character vectors that contain all
+        #' available table and view names in the EnergyPlus SQLite files for
+        #' group simulations. The list is named using IDF names.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @return A named list of character vectors.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$list_table(c(1, 4))
+        #' }
+        #'
+        list_table = function (which = NULL)
+            epgroup_list_table(self, private, which),
+        # }}}
+
+        # read_table {{{
+        #' @description
+        #' Read the same table from EnergyPlus SQL outputs
+        #'
+        #' @details
+        #' `$read_table()` takes a simulation index and a valid table `name` of
+        #' those from
+        #' \href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
+        #' and returns that table data in a [data.table::data.table()] format.
+        #' The first column will always be `case` which can be used to
+        #' distinguish output from different simulations.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #' @param name A single string specifying the name of table to read.
+        #'
+        #' @return A [data.table::data.table()].
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # read a specific table
+        #' group$read_table(c(1, 4), "Zones")
+        #' }
+        #'
+        read_table = function (which = NULL, name)
+            epgroup_read_table(self, private, which, name),
+        # }}}
+
+        # read_rdd {{{
+        #' @description
+        #' Read Report Data Dictionary (RDD) files
+        #'
+        #' @details
+        #' `$read_rdd()` return the core data of Report Data Dictionary (RDD)
+        #' files. For details, please see [read_rdd()].
+        #' The first column will always be `case` which can be used to
+        #' distinguish output from different simulations.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @return A [data.table::data.table()].
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$read_rdd(c(1, 4))
+        #' }
+        #'
+        read_rdd = function (which = NULL)
+            epgroup_read_rdd(self, private, which),
+        # }}}
+
+        # read_mdd {{{
+        #' @description
+        #' Read Meter Data Dictionary (MDD) files
+        #'
+        #' @details
+        #' `$read_mdd()` return the core data of Meter Data Dictionary (MDD)
+        #' files. For details, please see [read_mdd()].
+        #' The first column will always be `case` which can be used to
+        #' distinguish output from different simulations.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @return A [data.table::data.table()].
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$read_mdd(c(1, 4))
+        #' }
+        #'
+        read_mdd = function (which = NULL)
+            epgroup_read_mdd(self, private, which),
+        # }}}
+
+        # report_data_dict {{{
+        #' @description
+        #' Read report data dictionary from EnergyPlus SQL outputs
+        #'
+        #' @details
+        #' `$report_data_dict()` returns a [data.table::data.table()] which
+        #' contains all information about report data.
+        #'
+        #' For details on the meaning of each columns, please see "2.20.2.1
+        #' ReportDataDictionary Table" in EnergyPlus "Output Details and
+        #' Examples" documentation.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @return A [data.table::data.table()] of 10 columns:
+        #'
+        #' * `case`: The model name. This column can be used to distinguish
+        #'   output from different simulations
+        #' * `report_data_dictionary_index`: The integer used to link the
+        #'   dictionary data to the variable data. Mainly useful when joining
+        #'   diferent tables
+        #' * `is_meter`: Whether report data is a meter data. Possible values:
+        #'   `0` and `1`
+        #' * `timestep_type`: Type of data timestep. Possible values: `Zone` and
+        #'   `HVAC System`
+        #' * `key_value`: Key name of the data
+        #' * `name`: Actual report data name
+        #' * `reporting_frequency`:
+        #' * `schedule_name`: Name of the the schedule that controls reporting
+        #'     frequency.
+        #' * `units`: The data units
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$report_data_dict(c(1, 4))
+        #' }
+        #'
+        report_data_dict = function (which = NULL)
+            epgroup_report_data_dict(self, private, which),
+        # }}}
+
+        # report_data {{{
+        #' @description
+        #' Read report data
+        #'
+        #' @details
+        #' `$report_data()` extracts the report data in a
+        #' [data.table::data.table()] using key values, variable names and other
+        #' specifications.
+        #'
+        #' `$report_data()` can also directly take all or subset output from
+        #' `$report_data_dict()` as input, and extract all data specified.
+        #'
+        #' The returned column numbers varies depending on `all` argument.
+        #'
+        #' * `all` is `FALSE`, the returned [data.table::data.table()] has 6 columns:
+        #'   * `case`: The model name. This column can be used to distinguish
+        #'     output from different simulations
+        #'   * `datetime`: The date time of simulation result
+        #'   * `key_value`: Key name of the data
+        #'   * `name`: Actual report data name
+        #'   * `units`: The data units
+        #'   * `value`: The data value
+        #' * `all` is `TRUE`, besides columns described above, extra columns are also
+        #'   included:
+        #'   * `month`: The month of reported date time
+        #'   * `day`: The day of month of reported date time
+        #'   * `hour`: The hour of reported date time
+        #'   * `minute`: The minute of reported date time
+        #'   * `dst`: Daylight saving time indicator. Possible values: `0` and `1`
+        #'   * `interval`: Length of reporting interval
+        #'   * `simulation_days`: Day of simulation
+        #'   * `day_type`: The type of day, e.g. `Monday`, `Tuesday` and etc.
+        #'   * `environment_period_index`: The indice of environment.
+        #'   * `environment_name`: A text string identifying the environment.
+        #'   * `is_meter`: Whether report data is a meter data. Possible values: `0` and
+        #'     `1`
+        #'   * `type`: Nature of data type with respect to state. Possible values: `Sum`
+        #'     and `Avg`
+        #'   * `index_group`: The report group, e.g. `Zone`, `System`
+        #'   * `timestep_type`: Type of data timestep. Possible values: `Zone` and `HVAC
+        #'     System`
+        #'   * `reporting_frequency`: The reporting frequency of the variable, e.g.
+        #'   `HVAC System Timestep`, `Zone Timestep`.
+        #'   * `schedule_name`: Name of the the schedule that controls reporting
+        #'     frequency.
+        #'
+        #' With the `datetime` column, it is quite straightforward to apply time-series
+        #' analysis on the simulation output. However, another painful thing is that
+        #' every simulation run period has its own `Day of Week for Start Day`. Randomly
+        #' setting the `year` may result in a date time series that does not have
+        #' the same start day of week as specified in the RunPeriod objects.
+        #'
+        #' eplusr provides a simple solution for this. By setting `year` to `NULL`,
+        #' which is the default behavior, eplusr will calculate a year value (from
+        #' current year backwards) for each run period that compliances with the start
+        #' day of week restriction.
+        #'
+        #' It is worth noting that EnergyPlus uses 24-hour clock system where 24 is only
+        #' used to denote midnight at the end of a calendar day. In EnergyPlus output,
+        #' "00:24:00" with a time interval being 15 mins represents a time period from
+        #' "00:23:45" to "00:24:00", and similarly "00:15:00" represents a time period
+        #' from "00:24:00" to "00:15:00" of the next day. This means that if current day
+        #' is Friday, day of week rule applied in schedule time period "00:23:45" to
+        #' "00:24:00" (presented as "00:24:00" in the output) is also Friday, but not
+        #' Saturday. However, if you try to get the day of week of time "00:24:00" in R,
+        #' you will get Saturday, but not Friday. This introduces inconsistency and may
+        #' cause problems when doing data analysis considering day of week value.
+        #'
+        #' With `wide` equals `TRUE`, `$report_data()` will format the simulation output
+        #' in the same way as standard EnergyPlus csv output file. Sometimes this can be
+        #' useful as there may be existing tools/workflows that depend on this format.
+        #' When both `wide` and `all` are `TRUE`, columns of runperiod environment names
+        #' and date time components are also returned, including:
+        #' `environment_period_index", "environment_name`, `simulation_days`,
+        #' `datetime`, `month`, `day`, `hour`, `minute`, `day_type`.
+        #'
+        #' For convenience, input character arguments matching in
+        #' `$report_data()` are **case-insensitive**.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @param key_value A character vector to identify key values of the
+        #'        data. If `NULL`, all keys of that variable will be returned.
+        #'        `key_value` can also be data.frame that contains `key_value`
+        #'        and `name` columns. In this case, `name` argument in
+        #'        `$report_data()` is ignored. All available `key_value` for
+        #'        current simulation output can be obtained using
+        #'        \href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{$report_data_dict()}}.
+        #'        Default: `NULL`.
+        #'
+        #' @param name A character vector to identify names of the data. If
+        #'        `NULL`, all names of that variable will be returned. If
+        #'        `key_value` is a data.frame, `name` is ignored. All available
+        #'        `name` for current simulation output can be obtained using
+        #'        \href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{$report_data_dict()}}.
+        #'        Default: `NULL`.
+        #'
+        #' @param year Year of the date time in column `datetime`. If `NULL`, it
+        #'        will calculate a year value that meets the start day of week
+        #'        restriction for each environment. Default: `NULL`.
+        #'
+        #' @param tz Time zone of date time in column `datetime`. Default:
+        #'        `"UTC"`.
+        #'
+        #' @param case If not `NULL`, a character column will be added indicates
+        #'        the case of this simulation. If `"auto"`, the name of the IDF
+        #'        file without extension is used.
+        #'
+        #' @param all If `TRUE`, extra columns are also included in the returned
+        #'        [data.table::data.table()].
+        #'
+        #' @param wide If `TRUE`, the output is formated in the same way as
+        #'        standard EnergyPlus csv output file.
+        #'
+        #' @param period A Date or POSIXt vector used to specify which time
+        #'        period to return. The year value does not matter and only
+        #'        month, day, hour and minute value will be used when
+        #'        subsetting. If `NULL`, all time period of data is returned.
+        #'        Default: `NULL`.
+        #'
+        #' @param month,day,hour,minute Each is an integer vector for month,
+        #'        day, hour, minute subsetting of `datetime` column when
+        #'        querying on the SQL database. If `NULL`, no subsetting is
+        #'        performed on those components. All possible `month`, `day`,
+        #'        `hour` and `minute` can be obtained using
+        #'        \href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+        #'        Default: `NULL`.
+        #'
+        #' @param interval An integer vector used to specify which interval
+        #'        length of report to extract. If `NULL`, all interval will be
+        #'        used. Default: `NULL`.
+        #'
+        #' @param simulation_days An integer vector to specify which simulation
+        #'        day data to extract. Note that this number resets after warmup
+        #'        and at the beginning of an environment period. All possible
+        #'        `simulation_days` can be obtained using
+        #'        \href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+        #'        If `NULL`, all simulation days will be used. Default: `NULL`.
+        #'
+        #' @param day_type A character vector to specify which day type of data
+        #'        to extract. All possible day types are: `Sunday`, `Monday`,
+        #'        `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`,
+        #'        `Holiday`, `SummerDesignDay`, `WinterDesignDay`, `CustomDay1`,
+        #'        and `CustomDay2`. All possible values for current simulation
+        #'        output can be obtained using
+        #'        \href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+        #'
+        #' @param environment_name A character vector to specify which
+        #'        environment data to extract. If `NULL`, all environment data
+        #'        are returned. Default: `NULL`. All possible
+        #'        `environment_name` for current simulation output can be
+        #'        obtained using:
+        #' ```
+        #' $read_table(NULL, "EnvironmentPeriods")
+        #' ```
+        #'
+        #' @return A [data.table::data.table()].
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # read report data
+        #' group$report_data(c(1, 4))
+        #'
+        #' # specify output variables using report data dictionary
+        #' dict <- group$report_data_dict(1)
+        #' group$report_data(c(1, 4), dict[units == "C"])
+        #'
+        #' # specify output variables using 'key_value' and 'name'
+        #' group$report_data(c(1, 4), "environment", "site outdoor air drybulb temperature")
+        #'
+        #' # explicitly specify year value and time zone
+        #' group$report_data(c(1, 4), dict[1], year = 2020, tz = "Etc/GMT+8")
+        #'
+        #' # get all possible columns
+        #' group$report_data(c(1, 4), dict[1], all = TRUE)
+        #'
+        #' # return in a format that is similar as EnergyPlus CSV output
+        #' group$report_data(c(1, 4), dict[1], wide = TRUE)
+        #'
+        #' # return in a format that is similar as EnergyPlus CSV output with
+        #' # extra columns
+        #' group$report_data(c(1, 4), dict[1], wide = TRUE, all = TRUE)
+        #'
+        #' # only get data at the working hour on the first Monday
+        #' group$report_data(c(1, 4), dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
+        #' }
+        #'
+        report_data = function (which = NULL, key_value = NULL, name = NULL,
+                                year = NULL, tz = "UTC", all = FALSE, wide = FALSE,
+                                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
+                                interval = NULL, simulation_days = NULL, day_type = NULL,
+                                environment_name = NULL)
+            epgroup_report_data(self, private, which,
+                key_value = key_value, name = name, year = year, tz = tz, all = all, wide = wide,
+                period = period, month = month, day = day, hour = hour, minute = minute,
+                interval = interval, simulation_days = simulation_days, day_type = day_type,
+                environment_name = environment_name
+            ),
+        # }}}
+
+        # tabular_data {{{
+        #' @description
+        #' Read tabular data
+        #'
+        #' @details
+        #' `$tabular_data()` extracts the tabular data in a
+        #' [data.table::data.table()] using report, table, column and row name
+        #' specifications. The returned [data.table::data.table()] has
+        #' 9 columns:
+        #'
+        #' * `case`: The model name. This column can be used to distinguish
+        #'   output from different simulations
+        #' * `index`: Tabular data index
+        #' * `report_name`: The name of the report that the record belongs to
+        #' * `report_for`: The `For` text that is associated with the record
+        #' * `table_name`: The name of the table that the record belongs to
+        #' * `column_name`: The name of the column that the record belongs to
+        #' * `row_name`: The name of the row that the record belongs to
+        #' * `units`: The units of the record
+        #' * `value`: The value of the record **in string format**
+        #'
+        #' For convenience, input character arguments matching in
+        #' `$tabular_data()` are **case-insensitive**.
+        #'
+        #' @param which An integer vector of the indexes or a character vector
+        #'        or names of parametric simulations. If `NULL`, results of all
+        #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @param report_name,report_for,table_name,column_name,row_name Each is
+        #'        a character vector for subsetting when querying the SQL
+        #'        database.  For the meaning of each argument, please see the
+        #'        description above.
+        #'
+        #' @return A [data.table::data.table()] with 8 columns.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # read all tabular data
+        #' group$tabular_data(c(1, 4))
+        #'
+        #' # explicitly specify data you want
+        #' str(group$tabular_data(c(1, 4),
+        #'     report_name = "AnnualBuildingUtilityPerformanceSummary",
+        #'     table_name = "Site and Source Energy",
+        #'     column_name = "Total Energy",
+        #'     row_name = "Total Site Energy"
+        #' ))
+        #' }
+        #'
+        tabular_data = function(which = NULL, report_name = NULL, report_for = NULL,
+                                table_name = NULL, column_name = NULL, row_name = NULL)
+            epgroup_tabular_data(self, private, which, report_name = report_name,
+                report_for = report_for, table_name = table_name,
+                column_name = column_name, row_name = row_name),
+        # }}}
+
+        # print {{{
+        #' @description
+        #' Print `EplusGroupJob` object
+        #'
+        #' @details
+        #' `$print()` shows the core information of this `EplusGroupJob`, including the
+        #' path of IDFs and EPWs and also the simulation job status.
+        #'
+        #' `$print()` is quite useful to get the simulation status, especially when
+        #' `wait` is `FALSE` in `$run()`. The job status will be updated and printed
+        #' whenever `$print()` is called.
+        #'
+        #' @return The `EplusGroupJob` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' group$print()
+        #' }
+        #'
+        print = function ()
+            epgroup_print(self, private)
+        # }}}
+        # }}}
+    ),
+
+    private = list(
+        # PRIVATE FIELDS {{{
+        m_idfs = NULL,
+        m_epws = NULL,
+        m_job = NULL,
+        m_log = NULL
+        # }}}
+    )
+)
+# }}}
 
 #' Create An EnergyPlus Parametric Simulation Job
 #'
@@ -320,98 +736,8 @@ NULL
 #' @author Hongyuan Jia
 # group_job {{{
 group_job <- function (idfs, epws) {
-    EplusGroup$new(idfs, epws)
+    EplusGroupJob$new(idfs, epws)
 }
-# }}}
-
-# EplusGroup {{{
-EplusGroup <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
-    public = list(
-
-        # INITIALIZE {{{
-        initialize = function (idfs, epws) {
-            input <- get_epgroup_input(idfs, epws)
-            private$m_idfs <- input$idfs
-            private$m_epws <- input$epws
-
-            # add Output:SQLite if necessary
-            add_sql <- vlapply(private$m_idfs, idf_add_output_sqlite)
-            # add Output:VariableDictionary if necessary
-            add_dict <- vlapply(private$m_idfs, idf_add_output_vardict)
-            # log if the input idf has been changed
-            private$m_log$unsaved <- add_sql | add_dict
-
-            # save uuid
-            private$m_log$uuid <- vcapply(private$idfs, function (idf) ._get_private(idf)$m_log$uuid)
-        },
-        # }}}
-
-        # PUBLIC FUNCTIONS {{{
-        run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-            epgroup_run(self, private, dir, wait, force, copy_external, echo),
-
-        kill = function ()
-            epgroup_kill(self, private),
-
-        status = function ()
-            epgroup_status(self, private),
-
-        output_dir = function (which = NULL)
-            epgroup_output_dir(self, private, which),
-
-        locate_output = function (which = NULL, suffix = ".err", strict = TRUE)
-            epgroup_locate_output(self, private, which, suffix, strict),
-
-        errors = function (which = NULL, info = FALSE)
-            epgroup_output_errors(self, private, which, info),
-
-        list_table = function (which = NULL)
-            epgroup_list_table(self, private, which),
-
-        read_table = function (which = NULL, table)
-            epgroup_read_table(self, private, which, table),
-
-        read_rdd = function (which = NULL)
-            epgroup_read_rdd(self, private, which),
-
-        read_mdd = function (which = NULL)
-            epgroup_read_mdd(self, private, which),
-
-        report_data_dict = function (which = NULL)
-            epgroup_report_data_dict(self, private, which),
-
-        report_data = function (which = NULL, key_value = NULL, name = NULL,
-                                year = NULL, tz = "UTC", all = FALSE, wide = FALSE,
-                                period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
-                                interval = NULL, simulation_days = NULL, day_type = NULL,
-                                environment_name = NULL)
-            epgroup_report_data(self, private, which,
-                key_value = key_value, name = name, year = year, tz = tz, all = all, wide = wide,
-                period = period, month = month, day = day, hour = hour, minute = minute,
-                interval = interval, simulation_days = simulation_days, day_type = day_type,
-                environment_name = environment_name
-            ),
-
-        tabular_data = function(which = NULL, report_name = NULL, report_for = NULL,
-                                table_name = NULL, column_name = NULL, row_name = NULL)
-            epgroup_tabular_data(self, private, which, report_name = report_name,
-                report_for = report_for, table_name = table_name,
-                column_name = column_name, row_name = row_name),
-
-        print = function ()
-            epgroup_print(self, private)
-        # }}}
-    ),
-
-    private = list(
-        # PRIVATE FIELDS {{{
-        m_idfs = NULL,
-        m_epws = NULL,
-        m_job = NULL,
-        m_log = NULL
-        # }}}
-    )
-)
 # }}}
 
 # epgroup_run {{{

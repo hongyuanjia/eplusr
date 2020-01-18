@@ -15,309 +15,12 @@ storing only the path of Idf like in \link{EplusJob} class. Also, an object in
 \code{Output:SQLite} with \verb{Option Type} value of \code{SimpleAndTabular} will be
 automatically created if it does not exists, like \link{Idf} class does.
 }
-\section{Usage}{
-\preformatted{param <- param_job(idf, epw)
-param$version()
-param$seed()
-param$weather()
-param$apply_measure(measure, ..., .names = NULL)
-param$models()
-param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-param$kill()
-param$status()
-param$output_dir(which = NULL)
-param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-param$errors(which = NULL, info = FALSE)
-param$list_table(which = NULL)
-param$read_table(which = NULL, table)
-param$read_rdd(which = NULL)
-param$read_mdd(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
-                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
-param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
-param$print()
-}
-}
-
-\section{Create}{
-\preformatted{param <- param_job(idf, epw)
-}
-
-\strong{Arguments}
-\itemize{
-\item \code{idf}: Path to EnergyPlus IDF file or an \code{Idf} object.
-\item \code{epw}: Path to EnergyPlus EPW file or an \code{Epw} object. \code{epw} can also be
-\code{NULL} which will force design-day-only simulation when \verb{$run()} method is
-called. Note this needs at least one \code{Sizing:DesignDay} object exists in
-the \link{Idf}.
-}
-}
-
-\section{Get Seed Model and Weather}{
-\preformatted{param$version()
-param$seed()
-param$weather()
-}
-
-\verb{$version()} returns the version of input \link{Idf} object.
-
-\verb{$seed()} returns the input \link{Idf} object.
-
-\verb{$weather()} returns the input \link{Epw} object. If no \link{Epw} is provided when
-creating the \code{ParametricJob} object, \code{NULL} is returned.
-}
-
-\section{Apply Design Alternatives}{
-\preformatted{param$apply_measure(measure, ..., .names = NULL)
-}
-
-\verb{$apply_measure()} allows to apply a measure to an \link{Idf} and creates
-parametric models for analysis. Basically, a measure is just a function that
-takes an \link{Idf} object and other arguments as input, and returns a modified
-\link{Idf} object as output. Use \code{...} to supply different arguments, \strong{except for
-the first \code{Idf} argument}, to that measure. Under the hook, \code{\link[base:mapply]{base::mapply()}}
-is used to create multiple \link{Idf}s according to the input values.
-
-\strong{Arguments}
-\itemize{
-\item \code{measure}: A function that takes an \code{Idf} and other arguments as input and
-returns an \code{Idf} object as output.
-\item \code{...}: Arguments \strong{except first \code{Idf} argument} that are passed to that
-\code{measure}.
-\item \code{.names}: A character vector of the names of parametric \code{Idf}s. If \code{NULL},
-the new \code{Idf}s will be named in format \code{measure_name + number}.
-}
-}
-
-\section{Extract models}{
-\preformatted{param$models()
-param$save(dir = NULL, separate = TRUE, copy_external = FALSE)
-}
-
-\verb{$models()} returns a list of parametric models generated using input \link{Idf}
-object and \verb{$apply_measure()} method. Model names are assigned in the same
-way as the \code{.names} arugment in \verb{$apply_measure()}. If no measure has been
-applied, \code{NULL} is returned. Note that it is not recommended to conduct any
-extra modification on those models directly, after they were created using
-\verb{$apply_measure()}, as this may lead to an un-reproducible process. A warning
-message will be issued if any of those models has been modified when running
-simulations.
-
-\verb{$save()} saves all parametric models in specified folder. An error will be
-issued if no measure has been applied. \verb{$save()} returns a
-\link[data.table:data.table]{data.table} with two columns:
-\itemize{
-\item model: The path of saved parametric model files.
-\item weather: The path of saved weather files.
-}
-
-\strong{Arguments}
-\itemize{
-\item \code{dir}: The parent output directory for models to be saved. If \code{NULL}, the
-directory of the seed model will be used. Default: \code{NULL}.
-\item \code{separate}: If \code{TRUE}, all models are saved in a separate folder with each
-model's name under specified directory. If \code{FALSE}, all models are saved in
-the specified directory. Default: \code{TRUE}.
-\item \code{copy_external}: Only applicable when \code{separate} is \code{TRUE}. If \code{TRUE}, the
-external files that every \code{Idf} object depends on will also be copied into
-the saving directory. The values of file paths in the Idf will be changed
-automatically. Currently, only \code{Schedule:File} class is supported.  This
-ensures that the output directory will have all files needed for the model
-to run. Default: \code{FALSE}.
-}
-}
-
-\section{Run and Collect Results}{
-\preformatted{param$run(dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)
-param$kill()
-param$status()
-param$output_dir(which = NULL)
-param$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-param$errors(which = NULL, info = FALSE)
-param$list_table(which = NULL)
-param$read_table(which = NULL, table)
-param$read_rdd(which = NULL)
-param$read_mdd(which = NULL)
-param$report_data_dict(which = NULL)
-param$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
-                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
-param$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
-}
-
-All those functions have the same meaning as in \link{EplusJob} class, except
-that they only return the results of specified simulations. Most arguments
-have the same meanings as in \link{EplusJob} class.
-
-\verb{$run()} runs all parametric simulations in parallel. The number of parallel
-EnergyPlus process can be controlled by \code{eplusr_option("num_parallel")}. If
-\code{wait} is FALSE, then the job will be run in the background. You can get
-updated job status by just printing the \code{ParametricJob} object.
-
-\verb{$kill()} kills all background EnergyPlus processes that are current running
-if possible. It only works when simulations run in non-waiting mode.
-
-\verb{$status()} returns a named list of values indicates the status of the job:
-\itemize{
-\item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
-\item \code{alive}: \code{TRUE} if the job is still running in the background. \code{FALSE}
-otherwise.
-\item \code{terminated}: \code{TRUE} if the job was terminated during last
-simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
-\item \code{successful}: \code{TRUE} if last simulation ended successfully. \code{FALSE}
-otherwise. \code{NA} if the job has not been run yet.
-\item \code{changed_after}: \code{TRUE} if the \emph{seed model} has been modified since last
-simulation. \code{FALSE} otherwise.
-\item \code{job_status}: A \link[data.table:data.table]{data.table} contains meta data
-for each simulation job. For details, please see \code{\link[=run_multi]{run_multi()}}. If the
-job has not been run before, a null
-\link[data.table:data.table]{data.table} is returned.
-}
-
-$errors() returns an \link[=read_err]{ErrFile} object which contains all contents
-of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only warnings
-and errors are printed.
-
-\verb{$output_dir()} returns the output directory of specified simulations.
-
-\verb{$locate_output()} returns the path of a single output file of specified
-simulations.
-
-\verb{$list_table()} returns a list of character vectors containing all available
-table and view names in the SQLite file.
-
-\verb{$read_table()} takes a valid table name of those from \verb{$list_table()} and
-returns that table data in a \link[data.table:data.table]{data.table} format.
-
-\verb{$read_rdd()} and \verb{$read_mdd()} return the core data of Report Data
-Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
-details, please see \code{\link[=read_rdd]{read_rdd()}}.
-
-\verb{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
-contains all information about report data for specified simulations. For
-details on the meaning of each columns, please see "2.20.2.1
-ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
-documentation.
-
-\verb{$report_data()} extracts the report data in a
-\link[data.table:data.table]{data.table} using key values, variable names and
-other arguments.
-
-\verb{$tabular_data()} extracts tabular data in a
-\link[data.table:data.table]{data.table}.
-
-For convenience, input character arguments matching in \verb{$report_data()} and
-\verb{$tabular_data()} are \strong{case-insensitive}.
-
-For \verb{$read_table()}, \verb{$read_rdd()}, \verb{$read_mdd()}, \verb{$report_data_dict()},
-\verb{$report_data()} and \verb{$tabular_data()}, the returned data.table has a \code{case}
-column in the returned \link[data.table:data.table]{data.table} that indicates
-the names of models. For detailed documentation on the results of those
-methods, please see \link{EplusJob}.
-
-\strong{Arguments}
-\itemize{
-\item \code{which}: An integer vector of the indexes or a character vector or names of
-parametric simulations. If \code{NULL}, results of all parametric simulations
-are returned. Default: \code{NULL}.
-\item \code{dir}: The parent output directory for specified simulations. Outputs of
-each simulation are placed in a separate folder under the parent directory.
-\item \code{wait}: If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
-finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
-Default: \code{TRUE}.
-\item \code{force}: Only applicable when the last simulation runs with \code{wait} equals
-to \code{FALSE} and is still running. If \code{TRUE}, current running job is
-forced to stop and a new one will start. Default: \code{FALSE}.
-\item \code{copy_external}: If \code{TRUE}, the external files that every \code{Idf} object
-depends on will also be copied into the simulation output directory. The
-values of file paths in the Idf will be changed automatically. Currently,
-only \code{Schedule:File} class is supported.  This ensures that the output
-directory will have all files needed for the model to run. Default is
-\code{FALSE}.
-\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to simulation
-status. Default: The same value of \code{wait}.
-\item \code{suffix}: A string that indicates the file extension of simulation output.
-Default: \code{".err"}.
-\item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
-still running or the file does not exist. Default: \code{TRUE}.
-\item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
-\item \code{key_value}: A character vector to identify key values of the data. If
-\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
-data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \verb{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \verb{$report_data_dict()}.
-Default: \code{NULL}.
-\item \code{name}: A character vector to identify names of the data. If
-\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
-data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \verb{$report_data_dict()}.  Default: \code{NULL}.
-\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calculate a year value that meets the start day of week restriction
-for each environment. Default: \code{NULL}.
-\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
-\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the IDF file without extension
-is used.
-\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\link[data.table:data.table]{data.table}.
-\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
-EnergyPlus csv output file.
-\item \code{period}: A Date or POSIXt vector used to specify which time period to
-return. The year value does not matter and only month, day, hour and
-minute value will be used when subsetting. If \code{NULL}, all time period of
-data is returned. Default: \code{NULL}.
-\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
-hour, minute subsetting of \code{datetime} column when querying on the SQL
-database. If \code{NULL}, no subsetting is performed on those components. All
-possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\verb{$read_table("Time")}.  Default: \code{NULL}.
-\item \code{interval}: An integer vector used to specify which interval length of
-report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
-\item \code{simulation_days}: An integer vector to specify which simulation day data
-to extract. Note that this number resets after warmup and at the beginning
-of an environment period. All possible \code{simulation_days} can be obtained
-using \verb{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
-Default: \code{NULL}.
-\item \code{day_type}: A character vector to specify which day type of data to
-extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
-\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
-\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
-possible values for current simulation output can be obtained using
-\verb{$read_table("Time")}.
-\item \code{environment_name}: A character vector to specify which environment data to
-extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
-All possible \code{environment_name} for current simulation output can
-be obtained using\preformatted{$read_table("EnvironmentPeriods")
-}
-\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
-Each is a character vector for subsetting when querying the SQL database.
-For the meaning of each argument, please see the description above.
-}
-}
-
-\section{Printing}{
-\preformatted{param$print()
-print(param)
-}
-
-\verb{$print()} shows the core information of this \code{ParametricJob}, including the
-path of seed model and weather, the version and path of EnergyPlus used to
-run simulations, the measure that has been applied and parametric models
-generated, and also the simulation job status.
-
-\verb{$print()} is quite useful to get the simulation status, especially when
-\code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated and printed
-whenever \verb{$print()} is called.
-}
-
 \examples{
-\dontrun{
+
+## ------------------------------------------------
+## Method `ParametricJob$new`
+## ------------------------------------------------
+
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -325,101 +28,570 @@ if (is_avail_eplus(8.8)) {
     idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
     epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-    # create from local files
-    param_job(idf_path, epw_path)
-
     # create from an Idf and an Epw object
-    param <- param_job(read_idf(idf_path), read_epw(epw_path))
+    param <- ParametricJob$new(idf_path, epw_path)
+}
 
-    # get the seed model
-    param$seed()
 
-    # get the weather
-    param$weather()
+## ------------------------------------------------
+## Method `ParametricJob$version`
+## ------------------------------------------------
 
-    # get status of current job
-    param$status()
+\dontrun{
+param$version()
+}
 
-    # create a measure to change the orientation of the building
-    rotate_building <- function (idf, degree = 0L) {
-        if (!idf$is_valid_class("Building")) {
-           stop("Input model does not have a Building object")
-        }
 
-        if (degree > 360 || degree < -360 ) {
-            stop("Input degree should in range [-360, 360]")
-        }
+## ------------------------------------------------
+## Method `ParametricJob$seed`
+## ------------------------------------------------
 
-        cur <- idf$Building$North_Axis
+\dontrun{
+param$seed()
+}
 
-        new <- cur + degree
 
-        if (new > 360) {
-            new <- new \%\% 360
-            warning("Calculated new north axis is greater than 360. ",
-                "Final north axis will be ", new
-            )
-        } else if (new < -360) {
-            new <- new \%\% -360
-            warning("Calculated new north axis is smaller than -360. ",
-                "Final north axis will be ", new
-            )
-        }
+## ------------------------------------------------
+## Method `ParametricJob$weather`
+## ------------------------------------------------
 
-        idf$Building$North_Axis <- new
+\dontrun{
+param$weather()
+}
 
-        idf
+
+## ------------------------------------------------
+## Method `ParametricJob$models`
+## ------------------------------------------------
+
+\dontrun{
+param$models()
+}
+
+
+## ------------------------------------------------
+## Method `ParametricJob$apply_measure`
+## ------------------------------------------------
+
+\dontrun{
+# create a measure to change the orientation of the building
+rotate_building <- function (idf, degree = 0L) {
+    if (!idf$is_valid_class("Building")) {
+       stop("Input model does not have a Building object")
     }
 
-    # apply measure
-    # this will create 12 models
-    param$apply_measure(rotate_building, degree = seq(30, 360, 30))
-    # apply measure with new names specified
-    param$apply_measure(rotate_building, degree = seq(30, 360, 30),
-        .names = paste0("rotate_", seq(30, 360, 30))
-    )
+    if (degree > 360 || degree < -360 ) {
+        stop("Input degree should in range [-360, 360]")
+    }
 
-    # extract all parametric models
-    param$models()
+    cur <- idf$Building$North_Axis
 
-    # save all parametric models with each model in a separate folder
-    param$save(tempdir())
+    new <- cur + degree
 
-    # save all parametric models with all models in the same folder
-    param$save(tempdir(), separate = FALSE)
+    if (new > 360) {
+        new <- new \%\% 360
+        warning("Calculated new north axis is greater than 360. ",
+            "Final north axis will be ", new
+        )
+    } else if (new < -360) {
+        new <- new \%\% -360
+        warning("Calculated new north axis is smaller than -360. ",
+            "Final north axis will be ", new
+        )
+    }
 
-    # run parametric simulations
-    param$run(wait = TRUE)
+    idf$Building$North_Axis <- new
 
-    # run in background
-    param$run(wait = FALSE)
-    # get detailed job status by printing
-    print(param)
-
-    # status now includes a data.table with detailed information on each simulation
-    param$status()
-
-    # print simulation errors
-    param$errors()
-
-    # extract output of all simulations
-    param$report_data()
-
-    # extract only some simulations
-    param$report_data(c(1, 3))
-    param$tabular_data(c(1, 3))
-    param$report_data(c("rotate_30", "rotate_120"))
-    param$tabular_data(c("rotate_30", "rotate_120"))
-
-    # get output directory
-    param$output_dir()
-    param$output_dir(c(1, 3))
-
-    # get path of specific output file
-    param$locate_output(c(1, 3), ".csv")
+    idf
 }
+
+# apply measure
+# this will create 12 models
+param$apply_measure(rotate_building, degree = seq(30, 360, 30))
+
+# apply measure with new names specified
+param$apply_measure(rotate_building, degree = seq(30, 360, 30),
+    .names = paste0("rotate_", seq(30, 360, 30))
+)
 }
+
+
+## ------------------------------------------------
+## Method `ParametricJob$save`
+## ------------------------------------------------
+
+\dontrun{
+# save all parametric models with each model in a separate folder
+param$save(tempdir())
+
+# save all parametric models with all models in the same folder
+param$save(tempdir(), separate = FALSE)
+}
+
+
+## ------------------------------------------------
+## Method `ParametricJob$run`
+## ------------------------------------------------
+
+\dontrun{
+# run parametric simulations
+param$run(wait = TRUE)
+
+# run in background
+param$run(wait = FALSE)
+# get detailed job status by printing
+print(param)
+}
+
+
+## ------------------------------------------------
+## Method `ParametricJob$print`
+## ------------------------------------------------
+
+\dontrun{
+param$print()
+}
+
 }
 \author{
 Hongyuan Jia
+}
+\section{Super class}{
+\code{\link[eplusr:EplusGroupJob]{eplusr::EplusGroupJob}} -> \code{ParametricJob}
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{ParametricJob$new()}}
+\item \href{#method-version}{\code{ParametricJob$version()}}
+\item \href{#method-seed}{\code{ParametricJob$seed()}}
+\item \href{#method-weather}{\code{ParametricJob$weather()}}
+\item \href{#method-models}{\code{ParametricJob$models()}}
+\item \href{#method-apply_measure}{\code{ParametricJob$apply_measure()}}
+\item \href{#method-save}{\code{ParametricJob$save()}}
+\item \href{#method-run}{\code{ParametricJob$run()}}
+\item \href{#method-print}{\code{ParametricJob$print()}}
+}
+}
+\if{html}{
+\out{<details ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="errors">}\href{../../eplusr/html/EplusGroupJob.html#method-errors}{\code{eplusr::EplusGroupJob$errors()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="kill">}\href{../../eplusr/html/EplusGroupJob.html#method-kill}{\code{eplusr::EplusGroupJob$kill()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="list_table">}\href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{eplusr::EplusGroupJob$list_table()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="locate_output">}\href{../../eplusr/html/EplusGroupJob.html#method-locate_output}{\code{eplusr::EplusGroupJob$locate_output()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="output_dir">}\href{../../eplusr/html/EplusGroupJob.html#method-output_dir}{\code{eplusr::EplusGroupJob$output_dir()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_mdd">}\href{../../eplusr/html/EplusGroupJob.html#method-read_mdd}{\code{eplusr::EplusGroupJob$read_mdd()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_rdd">}\href{../../eplusr/html/EplusGroupJob.html#method-read_rdd}{\code{eplusr::EplusGroupJob$read_rdd()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="read_table">}\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{eplusr::EplusGroupJob$read_table()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data">}\href{../../eplusr/html/EplusGroupJob.html#method-report_data}{\code{eplusr::EplusGroupJob$report_data()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="report_data_dict">}\href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{eplusr::EplusGroupJob$report_data_dict()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="status">}\href{../../eplusr/html/EplusGroupJob.html#method-status}{\code{eplusr::EplusGroupJob$status()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusGroupJob" data-id="tabular_data">}\href{../../eplusr/html/EplusGroupJob.html#method-tabular_data}{\code{eplusr::EplusGroupJob$tabular_data()}}\out{</span>}
+}
+\out{</details>}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create a \code{ParametricJob} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$new(idf, epw)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{idf}}{Path to EnergyPlus IDF file or an \code{Idf} object.}
+
+\item{\code{epw}}{Path to EnergyPlus EPW file or an \code{Epw} object. \code{epw} can
+also be \code{NULL} which will force design-day-only simulation
+when \verb{$run()} method is called. Note this needs at least one
+\code{Sizing:DesignDay} object exists in the \link{Idf}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A \code{ParametricJob} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    # create from an Idf and an Epw object
+    param <- ParametricJob$new(idf_path, epw_path)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-version"></a>}}
+\subsection{Method \code{version()}}{
+Get the version of seed IDF
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$version()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$version()} returns the version of input seed \link{Idf} object.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$version()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-seed"></a>}}
+\subsection{Method \code{seed()}}{
+Get the seed \link{Idf} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$seed()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$seed()} returns the parsed input seed \link{Idf} object.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$seed()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-weather"></a>}}
+\subsection{Method \code{weather()}}{
+Get the \link{Epw} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$weather()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$weather()} returns the input \link{Epw} object. If no \link{Epw} is provided
+when creating the \code{ParametricJob} object, \code{NULL} is returned.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$weather()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-models"></a>}}
+\subsection{Method \code{models()}}{
+Get created parametric \link{Idf} objects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$models()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$models()} returns a list of parametric models generated using input
+\link{Idf} object and
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}
+method. Model names are assigned in the same way as the \code{.names}
+arugment in
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}}.
+If no measure has been applied, \code{NULL} is returned. Note that it is
+not recommended to conduct any extra modification on those models
+directly, after they were created using
+\href{../../eplusr/html/ParametricJob.html#method-apply_measure}{\code{$apply_measure()}},
+as this may lead to an un-reproducible process. A warning message
+will be issued if any of those models has been modified when running
+simulations.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$models()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-apply_measure"></a>}}
+\subsection{Method \code{apply_measure()}}{
+Create parametric models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$apply_measure(measure, ..., .names = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{measure}}{A function that takes an \code{Idf} and other arguments as
+input and returns an \link{Idf} object as output.}
+
+\item{\code{...}}{Arguments \strong{except first \code{Idf} argument} that are passed
+to that \code{measure}.}
+
+\item{\code{.names}}{A character vector of the names of parametric \code{Idf}s.
+If \code{NULL}, the new \code{Idf}s will be named in format
+\code{measure_name + number}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$apply_measure()} allows to apply a measure to an \link{Idf} and creates
+parametric models for analysis. Basically, a measure is just a
+function that takes an \link{Idf} object and other arguments as input, and
+returns a modified \link{Idf} object as output. Use \code{...} to supply
+different arguments, \strong{except for the first \code{Idf} argument}, to that
+measure. Under the hook, \code{\link[base:mapply]{base::mapply()}} is used to create multiple
+\link{Idf}s according to the input values.
+}
+
+\subsection{Returns}{
+The modified \code{ParametricJob} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# create a measure to change the orientation of the building
+rotate_building <- function (idf, degree = 0L) {
+    if (!idf$is_valid_class("Building")) {
+       stop("Input model does not have a Building object")
+    }
+
+    if (degree > 360 || degree < -360 ) {
+        stop("Input degree should in range [-360, 360]")
+    }
+
+    cur <- idf$Building$North_Axis
+
+    new <- cur + degree
+
+    if (new > 360) {
+        new <- new \%\% 360
+        warning("Calculated new north axis is greater than 360. ",
+            "Final north axis will be ", new
+        )
+    } else if (new < -360) {
+        new <- new \%\% -360
+        warning("Calculated new north axis is smaller than -360. ",
+            "Final north axis will be ", new
+        )
+    }
+
+    idf$Building$North_Axis <- new
+
+    idf
+}
+
+# apply measure
+# this will create 12 models
+param$apply_measure(rotate_building, degree = seq(30, 360, 30))
+
+# apply measure with new names specified
+param$apply_measure(rotate_building, degree = seq(30, 360, 30),
+    .names = paste0("rotate_", seq(30, 360, 30))
+)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save"></a>}}
+\subsection{Method \code{save()}}{
+Save parametric models
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$save(dir = NULL, separate = TRUE, copy_external = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir}}{The parent output directory for models to be saved. If
+\code{NULL}, the directory of the seed model will be used. Default:
+\code{NULL}.}
+
+\item{\code{separate}}{If \code{TRUE}, all models are saved in a separate folder
+with each model's name under specified directory. If \code{FALSE},
+all models are saved in the specified directory. Default:
+\code{TRUE}.}
+
+\item{\code{copy_external}}{Only applicable when \code{separate} is \code{TRUE}. If
+\code{TRUE}, the external files that every \code{Idf} object depends on
+will also be copied into the saving directory. The values of
+file paths in the Idf will be changed automatically.
+Currently, only \code{Schedule:File} class is supported.  This
+ensures that the output directory will have all files needed
+for the model to run. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$save()} saves all parametric models in specified folder. An error
+will be issued if no measure has been applied.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} with two columns:
+\itemize{
+\item model: The path of saved parametric model files.
+\item weather: The path of saved weather files.
+}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# save all parametric models with each model in a separate folder
+param$save(tempdir())
+
+# save all parametric models with all models in the same folder
+param$save(tempdir(), separate = FALSE)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run"></a>}}
+\subsection{Method \code{run()}}{
+Run parametric simulations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$run(
+  dir = NULL,
+  wait = TRUE,
+  force = FALSE,
+  copy_external = FALSE,
+  echo = wait
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir}}{The parent output directory for specified simulations.
+Outputs of each simulation are placed in a separate folder
+under the parent directory.}
+
+\item{\code{wait}}{If \code{TRUE}, R will hang on and wait all EnergyPlus
+simulations finish. If \code{FALSE}, all EnergyPlus simulations are
+run in the background.  Default: \code{TRUE}.}
+
+\item{\code{force}}{Only applicable when the last simulation runs with
+\code{wait} equals to \code{FALSE} and is still running. If \code{TRUE},
+current running job is forced to stop and a new one will
+start. Default: \code{FALSE}.}
+
+\item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
+object depends on will also be copied into the simulation
+output directory. The values of file paths in the Idf will be
+changed automatically. Currently, only \code{Schedule:File} class
+is supported.  This ensures that the output directory will
+have all files needed for the model to run. Default is
+\code{FALSE}.}
+
+\item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to
+simulation status. Default: same as \code{wait}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$run()} runs all parametric simulations in parallel. The number of
+parallel EnergyPlus process can be controlled by
+\code{eplusr_option("num_parallel")}. If \code{wait} is FALSE, then the job
+will be run in the background. You can get updated job status by just
+printing the \code{ParametricJob} object.
+}
+
+\subsection{Returns}{
+The \code{ParametricJob} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# run parametric simulations
+param$run(wait = TRUE)
+
+# run in background
+param$run(wait = FALSE)
+# get detailed job status by printing
+print(param)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{ParametricJob} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ParametricJob$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} shows the core information of this \code{ParametricJob},
+including the path of IDFs and EPWs and also the simulation job
+status.
+
+\verb{$print()} is quite useful to get the simulation status, especially
+when \code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated
+and printed whenever \verb{$print()} is called.
+}
+
+\subsection{Returns}{
+The \code{ParametricJob} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+param$print()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
 }

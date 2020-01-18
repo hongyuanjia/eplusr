@@ -25,68 +25,425 @@ Dictionary) files are created during simulation, an object in
 \code{Output:VariableDictionary} class with \verb{Key Field} value being \code{IDF} will be
 automatically created if it does not exists.
 }
-\section{Usage}{
-\preformatted{job <- eplus_job(idf, epw)
+\examples{
+
+## ------------------------------------------------
+## Method `EplusJob$new`
+## ------------------------------------------------
+
+if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    job <- EplusJob$new(idf_path, epw_path)
+}
+
+## ------------------------------------------------
+## Method `EplusJob$version`
+## ------------------------------------------------
+
+\dontrun{
 job$version()
-job$path(type = c("all", "idf", "epw"))
-job$run(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
-job$kill()
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$path`
+## ------------------------------------------------
+
+\dontrun{
+job$path()
+job$path("idf")
+job$path("epw")
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$run`
+## ------------------------------------------------
+
+\dontrun{
+# only run design day
+job$run(NULL)
+
+# specify output directory
+job$run(tempdir())
+
+# run in the background
+job$run(wait = TRUE)
+# see job status
 job$status()
-job$errors(info = FALSE)
-job$output_dir(open = FALSE)
-job$locate_output(suffix = ".err", strict = TRUE)
-job$list_table()
-job$read_table(name)
+
+# force to kill background job before running the new one
+job$run(force = TRUE)
+
+# do not show anything in the console
+job$run(echo = FALSE)
+
+# copy external files used in the model to simulation output directory
+job$run(copy_external = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$kill`
+## ------------------------------------------------
+
+\dontrun{
+job$kill()
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$status`
+## ------------------------------------------------
+
+\dontrun{
+job$status()
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$errors`
+## ------------------------------------------------
+
+\dontrun{
+job$errors()
+
+# show all information
+job$errors(info = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$output_dir`
+## ------------------------------------------------
+
+\dontrun{
+job$output_dir()
+
+# open output directory
+job$output_dir(open = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$locate_output`
+## ------------------------------------------------
+
+\dontrun{
+# get the file path of the error file
+job$locate_output(".err", strict = FALSE)
+
+# can use to detect if certain output file exists
+job$locate_output(".expidf", strict = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$read_rdd`
+## ------------------------------------------------
+
+\dontrun{
 job$read_rdd()
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$read_mdd`
+## ------------------------------------------------
+
+\dontrun{
 job$read_mdd()
-job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-                all = FALSE, wide = FALSE, period = NULL, month = NULL, day = NULL,
-                hour = NULL, minute = NULL, interval = NULL, simulation_days = NULL,
-                day_type = NULL, environment_name = NULL)
-job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
-                 column_name = NULL, row_name = NULL)
+}
+
+
+## ------------------------------------------------
+## Method `EplusJob$print`
+## ------------------------------------------------
+
+\dontrun{
 job$print()
 }
+
 }
-
-\section{Basic info}{
-\preformatted{job <- eplus_job(idf, epw)
-job$version()
-job$path(type = c("all", "idf", "epw"))
+\seealso{
+\link{ParametricJob} class for EnergyPlus parametric simulations.
 }
-
-\verb{$version()} reutrns the version of IDF that current \code{EplusJob} uses.
-
-\verb{$path()} returns the path of IDF or EPW of current job.
-
-\strong{Arguments}
+\author{
+Hongyuan Jia
+}
+\section{Super class}{
+\code{\link[eplusr:EplusSql]{eplusr::EplusSql}} -> \code{EplusJob}
+}
+\section{Methods}{
+\subsection{Public methods}{
 \itemize{
-\item \code{idf}: Path to an local EnergyPlus IDF file or an \link{Idf} object.
-\item \code{epw}: Path to an local EnergyPlus EPW file or an \link{Epw} object.
-\item \code{type}: If \code{"all"}, both the \link{Idf} path and \link{Epw} path are returned. If
-\code{"idf"}, only IDF path is returned. If \code{"epw"}, only EPW path is returned.
-Default: \code{"all"}. If \code{epw} is \code{NULL}, \code{NA} is returned for EPW path.
+\item \href{#method-new}{\code{EplusJob$new()}}
+\item \href{#method-version}{\code{EplusJob$version()}}
+\item \href{#method-path}{\code{EplusJob$path()}}
+\item \href{#method-run}{\code{EplusJob$run()}}
+\item \href{#method-kill}{\code{EplusJob$kill()}}
+\item \href{#method-status}{\code{EplusJob$status()}}
+\item \href{#method-errors}{\code{EplusJob$errors()}}
+\item \href{#method-output_dir}{\code{EplusJob$output_dir()}}
+\item \href{#method-locate_output}{\code{EplusJob$locate_output()}}
+\item \href{#method-read_rdd}{\code{EplusJob$read_rdd()}}
+\item \href{#method-read_mdd}{\code{EplusJob$read_mdd()}}
+\item \href{#method-print}{\code{EplusJob$print()}}
 }
+}
+\if{html}{
+\out{<details ><summary>Inherited methods</summary>}
+\itemize{
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="list_table">}\href{../../eplusr/html/EplusSql.html#method-list_table}{\code{eplusr::EplusSql$list_table()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="path_idf">}\href{../../eplusr/html/EplusSql.html#method-path_idf}{\code{eplusr::EplusSql$path_idf()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="read_table">}\href{../../eplusr/html/EplusSql.html#method-read_table}{\code{eplusr::EplusSql$read_table()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="report_data">}\href{../../eplusr/html/EplusSql.html#method-report_data}{\code{eplusr::EplusSql$report_data()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="report_data_dict">}\href{../../eplusr/html/EplusSql.html#method-report_data_dict}{\code{eplusr::EplusSql$report_data_dict()}}\out{</span>}
+\item \out{<span class="pkg-link" data-pkg="eplusr" data-topic="EplusSql" data-id="tabular_data">}\href{../../eplusr/html/EplusSql.html#method-tabular_data}{\code{eplusr::EplusSql$tabular_data()}}\out{</span>}
+}
+\out{</details>}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{EplusJob} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$new(idf, epw)}\if{html}{\out{</div>}}
 }
 
-\section{Run}{
-\preformatted{job$run(epw, dir = NULL, wait = TRUE, force = FALSE, echo = wait, copy_external = FALSE)
-job$kill()
-job$status()
-job$errors(info = FALSE)
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{idf}}{Path to an local EnergyPlus IDF file or an \link{Idf} object.}
+
+\item{\code{epw}}{Path to an local EnergyPlus EPW file or an \link{Epw} object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An \code{EplusJob} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    job <- EplusJob$new(idf_path, epw_path)
+}
+}
+\if{html}{\out{</div>}}
+
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-version"></a>}}
+\subsection{Method \code{version()}}{
+Get the version of IDF in current job
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$version()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$version()} reutrns the version of IDF that current \code{EplusJob} uses.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$version()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-path"></a>}}
+\subsection{Method \code{path()}}{
+Get the paths of file that current \code{EpwSql} uses
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$path(type = c("all", "idf", "epw"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{If \code{"all"}, both the \link{Idf} path and \link{Epw} path are
+returned. If \code{"idf"}, only IDF path is returned. If \code{"epw"},
+only EPW path is returned. If \code{epw} is \code{NULL}, \code{NA} is
+returned for EPW path. Default: \code{"all"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$path()} returns the path of IDF or EPW of current job.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$path()
+job$path("idf")
+job$path("epw")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run"></a>}}
+\subsection{Method \code{run()}}{
+Run simulationA
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$run(
+  epw,
+  dir = NULL,
+  wait = TRUE,
+  force = FALSE,
+  echo = wait,
+  copy_external = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{epw}}{A path to an \code{.epw} file or an \link{Epw} object. \code{epw} can
+also be \code{NULL} which will force design-day-only simulation.
+Note this needs at least one \code{Sizing:DesignDay} object exists
+in the \code{Idf}. If not given, the \code{epw} input used when creating
+this \code{EplusJob} object will be used.}
+
+\item{\code{dir}}{The directory to save the simulation results. If \code{NULL},
+the input \code{idf} folder will be used. Default: \code{NULL}.}
+
+\item{\code{wait}}{If \code{TRUE}, R will hang on and wait for the simulation to
+complete. EnergyPlus standard output (stdout) and error
+(stderr) is printed to R console. If \code{FALSE}, simulation will
+be run in a background process.  Default: \code{TRUE}.}
+
+\item{\code{force}}{Only applicable when the last job runs with \code{wait}
+equals to \code{FALSE} and is still running. If \code{TRUE}, current
+running job is forced to stop and a new one will start.
+Default: \code{FALSE}.}
+
+\item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to show
+standard output and error from EnergyPlus. Default: same as
+\code{wait}.}
+
+\item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
+object depends on will also be copied into the simulation
+output directory. The values of file paths in the Idf will be
+changed automatically. Currently, only \code{Schedule:File} class
+is supported.  This ensures that the output directory will
+have all files needed for the model to run. Default is
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$run()} runs the simulation using input IDF and EPW file. If \code{wait}
 is \code{FALSE}, the job is run in the background. You can get updated job
-status by just printing the \code{EplusJob} object.
+status by just
+\href{../../eplusr/html/EplusJob.html#method-print}{printing}
+the \code{EplusJob} object.
 
-Parameter \code{epw} can be used to reset the EPW file to use for simulation. If
-not given, the \code{epw} input for \code{\link[=eplus_job]{eplus_job()}} will be used.
+Parameter \code{epw} can be used to reset the EPW file to use for
+simulation. If not given, the \code{epw} input used when creating
+this \code{EplusJob} object will be used.
+}
 
-\verb{$kill()} kills the background EnergyPlus process if possible. It only works
-when simulation runs in non-waiting mode.
+\subsection{Returns}{
+The \code{EplusJob} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# only run design day
+job$run(NULL)
 
+# specify output directory
+job$run(tempdir())
+
+# run in the background
+job$run(wait = TRUE)
+# see job status
+job$status()
+
+# force to kill background job before running the new one
+job$run(force = TRUE)
+
+# do not show anything in the console
+job$run(echo = FALSE)
+
+# copy external files used in the model to simulation output directory
+job$run(copy_external = TRUE)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-kill"></a>}}
+\subsection{Method \code{kill()}}{
+Kill current running job
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$kill()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$kill()} kills the background EnergyPlus process if possible. It
+only works when simulation runs in non-waiting mode.
+}
+
+\subsection{Returns}{
+A single logical value of \code{TRUE} or \code{FALSE}, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$kill()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-status"></a>}}
+\subsection{Method \code{status()}}{
+Get the job status
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$status()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
 \verb{$status()} returns a named list of values that indicates the status of the
 job:
 \itemize{
@@ -100,324 +457,225 @@ otherwise. \code{NA} if the job has not been run yet.
 \item \code{changed_after}: \code{TRUE} if the IDF file has been changed since last
 simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 }
-
-$errors() returns an \link[=read_err]{ErrFile} object which contains all contents
-of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only warnings
-and errors are printed.
-
-\strong{Arguments}
-\itemize{
-\item \code{epw}: A path to an \code{.epw} file or an \link{Epw} object. \code{epw} can also be
-\code{NULL} which will force design-day-only simulation. Note this needs at
-least one \code{Sizing:DesignDay} object exists in the \code{Idf}. If not given, the
-EPW file input of \code{\link[=eplus_job]{eplus_job()}} is used.
-\item \code{dir}: The directory to save the simulation results. If \code{NULL}, the input
-\code{idf} folder will be used. Default: \code{NULL}.
-\item \code{wait}: If \code{TRUE}, R will hang on and wait for the simulation to complete.
-EnergyPlus standard output (stdout) and error (stderr) is printed to
-R console. If \code{FALSE}, simulation will be run in a background process.
-Default: \code{TRUE}.
-\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
-output and error from EnergyPlus. Default: same as \code{wait}.
-\item \code{force}: Only applicable when the last job runs with \code{wait} equals
-to \code{FALSE} and is still running. If \code{TRUE}, current running job is
-forced to stop and a new one will start. Default: \code{FALSE}.
-\item \code{copy_external}: If \code{TRUE}, the external files that current \code{Idf} object
-depends on will also be copied into the simulation output directory. The
-values of file paths in the Idf will be changed automatically. Currently,
-only \code{Schedule:File} class is supported.  This ensures that the output
-directory will have all files needed for the model to run. Default is
-\code{FALSE}.
-\item \code{info}: If \code{FALSE}, only warnings and errors are printed. Default: \code{FALSE}.
-}
 }
 
-\section{Simulation Output Extraction}{
-\preformatted{job$output_dir(open = FALSE)
-job$locate_output(suffix = ".err", strict = TRUE)
-job$list_table()
-job$read_table(table)
-job$read_rdd()
-job$read_mdd()
-job$report_data_dict()
-job$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC", case = "auto",
-                all = FALSE, wide = FALSE, period = NULL, month = NULL, day = NULL,
-                hour = NULL, minute = NULL, interval = NULL, simulation_days = NULL,
-                day_type = NULL, environment_name = NULL)
-job$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
-                 column_name = NULL, row_name = NULL)
+\subsection{Returns}{
+A named list of 5 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$status()
 }
 
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-errors"></a>}}
+\subsection{Method \code{errors()}}{
+Read simulation errors
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$errors(info = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{info}}{If \code{FALSE}, only warnings and errors are printed.
+Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+$errors() returns an \link[=read_err]{ErrFile} object which contains all
+contents of the simulation error file (\code{.err}). If \code{info} is \code{FALSE},
+only warnings and errors are printed.
+}
+
+\subsection{Returns}{
+An \link[=read_err]{ErrFile} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$errors()
+
+# show all information
+job$errors(info = TRUE)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-output_dir"></a>}}
+\subsection{Method \code{output_dir()}}{
+Get simulation output directory
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$output_dir(open = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{open}}{If \code{TRUE}, the output directory will be opened.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$output_dir()} returns the output directory of simulation results.
-
-\verb{$locate_output()} returns the path of a single output file specified by file
-suffix.
-
-\verb{$list_table()} returns all available table and view names in the SQLite file.
-
-\verb{$read_table()} takes a valid table name of those from \verb{$list_table()} and
-returns that table data in a \link[data.table:data.table]{data.table} format.
-
-\verb{$read_rdd()} and \verb{$read_mdd()} return the core data of Report Data
-Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
-details, please see \code{\link[=read_rdd]{read_rdd()}}.
-
-\verb{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
-contains all information about report data. For details on the meaning of
-each columns, please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus
-"Output Details and Examples" documentation.
-
-\verb{$report_data()} extracts the report data in a
-\link[data.table:data.table]{data.table} using key values, variable names and
-other specifications. \verb{$report_data()} can also directly take all or subset
-output from \verb{$report_data_dict()} as input, and extract all data specified.
-The returned column numbers varies depending on \code{all} argument.
-\itemize{
-\item \code{all} is \code{FALSE}, the returned \link[data.table:data.table]{data.table} has 6
-columns:
-\itemize{
-\item \code{case}: Simulation case specified using \code{case} argument
-\item \code{datetime}: The date time of simulation result
-\item \code{key_value}: Key name of the data
-\item \code{name}: Actual report data name
-\item \code{units}: The data units
-\item \code{value}: The data value
-}
-\item \code{all} is \code{TRUE}, besides columns described above, extra columns are also
-included:
-\itemize{
-\item \code{month}: The month of reported date time
-\item \code{day}: The day of month of reported date time
-\item \code{hour}: The hour of reported date time
-\item \code{minute}: The minute of reported date time
-\item \code{dst}: Daylight saving time indicator. Possible values: \code{0} and \code{1}
-\item \code{interval}: Length of reporting interval
-\item \code{simulation_days}: Day of simulation
-\item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
-\item \code{environment_period_index}: The indice of environment.
-\item \code{environment_name}: A text string identifying the environment.
-\item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
-\code{1}
-\item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
-and \code{Avg}
-\item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
-\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \verb{HVAC System}
-\item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
-\verb{HVAC System Timestep}, \verb{Zone Timestep}.
-\item \code{schedule_name}: Name of the the schedule that controls reporting
-frequency.
-}
 }
 
-With the \code{datetime} column, it is quite straightforward to apply time-series
-analysis on the simulation output. However, another painful thing is that
-every simulation run period has its own \verb{Day of Week for Start Day}. Randomly
-setting the \code{year} may result in a date time series that does not have
-the same start day of week as specified in the RunPeriod objects.
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$output_dir()
 
-eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
-which is the default behavior, eplusr will calculate a year value (from
-current year backwards) for each run period that compliance with the start
-day of week restriction.
-
-It is worth noting that EnergyPlus uses 24-hour clock system where 24 is only
-used to denote midnight at the end of a calendar day. In EnergyPlus output,
-"00:24:00" with a time interval being 15 mins represents a time period from
-"00:23:45" to "00:24:00", and similarly "00:15:00" represents a time period
-from "00:24:00" to "00:15:00" of the next day. This means that if current day
-is Friday, day of week rule applied in schedule time period "00:23:45" to
-"00:24:00" (presented as "00:24:00" in the output) is also Friday, but not
-Saturday. However, if you try to get the day of week of time "00:24:00" in R,
-you will get Saturday, but not Friday. This introduces inconsistency and may
-cause problems when doing data analysis considering day of week value.
-
-With \code{wide} equals \code{TRUE}, \verb{$report_data()} will format the simulation output
-in the same way as standard EnergyPlus csv output file. Sometimes this can be
-useful as there may be existing tools/workflows that depend on this format.
-When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
-and date time components are also returned, including:
-\verb{environment_period_index", "environment_name}, \code{simulation_days},
-\code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
-
-\verb{$tabular_data()} extracts the tabular data in a
-\link[data.table:data.table]{data.table} using report, table, column and row
-name specifications. The returned \link[data.table:data.table]{data.table} has
-8 columns:
-\itemize{
-\item \code{index}: Tabular data index
-\item \code{report_name}: The name of the report that the record belongs to
-\item \code{report_for}: The \code{For} text that is associated with the record
-\item \code{table_name}: The name of the table that the record belongs to
-\item \code{column_name}: The name of the column that the record belongs to
-\item \code{row_name}: The name of the row that the record belongs to
-\item \code{units}: The units of the record
-\item \code{value}: The value of the record \strong{in string format}
+# open output directory
+job$output_dir(open = TRUE)
 }
 
-For convenience, input character arguments matching in \verb{$report_data()} and
-\verb{$tabular_data()} are \strong{case-insensitive}.
+}
+\if{html}{\out{</div>}}
 
-\strong{Arguments}
-\itemize{
-\item \code{open}: If \code{TRUE}, the output directory will be opened.
-\item \code{suffix}: A string that indicates the file extension of simulation output.
-Default: \code{".err"}.
-\item \code{strict}: If \code{TRUE}, it will check if the simulation was terminated, is
-still running or the file exists or not. Default: \code{TRUE}.
-\item \code{table}: A string specifying which table to read. Valid table names can be
-obtained using \verb{$list_table()}.
-\item \code{key_value}: A character vector to identify key values of the data. If
-\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
-data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \verb{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \verb{$report_data_dict()}.
-Default: \code{NULL}.
-\item \code{name}: A character vector to identify names of the data. If
-\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
-data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \verb{$report_data_dict()}.  Default: \code{NULL}.
-\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calculate a year value that meets the start day of week restriction
-for each environment. Default: \code{NULL}.
-\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
-\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the IDF file without extension
-is used.
-\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\link[data.table:data.table]{data.table}.
-\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
-EnergyPlus csv output file.
-\item \code{period}: A Date or POSIXt vector used to specify which time period to
-return. The year value does not matter and only month, day, hour and
-minute value will be used when subsetting. If \code{NULL}, all time period of
-data is returned. Default: \code{NULL}.
-\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
-hour, minute subsetting of \code{datetime} column when querying on the SQL
-database. If \code{NULL}, no subsetting is performed on those components. All
-possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\verb{$read_table("Time")}.  Default: \code{NULL}.
-\item \code{interval}: An integer vector used to specify which interval length of
-report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
-\item \code{simulation_days}: An integer vector to specify which simulation day data
-to extract. Note that this number resets after warmup and at the beginning
-of an environment period. All possible \code{simulation_days} can be obtained
-using \verb{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
-Default: \code{NULL}.
-\item \code{day_type}: A character vector to specify which day type of data to
-extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
-\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
-\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
-possible values for current simulation output can be obtained using
-\verb{$read_table("Time")}.
-\item \code{environment_name}: A character vector to specify which environment data to
-extract. All possible \code{environment_name} for current simulation output can
-be obtained using\preformatted{$read_table("EnvironmentPeriods")
 }
 
-If \code{NULL}, all environment data are returned. Default: \code{NULL}.
-\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
-Each is a character vector for subsetting when querying the SQL database.
-For the meaning of each argument, please see the description above.
 }
-}
-
-\section{Printing}{
-\preformatted{job$print()
-print(job)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-locate_output"></a>}}
+\subsection{Method \code{locate_output()}}{
+Get path of output file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$locate_output(suffix = ".err", strict = TRUE)}\if{html}{\out{</div>}}
 }
 
-\verb{$print()} shows the core information of this \code{EplusJob} object, including
-the path of model and weather, the version and path of EnergyPlus used to run
-simulations, and the simulation job status.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{suffix}}{A string that indicates the file extension of
+simulation output. Default: \code{".err"}.}
 
-\verb{$print()} is quite useful to get the simulation status, especially when
-\code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated and printed
-whenever \verb{$print()} is called.
+\item{\code{strict}}{If \code{TRUE}, it will check if the simulation was
+terminated, is still running or the file exists or not.
+Default: \code{TRUE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$locate_output()} returns the path of a single output file specified
+by file suffix.
 }
 
-\examples{
-\dontrun{
-if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get the file path of the error file
+job$locate_output(".err", strict = FALSE)
 
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
-
-    # copy to tempdir
-    file.copy(c(idf_path, epw_path), tempdir())
-
-    # create an EplusJob from local an IDF and an EPW file
-    job <- eplus_job(file.path(tempdir(), idf_name), file.path(tempdir(), epw_name))
-
-    # get paths of idf and epw
-    job$path("all")
-    job$path("idf")
-    job$path("epw")
-
-    # get current job status
-    job$status()
-
-    # check if the job has been run before
-    job$status()$run_before
-
-    # run the job in waiting mode
-    job$run(wait = TRUE)
-
-    # check the job status again
-    job$status()$run_before
-    job$status()$successful
-
-    # get output directory
-    job$output_dir()
-
-    # open the output directory
-    job$output_dir(open = TRUE)
-
-    # check simulation errors
-    job$errors()
-
-    # check simulation errors, only including warnings and errors
-    job$errors(info = FALSE)
-
-    # get the file path of an output with a given suffix
-    job$locate_output(".err")
-
-    # give an error when simulation did not complete successfully or that file
-    # does not exist
-    job$locate_output(".exe", strict = TRUE)
-
-    # retrieve simulation results will fail if there is no EnergyPlus SQL output.
-    job$report_data_dict()
-
-    # instead, using `$run()` method in Idf class, which will add an
-    # `Output:SQLite` object automatically
-    idf <- read_idf(file.path(tempdir(), idf_name))
-    job <- idf$run(file.path(tempdir(), epw_name), dir = NULL)
-
-    # get report data dictionary
-    str(job$report_data_dict())
-
-    # extract all report data
-    str(job$report_data())
-
-    # extract some report variable
-    str(job$report_data(name = "EnergyTransfer:Building", case = NULL))
-
-    # add a "case" column in the returned data.table
-    str(job$report_data(name = "EnergyTransfer:Building", case = "Test"))
-
-    # change the format of datetime column in the returned data.table
-    str(job$report_data(name = "EnergyTransfer:Building", year = 2016L, tz = Sys.timezone()))
-
-    # get all tabular data
-    str(job$tabular_data())
+# can use to detect if certain output file exists
+job$locate_output(".expidf", strict = TRUE)
 }
+
 }
+\if{html}{\out{</div>}}
+
 }
-\seealso{
-\link{ParametricJob} class for EnergyPlus parametric simulations.
+
 }
-\author{
-Hongyuan Jia
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_rdd"></a>}}
+\subsection{Method \code{read_rdd()}}{
+Read Report Data Dictionary (RDD) file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$read_rdd()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$read_rdd()} return the core data of Report Data Dictionary (RDD)
+file. For details, please see \code{\link[=read_rdd]{read_rdd()}}.
+}
+
+\subsection{Returns}{
+An \link[=read_rdd]{RddFile} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$read_rdd()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_mdd"></a>}}
+\subsection{Method \code{read_mdd()}}{
+Read Report Data Dictionary (RDD) file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$read_mdd()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$read_mdd()} return the core data of Meter Data Dictionary (MDD)
+file. For details, please see \code{\link[=read_mdd]{read_mdd()}}.
+}
+
+\subsection{Returns}{
+An \link[=read_mdd]{MddFile} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$read_mdd()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{EplusSql} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusJob$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} shows the core information of this \code{EplusJob} object,
+including the path of model and weather, the version and path of
+EnergyPlus used to run simulations, and the simulation job status.
+
+\verb{$print()} is quite useful to get the simulation status, especially
+when \code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated
+and printed whenever \verb{$print()} is called.
+}
+
+\subsection{Returns}{
+The \code{EplusSql} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+job$print()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
 }
