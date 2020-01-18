@@ -1093,7 +1093,7 @@ idf$definition("Version")
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_id"></a>}}
 \subsection{Method \code{object_id()}}{
-Get the unique ID for each object in specified classes in the \link{Idf}.
+Get the unique ID for each object in specified classes in the \code{Idf}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$object_id(class = NULL, simplify = FALSE)}\if{html}{\out{</div>}}
 }
@@ -1152,7 +1152,7 @@ idf$object_id(c("Version", "Zone"), simplify = TRUE)
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_name"></a>}}
 \subsection{Method \code{object_name()}}{
-Get names for objects in specified classes in the \link{Idf}.
+Get names for objects in specified classes in the \code{Idf}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$object_name(class = NULL, simplify = FALSE)}\if{html}{\out{</div>}}
 }
@@ -2929,7 +2929,7 @@ idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid"></a>}}
 \subsection{Method \code{is_valid()}}{
-Check if there is no error in current \code{Idf}
+Check if there is any error in current \code{Idf}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$is_valid(level = eplusr_option("validate_level"))}\if{html}{\out{</div>}}
 }

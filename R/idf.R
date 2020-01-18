@@ -341,7 +341,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 
         # object_id {{{
         #' @description
-        #' Get the unique ID for each object in specified classes in the [Idf].
+        #' Get the unique ID for each object in specified classes in the `Idf`.
         #'
         #' @details
         #' In `Idf`, each object is assigned with an integer as an universally
@@ -385,7 +385,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 
         # object_name {{{
         #' @description
-        #' Get names for objects in specified classes in the [Idf].
+        #' Get names for objects in specified classes in the `Idf`.
         #'
         #' @details
         #' In `Idf`, each object is assigned with a single string as the name
@@ -1778,7 +1778,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 
         # is_valid {{{
         #' @description
-        #' Check if there is no error in current `Idf`
+        #' Check if there is any error in current `Idf`
         #'
         #' @details
         #' `$is_valid()` checks if there are errors in current `Idf` object

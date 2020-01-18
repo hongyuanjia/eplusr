@@ -7,137 +7,852 @@
 \description{
 \code{IdfObject} is an abstraction of a single object in an \link{Idf}. It provides
 more detail methods to modify object values and comments. An \code{IdfObject}
-object can be created using function \code{\link[=idf_object]{idf_object()}} or from methods of a
+object can also be created using function \code{\link[=idf_object]{idf_object()}} or from methods of a
 parent \link{Idf} object, using \verb{$object()}, \verb{$objects_in_class()} and equivalent.
 }
-\section{Usage}{
-
-\preformatted{
-idfobj <- model$object(which)
-idfobj <- idf_object(model, which, class = NULL)
-idfobj$version()
-idfobj$parent()
-idfobj$id()
-idfobj$name()
-idfobj$class_name()
-idfobj$group_name()
-idfobj$definition()
-idfobj$comment(comment, append = TRUE, width = 0L)
-idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
-idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
-idfobj$FieldName
-idfobj[[Field]]
-idfobj$set(..., .defaults = TRUE. .empty = FALSE)
-idfobj$FieldName <- Value
-idfobj[[Field]] <- Value
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
-                      recursive = FALSE, depth = 1L)
-idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$has_ref_to(which = NULL, class = NULL)
-idfobj$has_ref_by(which = NULL, class = NULL)
-idfobj$has_ref_node(which = NULL, class = NULL)
-idfobj$has_ref(which)
-idfobj$validate(level = eplusr_option("validate_level"))
-idfobj$is_valid(level = eplusr_option("validate_level"))
-idfobj$to_table(all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE)
-idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
-idfobj$print(comment = TRUE, auto_sep = FALSE, brief = FALSE)
-print(iddobj)
-}
-}
-
-\section{Basic Info}{
-\preformatted{idfobj <- model$object(which)
-idfobj <- idf_object(model, which, class = NULL)
-idfobj$version()
-idfobj$parent()
-idfobj$id()
-idfobj$name()
-idfobj$group_name()
-idfobj$class_name()
-}
-
-\verb{$version()} returns the version of parent \link{Idf} object in a
-\link[base:numeric_version]{numeric_version} format.
-
-\verb{$parent()} returns the parent \link{Idf} object.
-
-\verb{$id()} returns current \code{IdfObject} ID.
-
-\verb{$name()} returns current \code{IdfObject} name. If the class does not have name
-attribute, \code{NA} is returned.
-
-\verb{$group_name()} returns the group name of current \link{IdfObject} belongs to.
-
-\verb{$class_name()} returns the class name of current \link{IdfObject} belongs to.
-
-\strong{Arguments}:
+\note{
 \itemize{
-\item \code{model}: An \link{Idf} object.
-\item \code{class}: A single string of valid class name.
-\item \code{which}: A valid object ID (an integer) or name (a string).
+\item Only one single list is allowed, e.g. \code{idfobj$set(lst1)} where \code{lst1 <- list(field1 = value1)} is allowed, but \code{idfobj$set(lst1, lst2)} is not.
+\item You can delete a field by assigning \code{NULL} to it, e.g. \code{iddobj$set(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
+also \code{fld} is not a required field and the index of \code{fld} is larger than
+the number minimum fields required for that class, it will be deleted.
+Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
+will be filled with default value if applicable and left as blank if not.
+\item By default, trailing empty fields that are not required will be removed and
+only minimum required fields are kept. You can keep the trailing empty
+fields by setting \code{.empty} to \code{TRUE}.
+\item New fields that currently do not exist in that object can also be set. They
+will be automatically added on the fly.
+\item Field name matching is \strong{case-insensitive}. For convenience,
+underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
+equivalent to \verb{End Month}.
+\item If not all field names are given, positions of those values without field
+names are determined after those values with names. E.g. in
+\code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
+will be treated as the value of field \verb{Outside Layer} in \code{Construction}, as
+value of field \code{Name} has been given as \code{"name"}.
+}
+
+eplusr also provides custom S3 method of \verb{$<-} and
+\code{[[<-} which makes it more convenient to set a single field value of an
+\code{IdfObject}. Basically, \code{idfobj$FieldName <- value} and \code{idfobj[[Field]]
+<- value} is equivalent to \code{idfobj$set(FieldName = value)} and
+\code{idfobjset(Field = value)}.
+}
+\examples{
+
+## ------------------------------------------------
+## Method `IdfObject$new`
+## ------------------------------------------------
+
+# example model shipped with eplusr from EnergyPlus v8.8
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+idf <- read_idf(path_idf, use_idd(8.8, "auto"))
+
+roof <- IdfObject$new(26, parent = idf)
+
+# get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
+mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+
+
+## ------------------------------------------------
+## Method `IdfObject$version`
+## ------------------------------------------------
+
+# get version
+roof$version()
+
+
+## ------------------------------------------------
+## Method `IdfObject$parent`
+## ------------------------------------------------
+
+roof$parent()
+
+
+## ------------------------------------------------
+## Method `IdfObject$id`
+## ------------------------------------------------
+
+roof$id()
+
+
+## ------------------------------------------------
+## Method `IdfObject$name`
+## ------------------------------------------------
+
+roof$name()
+
+# NA will be returned if the class does not have name attribute. For example,
+# "Version" class
+idf$Version$name()
+
+## ------------------------------------------------
+## Method `IdfObject$group_name`
+## ------------------------------------------------
+
+roof$group_name()
+
+
+## ------------------------------------------------
+## Method `IdfObject$class_name`
+## ------------------------------------------------
+
+roof$class_name()
+
+
+## ------------------------------------------------
+## Method `IdfObject$definition`
+## ------------------------------------------------
+
+roof$definition()
+
+
+## ------------------------------------------------
+## Method `IdfObject$comment`
+## ------------------------------------------------
+
+# get object comments
+roof$comment()
+
+# add new object comments
+roof$comment(c("This is a material named `WD01`", "This object has an ID of 47"))
+roof$comment()
+
+# append new comments
+roof$comment("This is an appended comment")
+roof$comment()
+
+# prepend new comments
+roof$comment("This is a prepended comment", append = FALSE)
+roof$comment()
+
+# wrap long comments
+roof$comment("This is a very long comment that is needed to be wrapped.", width = 30)
+roof$comment()
+
+# delete old comments and add new one
+roof$comment("This is the only comment", append = NULL)
+roof$comment()
+
+# delete all comments
+roof$comment(NULL)
+roof$comment()
+
+
+## ------------------------------------------------
+## Method `IdfObject$value`
+## ------------------------------------------------
+
+# get all existing field values
+str(mat$value())
+
+# get values of field 1, 3, 5
+str(mat$value(c(1, 3, 5)))
+
+# get character format values instead of a named list
+mat$value(c(1, 3, 5), simplify = TRUE)
+
+# get values of all field even those that are not set
+str(roof$value())
+str(roof$value(all = TRUE))
+
+# get field values using shortcuts
+mat$Roughness
+mat[["Specific_Heat"]]
+mat[c(1,2)]
+mat[c("Name", "Density")]
+
+
+## ------------------------------------------------
+## Method `IdfObject$set`
+## ------------------------------------------------
+
+# set field values
+mat$set(name = "new_name", Thickness = 0.02)
+mat[c("Name", "Thickness")]
+
+# When `default` argument is set to TRUE and input field values are empty, i.e.
+# NULL, the field values will be reset to defaults.
+mat[c("Thermal Absorptance", "Solar Absorptance")]
+
+mat$set(visible_absorptance = NULL, Solar_Absorptance = NULL, .default = TRUE)
+mat[c("Visible Absorptance", "Solar Absorptance")]
+
+# set field values using shortcuts
+mat$Name <- "another_name"
+mat$Name
+mat[["Thickness"]] <- 0.019
+mat$Thickness
+
+
+## ------------------------------------------------
+## Method `IdfObject$value_possible`
+## ------------------------------------------------
+
+mat$value_possible()
+
+
+## ------------------------------------------------
+## Method `IdfObject$validate`
+## ------------------------------------------------
+
+mat$validate()
+
+# check at predefined validate level
+mat$validate("none")
+mat$validate("draft")
+mat$validate("final")
+
+# custom validate checking components
+mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+
+
+## ------------------------------------------------
+## Method `IdfObject$is_valid`
+## ------------------------------------------------
+
+mat$is_valid()
+
+mat$definition()$field_range("Density")
+eplusr_option(validate_level = "none") # have to set validate to "none" to do so
+mat$Density <- -1
+eplusr_option(validate_level = "final") # change back to "final" validate level
+mat$is_valid()
+
+# check at predefined validate level
+mat$is_valid("none")
+mat$is_valid("draft")
+mat$is_valid("final")
+
+# custom validate checking components
+mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+
+
+## ------------------------------------------------
+## Method `IdfObject$value_relation`
+## ------------------------------------------------
+
+# check each layer's reference of a construction named FLOOR
+roof$value_relation("zone name", "ref_to")
+
+# check where is this construction being used
+roof$value_relation("name", direction = "ref_by")
+
+
+## ------------------------------------------------
+## Method `IdfObject$ref_to_object`
+## ------------------------------------------------
+
+# get other objects that this object refereces
+mat$ref_to_object() # not referencing other objects
+
+
+## ------------------------------------------------
+## Method `IdfObject$ref_by_object`
+## ------------------------------------------------
+
+# get other objects that reference this object
+mat$ref_by_object() # referenced by construction "FLOOR"
+
+
+## ------------------------------------------------
+## Method `IdfObject$ref_to_node`
+## ------------------------------------------------
+
+\dontrun{
+if (is_avail_eplus(8.8)) {
+path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+idf_5z <- read_idf(path)
+idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
 }
 }
 
-\section{Definition}{
-\preformatted{idfobj$definition()
+
+## ------------------------------------------------
+## Method `IdfObject$has_ref_to`
+## ------------------------------------------------
+
+mat$has_ref_to()
+
+
+## ------------------------------------------------
+## Method `IdfObject$has_ref_by`
+## ------------------------------------------------
+
+mat$has_ref_by()
+
+
+## ------------------------------------------------
+## Method `IdfObject$has_ref_node`
+## ------------------------------------------------
+
+mat$has_ref_node()
+
+
+## ------------------------------------------------
+## Method `IdfObject$has_ref`
+## ------------------------------------------------
+
+# check if having any referenced objects or is referenced by other objects
+mat$has_ref()
+
+
+## ------------------------------------------------
+## Method `IdfObject$to_table`
+## ------------------------------------------------
+
+# get all object data in a data.table format without field units
+str(mat$to_table(unit = FALSE))
+
+# get all object data in a data.table format where all field values are put in a
+# list column and field names without unit
+str(mat$to_table(string_value = FALSE, unit = FALSE))
+
+# get all object data in a data.table format, including tailing empty fields
+str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
+
+# get all object data in a data.table format where each field becomes a column
+str(mat$to_table(wide = TRUE))
+
+
+## ------------------------------------------------
+## Method `IdfObject$to_string`
+## ------------------------------------------------
+
+# get string format object
+mat$to_string()
+
+# get string format of object, and decrease the space between field values and
+# field names
+mat$to_string(sep_at = 15)
+
+# get string format of object, and decrease the leading space of field values
+mat$to_string(leading = 0)
+
+
+## ------------------------------------------------
+## Method `IdfObject$print`
+## ------------------------------------------------
+
+# print the object without comment
+mat$print(comment = FALSE)
+
+# print the object, and auto separate field values and field names at the
+# largetst character length of field values
+mat$print(auto_sep = TRUE)
+
 }
-
-\verb{$definition()} returns an \link{IddObject} of current class. \link{IddObject} contains
-all data used for parsing and creating an \link{IdfObject}. For details, please
-see \link{IddObject} class.
+\seealso{
+\link{Idf} class
 }
-
-\section{Getting and Setting Comments}{
-\preformatted{idfobj$comment(comment, append = TRUE, width = 0L)
+\author{
+Hongyuan Jia
 }
-
-\verb{$comment()} returns current \code{IdfObject} comment if \code{comment} is not given,
-or modifies current \code{IdfObject} comment if \code{comment} is given.
-
-\strong{Arguments}
+\section{Methods}{
+\subsection{Public methods}{
 \itemize{
-\item \code{comment}: A character vector.
+\item \href{#method-new}{\code{IdfObject$new()}}
+\item \href{#method-version}{\code{IdfObject$version()}}
+\item \href{#method-parent}{\code{IdfObject$parent()}}
+\item \href{#method-id}{\code{IdfObject$id()}}
+\item \href{#method-name}{\code{IdfObject$name()}}
+\item \href{#method-group_name}{\code{IdfObject$group_name()}}
+\item \href{#method-class_name}{\code{IdfObject$class_name()}}
+\item \href{#method-definition}{\code{IdfObject$definition()}}
+\item \href{#method-comment}{\code{IdfObject$comment()}}
+\item \href{#method-value}{\code{IdfObject$value()}}
+\item \href{#method-set}{\code{IdfObject$set()}}
+\item \href{#method-value_possible}{\code{IdfObject$value_possible()}}
+\item \href{#method-validate}{\code{IdfObject$validate()}}
+\item \href{#method-is_valid}{\code{IdfObject$is_valid()}}
+\item \href{#method-value_relation}{\code{IdfObject$value_relation()}}
+\item \href{#method-ref_to_object}{\code{IdfObject$ref_to_object()}}
+\item \href{#method-ref_by_object}{\code{IdfObject$ref_by_object()}}
+\item \href{#method-ref_to_node}{\code{IdfObject$ref_to_node()}}
+\item \href{#method-has_ref_to}{\code{IdfObject$has_ref_to()}}
+\item \href{#method-has_ref_by}{\code{IdfObject$has_ref_by()}}
+\item \href{#method-has_ref_node}{\code{IdfObject$has_ref_node()}}
+\item \href{#method-has_ref}{\code{IdfObject$has_ref()}}
+\item \href{#method-to_table}{\code{IdfObject$to_table()}}
+\item \href{#method-to_string}{\code{IdfObject$to_string()}}
+\item \href{#method-print}{\code{IdfObject$print()}}
+\item \href{#method-clone}{\code{IdfObject$clone()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{IdfObject} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$new(object, class = NULL, parent)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{object}}{An integer specifying an object ID.}
+
+\item{\code{class}}{An integer specifying a class index.}
+
+\item{\code{parent}}{An \link{Idf} object specifying the parent object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+It is not recommended to directly use \verb{$new()} method to create an
+\code{IdfObject} object, instead considering to use \link{idf_object},
+\href{../../eplusr/html/Idf.html#method-object}{\code{Idf$object()}}
+and other equivalent to create \code{IdfObject} objects. They provide
+more user-friendly interfaces. \verb{$new()} is a lower level API which is
+mainly used inside methods in other classes.
+}
+
+\subsection{Returns}{
+An \code{IdfObject} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# example model shipped with eplusr from EnergyPlus v8.8
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+idf <- read_idf(path_idf, use_idd(8.8, "auto"))
+
+roof <- IdfObject$new(26, parent = idf)
+
+# get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
+mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-version"></a>}}
+\subsection{Method \code{version()}}{
+Get the version of parent \code{Idf}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$version()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$version()} returns the version of parent \code{Idf} in a
+\code{\link[base:numeric_version]{base::numeric_version()}} format. This makes it easy to direction
+compare versions of different \code{IdfObject}s, e.g. \code{idfobj$version() > 8.6} or
+\code{idfobj1$version() > idfobj2$version()}.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get version
+roof$version()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-parent"></a>}}
+\subsection{Method \code{parent()}}{
+Get parent \link{Idf}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$parent()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$parent()} returns parent \link{Idf} object.
+}
+
+\subsection{Returns}{
+A \link{Idf} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$parent()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-id"></a>}}
+\subsection{Method \code{id()}}{
+Get the unique ID for current object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$id()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+In \link{Idf}, each object is assigned with an integer as an universally
+unique identifier (UUID) in the context of current \link{Idf}. UUID is
+not reused even if the object associated is deleted.
+
+\verb{$id()} returns an integer of current object unique ID.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$id()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-name"></a>}}
+\subsection{Method \code{name()}}{
+Get the name for current object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+In \code{Idf}, each object is assigned with a single string as the name
+for it, if the class it belongs to has name attribute, e.g. class
+\code{RunPeriod}, \code{Material} and etc. That name should be unique among all
+objects in that class. EnergyPlus will fail with an error if
+duplications are found among object names in a class.
+
+\verb{$name()} returns a single string of current object name. If
+specified class does not have name attribute, \code{NA} is returned.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$name()
+
+# NA will be returned if the class does not have name attribute. For example,
+# "Version" class
+idf$Version$name()
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-group_name"></a>}}
+\subsection{Method \code{group_name()}}{
+Get name of group for current object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$group_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$group_name()} returns a single string of group name current
+\code{IdfObject} belongs to.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$group_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_name"></a>}}
+\subsection{Method \code{class_name()}}{
+Get name of class for current object.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$class_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$class_name()} returns a single string of class name current
+\code{IdfObject} belongs to.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$class_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-definition"></a>}}
+\subsection{Method \code{definition()}}{
+Get the \link{IddObject} object for current class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$definition()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$definition()} returns an \link{IddObject} of current class. \link{IddObject}
+contains all data used for parsing and creating current \code{IdfObject}.
+For details, please see \link{IddObject} class.
+}
+
+\subsection{Returns}{
+An \link{IddObject} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{roof$definition()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-comment"></a>}}
+\subsection{Method \code{comment()}}{
+Get and modify object comments
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$comment(comment, append = TRUE, width = 0L)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{A character vector.
 \itemize{
-\item If missing, current comments are returned. If there is no comment in
-current \code{IdfObject}, \code{NULL} is returned.
+\item If missing, current comments are returned. If there is no
+comment in current \code{IdfObject}, \code{NULL} is returned.
 \item If \code{NULL}, all comments in current \code{IdfObject} is deleted.
-\item If a character vector, it is inserted as comments depending on the
-\code{append} value.
-}
-\item \code{append}: Only applicable when \code{commment} is a character vector. Default: \code{FALSE}.
+\item If a character vector, it is inserted as comments depending on
+the \code{append} value.
+}}
+
+\item{\code{append}}{Only applicable when \code{commment} is a character vector.
+Default: \code{FALSE}.
 \itemize{
 \item If \code{NULL}, existing comments is deleted before adding \code{comment}.
 \item If \code{TRUE}, comment will be appended to existing comments.
 \item If \code{FALSE}, \code{comment} is prepended to existing currents.
+}}
+
+\item{\code{width}}{A positive integer giving the target width for wrapping
+inserted \code{comment}.}
 }
-\item \code{width}: A positive integer giving the target width for wrapping inserted
-\code{comment}.
+\if{html}{\out{</div>}}
 }
+\subsection{Details}{
+\verb{$comment()} returns current \code{IdfObject} comments if \code{comment} is not
+given, or modifies current \code{IdfObject} comments if \code{comment} is given.
+If no comments found, \code{NULL} is returned.
 }
 
-\section{Get Field Values}{
+\subsection{Returns}{
+If calling without any argument, a character vector or \code{NULL}
+(if no comments) is return. Otherwise, the modified object itself.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get object comments
+roof$comment()
 
-\preformatted{
-idfobj$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
-idfobj$value_possible(which = NULL, type = c("auto", "default", "choice", "range", "source"))
-idfobj$FieldName
-idfobj[[Field]]
+# add new object comments
+roof$comment(c("This is a material named `WD01`", "This object has an ID of 47"))
+roof$comment()
+
+# append new comments
+roof$comment("This is an appended comment")
+roof$comment()
+
+# prepend new comments
+roof$comment("This is a prepended comment", append = FALSE)
+roof$comment()
+
+# wrap long comments
+roof$comment("This is a very long comment that is needed to be wrapped.", width = 30)
+roof$comment()
+
+# delete old comments and add new one
+roof$comment("This is the only comment", append = NULL)
+roof$comment()
+
+# delete all comments
+roof$comment(NULL)
+roof$comment()
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\verb{$value()} takes an integer vector of valid field indexes or a character
-vector of valid field names, and returns a named list containing values of
-specified fields when \code{simplify} is \code{FALSE} and a character vector when
-\code{simplify} is \code{TRUE}.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-value"></a>}}
+\subsection{Method \code{value()}}{
+Get object field values.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$value(which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{all}}{If \code{TRUE}, values of all possible fields in current class
+the \code{IdfObject} belongs to are returned. Default: \code{FALSE}}
+
+\item{\code{simplify}}{If \code{TRUE}, values of fields are converted into
+characters and the converted character vector is returned.}
+
+\item{\code{unit}}{If \code{TRUE}, values of numeric fields are assigned with
+units using \code{\link[units:set_units]{units::set_units()}} if applicable. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$value()} takes an integer vector of valid field indexes or a
+character vector of valid field names, and returns a named list
+containing values of specified fields when \code{simplify} is \code{FALSE} and
+a character vector when \code{simplify} is \code{TRUE}.
 
 eplusr also provides custom S3 method of \code{$} and \code{[[} which make
-it more convenient to get a single value of current \code{IdfObject}. Basically,
-\code{idfobj$FieldName} and \code{idfobj[[Field]]} is equivalent to
-\code{idfobj$value(FieldName)[[1]]} and \code{idfobj$value(Field)[[1]]}.
+it more convenient to get a single value of current \code{IdfObject}.
+Basically, \code{idfobj$FieldName} and \code{idfobj[[Field]]} is
+equivalent to \code{idfobj$value(FieldName)[[1]]} and
+\code{idfobj$value(Field)[[1]]}.
+}
 
-\verb{$possible_value()} takes an integer vector of valid field indexes or a character
+\subsection{Returns}{
+A named list.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all existing field values
+str(mat$value())
+
+# get values of field 1, 3, 5
+str(mat$value(c(1, 3, 5)))
+
+# get character format values instead of a named list
+mat$value(c(1, 3, 5), simplify = TRUE)
+
+# get values of all field even those that are not set
+str(roof$value())
+str(roof$value(all = TRUE))
+
+# get field values using shortcuts
+mat$Roughness
+mat[["Specific_Heat"]]
+mat[c(1,2)]
+mat[c("Name", "Density")]
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set"></a>}}
+\subsection{Method \code{set()}}{
+Modify object field values.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$set(..., .default = TRUE, .empty = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{New field value definitions in \code{field = value} format or a
+single list in format:\preformatted{list(field1 = value1, field2 = value2)
+}}
+
+\item{\code{.default}}{If \code{TRUE}, default values are used for those blank
+fields if possible. Default: \code{TRUE}.}
+
+\item{\code{.empty}}{If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$set()} takes new field value definitions in \code{field = value} format
+or in a single list format, sets new values for fields specified, and
+returns the modified \code{IdfObject}. Unlike \verb{$set()} method in \link{Idf}
+class, the special element \code{.comment} is \strong{not allowed}. To modify
+object comments, please use \verb{$comment()}.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# set field values
+mat$set(name = "new_name", Thickness = 0.02)
+mat[c("Name", "Thickness")]
+
+# When `default` argument is set to TRUE and input field values are empty, i.e.
+# NULL, the field values will be reset to defaults.
+mat[c("Thermal Absorptance", "Solar Absorptance")]
+
+mat$set(visible_absorptance = NULL, Solar_Absorptance = NULL, .default = TRUE)
+mat[c("Visible Absorptance", "Solar Absorptance")]
+
+# set field values using shortcuts
+mat$Name <- "another_name"
+mat$Name
+mat[["Thickness"]] <- 0.019
+mat$Thickness
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-value_possible"></a>}}
+\subsection{Method \code{value_possible()}}{
+Get possible object field values.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$value_possible(
+  which = NULL,
+  type = c("auto", "default", "choice", "range", "source")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{type}}{A character vector. What types of possible values should
+be returned. Should be one of or a combination of \code{"auto"},
+\code{"default"}, \code{"choice"}, \code{"range"} and \code{"source"}. Default:
+All of those.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$value_possible()} takes an integer vector of valid field indexes or a character
 vector of valid field names, and returns all possible values for specified
 fields. For a specific field, there are 5 types of possible values:
 \itemize{
@@ -153,9 +868,12 @@ retrieved using \code{idfobj$definition()$field_choice()}.
 also be retrieved using \code{idfobj$definition()$field_range()}.
 \item \code{source}: All values from other objects that current field can refer to.
 }
+}
 
-\verb{$value_possible()} returns an \code{IdfValuePossible} object which is a
-\link[data.table:data.table]{data.table} with at most 15 columns:
+\subsection{Returns}{
+\verb{$value_possible()} returns an \code{IdfValuePossible} object
+which is a \link[data.table:data.table]{data.table} with at most 15
+columns:
 \itemize{
 \item \code{class_id}: index of class that current \code{IdfObject} belongs to
 \item \code{class_name}: name of class that current \code{IdfObject} belongs to
@@ -190,192 +908,147 @@ printed in number interval denotation.
 element is a character vector which includes all values from other objects
 that current field can use as sources and refers to.
 }
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$value_possible()
 
-\strong{Arguments}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-validate"></a>}}
+\subsection{Method \code{validate()}}{
+Check possible object field value errors
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$validate(level = eplusr_option("validate_level"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level}}{One of \code{"none"}, \code{"draft"}, \code{"final"} or a list of 10
+elements with same format as \code{\link[=custom_validate]{custom_validate()}} output.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$validate()} checks if there are errors in current \code{IdfObject} object
+under specified validation level and returns an \code{IdfValidity} object.
+
+\verb{$validate()} is useful to help avoid some common errors before
+running the model. By default, validation is performed when calling
+all methods that modify objects, e.g.
+\href{../../eplusr/html/IdfObject.html#method-set}{\code{$set()}}
+and etc.
+
+In total, there are 10 different validate checking components:
 \itemize{
-\item \code{which}: An integer vector of field indexes or a character vector of field
-names.
-\item \code{all}: If \code{TRUE}, values of all possible fields in current class the
-\code{IdfObject} belongs to are returned. Default: \code{FALSE}
-\item \code{simplify}: If \code{TRUE}, values of fields are converted into characters
-and the converted character vector is returned.
-\item \code{FieldName}: A single length character vector of one valid field name where
-all characters except letters and numbers are replaced by underscores.
-\item \code{Field}: A single length character vector of one valid field name or a
-single length integer vector of one valid field index. Same as above,
-field names should be given in a style where all characters except
-letters and numbers are replaced by underscores.
-\item \code{type}: A character vector. What types of possible values should be
-returned. Should be one of or a combination of \code{"auto"}, \code{"default"},
-\code{"choice"}, \code{"range"} and \code{"source"}. Default: All of those.
+\item \code{required_object}: Check if required objects are missing in current
+\code{Idf}.
+\item \code{unique_object}: Check if there are multiple objects in one
+unique-object class. An unique-object class means that there should
+be at most only one object existing in that class.
+\item \code{unique_name}: Check if all objects in each class have unique names.
+\item \code{extensible}: Check if all fields in an extensible group have
+values. An extensible group is a set of fields that should be
+treated as a whole, such like the X, Y and Z vertices of a building
+surfaces. An extensible group should be added or deleted together.
+\code{extensible} component checks if there are some, but not all,
+fields in an extensible group are empty.
+\item \code{required_field}: Check if all required fields have values.
+\item \code{auto_field}: Check if all fields filled with value \code{"Autosize"} and
+\code{"Autocalculate"} are actual autosizable and autocalculatable
+fields or not.
+\item \code{type}: Check if all fields have value types complied with their
+definitions, i.e. character, numeric and integer fields should be
+filled with corresponding type of values.
+\item \code{choice}: Check if all choice fields are filled with valid choice
+values.
+\item \code{range}: Check if all numeric fields have values within prescibed
+ranges.
+\item \code{reference}: Check if all fields whose values refer to other fields
+are valid.
 }
-}
 
-\section{Set Field Values}{
+The \code{level} argument controls what checkings should be performed.
+\code{level} here is just a list of 10 element which specify the toggle
+status of each component. You can use helper \code{\link[=custom_validate]{custom_validate()}} to
+get that list and pass it directly to \code{level}.
 
-\preformatted{
-idfobj$set(..., .default = TRUE, .empty = FALSE)
-idfobj$FieldName <- Value
-idfobj[[Field]] <- Value
-}
+There are 3 predefined validate level that indicates different
+combinations of checking components, i.e. \code{none}, \code{draft} and
+\code{final}. Basically, \code{none} level just does not perform any
+checkings; \code{draft} includes 5 components, i.e. \code{auto_field}, \code{type},
+\code{unique_name}, \code{choice} and \code{range}; and \code{final} level includes all
+10 components. You can always get what components each level contains
+using \code{\link[=level_checks]{level_checks()}}. By default, the result from
+\code{eplusr_option("validate_level")} is passed to \code{level}. If not set,
+\code{final} level is used.
 
-\verb{$set()} takes new field value definitions in \code{field = value} format or in a
-single list format, sets new values for fields specified, and returns the
-modified \link{IdfObject}. Unlike \verb{$set()} method in \link{Idf} class, the special
-element \code{.comment} is \strong{not allowed}. To modify object comments, please use
-\verb{$comment()}.
-
-\strong{Note}:
+Underneath, an \code{IdfValidity} object which \verb{$validate()} returns is a
+list of 13 element as shown below. Each element or several elements
+represents the results from a single validation checking component.
 \itemize{
-\item Only one single list is allowed, e.g. \code{idfobj$set(lst1)} where \code{lst1 <- list(field1 = value1)} is allowed, but \code{idfobj$set(lst1, lst2)} is not.
-\item You can delete a field by assigning \code{NULL} to it, e.g. \code{iddobj$set(fld = NULL)} means to delete the value of field \code{fld}. If \code{.default} is FALSE,
-also \code{fld} is not a required field and the index of \code{fld} is larger than
-the number minimum fields required for that class, it will be deleted.
-Otherwise it will be left as blank. If \code{.default} is \code{TRUE}, that field
-will be filled with default value if applicable and left as blank if not.
-\item By default, trailing empty fields that are not required will be removed and
-only minimum required fields are kept. You can keep the trailing empty
-fields by setting \code{.empty} to \code{TRUE}.
-\item New fields that currently do not exist in that object can also be set. They
-will be automatically added on the fly.
-\item Field name matching is \strong{case-insensitive}. For convenience,
-underscore-style field names are also allowed, e.g. \code{eNd_MoNtH} is
-equivalent to \verb{End Month}.
-\item If not all field names are given, positions of those values without field
-names are determined after those values with names. E.g. in
-\code{model$set(Construction = list("out_layer", name = "name"))}, \code{"out_layer"}
-will be treated as the value of field \verb{Outside Layer} in \code{Construction}, as
-value of field \code{Name} has been given as \code{"name"}.
+\item \code{missing_object}: Result of \code{required_object} checking.
+\item \code{duplicate_object}: Result of \code{unique_object} checking.
+\item \code{conflict_name}: Result of \code{unique_name} checking.
+\item \code{incomplete_extensible}: Result of \code{extensible} checking.
+\item \code{missing_value}: Result of \code{required_field} checking.
+\item \code{invalid_autosize}: Result of \code{auto_field} checking for invalid
+\code{Autosize} field values.
+\item \code{invalid_autocalculate}: Result of \code{auto_field} checking for
+invalid \code{Autocalculate} field values.
+\item \code{invalid_character}: Result of \code{type} checking for invalid
+character field values.
+\item \code{invalid_numeric}: Result of \code{type} checking for invalid
+numeric field values.
+\item \code{invalid_integer}: Result of \code{type} checking for invalid
+integer field values.
+\item \code{invalid_choice}: Result of \code{choice} checking.
+\item \code{invalid_range}: Result of \code{range} checking.
+\item \code{invalid_reference}: Result of \code{reference} checking.
 }
 
-eplusr also provides custom S3 method of \verb{$<-} and
-\code{[[<-} which makes it more convenient to set a single field value of an
-\code{IdfObject}. Basically, \code{idfobj$FieldName <- value} and \code{idfobj[[Field]]
-<- value} is equivalent to \code{idfobj$set(FieldName = value)} and
-\code{idfobjset(Field = value)}.
-
-\strong{Arguments}:
+Except \code{missing_object}, which is a character vector of class names
+that are missing, all other elements are
+\link[data.table:data.table]{data.table} with 9 columns containing data
+of invalid field values:
 \itemize{
-\item \code{...}: New field value definitions in \code{field = value} format or a single
-list in format\preformatted{list(field1 = value1, field2 = value2)
-}
-\item \code{.default}: If \code{TRUE}, default values are used for those blank fields if
-possible. Default: \code{TRUE}.
-\item \code{.empty}: If \code{TRUE}, trailing empty fields are kept. Default: \code{FALSE}.
-\item \code{FieldName}: A single length character vector of one valid field name where
-all characters except letters and numbers are replaced by underscores.
-\item \code{Field}: A single length character vector of one valid field name or a
-single length integer vector of one valid field index. Same as above,
-field names should be given in a style where all characters except
-letters and numbers are replaced by underscores.
-\item \code{Value}: A single length vector of value to set.
-}
-}
-
-\section{Field Value Relation}{
-
-\preformatted{
-idfobj$value_relation(which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
-                      recursive = FALSE, depth = 1L)
-idfobj$ref_to_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$ref_by_object(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$ref_to_node(which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-idfobj$has_ref_to(which = NULL, class = NULL)
-idfobj$has_ref_by(which = NULL, class = NULL)
-idfobj$has_ref_node(which = NULL, class = NULL)
-idfobj$has_ref(which)
+\item \code{object_id}: IDs of objects that contain invalid values
+\item \code{object_name}: names of objects that contain invalid values
+\item \code{class_id}: indexes of classes that invalid objects belong to
+\item \code{class_name}: names of classes that invalid objects belong to
+\item \code{field_id}: indexes (at Idd level) of object fields that are invalid
+\item \code{field_index}: indexes of object fields in corresponding that are invalid
+\item \code{field_name}: names (without units) of object fields that are invalid
+\item \code{units}: SI units of object fields that are invalid
+\item \code{ip_units}: IP units of object fields that are invalid
+\item \code{type_enum}: An integer vector indicates types of invalid fields
+\item \code{value_id}: indexes (at Idf level) of object field values that are invalid
+\item \code{value_chr}: values (converted to characters) of object fields that are
+invalid
+\item \code{value_num}: values (converted to numbers in SI units) of object fields
+that are invalid
 }
 
-Many fields in \link{Idd} can be referred by others. For example, the \verb{Outside Layer} and other fields in \code{Construction} class refer to the \code{Name} field
-in \code{Material} class and other material related classes. Here it means that
-the \verb{Outside Layer} field \strong{refers to} the \code{Name} field and the \code{Name} field
-is \strong{referred by} the \verb{Outside Layer}. In EnergyPlus, there is also a
-special type of field called \code{Node}, which together with \code{Branch} and
-\code{BranchList} define the topography of the HVAC connections. A outlet node of
-a component can be referred by another component as its inlet node, but can
-also exists independently, such as zone air node.
+Knowing the internal structure of \code{IdfValidity}, it is easy to extract
+invalid \link{IdfObject}s you interested in. For example, you can get all IDs of
+objects that contain invalid value references using
+\code{model$validate()$invalid_reference$object_id}. Then using
+\href{../../eplusr/html/IdfObject.html#method-set}{\code{$set()}}
+method to correct them.
 
-\verb{$value_relation()} provides a simple interface to get this kind of
-relation. It takes field indexes or field names, together a relation
-direction, and returns an \code{IdfRelation} object which contains data presenting
-such relation described above. For instance, if
-\code{idfobj$value_relation("Name", "ref_by")} gives results below:\preformatted{-- Referred by Others ------------------------
-  \\- 1: "WALL-1";      !- Name
-     ^~~~~~~~~~~~~~~~~~~~~~~~~
-     \\- Class: <BuildingSurface:Detailed>
-        \\- Object [ID:3] <WALL-1PF>
-           \\- 3: "WALL-1";      !- Construction Name
-}
-
-This means that the value \code{"WALL-1"} of field \code{Name} is referred by field
-\verb{Construction Name} in a surface named \verb{WALL-1PF}. All those objects can be
-futher easily extracted using \verb{$ref_by_object()} method.
-
-Note that \verb{$value_relation()} shows all fields specified, even some of them
-may do not have relation.
-
-\verb{$ref_to_object()} takes an integer vector of field indexes or a character
-vector of field names, and returns a list of \code{IdfObject}s that specified
-fields refer to.
-
-\verb{$ref_by_object()} takes an integer vector of field indexes or a character
-vector of field names, and returns a list of \code{IdfObject}s that refer to
-specified fields.
-
-\verb{$ref_to_node()} takes an integer vector of field indexes or a character
-vector of field names, and returns a list of \code{IdfObject}s whose nodes are
-referred by specified fields.
-
-\verb{$has_ref_to()} takes an integer vector of field indexes or a character
-vector of field names, and returns a logical vector showing whether specified
-fields refer to other object values or not.
-
-\verb{$has_ref_by()} takes an integer vector of field indexes or a character
-vector of field names, and returns a logical vector showing whether there are
-other object values ref to specified fields.
-
-\verb{$has_ref_node()} takes an integer vector of field indexes or a character
-vector of field names, and returns a logical vector showing whether specified
-fields refer to other objects' nodes.
-
-\verb{$has_ref()} takes an integer vector of field indexes or a character
-vector of field names, and returns a logical vector showing whether there are
-other object values ref to specified field values or specified field values
-refer to other object values or specified field values refer to other
-objects' nodes.
-
-\strong{Arguments}:
-\itemize{
-\item \code{which}: An integer vector of field indexes or a character vector of field
-names.
-\item \code{class}: A character vector of class names.
-\item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
-\code{"ref_to"} or "ref_by".
-\item \code{recursive}: If \code{TRUE}, the relation is searched recursively. A simple
-example of recursive reference: one material named \code{mat} is referred by a
-construction named \code{const}, and \code{const} is also referred by a surface named
-\code{surf}.
-\item \code{depth}: Only applicable when \code{recursive} is \code{TRUE}. This is a depth to
-when searching value relations recursively. If \code{NULL}, all recursive
-relations are returned. Default: \code{1}.
-}
-}
-
-\section{Validation}{
-\preformatted{idfobj$validate(level = eplusr_option("validate_level"))
-idfobj$is_valid(level = eplusr_option("validate_level"))
-}
-
-\verb{$validate()} checks if there are errors in values in current \code{IdfObject}
-under specified validation level and returns an \code{IdfValidity} object which
-contains data of invalid field values. Different validation result examples
-are shown below:
+Different validate result examples are shown below:
 \itemize{
 \item No error is found:\preformatted{v No error found.
 }
 
 Above result shows that there is no error found after conducting all
-validation checks in specified validation level.
+validate checks in specified validate level.
 \item Errors are found:\preformatted{ x [2] Errors found during validation.
 =========================================================================
 
@@ -387,202 +1060,571 @@ validation checks in specified validation level.
        +- 17: AUTOCALCULATE, !- Maximum Flow per Zone Floor Area During Reheat \{m3/s-m2\}
        \\- 18: AUTOCALCULATE; !- Maximum Flow Fraction During Reheat
 }
+
+Above result shows that after all validate components
+performed under current validate level, 2 invalid field values
+are found. All of them are in a object named \verb{SPACE5-1 VAV Reheat}
+with ID \code{176}. They are invalid because those two fields do not
+have an autocalculatable attribute but are given \code{AUTOCALCULATE}
+value. Knowing this info, one simple way to fix the
+error is to correct those two fields by doing:\preformatted{idf$set(..176 =
+    list(`Maximum Flow per Zone Floor Area During Reheat` = "autosize",
+         `Maximum Flow Fraction During Reheat` = "autosize"
+    )
+)
+}
+}
 }
 
-Above validation results show that after all validation components performed
-under current validation level, 2 invalid field values are found. All of them
-are in object named \verb{SPACE5-1 VAV Reheat} with ID \code{176}. They are invalid
-because those two fields do not have an autocalculatable attribute but are
-given \code{AUTOCALCULATE} value. Knowing this info, one simple way to fix the
-error is to set those two fields to correct value by doing \verb{idf$set(..176 = list(}Maximum Flow per Zone Floor Area During Reheat\verb{= "autosize",}Maximum Flow Fraction During Reheat\verb{ = "autosize" ))}
+\subsection{Returns}{
+An \code{IdfValidity} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$validate()
 
+# check at predefined validate level
+mat$validate("none")
+mat$validate("draft")
+mat$validate("final")
+
+# custom validate checking components
+mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid"></a>}}
+\subsection{Method \code{is_valid()}}{
+Check if there is any error in current object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$is_valid(level = eplusr_option("validate_level"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{level}}{One of \code{"none"}, \code{"draft"}, \code{"final"} or a list of 10
+elements with same format as \code{\link[=custom_validate]{custom_validate()}} output.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
 \verb{$is_valid()} returns \code{TRUE} if there is no error in current \code{IdfObject}
 object under specified validation level and \code{FALSE} otherwise.
 
-Underneath, an \code{IdfValidity} object which \verb{$validate()} returns is a list of
-13 element. For details about the underlying structure of \code{IdfValidity},
-please \verb{$validate()} in \link{Idf} class.
+\verb{$is_valid()} checks if there are errors in current \code{IdfObject} object
+under specified validation level and returns \code{TRUE} or \code{FALSE}
+accordingly. For detailed description on validate checking, see
+\href{../../eplusr/html/IdfObject.html#method-validate}{\code{$validate()}}
+documentation above.
 }
 
-\section{Data Extraction}{
-\preformatted{idfobj$to_table(string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)
-idfobj$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
+\subsection{Returns}{
+A single logical value of \code{TRUE} or \code{FALSE}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$is_valid()
+
+mat$definition()$field_range("Density")
+eplusr_option(validate_level = "none") # have to set validate to "none" to do so
+mat$Density <- -1
+eplusr_option(validate_level = "final") # change back to "final" validate level
+mat$is_valid()
+
+# check at predefined validate level
+mat$is_valid("none")
+mat$is_valid("draft")
+mat$is_valid("final")
+
+# custom validate checking components
+mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
-core data of current \link{IdfObject}. It has 6 columns:
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-value_relation"></a>}}
+\subsection{Method \code{value_relation()}}{
+Get value relations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$value_relation(
+  which = NULL,
+  direction = c("all", "ref_to", "ref_by", "node"),
+  recursive = FALSE,
+  depth = 1L
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{direction}}{The relation direction to extract. Should be either
+\code{"all"}, \code{"ref_to"} or "ref_by".}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}.}
+
+\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
+depth to when searching value relations recursively. If
+\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+
+\item{\code{class}}{A character vector of class names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Many fields in \link{Idd} can be referred by others. For example, the
+\verb{Outside Layer} and other fields in \code{Construction} class refer to the
+\code{Name} field in \code{Material} class and other material related classes.
+Here it means that the \verb{Outside Layer} field \strong{refers to} the \code{Name}
+field and the \code{Name} field is \strong{referred by} the \verb{Outside Layer}. In
+EnergyPlus, there is also a special type of field called \code{Node},
+which together with \code{Branch} and \code{BranchList} define the topography
+of the HVAC connections. A outlet node of a component can be referred
+by another component as its inlet node, but can also exists
+independently, such as zone air node.
+
+\verb{$value_relation()} provides a simple interface to get this kind of
+relation. It takes field indexes or field names, together a relation
+direction, and returns an \code{IdfRelation} object which contains data
+presenting such relation described above. For instance, if
+\code{idfobj$value_relation("Name", "ref_by")} gives results below:\preformatted{-- Referred by Others ------------------------
+  \\- 1: "WALL-1";      !- Name
+     ^~~~~~~~~~~~~~~~~~~~~~~~~
+     \\- Class: <BuildingSurface:Detailed>
+        \\- Object [ID:3] <WALL-1PF>
+           \\- 3: "WALL-1";      !- Construction Name
+}
+
+This means that the value \code{"WALL-1"} of field \code{Name} is referred by
+field \verb{Construction Name} in a surface named \verb{WALL-1PF}. All those
+objects can be futher easily extracted using \verb{$ref_by_object()}
+method.
+
+Note that \verb{$value_relation()} shows all fields specified, even some of them
+may do not have relation.
+}
+
+\subsection{Returns}{
+An \code{IdfRelation} object, which is a list of 3
+\code{\link[data.table:data.table]{data.table::data.table()}}s named \code{ref_to}, \code{ref_by} and \code{node}.
+Each \code{\link[data.table:data.table]{data.table::data.table()}} contains 24 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# check each layer's reference of a construction named FLOOR
+roof$value_relation("zone name", "ref_to")
+
+# check where is this construction being used
+roof$value_relation("name", direction = "ref_by")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ref_to_object"></a>}}
+\subsection{Method \code{ref_to_object()}}{
+Extract multiple \code{IdfObject} objects referred by speicifed field values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_to_object(
+  which = NULL,
+  class = NULL,
+  recursive = FALSE,
+  depth = 1L
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}.}
+
+\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
+depth to when searching value relations recursively. If
+\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$ref_to_object()} takes an integer vector of field indexes or a
+character vector of field names, and returns a list of \code{IdfObject}s
+that specified fields refer to.
+}
+
+\subsection{Returns}{
+A named list of \code{IdfObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get other objects that this object refereces
+mat$ref_to_object() # not referencing other objects
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ref_by_object"></a>}}
+\subsection{Method \code{ref_by_object()}}{
+Extract multiple \code{IdfObject} objects referring to specified field values
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_by_object(
+  which = NULL,
+  class = NULL,
+  recursive = FALSE,
+  depth = 1L
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}.}
+
+\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
+depth to when searching value relations recursively. If
+\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$ref_by_object()} takes an integer vector of field indexes or a
+character vector of field names, and returns a list of \code{IdfObject}s
+that refer to specified fields.
+}
+
+\subsection{Returns}{
+A named list of \code{IdfObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get other objects that reference this object
+mat$ref_by_object() # referenced by construction "FLOOR"
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ref_to_node"></a>}}
+\subsection{Method \code{ref_to_node()}}{
+Extract multiple \code{IdfObject} objects referring to same nodes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_to_node(
+  which = NULL,
+  class = NULL,
+  recursive = FALSE,
+  depth = 1L
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}.}
+
+\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
+depth to when searching value relations recursively. If
+\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$ref_to_node()} takes an integer vector of field indexes or a
+character vector of field names, and returns a list of \code{IdfObject}s
+whose nodes are referred by specified fields.
+}
+
+\subsection{Returns}{
+A named list of \code{IdfObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+if (is_avail_eplus(8.8)) {
+path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+idf_5z <- read_idf(path)
+idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
+}
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref_to"></a>}}
+\subsection{Method \code{has_ref_to()}}{
+Check if object field values refer to others
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_to(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$has_ref_to()} takes an integer vector of field indexes or a
+character vector of field names, and returns a logical vector showing
+whether specified fields refer to other object values or not.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as speicifed field.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$has_ref_to()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref_by"></a>}}
+\subsection{Method \code{has_ref_by()}}{
+Check if object field values are referred by others
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_by(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$has_ref_by()} takes an integer vector of field indexes or a
+character vector of field names, and returns a logical vector showing
+whether there are other object values ref to specified fields.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as speicifed field.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$has_ref_by()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref_node"></a>}}
+\subsection{Method \code{has_ref_node()}}{
+Check if object field values refer to other nodes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_node(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+
+\item{\code{class}}{A character vector of class names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$has_ref_node()} takes an integer vector of field indexes or a
+character vector of field names, and returns a logical vector showing
+whether specified fields refer to other objects' nodes.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as speicifed field.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{mat$has_ref_node()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_ref"></a>}}
+\subsection{Method \code{has_ref()}}{
+Check if object field values refer to or are referred by others
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of field indexes or a character vector
+of field names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+For details on field value relations, see
+\href{../../eplusr/html/IdfObject.html#method-value_relation}{\code{$value_relation()}}.
+
+\verb{$has_ref()} takes an integer vector of field indexes or a character
+vector of field names, and returns a logical vector showing whether
+there are other object values ref to specified field values or
+specified field values refer to other object values or specified
+field values refer to other objects' nodes.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as speicifed field.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# check if having any referenced objects or is referenced by other objects
+mat$has_ref()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_table"></a>}}
+\subsection{Method \code{to_table()}}{
+Format \code{IdfObject} as a data.frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$to_table(string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{string_value}}{If \code{TRUE}, all field values are returned as
+character. If \code{FALSE}, \code{value} column in returned
+\link[data.table:data.table]{data.table} is a list column with
+each value stored as corresponding type. Note that if the
+value of numeric field is set to \code{"Autosize"} or
+\code{"Autocalculate"}, it is left as it is, leaving the returned
+type being a string instead of a number. Default: \code{TRUE}.}
+
+\item{\code{unit}}{Only applicable when \code{string_value} is \code{FALSE}. If
+\code{TRUE}, values of numeric fields are assigned with units using
+\code{\link[units:set_units]{units::set_units()}} if applicable. Default: \code{FALSE}.}
+
+\item{\code{wide}}{Only applicable if target objects belong to a same class.
+If \code{TRUE}, a wide table will be returned, i.e. first three
+columns are always \code{id}, \code{name} and \code{class}, and then every
+field in a separate column. Note that this requires all
+objects specified must from the same class.
+Default: \code{FALSE}.}
+
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for the
+class that objects belong to will be returned. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
+contains core data of current \code{IdfObject}. It has 6 columns:
 \itemize{
-\item \code{id}: Integer type. Object IDs.
-\item \code{name}: Character type. Object names.
+\item \code{id}: Integer type. Object ID.
+\item \code{name}: Character type. Object name.
 \item \code{class}: Character type. Current class name.
 \item \code{index}: Integer type. Field indexes.
 \item \code{field}: Character type. Field names.
 \item \code{value}: Character type if \code{string_value} is \code{TRUE} or list type if
 \code{string_value} is \code{FALSE.} Field values.
 }
-
-\verb{$to_string()} returns the text format of an \code{IdfObject}.
-
-\strong{Arguments}:
-\itemize{
-\item \code{string_value}: If \code{TRUE}, all field values are returned as character. If
-\code{FALSE}, \code{value} column in returned \link[data.table:data.table]{data.table}
-is a list column with each value stored as corresponding type. Note that if
-the value of numeric field is set to \code{"Autosize"} or \code{"Autocalculate"}, it
-is left as it is, leaving the returned type being a string instead of a
-number.  Default: \code{TRUE}.
-\item \code{unit}: Only applicable when \code{string_value} is \code{FALSE}. If \code{TRUE}, values
-of numeric fields are assigned with units using \code{\link[units:set_units]{units::set_units()}} if
-applicable. Default: \code{FALSE}.
-\item \code{wide}: If \code{TRUE}, a wide table will be returned, i.e. first three columns
-are always \code{id}, \code{name} and \code{class}, and then every field in a separate
-column. Default: \code{FALSE}.
-\item \code{comment}: If \code{FALSE}, all comments will not be included. Default: \code{TRUE}.
-\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
-\item \code{sep_at}: The character width to separate value string and field string.
-Default: \code{29L} which is the same as IDF Editor.
-\item \code{all}: If \code{TRUE}, values of all possible fields in current class the
-\code{IdfObject} belongs to are returned. Default: \code{FALSE}
-}
 }
 
-\section{Print}{
-\preformatted{idfobj$print(comment = TRUE, auto_sep = FALSE)
-print(idfobj)
+\subsection{Returns}{
+A \link[data.table:data.table]{data.table} with 6 columns.
 }
-
-\verb{$print()} prints the \code{IdfObject}. Basically, the print output can be divided
-into 3 parts:
-\itemize{
-\item OBJECT: Class name, object id and name (if applicable).
-\item COMMENTS: Object comments if exist.
-\item VALUES: fields and values of current \code{IdfObject}. Required fields are marked
-with start \code{*}. String values are quoted. Numeric values are printed as
-they are. Blank string values are printed as \verb{<"Blank">} and blank number
-values are printed as \verb{<Blank>}.
-}
-
-\strong{Arguments}
-\itemize{
-\item \code{comment}: If \code{FALSE}, all comments are not included.
-\item \code{auto_sep}: If \code{TRUE}, values and field names are separated at the
-largest character length of values. Default: \code{FALSE}.
-}
-}
-
-\examples{
-\dontrun{
-# read an IDF file
-idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr"),
-    idd = use_idd(8.8, download = "auto"))
-
-# get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
-mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
-
-# get object ID
-mat$id()
-
-# get object name
-mat$name()
-
-# get parent Idf object
-mat$parent()
-
-# NA will be returned if the class does not have name attribute. For example,
-# "Version" class
-idf$Version$name()
-
-# get underlying IddObject of current class
-mat$definition()
-
-# get object comments
-mat$comment()
-
-# add new object comments
-mat$comment(c("This is a material named `WD01`", "This object has an ID of 47"))
-mat$comment()
-
-# append new comments
-mat$comment("This is an appended comment")
-mat$comment()
-
-# prepend new comments
-mat$comment("This is a prepended comment", append = FALSE)
-mat$comment()
-
-# wrap long comments
-mat$comment("This is a very long comment that is needed to be wrapped.", width = 30)
-mat$comment()
-
-# delete old comments and add new one
-mat$comment("This is the only comment", append = NULL)
-mat$comment()
-
-# delete all comments
-mat$comment(NULL)
-mat$comment()
-
-# get all existing field values
-str(mat$value())
-
-# get values of field 1, 3, 5
-str(mat$value(c(1, 3, 5)))
-
-# get character format values instead of a named list
-mat$value(c(1, 3, 5), simplify = TRUE)
-
-# get values of all field even those that are not set
-str(idf$Zone$`ZONE ONE`$value())
-
-str(idf$Zone$`ZONE ONE`$value(all = TRUE))
-
-# get field values using shortcuts
-mat$Roughness
-mat[["Specific_Heat"]]
-mat[c(1,2)]
-mat[c("Name", "Density")]
-
-# set field values
-mat$set(name = "new_name", Thickness = 0.02)
-mat[c("Name", "Thickness")]
-
-# When `default` argument is set to TRUE and input field values are empty, i.e.
-# NULL, the field values will be reset to defaults.
-mat[c("Thermal Absorptance", "Solar Absorptance")]
-
-mat$set(visible_absorptance = NULL, Solar_Absorptance = NULL, .default = TRUE)
-mat[c("Visible Absorptance", "Solar Absorptance")]
-
-# set field values using shortcuts
-mat$Name <- "another_name"
-mat$Name
-mat[["Thickness"]] <- 0.019
-mat$Thickness
-
-# check validate
-mat$validate()
-mat$is_valid()
-
-# if we set density to a negative number
-mat$definition()$field_range("Density")
-eplusr_option(validate_level = "none") # have to set validate to "none" to do so
-mat$Density <- -1
-eplusr_option(validate_level = "final") # change back to "final" validate level
-mat$is_valid()
-# get other objects that this object refereces
-mat$ref_to_object() # not referencing other objects
-mat$has_ref_to()
-
-# get other objects that reference this object
-mat$ref_by_object() # referenced by construction "FLOOR"
-names(mat$ref_by_object())
-
-mat$has_ref_by()
-
-# check if having any referenced objects or is referenced by other objects
-mat$has_ref()
-
-# get all object data in a data.table format without field units
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))
 
 # get all object data in a data.table format where all field values are put in a
@@ -595,7 +1637,47 @@ str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
 # get all object data in a data.table format where each field becomes a column
 str(mat$to_table(wide = TRUE))
 
-# get string format object
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_string"></a>}}
+\subsection{Method \code{to_string()}}{
+Format current object as a character vector
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$to_string(comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{If \code{FALSE}, all comments will not be included.
+Default: \code{TRUE}.}
+
+\item{\code{leading}}{Leading spaces added to each field. Default: \code{4L}.}
+
+\item{\code{sep_at}}{The character width to separate value string and field
+string. Default: \code{29L} which is the same as IDF Editor.}
+
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for the
+class that objects belong to will be returned. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_string()} returns the text format of current object.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get string format object
 mat$to_string()
 
 # get string format of object, and decrease the space between field values and
@@ -605,17 +1687,78 @@ mat$to_string(sep_at = 15)
 # get string format of object, and decrease the leading space of field values
 mat$to_string(leading = 0)
 
-# print the object without comment
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{IdfObject} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$print(comment = TRUE, auto_sep = TRUE, brief = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{If \code{FALSE}, all comments are not included.}
+
+\item{\code{auto_sep}}{If \code{TRUE}, values and field names are separated at
+the largest character length of values. Default: \code{FALSE}.}
+
+\item{\code{brief}}{If \code{TRUE}, only OBJECT part is printed. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$print()} prints the \code{IdfObject}. Basically, the print output can be
+divided into 3 parts:
+\itemize{
+\item OBJECT: Class name, object id and name (if applicable).
+\item COMMENTS: Object comments if exist.
+\item VALUES: fields and values of current \code{IdfObject}. Required fields are marked
+with start \code{*}. String values are quoted. Numeric values are printed as
+they are. Blank string values are printed as \verb{<"Blank">} and blank number
+values are printed as \verb{<Blank>}.
+}
+}
+
+\subsection{Returns}{
+The \code{IdfObject} itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# print the object without comment
 mat$print(comment = FALSE)
 
 # print the object, and auto separate field values and field names at the
 # largetst character length of field values
 mat$print(auto_sep = TRUE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$clone(deep = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
 }
 }
-\seealso{
-\link{Idf} class
-}
-\author{
-Hongyuan Jia
 }
