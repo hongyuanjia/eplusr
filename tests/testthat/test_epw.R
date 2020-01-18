@@ -3,7 +3,8 @@ test_that("Epw class", {
     clean_tempdir()
     eplusr_option(verbose_info = FALSE)
 
-    skip_if_not(is_avail_eplus(8.8))
+    skip_on_cran()
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- read_epw(path_epw))
@@ -17,7 +18,11 @@ test_that("Epw class", {
     # can read local EPW file
     expect_silent(epw <- read_epw(file.path(tempdir(), "weather.epw")))
 
-    expect_equal(epw$location(),
+    expect_equal(
+        epw$location(city = "Chongqing", state_province = "Chongqing", country = "China",
+            data_source = "TMY", wmo_number = "724944", latitude = 20.0,
+            longitude = -120.0, time_zone = 8L, elevation = 100
+        ),
         list(city = "Chongqing",
              state_province = "Chongqing",
              country = "China",
