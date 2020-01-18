@@ -322,7 +322,7 @@ install_eplus_macos <- function (exec, local = FALSE) {
     no_ext <- tools::file_path_sans_ext(f)
     system(sprintf("sudo hdiutil mount %s", f))
     if (local) {
-        system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target ~", no_ext, no_ext))
+        stop("Local installation is not supported on OS X")
     } else {
         system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
     }
