@@ -16,6 +16,7 @@ NULL
 #' @author Hongyuan Jia
 NULL
 
+#' @export
 # IdfObject {{{
 IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
     public = list(
