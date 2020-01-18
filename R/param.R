@@ -372,7 +372,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 #' @author Hongyuan Jia
 # param_job {{{
 param_job <- function (idf, epw) {
-    Parametric$new(idf, epw)
+    ParametricJob$new(idf, epw)
 }
 # }}}
 
