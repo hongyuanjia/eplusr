@@ -202,6 +202,15 @@ str(group$tabular_data(c(1, 4),
     column_name = "Total Energy",
     row_name = "Total Site Energy"
 ))
+
+# get tabular data in wide format and coerce numeric values
+str(group$tabular_data(c(1, 4),
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy",
+    wide = TRUE, string_value = FALSE
+))
 }
 
 
@@ -1030,7 +1039,9 @@ Read tabular data
   report_for = NULL,
   table_name = NULL,
   column_name = NULL,
-  row_name = NULL
+  row_name = NULL,
+  wide = FALSE,
+  string_value = !wide
 )}\if{html}{\out{</div>}}
 }
 
@@ -1045,6 +1056,20 @@ parametric simulations are returned. Default: \code{NULL}.}
 a character vector for subsetting when querying the SQL
 database.  For the meaning of each argument, please see the
 description above.}
+
+\item{\code{wide}}{If \code{TRUE}, each table will be converted into the similar
+format as it is shown in EnergyPlus HTML output file. Default:
+\code{FALSE}.}
+
+\item{\code{string_value}}{Only applicable when \code{wide} is \code{TRUE}. If
+\code{string_value} is \code{FALSE}, instead of keeping all values as
+characters, values in possible numeric columns are converted
+into numbers. Default: the opposite of \code{wide}. Possible
+numeric columns indicate column that:
+\itemize{
+\item columns that have associated units
+\item columns that contents numbers
+}}
 }
 \if{html}{\out{</div>}}
 }
@@ -1063,7 +1088,7 @@ output from different simulations
 \item \code{column_name}: The name of the column that the record belongs to
 \item \code{row_name}: The name of the row that the record belongs to
 \item \code{units}: The units of the record
-\item \code{value}: The value of the record \strong{in string format}
+\item \code{value}: The value of the record \strong{in string format} by default
 }
 
 For convenience, input character arguments matching in
@@ -1071,7 +1096,10 @@ For convenience, input character arguments matching in
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} with 8 columns.
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 9 columns (when \code{wide} is
+\code{FALSE}) or a named list of \code{\link[data.table:data.table]{data.table::data.table()}}s where the
+names are the combination of \code{report_name}, \code{report_for} and
+\code{table_name}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1085,6 +1113,15 @@ str(group$tabular_data(c(1, 4),
     table_name = "Site and Source Energy",
     column_name = "Total Energy",
     row_name = "Total Site Energy"
+))
+
+# get tabular data in wide format and coerce numeric values
+str(group$tabular_data(c(1, 4),
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy",
+    wide = TRUE, string_value = FALSE
 ))
 }
 

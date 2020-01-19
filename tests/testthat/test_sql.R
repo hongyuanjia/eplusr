@@ -74,6 +74,20 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$tabular_data(table_name = "Site and Source Energy")), 12)
     expect_equal(nrow(sql$tabular_data(column_name = "Total Energy")), 4)
     expect_equal(nrow(sql$tabular_data(row_name = "Total Site Energy")), 3)
+    # can convert to wide table
+    expect_silent(tab <- sql$tabular_data(row_name = "Total Site Energy", wide = TRUE, case = NULL))
+    expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
+    expect_equivalent(tab[[1L]][, lapply(.SD, class)],
+        data.table(
+            report_name = "character",
+            report_for = "character",
+            table_name = "character",
+            row_name = "character",
+            `Energy Per Conditioned Building Area [MJ/m2]` = "numeric",
+            `Energy Per Total Building Area [MJ/m2]` = "numeric",
+            `Total Energy [GJ]` = "numeric"
+        )
+    )
 
     skip_on_os("mac")
     # can get path

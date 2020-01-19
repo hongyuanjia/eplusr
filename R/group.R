@@ -635,7 +635,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' * `column_name`: The name of the column that the record belongs to
         #' * `row_name`: The name of the row that the record belongs to
         #' * `units`: The units of the record
-        #' * `value`: The value of the record **in string format**
+        #' * `value`: The value of the record **in string format** by default
         #'
         #' For convenience, input character arguments matching in
         #' `$tabular_data()` are **case-insensitive**.
@@ -649,7 +649,22 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'        database.  For the meaning of each argument, please see the
         #'        description above.
         #'
-        #' @return A [data.table::data.table()] with 8 columns.
+        #' @param wide If `TRUE`, each table will be converted into the similar
+        #'        format as it is shown in EnergyPlus HTML output file. Default:
+        #'        `FALSE`.
+        #'
+        #' @param string_value Only applicable when `wide` is `TRUE`. If
+        #'        `string_value` is `FALSE`, instead of keeping all values as
+        #'        characters, values in possible numeric columns are converted
+        #'        into numbers. Default: the opposite of `wide`. Possible
+        #'        numeric columns indicate column that:
+        #' * columns that have associated units
+        #' * columns that contents numbers
+        #'
+        #' @return A [data.table::data.table()] with 9 columns (when `wide` is
+        #' `FALSE`) or a named list of [data.table::data.table()]s where the
+        #' names are the combination of `report_name`, `report_for` and
+        #' `table_name`.
         #'
         #' @examples
         #' \dontrun{
@@ -663,13 +678,24 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'     column_name = "Total Energy",
         #'     row_name = "Total Site Energy"
         #' ))
+        #'
+        #' # get tabular data in wide format and coerce numeric values
+        #' str(group$tabular_data(c(1, 4),
+        #'     report_name = "AnnualBuildingUtilityPerformanceSummary",
+        #'     table_name = "Site and Source Energy",
+        #'     column_name = "Total Energy",
+        #'     row_name = "Total Site Energy",
+        #'     wide = TRUE, string_value = FALSE
+        #' ))
         #' }
         #'
         tabular_data = function(which = NULL, report_name = NULL, report_for = NULL,
-                                table_name = NULL, column_name = NULL, row_name = NULL)
+                                table_name = NULL, column_name = NULL, row_name = NULL,
+                                wide = FALSE, string_value = !wide)
             epgroup_tabular_data(self, private, which, report_name = report_name,
                 report_for = report_for, table_name = table_name,
-                column_name = column_name, row_name = row_name),
+                column_name = column_name, row_name = row_name,
+                wide = wide, string_value = string_value),
         # }}}
 
         # print {{{
@@ -1031,12 +1057,28 @@ epgroup_report_data <- function (self, private, which = NULL, key_value = NULL,
 # }}}
 # epgroup_tabular_data {{{
 epgroup_tabular_data <- function (self, private, which = NULL, report_name = NULL, report_for = NULL,
-                                table_name = NULL, column_name = NULL, row_name = NULL) {
-    d <- lapply(epgroup_sql_path(self, private, which), get_sql_tabular_data,
-        report_name = report_name, report_for = report_for,
-        table_name = table_name, column_name = column_name, row_name = row_name
+                                  table_name = NULL, column_name = NULL, row_name = NULL,
+                                  wide = FALSE, string_value = !wide) {
+    cases <- epgroup_case_from_which(self, private, which, name = TRUE)
+
+    l <- Map(get_sql_tabular_data,
+        sql = epgroup_sql_path(self, private, which),
+        case = epgroup_case_from_which(self, private, which, name = TRUE),
+        MoreArgs = list(
+            report_name = report_name, report_for = report_for,
+            table_name = table_name, column_name = column_name, row_name = row_name,
+            wide = wide, string_value = string_value
+        )
     )
-    epgroup_combine_data(self, private, which, d)[]
+
+    if (!wide) return(rbindlist(l, fill = TRUE))
+
+    nm_all <- unique(unlist(lapply(l, names)))
+    names(nm_all) <- nm_all
+
+    lapply(nm_all, function (nm) {
+        rbindlist(lapply(l, function (lst) lst[[nm]]), fill = TRUE)
+    })
 }
 # }}}
 # epgroup_print {{{

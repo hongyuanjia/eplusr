@@ -300,9 +300,10 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' @param tz Time zone of date time in column `datetime`. Default:
         #'        `"UTC"`.
         #'
-        #' @param case If not `NULL`, a character column will be added indicates
-        #'        the case of this simulation. If `"auto"`, the name of the IDF
-        #'        file without extension is used.
+        #' @param case A single string used to add a character column `case` in
+        #'        the returned results to indicate the case of this simulation.
+        #'        If `NULL`, no column is added. If `"auto"`, the name of the
+        #'        IDF file without extension is used. Default: `"auto"`.
         #'
         #' @param all If `TRUE`, extra columns are also included in the returned
         #'        [data.table::data.table()].
@@ -413,8 +414,9 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' `$tabular_data()` extracts the tabular data in a
         #' [data.table::data.table()] using report, table, column and row name
         #' specifications. The returned [data.table::data.table()] has
-        #' 8 columns:
+        #' 9 columns:
         #'
+        #' * `case`: Simulation case specified using `case` argument
         #' * `index`: Tabular data index
         #' * `report_name`: The name of the report that the record belongs to
         #' * `report_for`: The `For` text that is associated with the record
@@ -422,7 +424,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' * `column_name`: The name of the column that the record belongs to
         #' * `row_name`: The name of the row that the record belongs to
         #' * `units`: The units of the record
-        #' * `value`: The value of the record **in string format**
+        #' * `value`: The value of the record **in string format** by default.
         #'
         #' For convenience, input character arguments matching in
         #' `$tabular_data()` are **case-insensitive**.
@@ -431,8 +433,25 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'        a character vector for subsetting when querying the SQL
         #'        database.  For the meaning of each argument, please see the
         #'        description above.
+        #' @param case A single string used to add a character column `case` in
+        #'        the returned results to indicate the case of this simulation.
+        #'        If `NULL`, no column is added. If `"auto"`, the name of the
+        #'        IDF file without extension is used. Default: `"auto"`.
+        #' @param wide If `TRUE`, each table will be converted into the similar
+        #'        format as it is shown in EnergyPlus HTML output file. Default:
+        #'        `FALSE`.
+        #' @param string_value Only applicable when `wide` is `TRUE`. If
+        #'        `string_value` is `FALSE`, instead of keeping all values as
+        #'        characters, values in possible numeric columns are converted
+        #'        into numbers. Default: the opposite of `wide`. Possible
+        #'        numeric columns indicate column that:
+        #' * columns that have associated units
+        #' * columns that contents numbers
         #'
-        #' @return A [data.table::data.table()] with 8 columns.
+        #' @return A [data.table::data.table()] with 9 columns (when `wide` is
+        #' `FALSE`) or a named list of [data.table::data.table()]s where the
+        #' names are the combination of `report_name`, `report_for` and
+        #' `table_name`.
         #'
         #' @examples
         #' \dontrun{
@@ -446,13 +465,24 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'     column_name = "Total Energy",
         #'     row_name = "Total Site Energy"
         #' ))
+        #'
+        #' # get tabular data in wide format and coerce numeric values
+        #' str(sql$tabular_data(
+        #'     report_name = "AnnualBuildingUtilityPerformanceSummary",
+        #'     table_name = "Site and Source Energy",
+        #'     column_name = "Total Energy",
+        #'     row_name = "Total Site Energy",
+        #'     wide = TRUE, string_value = FALSE
+        #' ))
         #' }
         #'
         tabular_data = function(report_name = NULL, report_for = NULL, table_name = NULL,
-                                column_name = NULL, row_name = NULL)
+                                column_name = NULL, row_name = NULL,
+                                case = "auto", wide = FALSE, string_value = !wide)
             sql_tabular_data(self, private, report_name = report_name,
                 report_for = report_for, table_name = table_name,
-                column_name = column_name, row_name = row_name),
+                column_name = column_name, row_name = row_name,
+                case = case, wide = wide, string_value = string_value),
         # }}}
 
         # print {{{
@@ -560,9 +590,12 @@ sql_report_data <- function (self, private, key_value = NULL, name = NULL, year 
 # }}}
 # sql_tabular_data {{{
 sql_tabular_data <- function (self, private, report_name = NULL, report_for = NULL,
-                              table_name = NULL, column_name = NULL, row_name = NULL) {
+                              table_name = NULL, column_name = NULL, row_name = NULL,
+                              case = "auto", wide = FALSE, string_value = !wide) {
+    if (identical(case, "auto")) case <- tools::file_path_sans_ext(basename(private$m_path_sql))
     get_sql_tabular_data(private$m_path_sql, report_name = report_name, report_for = report_for,
-        table_name = table_name, column_name = column_name, row_name = row_name)
+        table_name = table_name, column_name = column_name, row_name = row_name,
+        case = case, wide = wide, string_value = string_value)
 }
 # }}}
 # sql_print {{{
