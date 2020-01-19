@@ -102,6 +102,21 @@ test_that("Group methods", {
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler", table_name = "Site and Source Energy")), 12)
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler" ,column_name = "Total Energy")), 4)
     expect_equal(nrow(grp$tabular_data("1zoneevapcooler", row_name = "Total Site Energy")), 3)
+    # can convert to wide table
+    expect_silent(tab <- grp$tabular_data("1zoneevapcooler", row_name = "Total Site Energy", wide = TRUE))
+    expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
+    expect_equivalent(tab[[1L]][, lapply(.SD, class)],
+        data.table(
+            case = "character",
+            report_name = "character",
+            report_for = "character",
+            table_name = "character",
+            row_name = "character",
+            `Energy Per Conditioned Building Area [MJ/m2]` = "numeric",
+            `Energy Per Total Building Area [MJ/m2]` = "numeric",
+            `Total Energy [GJ]` = "numeric"
+        )
+    )
     # }}}
 
     # Report Data {{{

@@ -141,7 +141,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/RtmprrcDIJ/temp_libpath2117415c8234/eplusr/extdata/1ZoneUnco...
+#>  * Path: '/tmp/RtmpKBABCZ/temp_libpath32e07f6ab0f9/eplusr/extdata/1ZoneUnco...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -372,12 +372,12 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/RtmprrcDIJ/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpKBABCZ/model.idf.
 #> ExpandObjects Started.
 #> No expanded file generated.
 #> ExpandObjects Finished. Time:     0.000
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.19 18:03
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.20 02:50
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -411,7 +411,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-01-19 18:03:00
+#>   * Simulation started: 2020-01-20 02:50:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
@@ -462,19 +462,16 @@ all(weekdays(results$datetime) == results$day_type)
 #> [1] TRUE
 
 # get tabular data
-job$tabular_data(table_name = "site and source energy", row_name = "total site energy")
-#>    index                             report_name      report_for
-#> 1:     1 AnnualBuildingUtilityPerformanceSummary Entire Facility
-#> 2:     5 AnnualBuildingUtilityPerformanceSummary Entire Facility
-#> 3:     9 AnnualBuildingUtilityPerformanceSummary Entire Facility
-#>                table_name                          column_name
-#> 1: Site and Source Energy                         Total Energy
-#> 2: Site and Source Energy       Energy Per Total Building Area
-#> 3: Site and Source Energy Energy Per Conditioned Building Area
-#>             row_name units        value
-#> 1: Total Site Energy    GJ        89.81
-#> 2: Total Site Energy MJ/m2       386.67
-#> 3: Total Site Energy MJ/m2
+job$tabular_data(table_name = "site and source energy", row_name = "total site energy", wide = TRUE)
+#> $`AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy`
+#>     case                             report_name      report_for
+#> 1: model AnnualBuildingUtilityPerformanceSummary Entire Facility
+#>                table_name          row_name
+#> 1: Site and Source Energy Total Site Energy
+#>    Energy Per Conditioned Building Area [MJ/m2]
+#> 1:                                             
+#>    Energy Per Total Building Area [MJ/m2] Total Energy [GJ]
+#> 1:                                 386.67             89.81
 ```
 
 ## Acknowledgement

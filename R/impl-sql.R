@@ -339,9 +339,77 @@ get_sql_report_data_dict <- function (sql) {
 # }}}
 # get_sql_tabular_data {{{
 get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
-                                  table_name = NULL, column_name = NULL, row_name = NULL) {
+                                  table_name = NULL, column_name = NULL, row_name = NULL,
+                                  case = "auto", wide = FALSE, string_value = !wide) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
-    setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
+    dt <- setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
+
+    if (not_empty(case)) {
+        assert(is_scalar(case))
+        case_name <- as.character(case)
+        set(dt, NULL, "case", case_name)
+        setcolorder(dt, c("case", setdiff(names(dt), "case")))
+    }
+
+    if (!wide) return(dt)
+
+    if (!string_value) {
+        dt[!J(c("", " ")), on = "units", is_num := TRUE]
+        # https://stackoverflow.com/questions/638565/parsing-scientific-notation-sensibly
+        dt[, is_num := any(stri_detect_regex(value, "^\\s*-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?$")),
+            by = c("report_name", "report_for", "table_name", "column_name")]
+    }
+
+    # add row index
+    dt[, row_index := seq_len(.N), by = c("case"[has_name(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
+
+    # remove empty rows
+    dt <- dt[!J(c("", "-"), c("", "-")), on = c("row_name", "value")]
+
+    # fill downwards row names
+    if (nrow(dt)) {
+        dt[, row_name := row_name[[1L]],
+            by = list(report_name, report_for, table_name, column_name, cumsum(row_name != ""))]
+    }
+
+    # combine column names and units
+    dt[!J("", " "), on = "units", column_name := paste0(column_name, " [", units, "]")]
+
+    l <- split(dt, by = c("report_name", "report_for", "table_name"))
+    lapply(l, wide_tabular_data, string_value = string_value)
+}
+# }}}
+# wide_tabular_data {{{
+wide_tabular_data <- function (dt, string_value = TRUE) {
+    # retain original column order
+    cols <- unique(dt$column_name)
+
+    # get numeric columns
+    cols_num <- unique(dt$column_name[dt$is_num])
+
+    # format table
+    if (has_name(dt, "case")) {
+        dt <- data.table::dcast.data.table(dt,
+            case + report_name + report_for + table_name + row_index + row_name ~ column_name,
+            value.var = "value"
+        )
+    } else {
+        dt <- data.table::dcast.data.table(dt,
+            report_name + report_for + table_name + row_index + row_name ~ column_name,
+            value.var = "value"
+        )
+    }
+
+    # clean
+    data.table::set(dt, NULL, "row_index", NULL)
+
+    # coerece type
+    if (!string_value && length(cols_num)) {
+        as_numeric <- function (x) suppressWarnings(as.numeric(x))
+        dt[, c(cols_num) := lapply(.SD, as_numeric), .SDcols = cols_num]
+    }
+
+    dt[]
 }
 # }}}
 # get_sql_wday {{{

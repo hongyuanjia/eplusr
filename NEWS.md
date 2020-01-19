@@ -101,6 +101,17 @@
   Please see `?install_eplus` for details.
 * All documentation in R6 classes have been update thanks to roxyten2 R6 support (#156).
 * Deprecated methods in each class have all been remove (#156).
+* New parameter `case` has been added in
+  `EplusSql$tabular_data()`. Similar like `case` paramter in
+  `EplusSql$report_data()`, it lets you to add a `case` column to indicate the
+  case of simulation. This brings some changes in the returned results of
+  `EplusSql$tabular_data()`. Compared to previous version, there will always be
+  a `case` column, unless `case` parameter is set to `NULL` (#182).
+* New parameter `wide` and `string_value` have been added in
+  `EplusSql$tabular_data()` and `EplusGroupJob$tabular_data()`. When `wide` is
+  `TRUE`, each table will be converted into the similar format as it is shown in
+  EnergyPlus HTML output file. And when `string_value` is `FALSE`, values in
+  possible numeric columns are converted into numbers (#182).
 
 ## Bug fixes
 

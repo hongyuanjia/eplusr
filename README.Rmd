@@ -233,7 +233,7 @@ str(results)
 all(weekdays(results$datetime) == results$day_type)
 
 # get tabular data
-job$tabular_data(table_name = "site and source energy", row_name = "total site energy")
+job$tabular_data(table_name = "site and source energy", row_name = "total site energy", wide = TRUE)
 ```
 
 ```{r del_job, include = FALSE}

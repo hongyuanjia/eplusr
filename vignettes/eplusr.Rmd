@@ -805,8 +805,10 @@ Now let's get the total site energy per total building area. Note that the
 store not just numbers. We need to manually convert it.
 
 ```{r tab, eval = can_run}
-site_energy <- job$tabular_data(column_name = "energy per total building area", row_name = "total site energy")
-site_energy[, value := as.numeric(value)]
+site_energy <- job$tabular_data(
+    column_name = "energy per total building area", row_name = "total site energy",
+    wide = TRUE, string_value = FALSE
+)[[1]]
 str(site_energy)
 ```
 
@@ -897,9 +899,9 @@ After all simulations completed, let's see the variations of total energy.
 
 ```{r param_res, eval = can_run}
 tab <- param$tabular_data(
-  table_name = "Site and Source Energy",
-  column_name = "Total Energy",
-  row_name = "Total Site Energy"
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy"
 )
 
 total_eng <- tab[, list(case, `Total Energy (GJ)` = as.numeric(value))]
