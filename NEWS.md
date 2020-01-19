@@ -99,6 +99,8 @@
   install_eplus(8.8, local = TRUE, dir = "~/MyPrograms")
   ```
   Please see `?install_eplus` for details.
+* All documentation in R6 classes have been update thanks to roxyten2 R6 support (#156).
+* Deprecated methods in each class have all been remove (#156).
 
 ## Bug fixes
 
