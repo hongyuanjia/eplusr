@@ -90,14 +90,14 @@ in interactive mode.
     faster than VersionUpdater distributed with EnergyPlus
 
 **Turn RStudio into a model editor via autocompletion**  
-<img src="tools/figures/autocomplete.gif" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true" width="60%" />
 
 **Query and modify weather file**  
-<img src="tools/figures/epw.gif" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true" width="60%" />
 
 **Query output via SQL in Tidy format which is much better for data
 analysis**  
-<img src="tools/figures/job.gif" width="60%" />
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true" width="60%" />
 
 ## Usage overview
 
@@ -131,7 +131,7 @@ library(eplusr)
 idd <- use_idd(8.8, download = "auto")
 #> IDD v8.8.0 has not been parsed before.
 #> Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
-#> IDD file found: '/usr/local/EnergyPlus-8-8-0/Energy+.idd'.
+#> IDD file found: '/home/hongyuanjia/.local/EnergyPlus-8-8-0/Energy+.idd'.
 #> Start parsing...
 #> Parsing completed.
 
@@ -140,8 +140,8 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 
 # print idf
 idf
-#> ── EnergPlus Input Data File ──────────────────────────────────────────────
-#>  * Path: '/tmp/RtmpQCPcsH/temp_libpath1f556bf719ab/eplusr/extdata/1Zon...
+#> ── EnergPlus Input Data File ───────────────────────────────────────────────────
+#>  * Path: '/tmp/RtmprrcDIJ/temp_libpath2117415c8234/eplusr/extdata/1ZoneUnco...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -185,10 +185,10 @@ idf$Material_NoMass$R13LAYER
 
 # get object relation
 idf$object_relation("R13LAYER", "all")
-#> ── Refer to Others ────────────────────────────────────────────────────────
+#> ── Refer to Others ─────────────────────────────────────────────────────────────
 #> Target(s) does not refer to any other field.
 #> 
-#> ── Referred by Others ─────────────────────────────────────────────────────
+#> ── Referred by Others ──────────────────────────────────────────────────────────
 #>   Class: <Material:NoMass>
 #>   └─ Object [ID:12] <R13LAYER>
 #>      └─ 1: "R13LAYER";    !- Name
@@ -197,7 +197,7 @@ idf$object_relation("R13LAYER", "all")
 #>            └─ Object [ID:15] <R13WALL>
 #>               └─ 2: "R13LAYER";    !- Outside Layer
 #> 
-#> ── Node Relation ──────────────────────────────────────────────────────────
+#> ── Node Relation ───────────────────────────────────────────────────────────────
 #> Target(s) has no node or their nodes have no reference to other object.
 
 # extract field value
@@ -227,7 +227,7 @@ idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 
 # get possible values for fields
 idf$Construction$FLOOR$value_possible("Outside Layer")
-#> ── 2: Outside Layer ───────────────────────────────────────────────────────
+#> ── 2: Outside Layer ────────────────────────────────────────────────────────────
 #> * Auto value: <NA>
 #> * Default: <NA>
 #> * Choice: <NA>
@@ -238,30 +238,30 @@ idf$Construction$FLOOR$value_possible("Outside Layer")
 
 # extract object data
 idf$to_table(class = "BuildingSurface:Detailed", string_value = FALSE, unit = TRUE)
-#>      id          name                    class index
-#>   1: 21 Zn001:Wall001 BuildingSurface:Detailed     1
-#>   2: 21 Zn001:Wall001 BuildingSurface:Detailed     2
-#>   3: 21 Zn001:Wall001 BuildingSurface:Detailed     3
-#>   4: 21 Zn001:Wall001 BuildingSurface:Detailed     4
-#>   5: 21 Zn001:Wall001 BuildingSurface:Detailed     5
-#>  ---                                                
-#> 128: 26 Zn001:Roof001 BuildingSurface:Detailed    18
-#> 129: 26 Zn001:Roof001 BuildingSurface:Detailed    19
-#> 130: 26 Zn001:Roof001 BuildingSurface:Detailed    20
-#> 131: 26 Zn001:Roof001 BuildingSurface:Detailed    21
-#> 132: 26 Zn001:Roof001 BuildingSurface:Detailed    22
-#>                           field         value
-#>   1:                       Name Zn001:Wall001
-#>   2:               Surface Type          Wall
-#>   3:          Construction Name       R13WALL
-#>   4:                  Zone Name      ZONE ONE
-#>   5: Outside Boundary Condition      Outdoors
-#>  ---                                         
-#> 128:      Vertex 3 Y-coordinate         0 [m]
-#> 129:      Vertex 3 Z-coordinate     4.572 [m]
-#> 130:      Vertex 4 X-coordinate     15.24 [m]
-#> 131:      Vertex 4 Y-coordinate     15.24 [m]
-#> 132:      Vertex 4 Z-coordinate     4.572 [m]
+#>      id          name                    class index                      field
+#>   1: 21 Zn001:Wall001 BuildingSurface:Detailed     1                       Name
+#>   2: 21 Zn001:Wall001 BuildingSurface:Detailed     2               Surface Type
+#>   3: 21 Zn001:Wall001 BuildingSurface:Detailed     3          Construction Name
+#>   4: 21 Zn001:Wall001 BuildingSurface:Detailed     4                  Zone Name
+#>   5: 21 Zn001:Wall001 BuildingSurface:Detailed     5 Outside Boundary Condition
+#>  ---                                                                           
+#> 128: 26 Zn001:Roof001 BuildingSurface:Detailed    18      Vertex 3 Y-coordinate
+#> 129: 26 Zn001:Roof001 BuildingSurface:Detailed    19      Vertex 3 Z-coordinate
+#> 130: 26 Zn001:Roof001 BuildingSurface:Detailed    20      Vertex 4 X-coordinate
+#> 131: 26 Zn001:Roof001 BuildingSurface:Detailed    21      Vertex 4 Y-coordinate
+#> 132: 26 Zn001:Roof001 BuildingSurface:Detailed    22      Vertex 4 Z-coordinate
+#>              value
+#>   1: Zn001:Wall001
+#>   2:          Wall
+#>   3:       R13WALL
+#>   4:      ZONE ONE
+#>   5:      Outdoors
+#>  ---              
+#> 128:         0 [m]
+#> 129:     4.572 [m]
+#> 130:     15.24 [m]
+#> 131:     15.24 [m]
+#> 132:     4.572 [m]
 
 # read EPW
 path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
@@ -269,7 +269,7 @@ epw <- read_epw(path_epw)
 
 # print weather
 epw
-#> ══ EnergyPlus Weather File ════════════════════════════════════════════════
+#> ══ EnergyPlus Weather File ═════════════════════════════════════════════════════
 #> [Location ]: San Francisco Intl Ap, CA, USA
 #>              {N 37°37'}, {W 122°24'}, {UTC-08:00}
 #> [Elevation]: 2m above see level
@@ -278,11 +278,11 @@ epw
 #> [Leap Year]: FALSE
 #> [Interval ]: 60 mins
 #> 
-#> ── Data Periods ───────────────────────────────────────────────────────────
+#> ── Data Periods ────────────────────────────────────────────────────────────────
 #>    Name StartDayOfWeek StartDay EndDay
 #> 1: Data         Sunday     1/ 1  12/31
 #> 
-#> ───────────────────────────────────────────────────────────────────────────
+#> ────────────────────────────────────────────────────────────────────────────────
 
 # get location
 (loc <- epw$location())
@@ -372,12 +372,12 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/RtmpQCPcsH/model.idf.
+#> Replace the existing IDF located at /tmp/RtmprrcDIJ/model.idf.
 #> ExpandObjects Started.
 #> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.008
+#> ExpandObjects Finished. Time:     0.000
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2019.11.10 03:45
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.19 18:03
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -404,23 +404,25 @@ job <- idf$run(epw)
 #> Warming up {18}
 #> Warming up {19}
 ....
+#> Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
+#> had status 1
 
 # print simulation error
 job$errors()
-#> ══ EnergyPlus Error File ══════════════════════════════════════════════════
+#> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2019-11-10 03:45:00
+#>   * Simulation started: 2020-01-19 18:03:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
 #> 
-#> ── During Simulation Initiation ───────────────────────────────────────────
-#> [W 1/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs
-#>         by more than 10% from Standard Barometric Pressure=101301.
-#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99%
-#>         CONDNS DB, Standard Pressure (based on elevation) will be used.
-#> [W 2/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs
-#>         by more than 10% from Standard Barometric Pressure=101301.
+#> ── During Simulation Initiation ────────────────────────────────────────────────
+#> [W 1/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by
+#>         more than 10% from Standard Barometric Pressure=101301.
+#>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN HTG 99% CONDNS DB,
+#>         Standard Pressure (based on elevation) will be used.
+#> [W 2/2] SetUpDesignDay: Entered DesignDay Barometric Pressure=81198 differs by
+#>         more than 10% from Standard Barometric Pressure=101301.
 #>         ...occurs in DesignDay=DENVER CENTENNIAL GOLDEN N ANN CLG 1% CONDNS
 #>         DB=>MWB, Standard Pressure (based on elevation) will be used.
 

@@ -122,17 +122,17 @@ if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
 
 **Turn RStudio into a model editor via autocompletion**\
 ```{r, echo = FALSE, out.width = "60%"}
-knitr::include_graphics("tools/figures/autocomplete.gif")
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true")
 ```
 
 **Query and modify weather file**\
 ```{r, echo = FALSE, out.width = "60%"}
-knitr::include_graphics("tools/figures/epw.gif")
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/epw.gif?raw=true")
 ```
 
 **Query output via SQL in Tidy format which is much better for data analysis**\
 ```{r, echo = FALSE, out.width = "60%"}
-knitr::include_graphics("tools/figures/job.gif")
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/job.gif?raw=true")
 ```
 
 ## Usage overview
