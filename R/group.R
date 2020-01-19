@@ -169,7 +169,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'     - `idf`: The path of input IDF file.
         #'     - `epw`: The path of input EPW file. If not provided, `NA` will be
         #'       assigned.
-        #' @return A named list.
+        #'
+        #' @return A named list of 6 elements.
         #'
         #' @examples
         #' \dontrun{
@@ -203,8 +204,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'
         #' # show all information
         #' group$errors(info = TRUE)
-        #'
         #' }
+        #'
         errors = function (which = NULL, info = FALSE)
             epgroup_output_errors(self, private, which, info),
         # }}}
@@ -219,6 +220,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param which An integer vector of the indexes or a character vector
         #'        or names of parametric simulations. If `NULL`, results of all
         #'        parametric simulations are returned. Default: `NULL`.
+        #'
+        #' @return A character vector.
         #'
         #' @examples
         #' \dontrun{
@@ -249,6 +252,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param strict If `TRUE`, it will check if the simulation was
         #'        terminated, is still running or the file exists or not.
         #'        Default: `TRUE`.
+        #'
+        #' @return A character vector.
         #'
         #' @examples
         #' \dontrun{

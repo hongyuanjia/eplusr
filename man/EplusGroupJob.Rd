@@ -79,8 +79,8 @@ group$errors()
 
 # show all information
 group$errors(info = TRUE)
-
 }
+
 
 ## ------------------------------------------------
 ## Method `EplusGroupJob$output_dir`
@@ -429,7 +429,7 @@ assigned.
 }
 
 \subsection{Returns}{
-A named list.
+A named list of 6 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -479,8 +479,8 @@ group$errors()
 
 # show all information
 group$errors(info = TRUE)
-
 }
+
 }
 \if{html}{\out{</div>}}
 
@@ -508,6 +508,9 @@ parametric simulations are returned. Default: \code{NULL}.}
 \verb{$output_dir()} returns the output directory of simulation results.
 }
 
+\subsection{Returns}{
+A character vector.
+}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
@@ -553,6 +556,9 @@ Default: \code{TRUE}.}
 simulations.
 }
 
+\subsection{Returns}{
+A character vector.
+}
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
