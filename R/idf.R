@@ -79,12 +79,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An `Idf` object.
         #'
         #' @examples
+        #' \dontrun{
         #' # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
         #' # occur. If Idd v8.8 is found, it will be used automatically.
-        #' \dontrun{idf <- Idf$new(path_idf)}
+        #' idf <- Idf$new(path_idf)
         #'
         #' # argument `idd` can be specified explicitly using `use_idd()`
-        #' \dontrun{idf <- Idf$new(path_idf, idd = use_idd(8.8))}
+        #' idf <- Idf$new(path_idf, idd = use_idd(8.8))
         #'
         #' # you can set `download` arugment to "auto" in `use_idd()` if you
         #' # want to automatically download corresponding IDD file when
@@ -101,6 +102,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'     "
         #'
         #' Idf$new(string_idf, use_idd(8.8, download = "auto"))
+        #' }
         #'
         initialize = function (path, idd = NULL) {
             # only store if input is a path
@@ -149,8 +151,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @return A [base::numeric_version()] object.
         #' @examples
+        #' \dontrun{
         #' # get version
         #' idf$version()
+        #' }
         #'
         version = function ()
             idf_version(self, private),
@@ -168,11 +172,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return `NULL` or a single string.
         #'
         #' @examples
+        #' \dontrun{
         #' # get path
         #' idf$path()
         #'
         #' # return `NULL` if Idf is not created from a file
         #' Idf$new("Version, 8.8;\n")$path()
+        #' }
         #'
         path = function ()
             idf_path(self, private),
@@ -197,6 +203,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get names of all groups Idf contains
         #' idf$group_name()
         #'
@@ -205,6 +212,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # get names of all available groups in underlying Idd
         #' idf$group_name(all = TRUE)
+        #' }
         #'
         group_name = function (all = FALSE, sorted = TRUE)
             idf_group_name(self, private, all, sorted),
@@ -233,6 +241,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' character vectors when `by_group` is `TRUE`.
         #'
         #' @examples
+        #' \dontrun{
         #' # get names of all classes in Idf
         #' idf$class_name()
         #'
@@ -248,6 +257,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # get names of all available classes grouped by group names in
         #' # underlying Idd
         #' idf$class_name(all = TRUE, by_group = TRUE)
+        #' }
         #'
         class_name = function (all = FALSE, sorted = TRUE, by_group = FALSE)
             idf_class_name(self, private, all, sorted, by_group),
@@ -275,11 +285,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # check if input is a valid group name in current Idf
         #' idf$is_valid_group(c("Schedules", "Compliance Objects"))
         #'
         #' # check if input is a valid group name in underlying Idd
         #' idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
+        #' }
         #'
         is_valid_group = function (group, all = FALSE)
             idf_is_valid_group_name(self, private, group, all),
@@ -307,11 +319,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # check if input is a valid class name in current Idf
         #' idf$is_valid_class(c("Building", "ShadowCalculation"))
         #'
         #' # check if input is a valid class name in underlying Idd
         #' idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
+        #' }
         #'
         is_valid_class = function (class, all = FALSE)
             idf_is_valid_class_name(self, private, class, all),
@@ -332,8 +346,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An [IddObject] object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get the IddObject object for specified class
         #' idf$definition("Version")
+        #' }
         #'
         definition = function (class)
             idf_definition(self, private, class),
@@ -365,6 +381,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' of integer vectors (when `simplify` is `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' # get IDs of all objects in current Idf object
         #' idf$object_id()
         #'
@@ -378,6 +395,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # get IDs of objects in class Version and Zone, and merge them into a
         #' # single integer vector
         #' idf$object_id(c("Version", "Zone"), simplify = TRUE)
+        #' }
         #'
         object_id = function (class = NULL, simplify = FALSE)
             idf_object_id(self, private, class, simplify),
@@ -412,6 +430,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' list of character vectors (when `simplify` is `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' # get names of all objects in current Idf object
         #' idf$object_name()
         #'
@@ -425,6 +444,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # get names of objects in class Version and Zone, and merge them into
         #' # a single character vector
         #' idf$object_name(c("Version", "Zone"), simplify = TRUE)
+        #' }
         #'
         object_name = function (class = NULL, simplify = FALSE)
             idf_object_name(self, private, class, simplify),
@@ -446,11 +466,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An integer vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get total number of objects
         #' idf$object_num()
         #'
         #' # get number of objects in class Zone and Schedule:Compact
         #' idf$object_num(c("Zone", "Schedule:Compact"))
+        #' }
         #'
         object_num = function (class = NULL)
             idf_object_num(self, private, class),
@@ -470,7 +492,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$is_valid_id(c(51, 1000))
+        #' }
         #'
         is_valid_id = function (id)
             idf_is_valid_object_id(self, private, id),
@@ -494,10 +518,12 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
         #'
         #' # name matching is case-insensitive
         #' idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
+        #' }
         #'
         is_valid_name = function (name)
             idf_is_valid_object_name(self, private, name),
@@ -529,12 +555,14 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An [IdfObject] object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get an object whose ID is 3
         #' idf$object(3)
         #'
         #' # get an object whose name is "simple one zone (wireframe dxf)"
         #' # NOTE: object name matching is case-insensitive
         #' idf$object("simple one zone (wireframe dxf)")
+        #' }
         #'
         object = function (which)
             idf_obj(self, private, which),
@@ -566,12 +594,14 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get objects whose IDs are 3 and 10
         #' idf$objects(c(3,10))
         #'
         #' # get objects whose names are "Simple One Zone (Wireframe DXF)" and "ZONE ONE"
         #' # NOTE: object name matching is case-insensitive
         #' idf$objects(c("Simple One Zone (Wireframe DXF)", "zone one"))
+        #' }
         #'
         objects = function (which)
             idf_objects(self, private, which),
@@ -612,12 +642,14 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An [IdfObject] object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get the SimulationColtrol object
         #' idf$object_unique("SimulationControl")
         #'
         #' # S3 "[[" and "$" can also be used
         #' idf$SimulationControl
         #' idf[["SimulationControl"]]
+        #' }
         #'
         object_unique = function (class)
             idf_object_unique(self, private, class),
@@ -654,12 +686,14 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all objects in Zone class
         #' idf$objects_in_class("Zone")
         #'
         #' # S3 "[[" and "$" can also be used
         #' idf$Zone
         #' idf[["Zone"]]
+        #' }
         #'
         objects_in_class = function (class)
             idf_objects_in_class(self, private, class),
@@ -679,8 +713,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all objects in Schedules group
         #' idf$objects_in_group("Schedules")
+        #' }
         #'
         objects_in_group = function (group)
             idf_objects_in_group(self, private, group),
@@ -742,11 +778,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' Each [data.table::data.table()] contains 24 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # check each layer's reference of a construction named FLOOR
         #' idf$object_relation("floor", "ref_to")
         #'
         #' # check where is this construction being used
         #' idf$object_relation("floor", "ref_by")
+        #' }
         #'
         object_relation = function (which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
             idf_object_relation(self, private, which, match.arg(direction), recursive = recursive, recursive_depth = depth),
@@ -802,12 +840,15 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        all possible recursive relations are returned. Default: `1`.
         #'
         #' @return An named list of [IdfObject] objects.
+        #'
         #' @examples
+        #' \dontrun{
         #' # get a construction named FLOOR and all materials it uses
         #' idf$objects_in_relation("floor", "ref_to")
         #'
         #' # get a construction named FLOOR and all surfaces that uses it
         #' idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+        #' }
         #'
         objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
             idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive, recursive_depth = depth),
@@ -833,8 +874,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all objects whose names contains "floor"
         #' idf$search_object("floor", ignore.case = TRUE)
+        #' }
         #'
         search_object = function (pattern, class = NULL, ignore.case = FALSE,
                                   perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -1198,8 +1241,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of renamed [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$objects(c("on/off", "test 352a"))
         #' idf$rename(on_off = "on/off", test_352a = 51)
+        #' }
         #'
         rename = function (...)
             idf_rename(self, private, ...),
@@ -1482,6 +1527,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of updated [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # update objects from string definitions:
         #' str <- idf$to_string("zone one", header = FALSE, format = "new_top")
         #' str[8] <- "2," # Multiplier
@@ -1491,6 +1537,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' dt <- idf$to_table("zone one")
         #' dt[field == "Multiplier", value := "1"]
         #' idf$update(dt)
+        #' }
         #'
         update = function (..., .default = TRUE, .empty = FALSE)
             idf_update(self, private, ..., .default = .default, .empty = .empty),
@@ -1560,11 +1607,13 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # search values that contains "floor"
         #' idf$search_value("floor", ignore.case = TRUE)
         #'
         #' # search values that contains "floor" in class Construction
         #' idf$search_value("floor", "Construction", ignore.case = TRUE)
+        #' }
         #'
         search_value = function (pattern, class = NULL, ignore.case = FALSE,
                                  perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -1604,8 +1653,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # search values that contains "win" and replace them with "windows"
-        #' \dontrun{idf$replace_value("win", "windows")}
+        #' idf$replace_value("win", "windows")
+        #' }
         #'
         replace_value = function (pattern, replacement, class = NULL, ignore.case = FALSE,
                                   perl = FALSE, fixed = FALSE, useBytes = FALSE)
@@ -1855,6 +1906,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get text format of the whole Idf
         #' head(idf$to_string())
         #'
@@ -1869,6 +1921,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # tweak output formatting
         #' head(idf$to_string("floor", leading = 0, sep_at = 0))
+        #' }
         #'
         to_string = function (which = NULL, class = NULL, comment = TRUE,
                               header = TRUE, format = eplusr_option("save_format"),
@@ -1927,6 +1980,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A [data.table][data.table::data.table()] with 6 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # extract whole Idf data
         #' idf$to_table()
         #'
@@ -1953,6 +2007,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # get a wide table with actual values
         #' idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
+        #' }
         #'
         to_table = function (which = NULL, class = NULL, string_value = TRUE,
                              unit = FALSE, wide = FALSE, align = FALSE, all = FALSE)
@@ -1972,7 +2027,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A single logical value of `TRUE` or `FALSE`.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$is_unsaved()
+        #' }
         #'
         is_unsaved = function ()
             idf_is_unsaved(self, private),
@@ -2165,6 +2222,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return The `Idf` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$print("group")
         #' idf$print("class")
         #' idf$print("object")
@@ -2173,6 +2231,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # order objects by there classes
         #' idf$print("object", order = FALSE)
         #' idf$print("field", order = FALSE)
+        #' }
         #'
         print = function (zoom = "class", order = TRUE)
             idf_print(self, private, zoom, order)

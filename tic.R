@@ -38,7 +38,7 @@ if (ci_get_branch() == "master" && Sys.getenv("TRAVIS_OS_NAME") == "linux" && Sy
         })
 
     get_stage("deploy") %>%
-        add_step(step_build_pkgdown(document = FALSE))
+        add_step(step_build_pkgdown(document = FALSE, run_dont_run = TRUE))
 
     get_stage("deploy") %>%
         add_step(step_push_deploy(path = "docs", branch = "gh-pages"))

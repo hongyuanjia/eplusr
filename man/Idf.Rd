@@ -46,12 +46,13 @@ path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v
 ## Method `Idf$new`
 ## ------------------------------------------------
 
+\dontrun{
 # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
-\dontrun{idf <- Idf$new(path_idf)}
+idf <- Idf$new(path_idf)
 
 # argument `idd` can be specified explicitly using `use_idd()`
-\dontrun{idf <- Idf$new(path_idf, idd = use_idd(8.8))}
+idf <- Idf$new(path_idf, idd = use_idd(8.8))
 
 # you can set `download` arugment to "auto" in `use_idd()` if you
 # want to automatically download corresponding IDD file when
@@ -68,31 +69,37 @@ string_idf <-
     "
 
 Idf$new(string_idf, use_idd(8.8, download = "auto"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$version`
 ## ------------------------------------------------
 
+\dontrun{
 # get version
 idf$version()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$path`
 ## ------------------------------------------------
 
+\dontrun{
 # get path
 idf$path()
 
 # return `NULL` if Idf is not created from a file
 Idf$new("Version, 8.8;\n")$path()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$group_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get names of all groups Idf contains
 idf$group_name()
 
@@ -101,12 +108,14 @@ idf$group_name(sorted = FALSE)
 
 # get names of all available groups in underlying Idd
 idf$group_name(all = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$class_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get names of all classes in Idf
 idf$class_name()
 
@@ -122,42 +131,50 @@ idf$class_name(all = TRUE)
 # get names of all available classes grouped by group names in
 # underlying Idd
 idf$class_name(all = TRUE, by_group = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid_group`
 ## ------------------------------------------------
 
+\dontrun{
 # check if input is a valid group name in current Idf
 idf$is_valid_group(c("Schedules", "Compliance Objects"))
 
 # check if input is a valid group name in underlying Idd
 idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid_class`
 ## ------------------------------------------------
 
+\dontrun{
 # check if input is a valid class name in current Idf
 idf$is_valid_class(c("Building", "ShadowCalculation"))
 
 # check if input is a valid class name in underlying Idd
 idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$definition`
 ## ------------------------------------------------
 
+\dontrun{
 # get the IddObject object for specified class
 idf$definition("Version")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object_id`
 ## ------------------------------------------------
 
+\dontrun{
 # get IDs of all objects in current Idf object
 idf$object_id()
 
@@ -171,12 +188,14 @@ idf$object_id(c("Version", "Zone"))
 # get IDs of objects in class Version and Zone, and merge them into a
 # single integer vector
 idf$object_id(c("Version", "Zone"), simplify = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get names of all objects in current Idf object
 idf$object_name()
 
@@ -190,120 +209,143 @@ idf$object_name(c("Version", "Zone"))
 # get names of objects in class Version and Zone, and merge them into
 # a single character vector
 idf$object_name(c("Version", "Zone"), simplify = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object_num`
 ## ------------------------------------------------
 
+\dontrun{
 # get total number of objects
 idf$object_num()
 
 # get number of objects in class Zone and Schedule:Compact
 idf$object_num(c("Zone", "Schedule:Compact"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid_id`
 ## ------------------------------------------------
 
+\dontrun{
 idf$is_valid_id(c(51, 1000))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid_name`
 ## ------------------------------------------------
 
+\dontrun{
 idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
 
 # name matching is case-insensitive
 idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object`
 ## ------------------------------------------------
 
+\dontrun{
 # get an object whose ID is 3
 idf$object(3)
 
 # get an object whose name is "simple one zone (wireframe dxf)"
 # NOTE: object name matching is case-insensitive
 idf$object("simple one zone (wireframe dxf)")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$objects`
 ## ------------------------------------------------
 
+\dontrun{
 # get objects whose IDs are 3 and 10
 idf$objects(c(3,10))
 
 # get objects whose names are "Simple One Zone (Wireframe DXF)" and "ZONE ONE"
 # NOTE: object name matching is case-insensitive
 idf$objects(c("Simple One Zone (Wireframe DXF)", "zone one"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object_unique`
 ## ------------------------------------------------
 
+\dontrun{
 # get the SimulationColtrol object
 idf$object_unique("SimulationControl")
 
 # S3 "[[" and "$" can also be used
 idf$SimulationControl
 idf[["SimulationControl"]]
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$objects_in_class`
 ## ------------------------------------------------
 
+\dontrun{
 # get all objects in Zone class
 idf$objects_in_class("Zone")
 
 # S3 "[[" and "$" can also be used
 idf$Zone
 idf[["Zone"]]
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$objects_in_group`
 ## ------------------------------------------------
 
+\dontrun{
 # get all objects in Schedules group
 idf$objects_in_group("Schedules")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$object_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # check each layer's reference of a construction named FLOOR
 idf$object_relation("floor", "ref_to")
 
 # check where is this construction being used
 idf$object_relation("floor", "ref_by")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$objects_in_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # get a construction named FLOOR and all materials it uses
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
 idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$search_object`
 ## ------------------------------------------------
 
+\dontrun{
 # get all objects whose names contains "floor"
 idf$search_object("floor", ignore.case = TRUE)
+}
 
 
 ## ------------------------------------------------
@@ -433,8 +475,10 @@ idf$del(ids)
 ## Method `Idf$rename`
 ## ------------------------------------------------
 
+\dontrun{
 idf$objects(c("on/off", "test 352a"))
 idf$rename(on_off = "on/off", test_352a = 51)
+}
 
 
 ## ------------------------------------------------
@@ -493,6 +537,7 @@ idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
 ## Method `Idf$update`
 ## ------------------------------------------------
 
+\dontrun{
 # update objects from string definitions:
 str <- idf$to_string("zone one", header = FALSE, format = "new_top")
 str[8] <- "2," # Multiplier
@@ -502,25 +547,30 @@ idf$update(str)
 dt <- idf$to_table("zone one")
 dt[field == "Multiplier", value := "1"]
 idf$update(dt)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$search_value`
 ## ------------------------------------------------
 
+\dontrun{
 # search values that contains "floor"
 idf$search_value("floor", ignore.case = TRUE)
 
 # search values that contains "floor" in class Construction
 idf$search_value("floor", "Construction", ignore.case = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$replace_value`
 ## ------------------------------------------------
 
+\dontrun{
 # search values that contains "win" and replace them with "windows"
-\dontrun{idf$replace_value("win", "windows")}
+idf$replace_value("win", "windows")
+}
 
 
 ## ------------------------------------------------
@@ -561,6 +611,7 @@ idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 ## Method `Idf$to_string`
 ## ------------------------------------------------
 
+\dontrun{
 # get text format of the whole Idf
 head(idf$to_string())
 
@@ -575,12 +626,14 @@ head(idf$to_string(c("floor", "zone one")))
 
 # tweak output formatting
 head(idf$to_string("floor", leading = 0, sep_at = 0))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$to_table`
 ## ------------------------------------------------
 
+\dontrun{
 # extract whole Idf data
 idf$to_table()
 
@@ -607,13 +660,16 @@ idf$to_table(class = "Construction", wide = TRUE)
 
 # get a wide table with actual values
 idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_unsaved`
 ## ------------------------------------------------
 
+\dontrun{
 idf$is_unsaved()
+}
 
 
 ## ------------------------------------------------
@@ -681,6 +737,7 @@ job$report_data()
 ## Method `Idf$print`
 ## ------------------------------------------------
 
+\dontrun{
 idf$print("group")
 idf$print("class")
 idf$print("object")
@@ -689,6 +746,7 @@ idf$print("field")
 # order objects by there classes
 idf$print("object", order = FALSE)
 idf$print("field", order = FALSE)
+}
 
 }
 \seealso{
@@ -782,12 +840,13 @@ An \code{Idf} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
+\preformatted{\dontrun{
+# If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
-\dontrun{idf <- Idf$new(path_idf)}
+idf <- Idf$new(path_idf)
 
 # argument `idd` can be specified explicitly using `use_idd()`
-\dontrun{idf <- Idf$new(path_idf, idd = use_idd(8.8))}
+idf <- Idf$new(path_idf, idd = use_idd(8.8))
 
 # you can set `download` arugment to "auto" in `use_idd()` if you
 # want to automatically download corresponding IDD file when
@@ -804,6 +863,7 @@ string_idf <-
     "
 
 Idf$new(string_idf, use_idd(8.8, download = "auto"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -831,8 +891,10 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get version
+\preformatted{\dontrun{
+# get version
 idf$version()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -859,11 +921,13 @@ locally.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get path
+\preformatted{\dontrun{
+# get path
 idf$path()
 
 # return `NULL` if Idf is not created from a file
 Idf$new("Version, 8.8;\n")$path()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -903,7 +967,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get names of all groups Idf contains
+\preformatted{\dontrun{
+# get names of all groups Idf contains
 idf$group_name()
 
 # get group name of each object in Idf
@@ -911,6 +976,7 @@ idf$group_name(sorted = FALSE)
 
 # get names of all available groups in underlying Idd
 idf$group_name(all = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -955,7 +1021,8 @@ character vectors when \code{by_group} is \code{TRUE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get names of all classes in Idf
+\preformatted{\dontrun{
+# get names of all classes in Idf
 idf$class_name()
 
 # get names of all classes grouped by group names in Idf
@@ -970,6 +1037,7 @@ idf$class_name(all = TRUE)
 # get names of all available classes grouped by group names in
 # underlying Idd
 idf$class_name(all = TRUE, by_group = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1011,11 +1079,13 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check if input is a valid group name in current Idf
+\preformatted{\dontrun{
+# check if input is a valid group name in current Idf
 idf$is_valid_group(c("Schedules", "Compliance Objects"))
 
 # check if input is a valid group name in underlying Idd
 idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1058,11 +1128,13 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check if input is a valid class name in current Idf
+\preformatted{\dontrun{
+# check if input is a valid class name in current Idf
 idf$is_valid_class(c("Building", "ShadowCalculation"))
 
 # check if input is a valid class name in underlying Idd
 idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1097,8 +1169,10 @@ An \link{IddObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get the IddObject object for specified class
+\preformatted{\dontrun{
+# get the IddObject object for specified class
 idf$definition("Version")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1145,7 +1219,8 @@ of integer vectors (when \code{simplify} is \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get IDs of all objects in current Idf object
+\preformatted{\dontrun{
+# get IDs of all objects in current Idf object
 idf$object_id()
 
 # get IDs of all objects in current Idf object, and merge them into a
@@ -1158,6 +1233,7 @@ idf$object_id(c("Version", "Zone"))
 # get IDs of objects in class Version and Zone, and merge them into a
 # single integer vector
 idf$object_id(c("Version", "Zone"), simplify = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1207,7 +1283,8 @@ list of character vectors (when \code{simplify} is \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get names of all objects in current Idf object
+\preformatted{\dontrun{
+# get names of all objects in current Idf object
 idf$object_name()
 
 # get names of all objects in current Idf object, and merge them into
@@ -1220,6 +1297,7 @@ idf$object_name(c("Version", "Zone"))
 # get names of objects in class Version and Zone, and merge them into
 # a single character vector
 idf$object_name(c("Version", "Zone"), simplify = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1255,11 +1333,13 @@ An integer vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get total number of objects
+\preformatted{\dontrun{
+# get total number of objects
 idf$object_num()
 
 # get number of objects in class Zone and Schedule:Compact
 idf$object_num(c("Zone", "Schedule:Compact"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1293,7 +1373,9 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$is_valid_id(c(51, 1000))
+\preformatted{\dontrun{
+idf$is_valid_id(c(51, 1000))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1331,10 +1413,12 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
+\preformatted{\dontrun{
+idf$is_valid_name(c("Simple One Zone (Wireframe DXF)", "ZONE ONE", "a"))
 
 # name matching is case-insensitive
 idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1380,12 +1464,14 @@ An \link{IdfObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get an object whose ID is 3
+\preformatted{\dontrun{
+# get an object whose ID is 3
 idf$object(3)
 
 # get an object whose name is "simple one zone (wireframe dxf)"
 # NOTE: object name matching is case-insensitive
 idf$object("simple one zone (wireframe dxf)")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1431,12 +1517,14 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get objects whose IDs are 3 and 10
+\preformatted{\dontrun{
+# get objects whose IDs are 3 and 10
 idf$objects(c(3,10))
 
 # get objects whose names are "Simple One Zone (Wireframe DXF)" and "ZONE ONE"
 # NOTE: object name matching is case-insensitive
 idf$objects(c("Simple One Zone (Wireframe DXF)", "zone one"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1491,12 +1579,14 @@ An \link{IdfObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get the SimulationColtrol object
+\preformatted{\dontrun{
+# get the SimulationColtrol object
 idf$object_unique("SimulationControl")
 
 # S3 "[[" and "$" can also be used
 idf$SimulationControl
 idf[["SimulationControl"]]
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1547,12 +1637,14 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all objects in Zone class
+\preformatted{\dontrun{
+# get all objects in Zone class
 idf$objects_in_class("Zone")
 
 # S3 "[[" and "$" can also be used
 idf$Zone
 idf[["Zone"]]
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1586,8 +1678,10 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all objects in Schedules group
+\preformatted{\dontrun{
+# get all objects in Schedules group
 idf$objects_in_group("Schedules")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1668,11 +1762,13 @@ Each \code{\link[data.table:data.table]{data.table::data.table()}} contains 24 c
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check each layer's reference of a construction named FLOOR
+\preformatted{\dontrun{
+# check each layer's reference of a construction named FLOOR
 idf$object_relation("floor", "ref_to")
 
 # check where is this construction being used
 idf$object_relation("floor", "ref_by")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1753,11 +1849,13 @@ An named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get a construction named FLOOR and all materials it uses
+\preformatted{\dontrun{
+# get a construction named FLOOR and all materials it uses
 idf$objects_in_relation("floor", "ref_to")
 
 # get a construction named FLOOR and all surfaces that uses it
 idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1805,8 +1903,10 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all objects whose names contains "floor"
+\preformatted{\dontrun{
+# get all objects whose names contains "floor"
 idf$search_object("floor", ignore.case = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2247,8 +2347,10 @@ A named list of renamed \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$objects(c("on/off", "test 352a"))
+\preformatted{\dontrun{
+idf$objects(c("on/off", "test 352a"))
 idf$rename(on_off = "on/off", test_352a = 51)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2588,7 +2690,8 @@ A named list of updated \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# update objects from string definitions:
+\preformatted{\dontrun{
+# update objects from string definitions:
 str <- idf$to_string("zone one", header = FALSE, format = "new_top")
 str[8] <- "2," # Multiplier
 idf$update(str)
@@ -2597,6 +2700,7 @@ idf$update(str)
 dt <- idf$to_table("zone one")
 dt[field == "Multiplier", value := "1"]
 idf$update(dt)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2699,11 +2803,13 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# search values that contains "floor"
+\preformatted{\dontrun{
+# search values that contains "floor"
 idf$search_value("floor", ignore.case = TRUE)
 
 # search values that contains "floor" in class Construction
 idf$search_value("floor", "Construction", ignore.case = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2763,8 +2869,10 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# search values that contains "win" and replace them with "windows"
-\dontrun{idf$replace_value("win", "windows")}
+\preformatted{\dontrun{
+# search values that contains "win" and replace them with "windows"
+idf$replace_value("win", "windows")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -3062,7 +3170,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get text format of the whole Idf
+\preformatted{\dontrun{
+# get text format of the whole Idf
 head(idf$to_string())
 
 # get text format of the whole Idf, excluding the header and all comments
@@ -3076,6 +3185,7 @@ head(idf$to_string(c("floor", "zone one")))
 
 # tweak output formatting
 head(idf$to_string("floor", leading = 0, sep_at = 0))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -3159,7 +3269,8 @@ A \link[data.table:data.table]{data.table} with 6 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# extract whole Idf data
+\preformatted{\dontrun{
+# extract whole Idf data
 idf$to_table()
 
 # extract all data from class Material
@@ -3185,6 +3296,7 @@ idf$to_table(class = "Construction", wide = TRUE)
 
 # get a wide table with actual values
 idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -3211,7 +3323,9 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$is_unsaved()
+\preformatted{\dontrun{
+idf$is_unsaved()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -3470,7 +3584,8 @@ The \code{Idf} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$print("group")
+\preformatted{\dontrun{
+idf$print("group")
 idf$print("class")
 idf$print("object")
 idf$print("field")
@@ -3478,6 +3593,7 @@ idf$print("field")
 # order objects by there classes
 idf$print("object", order = FALSE)
 idf$print("field", order = FALSE)
+}
 
 }
 \if{html}{\out{</div>}}
