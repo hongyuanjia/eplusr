@@ -4,8 +4,7 @@
 \alias{as.character.IddObject}
 \title{Coerce an IddObject into a Character Vector}
 \usage{
-\method{as.character}{IddObject}(x, comment = NULL, leading = 4L,
-  sep_at = 29L, all = FALSE, ...)
+\method{as.character}{IddObject}(x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
 \item{x}{An \link{IddObject} object.}

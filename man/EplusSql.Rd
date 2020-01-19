@@ -33,74 +33,485 @@ encounter some problems when retrieve data from an unsuccessful simulation.
 It is suggested to carefully go through the \code{.err} file using \code{\link[=read_err]{read_err()}} to
 make sure the output data in the SQLite is correct and reliable.
 }
-\section{Usage}{
-\preformatted{epsql <- eplus_sql(sql)
-epsql$path()
-epsql$path_idf()
-epsql$list_table()
-epsql$read_table(table)
-epsql$report_data_dict()
-epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL,
-                  month = NULL, day = NULL, hour = NULL, minute = NULL,
-                  interval = NULL, simulation_days = NULL, day_type = NULL,
-                  environment_name = NULL)
-epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
-epsql$print()
-print(epsql)
-}
-}
+\examples{
 
-\section{Basic Info}{
-\preformatted{epsql <- eplus_sql(sql)
-epsql$path()
-epsql$path_idf()
+## ------------------------------------------------
+## Method `EplusSql$new`
+## ------------------------------------------------
+
+if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
+
+    # copy to tempdir and run the model
+    idf <- read_idf(idf_path)
+    idf$run(epw_path, tempdir())
+
+    # create from local file
+    sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
 }
 
-\code{$path()} returns the path of EnergyPlus SQLite file.
+## ------------------------------------------------
+## Method `EplusSql$path`
+## ------------------------------------------------
 
-\code{$path_idf()} returns the IDF file path with same name as the SQLite file in
-the same folder. \code{NULL} is returned if no corresponding IDF is found.
+\dontrun{
+# get path
+sql$path()
+}
 
-\strong{Arguments}:
+
+## ------------------------------------------------
+## Method `EplusSql$path_idf`
+## ------------------------------------------------
+
+\dontrun{
+# get path
+sql$path_idf()
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$list_table`
+## ------------------------------------------------
+
+\dontrun{
+sql$list_table()
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$read_table`
+## ------------------------------------------------
+
+\dontrun{
+# read a specific table
+sql$read_table("Zones")
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$report_data_dict`
+## ------------------------------------------------
+
+\dontrun{
+sql$report_data_dict()
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$report_data`
+## ------------------------------------------------
+
+\dontrun{
+# read all report data
+sql$report_data()
+
+# specify output variables using report data dictionary
+dict <- sql$report_data_dict()
+sql$report_data(dict[units == "C"])
+
+# specify output variables using 'key_value' and 'name'
+sql$report_data("environment", "site outdoor air drybulb temperature")
+
+# explicitly specify year value and time zone
+sql$report_data(dict[1], year = 2020, tz = "Etc/GMT+8")
+
+# explicitly specify case name
+sql$report_data(dict[1], case = "example")
+
+# get all possible columns
+sql$report_data(dict[1], all = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output
+sql$report_data(dict[1], wide = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output with
+# extra columns
+sql$report_data(dict[1], wide = TRUE, all = TRUE)
+
+# only get data at the working hour on the first Monday
+sql$report_data(dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
+
+# only get specified run period data
+sql$read_table("EnvironmentPeriods") # possible environment name
+sql$report_data(dict[1], environment_name = "San Francisco Intl Ap CA USA TMY3 WMO#=724940")
+# can also be done using 'environment_period_index' column
+sql$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$tabular_data`
+## ------------------------------------------------
+
+\dontrun{
+# read all tabular data
+sql$tabular_data()
+
+# explicitly specify data you want
+str(sql$tabular_data(
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy"
+))
+}
+
+
+## ------------------------------------------------
+## Method `EplusSql$print`
+## ------------------------------------------------
+
+\dontrun{
+sql$print()
+}
+
+}
+\author{
+Hongyuan Jia
+}
+\section{Methods}{
+\subsection{Public methods}{
 \itemize{
-\item \code{epsql}: An \code{EplusSQL} object.
-\item \code{sql}: A path to an local EnergyPlus SQLite output file.
+\item \href{#method-new}{\code{EplusSql$new()}}
+\item \href{#method-path}{\code{EplusSql$path()}}
+\item \href{#method-path_idf}{\code{EplusSql$path_idf()}}
+\item \href{#method-list_table}{\code{EplusSql$list_table()}}
+\item \href{#method-read_table}{\code{EplusSql$read_table()}}
+\item \href{#method-report_data_dict}{\code{EplusSql$report_data_dict()}}
+\item \href{#method-report_data}{\code{EplusSql$report_data()}}
+\item \href{#method-tabular_data}{\code{EplusSql$tabular_data()}}
+\item \href{#method-print}{\code{EplusSql$print()}}
 }
 }
-
-\section{Read Tables}{
-\preformatted{epsql$list_table()
-epsql$read_table(table)
-epsql$report_data_dict()
-epsql$report_data(key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL,
-                  month = NULL, day = NULL, hour = NULL, minute = NULL,
-                  interval = NULL, simulation_days = NULL, day_type = NULL,
-                  environment_name = NULL)
-epsql$tabular_data(report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{EplusSql} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$new(sql)}\if{html}{\out{</div>}}
 }
 
-\code{$list_table()} returns all available table and view names in the SQLite file.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{sql}}{A path to an local EnergyPlus SQLite output file.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An \code{EplusSql} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{if (is_avail_eplus(8.8)) {
+    idf_name <- "1ZoneUncontrolled.idf"
+    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
-\code{$read_table()} takes a valid \code{table} name of those from \code{$list_table()} and
-returns that table data in a \link[data.table:data.table]{data.table} format.
+    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
+    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 
-\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
-contains all information about report data. For details on the meaning of
-each columns, please see "2.20.2.1 ReportDataDictionary Table" in EnergyPlus
-"Output Details and Examples" documentation.
+    # copy to tempdir and run the model
+    idf <- read_idf(idf_path)
+    idf$run(epw_path, tempdir())
 
-\code{$report_data()} extracts the report data in a
-\link[data.table:data.table]{data.table} using key values, variable names and
-other specifications. \code{$report_data()} can also directly take all or subset
-output from \code{$report_data_dict()} as input, and extract all data specified.
+    # create from local file
+    sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-path"></a>}}
+\subsection{Method \code{path()}}{
+Get the file path of current \code{EpwSql} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$path()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$path()} returns the path of EnergyPlus SQLite file.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get path
+sql$path()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-path_idf"></a>}}
+\subsection{Method \code{path_idf()}}{
+Get the path of corresponding IDF file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$path_idf()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$path_idf()} returns the IDF file path with same name as the SQLite
+file in the same folder. \code{NULL} is returned if no corresponding IDF
+is found.
+}
+
+\subsection{Returns}{
+NULL or a single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get path
+sql$path_idf()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_table"></a>}}
+\subsection{Method \code{list_table()}}{
+List all table names in current EnergyPlus SQL output
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$list_table()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$list_table()} returns all available table and view names in the
+EnergyPlus SQLite file.
+}
+
+\subsection{Returns}{
+A character vector
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+sql$list_table()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_table"></a>}}
+\subsection{Method \code{read_table()}}{
+Read a single table from current EnergyPlus SQL output
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$read_table(name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{name}}{A single string specifying the name of table to read.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$read_table()} takes a valid table \code{name} of those from
+\href{../../eplusr/html/EplusSql.html#method-list_table}{\code{$list_table()}}
+and returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read a specific table
+sql$read_table("Zones")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-report_data_dict"></a>}}
+\subsection{Method \code{report_data_dict()}}{
+Read report data dictionary from current EnergyPlus SQL output
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$report_data_dict()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which
+contains all information about report data.
+
+For details on the meaning of each columns, please see "2.20.2.1
+ReportDataDictionary Table" in EnergyPlus "Output Details and
+Examples" documentation.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 10 columns:
+\itemize{
+\item \code{report_data_dictionary_index}: The integer used to link the
+dictionary data to the variable data. Mainly useful when joining
+diferent tables
+\item \code{is_meter}: Whether report data is a meter data. Possible values:
+\code{0} and \code{1}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and
+\verb{HVAC System}
+\item \code{key_value}: Key name of the data
+\item \code{name}: Actual report data name
+\item \code{reporting_frequency}:
+\item \code{schedule_name}: Name of the the schedule that controls reporting
+frequency.
+\item \code{units}: The data units
+}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+sql$report_data_dict()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-report_data"></a>}}
+\subsection{Method \code{report_data()}}{
+Read report data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$report_data(
+  key_value = NULL,
+  name = NULL,
+  year = NULL,
+  tz = "UTC",
+  case = "auto",
+  all = FALSE,
+  wide = FALSE,
+  period = NULL,
+  month = NULL,
+  day = NULL,
+  hour = NULL,
+  minute = NULL,
+  interval = NULL,
+  simulation_days = NULL,
+  day_type = NULL,
+  environment_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{key_value}}{A character vector to identify key values of the
+data. If \code{NULL}, all keys of that variable will be returned.
+\code{key_value} can also be data.frame that contains \code{key_value}
+and \code{name} columns. In this case, \code{name} argument in
+\verb{$report_data()} is ignored. All available \code{key_value} for
+current simulation output can be obtained using
+\href{../../eplusr/html/EplusSql.html#method-report_data_dict}{\code{$report_data_dict()}}.
+Default: \code{NULL}.}
+
+\item{\code{name}}{A character vector to identify names of the data. If
+\code{NULL}, all names of that variable will be returned. If
+\code{key_value} is a data.frame, \code{name} is ignored. All available
+\code{name} for current simulation output can be obtained using
+\href{../../eplusr/html/EplusSql.html#method-report_data_dict}{\code{$report_data_dict()}}.
+Default: \code{NULL}.}
+
+\item{\code{year}}{Year of the date time in column \code{datetime}. If \code{NULL}, it
+will calculate a year value that meets the start day of week
+restriction for each environment. Default: \code{NULL}.}
+
+\item{\code{tz}}{Time zone of date time in column \code{datetime}. Default:
+\code{"UTC"}.}
+
+\item{\code{case}}{If not \code{NULL}, a character column will be added indicates
+the case of this simulation. If \code{"auto"}, the name of the IDF
+file without extension is used.}
+
+\item{\code{all}}{If \code{TRUE}, extra columns are also included in the returned
+\code{\link[data.table:data.table]{data.table::data.table()}}.}
+
+\item{\code{wide}}{If \code{TRUE}, the output is formated in the same way as
+standard EnergyPlus csv output file.}
+
+\item{\code{period}}{A Date or POSIXt vector used to specify which time
+period to return. The year value does not matter and only
+month, day, hour and minute value will be used when
+subsetting. If \code{NULL}, all time period of data is returned.
+Default: \code{NULL}.}
+
+\item{\code{month, day, hour, minute}}{Each is an integer vector for month,
+day, hour, minute subsetting of \code{datetime} column when
+querying on the SQL database. If \code{NULL}, no subsetting is
+performed on those components. All possible \code{month}, \code{day},
+\code{hour} and \code{minute} can be obtained using
+\href{../../eplusr/html/EplusSql.html#method-read_table}{\code{$read_table("Time")}}.
+Default: \code{NULL}.}
+
+\item{\code{interval}}{An integer vector used to specify which interval
+length of report to extract. If \code{NULL}, all interval will be
+used. Default: \code{NULL}.}
+
+\item{\code{simulation_days}}{An integer vector to specify which simulation
+day data to extract. Note that this number resets after warmup
+and at the beginning of an environment period. All possible
+\code{simulation_days} can be obtained using
+\href{../../eplusr/html/EplusSql.html#method-read_table}{\code{$read_table("Time")}}.
+If \code{NULL}, all simulation days will be used. Default: \code{NULL}.}
+
+\item{\code{day_type}}{A character vector to specify which day type of data
+to extract. All possible day types are: \code{Sunday}, \code{Monday},
+\code{Tuesday}, \code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday},
+\code{Holiday}, \code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1},
+and \code{CustomDay2}. All possible values for current simulation
+output can be obtained using
+\href{../../eplusr/html/EplusSql.html#method-read_table}{\code{$read_table("Time")}}.}
+
+\item{\code{environment_name}}{A character vector to specify which
+environment data to extract. If \code{NULL}, all environment data
+are returned. Default: \code{NULL}. All possible
+\code{environment_name} for current simulation output can be
+obtained using:\preformatted{$read_table("EnvironmentPeriods")
+}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$report_data()} extracts the report data in a
+\code{\link[data.table:data.table]{data.table::data.table()}} using key values, variable names and other
+specifications.
+
+\verb{$report_data()} can also directly take all or subset output from
+\verb{$report_data_dict()} as input, and extract all data specified.
+
 The returned column numbers varies depending on \code{all} argument.
 \itemize{
-\item \code{all} is \code{FALSE}, the returned \link[data.table:data.table]{data.table} has 6
-columns:
+\item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
 \itemize{
 \item \code{case}: Simulation case specified using \code{case} argument
 \item \code{datetime}: The date time of simulation result
@@ -127,9 +538,9 @@ included:
 \item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
 and \code{Avg}
 \item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
-\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \code{HVAC System}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \verb{HVAC System}
 \item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
-\code{HVAC System Timestep}, \code{Zone Timestep}.
+\verb{HVAC System Timestep}, \verb{Zone Timestep}.
 \item \code{schedule_name}: Name of the the schedule that controls reporting
 frequency.
 }
@@ -137,7 +548,7 @@ frequency.
 
 With the \code{datetime} column, it is quite straightforward to apply time-series
 analysis on the simulation output. However, another painful thing is that
-every simulation run period has its own \code{Day of Week for Start Day}. Randomly
+every simulation run period has its own \verb{Day of Week for Start Day}. Randomly
 setting the \code{year} may result in a date time series that does not have
 the same start day of week as specified in the RunPeriod objects.
 
@@ -157,17 +568,94 @@ Saturday. However, if you try to get the day of week of time "00:24:00" in R,
 you will get Saturday, but not Friday. This introduces inconsistency and may
 cause problems when doing data analysis considering day of week value.
 
-With \code{wide} equals \code{TRUE}, \code{$report_data()} will format the simulation output
+With \code{wide} equals \code{TRUE}, \verb{$report_data()} will format the simulation output
 in the same way as standard EnergyPlus csv output file. Sometimes this can be
 useful as there may be existing tools/workflows that depend on this format.
 When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
 and date time components are also returned, including:
-\code{environment_period_index", "environment_name}, \code{simulation_days},
+\verb{environment_period_index", "environment_name}, \code{simulation_days},
 \code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
 
-\code{$tabular_data()} extracts the tabular data in a
-\link[data.table:data.table]{data.table} using report, table, column and row
-name specifications. The returned \link[data.table:data.table]{data.table} has
+For convenience, input character arguments matching in
+\verb{$report_data()} are \strong{case-insensitive}.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read all report data
+sql$report_data()
+
+# specify output variables using report data dictionary
+dict <- sql$report_data_dict()
+sql$report_data(dict[units == "C"])
+
+# specify output variables using 'key_value' and 'name'
+sql$report_data("environment", "site outdoor air drybulb temperature")
+
+# explicitly specify year value and time zone
+sql$report_data(dict[1], year = 2020, tz = "Etc/GMT+8")
+
+# explicitly specify case name
+sql$report_data(dict[1], case = "example")
+
+# get all possible columns
+sql$report_data(dict[1], all = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output
+sql$report_data(dict[1], wide = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output with
+# extra columns
+sql$report_data(dict[1], wide = TRUE, all = TRUE)
+
+# only get data at the working hour on the first Monday
+sql$report_data(dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
+
+# only get specified run period data
+sql$read_table("EnvironmentPeriods") # possible environment name
+sql$report_data(dict[1], environment_name = "San Francisco Intl Ap CA USA TMY3 WMO#=724940")
+# can also be done using 'environment_period_index' column
+sql$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabular_data"></a>}}
+\subsection{Method \code{tabular_data()}}{
+Read tabular data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$tabular_data(
+  report_name = NULL,
+  report_for = NULL,
+  table_name = NULL,
+  column_name = NULL,
+  row_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{report_name, report_for, table_name, column_name, row_name}}{Each is
+a character vector for subsetting when querying the SQL
+database.  For the meaning of each argument, please see the
+description above.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$tabular_data()} extracts the tabular data in a
+\code{\link[data.table:data.table]{data.table::data.table()}} using report, table, column and row name
+specifications. The returned \code{\link[data.table:data.table]{data.table::data.table()}} has
 8 columns:
 \itemize{
 \item \code{index}: Tabular data index
@@ -180,120 +668,62 @@ name specifications. The returned \link[data.table:data.table]{data.table} has
 \item \code{value}: The value of the record \strong{in string format}
 }
 
-For convenience, input character arguments matching in \code{$report_data()} and
-\code{$tabular_data()} are \strong{case-insensitive}.
-
-\strong{Arguments}
-\itemize{
-\item \code{key_value}: A character vector to identify key values of the data. If
-\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
-data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \code{$report_data_dict()}.
-Default: \code{NULL}.
-\item \code{name}: A character vector to identify names of the data. If
-\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
-data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
-\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calculate a year value that meets the start day of week restriction
-for each environment. Default: \code{NULL}.
-\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
-\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the IDF file without extension
-is used.
-\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\link[data.table:data.table]{data.table}.
-\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
-EnergyPlus csv output file.
-\item \code{period}: A Date or POSIXt vector used to specify which time period to
-return. The year value does not matter and only month, day, hour and
-minute value will be used when subsetting. If \code{NULL}, all time period of
-data is returned. Default: \code{NULL}.
-\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
-hour, minute subsetting of \code{datetime} column when querying on the SQL
-database. If \code{NULL}, no subsetting is performed on those components. All
-possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\code{$read_table("Time")}.  Default: \code{NULL}.
-\item \code{interval}: An integer vector used to specify which interval length of
-report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
-\item \code{simulation_days}: An integer vector to specify which simulation day data
-to extract. Note that this number resets after warmup and at the beginning
-of an environment period. All possible \code{simulation_days} can be obtained
-using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
-Default: \code{NULL}.
-\item \code{day_type}: A character vector to specify which day type of data to
-extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
-\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
-\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
-possible values for current simulation output can be obtained using
-\code{$read_table("Time")}.
-\item \code{environment_name}: A character vector to specify which environment data to
-extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
-All possible \code{environment_name} for current simulation output can
-be obtained using.\preformatted{$read_table("EnvironmentPeriods")
-}
-\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
-Each is a character vector for subsetting when querying the SQL database.
-For the meaning of each argument, please see the description above.
-}
+For convenience, input character arguments matching in
+\verb{$tabular_data()} are \strong{case-insensitive}.
 }
 
-\section{Print}{
-\preformatted{epsql$print()
-print(epsql)
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 8 columns.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read all tabular data
+sql$tabular_data()
 
-\code{$print()} shows the core information of this \code{EplusSql} object, including
-the path of the EnergyPlus SQLite file, last modified time of the SQLite file
-and the path of the IDF file with the same name in the same folder.
-
-\strong{Arguments}
-\itemize{
-\item \code{epsql}: An \code{EplusSQL} object.
-}
-}
-
-\examples{
-\dontrun{
-if (is_avail_eplus(8.8)) {
-    idf_name <- "1ZoneUncontrolled.idf"
-    epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-
-    idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
-    epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
-
-    # copy to tempdir and run the model
-    idf <- read_idf(idf_path)
-    idf$run(epw_path, tempdir())
-
-    # create from local file
-    sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
-
-    # get sql file path
-    sql$path()
-
-    # get the parent IDF file path
-    sql$path_idf()
-
-    # list all tables in the sql file
-    sql$list_table()
-
-    # read a specific table
-    sql$read_read("Zones")
-
-    # read report data dictionary
-    sql$report_data_dict()
-
-    # read report data
-    sql$report_data(name = "EnergyTransfer:Building")
-
-    # read tabular data
-    sql$tabular_data()
-}
+# explicitly specify data you want
+str(sql$tabular_data(
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy"
+))
 }
 
 }
-\author{
-Hongyuan Jia
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{EplusSql} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusSql$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} shows the core information of this \code{EplusSql} object,
+including the path of the EnergyPlus SQLite file, last modified
+time of the SQLite file and the path of the IDF file with the
+same name in the same folder.
+}
+
+\subsection{Returns}{
+The \code{EplusSql} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+sql$print()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
 }

@@ -5,83 +5,404 @@
 \alias{EplusGroupJob}
 \title{Create and Run Parametric Analysis, and Collect Results}
 \description{
-\code{EplusGroupJob} class is a wrapper of \code{\link[=run_multi]{run_multi()}} and provides an interface to
-group multiple EnergyPlus simulations together for running and collecting
+\code{EplusGroupJob} class is a wrapper of \code{\link[=run_multi]{run_multi()}} and provides an interface
+to group multiple EnergyPlus simulations together for running and collecting
 outputs.
 }
-\section{Usage}{
-\preformatted{group <- group_job(idfs, epws)
-group$run(dir = NULL, wait = TRUE, force = FALSE, echo = wait)
-group$kill()
+\examples{
+
+## ------------------------------------------------
+## Method `EplusGroupJob$new`
+## ------------------------------------------------
+
+if (is_avail_eplus(8.8)) {
+    dir <- eplus_config(8.8)$dir
+    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
+        full.names = TRUE)[1:5]
+    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw",
+        full.names = TRUE)[1:5]
+
+    group <- EplusGroupJob$new(path_idfs, path_epws)
+}
+
+## ------------------------------------------------
+## Method `EplusGroupJob$run`
+## ------------------------------------------------
+
+\dontrun{
+# only run design day
+group$run(NULL)
+
+# specify output directory
+group$run(tempdir())
+
+# run in the background
+group$run(wait = TRUE)
+# see group job status
 group$status()
-group$output_dir(which = NULL)
-group$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-group$errors(which = NULL, info = FALSE)
-group$list_table(which = NULL)
-group$read_table(which = NULL, table)
-group$read_rdd(which = NULL)
-group$read_mdd(which = NULL)
-group$report_data_dict(which = NULL)
-group$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
-                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
-group$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
+
+# force to kill background group job before running the new one
+group$run(force = TRUE)
+
+# do not show anything in the console
+group$run(echo = FALSE)
+
+# copy external files used in the model to simulation output directory
+group$run(copy_external = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$kill`
+## ------------------------------------------------
+
+\dontrun{
+group$kill()
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$status`
+## ------------------------------------------------
+
+\dontrun{
+group$status()
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$errors`
+## ------------------------------------------------
+
+\dontrun{
+group$errors()
+
+# show all information
+group$errors(info = TRUE)
+
+}
+
+## ------------------------------------------------
+## Method `EplusGroupJob$output_dir`
+## ------------------------------------------------
+
+\dontrun{
+# get output directories of all simulations
+group$output_dir()
+
+# get output directories of specified simulations
+group$output_dir(c(1, 4))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$locate_output`
+## ------------------------------------------------
+
+\dontrun{
+# get the file path of the error file
+group$locate_output(c(1, 4), ".err", strict = FALSE)
+
+# can use to detect if certain output file exists
+group$locate_output(c(1, 4), ".expidf", strict = TRUE)
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$list_table`
+## ------------------------------------------------
+
+\dontrun{
+group$list_table(c(1, 4))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$read_table`
+## ------------------------------------------------
+
+\dontrun{
+# read a specific table
+group$read_table(c(1, 4), "Zones")
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$read_rdd`
+## ------------------------------------------------
+
+\dontrun{
+group$read_rdd(c(1, 4))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$read_mdd`
+## ------------------------------------------------
+
+\dontrun{
+group$read_mdd(c(1, 4))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$report_data_dict`
+## ------------------------------------------------
+
+\dontrun{
+group$report_data_dict(c(1, 4))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$report_data`
+## ------------------------------------------------
+
+\dontrun{
+# read report data
+group$report_data(c(1, 4))
+
+# specify output variables using report data dictionary
+dict <- group$report_data_dict(1)
+group$report_data(c(1, 4), dict[units == "C"])
+
+# specify output variables using 'key_value' and 'name'
+group$report_data(c(1, 4), "environment", "site outdoor air drybulb temperature")
+
+# explicitly specify year value and time zone
+group$report_data(c(1, 4), dict[1], year = 2020, tz = "Etc/GMT+8")
+
+# get all possible columns
+group$report_data(c(1, 4), dict[1], all = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output
+group$report_data(c(1, 4), dict[1], wide = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output with
+# extra columns
+group$report_data(c(1, 4), dict[1], wide = TRUE, all = TRUE)
+
+# only get data at the working hour on the first Monday
+group$report_data(c(1, 4), dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$tabular_data`
+## ------------------------------------------------
+
+\dontrun{
+# read all tabular data
+group$tabular_data(c(1, 4))
+
+# explicitly specify data you want
+str(group$tabular_data(c(1, 4),
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy"
+))
+}
+
+
+## ------------------------------------------------
+## Method `EplusGroupJob$print`
+## ------------------------------------------------
+
+\dontrun{
 group$print()
 }
-}
 
-\section{Create}{
-\preformatted{group <- group_job(idfs, epws)
 }
-
-\strong{Arguments}
+\author{
+Hongyuan Jia
+}
+\section{Methods}{
+\subsection{Public methods}{
 \itemize{
-\item \code{idfs}: Paths to EnergyPlus IDF files or a list of IDF files and \link{Idf}
-objects.
-\item \code{epws}: Paths to EnergyPlus EPW files or a list of EPW files and \link{Epw}
-objects. Each element in the list can be \code{NULL}, which will force
-design-day-only simulation. Note this needs at least one \code{Sizing:DesignDay}
-object exists in that \link{Idf}. If \code{epws} is \code{NULL}, design-day-only
-simulation will be conducted for all input models.
+\item \href{#method-new}{\code{EplusGroupJob$new()}}
+\item \href{#method-run}{\code{EplusGroupJob$run()}}
+\item \href{#method-kill}{\code{EplusGroupJob$kill()}}
+\item \href{#method-status}{\code{EplusGroupJob$status()}}
+\item \href{#method-errors}{\code{EplusGroupJob$errors()}}
+\item \href{#method-output_dir}{\code{EplusGroupJob$output_dir()}}
+\item \href{#method-locate_output}{\code{EplusGroupJob$locate_output()}}
+\item \href{#method-list_table}{\code{EplusGroupJob$list_table()}}
+\item \href{#method-read_table}{\code{EplusGroupJob$read_table()}}
+\item \href{#method-read_rdd}{\code{EplusGroupJob$read_rdd()}}
+\item \href{#method-read_mdd}{\code{EplusGroupJob$read_mdd()}}
+\item \href{#method-report_data_dict}{\code{EplusGroupJob$report_data_dict()}}
+\item \href{#method-report_data}{\code{EplusGroupJob$report_data()}}
+\item \href{#method-tabular_data}{\code{EplusGroupJob$tabular_data()}}
+\item \href{#method-print}{\code{EplusGroupJob$print()}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{EplusGroupJob} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$new(idfs, epws)}\if{html}{\out{</div>}}
 }
 
-\section{Run and Collect Results}{
-\preformatted{group$run(dir = NULL, wait = TRUE, force = FALSE, echo = wait)
-group$kill()
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{idfs}}{Paths to EnergyPlus IDF files or a list of IDF files and
+\link{Idf} objects.}
+
+\item{\code{epws}}{Paths to EnergyPlus EPW files or a list of EPW files and
+\link{Epw} objects. Each element in the list can be \code{NULL}, which
+will force design-day-only simulation. Note this needs at
+least one \code{Sizing:DesignDay} object exists in that \link{Idf}. If
+\code{epws} is \code{NULL}, design-day-only simulation will be conducted
+for all input models.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+An \code{EplusGroupJob} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{if (is_avail_eplus(8.8)) {
+    dir <- eplus_config(8.8)$dir
+    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
+        full.names = TRUE)[1:5]
+    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw",
+        full.names = TRUE)[1:5]
+
+    group <- EplusGroupJob$new(path_idfs, path_epws)
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-run"></a>}}
+\subsection{Method \code{run()}}{
+Run grouped simulations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$run(
+  dir = NULL,
+  wait = TRUE,
+  force = FALSE,
+  copy_external = FALSE,
+  echo = wait
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dir}}{The parent output directory for specified simulations.
+Outputs of each simulation are placed in a separate folder
+under the parent directory.}
+
+\item{\code{wait}}{If \code{TRUE}, R will hang on and wait all EnergyPlus
+simulations finish. If \code{FALSE}, all EnergyPlus simulations are
+run in the background.  Default: \code{TRUE}.}
+
+\item{\code{force}}{Only applicable when the last simulation runs with
+\code{wait} equals to \code{FALSE} and is still running. If \code{TRUE},
+current running job is forced to stop and a new one will
+start. Default: \code{FALSE}.}
+
+\item{\code{copy_external}}{If \code{TRUE}, the external files that current \code{Idf}
+object depends on will also be copied into the simulation
+output directory. The values of file paths in the Idf will be
+changed automatically. Currently, only \code{Schedule:File} class
+is supported.  This ensures that the output directory will
+have all files needed for the model to run. Default is
+\code{FALSE}.}
+
+\item{\code{echo}}{Only applicable when \code{wait} is \code{TRUE}. Whether to
+simulation status. Default: same as \code{wait}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$run()} runs all grouped simulations in parallel. The number of
+parallel EnergyPlus process can be controlled by
+\code{eplusr_option("num_parallel")}. If \code{wait} is FALSE, then the job
+will be run in the background. You can get updated job status by just
+printing the \code{EplusGroupJob} object.
+}
+
+\subsection{Returns}{
+The \code{EplusGroupJob} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# only run design day
+group$run(NULL)
+
+# specify output directory
+group$run(tempdir())
+
+# run in the background
+group$run(wait = TRUE)
+# see group job status
 group$status()
-group$errors(info = FALSE)
-group$output_dir(which = NULL)
-group$locate_output(which = NULL, suffix = ".err", strict = TRUE)
-group$list_table(which = NULL)
-group$read_table(which = NULL, table)
-group$read_rdd(which = NULL)
-group$read_mdd(which = NULL)
-group$report_data_dict(which = NULL)
-group$report_data(which = NULL, key_value = NULL, name = NULL, year = NULL, tz = "UTC",
-                  case = "auto", all = FALSE, wide = FALSE, period = NULL, month = NULL,
-                  day = NULL, hour = NULL, minute = NULL, interval = NULL,
-                  simulation_days = NULL, day_type = NULL, environment_name = NULL)
-group$tabular_data(which, report_name = NULL, report_for = NULL, table_name = NULL,
-                   column_name = NULL, row_name = NULL)
+
+# force to kill background group job before running the new one
+group$run(force = TRUE)
+
+# do not show anything in the console
+group$run(echo = FALSE)
+
+# copy external files used in the model to simulation output directory
+group$run(copy_external = TRUE)
 }
 
-All those functions have the same meaning as in \link{EplusJob} class, except
-that they only return the results of specified simulations. Most arguments
-have the same meanings as in \link{EplusJob} class, except that there is an
-argument \code{which} to select specific simulations.
+}
+\if{html}{\out{</div>}}
 
-\code{$run()} runs all parametric simulations in parallel. The number of parallel
-EnergyPlus process can be controlled by \code{eplusr_option("num_parallel")}. If
-\code{wait} is FALSE, then the job will be run in the background. You can get
-updated job status by just printing the \code{ParametricJob} object.
+}
 
-\code{$kill()} kills all background EnergyPlus processes that are current running
-if possible. It only works when simulations run in non-waiting mode.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-kill"></a>}}
+\subsection{Method \code{kill()}}{
+Kill current running jobs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$kill()}\if{html}{\out{</div>}}
+}
 
-\code{$status()} returns a named list of values indicates the status of the job:
+\subsection{Details}{
+\verb{$kill()} kills all background EnergyPlus processes that are current
+running if possible. It only works when simulations run in
+non-waiting mode.
+}
+
+\subsection{Returns}{
+A single logical value of \code{TRUE} or \code{FALSE}, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$kill()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-status"></a>}}
+\subsection{Method \code{status()}}{
+Get the group job status
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$status()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$status()} returns a named list of values indicates the status of the job:
 \itemize{
 \item \code{run_before}: \code{TRUE} if the job has been run before. \code{FALSE} otherwise.
 \item \code{alive}: \code{TRUE} if the job is still running in the background. \code{FALSE}
@@ -92,9 +413,9 @@ simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 there is any simulation failed. \code{NA} if the job has not been run yet.
 \item \code{changed_after}: \code{TRUE} if the \emph{seed model} has been modified since last
 simulation. \code{FALSE} otherwise.
-\item \code{job_status}: A \link[data.table:data.table]{data.table} contains meta data
+\item \code{job_status}: A \code{\link[data.table:data.table]{data.table::data.table()}} contains meta data
 for each simulation job. For details, please see \code{\link[=run_multi]{run_multi()}}. If the
-job has not been run before, a \link[data.table:data.table]{data.table}
+job has not been run before, a \code{\link[data.table:data.table]{data.table::data.table()}}
 with 4 columns is returned:
 \itemize{
 \item \code{index}: The index of simulation
@@ -105,185 +426,698 @@ with 4 columns is returned:
 assigned.
 }
 }
+}
 
-$errors() returns an \link[=read_err]{ErrFile} object which contains all contents
-of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only warnings
-and errors are printed.
+\subsection{Returns}{
+A named list.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$status()
+}
 
-\code{$output_dir()} returns the output directory of specified simulations.
+}
+\if{html}{\out{</div>}}
 
-\code{$locate_output()} returns the path of a single output file of specified
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-errors"></a>}}
+\subsection{Method \code{errors()}}{
+Read group simulation errors
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$errors(which = NULL, info = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
+\item{\code{info}}{If \code{FALSE}, only warnings and errors are printed.
+Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+$errors() returns a list of \link[=read_err]{ErrFile} objects which
+contain all contents of the simulation error files (\code{.err}). If
+\code{info} is \code{FALSE}, only warnings and errors are printed.
+}
+
+\subsection{Returns}{
+A list of \link[=read_err]{ErrFile} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$errors()
+
+# show all information
+group$errors(info = TRUE)
+
+}
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-output_dir"></a>}}
+\subsection{Method \code{output_dir()}}{
+Get simulation output directory
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$output_dir(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$output_dir()} returns the output directory of simulation results.
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get output directories of all simulations
+group$output_dir()
+
+# get output directories of specified simulations
+group$output_dir(c(1, 4))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-locate_output"></a>}}
+\subsection{Method \code{locate_output()}}{
+Get paths of output file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$locate_output(which = NULL, suffix = ".err", strict = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
+\item{\code{suffix}}{A string that indicates the file extension of
+simulation output. Default: \code{".err"}.}
+
+\item{\code{strict}}{If \code{TRUE}, it will check if the simulation was
+terminated, is still running or the file exists or not.
+Default: \code{TRUE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$locate_output()} returns the path of a single output file of specified
 simulations.
+}
 
-$errors() returns a list of \link[=read_err]{ErrFile} objects which contain all
-contents of the simulation error file (\code{.err}). If \code{info} is \code{FALSE}, only
-warnings and errors are printed.
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get the file path of the error file
+group$locate_output(c(1, 4), ".err", strict = FALSE)
 
-\code{$list_table()} returns a list of character vectors containing all available
-table and view names in the SQLite file.
+# can use to detect if certain output file exists
+group$locate_output(c(1, 4), ".expidf", strict = TRUE)
+}
 
-\code{$read_table()} takes a valid table name of those from \code{$list_table()} and
-returns that table data in a \link[data.table:data.table]{data.table} format.
+}
+\if{html}{\out{</div>}}
 
-\code{$read_rdd()} and \code{$read_mdd()} return the core data of Report Data
-Dictionary (RDD) file and Meter Data Dictionary (MDD) file respectively. For
-details, please see \code{\link[=read_rdd]{read_rdd()}}.
+}
 
-\code{$report_data_dict()} returns a \link[data.table:data.table]{data.table} which
-contains all information about report data for specified simulations. For
-details on the meaning of each columns, please see "2.20.2.1
-ReportDataDictionary Table" in EnergyPlus "Output Details and Examples"
-documentation.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-list_table"></a>}}
+\subsection{Method \code{list_table()}}{
+List all table names in EnergyPlus SQL outputs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$list_table(which = NULL)}\if{html}{\out{</div>}}
+}
 
-\code{$report_data()} extracts the report data in a
-\link[data.table:data.table]{data.table} using key values, variable names and
-other arguments.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$list_table()} returns a list of character vectors that contain all
+available table and view names in the EnergyPlus SQLite files for
+group simulations. The list is named using IDF names.
+}
 
-\code{$tabular_data()} extracts tabular data in a
-\link[data.table:data.table]{data.table}.
+\subsection{Returns}{
+A named list of character vectors.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$list_table(c(1, 4))
+}
 
-For convenience, input character arguments matching in \code{$report_data()} and
-\code{$tabular_data()} are \strong{case-insensitive}.
+}
+\if{html}{\out{</div>}}
 
-For \code{$read_table()}, \code{$read_rdd()}, \code{$read_mdd()}, \code{$report_data_dict()},
-\code{$report_data()} and \code{$tabular_data()}, the returned data.table has a \code{case}
-column in the returned \link[data.table:data.table]{data.table} that indicates
-the names of models. For detailed documentation on the results of those
-methods, please see \link{EplusJob}.
+}
 
-\strong{Arguments}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_table"></a>}}
+\subsection{Method \code{read_table()}}{
+Read the same table from EnergyPlus SQL outputs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$read_table(which = NULL, name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
+\item{\code{name}}{A single string specifying the name of table to read.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$read_table()} takes a simulation index and a valid table \code{name} of
+those from
+\href{../../eplusr/html/EplusGroupJob.html#method-list_table}{\code{$list_table()}}
+and returns that table data in a \code{\link[data.table:data.table]{data.table::data.table()}} format.
+The first column will always be \code{case} which can be used to
+distinguish output from different simulations.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read a specific table
+group$read_table(c(1, 4), "Zones")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_rdd"></a>}}
+\subsection{Method \code{read_rdd()}}{
+Read Report Data Dictionary (RDD) files
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$read_rdd(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$read_rdd()} return the core data of Report Data Dictionary (RDD)
+files. For details, please see \code{\link[=read_rdd]{read_rdd()}}.
+The first column will always be \code{case} which can be used to
+distinguish output from different simulations.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$read_rdd(c(1, 4))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-read_mdd"></a>}}
+\subsection{Method \code{read_mdd()}}{
+Read Meter Data Dictionary (MDD) files
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$read_mdd(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$read_mdd()} return the core data of Meter Data Dictionary (MDD)
+files. For details, please see \code{\link[=read_mdd]{read_mdd()}}.
+The first column will always be \code{case} which can be used to
+distinguish output from different simulations.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$read_mdd(c(1, 4))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-report_data_dict"></a>}}
+\subsection{Method \code{report_data_dict()}}{
+Read report data dictionary from EnergyPlus SQL outputs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$report_data_dict(which = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$report_data_dict()} returns a \code{\link[data.table:data.table]{data.table::data.table()}} which
+contains all information about report data.
+
+For details on the meaning of each columns, please see "2.20.2.1
+ReportDataDictionary Table" in EnergyPlus "Output Details and
+Examples" documentation.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 10 columns:
 \itemize{
-\item \code{which}: An integer vector of the indexes or a character vector or names of
-parametric simulations. If \code{NULL}, results of all parametric simulations
-are returned. Default: \code{NULL}.
-\item \code{dir}: The parent output directory for specified simulations. Outputs of
-each simulation are placed in a separate folder under the parent directory.
-\item \code{wait}: If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
-finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
-Default: \code{TRUE}.
-\item \code{force}: Only applicable when the last simulation runs with \code{wait} equals
-to \code{FALSE} and is still running. If \code{TRUE}, current running job is
-forced to stop and a new one will start. Default: \code{FALSE}.
-\item \code{echo}: Only applicable when \code{wait} is \code{TRUE}. Whether to simulation
-status. Default: \code{TRUE}.
-\item \code{suffix}: A string that indicates the file extension of simulation output.
-Default: \code{".err"}.
-\item \code{table}: A string specifying which table to read. Valid table names can be
-obtained using \code{$list_table()}.
-\item \code{strict}: If \code{TRUE}, it checks if the simulation was terminated, is
-still running or the file does not exist. Default: \code{TRUE}.
-\item \code{info}: If \code{FALSE},only warnings and errors are printed. Default: \code{FALSE}.
-\item \code{key_value}: A character vector to identify key values of the data. If
-\code{NULL}, all keys of that variable will be returned. \code{key_value} can also be
-data.frame that contains \code{key_value} and \code{name} columns. In this case,
-\code{name} argument in \code{$report_data()} is ignored. All available \code{key_value}
-for current simulation output can be obtained using \code{$report_data_dict()}.
-Default: \code{NULL}.
-\item \code{name}: A character vector to identify names of the data. If
-\code{NULL}, all names of that variable will be returned. If \code{key_value} is a
-data.frame, \code{name} is ignored. All available \code{name} for current simulation
-output can be obtained using \code{$report_data_dict()}.  Default: \code{NULL}.
-\item \code{year}: Year of the date time in column \code{datetime}. If \code{NULL}, it
-will calculate a year value that meets the start day of week restriction
-for each environment. Default: \code{NULL}.
-\item \code{tz}: Time zone of date time in column \code{datetime}. Default: \code{"UTC"}.
-\item \code{case}: If not \code{NULL}, a character column will be added indicates the case
-of this simulation. If \code{"auto"}, the name of the IDF file without extension
-is used.
-\item \code{all}: If \code{TRUE}, extra columns are also included in the returned
-\link[data.table:data.table]{data.table}.
-\item \code{wide}: If \code{TRUE}, the output is formated in the same way as standard
-EnergyPlus csv output file.
-\item \code{period}: A Date or POSIXt vector used to specify which time period to
-return. The year value does not matter and only month, day, hour and
-minute value will be used when subsetting. If \code{NULL}, all time period of
-data is returned. Default: \code{NULL}.
-\item \code{month}, \code{day}, \code{hour}, \code{minute}: Each is an integer vector for month, day,
-hour, minute subsetting of \code{datetime} column when querying on the SQL
-database. If \code{NULL}, no subsetting is performed on those components. All
-possible \code{month}, \code{day}, \code{hour} and \code{minute} can be obtained using
-\code{$read_table("Time")}.  Default: \code{NULL}.
-\item \code{interval}: An integer vector used to specify which interval length of
-report to extract. If \code{NULL}, all interval will be used. Default: \code{NULL}.
-\item \code{simulation_days}: An integer vector to specify which simulation day data
-to extract. Note that this number resets after warmup and at the beginning
-of an environment period. All possible \code{simulation_days} can be obtained
-using \code{$read_table("Time")}. If \code{NULL}, all simulation days will be used.
-Default: \code{NULL}.
-\item \code{day_type}: A character vector to specify which day type of data to
-extract. All possible day types are: \code{Sunday}, \code{Monday}, \code{Tuesday},
-\code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday}, \code{Holiday},
-\code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1}, and \code{CustomDay2}. All
-possible values for current simulation output can be obtained using
-\code{$read_table("Time")}.
-\item \code{environment_name}: A character vector to specify which environment data to
-extract. If \code{NULL}, all environment data are returned. Default: \code{NULL}.
-All possible \code{environment_name} for current simulation output can
-be obtained using\preformatted{$read_table("EnvironmentPeriods")
+\item \code{case}: The model name. This column can be used to distinguish
+output from different simulations
+\item \code{report_data_dictionary_index}: The integer used to link the
+dictionary data to the variable data. Mainly useful when joining
+diferent tables
+\item \code{is_meter}: Whether report data is a meter data. Possible values:
+\code{0} and \code{1}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and
+\verb{HVAC System}
+\item \code{key_value}: Key name of the data
+\item \code{name}: Actual report data name
+\item \code{reporting_frequency}:
+\item \code{schedule_name}: Name of the the schedule that controls reporting
+frequency.
+\item \code{units}: The data units
 }
-\item \code{report_name}, \code{report_for}, \code{table_name}, \code{column_name}, \code{row_name}:
-Each is a character vector for subsetting when querying the SQL database.
-For the meaning of each argument, please see the description above.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$report_data_dict(c(1, 4))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-report_data"></a>}}
+\subsection{Method \code{report_data()}}{
+Read report data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$report_data(
+  which = NULL,
+  key_value = NULL,
+  name = NULL,
+  year = NULL,
+  tz = "UTC",
+  all = FALSE,
+  wide = FALSE,
+  period = NULL,
+  month = NULL,
+  day = NULL,
+  hour = NULL,
+  minute = NULL,
+  interval = NULL,
+  simulation_days = NULL,
+  day_type = NULL,
+  environment_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
+\item{\code{key_value}}{A character vector to identify key values of the
+data. If \code{NULL}, all keys of that variable will be returned.
+\code{key_value} can also be data.frame that contains \code{key_value}
+and \code{name} columns. In this case, \code{name} argument in
+\verb{$report_data()} is ignored. All available \code{key_value} for
+current simulation output can be obtained using
+\href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{$report_data_dict()}}.
+Default: \code{NULL}.}
+
+\item{\code{name}}{A character vector to identify names of the data. If
+\code{NULL}, all names of that variable will be returned. If
+\code{key_value} is a data.frame, \code{name} is ignored. All available
+\code{name} for current simulation output can be obtained using
+\href{../../eplusr/html/EplusGroupJob.html#method-report_data_dict}{\code{$report_data_dict()}}.
+Default: \code{NULL}.}
+
+\item{\code{year}}{Year of the date time in column \code{datetime}. If \code{NULL}, it
+will calculate a year value that meets the start day of week
+restriction for each environment. Default: \code{NULL}.}
+
+\item{\code{tz}}{Time zone of date time in column \code{datetime}. Default:
+\code{"UTC"}.}
+
+\item{\code{all}}{If \code{TRUE}, extra columns are also included in the returned
+\code{\link[data.table:data.table]{data.table::data.table()}}.}
+
+\item{\code{wide}}{If \code{TRUE}, the output is formated in the same way as
+standard EnergyPlus csv output file.}
+
+\item{\code{period}}{A Date or POSIXt vector used to specify which time
+period to return. The year value does not matter and only
+month, day, hour and minute value will be used when
+subsetting. If \code{NULL}, all time period of data is returned.
+Default: \code{NULL}.}
+
+\item{\code{month, day, hour, minute}}{Each is an integer vector for month,
+day, hour, minute subsetting of \code{datetime} column when
+querying on the SQL database. If \code{NULL}, no subsetting is
+performed on those components. All possible \code{month}, \code{day},
+\code{hour} and \code{minute} can be obtained using
+\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+Default: \code{NULL}.}
+
+\item{\code{interval}}{An integer vector used to specify which interval
+length of report to extract. If \code{NULL}, all interval will be
+used. Default: \code{NULL}.}
+
+\item{\code{simulation_days}}{An integer vector to specify which simulation
+day data to extract. Note that this number resets after warmup
+and at the beginning of an environment period. All possible
+\code{simulation_days} can be obtained using
+\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+If \code{NULL}, all simulation days will be used. Default: \code{NULL}.}
+
+\item{\code{day_type}}{A character vector to specify which day type of data
+to extract. All possible day types are: \code{Sunday}, \code{Monday},
+\code{Tuesday}, \code{Wednesday}, \code{Thursday}, \code{Friday}, \code{Saturday},
+\code{Holiday}, \code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1},
+and \code{CustomDay2}. All possible values for current simulation
+output can be obtained using
+\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.}
+
+\item{\code{environment_name}}{A character vector to specify which
+environment data to extract. If \code{NULL}, all environment data
+are returned. Default: \code{NULL}. All possible
+\code{environment_name} for current simulation output can be
+obtained using:\preformatted{$read_table(NULL, "EnvironmentPeriods")
+}}
+
+\item{\code{case}}{If not \code{NULL}, a character column will be added indicates
+the case of this simulation. If \code{"auto"}, the name of the IDF
+file without extension is used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$report_data()} extracts the report data in a
+\code{\link[data.table:data.table]{data.table::data.table()}} using key values, variable names and other
+specifications.
+
+\verb{$report_data()} can also directly take all or subset output from
+\verb{$report_data_dict()} as input, and extract all data specified.
+
+The returned column numbers varies depending on \code{all} argument.
+\itemize{
+\item \code{all} is \code{FALSE}, the returned \code{\link[data.table:data.table]{data.table::data.table()}} has 6 columns:
+\itemize{
+\item \code{case}: The model name. This column can be used to distinguish
+output from different simulations
+\item \code{datetime}: The date time of simulation result
+\item \code{key_value}: Key name of the data
+\item \code{name}: Actual report data name
+\item \code{units}: The data units
+\item \code{value}: The data value
+}
+\item \code{all} is \code{TRUE}, besides columns described above, extra columns are also
+included:
+\itemize{
+\item \code{month}: The month of reported date time
+\item \code{day}: The day of month of reported date time
+\item \code{hour}: The hour of reported date time
+\item \code{minute}: The minute of reported date time
+\item \code{dst}: Daylight saving time indicator. Possible values: \code{0} and \code{1}
+\item \code{interval}: Length of reporting interval
+\item \code{simulation_days}: Day of simulation
+\item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
+\item \code{environment_period_index}: The indice of environment.
+\item \code{environment_name}: A text string identifying the environment.
+\item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
+\code{1}
+\item \code{type}: Nature of data type with respect to state. Possible values: \code{Sum}
+and \code{Avg}
+\item \code{index_group}: The report group, e.g. \code{Zone}, \code{System}
+\item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and \verb{HVAC System}
+\item \code{reporting_frequency}: The reporting frequency of the variable, e.g.
+\verb{HVAC System Timestep}, \verb{Zone Timestep}.
+\item \code{schedule_name}: Name of the the schedule that controls reporting
+frequency.
 }
 }
 
-\section{Printing}{
-\preformatted{group$print()
-print(group)
+With the \code{datetime} column, it is quite straightforward to apply time-series
+analysis on the simulation output. However, another painful thing is that
+every simulation run period has its own \verb{Day of Week for Start Day}. Randomly
+setting the \code{year} may result in a date time series that does not have
+the same start day of week as specified in the RunPeriod objects.
+
+eplusr provides a simple solution for this. By setting \code{year} to \code{NULL},
+which is the default behavior, eplusr will calculate a year value (from
+current year backwards) for each run period that compliances with the start
+day of week restriction.
+
+It is worth noting that EnergyPlus uses 24-hour clock system where 24 is only
+used to denote midnight at the end of a calendar day. In EnergyPlus output,
+"00:24:00" with a time interval being 15 mins represents a time period from
+"00:23:45" to "00:24:00", and similarly "00:15:00" represents a time period
+from "00:24:00" to "00:15:00" of the next day. This means that if current day
+is Friday, day of week rule applied in schedule time period "00:23:45" to
+"00:24:00" (presented as "00:24:00" in the output) is also Friday, but not
+Saturday. However, if you try to get the day of week of time "00:24:00" in R,
+you will get Saturday, but not Friday. This introduces inconsistency and may
+cause problems when doing data analysis considering day of week value.
+
+With \code{wide} equals \code{TRUE}, \verb{$report_data()} will format the simulation output
+in the same way as standard EnergyPlus csv output file. Sometimes this can be
+useful as there may be existing tools/workflows that depend on this format.
+When both \code{wide} and \code{all} are \code{TRUE}, columns of runperiod environment names
+and date time components are also returned, including:
+\verb{environment_period_index", "environment_name}, \code{simulation_days},
+\code{datetime}, \code{month}, \code{day}, \code{hour}, \code{minute}, \code{day_type}.
+
+For convenience, input character arguments matching in
+\verb{$report_data()} are \strong{case-insensitive}.
 }
 
-\code{$print()} shows the core information of this \code{EplusGroupJob}, including the
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read report data
+group$report_data(c(1, 4))
+
+# specify output variables using report data dictionary
+dict <- group$report_data_dict(1)
+group$report_data(c(1, 4), dict[units == "C"])
+
+# specify output variables using 'key_value' and 'name'
+group$report_data(c(1, 4), "environment", "site outdoor air drybulb temperature")
+
+# explicitly specify year value and time zone
+group$report_data(c(1, 4), dict[1], year = 2020, tz = "Etc/GMT+8")
+
+# get all possible columns
+group$report_data(c(1, 4), dict[1], all = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output
+group$report_data(c(1, 4), dict[1], wide = TRUE)
+
+# return in a format that is similar as EnergyPlus CSV output with
+# extra columns
+group$report_data(c(1, 4), dict[1], wide = TRUE, all = TRUE)
+
+# only get data at the working hour on the first Monday
+group$report_data(c(1, 4), dict[1], hour = 8:18, day_type = "monday", simulation_days = 1:7)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-tabular_data"></a>}}
+\subsection{Method \code{tabular_data()}}{
+Read tabular data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$tabular_data(
+  which = NULL,
+  report_name = NULL,
+  report_for = NULL,
+  table_name = NULL,
+  column_name = NULL,
+  row_name = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{which}}{An integer vector of the indexes or a character vector
+or names of parametric simulations. If \code{NULL}, results of all
+parametric simulations are returned. Default: \code{NULL}.}
+
+\item{\code{report_name, report_for, table_name, column_name, row_name}}{Each is
+a character vector for subsetting when querying the SQL
+database.  For the meaning of each argument, please see the
+description above.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$tabular_data()} extracts the tabular data in a
+\code{\link[data.table:data.table]{data.table::data.table()}} using report, table, column and row name
+specifications. The returned \code{\link[data.table:data.table]{data.table::data.table()}} has
+9 columns:
+\itemize{
+\item \code{case}: The model name. This column can be used to distinguish
+output from different simulations
+\item \code{index}: Tabular data index
+\item \code{report_name}: The name of the report that the record belongs to
+\item \code{report_for}: The \code{For} text that is associated with the record
+\item \code{table_name}: The name of the table that the record belongs to
+\item \code{column_name}: The name of the column that the record belongs to
+\item \code{row_name}: The name of the row that the record belongs to
+\item \code{units}: The units of the record
+\item \code{value}: The value of the record \strong{in string format}
+}
+
+For convenience, input character arguments matching in
+\verb{$tabular_data()} are \strong{case-insensitive}.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 8 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# read all tabular data
+group$tabular_data(c(1, 4))
+
+# explicitly specify data you want
+str(group$tabular_data(c(1, 4),
+    report_name = "AnnualBuildingUtilityPerformanceSummary",
+    table_name = "Site and Source Energy",
+    column_name = "Total Energy",
+    row_name = "Total Site Energy"
+))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{EplusGroupJob} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{EplusGroupJob$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} shows the core information of this \code{EplusGroupJob}, including the
 path of IDFs and EPWs and also the simulation job status.
 
-\code{$print()} is quite useful to get the simulation status, especially when
-\code{wait} is \code{FALSE} in \code{$run()}. The job status will be updated and printed
-whenever \code{$print()} is called.
+\verb{$print()} is quite useful to get the simulation status, especially when
+\code{wait} is \code{FALSE} in \verb{$run()}. The job status will be updated and printed
+whenever \verb{$print()} is called.
 }
 
-\examples{
-\dontrun{
-if (is_avail_eplus(8.8)) {
-    dir <- eplus_config(8.8)$dir
-    path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf")[1:5]
-    path_epws <- list.files(file.path(dir, "WeatherData"), "\\\\.epw")[1:5]
-
-    group <- group_job(path_idfs, path_epws)
-
-    # get status of current job
-    group$status()
-
-    # run parametric simulations
-    group$run(wait = TRUE)
-
-    # run in background
-    group$run(wait = FALSE)
-    # get detailed job status by printing
-    print(group)
-
-    # status now includes a data.table with detailed information on each simulation
-    group$status()
-
-    # print simulation errors
-    group$errors()
-
-    # extract output of all simulations
-    group$report_data()
-
-    # extract only some simulations
-    group$report_data(c(1, 3))
-    group$tabular_data(c(1, 3))
-    group$report_data(c("rotate_30", "rotate_120"))
-    group$tabular_data(c("rotate_30", "rotate_120"))
-
-    # get output directory
-    group$output_dir()
-    group$output_dir(c(1, 3))
-
-    # get path of specific output file
-    group$locate_output(c(1, 3), ".csv")
+\subsection{Returns}{
+The \code{EplusGroupJob} object itself, invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+group$print()
 }
+
 }
-\author{
-Hongyuan Jia
+\if{html}{\out{</div>}}
+
+}
+
+}
 }

@@ -86,7 +86,7 @@ test_that("Parametric methods", {
     )
     # can save when no weather are provided
     expect_silent(paths <- {
-        empty <- empty_idf()
+        empty <- empty_idf(8.8)
         empty$save(tempfile(fileext = ".idf"))
         par <- param_job(empty, NULL)
         par$apply_measure(function (idf, x) idf, 1:2, .names = 1:2)

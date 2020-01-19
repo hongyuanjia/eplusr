@@ -21,9 +21,9 @@ of EnergyPlus, valid IDF files are defined by the "Energy+.idd" file shipped
 with the release.
 
 eplusr tries to detect all installed EnergyPlus in default installation
-locations when loading, i.e. \code{C:\\EnergyPlusVX-X-0} on Windows,
-\code{/usr/local/EnergyPlus-X-Y-0} on Linux, and
-\code{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
+locations when loading, i.e. \verb{C:\\\\EnergyPlusVX-X-0} on Windows,
+\verb{/usr/local/EnergyPlus-X-Y-0} on Linux, and
+\verb{/Applications/EnergyPlus-X-Y-0} on macOS and stores all found locations
 internally. This data is used to locate the distributed "Energy+.idd" file of
 each EnergyPlus version. And also, every time an IDD file is parsed, an \code{Idd}
 object is created and cached in an environment.
@@ -49,202 +49,191 @@ four tables:
 }
 }
 
-\section{Usage}{
-
-
-\preformatted{
-idd <- use_idd(ver)
-idd$version()
-idd$build()
-idd$group_index(group = NULL)
-idd$group_name()
-idd$from_group(class)
-idd$class_index(class = NULL, by_group = FALSE)
-idd$class_name(index = NULL, by_group = FALSE)
-idd$required_class_name()
-idd$unique_class_name()
-idd$extenesible_class_name()
-idd$is_valid_group(group)
-idd$is_valid_class(class)
-idd$object_relation(class, direction = c("all", "ref_by", "ref_to"))
-idd$object(class)
-idd$objects(class)
-idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))
-idd$objects_in_group(group)
-idd$ClassName
-idd[[ClassName]]
-idd$to_table(class, all = FALSE)
-idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
-idd$print()
-print(idd)
-}
-}
-
-\section{Arguments}{
-
-\itemize{
-\item \code{ver}: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
-\item \code{idd}: An \code{Idd} object.
-\item \code{group}: A character vector of valid group names. For
-\code{$objects_in_group()}, a single string of valid group name.
-\item \code{index}: An integer vector giving indexes of name appearance in
-the IDD file of specified classes.
-\item \code{class}: A character vector of valid class names. For \code{$object_relation()}
-and \code{$objects_in_relation()}, a single string of valid class name.
-\item \code{ClassName}: A single string of valid class name.
-\item \code{direciton}: The relation direction to extract. Should be either \code{"all"},
-\code{"ref_to"} or "ref_by". For \code{$objects_in_relation()}, only \code{"ref_to"} and
-\code{"ref_by"} are acceptable.
-\item \code{all}: If \code{TRUE}, all fields in specified classes are returned. If \code{FALSE},
-only minimum required fields are returned. Default: \code{FALSE}.
-\item \code{leading}: Leading spaces added to each field. Default: \code{4L}.
-\item \code{sep_at}: The character width to separate value string and field string.
-Default: \code{29L} which is the same as IDF Editor.
-\item \code{sep_each}: A single integer of how many empty strings to insert between
-different classes. Default: \code{0}.
-\item \code{by_group}: If \code{TRUE}, a list is returned which separates class indexes or
-names by the group they belongs to. Default: \code{FALSE}.
-}
-}
-
-\section{Detail}{
-
-
-\code{$version()} returns the IDD version in
-\link[base:numeric_version]{numeric_version}.
-
-\code{$build()} returns the build tag string.
-
-\code{$group_index()} returns integer indexes (indexes of name appearance in
-the IDD file) of specified groups.
-
-\code{$group_name()} returns all group names.
-
-\code{$from_group()} returns the names of group that specified classes belongs to.
-
-\code{$is_valid_group()} return \code{TRUE} if the input is a valid group name.
-
-\code{$class_index()} returns integer indexes (indexes of name appearance in
-the IDD file) of specified classes. If \code{by_group} is \code{TRUE}, a list is returned
-which separate class indexes by the group they belong to. Otherwise, an
-integer vector is returned.
-
-\code{$class_name()} returns class names of specified class indexes. If \code{by_group}
-is \code{TRUE}, a list is returned which separate class names by the group they
-belong to. Otherwise, a character vector is returned.
-
-\code{$required_class_name()} returns the names of all required classes.
-
-\code{$unique_class_name()} returns the names of all unique-object classes.
-
-\code{$extensible_class_name()} returns the names of all extensible classes.
-
-\code{$is_valid_class()} return \code{TRUE} if the input is a valid class name.
-
-\code{$object()} returns an \link{IddObject} of specified class.
-
-\code{$objects()} returns a list of \link{IddObject}s of specified classes.
-
-\code{$object_relation()} returns an \code{IddRelation} object which contains field
-data that have relation with specified class. For instance, if
-\code{idd$object_relation("Class 1", "ref_to")} gives results below:\preformatted{-- Refer to Others ---------------------
-  Class: <Class 1>
-  +- Field: <1: Field 1>
-  |  v~~~~~~~~~~~~~~~~~~
-  |  \- Class: <Class 2>
-  |     \- Field: <2: Field 2>
-  |
-  \- Field: <2: Field 2>
-}
-
-This means that \code{Field 2} in class \code{Class 1} does not refer to any other fields.
-But \code{Field 1} in class \code{Class 2} refers to \code{Field 2} in class named \code{Class 2}.
-
-\code{$objects_in_relation()} returns a list of \link{IddObject}s that have relations.
-The first element is always the \link{IddObject} of that class. If specified class
-does not have any relation with other classes, a list that only contains the
-\link{IddObject} of that class is returned. For instance,
-\code{idd$objects_in_relation("Construction", "ref_to")} will return a list of an
-\link{IddObject} of class \code{Construction} and also all \link{IddObject}s that class
-\code{Construction} refers to; similarly, \code{idd$objects_in_relation("Construction", "ref_by")} will return a list of an \link{IddObject} of class \code{Construction} and
-also all \link{IddObject}s that refer to class \code{Construction}.
-
-\code{$objects_in_group()} returns a list of \link{IddObject}s of specified group.
-
-eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
-more convenient to get a single \link{IddObject}. Basically, \code{idd$ClassName} and
-\code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
-Here, \code{ClassName} is a single valid class name where all characters other
-than letters and numbers are replaced by a underscore \code{_}.
-
-For details about \link{IddObject}, please see \link{IddObject} class.
-
-\code{$to_table()} returns a \link[data.table:data.table]{data.table} that contains
-core data of specified class. It has 3 columns:
-\itemize{
-\item \code{class}: Character type. Class names.
-\item \code{index}: Integer type. Field indexes.
-\item \code{field}: Character type. Field names.
-}
-
-\code{$to_string()} returns empty objects of specified class in a character vector
-format. It is formatted exactly the same as in IDF Editor.
-
-\code{$print()} prints basic info ob current Idd object, including version, build
-tag and total class number.
-}
-
 \examples{
-\dontrun{
-# get the Idd object of EnergyPlus v8.8
+
+## ------------------------------------------------
+## Method `Idd$new`
+## ------------------------------------------------
+
+\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+
+# Preferable way
 idd <- use_idd(8.8, download = "auto")
 
-# version
+
+## ------------------------------------------------
+## Method `Idd$version`
+## ------------------------------------------------
+
+# get version
 idd$version()
 
-# build
+
+## ------------------------------------------------
+## Method `Idd$build`
+## ------------------------------------------------
+
+# get build tag
 idd$build()
 
-# all group names
-str(idd$group_name())
 
-# all class names
-str(idd$class_name())
+## ------------------------------------------------
+## Method `Idd$group_name`
+## ------------------------------------------------
 
-# all required class names
-str(idd$required_class_name())
+# get names of all groups Idf contains
+idd$group_name()
 
-# all unique class names
-str(idd$unique_class_name())
 
-# IddObject of SimulationControl class
-idd$object("SimulationControl")
-# OR
-idd$SimulationControl
-# OR
-idd[["SimulationControl"]]
+## ------------------------------------------------
+## Method `Idd$from_group`
+## ------------------------------------------------
 
-# IddObject of Construction and Material class
-idd$objects(c("Construction", "Material"))
+idd$from_group(c("Version", "Schedule:Compact"))
 
-# show all classes that refer to Material class
-length(idd$object_relation("Material", "ref_by"))
 
-# IddObjects that refer to class Construction
-length(idd$objects_in_relation("Construction", "ref_by"))
+## ------------------------------------------------
+## Method `Idd$class_name`
+## ------------------------------------------------
 
-# IddObjects that class Construction refers to
-length(idd$objects_in_relation("Construction", "ref_to"))
+# get names of the 10th to 20th class
+idd$class_name(10:20)
 
-# All IddObjects in group Schedules
-length(idd$objects_in_group("Schedules"))
+# get names of all classes in Idf
+idd$class_name()
 
-# Extract core data of class Material and Construction
-idd$to_table(c("Material", "Construction"))
+# get names of all classes grouped by group names in Idf
+idd$class_name(by_group = TRUE)
 
-# Get empty Material object and Construction object in a character vector
+
+## ------------------------------------------------
+## Method `Idd$required_class_name`
+## ------------------------------------------------
+
+idd$required_class_name()
+
+
+## ------------------------------------------------
+## Method `Idd$unique_class_name`
+## ------------------------------------------------
+
+idd$unique_class_name()
+
+
+## ------------------------------------------------
+## Method `Idd$extensible_class_name`
+## ------------------------------------------------
+
+idd$extensible_class_name()
+
+
+## ------------------------------------------------
+## Method `Idd$group_index`
+## ------------------------------------------------
+
+idd$group_index()
+
+
+## ------------------------------------------------
+## Method `Idd$class_index`
+## ------------------------------------------------
+
+idd$class_index()
+
+
+## ------------------------------------------------
+## Method `Idd$is_valid_group`
+## ------------------------------------------------
+
+idd$is_valid_group(c("Schedules", "Compliance Objects"))
+
+
+## ------------------------------------------------
+## Method `Idd$is_valid_class`
+## ------------------------------------------------
+
+idd$is_valid_class(c("Building", "ShadowCalculation"))
+
+
+## ------------------------------------------------
+## Method `Idd$object`
+## ------------------------------------------------
+
+idd$object(3)
+
+idd$object("Building")
+
+
+## ------------------------------------------------
+## Method `Idd$objects`
+## ------------------------------------------------
+
+idd$objects(c(3,10))
+
+idd$objects(c("Version", "Material"))
+
+
+## ------------------------------------------------
+## Method `Idd$object_relation`
+## ------------------------------------------------
+
+# check each construction layer's possible references
+idd$object_relation("Construction", "ref_to")
+
+# check where construction being used
+idd$object_relation("Construction", "ref_by")
+
+
+## ------------------------------------------------
+## Method `Idd$objects_in_relation`
+## ------------------------------------------------
+
+# get class Construction and all classes that it can refer to
+idd$objects_in_relation("Construction", "ref_to")
+
+# get class Construction and all classes that refer to it
+idd$objects_in_relation("Construction", "ref_by")
+
+
+## ------------------------------------------------
+## Method `Idd$objects_in_group`
+## ------------------------------------------------
+
+# get all classes in Schedules group
+idd$objects_in_group("Schedules")
+
+
+## ------------------------------------------------
+## Method `Idd$to_table`
+## ------------------------------------------------
+
+# extract data of class Material
+idd$to_table(class = "Material")
+
+# extract multiple class data
+idd$to_table(c("Construction", "Material"))
+
+
+## ------------------------------------------------
+## Method `Idd$to_string`
+## ------------------------------------------------
+
+# get text format of class Material
+head(idd$to_string(class = "Material"))
+
+# get text format of multiple class
 idd$to_string(c("Material", "Construction"))
-}
+
+# tweak output formatting
+idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+
+
+## ------------------------------------------------
+## Method `Idd$print`
+## ------------------------------------------------
+
+idd$print()
+
 }
 \references{
 \href{https://github.com/NREL/EnergyPlus/tree/develop/src/IDF_Editor}{IDFEditor},
@@ -256,4 +245,830 @@ curtain class
 }
 \author{
 Hongyuan Jia
+}
+\section{Methods}{
+\subsection{Public methods}{
+\itemize{
+\item \href{#method-new}{\code{Idd$new()}}
+\item \href{#method-version}{\code{Idd$version()}}
+\item \href{#method-build}{\code{Idd$build()}}
+\item \href{#method-group_name}{\code{Idd$group_name()}}
+\item \href{#method-from_group}{\code{Idd$from_group()}}
+\item \href{#method-class_name}{\code{Idd$class_name()}}
+\item \href{#method-required_class_name}{\code{Idd$required_class_name()}}
+\item \href{#method-unique_class_name}{\code{Idd$unique_class_name()}}
+\item \href{#method-extensible_class_name}{\code{Idd$extensible_class_name()}}
+\item \href{#method-group_index}{\code{Idd$group_index()}}
+\item \href{#method-class_index}{\code{Idd$class_index()}}
+\item \href{#method-is_valid_group}{\code{Idd$is_valid_group()}}
+\item \href{#method-is_valid_class}{\code{Idd$is_valid_class()}}
+\item \href{#method-object}{\code{Idd$object()}}
+\item \href{#method-objects}{\code{Idd$objects()}}
+\item \href{#method-object_relation}{\code{Idd$object_relation()}}
+\item \href{#method-objects_in_relation}{\code{Idd$objects_in_relation()}}
+\item \href{#method-objects_in_group}{\code{Idd$objects_in_group()}}
+\item \href{#method-to_table}{\code{Idd$to_table()}}
+\item \href{#method-to_string}{\code{Idd$to_string()}}
+\item \href{#method-print}{\code{Idd$print()}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{Idd} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$new(path)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{Either a path, a connection, or literal data (either a single
+string or a raw vector) to an EnergyPlus Input Data Dictionary
+(IDD). If a file path, that file usually has a extension
+\code{.idd}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+It takes an EnergyPlus Input Data Dictionary (IDD) as input and
+returns an \code{Idd} object.
+
+It is suggested to use helper \code{\link[=use_idd]{use_idd()}} which supports to directly
+take a valid IDD version as input and search automoatically the
+corresponding file path.
+}
+
+\subsection{Returns}{
+An \code{Idd} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+
+# Preferable way
+idd <- use_idd(8.8, download = "auto")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-version"></a>}}
+\subsection{Method \code{version()}}{
+Get the version of current \code{Idd}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$version()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$version()} returns the version of current \code{Idd} in a
+\code{\link[base:numeric_version]{base::numeric_version()}} format. This makes it easy to direction
+compare versions of different \code{Idd}s, e.g. \code{idd$version() > 8.6} or
+\code{idd1$version() > idd2$version()}.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get version
+idd$version()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-build"></a>}}
+\subsection{Method \code{build()}}{
+Get the build tag of current \code{Idd}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$build()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$build()} returns the build tag of current \code{Idd}. If no build tag is
+found, \code{NA} is returned.
+}
+
+\subsection{Returns}{
+A \code{\link[base:numeric_version]{base::numeric_version()}} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get build tag
+idd$build()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-group_name"></a>}}
+\subsection{Method \code{group_name()}}{
+Get names of groups
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$group_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$group_name()} returns names of groups current \code{Idd} contains.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get names of all groups Idf contains
+idd$group_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-from_group"></a>}}
+\subsection{Method \code{from_group()}}{
+Get the name of group that specified class belongs to
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$from_group(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A character vector of valid class names in current
+\code{Idd}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$from_group()} returns the name of group that specified class
+belongs to.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$from_group(c("Version", "Schedule:Compact"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_name"></a>}}
+\subsection{Method \code{class_name()}}{
+Get names of classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$class_name(index = NULL, by_group = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{An integer vector of class indices.}
+
+\item{\code{by_group}}{If \code{TRUE}, a list is returned which separates class
+names by the group they belong to. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$class_name()} returns names of classes current \code{Idd} contains
+}
+
+\subsection{Returns}{
+A character vector if \code{by_group} is \code{FALSE} and a list of
+character vectors when \code{by_group} is \code{TRUE}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get names of the 10th to 20th class
+idd$class_name(10:20)
+
+# get names of all classes in Idf
+idd$class_name()
+
+# get names of all classes grouped by group names in Idf
+idd$class_name(by_group = TRUE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-required_class_name"></a>}}
+\subsection{Method \code{required_class_name()}}{
+Get the names of required classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$required_class_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$required_class_name()} returns the names of required classes in
+current \code{Idd}. "Require" means that for any \link{Idf} there should be at
+least one object.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$required_class_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-unique_class_name"></a>}}
+\subsection{Method \code{unique_class_name()}}{
+Get the names of unique-object classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$unique_class_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$unique_class_name()} returns the names of unique-object classes in
+current \code{Idd}. "Unique-object" means that for any \link{Idf} there should
+be at most one object in those classes.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$unique_class_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-extensible_class_name"></a>}}
+\subsection{Method \code{extensible_class_name()}}{
+Get the names of classes with extensible fields
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$extensible_class_name()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$extensible_class_name()} returns the names of classes with
+extensible fields in current \code{Idd}. "Extensible fields" indicate
+fields that can be added dynamically, such like the X, Y and Z
+vertices of a building surface.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$extensible_class_name()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-group_index"></a>}}
+\subsection{Method \code{group_index()}}{
+Get the indices of specified groups
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$group_index(group = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{group}}{A character vector of valid group names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$group_index()} returns the indices of specifed groups in
+current \code{Idd}. A group index is just an integer indicating its
+appearance order in the \code{Idd}.
+}
+
+\subsection{Returns}{
+An integer vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$group_index()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-class_index"></a>}}
+\subsection{Method \code{class_index()}}{
+Get the indices of specified classes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$class_index(class = NULL, by_group = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A character vector of valid class names.}
+
+\item{\code{by_group}}{If \code{TRUE}, a list is returned which separates class
+names by the group they belong to. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$class_index()} returns the indices of specifed classes in
+current \code{Idd}. A class index is just an integer indicating its
+appearance order in the \code{Idd}.
+}
+
+\subsection{Returns}{
+An integer vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$class_index()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid_group"></a>}}
+\subsection{Method \code{is_valid_group()}}{
+Check if elements in input character vector are valid group names.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$is_valid_group(group)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{group}}{A character vector to check.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_group()} returns \code{TRUE}s if given character vector
+contains valid group names in the context of current \code{Idd}, and
+\code{FALSE}s otherwise.
+
+Note that case-sensitive matching is performed, which means that
+\code{"Location and Climate"} is a valid group name but \code{"location and climate"} is not.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as input character
+vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$is_valid_group(c("Schedules", "Compliance Objects"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_valid_class"></a>}}
+\subsection{Method \code{is_valid_class()}}{
+Check if elements in input character vector are valid class names.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$is_valid_class(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A character vector to check.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$is_valid_class()} returns \code{TRUE}s if given character vector
+contains valid class names in the context of current \code{Idd}, and
+\code{FALSE}s otherwise.
+
+Note that case-sensitive matching is performed, which means that
+\code{"Version"} is a valid class name but \code{"version"} is not.
+}
+
+\subsection{Returns}{
+A logical vector with the same length as input character
+vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$is_valid_class(c("Building", "ShadowCalculation"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-object"></a>}}
+\subsection{Method \code{object()}}{
+Extract an \link{IddObject} object using class index or name.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$object(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single integer specifying the class index or a single
+string specifying the class name.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$object()} returns an \link{IddObject} object specified by a class ID
+or name.
+
+Note that case-sensitive matching is performed, which means that
+\code{"Version"} is a valid class name but \code{"version"} is not.
+
+For convenience, underscore-style names are allowed, e.g.
+\code{Site_Location} is equivalent to \code{Site:Location}.
+}
+
+\subsection{Returns}{
+An \link{IddObject} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$object(3)
+
+idd$object("Building")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-objects"></a>}}
+\subsection{Method \code{objects()}}{
+Extract multiple \link{IddObject} objects using class indices or names.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$objects(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{An integer vector specifying class indices or a character
+vector specifying class names.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$objects()} returns a named list of \link{IddObject} objects using class
+indices or names. The returned list is named using class names.
+
+Note that case-sensitive matching is performed, which means that
+\code{"Version"} is a valid class name but \code{"version"} is not.
+
+For convenience, underscore-style names are allowed, e.g.
+\code{Site_Location} is equivalent to \code{Site:Location}.
+}
+
+\subsection{Returns}{
+A named list of \link{IddObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$objects(c(3,10))
+
+idd$objects(c("Version", "Material"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-object_relation"></a>}}
+\subsection{Method \code{object_relation()}}{
+Extract the relationship between class fields.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$object_relation(class, direction = c("all", "ref_to", "ref_by"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single integer specifying the class index or a single
+string specifying the class name.}
+
+\item{\code{direction}}{The relation direction to extract. Should be one of
+\code{"all"}, \code{"ref_to"} or \code{"ref_by"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Many fields in \link{Idd} can be referred by others. For example, the
+\verb{Outside Layer} and other fields in \code{Construction} class refer to the
+\code{Name} field in \code{Material} class and other material related classes.
+Here it means that the \verb{Outside Layer} field \strong{refers to} the \code{Name}
+field and the \code{Name} field is \strong{referred by} the \verb{Outside Layer}.
+
+\verb{$object_relation()} provides a simple interface to get this kind of
+relation. It takes a single class index or name and also a relation
+direction, and returns an \code{IddRelation} object which contains data
+presenting such relation above. For instance, if
+\code{idd$object_relation("Construction", "ref_to")} gives results below:\preformatted{-- Refer to Others ---------------------------
+  Class: <Construction>
+  |- Field: <02: Outside Layer>
+  |  v~~~~~~~~~~~~~~~~~~~~~~~~~
+  |  |- Class: <Material>
+  |  |  \\- Field: <1: Name>
+  |  |
+  |  |- Class: <Material:NoMass>
+  |  |  \\- Field: <1: Name>
+  |  |
+  |  |- Class: <Material:InfraredTransparent>
+  |  |  \\- Field: <1: Name>
+  |  |
+  ......
+}
+
+This means that the value of field \verb{Outside Layer} in class
+\code{Construction} can be one of values from field \code{Name} in class
+\code{Material}, field \code{Name} in class \code{Material:NoMass}, field \code{Name} in
+class \code{Material:InfraredTransparent} and etc. All those classes can
+be further easily extracted using \verb{$objects_in_relation()} method
+described below.
+}
+
+\subsection{Returns}{
+An \code{IddRelation} object, which is a list of 3
+\code{\link[data.table:data.table]{data.table::data.table()}}s named \code{ref_to} and \code{ref_by}.
+Each \code{\link[data.table:data.table]{data.table::data.table()}} contains 12 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# check each construction layer's possible references
+idd$object_relation("Construction", "ref_to")
+
+# check where construction being used
+idd$object_relation("Construction", "ref_by")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-objects_in_relation"></a>}}
+\subsection{Method \code{objects_in_relation()}}{
+Extract multiple \link{IddObject} objects referencing each others.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single integer specifying the class index or a single
+string specifying the class name.}
+
+\item{\code{direction}}{The relation direction to extract. Should be either
+\code{"ref_to"} or \code{"ref_by"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$objects_in_relation()} returns a named list of \link{IddObject} objects
+that have specified relationship with given class. The first element of
+returned list is always the specified class itself. If that
+class does not have specified relationship with other classes, a list
+that only contains specified class itself is returned.
+
+For instance, \code{idd$objects_in_relation("Construction", "ref_by")}
+will return a named list of an \link{IddObject} object named
+\code{Construction} and also all other \link{IddObject} objects that can refer
+to field values in class \code{Construction}. Similarly,
+\code{idd$objects_in_relation("Construction", "ref_to")} will return a
+named list of an \link{IddObject} object named \code{Construction} and also all
+other \link{IddObject} objects that \code{Construction} can refer to.
+}
+
+\subsection{Returns}{
+An named list of \link{IddObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get class Construction and all classes that it can refer to
+idd$objects_in_relation("Construction", "ref_to")
+
+# get class Construction and all classes that refer to it
+idd$objects_in_relation("Construction", "ref_by")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-objects_in_group"></a>}}
+\subsection{Method \code{objects_in_group()}}{
+Extract all \link{IddObject} objects in one group.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$objects_in_group(group)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{group}}{A single string of valid group name for current \code{Idd}
+object.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$objects_in_group()} returns a named list of all \link{IddObject} objects
+in specified group. The returned list is named using class names.
+}
+
+\subsection{Returns}{
+A named list of \link{IddObject} objects.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get all classes in Schedules group
+idd$objects_in_group("Schedules")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_table"></a>}}
+\subsection{Method \code{to_table()}}{
+Format \code{Idd} classes as a data.frame
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$to_table(class, all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A character vector of class names.}
+
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for
+specified class will be returned. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
+contains basic data of specified classes.
+The returned \link[data.table:data.table]{data.table} has 3 columns:
+\itemize{
+\item \code{class}: Character type. Current class name.
+\item \code{index}: Integer type. Field indexes.
+\item \code{field}: Character type. Field names.
+}
+}
+
+\subsection{Returns}{
+A \link[data.table:data.table]{data.table} with 3 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# extract data of class Material
+idd$to_table(class = "Material")
+
+# extract multiple class data
+idd$to_table(c("Construction", "Material"))
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-to_string"></a>}}
+\subsection{Method \code{to_string()}}{
+Format \code{Idf} classes as a character vector
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A character vector of class names.}
+
+\item{\code{leading}}{Leading spaces added to each field. Default: \code{4L}.}
+
+\item{\code{sep_at}}{The character width to separate value string and field
+string. Default: \code{29L} which is the same as IDF Editor.}
+
+\item{\code{sep_each}}{A single integer of how many empty strings to insert
+between different classes. Default: \code{0}.}
+
+\item{\code{all}}{If \code{TRUE}, all available fields defined in IDD for
+specified class will be returned. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$to_string()} returns the text format of specified classes. The
+returned character vector can be pasted into an IDF file as empty
+objects of specified classes.
+}
+
+\subsection{Returns}{
+A character vector.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get text format of class Material
+head(idd$to_string(class = "Material"))
+
+# get text format of multiple class
+idd$to_string(c("Material", "Construction"))
+
+# tweak output formatting
+idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{Idd} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idd$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} prints the \code{Idd} object giving the information of version,
+build tag and total class numbers.
+}
+
+\subsection{Returns}{
+The \code{Idd} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{idd$print()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
 }

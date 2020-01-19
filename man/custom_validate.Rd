@@ -4,10 +4,18 @@
 \alias{custom_validate}
 \title{Customize validation components}
 \usage{
-custom_validate(required_object = FALSE, unique_object = FALSE,
-  unique_name = FALSE, extensible = FALSE, required_field = FALSE,
-  autofield = FALSE, type = FALSE, choice = FALSE, range = FALSE,
-  reference = FALSE)
+custom_validate(
+  required_object = FALSE,
+  unique_object = FALSE,
+  unique_name = FALSE,
+  extensible = FALSE,
+  required_field = FALSE,
+  auto_field = FALSE,
+  type = FALSE,
+  choice = FALSE,
+  range = FALSE,
+  reference = FALSE
+)
 }
 \arguments{
 \item{required_object}{Check if required objects are missing in current
@@ -25,7 +33,7 @@ Default: \code{FALSE}.}
 \item{required_field}{Check if all required fields have values. Default:
 \code{FALSE}.}
 
-\item{autofield}{Check if all fields with value \code{"Autosize"} and
+\item{auto_field}{Check if all fields with value \code{"Autosize"} and
 \code{"Autocalculate"} are valid or not. Default: \code{FALSE}.}
 
 \item{type}{Check if all fields have values with valid types, i.e.
@@ -46,8 +54,8 @@ A named list with 10 elements.
 }
 \description{
 \code{custom_validate()} makes it easy to customize what validation components
-should be included during IDF object modifications using \code{$dup()}, \code{$add()},
-\code{$set()} and other methods in \link{Idf} class.
+should be included during IDF object modifications using \verb{$dup()}, \verb{$add()},
+\verb{$set()} and other methods in \link{Idf} class.
 }
 \details{
 There are 10 different validation check components in total. Three predefined

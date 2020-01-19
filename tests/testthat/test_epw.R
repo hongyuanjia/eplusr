@@ -3,7 +3,8 @@ test_that("Epw class", {
     clean_tempdir()
     eplusr_option(verbose_info = FALSE)
 
-    skip_if_not(is_avail_eplus(8.8))
+    skip_on_cran()
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
     expect_silent(epw <- read_epw(path_epw))
@@ -17,54 +18,11 @@ test_that("Epw class", {
     # can read local EPW file
     expect_silent(epw <- read_epw(file.path(tempdir(), "weather.epw")))
 
-    # can get basic info
-    expect_warning(city <- epw$city, "deprecated")
-    expect_warning(state_province <- epw$state_province, "deprecated")
-    expect_warning(country <- epw$country, "deprecated")
-    expect_warning(data_source <- epw$data_source, "deprecated")
-    expect_warning(wmo_number <- epw$wmo_number, "deprecated")
-    expect_warning(latitude <- epw$latitude, "deprecated")
-    expect_warning(longitude <- epw$longitude, "deprecated")
-    expect_warning(time_zone <- epw$time_zone, "deprecated")
-    expect_warning(elevation <- epw$elevation, "deprecated")
-    expect_warning(time_step <- epw$time_step, "deprecated")
-    expect_warning(start_day_of_week <- epw$start_day_of_week, "deprecated")
-    expect_equal(city, "San Francisco Intl Ap")
-    expect_equal(state_province, "CA")
-    expect_equal(country, "USA")
-    expect_equal(data_source, "TMY3")
-    expect_equal(wmo_number, "724940")
-    expect_equal(latitude, 37.62)
-    expect_equal(longitude, -122.4)
-    expect_equal(time_zone, -8)
-    expect_equal(elevation, 2)
-    expect_equal(time_step, 1)
-    expect_equal(start_day_of_week, "Sunday")
-
-    # can set basic info
-    expect_warning({epw$city <- "Chongqing"; city <- epw$city}, "deprecated")
-    expect_warning({epw$state_province <- "Chongqing"; state_province <- epw$state_province}, "deprecated")
-    expect_warning({epw$country <- "China"; country <- epw$country}, "deprecated")
-    expect_warning({epw$data_source <- "TMY"; data_source <- epw$data_source}, "deprecated")
-    expect_warning({epw$wmo_number <- "724944"; wmo_number <- epw$wmo_number}, "deprecated")
-    expect_warning({epw$latitude <- 20.0; latitude <- epw$latitude}, "deprecated")
-    expect_warning({epw$longitude <- -120.0; longitude <- epw$longitude}, "deprecated")
-    expect_warning({epw$time_zone <- 8; time_zone <- epw$time_zone}, "deprecated")
-    expect_warning({epw$elevation <- 100; elevation <- epw$elevation}, "deprecated")
-    expect_error({epw$time_step <- 2}, class = "error_eplusr_deprecated_time_step")
-    expect_warning({epw$start_day_of_week <- "Monday"; start_day_of_week <- epw$start_day_of_week}, "deprecated")
-    expect_equal(city, "Chongqing")
-    expect_equal(state_province, "Chongqing")
-    expect_equal(country, "China")
-    expect_equal(data_source, "TMY")
-    expect_equal(wmo_number, "724944")
-    expect_equal(latitude, 20.0)
-    expect_equal(longitude, -120.0)
-    expect_equal(time_zone, 8)
-    expect_equal(elevation, 100)
-    expect_equal(start_day_of_week, "Monday")
-
-    expect_equal(epw$location(),
+    expect_equal(
+        epw$location(city = "Chongqing", state_province = "Chongqing", country = "China",
+            data_source = "TMY", wmo_number = "724944", latitude = 20.0,
+            longitude = -120.0, time_zone = 8L, elevation = 100
+        ),
         list(city = "Chongqing",
              state_province = "Chongqing",
              country = "China",
@@ -114,7 +72,6 @@ test_that("Epw class", {
     expect_is(epw$fill_action(), "list")
 
     # can get weather data
-    expect_warning(epw$get_data(), "deprecated")
     expect_is(epw$data(), "data.table")
     expect_error(epw$data(2), class = "error_invalid_data_period_index")
     expect_equal(ncol(epw$data()), 36L)

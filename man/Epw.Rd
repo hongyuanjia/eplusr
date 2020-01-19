@@ -65,91 +65,508 @@ EnergyPlus energy model calibration often uses actual measured weather data.
 In order to streamline the error-prone process of creating custom EPW file,
 \code{Epw} provides methods to direction add, replace the core weather data.
 }
-\section{Usage}{
-\preformatted{epw <- read_epw(path)
-epw$location(city, state_province, country, data_source, wmo_number, latitude,
-             longitude, time_zone, elevation)
+\examples{
+
+## ------------------------------------------------
+## Method `Epw$new`
+## ------------------------------------------------
+
+# read an EPW file from EnergyPlus website
+path_base <- "https://energyplus.net/weather-download"
+path_region <- "north_and_central_america_wmo_region_4/USA/CA"
+path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+path_epw <- file.path(path_base, path_region, path_file)
+epw <- read_epw(path_epw)
+
+# read an EPW file distributed with EnergyPlus
+if (is_avail_eplus(8.8)) {
+    path_epw <- file.path(
+        eplus_config(8.8)$dir,
+        "WeatherData",
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    )
+    epw <- read_epw(path_epw)
+}
+
+
+## ------------------------------------------------
+## Method `Epw$path`
+## ------------------------------------------------
+
+# get path
+epw$path()
+
+
+## ------------------------------------------------
+## Method `Epw$location`
+## ------------------------------------------------
+
+epw$location()
+
+# modify location data
+epw$location(city = "MyCity")
+
+
+## ------------------------------------------------
+## Method `Epw$design_condition`
+## ------------------------------------------------
+
 epw$design_condition()
+
+
+## ------------------------------------------------
+## Method `Epw$typical_extreme_period`
+## ------------------------------------------------
+
 epw$typical_extreme_period()
+
+
+## ------------------------------------------------
+## Method `Epw$ground_temperature`
+## ------------------------------------------------
+
 epw$ground_temperature()
-epw$holiday(leapyear, dst, holiday)
-epw$comment1(comment)
-epw$comment2(comment)
+
+
+## ------------------------------------------------
+## Method `Epw$holiday`
+## ------------------------------------------------
+
+epw$holiday()
+
+# add daylight saving time
+epw$holiday(dst = c(3.10, 11.3))
+
+
+## ------------------------------------------------
+## Method `Epw$comment1`
+## ------------------------------------------------
+
+epw$comment1()
+
+epw$comment1("Comment1")
+
+
+## ------------------------------------------------
+## Method `Epw$comment2`
+## ------------------------------------------------
+
+epw$comment2()
+
+epw$comment2("Comment2")
+
+
+## ------------------------------------------------
+## Method `Epw$num_period`
+## ------------------------------------------------
+
 epw$num_period()
+
+
+## ------------------------------------------------
+## Method `Epw$interval`
+## ------------------------------------------------
+
 epw$interval()
-epw$period(period, name, start_day_of_week)
+
+
+## ------------------------------------------------
+## Method `Epw$period`
+## ------------------------------------------------
+
+# modify data period name
+epw$period(1, name = "test")
+
+# change start day of week
+epw$period(1, start_day_of_week = 3)
+
+
+## ------------------------------------------------
+## Method `Epw$missing_code`
+## ------------------------------------------------
+
 epw$missing_code()
+
+
+## ------------------------------------------------
+## Method `Epw$initial_missing_value`
+## ------------------------------------------------
+
 epw$initial_missing_value()
+
+
+## ------------------------------------------------
+## Method `Epw$range_exist`
+## ------------------------------------------------
+
 epw$range_exist()
+
+
+## ------------------------------------------------
+## Method `Epw$range_valid`
+## ------------------------------------------------
+
 epw$range_valid()
-epw$fill_action()
-epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
-                  type = c("both", "missing", "out_of_range"))
+
+
+## ------------------------------------------------
+## Method `Epw$fill_action`
+## ------------------------------------------------
+
+epw$fill_action("missing")
+
+epw$fill_action("out_of_range")
+
+
+## ------------------------------------------------
+## Method `Epw$data`
+## ------------------------------------------------
+
+# get weather data
+str(epw$data())
+
+# get weather data but change the year to 2018
+# the year column is not changed by default, only the returned datetime column
+head(epw$data(start_year = 2018)$datetime)
+str(epw$data(start_year = 2018)$year)
+# you can update the year column too
+head(epw$data(start_year = 2018, update = TRUE)$year)
+
+# change the time zone of datetime column in the returned weather data
+attributes(epw$data()$datetime)
+attributes(epw$data(tz = "Etc/GMT+8")$datetime)
+
+
+## ------------------------------------------------
+## Method `Epw$abnormal_data`
+## ------------------------------------------------
+
+epw$abnormal_data()
+
+# only check if there are any abnormal values in air temperature and
+# liquid precipitation rate
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"))
+
+# save as above, but only return date time columns plus those 2 columns
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    keep_all = FALSE
+)
+
+# same as above, but only check for missing values
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    type = "missing"
+)
+
+# same as above, but only check for out-of-range values
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    type = "out_of_range"
+)
+
+
+## ------------------------------------------------
+## Method `Epw$redundant_data`
+## ------------------------------------------------
+
 epw$redundant_data()
-epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)
-epw$fill_abnormal(period = NULL, missing = FALSE, out_of_range = FALSE, special = FALSE)
+
+
+## ------------------------------------------------
+## Method `Epw$make_na`
+## ------------------------------------------------
+
+# turn all missing values into NAs
+summary(epw$data()$liquid_precip_rate)
+epw$make_na(missing = TRUE)
+summary(epw$data()$liquid_precip_rate)
+
+
+## ------------------------------------------------
+## Method `Epw$fill_abnormal`
+## ------------------------------------------------
+
+# turn all missing values into NAs
+summary(epw$data()$liquid_precip_rate)
+epw$fill_abnormal(missing = TRUE)
+summary(epw$data()$liquid_precip_rate)
+
+
+## ------------------------------------------------
+## Method `Epw$add_unit`
+## ------------------------------------------------
+
+# get weather data with units
 epw$add_unit()
+head(epw$data())
+
+# with units specified, you can easily perform unit conversion using units
+# package
+t_dry_bulb <- epw$data()$dry_bulb_temperature
+units(t_dry_bulb) <- with(units::ud_units, "kelvin")
+
+head(t_dry_bulb)
+
+
+## ------------------------------------------------
+## Method `Epw$drop_unit`
+## ------------------------------------------------
+
 epw$drop_unit()
+epw$data()
+
+
+## ------------------------------------------------
+## Method `Epw$purge`
+## ------------------------------------------------
+
 epw$purge()
-epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
-epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-epw$del(period)
-epw$clone(deep = TRUE)
+
+
+## ------------------------------------------------
+## Method `Epw$add`
+## ------------------------------------------------
+
+# will fail since date time in input data has already been covered by
+# existing data period
+\dontrun{epw$add(epw$data())}
+
+
+## ------------------------------------------------
+## Method `Epw$set`
+## ------------------------------------------------
+
+# change the weather data
+epw$set(epw$data(), warning = FALSE)
+
+
+## ------------------------------------------------
+## Method `Epw$is_unsaved`
+## ------------------------------------------------
+
 epw$is_unsaved()
-epw$save(path, overwrite = FALSE)
+
+
+## ------------------------------------------------
+## Method `Epw$save`
+## ------------------------------------------------
+
+# save the weather file
+epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
+
+
+## ------------------------------------------------
+## Method `Epw$print`
+## ------------------------------------------------
+
 epw$print()
-print(epw)
-}
-}
 
-\section{Read}{
-\preformatted{epw <- read_epw(path)
 }
-
-\strong{Arguments}
+\author{
+Hongyuan Jia
+}
+\section{Methods}{
+\subsection{Public methods}{
 \itemize{
-\item \code{path}: Path of an EnergyPlus \code{EPW} file.
+\item \href{#method-new}{\code{Epw$new()}}
+\item \href{#method-path}{\code{Epw$path()}}
+\item \href{#method-location}{\code{Epw$location()}}
+\item \href{#method-design_condition}{\code{Epw$design_condition()}}
+\item \href{#method-typical_extreme_period}{\code{Epw$typical_extreme_period()}}
+\item \href{#method-ground_temperature}{\code{Epw$ground_temperature()}}
+\item \href{#method-holiday}{\code{Epw$holiday()}}
+\item \href{#method-comment1}{\code{Epw$comment1()}}
+\item \href{#method-comment2}{\code{Epw$comment2()}}
+\item \href{#method-num_period}{\code{Epw$num_period()}}
+\item \href{#method-interval}{\code{Epw$interval()}}
+\item \href{#method-period}{\code{Epw$period()}}
+\item \href{#method-missing_code}{\code{Epw$missing_code()}}
+\item \href{#method-initial_missing_value}{\code{Epw$initial_missing_value()}}
+\item \href{#method-range_exist}{\code{Epw$range_exist()}}
+\item \href{#method-range_valid}{\code{Epw$range_valid()}}
+\item \href{#method-fill_action}{\code{Epw$fill_action()}}
+\item \href{#method-data}{\code{Epw$data()}}
+\item \href{#method-abnormal_data}{\code{Epw$abnormal_data()}}
+\item \href{#method-redundant_data}{\code{Epw$redundant_data()}}
+\item \href{#method-make_na}{\code{Epw$make_na()}}
+\item \href{#method-fill_abnormal}{\code{Epw$fill_abnormal()}}
+\item \href{#method-add_unit}{\code{Epw$add_unit()}}
+\item \href{#method-drop_unit}{\code{Epw$drop_unit()}}
+\item \href{#method-purge}{\code{Epw$purge()}}
+\item \href{#method-add}{\code{Epw$add()}}
+\item \href{#method-set}{\code{Epw$set()}}
+\item \href{#method-del}{\code{Epw$del()}}
+\item \href{#method-is_unsaved}{\code{Epw$is_unsaved()}}
+\item \href{#method-save}{\code{Epw$save()}}
+\item \href{#method-print}{\code{Epw$print()}}
+\item \href{#method-clone}{\code{Epw$clone()}}
 }
 }
-
-\section{Query and Modify Header}{
-
-
-\subsection{LOCATION Header}{\preformatted{epw$location(city, state_province, country, data_source, wmo_number, latitude,
-             longitude, time_zone, elevation)
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-new"></a>}}
+\subsection{Method \code{new()}}{
+Create an \code{Epw} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$new(path, warning = FALSE)}\if{html}{\out{</div>}}
 }
 
-\code{$location()} takes new values for \code{LOCATION} header fields and  returns the
-parsed values of \code{LOCATION} header in a list format. If no input is given,
-current \code{LOCATION} header value is returned.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{Either a path, a connection, or literal data (either a
+single string or a raw vector) to an EnergyPlus Weather File
+(EPW).  If a file path, that file usually has a extension
+\code{.epw}.}
 
-\strong{Arguments}:
-\itemize{
-\item \code{city}: A string of city name recorded in the \code{LOCATION} header.
-\item \code{state_province}: A string of state or province name recorded in the
-\code{LOCATION} header.
-\item \code{country}: A string of country name recorded in the \code{LOCATION} header.
-\item \code{data_source}: A string of data source recorded in the \code{LOCATION} header.
-\item \code{wmo_number}: A string of WMO (World Meteorological Organization) number
-recorded in the \code{LOCATION} header.
-\item \code{latitude}: A number of latitude recorded in the \code{LOCATION} header. North
-latitude is positive and south latitude is negative. Should in range \code{[-90, +90]}.
-\item \code{longitude}: A number of longitude recorded in the \code{LOCATION} header. East
-longitude is positive and west longitude is negative. Should in range
-\code{[-180, +180]}.
-\item \code{time_zone}: A number of time zone recorded in the \code{LOCATION} header. Usually
-presented as the offset hours from UTC time. Should in range \code{[-12, +14]}.
-\item \code{elevation}: A number of elevation recorded in the \code{LOCATION} header.
-Should in range \code{[-1000, 9999.9)}.
+\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
+out-of-range data are found. Default: \code{TRUE}.}
 }
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+It takes an EnergyPlus Weather File (EPW) as input and returns an
+\code{EPW} object.
 }
 
-\subsection{DESIGN CONDITION Header}{\preformatted{epw$design_condition()
+\subsection{Returns}{
+An \code{Epw} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# read an EPW file from EnergyPlus website
+path_base <- "https://energyplus.net/weather-download"
+path_region <- "north_and_central_america_wmo_region_4/USA/CA"
+path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+path_epw <- file.path(path_base, path_region, path_file)
+epw <- read_epw(path_epw)
+
+# read an EPW file distributed with EnergyPlus
+if (is_avail_eplus(8.8)) {
+    path_epw <- file.path(
+        eplus_config(8.8)$dir,
+        "WeatherData",
+        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+    )
+    epw <- read_epw(path_epw)
 }
 
-\code{$design_condition()} returns the parsed values of \code{DESIGN CONDITION} header in
-a list format with 4 elements:
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-path"></a>}}
+\subsection{Method \code{path()}}{
+Get the file path of current \code{Epw}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$path()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$path()} returns the full path of current \code{Epw} or \code{NULL} if the
+\code{Epw} object is created using a character vector and not saved
+locally.
+}
+
+\subsection{Returns}{
+\code{NULL} or a single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get path
+epw$path()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-location"></a>}}
+\subsection{Method \code{location()}}{
+Get and modify LOCATION header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$location(
+  city,
+  state_province,
+  country,
+  data_source,
+  wmo_number,
+  latitude,
+  longitude,
+  time_zone,
+  elevation
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{city}}{A string of city name recorded in the \code{LOCATION} header.}
+
+\item{\code{state_province}}{A string of state or province name recorded in
+the \code{LOCATION} header.}
+
+\item{\code{country}}{A string of country name recorded in the \code{LOCATION}
+header.}
+
+\item{\code{data_source}}{A string of data source recorded in the \code{LOCATION}
+header.}
+
+\item{\code{wmo_number}}{A string of WMO (World Meteorological Organization)
+number recorded in the \code{LOCATION} header.}
+
+\item{\code{latitude}}{A number of latitude recorded in the \code{LOCATION}
+header. North latitude is positive and south latitude is
+negative. Should in range \verb{[-90, +90]}.}
+
+\item{\code{longitude}}{A number of longitude recorded in the \code{LOCATION}
+header. East longitude is positive and west longitude is
+negative. Should in range \verb{[-180, +180]}.}
+
+\item{\code{time_zone}}{A number of time zone recorded in the \code{LOCATION}
+header. Usually presented as the offset hours from UTC time.
+Should in range \verb{[-12, +14]}.}
+
+\item{\code{elevation}}{A number of elevation recorded in the \code{LOCATION}
+header. Should in range \verb{[-1000, 9999.9)}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$location()} takes new values for \code{LOCATION} header fields and
+returns the parsed values of \code{LOCATION} header in a list format. If
+no input is given, current \code{LOCATION} header value is returned.
+}
+
+\subsection{Returns}{
+A named list of 9 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$location()
+
+# modify location data
+epw$location(city = "MyCity")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-design_condition"></a>}}
+\subsection{Method \code{design_condition()}}{
+Get DESIGN CONDITION header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$design_condition()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$design_condition()} returns the parsed values of \verb{DESIGN CONDITION}
+header in a list format with 4 elements:
 \itemize{
 \item \code{source}: A string of source field
 \item \code{heating}: A list, usually of length 16, of the heading design conditions
@@ -160,10 +577,29 @@ a list format with 4 elements:
 For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
 }
 
-\subsection{TYPICAL/EXTREME Header}{\preformatted{epw$typical_extreme_period()
+\subsection{Returns}{
+A named list of 4 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$design_condition()
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\code{$typical_extreme_period()} returns the parsed values of \code{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-typical_extreme_period"></a>}}
+\subsection{Method \code{typical_extreme_period()}}{
+Get TYPICAL/EXTREME header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$typical_extreme_period()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$typical_extreme_period()} returns the parsed values of \verb{TYPICAL/EXTREME PERIOD} header in a \link[data.table:data.table]{data.table} format with 6
 columns:
 \itemize{
 \item \code{index}: Integer type. The index of typical or extreme period record
@@ -177,10 +613,29 @@ period
 }
 }
 
-\subsection{GROUND TEMPERATURE Header}{\preformatted{epw$ground_temperature()
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 6 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$typical_extreme_period()
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\code{$ground_temperature()} returns the parsed values of \code{GROUND TEMPERATURE}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ground_temperature"></a>}}
+\subsection{Method \code{ground_temperature()}}{
+Get GROUND TEMPERATURE header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$ground_temperature()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$ground_temperature()} returns the parsed values of \verb{GROUND TEMPERATURE}
 header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
@@ -188,18 +643,52 @@ header in a \link[data.table:data.table]{data.table} format with 7 columns:
 \item \code{month}: Integer type. The month when the ground temperature is measured
 \item \code{soil_conductivity}: Numeric type. The soil conductivity at measured depth
 \item \code{soil_density}: Numeric type. The soil density at measured depth
-\item \code{soil_specific heat}: Numeric type. The soil specific heat at measured depth
+\item \verb{soil_specific heat}: Numeric type. The soil specific heat at measured depth
 \item \code{temperature}: Numeric type. The measured group temperature
 }
 }
 
-\subsection{HOLIDAYS/DAYLIGHT SAVINGS Header}{\preformatted{epw$holiday(leapyear, dst, holiday)
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 7 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$ground_temperature()
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\code{$holiday()} takes new value for leap year indicator, daylight saving time
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-holiday"></a>}}
+\subsection{Method \code{holiday()}}{
+Get and modify HOLIDAYS/DAYLIGHT SAVINGS header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$holiday(leapyear, dst, holiday)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{leapyear}}{Either \code{TRUE} or \code{FALSE}.}
+
+\item{\code{dst}}{A length 2 EPW date specifications identifying the start
+and end of daylight saving time. For example, \code{c(3.10, 10.3)}.}
+
+\item{\code{holiday}}{a list or a data.frame containing two elements
+(columns) \code{name} and \code{day} where \code{name} are the holiday names
+and \code{day} are valid EPW date specifications. For example:\preformatted{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
+}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$holiday()} takes new value for leap year indicator, daylight saving time
 and holiday specifications, set these new values and returns the parsed values
-of \code{HOLIDAYS/DAYLIGHT SAVINGS} header. If no input is given, current values
-of \code{HOLIDAYS/DAYLIGHT SAVINGS} header is returned. It returns a list of 3
+of \verb{HOLIDAYS/DAYLIGHT SAVINGS} header. If no input is given, current values
+of \verb{HOLIDAYS/DAYLIGHT SAVINGS} header is returned. It returns a list of 3
 elements:
 \itemize{
 \item \code{leapyear}: A single logical vector. \code{TRUE} means that the weather data
@@ -229,65 +718,194 @@ The date specifications in \code{dst} and \code{holiday} should follow the rules
 formats automatically. Basically, 5 formats are allowed:
 \enumerate{
 \item A single integer is interpreted as the Julian day of year. For example,
-\code{1}, \code{2}, \code{3} and \code{4} will be parsed and presented as \code{1st day}, \code{2nd day}, \code{3rd day} and \code{4th day}.
+\code{1}, \code{2}, \code{3} and \code{4} will be parsed and presented as \verb{1st day}, \verb{2nd day}, \verb{3rd day} and \verb{4th day}.
 \item A single number is interpreted as \code{Month.Day}. For example, \code{1.2} and \code{5.6}
-will be parsed and presented as \code{Jan 02} and \code{May 06}.
+will be parsed and presented as \verb{Jan 02} and \verb{May 06}.
 \item A string giving \code{MonthName / DayNumber}, \code{DayNumber / MonthName}, and
 \code{MonthNumber / DayNumber}. A year number can be also included. For
 example, \code{"Jan/1"}, \code{"05/Dec"}, \code{"7/8"}, \code{"02/10/2019"}, and
-\code{"2019/04/05"} will be parsed and presented as \code{Jan 02}, \code{Dec 06}, \code{Jul 8}, \code{2019-02-10} and \code{2019-04-15}.
-\item A string giving \code{number Weekday in Month}. For example, \code{"2 Sunday in Jan"} will be parsed and presented as \code{2th Sunday in January}.
-\item A string giving \code{Last Weekday in Month}. For example, \code{"last Sunday in Dec"} will be parsed and presented as \code{Last Sunday in December}.
+\code{"2019/04/05"} will be parsed and presented as \verb{Jan 02}, \verb{Dec 06}, \verb{Jul 8}, \code{2019-02-10} and \code{2019-04-15}.
+\item A string giving \verb{number Weekday in Month}. For example, \code{"2 Sunday in Jan"} will be parsed and presented as \verb{2th Sunday in January}.
+\item A string giving \verb{Last Weekday in Month}. For example, \code{"last Sunday in Dec"} will be parsed and presented as \verb{Last Sunday in December}.
 }
 
 For convenience, besides all the formats described above, \code{dst} and days in
 \code{holiday} also accept standard Dates input. They will be treated as the same
 way as No.3 format described above.
-
-\strong{Arguments}:
-\itemize{
-\item \code{leapyear}: Either \code{TRUE} or \code{FALSE}.
-\item \code{dst}: A length 2 EPW date specifications identifying the start and end of
-daylight saving time. For example, \code{c(3.10, 10.3)}.
-\item \code{holiday}: a list or a data.frame containing two elements (columns) \code{name}
-and \code{day} where \code{name} are the holiday names and \code{day} are valid EPW date
-specifications. For example:\preformatted{list(name = c("New Year's Day", "Christmas Day"), day = c("1.1", "25 Dec"))
-}
 }
 
+\subsection{Returns}{
+A named list of 3 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$holiday()
+
+# add daylight saving time
+epw$holiday(dst = c(3.10, 11.3))
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\subsection{COMMENT1 and COMMENT2 Header}{\preformatted{epw$comment1(comment)
-epw$comment2(comment)
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-comment1"></a>}}
+\subsection{Method \code{comment1()}}{
+Get and modify COMMENT1 header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$comment1(comment)}\if{html}{\out{</div>}}
 }
 
-\code{$comment1()} and \code{$comment2()} both takes a single string of new comments
-and replaces the old comment with input one. If no input is given, current
-comment is returned.
-
-\strong{Arguments}:
-\itemize{
-\item \code{comment}: A string of new comments.
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{A string of new comments.}
 }
+\if{html}{\out{</div>}}
 }
-
-\subsection{DATA PERIODS Header}{\preformatted{epw$num_period()
-epw$interval()
-epw$period(period, name, start_day_of_week)
-}
-
-\code{$num_period()} returns a single positive integer of how many data periods
-current \code{Epw} contains.
-
-\code{$interval()} returns a single positive integer of how many records of weather
-data exist in one hour.
-
-\code{$period()} takes a data period index, a new period name and start day of
-week specification, and uses that input to replace the data period's name and
-start day of week. If no input is given, data periods in current \code{Epw} is
+\subsection{Details}{
+\verb{$comment1()} takes a single string of new comments and replaces the
+old comment with input one. If no input is given, current comment is
 returned.
+}
 
-\code{$period()} returns a \link[data.table:data.table]{data.table} with 5 columns:
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$comment1()
+
+epw$comment1("Comment1")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-comment2"></a>}}
+\subsection{Method \code{comment2()}}{
+Get and modify COMMENT2 header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$comment2(comment)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{comment}}{A string of new comments.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$comment2()} takes a single string of new comments and replaces the
+old comment with input one. If no input is given, current comment is
+returned.
+}
+
+\subsection{Returns}{
+A single string.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$comment2()
+
+epw$comment2("Comment2")
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-num_period"></a>}}
+\subsection{Method \code{num_period()}}{
+Get number of data periods in DATA PERIODS header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$num_period()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$num_period()} returns a single positive integer of how many data
+periods current \code{Epw} contains.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$num_period()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-interval"></a>}}
+\subsection{Method \code{interval()}}{
+Get the time interval in DATA PERIODS header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$interval()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$interval()} returns a single positive integer of how many records
+of weather data exist in one hour.
+}
+
+\subsection{Returns}{
+A single integer.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$interval()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-period"></a>}}
+\subsection{Method \code{period()}}{
+Get and modify data period meta data in DATA PERIODS header
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$period(period, name, start_day_of_week)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A positive integer vector identifying the data period
+indexes.}
+
+\item{\code{name}}{A character vector used as new names for specified data
+periods. Should have the same length as \code{index}.}
+
+\item{\code{start_day_of_week}}{A character vector or an integer vector used
+as the new start days of week of specified data periods.
+Should have the same length as \code{index}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$period()} takes a data period index, a new period name and start
+day of week specification, and uses that input to replace the data
+period's name and start day of week. If no input is given, data
+periods in current \code{Epw} is returned.
+}
+
+\subsection{Returns}{
+A \link[data.table:data.table]{data.table} with 5 columns:
 \itemize{
 \item \code{index}: Integer type. The index of data period.
 \item \code{name}: Character type. The name of data period.
@@ -295,337 +913,248 @@ returned.
 \item \code{start_day}: Date (EpwDate) type. The start day of data period.
 \item \code{end_day}: Date (EpwDate) type. The end day of data period.
 }
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# modify data period name
+epw$period(1, name = "test")
 
-\strong{Arguments}:
-\itemize{
-\item \code{index}: A positive integer vector identifying the data period indexes.
-\item \code{name}: A character vector used as new names for specified data periods.
-Should have the same length as \code{index}.
-\item \code{start_day_of_week}: A character vector or an integer vector used as the
-new start days of week of specified data periods. Should have the same
-length as \code{index}.
+# change start day of week
+epw$period(1, start_day_of_week = 3)
+
 }
-}
+\if{html}{\out{</div>}}
+
 }
 
-\section{Weather Data Specifications}{
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-missing_code"></a>}}
+\subsection{Method \code{missing_code()}}{
+Get missing code for weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$missing_code()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$missing_code()} returns a list of 29 elements containing the value
+used as missing value identifier for all weather data.
+}
+
+\subsection{Returns}{
+A named list of 29 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
 \preformatted{epw$missing_code()
-epw$initial_missing_value()
-epw$range_exist()
-epw$range_valid()
-epw$fill_action(type = c("missing", "out_of_range"))
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\code{$missing_code()} returns a list of 29 elements containing the value used as
-missing value identifier for all weather data.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-initial_missing_value"></a>}}
+\subsection{Method \code{initial_missing_value()}}{
+Get initial value for missing data of weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$initial_missing_value()}\if{html}{\out{</div>}}
+}
 
-\code{$initial_missing_value()} returns a list of 16 elements containing the
-initial value used to replace missing values for corresponding weather data.
+\subsection{Details}{
+\verb{$initial_missing_value()} returns a list of 16 elements containing
+the initial value used to replace missing values for corresponding
+weather data.
+}
 
-\code{$range_exist()} returns a list of 28 elements containing the range each
-numeric weather data should fall in. Any values out of this range are treated
-as missing.
+\subsection{Returns}{
+A named list of 16 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$initial_missing_value()
 
-\code{$range_valid()} returns a list of 28 elements containing the range each
-numeric weather data should fall in. Any values out of this range are treated
-as invalid.
+}
+\if{html}{\out{</div>}}
 
-\code{$fill_action()} returns a list containing \code{action}s that EnergyPlus and also
-\code{$fill_abnormal()} in \code{Epw} class will perform when certain abnormal data
-found for corresponding weather data. There are 3 types of actions in total:
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-range_exist"></a>}}
+\subsection{Method \code{range_exist()}}{
+Get value ranges for existing values of weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$range_exist()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$range_exist()} returns a list of 28 elements containing the range
+each numeric weather data should fall in. Any values out of this
+range are treated as missing.
+}
+
+\subsection{Returns}{
+A named list of 28 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$range_exist()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-range_valid"></a>}}
+\subsection{Method \code{range_valid()}}{
+Get value ranges for valid values of weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$range_valid()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$range_valid()} returns a list of 28 elements containing the range
+each numeric weather data should fall in. Any values out of this
+range are treated as invalid.
+}
+
+\subsection{Returns}{
+A named list of 28 elements.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$range_valid()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fill_action"></a>}}
+\subsection{Method \code{fill_action()}}{
+Get fill actions for abnormal values of weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_action(type = c("missing", "out_of_range"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{What abnormal type of actions to return. Should be one of
+\code{"missing"} and \code{"out_of_range"}. Default: \code{"missing"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$fill_action()} returns a list containing \code{action}s that EnergyPlus
+will perform when certain abnormal data found for corresponding
+weather data. There are 3 types of actions in total:
 \itemize{
 \item \code{do_nothing}: All abnormal values are left as they are.
 \item \code{use_zero}: All abnormal values are reset to zeros.
 \item \code{use_previous}: The first abnormal values of variables will be set to the
 initial missing values. All after are set to previous valid one.
 }
-
-\strong{Arguments}:
-\itemize{
-\item \code{type}: What abnormal type of actions to return. Should be one of \code{"missing"}
-and \code{"out_of_range"}. Default: \code{"missing"}.
-}
 }
 
-\section{Query Weather Data}{
-\preformatted{epw$data(period = 1L, start_year = NULL, tz = "UTC", update = FALSE)
-epw$abnormal_data(period = 1L, cols = NULL, keep_all = TRUE,
-                  type = c("both", "missing", "out_of_range"))
-epw$redundant_data()
+\subsection{Returns}{
+A named list.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$fill_action("missing")
+
+epw$fill_action("out_of_range")
+
+}
+\if{html}{\out{</div>}}
+
 }
 
-\code{$data()} returns weather data of specific data period.
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-data"></a>}}
+\subsection{Method \code{data()}}{
+Get weather data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$data(
+  period = 1L,
+  start_year = NULL,
+  align_wday = TRUE,
+  tz = "UTC",
+  update = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A single positive integer identifying the data period
+index. Data periods information can be obtained using
+\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
+described above.}
+
+\item{\code{start_year}}{A positive integer identifying the year of first
+date time in specified data period. If \code{NULL}, the values in
+the \code{year} column are used as years of \code{datetime} column.
+Default: \code{NULL}.}
+
+\item{\code{align_wday}}{Only applicable when \code{start_year} is \code{NULL}. If
+\code{TRUE}, a year value is automatically calculated for specified
+data period that compliance with the start day of week value
+specified in \verb{DATA PERIODS} header.}
+
+\item{\code{tz}}{A valid time zone to be assigned to the \code{datetime} column.
+All valid time zone names can be obtained using
+\code{OlsonNames()}. Default:\code{"UTC"}.}
+
+\item{\code{update}}{If \code{TRUE}, the \code{year} column are updated according to
+the newly created \code{datetime} column using \code{start_year}. If
+\code{FALSE}, original year data in the \code{Epw} object is kept.
+Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$data()} returns weather data of specific data period.
 
 Usually, EPW file downloaded from \href{https://energyplus.net/}{EnergyPlus website}
-contains TMY weather data. As years of weather data is not consecutive, it may
-be more convenient to align the year values to be consecutive, which will
-makes it possible to direct analyze and plot weather data. The \code{start_year}
-argument in \code{$data()} method can help to achieve this. However, randomly
-setting the \code{year} may result in a date time series that does not have the
-same start day of week as specified in the \code{DATA PERIODS} header. eplusr
-provides a simple solution for this. By setting \code{year} to \code{NULL} and
-\code{align_wday} to \code{TRUE}, eplusr will calculate a year value (from current year
-backwards) for each data period that compliance with the start day of week
-restriction.
+contains TMY weather data. As years of weather data is not
+consecutive, it may be more convenient to align the year values to be
+consecutive, which will makes it possible to direct analyze and plot
+weather data. The \code{start_year} argument in \verb{$data()} method can help
+to achieve this. However, randomly setting the \code{year} may result in a
+date time series that does not have the same start day of week as
+specified in the \verb{DATA PERIODS} header.  eplusr provides a simple
+solution for this. By setting \code{year} to \code{NULL} and \code{align_wday} to
+\code{TRUE}, eplusr will calculate a year value (from current year
+backwards) for each data period that compliance with the start day of
+week restriction.
 
-Note that if current data period contains AMY data and \code{start_year} is given,
-a warning is given because the actual year values will be overwritten by
-input \code{start_year}. Also, an error is given if using input \code{start_year}
-introduces invalid date time. This may happen when weather data contains leap
-year but input \code{start_year} is not a leap year. An error will also be issued
-if applying specified time zone specified using \code{tz} introduces invalid date
-time.
-
-\code{$abnormal_data()} returns abnormal data of specific data period. Basically,
-there are 2 types of abnormal data in \code{Epw}, i.e. missing values and
-out-of-range values. Sometimes, it may be useful to extract and inspect those
-data especially when inserting measured weather data. \code{$abnormal_data()}
-does this.
-
-\code{$redundant_data()} returns weather data in \code{Epw} object that do not belong
-to any data period. This data can be further removed using \code{$pruge()} method
-described below.
-
-For \code{$abnormal_data()} and \code{$redundant_data()}, a new column named \code{line} is
-created indicating the line numbers where abnormal data and redundant data
-occur in the actual EPW file.
-
-\strong{Arguments}:
+Note that if current data period contains AMY data and \code{start_year}
+is given, a warning is given because the actual year values will be
+overwritten by input \code{start_year}. An error is given if:
 \itemize{
-\item \code{period}: A single positive integer identifying the data period index. Data
-periods information can be obtained using \code{$period()} described above.
-\item \code{start_year}: A positive integer identifying the year of first date time in
-specified data period. If \code{NULL}, the values in the \code{year} column are used
-as years of \code{datetime} column. Default: \code{NULL}.
-\item \code{align_wday}: Only applicable when \code{start_year} is \code{NULL}. If \code{TRUE}, a
-year value is automatically calculated for specified data period that
-compliance with the start day of week value specified in \code{DATA PERIODS}
-header.
-\item \code{tz}: A valid time zone to be assigned to the \code{datetime} column. All valid
-time zone names can be obtained using \code{OlsonNames()}. Default:\code{"UTC"}.
-\item \code{update}: If \code{TRUE}, the \code{year} column are updated according to the newly
-created \code{datetime} column using \code{start_year}. If \code{FALSE}, original year
-data in the \code{Epw} object is kept. Default: \code{FALSE}.
-\item \code{cols}: A character vector identifying what data columns, i.e. all columns
-except \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour} and \code{minute}, to search
-abnormal values. If \code{NULL}, all data columns are used. Default: \code{NULL}.
-\item \code{keep_all}: If \code{TRUE}, all columns are returned. If \code{FALSE}, only \code{line},
-\code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour} and \code{minute}, together with
-columns specified in \code{cols} are returned. Default: \code{TRUE}
-\item \code{type}: What abnormal type of data to return. Should be one of \code{"all"},
-\code{"missing"} and \code{"out_of_range"}. Default: \code{"all"}.
+\item Using input \code{start_year} introduces invalid date time. This may
+happen when weather data contains leap year but input \code{start_year}
+is not a leap year.
+\item Applying specified time zone specified using \code{tz} introduces
+invalid date time.
 }
 }
 
-\section{Modify Weather Data In-Place}{
-\preformatted{epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)
-epw$fill_abnormal(period = NULL, missing = FALSE, out_of_range = FALSE, special = FALSE)
-epw$add_unit()
-epw$drop_unit()
-epw$purge()
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 36 columns.
 }
-
-\strong{Note} that all these 5 methods modify the weather data in-place, meaning
-that the returned data from \code{$data()} and \code{$abnormal_data()} may be different
-after calling these methods.
-
-\code{$make_na()} converts specified abnormal data into \code{NA}s in specified data
-period. This makes it easier to find abnormal data directly using \code{is.na()}
-instead of using \code{$missing_code()}.
-
-\code{$fill_abnormal()} fills specified abnormal data using corresponding actions
-listed in \code{$fill_action()}. For what kinds of actions to be performed, please
-see \code{$fill_action()} method described above. Note that only if \code{special} is
-\code{TRUE}, special actions listed in \code{$fill_action()} is performed. If \code{special}
-is \code{FALSE}, all abnormal data, including both missing values and out-of-range
-values, are filled with corresponding missing codes.
-
-\code{$make_na()} and \code{$fill_abnormal()} are reversible, i.e. \code{$make_na()} can be
-used to counteract the effects introduced by \code{$fill_abnormal()}, and vise a
-versa.
-
-\code{$add_unit()} assigns units to numeric weather data using
-\code{\link[units:set_units]{units::set_units()}} if applicable.
-
-\code{$drop_unit()} removes all units of numeric weather data.
-
-Similarly, \code{$add_unit()} and \code{$drop_unit()} are reversible, i.e.
-\code{$add_unit()} can be used to counteract the effects introduced by
-\code{$drop_unit()}, and vise a versa.
-
-\code{$purge()} deletes weather data in \code{Epw} object that do not belong to any
-data period.
-
-\strong{Arguments}:
-\itemize{
-\item \code{period}: A positive integer vector identifying the data period indexes.
-Data periods information can be obtained using \code{$period()} described
-above. If \code{NULL}, all data periods are included. Default: \code{NULL}.
-\item \code{missing}: If \code{TRUE}, missing values are included. Default: \code{FALSE}.
-\item \code{out_of_range}: If \code{TRUE}, out-of-range values are included. Default:
-\code{FALSE}.
-\item \code{special}: If \code{TRUE}, abnormal data are filled using corresponding actions
-listed \code{$fill_action()}. If \code{FALSE}, all abnormal data are fill with
-missing code described in \code{$missing_code()}.
-}
-}
-
-\section{Set Weather Data}{
-\preformatted{epw$add(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
-epw$set(data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
-epw$del(period)
-}
-
-\code{$add()} adds a new data period into current \code{Epw} object at specified
-position.
-
-\code{$set()} replaces existing data period using input new weather data.
-
-The validity of input data is checked before adding or setting according to
-rules following:
-\itemize{
-\item Column \code{datetime} exists and has type of \code{POSIXct}. Note that time zone of
-input date time will be reset to \code{UTC}.
-\item It assumes that input data is already sorted, i.e. no further sorting is
-made during validation. This is because when input data is TMY data, there
-is no way to properly sort input data rows only using \code{datetime} column.
-\item Number of data records per hour should be consistent across input data.
-\item Input number of data records per hour should be the same as
-existing data periods.
-\item The date time of input data should not overlap with existing data periods.
-\item Input data should have all 29 weather data columns with right types. The
-\code{year}, \code{month}, \code{day}, and \code{minute} column are not compulsory. They will
-be created according to values in the \code{datetime} column. Existing values
-will be overwritten.
-}
-
-\code{$del(period)} removes one specified data period.
-
-\strong{Arguments}:
-\itemize{
-\item \code{data}: A \link[data.table:data.table]{data.table} of new weather data to add
-or set.
-Validation is performed according to rules described above.
-\item \code{realyear}: Whether input data is AMY data. Default: \code{FALSE}.
-\item \code{name}: A new string used as name of added or set data period. Should not
-be the same as existing data period names. If \code{NULL}, it is generated
-automatically in format \code{Data}, \code{Data_1} and etc., based on existing data
-period names. Default: \code{NULL}
-\item \code{start_day_of_week}: A single integer or character specifying start day of
-week of input data period. If \code{NULL}, Sunday is used for TMY data and the
-actual start day of week is used for AMY data. Default: \code{NULL}.
-\item \code{after}: A single integer identifying the index of data period where input new
-data period to be inserted after. IF \code{0}, input new data period will be
-the first data period. Default: \code{0}.
-\item \code{period}: A single integer identifying the index of data period to set.
-\item \code{warning}: If \code{TRUE}, warnings are given if any missing data, out-of-range
-data are found. Default: \code{TRUE}.
-}
-}
-
-\section{Save}{
-\preformatted{epw$is_unsaved()
-epw$save(path, overwrite = FALSE, purge = FALSE)
-}
-
-\code{$is_unsaved()} returns \code{TRUE} if there are any modifications to the \code{Epw}
-object since it was saved or since it was created if not saved before.
-
-\code{$save()} saves current \code{Epw} to an EPW file. Note that if missing values and
-out-of-range values are converted to \code{NA}s using \code{$make_na()}, they will be
-filled with corresponding missing codes during saving.
-
-\strong{Arguments}
-\itemize{
-\item \code{path}: A path where to save the weather file. If \code{NULL}, the path of the
-weather file itself is used. Default: \code{NULL}.
-\item \code{overwrite}: Whether to overwrite the file if it already exists. Default is
-\code{FALSE}.
-\item \code{purge}: Whether to remove redundant data when saving. Default: \code{FALSE}.
-}
-}
-
-\section{Clone}{
-\preformatted{epw$clone(deep = TRUE)
-}
-
-\code{$clone()} copies and returns the cloned \code{Epw} object. Because \code{Epw} uses
-\code{R6Class} under the hook which has "modify-in-place" semantics, \code{epw_2 <- epw_1} does not copy \code{epw_1} at all but only create a new binding to \code{epw_1}.
-Modify \code{epw_1} will also affect \code{epw_2} as well, as these two are exactly the
-same thing underneath. In order to create a complete cloned copy, please use
-\code{$clone(deep = TRUE)}.
-
-\strong{Arguments}
-\itemize{
-\item \code{deep}: Has to be \code{TRUE} if a complete cloned copy is desired. Default:
-\code{TRUE}.
-}
-}
-
-\section{Print}{
-\preformatted{epw$print()
-print(epw)
-}
-
-\code{$print()} prints the \code{Epw} object, including location, elevation, data
-source, WMO station, leap year indicator, interval and data periods.
-}
-
-\examples{
-\dontrun{
-# read an EPW file from EnergyPlus website
-path_base <- "https://energyplus.net/weather-download"
-path_region <- "north_and_central_america_wmo_region_4/USA/CA"
-path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-path_epw <- file.path(path_base, path_region, path_file)
-epw <- read_epw(path_epw)
-
-# read an EPW file distributed with EnergyPlus
-if (is_avail_eplus(8.8)) {
-    epw_path <- file.path(
-        eplus_config(8.8)$dir,
-        "WeatherData",
-        "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
-    )
-    epw <- read_epw(path_epw)
-}
-
-# get file path
-epw$path()
-
-# get header data
-epw$location()
-epw$location()
-epw$design_condition()
-epw$typical_extreme_period()
-epw$ground_temperature()
-epw$holiday()
-epw$comment1()
-epw$comment2()
-epw$num_period()
-epw$interval()
-epw$period()
-
-# modify location data
-epw$location(city = "MyCity")
-
-# add daylight saving time
-epw$holiday(dst = c(3.10, 11.3))
-
-# modify data period name
-epw$period(1, name = "test")
-
-# change start day of week
-epw$(1, start_day_of_week = 3)
-
-# get data specifications
-epw$missing_code()
-epw$initial_missing_value()
-epw$range_exist()
-epw$range_valid()
-epw$fill_action()
-
-# get weather data
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get weather data
 str(epw$data())
 
 # get weather data but change the year to 2018
@@ -635,25 +1164,691 @@ str(epw$data(start_year = 2018)$year)
 # you can update the year column too
 head(epw$data(start_year = 2018, update = TRUE)$year)
 
-# get weather data with units
-epw$add_unit()
-head(epw$data())
-# with units specified, you can easily perform unit conversion using units
-# package
-t_dry_bulb <- epw$data()$dry_bulb_temperature
-units(t_dry_bulb) <- with(units::ud_units, "kelvin")
-head(t_dry_bulb)
-
 # change the time zone of datetime column in the returned weather data
 attributes(epw$data()$datetime)
 attributes(epw$data(tz = "Etc/GMT+8")$datetime)
 
-# change the weather data
-epw$set(epw$data())
-# save the weather file
-epw$save(file.path(tempdir(), "weather.epw"))
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-abnormal_data"></a>}}
+\subsection{Method \code{abnormal_data()}}{
+Get abnormal weather data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$abnormal_data(
+  period = 1L,
+  cols = NULL,
+  keep_all = TRUE,
+  type = c("both", "missing", "out_of_range")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A single positive integer identifying the data period
+index. Data periods information can be obtained using
+\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
+described above.}
+
+\item{\code{cols}}{A character vector identifying what data columns, i.e.
+all columns except \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour}
+and \code{minute}, to search abnormal values. If \code{NULL}, all data
+columns are used. Default: \code{NULL}.}
+
+\item{\code{keep_all}}{If \code{TRUE}, all columns are returned. If \code{FALSE}, only
+\code{line}, \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour} and
+\code{minute}, together with columns specified in \code{cols} are
+returned. Default: \code{TRUE}}
+
+\item{\code{type}}{What abnormal type of data to return. Should be one of
+\code{"all"}, \code{"missing"} and \code{"out_of_range"}. Default: \code{"all"}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$abnormal_data()} returns abnormal data of specific data period.
+Basically, there are 2 types of abnormal data in \code{Epw}, i.e. missing
+values and out-of-range values. Sometimes, it may be useful to
+extract and inspect those data especially when inserting measured
+weather data. \verb{$abnormal_data()} does this.
+
+In the returned \code{\link[data.table:data.table]{data.table::data.table()}}, a column named \code{line}
+is created indicating the line numbers where abnormal data occur in
+the actual EPW file.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$abnormal_data()
+
+# only check if there are any abnormal values in air temperature and
+# liquid precipitation rate
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"))
+
+# save as above, but only return date time columns plus those 2 columns
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    keep_all = FALSE
+)
+
+# same as above, but only check for missing values
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    type = "missing"
+)
+
+# same as above, but only check for out-of-range values
+epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
+    type = "out_of_range"
+)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-redundant_data"></a>}}
+\subsection{Method \code{redundant_data()}}{
+Get redundant weather data
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$redundant_data()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$redundant_data()} returns weather data in \code{Epw} object that do not
+belong to any data period. This data can be further removed using
+\href{../../eplusr/html/Epw.html#method-purge}{\code{$purge()}}`
+method described below.
+
+In the returned \code{\link[data.table:data.table]{data.table::data.table()}}, a column named \code{line}
+is created indicating the line numbers where redundant data occur in
+the actual EPW file.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 37 columns.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$redundant_data()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-make_na"></a>}}
+\subsection{Method \code{make_na()}}{
+Convert abnormal data into NAs
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A positive integer vector identifying the data period
+indexes. Data periods information can be obtained using
+\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
+described above. If \code{NULL}, all data periods are included.
+Default: \code{NULL}.}
+
+\item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
+\code{FALSE}.}
+
+\item{\code{out_of_range}}{If \code{TRUE}, out-of-range values are included.
+Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$make_na()} converts specified abnormal data into \code{NA}s in specified
+data period. This makes it easier to find abnormal data directly
+using \code{is.na()} instead of using
+\href{../../eplusr/html/Epw.html#method-missing_code}{\code{$missing_code()}}
+
+\verb{$make_na()} and
+\href{../../eplusr/html/Epw.html#method-fill_abnormal}{\code{$fill_abnormal()}}
+are reversible, i.e.
+\verb{$make_na()} can be used to counteract the effects introduced by
+\href{../../eplusr/html/Epw.html#method-make_na}{\code{$make_na()}},
+and vise a versa.
+
+\strong{Note} that \verb{$make_na} modify the weather data in-place, meaning
+that the returned data from
+\href{../../eplusr/html/Epw.html#method-data}{\code{$data()}}
+and
+\href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
+may be different after calling \verb{$make_na()}.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# turn all missing values into NAs
+summary(epw$data()$liquid_precip_rate)
+epw$make_na(missing = TRUE)
+summary(epw$data()$liquid_precip_rate)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-fill_abnormal"></a>}}
+\subsection{Method \code{fill_abnormal()}}{
+Fill abnormal data using prescribed pattern
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_abnormal(
+  period = NULL,
+  missing = FALSE,
+  out_of_range = FALSE,
+  special = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A positive integer vector identifying the data period
+indexes. Data periods information can be obtained using
+\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
+described above. If \code{NULL}, all data periods are included.
+Default: \code{NULL}.}
+
+\item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
+\code{FALSE}.}
+
+\item{\code{out_of_range}}{If \code{TRUE}, out-of-range values are included.
+Default: \code{FALSE}.}
+
+\item{\code{special}}{If \code{TRUE}, abnormal data are filled using
+corresponding actions listed
+\href{../../eplusr/html/Epw.html#method-fill_action}{\code{$fill_action()}}.
+If \code{FALSE}, all abnormal data are fill with missing code
+described in
+\href{../../eplusr/html/Epw.html#method-missing_code}{\code{$missing_code()}}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$fill_abnormal()} fills specified abnormal data using corresponding
+actions listed in
+\href{../../eplusr/html/Epw.html#method-fill_action}{\code{$fill_action()}}.
+For what kinds of actions to be performed, please see
+\href{../../eplusr/html/Epw.html#method-fill_action}{\code{$fill_action()}}.
+method described above. Note that only if \code{special} is \code{TRUE},
+special actions listed in \verb{$fill_action()} is performed. If \code{special}
+is \code{FALSE}, all abnormal data, including both missing values and
+out-of-range values, are filled with corresponding missing codes.
+
+\href{../../eplusr/html/Epw.html#method-make_na}{\code{$make_na()}}
+and \verb{$fill_abnormal()} are reversible, i.e.
+\href{../../eplusr/html/Epw.html#method-make_na}{\code{$make_na()}}
+can be used to counteract the effects introduced by
+\verb{$fill_abnormal()}, and vise a versa.
+
+\strong{Note} that \verb{$fill_abnormal} modify the weather data in-place,
+meaning that the returned data from
+\href{../../eplusr/html/Epw.html#method-data}{\code{$data()}}
+and
+\href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
+may be different after calling \verb{$fill_abnormal()}.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# turn all missing values into NAs
+summary(epw$data()$liquid_precip_rate)
+epw$fill_abnormal(missing = TRUE)
+summary(epw$data()$liquid_precip_rate)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add_unit"></a>}}
+\subsection{Method \code{add_unit()}}{
+Add units to weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$add_unit()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$add_unit()} assigns units to numeric weather data using
+\code{\link[units:set_units]{units::set_units()}} if applicable.
+
+\verb{$add_unit()}
+and
+\href{../../eplusr/html/Epw.html#method-drop_unit}{\code{$drop_unit()}}
+are reversible, i.e.
+\verb{$add_unit()}
+can be used to counteract the effects introduced by
+\href{../../eplusr/html/Epw.html#method-drop_unit}{\code{$drop_unit()}},
+and vise a versa.
+
+\strong{Note} that \verb{$add_unit} modify the weather data in-place,
+meaning that the returned data from
+\href{../../eplusr/html/Epw.html#method-data}{\code{$data()}}
+and
+\href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
+may be different after calling \verb{$add_unit()}.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# get weather data with units
+epw$add_unit()
+head(epw$data())
+
+# with units specified, you can easily perform unit conversion using units
+# package
+t_dry_bulb <- epw$data()$dry_bulb_temperature
+units(t_dry_bulb) <- with(units::ud_units, "kelvin")
+
+head(t_dry_bulb)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-drop_unit"></a>}}
+\subsection{Method \code{drop_unit()}}{
+Remove units in weather data variables
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$drop_unit()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$drop_unit()} removes all units of numeric weather data.
+
+\href{../../eplusr/html/Epw.html#method-add_unit}{\code{$add_unit()}}
+and
+\verb{$drop_unit()}
+are reversible, i.e.
+\href{../../eplusr/html/Epw.html#method-drop_unit}{\code{$add_unit()}}
+can be used to counteract the effects introduced by
+\verb{$drop_unit()},
+and vise a versa.
+
+\strong{Note} that \verb{$add_unit} modify the weather data in-place,
+meaning that the returned data from
+\href{../../eplusr/html/Epw.html#method-data}{\code{$data()}}
+and
+\href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
+may be different after calling \verb{$add_unit()}.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$drop_unit()
+epw$data()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-purge"></a>}}
+\subsection{Method \code{purge()}}{
+Delete redundant weather data observations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$purge()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$purge()} deletes weather data in \code{Epw} object that do not belong to
+any data period.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$purge()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-add"></a>}}
+\subsection{Method \code{add()}}{
+Add a data period
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$add(
+  data,
+  realyear = FALSE,
+  name = NULL,
+  start_day_of_week = NULL,
+  after = 0L,
+  warning = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A \code{\link[data.table:data.table]{data.table::data.table()}} of new weather data to add
+or set. Validation is performed according to rules described
+above.}
+
+\item{\code{realyear}}{Whether input data is AMY data. Default: \code{FALSE}.}
+
+\item{\code{name}}{A new string used as name of added or set data period.
+Should not be the same as existing data period names. If
+\code{NULL}, it is generated automatically in format \code{Data},
+\code{Data_1} and etc., based on existing data period names.
+Default: \code{NULL}}
+
+\item{\code{start_day_of_week}}{A single integer or character specifying
+start day of week of input data period. If \code{NULL}, Sunday is
+used for TMY data and the actual start day of week is used for
+AMY data.  Default: \code{NULL}.}
+
+\item{\code{after}}{A single integer identifying the index of data period
+where input new data period to be inserted after. IF \code{0},
+input new data period will be the first data period. Default:
+\code{0}.}
+
+\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
+out-of-range data are found. Default: \code{TRUE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$add()} adds a new data period into current \code{Epw} object at
+specified position.
+
+The validity of input data is checked before adding according to
+rules following:
+\itemize{
+\item Column \code{datetime} exists and has type of \code{POSIXct}. Note that time
+zone of input date time will be reset to \code{UTC}.
+\item It assumes that input data is already sorted, i.e. no further
+sorting is made during validation. This is because when input data
+is TMY data, there is no way to properly sort input data rows only
+using \code{datetime} column.
+\item Number of data records per hour should be consistent across input
+data.
+\item Input number of data records per hour should be the same as
+existing data periods.
+\item The date time of input data should not overlap with existing data
+periods.
+\item Input data should have all 29 weather data columns with right
+types. The \code{year}, \code{month}, \code{day}, and \code{minute} column are not
+compulsory. They will be created according to values in the
+\code{datetime} column. Existing values will be overwritten.
 }
 }
-\author{
-Hongyuan Jia
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# will fail since date time in input data has already been covered by
+# existing data period
+\dontrun{epw$add(epw$data())}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-set"></a>}}
+\subsection{Method \code{set()}}{
+Replace a data period
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$set(
+  data,
+  realyear = FALSE,
+  name = NULL,
+  start_day_of_week = NULL,
+  period = 1L,
+  warning = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{data}}{A \code{\link[data.table:data.table]{data.table::data.table()}} of new weather data to add
+or set. Validation is performed according to rules described
+above.}
+
+\item{\code{realyear}}{Whether input data is AMY data. Default: \code{FALSE}.}
+
+\item{\code{name}}{A new string used as name of added or set data period.
+Should not be the same as existing data period names. If
+\code{NULL}, it is generated automatically in format \code{Data},
+\code{Data_1} and etc., based on existing data period names.
+Default: \code{NULL}}
+
+\item{\code{start_day_of_week}}{A single integer or character specifying
+start day of week of input data period. If \code{NULL}, Sunday is
+used for TMY data and the actual start day of week is used for
+AMY data.  Default: \code{NULL}.}
+
+\item{\code{period}}{A single integer identifying the index of data period
+to set.}
+
+\item{\code{warning}}{If \code{TRUE}, warnings are given if any missing data,
+out-of-range data are found. Default: \code{TRUE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$set()} replaces existing data period using input new weather data.
+
+The validity of input data is checked before replacing according to
+rules following:
+\itemize{
+\item Column \code{datetime} exists and has type of \code{POSIXct}. Note that time
+zone of input date time will be reset to \code{UTC}.
+\item It assumes that input data is already sorted, i.e. no further
+sorting is made during validation. This is because when input data
+is TMY data, there is no way to properly sort input data rows only
+using \code{datetime} column.
+\item Number of data records per hour should be consistent across input
+data.
+\item Input number of data records per hour should be the same as
+existing data periods.
+\item The date time of input data should not overlap with existing data
+periods.
+\item Input data should have all 29 weather data columns with right
+types. The \code{year}, \code{month}, \code{day}, and \code{minute} column are not
+compulsory. They will be created according to values in the
+\code{datetime} column. Existing values will be overwritten.
+}
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# change the weather data
+epw$set(epw$data(), warning = FALSE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-del"></a>}}
+\subsection{Method \code{del()}}{
+Delete a data period
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$del(period)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{period}}{A single integer identifying the index of data period
+to set.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$del()} removes a specified data period. Note that an error will be
+given if current \code{Epw} only contains one data period.
+}
+
+\subsection{Returns}{
+The modified \code{Epw} object itself, invisibly.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-is_unsaved"></a>}}
+\subsection{Method \code{is_unsaved()}}{
+Check if there are unsaved changes in current \code{Epw}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$is_unsaved()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$is_unsaved()} returns \code{TRUE} if there are modifications on the
+\code{Epw} object since it was read or since last time it was saved, and
+returns \code{FALSE} otherwise.
+}
+
+\subsection{Returns}{
+A single logical value of \code{TRUE} or \code{FALSE}.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$is_unsaved()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save"></a>}}
+\subsection{Method \code{save()}}{
+Save \code{Epw} object as an EPW file
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$save(path = NULL, overwrite = FALSE, purge = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{path}}{A path where to save the weather file. If \code{NULL}, the
+path of the weather file itself is used. Default: \code{NULL}.}
+
+\item{\code{overwrite}}{Whether to overwrite the file if it already exists.
+Default is \code{FALSE}.}
+
+\item{\code{purge}}{Whether to remove redundant data when saving. Default:
+\code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$save()} saves current \code{Epw} to an EPW file. Note that if missing
+values and out-of-range values are converted to \code{NA}s using
+\href{../../eplusr/html/Epw.html#method-make_na}{\code{$make_na()}},
+they will be filled with corresponding missing codes during saving.
+}
+
+\subsection{Returns}{
+A length-one character vector, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{# save the weather file
+epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-print"></a>}}
+\subsection{Method \code{print()}}{
+Print \code{Idf} object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$print()} prints the \code{Epw} object, including location, elevation,
+data source, WMO station, leap year indicator, interval and data
+periods.
+}
+
+\subsection{Returns}{
+The \code{Epw} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{epw$print()
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-clone"></a>}}
+\subsection{Method \code{clone()}}{
+The objects of this class are cloneable with this method.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$clone(deep = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{deep}}{Whether to make a deep clone.}
+}
+\if{html}{\out{</div>}}
+}
+}
 }

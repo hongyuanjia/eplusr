@@ -45,198 +45,6 @@ NULL
 #' * `field`: contains field names and field properties.
 #' * `reference`: contains cross-reference data of fields.
 #'
-#' @section Usage:
-#'
-#' \preformatted{
-#' idd <- use_idd(ver)
-#' idd$version()
-#' idd$build()
-#' idd$group_index(group = NULL)
-#' idd$group_name()
-#' idd$from_group(class)
-#' idd$class_index(class = NULL, by_group = FALSE)
-#' idd$class_name(index = NULL, by_group = FALSE)
-#' idd$required_class_name()
-#' idd$unique_class_name()
-#' idd$extenesible_class_name()
-#' idd$is_valid_group(group)
-#' idd$is_valid_class(class)
-#' idd$object_relation(class, direction = c("all", "ref_by", "ref_to"))
-#' idd$object(class)
-#' idd$objects(class)
-#' idd$objects_in_relation(class, direction = c("ref_to", "ref_by"))
-#' idd$objects_in_group(group)
-#' idd$ClassName
-#' idd[[ClassName]]
-#' idd$to_table(class, all = FALSE)
-#' idd$to_string(class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
-#' idd$print()
-#' print(idd)
-#' }
-#'
-#' @section Arguments:
-#'
-#' * `ver`: A valid EnergyPlus IDD version, e.g. 8.8, "8.6.0".
-#' * `idd`: An `Idd` object.
-#' * `group`: A character vector of valid group names. For
-#'   `$objects_in_group()`, a single string of valid group name.
-#' * `index`: An integer vector giving indexes of name appearance in
-#'   the IDD file of specified classes.
-#' * `class`: A character vector of valid class names. For `$object_relation()`
-#'   and `$objects_in_relation()`, a single string of valid class name.
-#' * `ClassName`: A single string of valid class name.
-#' * `direciton`: The relation direction to extract. Should be either `"all"`,
-#'   `"ref_to"` or "ref_by". For `$objects_in_relation()`, only `"ref_to"` and
-#'   `"ref_by"` are acceptable.
-#' * `all`: If `TRUE`, all fields in specified classes are returned. If `FALSE`,
-#'   only minimum required fields are returned. Default: `FALSE`.
-#' * `leading`: Leading spaces added to each field. Default: `4L`.
-#' * `sep_at`: The character width to separate value string and field string.
-#'   Default: `29L` which is the same as IDF Editor.
-#' * `sep_each`: A single integer of how many empty strings to insert between
-#'   different classes. Default: `0`.
-#' * `by_group`: If `TRUE`, a list is returned which separates class indexes or
-#'   names by the group they belongs to. Default: `FALSE`.
-#'
-#' @section Detail:
-#'
-#' `$version()` returns the IDD version in
-#' [numeric_version][base::numeric_version()].
-#'
-#' `$build()` returns the build tag string.
-#'
-#' `$group_index()` returns integer indexes (indexes of name appearance in
-#'     the IDD file) of specified groups.
-#'
-#' `$group_name()` returns all group names.
-#'
-#' `$from_group()` returns the names of group that specified classes belongs to.
-#'
-#' `$is_valid_group()` return `TRUE` if the input is a valid group name.
-#'
-#' `$class_index()` returns integer indexes (indexes of name appearance in
-#' the IDD file) of specified classes. If `by_group` is `TRUE`, a list is returned
-#' which separate class indexes by the group they belong to. Otherwise, an
-#' integer vector is returned.
-#'
-#' `$class_name()` returns class names of specified class indexes. If `by_group`
-#' is `TRUE`, a list is returned which separate class names by the group they
-#' belong to. Otherwise, a character vector is returned.
-#'
-#' `$required_class_name()` returns the names of all required classes.
-#'
-#' `$unique_class_name()` returns the names of all unique-object classes.
-#'
-#' `$extensible_class_name()` returns the names of all extensible classes.
-#'
-#' `$is_valid_class()` return `TRUE` if the input is a valid class name.
-#'
-#' `$object()` returns an [IddObject] of specified class.
-#'
-#' `$objects()` returns a list of [IddObject]s of specified classes.
-#'
-#' `$object_relation()` returns an `IddRelation` object which contains field
-#' data that have relation with specified class. For instance, if
-#' `idd$object_relation("Class 1", "ref_to")` gives results below:
-#'
-#' ```
-#' -- Refer to Others ---------------------
-#'   Class: <Class 1>
-#'   +- Field: <1: Field 1>
-#'   |  v~~~~~~~~~~~~~~~~~~
-#'   |  \- Class: <Class 2>
-#'   |     \- Field: <2: Field 2>
-#'   |
-#'   \- Field: <2: Field 2>
-#' ```
-#'
-#' This means that `Field 2` in class `Class 1` does not refer to any other fields.
-#' But `Field 1` in class `Class 2` refers to `Field 2` in class named `Class 2`.
-#'
-#' `$objects_in_relation()` returns a list of [IddObject]s that have relations.
-#' The first element is always the [IddObject] of that class. If specified class
-#' does not have any relation with other classes, a list that only contains the
-#' [IddObject] of that class is returned. For instance,
-#' `idd$objects_in_relation("Construction", "ref_to")` will return a list of an
-#' [IddObject] of class `Construction` and also all [IddObject]s that class
-#' `Construction` refers to; similarly, `idd$objects_in_relation("Construction",
-#' "ref_by")` will return a list of an [IddObject] of class `Construction` and
-#' also all [IddObject]s that refer to class `Construction`.
-#'
-#' `$objects_in_group()` returns a list of [IddObject]s of specified group.
-#'
-#' eplusr also provides custom S3 method of \code{$} and \code{[[} to make it
-#' more convenient to get a single [IddObject]. Basically, `idd$ClassName` and
-#' \code{idd[[ClassName]]}, is equivalent to \code{idd$object(ClassName)[[1]]}.
-#' Here, `ClassName` is a single valid class name where all characters other
-#' than letters and numbers are replaced by a underscore `_`.
-#'
-#' For details about [IddObject], please see [IddObject] class.
-#'
-#' `$to_table()` returns a [data.table][data.table::data.table()] that contains
-#' core data of specified class. It has 3 columns:
-#'
-#' * `class`: Character type. Class names.
-#' * `index`: Integer type. Field indexes.
-#' * `field`: Character type. Field names.
-#'
-#' `$to_string()` returns empty objects of specified class in a character vector
-#' format. It is formatted exactly the same as in IDF Editor.
-#'
-#' `$print()` prints basic info ob current Idd object, including version, build
-#' tag and total class number.
-#'
-#' @examples
-#' \dontrun{
-#' # get the Idd object of EnergyPlus v8.8
-#' idd <- use_idd(8.8, download = "auto")
-#'
-#' # version
-#' idd$version()
-#'
-#' # build
-#' idd$build()
-#'
-#' # all group names
-#' str(idd$group_name())
-#'
-#' # all class names
-#' str(idd$class_name())
-#'
-#' # all required class names
-#' str(idd$required_class_name())
-#'
-#' # all unique class names
-#' str(idd$unique_class_name())
-#'
-#' # IddObject of SimulationControl class
-#' idd$object("SimulationControl")
-#' # OR
-#' idd$SimulationControl
-#' # OR
-#' idd[["SimulationControl"]]
-#'
-#' # IddObject of Construction and Material class
-#' idd$objects(c("Construction", "Material"))
-#'
-#' # show all classes that refer to Material class
-#' length(idd$object_relation("Material", "ref_by"))
-#'
-#' # IddObjects that refer to class Construction
-#' length(idd$objects_in_relation("Construction", "ref_by"))
-#'
-#' # IddObjects that class Construction refers to
-#' length(idd$objects_in_relation("Construction", "ref_to"))
-#'
-#' # All IddObjects in group Schedules
-#' length(idd$objects_in_group("Schedules"))
-#'
-#' # Extract core data of class Material and Construction
-#' idd$to_table(c("Material", "Construction"))
-#'
-#' # Get empty Material object and Construction object in a character vector
-#' idd$to_string(c("Material", "Construction"))
-#' }
 #' @docType class
 #' @name Idd
 #' @seealso [IddObject] class which provides detailed information of
@@ -247,11 +55,36 @@ NULL
 #' [OpenStudio utilities library](https://openstudio-sdk-documentation.s3.amazonaws.com/cpp/OpenStudio-2.5.1-doc/utilities/html/idf_page.html)
 NULL
 
+#' @export
 # Idd {{{
 Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
 
     public = list(
         # INITIALIZE {{{
+        #' @description
+        #' Create an `Idd` object
+        #'
+        #' @details
+        #' It takes an EnergyPlus Input Data Dictionary (IDD) as input and
+        #' returns an `Idd` object.
+        #'
+        #' It is suggested to use helper [use_idd()] which supports to directly
+        #' take a valid IDD version as input and search automoatically the
+        #' corresponding file path.
+        #'
+        #' @param path Either a path, a connection, or literal data (either a single
+        #'        string or a raw vector) to an EnergyPlus Input Data Dictionary
+        #'        (IDD). If a file path, that file usually has a extension
+        #'        `.idd`.
+        #'
+        #' @return An `Idd` object.
+        #'
+        #' @examples
+        #' \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+        #'
+        #' # Preferable way
+        #' idd <- use_idd(8.8, download = "auto")
+        #'
         initialize = function (path) {
             # add a uuid
             private$m_uuid <- unique_id()
@@ -270,75 +103,515 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         # }}}
 
         # PROPERTY GETTERS {{{
+        # version {{{
+        #' @description
+        #' Get the version of current `Idd`
+        #'
+        #' @details
+        #' `$version()` returns the version of current `Idd` in a
+        #' [base::numeric_version()] format. This makes it easy to direction
+        #' compare versions of different `Idd`s, e.g. `idd$version() > 8.6` or
+        #' `idd1$version() > idd2$version()`.
+        #'
+        #' @return A [base::numeric_version()] object.
+        #' @examples
+        #' # get version
+        #' idd$version()
+        #'
         version = function ()
             idd_version(self, private),
+        # }}}
 
+        # build {{{
+        #' @description
+        #' Get the build tag of current `Idd`
+        #'
+        #' @details
+        #' `$build()` returns the build tag of current `Idd`. If no build tag is
+        #' found, `NA` is returned.
+        #'
+        #' @return A [base::numeric_version()] object.
+        #' @examples
+        #' # get build tag
+        #' idd$build()
+        #'
         build = function ()
             idd_build(self, private),
+        # }}}
 
+        # group_name {{{
+        #' @description
+        #' Get names of groups
+        #'
+        #' @details
+        #' `$group_name()` returns names of groups current `Idd` contains.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get names of all groups Idf contains
+        #' idd$group_name()
+        #'
         group_name = function ()
             idd_group_name(self, private),
+        # }}}
 
+        # from_group {{{
+        #' @description
+        #' Get the name of group that specified class belongs to
+        #'
+        #' @details
+        #' `$from_group()` returns the name of group that specified class
+        #' belongs to.
+        #'
+        #' @param class A character vector of valid class names in current
+        #'        `Idd`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' idd$from_group(c("Version", "Schedule:Compact"))
+        #'
         from_group = function (class)
             idd_from_group(self, private, class),
+        # }}}
 
+        # class_name {{{
+        #' @description
+        #' Get names of classes
+        #'
+        #' @details
+        #' `$class_name()` returns names of classes current `Idd` contains
+        #'
+        #' @param index An integer vector of class indices.
+        #' @param by_group If `TRUE`, a list is returned which separates class
+        #'        names by the group they belong to. Default: `FALSE`.
+        #'
+        #' @return A character vector if `by_group` is `FALSE` and a list of
+        #' character vectors when `by_group` is `TRUE`.
+        #'
+        #' @examples
+        #' # get names of the 10th to 20th class
+        #' idd$class_name(10:20)
+        #'
+        #' # get names of all classes in Idf
+        #' idd$class_name()
+        #'
+        #' # get names of all classes grouped by group names in Idf
+        #' idd$class_name(by_group = TRUE)
+        #'
         class_name = function (index = NULL, by_group = FALSE)
             idd_class_name(self, private, index = index, by_group = by_group),
+        # }}}
 
+        # required_class_name {{{
+        #' @description
+        #' Get the names of required classes
+        #'
+        #' @details
+        #' `$required_class_name()` returns the names of required classes in
+        #' current `Idd`. "Require" means that for any [Idf] there should be at
+        #' least one object.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' idd$required_class_name()
+        #'
         required_class_name = function ()
             idd_required_class_name(self, private),
+        # }}}
 
+        # unique_class_name {{{
+        #' @description
+        #' Get the names of unique-object classes
+        #'
+        #' @details
+        #' `$unique_class_name()` returns the names of unique-object classes in
+        #' current `Idd`. "Unique-object" means that for any [Idf] there should
+        #' be at most one object in those classes.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' idd$unique_class_name()
+        #'
         unique_class_name = function ()
             idd_unique_class_name(self, private),
+        # }}}
 
+        # extensible_class_name {{{
+        #' @description
+        #' Get the names of classes with extensible fields
+        #'
+        #' @details
+        #' `$extensible_class_name()` returns the names of classes with
+        #' extensible fields in current `Idd`. "Extensible fields" indicate
+        #' fields that can be added dynamically, such like the X, Y and Z
+        #' vertices of a building surface.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' idd$extensible_class_name()
+        #'
         extensible_class_name = function ()
             idd_extensible_class_name(self, private),
+        # }}}
 
+        # group_index {{{
+        #' @description
+        #' Get the indices of specified groups
+        #'
+        #' @details
+        #' `$group_index()` returns the indices of specifed groups in
+        #' current `Idd`. A group index is just an integer indicating its
+        #' appearance order in the `Idd`.
+        #'
+        #' @param group A character vector of valid group names.
+        #'
+        #' @return An integer vector.
+        #'
+        #' @examples
+        #' idd$group_index()
+        #'
         group_index = function (group = NULL)
             idd_group_index(self, private, group),
+        # }}}
 
+        # class_index {{{
+        #' @description
+        #' Get the indices of specified classes
+        #'
+        #' @details
+        #' `$class_index()` returns the indices of specifed classes in
+        #' current `Idd`. A class index is just an integer indicating its
+        #' appearance order in the `Idd`.
+        #'
+        #' @param class A character vector of valid class names.
+        #' @param by_group If `TRUE`, a list is returned which separates class
+        #'        names by the group they belong to. Default: `FALSE`.
+        #'
+        #' @return An integer vector.
+        #'
+        #' @examples
+        #' idd$class_index()
+        #'
         class_index = function (class = NULL, by_group = FALSE)
             idd_class_index(self, private, class, by_group = by_group),
         # }}}
+        # }}}
 
         # ASSERTIONS {{{
+        # is_valid_group {{{
+        #' @description
+        #' Check if elements in input character vector are valid group names.
+        #'
+        #' @details
+        #' `$is_valid_group()` returns `TRUE`s if given character vector
+        #' contains valid group names in the context of current `Idd`, and
+        #' `FALSE`s otherwise.
+        #'
+        #' Note that case-sensitive matching is performed, which means that
+        #' `"Location and Climate"` is a valid group name but `"location and
+        #' climate"` is not.
+        #'
+        #' @param group A character vector to check.
+        #'
+        #' @return A logical vector with the same length as input character
+        #' vector.
+        #'
+        #' @examples
+        #' idd$is_valid_group(c("Schedules", "Compliance Objects"))
+        #'
         is_valid_group = function (group)
             idd_is_valid_group_name(self, private, group),
+        # }}}
 
+        # is_valid_class {{{
+        #' @description
+        #' Check if elements in input character vector are valid class names.
+        #'
+        #' @details
+        #' `$is_valid_class()` returns `TRUE`s if given character vector
+        #' contains valid class names in the context of current `Idd`, and
+        #' `FALSE`s otherwise.
+        #'
+        #' Note that case-sensitive matching is performed, which means that
+        #' `"Version"` is a valid class name but `"version"` is not.
+        #'
+        #' @param class A character vector to check.
+        #'
+        #' @return A logical vector with the same length as input character
+        #' vector.
+        #'
+        #' @examples
+        #' idd$is_valid_class(c("Building", "ShadowCalculation"))
+        #'
         is_valid_class = function (class)
             idd_is_valid_class_name(self, private, class),
         # }}}
+        # }}}
 
         # OBJECT GETTERS {{{
+        # object {{{
+        #' @description
+        #' Extract an [IddObject] object using class index or name.
+        #'
+        #' @details
+        #' `$object()` returns an [IddObject] object specified by a class ID
+        #' or name.
+        #'
+        #' Note that case-sensitive matching is performed, which means that
+        #' `"Version"` is a valid class name but `"version"` is not.
+        #'
+        #' For convenience, underscore-style names are allowed, e.g.
+        #' `Site_Location` is equivalent to `Site:Location`.
+        #'
+        #' @param class A single integer specifying the class index or a single
+        #'        string specifying the class name.
+        #'
+        #' @return An [IddObject] object.
+        #'
+        #' @examples
+        #' idd$object(3)
+        #'
+        #' idd$object("Building")
+        #'
         object = function (class)
             idd_obj(self, private, class),
+        # }}}
 
+        # objects {{{
+        #' @description
+        #' Extract multiple [IddObject] objects using class indices or names.
+        #'
+        #' @details
+        #' `$objects()` returns a named list of [IddObject] objects using class
+        #' indices or names. The returned list is named using class names.
+        #'
+        #' Note that case-sensitive matching is performed, which means that
+        #' `"Version"` is a valid class name but `"version"` is not.
+        #'
+        #' For convenience, underscore-style names are allowed, e.g.
+        #' `Site_Location` is equivalent to `Site:Location`.
+        #'
+        #' @param class An integer vector specifying class indices or a character
+        #'        vector specifying class names.
+        #'
+        #' @return A named list of [IddObject] objects.
+        #'
+        #' @examples
+        #' idd$objects(c(3,10))
+        #'
+        #' idd$objects(c("Version", "Material"))
+        #'
         objects = function (class)
             idd_objects(self, private, class),
+        # }}}
 
+        # object_relation {{{
+        #' @description
+        #' Extract the relationship between class fields.
+        #'
+        #' @details
+        #' Many fields in [Idd] can be referred by others. For example, the
+        #' `Outside Layer` and other fields in `Construction` class refer to the
+        #' `Name` field in `Material` class and other material related classes.
+        #' Here it means that the `Outside Layer` field **refers to** the `Name`
+        #' field and the `Name` field is **referred by** the `Outside Layer`.
+        #'
+        #' `$object_relation()` provides a simple interface to get this kind of
+        #' relation. It takes a single class index or name and also a relation
+        #' direction, and returns an `IddRelation` object which contains data
+        #' presenting such relation above. For instance, if
+        #' `idd$object_relation("Construction", "ref_to")` gives results below:
+        #'
+        #' ```
+        #' -- Refer to Others ---------------------------
+        #'   Class: <Construction>
+        #'   |- Field: <02: Outside Layer>
+        #'   |  v~~~~~~~~~~~~~~~~~~~~~~~~~
+        #'   |  |- Class: <Material>
+        #'   |  |  \- Field: <1: Name>
+        #'   |  |
+        #'   |  |- Class: <Material:NoMass>
+        #'   |  |  \- Field: <1: Name>
+        #'   |  |
+        #'   |  |- Class: <Material:InfraredTransparent>
+        #'   |  |  \- Field: <1: Name>
+        #'   |  |
+        #'   ......
+        #' ```
+        #'
+        #' This means that the value of field `Outside Layer` in class
+        #' `Construction` can be one of values from field `Name` in class
+        #' `Material`, field `Name` in class `Material:NoMass`, field `Name` in
+        #' class `Material:InfraredTransparent` and etc. All those classes can
+        #' be further easily extracted using `$objects_in_relation()` method
+        #' described below.
+        #'
+        #' @param class A single integer specifying the class index or a single
+        #'        string specifying the class name.
+        #' @param direction The relation direction to extract. Should be one of
+        #'        `"all"`, `"ref_to"` or `"ref_by"`.
+        #'
+        #' @return An `IddRelation` object, which is a list of 3
+        #' [data.table::data.table()]s named `ref_to` and `ref_by`.
+        #' Each [data.table::data.table()] contains 12 columns.
+        #'
+        #' @examples
+        #' # check each construction layer's possible references
+        #' idd$object_relation("Construction", "ref_to")
+        #'
+        #' # check where construction being used
+        #' idd$object_relation("Construction", "ref_by")
+        #'
         object_relation = function (class, direction = c("all", "ref_to", "ref_by"))
             idd_object_relation(self, private, class, match.arg(direction)),
+        # }}}
 
+        # objects_in_relation {{{
+        #' @description
+        #' Extract multiple [IddObject] objects referencing each others.
+        #'
+        #' @details
+        #' `$objects_in_relation()` returns a named list of [IddObject] objects
+        #' that have specified relationship with given class. The first element of
+        #' returned list is always the specified class itself. If that
+        #' class does not have specified relationship with other classes, a list
+        #' that only contains specified class itself is returned.
+        #'
+        #' For instance, `idd$objects_in_relation("Construction", "ref_by")`
+        #' will return a named list of an [IddObject] object named
+        #' `Construction` and also all other [IddObject] objects that can refer
+        #' to field values in class `Construction`. Similarly,
+        #' `idd$objects_in_relation("Construction", "ref_to")` will return a
+        #' named list of an [IddObject] object named `Construction` and also all
+        #' other [IddObject] objects that `Construction` can refer to.
+        #'
+        #' @param class A single integer specifying the class index or a single
+        #'        string specifying the class name.
+        #' @param direction The relation direction to extract. Should be either
+        #'        `"ref_to"` or `"ref_by"`.
+        #'
+        #' @return An named list of [IddObject] objects.
+        #'
+        #' @examples
+        #' # get class Construction and all classes that it can refer to
+        #' idd$objects_in_relation("Construction", "ref_to")
+        #'
+        #' # get class Construction and all classes that refer to it
+        #' idd$objects_in_relation("Construction", "ref_by")
+        #'
         objects_in_relation = function (class, direction = c("ref_to", "ref_by"))
             idd_objects_in_relation(self, private, class, match.arg(direction)),
+        # }}}
 
+        # objects_in_group {{{
+        #' @description
+        #' Extract all [IddObject] objects in one group.
+        #'
+        #' @details
+        #' `$objects_in_group()` returns a named list of all [IddObject] objects
+        #' in specified group. The returned list is named using class names.
+        #'
+        #' @param group A single string of valid group name for current `Idd`
+        #'        object.
+        #'
+        #' @return A named list of [IddObject] objects.
+        #'
+        #' @examples
+        #' # get all classes in Schedules group
+        #' idd$objects_in_group("Schedules")
+        #'
         objects_in_group = function (group)
             idd_objects_in_group(self, private, group = group),
-
-        object_in_group = function (group)
-            idd_object_in_group(self, private, group = group),
+        # }}}
         # }}}
 
         # DATA EXTRACTION {{{
+        # to_table {{{
+        #' @description
+        #' Format `Idd` classes as a data.frame
+        #'
+        #' @details
+        #' `$to_table()` returns a [data.table][data.table::data.table()] that
+        #' contains basic data of specified classes.
+        #' The returned [data.table][data.table::data.table()] has 3 columns:
+        #'
+        #' * `class`: Character type. Current class name.
+        #' * `index`: Integer type. Field indexes.
+        #' * `field`: Character type. Field names.
+        #'
+        #' @param class A character vector of class names.
+        #' @param all If `TRUE`, all available fields defined in IDD for
+        #'        specified class will be returned. Default: `FALSE`.
+        #'
+        #' @return A [data.table][data.table::data.table()] with 3 columns.
+        #'
+        #' @examples
+        #' # extract data of class Material
+        #' idd$to_table(class = "Material")
+        #'
+        #' # extract multiple class data
+        #' idd$to_table(c("Construction", "Material"))
+        #'
         to_table = function (class, all = FALSE)
             idd_to_table(self, private, class, all),
-        
+        # }}}
+
+        # to_string {{{
+        #' @description
+        #' Format `Idf` classes as a character vector
+        #'
+        #' @details
+        #' `$to_string()` returns the text format of specified classes. The
+        #' returned character vector can be pasted into an IDF file as empty
+        #' objects of specified classes.
+        #'
+        #' @param class A character vector of class names.
+        #' @param leading Leading spaces added to each field. Default: `4L`.
+        #' @param sep_at The character width to separate value string and field
+        #'        string. Default: `29L` which is the same as IDF Editor.
+        #' @param sep_each A single integer of how many empty strings to insert
+        #'        between different classes. Default: `0`.
+        #' @param all If `TRUE`, all available fields defined in IDD for
+        #'        specified class will be returned. Default: `FALSE`.
+        #'
+        #' @return A character vector.
+        #'
+        #' @examples
+        #' # get text format of class Material
+        #' head(idd$to_string(class = "Material"))
+        #'
+        #' # get text format of multiple class
+        #' idd$to_string(c("Material", "Construction"))
+        #'
+        #' # tweak output formatting
+        #' idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+        #'
         to_string = function (class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
             idd_to_string(self, private, class, leading, sep_at, sep_each, all),
         # }}}
+        # }}}
 
+        # print {{{
+        #' @description
+        #' Print `Idd` object
+        #'
+        #' @details
+        #' `$print()` prints the `Idd` object giving the information of version,
+        #' build tag and total class numbers.
+        #'
+        #' @return The `Idd` object itself, invisibly.
+        #'
+        #' @examples
+        #' idd$print()
+        #'
         print = function ()
             idd_print(self, private)
+        # }}}
     ),
 
     private = list(
