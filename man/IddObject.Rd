@@ -39,105 +39,134 @@ be character.
 ## Method `IddObject$new`
 ## ------------------------------------------------
 
+\dontrun{
 surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$version`
 ## ------------------------------------------------
 
+\dontrun{
 # get version
 surf$version()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$parent`
 ## ------------------------------------------------
 
+\dontrun{
 surf$parent()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$group_name`
 ## ------------------------------------------------
 
+\dontrun{
 surf$group_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$group_index`
 ## ------------------------------------------------
 
+\dontrun{
 surf$group_index()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$class_name`
 ## ------------------------------------------------
 
+\dontrun{
 surf$class_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$class_index`
 ## ------------------------------------------------
 
+\dontrun{
 surf$class_index()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$class_format`
 ## ------------------------------------------------
 
+\dontrun{
 surf$class_format()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$min_fields`
 ## ------------------------------------------------
 
+\dontrun{
 surf$min_fields()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$num_fields`
 ## ------------------------------------------------
 
+\dontrun{
 surf$num_fields()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$memo`
 ## ------------------------------------------------
 
+\dontrun{
 surf$memo()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$num_extensible`
 ## ------------------------------------------------
 
+\dontrun{
 surf$num_extensible()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$first_extensible_index`
 ## ------------------------------------------------
 
+\dontrun{
 surf$first_extensible_index()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$extensible_group_num`
 ## ------------------------------------------------
 
+\dontrun{
 surf$extensible_group_num()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$add_extensible_group`
 ## ------------------------------------------------
 
+\dontrun{
 # field number before adding
 surf$num_fields()
 # extensible group number before adding
@@ -150,12 +179,14 @@ surf$add_extensible_group(2)
 surf$num_fields()
 # extensible group number after adding
 surf$extensible_group_num()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$del_extensible_group`
 ## ------------------------------------------------
 
+\dontrun{
 # field number before deleting
 surf$num_fields()
 # extensible group number before deleting
@@ -168,40 +199,50 @@ surf$del_extensible_group(2)
 surf$num_fields()
 # extensible group number after deleting
 surf$extensible_group_num()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$has_name`
 ## ------------------------------------------------
 
+\dontrun{
 surf$has_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_required`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_required()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_unique`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_unique()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_extensible`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_extensible()
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field names
 surf$field_name()
 
@@ -213,225 +254,274 @@ surf$field_name(unit = TRUE)
 
 # change field name to lower-style
 surf$field_name(unit = TRUE, in_ip = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_index`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field indices
 surf$field_index()
 
 # get field indices for specific fields
 surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_type`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field types
 surf$field_type()
 
 # get field types for specific fields
 surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_note`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field notes
 surf$field_note()
 
 # get field types for specific fields
 surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_unit`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field units
 surf$field_unit()
 
 # get field units for specific fields
 surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_default`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field default values
 surf$field_default()
 
 # get default values for specific fields
 surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_choice`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field value choices
 surf$field_choice()
 
 # get field value choices for specific fields
 surf$field_choice(c("name", "sun exposure", "wind exposure"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_range`
 ## ------------------------------------------------
 
+\dontrun{
 # get all field value ranges
 surf$field_range()
 
 # get value ranges for specific fields
 surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # get field relation for specific fields
 surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$field_possible`
 ## ------------------------------------------------
 
+\dontrun{
 # get field possible values for specific fields
 surf$field_possible(6:10)
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_valid_field_num`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_valid_field_num(c(10, 14, 100))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_extensible_index`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_extensible_index(c(10, 14, 100))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_valid_field_name`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_valid_field_name(c("name", "sun_exposure"))
 
 # exact match
 surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_valid_field_index`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_valid_field_index(1:10)
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_autosizable_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_autosizable_field()
 
 surf$is_autosizable_field(c("name", "sun_exposure"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_autocalculatable_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_autocalculatable_field()
 
 surf$is_autocalculatable_field(c("name", "sun_exposure"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_numeric_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_numeric_field()
 
 surf$is_numeric_field(c("name", "sun_exposure"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_real_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_real_field()
 
 surf$is_real_field(c("name", "number of vertices"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_integer_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_integer_field()
 
 surf$is_integer_field(c("name", "number of vertices"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$is_required_field`
 ## ------------------------------------------------
 
+\dontrun{
 surf$is_required_field()
 
 surf$is_required_field(c("name", "number of vertices"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$has_ref`
 ## ------------------------------------------------
 
+\dontrun{
 surf$has_ref()
 
 surf$has_ref(c("name", "zone name"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$has_ref_to`
 ## ------------------------------------------------
 
+\dontrun{
 surf$has_ref_to()
 
 surf$has_ref_to(c("name", "zone name"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$has_ref_by`
 ## ------------------------------------------------
 
+\dontrun{
 surf$has_ref_by()
 
 surf$has_ref_by(c("name", "zone name"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$to_table`
 ## ------------------------------------------------
 
+\dontrun{
 surf$to_table()
 
 surf$to_table(TRUE)
+}
+
 
 ## ------------------------------------------------
 ## Method `IddObject$to_string`
 ## ------------------------------------------------
 
+\dontrun{
 # get text format of class BuildingSurface:Detailed
 surf$to_string()
 
@@ -440,15 +530,18 @@ surf$to_string(leading = 0, sep_at = 0)
 
 # add comments
 surf$to_string(c("This", "will", "be", "comments"))
+}
 
 
 ## ------------------------------------------------
 ## Method `IddObject$print`
 ## ------------------------------------------------
 
+\dontrun{
 surf
 
 surf$print(brief = TRUE)
+}
 
 }
 \seealso{
@@ -536,7 +629,9 @@ An \code{IddObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
+\preformatted{\dontrun{
+surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -564,8 +659,10 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get version
+\preformatted{\dontrun{
+# get version
 surf$version()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -590,7 +687,9 @@ A \link{Idd} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$parent()
+\preformatted{\dontrun{
+surf$parent()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -615,7 +714,9 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$group_name()
+\preformatted{\dontrun{
+surf$group_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -642,7 +743,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$group_index()
+\preformatted{\dontrun{
+surf$group_index()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -667,7 +770,9 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$class_name()
+\preformatted{\dontrun{
+surf$class_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -694,7 +799,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$class_index()
+\preformatted{\dontrun{
+surf$class_index()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -720,7 +827,9 @@ A single character.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$class_format()
+\preformatted{\dontrun{
+surf$class_format()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -746,7 +855,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$min_fields()
+\preformatted{\dontrun{
+surf$min_fields()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -772,7 +883,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$num_fields()
+\preformatted{\dontrun{
+surf$num_fields()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -798,7 +911,9 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$memo()
+\preformatted{\dontrun{
+surf$memo()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -830,7 +945,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$num_extensible()
+\preformatted{\dontrun{
+surf$num_extensible()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -862,7 +979,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$first_extensible_index()
+\preformatted{\dontrun{
+surf$first_extensible_index()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -894,7 +1013,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$extensible_group_num()
+\preformatted{\dontrun{
+surf$extensible_group_num()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -934,7 +1055,8 @@ The modified \code{IddObject} itself.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# field number before adding
+\preformatted{\dontrun{
+# field number before adding
 surf$num_fields()
 # extensible group number before adding
 surf$extensible_group_num()
@@ -946,6 +1068,7 @@ surf$add_extensible_group(2)
 surf$num_fields()
 # extensible group number after adding
 surf$extensible_group_num()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -985,7 +1108,8 @@ The modified \code{IddObject} itself.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# field number before deleting
+\preformatted{\dontrun{
+# field number before deleting
 surf$num_fields()
 # extensible group number before deleting
 surf$extensible_group_num()
@@ -997,6 +1121,7 @@ surf$del_extensible_group(2)
 surf$num_fields()
 # extensible group number after deleting
 surf$extensible_group_num()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1025,7 +1150,9 @@ A single logical value (\code{TRUE} or \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$has_name()
+\preformatted{\dontrun{
+surf$has_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1054,7 +1181,9 @@ A single logical value (\code{TRUE} or \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_required()
+\preformatted{\dontrun{
+surf$is_required()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1083,7 +1212,9 @@ A single logical value (\code{TRUE} or \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_unique()
+\preformatted{\dontrun{
+surf$is_unique()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1113,7 +1244,9 @@ A single logical value (\code{TRUE} or \code{FALSE}).
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_extensible()
+\preformatted{\dontrun{
+surf$is_extensible()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1165,7 +1298,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field names
+\preformatted{\dontrun{
+# get all field names
 surf$field_name()
 
 # get field units also
@@ -1176,6 +1310,7 @@ surf$field_name(unit = TRUE)
 
 # change field name to lower-style
 surf$field_name(unit = TRUE, in_ip = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1211,11 +1346,13 @@ An integer vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field indices
+\preformatted{\dontrun{
+# get all field indices
 surf$field_index()
 
 # get field indices for specific fields
 surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1259,11 +1396,13 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field types
+\preformatted{\dontrun{
+# get all field types
 surf$field_type()
 
 # get field types for specific fields
 surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1300,11 +1439,13 @@ A list of character vectors.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field notes
+\preformatted{\dontrun{
+# get all field notes
 surf$field_note()
 
 # get field types for specific fields
 surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1343,11 +1484,13 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field units
+\preformatted{\dontrun{
+# get all field units
 surf$field_unit()
 
 # get field units for specific fields
 surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1386,11 +1529,13 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field default values
+\preformatted{\dontrun{
+# get all field default values
 surf$field_default()
 
 # get default values for specific fields
 surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1426,11 +1571,13 @@ A list of character vectors.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field value choices
+\preformatted{\dontrun{
+# get all field value choices
 surf$field_choice()
 
 # get field value choices for specific fields
 surf$field_choice(c("name", "sun exposure", "wind exposure"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1489,11 +1636,13 @@ A list of ranges.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all field value ranges
+\preformatted{\dontrun{
+# get all field value ranges
 surf$field_range()
 
 # get value ranges for specific fields
 surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1561,8 +1710,10 @@ An \code{IddRelation} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get field relation for specific fields
+\preformatted{\dontrun{
+# get field relation for specific fields
 surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1621,8 +1772,10 @@ A \code{IddFieldPossible} object which is a
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get field possible values for specific fields
+\preformatted{\dontrun{
+# get field possible values for specific fields
 surf$field_possible(6:10)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1661,7 +1814,9 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_valid_field_num(c(10, 14, 100))
+\preformatted{\dontrun{
+surf$is_valid_field_num(c(10, 14, 100))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1697,7 +1852,9 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_extensible_index(c(10, 14, 100))
+\preformatted{\dontrun{
+surf$is_extensible_index(c(10, 14, 100))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1734,10 +1891,12 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_valid_field_name(c("name", "sun_exposure"))
+\preformatted{\dontrun{
+surf$is_valid_field_name(c("name", "sun_exposure"))
 
 # exact match
 surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1770,7 +1929,9 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_valid_field_index(1:10)
+\preformatted{\dontrun{
+surf$is_valid_field_index(1:10)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1805,9 +1966,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_autosizable_field()
+\preformatted{\dontrun{
+surf$is_autosizable_field()
 
 surf$is_autosizable_field(c("name", "sun_exposure"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1842,9 +2005,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_autocalculatable_field()
+\preformatted{\dontrun{
+surf$is_autocalculatable_field()
 
 surf$is_autocalculatable_field(c("name", "sun_exposure"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1879,9 +2044,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_numeric_field()
+\preformatted{\dontrun{
+surf$is_numeric_field()
 
 surf$is_numeric_field(c("name", "sun_exposure"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1916,9 +2083,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_real_field()
+\preformatted{\dontrun{
+surf$is_real_field()
 
 surf$is_real_field(c("name", "number of vertices"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1953,9 +2122,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_integer_field()
+\preformatted{\dontrun{
+surf$is_integer_field()
 
 surf$is_integer_field(c("name", "number of vertices"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1989,9 +2160,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$is_required_field()
+\preformatted{\dontrun{
+surf$is_required_field()
 
 surf$is_required_field(c("name", "number of vertices"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2026,9 +2199,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$has_ref()
+\preformatted{\dontrun{
+surf$has_ref()
 
 surf$has_ref(c("name", "zone name"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2063,9 +2238,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$has_ref_to()
+\preformatted{\dontrun{
+surf$has_ref_to()
 
 surf$has_ref_to(c("name", "zone name"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2100,9 +2277,11 @@ A logical vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$has_ref_by()
+\preformatted{\dontrun{
+surf$has_ref_by()
 
 surf$has_ref_by(c("name", "zone name"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2143,9 +2322,12 @@ A \link[data.table:data.table]{data.table} with 3 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf$to_table()
+\preformatted{\dontrun{
+surf$to_table()
 
 surf$to_table(TRUE)
+}
+
 }
 \if{html}{\out{</div>}}
 
@@ -2187,7 +2369,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get text format of class BuildingSurface:Detailed
+\preformatted{\dontrun{
+# get text format of class BuildingSurface:Detailed
 surf$to_string()
 
 # tweak output formatting
@@ -2195,6 +2378,7 @@ surf$to_string(leading = 0, sep_at = 0)
 
 # add comments
 surf$to_string(c("This", "will", "be", "comments"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2244,9 +2428,11 @@ The \code{IddObject} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{surf
+\preformatted{\dontrun{
+surf
 
 surf$print(brief = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}

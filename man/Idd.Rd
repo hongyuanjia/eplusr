@@ -55,47 +55,57 @@ four tables:
 ## Method `Idd$new`
 ## ------------------------------------------------
 
-\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
 
 # Preferable way
 idd <- use_idd(8.8, download = "auto")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$version`
 ## ------------------------------------------------
 
+\dontrun{
 # get version
 idd$version()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$build`
 ## ------------------------------------------------
 
+\dontrun{
 # get build tag
 idd$build()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$group_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get names of all groups Idf contains
 idd$group_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$from_group`
 ## ------------------------------------------------
 
+\dontrun{
 idd$from_group(c("Version", "Schedule:Compact"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$class_name`
 ## ------------------------------------------------
 
+\dontrun{
 # get names of the 10th to 20th class
 idd$class_name(10:20)
 
@@ -104,120 +114,148 @@ idd$class_name()
 
 # get names of all classes grouped by group names in Idf
 idd$class_name(by_group = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$required_class_name`
 ## ------------------------------------------------
 
+\dontrun{
 idd$required_class_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$unique_class_name`
 ## ------------------------------------------------
 
+\dontrun{
 idd$unique_class_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$extensible_class_name`
 ## ------------------------------------------------
 
+\dontrun{
 idd$extensible_class_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$group_index`
 ## ------------------------------------------------
 
+\dontrun{
 idd$group_index()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$class_index`
 ## ------------------------------------------------
 
+\dontrun{
 idd$class_index()
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$is_valid_group`
 ## ------------------------------------------------
 
+\dontrun{
 idd$is_valid_group(c("Schedules", "Compliance Objects"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$is_valid_class`
 ## ------------------------------------------------
 
+\dontrun{
 idd$is_valid_class(c("Building", "ShadowCalculation"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$object`
 ## ------------------------------------------------
 
+\dontrun{
 idd$object(3)
 
 idd$object("Building")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$objects`
 ## ------------------------------------------------
 
+\dontrun{
 idd$objects(c(3,10))
 
 idd$objects(c("Version", "Material"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$object_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # check each construction layer's possible references
 idd$object_relation("Construction", "ref_to")
 
 # check where construction being used
 idd$object_relation("Construction", "ref_by")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$objects_in_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # get class Construction and all classes that it can refer to
 idd$objects_in_relation("Construction", "ref_to")
 
 # get class Construction and all classes that refer to it
 idd$objects_in_relation("Construction", "ref_by")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$objects_in_group`
 ## ------------------------------------------------
 
+\dontrun{
 # get all classes in Schedules group
 idd$objects_in_group("Schedules")
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$to_table`
 ## ------------------------------------------------
 
+\dontrun{
 # extract data of class Material
 idd$to_table(class = "Material")
 
 # extract multiple class data
 idd$to_table(c("Construction", "Material"))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$to_string`
 ## ------------------------------------------------
 
+\dontrun{
 # get text format of class Material
 head(idd$to_string(class = "Material"))
 
@@ -226,13 +264,16 @@ idd$to_string(c("Material", "Construction"))
 
 # tweak output formatting
 idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idd$print`
 ## ------------------------------------------------
 
+\dontrun{
 idd$print()
+}
 
 }
 \references{
@@ -304,10 +345,11 @@ An \code{Idd} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+\preformatted{\dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
 
 # Preferable way
 idd <- use_idd(8.8, download = "auto")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -335,8 +377,10 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get version
+\preformatted{\dontrun{
+# get version
 idd$version()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -362,8 +406,10 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get build tag
+\preformatted{\dontrun{
+# get build tag
 idd$build()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -388,8 +434,10 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get names of all groups Idf contains
+\preformatted{\dontrun{
+# get names of all groups Idf contains
 idd$group_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -423,7 +471,9 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$from_group(c("Version", "Schedule:Compact"))
+\preformatted{\dontrun{
+idd$from_group(c("Version", "Schedule:Compact"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -459,7 +509,8 @@ character vectors when \code{by_group} is \code{TRUE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get names of the 10th to 20th class
+\preformatted{\dontrun{
+# get names of the 10th to 20th class
 idd$class_name(10:20)
 
 # get names of all classes in Idf
@@ -467,6 +518,7 @@ idd$class_name()
 
 # get names of all classes grouped by group names in Idf
 idd$class_name(by_group = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -493,7 +545,9 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$required_class_name()
+\preformatted{\dontrun{
+idd$required_class_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -520,7 +574,9 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$unique_class_name()
+\preformatted{\dontrun{
+idd$unique_class_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -548,7 +604,9 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$extensible_class_name()
+\preformatted{\dontrun{
+idd$extensible_class_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -582,7 +640,9 @@ An integer vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$group_index()
+\preformatted{\dontrun{
+idd$group_index()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -619,7 +679,9 @@ An integer vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$class_index()
+\preformatted{\dontrun{
+idd$class_index()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -657,7 +719,9 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$is_valid_group(c("Schedules", "Compliance Objects"))
+\preformatted{\dontrun{
+idd$is_valid_group(c("Schedules", "Compliance Objects"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -695,7 +759,9 @@ vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$is_valid_class(c("Building", "ShadowCalculation"))
+\preformatted{\dontrun{
+idd$is_valid_class(c("Building", "ShadowCalculation"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -735,9 +801,11 @@ An \link{IddObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$object(3)
+\preformatted{\dontrun{
+idd$object(3)
 
 idd$object("Building")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -777,9 +845,11 @@ A named list of \link{IddObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$objects(c(3,10))
+\preformatted{\dontrun{
+idd$objects(c(3,10))
 
 idd$objects(c("Version", "Material"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -848,11 +918,13 @@ Each \code{\link[data.table:data.table]{data.table::data.table()}} contains 12 c
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check each construction layer's possible references
+\preformatted{\dontrun{
+# check each construction layer's possible references
 idd$object_relation("Construction", "ref_to")
 
 # check where construction being used
 idd$object_relation("Construction", "ref_by")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -900,11 +972,13 @@ An named list of \link{IddObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get class Construction and all classes that it can refer to
+\preformatted{\dontrun{
+# get class Construction and all classes that it can refer to
 idd$objects_in_relation("Construction", "ref_to")
 
 # get class Construction and all classes that refer to it
 idd$objects_in_relation("Construction", "ref_by")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -938,8 +1012,10 @@ A named list of \link{IddObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all classes in Schedules group
+\preformatted{\dontrun{
+# get all classes in Schedules group
 idd$objects_in_group("Schedules")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -981,11 +1057,13 @@ A \link[data.table:data.table]{data.table} with 3 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# extract data of class Material
+\preformatted{\dontrun{
+# extract data of class Material
 idd$to_table(class = "Material")
 
 # extract multiple class data
 idd$to_table(c("Construction", "Material"))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1030,7 +1108,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get text format of class Material
+\preformatted{\dontrun{
+# get text format of class Material
 head(idd$to_string(class = "Material"))
 
 # get text format of multiple class
@@ -1038,6 +1117,7 @@ idd$to_string(c("Material", "Construction"))
 
 # tweak output formatting
 idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1063,7 +1143,9 @@ The \code{Idd} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idd$print()
+\preformatted{\dontrun{
+idd$print()
+}
 
 }
 \if{html}{\out{</div>}}

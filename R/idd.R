@@ -80,10 +80,11 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return An `Idd` object.
         #'
         #' @examples
-        #' \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))}
+        #' \dontrun{Idd$new(file.path(eplus_config(8.8)$dir, "Energy+.idd"))
         #'
         #' # Preferable way
         #' idd <- use_idd(8.8, download = "auto")
+        #' }
         #'
         initialize = function (path) {
             # add a uuid
@@ -115,8 +116,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' @return A [base::numeric_version()] object.
         #' @examples
+        #' \dontrun{
         #' # get version
         #' idd$version()
+        #' }
         #'
         version = function ()
             idd_version(self, private),
@@ -132,8 +135,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' @return A [base::numeric_version()] object.
         #' @examples
+        #' \dontrun{
         #' # get build tag
         #' idd$build()
+        #' }
         #'
         build = function ()
             idd_build(self, private),
@@ -149,8 +154,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get names of all groups Idf contains
         #' idd$group_name()
+        #' }
         #'
         group_name = function ()
             idd_group_name(self, private),
@@ -170,7 +177,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$from_group(c("Version", "Schedule:Compact"))
+        #' }
         #'
         from_group = function (class)
             idd_from_group(self, private, class),
@@ -191,6 +200,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' character vectors when `by_group` is `TRUE`.
         #'
         #' @examples
+        #' \dontrun{
         #' # get names of the 10th to 20th class
         #' idd$class_name(10:20)
         #'
@@ -199,6 +209,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' # get names of all classes grouped by group names in Idf
         #' idd$class_name(by_group = TRUE)
+        #' }
         #'
         class_name = function (index = NULL, by_group = FALSE)
             idd_class_name(self, private, index = index, by_group = by_group),
@@ -216,7 +227,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$required_class_name()
+        #' }
         #'
         required_class_name = function ()
             idd_required_class_name(self, private),
@@ -234,7 +247,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$unique_class_name()
+        #' }
         #'
         unique_class_name = function ()
             idd_unique_class_name(self, private),
@@ -253,7 +268,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$extensible_class_name()
+        #' }
         #'
         extensible_class_name = function ()
             idd_extensible_class_name(self, private),
@@ -273,7 +290,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return An integer vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$group_index()
+        #' }
         #'
         group_index = function (group = NULL)
             idd_group_index(self, private, group),
@@ -295,7 +314,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return An integer vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$class_index()
+        #' }
         #'
         class_index = function (class = NULL, by_group = FALSE)
             idd_class_index(self, private, class, by_group = by_group),
@@ -322,7 +343,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$is_valid_group(c("Schedules", "Compliance Objects"))
+        #' }
         #'
         is_valid_group = function (group)
             idd_is_valid_group_name(self, private, group),
@@ -346,7 +369,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' vector.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$is_valid_class(c("Building", "ShadowCalculation"))
+        #' }
         #'
         is_valid_class = function (class)
             idd_is_valid_class_name(self, private, class),
@@ -374,9 +399,11 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return An [IddObject] object.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$object(3)
         #'
         #' idd$object("Building")
+        #' }
         #'
         object = function (class)
             idd_obj(self, private, class),
@@ -402,9 +429,11 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A named list of [IddObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$objects(c(3,10))
         #'
         #' idd$objects(c("Version", "Material"))
+        #' }
         #'
         objects = function (class)
             idd_objects(self, private, class),
@@ -461,11 +490,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' Each [data.table::data.table()] contains 12 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # check each construction layer's possible references
         #' idd$object_relation("Construction", "ref_to")
         #'
         #' # check where construction being used
         #' idd$object_relation("Construction", "ref_by")
+        #' }
         #'
         object_relation = function (class, direction = c("all", "ref_to", "ref_by"))
             idd_object_relation(self, private, class, match.arg(direction)),
@@ -498,11 +529,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return An named list of [IddObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get class Construction and all classes that it can refer to
         #' idd$objects_in_relation("Construction", "ref_to")
         #'
         #' # get class Construction and all classes that refer to it
         #' idd$objects_in_relation("Construction", "ref_by")
+        #' }
         #'
         objects_in_relation = function (class, direction = c("ref_to", "ref_by"))
             idd_objects_in_relation(self, private, class, match.arg(direction)),
@@ -522,8 +555,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A named list of [IddObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all classes in Schedules group
         #' idd$objects_in_group("Schedules")
+        #' }
         #'
         objects_in_group = function (group)
             idd_objects_in_group(self, private, group = group),
@@ -551,11 +586,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A [data.table][data.table::data.table()] with 3 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # extract data of class Material
         #' idd$to_table(class = "Material")
         #'
         #' # extract multiple class data
         #' idd$to_table(c("Construction", "Material"))
+        #' }
         #'
         to_table = function (class, all = FALSE)
             idd_to_table(self, private, class, all),
@@ -582,6 +619,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get text format of class Material
         #' head(idd$to_string(class = "Material"))
         #'
@@ -590,6 +628,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         #' # tweak output formatting
         #' idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each = 5)
+        #' }
         #'
         to_string = function (class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE)
             idd_to_string(self, private, class, leading, sep_at, sep_each, all),
@@ -607,7 +646,9 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' @return The `Idd` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' idd$print()
+        #' }
         #'
         print = function ()
             idd_print(self, private)

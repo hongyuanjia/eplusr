@@ -310,6 +310,7 @@ idf$search_object("floor", ignore.case = TRUE)
 ## Method `Idf$dup`
 ## ------------------------------------------------
 
+\dontrun{
 # duplicate an object named "FLOOR"
 idf$dup("floor") # New object name 'FLOOR_1' is auto-generated
 
@@ -323,12 +324,14 @@ idf$dup(new_floor = "floor", new_floor2 = 16)
 floors_1 <- c(new_floor3 = "floor", new_floor4 = "floor")
 floors_2 <- setNames(rep(16, 5), paste0("flr", 1:5))
 idf$dup(floors_1, floors_2)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$add`
 ## ------------------------------------------------
 
+\dontrun{
 # add a new Building object with all default values
 empty <- empty_idf(8.8) # create an empty Idf
 empty$add(Building = list())
@@ -346,12 +349,14 @@ empty <- empty_idf(8.8) # create an empty Idf
 objs1 <- list(Schedule_Constant = list("const"), Building = list())
 rp <- list(RunPeriod = list("rp", 2, 1, 2, 28))
 empty$add(objs1, rp)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$set`
 ## ------------------------------------------------
 
+\dontrun{
 # modify an object by name (case-insensitive)
 idf$set(r13layer = list(roughness = "smooth"))
 
@@ -386,12 +391,14 @@ idf$set(r13layer = list(solar_absorptance = 0.8),
 # use variable input
 sets <- list(r13layer = list(roughness = "smooth"))
 idf$set(sets)
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$del`
 ## ------------------------------------------------
 
+\dontrun{
 # delete objects using names
 idf$object("Fraction") # ScheduleTypeLimits
 idf$del("Fraction")
@@ -419,6 +426,7 @@ idf$del("roof31", .ref_by = TRUE, .recursive = TRUE)
 # delete objects using variable inputs
 ids <- idf$object_id("Output:Variable", simplify = TRUE)
 idf$del(ids)
+}
 
 
 ## ------------------------------------------------
@@ -448,6 +456,7 @@ idf$insert(idf$SizingPeriod_DesignDay)
 ## Method `Idf$load`
 ## ------------------------------------------------
 
+\dontrun{
 # load objects from character vectors
 idf$load(
     c("Material,",
@@ -477,6 +486,7 @@ idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;", .default = FALSE
 idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
     .default = FALSE, .empty = TRUE
 )
+}
 
 
 ## ------------------------------------------------
@@ -517,6 +527,7 @@ idf$search_value("floor", "Construction", ignore.case = TRUE)
 ## Method `Idf$validate`
 ## ------------------------------------------------
 
+\dontrun{
 idf$validate()
 
 # check at predefined validate level
@@ -526,12 +537,14 @@ idf$validate("final")
 
 # custom validate checking components
 idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 
 ## ------------------------------------------------
 ## Method `Idf$is_valid`
 ## ------------------------------------------------
 
+\dontrun{
 idf$is_valid()
 
 # check at predefined validate level
@@ -541,6 +554,7 @@ idf$is_valid("final")
 
 # custom validate checking components
 idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 
 ## ------------------------------------------------
@@ -606,6 +620,7 @@ idf$is_unsaved()
 ## Method `Idf$save`
 ## ------------------------------------------------
 
+\dontrun{
 # save Idf as a new file
 idf$save(tempfile(fileext = ".idf"))
 
@@ -618,6 +633,7 @@ idf$save(overwrite = TRUE, format = "new_top")
 # save the model to a new file and copy all external csv files used in
 # "Schedule:File" class into the same folder
 idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
+}
 
 
 ## ------------------------------------------------
@@ -1835,7 +1851,8 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# duplicate an object named "FLOOR"
+\preformatted{\dontrun{
+# duplicate an object named "FLOOR"
 idf$dup("floor") # New object name 'FLOOR_1' is auto-generated
 
 # duplicate that object again by specifing object ID
@@ -1848,6 +1865,7 @@ idf$dup(new_floor = "floor", new_floor2 = 16)
 floors_1 <- c(new_floor3 = "floor", new_floor4 = "floor")
 floors_2 <- setNames(rep(16, 5), paste0("flr", 1:5))
 idf$dup(floors_1, floors_2)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1931,7 +1949,8 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# add a new Building object with all default values
+\preformatted{\dontrun{
+# add a new Building object with all default values
 empty <- empty_idf(8.8) # create an empty Idf
 empty$add(Building = list())
 
@@ -1948,6 +1967,7 @@ empty <- empty_idf(8.8) # create an empty Idf
 objs1 <- list(Schedule_Constant = list("const"), Building = list())
 rp <- list(RunPeriod = list("rp", 2, 1, 2, 28))
 empty$add(objs1, rp)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2041,7 +2061,8 @@ A named list of \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# modify an object by name (case-insensitive)
+\preformatted{\dontrun{
+# modify an object by name (case-insensitive)
 idf$set(r13layer = list(roughness = "smooth"))
 
 # modify an object by ID
@@ -2075,6 +2096,7 @@ idf$set(r13layer = list(solar_absorptance = 0.8),
 # use variable input
 sets <- list(r13layer = list(roughness = "smooth"))
 idf$set(sets)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2155,7 +2177,8 @@ The modified \code{Idf} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# delete objects using names
+\preformatted{\dontrun{
+# delete objects using names
 idf$object("Fraction") # ScheduleTypeLimits
 idf$del("Fraction")
 
@@ -2182,6 +2205,7 @@ idf$del("roof31", .ref_by = TRUE, .recursive = TRUE)
 # delete objects using variable inputs
 ids <- idf$object_id("Output:Variable", simplify = TRUE)
 idf$del(ids)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2417,7 +2441,8 @@ A named list of loaded \link{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# load objects from character vectors
+\preformatted{\dontrun{
+# load objects from character vectors
 idf$load(
     c("Material,",
       "    mat,                     !- Name",
@@ -2446,6 +2471,7 @@ idf$load("Material, mat1, smooth, 0.5, 0.2, 500, 1000,,, 0.5;", .default = FALSE
 idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
     .default = FALSE, .empty = TRUE
 )
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2910,7 +2936,8 @@ An \code{IdfValidity} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$validate()
+\preformatted{\dontrun{
+idf$validate()
 
 # check at predefined validate level
 idf$validate("none")
@@ -2919,6 +2946,7 @@ idf$validate("final")
 
 # custom validate checking components
 idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -2955,7 +2983,8 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{idf$is_valid()
+\preformatted{\dontrun{
+idf$is_valid()
 
 # check at predefined validate level
 idf$is_valid("none")
@@ -2964,6 +2993,7 @@ idf$is_valid("final")
 
 # custom validate checking components
 idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -3246,7 +3276,8 @@ A length-one character vector, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# save Idf as a new file
+\preformatted{\dontrun{
+# save Idf as a new file
 idf$save(tempfile(fileext = ".idf"))
 
 # save and overwrite current file
@@ -3258,6 +3289,7 @@ idf$save(overwrite = TRUE, format = "new_top")
 # save the model to a new file and copy all external csv files used in
 # "Schedule:File" class into the same folder
 idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}

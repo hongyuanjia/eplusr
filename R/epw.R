@@ -96,6 +96,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return An `Epw` object.
         #'
         #' @examples
+        #' \dontrun{
         #' # read an EPW file from EnergyPlus website
         #' path_base <- "https://energyplus.net/weather-download"
         #' path_region <- "north_and_central_america_wmo_region_4/USA/CA"
@@ -111,6 +112,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #'         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
         #'     )
         #'     epw <- read_epw(path_epw)
+        #' }
         #' }
         #'
         initialize = function (path, warning = FALSE) {
@@ -150,8 +152,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return `NULL` or a single string.
         #'
         #' @examples
+        #' \dontrun{
         #' # get path
         #' epw$path()
+        #' }
         #'
         path = function ()
             epw_path(self, private),
@@ -192,10 +196,12 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 9 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$location()
         #'
         #' # modify location data
         #' epw$location(city = "MyCity")
+        #' }
         #'
         location = function (city, state_province, country, data_source, wmo_number,
                              latitude, longitude, time_zone, elevation)
@@ -221,7 +227,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 4 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$design_condition()
+        #' }
         #'
         design_condition = function ()
             epw_design_condition(self, private),
@@ -248,7 +256,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A [data.table::data.table()] with 6 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$typical_extreme_period()
+        #' }
         #'
         typical_extreme_period = function ()
             epw_typical_extreme_period(self, private),
@@ -273,7 +283,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A [data.table::data.table()] with 7 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$ground_temperature()
+        #' }
         #'
         ground_temperature = function ()
             epw_ground_temperature(self, private),
@@ -346,10 +358,12 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 3 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$holiday()
         #'
         #' # add daylight saving time
         #' epw$holiday(dst = c(3.10, 11.3))
+        #' }
         #'
         holiday = function (leapyear, dst, holiday)
             epw_holiday(self, private, leapyear, dst, holiday),
@@ -369,9 +383,11 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$comment1()
         #'
         #' epw$comment1("Comment1")
+        #' }
         #'
         comment1 = function (comment)
             epw_comment1(self, private, comment),
@@ -391,9 +407,11 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$comment2()
         #'
         #' epw$comment2("Comment2")
+        #' }
         #'
         comment2 = function (comment)
             epw_comment2(self, private, comment),
@@ -410,7 +428,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$num_period()
+        #' }
         #'
         num_period = function ()
             epw_num_period(self, private),
@@ -427,7 +447,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$interval()
+        #' }
         #'
         interval = function ()
             epw_interval(self, private),
@@ -460,11 +482,13 @@ Epw <- R6::R6Class(classname = "Epw",
         #' * `end_day`: Date (EpwDate) type. The end day of data period.
         #'
         #' @examples
+        #' \dontrun{
         #' # modify data period name
         #' epw$period(1, name = "test")
         #'
         #' # change start day of week
         #' epw$period(1, start_day_of_week = 3)
+        #' }
         #'
         period = function (period, name, start_day_of_week)
             epw_period(self, private, period, name, start_day_of_week),
@@ -483,7 +507,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 29 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$missing_code()
+        #' }
         #'
         missing_code = function ()
             epw_missing_code(self, private),
@@ -501,7 +527,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 16 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$initial_missing_value()
+        #' }
         #'
         initial_missing_value = function ()
             epw_initial_missing_value(self, private),
@@ -519,7 +547,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 28 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$range_exist()
+        #' }
         #'
         range_exist = function ()
             epw_range_exist(self, private),
@@ -537,7 +567,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list of 28 elements.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$range_valid()
+        #' }
         #'
         range_valid = function ()
             epw_range_valid(self, private),
@@ -563,9 +595,11 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A named list.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$fill_action("missing")
         #'
         #' epw$fill_action("out_of_range")
+        #' }
         #'
         fill_action = function (type = c("missing", "out_of_range"))
             epw_fill_action(self, private, type = type),
@@ -627,6 +661,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A [data.table::data.table()] of 36 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # get weather data
         #' str(epw$data())
         #'
@@ -640,6 +675,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' # change the time zone of datetime column in the returned weather data
         #' attributes(epw$data()$datetime)
         #' attributes(epw$data(tz = "Etc/GMT+8")$datetime)
+        #' }
         #'
         data = function (period = 1L, start_year = NULL, align_wday = TRUE, tz = "UTC", update = FALSE)
             epw_data(self, private, period, start_year, align_wday, tz, update),
@@ -678,6 +714,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A [data.table::data.table()].
         #'
         #' @examples
+        #' \dontrun{
         #' epw$abnormal_data()
         #'
         #' # only check if there are any abnormal values in air temperature and
@@ -698,6 +735,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
         #'     type = "out_of_range"
         #' )
+        #' }
         #'
         abnormal_data = function (period = 1L, cols = NULL, keep_all = TRUE, type = c("both", "missing", "out_of_range"))
             epw_abnormal_data(self, private, period, cols, keep_all, type),
@@ -720,7 +758,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A [data.table::data.table()] of 37 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$redundant_data()
+        #' }
         #'
         redundant_data = function ()
             epw_redundant_data(self, private),
@@ -765,10 +805,12 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return The modified `Epw` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # turn all missing values into NAs
         #' summary(epw$data()$liquid_precip_rate)
         #' epw$make_na(missing = TRUE)
         #' summary(epw$data()$liquid_precip_rate)
+        #' }
         #'
         make_na = function (period = NULL, missing = FALSE, out_of_range = FALSE)
             epw_make_na(self, private, period, missing, out_of_range),
@@ -821,10 +863,12 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return The modified `Epw` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # turn all missing values into NAs
         #' summary(epw$data()$liquid_precip_rate)
         #' epw$fill_abnormal(missing = TRUE)
         #' summary(epw$data()$liquid_precip_rate)
+        #' }
         #'
         fill_abnormal = function (period = NULL, missing = FALSE, out_of_range = FALSE,
                                   special = FALSE)
@@ -857,6 +901,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @return The modified `Epw` object itself, invisibly.
         #' @examples
+        #' \dontrun{
         #' # get weather data with units
         #' epw$add_unit()
         #' head(epw$data())
@@ -867,6 +912,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' units(t_dry_bulb) <- with(units::ud_units, "kelvin")
         #'
         #' head(t_dry_bulb)
+        #' }
         #'
         add_unit = function ()
             epw_add_unit(self, private),
@@ -897,8 +943,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @return The modified `Epw` object itself, invisibly.
         #' @examples
+        #' \dontrun{
         #' epw$drop_unit()
         #' epw$data()
+        #' }
         #'
         drop_unit = function ()
             epw_drop_unit(self, private),
@@ -914,7 +962,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @return The modified `Epw` object itself, invisibly.
         #' @examples
+        #' \dontrun{
         #' epw$purge()
+        #' }
         #'
         purge = function ()
             epw_purge(self, private),
@@ -973,9 +1023,11 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return The modified `Epw` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # will fail since date time in input data has already been covered by
         #' # existing data period
         #' \dontrun{epw$add(epw$data())}
+        #' }
         #'
         add = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
             epw_add(self, private, data, realyear, name, start_day_of_week, after, warning),
@@ -1029,8 +1081,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return The modified `Epw` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # change the weather data
         #' epw$set(epw$data(), warning = FALSE)
+        #' }
         #'
         set = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, period = 1L, warning = TRUE)
             epw_set(self, private, data, realyear, name, start_day_of_week, period, warning),
@@ -1067,7 +1121,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A single logical value of `TRUE` or `FALSE`.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$is_unsaved()
+        #' }
         #'
         is_unsaved = function ()
             epw_is_unsaved(self, private),
@@ -1093,8 +1149,10 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return A length-one character vector, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # save the weather file
         #' epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
+        #' }
         #'
         save = function (path = NULL, overwrite = FALSE, purge = FALSE)
             epw_save(self, private, path, overwrite, purge),
@@ -1112,7 +1170,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #' @return The `Epw` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' epw$print()
+        #' }
         #'
         print = function ()
             epw_print(self, private)

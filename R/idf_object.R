@@ -40,6 +40,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @export
         #'
         #' @examples
+        #' \dontrun{
         #' # example model shipped with eplusr from EnergyPlus v8.8
         #' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
         #' idf <- read_idf(path_idf, use_idd(8.8, "auto"))
@@ -48,6 +49,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
         #' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+        #' }
         #'
         initialize = function (object, class = NULL, parent) {
             if (missing(parent) || !is_idf(parent)) {
@@ -84,8 +86,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A [base::numeric_version()] object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get version
         #' roof$version()
+        #' }
         #'
         version = function ()
             idfobj_version(self, private),
@@ -101,7 +105,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A [Idf] object.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$parent()
+        #' }
         #'
         parent = function ()
             idfobj_parent(self, private),
@@ -121,7 +127,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$id()
+        #' }
         #'
         id = function ()
             idfobj_id(self, private),
@@ -144,11 +152,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$name()
         #'
         #' # NA will be returned if the class does not have name attribute. For example,
         #' # "Version" class
         #' idf$Version$name()
+        #' }
+        #'
         name = function ()
             idfobj_name(self, private),
         # }}}
@@ -164,7 +175,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$group_name()
+        #' }
         #'
         group_name = function ()
             idfobj_group_name(self, private),
@@ -181,7 +194,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$class_name()
+        #' }
         #'
         class_name = function ()
             idfobj_class_name(self, private),
@@ -199,7 +214,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return An [IddObject] object.
         #'
         #' @examples
+        #' \dontrun{
         #' roof$definition()
+        #' }
         #'
         definition = function ()
             idfobj_definition(self, private),
@@ -234,6 +251,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' (if no comments) is return. Otherwise, the modified object itself.
         #'
         #' @examples
+        #' \dontrun{
         #' # get object comments
         #' roof$comment()
         #'
@@ -260,6 +278,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' # delete all comments
         #' roof$comment(NULL)
         #' roof$comment()
+        #' }
         #'
         comment = function (comment, append = TRUE, width = 0L)
             idfobj_comment(self, private, comment, append, width),
@@ -297,6 +316,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A named list.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all existing field values
         #' str(mat$value())
         #'
@@ -315,6 +335,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat[["Specific_Heat"]]
         #' mat[c(1,2)]
         #' mat[c("Name", "Density")]
+        #' }
         #'
         value = function (which = NULL, all = FALSE, simplify = FALSE, unit = FALSE)
             idfobj_value(self, private, which, all, simplify, unit),
@@ -373,6 +394,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param .empty If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
         #'
         #' @examples
+        #' \dontrun{
         #' # set field values
         #' mat$set(name = "new_name", Thickness = 0.02)
         #' mat[c("Name", "Thickness")]
@@ -389,6 +411,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$Name
         #' mat[["Thickness"]] <- 0.019
         #' mat$Thickness
+        #' }
         #'
         set = function (..., .default = TRUE, .empty = FALSE)
             idfobj_set(self, private, ..., .default = .default, .empty = .empty),
@@ -465,7 +488,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'   that current field can use as sources and refers to.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$value_possible()
+        #' }
         #'
         value_possible = function (which = NULL, type = c("auto", "default", "choice", "range", "source"))
             idfobj_value_possible(self, private, which, type),
@@ -627,6 +652,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return An `IdfValidity` object.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$validate()
         #'
         #' # check at predefined validate level
@@ -636,6 +662,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # custom validate checking components
         #' mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+        #' }
         #'
         validate = function (level = eplusr_option("validate_level"))
             idfobj_validate(self, private, level),
@@ -661,6 +688,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A single logical value of `TRUE` or `FALSE`.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$is_valid()
         #'
         #' mat$definition()$field_range("Density")
@@ -676,6 +704,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # custom validate checking components
         #' mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+        #' }
         #'
         is_valid = function (level = eplusr_option("validate_level"))
             idfobj_is_valid(self, private, level),
@@ -742,11 +771,13 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' Each [data.table::data.table()] contains 24 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # check each layer's reference of a construction named FLOOR
         #' roof$value_relation("zone name", "ref_to")
         #'
         #' # check where is this construction being used
         #' roof$value_relation("name", direction = "ref_by")
+        #' }
         #'
         value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
             idfobj_value_relation(self, private, which, match.arg(direction), recursive, depth),
@@ -781,8 +812,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A named list of `IdfObject` objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get other objects that this object refereces
         #' mat$ref_to_object() # not referencing other objects
+        #' }
         #'
         ref_to_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
             idfobj_ref_to_object(self, private, which, class, recursive, depth),
@@ -817,8 +850,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A named list of `IdfObject` objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # get other objects that reference this object
         #' mat$ref_by_object() # referenced by construction "FLOOR"
+        #' }
         #'
         ref_by_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
             idfobj_ref_by_object(self, private, which, class, recursive, depth),
@@ -855,9 +890,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @examples
         #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
-        #' path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
-        #' idf_5z <- read_idf(path)
-        #' idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
+        #'     path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+        #'     idf_5z <- read_idf(path)
+        #'     idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
         #' }
         #' }
         #'
@@ -885,7 +920,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A logical vector with the same length as speicifed field.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$has_ref_to()
+        #' }
         #'
         has_ref_to = function (which = NULL, class = NULL)
             idfobj_has_ref_to(self, private, which, class),
@@ -911,7 +948,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A logical vector with the same length as speicifed field.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$has_ref_by()
+        #' }
         #'
         has_ref_by = function (which = NULL, class = NULL)
             idfobj_has_ref_by(self, private, which, class),
@@ -937,7 +976,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A logical vector with the same length as speicifed field.
         #'
         #' @examples
+        #' \dontrun{
         #' mat$has_ref_node()
+        #' }
         #'
         has_ref_node = function (which = NULL, class = NULL)
             idfobj_has_ref_node(self, private, which, class),
@@ -963,8 +1004,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A logical vector with the same length as speicifed field.
         #'
         #' @examples
+        #' \dontrun{
         #' # check if having any referenced objects or is referenced by other objects
         #' mat$has_ref()
+        #' }
         #'
         has_ref = function (which = NULL)
             idfobj_has_ref(self, private, which),
@@ -1012,6 +1055,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A [data.table][data.table::data.table()] with 6 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all object data in a data.table format without field units
         #' str(mat$to_table(unit = FALSE))
         #'
@@ -1024,6 +1068,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # get all object data in a data.table format where each field becomes a column
         #' str(mat$to_table(wide = TRUE))
+        #' }
         #'
         to_table = function (string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE)
             idfobj_to_table(self, private, all, string_value, unit, wide),
@@ -1051,6 +1096,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get string format object
         #' mat$to_string()
         #'
@@ -1060,6 +1106,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # get string format of object, and decrease the leading space of field values
         #' mat$to_string(leading = 0)
+        #' }
         #'
         to_string = function (comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE)
             idfobj_to_string(self, private, comment, leading, sep_at, all),
@@ -1091,12 +1138,14 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @return The `IdfObject` itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # print the object without comment
         #' mat$print(comment = FALSE)
         #'
         #' # print the object, and auto separate field values and field names at the
         #' # largetst character length of field values
         #' mat$print(auto_sep = TRUE)
+        #' }
         #'
         print = function (comment = TRUE, auto_sep = TRUE, brief = FALSE)
             idfobj_print(self, private, comment, auto_sep, brief)

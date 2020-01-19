@@ -61,7 +61,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return An `IddObject` object.
         #'
         #' @examples
+        #' \dontrun{
         #' surf <- IddObject$new("BuildingSurface:Detailed", use_idd(8.8, download = "auto"))
+        #' }
         #'
         initialize = function (class, parent) {
             if (missing(parent)) {
@@ -93,8 +95,10 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A [base::numeric_version()] object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get version
         #' surf$version()
+        #' }
         #'
         version = function ()
             iddobj_version(self, private),
@@ -110,7 +114,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A [Idd] object.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$parent()
+        #' }
         #'
         parent = function ()
             iddobj_parent(self, private),
@@ -128,7 +134,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$group_name()
+        #' }
         #'
         group_name = function ()
             iddobj_group_name(self, private),
@@ -146,7 +154,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$group_index()
+        #' }
         #'
         group_index = function ()
             iddobj_group_index(self, private),
@@ -162,7 +172,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single string.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$class_name()
+        #' }
         #'
         class_name = function ()
             iddobj_class_name(self, private),
@@ -180,7 +192,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$class_index()
+        #' }
         #'
         class_index = function ()
             iddobj_class_index(self, private),
@@ -205,7 +219,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single character.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$class_format()
+        #' }
         #'
         class_format = function ()
             iddobj_class_format(self, private),
@@ -222,7 +238,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$min_fields()
+        #' }
         #'
         min_fields = function ()
             iddobj_min_fields(self, private),
@@ -243,7 +261,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$num_fields()
+        #' }
         #'
         num_fields = function ()
             iddobj_num_fields(self, private),
@@ -260,7 +280,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$memo()
+        #' }
         #'
         memo = function ()
             iddobj_memo(self, private),
@@ -283,7 +305,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$num_extensible()
+        #' }
         #'
         num_extensible = function ()
             iddobj_num_extensible(self, private),
@@ -306,7 +330,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$first_extensible_index()
+        #' }
         #'
         first_extensible_index = function ()
             iddobj_first_extensible_index(self, private),
@@ -329,7 +355,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single integer.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$extensible_group_num()
+        #' }
         #'
         extensible_group_num = function ()
             iddobj_extensible_group_num(self, private),
@@ -357,6 +385,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return The modified `IddObject` itself.
         #'
         #' @examples
+        #' \dontrun{
         #' # field number before adding
         #' surf$num_fields()
         #' # extensible group number before adding
@@ -369,6 +398,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$num_fields()
         #' # extensible group number after adding
         #' surf$extensible_group_num()
+        #' }
         #'
         add_extensible_group = function (num = 1L)
             iddobj_add_extensible_group(self, private, num),
@@ -394,6 +424,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return The modified `IddObject` itself.
         #'
         #' @examples
+        #' \dontrun{
         #' # field number before deleting
         #' surf$num_fields()
         #' # extensible group number before deleting
@@ -406,6 +437,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$num_fields()
         #' # extensible group number after deleting
         #' surf$extensible_group_num()
+        #' }
         #'
         del_extensible_group = function (num = 1L)
             iddobj_del_extensible_group(self, private, num),
@@ -427,7 +459,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single logical value (`TRUE` or `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' surf$has_name()
+        #' }
         #'
         has_name = function ()
             iddobj_has_name(self, private),
@@ -447,7 +481,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single logical value (`TRUE` or `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_required()
+        #' }
         #'
         is_required = function ()
             iddobj_is_required(self, private),
@@ -467,7 +503,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single logical value (`TRUE` or `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_unique()
+        #' }
         #'
         is_unique = function ()
             iddobj_is_unique(self, private),
@@ -488,7 +526,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A single logical value (`TRUE` or `FALSE`).
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_extensible()
+        #' }
         #'
         is_extensible = function ()
             iddobj_is_extensible(self, private),
@@ -524,6 +564,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field names
         #' surf$field_name()
         #'
@@ -535,6 +576,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'
         #' # change field name to lower-style
         #' surf$field_name(unit = TRUE, in_ip = TRUE)
+        #' }
         #'
         field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE)
             iddobj_field_name(self, private, index, unit, in_ip, lower),
@@ -556,11 +598,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return An integer vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field indices
         #' surf$field_index()
         #'
         #' # get field indices for specific fields
         #' surf$field_index(c("number of vertices", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_index = function (name = NULL)
             iddobj_field_index(self, private, name),
@@ -589,11 +633,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field types
         #' surf$field_type()
         #'
         #' # get field types for specific fields
         #' surf$field_type(c("name", "zone name", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_type = function (which = NULL)
             iddobj_field_type(self, private, which = which),
@@ -616,11 +662,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A list of character vectors.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field notes
         #' surf$field_note()
         #'
         #' # get field types for specific fields
         #' surf$field_note(c("name", "zone name", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_note = function (which = NULL)
             iddobj_field_note(self, private, which),
@@ -645,11 +693,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field units
         #' surf$field_unit()
         #'
         #' # get field units for specific fields
         #' surf$field_unit(c("name", "zone name", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_unit = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_unit(self, private, which, in_ip),
@@ -680,11 +730,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field default values
         #' surf$field_default()
         #'
         #' # get default values for specific fields
         #' surf$field_default(c("name", "zone name", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_default = function (which = NULL, in_ip = eplusr_option("view_in_ip"))
             iddobj_field_default(self, private, which, in_ip),
@@ -706,11 +758,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A list of character vectors.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field value choices
         #' surf$field_choice()
         #'
         #' # get field value choices for specific fields
         #' surf$field_choice(c("name", "sun exposure", "wind exposure"))
+        #' }
         #'
         field_choice = function (which = NULL)
             iddobj_field_choice(self, private, which),
@@ -752,11 +806,13 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A list of ranges.
         #'
         #' @examples
+        #' \dontrun{
         #' # get all field value ranges
         #' surf$field_range()
         #'
         #' # get value ranges for specific fields
         #' surf$field_range(c("name", "number of vertices", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_range = function (which = NULL)
             iddobj_field_range(self, private, which),
@@ -810,8 +866,10 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return An `IddRelation` object.
         #'
         #' @examples
+        #' \dontrun{
         #' # get field relation for specific fields
         #' surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
+        #' }
         #'
         field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"))
             iddobj_field_relation(self, private, which, match.arg(direction)),
@@ -859,8 +917,10 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' [data.table::data.table()] with 9 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' # get field possible values for specific fields
         #' surf$field_possible(6:10)
+        #' }
         #'
         field_possible = function (which = NULL, in_ip)
             iddobj_field_possible(self, private, which, in_ip),
@@ -887,7 +947,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_valid_field_num(c(10, 14, 100))
+        #' }
         #'
         is_valid_field_num = function (num)
             iddobj_is_valid_field_num(self, private, num),
@@ -909,7 +971,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_extensible_index(c(10, 14, 100))
+        #' }
         #'
         is_extensible_index = function (index)
             iddobj_is_extensible_index(self, private, index),
@@ -932,10 +996,12 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_valid_field_name(c("name", "sun_exposure"))
         #'
         #' # exact match
         #' surf$is_valid_field_name(c("Name", "Sun_Exposure"), strict = TRUE)
+        #' }
         #'
         is_valid_field_name = function (name, strict = FALSE)
             iddobj_is_valid_field_name(self, private, name, strict),
@@ -954,7 +1020,9 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_valid_field_index(1:10)
+        #' }
         #'
         is_valid_field_index = function (index)
             iddobj_is_valid_field_index(self, private, index),
@@ -975,9 +1043,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_autosizable_field()
         #'
         #' surf$is_autosizable_field(c("name", "sun_exposure"))
+        #' }
         #'
         is_autosizable_field = function (which = NULL)
             iddobj_is_autosizable_field(self, private, which),
@@ -998,9 +1068,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_autocalculatable_field()
         #'
         #' surf$is_autocalculatable_field(c("name", "sun_exposure"))
+        #' }
         #'
         is_autocalculatable_field = function (which = NULL)
             iddobj_is_autocalculatable_field(self, private, which),
@@ -1021,9 +1093,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_numeric_field()
         #'
         #' surf$is_numeric_field(c("name", "sun_exposure"))
+        #' }
         #'
         is_numeric_field = function (which = NULL)
             iddobj_is_numeric_field(self, private, which),
@@ -1044,9 +1118,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_real_field()
         #'
         #' surf$is_real_field(c("name", "number of vertices"))
+        #' }
         #'
         is_real_field = function (which = NULL)
             iddobj_is_real_field(self, private, which),
@@ -1067,9 +1143,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_integer_field()
         #'
         #' surf$is_integer_field(c("name", "number of vertices"))
+        #' }
         #'
         is_integer_field = function (which = NULL)
             iddobj_is_integer_field(self, private, which),
@@ -1089,9 +1167,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$is_required_field()
         #'
         #' surf$is_required_field(c("name", "number of vertices"))
+        #' }
         #'
         is_required_field = function (which = NULL)
             iddobj_is_required_field(self, private, which),
@@ -1112,9 +1192,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$has_ref()
         #'
         #' surf$has_ref(c("name", "zone name"))
+        #' }
         #'
         has_ref = function (which = NULL)
             iddobj_has_ref(self, private, which),
@@ -1135,9 +1217,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$has_ref_to()
         #'
         #' surf$has_ref_to(c("name", "zone name"))
+        #' }
         #'
         has_ref_to = function (which = NULL)
             iddobj_has_ref_to(self, private, which),
@@ -1158,9 +1242,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A logical vector.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$has_ref_by()
         #'
         #' surf$has_ref_by(c("name", "zone name"))
+        #' }
         #'
         has_ref_by = function (which = NULL)
             iddobj_has_ref_by(self, private, which),
@@ -1188,9 +1274,12 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A [data.table][data.table::data.table()] with 3 columns.
         #'
         #' @examples
+        #' \dontrun{
         #' surf$to_table()
         #'
         #' surf$to_table(TRUE)
+        #' }
+        #'
         to_table = function (all = FALSE)
             iddobj_to_table(self, private, all),
         # }}}
@@ -1215,6 +1304,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return A character vector.
         #'
         #' @examples
+        #' \dontrun{
         #' # get text format of class BuildingSurface:Detailed
         #' surf$to_string()
         #'
@@ -1223,6 +1313,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'
         #' # add comments
         #' surf$to_string(c("This", "will", "be", "comments"))
+        #' }
         #'
         to_string = function (comment = NULL, leading = 4L, sep_at = 29L, all = FALSE)
             iddobj_to_string(self, private, comment, leading, sep_at = sep_at, all = all),
@@ -1258,9 +1349,11 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @return The `IddObject` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' surf
         #'
         #' surf$print(brief = TRUE)
+        #' }
         #'
         print = function (brief = FALSE)
             iddobj_print(self, private, brief)

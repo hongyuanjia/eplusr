@@ -868,6 +868,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # duplicate an object named "FLOOR"
         #' idf$dup("floor") # New object name 'FLOOR_1' is auto-generated
         #'
@@ -881,6 +882,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' floors_1 <- c(new_floor3 = "floor", new_floor4 = "floor")
         #' floors_2 <- setNames(rep(16, 5), paste0("flr", 1:5))
         #' idf$dup(floors_1, floors_2)
+        #' }
         #'
         dup = function (...)
             idf_dup(self, private, ...),
@@ -951,6 +953,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # add a new Building object with all default values
         #' empty <- empty_idf(8.8) # create an empty Idf
         #' empty$add(Building = list())
@@ -968,6 +971,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' objs1 <- list(Schedule_Constant = list("const"), Building = list())
         #' rp <- list(RunPeriod = list("rp", 2, 1, 2, 28))
         #' empty$add(objs1, rp)
+        #' }
         #'
         add = function (..., .default = TRUE, .all = FALSE)
             idf_add(self, private, ..., .default = .default, .all = .all),
@@ -1045,6 +1049,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # modify an object by name (case-insensitive)
         #' idf$set(r13layer = list(roughness = "smooth"))
         #'
@@ -1079,6 +1084,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # use variable input
         #' sets <- list(r13layer = list(roughness = "smooth"))
         #' idf$set(sets)
+        #' }
         #'
         set = function (..., .default = TRUE, .empty = FALSE)
             idf_set(self, private, ..., .default = .default, .empty = .empty),
@@ -1136,6 +1142,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return The modified `Idf` object itself, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # delete objects using names
         #' idf$object("Fraction") # ScheduleTypeLimits
         #' idf$del("Fraction")
@@ -1163,6 +1170,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # delete objects using variable inputs
         #' ids <- idf$object_id("Output:Variable", simplify = TRUE)
         #' idf$del(ids)
+        #' }
         #'
         del = function (..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE)
             idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force),
@@ -1347,6 +1355,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A named list of loaded [IdfObject] objects.
         #'
         #' @examples
+        #' \dontrun{
         #' # load objects from character vectors
         #' idf$load(
         #'     c("Material,",
@@ -1376,6 +1385,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
         #'     .default = FALSE, .empty = TRUE
         #' )
+        #' }
         #'
         load = function (..., .unique = TRUE, .default = TRUE, .empty = FALSE)
             idf_load(self, private, ..., .unique = .unique, .default = .default, .empty = .empty),
@@ -1762,6 +1772,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return An `IdfValidity` object.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$validate()
         #'
         #' # check at predefined validate level
@@ -1771,6 +1782,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # custom validate checking components
         #' idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+        #' }
         #'
         validate = function (level = eplusr_option("validate_level"))
             idf_validate(self, private, level),
@@ -1793,6 +1805,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A single logical value of `TRUE` or `FALSE`.
         #'
         #' @examples
+        #' \dontrun{
         #' idf$is_valid()
         #'
         #' # check at predefined validate level
@@ -1802,6 +1815,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # custom validate checking components
         #' idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+        #' }
         #'
         is_valid = function (level = eplusr_option("validate_level"))
             idf_is_valid(self, private, level),
@@ -2000,6 +2014,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @return A length-one character vector, invisibly.
         #'
         #' @examples
+        #' \dontrun{
         #' # save Idf as a new file
         #' idf$save(tempfile(fileext = ".idf"))
         #'
@@ -2012,6 +2027,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' # save the model to a new file and copy all external csv files used in
         #' # "Schedule:File" class into the same folder
         #' idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
+        #' }
         #'
         save = function (path = NULL, format = eplusr_option("save_format"), overwrite = FALSE, copy_external = TRUE)
             idf_save(self, private, path, format = format, overwrite = overwrite, copy_external = copy_external),

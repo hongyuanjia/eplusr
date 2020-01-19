@@ -45,6 +45,7 @@ eplusr also provides custom S3 method of \verb{$<-} and
 ## Method `IdfObject$new`
 ## ------------------------------------------------
 
+\dontrun{
 # example model shipped with eplusr from EnergyPlus v8.8
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 idf <- read_idf(path_idf, use_idd(8.8, "auto"))
@@ -53,65 +54,82 @@ roof <- IdfObject$new(26, parent = idf)
 
 # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$version`
 ## ------------------------------------------------
 
+\dontrun{
 # get version
 roof$version()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$parent`
 ## ------------------------------------------------
 
+\dontrun{
 roof$parent()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$id`
 ## ------------------------------------------------
 
+\dontrun{
 roof$id()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$name`
 ## ------------------------------------------------
 
+\dontrun{
 roof$name()
 
 # NA will be returned if the class does not have name attribute. For example,
 # "Version" class
 idf$Version$name()
+}
+
 
 ## ------------------------------------------------
 ## Method `IdfObject$group_name`
 ## ------------------------------------------------
 
+\dontrun{
 roof$group_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$class_name`
 ## ------------------------------------------------
 
+\dontrun{
 roof$class_name()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$definition`
 ## ------------------------------------------------
 
+\dontrun{
 roof$definition()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$comment`
 ## ------------------------------------------------
 
+\dontrun{
 # get object comments
 roof$comment()
 
@@ -138,12 +156,14 @@ roof$comment()
 # delete all comments
 roof$comment(NULL)
 roof$comment()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$value`
 ## ------------------------------------------------
 
+\dontrun{
 # get all existing field values
 str(mat$value())
 
@@ -162,12 +182,14 @@ mat$Roughness
 mat[["Specific_Heat"]]
 mat[c(1,2)]
 mat[c("Name", "Density")]
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$set`
 ## ------------------------------------------------
 
+\dontrun{
 # set field values
 mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
@@ -184,19 +206,23 @@ mat$Name <- "another_name"
 mat$Name
 mat[["Thickness"]] <- 0.019
 mat$Thickness
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$value_possible`
 ## ------------------------------------------------
 
+\dontrun{
 mat$value_possible()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$validate`
 ## ------------------------------------------------
 
+\dontrun{
 mat$validate()
 
 # check at predefined validate level
@@ -206,12 +232,14 @@ mat$validate("final")
 
 # custom validate checking components
 mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$is_valid`
 ## ------------------------------------------------
 
+\dontrun{
 mat$is_valid()
 
 mat$definition()$field_range("Density")
@@ -227,33 +255,40 @@ mat$is_valid("final")
 
 # custom validate checking components
 mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$value_relation`
 ## ------------------------------------------------
 
+\dontrun{
 # check each layer's reference of a construction named FLOOR
 roof$value_relation("zone name", "ref_to")
 
 # check where is this construction being used
 roof$value_relation("name", direction = "ref_by")
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$ref_to_object`
 ## ------------------------------------------------
 
+\dontrun{
 # get other objects that this object refereces
 mat$ref_to_object() # not referencing other objects
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$ref_by_object`
 ## ------------------------------------------------
 
+\dontrun{
 # get other objects that reference this object
 mat$ref_by_object() # referenced by construction "FLOOR"
+}
 
 
 ## ------------------------------------------------
@@ -262,9 +297,9 @@ mat$ref_by_object() # referenced by construction "FLOOR"
 
 \dontrun{
 if (is_avail_eplus(8.8)) {
-path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
-idf_5z <- read_idf(path)
-idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+    idf_5z <- read_idf(path)
+    idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
 }
 }
 
@@ -273,35 +308,44 @@ idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
 ## Method `IdfObject$has_ref_to`
 ## ------------------------------------------------
 
+\dontrun{
 mat$has_ref_to()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$has_ref_by`
 ## ------------------------------------------------
 
+\dontrun{
 mat$has_ref_by()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$has_ref_node`
 ## ------------------------------------------------
 
+\dontrun{
 mat$has_ref_node()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$has_ref`
 ## ------------------------------------------------
 
+\dontrun{
 # check if having any referenced objects or is referenced by other objects
 mat$has_ref()
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$to_table`
 ## ------------------------------------------------
 
+\dontrun{
 # get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))
 
@@ -314,12 +358,14 @@ str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
 
 # get all object data in a data.table format where each field becomes a column
 str(mat$to_table(wide = TRUE))
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$to_string`
 ## ------------------------------------------------
 
+\dontrun{
 # get string format object
 mat$to_string()
 
@@ -329,18 +375,21 @@ mat$to_string(sep_at = 15)
 
 # get string format of object, and decrease the leading space of field values
 mat$to_string(leading = 0)
+}
 
 
 ## ------------------------------------------------
 ## Method `IdfObject$print`
 ## ------------------------------------------------
 
+\dontrun{
 # print the object without comment
 mat$print(comment = FALSE)
 
 # print the object, and auto separate field values and field names at the
 # largetst character length of field values
 mat$print(auto_sep = TRUE)
+}
 
 }
 \seealso{
@@ -413,7 +462,8 @@ An \code{IdfObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# example model shipped with eplusr from EnergyPlus v8.8
+\preformatted{\dontrun{
+# example model shipped with eplusr from EnergyPlus v8.8
 path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
 idf <- read_idf(path_idf, use_idd(8.8, "auto"))
 
@@ -421,6 +471,7 @@ roof <- IdfObject$new(26, parent = idf)
 
 # get the IdfObject of material named "C5 - 4 IN HW CONCRETE"
 mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
+}
 
 }
 \if{html}{\out{</div>}}
@@ -448,8 +499,10 @@ A \code{\link[base:numeric_version]{base::numeric_version()}} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get version
+\preformatted{\dontrun{
+# get version
 roof$version()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -474,7 +527,9 @@ A \link{Idf} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$parent()
+\preformatted{\dontrun{
+roof$parent()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -503,7 +558,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$id()
+\preformatted{\dontrun{
+roof$id()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -535,11 +592,14 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$name()
+\preformatted{\dontrun{
+roof$name()
 
 # NA will be returned if the class does not have name attribute. For example,
 # "Version" class
 idf$Version$name()
+}
+
 }
 \if{html}{\out{</div>}}
 
@@ -564,7 +624,9 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$group_name()
+\preformatted{\dontrun{
+roof$group_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -590,7 +652,9 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$class_name()
+\preformatted{\dontrun{
+roof$class_name()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -617,7 +681,9 @@ An \link{IddObject} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{roof$definition()
+\preformatted{\dontrun{
+roof$definition()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -670,7 +736,8 @@ If calling without any argument, a character vector or \code{NULL}
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get object comments
+\preformatted{\dontrun{
+# get object comments
 roof$comment()
 
 # add new object comments
@@ -696,6 +763,7 @@ roof$comment()
 # delete all comments
 roof$comment(NULL)
 roof$comment()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -747,7 +815,8 @@ A named list.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all existing field values
+\preformatted{\dontrun{
+# get all existing field values
 str(mat$value())
 
 # get values of field 1, 3, 5
@@ -765,6 +834,7 @@ mat$Roughness
 mat[["Specific_Heat"]]
 mat[c(1,2)]
 mat[c("Name", "Density")]
+}
 
 }
 \if{html}{\out{</div>}}
@@ -804,7 +874,8 @@ object comments, please use \verb{$comment()}.
 
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# set field values
+\preformatted{\dontrun{
+# set field values
 mat$set(name = "new_name", Thickness = 0.02)
 mat[c("Name", "Thickness")]
 
@@ -820,6 +891,7 @@ mat$Name <- "another_name"
 mat$Name
 mat[["Thickness"]] <- 0.019
 mat$Thickness
+}
 
 }
 \if{html}{\out{</div>}}
@@ -911,7 +983,9 @@ that current field can use as sources and refers to.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$value_possible()
+\preformatted{\dontrun{
+mat$value_possible()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1081,7 +1155,8 @@ An \code{IdfValidity} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$validate()
+\preformatted{\dontrun{
+mat$validate()
 
 # check at predefined validate level
 mat$validate("none")
@@ -1090,6 +1165,7 @@ mat$validate("final")
 
 # custom validate checking components
 mat$validate(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1129,7 +1205,8 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$is_valid()
+\preformatted{\dontrun{
+mat$is_valid()
 
 mat$definition()$field_range("Density")
 eplusr_option(validate_level = "none") # have to set validate to "none" to do so
@@ -1144,6 +1221,7 @@ mat$is_valid("final")
 
 # custom validate checking components
 mat$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1226,11 +1304,13 @@ Each \code{\link[data.table:data.table]{data.table::data.table()}} contains 24 c
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check each layer's reference of a construction named FLOOR
+\preformatted{\dontrun{
+# check each layer's reference of a construction named FLOOR
 roof$value_relation("zone name", "ref_to")
 
 # check where is this construction being used
 roof$value_relation("name", direction = "ref_by")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1284,8 +1364,10 @@ A named list of \code{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get other objects that this object refereces
+\preformatted{\dontrun{
+# get other objects that this object refereces
 mat$ref_to_object() # not referencing other objects
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1339,8 +1421,10 @@ A named list of \code{IdfObject} objects.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get other objects that reference this object
+\preformatted{\dontrun{
+# get other objects that reference this object
 mat$ref_by_object() # referenced by construction "FLOOR"
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1396,9 +1480,9 @@ A named list of \code{IdfObject} objects.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 if (is_avail_eplus(8.8)) {
-path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
-idf_5z <- read_idf(path)
-idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
+    path <- file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")
+    idf_5z <- read_idf(path)
+    idf_5z$NodeList$OutsideAirInletNodes$ref_to_node()
 }
 }
 
@@ -1440,7 +1524,9 @@ A logical vector with the same length as speicifed field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$has_ref_to()
+\preformatted{\dontrun{
+mat$has_ref_to()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1480,7 +1566,9 @@ A logical vector with the same length as speicifed field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$has_ref_by()
+\preformatted{\dontrun{
+mat$has_ref_by()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1520,7 +1608,9 @@ A logical vector with the same length as speicifed field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{mat$has_ref_node()
+\preformatted{\dontrun{
+mat$has_ref_node()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1560,8 +1650,10 @@ A logical vector with the same length as speicifed field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# check if having any referenced objects or is referenced by other objects
+\preformatted{\dontrun{
+# check if having any referenced objects or is referenced by other objects
 mat$has_ref()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1624,7 +1716,8 @@ A \link[data.table:data.table]{data.table} with 6 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get all object data in a data.table format without field units
+\preformatted{\dontrun{
+# get all object data in a data.table format without field units
 str(mat$to_table(unit = FALSE))
 
 # get all object data in a data.table format where all field values are put in a
@@ -1636,6 +1729,7 @@ str(idf$Zone$`ZONE ONE`$to_table(all = TRUE))
 
 # get all object data in a data.table format where each field becomes a column
 str(mat$to_table(wide = TRUE))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1677,7 +1771,8 @@ A character vector.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get string format object
+\preformatted{\dontrun{
+# get string format object
 mat$to_string()
 
 # get string format of object, and decrease the space between field values and
@@ -1686,6 +1781,7 @@ mat$to_string(sep_at = 15)
 
 # get string format of object, and decrease the leading space of field values
 mat$to_string(leading = 0)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1732,12 +1828,14 @@ The \code{IdfObject} itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# print the object without comment
+\preformatted{\dontrun{
+# print the object without comment
 mat$print(comment = FALSE)
 
 # print the object, and auto separate field values and field names at the
 # largetst character length of field values
 mat$print(auto_sep = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}

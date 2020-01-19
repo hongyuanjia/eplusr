@@ -71,6 +71,7 @@ In order to streamline the error-prone process of creating custom EPW file,
 ## Method `Epw$new`
 ## ------------------------------------------------
 
+\dontrun{
 # read an EPW file from EnergyPlus website
 path_base <- "https://energyplus.net/weather-download"
 path_region <- "north_and_central_america_wmo_region_4/USA/CA"
@@ -87,141 +88,175 @@ if (is_avail_eplus(8.8)) {
     )
     epw <- read_epw(path_epw)
 }
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$path`
 ## ------------------------------------------------
 
+\dontrun{
 # get path
 epw$path()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$location`
 ## ------------------------------------------------
 
+\dontrun{
 epw$location()
 
 # modify location data
 epw$location(city = "MyCity")
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$design_condition`
 ## ------------------------------------------------
 
+\dontrun{
 epw$design_condition()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$typical_extreme_period`
 ## ------------------------------------------------
 
+\dontrun{
 epw$typical_extreme_period()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$ground_temperature`
 ## ------------------------------------------------
 
+\dontrun{
 epw$ground_temperature()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$holiday`
 ## ------------------------------------------------
 
+\dontrun{
 epw$holiday()
 
 # add daylight saving time
 epw$holiday(dst = c(3.10, 11.3))
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$comment1`
 ## ------------------------------------------------
 
+\dontrun{
 epw$comment1()
 
 epw$comment1("Comment1")
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$comment2`
 ## ------------------------------------------------
 
+\dontrun{
 epw$comment2()
 
 epw$comment2("Comment2")
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$num_period`
 ## ------------------------------------------------
 
+\dontrun{
 epw$num_period()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$interval`
 ## ------------------------------------------------
 
+\dontrun{
 epw$interval()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$period`
 ## ------------------------------------------------
 
+\dontrun{
 # modify data period name
 epw$period(1, name = "test")
 
 # change start day of week
 epw$period(1, start_day_of_week = 3)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$missing_code`
 ## ------------------------------------------------
 
+\dontrun{
 epw$missing_code()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$initial_missing_value`
 ## ------------------------------------------------
 
+\dontrun{
 epw$initial_missing_value()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$range_exist`
 ## ------------------------------------------------
 
+\dontrun{
 epw$range_exist()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$range_valid`
 ## ------------------------------------------------
 
+\dontrun{
 epw$range_valid()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$fill_action`
 ## ------------------------------------------------
 
+\dontrun{
 epw$fill_action("missing")
 
 epw$fill_action("out_of_range")
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$data`
 ## ------------------------------------------------
 
+\dontrun{
 # get weather data
 str(epw$data())
 
@@ -235,12 +270,14 @@ head(epw$data(start_year = 2018, update = TRUE)$year)
 # change the time zone of datetime column in the returned weather data
 attributes(epw$data()$datetime)
 attributes(epw$data(tz = "Etc/GMT+8")$datetime)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$abnormal_data`
 ## ------------------------------------------------
 
+\dontrun{
 epw$abnormal_data()
 
 # only check if there are any abnormal values in air temperature and
@@ -261,39 +298,47 @@ epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
 epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
     type = "out_of_range"
 )
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$redundant_data`
 ## ------------------------------------------------
 
+\dontrun{
 epw$redundant_data()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$make_na`
 ## ------------------------------------------------
 
+\dontrun{
 # turn all missing values into NAs
 summary(epw$data()$liquid_precip_rate)
 epw$make_na(missing = TRUE)
 summary(epw$data()$liquid_precip_rate)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$fill_abnormal`
 ## ------------------------------------------------
 
+\dontrun{
 # turn all missing values into NAs
 summary(epw$data()$liquid_precip_rate)
 epw$fill_abnormal(missing = TRUE)
 summary(epw$data()$liquid_precip_rate)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$add_unit`
 ## ------------------------------------------------
 
+\dontrun{
 # get weather data with units
 epw$add_unit()
 head(epw$data())
@@ -304,60 +349,75 @@ t_dry_bulb <- epw$data()$dry_bulb_temperature
 units(t_dry_bulb) <- with(units::ud_units, "kelvin")
 
 head(t_dry_bulb)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$drop_unit`
 ## ------------------------------------------------
 
+\dontrun{
 epw$drop_unit()
 epw$data()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$purge`
 ## ------------------------------------------------
 
+\dontrun{
 epw$purge()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$add`
 ## ------------------------------------------------
 
+\dontrun{
 # will fail since date time in input data has already been covered by
 # existing data period
 \dontrun{epw$add(epw$data())}
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$set`
 ## ------------------------------------------------
 
+\dontrun{
 # change the weather data
 epw$set(epw$data(), warning = FALSE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$is_unsaved`
 ## ------------------------------------------------
 
+\dontrun{
 epw$is_unsaved()
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$save`
 ## ------------------------------------------------
 
+\dontrun{
 # save the weather file
 epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
+}
 
 
 ## ------------------------------------------------
 ## Method `Epw$print`
 ## ------------------------------------------------
 
+\dontrun{
 epw$print()
+}
 
 }
 \author{
@@ -431,7 +491,8 @@ An \code{Epw} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# read an EPW file from EnergyPlus website
+\preformatted{\dontrun{
+# read an EPW file from EnergyPlus website
 path_base <- "https://energyplus.net/weather-download"
 path_region <- "north_and_central_america_wmo_region_4/USA/CA"
 path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -446,6 +507,7 @@ if (is_avail_eplus(8.8)) {
         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
     )
     epw <- read_epw(path_epw)
+}
 }
 
 }
@@ -473,8 +535,10 @@ locally.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get path
+\preformatted{\dontrun{
+# get path
 epw$path()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -545,10 +609,12 @@ A named list of 9 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$location()
+\preformatted{\dontrun{
+epw$location()
 
 # modify location data
 epw$location(city = "MyCity")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -582,7 +648,9 @@ A named list of 4 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$design_condition()
+\preformatted{\dontrun{
+epw$design_condition()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -618,7 +686,9 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} with 6 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$typical_extreme_period()
+\preformatted{\dontrun{
+epw$typical_extreme_period()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -653,7 +723,9 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} with 7 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$ground_temperature()
+\preformatted{\dontrun{
+epw$ground_temperature()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -739,10 +811,12 @@ A named list of 3 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$holiday()
+\preformatted{\dontrun{
+epw$holiday()
 
 # add daylight saving time
 epw$holiday(dst = c(3.10, 11.3))
+}
 
 }
 \if{html}{\out{</div>}}
@@ -776,9 +850,11 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$comment1()
+\preformatted{\dontrun{
+epw$comment1()
 
 epw$comment1("Comment1")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -812,9 +888,11 @@ A single string.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$comment2()
+\preformatted{\dontrun{
+epw$comment2()
 
 epw$comment2("Comment2")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -840,7 +918,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$num_period()
+\preformatted{\dontrun{
+epw$num_period()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -866,7 +946,9 @@ A single integer.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$interval()
+\preformatted{\dontrun{
+epw$interval()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -916,11 +998,13 @@ A \link[data.table:data.table]{data.table} with 5 columns:
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# modify data period name
+\preformatted{\dontrun{
+# modify data period name
 epw$period(1, name = "test")
 
 # change start day of week
 epw$period(1, start_day_of_week = 3)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -946,7 +1030,9 @@ A named list of 29 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$missing_code()
+\preformatted{\dontrun{
+epw$missing_code()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -973,7 +1059,9 @@ A named list of 16 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$initial_missing_value()
+\preformatted{\dontrun{
+epw$initial_missing_value()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1000,7 +1088,9 @@ A named list of 28 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$range_exist()
+\preformatted{\dontrun{
+epw$range_exist()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1027,7 +1117,9 @@ A named list of 28 elements.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$range_valid()
+\preformatted{\dontrun{
+epw$range_valid()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1068,9 +1160,11 @@ A named list.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$fill_action("missing")
+\preformatted{\dontrun{
+epw$fill_action("missing")
 
 epw$fill_action("out_of_range")
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1154,7 +1248,8 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 36 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get weather data
+\preformatted{\dontrun{
+# get weather data
 str(epw$data())
 
 # get weather data but change the year to 2018
@@ -1167,6 +1262,7 @@ head(epw$data(start_year = 2018, update = TRUE)$year)
 # change the time zone of datetime column in the returned weather data
 attributes(epw$data()$datetime)
 attributes(epw$data(tz = "Etc/GMT+8")$datetime)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1227,7 +1323,8 @@ A \code{\link[data.table:data.table]{data.table::data.table()}}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$abnormal_data()
+\preformatted{\dontrun{
+epw$abnormal_data()
 
 # only check if there are any abnormal values in air temperature and
 # liquid precipitation rate
@@ -1247,6 +1344,7 @@ epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
 epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
     type = "out_of_range"
 )
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1278,7 +1376,9 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 37 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$redundant_data()
+\preformatted{\dontrun{
+epw$redundant_data()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1337,10 +1437,12 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# turn all missing values into NAs
+\preformatted{\dontrun{
+# turn all missing values into NAs
 summary(epw$data()$liquid_precip_rate)
 epw$make_na(missing = TRUE)
 summary(epw$data()$liquid_precip_rate)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1415,10 +1517,12 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# turn all missing values into NAs
+\preformatted{\dontrun{
+# turn all missing values into NAs
 summary(epw$data()$liquid_precip_rate)
 epw$fill_abnormal(missing = TRUE)
 summary(epw$data()$liquid_precip_rate)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1460,7 +1564,8 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# get weather data with units
+\preformatted{\dontrun{
+# get weather data with units
 epw$add_unit()
 head(epw$data())
 
@@ -1470,6 +1575,7 @@ t_dry_bulb <- epw$data()$dry_bulb_temperature
 units(t_dry_bulb) <- with(units::ud_units, "kelvin")
 
 head(t_dry_bulb)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1510,8 +1616,10 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$drop_unit()
+\preformatted{\dontrun{
+epw$drop_unit()
 epw$data()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1537,7 +1645,9 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$purge()
+\preformatted{\dontrun{
+epw$purge()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1621,9 +1731,11 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# will fail since date time in input data has already been covered by
+\preformatted{\dontrun{
+# will fail since date time in input data has already been covered by
 # existing data period
 \dontrun{epw$add(epw$data())}
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1704,8 +1816,10 @@ The modified \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# change the weather data
+\preformatted{\dontrun{
+# change the weather data
 epw$set(epw$data(), warning = FALSE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1757,7 +1871,9 @@ A single logical value of \code{TRUE} or \code{FALSE}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$is_unsaved()
+\preformatted{\dontrun{
+epw$is_unsaved()
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1799,8 +1915,10 @@ A length-one character vector, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{# save the weather file
+\preformatted{\dontrun{
+# save the weather file
 epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
+}
 
 }
 \if{html}{\out{</div>}}
@@ -1827,7 +1945,9 @@ The \code{Epw} object itself, invisibly.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{epw$print()
+\preformatted{\dontrun{
+epw$print()
+}
 
 }
 \if{html}{\out{</div>}}
