@@ -21,6 +21,7 @@ automatically created if it does not exists, like \link{Idf} class does.
 ## Method `ParametricJob$new`
 ## ------------------------------------------------
 
+\dontrun{
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -30,6 +31,7 @@ if (is_avail_eplus(8.8)) {
 
     # create from an Idf and an Epw object
     param <- ParametricJob$new(idf_path, epw_path)
+}
 }
 
 
@@ -219,7 +221,8 @@ A \code{ParametricJob} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{if (is_avail_eplus(8.8)) {
+\preformatted{\dontrun{
+if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
@@ -228,6 +231,7 @@ A \code{ParametricJob} object.
 
     # create from an Idf and an Epw object
     param <- ParametricJob$new(idf_path, epw_path)
+}
 }
 
 }

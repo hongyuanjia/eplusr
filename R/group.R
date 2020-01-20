@@ -36,6 +36,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @return An `EplusGroupJob` object.
         #'
         #' @examples
+        #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
         #'     dir <- eplus_config(8.8)$dir
         #'     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf",
@@ -45,6 +46,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'
         #'     group <- EplusGroupJob$new(path_idfs, path_epws)
         #' }
+        #' }
+        #'
         initialize = function (idfs, epws) {
             input <- get_epgroup_input(idfs, epws)
             private$m_idfs <- input$idfs
@@ -749,6 +752,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
 #' input models.
 #' @return A `EplusGroupJob` object.
 #' @examples
+#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'     dir <- eplus_config(8.8)$dir
 #'     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\.idf",
@@ -762,6 +766,8 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
 #'     # create from Idfs and Epws object
 #'     group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
 #' }
+#' }
+#'
 #' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
 #' @export
 #' @author Hongyuan Jia

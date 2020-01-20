@@ -3454,7 +3454,10 @@ as.character.Idf <- function (x, comment = TRUE, header = TRUE,
 #' @return An [Idf] object
 #' @export
 #' @examples
+#' \dontrun{
 #' if (is_avail_idd(8.8)) empty_idf(8.8)
+#' }
+#'
 # empty_idf {{{
 empty_idf <- function (ver = "latest") {
     ver <- standardize_ver(ver)

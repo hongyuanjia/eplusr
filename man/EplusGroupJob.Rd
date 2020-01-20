@@ -15,6 +15,7 @@ outputs.
 ## Method `EplusGroupJob$new`
 ## ------------------------------------------------
 
+\dontrun{
 if (is_avail_eplus(8.8)) {
     dir <- eplus_config(8.8)$dir
     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
@@ -24,6 +25,8 @@ if (is_avail_eplus(8.8)) {
 
     group <- EplusGroupJob$new(path_idfs, path_epws)
 }
+}
+
 
 ## ------------------------------------------------
 ## Method `EplusGroupJob$run`
@@ -274,7 +277,8 @@ An \code{EplusGroupJob} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{if (is_avail_eplus(8.8)) {
+\preformatted{\dontrun{
+if (is_avail_eplus(8.8)) {
     dir <- eplus_config(8.8)$dir
     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
         full.names = TRUE)[1:5]
@@ -283,6 +287,8 @@ An \code{EplusGroupJob} object.
 
     group <- EplusGroupJob$new(path_idfs, path_epws)
 }
+}
+
 }
 \if{html}{\out{</div>}}
 

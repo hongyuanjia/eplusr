@@ -25,6 +25,7 @@ A \code{EplusGroupJob} object.
 For details on \code{EplusGroupJob}, please see \link{EplusGroupJob} class.
 }
 \examples{
+\dontrun{
 if (is_avail_eplus(8.8)) {
     dir <- eplus_config(8.8)$dir
     path_idfs <- list.files(file.path(dir, "ExampleFiles"), "\\\\.idf",
@@ -38,6 +39,8 @@ if (is_avail_eplus(8.8)) {
     # create from Idfs and Epws object
     group_job(lapply(path_idfs, read_idf), lapply(path_epws, read_epw))
 }
+}
+
 }
 \seealso{
 \code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.

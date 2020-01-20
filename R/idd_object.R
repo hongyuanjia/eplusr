@@ -30,11 +30,14 @@ NULL
 #' @return An [IddObject] object.
 #' @export
 #' @examples
+#' \dontrun{
 #' idd <- use_idd(8.8, download = "auto")
 #'
 #' # get an IddObject using class name
 #' idd_object(idd, "Material")
 #' idd_object(8.8, "Material")
+#' }
+#'
 # idd_object {{{
 idd_object <- function (parent, class) {
     IddObject$new(class, parent)
@@ -1806,6 +1809,7 @@ iddobj_print <- function (self, private, brief = FALSE) {
 #' \dontrun{
 #' cat(format(use_idd(8.8, download = "auto")$Materal, leading = 0))
 #' }
+#'
 #' @export
 # format.IddObject {{{
 format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
@@ -1826,6 +1830,7 @@ format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all
 #' \dontrun{
 #' as.character(use_idd(8.8, download = "auto")$Materal, leading = 0)
 #' }
+#'
 #' @export
 # as.character.IddObject {{{
 as.character.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {

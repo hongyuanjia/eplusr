@@ -18,5 +18,8 @@ An \link{Idf} object
 that only contains a Version object.
 }
 \examples{
+\dontrun{
 if (is_avail_idd(8.8)) empty_idf(8.8)
+}
+
 }

@@ -1773,6 +1773,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 #'
 #' cat(format(mat, leading = 0, sep_at = 10))
 #' }
+#'
 #' @export
 # format.IdfObject {{{
 format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {
@@ -1796,6 +1797,7 @@ format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all
 #'
 #' as.character(mat, leading = 0, sep_at = 10)
 #' }
+#'
 #' @export
 # as.character.IdfObject {{{
 as.character.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...) {

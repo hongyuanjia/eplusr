@@ -742,6 +742,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 #' `Sizing:DesignDay` object exists in the [Idf].
 #' @return An `EplusJob` object.
 #' @examples
+#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'     idf_name <- "1ZoneUncontrolled.idf"
 #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -755,6 +756,8 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
 #'     # create from an Idf and an Epw object
 #'     eplus_job(read_idf(idf_path), read_epw(epw_path))
 #' }
+#' }
+#'
 #' @seealso [param_job()] for creating an EnergyPlus parametric job.
 #' @author Hongyuan Jia
 #' @export

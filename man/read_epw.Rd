@@ -22,6 +22,7 @@ process is extremely inspired by [EnergyPlus/WeatherManager.cc] with some
 simplifications. For more details on \code{Epw}, please see \link{Epw} class.
 }
 \examples{
+\dontrun{
 # read an EPW file from EnergyPlus v8.8 installation folder
 if (is_avail_eplus(8.8)) {
     path_epw <- file.path(
@@ -32,7 +33,6 @@ if (is_avail_eplus(8.8)) {
    read_epw(path_epw)
 }
 
-\dontrun{
 # read an EPW file from EnergyPlus website
 path_base <- "https://energyplus.net/weather-download"
 path_region <- "north_and_central_america_wmo_region_4/USA/CA"
@@ -40,6 +40,7 @@ path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl
 path_epw <- file.path(path_base, path_region, path_file)
 read_epw(path_epw)
 }
+
 }
 \seealso{
 \link{Epw} class

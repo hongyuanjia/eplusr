@@ -49,6 +49,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' @return An `EplusSql` object.
         #'
         #' @examples
+        #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
         #'     idf_name <- "1ZoneUncontrolled.idf"
         #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -63,6 +64,8 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'     # create from local file
         #'     sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
         #' }
+        #' }
+        #'
         initialize = function (sql) {
             assert(is_string(sql), has_ext(sql, "sql"))
             private$m_path_sql <- normalizePath(sql, mustWork = TRUE)

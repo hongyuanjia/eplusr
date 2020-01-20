@@ -22,6 +22,7 @@ A \code{ParametricJob} object.
 For details on \code{ParametricJob}, please see \link{ParametricJob} class.
 }
 \examples{
+\dontrun{
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -35,6 +36,8 @@ if (is_avail_eplus(8.8)) {
     # create from an Idf and an Epw object
     param_job(read_idf(idf_path), read_epw(epw_path))
 }
+}
+
 }
 \seealso{
 \code{\link[=eplus_job]{eplus_job()}} for creating an EnergyPlus single simulation job.

@@ -39,6 +39,7 @@ make sure the output data in the SQLite is correct and reliable.
 ## Method `EplusSql$new`
 ## ------------------------------------------------
 
+\dontrun{
 if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -53,6 +54,8 @@ if (is_avail_eplus(8.8)) {
     # create from local file
     sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
 }
+}
+
 
 ## ------------------------------------------------
 ## Method `EplusSql$path`
@@ -217,7 +220,8 @@ An \code{EplusSql} object.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{if (is_avail_eplus(8.8)) {
+\preformatted{\dontrun{
+if (is_avail_eplus(8.8)) {
     idf_name <- "1ZoneUncontrolled.idf"
     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 
@@ -231,6 +235,8 @@ An \code{EplusSql} object.
     # create from local file
     sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
 }
+}
+
 }
 \if{html}{\out{</div>}}
 

@@ -39,6 +39,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @return A `ParametricJob` object.
         #'
         #' @examples
+        #' \dontrun{
         #' if (is_avail_eplus(8.8)) {
         #'     idf_name <- "1ZoneUncontrolled.idf"
         #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -48,6 +49,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         #'     # create from an Idf and an Epw object
         #'     param <- ParametricJob$new(idf_path, epw_path)
+        #' }
         #' }
         #'
         initialize = function (idf, epw) {
@@ -357,6 +359,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 #' `Sizing:DesignDay` object exists in the [Idf].
 #' @return A `ParametricJob` object.
 #' @examples
+#' \dontrun{
 #' if (is_avail_eplus(8.8)) {
 #'     idf_name <- "1ZoneUncontrolled.idf"
 #'     epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
@@ -370,6 +373,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 #'     # create from an Idf and an Epw object
 #'     param_job(read_idf(idf_path), read_epw(epw_path))
 #' }
+#' }
+#'
 #' @seealso [eplus_job()] for creating an EnergyPlus single simulation job.
 #' @export
 #' @author Hongyuan Jia
