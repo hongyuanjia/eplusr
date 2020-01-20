@@ -43,6 +43,8 @@ test_that("can read IDD", {
     expect_true(is_avail_idd("9.9.9"))
 
     # can parse old IDD
+    expect_warning(use_idd(7.2, download = "auto"))
+    expect_warning(use_idd(8.0, download = "auto"))
     expect_warning(use_idd(8.1, download = "auto"))
 })
 # }}}
