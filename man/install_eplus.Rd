@@ -101,17 +101,21 @@ directory.
 # download the latest version of EnergyPlus
 download_eplus("latest", dir = tempdir())
 # install the latest version of EnergyPlus system-wide which is the default
+# and requires administrative privileges
 install_eplus("latest")
 
 # for a specific version of EnergyPlus
 download_eplus(8.8, dir = tempdir())
 install_eplus(8.8)
 
+# force to reinstall
+install_eplus(8.8, force = TRUE)
+
 # install EnergyPlus in your home directory
-install_eplus(8.8, local = TRUE)
+install_eplus(8.8, local = TRUE, force = TRUE)
 
 # custom EnergyPlus install home directory
-install_eplus(8.8, dir = "~/MyPrograms", local = TRUE)
+install_eplus(8.8, dir = "~/MyPrograms", local = TRUE, force = TRUE)
 }
 }
 \author{

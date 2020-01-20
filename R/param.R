@@ -292,7 +292,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' @examples
         #' \dontrun{
         #' # run parametric simulations
-        #' param$run(wait = TRUE)
+        #' param$run(wait = TRUE, echo = FALSE)
         #'
         #' # run in background
         #' param$run(wait = FALSE)
@@ -321,6 +321,9 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #'
         #' @examples
         #' \dontrun{
+        #' param$print()
+        #'
+        #' Sys.sleep(10)
         #' param$print()
         #' }
         #'

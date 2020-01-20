@@ -43,11 +43,11 @@ if (any(avail_eplus()) > 7.2) {
     transition(idf, max(avail_eplus()))
 
     # convert it from v7.2 to the latest EnergyPlus installed and keep all
-    intermediate versions
+    # intermediate versions
     transition(idf, max(avail_eplus()), keep_all = TRUE)
 
     # convert it from v7.2 to the latest EnergyPlus installed and keep all
-    intermediate versions and save all them
+    # intermediate versions and save all them
     idf$save(tempfile(fileext = ".idf"))
     transition(idf, max(avail_eplus()), keep_all = TRUE,
         save = TRUE, dir = tempdir()

@@ -37,10 +37,6 @@ NULL
 #' * `value`: contains field values
 #' * `reference`: contains cross-reference data of field values.
 #'
-#' @examples
-#' # example model shipped with eplusr from EnergyPlus v8.8
-#' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
-#'
 #' @seealso [IdfObject] class for a single object in an IDF.
 #' @author Hongyuan Jia
 #' @name Idf
@@ -80,6 +76,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @examples
         #' \dontrun{
+        #' # example model shipped with eplusr from EnergyPlus v8.8
+        #' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+        #'
         #' # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
         #' # occur. If Idd v8.8 is found, it will be used automatically.
         #' idf <- Idf$new(path_idf)
@@ -1196,7 +1195,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' # cannot delete objects that are referred by others
         #' level_checks()$reference # reference-checking is enable by default
-        #' \dontrun{idf$del("r13layer")} # error
+        #' idf$del("r13layer") # error
         #'
         #' # force to delete objects even thay are referred by others
         #' idf$del("r13layer", .force = TRUE)

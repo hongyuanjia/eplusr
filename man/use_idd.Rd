@@ -85,7 +85,7 @@ avail_idd()
 is_avail_idd(8.5)
 
 # download latest IDD file from EnergyPlus GitHub repo
-download_idd("latest", tempdir())
+str(download_idd("latest", tempdir()))
 
 # use specific version of Idd
 # only works if EnergyPlus v8.8 has been found or Idd v8.8 exists

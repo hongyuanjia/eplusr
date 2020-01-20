@@ -2854,7 +2854,7 @@ check_epw_new_data <- function (epw_data, epw_header, data, target_period, other
             }
             if (overlapped) {
                 abort("error_epw_data_overlap",
-                    paste0("Failed to set target data period becase date time in ",
+                    paste0("Failed to set target data period because date time in ",
                         "input data has overlapped with data period ",
                         p_other[i, paste0("#", index, " ", surround(name),
                             " [", start_day, ", ", end_day, "]"

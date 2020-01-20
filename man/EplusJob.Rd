@@ -70,7 +70,7 @@ job$path("epw")
 job$run(NULL)
 
 # specify output directory
-job$run(tempdir())
+job$run(dir = tempdir())
 
 # run in the background
 job$run(wait = TRUE)
@@ -471,7 +471,7 @@ The \code{EplusJob} object itself, invisibly.
 job$run(NULL)
 
 # specify output directory
-job$run(tempdir())
+job$run(dir = tempdir())
 
 # run in the background
 job$run(wait = TRUE)

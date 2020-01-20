@@ -22,7 +22,20 @@ running EnergyPlus models using \code{\link[=run_idf]{run_idf()}} and \code{\lin
 }
 \examples{
 \dontrun{
-clean_wd("foo.idf")
+# run a test simulation
+idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData",
+     "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
+)
+dir <- file.path(tempdir(), "test")
+run_idf(idf_path, epw_path, output_dir = dir, echo = FALSE)
+
+list.files(dir)
+
+# remove all output files
+clean_wd(file.path(dir, basename(idf_path)))
+
+list.files(dir)
 }
 }
 \author{

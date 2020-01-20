@@ -378,7 +378,7 @@ epw$purge()
 \dontrun{
 # will fail since date time in input data has already been covered by
 # existing data period
-\dontrun{epw$add(epw$data())}
+epw$add(epw$data())
 }
 
 
@@ -1734,7 +1734,7 @@ The modified \code{Epw} object itself, invisibly.
 \preformatted{\dontrun{
 # will fail since date time in input data has already been covered by
 # existing data period
-\dontrun{epw$add(epw$data())}
+epw$add(epw$data())
 }
 
 }

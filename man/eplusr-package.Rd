@@ -15,22 +15,38 @@ A rich toolkit of using the whole building simulation program
 eplusr provides a rich toolkit of using EnergyPlus directly in
 R, which enables programmatic navigation, modification of EnergyPlus models
 and makes it less painful to do parametric simulations and analysis.
+}
+\section{Features}{
 
-With eplusr, you can do:
 \itemize{
-\item Read, parse and modify EnergyPlus Weather File (EPW).
-\item Read and parse EnergyPlus IDF files.
-\item Query on models, including classes, objects and fields
-\item Directly add, modify, duplicate, and delete objects of IDF in R.
-\item Automatically change referred fields when modifying objects.
-\item Check any possible errors whenever modifications are made.
-\item Save the changed models into standard formats in the same way as IDFEditor
-distributed along with EnergyPlus.
-\item Run your models directly and collect the simulation output of EnergyPlus
-in R.
-\item Run parametric analysis in parallel and collect results in one go.
+\item Download and install EnergyPlus in R
+\item Read, parse and modify EnergyPlus:
+\itemize{
+\item Input Data File (IDF)
+\item Weather File (EPW)
+\item Report Data Dictionary (RDD) & Meter Data Dictionary (MDD)
+\item Error File (ERR)
+}
+\item Modify multiple versions of IDFs and run corresponding EnergyPlus
+both in the background and in the front
+\item Rich-featured interfaces to query and modify IDFs
+\item Automatically handle referenced fields and validate input during
+modification
+\item Take fully advantage of most common used data structure for data
+science in R – data.frame
+\itemize{
+\item Extract model, weather data into data.frames
+\item Modify multiple objects via data.frames input
+\item Query output via SQL in Tidy format which is much better for
+data analysis and visualization
+}
+\item Provide a simple yet extensible prototype of conducting parametric
+simulations and collect all results in one go
+\item A pure R-based version updater \code{\link[=transition]{transition()}} which is much faster than
+VersionUpdater distributed with EnergyPlus
 }
 }
+
 \seealso{
 Useful links:
 \itemize{

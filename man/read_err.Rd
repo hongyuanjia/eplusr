@@ -56,6 +56,7 @@ epw_name <-  "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 idf_path <- file.path(eplus_config(8.8)$dir, "ExampleFiles", idf_name)
 epw_path <- file.path(eplus_config(8.8)$dir, "WeatherData", epw_name)
 job <- eplus_job(idf_path, epw_path)
+job$run(dir = tempdir())
 
 # read the err file
 read_err(job$locate_output(".err"))

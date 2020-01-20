@@ -29,7 +29,7 @@ if (is_avail_eplus(8.8)) {
         "WeatherData",
         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
    )
-   epw <- read_epw(path_epw)
+   read_epw(path_epw)
 }
 
 \dontrun{
@@ -38,7 +38,7 @@ path_base <- "https://energyplus.net/weather-download"
 path_region <- "north_and_central_america_wmo_region_4/USA/CA"
 path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 path_epw <- file.path(path_base, path_region, path_file)
-epw <- read_epw(path_epw)
+read_epw(path_epw)
 }
 }
 \seealso{

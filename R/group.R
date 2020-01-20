@@ -101,22 +101,22 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' # only run design day
         #' group$run(NULL)
         #'
+        #' # do not show anything in the console
+        #' group$run(echo = FALSE)
+        #'
         #' # specify output directory
-        #' group$run(tempdir())
+        #' group$run(tempdir(), echo = FALSE)
         #'
         #' # run in the background
-        #' group$run(wait = TRUE)
+        #' group$run(wait = TRUE, echo = FALSE)
         #' # see group job status
         #' group$status()
         #'
         #' # force to kill background group job before running the new one
-        #' group$run(force = TRUE)
-        #'
-        #' # do not show anything in the console
-        #' group$run(echo = FALSE)
+        #' group$run(force = TRUE, echo = FALSE)
         #'
         #' # copy external files used in the model to simulation output directory
-        #' group$run(copy_external = TRUE)
+        #' group$run(copy_external = TRUE, echo = FALSE)
         #' }
         #'
         run = function (dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait)

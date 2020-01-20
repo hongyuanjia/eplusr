@@ -58,7 +58,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'
         #'     # copy to tempdir and run the model
         #'     idf <- read_idf(idf_path)
-        #'     idf$run(epw_path, tempdir())
+        #'     idf$run(epw_path, tempdir(), echo = FALSE)
         #'
         #'     # create from local file
         #'     sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))
@@ -537,7 +537,7 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
 #'
 #'     # copy to tempdir and run the model
 #'     idf <- read_idf(idf_path)
-#'     idf$run(epw_path, tempdir())
+#'     idf$run(epw_path, tempdir(), echo = FALSE)
 #'
 #'     # create from local file
 #'     sql <- eplus_sql(file.path(tempdir(), "1ZoneUncontrolled.sql"))

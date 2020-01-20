@@ -152,7 +152,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         #' job$run(NULL)
         #'
         #' # specify output directory
-        #' job$run(tempdir())
+        #' job$run(dir = tempdir())
         #'
         #' # run in the background
         #' job$run(wait = TRUE)

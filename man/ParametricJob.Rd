@@ -135,7 +135,7 @@ param$save(tempdir(), separate = FALSE)
 
 \dontrun{
 # run parametric simulations
-param$run(wait = TRUE)
+param$run(wait = TRUE, echo = FALSE)
 
 # run in background
 param$run(wait = FALSE)
@@ -149,6 +149,9 @@ print(param)
 ## ------------------------------------------------
 
 \dontrun{
+param$print()
+
+Sys.sleep(10)
 param$print()
 }
 
@@ -547,7 +550,7 @@ The \code{ParametricJob} object itself, invisibly.
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
 # run parametric simulations
-param$run(wait = TRUE)
+param$run(wait = TRUE, echo = FALSE)
 
 # run in background
 param$run(wait = FALSE)
@@ -585,6 +588,9 @@ The \code{ParametricJob} object itself, invisibly.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
+param$print()
+
+Sys.sleep(10)
 param$print()
 }
 

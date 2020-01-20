@@ -1026,7 +1026,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' \dontrun{
         #' # will fail since date time in input data has already been covered by
         #' # existing data period
-        #' \dontrun{epw$add(epw$data())}
+        #' epw$add(epw$data())
         #' }
         #'
         add = function (data, realyear = FALSE, name = NULL, start_day_of_week = NULL, after = 0L, warning = TRUE)
@@ -1215,7 +1215,7 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #'         "WeatherData",
 #'         "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 #'    )
-#'    epw <- read_epw(path_epw)
+#'    read_epw(path_epw)
 #' }
 #'
 #' \dontrun{
@@ -1224,7 +1224,7 @@ formals(Epw$public_methods$clone)$deep <- TRUE
 #' path_region <- "north_and_central_america_wmo_region_4/USA/CA"
 #' path_file <- "USA_CA_San.Francisco.Intl.AP.724940_TMY3/USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw"
 #' path_epw <- file.path(path_base, path_region, path_file)
-#' epw <- read_epw(path_epw)
+#' read_epw(path_epw)
 #' }
 #' @seealso [Epw] class
 #' @author Hongyuan Jia
@@ -1690,7 +1690,7 @@ format.Epw <- function (x, ...) {
 #' @return A character vector containing paths of downloaded files.
 #' @examples
 #' \dontrun{
-#' download_weather("los angeles.*tmy3", "la")
+#' download_weather("los angeles.*tmy3", "LosAngeles", tempdir(), ask = FALSE)
 #' }
 #' @author Hongyuan Jia
 #' @export

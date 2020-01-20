@@ -38,15 +38,15 @@ stored in three tables:
 }
 }
 \examples{
-# example model shipped with eplusr from EnergyPlus v8.8
-path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
-
 
 ## ------------------------------------------------
 ## Method `Idf$new`
 ## ------------------------------------------------
 
 \dontrun{
+# example model shipped with eplusr from EnergyPlus v8.8
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+
 # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
 idf <- Idf$new(path_idf)
@@ -451,7 +451,7 @@ idf$del(39, 40)
 
 # cannot delete objects that are referred by others
 level_checks()$reference # reference-checking is enable by default
-\dontrun{idf$del("r13layer")} # error
+idf$del("r13layer") # error
 
 # force to delete objects even thay are referred by others
 idf$del("r13layer", .force = TRUE)
@@ -841,6 +841,9 @@ An \code{Idf} object.
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{\dontrun{
+# example model shipped with eplusr from EnergyPlus v8.8
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr") # v8.8
+
 # If neither EnergyPlus v8.8 nor Idd v8.8 was found, error will
 # occur. If Idd v8.8 is found, it will be used automatically.
 idf <- Idf$new(path_idf)
@@ -2288,7 +2291,7 @@ idf$del(39, 40)
 
 # cannot delete objects that are referred by others
 level_checks()$reference # reference-checking is enable by default
-\dontrun{idf$del("r13layer")} # error
+idf$del("r13layer") # error
 
 # force to delete objects even thay are referred by others
 idf$del("r13layer", .force = TRUE)
