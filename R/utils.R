@@ -301,7 +301,20 @@ lower_name <- function (name) {
 
 # underscore_name {{{
 underscore_name <- function (name, merge = TRUE) {
-    stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
+    tryCatch(
+        stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge),
+        error = function (e) {
+            if (!grepl("invalid UTF-8 byte sequence detected", conditionMessage(e), fixed = TRUE)) {
+                signalCondition(e)
+            }
+
+            # fix encoding issue in older versions of IDD files
+            name[!stringi::stri_enc_isutf8(name)] <-
+                stringi::stri_encode(name[!stringi::stri_enc_isutf8(name)], "windows-1252", "UTF-8")
+
+            stri_replace_all_charclass(name, "[^[:alnum:]]", "_", merge = merge)
+        }
+    )
 }
 # }}}
 
