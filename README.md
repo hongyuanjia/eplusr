@@ -66,7 +66,7 @@ in interactive mode.
 
 ## Features
 
-  - Downloading, install EnergyPlus in R
+  - Download and install EnergyPlus in R
   - Read, parse and modify EnergyPlus:
       - Input Data File (IDF)
       - Weather File (EPW)
