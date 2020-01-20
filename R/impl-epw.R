@@ -2325,7 +2325,7 @@ fill_epw_data_abnormal <- function (epw_data, epw_header, period = NULL,
     # get atmospheric pressure at current elevation
     EPW_INIT_MISSING$atmospheric_pressure <- std_atm_press(epw_header$location$elevation)
 
-    # get all abnormal row indice in specific periods
+    # get all abnormal row indices in specific periods
     mr <- merge_data_period_abnormal_index(epw_header, period, missing = TRUE, out_of_range = TRUE)
     m <- mr$missing
     r <- mr$out_of_range

@@ -790,7 +790,7 @@ str(power)
 
 `$report_data()` can also directly take the whole or subset results of
 `$report_data_dict()` to extract report data. In some case this may be quite
-handy. Let's get all report variable with celsius degree unit.
+handy. Let's get all report variable with Celsius degree unit.
 
 ```{r dict_extract, eval = can_run}
 str(job$report_data(job$report_data_dict()[units == "C"]))

@@ -1036,7 +1036,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' comments for modified object, overwriting the old ones. Names in list
         #' element are treated as field names.
         #'
-        #' There is two special syntaxes in `$set()`, which is inspired by the
+        #' There is two special syntax in `$set()`, which is inspired by the
         #' [data.table](https://cran.r-project.org/package=eplusr) package:
         #'
         #' * `class := list(field = value)`: Note the use of `:=` instead of

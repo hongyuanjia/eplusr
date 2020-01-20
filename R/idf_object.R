@@ -743,7 +743,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' This means that the value `"WALL-1"` of field `Name` is referred by
         #' field `Construction Name` in a surface named `WALL-1PF`. All those
-        #' objects can be futher easily extracted using `$ref_by_object()`
+        #' objects can be further easily extracted using `$ref_by_object()`
         #' method.
         #'
         #' Note that `$value_relation()` shows all fields specified, even some of them
@@ -785,7 +785,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
 
         # ref_to_object {{{
         #' @description
-        #' Extract multiple `IdfObject` objects referred by speicifed field values
+        #' Extract multiple `IdfObject` objects referred by specified field values
         #'
         #' @details
         #' For details on field value relations, see
@@ -917,7 +917,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' @param class A character vector of class names.
         #'
-        #' @return A logical vector with the same length as speicifed field.
+        #' @return A logical vector with the same length as specified field.
         #'
         #' @examples
         #' \dontrun{
@@ -945,7 +945,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' @param class A character vector of class names.
         #'
-        #' @return A logical vector with the same length as speicifed field.
+        #' @return A logical vector with the same length as specified field.
         #'
         #' @examples
         #' \dontrun{
@@ -973,7 +973,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' @param class A character vector of class names.
         #'
-        #' @return A logical vector with the same length as speicifed field.
+        #' @return A logical vector with the same length as specified field.
         #'
         #' @examples
         #' \dontrun{
@@ -1001,7 +1001,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @return A logical vector with the same length as speicifed field.
+        #' @return A logical vector with the same length as specified field.
         #'
         #' @examples
         #' \dontrun{

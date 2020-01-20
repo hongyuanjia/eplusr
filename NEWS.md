@@ -7,7 +7,7 @@
   no measure is applied, `NULL` is returned (#59). Thanks @yidan1214 for this
   feature request.
 * A new method `$save()` has been added in `ParametricJob` class. It saves all
-  generated parametric models and weather file into speicifed directory. You can
+  generated parametric models and weather file into specified directory. You can
   use `separate` argument to determine whether each model is to be saved in a
   separate folder (#58). Thanks @yidan1214 for this feature request.
 * New arguments `align` and `all` have been added to `$to_table()` method in
@@ -102,7 +102,7 @@
 * All documentation in R6 classes have been update thanks to roxyten2 R6 support (#156).
 * Deprecated methods in each class have all been remove (#156).
 * New parameter `case` has been added in
-  `EplusSql$tabular_data()`. Similar like `case` paramter in
+  `EplusSql$tabular_data()`. Similar like `case` parameter in
   `EplusSql$report_data()`, it lets you to add a `case` column to indicate the
   case of simulation. This brings some changes in the returned results of
   `EplusSql$tabular_data()`. Compared to previous version, there will always be
@@ -147,11 +147,11 @@
   later package.
 * All messages can be suppressed by setting the `verbose_info` option to
   `FALSE`.
-* `$delete()` method in `Epw` class has been deprected in flavor of `$del()` to
+* `$delete()` method in `Epw` class has been deprecatd in flavor of `$del()` to
   provide a similar API as `Idf` class.
 * When `all` is `TRUE` in `$report_data()` in `EplusSql`, `EplusJob` and
   `ParametricJob` class, an extra column `environment_period_index` is returned
-  which contains the indice of each run period environment. This helps to
+  which contains the indices of each run period environment. This helps to
   distinguish different run period environment when no name is assigned.
 * `param_job()` now gives more informative error message if input `Idf` object
   and `Epw` object is not created from a local file (#112).
@@ -219,7 +219,7 @@ is included.
 * Reset year after checking datetime in `read_epw()` (#44).
 * Add field name in input before validation in `paste()` (#45).
 * Fix datetime calculation in `$report_data()` in `EplusSql` (#46).
-* Update doc on EnergyPlus time nodation (#47).
+* Update doc on EnergyPlus time notation (#47).
 * Fix EPW design condition parsing error when `hours_8_to_4_12.8_20.6` is zero.
 * Now recurring errors in `.err` file are parsed correctly in `ErrFile`.
 * Handle large value references in `get_value_reference_map()` (#50).

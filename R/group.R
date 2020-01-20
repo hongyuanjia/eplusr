@@ -393,7 +393,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'   output from different simulations
         #' * `report_data_dictionary_index`: The integer used to link the
         #'   dictionary data to the variable data. Mainly useful when joining
-        #'   diferent tables
+        #'   different tables
         #' * `is_meter`: Whether report data is a meter data. Possible values:
         #'   `0` and `1`
         #' * `timestep_type`: Type of data timestep. Possible values: `Zone` and
@@ -446,7 +446,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'   * `interval`: Length of reporting interval
         #'   * `simulation_days`: Day of simulation
         #'   * `day_type`: The type of day, e.g. `Monday`, `Tuesday` and etc.
-        #'   * `environment_period_index`: The indice of environment.
+        #'   * `environment_period_index`: The indices of environment.
         #'   * `environment_name`: A text string identifying the environment.
         #'   * `is_meter`: Whether report data is a meter data. Possible values: `0` and
         #'     `1`
@@ -527,7 +527,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' @param all If `TRUE`, extra columns are also included in the returned
         #'        [data.table::data.table()].
         #'
-        #' @param wide If `TRUE`, the output is formated in the same way as
+        #' @param wide If `TRUE`, the output is formatted in the same way as
         #'        standard EnergyPlus csv output file.
         #'
         #' @param period A Date or POSIXt vector used to specify which time

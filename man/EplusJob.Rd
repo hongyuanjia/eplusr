@@ -341,7 +341,7 @@ Get the version of IDF in current job
 }
 
 \subsection{Details}{
-\verb{$version()} reutrns the version of IDF that current \code{EplusJob} uses.
+\verb{$version()} returns the version of IDF that current \code{EplusJob} uses.
 }
 
 \subsection{Returns}{
@@ -819,7 +819,7 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 10 columns:
 \itemize{
 \item \code{report_data_dictionary_index}: The integer used to link the
 dictionary data to the variable data. Mainly useful when joining
-diferent tables
+different tables
 \item \code{is_meter}: Whether report data is a meter data. Possible values:
 \code{0} and \code{1}
 \item \code{timestep_type}: Type of data timestep. Possible values: \code{Zone} and
@@ -902,7 +902,7 @@ file without extension is used.}
 \item{\code{all}}{If \code{TRUE}, extra columns are also included in the returned
 \code{\link[data.table:data.table]{data.table::data.table()}}.}
 
-\item{\code{wide}}{If \code{TRUE}, the output is formated in the same way as
+\item{\code{wide}}{If \code{TRUE}, the output is formatted in the same way as
 standard EnergyPlus csv output file.}
 
 \item{\code{period}}{A Date or POSIXt vector used to specify which time
@@ -977,7 +977,7 @@ included:
 \item \code{interval}: Length of reporting interval
 \item \code{simulation_days}: Day of simulation
 \item \code{day_type}: The type of day, e.g. \code{Monday}, \code{Tuesday} and etc.
-\item \code{environment_period_index}: The indice of environment.
+\item \code{environment_period_index}: The indices of environment.
 \item \code{environment_name}: A text string identifying the environment.
 \item \code{is_meter}: Whether report data is a meter data. Possible values: \code{0} and
 \code{1}

@@ -69,7 +69,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' returns an `Idd` object.
         #'
         #' It is suggested to use helper [use_idd()] which supports to directly
-        #' take a valid IDD version as input and search automoatically the
+        #' take a valid IDD version as input and search automatically the
         #' corresponding file path.
         #'
         #' @param path Either a path, a connection, or literal data (either a single
@@ -281,7 +281,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' Get the indices of specified groups
         #'
         #' @details
-        #' `$group_index()` returns the indices of specifed groups in
+        #' `$group_index()` returns the indices of specified groups in
         #' current `Idd`. A group index is just an integer indicating its
         #' appearance order in the `Idd`.
         #'

@@ -704,7 +704,7 @@ print_single_validity <- function (single_validity, type) {
         invalid_character = "Fields below should be characters but are not:",
         invalid_integer = "Fields below are not or cannot be coerced into integers:",
         invalid_choice = "Fields below are not one of prescribed choices:",
-        invalid_range = "Fields below exceed prescibed ranges:",
+        invalid_range = "Fields below exceed prescribed ranges:",
         invalid_reference = "Fields below are not one of valid references:")
 
     cli::cat_line()

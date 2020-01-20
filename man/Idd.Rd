@@ -336,7 +336,7 @@ It takes an EnergyPlus Input Data Dictionary (IDD) as input and
 returns an \code{Idd} object.
 
 It is suggested to use helper \code{\link[=use_idd]{use_idd()}} which supports to directly
-take a valid IDD version as input and search automoatically the
+take a valid IDD version as input and search automatically the
 corresponding file path.
 }
 
@@ -630,7 +630,7 @@ Get the indices of specified groups
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
-\verb{$group_index()} returns the indices of specifed groups in
+\verb{$group_index()} returns the indices of specified groups in
 current \code{Idd}. A group index is just an integer indicating its
 appearance order in the \code{Idd}.
 }

@@ -2117,7 +2117,7 @@ special element \code{.comment} in each list will be used as the \strong{new}
 comments for modified object, overwriting the old ones. Names in list
 element are treated as field names.
 
-There is two special syntaxes in \verb{$set()}, which is inspired by the
+There is two special syntax in \verb{$set()}, which is inspired by the
 \href{https://cran.r-project.org/package=eplusr}{data.table} package:
 \itemize{
 \item \code{class := list(field = value)}: Note the use of \verb{:=} instead of

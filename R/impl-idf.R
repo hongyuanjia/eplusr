@@ -1165,7 +1165,7 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
     obj <- get_idf_object(idd_env, idf_env, class, object, NULL, underscore, ignore_case)
     set(obj, NULL, c("object_name_lower", "comment"), NULL)
 
-    # if field is not speicifed
+    # if field is not specified
     if (is.null(field)) {
         val <- idf_env$value[obj, on = "object_id", allow.cartesian = TRUE]
 

@@ -40,7 +40,7 @@ and design day files (DDY).
 }
 \examples{
 \dontrun{
-download_weather("los angeles.*tmy3", "la", ask = FALSE)
+download_weather("los angeles.*tmy3", "LosAngeles", tempdir(), ask = FALSE)
 }
 }
 \author{

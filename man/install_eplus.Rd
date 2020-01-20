@@ -76,7 +76,7 @@ Note that installing to the default location requires administrative
 privileges and you have to run R with administrator (or with sudo if you are
 on Linux) to make it work if you are not in interactive mode.
 
-If you cann't run R with administrator, it is possible to install EnergyPlus
+If you can't run R with administrator, it is possible to install EnergyPlus
 to your home corresponding directory by setting \code{local} to \code{TRUE}.
 
 The user level EnergyPlus installation path is:

@@ -1290,7 +1290,7 @@ presenting such relation described above. For instance, if
 
 This means that the value \code{"WALL-1"} of field \code{Name} is referred by
 field \verb{Construction Name} in a surface named \verb{WALL-1PF}. All those
-objects can be futher easily extracted using \verb{$ref_by_object()}
+objects can be further easily extracted using \verb{$ref_by_object()}
 method.
 
 Note that \verb{$value_relation()} shows all fields specified, even some of them
@@ -1321,7 +1321,7 @@ roof$value_relation("name", direction = "ref_by")
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ref_to_object"></a>}}
 \subsection{Method \code{ref_to_object()}}{
-Extract multiple \code{IdfObject} objects referred by speicifed field values
+Extract multiple \code{IdfObject} objects referred by specified field values
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_to_object(
   which = NULL,
@@ -1520,7 +1520,7 @@ whether specified fields refer to other object values or not.
 }
 
 \subsection{Returns}{
-A logical vector with the same length as speicifed field.
+A logical vector with the same length as specified field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1562,7 +1562,7 @@ whether there are other object values ref to specified fields.
 }
 
 \subsection{Returns}{
-A logical vector with the same length as speicifed field.
+A logical vector with the same length as specified field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1604,7 +1604,7 @@ whether specified fields refer to other objects' nodes.
 }
 
 \subsection{Returns}{
-A logical vector with the same length as speicifed field.
+A logical vector with the same length as specified field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -1646,7 +1646,7 @@ field values refer to other objects' nodes.
 }
 
 \subsection{Returns}{
-A logical vector with the same length as speicifed field.
+A logical vector with the same length as specified field.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
