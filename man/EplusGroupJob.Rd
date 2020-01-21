@@ -261,14 +261,16 @@ Create an \code{EplusGroupJob} object
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{idfs}}{Paths to EnergyPlus IDF files or a list of IDF files and
-\link{Idf} objects.}
+\link{Idf} objects. If only one IDF supplied, it will be used for
+simulations with all EPWs.}
 
 \item{\code{epws}}{Paths to EnergyPlus EPW files or a list of EPW files and
 \link{Epw} objects. Each element in the list can be \code{NULL}, which
 will force design-day-only simulation. Note this needs at
 least one \code{Sizing:DesignDay} object exists in that \link{Idf}. If
 \code{epws} is \code{NULL}, design-day-only simulation will be conducted
-for all input models.}
+for all input models. If only one EPW supplied, it will be
+used for simulations with all IDFs.}
 }
 \if{html}{\out{</div>}}
 }

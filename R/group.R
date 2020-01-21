@@ -25,13 +25,15 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' Create an `EplusGroupJob` object
         #'
         #' @param idfs Paths to EnergyPlus IDF files or a list of IDF files and
-        #'        [Idf] objects.
+        #'        [Idf] objects. If only one IDF supplied, it will be used for
+        #'        simulations with all EPWs.
         #' @param epws Paths to EnergyPlus EPW files or a list of EPW files and
         #'        [Epw] objects. Each element in the list can be `NULL`, which
         #'        will force design-day-only simulation. Note this needs at
         #'        least one `Sizing:DesignDay` object exists in that [Idf]. If
         #'        `epws` is `NULL`, design-day-only simulation will be conducted
-        #'        for all input models.
+        #'        for all input models. If only one EPW supplied, it will be
+        #'        used for simulations with all IDFs.
         #'
         #' @return An `EplusGroupJob` object.
         #'
@@ -1156,6 +1158,7 @@ get_epgroup_input <- function (idfs, epws) {
     # check length
     if (!is.null(epws)) {
         if (length(epws) == 1L) epws <- replicate(length(idfs), epws[[1L]]$clone())
+        if (length(idfs) == 1L) idfs <- replicate(length(epws), idfs[[1L]]$clone())
         assert(have_same_len(idfs, epws))
         nm_epw <- tools::file_path_sans_ext(basename(vcapply(epws, function (epw) epw$path())))
         setattr(epws, "names", make.unique(nm_epw, "_"))

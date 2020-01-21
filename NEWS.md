@@ -1,5 +1,9 @@
 # eplusr (development version)
 
+## Minor changes
+
+* Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
+
 # eplusr 0.11.0
 
 ## New features
