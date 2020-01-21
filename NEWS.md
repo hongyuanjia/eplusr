@@ -1,7 +1,5 @@
 # eplusr 0.11.0
 
-# eplusr 0.10.4.9000
-
 ## New features
 
 * A new method `$models()` has been added in `ParametricJob` class. It returns a
