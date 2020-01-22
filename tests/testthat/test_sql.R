@@ -77,6 +77,22 @@ test_that("Sql methods", {
     # can convert to wide table
     expect_silent(tab <- sql$tabular_data(row_name = "Total Site Energy", wide = TRUE, case = NULL))
     expect_equal(names(tab), "AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy")
+    expect_equivalent(
+        read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/1ZoneUncontrolled.idf"))$
+            run(NULL, tempdir(), echo = FALSE)$
+            tabular_data(table_name = "Site and Source Energy", wide = TRUE)[[1]][
+            , lapply(.SD, class)],
+        data.table(
+            case = "character",
+            report_name = "character",
+            report_for = "character",
+            table_name = "character",
+            row_name = "character",
+            `Energy Per Conditioned Building Area [MJ/m2]` = "numeric",
+            `Energy Per Total Building Area [MJ/m2]` = "numeric",
+            `Total Energy [GJ]` = "numeric"
+        )
+    )
     expect_equivalent(tab[[1L]][, lapply(.SD, class)],
         data.table(
             report_name = "character",
