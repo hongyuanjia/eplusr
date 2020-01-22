@@ -83,9 +83,9 @@ test_that("Sql methods", {
             report_for = "character",
             table_name = "character",
             row_name = "character",
-            `Energy Per Conditioned Building Area [MJ/m2]` = "numeric",
+            `Total Energy [GJ]` = "numeric",
             `Energy Per Total Building Area [MJ/m2]` = "numeric",
-            `Total Energy [GJ]` = "numeric"
+            `Energy Per Conditioned Building Area [MJ/m2]` = "numeric"
         )
     )
 

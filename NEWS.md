@@ -4,6 +4,11 @@
 
 * Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
 
+## Bug fixes
+
+* Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
+  `TRUE` (#186).
+
 # eplusr 0.11.0
 
 ## New features
