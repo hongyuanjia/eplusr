@@ -1,6 +1,6 @@
 # eplusr (development version)
 
-## Minor changes
+## New features
 
 * Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
 * A new method `Idf$last_job()` has been added to enable getting the last
@@ -10,6 +10,8 @@
 
 * The algorithm of detecting numeric columns in `EplusSql$tabular_data()` has
   been improved (#190).
+* Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
+  `TRUE` (#186).
 
 # eplusr 0.11.0
 
