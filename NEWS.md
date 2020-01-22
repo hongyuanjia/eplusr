@@ -3,6 +3,8 @@
 ## Minor changes
 
 * Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
+* A new method `Idf$last_job()` has been added to enable getting the last
+  simulation job created using `Idf$run()` (#187).
 
 # eplusr 0.11.0
 

@@ -734,6 +734,15 @@ job$report_data()
 
 
 ## ------------------------------------------------
+## Method `Idf$last_job`
+## ------------------------------------------------
+
+\dontrun{
+idf$last_job()
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$print`
 ## ------------------------------------------------
 
@@ -797,6 +806,7 @@ Hongyuan Jia
 \item \href{#method-is_unsaved}{\code{Idf$is_unsaved()}}
 \item \href{#method-save}{\code{Idf$save()}}
 \item \href{#method-run}{\code{Idf$run()}}
+\item \href{#method-last_job}{\code{Idf$last_job()}}
 \item \href{#method-print}{\code{Idf$print()}}
 \item \href{#method-clone}{\code{Idf$clone()}}
 }
@@ -3530,6 +3540,36 @@ job$run()
 
 # get simulation results
 job$report_data()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-last_job"></a>}}
+\subsection{Method \code{last_job()}}{
+Get the last simulation job
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$last_job()}\if{html}{\out{</div>}}
+}
+
+\subsection{Details}{
+\verb{$last_job()} returns the last \link{EplusJob} object that was created
+using
+\href{../../eplusr/html/Idf.html#method-run}{\code{$run()}}. If the
+\code{Idf} hasn't been run yet, \code{NULL} is returned.
+}
+
+\subsection{Returns}{
+\code{NULL} or an \link{EplusJob} object.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+idf$last_job()
 }
 
 }

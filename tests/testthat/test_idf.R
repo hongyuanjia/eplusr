@@ -487,6 +487,9 @@ test_that("Idf class", {
     expect_equal(idf2$Zone[[1]]$Name, "ZONE ONE")
     # }}}
 
+    # $last_job()
+    expect_null(idf$last_job())
+
     expect_silent(
         idf <- with_option(
             list(validate_level = "none", verbose_info = FALSE),
