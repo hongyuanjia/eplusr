@@ -2186,6 +2186,27 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             idf_run(self, private, weather, dir, wait, force, copy_external = copy_external, echo),
         # }}}
 
+        # last_job {{{
+        #' @description
+        #' Get the last simulation job
+        #'
+        #' @details
+        #' `$last_job()` returns the last [EplusJob] object that was created
+        #' using
+        #' \href{../../eplusr/html/Idf.html#method-run}{\code{$run()}}. If the
+        #' `Idf` hasn't been run yet, `NULL` is returned.
+        #'
+        #' @return `NULL` or an [EplusJob] object.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' idf$last_job()
+        #' }
+        #'
+        last_job = function ()
+            idf_last_job(self, private),
+        # }}}
+
         # print {{{
         #' @description
         #' Print `Idf` object
@@ -2872,6 +2893,11 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     private$m_log$job$run(dir = dir, wait = wait, force = force, echo = echo,
         copy_external = copy_external
     )
+}
+# }}}
+# idf_last_job {{{
+idf_last_job <- function (self, private) {
+    private$m_log$job
 }
 # }}}
 # idf_print {{{
