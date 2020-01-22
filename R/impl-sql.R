@@ -356,8 +356,10 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     if (!string_value) {
         dt[!J(c("", " ")), on = "units", is_num := TRUE]
         # https://stackoverflow.com/questions/638565/parsing-scientific-notation-sensibly
-        dt[, is_num := any(stri_detect_regex(value, "^\\s*-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?$")),
-            by = c("report_name", "report_for", "table_name", "column_name")]
+        dt[J(FALSE), on = "is_num",
+            is_num := any(stri_detect_regex(value, "^\\s*-?\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?$")),
+            by = c("report_name", "report_for", "table_name", "column_name")
+        ]
     }
 
     # add row index
