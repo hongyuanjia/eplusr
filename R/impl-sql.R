@@ -401,7 +401,10 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     }
 
     # clean
-    data.table::set(dt, NULL, "row_index", NULL)
+    set(dt, NULL, "row_index", NULL)
+
+    # column order
+    setcolorder(dt, c(setdiff(names(dt), cols), cols))
 
     # coerece type
     if (!string_value && length(cols_num)) {

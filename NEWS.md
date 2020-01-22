@@ -6,6 +6,11 @@
 * A new method `Idf$last_job()` has been added to enable getting the last
   simulation job created using `Idf$run()` (#187).
 
+## Bug fixes
+
+* Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
+  `TRUE` (#186).
+
 # eplusr 0.11.0
 
 ## New features
