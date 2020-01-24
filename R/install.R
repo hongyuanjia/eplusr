@@ -370,13 +370,13 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
             path_eplus_linux_sh(vdot, exec)
         } else {
             dir_eplus <- file.path(dir, paste0("EnergyPlus-", v))
-            message("'sed' is not found and eplusr will not correct.",
-                "There is a known issue in EnergyPlus installation since v9.1.0 which ",
+            message("There is a known issue in EnergyPlus installation since v9.1.0 which ",
                 "fails to extract files into correct directory ('", dir_eplus, "'). ",
                 "eplusr uses 'sed' to fix the issue before running the installation, ",
                 "but 'sed' is not found on current system. ",
-                "Please remember manually move corresponding files ",
-                "from '", dir, "' to '", dir_eplus, "'.",
+                "Please remember to manually move corresponding files ",
+                "from '", dir, "' to '", dir_eplus, "' in order to make sure ",
+                "eplusr can locate EnergyPlus v", vdot, "correctly.",
                 "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
             )
         }
