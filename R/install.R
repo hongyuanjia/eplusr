@@ -358,14 +358,55 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
     setwd(exe_dir)
 
     f <- basename(exec)
-    v <- gsub("\\.", "-", stri_match_first_regex(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
+    vdot <- stri_match_first_regex(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2]
+    v <- gsub("\\.", "-", vdot)
     system(sprintf('chmod +x %s', f))
+
+    # EnergyPlus installation are broken since 9.1.0, which extract all files
+    # directly into `/usr/local.
+    # see https://github.com/NREL/EnergyPlus/issues/7256
+    if (standardize_ver(vdot) >= 9.1) {
+        if (Sys.which("sed") != "") {
+            path_eplus_linux_sh(vdot, exec)
+        } else {
+            dir_eplus <- file.path(dir, paste0("EnergyPlus-", v))
+            message("'sed' is not found and eplusr will not correct.",
+                "There is a known issue in EnergyPlus installation since v9.1.0 which ",
+                "fails to extract files into correct directory ('", dir_eplus, "'). ",
+                "eplusr uses 'sed' to fix the issue before running the installation, ",
+                "but 'sed' is not found on current system. ",
+                "Please remember manually move corresponding files ",
+                "from '", dir, "' to '", dir_eplus, "'.",
+                "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
+            )
+        }
+    }
+
     if (local) {
         system(sprintf('echo "y\n%s\n%s" | ./%s', dir, dir_bin, f))
         system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, v))
     } else {
         system(sprintf('echo "y\n%s\n%s" | sudo ./%s', dir, dir_bin, f))
         system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, v))
+    }
+}
+# }}}
+# path_eplus_linux_sh {{{
+path_eplus_linux_sh <- function (ver, exec) {
+    if (ver == "9.1.0") {
+        system(sprintf("sed -i '%is/^/%s/' %s", 47,
+            "ori_install_directory=${install_directory}\\ninstall_directory=${install_directory}\\/${package_name}",
+            exec
+        ))
+        system(sprintf("sed -i '%is/^/%s/' %s", 89,
+            "install_directory=${ori_install_directory}",
+            exec
+        ))
+    } else if (standardize_ver(ver) > 9.1) {
+        system(sprintf("sed -i '%is/^/%s/' %s", 70,
+            "install_directory=${install_directory}\\/${package_name}",
+            exec
+        ))
     }
 }
 # }}}
