@@ -354,6 +354,7 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     if (!wide) return(dt)
 
     if (!string_value) {
+        set(dt, NULL, "is_num", FALSE)
         dt[!J(c("", " ")), on = "units", is_num := TRUE]
         # https://stackoverflow.com/questions/638565/parsing-scientific-notation-sensibly
         dt[J(FALSE), on = "is_num",

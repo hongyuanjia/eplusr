@@ -241,6 +241,12 @@ clean_wd(idf$path())
 unlink(idf$path())
 ```
 
+## Additional resources
+
+* Slides: https://hongyuanjia.github.io/eplusrIntro
+* eplusr website: https://hongyuanjia.github.io/eplusr/
+* eplusr Docker image: https://github.com/hongyuanjia/eplusr-docker
+
 ## Acknowledgement
 
 I would like to thank many open source projects who have heavily inspired the

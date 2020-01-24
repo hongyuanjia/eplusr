@@ -66,7 +66,7 @@ in interactive mode.
 
 ## Features
 
-  - Download and install EnergyPlus in R
+  - Download, install EnergyPlus in R
   - Read, parse and modify EnergyPlus:
       - Input Data File (IDF)
       - Weather File (EPW)
@@ -141,7 +141,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/RtmpKBABCZ/temp_libpath32e07f6ab0f9/eplusr/extdata/1ZoneUnco...
+#>  * Path: '/tmp/Rtmp7ASahR/temp_libpath4359c5e37fa/eplusr/extdata/1ZoneUncon...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -372,12 +372,12 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/RtmpKBABCZ/model.idf.
+#> Replace the existing IDF located at /tmp/Rtmp7ASahR/model.idf.
 #> ExpandObjects Started.
 #> No expanded file generated.
 #> ExpandObjects Finished. Time:     0.000
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.20 02:50
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.24 10:21
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -404,14 +404,12 @@ job <- idf$run(epw)
 #> Warming up {18}
 #> Warming up {19}
 ....
-#> Warning in system("timedatectl", intern = TRUE): running command 'timedatectl'
-#> had status 1
 
 # print simulation error
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-01-20 02:50:00
+#>   * Simulation started: 2020-01-24 10:21:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
@@ -466,13 +464,19 @@ job$tabular_data(table_name = "site and source energy", row_name = "total site e
 #> $`AnnualBuildingUtilityPerformanceSummary.Entire Facility.Site and Source Energy`
 #>     case                             report_name      report_for
 #> 1: model AnnualBuildingUtilityPerformanceSummary Entire Facility
-#>                table_name          row_name
-#> 1: Site and Source Energy Total Site Energy
+#>                table_name          row_name Total Energy [GJ]
+#> 1: Site and Source Energy Total Site Energy             89.81
+#>    Energy Per Total Building Area [MJ/m2]
+#> 1:                                 386.67
 #>    Energy Per Conditioned Building Area [MJ/m2]
-#> 1:                                             
-#>    Energy Per Total Building Area [MJ/m2] Total Energy [GJ]
-#> 1:                                 386.67             89.81
+#> 1:                                           NA
 ```
+
+## Additional resources
+
+  - Slides: <https://hongyuanjia.github.io/eplusrIntro>
+  - eplusr website: <https://hongyuanjia.github.io/eplusr/>
+  - eplusr Docker image: <https://github.com/hongyuanjia/eplusr-docker>
 
 ## Acknowledgement
 
