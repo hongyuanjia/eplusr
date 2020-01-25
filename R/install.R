@@ -330,7 +330,7 @@ install_eplus_macos <- function (exec, local = FALSE) {
     } else {
         system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
     }
-    system(sprintf("sudo hdiutil unmount /Volumes/%s/%s.pkg", no_ext, no_ext))
+    system(sprintf("sudo hdiutil unmount /Volumes/%s", no_ext, no_ext))
 }
 # }}}
 # install_eplus_linux {{{
