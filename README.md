@@ -503,3 +503,9 @@ Hongyuan Jia
 The project is released under the terms of MIT License.
 
 Copyright © 2016-2020 Hongyuan Jia
+
+-----
+
+Please note that the ‘eplusr’ project is released with a [Contributor
+Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project,
+you agree to abide by its terms.

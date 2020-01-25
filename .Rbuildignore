@@ -16,3 +16,4 @@
 ^cran-comments\.md$
 ^tools$
 ^tic\.R$
+^\.github$
