@@ -17,6 +17,7 @@
   been improved (#190).
 * Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
   `TRUE` (#186).
+* Fix EnergyPlus installation on macOS (#193).
 
 # eplusr 0.11.0
 
