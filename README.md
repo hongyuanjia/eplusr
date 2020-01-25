@@ -502,4 +502,4 @@ Hongyuan Jia
 
 The project is released under the terms of MIT License.
 
-Copyright © 2016-2019 Hongyuan Jia
+Copyright © 2016-2020 Hongyuan Jia
