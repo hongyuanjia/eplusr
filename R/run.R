@@ -742,8 +742,8 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         p_stdout <- tempfile()
         p_stderr <- tempfile()
         post_fun <- function () {
-            stdout <- suppressWarnings(eplusr:::read_lines(p_stdout)$string)
-            stderr <- suppressWarnings(eplusr:::read_lines(p_stderr)$string)
+            stdout <- suppressWarnings(read_lines(p_stdout)$string)
+            stderr <- suppressWarnings(read_lines(p_stderr)$string)
             if (!length(stdout)) stdout <- character(0)
             if (!length(stderr)) stderr <- character(0)
             list(stdout = stdout, stderr = stderr, end_time = Sys.time())
