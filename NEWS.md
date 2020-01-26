@@ -5,6 +5,11 @@
 * Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
 * A new method `Idf$last_job()` has been added to enable getting the last
   simulation job created using `Idf$run()` (#187).
+* Provide a workaround to fix the issue of EnergyPlus v9.1 and above
+  installation which fails to extract files into correct directory
+  `/usr/local/EnergyPlus-X-Y-0`, but instead extracting all files directly into
+  `/usr/local` ([NREL/EnergyPlus#7256](https://github.com/NREL/EnergyPlus/issues/7256))
+  (#193).
 
 ## Bug fixes
 
@@ -12,6 +17,7 @@
   been improved (#190).
 * Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
   `TRUE` (#186).
+* Fix EnergyPlus installation on macOS (#193).
 
 # eplusr 0.11.0
 

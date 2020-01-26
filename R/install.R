@@ -71,6 +71,9 @@ NULL
 #' administrator privileges if you do not have the write access to that
 #' directory.
 #'
+#' Please note that on macOS, when `local` is set to `FALSE`, no symbolic links
+#' will be created, since this process requires administrative privileges.
+#'
 #' @name install_eplus
 #' @return An invisible integer `0` if succeed. Moreover, some attributes will
 #' also be returned:
@@ -109,11 +112,22 @@ install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FA
     if (!is.null(dir)) assert(is_string(dir))
 
     # check if the same version has been installed already
-    if (is_avail_eplus(ver) && !isTRUE(force))
-        abort("error_eplus_to_install_exists", paste0(
-            "It seems EnergyPlus v", ver, " has been already installed at ",
-            surround(eplus_config(ver)$dir), ". Set `force` to `TRUE` to reinstall."
-        ))
+    if (is_avail_eplus(ver)) {
+        if (!isTRUE(force)) {
+            abort("error_eplus_to_install_exists", paste0(
+                "It seems EnergyPlus v", ver, " has been already installed at ",
+                surround(eplus_config(ver)$dir), ". Set `force` to `TRUE` to reinstall."
+            ))
+        }
+
+        if (is_macos() & ver >= 9.1) {
+            abort("error_eplus_to_force_install_macos", paste0(
+                "Cannot perform force reinstallation when EnergyPlus version is v9.1 and above. ",
+                "Please first uninstall EnergyPlus v", ver, " at ",
+                surround(eplus_config(ver)$dir), " and then run 'install_eplus(\"", ver, "\")'."
+            ))
+        }
+    }
 
     verbose_info(sprintf("Starting to download EnergyPlus v%s...", ver), "\n", cli::rule(line = 2))
 
@@ -127,9 +141,9 @@ install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FA
 
     inst <- attr(dl, "file")
     res <- switch(os_type(),
-           windows = install_eplus_win(inst, local = local, dir = dir, qtifw = ver >= 9.2),
-           linux = install_eplus_linux(inst, local = local, dir = dir, ...),
-           macos = install_eplus_macos(inst, local = local))
+           windows = install_eplus_win(ver, inst, local = local, dir = dir),
+           linux = install_eplus_linux(ver, inst, local = local, dir = dir, ...),
+           macos = install_eplus_macos(ver, inst, local = local))
 
     if (res != 0L) stop("Failed to install EnergyPlus v", ver, ".", call. = FALSE)
 
@@ -220,7 +234,7 @@ download_file <- function (url, dest) {
 }
 # }}}
 # install_eplus_win {{{
-install_eplus_win <- function (exec, local = FALSE, dir = NULL, qtifw = FALSE) {
+install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
     if (is.null(dir)) {
         if (local) {
             dir <- get_win_user_path(error = TRUE)
@@ -229,58 +243,13 @@ install_eplus_win <- function (exec, local = FALSE, dir = NULL, qtifw = FALSE) {
         }
     }
 
-    ver <- gsub("\\.", "-", stri_match_first_regex(exec, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
-    dir <- normalizePath(file.path(dir, paste0("EnergyPlusV", ver)), mustWork = FALSE)
+    dir <- normalizePath(file.path(dir, paste0("EnergyPlusV", gsub("\\.", "-", ver))), mustWork = FALSE)
 
-    if (!qtifw) {
+    if (ver > 9.1) {
         system(sprintf("%s /S /D=%s", exec, dir))
     } else {
-        # create a tempfile of QTIFW control script
-        ctrl <- tempfile(fileext = ".qs")
-        # NOTE: shoud escape slash twice here
-        dir <- gsub("\\", "\\\\", dir, fixed = TRUE)
-        write_lines(file = ctrl, x = paste0("
-            function Controller() {
-                installer.autoRejectMessageBoxes();
-                installer.installationFinished.connect(function() {
-                    gui.clickButton(buttons.NextButton);
-                })
-            }
-
-            Controller.prototype.IntroductionPageCallback = function() {
-                // click delay here because the next button is initially disabled for ~1 second
-                gui.clickButton(buttons.NextButton, 3000);
-            }
-
-            Controller.prototype.TargetDirectoryPageCallback = function() {
-                var page = gui.pageWidgetByObjectName('TargetDirectoryPage');
-                page.TargetDirectoryLineEdit.setText(\"", dir, "\");
-                gui.clickButton(buttons.NextButton);
-            }
-
-            Controller.prototype.ComponentSelectionPageCallback = function() {
-                gui.clickButton(buttons.NextButton);
-            }
-
-            Controller.prototype.LicenseAgreementPageCallback = function() {
-                gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
-                gui.clickButton(buttons.NextButton);
-            }
-
-            Controller.prototype.StartMenuDirectoryPageCallback = function() {
-                gui.clickButton(buttons.NextButton);
-            }
-
-            Controller.prototype.ReadyForInstallationPageCallback = function() {
-                gui.clickButton(buttons.NextButton);
-            }
-
-            Controller.prototype.FinishedPageCallback = function() {
-                gui.clickButton(buttons.FinishButton);
-            }
-        "))
-        system(sprintf("%s --script %s", exec, ctrl))
+        install_eplus_qt(ver, exec, dir)
     }
 }
 # }}}
@@ -314,31 +283,33 @@ get_win_user_path <- function (error = FALSE) {
 }
 # }}}
 # install_eplus_macos {{{
-install_eplus_macos <- function (exec, local = FALSE) {
-    # change working directory
-    ori_wd <- getwd()
-    on.exit(setwd(ori_wd), add = TRUE)
+install_eplus_macos <- function (ver, exec, local = FALSE) {
+    no_ext <- tools::file_path_sans_ext(basename(exec))
 
-    exe_dir <- dirname(exec)
-    setwd(exe_dir)
-
-    f <- basename(exec)
-    no_ext <- tools::file_path_sans_ext(f)
-    system(sprintf("sudo hdiutil mount %s", f))
-    if (local) {
-        stop("Local installation is not supported on OS X")
+    # mount
+    system(sprintf("hdiutil mount %s", exec))
+    if (ver < 9.1) {
+        if (local) {
+            system(sprintf("installer -pkg /Volumes/%s/%s.pkg -target CurrentUserHomeDirectory", no_ext, no_ext))
+        } else {
+            system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+        }
     } else {
-        system(sprintf("sudo installer -pkg /Volumes/%s/%s.pkg -target LocalSystem", no_ext, no_ext))
+        ver_dash <- gsub("\\.", "-", ver)
+        if (local) {
+            dir <- normalizePath(file.path("~/Applications", paste0("EnergyPlus-", ver_dash)), mustWork = FALSE)
+        } else {
+            dir <- file.path("/Applications", paste0("EnergyPlus-", ver_dash))
+        }
+        exec <- sprintf("/Volumes/%s/%s.app/Contents/MacOS/%s", no_ext, no_ext, no_ext)
+        system(sprintf('chmod +x %s', exec))
+        install_eplus_qt(exec, dir, local = local)
     }
-    system(sprintf("sudo hdiutil unmount /Volumes/%s/%s.pkg", no_ext, no_ext))
+    system(sprintf("hdiutil unmount /Volumes/%s/", no_ext))
 }
 # }}}
 # install_eplus_linux {{{
-install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL) {
-    # change working directory
-    ori_wd <- getwd()
-    on.exit(setwd(ori_wd), add = TRUE)
-
+install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
     if (local) {
         if (is.null(dir)) dir <- "~/.local"
         if (is.null(dir_bin)) dir_bin <- "~/.local/bin"
@@ -354,19 +325,120 @@ install_eplus_linux <- function (exec, local = FALSE, dir = NULL, dir_bin = NULL
     dir <- normalizePath(dir, mustWork = TRUE)
     dir_bin <- normalizePath(dir_bin, mustWork = TRUE)
 
-    exe_dir <- dirname(exec)
-    setwd(exe_dir)
-
-    f <- basename(exec)
-    v <- gsub("\\.", "-", stri_match_first_regex(f, "EnergyPlus-(\\d\\.\\d\\.\\d)-")[,2])
-    system(sprintf('chmod +x %s', f))
-    if (local) {
-        system(sprintf('echo "y\n%s\n%s" | ./%s', dir, dir_bin, f))
-        system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, v))
-    } else {
-        system(sprintf('echo "y\n%s\n%s" | sudo ./%s', dir, dir_bin, f))
-        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, v))
+    system(sprintf('chmod +x %s', exec))
+    # EnergyPlus installation are broken since 9.1.0, which extract all files
+    # directly into `/usr/local.
+    # see https://github.com/NREL/EnergyPlus/issues/7256
+    ver_dash <- gsub("\\.", "-", ver)
+    if (ver >= 9.1) {
+        if (Sys.which("sed") != "") {
+            patch_eplus_linux_sh(ver, exec)
+        } else {
+            dir_eplus <- file.path(dir, paste0("EnergyPlus-", ver_dash))
+            message("There is a known issue in EnergyPlus installation since v9.1.0 which ",
+                "fails to extract files into correct directory ('", dir_eplus, "'). ",
+                "eplusr uses 'sed' to fix the issue before running the installation, ",
+                "but 'sed' is not found on current system. ",
+                "Please remember to manually move corresponding files ",
+                "from '", dir, "' to '", dir_eplus, "' in order to make sure ",
+                "eplusr can locate EnergyPlus v", ver, "correctly.",
+                "For more information, please see https://github.com/NREL/EnergyPlus/issues/7256"
+            )
+        }
     }
+
+    if (local) {
+        system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
+        system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+    } else {
+        system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
+        system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
+    }
+}
+# }}}
+# patch_eplus_linux_sh {{{
+patch_eplus_linux_sh <- function (ver, exec) {
+    if (ver == "9.1.0") {
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 47,
+            "ori_install_directory=${install_directory}\\ninstall_directory=${install_directory}\\/${package_name}",
+            exec
+        ))
+        # change the start line of tar.gz as a new line has been added above
+        system(sprintf("sed -i '%is/+163/+164/' %s", 80, exec))
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 89,
+            "install_directory=${ori_install_directory}",
+            exec
+        ))
+    } else if (ver > 9.1) {
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 70,
+            "install_directory=${install_directory}\\/${package_name}",
+            exec
+        ))
+    }
+}
+# }}}
+# install_eplus_qt {{{
+install_eplus_qt <- function (exec, dir, local = FALSE) {
+    # create a tempfile of QTIFW control script
+    ctrl <- tempfile(fileext = ".qs")
+    # NOTE: shoud escape slash twice here
+    if (is_windows()) dir <- gsub("\\", "\\\\", dir, fixed = TRUE)
+    write_lines(file = ctrl, x = paste0("
+        function Controller() {
+            installer.setMessageBoxAutomaticAnswer('OverwriteTargetDirectory', QMessageBox.Yes);
+            installer.setMessageBoxAutomaticAnswer('TargetDirectoryInUse', QMessageBox.Ok);
+            installer.setMessageBoxAutomaticAnswer('cancelInstallation', QMessageBox.Yes);
+            installer.installationFinished.connect(function() {
+                gui.clickButton(buttons.NextButton);
+            })
+        };
+
+        Controller.prototype.IntroductionPageCallback = function() {
+            gui.clickButton(buttons.NextButton);
+            var page = gui.currentPageWidget()
+            page.completeChanged.connect(function() {
+                gui.clickButton(buttons.NextButton);
+            });
+        };
+
+        Controller.prototype.TargetDirectoryPageCallback = function() {
+            var page = gui.pageWidgetByObjectName('TargetDirectoryPage');
+            page.TargetDirectoryLineEdit.setText(\"", dir, "\");
+            gui.clickButton(buttons.NextButton);
+        };
+
+        Controller.prototype.ComponentSelectionPageCallback = function() {
+        ",
+        if (local) {
+            "gui.currentPageWidget().deselectComponent(\"Symlinks\");"
+        },
+        "
+            gui.clickButton(buttons.NextButton);
+        };
+
+        Controller.prototype.LicenseAgreementPageCallback = function() {
+            gui.currentPageWidget().AcceptLicenseRadioButton.setChecked(true);
+            gui.clickButton(buttons.NextButton);
+        };
+
+        Controller.prototype.StartMenuDirectoryPageCallback = function() {
+            gui.clickButton(buttons.NextButton);
+        };
+
+        Controller.prototype.ReadyForInstallationPageCallback = function() {
+            gui.clickButton(buttons.CommitButton);
+        };
+
+        Controller.prototype.PerformInstallationPageCallback = function()
+        {
+            gui.clickButton(buttons.CommitButton);
+        };
+
+        Controller.prototype.FinishedPageCallback = function() {
+            gui.clickButton(buttons.FinishButton);
+        };
+    ", collapse = "\n"))
+    system(sprintf("%s --script %s", exec, ctrl))
 }
 # }}}
 
@@ -593,9 +665,9 @@ eplus_default_path <- function (ver, local = FALSE) {
         }
     } else {
         if (local) {
-            d <- paste0("/Applications/EnergyPlus-", ver_dash)
-        } else {
             d <- paste0("~/Applications/EnergyPlus-", ver_dash)
+        } else {
+            d <- paste0("/Applications/EnergyPlus-", ver_dash)
         }
     }
     d
