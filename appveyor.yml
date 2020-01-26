@@ -14,9 +14,7 @@ install:
   - cmd: R -q -e "install.packages('remotes'); remotes::install_github('ropenscilabs/tic'); tic::prepare_all_stages()"
 
 cache:
-  # clearing the cache: https://github.com/appveyor/ci/issues/985
-  # change .appveyor_clear_cache.txt to invalidate cache
-  - C:\RLibrary -> .appveyor_clear_cache.txt
+  - C:\RLibrary
 
 before_build: R -q -e "tic::before_install()"
 build_script: R -q -e "tic::install()"
