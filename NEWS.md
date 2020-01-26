@@ -18,6 +18,7 @@
 * Now `EplusSql$tabular_data()` keeps the original column order when `wide` is
   `TRUE` (#186).
 * Fix EnergyPlus installation on macOS (#193).
+* Fix parallel simulations on macOS (#194).
 * Now `eplus_config()` will always return the expanded EnergyPlus path (#196).
 
 # eplusr 0.11.0
