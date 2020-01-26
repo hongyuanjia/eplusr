@@ -99,10 +99,12 @@ the simulation time
 \item \code{energyplus}: The path of EnergyPlus executable
 \item \code{stdout}: All standard output from EnergyPlus. Always being \code{NULL} if
 \code{wait} is \code{FALSE}, but you can manually get all standard output using
-\code{process$read_all_output_lines()}.
+\code{process$get_result()}, where \code{process} is the \link[processx:process]{processx::process}
+object stored in returned element \code{process}.
 \item \code{stderr}: All standard error from EnergyPlus. Always being \code{NULL} if
 \code{wait} is \code{FALSE}, but you can manually get all standard output using
-\code{process$read_all_output_lines()}.
+\code{process$get_result()}, where \code{process} is the \link[processx:process]{processx::process}
+object stored in returned element \code{process}.
 \item \code{process}: A \link[processx:process]{processx::process} object of current EnergyPlus simulation
 }
 
