@@ -567,7 +567,7 @@ use_eplus <- function (eplus) {
     }
 
     exe <- paste0("energyplus", if (is_windows()) ".exe" else "")
-    res <- list(version = ver, dir = eplus_dir, exe = exe)
+    res <- list(version = ver, dir = normalizePath(eplus_dir), exe = exe)
 
     ori <- .globals$eplus_config[[as.character(ver)]]
     .globals$eplus_config[[as.character(ver)]] <- res
