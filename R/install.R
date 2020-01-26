@@ -326,7 +326,6 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     dir_bin <- normalizePath(dir_bin, mustWork = TRUE)
 
     system(sprintf('chmod +x %s', exec))
-
     # EnergyPlus installation are broken since 9.1.0, which extract all files
     # directly into `/usr/local.
     # see https://github.com/NREL/EnergyPlus/issues/7256
@@ -349,10 +348,10 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
     }
 
     if (local) {
-        system(sprintf('echo "y\n%s\n%s" | ./%s', dir, dir_bin, exec))
+        system(sprintf('echo "y\n%s\n%s" | %s', dir, dir_bin, exec))
         system(sprintf('chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
     } else {
-        system(sprintf('echo "y\n%s\n%s" | sudo ./%s', dir, dir_bin, exec))
+        system(sprintf('echo "y\n%s\n%s" | sudo %s', dir, dir_bin, exec))
         system(sprintf('sudo chmod -R a+w %s/EnergyPlus-%s', dir, ver_dash))
     }
 }
@@ -360,18 +359,18 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
 # patch_eplus_linux_sh {{{
 patch_eplus_linux_sh <- function (ver, exec) {
     if (ver == "9.1.0") {
-        system(sprintf("sed -i '%is/^/%s/' %s", 47,
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 47,
             "ori_install_directory=${install_directory}\\ninstall_directory=${install_directory}\\/${package_name}",
             exec
         ))
         # change the start line of tar.gz as a new line has been added above
         system(sprintf("sed -i '%is/+163/+164/' %s", 80, exec))
-        system(sprintf("sed -i '%is/^/%s/' %s", 89,
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 89,
             "install_directory=${ori_install_directory}",
             exec
         ))
     } else if (ver > 9.1) {
-        system(sprintf("sed -i '%is/^/%s/' %s", 70,
+        system(sprintf("sed -i '%is/^.*$/%s/' %s", 70,
             "install_directory=${install_directory}\\/${package_name}",
             exec
         ))
