@@ -139,10 +139,12 @@ clean_wd <- function (path) {
 #'   * `energyplus`: The path of EnergyPlus executable
 #'   * `stdout`: All standard output from EnergyPlus. Always being `NULL` if
 #'      `wait` is `FALSE`, but you can manually get all standard output using
-#'      `process$read_all_output_lines()`.
+#'      `process$get_result()`, where `process` is the [processx::process]
+#'      object stored in returned element `process`.
 #'   * `stderr`: All standard error from EnergyPlus. Always being `NULL` if
 #'      `wait` is `FALSE`, but you can manually get all standard output using
-#'      `process$read_all_output_lines()`.
+#'      `process$get_result()`, where `process` is the [processx::process]
+#'      object stored in returned element `process`.
 #'   * `process`: A [processx::process] object of current EnergyPlus simulation
 #'
 #' For `run_multi()`, if `wait` is `TRUE`, a
@@ -558,12 +560,14 @@ are_all_completed <- function(jobs) {
 handle_events <- function(jobs, options, progress_bar) {
     jobs[status == "running" &
          vlapply(process, function (x) !is.null(x) && !x$is_alive()),
-        `:=`(
-            stdout = lapply(process, function (x) x$read_all_output_lines()),
-            stderr = lapply(process, function (x) x$read_all_error_lines()),
-            exit_status = viapply(process, function (x) x$get_exit_status()),
-            status = "newly_completed", end_time = Sys.time()
-        )
+        c("stdout", "stderr", "exit_status", "status", "end_time") := {
+            res <- lapply(process, function (p) p$get_result())
+            list(stdout = lapply(res, "[[", "stdout"),
+                 stderr = lapply(res, "[[", "stderr"),
+                 exit_status = viapply(process, function (x) x$get_exit_status()),
+                 status = "newly_completed", end_time = Sys.time()
+            )
+        }
     ]
 
     if (any(jobs$status == "newly_completed")) {
@@ -729,10 +733,27 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     res <- list()
 
+    if (wait) {
+        p_stdout <- p_stderr <- "|"
+        post_fun <- NULL
+    # should always poll stdout and stderr
+    # see https://github.com/r-lib/processx/issues/235
+    } else {
+        p_stdout <- tempfile()
+        p_stderr <- tempfile()
+        post_fun <- function () {
+            stdout <- suppressWarnings(eplusr:::read_lines(p_stdout)$string)
+            stderr <- suppressWarnings(eplusr:::read_lines(p_stderr)$string)
+            if (!length(stdout)) stdout <- character(0)
+            if (!length(stderr)) stderr <- character(0)
+            list(stdout = stdout, stderr = stderr, end_time = Sys.time())
+        }
+    }
+
     # run energyplus
     proc <- processx::process$new(command = eplus, args = args, wd = dirname(model),
         cleanup = TRUE, windows_verbatim_args = FALSE,
-        stdout = "|", stderr = "|", post_process = function () Sys.time()
+        stdout = p_stdout, stderr = p_stderr, post_process = post_fun
     )
 
     # kill energyplus on exit
