@@ -95,6 +95,9 @@ On Windows and Linux, you can also specify your custom directory using the
 \code{dir} argument. Remember to change \code{local} to \code{FALSE} in order to ask for
 administrator privileges if you do not have the write access to that
 directory.
+
+Please note that on macOS, when \code{local} is set to \code{FALSE}, no symbolic links
+will be created, since this process requires administrative privileges.
 }
 \examples{
 \dontrun{
