@@ -562,10 +562,14 @@ handle_events <- function(jobs, options, progress_bar) {
          vlapply(process, function (x) !is.null(x) && !x$is_alive()),
         c("stdout", "stderr", "exit_status", "status", "end_time") := {
             res <- lapply(process, function (p) p$get_result())
+            exit_code <- viapply(process, function (x) x$get_exit_status())
+            # somehow get_exit_status() function may return NA after execution
+            # of a (successful) command
+            # https://github.com/r-lib/processx/issues/220
+            exit_code[is.na(exit_code)] <- 0L
             list(stdout = lapply(res, "[[", "stdout"),
                  stderr = lapply(res, "[[", "stderr"),
-                 exit_status = viapply(process, function (x) x$get_exit_status()),
-                 status = "newly_completed", end_time = Sys.time()
+                 exit_status = exit_code, status = "newly_completed", end_time = Sys.time()
             )
         }
     ]
