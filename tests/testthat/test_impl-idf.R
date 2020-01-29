@@ -1081,5 +1081,18 @@ test_that("TO_TABLE", {
             "Visible Absorptance" = 0.65
         ), tolerance = 1e-5
     )
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE, unit = TRUE, wide = TRUE, group_ext = 1),
+        data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
+            "Name" = "C5 - 4 IN HW CONCRETE",
+            "Roughness" = "MediumRough",
+            "Thickness" = units::set_units(0.1014984, "m"),
+            "Conductivity" = units::set_units(1.729577, "W/K/m"),
+            "Density" = units::set_units(2242.585, "kg/m^3"),
+            "Specific Heat" = units::set_units(836.8, "J/K/kg"),
+            "Thermal Absorptance" = 0.9,
+            "Solar Absorptance" = 0.65,
+            "Visible Absorptance" = 0.65
+        ), tolerance = 1e-5
+    )
 })
 # }}}
