@@ -1021,27 +1021,27 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' `$to_table()` returns a [data.table][data.table::data.table()] that
         #' contains core data of current `IdfObject`. It has 6 columns:
         #'
-        #' * `id`: Integer type. Object ID.
-        #' * `name`: Character type. Object name.
+        #' * `id`: Integer type. Object IDs.
+        #' * `name`: Character type. Object names.
         #' * `class`: Character type. Current class name.
         #' * `index`: Integer type. Field indexes.
         #' * `field`: Character type. Field names.
         #' * `value`: Character type if `string_value` is `TRUE` or list type if
-        #'   `string_value` is `FALSE` or `group_ext` > `0`. Field values.
+        #'   `string_value` is `FALSE` or `group_ext` is not `"none"`. Field values.
         #'
-        #' Note that when `group_ext` > `0`, `index` and `field` values will not
-        #' match the original field indices and names. In this case, `index`
-        #' will only indicate the indices of sequences. For `field` column,
-        #' specifically:
+        #' Note that when `group_ext` is not `"none"`, `index` and `field`
+        #' values will not match the original field indices and names. In this
+        #' case, `index` will only indicate the indices of sequences. For
+        #' `field` column, specifically:
         #'
-        #' * When `group_ext` is `1L`, each field name in a extensible group
+        #' * When `group_ext` is `"group"`, each field name in a extensible group
         #'   will be abbreviated using [abbreviate()] with `minlength` being
         #'   `10L` and all abbreviated names will be separated by `|` and
         #'   combined together. For example, field names in the extensible group
         #'   (`Vertex 1 X-coordinate`, `Vertex 1 Y-coordinate`, `Vertex 1
         #'   Z-coordinate`) in class `BuildiBuildingSurface:Detailed` will be
         #'   merged into one name `Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd`.
-        #' * When `group_ext` is `2L`, the extensible group indicator in field
+        #' * When `group_ext` is `"index"`, the extensible group indicator in field
         #'   names will be removed. Take the same example as above, the
         #'   resulting field names will be `Vertex X-coordinate`, `Vertex
         #'   Y-coordinate`, and `Vertex Z-coordinate`.
@@ -1069,18 +1069,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'        class that objects belong to will be returned. Default:
         #'        `FALSE`.
         #'
-        #' @param group_ext If greater than `0L`, `value` column in returned
+        #' @param group_ext Should be one of `"none"`, `"group"` or `"index"`.
+        #'        If not `"none"`, `value` column in returned
         #'        [data.table::data.table()] will be converted into a list.
-        #'        If `1L`, values from extensible fields will be grouped by the
+        #'        If `"group"`, values from extensible fields will be grouped by the
         #'        extensible group they belong to. For example, coordinate
         #'        values of each vertex in class `BuildingSurface:Detailed` will
-        #'        be put into a list. If `2L`, values from extensible fields
+        #'        be put into a list. If `"index"`, values from extensible fields
         #'        will be grouped by the extensible field indice they belong to.
         #'        For example, coordinate values of all x coordinates will be
-        #'        put into a list. If `0L`, nothing special will be done.
-        #'        Default: `0L`.
+        #'        put into a list. If `"none"`, nothing special will be done.
+        #'        Default: `"none"`.
         #'
-        #' @return A [data.table][data.table::data.table()] with 6 columns.
+        #' @return A [data.table][data.table::data.table()] with 6 columns (if
+        #' `wide` is `FALSE`) or at least 6 columns (if `wide` is `TRUE`).
         #'
         #' @examples
         #' \dontrun{
@@ -1099,23 +1101,23 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' # group extensible by extensible group number
         #' surf <- idf$BuildingSurface_Detailed[["Zn001:Roof001"]]
-        #' surf$to_table(group_ext = 1)
+        #' surf$to_table(group_ext = "group")
         #'
         #' # group extensible by extensible group number and convert into a wide table
-        #' surf$to_table(group_ext = 1, wide = TRUE)
+        #' surf$to_table(group_ext = "group", wide = TRUE)
         #'
         #' # group extensible by extensible field index
-        #' surf$to_table(group_ext = 2)
+        #' surf$to_table(group_ext = "index")
         #'
         #' # group extensible by extensible field index and convert into a wide table
-        #' surf$to_table(group_ext = 2, wide = TRUE)
+        #' surf$to_table(group_ext = "index", wide = TRUE)
         #'
         #' # when grouping extensible, 'string_value' and 'unit' still take effect
-        #' surf$to_table(group_ext = 2, wide = TRUE, string_value = FALSE, unit = TRUE)
+        #' surf$to_table(group_ext = "index", wide = TRUE, string_value = FALSE, unit = TRUE)
         #' }
         #'
-        to_table = function (string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE, group_ext = 0L)
-            idfobj_to_table(self, private, all, string_value, unit, wide, group_ext),
+        to_table = function (string_value = TRUE, unit = TRUE, wide = FALSE, all = FALSE, group_ext = c("none", "group", "index"))
+            idfobj_to_table(self, private, all, string_value, unit, wide, match.arg(group_ext)),
         # }}}
 
         # to_string {{{
@@ -1727,10 +1729,10 @@ idfobj_has_ref_node <- function (self, private, which = NULL, class = NULL) {
 # }}}
 # idfobj_to_table {{{
 idfobj_to_table <- function (self, private, all = FALSE, string_value = TRUE,
-                             unit = TRUE, wide = FALSE, group_ext = 0L) {
+                             unit = TRUE, wide = FALSE, group_ext = c("none", "group", "index")) {
     get_idfobj_table(private$idd_env(), private$idf_env(), private$m_object_id,
         all = all, unit = unit, wide = wide, string_value = string_value,
-        group_ext = group_ext
+        group_ext = match.arg(group_ext)
     )
 }
 # }}}

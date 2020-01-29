@@ -11,12 +11,12 @@
   `/usr/local` ([NREL/EnergyPlus#7256](https://github.com/NREL/EnergyPlus/issues/7256))
   (#193).
 * A new parameter `group_ext` has been added in `Idf$to_table()` and
-  `IdfObject$to_table()`, with default value being `0L`.
-  If `1L`, values from extensible fields will be grouped by the
+  `IdfObject$to_table()`, with default value being `"none"`.
+  If `"group"`, values from extensible fields will be grouped by the
   extensible group they belong to. For example, coordinate
   values of each vertex in class `BuildingSurface:Detailed` will
-  be put into a list. If `2L`, values from extensible fields
-  will be grouped by the extensible field indice they belong to.
+  be put into a list. If `"index"`, values from extensible fields
+  will be grouped by the extensible field indices they belong to.
   For example, coordinate values of all x coordinates will be
   put into a list (#74).
 
