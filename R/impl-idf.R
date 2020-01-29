@@ -3391,8 +3391,8 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 # get_idf_table {{{
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
-                           align = FALSE, all = FALSE, group_ext = 0L) {
-    assert(is_count(group_ext, TRUE), in_range(group_ext, ranger(0L, TRUE, 2L, TRUE)))
+                           align = FALSE, all = FALSE, group_ext = c("none", "group", "index")) {
+    group_ext <- match.arg(group_ext)
 
     cols <- c("object_id", "object_name", "class_name",
               "field_index", "field_name",
@@ -3433,17 +3433,17 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
         }
     }
 
-    if (group_ext > 0L) {
+    if (group_ext != "none") {
         non_ext <- val[extensible_group == 0L][, `:=`(value = as.list(value))]
 
-        if (group_ext == 1L) {
+        if (group_ext == "group") {
             ext <- val[extensible_group > 0L][,
                 list(index = NA_integer_,
                      field = paste(abbreviate(field, 10), collapse = "|"),
                      value = list(value)),
                 by = c("rleid", "id", "name", "class", "extensible_group")
             ]
-        } else if (group_ext == 2L) {
+        } else if (group_ext == "index") {
             fun <- if (string_value) function (x) unlist(x, FALSE, FALSE) else function (x) do.call(c, x)
             ext <- val[extensible_group > 0L][,
                 extensible_group := data.table::rowid(rleid, id, extensible_group)][,
@@ -3480,7 +3480,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
             set(val, NULL, "rleid", NULL)
 
             cols <- setdiff(names(val), c("id", "name", "class"))
-            if (group_ext == 0L) cols_ext <- character()
+            if (group_ext == "none") cols_ext <- character()
             if (!unit) {
                 val[, c(setdiff(cols, cols_ext)) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE),
                     .SDcols = setdiff(cols, cols_ext)]

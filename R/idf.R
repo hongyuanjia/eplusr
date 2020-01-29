@@ -1945,21 +1945,21 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' * `index`: Integer type. Field indexes.
         #' * `field`: Character type. Field names.
         #' * `value`: Character type if `string_value` is `TRUE` or list type if
-        #'   `string_value` is `FALSE` or `group_ext` > `0`. Field values.
+        #'   `string_value` is `FALSE` or `group_ext` is not `"none"`. Field values.
         #'
-        #' Note that when `group_ext` > `0`, `index` and `field` values will not
-        #' match the original field indices and names. In this case, `index`
-        #' will only indicate the indices of sequences. For `field` column,
-        #' specifically:
+        #' Note that when `group_ext` is not `"none"`, `index` and `field`
+        #' values will not match the original field indices and names. In this
+        #' case, `index` will only indicate the indices of sequences. For
+        #' `field` column, specifically:
         #'
-        #' * When `group_ext` is `1L`, each field name in a extensible group
+        #' * When `group_ext` is `"group"`, each field name in a extensible group
         #'   will be abbreviated using [abbreviate()] with `minlength` being
         #'   `10L` and all abbreviated names will be separated by `|` and
         #'   combined together. For example, field names in the extensible group
         #'   (`Vertex 1 X-coordinate`, `Vertex 1 Y-coordinate`, `Vertex 1
         #'   Z-coordinate`) in class `BuildiBuildingSurface:Detailed` will be
         #'   merged into one name `Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd`.
-        #' * When `group_ext` is `2L`, the extensible group indicator in field
+        #' * When `group_ext` is `"index"`, the extensible group indicator in field
         #'   names will be removed. Take the same example as above, the
         #'   resulting field names will be `Vertex X-coordinate`, `Vertex
         #'   Y-coordinate`, and `Vertex Z-coordinate`.
@@ -1992,18 +1992,20 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param all If `TRUE`, all available fields defined in IDD for the
         #'        class that objects belong to will be returned. Default:
         #'        `FALSE`.
-        #' @param group_ext If greater than `0L`, `value` column in returned
+        #' @param group_ext Should be one of `"none"`, `"group"` or `"index"`.
+        #'        If not `"none"`, `value` column in returned
         #'        [data.table::data.table()] will be converted into a list.
-        #'        If `1L`, values from extensible fields will be grouped by the
+        #'        If `"group"`, values from extensible fields will be grouped by the
         #'        extensible group they belong to. For example, coordinate
         #'        values of each vertex in class `BuildingSurface:Detailed` will
-        #'        be put into a list. If `2L`, values from extensible fields
+        #'        be put into a list. If `"index"`, values from extensible fields
         #'        will be grouped by the extensible field indice they belong to.
         #'        For example, coordinate values of all x coordinates will be
-        #'        put into a list. If `0L`, nothing special will be done.
-        #'        Default: `0L`.
+        #'        put into a list. If `"none"`, nothing special will be done.
+        #'        Default: `"none"`.
         #'
-        #' @return A [data.table][data.table::data.table()] with 6 columns.
+        #' @return A [data.table][data.table::data.table()] with 6 columns (if
+        #' `wide` is `FALSE`) or at least 6 columns (if `wide` is `TRUE`).
         #'
         #' @examples
         #' \dontrun{
@@ -2035,27 +2037,27 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$to_table(class = "OtherEquipment", wide = TRUE, string_value = FALSE)
         #'
         #' # group extensible by extensible group number
-        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = 1)
+        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "group")
         #'
         #' # group extensible by extensible group number and convert into a wide table
-        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = 1, wide = TRUE)
+        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "group", wide = TRUE)
         #'
         #' # group extensible by extensible field index
-        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = 2)
+        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index")
         #'
         #' # group extensible by extensible field index and convert into a wide table
-        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = 2, wide = TRUE)
+        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index", wide = TRUE)
         #'
         #' # when grouping extensible, 'string_value' and 'unit' still take effect
-        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = 2,
+        #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
         #'     wide = TRUE, string_value = FALSE, unit = TRUE
         #' )
         #' }
         #'
         to_table = function (which = NULL, class = NULL, string_value = TRUE,
-                             unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = 0L)
+                             unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"))
             idf_to_table(self, private, which = which, class = class,
-                string_value = string_value, unit = unit, wide = wide, align = align, all = all, group_ext = group_ext),
+                string_value = string_value, unit = unit, wide = wide, align = align, all = all, group_ext = match.arg(group_ext)),
         # }}}
 
         # is_unsaved {{{
@@ -2880,7 +2882,7 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = 0L) {
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index")) {
     get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide, align, all, group_ext)
 }
 # }}}

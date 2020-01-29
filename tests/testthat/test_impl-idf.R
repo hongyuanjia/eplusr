@@ -1081,7 +1081,7 @@ test_that("TO_TABLE", {
             "Visible Absorptance" = 0.65
         ), tolerance = 1e-5
     )
-    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE, unit = TRUE, wide = TRUE, group_ext = 1),
+    expect_equivalent(get_idf_table(idd_env, idf_env, "Material", string_value = FALSE, unit = TRUE, wide = TRUE, group_ext = "group"),
         data.table(id = 14L, name = "C5 - 4 IN HW CONCRETE", class = "Material",
             "Name" = "C5 - 4 IN HW CONCRETE",
             "Roughness" = "MediumRough",

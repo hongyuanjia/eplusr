@@ -374,7 +374,7 @@ test_that("Idf class", {
         )
     )
     expect_equal(
-        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = 1),
+        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             index = 1:15,
             field = c(
@@ -414,7 +414,7 @@ test_that("Idf class", {
         )
     )
     expect_equal(
-        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = 2),
+        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             index = 1:13,
             field = c(
@@ -450,7 +450,7 @@ test_that("Idf class", {
         )
     )
     expect_equivalent(tolerance = 1e-5,
-        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 1),
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "group"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             index = 1:15,
             field = c(
@@ -490,7 +490,7 @@ test_that("Idf class", {
         )
     )
     expect_equivalent(tolerance = 1e-5,
-        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 2),
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "index"),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             index = 1:13,
             field = c(
@@ -526,7 +526,7 @@ test_that("Idf class", {
         )
     )
     expect_equivalent(tolerance = 1e-5,
-        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 1, wide = TRUE),
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "group", wide = TRUE),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             "Name" = "WALL-1PF",
             "Surface Type" = "WALL",
@@ -546,7 +546,7 @@ test_that("Idf class", {
         )
     )
     expect_equivalent(tolerance = 1e-5,
-        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 2, wide = TRUE),
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = "index", wide = TRUE),
         data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
             "Name" = "WALL-1PF",
             "Surface Type" = "WALL",
