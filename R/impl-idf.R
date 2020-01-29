@@ -3391,13 +3391,16 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 # get_idf_table {{{
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
-                           align = FALSE, all = FALSE) {
+                           align = FALSE, all = FALSE, group_ext = 0L) {
+    assert(is_count(group_ext, TRUE), in_range(group_ext, ranger(0L, TRUE, 2L, TRUE)))
+
     cols <- c("object_id", "object_name", "class_name",
-              "field_index", "field_name", "units", "ip_units", "type_enum",
+              "field_index", "field_name",
+              "units", "ip_units", "type_enum", "extensible_group",
               "value_chr", "value_num")
 
     val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum"),
+        property = c("units", "ip_units", "type_enum", "extensible_group"),
         align = align, complete = TRUE, all = all, ignore_case = TRUE)[
         , .SD, .SDcols = c("rleid", cols)]
 
@@ -3419,16 +3422,8 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
         c("id", "name", "class", "index", "field"))
 
     if (string_value) {
-        if (wide) {
-            res <- setcolorder(
-                dcast(val, rleid + id + name + class ~ field, value.var = "value_chr"),
-                c("id", "name", "class", unique(val$field))
-            )
-            set(res, NULL, "rleid", NULL)[]
-        } else {
-            setnames(val, "value_chr", "value")
-            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
-        }
+        set(val, NULL, c("units", "ip_units", "type_enum", "value_num"), NULL)
+        setnames(val, "value_chr", "value")
     } else {
         lst <- get_value_list(val, unit = unit)
         if (nrow(val) == 1L) {
@@ -3436,7 +3431,47 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
         } else {
             set(val, NULL, "value", lst)
         }
+    }
 
+    if (group_ext > 0L) {
+        non_ext <- val[extensible_group == 0L][, `:=`(value = as.list(value))]
+
+        if (group_ext == 1L) {
+            ext <- val[extensible_group > 0L][,
+                list(index = NA_integer_,
+                     field = paste(abbreviate(field, 10), collapse = "|"),
+                     value = list(value)),
+                by = c("rleid", "id", "name", "class", "extensible_group")
+            ]
+        } else if (group_ext == 2L) {
+            fun <- if (string_value) function (x) unlist(x, FALSE, FALSE) else function (x) do.call(c, x)
+            ext <- val[extensible_group > 0L][,
+                extensible_group := data.table::rowid(rleid, id, extensible_group)][,
+                list(index = NA_integer_, field = field[1L], value = list(fun(value))),
+                by = c("rleid", "id", "name", "class", "extensible_group")][,
+                `:=`(field = stri_replace_first_regex(field, "(?<=(#|A|N| ))\\d+ ", ""))
+            ]
+        }
+
+        val <- rbindlist(list(non_ext[, .SD, .SDcols = names(ext)], ext))
+        setorderv(val, c("rleid", "id"))
+        set(val, NULL, "index", rowidv(val, c("rleid", "id")))
+
+        # store extensible names
+        cols_ext <- unique(ext$field)
+    }
+
+    if (string_value) {
+        if (wide) {
+            res <- setcolorder(
+                dcast(val, rleid + id + name + class ~ field, value.var = "value"),
+                c("id", "name", "class", unique(val$field))
+            )
+            set(res, NULL, "rleid", NULL)[]
+        } else {
+            val[, .SD, .SDcols = c("id", "name", "class", "index", "field", "value")]
+        }
+    } else {
         if (wide) {
             val <- setcolorder(
                 dcast(val, rleid + id + name + class ~ field, value.var = "value", fill = NA),
@@ -3445,15 +3480,19 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
             set(val, NULL, "rleid", NULL)
 
             cols <- setdiff(names(val), c("id", "name", "class"))
+            if (group_ext == 0L) cols_ext <- character()
             if (!unit) {
-                val[, c(cols) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE), .SDcols = cols]
+                val[, c(setdiff(cols, cols_ext)) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE),
+                    .SDcols = setdiff(cols, cols_ext)]
             } else {
                 # get unit attributes
                 unit <- val[, lapply(.SD, function (x) list(attr(x[[1]], "units"))), .SDcols = cols]
 
-                val[, c(cols) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE), .SDcols = cols]
+                val[, c(setdiff(cols, cols_ext)) := lapply(.SD, unlist, recursive = FALSE, use.names = FALSE),
+                    .SDcols = setdiff(cols, cols_ext)]
 
-                for (nm in names(unit)) {
+                # only need to handle non-extensible groups
+                for (nm in setdiff(names(unit), cols_ext)) {
                     if (!is.null(unit[[nm]][[1L]])) {
                         set(val, NULL, nm, setattr(setattr(val[[nm]], "units", unit[[nm]][[1L]]), "class", "units"))
                     }

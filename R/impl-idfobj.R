@@ -274,9 +274,9 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
 
 # get_idfobj_table {{{
 get_idfobj_table <- function (idd_env, idf_env, object_id, all = FALSE,
-                              unit = TRUE, wide = FALSE, string_value = TRUE) {
+                              unit = TRUE, wide = FALSE, string_value = TRUE, group_ext = 0L) {
     get_idf_table(idd_env, idf_env, NULL, object_id, all = all, unit = unit,
-        wide = wide, string_value = string_value
+        wide = wide, string_value = string_value, group_ext = group_ext
     )
 }
 # }}}

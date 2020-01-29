@@ -367,10 +367,200 @@ test_that("Idf class", {
         idf$to_table(1, unit = TRUE, string_value = FALSE),
         data.table(id = 1L, name = "WD01", class = "Material", index = 1:9,
             field = idf$definition("Material")$field_name(),
-            value = list("WD01", "MediumSmooth", units::set_units(0.0191, m),
-                units::set_units(0.115, W/K/m), units::set_units(513, kg/m^3),
-                units::set_units(1381, J/K/kg), 0.9, 0.78, 0.78
+            value = list("WD01", "MediumSmooth", set_units(0.0191, m),
+                set_units(0.115, W/K/m), set_units(513, kg/m^3),
+                set_units(1381, J/K/kg), 0.9, 0.78, 0.78
             )
+        )
+    )
+    expect_equal(
+        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = 1),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            index = 1:15,
+            field = c(
+                "Name",
+                "Surface Type",
+                "Construction Name",
+                "Zone Name",
+                "Outside Boundary Condition",
+                "Outside Boundary Condition Object",
+                "Sun Exposure",
+                "Wind Exposure",
+                "View Factor to Ground",
+                "Number of Vertices",
+                "Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd",
+                "Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd",
+                "Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd",
+                "Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd",
+                "Vrtx5X-crd|Vrtx5Y-crd|Vrtx5Z-crd"
+            ),
+            value = list(
+                "WALL-1PF",
+                "WALL",
+                "WALL-1",
+                "PLENUM-1",
+                "Outdoors",
+                NA_character_,
+                "SunExposed",
+                "WindExposed",
+                "0.5",
+                "4",
+                c("0", "0", "3"),
+                c("0", "0", "2.4"),
+                c("30.5", "0", "2.4"),
+                c("30.5", "0", "3"),
+                rep(NA_character_, 3L)
+            )
+        )
+    )
+    expect_equal(
+        idf$to_table(3, unit = TRUE, string_value = TRUE, group_ext = 2),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            index = 1:13,
+            field = c(
+                "Name",
+                "Surface Type",
+                "Construction Name",
+                "Zone Name",
+                "Outside Boundary Condition",
+                "Outside Boundary Condition Object",
+                "Sun Exposure",
+                "Wind Exposure",
+                "View Factor to Ground",
+                "Number of Vertices",
+                "Vertex X-coordinate",
+                "Vertex Y-coordinate",
+                "Vertex Z-coordinate"
+            ),
+            value = list(
+                "WALL-1PF",
+                "WALL",
+                "WALL-1",
+                "PLENUM-1",
+                "Outdoors",
+                NA_character_,
+                "SunExposed",
+                "WindExposed",
+                "0.5",
+                "4",
+                c("0", "0", "30.5", "30.5", NA_character_),
+                c("0", "0", "0", "0", NA_character_),
+                c("3", "2.4", "2.4", "3", NA_character_)
+            )
+        )
+    )
+    expect_equivalent(tolerance = 1e-5,
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 1),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            index = 1:15,
+            field = c(
+                "Name",
+                "Surface Type",
+                "Construction Name",
+                "Zone Name",
+                "Outside Boundary Condition",
+                "Outside Boundary Condition Object",
+                "Sun Exposure",
+                "Wind Exposure",
+                "View Factor to Ground",
+                "Number of Vertices",
+                "Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd",
+                "Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd",
+                "Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd",
+                "Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd",
+                "Vrtx5X-crd|Vrtx5Y-crd|Vrtx5Z-crd"
+            ),
+            value = list(
+                "WALL-1PF",
+                "WALL",
+                "WALL-1",
+                "PLENUM-1",
+                "Outdoors",
+                NA_character_,
+                "SunExposed",
+                "WindExposed",
+                0.5,
+                4,
+                list(set_units(0., "m"), set_units(0., "m"), set_units(3., "m")),
+                list(set_units(0., "m"), set_units(0., "m"), set_units(2.4, "m")),
+                list(set_units(30.5, "m"), set_units(0., "m"), set_units(2.4, "m")),
+                list(set_units(30.5, "m"), set_units(0., "m"), set_units(3., "m")),
+                rep(list(set_units(NA_real_, "m")), 3L)
+            )
+        )
+    )
+    expect_equivalent(tolerance = 1e-5,
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 2),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            index = 1:13,
+            field = c(
+                "Name",
+                "Surface Type",
+                "Construction Name",
+                "Zone Name",
+                "Outside Boundary Condition",
+                "Outside Boundary Condition Object",
+                "Sun Exposure",
+                "Wind Exposure",
+                "View Factor to Ground",
+                "Number of Vertices",
+                "Vertex X-coordinate",
+                "Vertex Y-coordinate",
+                "Vertex Z-coordinate"
+            ),
+            value = list(
+                "WALL-1PF",
+                "WALL",
+                "WALL-1",
+                "PLENUM-1",
+                "Outdoors",
+                NA_character_,
+                "SunExposed",
+                "WindExposed",
+                0.5,
+                4,
+                set_units(c(0., 0., 30.5, 30.5, NA_real_), "m"),
+                set_units(c(0., 0., 0., 0., NA_real_), "m"),
+                set_units(c(3., 2.4, 2.4, 3., NA_real_), "m")
+            )
+        )
+    )
+    expect_equivalent(tolerance = 1e-5,
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 1, wide = TRUE),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            "Name" = "WALL-1PF",
+            "Surface Type" = "WALL",
+            "Construction Name" = "WALL-1",
+            "Zone Name" = "PLENUM-1",
+            "Outside Boundary Condition" = "Outdoors",
+            "Outside Boundary Condition Object" = NA_character_,
+            "Sun Exposure" = "SunExposed",
+            "Wind Exposure" = "WindExposed",
+            "View Factor to Ground" = 0.5,
+            "Number of Vertices" = 4.,
+            "Vrtx1X-crd|Vrtx1Y-crd|Vrtx1Z-crd" = list(list(set_units(0., "m"), set_units(0., "m"), set_units(3., "m"))),
+            "Vrtx2X-crd|Vrtx2Y-crd|Vrtx2Z-crd" = list(list(set_units(0., "m"), set_units(0., "m"), set_units(2.4, "m"))),
+            "Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd" = list(list(set_units(30.5, "m"), set_units(0., "m"), set_units(2.4, "m"))),
+            "Vrtx4X-crd|Vrtx4Y-crd|Vrtx4Z-crd" = list(list(set_units(30.5, "m"), set_units(0., "m"), set_units(3., "m"))),
+            "Vrtx5X-crd|Vrtx5Y-crd|Vrtx5Z-crd" = list(rep(list(set_units(NA_real_, "m")), 3L))
+        )
+    )
+    expect_equivalent(tolerance = 1e-5,
+        idf$to_table(3, unit = TRUE, string_value = FALSE, group_ext = 2, wide = TRUE),
+        data.table(id = 3L, name = "WALL-1PF", class = "BuildingSurface:Detailed",
+            "Name" = "WALL-1PF",
+            "Surface Type" = "WALL",
+            "Construction Name" = "WALL-1",
+            "Zone Name" = "PLENUM-1",
+            "Outside Boundary Condition" = "Outdoors",
+            "Outside Boundary Condition Object" = NA_character_,
+            "Sun Exposure" = "SunExposed",
+            "Wind Exposure" = "WindExposed",
+            "View Factor to Ground" = 0.5,
+            "Number of Vertices" = 4.,
+            "Vertex X-coordinate" = list(set_units(c(0., 0., 30.5, 30.5, NA_real_), "m")),
+            "Vertex Y-coordinate" = list(set_units(c(0., 0., 0., 0., NA_real_), "m")),
+            "Vertex Z-coordinate" = list(set_units(c(3., 2.4, 2.4, 3., NA_real_), "m"))
         )
     )
     # }}}
