@@ -71,6 +71,8 @@ addons:
   apt:
     packages:
       - libudunits2-dev
+      - mesa-common-dev
+      - freeglut3-dev
   homebrew:
     packages:
       - udunits
