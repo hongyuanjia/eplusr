@@ -28,6 +28,7 @@ Imports:
     processx (>= 3.2.0),
     progress (>= 1.2.0),
     R6,
+    rgl,
     RSQLite,
     stringi,
     units
@@ -35,7 +36,6 @@ Suggests:
     covr,
     knitr,
     pkgdown,
-    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: 
