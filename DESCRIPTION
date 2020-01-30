@@ -35,6 +35,7 @@ Suggests:
     covr,
     knitr,
     pkgdown,
+    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -77,4 +78,5 @@ Collate:
     'transition.R'
     'units.R'
     'validate.R'
+    'view.R'
     'zzz.R'
