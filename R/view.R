@@ -34,7 +34,7 @@ plot_idf <- function (idf) {
         shade <- rbindlist(lapply(cls_shade, extract_surfaces_table, idf = idf, type = "shading"))
     }
 
-    dt <- rbindlist(list(surf, win, shade), use.names = TRUE)
+    dt <- rbindlist(list(surf, win, shade), fill = TRUE)
 
     if (!nrow(dt)) {
         message("No supported surfaces are found.")
@@ -50,16 +50,25 @@ extract_surfaces_table <- function (idf, class, type) {
     dt <- idf$to_table(class = class, wide = TRUE, string_value = FALSE, align = TRUE)
     if (!has_name(dt, "Surface Type")) set(dt, NULL, "Surface Type", as.character(type))
 
-    dt <- melt.data.table(dt,
-        id.vars = c("id", "name", "Surface Type"),
+    # extra columns
+    ext <- c("Construction Name", "Zone Name", "Outside Boundary Condition", "Outside Boundary Condition Object")
+    has_ext <- has_name(dt, ext)
+
+    dt_m <- melt.data.table(dt,
+        id.vars = c("id", "name", "Surface Type", ext[has_ext]),
         measure.vars = patterns("X-coordinate", "Y-coordinate", "Z-coordinate")
     )
-    setnames(dt, "Surface Type", "type")
-    setnames(dt, paste0("value", 1:3), c("x", "y", "z"))
-    set(dt, NULL, "variable", NULL)
-    set(dt, NULL, "type", stri_trans_tolower(dt$type))
-    setorderv(dt, "id")
-    na.omit(dt, cols = c("x", "y", "z"))
+    setnames(dt_m, "Surface Type", "type")
+    setnames(dt_m, paste0("value", 1:3), c("x", "y", "z"))
+    set(dt_m, NULL, "variable", NULL)
+    set(dt_m, NULL, "type", stri_trans_tolower(dt_m$type))
+    setorderv(dt_m, "id")
+
+    if (any(has_ext)) {
+        setnames(dt_m, ext[has_ext], c("const", "zone", "boundary", "boundary_obj")[has_ext])
+    }
+
+    na.omit(dt_m, cols = c("x", "y", "z"))
 }
 # }}}
 
@@ -82,29 +91,64 @@ map_color <- function (dt) {
 
 #' @importFrom rgl rgl.open rgl.quads
 # plot_surface {{{
-plot_surface <- function (dt, ...) {
+plot_surface <- function (dt, new = FALSE, ...) {
     map_color(dt)
 
-    M <- as.matrix(dt[, .SD, .SDcols = c("x", "y", "z")])
-    dimnames(M)[[1L]] <- dt$name
-    color <- as.matrix(dt[, .SD, .SDcols = rep("color", 3L)])
+    pt_num <- dt[, .N, by = .(id, name)]
 
-    rgl_init()
+    # for triangles
+    dt_tri <- dt[pt_num[J(3L), on = "N", -"N", nomatch = NULL], on = c("id", "name")]
+    # for quadrangles
+    dt_quad <- dt[pt_num[J(4L), on = "N", -"N", nomatch = NULL], on = c("id", "name")]
+    # for polygons
+    dt_poly <- dt[pt_num[!J(c(3L, 4L)), on = "N", -"N"], on = c("id", "name")]
+
+    get_matrix <- function (dt) {
+        M <- as.matrix(dt[, .SD, .SDcols = c("x", "y", "z")])
+        dimnames(M)[[1L]] <- dt$name
+        M
+    }
+
+    get_color <- function(dt) as.matrix(dt[, .SD, .SDcols = rep("color", 3L)])
+
+    plot_type <- function (dt, type = c("tri", "quad", "poly")) {
+        type <- match.arg(type)
+        if (!nrow(dt)) return(NULL)
+        mat <- get_matrix(dt)
+        clr <- get_color(dt)
+
+        rgl_fun <- switch(type,
+            tri = rgl::triangles3d,
+            quad = rgl::quads3d,
+            poly = rgl::polygon3d
+        )
+
+        rgl_fun(mat, color = clr, lit = FALSE)
+        rgl_fun(mat, color = "black", lit = FALSE, front = "lines", back = "lines", lwd = 2.5)
+    }
+
+    rgl_init(new = new)
 
     # Add x, y, and z Axes
     rgl::rgl.lines(c(0, max(dt$x) * 2), c(0, 0), c(0, 0), color = "red", lit = FALSE)
     rgl::rgl.lines(c(0, 0), c(0, max(dt$y) * 2), c(0, 0), color = "green", lit = FALSE)
     rgl::rgl.lines(c(0, 0), c(0, 0), c(0, max(dt$z) * 2), color = "blue", lit = FALSE)
 
-    rgl::rgl.quads(M, color = color, ..., lit = FALSE)
-    rgl::rgl.quads(M, color = "black", ..., lit = FALSE, front = "lines", back = "lines", lwd = 2.5)
+    plot_type(dt_tri, "tri")
+    plot_type(dt_quad, "quad")
+    plot_type(dt_poly, "poly")
 }
 # }}}
 
 #' @importFrom rgl rgl.open par3d rgl.bg rgl.viewpoint
 # rgl_init {{{
-rgl_init <- function () {
-    rgl.open()
+rgl_init <- function (new = FALSE) {
+    if (new) {
+        rgl.open()
+    } else {
+        rgl.clear(type = c("shapes"))
+    }
+
     rgl.viewpoint(0, -60)
 
     cur <- par3d("mouseMode")
