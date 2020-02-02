@@ -62,14 +62,31 @@ extract_idf_surfaces <- function (idf) {
         set(win, NULL, "surface_lower", stri_trans_tolower(win$surface))
         set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
         win[surf, on = "surface_lower",
-            `:=`(surface = i.name, origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
+            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
+                 boundary_obj = i.boundary_obj,
+                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
+
         set(win, NULL, "surface_lower", NULL)
-        set(surf, NULL, "surface_lower", NULL)
     }
 
     if (length(cls_shade <- stri_subset_regex(cls, "Shading.+Detailed"))) {
         shade <- rbindlist(lapply(cls_shade, extract_idf_surface_table, idf = idf, type = "shading"))
+
+        # add zone for zone shading
+        if (!has_name(surf, "surface_lower")) {
+            set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
+        }
+
+        set(shade, NULL, "surface_lower", stri_trans_tolower(shade$surface))
+        shade[surf, on = "surface_lower",
+            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
+                 boundary_obj = i.boundary_obj,
+                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
+
+        set(shade, NULL, "surface_lower", NULL)
     }
+
+    if (has_name(surf, "surface_lower")) set(surf, NULL, "surface_lower", NULL)
 
     dt <- rbindlist(list(surf, win, shade), fill = TRUE)
 
@@ -84,7 +101,7 @@ extract_idf_surfaces <- function (idf) {
     set(dt, NULL, c("origin_x", "origin_y", "origin_z"), NULL)
 
     # rotate if necessary
-    coord <- rgl::rotate3d(as.matrix(dt[, .(x, y, z)]),
+    coord <- rgl::rotate3d(as.matrix(dt[, list(x, y, z)]),
         deg_to_arc(idf$Building$North_Axis), 0, 0, 1)
 
     set(dt, NULL, c("x", "y", "z"), as.data.table(coord))
@@ -99,8 +116,9 @@ extract_idf_surface_table <- function (idf, class, type) {
     if (!has_name(dt, "Surface Type")) set(dt, NULL, "Surface Type", as.character(type))
 
     # extra columns
-    detail <- c("Construction Name", "Building Surface Name", "Zone Name",
-        "Outside Boundary Condition", "Outside Boundary Condition Object")
+    detail <- c("Construction Name",
+        if (stri_startswith_fixed(class, "Shading")) "Base Surface Name" else "Building Surface Name",
+        "Zone Name", "Outside Boundary Condition", "Outside Boundary Condition Object")
     has_detail <- detail %in% names(dt)
 
     dt_m <- melt.data.table(dt,
@@ -114,7 +132,7 @@ extract_idf_surface_table <- function (idf, class, type) {
     setorderv(dt_m, "id")
 
     if (any(!has_detail)) {
-        set(dt_m, NULL,detail[!has_detail], NA_character_)
+        set(dt_m, NULL, detail[!has_detail], NA_character_)
     }
 
     setcolorder(dt_m, c("id", "name", "type", detail))
@@ -148,7 +166,7 @@ map_color <- function (dt) {
 plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE, ...) {
     map_color(dt)
 
-    pt_num <- dt[, .N, by = .(id, name)]
+    pt_num <- dt[, .N, by = c("id", "name")]
 
     # for triangles
     dt_tri <- dt[pt_num[J(3L), on = "N", -"N", nomatch = NULL], on = c("id", "name")]
