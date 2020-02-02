@@ -3,6 +3,8 @@ plot_idf <- function (idf, render_by = c("surface_type", "boundary", "constructi
                       new = TRUE, clear = TRUE, wireframe = FALSE) {
     render_by <- match.arg(render_by)
     dt <- extract_idf_surfaces(idf)
+
+    if (is.null(dt)) return(invisible())
     plot_surface(dt, new = new, clear = clear, wireframe = wireframe)
 }
 # }}}
@@ -20,13 +22,17 @@ extract_idf_surfaces <- function (idf) {
     shade <- data.table()
 
     # zone origins
-    zone <- idf$to_table(class = "Zone", wide = TRUE, all = TRUE, string_value = FALSE)[
-        , .SD, .SDcols = c("name", paste(c("X", "Y", "Z"), "Origin"))]
-    setnames(zone, c("name", "x", "y", "z"))
-    set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
-    zone[J(NA_real_), on = "x", x := 0.0]
-    zone[J(NA_real_), on = "y", y := 0.0]
-    zone[J(NA_real_), on = "z", z := 0.0]
+    if (!idf$is_valid_class("Zone")) {
+        zone <- data.table(name = character(), x = double(), y = double(), z = double(), name_lower = character())
+    } else {
+        zone <- idf$to_table(class = "Zone", wide = TRUE, all = TRUE, string_value = FALSE)[
+            , .SD, .SDcols = c("name", paste(c("X", "Y", "Z"), "Origin"))]
+        setnames(zone, c("name", "x", "y", "z"))
+        set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
+        zone[J(NA_real_), on = "x", x := 0.0]
+        zone[J(NA_real_), on = "y", y := 0.0]
+        zone[J(NA_real_), on = "z", z := 0.0]
+    }
 
     # surfaces
     if ("BuildingSurface:Detailed" %in% cls) {
@@ -52,6 +58,7 @@ extract_idf_surfaces <- function (idf) {
     # add origins
     surf[zone, on = c("zone_lower" = "name_lower"),
         `:=`(zone = i.name, origin_x = i.x, origin_y = i.y, origin_z = i.z)]
+
     set(surf, NULL, "zone_lower", NULL)
 
     # TODO: handle other surfaces
