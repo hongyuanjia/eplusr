@@ -9,6 +9,10 @@ build_args <- c("--force")
 # https://github.com/travis-ci/travis-ci/issues/7875
 if (.Platform$OS.type == "windows" || Sys.getenv("TRAVIS_OS_NAME") == "osx") args <- c("--no-manual", args)
 
+# make rgl works
+get_stage("before_install") %>%
+    add_code_step(options(rgl.useNULL = TRUE))
+
 do_package_checks(args = args, build_args = build_args, codecov = FALSE)
 
 # pkgdown
