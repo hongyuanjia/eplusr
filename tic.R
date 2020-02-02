@@ -11,7 +11,7 @@ if (.Platform$OS.type == "windows" || Sys.getenv("TRAVIS_OS_NAME") == "osx") arg
 
 # make rgl works
 get_stage("before_install") %>%
-    add_code_step(options(rgl.useNULL = TRUE))
+    add_code_step(system('export RGL_USE_NULL="TRUE"'))
 
 do_package_checks(args = args, build_args = build_args, codecov = FALSE)
 
