@@ -1,3 +1,68 @@
+# COLOR_MAP {{{
+# Reference: 'openstudio\openstudiocore\ruby\openstudio\sketchup_plugin\lib\interfaces\MaterialsInterface.rb'
+COLOR_MAP <- list(
+    surface_type = c(
+        undefined = grDevices::rgb(255/255, 255/255, 255/255, 1),
+        normalmaterial = grDevices::rgb(255/255, 255/255, 255/255, 1),
+        normalmaterial_ext = grDevices::rgb(255/255, 255/255, 255/255, 1),
+        normalmaterial_int = grDevices::rgb(255/255, 0/255, 0/255, 1),
+        floor = grDevices::rgb(128/255, 128/255, 128/255, 1),
+        floor_ext = grDevices::rgb(128/255, 128/255, 128/255, 1),
+        floor_int = grDevices::rgb(191/255, 191/255, 191/255, 1),
+        wall = grDevices::rgb(204/255, 178/255, 102/255, 1),
+        wall_ext = grDevices::rgb(204/255, 178/255, 102/255, 1),
+        wall_int = grDevices::rgb(235/255, 226/255, 197/255, 1),
+        roof = grDevices::rgb(153/255, 76/255, 76/255, 1),
+        roof_ext = grDevices::rgb(153/255, 76/255, 76/255, 1),
+        roof_int = grDevices::rgb(202/255, 149/255, 149/255, 1),
+        ceiling = grDevices::rgb(153/255, 76/255, 76/255, 1),
+        ceiling_ext = grDevices::rgb(153/255, 76/255, 76/255, 1),
+        ceiling_int = grDevices::rgb(202/255, 149/255, 149/255, 1),
+        window = grDevices::rgb(102/255, 178/255, 204/255, 0.6),
+        window_ext = grDevices::rgb(102/255, 178/255, 204/255, 0.6),
+        window_int = grDevices::rgb(192/255, 226/255, 235/255, 0.6),
+        door = grDevices::rgb(153/255, 133/255, 76/255, 1),
+        door_ext = grDevices::rgb(153/255, 133/255, 76/255, 1),
+        door_int = grDevices::rgb(202/255, 188/255, 149/255, 1),
+        glassdoor = grDevices::rgb(153/255, 133/255, 76/255, 1),
+        glassdoor_ext = grDevices::rgb(153/255, 133/255, 76/255, 1),
+        glassdoor_int = grDevices::rgb(202/255, 188/255, 149/255, 1),
+        siteshading = grDevices::rgb(75/255, 124/255, 149/255, 1),
+        siteshading_ext = grDevices::rgb(75/255, 124/255, 149/255, 1),
+        siteshading_int = grDevices::rgb(187/255, 209/255, 220/255, 1),
+        buildingshading = grDevices::rgb(113/255, 76/255, 153/255, 1),
+        buildingshading_ext = grDevices::rgb(113/255, 76/255, 153/255, 1),
+        buildingshading_int = grDevices::rgb(216/255, 203/255, 229/255, 1),
+        spaceshading = grDevices::rgb(76/255, 110/255, 178/255, 1),
+        spaceshading_ext = grDevices::rgb(76/255, 110/255, 178/255, 1),
+        spaceshading_int = grDevices::rgb(183/255, 197/255, 224/255, 1),
+        interiorpartitionsurface = grDevices::rgb(158/255, 188/255, 143/255, 1),
+        interiorpartitionsurface_ext = grDevices::rgb(158/255, 188/255, 143/255, 1),
+        interiorpartitionsurface_int = grDevices::rgb(213/255, 226/255, 207/255, 1)
+    ),
+    boundary = c(
+        surface = grDevices::rgb(0/255, 153/255, 0/255),
+        adiabatic = grDevices::rgb(255/255, 0/255, 0/255),
+        zone = grDevices::rgb(255/255, 0/255, 0/255),
+        outdoors = grDevices::rgb(163/255, 204/255, 204/255),
+        outdoors_sun = grDevices::rgb(40/255, 204/255, 204/255),
+        outdoors_wind = grDevices::rgb(9/255, 159/255, 162/255),
+        outdoors_sunwind = grDevices::rgb(68/255, 119/255, 161/255),
+        ground = grDevices::rgb(204/255, 183/255, 122/255),
+        groundfcfactormethod = grDevices::rgb(153/255, 122/255, 30/255),
+        groundslabpreprocessoraverage = grDevices::rgb(255/255, 191/255, 0/255),
+        groundslabpreprocessorcore = grDevices::rgb(255/255, 182/255, 50/255),
+        groundslabpreprocessorperimeter = grDevices::rgb(255/255, 178/255, 101/255),
+        groundbasementpreprocessoraveragewall = grDevices::rgb(204/255, 51/255, 0/255),
+        groundbasementpreprocessoraveragefloor = grDevices::rgb(204/255, 81/255, 40/255),
+        groundbasementpreprocessorupperwall = grDevices::rgb(204/255, 112/255, 81/255),
+        groundbasementpreprocessorlowerwall = grDevices::rgb(204/255, 173/255, 163/255),
+        othersidecoefficients = grDevices::rgb(63/255, 63/255, 63/255),
+        othersideconditionsmodel = grDevices::rgb(153/255, 0/255, 76/255)
+    )
+)
+# }}}
+
 # plot_idf {{{
 plot_idf <- function (idf, render_by = c("surface_type", "boundary", "construction", "zone"),
                       new = TRUE, clear = TRUE, wireframe = FALSE) {
@@ -5,7 +70,7 @@ plot_idf <- function (idf, render_by = c("surface_type", "boundary", "constructi
     dt <- extract_idf_surfaces(idf)
 
     if (is.null(dt)) return(invisible())
-    plot_surface(dt, new = new, clear = clear, wireframe = wireframe)
+    plot_surface(dt, new = new, clear = clear, wireframe = wireframe, render_by = render_by)
 }
 # }}}
 
@@ -150,28 +215,20 @@ extract_idf_surface_table <- function (idf, class, type) {
 # }}}
 
 # map_color {{{
-map_color <- function (dt) {
-    colors <- c(
-        wall = grDevices::rgb(204/255, 178/255, 102/255),
-        floor = grDevices::rgb(128/255, 128/255, 128/255),
-        roof = grDevices::rgb(153/255, 76/255, 76/255),
-        ceiling = grDevices::rgb(153/255, 76/255, 76/255),
-        window = grDevices::rgb(102/255, 178/255, 204/255, 0.6),
-        glassdoor = grDevices::rgb(102/255, 178/255, 204/255, 0.6),
-        shading = grDevices::rgb(113/255, 76/255, 153/255)
-    )
-    cl <- data.table(type = names(colors), color = colors)
+map_color <- function (dt, type = "surface_type") {
+    cl <- data.table(type = names(COLOR_MAP[[type]]), color = COLOR_MAP[[type]])
 
     dt[cl, on = "type", color := i.color]
     dt[, alpha := 1.0]
-    dt[J(c("window", "glassdoor")), on = "type", alpha := 0.6]
+    trans <- paste0(c("window", "glassdoor"), rep(c("", "_int", "_ext"), 2L))
+    dt[J(trans), on = "type", alpha := 0.6]
 }
 # }}}
 
 #' @importFrom rgl rgl.open rgl.quads
 # plot_surface {{{
-plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE, ...) {
-    map_color(dt)
+plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE, render_by, ...) {
+    map_color(dt, type = render_by)
 
     pt_num <- dt[, .N, by = c("id", "name")]
 
