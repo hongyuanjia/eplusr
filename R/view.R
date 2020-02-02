@@ -276,11 +276,10 @@ rgl_init <- function (new = FALSE, clear = TRUE) {
 
     cur <- par3d("mouseMode")
     cur[["wheel"]] <- "push"
-    # cur[["right"]] <- "polar"
     cur[["middle"]] <- "fov"
     par3d("mouseMode" = cur)
-    pan3d(1L)
-    trackball_origin(2L)
+    trackball_origin(1L)
+    pan3d(2L)
 
     rgl.bg(color = "white")
 }
