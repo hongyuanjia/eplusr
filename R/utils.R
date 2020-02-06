@@ -515,7 +515,3 @@ match_in_vec <- function (x, vec, abbr = NULL, label = FALSE) {
     }
 }
 # }}}
-
-# deg_to_arc {{{
-deg_to_arc <- function (x) x / 360 * (2 * pi)
-# }}}

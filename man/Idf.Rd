@@ -825,6 +825,8 @@ Hongyuan Jia
 \item \href{#method-run}{\code{Idf$run()}}
 \item \href{#method-last_job}{\code{Idf$last_job()}}
 \item \href{#method-print}{\code{Idf$print()}}
+\item \href{#method-geometry}{\code{Idf$geometry()}}
+\item \href{#method-view}{\code{Idf$view()}}
 \item \href{#method-clone}{\code{Idf$clone()}}
 }
 }
@@ -3705,6 +3707,22 @@ idf$print("field", order = FALSE)
 }
 \if{html}{\out{</div>}}
 
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-geometry"></a>}}
+\subsection{Method \code{geometry()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$geometry()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-view"></a>}}
+\subsection{Method \code{view()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$view()}\if{html}{\out{</div>}}
 }
 
 }

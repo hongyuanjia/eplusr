@@ -33,9 +33,9 @@ COLOR_MAP <- list(
         buildingshading = grDevices::rgb(113/255, 76/255, 153/255, 1),
         buildingshading_ext = grDevices::rgb(113/255, 76/255, 153/255, 1),
         buildingshading_int = grDevices::rgb(216/255, 203/255, 229/255, 1),
-        spaceshading = grDevices::rgb(76/255, 110/255, 178/255, 1),
-        spaceshading_ext = grDevices::rgb(76/255, 110/255, 178/255, 1),
-        spaceshading_int = grDevices::rgb(183/255, 197/255, 224/255, 1),
+        zoneshading = grDevices::rgb(76/255, 110/255, 178/255, 1),
+        zoneshading_ext = grDevices::rgb(76/255, 110/255, 178/255, 1),
+        zoneshading_int = grDevices::rgb(183/255, 197/255, 224/255, 1),
         interiorpartitionsurface = grDevices::rgb(158/255, 188/255, 143/255, 1),
         interiorpartitionsurface_ext = grDevices::rgb(158/255, 188/255, 143/255, 1),
         interiorpartitionsurface_int = grDevices::rgb(213/255, 226/255, 207/255, 1)
@@ -74,146 +74,6 @@ plot_idf <- function (idf, render_by = c("surface_type", "boundary", "constructi
 }
 # }}}
 
-# extract_idf_surfaces {{{
-extract_idf_surfaces <- function (idf) {
-    cls <- idf$class_name(by_group = TRUE)["Thermal Zones and Surfaces"][[1L]]
-    if (is.null(cls)) {
-        message("Current IDF does not contain any supported surfaces.")
-        return(invisible())
-    }
-
-    surf <- data.table()
-    win <- data.table()
-    shade <- data.table()
-
-    # zone origins
-    if (!idf$is_valid_class("Zone")) {
-        zone <- data.table(name = character(), x = double(), y = double(), z = double(), name_lower = character())
-    } else {
-        zone <- idf$to_table(class = "Zone", wide = TRUE, all = TRUE, string_value = FALSE)[
-            , .SD, .SDcols = c("name", paste(c("X", "Y", "Z"), "Origin"))]
-        setnames(zone, c("name", "x", "y", "z"))
-        set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
-        zone[J(NA_real_), on = "x", x := 0.0]
-        zone[J(NA_real_), on = "y", y := 0.0]
-        zone[J(NA_real_), on = "z", z := 0.0]
-    }
-
-    # surfaces
-    if ("BuildingSurface:Detailed" %in% cls) {
-        surf <- extract_idf_surface_table(idf, "BuildingSurface:Detailed")
-    }
-
-    # other detailed surface specs
-    cls_surf <- stri_subset_regex(cls, "(Wall|Roof|Floor|Ceiling).+Detailed")
-    if (length(cls_surf)) {
-        type <- stri_extract_first_regex(cls_surf, "(Wall|Roof|Floor)")
-        surf_sep <- mapply(extract_idf_surface_table, cls_surf, type,
-            MoreArgs = list(idf = idf), SIMPLIFY = FALSE, USE.NAMES = FALSE
-
-        )
-
-        # combine
-        surf <- rbindlist(list(surf, surf_sep))
-    }
-
-    # update zone name
-    set(surf, NULL, "zone_lower", stri_trans_tolower(surf$zone))
-
-    # add origins
-    surf[zone, on = c("zone_lower" = "name_lower"),
-        `:=`(zone = i.name, origin_x = i.x, origin_y = i.y, origin_z = i.z)]
-
-    set(surf, NULL, "zone_lower", NULL)
-
-    # TODO: handle other surfaces
-
-    if ("FenestrationSurface:Detailed" %in% cls) {
-        win <- extract_idf_surface_table(idf, "FenestrationSurface:Detailed")
-        # add zone
-        set(win, NULL, "surface_lower", stri_trans_tolower(win$surface))
-        set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
-        win[surf, on = "surface_lower",
-            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
-                 boundary_obj = i.boundary_obj,
-                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
-
-        set(win, NULL, "surface_lower", NULL)
-    }
-
-    if (length(cls_shade <- stri_subset_regex(cls, "Shading.+Detailed"))) {
-        shade <- rbindlist(lapply(cls_shade, extract_idf_surface_table, idf = idf, type = "shading"))
-
-        # add zone for zone shading
-        if (!has_name(surf, "surface_lower")) {
-            set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
-        }
-
-        set(shade, NULL, "surface_lower", stri_trans_tolower(shade$surface))
-        shade[surf, on = "surface_lower",
-            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
-                 boundary_obj = i.boundary_obj,
-                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
-
-        set(shade, NULL, "surface_lower", NULL)
-    }
-
-    if (has_name(surf, "surface_lower")) set(surf, NULL, "surface_lower", NULL)
-
-    dt <- rbindlist(list(surf, win, shade), fill = TRUE)
-
-    if (!nrow(dt)) {
-        message("Current IDF does not contain any supported surfaces.")
-        return(invisible())
-    }
-
-    # offset coordinates
-    dt[!J(NA_real_, NA_real_, NA_real_), on = c("origin_x", "origin_y", "origin_z"),
-        `:=`(x = origin_x + x, y = origin_y + y, z = origin_z + z)]
-    set(dt, NULL, c("origin_x", "origin_y", "origin_z"), NULL)
-
-    # rotate if necessary
-    coord <- rgl::rotate3d(as.matrix(dt[, list(x, y, z)]),
-        deg_to_arc(idf$Building$North_Axis), 0, 0, 1)
-
-    set(dt, NULL, c("x", "y", "z"), as.data.table(coord))
-
-    dt
-}
-# }}}
-
-# extract_idf_surface_table {{{
-extract_idf_surface_table <- function (idf, class, type) {
-    dt <- idf$to_table(class = class, wide = TRUE, string_value = FALSE, align = TRUE)
-    if (!has_name(dt, "Surface Type")) set(dt, NULL, "Surface Type", as.character(type))
-
-    # extra columns
-    detail <- c("Construction Name",
-        if (stri_startswith_fixed(class, "Shading")) "Base Surface Name" else "Building Surface Name",
-        "Zone Name", "Outside Boundary Condition", "Outside Boundary Condition Object")
-    has_detail <- detail %in% names(dt)
-
-    dt_m <- melt.data.table(dt,
-        id.vars = c("id", "name", "Surface Type", detail[has_detail]),
-        measure.vars = patterns("X-coordinate", "Y-coordinate", "Z-coordinate")
-    )
-    setnames(dt_m, "Surface Type", "type")
-    setnames(dt_m, paste0("value", 1:3), c("x", "y", "z"))
-    set(dt_m, NULL, "variable", NULL)
-    set(dt_m, NULL, "type", stri_trans_tolower(dt_m$type))
-    setorderv(dt_m, "id")
-
-    if (any(!has_detail)) {
-        set(dt_m, NULL, detail[!has_detail], NA_character_)
-    }
-
-    setcolorder(dt_m, c("id", "name", "type", detail))
-    setnames(dt_m, detail, c("const", "surface", "zone", "boundary", "boundary_obj"))
-
-    na.omit(dt_m, cols = c("x", "y", "z"))
-}
-# }}}
-
 # map_color {{{
 map_color <- function (dt, type = "surface_type") {
     cl <- data.table(type = names(COLOR_MAP[[type]]), color = COLOR_MAP[[type]])
@@ -227,24 +87,20 @@ map_color <- function (dt, type = "surface_type") {
 
 #' @importFrom rgl rgl.open rgl.quads
 # plot_surface {{{
-plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE, render_by, ...) {
+plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE,
+                          render_by = "surface_type", ...) {
     map_color(dt, type = render_by)
 
-    pt_num <- dt[, .N, by = c("id", "name")]
+    pt_num <- dt[, .N, by = c("id")]
 
     # for triangles
-    dt_tri <- dt[pt_num[J(3L), on = "N", -"N", nomatch = NULL], on = c("id", "name")]
+    dt_tri <- dt[pt_num[J(3L), on = "N", -"N", nomatch = NULL], on = c("id")]
     # for quadrangles
-    dt_quad <- dt[pt_num[J(4L), on = "N", -"N", nomatch = NULL], on = c("id", "name")]
+    dt_quad <- dt[pt_num[J(4L), on = "N", -"N", nomatch = NULL], on = c("id")]
     # for polygons
-    dt_poly <- dt[pt_num[!J(c(3L, 4L)), on = "N", -"N"], on = c("id", "name")]
+    dt_poly <- dt[pt_num[!J(c(3L, 4L)), on = "N", -"N"], on = c("id")]
 
-    get_matrix <- function (dt) {
-        M <- as.matrix(dt[, .SD, .SDcols = c("x", "y", "z")])
-        dimnames(M)[[1L]] <- dt$name
-        M
-    }
-
+    get_matrix <- function (dt) as.matrix(dt[, .SD, .SDcols = c("x", "y", "z")])
     get_color <- function(dt) as.matrix(dt[, .SD, .SDcols = rep("color", 3L)])
     get_alpha <- function(dt) as.matrix(dt[, .SD, .SDcols = rep("alpha", 3L)])
 
@@ -266,38 +122,63 @@ plot_surface <- function (dt, new = FALSE, clear = TRUE, wireframe = FALSE, rend
             if (!wireframe) {
                 rgl_fun(mat, color = clr, lit = FALSE, alpha = alp)
             }
-            rgl_fun(mat, color = "black", lit = FALSE, front = "lines", back = "lines", lwd = 2.0)
+            rgl_fun(mat, color = "black", lit = FALSE, front = "lines", back = "lines", lwd = 2.1)
         # for polygons, have to decide which are the two coordinates describe
         # the polygons
         } else {
-            dt_base <- dt[,
+            dt_base <- dt[!J("hole"), on = "category",
                 list(x = length(unique(x)), y = length(unique(y)), z = length(unique(z))),
-                by = c("id", "name")
+                by = "id"
             ]
+                browser()
+
+            # draw frame
+            rgl::polygon3d(get_matrix(sep_surfaces(dt[!J("hole"), on = "category"])),
+                color = "black", lwd = 2.1, fill = FALSE)
 
             plot_poly <- function (dt, dt_base, axis) {
-                dt_axis <-dt_base[J(1L), on = axis, nomatch = NULL]
+                dt_axis <- dt_base[J(1L), on = axis, nomatch = NULL]
                 if (!nrow(dt_axis)) return(NULL)
-                dt <- dt[dt_axis, on = c("id", "name")]
 
-                dt_s <- split(dt, by = c("id", "name"))
+                dt_s <- split(dt[J(dt_axis$id), on = "id"], by = "id")
 
                 base <- switch(axis, x = 1, y = 2, z = 3)
 
                 for (surf in dt_s) {
-                    mat <- get_matrix(surf)
-                    clr <- get_color(surf)
-
-                    # for polygons, no need to draw the frame since it should already
-                    # shown by other simple surfaces
-                    # try(rgl_fun(mat, color = clr, lit = FALSE, coords = setdiff(1:3, base), fill = FALSE), silent = TRUE)
-
-                    tryCatch(
-                        rgl_fun(mat, color = clr, lit = FALSE, coords = setdiff(1:3, base), fill = !wireframe),
-                        error = function (e) {
-                            cat(sprintf("Failed to render surface '%s'\n", surf$name[1]))
+                    # get accumulated vertice number per previous surface
+                    n_vert <- surf[, .N, by = "name"][, cumsum(data.table::shift(N, fill = 0L))]
+                    # get segment point index
+                    surf[, by = "name",
+                        c("segment_pnt1", "segment_pnt2") := {
+                            .i <- seq_len(.N) + n_vert[.GRP]
+                            list(.i, c(.i[-1L], .i[1L]))
                         }
+                    ]
+
+                    # get hole position
+                    # use centroid of the hole
+                    hole <- surf[J("hole"), on = "category", nomatch = NULL,
+                        by = c("name"),
+                        list(x = mean(x), y = mean(y), z = mean(z))
+                    ]
+
+                    # use RTriangle to triangulate polygon surfaces
+                    p <- RTriangle::pslg(
+                        P = surf[, .SD, .SDcols = setdiff(c("x", "y", "z"), axis)],
+                        S = surf[, .SD, .SDcols = paste0("segment_pnt", 1:2)],
+                        H = hole[, .SD, .SDcols = setdiff(c("x", "y", "z"), axis)]
                     )
+                    tri <- RTriangle::triangulate(p)
+
+                    if (!nrow(tri$T)) {
+                        cat(sprintf("Failed to render surface '%s'", surf$name[1]))
+                    }
+
+                    shape <- rgl::tmesh3d(
+                        vertices = t(surf[, list(x, y, z, n = 1L)]),
+                        indices = t(tri$T),
+                    )
+                    rgl::shade3d(shape, color = get_color(surf)[1])
                 }
             }
 

@@ -59,6 +59,7 @@ Collate:
     'epw.R'
     'err.R'
     'format.R'
+    'geometry.R'
     'group.R'
     'impl-idd.R'
     'idd.R'

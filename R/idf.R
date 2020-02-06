@@ -2300,7 +2300,19 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         print = function (zoom = "class", order = TRUE)
-            idf_print(self, private, zoom, order)
+            idf_print(self, private, zoom, order),
+        # }}}
+
+        # geometry {{{
+        geometry = function () {
+            IdfGeometry$new(self)
+        },
+        # }}}
+
+        # view {{{
+        view = function () {
+            IdfGeometry$new(self)$plot()
+        }
         # }}}
         # }}}
 
