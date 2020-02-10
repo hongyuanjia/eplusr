@@ -18,10 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: windows-latest, r: '3.6', AS_CRAN: true}
-          - {os: macOS-latest,   r: '3.6', AS_CRAN: true}
-          - {os: ubuntu-16.04,   r: '3.5', AS_CRAN: true,                      cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
-          - {os: ubuntu-16.04,   r: '3.6', AS_CRAN: true, BUILD_PKGDOWN: true, cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: windows-latest, r: '3.6',     AS_CRAN: true}
+          - {os: macOS-latest,   r: '3.6',     AS_CRAN: true}
+          - {os: ubuntu-16.04,   r: '3.5',     AS_CRAN: true, cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
+          - {os: ubuntu-16.04,   r: 'release', AS_CRAN: true, BUILD_PKGDOWN: true, cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
           - {os: ubuntu-16.04,   r: 'devel', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
 
     env:
