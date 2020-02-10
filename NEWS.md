@@ -29,6 +29,7 @@
 * Fix EnergyPlus installation on macOS (#193).
 * Fix parallel simulations on macOS (#194).
 * Now `eplus_config()` will always return the expanded EnergyPlus path (#196).
+* Fix error in `EplusGroupJob$run()` when custom `dir` is specified (#205).
 
 # eplusr 0.11.0
 
