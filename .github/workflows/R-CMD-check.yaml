@@ -63,7 +63,7 @@ jobs:
         run: Rscript -e "library(remotes)" -e "update(readRDS('depends.Rds'))" -e "remotes::install_cran('rcmdcheck')" -e 'remotes::install_github("jimhester/pkgdown@github-actions-deploy")'
 
       - name: Check
-        run: Rscript -e "args <- if (Sys.getenv('AS_CRAN', FALSE)) c('--as-cran --no-manual') else '--no-manual'; rcmdcheck::rcmdcheck(args = args, error_on = 'warning', check_dir = 'check')"
+        run: Rscript -e "args <- if (Sys.getenv('AS_CRAN', FALSE)) c('--as-cran', '--no-manual') else '--no-manual'; rcmdcheck::rcmdcheck(args = args, error_on = 'warning', check_dir = 'check')"
 
       - name: Upload check results
         if: failure()
