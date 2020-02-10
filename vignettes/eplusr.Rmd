@@ -36,6 +36,9 @@ knitr::knit_hooks$set(output = function(x, options) {
     hook_output(x, options)
 })
 
+# copy figures into temporary directory
+file.copy("../man/figures/class_structure.png", tempdir())
+
 knitr::opts_knit$set(root.dir = tempdir())
 
 options(crayon.enabled = FALSE)
