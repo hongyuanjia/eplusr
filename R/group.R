@@ -821,11 +821,14 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
     }
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
 
-    if (any(!dir.exists(unique(output_dir)))) {
-        create_dir <- dir.create(unique(output_dir), showWarnings = FALSE, recursive = TRUE)
-        abort("error_create_output_dir", paste0("Failed to create output directory: ",
-            collapse(unique(output_dir))[!create_dir])
-        )
+    if (any(!dir.exists(uniq_dir <- unique(output_dir)))) {
+        dir_to_create <- uniq_dir[!dir.exists(uniq_dir)]
+        create_dir <- dir.create(dir_to_create, showWarnings = FALSE, recursive = TRUE)
+        if (any(!create_dir)) {
+            abort("error_create_output_dir", paste0("Failed to create output directory: ",
+                collapse(dir_to_create)[!create_dir])
+            )
+        }
     }
 
     # check if the model is still running
