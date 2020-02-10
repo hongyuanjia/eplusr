@@ -29,6 +29,8 @@
 * Fix EnergyPlus installation on macOS (#193).
 * Fix parallel simulations on macOS (#194).
 * Now `eplus_config()` will always return the expanded EnergyPlus path (#196).
+* Now `group_job()` will return more informative error messages when input
+  contains `Idf` objects that havn't been saved (#204).
 
 # eplusr 0.11.0
 
