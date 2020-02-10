@@ -40,10 +40,6 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
-      - name: Extract branch name
-        shell: bash
-        run: echo "::set-env name=BRANCH_NAME::$(echo ${GITHUB_REF#refs/heads/} | sed 's/\//_/g')"
-
       - name: Query dependencies
         run: >
           Rscript
@@ -88,7 +84,7 @@ jobs:
           path: check
 
       - name: Deploy package site
-        if: matrix.config.BUILD_PKGDOWN && ${BRANCH_NAME} == "master"
+        if: contains(github.ref, 'master') && matrix.config.BUILD_PKGDOWN
         run: |
           pkgdown:::deploy_local(new_process = FALSE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')
         shell: Rscript {0}
