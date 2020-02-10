@@ -37,7 +37,8 @@ knitr::knit_hooks$set(output = function(x, options) {
 })
 
 # copy figures into temporary directory
-file.copy("../man/figures/class_structure.png", tempdir())
+copy <- file.copy("../man/figures/class_structure.png", tempdir())
+if (!copy) stop("Failed to copy figures")
 
 knitr::opts_knit$set(root.dir = tempdir())
 
