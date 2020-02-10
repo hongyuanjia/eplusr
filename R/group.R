@@ -1108,18 +1108,21 @@ get_epgroup_input <- function (idfs, epws) {
     if (is_idf(idfs)) {
         idfs <- list(get_init_idf(idfs))
     } else {
-        idfs <- tryCatch(lapply(idfs, get_init_idf),
-            error_idf_not_local = function (e) e,
-            error_idf_path_not_exist = function (e) e,
-            error_idf_not_saved = function (e) e
-        )
+        init_idf <- function (...) {
+            tryCatch(get_init_idf(...),
+                error_idf_not_local = function (e) e,
+                error_idf_path_not_exist = function (e) e,
+                error_idf_not_saved = function (e) e
+            )
+        }
+        idfs <- lapply(idfs, init_idf)
     }
 
     if (any(!vlapply(idfs, is_idf))) {
         for (err in c("error_idf_not_local", "error_idf_path_not_exist", "error_idf_not_saved")) {
             if (any(invld <- vlapply(idfs, inherits, err))) {
-                abort(err, paste0(conditionMessage(idfs[[which(invld)[[1L]]]]),
-                    " Invalid input index: ", collapse(which(invld))
+                abort(err, paste0("Invalid input index: ", collapse(which(invld)), " --> ",
+                    conditionMessage(idfs[[which(invld)[[1L]]]])
                 ))
             }
         }
