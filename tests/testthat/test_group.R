@@ -12,6 +12,17 @@ test_that("Group methods", {
         "\\.epw", full.names = TRUE)[1:5]
 
     expect_error(group_job(empty_idf(8.8)), class = "error_idf_not_local")
+    # can stop if input model is not saved after modification
+    expect_error(
+        group_job(
+            list(
+                {idf <- read_idf(path_idfs[[1]]); idf$RunPeriod <- NULL; idf},
+                path_idfs[1]
+            ),
+            NULL
+        ),
+        class = "error_idf_not_saved"
+    )
     expect_silent(group_job(path_idfs, path_epws[1L]))
     expect_silent(group_job(path_idfs[1], path_epws))
     expect_silent(grp <- group_job(path_idfs, NULL))
