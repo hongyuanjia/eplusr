@@ -137,7 +137,7 @@ if (!eplusr::is_avail_eplus(8.8)) {
 Below shows the class structure in eplusr.
 
 ```{r, echo = FALSE, eval = can_run, include = can_run, figure.width = "400px"}
-knitr::include_graphics("class_structure.png")
+knitr::include_graphics(file.path(tempdir(), "class_structure.png"))
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
