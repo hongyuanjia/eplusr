@@ -1,7 +1,7 @@
 Package: eplusr
 Title: A Toolkit for Using Whole Building Simulation Program
     'EnergyPlus'
-Version: 0.11.0.9000
+Version: 0.12.0
 Authors@R:
     person(given = "Hongyuan",
            family = "Jia",
