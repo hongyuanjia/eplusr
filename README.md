@@ -105,7 +105,7 @@ analysis**
 
 Below shows the class structure in eplusr.
 
-<img src="man/figures/class_structure.png" style="display: block; margin: auto;" />
+<img src="/tmp/RtmpZMyfQL/class_structure.png" width="451" style="display: block; margin: auto;" />
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and
 `IdfObject` class to present a single object in an IDF. Both `Idf` and
@@ -141,7 +141,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/Rtmp7ASahR/temp_libpath4359c5e37fa/eplusr/extdata/1ZoneUncon...
+#>  * Path: '/tmp/RtmpZMyfQL/temp_libpath7b645a5487e0/eplusr/extdata/1ZoneUnco...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -372,12 +372,12 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/Rtmp7ASahR/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpZMyfQL/model.idf.
 #> ExpandObjects Started.
 #> No expanded file generated.
 #> ExpandObjects Finished. Time:     0.000
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.01.24 10:21
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.02.20 15:40
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -409,7 +409,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-01-24 10:21:00
+#>   * Simulation started: 2020-02-20 15:40:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
@@ -507,5 +507,6 @@ Copyright © 2016-2020 Hongyuan Jia
 -----
 
 Please note that the ‘eplusr’ project is released with a [Contributor
-Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project,
-you agree to abide by its terms.
+Code of
+Conduct](https://github.com/hongyuanjia/eplusr/blob/master/.github/CODE_OF_CONDUCT.md).
+By contributing to this project, you agree to abide by its terms.
