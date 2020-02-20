@@ -31,9 +31,6 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 
-# copy figures into temporary directory
-file.copy("man/figures/class_structure.png", tempdir())
-
 # Make sure the date is shown in English format not Chinese.
 invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 ```
@@ -145,7 +142,7 @@ knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools
 Below shows the class structure in eplusr.
 
 ```{r, echo = FALSE, fig.align = "center"}
-knitr::include_graphics(file.path(tempdir(), "class_structure.png"))
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/man/figures/class_structure.png?raw=true")
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
