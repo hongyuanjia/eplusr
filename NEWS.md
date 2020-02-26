@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## Bug fixes
+
+* Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails
+  when running in parallel (#130)
+
 # eplusr 0.12.0
 
 ## New features
