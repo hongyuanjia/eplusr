@@ -769,15 +769,12 @@ eplus_job <- function (idf, epw) {
 
 # job_initialize {{{
 job_initialize <- function (self, private, idf, epw) {
+    # add Output:SQLite and Output:VariableDictionary if necessary
     private$m_idf <- get_init_idf(idf)
     if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
 
-    # add Output:SQLite if necessary
-    add_sql <- idf_add_output_sqlite(private$m_idf)
-    # add Output:VariableDictionary if necessary
-    add_dict <- idf_add_output_vardict(private$m_idf)
     # log if the input idf has been changed
-    private$m_log$unsaved <- add_sql || add_dict
+    private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
 
     # save uuid
     private$m_log$seed_uuid <- ._get_private(private$m_idf)$m_log$uuid
