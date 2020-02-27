@@ -290,11 +290,11 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         weather <- list(NULL)
     } else {
         if (length(weather) == 1L) weather <- rep(weather, length(model))
-        input_weather <- vcapply(weather,
-            function (x) if (is.null(x)) NA_character_ else normalizePath(x, mustWork = TRUE)
-        )
-        weather <- as.list(input_weather)
-        weather[is.na(input_weather)] <- list(NULL)
+        ddy <- is.na(weather)
+        input_weather <- weather
+        input_weather[!ddy] <- normalizePath(input_weather[!ddy], mustWork = TRUE)
+        weather <- as.list(weather)
+        weather[ddy] <- list(NULL)
     }
 
     if (is.null(eplus)) {
@@ -713,12 +713,31 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         cmd_epmacro <- NULL
     }
 
-    if (expand_obj) cmd_expand_obj <- "--expandobjects" else cmd_expand_obj <- NULL
     if (readvars) cmd_readvars <- "--readvars" else cmd_readvars <- NULL
     if (annual) cmd_annual <- "--annual" else cmd_annual <- NULL
     if (design_day) cmd_design_day <- "--design-day" else cmd_design_day <- NULL
     if (!is.null(idd)) cmd_idd <- paste0("--idd", shQuote(idd)) else cmd_idd <- NULL
     # }}}
+
+    # manually run ExpandObjects first
+    # backup original model path
+    model_ori <- model
+    if (expand_obj) {
+        expand_objects <- file.path(dirname(eplus), paste0("ExpandObjects", if (is_windows()) ".exe" else ""))
+        if (file.exists(expand_objects)) {
+            # create "in.idf"
+            file.copy(model, file.path(output_dir, "in.idf"), overwrite = TRUE)
+            # run ExpandObjects
+            processx::run(expand_objects, wd = output_dir)
+            # rename genereated expidf file
+            if (file.exists(file.path(output_dir, "in.expidf"))) {
+                model <- file.path(output_dir, paste0(tools::file_path_sans_ext(basename(model)), ".expidf"))
+                file.rename(file.path(output_dir, "in.expidf"), model)
+            } else {
+                unlink(file.path(output_dir, "in.idf"))
+            }
+        }
+    }
 
     arg_weather <- if (is.null(weather)) NULL else c("--weather", weather)
     args <- c(
@@ -727,13 +746,15 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
         "--output-prefix", output_prefix,
         "--output-suffix", output_suffix,
         cmd_epmacro,
-        cmd_expand_obj,
         cmd_readvars,
         cmd_annual,
         cmd_design_day,
         cmd_idd,
         model
     )
+
+    # restore original model path
+    if (expand_obj) model <- model_ori
 
     res <- list()
 

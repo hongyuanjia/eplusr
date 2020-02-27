@@ -36,10 +36,6 @@ knitr::knit_hooks$set(output = function(x, options) {
     hook_output(x, options)
 })
 
-# copy figures into temporary directory
-copy <- file.copy("../man/figures/class_structure.png", tempdir())
-if (!copy) stop("Failed to copy figures")
-
 knitr::opts_knit$set(root.dir = tempdir())
 
 options(crayon.enabled = FALSE)
@@ -137,8 +133,8 @@ if (!eplusr::is_avail_eplus(8.8)) {
 
 Below shows the class structure in eplusr.
 
-```{r, echo = FALSE, eval = can_run, include = can_run}
-knitr::include_graphics(file.path(tempdir(), "class_structure.png"))
+```{r, echo = FALSE, eval = can_run, include = can_run, figure.width = "400px"}
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/man/figures/class_structure.png?raw=true")
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
