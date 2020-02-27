@@ -3,10 +3,7 @@
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build
-Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+![R-CMD-check](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN
