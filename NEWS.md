@@ -1,5 +1,10 @@
 # eplusr (development version)
 
+## Minor changes
+
+* `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW
+  files, but only validate their existences and store the paths (#215)
+
 ## Bug fixes
 
 * Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails

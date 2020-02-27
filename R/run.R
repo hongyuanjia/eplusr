@@ -290,11 +290,11 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         weather <- list(NULL)
     } else {
         if (length(weather) == 1L) weather <- rep(weather, length(model))
-        input_weather <- vcapply(weather,
-            function (x) if (is.null(x)) NA_character_ else normalizePath(x, mustWork = TRUE)
-        )
-        weather <- as.list(input_weather)
-        weather[is.na(input_weather)] <- list(NULL)
+        ddy <- is.na(weather)
+        input_weather <- weather
+        input_weather[!ddy] <- normalizePath(input_weather[!ddy], mustWork = TRUE)
+        weather <- as.list(weather)
+        weather[ddy] <- list(NULL)
     }
 
     if (is.null(eplus)) {

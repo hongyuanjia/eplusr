@@ -21,6 +21,13 @@ test_that("Parametric methods", {
     # }}}
 
     # Measure {{{
+    pa <- param_job(example$idf, NULL)
+    test <- function(x, y) x
+    param$apply_measure(test, 1:5)
+    expect_equal(names(param$models()), sprintf("test_%i", 1:5))
+    param$apply_measure(function (x, y) x, 1:5)
+    expect_equal(names(param$models()), sprintf("case_%i", 1:5))
+
     # set_infil_rate {{{
     set_infil_rate <- function (idf, infil_rate) {
 

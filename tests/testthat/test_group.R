@@ -27,7 +27,7 @@ test_that("Group methods", {
             ),
             NULL
         ),
-        class = "error_idf_not_saved"
+        class = "error_invalid_group_idf_input"
     )
     expect_silent(group_job(path_idfs, path_epws[1L]))
     expect_silent(group_job(path_idfs[1], path_epws))

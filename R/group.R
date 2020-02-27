@@ -51,16 +51,13 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #' }
         #'
         initialize = function (idfs, epws) {
-            input <- get_epgroup_input(idfs, epws)
-            private$m_idfs <- input$idfs
-            private$m_epws <- input$epws
+            # add Output:SQLite and Output:VariableDictionary if necessary
+            input <- get_epgroup_input(idfs, epws, sql = TRUE, dict = TRUE)
 
-            # add Output:SQLite if necessary
-            add_sql <- vlapply(private$m_idfs, idf_add_output_sqlite)
-            # add Output:VariableDictionary if necessary
-            add_dict <- vlapply(private$m_idfs, idf_add_output_vardict)
+            private$m_idfs <- input$idfs
+            private$m_epws_path <- input$epws
             # log if the input idf has been changed
-            private$m_log$unsaved <- add_sql | add_dict
+            private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
             private$m_log$uuid <- vcapply(private$idfs, function (idf) ._get_private(idf)$m_log$uuid)
@@ -731,7 +728,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
     private = list(
         # PRIVATE FIELDS {{{
         m_idfs = NULL,
-        m_epws = NULL,
+        m_epws_path = NULL,
         m_job = NULL,
         m_log = NULL
         # }}}
@@ -798,18 +795,24 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 # }}}
 # epgroup_run_models {{{
 epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
-    nms <- make_filename(names(private$m_idfs))
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
-    if (is.null(private$m_epws)) {
+    if (is_named(private$m_idfs)) {
+        # for parametric job
+        nms <- paste0(make_filename(names(private$m_idfs)), ".idf")
+    } else {
+        nms <- basename(path_idf)
+    }
+
+    if (is.null(private$m_epws_path)) {
         path_epw <- NULL
         design_day <- TRUE
     } else {
-        path_epw <- lapply(private$m_epws, function (epw) if (!is.null(epw)) epw$path())
+        path_epw <- private$m_epws_path
         if (length(path_epw) == 1L) {
             path_epw <- rep(path_epw, length(path_idf))
         }
-        design_day <- vlapply(path_epw, is.null)
+        design_day <- is.na(path_epw)
     }
 
     if (is.null(output_dir))
@@ -854,10 +857,12 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         }
     }
 
-    path_group <- normalizePath(file.path(output_dir, nms, paste0(nms, ".idf")), mustWork = FALSE)
+    path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
 
     if (any(to_save <- path_group != path_idf | private$m_log$unsaved)) {
-        apply2(private$m_idfs[to_save], path_group[to_save],
+        # remove duplications
+        dup <- duplicated(path_group)
+        apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
             function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
         )
     }
@@ -932,10 +937,10 @@ epgroup_status <- function (self, private) {
                 status = "idle",
                 idf = vcapply(private$m_idfs, function (idf) idf$path())
             )
-            if (is.null(private$m_epws)) {
+            if (is.null(private$m_epws_path)) {
                 epw <- NA_character_
             } else {
-                epw <- vcapply(private$m_epws, function (epw) if (is.null(epw)) NA_character_ else epw$path())
+                epw <- vcapply(private$m_epws_path, function (epw) if (is.null(epw)) NA_character_ else epw)
             }
             set(status$job_status, NULL, "epw", epw)
         }
@@ -1103,10 +1108,10 @@ epgroup_print <- function (self, private) {
 
 # helper
 # get_epgroup_input {{{
-get_epgroup_input <- function (idfs, epws) {
+get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
     # check idf {{{
     if (is_idf(idfs)) {
-        idfs <- list(get_init_idf(idfs))
+        idfs <- list(get_init_idf(idfs, sql = sql, dict = dict))
     } else {
         init_idf <- function (...) {
             tryCatch(get_init_idf(...),
@@ -1115,47 +1120,42 @@ get_epgroup_input <- function (idfs, epws) {
                 error_idf_not_saved = function (e) e
             )
         }
-        idfs <- lapply(idfs, init_idf)
+        idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
     }
 
-    if (any(!vlapply(idfs, is_idf))) {
-        for (err in c("error_idf_not_local", "error_idf_path_not_exist", "error_idf_not_saved")) {
-            if (any(invld <- vlapply(idfs, inherits, err))) {
-                abort(err, paste0("Invalid input index: ", collapse(which(invld)), " --> ",
-                    conditionMessage(idfs[[which(invld)[[1L]]]])
-                ))
-            }
-        }
+    err <- c("error_idf_not_local", "error_idf_path_not_exist", "error_idf_not_saved")
+    if (any(invld <- vlapply(idfs, inherits, err))) {
+        abort("error_invalid_group_idf_input", paste0(
+            "Invalid IDF input found:\n",
+            paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(idfs[invld], conditionMessage),
+                collapse = "\n"
+            )
+        ))
     }
 
-    nm_idf <- tools::file_path_sans_ext(basename(vcapply(idfs, function (idf) idf$path())))
-    setattr(idfs, "names", make.unique(nm_idf, "_"))
+    sql <- vlapply(idfs, attr, "sql")
+    dict <- vlapply(idfs, attr, "sql")
     # }}}
 
-    # check epw {{{
-    get_epw <- function (epw) {
-        if (is.null(epw)) return(NULL)
-        get_init_epw(epw)
-    }
+    # check epw paths {{{
+    get_epw <- function (epw) if (is.null(epw)) NA_character_ else get_init_epw(epw)
 
-    if (is_epw(epws)) {
-        epws <- list(get_init_epw(epws))
-    } else {
-        epws <- tryCatch(lapply(epws, get_epw),
+    epws <- lapply(epws, function (x) {
+        tryCatch(get_epw(x),
             error_epw_not_local = function (e) e,
             error_epw_path_not_exist = function (e) e,
             error_epw_not_saved = function (e) e
         )
-    }
+    })
 
-    if (any(!vlapply(epws, is_epw))) {
-        for (err in c("error_epw_not_local", "error_epw_path_not_exist", "error_epw_not_saved")) {
-            if (any(invld <- vlapply(epws, inherits, err))) {
-                abort(err, paste0(conditionMessage(epws[[which(invld)[[1L]]]]),
-                    " Invalid input index: ", collapse(which(invld))
-                ))
-            }
-        }
+    err <- c("error_epw_not_local", "error_epw_path_not_exist", "error_epw_not_saved")
+    if (any(invld <- vlapply(epws, inherits, err))) {
+        abort("error_invalid_group_epw_input", paste0(
+            "Invalid EPW input found:\n",
+            paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(epws[invld], conditionMessage),
+                collapse = "\n"
+            )
+        ))
     }
 
     if (!length(epws)) epws <- NULL
@@ -1163,14 +1163,17 @@ get_epgroup_input <- function (idfs, epws) {
 
     # check length
     if (!is.null(epws)) {
-        if (length(epws) == 1L) epws <- replicate(length(idfs), epws[[1L]]$clone())
-        if (length(idfs) == 1L) idfs <- replicate(length(epws), idfs[[1L]]$clone())
+        epws <- vcapply(epws, `%||%`, NA_character_)
+        if (length(epws) == 1L) epws <- replicate(length(idfs), epws)
+        if (length(idfs) == 1L) {
+            idfs <- replicate(length(epws), idfs[[1L]]$clone())
+            sql <- rep(sql, length(epws))
+            dict <- rep(dict, length(epws))
+        }
         assert(have_same_len(idfs, epws))
-        nm_epw <- tools::file_path_sans_ext(basename(vcapply(epws, function (epw) epw$path())))
-        setattr(epws, "names", make.unique(nm_epw, "_"))
     }
 
-    list(idfs = idfs, epws = epws)
+    list(idfs = idfs, epws = epws, sql = sql, dict = dict)
 }
 # }}}
 # epgroup_retrieve_data {{{
@@ -1256,7 +1259,12 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
 # }}}
 # epgroup_case_from_which {{{
 epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) {
-    nms <- names(private$m_idfs)
+    if (is_named(private$m_idfs)) {
+        nms <- names(private$m_idfs)
+    } else {
+        nms <- vcapply(private$m_idfs, function(idf) tools::file_path_sans_ext(basename(idf$path())))
+    }
+
     if (is.null(which)) {
         if (name) return(nms) else return(seq_along(nms))
     }
@@ -1314,18 +1322,21 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
     if (!epw) {
         nm <- str_trunc(paste0(
             "[", lpad(seq_along(private$m_idfs), 0), "]: ",
-            surround(names(private$m_idfs))
+            surround(vcapply(private$m_idfs, function (x) basename(x$path())))
         ))
     } else {
         nm_idf <- str_trunc(paste0(
             "[", lpad(seq_along(private$m_idfs), 0), "]: ",
-            paste0("[IDF] ", surround(names(private$m_idfs)))
+            paste0("[IDF] ", surround(vcapply(private$m_idfs, function (x) basename(x$path()))))
         ))
 
-        if (is.null(private$m_epws)) {
+        if (is.null(private$m_epws_path)) {
             nm_epw <- "[EPW] << Not specified >>"
         } else {
-            nm_epw <- paste0("[EPW] ", surround(names(private$m_epws)))
+            nm_epw <- basename(private$m_epws_path)
+            nm_epw[!is.na(nm_epw)] <- surround(nm_epw[!is.na(nm_epw)])
+            nm_epw[is.na(nm_epw)] <- "<< Not specified >>"
+            nm_epw <- paste0("[EPW] ", nm_epw)
         }
 
         nm <- paste0(rpad(nm_idf), " + ", nm_epw)
