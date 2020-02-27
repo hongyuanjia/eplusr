@@ -53,15 +53,15 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         #' }
         #'
         initialize = function (idf, epw) {
-            private$m_seed <- get_init_idf(idf)
-            if (!is.null(epw)) private$m_epws <- list(get_init_epw(epw))
+            # add Output:SQLite and Output:VariableDictionary if necessary
+            idf <- get_init_idf(idf, sql = TRUE, dict = TRUE)
 
-            # add Output:SQLite if necessary
-            add_sql <- idf_add_output_sqlite(private$m_seed)
-            # add Output:VariableDictionary if necessary
-            add_dict <- idf_add_output_vardict(private$m_seed)
+            private$m_seed <- idf
+
             # log if the input idf has been changed
-            private$m_log$unsaved <- add_sql || add_dict
+            private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
+
+            if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 
             # save uuid
             private$m_log$seed_uuid <- ._get_private(private$m_seed)$m_log$uuid
@@ -339,7 +339,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
         # PRIVATE FIELDS {{{
         m_seed = NULL,
         m_idfs = NULL,
-        m_epws = NULL,
+        m_epws_path = NULL,
         m_job = NULL,
         m_log = NULL
         # }}}
@@ -401,11 +401,11 @@ param_models <- function (self, private) {
 # }}}
 # param_weather {{{
 param_weather <- function (self, private) {
-    private$m_epws[[1L]]
+    if (is.null(private$m_epws_path)) NULL else read_epw(private$m_epws_path)
 }
 # }}}
 # param_apply_measure {{{
-param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
+param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame()) {
     assert(is.function(measure))
 
     if (length(formals(measure)) < 2L) {
@@ -420,14 +420,19 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
         idf
     }
 
-    mea_nm <- deparse(substitute(measure, parent.frame()))
+    if (is.name(substitute(measure, .env))) {
+        bare <- FALSE
+        mea_nm <- deparse(substitute(measure, .env))
+    } else {
+        bare <- TRUE
+        mea_nm <- "case"
+    }
     private$m_log$measure_name <- mea_nm
 
     out <- mapply(measure_wrapper, ...,
         MoreArgs = list(idf = private$m_seed), SIMPLIFY = FALSE, USE.NAMES = FALSE)
 
     if (is.null(.names)) {
-        if (length(mea_nm) > 1L) mea_nm <- "case"
         nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
         assert(have_same_len(out, .names),
@@ -444,7 +449,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL) {
     private$m_log$uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
 
     if (eplusr_option("verbose_info")) {
-        if (length(private$m_log$measure_name) > 1L) {
+        if (bare) {
             mea_nm <- "function"
         } else {
             mea_nm <- surround(mea_nm)
@@ -496,12 +501,6 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 
     path_idf <- normalizePath(private$m_seed$path(), mustWork = TRUE)
 
-    if (is.null(private$m_epws)) {
-        path_epw <- NULL
-    } else {
-        path_epw <- vcapply(private$m_epws, function (epw) epw$path())
-    }
-
     if (is.null(dir))
         dir <- dirname(path_idf)
     else {
@@ -531,6 +530,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
         function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
     )
     # copy weather
+    path_epw <- private$m_epws_path
     if (!is.null(path_epw)) {
         path_epw <- copy_run_files(path_epw, unique(dirname(path_param)))
     } else {
