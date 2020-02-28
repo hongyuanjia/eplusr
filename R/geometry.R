@@ -227,7 +227,6 @@ extracct_idfgeom_surface <- function (idf, class, type = NA_character_) {
 # }}}
 
 # triangulate_surfaces {{{
-#' @importFrom decido earcut
 triangulate_surfaces <- function (dt) {
     # calculate normal vector of surfaces using Newell Method
     # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
@@ -271,6 +270,18 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
                        line_width = 1.5, line_color = "black",
                        theta = 0, phi = -60, fov = 60, zoom = 1, background = "white",
                        size = c(0, 30, 800)) {
+    if (!requireNamespace("rgl", quietly = TRUE)) {
+        abort("error_no_rgl", paste0(
+            "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
+            "please add this to your library with install.packages('rgl') and try agian."
+        ))
+    }
+    if (!requireNamespace("decido", quietly = TRUE)) {
+        abort("error_no_decido", paste0(
+            "'eplusr' relies on the 'decido' package to view 3D IDF geometry; ",
+            "please add this to your library with install.packages('decido') and try agian."
+        ))
+    }
 
     # copy the original data
     dt <- data.table::copy(private$m_geometry)
@@ -321,7 +332,6 @@ deg_to_rad <- function (x) x / 180 * pi
 rad_to_deg <- function (x) x / pi * 180
 # }}}
 
-#' @importFrom rgl rgl.open par3d rgl.bg rgl.viewpoint rgl.clear
 # rgl_init {{{
 rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
                       zoom = 1, background = "white", size = c(0, 30, 800)) {
@@ -346,34 +356,33 @@ rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
     } else if (length(size) == 4L) {
         size = c(size[1:2], size[1:2] + size[3:4])
     }
-    par3d(windowRect = size)
+    rgl::par3d(windowRect = size)
 
     # set viewpoint
-    rgl.viewpoint(theta, phi, fov, zoom)
+    rgl::rgl.viewpoint(theta, phi, fov, zoom)
 
     # change mouse control method
-    cur <- par3d("mouseMode")
+    cur <- rgl::par3d("mouseMode")
     cur[["left"]] <- "trackball"
     cur[["wheel"]] <- "push"
     cur[["middle"]] <- "fov"
-    par3d("mouseMode" = cur)
+    rgl::par3d("mouseMode" = cur)
     pan3d(2L)
 
-    rgl.bg(color = background)
+    rgl::rgl.bg(color = background)
 }
 # }}}
 
-#' @importFrom rgl rgl.cur currentSubscene3d par3d rgl.setMouseCallbacks translationMatrix
 # pan3d {{{
 # adapted from rgl examples
-pan3d <- function(button, dev = rgl.cur(), subscene = currentSubscene3d(dev)) {
+pan3d <- function(button, dev = rgl::rgl.cur(), subscene = rgl::currentSubscene3d(dev)) {
     start <- list()
 
     begin <- function(x, y) {
-        activeSubscene <- par3d("activeSubscene", dev = dev)
-        start$listeners <<- par3d("listeners", dev = dev, subscene = activeSubscene)
+        activeSubscene <- rgl::par3d("activeSubscene", dev = dev)
+        start$listeners <<- rgl::par3d("listeners", dev = dev, subscene = activeSubscene)
         for (sub in start$listeners) {
-            init <- par3d(c("userProjection","viewport"), dev = dev, subscene = sub)
+            init <- rgl::par3d(c("userProjection","viewport"), dev = dev, subscene = sub)
             init$pos <- c(x/init$viewport[3], 1 - y/init$viewport[4], 0.5)
             start[[as.character(sub)]] <<- init
         }
@@ -383,11 +392,11 @@ pan3d <- function(button, dev = rgl.cur(), subscene = currentSubscene3d(dev)) {
         for (sub in start$listeners) {
             init <- start[[as.character(sub)]]
             xlat <- 2*(c(x/init$viewport[3], 1 - y/init$viewport[4], 0.5) - init$pos)
-            mouseMatrix <- translationMatrix(xlat[1], xlat[2], xlat[3])
-            par3d(userProjection = mouseMatrix %*% init$userProjection, dev = dev, subscene = sub )
+            mouseMatrix <- rgl::translationMatrix(xlat[1], xlat[2], xlat[3])
+            rgl::par3d(userProjection = mouseMatrix %*% init$userProjection, dev = dev, subscene = sub)
         }
     }
-    rgl.setMouseCallbacks(button, begin, update, dev = dev, subscene = subscene)
+    rgl::rgl.setMouseCallbacks(button, begin, update, dev = dev, subscene = subscene)
 }
 # }}}
 
