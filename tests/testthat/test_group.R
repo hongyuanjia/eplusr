@@ -6,12 +6,29 @@ test_that("Group methods", {
 
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
-    path_idfs <- list.files(file.path(eplus_config(8.8)$dir, "ExampleFiles"),
-        "\\.idf", full.names = TRUE)[1:5]
-    path_epws <- list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
-        "\\.epw", full.names = TRUE)[1:5]
+    path_idfs <- normalizePath(file.path(eplus_config(8.8)$dir, "ExampleFiles",
+        c("1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf",
+          "1ZoneEvapCooler.idf",
+          "1ZoneParameterAspect.idf",
+          "1ZoneUncontrolled_DD2009.idf",
+          "1ZoneUncontrolled_DDChanges.idf"
+        )
+    ))
+    path_epws <- normalizePath(list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
+        "\\.epw", full.names = TRUE)[1:5])
 
     expect_error(group_job(empty_idf(8.8)), class = "error_idf_not_local")
+    # can stop if input model is not saved after modification
+    expect_error(
+        group_job(
+            list(
+                {idf <- read_idf(path_idfs[[1]]); idf$RunPeriod <- NULL; idf},
+                path_idfs[1]
+            ),
+            NULL
+        ),
+        class = "error_invalid_group_idf_input"
+    )
     expect_silent(group_job(path_idfs, path_epws[1L]))
     expect_silent(group_job(path_idfs[1], path_epws))
     expect_silent(grp <- group_job(path_idfs, NULL))
@@ -26,7 +43,7 @@ test_that("Group methods", {
 
     # Run and Status {{{
     # can run the simulation and get status of simulation
-    expect_equal({grp$run(dir = tempdir(), echo = FALSE); status <- grp$status(); names(status)},
+    expect_equal({grp$run(dir = file.path(tempdir(), "test"), echo = FALSE); status <- grp$status(); names(status)},
         c("run_before", "alive", "terminated", "successful", "changed_after", "job_status")
     )
     expect_equal(status[c("run_before", "alive", "terminated", "successful", "changed_after")],
@@ -152,7 +169,7 @@ test_that("Group methods", {
     # Locate Output {{{
     expect_error(grp$locate_output(suffix = ".sql"))
     expect_equal(grp$locate_output(2, suffix = ".sql"),
-        normalizePath(file.path(tempdir(),
+        normalizePath(file.path(tempdir(), "test",
             tools::file_path_sans_ext(basename(path_idfs[2])),
             paste0(tools::file_path_sans_ext(basename(path_idfs[2])), ".sql")
         ))

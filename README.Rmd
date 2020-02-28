@@ -5,7 +5,7 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r setup, echo = FALSE}
+```{r setup, include = FALSE}
 library(knitr)
 
 # the default output hook
@@ -37,8 +37,7 @@ invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+![R-CMD-check](https://github.com/hongyuanjia/eplusr/workflows/R-CMD-check/badge.svg)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN Checks](https://cranchecks.info/badges/summary/eplusr)](https://cranchecks.info/pkgs/eplusr)
@@ -142,7 +141,7 @@ knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools
 Below shows the class structure in eplusr.
 
 ```{r, echo = FALSE, fig.align = "center"}
-knitr::include_graphics("man/figures/class_structure.png")
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/man/figures/class_structure.png?raw=true")
 ```
 
 Basically, eplusr uses `Idf` class to present the whole IDF file and `IdfObject`
@@ -275,5 +274,5 @@ Copyright © 2016-2020 Hongyuan Jia
 ---
 
 Please note that the 'eplusr' project is released with a
-[Contributor Code of Conduct](CODE_OF_CONDUCT.md).
+[Contributor Code of Conduct](https://github.com/hongyuanjia/eplusr/blob/master/.github/CODE_OF_CONDUCT.md).
 By contributing to this project, you agree to abide by its terms.

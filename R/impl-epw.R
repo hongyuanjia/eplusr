@@ -1565,10 +1565,10 @@ read_epw_data <- function (path) {
     header_epw_data <- fread(path, sep = ",", skip = num_header, nrows = 0L, header = FALSE)
     if (ncol(header_epw_data) != 35L) {
         parse_issue("error_invalid_epw_data_column_num", "epw",
-            "Invalid weather data column",
+            "Invalid weather data column", num = 1L,
             post = paste0(
-                "Expected 35 fields in EPW data instead of the ",
-                surround(ncol(epw_data))
+                "Expected 35 fields in EPW data instead of ",
+                surround(ncol(header_epw_data)), " in current file"
             )
         )
     }

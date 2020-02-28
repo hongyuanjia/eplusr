@@ -721,7 +721,7 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
     private = list(
         # PRIVATE FIELDS {{{
         m_idf = NULL,
-        m_epw = NULL,
+        m_epw_path = NULL,
         m_job = NULL,
         m_log = NULL
         # }}}
@@ -769,15 +769,12 @@ eplus_job <- function (idf, epw) {
 
 # job_initialize {{{
 job_initialize <- function (self, private, idf, epw) {
+    # add Output:SQLite and Output:VariableDictionary if necessary
     private$m_idf <- get_init_idf(idf)
-    if (!is.null(epw)) private$m_epw <- get_init_epw(epw)
+    if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
 
-    # add Output:SQLite if necessary
-    add_sql <- idf_add_output_sqlite(private$m_idf)
-    # add Output:VariableDictionary if necessary
-    add_dict <- idf_add_output_vardict(private$m_idf)
     # log if the input idf has been changed
-    private$m_log$unsaved <- add_sql || add_dict
+    private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
 
     # save uuid
     private$m_log$seed_uuid <- ._get_private(private$m_idf)$m_log$uuid
@@ -792,7 +789,7 @@ job_version <- function (self, private) {
 job_path <- function (self, private, type = c("all", "idf", "epw")) {
     type <- match.arg(type)
 
-    path_epw <- if (is.null(private$m_epw)) NA_character_ else private$m_epw$path()
+    path_epw <- if (is.null(private$m_epw_path)) NA_character_ else private$m_epw_path
     switch(type,
         all = c(idf = private$m_idf$path(), epw = path_epw),
         idf = private$m_idf$path(), epw = path_epw
@@ -811,14 +808,14 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
         ))
     }
 
-    if (missing(epw)) epw <- private$m_epw
+    if (missing(epw)) epw <- private$m_epw_path
 
     if (is.null(epw)) {
-        private$m_epw <- epw
+        private$m_epw_path <- NULL
         path_epw <- NULL
     } else {
-        private$m_epw <- get_init_epw(epw)
-        path_epw <- private$m_epw$path()
+        private$m_epw_path <- get_init_epw(epw)
+        path_epw <- private$m_epw_path
     }
 
     path_idf <- private$m_idf$path()
@@ -835,7 +832,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     }
 
     # when no epw is given, at least one design day object should exists
-    if (is.null(private$m_epw)) {
+    if (is.null(private$m_epw_path)) {
         if (!private$m_idf$is_valid_class("SizingPeriod:DesignDay")) {
             assert("error_run_no_ddy",
                 paste0("When no weather file is given, input IDF should contain ",
@@ -871,7 +868,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
 
     private$m_job <- run_idf(path_idf, path_epw,
         output_dir = NULL, echo = echo, wait = wait, eplus = private$m_version,
-        design_day = is.null(private$m_epw)
+        design_day = is.null(private$m_epw_path)
     )
 
     if (wait) private$m_log$end_time <- Sys.time()
@@ -1107,7 +1104,7 @@ job_tabular_data <- function (self, private, report_name = NULL, report_for = NU
 # }}}
 # job_print {{{
 job_print <- function (self, private) {
-    path_epw <- if (is.null(private$m_epw)) NULL else private$m_epw$path()
+    path_epw <- if (is.null(private$m_epw_path)) NULL else private$m_epw_path
     print_job_header(title = "EnergPlus Simulation Job",
         path_idf = private$m_idf$path(),
         path_epw = path_epw,
@@ -1167,10 +1164,8 @@ format.EplusSql <- function (x, ...) {
 
 # helper
 # get_init_idf {{{
-get_init_idf <- function (idf) {
-    if (!is_idf(idf)) return(read_idf(idf))
-
-    idf <- idf$clone(deep = TRUE)
+get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
+    idf <- if (!is_idf(idf)) read_idf(idf) else idf$clone(deep = TRUE)
 
     if (is.null(idf$path())) {
         abort("error_idf_not_local",
@@ -1199,43 +1194,63 @@ get_init_idf <- function (idf) {
         )
     }
 
+    # add Output:SQLite if necessary
+    if (sql) sql <- idf_add_output_sqlite(idf)
+    setattr(idf, "sql", sql)
+
+    # add Output:VariableDictionary if necessary
+    if (dict) dict <- idf_add_output_vardict(idf)
+    setattr(idf, "dict", dict)
+
     idf
 }
 # }}}
 # get_init_epw {{{
 get_init_epw <- function (epw) {
-    if (!is_epw(epw)) return(read_epw(epw))
-
-    epw <- epw$clone(deep = TRUE)
-
-    if (is.null(epw$path())) {
-        abort("error_epw_not_local",
-            paste0(
-                "The Epw object is not created from local file. ",
-                "Please save it using `$save()` before running."
+    if (is_string(epw)) {
+        if (!file.exists(epw)) {
+            abort("error_epw_path_not_exist",
+                paste0(
+                    "Input EPW file does not exist. ",
+                    "Path: ", surround(normalizePath(epw, mustWork = FALSE))
+                )
             )
-        )
+        }
+        path <- epw
+    } else {
+        epw <- if (!is_epw(epw)) read_epw(epw) else epw$clone(deep = TRUE)
+
+        if (is.null(epw$path())) {
+            abort("error_epw_not_local",
+                paste0(
+                    "The Epw object is not created from local file. ",
+                    "Please save it using `$save()` before running."
+                )
+            )
+        }
+
+        if (!utils::file_test("-f", epw$path())) {
+            abort("error_epw_path_not_exist",
+                paste0(
+                    "Failed to locate the local EPW file of input Epw object. ",
+                    "Path: ", surround(epw$path()), " ",
+                    "Please re-save it to disk using `$save()` before running."
+                )
+            )
+        }
+
+        if (epw$is_unsaved()) {
+            abort("error_epw_not_saved",
+                paste0("Epw has been modified since read or last saved. ",
+                    "Please save it using `$save()` before running."
+                )
+            )
+        }
+
+        path <- epw$path()
     }
 
-    if (!utils::file_test("-f", epw$path())) {
-        abort("error_epw_path_not_exist",
-            paste0(
-                "Failed to locate the local EPW file of input Epw object. ",
-                "Path: ", surround(epw$path()), " ",
-                "Please re-save it to disk using `$save()` before running."
-            )
-        )
-    }
-
-    if (epw$is_unsaved()) {
-        abort("error_epw_not_saved",
-            paste0("Epw has been modified since read or last saved. ",
-                "Please save it using `$save()` before running."
-            )
-        )
-    }
-
-    epw
+    normalizePath(path)
 }
 # }}}
 # print_job_header {{{

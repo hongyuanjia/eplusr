@@ -1,5 +1,17 @@
 # eplusr (development version)
 
+## Minor changes
+
+* `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW
+  files, but only validate their existences and store the paths (#215)
+
+## Bug fixes
+
+* Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails
+  when running in parallel (#130)
+
+# eplusr 0.12.0
+
 ## New features
 
 * Now `group_job()` supports single IDF input with multiple EPW inputs (#185).
@@ -29,6 +41,9 @@
 * Fix EnergyPlus installation on macOS (#193).
 * Fix parallel simulations on macOS (#194).
 * Now `eplus_config()` will always return the expanded EnergyPlus path (#196).
+* Now `group_job()` will return more informative error messages when input
+  contains `Idf` objects that havn't been saved (#204).
+* Fix error in `EplusGroupJob$run()` when custom `dir` is specified (#205).
 
 # eplusr 0.11.0
 
