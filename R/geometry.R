@@ -16,23 +16,13 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
 
             # extract geometry surfaces
             private$m_geometry <- extracct_idfgeom(private$m_parent)
+
+            # save uuid
+            private$m_log$parent_uuid <- ._get_private(private$m_parent)$m_log$uuid
         },
 
-        gross_area = function () {},
-
-        net_area = function () {},
-
-        outward_normal = function () {},
-
-        tilt = function () {},
-
-        azimuth = function () {},
-
-        centroid = function () {},
-
-        vertices = function () {
-            private$m_geometry
-        },
+        vertices = function ()
+            geom_vertices(self, private),
 
         view = function (new = TRUE, clear = TRUE, render_by = "surface_type",
                          axis = TRUE, wireframe = TRUE, surface = TRUE,
@@ -43,13 +33,16 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
                       axis = axis, wireframe = wireframe, surface = surface,
                       line_width = line_width, line_color = line_color,
                       theta = theta, phi = phi, fov = fov, zoom = zoom,
-                      background = background, size = size)
+                      background = background, size = size),
+
+        save_snapshot = function (filename, bring_to_front = TRUE, axis = FALSE)
+            geom_save_snapshot(self, private, filename, bring_to_front, axis = axis)
     ),
 
     private = list(
         m_parent = NULL,
-        m_rule = NULL,
-        m_geometry = NULL
+        m_geometry = NULL,
+        m_log = NULL
     )
 )
 # }}}
@@ -264,6 +257,24 @@ triangulate_surfaces <- function (dt) {
 }
 # }}}
 
+# pair_line_vertex {{{
+pair_line_vertex <- function (dt) {
+    # for lines, vertices should be provided in pairs
+    # only need to plot surfaces here, since windows and holes are the same
+    # things here
+    dt[!J("hole"), on = "category", by = "id", {
+        idx <- c(sort(c(index_vertex, index_vertex[-1L])), 1L)
+        list(x = x[idx], y = y[idx], z = z[idx])
+    }]
+}
+# }}}
+
+# geom_vertices {{{
+geom_vertices <- function (self, private) {
+    data.table::copy(private$m_geometry)
+}
+# }}}
+
 # geom_view {{{
 geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
                        render_by = "surface_type", wireframe = TRUE, surface = TRUE,
@@ -283,6 +294,10 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
         ))
     }
 
+    # remove logged rgl ids
+    private$m_log$id <- NULL
+    private$m_log$view <- NULL
+
     # copy the original data
     dt <- data.table::copy(private$m_geometry)
 
@@ -290,19 +305,18 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
     map_color(dt, type = render_by)
 
     # initial rgl window
-    rgl_init(new = new, clear = clear)
+    private$m_log$id$device <- rgl_init(new = new, clear = clear,
+        theta = theta, phi = phi, fov = fov,
+        zoom = zoom, background = background, size = size
+    )
 
     # Add x, y, and z Axes
-    if (axis) {
-        rgl::rgl.lines(c(0, max(dt$x)* 1.05), c(0, 0), c(0, 0), color = "red", lit = FALSE)
-        rgl::rgl.lines(c(0, 0), c(0, max(dt$y) * 1.05), c(0, 0), color = "green", lit = FALSE)
-        rgl::rgl.lines(c(0, 0), c(0, 0), c(0, max(dt$z) * 1.05), color = "blue", lit = FALSE)
-    }
+    if (axis) geom_view_add_axis(self, private)
 
     if (surface) {
         tri <- triangulate_surfaces(dt)
 
-        rgl::triangles3d(
+        private$m_log$id$surface <- rgl::triangles3d(
             x = as.matrix(tri[, .SD, .SDcols = c("x", "y", "z")]),
             color = as.matrix(tri[, .SD, .SDcols = rep("color", 3L)]),
             alpha = as.matrix(tri[, .SD, .SDcols = rep("alpha", 3L)])
@@ -310,17 +324,79 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
     }
 
     if (wireframe) {
-        # for lines, vertices should be provided in pairs
-        # only need to plot surfaces here, since windows and holes are the same
-        # things here
-        l <- dt[!J("hole"), on = "category", by = "id", {
-            idx <- c(sort(c(index_vertex, index_vertex[-1L])), 1L)
-            list(x = x[idx], y = y[idx], z = z[idx])
-        }]
-        rgl::rgl.lines(l$x, l$y, l$z, color = line_color, lwd = line_width, lit = FALSE)
+        l <- pair_line_vertex(dt)
+        private$m_log$id$wireframe <- rgl::rgl.lines(l$x, l$y, l$z,
+            color = line_color, lwd = line_width, lit = FALSE
+        )
+
+        private$m_log$view$line_color <- line_color
+        private$m_log$view$line_width <- line_width
     }
 
     invisible(self)
+}
+# }}}
+
+# geom_view_add_axis {{{
+geom_view_add_axis <- function (self, private) {
+    dt <- private$m_geometry
+    private$m_log$id$x <- rgl::rgl.lines(c(0, max(dt$x)* 1.05), c(0, 0), c(0, 0), color = "red", lit = FALSE)
+    private$m_log$id$y <- rgl::rgl.lines(c(0, 0), c(0, max(dt$y) * 1.05), c(0, 0), color = "green", lit = FALSE)
+    private$m_log$id$z <- rgl::rgl.lines(c(0, 0), c(0, 0), c(0, max(dt$z) * 1.05), color = "blue", lit = FALSE)
+}
+# }}}
+
+# geom_view_add_ground {{{
+geom_view_add_ground <- function (self, private, ground = "#CCCCC9") {
+    dt <- private$m_geometry
+    rx <- range(dt$x)
+    ry <- range(dt$y)
+    private$m_log$id$ground <- rgl::rgl.quads(
+        c(rx[1], rx[2], rx[2], rx[1]), c(ry[1], ry[1], ry[2], ry[2]), 0,
+        color = ground, lit = FALSE
+    )
+}
+# }}}
+
+# geom_save_snapshot {{{
+geom_save_snapshot <- function (self, private, filename, bring_to_front = TRUE, axis = FALSE) {
+    if (!requireNamespace("rgl", quietly = TRUE)) {
+        abort("error_no_rgl", paste0(
+            "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
+            "please add this to your library with install.packages('rgl') and try agian."
+        ))
+    }
+
+    if (rgl::rgl.cur() == 0) {
+        abort("error_no_rgl_window", "No rgl window currently open. Please run '$view()' first.")
+    }
+
+    # set the last plot device as active
+    rgl::rgl.set(private$m_log$id$device)
+
+    redraw_axis <- FALSE
+    # remove axis first
+    if (!axis && !is.null(private$m_log$id$x)) {
+        rgl::rgl.pop(id = c(private$m_log$id$x, private$m_log$id$y, private$m_log$id$z))
+        redraw_axis <- TRUE
+    }
+
+    if (has_ext(filename, "png")) {
+        rgl::rgl.snapshot(filename, "png", top = bring_to_front)
+    } else if (has_ext(filename, c("ps", "eps", "tex", "pdf", "svg", "pgf"))) {
+        if (bring_to_front) rgl::rgl.bringtotop()
+        rgl::rgl.postscript(filename, tools::file_ext(filename))
+    } else {
+        abort("error_not_rgl_supported_fmt", paste0(
+            "Not supported export format ", surround(tools::file_ext(filename)), ". ",
+            "Current supported: ", collapse(c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"))
+        ))
+    }
+
+    # redraw axis
+    if (redraw_axis) geom_view_add_axis(self, private)
+
+    invisible()
 }
 # }}}
 
@@ -340,36 +416,41 @@ rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
         msg = sprintf("'size' should be a numeric vector with length no more than %i.", length(size))
     )
 
+    if (clear) {
+        if (rgl::rgl.cur() == 0) new <- TRUE else rgl::rgl.clear()
+    }
+
     if (new) {
         rgl::rgl.open()
-    } else if (clear) {
-        rgl::rgl.clear()
+
+        # set window size and position
+        if (length(size) == 1L) {
+            size = c(0, 0, size, size)
+        } else if (length(size) == 2L) {
+            size = c(0, 0, size)
+        } else if (length(size) == 3L) {
+            size = c(size[1:2], size[1:2] + size[3L])
+        } else if (length(size) == 4L) {
+            size = c(size[1:2], size[1:2] + size[3:4])
+        }
+
+        rgl::par3d(windowRect = size)
+
+        # set viewpoint
+        rgl::rgl.viewpoint(theta, phi, fov, zoom)
+
+        # change mouse control method
+        cur <- rgl::par3d("mouseMode")
+        cur[["left"]] <- "trackball"
+        cur[["wheel"]] <- "push"
+        cur[["middle"]] <- "fov"
+        rgl::par3d("mouseMode" = cur)
+        pan3d(2L)
     }
-
-    # set window size and position
-    if (length(size) == 1L) {
-        size = c(0, 0, size, size)
-    } else if (length(size) == 2L) {
-        size = c(0, 0, size)
-    } else if (length(size) == 3L) {
-        size = c(size[1:2], size[1:2] + size[3L])
-    } else if (length(size) == 4L) {
-        size = c(size[1:2], size[1:2] + size[3:4])
-    }
-    rgl::par3d(windowRect = size)
-
-    # set viewpoint
-    rgl::rgl.viewpoint(theta, phi, fov, zoom)
-
-    # change mouse control method
-    cur <- rgl::par3d("mouseMode")
-    cur[["left"]] <- "trackball"
-    cur[["wheel"]] <- "push"
-    cur[["middle"]] <- "fov"
-    rgl::par3d("mouseMode" = cur)
-    pan3d(2L)
 
     rgl::rgl.bg(color = background)
+
+    rgl::rgl.cur()
 }
 # }}}
 
