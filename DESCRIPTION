@@ -28,14 +28,15 @@ Imports:
     processx (>= 3.2.0),
     progress (>= 1.2.0),
     R6,
-    rgl,
     RSQLite,
     stringi,
     units
 Suggests:
     covr,
+    decido,
     knitr,
     pkgdown,
+    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -79,5 +80,4 @@ Collate:
     'transition.R'
     'units.R'
     'validate.R'
-    'view.R'
     'zzz.R'
