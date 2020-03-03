@@ -208,6 +208,11 @@ get_surface_vertices <- function (idf, cls, rules, zone) {
         # combine
         surf <- rbindlist(list(surf_build, surf_sep))
 
+        # a surface will be an adiabatic one if the outside boundary condition
+        # object is itself
+        surf[stri_trans_tolower(name) == stri_trans_tolower(outside_boundary_condition_object),
+            `:=`(outside_boundary_condition = "Adiabatic", outside_boundary_condition_object = NA_character_)]
+
         # convert to counter clockwise vertex entry direction
         if (rules$vertex_entry_direction != "counterclockwise") {
             surf[, by = "id", `:=`(x = rev(x), y = rev(y), z = rev(z))]
@@ -317,7 +322,6 @@ extract_surface_detailed <- function (idf, class) {
         list(id = rep(id, l),
              name = rep(name, l),
              class = rep(class, l),
-             name = rep(name, l),
              surface_type = rep(surface_type, l),
              construction_name = rep(construction_name, l),
              zone_name = rep(zone_name, l),
@@ -478,14 +482,17 @@ extract_shading_detailed <- function (idf, class) {
     # rename columns
     setnames(dt, paste0("Vertex ", c("X", "Y", "Z"), "-coordinate"), c("x", "y", "z"))
     setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
-    setnames(dt, "base_surface_name", "parent_surface_name")
+    if ("base_surface_name" %in% names(dt)) {
+        setnames(dt, "base_surface_name", "parent_surface_name")
+    } else {
+        set(dt, NULL, "parent_surface_name", NA_character_)
+    }
 
     na.omit(dt[, {
         l <- viapply(x, length)
         list(id = rep(id, l),
              name = rep(name, l),
              class = rep(class, l),
-             name = rep(name, l),
              surface_type = rep(surface_type, l),
              construction_name = NA_character_,
              parent_surface_name = rep(parent_surface_name, l),
@@ -1024,7 +1031,7 @@ COLOR_MAP <- list(
     ),
     boundary = c(
         Surface = rgb(0/255, 153/255, 0/255),
-        Adiabatic = rgb(255/255, 0/255, 0/255),
+        Adiabatic = rgb(255/255, 101/255, 178/255),
         Zone = rgb(255/255, 0/255, 0/255),
         Outdoors = rgb(163/255, 204/255, 204/255),
         Outdoors_Sun = rgb(40/255, 204/255, 204/255),
@@ -1207,8 +1214,8 @@ map_color <- function (dt, type = "surface_type", x_ray = FALSE) {
         if (!x_ray) dt[J(trans), on = "surface_type", alpha := 0.6]
     } else if (type == "boundary") {
         set(dt, NULL, "boundary_lower", stri_trans_tolower(dt$outside_boundary_condition))
-        set(dt, NULL, "sun_exposure_lower", stri_trans_tolower(dt$sun_exposure_lower))
-        set(dt, NULL, "wind_exposure_lower", stri_trans_tolower(dt$wind_exposure_lower))
+        set(dt, NULL, "sun_exposure_lower", stri_trans_tolower(dt$sun_exposure))
+        set(dt, NULL, "wind_exposure_lower", stri_trans_tolower(dt$wind_exposure))
 
         dt[J("outdoors", "sunexposed", "windexposed"),
            on = c("boundary_lower", "sun_exposure_lower", "wind_exposure_lower"),
