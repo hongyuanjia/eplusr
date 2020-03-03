@@ -760,6 +760,27 @@ idf$last_job()
 
 
 ## ------------------------------------------------
+## Method `Idf$view`
+## ------------------------------------------------
+
+\dontrun{
+idf$view()
+idf$view(render_by = "zone")
+idf$view(new, render_by = "construction")
+}
+
+
+## ------------------------------------------------
+## Method `Idf$save_view`
+## ------------------------------------------------
+
+\dontrun{
+idf$view()
+idf$save_view(tempfile(fileext = ".png"))
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$print`
 ## ------------------------------------------------
 
@@ -824,9 +845,9 @@ Hongyuan Jia
 \item \href{#method-save}{\code{Idf$save()}}
 \item \href{#method-run}{\code{Idf$run()}}
 \item \href{#method-last_job}{\code{Idf$last_job()}}
-\item \href{#method-print}{\code{Idf$print()}}
-\item \href{#method-geometry}{\code{Idf$geometry()}}
 \item \href{#method-view}{\code{Idf$view()}}
+\item \href{#method-save_view}{\code{Idf$save_view()}}
+\item \href{#method-print}{\code{Idf$print()}}
 \item \href{#method-clone}{\code{Idf$clone()}}
 }
 }
@@ -3238,7 +3259,8 @@ Format \code{Idf} as a data.frame
   wide = FALSE,
   align = FALSE,
   all = FALSE,
-  group_ext = c("none", "group", "index")
+  group_ext = c("none", "group", "index"),
+  force = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -3651,6 +3673,179 @@ idf$last_job()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-view"></a>}}
+\subsection{Method \code{view()}}{
+View 3D \code{Idf} geometry
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$view(
+  new = FALSE,
+  clear = TRUE,
+  render_by = "surface_type",
+  axis = TRUE,
+  wireframe = TRUE,
+  surface = TRUE,
+  line_width = 1.5,
+  line_color = "black",
+  theta = 0,
+  phi = -60,
+  fov = 60,
+  zoom = 1,
+  background = "white",
+  size = c(0, 30, 800)
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new}}{If \code{TRUE}, a new rgl window will be open using
+\code{\link[rgl:rgl.open]{rgl::rgl.open()}}. If \code{FALSE}, existing rgl window will be
+reused if possible. Default: \code{FALSE}.}
+
+\item{\code{clear}}{If \code{TRUE}, the current \code{rgl} device will be cleared
+before plotting new contents. Default: \code{TRUE}.}
+
+\item{\code{render_by}}{A single string specifying the way of rendering the
+geometry. Possible values are:\preformatted{* `"surface_type"`: Default. Render the model by surface type
+  model. Walls, roofs, windows, doors, floors, and shading
+  surfaces will have unqiue colors.
+* `"boundary"`: Render the model by outside boundary condition.
+  Only surfaces that have boundary conditions will be rendered
+  with a color. All other surfaces will be white.
+* `"construction"`: Render the model by surface constructions.
+* `"zone"`: Render the model by zones assigned.
+* `"surface_normal"`: (NOT IMPLEMENTED) Render the model by
+  surface normal. The outside face of a heat transfer face will
+  be rendered as white and the inside face will be rendered as
+  red. Shading surfaces are an exception where both sides are
+  rendered as red.
+}}
+
+\item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be drawn at the
+global origin. Default: \code{TRUE}.}
+
+\item{\code{wireframe}}{If \code{TRUE}, the wireframe of each surface will be
+shown. Default: \code{TRUE}.}
+
+\item{\code{surface}}{If \code{TRUE}, the surfaces themselves will be shown.
+Default: \code{TRUE}.}
+
+\item{\code{line_width}}{The line width of wireframes. Default: \code{1.5}.}
+
+\item{\code{line_color}}{The color of wireframes. Default: \code{black}.}
+
+\item{\code{theta}}{The rotation around z-axis in degrees. Default: \code{0}.}
+
+\item{\code{phi}}{The azimuth angle in degrees. Default: \code{-60}.}
+
+\item{\code{fov}}{The field-of-view angle in degrees. \code{0} means isometric.
+Default: \code{60}.}
+
+\item{\code{zoom}}{The zoom factor. Default: \code{1}.}
+
+\item{\code{background}}{The color of the backports. Default: \code{"white"}.}
+
+\item{\code{size}}{A numeric vector specifying the position, width and
+height of the rgl device. The x-y coordinates are based on the
+original located in the upper left corner of current screen.
+By default, x-y coordinates are set to zeros.\preformatted{* If 1 number, the width and height of rgl windows will be
+  the same as input number.
+* If 2 numbers, the width and height of rgl windows will be
+  set based on input number
+* If 3 numbers, the first 2 numbers will be used as x-y
+  coordinates and the 3rd number will be used for both window
+  width and height.
+* If 4 numbers, the first 2 numbers will be used as x-y
+  coordinates. The next 2 specify the window size.
+}}
+
+\item{\code{x_ray}}{(NOT IMPLEMENTED) If \code{TRUE}, all surfaces wll be
+rendered translucently.  Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$view()} uses the \href{https://cran.r-project.org/package=rgl}{rgl}
+package to visualize the IDF geometry in 3D in a similar way as
+\href{https://www.openstudio.net}{OpenStudio}.
+}
+
+\subsection{Returns}{
+The \code{Idf} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+idf$view()
+idf$view(render_by = "zone")
+idf$view(new, render_by = "construction")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-save_view"></a>}}
+\subsection{Method \code{save_view()}}{
+Capture and save current rgl view as an image
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$save_view(
+  filename,
+  autoview = FALSE,
+  autoclose = FALSE,
+  bring_to_front = FALSE,
+  axis = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{filename}}{A single string specifying the file name. Current
+supported formats are \code{png}, \code{pdf}, \code{svg}, \code{ps}, \code{eps}, \code{tex}
+and \code{pgf}.}
+
+\item{\code{autoview}}{If \code{TRUE}, a new view will be created if there is no
+existing one using
+\href{../../eplusr/html/Idf.html#method-view}{\code{$view()}}
+Default: \code{FALSE}.}
+
+\item{\code{autoclose}}{If \code{TRUE}, current rgl window will be closed after
+saving. Default: \code{FALSE}.}
+
+\item{\code{bring_to_front}}{If \code{TRUE}, The rgl window will be brought to
+the front when saving. Default: \code{FALSE}.}
+
+\item{\code{axis}}{If \code{TRUE}, the X, Y and Z axes will be saved in the
+image. Default: \code{FALSE}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$save_view()} captures the current rgl view and saves it as an
+image file to disk.
+}
+
+\subsection{Returns}{
+The \code{Idf} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+idf$view()
+idf$save_view(tempfile(fileext = ".png"))
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
 \subsection{Method \code{print()}}{
 Print \code{Idf} object
@@ -3713,22 +3908,6 @@ idf$print("field", order = FALSE)
 }
 \if{html}{\out{</div>}}
 
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-geometry"></a>}}
-\subsection{Method \code{geometry()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$geometry()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-view"></a>}}
-\subsection{Method \code{view()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$view()}\if{html}{\out{</div>}}
 }
 
 }

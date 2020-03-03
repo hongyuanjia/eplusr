@@ -1,9 +1,3 @@
-# normalize_idf_surfaces {{{
-normalize_idf_surfaces <- function (idf) {
-    idf
-}
-# }}}
-
 # IdfGeometry {{{
 IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
     public = list(
@@ -11,11 +5,8 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             if (!is_idf(idf)) idf <- read_idf(idf)
             private$m_parent <- idf
 
-            # change all non-detailed surfaces to their detailed equivalent
-            private$m_parent <- normalize_idf_surfaces(private$m_parent)
-
             # extract geometry surfaces
-            private$m_geometry <- extracct_idfgeom(private$m_parent)
+            private$m_geometry <- extract_geometry(private$m_parent)
 
             # save uuid
             private$m_log$parent_uuid <- ._get_private(private$m_parent)$m_log$uuid
@@ -47,124 +38,52 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
 )
 # }}}
 
-# extracct_idfgeom {{{
-extracct_idfgeom <- function (idf) {
-    cls <- idf$class_name(by_group = TRUE)["Thermal Zones and Surfaces"][[1L]]
-    if (is.null(cls)) {
-        message("Current IDF does not contain any surfaces.")
-        return(invisible())
-    }
+# extract_geometry {{{
+extract_geometry <- function (idf) {
+    cls <- data.table(class = idf$class_name(by_group = TRUE)["Thermal Zones and Surfaces"][[1L]])
+    set(cls, NULL, c("type", "subtype", "misc"),
+        as.data.table(stri_split_fixed(cls$class, ":", n = 3L, simplify = TRUE))
+    )
 
-    surf <- data.table()
-    hole <- data.table()
-    win <- data.table()
-    shade <- data.table()
+    cls_surface <- cls[type %in% c("BuildingSurface", "Wall", "RoofCeiling", "Floor", "Wall", "Roof", "Ceiling")]
+    cls_subsurface <- cls[type %in% c("FenestrationSurface", "Window", "Door", "GlazedDoor")]
+    cls_shading <- cls[type == "Shading"]
+
+    if (nrow(cls_surface) + nrow(cls_subsurface) + nrow(cls_shading) == 0L) return(data.table())
+
+    # get global geometry rules
+    rules <- get_global_geom_rules(idf)
 
     # zone origins
-    if (!idf$is_valid_class("Zone")) {
-        zone <- data.table(name = character(), x = double(), y = double(), z = double(), name_lower = character())
-    } else {
-        zone <- idf$to_table(class = "Zone", wide = TRUE, all = TRUE, string_value = FALSE)[
-            , .SD, .SDcols = c("name", paste(c("X", "Y", "Z"), "Origin"))]
-        setnames(zone, c("name", "x", "y", "z"))
-        set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
-        zone[J(NA_real_), on = "x", x := 0.0]
-        zone[J(NA_real_), on = "y", y := 0.0]
-        zone[J(NA_real_), on = "z", z := 0.0]
-    }
+    zone <- get_zone_origin(idf)
 
     # surfaces
-    if ("BuildingSurface:Detailed" %in% cls) {
-        surf <- extracct_idfgeom_surface(idf, "BuildingSurface:Detailed")
-    }
+    surf <- get_surface_vertices(idf, cls_surface, rules, zone)
 
-    # other detailed surface specs
-    cls_surf <- stri_subset_regex(cls, "(Wall|Roof|Floor|Ceiling).+Detailed")
-    if (length(cls_surf)) {
-        type <- stri_extract_first_regex(cls_surf, "(Wall|Roof|Floor)")
-        surf_sep <- mapply(extracct_idfgeom_surface, cls_surf, type,
-            MoreArgs = list(idf = idf), SIMPLIFY = FALSE, USE.NAMES = FALSE
+    # subsurfaces
+    win <- get_subsurface_vertices(idf, cls_subsurface, rules, surf)
 
-        )
+    # shadings
+    shading <- get_shading_vertices(idf, cls_shading, rules, zone, surf)
 
-        # combine
-        surf <- rbindlist(c(list(surf), surf_sep))
-    }
+    # treat windows as holes
+    hole <- copy(win)[!J(NA_character_), on = "parent_surface_name"]
+    set(hole, NULL, "surface_type", "Hole")
+    # use surface id for grouping
+    hole[surf, on = c(parent_surface_name = "name"), id := i.id]
 
-    set(surf, NULL, "category", "surface")
-    # update zone name
-    set(surf, NULL, "zone_lower", stri_trans_tolower(surf$zone))
-
-    # add origins
-    surf[zone, on = c("zone_lower" = "name_lower"),
-        `:=`(zone = i.name, origin_x = i.x, origin_y = i.y, origin_z = i.z)]
-
-    set(surf, NULL, "zone_lower", NULL)
-
-    # TODO: handle other surfaces
-
-    if ("FenestrationSurface:Detailed" %in% cls) {
-        win <- extracct_idfgeom_surface(idf, "FenestrationSurface:Detailed")
-        # add zone
-        set(win, NULL, "surface_lower", stri_trans_tolower(win$surface))
-        set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
-        win[surf, on = "surface_lower",
-            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
-                 boundary_obj = i.boundary_obj, surface_id = i.id,
-                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
-
-        set(win, NULL, "surface_lower", NULL)
-        set(win, NULL, "category", "window")
-
-        # treat windows as holes
-        # use surface id for grouping
-        # TODO: What if there are windows that are not attached to any surfaces?
-        hole <- copy(win)[!J(NA_character_), on = "surface"][, `:=`(id = surface_id)]
-        set(hole, NULL, "category", "hole")
-
-        # clean
-        set(win, NULL, "surface_id", NULL)
-        set(hole, NULL, "surface_id", NULL)
-    }
-
-    if (length(cls_shade <- stri_subset_regex(cls, "Shading.+Detailed"))) {
-        shade <- rbindlist(lapply(cls_shade, extracct_idfgeom_surface, idf = idf))
-
-        # add zone for zone shading
-        if (!has_name(surf, "surface_lower")) {
-            set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
-        }
-
-        set(shade, NULL, "surface_lower", stri_trans_tolower(shade$surface))
-        shade[surf, on = "surface_lower",
-            `:=`(surface = i.name, zone = i.zone, boundary = i.boundary,
-                 boundary_obj = i.boundary_obj,
-                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
-
-        set(shade, NULL, "surface_lower", NULL)
-        set(shade, NULL, "category", "shading")
-    }
-
-    if (has_name(surf, "surface_lower")) set(surf, NULL, "surface_lower", NULL)
-
-    dt <- rbindlist(list(surf, hole, win, shade), fill = TRUE)
-
-    if (!nrow(dt)) {
-        message("Current IDF does not contain any supported surfaces.")
-        return(invisible())
-    }
+    dt <- rbindlist(list(surf, hole, win, shading), fill = TRUE)
 
     # offset coordinates
     # this make sure every point has the same origin of (0, 0, 0)
-    dt[!J(NA_real_, NA_real_, NA_real_), on = c("origin_x", "origin_y", "origin_z"),
-        `:=`(x = origin_x + x, y = origin_y + y, z = origin_z + z)]
+    dt[J(NA_real_), on = "origin_x", origin_x := 0.0]
+    dt[J(NA_real_), on = "origin_y", origin_y := 0.0]
+    dt[J(NA_real_), on = "origin_z", origin_z := 0.0]
+    dt[, `:=`(x = origin_x + x, y = origin_y + y, z = origin_z + z)]
     set(dt, NULL, c("origin_x", "origin_y", "origin_z"), NULL)
 
     # rotate if necessary
-    coord <- rgl::rotate3d(as.matrix(dt[, list(x, y, z)]),
-        deg_to_rad(idf$Building$North_Axis), 0, 0, 1)
-
-    set(dt, NULL, c("x", "y", "z"), as.data.table(coord))
+    dt <- rotate_vertices(dt, idf$Building$North_Axis, c("x", "y", "z"))
 
     # add number of vert and vertex index
     dt[, `:=`(n_vert = .N, index_vertex = seq_len(.N)), by = "id"]
@@ -173,49 +92,594 @@ extracct_idfgeom <- function (idf) {
 }
 # }}}
 
-# extracct_idfgeom_surface {{{
-extracct_idfgeom_surface <- function (idf, class, type = NA_character_) {
-    dt <- idf$to_table(class = class, wide = TRUE, string_value = FALSE, align = TRUE)
+# get_global_geom_rules {{{
+get_global_geom_rules <- function (idf) {
+    if (idf$is_valid_class("GlobalGeometryRules")) {
+        rules <- idf$to_table(class = "GlobalGeometryRules", all = TRUE)
+        rules <- setattr(as.list(stri_trans_tolower(rules$value)), "names",
+            stri_trans_tolower(gsub(" ", "_", rules$field, fixed = TRUE)))
 
-    if (is.na(type)) {
-        # determine shading type based on class names
-        if (stri_startswith_fixed(class, "Shading")) {
-            if (stri_detect_fixed(class, "Site")) {
-                type <- "siteshading"
-            } else if (stri_detect_fixed(class, "Building")) {
-                type <- "buildingshading"
-            } else {
-                type <- "zoneshading"
+        invalid <- idf$object_unique("GlobalGeometryRules")$validate(custom_validate(choice = TRUE))$invalid_choice
+        if (nrow(invalid)) {
+            if (1L %in% invalid$field_index) {
+                warn("warn_invalid_start_vertex_pos", paste0(
+                    "Invalid coordinate system found ", surround(rules$starting_vertex_position), ". ",
+                    "Assuming 'UpperLeftCorner'."
+                ))
+                rules$starting_vertex_position <- "upperleftcorner"
             }
+
+            if (2L %in% invalid$field_index) {
+                warn("warn_invalid_vertex_entry_dir", paste0(
+                    "Invalid vertex entry direction found ", surround(rules$vertex_entry_direciton), ". ",
+                    "Assuming 'Counterclockwise'."
+                ))
+                rules$vertex_entry_direciton <- "counterclockwise"
+            }
+
+            if (3L %in% invalid$field_index) {
+                warn("warn_invalid_global_coord_sys", paste0(
+                    "Invalid coordinate system found ", surround(rules$coordinate_system), ". ",
+                    "Assuming 'Relative'."
+                ))
+                rules$coordinate_system <- "relative"
+            }
+
+            if (5L %in% invalid$field_index) {
+                warn("warn_invalid_rectsurface_coord_sys", paste0(
+                    "Invalid rectangular coordinate system found ", surround(rules$rectangular_surface_coordinate_system), ". ",
+                    "Assuming 'Relative'."
+                ))
+                rules$rectangular_surface_coordinate_system <- "relative"
+            }
+        }
+    } else {
+        warn("warn_no_global_geom_rules",
+            "No 'GlobalGeometryRules' object found in current IDF. Assuming all defaults."
+        )
+        rules <- list(
+            starting_vertex_position = "upperleftcorner",
+            vertex_entry_direciton = "counterclockwise",
+            coordinate_system = "relative",
+            daylighting_reference_point_coordinate_system = "relative",
+            rectangular_surface_coordinate_system = "relative"
+        )
+    }
+
+    idf$definition("GlobalGeometryRules")$field_default()
+
+    rules
+}
+# }}}
+
+# get_zone_origin {{{
+get_zone_origin <- function (idf) {
+    if (!idf$is_valid_class("Zone")) {
+        zone <- data.table(name = character(), x = double(), y = double(), z = double(), name_lower = character())
+    } else {
+        zone <- idf$to_table(class = "Zone", wide = TRUE, all = TRUE, string_value = FALSE)[
+            , .SD, .SDcols = c("name", paste(c("X", "Y", "Z"), "Origin"), "Direction of Relative North")]
+        setnames(zone, c("name", "x", "y", "z", "dir_relative_north"))
+        set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
+        if (nrow(mis_origin <- na.omit(zone, by = c("x", "y", "z"), invert = TRUE))) {
+            warn("warn_no_zone_origin", paste0(
+                "Zone below has unknown origin. (0, 0, 0) will be used:\n",
+                collapse(mis_origin$name)
+            ))
+            zone[J(NA_real_), on = "x", x := 0.0]
+            zone[J(NA_real_), on = "y", y := 0.0]
+            zone[J(NA_real_), on = "z", z := 0.0]
+        }
+
+        if (anyNA(zone$dir_relative_north)) {
+            warn("warn_no_zone_north", paste0(
+                "Zone below has unknown direction of relative North. 0 will be used:\n",
+                collapse(zone[is.na(dir_relative_north), name])
+            ))
+
+            zone[J(NA_real_), on = "dir_relative_north", dir_relative_north := 0.0]
+        }
+    }
+    zone
+}
+# }}}
+
+# get_surface_vertices {{{
+get_surface_vertices <- function (idf, cls, rules, zone) {
+    surf <- data.table()
+
+    # detailed surfaces
+    if (nrow(detailed <- cls[J("Detailed"), on = "subtype", nomatch = NULL])) {
+        surf_build <- list()
+        surf_sep <- list()
+
+        # first handle BuildingSurface:Detailed
+        # it has different fields with other detailed surface classes
+        if ("BuildingSurface" %in% detailed$type) {
+            surf_build <- extract_surface_detailed(idf, detailed[J("BuildingSurface"), on = "type"])
+            detailed <- detailed[!J("BuildingSurface"), on = "type"]
+        }
+
+        # then other detailed surface classes
+        if (nrow(detailed)) {
+            surf_sep <- extract_surface_detailed(idf, detailed$class)
+        }
+
+        # combine
+        surf <- rbindlist(list(surf_build, surf_sep))
+
+        # convert to counter clockwise vertex entry direction
+        if (rules$vertex_entry_direction != "counterclockwise") {
+            surf[, by = "id", `:=`(x = rev(x), y = rev(y), z = rev(z))]
+        }
+
+        # add zone origin
+        surf <- add_zone_origin(surf, zone, rules$coordinate_system)
+    }
+
+    # other simplified surface specs
+    simple <- cls[!J("Detailed"), on = "subtype"]
+
+    if (!nrow(simple)) return(surf)
+
+    surf_simple <- extract_surface_simple(idf, simple)
+    # add zone origin
+    surf_simple <- add_zone_origin(surf_simple, zone, rules$rectangular_surface_coordinate_system)
+
+    # combine all
+    rbindlist(list(surf, surf_simple))
+}
+# }}}
+
+# get_subsurface_vertices {{{
+get_subsurface_vertices <- function (idf, cls, rules, surf) {
+    subsurf <- data.table()
+
+    # detailed surfaces
+    if (nrow(detailed <- cls[J("Detailed"), on = "subtype", nomatch = NULL])) {
+        subsurf <- extract_subsurface_detailed(idf, detailed)
+
+        cls <- cls[!J("FenestrationSurface"), on = "type"]
+
+        # convert to counter clockwise vertex entry direction
+        if (rules$vertex_entry_direction != "counterclockwise") {
+            subsurf[, by = "id", `:=`(x = rev(x), y = rev(y), z = rev(z))]
+        }
+
+        # add parent surface
+        subsurf <- add_parent_surface(subsurf, surf, rules$coordinate_system)
+    }
+
+    # other simplified surface specs
+    simple <- cls[!J("Detailed"), on = "subtype"]
+
+    if (!nrow(simple)) return(subsurf)
+
+    subsurf_simple <- extract_subsurface_simple(idf, simple)
+    # add parent surface
+    subsurf_simple <- add_parent_surface(subsurf_simple, surf, rules$rectangular_surface_coordinate_system)
+
+    # combine all
+    rbindlist(list(subsurf, subsurf_simple))
+}
+# }}}
+
+# get_shading_vertices {{{
+get_shading_vertices <- function (idf, cls, rules, zone, surf) {
+    shade <- data.table()
+
+    if (nrow(detailed <- cls[J("Detailed"), on = "misc", nomatch = NULL])) {
+        shade <- extract_shading_detailed(idf, detailed)
+
+        # convert to counter clockwise vertex entry direction
+        if (rules$vertex_entry_direction != "counterclockwise") {
+            shade[, by = "id", `:=`(x = rev(x), y = rev(y), z = rev(z))]
+        }
+
+        # add zone origin
+        shade <- add_zone_origin(shade, zone, rules$coordinate_system)
+        # add parent surface
+        shade <- add_parent_surface(shade, surf, rules$coordinate_system)
+    }
+
+    # other simplified surface specs
+    simple <- cls[!J("Detailed"), on = "subtype"]
+
+    if (!nrow(simple)) return(shade)
+
+    shade_simple <- extract_shading_simple(idf, simple)
+    # add parent surface
+    shade_simple <- add_parent_surface(shade_simple, surf, rules$rectangular_surface_coordinate_system)
+
+    # combine all
+    rbindlist(list(shade, shade_simple))
+}
+# }}}
+
+# extract_surface_detailed {{{
+extract_surface_detailed <- function (idf, class) {
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE,
+        align = TRUE, group_ext = "index")
+
+    set(dt, NULL, "Name", NULL)
+
+    # get standard surface type
+    cls <- class[!J("Detailed"), on = "subtype"]
+    dt[cls, on = "class", `Surface Type` := i.type]
+
+    # rename coordinate columns
+    setnames(dt, paste0("Vertex ", c("X", "Y", "Z"), "-coordinate"), c("x", "y", "z"))
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+
+    # unlist
+    na.omit(dt[, {
+        l <- viapply(x, length)
+        list(id = rep(id, l),
+             name = rep(name, l),
+             class = rep(class, l),
+             name = rep(name, l),
+             surface_type = rep(surface_type, l),
+             construction_name = rep(construction_name, l),
+             zone_name = rep(zone_name, l),
+             outside_boundary_condition = rep(outside_boundary_condition, l),
+             outside_boundary_condition_object = rep(outside_boundary_condition_object, l),
+             sun_exposure = rep(sun_exposure, l),
+             wind_exposure = rep(wind_exposure, l),
+             x = unlist(x, TRUE, FALSE),
+             y = unlist(y, TRUE, FALSE),
+             z = unlist(z, TRUE, FALSE)
+        )
+    }], cols = c("x", "y", "z"))
+}
+# }}}
+
+# extract_surface_simple {{{
+extract_surface_simple <- function (idf, class) {
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE, all = TRUE, force = TRUE)
+
+    set(dt, NULL, "Name", NULL)
+
+    # get standard surface type
+    cls <- class
+    dt[cls, on = "class", `Surface Type` := i.type]
+
+    # handle both wall and roof
+    if ("Height" %in% names(dt)) {
+        setnames(dt, "Height", "height_width")
+        if ("Width" %in% names(dt)) {
+            dt[J(NA_real_), on = "height_width", height_width := Width]
+            set(dt, NULL, "Width", NULL)
+        }
+    } else if ("Width" %in% names(dt)) {
+        setnames(dt, "Width", "height_width")
+    }
+
+    # rename columns
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+
+    # calculate detailed vertices
+    vert <- dt[, {
+        vert <- get_vertices_from_specs(azimuth_angle, tilt_angle,
+            starting_x_coordinate, starting_y_coordinate, starting_z_coordinate,
+            length, height_width)
+        list(id = rep(id, 4L), x = unlist(vert$x), y = unlist(vert$y), z = unlist(vert$z))
+    }]
+
+    set(dt, NULL, c("azimuth_angle", "tilt_angle", "starting_x_coordinate",
+            "starting_y_coordinate", "starting_z_coordinate", "length", "height_width"), NULL)
+    dt <- vert[dt, on = "id"]
+
+    # make sure it has the same columns as detailed surfaces
+    if (!"outside_boundary_condition_object" %in% names(dt)) {
+        set(dt, NULL, "outside_boundary_condition_object", NA_character_)
+    }
+    set(dt, NULL, c("outside_boundary_condition", "sun_exposure", "wind_exposure"), NA_character_)
+
+    # change column orders
+    setcolorder(dt, c("id", "name", "class", "surface_type", "construction_name",
+            "zone_name", "outside_boundary_condition", "outside_boundary_condition_object",
+            "sun_exposure", "wind_exposure", "x", "y", "z")
+    )
+
+    dt
+}
+# }}}
+
+# extract_subsurface_detailed {{{
+extract_subsurface_detailed <- function (idf, class) {
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE, all = TRUE)
+
+    set(dt, NULL, "Name", NULL)
+
+    # get standard surface type
+    cls <- class[!J("Detailed"), on = "subtype"]
+    dt[cls, on = "class", `Surface Type` := i.type]
+
+    # rename columns
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+    setnames(dt, "building_surface_name", "parent_surface_name")
+
+    # melt table to put coordinate together
+    dt <- melt.data.table(dt, names(dt)[1L:7L], patterns("x-coordinate", "y-coordinate", "z-coordinate"),
+        value.name = c("x", "y", "z")
+    )
+    set(dt, NULL, "variable", NULL)
+
+    # retain the original order
+    setorderv(dt, "id")
+
+    # make sure it has all necessary columns
+    set(dt, NULL, c("zone_name", "outside_boundary_condition", "sun_exposure", "wind_exposure"), NA_character_)
+    setcolorder(dt, c(
+        "id", "name", "class", "surface_type", "construction_name",
+        "parent_surface_name", "zone_name", "outside_boundary_condition",
+        "outside_boundary_condition_object", "sun_exposure", "wind_exposure",
+        "x", "y", "z"
+    ))
+
+    na.omit(dt, cols = c("x", "y", "z"))
+}
+# }}}
+
+# extract_subsurface_simple {{{
+extract_subsurface_simple <- function (idf, class) {
+    return(data.table())
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE, all = TRUE, force = TRUE)
+
+    set(dt, NULL, "Name", NULL)
+
+    # get standard surface type
+    cls <- class
+    dt[cls, on = "class", `Surface Type` := i.type]
+
+    # rename columns
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+
+    # clean
+    if ("frame_and_divider_name" %in% names(dt)) set(dt, NULL, "frame_and_divider_name", NULL)
+    if ("multiplier" %in% names(dt)) set(dt, NULL, "multiplier", NULL)
+
+    browser()
+    # calculate detailed vertices
+    vert <- dt[, {
+        x <- list(
+            starting_x_coordinate,
+            starting_x_coordinate,
+            starting_x_coordinate + length,
+            starting_x_coordinate + length
+        )
+
+        y <- list(
+            starting_z_coordinate + height,
+            starting_z_coordinate,
+            starting_z_coordinate,
+            starting_z_coordinate + height,
+        )
+
+        vert <- get_vertices_from_specs(azimuth_angle, tilt_angle,
+            starting_x_coordinate, starting_y_coordinate, starting_z_coordinate,
+            length, height_width)
+        list(id = rep(id, 4L), x = unlist(vert$x), y = unlist(vert$y), z = unlist(vert$z))
+    }]
+}
+# }}}
+
+# extract_shading_detailed {{{
+extract_shading_detailed <- function (idf, class) {
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE,
+        align = TRUE, force = TRUE, group_ext = "index")
+
+    set(dt, NULL, c("Name", "Transmittance Schedule Name", "Number of Vertices"), NULL)
+
+    # get standard surface type
+    cls <- class
+    dt[cls, on = "class", `Surface Type` := paste0(i.subtype, "Shading")]
+
+    # rename columns
+    setnames(dt, paste0("Vertex ", c("X", "Y", "Z"), "-coordinate"), c("x", "y", "z"))
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+    setnames(dt, "base_surface_name", "parent_surface_name")
+
+    na.omit(dt[, {
+        l <- viapply(x, length)
+        list(id = rep(id, l),
+             name = rep(name, l),
+             class = rep(class, l),
+             name = rep(name, l),
+             surface_type = rep(surface_type, l),
+             construction_name = NA_character_,
+             parent_surface_name = rep(parent_surface_name, l),
+             zone_name = NA_character_,
+             outside_boundary_condition = NA_character_,
+             outside_boundary_condition_object = NA_character_,
+             sun_exposure = NA_character_,
+             wind_exposure = NA_character_,
+             x = unlist(x, TRUE, FALSE),
+             y = unlist(y, TRUE, FALSE),
+             z = unlist(z, TRUE, FALSE)
+        )
+    }], cols = c("x", "y", "z"))
+}
+# }}}
+
+# extract_shading_simple {{{
+extract_shading_simple <- function (idf, class) {
+    return(data.table())
+    # for overhang
+    if ("Overhang" %in% class$subtype) {
+        dt_overhang <- idf$to_table(class = class[J("Overhang"), on = "subtype", class],
+            wide = TRUE, string_value = FALSE, all = TRUE, force = TRUE)
+
+        if ("Depth as Fraction of Window/Door Height" %in% names(dt_overhang)) {
+            if (!"Depth" %in% names(dt_overhang)) set(dt_overhang, NULL, "Depth", NA_real_)
+            dt_overhang[J(NA_real_), on = "Depth", Depth := `Depth as Fraction of Window/Door Height`]
+            set(dt_overhang, NULL, "Depth as Fraction of Window/Door Height", NULL)
         }
     }
 
-    if (!has_name(dt, "Surface Type")) set(dt, NULL, "Surface Type", as.character(type))
+    # for fin
+    if ("Fin" %in% class$subtype) {
+        dt_fin <- idf$to_table(class = class[J("Fin"), on = "subtype", class],
+            wide = TRUE, string_value = FALSE, all = TRUE, force = TRUE)
 
-    # extra columns
-    detail <- c("Construction Name",
-        if (stri_startswith_fixed(class, "Shading")) "Base Surface Name" else "Building Surface Name",
-        "Zone Name", "Outside Boundary Condition", "Outside Boundary Condition Object")
-    has_detail <- detail %in% names(dt)
+        if ("Left Depth as Fraction of Window/Door Width" %in% names(dt_fin)) {
+            if (!"Left Depth" %in% names(dt_fin)) set(dt_fin, NULL, "Left Depth", NA_real_)
+            dt_fin[J(NA_real_), on = "Left Depth", `Left Depth` := `Left Depth as Fraction of Window/Door Width`]
+            set(dt_fin, NULL, "Left Depth as Fraction of Window/Door Width", NULL)
+        }
 
-    dt_m <- melt.data.table(dt,
-        id.vars = c("id", "name", "Surface Type", detail[has_detail]),
-        measure.vars = patterns("X-coordinate", "Y-coordinate", "Z-coordinate")
-    )
-    setnames(dt_m, "Surface Type", "type")
-    setnames(dt_m, paste0("value", 1:3), c("x", "y", "z"))
-    set(dt_m, NULL, "variable", NULL)
-    set(dt_m, NULL, "type", stri_trans_tolower(dt_m$type))
-    setorderv(dt_m, "id")
-
-    if (any(!has_detail)) {
-        set(dt_m, NULL, detail[!has_detail], NA_character_)
+        if ("Right Depth as Fraction of Window/Door Width" %in% names(dt_fin)) {
+            if (!"Right Depth" %in% names(dt_fin)) set(dt_fin, NULL, "Right Depth", NA_real_)
+            dt_fin[J(NA_real_), on = "Right Depth", `Right Depth` := `Right Depth as Fraction of Window/Door Width`]
+            set(dt_fin, NULL, "Right Depth as Fraction of Window/Door Width", NULL)
+        }
     }
 
-    setcolorder(dt_m, c("id", "name", "type", detail))
-    setnames(dt_m, detail, c("const", "surface", "zone", "boundary", "boundary_obj"))
+    dt <- idf$to_table(class = class$class, wide = TRUE, string_value = FALSE, all = TRUE, force = TRUE)
 
-    na.omit(dt_m, cols = c("x", "y", "z"))
+    set(dt, NULL, "Name", NULL)
+
+    # get standard surface type
+    cls <- class
+    dt[cls, on = "class", `Surface Type` := i.type]
+
+    # rename columns
+    setnames(dt, stri_trans_tolower(stri_replace_all_fixed(names(dt), " ", "_")))
+
+    # clean
+    if ("frame_and_divider_name" %in% names(dt)) set(dt, NULL, "frame_and_divider_name", NULL)
+    if ("multiplier" %in% names(dt)) set(dt, NULL, "multiplier", NULL)
+
+    browser()
+    # calculate detailed vertices
+    vert <- dt[, {
+        x <- list(
+            starting_x_coordinate,
+            starting_x_coordinate,
+            starting_x_coordinate + length,
+            starting_x_coordinate + length
+        )
+
+        y <- list(
+            starting_z_coordinate + height,
+            starting_z_coordinate,
+            starting_z_coordinate,
+            starting_z_coordinate + height,
+        )
+
+        vert <- get_vertices_from_specs(azimuth_angle, tilt_angle,
+            starting_x_coordinate, starting_y_coordinate, starting_z_coordinate,
+            length, height_width)
+        list(id = rep(id, 4L), x = unlist(vert$x), y = unlist(vert$y), z = unlist(vert$z))
+    }]
+}
+# }}}
+
+# add_zone_origin {{{
+add_zone_origin <- function (dt, zone, coord_sys) {
+    if (!nrow(dt)) return(dt)
+
+    # update zone name
+    set(dt, NULL, "zone_lower", stri_trans_tolower(dt$zone_name))
+
+    if (coord_sys != "relative") {
+        # add origins
+        dt[zone, on = c("zone_lower" = "name_lower"),
+            `:=`(zone_name = i.name, origin_x = 0.0, origin_y = 0.0, origin_z = 0.0)]
+    } else {
+        # add origins
+        dt[zone, on = c("zone_lower" = "name_lower"),
+            `:=`(zone_name = i.name, origin_x = i.x, origin_y = i.y, origin_z = i.z)]
+    }
+
+    set(dt, NULL, "zone_lower", NULL)
+
+    dt
+}
+# }}}
+
+# add_parent_surface {{{
+add_parent_surface <- function (dt, surf, coord_sys) {
+    if (!nrow(dt)) return(dt)
+
+    if (!nrow(surf)) {
+        # this means that all subsurface are not valid
+        set(dt, NULL, "parent_surface_name", NA_character_)
+        set(dt, NULL, c("origin_x", "origin_y", "origin_z"), 0.0)
+    } else {
+        set(surf, NULL, "surface_lower", stri_trans_tolower(surf$name))
+        set(dt, NULL, "surface_lower", stri_trans_tolower(dt$parent_surface_name))
+
+        dt[surf, on = "surface_lower",
+            `:=`(parent_surface_name = i.name, zone_name = i.zone_name,
+                 outside_boundary_condition = i.outside_boundary_condition,
+                 origin_x = i.origin_x, origin_y = i.origin_y, origin_z = i.origin_z)]
+
+        if (coord_sys != "relative") {
+            set(dt, NULL, c("origin_x", "origin_y", "origin_z"), 0.0)
+        }
+
+        set(surf, NULL, "surface_lower", NULL)
+        set(dt, NULL, "surface_lower", NULL)
+    }
+
+    dt
+}
+# }}}
+
+# get_vertices_from_specs {{{
+get_vertices_from_specs <- function (azimuth, tilt, x0, y0, z0, length, height_width) {
+    cos_azimuth <- cos(deg_to_rad(azimuth))
+    sin_azimuth <- sin(deg_to_rad(azimuth))
+    cos_tilt <- cos(deg_to_rad(tilt))
+    sin_tilt <- sin(deg_to_rad(tilt))
+
+    x_init <- list(0.0, 0.0, length, length)
+    y_init <- list(height_width, 0.0, 0.0, height_width)
+
+    x <- mapply(
+        function (x, y) x0 - cos_azimuth * x - cos_tilt * sin_azimuth * y,
+        x = x_init, y = y_init, SIMPLIFY = FALSE
+    )
+
+    y <- mapply(
+        function (x, y) y0 - sin_azimuth * x - cos_tilt * cos_azimuth * y,
+        x = x_init, y = y_init, SIMPLIFY = FALSE
+    )
+
+    z <- lapply(y_init, function (y) z0 - sin_tilt * y)
+
+    list(x = x, y = y, z = z)
+}
+# }}}
+
+# rotate_vertices {{{
+rotate_vertices <- function (dt, degree, vertices) {
+    if (is.na(degree)) return(dt)
+
+    # rotate if necessary
+    coord <- rgl::rotate3d(as.matrix(dt[, .SD, .SDcols = vertices]),
+        deg_to_rad(degree), 0, 0, 1)
+
+    set(dt, NULL, c("x", "y", "z"), as.data.table(coord))
+
+    dt
+}
+# }}}
+
+# get_outward_normal {{{
+get_outward_normal <- function (dt) {
+    # calculate normal vector of surfaces using Newell Method
+    # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
+    dt[, by = "id", {
+        nx <- seq_len(.N) %% .N + 1L
+        # calculate the distance from the origin to the first point on each polygon
+        norm_x <- sum((z + z[nx]) * (y - y[nx]))
+        norm_y <- sum((x + x[nx]) * (z - z[nx]))
+        norm_z <- sum((y + y[nx]) * (x - x[nx]))
+        dis <- x[1L] * norm_x + y[1L] * norm_y + z[1L] * norm_z
+        list(x = norm_x, y = norm_y, z = norm_z, distance = dis)
+    }]
 }
 # }}}
 
@@ -223,7 +687,7 @@ extracct_idfgeom_surface <- function (idf, class, type = NA_character_) {
 triangulate_surfaces <- function (dt) {
     # calculate normal vector of surfaces using Newell Method
     # Reference: https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal#Newell.27s_Method
-    norm <- dt[!J("hole"), on = "category", by = "id", {
+    norm <- dt[!J("hole"), on = "surface_type", by = "id", {
         nx <- seq_len(.N) %% .N + 1L
         # calculate the distance from the origin to the first point on each polygon
         norm_x <- sum((z + z[nx]) * (y - y[nx]))
@@ -244,16 +708,30 @@ triangulate_surfaces <- function (dt) {
     }, by = "id"]
 
     # triangulation using earcut algorithm
-    dt[, by = "id", {
-        # get vertex index of the start of a hole
-        hole <- index_vertex[c(0L, diff(rleid(name))) > 0]
-        if (!length(hole)) hole <- 0L
-        tri <- decido::earcut(list(projected_x, projected_y), hole)
-        list(x = x[tri], y = y[tri], z = z[tri],
-             color = rep(color[1L], length(tri)),
-             alpha = rep(alpha[1L], length(tri))
-        )
-    }]
+    if ("color_int" %in% names(dt)) {
+        dt[, by = "id", {
+            # get vertex index of the start of a hole
+            hole <- index_vertex[c(0L, diff(rleid(name))) > 0]
+            if (!length(hole)) hole <- 0L
+            tri <- decido::earcut(list(projected_x, projected_y), hole)
+            list(x = x[tri], y = y[tri], z = z[tri],
+                 color = rep(color[1L], length(tri)),
+                 color_int = rep(color_int[1L], length(tri)),
+                 alpha = rep(alpha[1L], length(tri))
+            )
+        }]
+    } else {
+        dt[, by = "id", {
+            # get vertex index of the start of a hole
+            hole <- index_vertex[c(0L, diff(rleid(name))) > 0]
+            if (!length(hole)) hole <- 0L
+            tri <- decido::earcut(list(projected_x, projected_y), hole)
+            list(x = x[tri], y = y[tri], z = z[tri],
+                 color = rep(color[1L], length(tri)),
+                 alpha = rep(alpha[1L], length(tri))
+            )
+        }]
+    }
 }
 # }}}
 
@@ -262,7 +740,7 @@ pair_line_vertex <- function (dt) {
     # for lines, vertices should be provided in pairs
     # only need to plot surfaces here, since windows and holes are the same
     # things here
-    dt[!J("hole"), on = "category", by = "id", {
+    dt[!J("Hole"), on = "surface_type", by = "id", {
         idx <- c(sort(c(index_vertex, index_vertex[-1L])), 1L)
         list(x = x[idx], y = y[idx], z = z[idx])
     }]
@@ -301,8 +779,13 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
     # copy the original data
     dt <- data.table::copy(private$m_geometry)
 
+    if (!nrow(dt)) {
+        message("Current IDF does not contain any supported surfaces.")
+        return(invisible())
+    }
+
     # map color
-    map_color(dt, type = render_by)
+    dt <- map_color(dt, type = render_by)
 
     # initial rgl window
     private$m_log$id$device <- rgl_init(new = new, clear = clear,
@@ -316,11 +799,26 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
     if (surface) {
         tri <- triangulate_surfaces(dt)
 
-        private$m_log$id$surface <- rgl::triangles3d(
-            x = as.matrix(tri[, .SD, .SDcols = c("x", "y", "z")]),
-            color = as.matrix(tri[, .SD, .SDcols = rep("color", 3L)]),
-            alpha = as.matrix(tri[, .SD, .SDcols = rep("alpha", 3L)])
-        )
+        if (render_by != "surface_type") {
+            private$m_log$id$surface <- rgl::triangles3d(
+                x = as.matrix(tri[, .SD, .SDcols = c("x", "y", "z")]),
+                color = as.matrix(tri[, .SD, .SDcols = rep("color", 3L)]),
+                alpha = as.matrix(tri[, .SD, .SDcols = rep("alpha", 3L)])
+            )
+        } else {
+            private$m_log$id$surface$front <- rgl::triangles3d(
+                x = as.matrix(tri[, .SD, .SDcols = c("x", "y", "z")]),
+                color = as.matrix(tri[, .SD, .SDcols = rep("color", 3L)]),
+                alpha = as.matrix(tri[, .SD, .SDcols = rep("alpha", 3L)]),
+                front = "fill", back = "culled"
+            )
+            private$m_log$id$surface$back <- rgl::triangles3d(
+                x = as.matrix(tri[, .SD, .SDcols = c("x", "y", "z")]),
+                color = as.matrix(tri[, .SD, .SDcols = rep("color_int", 3L)]),
+                alpha = as.matrix(tri[, .SD, .SDcols = rep("alpha", 3L)]),
+                front = "culled", back = "fill"
+            )
+        }
     }
 
     if (wireframe) {
@@ -367,7 +865,7 @@ geom_save_snapshot <- function (self, private, filename, bring_to_front = TRUE, 
         ))
     }
 
-    if (rgl::rgl.cur() == 0) {
+    if (is.null(private$m_log$id$device)) {
         abort("error_no_rgl_window", "No rgl window currently open. Please run '$view()' first.")
     }
 
@@ -486,63 +984,63 @@ pan3d <- function(button, dev = rgl::rgl.cur(), subscene = rgl::currentSubscene3
 #' @importFrom grDevices rgb
 COLOR_MAP <- list(
     surface_type = c(
-        undefined = rgb(255/255, 255/255, 255/255, 1),
-        normalmaterial = rgb(255/255, 255/255, 255/255, 1),
-        normalmaterial_ext = rgb(255/255, 255/255, 255/255, 1),
-        normalmaterial_int = rgb(255/255, 0/255, 0/255, 1),
-        floor = rgb(128/255, 128/255, 128/255, 1),
-        floor_ext = rgb(128/255, 128/255, 128/255, 1),
-        floor_int = rgb(191/255, 191/255, 191/255, 1),
-        wall = rgb(204/255, 178/255, 102/255, 1),
-        wall_ext = rgb(204/255, 178/255, 102/255, 1),
-        wall_int = rgb(235/255, 226/255, 197/255, 1),
-        roof = rgb(153/255, 76/255, 76/255, 1),
-        roof_ext = rgb(153/255, 76/255, 76/255, 1),
-        roof_int = rgb(202/255, 149/255, 149/255, 1),
-        ceiling = rgb(153/255, 76/255, 76/255, 1),
-        ceiling_ext = rgb(153/255, 76/255, 76/255, 1),
-        ceiling_int = rgb(202/255, 149/255, 149/255, 1),
-        window = rgb(102/255, 178/255, 204/255, 0.6),
-        window_ext = rgb(102/255, 178/255, 204/255, 0.6),
-        window_int = rgb(192/255, 226/255, 235/255, 0.6),
-        door = rgb(153/255, 133/255, 76/255, 1),
-        door_ext = rgb(153/255, 133/255, 76/255, 1),
-        door_int = rgb(202/255, 188/255, 149/255, 1),
-        glassdoor = rgb(153/255, 133/255, 76/255, 1),
-        glassdoor_ext = rgb(153/255, 133/255, 76/255, 1),
-        glassdoor_int = rgb(202/255, 188/255, 149/255, 1),
-        siteshading = rgb(75/255, 124/255, 149/255, 1),
-        siteshading_ext = rgb(75/255, 124/255, 149/255, 1),
-        siteshading_int = rgb(187/255, 209/255, 220/255, 1),
-        buildingshading = rgb(113/255, 76/255, 153/255, 1),
-        buildingshading_ext = rgb(113/255, 76/255, 153/255, 1),
-        buildingshading_int = rgb(216/255, 203/255, 229/255, 1),
-        zoneshading = rgb(76/255, 110/255, 178/255, 1),
-        zoneshading_ext = rgb(76/255, 110/255, 178/255, 1),
-        zoneshading_int = rgb(183/255, 197/255, 224/255, 1),
-        interiorpartitionsurface = rgb(158/255, 188/255, 143/255, 1),
-        interiorpartitionsurface_ext = rgb(158/255, 188/255, 143/255, 1),
-        interiorpartitionsurface_int = rgb(213/255, 226/255, 207/255, 1)
+        Undefined = rgb(255/255, 255/255, 255/255, 1),
+        NormalMaterial = rgb(255/255, 255/255, 255/255, 1),
+        NormalMaterial_Ext = rgb(255/255, 255/255, 255/255, 1),
+        NormalMaterial_Int = rgb(255/255, 0/255, 0/255, 1),
+        Floor = rgb(128/255, 128/255, 128/255, 1),
+        Floor_Ext = rgb(128/255, 128/255, 128/255, 1),
+        Floor_Int = rgb(191/255, 191/255, 191/255, 1),
+        Wall = rgb(204/255, 178/255, 102/255, 1),
+        Wall_Ext = rgb(204/255, 178/255, 102/255, 1),
+        Wall_Int = rgb(235/255, 226/255, 197/255, 1),
+        Roof = rgb(153/255, 76/255, 76/255, 1),
+        Roof_Ext = rgb(153/255, 76/255, 76/255, 1),
+        Roof_Int = rgb(202/255, 149/255, 149/255, 1),
+        Ceiling = rgb(153/255, 76/255, 76/255, 1),
+        Ceiling_Ext = rgb(153/255, 76/255, 76/255, 1),
+        Ceiling_Int = rgb(202/255, 149/255, 149/255, 1),
+        Window = rgb(102/255, 178/255, 204/255, 0.6),
+        Window_Ext = rgb(102/255, 178/255, 204/255, 0.6),
+        Window_Int = rgb(192/255, 226/255, 235/255, 0.6),
+        Door = rgb(153/255, 133/255, 76/255, 1),
+        Door_Ext = rgb(153/255, 133/255, 76/255, 1),
+        Door_Int = rgb(202/255, 188/255, 149/255, 1),
+        Glassdoor = rgb(153/255, 133/255, 76/255, 1),
+        Glassdoor_Ext = rgb(153/255, 133/255, 76/255, 1),
+        Glassdoor_Int = rgb(202/255, 188/255, 149/255, 1),
+        SiteShading = rgb(75/255, 124/255, 149/255, 1),
+        SiteShading_Ext = rgb(75/255, 124/255, 149/255, 1),
+        SiteShading_Int = rgb(187/255, 209/255, 220/255, 1),
+        BuildingShading = rgb(113/255, 76/255, 153/255, 1),
+        BuildingShading_Ext = rgb(113/255, 76/255, 153/255, 1),
+        BuildingShading_Int = rgb(216/255, 203/255, 229/255, 1),
+        ZoneShading = rgb(76/255, 110/255, 178/255, 1),
+        ZoneShading_Ext = rgb(76/255, 110/255, 178/255, 1),
+        ZoneShading_Int = rgb(183/255, 197/255, 224/255, 1),
+        InteriorPartitionSurface = rgb(158/255, 188/255, 143/255, 1),
+        InteriorPartitionSurface_Ext = rgb(158/255, 188/255, 143/255, 1),
+        InteriorPartitionSurface_Int = rgb(213/255, 226/255, 207/255, 1)
     ),
     boundary = c(
-        surface = rgb(0/255, 153/255, 0/255),
-        adiabatic = rgb(255/255, 0/255, 0/255),
-        zone = rgb(255/255, 0/255, 0/255),
-        outdoors = rgb(163/255, 204/255, 204/255),
-        outdoors_sun = rgb(40/255, 204/255, 204/255),
-        outdoors_wind = rgb(9/255, 159/255, 162/255),
-        outdoors_sunwind = rgb(68/255, 119/255, 161/255),
-        ground = rgb(204/255, 183/255, 122/255),
-        groundfcfactormethod = rgb(153/255, 122/255, 30/255),
-        groundslabpreprocessoraverage = rgb(255/255, 191/255, 0/255),
-        groundslabpreprocessorcore = rgb(255/255, 182/255, 50/255),
-        groundslabpreprocessorperimeter = rgb(255/255, 178/255, 101/255),
-        groundbasementpreprocessoraveragewall = rgb(204/255, 51/255, 0/255),
-        groundbasementpreprocessoraveragefloor = rgb(204/255, 81/255, 40/255),
-        groundbasementpreprocessorupperwall = rgb(204/255, 112/255, 81/255),
-        groundbasementpreprocessorlowerwall = rgb(204/255, 173/255, 163/255),
-        othersidecoefficients = rgb(63/255, 63/255, 63/255),
-        othersideconditionsmodel = rgb(153/255, 0/255, 76/255)
+        Surface = rgb(0/255, 153/255, 0/255),
+        Adiabatic = rgb(255/255, 0/255, 0/255),
+        Zone = rgb(255/255, 0/255, 0/255),
+        Outdoors = rgb(163/255, 204/255, 204/255),
+        Outdoors_Sun = rgb(40/255, 204/255, 204/255),
+        Outdoors_Wind = rgb(9/255, 159/255, 162/255),
+        Outdoors_Sunwind = rgb(68/255, 119/255, 161/255),
+        Ground = rgb(204/255, 183/255, 122/255),
+        GroundFCFactorMethod = rgb(153/255, 122/255, 30/255),
+        GroundSlabPreprocessorAverage = rgb(255/255, 191/255, 0/255),
+        GroundSlabPreprocessorCore = rgb(255/255, 182/255, 50/255),
+        GroundSlabPreprocessorPerimeter = rgb(255/255, 178/255, 101/255),
+        GroundBasementPreprocessorAverageWall = rgb(204/255, 51/255, 0/255),
+        GroundBasementPreprocessorAverageFloor = rgb(204/255, 81/255, 40/255),
+        GroundBasementPreprocessorUpperWall = rgb(204/255, 112/255, 81/255),
+        GroundBasementPreprocessorLowerWall = rgb(204/255, 173/255, 163/255),
+        OtherSideCoefficients = rgb(63/255, 63/255, 63/255),
+        OtherSideConditionsModel = rgb(153/255, 0/255, 76/255)
     ),
     color = c(
         AliceBlue = rgb(240/255, 248/255, 255/255),
@@ -696,17 +1194,36 @@ map_color <- function (dt, type = "surface_type") {
     set(dt, NULL, c("color", "alpha"), list("white", 1.0))
 
     if (type == "surface_type") {
-        cl <- data.table(type = names(COLOR_MAP$surface_type), color = COLOR_MAP$surface_type)
-        dt[cl, on = "type", color := i.color]
-        trans <- paste0(c("window", "glassdoor"), rep(c("", "_int", "_ext"), 2L))
-        dt[J(trans), on = "type", alpha := 0.6]
+        cl <- data.table(surface_type = names(COLOR_MAP$surface_type), color = COLOR_MAP$surface_type)
+        dt[cl, on = "surface_type", `:=`(color = i.color)]
+
+        dt[, surface_type_int := paste0(surface_type, "_Int")]
+        dt[cl, on = c("surface_type_int" = "surface_type"), `:=`(color_int = i.color)]
+        set(dt, NULL, "surface_type_int", NULL)
+
+        trans <- paste0(c("Window", "GlassDoor"), rep(c("", "_Int", "_Ext"), 2L))
+        dt[J(trans), on = "surface_type", alpha := 0.6]
     } else if (type == "boundary") {
-        set(dt, NULL, "boundary_lower", stri_trans_tolower(dt$boundary))
-        cl <- data.table(boundary_lower = names(COLOR_MAP$boundary), color = COLOR_MAP$boundary)
+        set(dt, NULL, "boundary_lower", stri_trans_tolower(dt$outside_boundary_condition))
+        set(dt, NULL, "sun_exposure_lower", stri_trans_tolower(dt$sun_exposure_lower))
+        set(dt, NULL, "wind_exposure_lower", stri_trans_tolower(dt$wind_exposure_lower))
+
+        dt[J("outdoors", "sunexposed", "windexposed"),
+           on = c("boundary_lower", "sun_exposure_lower", "wind_exposure_lower"),
+           boundary_lower := "outdoors_sunwind"]
+
+        dt[boundary_lower == "outdoors" & sun_exposure_lower == "sunexposed" & wind_exposure_lower != "windexposed",
+           boundary_lower := "outdoors_sun"]
+
+        dt[boundary_lower == "outdoors" & sun_exposure_lower != "sunexposed" & wind_exposure_lower == "windexposed",
+           boundary_lower := "outdoors_wind"]
+
+        cl <- data.table(boundary_lower = stri_trans_tolower(names(COLOR_MAP$boundary)), color = COLOR_MAP$boundary)
         dt[cl, on = "boundary_lower", color := i.color]
-        set(dt, NULL, "boundary_lower", NULL)
+
+        set(dt, NULL, c("boundary_lower", "sun_exposure_lower", "wind_exposure_lower"), NULL)
     } else {
-        col <- switch(type, construction = "const", zone = "zone")
+        col <- switch(type, construction = "construction_name", zone = "zone_name")
         col_lower <- paste0(col, "_lower")
 
         set(dt, NULL, col_lower, stri_trans_tolower(dt[[col]]))

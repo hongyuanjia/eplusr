@@ -266,6 +266,8 @@ them.
 |                     | `$save()`                | Save `Idf` to an `.idf` file                      |
 | Clone               | `$clone()`               | Create an copy                                    |
 | Run                 | `$run()`                 | Run `Idf` together with an `Epw`                  |
+| Visualize           | `$view()`                | Show `Idf` 3D geometry using the rgl package      |
+|                     | `$save_view()`           | Save current view as an image                     |
 | Print               | `$print()`               | Print `Idf` in different details                  |
 
 Table: Methods of `Idf` class
