@@ -80,7 +80,7 @@ jobs:
         if: contains(github.ref, 'master') && matrix.config.BUILD_PKGDOWN
         run: |
           Rscript -e "install.packages('devtools')"
-          Rscript -e "devtools::load_all(); pkgdown:::deploy_local(new_process = FALSE, run_dont_run = TRUE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')"
+          Rscript -e "devtools::install(); pkgdown:::deploy_local(new_process = FALSE, run_dont_run = TRUE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')"
 
       - name: Test coverage
         if: matrix.config.os == 'ubuntu-16.04' && matrix.config.r == 'release'
