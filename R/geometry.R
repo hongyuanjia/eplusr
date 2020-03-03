@@ -1190,14 +1190,16 @@ COLOR_MAP <- list(
 map_color <- function (dt, type = "surface_type", x_ray = FALSE) {
     type <- match.arg(type, c("surface_type", "boundary", "construction", "zone"))
 
-    # init alpha to 1.0 and color to white
-    set(dt, NULL, c("color", "alpha"), list("white", 1.0))
+    alpha <- if (x_ray) 0.4 else 1.0
+    # init color to white
+    set(dt, NULL, c("color", "alpha"), list("white", alpha))
 
     if (type == "surface_type") {
         cl <- data.table(surface_type = names(COLOR_MAP$surface_type), color = COLOR_MAP$surface_type)
         dt[cl, on = "surface_type", `:=`(color = i.color)]
 
-        dt[, surface_type_int := paste0(surface_type, "_Int")]
+        # TODO: figure out the outside face and the inside face
+        dt[, surface_type_int := surface_type]
         dt[cl, on = c("surface_type_int" = "surface_type"), `:=`(color_int = i.color)]
         set(dt, NULL, "surface_type_int", NULL)
 
