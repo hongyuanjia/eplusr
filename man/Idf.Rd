@@ -3291,6 +3291,12 @@ will be grouped by the extensible field indice they belong to.
 For example, coordinate values of all x coordinates will be
 put into a list. If \code{"none"}, nothing special will be done.
 Default: \code{"none"}.}
+
+\item{\code{force}}{If \code{TRUE}, \code{wide} can be \code{TRUE} even though there are
+multiple classes in input. This can result in a data.table
+with lots of columns. But may be useful when you know that
+target classes have the exact same fields, e.g.
+\code{Ceiling:Adiabatic} and \code{Floor:Adiabatic}. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

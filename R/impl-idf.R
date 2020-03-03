@@ -3391,7 +3391,8 @@ read_idfeditor_copy <- function (version = NULL, in_ip = FALSE) {
 # get_idf_table {{{
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
-                           align = FALSE, all = FALSE, group_ext = c("none", "group", "index")) {
+                           align = FALSE, all = FALSE, group_ext = c("none", "group", "index"),
+                           force = FALSE) {
     group_ext <- match.arg(group_ext)
 
     cols <- c("object_id", "object_name", "class_name",
@@ -3404,7 +3405,7 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
         align = align, complete = TRUE, all = all, ignore_case = TRUE)[
         , .SD, .SDcols = c("rleid", cols)]
 
-    if (wide && length(cls <- unique(val$class_name)) != 1L) {
+    if (wide && length(cls <- unique(val$class_name)) != 1L && !force) {
         if (length(cls) <= 5L) {
             cls <- collapse(cls)
         } else {
