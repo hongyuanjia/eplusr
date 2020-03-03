@@ -63,6 +63,10 @@ jobs:
           sudo -s eval "$sysreqs"
           sudo apt install -y qpdf
 
+      - name: Install udunits for macos
+        if: runner.os == 'macOS'
+        run: brew install udunits
+
       - name: Install dependencies
         run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck'); remotes::install_github('jimhester/pkgdown@github-actions-deploy')"
 
