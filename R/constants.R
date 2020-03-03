@@ -101,6 +101,16 @@ utils::globalVariables(c(
     "field_num", "i.class_id", "i.min_fields", "i.num_extensible",
     "i.extensible_group", "i.required_field", "i.comment", "old_min_fields",
     "new_rleid", "sgl_object_id", "sql", "day_type", "simulation_days",
-    "row_index", "is_num"
+    "row_index", "is_num", "alpha", "azimuth_angle", "boundary_lower", "color",
+    "color_int", "construction_name", "dir_relative_north", "height",
+    "height_width", "i.color", "i.id", "i.name", "i.origin_x", "i.origin_y",
+    "i.origin_z", "i.outside_boundary_condition", "i.projection_axis",
+    "i.subtype", "i.type", "i.x", "i.y", "i.z", "i.zone_name", "index_vertex",
+    "origin_x", "origin_y", "origin_z", "outside_boundary_condition",
+    "outside_boundary_condition_object", "parent_surface_name", "patterns",
+    "projected_x", "projected_y", "projection_axis", "starting_x_coordinate",
+    "starting_y_coordinate", "starting_z_coordinate", "sun_exposure",
+    "sun_exposure_lower", "surface_type", "surface_type_int", "tilt_angle",
+    "wind_exposure", "wind_exposure_lower", "y", "z", "zone", "zone_name"
 ))
 # }}}

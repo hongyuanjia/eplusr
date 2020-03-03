@@ -310,6 +310,7 @@ extract_surface_detailed <- function (idf, class) {
 
     # get standard surface type
     cls <- class[!J("Detailed"), on = "subtype"]
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := i.type]
 
     # rename coordinate columns
@@ -345,12 +346,14 @@ extract_surface_simple <- function (idf, class) {
 
     # get standard surface type
     cls <- class
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := i.type]
 
     # handle both wall and roof
     if ("Height" %in% names(dt)) {
         setnames(dt, "Height", "height_width")
         if ("Width" %in% names(dt)) {
+            Width <- NULL
             dt[J(NA_real_), on = "height_width", height_width := Width]
             set(dt, NULL, "Width", NULL)
         }
@@ -397,6 +400,7 @@ extract_subsurface_detailed <- function (idf, class) {
 
     # get standard surface type
     cls <- class[!J("Detailed"), on = "subtype"]
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := i.type]
 
     # rename columns
@@ -434,6 +438,7 @@ extract_subsurface_simple <- function (idf, class) {
 
     # get standard surface type
     cls <- class
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := i.type]
 
     # rename columns
@@ -457,7 +462,7 @@ extract_subsurface_simple <- function (idf, class) {
             starting_z_coordinate + height,
             starting_z_coordinate,
             starting_z_coordinate,
-            starting_z_coordinate + height,
+            starting_z_coordinate + height
         )
 
         vert <- get_vertices_from_specs(azimuth_angle, tilt_angle,
@@ -477,6 +482,7 @@ extract_shading_detailed <- function (idf, class) {
 
     # get standard surface type
     cls <- class
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := paste0(i.subtype, "Shading")]
 
     # rename columns
@@ -519,6 +525,7 @@ extract_shading_simple <- function (idf, class) {
 
         if ("Depth as Fraction of Window/Door Height" %in% names(dt_overhang)) {
             if (!"Depth" %in% names(dt_overhang)) set(dt_overhang, NULL, "Depth", NA_real_)
+            Depth <- `Depth as Fraction of Window/Door Height` <- NULL
             dt_overhang[J(NA_real_), on = "Depth", Depth := `Depth as Fraction of Window/Door Height`]
             set(dt_overhang, NULL, "Depth as Fraction of Window/Door Height", NULL)
         }
@@ -531,12 +538,14 @@ extract_shading_simple <- function (idf, class) {
 
         if ("Left Depth as Fraction of Window/Door Width" %in% names(dt_fin)) {
             if (!"Left Depth" %in% names(dt_fin)) set(dt_fin, NULL, "Left Depth", NA_real_)
+            `Left Depth` <- `Left Depth as Fraction of Window/Door Width` <- NULL
             dt_fin[J(NA_real_), on = "Left Depth", `Left Depth` := `Left Depth as Fraction of Window/Door Width`]
             set(dt_fin, NULL, "Left Depth as Fraction of Window/Door Width", NULL)
         }
 
         if ("Right Depth as Fraction of Window/Door Width" %in% names(dt_fin)) {
             if (!"Right Depth" %in% names(dt_fin)) set(dt_fin, NULL, "Right Depth", NA_real_)
+            `Right Depth` <- `Right Depth as Fraction of Window/Door Width` <- NULL
             dt_fin[J(NA_real_), on = "Right Depth", `Right Depth` := `Right Depth as Fraction of Window/Door Width`]
             set(dt_fin, NULL, "Right Depth as Fraction of Window/Door Width", NULL)
         }
@@ -548,6 +557,7 @@ extract_shading_simple <- function (idf, class) {
 
     # get standard surface type
     cls <- class
+    `Surface Type` <- NULL
     dt[cls, on = "class", `Surface Type` := i.type]
 
     # rename columns
@@ -571,7 +581,7 @@ extract_shading_simple <- function (idf, class) {
             starting_z_coordinate + height,
             starting_z_coordinate,
             starting_z_coordinate,
-            starting_z_coordinate + height,
+            starting_z_coordinate + height
         )
 
         vert <- get_vertices_from_specs(azimuth_angle, tilt_angle,
