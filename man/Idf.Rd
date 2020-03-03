@@ -37,6 +37,10 @@ stored in three tables:
 \item \code{reference}: contains cross-reference data of field values.
 }
 }
+\note{
+When rendering by surface types, the exterior and interior face
+detection may be not 100\% right.
+}
 \examples{
 
 ## ------------------------------------------------
@@ -3684,6 +3688,7 @@ View 3D \code{Idf} geometry
   axis = TRUE,
   wireframe = TRUE,
   surface = TRUE,
+  x_ray = FALSE,
   line_width = 1.5,
   line_color = "black",
   theta = 0,
@@ -3730,6 +3735,9 @@ shown. Default: \code{TRUE}.}
 \item{\code{surface}}{If \code{TRUE}, the surfaces themselves will be shown.
 Default: \code{TRUE}.}
 
+\item{\code{x_ray}}{If \code{TRUE}, all surfaces wll be rendered translucently.
+Default: \code{FALSE}.}
+
 \item{\code{line_width}}{The line width of wireframes. Default: \code{1.5}.}
 
 \item{\code{line_color}}{The color of wireframes. Default: \code{black}.}
@@ -3745,7 +3753,7 @@ Default: \code{60}.}
 
 \item{\code{background}}{The color of the backports. Default: \code{"white"}.}
 
-\item{\code{size}}{A numeric vector specifying the position, width and
+\item{\code{size}}{A numeric vector specifying the x-y coordiates, width and
 height of the rgl device. The x-y coordinates are based on the
 original located in the upper left corner of current screen.
 By default, x-y coordinates are set to zeros.\preformatted{* If 1 number, the width and height of rgl windows will be
@@ -3758,9 +3766,6 @@ By default, x-y coordinates are set to zeros.\preformatted{* If 1 number, the wi
 * If 4 numbers, the first 2 numbers will be used as x-y
   coordinates. The next 2 specify the window size.
 }}
-
-\item{\code{x_ray}}{(NOT IMPLEMENTED) If \code{TRUE}, all surfaces wll be
-rendered translucently.  Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -3768,6 +3773,35 @@ rendered translucently.  Default: \code{FALSE}.}
 \verb{$view()} uses the \href{https://cran.r-project.org/package=rgl}{rgl}
 package to visualize the IDF geometry in 3D in a similar way as
 \href{https://www.openstudio.net}{OpenStudio}.
+
+Current only detailed geometry classes are supported, including:
+\itemize{
+\item Surfaces:
+\itemize{
+\item \code{BuildingSurface:Detailed}
+\item \code{Wall:Detailed}
+\item \code{RoofCeiling:Detailed}
+\item \code{Floor:Detailed}
+}
+\item Sub-surfaces:
+\itemize{
+\item \code{FenestrationSurface:Detailed}
+}
+\item Shadings:
+\itemize{
+\item \code{Shading:Site:Detailed}
+\item \code{Shading:Building:Detailed}
+\item \code{Shading:Zone:Detailed}
+}
+}
+
+In the rgl window, you can control the view using your mouse:
+\itemize{
+\item Left button: Trackball
+\item Right button: Pan
+\item Middle button: Field-of-view (FOV)
+\item Wheel: Zoom
+}
 }
 
 \subsection{Returns}{

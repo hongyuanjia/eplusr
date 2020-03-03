@@ -2269,6 +2269,31 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' package to visualize the IDF geometry in 3D in a similar way as
         #' [OpenStudio](https://www.openstudio.net).
         #'
+        #' Current only detailed geometry classes are supported, including:
+        #'
+        #' * Surfaces:
+        #'     * `BuildingSurface:Detailed`
+        #'     * `Wall:Detailed`
+        #'     * `RoofCeiling:Detailed`
+        #'     * `Floor:Detailed`
+        #' * Sub-surfaces:
+        #'     * `FenestrationSurface:Detailed`
+        #' * Shadings:
+        #'     * `Shading:Site:Detailed`
+        #'     * `Shading:Building:Detailed`
+        #'     * `Shading:Zone:Detailed`
+        #'
+        #' In the rgl window, you can control the view using your mouse:
+        #'
+        #' * Left button: Trackball
+        #' * Right button: Pan
+        #' * Middle button: Field-of-view (FOV)
+        #' * Wheel: Zoom
+        #'
+        #' @note
+        #' When rendering by surface types, the exterior and interior face
+        #' detection may be not 100% right.
+        #'
         #' @param new If `TRUE`, a new rgl window will be open using
         #'        [rgl::rgl.open()]. If `FALSE`, existing rgl window will be
         #'        reused if possible. Default: `FALSE`.
@@ -2302,8 +2327,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @param surface If `TRUE`, the surfaces themselves will be shown.
         #'        Default: `TRUE`.
         #'
-        #' @param x_ray (NOT IMPLEMENTED) If `TRUE`, all surfaces wll be
-        #'        rendered translucently.  Default: `FALSE`.
+        #' @param x_ray If `TRUE`, all surfaces wll be rendered translucently.
+        #'        Default: `FALSE`.
         #'
         #' @param line_width The line width of wireframes. Default: `1.5`.
         #'
@@ -2320,7 +2345,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @param background The color of the backports. Default: `"white"`.
         #'
-        #' @param size A numeric vector specifying the position, width and
+        #' @param size A numeric vector specifying the x-y coordiates, width and
         #'        height of the rgl device. The x-y coordinates are based on the
         #'        original located in the upper left corner of current screen.
         #'        By default, x-y coordinates are set to zeros.
@@ -2345,12 +2370,12 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         view = function (new = FALSE, clear = TRUE, render_by = "surface_type",
-                         axis = TRUE, wireframe = TRUE, surface = TRUE,
+                         axis = TRUE, wireframe = TRUE, surface = TRUE, x_ray = FALSE,
                          line_width = 1.5, line_color = "black",
                          theta = 0, phi = -60, fov = 60, zoom = 1,
                          background = "white", size = c(0, 30, 800))
             idf_view(self, private, new = new, clear = clear, render_by = render_by,
-                     axis = axis, wireframe = wireframe, surface = surface,
+                     axis = axis, wireframe = wireframe, surface = surface, x_ray = x_ray,
                      line_width = line_width, line_color = line_color,
                      theta = theta, phi = phi, fov = fov, zoom = zoom,
                      background = background, size = size),
@@ -3090,12 +3115,12 @@ idf_last_job <- function (self, private) {
 # idf_view {{{
 idf_view <- function (self, private, new = FALSE, clear = TRUE, axis = TRUE,
                       render_by = "surface_type", wireframe = TRUE, surface = TRUE,
-                      line_width = 1.5, line_color = "black",
+                      x_ray = FALSE, line_width = 1.5, line_color = "black",
                       theta = 0, phi = -60, fov = 60, zoom = 1, background = "white",
                       size = c(0, 30, 800)) {
     private$m_log$geometry <- IdfGeometry$new(self)
     private$m_log$geometry$view(new = new, clear = clear, render_by = render_by,
-        axis = axis, wireframe = wireframe, surface = surface,
+        axis = axis, wireframe = wireframe, surface = surface, x_ray = x_ray,
         line_width = line_width, line_color = line_color,
         theta = theta, phi = phi, fov = fov, zoom = zoom,
         background = background, size = size

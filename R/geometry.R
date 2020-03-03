@@ -16,12 +16,12 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             geom_vertices(self, private),
 
         view = function (new = TRUE, clear = TRUE, render_by = "surface_type",
-                         axis = TRUE, wireframe = TRUE, surface = TRUE,
+                         axis = TRUE, wireframe = TRUE, surface = TRUE, x_ray = FALSE,
                          line_width = 1.5, line_color = "black",
                          theta = 0, phi = -60, fov = 60, zoom = 1,
                          background = "white", size = c(0, 30, 800))
             geom_view(self, private, new = new, clear = clear, render_by = render_by,
-                      axis = axis, wireframe = wireframe, surface = surface,
+                      axis = axis, wireframe = wireframe, surface = surface, x_ray = x_ray,
                       line_width = line_width, line_color = line_color,
                       theta = theta, phi = phi, fov = fov, zoom = zoom,
                       background = background, size = size),
@@ -756,7 +756,7 @@ geom_vertices <- function (self, private) {
 # geom_view {{{
 geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
                        render_by = "surface_type", wireframe = TRUE, surface = TRUE,
-                       line_width = 1.5, line_color = "black",
+                       x_ray = FALSE, line_width = 1.5, line_color = "black",
                        theta = 0, phi = -60, fov = 60, zoom = 1, background = "white",
                        size = c(0, 30, 800)) {
     if (!requireNamespace("rgl", quietly = TRUE)) {
@@ -785,7 +785,7 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
     }
 
     # map color
-    dt <- map_color(dt, type = render_by)
+    dt <- map_color(dt, type = render_by, x_ray = x_ray)
 
     # initial rgl window
     private$m_log$id$device <- rgl_init(new = new, clear = clear,
@@ -1187,7 +1187,7 @@ COLOR_MAP <- list(
 # }}}
 
 # map_color {{{
-map_color <- function (dt, type = "surface_type") {
+map_color <- function (dt, type = "surface_type", x_ray = FALSE) {
     type <- match.arg(type, c("surface_type", "boundary", "construction", "zone"))
 
     # init alpha to 1.0 and color to white
@@ -1202,7 +1202,7 @@ map_color <- function (dt, type = "surface_type") {
         set(dt, NULL, "surface_type_int", NULL)
 
         trans <- paste0(c("Window", "GlassDoor"), rep(c("", "_Int", "_Ext"), 2L))
-        dt[J(trans), on = "surface_type", alpha := 0.6]
+        if (!x_ray) dt[J(trans), on = "surface_type", alpha := 0.6]
     } else if (type == "boundary") {
         set(dt, NULL, "boundary_lower", stri_trans_tolower(dt$outside_boundary_condition))
         set(dt, NULL, "sun_exposure_lower", stri_trans_tolower(dt$sun_exposure_lower))
