@@ -68,7 +68,7 @@ jobs:
         run: brew install udunits
 
       - name: Install dependencies
-        run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck'); remotes::install_dev('pkgdown')"
+        run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck')"
 
       - name: Check
         run: Rscript -e "args <- if (Sys.getenv('AS_CRAN', FALSE)) c('--as-cran', '--no-manual') else '--no-manual'; rcmdcheck::rcmdcheck(args = args, error_on = 'warning', check_dir = 'check')"
@@ -83,6 +83,7 @@ jobs:
       - name: Deploy package site
         if: contains(github.ref, 'master') && matrix.config.BUILD_PKGDOWN
         run: |
+          Rscript -e "remotes::install_github('r-lib/pkgdown')"
           R CMD INSTALL .
           Rscript -e "pkgdown::deploy_to_branch(new_process = FALSE)"
 
