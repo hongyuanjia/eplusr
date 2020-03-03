@@ -68,7 +68,7 @@ jobs:
         run: brew install udunits
 
       - name: Install dependencies
-        run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck'); remotes::install_github('jimhester/pkgdown@github-actions-deploy')"
+        run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck'); remotes::install_dev('pkgdown')"
 
       - name: Check
         run: Rscript -e "args <- if (Sys.getenv('AS_CRAN', FALSE)) c('--as-cran', '--no-manual') else '--no-manual'; rcmdcheck::rcmdcheck(args = args, error_on = 'warning', check_dir = 'check')"
@@ -83,8 +83,8 @@ jobs:
       - name: Deploy package site
         if: contains(github.ref, 'master') && matrix.config.BUILD_PKGDOWN
         run: |
-          Rscript -e "install.packages('devtools')"
-          Rscript -e "devtools::install(); pkgdown:::deploy_local(new_process = FALSE, run_dont_run = TRUE, remote_url = 'https://x-access-token:${{secrets.DEPLOY_PAT}}@github.com/${{github.repository}}.git')"
+          R CMD INSTALL .
+          Rscript -e "pkgdown::deploy_to_branch(new_process = FALSE)"
 
       - name: Test coverage
         if: matrix.config.os == 'ubuntu-16.04' && matrix.config.r == 'release'
