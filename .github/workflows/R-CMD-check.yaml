@@ -65,7 +65,10 @@ jobs:
 
       - name: Install udunits for macos
         if: runner.os == 'macOS'
-        run: brew install udunits xquartz
+        run: |
+          brew install udunits
+          brew install caskroom/cask/brew-cask
+          brew cask install xquartz
 
       - name: Install dependencies
         run: Rscript -e "library(remotes); update(readRDS('depends.Rds')); remotes::install_cran('rcmdcheck')"
