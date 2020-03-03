@@ -119,6 +119,11 @@ if (!eplusr::is_avail_eplus(8.8)) eplusr::install_eplus(8.8)
   [20X](https://hongyuanjia.me/en/2019/08/update-energyplus-using-eplusr-transition)
   faster than VersionUpdater distributed with EnergyPlus
 
+**View IDF geometry in 3D**\
+```{r, echo = FALSE, out.width = "60%"}
+knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true")
+```
+
 **Turn RStudio into a model editor via autocompletion**\
 ```{r, echo = FALSE, out.width = "60%"}
 knitr::include_graphics("https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true")

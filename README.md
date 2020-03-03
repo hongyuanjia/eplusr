@@ -86,6 +86,9 @@ in interactive mode.
     [20X](https://hongyuanjia.me/en/2019/08/update-energyplus-using-eplusr-transition)
     faster than VersionUpdater distributed with EnergyPlus
 
+**View IDF geometry in 3D**  
+<img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/view_geometry.gif?raw=true" width="60%" />
+
 **Turn RStudio into a model editor via autocompletion**  
 <img src="https://github.com/hongyuanjia/eplusr/blob/master/tools/figures/autocomplete.gif?raw=true" width="60%" />
 
@@ -138,7 +141,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/Rtmp5eLLnD/temp_libpath742747ebc56c/eplusr/extdata/1ZoneUnco...
+#>  * Path: '/tmp/Rtmpc8OE8d/temp_libpath50206758a4f8/eplusr/extdata/1ZoneUnco...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -369,12 +372,9 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/Rtmp5eLLnD/model.idf.
-#> ExpandObjects Started.
-#> No expanded file generated.
-#> ExpandObjects Finished. Time:     0.000
+#> Replace the existing IDF located at /tmp/Rtmpc8OE8d/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.02.20 19:59
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.03.03 15:36
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -400,13 +400,16 @@ job <- idf$run(epw)
 #> Warming up {17}
 #> Warming up {18}
 #> Warming up {19}
+#> Warming up {20}
+#> Warming up {21}
+#> Warming up {22}
 ....
 
 # print simulation error
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-02-20 19:59:00
+#>   * Simulation started: 2020-03-03 15:36:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
