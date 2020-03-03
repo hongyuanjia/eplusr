@@ -1,5 +1,12 @@
 # eplusr (development version)
 
+## New features
+
+* `Idf$to_table()` gains a new parameter `force`. The default value is `FALSE`. If
+  `TRUE`, you can convert object data from any classes into a wide data.table.
+  This may be useful when you know that target classes have the exact same
+  fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic`.
+
 ## Minor changes
 
 * `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW

@@ -2003,6 +2003,11 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        For example, coordinate values of all x coordinates will be
         #'        put into a list. If `"none"`, nothing special will be done.
         #'        Default: `"none"`.
+        #' @param force If `TRUE`, `wide` can be `TRUE` even though there are
+        #'        multiple classes in input. This can result in a data.table
+        #'        with lots of columns. But may be useful when you know that
+        #'        target classes have the exact same fields, e.g.
+        #'        `Ceiling:Adiabatic` and `Floor:Adiabatic`. Default: `FALSE`.
         #'
         #' @return A [data.table][data.table::data.table()] with 6 columns (if
         #' `wide` is `FALSE`) or at least 6 columns (if `wide` is `TRUE`).
@@ -2055,9 +2060,11 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         to_table = function (which = NULL, class = NULL, string_value = TRUE,
-                             unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"))
+                             unit = FALSE, wide = FALSE, align = FALSE, all = FALSE,
+                             group_ext = c("none", "group", "index"), force = FALSE)
             idf_to_table(self, private, which = which, class = class,
-                string_value = string_value, unit = unit, wide = wide, align = align, all = all, group_ext = match.arg(group_ext)),
+                string_value = string_value, unit = unit, wide = wide, align = align,
+                all = all, group_ext = match.arg(group_ext), force = force),
         # }}}
 
         # is_unsaved {{{
@@ -2251,6 +2258,165 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         last_job = function ()
             idf_last_job(self, private),
+        # }}}
+
+        # view {{{
+        #' @description
+        #' View 3D `Idf` geometry
+        #'
+        #' @details
+        #' `$view()` uses the [rgl](https://cran.r-project.org/package=rgl)
+        #' package to visualize the IDF geometry in 3D in a similar way as
+        #' [OpenStudio](https://www.openstudio.net).
+        #'
+        #' Current only detailed geometry classes are supported, including:
+        #'
+        #' * Surfaces:
+        #'     * `BuildingSurface:Detailed`
+        #'     * `Wall:Detailed`
+        #'     * `RoofCeiling:Detailed`
+        #'     * `Floor:Detailed`
+        #' * Sub-surfaces:
+        #'     * `FenestrationSurface:Detailed`
+        #' * Shadings:
+        #'     * `Shading:Site:Detailed`
+        #'     * `Shading:Building:Detailed`
+        #'     * `Shading:Zone:Detailed`
+        #'
+        #' In the rgl window, you can control the view using your mouse:
+        #'
+        #' * Left button: Trackball
+        #' * Right button: Pan
+        #' * Middle button: Field-of-view (FOV)
+        #' * Wheel: Zoom
+        #'
+        #' @note
+        #' When rendering by surface types, the exterior and interior face
+        #' detection may be not 100% right.
+        #'
+        #' @param new If `TRUE`, a new rgl window will be open using
+        #'        [rgl::rgl.open()]. If `FALSE`, existing rgl window will be
+        #'        reused if possible. Default: `FALSE`.
+        #'
+        #' @param clear If `TRUE`, the current `rgl` device will be cleared
+        #'        before plotting new contents. Default: `TRUE`.
+        #'
+        #' @param render_by A single string specifying the way of rendering the
+        #'        geometry. Possible values are:
+        #'
+        #'     * `"surface_type"`: Default. Render the model by surface type
+        #'       model. Walls, roofs, windows, doors, floors, and shading
+        #'       surfaces will have unqiue colors.
+        #'     * `"boundary"`: Render the model by outside boundary condition.
+        #'       Only surfaces that have boundary conditions will be rendered
+        #'       with a color. All other surfaces will be white.
+        #'     * `"construction"`: Render the model by surface constructions.
+        #'     * `"zone"`: Render the model by zones assigned.
+        #'     * `"surface_normal"`: (NOT IMPLEMENTED) Render the model by
+        #'       surface normal. The outside face of a heat transfer face will
+        #'       be rendered as white and the inside face will be rendered as
+        #'       red. Shading surfaces are an exception where both sides are
+        #'       rendered as red.
+        #'
+        #' @param axis If `TRUE`, the X, Y and Z axes will be drawn at the
+        #'        global origin. Default: `TRUE`.
+        #'
+        #' @param wireframe If `TRUE`, the wireframe of each surface will be
+        #'        shown. Default: `TRUE`.
+        #'
+        #' @param surface If `TRUE`, the surfaces themselves will be shown.
+        #'        Default: `TRUE`.
+        #'
+        #' @param x_ray If `TRUE`, all surfaces wll be rendered translucently.
+        #'        Default: `FALSE`.
+        #'
+        #' @param line_width The line width of wireframes. Default: `1.5`.
+        #'
+        #' @param line_color The color of wireframes. Default: `black`.
+        #'
+        #' @param theta The rotation around z-axis in degrees. Default: `0`.
+        #'
+        #' @param phi The azimuth angle in degrees. Default: `-60`.
+        #'
+        #' @param fov The field-of-view angle in degrees. `0` means isometric.
+        #'        Default: `60`.
+        #'
+        #' @param zoom The zoom factor. Default: `1`.
+        #'
+        #' @param background The color of the backports. Default: `"white"`.
+        #'
+        #' @param size A numeric vector specifying the x-y coordiates, width and
+        #'        height of the rgl device. The x-y coordinates are based on the
+        #'        original located in the upper left corner of current screen.
+        #'        By default, x-y coordinates are set to zeros.
+        #'
+        #'     * If 1 number, the width and height of rgl windows will be
+        #'       the same as input number.
+        #'     * If 2 numbers, the width and height of rgl windows will be
+        #'       set based on input number
+        #'     * If 3 numbers, the first 2 numbers will be used as x-y
+        #'       coordinates and the 3rd number will be used for both window
+        #'       width and height.
+        #'     * If 4 numbers, the first 2 numbers will be used as x-y
+        #'       coordinates. The next 2 specify the window size.
+        #'
+        #' @return The `Idf` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' idf$view()
+        #' idf$view(render_by = "zone")
+        #' idf$view(new, render_by = "construction")
+        #' }
+        #'
+        view = function (new = FALSE, clear = TRUE, render_by = "surface_type",
+                         axis = TRUE, wireframe = TRUE, surface = TRUE, x_ray = FALSE,
+                         line_width = 1.5, line_color = "black",
+                         theta = 0, phi = -60, fov = 60, zoom = 1,
+                         background = "white", size = c(0, 30, 800))
+            idf_view(self, private, new = new, clear = clear, render_by = render_by,
+                     axis = axis, wireframe = wireframe, surface = surface, x_ray = x_ray,
+                     line_width = line_width, line_color = line_color,
+                     theta = theta, phi = phi, fov = fov, zoom = zoom,
+                     background = background, size = size),
+        # }}}
+
+        # save_view {{{
+        #' @description
+        #' Capture and save current rgl view as an image
+        #'
+        #' @details
+        #' `$save_view()` captures the current rgl view and saves it as an
+        #' image file to disk.
+        #'
+        #' @param filename A single string specifying the file name. Current
+        #'        supported formats are `png`, `pdf`, `svg`, `ps`, `eps`, `tex`
+        #'        and `pgf`.
+        #'
+        #' @param autoview If `TRUE`, a new view will be created if there is no
+        #'        existing one using
+        #'        \href{../../eplusr/html/Idf.html#method-view}{\code{$view()}}
+        #'        Default: `FALSE`.
+        #'
+        #' @param autoclose If `TRUE`, current rgl window will be closed after
+        #'        saving. Default: `FALSE`.
+        #'
+        #' @param bring_to_front If `TRUE`, The rgl window will be brought to
+        #'        the front when saving. Default: `FALSE`.
+        #'
+        #' @param axis If `TRUE`, the X, Y and Z axes will be saved in the
+        #'        image. Default: `FALSE`.
+        #'
+        #' @return The `Idf` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' idf$view()
+        #' idf$save_view(tempfile(fileext = ".png"))
+        #' }
+        #'
+        save_view = function (filename, autoview = FALSE, autoclose = FALSE, bring_to_front = FALSE, axis = FALSE)
+            idf_save_view(self, private, filename, autoview, autoclose, bring_to_front, axis),
         # }}}
 
         # print {{{
@@ -2882,8 +3048,8 @@ idf_string <- function (self, private, ...) {
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index")) {
-    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide, align, all, group_ext)
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"), force = FALSE) {
+    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide, align, all, group_ext, force)
 }
 # }}}
 # idf_save {{{
@@ -2944,6 +3110,43 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
 # idf_last_job {{{
 idf_last_job <- function (self, private) {
     private$m_log$job
+}
+# }}}
+# idf_view {{{
+idf_view <- function (self, private, new = FALSE, clear = TRUE, axis = TRUE,
+                      render_by = "surface_type", wireframe = TRUE, surface = TRUE,
+                      x_ray = FALSE, line_width = 1.5, line_color = "black",
+                      theta = 0, phi = -60, fov = 60, zoom = 1, background = "white",
+                      size = c(0, 30, 800)) {
+    private$m_log$geometry <- IdfGeometry$new(self)
+    private$m_log$geometry$view(new = new, clear = clear, render_by = render_by,
+        axis = axis, wireframe = wireframe, surface = surface, x_ray = x_ray,
+        line_width = line_width, line_color = line_color,
+        theta = theta, phi = phi, fov = fov, zoom = zoom,
+        background = background, size = size
+    )
+    invisible(self)
+}
+# }}}
+# idf_save_view {{{
+idf_save_view <- function (self, private, filename, autoview = FALSE, autoclose = FALSE,
+                           bring_to_front = FALSE, axis = FALSE) {
+    if (is.null(private$m_log$geometry)) {
+        if (autoview) {
+            self$view()
+        } else {
+            abort("error_no_geom_ready", "No geometry has been created yet. Please run '$view()' first.")
+        }
+    }
+
+    private$m_log$geometry$save_snapshot(filename, bring_to_front, axis)
+
+    if (autoclose) {
+        rgl::rgl.set(._get_private(private$m_log$geometry)$m_log$id$device)
+        rgl::rgl.close()
+    }
+
+    invisible(self)
 }
 # }}}
 # idf_print {{{

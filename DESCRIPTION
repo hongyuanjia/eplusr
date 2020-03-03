@@ -33,8 +33,10 @@ Imports:
     units
 Suggests:
     covr,
+    decido,
     knitr,
     pkgdown,
+    rgl,
     rmarkdown,
     testthat
 VignetteBuilder: 
@@ -58,6 +60,7 @@ Collate:
     'epw.R'
     'err.R'
     'format.R'
+    'geometry.R'
     'group.R'
     'impl-idd.R'
     'idd.R'
