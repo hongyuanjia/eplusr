@@ -67,10 +67,14 @@ extract_geometry <- function (idf) {
     shading <- get_shading_vertices(idf, cls_shading, rules, zone, surf)
 
     # treat windows as holes
-    hole <- copy(win)[!J(NA_character_), on = "parent_surface_name"]
-    set(hole, NULL, "surface_type", "Hole")
-    # use surface id for grouping
-    hole[surf, on = c(parent_surface_name = "name"), id := i.id]
+    if (!nrow(win)) {
+        hole <- data.table()
+    } else {
+        hole <- copy(win)[!J(NA_character_), on = "parent_surface_name"]
+        set(hole, NULL, "surface_type", "Hole")
+        # use surface id for grouping
+        hole[surf, on = c(parent_surface_name = "name"), id := i.id]
+    }
 
     dt <- rbindlist(list(surf, hole, win, shading), fill = TRUE)
 
