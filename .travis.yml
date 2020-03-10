@@ -71,6 +71,8 @@ addons:
   apt:
     packages:
       - libudunits2-dev
+      - libgdal-dev
+      - libproj-dev
   homebrew:
     packages:
       - udunits
