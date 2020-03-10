@@ -284,6 +284,7 @@ test_that("Idf class", {
     expect_error(idf$insert(idf_full$Version), class = "error_insert_version")
     expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), class = "error_validity")
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
+    expect_null(idf$insert(idf$Material_NoMass$R13LAYER, idf$Material_NoMass$R13LAYER))
     # }}}
 
     # DELETE {{{

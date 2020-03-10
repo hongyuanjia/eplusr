@@ -16,6 +16,7 @@
 
 * Fix the bug caused by `ExpandObjects` exectuable that causes `run_idf` fails
   when running in parallel (#130)
+* `Idf$insert()` now will remove all duplicated objects in input (#219).
 
 # eplusr 0.12.0
 

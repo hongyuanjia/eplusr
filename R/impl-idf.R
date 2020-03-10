@@ -639,6 +639,17 @@ sep_object_dots <- function (...) {
         )
     }, by = "object_rleid"]
 
+    # remove duplicated
+    if (any(dup <- duplicated(dt, by = c("uuid", "object_id")))) {
+        # give info
+        verbose_info(
+            "Duplicated objects in input have been removed:\n",
+            get_object_info(dt[dup], "id", collapse = "\n", name_prefix = FALSE)
+        )
+
+        dt <- dt[!dup]
+    }
+
     list(data = dt, dot = dt_dot)
 }
 # }}}
