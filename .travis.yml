@@ -71,7 +71,9 @@ addons:
   apt:
     packages:
       - libudunits2-dev
+      - libcgal-dev
       - libgdal-dev
+      - libglu1-mesa-dev
       - libproj-dev
   homebrew:
     packages:
