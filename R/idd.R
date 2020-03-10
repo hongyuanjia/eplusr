@@ -480,10 +480,19 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' be further easily extracted using `$objects_in_relation()` method
         #' described below.
         #'
-        #' @param class A single integer specifying the class index or a single
+        #' @param which A single integer specifying the class index or a single
         #'        string specifying the class name.
         #' @param direction The relation direction to extract. Should be one of
         #'        `"all"`, `"ref_to"` or `"ref_by"`.
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return An `IddRelation` object, which is a list of 3
         #' [data.table::data.table()]s named `ref_to` and `ref_by`.
@@ -498,8 +507,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' idd$object_relation("Construction", "ref_by")
         #' }
         #'
-        object_relation = function (class, direction = c("all", "ref_to", "ref_by"))
-            idd_object_relation(self, private, class, match.arg(direction)),
+        object_relation = function (which, direction = c("all", "ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
+            idd_object_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth),
         # }}}
 
         # objects_in_relation {{{
@@ -521,10 +530,25 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' named list of an [IddObject] object named `Construction` and also all
         #' other [IddObject] objects that `Construction` can refer to.
         #'
-        #' @param class A single integer specifying the class index or a single
+        #' @param which A single integer specifying the class index or a single
         #'        string specifying the class name.
         #' @param direction The relation direction to extract. Should be either
         #'        `"ref_to"` or `"ref_by"`.
+        #' @param class A character vector of valid class names in the
+        #'        current Idd. It is used to restrict the classes to be
+        #'        returned. If `NULL`, all possible classes are considered and
+        #'        corresponding [IddObject] objects are returned if
+        #'        relationships are found. Default: `NULL`.
+        #' @param group A character vector of valid group names in the
+        #'        current Idd. It is used to restrict the groups to be
+        #'        returned. If `NULL`, all possible groups are considered and
+        #'        corresponding [IddObject] objects are returned if
+        #'        relationships are found. Default: `NULL`.
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return An named list of [IddObject] objects.
         #'
@@ -537,8 +561,8 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #' idd$objects_in_relation("Construction", "ref_by")
         #' }
         #'
-        objects_in_relation = function (class, direction = c("ref_to", "ref_by"))
-            idd_objects_in_relation(self, private, class, match.arg(direction)),
+        objects_in_relation = function (which, direction = c("ref_to", "ref_by"), class = NULL, group = NULL, depth = 0L)
+            idd_objects_in_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth),
         # }}}
 
         # objects_in_group {{{
@@ -780,22 +804,26 @@ idd_objects <- function (self, private, class) {
 }
 # }}}
 # idd_object_relation {{{
-idd_object_relation <- function (self, private, class, direction = c("all", "ref_to", "ref_by")) {
-    assert(is_scalar(class))
+idd_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by"),
+                                 class = NULL, group = NULL, depth = 0L) {
+    assert(is_scalar(which))
     direction <- match.arg(direction)
 
-    cls <- get_idd_class(private$m_idd_env, class)
+    cls <- get_idd_class(private$m_idd_env, which)
 
     get_iddobj_relation(private$m_idd_env, cls$class_id, NULL, name = TRUE,
-        direction = direction, by_field = FALSE, max_depth = NULL, keep_all = FALSE
+        direction = direction, by_field = FALSE, depth = depth, keep_all = FALSE,
+        class = class, group = group
     )
 }
 # }}}
 # idd_objects_in_relation {{{
-idd_objects_in_relation <- function (self, private, class, direction = c("ref_to", "ref_by")) {
-    assert(is_scalar(class))
+idd_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by"),
+                                     class = NULL, group = NULL, depth = 0L) {
+    assert(is_scalar(which))
     direction <- match.arg(direction)
-    rel <- get_idd_relation(private$m_idd_env, class, max_depth = 0L, direction = direction, keep_all = TRUE)
+    rel <- get_idd_relation(private$m_idd_env, which, depth = depth, direction = direction,
+        class = class, group = group, keep_all = TRUE)
 
     if (direction == "ref_to") {
         id_self <- unique(rel$class_id)
@@ -812,7 +840,7 @@ idd_objects_in_relation <- function (self, private, class, direction = c("ref_to
 
     if (!length(id_ref)) {
         dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by")
-        verbose_info("Class ", surround(cls_nm), " ", dir, " any other class.")
+        verbose_info("Class ", surround(cls_nm), " ", dir, " any other class or group.")
         return(obj_self)
     }
 

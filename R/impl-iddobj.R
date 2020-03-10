@@ -4,12 +4,14 @@ NULL
 # get_iddobj_relation {{{
 get_iddobj_relation <- function (idd_env, class_id, field_id = NULL, name = TRUE,
                                  direction = c("ref_to", "ref_by", "all"),
-                                 by_field = FALSE, max_depth = 0L, keep_all = TRUE) {
+                                 class = NULL, group = NULL, depth = 0L,
+                                 by_field = FALSE, keep_all = TRUE) {
     direction <- match.arg(direction)
     if (direction == "ref_to") {
         res <- list(
             ref_to = get_idd_relation(idd_env, class_id, field_id,
-                max_depth = max_depth, name = name, direction = "ref_to", keep_all = keep_all),
+                class = class, group = group, depth = depth, name = name,
+                direction = "ref_to", keep_all = keep_all),
             ref_by = NULL
         )
         setattr(res$ref_to, "by_field", by_field)
@@ -17,15 +19,18 @@ get_iddobj_relation <- function (idd_env, class_id, field_id = NULL, name = TRUE
         res <- list(
             ref_to = NULL,
             ref_by = get_idd_relation(idd_env, class_id, field_id,
-                max_depth = max_depth, name = name, direction = "ref_by", keep_all = keep_all)
+                class = class, group = group, depth = depth, name = name,
+                direction = "ref_by", keep_all = keep_all)
         )
         setattr(res$ref_by, "by_field", by_field)
     } else {
         res <- list(
             ref_to = get_idd_relation(idd_env, class_id, field_id,
-                max_depth = max_depth, name = name, direction = "ref_to", keep_all = keep_all),
+                class = class, group = group, depth = depth, name = name,
+                direction = "ref_to", keep_all = keep_all),
             ref_by = get_idd_relation(idd_env, class_id, field_id,
-                max_depth = max_depth, name = name, direction = "ref_by", keep_all = keep_all)
+                class = class, group = group, depth = depth, name = name,
+                direction = "ref_by", keep_all = keep_all)
         )
         setattr(res$ref_to, "by_field", by_field)
         setattr(res$ref_by, "by_field", by_field)

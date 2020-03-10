@@ -1657,7 +1657,11 @@ Extract the relationship among fields
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IddObject$field_relation(
   which = NULL,
-  direction = c("all", "ref_by", "ref_to")
+  direction = c("all", "ref_by", "ref_to"),
+  class = NULL,
+  group = NULL,
+  depth = 0L,
+  keep = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -1670,6 +1674,23 @@ class are used. Default: \code{NULL}.}
 
 \item{\code{direction}}{The relation direction to extract. Should be one of
 \code{"all"}, \code{"ref_to"} or \code{"ref_by"}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
+
+\item{\code{keep}}{If \code{TRUE}, all input fields are returned regardless they
+have any relations with other objects or not. If \code{FALSE}, only
+fields in input that have relations with other objects are
+returned. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -2177,7 +2198,7 @@ surf$is_required_field(c("name", "number of vertices"))
 \subsection{Method \code{has_ref()}}{
 Check if input field can refer to or can be referred by other fields
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref(which = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref(which = NULL, class = NULL, group = NULL, depth = 0L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -2186,6 +2207,18 @@ Check if input field can refer to or can be referred by other fields
 \item{\code{which}}{An integer vector of field indices or a character vector
 of field names in current class. If \code{NULL}, all fields in this
 class are used. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -2216,7 +2249,7 @@ surf$has_ref(c("name", "zone name"))
 \subsection{Method \code{has_ref_to()}}{
 Check if input field can refer to other fields
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_to(which = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_to(which = NULL, class = NULL, group = NULL, depth = 0L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -2225,6 +2258,18 @@ Check if input field can refer to other fields
 \item{\code{which}}{An integer vector of field indices or a character vector
 of field names in current class. If \code{NULL}, all fields in this
 class are used. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -2255,7 +2300,7 @@ surf$has_ref_to(c("name", "zone name"))
 \subsection{Method \code{has_ref_by()}}{
 Check if input field can be referred by other fields
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_by(which = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$has_ref_by(which = NULL, class = NULL, group = NULL, depth = 0L)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -2264,6 +2309,18 @@ Check if input field can be referred by other fields
 \item{\code{which}}{An integer vector of field indices or a character vector
 of field names in current class. If \code{NULL}, all fields in this
 class are used. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }

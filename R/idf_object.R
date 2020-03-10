@@ -752,19 +752,28 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
-        #'
         #' @param direction The relation direction to extract. Should be either
         #'        `"all"`, `"ref_to"` or "ref_by".
         #'
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is a
-        #'        depth to when searching value relations recursively. If
-        #'        `NULL`, all recursive relations are returned. Default: `1`.
+        #' @param keep If `TRUE`, all input fields are returned regardless they
+        #'        have any relations with other objects or not. If `FALSE`, only
+        #'        fields in input that have relations with other objects are
+        #'        returned. Default: `FALSE`.
         #'
         #' @return An `IdfRelation` object, which is a list of 3
         #' [data.table::data.table()]s named `ref_to`, `ref_by` and `node`.
@@ -779,8 +788,10 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' roof$value_relation("name", direction = "ref_by")
         #' }
         #'
-        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
-            idfobj_value_relation(self, private, which, match.arg(direction), recursive, depth),
+        value_relation = function (which = NULL, direction = c("all", "ref_to", "ref_by", "node"),
+                                   object = NULL, class = NULL, group = NULL, depth = 0L, keep = FALSE)
+            idfobj_value_relation(self, private, which, match.arg(direction),
+                                  object = object, class = class, group = group, depth = depth, keep = keep),
         # }}}
 
         # ref_to_object {{{
@@ -798,16 +809,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
         #'
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`.
-        #'
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is a
-        #'        depth to when searching value relations recursively. If
-        #'        `NULL`, all recursive relations are returned. Default: `1`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return A named list of `IdfObject` objects.
         #'
@@ -817,8 +832,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$ref_to_object() # not referencing other objects
         #' }
         #'
-        ref_to_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-            idfobj_ref_to_object(self, private, which, class, recursive, depth),
+        ref_to_object = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L)
+            idfobj_ref_to_object(self, private, which, object = NULL, class = class, group = group, depth = depth),
         # }}}
 
         # ref_by_object {{{
@@ -836,16 +851,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
         #'
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`.
-        #'
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is a
-        #'        depth to when searching value relations recursively. If
-        #'        `NULL`, all recursive relations are returned. Default: `1`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return A named list of `IdfObject` objects.
         #'
@@ -855,8 +874,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$ref_by_object() # referenced by construction "FLOOR"
         #' }
         #'
-        ref_by_object = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-            idfobj_ref_by_object(self, private, which, class, recursive, depth),
+        ref_by_object = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L)
+            idfobj_ref_by_object(self, private, which, object = object, class = class, group = group, depth = depth),
         # }}}
 
         # ref_to_node {{{
@@ -874,16 +893,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
         #'
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`.
-        #'
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is a
-        #'        depth to when searching value relations recursively. If
-        #'        `NULL`, all recursive relations are returned. Default: `1`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return A named list of `IdfObject` objects.
         #'
@@ -896,8 +919,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' }
         #' }
         #'
-        ref_to_node = function (which = NULL, class = NULL, recursive = FALSE, depth = 1L)
-            idfobj_ref_to_node(self, private, which, class, recursive, depth),
+        ref_to_node = function (which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L)
+            idfobj_ref_to_node(self, private, which, object = NULL, class = class, group = group, depth = depth),
         # }}}
 
         # has_ref_to {{{
@@ -915,7 +938,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. Default: `FALSE`.
         #'
         #' @return A logical vector with the same length as specified field.
         #'
@@ -924,8 +959,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$has_ref_to()
         #' }
         #'
-        has_ref_to = function (which = NULL, class = NULL)
-            idfobj_has_ref_to(self, private, which, class),
+        has_ref_to = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+            idfobj_has_ref_to(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
         # has_ref_by {{{
@@ -943,7 +978,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. Default: `FALSE`.
         #'
         #' @return A logical vector with the same length as specified field.
         #'
@@ -952,8 +999,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$has_ref_by()
         #' }
         #'
-        has_ref_by = function (which = NULL, class = NULL)
-            idfobj_has_ref_by(self, private, which, class),
+        has_ref_by = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+            idfobj_has_ref_by(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
         # has_ref_node {{{
@@ -971,7 +1018,19 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
-        #' @param class A character vector of class names.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. Default: `FALSE`.
         #'
         #' @return A logical vector with the same length as specified field.
         #'
@@ -980,8 +1039,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$has_ref_node()
         #' }
         #'
-        has_ref_node = function (which = NULL, class = NULL)
-            idfobj_has_ref_node(self, private, which, class),
+        has_ref_node = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+            idfobj_has_ref_node(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
         # has_ref {{{
@@ -1001,6 +1060,20 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param which An integer vector of field indexes or a character vector
         #'        of field names.
         #'
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. Default: `FALSE`.
+        #'
         #' @return A logical vector with the same length as specified field.
         #'
         #' @examples
@@ -1009,8 +1082,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$has_ref()
         #' }
         #'
-        has_ref = function (which = NULL)
-            idfobj_has_ref(self, private, which),
+        has_ref = function (which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE)
+            idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive),
         # }}}
 
         # to_table {{{
@@ -1519,50 +1592,47 @@ idfobj_is_valid <- function (self, private, level = eplusr_option("validate_leve
 # idfobj_value_relation {{{
 idfobj_value_relation <- function (self, private, which = NULL,
                                    direction = c("all", "ref_to", "ref_by", "node"),
-                                   recursive = FALSE, recursive_depth = 1L) {
+                                   object = object, class = NULL, group = NULL, depth = 0L, keep = FALSE) {
     direction <- match.arg(direction)
 
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
-    get_idfobj_relation(private$idd_env(), private$idf_env(),
-        value_id = val$value_id, name = TRUE, direction = direction,
-        keep_all = TRUE, by_value = TRUE, recursive = recursive)
+    get_idfobj_relation(private$idd_env(), private$idf_env(), object_id = NULL,
+        value_id = val$value_id, name = TRUE, direction = direction, object = object,
+        class = class, group = group, depth = depth, keep_all = keep, by_value = TRUE)
 }
 # }}}
 # idfobj_ref_to_object {{{
-idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
+idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
     # exclude invalid references
     rel <- get_idf_relation(private$idd_env(), private$idf_env(),
-        value_id = val$value_id, direction = "ref_to", recursive = recursive
+        value_id = val$value_id, direction = "ref_to",
+        object = object, class = class, group = group, depth = depth
     )[!is.na(src_value_id)]
 
-    # only include specified class
-    if (!is.null(class)) {
-        add_joined_cols(private$idf_env()$object, rel, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
-        cls <- get_idd_class(private$idd_env(), class)
-        rel <- rel[J(cls$class_id), on = "src_class_id", nomatch = 0L]
-    }
-
     if (!nrow(rel)) {
-        if (is.null(class)) {
+        if (is.null(class) && is.null(group)) {
             verbose_info("Target object does not refer to any other object.")
         } else {
-            verbose_info("Target object does not refer to any other object in class ",
-                collapse(cls$class_name), "."
-            )
+            if (!is.null(class)) {
+                if (is.null(group)) {
+                    verbose_info("Target object does not refer to any other object in class ",
+                        collapse(class), ".")
+                } else {
+                    verbose_info("Target object does not refer to any other object in class ",
+                        collapse(class), " or group ", collapse(group), ".")
+                }
+            }
         }
         return(invisible())
     } else {
         rel <- rel[, list(src_object_id = unique(src_object_id)), by = "object_id"]
-        verbose_info("Target object refers to ", nrow(rel), " object(s) [ID:",
-            collapse(rel$src_object_id), "].\n"
-        )
         res <- apply2(
             rel$src_object_id,
             private$idf_env()$object[J(rel$src_object_id), on = "object_id", class_id],
@@ -1574,43 +1644,36 @@ idfobj_ref_to_object <- function (self, private, which = NULL, class = NULL, rec
     }
 }
 # }}}
-# idfobj_ref_from_object {{{
-idfobj_ref_from_object <- function (self, private) {
-    .deprecated_fun("$ref_from_object()", "$ref_to_object()", "IdfObject", "0.10.0")
-    idfobj_ref_to_object(self, private)
-}
-# }}}
 # idfobj_ref_by_object {{{
-idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
+idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
     # exclude invalid references
     rel <- get_idf_relation(private$idd_env(), private$idf_env(),
-        value_id = val$value_id, direction = "ref_by", recursive = recursive
+        value_id = val$value_id, direction = "ref_by",
+        object = object, class = class, group = group, depth = depth
     )[!is.na(value_id)]
 
-    # only include specified class
-    if (!is.null(class)) {
-        add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
-        cls <- get_idd_class(private$idd_env(), class)
-        rel <- rel[J(cls$class_id), on = "class_id", nomatch = 0L]
-    }
-
     if (!nrow(rel)) {
-        if (is.null(class)) {
+        # TODO: Update verbose info
+        if (is.null(class) && is.null(group)) {
             verbose_info("Target object is not referred by any other object.")
         } else {
-            verbose_info("Target object is not referred by any other object in class ",
-                collapse(cls$class_name), "."
-            )
+            if (!is.null(class)) {
+                if (is.null(group)) {
+                    verbose_info("Target object is not referred by any other object in class ",
+                        collapse(class), ".")
+                } else {
+                    verbose_info("Target object is not referred to any other object in class ",
+                        collapse(class), " or group ", collapse(group), ".")
+                }
+            }
         }
         return(invisible())
     } else {
         rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
-        verbose_info("Target object is referred by ", nrow(rel), " object(s) [ID:",
-            collapse(rel$object_id), "].\n")
         res <- apply2(
             rel$object_id,
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],
@@ -1623,30 +1686,29 @@ idfobj_ref_by_object <- function (self, private, which = NULL, class = NULL, rec
 }
 # }}}
 # idfobj_ref_to_node {{{
-idfobj_ref_to_node <- function (self, private, which = NULL, class = NULL, recursive = FALSE, recursive_depth = 1L) {
+idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
     val <- get_idf_value(private$idd_env(), private$idf_env(),
         object = private$m_object_id, field = which
     )
 
     # exclude invalid references
     rel <- get_idf_node_relation(private$idd_env(), private$idf_env(),
-        value_id = val$value_id, recursive = recursive, recursive_depth = recursive_depth
-    )[!is.na(value_id)]
-
-    # only include specified class
-    if (!is.null(class)) {
-        add_joined_cols(private$idf_env()$object, rel, "object_id", "class_id")
-        cls <- get_idd_class(private$idd_env(), class)
-        rel <- rel[J(cls$class_id), on = "class_id", nomatch = 0L]
-    }
+        value_id = val$value_id, object = object, class = class, group = group, depth = depth
+        )[!is.na(value_id)]
 
     if (!nrow(rel)) {
-        if (is.null(class)) {
+        if (is.null(class) && is.null(group)) {
             verbose_info("Target object has no node or its nodes have no reference to other object.")
         } else {
-            verbose_info("Target object has no node referring to any object in class ",
-                collapse(cls$class_name), "."
-            )
+            if (!is.null(class)) {
+                if (is.null(group)) {
+                    verbose_info("Target object has no node referring to any object in class ",
+                        collapse(class), ".")
+                } else {
+                    verbose_info("Target object has no node referring to any object in class ",
+                        collapse(class), " or group ", collapse(group), ".")
+                }
+            }
         }
         return(invisible())
     } else {
@@ -1665,32 +1727,20 @@ idfobj_ref_to_node <- function (self, private, which = NULL, class = NULL, recur
 }
 # }}}
 # idfobj_has_ref {{{
-idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c("all", "ref_to", "ref_by", "node")) {
+idfobj_has_ref <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, type = c("all", "ref_to", "ref_by", "node"), depth = 0L) {
     type <- match.arg(type)
     if (is.null(which)) {
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), private$m_object_id,
-            NULL, FALSE, direction = type, keep_all = TRUE)
+            NULL, FALSE, direction = type, object = object, class = class, group = group, depth = depth,
+            keep_all = TRUE)
     } else {
         val <- get_idf_value(private$idd_env(), private$idf_env(),
             object = private$m_object_id, field = which
         )
 
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(),
-            value_id = val$value_id, direction = type, keep_all = TRUE)
-    }
-
-    if (!is.null(class)) {
-        cls <- get_idd_class(private$idd_env(), class)
-        if (type %in% c("all", "ref_by")) {
-            add_joined_cols(private$idf_env()$object, rel$ref_by, "object_id", "class_id")
-            rel$ref_by <- rel$ref_by[J(cls$class_id), on = "class_id"]
-        } else if (type %in% c("all", "ref_to")) {
-            add_joined_cols(private$idf_env()$object, rel$ref_to, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
-            rel$ref_to <- rel$ref_to[J(cls$class_id), on = "src_class_id"]
-        } else if (type %in% c("all", "node")) {
-            add_joined_cols(private$idf_env()$object, rel$node, "object_id", "class_id")
-            rel$node <- rel$node[J(cls$class_id), on = "class_id"]
-        }
+            value_id = val$value_id, direction = type, object = object,
+            class = class, group = group, depth = depth, keep_all = TRUE)
     }
 
     if (type == "all") {
@@ -1707,24 +1757,18 @@ idfobj_has_ref <- function (self, private, which = NULL, class = NULL, type = c(
 }
 # }}}
 # idfobj_has_ref_to {{{
-idfobj_has_ref_to <- function (self, private, which = NULL, class = NULL) {
-    idfobj_has_ref(self, private, which, class, "ref_to")
-}
-# }}}
-# idfobj_has_ref_from {{{
-idfobj_has_ref_from <- function (self, private) {
-    .deprecated_fun("$has_ref_from()", "$has_ref_to()", "IdfObject", "0.10.0")
-    idfobj_has_ref_to(self, private)
+idfobj_has_ref_to <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "ref_to")
 }
 # }}}
 # idfobj_has_ref_by {{{
-idfobj_has_ref_by <- function (self, private, which = NULL, class = NULL) {
-    idfobj_has_ref(self, private, which, class, "ref_by")
+idfobj_has_ref_by <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "ref_by")
 }
 # }}}
 # idfobj_has_ref_node {{{
-idfobj_has_ref_node <- function (self, private, which = NULL, class = NULL) {
-    idfobj_has_ref(self, private, which, class, "node")
+idfobj_has_ref_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "node")
 }
 # }}}
 # idfobj_to_table {{{
@@ -1736,24 +1780,11 @@ idfobj_to_table <- function (self, private, all = FALSE, string_value = TRUE,
     )
 }
 # }}}
-# idfobj_table {{{
-idfobj_table <- function (self, private, all = FALSE, unit = TRUE, wide = FALSE, string_value = TRUE, in_ip) {
-    .deprecated_fun("$table()", "$to_table()", "IdfObject", "0.10.0")
-    if (!missing(in_ip)) .deprecated_arg("in_ip", "0.10.0", "IdfObject")
-    idfobj_to_table(self, private, all = all, unit = unit, wide = wide, string_value = string_value)
-}
-# }}}
 # idfobj_to_string {{{
 idfobj_to_string <- function (self, private, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE) {
     get_idfobj_string(private$idd_env(), private$idf_env(), private$m_object_id,
         comment = comment, leading = leading, sep_at = sep_at, all = all
     )
-}
-# }}}
-# idfobj_string {{{
-idfobj_string <- function (self, private, comment = TRUE, leading = 4L, sep_at = 29L) {
-    .deprecated_fun("$string()", "$to_string()", "IdfObject", "0.10.0")
-    idfobj_to_string(self, private, comment, leading, sep_at)
 }
 # }}}
 # idfobj_print {{{

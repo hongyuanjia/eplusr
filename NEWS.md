@@ -7,6 +7,19 @@
   This may be useful when you know that target classes have the exact same
   fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic`.
 
+## Major changes
+
+* The algorithm of object/field/value relation extraction has been completed
+  refactored. Now it can correctly detect object recursive-reference and it's
+  faster. All relation-related methods now have an unified interface:
+  ```r
+  X$method(which, direction, object, class, group)
+  ```
+  Where `which` is a class index or object ID, `direction` is the target
+  relation direction to extract. All results can be further constrained via
+  3 extra arguments, i.e. `object`, `class` and `object`. `object` only
+  applicable to `Idf` and `IdfObject`.
+
 ## Minor changes
 
 * `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW

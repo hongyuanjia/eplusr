@@ -191,6 +191,43 @@ test_that("IdfObject class", {
     expect_equivalent(con$value_relation(1),
         list(
             ref_to = data.table(
+                class_id = integer(), class_name = character(),
+                object_id = integer(), object_name = character(),
+                field_id = integer(), field_index = integer(), field_name = character(),
+                value_id = integer(), value_chr = character(), value_num = double(), type_enum = integer(),
+                src_class_id = integer(), src_class_name = character(),
+                src_object_id = integer(), src_object_name = character(),
+                src_field_id = integer(), src_field_index = integer(), src_field_name = character(),
+                src_value_id = integer(), src_value_chr = character(), src_value_num = double(), src_type_enum = integer(),
+                src_enum = integer(), dep = integer()
+            ),
+            ref_by = data.table(
+                class_id = 103L, class_name = "BuildingSurface:Detailed",
+                object_id = 3L, object_name = "WALL-1PF",
+                field_id = 11624L, field_index = 3L, field_name = "Construction Name",
+                value_id = 17L, value_chr = "WALL-1", value_num = NA_integer_, type_enum = 5L,
+                src_class_id = 90L, src_class_name = "Construction",
+                src_object_id = 2L, src_object_name = "WALL-1",
+                src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
+                src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_integer_, src_type_enum = 4L,
+                src_enum = 2L, dep = 0L
+            ),
+            node = data.table(
+                class_id = integer(), class_name = character(),
+                object_id = integer(), object_name = character(),
+                field_id = integer(), field_index = integer(), field_name = character(),
+                value_id = integer(), value_chr = character(), value_num = double(), type_enum = integer(),
+                src_class_id = integer(), src_class_name = character(),
+                src_object_id = integer(), src_object_name = character(),
+                src_field_id = integer(), src_field_index = integer(), src_field_name = character(),
+                src_value_id = integer(), src_value_chr = character(), src_value_num = double(), src_type_enum = integer(),
+                src_enum = integer(), dep = integer()
+            )
+        )
+    )
+    expect_equivalent(con$value_relation(1, keep = TRUE),
+        list(
+            ref_to = data.table(
                 class_id = 90L, class_name = "Construction",
                 object_id = 2L, object_name = "WALL-1",
                 field_id = 11006L, field_index = 1L, field_name = "Name",
@@ -221,7 +258,7 @@ test_that("IdfObject class", {
                 src_object_id = 2L, src_object_name = "WALL-1",
                 src_field_id = 11006L, src_field_index = 1L, src_field_name = "Name",
                 src_value_id = 10L, src_value_chr = "WALL-1", src_value_num = NA_real_, src_type_enum = 4L,
-                src_enum = 2L, dep = 0L
+                src_enum = NA_integer_, dep = 0L
             )
         )
     )

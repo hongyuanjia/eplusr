@@ -1754,8 +1754,11 @@ Extract the relationship between object field values.
 \if{html}{\out{<div class="r">}}\preformatted{Idf$object_relation(
   which,
   direction = c("all", "ref_to", "ref_by", "node"),
-  recursive = FALSE,
-  depth = 1L
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  depth = 0L,
+  keep = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -1768,15 +1771,25 @@ specifying object name.}
 \item{\code{direction}}{The relation direction to extract. Should be either
 \code{"all"}, \code{"ref_to"}, \code{"ref_by"} and \code{"node"}.}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}. If \code{recursive} is
-\code{TRUE}, all relations above will be extracted.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is the
-depth when searching value relations recursively. If \code{NULL},
-all possible recursive relations are returned. Default: \code{1}.}
+\item{\code{keep}}{If \code{TRUE}, all fields of specified object are returned
+regardless they have any relations with other objects or not.
+If \code{FALSE}, only fields in specified object that have
+relations with other objects are returned. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1841,9 +1854,10 @@ Extract multiple \link{IdfObject} objects referencing each others.
 \if{html}{\out{<div class="r">}}\preformatted{Idf$objects_in_relation(
   which,
   direction = c("ref_to", "ref_by", "node"),
+  object = NULL,
   class = NULL,
-  recursive = FALSE,
-  depth = 1L
+  group = NULL,
+  depth = 0L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1856,21 +1870,26 @@ specifying object name.}
 \item{\code{direction}}{The relation direction to extract. Should be one of
 \code{"ref_to"}, \code{"ref_by"} or \code{"node"}.}
 
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
 \item{\code{class}}{A character vector of valid class names in the
 underlying \link{Idd}. It is used to restrict the classes to be
 returned. If \code{NULL}, all possible classes are considered and
 corresponding \link{IdfObject} objects are returned if
 relationships are found. Default: \code{NULL}.}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{group}}{A character vector of valid group names in the
+underlying \link{Idd}. It is used to restrict the groups to be
+returned. If \code{NULL}, all possible groups are considered and
+corresponding \link{IdfObject} objects are returned if
+relationships are found. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}. If \code{recursive} is
-\code{TRUE}, all relations above will be extracted.}
-
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is the
-depth when searching value relations recursively. If \code{NULL},
-all possible recursive relations are returned. Default: \code{1}.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }

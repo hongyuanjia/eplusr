@@ -763,14 +763,21 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        specifying object name.
         #' @param direction The relation direction to extract. Should be either
         #'        `"all"`, `"ref_to"`, `"ref_by"` and `"node"`.
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`. If `recursive` is
-        #'        `TRUE`, all relations above will be extracted.
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is the
-        #'        depth when searching value relations recursively. If `NULL`,
-        #'        all possible recursive relations are returned. Default: `1`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
+        #' @param keep If `TRUE`, all fields of specified object are returned
+        #'        regardless they have any relations with other objects or not.
+        #'        If `FALSE`, only fields in specified object that have
+        #'        relations with other objects are returned. Default: `FALSE`.
         #'
         #' @return An `IdfRelation` object, which is a list of 3
         #' [data.table::data.table()]s named `ref_to`, `ref_by` and `node`.
@@ -785,8 +792,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$object_relation("floor", "ref_by")
         #' }
         #'
-        object_relation = function (which, direction = c("all", "ref_to", "ref_by", "node"), recursive = FALSE, depth = 1L)
-            idf_object_relation(self, private, which, match.arg(direction), recursive = recursive, recursive_depth = depth),
+        object_relation = function (which, direction = c("all", "ref_to", "ref_by", "node"),
+                                    object = NULL, class = NULL, group = NULL, depth = 0L, keep = FALSE)
+            idf_object_relation(self, private, which, match.arg(direction),
+                object = object, class = class, group = group, depth = depth, keep = keep),
         # }}}
 
         # objects_in_relation {{{
@@ -824,19 +833,23 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        specifying object name.
         #' @param direction The relation direction to extract. Should be one of
         #'        `"ref_to"`, `"ref_by"` or `"node"`.
+        #' @param object A character vector of object names or an integer vector
+        #'        of object IDs used for searching relations. Default: `NULL`.
         #' @param class A character vector of valid class names in the
         #'        underlying [Idd]. It is used to restrict the classes to be
         #'        returned. If `NULL`, all possible classes are considered and
         #'        corresponding [IdfObject] objects are returned if
         #'        relationships are found. Default: `NULL`.
-        #' @param recursive If `TRUE`, the relation is searched recursively. A
+        #' @param group A character vector of valid group names in the
+        #'        underlying [Idd]. It is used to restrict the groups to be
+        #'        returned. If `NULL`, all possible groups are considered and
+        #'        corresponding [IdfObject] objects are returned if
+        #'        relationships are found. Default: `NULL`.
+        #' @param depth If > 0, the relation is searched recursively. A
         #'        simple example of recursive reference: one material named
         #'        `mat` is referred by a construction named `const`, and `const`
-        #'        is also referred by a surface named `surf`. If `recursive` is
-        #'        `TRUE`, all relations above will be extracted.
-        #' @param depth Only applicable when `recursive` is `TRUE`. This is the
-        #'        depth when searching value relations recursively. If `NULL`,
-        #'        all possible recursive relations are returned. Default: `1`.
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
         #'
         #' @return An named list of [IdfObject] objects.
         #'
@@ -849,8 +862,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
         #' }
         #'
-        objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"), class = NULL, recursive = FALSE, depth = 1L)
-            idf_objects_in_relation(self, private, which, match.arg(direction), class, recursive = recursive, recursive_depth = depth),
+        objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"),
+                                        object = NULL, class = NULL, group = NULL, depth = 0L)
+            idf_objects_in_relation(self, private, which, match.arg(direction),
+                object = object, class = class, group = group, depth = depth),
         # }}}
 
         # search_object {{{
@@ -2661,12 +2676,6 @@ idf_objects <- function (self, private, which) {
     res
 }
 # }}}
-# idf_object_in_class {{{
-idf_object_in_class <- function (self, private, class) {
-    .deprecated_fun("$object_in_class()", "$objects_in_class()", "Idf", "0.10.0")
-    idf_objects_in_class(self, private, class)
-}
-# }}}
 # idf_objects_in_class {{{
 idf_objects_in_class <- function (self, private, class) {
     assert(is_string(class))
@@ -2699,7 +2708,8 @@ idf_objects_in_group <- function (self, private, group) {
 # idf_object_relation {{{
 idf_object_relation <- function (self, private, which,
                                  direction = c("all", "ref_to", "ref_by", "node"),
-                                 recursive = FALSE, recursive_depth = 1L) {
+                                 object = NULL, class = NULL, group = NULL,
+                                 depth = 0L, keep = FALSE) {
     assert(is_scalar(which))
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(),
@@ -2708,35 +2718,22 @@ idf_object_relation <- function (self, private, which,
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         object_id = obj$object_id, name = TRUE, direction = direction,
-        keep_all = FALSE, by_value = FALSE, max_depth = NULL,
-        recursive = recursive, recursive_depth = recursive_depth
+        keep_all = keep, by_value = FALSE, depth = depth,
+        object = object, class = class, group = group
     )
 }
 # }}}
 # idf_objects_in_relation {{{
 idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by", "node"),
-                                     class = NULL, recursive = FALSE, recursive_depth = 1L) {
+                                     object = NULL, class = NULL, group = NULL, depth = 0L) {
     assert(is_scalar(which))
     direction <- match.arg(direction)
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = which, ignore_case = TRUE)
     rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), obj$object_id,
-        name = FALSE, max_depth = NULL, direction = direction,
-        recursive = recursive, recursive_depth = recursive_depth
+        name = FALSE, depth = depth, direction = direction,
+        object = object, class = class, group = group
     )
-
-    # only include specified class
-    if (!is.null(class)) {
-        cls <- get_idd_class(private$idd_env(), class)
-
-        if (direction == "ref_to") {
-            add_joined_cols(private$idf_env()$object, rel$ref_to, c(src_object_id = "object_id"), c(src_class_id = "class_id"))
-            rel$ref_to <- rel$ref_to[J(cls$class_id), on = "src_class_id"]
-        } else {
-            add_joined_cols(private$idf_env()$object, rel[[direction]], "object_id", "class_id")
-            rel[[direction]] <- rel[[direction]][J(cls$class_id), on = "class_id"]
-        }
-    }
 
     id_self <- obj$object_id
     if (direction == "ref_to") {
@@ -2756,7 +2753,12 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
         if (is.null(class)) {
             verbose_info(paste0(msg, "."))
         } else {
-            verbose_info(paste0(msg, " in class ", collapse(cls$class_name), "."))
+            if (is.null(group)) {
+                verbose_info(paste0(msg, " in class ", collapse(cls$class_name), "."))
+            } else {
+                verbose_info(paste0(msg, " in class ", collapse(cls$class_name),
+                    " or group ", collapse(group), "."))
+            }
         }
         return(obj_self)
     }
@@ -2818,12 +2820,6 @@ idf_dup <- function (self, private, ...) {
     idf_return_modified(self, private, dup)
 }
 # }}}
-# idf_dup_object {{{
-idf_dup_object <- function (self, private, object, new_name = NULL) {
-    .deprecated_fun("$dup_object()", "$dup()", "Idf", "0.10.0")
-    idf_dup(self, private, setattr(object, "names", new_name))
-}
-# }}}
 # idf_add {{{
 idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = parent.frame(2)) {
     add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all, .env = .env)
@@ -2837,13 +2833,6 @@ idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = p
     idf_return_modified(self, private, add)
 }
 # }}}
-# idf_add_object {{{
-idf_add_object <- function (self, private, class, value = NULL, comment = NULL, default = TRUE, all = FALSE) {
-    .deprecated_fun("$add_object()", "$add()", "Idf", "0.10.0")
-    input <- old_input(class, value, comment, "add")
-    idf_add(self, private, input, .default = default, .all = all)
-}
-# }}}
 # idf_set {{{
 idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env = parent.frame(2)) {
     set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .empty = .empty, .env = .env)
@@ -2855,13 +2844,6 @@ idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env =
     log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, set)
-}
-# }}}
-# idf_set_object {{{
-idf_set_object <- function (self, private, object, value, comment, default) {
-    .deprecated_fun("$set_object()", "$set()", "Idf", "0.10.0")
-    input <- old_input(class, value, comment, "set")
-    idf_set(self, private, input, .default = default)
 }
 # }}}
 # idf_del {{{
@@ -2880,12 +2862,6 @@ idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recu
     log_new_uuid(private$m_log)
 
     invisible(self)
-}
-# }}}
-# idf_del_object {{{
-idf_del_object <- function (self, private, object, referenced = FALSE) {
-    .deprecated_fun("$del_object()", "$delete()", "Idf", "0.10.0")
-    idf_del(self, private, object, .ref_by = referenced)
 }
 # }}}
 # idf_rename {{{
@@ -2921,12 +2897,6 @@ idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
     log_new_uuid(private$m_log)
 
     idf_return_modified(self, private, ins)
-}
-# }}}
-# idf_ins_object {{{
-idf_ins_object <- function (self, private, object) {
-    warning("`$ins_object()` is deprecated. Please use `$ins()` instead.", call. = FALSE)
-    idf_insert(self, private, object)
 }
 # }}}
 # idf_search_value {{{
@@ -3039,12 +3009,6 @@ idf_to_string <- function (self, private, which = NULL, class = NULL,
         class, which, comment = comment, header = header, format = format,
         leading = leading, sep_at = sep_at
     )
-}
-# }}}
-# idf_string {{{
-idf_string <- function (self, private, ...) {
-    .deprecated_fun("$string()", "$to_string()", "Idf", "0.10.0")
-    idf_to_string(self, private, ...)
 }
 # }}}
 # idf_to_table {{{
