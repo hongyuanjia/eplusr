@@ -72,9 +72,6 @@ test_that("IddObject class", {
     # can use $field_name()
     expect_error(slash$field_name(slash$num_fields() + 30), class = "error_bad_field_index")
     expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
-    expect_warning({nm <- slash$field_name(c(2, 1), lower = TRUE)},
-        "Parameter `lower`.*has been deprecated"
-    )
 
     # can use $field_index()
     expect_equal(slash$field_index(), 1L:4L)
