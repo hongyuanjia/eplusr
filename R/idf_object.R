@@ -1727,7 +1727,8 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
 }
 # }}}
 # idfobj_has_ref {{{
-idfobj_has_ref <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, type = c("all", "ref_to", "ref_by", "node"), depth = 0L) {
+idfobj_has_ref <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, type = c("all", "ref_to", "ref_by", "node"), recursive = FALSE) {
+    depth <- if (recursive) NULL else 0L
     type <- match.arg(type)
     if (is.null(which)) {
         rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), private$m_object_id,

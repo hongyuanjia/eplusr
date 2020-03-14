@@ -1746,7 +1746,7 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "add")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -1836,7 +1836,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .empty = FAL
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2272,7 +2272,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "add")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2756,7 +2756,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE, 
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2821,7 +2821,7 @@ replace_idf_value <- function (idd_env, idf_env, pattern, replacement,
     assert_valid(idd_env, idf_env, obj, val, action = "set")
 
     list(object = obj, value = val,
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -3121,7 +3121,7 @@ add_idf_relation_format_cols <- function (idd_env, idf_env, ref) {
 }
 # }}}
 # update_value_reference {{{
-update_value_reference <- function (idd_env, idf_env, object, value, action = c("add", "set")) {
+update_value_reference <- function (idd_env, idf_env, object, value) {
     # If field reference has been handled and updated during validation, only
     # check sources
     if (level_checks()$reference) {
@@ -3142,9 +3142,9 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
             )
         }
 
-        # if have sources
+        # if have new sources
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-            idf_env <- update_referenced_value(idd_env, idf_env, value, action)
+            idf_env <- update_referenced_value(idd_env, idf_env, value)
             idf_env$value <- add_field_property(idd_env, idf_env$value, "type_enum")
             val <- value
             new_ref <- get_value_reference_map(idd_env$reference,
@@ -3174,7 +3174,7 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
         set(idf_env$value, NULL, "class_id", idf_env$object[J(idf_env$value$object_id), on = "object_id", class_id])
         idf_env$value <- add_class_name(idd_env, idf_env$value)
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-            idf_env <- update_referenced_value(idd_env, idf_env, value, action)
+            idf_env <- update_referenced_value(idd_env, idf_env, value)
 
             new_src <- TRUE
             val_src <- append_dt(idf_env$value, value, "value_id")
@@ -3195,48 +3195,41 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
 }
 # }}}
 # update_referenced_value {{{
-update_referenced_value <- function (idd_env, idf_env, value, action = c("add", "set")) {
-    # get old values that refer to current input recursively
-    # inter-references in the input should be excluded
-    depth <- if (action == "add") 0L else NULL
-    ref <- get_idf_relation(idd_env, idf_env,
-        value_id = value[src_enum > IDDFIELD_SOURCE$none, value_id],
-        direction = "ref_by", depth = depth
-    )
+update_referenced_value <- function (idd_env, idf_env, value) {
+    ref <- find_value_reference(idd_env, idf_env, value[src_enum > IDDFIELD_SOURCE$none, value_id])
 
     if (!nrow(ref)) return(idf_env)
 
-    depth <- 0L
-    max_depth <- max(ref$dep)
+    # get actual source value
+    ref[value, on = c("src_value_id" = "value_id"), `:=`(
+        value_chr = i.value_chr, value_num = i.value_num, class_name = i.class_name
+    )]
+    ref[J(IDDFIELD_SOURCE$class), on = "src_enum", `:=`(value_chr = class_name, value_num = NA_real_)]
 
-    setindexv(ref, "dep")
-
-    while (depth <= max_depth) {
-        ref_at_depth <- ref[J(depth), on = "dep", nomatch = 0L]
-
-        if (!nrow(ref_at_depth)) break
-
-        if (depth == 0L) {
-            src_val <- value[J(ref_at_depth$src_value_id), on = "value_id",
-                .SD, .SDcols = c("value_chr", "class_name")
-            ]
-            src_val[ref_at_depth$src_enum == 1L, value_chr := class_name]
-
-            set(ref_at_depth, NULL, "src_value_chr", src_val$value_chr)
-        } else {
-            set(ref_at_depth, NULL, "src_value_chr",
-                idf_env$value[J(ref_at_depth$src_value_id), on = "value_id", .SD, .SDcols = "value_chr"]
-            )
-        }
-
-        idf_env$value[ref_at_depth, on = "value_id",
-            `:=`(value_chr = ref_at_depth$src_value_chr, value_num = NA_real_)
-        ]
-
-        depth <- depth + 1L
-    }
+    # update value
+    idf_env$value[ref, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
 
     idf_env
+}
+# }}}
+# find_value_reference {{{
+find_value_reference <- function (idd_env, idf_env, value_id = NULL, only_top = TRUE) {
+    id <- value_id
+
+    if (!length(id)) return(idf_env$reference[0L])
+
+    cur_ref <- idf_env$reference[J(id), on = "src_value_id", nomatch = 0L]
+
+    ref <- cur_ref[0L]
+    while(nrow(cur_ref) > 0L) {
+        ref <- rbindlist(list(ref, cur_ref))
+        next_ref <- idf_env$reference[J(unique(cur_ref$value_id)), on = "src_value_id", nomatch = 0L]
+        # make sure always use the top level value id
+        if (only_top) next_ref[cur_ref, on = c("src_value_id" = "value_id"), src_value_id := i.value_id]
+        cur_ref <- next_ref
+    }
+
+    ref
 }
 # }}}
 
