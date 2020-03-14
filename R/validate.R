@@ -582,8 +582,7 @@ check_invalid_reference <- function (idd_env, idf_env, env_in) {
     if (!nrow(val)) return(env_in)
 
     if (env_in$check_whole) {
-        ref_map <- get_idf_relation(idd_env, idf_env, value_id = val$value_id,
-            direction = "ref_to", depth = 0L, keep_all = TRUE)
+        ref_map <- idf_env$reference[J(val$value_id), on = "value_id"]
     } else {
         # add necessary columns used for getting references
         add_field_property(idd_env, idf_env$value, "src_enum")
@@ -596,7 +595,7 @@ check_invalid_reference <- function (idd_env, idf_env, env_in) {
         set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
     }
 
-    invalid_ref <- ref_map[val, on = "value_id"][J(NA_character_), on = "src_value_id", nomatch = 0L]
+    invalid_ref <- ref_map[val, on = "value_id"][J(NA_integer_), on = "src_value_id", nomatch = 0L]
 
     if (!nrow(invalid_ref)) {
         # if check new objects, update reference map
