@@ -189,6 +189,9 @@ idf$RunPeriod[[1]][c("Begin Month", "End Month")]
 # add new object
 idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 
+# purge unused resource objects
+idf$purge(group = "Schedules")
+
 # get possible values for fields
 idf$Construction$FLOOR$value_possible("Outside Layer")
 
