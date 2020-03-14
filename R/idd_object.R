@@ -558,12 +558,6 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        It only has effect when `unit` is `TRUE`. Default:
         #'        `eplusr_option("view_in_ip")`.
         #'
-        #' @param lower If `TRUE`, "lower-style" names are returned, i.e. all
-        #'        spaces and dashes is replaced by underscores. "lower-style"
-        #'        names are useful when use them as filed names in
-        #'        `$set_value()` in `IdfObject` class and `$set_object()` in
-        #'        [Idf] class. Default: `FALSE`.
-        #'
         #' @return A character vector.
         #'
         #' @examples
@@ -581,8 +575,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_name(unit = TRUE, in_ip = TRUE)
         #' }
         #'
-        field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE)
-            iddobj_field_name(self, private, index, unit, in_ip, lower),
+        field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
+            iddobj_field_name(self, private, index, unit, in_ip),
         # }}}
 
         # field_index {{{
@@ -930,9 +924,6 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        of field names in current class. If `NULL`, all fields in this
         #'        class are used. Default: `NULL`.
         #'
-        #' @param in_ip Deprecated. The field value unit is determined by
-        #'        `eplusr_option("view_in_ip")`.
-        #'
         #' @return A `IddFieldPossible` object which is a
         #' [data.table::data.table()] with 9 columns.
         #'
@@ -942,8 +933,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_possible(6:10)
         #' }
         #'
-        field_possible = function (which = NULL, in_ip)
-            iddobj_field_possible(self, private, which, in_ip),
+        field_possible = function (which = NULL)
+            iddobj_field_possible(self, private, which),
         # }}}
         # }}}
 
@@ -1559,7 +1550,7 @@ iddobj_field_data <- function (self, private, which = NULL, property = NULL, und
 }
 # }}}
 # iddobj_field_name {{{
-iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE) {
+iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
     if (!is.null(index)) assert(are_count(index))
 
     if (unit) {
@@ -1571,8 +1562,6 @@ iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip 
     } else {
         res <- iddobj_field_data(self, private, index)$field_name
     }
-
-    if (lower) .deprecated_arg("lower", "0.10.0", "IddObject")
 
     res
 }
@@ -1654,8 +1643,7 @@ iddobj_field_relation <- function (self, private, which = NULL, direction = c("a
 }
 # }}}
 # iddobj_field_possible {{{
-iddobj_field_possible <- function (self, private, which = NULL, in_ip) {
-    if (!missing(in_ip)) .deprecated_arg("in_ip", "0.10.0", "IddObject")
+iddobj_field_possible <- function (self, private, which = NULL) {
     fld <- iddobj_field_data(self, private, which, FIELD_COLS$property, underscore = TRUE)
     get_iddobj_possible(private$idd_env(), field_id = fld$field_id)
 }

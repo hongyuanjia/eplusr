@@ -1521,27 +1521,9 @@ idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
     self
 }
 # }}}
-# idfobj_get_comment {{{
-idfobj_get_comment <- function (self, private) {
-    .deprecated_fun("$get_comment()", "$comment()", "IdfObject", "0.10.0")
-    idfobj_comment(self, private)
-}
-# }}}
-# idfobj_set_comment {{{
-idfobj_set_comment <- function (self, private, comment, append = TRUE, width = 0L) {
-    .deprecated_fun("$set_comment()", "$comment()", "IdfObject", "0.10.0")
-    idfobj_comment(self, private, comment, append, width)
-}
-# }}}
 # idfobj_value {{{
 idfobj_value <- function (self, private, which = NULL, all = FALSE, simplify = FALSE, unit = FALSE) {
     get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which, all, simplify, unit)
-}
-# }}}
-# idfobj_get_value {{{
-idfobj_get_value <- function (self, private, which = NULL, all = FALSE, simplify = FALSE, unit = FALSE) {
-    .deprecated_fun("$get_value()", "$value()", "IdfObject", "0.10.0")
-    idfobj_value(self, private, which, all, simplify, unit)
 }
 # }}}
 # idfobj_set {{{
@@ -1559,22 +1541,10 @@ idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
     self
 }
 # }}}
-# idfobj_set_value {{{
-idfobj_set_value <- function (self, private, ..., .default = TRUE) {
-    .deprecated_fun("$set_value()", "$set()", "IdfObject", "0.10.0")
-    idfobj_set(self, private, ..., .default = TRUE)
-}
-# }}}
 # idfobj_value_possible {{{
 idfobj_value_possible <- function (self, private, which = NULL, type = c("auto", "default", "choice", "range", "source")) {
 
     get_idfobj_possible(private$idd_env(), private$idf_env(), private$m_object_id, which, type)
-}
-# }}}
-# idfobj_possible_value {{{
-idfobj_possible_value <- function (self, private, which = NULL) {
-    .deprecated_fun("$possible_value()", "$value_possible()", "IdfObject", "0.10.0")
-    idfobj_value_possible(self, private, which)
 }
 # }}}
 # idfobj_validate {{{

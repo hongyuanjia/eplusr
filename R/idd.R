@@ -865,12 +865,6 @@ idd_objects_in_group <- function (self, private, group) {
     res
 }
 # }}}
-# idd_object_in_group {{{
-idd_object_in_group <- function (self, private, group) {
-    .deprecated_fun("$object_in_group()", "$objects_in_group()", "IdfObject", "0.10.0")
-    idd_objects_in_group(self, private, group)
-}
-# }}}
 # idd_to_table {{{
 idd_to_table <- function (self, private, class, all) {
     get_idd_table(private$m_idd_env, class, all)

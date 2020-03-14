@@ -1262,8 +1262,7 @@ Get field names
 \if{html}{\out{<div class="r">}}\preformatted{IddObject$field_name(
   index = NULL,
   unit = FALSE,
-  in_ip = eplusr_option("view_in_ip"),
-  lower = FALSE
+  in_ip = eplusr_option("view_in_ip")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1279,12 +1278,6 @@ Default: \code{FALSE}.}
 \item{\code{in_ip}}{If \code{in_ip}, corresponding imperial units are returned.
 It only has effect when \code{unit} is \code{TRUE}. Default:
 \code{eplusr_option("view_in_ip")}.}
-
-\item{\code{lower}}{If \code{TRUE}, "lower-style" names are returned, i.e. all
-spaces and dashes is replaced by underscores. "lower-style"
-names are useful when use them as filed names in
-\verb{$set_value()} in \code{IdfObject} class and \verb{$set_object()} in
-\link{Idf} class. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1747,7 +1740,7 @@ surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
 \subsection{Method \code{field_possible()}}{
 Get field possible values
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_possible(which = NULL, in_ip)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IddObject$field_possible(which = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1756,9 +1749,6 @@ Get field possible values
 \item{\code{which}}{An integer vector of field indices or a character vector
 of field names in current class. If \code{NULL}, all fields in this
 class are used. Default: \code{NULL}.}
-
-\item{\code{in_ip}}{Deprecated. The field value unit is determined by
-\code{eplusr_option("view_in_ip")}.}
 }
 \if{html}{\out{</div>}}
 }
