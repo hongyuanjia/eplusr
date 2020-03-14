@@ -1588,11 +1588,7 @@ idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL, cl
 
     if (!nrow(rel)) {
         if (eplusr_option("verbose_info")) {
-            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
-                node = "has no node or their nodes have no reference to"
-            )
-
-            msg <- paste("Target object", dir, "any objects")
+            msg <- paste("Target object does not refer to any objects")
 
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
@@ -1628,11 +1624,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL, cl
 
     if (!nrow(rel)) {
         if (eplusr_option("verbose_info")) {
-            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
-                node = "has no node or their nodes have no reference to"
-            )
-
-            msg <- paste("Target object", dir, "any objects")
+            msg <- paste("Target object is not referred by any objects")
 
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
@@ -1667,11 +1659,7 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
 
     if (!nrow(rel)) {
         if (eplusr_option("verbose_info")) {
-            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
-                node = "has no node or their nodes have no reference to"
-            )
-
-            msg <- paste("Target object", dir, "any objects")
+            msg <- paste("Target object has no node or their nodes have no reference to any objects")
 
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
