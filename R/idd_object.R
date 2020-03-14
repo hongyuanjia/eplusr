@@ -558,12 +558,6 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        It only has effect when `unit` is `TRUE`. Default:
         #'        `eplusr_option("view_in_ip")`.
         #'
-        #' @param lower If `TRUE`, "lower-style" names are returned, i.e. all
-        #'        spaces and dashes is replaced by underscores. "lower-style"
-        #'        names are useful when use them as filed names in
-        #'        `$set_value()` in `IdfObject` class and `$set_object()` in
-        #'        [Idf] class. Default: `FALSE`.
-        #'
         #' @return A character vector.
         #'
         #' @examples
@@ -581,8 +575,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_name(unit = TRUE, in_ip = TRUE)
         #' }
         #'
-        field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE)
-            iddobj_field_name(self, private, index, unit, in_ip, lower),
+        field_name = function (index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"))
+            iddobj_field_name(self, private, index, unit, in_ip),
         # }}}
 
         # field_index {{{
@@ -866,6 +860,23 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' @param direction The relation direction to extract. Should be one of
         #'        `"all"`, `"ref_to"` or `"ref_by"`.
         #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
+        #'
+        #' @param keep If `TRUE`, all input fields are returned regardless they
+        #'        have any relations with other objects or not. If `FALSE`, only
+        #'        fields in input that have relations with other objects are
+        #'        returned. Default: `FALSE`.
+        #'
         #' @return An `IddRelation` object.
         #'
         #' @examples
@@ -874,8 +885,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"))
-            iddobj_field_relation(self, private, which, match.arg(direction)),
+        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"), class = NULL, group = NULL, depth = 0L, keep = FALSE)
+            iddobj_field_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth, keep = keep),
         # }}}
 
         # field_possible {{{
@@ -913,9 +924,6 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        of field names in current class. If `NULL`, all fields in this
         #'        class are used. Default: `NULL`.
         #'
-        #' @param in_ip Deprecated. The field value unit is determined by
-        #'        `eplusr_option("view_in_ip")`.
-        #'
         #' @return A `IddFieldPossible` object which is a
         #' [data.table::data.table()] with 9 columns.
         #'
@@ -925,8 +933,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_possible(6:10)
         #' }
         #'
-        field_possible = function (which = NULL, in_ip)
-            iddobj_field_possible(self, private, which, in_ip),
+        field_possible = function (which = NULL)
+            iddobj_field_possible(self, private, which),
         # }}}
         # }}}
 
@@ -1192,6 +1200,18 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        of field names in current class. If `NULL`, all fields in this
         #'        class are used. Default: `NULL`.
         #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
+        #'
         #' @return A logical vector.
         #'
         #' @examples
@@ -1201,8 +1221,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref(c("name", "zone name"))
         #' }
         #'
-        has_ref = function (which = NULL)
-            iddobj_has_ref(self, private, which),
+        has_ref = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+            iddobj_has_ref(self, private, which, class = class, group = group, depth = depth),
         # }}}
 
         # has_ref_to {{{
@@ -1217,6 +1237,18 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        of field names in current class. If `NULL`, all fields in this
         #'        class are used. Default: `NULL`.
         #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
+        #'
         #' @return A logical vector.
         #'
         #' @examples
@@ -1226,8 +1258,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref_to(c("name", "zone name"))
         #' }
         #'
-        has_ref_to = function (which = NULL)
-            iddobj_has_ref_to(self, private, which),
+        has_ref_to = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+            iddobj_has_ref_to(self, private, which, class = class, group = group, depth = depth),
         # }}}
 
         # has_ref_by {{{
@@ -1242,6 +1274,18 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'        of field names in current class. If `NULL`, all fields in this
         #'        class are used. Default: `NULL`.
         #'
+        #' @param class A character vector of class names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param group A character vector of group names used for searching
+        #'        relations. Default: `NULL`.
+        #'
+        #' @param depth If > 0, the relation is searched recursively. A
+        #'        simple example of recursive reference: one material named
+        #'        `mat` is referred by a construction named `const`, and `const`
+        #'        is also referred by a surface named `surf`. If `NULL`,
+        #'        all possible recursive relations are returned. Default: `0`.
+        #'
         #' @return A logical vector.
         #'
         #' @examples
@@ -1251,8 +1295,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$has_ref_by(c("name", "zone name"))
         #' }
         #'
-        has_ref_by = function (which = NULL)
-            iddobj_has_ref_by(self, private, which),
+        has_ref_by = function (which = NULL, class = NULL, group = NULL, depth = 0L)
+            iddobj_has_ref_by(self, private, which, class = class, group = group, depth = depth),
         # }}}
         # }}}
 
@@ -1506,7 +1550,7 @@ iddobj_field_data <- function (self, private, which = NULL, property = NULL, und
 }
 # }}}
 # iddobj_field_name {{{
-iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip"), lower = FALSE) {
+iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
     if (!is.null(index)) assert(are_count(index))
 
     if (unit) {
@@ -1518,8 +1562,6 @@ iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip 
     } else {
         res <- iddobj_field_data(self, private, index)$field_name
     }
-
-    if (lower) .deprecated_arg("lower", "0.10.0", "IddObject")
 
     res
 }
@@ -1583,27 +1625,25 @@ iddobj_field_range <- function (self, private, which = NULL) {
 }
 # }}}
 # iddobj_field_relation {{{
-iddobj_field_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by")) {
+iddobj_field_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by"),
+                                   class = NULL, group = NULL, depth = 0L, keep = FALSE) {
     direction <- match.arg(direction)
 
     if (is.null(which)) {
-        get_iddobj_relation(private$idd_env(), private$m_class_id, NULL, TRUE, direction, TRUE)
+        get_iddobj_relation(private$idd_env(), private$m_class_id, NULL, name = TRUE,
+            direction = direction, depth = depth, keep_all = keep,
+            class = class, group = group)
     } else {
         fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
 
-        get_iddobj_relation(private$idd_env(), NULL, fld$field_id, TRUE, direction, TRUE)
+        get_iddobj_relation(private$idd_env(), NULL, fld$field_id, name = TRUE,
+            direction = direction, depth = depth, keep_all = keep,
+            class = class, group = group)
     }
 }
 # }}}
-# iddobj_field_reference {{{
-iddobj_field_reference <- function (self, private, which = NULL) {
-    .deprecated_fun("$field_reference()", "$field_relation()", "Idd", "0.10.0")
-    iddobj_field_relation(self, private, which, "ref_to")
-}
-# }}}
 # iddobj_field_possible {{{
-iddobj_field_possible <- function (self, private, which = NULL, in_ip) {
-    if (!missing(in_ip)) .deprecated_arg("in_ip", "0.10.0", "IddObject")
+iddobj_field_possible <- function (self, private, which = NULL) {
     fld <- iddobj_field_data(self, private, which, FIELD_COLS$property, underscore = TRUE)
     get_iddobj_possible(private$idd_env(), field_id = fld$field_id)
 }
@@ -1689,15 +1729,18 @@ iddobj_is_required_field <- function (self, private, which) {
 }
 # }}}
 # iddobj_has_ref {{{
-iddobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to", "ref_by")) {
+iddobj_has_ref <- function (self, private, which = NULL, class = NULL, group = NULL,
+                            depth = 0L, type = c("all", "ref_to", "ref_by")) {
     type <- match.arg(type)
 
     if (is.null(which)) {
-        rel <- get_iddobj_relation(private$idd_env(), private$m_class_id, direction = type)
+        rel <- get_iddobj_relation(private$idd_env(), private$m_class_id,
+            class = class, group = group, depth = depth, direction = type)
     } else {
         fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
 
-        rel <- get_iddobj_relation(private$idd_env(), NULL, fld$field_id, direction = type)
+        rel <- get_iddobj_relation(private$idd_env(), NULL, fld$field_id,
+            class = class, group = group, depth = depth, direction = type)
     }
 
     if (type == "all") {
@@ -1711,13 +1754,13 @@ iddobj_has_ref <- function (self, private, which = NULL, type = c("all", "ref_to
 }
 # }}}
 # iddobj_has_ref_by {{{
-iddobj_has_ref_by <- function (self, private, which = NULL) {
-    iddobj_has_ref(self, private, which, "ref_by")
+iddobj_has_ref_by <- function (self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
+    iddobj_has_ref(self, private, which, class = class, group = group, depth = depth, type = "ref_by")
 }
 # }}}
 # iddobj_has_ref_to {{{
-iddobj_has_ref_to <- function (self, private, which = NULL) {
-    iddobj_has_ref(self, private, which, "ref_to")
+iddobj_has_ref_to <- function (self, private, which = NULL, class = NULL, group = NULL, depth = 0L) {
+    iddobj_has_ref(self, private, which, class = class, group = group, depth = depth, type = "ref_to")
 }
 # }}}
 # iddobj_to_table {{{

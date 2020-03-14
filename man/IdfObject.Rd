@@ -1253,8 +1253,11 @@ Get value relations
 \if{html}{\out{<div class="r">}}\preformatted{IdfObject$value_relation(
   which = NULL,
   direction = c("all", "ref_to", "ref_by", "node"),
-  recursive = FALSE,
-  depth = 1L
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  depth = 0L,
+  keep = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -1267,16 +1270,25 @@ of field names.}
 \item{\code{direction}}{The relation direction to extract. Should be either
 \code{"all"}, \code{"ref_to"} or "ref_by".}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
-depth to when searching value relations recursively. If
-\code{NULL}, all recursive relations are returned. Default: \code{1}.}
-
-\item{\code{class}}{A character vector of class names.}
+\item{\code{keep}}{If \code{TRUE}, all input fields are returned regardless they
+have any relations with other objects or not. If \code{FALSE}, only
+fields in input that have relations with other objects are
+returned. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1341,9 +1353,10 @@ Extract multiple \code{IdfObject} objects referred by specified field values
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_to_object(
   which = NULL,
+  object = NULL,
   class = NULL,
-  recursive = FALSE,
-  depth = 1L
+  group = NULL,
+  depth = 0L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1353,16 +1366,20 @@ Extract multiple \code{IdfObject} objects referred by specified field values
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}.}
-
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
-depth to when searching value relations recursively. If
-\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1398,9 +1415,10 @@ Extract multiple \code{IdfObject} objects referring to specified field values
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_by_object(
   which = NULL,
+  object = NULL,
   class = NULL,
-  recursive = FALSE,
-  depth = 1L
+  group = NULL,
+  depth = 0L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1410,16 +1428,20 @@ Extract multiple \code{IdfObject} objects referring to specified field values
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}.}
-
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
-depth to when searching value relations recursively. If
-\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1455,9 +1477,10 @@ Extract multiple \code{IdfObject} objects referring to same nodes
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{IdfObject$ref_to_node(
   which = NULL,
+  object = NULL,
   class = NULL,
-  recursive = FALSE,
-  depth = 1L
+  group = NULL,
+  depth = 0L
 )}\if{html}{\out{</div>}}
 }
 
@@ -1467,16 +1490,20 @@ Extract multiple \code{IdfObject} objects referring to same nodes
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
 
-\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{depth}}{If > 0, the relation is searched recursively. A
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
-is also referred by a surface named \code{surf}.}
-
-\item{\code{depth}}{Only applicable when \code{recursive} is \code{TRUE}. This is a
-depth to when searching value relations recursively. If
-\code{NULL}, all recursive relations are returned. Default: \code{1}.}
+is also referred by a surface named \code{surf}. If \code{NULL},
+all possible recursive relations are returned. Default: \code{0}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1513,7 +1540,13 @@ if (is_avail_eplus(8.8)) {
 \subsection{Method \code{has_ref_to()}}{
 Check if object field values refer to others
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_to(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_to(
+  which = NULL,
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  recursive = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1522,7 +1555,19 @@ Check if object field values refer to others
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1555,7 +1600,13 @@ mat$has_ref_to()
 \subsection{Method \code{has_ref_by()}}{
 Check if object field values are referred by others
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_by(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_by(
+  which = NULL,
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  recursive = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1564,7 +1615,19 @@ Check if object field values are referred by others
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1597,7 +1660,13 @@ mat$has_ref_by()
 \subsection{Method \code{has_ref_node()}}{
 Check if object field values refer to other nodes
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_node(which = NULL, class = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref_node(
+  which = NULL,
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  recursive = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1606,7 +1675,19 @@ Check if object field values refer to other nodes
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
 
-\item{\code{class}}{A character vector of class names.}
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1639,7 +1720,13 @@ mat$has_ref_node()
 \subsection{Method \code{has_ref()}}{
 Check if object field values refer to or are referred by others
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref(which = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$has_ref(
+  which = NULL,
+  object = NULL,
+  class = NULL,
+  group = NULL,
+  recursive = FALSE
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1647,6 +1734,20 @@ Check if object field values refer to or are referred by others
 \describe{
 \item{\code{which}}{An integer vector of field indexes or a character vector
 of field names.}
+
+\item{\code{object}}{A character vector of object names or an integer vector
+of object IDs used for searching relations. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of class names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of group names used for searching
+relations. Default: \code{NULL}.}
+
+\item{\code{recursive}}{If \code{TRUE}, the relation is searched recursively. A
+simple example of recursive reference: one material named
+\code{mat} is referred by a construction named \code{const}, and \code{const}
+is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

@@ -433,101 +433,189 @@ clean_field_property <- function (dt, property) {
 # }}}
 
 # REFERENCES
-# get_recref {{{
-get_recref <- function (reference, id, col_on, col_rec, dep, max = Inf) {
-    drill <- if (length(col_on) == 2L) TRUE else FALSE
-    ref <- reference[0L]
-    set(ref, NULL, "dep", integer())
-    dep <- dep
-    col <- col
+# get_recursive_relation {{{
+get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_ref, col_rev, include = NULL) {
+    ref <- init_ref
+    cur_ref <- init_ref
 
-    get_ref <- function (id) {
-        if (drill) {
-            cur_ref <- reference[J(id), on = col_on[[1L]], nomatch = 0L]
-            drill <<- FALSE
-            col_on <<- col_on[[2L]]
-        } else {
-            cur_ref <- reference[J(id), on = col_on, nomatch = 0L]
+    # parent class or object
+    parent <- ref[[col_rev]]
+
+    # store classes or objects needed to be removed later
+    del <- list()
+
+    # log depth
+    dep <- init_dep
+
+    while (dep < max_dep && nrow(cur_ref)) {
+        # skip if specified classes/objects are matched
+        if (length(include)) {
+            del <- cur_ref[J(include), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
+            if (length(del)) {
+                cur_ref <- cur_ref[!J(del), on = col_rev]
+            }
+        }
+        # if all are matched, stop
+        if (!nrow(cur_ref)) break
+
+        # get current indirectly ref
+        new_ref <- all_ref[J(unique(cur_ref[[col_ref]])), on = col_rev, nomatch = 0L]
+
+        # get classes that do not going any deeper
+        # those classes should be removed
+        if (length(include)) {
+            del <- c(del,
+                list(setattr(setdiff(cur_ref[[col_ref]], c(include, new_ref[[col_rev]])), "dep", dep))
+            )
         }
 
+        cur_ref <- new_ref
+
+        # add depth
+        dep <- dep + 1L
+        # set depth value
         set(cur_ref, NULL, "dep", dep)
-        if (!nrow(cur_ref)) return(ref)
-        ref <<- rbindlist(list(ref, cur_ref))
-        if (dep == max) return(ref)
-        dep <<- dep + 1L
-        get_ref(cur_ref[[col_rec]])
+        # merge into the main results
+        ref <- rbindlist(list(ref, cur_ref))
+
+        # remove self reference
+        cur_ref <- cur_ref[!J(parent), on = col_ref]
     }
 
-    get_ref(id)
+    # should search backwards to only include paths related to specified
+    # classes/objects
+    if (length(include) && nrow(ref)) ref <- del_recursive_relation(ref, del, include)
+
+    ref
+}
+# }}}
+# del_recursive_relation {{{
+del_recursive_relation <- function (ref, target, keep, col_ref, col_rev) {
+    # split ref by depth
+    ref <- split(ref, by = "dep")
+
+    # get class/object indices needed to be removed in former level
+    not_found <- unique(ref[[length(ref)]][!J(keep), on = col_ref, .SD, .SDcols = col_rev][[1L]])
+    # only keep specified classes for current level
+    ref[[length(ref)]] <- ref[[length(ref)]][J(keep), on = col_ref, nomatch = 0L]
+    # NOTE: should include classes that contain valid ref
+    not_found <- setdiff(not_found, ref[[length(ref)]][[col_rev]])
+
+    for (i in rev(seq_along(ref[-length(ref)]))) {
+        # include specified classes to be removed
+        not_found <- c(not_found, target[[i]])
+        # get class/object indices needed to be removed in former level
+        next_not_found <- unique(ref[[i]][J(not_found), on = col_ref, .SD, .SDcols = col_rev][[1L]])
+        # remove at current level
+        if (length(not_found)) ref[[i]] <- ref[[i]][!J(not_found), on = col_ref]
+        not_found <- next_not_found
+    }
+
+    rbindlist(ref)
+}
+# }}}
+# combine_input_and_relation {{{
+combine_input_and_relation <- function (input, ref, type, direction) {
+    if (type == "idd") {
+        col_main <- "class_id"
+        col_sub <- "field_id"
+    } else if (type == "idf") {
+        col_main <- "object_id"
+        col_sub <- "value_id"
+    }
+
+    if (direction == "ref_by") {
+        col_main <- paste0("src_", col_main)
+        col_sub <- paste0("src_", col_sub)
+        setnames(input, c(col_sub, col_main))
+    }
+
+    if (!nrow(ref) || max(ref$dep) == 0L) {
+        set(ref, NULL, col_main, NULL)
+        ref <- ref[input, on = col_sub]
+        set(ref, NULL, "dep", 0L)
+    } else {
+        ref0 <- ref[J(0L), on = "dep"]
+        set(ref0, NULL, col_main, NULL)
+        ref0 <- ref0[input, on = col_sub]
+        set(ref0, NULL, "dep", 0L)
+        ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
+    }
+
+    ref
 }
 # }}}
 # get_idd_relation {{{
-get_idd_relation <- function (idd_env, class = NULL, field = NULL, max_depth = NULL,
-                              name = FALSE, direction = c("ref_to", "ref_by"), keep_all = FALSE) {
-    assert(is.null(max_depth) || is_count(max_depth, TRUE))
+get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, direction = c("ref_to", "ref_by"),
+                              class = NULL, group = NULL, depth = 0L, name = FALSE, keep_all = FALSE) {
     direction <- match.arg(direction)
+    assert(is.null(depth) || is_count(depth, TRUE))
+    if (is.null(depth)) depth <- Inf
 
     # get class reference
-    if (is.null(field)) {
-        if (is.null(class)) {
+    if (is.null(field_id)) {
+        if (is.null(class_id)) {
             id <- idd_env$class$class_id
         } else {
-            id <- get_idd_class(idd_env, class)$class_id
+            id <- get_idd_class(idd_env, class_id)$class_id
         }
-        col_on <- c("class_id", "field_id")
+        col_on <- "class_id"
     } else {
         # if no class is given, assume field are valid field ids
-        if (is.null(class)) {
-            id <- field
+        if (is.null(class_id)) {
+            id <- field_id
         } else {
-            id <- get_idd_field(idd_env, class, field)$field_id
+            warning("Both class id and field id are given.")
+            id <- intersect(field_id, get_idd_field(idd_env, class_id)$field_id)
         }
         col_on <- "field_id"
     }
 
     if (keep_all) {
-        fld <- idd_env$field[J(id), on = col_on[[1L]], .SD, .SDcols = c("field_id", "class_id")]
+        # make sure all input IDs appear in the result
+        fld <- idd_env$field[J(id), on = col_on, .SD, .SDcols = c("field_id", "class_id")]
     }
+
+    if (direction == "ref_by") col_on <- paste0("src_", col_on)
+
+    all_ref <- idd_env$reference
+
+    # init depth
+    dep <- 0L
+
+    # get first directly ref
+    cur_ref <- all_ref[J(id), on = col_on, nomatch = 0L]
+    set(cur_ref, NULL, "dep", if (nrow(cur_ref)) dep else integer())
 
     if (direction == "ref_to") {
-        col_rec <- "src_field_id"
+        col_ref <- "src_class_id"
+        col_rev <- "class_id"
     } else if (direction == "ref_by") {
-        col_on <- paste0("src_", col_on)
-        col_rec <- "field_id"
+        col_ref <- "class_id"
+        col_rev <- "src_class_id"
     }
 
-    # TODO: for extensible groups, only use the first group
-    dep <- 0L
-    if (is.null(max_depth)) max_depth <- Inf
-
-    ref <- get_recref(idd_env$reference, id, col_on, col_rec, dep, max_depth)
-
-    if (keep_all) {
-        if (direction == "ref_to") {
-            set(ref, NULL, "class_id", NULL)
-            if (!nrow(ref) || max(ref$dep) == 0L) {
-                ref <- ref[fld, on = "field_id"]
-                set(ref, NULL, "dep", 0L)
-            } else {
-                ref0 <- ref[J(0L), on = "dep"]
-                ref0 <- ref0[fld, on = "field_id"]
-                set(ref0, NULL, "dep", 0L)
-                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
-            }
-        } else {
-            set(ref, NULL, "src_class_id", NULL)
-            setnames(fld, c("src_field_id", "src_class_id"))
-            if (!nrow(ref) || max(ref$dep) == 0L) {
-                ref <- ref[fld, on = "src_field_id"]
-                set(ref, NULL, "dep", 0L)
-            } else {
-                ref0 <- ref[J(0L), on = "dep"]
-                ref0 <- ref0[fld, on = "src_field_id"]
-                set(ref0, NULL, "dep", 0L)
-                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
-            }
-        }
+    # restrict searching reference ranges
+    # NOTE: should do this depending on depth value
+    # This makes it possible to find recursive relations, e.g. how is the
+    # AirLoopHVAC related to Schedule:Compact?
+    cls_id <- NULL
+    if (!is.null(group)) {
+        grp_id <- get_idd_group_index(idd_env, group)
+        cls_id <- idd_env$class[J(grp_id), on = "group_id"]$class_id
     }
+    if (!is.null(class)) {
+        cls_id <- c(cls_id, get_idd_class(idd_env, class)$class_id)
+    }
+    if (depth == 0L && !is.null(cls_id)) {
+        cur_ref <- cur_ref[J(cls_id), on = col_ref, nomatch = 0L]
+    }
+
+    # get recursive relation
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, cls_id)
+
+    # keep all input
+    if (keep_all) ref <- combine_input_and_relation(fld, ref, "idd", direction)
 
     if (!name) return(ref)
 

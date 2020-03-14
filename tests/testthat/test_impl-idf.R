@@ -361,8 +361,13 @@ test_that("table", {
 
     # RELATION {{{
     expect_equal(get_idf_relation(idd_env, idf_env),
-        data.table(object_id = 2:3, value_id = c(11L, 17L), src_object_id = 1:2,
-            src_value_id = c(1L, 10L), src_enum = 2L, dep = 0L
+        data.table(
+            object_id = c(rep(2L, 4), rep(3L, 2), rep(2L, 4)),
+            value_id = c(11L:14L, 17L, 18L, 11L:14L),
+            src_object_id = c(1L, rep(NA, 3), 2L, NA, 1L, rep(NA, 3)),
+            src_value_id = c(1L, rep(NA, 3), 10L, NA, 1L, rep(NA, 3)),
+            src_enum = c(2L, rep(NA, 3), 2L, NA, 2L, rep(NA, 3)),
+            dep = c(rep(0L, 6L), rep(1L, 4L))
         )
     )
 
@@ -370,14 +375,14 @@ test_that("table", {
     idd_env <- ._get_private(use_idd(8.8))$m_idd_env
     id <- get_idf_object_id(idd_env, idf_env, "Material")$Material
     expect_equal(
-        get_idf_relation(idd_env, idf_env, id, recursive = TRUE, direction = "ref_by"),
+        get_idf_relation(idd_env, idf_env, id, depth = NULL, direction = "ref_by"),
         data.table(object_id = c(16L, 25L), value_id = c(111L, 220L),
             src_object_id = c(14L, 16L), src_value_id = c(99L, 110L),
             src_enum = c(2L, 2L), dep = c(0L, 1L)
         )
     )
     expect_equal(
-        get_idf_node_relation(idd_env, idf_env, id, recursive = TRUE),
+        get_idf_node_relation(idd_env, idf_env, id, depth = NULL),
         set(idf_env$reference[0L], NULL, "dep", integer())
     )
     # }}}

@@ -1288,7 +1288,7 @@ trans_funs$f850t860 <- function (idf) {
         dt15 <- dt15[index <= 5L]
         nm_zone <- vcapply(unique(dt15$id),
             function (id) {
-                zone <- idf$object(id)$ref_to_object(2L, class = "Zone", recursive = TRUE)[[1L]]
+                zone <- idf$object(id)$ref_to_object(2L, class = "Zone", depth = NULL)[[1L]]
                 if (!length(zone)) NA_character_ else zone$name()
             }
         )
@@ -2065,7 +2065,7 @@ trans_funs$f890t900 <- function (idf) {
                         ._get_private(idf)$idd_env(),
                         ._get_private(idf)$idf_env(),
                         value_id = unique(fene$id_surf), name = TRUE,
-                        direction = "ref_to", keep_all = TRUE, recursive = TRUE, recursive_depth = 1
+                        direction = "ref_to", keep_all = TRUE, depth = 1
                     )
                     # get surface name
                     surf <- zone[dep == 0, list(id_surf = src_object_id, name_surf = value_chr)]
@@ -2922,7 +2922,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
             # merge data
             idf_env <- priv$idf_env()
             idf_env$value <- append_dt(idf_env$value, val, "value_id")
-            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val, "set"))
+            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val))
         }
     }
 

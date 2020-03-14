@@ -72,9 +72,6 @@ test_that("IddObject class", {
     # can use $field_name()
     expect_error(slash$field_name(slash$num_fields() + 30), class = "error_bad_field_index")
     expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
-    expect_warning({nm <- slash$field_name(c(2, 1), lower = TRUE)},
-        "Parameter `lower`.*has been deprecated"
-    )
 
     # can use $field_index()
     expect_equal(slash$field_index(), 1L:4L)
@@ -106,8 +103,8 @@ test_that("IddObject class", {
     # can use $field_relation()
     expect_is(slash$field_relation(c(4, 2)), "list")
     expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
-    expect_equal(nrow(slash$field_relation(c(4, 2))$ref_by), 2L)
-    expect_equivalent(slash$field_relation(c(1, 3))$ref_to,
+    expect_equal(nrow(slash$field_relation(c(4, 2), keep = TRUE)$ref_by), 2L)
+    expect_equivalent(slash$field_relation(c(1, 3), keep = TRUE)$ref_to,
         data.table(
             class_id = 2L, class_name = "TestSlash",
             field_id = c(2L, 4L), field_index = c(1L, 3L),

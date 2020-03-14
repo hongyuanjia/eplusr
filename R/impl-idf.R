@@ -1746,7 +1746,7 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "add")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -1836,7 +1836,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .empty = FAL
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -1958,8 +1958,9 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
     # always check if targets objects are referred by others
     dir <- if (.ref_to) "all" else "ref_by"
 
+    depth <- if (.recursive) NULL else 0L
     rel <- get_idfobj_relation(idd_env, idf_env, id_del, direction = dir,
-        max_depth = NULL, recursive = .recursive, name = eplusr_option("verbose_info")
+        depth = depth, name = eplusr_option("verbose_info")
     )
 
     if (eplusr_option("verbose_info")) {
@@ -2271,7 +2272,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "add")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2755,7 +2756,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE, 
 
     list(object = obj[, .SD, .SDcols = names(idf_env$object)],
          value = val[, .SD, .SDcols = names(idf_env$value)],
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2820,7 +2821,7 @@ replace_idf_value <- function (idd_env, idf_env, pattern, replacement,
     assert_valid(idd_env, idf_env, obj, val, action = "set")
 
     list(object = obj, value = val,
-         reference = update_value_reference(idd_env, idf_env, obj, val, "set")
+         reference = update_value_reference(idd_env, idf_env, obj, val)
     )
 }
 # }}}
@@ -2991,66 +2992,11 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
 # REFERENCES
 # get_idf_relation {{{
 get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
-                              max_depth = NULL, name = FALSE,
-                              direction = c("ref_to", "ref_by"), keep_all = FALSE,
-                              recursive = FALSE, recursive_depth = 1L) {
-    direction <- match.arg(direction)
-
-    ref <- get_idf_relation_at_depth(idd_env, idf_env, object_id, value_id,
-        max_depth, direction, keep_all
-    )
-
-    if (recursive && nrow(ref)) {
-        if (is.null(recursive_depth)) recursive_depth <- Inf
-        assert(is_count(recursive_depth))
-
-        rec_in <- switch(direction, ref_to = "src_object_id", ref_by = "object_id")
-        new_id <- unique(ref[[rec_in]][!is.na(ref[[rec_in]])])
-        dep <- 1L
-
-        get_rec_ref <- function (recref, md, new_id) {
-            if (!length(new_id)) return(ref)
-
-            rec_ref <- get_idf_relation_at_depth(idd_env, idf_env, new_id,
-                NULL, max_depth, direction, keep_all = FALSE
-            )
-
-            # increase the depth
-            set(rec_ref, NULL, "dep", rec_ref$dep + md + 1L)
-
-            # exclude self reference to avoid infinite loop
-            # `Name` <--> `Outside Boundary Condition Object` in `BuildingSurface:Detaild`
-            rec_ref <- rec_ref[!ref, on = c("object_id", "value_id", "src_object_id", "src_value_id")]
-
-            ref <<- rbindlist(list(ref, rec_ref), use.names = TRUE)
-
-            if (dep == recursive_depth) return(ref)
-            dep <<- dep + 1L
-
-            new_id <- unique(rec_ref[[rec_in]][!is.na(rec_ref[[rec_in]])])
-
-            get_rec_ref(rec_ref, max(rec_ref$dep), new_id)
-
-            ref
-        }
-
-        ref <- get_rec_ref(ref, max(ref$dep), new_id)
-    }
-
-    if (!name) return(ref)
-
-    ref <- add_idf_relation_format_cols(idd_env, idf_env, ref)
-
-    cls <- switch(direction, ref_by = "IdfRelationBy", ref_to = "IdfRelationTo")
-    setattr(ref, "class", c(cls, class(ref)))
-    ref
-}
-# }}}
-# get_idf_relation_at_depth {{{
-get_idf_relation_at_depth <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
-                                       max_depth = NULL, direction = c("ref_to", "ref_by"),
-                                       keep_all = FALSE) {
-    assert(is.null(max_depth) || is_count(max_depth, TRUE))
+                              depth = NULL, name = FALSE, direction = c("ref_to", "ref_by"),
+                              object = NULL, class = NULL, group = NULL,
+                              keep_all = FALSE) {
+    assert(is.null(depth) || is_count(depth, TRUE))
+    if (is.null(depth)) depth <- Inf
     direction <- match.arg(direction)
 
     # if no value id is given
@@ -3063,7 +3009,7 @@ get_idf_relation_at_depth <- function (idd_env, idf_env, object_id = NULL, value
             # use specified object IDs
             id <- object_id
         }
-        col_on <- c("object_id", "value_id")
+        col_on <- "object_id"
     # if value ids are given
     } else {
         # if no object id is given
@@ -3078,57 +3024,69 @@ get_idf_relation_at_depth <- function (idd_env, idf_env, object_id = NULL, value
             val_id <- value_id
 
             # find value ids
-            id <- idf_env[J(obj_id, val_id), on = c("object_id", "value_id"), value_id]
+            id <- idf_env$value[J(obj_id, val_id), on = c("object_id", "value_id"), value_id]
         }
         col_on <- "value_id"
     }
 
     if (keep_all) {
         # make sure all input IDs appear in the result
-        val <- idf_env$value[J(id), on = col_on[[1L]], .SD, .SDcols = c("value_id", "object_id")]
+        val <- idf_env$value[J(id), on = col_on, .SD, .SDcols = c("value_id", "object_id")]
     }
+
+    if (direction == "ref_by") col_on <- paste0("src_", col_on)
+
+    all_ref <- idf_env$reference
+
+    # init depth
+    dep <- 0L
+
+    # get first directly ref
+    cur_ref <- idf_env$reference[J(id), on = col_on, nomatch = NULL]
+    set(cur_ref, NULL, "dep", if (nrow(cur_ref)) dep else integer())
 
     if (direction == "ref_to") {
-        col_rec <- "src_value_id"
+        col_ref <- "src_object_id"
+        col_rev <- "object_id"
     } else if (direction == "ref_by") {
-        col_on <- paste0("src_", col_on)
-        col_rec <- "value_id"
+        col_ref <- "object_id"
+        col_rev <- "src_object_id"
     }
 
-    dep <- 0L
-    if (is.null(max_depth)) max_depth <- Inf
-
-    ref <- get_recref(idf_env$reference, id, col_on, col_rec, dep, max_depth)
-
-    # keep all input {{{
-    if (keep_all) {
-        if (direction == "ref_to") {
-            set(ref, NULL, "object_id", NULL)
-            if (!nrow(ref) || max(ref$dep) == 0L) {
-                ref <- ref[val, on = "value_id"]
-                set(ref, NULL, "dep", 0L)
-            } else {
-                ref0 <- ref[J(0L), on = "dep"]
-                ref0 <- ref0[val, on = "value_id"]
-                set(ref0, NULL, "dep", 0L)
-                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
-            }
-        } else {
-            set(ref, NULL, "src_object_id", NULL)
-            setnames(val, c("src_value_id", "src_object_id"))
-            if (!nrow(ref) || max(ref$dep) == 0L) {
-                ref <- ref[val, on = "src_value_id"]
-                set(ref, NULL, "dep", 0L)
-            } else {
-                ref0 <- ref[J(0L), on = "dep"]
-                ref0 <- ref0[val, on = "src_value_id"]
-                set(ref0, NULL, "dep", 0L)
-                ref <- append_dt(ref0, ref[!J(0L), on = "dep"])
-            }
-        }
+    # restrict searching reference ranges
+    # NOTE: should do this depending on depth value
+    # This makes it possible to find recursive relations, e.g. how is the
+    # one AirLoopHVAC related to an Schedule:Compact object?
+    cls_id <- NULL
+    if (!is.null(group)) {
+        grp_id <- get_idd_group_index(idd_env, group)
+        cls_id <- idd_env$class[J(grp_id), on = "group_id"]$class_id
     }
-    # }}}
+    if (!is.null(class)) {
+        cls_id <- unique(c(cls_id, get_idd_class(idd_env, class)$class_id))
+    }
+    obj_id <- NULL
+    if (!is.null(cls_id)) {
+        obj_id <- idf_env$object[J(cls_id), on = "class_id", nomatch = 0L, object_id]
+    }
+    if (!is.null(object)) {
+        obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
+    }
+    if (depth == 0L && length(obj_id)) {
+        cur_ref <- cur_ref[J(obj_id), on = col_ref, nomatch = 0L]
+    }
 
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, obj_id)
+
+    # keep all input
+    if (keep_all) ref <- combine_input_and_relation(val, ref, "idf", direction)
+
+    if (!name) return(ref)
+
+    ref <- add_idf_relation_format_cols(idd_env, idf_env, ref)
+
+    cls <- switch(direction, ref_by = "IdfRelationBy", ref_to = "IdfRelationTo")
+    setattr(ref, "class", c(cls, class(ref)))
     ref
 }
 # }}}
@@ -3163,7 +3121,7 @@ add_idf_relation_format_cols <- function (idd_env, idf_env, ref) {
 }
 # }}}
 # update_value_reference {{{
-update_value_reference <- function (idd_env, idf_env, object, value, action = c("add", "set")) {
+update_value_reference <- function (idd_env, idf_env, object, value) {
     # If field reference has been handled and updated during validation, only
     # check sources
     if (level_checks()$reference) {
@@ -3184,9 +3142,9 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
             )
         }
 
-        # if have sources
+        # if have new sources
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-            idf_env <- update_referenced_value(idd_env, idf_env, value, action)
+            idf_env <- update_referenced_value(idd_env, idf_env, value)
             idf_env$value <- add_field_property(idd_env, idf_env$value, "type_enum")
             val <- value
             new_ref <- get_value_reference_map(idd_env$reference,
@@ -3216,7 +3174,7 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
         set(idf_env$value, NULL, "class_id", idf_env$object[J(idf_env$value$object_id), on = "object_id", class_id])
         idf_env$value <- add_class_name(idd_env, idf_env$value)
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-            idf_env <- update_referenced_value(idd_env, idf_env, value, action)
+            idf_env <- update_referenced_value(idd_env, idf_env, value)
 
             new_src <- TRUE
             val_src <- append_dt(idf_env$value, value, "value_id")
@@ -3237,133 +3195,189 @@ update_value_reference <- function (idd_env, idf_env, object, value, action = c(
 }
 # }}}
 # update_referenced_value {{{
-update_referenced_value <- function (idd_env, idf_env, value, action = c("add", "set")) {
-    # get old values that refer to current input recursively
-    # inter-references in the input should be excluded
-    depth <- if (action == "add") 0L else NULL
-    ref <- get_idf_relation(idd_env, idf_env,
-        value_id = value[src_enum > IDDFIELD_SOURCE$none, value_id],
-        direction = "ref_by", max_depth = depth
-    )
+update_referenced_value <- function (idd_env, idf_env, value) {
+    ref <- find_value_reference(idd_env, idf_env, value[src_enum > IDDFIELD_SOURCE$none, value_id])
 
     if (!nrow(ref)) return(idf_env)
 
-    depth <- 0L
-    max_depth <- max(ref$dep)
+    # get actual source value
+    ref[value, on = c("src_value_id" = "value_id"), `:=`(
+        value_chr = i.value_chr, value_num = i.value_num, class_name = i.class_name
+    )]
+    ref[J(IDDFIELD_SOURCE$class), on = "src_enum", `:=`(value_chr = class_name, value_num = NA_real_)]
 
-    setindexv(ref, "dep")
-
-    while (depth <= max_depth) {
-        ref_at_depth <- ref[J(depth), on = "dep", nomatch = 0L]
-
-        if (!nrow(ref_at_depth)) break
-
-        if (depth == 0L) {
-            src_val <- value[J(ref_at_depth$src_value_id), on = "value_id",
-                .SD, .SDcols = c("value_chr", "class_name")
-            ]
-            src_val[ref_at_depth$src_enum == 1L, value_chr := class_name]
-
-            set(ref_at_depth, NULL, "src_value_chr", src_val$value_chr)
-        } else {
-            set(ref_at_depth, NULL, "src_value_chr",
-                idf_env$value[J(ref_at_depth$src_value_id), on = "value_id", .SD, .SDcols = "value_chr"]
-            )
-        }
-
-        idf_env$value[ref_at_depth, on = "value_id",
-            `:=`(value_chr = ref_at_depth$src_value_chr, value_num = NA_real_)
-        ]
-
-        depth <- depth + 1L
-    }
+    # update value
+    idf_env$value[ref, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
 
     idf_env
+}
+# }}}
+# find_value_reference {{{
+find_value_reference <- function (idd_env, idf_env, value_id = NULL, only_top = TRUE) {
+    id <- value_id
+
+    if (!length(id)) return(idf_env$reference[0L])
+
+    cur_ref <- idf_env$reference[J(id), on = "src_value_id", nomatch = 0L]
+
+    ref <- cur_ref[0L]
+    while(nrow(cur_ref) > 0L) {
+        ref <- rbindlist(list(ref, cur_ref))
+        next_ref <- idf_env$reference[J(unique(cur_ref$value_id)), on = "src_value_id", nomatch = 0L]
+        # make sure always use the top level value id
+        if (only_top) next_ref[cur_ref, on = c("src_value_id" = "value_id"), src_value_id := i.value_id]
+        cur_ref <- next_ref
+    }
+
+    ref
 }
 # }}}
 
 # NODES
 # get_idf_node_relation {{{
 get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
-                                   name = FALSE, keep_all = FALSE, recursive = FALSE,
-                                   recursive_depth = 1L) {
+                                   object = NULL, class = NULL, group = NULL,
+                                   name = FALSE, keep_all = FALSE, depth = 0L) {
     assert(!is.null(object_id) || !is.null(value_id))
+    if (is.null(depth)) depth <- Inf
 
     # extract all node data
-    nodes_all <- add_field_property(idd_env, property = "type_enum",
+    all_nodes <- add_field_property(idd_env, property = "type_enum",
         idf_env$value[!J(NA_character_), on = "value_chr", .SD,
             .SDcols = c("object_id", "field_id", "value_id", "value_chr")])
-    nodes_all <- nodes_all[J(IDDFIELD_TYPE$node), on = "type_enum", nomatch = 0L]
-    set(nodes_all, NULL, c("type_enum", "field_id"), NULL)
-    set(nodes_all, NULL, "value_chr", stri_trans_tolower(nodes_all$value_chr))
+    all_nodes <- all_nodes[J(IDDFIELD_TYPE$node), on = "type_enum", nomatch = 0L]
+    set(all_nodes, NULL, c("type_enum", "field_id"), NULL)
+    set(all_nodes, NULL, "value_chr", stri_trans_tolower(all_nodes$value_chr))
 
-    dt_all <- if (keep_all) idf_env$value else nodes_all
-
-    # get initial input
-    if (!is.null(object_id) & !is.null(value_id)) {
-        # make sure object IDs and value ids have the same length
-        assert(have_same_len(object_id, value_id))
-        obj_id <- object_id
-        val_id <- value_id
-        col_on <- c("object_id", "value_id")
-    } else if (is.null(value_id)) {
-        id <- object_id
+    # if no value id is given
+    if (is.null(value_id)) {
+        # if no object id is given
+        if (is.null(object_id)) {
+            # use all objects in current IDF
+            id <- idf_env$object$object_id
+        } else {
+            # use specified object IDs
+            id <- object_id
+        }
         col_on <- "object_id"
+    # if value ids are given
     } else {
-        id <- value_id
+        # if no object id is given
+        if (is.null(object_id)) {
+            # use specified value id
+            id <- value_id
+        # if object IDs are given
+        } else {
+            # make sure object IDs and value ids have the same length
+            assert(have_same_len(object_id, value_id))
+            obj_id <- object_id
+            val_id <- value_id
+
+            # find value ids
+            id <- idf_env$value[J(obj_id, val_id), on = c("object_id", "value_id"), value_id]
+        }
         col_on <- "value_id"
     }
 
-    nom <- if (keep_all) NA else 0L
-    if (length(col_on) == 1L) {
-        nodes_in <- dt_all[J(id), on = col_on, nomatch = nom]
-    } else {
-        nodes_in <- dt_all[J(obj_id, value_id), on = col_on, nomatch = nom]
-    }
-
     if (keep_all) {
-        set(nodes_in, NULL, c("value_num", "field_id"), NULL)
-        set(nodes_in, NULL, "value_chr", stri_trans_tolower(nodes_in$value_chr))
+        # make sure all input IDs appear in the result
+        val <- idf_env$value[J(id), on = col_on, .SD, .SDcols = c("value_id", "object_id")]
     }
 
-    # rename columns
-    setnames(nodes_in, paste0("src_", names(nodes_in)))
-
-    ref <- idf_env$reference[0L]
-    set(ref, NULL, "dep", integer())
+    # init depth
     dep <- 0L
 
-    if (recursive) {
-        if (is.null(recursive_depth)) recursive_depth <- Inf
-        assert(is_count(recursive_depth))
-        # unlike value relation, depth equals 0L should be counted
-        recursive_depth <- recursive_depth + 1L
-    } else {
-        recursive_depth <- 1L
+    cur_nodes <- all_nodes[J(id), on = col_on, nomatch = NULL]
+    setnames(cur_nodes, c("object_id", "value_id"), c("src_object_id", "src_value_id"))
+    # excluding already matched nodes
+    all_nodes <- all_nodes[!J(cur_nodes$src_value_id), on = "value_id"]
+    cur_nodes <- all_nodes[cur_nodes, on = "value_chr"]
+    set(cur_nodes, NULL, "dep", dep)
+
+    col_ref <- "object_id"
+    col_rev <- "src_object_id"
+
+    # restrict searching reference ranges
+    # NOTE: should do this depending on depth value
+    # This makes it possible to find recursive relations, e.g. how is the
+    # one AirLoopHVAC related to an Schedule:Compact object?
+    cls_id <- NULL
+    if (!is.null(group)) {
+        grp_id <- get_idd_group_index(idd_env, group)
+        cls_id <- idd_env$class[J(grp_id), on = "group_id"]$class_id
+    }
+    if (!is.null(class)) {
+        cls_id <- unique(c(cls_id, get_idd_class(idd_env, class)$class_id))
+    }
+    obj_id <- NULL
+    if (!is.null(cls_id)) {
+        obj_id <- idf_env$object[J(cls_id), on = "class_id", nomatch = 0L, object_id]
+    }
+    if (!is.null(object)) {
+        obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
+    }
+    if (depth == 0L && length(obj_id)) {
+        cur_nodes <- cur_nodes[J(obj_id), on = col_ref, nomatch = 0L]
     }
 
-    get_ref <- function (input) {
-        cur_ref <- unique(nodes_all[!J(c(input$src_value_id, input$value_id)), on = "value_id"][
-            input, on = c(value_chr = "src_value_chr"), nomatch = nom])
+    # store classes or objects needed to be removed later
+    del <- list()
 
-        set(cur_ref, NULL, "value_chr", NULL)
-        set(cur_ref, NULL, c("src_enum", "dep"), list(2L, dep))
+    # parent class or object
+    parent <- cur_nodes[[col_rev]]
 
-        if (!nrow(cur_ref)) return(ref)
-        ref <<- rbindlist(list(ref, cur_ref), use.names = TRUE)
-        dep <<- dep + 1L
-        if (dep == recursive_depth) return(ref)
+    ref <- cur_nodes
+    # for node should reduce one level
+    while (dep < (depth - 1L) && nrow(cur_nodes)) {
+        # skip if specified classes/objects are matched
+        if (length(obj_id)) {
+            m <- cur_nodes[J(obj_id), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
+            if (length(m)) {
+                cur_nodes <- cur_nodes[!J(del), on = col_rev]
+            }
+        }
+        # if all are matched, stop
+        if (!nrow(cur_nodes)) break
 
-        next_input <- nodes_all[!J(c(ref$value_id, ref$src_value_id)), on = "value_id"][
-            J(cur_ref$object_id), on = "object_id", nomatch = 0L]
-        if (!nrow(next_input)) return(ref)
+        # excluding already matched values
+        all_nodes <- all_nodes[!J(cur_nodes$value_id), on = "value_id"]
+        # match new nodes
+        new_nodes <- all_nodes[J(unique(cur_nodes$object_id)), on = col_ref, nomatch = NULL]
+        setnames(new_nodes, c("object_id", "value_id"), c("src_object_id", "src_value_id"))
+        new_nodes <- all_nodes[new_nodes, on = "value_chr"]
 
-        set(next_input, NULL, "value_chr", stri_trans_tolower(next_input$value_chr))
-        setnames(next_input, paste0("src_", names(next_input)))
-        get_ref(next_input)
+        # get objects that do not going any deeper
+        # those objects should be removed
+        if (length(obj_id)) {
+            del <- c(del,
+                list(setattr(setdiff(cur_nodes[[col_ref]], c(obj_id, new_nodes[[col_rev]])), "dep", dep))
+            )
+            cur_nodes
+        }
+
+        cur_nodes <- new_nodes
+
+        # add depth
+        dep <- dep + 1L
+        # set depth value
+        set(cur_nodes, NULL, "dep", dep)
+        # merge into the main results
+        ref <- rbindlist(list(ref, cur_nodes))
+
+        # remove self reference
+        cur_nodes <- cur_nodes[!J(parent), on = col_ref]
     }
 
-    ref <- get_ref(nodes_in)
+    set(ref, NULL, "value_chr", NULL)
+    set(ref, NULL, "src_enum", IDDFIELD_SOURCE$field)
+    setcolorder(ref, names(idf_env$reference))
+
+    # should search backwards to only include paths related to specified
+    # classes/objects
+    if (length(obj_id) && nrow(ref)) ref <- del_recursive_relation(ref, del, obj_id, "object_id", "src_object_id")
+
+    # keep all input
+    if (keep_all) ref <- combine_input_and_relation(val, ref, "idf", "ref_by")
 
     if (!name) return(ref)
 

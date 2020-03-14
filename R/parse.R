@@ -1518,7 +1518,7 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
     if (!nrow(val_ref)) return(empty)
 
     # get field reference map in current IDF
-    val_ref_map <- val_ref[map, on = "field_id", nomatch = 0L, allow.cartesian = TRUE]
+    val_ref_map <- map[val_ref, on = "field_id", allow.cartesian = TRUE]
 
     # get all values in lower case that are sources
     val_src <- get_value_sources(src[J(unique(val_ref_map$src_field_id)), on = "field_id", nomatch = 0L], lower = TRUE)
@@ -1529,7 +1529,7 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
 
     # make sure every reference value has a corresponding source even NA
     if (!all || nrow(ref) == nrow(val_ref)) return(ref)
-    ref[J(val_ref$value_id), on = "value_id"]
+    ref[J(val_ref$object_id, val_ref$value_id), on = c("object_id", "value_id")]
 }
 # }}}
 

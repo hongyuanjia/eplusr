@@ -7,6 +7,32 @@
   This may be useful when you know that target classes have the exact same
   fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic`.
 
+## Major changes
+
+* The algorithm of object/field/value relation extraction has been completed
+  refactored. Now it can correctly detect object recursive-reference and it's
+  faster. All relation-related methods now have an unified interface:
+
+  ```r
+  X$method(which, direction, object = NULL, class = NULL, group = NULL, depth = NULL, keep = FALSE)
+  ```
+
+  Where `which` is a class index or object ID, `direction` is the target
+  relation direction to extract. All results can be further constrained via
+  3 extra arguments, i.e. `object`, `class` and `object`. `object` only
+  applicable to `Idf` and `IdfObject`. The `depth` argument is used to control
+  the depth for searching recursive relations. Default value is `0L`, which
+  means no recursive relations will be detected, while `NULL` means to search
+  all possible recursive relations.
+
+  A new `keep` parameter with default value `FALSE` has been added. If `TRUE`,
+  all input fields will be returned, even they may not have any relations. This
+  is the default behavior of v0.12.0 and before. In this version, only fields
+  that have relation with other objects will be returned.
+
+  With this update, it is possible, for example, to directly know the structure
+  of an air loop by using `idf$object_relation("AnAirLoop", depth = NULL)`
+
 ## Minor changes
 
 * `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW

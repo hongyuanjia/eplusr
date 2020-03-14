@@ -248,7 +248,7 @@ test_that("Validate method", {
         c("src_enum", "field_index", "field_name", "units", "ip_units", "type_enum")
     )
 
-    expect_silent({ref <- check_invalid_reference(idd_env, idf_env, env_in)$validity$invalid_reference})
+    expect_silent({ref <- check_invalid_reference(idd_env, env_in, env_in)$validity$invalid_reference})
     expect_equal(ref$object_id, c(rep(2L, 3), rep(3L, 2)))
     expect_equal(ref$value_id, c(12:14, 18L, 20L))
     # }}}

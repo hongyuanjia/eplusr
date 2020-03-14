@@ -1375,19 +1375,6 @@ epw_data <- function (self, private, period = 1L, start_year = NULL, align_wday 
     get_epw_data(private$m_data, private$m_header, period, start_year, align_wday, tz, update)
 }
 # }}}
-# epw_get_data {{{
-epw_get_data <- function (self, private, year = NULL, unit = FALSE, tz = "UTC", update = FALSE) {
-    warn("warning_eplusr_deprecated_fun",
-        paste(
-            "`$get_data()` in Epw class is deprecated. Please use `$data() instead.",
-            "Note that `unit` argument is equal to call `$add_unit()`.",
-            "Please see documentation of `$add_unit()` for more details."
-        )
-    )
-
-    self$data(1L, year, FALSE, tz, update)
-}
-# }}}
 # epw_abnormal_data {{{
 epw_abnormal_data <- function (self, private, period = 1L, cols = NULL,
                                keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
@@ -1578,12 +1565,6 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
     invisible(self)
 }
 # }}}
-# epw_set_data {{{
-epw_set_data <- function (self, private, data) {
-    .deprecated_fun("$set_data()", "$set()", "Epw", "0.10.0")
-    self$set(data)
-}
-# }}}
 # epw_del {{{
 epw_del <- function (self, private, period) {
     l <- del_epw_data(private$m_data, private$m_header, period)
@@ -1592,12 +1573,6 @@ epw_del <- function (self, private, period) {
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
     invisible(self)
-}
-# }}}
-# epw_delete {{{
-epw_delete <- function (self, private, period) {
-    .deprecated_fun("$delete()", "$del()", "Epw", "0.10.3")
-    epw_del(self, private, period)
 }
 # }}}
 # epw_is_unsaved {{{
