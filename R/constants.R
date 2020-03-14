@@ -1,3 +1,4 @@
+# nocov start
 # VERSIONS {{{
 ALL_EPLUS_VER <- c(
     paste0("7.", 0:2, ".0"),
@@ -111,6 +112,9 @@ utils::globalVariables(c(
     "projected_x", "projected_y", "projection_axis", "starting_x_coordinate",
     "starting_y_coordinate", "starting_z_coordinate", "sun_exposure",
     "sun_exposure_lower", "surface_type", "surface_type_int", "tilt_angle",
-    "wind_exposure", "wind_exposure_lower", "y", "z", "zone", "zone_name"
+    "wind_exposure", "wind_exposure_lower", "y", "z", "zone", "zone_name",
+    "cls", "i.class_name", "i.value_chr", "i.value_id", "i.value_num", "pointer",
+    "src_object_name"
 ))
 # }}}
+# nocov end

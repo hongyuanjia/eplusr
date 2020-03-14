@@ -361,11 +361,16 @@ test_that("table", {
 
     # RELATION {{{
     expect_equal(get_idf_relation(idd_env, idf_env),
-        data.table(object_id = c(2L, 3L, 2L), value_id = c(11L, 17L, 11L),
-            src_object_id = c(1L, 2L, 1L), src_value_id = c(1L, 10L, 1L),
-            src_enum = 2L, dep = c(0L, 0L, 1L)
+        data.table(
+            object_id = c(rep(2L, 4), rep(3L, 2), rep(2L, 4)),
+            value_id = c(11L:14L, 17L, 18L, 11L:14L),
+            src_object_id = c(1L, rep(NA, 3), 2L, NA, 1L, rep(NA, 3)),
+            src_value_id = c(1L, rep(NA, 3), 10L, NA, 1L, rep(NA, 3)),
+            src_enum = c(2L, rep(NA, 3), 2L, NA, 2L, rep(NA, 3)),
+            dep = c(rep(0L, 6L), rep(1L, 4L))
         )
     )
+
 
     idf_env <- parse_idf_file(example())
     idd_env <- ._get_private(use_idd(8.8))$m_idd_env

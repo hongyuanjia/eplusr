@@ -2922,7 +2922,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
             # merge data
             idf_env <- priv$idf_env()
             idf_env$value <- append_dt(idf_env$value, val, "value_id")
-            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val, "set"))
+            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val))
         }
     }
 
