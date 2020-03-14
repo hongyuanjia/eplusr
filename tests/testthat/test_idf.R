@@ -302,6 +302,43 @@ test_that("Idf class", {
     expect_equal(eplusr_option(validate_level = "final"), list(validate_level = "final"))
     # }}}
 
+    # PURGE {{{
+    idf <- read_idf(text("idf", 8.8))
+    expect_error(idf$purge(), class = "error_empty_purge_input")
+    expect_error(idf$purge(1000), class = "error_object_id")
+    expect_error(idf$purge(class = "AirLoopHVAC"), class = "error_class_name")
+    expect_error(idf$purge(group = "Schedules"), class = "error_group_name")
+
+    # can skip non-resource object
+    expect_true(idf$purge(5)$is_valid_id(5))
+
+    # can purge not used resource object
+    expect_false(idf$purge(4)$is_valid_id(4))
+
+    # can skip if object is still referenced by others
+    expect_true(idf$purge(1)$is_valid_id(1))
+    expect_true(idf$purge(2)$is_valid_id(2))
+    expect_true(all(idf$purge(c(1, 2))$is_valid_id(c(1, 2))))
+
+    # can purge considering input relations
+    expect_false(all(idf$purge(c(1, 2, 3))$is_valid_id(c(1, 2, 3))))
+
+    # can purge using input class names
+    idf <- read_idf(text("idf", 8.8))
+    expect_equal(idf$purge(class = "Material")$is_valid_id(c(1, 4)), c(TRUE, FALSE))
+    idf <- read_idf(text("idf", 8.8))
+    expect_equal(idf$purge(class = c("Material", "Construction"))$is_valid_id(c(1, 4)), c(TRUE, FALSE))
+
+    # can purge using input class names
+    idf <- read_idf(text("idf", 8.8))
+    expect_equal(idf$purge(group = "Surface Construction Elements")$is_valid_id(c(1, 4)), c(TRUE, FALSE))
+
+    # can purge using various specifications
+    idf <- read_idf(text("idf", 8.8))
+    expect_equal(idf$purge(1:5, c("Material", "Construction"), idf$group_name())$is_valid_id(1:5), c(rep(FALSE, 4), TRUE))
+    # }}}
+
+
     # RENAME {{{
     idf <- read_idf(example())
     idf$rename(test = "C5 - 4 IN HW CONCRETE")

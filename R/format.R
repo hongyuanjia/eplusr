@@ -435,7 +435,9 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     switch_ref_src(ref, invert = TRUE)
 
     ref[!is.na(src_enum), by = c("src_enum", "value_chr"), pointer := {
-        if (.BY$src_enum == IDDFIELD_SOURCE$class) {
+        if (!length(src_enum)) {
+            prefix <- NA_character_
+        } else if (.BY$src_enum == IDDFIELD_SOURCE$class) {
             prefix <- switch(direction, ref_by = "b", ref_to = "p")
         } else {
             prefix <- switch(direction, ref_by = tc$u, ref_to = tc$d)

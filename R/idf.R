@@ -1233,6 +1233,48 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
             idf_del(self, private, ..., .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force),
         # }}}
 
+        # purge {{{
+        #' @description
+        #' purge resource objects that are not used
+        #'
+        #' @details
+        #' `$purge()` takes an integer vector of object IDs or a character
+        #' vectors of object names, and deletes resource objects specified that
+        #' are not used by any objects.
+        #'
+        #' Here resource objects indicate all objects that can be referenced by
+        #' other objects, e.g. all schedules. `$purge()` will ignore any inputs
+        #' that are not resources. If inputs contain objects from multiple
+        #' classes, references among them are also taken into account, which
+        #' means purging is performed hierarchically. If both materials and
+        #' constructions are specified, the latter will be purged first, because
+        #' it is possible that input constructions reference input materials.
+        #'
+        #' @param object an integer vector of object IDs or a character vector
+        #'        of object names in current `Idf` object. Default: `NULL`.
+        #' @param class A character vector of valid class names in current `Idf`
+        #'        object. Default: `NULL`.
+        #' @param group A character vector of valid group names in current `Idf`
+        #'        object. Default: `NULL`.
+        #'
+        #' @return The modified `Idf` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # purge unused "Fraction" schedule type
+        #' idf$purge("Fraction") # ScheduleTypeLimits
+        #'
+        #' # purge all unused schedule types
+        #' idf$purge(class = "ScheduleTypeLimits")
+        #'
+        #' # purge all unused schedule related objects
+        #' idf$purge(group = "Schedules")
+        #' }
+        #'
+        purge = function (object = NULL, class = NULL, group = NULL)
+            idf_purge(self, private, object = object, class = class, group = group),
+        # }}}
+
         # rename {{{
         #' @description
         #' Rename existing objects
@@ -2857,6 +2899,22 @@ idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recu
 
     # log
     log_del_order(private$m_log, del$object$object_id)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
+
+    invisible(self)
+}
+# }}}
+# idf_purge {{{
+idf_purge <- function (self, private, object, class = NULL, group = NULL) {
+    purge <- purge_idf_object(private$idd_env(), private$idf_env(), object, class, group)
+
+    private$m_idf_env$object <- purge$object
+    private$m_idf_env$value <- purge$value
+    private$m_idf_env$reference <- purge$reference
+
+    # log
+    log_del_order(private$m_log, purge$object$object_id)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 

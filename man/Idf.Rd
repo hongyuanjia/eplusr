@@ -476,6 +476,22 @@ idf$del(ids)
 
 
 ## ------------------------------------------------
+## Method `Idf$purge`
+## ------------------------------------------------
+
+\dontrun{
+# purge unused "Fraction" schedule type
+idf$purge("Fraction") # ScheduleTypeLimits
+
+# purge all unused schedule types
+idf$purge(class = "ScheduleTypeLimits")
+
+# purge all unused schedule related objects
+idf$purge(group = "Schedules")
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$rename`
 ## ------------------------------------------------
 
@@ -834,6 +850,7 @@ Hongyuan Jia
 \item \href{#method-add}{\code{Idf$add()}}
 \item \href{#method-set}{\code{Idf$set()}}
 \item \href{#method-del}{\code{Idf$del()}}
+\item \href{#method-purge}{\code{Idf$purge()}}
 \item \href{#method-rename}{\code{Idf$rename()}}
 \item \href{#method-insert}{\code{Idf$insert()}}
 \item \href{#method-load}{\code{Idf$load()}}
@@ -2381,6 +2398,64 @@ idf$del("roof31", .ref_by = TRUE, .recursive = TRUE)
 # delete objects using variable inputs
 ids <- idf$object_id("Output:Variable", simplify = TRUE)
 idf$del(ids)
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-purge"></a>}}
+\subsection{Method \code{purge()}}{
+purge resource objects that are not used
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$purge(object = NULL, class = NULL, group = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{object}}{an integer vector of object IDs or a character vector
+of object names in current \code{Idf} object. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of valid class names in current \code{Idf}
+object. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of valid group names in current \code{Idf}
+object. Default: \code{NULL}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$purge()} takes an integer vector of object IDs or a character
+vectors of object names, and deletes resource objects specified that
+are not used by any objects.
+
+Here resource objects indicate all objects that can be referenced by
+other objects, e.g. all schedules. \verb{$purge()} will ignore any inputs
+that are not resources. If inputs contain objects from multiple
+classes, references among them are also taken into account, which
+means purging is performed hierarchically. If both materials and
+constructions are specified, the latter will be purged first, because
+it is possible that input constructions reference input materials.
+}
+
+\subsection{Returns}{
+The modified \code{Idf} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# purge unused "Fraction" schedule type
+idf$purge("Fraction") # ScheduleTypeLimits
+
+# purge all unused schedule types
+idf$purge(class = "ScheduleTypeLimits")
+
+# purge all unused schedule related objects
+idf$purge(group = "Schedules")
 }
 
 }
