@@ -106,8 +106,8 @@ test_that("IddObject class", {
     # can use $field_relation()
     expect_is(slash$field_relation(c(4, 2)), "list")
     expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
-    expect_equal(nrow(slash$field_relation(c(4, 2))$ref_by), 2L)
-    expect_equivalent(slash$field_relation(c(1, 3))$ref_to,
+    expect_equal(nrow(slash$field_relation(c(4, 2), keep = TRUE)$ref_by), 2L)
+    expect_equivalent(slash$field_relation(c(1, 3), keep = TRUE)$ref_to,
         data.table(
             class_id = 2L, class_name = "TestSlash",
             field_id = c(2L, 4L), field_index = c(1L, 3L),

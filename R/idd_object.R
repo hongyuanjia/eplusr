@@ -891,7 +891,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #' surf$field_relation(c("name", "zone name", "vertex 10 z-coordinate"))
         #' }
         #'
-        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"), class = NULL, group = NULL, depth = 0L, keep = TRUE)
+        field_relation = function (which = NULL, direction = c("all", "ref_by", "ref_to"), class = NULL, group = NULL, depth = 0L, keep = FALSE)
             iddobj_field_relation(self, private, which, match.arg(direction), class = class, group = group, depth = depth, keep = keep),
         # }}}
 
@@ -1637,18 +1637,18 @@ iddobj_field_range <- function (self, private, which = NULL) {
 # }}}
 # iddobj_field_relation {{{
 iddobj_field_relation <- function (self, private, which = NULL, direction = c("all", "ref_to", "ref_by"),
-                                   class = NULL, group = NULL, depth = 0L, keep = TRUE) {
+                                   class = NULL, group = NULL, depth = 0L, keep = FALSE) {
     direction <- match.arg(direction)
 
     if (is.null(which)) {
         get_iddobj_relation(private$idd_env(), private$m_class_id, NULL, name = TRUE,
-            direction = direction, by_field = TRUE, depth = depth, keep_all = keep,
+            direction = direction, depth = depth, keep_all = keep,
             class = class, group = group)
     } else {
         fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
 
         get_iddobj_relation(private$idd_env(), NULL, fld$field_id, name = TRUE,
-            direction = direction, by_field = TRUE, depth = depth, keep_all = keep,
+            direction = direction, depth = depth, keep_all = keep,
             class = class, group = group)
     }
 }

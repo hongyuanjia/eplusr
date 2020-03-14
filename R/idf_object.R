@@ -1601,7 +1601,7 @@ idfobj_value_relation <- function (self, private, which = NULL,
 
     get_idfobj_relation(private$idd_env(), private$idf_env(), object_id = NULL,
         value_id = val$value_id, name = TRUE, direction = direction, object = object,
-        class = class, group = group, depth = depth, keep_all = keep, by_value = TRUE)
+        class = class, group = group, depth = depth, keep_all = keep)
 }
 # }}}
 # idfobj_ref_to_object {{{

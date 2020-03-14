@@ -233,7 +233,7 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                                  name = TRUE, direction = c("ref_to", "ref_by", "node", "all"),
                                  object = NULL, class = NULL, group = NULL,
-                                 keep_all = FALSE, by_value = FALSE, depth = 0L) {
+                                 keep_all = FALSE, depth = 0L) {
     all_dir <- c("ref_to", "ref_by", "node", "all")
     direction <- all_dir[sort(chmatch(direction, all_dir))]
     assert(no_na(direction), msg = paste0("`direction` should be one or some of ", collapse(all_dir)))
@@ -247,7 +247,6 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
             depth = depth, name = name, direction = "ref_to", keep_all = keep_all,
             object = object, class = class, group = group
         )
-        setattr(rel$ref_to, "by_value", by_value)
     }
 
     if ("ref_by" %in% direction) {
@@ -255,7 +254,6 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
             depth = depth, name = name, direction = "ref_by", keep_all = keep_all,
             object = object, class = class, group = group
         )
-        setattr(rel$ref_by, "by_value", by_value)
     }
 
     if ("node" %in% direction) {
@@ -263,7 +261,6 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
             name = name, keep_all = keep_all, depth = depth,
             object = object, class = class, group = group
         )
-        setattr(rel$node, "by_value", by_value)
     }
 
 

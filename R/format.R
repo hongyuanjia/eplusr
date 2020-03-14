@@ -253,14 +253,7 @@ switch_ref_src <- function (dt, types, invert = FALSE) {
 
 # format_idd_relation: return pretty formatted tree string for Relation {{{
 format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
-    by_field <- attr(ref, "by_field") %||% FALSE
-    if (!nrow(ref)) {
-        if (by_field) {
-            return(data.table(class_id = integer(), field_id = integer(), fmt = list()))
-        } else {
-            return(data.table(class_id = integer(), fmt = list()))
-        }
-    }
+    if (!nrow(ref)) return(data.table(class_id = integer(), fmt = list()))
 
     # copy original
     ref <- copy(ref)
@@ -287,7 +280,9 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     )
 
     ref[!is.na(src_enum), by = c("src_enum", "field_name"), pointer := {
-        if (.BY$src_enum == IDDFIELD_SOURCE$class) {
+        if (!length(src_enum)) {
+            prefix <- NA_character_
+        } else if (.BY$src_enum == IDDFIELD_SOURCE$class) {
             prefix <- switch(direction, ref_by = "b", ref_to = "p")
         } else {
             prefix <- switch(direction, ref_by = tc$u, ref_to = tc$d)
@@ -385,7 +380,7 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
             ), fill = TRUE)
 
             setorderv(ref[[i - 1L]], c("class_id", "field_id", "src_class_id", "src_field_id"))
-        } else if (!by_field) {
+        } else  {
             ref[[1L]] <- ref[[1L]][, by = "class_id", {
                 if (.N == 1L) {
                     list(src_field_name = c(class_name[[1L]], src_field_name[[1L]][-1L]))
@@ -406,20 +401,12 @@ format_idd_relation <- function (ref, direction = c("ref_to", "ref_by")) {
 
     out <- ref[[1L]]
     setnames(out, "src_field_name", "fmt")
-    setattr(out, "by_field", by_field)
 }
 # }}}
 
 # format_idf_relation: return pretty formatted tree string for Relation {{{
 format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
-    by_value <- attr(ref, "by_value") %||% FALSE
-    if (!nrow(ref)) {
-        if (by_value) {
-            return(data.table(object_id = integer(), value_id = integer(), fmt = list()))
-        } else {
-            return(data.table(object_id = integer(), fmt = list()))
-        }
-    }
+    if (!nrow(ref)) return(data.table(class_id = integer(), object_id = integer(), value_id = integer(), fmt = list()))
 
     # copy original
     ref <- copy(ref)
@@ -556,7 +543,7 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
             ), fill = TRUE)
 
             setorderv(ref[[i - 1L]], c("class_id", "object_id", "field_id", "src_class_id", "src_object_id", "src_field_id"))
-        } else if (!by_value) {
+        } else  {
             ref[[1L]] <- ref[[1L]][, by = c("class_id", "object_id"), {
                 if (.N == 1L) {
                     list(src_value_chr = c(object_name[[1L]], stri_sub(src_value_chr[[1L]][-(1:2)], 3L)))
@@ -577,7 +564,6 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
 
     out <- ref[[1L]]
     setnames(out, "src_value_chr", "fmt")
-    setattr(out, "by_value", by_value)
     out
 }
 # }}}
@@ -1004,9 +990,8 @@ print.IddRelationBy <- function (x, ...) {
     if (!nrow(x)) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
-        lapply(format_idd_relation(x, "ref_by")$fmt,
-            function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
-        )
+        s <- paste0(" ", unlist(format_idd_relation(x, "ref_by")$fmt, use.names = FALSE))
+        cli::cat_line(str_trunc(s))
     }
     invisible(x)
 }
@@ -1018,9 +1003,8 @@ print.IddRelationTo <- function (x, ...) {
     if (!nrow(x)) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {
-        lapply(format_idd_relation(x, "ref_to")$fmt,
-            function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
-        )
+        s <- paste0(" ", unlist(format_idd_relation(x, "ref_to")$fmt, use.names = FALSE))
+        cli::cat_line(str_trunc(s))
     }
     invisible(x)
 }
@@ -1036,7 +1020,6 @@ print.IddRelation <- function (x, ...) {
 #' @export
 # print.IdfRelationBy {{{
 print.IdfRelationBy <- function (x, ...) {
-    by_value <- attr(x, "by_value") %||% FALSE
     cli::cat_rule("Referred by Others")
     if (!all(has_name(x, c(
         "class_name", "object_name", "field_name",
@@ -1049,15 +1032,8 @@ print.IdfRelationBy <- function (x, ...) {
     if (!nrow(x)) {
         cli::cat_line("Target(s) is not referred by any other field.")
     } else {
-        if (by_value) {
-            lapply(format_idf_relation(x, "ref_by")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
-            )
-        } else {
-            lapply(format_idf_relation(x, "ref_by")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
-            )
-        }
+        s <- paste0(" ", unlist(format_idf_relation(x, "ref_by")$fmt, use.names = FALSE))
+        cli::cat_line(str_trunc(s))
     }
     invisible(x)
 }
@@ -1065,7 +1041,6 @@ print.IdfRelationBy <- function (x, ...) {
 #' @export
 # print.IdfRelationTo {{{
 print.IdfRelationTo <- function (x, ...) {
-    by_value <- attr(x, "by_value") %||% FALSE
     cli::cat_rule("Refer to Others")
 
     if (!all(has_name(x, c(
@@ -1079,15 +1054,8 @@ print.IdfRelationTo <- function (x, ...) {
     if (!nrow(x)) {
         cli::cat_line("Target(s) does not refer to any other field.")
     } else {
-        if (by_value) {
-            lapply(format_idf_relation(x, "ref_to")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
-            )
-        } else {
-            lapply(format_idf_relation(x, "ref_to")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
-            )
-        }
+        s <- paste0(" ", unlist(format_idf_relation(x, "ref_to")$fmt, use.names = FALSE))
+        cli::cat_line(str_trunc(s))
     }
     invisible(x)
 }
@@ -1095,7 +1063,6 @@ print.IdfRelationTo <- function (x, ...) {
 #' @export
 # print.IdfRelationNode {{{
 print.IdfRelationNode <- function (x, ...) {
-    by_value <- attr(x, "by_value") %||% FALSE
     cli::cat_rule("Node Relation")
     if (!all(has_name(x, c(
         "class_name", "object_name", "field_name",
@@ -1108,15 +1075,8 @@ print.IdfRelationNode <- function (x, ...) {
     if (!nrow(x)) {
         cli::cat_line("Target(s) has no node or their nodes have no reference to other object.")
     } else {
-        if (by_value) {
-            lapply(format_idf_relation(x, "ref_by")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", x)))}
-            )
-        } else {
-            lapply(format_idf_relation(x, "ref_by")$fmt,
-                function (x) {cli::cat_line(str_trunc(paste(" ", unlist(x, use.names = FALSE))))}
-            )
-        }
+        s <- paste0(" ", unlist(format_idf_relation(x, "ref_by")$fmt, use.names = FALSE))
+        cli::cat_line(str_trunc(s))
     }
     invisible(x)
 }

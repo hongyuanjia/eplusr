@@ -2718,7 +2718,7 @@ idf_object_relation <- function (self, private, which,
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         object_id = obj$object_id, name = TRUE, direction = direction,
-        keep_all = keep, by_value = FALSE, depth = depth,
+        keep_all = keep, depth = depth,
         object = object, class = class, group = group
     )
 }

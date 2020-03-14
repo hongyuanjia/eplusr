@@ -1661,7 +1661,7 @@ Extract the relationship among fields
   class = NULL,
   group = NULL,
   depth = 0L,
-  keep = TRUE
+  keep = FALSE
 )}\if{html}{\out{</div>}}
 }
 

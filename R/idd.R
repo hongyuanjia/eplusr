@@ -812,7 +812,7 @@ idd_object_relation <- function (self, private, which, direction = c("all", "ref
     cls <- get_idd_class(private$m_idd_env, which)
 
     get_iddobj_relation(private$m_idd_env, cls$class_id, NULL, name = TRUE,
-        direction = direction, by_field = FALSE, depth = depth, keep_all = FALSE,
+        direction = direction, depth = depth, keep_all = FALSE,
         class = class, group = group
     )
 }

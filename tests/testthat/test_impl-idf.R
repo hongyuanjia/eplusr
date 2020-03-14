@@ -371,7 +371,6 @@ test_that("table", {
         )
     )
 
-
     idf_env <- parse_idf_file(example())
     idd_env <- ._get_private(use_idd(8.8))$m_idd_env
     id <- get_idf_object_id(idd_env, idf_env, "Material")$Material
