@@ -2746,18 +2746,17 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
     setattr(obj_self, "names", obj$object_name)
 
     if (!length(id_ref)) {
-        dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
-            node = "has no node or their nodes have no reference to"
-        )
-        msg <- paste0(get_object_info(obj, numbered = FALSE), " ", dir, " any other object")
-        if (is.null(class)) {
-            verbose_info(paste0(msg, "."))
-        } else {
-            if (is.null(group)) {
-                verbose_info(paste0(msg, " in class ", collapse(cls$class_name), "."))
+        if (eplusr_option("verbose_info")) {
+            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
+                node = "has no node or their nodes have no reference to"
+            )
+
+            msg <- paste(get_object_info(obj, numbered = FALSE), dir, "any objects")
+
+            if (is.null(object) && is.null(class) && is.null(group)) {
+                verbose_info(msg, ".")
             } else {
-                verbose_info(paste0(msg, " in class ", collapse(cls$class_name),
-                    " or group ", collapse(group), "."))
+                verbose_info(msg, "specifed.")
             }
         }
         return(obj_self)

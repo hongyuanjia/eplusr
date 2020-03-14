@@ -1587,17 +1587,17 @@ idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL, cl
     )[!is.na(src_value_id)]
 
     if (!nrow(rel)) {
-        if (is.null(class) && is.null(group)) {
-            verbose_info("Target object does not refer to any other object.")
-        } else {
-            if (!is.null(class)) {
-                if (is.null(group)) {
-                    verbose_info("Target object does not refer to any other object in class ",
-                        collapse(class), ".")
-                } else {
-                    verbose_info("Target object does not refer to any other object in class ",
-                        collapse(class), " or group ", collapse(group), ".")
-                }
+        if (eplusr_option("verbose_info")) {
+            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
+                node = "has no node or their nodes have no reference to"
+            )
+
+            msg <- paste("Target object", dir, "any objects")
+
+            if (is.null(object) && is.null(class) && is.null(group)) {
+                verbose_info(msg, ".")
+            } else {
+                verbose_info(msg, "specifed.")
             }
         }
         return(invisible())
@@ -1627,18 +1627,17 @@ idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL, cl
     )[!is.na(value_id)]
 
     if (!nrow(rel)) {
-        # TODO: Update verbose info
-        if (is.null(class) && is.null(group)) {
-            verbose_info("Target object is not referred by any other object.")
-        } else {
-            if (!is.null(class)) {
-                if (is.null(group)) {
-                    verbose_info("Target object is not referred by any other object in class ",
-                        collapse(class), ".")
-                } else {
-                    verbose_info("Target object is not referred to any other object in class ",
-                        collapse(class), " or group ", collapse(group), ".")
-                }
+        if (eplusr_option("verbose_info")) {
+            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
+                node = "has no node or their nodes have no reference to"
+            )
+
+            msg <- paste("Target object", dir, "any objects")
+
+            if (is.null(object) && is.null(class) && is.null(group)) {
+                verbose_info(msg, ".")
+            } else {
+                verbose_info(msg, "specifed.")
             }
         }
         return(invisible())
@@ -1667,17 +1666,17 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
         )[!is.na(value_id)]
 
     if (!nrow(rel)) {
-        if (is.null(class) && is.null(group)) {
-            verbose_info("Target object has no node or its nodes have no reference to other object.")
-        } else {
-            if (!is.null(class)) {
-                if (is.null(group)) {
-                    verbose_info("Target object has no node referring to any object in class ",
-                        collapse(class), ".")
-                } else {
-                    verbose_info("Target object has no node referring to any object in class ",
-                        collapse(class), " or group ", collapse(group), ".")
-                }
+        if (eplusr_option("verbose_info")) {
+            dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
+                node = "has no node or their nodes have no reference to"
+            )
+
+            msg <- paste("Target object", dir, "any objects")
+
+            if (is.null(object) && is.null(class) && is.null(group)) {
+                verbose_info(msg, ".")
+            } else {
+                verbose_info(msg, "specifed.")
             }
         }
         return(invisible())
