@@ -6,6 +6,20 @@
   `TRUE`, you can convert object data from any classes into a wide data.table.
   This may be useful when you know that target classes have the exact same
   fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic`.
+* A new method `Idf$purge()` has been added. It can be used to delete any
+  resource objects that are not referenced by other objects. Here resource
+  objects indicate all objects that can be referenced by other objects, e.g. all
+  schedules. `$purge()` will ignore any inputs that are not resources. If inputs
+  contain objects from multiple classes, references among them are also taken
+  into account, which means purging is performed hierarchically. If both
+  materials and constructions are specified, the latter will be purged first,
+  because it is possible that input constructions reference input materials.
+  `Idf$purge()` makes it quite straightforward to perform IDF cleaning. Actions
+  like removing all materials, constructions and schedules can be easily
+  achieved via
+  ```
+  Idf$purge(class = c("Material", "Construction"), group = "Schedules")
+  ```
 
 ## Major changes
 

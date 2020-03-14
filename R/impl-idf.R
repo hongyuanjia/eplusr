@@ -1088,7 +1088,7 @@ get_object_info <- function (dt_object, component = c("id", "name", "class"),
         mes_id <- dt_object[,
             ifelse(object_id < 0L,
                 paste0("Input #", lpad(-object_id, "0")),
-                paste0("ID [", lpad(object_id, "0"), "]")
+                paste0("ID [", lpad(object_id, " "), "]")
             )
         ]
         mes <- mes_id
@@ -2135,6 +2135,133 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
          value = dt_value[, .SD, .SDcols = names(idf_env$value)],
          reference = dt_reference
     )
+}
+# }}}
+# purge_idf_object {{{
+purge_idf_object <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+
+    if (is.null(object) && is.null(class) && is.null(group)) {
+        abort("error_empty_purge_input", "'object', 'class' and 'group' canot all be empty.")
+    }
+
+    obj <- data.table()
+    if (!is.null(object)) {
+        obj <- get_idf_object(idd_env, idf_env, object = object, ignore_case = TRUE)
+    }
+    if (!is.null(class)) {
+        obj <- rbindlist(list(obj, get_idf_object(idd_env, idf_env, class = class)), use.names = TRUE)
+    }
+    if (!is.null(group)) {
+        assert(is.character(group))
+
+        add_class_property(idd_env, idf_env$object, "group_name")
+
+        grp_in <- recognize_input(group, "group")
+        obj_grp <- join_from_input(idf_env$object, grp_in, "object_id")
+
+        # clean
+        set(idf_env$object, NULL, "group_name", NULL)
+
+        # add class name to make sure results have same columns as 'get_idf_object()'
+        set(obj_grp, NULL, "group_name", NULL)
+        add_class_property(idd_env, obj_grp, "class_name")
+
+        obj <- rbindlist(list(obj, obj_grp), use.names = TRUE)
+    }
+
+    obj <- unique(obj, by = "object_id")
+
+    # reset rleid
+    add_rleid(obj)
+
+    # exclude objects that cannot be resources
+    src <- obj[J(unique(idd_env$reference$src_class_id)), on = "class_id", nomatch = 0L]
+
+    if (eplusr_option("verbose_info")) {
+        norm <- obj[!src, on = "class_id"]
+        if (nrow(norm)) {
+            verbose_info("Non-resource objects are ignored:\n", get_object_info(norm, collapse = "\n"))
+        }
+    }
+
+    # get references
+    ref <- get_idf_relation(idd_env, idf_env, src$object_id, depth = 0L, direction = "ref_by")
+
+    # get objects that can be removed directly
+    id_del <- setdiff(src$object_id, ref$src_object_id)
+
+    # take into account references inside inputs, i.e. an resource object can
+    # be purged if all objects referencing it can be purged and have already
+    # been captured in 'id_del'
+    id_rec <- setdiff(
+        # resources that are used by objects to be purged
+        ref[J(id_del), on = "object_id", nomatch = 0L, src_object_id],
+        # resources that are not used by objects to be purged
+        ref[!J(id_del), on = "object_id", src_object_id]
+    )
+
+    # should do above step again to catch the deepest resources
+    id_del <- c(id_del, id_rec)
+    id_rec <- setdiff(
+        # resources that are used by objects to be purged
+        ref[J(id_del), on = "object_id", nomatch = 0L, src_object_id],
+        # resources that are not used by objects to be purged
+        ref[!J(id_del), on = "object_id", src_object_id]
+    )
+
+    # for a class-name-only reference, i.e. only object name is used as
+    # reference but none of its fields are, only purge it if there is multiple
+    # objects existing in the same class
+    #
+    # whether a object that both its class name and fields are referenced by
+    # others can be purged or not has been checked in 'id_rec', also for
+    # a class-name-only reference, the object references it can be purged or not
+    # has also been check in 'id_rec'
+    ref_cls <- ref[!J(id_rec), on = "src_object_id"]
+
+    if (!nrow(ref_cls)) {
+        id_cls <- NULL
+    } else {
+        id_cls <- ref_cls[, by = "src_object_id", list(class = all(src_enum == IDDFIELD_SOURCE$class))][
+            class == TRUE, src_object_id]
+
+        if (length(id_cls)) {
+            # get object number in that class
+            obj_num <- get_idf_object_num(idd_env, idf_env, obj[J(id_cls), on = "object_id", class_id])
+            id_cls <- id_cls[obj_num > 1L]
+
+            # add field id for updating reference table later
+            val_cls <- ref_cls[J(id_cls, IDDFIELD_SOURCE$class), on = c("src_object_id", "src_enum"),
+                list(src_value_id = unique(src_value_id))]
+            add_joined_cols(idf_env$value, val_cls, c(src_value_id = "value_id"), "field_id")
+
+        }
+    }
+
+    id <- unique(c(id_del, id_rec, id_cls))
+
+    if (!length(id)) {
+        verbose_info("None of specified object(s) can be purged. Skip.")
+        dt_object <- idf_env$object
+        dt_value <- idf_env$value
+        dt_reference <- idf_env$reference
+    } else {
+        verbose_info("Object(s) below have been purged:\n",
+            get_object_info(add_rleid(obj[J(id), on = "object_id"]), collapse = "\n"))
+
+        # delete rows in object table
+        dt_object <- idf_env$object[!J(id), on = "object_id"]
+        dt_value <- idf_env$value[!J(id), on = "object_id"]
+        dt_reference <- idf_env$reference[!J(id), on = "object_id"]
+
+        # update class-reference
+        if (nrow(ref_cls) && length(id_cls)) {
+            val_cls[dt_value, on = "field_id", `:=`(object_id = i.object_id, value_id = i.value_id)]
+            dt_reference[val_cls, on = "src_value_id", `:=`(src_object_id = i.object_id, src_value_id = i.value_id)]
+        }
+    }
+
+    list(object = dt_object, value = dt_value, reference = dt_reference)
 }
 # }}}
 # rename_idf_object {{{

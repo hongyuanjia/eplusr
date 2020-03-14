@@ -661,7 +661,26 @@ add_class_name <- function (idd_env, dt) {
 # }}}
 # add_class_property {{{
 add_class_property <- function (idd_env, dt, property) {
+    add_group <- FALSE
+    if ("group_name" %in% property) {
+        if ("group_id" %in% property) {
+            add_id <- FALSE
+            property <- property[property != "group_name"]
+        } else {
+            property <- c(property[property != "group_name"], "group_id")
+            add_id <- TRUE
+        }
+        add_group <- TRUE
+    }
+
     add_joined_cols(idd_env$class, dt, "class_id", property)
+
+    if (add_group) {
+        add_joined_cols(idd_env$group, dt, "group_id", "group_name")
+        if (add_id) set(dt, NULL, "group_id", NULL)
+    }
+
+    dt
 }
 # }}}
 # add_field_property {{{

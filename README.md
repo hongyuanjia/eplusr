@@ -3,8 +3,10 @@
 
 # eplusr <img src="man/figures/logo.svg" align="right" />
 
-[![Travis-CI Build Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
+[![Travis-CI Build
+Status](https://travis-ci.com/hongyuanjia/eplusr.svg?branch=master)](https://travis-ci.com/hongyuanjia/eplusr)
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/hongyuanjia/eplusr?branch=master&svg=true)](https://ci.appveyor.com/project/hongyuanjia/eplusr)
 [![codecov](https://codecov.io/gh/hongyuanjia/eplusr/branch/master/graph/badge.svg)](https://codecov.io/gh/hongyuanjia/eplusr)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/eplusr)](https://cran.r-project.org/package=eplusr)
 [![CRAN
@@ -142,7 +144,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/Rtmpc8OE8d/temp_libpath50206758a4f8/eplusr/extdata/1ZoneUnco...
+#>  * Path: '/tmp/RtmpiYeLsf/temp_libpathe5d7f4b4df7/eplusr/extdata/1ZoneUncon...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -190,13 +192,13 @@ idf$object_relation("R13LAYER", "all")
 #> Target(s) does not refer to any other field.
 #> 
 #> ── Referred by Others ──────────────────────────────────────────────────────────
-#>   Class: <Material:NoMass>
-#>   └─ Object [ID:12] <R13LAYER>
-#>      └─ 1: "R13LAYER";    !- Name
-#>         ^~~~~~~~~~~~~~~~~~~~~~~~~
-#>         └─ Class: <Construction>
-#>            └─ Object [ID:15] <R13WALL>
-#>               └─ 2: "R13LAYER";    !- Outside Layer
+#>  Object [ID:12] <R13LAYER>
+#>   └─ 1: "R13LAYER";    !- Name
+#>      ^~~~~~~~~~~~~~~~~~~~~~~~~
+#>      └─ Class: <Construction>
+#>         └─ Object [ID:15] <R13WALL>
+#>            └─ 2: "R13LAYER";    !- Outside Layer
+#>  
 #> 
 #> ── Node Relation ───────────────────────────────────────────────────────────────
 #> Target(s) has no node or their nodes have no reference to other object.
@@ -225,6 +227,11 @@ idf$add(RunPeriod = list("run_period", 3, 1, 4, 1))
 #> │─ 09 : "No",             !- Apply Weekend Holiday Rule
 #> │─ 10 : "Yes",            !- Use Weather File Rain Indicators
 #> └─ 11 : "Yes";            !- Use Weather File Snow Indicators
+
+# purge unused resource objects
+idf$purge(group = "Schedules")
+#> Object(s) below have been purged:
+#>  #1| Object ID [19] (name 'Fraction') in class 'ScheduleTypeLimits'
 
 # get possible values for fields
 idf$Construction$FLOOR$value_possible("Outside Layer")
@@ -373,9 +380,9 @@ weekdays(weather$datetime)
 # run simulation
 job <- idf$run(epw)
 #> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/Rtmpc8OE8d/model.idf.
+#> Replace the existing IDF located at /tmp/RtmpiYeLsf/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.03.03 15:36
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.03.15 04:31
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -410,7 +417,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-03-03 15:36:00
+#>   * Simulation started: 2020-03-15 04:31:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2

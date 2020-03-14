@@ -251,6 +251,7 @@ them.
 |                     | `$add()`                 | Add new objects                                   |
 |                     | `$set()`                 | Modify existing objects                           |
 |                     | `$del()`                 | Delete existing objects                           |
+|                     | `$purge()`               | Delete unused resource objects                    |
 |                     | `$rename()`              | Change object names                               |
 |                     | `$insert()`              | Add new objects from other `IdfObject`s           |
 |                     | `$load()`                | Add new objects from strings and data.frames      |
@@ -631,6 +632,15 @@ setting `.force` to `TRUE`.
 
 ```{r del_1}
 model$del("mat-clng-1", .force = TRUE)
+```
+
+### Purge object
+
+`$purge()` will delete resource objects specified that are not used by any
+objects. Below we remove all schedules that are not currently used.
+
+```{r purge}
+model$purge(group = "Schedules")
 ```
 
 ### Paste from IDF Editor
