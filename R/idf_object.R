@@ -1758,18 +1758,18 @@ idfobj_has_ref <- function (self, private, which = NULL, object = NULL, class = 
 }
 # }}}
 # idfobj_has_ref_to {{{
-idfobj_has_ref_to <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
-    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "ref_to")
+idfobj_has_ref_to <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive, type = "ref_to")
 }
 # }}}
 # idfobj_has_ref_by {{{
-idfobj_has_ref_by <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
-    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "ref_by")
+idfobj_has_ref_by <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive, type = "ref_by")
 }
 # }}}
 # idfobj_has_ref_node {{{
-idfobj_has_ref_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, depth = 0L) {
-    idfobj_has_ref(self, private, which, object = object, class = class, group = group, depth = depth, type = "node")
+idfobj_has_ref_node <- function (self, private, which = NULL, object = NULL, class = NULL, group = NULL, recursive = FALSE) {
+    idfobj_has_ref(self, private, which, object = object, class = class, group = group, recursive = recursive, type = "node")
 }
 # }}}
 # idfobj_to_table {{{

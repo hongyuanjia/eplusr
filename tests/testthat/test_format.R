@@ -169,23 +169,23 @@ test_that("Idd formatting", {
 
     # Relation
     expect_equal(
-        format_idd_relation(get_idd_relation(idd_parsed, direction = "ref_by", name = TRUE), "ref_by")$fmt[[1L]],
+        format_idd_relation(get_idd_relation(idd_parsed, direction = "ref_by", name = TRUE), "ref_by")$fmt,
         c("Class: <TestSimple>",
           "└─ Field: <1: Test Field>",
           "   ^~~~~~~~~~~~~~~~~~~~~~",
           "   └─ Class: <TestSlash>",
           "      └─ Field: <1: Test Character Field 1>",
-          "      "
+          ""
         )
     )
     expect_equal(
-        format_idd_relation(get_idd_relation(idd_parsed, direction = "ref_to", name = TRUE), "ref_to")$fmt[[1L]],
+        format_idd_relation(get_idd_relation(idd_parsed, direction = "ref_to", name = TRUE), "ref_to")$fmt,
         c("Class: <TestSlash>",
           "└─ Field: <1: Test Character Field 1>",
           "   v~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
           "   └─ Class: <TestSimple>",
           "      └─ Field: <1: Test Field>",
-          "      "
+          ""
         )
     )
     # }}}

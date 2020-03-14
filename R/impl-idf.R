@@ -3284,10 +3284,6 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
         val <- idf_env$value[J(id), on = col_on, .SD, .SDcols = c("value_id", "object_id")]
     }
 
-    # init results
-    ref <- idf_env$reference[0L]
-    set(ref, NULL, "dep", integer())
-
     # init depth
     dep <- 0L
 
@@ -3372,7 +3368,9 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
         cur_nodes <- cur_nodes[!J(parent), on = col_ref]
     }
 
+    set(ref, NULL, "value_chr", NULL)
     set(ref, NULL, "src_enum", IDDFIELD_SOURCE$field)
+    setcolorder(ref, names(idf_env$reference))
 
     # should search backwards to only include paths related to specified
     # classes/objects

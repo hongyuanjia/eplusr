@@ -615,7 +615,7 @@ get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, directi
     ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, cls_id)
 
     # keep all input
-    if (keep_all) ref <- combine_input_and_relation(val, ref, "idd", direction)
+    if (keep_all) ref <- combine_input_and_relation(fld, ref, "idd", direction)
 
     if (!name) return(ref)
 
