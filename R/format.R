@@ -548,7 +548,11 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
         } else  {
             ref[[1L]] <- ref[[1L]][, by = c("class_id", "object_id"), {
                 if (.N == 1L) {
-                    list(src_value_chr = c(object_name[[1L]], stri_sub(src_value_chr[[1L]][-(1:2)], 3L)))
+                    list(src_value_chr = c(
+                        class_name[[1L]],
+                        add_pre(object_name[[1L]]),
+                        paste0("   ", stri_sub(src_value_chr[[1L]][-(1:2)], 3L))
+                    ))
                 } else {
                     # remove class and field prefix
                     src <- lapply(src_value_chr,
@@ -558,7 +562,11 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                     src[[.N]] <- add_pre(src[[.N]])
                     src[-.N] <- lapply(src[-.N], add_pre, FALSE)
 
-                    list(src_value_chr = c(object_name[[1L]], unlist(src, FALSE, FALSE)))
+                    list(src_value_chr = c(
+                        class_name[[1L]],
+                        add_pre(object_name[[1L]]),
+                        paste0("   ", unlist(src, FALSE, FALSE))
+                    ))
                 }
             }]
         }
