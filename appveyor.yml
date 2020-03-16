@@ -16,7 +16,7 @@ install:
   - cmd: Rscript -e "options(pkgType = 'binary'); remotes::install_github('ropensci/tic', upgrade = 'always'); print(tic::dsl_load()); tic::prepare_all_stages()"
 
 before_build: Rscript -e "tic::before_install()"
-build_script: Rscript -e "options(install.lock = FALSE); tic::install()"
+build_script: Rscript -e "tic::install()"
 after_build: Rscript -e "tic::after_install()"
 before_test: Rscript -e "tic::before_script()"
 test_script: Rscript -e "tic::script()"
@@ -28,6 +28,7 @@ on_finish: Rscript -e "tic::after_script()"
 environment:
   USE_RTOOLS: true
   R_REMOTES_STANDALONE: true
+  R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
   matrix:
     - R_VERSION: release
     - R_VERSION: oldrel
