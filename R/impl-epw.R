@@ -723,7 +723,7 @@ parse_epw_header_design <- function (input, ...) {
         "mcdb_1.0",                                        #[50] dbl
         "enthalpy_2.0",                                    #[51] dbl
         "mcdb_2.0",                                        #[52] dbl
-        "hours_8_to_4_12.8_20.6",                          #[53] int
+        "hours_8_to_4_12.8_20.6",                          #[53] dbl
         "extremes",                                        #[54] chr
         "extreme_annual_ws_1.0",                           #[55] dbl
         "extreme_annual_ws_2.5",                           #[56] dbl
@@ -744,8 +744,8 @@ parse_epw_header_design <- function (input, ...) {
         ),
         # }}}
         type = list(
-            int = c("n", "coldest_month", "hotest_month", "hours_8_to_4_12.8_20.6"),
-            dbl = c(7L:20L, 23L:52L, 55L:70L)
+            int = c("n", "coldest_month", "hotest_month"),
+            dbl = c(7L:20L, 23L:53L, 55L:70L)
         ),
         range = list(
             `hours_8_to_4_12.8_20.6` = ranger(0L, TRUE),
