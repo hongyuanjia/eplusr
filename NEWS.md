@@ -23,8 +23,8 @@
 * New methods `Idf$duplicatd()` and `Idf$unique()` have been added. They can be
   used to detect and remove duplicated objects, respectively. Here duplicated
   objects refer to objects whose field values are the same except the names.
-  Object comments are ignored during comprison. These two methods can be useful
-  when doing model cleaning (#227).
+  Object comments are ignored during comparison. These two methods can be
+  useful when doing model cleaning (#227).
 
 ## Major changes
 
