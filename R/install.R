@@ -247,9 +247,9 @@ install_eplus_win <- function (ver, exec, local = FALSE, dir = NULL) {
     dir <- normalizePath(file.path(dir, paste0("EnergyPlusV", gsub("\\.", "-", ver))), mustWork = FALSE)
 
     if (ver > 9.1) {
-        system(sprintf("%s /S /D=%s", exec, dir))
+        install_eplus_qt(exec, dir, local = local)
     } else {
-        install_eplus_qt(ver, exec, dir)
+        system(sprintf("%s /S /D=%s", exec, dir))
     }
 }
 # }}}
