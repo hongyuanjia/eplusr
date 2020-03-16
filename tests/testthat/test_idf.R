@@ -3,7 +3,7 @@ context("Idf")
 # Idf class{{{
 test_that("Idf class", {
     eplusr_option(verbose_info = FALSE)
-    use_idd(8.8, "auto")
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
     # can create new Idf object from string
     expect_silent(idf <- read_idf(text("idf", 8.8)))

@@ -1327,7 +1327,7 @@ trans_funs$f850t860 <- function (idf) {
         # extract reference point name, zone name, and illuminance setpoint
         dt16_2 <- lapply(unique(dt16_1$id),
             function (id) {
-                refp <- with_silent(idf$object(id)$ref_by_object(1L, "Daylighting:DELight:ReferencePoint"))
+                refp <- with_silent(idf$object(id)$ref_by_object(1L, class = "Daylighting:DELight:ReferencePoint"))
                 if (!length(refp)) {
                     data.table()
                 } else {
