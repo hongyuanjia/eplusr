@@ -779,12 +779,12 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        If `FALSE`, only fields in specified object that have
         #'        relations with other objects are returned. Default: `FALSE`.
         #' @param class_ref Specify how to handle class-name-references. Class
-        #'        name references refer to references in field `Component 1
+        #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
         #'        many class names of objects, instaed of refering to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
-        #'        `"less"` and `"all"`, with `"both"` being the default.
-        #'     * `"none"`: just ignore class-name-references. It is a reasonal
+        #'        `"both"` and `"all"`, with `"both"` being the default.
+        #'     * `"none"`: just ignore class-name-references. It is a reasonable
         #'       option, as for most cases, class-name-references always come
         #'       along with field value references. Ignoring
         #'       class-name-references will not impact the most part of the
@@ -874,12 +874,12 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        is also referred by a surface named `surf`. If `NULL`,
         #'        all possible recursive relations are returned. Default: `0`.
         #' @param class_ref Specify how to handle class-name-references. Class
-        #'        name references refer to references in field `Component 1
+        #'        name references refer to references in like field `Component 1
         #'        Object Type` in `Branch` objects. Their value refers to other
         #'        many class names of objects, instaed of refering to specific
         #'        field values. There are 3 options in total, i.e. `"none"`,
-        #'        `"less"` and `"all"`, with `"both"` being the default.
-        #'     * `"none"`: just ignore class-name-references. It is a reasonal
+        #'        `"both"` and `"all"`, with `"both"` being the default.
+        #'     * `"none"`: just ignore class-name-references. It is a reasonable
         #'       option, as for most cases, class-name-references always come
         #'       along with field value references. Ignoring
         #'       class-name-references will not impact the most part of the

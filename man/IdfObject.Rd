@@ -1292,11 +1292,11 @@ fields in input that have relations with other objects are
 returned. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
-name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
 many class names of objects, instaed of refering to specific
 field values. There are 3 options in total, i.e. \code{"none"},
-\code{"less"} and \code{"all"}, with \code{"both"} being the default.
-* \code{"none"}: just ignore class-name-references. It is a reasonal
+\code{"both"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonable
 option, as for most cases, class-name-references always come
 along with field value references. Ignoring
 class-name-references will not impact the most part of the
@@ -1406,11 +1406,11 @@ is also referred by a surface named \code{surf}. If \code{NULL},
 all possible recursive relations are returned. Default: \code{0}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
-name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
 many class names of objects, instaed of refering to specific
 field values. There are 3 options in total, i.e. \code{"none"},
-\code{"less"} and \code{"all"}, with \code{"both"} being the default.
-* \code{"none"}: just ignore class-name-references. It is a reasonal
+\code{"both"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonable
 option, as for most cases, class-name-references always come
 along with field value references. Ignoring
 class-name-references will not impact the most part of the
@@ -1491,11 +1491,11 @@ is also referred by a surface named \code{surf}. If \code{NULL},
 all possible recursive relations are returned. Default: \code{0}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
-name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
 many class names of objects, instaed of refering to specific
 field values. There are 3 options in total, i.e. \code{"none"},
-\code{"less"} and \code{"all"}, with \code{"both"} being the default.
-* \code{"none"}: just ignore class-name-references. It is a reasonal
+\code{"both"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonable
 option, as for most cases, class-name-references always come
 along with field value references. Ignoring
 class-name-references will not impact the most part of the
@@ -1640,11 +1640,11 @@ simple example of recursive reference: one material named
 is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
-name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
 many class names of objects, instaed of refering to specific
 field values. There are 3 options in total, i.e. \code{"none"},
-\code{"less"} and \code{"all"}, with \code{"both"} being the default.
-* \code{"none"}: just ignore class-name-references. It is a reasonal
+\code{"both"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonable
 option, as for most cases, class-name-references always come
 along with field value references. Ignoring
 class-name-references will not impact the most part of the
@@ -1723,11 +1723,11 @@ simple example of recursive reference: one material named
 is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
 
 \item{\code{class_ref}}{Specify how to handle class-name-references. Class
-name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+name references refer to references in like field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
 many class names of objects, instaed of refering to specific
 field values. There are 3 options in total, i.e. \code{"none"},
-\code{"less"} and \code{"all"}, with \code{"both"} being the default.
-* \code{"none"}: just ignore class-name-references. It is a reasonal
+\code{"both"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonable
 option, as for most cases, class-name-references always come
 along with field value references. Ignoring
 class-name-references will not impact the most part of the
