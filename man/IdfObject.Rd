@@ -1257,7 +1257,8 @@ Get value relations
   class = NULL,
   group = NULL,
   depth = 0L,
-  keep = FALSE
+  keep = FALSE,
+  class_ref = c("both", "none", "all")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1289,6 +1290,28 @@ all possible recursive relations are returned. Default: \code{0}.}
 have any relations with other objects or not. If \code{FALSE}, only
 fields in input that have relations with other objects are
 returned. Default: \code{FALSE}.}
+
+\item{\code{class_ref}}{Specify how to handle class-name-references. Class
+name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+many class names of objects, instaed of refering to specific
+field values. There are 3 options in total, i.e. \code{"none"},
+\code{"less"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonal
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* \code{"both"}: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, only the object that is referenced in the
+next field \verb{Component 1 Name} is treated as referenced by
+\verb{Component 1 Object Type}. This is the default option.
+* \code{"all"}: include all class-name-references. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, all objects in \code{Coil:Heating:Water} will
+be treated as referenced by that field. This is the most
+aggressive option.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1356,7 +1379,8 @@ Extract multiple \code{IdfObject} objects referred by specified field values
   object = NULL,
   class = NULL,
   group = NULL,
-  depth = 0L
+  depth = 0L,
+  class_ref = c("both", "none", "all")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1380,6 +1404,28 @@ simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
 is also referred by a surface named \code{surf}. If \code{NULL},
 all possible recursive relations are returned. Default: \code{0}.}
+
+\item{\code{class_ref}}{Specify how to handle class-name-references. Class
+name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+many class names of objects, instaed of refering to specific
+field values. There are 3 options in total, i.e. \code{"none"},
+\code{"less"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonal
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* \code{"both"}: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, only the object that is referenced in the
+next field \verb{Component 1 Name} is treated as referenced by
+\verb{Component 1 Object Type}. This is the default option.
+* \code{"all"}: include all class-name-references. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, all objects in \code{Coil:Heating:Water} will
+be treated as referenced by that field. This is the most
+aggressive option.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1418,7 +1464,8 @@ Extract multiple \code{IdfObject} objects referring to specified field values
   object = NULL,
   class = NULL,
   group = NULL,
-  depth = 0L
+  depth = 0L,
+  class_ref = c("both", "none", "all")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1442,6 +1489,28 @@ simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
 is also referred by a surface named \code{surf}. If \code{NULL},
 all possible recursive relations are returned. Default: \code{0}.}
+
+\item{\code{class_ref}}{Specify how to handle class-name-references. Class
+name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+many class names of objects, instaed of refering to specific
+field values. There are 3 options in total, i.e. \code{"none"},
+\code{"less"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonal
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* \code{"both"}: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, only the object that is referenced in the
+next field \verb{Component 1 Name} is treated as referenced by
+\verb{Component 1 Object Type}. This is the default option.
+* \code{"all"}: include all class-name-references. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, all objects in \code{Coil:Heating:Water} will
+be treated as referenced by that field. This is the most
+aggressive option.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1545,7 +1614,8 @@ Check if object field values refer to others
   object = NULL,
   class = NULL,
   group = NULL,
-  recursive = FALSE
+  recursive = FALSE,
+  class_ref = c("both", "none", "all")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1568,6 +1638,28 @@ relations. Default: \code{NULL}.}
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
 is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
+
+\item{\code{class_ref}}{Specify how to handle class-name-references. Class
+name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+many class names of objects, instaed of refering to specific
+field values. There are 3 options in total, i.e. \code{"none"},
+\code{"less"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonal
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* \code{"both"}: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, only the object that is referenced in the
+next field \verb{Component 1 Name} is treated as referenced by
+\verb{Component 1 Object Type}. This is the default option.
+* \code{"all"}: include all class-name-references. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, all objects in \code{Coil:Heating:Water} will
+be treated as referenced by that field. This is the most
+aggressive option.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1605,7 +1697,8 @@ Check if object field values are referred by others
   object = NULL,
   class = NULL,
   group = NULL,
-  recursive = FALSE
+  recursive = FALSE,
+  class_ref = c("both", "none", "all")
 )}\if{html}{\out{</div>}}
 }
 
@@ -1628,6 +1721,28 @@ relations. Default: \code{NULL}.}
 simple example of recursive reference: one material named
 \code{mat} is referred by a construction named \code{const}, and \code{const}
 is also referred by a surface named \code{surf}. Default: \code{FALSE}.}
+
+\item{\code{class_ref}}{Specify how to handle class-name-references. Class
+name references refer to references in field \verb{Component 1 Object Type} in \code{Branch} objects. Their value refers to other
+many class names of objects, instaed of refering to specific
+field values. There are 3 options in total, i.e. \code{"none"},
+\code{"less"} and \code{"all"}, with \code{"both"} being the default.
+* \code{"none"}: just ignore class-name-references. It is a reasonal
+option, as for most cases, class-name-references always come
+along with field value references. Ignoring
+class-name-references will not impact the most part of the
+relation structure.
+* \code{"both"}: only include class-name-references if this object
+also reference field values of the same one. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, only the object that is referenced in the
+next field \verb{Component 1 Name} is treated as referenced by
+\verb{Component 1 Object Type}. This is the default option.
+* \code{"all"}: include all class-name-references. For example, if the
+value of field \verb{Component 1 Object Type} is
+\code{Coil:Heating:Water}, all objects in \code{Coil:Heating:Water} will
+be treated as referenced by that field. This is the most
+aggressive option.}
 }
 \if{html}{\out{</div>}}
 }
