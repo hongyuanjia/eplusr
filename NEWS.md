@@ -5,8 +5,8 @@
 * `Idf$to_table()` gains a new parameter `force`. The default value is `FALSE`. If
   `TRUE`, you can convert object data from any classes into a wide data.table.
   This may be useful when you know that target classes have the exact same
-  fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic`.
-* A new method `Idf$purge()` has been added. It can be used to delete any
+  fields, e.g.  `Ceiling:Adiabatic` and `Floor:Adiabatic` (#202).
+* A new method `Idf$purge()` has been added (#223). It can be used to delete any
   resource objects that are not referenced by other objects. Here resource
   objects indicate all objects that can be referenced by other objects, e.g. all
   schedules. `$purge()` will ignore any inputs that are not resources. If inputs
@@ -17,9 +17,14 @@
   `Idf$purge()` makes it quite straightforward to perform IDF cleaning. Actions
   like removing all materials, constructions and schedules can be easily
   achieved via
-  ```
+  ```r
   Idf$purge(class = c("Material", "Construction"), group = "Schedules")
   ```
+* New methods `Idf$duplicatd()` and `Idf$unique()` have been added. They can be
+  used to detect and remove duplicated objects, respectively. Here duplicated
+  objects refer to objects whose field values are the same except the names.
+  Object comments are ignored during comparison. These two methods can be
+  useful when doing model cleaning (#227).
 
 ## Major changes
 

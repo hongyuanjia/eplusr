@@ -2139,40 +2139,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
 # }}}
 # purge_idf_object {{{
 purge_idf_object <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
-
-    if (is.null(object) && is.null(class) && is.null(group)) {
-        abort("error_empty_purge_input", "'object', 'class' and 'group' canot all be empty.")
-    }
-
-    obj <- data.table()
-    if (!is.null(object)) {
-        obj <- get_idf_object(idd_env, idf_env, object = object, ignore_case = TRUE)
-    }
-    if (!is.null(class)) {
-        obj <- rbindlist(list(obj, get_idf_object(idd_env, idf_env, class = class)), use.names = TRUE)
-    }
-    if (!is.null(group)) {
-        assert(is.character(group))
-
-        add_class_property(idd_env, idf_env$object, "group_name")
-
-        grp_in <- recognize_input(group, "group")
-        obj_grp <- join_from_input(idf_env$object, grp_in, "object_id")
-
-        # clean
-        set(idf_env$object, NULL, "group_name", NULL)
-
-        # add class name to make sure results have same columns as 'get_idf_object()'
-        set(obj_grp, NULL, "group_name", NULL)
-        add_class_property(idd_env, obj_grp, "class_name")
-
-        obj <- rbindlist(list(obj, obj_grp), use.names = TRUE)
-    }
-
-    obj <- unique(obj, by = "object_id")
-
-    # reset rleid
-    add_rleid(obj)
+    obj <- get_idf_object_from_multi_level(idd_env, idf_env, object, class, group)
 
     # exclude objects that cannot be resources
     src <- obj[J(unique(idd_env$reference$src_class_id)), on = "class_id", nomatch = 0L]
@@ -2262,6 +2229,74 @@ purge_idf_object <- function (idd_env, idf_env, object = NULL, class = NULL, gro
     }
 
     list(object = dt_object, value = dt_value, reference = dt_reference)
+}
+# }}}
+# duplicated_idf_object {{{
+duplicated_idf_object <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+    dup <- get_idf_duplicated_object(idd_env, idf_env, object, class, group)
+
+    set(dup$object, NULL, "duplicated", FALSE)
+    dup$object[J(dup$duplicated$object_id_dup), on = "object_id", duplicated := TRUE]
+
+    dup
+}
+# }}}
+# unique_idf_object {{{
+unique_idf_object <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+    dup <- get_idf_duplicated_object(idd_env, idf_env, object, class, group)
+
+    if (!nrow(dup$duplicated)) {
+        verbose_info("None duplicated objects found. Skip.")
+        return(list(object = idf_env$object, value = idf_env$value, reference = idf_env$reference))
+    }
+
+    obj <- dup$object
+    val <- dup$value
+    dup <- dup$duplicated
+
+    # get referenced field index of object to be deleted
+    ref <- get_idf_relation(idd_env, idf_env, object_id = dup$object_id_dup, direction = "ref_by", depth = 0L)
+    ref[val, on = c("src_object_id" = "object_id", "src_value_id" = "value_id"), field_index := i.field_index]
+    # update the referenced object id
+    ref[dup, on = c("src_object_id" = "object_id_dup"), src_object_id := i.object_id]
+    # update the reference value id
+    ref[val, on = c("src_object_id" = "object_id", "field_index"), `:=`(
+        src_value_id = i.value_id, src_value_chr = i.value_chr,
+        src_value_num = i.value_num
+    )]
+
+    # update referenced value
+    idf_env$value[ref, on = c("object_id", "value_id"), `:=`(
+        value_chr = i.src_value_chr, value_num = i.src_value_num
+    )]
+    # update reference dict
+    idf_env$reference[ref, on = c("object_id", "value_id"), `:=`(
+        src_object_id = i.src_object_id, src_value_id = i.src_value_id
+    )]
+
+    if (eplusr::eplusr_option("verbose_info")) {
+        dup[obj, on = "object_id", `:=`(class_name = i.class_name, object_name = i.object_name)]
+        set(dup, NULL, "merged", get_object_info(dup, numbered = FALSE, prefix = ""))
+
+        setnames(dup, c("object_id", "object_id_dup"), c("merged_object_id", "object_id"))
+        dup[obj, on = "object_id", `:=`(object_name = i.object_name)]
+        dup[, by = c("class_id", "merged_object_id"), removed := get_object_info(.SD, c("id", "name"), numbered = TRUE)]
+
+        msg <- dup[, by = c("class_id", "merged_object_id"), list(list(
+            sprintf("Duplications for %s have been removed:\n %s",
+                merged[[1L]], paste0(removed, collapse = "\n ")
+            )
+        ))]$V1
+
+        setnames(dup, c("merged_object_id", "object_id"), c("object_id", "object_id_dup"))
+
+        verbose_info(paste0(unlist(msg), collapse = "\n\n"))
+    }
+
+    list(object = idf_env$object[!J(dup$object_id_dup), on = "object_id"],
+         value = idf_env$value[!J(dup$object_id_dup), on = "object_id"],
+         reference = idf_env$reference
+    )
 }
 # }}}
 # rename_idf_object {{{
@@ -2985,6 +3020,48 @@ get_object_input <- function (idd_env, idf_env, l, property = NULL, keep_duplica
     unique(obj, by = "object_id")
 }
 # }}}
+# get_idf_object_from_multi_level {{{
+get_idf_object_from_multi_level <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL, empty = FALSE) {
+    obj <- data.table()
+
+    if (is.null(object) && is.null(class) && is.null(group)) {
+        if (empty) {
+            obj <- get_idf_object(idd_env, idf_env)
+        } else {
+            abort("error_empty_purge_input", "'object', 'class' and 'group' canot all be empty.")
+        }
+    }
+
+    if (!is.null(object)) {
+        obj <- get_idf_object(idd_env, idf_env, object = object, ignore_case = TRUE)
+    }
+    if (!is.null(class)) {
+        obj <- rbindlist(list(obj, get_idf_object(idd_env, idf_env, class = class)), use.names = TRUE)
+    }
+    if (!is.null(group)) {
+        assert(is.character(group))
+
+        add_class_property(idd_env, idf_env$object, "group_name")
+
+        grp_in <- recognize_input(group, "group")
+        obj_grp <- join_from_input(idf_env$object, grp_in, "object_id")
+
+        # clean
+        set(idf_env$object, NULL, "group_name", NULL)
+
+        # add class name to make sure results have same columns as 'get_idf_object()'
+        set(obj_grp, NULL, "group_name", NULL)
+        add_class_property(idd_env, obj_grp, "class_name")
+
+        obj <- rbindlist(list(obj, obj_grp), use.names = TRUE)
+    }
+
+    obj <- unique(obj, by = "object_id")
+
+    # reset rleid
+    add_rleid(obj)
+}
+# }}}
 # fill_unnamed_field_index {{{
 fill_unnamed_field_index <- function (idd_env, idf_env, val) {
     # match field names and get field index
@@ -3113,6 +3190,40 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
     }
 
     list(object = obj, value = val)
+}
+# }}}
+# get_idf_duplicated_object {{{
+get_idf_duplicated_object <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+    obj <- get_idf_object_from_multi_level(idd_env, idf_env, object, class, group, empty = TRUE)
+
+    val <- get_idf_value(idd_env, idf_env, object = obj$object_id, align = TRUE,
+        property = "src_enum")
+
+    # change to lower case for comparison
+    set(val, NULL, "value_chr_lower", tolower(val$value_chr))
+
+    # should seperate resource objects and non-resource objects
+    set(val, NULL, "is_resource", FALSE)
+    cls_rsrc <- val[field_index == 1L & src_enum > IDDFIELD_SOURCE$none, unique(class_id)]
+    if (length(cls_rsrc)) val[J(cls_rsrc), on = "class_id", is_resource := TRUE]
+
+    # get ID of objects to keep and delete
+    dup <- lapply(
+        split(val[, .SD, .SDcols = c("class_id", "object_id", "field_index",
+                "value_chr_lower", "is_resource")], by = "class_id"),
+        function(d) {
+            # dcast to compare
+            dd <- data.table::dcast(d, class_id + object_id ~ field_index, value.var = "value_chr_lower")
+
+            dd[, list(class_id = class_id[[1L]], object_id = object_id[[1L]],
+                     object_id_dup = list(object_id[-1L])
+                ), by = c(setdiff(names(dd), c("class_id", "object_id", "1"[d$is_resource[[1L]]])))][
+              , list(class_id, object_id, object_id_dup)]
+        }
+    )
+    dup <- data.table::rbindlist(dup)[, lapply(.SD, unlist), by = c("class_id", "object_id")]
+
+    list(object = obj, value = val, duplicated = dup)
 }
 # }}}
 

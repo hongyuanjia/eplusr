@@ -252,6 +252,8 @@ them.
 |                     | `$set()`                 | Modify existing objects                           |
 |                     | `$del()`                 | Delete existing objects                           |
 |                     | `$purge()`               | Delete unused resource objects                    |
+|                     | `$duplicated()`          | Detect duplicated objects                         |
+|                     | `$unique()`              | Delete duplicated objects                         |
 |                     | `$rename()`              | Change object names                               |
 |                     | `$insert()`              | Add new objects from other `IdfObject`s           |
 |                     | `$load()`                | Add new objects from strings and data.frames      |
@@ -607,6 +609,8 @@ model$update(dt)
 
 ### Delete object
 
+#### `$del()`
+
 `$del()` will delete objects specified by object IDs or names.
 For example, in current model, there is a material named `"MAT-CLNG-1"` in class
 `Material:NoMass`. Let's see if it has been referred by other objects.
@@ -634,13 +638,28 @@ setting `.force` to `TRUE`.
 model$del("mat-clng-1", .force = TRUE)
 ```
 
-### Purge object
+#### `$purge()`
 
 `$purge()` will delete resource objects specified that are not used by any
 objects. Below we remove all schedules that are not currently used.
 
 ```{r purge}
 model$purge(group = "Schedules")
+```
+
+#### `$duplicated()` and `$unique()`
+
+`$duplicatd()` and `$unique()` can be used to detect and remove duplicated
+objects, respectively. Here duplicated objects refer to objects whose field
+values are the same except the names. Object comments are ignored during
+comparison. These two methods can be useful when doing model cleaning.
+
+```{r duplicated}
+model$duplicated(group = "Schedules")
+```
+
+```{r unique}
+model$unique(group = "Schedules")
 ```
 
 ### Paste from IDF Editor

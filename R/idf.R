@@ -1281,7 +1281,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
 
         # purge {{{
         #' @description
-        #' purge resource objects that are not used
+        #' Purge resource objects that are not used
         #'
         #' @details
         #' `$purge()` takes an integer vector of object IDs or a character
@@ -1319,6 +1319,97 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         purge = function (object = NULL, class = NULL, group = NULL)
             idf_purge(self, private, object = object, class = class, group = group),
+        # }}}
+
+        # duplicated {{{
+        #' @description
+        #' Determine duplicated objects
+        #'
+        #' @details
+        #' `$duplicated()` takes an integer vector of object IDs or a character
+        #' vectors of object names, and returns a [data.table::data.table()]
+        #' to show whether input objects contain duplications or not.
+        #'
+        #' Here duplicated objects refer to objects whose field values are the
+        #' same except the names. Object comments are just ignored during
+        #' comparison.
+        #'
+        #' @param object an integer vector of object IDs or a character vector
+        #'        of object names in current `Idf` object. Default: `NULL`.
+        #' @param class A character vector of valid class names in current `Idf`
+        #'        object. Default: `NULL`.
+        #' @param group A character vector of valid group names in current `Idf`
+        #'        object. Default: `NULL`.
+        #'
+        #' If all `object`, `class` and `group` are `NULL`, duplication checking
+        #' is performed on the whole `Idf`.
+        #'
+        #' @return A [data.table::data.table()] of 4 columns:
+        #'
+        #' * `class`: Character. Names of classes that input objects belong to
+        #' * `id`: Integer. Input object IDs
+        #' * `name`: Character. Input object names
+        #' * `duplicated`: Logical. Whether this object is a duplication or not
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # check if there are any duplications in the Idf
+        #' idf$duplicated(class = "ScheduleTypeLimits")
+        #'
+        #' # check if there are any duplications in the schedule types
+        #' idf$duplicated(class = "ScheduleTypeLimits")
+        #'
+        #' # check if there are any duplications in the schedule groups and
+        #' # material class
+        #' idf$duplicated(class = "Material", group = "Schedules")
+        #' }
+        #'
+        duplicated = function (object = NULL, class = NULL, group = NULL)
+            idf_duplicated(self, private, object = object, class = class, group = group),
+        # }}}
+
+        # unique {{{
+        #' @description
+        #' Remove duplicated objects
+        #'
+        #' @details
+        #' `$unique()` takes an integer vector of object IDs or a character
+        #' vectors of object names, and remove duplicated objects.
+        #'
+        #' Here duplicated objects refer to objects whose field values are the
+        #' same except the names. Object comments are just ignored during
+        #' comparison.
+        #'
+        #' `$unique()` will only keep the first unique object and remove all
+        #' redundant objects. Value referencing the redundant objects will be
+        #' redirected into the unique object.
+        #'
+        #' @param object an integer vector of object IDs or a character vector
+        #'        of object names in current `Idf` object. Default: `NULL`.
+        #' @param class A character vector of valid class names in current `Idf`
+        #'        object. Default: `NULL`.
+        #' @param group A character vector of valid group names in current `Idf`
+        #'        object. Default: `NULL`.
+        #'
+        #' If all `object`, `class` and `group` are `NULL`, duplication checking
+        #' is performed on the whole `Idf`.
+        #'
+        #' @return The modified `Idf` object itself, invisibly.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # remove duplications in the Idf
+        #' idf$unique(class = "ScheduleTypeLimits")
+        #'
+        #' # remove duplications in the schedule types
+        #' idf$unique(class = "ScheduleTypeLimits")
+        #'
+        #' # remove duplications in the schedule groups and material class
+        #' idf$unique(class = "Material", group = "Schedules")
+        #' }
+        #'
+        unique = function (object = NULL, class = NULL, group = NULL)
+            idf_unique(self, private, object = object, class = class, group = group),
         # }}}
 
         # rename {{{
@@ -2953,7 +3044,7 @@ idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recu
 }
 # }}}
 # idf_purge {{{
-idf_purge <- function (self, private, object, class = NULL, group = NULL) {
+idf_purge <- function (self, private, object = NULL, class = NULL, group = NULL) {
     purge <- purge_idf_object(private$idd_env(), private$idf_env(), object, class, group)
 
     private$m_idf_env$object <- purge$object
@@ -2962,6 +3053,28 @@ idf_purge <- function (self, private, object, class = NULL, group = NULL) {
 
     # log
     log_del_order(private$m_log, purge$object$object_id)
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
+
+    invisible(self)
+}
+# }}}
+# idf_duplicated {{{
+idf_duplicated <- function (self, private, object = NULL, class = NULL, group = NULL) {
+    dup <- duplicated_idf_object(private$idd_env(), private$idf_env(), object, class, group)
+    dup$object[, list(class = class_name, id = object_id, name = object_name, duplicated)]
+}
+# }}}
+# idf_unique {{{
+idf_unique <- function (self, private, object = NULL, class = NULL, group = NULL) {
+    uni <- unique_idf_object(private$idd_env(), private$idf_env(), object, class, group)
+
+    private$m_idf_env$object <- uni$object
+    private$m_idf_env$value <- uni$value
+    private$m_idf_env$reference <- uni$reference
+
+    # log
+    log_del_order(private$m_log, uni$object$object_id)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 

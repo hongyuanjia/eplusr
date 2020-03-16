@@ -114,7 +114,9 @@ utils::globalVariables(c(
     "sun_exposure_lower", "surface_type", "surface_type_int", "tilt_angle",
     "wind_exposure", "wind_exposure_lower", "y", "z", "zone", "zone_name",
     "cls", "i.class_name", "i.value_chr", "i.value_id", "i.value_num", "pointer",
-    "src_object_name", "i.field_id"
+    "src_object_name", "i.field_id", "i.field_index", "i.object_name",
+    "i.src_object_id", "i.src_value_chr", "i.src_value_id", "i.src_value_num",
+    "is_resource", "merged", "object_id_dup", "removed"
 ))
 # }}}
 # nocov end
