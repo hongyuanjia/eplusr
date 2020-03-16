@@ -434,12 +434,38 @@ clean_field_property <- function (dt, property) {
 
 # REFERENCES
 # get_recursive_relation {{{
-get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_ref, col_rev, include = NULL) {
-    ref <- init_ref
-    cur_ref <- init_ref
+get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_ref, col_rev, include = NULL, both = FALSE) {
+    if (both) {
+        if (substring(col_ref, 1, 3) == "src") {
+            col_fld <- "src_field_id"
+            col_val <- "src_value_id"
+        } else {
+            col_fld <- "field_id"
+            col_val <- "value_id"
+        }
+
+        # this assume that one class-name-reference is always followed by one
+        # field value reference
+        redundant <- init_ref[, by = c(col_rev, col_fld), {
+            # for field-reference only
+            if (!IDDFIELD_SOURCE$class %in% src_enum) {
+                id <- integer()
+            } else {
+                id <- setdiff(
+                    get(col_val)[src_enum == IDDFIELD_SOURCE$class],
+                    get(col_val)[src_enum == IDDFIELD_SOURCE$field]
+                )
+            }
+            list(id)
+        }]
+        setnames(redundant, c(col_rev, col_fld, col_val))
+        set(redundant, NULL, "src_enum", IDDFIELD_SOURCE$class)
+
+        if (nrow(redundant)) init_ref <- init_ref[!redundant, on = c(col_rev, col_val, "src_enum")]
+    }
 
     # parent class or object
-    parent <- ref[[col_rev]]
+    parent <- init_ref[[col_rev]]
 
     # store classes or objects needed to be removed later
     del <- list()
@@ -447,12 +473,14 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
     # log depth
     dep <- init_dep
 
+    ref <- init_ref
+    cur_ref <- init_ref
     while (dep < max_dep && nrow(cur_ref)) {
         # skip if specified classes/objects are matched
         if (length(include)) {
-            del <- cur_ref[J(include), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
-            if (length(del)) {
-                cur_ref <- cur_ref[!J(del), on = col_rev]
+            skip <- cur_ref[J(include), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
+            if (length(skip)) {
+                cur_ref <- cur_ref[!J(skip), on = col_rev]
             }
         }
         # if all are matched, stop
@@ -460,6 +488,27 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
 
         # get current indirectly ref
         new_ref <- all_ref[J(unique(cur_ref[[col_ref]])), on = col_rev, nomatch = 0L]
+
+        if (both) {
+            # this assume that one class-name-reference is always followed by one
+            # field value reference
+            redundant <- new_ref[, by = c(col_rev, col_fld), {
+                # for field-reference only
+                if (!IDDFIELD_SOURCE$class %in% src_enum) {
+                    id <- integer()
+                } else {
+                    id <- setdiff(
+                        get(col_val)[src_enum == IDDFIELD_SOURCE$class],
+                        get(col_val)[src_enum == IDDFIELD_SOURCE$field]
+                    )
+                }
+                list(id)
+            }]
+            setnames(redundant, c(col_rev, col_fld, col_val))
+            set(redundant, NULL, "src_enum", IDDFIELD_SOURCE$class)
+
+            if (nrow(redundant)) new_ref <- new_ref[!redundant, on = c(col_rev, col_val, "src_enum")]
+        }
 
         # get classes that do not going any deeper
         # those classes should be removed
@@ -484,7 +533,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
 
     # should search backwards to only include paths related to specified
     # classes/objects
-    if (length(include) && nrow(ref)) ref <- del_recursive_relation(ref, del, include)
+    if (length(include) && nrow(ref)) ref <- del_recursive_relation(ref, del, include, col_ref, col_rev)
 
     ref
 }

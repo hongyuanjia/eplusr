@@ -778,6 +778,28 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        regardless they have any relations with other objects or not.
         #'        If `FALSE`, only fields in specified object that have
         #'        relations with other objects are returned. Default: `FALSE`.
+        #' @param class_ref Specify how to handle class-name-references. Class
+        #'        name references refer to references in like field `Component 1
+        #'        Object Type` in `Branch` objects. Their value refers to other
+        #'        many class names of objects, instaed of refering to specific
+        #'        field values. There are 3 options in total, i.e. `"none"`,
+        #'        `"both"` and `"all"`, with `"both"` being the default.
+        #'     * `"none"`: just ignore class-name-references. It is a reasonable
+        #'       option, as for most cases, class-name-references always come
+        #'       along with field value references. Ignoring
+        #'       class-name-references will not impact the most part of the
+        #'       relation structure.
+        #'     * `"both"`: only include class-name-references if this object
+        #'       also reference field values of the same one. For example, if the
+        #'       value of field `Component 1 Object Type` is
+        #'       `Coil:Heating:Water`, only the object that is referenced in the
+        #'       next field `Component 1 Name` is treated as referenced by
+        #'       `Component 1 Object Type`. This is the default option.
+        #'     * `"all"`: include all class-name-references. For example, if the
+        #'       value of field `Component 1 Object Type` is
+        #'       `Coil:Heating:Water`, all objects in `Coil:Heating:Water` will
+        #'       be treated as referenced by that field. This is the most
+        #'       aggressive option.
         #'
         #' @return An `IdfRelation` object, which is a list of 3
         #' [data.table::data.table()]s named `ref_to`, `ref_by` and `node`.
@@ -793,9 +815,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         object_relation = function (which, direction = c("all", "ref_to", "ref_by", "node"),
-                                    object = NULL, class = NULL, group = NULL, depth = 0L, keep = FALSE)
+                                    object = NULL, class = NULL, group = NULL, depth = 0L,
+                                    keep = FALSE, class_ref = c("both", "none", "all"))
             idf_object_relation(self, private, which, match.arg(direction),
-                object = object, class = class, group = group, depth = depth, keep = keep),
+                object = object, class = class, group = group, depth = depth, keep = keep, class_ref = match.arg(class_ref)),
         # }}}
 
         # objects_in_relation {{{
@@ -850,6 +873,28 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        `mat` is referred by a construction named `const`, and `const`
         #'        is also referred by a surface named `surf`. If `NULL`,
         #'        all possible recursive relations are returned. Default: `0`.
+        #' @param class_ref Specify how to handle class-name-references. Class
+        #'        name references refer to references in like field `Component 1
+        #'        Object Type` in `Branch` objects. Their value refers to other
+        #'        many class names of objects, instaed of refering to specific
+        #'        field values. There are 3 options in total, i.e. `"none"`,
+        #'        `"both"` and `"all"`, with `"both"` being the default.
+        #'     * `"none"`: just ignore class-name-references. It is a reasonable
+        #'       option, as for most cases, class-name-references always come
+        #'       along with field value references. Ignoring
+        #'       class-name-references will not impact the most part of the
+        #'       relation structure.
+        #'     * `"both"`: only include class-name-references if this object
+        #'       also reference field values of the same one. For example, if the
+        #'       value of field `Component 1 Object Type` is
+        #'       `Coil:Heating:Water`, only the object that is referenced in the
+        #'       next field `Component 1 Name` is treated as referenced by
+        #'       `Component 1 Object Type`. This is the default option.
+        #'     * `"all"`: include all class-name-references. For example, if the
+        #'       value of field `Component 1 Object Type` is
+        #'       `Coil:Heating:Water`, all objects in `Coil:Heating:Water` will
+        #'       be treated as referenced by that field. This is the most
+        #'       aggressive option.
         #'
         #' @return An named list of [IdfObject] objects.
         #'
@@ -863,9 +908,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         objects_in_relation = function (which, direction = c("ref_to", "ref_by", "node"),
-                                        object = NULL, class = NULL, group = NULL, depth = 0L)
+                                        object = NULL, class = NULL, group = NULL, depth = 0L,
+                                        class_ref = c("both", "none", "all"))
             idf_objects_in_relation(self, private, which, match.arg(direction),
-                object = object, class = class, group = group, depth = depth),
+                object = object, class = class, group = group, depth = depth, class_ref = match.arg(class_ref)),
         # }}}
 
         # search_object {{{
@@ -2751,7 +2797,7 @@ idf_objects_in_group <- function (self, private, group) {
 idf_object_relation <- function (self, private, which,
                                  direction = c("all", "ref_to", "ref_by", "node"),
                                  object = NULL, class = NULL, group = NULL,
-                                 depth = 0L, keep = FALSE) {
+                                 depth = 0L, keep = FALSE, class_ref = c("both", "none", "all")) {
     assert(is_scalar(which))
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(),
@@ -2760,21 +2806,22 @@ idf_object_relation <- function (self, private, which,
 
     get_idfobj_relation(private$idd_env(), private$idf_env(),
         object_id = obj$object_id, name = TRUE, direction = direction,
-        keep_all = keep, depth = depth,
+        keep_all = keep, depth = depth, class_ref = class_ref,
         object = object, class = class, group = group
     )
 }
 # }}}
 # idf_objects_in_relation {{{
 idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by", "node"),
-                                     object = NULL, class = NULL, group = NULL, depth = 0L) {
+                                     object = NULL, class = NULL, group = NULL, depth = 0L,
+                                     class_ref = c("both", "none", "all")) {
     assert(is_scalar(which))
     direction <- match.arg(direction)
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = which, ignore_case = TRUE)
     rel <- get_idfobj_relation(private$idd_env(), private$idf_env(), obj$object_id,
         name = FALSE, depth = depth, direction = direction,
-        object = object, class = class, group = group
+        object = object, class = class, group = group, class_ref = class_ref
     )
 
     id_self <- obj$object_id
@@ -3119,7 +3166,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     # recreate job if the model has been changed since last ran
     } else if (
         normalizePath(private$m_path, mustWork = FALSE) !=
-        normalizePath(private$m_log$job$path("idf"), mustWork = FALSE)){
+        normalizePath(private$m_log$job$path("idf"), mustWork = FALSE)) {
         private$m_log$job <- EplusJob$new(self, epw)
     }
 

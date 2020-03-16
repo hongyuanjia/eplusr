@@ -338,7 +338,6 @@ test_that("Idf class", {
     expect_equal(idf$purge(1:5, c("Material", "Construction"), idf$group_name())$is_valid_id(1:5), c(rep(FALSE, 4), TRUE))
     # }}}
 
-
     # RENAME {{{
     idf <- read_idf(example())
     idf$rename(test = "C5 - 4 IN HW CONCRETE")
@@ -358,6 +357,44 @@ test_that("Idf class", {
     expect_equal(
         vapply(idf$replace_value("WALL-1", "WALL-2"), function (x) x$id(), integer(1)),
         c(`WALL-2` = 2L, `WALL-2PF` = 3L)
+    )
+    # }}}
+
+    # RELATION {{{
+    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+
+    # default only include both objects that are both referenced by their field
+    # value and class names
+    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to")
+    expect_equal(nrow(ref$ref_to), 8L)
+    expect_equal(unique(ref$ref_to$src_object_name),
+        c("OA Sys 1", "Main Cooling Coil 1", "Main Heating Coil 1", "Supply Fan 1")
+    )
+
+    # can exclude all class-name-reference
+    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to", class_ref = "none")
+    expect_equal(nrow(ref$ref_to), 4L)
+    expect_equal(unique(ref$ref_to$src_object_name),
+        c("OA Sys 1", "Main Cooling Coil 1", "Main Heating Coil 1", "Supply Fan 1")
+    )
+
+    # can include all possible objects that are class-name-referenced
+    ref <- idf_1$object_relation(idf_1$Branch[[1]]$id(), direction = "ref_to", class_ref = "all")
+    expect_equal(nrow(ref$ref_to), 15L)
+    expect_equal(unique(ref$ref_to$src_object_name),
+        c(
+        "OA Sys 1",
+        "OA Cooling Coil 1",
+        "Main Cooling Coil 1",
+        "SPACE1-1 Zone Coil",
+        "SPACE2-1 Zone Coil",
+        "SPACE3-1 Zone Coil",
+        "SPACE4-1 Zone Coil",
+        "SPACE5-1 Zone Coil",
+        "OA Heating Coil 1",
+        "Main Heating Coil 1",
+        "Supply Fan 1"
+        )
     )
     # }}}
 

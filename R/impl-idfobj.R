@@ -233,7 +233,7 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
 get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                                  name = TRUE, direction = c("ref_to", "ref_by", "node", "all"),
                                  object = NULL, class = NULL, group = NULL,
-                                 keep_all = FALSE, depth = 0L) {
+                                 keep_all = FALSE, depth = 0L, class_ref = c("both", "none", "all")) {
     all_dir <- c("ref_to", "ref_by", "node", "all")
     direction <- all_dir[sort(chmatch(direction, all_dir))]
     assert(no_na(direction), msg = paste0("`direction` should be one or some of ", collapse(all_dir)))
@@ -245,14 +245,14 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
     if ("ref_to" %in% direction) {
         rel$ref_to <- get_idf_relation(idd_env, idf_env, object_id = object_id, value_id,
             depth = depth, name = name, direction = "ref_to", keep_all = keep_all,
-            object = object, class = class, group = group
+            object = object, class = class, group = group, class_ref = match.arg(class_ref)
         )
     }
 
     if ("ref_by" %in% direction) {
         rel$ref_by <- get_idf_relation(idd_env, idf_env, object_id = object_id, value_id,
             depth = depth, name = name, direction = "ref_by", keep_all = keep_all,
-            object = object, class = class, group = group
+            object = object, class = class, group = group, class_ref = match.arg(class_ref)
         )
     }
 
@@ -262,7 +262,6 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
             object = object, class = class, group = group
         )
     }
-
 
     setattr(rel, "class", c("IdfRelation", class(rel)))
 

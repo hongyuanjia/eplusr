@@ -3121,10 +3121,11 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
 get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                               depth = NULL, name = FALSE, direction = c("ref_to", "ref_by"),
                               object = NULL, class = NULL, group = NULL,
-                              keep_all = FALSE) {
+                              keep_all = FALSE, class_ref = c("both", "none", "all")) {
     assert(is.null(depth) || is_count(depth, TRUE))
     if (is.null(depth)) depth <- Inf
     direction <- match.arg(direction)
+    class_ref <- match.arg(class_ref)
 
     # if no value id is given
     if (is.null(value_id)) {
@@ -3165,11 +3166,23 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
 
     all_ref <- idf_env$reference
 
+    if (class_ref == "none") {
+        both <- FALSE
+        all_ref <- all_ref[!J(IDDFIELD_SOURCE$class), on = "src_enum"]
+    } else if (class_ref == "all") {
+        both <- FALSE
+    } else if (class_ref == "both") {
+        both <- TRUE
+        all_ref[idf_env$value, on = "value_id", field_id := i.field_id]
+        all_ref[idf_env$value, on = c("src_value_id" = "value_id"), src_field_id := i.field_id]
+        on.exit(set(all_ref, NULL, c("field_id", "src_field_id"), NULL), add = TRUE)
+    }
+
     # init depth
     dep <- 0L
 
     # get first directly ref
-    cur_ref <- idf_env$reference[J(id), on = col_on, nomatch = NULL]
+    cur_ref <- all_ref[J(id), on = col_on, nomatch = NULL]
     set(cur_ref, NULL, "dep", if (nrow(cur_ref)) dep else integer())
 
     if (direction == "ref_to") {
@@ -3203,7 +3216,10 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
         cur_ref <- cur_ref[J(obj_id), on = col_ref, nomatch = 0L]
     }
 
-    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, obj_id)
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, obj_id, both = both)
+
+    # remove redundant columns
+    set(ref, NULL, c("field_id", "src_field_id"), NULL)
 
     # keep all input
     if (keep_all) ref <- combine_input_and_relation(val, ref, "idf", direction)
@@ -3458,9 +3474,9 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     while (dep < (depth - 1L) && nrow(cur_nodes)) {
         # skip if specified classes/objects are matched
         if (length(obj_id)) {
-            m <- cur_nodes[J(obj_id), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
-            if (length(m)) {
-                cur_nodes <- cur_nodes[!J(del), on = col_rev]
+            skip <- cur_nodes[J(obj_id), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
+            if (length(skip)) {
+                cur_nodes <- cur_nodes[!J(skip), on = col_rev]
             }
         }
         # if all are matched, stop

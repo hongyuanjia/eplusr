@@ -25,7 +25,9 @@
 
 * The algorithm of object/field/value relation extraction has been completed
   refactored. Now it can correctly detect object recursive-reference and it's
-  faster. All relation-related methods now have an unified interface:
+  faster (#222, #223).
+
+  All relation-related methods now have an unified interface:
 
   ```r
   X$method(which, direction, object = NULL, class = NULL, group = NULL, depth = NULL, keep = FALSE)
@@ -46,6 +48,28 @@
 
   With this update, it is possible, for example, to directly know the structure
   of an air loop by using `idf$object_relation("AnAirLoop", depth = NULL)`
+
+  Moreover, a new argument `class_ref` can be specified in methods of
+  value-relation extraction. It can be used to specify how to handle
+  class-name-references. Class name references refer to references in like
+  field `Component 1 Object Type` in `Branch` objects. Their value refers to
+  other many class names of objects, instaed of refering to specific field
+  values. There are 3 options in total, i.e. `"none"`, `"both"` and `"all"`,
+  with `"both"` being the default.
+
+  * `"none"`: just ignore class-name-references. It is a reasonable
+    option, as for most cases, class-name-references always come along with
+    field value references. Ignoring class-name-references will not impact the
+    most part of the relation structure.
+  * `"both"`: only include class-name-references if this object
+    also reference field values of the same one. For example, if the value of
+    field `Component 1 Object Type` is `Coil:Heating:Water`, only the object
+    that is referenced in the next field `Component 1 Name` is treated as
+    referenced by `Component 1 Object Type`. This is the default option.
+  * `"all"`: include all class-name-references. For example, if the
+    value of field `Component 1 Object Type` is `Coil:Heating:Water`, all
+    objects in `Coil:Heating:Water` will be treated as referenced by that
+    field. This is the most aggressive option.
 
 ## Minor changes
 
