@@ -338,6 +338,28 @@ test_that("Idf class", {
     expect_equal(idf$purge(1:5, c("Material", "Construction"), idf$group_name())$is_valid_id(1:5), c(rep(FALSE, 4), TRUE))
     # }}}
 
+    # UNIQUE {{{
+    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_1$unique(1, group = "Schedules")
+    expect_false(all(idf_1$is_valid_id(c(35, 38, 42))))
+    id <- idf_1$object_id(c("Material", "Output:Meter:MeterFileOnly"))
+    expect_silent(idf_1$unique(class = c("Material", "Output:Meter:MeterFileOnly")))
+    expect_equal(idf_1$object_id(c("Material", "Output:Meter:MeterFileOnly")), id)
+    # }}}
+
+    # DUPLICATED {{{
+    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    expect_silent(dup <- idf_1$duplicated())
+    expect_equal(nrow(dup), 322)
+    expect_equal(names(dup), c("class", "id", "name", "duplicated"))
+    expect_equal(dup$class, idf_1$class_name(sorted = FALSE))
+    expect_equal(dup$id, 1:322)
+    expect_equal(dup$name, idf_1$object_name(simplify = TRUE))
+    expect_equal(dup[duplicated == TRUE, id], c(35L, 38L, 42L, 77L, 78L, 152L, 154L, 156L, 158L))
+    expect_equal(idf_1$duplicated(class = "Schedule:Compact")[duplicated == TRUE, id], c(35L, 38L, 42L))
+    expect_equal(idf_1$duplicated(group = "Schedules")[duplicated == TRUE, id], c(35L, 38L, 42L))
+    # }}}
+
     # RENAME {{{
     idf <- read_idf(example())
     idf$rename(test = "C5 - 4 IN HW CONCRETE")

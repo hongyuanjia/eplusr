@@ -492,6 +492,39 @@ idf$purge(group = "Schedules")
 
 
 ## ------------------------------------------------
+## Method `Idf$duplicated`
+## ------------------------------------------------
+
+\dontrun{
+# check if there are any duplications in the Idf
+idf$duplicated(class = "ScheduleTypeLimits")
+
+# check if there are any duplications in the schedule types
+idf$duplicated(class = "ScheduleTypeLimits")
+
+# check if there are any duplications in the schedule groups and
+# material class
+idf$duplicated(class = "Material", group = "Schedules")
+}
+
+
+## ------------------------------------------------
+## Method `Idf$unique`
+## ------------------------------------------------
+
+\dontrun{
+# remove duplications in the Idf
+idf$unique(class = "ScheduleTypeLimits")
+
+# remove duplications in the schedule types
+idf$unique(class = "ScheduleTypeLimits")
+
+# remove duplications in the schedule groups and material class
+idf$unique(class = "Material", group = "Schedules")
+}
+
+
+## ------------------------------------------------
 ## Method `Idf$rename`
 ## ------------------------------------------------
 
@@ -851,6 +884,8 @@ Hongyuan Jia
 \item \href{#method-set}{\code{Idf$set()}}
 \item \href{#method-del}{\code{Idf$del()}}
 \item \href{#method-purge}{\code{Idf$purge()}}
+\item \href{#method-duplicated}{\code{Idf$duplicated()}}
+\item \href{#method-unique}{\code{Idf$unique()}}
 \item \href{#method-rename}{\code{Idf$rename()}}
 \item \href{#method-insert}{\code{Idf$insert()}}
 \item \href{#method-load}{\code{Idf$load()}}
@@ -2455,7 +2490,7 @@ idf$del(ids)
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-purge"></a>}}
 \subsection{Method \code{purge()}}{
-purge resource objects that are not used
+Purge resource objects that are not used
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Idf$purge(object = NULL, class = NULL, group = NULL)}\if{html}{\out{</div>}}
 }
@@ -2502,6 +2537,130 @@ idf$purge(class = "ScheduleTypeLimits")
 
 # purge all unused schedule related objects
 idf$purge(group = "Schedules")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-duplicated"></a>}}
+\subsection{Method \code{duplicated()}}{
+Determine duplicated objects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$duplicated(object = NULL, class = NULL, group = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{object}}{an integer vector of object IDs or a character vector
+of object names in current \code{Idf} object. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of valid class names in current \code{Idf}
+object. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of valid group names in current \code{Idf}
+object. Default: \code{NULL}.
+
+If all \code{object}, \code{class} and \code{group} are \code{NULL}, duplication checking
+is performed on the whole \code{Idf}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$duplicated()} takes an integer vector of object IDs or a character
+vectors of object names, and returns a \code{\link[data.table:data.table]{data.table::data.table()}}
+to show whether input objects contain duplications or not.
+
+Here duplicated objects refer to objects whose field values are the
+same except the names. Object comments are just ignored during
+comparison.
+}
+
+\subsection{Returns}{
+A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
+\itemize{
+\item \code{class}: Character. Names of classes that input objects belong to
+\item \code{id}: Integer. Input object IDs
+\item \code{name}: Character. Input object names
+\item \code{duplicated}: Logical. Whether this object is a duplication or not
+}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# check if there are any duplications in the Idf
+idf$duplicated(class = "ScheduleTypeLimits")
+
+# check if there are any duplications in the schedule types
+idf$duplicated(class = "ScheduleTypeLimits")
+
+# check if there are any duplications in the schedule groups and
+# material class
+idf$duplicated(class = "Material", group = "Schedules")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-unique"></a>}}
+\subsection{Method \code{unique()}}{
+Remove duplicated objects
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Idf$unique(object = NULL, class = NULL, group = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{object}}{an integer vector of object IDs or a character vector
+of object names in current \code{Idf} object. Default: \code{NULL}.}
+
+\item{\code{class}}{A character vector of valid class names in current \code{Idf}
+object. Default: \code{NULL}.}
+
+\item{\code{group}}{A character vector of valid group names in current \code{Idf}
+object. Default: \code{NULL}.
+
+If all \code{object}, \code{class} and \code{group} are \code{NULL}, duplication checking
+is performed on the whole \code{Idf}.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$unique()} takes an integer vector of object IDs or a character
+vectors of object names, and remove duplicated objects.
+
+Here duplicated objects refer to objects whose field values are the
+same except the names. Object comments are just ignored during
+comparison.
+
+\verb{$unique()} will only keep the first unique object and remove all
+redundant objects. Value referencing the redundant objects will be
+redirected into the unique object.
+}
+
+\subsection{Returns}{
+The modified \code{Idf} object itself, invisibly.
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# remove duplications in the Idf
+idf$unique(class = "ScheduleTypeLimits")
+
+# remove duplications in the schedule types
+idf$unique(class = "ScheduleTypeLimits")
+
+# remove duplications in the schedule groups and material class
+idf$unique(class = "Material", group = "Schedules")
 }
 
 }
