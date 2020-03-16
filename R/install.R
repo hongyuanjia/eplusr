@@ -551,7 +551,7 @@ use_eplus <- function (eplus) {
                     collapse(paste0("v", ver)), ".\n")
             }
 
-            fail <- paste0("Cannot locate EnergyPlus v", stringi::stri_trim_both(eplus), " at default ",
+            fail <- paste0("Cannot locate EnergyPlus v", stringi::stri_trim_both(as.character(eplus)), " at default ",
                 "installation path ", surround(c(dir_cache, eplus_dir)), collapse = "\n")
             abort("error_cannot_locate_eplus", paste0(msg, fail, "\n",
                 "Please specify explicitly the path of EnergyPlus installation."
@@ -647,7 +647,12 @@ locate_eplus <- function () {
 # eplus_default_path {{{
 eplus_default_path <- function (ver, local = FALSE) {
     ver <- standardize_ver(ver)
-    assert(is_idd_ver(ver))
+    if (length(ver) <= 1L) {
+        assert(is_idd_ver(ver))
+    } else {
+        lapply(ver, function (v) assert(is_idd_ver(v)))
+    }
+
     ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
     if (is_windows()) {
         if (local) {

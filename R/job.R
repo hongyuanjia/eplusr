@@ -867,7 +867,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     private$m_log$killed <- NULL
 
     private$m_job <- run_idf(path_idf, path_epw,
-        output_dir = NULL, echo = echo, wait = wait, eplus = private$m_version,
+        output_dir = NULL, echo = echo, wait = wait, eplus = private$m_idf$version(),
         design_day = is.null(private$m_epw_path)
     )
 
@@ -1259,11 +1259,19 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
                               name_idf = "Model", name_epw = "Weather") {
     cli::cat_rule(title, col = "green")
     config <- eplus_config(eplus_ver)
+    if (is.null(config)) {
+        path_eplus <- "<< Not Found >>"
+        eplus_ver <- surround(eplus_ver)
+    } else {
+        path_eplus <- surround(normalizePath(config$dir))
+        eplus_ver <- surround(config$version)
+    }
+
     cli::cat_line(c(
         str_trunc(paste0("* ", name_idf, ": ", surround(normalizePath(path_idf, mustWork = FALSE)))),
         str_trunc(paste0("* ", name_epw, ": ", if (is.null(path_epw)) "<< Not specified >>" else surround(path_epw))),
-        paste0("* EnergyPlus Version: ", surround(config$version)),
-        str_trunc(paste0("* EnergyPlus Path: ", surround(normalizePath(config$dir))))
+        paste0("* EnergyPlus Version: ", eplus_ver),
+        str_trunc(paste0("* EnergyPlus Path: ", path_eplus))
     ))
 }
 # }}}
