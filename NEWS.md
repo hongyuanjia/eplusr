@@ -81,7 +81,10 @@
   other methods of `Epw` class. Some EPWs from sources other than
   energyplus.net sometimes fail to give all valid values for thse headers. Now
   `read_epw()` will return all failed-to-parse values as `NA`s. All parsing
-  warnings can be shown by setting `warning` in `read_epw()` to `TRUE`.
+  warnings can be shown by setting `warning` in `read_epw()` to `TRUE`. For
+  `HOLIDAYS/DAYLIGHT SAVINGS` and `DATA PERIODS`, `read_epw()` will still give
+  an error if any parsing errors are found. This is becasue values of those 2
+  headers are used to parsing the actual weather data.
 
 ## Minor changes
 
