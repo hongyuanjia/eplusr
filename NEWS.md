@@ -75,6 +75,13 @@
     value of field `Component 1 Object Type` is `Coil:Heating:Water`, all
     objects in `Coil:Heating:Water` will be treated as referenced by that
     field. This is the most aggressive option.
+* `read_epw()` will proceed parsing if type error occurs for non-important
+  headers, including `LOCATION`, `DESIGN CONDITIONS`, `TYPICAL/EXTREME PERIODS`
+  and `GROUND TEMPERATURES` (#235). These headers are not directly used in any
+  other methods of `Epw` class. Some EPWs from sources other than
+  energyplus.net sometimes fail to give all valid values for thse headers. Now
+  `read_epw()` will return all failed-to-parse values as `NA`s. All parsing
+  warnings can be shown by setting `warning` in `read_epw()` to `TRUE`.
 
 ## Minor changes
 
