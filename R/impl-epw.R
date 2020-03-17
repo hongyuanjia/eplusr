@@ -386,7 +386,7 @@ EPWDATE_YEAR <- list(
 
 parse_epw_file <- function (path, warning = FALSE) {
     # read and parse header
-    epw_header <- parse_epw_header(read_epw_header(path))
+    epw_header <- parse_epw_header(read_epw_header(path), warning = warning)
 
     # read core weather data
     epw_data <- read_epw_data(path)
@@ -500,11 +500,11 @@ read_epw_header <- function (path) {
 }
 # }}}
 # parse_epw_header {{{
-parse_epw_header <- function (header) {
+parse_epw_header <- function (header, warning = FALSE) {
     epw_header <- EPW_HEADER
     for (i in seq_along(epw_header)) {
         fun <- match.fun(paste0("parse_epw_header_", names(epw_header)[i]))
-        epw_header[[i]] <- fun(input = header[i, contents][[1L]], data = header[i])
+        epw_header[[i]] <- fun(input = header[i, contents][[1L]], data = header[i], warning = warning)
     }
 
     # update EpwDate year according to leapyear element in HOLIDAYS header
@@ -537,7 +537,7 @@ parse_epw_header <- function (header) {
 # parse_epw_header_basic {{{
 parse_epw_header_basic <- function (
     header_type, input,
-    len = NULL, name = NULL, type = NULL, range = NULL, raw = TRUE, coerce = TRUE, ...
+    len = NULL, name = NULL, type = NULL, range = NULL, raw = TRUE, coerce = TRUE, strict = TRUE, ...
 ) {
 
     # convert to a list if necessary
@@ -545,8 +545,10 @@ parse_epw_header_basic <- function (
 
     # set names
     if (!is.null(name)) {
-        if (length(input) < length(name)) stop("`input` length is less that the length of `name`.")
-        if (!is.null(name)) setattr(input, "names", name)
+        if (length(input) < length(name)) {
+            name <- name[1:length(input)]
+        }
+        setattr(input, "names", name)
     }
 
     # check length {{{
@@ -569,7 +571,7 @@ parse_epw_header_basic <- function (
         if (has_name(input, tnm)) {
             for (i in tnm) {
                 fun <- header_data_type_fun(type[[i]], raw = raw, coerce = coerce,
-                    prefix = paste(EPW_HEADER[[header_type]])
+                    prefix = paste(EPW_HEADER[[header_type]]), strict = strict
                 )
                 input[[i]] <- tryCatch(fun(input[[i]]),
                     error_assertion = function (e) header_error_cnd(e, header_type, "type", tnm, raw, ...)
@@ -593,7 +595,7 @@ parse_epw_header_basic <- function (
                 }
 
                 # get type assert and coerce function
-                fun <- header_data_type_fun(i, raw = raw, coerce = coerce, prefix = paste(EPW_HEADER[[header_type]]))
+                fun <- header_data_type_fun(i, raw = raw, coerce = coerce, prefix = paste(EPW_HEADER[[header_type]]), strict = strict)
 
                 # for each specified index
                 for (idx in indices) {
@@ -618,7 +620,7 @@ parse_epw_header_basic <- function (
         for (name in names(range)) {
             tryCatch(assert(in_range(input[[name]], range[[name]]), prefix = paste(EPW_HEADER[[header_type]])),
                 error_assertion = function (e) {
-                    header_error_cnd(e, header_type, "range", name, raw, ...)
+                    if (!strict) NA_real_ else header_error_cnd(e, header_type, "range", name, raw, ...)
                 }
             )
         }
@@ -629,8 +631,8 @@ parse_epw_header_basic <- function (
 }
 # }}}
 # parse_epw_header_location {{{
-parse_epw_header_location <- function (input, ...) {
-    parse_epw_header_basic("location", input, len = 10L,
+parse_epw_header_location <- function (input, warning = TRUE, ...) {
+    res <- parse_epw_header_basic("location", input, len = 10L,
         name = c("header_name",
             "city", "state_province", "country", "data_source", "wmo_number",
             "latitude", "longitude", "time_zone", "elevation"
@@ -644,14 +646,19 @@ parse_epw_header_location <- function (input, ...) {
         ),
         coerce = TRUE,
         raw = TRUE,
+        strict = FALSE,
         ...
     )[-1L]
+
+    if (warning) warn_epw_header_na(input, res)
+
+    res
 }
 # }}}
 # parse_epw_header_design {{{
 # currently, only parse annual design day conditions as specified in ASHRAE HOF
 # 2009
-parse_epw_header_design <- function (input, ...) {
+parse_epw_header_design <- function (input, warning = TRUE, ...) {
     n <- suppressWarnings(as.integer(input[2L]))
 
     if (is.na(n) || !n %in% c(0L, 1L)) {
@@ -752,14 +759,16 @@ parse_epw_header_design <- function (input, ...) {
             `coldest_month` = ranger(1L, TRUE, 12L, TRUE),
             `hotest_month` = ranger(1L, TRUE, 12L, TRUE)
         ),
-        raw = TRUE, coerce = TRUE, ...
+        raw = TRUE, coerce = TRUE, strict = FALSE, ...
     )
+
+    if (warning) warn_epw_header_na(input, res)
 
     list(source = res$source, heating = res[6L:20L], cooling = res[22L:53L], extremes = res[55L:70L])
 }
 # }}}
 # parse_epw_header_typical {{{
-parse_epw_header_typical <- function (input, ...) {
+parse_epw_header_typical <- function (input, warning = TRUE, ...) {
     # get number of typical periods
     n <- parse_epw_header_basic("typical", input[2L], name = "n",
         type = list(int = "n"), range = list(n = ranger(0, TRUE)),
@@ -772,7 +781,23 @@ parse_epw_header_typical <- function (input, ...) {
     # "TYPICAL/EXTREME PERIODS, 0"
     if (length(input) == 2L && n == 0L) return(list(list(data.table())))
 
-    days <- data.table(matrix(input[-c(1L, 2L)], nrow = n, byrow = TRUE,
+    if ((actual_n <- (length(input) - 2) %/% 4) != n) {
+        if (actual_n * 4 != (length(input) - 2)) input <- input[1:(actual_n * 4 + 2)]
+
+        if (warning) {
+            parse_issue("warning_invalid_epw_header_typical_length", "epw",
+                paste("Invalid", input[[1]], "header data format"), num = 1,
+                post = paste0("Number of periods '", n, "' did not match the actual data period presented '",
+                    actual_n, "'. The latter will be used during parsing."),
+                stop = FALSE
+            )
+        }
+    }
+
+    input <- input[-c(1L, 2L)]
+    n <- actual_n
+
+    days <- data.table(matrix(input, nrow = n, byrow = TRUE,
         dimnames = list(as.character(1:n), c("name", "type", "start_day", "end_day"))
     ))
 
@@ -784,29 +809,37 @@ parse_epw_header_typical <- function (input, ...) {
 
     tryCatch(
         assert(is_unique(days$name), prefix = paste("Name of", EPW_HEADER$typical)),
-        error_assertion = function (e) header_error_cnd(e, "typical", "day_name", ...)
+        error_assertion = function (e) {
+            if (warning) header_error_cnd(e, "typical", "day_name", stop = FALSE, ...)
+        }
     )
     tryCatch(
         assert(is_choice(days$type, c("Extreme", "Typical")), prefix = paste("Day type of", EPW_HEADER$typical)),
-        error_assertion = function (e) header_error_cnd(e, "typical", "day_type", ...)
+        error_assertion = function (e) {
+            if (warning) header_error_cnd(e, "typical", "day_type", stop = FALSE, ...)
+        }
     )
     tryCatch(
         assert(not_epwdate_realyear(days$start_day), prefix = paste("Start day of", EPW_HEADER$typical)),
-        error_assertion = function (e) header_error_cnd(e, "typical", "day_date", ...)
+        error_assertion = function (e) {
+            if (warning) header_error_cnd(e, "typical", "day_date", stop = FALSE, ...)
+        }
     )
     tryCatch(
         assert(not_epwdate_realyear(days$end_day), prefix = paste("End day of", EPW_HEADER$typical)),
-        error_assertion = function (e) header_error_cnd(e, "typical", "day_date", ...)
+        error_assertion = function (e) {
+            if (warning) header_error_cnd(e, "typical", "day_date", stop = FALSE, ...)
+        }
     )
     days
 }
 # }}}
 # parse_epw_header_ground {{{
-parse_epw_header_ground <- function (input, ...) {
+parse_epw_header_ground <- function (input, warning = TRUE, ...) {
     # get number of ground temperature periods
     n <- parse_epw_header_basic("ground", input[2L], name = "n",
         type = list(int = "n"), range = list(n = ranger(0, TRUE)),
-        raw = TRUE, coerce = TRUE, ...
+        raw = TRUE, coerce = TRUE, strict = TRUE, ...
     )$n
 
     # check length
@@ -815,13 +848,55 @@ parse_epw_header_ground <- function (input, ...) {
     # "GROUND TEMPERATURES, 0"
     if (length(input) == 2L && n == 0L) return(list(list(data.table())))
 
-    # check types
-    m <- matrix(input[-c(1L, 2L)], nrow = n, byrow = TRUE)
-    assert(are_strnum(m[, c(1L, 5L:16L)]), prefix = EPW_HEADER$ground)
-    assert(stri_isempty(m[, c(2L:4L)]) | are_strnum(m[, c(2L:4L)]), prefix = EPW_HEADER$ground)
+    if ((actual_n <- (length(input) - 2) %/% 16) != n) {
+        if (actual_n * 16 != (length(input) - 2)) input <- input[1:(actual_n * 16 + 2)]
+
+        if (warning) {
+            parse_issue("warning_invalid_epw_header_typical_length", "epw",
+                paste("Invalid", input[[1]], "header data format"), num = 1,
+                post = paste0("Number of periods '", n, "' did not match the actual data period presented '",
+                    actual_n, "'. The latter will be used during parsing."),
+                stop = FALSE
+            )
+        }
+    }
+
+    if (warning) type <- input[1L]
+
+    input <- input[-c(1L, 2L)]
+    n <- actual_n
+
+    m <- matrix(suppressWarnings(as.numeric(input)), nrow = n, byrow = TRUE)
+    if (warning) {
+        inp <- matrix(input, nrow = n, byrow = TRUE)
+        if (any(na <- is.na(m[, 1L]))) {
+            parse_issue("warning_invalid_epw_header_ground_depth", "epw",
+                paste("Invalid", type, "header data format"),
+                num = sum(na),
+                post = sprintf("[%s]: failed to parse ground depth value '%s' at field position #%i. NA was introduced.",
+                    lpad(seq_len(sum(na)), "0"), as.character(inp[na, 1L]), (which(na) - 1L) * 16 + 2L
+                ),
+                stop = FALSE
+            )
+        }
+
+        if (any(na <- is.na(m[, 5L:16L]))) {
+            i_fld <- which(t(na)) %% 12L
+            i_dep <- vlapply(seq_len(n), function(i) any(na[i, ]))
+            parse_issue("warning_invalid_epw_header_ground_temp", "epw",
+                paste("Invalid", type, "header data format"),
+                num = sum(na),
+                post = sprintf("[%s]: failed to parse ground temp value '%s' at field position #%i of #%i depth '%s'. NA was introduced.",
+                    lpad(seq_len(sum(na)), "0"), as.character(unlist(inp[, 5L:16L])[unlist(na)]),
+                    i_fld + 3L, which(i_dep), m[, 1L][i_dep]
+                ),
+                stop = FALSE
+            )
+        }
+    }
 
     # change into a data.table
-    temp <- data.table(matrix(as.double(input[-c(1L, 2L)]), nrow = n, byrow = TRUE))
+    temp <- data.table(m)
     setnames(temp,
         c("depth",
           "soil_conductivity",
@@ -830,9 +905,12 @@ parse_epw_header_ground <- function (input, ...) {
           "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
         )
     )
+
     tryCatch(
         assert(is_unique(temp$depth), prefix = paste("Depth of", EPW_HEADER$ground)),
-        error_assertion = function (e) header_error_cnd(e, "ground", "depth", ...)
+        error_assertion = function (e) {
+            if (warning) header_error_cnd(e, "ground", "depth", stop = FALSE, ...)
+        }
     )
 
     # change into tidy format
@@ -848,7 +926,7 @@ parse_epw_header_ground <- function (input, ...) {
 }
 # }}}
 # parse_epw_header_holiday {{{
-parse_epw_header_holiday <- function (input, ...) {
+parse_epw_header_holiday <- function (input, warning = TRUE, ...) {
     # get number of holidays
     res <- parse_epw_header_basic("holiday", input[2L:5L],
         name = c("leapyear", "dst_start_day", "dst_end_day", "n"),
@@ -921,7 +999,7 @@ parse_epw_header_holiday <- function (input, ...) {
 }
 # }}}
 # parse_epw_header_comment1 {{{
-parse_epw_header_comment1 <- function (input, ...) {
+parse_epw_header_comment1 <- function (input, warning = TRUE, ...) {
     Reduce(function (...) paste(..., sep = ","), input[-1L])
 }
 # }}}
@@ -929,7 +1007,7 @@ parse_epw_header_comment1 <- function (input, ...) {
 parse_epw_header_comment2 <- parse_epw_header_comment1
 # }}}
 # parse_epw_header_period {{{
-parse_epw_header_period <- function (input, ...) {
+parse_epw_header_period <- function (input, warning = TRUE, ...) {
     # get number of data periods
     res <- parse_epw_header_basic("period", input, len = list(len = 7L, step = 4L),
         name = c("header_name", "n", "interval"),
@@ -1057,13 +1135,33 @@ parse_epw_header_period <- function (input, ...) {
     res
 }
 # }}}
+# warn_epw_header_na {{{
+warn_epw_header_na <- function (input, res) {
+    if (!any(na <- vlapply(res, is.na))) return()
+
+    nm <- gsub("_", " ", names(res[na]), fixed = TRUE)
+
+    parse_issue("warning_invalid_epw_header_design", "epw",
+        paste("Invalid", input[[1]], "header data format"),
+        num = sum(na),
+        post = sprintf("[%s]: failed to parse value '%s' at field position #%i. NA was introduced.",
+            lpad(seq_along(nm), "0"), unlist(input[na]), which(na)
+        ),
+        stop = FALSE
+    )
+
+    res
+}
+# }}}
 # header_data_type_fun {{{
-header_data_type_fun <- function (type, coerce = TRUE, raw = FALSE, ...) {
-    factory <- function (before, after = NULL, .coerce = coerce) {
-        if (!.coerce) {
+header_data_type_fun <- function (type, coerce = TRUE, raw = FALSE, strict = TRUE, ...) {
+    factory <- function (before, after = NULL) {
+        if (!coerce) {
             function (x) {assert(before(x), ...); x}
-        } else {
+        } else if (strict) {
             function (x) {assert(before(x), ...); after(x)}
+        } else {
+            function (x) suppressWarnings(after(x))
         }
     }
 
@@ -1083,7 +1181,7 @@ header_data_type_fun <- function (type, coerce = TRUE, raw = FALSE, ...) {
 }
 # }}}
 # header_error_cnd {{{
-header_error_cnd <- function (cnd, header_type, check_type, idx = NULL, raw = TRUE, ...) {
+header_error_cnd <- function (cnd, header_type, check_type, idx = NULL, raw = TRUE, stop = TRUE, ...) {
     # error message from the original assertion or coercion
     msg <- conditionMessage(cnd)
 
@@ -1103,7 +1201,7 @@ header_error_cnd <- function (cnd, header_type, check_type, idx = NULL, raw = TR
     if (raw) {
         parse_issue(err_type, "epw",
             title = paste("Invalid", EPW_HEADER[[header_type]], "header data format"),
-            post = msg, ...
+            post = msg, stop = stop, ...
         )
     } else {
         abort(err_type, msg)
