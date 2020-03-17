@@ -3330,7 +3330,7 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
     ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, obj_id, both = both)
 
     # remove redundant columns
-    set(ref, NULL, c("field_id", "src_field_id"), NULL)
+    if (both) set(ref, NULL, c("field_id", "src_field_id"), NULL)
 
     # keep all input
     if (keep_all) ref <- combine_input_and_relation(val, ref, "idf", direction)
