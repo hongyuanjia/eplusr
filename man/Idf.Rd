@@ -1256,14 +1256,15 @@ idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 \subsection{Method \code{definition()}}{
 Get the \link{IddObject} object for specified class.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$definition(class)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idf$definition(class = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{class}}{A \strong{single} string of valid class name in current
-\link{Idd}.}
+\link{Idd}. If \code{NULL}, the underlying \link{Idd} object is returned.
+Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1274,7 +1275,8 @@ details, please see \link{IddObject} class.
 }
 
 \subsection{Returns}{
-An \link{IddObject} object.
+An \link{IddObject} object if class is not \code{NULL} or an \link{Idd}
+object if class is \code{NULL}.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}

@@ -340,9 +340,11 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' details, please see [IddObject] class.
         #'
         #' @param class A **single** string of valid class name in current
-        #'        [Idd].
+        #'        [Idd]. If `NULL`, the underlying [Idd] object is returned.
+        #'        Default: `NULL`.
         #'
-        #' @return An [IddObject] object.
+        #' @return An [IddObject] object if class is not `NULL` or an [Idd]
+        #' object if class is `NULL`.
         #'
         #' @examples
         #' \dontrun{
@@ -350,7 +352,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$definition("Version")
         #' }
         #'
-        definition = function (class)
+        definition = function (class = NULL)
             idf_definition(self, private, class),
         # }}}
 
@@ -2804,8 +2806,12 @@ idf_is_unsaved <- function (self, private) {
 }
 # }}}
 # idf_definition {{{
-idf_definition <- function (self, private, class) {
-    IddObject$new(class, private$m_idd)
+idf_definition <- function (self, private, class = NULL) {
+    if (is.null(class)) {
+        private$m_idd
+    } else {
+        IddObject$new(class, private$m_idd)
+    }
 }
 # }}}
 # idf_obj {{{
