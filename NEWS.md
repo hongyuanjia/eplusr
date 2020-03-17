@@ -25,6 +25,8 @@
   objects refer to objects whose field values are the same except the names.
   Object comments are ignored during comparison. These two methods can be
   useful when doing model cleaning (#227).
+* Now if `class` is set to `NULL` in `Idf$definition()`, the underlying `Idd`
+  object is returned (#237).
 
 ## Major changes
 

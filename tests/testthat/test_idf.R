@@ -95,6 +95,9 @@ test_that("Idf class", {
     # }}}
 
     # OBJECT {{{
+    # can get Idd
+    expect_is(idf$definition(), "Idd")
+
     # can get IddObject
     expect_is(idf$definition("Version"), "IddObject")
 
