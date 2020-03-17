@@ -3694,7 +3694,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         }
 
         # ignore same objects and insert new ones
-        if (any(!same_id)) .subset2(x, "insert")(value[!same_id], .unique = FALSE)
+        if (any(!same_id)) .subset2(self, "insert")(value[!same_id], .unique = FALSE)
 
         # delete objects that are not included in input
         if (exist) {
