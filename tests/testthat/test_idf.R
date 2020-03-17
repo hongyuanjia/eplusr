@@ -764,6 +764,10 @@ test_that("Idf class", {
     expect_silent(idf$add(SimulationControl = list()))
     expect_silent(idf$SimulationControl$set(Do_Zone_Sizing_Calculation = "no"))
     expect_silent(idf$SimulationControl$Do_Zone_Sizing_Calculation <- "No")
+
+    # can directly insert objects from other idf
+    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    expect_silent(without_checking(idf$BuildingSurface_Detailed <- idf_1$BuildingSurface_Detailed))
     # }}}
 
     # CLONE {{{
