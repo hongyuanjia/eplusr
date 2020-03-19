@@ -99,6 +99,8 @@
   when running in parallel (#130)
 * `Idf$insert()` now will remove all duplicated objects in input (#219).
 * Fix the bug in `install_eplus()` on Windows (#230)
+* Fix the error in `$<-.Idf` when input list of `IdfObject`s are all from the
+  same `Idf` on the LHS (#238).
 
 # eplusr 0.12.0
 

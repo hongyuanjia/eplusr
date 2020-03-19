@@ -771,6 +771,9 @@ test_that("Idf class", {
     # can directly insert objects from other idf
     idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     expect_silent(without_checking(idf$BuildingSurface_Detailed <- idf_1$BuildingSurface_Detailed))
+    idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf_2 <- read_idf(idf_1$path())
+    expect_silent(without_checking(idf_1$BuildingSurface_Detailed <- idf_2$BuildingSurface_Detailed))
     # }}}
 
     # CLONE {{{
