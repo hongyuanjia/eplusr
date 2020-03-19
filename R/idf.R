@@ -3703,8 +3703,8 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         if (any(!same_id)) .subset2(self, "insert")(value[!same_id], .unique = FALSE)
 
         # delete objects that are not included in input
-        if (exist) {
-            invisible(self$del(setdiff(obj_main$object_id, obj_id_in), .force = TRUE))
+        if (exist && length(id_del <- setdiff(obj_main$object_id, obj_id_in))) {
+            invisible(self$del(id_del, .force = TRUE))
         }
 
     } else {
