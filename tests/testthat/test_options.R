@@ -25,5 +25,10 @@ test_that("eplusr_option()", {
              view_in_ip = FALSE
         )
     )
+
+    expect_false(with_option(list(verbose_info = FALSE), eplusr_option("verbose_info")))
+    expect_false(with_silent(eplusr_option("verbose_info")))
+    expect_equal(without_checking(eplusr_option("validate_level")), "none")
+    expect_equal(with_speed(c(eplusr_option("validate_level"), eplusr_option("autocomplete"))), c("none", "FALSE"))
 })
 
