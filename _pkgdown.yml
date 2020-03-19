@@ -41,6 +41,8 @@ reference:
       - download_idd
       - avail_idd
       - is_avail_idd
+      - as.character.IddObject
+      - format.IddObject
   - title: IDF
     desc: Read, modify and run an EnergyPlus Input Data File (IDF)
     contents:
@@ -51,6 +53,10 @@ reference:
       - empty_idf
       - transition
       - version_updater
+      - as.character.Idf
+      - as.character.IdfObject
+      - format.Idf
+      - format.IdfObject
   - title: EPW
     desc: Download, read and modify an EnergyPlus Weather (EPW)
     contents:
@@ -82,6 +88,7 @@ reference:
       - read_err
       - read_rdd
       - read_mdd
+      - print.ErrFile
   - title: Data Helpers
     desc: Help to create and format IDF data
     contents:
@@ -105,3 +112,7 @@ reference:
       - eplusr_option
       - custom_validate
       - level_checks
+      - with_option
+      - with_silent
+      - without_checking
+      - with_speed

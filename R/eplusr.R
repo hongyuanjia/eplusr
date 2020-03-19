@@ -198,6 +198,37 @@ eplusr_option <- function (...) {
     as.list.environment(.options)[nm]
 }
 # }}}
+
+#' Evaluate an expression with temporary eplusr options
+#'
+#' These functions evaluate an expression with temporary eplusr options
+#'
+#' `with_option` evaluates an expression with specified eplusr options.
+#'
+#' `with_silent` evaluates an expression with no verbose messages.
+#'
+#' `without_checking` evaluates an expression with no checkings.
+#'
+#' `with_speed` evaluates an expression with no checkings and autocompletion
+#' functionality.
+#'
+#' @param opts A list of valid input for `eplusr::eplusr_option()`.
+#' @param expr An expression to be evaluated.
+#' @name with_option
+#' @export
+#' @examples
+#' \dontrun{
+#' path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+#'
+#' # temporarily disable verbose messages
+#' idf <- with_silent(read_idf(path_idf, use_idd(8.8, download = "auto")))
+#'
+#' # temporarily disable checkings
+#' without_checking(idf$'BuildingSurface:Detailed' <- NULL)
+#' # OR
+#' with_option(list(validate_level = "none"), idf$'BuildingSurface:Detailed' <- NULL)
+#' }
+#'
 # with_option {{{
 with_option <- function (opts, expr) {
     # get options
@@ -218,16 +249,25 @@ with_option <- function (opts, expr) {
     force(expr)
 }
 # }}}
+
+#' @name with_option
+#' @export
 # with_silent {{{
 with_silent <- function (expr) {
     with_option(list(verbose_info = FALSE), expr)
 }
 # }}}
+
+#' @name with_option
+#' @export
 # with_speed {{{
 with_speed <- function (expr) {
     with_option(list(validate_level = "none", autocomplete = FALSE), expr)
 }
 # }}}
+
+#' @name with_option
+#' @export
 # without_checking {{{
 without_checking <- function (expr) {
     with_option(list(validate_level = "none"), expr)
