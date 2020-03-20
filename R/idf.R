@@ -2942,7 +2942,7 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
             } else {
-                verbose_info(msg, "specifed.")
+                verbose_info(msg, " specified.")
             }
         }
         return(obj_self)
