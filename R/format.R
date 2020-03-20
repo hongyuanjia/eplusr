@@ -427,12 +427,43 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
     # add formatted string for object, class, fields and values
     set(ref, NULL, "class_name", format_class(ref))
     set(ref, NULL, "object_name", format_object(ref))
-    set(ref, NULL, "value_chr", format_field_by_parent(ref, "value"))
     switch_ref_src(ref)
     set(ref, NULL, "class_name", format_class(ref))
     set(ref, NULL, "object_name", format_object(ref))
-    set(ref, NULL, "value_chr", as.list(format_field_by_parent(ref, "value")))
     switch_ref_src(ref, invert = TRUE)
+    # format values {{{
+    val <- ref[, by = c("object_id"), {
+        dup <- duplicated(value_id)
+        l <- list(
+            field_index = field_index[!dup],
+            field_name = field_name[!dup],
+            value_chr = value_chr[!dup],
+            value_num = value_num[!dup],
+            type_enum = type_enum[!dup]
+        )
+        val <- format_field(setDT(l), leading = 0L, sep_at = 15L, pad_char = "0",
+            value = TRUE, quote = TRUE, blank = TRUE, index = TRUE, required = FALSE, prefix = TRUE
+        )
+        list(value_id = value_id[!dup], value_chr = val)
+    }]
+    ref[val, on = c("object_id", "value_id"), value_chr := i.value_chr]
+    val <- ref[, by = c("src_object_id"), {
+        dup <- duplicated(src_value_id)
+        l <- list(
+            field_index = src_field_index[!dup],
+            field_name = src_field_name[!dup],
+            value_chr = src_value_chr[!dup],
+            value_num = src_value_num[!dup],
+            type_enum = src_type_enum[!dup]
+        )
+        val <- format_field(setDT(l), leading = 0L, sep_at = 15L, pad_char = "0",
+            value = TRUE, quote = TRUE, blank = TRUE, index = TRUE, required = FALSE, prefix = TRUE
+        )
+        list(src_value_id = src_value_id[!dup], src_value_chr = val)
+    }]
+    ref[val, on = c("src_object_id", "src_value_id"), src_value_chr := i.src_value_chr]
+    set(ref, NULL, "src_value_chr", as.list(ref$src_value_chr))
+    # }}}
 
     ref[!is.na(src_enum), by = c("src_enum", "value_chr"), pointer := {
         if (!length(src_enum)) {
