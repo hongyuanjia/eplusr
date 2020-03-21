@@ -3199,12 +3199,12 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
     # get all input value
     val_in <- val[, list(class_id, object_id, field_index, value_chr)]
 
-    # dcast to compare
-    val_d <- dcast(rbindlist(list(val_idf, val_in), fill = TRUE),
-        class_id + object_id ~ field_index, value.var = "value_chr")
-
     # compare in case-insensitive way
+    val_d <- rbindlist(list(val_idf, val_in), fill = TRUE)
     set(val_d, NULL, "value_chr", stri_trans_tolower(val_d$value_chr))
+
+    # dcast to compare
+    val_d <- dcast(val_d, class_id + object_id ~ field_index, value.var = "value_chr")
 
     # get indicator
     dup <- duplicated(val_d, by = setdiff(names(val_d), c("object_id", "class_id")))
