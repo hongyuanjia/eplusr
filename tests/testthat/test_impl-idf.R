@@ -865,10 +865,6 @@ test_that("Insert", {
         class = "error_insert_unique"
     )
     expect_error(
-        insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Version),
-        class = "error_insert_version"
-    )
-    expect_error(
         insert_idf_object(idd_env, idf_env, version = numeric_version("8.7.0"), idf$Material),
         class = "error_not_same_version"
     )
@@ -876,6 +872,12 @@ test_that("Insert", {
         insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Material, .unique = FALSE),
         class = "error_validity"
     )
+    # can skip Version object
+    expect_silent(
+        ins <- insert_idf_object(idd_env, idf_env, version = idf$version(), idf$Version)
+    )
+    expect_equal(nrow(ins$object), 0L)
+    expect_equal(nrow(ins$value), 0L)
     new_mat <- idf$clone()$Material[[1L]]$set(name = "new_mat")
     expect_silent(
         ins <- insert_idf_object(idd_env, idf_env, version = idf$version(), new_mat)
