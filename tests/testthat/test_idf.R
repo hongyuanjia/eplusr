@@ -288,6 +288,9 @@ test_that("Idf class", {
     expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), class = "error_validity")
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER, idf$Material_NoMass$R13LAYER))
+    # can directly insert an Idf
+    expect_silent(idf1$insert(idf2))
+    expect_equal(idf1$object_id(), list(Version = 1L))
     # }}}
 
     # DELETE {{{

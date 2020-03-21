@@ -14,7 +14,7 @@ dot_string <- function (dt, collapse = "\n") {
     dt[, string := paste0(" #", lpad(rleid, "0"), "| ", dot)]
     dt[!is.na(dot_nm), string := paste0(" #", lpad(rleid, "0"), "| ", dot_nm, " = ", dot, collapse = collapse)]
     on.exit(set(dt, NULL, "string", NULL), add = TRUE)
-    str_trunc(stri_replace_all_fixed(paste0(dt$string, collapse = collapse), "<environment>", "<IdfObject>"))
+    str_trunc(stri_replace_all_fixed(paste0(dt$string, collapse = collapse), "<environment>", "<Idf|IdfObject>"))
 }
 # }}}
 # find_dot {{{
@@ -578,14 +578,17 @@ sep_object_dots <- function (...) {
     # stop if empty input
     if (!length(l)) abort("error_empty_input", "Please give object(s) to insert.")
 
+    .t <- list(idf = 1L, idfobject = 2L, list = 3L, invalid = 0L)
     # check type of each element
     get_depth <- function (x) {
-        if (is_idfobject(x)) {
-            1L
+        if (is_idf(x)) {
+            .t$idf
+        } else if (is_idfobject(x)) {
+            .t$idfobject
         } else if (is.list(x) & length(x) > 0) {
-            2L
+            .t$list
         } else {
-            0L
+            .t$invalid
         }
     }
     depth <- viapply(l, get_depth)
@@ -596,47 +599,63 @@ sep_object_dots <- function (...) {
     if (any(depth == 0L)) {
         abort("error_wrong_type",
             paste0("Each element must be an IdfObject or a list of IdfObjects. ",
-                "Invalid input:\n", dot_string(dt_dot[J(0L), on = "dep"])
+                "Invalid input:\n", dot_string(dt_dot[J(.t$invalid), on = "dep"])
             )
         )
     }
 
-    if (any(depth == 1L)) {
-        dt_1 <- dt_dot[J(1L), on = "dep"]
+    # to avoid partial matching
+    if (any(depth == .t[["idf"]])) {
+        dt_idf <- dt_dot[J(.t[["idf"]]), on = "dep"]
     } else {
-        dt_1 <- data.table()
+        dt_idf <- data.table()
     }
 
-    if (any(depth == 2L)){
-        dt_2 <- dt_dot[J(2L), on = "dep",
+    if (any(depth == .t$idfobject)) {
+        dt_idfobj <- dt_dot[J(.t$idfobject), on = "dep"]
+    } else {
+        dt_idfobj <- data.table()
+    }
+
+    if (any(depth == .t$list)){
+        dt_list <- dt_dot[J(.t$list), on = "dep",
             {
                 len <- each_length(dot)
                 lst <- unlist(dot, recursive = FALSE, use.names = TRUE)
-                list(dot = lst, dot_nm = names2(lst), dep = 1L)
+                dep <- viapply(lst, get_depth)
+                list(dot = lst, dot_nm = names2(lst), dep = dep)
             }, by = "rleid"]
     } else {
-        dt_2 <- data.table()
+        dt_list <- data.table()
     }
 
-    dt <- rbindlist(list(dt_1, dt_2), use.names = TRUE)
+    dt <- rbindlist(list(dt_idf, dt_idfobj, dt_list), use.names = TRUE)
     setorderv(dt, "rleid")
     add_rleid(dt, "object")
 
     dt[, c("version", "uuid", "object_id", "idd_env", "idf_env") := {
-        if (!is_idfobject(dot[[1L]])) {
+        if (is_idf(dot[[1L]])) {
+            list(._get_private(dot[[1L]])$m_version,
+                 ._get_private(dot[[1L]])$m_log$uuid,
+                 # use a negative integer to indicate this is an Idf
+                 -1L,
+                 list(._get_private(dot[[1L]])$idd_env()),
+                 list(._get_private(dot[[1L]])$idf_env())
+            )
+        } else if (is_idfobject(dot[[1L]])) {
+            list(._get_private(._get_private(dot[[1L]])$m_parent)$m_version,
+                 ._get_private(._get_private(dot[[1L]])$m_parent)$m_log$uuid,
+                 ._get_private(dot[[1L]])$m_object_id,
+                 list(._get_private(dot[[1L]])$idd_env()),
+                 list(._get_private(dot[[1L]])$idf_env())
+            )
+        } else {
             abort("error_wrong_type",
-                paste0("Each element must be an IdfObject or a list of IdfObjects. ",
+                paste0("Each element must be an Idf or an IdfObject, or a list of Idfs or IdfObjects. ",
                     "Invalid input:\n", dot_string(copy(.SD))
                 )
             )
         }
-
-        list(._get_private(._get_private(dot[[1L]])$m_parent)$m_version,
-             ._get_private(._get_private(dot[[1L]])$m_parent)$m_log$uuid,
-             ._get_private(dot[[1L]])$m_object_id,
-             list(._get_private(dot[[1L]])$idd_env()),
-             list(._get_private(dot[[1L]])$idf_env())
-        )
     }, by = "object_rleid"]
 
     # remove duplicated
@@ -2365,40 +2384,55 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .
     if (input[version != ver, .N]) {
         abort("error_not_same_version",
             paste0(
-                "Input object(s) should be IdfObjects with version ", surround(ver), ". ",
+                "Input object(s) should be Idfs or IdfObjects with version ", surround(ver), ". ",
                 "Invalid input:\n",
                 paste0(dot_string(l$dot[J(input[version != ver, unique(rleid)]), on = "rleid"], NULL), collapse = "\n")
             )
         )
     }
 
-    # get object table
-    obj <- input[, list(list(
-        set(get_idf_object(idd_env[[1L]], idf_env[[1L]], object = object_id, property = "has_name"),
-            NULL, c("rleid"), list(object_rleid)
-        )
-        )), by = "uuid"]$V1
-    obj <- rbindlist(obj)
-
-    # stop of trying to add Version object
-    if (any(obj$class_id == 1L)) {
-        invld <- find_dot(l$dot, obj[class_id == 1L])
-        m <- paste0(dot_string(invld, NULL), " --> Class ", invld$class_name, collapse = "\n")
-        abort("error_insert_version",
-            paste0("Inserting Version object is prohibited. Invalid input:\n", m)
-        )
-    }
-
+    # field properties needed
     prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
         "required_field", "src_enum", "type_enum", "extensible_group"
     )
-    val <- input[, list(list({
-        val_per <- get_idf_value(idd_env[[1L]], idf_env[[1L]], object = object_id, complete = TRUE, property = prop)
-        set(val_per, NULL, "rleid", rep(unique(object_rleid), table(val_per$rleid)))
-    })), by = "uuid"]$V1
-    val <- rbindlist(val)
-    # update name field
-    val[is_name == TRUE, `:=`(value_chr = obj$object_name[obj$has_name], value_num = NA_real_)]
+    n_obj <- 0L
+    # get object and value table
+    obj_val <- input[, {
+        # if there is one whole Idf input, just ignore other IdfObjects
+        if (-1L %in% object_id) {
+            obj_per <- get_idf_object(idd_env[[1L]], idf_env[[1L]], property = "has_name")
+            val_per <- get_idf_value(idd_env[[1L]], idf_env[[1L]], property = prop, complete = TRUE)
+            # for logging purpose
+            set(obj_per, NULL, "input_rleid", rleid[1L])
+        } else {
+            obj_per <- get_idf_object(idd_env[[1L]], idf_env[[1L]], object = object_id, property = "has_name")
+            val_per <- get_idf_value(idd_env[[1L]], idf_env[[1L]], object = object_id, complete = TRUE, property = prop)
+            # for logging purpose
+            set(obj_per, NULL, "input_rleid", rleid)
+        }
+
+        # update object rleid to make it as an identifier
+        set(obj_per, NULL, "rleid", obj_per$rleid + n_obj)
+        set(val_per, NULL, "rleid", val_per$rleid + n_obj)
+        n_obj <<- nrow(obj_per) + n_obj
+
+        list(object = list(obj_per), value = list(val_per))
+    }, by = "uuid"]
+
+    obj <- rbindlist(obj_val$object)
+    val <- rbindlist(obj_val$value)
+
+    # ignore Version object
+    if (any(obj$class_id == 1L)) {
+        if (eplusr_option("verbose_info")) {
+            invld <- l$dot[obj[class_id == 1L], on = c("rleid" = "input_rleid"), mult = "first"]
+            m <- paste0(str_trunc(dot_string(invld, NULL), cli::console_width() - 20L), " --> Class 'Version'", collapse = "\n")
+            verbose_info("'Version' objects in input below have been automatically skipped:\n", m)
+        }
+        obj <- obj[!J(1L), on = "class_id"]
+        val <- val[J(obj$rleid), on = "rleid"]
+    }
+
     # set newly added fields to default value if possible
     set(val, NULL, "defaulted", FALSE)
     val[value_id < 0L, defaulted := TRUE]
@@ -2415,12 +2449,16 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .
     if (!.empty) val <- remove_empty_fields(val)
 
     # remove duplicated objects
+    add_class_name(idd_env, obj)
     if (.unique) {
         obj_val <- remove_duplicated_objects(idd_env, idf_env, obj, val)
         obj <- obj_val$object
         val <- obj_val$value
     }
 
+    # for correctly reporting input rleid
+    set(obj, NULL, "rleid", NULL)
+    setnames(obj, "input_rleid", "rleid")
     # stop if cannot insert objects in specified classes
     assert_can_do(idd_env, idf_env, l$dot, obj, "insert")
 
@@ -3177,7 +3215,7 @@ remove_duplicated_objects <- function (idd_env, idf_env, obj, val) {
     if (length(id_dup)) {
         # give info
         verbose_info(
-            "Duplicated objects in input or objects in input that are the same in current IDF have been removed:\n",
+            "Duplicated objects in input, or objects in input that are the same in current IDF have been removed:\n",
             {
                 del <- obj[J(id_dup), on = "object_id"]
                 setorderv(del, "rleid")

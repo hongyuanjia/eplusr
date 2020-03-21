@@ -30,6 +30,9 @@
 * Internal helper functions `with_option()`, `with_silent()`, `with_speed()`
   and `without_checking()` have been exported. They can be used to evaluate an
   expression with temporary eplusr options (#240).
+* Now `Idf$insert()` can directly take an `Idf` object or a list of `Idf`
+  objects ad input. And also `Version` objects in input will be directly
+  skipped instead of giving an error (#243, #244).
 
 ## Major changes
 
