@@ -104,6 +104,8 @@
 * Fix the bug in `install_eplus()` on Windows (#230)
 * Fix the error in `$<-.Idf` when input list of `IdfObject`s are all from the
   same `Idf` on the LHS (#238).
+* Now `Idf$insert()` and `Idf$load()` can now successfully remove duplicated
+  objects by comparing field values case-insensitively (#243)
 
 # eplusr 0.12.0
 
