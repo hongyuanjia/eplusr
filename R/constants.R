@@ -116,7 +116,8 @@ utils::globalVariables(c(
     "cls", "i.class_name", "i.value_chr", "i.value_id", "i.value_num", "pointer",
     "src_object_name", "i.field_id", "i.field_index", "i.object_name",
     "i.src_object_id", "i.src_value_chr", "i.src_value_id", "i.src_value_num",
-    "is_resource", "merged", "object_id_dup", "removed"
+    "is_resource", "merged", "object_id_dup", "removed", "src_type_enum",
+    "src_value_num"
 ))
 # }}}
 # nocov end
