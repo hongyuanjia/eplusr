@@ -284,7 +284,8 @@ test_that("Idf class", {
     expect_equal(idf_full$Material_NoMass$R13LAYER$value(simplify = TRUE),
         c("R13LAYER", "Rough", "2.290965", "0.9", "0.75", "0.75")
     )
-    expect_error(idf$insert(idf_full$Version), class = "error_insert_version")
+    # can skip Version object
+    expect_silent(idf$insert(idf_full$Version))
     expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), class = "error_validity")
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER))
     expect_null(idf$insert(idf$Material_NoMass$R13LAYER, idf$Material_NoMass$R13LAYER))
@@ -297,7 +298,7 @@ test_that("Idf class", {
     expect_equal(idf1$object_id()$ScheduleTypeLimits, 2L)
     # can directly insert an Idf
     expect_silent(idf1$insert(idf2))
-    expect_equal(idf1$object_id(), list(Version = 1L))
+    expect_equal(idf1$object_id(), list(Version = 1L, ScheduleTypeLimits = 2L))
     # }}}
 
     # DELETE {{{
