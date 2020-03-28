@@ -20,7 +20,7 @@ Depends:
     R (>= 3.2.0)
 Imports:
     callr (>= 2.0.4),
-    cli,
+    cli (>= 1.1.0),
     crayon,
     data.table (>= 1.9.8),
     lubridate,
