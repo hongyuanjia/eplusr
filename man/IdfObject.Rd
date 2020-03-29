@@ -2077,7 +2077,7 @@ mat$to_string(leading = 0)
 \subsection{Method \code{print()}}{
 Print \code{IdfObject} object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{IdfObject$print(comment = TRUE, auto_sep = TRUE, brief = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{IdfObject$print(comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -2090,6 +2090,9 @@ the largest character length of values. Default: \code{FALSE}.}
 
 \item{\code{brief}}{If \code{TRUE}, only OBJECT part is printed. Default:
 \code{FALSE}.}
+
+\item{\code{all}}{If \code{TRUE}, all fields defined in \link{Idd} are printed even
+they do not exist in current object. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }

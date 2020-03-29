@@ -487,10 +487,10 @@ wday <- function (x, label = FALSE) {
 # }}}
 
 # str_trunc {{{
-str_trunc <- function (x, width = getOption("width", 60L)) {
+str_trunc <- function (x, width = cli::console_width()) {
     # in case invalid UTF-8 character in IDF
     x <- stringi::stri_encode(x)
-    tr <- nchar(x, "width") > (0.95 * width)
+    tr <- nchar(crayon::strip_style(x), "width") > (0.95 * width)
     x[tr] <- paste0(stri_sub(x[tr], to = width - 5L), "...")
     x
 }

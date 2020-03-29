@@ -1371,6 +1371,9 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' @param brief If `TRUE`, only OBJECT part is printed. Default:
         #'        `FALSE`.
         #'
+        #' @param all If `TRUE`, all fields defined in [Idd] are printed even
+        #'        they do not exist in current object. Default: `FALSE`.
+        #'
         #' @return The `IdfObject` itself, invisibly.
         #'
         #' @examples
@@ -1383,8 +1386,8 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat$print(auto_sep = TRUE)
         #' }
         #'
-        print = function (comment = TRUE, auto_sep = TRUE, brief = FALSE)
-            idfobj_print(self, private, comment, auto_sep, brief)
+        print = function (comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE)
+            idfobj_print(self, private, comment, auto_sep, brief, all)
         # }}}
         # }}}
     ),
@@ -1877,7 +1880,7 @@ idfobj_to_string <- function (self, private, comment = TRUE, leading = 4L, sep_a
 }
 # }}}
 # idfobj_print {{{
-idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief = FALSE) {
+idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief = FALSE, all = FALSE) {
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = private$m_object_id)
 
     if (is.na(obj$object_name)) {
@@ -1890,7 +1893,7 @@ idfobj_print <- function (self, private, comment = TRUE, auto_sep = FALSE, brief
 
     if (brief) return(invisible(self))
 
-    val <- get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id)
+    val <- get_idf_value(private$idd_env(), private$idf_env(), object = private$m_object_id, all = all)
 
     # comment
     if (comment && !is.null(obj$comment[[1L]])) {
@@ -1982,9 +1985,9 @@ str.IdfObject <- function (object, ...) {
 
 #' @export
 # print.IdfObject {{{
-print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, ...) {
+print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, all = FALSE, ...) {
     add_idfobj_field_bindings(x, update = TRUE)
-    x$print(comment = comment, auto_sep = auto_sep, brief = brief)
+    x$print(comment = comment, auto_sep = auto_sep, brief = brief, all = all)
 }
 # }}}
 

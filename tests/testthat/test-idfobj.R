@@ -395,5 +395,6 @@ test_that("IdfObject class", {
     # }}}
 
     expect_output(con$print())
+    expect_output(con$print(all = TRUE), "11 :")
 })
 # }}}

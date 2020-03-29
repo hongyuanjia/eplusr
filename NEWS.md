@@ -33,6 +33,9 @@
 * Now `Idf$insert()` can directly take an `Idf` object or a list of `Idf`
   objects as input. And also `Version` objects in input will be directly
   skipped instead of giving an error (#245).
+* A new option `all` has been added in `IdfObject$print()` with default being
+  `FALSE`. If `TRUE`, all fields defined in [Idd] are printed even they do not
+  exist in current object (#247).
 
 ## Major changes
 
