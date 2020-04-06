@@ -165,6 +165,11 @@ test_that("Group methods", {
     expect_equal(nrow(grp$report_data(2, environment_name = "DENVER CENTENNIAL ANN HTG 99.6% CONDNS DB")), 436)
     # }}}
 
+    # S3 {{{
+    expect_true(grp == grp)
+    expect_false(grp != grp)
+    # }}}
+
     skip_on_os("mac")
     # Locate Output {{{
     expect_error(grp$locate_output(suffix = ".sql"))

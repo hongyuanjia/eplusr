@@ -1887,3 +1887,20 @@ str.IddObject <- function (object, brief = FALSE, ...) {
     object$print(brief)
 }
 # }}}
+
+#' @export
+# ==.IddObject {{{
+`==.IddObject` <- function (e1, e2) {
+    if (!is_iddobject(e2)) return(FALSE)
+    identical(
+        ._get_private(._get_private(e1)$m_parent)$m_log$uuid,
+        ._get_private(._get_private(e2)$m_parent)$m_log$uuid
+    ) &&
+    identical(._get_private(e1)$m_class_id, ._get_private(e2)$m_class_id)
+}
+
+#' @export
+`!=.IddObject` <- function (e1, e2) {
+    Negate(`==.IddObject`)(e1, e2)
+}
+# }}}

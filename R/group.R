@@ -60,7 +60,9 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
-            private$m_log$uuid <- vcapply(private$idfs, function (idf) ._get_private(idf)$m_log$uuid)
+            private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+
+            private$m_log$uuid <- unique_id()
         },
         # }}}
 
@@ -159,7 +161,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         #'      simulation. `FALSE` otherwise. `NA` if the job has not been run yet.
         #'   * `successful`: `TRUE` if all simulations ended successfully. `FALSE` if
         #'     there is any simulation failed. `NA` if the job has not been run yet.
-        #'   * `changed_after`: `TRUE` if the *seed model* has been modified since last
+        #'   * `changed_after`: `TRUE` if the models has been modified since last
         #'      simulation. `FALSE` otherwise.
         #'   * `job_status`: A [data.table::data.table()] contains meta data
         #'     for each simulation job. For details, please see [run_multi()]. If the
@@ -780,15 +782,17 @@ group_job <- function (idfs, epws) {
 epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     # check if generated models have been modified outside
     uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
-    if (any(uuid != private$m_log$uuid)) {
+    if (any(uuid != private$m_log$idf_uuid)) {
         warn("warning_param_modified", paste0(
             "Some of the grouped models have been modified. ",
             "Running these models will result in simulation outputs that may be not reproducible. ",
-            paste0(" # ", seq_along(uuid)[uuid != private$m_log$uuid]," | ",
-                names(uuid)[uuid != private$m_log$uuid], collapse = "\n"
+            paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
+                names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
             )
         ))
     }
+
+    log_new_uuid(private$m_log)
 
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
 }
@@ -957,7 +961,13 @@ epgroup_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    if (!identical(private$m_log$seed_uuid, ._get_private(private$m_seed)$m_log$uuid)) {
+    uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    if (any(private$m_log$idf_uuid != uuid)) {
+        status$changed_after <- TRUE
+    }
+
+    # for parametric job
+    if (is_idf(private$m_seed) && !identical(private$m_log$seed_uuid, ._get_private(private$m_seed)$m_log$uuid)) {
         status$changed_after <- TRUE
     }
 
@@ -1438,5 +1448,16 @@ str.EplusGroupJob <- function (object, ...) {
 #' @export
 format.EplusGroupJob <- function (x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
+}
+
+#' @export
+`==.EplusGroupJob` <- function (e1, e2) {
+    if (!inherits(e2, "EplusGroupJob")) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+
+#' @export
+`!=.EplusGroupJob` <- function (e1, e2) {
+    Negate(`==.EplusGroupJob`)(e1, e2)
 }
 # }}}

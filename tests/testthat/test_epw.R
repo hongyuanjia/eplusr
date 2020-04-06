@@ -204,6 +204,12 @@ test_that("Epw class", {
     expect_equal({d <- epw_date(1:2);d[[1]] <- epw_date(3);d}, epw_date(c(3, 2)))
     # }}}
 
+    # can check equality
+    expect_true(epw == epw)
+    expect_false(epw == read_epw(path_epw))
+    expect_false(epw != epw)
+    expect_true(epw != read_epw(path_epw))
+
     # do not test on CRAN
     skip_on_cran()
     # download weather

@@ -778,6 +778,8 @@ job_initialize <- function (self, private, idf, epw) {
 
     # save uuid
     private$m_log$seed_uuid <- ._get_private(private$m_idf)$m_log$uuid
+
+    private$m_log$uuid <- unique_id()
 }
 # }}}
 # job_version {{{
@@ -872,6 +874,8 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     )
 
     if (wait) private$m_log$end_time <- Sys.time()
+
+    log_new_uuid(private$m_log)
     self
 }
 # }}}
@@ -1159,6 +1163,17 @@ str.EplusSql <- function (object, ...) {
 #' @export
 format.EplusSql <- function (x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
+}
+
+#' @export
+`==.EplusJob` <- function (e1, e2) {
+    if (!inherits(e2, "EplusJob")) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+
+#' @export
+`!=.EplusJob` <- function (e1, e2) {
+    Negate(`==.EplusJob`)(e1, e2)
 }
 # }}}
 

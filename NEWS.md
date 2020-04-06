@@ -36,6 +36,11 @@
 * A new option `all` has been added in `IdfObject$print()` with default being
   `FALSE`. If `TRUE`, all fields defined in [Idd] are printed even they do not
   exist in current object (#247).
+* New S3 methods of `==` for all classes are added, i.e. `==.Idf`,
+  `==.IdfObject`, `==.Idd`, `==.IddObject`, `==.Epw`, `==.EplusJob`,
+  `==.EplusSql`, `==.EplusGroupJob`, `==.ParametricJob`. The negate methods are
+  also added. This makes it quite easy to check the equality of R6 objects of
+  these types.
 
 ## Major changes
 

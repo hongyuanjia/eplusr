@@ -237,7 +237,7 @@ append_dt <- function (dt, new_dt, base_col = NULL) {
 # }}}
 # unique_id {{{
 unique_id <- function () {
-    paste0("id-", stri_rand_strings(1, 15L))
+    paste0("id-", stri_rand_strings(1, 15L), "-", as.numeric(Sys.time()))
 }
 # }}}
 
