@@ -75,6 +75,7 @@ Collate:
     'job.R'
     'param.R'
     'rdd.R'
+    'reload.R'
     'run.R'
     'sql.R'
     'transition.R'

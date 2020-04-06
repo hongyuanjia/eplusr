@@ -976,8 +976,15 @@ epgroup_status <- function (self, private) {
             status$alive <- TRUE
         } else {
             status$alive <- FALSE
-            proc$wait()
-            exit_status <- proc$get_exit_status()
+
+            # in waiting mode
+            if (!is.null(proc$exit_status)) {
+                exit_status <- proc$exit_status
+            # in non-waiting mode
+            } else {
+                proc$wait()
+                exit_status <- proc$get_exit_status()
+            }
 
             status$job_status <- tryCatch(proc$get_result(), error = function (e) data.table())
 
