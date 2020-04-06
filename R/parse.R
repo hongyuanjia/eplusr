@@ -125,6 +125,20 @@ parse_idd_file <- function(path) {
     dt_field <- complete_property(dt_field, "field", dt_class)
     dt_class <- complete_property(dt_class, "class", dt_field)
 
+    # ConnectorList references are missing until v9.1
+    # See https://github.com/NREL/EnergyPlus/issues/7172
+    if (idd_version < 9.1) {
+        id_conlst <- dt_class[J("ConnectorList"), on = "class_name", class_id]
+        dt_field[J(id_conlst, c(3L, 5L)), on = c("class_id", "field_index"), `:=`(
+            object_list = list(list("plantconnectors"))
+        )]
+
+        id_con <- dt_class[J(c("Connector:Mixer", "Connector:Splitter")), on = "class_name", class_id]
+        dt_field[J(id_con, c(1L)), on = c("class_id", "field_index"), `:=`(
+            reference = list(list("plantconnectors"))
+        )]
+    }
+
     # extract field reference map
     dt <- parse_field_reference_table(dt_field)
     dt_field <- dt$left
