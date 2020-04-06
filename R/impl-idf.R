@@ -3270,7 +3270,8 @@ get_idf_duplicated_object <- function (idd_env, idf_env, object = NULL, class = 
 get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NULL,
                               depth = NULL, name = FALSE, direction = c("ref_to", "ref_by"),
                               object = NULL, class = NULL, group = NULL,
-                              keep_all = FALSE, class_ref = c("both", "none", "all")) {
+                              keep_all = FALSE, class_ref = c("both", "none", "all"),
+                              match_all = FALSE) {
     assert(is.null(depth) || is_count(depth, TRUE))
     if (is.null(depth)) depth <- Inf
     direction <- match.arg(direction)
@@ -3361,11 +3362,15 @@ get_idf_relation <- function (idd_env, idf_env, object_id = NULL, value_id = NUL
     if (!is.null(object)) {
         obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
     }
-    if (depth == 0L && length(obj_id)) {
+    if (depth == 0L && !is.null(obj_id)) {
         cur_ref <- cur_ref[J(obj_id), on = col_ref, nomatch = 0L]
     }
 
-    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, obj_id, both = both)
+    # no matched objects found for specified classes or groups
+    if (!is.null(obj_id) && !length(obj_id)) all_ref <- all_ref[0L]
+
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref,
+        col_rev, obj_id, both = both, match_all = match_all)
 
     # remove redundant columns
     if (both) set(ref, NULL, c("field_id", "src_field_id"), NULL)

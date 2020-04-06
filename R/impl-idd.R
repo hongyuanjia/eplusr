@@ -434,7 +434,9 @@ clean_field_property <- function (dt, property) {
 
 # REFERENCES
 # get_recursive_relation {{{
-get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_ref, col_rev, include = NULL, both = FALSE) {
+get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep,
+                                    col_ref, col_rev, include = NULL,
+                                    both = FALSE, match_all = FALSE) {
     if (both) {
         if (substring(col_ref, 1, 3) == "src") {
             col_fld <- "src_field_id"
@@ -477,10 +479,16 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
     cur_ref <- init_ref
     while (dep < max_dep && nrow(cur_ref)) {
         # skip if specified classes/objects are matched
-        if (length(include)) {
+        if (!match_all && !is.null(include)) {
             skip <- cur_ref[J(include), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
             if (length(skip)) {
                 cur_ref <- cur_ref[!J(skip), on = col_rev]
+
+                # should also remove all unmatched in the init match
+                if (dep == 0L) {
+                    exclu <- ref[J(skip), on = col_rev][!J(include), on = col_ref]
+                    ref <- ref[!exclu, on = c(col_rev, col_ref)]
+                }
             }
         }
         # if all are matched, stop
@@ -512,7 +520,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
 
         # get classes that do not going any deeper
         # those classes should be removed
-        if (length(include)) {
+        if (!is.null(include)) {
             del <- c(del,
                 list(setattr(setdiff(cur_ref[[col_ref]], c(include, new_ref[[col_rev]])), "dep", dep))
             )
@@ -533,7 +541,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep, col_re
 
     # should search backwards to only include paths related to specified
     # classes/objects
-    if (length(include) && nrow(ref)) ref <- del_recursive_relation(ref, del, include, col_ref, col_rev)
+    if (!is.null(include) && nrow(ref)) ref <- del_recursive_relation(ref, del, include, col_ref, col_rev)
 
     ref
 }
@@ -596,7 +604,7 @@ combine_input_and_relation <- function (input, ref, type, direction) {
 # }}}
 # get_idd_relation {{{
 get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, direction = c("ref_to", "ref_by"),
-                              class = NULL, group = NULL, depth = 0L, name = FALSE, keep_all = FALSE) {
+                              class = NULL, group = NULL, depth = 0L, name = FALSE, keep_all = FALSE, match_all = FALSE) {
     direction <- match.arg(direction)
     assert(is.null(depth) || is_count(depth, TRUE))
     if (is.null(depth)) depth <- Inf
@@ -661,7 +669,7 @@ get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, directi
     }
 
     # get recursive relation
-    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, cls_id)
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, cls_id, match_all = match_all)
 
     # keep all input
     if (keep_all) ref <- combine_input_and_relation(fld, ref, "idd", direction)
@@ -698,13 +706,11 @@ add_idd_relation_format_cols <- function (idd_env, ref) {
 
 # add_class_id {{{
 add_class_id <- function (idd_env, dt) {
-    if (has_name(dt, "class_id")) return(dt)
     add_joined_cols(idd_env$class, dt, "class_name", "class_id")
 }
 # }}}
 # add_class_name {{{
 add_class_name <- function (idd_env, dt) {
-    if (has_name(dt, "class_name")) return(dt)
     add_joined_cols(idd_env$class, dt, "class_id", "class_name")
 }
 # }}}
