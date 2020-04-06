@@ -40,7 +40,7 @@
   `==.IdfObject`, `==.Idd`, `==.IddObject`, `==.Epw`, `==.EplusJob`,
   `==.EplusSql`, `==.EplusGroupJob`, `==.ParametricJob`. The negate methods are
   also added. This makes it quite easy to check the equality of R6 objects of
-  these types.
+  these types (#250).
 
 ## Major changes
 
