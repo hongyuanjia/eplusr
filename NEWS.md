@@ -40,7 +40,7 @@
   `==.IdfObject`, `==.Idd`, `==.IddObject`, `==.Epw`, `==.EplusJob`,
   `==.EplusSql`, `==.EplusGroupJob`, `==.ParametricJob`. The negate methods are
   also added. This makes it quite easy to check the equality of R6 objects of
-  these types.
+  these types (#250).
 * A new Generic function `reload()` is added. eplusr relies heavily on the
   `data.table` package. The core data of all main
   classes in eplusr are saved as `data.table`s. This introduces
