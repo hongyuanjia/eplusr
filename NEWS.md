@@ -41,6 +41,16 @@
   `==.EplusSql`, `==.EplusGroupJob`, `==.ParametricJob`. The negate methods are
   also added. This makes it quite easy to check the equality of R6 objects of
   these types (#250).
+* A new Generic function `reload()` is added. eplusr relies heavily on the
+  `data.table` package. The core data of all main
+  classes in eplusr are saved as `data.table`s. This introduces
+  a problem when loading saved `Idf` objects or other class objects via an
+  `*.RDS` and `*.RData` file on disk: the stored `data.table`s lose
+  their column over-allocation. `reload()` is a helper function that calls
+  `data.table::setDT()` on all internal `data.table`s to make
+  sure they are initialized properly. It is recommended to call `reload()` on
+  each `Idd`, `Idf` and other class object in eplusr loaded with `readRDS()` or
+  `load()`, to make sure all eplusr's functionaries works properly (#251).
 
 ## Major changes
 

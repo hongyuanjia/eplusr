@@ -940,8 +940,16 @@ job_status <- function (self, private) {
         status$alive <- TRUE
     } else {
         status$alive <- FALSE
-        proc$process$wait()
-        exit_status <- proc$process$get_exit_status()
+
+        # in waiting mode
+        if (!is.null(proc$exit_status)) {
+            exit_status <- proc$exit_status
+        # in non-waiting mode
+        } else {
+            proc$process$wait()
+            exit_status <- proc$process$get_exit_status()
+        }
+
         if (!is.na(exit_status) && exit_status == 0L) {
             status$successful <- TRUE
         } else {

@@ -95,6 +95,7 @@ reference:
       - dt_to_load
       - rdd_to_load
       - mdd_to_load
+      - reload
   - title: Assertion
     desc: Check Types
     contents:
