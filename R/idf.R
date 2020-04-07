@@ -3849,6 +3849,21 @@ str.Idf <- function (object, zoom = "class", ...) {
 }
 # }}}
 
+#' @export
+# ==.Idf {{{
+`==.Idf` <- function (e1, e2) {
+    if (!is_idf(e2)) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+# }}}
+
+#' @export
+# !=.Idf {{{
+`!=.Idf` <- function (e1, e2) {
+    Negate(`==.Idf`)(e1, e2)
+}
+# }}}
+
 #' Format an Idf Object
 #'
 #' Format an [Idf] object.

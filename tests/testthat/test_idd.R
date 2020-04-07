@@ -153,5 +153,11 @@ test_that("Idd class", {
 
     expect_is(idd$object("TestSlash"), "IddObject")
     expect_is(idd$objects_in_group("TestGroup1")[[1L]], "IddObject")
+
+    # can check equality
+    expect_false(idd == "a")
+    expect_true(idd == idd)
+    expect_true(idd != "a")
+    expect_false(idd != idd)
 })
 # }}}

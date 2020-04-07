@@ -428,7 +428,7 @@ otherwise.
 simulation. \code{FALSE} otherwise. \code{NA} if the job has not been run yet.
 \item \code{successful}: \code{TRUE} if all simulations ended successfully. \code{FALSE} if
 there is any simulation failed. \code{NA} if the job has not been run yet.
-\item \code{changed_after}: \code{TRUE} if the \emph{seed model} has been modified since last
+\item \code{changed_after}: \code{TRUE} if the models has been modified since last
 simulation. \code{FALSE} otherwise.
 \item \code{job_status}: A \code{\link[data.table:data.table]{data.table::data.table()}} contains meta data
 for each simulation job. For details, please see \code{\link[=run_multi]{run_multi()}}. If the

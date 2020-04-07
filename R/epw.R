@@ -1644,6 +1644,17 @@ str.Epw <- function (object, ...) {
 format.Epw <- function (x, ...) {
     paste0(utils::capture.output(x$print()), collapse = "\n")
 }
+
+#' @export
+`==.Epw` <- function (e1, e2) {
+    if (!is_epw(e2)) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+
+#' @export
+`!=.Epw` <- function (e1, e2) {
+    Negate(`==.Epw`)(e1, e2)
+}
 # }}}
 
 #' Download EnergyPlus Weather File (EPW) and Design Day File (DDY)

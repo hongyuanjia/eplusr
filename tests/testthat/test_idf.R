@@ -785,6 +785,12 @@ test_that("Idf class", {
     idf_1 <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
     idf_2 <- read_idf(idf_1$path())
     expect_silent(without_checking(idf_1$BuildingSurface_Detailed <- idf_2$BuildingSurface_Detailed))
+
+    # can check equality
+    expect_true(idf_1 == idf_1)
+    expect_false(idf_1 == idf_2)
+    expect_false(idf_1 != idf_1)
+    expect_true(idf_1 != idf_2)
     # }}}
 
     # CLONE {{{
@@ -795,9 +801,14 @@ test_that("Idf class", {
     expect_equal(idf2$Zone[[1]]$Name, "ZONE ONE")
     # }}}
 
-    # $last_job()
-    expect_null(idf$last_job())
+    # $last_job() {{{
+    tmp <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    expect_null(tmp$last_job())
+    expect_is({tmp$run(NULL, tempdir()); tmp$last_job()}, "EplusJob")
+    # }}}
 
+    # OBJECT_UNIQUE {{{
+    # can stop if multiple objects in unique class found
     expect_silent(
         idf <- with_option(
             list(validate_level = "none", verbose_info = FALSE),
@@ -809,6 +820,7 @@ test_that("Idf class", {
         )
     )
     expect_error(idf$object_unique("Building"), class = "error_idf_dup_unique_class")
+    # }}}
 })
 # }}}
 

@@ -65,6 +65,8 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
 
             # save uuid
             private$m_log$seed_uuid <- ._get_private(private$m_seed)$m_log$uuid
+
+            private$m_log$uuid <- unique_id()
         },
         # }}}
 
@@ -446,7 +448,8 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     private$m_idfs <- out
 
     # log unique ids
-    private$m_log$uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    log_new_uuid(private$m_log)
 
     if (eplusr_option("verbose_info")) {
         if (bare) {
@@ -471,20 +474,21 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 
     # check if generated models have been modified outside
     uuid <- vapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid, character(1))
-    if (any(uuid != private$m_log$uuid)) {
+    if (any(uuid != private$m_log$idf_uuid)) {
         warn("warning_param_modified",
             paste0(
                 "Some of the parametric models have been modified after created using `$apply_measure()`. ",
                 "Running these models will result in simulation outputs that may be not reproducible. ",
                 "It is recommended to re-apply your original measure using `$apply_measure()` and call `$run()` again. ",
                 "Models that have been modified are listed below:\n",
-                paste0(" # ", seq_along(uuid)[uuid != private$m_log$uuid]," | ",
-                    names(uuid)[uuid != private$m_log$uuid], collapse = "\n"
+                paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
+                    names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
                 )
             )
         )
     }
 
+    log_new_uuid(private$m_log)
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
 }
 # }}}
@@ -572,3 +576,14 @@ param_print <- function (self, private) {
     epgroup_print_status(self, private, epw = FALSE)
 }
 # }}}
+
+#' @export
+`==.ParametricJob` <- function (e1, e2) {
+    if (!inherits(e2, "ParametricJob")) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+
+#' @export
+`!=.ParametricJob` <- function (e1, e2) {
+    Negate(`==.ParametricJob`)(e1, e2)
+}

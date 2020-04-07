@@ -245,6 +245,11 @@ test_that("IddObject class", {
     )
     # }}}
 
+    # can check equality
+    expect_true(slash == slash)
+    expect_false(slash == IddObject$new("TestSlash", idd))
+    expect_true(slash != IddObject$new("TestSlash", idd))
+
     # print
     expect_output(slash$print())
 })

@@ -251,6 +251,11 @@ test_that("Parametric methods", {
     expect_equal(nrow(param$report_data(environment_name = "WINTERDAY")), 1920 * 5)
     # }}}
 
+    # S3 {{{
+    expect_true(param == param)
+    expect_false(param != param)
+    # }}}
+
     skip_on_os("mac")
     # Locate Output {{{
     expect_equal(param$locate_output(suffix = ".sql"),

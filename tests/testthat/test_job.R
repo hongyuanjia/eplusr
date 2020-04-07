@@ -93,6 +93,9 @@ test_that("Job methods", {
     expect_equal(nrow(job$report_data(day_type = "Tuesday")), 3840)
     expect_equal(nrow(job$report_data(environment_name = "WINTERDAY")), 1920)
 
+    expect_true(job == job)
+    expect_false(job != job)
+
     skip_on_os("mac")
     # can get path
     expect_equal(job$path(), c(idf = example$idf, epw = example$epw))

@@ -2109,3 +2109,22 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
     }
 }
 # }}}
+
+#' @export
+# ==.IdfObject {{{
+`==.IdfObject` <- function (e1, e2) {
+    if (!is_idfobject(e2)) return(FALSE)
+    identical(
+        ._get_private(._get_private(e1)$m_parent)$m_log$uuid,
+        ._get_private(._get_private(e2)$m_parent)$m_log$uuid
+    ) &&
+    identical(._get_private(e1)$m_object_id, ._get_private(e2)$m_object_id)
+}
+# }}}
+
+#' @export
+# !=.IdfObject {{{
+`!=.IdfObject` <- function (e1, e2) {
+    Negate(`==.IdfObject`)(e1, e2)
+}
+# }}}

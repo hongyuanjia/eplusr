@@ -88,7 +88,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         initialize = function (path) {
             # add a uuid
-            private$m_uuid <- unique_id()
+            private$m_log$uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
             private$m_version <- idd_file$version
@@ -681,10 +681,10 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
 
     private = list(
         # PRIVATE FIELDS {{{
-        m_uuid = NULL,
         m_version = NULL,
         m_build = NULL,
-        m_idd_env = NULL
+        m_idd_env = NULL,
+        m_log = NULL
         # }}}
     )
 )
@@ -954,6 +954,21 @@ format.Idd <- function (x, ...) {
         ),
         collapse = "\n"
     )
+}
+# }}}
+
+#' @export
+# ==.Idd {{{
+`==.Idd` <- function (e1, e2) {
+    if (!is_idd(e2)) return(FALSE)
+    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+}
+# }}}
+
+#' @export
+# !=.Idd {{{
+`!=.Idd` <- function (e1, e2) {
+    Negate(`==.Idd`)(e1, e2)
 }
 # }}}
 
