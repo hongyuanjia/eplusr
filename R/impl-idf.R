@@ -1297,12 +1297,6 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
 }
 # }}}
 
-# get_idf_value_all_node {{{
-get_idf_value_all_node <- function (idf_env) {
-    idf_env$value[type_enum == IDDFIELD_TYPE$node & !is.na(value_chr), unique(value_chr)]
-}
-# }}}
-
 # ASSERT
 # FOR BACK COMPATIBILITY
 # SHOULD BE REMOVED IN NEXT RELEASE
@@ -1748,7 +1742,7 @@ add_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .all = FALSE
     setorderv(val, c("rleid", "field_index"))
 
     # assign default values if needed
-    if (.default) val <- assign_default_value(val)
+    if (.default) val <- assign_default_value(idd_env, idf_env, val)
     set(val, NULL, c("default_chr", "default_num"), NULL)
 
     # assign new value id
@@ -1826,7 +1820,7 @@ set_idf_object <- function (idd_env, idf_env, ..., .default = TRUE, .empty = FAL
 
     # assign default values if needed
     if (.default) {
-        val <- assign_default_value(val)
+        val <- assign_default_value(idd_env, idf_env, val)
     } else {
         # remove
         val[defaulted == TRUE, `:=`(value_chr = NA_character_, value_num = NA_real_)]
@@ -2436,7 +2430,7 @@ insert_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .
     # set newly added fields to default value if possible
     set(val, NULL, "defaulted", FALSE)
     val[value_id < 0L, defaulted := TRUE]
-    val <- assign_default_value(val)
+    val <- assign_default_value(idd_env, idf_env, val)
 
     # update object id
     obj <- assign_new_id(idf_env, obj, "object")
@@ -2525,7 +2519,7 @@ paste_idf_object <- function (idd_env, idf_env, version, in_ip = FALSE, unique =
     if (default) {
         parsed$value[is.na(value_chr), defaulted := TRUE]
         add_field_property(idd_env, parsed$value, c("default_chr", "default_num", "units", "ip_units"))
-        parsed$value <- assign_default_value(parsed$value)
+        parsed$value <- assign_default_value(idd_env, idf_env, parsed$value)
     }
 
     # validate
@@ -2675,7 +2669,7 @@ load_idf_object <- function (idd_env, idf_env, version, ..., .unique = TRUE, .de
     obj <- update_object_name(obj, val)
 
     # assign default
-    if (.default) val <- assign_default_value(val)
+    if (.default) val <- assign_default_value(idd_env, idf_env, val)
 
     # remove duplicated objects
     if (.unique) {
@@ -2927,7 +2921,7 @@ update_idf_object <- function (idd_env, idf_env, version, ..., .default = TRUE, 
 
     # assign default values if needed
     if (.default) {
-        val <- assign_default_value(val)
+        val <- assign_default_value(idd_env, idf_env, val)
         set(val, NULL, c("default_chr", "default_num"), NULL)
     } else {
         # remove
@@ -4096,9 +4090,9 @@ correct_obj_id <- function (dt_object, dt_value) {
 }
 # }}}
 # assign_default_value {{{
-assign_default_value <- function (dt_value) {
+assign_default_value <- function (idd_env, idf_env, dt_value) {
     if (in_ip_mode()) {
-        dt_value <- field_default_to_unit(dt_value, "si", "ip")
+        dt_value <- field_default_to_unit(idd_env, dt_value, "si", "ip")
     }
     dt_value[defaulted == TRUE, `:=`(value_chr = default_chr, value_num = default_num)]
     dt_value

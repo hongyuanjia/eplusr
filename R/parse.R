@@ -229,7 +229,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     # IP - SI conversion
     from <- if(options$view_in_ip) "ip" else "si"
     to <- if(.options$view_in_ip) "ip" else "si"
-    dt_value <- convert_value_unit(dt_value, from, to)
+    dt_value <- convert_value_unit(idd_env, dt_value, from, to)
 
     # value reference map
     if (ref) {
@@ -1427,12 +1427,20 @@ update_object_name <- function (dt_object, dt_value) {
 # }}}
 
 # convert_value_unit {{{
-convert_value_unit <- function (dt_value, from, to, type = "value") {
+convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
     from <- match.arg(from, c("si", "ip"))
     to <- match.arg(to, c("si", "ip"))
 
     if (identical(from, to)) return(dt_value)
 
+    if (!has_name(dt_value, "units")) {
+        add_field_property(idd_env, dt_value, "units")
+        on.exit(set(dt_value, NULL, "units", NULL), add = TRUE)
+    }
+    if (!has_name(dt_value, "ip_units")) {
+        add_field_property(idd_env, dt_value, "ip_units")
+        on.exit(set(dt_value, NULL, "ip_units", NULL), add = TRUE)
+    }
     val <- dt_value[!is.na(value_num) & !is.na(units), list(value_id, value_num, units, ip_units)]
 
     if (!nrow(val)) return(dt_value)

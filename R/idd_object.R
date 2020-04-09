@@ -1599,7 +1599,7 @@ iddobj_field_default <- function (self, private, which = NULL, in_ip = eplusr_op
         c("default_chr", "default_num", "units", "ip_units", "type_enum")
     )
 
-    if (in_ip) fld <- field_default_to_unit(fld, "si", "ip")
+    if (in_ip) fld <- field_default_to_unit(private$idd_env(), fld, "si", "ip")
 
     setnames(fld, c("default_chr", "default_num"), c("value_chr", "value_num"))
     get_value_list(fld)

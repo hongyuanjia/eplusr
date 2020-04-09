@@ -1505,7 +1505,7 @@ idf_object <- function (parent, object = NULL, class = NULL) {
         )
 
         # assign default values
-        val <- assign_default_value(val)
+        val <- assign_default_value(idd_env, idf_env, val)
 
         # validate
         assert_valid(idd_env, idf_env, obj, val, action = "add")
@@ -1795,8 +1795,6 @@ idfobj_ref_to_node <- function (self, private, which = NULL, object = NULL, clas
         return(invisible())
     } else {
         rel <- rel[, list(object_id = unique(object_id)), by = "src_object_id"]
-        verbose_info("Target object has node(s) referring to ", nrow(rel), " object(s) [ID:",
-            collapse(rel$object_id), "].\n")
         res <- apply2(
             rel$object_id,
             private$idf_env()$object[J(rel$object_id), on = "object_id", class_id],

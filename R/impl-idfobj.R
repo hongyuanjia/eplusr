@@ -177,7 +177,7 @@ get_idfobj_possible <- function (idd_env, idf_env, object, field,
         setnames(val, c("value_id", "value_chr", "value_num"),
             c("ori_value_id", "ori_value_chr", "ori_value_num"))
 
-        val <- field_default_to_unit(val, "si", if (in_ip_mode()) "ip" else "si")
+        val <- field_default_to_unit(idd_env, val, "si", if (in_ip_mode()) "ip" else "si")
         setnames(val, c("default_chr", "default_num"), c("value_chr", "value_num"))
         # make sure default is a list
         if (nrow(val) == 1L) {

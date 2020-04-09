@@ -745,13 +745,27 @@ add_field_property <- function (idd_env, dt, property) {
 # }}}
 
 # field_default_to_unit {{{
-field_default_to_unit <- function (dt_field, from, to) {
+field_default_to_unit <- function (idd_env, dt_field, from, to) {
+    if (has_name(dt_field, "value_id")) {
+        value_id <- dt_field$value_id
+    } else {
+        value_id <- NULL
+    }
     set(dt_field, NULL, "value_id", seq_along(dt_field$field_id))
+
+    if (!has_name(dt_field, "default_chr")) {
+        add_field_property(idd_env, dt_field, "default_chr")
+    }
+
+    if (!has_name(dt_field, "default_num")) {
+        add_field_property(idd_env, dt_field, "default_num")
+    }
+
     setnames(dt_field, c("default_chr", "default_num"), c("value_chr", "value_num"))
 
-    dt_field <- convert_value_unit(dt_field, from, to)
+    dt_field <- convert_value_unit(idd_env, dt_field, from, to)
 
-    set(dt_field, NULL, "value_id", NULL)
+    set(dt_field, NULL, "value_id", value_id)
     setnames(dt_field, c("value_chr", "value_num"), c("default_chr", "default_num"))
     dt_field
 }

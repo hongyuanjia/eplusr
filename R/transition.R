@@ -2911,7 +2911,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
             )
             set(val, NULL, "defaulted", TRUE)
             # assign default values
-            val <- assign_default_value(val)
+            val <- assign_default_value(priv$idd_env(), priv$idf_env(), val)
 
             # assign old object id
             val[obj, on = "rleid", object_id := i.object_id]

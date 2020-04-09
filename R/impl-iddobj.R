@@ -54,7 +54,7 @@ get_iddobj_possible <- function (idd_env, class_id, field_id = NULL) {
     fld[J(TRUE), on = "autocalculatable", `:=`(auto = "Autocalculate")]
 
     # default
-    fld <- field_default_to_unit(fld, "si", if (in_ip_mode()) "ip" else "si")
+    fld <- field_default_to_unit(idd_env, fld, "si", if (in_ip_mode()) "ip" else "si")
     setnames(fld, c("default_chr", "default_num"), c("value_chr", "value_num"))
     # make sure default is a list
     if (nrow(fld) == 1L) {
