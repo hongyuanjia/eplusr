@@ -91,7 +91,7 @@ get_value_list <- function (dt_value, unit = FALSE) {
         if (any(u)) {
             col <- paste0(prefix, "_standard_name")
 
-            unit <- UNIT_CONV_TABLE[J(dt_value[[input]][u]), on = c(paste0(prefix, "_name")),
+            unit <- FIELD_UNIT_TABLE[J(dt_value[[input]][u]), on = c(paste0(prefix, "_name")),
                 mult = "first", .SD, .SDcols = c(col)]
 
             res[u] <- apply2(res[u], unit[[col]], function (val, unit) {

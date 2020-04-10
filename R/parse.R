@@ -978,7 +978,7 @@ parse_field_property_name <- function (dt) {
     ]
 
     # fill missing ip units
-    unit_dt <- UNIT_CONV_TABLE[UNIT_CONV_TABLE[, .I[1], by = si_name]$V1,
+    unit_dt <- FIELD_UNIT_TABLE[FIELD_UNIT_TABLE[, .I[1], by = si_name]$V1,
         .SD, .SDcols = c("si_name", "ip_name")
     ]
     dt <- unit_dt[dt, on = list(si_name = units)][is.na(ip_units), `:=`(ip_units = ip_name)]
@@ -1445,7 +1445,7 @@ convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
 
     if (!nrow(val)) return(dt_value)
 
-    val <- UNIT_CONV_TABLE[val, on = c(si_name = "units", ip_name = "ip_units")]
+    val <- FIELD_UNIT_TABLE[val, on = c(si_name = "units", ip_name = "ip_units")]
     set(val, NULL, c("si_name", "ip_name"), NULL)
     setnames(val, c("si_standard_name", "ip_standard_name"), c("si", "ip"))
 
