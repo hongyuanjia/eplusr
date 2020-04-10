@@ -14,7 +14,7 @@ NULL
 # collapse {{{
 collapse <- function (x, out = "'", or = FALSE) {
     if (is.null(out)) {
-        s <- x
+        s <- as.character(x)
     } else {
         out <- as.character(out)
         if (is_scalar(out)) {
@@ -26,7 +26,9 @@ collapse <- function (x, out = "'", or = FALSE) {
 
     b <- paste0(s[-length(s)], collapse = ", ")
     e <- s[length(s)]
-    if (or) {
+    if (is.null(or)) {
+        paste0(b, ", ", e)
+    } else if (or) {
         paste0(b, " or ", e)
     } else {
         paste0(b, " and ", e)
@@ -36,7 +38,7 @@ collapse <- function (x, out = "'", or = FALSE) {
 
 # surround {{{
 surround <- function (x, out = "'") {
-    if (is.null(out)) return(x)
+    if (is.null(out)) return(as.character(x))
     out <- as.character(out)
     if (is_scalar(out)) {
         out <- c(out, out)
@@ -73,40 +75,11 @@ lpad <- function(x, char = " ", width = NULL) {
 }
 # }}}
 
-# clone_generator {{{
-clone_generator <- function (x) {
-    # create a new environment with the R6:::capsule environment being its
-    # parent
-    new <- new.env(parent = parent.env(x))
-
-    # set enclosing environments of all generator funs to the new environment
-    new_funs <- lapply(as.list.environment(x, all.names = TRUE), function(x) {
-        if (is.function(x)) environment(x) <- new
-        x
-    })
-
-    # add generator funs to the new environment
-    list2env(new_funs, new)
-    # set self ref
-    new$self <- new
-
-    # add attributes
-    class(new) <- "R6ClassGenerator"
-    attr(new, "name") <- paste0(deparse(substitute(x)), "_generator")
-
-    new
-}
-# }}}
-
 # read_lines {{{
 read_lines <- function(input, trim = TRUE, ...) {
     dt <- tryCatch(
         fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
-        error = function (e) {
-            abort("error_read_file",
-                paste0("Failed to read input file. ", conditionMessage(e))
-            )
-        }
+        error = function (e) stop("Failed to read input file. ", conditionMessage(e))
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
@@ -142,7 +115,7 @@ write_lines <- function (x, file = "", append = FALSE) {
         assert(has_name(x, "string"))
         fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE, append = append)
     } else {
-        assert(is.character(x))
+        checkmate::assert_character(x)
         fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE, append = append)
     }
 }
@@ -180,26 +153,18 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
     ver[has_trail] <- ver[has_trail, 1L:3L]
 
     # complete patch version to 0 if not exist
-    if (complete && any(!is.na(ver) & is.na(ver[, 3L]))) {
-        ver[!is.na(ver) & is.na(ver[, 3L]), 3L] <- 0L
+    if (complete && any(!is.na(ver) & suppressWarnings(is.na(ver[, 3L])))) {
+        ver[!is.na(ver) & suppressWarnings(is.na(ver[, 3L])), 3L] <- 0L
     }
 
-    ver
-}
-# }}}
-
-# complete_patch_ver {{{
-complete_patch_ver <- function (ver) {
-    if (any(!is.na(ver) & is.na(ver[, 3L]))) {
-        ver[!is.na(ver) & is.na(ver[, 3L]), 3L] <- 0L
-    }
     ver
 }
 # }}}
 
 # match_minor_ver {{{
 match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = TRUE) {
-    assert(is_scalar(ver))
+    checkmate::assert_class(ver, "numeric_version")
+    checkmate::assert_vector(ver, len = 1L)
     if (!length(all_ver)) return(numeric_version(NA, strict = FALSE))
     all_ver <- unique(all_ver)
     ori_ver <- ver
@@ -230,12 +195,6 @@ match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = T
 }
 # }}}
 
-# is_normal_list {{{
-is_normal_list <- function (x) {
-    is.list(x) && vec_depth(x) == 2L && all(vapply(x, not_empty, logical(1)))
-}
-# }}}
-
 # vec_depth {{{
 vec_depth <- function (x) {
     if (is.null(x)) {
@@ -246,7 +205,7 @@ vec_depth <- function (x) {
         depths <- vapply(x, vec_depth, integer(1))
         1L + max(depths, 0L)
     } else {
-        stop("`x` must be a vector")
+        stop("'x' must be a vector")
     }
 }
 # }}}
@@ -380,7 +339,7 @@ names2 <- function (x, default = NA_character_) {
 
 # each_length {{{
 each_length <- function (x) {
-    vapply(x, length, integer(1L))
+    viapply(x, length)
 }
 # }}}
 
@@ -398,9 +357,6 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
         "class", c("Range", "list")
     )
 }
-# as_Range.character <- function (x) {
-# "([\\(\\[])\\s*(\\d+)\\s*,\\s*(\\d+|Inf)\\s*([\\)\\]])"
-# }
 # }}}
 
 # append_dt {{{
@@ -416,20 +372,11 @@ append_dt <- function (dt, new_dt, base_col = NULL) {
 # }}}
 
 # unique_id {{{
+# nocov start
 unique_id <- function () {
-    paste0("id-", stri_rand_strings(1, 15L))
+    paste0("id-", stri_rand_strings(1, 15L), "-", Sys.time())
 }
-# }}}
-
-# as_integer {{{
-as_integer <- function (x) {
-    x <- as.double(x)
-    if (any(x[!is.na(x)] != trunc(x[!is.na(x)]))) {
-        x[!is.na(x) & x != trunc(x)] <- NA_integer_
-        warning("NAs introduced by coercion")
-    }
-    x
-}
+# nocov end
 # }}}
 
 # fmt_* {{{
@@ -443,50 +390,8 @@ wday <- function (x, label = FALSE) {
 }
 # }}}
 
-# .deprecated_fun {{{
-# adopted from tidyverse/lubridate/R/deprecated.R
-.deprecated_fun <- function(name, replacement, class = NULL, version) {
-    class <- if (is.null(class)) "" else paste0(" in ", class, " class")
-    msg <- paste0(sprintf("`%s` is deprecated%s in eplusr version `%s`. Please use `%s` instead.",
-        name, class, version, replacement)
-    )
-    .deprecated(msg, version)
-}
-# }}}
-
-# .deprecated_arg {{{
-.deprecated_arg <- function(arg, version, class = NULL, n_call = 1) {
-    name <- paste0(as.character(sys.call(-n_call)[[1]]), "()")
-    if (!is.null(class)) {
-        name <- sub(".*?_", "$", name)
-        cls <- paste0(" in class '", class, "'")
-    } else {
-        cls <- ""
-    }
-    mes <- sprintf("Parameter `%s` of `%s`%s has been deprecated in eplusr version %s.",
-        arg, name, cls, version)
-    .deprecated(mes, version)
-}
-# }}}
-
-# .deprecated {{{
-.deprecated <- function(msg, version) {
-    v <- as.package_version(version)
-    cv <- utils::packageVersion("eplusr")
-
-    # If current major number is greater than last-good major number, or if
-    # current minor number is more than 2 greater than last-good minor number,
-    # give error.
-    if (cv[[1, 1]] > v[[1, 1]]  ||  cv[[1, 2]] > v[[1, 2]] + 2) {
-        abort("error_eplusr_deprecated", msg)
-    } else {
-        warn("warning_eplusr_deprecated", msg)
-    }
-    invisible()
-}
-# }}}
-
 # str_trunc {{{
+#' @importFrom cli console_width
 str_trunc <- function (x, width = cli::console_width()) {
     # in case invalid UTF-8 character in IDF
     x <- stringi::stri_encode(x)

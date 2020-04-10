@@ -39,7 +39,7 @@ Suggests:
     rgl,
     rmarkdown,
     testthat
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 Encoding: UTF-8
 LazyData: true
