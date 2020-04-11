@@ -17,7 +17,7 @@ collapse <- function (x, out = "'", or = FALSE) {
         s <- as.character(x)
     } else {
         out <- as.character(out)
-        if (is_scalar(out)) {
+        if (length(out) == 1L) {
             out <- c(out, out)
         }
         s <- paste0(out[1L], x, out[2L])
@@ -40,7 +40,7 @@ collapse <- function (x, out = "'", or = FALSE) {
 surround <- function (x, out = "'") {
     if (is.null(out)) return(as.character(x))
     out <- as.character(out)
-    if (is_scalar(out)) {
+    if (length(out) == 1L) {
         out <- c(out, out)
     }
     paste0(out[1L], x, out[2L])
@@ -110,12 +110,13 @@ read_lines <- function(input, trim = TRUE, ...) {
 # write_lines {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
+#' @importFrom checkmate assert_character assert_names
 write_lines <- function (x, file = "", append = FALSE) {
     if (inherits(x, "data.table")) {
-        assert(has_name(x, "string"))
+        assert_names(names(x), must.include = "string")
         fwrite(x[, list(string)], file = file, col.names = FALSE, quote = FALSE, append = append)
     } else {
-        checkmate::assert_character(x)
+        assert_character(x)
         fwrite(data.table(x), file = file, col.names = FALSE, quote = FALSE, append = append)
     }
 }
@@ -162,6 +163,7 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
 # }}}
 
 # match_minor_ver {{{
+#' @importFrom checkmate assert_class assert_vector
 match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = TRUE) {
     checkmate::assert_class(ver, "numeric_version")
     checkmate::assert_vector(ver, len = 1L)
@@ -344,11 +346,12 @@ each_length <- function (x) {
 # }}}
 
 # ranger {{{
+#' @importFrom checkmate assert_number assert_flag
 ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
-    assert(is_scalar(minimum) && is.numeric(minimum),
-           is_scalar(maximum) && is.numeric(maximum),
-           is_flag(lower_incbounds), is_flag(upper_incbounds)
-    )
+    assert_number(minimum)
+    assert_number(maximum)
+    assert_flag(lower_incbounds)
+    assert_flag(upper_incbounds)
     setattr(
         list(
             minimum = minimum, lower_incbounds = lower_incbounds,
@@ -360,8 +363,9 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
 # }}}
 
 # append_dt {{{
+#' @importFrom checkmate assert_names
 append_dt <- function (dt, new_dt, base_col = NULL) {
-    assert(has_name(new_dt, names(dt)))
+    assert_names(names(new_dt), must.include = names(dt))
 
     if (is.null(base_col)) {
         rbindlist(list(dt, new_dt[, .SD, .SDcols = names(dt)]))

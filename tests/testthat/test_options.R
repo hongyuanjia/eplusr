@@ -1,11 +1,7 @@
 test_that("eplusr_option()", {
-    expect_error(eplusr_option(validate = TRUE), class = "error_not_%in%")
-
-    expect_error(eplusr_option(validate_level = "wrong"))
-
-    expect_error(eplusr_option(view_in_ip = 1), class = "error_not_flag")
-
-    expect_warning(eplusr_option(num_digits = "a"))
+    expect_error(eplusr_option(validate = TRUE), "Must be a subset")
+    expect_error(eplusr_option(validate_level = "wrong"), "Must be element")
+    expect_error(eplusr_option(view_in_ip = 1), "Must be of type")
 
     expect_equal(eplusr_option(validate_level = custom_validate(required_object = TRUE)),
         list(validate_level = custom_validate(required_object = TRUE)))
