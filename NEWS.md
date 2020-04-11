@@ -116,6 +116,9 @@
 
 * `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW
   files, but only validate their existences and store the paths (#215)
+* `run_idf()` and `run_multi()` now return additional element/column called
+* `version` which contain the versions of EnergyPlus that are called during
+  simulations
 
 ## Bug fixes
 
