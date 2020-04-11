@@ -147,7 +147,7 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
         if (any(int)) ver[int] <- paste0(ver[int], ".0")
     }
 
-    ver <- numeric_version(ver, strict = FALSE)
+    if (!test_class(ver, "numeric_version")) ver <- numeric_version(ver, strict = FALSE)
 
     # only keep major.minor.patch, and remove others
     has_trail <- suppressWarnings(!is.na(ver[, 4L]))
@@ -164,7 +164,7 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
 
 # match_minor_ver {{{
 #' @importFrom checkmate assert_class assert_vector
-match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = TRUE) {
+match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), max = TRUE, verbose = TRUE) {
     checkmate::assert_class(ver, "numeric_version")
     checkmate::assert_vector(ver, len = 1L)
     if (!length(all_ver)) return(numeric_version(NA, strict = FALSE))
@@ -180,17 +180,20 @@ match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), verbose = T
     if (!length(ver)) {
         ver <- numeric_version(NA, strict = FALSE)
     } else if (length(ver) > 1L) {
-        if (verbose) {
-            type <- match.arg(type)
-            key <- switch(type, idd = "IDD", eplus = "EnergyPlus")
+        if (max) {
+            ver <- max(ver)
 
-            verbose_info("Multiple versions found for ", key, " v", ori_ver, ": ",
-                collapse(paste0("v", ver)), ". ",
-                "The last patched version v", max(ver), " will be used. ",
-                "Please explicitly give the full version if you want to use the other versions."
-            )
+            if (verbose) {
+                type <- match.arg(type)
+                key <- switch(type, idd = "IDD", eplus = "EnergyPlus")
+
+                verbose_info("Multiple versions found for ", key, " v", ori_ver, ": ",
+                    collapse(paste0("v", ver)), ". ",
+                    "The last patched version v", max(ver), " will be used. ",
+                    "Please explicitly give the full version if you want to use the other versions."
+                )
+            }
         }
-        ver <- max(ver)
     }
 
     ver

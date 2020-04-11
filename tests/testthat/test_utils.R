@@ -40,9 +40,13 @@ test_that("Utility functions", {
 
     expect_error(match_minor_ver(1), "numeric_version")
     expect_error(match_minor_ver(numeric_version(1:2)), "length 1")
+    expect_equal(match_minor_ver(numeric_version("0.0"), NULL), numeric_version(NA, strict = FALSE))
     expect_equal(match_minor_ver(numeric_version("0.0"), ALL_IDD_VER), numeric_version(NA, strict = FALSE))
     expect_equal(match_minor_ver(numeric_version("9.1"), ALL_IDD_VER), numeric_version("9.1.0"))
     expect_equal(match_minor_ver(numeric_version("9.0"), ALL_IDD_VER), numeric_version("9.0.1"))
+    expect_equal(match_minor_ver(numeric_version("9.0"), ALL_EPLUS_VER, max = FALSE, verbose = FALSE),
+        numeric_version(c("9.0.0", "9.0.1")))
+    expect_equal(match_minor_ver(numeric_version("9.0.1"), ALL_EPLUS_VER), numeric_version("9.0.1"))
 
     expect_equal(vec_depth(NULL), 0L)
     expect_equal(vec_depth(character()), 1L)
