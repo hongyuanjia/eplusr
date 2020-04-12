@@ -22,7 +22,7 @@ Imports:
     callr (>= 2.0.4),
     cli (>= 1.1.0),
     crayon,
-    data.table (>= 1.9.8),
+    data.table (>= 1.12.4),
     lubridate,
     methods,
     processx (>= 3.2.0),
@@ -73,6 +73,7 @@ Collate:
     'impl-sql.R'
     'install.R'
     'job.R'
+    'options.R'
     'param.R'
     'rdd.R'
     'reload.R'
