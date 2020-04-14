@@ -226,8 +226,10 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 
     eplus <- eplus %||% as.character(get_idf_ver(read_lines(model)))
     if (!length(eplus)) {
-        stop("Missing version field in input IDF file. Failed to determine the ",
-            "version of EnergyPlus to use.", call. = FALSE)
+        abort(paste0("Missing version field in input IDF file. ",
+            "Failed to determine the version of EnergyPlus to use."),
+            "miss_idf_ver"
+        )
     }
 
     energyplus_exe <- eplus_exe(eplus)
@@ -237,7 +239,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
     if (!dir.exists(output_dir)) {
         tryCatch(dir.create(output_dir, recursive = TRUE),
-            warning = function (w) stop("Failed to create output directory: ", surround(output_dir))
+            warning = function (w) abort(paste0("Failed to create output directory: ", surround(output_dir)), "create_output_dir")
         )
     }
 
@@ -293,7 +295,9 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     }
 
     if (any(annual & design_day)) {
-        stop("Cannot force both design-day-only simulation and annual simulation at the same time")
+        abort("Cannot force both design-day-only simulation and annual simulation at the same time",
+            "both_ddy_annual"
+        )
     }
 
     model <- normalizePath(model, mustWork = TRUE)
@@ -316,8 +320,8 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         if (any(ver_miss)) {
             msg <- paste0("  #", lpad(seq_along(model)[ver_miss]), "| ", surround(model[ver_miss]),
                 collapse = "\n")
-            stop("Missing version field in input IDF file. Failed to determine the ",
-                "version of EnergyPlus to use:\n", msg)
+            abort(paste0("Missing version field in input IDF file. Failed to determine the ",
+                "version of EnergyPlus to use:\n", msg), "miss_idf_ver")
         }
 
         ver <- unlist(ver_list)
@@ -328,7 +332,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     ver <- vcapply(ver, function (v) as.character(eplus_config(v)$version))
 
     if (anyDuplicated(model) & is.null(output_dir)) {
-        stop("'model' cannot have any duplications when 'output_dir' is NULL.")
+        abort("'model' cannot have any duplications when 'output_dir' is NULL.", "duplicated_sim")
     }
 
     if (is.null(output_dir)) {
@@ -342,13 +346,15 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     jobs <- data.table::data.table(input_model = model, output_dir = output_dir)
 
     if (anyDuplicated(jobs))
-        stop("Duplication found in the combination of 'model' and 'output_dir'. ",
-            "One model could not be run in the same output directory multiple times simultaneously.")
+        stop(paste0("Duplication found in the combination of 'model' and 'output_dir'. ",
+            "One model could not be run in the same output directory multiple times simultaneously."),
+            "duplicated_sim"
+        )
 
     d <- unique(output_dir[!dir.exists(output_dir)])
     created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
     if (any(!created)) {
-        abort("error_create_output_dir", paste0("Failed to create output directory:\n",
+        abort(paste0("Failed to create output directory:\n",
             paste0(surround(d[!created]), collapse = "\n")
         ))
     }
@@ -421,6 +427,9 @@ run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
     assert_count(options$num_parallel, positive = TRUE)
 
+    # in case run in background
+    jobs <- setDT(jobs)
+
     ## Kill all child processes if we quit from this function
     on.exit(kill_jobs(jobs, options), add = TRUE)
 
@@ -463,7 +472,7 @@ run_parallel_jobs <- function(jobs, options) {
 # }}}
 # kill_jobs {{{
 kill_jobs <- function(jobs, options) {
-    jobs[vlapply(process, function (x) !is.null(x) && x$is_alive()), `:=`(
+    jobs[vlapply(process, function (x) inherits(x, "process") && x$is_alive()), `:=`(
         status = {for (p in process) p$kill(); "terminated"}
     )]
 
@@ -617,7 +626,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
     if (!is.null(idd)) assert_file_exists(idd)
 
     if (annual && design_day) {
-        stop("Cannot force both design-day and annual simulations")
+        abort("Cannot force both design-day and annual simulations", "both_ddy_annual")
     }
 
     # argument docs {{{
@@ -843,13 +852,15 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
-    config <- tryCatch(eplus_config(eplus), warning = function (w) stop(w))
+    config <- tryCatch(eplus_config(eplus), miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config"))
 
     if (config$version < 8.3) {
-        stop("Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
+        abort(paste0("Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
              "This is because eplusr uses EnergyPlus command line interface ",
              "which is available only in EnergyPlus v8.3 and above. ",
-             "You can update the version of your model using 'transition()' or 'version_updater()' and try again.")
+             "You can update the version of your model using 'transition()' or 'version_updater()' and try again."),
+             "eplus_ver_not_supported"
+        )
     }
 
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
@@ -869,8 +880,8 @@ copy_run_files <- function (file, dir) {
     )
 
     if (any(!flag))
-        stop("Unable to copy file ", surround(basename(file[!flag])), "into ",
-            "simulation output directory.", call. = FALSE)
+        abort(paste0("Unable to copy file ", surround(basename(file[!flag])), "into ",
+            "simulation output directory."), "copy_run_files")
 
     loc
 }

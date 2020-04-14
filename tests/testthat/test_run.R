@@ -28,7 +28,7 @@ test_that("run_idf()", {
         f <- tempfile(fileext = ".idf")
         write_lines(read_lines(path_idf)[-91], f)
         run_idf(f, NULL, output_dir = tempdir(), echo = FALSE)
-    }, "Missing version field")
+    }, "Missing version field", class = "eplusr_error_miss_idf_ver")
     # can use input file directory
     expect_silent({
         f <- tempfile(fileext = ".idf")
@@ -72,7 +72,7 @@ test_that("run_idf()", {
     expect_null(res$stdout)
     expect_null(res$stderr)
     expect_is(res$process, "process")
-    expect_silent(res_post <- res$process$get_result())
+    expect_silent({res$process$wait(); res_post <- res$process$get_result()})
     expect_is(res_post$stdout, "character")
     expect_is(res_post$stderr, "character")
 })
@@ -92,7 +92,7 @@ test_that("run_multi()", {
     # can stop if idf and annual does not have the same length
     expect_error(run_multi(rep(path_idf, 2), NULL, annual = rep(FALSE, 3)), "Must have same length")
     # can stop if both design and annual is TRUE
-    expect_error(run_multi(path_idf, NULL, annual = TRUE, design_day = TRUE), "both design-day-only")
+    expect_error(run_multi(path_idf, NULL, annual = TRUE, design_day = TRUE), "both design-day-only", class = "eplusr_error_both_ddy_annual")
     # can stop if model does not exist
     expect_error(run_multi("", NULL), "No such file or directory")
     # can stop if model does not contain version
@@ -100,11 +100,11 @@ test_that("run_multi()", {
         f <- tempfile(fileext = ".idf")
         write_lines(read_lines(path_idf)[-91], f)
         run_multi(f, NULL, output_dir = tempdir())
-    }, "Failed to determine the version of EnergyPlus")
+    }, "Failed to determine the version of EnergyPlus", class = "eplusr_error_miss_idf_ver")
     # can stop if target EnergyPlus is not found
-    expect_error(run_multi(path_idf, NULL, eplus = 8.0), "Cannot locate EnergyPlus")
+    expect_error(run_multi(path_idf, NULL, eplus = 8.0), "Cannot locate EnergyPlus", class = "eplusr_error_locate_eplus")
     # can stop if input idf contain duplications
-    expect_error(run_multi(rep(path_idf, 2L), NULL, output_dir = NULL), "Have any duplication")
+    expect_error(run_multi(rep(path_idf, 2L), NULL, output_dir = NULL), class = "eplusr_error_duplicated_sim")
     # can stop if idf and output directory does not have the same length
     expect_error(run_multi(rep(path_idf, 2L), NULL, output_dir = tempdir()), "have same length")
     # can stop if idf and output directory combines same job
@@ -132,7 +132,7 @@ test_that("run_multi()", {
 
     expect_silent(res <- run_multi(rep(path_idf, 2L), NULL, output_dir = c(file.path(tempdir(), "a"), file.path(tempdir(), "b")), wait = FALSE))
     expect_is(res, "r_process")
-    expect_equal(res$get_exit_status(), 0L)
+    expect_equal({res$wait(); res$get_exit_status()}, 0L)
     expect_silent(res <- res$get_result())
     expect_is(res, "data.table")
     expect_equal(names(res), c("index", "status", "idf", "epw", "version",
