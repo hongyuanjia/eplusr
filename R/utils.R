@@ -79,7 +79,8 @@ lpad <- function(x, char = " ", width = NULL) {
 read_lines <- function(input, trim = TRUE, ...) {
     dt <- tryCatch(
         fread(input = input, sep = NULL, header = FALSE, col.names = "string", ...),
-        error = function (e) stop("Failed to read input file. ", conditionMessage(e))
+        warning = function (w) if (grepl("has size 0", conditionMessage(w))) data.table() else warning(w),
+        error = function (e) abort(paste0("Failed to read input file. ", conditionMessage(e)), "read_lines")
     )
     if (!nrow(dt)) return(data.table(string = character(0L), line = integer(0L)))
     set(dt, j = "line", value = seq_along(dt[["string"]]))
@@ -147,7 +148,7 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
         if (any(int)) ver[int] <- paste0(ver[int], ".0")
     }
 
-    if (!test_class(ver, "numeric_version")) ver <- numeric_version(ver, strict = FALSE)
+    if (!inherits(ver, "numeric_version")) ver <- numeric_version(ver, strict = FALSE)
 
     # only keep major.minor.patch, and remove others
     has_trail <- suppressWarnings(!is.na(ver[, 4L]))
@@ -298,35 +299,31 @@ make_filename <- function (x, len = 100, unique = TRUE) {
 }
 # }}}
 
-# cnd {{{
-cnd <- function (type = c("error", "warning", "message"), subclass, message, call = NULL, ...) {
-    type <- match.arg(type)
-    structure(
-        list(message = message, call = call, ...),
-        class = c(subclass, type, "condition")
-    )
-}
-# }}}
-
 # abort {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
-abort <- function (subclass, message, call = NULL, ...) {
+abort <- function (message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
-    err <- cnd(type = "error", subclass =  subclass, message = message, call = call, ...)
-    stop(err)
+    if (is.null(class)) {
+        stop(errorCondition(message, ..., class = "eplusr_error", call = call))
+    } else {
+        stop(errorCondition(message, ..., class = unique(c(paste0("eplusr_error_", class), "eplusr_error")), call = call))
+    }
 }
 # }}}
 
 # warn {{{
 # reference: https://adv-r.hadley.nz/conditions.html#custom-conditions
-warn <- function (subclass, message, call = NULL, ...) {
+warn <- function (message, class = NULL, call = NULL, ...) {
     ori <- getOption("warning.length")
     options(warning.length = 8170L)
     on.exit(options(warning.length = ori), add = TRUE)
-    w <- cnd(type = "warning", subclass =  subclass, message = message, call = call, ...)
-    warning(w)
+    if (is.null(class)) {
+        warning(warningCondition(message, ..., class = "eplusr_warning", call = call))
+    } else {
+        warning(warningCondition(message, ..., class = unique(c(paste0("eplusr_warning_", class), "eplusr_warning")), call = call))
+    }
 }
 # }}}
 
@@ -363,27 +360,6 @@ ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, uppe
         "class", c("Range", "list")
     )
 }
-# }}}
-
-# append_dt {{{
-#' @importFrom checkmate assert_names
-append_dt <- function (dt, new_dt, base_col = NULL) {
-    assert_names(names(new_dt), must.include = names(dt))
-
-    if (is.null(base_col)) {
-        rbindlist(list(dt, new_dt[, .SD, .SDcols = names(dt)]))
-    } else {
-        rbindlist(list(dt[!new_dt, on = base_col], new_dt[, .SD, .SDcols = names(dt)]))
-    }
-}
-# }}}
-
-# unique_id {{{
-# nocov start
-unique_id <- function () {
-    paste0("id-", stri_rand_strings(1, 15L), "-", Sys.time())
-}
-# nocov end
 # }}}
 
 # fmt_* {{{

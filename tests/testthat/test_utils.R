@@ -19,7 +19,7 @@ test_that("Utility functions", {
     expect_equal(lpad(c(1, 10)), c(" 1", "10"))
     expect_equal(lpad(c(1, 10), width = 3), c("  1", " 10"))
 
-    expect_error(read_lines(NULL), "Failed to read input file")
+    expect_error(read_lines(NULL), "Failed to read input file", "eplusr_error_read_lines")
     expect_equal(read_lines("a\n b \n c \n"), data.table(line = 1:3, string = c("a", "b", "c")))
 
     f <- tempfile()
@@ -90,11 +90,6 @@ test_that("Utility functions", {
     expect_equal(format(ranger()), "(-Inf, Inf)")
     expect_equal(ranger(1, TRUE)[], list(minimum = 1, lower_incbounds = TRUE, maximum = Inf, upper_incbounds = FALSE))
     expect_equal(format(ranger(1, TRUE)), "[1, Inf)")
-
-    expect_error(append_dt(data.table(a = 1), data.table()))
-    expect_equal(append_dt(data.table(), data.table()), data.table())
-    expect_equal(append_dt(data.table(a = 1), data.table(a = 2, b = 1)), data.table(a = c(1, 2)))
-    expect_equal(append_dt(data.table(a = 1, b = 1), data.table(a = c(1, 2), b = c(3, 4)), "a"), data.table(a = c(1, 2), b = c(3, 4)))
 
     expect_equal(fmt_dbl(1.111), "1.11")
     expect_equal(fmt_dbl(1.111, 1), "1.1")
