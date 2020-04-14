@@ -130,7 +130,7 @@ eplusr_option <- function (...) {
     for (nm_opt in count_opt) assign_count_opt(opt, nm_opt)
 
     # validate level
-    if ("validate_level" %in% nm) {
+    if ("validate_level" %chin% nm) {
         level <- opt[["validate_level"]]
         if (test_choice(level, c("none", "draft", "final"))) {
             .options[["validate_level"]] <- level
