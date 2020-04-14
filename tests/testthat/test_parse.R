@@ -79,7 +79,7 @@ test_that("parse_idd_file()", {
         Test,
         A1 ; \\note something"
     )
-    expect_error(parse_idd_file(idd_wrong), "No version found")
+    expect_error(parse_idd_file(idd_wrong), "No IDD version", "eplusr_error_parse_idd")
 
     # can detect error of invalid IDD version
     idd_wrong <- c(
@@ -89,7 +89,7 @@ test_that("parse_idd_file()", {
         Test,
         A1 ; \\note something"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid IDD version")
+    expect_error(parse_idd_file(idd_wrong), "Invalid IDD version", "eplusr_error_parse_idd")
 
     # can warn about missing IDD build tag
     idd_wrong <- c(
@@ -99,8 +99,7 @@ test_that("parse_idd_file()", {
          Test,
          A1 ; \\note something"
     )
-    expect_warning(idd_parsed <- parse_idd_file(idd_wrong), "No build tag found")
-    expect_equal(idd_parsed$build, NA_character_)
+    expect_equal(parse_idd_file(idd_wrong)$build, NA_character_)
 
     # can detect error of invalid line
     idd_wrong <- c(
@@ -113,7 +112,7 @@ test_that("parse_idd_file()", {
 
          Some Mess Here"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid line")
+    expect_error(parse_idd_file(idd_wrong), "Invalid line", "eplusr_error_parse_idd")
 
     # can detect missing group lines
     idd_wrong <- c(
@@ -147,7 +146,7 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong), "Duplicated class names found")
+    expect_error(parse_idd_file(idd_wrong), "Duplicated class names found", class = "eplusr_error_parse_idd")
 
     # can detect incomplete class
     idd_wrong <- c(
@@ -164,7 +163,7 @@ test_that("parse_idd_file()", {
          A1 , \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong), "Missing class name")
+    expect_error(parse_idd_file(idd_wrong), "Missing class name", class = "eplusr_error_parse_idd")
 
     # can detect missing class names
     idd_wrong <- c(
@@ -180,7 +179,7 @@ test_that("parse_idd_file()", {
          A1 ; \\note something
          "
     )
-    expect_error(parse_idd_file(idd_wrong), "Missing class name")
+    expect_error(parse_idd_file(idd_wrong), "Missing class name", class = "eplusr_error_parse_idd")
 
     # can manually insert class slash
     idd_cls <- c(
@@ -207,7 +206,7 @@ test_that("parse_idd_file()", {
 
          TestInvalidSlash,
          A1 ; \\invalid-slash-key")
-    expect_error(parse_idd_file(idd_wrong), "Invalid slash key")
+    expect_error(parse_idd_file(idd_wrong), "Invalid slash key", class = "eplusr_error_parse_idd")
 
     # can detect error of invaid type key
     idd_wrong <- c(
@@ -218,7 +217,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\type invalid"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid type value")
+    expect_error(parse_idd_file(idd_wrong), "Invalid type value", class = "eplusr_error_parse_idd")
 
     # can detect error of invaid external list key
     idd_wrong <- c(
@@ -229,7 +228,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\external-list invalid"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid external list value")
+    expect_error(parse_idd_file(idd_wrong), "Invalid external list value", class = "eplusr_error_parse_idd")
 
     # can detect error of invalid format key
     idd_wrong <- c(
@@ -240,7 +239,7 @@ test_that("parse_idd_file()", {
          TestInvalidSlash,
          A1 ; \\format invalid"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid format value")
+    expect_error(parse_idd_file(idd_wrong), "Invalid format value", class = "eplusr_error_parse_idd")
 
     # can detect error of mismatched object-list
     idd_wrong <- c(
@@ -252,7 +251,7 @@ test_that("parse_idd_file()", {
          A1 ; \\format invalid
          \\object-list ref"
     )
-    expect_error(parse_idd_file(idd_wrong), "Invalid \\\\object-list value")
+    expect_error(parse_idd_file(idd_wrong), "Invalid \\\\object-list value", class = "eplusr_error_parse_idd")
 
     # can fix ConnectorList references
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
@@ -281,9 +280,7 @@ test_that("parse_idf_file()", {
     )
     # }}}
 
-    expect_warning(idf_parsed <- parse_idf_file(text("idf"), 8.8),
-        "Missing version field in input IDF"
-    )
+    expect_warning(idf_parsed <- parse_idf_file(text("idf"), 8.8), "Missing version field in input IDF")
 
     # can parse Idf stored in strings
     expect_equal(names(idf_parsed),

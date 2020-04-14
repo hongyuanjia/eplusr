@@ -154,26 +154,6 @@ parse_idd_file <- function(path) {
     dt_field <- dt$left
     dt_reference <- dt$reference
 
-    # # add index
-    # setindexv(dt_group, "group_id")
-    # setindexv(dt_group, "group_name")
-
-    # setindexv(dt_class, "class_id")
-    # setindexv(dt_class, "class_name")
-    # setindexv(dt_class, "class_name_us")
-
-    # setindexv(dt_field, "field_id")
-    # setindexv(dt_field, "field_name")
-    # setindexv(dt_field, "field_name_us")
-    # setindexv(dt_field, c("class_id", "field_index"))
-    # setindexv(dt_field, c("class_id", "field_name"))
-    # setindexv(dt_field, c("class_id", "field_name_us"))
-
-    # setindexv(dt_reference, "class_id")
-    # setindexv(dt_reference, "field_id")
-    # setindexv(dt_reference, "src_class_id")
-    # setindexv(dt_reference, "src_field_id")
-
     list(version = idd_version, build = idd_build, group = dt_group,
         class = dt_class, field = dt_field,
         reference = dt_reference
@@ -192,7 +172,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     if (has_ext(path, "ddy")) {
         idd <- withCallingHandlers(get_idd_from_ver(idf_ver, idd),
-            warning = function (w) invokeRestart("muffleWarning")
+            eplusr_warning = function (w) invokeRestart("muffleWarning")
         )
     } else {
         idd <- get_idd_from_ver(idf_ver, idd)
@@ -256,29 +236,6 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
         c("value_id", "value_chr", "value_num", "object_id", "field_id")), NULL
     )
 
-    # # set index
-    # setindexv(dt_object, "class_id")
-    # setindexv(dt_object, "object_id")
-    # setindexv(dt_object, "object_name")
-    # setindexv(dt_object, "object_name_lower")
-    # setindexv(dt_object, c("class_id", "object_id"))
-    # setindexv(dt_object, c("class_id", "object_name"))
-    # setindexv(dt_object, c("class_id", "object_name_lower"))
-
-    # setindexv(dt_value, "field_id")
-    # setindexv(dt_value, "value_id")
-    # setindexv(dt_value, "value_chr")
-    # setindexv(dt_value, c("object_id", "field_id"))
-    # setindexv(dt_value, c("object_id", "value_id"))
-    # setindexv(dt_value, c("object_id", "value_chr"))
-
-    # setindexv(dt_reference, "object_id")
-    # setindexv(dt_reference, "value_id")
-    # setindexv(dt_reference, c("object_id", "value_id"))
-    # setindexv(dt_reference, "src_object_id")
-    # setindexv(dt_reference, "src_value_id")
-    # setindexv(dt_reference, c("src_object_id", "src_value_id"))
-
     list(version = idd_ver, options = options,
          object = dt_object, value = dt_value, reference = dt_reference
     )
@@ -291,11 +248,11 @@ get_idd_ver <- function (idd_dt) {
     ver_line <- idd_dt$string[[1L]]
 
     if (!stri_startswith_fixed(ver_line, "!IDD_Version")) {
-        stop("No version found in input IDD.")
+        parse_error("idd", "No IDD version on 1st line", idd_dt[1L])
     } else {
         ver <- standardize_ver(stri_sub(ver_line, 14L))
 
-        if (is.na(ver)) parse_error("idd", "Invalid IDD version", idd_dt[1L])
+        if (is.na(ver)) parse_error("idd", "Invalid IDD version on 1st line", idd_dt[1L])
 
         ver
     }
@@ -308,7 +265,6 @@ get_idd_build <- function (idd_dt) {
     build_line <- idd_dt$string[[2L]]
 
     if (!stri_startswith_fixed(build_line, "!IDD_BUILD")) {
-        warning("No build tag found in input IDD.")
         NA_character_
     } else {
         stri_sub(build_line, 12L)
@@ -1335,7 +1291,7 @@ get_value_table <- function (dt, idd) {
             c("type_enum", "src_enum", "is_name", "units", "ip_units"),
             complete = TRUE
         ),
-        error_bad_field_index = function (e) e
+        eplusr_error_invalid_field_index = function (e) e
     )
 
     # issue parse error if invalid field number found
@@ -1587,14 +1543,10 @@ parse_issue <- function (type = c("idf", "idd", "err", "epw"),
     key <- if(stop) "ERROR" else "WARNING"
     all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
 
-    ori <- getOption("warning.length")
-    options(warning.length = 8170L)
-    on.exit(options(warning.length = ori), add = TRUE)
-
     if (stop) {
-        stop(all_mes, call. = FALSE)
+        abort(all_mes, paste0("parse_", type))
     } else {
-        warning(all_mes, call. = FALSE)
+        warn(all_mes, paste0("parse_", type))
     }
 }
 # }}}
