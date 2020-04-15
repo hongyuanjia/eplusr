@@ -51,6 +51,8 @@
   sure they are initialized properly. It is recommended to call `reload()` on
   each `Idd`, `Idf` and other class object in eplusr loaded with `readRDS()` or
   `load()`, to make sure all eplusr's functionaries works properly (#251).
+* Some internal functions have been exported. They are mainly useful for
+  developers to handle internal IDD and IDF data more efficiently.
 
 ## Major changes
 
