@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @importFrom checkmate assert_vector assert_string assert_scalar
 #' @include impl-idd.R
 NULL
 
@@ -88,6 +89,7 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         #'
         initialize = function (path) {
             # add a uuid
+            private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$uuid <- unique_id()
 
             idd_file <- parse_idd_file(path)
@@ -684,8 +686,16 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         m_version = NULL,
         m_build = NULL,
         m_idd_env = NULL,
-        m_log = NULL
+        m_log = NULL,
         # }}}
+
+        idd_env = function () {
+            private$m_idd_env
+        },
+
+        log_env = function () {
+            private$m_log
+        }
     )
 )
 # }}}
@@ -806,7 +816,7 @@ idd_objects <- function (self, private, class) {
 # idd_object_relation {{{
 idd_object_relation <- function (self, private, which, direction = c("all", "ref_to", "ref_by"),
                                  class = NULL, group = NULL, depth = 0L) {
-    assert(is_scalar(which))
+    assert_scalar(which)
     direction <- match.arg(direction)
 
     cls <- get_idd_class(private$m_idd_env, which)
@@ -820,7 +830,7 @@ idd_object_relation <- function (self, private, which, direction = c("all", "ref
 # idd_objects_in_relation {{{
 idd_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by"),
                                      class = NULL, group = NULL, depth = 0L) {
-    assert(is_scalar(which))
+    assert_scalar(which)
     direction <- match.arg(direction)
     rel <- get_idd_relation(private$m_idd_env, which, depth = depth, direction = direction,
         class = class, group = group, keep_all = TRUE)
@@ -854,7 +864,7 @@ idd_objects_in_relation <- function (self, private, which, direction = c("ref_to
 # }}}
 # idd_objects_in_group {{{
 idd_objects_in_group <- function (self, private, group) {
-    assert(is_string(group))
+    assert_string(group)
 
     grp_id <- idd_group_index(self, private, group)
 
@@ -887,27 +897,11 @@ idd_print <- function (self, private) {
 # }}}
 
 #' @export
-# [.Idd {{{
-'[.Idd' <- function(x, i) {
-    if (!is.character(x)) return(NextMethod())
-
-    self <- ._get_self(x)
-    private <- ._get_private(x)
-
-    if (any(i %chin% private$m_idd_env$class$class_name)) {
-        .subset2(x, "objects")(i)
-    } else {
-        NextMethod()
-    }
-}
-# }}}
-
-#' @export
 # [[.Idd {{{
 `[[.Idd` <- function (x, i) {
     if (i %chin% ls(x)) return(NextMethod())
 
-    private <- ._get_private(x)
+    private <- get_priv_env(x)
 
     cls_id <- chmatch(i, private$m_idd_env$class$class_name)
 
@@ -924,7 +918,7 @@ idd_print <- function (self, private) {
 `$.Idd` <- function (x, i) {
     if (i %chin% ls(x)) return(NextMethod())
 
-    private <- ._get_private(x)
+    private <- get_priv_env(x)
 
     cls_id <- chmatch(i, private$m_idd_env$class$class_name_us)
 
@@ -946,14 +940,17 @@ str.Idd <- function (object, ...) {
 #' @export
 # format.Idd {{{
 format.Idd <- function (x, ...) {
-    paste0(
-        c(cli::rule("EnergyPlus Input Data Dictionary"),
-          paste0("Version", ": ", x$version()),
-          paste0("Build", ": ", x$build()),
-          paste0("Total Class", ": ", length(x$class_index()))
-        ),
-        collapse = "\n"
-    )
+    n <- length(x$class_index())
+
+    if (is.na(x$build())) {
+        sprintf("<EnergyPlus IDD v%s with %i %s>", x$version(), n,
+           if (n <= 1L) "class" else "classes"
+        )
+    } else {
+        sprintf("<EnergyPlus IDD v%s (%s) with %i classes>", x$version(), x$build(),
+            n, if (n <= 1L) "class" else "classes"
+        )
+    }
 }
 # }}}
 
@@ -961,7 +958,7 @@ format.Idd <- function (x, ...) {
 # ==.Idd {{{
 `==.Idd` <- function (e1, e2) {
     if (!is_idd(e2)) return(FALSE)
-    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
 }
 # }}}
 
@@ -1067,31 +1064,23 @@ read_idd <- function (path) {
 use_idd <- function (idd, download = FALSE) {
     if (is_idd(idd)) return(idd)
 
-    assert(is_scalar(idd))
+    assert_vector(idd, len = 1L)
 
     # if input is a file path or literal IDD string
     if (!is_idd_ver(idd)) {
-        return(tryCatch(read_idd(idd), error_read_file = function (e) {
-            abort("error_invalid_idd_input",
-                paste0("Parameter `idd` should be a valid version, a path, or ",
-                    "a single character string of an EnergyPlus Input Data ",
-                    "Dictionary (IDD) file (usually named `Energy+.idd`). ",
-                    "Invalid input found: ",
-                    if (length(idd) > 1L) {
-                        surround(paste0(idd[1L], "..."))
-                    } else {
-                        surround(idd)
-                    },
-                    "."
-                )
-            )
+        return(tryCatch(read_idd(idd), eplusr_error_read_lines = function (e) {
+            abort(paste0("Parameter 'idd' should be a valid version, a path, or ",
+                "a single character string of an EnergyPlus Input Data ",
+                "Dictionary (IDD) file (usually named 'Energy+.idd'). ",
+                "Invalid input found: ", str_trunc(surround(idd)), "."
+            ), "read_lines")
         }))
     }
 
     # make sure to print multiple version message only once
     ver_in <- standardize_ver(idd, complete = FALSE)
     # first check if version already exists
-    ver <- match_minor_ver(ver_in, c(names(.globals$idd), names(.globals$eplus_config)), "idd")
+    ver <- match_minor_ver(ver_in, c(names(.globals$idd), names(.globals$eplus)), "idd")
     # if not exists, try to find more
     if (is.na(ver)) ver <- match_minor_ver(ver_in, ALL_IDD_VER, "idd")
 
@@ -1104,12 +1093,12 @@ use_idd <- function (idd, download = FALSE) {
         if (is_avail_idd(ver)) return(.globals$idd[[as.character(ver)]])
 
         verbose_info("IDD v", ver, " has not been parsed before.\nTry to locate ",
-            "`Energy+.idd` in EnergyPlus v", ver, " installation folder ",
+            "'Energy+.idd' in EnergyPlus v", ver, " installation folder ",
             surround(eplus_default_path(ver)), ".")
 
         # if corresponding EnergyPlus folder not found
         if (!is_avail_eplus(ver)) {
-            verbose_info("Failed to locate `Energy+.idd` because EnergyPlus v",
+            verbose_info("Failed to locate 'Energy+.idd' because EnergyPlus v",
                 ver, " is not available.")
 
             # try to locate using latest IDFVersionUpdater
@@ -1124,13 +1113,11 @@ use_idd <- function (idd, download = FALSE) {
                     idd <- attr(dl, "file")
                 # else issue an error
                 } else {
-                    abort("error_no_matched_idd",
-                        paste0("Failed to locate IDD v", ver, ".\n",
-                            "You may want to set `download` to TRUE or ",
-                            "\"auto\" to download the IDD file from EnregyPlus ",
-                            "GitHub repo."
-                        )
-                    )
+                    abort(paste0("Failed to locate IDD v", ver, ".\n",
+                        "You may want to set 'download' to TRUE or ",
+                        "\"auto\" to download the IDD file from EnregyPlus ",
+                        "GitHub repo."
+                    ), "locate_idd")
                 }
             }
         # if corresponding EnergyPlus folder is found
@@ -1140,7 +1127,7 @@ use_idd <- function (idd, download = FALSE) {
 
             # but IDD file is missing
             if (!file.exists(idd)) {
-                verbose_info("`Energy+.idd` file does not exist in EnergyPlus v",
+                verbose_info("'Energy+.idd' file does not exist in EnergyPlus v",
                     config$version, " installation folder ", surround(config$dir), "."
                 )
 
@@ -1156,13 +1143,10 @@ use_idd <- function (idd, download = FALSE) {
                         idd <- attr(dl, "file")
                     # else issue an error
                     } else {
-                        abort("error_no_matched_idd",
-                            paste0("Failed to locate IDD v", ver,
-                                "You may want to set `download` to TRUE or ",
-                                "\"auto\" to download the IDD file from EnregyPlus ",
-                                "GitHub repo."
-                            )
-                        )
+                        abort(paste0("Failed to locate IDD v", ver,
+                            "You may want to set 'download' to TRUE or ",
+                            "\"auto\" to download the IDD file from EnregyPlus GitHub repo."
+                        ), "locate_idd")
                     }
                 }
             }
@@ -1181,8 +1165,10 @@ use_idd <- function (idd, download = FALSE) {
 #' @export
 # download_idd {{{
 download_idd <- function (ver = "latest", dir = ".") {
+    assert_vector(ver, len = 1L)
     ver <- standardize_ver(ver, complete = FALSE)
-    assert(is_scalar(ver), is_idd_ver(ver))
+
+    if (!is_eplus_ver(ver)) abort("'ver' must be a valid EnergyPlus version", "invalid_eplus_ver")
 
     ori_ver <- ver
     # if no patch version is given
@@ -1202,11 +1188,6 @@ download_idd <- function (ver = "latest", dir = ".") {
 
         if (ver == numeric_version("9.0.1")) ver <- numeric_version("9.0.0")
 
-    # in case explicitly download IDD version "9.0.0"
-    # because if ver is "9.0", then "9.0.1" will be downloaded, as there is no
-    # "9.0.0" IDD any more in current latest release.
-    } else if (ver == 9.0) {
-        latest_ver <- "9.0.0"
     # in case explicitly download IDD version "9.0.1"
     # change the file to download to "V9-0-0-Energy+.idd" as there is no
     # "V9-0-1-Energy+.idd" and only "V9-0-0-Energy+.idd", which does not follow
@@ -1239,8 +1220,7 @@ download_idd <- function (ver = "latest", dir = ".") {
     dest <- normalizePath(file.path(dir, file), mustWork = FALSE)
     res <- download_file(url, dest)
 
-    if (res != 0L)
-        stop(sprintf("Failed to download EnergyPlus IDD v%s.", ver), call. = FALSE)
+    if (res != 0L) abort(sprintf("Failed to download EnergyPlus IDD v%s.", ver), "download_idd")
 
     if (ver == latest_ver) {
         cmt <- ALL_EPLUS_RELEASE_COMMIT[version == ver][["commit"]]
@@ -1274,8 +1254,10 @@ avail_idd <- function () {
 #' @export
 # is_avail_idd {{{
 is_avail_idd <- function (ver) {
-    assert(is_idd_ver(ver, strict = TRUE))
-    !is.na(match_minor_ver(standardize_ver(ver, complete = FALSE), names(.globals$idd), "idd", verbose = FALSE))
+    if (is.character(ver) && "latest" %chin% ver) {
+        abort("'latest' notation for IDD version is not allowed here. Please give specific versions.", "ambiguous_idd_ver")
+    }
+    !is.na(convert_to_idd_ver(ver, strict = TRUE, all_ver = names(.globals$idd)))
 }
 # }}}
 
@@ -1284,7 +1266,7 @@ find_idd_from_updater <- function (ver) {
     ver <- standardize_ver(ver, strict = TRUE)
     # check if there are any EnergyPlus detected whose version is
     # newer than specified version
-    vers <- rev(avail_eplus()[avail_eplus() > ver])
+    vers <- rev(avail_eplus()[avail_eplus() >= ver])
 
     if (!length(vers)) return(NULL)
 
@@ -1326,25 +1308,21 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
             # if input IDF has a version but neither that version of EnergyPlus
             # nor IDD is available, rewrite the message
             idd <- tryCatch(use_idd(idf_ver),
-                error_no_matched_idd = function (e) {
+                eplusr_error_locate_idd = function (e) {
                     mes <- stri_replace_all_fixed(conditionMessage(e),
-                        "You may want to set `download`",
-                        "You may want to use `use_idd()` and set `download`"
+                        "You may want to set 'download'",
+                        "You may want to use 'use_idd()' and set 'download'"
                     )
-                    abort("error_no_matched_idd", mes)
+                    abort(mes, "locate_idd")
                 }
             )
         } else {
             idd <- use_idd(idd)
             if (warn && idf_ver[, 1L:2L] != idd$version()[, 1L:2L]) {
-                warn("waring_idf_idd_mismatch_ver",
-                    paste0(
-                        "Version Mismatch. The IDF file parsing has a differnet ",
-                        "version (", idf_ver, ") than the IDD file used (",
-                        idd$version(), "). Parsing errors may occur."
-                    ),
-                    idf_ver = idf_ver,
-                    idd_ver = idd$version()
+                warn(paste0("Version mismatch. The IDF file parsing has a differnet ",
+                    "version (", idf_ver, ") than the IDD file used (",
+                    idd$version(), "). Parsing errors may occur."),
+                    "use_mismatch_idd"
                 )
             }
         }
@@ -1354,28 +1332,21 @@ get_idd_from_ver <- function (idf_ver = NULL, idd = NULL, warn = TRUE) {
         if (!is.null(idd)) {
             idd <- use_idd(idd)
             if (warn) {
-                warn("warning_given_idd_used",
-                    paste0(
-                        mes, " The given IDD version ", idd$version(),
-                        " will be used. Parsing errors may occur."
-                    )
+                warn(paste0(mes, " The given IDD version ", idd$version(),
+                    " will be used. Parsing errors may occur."), "use_hard_coded_idd"
                 )
             }
         } else {
             if (is.null(avail_idd())) {
-                abort("error_no_avail_idd",
-                    paste(mes, "No parsed IDD was available to use.")
-                )
+                abort(paste(mes, "No parsed IDD was available to use."), "no_avail_idd")
             }
 
             # which.max does not work with numeric_version objects
             idd <- use_idd(avail_idd()[max(order(avail_idd()))])
             if (warn) {
-                warn("warning_latest_idd_used",
-                    paste0(mes,
-                        " The latest parsed IDD version ", idd$version(),
+                warn(paste0(mes, " The latest parsed IDD version ", idd$version(),
                         " will be used. Parsing errors may occur."
-                    )
+                    ), "use_latest_idd"
                 )
             }
         }

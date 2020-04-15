@@ -121,6 +121,8 @@
 * `run_idf()` and `run_multi()` now return additional element/column called
 * `version` which contain the versions of EnergyPlus that are called during
   simulations
+* `format.Idd()` now returns a single line string in format
+  `<EnergyPlus IDD v[Version] (Build) with X classes`.
 
 ## Bug fixes
 
