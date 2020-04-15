@@ -179,8 +179,8 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     }
 
     # get idd version and table
-    idd_ver <- ._get_private(idd)$m_version
-    idd_env <- ._get_private(idd)$m_idd_env
+    idd_ver <- get_priv_env(idd)$m_version
+    idd_env <- get_priv_env(idd)$m_idd_env
 
     # insert version line if necessary
     if (is.null(idf_ver)) idf_dt <- insert_version(idf_dt, idd_ver)

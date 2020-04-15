@@ -54,27 +54,27 @@ reload.default <- function (x, ...) {
 
 #' @export
 reload.Idf <- function (x, ...) {
-    reload_idd_env(._get_private(x)$idd_env())
-    reload_idf_env(._get_private(x)$idf_env())
-    reload_log_env(._get_private(x)$log_env())
+    reload_idd_env(get_priv_env(x)$idd_env())
+    reload_idf_env(get_priv_env(x)$idf_env())
+    reload_log_env(get_priv_env(x)$log_env())
     x
 }
 
 #' @export
 reload.Idd <- function (x, ...) {
-    reload_idd_env(._get_private(x)$m_idd_env)
+    reload_idd_env(get_priv_env(x)$m_idd_env)
     x
 }
 
 #' @export
 reload.IddObject <- function (x, ...) {
-    reload_idd_env(._get_private(x)$idd_env())
+    reload_idd_env(get_priv_env(x)$idd_env())
     x
 }
 
 #' @export
 reload.Epw <- function (x, ...) {
-    priv <- ._get_private(x)
+    priv <- get_priv_env(x)
     priv$m_header$typical <- setDT(priv$m_header$typical)
     priv$m_header$ground <- setDT(priv$m_header$ground)
     priv$m_header$holiday$holiday <- setDT(priv$m_header$holiday$holiday)
@@ -85,13 +85,13 @@ reload.Epw <- function (x, ...) {
 
 #' @export
 reload.EplusJob <- function (x, ...) {
-    reload.Idf(._get_private(x)$m_idf)
+    reload.Idf(get_priv_env(x)$m_idf)
     x
 }
 
 #' @export
 reload.EplusGroupJob <- function (x, ...) {
-    priv <- ._get_private(x)
+    priv <- get_priv_env(x)
     for (idf in priv$m_idfs) reload.Idf(idf, ...)
 
     if (inherits(priv$m_job, "data.table")) priv$m_job <- setDT(priv$m_job)
@@ -100,7 +100,7 @@ reload.EplusGroupJob <- function (x, ...) {
 
 #' @export
 reload.ParametricJob <- function (x, ...) {
-    priv <- ._get_private(x)
+    priv <- get_priv_env(x)
     reload.Idf(priv$m_seed)
     if (!is.null(priv$m_idfs)) for (idf in priv$m_idfs) reload.Idf(idf, ...)
 

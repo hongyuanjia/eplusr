@@ -47,14 +47,34 @@ surround <- function (x, out = "'") {
 }
 # }}}
 
-# `._get_self`{{{
-`._get_self` <- function (x) {
+# `get_self_env`{{{
+#' Get the enclosed environment of an R6 object
+#'
+#' @details
+#'
+#' `get_self_env()` returns the `self` enclosed environment of an [R6::R6Class()]
+#' object.
+#'
+#' `get_priv_env()` returns the `private` enclosed environment of an [R6::R6Class()]
+#' object.
+#'
+#' @param x An R6 object.
+#'
+#' @return An environment.
+#'
+#' @keywords internal
+#' @export
+#' @name get_env
+`get_self_env` <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "self")
 }
 # }}}
 
-# `._get_private`{{{
-`._get_private` <- function (x) {
+# `get_priv_env`{{{
+#' @keywords internal
+#' @export
+#' @name get_env
+`get_priv_env` <- function (x) {
     .subset2(.subset2(x, ".__enclos_env__"), "private")
 }
 # }}}
