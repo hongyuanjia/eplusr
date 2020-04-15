@@ -1380,7 +1380,7 @@ convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
         by = list(si, ip)
     ]
 
-    dt_value[val, on = "value_id", `:=`(value_num = val$value_num)]
+    dt_value[val, on = "value_id", `:=`(value_num = i.value_num, value_chr = as.character(i.value_num))]
 
     dt_value
 }
