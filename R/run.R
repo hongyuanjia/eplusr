@@ -1,4 +1,6 @@
 #' @importFrom callr r_bg
+#' @importFrom checkmate assert_flag assert_file_exists assert_directory_exists
+#' @importFrom checkmate assert_logical
 #' @importFrom cli cat_line
 #' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
@@ -270,7 +272,6 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 
 #' @export
 #' @rdname run_model
-#' @importFrom checkmate assert_flag assert_logical
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
                        annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
@@ -604,7 +605,6 @@ sim_status <- function (type, index, model, weather, exit_code = NULL) {
 }
 # }}}
 # energyplus {{{
-#' @importFrom checkmate assert_flag assert_file_exists assert_directory_exists
 energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
                         output_suffix = c("C", "L", "D"), expand_obj = TRUE,
                         readvars = TRUE, annual = FALSE, design_day = FALSE,

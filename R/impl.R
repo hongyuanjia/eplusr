@@ -1,4 +1,6 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
+#' @importFrom checkmate assert_names check_integerish
+#' @importFrom checkmate assert_character assert_integerish check_character
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
@@ -218,7 +220,6 @@ errormsg_field_name <- function (dt) {
 # }}}
 
 # new_id {{{
-#' @importFrom checkmate assert_names
 new_id <- function (dt, name, num) {
     assert_names(names(dt), must.include = name)
     max(dt[[name]], na.rm = TRUE) + seq_len(num)
@@ -231,7 +232,6 @@ add_rleid <- function (dt, prefix = NULL) {
 }
 # }}}
 # append_dt {{{
-#' @importFrom checkmate assert_names
 append_dt <- function (dt, new_dt, base_col = NULL) {
     assert_names(names(new_dt), must.include = names(dt))
 
@@ -249,8 +249,6 @@ unique_id <- function () {
 # }}}
 
 # assert_valid_type {{{
-#' @importFrom checkmate assert_character assert_integerish check_character
-#' @importFrom checkmate check_integerish
 assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lower = -Inf, type = c("both", "id", "name")) {
     if (is.null(name)) name <- checkmate::vname(x)
     type <- match.arg(type)

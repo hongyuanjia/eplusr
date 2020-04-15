@@ -1,4 +1,6 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
+#' @importFrom checkmate assert_count assert_names assert_integerish
+#' @importFrom checkmate test_integerish assert_integer assert_character
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
@@ -8,11 +10,10 @@ NULL
 
 # GROUP
 # get_idd_group_index {{{
-#' @importFrom checkmate assert_string
 get_idd_group_index <- function (idd_env, group = NULL) {
     if (is.null(group)) return(idd_env$group$group_id)
 
-    assert_string(group)
+    assert_character(group, any.missing = FALSE)
 
     res <- idd_env$group[J(group), on = "group_name", group_id]
     if (anyNA(res)) abort_bad_key("group name", group)
@@ -20,11 +21,10 @@ get_idd_group_index <- function (idd_env, group = NULL) {
 }
 # }}}
 # get_idd_group_name {{{
-#' @importFrom checkmate assert_count
 get_idd_group_name <- function (idd_env, group = NULL) {
     if (is.null(group)) return(idd_env$group$group_name)
 
-    assert_count(group, positive = TRUE)
+    assert_integerish(group, lower = 1L, any.missing = FALSE)
 
     res <- idd_env$group[J(group), on = "group_id", group_name]
     if (anyNA(res)) abort_bad_key("group index", group)
@@ -103,7 +103,6 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
 #   * If input number is larger than the total existing field number:
 #       - The acceptable field number will be the field index of the last
 #         field in the last extensible group.
-#' @importFrom checkmate assert_integer assert_names
 get_idd_class_field_num <- function (dt_class, num = NULL) {
     assert_integer(num, lower = 1L, any.missing = FALSE, null.ok = TRUE)
 
@@ -214,7 +213,6 @@ get_idd_field_in_class <- function (idd_env, class, all = FALSE, underscore = TR
 }
 # }}}
 # get_idd_field_from_which {{{
-#' @importFrom checkmate test_integerish
 get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                                       no_ext = FALSE, complete = FALSE, all = FALSE) {
     assert_valid_type(field, "field")
@@ -651,7 +649,6 @@ combine_input_and_relation <- function (input, ref, type, direction) {
 #'
 #' @keywords internal
 #' @export
-#' @importFrom checkmate assert_count
 get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL,
                               direction = c("ref_to", "ref_by"), depth = 0L, name = FALSE,
                               class = NULL, group = NULL, keep_all = FALSE,
@@ -1007,7 +1004,6 @@ del_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
 }
 # }}}
 # get_input_class_data {{{
-#' @importFrom checkmate assert_names assert_integerish
 get_input_class_data <- function (idd_env, class, num = NULL) {
     if (is.data.frame(class)) {
         dt_cls <- class
@@ -1055,7 +1051,6 @@ get_idd_table <- function (idd_env, class, all = FALSE) {
 
 # STRING
 # get_idd_string {{{
-#' @importFrom checkmate assert_count
 get_idd_string <- function (idd_env, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
     assert_valid_type(class, "class")
     assert_count(sep_each)

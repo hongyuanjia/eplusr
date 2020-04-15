@@ -1,3 +1,7 @@
+#' @importFrom checkmate assert_count assert_choice assert_flag assert_subset
+#' @importFrom checkmate assert_string test_choice
+NULL
+
 # package level global constant {{{
 .globals <- new.env(parent = emptyenv())
 
@@ -71,8 +75,6 @@
 #'
 #' # set options
 #' eplusr_option(verbose_info = TRUE, view_in_ip = FALSE)
-#' @importFrom checkmate assert_count assert_choice assert_flag assert_subset
-#' @importFrom checkmate assert_string test_choice
 #' @export
 #' @author Hongyuan Jia
 # eplusr_option {{{

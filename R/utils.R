@@ -1,4 +1,6 @@
 #' @importFrom stringi stri_enc_toutf8 stri_replace_all_charclass stri_trans_tolower
+#' @importFrom checkmate assert_number assert_flag assert_class assert_vector
+#' @importFrom checkmate assert_character assert_names
 NULL
 
 # `%||%` {{{
@@ -131,7 +133,6 @@ read_lines <- function(input, trim = TRUE, ...) {
 # write_lines {{{
 # NOTE: IDFEditor will crash if a large IDF file was saved with LF eol on
 #       Windows.
-#' @importFrom checkmate assert_character assert_names
 write_lines <- function (x, file = "", append = FALSE) {
     if (inherits(x, "data.table")) {
         assert_names(names(x), must.include = "string")
@@ -184,7 +185,6 @@ standardize_ver <- function (ver, strict = FALSE, complete = TRUE) {
 # }}}
 
 # match_minor_ver {{{
-#' @importFrom checkmate assert_class assert_vector
 match_minor_ver <- function (ver, all_ver, type = c("idd", "eplus"), max = TRUE, verbose = TRUE) {
     checkmate::assert_class(ver, "numeric_version")
     checkmate::assert_vector(ver, len = 1L)
@@ -366,7 +366,6 @@ each_length <- function (x) {
 # }}}
 
 # ranger {{{
-#' @importFrom checkmate assert_number assert_flag
 ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
     assert_number(minimum)
     assert_number(maximum)

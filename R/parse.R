@@ -1,4 +1,5 @@
 #' @importFrom cli rule
+#' @importFrom checkmate assert_data_table assert_names
 #' @importFrom data.table ":=" "%chin%"
 #' @importFrom data.table between chmatch data.table dcast.data.table last
 #' @importFrom data.table rbindlist rowidv rleid set setattr setcolorder
@@ -243,7 +244,6 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 # }}}
 
 # get_idd_ver {{{
-#' @importFrom checkmate assert_data_table assert_names
 get_idd_ver <- function (idd_dt) {
     ver_line <- idd_dt$string[[1L]]
 
@@ -260,7 +260,6 @@ get_idd_ver <- function (idd_dt) {
 # }}}
 
 # get_idd_build {{{
-#' @importFrom checkmate assert_data_table assert_names
 get_idd_build <- function (idd_dt) {
     build_line <- idd_dt$string[[2L]]
 
@@ -656,7 +655,6 @@ get_field_table <- function (dt, type_enum) {
 # }}}
 
 # dcast_slash {{{
-#' @importFrom checkmate assert_names
 dcast_slash <- function (dt, id, keys, keep = NULL) {
     if (!is.null(keep)) assert_names(names(dt), must.include = keep)
 
