@@ -91,7 +91,7 @@ test_that("parse_idd_file()", {
     )
     expect_error(parse_idd_file(idd_wrong), "Invalid IDD version", "eplusr_error_parse_idd")
 
-    # can warn about missing IDD build tag
+    # can handle missing IDD build tag
     idd_wrong <- c(
         "!IDD_Version 9.9.9
          \\group TestGroup

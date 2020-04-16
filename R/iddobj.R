@@ -1,4 +1,5 @@
 #' @importFrom R6 R6Class
+#' @importFrom checkmate assert_count assert_vector assert_integerish
 NULL
 
 #' EnergyPlus IDD object
@@ -70,16 +71,14 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         #'
         initialize = function (class, parent) {
             if (missing(parent)) {
-                abort("error_iddobject_missing_parent",
-                    paste("IddObject can only be created based on a parent Idd object.",
-                        "Please give `parent`, which should be either an IDD version or an `Idd` object."
-                    )
-                )
+                abort(paste("IddObject can only be created based on a parent Idd object.",
+                    "Please give 'parent', which should be either an IDD version or an 'Idd' object."
+                ))
             } else {
                 private$m_parent <- use_idd(parent)
             }
 
-            assert(!is.null(class))
+            assert_vector(class, null.ok = FALSE)
             private$m_class_id <- get_idd_class(private$idd_env(), class, underscore = TRUE)$class_id
         },
         # }}}
@@ -1414,12 +1413,8 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        idd_priv = function () {
-            ._get_private(private$m_parent)
-        },
-
         idd_env = function () {
-            .subset2(._get_private(private$m_parent), "m_idd_env")
+            .subset2(get_priv_env(private$m_parent), "m_idd_env")
         }
         # }}}
     )
@@ -1428,7 +1423,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
 
 # iddobj_version {{{
 iddobj_version <- function (self, private) {
-    private$idd_priv()$m_version
+    private$m_parent$version()
 }
 # }}}
 # iddobj_parent {{{
@@ -1499,9 +1494,9 @@ iddobj_extensible_group_num <- function (self, private) {
 # }}}
 # iddobj_add_extensible_group {{{
 iddobj_add_extensible_group <- function (self, private, num) {
-    assert(is_count(num))
+    assert_count(num, positive = TRUE)
 
-    iddenv <- ._get_private(private$m_parent)$m_idd_env
+    iddenv <- get_priv_env(private$m_parent)$m_idd_env
     iddenv <- add_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) added")
@@ -1511,9 +1506,9 @@ iddobj_add_extensible_group <- function (self, private, num) {
 # }}}
 # iddobj_del_extensible_group {{{
 iddobj_del_extensible_group <- function (self, private, num) {
-    assert(is_count(num))
+    assert_count(num, positive = TRUE)
 
-    iddenv <- ._get_private(private$m_parent)$m_idd_env
+    iddenv <- get_priv_env(private$m_parent)$m_idd_env
     iddenv <- del_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
 
     verbose_info(num, " extensible group(s) deleted")
@@ -1551,14 +1546,14 @@ iddobj_field_data <- function (self, private, which = NULL, property = NULL, und
 # }}}
 # iddobj_field_name {{{
 iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip = eplusr_option("view_in_ip")) {
-    if (!is.null(index)) assert(are_count(index))
+    index <- assert_integerish(index, lower = 1L, any.missing = FALSE, null.ok = TRUE, coerce = TRUE)
 
     if (unit) {
         if (eplusr_option("view_in_ip") != in_ip) {
             eplusr_option(view_in_ip = in_ip)
             on.exit(eplusr_option(view_in_ip = !in_ip), add = TRUE)
         }
-        res <- format_name(iddobj_field_data(self, private, index, c("units", "ip_units")))
+        res <- format_name(iddobj_field_data(self, private, index, c("units", "ip_units")), prefix = FALSE)
     } else {
         res <- iddobj_field_data(self, private, index)$field_name
     }
@@ -1568,7 +1563,7 @@ iddobj_field_name <- function (self, private, index = NULL, unit = FALSE, in_ip 
 # }}}
 # iddobj_field_index {{{
 iddobj_field_index <- function (self, private, name = NULL) {
-    if (!is.null(name)) assert(is.character(name))
+    assert_character(name, any.missing = FALSE, null.ok = TRUE)
     iddobj_field_data(self, private, name, underscore = TRUE)$field_index
 }
 # }}}
@@ -1650,7 +1645,7 @@ iddobj_field_possible <- function (self, private, which = NULL) {
 # }}}
 # iddobj_is_valid_field_num {{{
 iddobj_is_valid_field_num <- function (self, private, num) {
-    assert(are_count(num))
+    num <- assert_integerish(num, lower = 1L, any.missing = FALSE, coerce = TRUE)
 
     cls <- iddobj_class_data(self, private)
 
@@ -1670,7 +1665,7 @@ iddobj_is_valid_field_num <- function (self, private, num) {
 # }}}
 # iddobj_is_extensible_index {{{
 iddobj_is_extensible_index <- function (self, private, index) {
-    assert(are_count(index))
+    index <- assert_integerish(index, lower = 1L, any.missing = FALSE, coerce = TRUE)
 
     cls <- iddobj_class_data(self, private)
 
@@ -1694,7 +1689,7 @@ iddobj_is_valid_field_name <- function (self, private, name, strict = FALSE) {
 # }}}
 # iddobj_is_valid_field_index {{{
 iddobj_is_valid_field_index <- function (self, private, index) {
-    assert(are_count(index))
+    index <- assert_integerish(index, lower = 1L, any.missing = FALSE, coerce = TRUE)
     index <= iddobj_class_data(self, private)$num_fields
 }
 # }}}
@@ -1735,12 +1730,16 @@ iddobj_has_ref <- function (self, private, which = NULL, class = NULL, group = N
 
     if (is.null(which)) {
         rel <- get_iddobj_relation(private$idd_env(), private$m_class_id,
-            class = class, group = group, depth = depth, direction = type)
+            class = class, group = group, depth = depth, direction = type,
+            keep_all = TRUE
+        )
     } else {
         fld <- get_idd_field(private$idd_env(), private$m_class_id, which)
 
         rel <- get_iddobj_relation(private$idd_env(), NULL, fld$field_id,
-            class = class, group = group, depth = depth, direction = type)
+            class = class, group = group, depth = depth, direction = type,
+            keep_all = TRUE
+        )
     }
 
     if (type == "all") {
@@ -1835,30 +1834,28 @@ iddobj_print <- function (self, private, brief = FALSE) {
 
 #' Format an IddObject
 #'
-#' Format an [IddObject] into a string of an empty object of current class.
-#' It is formatted exactly the same as in IDF Editor.
+#' Format an [IddObject] into a string. It is formatted the same way as
+#' `IddObject$print(brief = TRUE)` but with a suffix of current IDD version.
 #'
 #' @param x An [IddObject] object.
-#' @param all If `TRUE`, all fields in current class are returned, otherwise
-#' only minimum fields are returned.
-#' @param comment A character vector to be used as comments of returned string
-#' format object. If `NULL`, no comments are inserted. Default: `NULL`.
-#' @param leading Leading spaces added to each field. Default: `4`.
-#' @param sep_at The character width to separate value string and field string.
-#' Default: `29` which is the same as IDF Editor.
+#' @param ver If `TRUE`, a suffix of version string is added. Default: `TRUE`.
 #' @param ... Further arguments passed to or from other methods.
+#'
 #' @return A single length character vector.
 #' @examples
 #' \dontrun{
-#' cat(format(use_idd(8.8, download = "auto")$Materal, leading = 0))
+#' format(use_idd(8.8, download = "auto")$Material)
 #' }
 #'
 #' @export
 # format.IddObject {{{
-format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all = FALSE, ...) {
-    paste0(x$to_string(comment = comment, leading = leading, sep_at = sep_at, all = all),
-        collapse = "\n"
-    )
+format.IddObject <- function (x, ver = TRUE, ...) {
+    nm <- get_idd_class(get_priv_env(x)$idd_env(), get_priv_env(x)$m_class_id)$class_name
+    if (isTRUE(ver)) {
+        paste0("<IddObject: ", surround(nm), " v", x$version(), ">")
+    } else {
+        paste0("<IddObject: ", surround(nm), ">")
+    }
 }
 # }}}
 
@@ -1867,7 +1864,16 @@ format.IddObject <- function (x, comment = NULL, leading = 4L, sep_at = 29L, all
 #' Coerce an [IddObject] into an empty object of current class in a character
 #' vector format. It is formatted exactly the same as in IDF Editor.
 #'
-#' @inheritParams format.IddObject
+#' @param x An [IddObject] object.
+#' @param all If `TRUE`, all fields in current class are returned, otherwise
+#'        only minimum fields are returned.
+#' @param comment A character vector to be used as comments of returned string
+#'        format object. If `NULL`, no comments are inserted. Default: `NULL`.
+#' @param leading Leading spaces added to each field. Default: `4`.
+#' @param sep_at The character width to separate value string and field string.
+#'        Default: `29` which is the same as IDF Editor.'
+#' @param ... Further arguments passed to or from other methods.
+#'
 #' @return A character vector.
 #' @examples
 #' \dontrun{
@@ -1893,10 +1899,10 @@ str.IddObject <- function (object, brief = FALSE, ...) {
 `==.IddObject` <- function (e1, e2) {
     if (!is_iddobject(e2)) return(FALSE)
     identical(
-        ._get_private(._get_private(e1)$m_parent)$m_log$uuid,
-        ._get_private(._get_private(e2)$m_parent)$m_log$uuid
+        get_priv_env(get_priv_env(e1)$m_parent)$m_log$uuid,
+        get_priv_env(get_priv_env(e2)$m_parent)$m_log$uuid
     ) &&
-    identical(._get_private(e1)$m_class_id, ._get_private(e2)$m_class_id)
+    identical(get_priv_env(e1)$m_class_id, get_priv_env(e2)$m_class_id)
 }
 
 #' @export

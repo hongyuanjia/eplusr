@@ -3,10 +3,13 @@ context("IddObject")
 test_that("IddObject class", {
 
     expect_silent(idd <- Idd$new(text("idd", 9.9)))
+    expect_silent(simple <- IddObject$new("TestSimple", idd))
     expect_silent(slash <- IddObject$new("TestSlash", idd))
     expect_silent(slash <- idd_object(use_idd(text("idd", 9.9)), "TestSlash"))
 
-    expect_error(idd_object(), class = "error_iddobject_missing_parent")
+    expect_error(idd_object(), "based on a parent Idd object", class = "eplusr_error")
+
+    expect_equal(slash$version(), idd$version())
 
     expect_is(slash$parent(), "Idd")
 
@@ -65,17 +68,19 @@ test_that("IddObject class", {
 
     # can use $del_extensible_groups()
     expect_equal(slash$del_extensible_group(1)$num_fields(), 4L)
-    expect_s3_class(catch_cnd(slash$del_extensible_group(1)), "error_del_extensible")
+    expect_s3_class(catch_cnd(slash$del_extensible_group(1)), "eplusr_error")
     # }}}
 
     # Field {{{
     # can use $field_name()
-    expect_error(slash$field_name(slash$num_fields() + 30), class = "error_bad_field_index")
+    expect_error(slash$field_name(slash$num_fields() + 30), class = "eplusr_error_invalid_field_index")
     expect_equal(slash$field_name(c(2, 1)), c("Test Numeric Field 1", "Test Character Field 1"))
+    expect_equal(slash$field_name(c(2, 1), unit = TRUE), c("Test Numeric Field 1 {m}", "Test Character Field 1"))
+    expect_equal(slash$field_name(c(2, 1), unit = TRUE, in_ip = TRUE), c("Test Numeric Field 1 {in}", "Test Character Field 1"))
 
     # can use $field_index()
     expect_equal(slash$field_index(), 1L:4L)
-    expect_error(slash$field_index("WrongName"), class = "error_bad_field_name")
+    expect_error(slash$field_index("WrongName"), class = "eplusr_error_invalid_field_name")
     expect_equal(slash$field_index(
             c("Test Numeric Field 1", "Test Character Field 1")), c(2L, 1L))
     # can use $field_type()
@@ -101,6 +106,7 @@ test_that("IddObject class", {
         list(ranger(NA_real_, FALSE, NA_real_, FALSE), ranger(1L, TRUE, 10, FALSE)))
 
     # can use $field_relation()
+    expect_is(slash$field_relation(), "list")
     expect_is(slash$field_relation(c(4, 2)), "list")
     expect_null(slash$field_relation(c(4, 2), "ref_by")$ref_to)
     expect_equal(nrow(slash$field_relation(c(4, 2), keep = TRUE)$ref_by), 2L)
@@ -137,6 +143,7 @@ test_that("IddObject class", {
     expect_equal(slash$is_valid_field_num(c(1, 4, 6, 12)), c(FALSE, TRUE, FALSE, TRUE))
 
     # can use $is_extensible_field_index()
+    expect_equal(simple$is_extensible_index(1:2), rep(FALSE, 2L))
     expect_equal(slash$is_extensible_index(c(1, 4, 6, 12)), rep(TRUE, times = 4L))
 
     # can use $is_valid_field_name()
@@ -145,6 +152,7 @@ test_that("IddObject class", {
     expect_true(slash$is_valid_field_name("Test Numeric Field 1"))
     expect_true(slash$is_valid_field_name("Test Numeric Field 2"))
     expect_true(slash$is_valid_field_name("test_character_field_1"))
+    expect_false(slash$is_valid_field_name("test_character_field_1", strict = TRUE))
     expect_true(slash$is_valid_field_name("test_numeric_field_1"))
     expect_false(slash$is_valid_field_name(1))
     expect_false(slash$is_valid_field_name("wrong"))
@@ -154,7 +162,7 @@ test_that("IddObject class", {
     expect_true(slash$is_valid_field_index(2))
     expect_true(slash$is_valid_field_index(3))
     expect_true(slash$is_valid_field_index(4))
-    expect_error(slash$is_valid_field_index("wrong"), class = "error_not_count")
+    expect_error(slash$is_valid_field_index("wrong"), "integerish")
     expect_false(slash$is_valid_field_index(5))
 
     # can use $is_autosizable_field()
@@ -245,11 +253,21 @@ test_that("IddObject class", {
     )
     # }}}
 
+    # S3 {{{
+    expect_equal(format(slash), "<IddObject: 'TestSlash' v9.9.0>")
+    expect_equal(format(slash, ver = FALSE), "<IddObject: 'TestSlash'>")
+    expect_output(str(slash))
+    expect_equal(as.character(slash), slash$to_string())
+    # }}}
+
     # can check equality
     expect_true(slash == slash)
+    expect_false(slash == "a")
     expect_false(slash == IddObject$new("TestSlash", idd))
     expect_true(slash != IddObject$new("TestSlash", idd))
 
     # print
+    expect_output(slash$print(brief = TRUE))
     expect_output(slash$print())
+    expect_output(simple$print())
 })
