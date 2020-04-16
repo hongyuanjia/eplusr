@@ -367,8 +367,8 @@ each_length <- function (x) {
 
 # ranger {{{
 ranger <- function (minimum = -Inf, lower_incbounds = FALSE, maximum = Inf, upper_incbounds = FALSE) {
-    assert_number(minimum)
-    assert_number(maximum)
+    assert_number(minimum, na.ok = TRUE)
+    assert_number(maximum, na.ok = TRUE)
     assert_flag(lower_incbounds)
     assert_flag(upper_incbounds)
     setattr(
