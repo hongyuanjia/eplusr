@@ -6,7 +6,7 @@ eplusr_option(verbose_info = FALSE)
 test_that("download_idd() can download IDD from EnergyPlus repo", {
     expect_error(download_idd(1, tempdir()), classs = "eplusr_error_invalid_eplus_ver")
 
-    # skip_on_cran()
+    skip_on_cran()
     # should download IDD v9.0.1 if input is 9, 9.0, 9.0.1
     expect_equal(read_idd(attr(download_idd(9.0, tempdir()), "file"))$version(), numeric_version("9.0.1"))
     expect_equal(read_idd(attr(download_idd("9.0.1", tempdir()), "file"))$version(), numeric_version("9.0.1"))
@@ -15,7 +15,7 @@ test_that("download_idd() can download IDD from EnergyPlus repo", {
 
 # use_idd() {{{
 test_that("can read IDD", {
-    # skip_on_cran()
+    skip_on_cran()
     # remove all parsed IDD
     .globals$idd <- list()
 
@@ -89,8 +89,6 @@ test_that("can read IDD", {
     locate_eplus()
 
     # can parse old IDD
-    skip_on_travis()
-    skip_on_appveyor()
     expect_silent(use_idd(7.2))
     expect_silent(use_idd(8.0))
     expect_silent(use_idd(8.1))
