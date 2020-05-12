@@ -2139,7 +2139,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         verbose_info(paste0(msg, msg_rel, collapse = "\n"))
     }
 
-    id_del <- if (.ref_to) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
+    id_del <- if (NROW(rel$ref_to)) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
 
     # delete rows in object table
     dt_object <- idf_env$object[!J(id_del), on = "object_id"]
