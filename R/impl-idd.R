@@ -486,7 +486,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep,
 
                 # should also remove all unmatched in the init match
                 if (dep == 0L) {
-                    exclu <- ref[J(skip), on = col_rev][!J(include), on = col_ref]
+                    exclu <- ref[J(unique(skip)), on = col_rev][!J(include), on = col_ref]
                     ref <- ref[!exclu, on = c(col_rev, col_ref)]
                 }
             }

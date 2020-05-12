@@ -3425,19 +3425,8 @@ update_value_reference <- function (idd_env, idf_env, object, value) {
         set(object, NULL, "rleid", -object$rleid)
 
         # update object id as new object id during validation
-        input_ref <- idf_env$reference[object_id < 0L, which = TRUE]
-        if (length(input_ref)) {
-            set(idf_env$reference, input_ref, "object_id",
-                object[J(idf_env$reference$object_id[input_ref]), on = "rleid", object_id]
-            )
-        }
-
-        input_src <- idf_env$reference[src_object_id < 0L, which = TRUE]
-        if (length(input_src)) {
-            set(idf_env$reference, input_src, "src_object_id",
-                object[J(idf_env$reference$src_object_id[input_src]), on = "rleid", object_id]
-            )
-        }
+        idf_env$reference[J(-object$rleid), on = "object_id", object_id := object$object_id]
+        idf_env$reference[J(-object$rleid), on = "src_object_id", object_id := object$object_id]
 
         # if have new sources
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
