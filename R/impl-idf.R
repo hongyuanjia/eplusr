@@ -2139,7 +2139,7 @@ del_idf_object <- function (idd_env, idf_env, ..., .ref_to = FALSE, .ref_by = FA
         verbose_info(paste0(msg, msg_rel, collapse = "\n"))
     }
 
-    id_del <- if (.ref_to) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
+    id_del <- if (NROW(rel$ref_to)) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
 
     # delete rows in object table
     dt_object <- idf_env$object[!J(id_del), on = "object_id"]
@@ -3425,19 +3425,8 @@ update_value_reference <- function (idd_env, idf_env, object, value) {
         set(object, NULL, "rleid", -object$rleid)
 
         # update object id as new object id during validation
-        input_ref <- idf_env$reference[object_id < 0L, which = TRUE]
-        if (length(input_ref)) {
-            set(idf_env$reference, input_ref, "object_id",
-                object[J(idf_env$reference$object_id[input_ref]), on = "rleid", object_id]
-            )
-        }
-
-        input_src <- idf_env$reference[src_object_id < 0L, which = TRUE]
-        if (length(input_src)) {
-            set(idf_env$reference, input_src, "src_object_id",
-                object[J(idf_env$reference$src_object_id[input_src]), on = "rleid", object_id]
-            )
-        }
+        idf_env$reference[object, on = c("object_id" = "rleid"), object_id := i.object_id]
+        idf_env$reference[object, on = c("src_object_id" = "rleid"), src_object_id := i.object_id]
 
         # if have new sources
         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
