@@ -111,6 +111,9 @@
   SAVINGS` and `DATA PERIODS`, `read_epw()` will still give an error if any
   parsing errors are found. This is because the values of those 2 headers are
   used to parsing the actual weather data.
+* Now `EplusSql$report_data()` will set the year values of day type
+  `SummerDesignDay` and `WinterDesignDay` to current year and the `day_type`
+  value will be left unchanged (#258).
 
 ## Minor changes
 
