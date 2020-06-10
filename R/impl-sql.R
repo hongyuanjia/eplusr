@@ -166,13 +166,22 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
             msg = "`period` should be a Date or DateTime vector."
         )
         p <- unique(period)
-        period <- data.table(
-            MONTH = lubridate::month(p),
-            DAY = lubridate::mday(p),
-            HOUR = lubridate::hour(p),
-            MINUTE = lubridate::minute(p)
-        )
-        time <- time[period, on = names(period)]
+        if (inherits(period, "Date")) {
+            period <- data.table(
+                MONTH = lubridate::month(p),
+                DAY = lubridate::mday(p)
+            )
+        } else if (inherits(period, "POSIXt")) {
+            period <- data.table(
+                MONTH = lubridate::month(p),
+                DAY = lubridate::mday(p),
+                HOUR = lubridate::hour(p),
+                MINUTE = lubridate::minute(p)
+            )
+        } else {
+            abort("error_sql_period_type", "`period` should be a Date or DateTime vector.")
+        }
+        time <- time[period, on = names(period), nomatch = NULL]
     }
     if (!is.null(day_type)) {
         subset_time <- TRUE
