@@ -346,6 +346,14 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #'        and `CustomDay2`. All possible values for current simulation
         #'        output can be obtained using
         #'        \href{../../eplusr/html/EplusSql.html#method-read_table}{\code{$read_table("Time")}}.
+        #'        A few grouped options are also provided:
+        #'
+        #' - `"Weekday"`: All working days, i.e. from Monday to Friday
+        #' - `"Weekend"`: Saturday and Sunday
+        #' - `"DesignDay"`: Equivalent to `"SummerDesignDay"` plus `"WinterDesignDay"`
+        #' - `"CustomDay"`: CustomDay1 and CustomDay2
+        #' - `"SpecialDay"`: Equivalent to `"DesignDay"` plus `"CustomDay"`
+        #' - `"NormalDay"`: Equivalent to `"Weekday"` and `"Weekend"` plus `"Holiday"`
         #'
         #' @param environment_name A character vector to specify which
         #'        environment data to extract. If `NULL`, all environment data
