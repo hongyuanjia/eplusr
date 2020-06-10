@@ -30,163 +30,6 @@ get_sql_query <- function (sql, query) {
     })
 }
 # }}}
-# get_sql_report_data_query {{{
-get_sql_report_data_query <- function (key_value = NULL, name = NULL,
-                                       period = NULL,
-                                       month = NULL, day = NULL, hour = NULL, minute = NULL,
-                                       interval = NULL, simulation_days = NULL, day_type = NULL,
-                                       environment_name = NULL) {
-    # Query for Time {{{
-    time <- NULL %and%
-        .sql_make(month, assert(are_count(month), month <= 12L), "Month") %and%
-        .sql_make(day, assert(are_count(day), day <= 31L), "Day") %and%
-        .sql_make(hour, assert(are_count(hour, TRUE), hour <= 23L), "Hour") %and%
-        .sql_make(minute, assert(are_count(minute, TRUE), minute <= 59L), "Minute") %and%
-        .sql_make(interval, assert(are_count(interval)), "Interval") %and%
-        .sql_make(simulation_days, assert(are_count(simulation_days)), "SimulationDays")
-
-    if (!is.null(day_type)) {
-        dt <- match_in_vec(day_type, label = TRUE,
-            c("Monday", "Tuesday", "Wednesday", "Thursday",
-              "Friday", "Saturday", "Sunday", "Holiday",
-              "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"
-            )
-        )
-        assert(!is.na(dt), msg = paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
-        time <- time %and% .sql_make(dt, sql_col = "DayType")
-    }
-
-    if (is.null(environment_name)) {
-        env <- "EnvironmentPeriods"
-    } else {
-        assert(is.character(environment_name), no_na(environment_name))
-        env <- paste0("
-            (
-            SELECT *
-            FROM EnvironmentPeriods
-            WHERE ", .sql_make(environment_name, sql_col = "EnvironmentName"), "
-            )"
-        )
-    }
-
-    if (is.null(time) && is.null(period)) {
-        time <- paste0("
-            SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                   SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
-            FROM (
-                SELECT *
-                FROM ", env, " AS e
-                INNER JOIN Time AS t
-                ON e.EnvironmentPeriodIndex = t.EnvironmentPeriodIndex
-            )
-            "
-        )
-    } else {
-        if (is.null(period)) {
-            time <- paste0("
-                SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                       SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
-                FROM (
-                    SELECT *
-                    FROM ", env, " AS e
-                    INNER JOIN (
-                        SELECT *
-                        FROM Time
-                        WHERE ", time, "
-                    ) AS t
-                    ON e.EnvironmentPeriodIndex = t.EnvironmentPeriodIndex
-                )
-                "
-            )
-        # make date time string
-        } else {
-            assert(any(c("Date", "POSIXt") %in% class(period)),
-                msg = "`period` should be a Date or DateTime vector."
-            )
-            p <- unique(period)
-            period <- paste(
-                lubridate::month(p),
-                lubridate::mday(p),
-                lubridate::hour(p),
-                lubridate::minute(p),
-                sep = "-"
-            )
-            period <- .sql_make(period, sql_col = "DateTime")
-
-            dt <- "(Month || \"-\" || Day || \"-\" || Hour || \"-\" || Minute) AS DateTime"
-            time <- paste0("
-                SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
-                       SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
-                FROM (
-                    SELECT *
-                    FROM ", env, " AS e
-                    INNER JOIN (
-                        SELECT *, ", dt, "
-                        FROM Time
-                        WHERE ", period %and% time, "
-                    ) AS t
-                    ON e.EnvironmentPeriodIndex = t.EnvironmentPeriodIndex
-                )
-                "
-            )
-        }
-    }
-    # }}}
-    # Query for dict {{{
-    if (is.data.frame(key_value)) {
-        assert(has_name(key_value, c("key_value", "name")))
-        name <- key_value$name
-        key_value <- key_value$key_value
-    }
-
-    key_var <- NULL %and%
-        .sql_make(key_value, assert(is.character(key_value), no_na(key_value)), "KeyValue") %and%
-        .sql_make(name, assert(is.character(name), no_na(name)), "Name")
-
-    if (is.null(key_var)) {
-        key_var <- "ReportDataDictionary"
-    } else {
-        key_var <- paste0("
-            SELECT *
-                FROM ReportDataDictionary
-            WHERE ", key_var
-        )
-    }
-    # }}}
-
-    query <- paste0(
-        "
-        SELECT t.Month AS month,
-               t.Day AS day,
-               t.Hour AS hour,
-               t.Minute AS minute,
-               t.Dst AS dst,
-               t.Interval AS interval,
-               t.SimulationDays AS simulation_days,
-               t.DayType AS day_type,
-               t.EnvironmentName AS environment_name,
-               t.EnvironmentPeriodIndex AS environment_period_index,
-               rdd.IsMeter AS is_meter,
-               rdd.Type AS type,
-               rdd.indexgroup AS index_group,
-               rdd.timesteptype AS timestep_type,
-               rdd.KeyValue AS key_value,
-               rdd.Name AS name,
-               rdd.ReportingFrequency AS reporting_frequency,
-               rdd.ScheduleName AS schedule_name,
-               rdd.Units As units,
-               rd.Value As value
-        FROM ReportData AS rd
-        INNER JOIN (", key_var, ") As rdd
-            ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex
-        INNER JOIN (", time, ") As t
-            ON rd.TimeIndex = t.TimeIndex
-        "
-    )
-
-    query
-}
-# }}}
 # get_sql_tabular_data_query {{{
 get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
@@ -249,83 +92,250 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
                                  interval = NULL, simulation_days = NULL, day_type = NULL,
                                  environment_name = NULL) {
-    q <- get_sql_report_data_query(
-        key_value, name,
-        period, month, day, hour, minute,
-        interval, simulation_days, day_type, environment_name
-    )
-    res <- get_sql_query(sql, q)
-
-    # check leap year
-    leap <- any(res$month == 2L & res$day == 29L)
-    # month, day, hour, minute may be NA if reporting frequency is Monthly or
-    # RunPeriod
-    if (is.na(leap)) leap <- FALSE
-
-    # get input year
-    if (is.null(year)) {
-        year <- lubridate::year(Sys.Date())
-
-        # get wday per environment
-        w <- get_sql_wday(sql)
-
-        # in case there is no valid day type and get_sql_wday() returns nothing
-        if (!nrow(w)) {
-            set(res, NULL, "year", year)
+    # report data dictionary {{{
+    rpvar_dict <- read_sql_table(sql, "ReportDataDictionary")
+    subset_rpvar <- FALSE
+    if (!is.null(key_value)) {
+        subset_rpvar <- TRUE
+        if (is.data.frame(key_value)) {
+            assert(has_name(key_value, c("key_value", "name")))
+            if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
+            kv <- unique(key_value)
+            rpvar_dict <- rpvar_dict[kv, on = c("key_value", "name"), nomatch = NULL]
         } else {
-            # for WinterDesignDay and SummerDesignDay, set to Monday
-            set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
-            set(w, NULL, "dt", get_epw_wday(w$day_type))
-            w[day_type %chin% c("WinterDesignDay", "SummerDesignDay"), dt := 1L]
-
-            if (any(!is.na(w$dt))) {
-                for (i in which(!is.na(w$dt))) {
-                    set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], year, leap))
-                }
-            }
-
-            # make sure all environments have a year value
-            w[is.na(dt), year := lubridate::year(Sys.Date())]
-
-            set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
+            assert(is.character(key_value), no_na(key_value))
+            KEY_VALUE <- key_value
+            rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value", nomatch = NULL]
         }
-    } else {
-        set(res, NULL, "year", year)
     }
 
-    set(res, NULL, "datetime",
-        lubridate::make_datetime(res$year, res$month, res$day, res$hour, res$minute, tz = tz)
+    if (!is.null(name)) {
+        subset_rpvar <- TRUE
+        assert(is.character(name), no_na(name))
+        NAME <- name
+        rpvar_dict <- rpvar_dict[J(NAME), on = "name"]
+    }
+    # }}}
+
+    # environment periods {{{
+    env_periods <- read_sql_table(sql, "EnvironmentPeriods")
+    if (!is.null(environment_name)) {
+        ENVIRONMENT_NAME <- environment_name
+        env_periods <- env_periods[J(toupper(unique(ENVIRONMENT_NAME))), on = "environment_name", nomatch = NULL]
+    }
+    # }}}
+
+    # time {{{
+    time <- read_sql_table(sql, "Time")
+    set(time, NULL, c("warmup_flag", "interval_type"), NULL)
+    setnames(time, toupper(names(time)))
+    subset_time <- FALSE
+    if (!is.null(month)) {
+        subset_time <- TRUE
+        assert(are_count(month), month <= 12L)
+        time <- time[J(unique(month)), on = "MONTH", nomatch = NULL]
+    }
+    if (!is.null(day)) {
+        subset_time <- TRUE
+        assert(are_count(day), day <= 31L)
+        time <- time[J(unique(day)), on = "DAY", nomatch = NULL]
+    }
+    if (!is.null(hour)) {
+        subset_time <- TRUE
+        assert(are_count(hour, TRUE), hour <= 24L)
+        time <- time[J(unique(hour)), on = "HOUR", nomatch = NULL]
+    }
+    if (!is.null(minute)) {
+        subset_time <- TRUE
+        assert(are_count(minute, TRUE), minute <= 60L)
+        time <- time[J(unique(minute)), on = "MINUTE", nomatch = NULL]
+    }
+    if (!is.null(interval)) {
+        subset_time <- TRUE
+        assert(are_count(interval), interval <= 527040) # 366 days
+        time <- time[J(unique(interval)), on = "INTERVAL", nomatch = NULL]
+    }
+    if (!is.null(simulation_days)) {
+        subset_time <- TRUE
+        assert(are_count(simulation_days), simulation_days <= 366) # 366 days
+        time <- time[J(unique(simulation_days)), on = "SIMULATION_DAYS", nomatch = NULL]
+    }
+    if (!is.null(period)) {
+        subset_time <- TRUE
+        assert(any(c("Date", "POSIXt") %in% class(period)),
+            msg = "`period` should be a Date or DateTime vector."
+        )
+        p <- unique(period)
+        if (inherits(period, "Date")) {
+            period <- data.table(
+                MONTH = lubridate::month(p),
+                DAY = lubridate::mday(p)
+            )
+        } else if (inherits(period, "POSIXt")) {
+            period <- data.table(
+                MONTH = lubridate::month(p),
+                DAY = lubridate::mday(p),
+                HOUR = lubridate::hour(p),
+                MINUTE = lubridate::minute(p)
+            )
+        } else {
+            abort("error_sql_period_type", "`period` should be a Date or DateTime vector.")
+        }
+        time <- time[period, on = names(period), nomatch = NULL]
+    }
+    if (!is.null(day_type)) {
+        subset_time <- TRUE
+        weekday <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+        weekend <- c("Saturday", "Sunday")
+        designday <- c("SummerDesignDay", "WinterDesignDay")
+        customday <- c("CustomDay1", "CustomDay2")
+        specialday <- c(designday, customday)
+        normalday <- c(weekday, weekend, "Holiday")
+        dt <- match_in_vec(day_type, label = TRUE, unique(
+            c(weekday,   weekend,   designday,   customday,   specialday,   normalday,
+              "Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay"
+        )))
+        assert(!is.na(dt), msg = paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
+        # expand
+        expd <- c()
+        if ("Weekday" %chin% dt) {expd <- c(expd, weekday); dt <- setdiff(dt, "Weekday")}
+        if ("Weekend" %chin% dt) {expd <- c(expd, weekend); dt <- setdiff(dt, "Weekend")}
+        if ("DesignDay" %chin% dt) {expd <- c(expd, designday); dt <- setdiff(dt, "DesignDay")}
+        if ("CustomDay" %chin% dt) {expd <- c(expd, customday); dt <- setdiff(dt, "CustomDay")}
+        if ("SpecialDay" %chin% dt) {expd <- c(expd, specialday); dt <- setdiff(dt, "SpecialDay")}
+        if ("NormalDay" %chin% dt) {expd <- c(expd, normalday); dt <- setdiff(dt, "NormalDay")}
+        dt <- unique(c(dt, expd))
+        time <- time[J(dt), on = "DAY_TYPE"]
+    }
+
+    setnames(time, tolower(names(time)))
+    time <- time[env_periods, on = "environment_period_index", nomatch = NULL]
+
+    # get input year
+    if (!is.null(year)) {
+        set(time, NULL, "year", year)
+    } else {
+        # current year
+        cur_year <- lubridate::year(Sys.Date())
+
+        if ("year" %in% names(time)) {
+            time[J(0L), on = "year", year := NA_integer_]
+        } else {
+            # get wday of first simulation day per environment
+            w <- time[simulation_days == 1L & !is.na(day_type), .SD[1L],
+                .SDcols = c("month", "day", "day_type", "environment_period_index"),
+                by = "environment_period_index"
+            ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
+
+            # in case there is no valid day type
+            if (!nrow(w)) {
+                # directly assign current year
+                set(time, NULL, "year", cur_year)
+            } else {
+                set(w, NULL, "date", lubridate::make_date(cur_year, w$month, w$day))
+                set(w, NULL, "dt", get_epw_wday(w$day_type))
+
+                # check leap year
+                leap <- time[J(2L, 29L), on = c("month", "day"), nomatch = NULL, .N > 0]
+
+                if (any(!is.na(w$dt))) {
+                    for (i in which(!is.na(w$dt))) {
+                        set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], cur_year, leap))
+                    }
+                }
+
+                # make sure all environments have a year value
+                w[is.na(dt), year := lubridate::year(Sys.Date())]
+
+                set(time, NULL, "year", w[J(time$environment_period_index), on = "environment_period_index", year])
+            }
+        }
+
+        # for SummerDesignDay and WinterDesignDay, directly use current year
+        time[J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type", year := cur_year]
+    }
+
+    set(time, NULL, "datetime",
+        lubridate::make_datetime(time$year, time$month, time$day, time$hour, time$minute, tz = tz)
     )
 
-    set(res, NULL, "year", NULL)
+    set(time, NULL, "year", NULL)
 
     # warning if any invalid datetime found
-    # month, day, hour, minute may be NA if reporting frequency is Monthly or
-    # RunPeriod
-    if (anyNA(res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute), datetime])) {
-        invld <- res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute)]
-        mes <- invld[, paste0("Original: ", month, "-", day, " ",  hour, ":", minute,
-            " --> New year: ", year)]
+    # month, day, hour, minute, day_type may be NA if reporting frequency is
+    # Monthly or RunPeriod
+    norm_time <- na.omit(time, cols = c("month", "day", "hour", "minute", "day_type"))
+    if (anyNA(norm_time$datetime)) {
+        mes <- norm_time[is.na(datetime), paste0(
+            "Original: ", month, "-", day, " ",  hour, ":", minute, " --> New year: ", year
+        )]
         warn("warn_invalid_epw_date_introduced",
             paste0("Invalid date introduced with input start year:\n",
                 paste0(mes, collapse = "\n")
             )
         )
     }
+    # }}}
+
+    # construct queries for ReportData {{{
+    # no subset on variables
+    if (subset_rpvar) {
+        # no subset on time
+        if (!subset_time) {
+            rp_data <- read_sql_table(sql, "ReportData")
+        # subset on time with no matched
+        } else if (!nrow(time)) {
+            rp_data <- tidy_sql_name(get_sql_query(sql, "SELECT * FROM ReportData LIMIT 0"))
+        } else {
+            rp_data <- tidy_sql_name(get_sql_query(sql, paste0(
+                "SELECT * FROM ReportData WHERE TimeIndex IN ",
+                "(", paste0(sprintf("'%s'", time$time_index), collapse = ", "), ")"
+            )))
+        }
+    # subset on variables with no matched
+    } else if (!nrow(rpvar_dict)) {
+        rp_data <- tidy_sql_name(get_sql_query(sql, "SELECT * FROM ReportData LIMIT 0"))
+    } else {
+        # no subset on time
+        if (!subset_time) {
+            rp_data <- tidy_sql_name(get_sql_query(sql, paste0(
+                "SELECT * FROM ReportData WHERE ReportDataDictionaryIndex IN ",
+                "(", paste0(sprintf("'%s'", rpvar_dict$report_data_dictionary_index), collapse = ", "), ")"
+            )))
+        # subset on time with no matched
+        } else if (!nrow(time)) {
+            rp_data <- tidy_sql_name(get_sql_query(sql, "SELECT * FROM ReportData LIMIT 0"))
+        } else {
+            rp_data <- tidy_sql_name(get_sql_query(sql, paste0(
+                "SELECT * FROM ReportData WHERE TimeIndex IN ",
+                "(", paste0(sprintf("'%s'", time$time_index), collapse = ", "), ")",
+                "AND ReportDataDictionaryIndex IN ",
+                "(", paste0(sprintf("'%s'", rpvar_dict$report_data_dictionary_index), collapse = ", "), ")"
+            )))
+        }
+    }
+    # }}}
+
+    res <- time[rp_data, on = "time_index", nomatch = NULL][rpvar_dict, on = "report_data_dictionary_index", nomatch = NULL]
+    cols <- c("datetime", "month", "day", "hour", "minute", "dst",
+        "interval", "simulation_days", "day_type", "environment_name",
+        "environment_period_index", "is_meter", "type", "index_group",
+        "timestep_type", "key_value", "name", "reporting_frequency",
+        "schedule_name", "units", "value"
+    )
+    set(res, NULL, setdiff(names(res), cols), NULL)
+    setcolorder(res, cols)
 
     if (!all & !wide) {
         res <- res[, .SD, .SDcols = c("datetime", "key_value", "name", "units", "value")]
-    } else {
-        setcolorder(res, c("datetime", setdiff(names(res), "datetime")))
     }
 
     # change to wide table
     if (wide) res <- report_dt_to_wide(res, all)
 
-    if (not_empty(case)) {
+    if (!is.null(case)) {
         assert(is_scalar(case))
-        case_name <- as.character(case)
-        set(res, NULL, "case", case_name)
+        set(res, NULL, "case", as.character(case))
         setcolorder(res, c("case", setdiff(names(res), "case")))
     }
 
@@ -418,20 +428,6 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     dt[]
 }
 # }}}
-# get_sql_wday {{{
-get_sql_wday <- function (sql) {
-    q <- "
-         SELECT Month AS month,
-                Day AS day,
-                DayType AS day_type,
-                EnvironmentPeriodIndex AS environment_period_index
-         FROM Time
-         WHERE SimulationDays == 1 AND DayType IS NOT NULL
-         GROUP BY EnvironmentPeriodIndex
-        "
-    get_sql_query(sql, q)
-}
-# }}}
 # get_sql_date {{{
 get_sql_date <- function (sql, environment_period_index, simulation_days) {
     cond <- NULL %and%
@@ -494,11 +490,7 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
 
     # handle special cases
     if (nrow(dt) & all(is.na(dt$datetime))) {
-        dt[reporting_frequency != "Monthly", `Date/Time` := paste0("simdays=", simulation_days)]
-        dt[reporting_frequency == "Monthly", `Date/Time` := {
-            m <- get_sql_date(sql, .BY$environment_period_index, simulation_days)$month
-            get_epw_month(m, label = TRUE)
-        }, by = "environment_period_index"]
+        dt[, `Date/Time` := paste0("simdays=", simulation_days)]
     }
 
     if (date_components) {

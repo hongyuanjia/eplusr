@@ -7,7 +7,7 @@ test_that("Sql methods", {
     example <- copy_example()
     idf <- read_idf(example$idf)
 
-    expect_silent(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE))
+    expect_is(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE), "EplusJob")
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
     # path
@@ -61,6 +61,8 @@ test_that("Sql methods", {
     expect_equal(nrow(sql$report_data(interval = 15)), 3840)
     expect_equal(nrow(sql$report_data(simulation_days = 1)), 3840)
     expect_equal(nrow(sql$report_data(day_type = "Tuesday")), 3840)
+    expect_equal(nrow(sql$report_data(day_type = "normalday")), 3840)
+    expect_equal(nrow(sql$report_data(day_type = "designday")), 0)
     expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)
 
     expect_equal(nrow(sql$tabular_data()), 6662)

@@ -2692,7 +2692,7 @@ get_epw_data <- function (epw_data, epw_header, period = 1L, start_year = NULL,
         setcolorder(d, c("datetime", setdiff(names(d), "datetime")))
     }
 
-    if (tz != lubridate::tz(d$datime[1L])) {
+    if (tz != lubridate::tz(d$datetime[1L])) {
         can_update <- TRUE
         set(d, NULL, "datetime1", lubridate::force_tz(d$datetime, tz))
 

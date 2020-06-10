@@ -902,7 +902,16 @@ to extract. All possible day types are: \code{Sunday}, \code{Monday},
 \code{Holiday}, \code{SummerDesignDay}, \code{WinterDesignDay}, \code{CustomDay1},
 and \code{CustomDay2}. All possible values for current simulation
 output can be obtained using
-\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.}
+\href{../../eplusr/html/EplusGroupJob.html#method-read_table}{\code{$read_table(NULL, "Time")}}.
+A few grouped options are also provided:
+\itemize{
+\item \code{"Weekday"}: All working days, i.e. from Monday to Friday
+\item \code{"Weekend"}: Saturday and Sunday
+\item \code{"DesignDay"}: Equivalent to \code{"SummerDesignDay"} plus \code{"WinterDesignDay"}
+\item \code{"CustomDay"}: CustomDay1 and CustomDay2
+\item \code{"SpecialDay"}: Equivalent to \code{"DesignDay"} plus \code{"CustomDay"}
+\item \code{"NormalDay"}: Equivalent to \code{"Weekday"} and \code{"Weekend"} plus \code{"Holiday"}
+}}
 
 \item{\code{environment_name}}{A character vector to specify which
 environment data to extract. If \code{NULL}, all environment data
