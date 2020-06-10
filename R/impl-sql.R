@@ -99,7 +99,9 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         subset_rpvar <- TRUE
         if (is.data.frame(key_value)) {
             assert(has_name(key_value, c("key_value", "name")))
-            rpvar_dict <- rpvar_dict[key_value, on = c("key_value", "name"), nomatch = NULL]
+            if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
+            kv <- unique(key_value)
+            rpvar_dict <- rpvar_dict[kv, on = c("key_value", "name"), nomatch = NULL]
         } else {
             assert(is.character(key_value), no_na(key_value))
             KEY_VALUE <- key_value
