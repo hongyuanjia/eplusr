@@ -114,6 +114,8 @@
 * Now `EplusSql$report_data()` will set the year values of day type
   `SummerDesignDay` and `WinterDesignDay` to current year and the `day_type`
   value will be left unchanged (#258).
+* The implementation of `$report_data()` has been refactored with ~200%
+  speed-up (#259)
 
 ## Minor changes
 
