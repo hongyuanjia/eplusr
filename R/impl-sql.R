@@ -35,7 +35,9 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
                                        period = NULL,
                                        month = NULL, day = NULL, hour = NULL, minute = NULL,
                                        interval = NULL, simulation_days = NULL, day_type = NULL,
-                                       environment_name = NULL) {
+                                       environment_name = NULL, support_year = FALSE) {
+    sql_year <- if (support_year) "Year," else NULL
+
     # Query for Time {{{
     time <- NULL %and%
         .sql_make(month, assert(are_count(month), month <= 12L), "Month") %and%
@@ -71,7 +73,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
 
     if (is.null(time) && is.null(period)) {
         time <- paste0("
-            SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
+            SELECT TimeIndex,", sql_year, " Month, Day, Hour, Minute, Dst, Interval,
                    SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
             FROM (
                 SELECT *
@@ -84,7 +86,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
     } else {
         if (is.null(period)) {
             time <- paste0("
-                SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
+                SELECT TimeIndex,", sql_year, " Month, Day, Hour, Minute, Dst, Interval,
                        SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
                 FROM (
                     SELECT *
@@ -115,7 +117,7 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
 
             dt <- "(Month || \"-\" || Day || \"-\" || Hour || \"-\" || Minute) AS DateTime"
             time <- paste0("
-                SELECT TimeIndex, Month, Day, Hour, Minute, Dst, Interval,
+                SELECT TimeIndex,", sql_year, " Month, Day, Hour, Minute, Dst, Interval,
                        SimulationDays, DayType, EnvironmentName, EnvironmentPeriodIndex
                 FROM (
                     SELECT *
@@ -156,7 +158,8 @@ get_sql_report_data_query <- function (key_value = NULL, name = NULL,
 
     query <- paste0(
         "
-        SELECT t.Month AS month,
+        SELECT ", if (!is.null(sql_year)) "t.Year AS year,",
+        "      t.Month AS month,
                t.Day AS day,
                t.Hour AS hour,
                t.Minute AS minute,
@@ -243,6 +246,11 @@ list_sql_table <- function (sql) {
     with_sql(con, RSQLite::dbListTables(con))
 }
 # }}}
+# check_year_field {{{
+check_year_field <- function (sql) {
+    "Year" %in% names(get_sql_query(sql, "SELECT * FROM Time LIMIT 0"))
+}
+# }}}
 # get_sql_report_data {{{
 get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
                                  tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
@@ -252,7 +260,8 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     q <- get_sql_report_data_query(
         key_value, name,
         period, month, day, hour, minute,
-        interval, simulation_days, day_type, environment_name
+        interval, simulation_days, day_type, environment_name,
+        support_year = check_year_field(sql)
     )
     res <- get_sql_query(sql, q)
 
@@ -263,34 +272,44 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (is.na(leap)) leap <- FALSE
 
     # get input year
-    if (is.null(year)) {
-        year <- lubridate::year(Sys.Date())
-
-        # get wday per environment
-        w <- get_sql_wday(sql)
-
-        # in case there is no valid day type and get_sql_wday() returns nothing
-        if (!nrow(w)) {
-            set(res, NULL, "year", year)
-        } else {
-            # for WinterDesignDay and SummerDesignDay, set to Monday
-            set(w, NULL, "date", lubridate::make_date(year, w$month, w$day))
-            set(w, NULL, "dt", get_epw_wday(w$day_type))
-            w[day_type %chin% c("WinterDesignDay", "SummerDesignDay"), dt := 1L]
-
-            if (any(!is.na(w$dt))) {
-                for (i in which(!is.na(w$dt))) {
-                    set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], year, leap))
-                }
-            }
-
-            # make sure all environments have a year value
-            w[is.na(dt), year := lubridate::year(Sys.Date())]
-
-            set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
-        }
-    } else {
+    if (!is.null(year)) {
         set(res, NULL, "year", year)
+    } else {
+        # current year
+        cur_year <- lubridate::year(Sys.Date())
+
+        if ("year" %in% names(res)) {
+            res[J(0L), on = "year", year := NA_integer_]
+        } else {
+            # get wday of first simulation day per environment
+            w <- res[simulation_days == 1L & !is.na(day_type), .SD[1L],
+                .SDcols = c("month", "day", "day_type", "environment_period_index"),
+                by = "environment_period_index"
+            ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
+
+            # in case there is no valid day type
+            if (!nrow(w)) {
+                # directly assign current year
+                set(res, NULL, "year", cur_year)
+            } else {
+                set(w, NULL, "date", lubridate::make_date(cur_year, w$month, w$day))
+                set(w, NULL, "dt", get_epw_wday(w$day_type))
+
+                if (any(!is.na(w$dt))) {
+                    for (i in which(!is.na(w$dt))) {
+                        set(w, i, "year", find_nearst_wday_year(w$date[i], w$dt[i], cur_year, leap))
+                    }
+                }
+
+                # make sure all environments have a year value
+                w[is.na(dt), year := lubridate::year(Sys.Date())]
+
+                set(res, NULL, "year", w[J(res$environment_period_index), on = "environment_period_index", year])
+            }
+        }
+
+        # for SummerDesignDay and WinterDesignDay, directly use current year
+        res[J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type", year := cur_year]
     }
 
     set(res, NULL, "datetime",
@@ -300,10 +319,10 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     set(res, NULL, "year", NULL)
 
     # warning if any invalid datetime found
-    # month, day, hour, minute may be NA if reporting frequency is Monthly or
-    # RunPeriod
-    if (anyNA(res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute), datetime])) {
-        invld <- res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute)]
+    # month, day, hour, minute, day_type may be NA if reporting frequency is
+    # Monthly or RunPeriod
+    if (anyNA(res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute) & !is.na(day_type), datetime])) {
+        invld <- res[!is.na(month) & !is.na(day) & !is.na(hour) & !is.na(minute) & !is.na(day_type) & is.na(datetime)]
         mes <- invld[, paste0("Original: ", month, "-", day, " ",  hour, ":", minute,
             " --> New year: ", year)]
         warn("warn_invalid_epw_date_introduced",
@@ -416,20 +435,6 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     }
 
     dt[]
-}
-# }}}
-# get_sql_wday {{{
-get_sql_wday <- function (sql) {
-    q <- "
-         SELECT Month AS month,
-                Day AS day,
-                DayType AS day_type,
-                EnvironmentPeriodIndex AS environment_period_index
-         FROM Time
-         WHERE SimulationDays == 1 AND DayType IS NOT NULL
-         GROUP BY EnvironmentPeriodIndex
-        "
-    get_sql_query(sql, q)
 }
 # }}}
 # get_sql_date {{{
