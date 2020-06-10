@@ -51,6 +51,15 @@
   sure they are initialized properly. It is recommended to call `reload()` on
   each `Idd`, `Idf` and other class object in eplusr loaded with `readRDS()` or
   `load()`, to make sure all eplusr's functionaries works properly (#251).
+* The implementation of `EplusSql$report_data()` has been refactored, resulting
+  in a ~200% speed-up (#259).
+* Now `day_type` in `EplusSql$report_data()` has a few new options (#259):
+  - `"Weekday"`: All working days, i.e. from Monday to Friday
+  - `"Weekend"`: Saturday and Sunday
+  - `"DesignDay"`: Equivalent to `"SummerDesignDay"` plus `"WinterDesignDay"`
+  - `"CustomDay"`: CustomDay1 and CustomDay2
+  - `"SpecialDay"`: Equivalent to `"DesignDay"` plus `"CustomDay"`
+  - `"NormalDay"`: Equivalent to `"Weekday"` and `"Weekend"` plus `"Holiday"`
 
 ## Major changes
 
@@ -119,6 +128,7 @@
 
 * `EplusJob`, `EplusGroupJob` and `ParametricJob` will not parse input EPW
   files, but only validate their existences and store the paths (#215)
+* `period` parameter in  `EplusSql$report_data()` now works as expected (#259).
 
 ## Bug fixes
 
