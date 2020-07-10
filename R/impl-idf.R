@@ -3623,8 +3623,10 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
         all_nodes <- all_nodes[!J(cur_nodes$value_id), on = "value_id"]
         # match new nodes
         new_nodes <- all_nodes[J(unique(cur_nodes$object_id)), on = col_ref, nomatch = NULL]
+        # excluding already matched objects
+        all_nodes <- all_nodes[!J(new_nodes$value_id), on = "value_id"]
         setnames(new_nodes, c("object_id", "value_id"), c("src_object_id", "src_value_id"))
-        new_nodes <- all_nodes[new_nodes, on = "value_chr"]
+        new_nodes <- all_nodes[new_nodes, on = "value_chr", nomatch = NULL]
 
         # get objects that do not going any deeper
         # those objects should be removed

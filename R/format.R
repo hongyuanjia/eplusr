@@ -527,15 +527,12 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
                             # the deepest
                             c(src_class_name[[i]][[1L]],
                               add_pre(src_object_name[[i]][[1L]]),
-                              paste0("   ", unlist(src_value_chr[[i]][[1L]], FALSE, FALSE))
+                              paste0("   ", add_pre(unlist(src_value_chr[[i]][[1L]], FALSE, FALSE)))
                             )
                         } else {
                             # remove class and field prefix
-                            srci <- c(
-                                src_value_chr[i[[1L]]],
-                                lapply(src_value_chr[i[-1L]],
-                                    function (s) if (length(s) > 1L) stri_sub(s[-(1L:2L)], 7L) else s
-                                )
+                            srci <- lapply(src_value_chr[i],
+                                function (s) if (length(s) > 1L) stri_sub(s[-(1L:2L)], 7L) else s
                             )
 
                             l <- length(srci)
@@ -571,8 +568,10 @@ format_idf_relation <- function (ref, direction = c("ref_to", "ref_by")) {
             ref[[i - 1L]] <- rbindlist(list(
                 pre,
                 unique(pre[, .SD, .SDcols = c("class_id", "class_name", "object_id", "object_name", "field_id", "value_chr", "dep", "pointer", "src_class_id", "src_object_id")])[
-                cur[, list(src_class_id = class_id, src_class_name = class_name, src_object_id = object_id, src_object_name = object_name, src_field_id = field_id, src_value_chr)],
-                on = c("src_class_id", "src_object_id"), allow.cartesian = TRUE]
+                    cur[, list(src_class_id = class_id, src_class_name = class_name,
+                               src_object_id = object_id, src_object_name = object_name,
+                               src_field_id = field_id, src_value_chr)],
+                    on = c("src_class_id", "src_object_id"), allow.cartesian = TRUE]
             ), fill = TRUE)
 
             setorderv(ref[[i - 1L]], c("class_id", "object_id", "field_id", "src_class_id", "src_object_id", "src_field_id"))
