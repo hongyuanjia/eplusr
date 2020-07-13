@@ -140,6 +140,9 @@
   same `Idf` on the LHS (#238).
 * Now `Idf$insert()` and `Idf$load()` can now successfully remove duplicated
   objects by comparing field values case-insensitively (#243)
+* Now `Epw$save()` can work with empty `DESIGN CONDITIONS`, `TYPICAL/EXTREME
+* PERIODS` and `GROUND TEMPERATURES` headers. Thanks @lukas-rokka for the
+  bug report (#263).
 
 # eplusr 0.12.0
 

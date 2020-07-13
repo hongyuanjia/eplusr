@@ -3,6 +3,16 @@ test_that("Epw class", {
     clean_tempdir()
     eplusr_option(verbose_info = FALSE)
 
+    expect_equal(format_epw_header_design(NULL), "0")
+    expect_equal(format_epw_header_design(list(NULL)), "0")
+    expect_equal(format_epw_header_design(list(list(NULL))), "0")
+    expect_equal(format_epw_header_typical(NULL), "0")
+    expect_equal(format_epw_header_typical(list(NULL)), "0")
+    expect_equal(format_epw_header_typical(list(list(NULL))), "0")
+    expect_equal(format_epw_header_ground(NULL), "0")
+    expect_equal(format_epw_header_ground(list(NULL)), "0")
+    expect_equal(format_epw_header_ground(list(list(NULL))), "0")
+
     skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
