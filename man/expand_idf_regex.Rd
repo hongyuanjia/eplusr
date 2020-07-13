@@ -26,6 +26,8 @@ value, and reference.}
 \item{pattern}{A single string of regular expression used to match field
 values}
 
+\item{class}{A character vector specifying the target class names}
+
 \item{pattern, ignore.case, perl, fixed, useBytes}{All of them are
 directly passed to \link[base:grep]{base::grepl} and
 \link[base:grep]{base::gsub} with the same default values.}

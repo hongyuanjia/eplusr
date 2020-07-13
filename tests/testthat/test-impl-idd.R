@@ -1,4 +1,3 @@
-# IDD {{{
 test_that("IDD implementation", {
     expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))
 
@@ -61,6 +60,10 @@ test_that("IDD implementation", {
     expect_equivalent(names(get_idd_class_field_num(idd_parsed$class[0L])),
         names(set(idd_parsed$class[0L], NULL, c("input_num", "acceptable_num"), integer(0))[])
     )
+
+    expect_equal(get_class_component_name("Material"), "Material")
+    expect_equal(get_class_component_name("Material:NoMass"), "Material")
+    expect_equal(get_class_component_name("BuildingSurface:Detailed"), "BuildingSurface")
     # }}}
 
     # EXTENSIBLE GROUP {{{
@@ -339,4 +342,3 @@ test_that("IDD implementation", {
     )
     # }}}
 })
-# }}}

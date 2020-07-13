@@ -920,7 +920,7 @@ idd_print <- function (self, private) {
 
     private <- get_priv_env(x)
 
-    cls_id <- chmatch(i, private$m_idd_env$class$class_name_us)
+    cls_id <- chmatch(underscore_name(i), private$m_idd_env$class$class_name_us)
 
     # skip if not a valid IDD class name
     if (is.na(cls_id)) return(NextMethod())
@@ -937,6 +937,19 @@ str.Idd <- function (object, ...) {
 }
 # }}}
 
+#' Format an Idd
+#'
+#' Format an [Idd] into a string.
+#'
+#' @param x An [Idd] object.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @return A single length character vector.
+#' @examples
+#' \dontrun{
+#' format(use_idd(8.8, download = "auto"))
+#' }
+#'
 #' @export
 # format.Idd {{{
 format.Idd <- function (x, ...) {
@@ -1279,7 +1292,7 @@ find_idd_from_updater <- function (ver) {
         line_break <- if (i == 1L) "" else "\n"
         dir <- file.path(eplus_config(vers[i])$dir, "PreProcess", "IDFVersionUpdater")
         idd_path <- normalizePath(file.path(dir, file), mustWork = FALSE)
-        msg <- paste0(msg, line_break, "Try to locate `", file, "` in EnergyPlus v",
+        msg <- paste0(msg, line_break, "Try to locate ", surround(file), " in EnergyPlus v",
             vers[i], " IDFVersionUpdater folder ", surround(dir), "."
         )
 

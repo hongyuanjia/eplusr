@@ -10,32 +10,35 @@ test_that("table", {
 
     # OBJECT {{{
     expect_equal(get_idf_object(idd_env, idf_env, 1),
-        data.table(class_id = 1L, object_id = 5L, comment = list(),
-            object_name = NA_character_, object_name_lower = NA_character_,
-            rleid = 1L, class_name = "Version"
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+            object_id = 5L, object_name = NA_character_,
+            object_name_lower = NA_character_, comment = list()
         )
     )
     expect_equal(get_idf_object(idd_env, idf_env, "Version"),
-        data.table(class_id = 1L, object_id = 5L, comment = list(),
-            object_name = NA_character_, object_name_lower = NA_character_,
-            rleid = 1L, class_name = "Version"
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+            object_id = 5L, object_name = NA_character_,
+            object_name_lower = NA_character_, comment = list()
         )
     )
     expect_equal(get_idf_object(idd_env, idf_env, "Version", 5),
-        data.table(object_id = 5L, class_id = 1L, comment = list(),
-            object_name = NA_character_, object_name_lower = NA_character_,
-            class_name = "Version", rleid = 1L
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+            object_id = 5L, object_name = NA_character_,
+            object_name_lower = NA_character_, comment = list()
         )
     )
     expect_equal(get_idf_object(idd_env, idf_env, "Version", 5, c("num_fields")),
-        data.table(object_id = 5L, class_id = 1L, comment = list(),
-            object_name = NA_character_, object_name_lower = NA_character_,
-            class_name = "Version", num_fields = 1L, rleid = 1L
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+            object_id = 5L, object_name = NA_character_,
+            object_name_lower = NA_character_, comment = list(), num_fields = 1L
         )
     )
-    expect_equal(get_idf_object(idd_env, idf_env), add_rleid(add_class_name(idd_env, copy(idf_env$object))))
+    expect_equal(get_idf_object(idd_env, idf_env), setcolorder(add_rleid(add_class_name(idd_env, copy(idf_env$object))), c("rleid", "class_id", "class_name")))
     expect_equal(get_idf_object(idd_env, idf_env, property = "has_name"),
-        add_rleid(add_class_property(idd_env, add_class_name(idd_env, copy(idf_env$object)), "has_name")))
+        setcolorder(add_rleid(add_class_property(idd_env, add_class_name(idd_env, copy(idf_env$object)), "has_name")),
+            c("rleid", "class_id", "class_name")
+        )
+    )
     expect_equal(get_idf_object(idd_env, idf_env, 55, property = "has_name")$has_name, c(TRUE, TRUE))
     expect_equal(get_idf_object(idd_env, idf_env, 55)$object_id, c(1L, 4L))
     expect_equal(get_idf_object(idd_env, idf_env, 55, c("WD02", "WD01"))$object_id, c(4L, 1L))
@@ -46,6 +49,17 @@ test_that("table", {
     expect_error(get_idf_object(idd_env, idf_env, "Material", "wrong"), class = "eplusr_error_invalid_object_name")
     expect_error(get_idf_object(idd_env, idf_env, "Material", 15), class = "eplusr_error_invalid_object_id")
     expect_equal(get_idf_object(idd_env, idf_env, 55, c("wd02", "wd01"), ignore_case = TRUE)$object_id, c(4L, 1L))
+
+    expect_equal(get_idf_object_multi_scope(idd_env, idf_env)$object_id, 1:5)
+    expect_equal(get_idf_object_multi_scope(idd_env, idf_env, 1, "Construction", "Thermal Zones and Surfaces"),
+        data.table(rleid = 1:3, class_id = c(55L, 90L, 103L),
+            class_name = c("Material", "Construction", "BuildingSurface:Detailed"),
+            object_id = 1:3,
+            object_name = c("WD01", "WALL-1", "WALL-1PF"),
+            object_name_lower = c("wd01", "wall-1", "wall-1pf"),
+            comment = list(" this is a test comment for WD01", NULL, NULL)
+        )
+    )
 
     # can stop if same names found in input class
     idf_env1 <- idf_env
@@ -123,8 +137,8 @@ test_that("table", {
     # get all value from current idf {{{
     expect_equivalent(nrow(get_idf_value(idd_env, idf_env)), 44L)
     expect_equivalent(names(get_idf_value(idd_env, idf_env)),
-        c("value_id", "value_chr", "value_num", "object_id", "field_id",
-        "class_id", "object_name", "class_name", "rleid", "field_index", "field_name"
+        c("rleid", "class_id", "class_name", "object_id", "object_name",
+        "field_id", "field_index", "field_name", "value_id", "value_chr", "value_num"
         )
     )
     # }}}
@@ -469,6 +483,9 @@ test_that("table", {
     # can specify target class
     expect_equal(get_idf_relation(idd_env, idf_env, 51L, depth = NULL, class = "Schedule:Constant", name = TRUE)$src_class_name, "Schedule:Constant")
 
+    # can specify non-existing class
+    expect_equal(nrow(get_idf_relation(idd_env, idf_env, 51L, depth = NULL, class = "Window")), 0L)
+
     # can specify target object
     expect_equal(get_idf_relation(idd_env, idf_env, 51L, object = 53L, name = TRUE)$src_object_name, "AlwaysOn")
 
@@ -492,9 +509,52 @@ test_that("table", {
     idf_env <- parse_idf_file(path_idf, 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    id <- get_idf_value(idd_env, idf_env, object = 277L, field = 5)$value_id
-    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, value_id = id, depth = NULL)), 10L)
-    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, 277L, depth = NULL)), 12L)
+    expect_error(get_idf_node_relation(idd_env, idf_env))
+
+    val <- get_idf_value(idd_env, idf_env, object = 277L, field = 5)
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, value_id = val$value_id, depth = NULL)), 10L)
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL)), 12L)
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, keep_all = TRUE)), 26L)
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, val$value_id, depth = NULL)), 10L)
+
+    # can specify object id
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL)), 12L)
+
+    # can specify value id
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, value_id = val$value_id, depth = NULL)), 10L)
+
+    # can specify both object id and value id
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, val$value_id, depth = NULL)), 10L)
+
+    # can keep all input id
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, keep_all = TRUE)), 26L)
+
+    # can add format columns
+    expect_is(rel <- get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, name = TRUE), "data.table")
+    expect_equal(names(rel), c(
+        "class_id", "class_name",
+        "object_id", "object_name",
+        "field_id", "field_index", "field_name",
+        "value_id", "value_chr", "value_num", "type_enum",
+        "src_class_id", "src_class_name",
+        "src_object_id", "src_object_name",
+        "src_field_id", "src_field_index", "src_field_name",
+        "src_value_id", "src_value_chr", "src_value_num", "src_type_enum",
+        "src_enum", "dep"
+    ))
+
+    # can specify target group
+    expect_equal(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, group = "Node-Branch Management", name = TRUE)$class_name,
+        c(rep("Branch", 5), rep("Pipe:Adiabatic", 4)))
+
+    # can specify target class
+    expect_equal(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, class = "Branch", name = TRUE)$class_name, rep("Branch", 5))
+
+    # can specify non-existing class
+    expect_equal(nrow(get_idf_node_relation(idd_env, idf_env, val$object_id, depth = NULL, class = "Window")), 0L)
+
+    # can specify target object
+    expect_equal(get_idf_node_relation(idd_env, idf_env, val$object_id, object = 223, name = TRUE)$class_name, "Branch")
     # }}}
 })
 # }}}
@@ -525,32 +585,37 @@ test_that("NAME DOTS", {
     # can work with only object ID inputs
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, 1:2, a = 3, .property = "has_name")[, -"comment"],
-        data.table(rleid = 1:3, object_id = 1:3, class_id = c(1L, 13L, 3L),
+        data.table(rleid = 1:3,
+            class_id = c(1L, 13L, 3L), class_name = c("Version", "Timestep", "Building"),
+            object_id = 1:3,
             object_name = c(NA_character_, NA_character_, "Simple One Zone (Wireframe DXF)"),
             object_name_lower = c(NA_character_, NA_character_, "simple one zone (wireframe dxf)"),
-            class_name = c("Version", "Timestep", "Building"),
-            has_name = c(FALSE, FALSE, TRUE),
-            new_object_name = c(NA_character_, NA_character_, "a")
+            new_object_name = c(NA_character_, NA_character_, "a"),
+            has_name = c(FALSE, FALSE, TRUE)
         )
     )
 
     # can exclude input names
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, 1:2, 3, .keep_name = FALSE)[, -"comment"],
-        data.table(rleid = 1:3, object_id = 1:3, class_id = c(1L, 13L, 3L),
+        data.table(rleid = 1:3,
+            class_id = c(1L, 13L, 3L),
+            class_name = c("Version", "Timestep", "Building"),
+            object_id = 1:3,
             object_name = c(NA_character_, NA_character_, "Simple One Zone (Wireframe DXF)"),
-            object_name_lower = c(NA_character_, NA_character_, "simple one zone (wireframe dxf)"),
-            class_name = c("Version", "Timestep", "Building")
+            object_name_lower = c(NA_character_, NA_character_, "simple one zone (wireframe dxf)")
         )
     )
 
     # can work with only object name inputs
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"))[, -"comment"],
-        data.table(rleid = 1:3, object_id = c(16L, 18L, 49L), class_id = c(90L, 100L, 277L),
+        data.table(rleid = 1:3,
+            class_id = c(90L, 100L, 277L),
+            class_name = c("Construction", "Zone", "Exterior:Lights"),
+            object_id = c(16L, 18L, 49L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
             object_name_lower = c("floor", "zone one", "extlights"),
-            class_name = c("Construction", "Zone", "Exterior:Lights"),
             new_object_name = c("Floor", NA_character_, "l")
         )
     )
@@ -558,20 +623,24 @@ test_that("NAME DOTS", {
     # can exclude input names
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, Floor = "floor", c("zone one", l = "extlights"), .keep_name = FALSE)[, -"comment"],
-        data.table(rleid = 1:3, object_id = c(16L, 18L, 49L), class_id = c(90L, 100L, 277L),
+        data.table(rleid = 1:3,
+            class_id = c(90L, 100L, 277L),
+            class_name = c("Construction", "Zone", "Exterior:Lights"),
+            object_id = c(16L, 18L, 49L),
             object_name = c("FLOOR", "ZONE ONE", "ExtLights"),
-            object_name_lower = c("floor", "zone one", "extlights"),
-            class_name = c("Construction", "Zone", "Exterior:Lights")
+            object_name_lower = c("floor", "zone one", "extlights")
         )
     )
 
     # can work with both object ID and name inputs
     expect_equal(
         expand_idf_dots_name(idd_env, idf_env, 1L, Floor = "floor")[, -"comment"],
-        data.table(rleid = 1:2, object_id = c(1L, 16L), class_id = c(1L, 90L),
+        data.table(rleid = 1:2,
+            class_id = c(1L, 90L),
+            class_name = c("Version", "Construction"),
+            object_id = c(1L, 16L),
             object_name = c(NA_character_, "FLOOR"),
             object_name_lower = c(NA_character_, "floor"),
-            class_name = c("Version", "Construction"),
             new_object_name = c(NA_character_, "Floor")
         )
     )
@@ -582,7 +651,7 @@ test_that("NAME DOTS", {
 test_that("VALUE DOTS", {
     # parse_dots_value {{{
     # can stop if empty input
-    expect_error(parse_dots_value(), "missing value")
+    expect_error(parse_dots_value(), "Must have length >= 1")
     expect_error(parse_dots_value(NULL), "missing value")
 
     # can stop if not named
@@ -814,12 +883,12 @@ test_that("VALUE DOTS", {
              )
         )
     )
-    expect_equal({x <- list(a = list(1), b = list()); parse_dots_value(x, .empty = TRUE)},
-        list(object = data.table(rleid = 1:2, each_rleid = 1L, id = NA_integer_, name = c("a", "b"),
-                comment = list(), is_ref = FALSE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = c(FALSE, TRUE)),
-             value = data.table(rleid = 1:2, each_rleid = 1L, id = NA_integer_, name = c("a", "b"),
+    expect_equal({x <- list(a = list(1), b = list(), ..5 = list()); parse_dots_value(x, .empty = TRUE)},
+        list(object = data.table(rleid = 1:3, each_rleid = 1L, id = c(NA, NA, 5L), name = c("a", "b", NA),
+                comment = list(), is_ref = FALSE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = c(FALSE, TRUE, TRUE)),
+             value = data.table(rleid = 1:3, each_rleid = 1L, id = c(NA, NA, 5L), name = c("a", "b", NA),
                  field_index = NA_integer_, field_name = NA_character_,
-                 value_chr = c("1", NA_character_), value_num = c(1, NA_real_)
+                 value_chr = c("1", NA, NA), value_num = c(1, NA, NA)
              )
         )
     )
@@ -1287,6 +1356,8 @@ test_that("OBJECT DOTS", {
 
     # can proceed if version is not the same
     expect_is(expand_idf_dots_object(idd_env, idf_env, empty_idf(8.7), .strict = FALSE), "list")
+
+    expect_silent(expand_idf_dots_value(idd_env, idf_env, ..53 = list("sch"), .type = "object", .empty = FALSE))
 })
 # }}}
 
@@ -1401,7 +1472,7 @@ test_that("LITERAL DOTS", {
     expect_equal(l$value$class_id, c(rep(55L, 6), rep(56L, 24)))
     expect_equal(l$value$object_id, rep(c(14L, 12L, 13L, 12L, 13L), each = 6))
     expect_equal(l$value$object_name, c(rep("C5 - 4 IN HW CONCRETE", 6), rep(rep(c("R13LAYER", "R31LAYER"), 2), each = 6)))
-    expect_equal(l$value$value_id, c(1:6, rep(87:98, 2)))
+    expect_equal(l$value$value_id, c(rep(99:101, 2), rep(87:98, 2)))
     expect_equal(l$value$value_num, c(rep(c(NA, NA, 0.2), 2), rep(c(NA, NA, 2.290965, 0.9, 0.75, 0.75, NA, NA, 5.456, 0.9, 0.75, 0.75), 2)))
 })
 # }}}
@@ -1515,7 +1586,7 @@ test_that("make_idf_object_name", {
             set(obj, 1L, "object_name_lower", "construction")
             set(obj, 1L, "new_object_name", "Const")
             set(obj, 1L, "new_object_name_lower", "const")
-            make_idf_object_name(idd_env, idf_env, obj, include_ori = FALSE)[]
+            make_idf_object_name(idd_env, idf_env, obj, include_ori = FALSE)
         },
         data.table(rleid = 1:2, class_id = 90L, class_name = "Construction",
             group_id = 5L, object_id = 54:55,
@@ -1532,7 +1603,7 @@ test_that("make_idf_object_name", {
             obj <- init_idf_object(idd_env, idf_env, c(rep("Construction", 3), "Coil:Cooling:Water"), name = FALSE)
             set(obj, 1L, "object_name", "Const")
             set(obj, 1L, "object_name_lower", "const")
-            make_idf_object_name(idd_env, idf_env, obj, keep_na = FALSE)[]
+            make_idf_object_name(idd_env, idf_env, obj, keep_na = FALSE)
         },
         data.table(rleid = 1:4, class_id = c(rep(90L, 3), 390L),
             class_name = c(rep("Construction", 3), "Coil:Cooling:Water"),
@@ -1564,32 +1635,20 @@ test_that("Dup", {
         "RunPeriod.*R31LAYER 1"
     )
     expect_is(dup, "list")
-    expect_equal(names(dup), c("object", "value", "reference"))
-    expect_equal(dup$object,
-        data.table(rleid = 1:4, class_id = c(22L, 22L, 56L, 56L),
-            class_name = c("RunPeriod", "RunPeriod", "Material:NoMass", "Material:NoMass"),
+    expect_equal(names(dup), c("object", "value", "reference", "changed", "updated"))
+    expect_equal(nrow(dup$object), 57)
+    expect_equal(dup$object[54:57],
+        data.table(
             object_id = 54:57,
             object_name = c("RunPeriod", "Annual", "nomass", "R31LAYER 1"),
             object_name_lower = c("runperiod", "annual", "nomass", "r31layer 1"),
-            comment = list()
+            comment = list(),
+            class_id = c(22L, 22L, 56L, 56L)
         )
     )
-    expect_equal(dup$value,
+    expect_equal(nrow(dup$value), 382)
+    expect_equal(dup$value[349:382],
         data.table(
-            rleid = c(rep(1L, 11), rep(2L, 11), rep(3L, 6), rep(4L, 6)),
-            class_id = c(rep(22L, 22), rep(56L, 12)),
-            class_name = c(rep("RunPeriod", 22), rep("Material:NoMass", 12)),
-            object_id = c(rep(54L, 11), rep(55L, 11), rep(56L, 6), rep(57L, 6)),
-            object_name = c(rep(NA_character_, 22), rep("R31LAYER", 12)),
-            field_id = c(104:114, 104:114, 7090:7095, 7090:7095),
-            field_index = c(1:11, 1:11, 1:6, 1:6),
-            field_name = c(
-                rep(c("Name", "Begin Month", "Begin Day of Month", "End Month", "End Day of Month",
-                      "Day of Week for Start Day", "Use Weather File Holidays and Special Days",
-                      "Use Weather File Daylight Saving Period", "Apply Weekend Holiday Rule",
-                      "Use Weather File Rain Indicators", "Use Weather File Snow Indicators"), 2L),
-                rep(c("Name", "Roughness", "Thermal Resistance", "Thermal Absorptance",
-                      "Solar Absorptance", "Visible Absorptance"), 2L)),
           value_id = 349:382,
           value_chr = c(
               "RunPeriod", "1", "1", "12", "31", "Tuesday", "Yes", "Yes", "No", "Yes", "Yes",
@@ -1600,15 +1659,14 @@ test_that("Dup", {
               NA, 1, 1, 12, 31, NA, NA, NA, NA, NA, NA,
               NA, 1, 1, 12, 31, NA, NA, NA, NA, NA, NA,
               NA, NA, 5.456, 0.9, 0.75, 0.75,
-              NA, NA, 5.456, 0.9, 0.75, 0.75)
+              NA, NA, 5.456, 0.9, 0.75, 0.75),
+            object_id = c(rep(54L, 11), rep(55L, 11), rep(56L, 6), rep(57L, 6)),
+            field_id = c(104:114, 104:114, 7090:7095, 7090:7095)
         )
     )
-    expect_equal(dup$reference,
-        data.table(object_id = integer(), value_id = integer(),
-            src_object_id = integer(), src_value_id = integer(),
-            src_enum = integer()
-        )
-    )
+    expect_equal(nrow(dup$reference), 21)
+    expect_equal(dup$changed, 54:57)
+    expect_equal(dup$updated, integer())
 })
 # }}}
 
@@ -1648,43 +1706,17 @@ test_that("Add", {
         }, class = "eplusr_error_validity_check")
 
     # can remove input objects that are the same as existing ones
-    expect_equal(
+    expect_is(class = "list",
         {
             l <- expand_idf_dots_value(idd_env, idf_env, floor = list(), .type = "object")
-            add_idf_object(idd_env, idf_env, l$object, l$value, level = "none", unique = TRUE)
-        },
-        list(
-            object = data.table(
-                rleid = integer(),
-                class_id = integer(),
-                class_name = character(),
-                object_id = integer(),
-                object_name = character(),
-                object_name_lower = character(),
-                comment = list()
-            ),
-            value = data.table(
-                rleid = integer(),
-                class_id = integer(),
-                class_name = character(),
-                object_id = integer(),
-                object_name = character(),
-                field_id = integer(),
-                field_index = integer(),
-                field_name = character(),
-                value_id = integer(),
-                value_chr = character(),
-                value_num = double()
-            ),
-            reference = data.table(
-                object_id = integer(),
-                value_id = integer(),
-                src_object_id = integer(),
-                src_value_id = integer(),
-                src_enum = integer()
-            )
-        )
+            l <- add_idf_object(idd_env, idf_env, l$object, l$value, level = "none", unique = TRUE)
+        }
     )
+    expect_equal(nrow(l$object), 53)
+    expect_equal(nrow(l$value), 348)
+    expect_equal(nrow(l$reference), 21)
+    expect_equal(l$changed, integer())
+    expect_equal(l$updated, integer())
 
     # can handle references
     expect_equal(
@@ -1694,14 +1726,14 @@ test_that("Add", {
                 Construction = list("NewConst", "NewMat"),
                 Material = list("NewMat"), .unique = FALSE
             )
-            add_idf_object(idd_env, idf_env, l$object, l$value, level = custom_validate(reference = TRUE))$reference
+            add_idf_object(idd_env, idf_env, l$object, l$value, level = custom_validate(reference = TRUE))$reference[22:23]
         },
         data.table(object_id = 54:55, value_id = c(350L, 352L),
             src_object_id = c(12L, 56L), src_value_id = c(87L, 353L), src_enum = 2L)
     )
 
     # whole game
-    expect_equal(
+    expect_is(class = "list",
         {
             l <- expand_idf_dots_value(idd_env, idf_env,
                 Material := list(paste("Mat", 1:3)),
@@ -1710,56 +1742,45 @@ test_that("Add", {
                 Zone = list("Zone"),
                 .scalar = FALSE, .pair = TRUE, .empty = TRUE, .unique = FALSE
             )
-            add_idf_object(idd_env, idf_env, l$object, l$value, level = "none", unique = TRUE)
-        },
-        list(
-            object = data.table(
-                rleid = 1:6,
-                class_id = c(55L, 55L, 55L, 90L, 103L, 100L),
-                class_name = c("Material", "Material", "Material", "Construction", "BuildingSurface:Detailed", "Zone"),
-                object_id = 54:59,
-                object_name = c("Mat 1", "Mat 2", "Mat 3", "Const", "Surf", "Zone"),
-                object_name_lower = c("mat 1", "mat 2", "mat 3", "const", "surf", "zone"),
-                comment = list()
-            ),
-            value = data.table(
-                rleid = c(rep(1L, 6), rep(2L, 6), rep(3L, 6), rep(4L, 4), rep(5L, 19), 6L),
-                class_id = c(rep(55L, 18), rep(90L, 4), rep(103L, 19), 100L),
-                class_name = c(rep("Material", 18), rep("Construction", 4), rep("BuildingSurface:Detailed", 19), "Zone"),
-                object_id = c(rep(54L, 6), rep(55L, 6), rep(56L, 6), rep(57L, 4), rep(58L, 19), 59L),
-                object_name = c(rep("Mat 1", 6), rep("Mat 2", 6), rep("Mat 3", 6), rep("Const", 4), rep("Surf", 19), "Zone"),
-                field_id = c(rep(7081:7086, 3), 11006:11009, 11622:11640, 11105L),
-                field_index = c(rep(1:6, 3), 1:4, 1:19, 1L),
-                field_name = c(
-                    rep(c("Name", "Roughness", "Thickness", "Conductivity", "Density", "Specific Heat"), 3),
-                    "Name", "Outside Layer", "Layer 2", "Layer 3",
-                    "Name", "Surface Type", "Construction Name", "Zone Name", "Outside Boundary Condition",
-                    "Outside Boundary Condition Object", "Sun Exposure", "Wind Exposure",
-                    "View Factor to Ground", "Number of Vertices",
-                    "Vertex 1 X-coordinate", "Vertex 1 Y-coordinate", "Vertex 1 Z-coordinate",
-                    "Vertex 2 X-coordinate", "Vertex 2 Y-coordinate", "Vertex 2 Z-coordinate",
-                    "Vertex 3 X-coordinate", "Vertex 3 Y-coordinate", "Vertex 3 Z-coordinate",
-                    "Name"),
-                value_id = 349:390,
-                value_chr = c(
-                    "Mat 1", NA, NA, NA, NA, NA,
-                    "Mat 2", NA, NA, NA, NA, NA,
-                    "Mat 3", NA, NA, NA, NA, NA,
-                    "Const", "Mat1", "Mat2", "Mat3",
-                    "Surf", "Floor", "Const", "Zone", NA, NA, "SunExposed",
-                    "WindExposed", "autocalculate", "autocalculate",
-                    NA, NA, NA, NA, NA, NA, NA, NA, NA, "Zone"),
-                value_num = NA_real_
-            ),
-            reference = data.table(
-                object_id = c(57L, 57L, 57L, 58L, 58L),
-                value_id = c(368L, 369L, 370L, 373L, 374L),
-                src_object_id = c(NA, NA, NA, 57L, 59L),
-                src_value_id = c(NA, NA, NA, 367L, 390L),
-                src_enum = c(NA, NA, NA, 2L, 2L)
-            )
+            l <- add_idf_object(idd_env, idf_env, l$object, l$value, level = "none", unique = TRUE)
+        }
+    )
+    expect_equal(l$object[54:59],
+        object = data.table(
+            object_id = 54:59,
+            object_name = c("Mat 1", "Mat 2", "Mat 3", "Const", "Surf", "Zone"),
+            object_name_lower = c("mat 1", "mat 2", "mat 3", "const", "surf", "zone"),
+            comment = list(),
+            class_id = c(55L, 55L, 55L, 90L, 103L, 100L)
         )
     )
+    expect_equal(l$value[349:390],
+        data.table(
+            value_id = 349:390,
+            value_chr = c(
+                "Mat 1", NA, NA, NA, NA, NA,
+                "Mat 2", NA, NA, NA, NA, NA,
+                "Mat 3", NA, NA, NA, NA, NA,
+                "Const", "Mat1", "Mat2", "Mat3",
+                "Surf", "Floor", "Const", "Zone", NA, NA, "SunExposed",
+                "WindExposed", "autocalculate", "autocalculate",
+                NA, NA, NA, NA, NA, NA, NA, NA, NA, "Zone"),
+            value_num = NA_real_,
+            object_id = c(rep(54L, 6), rep(55L, 6), rep(56L, 6), rep(57L, 4), rep(58L, 19), 59L),
+            field_id = c(rep(7081:7086, 3), 11006:11009, 11622:11640, 11105L)
+        )
+    )
+    expect_equal(l$reference[22:26],
+        data.table(
+            object_id = c(57L, 57L, 57L, 58L, 58L),
+            value_id = c(368L, 369L, 370L, 373L, 374L),
+            src_object_id = c(NA, NA, NA, 57L, 59L),
+            src_value_id = c(NA, NA, NA, 367L, 390L),
+            src_enum = c(NA, NA, NA, 2L, 2L)
+        )
+    )
+    expect_equal(l$changed, 54:59)
+    expect_equal(l$updated, integer())
 })
 # }}}
 
@@ -1792,13 +1813,15 @@ test_that("Set", {
             rp <- set_idf_object(idd_env, idf_env, l$object, l$value)
         }
     )
-    expect_equal(nrow(rp$object), 1L)
-    expect_equal(rp$object$object_id, 8L)
-    expect_equal(rp$object$object_name, "Test")
-    expect_equal(rp$object$object_name_lower, "test")
-    expect_equal(nrow(rp$value), 11L)
-    expect_equal(rp$value$value_chr[1L], "Test")
-    expect_equal(nrow(rp$reference), 0L)
+    expect_equal(nrow(rp$object), 53L)
+    expect_equal(rp$object$object_id[8], 8L)
+    expect_equal(rp$object$object_name[8], "Test")
+    expect_equal(rp$object$object_name_lower[8], "test")
+    expect_equal(nrow(rp$value), 348L)
+    expect_equal(rp$value$value_chr[19L], "Test")
+    expect_equal(nrow(rp$reference), 21L)
+    expect_equal(rp$changed, 8L)
+    expect_equal(rp$updated, integer())
 
     expect_is(class = "list",
         {
@@ -1806,18 +1829,20 @@ test_that("Set", {
             floor <- set_idf_object(idd_env, idf_env, l$object, l$value)
         }
     )
-    expect_equal(nrow(floor$object), 1L)
-    expect_equal(floor$object$object_id, 16)
-    expect_equal(floor$object$object_name, "Flr")
-    expect_equal(floor$object$object_name_lower, "flr")
-    expect_equal(nrow(floor$value), 2)
-    expect_equal(floor$value$value_chr[1L], "Flr")
-    expect_equal(floor$reference,
+    expect_equal(nrow(floor$object), 53L)
+    expect_equal(floor$object$object_id[16], 16)
+    expect_equal(floor$object$object_name[16], "Flr")
+    expect_equal(floor$object$object_name_lower[16], "flr")
+    expect_equal(nrow(floor$value), 348)
+    expect_equal(floor$value$value_chr[220L], "Flr")
+    expect_equal(floor$reference[20:21],
         data.table(object_id = c(16L, 25L), value_id = c(111L, 220L),
             src_object_id = c(14L, 16L), src_value_id = c(99L, 110L),
             src_enum = 2L
         )
     )
+    expect_equal(floor$changed, 16L)
+    expect_equal(floor$updated, 25L)
 
     # delete fields
     expect_is(class = "list",
@@ -1826,13 +1851,23 @@ test_that("Set", {
             rp <- set_idf_object(idd_env, idf_env, l$object, l$value)
         }
     )
-    expect_equal(nrow(rp$object), 1L)
-    expect_equal(rp$object$object_id, 8L)
-    expect_equal(rp$object$object_name, "name")
-    expect_equal(rp$object$object_name_lower, "name")
-    expect_equal(nrow(rp$value), 11L)
-    expect_equal(rp$value$value_chr[1L], "name")
-    expect_equal(nrow(rp$reference), 0L)
+    expect_equal(nrow(rp$object), 53)
+    expect_equal(rp$object$object_id[8], 8L)
+    expect_equal(rp$object$object_name[8], "name")
+    expect_equal(rp$object$object_name_lower[8], "name")
+    expect_equal(nrow(rp$value), 348L)
+    expect_equal(rp$value$value_chr[19L], "name")
+    expect_equal(nrow(rp$reference), 21)
+    expect_equal(rp$changed, 8L)
+    expect_equal(rp$updated, integer())
+
+    expect_is(class = "list",
+        {
+            l <- expand_idf_dots_value(idd_env, idf_env, ..14 = list(visible_absorptance = NULL), .type = "object", .default = FALSE)
+            mat <- set_idf_object(idd_env, idf_env, l$object, l$value)
+        }
+    )
+    expect_equal(nrow(get_idf_value(idd_env, mat, object = 14)), 8)
 
     # can set whole class
     expect_is(class = "list",
@@ -1843,38 +1878,42 @@ test_that("Set", {
             mat <- set_idf_object(idd_env, idf_env, l$object, l$value)
         }
     )
-    expect_equal(nrow(mat$object), 2L)
-    expect_equal(mat$object$object_id, 12:13)
-    expect_equal(mat$object$object_name, c("R13LAYER", "R31LAYER"))
-    expect_equal(mat$object$object_name_lower, c("r13layer", "r31layer"))
-    expect_equal(nrow(mat$value), 8L)
-    expect_equal(mat$value$field_index, rep(1:4, 2))
-    expect_equal(mat$value$value_chr[c(4, 8)], c("0.8", "0.8"))
-    expect_equal(mat$reference,
+    expect_equal(nrow(mat$object), 53L)
+    expect_equal(mat$object$object_id[12:13], 12:13)
+    expect_equal(mat$object$object_name[12:13], c("R13LAYER", "R31LAYER"))
+    expect_equal(mat$object$object_name_lower[12:13], c("r13layer", "r31layer"))
+    expect_equal(get_idf_value(idd_env, mat, "Material:NoMass", field = "roughness")$value_chr, rep("smooth", 2))
+    expect_equal(get_idf_value(idd_env, mat, "Material:NoMass", field = "thermal_absorptance")$value_num, rep(0.8, 2))
+    expect_equal(mat$reference[20:21],
         data.table(object_id = c(15L, 17L), value_id = c(109L, 113L),
             src_object_id = c(12L, 13L), src_value_id = c(87L, 93L),
             src_enum = 2L
         )
     )
+    expect_equal(mat$changed, 12:13)
+    expect_equal(mat$updated, c(15L, 17L))
 
     # can handle references
-    expect_equal(class = "list",
+    expect_is(class = "list",
         {
             l <- expand_idf_dots_value(idd_env, idf_env, .type = "object",
                 ROOF31 = list(outside_layer = "R13LAYER"),
                 FLOOR = list(outside_layer = "NoSuchMaterial")
             )
-            set_idf_object(idd_env, idf_env, l$object, l$value, level = "none")$reference
-        },
+            l <- set_idf_object(idd_env, idf_env, l$object, l$value, level = "none")
+        }
+    )
+    expect_equal(l$reference[19:21],
         data.table(
-            object_id = c(17L, 16L, 26L, 25L),
-            value_id = c(113L, 111L, 242L, 220L),
-            src_object_id = c(12L, NA, 17L, 16L),
-            src_value_id = c(87L, NA, 112L, 110L),
-            src_enum = c(2L, NA, 2L, 2L)
+            object_id = c(17L, 16L, 26L),
+            value_id = c(113L, 111L, 242L),
+            src_object_id = c(12L, NA, 17L),
+            src_value_id = c(87L, NA, 112L),
+            src_enum = c(2L, NA, 2L)
         )
     )
-
+    expect_equal(l$changed, c(17L, 16L))
+    expect_equal(l$updated, 26L)
 })
 # }}}
 
@@ -1887,9 +1926,12 @@ test_that("Del", {
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "Version")), class = "eplusr_error_del_version")
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = 3)), class = "eplusr_error_del_required")
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = 7)), class = "eplusr_error_del_unique")
+    expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = rep(53, 2))), class = "eplusr_error_del_same")
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = c("R13WALL", "FLOOR", "ROOF31"))), class = "eplusr_error_del_referenced")
     expect_message({del <- with_option(list(verbose_info = TRUE), del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = c(21:26, 14)), ref_to = TRUE, ref_by = TRUE, recursive = TRUE))}, "relation")
-    expect_equivalent(setdiff(idf_env$object$object_id, del$object$object_id), c(14:17, 21:26))
+    expect_equal(setdiff(idf_env$object$object_id, del$object$object_id), c(14:17, 21:26))
+    expect_equal(del$changed, c(21:26, 14:17))
+    expect_equal(del$updated, integer())
 })
 # }}}
 
@@ -1900,19 +1942,25 @@ test_that("Purge", {
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
     expect_message(pu <- with_option(list(verbose_info = TRUE), purge_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "SimulationControl"))), "ignored")
-    expect_equal(pu$object, data.table())
-    expect_equal(pu$value, data.table())
-    expect_equal(pu$reference, data.table())
+    expect_equal(pu$object, idf_env$object)
+    expect_equal(pu$value, idf_env$value)
+    expect_equal(pu$reference, idf_env$reference)
+    expect_equal(pu$changed, integer())
+    expect_equal(pu$updated, integer())
 
     expect_is(pu <- purge_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "Material:NoMass")), "list")
-    expect_equal(pu$object, data.table())
-    expect_equal(pu$value, data.table())
-    expect_equal(pu$reference, data.table())
+    expect_equal(pu$object, idf_env$object)
+    expect_equal(pu$value, idf_env$value)
+    expect_equal(pu$reference, idf_env$reference)
+    expect_equal(pu$changed, integer())
+    expect_equal(pu$updated, integer())
 
     expect_is(pu <- purge_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "RunPeriod")), "list")
-    expect_equal(pu$object$object_id, 8L)
-    expect_equal(nrow(pu$value), 11L)
-    expect_equal(nrow(pu$reference), 0L)
+    expect_equal(setdiff(idf_env$object$object_id, pu$object$object_id), 8L)
+    expect_equal(nrow(pu$value), 337L)
+    expect_equal(pu$reference, idf_env$reference)
+    expect_equal(pu$changed, 8L)
+    expect_equal(pu$updated, integer())
 })
 # }}}
 
@@ -1922,9 +1970,8 @@ test_that("Duplicated", {
     idf_env <- parse_idf_file(example(), 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    dup_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "SimulationControl"), "none")
-    expect_equal(duplicated_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))$duplicated, rep(FALSE, 53))
-    expect_equal(duplicated_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))$duplicated, rep(FALSE, 53))
+    l <- dup_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "SimulationControl"), "none")
+    expect_equal(duplicated_idf_object(idd_env, l, get_idf_object(idd_env, l))$unique_object_id, c(rep(NA, 53), 7L))
 })
 # }}}
 
@@ -1934,7 +1981,27 @@ test_that("Unique", {
     idf_env <- parse_idf_file(example(), 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_equal(duplicated_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))$duplicated, rep(FALSE, 53))
+    expect_message(with_option(list(verbose_info = TRUE), unique_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))), "Skip")
+
+    # change references from the original ones to duplicated ones
+    ori_obj <- get_idf_object(idd_env, idf_env, "Material:NoMass")
+    ori_val <- get_idf_value(idd_env, idf_env, "Material:NoMass")
+    l <- dup_idf_object(idd_env, idf_env, ori_obj)
+    new_val <- data.table::fsetdiff(l$value, idf_env$value)
+    ref <- set(ori_val[, list(object_id, value_id)], NULL,
+        c("new_object_id", "new_value_id"), new_val[, list(object_id, value_id)]
+    )
+    l$reference[ref, on = c("src_value_id" = "value_id"),
+        `:=`(src_object_id = i.new_object_id, src_value_id = i.new_value_id)]
+
+    expect_message(l <- with_option(list(verbose_info = TRUE), unique_idf_object(idd_env, l, get_idf_object(idd_env, l))),
+        "have been removed"
+    )
+    expect_equivalent(l$object, idf_env$object)
+    expect_equivalent(l$value, idf_env$value)
+    expect_equivalent(l$reference, idf_env$reference)
+    expect_equivalent(l$changed, 54:55)
+    expect_equivalent(l$updated, c(15L, 17L))
 })
 # }}}
 
@@ -1993,12 +2060,67 @@ test_that("Rename", {
             l <- rename_idf_object(idd_env, idf_env, obj)
         }
     )
-    expect_equal(l$object$object_name, c("r13", "flr", "roof", "r31"))
-    expect_equal(l$value[field_index == 1L, value_chr], c("r13", "flr", "roof", "r31"))
-    expect_equal(nrow(l$reference), 7)
-    expect_equal(idf_env$value[J(l$reference$value_id), on = "value_id", value_chr],
+    expect_is(get_idf_object(idd_env, l, object = c("r13", "flr", "roof", "r31")), "data.table")
+    expect_equal(get_idf_value(idd_env, l, object = c("r13", "flr", "roof", "r31"), field = rep(1, 4))$value_chr,
+        c("r13", "flr", "roof", "r31"))
+    expect_equal(nrow(data.table::fsetdiff(l$reference, idf_env$reference)), 0)
+    expect_equal(
+        {
+            id <- get_idf_value(idd_env, l, object = c("r13", "flr", "roof", "r31"), field = rep(1, 4))$value_id
+            id <- l$reference[J(id), on = "src_value_id", value_id]
+            idf_env$value[J(id), on = "value_id", value_chr]
+        },
         c(rep("r13", 4), "flr", "roof", "r31")
     )
+    expect_equal(l$changed, c(15:17, 13L))
+    expect_equal(l$updated, 21:26)
+})
+# }}}
+
+# REMOVE {{{
+test_that("Remove", {
+    # read idf
+    idf_env <- parse_idf_file(example(), 8.8)
+    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+
+    # REMOVE FIELDS
+    # can work if no trailing empty fields are found
+    expect_equal(nrow(remove_empty_fields(idd_env, idf_env, get_idf_value(idd_env, idf_env, "SimulationControl"))), 5L)
+    # can work for non-extensible fields
+    val <- get_idf_value(idd_env, idf_env, "Material")[field_index > 7L,
+        `:=`(value_chr = NA_character_, value_num = NA_real_)]
+    expect_equal(nrow(remove_empty_fields(idd_env, idf_env, val)), 7L)
+    # can work for extensible fields
+    val <- get_idf_value(idd_env, idf_env, object = "Zn001:Wall001", field = 24, complete = TRUE)
+    ## (a) can skip if extensible group is incomplete
+    expect_equal(nrow(remove_empty_fields(idd_env, idf_env, val[field_index <= 24L])), 24L)
+    ## (b) can remove if all extensible fields in a extensible group are empty
+    expect_equal(nrow(remove_empty_fields(idd_env, idf_env, val)), 22L)
+    ## (c) can skip if not all extensible fields in a group are empty
+    expect_equal(nrow(remove_empty_fields(idd_env, idf_env, val[field_index == 24L, value_chr := "1"])), 25L)
+
+    # REMOVE OBJECTS
+    l <- list()
+    l1 <- expand_idf_dots_value(idd_env, idf_env, "Site:WeatherStation" = list())
+    expect_is(rev <- remove_duplicated_objects(idd_env, idf_env, l1$object, l1$value), "list")
+    expect_equal(l1$object, rev$object)
+    expect_equal(l1$value, rev$value)
+    l2 <- dup_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = rep("Zn001:Wall001", 2L)))
+    l$object <- rbindlist(list(
+        l1$object,
+        get_idf_object(idd_env, l2, object = 54:55)[,
+            `:=`(object_name = stri_sub(object_name, to = -3),
+                 object_name_lower = stri_sub(object_name_lower, to = -3))]
+    ))
+    l$value <- rbindlist(list(
+        l1$value,
+        get_idf_value(idd_env, l2, object = 54:55)[,
+            `:=`(object_name = stri_sub(object_name, to = -3))][
+            field_index == 1L, value_chr := stri_sub(value_chr, to = -3)]
+    ))
+    expect_message(with_option(list(verbose_info = TRUE), rev <- remove_duplicated_objects(idd_env, idf_env, l$object, l$value)), "removed")
+    expect_equal(rev$object$class_name, "Site:WeatherStation")
+    expect_equal(nrow(rev$value), 4L)
 })
 # }}}
 
@@ -2121,6 +2243,29 @@ test_that("to_table", {
             "Visible Absorptance" = 0.65
         ), tolerance = 1e-5
     )
+
+    expect_error(get_idf_table(idd_env, idf_env, wide = TRUE), class = "eplusr_error")
+    expect_error(get_idf_table(idd_env, idf_env, idf_env$object[, unique(class_id)][1:4], wide = TRUE), class = "eplusr_error")
+    expect_equal(get_idf_table(idd_env, idf_env, 1, string_value = FALSE)$value, list("8.8"))
+
+    expect_is(val <- get_idf_table(idd_env, idf_env, object = get_idf_object(idd_env, idf_env, "BuildingSurface:Detailed")$object_id[1:2],
+            string_value = FALSE, wide = TRUE, group_ext = "group"),
+        "data.table"
+    )
+    expect_equal(names(val)[14:ncol(val)], sprintf("Vrtx%sX-crd|Vrtx%sY-crd|Vrtx%sZ-crd", 1:4, 1:4, 1:4))
+    expect_equal(val[["Vrtx3X-crd|Vrtx3Y-crd|Vrtx3Z-crd"]], list(list(15.24, 0., 0.), list(15.24, 15.24, 0.)))
+
+    expect_is(val <- get_idf_table(idd_env, idf_env, object = get_idf_object(idd_env, idf_env, "BuildingSurface:Detailed")$object_id[1:2],
+            string_value = FALSE, wide = TRUE, group_ext = "index"),
+        "data.table"
+    )
+    expect_equal(names(val)[14:ncol(val)], sprintf("Vertex %s-coordinate", c("X", "Y", "Z")))
+    expect_equal(val[["Vertex X-coordinate"]], list(c(0., 0., 15.24, 15.24), c(15.24, 15.24, 15.24, 15.24)))
+
+    # can init object value table
+    expect_is(val <- get_idf_table(idd_env, idf_env, "Material", init = TRUE, all = TRUE), "data.table")
+    expect_equal(nrow(val), 9)
+    expect_equal(val$value, c(rep(NA, 6), ".9", ".7", ".7"))
 })
 # }}}
 
@@ -2156,6 +2301,7 @@ test_that("to_string", {
     expect_equal(length(get_idf_string(idd_env, idf_env, class = "Version", comment = FALSE)), 12)
     expect_equal(length(get_idf_string(idd_env, idf_env, class = "Version", comment = FALSE, header = FALSE)), 5)
     expect_equal(length(get_idf_string(idd_env, idf_env, class = "Material", header = FALSE, in_ip = TRUE)), 13L)
+    expect_equal(length(get_idf_string(idd_env, idf_env, idf_env$object[0, list(object_id, object_order = integer())], class = "Material", header = FALSE, format = "new_top")), 11)
 })
 # }}}
 
@@ -2165,9 +2311,32 @@ test_that("Save", {
     idf_env <- parse_idf_file(example(), 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
+    expect_error(class = "eplusr_error_idf_save_ext",
+        save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
+            tempfile(fileext = ".txt")
+        )
+    )
+    f <- tempfile(fileext = ".idf")
     expect_silent(
         save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
-            tempfile(fileext = ".idf"), format = "sorted"
+            f, format = "sorted"
+        )
+    )
+    expect_error(class = "eplusr_error_idf_save_exist",
+        save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
+            f, format = "sorted"
+        )
+    )
+    expect_message(
+        with_option(list(verbose_info = TRUE),
+            save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
+            f, format = "sorted", overwrite = TRUE
+        )),
+        "Replace the existing"
+    )
+    expect_silent(
+        save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
+            file.path(tempdir(), tempfile(), basename(tempfile(fileext = ".idf"))), format = "new_top"
         )
     )
     expect_silent(
@@ -2183,3 +2352,56 @@ test_that("Save", {
 })
 # }}}
 
+# RESOLVE_EXTERNAL {{{
+test_that("resolve external link", {
+    # read idf
+    idf_env <- parse_idf_file(example(), 8.8)
+    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+
+    expect_false(resolve_idf_external_link(idd_env, idf_env))
+
+    # add a Schedule:File object
+    f <- tempfile(fileext = ".csv")
+    l <- expand_idf_dots_value(idd_env, idf_env, `Schedule:File` = list("sch_file", NULL, f, 1, 0))
+    l <- add_idf_object(idd_env, idf_env, l$object, l$value)
+
+    # can give warnings if links are broken
+    expect_warning(flg <- resolve_idf_external_link(idd_env, l, example(), tempfile(fileext = ".idf")), "Broken")
+    expect_false(flg)
+
+    # can keep the original link if copy is not required
+    writeLines(",\n", f)
+    expect_false(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), example(), copy = FALSE))
+    expect_equal(l$value[field_id == 7074, normalizePath(value_chr)], normalizePath(f))
+
+    expect_true(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), example(), copy = TRUE))
+    expect_true(file.exists(file.path(dirname(example()), basename(f))))
+    expect_equal(l$value[field_id == 7074, normalizePath(value_chr, mustWork = FALSE)], basename(f))
+
+    unlink(file.path(dirname(example()), basename(f)), force = TRUE)
+})
+# }}}
+
+# UTILITIES {{{
+test_that("utilities", {
+    # read idf
+    idf_env <- parse_idf_file(example(), 8.8)
+    idd_env <- get_priv_env(use_idd(8.8))$idd_env()
+
+    l <- expand_idf_dots_value(idd_env, idf_env, Building := list())
+    obj <- l$object
+    val <- l$value
+    obj[1, object_id := 1L]
+    val[3:4, value_id := 1:2]
+
+    expect_equal(assign_new_id(idf_env, obj, "object", keep = TRUE)$object_id, 1L)
+    expect_equal(assign_new_id(idf_env, obj, "object", keep = FALSE)$object_id, 54L)
+
+    expect_equal(assign_new_id(idf_env, val, "value", keep = TRUE)$value_id, c(349:350, 1:2, 351:354))
+    expect_equal(assign_new_id(idf_env, val, "value", keep = FALSE)$value_id, 349:356)
+
+    expect_is(def <- with_option(list(view_in_ip = TRUE), assign_idf_value_default(idd_env, idf_env, l$value[, `:=`(value_chr = NA_character_, value_num = NA_real_)])), "data.table")
+    expect_true(all(!is.na(def$value_chr)))
+    expect_equal(sum(!is.na(def$value_num)), 5)
+})
+# }}}

@@ -161,6 +161,13 @@ verbose_info <- function (...) {
     if (eplusr_option("verbose_info")) message(...)
 }
 # }}}
+# fast_subset {{{
+# very odd way to subset columns but is way faster
+# ref: https://github.com/Rdatatable/data.table/issues/3477
+fast_subset <- function (dt, cols) {
+    setDT(unclass(dt)[cols])
+}
+# }}}
 
 # abort_bad_key {{{
 abort_bad_key <- function (key, value) {
@@ -177,7 +184,7 @@ abort_bad_field <- function (key, dt, ...) {
         name = errormsg_field_name(dt)
     )
 
-    abort(paste0(h, mes, ...), class = paste0("invalid_field_", key))
+    abort(paste0(h, mes, ...), class = paste0("invalid_field_", key), data = dt)
 }
 # }}}
 # errormsg_info {{{
@@ -235,10 +242,12 @@ add_rleid <- function (dt, prefix = NULL) {
 append_dt <- function (dt, new_dt, base_col = NULL) {
     assert_names(names(new_dt), must.include = names(dt))
 
+    if (!nrow(new_dt)) return(dt)
+
     if (is.null(base_col)) {
-        rbindlist(list(dt, new_dt[, .SD, .SDcols = names(dt)]))
+        rbindlist(list(dt, fast_subset(new_dt, names(dt))))
     } else {
-        rbindlist(list(dt[!new_dt, on = base_col], new_dt[, .SD, .SDcols = names(dt)]))
+        rbindlist(list(dt[!new_dt, on = base_col], fast_subset(new_dt, names(dt))))
     }
 }
 # }}}
@@ -249,7 +258,7 @@ unique_id <- function () {
 # }}}
 
 # assert_valid_type {{{
-assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lower = -Inf, type = c("both", "id", "name")) {
+assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lower = 1L, type = c("both", "id", "name")) {
     if (is.null(name)) name <- checkmate::vname(x)
     type <- match.arg(type)
 

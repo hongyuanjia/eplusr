@@ -12,7 +12,7 @@ make_idf_object_name(
   prefix_col = NULL,
   prefix_sep = " ",
   keep_na = TRUE,
-  inclu_ori = FALSE
+  include_ori = FALSE
 )
 }
 \arguments{
@@ -38,7 +38,7 @@ prefix columns. Default: \code{NULL}.}
 \item{keep_na}{If \code{TRUE}, new object names will be \code{NA} if the original
 object names in column \code{object_name} are \code{NA}s. Default: \code{TRUE}.}
 
-\item{inclu_ori}{If \code{TRUE}, make sure new object names are not the same as
+\item{include_ori}{If \code{TRUE}, make sure new object names are not the same as
 the original object names in the \code{object_name} column. Default: \code{FALSE}.}
 }
 \value{

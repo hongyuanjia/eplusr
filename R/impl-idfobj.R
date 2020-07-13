@@ -7,40 +7,6 @@
 NULL
 
 # IDF OBJECT
-# set_idfobj_comment {{{
-set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = TRUE, width = 0L) {
-    obj <- get_idf_object(idd_env, idf_env, object = object_id)
-
-    if (is.null(comment)) {
-        set(obj, NULL, "comment", list(list(NULL)))
-    } else {
-        comment <- as.character(comment)
-        assert(is_count(width, TRUE))
-
-        cmt <- unlist(strsplit(comment, "\n", fixed = TRUE), use.names = FALSE)
-
-        if (width != 0L) {
-            cmt <- strwrap(cmt, width = width)
-        }
-
-        if (is.null(append)) {
-            # reset
-            set(obj, NULL, "comment", list(list(cmt)))
-        } else {
-            assert(is_flag(append), msg = "`append` should be NULL or a single logical value.")
-            if (append) {
-                # add new
-                set(obj, NULL, "comment", list(list(c(obj$comment[[1L]], cmt))))
-            } else {
-                set(obj, NULL, "comment", list(list(c(cmt, obj$comment[[1L]]))))
-            }
-
-        }
-    }
-
-    obj
-}
-# }}}
 # get_idfobj_value {{{
 get_idfobj_value <- function (idd_env, idf_env, object, which = NULL, all = FALSE,
                               simplify = FALSE, unit = FALSE, underscore = FALSE) {
@@ -53,9 +19,10 @@ get_idfobj_value <- function (idd_env, idf_env, object, which = NULL, all = FALS
     get_value_list(val, unit)
 }
 # }}}
-# get_value_list: return a list of field values with correct types {{{
+# get_value_list {{{
+#' @importFrom checkmate assert_names
 get_value_list <- function (dt_value, unit = FALSE) {
-    assert(has_name(dt_value, c("value_chr", "value_num", "type_enum")))
+    assert_names(names(dt_value), must.include = c("value_chr", "value_num", "type_enum"))
 
     res <- as.list(dt_value[["value_chr"]])
     num <- dt_value$type_enum <= IDDFIELD_TYPE$real &
@@ -68,12 +35,11 @@ get_value_list <- function (dt_value, unit = FALSE) {
     res[num & !is_double] <- as.integer(val[num & !is_double])
 
     if (any(unlist(res[exists & num & !is_double]) != val[exists & num & !is_double])) {
-        warn("warning_value_int_trunc",
-            paste0("Truncated error introduced when converting value of field ",
+        warn(paste0("Truncated error introduced when converting value of field ",
                 collapse(dt_value[["field_name"]][res[num & !is_double] != val[num & !is_double]]),
                 " to integer. This often indicates that integer fields have ",
-                "decimal numbers. Please see `$validate()` for details."
-            )
+                "decimal numbers. Please see '$validate()' for details."
+            ), "warning_value_int_trunc"
         )
     }
 
@@ -103,59 +69,11 @@ get_value_list <- function (dt_value, unit = FALSE) {
     res
 }
 # }}}
-# set_idfobj_value {{{
-set_idfobj_value <- function (idd_env, idf_env, object, ..., .default = TRUE, .empty = FALSE) {
-    nm <- if (is_count(object)) paste0("..", object) else object
-
-    input <- list(...)
-
-    # if single input
-    if (length(input) == 1L) {
-        # if input is an atomic
-        if (is.atomic(input[[1L]])) {
-            # for `<-.IdfObject`
-            if (length(input[[1L]]) == 1L && is_named(input[[1L]])) {
-                input <- list(as.list(input[[1L]]))
-            # for `$set(field = value)`
-            } else {
-                input <- list(input)
-            }
-        # for `$set(list(field1 = value1, field2 = value2))`
-        } else {
-            # check for .comment
-            if (has_name(input[[1L]], ".comment")) {
-                abort("error_idfobj_dotcomment",
-                    paste0(
-                        "Using `.comment` to set object comments is prohibited in ",
-                        "`IdfObject` class. Please use `$comment()` method instead."
-                    )
-                )
-            }
-        }
-    # for `$set(field1 = value1, field2 = value2)`
-    } else {
-        # check for .comment
-        if (has_name(input, ".comment")) {
-            abort("error_idfobj_dotcomment",
-                paste0(
-                    "Using `.comment` to set object comments is prohibited in ",
-                    "`IdfObject` class. Please use `$comment()` method instead."
-                )
-            )
-        }
-        input <- list(input)
-    }
-
-    setattr(input, "names", nm)
-
-    set_idf_object(idd_env, idf_env, input, .default = .default, .empty = .empty)
-}
-# }}}
 # get_idfobj_possible {{{
-get_idfobj_possible <- function (idd_env, idf_env, object, field,
+#' @importFrom checkmate assert_subset
+get_idfobj_possible <- function (idd_env, idf_env, object, field = NULL,
                                  type = c("auto", "default", "choice", "range", "source")) {
-    all_type <- c("auto", "default", "choice", "range", "source")
-    assert(no_na(chmatch(type, all_type)), msg = paste0("`type` should be one or some of ", collapse(all_type)))
+    assert_subset(type, c("auto", "default", "choice", "range", "source"), FALSE)
 
     prop <- c("units", "ip_units", "type_enum")
     if ("auto" %chin% type) prop <- c(prop, "autosizable", "autocalculatable")
@@ -235,8 +153,7 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
                                  object = NULL, class = NULL, group = NULL,
                                  keep_all = FALSE, depth = 0L, class_ref = c("both", "none", "all")) {
     all_dir <- c("ref_to", "ref_by", "node", "all")
-    direction <- all_dir[sort(chmatch(direction, all_dir))]
-    assert(no_na(direction), msg = paste0("`direction` should be one or some of ", collapse(all_dir)))
+    checkmate::assert_subset(direction, all_dir, FALSE)
 
     rel <- list(ref_to = NULL, ref_by = NULL, node = NULL)
 
@@ -268,10 +185,9 @@ get_idfobj_relation <- function (idd_env, idf_env, object_id = NULL, value_id = 
     rel
 }
 # }}}
-
 # get_idfobj_table {{{
 get_idfobj_table <- function (idd_env, idf_env, object_id, all = FALSE,
-                              unit = TRUE, wide = FALSE, string_value = TRUE, group_ext = 0L) {
+                              unit = TRUE, wide = FALSE, string_value = TRUE, group_ext = "none") {
     get_idf_table(idd_env, idf_env, NULL, object_id, all = all, unit = unit,
         wide = wide, string_value = string_value, group_ext = group_ext
     )
@@ -299,16 +215,39 @@ get_idfobj_string <- function (idd_env, idf_env, object_id, comment = TRUE, lead
     c(cmt, cls, fld)
 }
 # }}}
+# set_idfobj_comment {{{
+#' @importFrom checkmate assert_count test_flag
+set_idfobj_comment <- function (idd_env, idf_env, object_id, comment, append = TRUE, width = 0L) {
+    obj <- get_idf_object(idd_env, idf_env, object = object_id)
 
-# helper
-# merge_idfobj_data {{{
-merge_idfobj_data <- function (idf_env, dt, type = c("object", "value", "reference")) {
-    type <- match.arg(type)
-    if (type != "reference") {
-        idf_env[[type]] <- append_dt(idf_env[[type]], dt, paste0(type, "_id"))
+    if (is.null(comment)) {
+        set(obj, NULL, "comment", list(list(NULL)))
     } else {
-        idf_env[[type]] <- dt
+        comment <- as.character(comment)
+        assert_count(width)
+
+        cmt <- unlist(strsplit(comment, "\n", fixed = TRUE), use.names = FALSE)
+
+        if (width != 0L) {
+            cmt <- strwrap(cmt, width = width)
+        }
+
+        if (is.null(append)) {
+            # reset
+            set(obj, NULL, "comment", list(list(cmt)))
+        } else if (test_flag(append)){
+            if (append) {
+                # add new
+                set(obj, NULL, "comment", list(list(c(obj$comment[[1L]], cmt))))
+            } else {
+                set(obj, NULL, "comment", list(list(c(cmt, obj$comment[[1L]]))))
+            }
+
+        } else {
+            abort("'append' should be NULL or a single logical value.")
+        }
     }
-    idf_env
+
+    obj
 }
 # }}}

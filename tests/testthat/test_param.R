@@ -12,7 +12,7 @@ test_that("Parametric methods", {
 
     param <- param_job(example$idf, example$epw)
 
-    priv <- ._get_private(param)
+    priv <- get_priv_env(param)
 
     # Seed and Weather {{{
     expect_is(param$seed(), "Idf")

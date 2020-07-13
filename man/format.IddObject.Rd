@@ -4,10 +4,12 @@
 \alias{format.IddObject}
 \title{Format an IddObject}
 \usage{
-\method{format}{IddObject}(x, ...)
+\method{format}{IddObject}(x, ver = TRUE, ...)
 }
 \arguments{
 \item{x}{An \link{IddObject} object.}
+
+\item{ver}{If \code{TRUE}, a suffix of version string is added. Default: \code{TRUE}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

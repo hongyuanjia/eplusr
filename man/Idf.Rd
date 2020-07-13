@@ -730,6 +730,9 @@ idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index", wide = TRU
 idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
     wide = TRUE, string_value = FALSE, unit = TRUE
 )
+
+# create table for new object input
+idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 }
 
 
@@ -1542,7 +1545,7 @@ idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
 \subsection{Method \code{object()}}{
 Extract an \link{IdfObject} object using object ID or name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$object(which)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idf$object(which, class = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1550,6 +1553,10 @@ Extract an \link{IdfObject} object using object ID or name.
 \describe{
 \item{\code{which}}{A single integer specifying the object ID or a single
 string specifying the object name.}
+
+\item{\code{class}}{A character vector that contains valid class names for
+current \code{Idf} object used to locate objects. If \code{NULL}, all
+classes in current \code{Idf} object are used. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -2588,7 +2595,8 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
 \item \code{class}: Character. Names of classes that input objects belong to
 \item \code{id}: Integer. Input object IDs
 \item \code{name}: Character. Input object names
-\item \code{duplicated}: Logical. Whether this object is a duplication or not
+\item \code{duplicate}: Integer. The IDs of objects that input objects
+duplicate. If input object is not a duplication, \code{NA} is returned
 }
 }
 \subsection{Examples}{
@@ -3565,7 +3573,8 @@ Format \code{Idf} as a data.frame
   align = FALSE,
   all = FALSE,
   group_ext = c("none", "group", "index"),
-  force = FALSE
+  force = FALSE,
+  init = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -3624,6 +3633,11 @@ multiple classes in input. This can result in a data.table
 with lots of columns. But may be useful when you know that
 target classes have the exact same fields, e.g.
 \code{Ceiling:Adiabatic} and \code{Floor:Adiabatic}. Default: \code{FALSE}.}
+
+\item{\code{init}}{If \code{TRUE}, a table for new object input will be returned
+with all values filled with defaults. In this case, \code{object}
+input will be ignored. The \code{id} column will be filled with
+possible new object IDs. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -3708,6 +3722,9 @@ idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index", wide = TRU
 idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
     wide = TRUE, string_value = FALSE, unit = TRUE
 )
+
+# create table for new object input
+idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 }
 
 }

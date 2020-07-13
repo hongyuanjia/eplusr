@@ -42,6 +42,7 @@ reference:
       - avail_idd
       - is_avail_idd
       - as.character.IddObject
+      - format.Idd
       - format.IddObject
   - title: IDF
     desc: Read, modify and run an EnergyPlus Input Data File (IDF)

@@ -223,7 +223,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
 
     # value reference map
     if (ref) {
-        dt_reference <- get_value_reference_map(idd_env$reference, dt_value, dt_value)
+        dt_reference <- get_value_reference_map(idd_env, dt_value, dt_value)
     } else {
         dt_reference <- data.table(
                 object_id = integer(0L),     value_id = integer(0L),
@@ -236,6 +236,10 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     set(dt_value, NULL, setdiff(names(dt_value),
         c("value_id", "value_chr", "value_num", "object_id", "field_id")), NULL
     )
+
+    # column order
+    setcolorder(dt_object, c("object_id", "object_name", "object_name_lower", "comment", "class_id"))
+    setcolorder(dt_value, c("value_id", "value_chr", "value_num", "object_id", "field_id"))
 
     list(version = idd_ver, options = options,
          object = dt_object, value = dt_value, reference = dt_reference
@@ -293,9 +297,12 @@ get_idf_ver <- function (idf_dt) {
     if (!nrow(ver_line)) {
         NULL
     } else if (nrow(ver_line) == 1L) {
-        standardize_ver(ver_line$version, complete = FALSE)
+        ver <- standardize_ver(ver_line$version, complete = FALSE)
+        if (is.na(ver)) parse_error("idf", "Invalid IDF version found", ver_line, subtype = "ver")
+        attr(ver, "line") <- ver_line$line
+        ver
     } else {
-        parse_error("idf", "Multiple versions found", ver_line)
+        parse_error("idf", "Multiple IDF versions found", ver_line, subtype = "ver")
     }
 }
 # }}}
@@ -1089,7 +1096,7 @@ mark_idf_lines <- function (dt, type_enum) {
 
     # if there are still known lines, throw an error
     if (nrow(dt[type == type_enum$unknown]) > 0L) {
-        parse_error("idf", "Invalid line found", dt[type == type_enum$unknown])
+        parse_error("idf", "Invalid line found", dt[type == type_enum$unknown], subtype = "line")
     }
 
     dt
@@ -1158,7 +1165,7 @@ sep_object_table <- function (dt, type_enum, version, idd) {
     # check incomplete object
     incomp_obj <- dt[is.na(object_id) & type >= type_enum$value]
     if (nrow(incomp_obj)) {
-        parse_error("idf", "Incomplete object", dt[is.na(object_id)], 1L)
+        parse_error("idf", "Incomplete object", dt[is.na(object_id)], 1L, subtype = "object")
     }
 
     # extract class names
@@ -1190,14 +1197,14 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 
     # if multiple version found, stop
     if (length(id_ver) > 1L) {
-        parse_error("idf", "Multiple IDF Version found", dt[object_id %in% id_ver], length(id_ver))
+        parse_error("idf", "Multiple IDF versions found", dt[object_id %in% id_ver], length(id_ver), subtype = "ver")
     }
     # }}}
 
     # check invalid class name
     invld_obj <- dt[is.na(class_id) & !is.na(class_name_lower)]
     if (nrow(invld_obj)) {
-        parse_error("idf", "Invalid class name", invld_obj)
+        parse_error("idf", "Invalid class name", invld_obj, subtype = "class")
     }
 
     # fill class id and class name
@@ -1238,7 +1245,12 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 # get_value_table {{{
 get_value_table <- function (dt, idd) {
     # count value number per line
-    set(dt, NULL, "value_count", stri_count_charclass(dt$body, "[,;]"))
+    set(dt, NULL, "value_count", stri_count_fixed(dt$body, ",") + stri_endswith_fixed(dt$body, ";"))
+
+    # in case there are multiple semicolon in one line
+    if (any(stri_count_fixed(dt$body, ";") > 1L)) {
+        parse_error("idf", "Invalid line found", dt[stri_count_fixed(body, ";") > 1L], subtype = "line")
+    }
 
     setindexv(dt, "value_count")
 
@@ -1293,7 +1305,7 @@ get_value_table <- function (dt, idd) {
     )
 
     # issue parse error if invalid field number found
-    if (inherits(fld, "error_bad_field_index")) {
+    if (inherits(fld, "eplusr_error_invalid_field_index")) {
         # get invalid class id and field number
         invld <- set(fld$data, NULL, "field_index", NULL)
         # find which object has invalid field number
@@ -1301,7 +1313,7 @@ get_value_table <- function (dt, idd) {
 
         # modify message
         msg <- gsub(" *#\\d+\\|", "-->", gsub("index", "number", fld$message))
-        parse_error("idf", "Invalid field number", dt[J(obj), on = "object_id"], post = msg)
+        parse_error("idf", "Invalid field number", dt[J(obj), on = "object_id"], post = msg, subtype = "field")
     }
 
     # bind columns
@@ -1341,7 +1353,7 @@ update_object_name <- function (dt_object, dt_value) {
             return(dt_object)
         }
     }
-    dt_object[dt_nm, on = "object_id", `:=`(object_name = dt_nm$object_name, object_name_lower = dt_nm$object_name_lower)]
+    dt_object[dt_nm, on = "object_id", `:=`(object_name = i.object_name, object_name_lower = i.object_name_lower)]
     dt_object
 }
 # }}}
@@ -1384,14 +1396,44 @@ convert_value_unit <- function (idd_env, dt_value, from, to, type = "value") {
 }
 # }}}
 
-# get_value_sources {{{
-get_value_sources <- function (dt_value, lower = FALSE) {
-    dt_val <- dt_value[!is.na(value_chr), list(object_id, field_id, value_id, value_chr, src_enum, class_name)]
+# get_value_reference_map {{{
+get_value_reference_map <- function (idd_env, src, value, all = TRUE) {
+    empty <- data.table(
+            object_id = integer(0L),     value_id = integer(0L),
+        src_object_id = integer(0L), src_value_id = integer(0L),
+        src_enum = integer(0L)
+    )
 
-    setindexv(dt_val, "src_enum")
+    # get all values in lower case that are references {{{
+    if (!has_names(value, "type_enum")) {
+        add_field_property(idd_env, value, "type_enum")
+        on.exit(set(value, NULL, "type_enum", NULL), add = TRUE)
+    }
+    val_ref <- value[!is.na(value_chr) & type_enum == IDDFIELD_TYPE$object_list,
+        list(object_id, value_id, value_chr = stri_trans_tolower(value_chr), field_id)]
+    if (!nrow(val_ref)) return(empty)
+    # }}}
+
+    # get field reference map in current IDF
+    val_ref_map <- idd_env$reference[val_ref, on = "field_id", allow.cartesian = TRUE]
+
+    # get all values in lower case that are sources {{{
+    if (!has_names(src, "class_name")) {
+        add_class_name(idd_env, src)
+        on.exit(set(src, NULL, "class_name", NULL), add = TRUE)
+    }
+    if (!has_names(src, "src_enum")) {
+        add_field_property(idd_env, src, "src_enum")
+        on.exit(set(src, NULL, "src_enum", NULL), add = TRUE)
+    }
+    val_src <- src[!J(NA_character_), on = "value_chr", .SD,
+        .SDcols = c("object_id", "field_id", "value_id", "value_chr", "src_enum", "class_name")
+    ]
+
+    setindexv(val_src, "src_enum")
 
     # a) reference class names
-    cls_src <- dt_val[J(IDDFIELD_SOURCE$class), on = "src_enum", nomatch = 0L,
+    cls_src <- val_src[J(IDDFIELD_SOURCE$class), on = "src_enum", nomatch = 0L,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1402,7 +1444,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
     ]
 
     # b) reference field values
-    fld_src <- dt_val[J(IDDFIELD_SOURCE$field), on = "src_enum", nomatch = 0L,
+    fld_src <- val_src[J(IDDFIELD_SOURCE$field), on = "src_enum", nomatch = 0L,
         list(
             src_object_id = object_id,
             src_field_id = field_id,
@@ -1414,7 +1456,7 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 
     # c) reference both class names and field values
     ## seperate source enum here
-    mix_src <- dt_val[J(IDDFIELD_SOURCE$mixed), on = "src_enum", nomatch = 0L,
+    mix_src <- val_src[J(IDDFIELD_SOURCE$mixed), on = "src_enum", nomatch = 0L,
         {
             list(
                 src_object_id = c(object_id, object_id),
@@ -1428,42 +1470,8 @@ get_value_sources <- function (dt_value, lower = FALSE) {
 
     # combine
     val_src <- rbindlist(list(cls_src, fld_src, mix_src))
-
-    if (lower) set(val_src, NULL, "src_value_chr", stri_trans_tolower(val_src$src_value_chr))
-
-    val_src
-}
-# }}}
-
-# get_value_references {{{
-get_value_references <- function (dt_value, lower = FALSE) {
-    val_ref <- dt_value[
-        !is.na(value_chr) & type_enum == IDDFIELD_TYPE$object_list,
-        list(object_id, value_id, value_chr, field_id)]
-
-    if (lower) set(val_ref, NULL, "value_chr", stri_trans_tolower(val_ref$value_chr))
-
-    val_ref
-}
-# }}}
-
-# get_value_reference_map {{{
-get_value_reference_map <- function (map, src, value, all = TRUE) {
-    empty <- data.table(
-            object_id = integer(0L),     value_id = integer(0L),
-        src_object_id = integer(0L), src_value_id = integer(0L),
-        src_enum = integer(0L)
-    )
-
-    # get all values in lower case that are references
-    val_ref <- get_value_references(value, lower = TRUE)
-    if (!nrow(val_ref)) return(empty)
-
-    # get field reference map in current IDF
-    val_ref_map <- map[val_ref, on = "field_id", allow.cartesian = TRUE]
-
-    # get all values in lower case that are sources
-    val_src <- get_value_sources(src[J(unique(val_ref_map$src_field_id)), on = "field_id", nomatch = 0L], lower = TRUE)
+    set(val_src, NULL, "src_value_chr", stri_trans_tolower(val_src$src_value_chr))
+    # }}}
 
     # match
     ref <- val_ref_map[val_src, on = c(value_chr = "src_value_chr", "src_enum", "src_field_id"),
@@ -1477,16 +1485,16 @@ get_value_reference_map <- function (map, src, value, all = TRUE) {
 
 # parse_issue {{{
 parse_warn <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
-                        num = NULL, prefix = NULL, post = NULL) {
-    parse_issue(type, title, data, num, prefix, post, stop = FALSE)
+                        num = NULL, prefix = NULL, post = NULL, subtype = NULL) {
+    parse_issue(type, title, data, num, prefix, post, stop = FALSE, subtype = subtype)
 }
 parse_error <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
-                         num = NULL, prefix = NULL, post = NULL) {
-    parse_issue(type, title, data, num, prefix, post, stop = TRUE)
+                         num = NULL, prefix = NULL, post = NULL, subtype = NULL) {
+    parse_issue(type, title, data, num, prefix, post, stop = TRUE, subtype = subtype)
 }
 parse_issue <- function (type = c("idf", "idd", "err", "epw"),
                          title, data = NULL, num = NULL, prefix = NULL, post = NULL,
-                         stop = TRUE) {
+                         stop = TRUE, subtype = NULL) {
 
     start_rule <- cli::rule(line = 2L)
 
@@ -1541,10 +1549,13 @@ parse_issue <- function (type = c("idf", "idd", "err", "epw"),
     key <- if(stop) "ERROR" else "WARNING"
     all_mes <- paste0(paste0(toupper(type)," PARSING ", key, ".\n"), all_mes)
 
+    type <- paste0("parse_", type)
+    subtype <- if (!is.null(subtype)) paste0(type, "_", subtype)
+
     if (stop) {
-        abort(all_mes, paste0("parse_", type))
+        abort(all_mes, c(subtype, type), data = data)
     } else {
-        warn(all_mes, paste0("parse_", type))
+        warn(all_mes, c(subtype, type), data = data)
     }
 }
 # }}}
@@ -1553,7 +1564,7 @@ parse_issue <- function (type = c("idf", "idd", "err", "epw"),
 insert_version <- function (x, ver) {
     if (is.character(x)) {
         paste0(x, "Version, ", standardize_ver(ver)[, 1L:2L], ";")
-    } else if (inherits(x, "data.table") && has_names(x, c("line", "string"))) {
+    } else if (inherits(x, "data.table") && all(has_names(x, c("line", "string")))) {
         n <- if (!nrow(x)) 0L else max(x$line)
         append_dt(x, data.table(line = n + 1L, string = paste0("Version, ", standardize_ver(ver)[, 1L:2L], ";")))
     } else {

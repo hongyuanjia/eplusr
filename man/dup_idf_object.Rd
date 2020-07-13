@@ -18,14 +18,17 @@ field, and reference.}
 \item{idf_env}{An environment or list contains IDF tables including object,
 value, and reference.}
 
-\item{dt_object}{A \code{\link[data.table:data.table]{data.table::data.table()}} that contains object data.
-Usually created using \code{\link[=expand_idf_dots_value]{expand_idf_dots_value()}}.}
+\item{dt_object}{A \code{\link[data.table:data.table]{data.table::data.table()}} that contains object data.}
 
 \item{level}{Validate level. Default: \code{eplusr_option("validate_level")}.}
 }
 \value{
-The duplicated object data in a named list of 3
-\code{\link[data.table:data.table]{data.table::data.table()}}s, i.e. \code{object}, \code{value} and \code{reference}.
+The modified \link{Idf} data in a named list of 5 elements, i.e. \code{object},
+\code{value}, \code{reference}, \code{changed} and \code{updated}. First 3 elements are
+\code{\link[data.table:data.table]{data.table::data.table()}}s containing the actual updated \link{Idf} data while
+\code{changed} and \code{updated} are integer vectors containing IDs of objects that
+have been directly changed and indirectly updated due to references,
+respectively.
 }
 \description{
 Duplicate existing objects

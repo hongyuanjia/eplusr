@@ -55,7 +55,7 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
     if (is.null(class)) {
         # very odd way to subset columns but is way faster that others
         # ref: https://github.com/Rdatatable/data.table/issues/3477
-        if (is.null(property)) return(setDT(unclass(idd_env$class)[cols]))
+        if (is.null(property)) return(fast_subset(idd_env$class, cols))
 
         if ("group_name" %chin% property) {
             property <- setdiff(property, "group_name")
@@ -66,7 +66,7 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
 
         # very odd way to subset columns but is way faster
         # ref: https://github.com/Rdatatable/data.table/issues/3477
-        res <- setDT(unclass(idd_env$class)[unique(c(cols, property))])
+        res <- fast_subset(idd_env$class, unique(c(cols, property)))
 
         if (add_group) add_joined_cols(idd_env$group, res, "group_id", "group_name")
 
@@ -80,9 +80,7 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
         add_joined_cols(idd_env$group, res, "group_id", "group_name")
     }
 
-    # very odd way to subset columns but is way faster
-    # ref: https://github.com/Rdatatable/data.table/issues/3477
-    setDT(unclass(res)[c("rleid", unique(c(cols, property)))])
+    fast_subset(res, c("rleid", unique(c(cols, property))))
 }
 # }}}
 # get_idd_class_field_num {{{
@@ -151,6 +149,18 @@ get_idd_class_field_num <- function (dt_class, num = NULL) {
     dt_class
 }
 # }}}
+# get_idd_class_unique {{{
+get_idd_class_unique <- function (idd_env) {
+    idd_env$class[J(TRUE), on = "unique_object", nomatch = NULL]
+}
+# }}}
+# get_class_component_name {{{
+get_class_component_name <- function (class) {
+    nm <- stri_extract_first_regex(class, "^.+?(?=:)")
+    nm[is.na(nm)] <- class[is.na(nm)]
+    nm
+}
+# }}}
 
 # FIELD
 # get_idd_field {{{
@@ -159,16 +169,11 @@ get_idd_class_field_num <- function (dt_class, num = NULL) {
 #' @param idd_env An environment or list contains IDD tables including class,
 #'        field, and reference.
 #' @param class An integer vector of valid class indexes or a character vector
-#'        of valid class names or a data.table that contains column `class_id`
-#'        and `rleid`. If a data.table that contains a column `object_id`, that
-#'        column will be preserved.
+#'        of valid class names.
 #' @param field An integer vector of valid field indexes or a character
 #'        vector of valid field names (can be in in underscore style).  `class`
 #'        and `field` should have the same length.
-#' @param property A character vector of column names in field table to return. If
-#'        `NULL`, all columns from IDD field table will be returned, plus column
-#'        `rleid`, `object_id` (if applicable) and `matched_rleid` (if
-#'        `complete` is `TRUE`).
+#' @param property A character vector of column names in field table to return.
 #' @param underscore If `TRUE`, input class name and field names will be
 #'        converted into underscore style name first and column `class_name_us`
 #'        and `field_name_us` will be used for matching.
@@ -215,7 +220,7 @@ get_idd_field_in_class <- function (idd_env, class, all = FALSE, underscore = TR
 # get_idd_field_from_which {{{
 get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                                       no_ext = FALSE, complete = FALSE, all = FALSE) {
-    assert_valid_type(field, "field")
+    assert_valid_type(field, "Field Index|Name")
 
     # class properties used for min required field num calculation
     col_prop <- c("num_fields", "min_fields", "last_required", "num_extensible",
@@ -816,6 +821,9 @@ field_default_to_unit <- function (idd_env, dt_field, from, to) {
     } else {
         value_id <- NULL
     }
+    if (has_names(dt_field, "value_chr")) {
+        setnames(dt_field, c("value_chr", "value_num"), paste0(c("value_chr", "value_num"), "-backup"))
+    }
     set(dt_field, NULL, "value_id", seq_along(dt_field$field_id))
 
     cols_add <- NULL
@@ -829,6 +837,11 @@ field_default_to_unit <- function (idd_env, dt_field, from, to) {
 
     set(dt_field, NULL, "value_id", value_id)
     setnames(dt_field, c("value_chr", "value_num"), c("default_chr", "default_num"))
+
+    if (has_names(dt_field, "value_chr-backup")) {
+        setnames(dt_field, paste0(c("value_chr", "value_num"), "-backup"), c("value_chr", "value_num"))
+    }
+
     dt_field
 }
 # }}}
@@ -1038,7 +1051,7 @@ get_input_class_data <- function (idd_env, class, num = NULL) {
 # TABLE
 # get_idd_table {{{
 get_idd_table <- function (idd_env, class, all = FALSE) {
-    assert_valid_type(class, "class")
+    assert_valid_type(class, "Class Index|Name")
     fld <- get_idd_field(idd_env, class, all = all)[
         , .SD, .SDcols = c("class_name", "field_index", "field_name")
     ]
@@ -1052,7 +1065,7 @@ get_idd_table <- function (idd_env, class, all = FALSE) {
 # STRING
 # get_idd_string {{{
 get_idd_string <- function (idd_env, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
-    assert_valid_type(class, "class")
+    assert_valid_type(class, "Class Index|Name")
     assert_count(sep_each)
 
     fld <- get_idd_field(idd_env, class, property = c("units", "ip_units"), all = all)

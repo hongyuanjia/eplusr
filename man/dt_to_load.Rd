@@ -8,15 +8,15 @@ dt_to_load(dt, string_value = TRUE)
 }
 \arguments{
 \item{dt}{A data.table created using \code{Idf$to_table()} and
-\code{IdfObject$to_table()}. \code{dt} should at least contain column \code{id} (indicator
-used to distinguish object definitions), \code{class} (class names). If a \code{name}
-column exists, it will be preserved.}
+\code{IdfObject$to_table()}. \code{dt} should at least contain column \code{id}
+(indicator used to distinguish object definitions), \code{class} (class
+names). If a \code{name} column exists, it will be preserved.}
 
 \item{string_value}{If \code{TRUE}, all value will be coerced into character and
-the \code{value} column of returned \link[data.table:data.table]{datat.table} will
-be character type. If \code{FALSE}, the original value will be preserved and the
-\code{value} column of returned \link[data.table:data.table]{data.table} will be
-list type.}
+the \code{value} column of returned \link[data.table:data.table]{datat.table}
+will be character type. If \code{FALSE}, the original value will be
+preserved and the \code{value} column of returned
+\link[data.table:data.table]{data.table} will be list type.}
 }
 \value{
 A \link[data.table:data.table]{data.table} with 5 or 6 columns:
@@ -47,4 +47,5 @@ dt <- idf$to_table(class = "Material", wide = TRUE)
 
 dt_to_load(dt)
 }
+
 }

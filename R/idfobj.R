@@ -51,18 +51,18 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #' mat <- idf$Material[["C5 - 4 IN HW CONCRETE"]]
         #' }
         #'
+        #' @importFrom checkmate assert_count
         initialize = function (object, class = NULL, parent) {
             if (missing(parent) || !is_idf(parent)) {
-                abort("error_idfobject_missing_parent",
-                    paste("IdfObject can only be created based a parent Idf object.",
-                        "Please give `parent`, which should be an Idf object.")
+                abort(paste("IdfObject can only be created based a parent Idf object.",
+                    "Please give 'parent', which should be an Idf object.")
                 )
             } else {
                 private$m_parent <- parent
             }
-            assert(is_count(object))
+            object <- assert_count(object, positive = TRUE, coerce = TRUE)
             if (!is.null(class)) {
-                assert(is_count(class))
+                class <- assert_count(class, positive = TRUE, coerce = TRUE)
             } else {
                 class <- get_idf_object(private$idd_env(), private$idf_env(), NULL, object)$class_id
             }
@@ -1401,15 +1401,15 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         # }}}
 
         idf_env = function () {
-            ._get_private(private$m_parent)$m_idf_env
+            get_priv_env(private$m_parent)$m_idf_env
         },
 
         idd_env = function () {
-            ._get_private(private$m_parent)$idd_env()
+            get_priv_env(private$m_parent)$idd_env()
         },
 
         log_env = function () {
-            ._get_private(private$m_parent)$m_log
+            get_priv_env(private$m_parent)$m_log
         }
     )
 )
@@ -1462,66 +1462,30 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
 #' }
 #' @export
 # idf_object {{{
+#' @importFrom checkmate assert_string
 idf_object <- function (parent, object = NULL, class = NULL) {
     if (missing(parent) || !is_idf(parent)) {
-        abort("error_idfobject_missing_parent",
-            paste("IdfObject can only be created based a parent Idf object.",
-                "Please give `parent`, which should be an Idf object.")
+        abort(paste("IdfObject can only be created based a parent Idf object.",
+            "Please give `parent`, which should be an Idf object.")
         )
     }
 
-    idd_env <- ._get_private(parent)$idd_env()
-    idf_env <- ._get_private(parent)$idf_env()
+    idd_env <- get_priv_env(parent)$idd_env()
+    idf_env <- get_priv_env(parent)$idf_env()
 
     # add an empty object
     if (is.null(object)) {
-        assert(!is.null(class),
-            msg = paste0("`class` must be given when `object` is not.")
-        )
+        if (is.null(class)) stop("'class' must be given when 'object' is not")
 
-        assert(is_string(class))
+        assert_string(class)
 
-        # add field property
-        prop <- c("units", "ip_units", "default_chr", "default_num", "is_name",
-            "required_field", "src_enum", "type_enum", "extensible_group"
-        )
-
-        cls <- get_idd_class(idd_env, class)
-        fld <- get_idd_field(idd_env, cls$class_id, property = prop)
-
-        obj <- set(cls, NULL, c("object_id", "object_name", "object_name_lower", "comment"),
-            list(new_id(idf_env$object, "object_id", 1L), NA_character_, NA_character_, list())
-        )
-
-        dot <- data.table(rleid = 1L, object_rleid = 1L, dep = 1, dot = class, dot_nm = NA_character_)
-
-        assert_can_do(idd_env, idf_env, dot, obj, action = "add")
-
-        val <- set(fld, NULL, c("value_id", "value_chr", "value_num", "object_id", "defaulted"),
-            list(new_id(idf_env$value, "value_id", nrow(fld)),
-                 NA_character_, NA_real_, obj$object_id,
-                 TRUE
-            )
-        )
-
-        # assign default values
-        val <- assign_default_value(idd_env, idf_env, val)
-
-        # validate
-        assert_valid(idd_env, idf_env, obj, val, action = "add")
-
-        idf_env$object <- append_dt(idf_env$object, obj)
-        idf_env$value <- append_dt(idf_env$value, val)
-
-        object <- obj$object_id
-        class <- obj$class_id
-
-        # validate
-        assert_valid(idd_env, idf_env, obj, val, action = "add")
+        lst <- list(list())
+        names(lst) <- class
+        obj <- parent$add(lst)[[1L]]
 
         verbose_info(
-            paste0("New empty object [ID:", obj$object_id, "] in class ",
-                surround(obj$class_name), " created."
+            paste0("New empty object [ID:", obj$id(), "] in class ",
+                surround(obj$class_name()), " created."
             )
         )
     } else {
@@ -1529,9 +1493,8 @@ idf_object <- function (parent, object = NULL, class = NULL) {
 
         object <- obj$object_id
         class <- obj$class_id
+        obj <- IdfObject$new(object, class, parent)
     }
-
-    obj <- IdfObject$new(object, class, parent)
 
     add_idfobj_field_bindings(obj)
 }
@@ -1566,8 +1529,9 @@ add_idfobj_field_bindings <- function (obj, field_index = NULL, update = FALSE) 
         if (missing(value)) {
             self$value(field)[[1L]]
         } else {
+            lst <- list(value)
             names(value) <- field
-            self$set(c(value))
+            do.call(self$set, lst)
             invisible(self)
         }
     })
@@ -1617,16 +1581,17 @@ idfobj_class_name <- function (self, private) {
 # }}}
 # idfobj_definition {{{
 idfobj_definition <- function (self, private) {
-    IddObject$new(private$m_class_id, ._get_private(private$m_parent)$m_idd)
+    IddObject$new(private$m_class_id, get_priv_env(private$m_parent)$m_idd)
 }
 # }}}
 # idfobj_comment {{{
+#' @importFrom checkmate assert_character
 idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
     if (missing(comment)) {
         return(private$idf_env()$object[J(private$m_object_id), on = "object_id"]$comment[[1L]])
     }
 
-    assert(is.atomic(comment), msg = "`comment` should be NULL or a character vector.")
+    assert_character(comment, null.ok = TRUE)
     obj <- set_idfobj_comment(private$idd_env(), private$idf_env(), private$m_object_id,
         comment = comment, append = append, width = width
     )
@@ -1636,7 +1601,7 @@ idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
     log_new_uuid(private$log_env())
 
     # update object in parent
-    merge_idfobj_data(private$idf_env(), obj, "object")
+    private$idf_env()[obj, on = "object_id", `:=`(comment = i.comment)]
 
     self
 }
@@ -1648,15 +1613,11 @@ idfobj_value <- function (self, private, which = NULL, all = FALSE, simplify = F
 # }}}
 # idfobj_set {{{
 idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
-    set <- set_idfobj_value(private$idd_env(), private$idf_env(),
-        private$m_object_id, ..., .default = .default, .empty = .empty
+    lst <- list(list(...))
+    names(lst) <- paste0("..", private$m_object_id)
+    idf_set(get_self_env(private$m_parent), get_priv_env(private$m_parent),
+        lst, .default = .default, .empty = .empty, .env = environment()
     )
-    merge_idf_data(private$idf_env(), set, by_object = TRUE)
-
-    # log
-    log_add_order(private$log_env(), set$object$object_id)
-    log_unsaved(private$log_env())
-    log_new_uuid(private$log_env())
 
     self
 }
@@ -1710,13 +1671,13 @@ idfobj_ref_to_object <- function (self, private, which = NULL, object = NULL,
     )[!is.na(src_value_id)]
 
     if (!nrow(rel)) {
-        if (eplusr_option("verbose_info")) {
+        if (in_verbose()) {
             msg <- paste("Target object does not refer to any objects")
 
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
             } else {
-                verbose_info(msg, "specifed.")
+                verbose_info(msg, " specifed.")
             }
         }
         return(invisible())
@@ -1754,7 +1715,7 @@ idfobj_ref_by_object <- function (self, private, which = NULL, object = NULL,
             if (is.null(object) && is.null(class) && is.null(group)) {
                 verbose_info(msg, ".")
             } else {
-                verbose_info(msg, "specifed.")
+                verbose_info(msg, " specifed.")
             }
         }
         return(invisible())
@@ -2000,10 +1961,10 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 #' @export
 # $.IdfObject {{{
 '$.IdfObject' <- function (x, name) {
-    if (name %in% ls(x)) return(NextMethod())
+    if (name %chin% ls(x)) return(NextMethod())
 
-    self <- ._get_self(x)
-    private <- ._get_private(x)
+    self <- get_self_env(x)
+    private <- get_priv_env(x)
 
     # In order to make sure `idfobj$nAmE` is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
@@ -2015,7 +1976,7 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
             get_idfobj_value(private$idd_env(), private$idf_env(),
                 private$m_object_id, which = fld_idx
             )[[1L]],
-            error_bad_field_name = function (e) NextMethod()
+            eplusr_error_invalid_field_name = function (e) NextMethod()
         )
     } else {
         NextMethod()
@@ -2028,17 +1989,17 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 '[[.IdfObject' <- function(x, i) {
     if (length(i) != 1L) return(NextMethod())
 
-    if (i %in% ls(x)) {
+    if (as.character(i) %chin% ls(x)) {
         NextMethod()
     } else {
-        self <- ._get_self(x)
-        private <- ._get_private(x)
+        self <- get_self_env(x)
+        private <- get_priv_env(x)
 
         # In order to make sure `idfobj$nAmE` is not acceptable
-        if (is_integer(i) || i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
+        if (checkmate::test_count(i, positive = TRUE) || i %chin% private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]) {
             tryCatch(
                 get_idfobj_value(private$idd_env(), private$idf_env(), private$m_object_id, which = i)[[1L]],
-                error_bad_field_name = function (e) NextMethod()
+                eplusr_error_invalid_field_name = function (e) NextMethod()
             )
         } else {
             NextMethod()
@@ -2049,13 +2010,13 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 
 #' @export
 # $<-.IdfObject {{{
+#' @importFrom checkmate assert_scalar
 `$<-.IdfObject` <- function (x, name, value) {
-    if (name %in% ls(x)) return(NextMethod())
+    # all field names start with a capital letter
+    if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
 
-    self <- ._get_self(x)
-    private <- ._get_private(x)
-
-    assert(is_scalar(value))
+    self <- get_self_env(x)
+    private <- get_priv_env(x)
 
     # In order to make sure `idfobj$nAmE <- "a"` is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
@@ -2063,8 +2024,10 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
     if (is.na(fld_idx)) fld_idx <- chmatch(name, underscore_name(fld_nm))
 
     if (!is.na(fld_idx)) {
+        if (is.null(value)) value <- list(NULL)
         names(value) <- name
-        tryCatch(.subset2(x, "set")(c(value)), error_bad_field_name = function (e) NextMethod())
+        tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
+            eplusr_error_invalid_field_name = function (e) NextMethod())
 
         # add bindings
         add_idfobj_field_bindings(x, fld_idx)
@@ -2081,22 +2044,25 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 '[[<-.IdfObject' <- function(x, i, value) {
     if (length(i) != 1) return(NextMethod())
 
-    if (i %in% ls(x)) return(NextMethod())
+    if (!substr(as.character(i), 1, 1) %chin% LETTERS && as.character(i) %chin% ls(x)) return(NextMethod())
 
-    self <- ._get_self(x)
-    private <- ._get_private(x)
+    self <- get_self_env(x)
+    private <- get_priv_env(x)
 
     # In order to make sure only standard field name is not acceptable
     fld_nm <- private$idd_env()$field[J(private$m_class_id), on = "class_id", field_name]
-    if (is_integer(i)) {
+    if (checkmate::test_count(i, positive = TRUE)) {
         fld_idx <- i
-        i <- fld_nm[[i]]
+        nm <- paste0("..", i)
     } else {
         fld_idx <- chmatch(i, fld_nm)
+        nm <- i
     }
     if (!is.na(fld_idx)) {
-        names(value) <- i
-        tryCatch(.subset2(x, "set")(c(value)), error_bad_field_name = function (e) NextMethod())
+        if (is.null(value)) value <- list(NULL)
+        names(value) <- nm
+        tryCatch(do.call(.subset2(x, "set"), c(as.list(value), .default = FALSE, .empty = FALSE)),
+            eplusr_error_invalid_field_name = function (e) NextMethod())
 
         # add bindings
         add_idfobj_field_bindings(x, fld_idx)
@@ -2113,10 +2079,10 @@ print.IdfObject <- function (x, comment = TRUE, auto_sep = TRUE, brief = FALSE, 
 `==.IdfObject` <- function (e1, e2) {
     if (!is_idfobject(e2)) return(FALSE)
     identical(
-        ._get_private(._get_private(e1)$m_parent)$m_log$uuid,
-        ._get_private(._get_private(e2)$m_parent)$m_log$uuid
+        get_priv_env(get_priv_env(e1)$m_parent)$m_log$uuid,
+        get_priv_env(get_priv_env(e2)$m_parent)$m_log$uuid
     ) &&
-    identical(._get_private(e1)$m_object_id, ._get_private(e2)$m_object_id)
+    identical(get_priv_env(e1)$m_object_id, get_priv_env(e2)$m_object_id)
 }
 # }}}
 

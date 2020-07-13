@@ -141,6 +141,7 @@ get_idf_object <- function (idd_env, idf_env, class = NULL, object = NULL, prope
         # }}}
     }
 
+    setcolorder(obj, c("rleid", "class_id", "class_name", "object_id", "object_name", "object_name_lower", "comment"))
     obj
 }
 # }}}
@@ -205,6 +206,28 @@ get_idf_object_num <- function (idd_env, idf_env, class = NULL) {
 }
 # }}}
 # get_object_info {{{
+#' Format object information string
+#'
+#' @param dt_object A [data.table::data.table()] of object data
+#' @param component A character vector specifying what information to be
+#'        formatted. Should be a subset of `"id"`, `"name"` and `"class"`.
+#'        Defaults are all of them.
+#' @param by_class If `TRUE`, multiple objects in the same class will be
+#'        concatenated. Default: `FALSE`.
+#' @param numbered If `TRUE`, a index number will be prepended. If `rleid`
+#'        column exists in `dt_object`, its values will be used as the index
+#'        numbers.
+#' @param collapse A single string used to collapse the results into a single
+#'        string. Default: `NULL`.
+#' @param prefix A character vector used to add at the beginning of object
+#'        information. Default: `NULL`.
+#' @param name_prefix If `TRUE`, Default: `TRUE`.
+#'
+#' @return A character vector of the same length as the row number of input
+#' `dt_object` if `collapse` is `NULL`. Otherwise a single string.
+#'
+#' @keywords internal
+#' @export
 get_object_info <- function (dt_object, component = c("id", "name", "class"),
                              by_class = FALSE, numbered = TRUE, collapse = NULL,
                              prefix = NULL, name_prefix = TRUE) {
@@ -537,6 +560,50 @@ make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
     setcolorder(dt, setdiff(names(dt), c("new_object_name", "new_object_name_lower")))
 }
 # }}}
+# get_idf_object_multi_scope {{{
+get_idf_object_multi_scope <- function (idd_env, idf_env, object = NULL, class = NULL, group = NULL) {
+    obj <- data.table()
+
+    if (is.null(object) && is.null(class) && is.null(group)) {
+        return(setcolorder(get_idf_object(idd_env, idf_env),
+            c("rleid", "class_id", "class_name", "object_id", "object_name", "object_name_lower", "comment")
+        ))
+    }
+
+    if (!is.null(object)) {
+        obj <- get_idf_object(idd_env, idf_env, object = object, ignore_case = TRUE)
+    }
+    if (!is.null(class)) {
+        obj <- rbindlist(list(obj, get_idf_object(idd_env, idf_env, class)), use.names = TRUE)
+    }
+    if (!is.null(group)) {
+        assert_valid_type(group, "Group Name", type = "name")
+
+        add_class_property(idd_env, idf_env$object, "group_name")
+
+        grp_in <- recognize_input(group, "group")
+        obj_grp <- join_from_input(idf_env$object, grp_in, "object_id")
+
+        # clean
+        set(idf_env$object, NULL, "group_name", NULL)
+
+        # add class name to make sure results have same columns as 'get_idf_object()'
+        set(obj_grp, NULL, "group_name", NULL)
+        add_class_property(idd_env, obj_grp, "class_name")
+
+        obj <- rbindlist(list(obj, obj_grp), use.names = TRUE)
+    }
+
+    obj <- unique(obj, by = "object_id")
+
+    # reset rleid
+    add_rleid(obj)
+
+    setcolorder(obj, c("rleid", "class_id", "class_name", "object_id", "object_name", "object_name_lower", "comment"))
+
+    obj
+}
+# }}}
 
 # VALUE
 # get_idf_value {{{
@@ -587,6 +654,9 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
         # if just want to get the value, no special treatment is required
         if (!(all || complete || align)) {
             add_joined_cols(idd_env$field, val, "field_id", c("field_index", "field_name", property))
+            setcolorder(val, c("rleid", "class_id", "class_name", "object_id",
+                "object_name", "field_id", "field_index", "field_name", "value_id",
+                "value_chr", "value_num"))
             return(val)
         }
 
@@ -682,7 +752,10 @@ get_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field 
         val <- idf_env$value[fld, on = c("object_id", "field_id"), nomatch = nom]
     }
 
-    val[is.na(value_id), value_id := -.I]
+    val[J(NA_integer_), on = "value_id", value_id := -.I]
+    setcolorder(val, c("rleid", "class_id", "class_name", "object_id",
+        "object_name", "field_id", "field_index", "field_name", "value_id",
+        "value_chr", "value_num"))
 
     val
 }
@@ -784,7 +857,7 @@ expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .pro
 
     # see https://github.com/mllg/checkmate/issues/146
     # For list, only NULL is treated as "missing" value
-    assert_list(l, c("character", "integerish"), any.missing = FALSE, all.missing = FALSE, .var.name = "Input")
+    assert_list(l, c("character", "integerish"), any.missing = FALSE, all.missing = FALSE, .var.name = "Input", min.len = 1L)
     qassertr(l, "V", "Input")
 
     is_nm <- vlapply(l, is.character, use.names = FALSE)
@@ -842,6 +915,8 @@ expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .pro
     set(obj, NULL, "rleid", rleid(obj$input_rleid, obj$object_rleid))
     set(obj, NULL, c("input_rleid", "object_rleid"), NULL)
     setcolorder(obj, "rleid")
+    if (!is.null(.property)) setcolorder(obj, setdiff(names(obj), .property))
+    obj
 }
 # }}}
 # parse_dots_value {{{
@@ -853,7 +928,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
     l <- eval(substitute(alist(...)))
     rules <- if (.scalar) "V1" else "V"
 
-    assert_list(l, any.missing = FALSE, all.missing = FALSE, .var.name = "Input")
+    assert_list(l, any.missing = FALSE, all.missing = FALSE, .var.name = "Input", min.len = 1L)
 
     nm <- name <- names2(l)
     ll <- vector("list", length(l))
@@ -922,6 +997,15 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                 abort("Assertion on 'Input' failed: Must be named.", "dots_no_name")
             }
             val <- li
+
+            # for '..ID = list()'
+            name <- nm[[i]]
+            if (stri_detect_regex(name, "^\\.\\.\\d+$")) {
+                id <- stri_sub(name, 3L)
+                storage.mode(id) <- "integer"
+                set(dt_in, i, "id", list(id))
+                set(dt_in, i, "name", list(NA_character_))
+            }
         # if `-`, `{`, `(` and other special function calls, len will be 2
         } else {
             evaluated <- FALSE
@@ -2012,7 +2096,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
     l <- list(...)
     ver <- standardize_ver(get_idf_value(idd_env, idf_env, "Version")$value_chr)
 
-    assert_list(l, c("character", "data.frame"), .var.name = "Input")
+    assert_list(l, c("character", "data.frame"), .var.name = "Input", min.len = 1L)
 
     is_chr <- vlapply(l, is.character)
 
@@ -2123,6 +2207,11 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
             set(obj_chr, NULL, "object_id", obj_chr_match$object_id)
             add_joined_cols(obj_chr, val_chr, c("object_id" = "input_object_id"), "object_id")
             set(obj_chr, NULL, "input_object_id", NULL)
+
+            # update value id
+            set(val_chr, NULL, "value_id", NA_integer_)
+            val_chr[idf_env$value, on = c("object_id", "field_id"), value_id := i.value_id]
+            val_chr[J(NA_integer_), on = "value_id", value_id := -.I]
         }
         # }}}
 
@@ -2293,6 +2382,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
                  value_type = i.value_type, object_rleid = i.object_rleid
             )
         ]
+        setnafill(val_dt, type = "locf", cols = c("rleid", "object_id", "object_rleid", "value_type"))
         # if value column is a character vector, need to reset values since
         # all of them are coerced regardless of field types
         val_dt[value_type == 1L & type_enum > IDDFIELD_TYPE$real, value_num := NA_real_]
@@ -2348,6 +2438,8 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
 #' @param pattern A single string of regular expression used to match field
 #'        values
 #'
+#' @param class A character vector specifying the target class names
+#'
 #' @param pattern,ignore.case,perl,fixed,useBytes All of them are
 #'        directly passed to [base::grepl][base::grep()] and
 #'        [base::gsub][base::grep()] with the same default values.
@@ -2377,7 +2469,7 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
     if (!nrow(val)) {
         obj <- get_idf_object(idd_env, idf_env, 1L)[0L]
     } else {
-        obj <- get_idf_object(idd_env, idf_env, object = val[, by = "rleid", object_id]$object_id)
+        obj <- get_idf_object(idd_env, idf_env, object = unique(val[, by = "rleid", object_id]$object_id))
     }
 
     if (!is.null(replacement)) {
@@ -2413,14 +2505,6 @@ assert_valid <- function (validity, action) {
 }
 # }}}
 
-# get_class_component_name {{{
-get_class_component_name <- function (class) {
-    nm <- stri_extract_first_regex(class, "^.+?(?=:)")
-    nm[is.na(nm)] <- class[is.na(nm)]
-    nm
-}
-# }}}
-
 # OBJECT MUNIPULATION
 # dup_idf_object {{{
 #' Duplicate existing objects
@@ -2430,11 +2514,14 @@ get_class_component_name <- function (class) {
 #' @param idf_env An environment or list contains IDF tables including object,
 #'        value, and reference.
 #' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
 #' @param level Validate level. Default: `eplusr_option("validate_level")`.
 #'
-#' @return The duplicated object data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
+#' @return The modified [Idf] data in a named list of 5 elements, i.e. `object`,
+#' `value`, `reference`, `changed` and `updated`. First 3 elements are
+#' [data.table::data.table()]s containing the actual updated [Idf] data while
+#' `changed` and `updated` are integer vectors containing IDs of objects that
+#' have been directly changed and indirectly updated due to references,
+#' respectively.
 #'
 #' @keywords internal
 #' @export
@@ -2468,7 +2555,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     id_obj <- new_id(idf_env$object, "object_id", nrow(obj))
 
     # logging
-    if (in_verbose() && any(auto <- is.na(dt_object$new_object_name))) {
+    if (in_verbose() && any(auto <- dt_object$has_name & is.na(dt_object$new_object_name))) {
         auto <- set(copy(obj), NULL, "object_id", id_obj)[auto]
         id <- get_object_info(auto, c("id", "class"))
         name <- get_object_info(auto, "name", prefix = " --> New ", numbered = FALSE)
@@ -2478,15 +2565,18 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
         )
     }
 
+    # assign new rleid
+    obj <- add_rleid(obj)
+
     # extract value table
     val <- get_idf_value(idd_env, idf_env, object = obj$object_id, property = "is_name")
-
-    # assign new object id and value id
+    # assign new id
     obj <- assign_new_id(idf_env, obj, "object")
     add_joined_cols(obj, val, "rleid", "object_id")
 
     # assign new object name
-    val[obj, on = c("object_id", is_name = "has_name"), value_chr := i.object_name]
+    val[obj, on = "object_id", object_name := i.object_name]
+    val[obj[J(TRUE), on = "has_name", nomatch = NULL], on = c("object_id", is_name = "has_name"), value_chr := i.object_name]
 
     # value reference
     # extract value reference
@@ -2498,7 +2588,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     val[obj, on = "object_id", new_object_id := i.new_object_id]
     set(val, NULL, "new_value_id", new_id(idf_env$value, "value_id", nrow(val)))
     # update ids in ref
-    ref[val, on = c("object_id", "value_id"), `:=`(object_id = i.new_object_id, value_id = i.new_value_id)]
+    if (nrow(ref)) ref[val, on = c("object_id", "value_id"), `:=`(object_id = i.new_object_id, value_id = i.new_value_id)]
 
     # remove original ids
     set(obj, NULL, "object_id", NULL)
@@ -2515,29 +2605,23 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
         add_field_property(idd_env, idf_env$value, "type_enum")
         src <- get_value_reference_map(idd_env, src_val, idf_env$value, all = FALSE)[
             !J(NA_integer_), on = "value_id"]
-        on.exit(set(idf_env$value, NULL, "type_enum", NULL), add = TRUE)
+        set(idf_env$value, NULL, "type_enum", NULL)
         ref <- rbindlist(list(ref, src))
     }
 
-    set(obj, NULL, "has_name", NULL)
-    set(val, NULL, c("src_enum", "is_name"), NULL)
-    setcolorder(obj, c("rleid", "class_id", "class_name", "object_id", "object_name", "object_name_lower", "comment"))
-    setcolorder(val, c("rleid", "class_id", "class_name", "object_id", "object_name", "field_id", "field_index", "field_name", "value_id", "value_chr"))
-
-    list(object = obj, value = val, reference = ref)
+    list(object = append_dt(idf_env$object, obj),
+         value = append_dt(idf_env$value, val),
+         reference = append_dt(idf_env$reference, ref),
+         changed = obj$object_id,
+         updated = integer()
+    )
 }
 # }}}
 # add_idf_object {{{
 #' Add new objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
+#' @inherit dup_idf_object
 #' @param dt_value A [data.table::data.table()] that contains value data.
-#'        Usually created using [expand_idf_dots_value()].
 #' @param default If `TRUE`, default values are used for those blank
 #'        fields if possible. If `FALSE`, empty fields are kept blank.
 #'        Default: `TRUE`.
@@ -2545,9 +2629,6 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
 #'        duplications in input are removed. Default: `FALSE`.
 #' @param empty If `TRUE`, trailing empty fields are kept. Default: `FALSE`.
 #' @param level Validate level. Default: `eplusr_option("validate_level")`.
-#'
-#' @return The newly added object data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
 #'
 #' @keywords internal
 #' @export
@@ -2572,7 +2653,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
             )
         }
 
-        if (nrow(invld <- idf_env$object[fast_subset(uni, c("rleid", "class_id", "class_name")), on = "class_id"])) {
+        if (nrow(invld <- idf_env$object[fast_subset(uni, c("rleid", "class_id", "class_name")), on = "class_id", nomatch = 0L])) {
             abort(paste0("Adding new object in existing unique-object class is prohibited. Invalid input:\n",
                 get_object_info(invld[, object_id := -rleid], numbered = TRUE, collapse = "\n")),
                 "add_unique"
@@ -2609,7 +2690,10 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
     }
     # if all inputs are duplications
     if (!nrow(dt_object)) {
-        return(list(object = dt_object[0L], value = dt_value[0L], reference = idf_env$reference[0L]))
+        if (unique) verbose_info("After removing duplications, nothing to add.")
+        return(list(
+            object = idf_env$object, value = idf_env$value, reference = idf_env$reference,
+            changed = integer(), updated = integer()))
     }
 
     # validate {{{
@@ -2648,10 +2732,13 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
 
         # extract new reference
         k <- unique(c(i, j))
-        ref <- .Call(data.table:::CsubsetDT, idf_env$reference, k, seq_along(idf_env$reference))
-
-        # remove from the original IDF reference table
-        idf_env$reference <- idf_env$reference[-k]
+        if (!length(k)) {
+            ref <- idf_env$reference[0L]
+        } else {
+            ref <- .Call(data.table:::CsubsetDT, idf_env$reference, k, seq_along(idf_env$reference))
+            # remove from the original IDF reference table
+            idf_env$reference <- idf_env$reference[-k]
+        }
     # manually check new reference
     } else {
         # add necessary columns used for getting references
@@ -2660,11 +2747,9 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
         add_field_property(idd_env, idf_env$value, "src_enum")
         add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
         add_class_name(idd_env, idf_env$value)
-        on.exit(set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL), add = TRUE)
 
         ref <- get_value_reference_map(idd_env, append_dt(idf_env$value, dt_value), dt_value)
-
-        set(dt_value, NULL, "src_enum", NULL)
+        set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
     }
 
     # here should only find if any values in the original IDF reference input
@@ -2673,26 +2758,18 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
     ref <- unique(rbindlist(list(ref, src)))
     # }}}
 
-    list(object = dt_object, value = dt_value, reference = ref)
+    list(object = append_dt(idf_env$object, dt_object),
+         value = append_dt(idf_env$value, dt_value),
+         reference = append_dt(idf_env$reference, ref, "value_id"),
+         changed = dt_object$object_id,
+         updated = integer()
+    )
 }
 # }}}
 # set_idf_object {{{
 #' Modifying existing objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
-#' @param dt_value A [data.table::data.table()] that contains value data.
-#'        Usually created using [expand_idf_dots_value()].
-#' @param empty If `FALSE`, not required empty fields will be removed.
-#'        Default: `FALSE`.
-#' @param level Validate level. Default: `eplusr_option("validate_level")`.
-#'
-#' @return The modified object data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
+#' @inherit add_idf_object
 #'
 #' @keywords internal
 #' @export
@@ -2723,7 +2800,12 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     dt_value[dt_object, on = c("rleid", "object_id"), object_name := i.object_name]
 
     # delete empty fields
-    if (!empty) dt_value <- remove_empty_fields(idd_env, idf_env, dt_value)
+    id_del <- integer()
+    if (!empty) {
+        id_all <- dt_value$value_id
+        dt_value <- remove_empty_fields(idd_env, idf_env, dt_value)
+        id_del <- setdiff(id_all, dt_value$value_id)
+    }
 
     # validate
     validity <- validate_on_level(idd_env, idf_env, dt_object, dt_value, level = chk)
@@ -2746,10 +2828,10 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
         add_field_property(idd_env, idf_env$value, "src_enum")
         add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
         add_class_name(idd_env, idf_env$value)
-        on.exit(set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL), add = TRUE)
 
         ref <- get_value_reference_map(idd_env, append_dt(idf_env$value, dt_value), dt_value)
 
+        set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
         set(dt_value, NULL, "src_enum", NULL)
     }
 
@@ -2759,18 +2841,29 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
     ref <- unique(rbindlist(list(ref, src)))
     # }}}
 
-    list(object = dt_object, value = dt_value, reference = ref)
+    # update referenced values
+    add_joined_cols(dt_value, ref, c("src_value_id" = "value_id"), c("value_chr", "value_num"))
+    idf_env$value[ref, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+
+    if (length(id_del)) {
+        value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")
+    } else {
+        value <- append_dt(idf_env$value, dt_value, "value_id")
+    }
+
+    order_idf_data(list(
+        object = append_dt(idf_env$object, dt_object, "object_id"),
+        value = value,
+        reference = append_dt(idf_env$reference, ref, "value_id"),
+        changed = c(dt_object$object_id),
+        updated = setdiff(ref$object_id, dt_object$object_id)
+    ))
 }
 # }}}
 # del_idf_object {{{
 #' Delete existing objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
+#' @inherit add_idf_object
 #' @param ref_by If `TRUE`, objects whose fields refer to input objects
 #'        will also be deleted. Default: `FALSE`.
 #' @param ref_to If `TRUE`, objects whose fields are referred by input
@@ -2782,10 +2875,6 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
 #'        by another object. Default: `FALSE`.
 #' @param force If `TRUE`, objects are deleted even if they are
 #'        referred by other objects.
-#' @param level Validate level. Default: `eplusr_option("validate_level")`.
-#'
-#' @return The modified whole IDF data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
 #'
 #' @keywords internal
 #' @export
@@ -2813,6 +2902,13 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
                 get_object_info(invld, numbered = TRUE, collapse = "\n")),
                 "del_unique")
         }
+    }
+    # stop if modifying same object multiple times
+    if (anyDuplicated(dt_object$object_id)) {
+        abort(paste0("Cannot delete same object multiple times. Invalid input:\n",
+            get_object_info(dt_object[duplicated(object_id)], collapse = "\n")),
+            "del_same"
+        )
     }
 
     # get objects to be deleted
@@ -2937,30 +3033,19 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
 
     id_del <- if (NROW(rel$ref_to)) c(id_del, id_ref_by, id_ref_to) else c(id_del, id_ref_by)
 
-    # delete rows in object table
-    obj <- idf_env$object[!J(id_del), on = "object_id"]
-    val <- idf_env$value[!J(id_del), on = "object_id"]
-    ref <- idf_env$reference[J(id_del), on = "object_id", nomatch = 0L]
-
-    # NOTE: should keep invalid reference
-    # [J(id_del), on = "src_object_id", `:=`(src_object_id = NA_integer_, src_value_id = NA_integer_)
-
-    list(object = obj, value = val, reference = ref)
+    list(object = idf_env$object[!J(id_del), on = "object_id"],
+         value = idf_env$value[!J(id_del), on = "object_id"],
+         reference = idf_env$reference[!J(id_del), on = "object_id"][
+                J(id_del), on = "src_object_id",
+                `:=`(src_object_id = NA_integer_, src_value_id = NA_integer_)],
+         changed = id_del, updated = integer()
+    )
 }
 # }}}
 # purge_idf_object {{{
 #' Purge not-used resource objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
-#' @param level Validate level. Default: `eplusr_option("validate_level")`.
-#'
-#' @return The modified whole IDF data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
+#' @inherit add_idf_object
 #'
 #' @keywords internal
 #' @export
@@ -2973,6 +3058,13 @@ purge_idf_object <- function (idd_env, idf_env, dt_object) {
         if (nrow(norm)) {
             verbose_info("Non-resource objects are ignored:\n", get_object_info(norm, collapse = "\n"))
         }
+    }
+
+    if (!nrow(src)) {
+        verbose_info("None of specified object(s) can be purged. Skip.")
+        return(list(
+            object = idf_env$object, value = idf_env$value, reference = idf_env$reference,
+            changed = integer(), updated = integer()))
     }
 
     # get references
@@ -3005,35 +3097,30 @@ purge_idf_object <- function (idd_env, idf_env, dt_object) {
 
     if (!length(id)) {
         verbose_info("None of specified object(s) can be purged. Skip.")
-        obj <- data.table()
-        val <- data.table()
-        ref <- data.table()
+        obj <- idf_env$object
+        val <- idf_env$value
+        ref <- idf_env$reference
     } else {
         verbose_info("Object(s) below have been purged:\n",
             get_object_info(add_rleid(dt_object[J(id), on = "object_id"]), collapse = "\n"))
 
         # delete rows in object table
-        obj <- idf_env$object[J(id), on = "object_id"]
-        val <- idf_env$value[J(id), on = "object_id"]
-        ref <- idf_env$reference[J(id), on = "object_id", nomatch = 0L]
+        obj <- idf_env$object[!J(id), on = "object_id"]
+        val <- idf_env$value[!J(id), on = "object_id"]
+        ref <- idf_env$reference[!J(id), on = "object_id"]
     }
 
-    list(object = obj, value = val, reference = ref)
+    list(object = obj, value = val, reference = ref, changed = id, updated = integer())
 }
 # }}}
 # duplicated_idf_object {{{
 #' Determine duplicate objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
+#' @inherit add_idf_object
 #'
 #' @return A same [data.table::data.table()] as input `dt_object` (updated by
-#' reference) with appended logical column `duplicated` indicating the object is
-#' a duplicated one or not.
+#' reference) with appended integer column `unique_object_id` indicating the
+#' object is a duplicated one of that object.
 #'
 #' @keywords internal
 #' @export
@@ -3064,8 +3151,7 @@ duplicated_idf_object <- function (idd_env, idf_env, dt_object) {
         }
     ))[, lapply(.SD, unlist), by = c("class_id", "object_id")]
 
-    set(dt_object, NULL, "duplicated", FALSE)
-    if (nrow(dup)) dt_object[J(dup$object_id_dup), on = "object_id", duplicated := TRUE]
+    dt_object[dup, on = c("object_id" = "object_id_dup"), unique_object_id := i.object_id]
 
     dt_object
 }
@@ -3073,95 +3159,78 @@ duplicated_idf_object <- function (idd_env, idf_env, dt_object) {
 # unique_idf_object {{{
 #' Remove duplicate objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_value()].
-#'
-#' @return The modified whole IDF data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value` and `reference`.
+#' @inherit add_idf_object
 #'
 #' @keywords internal
 #' @export
 unique_idf_object <- function (idd_env, idf_env, dt_object) {
     dup <- duplicated_idf_object(idd_env, idf_env, dt_object)
 
-    if (!any(dup$duplicated)) {
+    if (checkmate::allMissing(dup$unique_object_id)) {
         verbose_info("None duplicated objects found. Skip.")
-        return(list(object = data.table(), value = data.table(), reference = data.table()))
+        return(list(
+            object = idf_env$object, value = idf_env$value, reference = idf_env$reference,
+            changed = integer(), updated = integer()))
     }
 
-    obj <- dup[J(TRUE), on = "duplicated", .SDcols = -"duplicated"]
-    val <- get_idf_value(idd_env, idf_env, object = obj$object_id)
+    obj <- dup[!J(NA_integer_), on = "unique_object_id"]
+
+    # remove reference rows of duplicated objects
+    ref <- idf_env$reference[!J(obj$object_id), on = "object_id"]
 
     # get referenced field index of object to be deleted
-    ref <- get_idf_relation(idd_env, idf_env, object_id = obj$object_id, direction = "ref_by", depth = 0L)
-    ref[val, on = c("src_object_id" = "object_id", "src_value_id" = "value_id"), field_index := i.field_index]
-    # update the referenced object id
-    ref[dup, on = c("src_object_id" = "object_id_dup"), src_object_id := i.object_id]
-    # update the reference value id
-    ref[val, on = c("src_object_id" = "object_id", "field_index"), `:=`(
-        src_value_id = i.value_id, src_value_chr = i.value_chr,
-        src_value_num = i.value_num
-    )]
+    src <- ref[J(obj$object_id), on = "src_object_id", nomatch = NULL]
 
-    # update referenced value
-    idf_env$value[ref, on = c("object_id", "value_id"), `:=`(
-        value_chr = i.src_value_chr, value_num = i.src_value_num
-    )]
-    # update reference dict
-    idf_env$reference[ref, on = c("object_id", "value_id"), `:=`(
-        src_object_id = i.src_object_id, src_value_id = i.src_value_id
-    )]
+    if (in_verbose()) {
+        setnames(obj, c("object_id", "object_name", "unique_object_id"), c("removed_object_id", "removed_object_name", "object_id"))
+        obj[dup, on = "object_id", `:=`(object_name = i.object_name)]
+        set(obj, NULL, "unique", get_object_info(obj, numbered = FALSE, prefix = ""))
 
-    if (eplusr::eplusr_option("verbose_info")) {
-        dup[obj, on = "object_id", `:=`(class_name = i.class_name, object_name = i.object_name)]
-        set(dup, NULL, "merged", get_object_info(dup, numbered = FALSE, prefix = ""))
+        setnames(obj,
+            c("removed_object_id", "removed_object_name", "object_id", "object_name"),
+            c("object_id", "object_name", "unique_object_id", "unique_object_name")
+        )
 
-        setnames(dup, c("object_id", "object_id_dup"), c("merged_object_id", "object_id"))
-        dup[obj, on = "object_id", `:=`(object_name = i.object_name)]
-        dup[, by = c("class_id", "merged_object_id"), removed := get_object_info(.SD, c("id", "name"), numbered = TRUE)]
+        obj[, rleid := seq_len(.N), by = c("class_id", "unique_object_id")]
+        obj[, by = c("class_id", "unique_object_id"),
+            removed := get_object_info(.SD, c("id", "name"), numbered = TRUE)
+        ]
 
-        msg <- dup[, by = c("class_id", "merged_object_id"), list(list(
+        msg <- obj[, by = c("class_id", "unique_object_id"), list(list(
             sprintf("Duplications for %s have been removed:\n %s",
-                merged[[1L]], paste0(removed, collapse = "\n ")
+                unique[[1L]], paste0(removed, collapse = "\n ")
             )
         ))]$V1
-
-        setnames(dup, c("merged_object_id", "object_id"), c("object_id", "object_id_dup"))
-
         verbose_info(paste0(unlist(msg), collapse = "\n\n"))
     }
 
-    list(object = idf_env$object[!J(dup$object_id_dup), on = "object_id"],
-         value = idf_env$value[!J(dup$object_id_dup), on = "object_id"],
-         reference = idf_env$reference
+    src[idf_env$value, on = c("src_object_id" = "object_id", "src_value_id" = "value_id"),
+        `:=`(src_field_id = i.field_id)]
+
+    # get unique object data
+    src[obj, on = c("src_object_id" = "object_id"), unique_object_id := i.unique_object_id]
+    src[idf_env$value, on = c("unique_object_id" = "object_id", "src_field_id" = "field_id"),
+        `:=`(src_value_id = i.value_id, src_value_chr = i.value_chr, src_value_num = i.value_num)]
+
+    # update referenced value
+    idf_env$value[src, on = c("object_id", "value_id"), `:=`(
+        value_chr = i.src_value_chr, value_num = i.src_value_num
+    )]
+    # update reference dict
+    ref[src, on = c("object_id", "value_id"), `:=`(
+        src_object_id = i.unique_object_id, src_value_id = i.src_value_id
+    )]
+
+    list(object = idf_env$object[!J(obj$object_id), on = "object_id"],
+         value = idf_env$value[!J(obj$object_id), on = "object_id"],
+         reference = ref, changed = obj$object_id, updated = setdiff(src$object_id, obj$object_id)
     )
 }
 # }}}
 # rename_idf_object {{{
 #' Rename existing objects
 #'
-#' @param idd_env An environment or list contains IDD tables including class,
-#'        field, and reference.
-#' @param idf_env An environment or list contains IDF tables including object,
-#'        value, and reference.
-#' @param dt_object A [data.table::data.table()] that contains object data.
-#'        Usually created using [expand_idf_dots_name()].
-#' @param level Validate level. Default: `eplusr_option("validate_level")`.
-#'
-#' @return The modified object data in a named list of 3
-#' [data.table::data.table()]s, i.e. `object`, `value`, `reference`.
-#'
-#' @note
-#' * The `reference` table in the returned list only contains the reference-by
-#'   map, indicating which values have been updated in the main `value` table in
-#'   `idf_env`.
-#' * The `value` table in input `idf_env` could be modified if input objects are
-#'   referenced by other objects. The `reference` table in the returned list
-#'   tells the id actual values modified
+#' @inherit add_idf_object
 #'
 #' @keywords internal
 #' @export
@@ -3193,7 +3262,8 @@ rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_optio
     setnames(obj, c("new_object_name", "new_object_name_lower"), c("object_name", "object_name_lower"))
 
     # extract value table
-    val <- get_idf_value(idd_env, idf_env, object = obj$object_id, property = "is_name")
+    val <- get_idf_value(idd_env, idf_env, object = obj$object_id, property = "is_name")[
+        J(TRUE), on = "is_name", nomatch = NULL]
 
     # assign new object name
     set(obj, NULL, "has_name", TRUE)
@@ -3205,8 +3275,9 @@ rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_optio
     # For instance, `1: Zone Name` in `AirflowNetwork:MultiZone:Zone`. It
     # references to values from `Zone` names and also can be referenced by
     # `3: Zone Name` in `AirflowNetwork:IntraZone:Node`.
-    # In this case, it is also needed to check if new names are valid.
-    ref_to <- idf_env$reference[J(val$value_id[val$is_name], IDDFIELD_SOURCE$field), on = c("value_id", "src_enum"), nomatch = 0L]
+    # In this case, if these fields are names, it is also needed to check if new
+    # names are valid.
+    ref_to <- idf_env$reference[J(val$value_id, IDDFIELD_SOURCE$field), on = c("value_id", "src_enum"), nomatch = 0L]
     if (nrow(ref_to) && chk$reference) {
         validity <- validate_on_level(idd_env, idf_env, obj, val, level = chk)
         assert_valid(validity, "rename")
@@ -3215,7 +3286,7 @@ rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_optio
     # value reference
     # extract value reference and update other objects using its name
     # only consider value reference
-    ref_by <- idf_env$reference[J(val$value_id[val$is_name], IDDFIELD_SOURCE$field), on = c("src_value_id", "src_enum"), nomatch = 0L]
+    ref_by <- idf_env$reference[J(val$value_id, IDDFIELD_SOURCE$field), on = c("src_value_id", "src_enum"), nomatch = 0L]
 
     # update values in main table
     if (nrow(ref_by)) {
@@ -3224,16 +3295,28 @@ rename_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_optio
         set(ref_by, NULL, "src_value_chr", NULL)
     }
 
-    set(obj, NULL, "has_name", NULL)
-    set(val, NULL, "is_name", NULL)
-    setcolorder(obj, c("rleid", "class_id", "class_name", "object_id", "object_name", "object_name_lower", "comment"))
-    setcolorder(val, c("rleid", "class_id", "class_name", "object_id", "object_name", "field_id", "field_index", "field_name", "value_id", "value_chr"))
-
-    list(object = obj, value = val, reference = ref_by)
+    list(object = idf_env$object[obj, on = "object_id", `:=`(object_name = i.object_name, object_name_lower = i.object_name_lower)],
+         value = idf_env$value[val, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)],
+         reference = idf_env$reference,
+         changed = obj$object_id,
+         updated = setdiff(ref_by$object_id, obj$object_id)
+    )
 }
 # }}}
 
 # remove_empty_fields {{{
+#' Remove trailing empty object fields
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param idf_env An environment or list contains IDF tables including object,
+#'        value, and reference.
+#' @param dt_value A [data.table::data.table()] that contains value data.
+#'
+#' @return A [data.table::data.table()]
+#'
+#' @keywords internal
+#' @export
 remove_empty_fields <- function (idd_env, idf_env, dt_value) {
     if (!has_names(dt_value, "required_field")) {
         add_field_property(idd_env, dt_value, "required_field")
@@ -3302,6 +3385,20 @@ remove_empty_fields <- function (idd_env, idf_env, dt_value) {
 }
 # }}}
 # remove_duplicated_objects {{{
+#' Remove duplicated objects in inputs
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param idf_env An environment or list contains IDF tables including object,
+#'        value, and reference.
+#' @param dt_object A [data.table::data.table()] that contains object data.
+#' @param dt_value A [data.table::data.table()] that contains value data.
+#'
+#' @return The modified input data in a named list of 2
+#' [data.table::data.table()]s, i.e. `object` and `value`.
+#'
+#' @keywords internal
+#' @export
 remove_duplicated_objects <- function (idd_env, idf_env, dt_object, dt_value) {
     # extract all object values in the same class
     # in order to distinguish input from original IDF, set id of objects
@@ -3314,14 +3411,16 @@ remove_duplicated_objects <- function (idd_env, idf_env, dt_object, dt_value) {
         list(class_id, object_id = -object_id, field_index, value_chr), nomatch = 0L]
     set(idf_env$value, NULL, c("class_id", "field_index"), NULL)
 
-    # if there are no objects in the same class
-    if (!nrow(val_idf)) return(list(object = dt_object, value = dt_value))
-
     # get all input value
     val_in <- dt_value[, list(class_id, object_id, field_index, value_chr)]
 
     # compare in case-insensitive way
-    val_d <- rbindlist(list(val_idf, val_in), fill = TRUE)
+    if (!nrow(val_idf)) {
+        # if there are no objects in the same class, only consider input
+        val_d <- val_in
+    } else {
+        val_d <- rbindlist(list(val_idf, val_in), fill = TRUE)
+    }
     set(val_d, NULL, "value_chr", stri_trans_tolower(val_d$value_chr))
 
     # dcast to compare
@@ -3548,107 +3647,6 @@ add_idf_relation_format_cols <- function (idd_env, idf_env, ref) {
     ref
 }
 # }}}
-# # update_value_reference {{{
-# update_value_reference <- function (idd_env, idf_env, object, value) {
-#     # If field reference has been handled and updated during validation, only
-#     # check sources
-#     if (level_checks()$reference) {
-#         set(object, NULL, "rleid", -object$rleid)
-
-#         # update object id as new object id during validation
-#         idf_env$reference[object, on = c("object_id" = "rleid"), object_id := i.object_id]
-#         idf_env$reference[object, on = c("src_object_id" = "rleid"), src_object_id := i.object_id]
-
-#         # if have new sources
-#         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-#             idf_env <- update_referenced_value(idd_env, idf_env, value)
-#             idf_env$value <- add_field_property(idd_env, idf_env$value, "type_enum")
-#             val <- value
-#             new_ref <- get_value_reference_map(idd_env,
-#                 value[!J(idf_env$value$value_id), on = "value_id"],
-#                 idf_env$value[!J(val$value_id), on = "value_id"], all = FALSE
-#             )
-#             set(idf_env$value, NULL, "type_enum", NULL)
-#             if (nrow(new_ref)) {
-#                 ref <- rbindlist(list(idf_env$reference, new_ref))
-#             } else {
-#                 ref <- idf_env$reference
-#             }
-#         } else {
-#             ref <- idf_env$reference
-#         }
-#     } else {
-#         idf_env$value <- add_field_property(idd_env, idf_env$value, c("src_enum", "type_enum"))
-#         if (any(value$type_enum == IDDFIELD_TYPE$object_list)) {
-#             new_ref <- TRUE
-#             val_ref <- append_dt(idf_env$value, value, "value_id")
-#         } else {
-#             new_ref <- FALSE
-#             val_ref <- idf_env$value
-#         }
-
-#         # add class name
-#         set(idf_env$value, NULL, "class_id", idf_env$object[J(idf_env$value$object_id), on = "object_id", class_id])
-#         idf_env$value <- add_class_name(idd_env, idf_env$value)
-#         if (any(value$src_enum > IDDFIELD_SOURCE$none)) {
-#             idf_env <- update_referenced_value(idd_env, idf_env, value)
-
-#             new_src <- TRUE
-#             val_src <- append_dt(idf_env$value, value, "value_id")
-#         } else {
-#             new_src <- FALSE
-#             val_src <- idf_env$value
-#         }
-
-#         if (!new_ref && !new_src) {
-#             ref <- idf_env$reference
-#         } else {
-#             ref <- get_value_reference_map(idd_env, val_src, val_ref)
-#         }
-#         set(idf_env$value, NULL, c("class_id", "class_name", "src_enum", "type_enum"), NULL)
-#     }
-
-#     ref
-# }
-# # }}}
-# # update_referenced_value {{{
-# update_referenced_value <- function (idd_env, idf_env, value) {
-#     ref <- find_value_reference(idd_env, idf_env, value[src_enum > IDDFIELD_SOURCE$none, value_id])
-
-#     if (!nrow(ref)) return(idf_env)
-
-#     # get actual source value
-#     ref[value, on = c("src_value_id" = "value_id"), `:=`(
-#         value_chr = i.value_chr, value_num = i.value_num, class_name = i.class_name
-#     )]
-#     ref[J(IDDFIELD_SOURCE$class), on = "src_enum", `:=`(value_chr = class_name, value_num = NA_real_)]
-
-#     # update value
-#     idf_env$value[ref, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
-
-#     idf_env
-# }
-# # }}}
-# # find_value_reference {{{
-# find_value_reference <- function (idd_env, idf_env, value_id = NULL, only_top = TRUE) {
-#     id <- value_id
-
-#     if (!length(id)) return(idf_env$reference[0L])
-
-#     cur_ref <- idf_env$reference[J(id), on = "src_value_id", nomatch = 0L]
-
-#     ref <- cur_ref[0L]
-#     while(nrow(cur_ref) > 0L) {
-#         ref <- rbindlist(list(ref, cur_ref))
-#         next_ref <- idf_env$reference[J(unique(cur_ref$value_id)), on = "src_value_id", nomatch = 0L]
-#         # make sure always use the top level value id
-#         if (only_top) next_ref[cur_ref, on = c("src_value_id" = "value_id"), src_value_id := i.value_id]
-#         cur_ref <- next_ref
-#     }
-
-#     ref
-# }
-# # }}}
 
 # NODES
 # get_idf_node_relation {{{
@@ -3664,8 +3662,8 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
                                    object = NULL, class = NULL, group = NULL,
                                    name = FALSE, keep_all = FALSE, depth = 0L) {
     assert(
-        check_integerish(object_id, any.missing = FALSE),
-        check_integerish(value_id, any.missing = FALSE)
+        check_integerish(object_id, any.missing = FALSE, null.ok = TRUE),
+        check_integerish(value_id, any.missing = FALSE, null.ok = TRUE)
     )
     assert_count(depth, null.ok = TRUE)
     if (is.null(depth)) depth <- Inf
@@ -3682,8 +3680,8 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     if (is.null(value_id)) {
         # if no object id is given
         if (is.null(object_id)) {
-            # use all objects in current IDF
-            id <- idf_env$object$object_id
+            # node search needs a start point
+            abort("A start point is needed for searching for node relation. Either 'object_id' or 'value_id' should not be NULL.")
         } else {
             # use specified object IDs
             id <- object_id
@@ -3745,9 +3743,12 @@ get_idf_node_relation <- function (idd_env, idf_env, object_id = NULL, value_id 
     if (!is.null(object)) {
         obj_id <- unique(c(obj_id, get_idf_object(idd_env, idf_env, object = object)$object_id))
     }
-    if (depth == 0L && length(obj_id)) {
+    if (!is.null(obj_id)) {
         cur_nodes <- cur_nodes[J(obj_id), on = col_ref, nomatch = 0L]
     }
+
+    # no matched objects found for specified classes or groups
+    if (!is.null(obj_id) && !length(obj_id)) all_nodes <- all_nodes[0L]
 
     # store classes or objects needed to be removed later
     del <- list()
@@ -3893,7 +3894,7 @@ read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
                            align = FALSE, all = FALSE, group_ext = c("none", "group", "index"),
-                           force = FALSE) {
+                           force = FALSE, init = FALSE) {
     group_ext <- match.arg(group_ext)
 
     cols <- c("object_id", "object_name", "class_name",
@@ -3901,10 +3902,21 @@ get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
               "units", "ip_units", "type_enum", "extensible_group",
               "value_chr", "value_num")
 
-    val <- get_idf_value(idd_env, idf_env, class = class, object = object,
-        property = c("units", "ip_units", "type_enum", "extensible_group"),
-        align = align, complete = TRUE, all = all, ignore_case = TRUE)[
-        , .SD, .SDcols = c("rleid", cols)]
+    if (init) {
+        if (!is.null(object)) warn("'object' is ignored when 'init' is set to 'TRUE'.")
+
+        val <- init_idf_value(idd_env, idf_env, class, complete = TRUE, all = all, id = TRUE,
+            property = c("units", "ip_units", "type_enum", "extensible_group")
+        )
+
+        # assign new object id
+        set(val, NULL, "object_id", val$rleid + max(idf_env$object$object_id))
+    } else {
+        val <- get_idf_value(idd_env, idf_env, class = class, object = object,
+            property = c("units", "ip_units", "type_enum", "extensible_group"),
+            align = align, complete = TRUE, all = all, ignore_case = TRUE)[
+            , .SD, .SDcols = c("rleid", cols)]
+    }
 
     if (wide && length(cls <- unique(val$class_name)) != 1L && !force) {
         if (length(cls) <= 5L) {
@@ -4151,12 +4163,12 @@ save_idf <- function (idd_env, idf_env, dt_order = NULL, path, in_ip = FALSE,
     format <- match.arg(format)
 
     assert_string(path)
-    if (!has_ext(path, "idf")) abort("'path' should have the extension of 'idf'")
+    if (!has_ext(path, "idf")) abort("'path' should have the extension of 'idf'", "idf_save_ext")
 
     if (file.exists(path)) {
         new_file <- FALSE
         if (!overwrite) {
-            abort("Target IDF file already exists. Please set 'overwrite' to TRUE if you want to replace it.")
+            abort("Target IDF file already exists. Please set 'overwrite' to TRUE if you want to replace it.", "idf_save_exist")
         } else {
             verbose_info("Replace the existing IDF located at ", normalizePath(path), ".")
         }
@@ -4218,8 +4230,8 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
 
         m <- paste0("  ", unlist(format_objects(val, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
-        warn("warning_broken_file_link",
-            paste0("Broken external file link found in IDF:\n\n", m)
+        warn(paste0("Broken external file link found in IDF:\n\n", m),
+            "warning_broken_file_link"
         )
     }
 
@@ -4266,26 +4278,38 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
 
 # MISC
 # assign_new_id {{{
-assign_new_id <- function (dt_idf, dt, type = c("object", "value"), keep = FALSE) {
+assign_new_id <- function (idf_env, dt, type = c("object", "value"), keep = FALSE) {
     type <- match.arg(type)
     col <- paste0(type, "_id")
     if (!keep) {
-        set(dt, NULL, col, new_id(dt_idf[[type]], col, nrow(dt)))
+        set(dt, NULL, col, new_id(idf_env[[type]], col, nrow(dt)))
     } else {
-        dt[is.na(get(col)), `:=`(value_id = new_id(dt_idf[[type]], col, .N))]
+        dt[is.na(get(col)), `:=`(value_id = new_id(idf_env[[type]], col, .N))]
     }
 }
 # }}}
 # assign_idf_value_default {{{
+#' Assign default field values
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param idf_env An environment or list contains IDF tables including object,
+#'        value, and reference.
+#' @param dt_value A [data.table::data.table()] that contains object value data.
+#'
+#' @return The updated version of [data.table::data.table()].
+#'
+#' @keywords internal
+#' @export
 assign_idf_value_default <- function (idd_env, idf_env, dt_value) {
-    if (in_ip_mode()) {
-        dt_value <- field_default_to_unit(idd_env, dt_value, "si", "ip")
-    }
-
     cols_add <- NULL
     if (!has_names(dt_value, "default_chr")) cols_add <- "default_chr"
     if (!has_names(dt_value, "default_num")) cols_add <- c(cols_add, "default_num")
     if (!is.null(cols_add)) add_field_property(idd_env, dt_value, cols_add)
+
+    if (in_ip_mode()) {
+        dt_value <- field_default_to_unit(idd_env, dt_value, "si", "ip")
+    }
 
     if (has_names(dt_value, "defaulted")) {
         dt_value[J(TRUE), on = "defaulted", `:=`(value_chr = default_chr, value_num = default_num)]
@@ -4298,25 +4322,12 @@ assign_idf_value_default <- function (idd_env, idf_env, dt_value) {
     dt_value
 }
 # }}}
-# merge_idf_data {{{
-merge_idf_data <- function (idf_env, lst, by_object = FALSE) {
-    assert_names(names(lst), c("object", "value", "reference"))
+# order_idf_data {{{
+order_idf_data <- function (lst) {
+    setorderv(lst$object, "object_id")
+    setorderv(lst$value, c("object_id", "field_id"))
 
-    idf_env$object <- append_dt(idf_env$object, lst$object, "object_id")
-
-    if (nrow(lst$value)) {
-        if (by_object) {
-            idf_env$value <- append_dt(idf_env$value, lst$value, "object_id")
-        } else {
-            idf_env$value <- append_dt(idf_env$value, lst$value, "value_id")
-        }
-    }
-    idf_env$reference <- lst$reference
-
-    setorderv(idf_env$object, c("object_id"))
-    setorderv(idf_env$value, c("object_id", "field_id"))
-
-    idf_env
+    lst
 }
 # }}}
 # add_idf_format_cols {{{

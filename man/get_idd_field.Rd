@@ -20,18 +20,13 @@ get_idd_field(
 field, and reference.}
 
 \item{class}{An integer vector of valid class indexes or a character vector
-of valid class names or a data.table that contains column \code{class_id}
-and \code{rleid}. If a data.table that contains a column \code{object_id}, that
-column will be preserved.}
+of valid class names.}
 
 \item{field}{An integer vector of valid field indexes or a character
 vector of valid field names (can be in in underscore style).  \code{class}
 and \code{field} should have the same length.}
 
-\item{property}{A character vector of column names in field table to return. If
-\code{NULL}, all columns from IDD field table will be returned, plus column
-\code{rleid}, \code{object_id} (if applicable) and \code{matched_rleid} (if
-\code{complete} is \code{TRUE}).}
+\item{property}{A character vector of column names in field table to return.}
 
 \item{underscore}{If \code{TRUE}, input class name and field names will be
 converted into underscore style name first and column \code{class_name_us}

@@ -265,16 +265,16 @@ test_that("parse_idd_file()", {
 test_that("parse_idf_file()", {
     # get version {{{
     # Normal formatted
-    expect_equal(
+    expect_equivalent(
         get_idf_ver(data.table(string = c("Version,", "8.6;"), line = 1:2)),
         numeric_version(8.6)
     )
     # One line formatted
-    expect_equal(
+    expect_equivalent(
         get_idf_ver(data.table(string = "Version, 8.6;", line = 1)),
         numeric_version(8.6)
     )
-    expect_equal(
+    expect_equivalent(
         get_idf_ver(data.table(string = "Version, 8.6; !- Version", line = 1)),
         numeric_version(8.6)
     )
@@ -329,11 +329,11 @@ test_that("parse_idf_file()", {
     # can parse one-line empty object
     expect_silent(idf_parsed <- parse_idf_file("Version,8.8;\nOutput:Surfaces:List,,;"))
     expect_equivalent(idf_parsed$object,
-        data.table(object_id = 1:2, class_id = c(1L, 764L),
-        comment = list(), object_name = rep(NA_character_, 2), object_name_lower = rep(NA_character_, 2))
+        data.table(object_id = 1:2, object_name = rep(NA_character_, 2),
+        object_name_lower = rep(NA_character_, 2), comment = list(), class_id = c(1L, 764L))
     )
     expect_equivalent(idf_parsed$value,
-        data.table(object_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
+        data.table(value_id = 1:3, value_chr = c("8.8", NA_character_, NA_character_),
         value_num = rep(NA_real_, 3), object_id = c(1L, 2L, 2L), field_id = c(1L, 58822L, 58823L))
     )
 
@@ -359,7 +359,8 @@ test_that("parse_idf_file()", {
             0.7800000,               !- Solar Absorptance
             0.7800000;               !- Visible Absorptance
         ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid line found")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_line")
+    expect_error(parse_idf_file("Construction, const1, mat; Construction, const2;\nVersion, 8.8;"))
 
     # can detect incomplete object
     idf_wrong <- c(
@@ -375,7 +376,7 @@ test_that("parse_idf_file()", {
             0.7800000,               !- Solar Absorptance
             0.7800000,               !- Visible Absorptance
         ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Incomplete object")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_object")
 
     # can detect error of invalid class name
     idf_wrong <- c(
@@ -387,16 +388,16 @@ test_that("parse_idf_file()", {
          WrongClass,
             WD01;                    !- Name
         ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid class name")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_class")
     idf_wrong <- c(
         "Version,8.8;
          WrongClass, WD01;
         ")
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid class name")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_class")
 
     # can detect error of multiple version
     idf_wrong <- "Version, 8.8;\nVersion, 8.9;"
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Multiple versions found")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_ver")
 
     # can detect error of invalid field number
     idf_wrong <- "
@@ -405,7 +406,7 @@ test_that("parse_idf_file()", {
             Simple, !- Algorithm
             Simple, !- Algorithm
             TARP; !- Algorithm"
-    expect_error(parse_idf_file(idf_wrong, 8.8), "Invalid field number")
+    expect_error(parse_idf_file(idf_wrong, 8.8), class = "eplusr_error_parse_idf_field")
 
     # can optional discard reference parsing
     expect_equal(nrow(parse_idf_file(text(ver = 8.8), 8.8, ref = FALSE)$reference), 0L)

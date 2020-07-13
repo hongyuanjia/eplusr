@@ -20,6 +20,7 @@ Depends:
     R (>= 3.2.0)
 Imports:
     callr (>= 2.0.4),
+    checkmate,
     cli (>= 1.1.0),
     crayon,
     data.table (>= 1.12.4),
@@ -64,7 +65,7 @@ Collate:
     'group.R'
     'impl-idd.R'
     'idd.R'
-    'idd_object.R'
+    'iddobj.R'
     'impl-idf.R'
     'idf.R'
     'impl-idfobj.R'

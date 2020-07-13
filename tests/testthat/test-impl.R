@@ -2,7 +2,7 @@
 test_that("Basic Table Implementation", {
     expect_equal(assert_valid_type("a"), "a")
     expect_error(assert_valid_type("a", type = "id"), "integerish")
-    expect_error(assert_valid_type("a", "object", type = "id"), "object")
+    expect_error(assert_valid_type("a", "Object ID", type = "id"), "Object")
     expect_error(assert_valid_type("a", len = 2, type = "name"), "length 2")
     expect_equal(assert_valid_type(1, type = "id"), 1L)
     expect_equal(assert_valid_type(1), 1L)
