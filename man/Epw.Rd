@@ -102,6 +102,16 @@ epw$path()
 
 
 ## ------------------------------------------------
+## Method `Epw$definition`
+## ------------------------------------------------
+
+\dontrun{
+# get path
+epw$definition("LOCATION")
+}
+
+
+## ------------------------------------------------
 ## Method `Epw$location`
 ## ------------------------------------------------
 
@@ -428,6 +438,7 @@ Hongyuan Jia
 \itemize{
 \item \href{#method-new}{\code{Epw$new()}}
 \item \href{#method-path}{\code{Epw$path()}}
+\item \href{#method-definition}{\code{Epw$definition()}}
 \item \href{#method-location}{\code{Epw$location()}}
 \item \href{#method-design_condition}{\code{Epw$design_condition()}}
 \item \href{#method-typical_extreme_period}{\code{Epw$typical_extreme_period()}}
@@ -483,7 +494,7 @@ out-of-range data are found. Default: \code{TRUE}.}
 }
 \subsection{Details}{
 It takes an EnergyPlus Weather File (EPW) as input and returns an
-\code{EPW} object.
+\code{Epw} object.
 }
 
 \subsection{Returns}{
@@ -538,6 +549,52 @@ locally.
 \preformatted{\dontrun{
 # get path
 epw$path()
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-definition"></a>}}
+\subsection{Method \code{definition()}}{
+Get the \link{IddObject} object for specified EPW class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$definition(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single string.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$definition()} returns an \link{IddObject} of given EPW class. \link{IddObject}
+contains all data used for parsing that EPW class.
+
+Currently, all supported EPW classes are:
+\itemize{
+\item \code{LOCATION}
+\item \verb{DESIGN CONDITIONS}
+\item \verb{TYPICAL/EXTREME PERIODS}
+\item \verb{GROUND TEMPERATURES}
+\item \verb{HOLIDAYS/DAYLIGHT SAVINGS}
+\item \verb{COMMENTS 1}
+\item \verb{COMMENTS 2}
+\item \verb{DATA PERIODS}
+\item \verb{WEATHER DATA}
+}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get path
+epw$definition("LOCATION")
 }
 
 }
@@ -637,7 +694,7 @@ header in a list format with 4 elements:
 \item \code{source}: A string of source field
 \item \code{heating}: A list, usually of length 16, of the heading design conditions
 \item \code{cooling}: A list, usually of length 32, of the cooling design conditions
-\item \code{extreme}: A list, usually of length 16, of the extreme design conditions
+\item \code{extremes}: A list, usually of length 16, of the extreme design conditions
 }
 
 For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
@@ -706,20 +763,20 @@ Get GROUND TEMPERATURE header
 
 \subsection{Details}{
 \verb{$ground_temperature()} returns the parsed values of \verb{GROUND TEMPERATURE}
-header in a \link[data.table:data.table]{data.table} format with 7 columns:
+header in a \link[data.table:data.table]{data.table} format with 17 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
 \item \code{depth}: Numeric type. The depth of the ground temperature is measured
-\item \code{month}: Integer type. The month when the ground temperature is measured
 \item \code{soil_conductivity}: Numeric type. The soil conductivity at measured depth
 \item \code{soil_density}: Numeric type. The soil density at measured depth
 \item \verb{soil_specific heat}: Numeric type. The soil specific heat at measured depth
-\item \code{temperature}: Numeric type. The measured group temperature
+\item \code{January} to \code{December}: Numeric type. The measured group
+temperature for each month.
 }
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} with 7 columns.
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 17 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -991,7 +1048,7 @@ A \link[data.table:data.table]{data.table} with 5 columns:
 \itemize{
 \item \code{index}: Integer type. The index of data period.
 \item \code{name}: Character type. The name of data period.
-\item \code{start_day_of_week}: Integer type. The start day of week of data period.
+\item \code{start_day_of_week}: Character type. The start day of week of data period.
 \item \code{start_day}: Date (EpwDate) type. The start day of data period.
 \item \code{end_day}: Date (EpwDate) type. The end day of data period.
 }
@@ -1182,7 +1239,8 @@ Get weather data
   start_year = NULL,
   align_wday = TRUE,
   tz = "UTC",
-  update = FALSE
+  update = FALSE,
+  line = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -1211,6 +1269,10 @@ All valid time zone names can be obtained using
 \item{\code{update}}{If \code{TRUE}, the \code{year} column are updated according to
 the newly created \code{datetime} column using \code{start_year}. If
 \code{FALSE}, original year data in the \code{Epw} object is kept.
+Default: \code{FALSE}.}
+
+\item{\code{line}}{If \code{TRUE}, a column named \code{line} is prepended indicating
+the line numbers where data occur in the actual EPW file.
 Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
@@ -1293,8 +1355,8 @@ described above.}
 
 \item{\code{cols}}{A character vector identifying what data columns, i.e.
 all columns except \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour}
-and \code{minute}, to search abnormal values. If \code{NULL}, all data
-columns are used. Default: \code{NULL}.}
+\code{minute}, and character columns, to search abnormal values. If
+\code{NULL}, all data columns are used. Default: \code{NULL}.}
 
 \item{\code{keep_all}}{If \code{TRUE}, all columns are returned. If \code{FALSE}, only
 \code{line}, \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour} and
@@ -1391,18 +1453,12 @@ epw$redundant_data()
 \subsection{Method \code{make_na()}}{
 Convert abnormal data into NAs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$make_na(missing = FALSE, out_of_range = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{period}}{A positive integer vector identifying the data period
-indexes. Data periods information can be obtained using
-\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-described above. If \code{NULL}, all data periods are included.
-Default: \code{NULL}.}
-
 \item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
 \code{FALSE}.}
 
@@ -1455,23 +1511,12 @@ summary(epw$data()$liquid_precip_rate)
 \subsection{Method \code{fill_abnormal()}}{
 Fill abnormal data using prescribed pattern
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_abnormal(
-  period = NULL,
-  missing = FALSE,
-  out_of_range = FALSE,
-  special = FALSE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_abnormal(missing = FALSE, out_of_range = FALSE, special = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{period}}{A positive integer vector identifying the data period
-indexes. Data periods information can be obtained using
-\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-described above. If \code{NULL}, all data periods are included.
-Default: \code{NULL}.}
-
 \item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
 \code{FALSE}.}
 
@@ -1719,7 +1764,7 @@ data.
 existing data periods.
 \item The date time of input data should not overlap with existing data
 periods.
-\item Input data should have all 29 weather data columns with right
+\item Input data should have all 29 weather data columns with correct
 types. The \code{year}, \code{month}, \code{day}, and \code{minute} column are not
 compulsory. They will be created according to values in the
 \code{datetime} column. Existing values will be overwritten.

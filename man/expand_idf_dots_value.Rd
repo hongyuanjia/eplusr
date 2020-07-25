@@ -31,7 +31,14 @@ value, and reference.}
 with a valid class/object id/name. ID should be denoted in style
 \code{..ID}. There is a special element \code{.comment} in each list, which will
 be used as new comments of the object. If \code{.ref_assign} is \code{TRUE},
-\verb{:=} can be used to group multiple id/name wrapped by \code{.()} or \code{c()}.}
+\verb{:=} can be used to group ids/names:
+\itemize{
+\item When \code{.type} equals \code{"class"}, LHS multiple class indices/names should be
+wrapped by \code{.()}, \code{c()}.
+\item When \code{.type} equals \code{"object"}, LHS multiple object ids/names should be
+wrapped by \code{.()} or \code{c()}. LHS \strong{SINGLE} class name should be
+wrapped by \code{..()}.
+}}
 
 \item{.type}{Should be either \code{"class"} or \code{"object"}. If \code{"class"},
 id/name of each input will be treated as class index/name. If \code{"object"},

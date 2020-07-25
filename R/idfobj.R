@@ -53,7 +53,7 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         #'
         #' @importFrom checkmate assert_count
         initialize = function (object, class = NULL, parent) {
-            if (missing(parent) || !is_idf(parent)) {
+            if (missing(parent) || (!is_idf(parent) && !is_epw(parent))) {
                 abort(paste("IdfObject can only be created based a parent Idf object.",
                     "Please give 'parent', which should be an Idf object.")
                 )

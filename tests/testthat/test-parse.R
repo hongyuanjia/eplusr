@@ -261,6 +261,115 @@ test_that("parse_idd_file()", {
 })
 # }}}
 
+# parse_idd_file("EPW.idd") {{{
+test_that("parse_idd_file()", {
+    expect_is(idd_parsed <- parse_idd_file(system.file("extdata/epw.idd", package = "eplusr"), epw = TRUE), "list")
+
+    # can get Idd version
+    expect_equal(idd_parsed$version, as.numeric_version("1.0.0"))
+
+    # can get Idd build
+    expect_equal(idd_parsed$build, "2020-07-20")
+
+    # can parse group data
+    expect_equal(idd_parsed$group$group_id, 1:2)
+    expect_equal(idd_parsed$group$group_name, c("Header", "Data"))
+
+    # can parse class index data
+    expect_equal(idd_parsed$class$class_id, 1:9)
+    expect_equal(idd_parsed$class$class_name, c(
+        "LOCATION",                 "DESIGN CONDITIONS",
+        "TYPICAL/EXTREME PERIODS",  "GROUND TEMPERATURES",
+        "HOLIDAYS/DAYLIGHT SAVINGS","COMMENTS 1",
+        "COMMENTS 2",               "DATA PERIODS",
+        "WEATHER DATA"
+    ))
+    expect_equal(idd_parsed$class$group_id, c(rep(1, 8), 2))
+
+    # can parse class property data
+    expect_equal(idd_parsed$class$format, rep("standard", 9))
+    expect_equal(idd_parsed$class$min_fields, c(9, 1, 1, 1, 4, 0, 0, 6, 35))
+    expect_equal(idd_parsed$class$num_fields, c(9, 69, 5, 17, 6, 1, 1, 6, 35))
+    expect_equal(idd_parsed$class$last_required, c(9, 1, 1, 1, 4, 0, 0, 6, 35))
+    expect_equal(idd_parsed$class$has_name, rep(FALSE, 9))
+    expect_equal(idd_parsed$class$required_object, c(rep(TRUE, 8), FALSE))
+    expect_equal(idd_parsed$class$unique_object, c(rep(TRUE, 8), FALSE))
+    expect_equal(idd_parsed$class$num_extensible, c(0, 66, 4, 16, 2, 1, 1, 4, 0))
+    expect_equal(idd_parsed$class$first_extensible, c(0, 4, 2, 2, 5, 1, 1, 3, 0))
+    expect_equal(idd_parsed$class$num_extensible_group, c(0, 1, 1, 1, 1, 1, 1, 1, 0))
+
+    # can parse field index data
+    expect_equal(idd_parsed$field$field_id, 1:149)
+
+    # can parse field property data
+    expect_is(fld <- idd_parsed$field[field_name == "Data Source and Uncertainty Flags"], "data.table")
+    expect_equal(fld$units, NA_character_)
+    expect_equal(fld$ip_units, NA_character_)
+    expect_equal(fld$is_name, FALSE)
+    expect_equal(fld$required_field, TRUE)
+    expect_equal(fld$extensible_group, 0L)
+    expect_equal(fld$type_enum, 4L)
+    expect_equal(fld$autosizable, FALSE)
+    expect_equal(fld$autocalculatable, FALSE)
+    expect_equal(fld$default_chr, NA_character_)
+    expect_equal(fld$default_num, NA_real_)
+    expect_equal(fld$choice, list(NULL))
+    expect_equal(fld$has_range, FALSE)
+    expect_equal(fld$maximum, NA_real_)
+    expect_equal(fld$minimum, NA_real_)
+    expect_equal(fld$lower_incbounds, FALSE)
+    expect_equal(fld$upper_incbounds, FALSE)
+    expect_equal(fld$src_enum, 0L)
+    expect_equal(fld$has_exist, FALSE)
+    expect_equal(fld$exist_maximum, NA_real_)
+    expect_equal(fld$exist_minimum, NA_real_)
+    expect_equal(fld$exist_lower_incbounds, FALSE)
+    expect_equal(fld$exist_upper_incbounds, FALSE)
+    expect_equal(fld$missing_chr, NA_character_)
+    expect_equal(fld$missing_num, NA_real_)
+
+    # can parse field property data
+    expect_is(fld <- idd_parsed$field[field_name == "Liquid Precipitation Depth"], "data.table")
+    expect_equal(fld$units, "mm")
+    expect_equal(fld$ip_units, NA_character_)
+    expect_equal(fld$is_name, FALSE)
+    expect_equal(fld$required_field, TRUE)
+    expect_equal(fld$extensible_group, 0L)
+    expect_equal(fld$type_enum, 2L)
+    expect_equal(fld$autosizable, FALSE)
+    expect_equal(fld$autocalculatable, FALSE)
+    expect_equal(fld$default_chr, "0.0")
+    expect_equal(fld$default_num, 0.0)
+    expect_equal(fld$choice, list(NULL))
+    expect_equal(fld$has_range, TRUE)
+    expect_equal(fld$maximum, NA_real_)
+    expect_equal(fld$minimum, 0.0)
+    expect_equal(fld$lower_incbounds, TRUE)
+    expect_equal(fld$upper_incbounds, FALSE)
+    expect_equal(fld$src_enum, 0L)
+    expect_equal(fld$has_exist, TRUE)
+    expect_equal(fld$exist_maximum, 999)
+    expect_equal(fld$exist_minimum, 0)
+    expect_equal(fld$exist_lower_incbounds, TRUE)
+    expect_equal(fld$exist_upper_incbounds, TRUE)
+    expect_equal(fld$missing_chr, "999")
+    expect_equal(fld$missing_num, 999)
+
+    # can parse field property data
+    expect_is(fld <- idd_parsed$field[field_name == "Dry Bulb Temperature"], "data.table")
+    expect_equal(fld$has_exist, TRUE)
+    expect_equal(fld$exist_maximum, 99.9)
+    expect_equal(fld$exist_minimum, -Inf)
+    expect_equal(fld$exist_lower_incbounds, FALSE)
+    expect_equal(fld$exist_upper_incbounds, TRUE)
+    expect_equal(fld$missing_chr, "99.9")
+    expect_equal(fld$missing_num, 99.9)
+
+    # can ignore reference data
+    expect_equal(nrow(idd_parsed$reference), 0L)
+})
+# }}}
+
 # parse_idf_file() {{{
 test_that("parse_idf_file()", {
     # get version {{{

@@ -2136,7 +2136,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @details
         #' `$to_table()` returns a [data.table][data.table::data.table()] that
         #' contains core data of specified objects.
-        #' The returned [data.table][data.table::data.table()] has 6 columns:
+        #' The returned [data.table][data.table::data.table()] has 5 columns:
         #'
         #' * `id`: Integer type. Object IDs.
         #' * `name`: Character type. Object names.

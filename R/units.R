@@ -8,8 +8,9 @@ reg_custom_units <- function () {
         {
             install_symbolic_unit("person")
             install_symbolic_unit("dollar")
-            install_conversion_constant("Wh", "J", 3.6E3)
+            install_symbolic_unit("thousandths")
             install_conversion_constant("inH2O", "inch_H2O_39F", 1)
+            TRUE
         },
         warning = function (w) NULL,
         error = function (e) NULL
@@ -115,7 +116,9 @@ FIELD_UNIT_TABLE <- fread(
     K/m                            	 K/m              	 F/ft                           	 degF/ft
     W/s                            	 W/s              	 W/s                            	 W/s
     kmol                           	 kmol             	 kmol                           	 kmol
-    J                              	 J                	 Wh                             	 Wh
+    J                              	 J                	 Wh                             	 W*hr
+    Wh/m2                          	 W*h/m^2          	 Wh/m2                          	 W*hr/m^2
+    cd/m2                          	 cd/m^2           	 cd/m2                          	 cd/m^2
     GJ                             	 GJ               	 ton-hrs                        	 ton*hr
     days                           	 days             	 days                           	 days
     kg/m2                          	 kg/m2            	 lb/ft2                         	 lb/ft^2

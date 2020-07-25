@@ -3644,7 +3644,7 @@ possible new object IDs. Default: \code{FALSE}.}
 \subsection{Details}{
 \verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
 contains core data of specified objects.
-The returned \link[data.table:data.table]{data.table} has 6 columns:
+The returned \link[data.table:data.table]{data.table} has 5 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.

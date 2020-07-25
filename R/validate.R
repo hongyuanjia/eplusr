@@ -112,6 +112,7 @@ exclude_invalid <- function (env_in, invalid, on) {
 #'
 #' # only check unique name during validation
 #' eplusr_option(validate_level = custom_validate(unique_name = TRUE))
+#' @importFrom checkmate assert_flag
 # custom_validate {{{
 custom_validate <- function (
     required_object = FALSE, unique_object = FALSE, unique_name = FALSE,
@@ -119,18 +120,16 @@ custom_validate <- function (
     type = FALSE, choice = FALSE, range = FALSE, reference = FALSE
 )
 {
-    assert(
-        is_flag(required_object),
-        is_flag(unique_object),
-        is_flag(unique_name),
-        is_flag(extensible),
-        is_flag(required_field),
-        is_flag(auto_field),
-        is_flag(type),
-        is_flag(choice),
-        is_flag(range),
-        is_flag(reference)
-    )
+    assert_flag(required_object)
+    assert_flag(unique_object)
+    assert_flag(unique_name)
+    assert_flag(extensible)
+    assert_flag(required_field)
+    assert_flag(auto_field)
+    assert_flag(type)
+    assert_flag(choice)
+    assert_flag(range)
+    assert_flag(reference)
 
     list(
         required_object = required_object,
@@ -166,10 +165,11 @@ custom_validate <- function (
 #' level_checks(custom_validate(auto_field = TRUE))
 #' level_checks(eplusr_option("validate_level"))
 #' @export
+#' @importFrom checkmate test_string assert_choice test_list
 # level_checks {{{
 level_checks <- function (level = eplusr_option("validate_level")) {
-    if (is_string(level)) {
-        level <- match.arg(level, c("none", "draft", "final"))
+    if (test_string(level)) {
+        level <- assert_choice(level, c("none", "draft", "final"))
         if (level == "none") {
             custom_validate()
         } else if (level == "draft") {
@@ -184,9 +184,8 @@ level_checks <- function (level = eplusr_option("validate_level")) {
                 type = TRUE, choice = TRUE, range = TRUE, reference = TRUE
             )
         }
-    } else {
-        assert(is.list(level), msg = "`level` should be a string or a list.")
-        assert(has_name(level, names(custom_validate())))
+    } else if (test_list(level)) {
+        assert_names(names(level), permutation.of = names(custom_validate()))
         custom_validate(
             required_object = level$required_object,
             unique_object = level$unique_object,
@@ -199,6 +198,8 @@ level_checks <- function (level = eplusr_option("validate_level")) {
             range = level$range,
             reference = level$reference
         )
+    } else {
+        stop("'level' must be a string or a list")
     }
 }
 # }}}
@@ -230,35 +231,37 @@ validate_on_level <- function (idd_env, idf_env, dt_object = NULL, dt_value = NU
 }
 # }}}
 # validate_objects {{{
-# Validate input IDF data in terms of various aspects
-# @param idd_env An environment that contains IDD data
-# @param idf_env An environment that contains IDF data
-# @param dt_object A data.table that contains object data to validate. If
-#        `NULL`, the object data from `idf_env` will be used, which means to
-#        validate the whole IDF.
-# @param dt_value A data.table that contains value data to validate. If
-#        `NULL`, the value data from `idf_env` will be used, which means to
-#        validate the whole IDF.
-# @param required_object Whether to check if required objects are missing. This
-#        will only be applied when checking the whole IDF.
-# @param unique_object Whether to check if there are multiple instances of
-#        unique object.
-# @param unique_name Whether to check if there are objects having the same name
-#        in same class.
-# @param extensible Whether to check if there are incomplete extensible.
-# @param required_field Whether to check if there are missing value for
-#        required fields.
-# @param auto_field Whether to check if there are non-autosizable or
-#        non-autocalculatable fields that are assigned "autosize" or
-#        "autocalculate".
-# @param type Whether to check if there are input values whose type are not
-#        consistent with definitions in IDD.
-# @param choice Whether to check if there are invalid choice values.
-# @param range Whether to check if there are numeric values that are out of
-#        ranges specified in IDD.
-# @param reference Whether to check if there are values that have invalid
-#        references.
-# @return An IdfValidity object.
+#' Validate input IDF data in terms of various aspects
+#' @param idd_env An environment that contains IDD data
+#' @param idf_env An environment that contains IDF data
+#' @param dt_object A data.table that contains object data to validate. If
+#'        `NULL`, the object data from `idf_env` will be used, which means to
+#'        validate the whole IDF.
+#' @param dt_value A data.table that contains value data to validate. If
+#'        `NULL`, the value data from `idf_env` will be used, which means to
+#'        validate the whole IDF.
+#' @param required_object Whether to check if required objects are missing. This
+#'        will only be applied when checking the whole IDF.
+#' @param unique_object Whether to check if there are multiple instances of
+#'        unique object.
+#' @param unique_name Whether to check if there are objects having the same name
+#'        in same class.
+#' @param extensible Whether to check if there are incomplete extensible.
+#' @param required_field Whether to check if there are missing value for
+#'        required fields.
+#' @param auto_field Whether to check if there are non-autosizable or
+#'        non-autocalculatable fields that are assigned "autosize" or
+#'        "autocalculate".
+#' @param type Whether to check if there are input values whose type are not
+#'        consistent with definitions in IDD.
+#' @param choice Whether to check if there are invalid choice values.
+#' @param range Whether to check if there are numeric values that are out of
+#'        ranges specified in IDD.
+#' @param reference Whether to check if there are values that have invalid
+#'        references.
+#' @return An IdfValidity object.
+#' @keywords internal
+#' @export
 validate_objects <- function
 (
     idd_env, idf_env, dt_object = NULL, dt_value = NULL,
@@ -283,7 +286,7 @@ validate_objects <- function
         add_joined_cols(idd_env$field, dt_value, "field_id", c("field_index", "field_name", "type_enum", "ip_units", "units"))
         on.exit(
             set(dt_value, NULL,
-                c("class_id", "class_name", "object_name",
+                c("class_id", "class_name", "object_name", "field_name",
                   "field_index", "type_enum", "units", "ip_units"),
             NULL),
             add = TRUE
@@ -292,12 +295,11 @@ validate_objects <- function
         check_whole <- TRUE
     } else {
         check_whole <- FALSE
-        add_joined_cols(idd_env$field, dt_value, "field_id", c("type_enum", "ip_units", "units"))
     }
 
     # add field attributes used for validating {{{
     # add field index
-    cols_add <- character(0)
+    cols_add <- c("type_enum", "ip_units", "units")
     if (isTRUE(extensible)) cols_add <- c(cols_add, "extensible_group")
     if (isTRUE(required_field)) cols_add <- c(cols_add, "required_field")
     if (isTRUE(auto_field)) cols_add <- c(cols_add, "autosizable", "autocalculatable")
@@ -314,9 +316,9 @@ validate_objects <- function
     # to check reference
     if (isTRUE(reference)) cols_add <- c(cols_add, "src_enum")
 
-    cols_add <- setdiff(unique(cols_add), names(dt_value))
+    cols_add <- setdiff(cols_add, names(dt_value))
     if (length(cols_add)) {
-        dt_value <- add_joined_cols(idd_env$field, dt_value, "field_id", cols_add)
+        dt_value <- add_field_property(idd_env, dt_value, cols_add)
         on.exit(set(dt_value, NULL, cols_add, NULL), add = TRUE)
     }
     # }}}
@@ -589,7 +591,7 @@ check_invalid_reference <- function (idd_env, idf_env, env_in) {
         add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
         add_class_name(idd_env, idf_env$value)
 
-        ref_map <- get_value_reference_map(idd_env$reference,
+        ref_map <- get_value_reference_map(idd_env,
             src = append_dt(idf_env$value, env_in$value, "value_id"), value = val)
 
         set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
@@ -653,8 +655,8 @@ count_check_error <- function (validity) {
 
 }
 # }}}
-# print_validity: print all validity results {{{
-print_validity <- function (validity) {
+# format_validity: print all validity results {{{
+format_validity <- function (validity, epw = FALSE) {
     error_num_per <- vapply(names(validity), count_check_type_error,
         integer(1L), validity = validity)
 
@@ -662,28 +664,33 @@ print_validity <- function (validity) {
     error_type <- names(which(error_num_per > 0L))
 
     if (error_num == 0L) {
-        cli::cat_line(" ", cli::symbol$tick, " ", "No error found.")
-        return()
+        return(paste0(" ", cli::symbol$tick, " ", "No error found."))
     }
 
-    cli::cat_line(" ", cli::symbol$cross, " [", error_num, "] ",
-        "Errors found during validation.")
-    cli::cat_rule(line = 2)
+    header <- c(
+        paste0(" ", cli::symbol$cross, " [", error_num, "] ",
+            "Errors found during validation."),
+        cli::rule(line = 2, width = cli::console_width() - 2L)
+    )
 
-    mapply(print_single_validity, type = error_type,
-        MoreArgs = list(single_validity = validity[error_type]))
+    detail <- mapply(format_single_validity, type = error_type,
+        MoreArgs = list(single_validity = validity[error_type], epw = epw),
+        SIMPLIFY = FALSE, USE.NAMES = FALSE
+    )
 
-    cli::cat_line()
+    c(header, unlist(detail, FALSE, FALSE))
 }
 # }}}
-# print_single_validity: print a single validity result {{{
-print_single_validity <- function (single_validity, type) {
+# format_single_validity: print a single validity result {{{
+format_single_validity <- function (single_validity, type, epw = FALSE) {
     error_num <- count_check_type_error(single_validity, type)
 
+    obj <- if (epw) "Header" else "Object"
+
     title <- switch(type,
-        missing_object = "Missing Required Object",
-        duplicate_object = "Duplicated Unique Object",
-        conflict_name = "Conflicted Object Names",
+        missing_object = paste("Missing Required", obj),
+        duplicate_object = paste("Duplicated Unique", obj),
+        conflict_name = paste0("Conflicted", obj, "Names"),
         incomplete_extensible = "Incomplete Extensible Group",
         missing_value = "Missing Required Field",
         invalid_autosize = "Invalid Autosize Field",
@@ -697,9 +704,9 @@ print_single_validity <- function (single_validity, type) {
     )
 
     bullet <- switch(type,
-        missing_object = "Objects below are required but not exist:",
-        duplicate_object = "Objects should be unique but have multiple instances:",
-        conflict_name = "Objects below have the same name:",
+        missing_object = paste(obj, "below are required but not exist:"),
+        duplicate_object = paste(obj, "should be unique but have multiple instances:"),
+        conflict_name = paste(obj, "below have the same name:"),
         incomplete_extensible = "Fields in each extensible group cannot contain any empty:",
         missing_value = "Fields below are required but values are not given:",
         invalid_autosize = "Fields below cannot be `autosize`:",
@@ -711,29 +718,40 @@ print_single_validity <- function (single_validity, type) {
         invalid_range = "Fields below exceed prescribed ranges:",
         invalid_reference = "Fields below are not one of valid references:")
 
-    cli::cat_line()
-    cli::cat_rule(paste0("[", error_num, "] ", title))
-    cli::cat_line("   ", bullet, "\n")
+    out <- c("",
+        cli::rule(paste0("[", error_num, "] ", title), width = cli::console_width() - 2L),
+        paste0("   ", bullet),
+        ""
+    )
 
     if (type == "missing_object") {
-        cli::cat_line(paste0("   * ", surround(single_validity[[type]])))
-    } else {
-        cli::cat_line(
-            paste0("    ",
-                unlist(
-                    format_objects(single_validity[[type]],
-                        c("class", "object", "value"), brief = FALSE)$out,
-                    use.names = FALSE
-                )
-            )
-        )
+        return(c(out, paste0("   * ", surround(single_validity[[type]]))))
     }
+
+    fmt <- unlist(
+        format_objects(single_validity[[type]],
+            c("class", "object", "value"), brief = FALSE)$out,
+        use.names = FALSE
+    )
+
+    # change class to header
+    if (epw) fmt <- stri_replace_all_fixed(fmt, "Class: <", "Header: <")
+
+    c(out, paste0("    ", fmt))
 }
 # }}}
 
 #' @export
 # print.IdfValidity {{{
 print.IdfValidity <- function (x, ...) {
-    print_validity(x, ...)
+    cli::cat_line(format_validity(x))
+    invisible(x)
+}
+# }}}
+#' @export
+# print.EpwValidity {{{
+print.EpwValidity <- function (x, ...) {
+    cli::cat_line(format_validity(x, epw = TRUE))
+    invisible(x)
 }
 # }}}

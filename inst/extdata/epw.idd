@@ -1,0 +1,904 @@
+!IDD_Version 1.0.0
+!IDD_BUILD 2020-07-20
+! **************************************************************************
+! EnergyPlus Weather Format Specification
+!
+! Adopted from EnergyPlus Weather File (EPW) Data Dictionary from
+! "AuxillaryPrograms.PDF"
+!
+! Specifical field-level comments
+! --------------------
+! In addition, the following special comments are added compared to a normal
+! EnergyPlus Input Data Dictionary (IDD).
+!
+! Field-level comments:
+!
+!  \missing         Missing code.
+!
+!  \exist-minimum   Minimum that includes the following value to be treated
+!                   as existing. Otherwise EnergyPlus will treat it as a missing
+!                   value even though it does not equal to the missing code.
+!
+!  \exist-minimum>  Minimum that must be > than the following value to be treated
+!                   as existing. Otherwise EnergyPlus will treat it as a missing
+!                   value even though it does not equal to the missing code.
+!
+!  \exist-maximum   Maximum that includes the following value to be treated
+!                   as existing. Otherwise EnergyPlus will treat it as a missing
+!                   value even though it does not equal to the missing code.
+!
+!  \exist-minimum<  Maximum that must be < than the following value to be treated
+!                   as existing. Otherwise EnergyPlus will treat it as a missing
+!                   value even though it does not equal to the missing code.
+!
+! **************************************************************************
+
+\group Header
+
+LOCATION,
+    \memo The Location header record duplicates the information required for the
+    \memo Location Object. When only a Run Period object is used (i.e. a weather
+    \memo file), then the Location Object IS not needed. When a Run Period and
+    \memo Design Day objects are entered, then the Location on the weather file
+    \memo (as described previously) is used and overrides any Location Object
+    \memo entry.
+    \unique-object
+    \required-object
+    \min-fields 9
+    A1, \field City
+        \type alpha
+        \required-field
+    A2, \field State Province
+        \type alpha
+        \required-field
+    A3, \field Country
+        \type alpha
+        \required-field
+    A4, \field Data Source
+        \type alpha
+        \required-field
+    A5, \field WMO Number
+        \note Usually a 6 digit field. Used as alpha in EnergyPlus
+        \type alpha
+        \required-field
+    N2, \field Latitude
+        \note + is North, - is South, degree minutes represented in decimal (i.e. 30 minutes is .5)
+        \units deg
+        \minimum -90.0
+        \maximum +90.0
+        \default 0.0
+        \type real
+        \required-field
+    N3, \field Longitude
+        \note - is West, + is East, degree minutes represented in decimal (i.e. 30 minutes is .5)
+        \type real
+        \units deg
+        \minimum -180.0
+        \maximum +180.0
+        \default 0.0
+        \required-field
+    N4, \field Time Zone
+        \note Time relative to GMT.
+        \units hour
+        \minimum -12.0
+        \maximum +12.0
+        \default 0.0
+        \type real
+        \required-field
+    N5; \field Elevation
+        \units m
+        \minimum -1000.0
+        \maximum< +9999.9
+        \default 0.0
+        \type real
+        \required-field
+
+DESIGN CONDITIONS,
+    \memo The Design Conditions header record encapsulates matching (using WMO#
+    \memo World Meteorological Organization Station Number) design conditions
+    \memo for a weather file location. Currently only those design conditions
+    \memo contained in the ASHRAE Handbook of Fundamentals 2009 are contained
+    \memo in the weather files. These conditions can be used as desired. In
+    \memo addition, Design Day definition files have been created of all World,
+    \memo Canada, and United States Design Conditions. These files are available
+    \memo in the DataSet folder of the EnergyPlus installation.
+    \unique-object
+    \required-object
+    \min-fields 1
+    \extensible: 66
+    N1, \field Number of Design Conditions
+        \type integer
+        \minimum 0
+        \default 0
+        \required-field
+    A1, \field Design Condition Source
+        \type alpha
+        \note Current sources are ASHRAE HOF 2009 US Design Conditions, Canadian Design Conditions
+        \note and World Design Conditions
+    A2, \field Seperator
+        \type alpha
+        \note An empty seperator. Not actual design condition data
+    A3, \field Condition 1 Heating Design Condition Type
+        \type choice
+        \key Heating
+        \default Heating
+        \begin-extensible
+    N2, \field Condition 1 Coldest Month
+        \type integer
+        \minimum 1
+        \maximum 12
+    N3, \field Condition 1 99.6% Heating Dry-Bulb Temperature
+        \note Dry-bulb temperature corresponding to 99.6% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N4, \field Condition 1 90.0% Heating Dry-Bulb Temperature
+        \note Dry-bulb temperature corresponding to 90.0% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N5, \field Condition 1 99.6% Heating Dew-point Temperature
+        \note Dew-point temperature corresponding to 99.6% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N6, \field Condition 1 Humidification Ratio for 99.6% Heating Dew-point Temperature
+        \note Humidity ratio, calculated at standard atmospheric pressure
+        \note at elevation of station, corresponding to
+        \note Dew-point temperature corresponding to 99.6% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \type real
+        \units gWater/kgDryAir
+        \minimum 0
+    N7, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 99.6% Heating Dew-point Temperature
+        \note Mean coincident Dry-Bulb temperature corresponding to
+        \note Dew-point temperature corresponding to 99.6% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N8, \field Condition 1 Heating Dew-point Temperature 90.0%
+        \note Dew-point temperature corresponding to 90.0% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N9, \field Condition 1 Humidification ratio for 90.0% Heating Dew-point Temperature
+        \note humidity ratio, calculated at standard atmospheric pressure
+        \note at elevation of station, corresponding to
+        \note Dew-point temperature corresponding to 90.0% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \type real
+        \units gWater/kgDryAir
+        \minimum 0
+    N10, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 90.0% Heating Dew-point Temperature
+        \note mean coincident Dry-Bulb temperature corresponding to
+        \note Dew-point temperature corresponding to 90.0% annual cumulative
+        \note frequency of occurrence (cold conditions)
+        \units C
+        \type real
+    N11, \field Condition 1 Heating Wind Speed 0.4%
+        \units m/s
+        \type real
+        \minimum 0
+    N12, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Heating Wind Speed
+        \note Mean coincident dry-bulb temperature to wind speed corresponding to 0.4% cumulative frequency for coldest month
+        \units C
+        \type real
+    N13, \field Condition 1 Heating Wind Speed 1.0%
+        \note Wind speed corresponding to 1.0% cumulative frequency
+        \note of occurrence for coldest month;
+        \units m/s
+        \type real
+        \minimum 0
+    N14, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Heating Wind Speed
+        \note Mean coincident dry-bulb temperature to wind speed corresponding to 1.0% cumulative frequency for coldest month
+        \units C
+        \type real
+    N15, \field Condition 1 Mean Coincident Wind Speed for 99.6% Heating Dry-Bulb Temperature
+        \note Mean wind speed coincident with 99.6% dry-bulb temperature
+        \units m/s
+        \type real
+        \minimum 0
+    N16, \field Condition 1 Wind Most Frequent Wind Direction for 99.6 Heating Dry-Bulb Temperature
+        \note Most frequent wind direction corresponding to mean wind speed coincident with 99.6% dry-bulb temperature
+        \note degrees from north (east = 90 deg)
+        \units deg
+        \type real
+        \minimum -360
+        \maximum +360
+    A4, \field Condition 1 Cooling Design Condition Type
+        \type choice
+        \key Cooling
+        \default Cooling
+    N17, \field Condition 1 Hottest Month
+        \type integer
+        \minimum 1
+        \maximum 12
+    N18, \field Condition 1 Daily Temperature Range for Hottest Month
+        \note Daily temperature range for hottest month
+        \note [defined as mean of the difference between daily maximum
+        \note and daily minimum dry-bulb temperatures for hottest month]
+        \units C
+        \type real
+        \minimum 0
+    N19, \field Condition 1 0.4% Cooling Dry-Bulb Temperature
+        \note Dry-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N20, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 0.4% Cooling Dry-Bulb Temperature
+        \note Mean coincident wet-bulb temperature to
+        \note Dry-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N21, \field Condition 1 1.0% Cooling Dry-Bulb Temperature
+        \note Dry-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N22, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 1.0% Cooling Dry-Bulb Temperature
+        \note Mean coincident wet-bulb temperature to
+        \note Dry-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N23, \field Condition 1 2.0% Cooling Dry-Bulb Temperature
+        \note Mean coincident wet-bulb temperature to
+        \note Dry-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N24, \field Condition 1 Mean Coincident Wet-Bulb Temperature for 2.0% Cooling Dry-Bulb Temperature
+        \note mean coincident wet-bulb temperature to
+        \note Dry-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence (warm conditions)
+        \units C
+        \type real
+    N25, \field Condition 1 0.4% Cooling Wet-Bulb Temperature
+        \note Wet-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N26, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Wet-Bulb Temperature
+        \note Mean coincident dry-bulb temperature to
+        \note Wet-bulb temperature corresponding to 0.4% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N27, \field Condition 1 1.0% Cooling Wet-Bulb Temperature
+        \note Wet-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N28, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Wet-Bulb Temperature
+        \note Mean coincident dry-bulb temperature to
+        \note Wet-bulb temperature corresponding to 1.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N29, \field Condition 1 2.0% Cooling Wet-Bulb Temperature
+        \note Wet-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N30, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Wet-Bulb Temperature
+        \note mean coincident dry-bulb temperature to
+        \note Wet-bulb temperature corresponding to 2.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N31, \field Condition 1 Mean Coincident Wind Speed for 0.4% Cooling Dry-Bulb Temperature
+        \note Mean wind speed coincident with 0.4% dry-bulb temperature
+        \units m/s
+        \type real
+        \minimum 0
+    N32, \field Condition 1 Most Frequent Wind Direction for 0.4% Cooling Dry-Bulb Temperature
+        \note Corresponding most frequent wind direction
+        \note Mean wind speed coincident with 0.4% dry-bulb temperature
+        \note degrees true from north (east = 90 deg)
+        \units deg
+        \type real
+        \minimum -360
+        \maximum +360
+    N33, \field Condition 1 Condition 1 0.4% Cooling Dew-point Temperature
+        \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N34, \field Condition 1 Humidity Ratio for 0.4% Cooling Dew-point Temperature
+        \note Humidity ratio corresponding to
+        \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
+        \units
+        \type real
+        \units gWater/kgDryAir
+        \minimum 0
+    N35, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Dew-point Temperature
+        \note Mean coincident dry-bulb temperature to
+        \note Dew-point temperature corresponding to 0.4% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N36, \field Condition 1 1.0% Cooling Dew-point Temperature
+        \note Dew-point temperature corresponding to 1.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N37, \field Condition 1 Humidity Ratio for 1.0% Cooling Dew-point Temperature
+        \note Humidity ratio corresponding to
+        \note Dew-point temperature corresponding to 1.0,% annual cumulative frequency of occurrence
+        \note calculated at the standard atmospheric pressure at elevation of station
+        \units
+        \type real
+        \units gWater/kgDryAir
+        \minimum 0
+    N38, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Dew-point Temperature
+        \note Mean coincident dry-bulb temperature to
+        \note Dew-point temperature corresponding to 1.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N39, \field Condition 1 2.0% Cooling Dew-point Temperature
+        \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N40, \field Condition 1 Humidity Ratio for 2.0% Cooling Dew-point Temperature
+        \note Humidity ratio corresponding to
+        \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
+        \note calculated at the standard atmospheric pressure at elevation of station
+        \units
+        \type real
+        \units gWater/kgDryAir
+        \minimum 0
+    N41, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Dew-point Temperature
+        \note Mean coincident dry-bulb temperature to
+        \note Dew-point temperature corresponding to 2.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N42, \field Condition 1 0.4 Cooling Enthalpy
+        \note Enthalpy corresponding to 0.4% annual cumulative frequency of occurrence
+        \units kJ/kg
+        \type real
+        \minimum> 0
+    N43, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 0.4% Cooling Enthalpy
+        \note Mean coincident dry-bulb temperature to
+        \note Enthalpy corresponding to 0.4% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N44, \field Condition 1 1.0 Cooling Enthalpy
+        \note Enthalpy corresponding to 1.0% annual cumulative frequency of occurrence
+        \units kJ/kg
+        \type real
+        \minimum> 0
+    N45, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 1.0% Cooling Enthalpy
+        \note Mean coincident dry-bulb temperature to
+        \note Enthalpy corresponding to 1.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N46, \field Condition 1 2.0% Cooling Enthalpy
+        \note Mean coincident dry-bulb temperature to
+        \note Enthalpy corresponding to 2.0% annual cumulative frequency of occurrence
+        \units kJ/kg
+        \type real
+        \minimum> 0
+    N47, \field Condition 1 Mean Coincident Dry-Bulb Temperature for 2.0% Cooling Enthalpy
+        \note mean coincident dry-bulb temperature to
+        \note Enthalpy corresponding to 2.0% annual cumulative frequency of occurrence
+        \units C
+        \type real
+    N48, \field Condition 1 Number of Hours (>= 8AM & <= 4PM) with Dry-Bulb Temperature in [12.8, 20.6] C
+        \note Number of hours between 8 AM and 4 PM (inclusive) with dry-bulb temperature between 12.8 and 20.6 C
+        \type real
+        \minimum 0
+    A5, \field Condition 1 Extreme Design Condition Type
+        \type choice
+        \key Extremes
+        \default Extremes
+    N49, \field Condition 1 1.0% Extreme Wind Speed
+        \note Wind speed corresponding to 1.0% annual cumulative frequency of occurrence
+        \units m/s
+        \type real
+        \minimum 0
+    N50, \field Condition 1 2.5% Extreme Wind Speed
+        \note Wind speed corresponding to 2.5% annual cumulative frequency of occurrence
+        \units m/s
+        \type real
+        \minimum 0
+    N51, \field Condition 1 5.0% Extreme Wind Speed
+        \note Wind speed corresponding 5.0% annual cumulative frequency of occurrence
+        \units m/s
+        \type real
+        \minimum 0
+    N52, \field Condition 1 Extreme Maximum Wet-Bulb Temperature
+        \units C
+        \type real
+    N53, \field Condition 1 Mean of Extreme Annual Minimum Dry-Bulb Temperature
+        \units C
+        \type real
+    N54, \field Condition 1 Mean of Extreme Annual Maximum Dry-Bulb Temperature
+        \units C
+        \type real
+    N55, \field Condition 1 Standard Deviation of Extreme Annual Minimum Dry-Bulb Temperature
+        \units C
+        \type real
+        \minimum 0
+    N56, \field Condition 1 Standard Deviation of Extreme Annual Maximum Dry-Bulb Temperature
+        \units C
+        \type real
+        \minimum 0
+    N57, \field Condition 1 5-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N58, \field Condition 1 5-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N59, \field Condition 1 10-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N60, \field Condition 1 10-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N61, \field Condition 1 20-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N62, \field Condition 1 20-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N63, \field Condition 1 50-Year Return Period Value for Minimum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+    N64; \field Condition 1 50-Year Return Period Value for Maximum Extreme Dry-Bulb Temperature
+        \units C
+        \type real
+
+TYPICAL/EXTREME PERIODS,
+    \memo Using a heuristic method, the weather converter can determine typical
+    \memo and extreme weather periods for full year weather files. These will
+    \memo then be shown on the Typical/Extreme Periods header record. These are
+    \memo also reported in the statistical report output from the Weather
+    \memo Converter.
+    \unique-object
+    \required-object
+    \min-fields 1
+    \extensible: 4
+    N1, \field Number of Typical/Extreme Periods
+        \type integer
+        \minimum 0
+        \default 0
+        \required-field
+    A1, \field Typical/Extreme Period 1 Name
+        \type alpha
+        \begin-extensible
+    A2, \field Typical/Extreme Period 1 Type
+        \type choice
+        \key Extreme
+        \key Typical
+    A3, \field Period 1 Start Day
+        \type alpha
+    A4; \field Period 1 End Day
+        \type alpha
+
+GROUND TEMPERATURES,
+    \memo The weather converter program can use a full year weather data file to
+    \memo calculate "undisturbed" ground temperatures based on temperatures.
+    \memo Since an important part of soil heat transfer includes soil properties
+    \memo such as conductivity, density and specific heat AND these cannot be
+    \memo calculated from simple weather observations, this header record is
+    \memo provided primarilyfor user information. However, with the FC
+    \memo construction option, these are automatically selected (0.5m depth) for
+    \memo use if the user does not include values in the
+    \memo Site:GroundTemperature:FcfactorMethod object.
+    \unique-object
+    \required-object
+    \min-fields 1
+    \extensible: 16
+    N1, \field Number of Ground Temperature Depths
+        \type integer
+        \minimum 0
+        \required-field
+    N2, \field Depth 1 Ground Temperature
+        \type real
+        \units m
+        \minimum 0
+        \begin-extensible
+    N3, \field Depth 1 Soil Conductivity
+        \type real
+        \units W/m-K,
+        \minimum> 0
+    N4, \field Depth 1 Soil Density
+        \type real
+        \units kg/m3
+        \minimum> 0
+    N5, \field Depth 1 Soil Specific Heat
+        \type real
+        \units J/kg-K,
+        \minimum> 0
+    N6, \field Depth 1 January Average Ground Temperature
+        \type real
+        \units C
+    N7, \field Depth 1 February Average Ground Temperature
+        \type real
+        \units C
+    N8, \field Depth 1 March Average Ground Temperature
+        \type real
+        \units C
+    N9, \field Depth 1 April Average Ground Temperature
+        \type real
+        \units C
+    N10, \field Depth 1 May Average Ground Temperature
+        \type real
+        \units C
+    N11, \field Depth 1 June Average Ground Temperature
+        \type real
+        \units C
+    N12, \field Depth 1 July Average Ground Temperature
+        \type real
+        \units C
+    N13, \field Depth 1 August Average Ground Temperature
+        \type real
+        \units C
+    N14, \field Depth 1 September Average Ground Temperature
+        \type real
+        \units C
+    N15, \field Depth 1 October Average Ground Temperature
+        \type real
+        \units C
+    N16, \field Depth 1 November Average Ground Temperature
+        \type real
+        \units C
+    N17; \field Depth 1 December Average Ground Temperature
+        \type real
+        \units C
+
+HOLIDAYS/DAYLIGHT SAVINGS,
+    \memo The Holidays/Daylight Saving header record details the start and end
+    \memo dates of Daylight Saving Time and other special days such as might be
+    \memo recorded for the weather file. These can be used by keying "Yes" for
+    \memo appropriate fields in the Run Period Object.
+    \memo Note: EnergyPlus processed weather files available on the EnergyPlus
+    \memo website: have neither special days specified nor daylight saving
+    \memo period.
+    \unique-object
+    \required-object
+    \min-fields 4
+    \extensible: 2
+    A1, \field LeapYear Observed
+        \note Yes if Leap Year will be observed for this file
+        \note No if Leap Year days (29 Feb) should be ignored in this file
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \required-field
+    A2, \field Daylight Saving Start Day
+        \type alpha
+        \default 0
+        \required-field
+    A3, \field Daylight Saving End Day
+        \type alpha
+        \default 0
+        \required-field
+    N1, \field Number of Holidays
+        \type integer
+        \minimum 0
+        \default 0
+        \required-field
+    A4, \field Holiday 1 Name
+        \type alpha
+        \begin-extensible
+    A5; \field Holiday 1 Day
+        \type alpha
+
+COMMENTS 1,
+    \memo The Comment header records may provide additional information about
+    \memo the weather data source or other information which may not fit in
+    \memo other header record formats.
+    \unique-object
+    \required-object
+    \extensible: 1
+    A1; \field Comments
+        \type alpha
+        \begin-extensible
+
+COMMENTS 2,
+    \memo The Comment header records may provide additional information about
+    \memo the weather data source or other information which may not fit in
+    \memo other header record formats.
+    \unique-object
+    \required-object
+    \extensible: 1
+    A1; \field Comments
+        \type alpha
+        \begin-extensible
+
+DATA PERIODS,
+    \memo A weather file may contain several "data periods" though this is not
+    \memo required (and, in fact, may be detrimental). In addition, a weather
+    \memo file may contain multiple records per hour BUT these must match the
+    \memo Number of Time Steps In Hour for the simulation. Multiple interval
+    \memo data files can be valued when you want to be sure of the weather
+    \memo values for each time step (rather than relying on "interpolated""
+    \memo weather data). A weather file may also contain several consecutive
+    \memo years of weather data. EnergyPlus will automatically process the extra
+    \memo years when the Number of Years field is used in the RunPeriod object.
+    \memo Sorry - there is no way to jump into a year in the middle of the EPW
+    \memo file. Note that a Run Period object may not cross Data Period
+    \memo boundary lines.
+    \required-object
+    \unique-object
+    \min-fields 6
+    \extensible: 4
+    N1, \field Number of Data Periods
+        \type integer
+        \minimum 1
+        \default 1
+        \required-field
+    N2, \field Number of Records per Hour
+        \type integer
+        \minimum 1
+        \default 1
+        \required-field
+    A1, \field Data Period 1 Name/Description
+        \type alpha
+        \begin-extensible
+        \required-field
+    A2, \field Data Period 1 Start Day of Week
+        \type choice
+        \key Sunday
+        \key Monday
+        \key Tuesday
+        \key Wednesday
+        \key Thursday
+        \key Friday
+        \key Saturday
+        \required-field
+    A3, \field Data Period 1 Start Day
+        \type alpha
+        \required-field
+    A4; \field Data Period 1 End Day
+        \type alpha
+        \required-field
+
+\group Data
+
+WEATHER DATA,
+    \memo Core weather data
+    \min-fields: 35
+    N1, \field Year
+        \type integer
+        \required-field
+    N2, \field Month
+        \type integer
+        \minimum 1
+        \maximum 12
+        \required-field
+    N3, \field Day
+        \type integer
+        \minimum 1
+        \maximum 31
+        \required-field
+    N4, \field Hour
+        \type integer
+        \minimum 1
+        \maximum 24
+        \required-field
+    N5, \field Minute
+        \type integer
+        \minimum 0
+        \maximum 60
+        \required-field
+    A1, \field Data Source
+        \type alpha
+        \note Initial day of weather file is checked by EnergyPlus for validity.
+        \note Each field is checked for "missing" as shown below. Reasonable
+        \note values, calculated values or the last "good" value is substituted.
+        \required-field
+    N6, \field Dry Bulb Temperature
+        \type real
+        \units C
+        \minimum> -90
+        \maximum< 70
+        \missing 99.9
+        \default 6.0
+        \exist-minimum> -Inf
+        \required-field
+    N7, \field Dew Point Temperature
+        \type real
+        \units C
+        \minimum> -90
+        \maximum< 70
+        \missing 99.9
+        \default 3.0
+        \exist-minimum> -Inf
+        \required-field
+    N8, \field Relative Humidity
+        \type real
+        \units %
+        \minimum 0
+        \maximum 110
+        \missing 999
+        \default 50
+        \required-field
+    N9, \field Atmospheric Pressure
+        \type real
+        \units Pa
+        \minimum> 31000
+        \maximum 120000
+        \missing 999999
+        \exist-minimum 0
+        \required-field
+    N10, \field Extraterrestrial Horizontal Radiation
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N11, \field Extraterrestrial Direct Normal Radiation
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N12, \field Horizontal Infrared Radiation Intensity from Sky
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N13, \field Global Horizontal Radiation
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N14, \field Direct Normal Radiation
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N15, \field Diffuse Horizontal Radiation
+        \type real
+        \units Wh/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N16, \field Global Horizontal Illuminance
+        \note will be missing if >= 999900
+        \type real
+        \units lux
+        \minimum 0
+        \maximum 999900
+        \missing 999999
+        \required-field
+    N17, \field Direct Normal Illuminance
+        \note will be missing if >= 999900
+        \type real
+        \units lux
+        \minimum 0
+        \maximum 999900
+        \missing 999999
+        \required-field
+    N18, \field Diffuse Horizontal Illuminance
+        \note will be missing if >= 999900
+        \type real
+        \units lux
+        \minimum 0
+        \maximum 999900
+        \missing 999999
+        \required-field
+    N19, \field Zenith Luminance
+        \note will be missing if >= 9999
+        \type real
+        \units cd/m2
+        \minimum 0
+        \missing 9999
+        \required-field
+    N20, \field Wind Direction
+        \type real
+        \units deg
+        \minimum 0
+        \maximum 360
+        \missing 999
+        \default 180
+        \exist-maximum 360
+        \required-field
+    N21, \field Wind Speed
+        \type real
+        \units m/s
+        \minimum 0
+        \maximum 40
+        \missing 999
+        \default 2.5
+        \required-field
+    N22, \field Total Sky Cover
+        \type integer
+        \note This is the value for total sky cover (tenths of coverage). (i.e.
+        \note 1 is 1/10 covered. 10 is total coverage). (Amount of sky dome in
+        \note tenths covered by clouds or obscuring phenomena at the  hour
+        \note indicated at the time indicated.)
+        \minimum 0
+        \maximum 10
+        \missing 99
+        \default 5
+        \required-field
+    N23, \field Opaque Sky Cover
+        \note This is the value for opaque sky cover (tenths of coverage). (i.e.
+        \note 1 is 1/10 covered. 10 is total  coverage). (Amount of sky dome in
+        \note tenths covered by clouds or obscuring phenomena that  prevent
+        \note observing the sky or higher cloud layers at the time indicated.)
+        \note This is not used unless the field for Horizontal Infrared
+        \note Radiation Intensity is missing and then it is used to calculate
+        \note Horizontal Infrared Radiation Intensity
+        \type integer
+        \minimum 0
+        \maximum 10
+        \missing 99
+        \default 5
+        \required-field
+    N24, \field Visibility
+        \note This is the value for visibility in km. (Horizontal visibility at
+        \note the time indicated.)
+        \type real
+        \units km
+        \minimum 0
+        \missing 9999
+        \default 777.7
+        \required-field
+    N25, \field Ceiling Height
+        \note This is the value for ceiling height in m.
+        \note (77777 is unlimited ceiling height. 88888 is cirroform ceiling.)
+        \note It is not currently used in EnergyPlus calculations.
+        \type real
+        \units m
+        \minimum 0
+        \missing 99999
+        \default 77777
+        \required-field
+    N26, \field Present Weather Observation
+        \note If the value of the field is 0, then the observed weather codes
+        \note are taken from the following field.
+        \note If the value of the field is 9, then "missing" weather is assumed.
+        \note Since the primary use of these fields (Present Weather Observation
+        \note and Present Weather Codes) is for rain/wet surfaces, a missing
+        \note observation field or a missing weather code implies "no rain".
+        \type integer
+        \minimum 0
+        \maximum 9
+        \missing 9
+        \required-field
+    A2, \field Present Weather Codes
+        \type alpha
+        \missing 999999999
+        \required-field
+    N27, \field Precipitable Water
+        \type real
+        \units mm
+        \minimum 0
+        \missing 999
+        \default 0
+        \required-field
+    N28, \field Aerosol Optical Depth
+        \type real
+        \units thousandths
+        \minimum 0
+        \missing 0.999
+        \default 0
+        \required-field
+    N29, \field Snow Depth
+        \type real
+        \units cm
+        \minimum 0
+        \missing 999
+        \required-field
+    N30, \field Days Since Last Snow
+        \type integer
+        \units day
+        \minimum 0
+        \missing 99
+        \default 88
+        \required-field
+    N31, \field Albedo
+        \type real
+        \minimum 0
+        \missing 999
+        \default 0.0
+        \required-field
+    N32, \field Liquid Precip Depth
+        \note Liquid Precipitation Depth
+        \type real
+        \units mm
+        \minimum 0
+        \missing 999
+        \default 0.0
+        \required-field
+    N33; \field Liquid Precip Rate
+        \note Liquid Precipitation Rate
+        \type real
+        \units hour
+        \minimum 0
+        \missing 99
+        \required-field

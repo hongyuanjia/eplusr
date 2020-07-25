@@ -828,6 +828,54 @@ init_idf_value <- function (idd_env, idf_env, class, field = NULL, property = NU
             "value_id", "value_chr", "value_num"))
 }
 # }}}
+# standardize_idf_value {{{
+#' Standardize Value Data
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param idf_env An environment or list contains IDF tables including object,
+#'        value, and reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names. Default: `NULL`.
+#' @param object An integer vector of valid object IDs or a character vector
+#'        of valid object names. Default: `NULL`.
+#' @param field An integer vector of valid field indexes or a character
+#'        vector of valid field names (can be in in underscore style). `class`
+#'        and `field` should have the same length.
+#' @param type A character vector to specify what type of values to be
+#'        standardized. Should be a subset of `c("choice", "reference")`.
+#'        Default: `c("choice", "reference")`.
+#'
+#' @return A data.table
+#' @keywords internal
+#' @export
+standardize_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field = NULL, type = c("choice", "reference")) {
+    type <- assert_subset(type, c("choice", "reference"), empty.ok = FALSE)
+
+    prop <- "type_enum"
+    if ("choice" %chin% type) prop <- c(prop, "choice")
+
+    val <- get_idf_value(idd_env, idf_env, class, object, field, property = prop)
+
+    if ("choice" %chin% type && any(i <- val$type_enum == IDDFIELD_TYPE$choice)) {
+        val[i, value_chr := {
+            i <- apply2_int(stri_trans_tolower(value_chr), lapply(choice, stri_trans_tolower), chmatch)
+            std <- apply2_chr(choice, i, .subset2)
+            value_chr[!is.na(i)] <- apply2_chr(choice[!is.na(i)], i[!is.na(i)], .subset2)
+            value_chr
+        }]
+    }
+
+    if ("reference" %chin% type && any(i <- val$type_enum == IDDFIELD_TYPE$object_list) && nrow(idf$reference)) {
+        ref <- idf_env$reference[J(val$value_id[i]), on = "value_id", nomatch = NULL]
+        ref[idf_env$value, on = c("src_value_id" = "value_id"),
+            `:=`(src_value_chr = i.value_chr, src_value_num = i.value_num)]
+        val[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
+    }
+
+    set(val, NULL, prop, NULL)
+}
+# }}}
 
 # DOTS EXPANSION
 # expand_idf_dots_name {{{
@@ -1035,7 +1083,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                     # indicate that LHS is a single name
                     set(dt_in, i, "lhs_sgl", TRUE)
                 # for 'c(Obj, Obj) := list()'
-                } else if (as.character(li[[2L]][[1L]]) %in% c("c", ".")) {
+                } else if (as.character(li[[2L]][[1L]]) %chin% c("c", ".")) {
                     li[[2L]][[1L]] <- as.name("c")
                     name <- eval(li[[2L]], envir = .env)
                     name <- assert_valid_type(name, "ID | Name | Index")
@@ -1046,8 +1094,16 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                         set(dt_in, i, "id", list(name))
                         set(dt_in, i, "name", list(rep(NA_character_, length(name))))
                     }
+                # for '..(Cls) := list()'
+                } else if (as.character(li[[2L]][[1L]]) == "..") {
+                    li[[2L]][[1L]] <- as.name("c")
+                    name <- eval(li[[2L]], envir = .env)
+                    name <- assert_valid_type(name, "Name", len = 1L, type = "name")
+                    set(dt_in, i, "name", list(name))
+                    # indicate that LHS is a single name
+                    set(dt_in, i, "lhs_sgl", TRUE)
                 } else {
-                    abort("Assertion on 'Input' failed: LHS of ':=' must start with '.()' or 'c()'", "dots_ref_lhs")
+                    abort("Assertion on 'Input' failed: LHS of ':=' must start with '.()', 'c()', or '..()'", "dots_ref_lhs")
                 }
 
                 li <- li[[3L]]
@@ -1299,7 +1355,13 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
 #'        with a valid class/object id/name. ID should be denoted in style
 #'        `..ID`. There is a special element `.comment` in each list, which will
 #'        be used as new comments of the object. If `.ref_assign` is `TRUE`,
-#'        `:=` can be used to group multiple id/name wrapped by `.()` or `c()`.
+#'        `:=` can be used to group ids/names:
+#'
+#' * When `.type` equals `"class"`, LHS multiple class indices/names should be
+#'   wrapped by `.()`, `c()`.
+#' * When `.type` equals `"object"`, LHS multiple object ids/names should be
+#'   wrapped by `.()` or `c()`. LHS **SINGLE** class name should be
+#'   wrapped by `..()`.
 #'
 #' @param .type Should be either `"class"` or `"object"`. If `"class"`,
 #'        id/name of each input will be treated as class index/name. If `"object"`,
@@ -1639,7 +1701,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                     add_joined_cols(idf_env$object, cls_val, "object_id", "object_name")
                     cls_val[idf_env$value, on = c("object_id", "field_id"), value_id := i.value_id]
                 }
-                setorderv(cls_val, c("rleid", "object_id"))
+                setorderv(cls_val, c("rleid", "object_id", "field_id"))
             }
 
             # combine empty
@@ -2094,7 +2156,6 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
 #' @export
 expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .exact = FALSE) {
     l <- list(...)
-    ver <- standardize_ver(get_idf_value(idd_env, idf_env, "Version")$value_chr)
 
     assert_list(l, c("character", "data.frame"), .var.name = "Input", min.len = 1L)
 
@@ -2126,6 +2187,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         same_ver <- TRUE
 
         # parse as an IDF file
+        ver <- standardize_ver(get_idf_value(idd_env, idf_env, "Version")$value_chr)
         parsed <- withCallingHandlers(
             parse_idf_file(chr_one, idd = ver, ref = FALSE),
 
@@ -2492,19 +2554,6 @@ expand_idf_regex <- function (idd_env, idf_env, pattern, replacement = NULL,
 }
 # }}}
 
-# ASSERT
-# assert_valid {{{
-assert_valid <- function (validity, action) {
-    if (count_check_error(validity)) {
-        m <- paste0(capture.output(print_validity(validity)), collapse = "\n")
-        t <- paste0("Failed to ", action ," object(s).")
-        abort(paste0(t, "\n\n", m), class = "validity_check")
-    }
-
-    TRUE
-}
-# }}}
-
 # OBJECT MUNIPULATION
 # dup_idf_object {{{
 #' Duplicate existing objects
@@ -2531,7 +2580,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     set(dt_object, NULL, "new_object_name_lower", stri_trans_tolower(dt_object$new_object_name))
 
     # stop if try to dup version
-    if (any(invld <- dt_object$class_id == 1L)) {
+    if (any(invld <- dt_object$class_name == "Version")) {
         abort(paste0("Duplicating 'Version' object is prohibited.\n",
             paste0(dt_object[invld, sprintf(" #%s| Object ID [%i] --> Class 'Version'",
                 lpad(rleid, "0"), object_id)], collapse = "\n")),
@@ -2637,7 +2686,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
                             level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
     # stop if try to add version
-    if (any(invld <- dt_object$class_id == 1L)) {
+    if (any(invld <- dt_object$class_name == "Version")) {
         abort(paste0("Adding 'Version' object is prohibited. Invalid input:\n",
             paste0(sprintf(" #%s| Class 'Version'", lpad(dt_object$rleid[invld], "0")), collapse = "\n")),
             "add_version")
@@ -2776,7 +2825,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
 set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE, level = eplusr_option("validate_level")) {
     chk <- level_checks(level)
     # stop if try to modify version
-    if (any(invld <- dt_object$class_id == 1L)) {
+    if (any(invld <- dt_object$class_name == "Version")) {
         abort(paste0("Modifying 'Version' object is prohibited. Invalid input:\n",
             paste0(sprintf(" #%s| Class 'Version'", lpad(dt_object$rleid[invld], "0")), collapse = "\n")),
             "set_version")
@@ -2883,7 +2932,7 @@ del_idf_object <- function (idd_env, idf_env, dt_object, ref_to = FALSE, ref_by 
     chk <- level_checks(level)
 
     # stop if try to delete version
-    if (any(invld <- dt_object$class_id == 1L)) {
+    if (any(invld <- dt_object$class_name == "Version")) {
         abort(paste0("Deleting 'Version' object is prohibited.\n",
             paste0(dt_object[invld, sprintf(" #%s| Object ID [%i] --> Class 'Version'",
                 lpad(rleid, "0"), object_id)], collapse = "\n")),
@@ -3891,6 +3940,75 @@ read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE
 
 # TABLE
 # get_idf_table {{{
+#' Extract value data in a data.table
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param idf_env An environment or list contains IDF tables including object,
+#'        value, and reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names. Default: `NULL`.
+#' @param object An integer vector of valid object IDs or a character vector
+#'        of valid object names. Default: `NULL`.
+#' @param string_value If `TRUE`, all field values are returned as
+#'        character. If `FALSE`, `value` column in returned
+#'        [data.table][data.table::data.table()] is a list column with
+#'        each value stored as corresponding type. Note that if the
+#'        value of numeric field is set to `"Autosize"` or
+#'        `"Autocalculate"`, it is left as it is, leaving the returned
+#'        type being a string instead of a number. Default: `TRUE`.
+#' @param unit Only applicable when `string_value` is `FALSE`. If
+#'        `TRUE`, values of numeric fields are assigned with units using
+#'        [units::set_units()] if applicable. Default: `FALSE`.
+#' @param wide Only applicable if target objects belong to a same class.
+#'        If `TRUE`, a wide table will be returned, i.e. first three
+#'        columns are always `id`, `name` and `class`, and then every
+#'        field in a separate column. Note that this requires all
+#'        objects specified must from the same class.
+#'        Default: `FALSE`.
+#' @param align If `TRUE`, all objects in the same class will have the
+#'        same field number. The number of fields is the same as the
+#'        object that have the most fields among objects specified.
+#'        Default: `FALSE`.
+#' @param all If `TRUE`, all available fields defined in IDD for the
+#'        class that objects belong to will be returned. Default:
+#'        `FALSE`.
+#' @param group_ext Should be one of `"none"`, `"group"` or `"index"`.
+#'        If not `"none"`, `value` column in returned
+#'        [data.table::data.table()] will be converted into a list.
+#'        If `"group"`, values from extensible fields will be grouped by the
+#'        extensible group they belong to. For example, coordinate
+#'        values of each vertex in class `BuildingSurface:Detailed` will
+#'        be put into a list. If `"index"`, values from extensible fields
+#'        will be grouped by the extensible field indice they belong to.
+#'        For example, coordinate values of all x coordinates will be
+#'        put into a list. If `"none"`, nothing special will be done.
+#'        Default: `"none"`.
+#' @param force If `TRUE`, `wide` can be `TRUE` even though there are
+#'        multiple classes in input. This can result in a data.table
+#'        with lots of columns. But may be useful when you know that
+#'        target classes have the exact same fields, e.g.
+#'        `Ceiling:Adiabatic` and `Floor:Adiabatic`. Default: `FALSE`.
+#' @param init If `TRUE`, a table for new object input will be returned
+#'        with all values filled with defaults. In this case, `object`
+#'        input will be ignored. The `id` column will be filled with
+#'        possible new object IDs. Default: `FALSE`.
+#'
+#' @return A [data.table][data.table::data.table()] with 6 columns (if
+#' `wide` is `FALSE`) or at least 5 columns (if `wide` is `TRUE`).
+#'
+#' When `wide` is `FALSE`, the 5 columns are:
+#'
+#' * `id`: Integer type. Object IDs.
+#' * `name`: Character type. Object names.
+#' * `class`: Character type. Current class name.
+#' * `index`: Integer type. Field indexes.
+#' * `field`: Character type. Field names.
+#' * `value`: Character type if `string_value` is `TRUE` or list type if
+#'   `string_value` is `FALSE` or `group_ext` is not `"none"`. Field values.
+#'
+#' @keywords internal
+#' @export
 get_idf_table <- function (idd_env, idf_env, class = NULL, object = NULL,
                            string_value = TRUE, unit = FALSE, wide = FALSE,
                            align = FALSE, all = FALSE, group_ext = c("none", "group", "index"),
@@ -4093,7 +4211,7 @@ dt_to_load <- function (dt, string_value = TRUE) {
 get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, object = NULL,
                             in_ip = FALSE, comment = TRUE, header = TRUE,
                             format = c("sorted", "new_top", "new_bot"),
-                            leading = 4L, sep_at = 29L) {
+                            leading = 4L, sep_at = 29L, flat = TRUE) {
     format <- match.arg(format)
 
     # IP - SI conversion
@@ -4131,6 +4249,8 @@ get_idf_string <- function (idd_env, idf_env, dt_order = NULL, class = NULL, obj
     }
 
     if (from != to) idf_env$value <- value
+
+    if (!flat) return(fmt)
 
     if (format == "sorted") {
         combine_fmt <- function (lst) {

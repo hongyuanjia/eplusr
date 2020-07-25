@@ -683,6 +683,17 @@ test_that("VALUE DOTS", {
     # can stop if LHS of ":=" is not allowed
     expect_error(parse_dots_value(c(1, 2) := list(..1 = "name", ..2 = "sch", 1:3), .scalar = FALSE, .pair = TRUE), class = "eplusr_error_dots_pair_length")
 
+    expect_equal(parse_dots_value(cls = list(..1 = "name", ..2 = 1L, NULL, NULL)),
+        list(object = data.table(rleid = 1L, each_rleid = 1L, id = NA_integer_, name = "cls",
+                comment = list(), is_ref = FALSE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = FALSE),
+             value = data.table(rleid = 1L, each_rleid = 1L, id = NA_integer_, name = "cls",
+                 field_index = c(1:2, rep(NA_integer_, 2)), field_name = NA_character_,
+                 value_chr = c("name", "1", rep(NA_character_, 2)),
+                 value_num = c(NA_real_, 1, NA_real_, NA_real_)
+             )
+        )
+    )
+
     # can separate numeric and character value
     expect_equal(parse_dots_value(cls = list(..1 = "name", ..2 = 1L, NULL, NULL)),
         list(object = data.table(rleid = 1L, each_rleid = 1L, id = NA_integer_, name = "cls",
@@ -742,12 +753,45 @@ test_that("VALUE DOTS", {
     )
 
     # can use multiple inputs on LHS of ":="
+    expect_equal(parse_dots_value(.(1:3) := list(..1 = "name")),
+        list(object = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
+                comment = list(), is_ref = TRUE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = FALSE),
+             value = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
+                 field_index = 1L, field_name = NA_character_,
+                 value_chr = "name", value_num = NA_real_
+             )
+        )
+    )
     expect_equal(parse_dots_value(c(1:3) := list(..1 = "name")),
         list(object = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
                 comment = list(), is_ref = TRUE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = FALSE),
              value = data.table(rleid = 1L, each_rleid = 1:3, id = 1:3, name = NA_character_,
                  field_index = 1L, field_name = NA_character_,
                  value_chr = "name", value_num = NA_real_
+             )
+        )
+    )
+    a <- "cls1"
+    b <- c("cls2", "cls3")
+    expect_equal(parse_dots_value(..(a) := list(), ..(b) := list(), .empty = TRUE),
+        list(object = data.table(rleid = c(1L, 2L, 2L), each_rleid = c(1L, 1L, 2L),
+                id = NA_integer_, name = paste0("cls", 1:3),
+                comment = list(), is_ref = TRUE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = TRUE),
+             value = data.table(rleid = c(1L, 2L, 2L), each_rleid = c(1L, 1L, 2L),
+                 id = NA_integer_, name = paste0("cls", 1:3),
+                 field_index = NA_integer_, field_name = NA_character_,
+                 value_chr = NA_character_, value_num = NA_real_
+             )
+        )
+    )
+    expect_equal(parse_dots_value(..("cls1") := list(), ..("cls2", "cls3") := list(), .empty = TRUE),
+        list(object = data.table(rleid = c(1L, 2L, 2L), each_rleid = c(1L, 1L, 2L),
+                id = NA_integer_, name = paste0("cls", 1:3),
+                comment = list(), is_ref = TRUE, lhs_sgl = FALSE, rhs_sgl = TRUE, is_empty = TRUE),
+             value = data.table(rleid = c(1L, 2L, 2L), each_rleid = c(1L, 1L, 2L),
+                 id = NA_integer_, name = paste0("cls", 1:3),
+                 field_index = NA_integer_, field_name = NA_character_,
+                 value_chr = NA_character_, value_num = NA_real_
              )
         )
     )
@@ -950,15 +994,15 @@ test_that("VALUE DOTS", {
     expect_is(res <- expand_idf_dots_value(idd_env, idf_env, c(1) := list(8.8), .empty = FALSE), "list")
     expect_equal(names(res), c("object", "value"))
     expect_equal(res$object,
-        data.table(rleid = 1L, class_id = 1L, class_name = "Version", 
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
             object_id = NA_integer_, object_name = NA_character_,
             object_name_lower = NA_character_, comment = list()
         )
     )
     expect_equal(res$value,
-        data.table(rleid = 1L, class_id = 1L, class_name = "Version", 
-            object_id = NA_integer_, object_name = NA_character_, field_id = 1L, 
-            field_index = 1L, field_name = "Version Identifier", value_id = NA_integer_, 
+        data.table(rleid = 1L, class_id = 1L, class_name = "Version",
+            object_id = NA_integer_, object_name = NA_character_, field_id = 1L,
+            field_index = 1L, field_name = "Version Identifier", value_id = NA_integer_,
             value_chr = "8.8", value_num = 8.8)
     )
 
@@ -1045,6 +1089,14 @@ test_that("VALUE DOTS", {
     )
     expect_equal(res$object$object_id, 27:40)
     expect_equal(res$value$field_index, rep(1:3, 14))
+    cls <- "Output_Variable"
+    expect_is(class = "list",
+        res1 <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
+            ..(cls) := list(),
+            .scalar = FALSE, .pair = TRUE
+        )
+    )
+    expect_equal(res, res1)
     ## Class := list(), dup
     expect_is(class = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,

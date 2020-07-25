@@ -27,7 +27,10 @@ IDD_SLASHKEY <- list (
         flat = c("field", "required-field", "units", "ip-units",
             "unitsbasedonfield", "minimum", "minimum>", "maximum", "maximum<",
             "default", "autosizable", "autocalculatable", "type",
-            "external-list", "begin-extensible"),
+            "external-list", "begin-extensible",
+            # EPW specific
+            "missing", "exist-minimum", "exist-minimum>", "exist-maximum", "exist-maximum<"
+        ),
         nest = c("note", "key", "object-list", "reference", "reference-class-name")
     ),
 
@@ -36,9 +39,12 @@ IDD_SLASHKEY <- list (
             "unitsbasedonfield", "autosizable", "autocalculatable",
             "begin-extensible", "deprecated", "obsolete", "retaincase"),
         int = c("min-fields", "extensible"),
-        dbl = c("minimum", "minimum>", "maximum", "maximum<"),
+        dbl = c("minimum", "minimum>", "maximum", "maximum<",
+            # EPW specific
+            "exist-minimum", "exist-minimum>", "exist-maximum", "exist-maximum<"
+        ),
         chr = c("group", "format", "field", "units", "ip-units", "default", "type",
-            "external-list"),
+            "external-list", "missing"),
         lst = c("memo", "reference-class-name", "note", "key", "object-list",
             "reference")
     )
@@ -84,14 +90,17 @@ FIELD_COLS <- list(
         "type_enum", "src_enum", "type",
         "autosizable", "autocalculatable",
         "has_range", "maximum", "minimum", "lower_incbounds", "upper_incbounds",
-        "default_chr", "default_num", "choice", "note"
+        "default_chr", "default_num", "choice", "note",
+        # EPW specific
+        "missing_chr", "missing_num",
+        "has_exist", "exist_maximum", "exist_minimum", "exist_lower_incbounds", "exist_upper_incbounds"
     )
 )
 # nocov end
 # }}}
 
 # parse_idd_file {{{
-parse_idd_file <- function(path) {
+parse_idd_file <- function(path, epw = FALSE) {
     # read idd string, get idd version and build
     idd_dt <- read_lines(path)
 
@@ -104,6 +113,7 @@ parse_idd_file <- function(path) {
     # type enum
     type_enum <- list(unknown = 0L, slash = 1L, group = 2L, class = 3L, field = 4L, field_last = 5L)
 
+    # idd_dt[slash_key == "exist-minimum>"]
     # separate lines into bodies, slash keys and slash values
     idd_dt <- sep_idd_lines(idd_dt)
 
@@ -133,7 +143,7 @@ parse_idd_file <- function(path) {
     )
 
     # complete property columns
-    dt_field <- complete_property(dt_field, "field", dt_class)
+    dt_field <- complete_property(dt_field, "field", dt_class, epw = epw)
     dt_class <- complete_property(dt_class, "class", dt_field)
 
     # ConnectorList references are missing until v9.1
@@ -203,7 +213,7 @@ parse_idf_file <- function (path, idd = NULL, ref = TRUE) {
     idf_dt <- dt$left
 
     # object table
-    dt <- sep_object_table(idf_dt, type_enum, idd_ver, idd_env)
+    dt <- sep_object_table(idf_dt, type_enum, idd_env)
     dt_object <- dt$object
     idf_dt <- dt$left
 
@@ -354,7 +364,7 @@ sep_idd_lines <- function (dt, col = "string") {
     # b) for numeric value slash with comments, e.g. "\extensible:<#> -some comments"
     # https://stackoverflow.com/questions/3575331/how-do-extract-decimal-number-from-string-in-c-sharp/3575807
     dt[J(c(IDD_SLASHKEY$type$int, IDD_SLASHKEY$type$dbl)), on = "slash_key",
-        `:=`(slash_value = stri_extract_first_regex(slash_value, "[-+]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?"))
+        `:=`(slash_value = stri_extract_first_regex(slash_value, "[-+]?([0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?|Inf)"))
     ]
 
     # change all values of reference, object-list and refercne-class-name to
@@ -697,7 +707,7 @@ dcast_slash <- function (dt, id, keys, keep = NULL) {
 # }}}
 
 # complete_property {{{
-complete_property <- function (dt, type, ref) {
+complete_property <- function (dt, type, ref, epw = FALSE) {
     type <- match.arg(type, c("class", "field"))
     keys <- switch(type, class = IDD_SLASHKEY$class, field = IDD_SLASHKEY$field)
 
@@ -726,7 +736,7 @@ complete_property <- function (dt, type, ref) {
         slash_as_type(key)(res)
     }
 
-    # convert proerty column types
+    # convert property column types
     types <- unlist(IDD_SLASHKEY$type, use.names = FALSE)
     for (key in intersect(names(dt), types)) {
         if (!slash_is_type(key)(dt[[key]])) {
@@ -742,7 +752,7 @@ complete_property <- function (dt, type, ref) {
 
     dt <- switch(type,
         class = parse_class_property(dt, ref),
-        field = parse_field_property(dt, ref)
+        field = parse_field_property(dt, ref, epw = epw)
     )
 
     dt
@@ -799,7 +809,7 @@ parse_class_property <- function (dt, ref) {
 # }}}
 
 # parse_field_property {{{
-parse_field_property <- function (dt, ref) {
+parse_field_property <- function (dt, ref, epw = FALSE) {
     # rename column names to lower case
     nms <- stri_replace_all_fixed(names(dt), "-", "_")
     setnames(dt, nms)
@@ -833,6 +843,14 @@ parse_field_property <- function (dt, ref) {
 
     # parse field default
     dt <- parse_field_property_default(dt)
+
+    # EPW specific
+    if (epw) {
+        # parse EPW missing field
+        dt <- parse_field_property_missing(dt)
+        # parse EPW range of existing field
+        dt <- parse_field_property_exist(dt)
+    }
 
     # add lower underscore name
     set(dt, NULL, "field_name_us", stri_trans_tolower(underscore_name(dt$field_name)))
@@ -934,16 +952,52 @@ parse_field_property_default <- function (dt) {
 }
 # }}}
 
+# parse_field_property_missing {{{
+parse_field_property_missing <- function (dt) {
+    set(dt, NULL, "missing_num", NA_real_)
+    set(dt, NULL, "missing_chr", dt$missing)
+    dt[type_enum <= IDDFIELD_TYPE$real, `:=`(missing_num = suppressWarnings(as.double(missing)))]
+    dt
+}
+# }}}
+
 # parse_field_property_range {{{
 parse_field_property_range <- function (dt) {
     set(dt, NULL, c("has_range", "lower_incbounds", "upper_incbounds"), FALSE)
 
-    dt[!is.na(minimum), `:=`(has_range = TRUE, lower_incbounds = TRUE)]
-    dt[!is.na(maximum), `:=`(has_range = TRUE, upper_incbounds = TRUE)]
-    dt[!is.na(`minimum>`), `:=`(has_range = TRUE, minimum = `minimum>`)]
-    dt[!is.na(`maximum<`), `:=`(has_range = TRUE, maximum = `maximum<`)]
+    setnames(dt, c("minimum>", "maximum<"), c("minimum_u", "maximum_l"))
+    dt[!J(NA_real_), on = "minimum", `:=`(has_range = TRUE, lower_incbounds = TRUE)]
+    dt[!J(NA_real_), on = "maximum", `:=`(has_range = TRUE, upper_incbounds = TRUE)]
+    dt[!J(NA_real_), on = "minimum_u", `:=`(has_range = TRUE, minimum = minimum_u)]
+    dt[!J(NA_real_), on = "maximum_l", `:=`(has_range = TRUE, maximum = maximum_l)]
 
-    set(dt, NULL, c("minimum>", "maximum<"), NULL)
+    set(dt, NULL, c("minimum_u", "maximum_l"), NULL)
+    dt
+}
+# }}}
+
+# parse_field_property_exist {{{
+parse_field_property_exist <- function (dt) {
+    set(dt, NULL, c("has_exist", "exist_lower_incbounds", "exist_upper_incbounds"), FALSE)
+
+    setnames(dt, c("exist_minimum>", "exist_maximum<"), c("exist_minimum_u", "exist_maximum_l"))
+
+    dt[!J(NA_real_), on = "exist_minimum", `:=`(has_exist = TRUE, exist_lower_incbounds = TRUE)]
+    dt[!J(NA_real_), on = "exist_maximum", `:=`(has_exist = TRUE, exist_upper_incbounds = TRUE)]
+    dt[!J(NA_real_), on = "exist_minimum_u", `:=`(has_exist = TRUE,
+        exist_minimum = exist_minimum_u, exist_lower_incbounds = FALSE)]
+    dt[!J(NA_real_), on = "exist_maximum_l", `:=`(has_exist = TRUE,
+        exist_maximum = exist_maximum_l, exist_upper_incbounds = FALSE)]
+
+    # by default use minimum and missing code as the lower and upper bound
+    dt[!is.na(minimum) & is.na(exist_minimum), `:=`(
+        has_exist = TRUE, exist_minimum = minimum, exist_lower_incbounds = lower_incbounds
+    )]
+    dt[!is.na(missing_num) & is.na(exist_maximum), `:=`(
+        has_exist = TRUE, exist_maximum = missing_num, exist_upper_incbounds = FALSE
+    )]
+
+    set(dt, NULL, c("exist_minimum_u", "exist_maximum_l"), NULL)
     dt
 }
 # }}}
@@ -1157,7 +1211,7 @@ sep_header_options <- function (dt, type_enum) {
 # }}}
 
 # sep_object_table {{{
-sep_object_table <- function (dt, type_enum, version, idd) {
+sep_object_table <- function (dt, type_enum, idd) {
     # object id
     left <- dt[J(type_enum$value_last), on = "type", list(line, object_id = seq_along(line)), nomatch = 0L]
     dt <- left[dt, on = "line", roll = -Inf]
@@ -1243,12 +1297,12 @@ sep_object_table <- function (dt, type_enum, version, idd) {
 # }}}
 
 # get_value_table {{{
-get_value_table <- function (dt, idd) {
+get_value_table <- function (dt, idd, escape = FALSE) {
     # count value number per line
     set(dt, NULL, "value_count", stri_count_fixed(dt$body, ",") + stri_endswith_fixed(dt$body, ";"))
 
     # in case there are multiple semicolon in one line
-    if (any(stri_count_fixed(dt$body, ";") > 1L)) {
+    if (any(stri_count_fixed(dt$body, ";") > 1L) && !escape) {
         parse_error("idf", "Invalid line found", dt[stri_count_fixed(body, ";") > 1L], subtype = "line")
     }
 
@@ -1318,7 +1372,7 @@ get_value_table <- function (dt, idd) {
 
     # bind columns
     set(fld, NULL, c("rleid", "field_in"), NULL)
-    dt <- unique(fld, by = "field_id")[dt, on = c("class_id", "field_index")]
+    dt <- dt[unique(fld, by = "field_id"), on = c("class_id", "field_index")]
 
     # fill data for missing fields
     dt[is.na(line), `:=`(value_id = new_id(dt, "value_id", length(value_id)))]
@@ -1327,6 +1381,7 @@ get_value_table <- function (dt, idd) {
     dt[type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = suppressWarnings(as.numeric(value_chr)))]
     # update value_chr upon the numeric value
     dt[!is.na(value_num), `:=`(value_chr = as.character(value_num))]
+    setnafill(dt, "locf", cols = "object_id")
 
     # only keep useful columns
     nms <- c("value_id", "value_chr", "value_num", "object_id", "field_id",
@@ -1485,16 +1540,18 @@ get_value_reference_map <- function (idd_env, src, value, all = TRUE) {
 
 # parse_issue {{{
 parse_warn <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
-                        num = NULL, prefix = NULL, post = NULL, subtype = NULL) {
-    parse_issue(type, title, data, num, prefix, post, stop = FALSE, subtype = subtype)
+                        num = NULL, prefix = NULL, suffix = NULL, post = NULL,
+                        stop = TRUE, subtype = NULL, loc_name = "Line") {
+    parse_issue(type, title, data, num, prefix, suffix, post, stop = FALSE, subtype, loc_name)
 }
 parse_error <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
-                         num = NULL, prefix = NULL, post = NULL, subtype = NULL) {
-    parse_issue(type, title, data, num, prefix, post, stop = TRUE, subtype = subtype)
+                         num = NULL, prefix = NULL, suffix = NULL, post = NULL,
+                         stop = TRUE, subtype = NULL, loc_name = "Line") {
+    parse_issue(type, title, data, num, prefix, suffix, post, stop = TRUE, subtype, loc_name)
 }
-parse_issue <- function (type = c("idf", "idd", "err", "epw"),
-                         title, data = NULL, num = NULL, prefix = NULL, post = NULL,
-                         stop = TRUE, subtype = NULL) {
+parse_issue <- function (type = c("idf", "idd", "err", "epw"), title, data = NULL,
+                         num = NULL, prefix = NULL, suffix = NULL, post = NULL,
+                         stop = TRUE, subtype = NULL, loc_name = "Line") {
 
     start_rule <- cli::rule(line = 2L)
 
@@ -1504,10 +1561,9 @@ parse_issue <- function (type = c("idf", "idd", "err", "epw"),
             num <- nrow(data)
         }
         assert_names(names(data), must.include = c("line", "string"))
-        mes <- paste0(data$msg_each, "Line ", lpad(data$line), ": ", data$string)
-        if (!is.null(prefix)) {
-            mes <- paste0(prefix, mes)
-        }
+        mes <- paste0(data$msg_each, loc_name, " ", lpad(data$line), ": ", data$string)
+        if (!is.null(prefix)) mes <- paste0(prefix, mes)
+        if (!is.null(suffix)) mes <- paste0(mes, suffix)
 
         # only show the first 15 message
         if (length(mes) > 10L) {

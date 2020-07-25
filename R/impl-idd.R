@@ -194,8 +194,12 @@ get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = 
     } else {
         res <- get_idd_field_from_which(idd_env, class, field, underscore, no_ext, complete, all)
     }
-    if (has_names(res, "field_name_us")) set(res, NULL, "field_name_us", NULL)
-    clean_field_property(res, property %||% "")
+
+    cols <- c("rleid", "class_id", "class_name", "field_id", "field_index", "field_name", "field_in")
+    if (length(col_del <- setdiff(names(res), c(cols, property)))) {
+        set(res, NULL, col_del, NULL)
+    }
+
     res
 }
 # }}}
@@ -406,6 +410,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                 set(dt_ext_join, NULL, col_prop, NULL)
                 set(dt_join, NULL, col_prop, NULL)
                 fld <- append_dt(dt_join[!is.na(field_id)], dt_ext_join)
+                setorderv(fld, "field_rleid")
                 set(fld, NULL, "field_rleid", NULL)
                 # }}}
             } else {
@@ -430,15 +435,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
         # }}}
     }
 
-    set(fld, NULL, "field_name_us", NULL)
     fld
-}
-# }}}
-# clean_field_property {{{
-clean_field_property <- function (dt, property) {
-    col_del <- setdiff(FIELD_COLS$property, property)
-    if (length(col_del)) set(dt, NULL, col_del, NULL)
-    dt
 }
 # }}}
 

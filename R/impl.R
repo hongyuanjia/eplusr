@@ -206,9 +206,11 @@ errormsg_field_index <- function (dt) {
 
     dt[min_fields == 0L, msg := paste0(msg,
         " Field index should be no more than ", num_fields, ".")]
-    dt[min_fields >  0L, msg := paste0(msg,
+    dt[min_fields >  0L & min_fields < num_fields, msg := paste0(msg,
         " Field index should be no less than ", min_fields,
         " and no more than ", num_fields, ".")]
+    dt[min_fields >  0L & min_fields == num_fields, msg := paste0(msg,
+        " Field index should be equal to ", min_fields, ".")]
 
     paste0(dt$msg, collapse = "\n")
 }
@@ -275,5 +277,20 @@ assert_valid_type <- function (x, name = NULL, len = NULL, null.ok = FALSE, lowe
         if (is.numeric(x)) storage.mode(x) <- "integer"
     }
     x
+}
+# }}}
+# assert_valid {{{
+assert_valid <- function (validity, action = NULL, epw = FALSE) {
+    if (count_check_error(validity)) {
+        m <- paste0(format_validity(validity, epw = epw), collapse = "\n")
+        if (is.null(action)) {
+            abort(m, class = "validity_check", data = validity)
+        } else {
+            t <- paste("Failed to", action , if (epw) "header." else "object(s).")
+            abort(paste0(t, "\n\n", m), class = "validity_check", data = validity)
+        }
+    }
+
+    TRUE
 }
 # }}}

@@ -39,7 +39,7 @@ Suggests:
     pkgdown,
     rgl,
     rmarkdown,
-    testthat
+    testthat (>= 2.1.0)
 VignetteBuilder:
     knitr
 Encoding: UTF-8
@@ -51,25 +51,25 @@ SystemRequirements: EnergyPlus (>= 8.3, optional)
     (<https://energyplus.net>); udunits2
 Collate:
     'constants.R'
-    'assertions.R'
+    'assert.R'
     'diagram.R'
     'eplusr.R'
     'utils.R'
     'impl.R'
     'parse.R'
     'impl-epw.R'
+    'impl-idd.R'
+    'impl-idf.R'
+    'idf.R'
+    'idd.R'
     'epw.R'
     'err.R'
     'format.R'
     'geometry.R'
     'group.R'
-    'impl-idd.R'
-    'idd.R'
     'iddobj.R'
-    'impl-idf.R'
-    'idf.R'
     'impl-idfobj.R'
-    'idf_object.R'
+    'idfobj.R'
     'impl-iddobj.R'
     'impl-sql.R'
     'install.R'
