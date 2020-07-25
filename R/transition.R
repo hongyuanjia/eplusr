@@ -1956,7 +1956,7 @@ trans_funs$f890t900 <- function (idf) {
                 num_rep <- value[12L + 2L]
 
                 if (!is.na(start_year)) {
-                    if (!test_strint(start_year)) {
+                    if (!checkmate::test_count(as.numeric(start_year))) {
                         abort(paste0(
                             "For 'RunPeriod' ", surround(name[[1L]]), " [ID:", id[[1L]], "]:\n",
                             "Invalid 'Start Year' value (", surround(start_year), ") found."
@@ -1969,7 +1969,7 @@ trans_funs$f890t900 <- function (idf) {
 
                 # convert num of repeats to integer
                 if (!is.na(num_rep)) {
-                    if (!test_strint(num_rep)) {
+                    if (!checkmate::test_count(as.numeric(num_rep))) {
                         abort(paste0(
                             "For 'RunPeriod' ", surround(name[[1L]]), " [ID:", id[[1L]], "]:\n",
                             "Invalid 'Number of Times Runperiod to be Repeated' value (",
@@ -2074,8 +2074,8 @@ trans_funs$f890t900 <- function (idf) {
                     end_year <- start_year + num_rep
                     value[7L] <- as.character(end_year)
 
-                    end_month <- assert_strint(value[5L], coerce = TRUE, .var.name = "End Month")
-                    end_day <- assert_strint(value[6L], coerce = TRUE, .var.name = "End Day of Month")
+                    end_month <- assert_integerish(as.numeric(value[5L]), len = 1L, lower = 1L, upper = 12L, any.missing = FALSE, coerce = TRUE, .var.name = "End Month")
+                    end_day <- assert_integerish(as.numeric(value[6L]), len = 1L, lower = 1L, upper = 31L, any.missing = FALSE, coerce = TRUE, .var.name = "End Day of Month")
 
                     # check if leap day of end date is specified in an non-leap year
                     if ((!leap_year(end_year)) && end_month == 2L && end_day == 29L) {

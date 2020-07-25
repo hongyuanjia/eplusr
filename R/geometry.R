@@ -9,7 +9,7 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
             private$m_geometry <- extract_geometry(private$m_parent)
 
             # save uuid
-            private$m_log$parent_uuid <- ._get_private(private$m_parent)$m_log$uuid
+            private$m_log$parent_uuid <- get_priv_env(private$m_parent)$m_log$uuid
         },
 
         vertices = function ()
@@ -87,7 +87,19 @@ extract_geometry <- function (idf) {
     set(dt, NULL, c("origin_x", "origin_y", "origin_z"), NULL)
 
     # rotate if necessary
-    dt <- rotate_vertices(dt, idf$Building$North_Axis, c("x", "y", "z"))
+    if (idf$is_valid_class("Building")) {
+        north <- idf$Building$North_Axis
+        if (is.na(north)) {
+            warn("North Axis unknown, using 0", "warn_unknown_north_axis")
+            north <- 0
+        }
+    } else {
+        north <- 0
+        warn("Could not find 'Building' object, assuming 0 rotation",
+            "warn_no_building"
+        )
+    }
+    dt <- rotate_vertices(dt, north, c("x", "y", "z"))
 
     # add number of vert and vertex index
     dt[, `:=`(n_vert = .N, index_vertex = seq_len(.N)), by = "id"]
@@ -106,44 +118,40 @@ get_global_geom_rules <- function (idf) {
         invalid <- idf$object_unique("GlobalGeometryRules")$validate(custom_validate(choice = TRUE))$invalid_choice
         if (nrow(invalid)) {
             if (1L %in% invalid$field_index) {
-                warn("warn_invalid_start_vertex_pos", paste0(
-                    "Invalid coordinate system found ", surround(rules$starting_vertex_position), ". ",
+                warn(paste0("Invalid coordinate system found ", surround(rules$starting_vertex_position), ". ",
                     "Assuming 'UpperLeftCorner'."
-                ))
+                ), "warn_invalid_start_vertex_pos")
                 rules$starting_vertex_position <- "upperleftcorner"
             }
 
             if (2L %in% invalid$field_index) {
-                warn("warn_invalid_vertex_entry_dir", paste0(
-                    "Invalid vertex entry direction found ", surround(rules$vertex_entry_direciton), ". ",
+                warn(paste0("Invalid vertex entry direction found ", surround(rules$vertex_entry_direction), ". ",
                     "Assuming 'Counterclockwise'."
-                ))
-                rules$vertex_entry_direciton <- "counterclockwise"
+                ), "warn_invalid_vertex_entry_dir")
+                rules$vertex_entry_direction <- "counterclockwise"
             }
 
             if (3L %in% invalid$field_index) {
-                warn("warn_invalid_global_coord_sys", paste0(
-                    "Invalid coordinate system found ", surround(rules$coordinate_system), ". ",
+                warn(paste0("Invalid coordinate system found ", surround(rules$coordinate_system), ". ",
                     "Assuming 'Relative'."
-                ))
+                ), "warn_invalid_global_coord_sys")
                 rules$coordinate_system <- "relative"
             }
 
             if (5L %in% invalid$field_index) {
-                warn("warn_invalid_rectsurface_coord_sys", paste0(
-                    "Invalid rectangular coordinate system found ", surround(rules$rectangular_surface_coordinate_system), ". ",
+                warn(paste0("Invalid rectangular coordinate system found ", surround(rules$rectangular_surface_coordinate_system), ". ",
                     "Assuming 'Relative'."
-                ))
+                ), "warn_invalid_rectsurface_coord_sys")
                 rules$rectangular_surface_coordinate_system <- "relative"
             }
         }
     } else {
-        warn("warn_no_global_geom_rules",
-            "No 'GlobalGeometryRules' object found in current IDF. Assuming all defaults."
+        warn("No 'GlobalGeometryRules' object found in current IDF. Assuming all defaults.",
+            "warn_no_global_geom_rules"
         )
         rules <- list(
             starting_vertex_position = "upperleftcorner",
-            vertex_entry_direciton = "counterclockwise",
+            vertex_entry_direction = "counterclockwise",
             coordinate_system = "relative",
             daylighting_reference_point_coordinate_system = "relative",
             rectangular_surface_coordinate_system = "relative"
@@ -166,20 +174,18 @@ get_zone_origin <- function (idf) {
         setnames(zone, c("name", "x", "y", "z", "dir_relative_north"))
         set(zone, NULL, "name_lower", stri_trans_tolower(zone$name))
         if (nrow(mis_origin <- na.omit(zone, by = c("x", "y", "z"), invert = TRUE))) {
-            warn("warn_no_zone_origin", paste0(
-                "Zone below has unknown origin. (0, 0, 0) will be used:\n",
+            warn(paste0("Zone below has unknown origin. (0, 0, 0) will be used:\n",
                 collapse(mis_origin$name)
-            ))
+            ), "warn_no_zone_origin")
             zone[J(NA_real_), on = "x", x := 0.0]
             zone[J(NA_real_), on = "y", y := 0.0]
             zone[J(NA_real_), on = "z", z := 0.0]
         }
 
         if (anyNA(zone$dir_relative_north)) {
-            warn("warn_no_zone_north", paste0(
-                "Zone below has unknown direction of relative North. 0 will be used:\n",
+            warn(paste0("Zone below has unknown direction of relative North. 0 will be used:\n",
                 collapse(zone[is.na(dir_relative_north), name])
-            ))
+            ), "warn_no_zone_north")
 
             zone[J(NA_real_), on = "dir_relative_north", dir_relative_north := 0.0]
         }
@@ -676,6 +682,7 @@ get_vertices_from_specs <- function (azimuth, tilt, x0, y0, z0, length, height_w
 
 # rotate_vertices {{{
 rotate_vertices <- function (dt, degree, vertices) {
+    browser()
     if (is.na(degree)) return(dt)
 
     # rotate if necessary
@@ -781,13 +788,13 @@ geom_view <- function (self, private, new = TRUE, clear = TRUE, axis = TRUE,
                        theta = 0, phi = -60, fov = 60, zoom = 1, background = "white",
                        size = c(0, 30, 800)) {
     if (!requireNamespace("rgl", quietly = TRUE)) {
-        abort("error_no_rgl", paste0(
+        abort(paste0(
             "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
             "please add this to your library with install.packages('rgl') and try agian."
         ))
     }
     if (!requireNamespace("decido", quietly = TRUE)) {
-        abort("error_no_decido", paste0(
+        abort(paste0(
             "'eplusr' relies on the 'decido' package to view 3D IDF geometry; ",
             "please add this to your library with install.packages('decido') and try agian."
         ))
@@ -880,14 +887,13 @@ geom_view_add_ground <- function (self, private, ground = "#CCCCC9") {
 # geom_save_snapshot {{{
 geom_save_snapshot <- function (self, private, filename, bring_to_front = TRUE, axis = FALSE) {
     if (!requireNamespace("rgl", quietly = TRUE)) {
-        abort("error_no_rgl", paste0(
-            "'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
+        abort(paste0("'eplusr' relies on the 'rgl' package to view 3D IDF geometry; ",
             "please add this to your library with install.packages('rgl') and try agian."
         ))
     }
 
     if (is.null(private$m_log$id$device)) {
-        abort("error_no_rgl_window", "No rgl window currently open. Please run '$view()' first.")
+        abort("No rgl window currently open. Please run '$view()' first.")
     }
 
     # set the last plot device as active
@@ -906,8 +912,7 @@ geom_save_snapshot <- function (self, private, filename, bring_to_front = TRUE, 
         if (bring_to_front) rgl::rgl.bringtotop()
         rgl::rgl.postscript(filename, tools::file_ext(filename))
     } else {
-        abort("error_not_rgl_supported_fmt", paste0(
-            "Not supported export format ", surround(tools::file_ext(filename)), ". ",
+        abort(paste0("Not supported export format ", surround(tools::file_ext(filename)), ". ",
             "Current supported: ", collapse(c("png", "ps", "eps", "tex", "pdf", "svg", "pgf"))
         ))
     }
@@ -928,12 +933,12 @@ rad_to_deg <- function (x) x / pi * 180
 # }}}
 
 # rgl_init {{{
+#' @importFrom checkmate assert_flag assert_numeric
 rgl_init <- function (new = FALSE, clear = TRUE, theta = 0, phi = -60, fov = 60,
                       zoom = 1, background = "white", size = c(0, 30, 800)) {
-    assert(is_flag(new), is_flag(clear), is_number(theta), is_number(phi), is_number(fov), is_number(zoom))
-    assert(are_number(size), length(size) <= 4L,
-        msg = sprintf("'size' should be a numeric vector with length no more than %i.", length(size))
-    )
+    checkmate::assert_flag(new)
+    checkmate::assert_flag(clear)
+    checkmate::assert_numeric(size, max.len = 4L)
 
     if (clear) {
         if (rgl::rgl.cur() == 0) new <- TRUE else rgl::rgl.clear()

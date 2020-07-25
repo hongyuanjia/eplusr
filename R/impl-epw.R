@@ -425,7 +425,7 @@ parse_epw_header_holiday <- function (header, strict = FALSE, transform = TRUE) 
         invld <- val[J(i, 2L), on = c("extensible_group", "extensible_field_index")]
         issue_epw_header_parse_error_single(obj, invld, i)
     }
-    if (any(realyr <- !not_epwdate_realyear(holiday))) {
+    if (any(realyr <- is_epwdate_type(holiday, EPWDATE_TYPE$ymd))) {
         i <- which(realyr)
         invld <- val[J(i, 2L), on = c("extensible_group", "extensible_field_index")]
         issue_epw_header_parse_error_single(obj, invld, i, ". Can not contain year specification.")

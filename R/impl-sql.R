@@ -31,6 +31,7 @@ get_sql_query <- function (sql, query) {
 }
 # }}}
 # get_sql_tabular_data_query {{{
+#' @importFrom checkmate assert_character
 get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
                                         row_name = NULL) {
@@ -68,12 +69,17 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
         "
     # }}}
 
+    assert_character(report_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(report_for, any.missing = FALSE, null.ok = TRUE)
+    assert_character(table_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(column_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(row_name, any.missing = FALSE, null.ok = TRUE)
     q <- NULL %and%
-        .sql_make(report_name, assert(is.character(report_name), no_na(report_name))) %and%
-        .sql_make(report_for, assert(is.character(report_for), no_na(report_for))) %and%
-        .sql_make(table_name, assert(is.character(table_name), no_na(table_name))) %and%
-        .sql_make(column_name, assert(is.character(column_name), no_na(column_name))) %and%
-        .sql_make(row_name, assert(is.character(row_name), no_na(row_name)))
+        .sql_make(report_name) %and%
+        .sql_make(report_for) %and%
+        .sql_make(table_name) %and%
+        .sql_make(column_name) %and%
+        .sql_make(row_name)
 
     if (is.null(q)) return(view)
 
@@ -87,6 +93,7 @@ list_sql_table <- function (sql) {
 }
 # }}}
 # get_sql_report_data {{{
+#' @importFrom checkmate assert_scalar
 get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
                                  tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
@@ -334,8 +341,9 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (wide) res <- report_dt_to_wide(res, all)
 
     if (!is.null(case)) {
-        assert(is_scalar(case))
-        set(res, NULL, "case", as.character(case))
+        assert_scalar(case)
+        case_name <- as.character(case)
+        set(res, NULL, "case", case_name)
         setcolorder(res, c("case", setdiff(names(res), "case")))
     }
 
@@ -348,14 +356,15 @@ get_sql_report_data_dict <- function (sql) {
 }
 # }}}
 # get_sql_tabular_data {{{
+#' @importFrom checkmate assert_scalar
 get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   case = "auto", wide = FALSE, string_value = !wide) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
     dt <- setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
 
-    if (not_empty(case)) {
-        assert(is_scalar(case))
+    if (!is.null(case)) {
+        assert_scalar(case)
         case_name <- as.character(case)
         set(dt, NULL, "case", case_name)
         setcolorder(dt, c("case", setdiff(names(dt), "case")))
@@ -374,7 +383,7 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     }
 
     # add row index
-    dt[, row_index := seq_len(.N), by = c("case"[has_name(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
+    dt[, row_index := seq_len(.N), by = c("case"[has_names(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
 
     # remove empty rows
     dt <- dt[!J(c("", "-"), c("", "-")), on = c("row_name", "value")]
@@ -401,7 +410,7 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     cols_num <- unique(dt$column_name[dt$is_num])
 
     # format table
-    if (has_name(dt, "case")) {
+    if (has_names(dt, "case")) {
         dt <- data.table::dcast.data.table(dt,
             case + report_name + report_for + table_name + row_index + row_name ~ column_name,
             value.var = "value"
@@ -451,11 +460,13 @@ tidy_sql_name <- function (x) {
 }
 # }}}
 # report_dt_to_wide {{{
+#' @importFrom checkmate assert_names
 report_dt_to_wide <- function (dt, date_components = FALSE) {
-    assert(has_name(dt, c("datetime", "month", "day", "hour", "minute",
+    assert_names(names(dt), must.include = c(
+        "datetime", "month", "day", "hour", "minute",
         "key_value", "name", "environment_period_index", "environment_name",
         "reporting_frequency", "is_meter", "simulation_days", "day_type"
-    )))
+    ))
 
     # change detailed level frequency to "Each Call"
     dt[, Variable := reporting_frequency]
@@ -502,7 +513,7 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
             `:=`(day_type = wday(datetime, label = TRUE))
         ]
 
-        if (has_name(dt, "case")) {
+        if (has_names(dt, "case")) {
             dt <- dcast.data.table(dt, case +
                 environment_period_index + environment_name + simulation_days +
                 datetime + month + day + hour + minute +
@@ -516,7 +527,7 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
                 value.var = "value")
         }
     } else {
-        if (has_name(dt, "case")) {
+        if (has_names(dt, "case")) {
             dt <- dcast.data.table(dt, case +
                 environment_period_index + environment_name + simulation_days +
                 `Date/Time` ~ Variable,

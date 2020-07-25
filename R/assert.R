@@ -135,56 +135,6 @@ is_rdd <- function (x) checkmate::test_class(x, "RddFile")
 is_mdd <- function (x) checkmate::test_class(x, "MddFile")
 # }}}
 
-# is_range {{{
-is_range <- function (x) {
-    checkmate::test_list(x, len = 4L) && checkmate::test_class(x, "Range")
-}
-# }}}
-
-# assert_strint {{{
-check_strint <- function (x, len = NULL, min.len = NULL, max.len = NULL, names = NULL, null.ok = FALSE) {
-    chk <- checkmate::check_character(x, any.missing = FALSE, len = len, min.len = max.len, names = names, null.ok = null.ok)
-    if (isTRUE(chk)) TRUE else chk
-    num <- suppressWarnings(as.double(x))
-    chk <- checkmate::check_integerish(num, any.missing = FALSE)
-    if (isTRUE(chk)) TRUE
-    else "Must be a vector with integer-coercible format"
-}
-test_strint <- checkmate::makeTestFunction(check_strint)
-assert_strint <- function (x, len = NULL, coerce = FALSE, .var.name = checkmate::vname(x), add = NULL) {
-    res <- check_strint(x)
-    checkmate::makeAssertion(x, res, .var.name, add)
-    if (isTRUE(coerce)) storage.mode(x) <- "integer"
-    x
-}
-# }}}
-# assert_length {{{
-check_length <- function (x, len, step = NULL) {
-    if (is_range(len)) {
-        res <- if (in_range(length(x), len)) TRUE
-            else paste0("Must have length in range ", len, ", but has length ", length(x))
-    } else if (checkmate::test_count(len)){
-        if (is.null(step)) {
-            length(x) == len
-            res <- if (length(x) == len) TRUE
-            else paste0("Must have length ", len, ", but has length ", length(x))
-        } else {
-            if (!checkmate::test_count(step, positive = TRUE)) stop("'step' should be either NULL or an integer")
-            res <- if (length(x) >= len && ((length(x) - len) %% step == 0L)) TRUE
-            else paste0("Must have length of pattern '", len, " + " , step, " x N'")
-        }
-    } else if (checkmate::test_integerish(len, lower = 0L)) {
-        if (!is.null(step)) {
-            stop("'step' should not be provided when 'len' is an integer vector")
-        }
-        res <- if (length(x) %in% len) TRUE
-            else paste0("Must have length ", collapse(len, or = TRUE), ", but has length ", length(x))
-    } else {
-        stop("'len' should be either a range or an integer vector")
-    }
-}
-assert_length <- checkmate::makeAssertionFunction(check_length)
-# }}}
 # assert_same_len {{{
 check_same_len <- function (x, y) {
     if (NROW(x) == NROW(y)) TRUE else "Must have same length"
@@ -195,6 +145,7 @@ assert_same_len <- function(x, y, .var.name = paste(checkmate::vname(x), "and", 
     checkmate::makeAssertion(x, res, .var.name, add)
 }
 # }}}
+
 # in_range {{{
 in_range <- function (x, range) {
     if (range$lower_incbounds == range$upper_incbounds) {
@@ -208,90 +159,19 @@ in_range <- function (x, range) {
     }
 }
 # }}}
-# check_range {{{
-check_range <- function (x, range) {
-    res <- in_range(x, range)
-    if (all(res)) TRUE
-    else paste("Must in range", range)
-}
-# }}}
-# is_choice {{{
-is_choice <- function (x, choices) {
-    is.character(x) & stri_trans_tolower(x) %chin% stri_trans_tolower(choices)
-}
-# on_fail(is_choice) <- function (call, env) {
-#     paste0(deparse(call$x), " should be one of ", collapse(eval(call$choices, env)))
-# }
-# }}}
 
 # has_names {{{
 has_names <- function(x, names) names %chin% names(x)
 # }}}
+
 # has_ext {{{
 has_ext <- function (path, ext) tolower(tools::file_ext(path)) %chin% ext
 # }}}
-
-assert_epwdate <- function (x, len = NULL, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL) {
-    x <- assert_vector(x, len = len, null.ok = null.ok)
-    if (is.null(x)) return(x)
-    x <- epw_data(x)
-    res <- if (!checkmate::anyMissing(x)) TRUE
-    else "Must be a vector of valid EPW date specifications"
-    makeAssertion(x, res, .var.name, add)
-}
-assert_wday <- function (x, len = NULL, null.ok = FALSE, .var.name = checkmate::vname(x), add = NULL) {
-    x <- assert_vector(x, len = len, null.ok = null.ok)
-    if (is.null(x)) return(x)
-    x <- get_epw_wday(x)
-    res <- if (!checkmate::anyMissing(x)) TRUE
-    else "Must be a vector of valid EPW day of week specifications"
-    makeAssertion(x, res, .var.name, add)
-}
 
 # is_epwdate {{{
 is_epwdate <- function (x) {
     length(x) == 1L && !is.na(epw_date(x))
 }
-# }}}
-# not_epwdate_realyear {{{
-not_epwdate_realyear <- function (x, scalar = FALSE, zero = TRUE) {
-    d <- epw_date(x)
-    r <- !is.na(d) & get_epwdate_type(d) != 3L
-    if (!zero) r <- r & get_epwdate_type(d) != 0L
-    if (scalar) {
-        length(x) == 1L && all(r)
-    } else {
-        r
-    }
-}
-# on_fail(not_epwdate_realyear) <- function (call, env) {
-#     s <- eval(call$scalar, env)
-#     if (!is.null(s) && s) {
-#         paste0(deparse(call$x), " should not be EPW real-year date specification.")
-#     } else {
-#         paste0(deparse(call$x), " should not contain any EPW real-year date specification.")
-#     }
-# }
-# }}}
-# not_epwdate_weekday {{{
-not_epwdate_weekday <- function (x, scalar = FALSE, zero = TRUE) {
-    d <- epw_date(x)
-    r <- !is.na(d) & get_epwdate_type(d) != 5L
-    if (!zero) r <- r & get_epwdate_type(d) != 0L
-    if (scalar) {
-        length(x) == 1L && all(r)
-    } else {
-        r
-    }
-}
-# on_fail(not_epwdate_weekday) <- function (call, env) {
-#     s <- eval(call$scalar, env)
-#     if (!is.null(s) && s) {
-#         paste0(deparse(call$x), " is not valid EPW Julian day or Month/Day date specification.")
-#     } else {
-#         paste0(deparse(call$x), " contains invalid EPW Julian day or Month/Day date specification.")
-#     }
-# }
 # }}}
 
 # is_windows {{{

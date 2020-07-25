@@ -56,9 +56,10 @@ NULL
 #' # read the err file
 #' read_err(job$locate_output(".err"))
 #' }
+#' @importFrom checkmate assert_file
 # read_err {{{
 read_err <- function (path) {
-    assert(has_ext(path, c("err", "vcperr")))
+    checkmate::assert_file(path, extension = c("err", "vcperr"))
     parse_err_file(path)
 }
 # }}}
