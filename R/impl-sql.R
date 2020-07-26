@@ -101,6 +101,10 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
                                  environment_name = NULL) {
     # report data dictionary {{{
     rpvar_dict <- read_sql_table(sql, "ReportDataDictionary")
+    # ignore case
+    set(rpvar_dict, NULL, c("key_value_lower", "name_lower"),
+        list(stri_trans_tolower(rpvar_dict$key_value), stri_trans_tolower(rpvar_dict$name))
+    )
     subset_rpvar <- FALSE
     if (!is.null(key_value)) {
         subset_rpvar <- TRUE
@@ -108,20 +112,25 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
             assert_names(names(key_value), must.include = c("key_value", "name"))
             if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
             kv <- unique(key_value)
-            rpvar_dict <- rpvar_dict[kv, on = c("key_value", "name"), nomatch = NULL]
+            set(kv, NULL, c("key_value_lower", "name_lower"),
+                list(stri_trans_tolower(kv$key_value), stri_trans_tolower(kv$name))
+            )
+            rpvar_dict <- rpvar_dict[kv, on = c("key_value_lower", "name_lower"), nomatch = NULL]
+            set(kv, NULL, c("key_value_lower", "name_lower"), NULL)
         } else {
             assert_character(key_value, any.missing = FALSE)
-            KEY_VALUE <- key_value
-            rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value", nomatch = NULL]
+            KEY_VALUE <- stri_trans_tolower(key_value)
+            rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value_lower", nomatch = NULL]
         }
     }
 
     if (!is.null(name)) {
         subset_rpvar <- TRUE
         assert_character(name, any.missing = FALSE)
-        NAME <- name
-        rpvar_dict <- rpvar_dict[J(NAME), on = "name"]
+        NAME <- stri_trans_tolower(name)
+        rpvar_dict <- rpvar_dict[J(NAME), on = "name_lower"]
     }
+    set(rpvar_dict, NULL, c("key_value_lower", "name_lower"), NULL)
     # }}}
 
     # environment periods {{{
@@ -322,6 +331,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     }
     # }}}
 
+    browser()
     res <- time[rp_data, on = "time_index", nomatch = NULL][rpvar_dict, on = "report_data_dictionary_index", nomatch = NULL]
     cols <- c("datetime", "month", "day", "hour", "minute", "dst",
         "interval", "simulation_days", "day_type", "environment_name",
