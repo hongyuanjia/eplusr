@@ -2380,7 +2380,7 @@ test_that("Save", {
     )
     expect_silent(
         save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
-            file.path(tempdir(), tempfile(), basename(tempfile(fileext = ".idf"))), format = "new_top"
+            file.path(tempdir(), basename(tempfile()), basename(tempfile(fileext = ".idf"))), format = "new_top"
         )
     )
     expect_silent(
@@ -2410,19 +2410,22 @@ test_that("resolve external link", {
     l <- add_idf_object(idd_env, idf_env, l$object, l$value)
 
     # can give warnings if links are broken
-    expect_warning(flg <- resolve_idf_external_link(idd_env, l, example(), tempfile(fileext = ".idf")), "Broken")
+    dir <- tempfile()
+    dir.create(dir, FALSE)
+    path <- file.path(dir, "test.idf")
+    expect_warning(flg <- resolve_idf_external_link(idd_env, l, path, tempfile(fileext = ".idf")), "Broken")
     expect_false(flg)
 
     # can keep the original link if copy is not required
     writeLines(",\n", f)
-    expect_false(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), example(), copy = FALSE))
+    expect_is(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), path, copy = FALSE), "logical")
     expect_equal(l$value[field_id == 7074, normalizePath(value_chr)], normalizePath(f))
 
-    expect_true(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), example(), copy = TRUE))
-    expect_true(file.exists(file.path(dirname(example()), basename(f))))
-    expect_equal(l$value[field_id == 7074, normalizePath(value_chr, mustWork = FALSE)], basename(f))
+    expect_true(resolve_idf_external_link(idd_env, l, tempfile(fileext = ".idf"), path, copy = TRUE))
+    expect_true(file.exists(file.path(dir, basename(f))))
+    expect_equal(l$value[field_id == 7074, value_chr], basename(f))
 
-    unlink(file.path(dirname(example()), basename(f)), force = TRUE)
+    unlink(file.path(dir, basename(f)), force = TRUE)
 })
 # }}}
 

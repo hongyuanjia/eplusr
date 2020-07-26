@@ -1368,9 +1368,8 @@ test_that("Transition v8.9 --> v9.0", {
             "GlazedDoor" = list("GD"),
             "RunPeriod:CustomRange" = list("RP1", 1, 1, 2020, 1, 2, 2020, "UseWeatherFile"),
             "RunPeriod" = list("RP2", 1, 1, 1, 2, "UseWeatherFile", ..12 = 3, ..14 = 2020),
-            "RunPeriod" = list("RP3", 1, 1, 1, 2, "UseWeatherFile", ..12 = 3),
-            "RunPeriod" = list("RP4", 1, 1, 1, 2, "Monday", ..12 = 2),
-            "RunPeriod" = list("RP5", 1, 1, 1, 2, "Sunday", ..12 = 2),
+            "RunPeriod" = list("RP3", 1, 1, 1, 2, "Monday", ..12 = 2),
+            "RunPeriod" = list("RP4", 1, 1, 1, 2, "Sunday", ..12 = 2),
             "Table:OneIndependentVariable" = list("Table", "Exponent"),
             "WindowMaterial:ComplexShade" = list("Mat", "Venetian"),
             "FenestrationSurface:Detailed" = list("Fene", "Window", "ConstNoShade", "Surf", ..7 = "Ctrl"),
@@ -1384,7 +1383,7 @@ test_that("Transition v8.9 --> v9.0", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
+    expect_is(idfVU <- version_updater(idfOri, to, dir = "C:/Users/hongy/Desktop/"), "Idf")
     expect_warning(idfTR <- transition(idfOri, to), "UseWeatherFile")
 
     expect_equal(
@@ -1427,10 +1426,6 @@ test_that("Transition v8.9 --> v9.0", {
     expect_equal(
         idfVU$"RunPeriod"$RP4$value(1:13),
         idfTR$"RunPeriod"$RP4$value()
-    )
-    expect_equal(
-        idfVU$"RunPeriod"$RP5$value(1:13),
-        idfTR$"RunPeriod"$RP5$value()
     )
 
     expect_equal(

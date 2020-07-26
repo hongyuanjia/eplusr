@@ -3908,6 +3908,10 @@ read_idfeditor_copy <- function (idd_env, idf_env, version = NULL, in_ip = FALSE
         text <- paste0("!-Option SortedOrder ViewInIPunits\n", text)
     }
 
+    if (is.null(version)) {
+        version <- get_idf_value(idd_env, idf_env, "Version")$value_chr
+    }
+
     # ignore the warning of using given IDD
     parsed <- withCallingHandlers(parse_idf_file(text, idd = version, ref = FALSE),
         eplusr_warning = function (w) invokeRestart("muffleWarning")
