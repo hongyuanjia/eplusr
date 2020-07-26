@@ -428,6 +428,8 @@ test_that("Data Setter", {
 
 # CLONE {{{
 test_that("$clone()", {
+    skip_on_cran()
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
     expect_is(epw1 <- read_epw(path_epw), "Epw")
 

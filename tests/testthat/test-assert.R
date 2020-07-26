@@ -32,7 +32,7 @@ test_that("Assertion functions", {
     })
 
     expect_false(is_idd(1))
-    expect_true(is_idd(use_idd(8.8)))
+    expect_true(is_idd(use_idd(8.8, download = "auto")))
 
     expect_false(is_idf(1))
     expect_true(is_idf(read_idf(example())))
