@@ -1247,9 +1247,9 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_false({capture.output(with_option(list(autocomplete = TRUE), print(idf))); "SimulationControl" %in% names(idf)})
 
     # can insert unique-object class
-    expect_silent(idf$SimulationControl <- tbl)
+    expect_silent(with_option(list(autocomplete = TRUE), idf$SimulationControl <- tbl))
     expect_true(idf$is_valid_class("SimulationControl"))
-    expect_silent(idf$SimulationControl <- str)
+    expect_silent(with_option(list(autocomplete = TRUE), idf$SimulationControl <- str))
     expect_true("SimulationControl" %in% names(idf))
     # }}}
 
