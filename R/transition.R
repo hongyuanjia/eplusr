@@ -2985,7 +2985,6 @@ trans_preprocess <- function (idf, version, class = NULL) {
                     "required_field", "src_enum", "type_enum"
                 )
             )
-            set(val, NULL, "defaulted", TRUE)
             # assign default values
             val <- assign_idf_value_default(priv$idd_env(), priv$idf_env(), val)
 
@@ -2998,7 +2997,14 @@ trans_preprocess <- function (idf, version, class = NULL) {
             # merge data
             idf_env <- priv$idf_env()
             idf_env$value <- append_dt(idf_env$value, val, "value_id")
-            idf_env$reference <- without_checking(update_value_reference(priv$idd_env(), priv$idf_env(), obj, val))
+
+            # add necessary columns used for getting references
+            add_field_property(idd_env, idf_env$value, "src_enum")
+            add_joined_cols(idf_env$object, idf_env$value, "object_id", "class_id")
+            add_class_name(idd_env, idf_env$value)
+            ref <- get_value_reference_map(idd_env, idf_env$value, idf_env$value)
+            set(idf_env$value, NULL, c("src_enum", "class_id", "class_name"), NULL)
+            idf_env$reference <- ref
         }
     }
 
