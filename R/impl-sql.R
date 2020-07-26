@@ -331,7 +331,6 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     }
     # }}}
 
-    browser()
     res <- time[rp_data, on = "time_index", nomatch = NULL][rpvar_dict, on = "report_data_dictionary_index", nomatch = NULL]
     cols <- c("datetime", "month", "day", "hour", "minute", "dst",
         "interval", "simulation_days", "day_type", "environment_name",
