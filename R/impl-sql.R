@@ -146,6 +146,14 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     set(time, NULL, c("warmup_flag", "interval_type"), NULL)
     setnames(time, toupper(names(time)))
     subset_time <- FALSE
+    # store day of week for the first simulation day
+    if (is.null(year) && !"year" %chin% names(time)) {
+        # get wday of first simulation day per environment
+        w <- time[SIMULATION_DAYS == 1L & !is.na(DAY_TYPE), .SD[1L],
+            .SDcols = c("MONTH", "DAY", "DAY_TYPE", "ENVIRONMENT_PERIOD_INDEX"),
+            by = "ENVIRONMENT_PERIOD_INDEX"
+        ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "DAY_TYPE"]
+    }
     if (!is.null(month)) {
         subset_time <- TRUE
         assert_integerish(month, lower = 1L, upper = 12L, any.missing = FALSE)
@@ -236,11 +244,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         if ("year" %in% names(time)) {
             time[J(0L), on = "year", year := NA_integer_]
         } else {
-            # get wday of first simulation day per environment
-            w <- time[simulation_days == 1L & !is.na(day_type), .SD[1L],
-                .SDcols = c("month", "day", "day_type", "environment_period_index"),
-                by = "environment_period_index"
-            ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
+            setnames(w, tolower(names(w)))
 
             # in case there is no valid day type
             if (!nrow(w)) {
