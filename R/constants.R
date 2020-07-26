@@ -59,8 +59,8 @@ MACRO_DICT <-
 `.` <- `..` <- `.GRP` <- `.I` <- `.N` <- `.SD` <- `.BY` <- `.EACHI` <- J <- N <- V1 <- V2 <- NULL
 
 utils::globalVariables(c(
-    "Date/Time", "Variable", "acceptable_num", "all_name_lower", "alpha",
-    "annual", "autocalculatable", "autosizable", "azimuth_angle",
+    "..", "J", "Date/Time", "Variable", "acceptable_num", "all_name_lower",
+    "alpha", "annual", "autocalculatable", "autosizable", "azimuth_angle",
     "begin_extensible", "boundary_lower", "can_be_na", "check", "check_lower",
     "check_upper", "choice", "class_id", "class_name", "color", "color_int",
     "construction_name", "country", "data", "datetime", "day", "day_type",

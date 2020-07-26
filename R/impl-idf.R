@@ -1605,7 +1605,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 }
 
                 # exclude empty value input
-                cls_val <- cls_val[rleid %in% cls_in$rleid[cls_in$is_empty]]
+                cls_val <- cls_val[!rleid %in% cls_in$rleid[cls_in$is_empty]]
             }
 
             if (!nrow(cls_val)) {
@@ -2637,13 +2637,9 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     dt_id <- fast_subset(val, c("object_id", "value_id", "new_value_id"))
     setnames(dt_id, "object_id", "new_object_id")
     ref <- idf_env$reference[dt_id, on = "value_id", nomatch = 0L]
-
-    # update ids in ref
-    if (nrow(ref)) {
-        set(ref, NULL, c("object_id", "value_id"), NULL)
-        setnames(ref, c("new_object_id", "new_value_id"), c("object_id", "value_id"))
-        setcolorder(ref, names(idf_env$reference))
-    }
+    set(ref, NULL, c("object_id", "value_id"), NULL)
+    setnames(ref, c("new_object_id", "new_value_id"), c("object_id", "value_id"))
+    setcolorder(ref, names(idf_env$reference))
 
     # remove original ids
     set(val, NULL, "value_id", NULL)

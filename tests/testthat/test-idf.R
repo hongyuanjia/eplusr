@@ -1129,7 +1129,7 @@ test_that("add_idd_class_bindings", {
     expect_is(with_option(list(autocomplete = TRUE), idf <- read_idf(example())), "Idf")
     expect_true(all(idf$class_name() %in% ls(idf)))
 
-    expect_null(without_checking(idf$Timestep <- NULL))
+    expect_null(without_checking(with_option(list(autocomplete = TRUE), idf$Timestep <- NULL)))
     expect_output(with_option(list(autocomplete = TRUE), print(idf)))
     expect_false("Timestep" %in% ls(idf))
 })
