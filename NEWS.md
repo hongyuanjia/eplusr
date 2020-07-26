@@ -2,6 +2,17 @@
 
 ## New features
 
+* `Idf$add()` and `Idf$set()` have new features:
+
+  ```r
+  # refer to field using '..'
+  idf$add(Material = list(..1 = "mat", ..7 = 0.95))
+  idf$set(mat = list(..6 = 0.5))
+
+  # using vector field values
+  idf$add(Material := list(..1 = sprintf("mat%i", 1:10)))
+  idf$set(c(sprintf("mat%i", 1:10)) := list(..6 = runif(10)))
+  ```
 * `Idf$to_table()` gains a new parameter `force`. The default value is `FALSE`. If
   `TRUE`, you can convert object data from any classes into a wide data.table.
   This may be useful when you know that target classes have the exact same
@@ -112,19 +123,12 @@
     value of field `Component 1 Object Type` is `Coil:Heating:Water`, all
     objects in `Coil:Heating:Water` will be treated as referenced by that
     field. This is the most aggressive option.
-* `read_epw()` will proceed parsing if type error occurs for non-important
-  headers, including `LOCATION`, `DESIGN CONDITIONS`, `TYPICAL/EXTREME PERIODS`
-  and `GROUND TEMPERATURES` (#236). These headers are not directly used in any
-  other method of `Epw` class. Some EPWs from sources other than energyplus.net
-  sometimes fail to give all valid values for those headers. Now `read_epw()`
-  will return all failed-to-parse values as `NA`s. All parsing warnings can be
-  shown by setting `warning` in `read_epw()` to `TRUE`. For `HOLIDAYS/DAYLIGHT
-  SAVINGS` and `DATA PERIODS`, `read_epw()` will still give an error if any
-  parsing errors are found. This is because the values of those 2 headers are
-  used to parsing the actual weather data.
+* `read_epw()` will proceed parsing for non-standard EPW header format (#236).
 * Now `EplusSql$report_data()` will set the year values of day type
   `SummerDesignDay` and `WinterDesignDay` to current year and the `day_type`
   value will be left unchanged (#258).
+* Now `read_idf()` will always make sure all necessary fields are added during
+  parsing (#267).
 
 ## Minor changes
 
@@ -136,6 +140,8 @@
   simulations
 * `format.Idd()` now returns a single line string in format
   `<EnergyPlus IDD v[Version] (Build) with X classes`.
+* The column `datasource` returned in `Epw$data()` has been renamed to
+  `data_source`.
 
 ## Bug fixes
 
