@@ -423,8 +423,8 @@ make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
 
     # sep objects with/without name attr
     can_nm <- dt_object$has_name
-    dt_obj_nm <- .Call(data.table:::CsubsetDT, dt_object, which(can_nm), seq_along(dt_object))
-    dt_obj_no <- .Call(data.table:::CsubsetDT, dt_object, which(!can_nm), seq_along(dt_object))
+    dt_obj_nm <- dt_object[which(can_nm)]
+    dt_obj_no <- dt_object[which(!can_nm)]
 
     # stop if trying to assign names to objects that do not have name attribute
     if (any(!is.na(dt_obj_no$new_object_name))) {
@@ -446,8 +446,8 @@ make_idf_object_name <- function (idd_env, idf_env, dt_object, use_old = TRUE,
 
     # auto-generate object names if necessary
     autoname <- is.na(dt_obj_nm$new_object_name)
-    dt_obj_nm_auto <- .Call(data.table:::CsubsetDT, dt_obj_nm, which(autoname), seq_along(dt_obj_nm))
-    dt_obj_nm_input <- .Call(data.table:::CsubsetDT, dt_obj_nm, which(!autoname), seq_along(dt_obj_nm))
+    dt_obj_nm_auto <- dt_obj_nm[which(autoname)]
+    dt_obj_nm_input <- dt_obj_nm[which(!autoname)]
 
     # check if input new names are the same as existing ones
     if (nrow(invld <- dt_all[dt_obj_nm_input, on = c("class_id", object_name_lower = "new_object_name_lower"), nomatch = 0L])) {
@@ -968,7 +968,7 @@ expand_idf_dots_name <- function (idd_env, idf_env, ..., .keep_name = TRUE, .pro
 }
 # }}}
 # parse_dots_value {{{
-#' @inheritParams expand_idf_dots_value
+#' @inherit expand_idf_dots_value
 #' @export
 parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                               .ref_assign = TRUE, .unique = FALSE,
@@ -1543,8 +1543,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
             obj_val <- val
         } else {
             # separate class input and object input
-            cls <- .Call(data.table:::CsubsetDT, obj, which(obj$lhs_sgl), seq_along(obj))
-            obj <- .Call(data.table:::CsubsetDT, obj, which(!obj$lhs_sgl), seq_along(obj))
+            cls <- obj[lhs_sgl == TRUE]
+            obj <- obj[lhs_sgl == FALSE]
 
             # match class name
             cls_in <- cls[, list(class_name = name[[1L]], is_empty = is_empty[[1L]], rhs_sgl = rhs_sgl[[1L]], num = .N), by = "rleid"]
@@ -1573,8 +1573,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
             }
 
             # separate class value input and object value input
-            cls_val <- .Call(data.table:::CsubsetDT, val, which(val$rleid %in% cls_in$rleid), seq_along(val))
-            obj_val <- .Call(data.table:::CsubsetDT, val, which(!val$rleid %in% cls_in$rleid), seq_along(val))
+            cls_val <- val[rleid %in% cls_in$rleid]
+            obj_val <- val[!rleid %in% cls_in$rleid]
 
             # extract values for empty input
             # empty here means to extract all objects in that class
@@ -1585,8 +1585,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 cls_obj_emp <- data.table()
                 cls_val_emp <- data.table()
             } else {
-                cls_obj_emp <- .Call(data.table:::CsubsetDT, cls_obj, which(cls_obj$rleid %in% cls_in$rleid[cls_in$is_empty]), seq_along(cls_obj))
-                cls_obj <- .Call(data.table:::CsubsetDT, cls_obj, which(!cls_obj$rleid %in% cls_in$rleid[cls_in$is_empty]), seq_along(cls_obj))
+                cls_obj_emp <- cls_obj[rleid %in% cls_in$rleid[cls_in$is_empty]]
+                cls_obj <- cls_obj[!rleid %in% cls_in$rleid[cls_in$is_empty]]
 
                 cls_val_emp <- get_idf_value(idd_env, idf_env, cls_in$class_id[cls_in$is_empty],
                     complete = .complete, all = .all
@@ -1605,7 +1605,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 }
 
                 # exclude empty value input
-                cls_val <- .Call(data.table:::CsubsetDT, cls_val, which(!cls_val$rleid %in% cls_in$rleid[cls_in$is_empty]), seq_along(cls_val))
+                cls_val <- cls_val[rleid %in% cls_in$rleid[cls_in$is_empty]]
             }
 
             if (!nrow(cls_val)) {
@@ -1767,8 +1767,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 obj_emp <- data.table()
                 val_emp <- data.table()
             } else {
-                obj_emp <- .Call(data.table:::CsubsetDT, obj, which(obj$rleid %in% obj$rleid[obj$is_empty]), seq_along(obj))
-                obj <- .Call(data.table:::CsubsetDT, obj, which(!obj$rleid %in% obj$rleid[obj$is_empty]), seq_along(obj))
+                obj_emp <- obj[rleid %in% obj$rleid[obj$is_empty]]
+                obj <- obj[!rleid %in% obj$rleid[obj$is_empty]]
 
                 set(obj_emp, NULL, c("is_empty", "each_rleid"), NULL)
 
@@ -1789,7 +1789,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 }
 
                 # exclude empty value input
-                obj_val <- .Call(data.table:::CsubsetDT, obj_val, which(obj_val$rleid %in% obj$rleid), seq_along(obj_val))
+                obj_val <- obj_val[rleid %in% obj$rleid]
             }
 
             if (!nrow(obj_val)) {
@@ -2642,6 +2642,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     if (nrow(ref)) {
         set(ref, NULL, c("object_id", "value_id"), NULL)
         setnames(ref, c("new_object_id", "new_value_id"), c("object_id", "value_id"))
+        setcolorder(ref, names(idf_env$reference))
     }
 
     # remove original ids
@@ -2787,7 +2788,7 @@ add_idf_object <- function (idd_env, idf_env, dt_object, dt_value,
         if (!length(k)) {
             ref <- idf_env$reference[0L]
         } else {
-            ref <- .Call(data.table:::CsubsetDT, idf_env$reference, k, seq_along(idf_env$reference))
+            ref <- idf_env$reference[k]
             # remove from the original IDF reference table
             idf_env$reference <- idf_env$reference[-k]
         }

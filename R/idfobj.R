@@ -1916,7 +1916,7 @@ format.IdfObject <- function (x, comment = TRUE, leading = 4L, sep_at = 29L, all
 #'
 #' Coerce an [IdfObject] into a character vector in the same way as in IDF Editor.
 #'
-#' @inheritParams format.IddObject
+#' @inherit format.IdfObject
 #' @return A character vector.
 #' @examples
 #' \dontrun{

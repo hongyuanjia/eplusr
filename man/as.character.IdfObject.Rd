@@ -7,7 +7,17 @@
 \method{as.character}{IdfObject}(x, comment = TRUE, leading = 4L, sep_at = 29L, all = FALSE, ...)
 }
 \arguments{
-\item{x}{An \link{IddObject} object.}
+\item{x}{An \link{IdfObject} object.}
+
+\item{comment}{If \code{FALSE}, all comments will not be included. Default: \code{TRUE}.}
+
+\item{leading}{Leading spaces added to each field. Default: \code{4L}.}
+
+\item{sep_at}{The character width to separate value string and field string.
+Default: \code{29L} which is the same as IDF Editor.}
+
+\item{all}{If \code{TRUE}, values of all possible fields in current class the
+\link{IdfObject} belongs to are returned. Default: \code{FALSE}}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

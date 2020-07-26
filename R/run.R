@@ -389,7 +389,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
         # always echo in order to catch standard output and error
         options$echo <- TRUE
         callr::r_bg(function (jobs, options) {
-            eplusr:::run_parallel_jobs(jobs, options)
+            utils::getFromNamespace("run_parallel_jobs", "eplusr")(jobs, options)
         }, args = list(jobs = jobs, options = options))
     }
 }

@@ -328,7 +328,7 @@ clean_idd_lines <- function (dt) {
 
     # remove empty lines
     i <- which(!stri_isempty(dt[["string"]]))
-    if (length(i)) dt <- .Call(data.table:::CsubsetDT, dt, i, seq_along(dt))
+    if (length(i)) dt <- dt[i]
 
     dt
 }

@@ -23,7 +23,7 @@ Imports:
     checkmate,
     cli (>= 1.1.0),
     crayon,
-    data.table (>= 1.12.4),
+    data.table (>= 1.13.0),
     lubridate,
     methods,
     processx (>= 3.2.0),
