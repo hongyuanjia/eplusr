@@ -296,7 +296,7 @@ test_that("Data Tagger", {
             rad <- epw$data()$direct_normal_radiation
         }
     )
-    expect_equal(units(rad)$numerator, c("W", "h"))
+    expect_true(all(units(rad)$numerator %in% c("W", "h")))
     expect_equal(units(rad)$denominator, c("m", "m"))
     expect_message(with_option(list(verbose_info = TRUE), epw$add_unit()), "already")
 
