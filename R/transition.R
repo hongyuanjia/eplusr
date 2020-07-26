@@ -2995,6 +2995,7 @@ trans_preprocess <- function (idf, version, class = NULL) {
             set(val, NULL, "value_id", new_id(priv$idf_env()$value, "value_id", nrow(val)))
 
             # merge data
+            idd_env <- priv$idd_env()
             idf_env <- priv$idf_env()
             idf_env$value <- append_dt(idf_env$value, val, "value_id")
 

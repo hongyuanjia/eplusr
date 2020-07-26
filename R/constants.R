@@ -115,7 +115,7 @@ utils::globalVariables(c(
     "update_value_reference", "upper_incbounds", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "value_type",
     "variable", "weather", "wind_exposure", "wind_exposure_lower", "wmo_number",
-    "x", "y", "z", "zone_name"
+    "x", "y", "z", "zone_name", "DAY_TYPE", "SIMULATION_DAYS"
 ))
 # }}}
 # nocov end
