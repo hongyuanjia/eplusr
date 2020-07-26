@@ -756,7 +756,9 @@ format_field_by_parent <- function (dt, col = "value", sep_at = 15L, required = 
 format_objects <- function (dt, component = c("group", "class", "object", "field", "value"),
                             brief = TRUE, merge = TRUE, sep_at = 15L, nest = TRUE,
                             order = FALSE, required = FALSE) {
-    assert_subset(component, c("group", "class", "object", "field", "value"), FALSE)
+    choices <- c("group", "class", "object", "field", "value")
+    assert_subset(component, choices, FALSE)
+    component <- choices[choices %in% component]
 
     # create each component {{{
     if ("group" %chin% component) {

@@ -2989,7 +2989,7 @@ idf_return_matched <- function (self, private, matched, object_id) {
 
     res <- apply2(matched$object_id, matched$class_id, IdfObject$new, list(parent = self))
     res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", matched$object_name)
+    setattr(res, "names", matched$object_name)[]
 }
 # }}}
 # idf_update_idf_env {{{
@@ -3291,7 +3291,7 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
                       overwrite = FALSE, copy_external = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
-            abort("The Idf object is not created from local file. Please give the path to save.")
+            abort("The Idf object is not created from local file. Please give the path to save.", "idf_not_local")
         } else {
             path <- private$m_path
         }
@@ -3466,14 +3466,14 @@ idf_add_output_sqlite <- function (idf) {
         type <- toupper(sql$value()[[1]])
         if (type != "SIMPLEANDTABULAR") {
             sql$set("SimpleAndTabular")
-            verbose_info("Setting `Option Type` in ",
-                "`Output:SQLite` to from ", surround(type), " to `SimpleAndTabular`.")
+            verbose_info("Setting 'Option Type' in ",
+                "'Output:SQLite' to from ", surround(type), " to 'SimpleAndTabular'.")
             added <- TRUE
         }
     } else {
         idf$add(Output_SQLite = list("SimpleAndTabular"))
-        verbose_info("Adding an object in class `Output:SQLite` and setting its ",
-            "`Option Type` to `SimpleAndTabular` in order to create SQLite output file.")
+        verbose_info("Adding an object in class 'Output:SQLite' and setting its ",
+            "'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.")
         added <- TRUE
     }
     added

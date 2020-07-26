@@ -102,7 +102,7 @@ transition <- function (idf, ver, keep_all = FALSE, save = FALSE, dir = NULL) {
 
     # check if original file exists
     if (is.null(idf$path())) {
-        abort("The Idf object is not created from local file. Please save Idf using '$save()' before transition.")
+        abort("The Idf object is not created from local file. Please save Idf using '$save()' before transition.", "idf_not_local")
     }
 
     if (is.null(dir)) {
@@ -3545,7 +3545,7 @@ version_updater <- function (idf, ver, dir = NULL, keep_all = FALSE) {
     if (is.null(idf$path()) || !utils::file_test("-f", idf$path())) {
         abort(paste0("The Idf object is not created from local file or local file has ",
                 "been deleted from disk. Please save Idf using '$save()' before transition."
-        ))
+        ), "idf_not_local")
     }
 
     # stop if unsaved

@@ -267,6 +267,11 @@ test_that("$validate()", {
             value_num = rep(NA_real_, 3L)
         )
     )
+
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
+    idf$dup(c(my_roof = "ROOF-1", "ROOF-1", "WALL-1"))
+    expect_equal(nrow(idf$validate()$invalid_reference), 0L)
 })
 # }}}
 
@@ -604,7 +609,7 @@ test_that("add_idfobj_field_bindings()", {
     expect_is(idf <- read_idf(text("idf", 8.8), use_idd(8.8, "auto")), "Idf")
 
     expect_is(ver <- with_option(list(autocomplete = FALSE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
-    expect_false("Version Identifier" %in% ls(obj))
+    expect_false("Version Identifier" %in% ls(ver))
 
     expect_is(ver <- with_option(list(autocomplete = TRUE), add_idfobj_field_bindings(IdfObject$new(5, parent = idf))), "IdfObject")
     expect_true("Version Identifier" %in% ls(ver))

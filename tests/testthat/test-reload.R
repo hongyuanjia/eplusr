@@ -61,13 +61,8 @@ test_that("Reload", {
         expect_true(data.table::truelength(get_priv_env(idf)$idf_env()$reference) > 0L)
     }
 
-    expect_true(data.table::truelength(get_priv_env(epw)$m_header$typical) > 0L)
-    expect_true(data.table::truelength(get_priv_env(epw)$m_header$ground) > 0L)
-    expect_true(data.table::truelength(get_priv_env(epw)$m_header$holiday$holiday) > 0L)
-    expect_true(data.table::truelength(get_priv_env(epw)$m_header$period$period) > 0L)
-    expect_true(data.table::truelength(get_priv_env(epw)$m_data) > 0L)
-
     expect_idf_reloaded(idf)
+    expect_idf_reloaded(epw)
     expect_idf_reloaded(get_priv_env(job)$m_idf)
     expect_idf_reloaded(get_priv_env(par)$m_seed)
     lapply(get_priv_env(grp)$m_idfs, expect_idf_reloaded)

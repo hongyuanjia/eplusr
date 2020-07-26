@@ -315,6 +315,7 @@ Hongyuan Jia
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{Idd} object
 \subsection{Usage}{
@@ -359,6 +360,7 @@ idd <- use_idd(8.8, download = "auto")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-version"></a>}}
+\if{latex}{\out{\hypertarget{method-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of current \code{Idd}
 \subsection{Usage}{
@@ -390,6 +392,7 @@ idd$version()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-build"></a>}}
+\if{latex}{\out{\hypertarget{method-build}{}}}
 \subsection{Method \code{build()}}{
 Get the build tag of current \code{Idd}
 \subsection{Usage}{
@@ -419,6 +422,7 @@ idd$build()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-group_name"></a>}}
+\if{latex}{\out{\hypertarget{method-group_name}{}}}
 \subsection{Method \code{group_name()}}{
 Get names of groups
 \subsection{Usage}{
@@ -447,6 +451,7 @@ idd$group_name()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-from_group"></a>}}
+\if{latex}{\out{\hypertarget{method-from_group}{}}}
 \subsection{Method \code{from_group()}}{
 Get the name of group that specified class belongs to
 \subsection{Usage}{
@@ -483,6 +488,7 @@ idd$from_group(c("Version", "Schedule:Compact"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-class_name}{}}}
 \subsection{Method \code{class_name()}}{
 Get names of classes
 \subsection{Usage}{
@@ -528,6 +534,7 @@ idd$class_name(by_group = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-required_class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-required_class_name}{}}}
 \subsection{Method \code{required_class_name()}}{
 Get the names of required classes
 \subsection{Usage}{
@@ -557,6 +564,7 @@ idd$required_class_name()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-unique_class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-unique_class_name}{}}}
 \subsection{Method \code{unique_class_name()}}{
 Get the names of unique-object classes
 \subsection{Usage}{
@@ -586,6 +594,7 @@ idd$unique_class_name()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-extensible_class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-extensible_class_name}{}}}
 \subsection{Method \code{extensible_class_name()}}{
 Get the names of classes with extensible fields
 \subsection{Usage}{
@@ -616,6 +625,7 @@ idd$extensible_class_name()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-group_index"></a>}}
+\if{latex}{\out{\hypertarget{method-group_index}{}}}
 \subsection{Method \code{group_index()}}{
 Get the indices of specified groups
 \subsection{Usage}{
@@ -652,6 +662,7 @@ idd$group_index()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-class_index"></a>}}
+\if{latex}{\out{\hypertarget{method-class_index}{}}}
 \subsection{Method \code{class_index()}}{
 Get the indices of specified classes
 \subsection{Usage}{
@@ -691,6 +702,7 @@ idd$class_index()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_group"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_group}{}}}
 \subsection{Method \code{is_valid_group()}}{
 Check if elements in input character vector are valid group names.
 \subsection{Usage}{
@@ -731,6 +743,7 @@ idd$is_valid_group(c("Schedules", "Compliance Objects"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_class"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_class}{}}}
 \subsection{Method \code{is_valid_class()}}{
 Check if elements in input character vector are valid class names.
 \subsection{Usage}{
@@ -771,6 +784,7 @@ idd$is_valid_class(c("Building", "ShadowCalculation"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object"></a>}}
+\if{latex}{\out{\hypertarget{method-object}{}}}
 \subsection{Method \code{object()}}{
 Extract an \link{IddObject} object using class index or name.
 \subsection{Usage}{
@@ -815,6 +829,7 @@ idd$object("Building")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects"></a>}}
+\if{latex}{\out{\hypertarget{method-objects}{}}}
 \subsection{Method \code{objects()}}{
 Extract multiple \link{IddObject} objects using class indices or names.
 \subsection{Usage}{
@@ -859,6 +874,7 @@ idd$objects(c("Version", "Material"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-object_relation}{}}}
 \subsection{Method \code{object_relation()}}{
 Extract the relationship between class fields.
 \subsection{Usage}{
@@ -952,6 +968,7 @@ idd$object_relation("Construction", "ref_by")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects_in_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-objects_in_relation}{}}}
 \subsection{Method \code{objects_in_relation()}}{
 Extract multiple \link{IddObject} objects referencing each others.
 \subsection{Usage}{
@@ -1030,6 +1047,7 @@ idd$objects_in_relation("Construction", "ref_by")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects_in_group"></a>}}
+\if{latex}{\out{\hypertarget{method-objects_in_group}{}}}
 \subsection{Method \code{objects_in_group()}}{
 Extract all \link{IddObject} objects in one group.
 \subsection{Usage}{
@@ -1067,6 +1085,7 @@ idd$objects_in_group("Schedules")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-to_table"></a>}}
+\if{latex}{\out{\hypertarget{method-to_table}{}}}
 \subsection{Method \code{to_table()}}{
 Format \code{Idd} classes as a data.frame
 \subsection{Usage}{
@@ -1115,6 +1134,7 @@ idd$to_table(c("Construction", "Material"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-to_string"></a>}}
+\if{latex}{\out{\hypertarget{method-to_string}{}}}
 \subsection{Method \code{to_string()}}{
 Format \code{Idf} classes as a character vector
 \subsection{Usage}{
@@ -1169,6 +1189,7 @@ idd$to_string(c("Material", "Construction"), leading = 0, sep_at = 0, sep_each =
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{Idd} object
 \subsection{Usage}{

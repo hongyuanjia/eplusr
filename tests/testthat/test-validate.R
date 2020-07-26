@@ -134,8 +134,8 @@ test_that("Validate method", {
     invisible(env_in$value[J(c(1L, 10L, 15L)), on = "value_id", value_chr := NA_character_])
 
     expect_silent({mis <- check_missing_value(idd_env, idf_env, env_in)$validity$missing_value})
-    expect_equal(mis$object_id, 1:3)
-    expect_equal(mis$value_id, c(1L, 10L, 15L))
+    expect_equal(mis$object_id, c(1:3, 4, 4))
+    expect_equal(mis$value_id, c(1L, 10L, 15L, 45L, 46L))
     # }}}
 
     # INVALID AUTOSIZE {{{
@@ -191,8 +191,8 @@ test_that("Validate method", {
     invisible(env_in$value[object_id == 1L & type_enum <= IDDFIELD_TYPE$real, `:=`(value_num = NA_real_)])
 
     expect_silent({num <- check_invalid_numeric(idd_env, idf_env, env_in)$validity$invalid_numeric})
-    expect_equal(num$object_id, c(rep(1L, 7), rep(3L, 3)))
-    expect_equal(num$value_id, c(3:9, 37:39))
+    expect_equal(num$object_id, c(rep(1L, 7), rep(3L, 3), rep(4L, 2)))
+    expect_equal(num$value_id, c(3:9, 37:39, 45:46))
     # }}}
 
     # INVALID INTEGER {{{

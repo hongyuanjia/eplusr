@@ -16,16 +16,16 @@ test_that("Rdd", {
     expect_equal(attr(mdd, "eplus_version"), idf$version())
 
     expect_error(rdd_to_load(rdd, reporting_frequency = "hour"),
-        class = "error_invalid_reporting_frequency"
+        class = "eplusr_error"
     )
     expect_error(mdd_to_load(mdd, reporting_frequency = "hour"),
-        class = "error_invalid_reporting_frequency"
+        class = "eplusr_error"
     )
     expect_error(rdd_to_load(rdd[1:2][, reporting_frequency := c(1, 2)]),
-        class = "error_invalid_reporting_frequency"
+        class = "eplusr_error"
     )
     expect_error(mdd_to_load(mdd[1:2][, reporting_frequency := c(1, 2)]),
-        class = "error_invalid_reporting_frequency"
+        class = "eplusr_error"
     )
     expect_error(mdd_to_load(mdd, class = ""))
 

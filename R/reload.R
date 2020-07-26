@@ -56,7 +56,7 @@ reload.default <- function (x, ...) {
 reload.Idf <- function (x, ...) {
     reload_idd_env(get_priv_env(x)$idd_env())
     reload_idf_env(get_priv_env(x)$idf_env())
-    reload_log_env(get_priv_env(x)$log_env())
+    reload_log_env(get_priv_env(x)$m_log)
     x
 }
 
@@ -75,10 +75,9 @@ reload.IddObject <- function (x, ...) {
 #' @export
 reload.Epw <- function (x, ...) {
     priv <- get_priv_env(x)
-    priv$m_header$typical <- setDT(priv$m_header$typical)
-    priv$m_header$ground <- setDT(priv$m_header$ground)
-    priv$m_header$holiday$holiday <- setDT(priv$m_header$holiday$holiday)
-    priv$m_header$period$period <- setDT(priv$m_header$period$period)
+    reload_idd_env(priv$idd_env())
+    reload_idf_env(priv$idf_env())
+    reload_log_env(priv$m_log)
     priv$m_data <- setDT(priv$m_data)
     x
 }

@@ -297,6 +297,7 @@ Hongyuan Jia
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{EplusJob} object
 \subsection{Usage}{
@@ -334,6 +335,7 @@ An \code{EplusJob} object.
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-version"></a>}}
+\if{latex}{\out{\hypertarget{method-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of IDF in current job
 \subsection{Usage}{
@@ -361,6 +363,7 @@ job$version()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-path"></a>}}
+\if{latex}{\out{\hypertarget{method-path}{}}}
 \subsection{Method \code{path()}}{
 Get the paths of file that current \code{EpwSql} uses
 \subsection{Usage}{
@@ -400,6 +403,7 @@ job$path("epw")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run"></a>}}
+\if{latex}{\out{\hypertarget{method-run}{}}}
 \subsection{Method \code{run()}}{
 Run simulationA
 \subsection{Usage}{
@@ -496,6 +500,7 @@ job$run(copy_external = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-kill"></a>}}
+\if{latex}{\out{\hypertarget{method-kill}{}}}
 \subsection{Method \code{kill()}}{
 Kill current running job
 \subsection{Usage}{
@@ -524,6 +529,7 @@ job$kill()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-status"></a>}}
+\if{latex}{\out{\hypertarget{method-status}{}}}
 \subsection{Method \code{status()}}{
 Get the job status
 \subsection{Usage}{
@@ -563,6 +569,7 @@ job$status()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-errors"></a>}}
+\if{latex}{\out{\hypertarget{method-errors}{}}}
 \subsection{Method \code{errors()}}{
 Read simulation errors
 \subsection{Usage}{
@@ -603,6 +610,7 @@ job$errors(info = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-output_dir"></a>}}
+\if{latex}{\out{\hypertarget{method-output_dir}{}}}
 \subsection{Method \code{output_dir()}}{
 Get simulation output directory
 \subsection{Usage}{
@@ -637,6 +645,7 @@ job$output_dir(open = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-locate_output"></a>}}
+\if{latex}{\out{\hypertarget{method-locate_output}{}}}
 \subsection{Method \code{locate_output()}}{
 Get path of output file
 \subsection{Usage}{
@@ -678,6 +687,7 @@ job$locate_output(".expidf", strict = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-read_rdd"></a>}}
+\if{latex}{\out{\hypertarget{method-read_rdd}{}}}
 \subsection{Method \code{read_rdd()}}{
 Read Report Data Dictionary (RDD) file
 \subsection{Usage}{
@@ -706,6 +716,7 @@ job$read_rdd()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-read_mdd"></a>}}
+\if{latex}{\out{\hypertarget{method-read_mdd}{}}}
 \subsection{Method \code{read_mdd()}}{
 Read Report Data Dictionary (RDD) file
 \subsection{Usage}{
@@ -734,6 +745,7 @@ job$read_mdd()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-list_table"></a>}}
+\if{latex}{\out{\hypertarget{method-list_table}{}}}
 \subsection{Method \code{list_table()}}{
 List all table names in EnergyPlus SQL output
 \subsection{Usage}{
@@ -762,6 +774,7 @@ job$list_table()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-read_table"></a>}}
+\if{latex}{\out{\hypertarget{method-read_table}{}}}
 \subsection{Method \code{read_table()}}{
 Read a single table from EnergyPlus SQL output
 \subsection{Usage}{
@@ -799,6 +812,7 @@ job$read_table("Zones")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-report_data_dict"></a>}}
+\if{latex}{\out{\hypertarget{method-report_data_dict}{}}}
 \subsection{Method \code{report_data_dict()}}{
 Read report data dictionary from EnergyPlus SQL output
 \subsection{Usage}{
@@ -846,6 +860,7 @@ job$report_data_dict()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-report_data"></a>}}
+\if{latex}{\out{\hypertarget{method-report_data}{}}}
 \subsection{Method \code{report_data()}}{
 Read report data
 \subsection{Usage}{
@@ -1076,6 +1091,7 @@ job$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tabular_data"></a>}}
+\if{latex}{\out{\hypertarget{method-tabular_data}{}}}
 \subsection{Method \code{tabular_data()}}{
 Read tabular data
 \subsection{Usage}{
@@ -1173,6 +1189,7 @@ str(job$tabular_data(
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{EplusSql} object
 \subsection{Usage}{

@@ -690,7 +690,10 @@ test_that("$load()", {
               "Material,",
               "    mat,                     !- Name",
               "    MediumSmooth,            !- Roughness",
-              "    0.667;                   !- Thickness {m}",
+              "    0.667,                   !- Thickness {m}",
+              "    0.5,",
+              "    800,",
+              "    300;",
               "Construction, const, mat;"
             )
         )
@@ -717,7 +720,7 @@ test_that("$update()", {
     # can stop if trying to update non-named objects using string
     expect_error(idf$update("SimulationControl, no;\n"))
 
-    expect_is(idf$update("Material:NoMass, R13LAYER, Smooth;\n"), "list")
+    expect_is(idf$update("Material:NoMass, R13LAYER, Smooth, 2;\n"), "list")
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "Smooth")
 
     expect_is(class = "list",
@@ -738,7 +741,7 @@ test_that("$validate()", {
     expect_equal(nrow(val$duplicate_object), 0)
     expect_equal(nrow(val$conflict_name), 0)
     expect_equal(nrow(val$incomplete_extensible), 0)
-    expect_equal(nrow(val$missing_value), 0)
+    expect_equal(nrow(val$missing_value), 2)
     expect_equal(nrow(val$invalid_autosize), 0)
     expect_equal(nrow(val$invalid_autocalculate), 0)
     expect_equal(nrow(val$invalid_character), 0)
@@ -1127,7 +1130,7 @@ test_that("add_idd_class_bindings", {
     expect_true(all(idf$class_name() %in% ls(idf)))
 
     expect_null(without_checking(idf$Timestep <- NULL))
-    expect_output(print(idf))
+    expect_output(with_option(list(autocomplete = TRUE), print(idf)))
     expect_false("Timestep" %in% ls(idf))
 })
 # }}}
@@ -1241,7 +1244,7 @@ test_that("[[<-.Idf and $<-.Idf", {
     expect_null(without_checking(idf$SimulationControl <- NULL))
     expect_false(idf$is_valid_class("SimulationControl"))
     expect_null(idf$SimulationControl)
-    expect_false({capture.output(print(idf)); "SimulationControl" %in% names(idf)})
+    expect_false({capture.output(with_option(list(autocomplete = TRUE), print(idf))); "SimulationControl" %in% names(idf)})
 
     # can insert unique-object class
     expect_silent(idf$SimulationControl <- tbl)

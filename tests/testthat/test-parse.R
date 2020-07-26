@@ -302,7 +302,7 @@ test_that("parse_idd_file()", {
     expect_equal(idd_parsed$field$field_id, 1:149)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Data Source and Uncertainty Flags"], "data.table")
+    expect_is(fld <- idd_parsed$field[class_id == 9L & field_name == "Data Source"], "data.table")
     expect_equal(fld$units, NA_character_)
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -329,7 +329,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$missing_num, NA_real_)
 
     # can parse field property data
-    expect_is(fld <- idd_parsed$field[field_name == "Liquid Precipitation Depth"], "data.table")
+    expect_is(fld <- idd_parsed$field[field_name == "Liquid Precip Depth"], "data.table")
     expect_equal(fld$units, "mm")
     expect_equal(fld$ip_units, NA_character_)
     expect_equal(fld$is_name, FALSE)
@@ -351,7 +351,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$exist_maximum, 999)
     expect_equal(fld$exist_minimum, 0)
     expect_equal(fld$exist_lower_incbounds, TRUE)
-    expect_equal(fld$exist_upper_incbounds, TRUE)
+    expect_equal(fld$exist_upper_incbounds, FALSE)
     expect_equal(fld$missing_chr, "999")
     expect_equal(fld$missing_num, 999)
 
@@ -361,7 +361,7 @@ test_that("parse_idd_file()", {
     expect_equal(fld$exist_maximum, 99.9)
     expect_equal(fld$exist_minimum, -Inf)
     expect_equal(fld$exist_lower_incbounds, FALSE)
-    expect_equal(fld$exist_upper_incbounds, TRUE)
+    expect_equal(fld$exist_upper_incbounds, FALSE)
     expect_equal(fld$missing_chr, "99.9")
     expect_equal(fld$missing_num, 99.9)
 
@@ -523,7 +523,7 @@ test_that("parse_idf_file()", {
     # can handle DDY without giving unnecessary warning
     ddy <- tempfile(fileext = ".ddy")
     file.create(ddy)
-    expect_silent(idf_parsed <- parse_idf_file(ddy))
+    expect_silent(idf_parsed <- parse_idf_file(ddy, 8.8))
     unlink(ddy)
 })
 # }}}

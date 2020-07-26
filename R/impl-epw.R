@@ -425,14 +425,14 @@ parse_epw_header_holiday <- function (header, strict = FALSE, transform = TRUE) 
         invld <- val[J(i, 2L), on = c("extensible_group", "extensible_field_index")]
         issue_epw_header_parse_error_single(obj, invld, i)
     }
-    if (any(realyr <- is_epwdate_type(holiday, EPWDATE_TYPE$ymd))) {
+    if (any(realyr <- is_epwdate_type(holiday, "ymd"))) {
         i <- which(realyr)
         invld <- val[J(i, 2L), on = c("extensible_group", "extensible_field_index")]
         issue_epw_header_parse_error_single(obj, invld, i, ". Can not contain year specification.")
     }
 
     # check if duplicated names
-    name = val[J(1L), on = "extensible_field_index", value_chr]
+    name <- val[J(1L), on = "extensible_field_index", value_chr]
     if (anyDuplicated(tolower(name))) {
         i <- which(duplicated(tolower(name)))
         invld <- val[J(i, 1L), on = c("extensible_group", "extensible_field_index")]
@@ -595,10 +595,11 @@ parse_epw_header_period <- function (header, strict = FALSE, transform = TRUE) {
     # check each period does not overlap {{{
     n <- val$value_num[[1]]
     if (n > 1) {
-        comb <- utils::combn(seq_len(n), 2L, simplify = FALSE)
+        comb <- utils::combn(n, 2L, simplify = FALSE)
 
         for (i in comb) {
-            overlapped <- !(start_day[i[1L]] > end_day[i[2L]] || end_day[i[1L]] < start_day[i[2L]])
+            overlapped <- !(as_date(start_day[i[1L]]) > as_date(end_day[i[2L]]) ||
+                            as_date(end_day[i[1L]]) < as_date(start_day[i[2L]]))
             if (overlapped) {
                 parse_error("epw", paste("Invalid", obj$class_name[[1L]], "header"), num = 1L,
                     post = paste0(
@@ -712,8 +713,8 @@ update_epw_header_num_field <- function (header, dt_object, dt_value, i = 1L, st
             subtype = "header_num_field"
         )
 
-        set(dt_value, i, "value_num", as.double(dt_object$num_extensible_group))
-        set(dt_value, i, "value_chr", as.character(dt_object$num_extensible_group))
+        set(dt_value, i, "value_num", as.double(num))
+        set(dt_value, i, "value_chr", as.character(num))
 
         # update the value table
         header$value[dt_value[i], on = "value_id", `:=`(
@@ -854,14 +855,6 @@ align_epwdate_type <- function (x, to) {
     can_align <- t >= EPWDATE_TYPE$jul & t <= EPWDATE_TYPE$md
     x[can_align] <- set_epwdate_year(x[can_align], lubridate::year(to[can_align]))
     x
-}
-set_epwdate_type <- function(x, type = ("md")) {
-    type <- match.arg(type, c("md", "ymd"))
-    assert(is_epwdate_type(x, c("md", "ymd")))
-    is_leap <- lubridate::leap_year(x)
-    y_l <- EPWDATE_TYPE$leap[[type]]
-    y_nol <- EPWDATE_TYPE$noleap[[type]]
-    x[t]
 }
 reset_epwdate_year <- function (x, leapyear) {
     # expect empty and real year
@@ -1496,7 +1489,7 @@ check_epw_data_range <- function (epw_data, range, merge = TRUE) {
 # check_epw_data_type{{{
 check_epw_data_type <- function (epw_data, type = NULL) {
     if (is.null(type)) type <- unlist(get_epw_data_type())
-    assert_names(type)
+    assert_names(names(type))
     assert_data_table(epw_data)
     assert_names(names(epw_data), must.include = names(type))
     setcolorder(epw_data, names(type))
@@ -1510,7 +1503,7 @@ check_epw_data_type <- function (epw_data, type = NULL) {
             } else {
                 parse_error("epw", "Failed to parse variables as integer", num = 1L,
                     post = paste0("Failed variables: ",
-                        get_idd_field(idd_env, EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
+                        get_idd_field(get_epw_idd_env(), EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
                     subtype = "data_type"
                 )
             }
@@ -1522,7 +1515,7 @@ check_epw_data_type <- function (epw_data, type = NULL) {
             } else {
                 parse_error("epw", "Failed to parse variables as double", num = 1L,
                     post = paste0("Failed variables: ",
-                        get_idd_field(idd_env, EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
+                        get_idd_field(get_epw_idd_env(), EPW_CLASS$data, names(type)[[j]], underscore = TRUE)$field_name),
                     subtype = "data_type"
                 )
             }

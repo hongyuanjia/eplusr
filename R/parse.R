@@ -1346,12 +1346,11 @@ get_value_table <- function (dt, idd, escape = FALSE) {
     dt[stri_isempty(value_chr), `:=`(value_chr = NA_character_)]
 
     # in order to get the object id with wrong field number
-    dt_max <- dt[, list(field_index = max(field_index)), by = c("class_id", "object_id")]
-    dt_uni <- dt_max[, list(field_index = unique(field_index)), by = "class_id"]
+    dt_max <- dt[, list(class_id = class_id[[1L]], field_index = max(field_index)), by = "object_id"]
 
     # only use the max field index to speed up
     fld <- tryCatch(
-        get_idd_field(idd, dt_uni$class_id, dt_uni$field_index,
+        get_idd_field(idd, dt_max$class_id, dt_max$field_index,
             c("type_enum", "src_enum", "is_name", "units", "ip_units"),
             complete = TRUE
         ),
@@ -1371,8 +1370,12 @@ get_value_table <- function (dt, idd, escape = FALSE) {
     }
 
     # bind columns
+    # NOTE: make sure all necessary fields are there
+    add_rleid(dt_max)
+    add_joined_cols(dt_max, fld, "rleid", "object_id")
     set(fld, NULL, c("rleid", "field_in"), NULL)
-    dt <- dt[unique(fld, by = "field_id"), on = c("class_id", "field_index")]
+    set(dt, NULL, "class_id", NULL)
+    dt <- dt[fld, on = c("object_id", "field_index")]
 
     # fill data for missing fields
     dt[is.na(line), `:=`(value_id = new_id(dt, "value_id", length(value_id)))]

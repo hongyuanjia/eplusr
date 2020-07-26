@@ -46,26 +46,29 @@ test_that("Epw Header", {
     expect_equal(h$value[object_id %in% c(6, 7), value_chr], rep(NA_character_, 2))
 
     # can fix mismatched extensible group and value of number field
-    DC <- function (n = 1, m = n) {
-        htg <- c("heating", 1:15)
-        clg <- c("cooling", 1:32)
-        ext <- c("extremes", 1:16)
-        grp <- paste0(rep(c(htg, clg, ext), m), collapse = ",")
-        paste("DESIGN CONDITIONS", n, "src", "", grp, sep = ",", collapse = ",")
-    }
     expect_warning(
-        h <- parse_epw_header(paste0(
-            "
-            LOCATION,city,state,country,type,wmo,1,2,3,4
-            ", DC(0, 1), "
-            TYPICAL/EXTREME PERIODS,0,period,typical,1/1,1/2
-            GROUND TEMPERATURES,0,0.5,,,,", paste0(1:12, collapse = ","), "
-            HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0,New year,1/1
-            COMMENTS 1
-            COMMENTS 2
-            DATA PERIODS,1,1,Data,Friday,2016/01/01,2016/12/31,Data1,Friday,2017/01/01,2017/12/31
-            "
-        )),
+        {
+            DC <- function (n = 1, m = n) {
+                htg <- c("heating", 1:15)
+                clg <- c("cooling", 1:32)
+                ext <- c("extremes", 1:16)
+                grp <- paste0(rep(c(htg, clg, ext), m), collapse = ",")
+                paste("DESIGN CONDITIONS", n, "src", "", grp, sep = ",", collapse = ",")
+            }
+
+            h <- parse_epw_header(paste0(
+                "
+                LOCATION,city,state,country,type,wmo,1,2,3,4
+                ", DC(0, 1), "
+                TYPICAL/EXTREME PERIODS,0,period,typical,1/1,1/2
+                GROUND TEMPERATURES,0,0.5,,,,", paste0(1:12, collapse = ","), "
+                HOLIDAYS/DAYLIGHT SAVINGS,yes,0,0,0,New year,1/1
+                COMMENTS 1
+                COMMENTS 2
+                DATA PERIODS,1,1,Data,Friday,2016/01/01,2016/12/31,Data1,Friday,2017/01/01,2017/12/31
+                "
+            ))
+        },
         "Number of Design Conditions"
     )
     expect_equal(h$value[object_id == 2, value_num][1], 1L)
@@ -287,7 +290,7 @@ test_that("Epw Header", {
     )
 
     expect_error(
-        h <- parse_epw_header(paste0(
+        suppressWarnings(h <- parse_epw_header(paste0(
             "
             LOCATION,city,state,country,type,wmo,1,2,3,4
             DESIGN CONDITIONS
@@ -298,7 +301,7 @@ test_that("Epw Header", {
             COMMENTS 2
             DATA PERIODS,1,1,Data,Friday,2016/2/29,2016/3/1
             "
-        )),
+        ))),
         class = "eplusr_error_parse_epw"
     )
 

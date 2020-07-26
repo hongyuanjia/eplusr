@@ -1601,7 +1601,7 @@ idfobj_comment <- function (self, private, comment, append = TRUE, width = 0L) {
     log_new_uuid(private$log_env())
 
     # update object in parent
-    private$idf_env()[obj, on = "object_id", `:=`(comment = i.comment)]
+    private$idf_env()$object[obj, on = "object_id", `:=`(comment = i.comment)]
 
     self
 }
@@ -1613,10 +1613,12 @@ idfobj_value <- function (self, private, which = NULL, all = FALSE, simplify = F
 # }}}
 # idfobj_set {{{
 idfobj_set <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
-    lst <- list(list(...))
+    # support value input in a list format
+    lst <- list(...)
+    if (!(length(lst) == 1L && is.list(lst[[1L]]))) lst <- list(lst)
     names(lst) <- paste0("..", private$m_object_id)
     idf_set(get_self_env(private$m_parent), get_priv_env(private$m_parent),
-        lst, .default = .default, .empty = .empty, .env = environment()
+        lst, .default = .default, .empty = .empty
     )
 
     self

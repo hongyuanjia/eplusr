@@ -327,10 +327,11 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 
         ver <- unlist(ver_list)
         energyplus_exe <- vcapply(ver, eplus_exe)
+        ver <- vcapply(ver, function (v) as.character(eplus_config(v)$version))
     } else {
         energyplus_exe <- vcapply(eplus, eplus_exe)
+        ver <- vcapply(eplus, function (v) as.character(eplus_config(v)$version))
     }
-    ver <- vcapply(ver, function (v) as.character(eplus_config(v)$version))
 
     if (anyDuplicated(model) & is.null(output_dir)) {
         abort("'model' cannot have any duplications when 'output_dir' is NULL.", "duplicated_sim")

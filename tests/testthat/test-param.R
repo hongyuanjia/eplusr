@@ -6,7 +6,7 @@ test_that("Parametric methods", {
 
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
 
-    expect_error(param_job(empty_idf(8.8), NULL), class = "error_idf_not_local")
+    expect_error(param_job(empty_idf(8.8), NULL), class = "eplusr_error_idf_not_local")
 
     example <- copy_example()
 
@@ -126,15 +126,15 @@ test_that("Parametric methods", {
         )
     )
     expect_equal(names(status$job_status),
-        c("index", "status", "idf", "epw", "exit_status", "start_time", "end_time",
-          "energyplus", "output_dir", "stdout", "stderr"
+        c("index", "status", "idf", "epw", "version", "exit_status", "start_time", "end_time",
+          "output_dir", "energyplus", "stdout", "stderr"
         )
     )
     # }}}
 
     # Report Data Dict {{{
     expect_is(param$report_data_dict(), "data.table")
-    expect_true(has_name(param$report_data_dict(), "case"))
+    expect_true(has_names(param$report_data_dict(), "case"))
     expect_equal(nrow(param$report_data_dict(2)), 20)
     expect_equal(nrow(param$report_data_dict("set_infil_rate_2")), 20)
     # }}}

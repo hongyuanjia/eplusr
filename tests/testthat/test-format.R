@@ -225,7 +225,7 @@ test_that("Idd formatting", {
             component = c("object", "value"))$out[c(1,2,4,5)],
         c("[09<V>] Object [ID:1] <WD01>",
           "[05<V>] Object [ID:2] <WALL-1>",
-          "[04<V>] Object [ID:4] <WD02>",
+          "[06<V>] Object [ID:4] <WD02>",
           "[01<V>] Object [ID:5]"
         )
     )
@@ -298,9 +298,9 @@ test_that("Idd formatting", {
         )
     )
     expect_equal(
-        unlist(format_objects(get_idf_value(idd_parsed, idf_parsed),
-            component = c("class", "object", "value"),
-            brief = FALSE)$out[[1L]]),
+        unlist(with_nocolor(format_objects(get_idf_value(idd_parsed, idf_parsed),
+                    component = c("class", "object", "value"),
+                    brief = FALSE)$out[[1L]])),
         c("Class: <Material>",
           "├─ Object [ID:1] <WD01>",
           "│  ├─ 1: \"WD01\",        !- Name",
@@ -317,14 +317,16 @@ test_that("Idd formatting", {
           "   ├─ 1: \"WD02\",        !- Name",
           "   │─ 2: \"MediumSmooth\",!- Roughness",
           "   │─ 3: 0.019099999,   !- Thickness {m}",
-          "   └─ 4: 0.115;         !- Conductivity {W/m-K}",
+          "   │─ 4: 0.115,         !- Conductivity {W/m-K}",
+          "   │─ 5: <Blank>,       !- Density {kg/m3}",
+          "   └─ 6: <Blank>;       !- Specific Heat {J/kg-K}",
           "   "
           )
     )
     expect_equal(
-        unlist(format_objects(get_idf_value(idd_parsed, idf_parsed),
+        unlist(with_nocolor(format_objects(get_idf_value(idd_parsed, idf_parsed),
             component = c("class", "object", "field", "value"),
-            brief = FALSE, merge = FALSE)$out[[1L]]),
+            brief = FALSE, merge = FALSE)$out[[1L]])),
         c("Class: <Material>",
           "├─ Object [ID:1] <WD01>",
           "│  ├─ Field: <1: Name>",
@@ -364,8 +366,14 @@ test_that("Idd formatting", {
           "   │─ Field: <3: Thickness {m}>",
           "   │  └─ Value: <0.019099999>",
           "   │  ",
-          "   └─ Field: <4: Conductivity {W/m-K}>",
-          "      └─ Value: <0.115>",
+          "   │─ Field: <4: Conductivity {W/m-K}>",
+          "   │  └─ Value: <0.115>",
+          "   │  ",
+          "   │─ Field: <5: Density {kg/m3}>",
+          "   │  └─ Value: <<Blank>>",
+          "   │  ",
+          "   └─ Field: <6: Specific Heat {J/kg-K}>",
+          "      └─ Value: <<Blank>>",
           "      "
           )
     )
@@ -405,7 +413,9 @@ test_that("Idd formatting", {
                    "    WD02,                    !- Name",
                    "    MediumSmooth,            !- Roughness",
                    "    0.019099999,             !- Thickness {m}",
-                   "    0.115;                   !- Conductivity {W/m-K}"
+                   "    0.115,                   !- Conductivity {W/m-K}",
+                   "    ,                        !- Density {kg/m3}",
+                   "    ;                        !- Specific Heat {J/kg-K}"
                  )
             )
         )

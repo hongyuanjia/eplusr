@@ -1034,9 +1034,7 @@ job_output_errors <- function (self, private, info = FALSE) {
 # job_sql_path {{{
 job_sql_path <- function (self, private) {
     path_sql <- job_locate_output(self, private, ".sql", must_exist = FALSE)
-    if (!file.exists(path_sql)) {
-        abort("Simulation SQL output does not exist.")
-    }
+    checkmate::assert_file_exists(path_sql, "r", .var.name = "Simulation SQL output")
     path_sql
 }
 # }}}
@@ -1049,7 +1047,7 @@ job_rdd_path <- function (self, private, type = c("rdd", "mdd")) {
         mdd = "Meter Data Dictionary (MDD) file"
     )
 
-    if (must_exist) checkmate::assert_file_exists(out, "r", .var.name = name)
+    checkmate::assert_file_exists(path, "r", .var.name = name)
 
     path
 }
@@ -1182,18 +1180,18 @@ get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
     idf <- if (!is_idf(idf)) read_idf(idf) else idf$clone(deep = TRUE)
 
     if (is.null(idf$path())) {
-        abort("The Idf object is not created from local file. Please save it using `$save()` before running.")
+        abort("The Idf object is not created from local file. Please save it using `$save()` before running.", "idf_not_local")
     }
 
     if (!utils::file_test("-f", idf$path())) {
         abort(paste0("Failed to locate the local IDF file of input Idf object. ",
             "Path: ", surround(idf$path()), " ",
             "Please re-save it to disk using `$save()` before running."
-        ))
+        ), "idf_path_not_exist")
     }
 
     if (idf$is_unsaved()) {
-        abort("Idf has been modified since read or last saved. Please save it using `$save()` before running.")
+        abort("Idf has been modified since read or last saved. Please save it using `$save()` before running.", "idf_not_saved")
     }
 
     # add Output:SQLite if necessary
@@ -1211,28 +1209,28 @@ get_init_idf <- function (idf, sql = TRUE, dict = TRUE) {
 #' @importFrom checkmate test_string
 get_init_epw <- function (epw) {
     if (checkmate::test_string(epw)) {
-        if (!file.exists(epw)) {
+        if (!utils::file_test("-f", epw)) {
             abort(paste0("Input EPW file does not exist. ",
                 "Path: ", surround(normalizePath(epw, mustWork = FALSE))
-            ))
+            ), "epw_path_not_exist")
         }
         path <- epw
     } else {
         epw <- if (!is_epw(epw)) read_epw(epw) else epw$clone(deep = TRUE)
 
         if (is.null(epw$path())) {
-            abort("The Epw object is not created from local file. Please save it using `$save()` before running.")
+            abort("The Epw object is not created from local file. Please save it using `$save()` before running.", "epw_not_local")
         }
 
         if (!utils::file_test("-f", epw$path())) {
             abort(paste0("Failed to locate the local EPW file of input Epw object. ",
                 "Path: ", surround(epw$path()), " ",
                 "Please re-save it to disk using `$save()` before running."
-            ))
+            ), "epw_path_not_exist")
         }
 
         if (epw$is_unsaved()) {
-            abort("Epw has been modified since read or last saved. Please save it using `$save()` before running.")
+            abort("Epw has been modified since read or last saved. Please save it using `$save()` before running.", "epw_not_saved")
         }
 
         path <- epw$path()

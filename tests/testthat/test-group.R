@@ -17,7 +17,7 @@ test_that("Group methods", {
     path_epws <- normalizePath(list.files(file.path(eplus_config(8.8)$dir, "WeatherData"),
         "\\.epw", full.names = TRUE)[1:5])
 
-    expect_error(group_job(empty_idf(8.8)), class = "error_idf_not_local")
+    expect_error(group_job(empty_idf(8.8)), "local", class = "eplusr_error")
     # can stop if input model is not saved after modification
     expect_error(
         group_job(
@@ -27,7 +27,8 @@ test_that("Group methods", {
             ),
             NULL
         ),
-        class = "error_invalid_group_idf_input"
+        "save",
+        class = "eplusr_error"
     )
     expect_silent(group_job(path_idfs, path_epws[1L]))
     expect_silent(group_job(path_idfs[1], path_epws))
@@ -52,8 +53,8 @@ test_that("Group methods", {
         )
     )
     expect_equal(names(status$job_status),
-        c("index", "status", "idf", "epw", "exit_status", "start_time", "end_time",
-          "energyplus", "output_dir", "stdout", "stderr"
+        c("index", "status", "idf", "epw", "version", "exit_status", "start_time", "end_time",
+          "output_dir", "energyplus", "stdout", "stderr"
         )
     )
     expect_equal(status$job_status$exit_status, c(0L, 0L, 1L, 0L, 0L))
@@ -61,12 +62,12 @@ test_that("Group methods", {
 
     # Errors {{{
     expect_silent(grp$errors(2))
-    expect_warning(grp$errors(3), class = "warn_job_error")
+    expect_warning(grp$errors(3), class = "eplusr_warning_job_error")
     # }}}
 
     # Output Dir{{{
     expect_silent(grp$output_dir(1))
-    expect_warning(grp$output_dir(3), class = "warn_job_error")
+    expect_warning(grp$output_dir(3), class = "eplusr_warning_job_error")
     # }}}
 
     # Table {{{
@@ -90,9 +91,9 @@ test_that("Group methods", {
     # }}}
 
     # Report Data Dict {{{
-    expect_error(grp$report_data_dict(), class = "error_job_error")
+    expect_error(grp$report_data_dict(), class = "eplusr_error_job_error")
     expect_is(grp$report_data_dict(c(1,2,4,5)), "data.table")
-    expect_true(has_name(grp$report_data_dict(c(1,2,4,5)), "case"))
+    expect_true(has_names(grp$report_data_dict(c(1,2,4,5)), "case"))
     expect_equal(nrow(grp$report_data_dict(2)), 22)
     expect_equal(nrow(grp$report_data_dict("1zoneevapcooler")), 22)
     # }}}

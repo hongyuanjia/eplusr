@@ -256,7 +256,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
 #' @importFrom checkmate assert_string
 # rdd_to_load {{{
 rdd_to_load <- function (rdd, key_value, reporting_frequency) {
-    if (is_rdd(rdd)) abort("'rdd' must be an RddFile object")
+    if (!is_rdd(rdd)) abort("'rdd' must be an RddFile object")
 
     # copy the original
     rdd <- copy(rdd)
@@ -310,7 +310,7 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
                                                              "Output:Meter:MeterFileOnly",
                                                              "Output:Meter:Cumulative",
                                                              "Output:Meter:Cumulative:MeterFileOnly")) {
-    if (is_mdd(rdd)) stop("'mdd' must be an MddFile object")
+    if (!is_mdd(mdd)) abort("'mdd' must be an MddFile object")
     ver <- attr(mdd, "eplus_version")
     class <- match.arg(class)
 
@@ -358,7 +358,7 @@ validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
 
     freq <- match_in_vec(reporting_frequency, all_freq, label = TRUE)
 
-    assert_subset(freq, all_freq, empty.ok = FALSE)
+    if (anyNA(freq)) abort(sprintf("Invalid reporting frequency found: %s.", collapse(reporting_frequency[is.na(freq)])))
 
     freq
 }

@@ -438,47 +438,47 @@ test_that("Transition v8.0 --> v8.1", {
 
     expect_equal(
         idfVU$"HVACTemplate:Zone:PTAC"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:PTAC"[[1]]$value(1:36)
+        idfTR$"HVACTemplate:Zone:PTAC"[[1]]$value()
     )
     expect_equal(
         idfVU$"HVACTemplate:Zone:PTAC"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:PTAC"[[2]]$value(1:36)
+        idfTR$"HVACTemplate:Zone:PTAC"[[2]]$value()
     )
 
     expect_equal(
         idfVU$"HVACTemplate:Zone:PTHP"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:PTHP"[[1]]$value(1:46)
+        idfTR$"HVACTemplate:Zone:PTHP"[[1]]$value()
     )
     expect_equal(
         idfVU$"HVACTemplate:Zone:PTHP"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:PTHP"[[2]]$value(1:46)
+        idfTR$"HVACTemplate:Zone:PTHP"[[2]]$value()
     )
 
     expect_equal(
         idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"[[1]]$value(),
-        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[1]]$value(1:41)
+        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[1]]$value()
     )
     expect_equal(
         idfVU$"HVACTemplate:Zone:WaterToAirHeatPump"[[2]]$value(),
-        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[2]]$value(1:41)
+        idfTR$"HVACTemplate:Zone:WaterToAirHeatPump"[[2]]$value()
     )
 
     expect_equal(
         idfVU$"HVACTemplate:System:Unitary"$Sys1$value(),
-        idfTR$"HVACTemplate:System:Unitary"$Sys1$value(1:47)
+        idfTR$"HVACTemplate:System:Unitary"$Sys1$value()
     )
     expect_equal(
         idfVU$"HVACTemplate:System:Unitary"$Sys2$value(),
-        idfTR$"HVACTemplate:System:Unitary"$Sys2$value(1:47)
+        idfTR$"HVACTemplate:System:Unitary"$Sys2$value()
     )
 
     expect_equal(
         idfVU$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys3$value(),
-        idfTR$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys3$value(1:56)
+        idfTR$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys3$value()
     )
     expect_equal(
         idfVU$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys4$value(),
-        idfTR$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys4$value(1:56)
+        idfTR$"HVACTemplate:System:UnitaryHeatPump:AirToAir"$Sys4$value()
     )
 })
 # }}}
@@ -1020,7 +1020,7 @@ test_that("Transition v8.5 --> v8.6", {
         # NOTE: VersionUpdater failed to update `Lighting Control Type` and always
         # returned "Continuous"
         idfVU$"Daylighting:Controls"$DELight3$value()[-5],
-        idfTR$"Daylighting:Controls"$DELight3$value(1:13)[-5]
+        idfTR$"Daylighting:Controls"$DELight3$value()[-5]
     )
     expect_equal(
         idfTR$"Daylighting:Controls"$DELight3$value("Lighting Control Type")[[1]],
@@ -1485,14 +1485,14 @@ test_that("Transition v9.0 --> v9.1", {
 test_that("Transition v9.1 --> v9.2", {
     skip_on_cran()
     from <- 9.1; to <- 9.2
-    f <- tempfile(fileext = ".csv")
-    writeLines("", f)
+    unlink(file.path(tempdir(), "test.csv"))
+    writeLines("", file.path(tempdir(), "test.csv"))
     expect_is(class = "Idf",
         idfOri <- temp_idf(from,
             "Foundation:Kiva" = list(),
             "RunPeriod" := list(c(paste0("runperiod", c("", 1:5), "rp"))),
             "RunPeriod" := list(..2 = rep(1:5)),
-            "Schedule:File" = list(..3 = f, ..7 = "fixed"),
+            "Schedule:File" = list(..3 = file.path(tempdir(), "test.csv"), ..7 = "fixed"),
             "Table:OneIndependentVariable" = list(
                 "One", "Quadratic", "EvaluateCurveToLimits", 0.0, 1.0, 0.85,
                 1.0, "Dimensionless", "Dimensionless", NULL, 0.0, 0.85, 0.5,
@@ -1621,8 +1621,6 @@ test_that("Transition v9.1 --> v9.2", {
             .all = FALSE
         )
     )
-
-    idf <- read_idf("/mnt/c/Users/hongy/Desktop/LookupTables_V920.idf")
 
     expect_is(idfVU <- version_updater(idfOri, to), "Idf")
     expect_warning(idfTR <- transition(idfOri, to), "comments")

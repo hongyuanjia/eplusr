@@ -296,7 +296,7 @@ test_that("Data Tagger", {
             rad <- epw$data()$direct_normal_radiation
         }
     )
-    expect_equal(units(rad)$numerator, c("h", "W"))
+    expect_equal(units(rad)$numerator, c("W", "h"))
     expect_equal(units(rad)$denominator, c("m", "m"))
     expect_message(with_option(list(verbose_info = TRUE), epw$add_unit()), "already")
 
@@ -323,7 +323,7 @@ test_that("Data Setter", {
 
     # $set() {{{
     expect_is(d <- epw$data(), "data.table")
-    expect_message(with_option(list(verbose_info = TRUE), epw$set(d, realyear = TRUE)))
+    expect_output(with_option(list(verbose_info = TRUE), epw$set(d, realyear = TRUE)))
     expect_equal(epw$period(),
         data.table(index = 1L, name = "Data", start_day_of_week = "Sunday",
             start_day = epw_date("2017/1/1"), end_day = epw_date("2017/12/31")
@@ -349,7 +349,7 @@ test_that("Data Setter", {
     expect_error(epw$add(epw$data()), class = "eplusr_error_parse_epw")
 
     # after 0L
-    expect_message(with_option(list(verbose_info = TRUE), epw$add(epw$data(start_year = 2017), realyear = TRUE)))
+    expect_output(with_option(list(verbose_info = TRUE), epw$add(epw$data(start_year = 2017), realyear = TRUE)))
     expect_equal(epw$period()$name, c("Data1", "Data"))
     expect_equal(lubridate::year(epw$data(1, align_wday = FALSE)$datetime[1]), 2017)
     expect_equal(get_priv_env(epw)$m_log$matched,

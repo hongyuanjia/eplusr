@@ -1920,7 +1920,7 @@ epw_is_unsaved <- function (self, private) {
 epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
-            abort("The Epw object is not created from local file. Please give the path to save.")
+            abort("The Epw object is not created from local file. Please give the path to save.", "epw_not_local")
         } else {
             path <- private$m_path
         }

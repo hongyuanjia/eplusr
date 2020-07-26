@@ -1085,7 +1085,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                 # for 'c(Obj, Obj) := list()'
                 } else if (as.character(li[[2L]][[1L]]) %chin% c("c", ".")) {
                     li[[2L]][[1L]] <- as.name("c")
-                    name <- eval(li[[2L]], envir = .env)
+                    name <- eval(li[[2L]], .env)
                     name <- assert_valid_type(name, "ID | Name | Index")
                     if (is.character(name)) {
                         set(dt_in, i, "name", list(name))
@@ -1097,7 +1097,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
                 # for '..(Cls) := list()'
                 } else if (as.character(li[[2L]][[1L]]) == "..") {
                     li[[2L]][[1L]] <- as.name("c")
-                    name <- eval(li[[2L]], envir = .env)
+                    name <- eval(li[[2L]], .env)
                     name <- assert_valid_type(name, "Name", len = 1L, type = "name")
                     set(dt_in, i, "name", list(name))
                     # indicate that LHS is a single name
@@ -1111,7 +1111,7 @@ parse_dots_value <- function (..., .scalar = TRUE, .pair = FALSE,
             }
         }
 
-        if (!evaluated) val <- eval(li, envir = .env)
+        if (!evaluated) val <- eval(li, .env)
         assert_list(val, c("character", "integer", "double", "null"), .var.name = "Input",
             all.missing = .empty
         )
@@ -2226,6 +2226,7 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
             parse_error("idf", "Adding a different Version object is prohibited", data, subtype = "ver")
         }
 
+        get_idf_value(idd_env, parsed, complete = )
         # remove inserted version object
         id <- parsed$object[J(1L), on = "class_id", object_id]
         obj_chr <- parsed$object[!J(id), on = "object_id"]
@@ -2619,7 +2620,7 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
 
     # extract value table
     val <- get_idf_value(idd_env, idf_env, object = obj$object_id, property = "is_name")
-    # assign new id
+    # assign new object id
     obj <- assign_new_id(idf_env, obj, "object")
     add_joined_cols(obj, val, "rleid", "object_id")
 
@@ -2627,23 +2628,25 @@ dup_idf_object <- function (idd_env, idf_env, dt_object, level = eplusr_option("
     val[obj, on = "object_id", object_name := i.object_name]
     val[obj[J(TRUE), on = "has_name", nomatch = NULL], on = c("object_id", is_name = "has_name"), value_chr := i.object_name]
 
+    # assign new value id
+    set(val, NULL, "new_value_id", new_id(idf_env$value, "value_id", nrow(val)))
+
     # value reference
     # extract value reference
     # directly copy old field references excepting the name field
-    ref <- idf_env$reference[J(val$value_id[!val$is_name]), on = "value_id", nomatch = 0L]
+    dt_id <- fast_subset(val, c("object_id", "value_id", "new_value_id"))
+    setnames(dt_id, "object_id", "new_object_id")
+    ref <- idf_env$reference[dt_id, on = "value_id", nomatch = 0L]
 
-    # assign new id
-    set(obj, NULL, "new_object_id", id_obj)
-    val[obj, on = "object_id", new_object_id := i.new_object_id]
-    set(val, NULL, "new_value_id", new_id(idf_env$value, "value_id", nrow(val)))
     # update ids in ref
-    if (nrow(ref)) ref[val, on = c("object_id", "value_id"), `:=`(object_id = i.new_object_id, value_id = i.new_value_id)]
+    if (nrow(ref)) {
+        set(ref, NULL, c("object_id", "value_id"), NULL)
+        setnames(ref, c("new_object_id", "new_value_id"), c("object_id", "value_id"))
+    }
 
     # remove original ids
-    set(obj, NULL, "object_id", NULL)
-    setnames(obj, "new_object_id", "object_id")
-    set(val, NULL, c("object_id", "value_id"), NULL)
-    setnames(val, c("new_object_id", "new_value_id"), c("object_id", "value_id"))
+    set(val, NULL, "value_id", NULL)
+    setnames(val, "new_value_id", "value_id")
 
     # NOTE: For original objects whose fields are referred by others, just keep
     # the original relation and no new relation needs to be created as one value

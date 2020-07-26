@@ -105,12 +105,12 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (!is.null(key_value)) {
         subset_rpvar <- TRUE
         if (is.data.frame(key_value)) {
-            assert(has_name(key_value, c("key_value", "name")))
+            assert_names(names(key_value), must.include = c("key_value", "name"))
             if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
             kv <- unique(key_value)
             rpvar_dict <- rpvar_dict[kv, on = c("key_value", "name"), nomatch = NULL]
         } else {
-            assert(is.character(key_value), no_na(key_value))
+            assert_character(key_value, any.missing = FALSE)
             KEY_VALUE <- key_value
             rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value", nomatch = NULL]
         }
@@ -118,7 +118,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 
     if (!is.null(name)) {
         subset_rpvar <- TRUE
-        assert(is.character(name), no_na(name))
+        assert_character(name, any.missing = FALSE)
         NAME <- name
         rpvar_dict <- rpvar_dict[J(NAME), on = "name"]
     }
@@ -139,39 +139,38 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     subset_time <- FALSE
     if (!is.null(month)) {
         subset_time <- TRUE
-        assert(are_count(month), month <= 12L)
+        assert_integerish(month, lower = 1L, upper = 12L, any.missing = FALSE)
         time <- time[J(unique(month)), on = "MONTH", nomatch = NULL]
     }
     if (!is.null(day)) {
         subset_time <- TRUE
-        assert(are_count(day), day <= 31L)
+        assert_integerish(day, lower = 1L, upper = 31L, any.missing = FALSE)
         time <- time[J(unique(day)), on = "DAY", nomatch = NULL]
     }
     if (!is.null(hour)) {
         subset_time <- TRUE
-        assert(are_count(hour, TRUE), hour <= 24L)
+        assert_integerish(hour, lower = 0L, upper = 24L, any.missing = FALSE)
         time <- time[J(unique(hour)), on = "HOUR", nomatch = NULL]
     }
     if (!is.null(minute)) {
         subset_time <- TRUE
-        assert(are_count(minute, TRUE), minute <= 60L)
+        assert_integerish(minute, lower = 0L, upper = 60L, any.missing = FALSE)
         time <- time[J(unique(minute)), on = "MINUTE", nomatch = NULL]
     }
     if (!is.null(interval)) {
         subset_time <- TRUE
-        assert(are_count(interval), interval <= 527040) # 366 days
+        assert_integerish(interval, lower = 1L, upper = 527040, any.missing = FALSE)
         time <- time[J(unique(interval)), on = "INTERVAL", nomatch = NULL]
     }
     if (!is.null(simulation_days)) {
         subset_time <- TRUE
-        assert(are_count(simulation_days), simulation_days <= 366) # 366 days
+        assert_integerish(simulation_days, lower = 1L, upper = 366, any.missing = FALSE)
         time <- time[J(unique(simulation_days)), on = "SIMULATION_DAYS", nomatch = NULL]
     }
     if (!is.null(period)) {
         subset_time <- TRUE
-        assert(any(c("Date", "POSIXt") %in% class(period)),
-            msg = "`period` should be a Date or DateTime vector."
-        )
+        if (!any(c("Date", "POSIXt") %in% class(period)))
+            abort("`period` should be a Date or DateTime vector.")
         p <- unique(period)
         if (inherits(period, "Date")) {
             period <- data.table(
@@ -202,7 +201,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
             c(weekday,   weekend,   designday,   customday,   specialday,   normalday,
               "Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay"
         )))
-        assert(!is.na(dt), msg = paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
+        if (anyNA(dt)) abort(paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
         # expand
         expd <- c()
         if ("Weekday" %chin% dt) {expd <- c(expd, weekday); dt <- setdiff(dt, "Weekday")}

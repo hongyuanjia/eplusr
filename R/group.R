@@ -791,13 +791,13 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
     # check if generated models have been modified outside
     uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
     if (any(uuid != private$m_log$idf_uuid)) {
-        warn("warning_param_modified", paste0(
+        warn(paste0(
             "Some of the grouped models have been modified. ",
             "Running these models will result in simulation outputs that may be not reproducible. ",
             paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
                 names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
             )
-        ))
+        ), "group_model_modified")
     }
 
     log_new_uuid(private$m_log)
@@ -810,7 +810,7 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
-    if (checkmate::test_names(private$m_idfs)) {
+    if (checkmate::test_names(names(private$m_idfs))) {
         # for parametric job
         nms <- paste0(make_filename(names(private$m_idfs)), ".idf")
     } else {
@@ -1165,13 +1165,13 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 
     epws <- lapply(epws, function (x) {
         tryCatch(get_epw(x),
-            error_epw_not_local = function (e) e,
-            error_epw_path_not_exist = function (e) e,
-            error_epw_not_saved = function (e) e
+            eplusr_error_epw_not_local = function (e) e,
+            eplusr_error_epw_path_not_exist = function (e) e,
+            eplusr_error_epw_not_saved = function (e) e
         )
     })
 
-    err <- c("error_epw_not_local", "error_epw_path_not_exist", "error_epw_not_saved")
+    err <- c("eplusr_error_epw_not_local", "eplusr_error_epw_path_not_exist", "eplusr_error_epw_not_saved")
     if (any(invld <- vlapply(epws, inherits, err))) {
         abort(paste0("Invalid EPW input found:\n",
             paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(epws[invld], conditionMessage),
@@ -1264,15 +1264,15 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
         incomplete <- job[status != "completed"]
         msg <- incomplete[, sim_status(rpad(toupper(status)), index, idf, epw)]
         if (keep_unsucess) {
-            warn("error_job_error", paste0("Some of jobs failed to complete. ",
+            warn(paste0("Some of jobs failed to complete. ",
                 "Simulation results may not be correct:\n",
                 paste0(msg, collapse = "\n")
-            ))
+            ), "job_error")
         } else {
             abort(paste0("Some of jobs failed to complete. ",
                 "Please fix the problems and re-run it before collecting output:\n",
                 paste0(msg, collapse = "\n")
-            ))
+            ), "job_error")
         }
     }
 

@@ -202,6 +202,7 @@ Hongyuan Jia
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{EplusSql} object
 \subsection{Usage}{
@@ -245,6 +246,7 @@ if (is_avail_eplus(8.8)) {
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-path"></a>}}
+\if{latex}{\out{\hypertarget{method-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{EpwSql} object
 \subsection{Usage}{
@@ -273,6 +275,7 @@ sql$path()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-path_idf"></a>}}
+\if{latex}{\out{\hypertarget{method-path_idf}{}}}
 \subsection{Method \code{path_idf()}}{
 Get the path of corresponding IDF file
 \subsection{Usage}{
@@ -303,6 +306,7 @@ sql$path_idf()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-list_table"></a>}}
+\if{latex}{\out{\hypertarget{method-list_table}{}}}
 \subsection{Method \code{list_table()}}{
 List all table names in current EnergyPlus SQL output
 \subsection{Usage}{
@@ -331,6 +335,7 @@ sql$list_table()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-read_table"></a>}}
+\if{latex}{\out{\hypertarget{method-read_table}{}}}
 \subsection{Method \code{read_table()}}{
 Read a single table from current EnergyPlus SQL output
 \subsection{Usage}{
@@ -368,6 +373,7 @@ sql$read_table("Zones")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-report_data_dict"></a>}}
+\if{latex}{\out{\hypertarget{method-report_data_dict}{}}}
 \subsection{Method \code{report_data_dict()}}{
 Read report data dictionary from current EnergyPlus SQL output
 \subsection{Usage}{
@@ -415,6 +421,7 @@ sql$report_data_dict()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-report_data"></a>}}
+\if{latex}{\out{\hypertarget{method-report_data}{}}}
 \subsection{Method \code{report_data()}}{
 Read report data
 \subsection{Usage}{
@@ -655,6 +662,7 @@ sql$report_data(dict[1], all = TRUE)[environment_period_index == 3L]
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-tabular_data"></a>}}
+\if{latex}{\out{\hypertarget{method-tabular_data}{}}}
 \subsection{Method \code{tabular_data()}}{
 Read tabular data
 \subsection{Usage}{
@@ -758,6 +766,7 @@ str(sql$tabular_data(
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{EplusSql} object
 \subsection{Usage}{
