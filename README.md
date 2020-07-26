@@ -133,7 +133,7 @@ library(eplusr)
 # parse IDD
 idd <- use_idd(8.8, download = "auto")
 #> IDD v8.8.0 has not been parsed before.
-#> Try to locate `Energy+.idd` in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
+#> Try to locate 'Energy+.idd' in EnergyPlus v8.8.0 installation folder '/usr/local/EnergyPlus-8-8-0'.
 #> IDD file found: '/home/hongyuanjia/.local/EnergyPlus-8-8-0/Energy+.idd'.
 #> Start parsing...
 #> Parsing completed.
@@ -144,7 +144,7 @@ idf <- read_idf(system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
 # print idf
 idf
 #> ── EnergPlus Input Data File ───────────────────────────────────────────────────
-#>  * Path: '/tmp/RtmpiYeLsf/temp_libpathe5d7f4b4df7/eplusr/extdata/1ZoneUncon...
+#>  * Path: '/tmp/Rtmps8kJCk/temp_libpath16533d1aded9/eplusr/extdata/1ZoneUnco...
 #>  * Version: '8.8.0'
 #> 
 #> Group: <Simulation Parameters>
@@ -192,13 +192,14 @@ idf$object_relation("R13LAYER", "all")
 #> Target(s) does not refer to any other field.
 #> 
 #> ── Referred by Others ──────────────────────────────────────────────────────────
-#>  Object [ID:12] <R13LAYER>
-#>   └─ 1: "R13LAYER";    !- Name
-#>      ^~~~~~~~~~~~~~~~~~~~~~~~~
-#>      └─ Class: <Construction>
-#>         └─ Object [ID:15] <R13WALL>
-#>            └─ 2: "R13LAYER";    !- Outside Layer
-#>  
+#>  Class: <Material:NoMass>
+#>  └─ Object [ID:12] <R13LAYER>
+#>      └─ 1: "R13LAYER";    !- Name
+#>         ^~~~~~~~~~~~~~~~~~~~~~~~~
+#>         └─ Class: <Construction>
+#>            └─ Object [ID:15] <R13WALL>
+#>               └─ 2: "R13LAYER";    !- Outside Layer
+#>     
 #> 
 #> ── Node Relation ───────────────────────────────────────────────────────────────
 #> Target(s) has no node or their nodes have no reference to other object.
@@ -283,7 +284,7 @@ epw
 #> [Elevation]: 2m above see level
 #> [Data Src ]: TMY3
 #> [WMO Stat ]: 724940
-#> [Leap Year]: FALSE
+#> [Leap Year]: No
 #> [Interval ]: 60 mins
 #> 
 #> ── Data Periods ────────────────────────────────────────────────────────────────
@@ -346,7 +347,7 @@ idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 #> 4: 2017-01-01 04:00:00 1999     1   1    4      0
 #> 5: 2017-01-01 05:00:00 1999     1   1    5      0
 #> 6: 2017-01-01 06:00:00 1999     1   1    6      0
-#>                                            datasource dry_bulb_temperature
+#>                                           data_source dry_bulb_temperature
 #> 1: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
 #> 2: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  7.2
 #> 3: ?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9?9?9?9                  6.7
@@ -373,16 +374,16 @@ idf$save(file.path(tempdir(), "model.idf"), overwrite = TRUE)
 
 # a date time column added with correct start day of week type
 epw$period()$start_day_of_week
-#> [1] 7
+#> [1] "Sunday"
 weekdays(weather$datetime)
 #> [1] "Sunday" "Sunday" "Sunday" "Sunday" "Sunday" "Sunday"
 
 # run simulation
 job <- idf$run(epw)
-#> Adding an object in class `Output:SQLite` and setting its `Option Type` to `SimpleAndTabular` in order to create SQLite output file.
-#> Replace the existing IDF located at /tmp/RtmpiYeLsf/model.idf.
+#> Adding an object in class 'Output:SQLite' and setting its 'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.
+#> Replace the existing IDF located at /tmp/Rtmps8kJCk/model.idf.
 #> EnergyPlus Starting
-#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.03.15 04:31
+#> EnergyPlus, Version 8.8.0-7c3bbe4830, YMD=2020.07.26 23:58
 #> Processing Data Dictionary
 #> Processing Input File
 #> Initializing Simulation
@@ -417,7 +418,7 @@ job <- idf$run(epw)
 job$errors()
 #> ══ EnergyPlus Error File ═══════════════════════════════════════════════════════
 #>   * EnergyPlus version: 8.8.0 (7c3bbe4830)
-#>   * Simulation started: 2020-03-15 04:31:00
+#>   * Simulation started: 2020-07-26 23:58:00
 #>   * Terminated: FALSE
 #>   * Successful: TRUE
 #>   * Warning[W]: 2
