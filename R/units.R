@@ -181,5 +181,5 @@ FIELD_UNIT_TABLE <- fread(
     W/((m3/s)-Pa)                  	 W/((m3/s)*Pa)    	 W/((ft3/min)-inH2O)            	 W/((ft^3/min)*inH2O)
     "
 )
-# nocov start
+# nocov end
 # }}}
