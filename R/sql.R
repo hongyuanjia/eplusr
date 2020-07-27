@@ -66,13 +66,14 @@ EplusSql <- R6::R6Class(classname = "EplusSql", cloneable = FALSE,
         #' }
         #' }
         #'
+        #' @importFrom checkmate assert_file_exists
         initialize = function (sql) {
-            assert(is_string(sql), has_ext(sql, "sql"))
+            assert_file_exists(sql, "r", "sql")
             private$m_path_sql <- normalizePath(sql, mustWork = TRUE)
             private$m_path_idf <- paste0(tools::file_path_sans_ext(private$m_path_sql), ".idf")
-            if (!file.exists(private$m_path_idf)) {
+            if (!checkmate::test_file_exists(private$m_path_idf)) {
                 private$m_path_idf <- file.path(dirname(private$m_path_sql), "in.idf")
-                if (!file.exists(private$m_path_idf)) {
+                if (!checkmate::test_file_exists(private$m_path_idf)) {
                     private$m_path_idf <- NULL
                 }
             }

@@ -8,10 +8,12 @@
 # @param path A path of EnergyPlus `Bind Node Detail` (`.bnd`) file.
 # @return File path of the generated `.svg` file if successful. Otherwise
 # `NULL`.
+#' @importFrom checkmate test_file_exists
 # @export
 # hvac_diagram {{{
 hvac_diagram <- function (eplus, path) {
-    assert(file.exists(path), has_ext(path, "bnd"))
+    if (!checkmate::test_file_exists(path, "r", "bnd")) return(NULL)
+    assert_vector(eplus, len = 1L)
 
     nm <- tools::file_path_sans_ext(basename(path))
     wd <- dirname(path)

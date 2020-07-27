@@ -31,6 +31,7 @@ get_sql_query <- function (sql, query) {
 }
 # }}}
 # get_sql_tabular_data_query {{{
+#' @importFrom checkmate assert_character
 get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
                                         table_name = NULL, column_name = NULL,
                                         row_name = NULL) {
@@ -68,12 +69,17 @@ get_sql_tabular_data_query <- function (report_name = NULL, report_for = NULL,
         "
     # }}}
 
+    assert_character(report_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(report_for, any.missing = FALSE, null.ok = TRUE)
+    assert_character(table_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(column_name, any.missing = FALSE, null.ok = TRUE)
+    assert_character(row_name, any.missing = FALSE, null.ok = TRUE)
     q <- NULL %and%
-        .sql_make(report_name, assert(is.character(report_name), no_na(report_name))) %and%
-        .sql_make(report_for, assert(is.character(report_for), no_na(report_for))) %and%
-        .sql_make(table_name, assert(is.character(table_name), no_na(table_name))) %and%
-        .sql_make(column_name, assert(is.character(column_name), no_na(column_name))) %and%
-        .sql_make(row_name, assert(is.character(row_name), no_na(row_name)))
+        .sql_make(report_name) %and%
+        .sql_make(report_for) %and%
+        .sql_make(table_name) %and%
+        .sql_make(column_name) %and%
+        .sql_make(row_name)
 
     if (is.null(q)) return(view)
 
@@ -87,6 +93,7 @@ list_sql_table <- function (sql) {
 }
 # }}}
 # get_sql_report_data {{{
+#' @importFrom checkmate assert_scalar
 get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL,
                                  tz = "UTC", case = "auto", all = FALSE, wide = FALSE,
                                  period = NULL, month = NULL, day = NULL, hour = NULL, minute = NULL,
@@ -94,27 +101,36 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
                                  environment_name = NULL) {
     # report data dictionary {{{
     rpvar_dict <- read_sql_table(sql, "ReportDataDictionary")
+    # ignore case
+    set(rpvar_dict, NULL, c("key_value_lower", "name_lower"),
+        list(stri_trans_tolower(rpvar_dict$key_value), stri_trans_tolower(rpvar_dict$name))
+    )
     subset_rpvar <- FALSE
     if (!is.null(key_value)) {
         subset_rpvar <- TRUE
         if (is.data.frame(key_value)) {
-            assert(has_name(key_value, c("key_value", "name")))
+            assert_names(names(key_value), must.include = c("key_value", "name"))
             if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
             kv <- unique(key_value)
-            rpvar_dict <- rpvar_dict[kv, on = c("key_value", "name"), nomatch = NULL]
+            set(kv, NULL, c("key_value_lower", "name_lower"),
+                list(stri_trans_tolower(kv$key_value), stri_trans_tolower(kv$name))
+            )
+            rpvar_dict <- rpvar_dict[kv, on = c("key_value_lower", "name_lower"), nomatch = NULL]
+            set(kv, NULL, c("key_value_lower", "name_lower"), NULL)
         } else {
-            assert(is.character(key_value), no_na(key_value))
-            KEY_VALUE <- key_value
-            rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value", nomatch = NULL]
+            assert_character(key_value, any.missing = FALSE)
+            KEY_VALUE <- stri_trans_tolower(key_value)
+            rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value_lower", nomatch = NULL]
         }
     }
 
     if (!is.null(name)) {
         subset_rpvar <- TRUE
-        assert(is.character(name), no_na(name))
-        NAME <- name
-        rpvar_dict <- rpvar_dict[J(NAME), on = "name"]
+        assert_character(name, any.missing = FALSE)
+        NAME <- stri_trans_tolower(name)
+        rpvar_dict <- rpvar_dict[J(NAME), on = "name_lower"]
     }
+    set(rpvar_dict, NULL, c("key_value_lower", "name_lower"), NULL)
     # }}}
 
     # environment periods {{{
@@ -130,41 +146,48 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     set(time, NULL, c("warmup_flag", "interval_type"), NULL)
     setnames(time, toupper(names(time)))
     subset_time <- FALSE
+    # store day of week for the first simulation day
+    if (is.null(year) && !"year" %chin% names(time)) {
+        # get wday of first simulation day per environment
+        w <- time[SIMULATION_DAYS == 1L & !is.na(DAY_TYPE), .SD[1L],
+            .SDcols = c("MONTH", "DAY", "DAY_TYPE", "ENVIRONMENT_PERIOD_INDEX"),
+            by = "ENVIRONMENT_PERIOD_INDEX"
+        ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "DAY_TYPE"]
+    }
     if (!is.null(month)) {
         subset_time <- TRUE
-        assert(are_count(month), month <= 12L)
+        assert_integerish(month, lower = 1L, upper = 12L, any.missing = FALSE)
         time <- time[J(unique(month)), on = "MONTH", nomatch = NULL]
     }
     if (!is.null(day)) {
         subset_time <- TRUE
-        assert(are_count(day), day <= 31L)
+        assert_integerish(day, lower = 1L, upper = 31L, any.missing = FALSE)
         time <- time[J(unique(day)), on = "DAY", nomatch = NULL]
     }
     if (!is.null(hour)) {
         subset_time <- TRUE
-        assert(are_count(hour, TRUE), hour <= 24L)
+        assert_integerish(hour, lower = 0L, upper = 24L, any.missing = FALSE)
         time <- time[J(unique(hour)), on = "HOUR", nomatch = NULL]
     }
     if (!is.null(minute)) {
         subset_time <- TRUE
-        assert(are_count(minute, TRUE), minute <= 60L)
+        assert_integerish(minute, lower = 0L, upper = 60L, any.missing = FALSE)
         time <- time[J(unique(minute)), on = "MINUTE", nomatch = NULL]
     }
     if (!is.null(interval)) {
         subset_time <- TRUE
-        assert(are_count(interval), interval <= 527040) # 366 days
+        assert_integerish(interval, lower = 1L, upper = 527040, any.missing = FALSE)
         time <- time[J(unique(interval)), on = "INTERVAL", nomatch = NULL]
     }
     if (!is.null(simulation_days)) {
         subset_time <- TRUE
-        assert(are_count(simulation_days), simulation_days <= 366) # 366 days
+        assert_integerish(simulation_days, lower = 1L, upper = 366, any.missing = FALSE)
         time <- time[J(unique(simulation_days)), on = "SIMULATION_DAYS", nomatch = NULL]
     }
     if (!is.null(period)) {
         subset_time <- TRUE
-        assert(any(c("Date", "POSIXt") %in% class(period)),
-            msg = "`period` should be a Date or DateTime vector."
-        )
+        if (!any(c("Date", "POSIXt") %in% class(period)))
+            abort("`period` should be a Date or DateTime vector.")
         p <- unique(period)
         if (inherits(period, "Date")) {
             period <- data.table(
@@ -195,7 +218,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
             c(weekday,   weekend,   designday,   customday,   specialday,   normalday,
               "Weekday", "Weekend", "DesignDay", "CustomDay", "SpecialDay", "NormalDay"
         )))
-        assert(!is.na(dt), msg = paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
+        if (anyNA(dt)) abort(paste0("Invalid day type found: ", collapse(day_type[is.na(dt)]), "."))
         # expand
         expd <- c()
         if ("Weekday" %chin% dt) {expd <- c(expd, weekday); dt <- setdiff(dt, "Weekday")}
@@ -221,11 +244,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         if ("year" %in% names(time)) {
             time[J(0L), on = "year", year := NA_integer_]
         } else {
-            # get wday of first simulation day per environment
-            w <- time[simulation_days == 1L & !is.na(day_type), .SD[1L],
-                .SDcols = c("month", "day", "day_type", "environment_period_index"),
-                by = "environment_period_index"
-            ][!J(c("WinterDesignDay", "SummerDesignDay")), on = "day_type"]
+            setnames(w, tolower(names(w)))
 
             # in case there is no valid day type
             if (!nrow(w)) {
@@ -334,8 +353,9 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (wide) res <- report_dt_to_wide(res, all)
 
     if (!is.null(case)) {
-        assert(is_scalar(case))
-        set(res, NULL, "case", as.character(case))
+        assert_scalar(case)
+        case_name <- as.character(case)
+        set(res, NULL, "case", case_name)
         setcolorder(res, c("case", setdiff(names(res), "case")))
     }
 
@@ -348,14 +368,15 @@ get_sql_report_data_dict <- function (sql) {
 }
 # }}}
 # get_sql_tabular_data {{{
+#' @importFrom checkmate assert_scalar
 get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
                                   table_name = NULL, column_name = NULL, row_name = NULL,
                                   case = "auto", wide = FALSE, string_value = !wide) {
     q <- get_sql_tabular_data_query(report_name, report_for, table_name, column_name, row_name)
     dt <- setnames(get_sql_query(sql, q), "tabular_data_index", "index")[]
 
-    if (not_empty(case)) {
-        assert(is_scalar(case))
+    if (!is.null(case)) {
+        assert_scalar(case)
         case_name <- as.character(case)
         set(dt, NULL, "case", case_name)
         setcolorder(dt, c("case", setdiff(names(dt), "case")))
@@ -374,7 +395,7 @@ get_sql_tabular_data <- function (sql, report_name = NULL, report_for = NULL,
     }
 
     # add row index
-    dt[, row_index := seq_len(.N), by = c("case"[has_name(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
+    dt[, row_index := seq_len(.N), by = c("case"[has_names(dt, "case")], "report_name", "report_for", "table_name", "column_name")]
 
     # remove empty rows
     dt <- dt[!J(c("", "-"), c("", "-")), on = c("row_name", "value")]
@@ -401,7 +422,7 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     cols_num <- unique(dt$column_name[dt$is_num])
 
     # format table
-    if (has_name(dt, "case")) {
+    if (has_names(dt, "case")) {
         dt <- data.table::dcast.data.table(dt,
             case + report_name + report_for + table_name + row_index + row_name ~ column_name,
             value.var = "value"
@@ -451,11 +472,13 @@ tidy_sql_name <- function (x) {
 }
 # }}}
 # report_dt_to_wide {{{
+#' @importFrom checkmate assert_names
 report_dt_to_wide <- function (dt, date_components = FALSE) {
-    assert(has_name(dt, c("datetime", "month", "day", "hour", "minute",
+    assert_names(names(dt), must.include = c(
+        "datetime", "month", "day", "hour", "minute",
         "key_value", "name", "environment_period_index", "environment_name",
         "reporting_frequency", "is_meter", "simulation_days", "day_type"
-    )))
+    ))
 
     # change detailed level frequency to "Each Call"
     dt[, Variable := reporting_frequency]
@@ -502,7 +525,7 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
             `:=`(day_type = wday(datetime, label = TRUE))
         ]
 
-        if (has_name(dt, "case")) {
+        if (has_names(dt, "case")) {
             dt <- dcast.data.table(dt, case +
                 environment_period_index + environment_name + simulation_days +
                 datetime + month + day + hour + minute +
@@ -516,7 +539,7 @@ report_dt_to_wide <- function (dt, date_components = FALSE) {
                 value.var = "value")
         }
     } else {
-        if (has_name(dt, "case")) {
+        if (has_names(dt, "case")) {
             dt <- dcast.data.table(dt, case +
                 environment_period_index + environment_name + simulation_days +
                 `Date/Time` ~ Variable,

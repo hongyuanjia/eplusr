@@ -2,42 +2,47 @@
 NULL
 
 # get_iddobj_relation {{{
-get_iddobj_relation <- function (idd_env, class_id, field_id = NULL, name = TRUE,
-                                 direction = c("ref_to", "ref_by", "all"),
-                                 class = NULL, group = NULL, depth = 0L, keep_all = TRUE) {
+get_iddobj_relation <- function (idd_env, class_id, field_id = NULL,
+                                 direction = c("ref_to", "ref_by", "all"), depth = 0L, name = FALSE,
+                                 class = NULL, group = NULL, keep_all = FALSE,
+                                 class_ref = c("both", "none", "all"), match_all = FALSE) {
     direction <- match.arg(direction)
     if (direction == "ref_to") {
         res <- list(
             ref_to = get_idd_relation(idd_env, class_id, field_id,
-                class = class, group = group, depth = depth, name = name,
-                direction = "ref_to", keep_all = keep_all),
+                direction = "ref_to", depth = depth, name = name,
+                class = class, group = group, keep_all = keep_all,
+                class_ref = class_ref, match_all = match_all),
             ref_by = NULL
         )
     } else if (direction == "ref_by") {
         res <- list(
             ref_to = NULL,
             ref_by = get_idd_relation(idd_env, class_id, field_id,
-                class = class, group = group, depth = depth, name = name,
-                direction = "ref_by", keep_all = keep_all)
+                direction = "ref_by", depth = depth, name = name,
+                class = class, group = group, keep_all = keep_all,
+                class_ref = class_ref, match_all = match_all)
         )
     } else {
         res <- list(
             ref_to = get_idd_relation(idd_env, class_id, field_id,
-                class = class, group = group, depth = depth, name = name,
-                direction = "ref_to", keep_all = keep_all),
+                direction = "ref_to", depth = depth, name = name,
+                class = class, group = group, keep_all = keep_all,
+                class_ref = class_ref, match_all = match_all),
             ref_by = get_idd_relation(idd_env, class_id, field_id,
-                class = class, group = group, depth = depth, name = name,
-                direction = "ref_by", keep_all = keep_all)
+                direction = "ref_by", depth = depth, name = name,
+                class = class, group = group, keep_all = keep_all,
+                class_ref = class_ref, match_all = match_all)
         )
     }
 
-    setattr(res, "class", c("IddRelation", class(res)))
+    if (name) setattr(res, "class", c("IddRelation", class(res)))
 
     res
 }
 # }}}
 # get_iddobj_possible {{{
-get_iddobj_possible <- function (idd_env, class_id, field_id = NULL) {
+get_iddobj_possible <- function (idd_env, class_id = NULL, field_id = NULL) {
     all <- if (is.null(field_id)) TRUE else FALSE
     if (all) {
         cls_id <- class_id
@@ -54,7 +59,7 @@ get_iddobj_possible <- function (idd_env, class_id, field_id = NULL) {
     fld[J(TRUE), on = "autocalculatable", `:=`(auto = "Autocalculate")]
 
     # default
-    fld <- field_default_to_unit(fld, "si", if (in_ip_mode()) "ip" else "si")
+    fld <- field_default_to_unit(idd_env, fld, "si", if (in_ip_mode()) "ip" else "si")
     setnames(fld, c("default_chr", "default_num"), c("value_chr", "value_num"))
     # make sure default is a list
     if (nrow(fld) == 1L) {
@@ -99,7 +104,6 @@ get_iddobj_string <- function (idd_env, class_id = NULL, comment = NULL, leading
     str_cmt <- NULL
 
     if (!is.null(comment)) {
-        assert(is.character(comment))
         str_cmt <- c(paste0("!", comment), "")
     }
 

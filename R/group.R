@@ -60,7 +60,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
-            private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+            private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
 
             private$m_log$uuid <- unique_id()
         },
@@ -789,15 +789,15 @@ group_job <- function (idfs, epws) {
 # epgroup_run {{{
 epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     # check if generated models have been modified outside
-    uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
     if (any(uuid != private$m_log$idf_uuid)) {
-        warn("warning_param_modified", paste0(
+        warn(paste0(
             "Some of the grouped models have been modified. ",
             "Running these models will result in simulation outputs that may be not reproducible. ",
             paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
                 names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
             )
-        ))
+        ), "group_model_modified")
     }
 
     log_new_uuid(private$m_log)
@@ -806,10 +806,11 @@ epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = 
 }
 # }}}
 # epgroup_run_models {{{
+#' @importFrom checkmate test_names
 epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     path_idf <- vcapply(private$m_idfs, function (idf) idf$path())
 
-    if (is_named(private$m_idfs)) {
+    if (checkmate::test_names(names(private$m_idfs))) {
         # for parametric job
         nms <- paste0(make_filename(names(private$m_idfs)), ".idf")
     } else {
@@ -832,7 +833,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
     else if (length(output_dir) == 1L) {
         output_dir <- rep(output_dir, length(path_idf))
     } else {
-        assert(have_same_len(path_idf, output_dir))
+        assert_same_len(path_idf, output_dir)
     }
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
 
@@ -840,9 +841,7 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
         dir_to_create <- uniq_dir[!dir.exists(uniq_dir)]
         create_dir <- dir.create(dir_to_create, showWarnings = FALSE, recursive = TRUE)
         if (any(!create_dir)) {
-            abort("error_create_output_dir", paste0("Failed to create output directory: ",
-                collapse(dir_to_create)[!create_dir])
-            )
+            abort(paste0("Failed to create output directory: ", collapse(dir_to_create)[!create_dir]))
         }
     }
 
@@ -969,13 +968,13 @@ epgroup_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
     if (any(private$m_log$idf_uuid != uuid)) {
         status$changed_after <- TRUE
     }
 
     # for parametric job
-    if (is_idf(private$m_seed) && !identical(private$m_log$seed_uuid, ._get_private(private$m_seed)$m_log$uuid)) {
+    if (is_idf(private$m_seed) && !identical(private$m_log$seed_uuid, get_priv_env(private$m_seed)$m_log$uuid)) {
         status$changed_after <- TRUE
     }
 
@@ -1150,8 +1149,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 
     err <- c("error_idf_not_local", "error_idf_path_not_exist", "error_idf_not_saved")
     if (any(invld <- vlapply(idfs, inherits, err))) {
-        abort("error_invalid_group_idf_input", paste0(
-            "Invalid IDF input found:\n",
+        abort(paste0("Invalid IDF input found:\n",
             paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(idfs[invld], conditionMessage),
                 collapse = "\n"
             )
@@ -1167,16 +1165,15 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
 
     epws <- lapply(epws, function (x) {
         tryCatch(get_epw(x),
-            error_epw_not_local = function (e) e,
-            error_epw_path_not_exist = function (e) e,
-            error_epw_not_saved = function (e) e
+            eplusr_error_epw_not_local = function (e) e,
+            eplusr_error_epw_path_not_exist = function (e) e,
+            eplusr_error_epw_not_saved = function (e) e
         )
     })
 
-    err <- c("error_epw_not_local", "error_epw_path_not_exist", "error_epw_not_saved")
+    err <- c("eplusr_error_epw_not_local", "eplusr_error_epw_path_not_exist", "eplusr_error_epw_not_saved")
     if (any(invld <- vlapply(epws, inherits, err))) {
-        abort("error_invalid_group_epw_input", paste0(
-            "Invalid EPW input found:\n",
+        abort(paste0("Invalid EPW input found:\n",
             paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(epws[invld], conditionMessage),
                 collapse = "\n"
             )
@@ -1195,7 +1192,7 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
             sql <- rep(sql, length(epws))
             dict <- rep(dict, length(epws))
         }
-        assert(have_same_len(idfs, epws))
+        assert_same_len(idfs, epws)
     }
 
     list(idfs = idfs, epws = epws, sql = sql, dict = dict)
@@ -1226,7 +1223,7 @@ epgroup_retrieve_data <- function (self, private) {
             }
             if (is.null(private$m_log$end_time)) {
                 end_times <- private$m_job[!is.na(end_time), end_time]
-                if (not_empty(end_times)) private$m_log$end_time <- max(end_times)
+                if (length(end_times)) private$m_log$end_time <- max(end_times)
             }
         }
     }
@@ -1263,19 +1260,19 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
 
     # setting `keep_unsucess` to TRUE makes it possible to continue to parse
     # some output files such like .err files. (#24)
-    if (not_empty(job[status != "completed"])) {
+    if (nrow(job[status != "completed"])) {
         incomplete <- job[status != "completed"]
         msg <- incomplete[, sim_status(rpad(toupper(status)), index, idf, epw)]
         if (keep_unsucess) {
-            warn("error_job_error", paste0("Some of jobs failed to complete. ",
+            warn(paste0("Some of jobs failed to complete. ",
                 "Simulation results may not be correct:\n",
                 paste0(msg, collapse = "\n")
-            ))
+            ), "job_error")
         } else {
-            abort("error_job_error", paste0("Some of jobs failed to complete. ",
+            abort(paste0("Some of jobs failed to complete. ",
                 "Please fix the problems and re-run it before collecting output:\n",
                 paste0(msg, collapse = "\n")
-            ))
+            ), "job_error")
         }
     }
 
@@ -1283,8 +1280,9 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
 }
 # }}}
 # epgroup_case_from_which {{{
+#' @importFrom checkmate test_names
 epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) {
-    if (is_named(private$m_idfs)) {
+    if (checkmate::test_names(private$m_idfs)) {
         nms <- names(private$m_idfs)
     } else {
         nms <- vcapply(private$m_idfs, function(idf) tools::file_path_sans_ext(basename(idf$path())))
@@ -1301,7 +1299,7 @@ epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) 
                 collapse(which[is.na(valid)]), ".", call. = FALSE)
 
         idx <- valid
-    } else if (all(are_count(which))) {
+    } else if (checkmate::test_integerish(which, lower = 1L, any.missing = FALSE)) {
         valid <- which <= length(nms)
         if (any(!valid))
             stop("Invalid job index found for current parametric job: ",
@@ -1468,7 +1466,7 @@ format.EplusGroupJob <- function (x, ...) {
 #' @export
 `==.EplusGroupJob` <- function (e1, e2) {
     if (!inherits(e2, "EplusGroupJob")) return(FALSE)
-    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
 }
 
 #' @export

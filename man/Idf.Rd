@@ -730,6 +730,9 @@ idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index", wide = TRU
 idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
     wide = TRUE, string_value = FALSE, unit = TRUE
 )
+
+# create table for new object input
+idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 }
 
 
@@ -909,6 +912,7 @@ Hongyuan Jia
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{Idf} object
 \subsection{Usage}{
@@ -982,6 +986,7 @@ Idf$new(string_idf, use_idd(8.8, download = "auto"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-version"></a>}}
+\if{latex}{\out{\hypertarget{method-version}{}}}
 \subsection{Method \code{version()}}{
 Get the version of current \code{Idf}
 \subsection{Usage}{
@@ -1013,6 +1018,7 @@ idf$version()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-path"></a>}}
+\if{latex}{\out{\hypertarget{method-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{Idf}
 \subsection{Usage}{
@@ -1046,6 +1052,7 @@ Idf$new("Version, 8.8;\n")$path()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-group_name"></a>}}
+\if{latex}{\out{\hypertarget{method-group_name}{}}}
 \subsection{Method \code{group_name()}}{
 Get names of groups
 \subsection{Usage}{
@@ -1095,6 +1102,7 @@ idf$group_name(all = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-class_name"></a>}}
+\if{latex}{\out{\hypertarget{method-class_name}{}}}
 \subsection{Method \code{class_name()}}{
 Get names of classes
 \subsection{Usage}{
@@ -1156,6 +1164,7 @@ idf$class_name(all = TRUE, by_group = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_group"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_group}{}}}
 \subsection{Method \code{is_valid_group()}}{
 Check if elements in input character vector are valid group names.
 \subsection{Usage}{
@@ -1204,6 +1213,7 @@ idf$is_valid_group(c("Schedules", "Compliance Objects"), all = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_class"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_class}{}}}
 \subsection{Method \code{is_valid_class()}}{
 Check if elements in input character vector are valid class names.
 \subsection{Usage}{
@@ -1253,6 +1263,7 @@ idf$is_valid_class(c("Building", "ShadowCalculation"), all = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-definition"></a>}}
+\if{latex}{\out{\hypertarget{method-definition}{}}}
 \subsection{Method \code{definition()}}{
 Get the \link{IddObject} object for specified class.
 \subsection{Usage}{
@@ -1293,6 +1304,7 @@ idf$definition("Version")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_id"></a>}}
+\if{latex}{\out{\hypertarget{method-object_id}{}}}
 \subsection{Method \code{object_id()}}{
 Get the unique ID for each object in specified classes in the \code{Idf}.
 \subsection{Usage}{
@@ -1354,6 +1366,7 @@ idf$object_id(c("Version", "Zone"), simplify = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_name"></a>}}
+\if{latex}{\out{\hypertarget{method-object_name}{}}}
 \subsection{Method \code{object_name()}}{
 Get names for objects in specified classes in the \code{Idf}.
 \subsection{Usage}{
@@ -1418,6 +1431,7 @@ idf$object_name(c("Version", "Zone"), simplify = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_num"></a>}}
+\if{latex}{\out{\hypertarget{method-object_num}{}}}
 \subsection{Method \code{object_num()}}{
 Get number of objects in specified classes in the \link{Idf} object.
 \subsection{Usage}{
@@ -1460,6 +1474,7 @@ idf$object_num(c("Zone", "Schedule:Compact"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_id"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_id}{}}}
 \subsection{Method \code{is_valid_id()}}{
 Check if elements in input integer vector are valid object IDs.
 \subsection{Usage}{
@@ -1496,6 +1511,7 @@ idf$is_valid_id(c(51, 1000))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid_name"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid_name}{}}}
 \subsection{Method \code{is_valid_name()}}{
 Check if elements in input character vector are valid object names.
 \subsection{Usage}{
@@ -1539,10 +1555,11 @@ idf$is_valid_name(c("simple one zone (wireframe dxf)", "zone one", "a"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object"></a>}}
+\if{latex}{\out{\hypertarget{method-object}{}}}
 \subsection{Method \code{object()}}{
 Extract an \link{IdfObject} object using object ID or name.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Idf$object(which)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Idf$object(which, class = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -1550,6 +1567,10 @@ Extract an \link{IdfObject} object using object ID or name.
 \describe{
 \item{\code{which}}{A single integer specifying the object ID or a single
 string specifying the object name.}
+
+\item{\code{class}}{A character vector that contains valid class names for
+current \code{Idf} object used to locate objects. If \code{NULL}, all
+classes in current \code{Idf} object are used. Default: \code{NULL}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -1592,6 +1613,7 @@ idf$object("simple one zone (wireframe dxf)")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects"></a>}}
+\if{latex}{\out{\hypertarget{method-objects}{}}}
 \subsection{Method \code{objects()}}{
 Extract multiple \link{IdfObject} objects using object IDs or names.
 \subsection{Usage}{
@@ -1645,6 +1667,7 @@ idf$objects(c("Simple One Zone (Wireframe DXF)", "zone one"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_unique"></a>}}
+\if{latex}{\out{\hypertarget{method-object_unique}{}}}
 \subsection{Method \code{object_unique()}}{
 Extract the \link{IdfObject} in class with \code{unique-object} attribute.
 \subsection{Usage}{
@@ -1707,6 +1730,7 @@ idf[["SimulationControl"]]
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects_in_class"></a>}}
+\if{latex}{\out{\hypertarget{method-objects_in_class}{}}}
 \subsection{Method \code{objects_in_class()}}{
 Extract all \link{IdfObject} objects in one class.
 \subsection{Usage}{
@@ -1765,6 +1789,7 @@ idf[["Zone"]]
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects_in_group"></a>}}
+\if{latex}{\out{\hypertarget{method-objects_in_group}{}}}
 \subsection{Method \code{objects_in_group()}}{
 Extract all \link{IdfObject} objects in one group.
 \subsection{Usage}{
@@ -1802,6 +1827,7 @@ idf$objects_in_group("Schedules")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-object_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-object_relation}{}}}
 \subsection{Method \code{object_relation()}}{
 Extract the relationship between object field values.
 \subsection{Usage}{
@@ -1925,6 +1951,7 @@ idf$object_relation("floor", "ref_by")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-objects_in_relation"></a>}}
+\if{latex}{\out{\hypertarget{method-objects_in_relation}{}}}
 \subsection{Method \code{objects_in_relation()}}{
 Extract multiple \link{IdfObject} objects referencing each others.
 \subsection{Usage}{
@@ -2041,6 +2068,7 @@ idf$objects_in_relation("floor", "ref_by", "BuildingSurface:Detailed")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-search_object"></a>}}
+\if{latex}{\out{\hypertarget{method-search_object}{}}}
 \subsection{Method \code{search_object()}}{
 Extract multiple \link{IdfObject} objects using regular expression on
 names.
@@ -2092,6 +2120,7 @@ idf$search_object("floor", ignore.case = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-dup"></a>}}
+\if{latex}{\out{\hypertarget{method-dup}{}}}
 \subsection{Method \code{dup()}}{
 Duplicate existing objects.
 \subsection{Usage}{
@@ -2151,6 +2180,7 @@ idf$dup(floors_1, floors_2)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add"></a>}}
+\if{latex}{\out{\hypertarget{method-add}{}}}
 \subsection{Method \code{add()}}{
 Add new objects.
 \subsection{Usage}{
@@ -2253,6 +2283,7 @@ empty$add(objs1, rp)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-set"></a>}}
+\if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
 Set values of existing objects.
 \subsection{Usage}{
@@ -2382,6 +2413,7 @@ idf$set(sets)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-del"></a>}}
+\if{latex}{\out{\hypertarget{method-del}{}}}
 \subsection{Method \code{del()}}{
 Delete existing objects
 \subsection{Usage}{
@@ -2491,6 +2523,7 @@ idf$del(ids)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-purge"></a>}}
+\if{latex}{\out{\hypertarget{method-purge}{}}}
 \subsection{Method \code{purge()}}{
 Purge resource objects that are not used
 \subsection{Usage}{
@@ -2549,6 +2582,7 @@ idf$purge(group = "Schedules")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-duplicated"></a>}}
+\if{latex}{\out{\hypertarget{method-duplicated}{}}}
 \subsection{Method \code{duplicated()}}{
 Determine duplicated objects
 \subsection{Usage}{
@@ -2588,7 +2622,8 @@ A \code{\link[data.table:data.table]{data.table::data.table()}} of 4 columns:
 \item \code{class}: Character. Names of classes that input objects belong to
 \item \code{id}: Integer. Input object IDs
 \item \code{name}: Character. Input object names
-\item \code{duplicated}: Logical. Whether this object is a duplication or not
+\item \code{duplicate}: Integer. The IDs of objects that input objects
+duplicate. If input object is not a duplication, \code{NA} is returned
 }
 }
 \subsection{Examples}{
@@ -2613,6 +2648,7 @@ idf$duplicated(class = "Material", group = "Schedules")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-unique"></a>}}
+\if{latex}{\out{\hypertarget{method-unique}{}}}
 \subsection{Method \code{unique()}}{
 Remove duplicated objects
 \subsection{Usage}{
@@ -2673,6 +2709,7 @@ idf$unique(class = "Material", group = "Schedules")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-rename"></a>}}
+\if{latex}{\out{\hypertarget{method-rename}{}}}
 \subsection{Method \code{rename()}}{
 Rename existing objects
 \subsection{Usage}{
@@ -2718,6 +2755,7 @@ idf$rename(on_off = "on/off", test_352a = 51)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-insert"></a>}}
+\if{latex}{\out{\hypertarget{method-insert}{}}}
 \subsection{Method \code{insert()}}{
 Insert new objects from \link{IdfObject}s
 \subsection{Usage}{
@@ -2783,6 +2821,7 @@ idf$insert(idf$SizingPeriod_DesignDay)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-load"></a>}}
+\if{latex}{\out{\hypertarget{method-load}{}}}
 \subsection{Method \code{load()}}{
 Load new objects from characters or data.frames
 \subsection{Usage}{
@@ -2941,6 +2980,7 @@ idf$load("Material, mat2, smooth, 0.5, 0.2, 500, 1000,,,;",
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-update"></a>}}
+\if{latex}{\out{\hypertarget{method-update}{}}}
 \subsection{Method \code{update()}}{
 Update existing object values from characters or data.frames
 \subsection{Usage}{
@@ -3068,6 +3108,7 @@ idf$update(dt)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-paste"></a>}}
+\if{latex}{\out{\hypertarget{method-paste}{}}}
 \subsection{Method \code{paste()}}{
 Paste new objects from IDF Editor
 \subsection{Usage}{
@@ -3120,6 +3161,7 @@ A named list of loaded \link{IdfObject} objects.
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-search_value"></a>}}
+\if{latex}{\out{\hypertarget{method-search_value}{}}}
 \subsection{Method \code{search_value()}}{
 Search objects by field values using regular expression
 \subsection{Usage}{
@@ -3177,6 +3219,7 @@ idf$search_value("floor", "Construction", ignore.case = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-replace_value"></a>}}
+\if{latex}{\out{\hypertarget{method-replace_value}{}}}
 \subsection{Method \code{replace_value()}}{
 Replace object field values using regular expression
 \subsection{Usage}{
@@ -3240,6 +3283,7 @@ idf$replace_value("win", "windows")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-validate"></a>}}
+\if{latex}{\out{\hypertarget{method-validate}{}}}
 \subsection{Method \code{validate()}}{
 Check possible object field value errors
 \subsection{Usage}{
@@ -3422,6 +3466,7 @@ idf$validate(custom_validate(auto_field = TRUE, choice = TRUE))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-is_valid}{}}}
 \subsection{Method \code{is_valid()}}{
 Check if there is any error in current \code{Idf}
 \subsection{Usage}{
@@ -3469,6 +3514,7 @@ idf$is_valid(custom_validate(auto_field = TRUE, choice = TRUE))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-to_string"></a>}}
+\if{latex}{\out{\hypertarget{method-to_string}{}}}
 \subsection{Method \code{to_string()}}{
 Format \code{Idf} as a character vector
 \subsection{Usage}{
@@ -3553,6 +3599,7 @@ head(idf$to_string("floor", leading = 0, sep_at = 0))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-to_table"></a>}}
+\if{latex}{\out{\hypertarget{method-to_table}{}}}
 \subsection{Method \code{to_table()}}{
 Format \code{Idf} as a data.frame
 \subsection{Usage}{
@@ -3565,7 +3612,8 @@ Format \code{Idf} as a data.frame
   align = FALSE,
   all = FALSE,
   group_ext = c("none", "group", "index"),
-  force = FALSE
+  force = FALSE,
+  init = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -3624,13 +3672,18 @@ multiple classes in input. This can result in a data.table
 with lots of columns. But may be useful when you know that
 target classes have the exact same fields, e.g.
 \code{Ceiling:Adiabatic} and \code{Floor:Adiabatic}. Default: \code{FALSE}.}
+
+\item{\code{init}}{If \code{TRUE}, a table for new object input will be returned
+with all values filled with defaults. In this case, \code{object}
+input will be ignored. The \code{id} column will be filled with
+possible new object IDs. Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Details}{
 \verb{$to_table()} returns a \link[data.table:data.table]{data.table} that
 contains core data of specified objects.
-The returned \link[data.table:data.table]{data.table} has 6 columns:
+The returned \link[data.table:data.table]{data.table} has 5 columns:
 \itemize{
 \item \code{id}: Integer type. Object IDs.
 \item \code{name}: Character type. Object names.
@@ -3708,6 +3761,9 @@ idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index", wide = TRU
 idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
     wide = TRUE, string_value = FALSE, unit = TRUE
 )
+
+# create table for new object input
+idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
 }
 
 }
@@ -3718,6 +3774,7 @@ idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_unsaved"></a>}}
+\if{latex}{\out{\hypertarget{method-is_unsaved}{}}}
 \subsection{Method \code{is_unsaved()}}{
 Check if there are unsaved changes in current \code{Idf}
 \subsection{Usage}{
@@ -3747,6 +3804,7 @@ idf$is_unsaved()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-save"></a>}}
+\if{latex}{\out{\hypertarget{method-save}{}}}
 \subsection{Method \code{save()}}{
 Save \code{Idf} object as an IDF file
 \subsection{Usage}{
@@ -3825,6 +3883,7 @@ idf$save(path = file.path(tempdir(), "test1.idf"), copy_external = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-run"></a>}}
+\if{latex}{\out{\hypertarget{method-run}{}}}
 \subsection{Method \code{run()}}{
 Run simulation using EnergyPlus
 \subsection{Usage}{
@@ -3949,6 +4008,7 @@ job$report_data()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-last_job"></a>}}
+\if{latex}{\out{\hypertarget{method-last_job}{}}}
 \subsection{Method \code{last_job()}}{
 Get the last simulation job
 \subsection{Usage}{
@@ -3979,6 +4039,7 @@ idf$last_job()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-view"></a>}}
+\if{latex}{\out{\hypertarget{method-view}{}}}
 \subsection{Method \code{view()}}{
 View 3D \code{Idf} geometry
 \subsection{Usage}{
@@ -4124,6 +4185,7 @@ idf$view(new, render_by = "construction")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-save_view"></a>}}
+\if{latex}{\out{\hypertarget{method-save_view}{}}}
 \subsection{Method \code{save_view()}}{
 Capture and save current rgl view as an image
 \subsection{Usage}{
@@ -4182,6 +4244,7 @@ idf$save_view(tempfile(fileext = ".png"))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{Idf} object
 \subsection{Usage}{
@@ -4248,6 +4311,7 @@ idf$print("field", order = FALSE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

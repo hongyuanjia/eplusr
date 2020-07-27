@@ -1,4 +1,6 @@
 #' @importFrom cli cat_bullet cat_line cat_rule rule symbol
+#' @importFrom checkmate assert_count assert_names assert_integerish
+#' @importFrom checkmate test_integerish assert_integer assert_character
 #' @importFrom data.table copy data.table dcast rbindlist
 #' @importFrom data.table setattr setcolorder setnames setorder setorderv
 #' @importFrom stringi stri_locate_first_regex stri_replace_first_regex "stri_sub<-"
@@ -11,10 +13,10 @@ NULL
 get_idd_group_index <- function (idd_env, group = NULL) {
     if (is.null(group)) return(idd_env$group$group_id)
 
-    assert(are_string(group))
+    assert_character(group, any.missing = FALSE)
 
     res <- idd_env$group[J(group), on = "group_name", group_id]
-    if (anyNA(res)) abort_bad_key("error_group_name", "group name", group)
+    if (anyNA(res)) abort_bad_key("group name", group)
     res
 }
 # }}}
@@ -22,61 +24,63 @@ get_idd_group_index <- function (idd_env, group = NULL) {
 get_idd_group_name <- function (idd_env, group = NULL) {
     if (is.null(group)) return(idd_env$group$group_name)
 
-    assert(are_count(group))
+    assert_integerish(group, lower = 1L, any.missing = FALSE)
 
     res <- idd_env$group[J(group), on = "group_id", group_name]
-    if (anyNA(res)) abort_bad_key("error_group_id", "group index", group)
+    if (anyNA(res)) abort_bad_key("group index", group)
     res
 }
 # }}}
 
 # CLASS
 # get_idd_class {{{
-# Get class data
-# @param idd_env An environment or list contains IDD tables including class,
-#        field, and reference.
-# @param class An integer vector of valid class indexes or a character vector
-#        of valid class names. If `NULL`, all classes are returned.
-# @param property A character vector of column names in class table to return.
-#        If `NULL`, only class index columns are returned, plus column `rleid`.
-# @param underscore If `TRUE`, input class name will be converted into
-#        underscore style name first and column `class_name_us` will be used
-#        for matching.
-# @return A data.table containing specified columns.
+#' Get class data
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names. If `NULL`, all classes are returned.
+#' @param property A character vector of column names in class table to return.
+#'        If `NULL`, only class index columns are returned, plus column `rleid`.
+#' @param underscore If `TRUE`, input class name will be converted into
+#'        underscore style name first and column `class_name_us` will be used
+#'        for matching.
+#'
+#' @return A data.table containing specified columns.
+#' @keywords internal
+#' @export
 get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = FALSE) {
+    cols <- setdiff(CLASS_COLS$index, "class_name_us")
+
     if (is.null(class)) {
-        cols <- setdiff(CLASS_COLS$index, "class_name_us")
-        if (is.null(property)) {
-            return(idd_env$class[, .SD, .SDcols = cols])
+        # very odd way to subset columns but is way faster that others
+        # ref: https://github.com/Rdatatable/data.table/issues/3477
+        if (is.null(property)) return(fast_subset(idd_env$class, cols))
+
+        if ("group_name" %chin% property) {
+            property <- setdiff(property, "group_name")
+            add_group <- TRUE
         } else {
-            if ("group_name" %chin% property) {
-                property <- setdiff(property, "group_name")
-                add_group <- TRUE
-            } else {
-                add_group <- FALSE
-            }
-
-            res <- idd_env$class[, .SD, .SDcols = unique(c(cols, property))]
-
-            if (add_group) {
-                add_joined_cols(idd_env$group, res, "group_id", "group_name")
-            }
-
-            return(res)
+            add_group <- FALSE
         }
+
+        # very odd way to subset columns but is way faster
+        # ref: https://github.com/Rdatatable/data.table/issues/3477
+        res <- fast_subset(idd_env$class, unique(c(cols, property)))
+
+        if (add_group) add_joined_cols(idd_env$group, res, "group_id", "group_name")
+
+        return(res)
     }
 
     cls_in <- recognize_input(class, "class", underscore)
     res <- join_from_input(idd_env$class, cls_in, "group_id")
-    set(res, NULL, "class_name_us", NULL)
 
-    property <- property %||% ""
-    if ("group_name" %chin% property) {
+    if (!is.null(property) && "group_name" %chin% property) {
         add_joined_cols(idd_env$group, res, "group_id", "group_name")
     }
-    clean_class_property(res, property)
 
-    res
+    fast_subset(res, c("rleid", unique(c(cols, property))))
 }
 # }}}
 # get_idd_class_field_num {{{
@@ -98,14 +102,15 @@ get_idd_class <- function (idd_env, class = NULL, property = NULL, underscore = 
 #       - The acceptable field number will be the field index of the last
 #         field in the last extensible group.
 get_idd_class_field_num <- function (dt_class, num = NULL) {
-    if (!is.null(num)) assert(are_count(num))
+    assert_integer(num, lower = 1L, any.missing = FALSE, null.ok = TRUE)
 
     dt_class <- add_rleid(dt_class, "class")
 
     # directly return num of fields in class
-    assert(has_name(dt_class, c("num_fields", "min_fields", "last_required", "num_extensible", "first_extensible")))
+    assert_names(names(dt_class), must.include = c("num_fields", "min_fields", "last_required", "num_extensible", "first_extensible"))
 
     if (!nrow(dt_class)) {
+        set(dt_class, NULL, "class_rleid", NULL)
         set(dt_class, NULL, "input_num", integer(0L))
         set(dt_class, NULL, "acceptable_num", integer(0L))
         return(dt_class)
@@ -114,13 +119,13 @@ get_idd_class_field_num <- function (dt_class, num = NULL) {
     if (is.null(num)) {
         set(dt_class, NULL, "input_num", 0L)
     } else {
-        assert(have_same_len(dt_class, num))
+        assert_same_len(dt_class, num)
         set(dt_class, NULL, "input_num", as.integer(num))
     }
 
     # get index of the last field in the last extensible group
     set(dt_class, NULL, "last_extensible", 0)
-    if (nrow(dt_class[num_extensible > 0L])) {
+    if (any(dt_class$num_extensible > 0L)) {
         dt_class[
             num_extensible > 0L & input_num > first_extensible,
             last_extensible :=
@@ -144,16 +149,44 @@ get_idd_class_field_num <- function (dt_class, num = NULL) {
     dt_class
 }
 # }}}
-# clean_class_property {{{
-clean_class_property <- function (dt, property) {
-    col_del <- setdiff(CLASS_COLS$property, property)
-    if (length(col_del)) set(dt, NULL, col_del, NULL)
-    dt
+# get_idd_class_unique {{{
+get_idd_class_unique <- function (idd_env) {
+    idd_env$class[J(TRUE), on = "unique_object", nomatch = NULL]
+}
+# }}}
+# get_class_component_name {{{
+get_class_component_name <- function (class) {
+    nm <- stri_extract_first_regex(class, "^.+?(?=:)")
+    nm[is.na(nm)] <- class[is.na(nm)]
+    nm
 }
 # }}}
 
 # FIELD
 # get_idd_field {{{
+#' Get field data
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param class An integer vector of valid class indexes or a character vector
+#'        of valid class names.
+#' @param field An integer vector of valid field indexes or a character
+#'        vector of valid field names (can be in in underscore style).  `class`
+#'        and `field` should have the same length.
+#' @param property A character vector of column names in field table to return.
+#' @param underscore If `TRUE`, input class name and field names will be
+#'        converted into underscore style name first and column `class_name_us`
+#'        and `field_name_us` will be used for matching.
+#' @param no_ext If `TRUE`, no new extensible groups will be added even if there
+#'        are no matched input found and an error will be issued right away.
+#' @param complete If `TRUE`, at least fields till the current whole extensible
+#'        group will be returned. A new column named "matched_rleid" will be
+#'        created (when `property` is NULL) indicating if given field has been
+#'        matched or not.
+#'
+#' @return A data.table containing specified columns.
+#' @keywords internal
+#' @export
 get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = FALSE,
                            underscore = TRUE, no_ext = FALSE, complete = FALSE) {
     if (is.null(field)) {
@@ -161,8 +194,12 @@ get_idd_field <- function (idd_env, class, field = NULL, property = NULL, all = 
     } else {
         res <- get_idd_field_from_which(idd_env, class, field, underscore, no_ext, complete, all)
     }
-    if (has_name(res, "field_name_us")) set(res, NULL, "field_name_us", NULL)
-    clean_field_property(res, property %||% "")
+
+    cols <- c("rleid", "class_id", "class_name", "field_id", "field_index", "field_name", "field_in")
+    if (length(col_del <- setdiff(names(res), c(cols, property)))) {
+        set(res, NULL, col_del, NULL)
+    }
+
     res
 }
 # }}}
@@ -185,32 +222,9 @@ get_idd_field_in_class <- function (idd_env, class, all = FALSE, underscore = TR
 }
 # }}}
 # get_idd_field_from_which {{{
-# Get specified field data
-# @param idd_env An environment or list contains IDD tables including class,
-#        field, and reference.
-# @param class An integer vector of valid class indexes or a character vector
-#        of valid class names or a data.table that contains column `class_id`
-#        and `rleid`. If a data.table that contains a column `object_id`, that
-#        column will be preserved.
-# @param field An integer vector of valid field indexes or a character
-#        vector of valid field names (can be in in underscore style).  `class`
-#        and `field` should have the same length.
-# @param property A character vector of column names in field table to return. If
-#        `NULL`, all columns from IDD field table will be returned, plus column
-#        `rleid`, `object_id` (if applicable) and `matched_rleid` (if
-#        `complete` is `TRUE`).
-# @param underscore If `TRUE`, input class name and field names will be
-#        converted into underscore style name first and column `class_name_us`
-#        and `field_name_us` will be used for matching.
-# @param no_ext If `TRUE`, no new extensible groups will be added even if there
-#        are no matched input found and an error will be issued right away.
-# @param complete If `TRUE`, at least fields till the current whole extensible
-#        group will be returned. A new column named "matched_rleid" will be
-#        created (when `property` is NULL) indicating if given field has been
-#        matched or not.
 get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                                       no_ext = FALSE, complete = FALSE, all = FALSE) {
-    assert_valid_type(field, "field")
+    assert_valid_type(field, "Field Index|Name")
 
     # class properties used for min required field num calculation
     col_prop <- c("num_fields", "min_fields", "last_required", "num_extensible",
@@ -239,9 +253,9 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
     }
     # }}}
 
-    assert(have_same_len(dt_in, field), prefix = "class and field")
+    assert_same_len(dt_in, field, "class and field")
 
-    if (all(are_count(field))) {
+    if (test_integerish(field, lower = 1L, any.missing = FALSE)) {
         # from field index {{{
         field <- as.integer(field)
         set(dt_in, NULL, c("field_index", "field_in"), list(field, field))
@@ -255,7 +269,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
         # check invalid field index
         if (dt_in[field_in > acceptable_num, .N > 0L]) {
             invld_idx <- dt_in[field_in > acceptable_num]
-            abort_bad_field("error_bad_field_index", "index", invld_idx)
+            abort_bad_field("index", invld_idx)
         }
 
         # handle extensible fields
@@ -266,7 +280,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
 
         # stop if adding new extensible groups is not allowed
         if (no_ext && nrow(dt_in[num > 0L])) {
-            abort_bad_field("error_bad_field_index", "index", dt_in[num > 0L])
+            abort_bad_field("index", dt_in[num > 0L])
         }
 
         # add extensible groups
@@ -348,12 +362,12 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
             # invalid field names for non-extensible classes
             if (any(dt_nom$class_id %in% idd_env$class[J(0L), on = "num_extensible", class_id])) {
                 invld_non_ext <- dt_nom[class_id %in% idd_env$class[J(0L), on = "num_extensible", class_id]]
-                abort_bad_field("error_bad_field_name", "name", clean_errnm_dt(invld_non_ext))
+                abort_bad_field("name", clean_errnm_dt(invld_non_ext))
             }
 
             # if all names not found are in extensible class
             if (no_ext) {
-                abort_bad_field("error_bad_field_name", "name", clean_errnm_dt(dt_nom))
+                abort_bad_field("name", clean_errnm_dt(dt_nom))
             }
 
             # get number of field names to check per class
@@ -383,7 +397,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                     num_extensible_group = num_extensible_group + num
                     )]
                 idd_env <- del_idd_extensible_group(idd_env, dt_ext)
-                abort_bad_field("error_bad_field_name", "name",
+                abort_bad_field("name",
                     add_class_property(idd_env, invld_nm, c("min_fields", "num_fields")),
                     "\n\nNOTE: For extensible fields, new one will be added only ",
                     "when all previous extensible groups exist."
@@ -396,6 +410,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
                 set(dt_ext_join, NULL, col_prop, NULL)
                 set(dt_join, NULL, col_prop, NULL)
                 fld <- append_dt(dt_join[!is.na(field_id)], dt_ext_join)
+                setorderv(fld, "field_rleid")
                 set(fld, NULL, "field_rleid", NULL)
                 # }}}
             } else {
@@ -420,15 +435,7 @@ get_idd_field_from_which <- function (idd_env, class, field, underscore = TRUE,
         # }}}
     }
 
-    set(fld, NULL, "field_name_us", NULL)
     fld
-}
-# }}}
-# clean_field_property {{{
-clean_field_property <- function (dt, property) {
-    col_del <- setdiff(FIELD_COLS$property, property)
-    if (length(col_del)) set(dt, NULL, col_del, NULL)
-    dt
 }
 # }}}
 
@@ -445,6 +452,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep,
             col_fld <- "field_id"
             col_val <- "value_id"
         }
+        if (!col_val %chin% names(init_ref)) col_val <- col_fld
 
         # this assume that one class-name-reference is always followed by one
         # field value reference
@@ -480,7 +488,7 @@ get_recursive_relation <- function (all_ref, init_ref, init_dep, max_dep,
     while (dep < max_dep && nrow(cur_ref)) {
         # skip if specified classes/objects are matched
         if (!match_all && !is.null(include)) {
-            skip <- cur_ref[J(include), on = col_ref, .SD, .SDcols = col_rev, nomatch = 0L][[1L]]
+            skip <- unique(cur_ref[J(include), on = col_ref, col_rev, with = FALSE][[1L]])
             if (length(skip)) {
                 cur_ref <- cur_ref[!J(skip), on = col_rev]
 
@@ -602,12 +610,55 @@ combine_input_and_relation <- function (input, ref, type, direction) {
     ref
 }
 # }}}
+
 # get_idd_relation {{{
-get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, direction = c("ref_to", "ref_by"),
-                              class = NULL, group = NULL, depth = 0L, name = FALSE, keep_all = FALSE, match_all = FALSE) {
-    direction <- match.arg(direction)
-    assert(is.null(depth) || is_count(depth, TRUE))
+#' Get field relation data
+#'
+#' @param idd_env An environment or list contains IDD tables including class,
+#'        field, and reference.
+#' @param class_id An integer vector of valid class indexes. Should be `NULL` if
+#'        `field_id` is given.
+#' @param field_id An integer vector of valid field id. Should be `NULL` if
+#'        `class_id` is given.
+#' @param direction The relation direction to extract. Should be one of
+#'        `"ref_to"` or `"ref_by"`.
+#' @param underscore If `TRUE`, input class name and field names will be
+#'        converted into underscore style name first and column `class_name_us`
+#'        and `field_name_us` will be used for matching.
+#' @param depth If > 0, the relation is searched recursively. If `NULL`,
+#'        all possible recursive relations are returned. Default: `0`.
+#' @param name If `TRUE`, additional formatting columns are added and an
+#'        `IddRelation` object is returned. Default: `FALSE`.
+#' @param class,group A character vector of group names used for searching
+#'        relations. Default: `NULL`.
+#' @param keep If `TRUE`, all inputs are returned regardless they have any
+#'        relations with other fields or not. If `FALSE`, only input that have
+#'        relations with other fields are returned. Default: `FALSE`.
+#' @param class_ref Specify how to handle class-name-references. There are 3
+#'        options in total, i.e. `"none"`, `"both"` and `"all"`, with `"both"`
+#'        being the default.
+#'     * `"none"`: just ignore class-name-references.
+#'     * `"both"`: only include class-name-references if this object
+#'       also reference field values of the same one. This is the default
+#'       option.
+#'     * `"all"`: include all class-name-references. This is the most aggressive
+#'       option.
+#' @param match_all If `TRUE`, relation search will continue even though one
+#'        relation has been found. If `FALSE`, searching is stopped whenever one
+#'        relation is found in specified classes/groups. Default: `FALSE`.
+#'
+#' @return A data.table.
+#'
+#' @keywords internal
+#' @export
+get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL,
+                              direction = c("ref_to", "ref_by"), depth = 0L, name = FALSE,
+                              class = NULL, group = NULL, keep_all = FALSE,
+                              class_ref = c("both", "none", "all"), match_all = FALSE) {
+    assert_count(depth, null.ok = TRUE)
     if (is.null(depth)) depth <- Inf
+    direction <- match.arg(direction)
+    class_ref <- match.arg(class_ref)
 
     # get class reference
     if (is.null(field_id)) {
@@ -622,8 +673,9 @@ get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, directi
         if (is.null(class_id)) {
             id <- field_id
         } else {
-            warning("Both class id and field id are given.")
-            id <- intersect(field_id, get_idd_field(idd_env, class_id)$field_id)
+            abort("Should not specify both class id and field id at the same time",
+                "idd_relation"
+            )
         }
         col_on <- "field_id"
     }
@@ -636,6 +688,15 @@ get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, directi
     if (direction == "ref_by") col_on <- paste0("src_", col_on)
 
     all_ref <- idd_env$reference
+
+    if (class_ref == "none") {
+        both <- FALSE
+        all_ref <- all_ref[!J(IDDFIELD_SOURCE$class), on = "src_enum"]
+    } else if (class_ref == "all") {
+        both <- FALSE
+    } else if (class_ref == "both") {
+        both <- TRUE
+    }
 
     # init depth
     dep <- 0L
@@ -668,8 +729,12 @@ get_idd_relation <- function (idd_env, class_id = NULL, field_id = NULL, directi
         cur_ref <- cur_ref[J(cls_id), on = col_ref, nomatch = 0L]
     }
 
+    # no matched found for specified classes or groups
+    if (!is.null(cls_id) && !length(cls_id)) all_ref <- all_ref[0L]
+
     # get recursive relation
-    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref, col_rev, cls_id, match_all = match_all)
+    ref <- get_recursive_relation(all_ref, cur_ref, dep, depth, col_ref,
+        col_rev, cls_id, both = both, match_all = match_all)
 
     # keep all input
     if (keep_all) ref <- combine_input_and_relation(fld, ref, "idd", direction)
@@ -704,6 +769,7 @@ add_idd_relation_format_cols <- function (idd_env, ref) {
 }
 # }}}
 
+# PROPERTY COLUMNS
 # add_class_id {{{
 add_class_id <- function (idd_env, dt) {
     add_joined_cols(idd_env$class, dt, "class_name", "class_id")
@@ -744,15 +810,35 @@ add_field_property <- function (idd_env, dt, property) {
 }
 # }}}
 
+# UNIT CONVERSION
 # field_default_to_unit {{{
-field_default_to_unit <- function (dt_field, from, to) {
+field_default_to_unit <- function (idd_env, dt_field, from, to) {
+    if (has_names(dt_field, "value_id")) {
+        value_id <- dt_field$value_id
+    } else {
+        value_id <- NULL
+    }
+    if (has_names(dt_field, "value_chr")) {
+        setnames(dt_field, c("value_chr", "value_num"), paste0(c("value_chr", "value_num"), "-backup"))
+    }
     set(dt_field, NULL, "value_id", seq_along(dt_field$field_id))
+
+    cols_add <- NULL
+    if (!has_names(dt_field, "default_chr")) cols_add <- "default_chr"
+    if (!has_names(dt_field, "default_num")) cols_add <- c(cols_add, "default_num")
+    if (!is.null(cols_add)) add_field_property(idd_env, dt_field, cols_add)
+
     setnames(dt_field, c("default_chr", "default_num"), c("value_chr", "value_num"))
 
-    dt_field <- convert_value_unit(dt_field, from, to)
+    dt_field <- convert_value_unit(idd_env, dt_field, from, to)
 
-    set(dt_field, NULL, "value_id", NULL)
+    set(dt_field, NULL, "value_id", value_id)
     setnames(dt_field, c("value_chr", "value_num"), c("default_chr", "default_num"))
+
+    if (has_names(dt_field, "value_chr-backup")) {
+        setnames(dt_field, paste0(c("value_chr", "value_num"), "-backup"), c("value_chr", "value_num"))
+    }
+
     dt_field
 }
 # }}}
@@ -764,11 +850,9 @@ add_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
 
     # stop if non-extensible class found
     if (strict && nrow(dt_cls[num_extensible == 0L])) {
-        abort("error_nonextensible_class",
-            paste0("Non-extensible class found: ",
-                collapse(dt_cls[num_extensible == 0L, unique(class_name)])
-            )
-        )
+        abort(paste0("Non-extensible class found: ",
+            collapse(dt_cls[num_extensible == 0L, unique(class_name)])
+        ), "non_extensible_class")
     }
 
     ext <- dt_cls[num_extensible > 0L & num > 0L]
@@ -883,13 +967,12 @@ del_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
 
     # stop if non-extensible class found
     if (strict && nrow(dt_cls[num_extensible == 0L])) {
-        stop("Non-extensible class found: ",
-            collapse(dt_cls[num_extensible == 0L, unique(class_name)]),
-            call. = FALSE
-        )
+        abort(paste0("Non-extensible class found: ",
+            collapse(dt_cls[num_extensible == 0L, unique(class_name)])
+        ), "non_extensible_class")
     }
 
-    ext <- dt_cls[num_extensible > 0L]
+    ext <- dt_cls[num_extensible > 0L & num > 0L]
 
     if (!nrow(ext)) return(idd_env)
 
@@ -909,7 +992,7 @@ del_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
         less <- errormsg_info(less)
         mes <- less[, paste0(info, ": ", left_fields, " left with ", last_required, " required.")]
         mes <- paste0("Failed to delete extensible groups. Number of field(s) left less than required:\n", mes)
-        abort("error_del_extensible", mes, data = less)
+        abort(mes, data = less)
     }
 
     # get field id to delete
@@ -934,16 +1017,16 @@ del_idd_extensible_group <- function (idd_env, class, num = NULL, strict = FALSE
 get_input_class_data <- function (idd_env, class, num = NULL) {
     if (is.data.frame(class)) {
         dt_cls <- class
-        assert(has_name(dt_cls,
-            c("min_fields", "num_fields", "num_extensible", "last_required", "num_extensible_group")
-        ))
+        assert_names(names(dt_cls),
+            must.include = c("min_fields", "num_fields", "num_extensible", "last_required", "num_extensible_group")
+        )
 
         if (is.null(num)) {
-            assert(has_name(dt_cls, "num"))
+            assert_names(names(dt_cls), must.include = "num")
             set(dt_cls, NULL, "num", as.integer(dt_cls$num))
         } else {
-            assert(are_count(num))
-            set(dt_cls, NULL, "num", as.integer(num))
+            num <- assert_integerish(num, lower = 1L, any.missing = FALSE, coerce = TRUE)
+            set(dt_cls, NULL, "num", num)
         }
 
     } else {
@@ -955,9 +1038,9 @@ get_input_class_data <- function (idd_env, class, num = NULL) {
             )
         )
 
-        assert(are_count(num))
-        assert(have_same_len(class, num))
-        set(dt_cls, NULL, "num", as.integer(num))
+        num <- assert_integerish(num, lower = 1L, any.missing = FALSE, coerce = TRUE, len = 1L)
+        assert_same_len(class, num)
+        set(dt_cls, NULL, "num", num)
     }
 }
 # }}}
@@ -965,7 +1048,7 @@ get_input_class_data <- function (idd_env, class, num = NULL) {
 # TABLE
 # get_idd_table {{{
 get_idd_table <- function (idd_env, class, all = FALSE) {
-    assert_valid_type(class, "class")
+    assert_valid_type(class, "Class Index|Name")
     fld <- get_idd_field(idd_env, class, all = all)[
         , .SD, .SDcols = c("class_name", "field_index", "field_name")
     ]
@@ -979,8 +1062,8 @@ get_idd_table <- function (idd_env, class, all = FALSE) {
 # STRING
 # get_idd_string {{{
 get_idd_string <- function (idd_env, class, leading = 4L, sep_at = 29L, sep_each = 0L, all = FALSE) {
-    assert_valid_type(class, "class")
-    assert(is_count(sep_each, TRUE))
+    assert_valid_type(class, "Class Index|Name")
+    assert_count(sep_each)
 
     fld <- get_idd_field(idd_env, class, property = c("units", "ip_units"), all = all)
 

@@ -59,18 +59,20 @@ NULL
 #' }
 #' @rdname rdd
 #' @author Hongyuan Jia
+#' @importFrom checkmate assert_file_exists
 # read_rdd {{{
 read_rdd <- function (path) {
-    assert(has_ext(path, "rdd"))
+    assert_file_exists(path, "r", "rdd")
     parse_rdd_file(path)[]
 }
 # }}}
 
 #' @rdname rdd
+#' @importFrom checkmate assert_file_exists
 #' @export
 # read_mdd {{{
 read_mdd <- function (path) {
-    assert(has_ext(path, "mdd"))
+    assert_file_exists(path, "r", "mdd")
     parse_rdd_file(path, mdd = TRUE)[]
 }
 # }}}
@@ -99,9 +101,7 @@ parse_rdd_file <- function (path, mdd = FALSE) {
     if (!stri_startswith_fixed(header$string, "Program Version") &&
         !stri_startswith_fixed(header$string, "! Program Version")) {
         type <- if (mdd) "mdd" else "rdd"
-        abort(paste0("error_invalid_", type),
-            paste0("Input file is not a valid EnergyPlus ", stri_trans_toupper(type), " file.")
-        )
+        abort(paste0("Input file is not a valid EnergyPlus ", stri_trans_toupper(type), " file."))
     }
 
     rdd_head <- stri_split_fixed(header$string, ",")[[1L]]
@@ -253,9 +253,10 @@ parse_rdd_file <- function (path, mdd = FALSE) {
 #' mdd_to_load(mdd_sub, class = "Output:Meter:MeterFileOnly")
 #' }
 #' @export
+#' @importFrom checkmate assert_string
 # rdd_to_load {{{
 rdd_to_load <- function (rdd, key_value, reporting_frequency) {
-    assert(is_rdd(rdd))
+    if (!is_rdd(rdd)) abort("'rdd' must be an RddFile object")
 
     # copy the original
     rdd <- copy(rdd)
@@ -267,9 +268,9 @@ rdd_to_load <- function (rdd, key_value, reporting_frequency) {
     set(rdd, NULL, "class", "Output:Variable")
 
     if (!missing(key_value)) {
-        assert(is_string(key_value))
+        assert_string(key_value)
         set(rdd, NULL, "key_value", key_value)
-    } else if (!has_name(rdd, "key_value")) {
+    } else if (!has_names(rdd, "key_value")) {
         set(rdd, NULL, "key_value", "*")
     } else {
         set(rdd, NULL, "key_value", as.character(rdd$key_value))
@@ -278,7 +279,7 @@ rdd_to_load <- function (rdd, key_value, reporting_frequency) {
     if (!missing(reporting_frequency)) {
         rep_freq <- validate_report_freq(reporting_frequency)
         set(rdd, NULL, "reporting_frequency", rep_freq)
-    } else if (!has_name(rdd, "reporting_frequency")) {
+    } else if (!has_names(rdd, "reporting_frequency")) {
         set(rdd, NULL, "reporting_frequency", "Timestep")
     } else {
         set(rdd, NULL, "reporting_frequency",
@@ -309,7 +310,7 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
                                                              "Output:Meter:MeterFileOnly",
                                                              "Output:Meter:Cumulative",
                                                              "Output:Meter:Cumulative:MeterFileOnly")) {
-    assert(is_mdd(mdd))
+    if (!is_mdd(mdd)) abort("'mdd' must be an MddFile object")
     ver <- attr(mdd, "eplus_version")
     class <- match.arg(class)
 
@@ -324,7 +325,7 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
     if (!missing(reporting_frequency)) {
         rep_freq <- validate_report_freq(reporting_frequency)
         set(mdd, NULL, "reporting_frequency", rep_freq)
-    } else if (!has_name(mdd, "reporting_frequency")) {
+    } else if (!has_names(mdd, "reporting_frequency")) {
         set(mdd, NULL, "reporting_frequency", "Timestep")
     } else {
         set(mdd, NULL, "reporting_frequency",
@@ -350,20 +351,14 @@ mdd_to_load <- function (mdd, reporting_frequency, class = c("Output:Meter",
 
 # validate_report_freq {{{
 validate_report_freq <- function (reporting_frequency, scalar = TRUE) {
-    if (scalar) assert(is_string(reporting_frequency))
+    if (scalar) assert_string(reporting_frequency)
 
     all_freq <- c("Detailed", "Timestep", "Hourly", "Daily", "Monthly",
           "RunPeriod", "Environment", "Annual")
 
     freq <- match_in_vec(reporting_frequency, all_freq, label = TRUE)
 
-    assert(no_na(freq),
-        msg = paste0("Invalid reporting frequency found: ",
-            collapse(unique(reporting_frequency[is.na(freq)])), ". All possible values: ",
-            collapse(all_freq), "."
-        ),
-        err_type = "error_invalid_reporting_frequency"
-    )
+    if (anyNA(freq)) abort(sprintf("Invalid reporting frequency found: %s.", collapse(reporting_frequency[is.na(freq)])))
 
     freq
 }

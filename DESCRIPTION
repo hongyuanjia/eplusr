@@ -20,9 +20,10 @@ Depends:
     R (>= 3.2.0)
 Imports:
     callr (>= 2.0.4),
+    checkmate,
     cli (>= 1.1.0),
     crayon,
-    data.table (>= 1.9.8),
+    data.table (>= 1.12.4),
     lubridate,
     methods,
     processx (>= 3.2.0),
@@ -38,41 +39,42 @@ Suggests:
     pkgdown,
     rgl,
     rmarkdown,
-    testthat
-VignetteBuilder: 
+    testthat (>= 2.1.0)
+VignetteBuilder:
     knitr
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE, roclets = c("rd", "namespace",
     "collate"))
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 SystemRequirements: EnergyPlus (>= 8.3, optional)
     (<https://energyplus.net>); udunits2
 Collate:
     'constants.R'
-    'assertions.R'
+    'assert.R'
     'diagram.R'
     'eplusr.R'
     'utils.R'
     'impl.R'
     'parse.R'
     'impl-epw.R'
+    'impl-idd.R'
+    'impl-idf.R'
+    'idf.R'
+    'idd.R'
     'epw.R'
     'err.R'
     'format.R'
     'geometry.R'
     'group.R'
-    'impl-idd.R'
-    'idd.R'
-    'idd_object.R'
-    'impl-idf.R'
-    'idf.R'
+    'iddobj.R'
     'impl-idfobj.R'
-    'idf_object.R'
+    'idfobj.R'
     'impl-iddobj.R'
     'impl-sql.R'
     'install.R'
     'job.R'
+    'options.R'
     'param.R'
     'rdd.R'
     'reload.R'

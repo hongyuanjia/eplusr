@@ -106,23 +106,22 @@ NULL
 #' }
 #' @author Hongyuan Jia
 #' @export
+#' @importFrom checkmate assert_string
 # install_eplus {{{
 install_eplus <- function (ver = "latest", local = FALSE, dir = NULL, force = FALSE, ...) {
     ver <- standardize_ver(ver)
-    if (!is.null(dir)) assert(is_string(dir))
+    assert_string(dir, null.ok = TRUE)
 
     # check if the same version has been installed already
     if (is_avail_eplus(ver)) {
         if (!isTRUE(force)) {
-            abort("error_eplus_to_install_exists", paste0(
-                "It seems EnergyPlus v", ver, " has been already installed at ",
+            abort(paste0("It seems EnergyPlus v", ver, " has been already installed at ",
                 surround(eplus_config(ver)$dir), ". Set `force` to `TRUE` to reinstall."
             ))
         }
 
         if (is_macos() & ver >= 9.1) {
-            abort("error_eplus_to_force_install_macos", paste0(
-                "Cannot perform force reinstallation when EnergyPlus version is v9.1 and above. ",
+            abort(paste0("Cannot perform force reinstallation when EnergyPlus version is v9.1 and above. ",
                 "Please first uninstall EnergyPlus v", ver, " at ",
                 surround(eplus_config(ver)$dir), " and then run 'install_eplus(\"", ver, "\")'."
             ))
@@ -186,7 +185,7 @@ download_eplus <- function (ver = "latest", dir) {
 eplus_download_url <- function (ver) {
     cmt <- eplus_release_commit(ver)
 
-    if (is_empty(cmt))
+    if (!length(cmt))
         stop("Failed to get installer data for EnergyPlus v", ver, ". ",
              "All available version are: ",
              collapse(ALL_EPLUS_RELEASE_COMMIT[order(version), version]), ".", call. = FALSE)
@@ -209,8 +208,6 @@ eplus_download_url <- function (ver) {
 # eplus_release_commit: return EnergyPlus release commit data {{{
 eplus_release_commit <- function(ver) {
     ver <- standardize_ver(ver)
-
-    assert(is_eplus_ver(ver))
 
     ALL_EPLUS_RELEASE_COMMIT[version == as.character(ver)]
 }
@@ -269,10 +266,7 @@ get_win_user_path <- function (error = FALSE) {
             if (whoami$status != 0L) {
                 if (!error) return("")
 
-                abort("error_cannot_get_win_user", paste0(
-                    "Cannot get the user-level install path because ",
-                    "it failed to get current logged user name."
-                ))
+                abort("Cannot get the user-level install path because it failed to get current logged user name.")
             }
 
             user <- gsub("\r\n", "", basename(whoami$stdout), fixed = TRUE)
@@ -309,6 +303,7 @@ install_eplus_macos <- function (ver, exec, local = FALSE) {
 }
 # }}}
 # install_eplus_linux {{{
+#' @importFrom checkmate assert_string
 install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin = NULL) {
     if (local) {
         if (is.null(dir)) dir <- "~/.local"
@@ -318,7 +313,7 @@ install_eplus_linux <- function (ver, exec, local = FALSE, dir = NULL, dir_bin =
         if (is.null(dir_bin)) dir_bin <- "/usr/local/bin"
     }
 
-    if (!is.null(dir_bin)) assert(is_string(dir_bin))
+    assert_string(dir_bin)
     if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
     if (!dir.exists(dir_bin)) dir.create(dir_bin, recursive = TRUE)
 
@@ -494,22 +489,14 @@ install_eplus_qt <- function (exec, dir, local = FALSE) {
 #'
 #' @export
 # use_eplus {{{
+#' @importFrom checkmate assert_vector
 use_eplus <- function (eplus) {
-    assert(is_scalar(eplus))
+    assert_vector(eplus, len = 1L)
 
+    ver <- convert_to_eplus_ver(eplus, strict = TRUE, max = FALSE)[[1L]]
     # if eplus is a version, try to locate it in the default path
-    if (is_eplus_ver(eplus, strict = TRUE)) {
-        ver <- standardize_ver(eplus, complete = FALSE)
-        ori_ver <- ver
-
-        # have to check all possible patched versions
-        all_ver <- unique(c(ALL_IDD_VER, names(.globals$eplus_config)))
-        if (is.na(ver[, 3L])) {
-            ver <- numeric_version(all_ver[ver == numeric_version(all_ver)[, 1L:2L]])
-        } else {
-            ver <- numeric_version(all_ver[ver == numeric_version(all_ver)])
-        }
-
+    if (!anyNA(ver)) {
+        ori_ver <- ver[, 1:2]
         # try user-level first
         eplus_dir <- eplus_default_path(ver, local = TRUE)
         dir_cache <- eplus_dir
@@ -551,26 +538,23 @@ use_eplus <- function (eplus) {
                     collapse(paste0("v", ver)), ".\n")
             }
 
-            fail <- paste0("Cannot locate EnergyPlus v", stringi::stri_trim_both(as.character(eplus)), " at default ",
+            fail <- paste0("Cannot locate EnergyPlus v", ori_ver, " at default ",
                 "installation path ", surround(c(dir_cache, eplus_dir)), collapse = "\n")
-            abort("error_cannot_locate_eplus", paste0(msg, fail, "\n",
-                "Please specify explicitly the path of EnergyPlus installation."
-            ))
+            abort(paste0(msg, fail, "\nPlease specify explicitly the path of EnergyPlus installation."), "locate_eplus")
         }
     } else if (is_eplus_path(eplus)){
         ver <- get_ver_from_path(eplus)
         eplus_dir <- eplus
     } else {
-        abort("error_invalid_eplus_input", paste0("`eplus` should be either a ",
-            "valid EnergyPlus version or an EnergyPlus installation path."
-        ))
+        abort("`eplus` should be either a valid EnergyPlus version or an EnergyPlus installation path.")
     }
 
+    eplus_dir <- normalizePath(eplus_dir)
     exe <- paste0("energyplus", if (is_windows()) ".exe" else "")
-    res <- list(version = ver, dir = normalizePath(eplus_dir), exe = exe)
+    res <- list(version = ver, dir = eplus_dir, exe = exe)
 
-    ori <- .globals$eplus_config[[as.character(ver)]]
-    .globals$eplus_config[[as.character(ver)]] <- res
+    ori <- .globals$eplus[[as.character(ver)]]
+    .globals$eplus[[as.character(ver)]] <- res
 
     if (is.null(ori)) {
         verbose_info("EnergyPlus v", ver, " located at ", surround(eplus_dir),
@@ -580,8 +564,8 @@ use_eplus <- function (eplus) {
             surround(eplus_dir), " already exists. No Updating performed.")
     } else {
         verbose_info("Update configure data of EnergyPlus v", ver, ":\n",
-            "    Former location: ", surround(ori$dir), " ---> ",
-                   "New location: ", surround(eplus_dir))
+            "  Former location: ", surround(ori$dir), " ---> ",
+                 "New location: ", surround(eplus_dir))
     }
 
     if (ver < 8.3) {
@@ -600,17 +584,15 @@ use_eplus <- function (eplus) {
 #' @export
 # eplus_config {{{
 eplus_config <- function (ver) {
-    assert(is_idd_ver(ver, strict = TRUE))
-    ver <- standardize_ver(ver, complete = FALSE)
-    ver_m <- match_minor_ver(ver, names(.globals$eplus_config), "eplus")
-    if (is.na(ver)) {
-        warn("warning_miss_eplus_config",
-            "Failed to find configuration data of EnergyPlus v", ver, ".",
-            call. = FALSE)
+    assert_vector(ver, len = 1L)
+    ver_m <- convert_to_eplus_ver(ver, all_ver = names(.globals$eplus))
+
+    if (is.na(ver_m)) {
+        warn(paste0("Failed to find configuration data of EnergyPlus v", ver), "miss_eplus_config")
         return(list())
     }
 
-    .globals$eplus_config[[as.character(ver_m)]]
+    .globals$eplus[[as.character(ver_m)]]
 }
 # }}}
 
@@ -618,7 +600,7 @@ eplus_config <- function (ver) {
 #' @export
 # avail_eplus {{{
 avail_eplus <- function () {
-    res <- names(.globals$eplus_config)
+    res <- names(.globals$eplus)
     if (!length(res)) return(NULL)
     sort(numeric_version(res))
 }
@@ -646,11 +628,8 @@ locate_eplus <- function () {
 # }}}
 # eplus_default_path {{{
 eplus_default_path <- function (ver, local = FALSE) {
-    ver <- standardize_ver(ver)
-    if (length(ver) <= 1L) {
-        assert(is_idd_ver(ver))
-    } else {
-        lapply(ver, function (v) assert(is_idd_ver(v)))
+    if (anyNA(ver <- convert_to_eplus_ver(ver))) {
+        stop("'ver' must be a vector of valid EnergyPlus versions")
     }
 
     ver_dash <- paste0(ver[, 1L], "-", ver[, 2L], "-", ver[, 3L])
@@ -683,17 +662,7 @@ get_ver_from_path <- function (path) {
     idd_file <- normalizePath(file.path(path, "Energy+.idd"), mustWork = TRUE)
 
     tryCatch(get_idd_ver(read_lines(idd_file, nrows = 1L)),
-        error_miss_idd_ver = function (e) {
-            stop("Failed to parse EnergyPlus version using IDD ",
-                surround(idd_file), ".\n", conditionMessage(e)
-            )
-        },
-        error_invalid_idd_ver = function (e) {
-            stop("Failed to parse EnergyPlus version using IDD ",
-                surround(idd_file), ".\n", conditionMessage(e)
-            )
-        },
-        error_multi_idd_ver = function (e) {
+        error = function (e) {
             stop("Failed to parse EnergyPlus version using IDD ",
                 surround(idd_file), ".\n", conditionMessage(e)
             )

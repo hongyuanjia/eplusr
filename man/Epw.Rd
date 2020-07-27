@@ -102,6 +102,16 @@ epw$path()
 
 
 ## ------------------------------------------------
+## Method `Epw$definition`
+## ------------------------------------------------
+
+\dontrun{
+# get path
+epw$definition("LOCATION")
+}
+
+
+## ------------------------------------------------
 ## Method `Epw$location`
 ## ------------------------------------------------
 
@@ -428,6 +438,7 @@ Hongyuan Jia
 \itemize{
 \item \href{#method-new}{\code{Epw$new()}}
 \item \href{#method-path}{\code{Epw$path()}}
+\item \href{#method-definition}{\code{Epw$definition()}}
 \item \href{#method-location}{\code{Epw$location()}}
 \item \href{#method-design_condition}{\code{Epw$design_condition()}}
 \item \href{#method-typical_extreme_period}{\code{Epw$typical_extreme_period()}}
@@ -462,6 +473,7 @@ Hongyuan Jia
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-new"></a>}}
+\if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 Create an \code{Epw} object
 \subsection{Usage}{
@@ -483,7 +495,7 @@ out-of-range data are found. Default: \code{TRUE}.}
 }
 \subsection{Details}{
 It takes an EnergyPlus Weather File (EPW) as input and returns an
-\code{EPW} object.
+\code{Epw} object.
 }
 
 \subsection{Returns}{
@@ -518,6 +530,7 @@ if (is_avail_eplus(8.8)) {
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-path"></a>}}
+\if{latex}{\out{\hypertarget{method-path}{}}}
 \subsection{Method \code{path()}}{
 Get the file path of current \code{Epw}
 \subsection{Usage}{
@@ -547,7 +560,55 @@ epw$path()
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-definition"></a>}}
+\if{latex}{\out{\hypertarget{method-definition}{}}}
+\subsection{Method \code{definition()}}{
+Get the \link{IddObject} object for specified EPW class.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Epw$definition(class)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{class}}{A single string.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+\verb{$definition()} returns an \link{IddObject} of given EPW class. \link{IddObject}
+contains all data used for parsing that EPW class.
+
+Currently, all supported EPW classes are:
+\itemize{
+\item \code{LOCATION}
+\item \verb{DESIGN CONDITIONS}
+\item \verb{TYPICAL/EXTREME PERIODS}
+\item \verb{GROUND TEMPERATURES}
+\item \verb{HOLIDAYS/DAYLIGHT SAVINGS}
+\item \verb{COMMENTS 1}
+\item \verb{COMMENTS 2}
+\item \verb{DATA PERIODS}
+\item \verb{WEATHER DATA}
+}
+}
+
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{\dontrun{
+# get path
+epw$definition("LOCATION")
+}
+
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-location"></a>}}
+\if{latex}{\out{\hypertarget{method-location}{}}}
 \subsection{Method \code{location()}}{
 Get and modify LOCATION header
 \subsection{Usage}{
@@ -624,6 +685,7 @@ epw$location(city = "MyCity")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-design_condition"></a>}}
+\if{latex}{\out{\hypertarget{method-design_condition}{}}}
 \subsection{Method \code{design_condition()}}{
 Get DESIGN CONDITION header
 \subsection{Usage}{
@@ -637,7 +699,7 @@ header in a list format with 4 elements:
 \item \code{source}: A string of source field
 \item \code{heating}: A list, usually of length 16, of the heading design conditions
 \item \code{cooling}: A list, usually of length 32, of the cooling design conditions
-\item \code{extreme}: A list, usually of length 16, of the extreme design conditions
+\item \code{extremes}: A list, usually of length 16, of the extreme design conditions
 }
 
 For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
@@ -660,6 +722,7 @@ epw$design_condition()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-typical_extreme_period"></a>}}
+\if{latex}{\out{\hypertarget{method-typical_extreme_period}{}}}
 \subsection{Method \code{typical_extreme_period()}}{
 Get TYPICAL/EXTREME header
 \subsection{Usage}{
@@ -698,6 +761,7 @@ epw$typical_extreme_period()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ground_temperature"></a>}}
+\if{latex}{\out{\hypertarget{method-ground_temperature}{}}}
 \subsection{Method \code{ground_temperature()}}{
 Get GROUND TEMPERATURE header
 \subsection{Usage}{
@@ -706,20 +770,20 @@ Get GROUND TEMPERATURE header
 
 \subsection{Details}{
 \verb{$ground_temperature()} returns the parsed values of \verb{GROUND TEMPERATURE}
-header in a \link[data.table:data.table]{data.table} format with 7 columns:
+header in a \link[data.table:data.table]{data.table} format with 17 columns:
 \itemize{
 \item \code{index}: Integer type. The index of ground temperature record
 \item \code{depth}: Numeric type. The depth of the ground temperature is measured
-\item \code{month}: Integer type. The month when the ground temperature is measured
 \item \code{soil_conductivity}: Numeric type. The soil conductivity at measured depth
 \item \code{soil_density}: Numeric type. The soil density at measured depth
 \item \verb{soil_specific heat}: Numeric type. The soil specific heat at measured depth
-\item \code{temperature}: Numeric type. The measured group temperature
+\item \code{January} to \code{December}: Numeric type. The measured group
+temperature for each month.
 }
 }
 
 \subsection{Returns}{
-A \code{\link[data.table:data.table]{data.table::data.table()}} with 7 columns.
+A \code{\link[data.table:data.table]{data.table::data.table()}} with 17 columns.
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
@@ -735,6 +799,7 @@ epw$ground_temperature()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-holiday"></a>}}
+\if{latex}{\out{\hypertarget{method-holiday}{}}}
 \subsection{Method \code{holiday()}}{
 Get and modify HOLIDAYS/DAYLIGHT SAVINGS header
 \subsection{Usage}{
@@ -826,6 +891,7 @@ epw$holiday(dst = c(3.10, 11.3))
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-comment1"></a>}}
+\if{latex}{\out{\hypertarget{method-comment1}{}}}
 \subsection{Method \code{comment1()}}{
 Get and modify COMMENT1 header
 \subsection{Usage}{
@@ -864,6 +930,7 @@ epw$comment1("Comment1")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-comment2"></a>}}
+\if{latex}{\out{\hypertarget{method-comment2}{}}}
 \subsection{Method \code{comment2()}}{
 Get and modify COMMENT2 header
 \subsection{Usage}{
@@ -902,6 +969,7 @@ epw$comment2("Comment2")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-num_period"></a>}}
+\if{latex}{\out{\hypertarget{method-num_period}{}}}
 \subsection{Method \code{num_period()}}{
 Get number of data periods in DATA PERIODS header
 \subsection{Usage}{
@@ -930,6 +998,7 @@ epw$num_period()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-interval"></a>}}
+\if{latex}{\out{\hypertarget{method-interval}{}}}
 \subsection{Method \code{interval()}}{
 Get the time interval in DATA PERIODS header
 \subsection{Usage}{
@@ -958,6 +1027,7 @@ epw$interval()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-period"></a>}}
+\if{latex}{\out{\hypertarget{method-period}{}}}
 \subsection{Method \code{period()}}{
 Get and modify data period meta data in DATA PERIODS header
 \subsection{Usage}{
@@ -991,7 +1061,7 @@ A \link[data.table:data.table]{data.table} with 5 columns:
 \itemize{
 \item \code{index}: Integer type. The index of data period.
 \item \code{name}: Character type. The name of data period.
-\item \code{start_day_of_week}: Integer type. The start day of week of data period.
+\item \code{start_day_of_week}: Character type. The start day of week of data period.
 \item \code{start_day}: Date (EpwDate) type. The start day of data period.
 \item \code{end_day}: Date (EpwDate) type. The end day of data period.
 }
@@ -1014,6 +1084,7 @@ epw$period(1, start_day_of_week = 3)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-missing_code"></a>}}
+\if{latex}{\out{\hypertarget{method-missing_code}{}}}
 \subsection{Method \code{missing_code()}}{
 Get missing code for weather data variables
 \subsection{Usage}{
@@ -1042,6 +1113,7 @@ epw$missing_code()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-initial_missing_value"></a>}}
+\if{latex}{\out{\hypertarget{method-initial_missing_value}{}}}
 \subsection{Method \code{initial_missing_value()}}{
 Get initial value for missing data of weather data variables
 \subsection{Usage}{
@@ -1071,6 +1143,7 @@ epw$initial_missing_value()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-range_exist"></a>}}
+\if{latex}{\out{\hypertarget{method-range_exist}{}}}
 \subsection{Method \code{range_exist()}}{
 Get value ranges for existing values of weather data variables
 \subsection{Usage}{
@@ -1100,6 +1173,7 @@ epw$range_exist()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-range_valid"></a>}}
+\if{latex}{\out{\hypertarget{method-range_valid}{}}}
 \subsection{Method \code{range_valid()}}{
 Get value ranges for valid values of weather data variables
 \subsection{Usage}{
@@ -1129,6 +1203,7 @@ epw$range_valid()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fill_action"></a>}}
+\if{latex}{\out{\hypertarget{method-fill_action}{}}}
 \subsection{Method \code{fill_action()}}{
 Get fill actions for abnormal values of weather data variables
 \subsection{Usage}{
@@ -1174,6 +1249,7 @@ epw$fill_action("out_of_range")
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-data"></a>}}
+\if{latex}{\out{\hypertarget{method-data}{}}}
 \subsection{Method \code{data()}}{
 Get weather data
 \subsection{Usage}{
@@ -1182,7 +1258,8 @@ Get weather data
   start_year = NULL,
   align_wday = TRUE,
   tz = "UTC",
-  update = FALSE
+  update = FALSE,
+  line = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -1211,6 +1288,10 @@ All valid time zone names can be obtained using
 \item{\code{update}}{If \code{TRUE}, the \code{year} column are updated according to
 the newly created \code{datetime} column using \code{start_year}. If
 \code{FALSE}, original year data in the \code{Epw} object is kept.
+Default: \code{FALSE}.}
+
+\item{\code{line}}{If \code{TRUE}, a column named \code{line} is prepended indicating
+the line numbers where data occur in the actual EPW file.
 Default: \code{FALSE}.}
 }
 \if{html}{\out{</div>}}
@@ -1272,6 +1353,7 @@ attributes(epw$data(tz = "Etc/GMT+8")$datetime)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-abnormal_data"></a>}}
+\if{latex}{\out{\hypertarget{method-abnormal_data}{}}}
 \subsection{Method \code{abnormal_data()}}{
 Get abnormal weather data
 \subsection{Usage}{
@@ -1293,8 +1375,8 @@ described above.}
 
 \item{\code{cols}}{A character vector identifying what data columns, i.e.
 all columns except \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour}
-and \code{minute}, to search abnormal values. If \code{NULL}, all data
-columns are used. Default: \code{NULL}.}
+\code{minute}, and character columns, to search abnormal values. If
+\code{NULL}, all data columns are used. Default: \code{NULL}.}
 
 \item{\code{keep_all}}{If \code{TRUE}, all columns are returned. If \code{FALSE}, only
 \code{line}, \code{datetime}, \code{year}, \code{month}, \code{day}, \code{hour} and
@@ -1354,6 +1436,7 @@ epw$abnormal_data(cols = c("dry_bulb_temperature", "liquid_precip_rate"),
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-redundant_data"></a>}}
+\if{latex}{\out{\hypertarget{method-redundant_data}{}}}
 \subsection{Method \code{redundant_data()}}{
 Get redundant weather data
 \subsection{Usage}{
@@ -1388,21 +1471,16 @@ epw$redundant_data()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-make_na"></a>}}
+\if{latex}{\out{\hypertarget{method-make_na}{}}}
 \subsection{Method \code{make_na()}}{
 Convert abnormal data into NAs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$make_na(period = NULL, missing = FALSE, out_of_range = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$make_na(missing = FALSE, out_of_range = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{period}}{A positive integer vector identifying the data period
-indexes. Data periods information can be obtained using
-\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-described above. If \code{NULL}, all data periods are included.
-Default: \code{NULL}.}
-
 \item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
 \code{FALSE}.}
 
@@ -1452,26 +1530,16 @@ summary(epw$data()$liquid_precip_rate)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-fill_abnormal"></a>}}
+\if{latex}{\out{\hypertarget{method-fill_abnormal}{}}}
 \subsection{Method \code{fill_abnormal()}}{
 Fill abnormal data using prescribed pattern
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_abnormal(
-  period = NULL,
-  missing = FALSE,
-  out_of_range = FALSE,
-  special = FALSE
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Epw$fill_abnormal(missing = FALSE, out_of_range = FALSE, special = FALSE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{period}}{A positive integer vector identifying the data period
-indexes. Data periods information can be obtained using
-\href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-described above. If \code{NULL}, all data periods are included.
-Default: \code{NULL}.}
-
 \item{\code{missing}}{If \code{TRUE}, missing values are included. Default:
 \code{FALSE}.}
 
@@ -1532,6 +1600,7 @@ summary(epw$data()$liquid_precip_rate)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add_unit"></a>}}
+\if{latex}{\out{\hypertarget{method-add_unit}{}}}
 \subsection{Method \code{add_unit()}}{
 Add units to weather data variables
 \subsection{Usage}{
@@ -1585,6 +1654,7 @@ head(t_dry_bulb)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-drop_unit"></a>}}
+\if{latex}{\out{\hypertarget{method-drop_unit}{}}}
 \subsection{Method \code{drop_unit()}}{
 Remove units in weather data variables
 \subsection{Usage}{
@@ -1629,6 +1699,7 @@ epw$data()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-purge"></a>}}
+\if{latex}{\out{\hypertarget{method-purge}{}}}
 \subsection{Method \code{purge()}}{
 Delete redundant weather data observations
 \subsection{Usage}{
@@ -1657,6 +1728,7 @@ epw$purge()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-add"></a>}}
+\if{latex}{\out{\hypertarget{method-add}{}}}
 \subsection{Method \code{add()}}{
 Add a data period
 \subsection{Usage}{
@@ -1719,7 +1791,7 @@ data.
 existing data periods.
 \item The date time of input data should not overlap with existing data
 periods.
-\item Input data should have all 29 weather data columns with right
+\item Input data should have all 29 weather data columns with correct
 types. The \code{year}, \code{month}, \code{day}, and \code{minute} column are not
 compulsory. They will be created according to values in the
 \code{datetime} column. Existing values will be overwritten.
@@ -1745,6 +1817,7 @@ epw$add(epw$data())
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-set"></a>}}
+\if{latex}{\out{\hypertarget{method-set}{}}}
 \subsection{Method \code{set()}}{
 Replace a data period
 \subsection{Usage}{
@@ -1829,6 +1902,7 @@ epw$set(epw$data(), warning = FALSE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-del"></a>}}
+\if{latex}{\out{\hypertarget{method-del}{}}}
 \subsection{Method \code{del()}}{
 Delete a data period
 \subsection{Usage}{
@@ -1854,6 +1928,7 @@ The modified \code{Epw} object itself, invisibly.
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-is_unsaved"></a>}}
+\if{latex}{\out{\hypertarget{method-is_unsaved}{}}}
 \subsection{Method \code{is_unsaved()}}{
 Check if there are unsaved changes in current \code{Epw}
 \subsection{Usage}{
@@ -1883,6 +1958,7 @@ epw$is_unsaved()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-save"></a>}}
+\if{latex}{\out{\hypertarget{method-save}{}}}
 \subsection{Method \code{save()}}{
 Save \code{Epw} object as an EPW file
 \subsection{Usage}{
@@ -1928,6 +2004,7 @@ epw$save(file.path(tempdir(), "weather.epw"), overwrite = TRUE)
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}
+\if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{Idf} object
 \subsection{Usage}{
@@ -1957,6 +2034,7 @@ epw$print()
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

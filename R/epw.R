@@ -3,8 +3,48 @@
 #' @importFrom cli rule cat_rule
 #' @importFrom R6 R6Class
 #' @importFrom utils menu
+#' @importFrom checkmate assert_list assert_names assert_flag
+#' @include idd.R
+#' @include idf.R
 #' @include impl-epw.R
 NULL
+
+# EpwIdd {{{
+EpwIdd <- R6::R6Class(classname = "EpwIdd", cloneable = FALSE, lock_objects = FALSE,
+    inherit = Idd,
+    public = list(
+        initialize = function (path) {
+            # add a uuid
+            private$m_log <- new.env(hash = FALSE, parent = emptyenv())
+            private$m_log$uuid <- unique_id()
+
+            idd_file <- parse_idd_file(path, epw = TRUE)
+            private$m_version <- idd_file$version
+            private$m_build <- idd_file$build
+
+            private$m_idd_env <- list2env(
+                idd_file[!names(idd_file) %in% c("version", "build")], parent = emptyenv()
+            )
+
+            # add current idd to .globals
+            .globals$epw <- self
+        },
+
+        print = function ()
+            epwidd_print(self, private)
+    )
+)
+# }}}
+# epwidd_print {{{
+epwidd_print <- function (self, private) {
+    cli::cat_rule("EnergyPlus Weather File Data Dictionary")
+    cli::cat_line("* ", c(
+        paste0("Version", ": ", private$m_version),
+        paste0("Build", ": ", private$m_build),
+        paste0("Total Class", ": ", nrow(private$m_idd_env$class))
+    ))
+}
+# }}}
 
 #' Read, and modify an EnergyPlus Weather File (EPW)
 #'
@@ -83,7 +123,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' It takes an EnergyPlus Weather File (EPW) as input and returns an
-        #' `EPW` object.
+        #' `Epw` object.
         #'
         #' @param path Either a path, a connection, or literal data (either a
         #'        single string or a raw vector) to an EnergyPlus Weather File
@@ -116,16 +156,19 @@ Epw <- R6::R6Class(classname = "Epw",
         #' }
         #'
         initialize = function (path, warning = FALSE) {
-            if (is_string(path) && file.exists(path)) {
+            if (checkmate::test_file_exists(path, "r")) {
                 private$m_path <- normalizePath(path)
             }
 
-            epw_file <- parse_epw_file(path, warning = warning)
+            private$m_idd <- get_epw_idd()
 
-            private$m_header <- epw_file$header
+            epw_file <- parse_epw_file(path, warning = warning, idd = private$m_idd)
+
+            private$m_idf_env <- list2env(epw_file$header, parent = emptyenv())
             private$m_data <- epw_file$data
 
             private$m_log <- new.env(hash = FALSE, parent = emptyenv())
+            private$m_log$matched <- epw_file$matched
             private$m_log$unit <- FALSE
             private$m_log$miss_na <- FALSE
             private$m_log$range_na <- FALSE
@@ -136,6 +179,8 @@ Epw <- R6::R6Class(classname = "Epw",
             private$m_log$purged <- FALSE
             private$m_log$unsaved <- FALSE
             private$m_log$uuid <- unique_id()
+            private$m_log$order <- private$m_idf_env$object[, list(object_id)][
+                , object_order := 0L]
         },
         # }}}
 
@@ -159,6 +204,37 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         path = function ()
             epw_path(self, private),
+        # }}}
+        # definition {{{
+        #' @description
+        #' Get the [IddObject] object for specified EPW class.
+        #'
+        #' @details
+        #' `$definition()` returns an [IddObject] of given EPW class. [IddObject]
+        #' contains all data used for parsing that EPW class.
+        #'
+        #' Currently, all supported EPW classes are:
+        #'
+        #' * `LOCATION`
+        #' * `DESIGN CONDITIONS`
+        #' * `TYPICAL/EXTREME PERIODS`
+        #' * `GROUND TEMPERATURES`
+        #' * `HOLIDAYS/DAYLIGHT SAVINGS`
+        #' * `COMMENTS 1`
+        #' * `COMMENTS 2`
+        #' * `DATA PERIODS`
+        #' * `WEATHER DATA`
+        #'
+        #' @param class A single string.
+        #'
+        #' @examples
+        #' \dontrun{
+        #' # get path
+        #' epw$definition("LOCATION")
+        #' }
+        #'
+        definition = function (class)
+            epw_definition(self, private, class),
         # }}}
         # }}}
 
@@ -220,7 +296,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #' * `source`: A string of source field
         #' * `heating`: A list, usually of length 16, of the heading design conditions
         #' * `cooling`: A list, usually of length 32, of the cooling design conditions
-        #' * `extreme`: A list, usually of length 16, of the extreme design conditions
+        #' * `extremes`: A list, usually of length 16, of the extreme design conditions
         #'
         #' For the meaning of each element, please see ASHRAE Handbook of Fundamentals.
         #'
@@ -270,17 +346,17 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' @details
         #' `$ground_temperature()` returns the parsed values of `GROUND TEMPERATURE`
-        #' header in a [data.table][data.table::data.table()] format with 7 columns:
+        #' header in a [data.table][data.table::data.table()] format with 17 columns:
         #'
         #' * `index`: Integer type. The index of ground temperature record
         #' * `depth`: Numeric type. The depth of the ground temperature is measured
-        #' * `month`: Integer type. The month when the ground temperature is measured
         #' * `soil_conductivity`: Numeric type. The soil conductivity at measured depth
         #' * `soil_density`: Numeric type. The soil density at measured depth
         #' * `soil_specific heat`: Numeric type. The soil specific heat at measured depth
-        #' * `temperature`: Numeric type. The measured group temperature
+        #' * `January` to `December`: Numeric type. The measured group
+        #'   temperature for each month.
         #'
-        #' @return A [data.table::data.table()] with 7 columns.
+        #' @return A [data.table::data.table()] with 17 columns.
         #'
         #' @examples
         #' \dontrun{
@@ -477,7 +553,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #'
         #' * `index`: Integer type. The index of data period.
         #' * `name`: Character type. The name of data period.
-        #' * `start_day_of_week`: Integer type. The start day of week of data period.
+        #' * `start_day_of_week`: Character type. The start day of week of data period.
         #' * `start_day`: Date (EpwDate) type. The start day of data period.
         #' * `end_day`: Date (EpwDate) type. The end day of data period.
         #'
@@ -657,6 +733,9 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        the newly created `datetime` column using `start_year`. If
         #'        `FALSE`, original year data in the `Epw` object is kept.
         #'        Default: `FALSE`.
+        #' @param line If `TRUE`, a column named `line` is prepended indicating
+        #'        the line numbers where data occur in the actual EPW file.
+        #'        Default: `FALSE`.
         #'
         #' @return A [data.table::data.table()] of 36 columns.
         #'
@@ -677,8 +756,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #' attributes(epw$data(tz = "Etc/GMT+8")$datetime)
         #' }
         #'
-        data = function (period = 1L, start_year = NULL, align_wday = TRUE, tz = "UTC", update = FALSE)
-            epw_data(self, private, period, start_year, align_wday, tz, update),
+        data = function (period = 1L, start_year = NULL, align_wday = TRUE, tz = "UTC", update = FALSE, line = FALSE)
+            epw_data(self, private, period, start_year, align_wday, tz, update, line),
         # }}}
 
         # abnormal_data {{{
@@ -702,8 +781,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #'        described above.
         #' @param cols A character vector identifying what data columns, i.e.
         #'        all columns except `datetime`, `year`, `month`, `day`, `hour`
-        #'        and `minute`, to search abnormal values. If `NULL`, all data
-        #'        columns are used. Default: `NULL`.
+        #'        `minute`, and character columns, to search abnormal values. If
+        #'        `NULL`, all data columns are used. Default: `NULL`.
         #' @param keep_all If `TRUE`, all columns are returned. If `FALSE`, only
         #'        `line`, `datetime`, `year`, `month`, `day`, `hour` and
         #'        `minute`, together with columns specified in `cols` are
@@ -792,11 +871,6 @@ Epw <- R6::R6Class(classname = "Epw",
         #' \href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
         #' may be different after calling `$make_na()`.
         #'
-        #' @param period A positive integer vector identifying the data period
-        #'        indexes. Data periods information can be obtained using
-        #'        \href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-        #'        described above. If `NULL`, all data periods are included.
-        #'        Default: `NULL`.
         #' @param missing If `TRUE`, missing values are included. Default:
         #'        `FALSE`.
         #' @param out_of_range If `TRUE`, out-of-range values are included.
@@ -812,8 +886,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #' summary(epw$data()$liquid_precip_rate)
         #' }
         #'
-        make_na = function (period = NULL, missing = FALSE, out_of_range = FALSE)
-            epw_make_na(self, private, period, missing, out_of_range),
+        make_na = function (missing = FALSE, out_of_range = FALSE)
+            epw_make_na(self, private, missing, out_of_range),
         # }}}
 
         # fill_abnormal {{{
@@ -844,11 +918,6 @@ Epw <- R6::R6Class(classname = "Epw",
         #' \href{../../eplusr/html/Epw.html#method-abnormal_data}{\code{$abnormal_data()}}
         #' may be different after calling `$fill_abnormal()`.
         #'
-        #' @param period A positive integer vector identifying the data period
-        #'        indexes. Data periods information can be obtained using
-        #'        \href{../../eplusr/html/Epw.html#method-period}{\code{$period()}}
-        #'        described above. If `NULL`, all data periods are included.
-        #'        Default: `NULL`.
         #' @param missing If `TRUE`, missing values are included. Default:
         #'        `FALSE`.
         #' @param out_of_range If `TRUE`, out-of-range values are included.
@@ -870,9 +939,8 @@ Epw <- R6::R6Class(classname = "Epw",
         #' summary(epw$data()$liquid_precip_rate)
         #' }
         #'
-        fill_abnormal = function (period = NULL, missing = FALSE, out_of_range = FALSE,
-                                  special = FALSE)
-            epw_fill_abnormal(self, private, period, missing, out_of_range, special),
+        fill_abnormal = function (missing = FALSE, out_of_range = FALSE, special = FALSE)
+            epw_fill_abnormal(self, private, missing, out_of_range, special),
         # }}}
 
         # add_unit {{{
@@ -995,7 +1063,7 @@ Epw <- R6::R6Class(classname = "Epw",
         #'   existing data periods.
         #' * The date time of input data should not overlap with existing data
         #'   periods.
-        #' * Input data should have all 29 weather data columns with right
+        #' * Input data should have all 29 weather data columns with correct
         #'   types. The `year`, `month`, `day`, and `minute` column are not
         #'   compulsory. They will be created according to values in the
         #'   `datetime` column. Existing values will be overwritten.
@@ -1109,6 +1177,7 @@ Epw <- R6::R6Class(classname = "Epw",
         # }}}
         # }}}
 
+        # SAVE {{{
         # is_unsaved {{{
         #' @description
         #' Check if there are unsaved changes in current `Epw`
@@ -1157,6 +1226,7 @@ Epw <- R6::R6Class(classname = "Epw",
         save = function (path = NULL, overwrite = FALSE, purge = FALSE)
             epw_save(self, private, path, overwrite, purge),
         # }}}
+        # }}}
 
         # print {{{
         #' @description
@@ -1181,9 +1251,18 @@ Epw <- R6::R6Class(classname = "Epw",
 
     private = list(
         m_path = NULL,
-        m_header = NULL,
+        m_idd = NULL,
+        m_idf_env = NULL,
         m_data = NULL,
         m_log = NULL,
+
+        idd_env = function () {
+            get_priv_env(private$m_idd)$m_idd_env
+        },
+
+        idf_env = function () {
+            private$m_idf_env
+        },
 
         deep_clone = function (name, value) {
             epw_deep_clone(self, private, name, value)
@@ -1241,6 +1320,11 @@ epw_path <- function (self, private) {
     private$m_path
 }
 # }}}
+# epw_definition {{{
+epw_definition <- function (self, private, class) {
+    IddObject$new(class, private$m_idd)
+}
+# }}}
 # epw_location {{{
 epw_location <- function (self, private,
                           city, state_province, country, data_source,
@@ -1257,138 +1341,352 @@ epw_location <- function (self, private,
     if (!missing(time_zone)) l$time_zone <- time_zone
     if (!missing(elevation)) l$elevation <- elevation
 
-    if (!length(l)) return(private$m_header$location)
+    if (length(l)) {
+        idf_set(self, private, ..(EPW_CLASS$location) := l, .default = FALSE, .empty = TRUE)
+    }
 
-    private$m_header <- set_epw_location(private$m_header, l)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
-    private$m_header$location
+    parse_epw_header_location(private$idf_env())
 }
 # }}}
 # epw_design_condition {{{
 epw_design_condition <- function (self, private) {
-    copy(private$m_header$design)
+    # short names {{{
+    nm <- c(
+        "n",                                               # [2] int
+        "source",                                          # [3] chr
+        "empty_separator",                                 # [4] chr
+        "heating",                                         # [5] chr
+        "coldest_month",                                   # [6] int
+        "heating_db_99.6",                                 # [7] dbl
+        "heating_db_99.0",                                 # [8] dbl
+        "humidification_dp_99.6",                          # [9] dbl
+        "humidification_hr_99.6",                          #[10] dbl
+        "humidification_mcdb_99.6",                        #[11] dbl
+        "humidification_dp_99.0",                          #[12] dbl
+        "humidification_hr_99.0",                          #[13] dbl
+        "humidification_mcdb_99.0",                        #[14] dbl
+        "coldest_month_ws_0.4",                            #[15] dbl
+        "coldest_month_mcdb_0.4",                          #[16] dbl
+        "coldest_month_ws_1.0",                            #[17] dbl
+        "coldest_month_mcdb_1.0",                          #[18] dbl
+        "mcws_99.6_db",                                    #[19] dbl
+        "pcwd_99.6_db",                                    #[20] dbl
+        "cooling",                                         #[21] chr
+        "hotest_month",                                    #[22] int
+        "hotest_month_db_range",                           #[23] dbl
+        "cooling_db_0.4",                                  #[24] dbl
+        "cooling_mcwb_0.4",                                #[25] dbl
+        "cooling_db_1.0",                                  #[26] dbl
+        "cooling_mcwb_1.0",                                #[27] dbl
+        "cooling_db_2.0",                                  #[28] dbl
+        "cooling_mcwb_2.0",                                #[29] dbl
+        "evaporation_wb_0.4",                              #[30] dbl
+        "evaporation_mcdb_0.4",                            #[31] dbl
+        "evaporation_wb_1.0",                              #[32] dbl
+        "evaporation_mcdb_1.0",                            #[33] dbl
+        "evaporation_wb_2.0",                              #[34] dbl
+        "evaporation_mcdb_2.0",                            #[35] dbl
+        "mcws_0.4_db",                                     #[36] dbl
+        "pcwd_0.4_db",                                     #[37] dbl
+        "dehumification_dp_0.4",                           #[38] dbl
+        "dehumification_hr_0.4",                           #[39] dbl
+        "dehumification_mcdb_0.4",                         #[40] dbl
+        "dehumification_dp_1.0",                           #[41] dbl
+        "dehumification_hr_1.0",                           #[42] dbl
+        "dehumification_mcdb_1.0",                         #[43] dbl
+        "dehumification_dp_2.0",                           #[44] dbl
+        "dehumification_hr_2.0",                           #[45] dbl
+        "dehumification_mcdb_2.0",                         #[46] dbl
+        "enthalpy_0.4",                                    #[47] dbl
+        "mcdb_0.4",                                        #[48] dbl
+        "enthalpy_1.0",                                    #[49] dbl
+        "mcdb_1.0",                                        #[50] dbl
+        "enthalpy_2.0",                                    #[51] dbl
+        "mcdb_2.0",                                        #[52] dbl
+        "hours_8_to_4_12.8_20.6",                          #[53] dbl
+        "extremes",                                        #[54] chr
+        "extreme_annual_ws_1.0",                           #[55] dbl
+        "extreme_annual_ws_2.5",                           #[56] dbl
+        "extreme_annual_ws_5.0",                           #[57] dbl
+        "extreme_max_wb",                                  #[58] dbl
+        "extreme_annual_db_mean_min",                      #[59] dbl
+        "extreme_annual_db_mean_max",                      #[60] dbl
+        "extreme_annual_db_sd_min",                        #[61] dbl
+        "extreme_annual_db_sd_max",                        #[62] dbl
+        "5_year_return_period_values_of_extreme_db_min",   #[63] dbl
+        "5_year_return_period_values_of_extreme_db_max",   #[64] dbl
+        "10_year_return_period_values_of_extreme_db_min",  #[65] dbl
+        "10_year_return_period_values_of_extreme_db_max",  #[66] dbl
+        "20_year_return_period_values_of_extreme_db_min",  #[67] dbl
+        "20_year_return_period_values_of_extreme_db_max",  #[68] dbl
+        "50_year_return_period_values_of_extreme_db_min",  #[69] dbl
+        "50_year_return_period_values_of_extreme_db_max"   #[70] dbl
+    )
+    # }}}
+    val <- parse_epw_header_design(private$idf_env(), strict = TRUE)$value
+    setattr(val, "names", nm)
+
+    list(source = val$source,
+        heating = val[5:19],
+        cooling = val[21:52],
+        extremes = val[53:69]
+    )
 }
 # }}}
 # epw_typical_extreme_period {{{
 epw_typical_extreme_period <- function (self, private) {
-    copy(private$m_header$typical)
+    parse_epw_header_typical(private$idf_env(), strict = TRUE)
 }
 # }}}
 # epw_ground_temperature {{{
 epw_ground_temperature <- function (self, private) {
-    copy(private$m_header$ground)
+    parse_epw_header_ground(private$idf_env(), strict = TRUE)
 }
 # }}}
 # epw_holiday {{{
 epw_holiday <- function (self, private, leapyear, dst, holiday) {
     if (missing(leapyear) && missing(dst) && missing(holiday)) {
-        copy(private$m_header$holiday)
+        return(parse_epw_header_holiday(private$idf_env()))
     }
 
-    private$m_header <- set_epw_holiday(private$m_header, leapyear, dst, holiday)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
-    copy(private$m_header$holiday)
+    hol <- parse_epw_header_holiday(private$idf_env())
+    l <- list()
+
+    if (!missing(leapyear)) {
+        assert_flag(leapyear)
+        l$"..1" <- if (leapyear) "Yes" else "No"
+
+        period <- parse_epw_header_period(private$idf_env())
+
+        # note that parsed start and end day in data period can only be
+        # either md or ymd type
+        s <- period$period$start_day
+        e <- period$period$end_day
+
+        # current is leap year but want to change to non-leap year
+        # for md type, it is ok to change only if that period does not cover
+        # Feb 29, e.g. [01/02, 02/28]
+        # for ymd type, if that period covers multiple years, e.g.
+        # [2007-01-01, 2009-01-01], there is a need to check 2008-02-28
+        if (hol$leapyear & !leapyear) {
+            for (i in seq_along(s)) {
+                # in case ymd format that spans multiple years
+                feb29 <- lubridate::make_date(c(lubridate::year(s[i]) : lubridate::year(e[i])), 2, 29)
+                # for case [2007-01-01, 2009-01-01]
+                feb29 <- feb29[!is.na(feb29)]
+
+                # if February exists in the data
+                if (any(s[i] <= feb29 & feb29 <= e[i])) {
+                    abort(paste0("Failed to change leap year indicator to ", leapyear, ", ",
+                        "because data period ",
+                        period$period[i, paste0("#", index, " ", surround(name))],
+                        " contains weather data of February 29th [", s[i], ", ", e[i], "]."
+                    ), "epw_header")
+                }
+            }
+
+        # current is non-leap year but want to change to leap year
+        # for md type, it is ok to change only if that period does not
+        # across Feb, e.g. [01/02, 02/28], [03/01, 12/31]
+        # for ymd type, it is always OK
+        } else if (!hol$leapyear & leapyear) {
+            is_md <- is_epwdate_type(s, "md")
+            if (any(is_md)) {
+                s_md <- s[is_md]
+                e_md <- e[is_md]
+                for (i in seq_along(s_md)) {
+                    # in case ymd format that spans multiple years
+                    feb28 <- lubridate::make_date(lubridate::year(s_md[i]), 2L, 28L)
+
+                    if (!all(e_md[i] <= feb28 | feb28 <= s_md[i])) {
+                        abort(paste0("Failed to change leap year indicator to ", leapyear, ", ",
+                            "because data period ",
+                            period$period[is_md][i, paste0("#", index, " ", surround(name))],
+                            " contains weather data of February 29th [", s_md[i], ", ", e_md[i], "]."
+                        ), "epw_header")
+                    }
+                }
+            }
+        }
+    }
+
+    if (!missing(dst)) {
+        dst <- assert_vector(as.character(dst), len = 2L, .var.name = "Daylight saving time")
+        dst <- epw_date(dst)
+
+        # make it possible for directly giving Date-Time object
+        if (any(is_epwdate_type(dst, "ymd"))) {
+            is_ymd <- is_epwdate_type(dst, "ymd")
+            dst[is_ymd] <- ymd_to_md(dst[is_ymd])
+        }
+
+        l$"Daylight Saving Start Day" <- format(dst[1])
+        l$"Daylight Saving End Day" <- format(dst[2])
+    }
+
+    if (!missing(holiday)) {
+        assert_list(holiday, len = 2L)
+        assert_names(names(holiday), must.include = c("name", "day"))
+
+        holiday <- as.list(unlist(data.table::transpose(as.data.table(holiday))))
+        setattr(holiday, "names", paste0("..", 4 + seq_along(holiday)))
+        l <- c(l, holiday)
+        l$"Number of Holidays" <- length(holiday)/2L
+    }
+
+    # store current values in case error occur in later procedures
+    obj <- get_idf_object(private$idd_env(), private$idf_env(), EPW_CLASS$holiday)
+    val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$holiday)
+    # store save status
+    unsaved <- private$m_log$unsaved
+
+    idf_set(self, private, ..(EPW_CLASS$holiday) := l, .default = FALSE, .empty = TRUE)
+
+    withCallingHandlers(parse_epw_header_holiday(private$idf_env()),
+        eplusr_warning_epw_header_num_field = function (w) invokeRestart("muffleWarning"),
+        eplusr_error_parse_epw_header = function (e) {
+            # restore header value
+            env <- private$idf_env()
+            env$object <- append_dt(env$object, obj, "object_id")
+            env$value <- append_dt(env$value, val, "object_id")
+            setorderv(env$object, "object_id")
+            setorderv(env$value, "object_id")
+
+            # restore save status
+            private$m_log$unsaved <- unsaved
+        }
+    )
 }
 # }}}
 # epw_comment1 {{{
+#' @importFrom checkmate assert_string
 epw_comment1 <- function (self, private, comment) {
-    if (missing(comment)) {
-        return(private$m_header$comment1)
-    } else {
-        assert(is_string(comment))
-        log_unsaved(private$m_log)
-        log_new_uuid(private$m_log)
-        (private$m_header$comment1 <- comment)
-    }
+    val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$comment1)
+
+    if (missing(comment)) return(val$value_chr)
+
+    assert_string(comment)
+    private$idf_env()$value[J(val$value_id), on = "value_id", value_chr := comment]
+    log_unsaved(private$m_log)
+    log_new_uuid(private$m_log)
+
+    comment
 }
 # }}}
 # epw_comment2 {{{
-epw_comment2 <- function (self, private, comment) {
-    if (missing(comment)) {
-        return(private$m_header$comment2)
-    } else {
-        assert(is_string(comment))
-        log_unsaved(private$m_log)
-        log_new_uuid(private$m_log)
-        (private$m_header$comment2 <- comment)
-    }
-}
+epw_comment2 <- epw_comment1
 # }}}
 # epw_num_period {{{
 epw_num_period <- function (self, private) {
-    nrow(private$m_header$period$period)
+    get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$period, field = 1L)$value_num
 }
 # }}}
 # epw_interval {{{
 epw_interval <- function (self, private) {
-    private$m_header$period$interval
+    get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$period, field = 2L)$value_num
 }
 # }}}
 # epw_period {{{
 epw_period <- function (self, private, period, name, start_day_of_week) {
-    if (missing(period) && missing(name) && missing(start_day_of_week)) {
-        return(private$m_header$period$period[, -c("from", "to", "missing", "out_of_range")])
+    p <- parse_epw_header_period(private$idf_env())
+
+    if (!missing(period)) {
+        period <- assert_count(period, coerce = TRUE)
+        if (period > nrow(p$period)) {
+            abort(paste0("Invalid data period index found. EPW contains only ",
+                nrow(p$period), " data period(s) but ", surround(period), " is specified."
+                ), "epw_data_period_index"
+            )
+        }
     }
 
-    private$m_header <- set_epw_period_basic(private$m_header, period, name, start_day_of_week)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
-    private$m_header$period$period
+    l <- list()
+    if (!missing(name)) l[sprintf("Data Period %i Name/Description", period)] <- name
+    if (!missing(start_day_of_week)) {
+        if (!is.na(wd <- get_epw_wday(start_day_of_week, TRUE))) start_day_of_week <- wd
+        l[sprintf("Data Period %i Start Day of Week", period)] <- start_day_of_week
+    }
+
+    if (!length(l)) {
+        if (missing(period)) return(p$period) else return(p$period[period])
+    }
+
+    # store current values in case error occur in later procedures
+    obj <- get_idf_object(private$idd_env(), private$idf_env(), EPW_CLASS$period)
+    val <- get_idf_value(private$idd_env(), private$idf_env(), EPW_CLASS$period)
+    # store save status
+    unsaved <- private$m_log$unsaved
+
+    idf_set(self, private, ..(EPW_CLASS$period) := l, .default = FALSE, .empty = TRUE)
+
+    withCallingHandlers(parse_epw_header_period(private$idf_env())$period[period],
+        eplusr_warning_epw_header_num_field = function (w) invokeRestart("muffleWarning"),
+        eplusr_error_parse_epw_header = function (e) {
+            # restore header value
+            env <- private$idf_env()
+            env$object <- append_dt(env$object, obj, "object_id")
+            env$value <- append_dt(env$value, val, "object_id")
+            setorderv(env$object, "object_id")
+            setorderv(env$value, "object_id")
+
+            # restore save status
+            private$m_log$unsaved <- unsaved
+        }
+    )
 }
 # }}}
 # epw_missing_code {{{
 epw_missing_code <- function (self, private) {
-    EPW_MISSING_CODE
+    get_epw_data_missing_code()
 }
 # }}}
 # epw_initial_missing_value {{{
 epw_initial_missing_value <- function (self, private) {
-    EPW_INIT_MISSING$atmospheric_pressure <- std_atm_press(private$m_header$location$elevation)
-    EPW_INIT_MISSING
+    get_epw_data_init_value()
 }
 # }}}
 # epw_range_exist {{{
 epw_range_exist <- function (self, private) {
-    EPW_RANGE_EXIST
+    get_epw_data_range("exist")
 }
 # }}}
 # epw_range_valid {{{
 epw_range_valid <- function (self, private) {
-    EPW_RANGE_VALID
+    get_epw_data_range("valid")
 }
 # }}}
 # epw_fill_action {{{
 epw_fill_action <- function (self, private, type = c("missing", "out_of_range")) {
-    type <- match.arg(type)
-    if (type == "missing") {
-        EPW_REPORT_MISSING
-    } else {
-        EPW_REPORT_RANGE
-    }
+    get_epw_data_fill_action(match.arg(type))
 }
 # }}}
 # epw_data {{{
 epw_data <- function (self, private, period = 1L, start_year = NULL, align_wday = TRUE,
-                      tz = "UTC", update = FALSE) {
-    get_epw_data(private$m_data, private$m_header, period, start_year, align_wday, tz, update)
+                      tz = "UTC", update = FALSE, line = FALSE) {
+    d <- get_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
+        period, start_year, align_wday, tz, update)
+
+    assert_flag(line)
+
+    if (!line) set(d, NULL, "line", NULL)
+    d[]
 }
 # }}}
 # epw_abnormal_data {{{
 epw_abnormal_data <- function (self, private, period = 1L, cols = NULL,
                                keep_all = TRUE, type = c("both", "missing", "out_of_range")) {
-    get_epw_data_abnormal(private$m_data, private$m_header, period, cols, keep_all, type)
+    get_epw_data_abnormal(private$m_data, private$idf_env(), private$m_log$matched,
+        period, cols, keep_all, type)
 }
 # }}}
 # epw_redundant_data {{{
 epw_redundant_data <- function (self, private) {
-    get_epw_data_redundant(private$m_data, private$m_header)
+    get_epw_data_redundant(private$m_data, private$idf_env(), private$m_log$matched)
 }
 # }}}
 # epw_make_na {{{
-epw_make_na <- function (self, private, period = NULL, missing = FALSE, out_of_range = FALSE) {
-    assert(is_flag(missing), is_flag(out_of_range))
+#' @importFrom checkmate assert_flag
+epw_make_na <- function (self, private, missing = FALSE, out_of_range = FALSE) {
     if (!missing && !out_of_range) return(invisible(self))
     if (missing) {
         if (private$m_log$miss_na) {
@@ -1408,16 +1706,21 @@ epw_make_na <- function (self, private, period = NULL, missing = FALSE, out_of_r
             private$m_log$range_filled <- FALSE
         }
     }
-    private$m_data <- make_epw_data_na(private$m_data, private$m_header, period = period,
-        missing = missing, out_of_range = out_of_range
+    private$m_data <- make_epw_data_na(private$m_data, private$idf_env(), private$m_log$matched,
+        period = NULL, missing = missing, out_of_range = out_of_range
     )
     invisible(self)
 }
 # }}}
 # epw_fill_abnormal {{{
-epw_fill_abnormal <- function (self, private, period = NULL, missing = FALSE, out_of_range = FALSE, special = FALSE) {
-    assert(is_flag(missing), is_flag(out_of_range), is_flag(special))
+#' @importFrom checkmate assert_flag
+epw_fill_abnormal <- function (self, private, missing = FALSE, out_of_range = FALSE, special = FALSE) {
+    assert_flag(missing)
+    assert_flag(out_of_range)
+    assert_flag(special)
+
     if (!missing && !out_of_range) return(invisible(self))
+
     miss_na <- private$m_log$miss_na
     if (missing) {
         if (private$m_log$miss_filled) {
@@ -1429,6 +1732,7 @@ epw_fill_abnormal <- function (self, private, period = NULL, missing = FALSE, ou
             miss_na <- TRUE
         }
     }
+
     range_na <- private$m_log$range_na
     if (out_of_range) {
         if (private$m_log$range_filled) {
@@ -1440,12 +1744,16 @@ epw_fill_abnormal <- function (self, private, period = NULL, missing = FALSE, ou
             range_na <- TRUE
         }
     }
-    private$m_data <- fill_epw_data_abnormal(private$m_data, private$m_header,
-        period, missing, out_of_range, special, private$m_log$miss_na, private$m_log$range_na
+
+    private$m_data <- fill_epw_data_abnormal(private$m_data, private$idf_env(),
+        private$m_log$matched, NULL, NULL, missing, out_of_range, special,
+        private$m_log$miss_na, private$m_log$range_na
     )
+
     # have to update na status after filling, as it was used when doing filling
     private$m_log$miss_na <- miss_na
     private$m_log$range_na <- range_na
+
     invisible(self)
 }
 # }}}
@@ -1476,36 +1784,32 @@ epw_purge <- function (self, private) {
     if (private$m_log$purged) {
         verbose_info("Redundant data has already been purged before. Skip...")
     } else {
-        lst <- purge_epw_data_redundant(private$m_data, private$m_header)
-        if (nrow(lst$data) != nrow(private$m_data)) {
+        purged <- purge_epw_data_redundant(private$m_data, private$idf_env(), private$m_log$matched)
+        if (nrow(purged$data) != nrow(private$m_data)) {
             log_unsaved(private$m_log)
             log_new_uuid(private$m_log)
         }
-        private$m_header <- lst$header
-        private$m_data <- lst$data
+        private$m_data <- purged$data
+        private$m_log$matched <- purged$matched
     }
     invisible(self)
 }
 # }}}
 # epw_align_data_status {{{
-epw_align_data_status <- function (self, private, data, data_period) {
-    if (private$m_log$miss_na) {
-        data <- make_epw_data_na_line(data, data_period$missing[[1L]])
-    } else if (private$m_log$miss_filled) {
-        data <- fill_epw_data_abnormal_line(data, data_period$missing[[1L]], FALSE,
-            private$m_log$miss_filled_special, "missing")
-    }
+epw_align_data_status <- function (self, private, data, period = NULL) {
+    data <- make_epw_data_na(data, private$idf_env(), private$m_log$matched,
+        period, missing = private$m_log$miss_na, out_of_range = private$m_log$range_na
+    )
 
-    if (private$m_log$range_na) {
-        data <- make_epw_data_na_line(data, data_period$out_of_range[[1L]])
-    } else if (private$m_log$range_filled) {
-        data <- fill_epw_data_abnormal_line(data, data_period$out_of_range[[1L]], FALSE,
-            private$m_log$miss_filled_special, "out_of_range")
-    }
+    data <- fill_epw_data_abnormal(data, private$idf_env(),
+        private$m_log$matched, period, NULL,
+        private$m_log$miss_filled,
+        private$m_log$range_filled,
+        private$m_log$miss_filled_special && private$m_log$range_filled_special,
+        private$m_log$miss_na, private$m_log$range_na
+    )
 
-    if (private$m_log$unit) {
-        data <- add_epw_data_unit(data)
-    }
+    if (private$m_log$unit) data <- add_epw_data_unit(data)
 
     data
 }
@@ -1513,51 +1817,62 @@ epw_align_data_status <- function (self, private, data, data_period) {
 # epw_add {{{
 epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, after = 0L, warning = TRUE) {
-    lst <- add_epw_data(private$m_data, private$m_header, data, realyear, name, start_day_of_week, after, warning)
-    lst$data <- epw_align_data_status(self, private, lst$data, lst$header$period$period[after + 1L])
-    private$m_header <- lst$header
-    private$m_data <- rbindlist(lst[names(lst) != "header"])
+    lst <- add_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
+        data, realyear, name, start_day_of_week, after, warning)
 
-    if (eplusr_option("verbose_info")) {
-        # get data period
-        n <- nrow(lst$header$period$period)
-        # use nearest as template
-        if (after > n) after <- n - 1L
+    lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
+    private$m_data <- lst$data
+    private$m_log$matched <- lst$matched
+    idf_update_idf_env(self, private, lst$header)
 
+    if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
-        cat("New data period has been added successfully:\n")
+        cat("New data period has been added successfully:\n\n")
 
-        print(private$m_header$period$period[after + 1L,
-           list(" " = paste0(index, ": "), Name = name,
-            `StartDayOfWeek` = get_epw_wday(start_day_of_week, label = TRUE),
+        print(self$period()[lst$period][,
+           list(
+            " " = paste0(index, ": "),
+            Name = name,
+            `StartDayOfWeek` = start_day_of_week,
             `StartDay` = start_day, `EndDay` = end_day)],
-            row.names = FALSE
+            class = FALSE, row.names = FALSE
         )
+
+        cli::cat_rule()
     }
 
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
+    private$m_log$purged <- FALSE
     invisible(self)
 }
 # }}}
 # epw_set {{{
 epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
                      start_day_of_week = NULL, period = 1L, warning = TRUE) {
-    lst <- set_epw_data(private$m_data, private$m_header, data, realyear, name, start_day_of_week, period, warning)
-    lst$data <- epw_align_data_status(self, private, lst$data, lst$header$period$period[period])
-    private$m_header <- lst$header
-    private$m_data <- rbindlist(lst[names(lst) != "header"])
+    lst <- set_epw_data(private$m_data, private$idf_env(), private$m_log$matched,
+        data, realyear, name, start_day_of_week, period, warning)
 
-    if (eplusr_option("verbose_info")) {
+    lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
+
+    private$m_data <- lst$data
+    private$m_log$matched <- lst$matched
+    idf_update_idf_env(self, private, lst$header)
+
+    if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
-        cat("Data period", paste0("#", period), "has been replaced with input data.\n")
+        cat("Data period", paste0("#", lst$period), "has been replaced with input data.\n\n")
 
-        print(private$m_header$period$period[period,
-           list(" " = paste0(index, ": "), Name = name,
-            `StartDayOfWeek` = get_epw_wday(start_day_of_week, label = TRUE),
+        print(self$period()[lst$period][,
+           list(
+            " " = paste0(index, ": "),
+            Name = name,
+            `StartDayOfWeek` = start_day_of_week,
             `StartDay` = start_day, `EndDay` = end_day)],
-            row.names = FALSE
+            class = FALSE, row.names = FALSE
         )
+
+        cli::cat_rule()
     }
 
     log_unsaved(private$m_log)
@@ -1567,9 +1882,30 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
 # }}}
 # epw_del {{{
 epw_del <- function (self, private, period) {
-    l <- del_epw_data(private$m_data, private$m_header, period)
-    private$m_header <- l$header
-    private$m_data <- l$data
+    lst <- del_epw_data(private$m_data, private$idf_env(), private$m_log$matched, period)
+
+    if (in_verbose()) p <- self$period()
+
+    private$m_data <- lst$data
+    private$m_log$matched <- lst$matched
+    idf_update_idf_env(self, private, lst$header)
+
+    if (in_verbose()) {
+        cli::cat_rule("Info", col = "green")
+        cat("Data period", paste0("#", lst$period), "has been successfully deleted:\n\n")
+
+        print(p[lst$period][,
+           list(
+            " " = paste0(index, ": "),
+            Name = name,
+            `StartDayOfWeek` = start_day_of_week,
+            `StartDay` = start_day, `EndDay` = end_day)],
+            class = FALSE, row.names = FALSE
+        )
+
+        cli::cat_rule()
+    }
+
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
     invisible(self)
@@ -1584,23 +1920,22 @@ epw_is_unsaved <- function (self, private) {
 epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FALSE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
-            abort("error_not_local",
-                paste0(
-                    "The Epw object is not created from local file. ",
-                    "Please give the path to save."
-                )
-            )
+            abort("The Epw object is not created from local file. Please give the path to save.", "epw_not_local")
         } else {
             path <- private$m_path
         }
     }
 
-    assert(is_string(path), has_ext(path, "epw"), is_flag(overwrite), is_flag(purge))
+    assert_string(path)
+    if (!has_ext(path, "epw")) abort("'path' should have an file extension of 'epw'", "epw_save_ext")
+    assert_flag(overwrite)
+    assert_flag(purge)
 
     # fill all NAs with missing code
     fill <- if (!private$m_log$miss_filled || !private$m_log$range_filled) TRUE else FALSE
 
-    p <- save_epw_file(private$m_data, private$m_header, path, overwrite, fmt_digit = TRUE,
+    p <- save_epw_file(private$m_data, private$idf_env(), private$m_log$matched,
+        path, overwrite, fmt_digit = TRUE,
         fill = fill,
         missing = private$m_log$miss_filled,
         out_of_range = private$m_log$range_filled,
@@ -1617,22 +1952,29 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
 # }}}
 # epw_print {{{
 epw_print <- function (self, private) {
-    print_epw_header(private$m_header)
+    cli::cat_rule("EnergyPlus Weather File", line = 2)
+
+    cli::cat_line(format_epw_meta(private$idf_env()))
+
+    cli::cat_line()
+
+    cli::cat_rule("Data Periods")
+
+    period <- parse_epw_header_period(private$idf_env())
+    print(period$period[,
+       list(Name = name,
+        `StartDayOfWeek` = get_epw_wday(start_day_of_week, label = TRUE),
+        `StartDay` = start_day, `EndDay` = end_day)],
+        class = FALSE
+    )
+
+    cli::cat_line()
+
+    cli::cat_rule()
 }
 # }}}
 # epw_deep_clone {{{
-epw_deep_clone <- function (self, private, name, value) {
-    if (is.environment(value)) {
-        l <- as.list.environment(value)
-        # copy data.table is necessary here
-        l <- lapply(l, function (x) if (inherits(x, "data.table")) copy(x) else x)
-        list2env(l)
-    } else if (inherits(value, "data.table")){
-        copy(value)
-    } else {
-        value
-    }
-}
+epw_deep_clone <- idf_deep_clone
 # }}}
 # S3 Epw methods {{{
 #' @export
@@ -1642,13 +1984,13 @@ str.Epw <- function (object, ...) {
 
 #' @export
 format.Epw <- function (x, ...) {
-    paste0(utils::capture.output(x$print()), collapse = "\n")
+    utils::capture.output(x$print())
 }
 
 #' @export
 `==.Epw` <- function (e1, e2) {
     if (!is_epw(e2)) return(FALSE)
-    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
 }
 
 #' @export

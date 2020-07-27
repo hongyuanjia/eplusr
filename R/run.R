@@ -1,4 +1,6 @@
 #' @importFrom callr r_bg
+#' @importFrom checkmate assert_flag assert_file_exists assert_directory_exists
+#' @importFrom checkmate assert_logical
 #' @importFrom cli cat_line
 #' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
@@ -44,7 +46,7 @@ NULL
 #' @author Hongyuan Jia
 # clean_wd {{{
 clean_wd <- function (path) {
-
+    assert_string(path)
     base <- tools::file_path_sans_ext(basename(path))
     without_ext <- tools::file_path_sans_ext(path)
     wd <- dirname(path)
@@ -82,98 +84,113 @@ clean_wd <- function (path) {
 
 #' Run simulations of EnergyPlus models.
 #'
+#' @param model A path (for `run_idf()`) or a vector of paths (for
+#'        `run_multi()`) of EnergyPlus IDF or IMF files.
+#'
+#' @param weather A path (for `run_idf()`) or a vector of paths (for
+#'        `run_multi()`) of EnergyPlus EPW weather files. For `run_multi()`,
+#'        `weather` can also be a single EPW file path. In this case, that
+#'        weather will be used for all simulations; otherwise, `model` and
+#'        `weather` should have the same length.
+#'
+#' @param output_dir Output directory path (for `rum_idf()`) or paths (for
+#'        `run_mult()`). If NULL, the directory of input model is used. For
+#'        `run_multi()`, `output_dir`, if not `NULL`, should have the same
+#'        length as `model`. Any duplicated combination of `model` and
+#'        `output_dir` is prohibited.
+#'
+#' @param design_day Force design-day-only simulation. For `rum_multi()`,
+#'        `design_day` can also be a logical vector which has the same length as
+#'        `model`. Default: `FALSE`.
+#'
+#' @param annual Force design-day-only simulation. For `rum_multi()`,
+#'        `annual` can also be a logical vector which has the same length as
+#'        `model`. Note that `design_day` and `annual` cannot be all `TRUE` at
+#'        the same time. Default: `FALSE`.
+#'
+#' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
+#'        Default: `TRUE`.
+#'
+#' @param echo Only applicable when `wait` is `TRUE`. Whether to show standard
+#'        output and error from EnergyPlus command line interface for
+#'        `run_idf()` and simulation status for `run_multi()`. Default: `TRUE`.
+#'
+#' @param wait If `TRUE`, R will hang on and wait all EnergyPlus simulations
+#'        finish. If `FALSE`, all EnergyPlus simulations are run in the
+#'        background, and a [process][processx::process] object is returned.
+#'
+#' @param eplus An acceptable input (for `run_idf()`) or inputs (for
+#'        `run_multi()`) of [use_eplus()] and [eplus_config()]. If `NULL`, which
+#'        is the default, the version of EnergyPlus to use is determined by the
+#'        version of input model. For `run_multi()`, `eplus`, if not `NULL`,
+#'        should have the same length as `model`.
+#'
+#' @details
+#'
 #' `run_idf()` is a wrapper of EnergyPlus command line interface which enables to
 #' run EnergyPlus model with different options.
 #'
 #' `run_multi()` provides the functionality of running multiple models in
 #' parallel.
 #'
-#' @param model A path (for `run_idf()`) or a vector of paths (for
-#'     `run_multi()`) of EnergyPlus IDF or IMF files.
-#' @param weather A path (for `run_idf()`) or a vector of paths (for
-#'     `run_multi()`) of EnergyPlus EPW weather files. For `run_multi()`,
-#'     `weather` can also be a single EPW file path. In this case, that weather
-#'     will be used for all simulations; otherwise, `model` and `weather` should
-#'     have the same length.
-#' @param output_dir Output directory path (for `rum_idf()`) or paths (for
-#'     `run_mult()`). If NULL, the directory of input model is used. For
-#'     `run_multi()`, `output_dir`, if not `NULL`, should have the same length
-#'     as `model`. Any duplicated combination of `model` and `output_dir` is
-#'     prohibited.
-#' @param design_day Force design-day-only simulation. Default: `FALSE`.
-#' @param annual Force design-day-only simulation. Default: `FALSE`.
-#' @param expand_obj Whether to run ExpandObject preprocessor before simulation.
-#'     Default: `TRUE`.
-#' @param echo Only applicable when `wait` is `TRUE`. Whether to show standard
-#'     output and error from EnergyPlus command line interface for `run_idf()`
-#'     and simulation status for `run_multi()`.Default: `TRUE`.
-#' @param wait If `TRUE`, R will hang on and wait all EnergyPlus simulations
-#'     finish. If `FALSE`, all EnergyPlus simulations are run in the background.
-#'     and a [processx::process] object is returned. Note that, if `FALSE`, R is
-#'     *not blocked* even when `echo` is `TRUE`. Default: `TRUE`.
-#' @param eplus An acceptable input (for `run_idf()`) or inputs (for
-#'     `run_multi()`) of [use_eplus()] and [eplus_config()]. If
-#'     `NULL`, which is the default, the version of EnergyPlus to use is
-#'     determined by the version of input model. For `run_multi()`, `eplus`, if not
-#'     `NULL`, should have the same length as `model`.
-#'
-#' @details
-#'
 #' `run_idf()` and `run_multi()` currently only support EnergyPlus v8.3 and
-#'     above. This is because eplusr uses EnergyPlus command line interface
-#'     which is a new feature as of EnergyPlus v8.3.
+#' above. This is because eplusr uses EnergyPlus command line interface which is
+#' a new feature as of EnergyPlus v8.3.
 #'
-#' For `run_idf()`, a named list will be returned:
+#' It is suggested to run simulations using [EplusJob] class and [EplusGroupJob]
+#' class, which provide much more detailed controls on the simulation and also
+#' methods to extract simulation outputs.
 #'
-#'   * `idf`: The path of IDF file
-#'   * `epw`: The path of EPW file
-#'   * `exit_status`: The exit code of the process if it has finished and NULL
-#'     otherwise. Always being `NULL` if `wait` is FALSE, but you can manually
-#'     get the exit code using the process object, i.e.
-#'     `process$get_exit_status()` after simulation *completed*.
-#'   * `start_time`: When the EnergyPlus process started.
-#'   * `end_time`: When the EnergyPlus process stopped. All being `NULL` if
-#'      `wait` is `FALSE`, but you can manually check EnergyPlus `stdout` to get
-#'      the simulation time
-#'   * `output_dir`: The simulation output directory
-#'   * `energyplus`: The path of EnergyPlus executable
-#'   * `stdout`: All standard output from EnergyPlus. Always being `NULL` if
-#'      `wait` is `FALSE`, but you can manually get all standard output using
-#'      `process$get_result()`, where `process` is the [processx::process]
-#'      object stored in returned element `process`.
-#'   * `stderr`: All standard error from EnergyPlus. Always being `NULL` if
-#'      `wait` is `FALSE`, but you can manually get all standard output using
-#'      `process$get_result()`, where `process` is the [processx::process]
-#'      object stored in returned element `process`.
-#'   * `process`: A [processx::process] object of current EnergyPlus simulation
+#' @return
 #'
-#' For `run_multi()`, if `wait` is `TRUE`, a
-#' [data.table][data.table::data.table()] contains all data (excluding
-#' `process`) with same column names as above, and also another two columns:
+#' * For `run_idf()`, a named list of 11 elements:
 #'
-#'   * `index`: The index of simulation
-#'   * `status`: The status of simulation. Should be one of below:
-#'       - `"completed"`: the simulation job is completed successfully.
-#'       - `"failed"`: the simulation job ended with error.
-#'       - `"terminated"`: the simulation job started but was terminated.
-#'       - `"cancelled"`: the simulation job was cancelled, i.e. did not start
-#'          at all.
+#'   | No.  | Column        | Type                         | Description                                                                          |
+#'   | ---: | -----         | -----                        | -----                                                                                |
+#'   | 1    | `idf`         | `character(1)`               | Full path of input IDF file                                                          |
+#'   | 2    | `epw`         | `character(1)` or `NULL`     | Full path of input EPW file                                                          |
+#'   | 3    | `version`     | `character(1)`               | Version of called EnergyPlus                                                         |
+#'   | 4    | `exit_status` | `integer(1)` or `NULL`       | Exit status of EnergyPlus. `NULL` if terminated or `wait` is `FALSE`                 |
+#'   | 5    | `start_time`  | `POSIXct(1)`                 | Start of time of simulation                                                          |
+#'   | 6    | `end_time`    | `POSIXct(1)` or `NULL`       | End of time of simulation. `NULL` if `wait` is `FALSE`                               |
+#'   | 7    | `output_dir`  | `character(1)`               | Full path of simulation output directory                                             |
+#'   | 8    | `energyplus`  | `character(1)`               | Full path of called EnergyPlus executable                                            |
+#'   | 9    | `stdout`      | `character(1)` or `NULL`     | Standard output of EnergyPlus during simulation                                      |
+#'   | 10   | `stderr`      | `character(1)` or `NULL`     | Standard error of EnergyPlus during simulation                                       |
+#'   | 11   | `process`     | [process][processx::process] | A [process][processx::process] object which called EnergyPlus and ran the simulation |
 #'
-#' For `run_multi()`, if `wait` is `FALSE`, a [r_process][callr::r_bg()]
-#'     object of background R process which handles all simulation jobs is
-#'     returned. You can check if the jobs are completed using `$is_alive()` and
-#'     get the final data.table using `$get_result()`.
+#' * For `rum_multi()`, if `wait` is TRUE, a
+#'   [data.table][data.table::data.table()] of 12 columns:
 #'
-#' It is suggested to run simulations using [EplusJob] class and
-#'     [ParametricJob] class, which provide much more detailed controls
-#'     on the simulation and also methods to extract simulation outputs.
+#'   | No.  | Column        | Type        | Description                                                      |
+#'   | ---: | -----         | -----       | -----                                                            |
+#'   | 1    | `index`       | `integer`   | Index of simuation                                               |
+#'   | 2    | `status`      | `character` | Simulation status                                                |
+#'   | 3    | `idf`         | `character` | Full path of input IDF file                                      |
+#'   | 4    | `epw`         | `character` | Full path of input EPW file. `NA` for design-day-only simulation |
+#'   | 5    | `version`     | `character` | Version of EnergyPlus                                            |
+#'   | 6    | `exit_status` | `integer`   | Exit status of EnergyPlus. `NA` if terminated                    |
+#'   | 7    | `start_time`  | `POSIXct`   | Start of time of simulation                                      |
+#'   | 8    | `end_time`    | `POSIXct`   | End of time of simulation.                                       |
+#'   | 9    | `output_dir`  | `character` | Full path of simulation output directory                         |
+#'   | 10   | `energyplus`  | `character` | Full path of called EnergyPlus executable                        |
+#'   | 11   | `stdout`      | `list`      | Standard output of EnergyPlus during simulation                  |
+#'   | 12   | `stderr`      | `list`      | Standard error of EnergyPlus during simulation                   |
 #'
-#' @return A list for `run_idf()`. For `rum_multi()`, a
-#' [data.table][data.table::data.table()] if `wait` is `TRUE` or a
-#' [process][processx::process] if `wait` is `FALSE`.
+#'   For column `status`, there are 4 possible values:
+#'   - `"completed"`: the simulation job is completed successfully
+#'   - `"failed"`: the simulation job ended with error
+#'   - `"terminated"`: the simulation job started but was terminated
+#'   - `"cancelled"`: the simulation job was cancelled, i.e. did not start at all
+#'
+#' * For `run_multi()`, if `wait` is `FALSE`, a [r_process][callr::r_bg()]
+#'   object of background R process which handles all simulation jobs is
+#'   returned. You can check if the jobs are completed using `$is_alive()` and
+#'   get the final data.table using `$get_result()` method.
 #'
 #' @references
 #' [Running EnergyPlus from Command Line (EnergyPlus GitHub Repository)](https://github.com/NREL/EnergyPlus/blob/develop/doc/running-energyplus-from-command-line.md)
+#'
 #' @examples
 #' \dontrun{
 #' idf_path <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
@@ -210,22 +227,21 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     if (!is.null(weather)) weather <- normalizePath(weather, mustWork = TRUE)
 
     eplus <- eplus %||% as.character(get_idf_ver(read_lines(model)))
-    energyplus_exe <- eplus_exe(eplus)
-
-    if (is_empty(eplus)) {
-        stop("Missing version field in input IDF file. Failed to determine the ",
-            "version of EnergyPlus to use.", call. = FALSE)
+    if (!length(eplus)) {
+        abort(paste0("Missing version field in input IDF file. ",
+            "Failed to determine the version of EnergyPlus to use."),
+            "miss_idf_ver"
+        )
     }
+
+    energyplus_exe <- eplus_exe(eplus)
 
     # get output directory
     if (is.null(output_dir)) output_dir <- dirname(model)
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
     if (!dir.exists(output_dir)) {
         tryCatch(dir.create(output_dir, recursive = TRUE),
-            warning = function (w) {
-                stop("Failed to create output directory: ",
-                     surround(output_dir), call. = FALSE)
-            }
+            warning = function (w) abort(paste0("Failed to create output directory: ", surround(output_dir)), "create_output_dir")
         )
     }
 
@@ -249,7 +265,7 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
     res["epw"] <- list(weather)
     res$version <- as.character(eplus_config(eplus)$version)
 
-    res[c("idf", "epw", "exit_status", "start_time", "end_time", "output_dir",
+    res[c("idf", "epw", "version", "exit_status", "start_time", "end_time", "output_dir",
         "energyplus", "stdout", "stderr", "process")]
 }
 # }}}
@@ -259,28 +275,30 @@ run_idf <- function (model, weather, output_dir, design_day = FALSE,
 # run_multi {{{
 run_multi <- function (model, weather, output_dir, design_day = FALSE,
                        annual = FALSE, wait = TRUE, echo = TRUE, eplus = NULL) {
-    assert(is_flag(wait))
-    assert(is_flag(echo))
+    assert_flag(wait)
+    assert_flag(echo)
+    assert_logical(design_day, any.missing = FALSE)
+    assert_logical(annual, any.missing = FALSE)
 
-    if (!is_scalar(model)) {
-        if (!is.null(weather) && !is_scalar(weather)) {
-            assert(have_same_len(model, weather))
+    if (length(model) != 1L) {
+        if (!is.null(weather) && length(weather) != 1L) {
+            assert_same_len(model, weather)
         }
-        if (!is.null(eplus) && !is_scalar(eplus)) {
-            assert(have_same_len(model, eplus))
+        if (!is.null(eplus) && length(eplus) != 1L) {
+            assert_same_len(model, eplus)
         }
-        if (!is_scalar(design_day)) {
-            assert(have_same_len(model, design_day))
-            assert(is.logical(design_day), no_na(design_day))
+        if (length(design_day) != 1L) {
+            assert_same_len(model, design_day)
         }
-        if (!is_scalar(annual)) {
-            assert(have_same_len(model, annual))
-            assert(is.logical(annual), no_na(annual))
+        if (length(annual) != 1L) {
+            assert_same_len(model, annual)
         }
     }
 
     if (any(annual & design_day)) {
-        abort("error_run_both_ddy_annual", "Cannot force both design-day and annual simulations.")
+        abort("Cannot force both design-day-only simulation and annual simulation at the same time",
+            "both_ddy_annual"
+        )
     }
 
     model <- normalizePath(model, mustWork = TRUE)
@@ -298,34 +316,31 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     }
 
     if (is.null(eplus)) {
-        ver_list <- lapply(model, function (x) {
-            as.character(get_idf_ver(read_lines(x)))
-        })
-        ver_miss <- vapply(ver_list, is_empty, logical(1))
+        ver_list <- lapply(model, function (x) as.character(get_idf_ver(read_lines(x))))
+        ver_miss <- viapply(ver_list, length) == 0L
         if (any(ver_miss)) {
-            msg <- paste0("  ", seq_along(model)[ver_miss], "| ", surround(model[ver_miss]),
+            msg <- paste0("  #", lpad(seq_along(model)[ver_miss]), "| ", surround(model[ver_miss]),
                 collapse = "\n")
-            abort("error_miss_idf_ver", paste0(
-                "Missing version field in input IDF file. Failed to determine the ",
-                "version of EnergyPlus to use:\n", msg
-            ))
+            abort(paste0("Missing version field in input IDF file. Failed to determine the ",
+                "version of EnergyPlus to use:\n", msg), "miss_idf_ver")
         }
 
-        eplus <- unlist(ver_list)
+        ver <- unlist(ver_list)
+        energyplus_exe <- vcapply(ver, eplus_exe)
+        ver <- vcapply(ver, function (v) as.character(eplus_config(v)$version))
+    } else {
+        energyplus_exe <- vcapply(eplus, eplus_exe)
+        ver <- vcapply(eplus, function (v) as.character(eplus_config(v)$version))
     }
 
-    energyplus_exe <- vapply(eplus, eplus_exe, FUN.VALUE = character(1))
-
     if (anyDuplicated(model) & is.null(output_dir)) {
-        abort("error_run_duplicated_model",
-            "`model` cannot have any duplications when `output_dir` is NULL."
-        )
+        abort("'model' cannot have any duplications when 'output_dir' is NULL.", "duplicated_sim")
     }
 
     if (is.null(output_dir)) {
         output_dir <- dirname(model)
     } else {
-        assert(have_same_len(model, output_dir))
+        assert_same_len(model, output_dir)
     }
 
     output_dir <- normalizePath(output_dir, mustWork = FALSE)
@@ -333,27 +348,27 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     jobs <- data.table::data.table(input_model = model, output_dir = output_dir)
 
     if (anyDuplicated(jobs))
-        abort("error_run_duplicated_job", paste0(
-            "Duplication found in the combination of `model` and `output_dir`.",
-            " One model could not be run in the same output directory multiple ",
-            "times simultaneously."
-        ))
+        stop(paste0("Duplication found in the combination of 'model' and 'output_dir'. ",
+            "One model could not be run in the same output directory multiple times simultaneously."),
+            "duplicated_sim"
+        )
 
     d <- unique(output_dir[!dir.exists(output_dir)])
     created <- vapply(d, dir.create, logical(1L), showWarnings = FALSE, recursive = TRUE)
     if (any(!created)) {
-        abort("error_create_output_dir", paste0("Failed to create output directory:\n",
+        abort(paste0("Failed to create output directory:\n",
             paste0(surround(d[!created]), collapse = "\n")
         ))
     }
 
     jobs[, `:=`(
         energyplus = energyplus_exe,
-        model = copy_run_files(model, output_dir),
+        model = copy_run_files(model, output_dir), version = ver,
         index = .I, annual = annual, design_day = design_day
     )]
+
     if (is.null(weather)) {
-        jobs[, `:=`(input_weather = NA_character_, weather = list(NULL))]
+        set(jobs, NULL, c("input_weather", "weather"), list(NA_character_, list(NULL)))
     } else {
         if (any(!is.na(input_weather))) {
             weather[!is.na(input_weather)] <- as.list(
@@ -363,7 +378,7 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
                 )
             )
         }
-        jobs[, `:=`(input_weather = input_weather, weather = weather)]
+        set(jobs, NULL, c("input_weather", "weather"), list(input_weather, weather))
     }
 
     options <- list(num_parallel = eplusr_option("num_parallel"), echo = echo)
@@ -371,26 +386,12 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
     if (wait) {
         run_parallel_jobs(jobs, options)
     } else {
-        ext_funs <- tempfile("eplusr_run_parallel_jobs_fun", fileext = ".eplusr_temp")
-
-        base::dump(list = c("run_parallel_jobs", "kill_jobs", "schedule_next_sim",
-            "run_job", "are_all_completed", "handle_events", "sim_status", "clean_wd",
-            "energyplus", "is_string", "is_flag", "has_ext", "lpad", "surround", "assert",
-            "is_integer", "is_scalar"),
-            file = ext_funs
-        )
-
         # always echo in order to catch standard output and error
         options$echo <- TRUE
-        proc <- callr::r_bg(function (ext_funs, jobs, options) {
-            requireNamespace("data.table", quietly = TRUE)
-            source(ext_funs)
-            run_parallel_jobs(jobs, options)
-        }, args = list(ext_funs = ext_funs, jobs = jobs, options = options))
-
-        proc
+        callr::r_bg(function (jobs, options) {
+            utils::getFromNamespace("run_parallel_jobs", "eplusr")(jobs, options)
+        }, args = list(jobs = jobs, options = options))
     }
-
 }
 # }}}
 
@@ -426,15 +427,19 @@ proc_print <- function(p, control = c(TRUE, TRUE)) {
 # reference: https://github.com/r-lib/revdepcheck/blob/master/R/event-loop.R
 run_parallel_jobs <- function(jobs, options) {
     if (nrow(jobs) == 0) return()
-    assert(is_integer(options$num_parallel))
+    assert_count(options$num_parallel, positive = TRUE)
+
+    # in case run in background
+    jobs <- setDT(jobs)
 
     ## Kill all child processes if we quit from this function
     on.exit(kill_jobs(jobs, options), add = TRUE)
 
     # initialize job status and worker
-    jobs[, `:=`(status = "waiting", index_str = lpad(index, "0"), process = list(),
-        stdout = list(), stderr = list(), exit_status = NA_integer_
-    )]
+    set(jobs, NULL, c("status", "index_str", "process", "stdout", "stderr", "exit_status", "start_time", "end_time"),
+        list("waiting", lpad(jobs$index, "0"), list(), list(), list(), NA_integer_, as.POSIXct(NA), as.POSIXct(NA))
+    )
+    setindexv(jobs, "status")
 
     # Our global progress bar
     progress_bar <- progress::progress_bar$new(
@@ -450,8 +455,8 @@ run_parallel_jobs <- function(jobs, options) {
         jobs <- run_job(jobs, options, progress_bar)
     }
 
-    num_head <- num_tail <- 0L
-    while (1) {
+    # Run until all simulation complete
+    while (TRUE) {
         if (are_all_completed(jobs)) break;
         progress_bar$tick(0)
         jobs <- handle_events(jobs, options, progress_bar)
@@ -459,47 +464,39 @@ run_parallel_jobs <- function(jobs, options) {
         jobs <- run_job(jobs, options, progress_bar)
     }
 
-    jobs[, c("model", "weather") := NULL]
-    data.table::setnames(jobs, c("input_model", "input_weather"), c("idf", "epw"))
+    set(jobs, NULL, c("model", "weather"), NULL)
+    setnames(jobs, c("input_model", "input_weather"), c("idf", "epw"))
 
-    jobs[, .SD, .SDcols = c("index", "status", "idf", "epw", "exit_status",
-        "start_time", "end_time", "energyplus", "output_dir", "stdout", "stderr"
+    jobs[, .SD, .SDcols = c("index", "status", "idf", "epw", "version", "exit_status",
+        "start_time", "end_time", "output_dir", "energyplus", "stdout", "stderr"
     )]
 }
 # }}}
 # kill_jobs {{{
 kill_jobs <- function(jobs, options) {
-    jobs[vapply(process, function (x) {!is.null(x) && x$is_alive()}, logical(1)), `:=`(
+    jobs[vlapply(process, function (x) inherits(x, "process") && x$is_alive()), `:=`(
         status = {for (p in process) p$kill(); "terminated"}
     )]
 
-    jobs[status %in% c("waiting", "ready"), `:=`(status = "cancelled")]
+    jobs[J(c("waiting", "ready")), on = "status", status := "cancelled"]
 
-
-    if (any(jobs$status == "terminated")) {
-        jobs[status == "terminated", `:=`(
+    if (any(is_term <- jobs$status == "terminated")) {
+        jobs[is_term, `:=`(
             stdout = lapply(process, function (x) tryCatch(x$read_all_output_lines(), error = function (e) NA_character_)),
             stderr = lapply(process, function (x) tryCatch(x$read_all_error_lines(), error = function (e) NA_character_)),
-            exit_status = vapply(process, function (x) x$get_exit_status(), integer(1))
+            exit_status = viapply(process, function (x) x$get_exit_status())
         )]
     }
 
     if (options$echo) {
-
-        if (any(jobs$status == "terminated")) {
-            terminated <- jobs[status == "terminated",
-                sim_status("terminate", index_str, model, weather)
-            ]
-
-            cli::cat_line(terminated, col = "white", background_col = "red")
+        if (any(is_term)) {
+            terminated <- jobs[is_term, sim_status("terminate", index_str, model, weather)]
+            cat_line(terminated, col = "white", background_col = "red")
         }
 
-        if (any(jobs$status == "cancelled")) {
-            cancelled <- jobs[status == "cancelled",
-                sim_status("cancel", index_str, model, weather)
-            ]
-
-            cli::cat_line(cancelled, col = "white", background_col = "red")
+        if (any(is_canc <- jobs$status == "cancelled")) {
+            cancelled <- jobs[is_canc, sim_status("cancel", index_str, model, weather)]
+            cat_line(cancelled, col = "white", background_col = "red")
         }
     }
 }
@@ -512,9 +509,9 @@ schedule_next_sim <- function(jobs, options, progress_bar) {
     }
 
     # waiting -> running
-    ready <- jobs$status == "waiting"
-    if (any(ready)) {
-        jobs[jobs[ready, index[1L]], `:=`(status = "ready")]
+    # always schedule only one new job
+    if (any(ready <- jobs$status == "waiting")) {
+        set(jobs, jobs$index[ready][1L], "status", "ready")
     }
 
     jobs
@@ -523,32 +520,27 @@ schedule_next_sim <- function(jobs, options, progress_bar) {
 # run_job {{{
 run_job <- function(jobs, options, progress_bar) {
     # clean wd
-    lapply(jobs[status == "ready", model], clean_wd)
+    ready <- which(jobs$status == "ready")
 
-    jobs[status == "ready", `:=`(status = "newly_started",
-        process = list(energyplus(eplus = energyplus, model = model,
+    if (!length(ready)) return(jobs)
+
+    jobs[ready, c("status", "process", "start_time") := {
+        clean_wd(model)
+
+        process <- energyplus(eplus = energyplus, model = model,
             weather = unlist(weather), output_dir = output_dir, annual = annual,
-            design_day = design_day, wait = FALSE, echo = FALSE)$process)
-    )]
-
-    if (any(jobs$status == "newly_started")) {
-        completed <- jobs[status == "newly_started",
-            sim_status("run", index_str, model, weather)
-        ]
+            design_day = design_day, wait = FALSE, echo = FALSE)$process
 
         if (options$echo) {
-            progress_bar$message(paste0(completed, collapse = "\n"))
+            run <- sim_status("run", index_str, model, weather)
+            progress_bar$message(paste0(run, collapse = "\n"))
         }
         progress_bar$tick(0)
-    }
 
-    jobs[status == "newly_started", `:=`(status = "running",
-        start_time = do.call("c", lapply(process,
-            function (x) lubridate::with_tz(x$get_start_time(), Sys.timezone())
-        ))
-    )]
+        start_time <- lubridate::with_tz(process$get_start_time(), Sys.timezone())
 
-    jobs
+        list(status = "running", process = list(process), start_time = start_time)
+    }]
 }
 # }}}
 # are_all_completed {{{
@@ -558,44 +550,39 @@ are_all_completed <- function(jobs) {
 # }}}
 # handle_events {{{
 handle_events <- function(jobs, options, progress_bar) {
-    jobs[status == "running" &
-         vlapply(process, function (x) !is.null(x) && !x$is_alive()),
+    run <- jobs$status == "running"
+    if (!any(run)) return(jobs)
+
+    jobs[run & vlapply(process, function (x) !is.null(x) && !x$is_alive()),
         c("stdout", "stderr", "exit_status", "status", "end_time") := {
             res <- lapply(process, function (p) p$get_result())
-            exit_code <- viapply(process, function (x) x$get_exit_status())
+
             # somehow get_exit_status() function may return NA after execution
             # of a (successful) command
-            # https://github.com/r-lib/processx/issues/220
+            # ref: https://github.com/r-lib/processx/issues/220
+            exit_code <- viapply(process, function (x) x$get_exit_status())
             exit_code[is.na(exit_code)] <- 0L
-            list(stdout = lapply(res, "[[", "stdout"),
-                 stderr = lapply(res, "[[", "stderr"),
-                 exit_status = exit_code, status = "newly_completed", end_time = Sys.time()
+
+            if (options$echo) {
+                comp <- sim_status("complete", index_str, model, weather, exit_code)
+                progress_bar$message(paste0(comp, collapse = "\n"))
+            }
+            progress_bar$tick(.N)
+
+            status[exit_code == 0L] <- "completed"
+            status[exit_code != 0L] <- "failed"
+
+            list(stdout = lapply(res, "[[", "stdout"), stderr = lapply(res, "[[", "stderr"),
+                 exit_status = exit_code, status = status, end_time = Sys.time()
             )
         }
     ]
-
-    if (any(jobs$status == "newly_completed")) {
-        num <- sum(jobs$status == "newly_completed")
-
-        completed <- jobs[status == "newly_completed",
-            sim_status("complete", index_str, model, weather, exit_status)
-        ]
-
-        if (options$echo) {
-            progress_bar$message(paste0(completed, collapse = "\n"))
-        }
-        progress_bar$tick(num)
-    }
-
-    jobs[status == "newly_completed", `:=`(status = ifelse(exit_status == 0L, "completed", "failed"))]
-
-    jobs
 }
 # }}}
 # sim_status {{{
 sim_status <- function (type, index, model, weather, exit_code = NULL) {
     status <- c("run", "complete", "cancel", "terminate")
-    if (length(type) ==1L && type %in% status) {
+    if (length(type) == 1L && type %in% status) {
         type <- switch(type,
             run       = "RUNNING   ",
             complete  = "COMPLETED ",
@@ -626,23 +613,21 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
 
     output_suffix <- match.arg(output_suffix)
 
-    assert(
-        file.exists(eplus),
-        file.exists(model),
-        is.null(weather) || file.exists(weather),
-        is.null(output_dir) || dir.exists(output_dir),
-        is.null(output_prefix) || is_string(output_prefix),
-        is_flag(expand_obj),
-        is_flag(readvars),
-        is_flag(annual),
-        is_flag(design_day),
-        is.null(idd) || file.exists(idd),
-        is_flag(echo),
-        is_flag(wait)
-    )
+    assert_file_exists(eplus)
+    assert_file_exists(model)
+    assert_flag(expand_obj)
+    assert_flag(readvars)
+    assert_flag(annual)
+    assert_flag(design_day)
+    assert_flag(echo)
+    assert_flag(wait)
+    if (!is.null(weather)) assert_file_exists(weather)
+    if (!is.null(output_dir)) assert_directory_exists(output_dir, "w")
+    if (!is.null(output_prefix)) assert_string(output_prefix)
+    if (!is.null(idd)) assert_file_exists(idd)
 
     if (annual && design_day) {
-        stop("Cannot force both design-day and annual simulations.", call. = FALSE)
+        abort("Cannot force both design-day and annual simulations", "both_ddy_annual")
     }
 
     # argument docs {{{
@@ -771,6 +756,7 @@ energyplus <- function (eplus, model, weather, output_dir, output_prefix = NULL,
             stderr <- suppressWarnings(read_lines(p_stderr)$string)
             if (!length(stdout)) stdout <- character(0)
             if (!length(stderr)) stderr <- character(0)
+            unlink(c(p_stdout, p_stderr))
             list(stdout = stdout, stderr = stderr, end_time = Sys.time())
         }
     }
@@ -867,15 +853,15 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
-    config <- tryCatch(eplus_config(eplus), warning = function (w) stop(w))
+    config <- tryCatch(eplus_config(eplus), miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config"))
 
     if (config$version < 8.3) {
-        abort("error_eplus_lower_8.3", paste(
-            "Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
-            "This is because eplusr uses EnergyPlus command line interface ",
-            "which is available only in EnergyPlus v8.3 and above. ",
-            "You can update the version of your model using `version_updater()` and try again."
-        ))
+        abort(paste0("Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
+             "This is because eplusr uses EnergyPlus command line interface ",
+             "which is available only in EnergyPlus v8.3 and above. ",
+             "You can update the version of your model using 'transition()' or 'version_updater()' and try again."),
+             "eplus_ver_not_supported"
+        )
     }
 
     normalizePath(file.path(config$dir, config$exe), mustWork = TRUE)
@@ -889,16 +875,16 @@ copy_run_files <- function (file, dir) {
 
     if (all(file == loc)) return(file)
 
-    copy <- unique(data.table::data.table(from = file, to = loc))
+    copy <- unique(data.table(from = file, to = loc))
     flag <- apply2_int(copy$from, copy$to, file.copy,
         more_args = list(overwrite = TRUE, copy.date = TRUE)
     )
 
     if (any(!flag))
-        stop("Unable to copy file ", surround(basename(file[!flag])), "into ",
-            "simulation output directory.", call. = FALSE)
+        abort(paste0("Unable to copy file ", surround(basename(file[!flag])), "into ",
+            "simulation output directory."), "copy_run_files")
 
-    return(loc)
+    loc
 }
 # }}}
 # get_run_time {{{
@@ -906,7 +892,6 @@ get_run_time <- function (stdout) {
     last <- stdout[length(stdout)]
 
     period <- lubridate::hms(last, quiet = TRUE)
-    if (is.na(period)) return(NULL)
-    period
+    if (is.na(period)) NULL else period
 }
 # }}}

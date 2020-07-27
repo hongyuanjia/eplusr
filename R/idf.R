@@ -132,7 +132,6 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
                 , object_order := 0L]
 
             private$m_log$view_in_ip <- eplusr_option("view_in_ip")
-            private$m_log$num_digits <- eplusr_option("num_digits")
             private$m_log$save_format <- idf_file$options$save_format
         },
         # }}}
@@ -552,6 +551,9 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'
         #' @param which A single integer specifying the object ID or a single
         #'        string specifying the object name.
+        #' @param class A character vector that contains valid class names for
+        #'        current `Idf` object used to locate objects. If `NULL`, all
+        #'        classes in current `Idf` object are used. Default: `NULL`.
         #'
         #' @return An [IdfObject] object.
         #'
@@ -565,8 +567,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$object("simple one zone (wireframe dxf)")
         #' }
         #'
-        object = function (which)
-            idf_obj(self, private, which),
+        object = function (which, class = NULL)
+            idf_obj(self, private, which, class),
         # }}}
 
         # objects {{{
@@ -1079,7 +1081,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         add = function (..., .default = TRUE, .all = FALSE)
-            idf_add(self, private, ..., .default = .default, .all = .all),
+            idf_add(self, private, ..., .default = .default, .all = .all, .env = parent.frame()),
         # }}}
 
         # set {{{
@@ -1192,7 +1194,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' }
         #'
         set = function (..., .default = TRUE, .empty = FALSE)
-            idf_set(self, private, ..., .default = .default, .empty = .empty),
+            idf_set(self, private, ..., .default = .default, .empty = .empty, .env = parent.frame()),
         # }}}
 
         # del {{{
@@ -1351,7 +1353,8 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' * `class`: Character. Names of classes that input objects belong to
         #' * `id`: Integer. Input object IDs
         #' * `name`: Character. Input object names
-        #' * `duplicated`: Logical. Whether this object is a duplication or not
+        #' * `duplicate`: Integer. The IDs of objects that input objects
+        #'   duplicate. If input object is not a duplication, `NA` is returned
         #'
         #' @examples
         #' \dontrun{
@@ -2133,7 +2136,7 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' @details
         #' `$to_table()` returns a [data.table][data.table::data.table()] that
         #' contains core data of specified objects.
-        #' The returned [data.table][data.table::data.table()] has 6 columns:
+        #' The returned [data.table][data.table::data.table()] has 5 columns:
         #'
         #' * `id`: Integer type. Object IDs.
         #' * `name`: Character type. Object names.
@@ -2204,6 +2207,10 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #'        with lots of columns. But may be useful when you know that
         #'        target classes have the exact same fields, e.g.
         #'        `Ceiling:Adiabatic` and `Floor:Adiabatic`. Default: `FALSE`.
+        #' @param init If `TRUE`, a table for new object input will be returned
+        #'        with all values filled with defaults. In this case, `object`
+        #'        input will be ignored. The `id` column will be filled with
+        #'        possible new object IDs. Default: `FALSE`.
         #'
         #' @return A [data.table][data.table::data.table()] with 6 columns (if
         #' `wide` is `FALSE`) or at least 6 columns (if `wide` is `TRUE`).
@@ -2253,14 +2260,18 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         #' idf$to_table(class = "BuildingSurface:Detailed", group_ext = "index",
         #'     wide = TRUE, string_value = FALSE, unit = TRUE
         #' )
+        #'
+        #' # create table for new object input
+        #' idf$to_table(class = "BuildingSurface:Detailed", init = TRUE)
         #' }
         #'
         to_table = function (which = NULL, class = NULL, string_value = TRUE,
                              unit = FALSE, wide = FALSE, align = FALSE, all = FALSE,
-                             group_ext = c("none", "group", "index"), force = FALSE)
+                             group_ext = c("none", "group", "index"), force = FALSE,
+                             init = FALSE)
             idf_to_table(self, private, which = which, class = class,
                 string_value = string_value, unit = unit, wide = wide, align = align,
-                all = all, group_ext = match.arg(group_ext), force = force),
+                all = all, group_ext = match.arg(group_ext), force = force, init = init),
         # }}}
 
         # is_unsaved {{{
@@ -2678,15 +2689,11 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         # }}}
 
         idd_env = function () {
-            ._get_private(private$m_idd)$m_idd_env
+            get_priv_env(private$m_idd)$m_idd_env
         },
 
         idf_env = function () {
             private$m_idf_env
-        },
-
-        log_env = function () {
-            private$m_log
         },
 
         deep_clone = function (name, value) {
@@ -2777,26 +2784,30 @@ idf_object_num <- function (self, private, class = NULL) {
 }
 # }}}
 # idf_is_valid_group_name {{{
+#' @importFrom checkmate assert_character
 idf_is_valid_group_name <- function (self, private, group, all = FALSE) {
-    assert(is.character(group), msg = "`group` should be a character vector.")
-    group %in% idf_group_name(self, private, all, FALSE)
+    assert_valid_type(group, "Group Name", type = "name")
+    group %chin% idf_group_name(self, private, all, FALSE)
 }
 # }}}
 # idf_is_valid_class_name {{{
+#' @importFrom checkmate assert_character
 idf_is_valid_class_name <- function (self, private, class, all = FALSE) {
-    assert(is.character(class), msg = "`class` should be a character vector.")
+    assert_valid_type(class, "Class Name", type = "name")
     class %in% idf_class_name(self, private, all, FALSE)
 }
 # }}}
 # idf_is_valid_object_id {{{
+#' @importFrom checkmate assert_integerish
 idf_is_valid_object_id <- function (self, private, id) {
-    assert(are_count(id))
+    assert_valid_type(id, "Object ID", type = "id")
+    id <- assert_integerish(id, any.missing = FALSE, coerce = TRUE)
     id %in% idf_object_id(self, private, NULL, simplify = TRUE)
 }
 # }}}
 # idf_is_valid_object_name {{{
 idf_is_valid_object_name <- function (self, private, name) {
-    assert(is.character(name), msg = "`name` should be a character vector.")
+    assert_valid_type(name, "Object Name", type = "name")
     stri_trans_tolower(name) %chin% private$idf_env()$object[!is.na(object_name), object_name_lower]
 }
 # }}}
@@ -2815,66 +2826,59 @@ idf_definition <- function (self, private, class = NULL) {
 }
 # }}}
 # idf_obj {{{
-idf_obj <- function (self, private, which) {
-    assert(!is.null(which), is_scalar(which))
-    obj <- get_idf_object(private$idd_env(), private$idf_env(), class = NULL, object = which,
-        ignore_case = TRUE
+#' @importFrom checkmate assert
+idf_obj <- function (self, private, which, class = NULL) {
+    assert_valid_type(which, "Object ID|Name", len = 1L)
+    obj <- get_idf_object(private$idd_env(), private$idf_env(),
+        class = class, object = which, ignore_case = TRUE
     )
 
-    add_idfobj_field_bindings(IdfObject$new(obj$object_id, obj$class_id, parent = self))
+    idf_return_matched(self, private, obj)[[1L]]
 }
 # }}}
 # idf_object_unique {{{
 idf_object_unique <- function (self, private, class) {
-    assert(is_scalar(class))
+    assert_valid_type(class, "Class Name", len = 1L, type = "name")
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
 
-    if (!unique(obj$class_id) %in% private$idd_env()$class[unique_object == TRUE, class_id]) {
-        abort("error_idf_not_unique_class",
-            paste0(surround(unique(obj$class_name)), " is not a valid unique-object class index or name.")
-        )
+    if (!unique(obj$class_id) %in% private$idd_env()$class[J(TRUE), on = "unique_object", class_id, nomatch = NULL]) {
+        abort(paste0(surround(unique(obj$class_name)), " is not a valid unique-object class index or name."))
     }
 
     if (nrow(obj) > 1L) {
-        abort("error_idf_dup_unique_class",
-            paste0(surround(unique(obj$class_name)), " class have more than one ",
-                "objects:\n",
-                get_object_info(obj[, rleid := .I], c("id", "name"), collapse = "\n"),
-                "\nPlease see `$validate()` for more details."
-            )
-        )
+        abort(paste0("Unique-object class ", surround(unique(obj$class_name)), " have more than one objects:\n",
+            get_object_info(obj[, rleid := .I], c("id", "name"), collapse = "\n"),
+            "\nPlease see '$validate()' for more details."
+        ))
     }
 
-    add_idfobj_field_bindings(IdfObject$new(obj$object_id, obj$class_id, parent = self))
+    idf_return_matched(self, private, obj)[[1L]]
 }
 # }}}
 # idf_objects {{{
-idf_objects <- function (self, private, which) {
-    assert(!is.null(which))
-    obj <- get_idf_object(private$idd_env(), private$idf_env(), class = NULL, object = which,
-        ignore_case = TRUE
+#' @importFrom checkmate assert check_character check_integerish
+idf_objects <- function (self, private, which, class = NULL) {
+    assert_valid_type(which, "Object ID|Name")
+    obj <- get_idf_object(private$idd_env(), private$idf_env(),
+        class = class, object = which, ignore_case = TRUE
     )
 
-    res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", obj$object_name)
-    res
+    idf_return_matched(self, private, obj)
 }
 # }}}
 # idf_objects_in_class {{{
+#' @importFrom checkmate assert_string
 idf_objects_in_class <- function (self, private, class) {
-    assert(is_string(class))
+    assert_valid_type(class, "Class Name", type = "name")
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
 
-    res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", obj$object_name)
-    res
+    idf_return_matched(self, private, obj)
 }
 # }}}
 # idf_objects_in_group {{{
+#' @importFrom checkmate assert_string
 idf_objects_in_group <- function (self, private, group) {
-    assert(is_string(group))
+    assert_string(group)
 
     add_joined_cols(private$idd_env()$class, private$idf_env()$object, "class_id", "group_id")
     add_joined_cols(private$idd_env()$group, private$idf_env()$object, "group_id", "group_name")
@@ -2884,18 +2888,16 @@ idf_objects_in_group <- function (self, private, group) {
 
     obj <- join_from_input(private$idf_env()$object, grp_in, "group_id")
 
-    res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", obj$object_name)
-    res
+    idf_return_matched(self, private, obj)
 }
 # }}}
 # idf_object_relation {{{
+#' @importFrom checkmate assert check_string
 idf_object_relation <- function (self, private, which,
                                  direction = c("all", "ref_to", "ref_by", "node"),
                                  object = NULL, class = NULL, group = NULL,
                                  depth = 0L, keep = FALSE, class_ref = c("both", "none", "all")) {
-    assert(is_scalar(which))
+    assert_valid_type(which, "Object ID|Name")
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(),
         object = which, ignore_case = TRUE
@@ -2912,7 +2914,7 @@ idf_object_relation <- function (self, private, which,
 idf_objects_in_relation <- function (self, private, which, direction = c("ref_to", "ref_by", "node"),
                                      object = NULL, class = NULL, group = NULL, depth = 0L,
                                      class_ref = c("both", "none", "all")) {
-    assert(is_scalar(which))
+    assert_valid_type(which, "Object ID|Name")
     direction <- match.arg(direction)
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(), object = which, ignore_case = TRUE)
@@ -2932,7 +2934,7 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
     setattr(obj_self, "names", obj$object_name)
 
     if (!length(id_ref)) {
-        if (eplusr_option("verbose_info")) {
+        if (in_verbose()) {
             dir <- switch(direction, ref_to = "does not refer to", ref_by = "is not referred by",
                 node = "has no node or their nodes have no reference to"
             )
@@ -2962,9 +2964,7 @@ idf_objects_in_relation <- function (self, private, which, direction = c("ref_to
 idf_search_object <- function (self, private, pattern, class = NULL, ignore.case = FALSE,
                                perl = FALSE, fixed = FALSE, useBytes = FALSE) {
     if (!is.null(class) && anyDuplicated(class)) {
-        abort("error_search_object_dup_class",
-            "Class should not contain any duplication.", class = class
-        )
+        abort("Class should not contain any duplication.")
     }
 
     obj <- get_idf_object(private$idd_env(), private$idf_env(), class)
@@ -2978,238 +2978,283 @@ idf_search_object <- function (self, private, pattern, class = NULL, ignore.case
         return(invisible())
     }
 
-    res <- apply2(obj$object_id, obj$class_id, IdfObject$new, list(parent = self))
-    res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", obj$object_name)
-    res
+    idf_return_matched(self, private, obj)
 }
 # }}}
-# idf_return_modified {{{
-idf_return_modified <- function (self, private, modified) {
-    res <- apply2(modified$object$object_id, modified$object$class_id, IdfObject$new, list(parent = self))
+# idf_return_matched {{{
+idf_return_matched <- function (self, private, matched, object_id) {
+    if (is.numeric(matched)) {
+        matched <- private$idf_env()$object[J(matched), on = "object_id", nomatch = NULL]
+    }
+
+    res <- apply2(matched$object_id, matched$class_id, IdfObject$new, list(parent = self))
     res <- lapply(res, add_idfobj_field_bindings)
-    setattr(res, "names", modified$object$object_name)
-    res
+    setattr(res, "names", matched$object_name)[]
+}
+# }}}
+# idf_update_idf_env {{{
+idf_update_idf_env <- function (self, private, lst) {
+    idf_env <- private$idf_env()
+    idf_env$object <- lst$object
+    idf_env$value <- lst$value
+    idf_env$reference <- lst$reference
 }
 # }}}
 # idf_dup {{{
 idf_dup <- function (self, private, ...) {
-    dup <- dup_idf_object(private$idd_env(), private$idf_env(), ...)
-    merge_idf_data(private$idf_env(), dup)
+    obj <- expand_idf_dots_name(private$idd_env(), private$idf_env(), ...)
+    dup <- dup_idf_object(private$idd_env(), private$idf_env(), obj)
 
     # log
-    log_new_order(private$m_log, dup$object$object_id)
+    log_new_order(private$m_log, dup$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, dup)
+    idf_update_idf_env(self, private, dup)
+    idf_return_matched(self, private, dup$changed)
 }
 # }}}
 # idf_add {{{
-idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = parent.frame(2)) {
-    add <- add_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .all = .all, .env = .env)
-    merge_idf_data(private$idf_env(), add)
+idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = parent.frame()) {
+    l <- expand_idf_dots_value(private$idd_env(), private$idf_env(), ...,
+        .type = "class", .complete = TRUE, .all = .all,
+        .scalar = FALSE, .pair = TRUE, .ref_assign = TRUE,
+        .unique = FALSE, .empty = TRUE, .default = .default, .env = .env
+    )
+
+    add <- add_idf_object(private$idd_env(), private$idf_env(),
+        l$object, l$value, default = FALSE, unique = FALSE, empty = .all)
+
+    if (!length(add$changed)) return(invisible(NULL))
 
     # log
-    log_new_order(private$m_log, add$object$object_id)
+    log_new_order(private$m_log, add$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, add)
+    idf_update_idf_env(self, private, add)
+    idf_return_matched(self, private, add$changed)
 }
 # }}}
 # idf_set {{{
-idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env = parent.frame(2)) {
-    set <- set_idf_object(private$idd_env(), private$idf_env(), ..., .default = .default, .empty = .empty, .env = .env)
-    merge_idf_data(private$idf_env(), set, by_object = TRUE)
+idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env = parent.frame()) {
+    l <- expand_idf_dots_value(private$idd_env(), private$idf_env(), ...,
+        .type = "object", .complete = TRUE, .all = FALSE,
+        .scalar = FALSE, .pair = TRUE, .ref_assign = TRUE,
+        .unique = TRUE, .empty  = TRUE, .default = .default, .env = .env
+    )
+
+    set <- set_idf_object(private$idd_env(), private$idf_env(),
+        l$object, l$value, empty = .empty)
 
     # log
-    log_add_order(private$m_log, set$object$object_id)
+    log_add_order(private$m_log, c(set$changed, set$updated))
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, set)
+    idf_update_idf_env(self, private, set)
+    idf_return_matched(self, private, set$changed)
 }
 # }}}
 # idf_del {{{
 idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recursive = FALSE, .force = FALSE) {
-    del <- del_idf_object(private$idd_env(), private$idf_env(), ...,
-        .ref_by = .ref_by, .ref_to = .ref_to, .recursive = .recursive, .force = .force
-    )
-
-    private$m_idf_env$object <- del$object
-    private$m_idf_env$value <- del$value
-    private$m_idf_env$reference <- del$reference
+    obj <- expand_idf_dots_name(private$idd_env(), private$idf_env(), ..., .keep_name = FALSE)
+    del <- del_idf_object(private$idd_env(), private$idf_env(), obj,
+        ref_to = .ref_to, ref_by = .ref_by, recursive = .recursive, force = .force)
 
     # log
-    log_del_order(private$m_log, del$object$object_id)
+    log_del_order(private$m_log, del$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
+
+    idf_update_idf_env(self, private, del)
 
     invisible(self)
 }
 # }}}
 # idf_purge {{{
 idf_purge <- function (self, private, object = NULL, class = NULL, group = NULL) {
-    purge <- purge_idf_object(private$idd_env(), private$idf_env(), object, class, group)
+    obj <- get_idf_object_multi_scope(private$idd_env(), private$idf_env(), object, class, group)
+    purge <- purge_idf_object(private$idd_env(), private$idf_env(), obj)
 
-    private$m_idf_env$object <- purge$object
-    private$m_idf_env$value <- purge$value
-    private$m_idf_env$reference <- purge$reference
+    if (!length(purge$changed)) return(invisible(self))
 
     # log
-    log_del_order(private$m_log, purge$object$object_id)
+    log_del_order(private$m_log, purge$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
+
+    idf_update_idf_env(self, private, purge)
 
     invisible(self)
 }
 # }}}
 # idf_duplicated {{{
 idf_duplicated <- function (self, private, object = NULL, class = NULL, group = NULL) {
-    dup <- duplicated_idf_object(private$idd_env(), private$idf_env(), object, class, group)
-    dup$object[, list(class = class_name, id = object_id, name = object_name, duplicated)]
+    obj <- get_idf_object_multi_scope(private$idd_env(), private$idf_env(), object, class, group)
+    duplicated_idf_object(private$idd_env(), private$idf_env(), obj)[
+        , list(class = class_name, id = object_id, name = object_name, duplicate = unique_object_id)]
 }
 # }}}
 # idf_unique {{{
 idf_unique <- function (self, private, object = NULL, class = NULL, group = NULL) {
-    uni <- unique_idf_object(private$idd_env(), private$idf_env(), object, class, group)
+    obj <- get_idf_object_multi_scope(private$idd_env(), private$idf_env(), object, class, group)
+    uni <- unique_idf_object(private$idd_env(), private$idf_env(), obj)
 
-    private$m_idf_env$object <- uni$object
-    private$m_idf_env$value <- uni$value
-    private$m_idf_env$reference <- uni$reference
+    if (!length(uni$changed)) return(invisible(self))
 
     # log
-    log_del_order(private$m_log, uni$object$object_id)
+    log_del_order(private$m_log, uni$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
+
+    idf_update_idf_env(self, private, uni)
 
     invisible(self)
 }
 # }}}
 # idf_rename {{{
 idf_rename <- function (self, private, ...) {
-    ren <- rename_idf_object(private$idd_env(), private$idf_env(), ...)
-
-    merge_idf_data(private$idf_env(), ren)
+    obj <- expand_idf_dots_name(private$idd_env(), private$idf_env(), ..., .keep_name = TRUE)
+    ren <- rename_idf_object(private$idd_env(), private$idf_env(), obj)
 
     # log
-    log_add_order(private$m_log, ren$object$object_id)
+    log_add_order(private$m_log, c(ren$changed, ren$updated))
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    res <- apply2(ren$object$object_id, ren$object$class_id, IdfObject$new, list(parent = self))
-    setattr(res, "names", ren$object$object_name)
-    res
+    idf_update_idf_env(self, private, ren)
+    idf_return_matched(self, private, ren$changed)
 }
 # }}}
 # idf_insert {{{
 idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
-    ins <- insert_idf_object(private$idd_env(), private$idf_env(), private$m_version, ..., .unique = .unique, .empty = .empty)
+    l <- expand_idf_dots_object(private$idd_env(), private$idf_env(), ...,
+        .unique = FALSE, .strict = TRUE)
 
-    if (!nrow(ins$object)) {
-        verbose_info("After deleting duplications, nothing to add.")
-        return(invisible())
+    # ignore Version object
+    if (any(l$object$class_id == 1L)) {
+        if (in_verbose()) {
+            m <- l$object[class_id == 1L, paste0(" #", rleid, "| Object [", object_id, ", ] --> Class 'Version'", collapse = "\n")]
+            verbose_info("'Version' objects in input below have been automatically skipped:\n", m)
+        }
+        l$object <- l$object[!J(1L), on = "class_id"]
+        l$value <- l$value[J(l$object$rleid), on = "rleid"]
+
+        if (!nrow(l$object)) {
+            verbose_info("After removing Version objects, nothing to add.")
+            return(invisible())
+        }
     }
 
-    merge_idf_data(private$idf_env(), ins, by_object = TRUE)
+    ins <- add_idf_object(private$idd_env(), private$idf_env(), l$object, l$value,
+        default = FALSE, unique = .unique, empty = .empty
+    )
+
+    if (!length(ins$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, ins$object$object_id)
+    log_new_order(private$m_log, ins$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, ins)
+    idf_update_idf_env(self, private, ins)
+    idf_return_matched(self, private, ins$changed)
 }
 # }}}
 # idf_search_value {{{
 idf_search_value <- function (self, private, pattern, class = NULL, ignore.case = FALSE,
                               perl = FALSE, fixed = FALSE, useBytes = FALSE) {
-    val <- search_idf_value(private$idd_env(), private$idf_env(), pattern, class,
-        ignore.case, perl, fixed, useBytes
-    )
+    l <- expand_idf_regex(private$idd_env(), private$idf_env(), pattern,
+        replacement = NULL, class, ignore.case, perl, fixed, useBytes)
 
-    if (is.null(val)) return(invisible())
+    if (!nrow(l$object)) {
+        verbose_info("No matched result found.")
+        return(invisible())
+    }
 
-    obj <- val[, list(object_name = object_name[[1L]]), by = c("class_id", "object_id")]
-    idf_return_modified(self, private, list(object = obj))
+    idf_return_matched(self, private, l$object)
 }
 # }}}
 # idf_replace_value {{{
 idf_replace_value <- function (self, private, pattern, replacement, class = NULL,
                                ignore.case = FALSE, perl = FALSE, fixed = FALSE,
                                useBytes = FALSE) {
-    rep <- replace_idf_value(private$idd_env(), private$idf_env(), pattern, replacement,
-        class, ignore.case, perl, fixed, useBytes)
+    l <- expand_idf_regex(private$idd_env(), private$idf_env(), pattern,
+        replacement, class, ignore.case, perl, fixed, useBytes)
 
-    if (is.null(rep)) return(invisible())
+    if (!nrow(l$object)) {
+        verbose_info("No matched result found.")
+        return(invisible())
+    }
 
-    merge_idf_data(private$idf_env(), rep)
+    rep <- set_idf_object(private$idd_env(), private$idf_env(), l$object, l$value, empty = FALSE)
 
     # log
-    log_add_order(private$m_log, rep$object$object_id)
+    log_add_order(private$m_log, c(rep$changed, rep$updated))
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, rep)
+    idf_update_idf_env(self, private, rep)
+    idf_return_matched(self, private, rep$changed)
 }
 # }}}
 # idf_paste {{{
 idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE, empty = FALSE) {
-    pas <- paste_idf_object(private$idd_env(), private$idf_env(),
-        version = private$m_version, in_ip = in_ip, unique = unique, empty = empty
-    )
+    if (is.null(ver)) ver <- private$m_version
 
-    if (!nrow(pas$object)) {
-        verbose_info("After deleting duplications, nothing to add.")
-        return(invisible())
-    }
+    l <- read_idfeditor_copy(private$idd_env(), private$idf_env(), version = ver, in_ip = in_ip)
 
-    merge_idf_data(private$idf_env(), pas, by_object = TRUE)
+    pst <- add_idf_object(private$idd_env(), private$idf_env(),
+        l$object, l$value, default = FALSE, unique = unique, empty = empty)
+
+    if (!length(pst$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, pas$object$object_id)
+    log_new_order(private$m_log, pst$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, pas)
+    idf_update_idf_env(self, private, pst)
+    idf_return_matched(self, private, pst$changed)
 }
 # }}}
 # idf_load {{{
 idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE, .empty = FALSE) {
-    l <- load_idf_object(private$idd_env(), private$idf_env(), private$m_version,
-        ..., .unique = .unique, .default = .default, .empty = .empty
+    l <- expand_idf_dots_literal(private$idd_env(), private$idf_env(), ...,
+        .default = .default, .exact = FALSE
     )
 
-    if (!nrow(l$object)) {
-        verbose_info("After deleting duplications, nothing to add.")
-        return(invisible())
-    }
+    ld <- add_idf_object(private$idd_env(), private$idf_env(),
+        l$object, l$value, default = FALSE, unique = .unique, empty = .empty)
 
-    merge_idf_data(private$idf_env(), l, by_object = TRUE)
+    if (!length(ld$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, l$object$object_id)
+    log_new_order(private$m_log, ld$changed)
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, l)
+    idf_update_idf_env(self, private, ld)
+    idf_return_matched(self, private, ld$changed)
 }
 # }}}
 # idf_update {{{
 idf_update <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
-    l <- update_idf_object(private$idd_env(), private$idf_env(), private$m_version,
-        ..., .default = .default, .empty = .empty
+    l <- expand_idf_dots_literal(private$idd_env(), private$idf_env(), ...,
+        .default = .default, .exact = TRUE
     )
 
-    merge_idf_data(private$idf_env(), l, by_object = TRUE)
+    upd <- set_idf_object(private$idd_env(), private$idf_env(),
+        l$object, l$value, empty = .empty)
 
     # log
-    log_new_order(private$m_log, l$object$object_id)
+    log_add_order(private$m_log, c(upd$changed, upd$updated))
     log_unsaved(private$m_log)
     log_new_uuid(private$m_log)
 
-    idf_return_modified(self, private, l)
+    idf_update_idf_env(self, private, upd)
+    idf_return_matched(self, private, upd$changed)
 }
 # }}}
 # idf_validate {{{
@@ -3235,8 +3280,10 @@ idf_to_string <- function (self, private, which = NULL, class = NULL,
 }
 # }}}
 # idf_to_table {{{
-idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"), force = FALSE) {
-    get_idf_table(private$idd_env(), private$idf_env(), class, which, string_value, unit, wide, align, all, group_ext, force)
+idf_to_table <- function (self, private, which = NULL, class = NULL, string_value = TRUE, unit = FALSE, wide = FALSE, align = FALSE, all = FALSE, group_ext = c("none", "group", "index"), force = FALSE, init = FALSE) {
+    get_idf_table(private$idd_env(), private$idf_env(), class = class, object = which,
+        string_value = string_value, unit = unit, wide = wide, align = align,
+        all = all, group_ext = group_ext, force = force, init = init)
 }
 # }}}
 # idf_save {{{
@@ -3244,12 +3291,7 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
                       overwrite = FALSE, copy_external = TRUE) {
     if (is.null(path)) {
         if (is.null(private$m_path)) {
-            abort("error_not_local",
-                paste0(
-                    "The Idf object is not created from local file. ",
-                    "Please give the path to save."
-                )
-            )
+            abort("The Idf object is not created from local file. Please give the path to save.", "idf_not_local")
         } else {
             path <- private$m_path
         }
@@ -3322,14 +3364,14 @@ idf_save_view <- function (self, private, filename, autoview = FALSE, autoclose 
         if (autoview) {
             self$view()
         } else {
-            abort("error_no_geom_ready", "No geometry has been created yet. Please run '$view()' first.")
+            abort("No geometry has been created yet. Please run '$view()' first.")
         }
     }
 
     private$m_log$geometry$save_snapshot(filename, bring_to_front, axis)
 
     if (autoclose) {
-        rgl::rgl.set(._get_private(private$m_log$geometry)$m_log$id$device)
+        rgl::rgl.set(get_priv_env(private$m_log$geometry)$m_log$id$device)
         rgl::rgl.close()
     }
 
@@ -3424,14 +3466,14 @@ idf_add_output_sqlite <- function (idf) {
         type <- toupper(sql$value()[[1]])
         if (type != "SIMPLEANDTABULAR") {
             sql$set("SimpleAndTabular")
-            verbose_info("Setting `Option Type` in ",
-                "`Output:SQLite` to from", surround(type), " to `SimpleAndTabular`.")
+            verbose_info("Setting 'Option Type' in ",
+                "'Output:SQLite' to from ", surround(type), " to 'SimpleAndTabular'.")
             added <- TRUE
         }
     } else {
-        invisible(idf$add(Output_SQLite = list("SimpleAndTabular")))
-        verbose_info("Adding an object in class `Output:SQLite` and setting its ",
-            "`Option Type` to `SimpleAndTabular` in order to create SQLite output file.")
+        idf$add(Output_SQLite = list("SimpleAndTabular"))
+        verbose_info("Adding an object in class 'Output:SQLite' and setting its ",
+            "'Option Type' to 'SimpleAndTabular' in order to create SQLite output file.")
         added <- TRUE
     }
     added
@@ -3446,14 +3488,14 @@ idf_add_output_vardict <- function (idf) {
         key <- toupper(dict$value()[[1]])
         if (!key %chin% c("IDF", "REGULAR")) {
             dict$set("IDF")
-            verbose_info("Setting `Key Field` in ",
-                "`Output:VariableDictionary` to from", surround(key), " to `IDF`.")
+            verbose_info("Setting 'Key Field' in ",
+                "'Output:VariableDictionary' to from ", surround(key), " to 'IDF'.")
             added <- TRUE
         }
     } else {
-        invisible(idf$add(Output_VariableDictionary = list("IDF")))
-        verbose_info("Adding an object in class `Output:VariableDictionary` and setting its ",
-            "`Key Field` to `IDF` in order to create RDD and MDD output file.")
+        with_silent(idf$add(Output_VariableDictionary = list("IDF")))
+        verbose_info("Adding an object in class 'Output:VariableDictionary' and setting its ",
+            "'Key Field' to 'IDF' in order to create RDD and MDD output file.")
         added <- TRUE
     }
     added
@@ -3615,18 +3657,11 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         }
 
         # disable unique object checking
-        if (exist && unique_object) {
-            ori <- eplusr_option("validate_level")
-            on.exit(eplusr_option(validate_level = ori), add = TRUE)
-
-            chk <- level_checks(ori)
-            chk$unique_object <- FALSE
-            eplusr_option(validate_level = chk)
-        }
+        chk <- level_checks()
+        if (exist && unique_object) chk$unique_object <- FALSE
 
         # get new object data
-        l <- load_idf_object(private$idd_env(), private$idf_env(), version = private$m_version,
-            value, .unique = FALSE)
+        l <- expand_idf_dots_literal(private$idd_env(), private$idf_env(), value)
 
         # stop if not from the same class
         cls_in <- private$idd_env()$class$class_name[l$object$class_id]
@@ -3639,35 +3674,35 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
             }
 
             invld_cls <- cls_in[cls_in != class]
-            abort("error_invalid_input_object_class",
-                paste0(
-                    "Input IdfObjects should from class `", class, "`. ",
-                    " Invalid input class: ", collapse(invld_cls)
-                )
-            )
+            abort(paste0("Input IdfObjects should from class ", surround(class), ". ",
+                "Invalid input class: ", collapse(invld_cls)
+            ))
         }
 
         # if everything looks good, add new objects
-        merge_idf_data(private$idf_env(), l, by_object = TRUE)
-        log_new_order(private$m_log, l$object$object_id)
+        l <- add_idf_object(private$idd_env(), private$idf_env(), l$object, l$value,
+            default = TRUE, unique = FALSE, empty = FALSE, level = chk
+        )
+        idf_update_idf_env(self, private, l)
+        log_new_order(private$m_log, l$changed)
         log_unsaved(private$m_log)
         log_new_uuid(private$m_log)
 
         # delete original objects
         if (exist) {
-            invisible(self$del(obj_main$object_id, .force = TRUE))
+            with_silent(self$del(obj_main$object_id, .force = TRUE))
         }
 
     # if a list of IdfObjects, use `$insert()`
-    } else if (is.list(value) && all(vlapply(value, is_idfobject))) {
+    } else if (checkmate::test_list(value, "IdfObject", any.missing = FALSE)) {
         # check if input is from the same model
         # get uuid if idf
         uuid_main <- private$m_log$uuid
 
         # get uuids of input
-        uuid_in <- vcapply(value, function (obj) .subset2(.subset2(._get_private(obj), "log_env")(), "uuid"))
+        uuid_in <- vcapply(value, function (obj) .subset2(.subset2(get_priv_env(obj), "log_env")(), "uuid"))
         # get id of input
-        obj_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_object_id"))
+        obj_id_in <- viapply(value, function (obj) .subset2(get_priv_env(obj), "m_object_id"))
 
         # ignore ones that is from the same idf
         if (exist) {
@@ -3683,20 +3718,14 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         if (all(uuid_main == uuid_in) && same_num && all(same_id)) return(invisible(self))
 
         # stop if not from the same class
-        cls_id_in <- viapply(value, function (obj) .subset2(._get_private(obj), "m_class_id"))
+        cls_id_in <- viapply(value, function (obj) .subset2(get_priv_env(obj), "m_class_id"))
         cls_in <- private$idd_env()$class$class_name[cls_id_in]
         if (any(cls_in != class)) {
             invld_cls <- vcapply(value[cls_in != class], function (obj) .subset2(obj, "class_name")())
             msg <- paste0(" #", which(cls_in != class), "| <IdfObject> --> Class: ", surround(invld_cls),
                 collapse = "\n"
             )
-            abort("error_invalid_input_object_class",
-                paste0(
-                    "Input IdfObjects should from class `", class, "`. ",
-                    " Invalid input:\n", msg
-
-                )
-            )
+            abort(paste0("Input IdfObjects should from class '", class, "'. Invalid input:\n", msg))
         }
 
         # ignore same objects and insert new ones
@@ -3709,12 +3738,9 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 
     } else {
         mes <- if (unique_object) "an IdfObject" else "a list of IdfObjects"
-        abort("error_invalid_active_binding_value",
-            paste0(
-                "Value should be ", mes, ", a character vector or a data.frame. ",
-                "Input class: ", surround(class(value)[[1]]), "."
-            )
-        )
+        abort(paste0("Value should be ", mes, ", a character vector or a data.frame. ",
+            "Input class: ", surround(class(value)[[1]]), "."
+        ))
     }
 
     invisible(self)
@@ -3726,7 +3752,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 `$.Idf` <- function (x, i) {
     if (i %chin% ls(x)) return(NextMethod())
 
-    private <- ._get_private(x)
+    private <- get_priv_env(x)
 
     cls_id <- chmatch(i, private$idd_env()$class$class_name_us)
     if (is.na(cls_id)) cls_id <- chmatch(i, private$idd_env()$class$class_name)
@@ -3749,9 +3775,11 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # [[.Idf {{{
 `[[.Idf` <- function (x, i) {
+    if (!checkmate::test_string(i)) return(NextMethod())
+
     if (i %chin% ls(x)) return(NextMethod())
 
-    private <- ._get_private(x)
+    private <- get_priv_env(x)
 
     cls_id <- chmatch(i, private$idd_env()$class$class_name)
 
@@ -3773,10 +3801,11 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # $<-.Idf {{{
 `$<-.Idf` <- function (x, name, value) {
-    if (name %chin% ls(x)) return(NextMethod())
+    # all field names start with a capital letter
+    if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
 
-    self <- ._get_self(x)
-    private <- ._get_private(x)
+    self <- get_self_env(x)
+    private <- get_priv_env(x)
 
     # match both normal and underscore class names
     cls_id <- chmatch(name, private$idd_env()$class$class_name)
@@ -3804,29 +3833,28 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
 #' @export
 # [[<-.Idf {{{
 `[[<-.Idf` <- function (x, name, value) {
-    if (length(name) != 1L) return(NextMethod())
+    if (!checkmate::test_string(name)) return(NextMethod())
 
-    if (name %chin% ls(x)) {
-        NextMethod()
-    } else {
-        self <- ._get_self(x)
-        private <- ._get_private(x)
+    # all field names start with a capital letter
+    if (!substr(name, 1, 1) %chin% LETTERS && name %chin% ls(x)) return(NextMethod())
 
-        # match only normal class names
-        cls_id <- chmatch(name, private$idd_env()$class$class_name)
+    self <- get_self_env(x)
+    private <- get_priv_env(x)
 
-        # skip if not a valid IDD class name
-        # imitate error message of a locked environment
-        if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
+    # match only normal class names
+    cls_id <- chmatch(name, private$idd_env()$class$class_name)
 
-        cls_nm <- private$idd_env()$class$class_name[cls_id]
-        uni <- private$idd_env()$class$unique_object[cls_id]
+    # skip if not a valid IDD class name
+    # imitate error message of a locked environment
+    if (is.na(cls_id)) stop("cannot add bindings to a locked environment")
 
-        replace_objects_in_class(self, private, cls_nm, value, uni)
-        # if not an existing IDF class name, add active bindings
-        if (!cls_id %in% private$idf_env()$object$class_id) {
-            add_idf_class_bindings(x, cls_id)
-        }
+    cls_nm <- private$idd_env()$class$class_name[cls_id]
+    uni <- private$idd_env()$class$unique_object[cls_id]
+
+    replace_objects_in_class(self, private, cls_nm, value, uni)
+    # if not an existing IDF class name, add active bindings
+    if (!cls_id %in% private$idf_env()$object$class_id) {
+        add_idf_class_bindings(x, cls_id)
     }
 
     invisible(x)
@@ -3853,7 +3881,7 @@ str.Idf <- function (object, zoom = "class", ...) {
 # ==.Idf {{{
 `==.Idf` <- function (e1, e2) {
     if (!is_idf(e2)) return(FALSE)
-    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
 }
 # }}}
 

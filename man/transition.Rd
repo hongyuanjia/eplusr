@@ -9,7 +9,7 @@ transition(idf, ver, keep_all = FALSE, save = FALSE, dir = NULL)
 \arguments{
 \item{idf}{An \link{Idf} object or a path of IDF file.}
 
-\item{ver}{A valid EnergyPlus version, e.g. \code{9}, \code{8.8}, or \code{"8.8.0"}.}
+\item{ver}{A valid EnergyPlus IDD version, e.g. \code{9}, \code{8.8}, or \code{"8.8.0"}.}
 
 \item{keep_all}{If \code{TRUE}, a list will be return which contains all
 \link{Idf} objects of intermediate versions. The list will be named using first

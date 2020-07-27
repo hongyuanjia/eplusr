@@ -64,7 +64,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 
             # save uuid
-            private$m_log$seed_uuid <- ._get_private(private$m_seed)$m_log$uuid
+            private$m_log$seed_uuid <- get_priv_env(private$m_seed)$m_log$uuid
 
             private$m_log$uuid <- unique_id()
         },
@@ -407,18 +407,23 @@ param_weather <- function (self, private) {
 }
 # }}}
 # param_apply_measure {{{
+#' @importFrom checkmate assert_function
 param_apply_measure <- function (self, private, measure, ..., .names = NULL, .env = parent.frame()) {
-    assert(is.function(measure))
+    checkmate::assert_function(measure)
 
     if (length(formals(measure)) < 2L) {
-        abort("error_measure_no_arg", "`measure` function must have at least two argument.")
+        stop("'measure' function must have at least two argument")
     }
 
     measure_wrapper <- function (idf, ...) {
-        assert(is_idf(idf), msg = paste0("Measure should take an `Idf` object as input, not `", class(idf)[[1]], "`."))
+        if (!is_idf(idf)) {
+            stop("Measure should take an 'Idf' object as input, not '", class(idf)[[1]], "'")
+        }
         idf <- idf$clone(deep = TRUE)
         idf <- measure(idf, ...)
-        assert(is_idf(idf), msg = paste0("Measure should return an `Idf` object, not `", class(idf)[[1]], "`."))
+        if (!is_idf(idf)) {
+            stop("Measure should return an 'Idf' object, not '", class(idf)[[1]], "'")
+        }
         idf
     }
 
@@ -437,9 +442,9 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     if (is.null(.names)) {
         nms <- paste0(mea_nm, "_", seq_along(out))
     } else {
-        assert(have_same_len(out, .names),
-            msg = paste0(length(out), " models created with only ", length(.names), " names given.")
-        )
+        if (length(out) != length(.names)) {
+            stop(paste0(length(out), " models created with only ", length(.names), " names given"))
+        }
         nms <- make.unique(as.character(.names), sep = "_")
     }
 
@@ -448,7 +453,7 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     private$m_idfs <- out
 
     # log unique ids
-    private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
     log_new_uuid(private$m_log)
 
     if (eplusr_option("verbose_info")) {
@@ -469,11 +474,11 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
 # param_run {{{
 param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     if (is.null(private$m_idfs)) {
-        abort("error_no_measured_applied", "No measure has been applied.")
+        abort("No measure has been applied.")
     }
 
     # check if generated models have been modified outside
-    uuid <- vapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid, character(1))
+    uuid <- vapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid, character(1))
     if (any(uuid != private$m_log$idf_uuid)) {
         warn("warning_param_modified",
             paste0(
@@ -493,22 +498,21 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
 }
 # }}}
 # param_save {{{
+#' @importFrom checkmate assert_string
 param_save <- function (self, private, dir = NULL, separate = TRUE, copy_external = FALSE) {
     if (is.null(private$m_idfs)) {
-        abort("error_no_measured_applied",
-            "No parametric models found since no measure has been applied."
-        )
+        abort("No parametric models found since no measure has been applied.")
     }
 
     # restore uuid
-    uuid <- vcapply(private$m_idfs, function (idf) ._get_private(idf)$m_log$uuid)
+    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
 
     path_idf <- normalizePath(private$m_seed$path(), mustWork = TRUE)
 
     if (is.null(dir))
         dir <- dirname(path_idf)
     else {
-        assert(is_string(dir))
+        assert_string(dir)
     }
 
     if (!dir.exists(dir)) {
@@ -545,7 +549,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     # if not assign original here, the model modification checkings in `$run()`
     # may be incorrect.
     for (i in seq_along(uuid)) {
-        log <- ._get_private(private$m_idfs[[i]])$m_log
+        log <- get_priv_env(private$m_idfs[[i]])$m_log
         log$uuid <- uuid[[i]]
     }
 
@@ -580,7 +584,7 @@ param_print <- function (self, private) {
 #' @export
 `==.ParametricJob` <- function (e1, e2) {
     if (!inherits(e2, "ParametricJob")) return(FALSE)
-    identical(._get_private(e1)$m_log$uuid, ._get_private(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
 }
 
 #' @export

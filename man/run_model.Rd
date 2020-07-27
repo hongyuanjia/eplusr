@@ -34,103 +34,107 @@ run_multi(
 
 \item{weather}{A path (for \code{run_idf()}) or a vector of paths (for
 \code{run_multi()}) of EnergyPlus EPW weather files. For \code{run_multi()},
-\code{weather} can also be a single EPW file path. In this case, that weather
-will be used for all simulations; otherwise, \code{model} and \code{weather} should
-have the same length.}
+\code{weather} can also be a single EPW file path. In this case, that
+weather will be used for all simulations; otherwise, \code{model} and
+\code{weather} should have the same length.}
 
 \item{output_dir}{Output directory path (for \code{rum_idf()}) or paths (for
 \code{run_mult()}). If NULL, the directory of input model is used. For
-\code{run_multi()}, \code{output_dir}, if not \code{NULL}, should have the same length
-as \code{model}. Any duplicated combination of \code{model} and \code{output_dir} is
-prohibited.}
+\code{run_multi()}, \code{output_dir}, if not \code{NULL}, should have the same
+length as \code{model}. Any duplicated combination of \code{model} and
+\code{output_dir} is prohibited.}
 
-\item{design_day}{Force design-day-only simulation. Default: \code{FALSE}.}
+\item{design_day}{Force design-day-only simulation. For \code{rum_multi()},
+\code{design_day} can also be a logical vector which has the same length as
+\code{model}. Default: \code{FALSE}.}
 
-\item{annual}{Force design-day-only simulation. Default: \code{FALSE}.}
+\item{annual}{Force design-day-only simulation. For \code{rum_multi()},
+\code{annual} can also be a logical vector which has the same length as
+\code{model}. Note that \code{design_day} and \code{annual} cannot be all \code{TRUE} at
+the same time. Default: \code{FALSE}.}
 
 \item{expand_obj}{Whether to run ExpandObject preprocessor before simulation.
 Default: \code{TRUE}.}
 
 \item{wait}{If \code{TRUE}, R will hang on and wait all EnergyPlus simulations
-finish. If \code{FALSE}, all EnergyPlus simulations are run in the background.
-and a \link[processx:process]{processx::process} object is returned. Note that, if \code{FALSE}, R is
-\emph{not blocked} even when \code{echo} is \code{TRUE}. Default: \code{TRUE}.}
+finish. If \code{FALSE}, all EnergyPlus simulations are run in the
+background, and a \link[processx:process]{process} object is returned.}
 
 \item{echo}{Only applicable when \code{wait} is \code{TRUE}. Whether to show standard
-output and error from EnergyPlus command line interface for \code{run_idf()}
-and simulation status for \code{run_multi()}.Default: \code{TRUE}.}
+output and error from EnergyPlus command line interface for
+\code{run_idf()} and simulation status for \code{run_multi()}. Default: \code{TRUE}.}
 
 \item{eplus}{An acceptable input (for \code{run_idf()}) or inputs (for
-\code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If
-\code{NULL}, which is the default, the version of EnergyPlus to use is
-determined by the version of input model. For \code{run_multi()}, \code{eplus}, if not
-\code{NULL}, should have the same length as \code{model}.}
+\code{run_multi()}) of \code{\link[=use_eplus]{use_eplus()}} and \code{\link[=eplus_config]{eplus_config()}}. If \code{NULL}, which
+is the default, the version of EnergyPlus to use is determined by the
+version of input model. For \code{run_multi()}, \code{eplus}, if not \code{NULL},
+should have the same length as \code{model}.}
 }
 \value{
-A list for \code{run_idf()}. For \code{rum_multi()}, a
-\link[data.table:data.table]{data.table} if \code{wait} is \code{TRUE} or a
-\link[processx:process]{process} if \code{wait} is \code{FALSE}.
+\itemize{
+\item For \code{run_idf()}, a named list of 11 elements:\tabular{rlll}{
+   No. \tab Column \tab Type \tab Description \cr
+   1 \tab \code{idf} \tab \code{character(1)} \tab Full path of input IDF file \cr
+   2 \tab \code{epw} \tab \code{character(1)} or \code{NULL} \tab Full path of input EPW file \cr
+   3 \tab \code{version} \tab \code{character(1)} \tab Version of called EnergyPlus \cr
+   4 \tab \code{exit_status} \tab \code{integer(1)} or \code{NULL} \tab Exit status of EnergyPlus. \code{NULL} if terminated or \code{wait} is \code{FALSE} \cr
+   5 \tab \code{start_time} \tab \code{POSIXct(1)} \tab Start of time of simulation \cr
+   6 \tab \code{end_time} \tab \code{POSIXct(1)} or \code{NULL} \tab End of time of simulation. \code{NULL} if \code{wait} is \code{FALSE} \cr
+   7 \tab \code{output_dir} \tab \code{character(1)} \tab Full path of simulation output directory \cr
+   8 \tab \code{energyplus} \tab \code{character(1)} \tab Full path of called EnergyPlus executable \cr
+   9 \tab \code{stdout} \tab \code{character(1)} or \code{NULL} \tab Standard output of EnergyPlus during simulation \cr
+   10 \tab \code{stderr} \tab \code{character(1)} or \code{NULL} \tab Standard error of EnergyPlus during simulation \cr
+   11 \tab \code{process} \tab \link[processx:process]{process} \tab A \link[processx:process]{process} object which called EnergyPlus and ran the simulation \cr
+}
+
+\item For \code{rum_multi()}, if \code{wait} is TRUE, a
+\link[data.table:data.table]{data.table} of 12 columns:\tabular{rlll}{
+   No. \tab Column \tab Type \tab Description \cr
+   1 \tab \code{index} \tab \code{integer} \tab Index of simuation \cr
+   2 \tab \code{status} \tab \code{character} \tab Simulation status \cr
+   3 \tab \code{idf} \tab \code{character} \tab Full path of input IDF file \cr
+   4 \tab \code{epw} \tab \code{character} \tab Full path of input EPW file. \code{NA} for design-day-only simulation \cr
+   5 \tab \code{version} \tab \code{character} \tab Version of EnergyPlus \cr
+   6 \tab \code{exit_status} \tab \code{integer} \tab Exit status of EnergyPlus. \code{NA} if terminated \cr
+   7 \tab \code{start_time} \tab \code{POSIXct} \tab Start of time of simulation \cr
+   8 \tab \code{end_time} \tab \code{POSIXct} \tab End of time of simulation. \cr
+   9 \tab \code{output_dir} \tab \code{character} \tab Full path of simulation output directory \cr
+   10 \tab \code{energyplus} \tab \code{character} \tab Full path of called EnergyPlus executable \cr
+   11 \tab \code{stdout} \tab \code{list} \tab Standard output of EnergyPlus during simulation \cr
+   12 \tab \code{stderr} \tab \code{list} \tab Standard error of EnergyPlus during simulation \cr
+}
+
+
+For column \code{status}, there are 4 possible values:
+\itemize{
+\item \code{"completed"}: the simulation job is completed successfully
+\item \code{"failed"}: the simulation job ended with error
+\item \code{"terminated"}: the simulation job started but was terminated
+\item \code{"cancelled"}: the simulation job was cancelled, i.e. did not start at all
+}
+\item For \code{run_multi()}, if \code{wait} is \code{FALSE}, a \link[callr:r_bg]{r_process}
+object of background R process which handles all simulation jobs is
+returned. You can check if the jobs are completed using \verb{$is_alive()} and
+get the final data.table using \verb{$get_result()} method.
+}
 }
 \description{
-\code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
-run EnergyPlus model with different options.
+Run simulations of EnergyPlus models.
 }
 \details{
+\code{run_idf()} is a wrapper of EnergyPlus command line interface which enables to
+run EnergyPlus model with different options.
+
 \code{run_multi()} provides the functionality of running multiple models in
 parallel.
 
 \code{run_idf()} and \code{run_multi()} currently only support EnergyPlus v8.3 and
-above. This is because eplusr uses EnergyPlus command line interface
-which is a new feature as of EnergyPlus v8.3.
+above. This is because eplusr uses EnergyPlus command line interface which is
+a new feature as of EnergyPlus v8.3.
 
-For \code{run_idf()}, a named list will be returned:
-\itemize{
-\item \code{idf}: The path of IDF file
-\item \code{epw}: The path of EPW file
-\item \code{exit_status}: The exit code of the process if it has finished and NULL
-otherwise. Always being \code{NULL} if \code{wait} is FALSE, but you can manually
-get the exit code using the process object, i.e.
-\code{process$get_exit_status()} after simulation \emph{completed}.
-\item \code{start_time}: When the EnergyPlus process started.
-\item \code{end_time}: When the EnergyPlus process stopped. All being \code{NULL} if
-\code{wait} is \code{FALSE}, but you can manually check EnergyPlus \code{stdout} to get
-the simulation time
-\item \code{output_dir}: The simulation output directory
-\item \code{energyplus}: The path of EnergyPlus executable
-\item \code{stdout}: All standard output from EnergyPlus. Always being \code{NULL} if
-\code{wait} is \code{FALSE}, but you can manually get all standard output using
-\code{process$get_result()}, where \code{process} is the \link[processx:process]{processx::process}
-object stored in returned element \code{process}.
-\item \code{stderr}: All standard error from EnergyPlus. Always being \code{NULL} if
-\code{wait} is \code{FALSE}, but you can manually get all standard output using
-\code{process$get_result()}, where \code{process} is the \link[processx:process]{processx::process}
-object stored in returned element \code{process}.
-\item \code{process}: A \link[processx:process]{processx::process} object of current EnergyPlus simulation
-}
-
-For \code{run_multi()}, if \code{wait} is \code{TRUE}, a
-\link[data.table:data.table]{data.table} contains all data (excluding
-\code{process}) with same column names as above, and also another two columns:
-\itemize{
-\item \code{index}: The index of simulation
-\item \code{status}: The status of simulation. Should be one of below:
-\itemize{
-\item \code{"completed"}: the simulation job is completed successfully.
-\item \code{"failed"}: the simulation job ended with error.
-\item \code{"terminated"}: the simulation job started but was terminated.
-\item \code{"cancelled"}: the simulation job was cancelled, i.e. did not start
-at all.
-}
-}
-
-For \code{run_multi()}, if \code{wait} is \code{FALSE}, a \link[callr:r_bg]{r_process}
-object of background R process which handles all simulation jobs is
-returned. You can check if the jobs are completed using \verb{$is_alive()} and
-get the final data.table using \verb{$get_result()}.
-
-It is suggested to run simulations using \link{EplusJob} class and
-\link{ParametricJob} class, which provide much more detailed controls
-on the simulation and also methods to extract simulation outputs.
+It is suggested to run simulations using \link{EplusJob} class and \link{EplusGroupJob}
+class, which provide much more detailed controls on the simulation and also
+methods to extract simulation outputs.
 }
 \examples{
 \dontrun{

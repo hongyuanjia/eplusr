@@ -130,25 +130,23 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
 # }}}
 
 # format_idf: return whole Idf output {{{
+#' @importFrom checkmate assert_names assert_count assert_flag assert_int
 format_idf <- function (
     dt_value, dt_object = NULL, dt_order = NULL,
     header = TRUE, comment = TRUE, save_format = c("sorted", "new_top", "new_bot"),
-    special_format = FALSE, leading = 4L, in_ip = FALSE, sep_at = 29L, index = FALSE,
+    special_format = FALSE, leading = 4L, sep_at = 29L, index = FALSE,
     blank = FALSE, end = TRUE, required = FALSE
 )
 {
-    assert(has_name(dt_value, c("object_id", "class_id", "class_name", "field_index")))
+    assert_names(names(dt_value), must.include = c("object_id", "class_id", "class_name", "field_index"))
 
     save_format <- match.arg(save_format)
-    assert(
-        is_count(leading, zero = TRUE),
-        is_flag(in_ip),
-        is_count(sep_at, zero = TRUE),
-        is_flag(index),
-        is_flag(blank),
-        is_flag(end),
-        is_flag(required)
-    )
+    assert_count(leading)
+    assert_int(sep_at, lower = -1L)
+    assert_flag(index)
+    assert_flag(blank)
+    assert_flag(end)
+    assert_flag(required)
 
     setorderv(dt_value, c("object_id", "field_index"))
 
@@ -194,19 +192,23 @@ format_idf <- function (
             by = c("class_id")
         ]
     } else {
-        assert(!is.null(dt_order))
-        out[J(dt_order$object_id), on = "object_id", object_order := dt_order$object_order]
-        if (save_format == "new_top") {
-            setorderv(out, c("object_order", "object_id"), c(-1L, 1L))
-        } else {
-            setorderv(out, c("object_order", "object_id"), c(1L, 1L))
+        if (!is.null(dt_order)) {
+            assert_data_frame(dt_order, any.missing = FALSE, min.cols = 2)
+            assert_names(names(dt_order), must.include = c("object_id", "object_order"))
+
+            out[dt_order, on = "object_id", object_order := i.object_order]
+            if (save_format == "new_top") {
+                setorderv(out, c("object_order", "object_id"), c(-1L, 1L))
+            } else {
+                setorderv(out, c("object_order", "object_id"), c(1L, 1L))
+            }
+            set(out, NULL, "object_order", NULL)
         }
-        set(out, NULL, "object_order", NULL)
     }
     # }}}
 
     if (header)
-        h <- format_header(save_format = save_format, view_in_ip = in_ip, special_format = special_format)
+        h <- format_header(save_format = save_format, view_in_ip = eplusr_option("view_in_ip"), special_format = special_format)
     else h <- NULL
 
     list(header = h, format = out)
@@ -616,7 +618,7 @@ format_possible <- function (x) {
     cols <- NULL
 
     # auto {{{
-    if (has_name(x, "auto")) {
+    if (has_names(x, "auto")) {
         set(x, NULL, "fmt_auto", paste0("* Auto value: ",
             {
                 tmp <- paste0("\"", x$auto, "\"")
@@ -630,7 +632,7 @@ format_possible <- function (x) {
     # }}}
 
     # default {{{
-    if (has_name(x, "default")) {
+    if (has_names(x, "default")) {
         set(x, NULL, "fmt_default", paste0("* Default: ",
             vcapply(x$default, function (def) {
                 if (is.numeric(def)) {
@@ -648,7 +650,7 @@ format_possible <- function (x) {
     # }}}
 
     # choice {{{
-    if (has_name(x, "choice")) {
+    if (has_names(x, "choice")) {
         set(x, NULL, "fmt_choice", paste0("* Choice:",
             vcapply(x$choice, function (cho) {
                 if (!length(cho)) return(" <NA>")
@@ -663,7 +665,7 @@ format_possible <- function (x) {
     # }}}
 
     # range {{{
-    if (has_name(x, "ranger")) {
+    if (has_names(x, "ranger")) {
         set(x, NULL, "range", paste0("* Range: ", vcapply(x$range, format.Range)))
         on.exit(set(x, NULL, "fmt_range", NULL), add = TRUE)
         cols <- c(cols, "fmt_range")
@@ -671,7 +673,7 @@ format_possible <- function (x) {
     # }}}
 
     # source {{{
-    if (has_name(x, "source")) {
+    if (has_names(x, "source")) {
         set(x, NULL, "fmt_source", paste0("* Source: ",
             vcapply(x$source, function (src) {
                 if (!length(src)) return("<NA>")
@@ -684,7 +686,7 @@ format_possible <- function (x) {
     }
     # }}}
 
-    if (has_name(x, "value_id")) {
+    if (has_names(x, "value_id")) {
         res <- x[, .SD, .SDcols = c("object_id", "value_id", "field", cols)]
     } else {
         res <- x[, .SD, .SDcols = c("class_id", "field_id", "field", cols)]
@@ -722,11 +724,11 @@ format_field_by_parent <- function (dt, col = "value", sep_at = 15L, required = 
     val <- col == "value"
     # in order to keep index more tidy, have to format them based on
     # parent index
-    if (has_name(dt, "object_id")) {
+    if (has_names(dt, "object_id")) {
         col_parent <- "object_id"
-    } else if (has_name(dt, "class_id")) {
+    } else if (has_names(dt, "class_id")) {
         col_parent <- "class_id"
-    } else if (has_name(dt, "group_id")) {
+    } else if (has_names(dt, "group_id")) {
         col_parent <- "group_id"
     } else {
         col_parent <- NULL
@@ -750,34 +752,35 @@ format_field_by_parent <- function (dt, col = "value", sep_at = 15L, required = 
 # }}}
 
 # format_objects: return pretty formatted tree string for mutiple IdfObjects {{{
+#' @importFrom checkmate assert_subset assert_names
 format_objects <- function (dt, component = c("group", "class", "object", "field", "value"),
                             brief = TRUE, merge = TRUE, sep_at = 15L, nest = TRUE,
                             order = FALSE, required = FALSE) {
-    all_comp <- c("group", "class", "object", "field", "value")
-    component <- all_comp[sort(chmatch(component, all_comp))]
-    assert(no_na(component), msg = paste0("`component` should be one or some of ", collapse(all_comp)))
+    choices <- c("group", "class", "object", "field", "value")
+    assert_subset(component, choices, FALSE)
+    component <- choices[choices %in% component]
 
     # create each component {{{
     if ("group" %chin% component) {
-        assert(has_name(dt, c("group_id", "group_name")), prefix = "Input")
+        assert_names(names(dt), must.include = c("group_id", "group_name"))
         set(dt, NULL, "group", format_group(dt))
     }
 
     if ("class" %chin% component) {
-        assert(has_name(dt, c("class_id", "class_name")), prefix = "Input")
+        assert_names(names(dt), must.include = c("class_id", "class_name"))
         set(dt, NULL, "class", format_class(dt))
     }
 
     if ("object" %chin% component) {
-        assert(has_name(dt, c("object_id", "object_name")), prefix = "Input")
+        assert_names(names(dt), must.include = c("object_id", "object_name"))
         set(dt, NULL, "object", format_object(dt))
     }
 
     if ("value" %chin% component) {
-        assert(has_name(dt, c("value_id", "value_chr", "value_num")), prefix = "Input")
+        assert_names(names(dt), must.include = c("value_id", "value_chr", "value_num"))
         old_value <- dt[["value_chr"]]
         if (merge) {
-            assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")))
+            assert_names(names(dt), must.include = c("field_id", "field_index", "field_name", "units", "ip_units"))
             set(dt, NULL, "value", format_field_by_parent(dt, "value", sep_at = sep_at, required = required))
             component <- component[component != "field"]
         } else {
@@ -793,7 +796,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
     # should format "field" after "value" as if merge is TRUE, then formatting
     # field is not necessary
     if ("field" %chin% component) {
-        assert(has_name(dt, c("field_id", "field_index", "field_name", "units", "ip_units")), prefix = "Input")
+        assert_names(names(dt), must.include = c("field_id", "field_index", "field_name", "units", "ip_units"))
         if ((!"value" %chin% component) || ("value" %chin% component & !merge)) {
             set(dt, NULL, "field", paste0("Field: <", format_field_by_parent(dt, "field", sep_at = sep_at, required = required), ">")
             )
@@ -857,7 +860,7 @@ format_objects <- function (dt, component = c("group", "class", "object", "field
 
     col_del <- intersect(names(dt), c("group", "class", "object", "field", "value"))
     if (length(col_del)) set(dt, NULL, col_del, NULL)
-    if (has_name(dt, "value_chr")) set(dt, NULL, "value_chr", old_value)
+    if (has_names(dt, "value_chr")) set(dt, NULL, "value_chr", old_value)
 
     if (nest & order) setorderv(out, col_id)
     out
@@ -884,7 +887,7 @@ format_field <- function (dt,
         val <- NULL
     }
 
-    nm <- format_name(dt, prefix)
+    nm <- if (sep_at < 0L) "" else format_name(dt, prefix)
 
     paste0(idx, val, nm)
 }
@@ -892,7 +895,7 @@ format_field <- function (dt,
 
 # format_index: return right aligned field index {{{
 format_index <- function (dt, required = FALSE, pad_char = " ") {
-    if (required) assert(has_name(dt, "required_field"))
+    if (required) assert_names(names(dt), must.include = "required_field")
 
     if (any(!is.na(dt$field_index))) {
         idx <- lpad(dt$field_index, pad_char, width = max(nchar(dt$field_index[!is.na(dt$field_index)], "width")))
@@ -912,13 +915,14 @@ format_index <- function (dt, required = FALSE, pad_char = " ") {
 # }}}
 
 # format_value: return Idf format value strings {{{
+#' @importFrom checkmate assert_names
 format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank = FALSE, end = TRUE) {
     length <- max(length, 0L)
     if (is.null(dt$value_chr)) return(paste0(stri_dup(" ", leading), character(nrow(dt))))
     set(dt, NULL, "value_out", dt$value_chr)
     set(dt, NULL, "width", leading + nchar(dt$value_out, "width") + 1L) # 1 for comma(,)
 
-    if (has_name(dt, "value_num")) {
+    if (has_names(dt, "value_num")) {
         dt[!is.na(value_num), `:=`(
             value_out = as.character(value_num),
             width = leading + nchar(value_num, "width") + 1L)
@@ -943,7 +947,7 @@ format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank =
     if (!quote) {
         dt[is.na(value_out), `:=`(value_out = blk_chr, width = leading + blk_chr_w + 1L)]
     } else {
-        assert(has_name(dt, "type_enum"))
+        assert_names(names(dt), must.include = "type_enum")
 
         # character value
         dt[type_enum > IDDFIELD_TYPE$real,
@@ -982,7 +986,7 @@ format_value <- function (dt, leading = 4L, length = 29L, quote = FALSE, blank =
     } else if (!end) {
         res <- paste0(values, ",")
     } else {
-        if (has_name(dt, "object_id")) {
+        if (has_names(dt, "object_id")) {
             is_end <- dt[, .I[.N], by = object_id]$V1
         } else {
             is_end <- length(values)
@@ -1061,10 +1065,7 @@ print.IddRelation <- function (x, ...) {
 # print.IdfRelationBy {{{
 print.IdfRelationBy <- function (x, ...) {
     cli::cat_rule("Referred by Others")
-    if (!all(has_name(x, c(
-        "class_name", "object_name", "field_name",
-         "src_class_name", "src_object_name", "src_field_name"
-        )))) {
+    if (!all(has_names(x, c("class_name", "object_name", "field_name", "src_class_name", "src_object_name", "src_field_name")))) {
         NextMethod("print")
         return(invisible(x))
     }
@@ -1083,10 +1084,7 @@ print.IdfRelationBy <- function (x, ...) {
 print.IdfRelationTo <- function (x, ...) {
     cli::cat_rule("Refer to Others")
 
-    if (!all(has_name(x, c(
-        "class_name", "object_name", "field_name",
-         "src_class_name", "src_object_name", "src_field_name"
-        )))) {
+    if (!all(has_names(x, c("class_name", "object_name", "field_name", "src_class_name", "src_object_name", "src_field_name")))) {
         NextMethod("print")
         return(invisible(x))
     }
@@ -1104,10 +1102,7 @@ print.IdfRelationTo <- function (x, ...) {
 # print.IdfRelationNode {{{
 print.IdfRelationNode <- function (x, ...) {
     cli::cat_rule("Node Relation")
-    if (!all(has_name(x, c(
-        "class_name", "object_name", "field_name",
-         "src_class_name", "src_object_name", "src_field_name"
-        )))) {
+    if (!all(has_names(x, c("class_name", "object_name", "field_name", "src_class_name", "src_object_name", "src_field_name")))) {
         NextMethod("print")
         return(invisible(x))
     }
