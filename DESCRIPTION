@@ -24,6 +24,7 @@ Imports:
     cli (>= 1.1.0),
     crayon,
     data.table (>= 1.12.4),
+    hms,
     lubridate,
     methods,
     processx (>= 3.2.0),
