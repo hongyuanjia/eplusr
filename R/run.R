@@ -4,7 +4,7 @@
 #' @importFrom cli cat_line
 #' @importFrom crayon red
 #' @importFrom data.table data.table setattr setnames
-#' @importFrom lubridate hms with_tz
+#' @importFrom lubridate with_tz
 #' @importFrom tools file_path_sans_ext
 #' @importFrom processx process
 #' @importFrom progress progress_bar

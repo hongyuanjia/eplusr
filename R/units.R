@@ -9,6 +9,7 @@ reg_custom_units <- function () {
             install_symbolic_unit("person")
             install_symbolic_unit("dollar")
             install_symbolic_unit("thousandths")
+            install_conversion_constant("Wh", "J", 3.6E3)
             install_conversion_constant("inH2O", "inch_H2O_39F", 1)
             TRUE
         },
