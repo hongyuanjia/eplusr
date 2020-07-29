@@ -7,9 +7,7 @@
 standardize_idf_value(
   idd_env,
   idf_env,
-  class = NULL,
-  object = NULL,
-  field = NULL,
+  dt_value,
   type = c("choice", "reference")
 )
 }
@@ -20,6 +18,10 @@ field, and reference.}
 \item{idf_env}{An environment or list contains IDF tables including object,
 value, and reference.}
 
+\item{type}{A character vector to specify what type of values to be
+standardized. Should be a subset of \code{c("choice", "reference")}.
+Default: \code{c("choice", "reference")}.}
+
 \item{class}{An integer vector of valid class indexes or a character vector
 of valid class names. Default: \code{NULL}.}
 
@@ -29,10 +31,6 @@ of valid object names. Default: \code{NULL}.}
 \item{field}{An integer vector of valid field indexes or a character
 vector of valid field names (can be in in underscore style). \code{class}
 and \code{field} should have the same length.}
-
-\item{type}{A character vector to specify what type of values to be
-standardized. Should be a subset of \code{c("choice", "reference")}.
-Default: \code{c("choice", "reference")}.}
 }
 \value{
 A data.table

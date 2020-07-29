@@ -1,0 +1,138 @@
+---
+title: "Handle 'Schedule:Compact' objects"
+author: "Hongyuan Jia"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: "paged"
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Handle 'Schedule:Compact' objects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE,
+    fig.align = "center"
+)
+
+# the default output hook
+hook_output <- knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
+    }
+    hook_output(x, options)
+})
+
+options(crayon.enabled = FALSE)
+```
+
+## The `IdfScheduleCompact` class
+
+```{r}
+library(eplusr)
+path_idf <- system.file("extdata/1ZoneUncontrolled.idf", package = "eplusr")
+idf <- read_idf(path_idf)
+```
+
+Create a new `IdfScheduleCompact` object.
+
+```{r}
+sch <- IdfScheduleCompact$new("schedule", idf, TRUE)
+sch
+```
+
+## Get type limits
+
+```{r}
+sch$type_limits()
+```
+
+## Set type limits
+
+```{r}
+sch$type_limits("fraction")
+```
+
+## Set schedule values
+
+* Group day types inside `c(...)` at the LHS of `:=`
+* Put actual schedule values inside `list(...)` at the RHS of `:=`
+* Each schedule value should be named a time. Time can be given in
+  either `..H` or `"HH:MM"`.
+
+```{r}
+sch$set(c("weekday", "summerdesignday") := list(
+    ..6 = 0.2, "8:00" = 0.5,
+    ..12 = 0.95, "13:30" = 0.6, ..14 = 0.8,
+    ..18 = 0.95, ..19 = 0.2, ..24 = 0),
+    allotherday = list(..24 = 0)
+)
+```
+
+## Check schedule value ranges
+
+```{r}
+sch$validate()
+```
+
+## Extract schedule values
+
+```{r}
+d <- sch$extract()
+print(d)
+```
+
+Expand day types
+
+```{r}
+d <- sch$extract(daytype = "expand")
+print(d)
+```
+
+Change time step
+
+```{r}
+d <- sch$extract(timestep = "1 hour")
+print(d)
+```
+
+Visualization
+
+```{r, fig.width = 8, fig.hight = 5}
+library(ggplot2)
+
+ggplot(sch$extract(timestep = "1 hour")) +
+    geom_col(aes(time, value, fill = daytype), color = "black") +
+    facet_wrap(~daytype)
+```
+
+## Update schedue values using data.frame
+
+Steps:
+
+1. Extract values using `$extract()`.
+2. Modify values as you wish.
+3. Update schedule values using `$update()`.
+
+```{r}
+d <- sch$extract(timestep = "2 hour")
+
+d[daytype == "Weekday" & time >= hms::hms(hours = 8) & time <= hms::as_hms("18:00:00"),
+    value := value * 0.6]
+
+sch$update(d)
+```
+

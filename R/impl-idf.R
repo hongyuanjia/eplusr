@@ -849,16 +849,20 @@ init_idf_value <- function (idd_env, idf_env, class, field = NULL, property = NU
 #' @return A data.table
 #' @keywords internal
 #' @export
-standardize_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL, field = NULL, type = c("choice", "reference")) {
+standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice", "reference")) {
     type <- assert_subset(type, c("choice", "reference"), empty.ok = FALSE)
 
     prop <- "type_enum"
     if ("choice" %chin% type) prop <- c(prop, "choice")
 
-    val <- get_idf_value(idd_env, idf_env, class, object, field, property = prop)
+    if (any(miss <- !prop %chin% names(dt_value))) {
+        add_field_property(idd_env, dt_value, prop[miss])
+    } else {
+        prop <- NULL
+    }
 
-    if ("choice" %chin% type && any(i <- val$type_enum == IDDFIELD_TYPE$choice)) {
-        val[i, value_chr := {
+    if ("choice" %chin% type && any(i <- dt_value$type_enum == IDDFIELD_TYPE$choice)) {
+        dt_value[i, value_chr := {
             i <- apply2_int(stri_trans_tolower(value_chr), lapply(choice, stri_trans_tolower), chmatch)
             std <- apply2_chr(choice, i, .subset2)
             value_chr[!is.na(i)] <- apply2_chr(choice[!is.na(i)], i[!is.na(i)], .subset2)
@@ -866,14 +870,16 @@ standardize_idf_value <- function (idd_env, idf_env, class = NULL, object = NULL
         }]
     }
 
-    if ("reference" %chin% type && any(i <- val$type_enum == IDDFIELD_TYPE$object_list) && nrow(idf$reference)) {
-        ref <- idf_env$reference[J(val$value_id[i]), on = "value_id", nomatch = NULL]
+    if ("reference" %chin% type && any(i <- dt_value$type_enum == IDDFIELD_TYPE$object_list) && nrow(idf$reference)) {
+        ref <- idf_env$reference[J(dt_value$value_id[i]), on = "value_id", nomatch = NULL]
         ref[idf_env$value, on = c("src_value_id" = "value_id"),
             `:=`(src_value_chr = i.value_chr, src_value_num = i.value_num)]
-        val[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
+        dt_value[ref, on = "value_id", `:=`(value_chr = i.src_value_chr, value_num = i.src_value_num)]
     }
 
-    set(val, NULL, prop, NULL)
+    if (!is.null(prop)) set(dt_value, NULL, prop, NULL)
+
+    dt_value
 }
 # }}}
 

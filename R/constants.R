@@ -115,7 +115,11 @@ utils::globalVariables(c(
     "update_value_reference", "upper_incbounds", "value", "value_chr",
     "value_count", "value_id", "value_lower", "value_num", "value_type",
     "variable", "weather", "wind_exposure", "wind_exposure_lower", "wmo_number",
-    "x", "y", "z", "zone_name", "DAY_TYPE", "SIMULATION_DAYS"
+    "x", "y", "z", "zone_name", "DAY_TYPE", "SIMULATION_DAYS", "daytype",
+    "daytype_index", "i.daytype", "i.for", "i.interp", "i.interpolate",
+    "i.pair_type", "i.through", "i.type_limits", "index_daytype",
+    "index_schedule_value", "interpolate", "pair", "pair_type", "time",
+    "time_rleid", "value_index", "year_day"
 ))
 # }}}
 # nocov end

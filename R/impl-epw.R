@@ -849,7 +849,7 @@ set_epwdate_year <- function(x, year) {
     assign_epwdate(tmp)
 }
 align_epwdate_type <- function (x, to) {
-    assert_same_len(x, to)
+    if (length(to) != 1L) assert_same_len(x, to)
     t <- get_epwdate_type(x)
     # only for julian and month day
     can_align <- t >= EPWDATE_TYPE$jul & t <= EPWDATE_TYPE$md
@@ -2371,7 +2371,8 @@ format_epw <- function (epw_data, epw_header, fmt_digit = TRUE, fill = FALSE, pu
 # }}}
 # format_epw_header {{{
 format_epw_header <- function (header) {
-    header$value <- standardize_idf_value(get_epw_idd_env(), header, type = "choice")
+    val <- get_idf_value(get_epw_idd_env(), header, property = "choice")
+    header$value <- standardize_idf_value(get_epw_idd_env(), header, val, type = "choice")
     fmt <- get_idf_string(get_epw_idd_env(), header, header = FALSE, comment = FALSE,
         format = "new_top", leading = 0, sep_at = -1, flat = FALSE
     )

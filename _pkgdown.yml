@@ -49,6 +49,7 @@ reference:
     contents:
       - Idf
       - IdfObject
+      - IdfScheduleCompact
       - idf_object
       - read_idf
       - empty_idf
