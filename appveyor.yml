@@ -15,7 +15,11 @@ install:
   - cmd: Rscript -e "if (getRversion() < '3.2' && !requireNamespace('curl')) install.packages('curl', type = 'binary')"
   - cmd: Rscript -e "options(pkgType = 'binary'); remotes::install_github('ropensci/tic', upgrade = 'always'); print(tic::dsl_load()); tic::prepare_all_stages()"
 
-before_build: Rscript -e "tic::before_install()"
+before_build:
+  # data.table::fread segfault in v1.13.0
+  # ref: https://github.com/Rdatatable/data.table/issues/4644
+  - cmd: Rscript -e "remotes::install_version('data.table', '1.12.4')"
+  - cmd: Rscript -e "tic::before_install()"
 build_script: Rscript -e "tic::install()"
 after_build: Rscript -e "tic::after_install()"
 before_test: Rscript -e "tic::before_script()"
