@@ -5,7 +5,7 @@
 #'
 #' @importFrom R6 R6Class
 #' @docType class
-#' @name IdfScheduleCompact
+#' @name IdfSchedule
 #' @seealso [Idf] class
 #' @author Hongyuan Jia
 NULL
@@ -16,6 +16,7 @@ IdfSchedule <- R6::R6Class(classname = "IdfSchedule", lock_objects = FALSE, inhe
 # }}}
 
 #' @export
+#' @name IdfSchedule
 # IdfScheduleCompact {{{
 IdfScheduleCompact <- R6::R6Class(classname = "IdfScheduleCompact", lock_objects = FALSE,
     inherit = IdfSchedule,
