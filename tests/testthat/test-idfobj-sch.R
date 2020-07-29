@@ -19,7 +19,7 @@ test_that("IdfSchedule class", {
     expect_equal(sch$type_limits(), lim)
 
     # set values
-    expect_is(class = "IdfScheduleCompact"
+    expect_is(class = "IdfScheduleCompact",
         sch$set(c("weekday", "summerdesignday") := list(
             ..6 = 0.2, ..8 = 0.5,
             ..12 = 0.95, "13:30" = 0.6, ..14 = 0.8,
