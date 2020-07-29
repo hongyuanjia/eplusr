@@ -1,7 +1,7 @@
 #' Create and Modify an EnergyPlus Schedule
 #'
-#' `IdfSchedule` is an abstraction of a single schedule in an [Idf]. It provides
-#' more detailed methods to modify schedule values.
+#' `IdfScheduleCompact` is an abstraction of a single schedule in an [Idf]. It
+#' provides more detailed methods to modify schedule values.
 #'
 #' @importFrom R6 R6Class
 #' @docType class
@@ -11,6 +11,7 @@
 NULL
 
 # IdfSchedule {{{
+#' @export
 IdfSchedule <- R6::R6Class(classname = "IdfSchedule", lock_objects = FALSE, inherit = IdfObject)
 # }}}
 

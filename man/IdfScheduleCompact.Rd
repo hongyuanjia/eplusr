@@ -5,8 +5,8 @@
 \alias{IdfScheduleCompact}
 \title{Create and Modify an EnergyPlus Schedule}
 \description{
-\code{IdfSchedule} is an abstraction of a single schedule in an \link{Idf}. It provides
-more detailed methods to modify schedule values.
+\code{IdfScheduleCompact} is an abstraction of a single schedule in an \link{Idf}. It
+provides more detailed methods to modify schedule values.
 }
 \examples{
 
