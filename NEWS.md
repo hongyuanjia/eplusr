@@ -154,8 +154,9 @@
 * Now `Idf$insert()` and `Idf$load()` can now successfully remove duplicated
   objects by comparing field values case-insensitively (#243)
 * Now `Epw$save()` can work with empty `DESIGN CONDITIONS`, `TYPICAL/EXTREME
-* PERIODS` and `GROUND TEMPERATURES` headers. Thanks @lukas-rokka for the
+  PERIODS` and `GROUND TEMPERATURES` headers. Thanks @lukas-rokka for the
   bug report (#263).
+* Fix output directory creation error in `EplusGroupJob`(#270).
 
 # eplusr 0.12.0
 
