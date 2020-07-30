@@ -2898,7 +2898,13 @@ set_idf_object <- function (idd_env, idf_env, dt_object, dt_value, empty = FALSE
 
     # update referenced values
     add_joined_cols(dt_value, ref, c("src_value_id" = "value_id"), c("value_chr", "value_num"))
-    idf_env$value[ref, on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
+    # handle class-references #271
+    if (any(i <- !is.na(ref$src_enum) & ref$src_enum == IDDFIELD_SOURCE$class)) {
+        add_joined_cols(dt_object, ref, c("src_object_id" = "object_id"), "class_name")
+        ref[i, value_chr := class_name]
+    }
+    # only update valid reference
+    idf_env$value[ref[!J(NA_character_), on = "value_chr"], on = "value_id", `:=`(value_chr = i.value_chr, value_num = i.value_num)]
 
     if (length(id_del)) {
         value <- append_dt(idf_env$value[!J(id_del), on = "value_id"], dt_value, "value_id")

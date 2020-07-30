@@ -475,7 +475,7 @@ test_that("$set()", {
     expect_equal(idf$RunPeriod$rp_test$Use_Weather_File_Rain_Indicators, "Yes")
 
     # can remove trailing empty fields
-    expect_is(class = "list", 
+    expect_is(class = "list",
         idf$set(rp_test = list(
             Number_of_Times_Runperiod_to_be_Repeated = NULL,
             Increment_Day_of_Week_on_repeat = NULL
@@ -505,6 +505,11 @@ test_that("$set()", {
     )
     expect_equal(idf$Material_NoMass$R13LAYER$Roughness, "VeryRough")
     expect_equal(idf$Material_NoMass$R31LAYER$Roughness, "Smooth")
+
+    # can handle references
+    expect_is(idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf")), "Idf")
+    expect_is(idf$set("Pump:VariableSpeed" := list(c("pump1", "pump2"))), "list")
+    expect_equal(idf$"Pump:VariableSpeed"[[1]]$ref_by_object(class = "Branch")[[1L]]$Component_1_Object_Type, "Pump:VariableSpeed")
 })
 # }}}
 
