@@ -24,6 +24,7 @@ test_that("eplusr_option()", {
 
     expect_false(with_option(list(verbose_info = FALSE), eplusr_option("verbose_info")))
     expect_false(with_silent(eplusr_option("verbose_info")))
+    expect_message(with_verbose(verbose_info("a")), "a")
     expect_equal(without_checking(eplusr_option("validate_level")), "none")
     expect_equal(with_speed(c(eplusr_option("validate_level"), eplusr_option("autocomplete"))), c("none", "FALSE"))
 })
