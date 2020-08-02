@@ -2012,7 +2012,7 @@ test_that("Del", {
     expect_message({
         obj <- get_idf_object(idd_env, idf_env, object = "R13LAYER")
         with_verbose(del_idf_object(idd_env, idf_env, obj, ref_by = TRUE))
-    }, "skipping")
+    }, "Skipping")
 
     expect_message({
         env <- list2env(idf_env)
@@ -2534,10 +2534,10 @@ test_that("utilities", {
     id_choice <- get_idf_value(idd_env, idf_env, "Material", field = "Roughness")$value_id
     idf_env$value[J(id_choice), on = "value_id", value_chr := tolower(value_chr)]
 
-    val <- get_idf_value(idd_env, idf_env, "Construction", field = 2)
+    val <- get_idf_value(idd_env, idf_env, "Construction", field = 2, property = "type_enum")
     expect_equal(standardize_idf_value(idd_env, idf_env, val)$value_chr, c("R13LAYER", "C5 - 4 IN HW CONCRETE", "R31LAYER"))
 
-    val <- get_idf_value(idd_env, idf_env, "Material", field = 2, property = "type_enum")
-    expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "reference")$value_chr, "MediumRough")
+    val <- get_idf_value(idd_env, idf_env, "Material", field = 2)
+    expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "choice")$value_chr, "MediumRough")
 })
 # }}}
