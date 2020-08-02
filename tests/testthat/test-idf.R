@@ -802,6 +802,9 @@ test_that("$to_string()", {
     )
     expect_silent(idf_1 <- read_idf(paste0(idf_string, collapse = "\n")))
     expect_equal(idf_1$to_string(format = "new_top"), idf_string)
+
+    expect_is(idf <- read_idf(example()), "Idf")
+    expect_equal(idf$to_string()[2], "!-Option OriginalOrderTop")
 })
 # }}}
 
