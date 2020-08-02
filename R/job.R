@@ -803,9 +803,9 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE) {
     # stop if idf object has been changed accidentally
     if (!identical(get_priv_env(private$m_idf)$m_log$uuid, private$m_log$seed_uuid)) {
-        abort(paste0("The idf has been modified after job was created. ",
-            "Running this idf will result in simulation outputs that may be not reproducible.",
-            "Please recreate the job using new idf and then run it."
+        abort(paste0("The Idf has been modified after job was created. ",
+            "Running this Idf will result in simulation outputs that may be not reproducible.",
+            "Please recreate the job using new Idf and then run it."
         ))
     }
 
@@ -830,15 +830,16 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     # if necessary, resave the model
     if (private$m_log$unsaved || !is.null(dir)) {
         path_idf <- private$m_idf$save(path_idf, overwrite = TRUE, copy_external = copy_external)
+        log_saved(private$m_log)
     }
 
     # when no epw is given, at least one design day object should exists
     if (is.null(private$m_epw_path)) {
         if (!private$m_idf$is_valid_class("SizingPeriod:DesignDay")) {
-            stop("When no weather file is given, input IDF should contain ",
+            abort(paste0("When no weather file is given, input IDF should contain ",
                 "at least one 'SizingPeriod:DesignDay' object to enable ",
                 "Design-Day-only simulation."
-            )
+            ))
         }
     }
 

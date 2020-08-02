@@ -3325,9 +3325,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     if (!inherits(old, "EplusJob")) {
         private$m_log$job <- EplusJob$new(self, epw)
     # recreate job if the model has been changed since last ran
-    } else if (
-        normalizePath(private$m_path, mustWork = FALSE) !=
-        normalizePath(private$m_log$job$path("idf"), mustWork = FALSE)) {
+    } else if (private$m_log$uuid != get_priv_env(private$m_log$job)$m_log$seed_uuid) {
         private$m_log$job <- EplusJob$new(self, epw)
     }
 
