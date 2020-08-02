@@ -154,6 +154,8 @@ eplusr_option <- function (...) {
 #'
 #' `with_silent` evaluates an expression with no verbose messages.
 #'
+#' `with_verbose` evaluates an expression with verbose messages.
+#'
 #' `without_checking` evaluates an expression with no checkings.
 #'
 #' `with_speed` evaluates an expression with no checkings and autocompletion
@@ -196,6 +198,14 @@ with_option <- function (opts, expr) {
 # with_silent {{{
 with_silent <- function (expr) {
     with_option(list(verbose_info = FALSE), expr)
+}
+# }}}
+
+#' @name with_option
+#' @export
+# with_verbose {{{
+with_verbose <- function (expr) {
+    with_option(list(verbose_info = TRUE), expr)
 }
 # }}}
 

@@ -3,6 +3,7 @@
 \name{with_option}
 \alias{with_option}
 \alias{with_silent}
+\alias{with_verbose}
 \alias{with_speed}
 \alias{without_checking}
 \title{Evaluate an expression with temporary eplusr options}
@@ -10,6 +11,8 @@
 with_option(opts, expr)
 
 with_silent(expr)
+
+with_verbose(expr)
 
 with_speed(expr)
 
@@ -27,6 +30,8 @@ These functions evaluate an expression with temporary eplusr options
 \code{with_option} evaluates an expression with specified eplusr options.
 
 \code{with_silent} evaluates an expression with no verbose messages.
+
+\code{with_verbose} evaluates an expression with verbose messages.
 
 \code{without_checking} evaluates an expression with no checkings.
 
