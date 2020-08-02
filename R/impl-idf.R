@@ -1621,24 +1621,20 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 # update id and name column
                 add_joined_cols(cls_in, cls_val, "rleid", c("class_id", "class_name"))
 
-                # extract field input by class
-                cls_fld_in <- unique(fast_subset(cls_val, c("rleid", "class_id", "field_index", "field_name")),
-                    by = c("rleid", "field_index", "field_name"))
-                # store input before matching
-                set(cls_fld_in, NULL, c("field_index_in", "field_name_in"), list(cls_fld_in$field_index, cls_fld_in$field_name))
                 # match field id
-                cls_fld_in <- match_idd_field(idd_env, cls_fld_in)
+                cls_sgl <- cls_val[, by = "rleid", list(each_rleid = max(each_rleid), n = length(unique(each_rleid)))]
+                cls_sgl <- match_idd_field(idd_env, cls_val[cls_sgl, on = c("rleid", "each_rleid")])
 
-                # if no duplicated fields, unique will just return the
-                # the original data.table
-                # in this case, cls_val is modified when matching
-                if (nrow(cls_fld_in) == nrow(cls_val)) {
-                    set(cls_val, NULL, c("field_id", "field_index", "field_name"), fast_subset(cls_fld_in, c("field_id", "field_index", "field_name")))
-                # match field in the original value input
-                } else {
-                    cls_val[cls_fld_in, on = c("rleid", "field_index" = "field_index_in", "field_name" = "field_name_in"),
-                        `:=`(field_index = i.field_index, field_name = i.field_name, field_id = i.field_id)]
-                }
+                cls_sgl <- cls_sgl[, by = "rleid",
+                    list(field_id = rep(field_id, n[[1L]]),
+                         field_index = rep(field_index, n[[1L]]),
+                         field_name = rep(field_name, n[[1L]])
+                    )
+                ]
+
+                set(cls_val, NULL, c("field_id", "field_index", "field_name"),
+                    set(cls_sgl, NULL, "rleid", NULL)
+                )
 
                 # assign default value if necessary
                 if (.default && .sgl) {
@@ -1679,7 +1675,7 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
 
                 # complete fields if necessary
                 if (.all || .complete) {
-                    fld_in <- cls_fld_in[, by = "rleid", list(class_id = class_id[[1L]], field_index = max(field_index))]
+                    fld_in <- cls_val[, by = "rleid", list(class_id = class_id[[1L]], field_index = max(field_index))]
                     cls_val_out <- get_idf_value(idd_env, idf_env,
                         class = fld_in$class_id, field = fld_in$field_index,
                         complete = .complete, all = .all

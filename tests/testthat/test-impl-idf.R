@@ -1126,6 +1126,31 @@ test_that("VALUE DOTS", {
     )
     expect_equal(res$object$object_id, 27:40)
     expect_equal(res$value$field_index, rep(1:2, 14))
+
+    ## Class := list(Val1, Val2)
+    expect_is(class = "list",
+        res <- expand_idf_dots_value(idd_env, idf_env,
+            SimulationControl := list("No", "No", "No", "No", "Yes"),
+            .type = "object", .complete = TRUE, .all = FALSE,
+            .scalar = FALSE, .pair = TRUE, .ref_assign = TRUE,
+            .unique = TRUE, .empty  = TRUE, .default = TRUE
+        )
+    )
+    expect_equal(res$value$field_index, 1:5)
+    expect_equal(res$value$value_chr, c("No", "No", "No", "No", "Yes"))
+
+    ## Class := list(Fld2 = Val2, Val1)
+    expect_is(class = "list",
+        res <- expand_idf_dots_value(idd_env, idf_env,
+            SimulationControl := list(do_zone_sizing_calculation = "No", "No", "No", "No", "Yes"),
+            .type = "object", .complete = TRUE, .all = FALSE,
+            .scalar = FALSE, .pair = TRUE, .ref_assign = TRUE,
+            .unique = TRUE, .empty  = TRUE, .default = TRUE
+        )
+    )
+    expect_equal(res$value$field_index, 1:5)
+    expect_equal(res$value$value_chr, c("No", "No", "No", "No", "Yes"))
+
     ## Class := list(Fld1 = Val1, Fld = Val2), dup
     expect_is(class = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
@@ -1146,6 +1171,14 @@ test_that("VALUE DOTS", {
     )
     expect_equal(res$object$object_id, 27:40)
     expect_equal(res$value$field_index, rep(1, 14))
+    expect_is(class = "list",
+        res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
+            Output_Variable := list(rep("*", 14), "Temp"),
+            .scalar = FALSE, .pair = TRUE
+        )
+    )
+    expect_equal(res$object$object_id, 27:40)
+    expect_equal(res$value$field_index, rep(1:2, 14))
     ## Class := list(Fld1 = c(Val1, Val2, Val3, ...)), dup
     expect_is(class = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
