@@ -1139,15 +1139,15 @@ get_epgroup_input <- function (idfs, epws, sql = TRUE, dict = TRUE) {
     } else {
         init_idf <- function (...) {
             tryCatch(get_init_idf(...),
-                error_idf_not_local = function (e) e,
-                error_idf_path_not_exist = function (e) e,
-                error_idf_not_saved = function (e) e
+                eplusr_error_idf_not_local = function (e) e,
+                eplusr_error_idf_path_not_exist = function (e) e,
+                eplusr_error_idf_not_saved = function (e) e
             )
         }
         idfs <- lapply(idfs, init_idf, sql = sql, dict = dict)
     }
 
-    err <- c("error_idf_not_local", "error_idf_path_not_exist", "error_idf_not_saved")
+    err <- c("eplusr_error_idf_not_local", "eplusr_error_idf_path_not_exist", "eplusr_error_idf_not_saved")
     if (any(invld <- vlapply(idfs, inherits, err))) {
         abort(paste0("Invalid IDF input found:\n",
             paste0(lpad(paste0("  #", which(invld))), ": ", vcapply(idfs[invld], conditionMessage),
@@ -1282,7 +1282,7 @@ epgroup_job_from_which <- function (self, private, which, keep_unsucess = FALSE)
 # epgroup_case_from_which {{{
 #' @importFrom checkmate test_names
 epgroup_case_from_which <- function (self, private, which = NULL, name = FALSE) {
-    if (checkmate::test_names(private$m_idfs)) {
+    if (checkmate::test_named(private$m_idfs)) {
         nms <- names(private$m_idfs)
     } else {
         nms <- vcapply(private$m_idfs, function(idf) tools::file_path_sans_ext(basename(idf$path())))
