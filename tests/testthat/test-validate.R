@@ -1,4 +1,4 @@
-context("validate")
+context("Validate")
 
 # VALIDTATE {{{
 test_that("Validate method", {
@@ -24,6 +24,11 @@ test_that("Validate method", {
         )
     )
 
+    expect_error(level_checks(1))
+
+    expect_is(format_validity(empty_validity()), "character")
+    expect_output(print.IdfValidity(empty_validity()))
+    expect_output(print.EpwValidity(empty_validity()))
 
     # MISSING OBJECT {{{
     env_in <- parse_idf_file(text("idf", 8.8))

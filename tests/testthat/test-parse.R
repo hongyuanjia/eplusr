@@ -122,6 +122,20 @@ test_that("parse_idd_file()", {
          Test,
          A1 ; \\note something
 
+         Test1,
+         A1 ; \\note something
+         "
+    )
+    expect_warning(idd_parsed <- parse_idd_file(idd_wrong), "Missing group name")
+    expect_equal(idd_parsed$group$group_id, 1L)
+    expect_equal(idd_parsed$group$group_name, "Default Group")
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         Test,
+         A1 ; \\note something
+
          \\group TestGroup
 
          Test1,
@@ -155,17 +169,25 @@ test_that("parse_idd_file()", {
 
          \\group TestGroup
 
-         Test,
          A1 ; \\note something
-
-         A1 , \\note something
-         A1 ; \\note something
-         A1 , \\note something
          "
     )
     expect_error(parse_idd_file(idd_wrong), "Missing class name", class = "eplusr_error_parse_idd")
 
     # can detect missing class names
+    idd_wrong <- c(
+        "!IDD_Version 9.9.9
+         !IDD_BUILD 7c3bbe4830
+
+         \\group TestGroup
+
+         Test2,
+         A1,
+         A2,
+         "
+    )
+    expect_error(parse_idd_file(idd_wrong), "Incomplete class", class = "eplusr_error_parse_idd")
+
     idd_wrong <- c(
         "!IDD_Version 9.9.9
          !IDD_BUILD 7c3bbe4830

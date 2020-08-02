@@ -105,18 +105,18 @@ format_header <- function (save_format = c("sorted", "new_top", "new_bot"),
     header_option <- paste0("!-Option ", save_format)
 
     if (special_format) {
-        warn("warning_special_format",
-            paste0("Currently, special format for classes such as ",
+        warn(paste0("Currently, special format for classes such as ",
                 "single line formating for vertices are not support. ",
                 "All objects will be formatted in standard way."
-            )
+            ),
+            "warning_special_format"
         )
     }
     special_format <- NULL
 
-    if (view_in_ip) in_ip <- "ViewInIPunits" else in_ip <- NULL
+    if (view_in_ip) in_ip <- " ViewInIPunits" else in_ip <- NULL
 
-    header_option <- stri_trim_right(paste0(header_option, " ", special_format, " ", in_ip))
+    header_option <- stri_trim_right(paste0(header_option, special_format, in_ip))
 
     # TODO: Add "UseSpecialFormat" support
     c(
