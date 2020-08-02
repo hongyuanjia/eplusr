@@ -321,8 +321,8 @@ test_that("$objects_in_relation()", {
     expect_equal(length(obj), 2L)
     expect_equal(names(obj), c("WALL-1", "WD01"))
 
-    expect_message(with_option(list(verbose_info = TRUE), obj <- idf$objects_in_relation(1)), "does not refer to")
-    expect_message(with_option(list(verbose_info = TRUE), obj <- idf$objects_in_relation(1, class = "Material")), "does not refer to")
+    expect_message(with_verbose(obj <- idf$objects_in_relation(1)), "does not refer to")
+    expect_message(with_verbose(obj <- idf$objects_in_relation(1, class = "Material")), "does not refer to")
     expect_equal(length(obj), 1L)
     expect_equal(names(obj), "WD01")
 
@@ -622,7 +622,7 @@ test_that("$insert()", {
     )
 
     # can skip Version object
-    expect_message(with_option(list(verbose_info = TRUE), idf$insert(idf_full$Version)), "skipped")
+    expect_message(with_verbose(idf$insert(idf_full$Version)), "skipped")
 
     # can remove same object
     expect_error(idf$insert(idf$Material_NoMass$R13LAYER, .unique = FALSE), class = "eplusr_error_validity_check")
