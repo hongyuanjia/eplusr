@@ -403,6 +403,15 @@ test_that("parse_idf_file()", {
         list(idf_editor = FALSE, special_format = FALSE, view_in_ip = FALSE, save_format = "sorted")
     )
 
+    expect_equal(
+        parse_idf_file(idd = 8.8,
+            "!-Option OriginalOrderTop UseSpecialFormat
+             Version, 8.8;
+            "
+        )$options,
+        list(idf_editor = FALSE, special_format = TRUE, view_in_ip = FALSE, save_format = "new_top")
+    )
+
     # can parse object data
     expect_equal(idf_parsed$object$object_id, 1:5)
     expect_equal(idf_parsed$object$class_id, c(55, 90, 103, 55, 1))

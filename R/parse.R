@@ -1095,6 +1095,7 @@ sep_idf_lines <- function (dt, type_enum) {
         body = stri_trim_right(stri_sub(string, to = excl_loc - 1L)),
         comment = stri_sub(string, excl_loc + 1L)
     )]
+    dt[excl_loc <= spcl_loc, `:=`(excl_loc = NA_integer_)]
     dt[is.na(excl_loc) & !is.na(spcl_loc), `:=`(comment = stri_trim_left(stri_sub(comment, 2L)))]
 
     set(dt, NULL, c("excl_loc", "spcl_loc"), NULL)
@@ -1201,7 +1202,7 @@ sep_header_options <- function (dt, type_enum) {
 
     if (!length(out)) return(res)
 
-    save_format <- c("sorted", "ori_top", "ori_bot")
+    save_format <- c("sorted", "new_top", "new_bot")
     for (lgl in setdiff(out, save_format)) res$options[[lgl]] <- TRUE
     sf <- save_format[save_format %in% out][1L]
     if (!is.na(sf)) res$options$save_format <- sf
