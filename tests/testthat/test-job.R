@@ -9,6 +9,9 @@ test_that("Job methods", {
 
     expect_silent(job <- eplus_job(example$idf, example$epw))
 
+    expect_equal(job$version(), numeric_version("8.8.0"))
+    expect_output(job$print())
+
     # can get job status
     expect_equal(
         job$status(),
