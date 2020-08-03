@@ -816,14 +816,14 @@ test_that("Transition v8.3 --> v8.4", {
     expect_equal(idfTR$"GroundHeatExchanger:Slinky"$HES1$value(21)[[1]], "KATemp 11")
     expect_equal(idfTR$"GroundHeatExchanger:Slinky"$HES2$value(21)[[1]], "KATemp 12")
 
-    expect_equal(idfVU$object(11)$value(), idfTR$object(108)$value())
-    expect_equal(idfVU$object(12)$value(), idfTR$object(109)$value())
+    expect_equal(idfVU$object(11)$value(), idfTR$object(36)$value())
+    expect_equal(idfVU$object(12)$value(), idfTR$object(37)$value())
 
-    expect_equal(idfVU$object(13)$value(), idfTR$object(110)$value())
-    expect_equal(idfVU$object(14)$value(), idfTR$object(111)$value())
+    expect_equal(idfVU$object(13)$value(), idfTR$object(38)$value())
+    expect_equal(idfVU$object(14)$value(), idfTR$object(39)$value())
 
-    expect_equal(idfVU$object(15)$value(), idfTR$object(112)$value())
-    expect_equal(idfVU$object(16)$value(), idfTR$object(113)$value())
+    expect_equal(idfVU$object(15)$value(), idfTR$object(40)$value())
+    expect_equal(idfVU$object(16)$value(), idfTR$object(41)$value())
 
     expect_equal(
         idfVU$"ZoneAirMassFlowConservation"$value(),
