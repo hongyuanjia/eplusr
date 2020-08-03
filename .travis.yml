@@ -55,8 +55,8 @@ before_install:
 install:
   # data.table::fread segfault in v1.13.0
   # ref: https://github.com/Rdatatable/data.table/issues/4644
-  - R -q -e 'remotes::install_version("data.table", "1.12.4")'
   - R -q -e 'tic::install()'
+  - R -q -e 'remotes::install_version("data.table", "1.12.4")'
 before_script: R -q -e 'tic::before_script()'
 script: R -q -e 'tic::script()'
 after_success: R -q -e 'tic::after_success()'
