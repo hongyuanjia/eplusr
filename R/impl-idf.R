@@ -1632,6 +1632,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                     )
                 ]
 
+                set(cls_val, NULL, "each_rleid", NULL)
+
                 set(cls_val, NULL, c("field_id", "field_index", "field_name"),
                     set(cls_sgl, NULL, "rleid", NULL)
                 )
