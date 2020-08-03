@@ -33,7 +33,9 @@ environment:
   USE_RTOOLS: true
   R_REMOTES_STANDALONE: true
   R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+  R_REMOTES_UPGRADE: false
   matrix:
+    - R_VERSION: devel
     - R_VERSION: release
     - R_VERSION: oldrel
 
