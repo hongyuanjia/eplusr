@@ -378,16 +378,16 @@ test_that("$ref_to_object()", {
     expect_is(con <- IdfObject$new(2, parent = idf), "IdfObject")
     expect_is(ver <- IdfObject$new(5, parent = idf), "IdfObject")
 
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_to_object()), "does not refer")
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_to_object(class = "Material")), "does not refer")
+    expect_message(with_verbose(ver$ref_to_object()), "does not refer")
+    expect_message(with_verbose(ver$ref_to_object(class = "Material")), "does not refer")
     expect_equal(names(con$ref_to_object()), "WD01")
 
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_by_object()), "is not referred")
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_by_object(class = "Material")), "is not referred")
+    expect_message(with_verbose(ver$ref_by_object()), "is not referred")
+    expect_message(with_verbose(ver$ref_by_object(class = "Material")), "is not referred")
     expect_equal(names(con$ref_by_object()), "WALL-1PF")
 
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_to_node()), "has no node")
-    expect_message(with_option(list(verbose_info = TRUE), ver$ref_to_node(class = "Material")), "has no node")
+    expect_message(with_verbose(ver$ref_to_node()), "has no node")
+    expect_message(with_verbose(ver$ref_to_node(class = "Material")), "has no node")
 
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     idf <- read_idf(file.path(eplus_config(8.8)$dir, "ExampleFiles/5Zone_Transformer.idf"))
@@ -544,6 +544,8 @@ test_that("$.IdfObject and [[.IdfObject", {
     expect_equal(mat[["Roughness"]], "MediumSmooth")
     expect_null(mat[["roughness"]])
     expect_error(mat[[1:2]])
+
+    expect_is(mat[["version"]], "function")
 })
 # }}}
 

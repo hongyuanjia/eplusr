@@ -17,6 +17,8 @@ test_that("Meta info", {
 
     expect_is(epw <- read_epw(path_epw), "Epw")
 
+    expect_is(epw <- Epw$new(path_epw), "Epw")
+
     # can update the path after saved
     expect_equal(epw$path(), normalizePath(path_epw))
 
@@ -31,7 +33,7 @@ test_that("Header getter and setter", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
 
     # $location() {{{
     expect_equal(
@@ -92,17 +94,17 @@ test_that("Header getter and setter", {
     # }}}
 
     # $holiday {{{
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
     expect_is(epw$holiday(), "list")
     expect_equal(names(epw$holiday()), c("leapyear", "dst", "holiday"))
 
     # leapyear
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_equal(epw$holiday()$leapyear, FALSE)
     expect_error(epw$holiday(TRUE), class = "eplusr_error_epw_header")
 
     # change to leapyear
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_warning(d <- epw$data(1, start_year = 2016, align_wday = FALSE))
     feb29 <- d[month == 2 & day == 28][, day := 29L]
     d <- rbindlist(list(d, feb29))[order(month, day)]
@@ -112,12 +114,12 @@ test_that("Header getter and setter", {
     expect_error(epw$holiday(FALSE))
 
     # dst
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_equal(epw$holiday(dst = c(1, 2))$dst, epw_date(1:2))
     expect_equal(epw$holiday(dst = c(as.Date("2008-01-01"), as.Date("2008-02-01")))$dst, epw_date(c("Jan 01", "Feb 01")))
 
     # holiday
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(hol <- epw$holiday(holiday = list(name = "New Year", day = "Jan 01")), "list")
     expect_equal(hol$holiday,
         data.table(index = 1L, name = "New Year", day = epw_date("1/1"))
@@ -169,7 +171,7 @@ test_that("Constant data", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
 
     expect_is(epw$missing_code(), "list")
     expect_equal(length(epw$missing_code()), 29L)
@@ -190,7 +192,7 @@ test_that("$save() & $is_unsaved()", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(d_ori <- epw$data(), "data.table")
 
     # $is_unsaved() {{{
@@ -203,7 +205,7 @@ test_that("$save() & $is_unsaved()", {
     expect_is(epw$save(file.path(tempdir(), "test_save.epw")), "character")
     expect_error(epw$save(file.path(tempdir(), "test_save.epw")), class = "eplusr_error")
     expect_is(epw$save(overwrite = TRUE), "character")
-    expect_is(epw1 <- read_epw(file.path(tempdir(), "test_save.epw")), "Epw")
+    expect_is(epw1 <- Epw$new(file.path(tempdir(), "test_save.epw")), "Epw")
     expect_equal(epw1$data(), d_ori)
     # }}}
 })
@@ -215,7 +217,7 @@ test_that("Data Getter", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
 
     # $data() {{{
     # can get weather data
@@ -269,14 +271,14 @@ test_that("Data Tagger", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
 
     # $make_na() {{{
     expect_true({
         epw$make_na(missing = TRUE, out_of_range = TRUE)
         all(is.na(epw$abnormal_data(cols = "albedo", keep_all = FALSE, type = "missing")$albedo))
     })
-    expect_message(with_option(list(verbose_info = TRUE), epw$make_na(missing = TRUE, out_of_range = TRUE)), "already")
+    expect_message(with_verbose(epw$make_na(missing = TRUE, out_of_range = TRUE)), "already")
     # }}}
 
     # $fill_abnormal() {{{
@@ -286,7 +288,7 @@ test_that("Data Tagger", {
             epw$abnormal_data(cols = "albedo", keep_all = FALSE, type = "missing")$albedo
         }, rep(999, 2160)
     )
-    expect_message(with_option(list(verbose_info = TRUE), epw$fill_abnormal(missing = TRUE, out_of_range = TRUE)), "already")
+    expect_message(with_verbose(epw$fill_abnormal(missing = TRUE, out_of_range = TRUE)), "already")
     # }}}
 
     # $add_unit() & $drop_unit() {{{
@@ -298,17 +300,17 @@ test_that("Data Tagger", {
     )
     expect_true(all(units(rad)$numerator %in% c("W", "h")))
     expect_equal(units(rad)$denominator, c("m", "m"))
-    expect_message(with_option(list(verbose_info = TRUE), epw$add_unit()), "already")
+    expect_message(with_verbose(epw$add_unit()), "already")
 
     expect_is(epw$drop_unit()$data()$dry_bulb_temperature, "numeric")
-    expect_message(with_option(list(verbose_info = TRUE), epw$drop_unit()), "already")
+    expect_message(with_verbose(epw$drop_unit()), "already")
     # }}}
 
     # $purge() {{{
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(epw$purge(), "Epw")
     epw$.__enclos_env__$private$m_data <- rbindlist(list(get_priv_env(epw)$m_data, epw$data()))
-    expect_message(with_option(list(verbose_info = TRUE), epw$purge()))
+    expect_message(with_verbose(epw$purge()))
     # }}}
 })
 # }}}
@@ -323,7 +325,7 @@ test_that("Data Setter", {
 
     # $set() {{{
     expect_is(d <- epw$data(), "data.table")
-    expect_output(with_option(list(verbose_info = TRUE), epw$set(d, realyear = TRUE)))
+    expect_output(with_verbose(epw$set(d, realyear = TRUE)))
     expect_equal(epw$period(),
         data.table(index = 1L, name = "Data", start_day_of_week = "Sunday",
             start_day = epw_date("2017/1/1"), end_day = epw_date("2017/12/31")
@@ -344,12 +346,12 @@ test_that("Data Setter", {
     # }}}
 
     # $add() {{{
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
 
     expect_error(epw$add(epw$data()), class = "eplusr_error_parse_epw")
 
     # after 0L
-    expect_output(with_option(list(verbose_info = TRUE), epw$add(epw$data(start_year = 2017), realyear = TRUE)))
+    expect_output(with_verbose(epw$add(epw$data(start_year = 2017), realyear = TRUE)))
     expect_equal(epw$period()$name, c("Data1", "Data"))
     expect_equal(lubridate::year(epw$data(1, align_wday = FALSE)$datetime[1]), 2017)
     expect_equal(get_priv_env(epw)$m_log$matched,
@@ -374,7 +376,7 @@ test_that("Data Setter", {
     )
 
     # unit + no unit
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(d <- epw$data(start_year = 2017), "data.table")
     expect_is(epw$add_unit(), "Epw")
     expect_is(epw$add(d, realyear = TRUE), "Epw")
@@ -382,7 +384,7 @@ test_that("Data Setter", {
     expect_equal(u, "h")
 
     # unit + unit
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(epw$add_unit(), "Epw")
     expect_is(d <- epw$data(start_year = 2017), "data.table")
     expect_is(epw$add(d, realyear = TRUE), "Epw")
@@ -390,7 +392,7 @@ test_that("Data Setter", {
     expect_equal(u, "h")
 
     # no unit + unit
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(epw$add_unit(), "Epw")
     expect_is(d <- epw$data(start_year = 2017), "data.table")
     expect_is(epw$drop_unit(), "Epw")
@@ -399,7 +401,7 @@ test_that("Data Setter", {
     expect_is(u, "numeric")
 
     # no na + na
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(epw$make_na(TRUE, TRUE), "Epw")
     expect_is(d <- epw$data(start_year = 2017), "data.table")
     expect_is(epw$fill_abnormal(TRUE, TRUE), "Epw")
@@ -407,7 +409,7 @@ test_that("Data Setter", {
     expect_true(all(!is.na(epw$abnormal_data(cols = "albedo", keep_all = FALSE, type = "missing")$albedo)))
 
     # na + no na
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
     expect_is(d <- epw$data(start_year = 2017), "data.table")
     expect_is(epw$make_na(TRUE, TRUE), "Epw")
     expect_is(epw$add(d, realyear = TRUE), "Epw")
@@ -415,13 +417,13 @@ test_that("Data Setter", {
     # }}}
 
     # $del() {{{
-    expect_is(epw <- read_epw(path_epw), "Epw")
+    expect_is(epw <- Epw$new(path_epw), "Epw")
 
     expect_error(epw$del())
     expect_error(epw$del(1))
 
     expect_is(epw$add(epw$data(start_year = 2017), realyear = TRUE), "Epw")
-    expect_message(with_option(list(verbose_info = TRUE), epw$del(1)))
+    expect_message(with_verbose(epw$del(1)))
     # }}}
 })
 # }}}
@@ -431,7 +433,7 @@ test_that("$clone()", {
     skip_on_cran()
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
-    expect_is(epw1 <- read_epw(path_epw), "Epw")
+    expect_is(epw1 <- Epw$new(path_epw), "Epw")
 
     epw2 <- epw1$clone()
     epw2$period(1, name = "Data2")
@@ -446,7 +448,7 @@ test_that("$print()", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
 
     # $print() {{{
     expect_output(epw$print())
@@ -460,7 +462,7 @@ test_that("str.Epw & format.Epw", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
     expect_output(str(epw))
     expect_is(format(epw), "character")
 })
@@ -472,13 +474,13 @@ test_that("==.Epw & !=.Epw", {
     if (!is_avail_eplus(8.8)) install_eplus(8.8)
     path_epw <- file.path(eplus_config(8.8)$dir, "WeatherData", "USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw")
 
-    expect_silent(epw <- read_epw(path_epw))
+    expect_silent(epw <- Epw$new(path_epw))
 
     expect_true(epw == epw)
-    expect_false(epw == read_epw(path_epw))
+    expect_false(epw == Epw$new(path_epw))
     expect_false(epw == 1)
     expect_false(epw != epw)
-    expect_true(epw != read_epw(path_epw))
+    expect_true(epw != Epw$new(path_epw))
 })
 # }}}
 
@@ -487,8 +489,14 @@ test_that("download_weather()", {
     skip_on_cran()
 
     # download weather
-    expect_message({path_epw <- with_option(list(verbose_info = TRUE),
+    expect_message({path_epw <- with_verbose(
         download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "epw", dir = tempdir()))}
+    )
+    expect_message({path_epw <- with_verbose(
+        download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "all", dir = tempdir()))}
+    )
+    expect_message({path_epw <- with_verbose(
+        download_weather("USA_CA_San.Francisco.Intl.AP.724940_TMY3", ask = FALSE, type = "ddy", dir = tempdir()))}
     )
 })
 # }}}

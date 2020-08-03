@@ -8,6 +8,8 @@ test_that("IdfSchedule class", {
 
     expect_is(idf <- read_idf(path_idf), "Idf")
 
+    expect_error(IdfScheduleCompact$new(""), class = "eplusr_error_idfobject_missing_parent")
+
     # create new
     expect_is(sch <- IdfScheduleCompact$new("schedule", idf, TRUE), "IdfScheduleCompact")
 

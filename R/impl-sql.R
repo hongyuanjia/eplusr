@@ -187,22 +187,20 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (!is.null(period)) {
         subset_time <- TRUE
         if (!any(c("Date", "POSIXt") %in% class(period)))
-            abort("`period` should be a Date or DateTime vector.")
+            abort("'period' should be a Date or DateTime vector.")
         p <- unique(period)
         if (inherits(period, "Date")) {
             period <- data.table(
                 MONTH = lubridate::month(p),
                 DAY = lubridate::mday(p)
             )
-        } else if (inherits(period, "POSIXt")) {
+        } else {
             period <- data.table(
                 MONTH = lubridate::month(p),
                 DAY = lubridate::mday(p),
                 HOUR = lubridate::hour(p),
                 MINUTE = lubridate::minute(p)
             )
-        } else {
-            abort("error_sql_period_type", "`period` should be a Date or DateTime vector.")
         }
         time <- time[period, on = names(period), nomatch = NULL]
     }
@@ -288,10 +286,10 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
         mes <- norm_time[is.na(datetime), paste0(
             "Original: ", month, "-", day, " ",  hour, ":", minute, " --> New year: ", year
         )]
-        warn("warn_invalid_epw_date_introduced",
-            paste0("Invalid date introduced with input start year:\n",
+        warn(paste0("Invalid date introduced with input start year:\n",
                 paste0(mes, collapse = "\n")
-            )
+            ),
+            "invalid_epw_date_introduced"
         )
     }
     # }}}
@@ -447,23 +445,6 @@ wide_tabular_data <- function (dt, string_value = TRUE) {
     }
 
     dt[]
-}
-# }}}
-# get_sql_date {{{
-get_sql_date <- function (sql, environment_period_index, simulation_days) {
-    cond <- NULL %and%
-        .sql_make(environment_period_index, sql_col = "EnvironmentPeriodIndex") %and%
-        .sql_make(simulation_days, sql_col = "SimulationDays")
-    q <- paste0("
-         SELECT DISTINCT
-                EnvironmentPeriodIndex as environment_period_index,
-                SimulationDays as simulation_days,
-                Month AS month,
-                Day AS day
-         FROM Time
-         WHERE ", cond, " AND (Month IS NOT NULL) AND (Day IS NOT NULL)"
-        )
-    get_sql_query(sql, q)
 }
 # }}}
 # tidy_sql_name {{{

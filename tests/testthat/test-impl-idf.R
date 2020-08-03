@@ -1706,8 +1706,7 @@ test_that("Dup", {
     # can stop if duplicate unique object
     expect_error(dup_idf_object(idd_env, idf_env, expand_idf_dots_name(idd_env, idf_env, 3)), class = "eplusr_error_dup_unique")
 
-    expect_message(with_option(
-        list(verbose_info = TRUE),
+    expect_message(with_verbose(
         dup <- dup_idf_object(idd_env, idf_env, expand_idf_dots_name(idd_env, idf_env, 8, Annual = 8, nomass = 13, 13))),
         "RunPeriod.*R31LAYER 1"
     )
@@ -2005,10 +2004,49 @@ test_that("Del", {
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = 7)), class = "eplusr_error_del_unique")
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = rep(53, 2))), class = "eplusr_error_del_same")
     expect_error(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = c("R13WALL", "FLOOR", "ROOF31"))), class = "eplusr_error_del_referenced")
-    expect_message({del <- with_option(list(verbose_info = TRUE), del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = c(21:26, 14)), ref_to = TRUE, ref_by = TRUE, recursive = TRUE))}, "relation")
+    expect_message({del <- with_verbose(del_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, object = c(21:26, 14)), ref_to = TRUE, ref_by = TRUE, recursive = TRUE))}, "relation")
     expect_equal(setdiff(idf_env$object$object_id, del$object$object_id), c(14:17, 21:26))
     expect_equal(del$changed, c(21:26, 14:17))
     expect_equal(del$updated, integer())
+
+    expect_message({
+        obj <- get_idf_object(idd_env, idf_env, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, idf_env, obj, ref_by = TRUE))
+    }, "Skipping")
+
+    expect_message({
+        env <- list2env(idf_env)
+        l <- expand_idf_dots_value(idd_env, env, Construction = list("Const", "R13LAYER"))
+        add <- add_idf_object(idd_env, env, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_by = TRUE))
+    }, "Including")
+
+    expect_message({
+        env <- list2env(idf_env)
+        l <- expand_idf_dots_value(idd_env, env, Construction = list("Const", "R13LAYER"))
+        add <- add_idf_object(idd_env, env, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_by = TRUE, force = TRUE))
+    }, "Including")
+
+    expect_message({
+        obj <- expand_idf_dots_name(idd_env, env, mat = "R13LAYER")
+        dup <- list2env(dup_idf_object(idd_env, idf_env, obj, "final"))
+        l <- expand_idf_dots_value(idd_env, dup, Construction = list("Const", "mat"))
+        add <- add_idf_object(idd_env, dup, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "Const")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_to = TRUE))
+    }, "Including")
+
+    expect_message({
+        obj <- expand_idf_dots_name(idd_env, env, mat = "R13LAYER")
+        dup <- list2env(dup_idf_object(idd_env, env, obj, "final"))
+        l <- expand_idf_dots_value(idd_env, dup, Construction = list("Const", "mat"))
+        add <- add_idf_object(idd_env, dup, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "Const")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_to = TRUE, force = TRUE))
+    }, "Including")
 })
 # }}}
 
@@ -2018,7 +2056,7 @@ test_that("Purge", {
     idf_env <- parse_idf_file(example(), 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_message(pu <- with_option(list(verbose_info = TRUE), purge_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "SimulationControl"))), "ignored")
+    expect_message(pu <- with_verbose(purge_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env, "SimulationControl"))), "ignored")
     expect_equal(pu$object, idf_env$object)
     expect_equal(pu$value, idf_env$value)
     expect_equal(pu$reference, idf_env$reference)
@@ -2058,7 +2096,7 @@ test_that("Unique", {
     idf_env <- parse_idf_file(example(), 8.8)
     idd_env <- get_priv_env(use_idd(8.8))$idd_env()
 
-    expect_message(with_option(list(verbose_info = TRUE), unique_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))), "Skip")
+    expect_message(with_verbose(unique_idf_object(idd_env, idf_env, get_idf_object(idd_env, idf_env))), "Skip")
 
     # change references from the original ones to duplicated ones
     ori_obj <- get_idf_object(idd_env, idf_env, "Material:NoMass")
@@ -2071,7 +2109,7 @@ test_that("Unique", {
     l$reference[ref, on = c("src_value_id" = "value_id"),
         `:=`(src_object_id = i.new_object_id, src_value_id = i.new_value_id)]
 
-    expect_message(l <- with_option(list(verbose_info = TRUE), unique_idf_object(idd_env, l, get_idf_object(idd_env, l))),
+    expect_message(l <- with_verbose(unique_idf_object(idd_env, l, get_idf_object(idd_env, l))),
         "have been removed"
     )
     expect_equivalent(l$object, idf_env$object)
@@ -2195,7 +2233,7 @@ test_that("Remove", {
             `:=`(object_name = stri_sub(object_name, to = -3))][
             field_index == 1L, value_chr := stri_sub(value_chr, to = -3)]
     ))
-    expect_message(with_option(list(verbose_info = TRUE), rev <- remove_duplicated_objects(idd_env, idf_env, l$object, l$value)), "removed")
+    expect_message(with_verbose(rev <- remove_duplicated_objects(idd_env, idf_env, l$object, l$value)), "removed")
     expect_equal(rev$object$class_name, "Site:WeatherStation")
     expect_equal(nrow(rev$value), 4L)
 })
@@ -2405,8 +2443,8 @@ test_that("Save", {
         )
     )
     expect_message(
-        with_option(list(verbose_info = TRUE),
-            save_idf(idd_env, idf_env, idf_env$object[, list(object_id, object_order = 0)],
+        with_verbose(save_idf(idd_env, idf_env,
+            idf_env$object[, list(object_id, object_order = 0)],
             f, format = "sorted", overwrite = TRUE
         )),
         "Replace the existing"
@@ -2480,8 +2518,26 @@ test_that("utilities", {
     expect_equal(assign_new_id(idf_env, val, "value", keep = TRUE)$value_id, c(349:350, 1:2, 351:354))
     expect_equal(assign_new_id(idf_env, val, "value", keep = FALSE)$value_id, 349:356)
 
-    expect_is(def <- with_option(list(view_in_ip = TRUE), assign_idf_value_default(idd_env, idf_env, l$value[, `:=`(value_chr = NA_character_, value_num = NA_real_)])), "data.table")
+    expect_is(class = "data.table",
+        def <- with_option(
+            list(view_in_ip = TRUE),
+            assign_idf_value_default(idd_env, idf_env,
+                l$value[, `:=`(value_chr = NA_character_, value_num = NA_real_)]
+            )
+        )
+    )
     expect_true(all(!is.na(def$value_chr)))
     expect_equal(sum(!is.na(def$value_num)), 5)
+
+    id_ref <- get_idf_value(idd_env, idf_env, "Construction", field = 2)$value_id
+    idf_env$value[J(id_ref), on = "value_id", value_chr := tolower(value_chr)]
+    id_choice <- get_idf_value(idd_env, idf_env, "Material", field = "Roughness")$value_id
+    idf_env$value[J(id_choice), on = "value_id", value_chr := tolower(value_chr)]
+
+    val <- get_idf_value(idd_env, idf_env, "Construction", field = 2, property = "type_enum")
+    expect_equal(standardize_idf_value(idd_env, idf_env, val)$value_chr, c("R13LAYER", "C5 - 4 IN HW CONCRETE", "R31LAYER"))
+
+    val <- get_idf_value(idd_env, idf_env, "Material", field = 2)
+    expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "choice")$value_chr, "MediumRough")
 })
 # }}}

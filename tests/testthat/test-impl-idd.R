@@ -14,6 +14,12 @@ test_that("IDD implementation", {
     expect_equivalent(get_idd_class(idd_parsed),
         idd_parsed$class[, .SD, .SDcols = c("class_id", "class_name", "group_id")]
     )
+    expect_equivalent(d <- get_idd_class(idd_parsed, property = c("group_name", "group_id"))[],
+        data.table(
+            class_id = 1:2, class_name = c("TestSimple", "TestSlash"),
+            group_id = 1:2, group_name = c("TestGroup1", "TestGroup2")
+        )
+    )
     expect_equivalent(get_idd_class(idd_parsed, property = "group_name"),
         set(idd_parsed$class[, .SD, .SDcols = c("class_id", "class_name", "group_id")],
             NULL, "group_name", c("TestGroup1", "TestGroup2")
@@ -68,6 +74,13 @@ test_that("IDD implementation", {
 
     # EXTENSIBLE GROUP {{{
     # ADD {{{
+    expect_equal(
+        {
+            cls <- get_idd_class(idd_parsed, "TestSimple", property = c("min_fields", "num_fields", "num_extensible", "last_required", "num_extensible_group"))
+            add_idd_extensible_group(idd_parsed, cls, 1)$field
+        },
+        idd_parsed$field
+    )
     expect_equal(add_idd_extensible_group(idd_parsed, "TestSimple", 1)$field, idd_parsed$field)
     expect_error(add_idd_extensible_group(idd_parsed, "TestSimple", 1, strict = TRUE), "Non-extensible class", class = "eplusr_error_non_extensible_class")
     expect_equal(nrow(idd_added <- add_idd_extensible_group(idd_parsed, "TestSlash", 2)$field), 13L)
@@ -236,6 +249,8 @@ test_that("IDD implementation", {
         )
     )
     expect_equal(nrow(get_idd_field(idd_parsed, 2L, "test_numeric_field_3", all = TRUE)), 8L)
+
+    expect_equal(get_idd_field(idd_parsed, 2, "test_numeric_field_2", all = TRUE)$field_index, 1:4)
     # }}}
     # }}}
 
@@ -291,6 +306,8 @@ test_that("IDD implementation", {
             class_ref = "none", group = "Node-Branch Management", depth = 0L)), 7L)
     expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, direction = "ref_to",
             class_ref = "all", group = "Node-Branch Management", depth = 0L)), 14L)
+
+    expect_equal(nrow(get_idd_relation(idd_env, field_id = fld$field_id, class = "Version")), 0L)
     # }}}
 
     # PROPERTY COLUMNS {{{

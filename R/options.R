@@ -43,7 +43,7 @@ NULL
 #'   IP-units support in eplusr is not fully tested.
 #'
 #' * `save_format`: The default format to use when saving Idf objects to `.idf` files.
-#'   Possible values: `"asis"`, `"sorted"`, `"new_top"` and `"new_bottom"`.
+#'   Possible values: `"asis"`, `"sorted"`, `"new_top"` and `"new_bot"`.
 #'   The later three have the same effect as `Save Options` settings
 #'   `"Sorted"`, `"Original with New at Top"` and `"Original with New at
 #'   Bottom"` in IDF Editor, respectively. For `"asis"`, the saving format
@@ -154,6 +154,8 @@ eplusr_option <- function (...) {
 #'
 #' `with_silent` evaluates an expression with no verbose messages.
 #'
+#' `with_verbose` evaluates an expression with verbose messages.
+#'
 #' `without_checking` evaluates an expression with no checkings.
 #'
 #' `with_speed` evaluates an expression with no checkings and autocompletion
@@ -196,6 +198,14 @@ with_option <- function (opts, expr) {
 # with_silent {{{
 with_silent <- function (expr) {
     with_option(list(verbose_info = FALSE), expr)
+}
+# }}}
+
+#' @name with_option
+#' @export
+# with_verbose {{{
+with_verbose <- function (expr) {
+    with_option(list(verbose_info = TRUE), expr)
 }
 # }}}
 

@@ -38,9 +38,9 @@
   useful when doing model cleaning (#227).
 * Now if `class` is set to `NULL` in `Idf$definition()`, the underlying `Idd`
   object is returned (#237).
-* Internal helper functions `with_option()`, `with_silent()`, `with_speed()`
-  and `without_checking()` have been exported. They can be used to evaluate an
-  expression with temporary eplusr options (#240).
+* Internal helper functions `with_option()`, `with_silent()`, `with_verbose()`,
+  `with_speed()` and `without_checking()` have been exported. They can be used
+  to evaluate an expression with temporary eplusr options (#240).
 * Now `Idf$insert()` can directly take an `Idf` object or a list of `Idf`
   objects as input. And also `Version` objects in input will be directly
   skipped instead of giving an error (#245).
@@ -157,6 +157,7 @@
   PERIODS` and `GROUND TEMPERATURES` headers. Thanks @lukas-rokka for the
   bug report (#263).
 * Fix output directory creation error in `EplusGroupJob`(#270).
+* Fix IDF header option parsing (#278).
 
 # eplusr 0.12.0
 
