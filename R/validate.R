@@ -199,7 +199,7 @@ level_checks <- function (level = eplusr_option("validate_level")) {
             reference = level$reference
         )
     } else {
-        stop("'level' must be a string or a list")
+        abort("'level' must be a string or a list")
     }
 }
 # }}}

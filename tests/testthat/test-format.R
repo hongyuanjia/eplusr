@@ -1,6 +1,6 @@
 context("Format methods")
 
-test_that("Idd formatting", {
+test_that("Formatting", {
     # only test on UTF-8 supported platform
     skip_if_not(cli::is_utf8_output())
 
@@ -168,6 +168,7 @@ test_that("Idd formatting", {
     )
 
     # Relation
+    expect_equal(format_idd_relation(data.table()), data.table(class_id = integer(), fmt = list()))
     expect_equal(
         format_idd_relation(get_idd_relation(idd_parsed, direction = "ref_by", name = TRUE), "ref_by")$fmt,
         c("Class: <TestSimple>",
@@ -188,8 +189,47 @@ test_that("Idd formatting", {
           ""
         )
     )
+    if (!is_avail_eplus(8.8)) install_eplus(8.8)
+    expect_is(idd88 <- parse_idd_file(file.path(eplus_config(8.8)$dir, "Energy+.idd")), "list")
+    expect_equal(format_idd_relation(get_idd_relation(idd88, NULL, 21590, name = TRUE, class_ref = "all")[1:2])$fmt,
+        c("Class: <AirLoopHVAC:OutdoorAirSystem:EquipmentList>",
+          "└─ Field: <2: Component 1 Object Type>",
+          "   p~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+          "   ├─ Class: <Fan:ConstantVolume>",
+          "   │  └─ Field: <1: Name>",
+          "   │  ",
+          "   └─ Class: <Fan:VariableVolume>",
+          "      └─ Field: <1: Name>",
+          "      "
+        )
+    )
+
+    expect_is(pos <- format_possible(get_iddobj_possible(idd88, 3)), "IddFieldPossible")
+    expect_equal(pos$fmt_auto,
+        c("* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
+          "* Auto value: <NA>", "* Auto value: <NA>", "* Auto value: <NA>",
+          "* Auto value: <NA>", "* Auto value: <NA>")
+    )
+    expect_equal(pos$fmt_default,
+        c("* Default: \"NONE\"", "* Default: 0", "* Default: \"Suburbs\"",
+          "* Default: 0.04", "* Default: 0.4", "* Default: \"FullExterior\"",
+          "* Default: 25", "* Default: 6")
+    )
+    expect_equal(pos$fmt_choice,
+        c("* Choice: <NA>",
+          "* Choice: <NA>",
+          "* Choice:\n  - \"Country\"\n  - \"Suburbs\"\n  - \"City\"\n  - \"Ocean\"\n  - \"Urban\"",
+          "* Choice: <NA>",
+          "* Choice: <NA>",
+          "* Choice:\n  - \"MinimalShadowing\"\n  - \"FullExterior\"\n  - \"FullInteriorAndExterior\"\n  - \"FullExteriorWithReflections\"\n  - \"FullInteriorAndExteriorWithReflections\"",
+          "* Choice: <NA>",
+          "* Choice: <NA>")
+    )
     # }}}
     # IDF {{{
+    expect_warning(format_header(special_format = TRUE))
+    expect_equal(format_header(view_in_ip = TRUE)[2], "!-Option SortedOrder ViewInIPunits")
+
     idd_parsed <- get_priv_env(use_idd(8.8, "auto"))$m_idd_env
     idf_parsed <- parse_idf_file(text("idf", "8.8"))
     add_joined_cols(idd_parsed$field, idf_parsed$value, "field_id", c("field_index", "type_enum", "units", "ip_units"))
@@ -441,5 +481,13 @@ test_that("Idd formatting", {
                 "    0.78;                    !- Visible Absorptance")
         )
     )
+
+    expect_is(pos <- format_possible(get_idfobj_possible(idd_parsed, idf_parsed, 2, 2)), "IdfValuePossible")
+    expect_equal(pos$fmt_auto, "* Auto value: <NA>")
+    expect_equal(pos$fmt_default, "* Default: <NA>")
+    expect_equal(pos$fmt_choice, "* Choice: <NA>")
+    expect_equal(pos$fmt_source, "* Source: \n  - \"WD01\"\n  - \"WD02\"")
+
+    expect_equal(format_comment(data.table(comment = list("a", NULL))), c("!a", NA))
     # }}}
 })

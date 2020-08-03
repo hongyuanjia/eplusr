@@ -43,7 +43,7 @@ NULL
 #'   IP-units support in eplusr is not fully tested.
 #'
 #' * `save_format`: The default format to use when saving Idf objects to `.idf` files.
-#'   Possible values: `"asis"`, `"sorted"`, `"new_top"` and `"new_bottom"`.
+#'   Possible values: `"asis"`, `"sorted"`, `"new_top"` and `"new_bot"`.
 #'   The later three have the same effect as `Save Options` settings
 #'   `"Sorted"`, `"Original with New at Top"` and `"Original with New at
 #'   Bottom"` in IDF Editor, respectively. For `"asis"`, the saving format

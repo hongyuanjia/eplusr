@@ -2008,6 +2008,45 @@ test_that("Del", {
     expect_equal(setdiff(idf_env$object$object_id, del$object$object_id), c(14:17, 21:26))
     expect_equal(del$changed, c(21:26, 14:17))
     expect_equal(del$updated, integer())
+
+    expect_message({
+        obj <- get_idf_object(idd_env, idf_env, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, idf_env, obj, ref_by = TRUE))
+    }, "Skipping")
+
+    expect_message({
+        env <- list2env(idf_env)
+        l <- expand_idf_dots_value(idd_env, env, Construction = list("Const", "R13LAYER"))
+        add <- add_idf_object(idd_env, env, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_by = TRUE))
+    }, "Including")
+
+    expect_message({
+        env <- list2env(idf_env)
+        l <- expand_idf_dots_value(idd_env, env, Construction = list("Const", "R13LAYER"))
+        add <- add_idf_object(idd_env, env, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "R13LAYER")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_by = TRUE, force = TRUE))
+    }, "Including")
+
+    expect_message({
+        obj <- expand_idf_dots_name(idd_env, env, mat = "R13LAYER")
+        dup <- list2env(dup_idf_object(idd_env, idf_env, obj, "final"))
+        l <- expand_idf_dots_value(idd_env, dup, Construction = list("Const", "mat"))
+        add <- add_idf_object(idd_env, dup, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "Const")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_to = TRUE))
+    }, "Including")
+
+    expect_message({
+        obj <- expand_idf_dots_name(idd_env, env, mat = "R13LAYER")
+        dup <- list2env(dup_idf_object(idd_env, env, obj, "final"))
+        l <- expand_idf_dots_value(idd_env, dup, Construction = list("Const", "mat"))
+        add <- add_idf_object(idd_env, dup, l$object, l$value, level = "final")
+        obj <- get_idf_object(idd_env, add, object = "Const")
+        with_verbose(del_idf_object(idd_env, add, obj, ref_to = TRUE, force = TRUE))
+    }, "Including")
 })
 # }}}
 
@@ -2489,5 +2528,16 @@ test_that("utilities", {
     )
     expect_true(all(!is.na(def$value_chr)))
     expect_equal(sum(!is.na(def$value_num)), 5)
+
+    id_ref <- get_idf_value(idd_env, idf_env, "Construction", field = 2)$value_id
+    idf_env$value[J(id_ref), on = "value_id", value_chr := tolower(value_chr)]
+    id_choice <- get_idf_value(idd_env, idf_env, "Material", field = "Roughness")$value_id
+    idf_env$value[J(id_choice), on = "value_id", value_chr := tolower(value_chr)]
+
+    val <- get_idf_value(idd_env, idf_env, "Construction", field = 2, property = "type_enum")
+    expect_equal(standardize_idf_value(idd_env, idf_env, val)$value_chr, c("R13LAYER", "C5 - 4 IN HW CONCRETE", "R31LAYER"))
+
+    val <- get_idf_value(idd_env, idf_env, "Material", field = 2)
+    expect_equal(standardize_idf_value(idd_env, idf_env, val, type = "choice")$value_chr, "MediumRough")
 })
 # }}}

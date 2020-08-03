@@ -1,3 +1,5 @@
+context("Run simulation")
+
 test_that("clean_wd()", {
     expect_true(file.create(f <- tempfile()))
     expect_true({clean_wd(f); file.exists(f)})
@@ -10,6 +12,15 @@ test_that("clean_wd()", {
     expect_true(file.create(f <- file.path(tempdir(), "in.idf")))
     expect_silent({clean_wd(f); file.exists(f)})
     unlink(f)
+})
+
+test_that("utilities", {
+    .globals$eplus$"8.1.0"$version <- numeric_version("8.1.0")
+    .globals$eplus$"8.1.0"$dir <- tempdir()
+    .globals$eplus$"8.1.0"$exe <- "energyplus"
+    get(".globals", envir = asNamespace("eplusr"))$eplus
+    expect_error(eplus_exe(8.1), class = "eplusr_error_eplus_ver_not_supported")
+    .globals$eplus$"8.1.0" <- NULL
 })
 
 test_that("run_idf()", {
@@ -150,4 +161,6 @@ test_that("run_multi()", {
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
     checkmate::expect_list(res$stderr, "character")
+    expect_is(get_run_time(res$stdout[[1]]), "Period")
+    expect_null(get_run_time("a"))
 })

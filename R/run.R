@@ -395,34 +395,6 @@ run_multi <- function (model, weather, output_dir, design_day = FALSE,
 }
 # }}}
 
-# proc_print {{{
-# reference: https://github.com/rstudio/blogdown/blob/master/R/serve.R
-proc_print <- function(p, control = c(TRUE, TRUE)) {
-    if (!p$is_alive()) {
-        # We might still have output
-        while (p$is_incomplete_output() || p$is_incomplete_error()) {
-            p$poll_io(-1)
-            out <- p$read_output_lines(2000)
-            err <- p$read_error_lines(2000)
-            if (length(out)) cli::cat_line(out, file = stdout(), col = "green")
-            if (length(err)) cli::cat_line(err, file = stdout(), col = "white", background_col = "red")
-        }
-        return(FALSE)
-    }
-
-    if (control[1]) {
-        out <- p$read_output_lines()
-        if (length(out)) cli::cat_line(out, file = stdout(), col = "green")
-    }
-
-    if (control[2]) {
-        err <- p$read_error_lines()
-        if (length(err)) cli::cat_line(err, file = stderr(), col = "white", background_col = "red")
-    }
-
-    TRUE
-}
-# }}}
 # run_parallel_jobs {{{
 # reference: https://github.com/r-lib/revdepcheck/blob/master/R/event-loop.R
 run_parallel_jobs <- function(jobs, options) {
@@ -853,7 +825,9 @@ eplus_run_wait <- function (proc, echo = TRUE) {
 # eplus_exe {{{
 eplus_exe <- function (eplus) {
     if (!is_avail_eplus(eplus)) use_eplus(eplus)
-    config <- tryCatch(eplus_config(eplus), miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config"))
+    config <- tryCatch(eplus_config(eplus),
+        eplusr_warning_miss_eplus_config = function (w) abort(conditionMessage(w), "miss_eplus_config")
+    )
 
     if (config$version < 8.3) {
         abort(paste0("Currently, eplusr only supports running IDFs of EnergyPlus v8.3 and above. ",
@@ -892,6 +866,6 @@ get_run_time <- function (stdout) {
     last <- stdout[length(stdout)]
 
     period <- lubridate::hms(last, quiet = TRUE)
-    if (is.na(period)) NULL else period
+    if (is.null(period) || is.na(period)) NULL else period
 }
 # }}}

@@ -14,6 +14,10 @@ test_that("Parametric methods", {
 
     priv <- get_priv_env(param)
 
+    expect_equal(param$version(), numeric_version("8.8.0"))
+    expect_output(param$print())
+    expect_null(param_job(example$idf, NULL)$weather())
+
     # Seed and Weather {{{
     expect_is(param$seed(), "Idf")
     expect_is(param$weather(), "Epw")
@@ -252,6 +256,7 @@ test_that("Parametric methods", {
     # }}}
 
     # S3 {{{
+    expect_false(param == 1)
     expect_true(param == param)
     expect_false(param != param)
     # }}}

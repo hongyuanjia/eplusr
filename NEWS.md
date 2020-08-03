@@ -157,6 +157,7 @@
   PERIODS` and `GROUND TEMPERATURES` headers. Thanks @lukas-rokka for the
   bug report (#263).
 * Fix output directory creation error in `EplusGroupJob`(#270).
+* Fix IDF header option parsing (#278).
 
 # eplusr 0.12.0
 

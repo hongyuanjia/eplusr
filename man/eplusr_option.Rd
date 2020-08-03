@@ -32,7 +32,7 @@ components each level contains, see \code{\link[=level_checks]{level_checks()}}.
 \code{FALSE}. It is not recommended to set this option to \code{TRUE} as currently
 IP-units support in eplusr is not fully tested.
 \item \code{save_format}: The default format to use when saving Idf objects to \code{.idf} files.
-Possible values: \code{"asis"}, \code{"sorted"}, \code{"new_top"} and \code{"new_bottom"}.
+Possible values: \code{"asis"}, \code{"sorted"}, \code{"new_top"} and \code{"new_bot"}.
 The later three have the same effect as \verb{Save Options} settings
 \code{"Sorted"}, \code{"Original with New at Top"} and \code{"Original with New at Bottom"} in IDF Editor, respectively. For \code{"asis"}, the saving format
 will be set according to the header of IDF file. If no header found,
