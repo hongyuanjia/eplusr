@@ -161,6 +161,6 @@ test_that("run_multi()", {
     expect_equal(res$energyplus, rep(normalizePath(file.path(eplus_config(8.8)$dir, eplus_config(8.8)$exe), mustWork = TRUE), 2L))
     checkmate::expect_list(res$stdout, "character")
     checkmate::expect_list(res$stderr, "character")
-    expect_is(get_run_time(res$stdout[[1]]), "Period")
+    expect_null(get_run_time(NULL))
     expect_null(get_run_time("a"))
 })
