@@ -38,7 +38,6 @@ latex: true
 env:
   global:
     - MAKEFLAGS="-j 2"
-    - R_REMOTES_UPGRADE=false
 
 # Stages -----------------------------------------------------------------------
 
