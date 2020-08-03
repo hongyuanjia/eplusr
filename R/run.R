@@ -863,9 +863,10 @@ copy_run_files <- function (file, dir) {
 # }}}
 # get_run_time {{{
 get_run_time <- function (stdout) {
+    if (!length(stdout)) return(NULL)
     last <- stdout[length(stdout)]
 
     period <- lubridate::hms(last, quiet = TRUE)
-    if (is.null(period) || is.na(period)) NULL else period
+    if (is.na(period)) NULL else period
 }
 # }}}
