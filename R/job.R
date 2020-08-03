@@ -1254,9 +1254,16 @@ print_job_header <- function (title = "EnergyPlus Simulation Job", path_idf, pat
         eplus_ver <- surround(config$version)
     }
 
+    path_idf <- normalizePath(path_idf, mustWork = FALSE)
+    path_epw <- if (is.null(path_epw)) {
+        "<< Not specified >>"
+    } else {
+        normalizePath(path_epw, mustWork = FALSE)
+    }
+
     cli::cat_line(c(
-        str_trunc(paste0("* ", name_idf, ": ", surround(normalizePath(path_idf, mustWork = FALSE)))),
-        str_trunc(paste0("* ", name_epw, ": ", if (is.null(path_epw)) "<< Not specified >>" else surround(path_epw))),
+        str_trunc(paste0("* ", name_idf, ": ", surround(path_idf))),
+        str_trunc(paste0("* ", name_epw, ": ", surround(path_epw))),
         paste0("* EnergyPlus Version: ", eplus_ver),
         str_trunc(paste0("* EnergyPlus Path: ", path_eplus))
     ))

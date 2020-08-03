@@ -1632,6 +1632,8 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                     )
                 ]
 
+                set(cls_val, NULL, "each_rleid", NULL)
+
                 set(cls_val, NULL, c("field_id", "field_index", "field_name"),
                     set(cls_sgl, NULL, "rleid", NULL)
                 )
@@ -2347,6 +2349,8 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
                 # indicates it's a list
                 type <- 2L
 
+                if (!is.list(value)) value <- as.list(value)
+
                 # check if NULL
                 isnull <- vlapply(value, is.null)
 
@@ -2380,6 +2384,9 @@ expand_idf_dots_literal <- function (idd_env, idf_env, ..., .default = TRUE, .ex
         # match {{{
         # rename
         setnames(dt, c("id", "class", "index"), c("object_id", "class_name", "field_index"))
+        dt[, by = c("rleid", "object_id"), id := .GRP]
+        setorderv(dt, "id")
+        set(dt, NULL, "id", NULL)
 
         # in this case, object_rleid is the unique identifier
         set(dt, NULL, "object_rleid", rleid(dt$rleid, dt$class_name, dt$object_id))
