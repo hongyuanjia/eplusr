@@ -10,6 +10,10 @@ test_that("Sql methods", {
     expect_is(job <- read_idf(example$idf)$run(example$epw, NULL, echo = FALSE), "EplusJob")
     expect_silent(sql <- eplus_sql(job$locate_output(".sql")))
 
+    expect_output(sql$print())
+    expect_output(str(sql))
+    expect_is(format(sql), "character")
+
     # path
     expect_equal(sql$path(), normalizePath(file.path(tempdir(), "5Zone_Transformer.sql")))
     expect_equal(sql$path_idf(), normalizePath(file.path(tempdir(), "5Zone_Transformer.idf")))
@@ -52,15 +56,25 @@ test_that("Sql methods", {
           "schedule_name", "units", "value"
         )
     )
+    expect_error(sql$report_data(period = seq(1, 5, 1)), class = "eplusr_error")
+    expect_equal(nrow(sql$report_data(period = seq(
+        lubridate::ymd("2019-01-14"), lubridate::ymd("2019-01-15"), "1 day")
+    )), 1920)
     expect_equal(nrow(sql$report_data(period = seq(
         lubridate::ymd_hms("2019-01-14 0:0:0"), lubridate::ymd_hms("2019-01-15 0:0:0"), "15 min")
     )), 1900)
     expect_equal(nrow(sql$report_data(month = 1)), 1920)
+    expect_equal(nrow(sql$report_data(month = 1, day = 14:15)), 1920)
     expect_equal(nrow(sql$report_data(month = 1, hour = 1)), 80)
     expect_equal(nrow(sql$report_data(minute = 0)), 960)
     expect_equal(nrow(sql$report_data(interval = 15)), 3840)
     expect_equal(nrow(sql$report_data(simulation_days = 1)), 3840)
-    expect_equal(nrow(sql$report_data(day_type = "Tuesday")), 3840)
+    expect_error(sql$report_data(day_type = "what"), class = "eplusr_error")
+    expect_equal(nrow(sql$report_data(day_type = "weekday")), 3840)
+    expect_equal(nrow(sql$report_data(day_type = "weekend")), 0)
+    expect_equal(nrow(sql$report_data(day_type = "customday")), 0)
+    expect_equal(nrow(sql$report_data(day_type = "specialday")), 0)
+    expect_equal(nrow(sql$report_data(day_type = "tuesday")), 3840)
     expect_equal(nrow(sql$report_data(day_type = "normalday")), 3840)
     expect_equal(nrow(sql$report_data(day_type = "designday")), 0)
     expect_equal(nrow(sql$report_data(environment_name = "WINTERDAY")), 1920)

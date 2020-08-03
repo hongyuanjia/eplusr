@@ -544,6 +544,8 @@ test_that("$.IdfObject and [[.IdfObject", {
     expect_equal(mat[["Roughness"]], "MediumSmooth")
     expect_null(mat[["roughness"]])
     expect_error(mat[[1:2]])
+
+    expect_is(mat[["version"]], "function")
 })
 # }}}
 

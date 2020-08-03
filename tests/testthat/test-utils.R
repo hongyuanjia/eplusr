@@ -31,6 +31,9 @@ test_that("Utility functions", {
     expect_equal(read_lines(f), data.table(line = 1:4, string = c("a", "b", "c", "d")))
     expect_error(write_lines(1:3, f), "Must be of type 'character'")
 
+    expect_equal(read_lines(test_path("file/latin1"))$string[1], "N13, \\field Young’s modulus")
+    expect_equal(underscore_name(read_lines(test_path("file/latin1"), F)$string)[1], "N13_field_Young_s_modulus")
+
     expect_equal(standardize_ver("latest"), numeric_version("9.2.0"))
     expect_equal(standardize_ver("latest", strict = TRUE), numeric_version(NA, strict = FALSE))
     expect_equal(standardize_ver(c(1, 1.1)), numeric_version(c("1.0.0", "1.1.0")))
@@ -105,4 +108,7 @@ test_that("Utility functions", {
     expect_equal(match_in_vec("a", LETTERS, "aa"), 1L)
     expect_equal(match_in_vec("a", LETTERS, "aa", label = TRUE), "A")
     expect_equal(match_in_vec("aa", LETTERS, "aa", label = TRUE), "A")
+
+    expect_is(catch_cnd(warn("")), "eplusr_warning")
+    expect_is(catch_cnd(warn("", class = "empty")), "eplusr_warning_empty")
 })

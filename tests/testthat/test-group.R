@@ -167,6 +167,7 @@ test_that("Group methods", {
     # }}}
 
     # S3 {{{
+    expect_output(grp$print())
     expect_true(grp == grp)
     expect_false(grp != grp)
     # }}}

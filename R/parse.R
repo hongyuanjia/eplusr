@@ -144,7 +144,7 @@ parse_idd_file <- function(path, epw = FALSE) {
 
     # complete property columns
     dt_field <- complete_property(dt_field, "field", dt_class, epw = epw)
-    dt_class <- complete_property(dt_class, "class", dt_field)
+    dt_class <- complete_property(dt_class, "class", dt_field, epw = epw)
 
     # ConnectorList references are missing until v9.1
     # See https://github.com/NREL/EnergyPlus/issues/7172
@@ -746,7 +746,9 @@ complete_property <- function (dt, type, ref, epw = FALSE) {
     }
 
     # add missing property columns if necessary
-    for (key in unlist(keys, use.names = FALSE)) {
+    cols <- unlist(keys, use.names = FALSE)
+    if (!epw) cols <- setdiff(cols, c("missing", "exist-minimum", "exist-minimum>", "exist-maximum", "exist-maximum<"))
+    for (key in cols) {
         if (!has_names(dt, key)) set(dt, NULL, key, slash_init_value(key))
     }
 

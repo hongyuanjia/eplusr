@@ -163,7 +163,7 @@ idfsch_cmpt_init <- function (super, self, private, object, parent, new = FALSE)
     if (missing(parent) || !is_idf(parent)) {
         abort(paste("IdfScheduleCompact can only be created based a parent Idf object.",
                 "Please give `parent`, which should be an Idf object."),
-            "error_idfobject_missing_parent"
+            "idfobject_missing_parent"
         )
     } else {
         private$m_parent <- parent

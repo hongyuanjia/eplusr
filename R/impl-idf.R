@@ -870,7 +870,7 @@ standardize_idf_value <- function (idd_env, idf_env, dt_value, type = c("choice"
         }]
     }
 
-    if ("reference" %chin% type && any(i <- dt_value$type_enum == IDDFIELD_TYPE$object_list) && nrow(idf$reference)) {
+    if ("reference" %chin% type && any(i <- dt_value$type_enum == IDDFIELD_TYPE$object_list) && nrow(idf_env$reference)) {
         ref <- idf_env$reference[J(dt_value$value_id[i]), on = "value_id", nomatch = NULL]
         ref[idf_env$value, on = c("src_value_id" = "value_id"),
             `:=`(src_value_chr = i.value_chr, src_value_num = i.value_num)]
@@ -4386,9 +4386,6 @@ resolve_idf_external_link <- function (idd_env, idf_env, old, new, copy = TRUE) 
         to_copy <- unique(val$old_full_path)
         flag <- file.copy(to_copy, new_dir, copy.date = TRUE, overwrite = TRUE)
         if (any(!flag)) {
-            on.exit(options(warning.length = getOption("warning.length")), add = TRUE)
-            options(warning.length = 8170)
-
             invld <- val[J(to_copy[!flag]), on = c("old_full_path")]
             m <- paste0("  ", unlist(format_objects(invld, c("class", "object", "value"), brief = FALSE)$out), collapse = "\n")
 
