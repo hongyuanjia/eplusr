@@ -866,6 +866,6 @@ get_run_time <- function (stdout) {
     last <- stdout[length(stdout)]
 
     period <- lubridate::hms(last, quiet = TRUE)
-    if (is.na(period)) NULL else period
+    if (is.null(period) || is.na(period)) NULL else period
 }
 # }}}
