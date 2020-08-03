@@ -1383,7 +1383,7 @@ test_that("Transition v8.9 --> v9.0", {
         )
     )
 
-    expect_is(idfVU <- version_updater(idfOri, to, dir = "C:/Users/hongy/Desktop/"), "Idf")
+    expect_is(idfVU <- version_updater(idfOri, to), "Idf")
     expect_warning(idfTR <- transition(idfOri, to), "UseWeatherFile")
 
     expect_equal(
