@@ -558,10 +558,9 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
 # }}}
 # param_print {{{
 param_print <- function (self, private) {
-    path_epw <- if (is.null(private$m_epws)) NULL else vcapply(private$m_epws, function (epw) epw$path())
     print_job_header(title = "EnergPlus Parametric Simulation Job",
         path_idf = private$m_seed$path(),
-        path_epw = path_epw,
+        path_epw = private$m_epws_path,
         eplus_ver = private$m_seed$version(),
         name_idf = "Seed", name_epw = "Weather"
     )

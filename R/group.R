@@ -1342,15 +1342,19 @@ epgroup_print_status <- function (self, private, epw = TRUE) {
     epgroup_retrieve_data(self, private)
     status <- epgroup_status(self, private)
 
+    if (!is.null(names(private$m_idfs))) {
+        nm_idf <- paste0(names(private$m_idfs), ".idf")
+    } else {
+        nm_idf <- vcapply(private$m_idfs, function (x) basename(x$path()))
+    }
     if (!epw) {
         nm <- str_trunc(paste0(
-            "[", lpad(seq_along(private$m_idfs), 0), "]: ",
-            surround(vcapply(private$m_idfs, function (x) basename(x$path())))
+            "[", lpad(seq_along(private$m_idfs), 0), "]: ", surround(nm_idf)
         ))
     } else {
         nm_idf <- str_trunc(paste0(
             "[", lpad(seq_along(private$m_idfs), 0), "]: ",
-            paste0("[IDF] ", surround(vcapply(private$m_idfs, function (x) basename(x$path()))))
+            paste0("[IDF] ", surround(nm_idf))
         ))
 
         if (is.null(private$m_epws_path)) {
