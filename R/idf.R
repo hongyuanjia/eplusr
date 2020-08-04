@@ -3003,14 +3003,6 @@ idf_return_matched <- function (self, private, matched, object_id) {
     setattr(res, "names", matched$object_name)[]
 }
 # }}}
-# idf_update_idf_env {{{
-idf_update_idf_env <- function (self, private, lst) {
-    idf_env <- private$idf_env()
-    idf_env$object <- lst$object
-    idf_env$value <- lst$value
-    idf_env$reference <- lst$reference
-}
-# }}}
 # idf_dup {{{
 idf_dup <- function (self, private, ...) {
     obj <- expand_idf_dots_name(private$idd_env(), private$idf_env(), ...)

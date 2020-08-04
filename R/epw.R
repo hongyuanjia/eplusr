@@ -1836,7 +1836,7 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
@@ -1870,7 +1870,7 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
 
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
@@ -1901,7 +1901,7 @@ epw_del <- function (self, private, period) {
 
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
