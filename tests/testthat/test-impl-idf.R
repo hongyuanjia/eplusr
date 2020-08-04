@@ -1296,6 +1296,15 @@ test_that("VALUE DOTS", {
     )
     expect_equal(res$object$object_id, 27:28)
     expect_equal(res$value$field_index, rep(1:2, 2))
+    expect_is(class = "list",
+        res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
+            c(27, 28) := list(key_value = rep("*", 3), variable_name = NULL),
+            .scalar = FALSE, .pair = FALSE
+        )
+    )
+    expect_equal(res$object$object_id, 27:28)
+    expect_equal(res$value$field_index, rep(1:2, 2))
+    expect_equal(res$value$value_chr, list(rep("*", 3), NA_character_, rep("*", 3), NA_character_))
     ## c(Obj1, Obj2) := list(Fld1 = Val1, Fld2 = Val2), dup
     expect_is(class = "list",
         res <- expand_idf_dots_value(idd_env, idf_env, .type = "object", .complete = FALSE,
