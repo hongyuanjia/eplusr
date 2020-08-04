@@ -1806,25 +1806,20 @@ expand_idf_dots_value <- function (idd_env, idf_env, ...,
                 # after this, each_rleid is not needed
                 set(obj, NULL, "each_rleid", NULL)
 
-                if (.sgl) {
-                    # match field id
-                    obj_sgl <- obj_val[, by = "rleid", list(each_rleid = max(each_rleid), n = length(unique(each_rleid)))]
-                    obj_sgl <- match_idd_field(idd_env, obj_val[obj_sgl, on = c("rleid", "each_rleid")])
+                # match field id
+                obj_sgl <- obj_val[, by = "rleid", list(each_rleid = max(each_rleid), n = length(unique(each_rleid)))]
+                obj_sgl <- match_idd_field(idd_env, obj_val[obj_sgl, on = c("rleid", "each_rleid")])
 
-                    obj_sgl <- obj_sgl[, by = "rleid",
-                        list(field_id = rep(field_id, n[[1L]]),
-                             field_index = rep(field_index, n[[1L]]),
-                             field_name = rep(field_name, n[[1L]])
-                        )
-                    ]
-
-                    set(obj_val, NULL, c("field_id", "field_index", "field_name"),
-                        set(obj_sgl, NULL, "rleid", NULL)
+                obj_sgl <- obj_sgl[, by = "rleid",
+                    list(field_id = rep(field_id, n[[1L]]),
+                         field_index = rep(field_index, n[[1L]]),
+                         field_name = rep(field_name, n[[1L]])
                     )
-                } else {
-                    # match field id
-                    obj_val <- match_idd_field(idd_env, obj_val)
-                }
+                ]
+
+                set(obj_val, NULL, c("field_id", "field_index", "field_name"),
+                    set(obj_sgl, NULL, "rleid", NULL)
+                )
 
                 # assign default value if necessary
                 if (.default && .sgl) {
