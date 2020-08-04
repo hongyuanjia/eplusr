@@ -2688,17 +2688,28 @@ Idf <- R6::R6Class(classname = "Idf", lock_objects = FALSE,
         m_log = NULL,
         # }}}
 
-        idd_env = function () {
-            get_priv_env(private$m_idd)$m_idd_env
+        # PRIVATE FUNCTIONS {{{
+        uuid = function () private$m_log$uuid,
+        log_new_uuid = function () log_new_uuid(private$m_log),
+
+        log_saved = function () log_saved(private$m_log),
+        log_unsaved = function () log_unsaved(private$m_log),
+
+        log_new_order = function (id) log_new_order(private$m_log, id),
+        log_add_order = function (id) log_add_order(private$m_log, id),
+        log_del_order = function (id) log_del_order(private$m_log, id),
+
+        idd_env = function () get_priv_env(private$m_idd)$m_idd_env,
+        idf_env = function () private$m_idf_env,
+
+        update_idf_env = function (lst) {
+            private$m_idf_env$object <- lst$object
+            private$m_idf_env$value <- lst$value
+            private$m_idf_env$reference <- lst$reference
         },
 
-        idf_env = function () {
-            private$m_idf_env
-        },
-
-        deep_clone = function (name, value) {
-            idf_deep_clone(self, private, name, value)
-        }
+        deep_clone = function (name, value) idf_deep_clone(self, private, name, value)
+        # }}}
     )
 )
 
@@ -3006,11 +3017,11 @@ idf_dup <- function (self, private, ...) {
     dup <- dup_idf_object(private$idd_env(), private$idf_env(), obj)
 
     # log
-    log_new_order(private$m_log, dup$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_new_order(dup$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, dup)
+    private$update_idf_env(dup)
     idf_return_matched(self, private, dup$changed)
 }
 # }}}
@@ -3028,11 +3039,11 @@ idf_add <- function (self, private, ..., .default = TRUE, .all = FALSE, .env = p
     if (!length(add$changed)) return(invisible(NULL))
 
     # log
-    log_new_order(private$m_log, add$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_new_order(add$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, add)
+    private$update_idf_env(add)
     idf_return_matched(self, private, add$changed)
 }
 # }}}
@@ -3048,11 +3059,11 @@ idf_set <- function (self, private, ..., .default = TRUE, .empty = FALSE, .env =
         l$object, l$value, empty = .empty)
 
     # log
-    log_add_order(private$m_log, c(set$changed, set$updated))
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_add_order(c(set$changed, set$updated))
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, set)
+    private$update_idf_env(set)
     idf_return_matched(self, private, set$changed)
 }
 # }}}
@@ -3063,11 +3074,11 @@ idf_del <- function (self, private, ..., .ref_by = FALSE, .ref_to = FALSE, .recu
         ref_to = .ref_to, ref_by = .ref_by, recursive = .recursive, force = .force)
 
     # log
-    log_del_order(private$m_log, del$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_del_order(del$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, del)
+    private$update_idf_env(del)
 
     invisible(self)
 }
@@ -3080,11 +3091,11 @@ idf_purge <- function (self, private, object = NULL, class = NULL, group = NULL)
     if (!length(purge$changed)) return(invisible(self))
 
     # log
-    log_del_order(private$m_log, purge$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_del_order(purge$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, purge)
+    private$update_idf_env(purge)
 
     invisible(self)
 }
@@ -3104,11 +3115,11 @@ idf_unique <- function (self, private, object = NULL, class = NULL, group = NULL
     if (!length(uni$changed)) return(invisible(self))
 
     # log
-    log_del_order(private$m_log, uni$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_del_order(uni$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, uni)
+    private$update_idf_env(uni)
 
     invisible(self)
 }
@@ -3119,11 +3130,11 @@ idf_rename <- function (self, private, ...) {
     ren <- rename_idf_object(private$idd_env(), private$idf_env(), obj)
 
     # log
-    log_add_order(private$m_log, c(ren$changed, ren$updated))
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_add_order(c(ren$changed, ren$updated))
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, ren)
+    private$update_idf_env(ren)
     idf_return_matched(self, private, ren$changed)
 }
 # }}}
@@ -3154,11 +3165,11 @@ idf_insert <- function (self, private, ..., .unique = TRUE, .empty = FALSE) {
     if (!length(ins$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, ins$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_new_order(ins$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, ins)
+    private$update_idf_env(ins)
     idf_return_matched(self, private, ins$changed)
 }
 # }}}
@@ -3191,11 +3202,11 @@ idf_replace_value <- function (self, private, pattern, replacement, class = NULL
     rep <- set_idf_object(private$idd_env(), private$idf_env(), l$object, l$value, empty = FALSE)
 
     # log
-    log_add_order(private$m_log, c(rep$changed, rep$updated))
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_add_order(c(rep$changed, rep$updated))
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, rep)
+    private$update_idf_env(rep)
     idf_return_matched(self, private, rep$changed)
 }
 # }}}
@@ -3211,11 +3222,11 @@ idf_paste <- function (self, private, in_ip = FALSE, ver = NULL, unique = TRUE, 
     if (!length(pst$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, pst$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_new_order(pst$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, pst)
+    private$update_idf_env(pst)
     idf_return_matched(self, private, pst$changed)
 }
 # }}}
@@ -3231,11 +3242,11 @@ idf_load <- function (self, private, ..., .unique = TRUE, .default = TRUE, .empt
     if (!length(ld$changed)) return(invisible())
 
     # log
-    log_new_order(private$m_log, ld$changed)
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_new_order(ld$changed)
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, ld)
+    private$update_idf_env(ld)
     idf_return_matched(self, private, ld$changed)
 }
 # }}}
@@ -3249,11 +3260,11 @@ idf_update <- function (self, private, ..., .default = TRUE, .empty = FALSE) {
         l$object, l$value, empty = .empty)
 
     # log
-    log_add_order(private$m_log, c(upd$changed, upd$updated))
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_add_order(c(upd$changed, upd$updated))
+    private$log_unsaved()
+    private$log_new_uuid()
 
-    idf_update_idf_env(self, private, upd)
+    private$update_idf_env(upd)
     idf_return_matched(self, private, upd$changed)
 }
 # }}}
@@ -3306,11 +3317,11 @@ idf_save <- function (self, private, path = NULL, format = eplusr_option("save_f
         overwrite = overwrite, copy_external = copy_external, oldpath = oldpath)
 
     # if values are updated, assign new uuid
-    if (attr(path, "path_updated")) log_new_uuid(private$m_log)
+    if (attr(path, "path_updated")) private$log_new_uuid()
     attr(path, "path_updated") <- NULL
 
     # log saved
-    log_saved(private$m_log)
+    private$log_saved()
 
     # change path
     private$m_path <- normalizePath(path)
@@ -3325,7 +3336,7 @@ idf_run <- function (self, private, epw, dir = NULL, wait = TRUE,
     if (!inherits(old, "EplusJob")) {
         private$m_log$job <- EplusJob$new(self, epw)
     # recreate job if the model has been changed since last ran
-    } else if (private$m_log$uuid != get_priv_env(private$m_log$job)$m_log$seed_uuid) {
+    } else if (private$uuid() != get_priv_env(private$m_log$job)$cached_seed_uuid()) {
         private$m_log$job <- EplusJob$new(self, epw)
     }
 
@@ -3681,10 +3692,10 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
         l <- add_idf_object(private$idd_env(), private$idf_env(), l$object, l$value,
             default = TRUE, unique = FALSE, empty = FALSE, level = chk
         )
-        idf_update_idf_env(self, private, l)
-        log_new_order(private$m_log, l$changed)
-        log_unsaved(private$m_log)
-        log_new_uuid(private$m_log)
+        private$update_idf_env(l)
+        private$log_new_order(l$changed)
+        private$log_unsaved()
+        private$log_new_uuid()
 
         # delete original objects
         if (exist) {
@@ -3695,7 +3706,7 @@ replace_objects_in_class <- function (self, private, class, value, unique_object
     } else if (checkmate::test_list(value, "IdfObject", any.missing = FALSE)) {
         # check if input is from the same model
         # get uuid if idf
-        uuid_main <- private$m_log$uuid
+        uuid_main <- private$uuid()
 
         # get uuids of input
         uuid_in <- vcapply(value, function (obj) .subset2(.subset2(get_priv_env(obj), "log_env")(), "uuid"))
@@ -3879,7 +3890,7 @@ str.Idf <- function (object, zoom = "class", ...) {
 # ==.Idf {{{
 `==.Idf` <- function (e1, e2) {
     if (!is_idf(e2)) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 # }}}
 

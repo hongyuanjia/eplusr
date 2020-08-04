@@ -1400,17 +1400,11 @@ IdfObject <- R6::R6Class(classname = "IdfObject", lock_objects = FALSE,
         m_class_id = NULL,
         # }}}
 
-        idf_env = function () {
-            get_priv_env(private$m_parent)$m_idf_env
-        },
-
-        idd_env = function () {
-            get_priv_env(private$m_parent)$idd_env()
-        },
-
-        log_env = function () {
-            get_priv_env(private$m_parent)$m_log
-        }
+        # PRIVATE FUNCTIONS {{{
+        idf_env = function () get_priv_env(private$m_parent)$idf_env(),
+        idd_env = function () get_priv_env(private$m_parent)$idd_env(),
+        log_env = function () get_priv_env(private$m_parent)$m_log
+        # }}}
     )
 )
 # }}}

@@ -57,13 +57,12 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_idfs <- input$idfs
             private$m_epws_path <- input$epws
             # log if the input idf has been changed
-            private$m_log <- new.env(parent = emptyenv())
+            private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
-            private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
-
-            private$m_log$uuid <- unique_id()
+            private$log_idf_uuid()
+            private$log_new_uuid()
         },
         # }}}
 
@@ -741,7 +740,19 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
         m_idfs = NULL,
         m_epws_path = NULL,
         m_job = NULL,
-        m_log = NULL
+        m_log = NULL,
+        # }}}
+        # PRIVATE FUNCTIONS {{{
+        uuid = function () private$m_log$uuid,
+        log_new_uuid = function () log_new_uuid(private$m_log),
+
+        idf_uuid = function () vcapply(private$m_idfs, function (idf) get_priv_env(idf)$uuid()),
+        log_idf_uuid = function () private$m_log$idf_uuid <- private$idf_uuid(),
+        cached_idf_uuid = function () private$m_log$idf_uuid,
+
+        is_unsaved = function () private$m_log$unsaved,
+        log_saved = function (which = NULL) log_saved(private$m_log, which),
+        log_unsaved = function (which = NULL) log_unsaved(private$m_log, which)
         # }}}
     )
 )
@@ -790,18 +801,17 @@ group_job <- function (idfs, epws) {
 # epgroup_run {{{
 epgroup_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FALSE, copy_external = FALSE, echo = wait) {
     # check if generated models have been modified outside
-    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
-    if (any(uuid != private$m_log$idf_uuid)) {
+    uuid <- private$idf_uuid()
+    if (any(i <- uuid != private$cached_idf_uuid())) {
         warn(paste0(
             "Some of the grouped models have been modified. ",
             "Running these models will result in simulation outputs that may be not reproducible. ",
-            paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
-                names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
-            )
+            paste0(" # ", seq_along(uuid)[i], " | ", names(uuid)[i], collapse = "\n")
         ), "group_model_modified")
+        private$log_unsaved(which(i))
     }
 
-    log_new_uuid(private$m_log)
+    private$log_new_uuid()
 
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
 }
@@ -861,22 +871,22 @@ epgroup_run_models <- function (self, private, output_dir = NULL, wait = TRUE, f
                     "Parent R Process PID: ", pid, ") and restart...")
                 suppressMessages(self$kill())
             } else {
-                stop("Current parametric simulations are still running (Parent R Process PID: ",
+                abort(paste0("Current parametric simulations are still running (Parent R Process PID: ",
                     pid, "). Please set `force` to TRUE if you want ",
-                    "to kill the running process and restart.",
-                    call. = FALSE)
+                    "to kill the running process and restart."))
             }
         }
     }
 
     path_group <- normalizePath(file.path(output_dir, tools::file_path_sans_ext(nms), nms), mustWork = FALSE)
 
-    if (any(to_save <- path_group != path_idf | private$m_log$unsaved)) {
+    if (any(to_save <- path_group != path_idf | private$is_unsaved())) {
         # remove duplications
         dup <- duplicated(path_group)
         apply2(private$m_idfs[to_save & !dup], path_group[to_save & !dup],
             function (x, y) x$save(y, overwrite = TRUE, copy_external = copy_external)
         )
+        private$log_saved(which(to_save))
     }
 
     # reset status
@@ -969,13 +979,13 @@ epgroup_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
-    if (any(private$m_log$idf_uuid != uuid)) {
+    uuid <- private$idf_uuid()
+    if (any(private$cached_idf_uuid() != uuid)) {
         status$changed_after <- TRUE
     }
 
     # for parametric job
-    if (is_idf(private$m_seed) && !identical(private$m_log$seed_uuid, get_priv_env(private$m_seed)$m_log$uuid)) {
+    if (is_idf(private$m_seed) && !identical(private$seed_uuid(), get_priv_env(private$m_seed)$uuid())) {
         status$changed_after <- TRUE
     }
 
@@ -1471,7 +1481,7 @@ format.EplusGroupJob <- function (x, ...) {
 #' @export
 `==.EplusGroupJob` <- function (e1, e2) {
     if (!inherits(e2, "EplusGroupJob")) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export

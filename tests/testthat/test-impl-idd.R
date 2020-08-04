@@ -1,4 +1,6 @@
-test_that("IDD implementation", {
+context("Idd Implementation")
+
+test_that("Idd implementation", {
     expect_silent(idd_parsed <- parse_idd_file(text("idd", "9.9.9")))
 
     # GROUP {{{

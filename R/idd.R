@@ -689,13 +689,13 @@ Idd <- R6::R6Class(classname = "Idd", cloneable = FALSE, lock_objects = FALSE,
         m_log = NULL,
         # }}}
 
-        idd_env = function () {
-            private$m_idd_env
-        },
+        # PRIVATE FUNCTIONS {{{
+        uuid = function () private$m_log$uuid,
+        log_new_uuid = function () log_new_uuid(private$m_log),
 
-        log_env = function () {
-            private$m_log
-        }
+        idd_env = function () private$m_idd_env,
+        log_env = function () private$m_log
+        # }}}
     )
 )
 # }}}
@@ -971,7 +971,7 @@ format.Idd <- function (x, ...) {
 # ==.Idd {{{
 `==.Idd` <- function (e1, e2) {
     if (!is_idd(e2)) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 # }}}
 
