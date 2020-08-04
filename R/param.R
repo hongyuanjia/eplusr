@@ -59,6 +59,7 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             private$m_seed <- idf
 
             # log if the input idf has been changed
+            private$m_log <- new.env(parent = emptyenv())
             private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
 
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)

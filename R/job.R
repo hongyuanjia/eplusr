@@ -774,6 +774,7 @@ job_initialize <- function (self, private, idf, epw) {
     if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
 
     # log if the input idf has been changed
+    private$m_log <- new.env(parent = emptyenv())
     private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
 
     # save uuid

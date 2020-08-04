@@ -57,6 +57,7 @@ EplusGroupJob <- R6::R6Class(classname = "EplusGroupJob", cloneable = FALSE,
             private$m_idfs <- input$idfs
             private$m_epws_path <- input$epws
             # log if the input idf has been changed
+            private$m_log <- new.env(parent = emptyenv())
             private$m_log$unsaved <- input$sql | input$dict
 
             # save uuid
