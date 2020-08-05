@@ -130,13 +130,23 @@ log_del_order <- function (log, id) {
 }
 # }}}
 # log_unsaved {{{
-log_unsaved <- function (log) {
-    log$unsaved <- TRUE
+log_unsaved <- function (log, which = NULL) {
+    if (is.null(which)) {
+        which <- seq_along(log$unsaved)
+    } else {
+        assert_integerish(which, lower = 1L, upper = length(log$unsaved))
+    }
+    log$unsaved[which] <- TRUE
 }
 # }}}
 # log_saved {{{
-log_saved <- function (log) {
-    log$unsaved <- FALSE
+log_saved <- function (log, which = NULL) {
+    if (is.null(which)) {
+        which <- seq_along(log$unsaved)
+    } else {
+        assert_integerish(which, lower = 1L, upper = length(log$unsaved))
+    }
+    log$unsaved[which] <- FALSE
 }
 # }}}
 

@@ -1981,7 +1981,7 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
     # extract Idf meta
     extract_idf <- function (x) {
         list(version = get_priv_env(x)$m_version,
-             uuid = get_priv_env(x)$m_log$uuid,
+             uuid = get_priv_env(x)$uuid(),
              object_id = NA_integer_,
              idd_env = list(get_priv_env(x)$idd_env()),
              idf_env = list(get_priv_env(x)$idf_env())
@@ -1990,7 +1990,7 @@ expand_idf_dots_object <- function (idd_env, idf_env, ..., .unique = TRUE, .stri
     # extract IdfObject meta
     extract_idfobj <- function (x) {
         list(version = get_priv_env(get_priv_env(x)$m_parent)$m_version,
-             uuid = get_priv_env(get_priv_env(x)$m_parent)$m_log$uuid,
+             uuid = get_priv_env(get_priv_env(x)$m_parent)$uuid(),
              object_id = get_priv_env(x)$m_object_id,
              idd_env = list(get_priv_env(x)$idd_env()),
              idf_env = list(get_priv_env(x)$idf_env())

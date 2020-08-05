@@ -7,9 +7,6 @@ IdfGeometry <- R6Class("IdfGeometry", cloneable = FALSE,
 
             # extract geometry surfaces
             private$m_geometry <- extract_geometry(private$m_parent)
-
-            # save uuid
-            private$m_log$parent_uuid <- get_priv_env(private$m_parent)$m_log$uuid
         },
 
         vertices = function ()

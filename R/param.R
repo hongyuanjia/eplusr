@@ -59,15 +59,14 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
             private$m_seed <- idf
 
             # log if the input idf has been changed
-            private$m_log <- new.env(parent = emptyenv())
+            private$m_log <- new.env(hash = FALSE, parent = emptyenv())
             private$m_log$unsaved <- attr(idf, "sql") || attr(idf, "dict")
 
             if (!is.null(epw)) private$m_epws_path <- get_init_epw(epw)
 
             # save uuid
-            private$m_log$seed_uuid <- get_priv_env(private$m_seed)$m_log$uuid
-
-            private$m_log$uuid <- unique_id()
+            private$log_seed_uuid()
+            private$log_new_uuid()
         },
         # }}}
 
@@ -341,10 +340,11 @@ ParametricJob <- R6::R6Class(classname = "ParametricJob", cloneable = FALSE,
     private = list(
         # PRIVATE FIELDS {{{
         m_seed = NULL,
-        m_idfs = NULL,
-        m_epws_path = NULL,
-        m_job = NULL,
-        m_log = NULL
+        # }}}
+        # PRIVATE FUNCTIONS {{{
+        seed_uuid = function () get_priv_env(private$m_seed)$m_log$uuid,
+        log_seed_uuid = function () private$m_log$seed_uuid <- private$seed_uuid(),
+        cached_seed_uuid = function () private$m_log$seed_uuid
         # }}}
     )
 )
@@ -454,8 +454,9 @@ param_apply_measure <- function (self, private, measure, ..., .names = NULL, .en
     private$m_idfs <- out
 
     # log unique ids
-    private$m_log$idf_uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
-    log_new_uuid(private$m_log)
+    private$log_idf_uuid()
+    private$log_new_uuid()
+    private$m_log$unsaved <- rep(TRUE, length(out))
 
     if (eplusr_option("verbose_info")) {
         if (bare) {
@@ -479,22 +480,21 @@ param_run <- function (self, private, output_dir = NULL, wait = TRUE, force = FA
     }
 
     # check if generated models have been modified outside
-    uuid <- vapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid, character(1))
-    if (any(uuid != private$m_log$idf_uuid)) {
-        warn("warning_param_modified",
-            paste0(
+    uuid <- private$idf_uuid()
+    if (any(i <- uuid != private$cached_idf_uuid())) {
+        warn(paste0(
                 "Some of the parametric models have been modified after created using `$apply_measure()`. ",
                 "Running these models will result in simulation outputs that may be not reproducible. ",
                 "It is recommended to re-apply your original measure using `$apply_measure()` and call `$run()` again. ",
                 "Models that have been modified are listed below:\n",
-                paste0(" # ", seq_along(uuid)[uuid != private$m_log$idf_uuid]," | ",
-                    names(uuid)[uuid != private$m_log$idf_uuid], collapse = "\n"
-                )
-            )
+                paste0(" # ", seq_along(uuid)[i], " | ", names(uuid)[i], collapse = "\n")
+            ),
+            "param_model_modified"
         )
+        private$log_unsaved(which(i))
     }
 
-    log_new_uuid(private$m_log)
+    private$log_new_uuid()
     epgroup_run_models(self, private, output_dir, wait, force, copy_external, echo)
 }
 # }}}
@@ -506,7 +506,7 @@ param_save <- function (self, private, dir = NULL, separate = TRUE, copy_externa
     }
 
     # restore uuid
-    uuid <- vcapply(private$m_idfs, function (idf) get_priv_env(idf)$m_log$uuid)
+    uuid <- private$idf_uuid()
 
     path_idf <- normalizePath(private$m_seed$path(), mustWork = TRUE)
 
@@ -584,7 +584,7 @@ param_print <- function (self, private) {
 #' @export
 `==.ParametricJob` <- function (e1, e2) {
     if (!inherits(e2, "ParametricJob")) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export

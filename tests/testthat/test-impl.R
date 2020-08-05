@@ -1,3 +1,5 @@
+context("Basic Implementation")
+
 # Basic Impl {{{
 test_that("Basic Table Implementation", {
     expect_equal(assert_valid_type("a"), "a")
@@ -76,6 +78,7 @@ test_that("Basic Table Implementation", {
 
     # log {{{
     log <- new.env(parent = emptyenv())
+    log$unsaved <- NA
 
     expect_silent(log_new_uuid(log))
     expect_equal(nchar(log$uuid), 2 + 1 + 10 + 1 + 10)

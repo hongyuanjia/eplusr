@@ -72,7 +72,7 @@ test_that("Transition Helper", {
     expect_silent(new_idf <- trans_preprocess(idf, 8.9, "Construction"))
     expect_equivalent(new_idf$version(), numeric_version("8.9.0"))
     expect_false(new_idf$is_valid_class("Construction"))
-    expect_false(get_priv_env(new_idf)$m_log$uuid == get_priv_env(idf)$m_log$uuid)
+    expect_false(get_priv_env(new_idf)$uuid() == get_priv_env(idf)$uuid())
     # }}}
 
     # versions {{{

@@ -723,7 +723,20 @@ EplusJob <- R6::R6Class(classname = "EplusJob", cloneable = FALSE,
         m_idf = NULL,
         m_epw_path = NULL,
         m_job = NULL,
-        m_log = NULL
+        m_log = NULL,
+        # }}}
+
+        # PRIVATE FUNCTIONS {{{
+        uuid = function () private$m_log$uuid,
+        log_new_uuid = function () log_new_uuid(private$m_log),
+
+        seed_uuid = function () get_priv_env(private$m_idf)$m_log$uuid,
+        log_seed_uuid = function () private$m_log$seed_uuid <- get_priv_env(private$m_idf)$m_log$uuid,
+        cached_seed_uuid = function () private$m_log$seed_uuid,
+
+        is_unsaved = function () private$m_log$unsaved,
+        log_saved = function () log_saved(private$m_log),
+        log_unsaved = function () log_unsaved(private$m_log)
         # }}}
     )
 )
@@ -774,13 +787,12 @@ job_initialize <- function (self, private, idf, epw) {
     if (!is.null(epw)) private$m_epw_path <- get_init_epw(epw)
 
     # log if the input idf has been changed
-    private$m_log <- new.env(parent = emptyenv())
+    private$m_log <- new.env(hash = FALSE, parent = emptyenv())
     private$m_log$unsaved <- attr(private$m_idf, "sql") || attr(private$m_idf, "dict")
 
     # save uuid
-    private$m_log$seed_uuid <- get_priv_env(private$m_idf)$m_log$uuid
-
-    private$m_log$uuid <- unique_id()
+    private$log_seed_uuid()
+    private$log_new_uuid()
 }
 # }}}
 # job_version {{{
@@ -803,7 +815,7 @@ job_path <- function (self, private, type = c("all", "idf", "epw")) {
 job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
                      echo = wait, copy_external = FALSE) {
     # stop if idf object has been changed accidentally
-    if (!identical(get_priv_env(private$m_idf)$m_log$uuid, private$m_log$seed_uuid)) {
+    if (!identical(private$seed_uuid(), private$cached_seed_uuid())) {
         abort(paste0("The Idf has been modified after job was created. ",
             "Running this Idf will result in simulation outputs that may be not reproducible.",
             "Please recreate the job using new Idf and then run it."
@@ -829,9 +841,9 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
     }
 
     # if necessary, resave the model
-    if (private$m_log$unsaved || !is.null(dir)) {
+    if (private$is_unsaved() || !is.null(dir)) {
         path_idf <- private$m_idf$save(path_idf, overwrite = TRUE, copy_external = copy_external)
-        log_saved(private$m_log)
+        private$log_saved()
     }
 
     # when no epw is given, at least one design day object should exists
@@ -873,7 +885,7 @@ job_run <- function (self, private, epw, dir = NULL, wait = TRUE, force = FALSE,
 
     if (wait) private$m_log$end_time <- Sys.time()
 
-    log_new_uuid(private$m_log)
+    private$log_new_uuid()
     self
 }
 # }}}
@@ -956,7 +968,7 @@ job_status <- function (self, private) {
     }
 
     status$changed_after <- FALSE
-    if (!identical(private$m_log$seed_uuid, get_priv_env(private$m_idf)$m_log$uuid)) {
+    if (!identical(private$cached_seed_uuid(), private$seed_uuid())) {
         status$changed_after <- TRUE
     }
 
@@ -1167,7 +1179,7 @@ format.EplusSql <- function (x, ...) {
 #' @export
 `==.EplusJob` <- function (e1, e2) {
     if (!inherits(e2, "EplusJob")) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export

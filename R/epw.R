@@ -1250,23 +1250,36 @@ Epw <- R6::R6Class(classname = "Epw",
     ),
 
     private = list(
+        # PRIVATE FIELDS {{{
         m_path = NULL,
         m_idd = NULL,
         m_idf_env = NULL,
         m_data = NULL,
         m_log = NULL,
+        # }}}
 
-        idd_env = function () {
-            get_priv_env(private$m_idd)$m_idd_env
+        # PRIVATE FUNCTIONS {{{
+        uuid = function () private$m_log$uuid,
+        log_new_uuid = function () log_new_uuid(private$m_log),
+
+        log_saved = function () log_saved(private$m_log),
+        log_unsaved = function () log_unsaved(private$m_log),
+
+        log_new_order = function (id) log_new_order(private$m_log, id),
+        log_add_order = function (id) log_add_order(private$m_log, id),
+        log_del_order = function (id) log_del_order(private$m_log, id),
+
+        idd_env = function () get_priv_env(private$m_idd)$m_idd_env,
+        idf_env = function () private$m_idf_env,
+
+        update_idf_env = function (lst) {
+            private$m_idf_env$object <- lst$object
+            private$m_idf_env$value <- lst$value
+            private$m_idf_env$reference <- lst$reference
         },
 
-        idf_env = function () {
-            private$m_idf_env
-        },
-
-        deep_clone = function (name, value) {
-            epw_deep_clone(self, private, name, value)
-        }
+        deep_clone = function (name, value) epw_deep_clone(self, private, name, value)
+        # }}}
     )
 )
 
@@ -1567,8 +1580,8 @@ epw_comment1 <- function (self, private, comment) {
 
     assert_string(comment)
     private$idf_env()$value[J(val$value_id), on = "value_id", value_chr := comment]
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_unsaved()
+    private$log_new_uuid()
 
     comment
 }
@@ -1786,8 +1799,8 @@ epw_purge <- function (self, private) {
     } else {
         purged <- purge_epw_data_redundant(private$m_data, private$idf_env(), private$m_log$matched)
         if (nrow(purged$data) != nrow(private$m_data)) {
-            log_unsaved(private$m_log)
-            log_new_uuid(private$m_log)
+            private$log_unsaved()
+            private$log_new_uuid()
         }
         private$m_data <- purged$data
         private$m_log$matched <- purged$matched
@@ -1823,7 +1836,7 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
     lst$data <- epw_align_data_status(self, private, lst$data, lst$period)
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
@@ -1841,8 +1854,8 @@ epw_add <- function (self, private, data, realyear = FALSE, name = NULL,
         cli::cat_rule()
     }
 
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_unsaved()
+    private$log_new_uuid()
     private$m_log$purged <- FALSE
     invisible(self)
 }
@@ -1857,7 +1870,7 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
 
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
@@ -1875,8 +1888,8 @@ epw_set <- function (self, private, data, realyear = FALSE, name = NULL,
         cli::cat_rule()
     }
 
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_unsaved()
+    private$log_new_uuid()
     invisible(self)
 }
 # }}}
@@ -1888,7 +1901,7 @@ epw_del <- function (self, private, period) {
 
     private$m_data <- lst$data
     private$m_log$matched <- lst$matched
-    idf_update_idf_env(self, private, lst$header)
+    private$update_idf_env(lst$header)
 
     if (in_verbose()) {
         cli::cat_rule("Info", col = "green")
@@ -1906,8 +1919,8 @@ epw_del <- function (self, private, period) {
         cli::cat_rule()
     }
 
-    log_unsaved(private$m_log)
-    log_new_uuid(private$m_log)
+    private$log_unsaved()
+    private$log_new_uuid()
     invisible(self)
 }
 # }}}
@@ -1946,7 +1959,7 @@ epw_save <- function (self, private, path = NULL, overwrite = FALSE, purge = FAL
 
     # update path
     private$m_path <- path
-    log_saved(private$m_log)
+    private$log_saved()
     invisible(path)
 }
 # }}}
@@ -1990,7 +2003,7 @@ format.Epw <- function (x, ...) {
 #' @export
 `==.Epw` <- function (e1, e2) {
     if (!is_epw(e2)) return(FALSE)
-    identical(get_priv_env(e1)$m_log$uuid, get_priv_env(e2)$m_log$uuid)
+    identical(get_priv_env(e1)$uuid(), get_priv_env(e2)$uuid())
 }
 
 #' @export

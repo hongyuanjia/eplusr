@@ -78,7 +78,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
                 private$m_parent <- use_idd(parent)
             }
 
-            assert_vector(class, null.ok = FALSE)
+            assert_valid_type(class, len = 1L)
             private$m_class_id <- get_idd_class(private$idd_env(), class, underscore = TRUE)$class_id
         },
         # }}}
@@ -1413,9 +1413,7 @@ IddObject <- R6::R6Class(classname = "IddObject", cloneable = FALSE,
         # }}}
 
         # PRIVATE FUNCTIONS {{{
-        idd_env = function () {
-            .subset2(get_priv_env(private$m_parent), "m_idd_env")
-        }
+        idd_env = function () .subset2(get_priv_env(private$m_parent), "m_idd_env")
         # }}}
     )
 )
@@ -1498,6 +1496,7 @@ iddobj_add_extensible_group <- function (self, private, num) {
 
     iddenv <- get_priv_env(private$m_parent)$m_idd_env
     iddenv <- add_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
+    get_priv_env(private$m_parent)$log_new_uuid()
 
     verbose_info(num, " extensible group(s) added")
 
@@ -1510,6 +1509,7 @@ iddobj_del_extensible_group <- function (self, private, num) {
 
     iddenv <- get_priv_env(private$m_parent)$m_idd_env
     iddenv <- del_idd_extensible_group(private$idd_env(), private$m_class_id, num, strict = TRUE)
+    get_priv_env(private$m_parent)$log_new_uuid()
 
     verbose_info(num, " extensible group(s) deleted")
 
@@ -1899,8 +1899,8 @@ str.IddObject <- function (object, brief = FALSE, ...) {
 `==.IddObject` <- function (e1, e2) {
     if (!is_iddobject(e2)) return(FALSE)
     identical(
-        get_priv_env(get_priv_env(e1)$m_parent)$m_log$uuid,
-        get_priv_env(get_priv_env(e2)$m_parent)$m_log$uuid
+        get_priv_env(get_priv_env(e1)$m_parent)$uuid(),
+        get_priv_env(get_priv_env(e2)$m_parent)$uuid()
     ) &&
     identical(get_priv_env(e1)$m_class_id, get_priv_env(e2)$m_class_id)
 }
