@@ -140,7 +140,8 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     # environment periods {{{
     env_periods <- read_sql_table(sql, "EnvironmentPeriods")
     if (!is.null(environment_name)) {
-        ENVIRONMENT_NAME <- unique(stri_trans_tolower(environment_name))
+        assert_character(environment_name, any.missing = FALSE)
+        ENVIRONMENT_NAME <- unique(stri_trans_toupper(environment_name))
         env_periods <- env_periods[J(ENVIRONMENT_NAME), on = "environment_name", nomatch = NULL]
     }
     # }}}
