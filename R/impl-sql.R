@@ -109,6 +109,10 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (!is.null(key_value)) {
         subset_rpvar <- TRUE
         if (is.data.frame(key_value)) {
+            if (!is.null(name)) {
+                warn("'name' will be ignored when 'key_value' is a data.frame.")
+                name <- NULL
+            }
             assert_names(names(key_value), must.include = c("key_value", "name"))
             if (ncol(key_value) > 2) set(key_value, NULL, setdiff(names(key_value), c("key_value", "name")), NULL)
             kv <- unique(key_value)
@@ -119,7 +123,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
             set(kv, NULL, c("key_value_lower", "name_lower"), NULL)
         } else {
             assert_character(key_value, any.missing = FALSE)
-            KEY_VALUE <- stri_trans_tolower(key_value)
+            KEY_VALUE <- unique(stri_trans_tolower(key_value))
             rpvar_dict <- rpvar_dict[J(KEY_VALUE), on = "key_value_lower", nomatch = NULL]
         }
     }
@@ -127,7 +131,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     if (!is.null(name)) {
         subset_rpvar <- TRUE
         assert_character(name, any.missing = FALSE)
-        NAME <- stri_trans_tolower(name)
+        NAME <- unique(stri_trans_tolower(name))
         rpvar_dict <- rpvar_dict[J(NAME), on = "name_lower"]
     }
     set(rpvar_dict, NULL, c("key_value_lower", "name_lower"), NULL)
@@ -136,8 +140,8 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
     # environment periods {{{
     env_periods <- read_sql_table(sql, "EnvironmentPeriods")
     if (!is.null(environment_name)) {
-        ENVIRONMENT_NAME <- environment_name
-        env_periods <- env_periods[J(toupper(unique(ENVIRONMENT_NAME))), on = "environment_name", nomatch = NULL]
+        ENVIRONMENT_NAME <- unique(stri_trans_tolower(environment_name))
+        env_periods <- env_periods[J(ENVIRONMENT_NAME), on = "environment_name", nomatch = NULL]
     }
     # }}}
 
@@ -234,6 +238,7 @@ get_sql_report_data <- function (sql, key_value = NULL, name = NULL, year = NULL
 
     # get input year
     if (!is.null(year)) {
+        year <- assert_count(year, positive = TRUE, coerce = TRUE)
         set(time, NULL, "year", year)
     } else {
         # current year
