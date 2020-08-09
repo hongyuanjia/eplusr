@@ -39,6 +39,7 @@ knitr::knit_hooks$set(output = function(x, options) {
 
 options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
+use_idd(8.8, "auto")
 ```
 
 ## The `Schedule:Compact` class
