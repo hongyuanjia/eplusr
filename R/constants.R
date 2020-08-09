@@ -119,7 +119,8 @@ utils::globalVariables(c(
     "daytype_index", "i.daytype", "i.for", "i.interp", "i.interpolate",
     "i.pair_type", "i.through", "i.type_limits", "index_daytype",
     "index_schedule_value", "interpolate", "pair", "pair_type", "time",
-    "time_rleid", "value_index", "year_day"
+    "time_rleid", "value_index", "year_day", "daytype_split", "i.daytype_split",
+    "i.group_id", "int_idx"
 ))
 # }}}
 # nocov end
