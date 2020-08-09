@@ -133,6 +133,10 @@
   value will be left unchanged (#258).
 * Now `read_idf()` will always make sure all necessary fields are added during
   parsing (#267).
+* `[[.IdfObject` now only accept standard field names. No underscore-style
+  names are allowed.
+* The suffix of automatcially created names in `Idf$dup()` has been changed
+  from `_X` to ` X`.
 
 ## Minor changes
 

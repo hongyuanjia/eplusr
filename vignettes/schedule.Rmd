@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 )
 
 # the default output hook
-hook_output <- knitr::knit_hooks$get('output')
+hook_output = knitr::knit_hooks$get('output')
 knitr::knit_hooks$set(output = function(x, options) {
     if (!is.null(n <- options$out.lines)) {
         x <- unlist(strsplit(x, '\n', fixed = TRUE))
@@ -39,8 +39,9 @@ knitr::knit_hooks$set(output = function(x, options) {
 
 options(crayon.enabled = FALSE)
 options(data.table.print.class = TRUE)
+
 library(eplusr)
-use_idd(8.8, "auto")
+if (!is_avail_eplus(8.8)) install_eplus(8.8)
 ```
 
 # The `Schedule:Compact` class

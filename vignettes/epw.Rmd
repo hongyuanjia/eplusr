@@ -1,0 +1,44 @@
+---
+title: "Work with weather files"
+author: "Hongyuan Jia"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    df_print: "paged"
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Work with weather files}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    screenshot.force = FALSE,
+    fig.align = "center"
+)
+
+# the default output hook
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+    if (!is.null(n <- options$out.lines)) {
+        x <- unlist(strsplit(x, '\n', fixed = TRUE))
+        if (length(x) > n) {
+            # truncate the output
+            x <- c(head(x, n), '....', '')
+        } else {
+            x <- c(x, "")
+        }
+        x <- paste(x, collapse = '\n') # paste first n lines together
+    }
+    hook_output(x, options)
+})
+
+options(crayon.enabled = FALSE)
+options(data.table.print.class = TRUE)
+
+library(eplusr)
+if (!is_avail_eplus(8.8)) install_eplus(8.8)
+```
